@@ -25,13 +25,14 @@ export async function dev(
     }
   };
   await cycle();
-  ctx.logger.info("Watching src/ and the project manifests. Press Ctrl+C to stop.");
 
+  // Start watching before announcing it, so a save made right after the message is never missed.
   const watchers = [
     Deno.watchFs(join(ctx.root, "src"), { recursive: true }),
     Deno.watchFs(ctx.root, { recursive: false }),
   ];
   options.signal?.addEventListener("abort", () => watchers.forEach((watcher) => watcher.close()));
+  ctx.logger.info("Watching src/ and the project manifests. Press Ctrl+C to stop.");
 
   let timer: ReturnType<typeof setTimeout> | undefined;
   let running = Promise.resolve();
