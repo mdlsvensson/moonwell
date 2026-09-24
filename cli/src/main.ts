@@ -2,6 +2,7 @@ import { parseArgs } from "@std/cli/parse-args";
 import { join } from "@std/path";
 import { build } from "./commands/build.ts";
 import { check } from "./commands/check.ts";
+import { dev } from "./commands/dev.ts";
 import { init } from "./commands/init.ts";
 import { setup } from "./commands/setup.ts";
 import { test } from "./commands/test.ts";
@@ -64,6 +65,9 @@ export async function main(
         break;
       case "test":
         await test(ctx, stage);
+        break;
+      case "dev":
+        await dev(ctx);
         break;
       case "check":
         await check(ctx);
