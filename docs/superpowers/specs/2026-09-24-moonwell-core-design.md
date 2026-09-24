@@ -121,7 +121,7 @@ If the JSR scope `@moonwell` is unavailable, the CLI is published as
 
 ```pkl
 map { folder: String = "map.w3x"; entry: String = "src/main.yue" }
-output { folder: String = "dist/bin"; minify: Boolean = false }
+build { folder: String = "dist/bin"; minify: Boolean = false }   // not "output": every Pkl module already has a built-in `output`
 launch { gameExecutable: String?; args: Listing<String> = new { "-launch"; "-windowmode"; "windowed" } }
 yue { version: String = "0.34.2"; path: String? }   // path: use a local compiler build
 settings: MapSettings = new {}
@@ -152,7 +152,7 @@ Map-project tasks (all `deno run -A jsr:@moonwell/cli@<ver> <command>`):
 | --- | --- |
 | `init <dir>` | Scaffold §3.2 into an empty or new directory, then run `pkl project resolve`. |
 | `setup` | Install the pinned `yue` into the user cache. Run implicitly by build/test/dev/check. |
-| `build [--entry f] [--minify]` | Full pipeline (§5) → `dist/bin/<map folder name>` (a packed `.w3x`). |
+| `build [--entry f] [--minify]` | Full pipeline (§5) → `<build.folder>/<map folder name>` (a packed `.w3x`, default `dist/bin`). |
 | `test [--entry f]` | Pipeline without packing; launch the game on the staged folder map. |
 | `dev` | Watch `src/`, `objects/`, `assets/`, `moonwell*.pkl`. Recompile changed Yue files, re-evaluate Pkl, regenerate `objects.yue`, print errors. No hot reload. |
 | `check` | Compile all Yue, resolve the require graph, evaluate and validate the manifest, objects, settings and assets (read-only). No game and no packing. |

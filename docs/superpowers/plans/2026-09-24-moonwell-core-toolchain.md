@@ -599,7 +599,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 **Interfaces:**
 - Produces:
-  - the Pkl module `@moonwell/Project.pkl`, with properties `map { folder; entry }`, `output { folder; minify }`, `launch { gameExecutable?; args }`, `yue { version; path? }`;
+  - the Pkl module `@moonwell/Project.pkl`, with properties `map { folder; entry }`, `build { folder; minify }`, `launch { gameExecutable?; args }`, `yue { version; path? }`;
   - its JSON rendering. Null properties are omitted; Listings become arrays.
 
 - [ ] **Step 1: Write the failing Pkl test**
@@ -615,8 +615,8 @@ facts {
   ["defaults"] {
     Project.map.folder == "map.w3x"
     Project.map.entry == "src/main.yue"
-    Project.output.folder == "dist/bin"
-    Project.output.minify == false
+    Project.build.folder == "dist/bin"
+    Project.build.minify == false
     Project.launch.gameExecutable == null
     Project.launch.args.toList() == List("-launch", "-windowmode", "windowed")
     Project.yue.version == "0.34.2"
@@ -675,7 +675,7 @@ class MapConfig {
   entry: String(startsWith("src/"), endsWith(".yue")) = "src/main.yue"
 }
 
-class OutputConfig {
+class BuildConfig {
   /// Folder, relative to the project root, that receives the packed `.w3x`.
   folder: String = "dist/bin"
 
@@ -700,7 +700,7 @@ class YueConfig {
 }
 
 map: MapConfig = new {}
-output: OutputConfig = new {}
+build: BuildConfig = new {}
 launch: LaunchConfig = new {}
 yue: YueConfig = new {}
 ```
@@ -755,7 +755,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
     interface Project {
       root: string;
       map: { folder: string; entry: string };
-      output: { folder: string; minify: boolean };
+      build: { folder: string; minify: boolean };
       launch: { gameExecutable: string | null; args: string[] };
       yue: { version: string; path: string | null };
     }
@@ -784,7 +784,7 @@ import {
 
 const FULL = {
   map: { folder: "map.w3x", entry: "src/main.yue" },
-  output: { folder: "dist/bin", minify: false },
+  build: { folder: "dist/bin", minify: false },
   launch: { args: ["-launch"] },
   yue: { version: "0.34.2" },
 };
@@ -794,7 +794,7 @@ Deno.test("parseProject maps omitted nullable fields to null", () => {
   assertEquals(project, {
     root: "/p",
     map: { folder: "map.w3x", entry: "src/main.yue" },
-    output: { folder: "dist/bin", minify: false },
+    build: { folder: "dist/bin", minify: false },
     launch: { gameExecutable: null, args: ["-launch"] },
     yue: { version: "0.34.2", path: null },
   });
@@ -897,7 +897,7 @@ import { VERSION } from "../version.ts";
 export interface Project {
   root: string;
   map: { folder: string; entry: string };
-  output: { folder: string; minify: boolean };
+  build: { folder: string; minify: boolean };
   launch: { gameExecutable: string | null; args: string[] };
   yue: { version: string; path: string | null };
 }
@@ -995,13 +995,13 @@ export function parseProject(root: string, value: unknown, file: string): Projec
 
   const data = record(value, "the manifest");
   const map = record(data.map, "map");
-  const output = record(data.output, "output");
+  const buildConfig = record(data.build, "build");
   const launch = record(data.launch, "launch");
   const yue = record(data.yue, "yue");
   return {
     root,
     map: { folder: string(map.folder, "map.folder"), entry: string(map.entry, "map.entry") },
-    output: { folder: string(output.folder, "output.folder"), minify: boolean(output.minify, "output.minify") },
+    build: { folder: string(buildConfig.folder, "build.folder"), minify: boolean(buildConfig.minify, "build.minify") },
     launch: {
       gameExecutable: nullableString(launch.gameExecutable, "launch.gameExecutable"),
       args: strings(launch.args, "launch.args"),
@@ -3427,7 +3427,7 @@ import { ensureYue } from "./yue/install.ts";
 export interface StageOptions {
   /** Entry file overriding map.entry, relative to the project root. */
   entry?: string;
-  /** Overrides output.minify when set. */
+  /** Overrides build.minify when set. */
   minify?: boolean;
 }
 
@@ -3452,7 +3452,7 @@ export async function compileProject(
   const output = await compileSources({
     yue,
     root: ctx.root,
-    minify: options.minify ?? project.output.minify,
+    minify: options.minify ?? project.build.minify,
     run: ctx.run,
   });
   const entry = entryModuleName(options.entry ?? project.map.entry);
@@ -3507,11 +3507,11 @@ import { loadProject } from "../project/project.ts";
 import { removeIfExists, toPosix } from "../shared/fs.ts";
 import { withBuildLock } from "../shared/lock.ts";
 
-/** Builds <output.folder>/<map.folder>; a failed build leaves no archive behind. */
+/** Builds <build.folder>/<map.folder>; a failed build leaves no archive behind. */
 export function build(ctx: CommandContext, options: StageOptions = {}): Promise<string> {
   return withBuildLock(join(ctx.root, "dist"), async () => {
     const project = await loadProject(ctx.root, ctx.run);
-    const output = join(ctx.root, project.output.folder, project.map.folder);
+    const output = join(ctx.root, project.build.folder, project.map.folder);
     await removeIfExists(output);
     try {
       const stage = await prepareStage(ctx, project, options);
@@ -3604,7 +3604,7 @@ Usage: moonwell <command> [options]
 Commands:
   init <dir> [--link]            Create a project (--link: use this local Moonwell checkout)
   setup                          Install the pinned YueScript compiler
-  build [--entry f] [--minify]   Build <output.folder>/<map.folder>
+  build [--entry f] [--minify]   Build <build.folder>/<map.folder>
   test [--entry f]               Stage the map and launch Warcraft III
   dev                            Watch sources and report errors on save
   check                          Compile and validate without building a map
@@ -3813,7 +3813,7 @@ amends "@moonwell/Project.pkl"
 //   entry = "src/main.yue"    // gameplay entry point
 // }
 
-// output {
+// build {
 //   folder = "dist/bin"
 //   minify = true
 // }
