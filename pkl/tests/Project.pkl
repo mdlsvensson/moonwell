@@ -1,14 +1,20 @@
 amends "pkl:test"
 
+import "pkl:json"
 import "pkl:test" as t
 import "../Project.pkl"
+import "fixtures/project.pkl" as fixture
+
+/// The fixture rendered through its module output, as `pkl eval -f json` does.
+local fixtureJson = (fixture.output) { renderer = new JsonRenderer {} }.text
+local parsed = new json.Parser {}.parse(fixtureJson) as Dynamic
 
 facts {
   ["defaults"] {
     Project.map.folder == "map.w3x"
     Project.map.entry == "src/main.yue"
-    Project.output.folder == "dist/bin"
-    Project.output.minify == false
+    Project.build.folder == "dist/bin"
+    Project.build.minify == false
     Project.launch.gameExecutable == null
     Project.launch.args.toList() == List("-launch", "-windowmode", "windowed")
     Project.yue.version == "0.34.2"
@@ -26,5 +32,16 @@ facts {
   }
   ["yue version must be semver"] {
     t.catch(() -> (Project) { yue { version = "latest" } }.yue.version).contains("matches")
+  }
+  ["an amending project renders as JSON"] {
+    parsed.map.folder == "hero.w3x"
+    parsed.map.entry == "src/main.yue"
+    parsed.build.folder == "dist/bin"
+    parsed.build.minify == false
+    parsed.launch.args is Listing
+    parsed.launch.args.toList() == List("-launch", "-windowmode", "windowed")
+    !parsed.launch.hasProperty("gameExecutable")
+    parsed.yue.version == "0.34.2"
+    !parsed.yue.hasProperty("path")
   }
 }

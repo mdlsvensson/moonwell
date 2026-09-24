@@ -12,7 +12,7 @@ class MapConfig {
   entry: String(startsWith("src/"), endsWith(".yue")) = "src/main.yue"
 }
 
-class OutputConfig {
+class BuildConfig {
   /// Folder, relative to the project root, that receives the packed `.w3x`.
   folder: String = "dist/bin"
 
@@ -37,6 +37,6 @@ class YueConfig {
 }
 
 map: MapConfig = new {}
-output: OutputConfig = new {}
+build: BuildConfig = new {}
 launch: LaunchConfig = new {}
 yue: YueConfig = new {}
