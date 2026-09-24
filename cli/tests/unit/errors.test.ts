@@ -2,7 +2,11 @@ import { assertEquals, assertStringIncludes } from "@std/assert";
 import { formatError, MoonwellError } from "../../src/shared/errors.ts";
 
 Deno.test("formatError prints file, line, message and hint", () => {
-  const error = new MoonwellError("unexpected symbol", { file: "src/main.yue", line: 3, hint: "check the indentation" });
+  const error = new MoonwellError("unexpected symbol", {
+    file: "src/main.yue",
+    line: 3,
+    hint: "check the indentation",
+  });
   assertEquals(formatError(error), "error: src/main.yue:3 › unexpected symbol\nhint: check the indentation");
 });
 

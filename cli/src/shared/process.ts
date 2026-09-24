@@ -19,7 +19,10 @@ export const runProcess: Runner = async (command, args, options = {}) => {
     output = await new Deno.Command(command, { args, cwd: options.cwd, stdout: "piped", stderr: "piped" }).output();
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) {
-      throw new MoonwellError(`Cannot run '${command}': command not found.`, { hint: options.notFoundHint, cause: error });
+      throw new MoonwellError(`Cannot run '${command}': command not found.`, {
+        hint: options.notFoundHint,
+        cause: error,
+      });
     }
     throw error;
   }
