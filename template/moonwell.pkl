@@ -1,0 +1,26 @@
+// Moonwell project manifest. Schema and documentation: @moonwell/Project.pkl
+// Uncomment and edit what you need; everything else uses the defaults.
+//
+// Machine-specific values belong in moonwell.local.pkl (git-ignored):
+//
+//   amends "moonwell.pkl"
+//   launch { gameExecutable = "C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe" }
+amends "@moonwell/Project.pkl"
+
+// map {
+//   folder = "map.w3x"        // World Editor map folder under maps/
+//   entry = "src/main.yue"    // gameplay entry point
+// }
+
+// build {
+//   folder = "dist/bin"
+//   minify = true
+// }
+
+// launch {
+//   args { "-launch"; "-windowmode"; "windowed" }
+// }
+
+// yue {
+//   version = "0.34.2"
+// }

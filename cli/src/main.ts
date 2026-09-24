@@ -2,10 +2,11 @@ import { parseArgs } from "@std/cli/parse-args";
 import { join } from "@std/path";
 import { build } from "./commands/build.ts";
 import { check } from "./commands/check.ts";
+import { init } from "./commands/init.ts";
 import { setup } from "./commands/setup.ts";
 import { test } from "./commands/test.ts";
 import { createContext } from "./context.ts";
-import { formatError } from "./shared/errors.ts";
+import { formatError, MoonwellError } from "./shared/errors.ts";
 import { createLogger } from "./shared/log.ts";
 import { VERSION } from "./version.ts";
 
@@ -49,6 +50,12 @@ export async function main(
   const stage = { entry: flags.entry, minify: flags.minify ? true : undefined };
   try {
     switch (command) {
+      case "init": {
+        const dir = flags._[1] === undefined ? undefined : String(flags._[1]);
+        if (dir === undefined) throw new MoonwellError("init needs a directory.", { hint: "moonwell init my-map" });
+        await init(dir, ctx, { link: flags.link });
+        break;
+      }
       case "setup":
         await setup(ctx);
         break;

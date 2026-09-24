@@ -1,5 +1,5 @@
 {
-  "workspace": ["./cli"],
+  "workspace": ["./cli", "./template"],
   "nodeModulesDir": "none",
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.13",

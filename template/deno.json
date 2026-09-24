@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "build": "deno run -A ../cli/src/main.ts build",
+    "test": "deno run -A ../cli/src/main.ts test",
+    "dev": "deno run -A ../cli/src/main.ts dev",
+    "check": "deno run -A ../cli/src/main.ts check",
+    "setup": "deno run -A ../cli/src/main.ts setup"
+  }
+}
