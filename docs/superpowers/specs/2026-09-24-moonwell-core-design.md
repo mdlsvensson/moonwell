@@ -57,7 +57,7 @@ Checked on 2026-09-24:
 
 ```
 moonwell/
-  deno.json                 workspace ["cli"]; repo tasks (test, lint, fmt, gen*, release)
+  deno.json                 workspace ["cli", "template"]; repo tasks (test, lint, fmt, gen*, release)
   cli/                      JSR package @moonwell/cli
     deno.json               name, version, exports "./src/main.ts", publish include/exclude
     src/main.ts             argument parsing and command dispatch
