@@ -4,7 +4,7 @@
 // Machine-specific values belong in moonwell.local.pkl (git-ignored):
 //
 //   amends "moonwell.pkl"
-//   launch { gameExecutable = "C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe" }
+//   launch { gameExecutable = "C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe" }
 amends "@moonwell/Project.pkl"
 
 // map {
