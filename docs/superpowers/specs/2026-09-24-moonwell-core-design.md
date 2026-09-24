@@ -19,7 +19,7 @@ shares nothing at runtime.
 ### Hard constraints
 
 - **No Node.js.** No `package.json`, no `node_modules`, no `npm:` specifiers, and no npm
-  packages in map projects or in the Moonwell repo. Deno with `nodeModulesDir: "none"`. Only
+  packages in map projects or in the Moonwell repo. The repo root sets `nodeModulesDir: "none"`. Only
   `jsr:` imports (`@std/*`).
 - Gameplay code is YueScript compiled to Lua 5.3, which is the Lua version Warcraft III runs.
 - Pkl is required for anything that reads project configuration.
@@ -97,7 +97,7 @@ Generated modules are committed, and a test fails if they are stale.
 
 ```
 my-map/
-  deno.json                tasks → jsr:@moonwell/cli@<ver>; nodeModulesDir "none"
+  deno.json                tasks → jsr:@moonwell/cli@<ver> (no package.json, so Deno creates no node_modules)
   PklProject               dependency on package moonwell@<ver>
   PklProject.deps.json     resolved + checksummed (committed)
   moonwell.pkl             project manifest (amends "@moonwell/Project.pkl"), commented templates
