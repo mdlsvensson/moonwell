@@ -84,9 +84,11 @@ export async function compileSources(options: {
     });
   }
 
+  const modules = new Set(sources.map((file) => file.slice(0, -4).split("/").join(".")));
   return {
     outDir,
     load(name: string): CompiledModule | undefined {
+      if (!modules.has(name)) return undefined;
       const relative = name.split(".").join("/");
       try {
         return {

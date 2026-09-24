@@ -37,11 +37,17 @@ Deno.test("compileSources compiles modules and loads them by dotted name", async
   assertStringIncludes(main.source, 'require("util.math")');
   assertEquals(output.load("util.math")?.sourcePath, "src/util/math.yue");
   assertEquals(output.load("missing"), undefined);
+  assertEquals(output.load("util/math"), undefined);
+  assertEquals(output.load("Util.Math"), undefined);
 });
 
 Deno.test("compileSources only recompiles changed files and removes deleted outputs", async () => {
   const yue = await testYue();
-  const root = await project({ "src/a.yue": "export x = 1\n", "src/b.yue": "export y = 2\n" });
+  const root = await project({
+    "src/a.yue": "export x = 1\n",
+    "src/b.yue": "export y = 2\n",
+    "src/c.yue": "export z = 4\n",
+  });
   await compileSources({ yue, root, minify: false });
 
   await Deno.writeTextFile(join(root, "src/a.yue"), "export x = 3\n");
@@ -53,9 +59,13 @@ Deno.test("compileSources only recompiles changed files and removes deleted outp
   assertStringIncludes(output.load("a")!.source, "3");
   assertEquals(await exists(join(root, "dist/stage/lua/b.lua")), false);
 
+  const unchanged = countingRunner();
+  await compileSources({ yue, root, minify: false, run: unchanged.run });
+  assertEquals(unchanged.compiled.length, 0);
+
   const minified = countingRunner();
   await compileSources({ yue, root, minify: true, run: minified.run });
-  assertEquals(minified.compiled.length, 1);
+  assertEquals(minified.compiled.length, 2);
 });
 
 Deno.test("compileSources reports syntax errors with file and line", async () => {
