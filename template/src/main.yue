@@ -1,0 +1,7 @@
+import "moonwell" as mw
+
+mw.on_main ->
+  print "Moonwell is running."
+  unit = CreateUnit Player(0), FourCC("hfoo"), 0, 0, 270
+  TimerStart CreateTimer!, 1.0, true, ->
+    SetUnitColor unit, ConvertPlayerColor GetRandomInt 0, 23
