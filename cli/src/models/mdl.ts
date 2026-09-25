@@ -73,6 +73,7 @@ export function readMdlPaths(text: string, file: string): ModelPath[] {
   const paths: ModelPath[] = [];
   const stack: Block[] = [];
   let statement: Token[] = [];
+  let hasHeader = false; // a top-level Version or Model block, which every exporter writes
   const finishStatement = () => {
     const block = stack.at(-1);
     const [key, value] = statement;
@@ -87,6 +88,7 @@ export function readMdlPaths(text: string, file: string): ModelPath[] {
     if (token.type === "{") {
       const name = statement[0]?.type === "word" ? statement[0].value : "";
       statement = [];
+      if (stack.length === 0 && (name === "Version" || name === "Model")) hasHeader = true;
       stack.push({ name, strings: new Map(), numbers: new Map(), flags: new Set() });
     } else if (token.type === "}") {
       finishStatement();
@@ -107,5 +109,6 @@ export function readMdlPaths(text: string, file: string): ModelPath[] {
     }
   }
   if (stack.length > 0) throw modelError(file, `the ${stack.at(-1)!.name || "unnamed"} block is never closed`);
+  if (!hasHeader) throw modelError(file, "it has no Version or Model block");
   return paths;
 }

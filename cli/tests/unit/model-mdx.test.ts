@@ -75,8 +75,10 @@ Deno.test("readMdxPaths rejects damaged files with a MoonwellError naming the fi
     mdx(chunk("ATCH", setU32(record, 0, 4 + 96))), // a record with no room for its path
   ];
   for (const bytes of damaged) {
-    const error = assertThrows(() => readMdxPaths(bytes, "assets/Knight.mdx"), MoonwellError, "not a readable model");
+    const error = assertThrows(() => readMdxPaths(bytes, "assets/Knight.mdx"), MoonwellError, "Not a readable model");
     assertEquals(error.file, "assets/Knight.mdx");
+    assertEquals(error.message.includes("Knight.mdx"), false, "the file is printed once, from error.file");
+    assertEquals(/\ba [A-Z]{4}\b/.test(error.message), false, `reads naturally: ${error.message}`);
   }
 });
 

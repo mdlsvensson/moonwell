@@ -37,13 +37,17 @@ export function readMdxPaths(bytes: Uint8Array, file: string): ModelPath[] {
   ) => {
     let offset = start;
     while (offset < end) {
-      if (offset + 4 > end) fail(`a ${tag} record is cut off`);
+      if (offset + 4 > end) fail(`the ${tag} chunk has a record that is cut off`);
       const recordEnd = offset + u32(offset);
-      if (recordEnd < offset + 4 + NODE_FIXED_SIZE || recordEnd > end) fail(`a ${tag} record has an invalid size`);
+      if (recordEnd < offset + 4 + NODE_FIXED_SIZE || recordEnd > end) {
+        fail(`the ${tag} chunk has a record with an invalid size`);
+      }
       const nodeSize = u32(offset + 4);
-      if (nodeSize < NODE_FIXED_SIZE || offset + 4 + nodeSize > recordEnd) fail(`a ${tag} node has an invalid size`);
+      if (nodeSize < NODE_FIXED_SIZE || offset + 4 + nodeSize > recordEnd) {
+        fail(`the ${tag} chunk has a node with an invalid size`);
+      }
       const pathStart = offset + 4 + nodeSize + pathOffset;
-      if (pathStart + PATH_SIZE > recordEnd) fail(`a ${tag} record is too small for its path`);
+      if (pathStart + PATH_SIZE > recordEnd) fail(`the ${tag} chunk has a record too small for its path`);
       add(u32(offset + 4 + NODE_FLAGS_OFFSET), text(pathStart, PATH_SIZE));
       offset = recordEnd;
     }
