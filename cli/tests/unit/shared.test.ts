@@ -4,7 +4,14 @@ import { join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { createLogger } from "../../src/shared/log.ts";
 import { runProcess } from "../../src/shared/process.ts";
-import { listFiles, removeIfExists, replaceDir, sha256Hex, writeTextIfChanged } from "../../src/shared/fs.ts";
+import {
+  listFiles,
+  removeFileIfExists,
+  removeIfExists,
+  replaceDir,
+  sha256Hex,
+  writeTextIfChanged,
+} from "../../src/shared/fs.ts";
 import { releaseHeldLocks, withBuildLock } from "../../src/shared/lock.ts";
 import { deflate, deflateRaw, inflate, inflateRaw } from "../../src/shared/compression.ts";
 
@@ -123,4 +130,49 @@ Deno.test("compression round trips; deflate emits a zlib header", async () => {
   assertEquals(zlib[0], 0x78);
   assertEquals(await inflate(zlib), data);
   assertEquals(await inflateRaw(await deflateRaw(data)), data);
+});
+
+/** Holds `path` open without sharing, as a running Warcraft III holds its map, until the returned function is called. */
+async function lockFile(path: string): Promise<() => Promise<void>> {
+  const script = `$h = [System.IO.File]::Open('${path}', 'Open', 'Read', 'None'); 'locked'; [Console]::In.ReadLine()`;
+  const child = new Deno.Command("powershell", {
+    args: ["-NoProfile", "-Command", script],
+    stdin: "piped",
+    stdout: "piped",
+    stderr: "null",
+  }).spawn();
+  const reader = child.stdout.pipeThrough(new TextDecoderStream()).getReader();
+  let seen = "";
+  while (!seen.includes("locked")) {
+    const { value, done } = await reader.read();
+    if (done) throw new Error("the locking process exited early");
+    seen += value;
+  }
+  return async () => {
+    await child.stdin.close();
+    await reader.cancel();
+    await child.status;
+  };
+}
+
+Deno.test({
+  name: "removing a file another program holds open names the file and says to close the game",
+  ignore: Deno.build.os !== "windows",
+  fn: async () => {
+    const dir = await Deno.makeTempDir();
+    const file = join(dir, "map.w3x");
+    await Deno.writeTextFile(file, "archive");
+    const unlock = await lockFile(file);
+    try {
+      for (const remove of [removeFileIfExists, removeIfExists]) {
+        const error = await assertRejects(() => remove(file), MoonwellError, "in use by another program");
+        assertStringIncludes(error.message, file);
+        assertStringIncludes(error.hint ?? "", "Warcraft III");
+      }
+    } finally {
+      await unlock();
+    }
+    await removeFileIfExists(file);
+    assertEquals(await exists(file), false);
+  },
 });
