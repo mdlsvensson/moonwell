@@ -5,6 +5,8 @@
 - Assets: files under `assets/` are imported into builds. The manifest's `assets` block maps them to exact paths and
   excludes files. The `assets:check` and `assets:sync` commands write them into the source map for World Editor, with
   ownership tracking and rollback.
+- `assets:paths` lists the files a model (`.mdx` or `.mdl`) references, and whether the project imports them.
+- `init` creates World Editor's icon folders under `assets/ReplaceableTextures/`.
 
 ## 0.1.0 (2026-09-25)
 
