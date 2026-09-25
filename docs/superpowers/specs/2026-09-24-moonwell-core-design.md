@@ -125,7 +125,7 @@ build { folder: String = "dist/bin"; minify: Boolean = false }   // not "output"
 launch { gameExecutable: String?; args: List<String> = List("-launch", "-windowmode", "windowed") }  // a List, so assigning replaces the default
 yue { version: String = "0.34.2"; path: String? }   // path: use a local compiler build
 settings: MapSettings = new {}
-assets: Assets = new {}
+assets: AssetsConfig = new {}
 objects: Objects = new {}
 ```
 
@@ -188,7 +188,8 @@ Order, shared by `build`, `test` and (partially) `check`:
 2. **Load project** (§3.3).
 3. **Ensure compiler** (§5.1).
 4. **Compile Yue** (§5.2).
-5. **Evaluate data.** Objects, settings and assets from the manifest.
+5. **Evaluate data.** Objects, settings and assets from the manifest. Only the `assets` configuration is read
+   here: the files under `assets/` are collected and applied in step 7, against the staged copy.
 6. **Stage.** Copy `maps/<folder>` into `dist/stage/<folder>` (e.g. `dist/stage/map.w3x`), replacing any previous
    staging. The staged folder keeps the `.w3x` name because the game loads folder maps by that name.
 7. **Apply.** Object data (§6.1), then settings (§6.3), then assets (§6.2) to the staged map.
@@ -373,7 +374,7 @@ content changes. `check` fails if it is stale.
 ### 6.2 Assets
 
 Ported from wc3-dev-framework with the same behavior. Configured in `moonwell.pkl`:
-`assets { paths { ... }; exclude { ... } }`.
+`assets { paths { ... }; exclude = List(...) }`.
 
 - Files under `assets/` import at their relative path with Windows separators. `paths` maps a
   source path to an exact in-map path. `exclude` takes exact files or directory prefixes
