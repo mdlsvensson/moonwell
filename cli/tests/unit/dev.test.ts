@@ -15,6 +15,7 @@ Deno.test("isRelevantChange watches Yue sources and project manifests only", () 
   assertEquals(check("moonwell.pkl"), true);
   assertEquals(check("moonwell.local.pkl"), true);
   assertEquals(check("PklProject"), true);
+  assertEquals(check("assets", "icons", "a.blp"), true);
   assertEquals(check("dist", "stage", "lua", "main.lua"), false);
   assertEquals(check("README.md"), false);
 });

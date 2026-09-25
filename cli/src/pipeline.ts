@@ -1,5 +1,6 @@
 import { exists } from "@std/fs";
 import { join, relative } from "@std/path";
+import { applyAssetPlan, assetLocations, planAssets } from "./assets/plan.ts";
 import { emitBundle, injectBundle } from "./bundle/emit.ts";
 import { resolveGraph } from "./bundle/graph.ts";
 import type { CommandContext } from "./context.ts";
@@ -72,6 +73,11 @@ export async function prepareStage(
       hint: "Close Warcraft III or World Editor if they have dist/stage open, then retry.",
     });
   }
+  // No state file: a build imports into the staged copy only and never changes source-map ownership.
+  const { stateFile } = await assetLocations(ctx.root, project.map.folder);
+  const assets = await planAssets(ctx.root, mapDir, stateFile, project.assets);
+  await applyAssetPlan(assets);
+  if (assets.assets.length > 0) ctx.logger.info(`Imported ${assets.assets.length} asset(s).`);
 
   const scriptPath = join(mapDir, "war3map.lua");
   const scriptLabel = `maps/${project.map.folder}/war3map.lua`;
