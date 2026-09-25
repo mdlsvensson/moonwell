@@ -16,11 +16,16 @@ Deno.test("assets:check plans without writing; assets:sync writes the source map
   const root = await project();
   await Deno.mkdir(join(root, "assets", "icons"), { recursive: true });
   await Deno.writeTextFile(join(root, "assets", "icons", "a.blp"), "icon");
-  const ctx = createContext(root, silentLogger());
+  const logger = silentLogger();
+  const ctx = createContext(root, logger);
   const map = join(root, "maps", "map.w3x");
 
   const checked = await assets(ctx, "check");
   assertEquals(checked.assets.map((asset) => asset.target), ["icons/a.blp"]);
+  assertEquals(logger.lines.filter((line) => /^(write|delete) /.test(line)), [
+    "write maps/map.w3x/icons/a.blp",
+    "write maps/map.w3x/war3map.imp",
+  ]);
   assertEquals(await exists(join(map, "icons", "a.blp")), false);
   assertEquals(await exists(join(root, ".asset-state")), false);
 

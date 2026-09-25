@@ -1,9 +1,10 @@
 import { exists } from "@std/fs";
-import { join } from "@std/path";
+import { join, relative } from "@std/path";
 import { applyAssetPlan, assetLocations, type AssetPlan, planAssets } from "../assets/plan.ts";
 import type { CommandContext } from "../context.ts";
 import { loadProject } from "../project/project.ts";
 import { MoonwellError } from "../shared/errors.ts";
+import { toPosix } from "../shared/fs.ts";
 import { withBuildLock } from "../shared/lock.ts";
 
 /** assets:check shows what assets:sync would change; assets:sync writes assets/ into the source map for World Editor. */
@@ -22,6 +23,9 @@ export async function assets(ctx: CommandContext, mode: "check" | "sync"): Promi
     }
     const plan = await planAssets(ctx.root, mapDir, stateFile, project.assets);
     for (const asset of plan.assets) ctx.logger.info(`${asset.source} -> ${asset.target.replaceAll("/", "\\")}`);
+    for (const change of plan.changes) {
+      ctx.logger.info(`${change.after === undefined ? "delete" : "write"} ${toPosix(relative(ctx.root, change.file))}`);
+    }
     if (mode === "sync") {
       await applyAssetPlan(plan, stateFile);
       ctx.logger.info(

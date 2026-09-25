@@ -147,7 +147,8 @@ export function parseProject(root: string, value: unknown, file: string): Projec
   const buildConfig = record(data.build, "build");
   const launch = record(data.launch, "launch");
   const yue = record(data.yue, "yue");
-  const assets = record(data.assets, "assets");
+  // Moonwell 0.1.0 schema packages have no assets block; within 0.1.x a missing one means no configuration.
+  const assets = data.assets === undefined ? { paths: {}, exclude: [] } : record(data.assets, "assets");
   return {
     root,
     map: { folder: string(map.folder, "map.folder"), entry: string(map.entry, "map.entry") },

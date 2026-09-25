@@ -53,10 +53,12 @@ function symlinkError(path: string): MoonwellError {
   });
 }
 
-/** Joins `relative` under `root`, refusing a symlink at every step so asset data cannot leave its folder. */
+/**
+ * Joins `relative` under `root`, refusing a symlink at every step below `root` so asset data cannot leave its folder.
+ * `root` itself is trusted: it is chosen by the caller (such as a project opened through a junction), not an escape.
+ */
 export async function safeJoin(root: string, relative: string): Promise<string> {
   let current = resolve(root);
-  if ((await lstatOrUndefined(current))?.isSymlink) throw symlinkError(current);
   for (const segment of assetPath(relative).split("/")) {
     current = join(current, segment);
     if ((await lstatOrUndefined(current))?.isSymlink) throw symlinkError(current);
