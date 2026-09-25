@@ -19,6 +19,8 @@ deno task test:pkl     # needs pkl
 deno task test:e2e     # needs pkl and yue
 ```
 
+`.github/workflows/ci.yml` runs all of these (plus `deno fmt --check`) on Ubuntu and Windows.
+
 Never add `package.json`, `node_modules` or `npm:` imports.
 
 Versions must agree. `cli/deno.json` `version`, `cli/src/version.ts` and `pkl/PklProject` `package.version` always carry
