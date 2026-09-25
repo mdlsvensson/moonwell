@@ -62,8 +62,9 @@ inside hooks.
 | `deno task check`                                | Compile and validate without building  |
 | `deno task setup`                                | Download the pinned YueScript compiler |
 
-The compiler is downloaded once per version into `%LOCALAPPDATA%\moonwell` (or `~/.cache/moonwell`) and verified by
-checksum. Set `yue { path = "..." }` in `moonwell.local.pkl` to use your own build.
+The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
+else in `%LOCALAPPDATA%\moonwell` on Windows, else in `$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`. Set
+`yue { path = "..." }` in `moonwell.local.pkl` to use your own build.
 
 ## Credits
 

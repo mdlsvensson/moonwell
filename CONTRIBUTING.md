@@ -41,6 +41,8 @@ the same number, and a unit test enforces it.
 ## Publishing
 
 1. Bump the version in `cli/deno.json`, `cli/src/version.ts` and `pkl/PklProject`.
-2. `pkl project package pkl/` produces the package zip and metadata. Create a GitHub release tagged `moonwell@<version>`
+2. Re-resolve the template's Pkl dependencies (`cd template && pkl project resolve`), then run `deno task gen` so the
+   embedded template carries the new `PklProject.deps.json`. Commit both.
+3. `pkl project package pkl/` produces the package zip and metadata. Create a GitHub release tagged `moonwell@<version>`
    in `mdlsvensson/moonwell` and attach both files.
-3. `cd cli && deno publish`.
+4. `cd cli && deno publish`.
