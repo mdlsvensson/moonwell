@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects, assertThrows } from "@std/assert";
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from "@std/assert";
 import { join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import type { Runner } from "../../src/shared/process.ts";
@@ -104,4 +104,21 @@ Deno.test("loadProject explains a missing manifest", async () => {
   const root = await Deno.makeTempDir();
   const run = fakeRunner({ "pkl --version": { stdout: "Pkl 0.32.1" } });
   await assertRejects(() => loadProject(root, run), MoonwellError, "No moonwell.pkl");
+});
+
+Deno.test("loadProject explains a corrupt PklProject.deps.json", async () => {
+  const root = await Deno.makeTempDir();
+  await Deno.writeTextFile(join(root, "moonwell.pkl"), "");
+  await Deno.writeTextFile(join(root, "PklProject.deps.json"), "{ not json");
+  const run = fakeRunner({ "pkl --version": { stdout: "Pkl 0.32.1" } });
+  const error = await assertRejects(() => loadProject(root, run), MoonwellError, "PklProject.deps.json");
+  assertStringIncludes(error.hint ?? "", "pkl project resolve");
+});
+
+Deno.test("loadProject explains pkl output that is not JSON", async () => {
+  const root = await Deno.makeTempDir();
+  await Deno.writeTextFile(join(root, "moonwell.pkl"), "");
+  await Deno.writeTextFile(join(root, "PklProject.deps.json"), LOCAL_DEPS.replace("0.1.3", "0.1.0"));
+  const run = fakeRunner({ "pkl --version": { stdout: "Pkl 0.32.1" }, "pkl eval": { stdout: "map { }" } });
+  await assertRejects(() => loadProject(root, run), MoonwellError, "not valid JSON");
 });

@@ -1,6 +1,7 @@
+import { exists } from "@std/fs";
 import { join, relative } from "@std/path";
 import type { CommandContext } from "../context.ts";
-import { formatError } from "../shared/errors.ts";
+import { formatError, MoonwellError } from "../shared/errors.ts";
 import { toPosix } from "../shared/fs.ts";
 import { check } from "./check.ts";
 
@@ -17,6 +18,12 @@ export async function dev(
   ctx: CommandContext,
   options: { signal?: AbortSignal; debounceMs?: number } = {},
 ): Promise<void> {
+  if (!(await exists(join(ctx.root, "src"), { isDirectory: true }))) {
+    throw new MoonwellError("The src/ folder is missing.", {
+      file: ctx.root,
+      hint: "Run dev from a Moonwell project folder, or create one with `moonwell init <dir>`.",
+    });
+  }
   const cycle = async () => {
     try {
       await check(ctx);

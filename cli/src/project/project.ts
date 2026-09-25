@@ -37,16 +37,30 @@ export async function loadProject(root: string, run: Runner = runProcess): Promi
   checkPackageVersion(readPackageVersion(deps), VERSION);
   const result = await run("pkl", ["eval", "--format", "json", "--project-dir", ".", file], {
     cwd: root,
-    notFoundHint: PKL_INSTALL_HINT,
+    hint: PKL_INSTALL_HINT,
   });
   if (result.code !== 0) {
     throw new MoonwellError(`Evaluating ${file} failed:\n${(result.stderr || result.stdout).trim()}`, { file });
   }
-  return parseProject(root, JSON.parse(result.stdout), file);
+  let value: unknown;
+  try {
+    value = JSON.parse(result.stdout);
+  } catch (cause) {
+    throw new MoonwellError(
+      `pkl eval printed output that is not valid JSON:
+${result.stdout.trim().slice(0, 500)}`,
+      {
+        file,
+        cause,
+        hint: "Check that pkl on PATH is Pkl 0.32 or newer and that no other program is named pkl.",
+      },
+    );
+  }
+  return parseProject(root, value, file);
 }
 
 export async function checkPkl(run: Runner): Promise<void> {
-  const result = await run("pkl", ["--version"], { notFoundHint: PKL_INSTALL_HINT });
+  const result = await run("pkl", ["--version"], { hint: PKL_INSTALL_HINT });
   const match = /Pkl (\d+)\.(\d+)\.(\d+)/.exec(result.stdout);
   const tooOld = match && (Number(match[1]) === 0 && Number(match[2]) < 32);
   if (!match || tooOld) {
@@ -58,7 +72,16 @@ export async function checkPkl(run: Runner): Promise<void> {
 
 /** The resolved version of the `moonwell` package in a PklProject.deps.json document. */
 export function readPackageVersion(depsJson: string): string {
-  const deps = JSON.parse(depsJson) as { resolvedDependencies?: Record<string, { uri?: string }> };
+  let deps: { resolvedDependencies?: Record<string, { uri?: string }> };
+  try {
+    deps = JSON.parse(depsJson);
+  } catch (cause) {
+    throw new MoonwellError("PklProject.deps.json is not valid JSON.", {
+      file: "PklProject.deps.json",
+      cause,
+      hint: "Fix or regenerate it with `pkl project resolve`.",
+    });
+  }
   for (const [key, dependency] of Object.entries(deps.resolvedDependencies ?? {})) {
     if (!/\/moonwell@\d+$/.test(key)) continue;
     const version = /@(\d+\.\d+\.\d+[^/]*)$/.exec(dependency.uri ?? "")?.[1];

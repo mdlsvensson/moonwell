@@ -9,8 +9,23 @@ export interface RunResult {
 export type Runner = (
   command: string,
   args: string[],
-  options?: { cwd?: string; notFoundHint?: string },
+  /** `hint` is shown when the command cannot be started at all. */
+  options?: { cwd?: string; hint?: string },
 ) => Promise<RunResult>;
+
+/** Wraps an error thrown while starting `command` (missing, a directory, not executable...) into MoonwellError. */
+export function spawnError(
+  command: string,
+  error: unknown,
+  options: { hint?: string; file?: string } = {},
+): MoonwellError {
+  const reason = error instanceof Deno.errors.NotFound
+    ? "command not found"
+    : error instanceof Error
+    ? error.message
+    : String(error);
+  return new MoonwellError(`Cannot run '${command}': ${reason.replace(/\.$/, "")}.`, { ...options, cause: error });
+}
 
 /** Runs a command to completion and captures its output. */
 export const runProcess: Runner = async (command, args, options = {}) => {
@@ -18,13 +33,7 @@ export const runProcess: Runner = async (command, args, options = {}) => {
   try {
     output = await new Deno.Command(command, { args, cwd: options.cwd, stdout: "piped", stderr: "piped" }).output();
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) {
-      throw new MoonwellError(`Cannot run '${command}': command not found.`, {
-        hint: options.notFoundHint,
-        cause: error,
-      });
-    }
-    throw error;
+    throw spawnError(command, error, { hint: options.hint });
   }
   const decoder = new TextDecoder();
   return { code: output.code, stdout: decoder.decode(output.stdout), stderr: decoder.decode(output.stderr) };
