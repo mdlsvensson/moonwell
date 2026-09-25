@@ -47,7 +47,7 @@ export async function compileProject(
   return { modules: resolveGraph(entry, output.load, BUILTIN_MODULES), entry };
 }
 
-/** Compiles gameplay, stages the source map into dist/stage/map and injects the bundle. */
+/** Compiles gameplay, stages the source map into dist/stage/<map.folder> and injects the bundle. */
 export async function prepareStage(
   ctx: CommandContext,
   project: Project,
@@ -61,19 +61,16 @@ export async function prepareStage(
       hint: "Set map.folder to a folder under maps/ saved by World Editor in folder format.",
     });
   }
-  const mapDir = join(ctx.root, "dist", "stage", "map");
+  // Named like the source (e.g. dist/stage/map.w3x): the game loads a folder map by its .w3x name.
+  const mapDir = join(ctx.root, "dist", "stage", project.map.folder);
   try {
     await replaceDir(source, mapDir);
   } catch (cause) {
-    throw new MoonwellError(
-      `Staging the map into ${toPosix(relative(ctx.root, mapDir))} failed: ${
-        cause instanceof Error ? cause.message : String(cause)
-      }`,
-      {
-        cause,
-        hint: "Close Warcraft III or World Editor if they have dist/stage open, then retry.",
-      },
-    );
+    const reason = cause instanceof Error ? cause.message : String(cause);
+    throw new MoonwellError(`Staging the map into ${toPosix(relative(ctx.root, mapDir))} failed: ${reason}`, {
+      cause,
+      hint: "Close Warcraft III or World Editor if they have dist/stage open, then retry.",
+    });
   }
 
   const scriptPath = join(mapDir, "war3map.lua");

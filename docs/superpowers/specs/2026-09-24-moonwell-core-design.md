@@ -177,7 +177,8 @@ Order, shared by `build`, `test` and (partially) `check`:
 3. **Ensure compiler** (§5.1).
 4. **Compile Yue** (§5.2).
 5. **Evaluate data.** Objects, settings and assets from the manifest.
-6. **Stage.** Copy `maps/<folder>` into `dist/stage/map/`, replacing any previous staging.
+6. **Stage.** Copy `maps/<folder>` into `dist/stage/<folder>` (e.g. `dist/stage/map.w3x`), replacing any previous
+   staging. The staged folder keeps the `.w3x` name because the game loads folder maps by that name.
 7. **Apply.** Object data (§6.1), then settings (§6.3), then assets (§6.2) to the staged map.
 8. **Bundle and inject** (§5.3, §5.4) into the staged `war3map.lua`.
 9. **Pack** (§7) for `build`, or **launch** for `test`.
