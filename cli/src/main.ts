@@ -1,6 +1,7 @@
 import { parseArgs } from "@std/cli/parse-args";
 import { existsSync } from "@std/fs";
 import { join } from "@std/path";
+import { assets } from "./commands/assets.ts";
 import { build } from "./commands/build.ts";
 import { check } from "./commands/check.ts";
 import { dev } from "./commands/dev.ts";
@@ -24,6 +25,8 @@ Commands:
   test [--entry f]               Stage the map and launch Warcraft III
   dev                            Watch sources and report errors on save
   check                          Compile and validate without building a map
+  assets:check                   Show what assets:sync would change in the source map
+  assets:sync                    Write assets/ into the source map (close it in World Editor first)
 
 Options:
   -h, --help                     Show this help
@@ -64,7 +67,7 @@ export async function main(
     releaseHeldLocks();
     Deno.exit(130);
   };
-  const handlesSigint = ["build", "test", "check", "dev"].includes(command);
+  const handlesSigint = ["build", "test", "check", "dev", "assets:check", "assets:sync"].includes(command);
   if (handlesSigint) Deno.addSignalListener("SIGINT", onSigint);
   try {
     switch (command) {
@@ -89,6 +92,12 @@ export async function main(
         break;
       case "check":
         await check(ctx);
+        break;
+      case "assets:check":
+        await assets(ctx, "check");
+        break;
+      case "assets:sync":
+        await assets(ctx, "sync");
         break;
       default:
         write(`Unknown command '${command}'.\n\n${USAGE}`);

@@ -33,6 +33,8 @@ deno task test
 | `moonwell.local.pkl` | This machine's settings, such as the game path; git-ignored, and `deno task setup` recreates it        |
 | `src/main.yue`       | Gameplay entry                                                                                         |
 | `maps/map.w3x/`      | World Editor map (folder format, Lua script mode)                                                      |
+| `assets/`            | Files to import into the map                                                                           |
+| `.asset-state/`      | Which source-map files `assets:sync` owns; commit it                                                   |
 | `dist/`              | Build output                                                                                           |
 
 `moonwell.local.pkl` amends `moonwell.pkl`, so any setting can be overridden there for your machine only. Lists such as
@@ -51,6 +53,24 @@ Hooks: `before_config`, `on_config`, `before_main`, `on_main`. A failing hook pr
 line, and the other hooks still run. Module top-level code runs while the map script loads, so create game objects
 inside hooks.
 
+## Assets
+
+Every file under `assets/` is imported into the built map at its relative path: `assets/Models/unit.mdx` becomes
+`Models\unit.mdx`. Names starting with `.` are skipped. The `assets` block in `moonwell.pkl` maps files to exact in-map
+paths and leaves files out:
+
+```pkl
+assets {
+  paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# }
+  exclude = List("credits/")
+}
+```
+
+Builds import assets into the staged copy only. To see them in World Editor, close the map there and run
+`deno task assets:sync`. It writes the files and `war3map.imp` into `maps/<folder>`, and records what it owns in
+`.asset-state/`. It never overwrites or deletes a file it does not own, and it refuses to touch an owned file you edited
+in the map.
+
 ## Commands
 
 | Command                                          | What                                                                             |
@@ -59,6 +79,8 @@ inside hooks.
 | `deno task test [--entry src/x.yue]`             | Stage the map and launch Warcraft III                                            |
 | `deno task dev`                                  | Re-check on every save                                                           |
 | `deno task check`                                | Compile and validate without building                                            |
+| `deno task assets:check`                         | Show what `assets:sync` would change in the source map                           |
+| `deno task assets:sync`                          | Write `assets/` into the source map for World Editor (close the map first)       |
 | `deno task setup`                                | Create a missing `moonwell.local.pkl` and download the pinned YueScript compiler |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
