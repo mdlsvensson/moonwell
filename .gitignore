@@ -3,3 +3,4 @@ dist/
 template/dist/
 template/moonwell.local.pkl
 .pkl-lsp/
+.out/

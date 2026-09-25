@@ -42,9 +42,19 @@ carry the same number, and a unit test enforces it.
 
 ## Publishing
 
-1. Bump the version in `cli/deno.json`, `cli/src/version.ts` and `schema/PklProject`.
-2. Re-resolve the template's Pkl dependencies (`cd template && pkl project resolve`), then run `deno task gen` so the
-   embedded template carries the new `PklProject.deps.json`. Commit both.
-3. `pkl project package schema/` produces the package zip and metadata. Create a GitHub release tagged
-   `moonwell@<version>` in `mdlsvensson/moonwell` and attach both files.
-4. `cd cli && deno publish`.
+Publish the Pkl package before the CLI: a new project's `init` resolves `moonwell@<version>` from the GitHub release.
+
+1. Set the version, unless it is already the one being released (as with the first release, 0.1.0). Bump it in
+   `cli/deno.json`, `cli/src/version.ts` and `schema/PklProject`, re-resolve the template's Pkl dependencies
+   (`cd template && pkl project resolve`), and run `deno task gen` so the embedded template carries the new
+   `PklProject.deps.json`. Commit and push.
+2. `pkl project package schema/` writes `.out/moonwell@<version>/`. It ends by asking pkg.pkl-lang.org whether the
+   version is already published; if that check crashes (seen on Windows: "Unable to establish loopback connection"), add
+   `--skip-publish-check`, which is safe for a version that was never released.
+3. Create a GitHub release in `mdlsvensson/moonwell` with a new tag `moonwell@<version>` on the pushed commit. Attach
+   `moonwell@<version>.zip` and the metadata file `moonwell@<version>` (no extension). `package://pkg.pkl-lang.org/...`
+   URIs redirect to these release assets.
+4. `cd cli && deno publish`. It opens the browser to authorize with JSR. The first time, create the `@moonwell` scope
+   and its `cli` package on jsr.io.
+5. Check the published release from outside the repo: `deno run -A jsr:@moonwell/cli@<version> init my-map`, then
+   `cd my-map && deno task build`.
