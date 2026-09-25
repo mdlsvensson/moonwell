@@ -205,23 +205,23 @@ export async function applyAssetPlan(plan: AssetPlan, stateFile?: string): Promi
       }
     }
   } catch (error) {
-    let undone = true;
+    const reasonOf = (failure: unknown) => (failure instanceof Error ? failure.message : String(failure));
+    const unrestored: string[] = [];
     for (const change of applied.reverse()) {
       try {
         if (change.before === undefined) await removeFileIfExists(change.file);
         else await Deno.writeFile(change.file, change.before);
-      } catch {
-        undone = false;
+      } catch (failure) {
+        unrestored.push(`${change.file} (${reasonOf(failure)})`);
       }
     }
-    if (!undone) {
-      throw new MoonwellError("Writing assets failed and not every change could be undone.", {
-        cause: error,
-        hint: "Restore the map folder from version control before retrying.",
-      });
+    if (unrestored.length > 0) {
+      throw new MoonwellError(
+        `Writing assets failed (${reasonOf(error)}), and these files could not be restored: ${unrestored.join(", ")}`,
+        { cause: error, hint: "Restore the map folder from version control before retrying." },
+      );
     }
     if (error instanceof MoonwellError) throw error;
-    const reason = error instanceof Error ? error.message : String(error);
-    throw new MoonwellError(`Writing assets failed: ${reason}. Every change was undone.`, { cause: error });
+    throw new MoonwellError(`Writing assets failed: ${reasonOf(error)}. Every change was undone.`, { cause: error });
   }
 }
