@@ -92,6 +92,12 @@ export function readMdlPaths(text: string, file: string): ModelPath[] {
       finishStatement();
       const block = stack.pop();
       if (block === undefined) throw modelError(file, "a } has no matching {");
+      // Exporters write a ParticleEmitter's Path inside its nested Particle block.
+      const parent = stack.at(-1);
+      const childPath = block.strings.get("Path");
+      if (block.name === "Particle" && parent?.name === "ParticleEmitter" && childPath !== undefined) {
+        if (!parent.strings.has("Path")) parent.strings.set("Path", childPath);
+      }
       const ref = blockPath(block);
       if (ref !== undefined) paths.push(ref);
     } else if (token.type === ",") {

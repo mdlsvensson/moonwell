@@ -33,7 +33,15 @@ ParticleEmitter "Heal" {
 		0: 1,
 		100: 0,
 	}
-	Path "Abilities\Spells\Human\Heal.mdx",
+	Translation 1 {
+		Linear,
+		0: { 1, 2, 3 },
+	}
+	Particle {
+		static LifeSpan 1,
+		static InitVelocity 0,
+		Path "Abilities\Spells\Human\Heal.mdx",
+	}
 }
 ParticleEmitter "Spark" {
 	EmitterUsesTGA,
