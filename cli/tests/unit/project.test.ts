@@ -2,9 +2,11 @@ import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from 
 import { join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import type { Runner } from "../../src/shared/process.ts";
+import { projectLocalPkl } from "../../src/project-files.ts";
 import {
   checkPackageVersion,
   checkPkl,
+  ensureLocalManifest,
   loadProject,
   parseProject,
   readPackageVersion,
@@ -42,7 +44,7 @@ const LOCAL_DEPS = JSON.stringify({
     "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0": {
       type: "local",
       uri: "projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.1.3",
-      path: "../pkl",
+      path: "../schema",
     },
   },
 });
@@ -121,4 +123,14 @@ Deno.test("loadProject explains pkl output that is not JSON", async () => {
   await Deno.writeTextFile(join(root, "PklProject.deps.json"), LOCAL_DEPS.replace("0.1.3", "0.1.0"));
   const run = fakeRunner({ "pkl --version": { stdout: "Pkl 0.32.1" }, "pkl eval": { stdout: "map { }" } });
   await assertRejects(() => loadProject(root, run), MoonwellError, "not valid JSON");
+});
+
+Deno.test("ensureLocalManifest creates moonwell.local.pkl once and never overwrites it", async () => {
+  const root = await Deno.makeTempDir();
+  const local = join(root, "moonwell.local.pkl");
+  assertEquals(await ensureLocalManifest(root), true);
+  assertEquals(await Deno.readTextFile(local), projectLocalPkl());
+  await Deno.writeTextFile(local, "mine");
+  assertEquals(await ensureLocalManifest(root), false);
+  assertEquals(await Deno.readTextFile(local), "mine");
 });

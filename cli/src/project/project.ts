@@ -1,5 +1,6 @@
 import { exists } from "@std/fs";
 import { join } from "@std/path";
+import { projectLocalPkl } from "../project-files.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { type Runner, runProcess } from "../shared/process.ts";
 import { VERSION } from "../version.ts";
@@ -14,6 +15,17 @@ export interface Project {
 
 export const PKL_INSTALL_HINT =
   "Install Pkl 0.32 or newer: https://pkl-lang.org/main/current/pkl-cli/index.html#installation";
+
+/** Creates moonwell.local.pkl in `root` unless it exists; returns whether it did. Never overwrites. */
+export async function ensureLocalManifest(root: string): Promise<boolean> {
+  try {
+    await Deno.writeTextFile(join(root, "moonwell.local.pkl"), projectLocalPkl(), { createNew: true });
+    return true;
+  } catch (error) {
+    if (error instanceof Deno.errors.AlreadyExists) return false;
+    throw error;
+  }
+}
 
 /** Evaluates moonwell.local.pkl (or moonwell.pkl) in `root` and returns the typed project. */
 export async function loadProject(root: string, run: Runner = runProcess): Promise<Project> {

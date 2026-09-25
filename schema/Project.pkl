@@ -1,7 +1,8 @@
 /// Root schema for a Moonwell project's `moonwell.pkl`.
 ///
-/// Every property has a default; a project only writes what it changes.
-/// Machine-specific values belong in `moonwell.local.pkl`, which amends `moonwell.pkl`.
+/// Every property has a default, so a manifest only needs what it changes. The template's `moonwell.pkl` spells out the
+/// everyday settings; the advanced ones (the whole `yue` block) are left out and keep their defaults unless set.
+/// Machine-specific values belong in `moonwell.local.pkl`, which amends `moonwell.pkl` and is git-ignored.
 module moonwell.Project
 
 /// `path` split on `/` and `\`, without empty and `.` segments.
@@ -44,15 +45,19 @@ class LaunchConfig {
   /// Path to `Warcraft III.exe`. Set this in `moonwell.local.pkl`.
   gameExecutable: String?
 
-  /// Arguments passed before `-loadfile <map>`.
-  args: Listing<String> = new { "-launch"; "-windowmode"; "windowed" }
+  /// Arguments passed before `-loadfile <map>`. Assigning a list replaces the default one:
+  /// `args = List("-launch", "-windowmode", "fullscreen")`.
+  args: List<String> = List("-launch", "-windowmode", "windowed")
 }
 
+/// Advanced: the YueScript compiler. Most projects never set this block.
 class YueConfig {
-  /// YueScript compiler version, downloaded and verified by Moonwell.
+  /// YueScript compiler version. Moonwell downloads it and verifies it against a checksum pinned in the CLI, so only
+  /// versions that CLI release knows are accepted. Leave unset to use the version pinned by this schema release.
   version: String(matches(Regex(#"\d+\.\d+\.\d+"#))) = "0.34.2"
 
-  /// Use this compiler binary instead of downloading one.
+  /// Path to a `yue` binary to use instead of downloading one, for example a compiler you built yourself.
+  /// Set it in `moonwell.local.pkl`, since the path is specific to your machine.
   path: String?
 }
 

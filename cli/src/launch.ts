@@ -13,11 +13,8 @@ export const spawnDetached: Spawn = (command, args) => {
   child.unref();
 };
 
-const LOCAL_EXAMPLE = [
-  "Create moonwell.local.pkl next to moonwell.pkl:",
-  '  amends "moonwell.pkl"',
-  '  launch { gameExecutable = "C:\\\\Program Files (x86)\\\\Warcraft III\\\\_retail_\\\\x86_64\\\\Warcraft III.exe" }',
-].join("\n");
+const SET_EXECUTABLE =
+  "Run `deno task setup` to create moonwell.local.pkl, then set launch.gameExecutable there to your Warcraft III.exe.";
 
 const FIX_EXECUTABLE = "Fix launch.gameExecutable in moonwell.local.pkl to point at Warcraft III.exe.";
 
@@ -29,7 +26,7 @@ export async function launchGame(
 ): Promise<void> {
   const executable = launch.gameExecutable;
   if (executable === null) {
-    throw new MoonwellError("launch.gameExecutable is not set.", { file: "moonwell.local.pkl", hint: LOCAL_EXAMPLE });
+    throw new MoonwellError("launch.gameExecutable is not set.", { file: "moonwell.local.pkl", hint: SET_EXECUTABLE });
   }
   if (!(await exists(executable))) {
     throw new MoonwellError(`Game executable not found: ${executable}`, {
