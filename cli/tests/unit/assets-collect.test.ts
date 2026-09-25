@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import { dirname, join } from "@std/path";
 import { collectAssets } from "../../src/assets/collect.ts";
-import { assetPath, pathKey, scanFiles, targetPath } from "../../src/assets/paths.ts";
+import { assetPath, pathKey, safeJoin, scanFiles, targetPath } from "../../src/assets/paths.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 
 const defaults = { paths: {}, exclude: [] };
@@ -100,4 +100,18 @@ Deno.test("scanFiles rejects case collisions and symlinked folders", async () =>
     type: Deno.build.os === "windows" ? "junction" : "dir",
   });
   await assertRejects(() => collectAssets(root, defaults), MoonwellError, "Symlinks");
+});
+
+Deno.test("safeJoin accepts a root that is itself a link but rejects a link below it", async () => {
+  const parent = await projectRoot();
+  const real = join(parent, "real");
+  await put(real, "assets/a.blp");
+  const type = Deno.build.os === "windows" ? "junction" : "dir";
+  const linkedRoot = join(parent, "linked-root");
+  await Deno.symlink(real, linkedRoot, { type });
+  assertEquals(await safeJoin(linkedRoot, "assets/a.blp"), join(linkedRoot, "assets", "a.blp"));
+  assertEquals((await collectAssets(linkedRoot, defaults)).map((asset) => asset.target), ["a.blp"]);
+
+  await Deno.symlink(join(parent, "assets"), join(real, "inner"), { type });
+  await assertRejects(() => safeJoin(linkedRoot, "inner/x.blp"), MoonwellError, "Symlinks");
 });

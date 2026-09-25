@@ -35,9 +35,20 @@ Deno.test("parseProject maps omitted nullable fields to null", () => {
 Deno.test("parseProject reads assets and rejects a wrong shape", () => {
   const assets = { paths: { "a.blp": "Textures\\a.blp" }, exclude: ["credits/"] };
   assertEquals(parseProject("/p", { ...FULL, assets }, "moonwell.pkl").assets, assets);
-  for (const bad of [{ paths: [], exclude: [] }, { paths: { a: 1 }, exclude: [] }, { paths: {}, exclude: "x" }]) {
-    assertThrows(() => parseProject("/p", { ...FULL, assets: bad }, "moonwell.pkl"), MoonwellError, "assets");
+  const cases: [unknown, string][] = [
+    [null, "assets must be an object"],
+    [{ paths: [], exclude: [] }, "assets.paths must be"],
+    [{ paths: { a: 1 }, exclude: [] }, "assets.paths must be"],
+    [{ paths: {}, exclude: "x" }, "assets.exclude must be"],
+  ];
+  for (const [bad, message] of cases) {
+    assertThrows(() => parseProject("/p", { ...FULL, assets: bad }, "moonwell.pkl"), MoonwellError, message);
   }
+});
+
+Deno.test("parseProject defaults a missing assets block, as 0.1.0 schema packages have none", () => {
+  const { assets: _, ...withoutAssets } = FULL;
+  assertEquals(parseProject("/p", withoutAssets, "moonwell.pkl").assets, { paths: {}, exclude: [] });
 });
 
 Deno.test("parseProject rejects a schema mismatch", () => {

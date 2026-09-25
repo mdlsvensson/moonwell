@@ -73,7 +73,8 @@ export async function prepareStage(
       hint: "Close Warcraft III or World Editor if they have dist/stage open, then retry.",
     });
   }
-  // No state file: a build imports into the staged copy only and never changes source-map ownership.
+  // A build reads the ownership state (to know which source-map files assets:sync owns) but never writes it:
+  // applyAssetPlan gets no state file, so only the staged copy changes.
   const { stateFile } = await assetLocations(ctx.root, project.map.folder);
   const assets = await planAssets(ctx.root, mapDir, stateFile, project.assets);
   await applyAssetPlan(assets);

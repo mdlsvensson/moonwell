@@ -91,7 +91,9 @@ Deno.test("conflicts and edited owned files fail before anything changes", async
   await Deno.remove(join(map, "a.blp"));
   await applyAssetPlan(await planAssets(root, map, state, defaults), state);
   await put(map, "a.blp", "manual edit");
-  await assertRejects(() => planAssets(root, map, state, defaults), MoonwellError, "modified");
+  const modified = await assertRejects(() => planAssets(root, map, state, defaults), MoonwellError, "modified");
+  assertEquals(modified.file, join(map, "a.blp"));
+  assert(modified.hint?.includes("source map"), modified.hint);
   await Deno.remove(join(root, "assets", "a.blp"));
   await assertRejects(() => planAssets(root, map, state, defaults), MoonwellError, "modified");
   assertEquals(await text(map, "a.blp"), "manual edit");
@@ -123,7 +125,8 @@ Deno.test("existing folder spelling is reused and forged state cannot target map
       files: { "war3map.lua": "0".repeat(64) },
     }),
   );
-  await assertRejects(() => planAssets(root, map, state, defaults), MoonwellError, "Reserved");
+  const reserved = await assertRejects(() => planAssets(root, map, state, defaults), MoonwellError, "Reserved");
+  assertEquals(reserved.file, state);
 });
 
 Deno.test("new folders planned in one run share one spelling", async () => {
@@ -178,4 +181,33 @@ Deno.test("with no assets and nothing owned, war3map.imp is left untouched", asy
   const plan = await planAssets(root, map, state, defaults);
   assertEquals(plan.changes, []);
   assertEquals(await exists(join(map, "war3map.imp")), false);
+});
+
+Deno.test("with no assets and nothing owned, a build never reads war3map.imp", async () => {
+  const { root, map, state } = await fixture();
+  await Deno.writeFile(join(map, "war3map.imp"), new Uint8Array([9, 9]));
+  const plan = await planAssets(root, map, state, defaults);
+  assertEquals(plan, { assets: [], changes: [], state: { version: 1, files: {} } });
+});
+
+Deno.test("a failed sync restores the files it overwrote byte for byte", async () => {
+  const { root, map, state } = await fixture();
+  await put(root, "assets/a.blp", "first");
+  await put(map, "war3mapImported/existing.wav", "editor");
+  await Deno.writeFile(join(map, "war3map.imp"), writeImports([{ flag: 5, path: "existing.wav" }]));
+  await applyAssetPlan(await planAssets(root, map, state, defaults), state);
+  const assetBefore = await Deno.readFile(join(map, "a.blp"));
+  const impBefore = await Deno.readFile(join(map, "war3map.imp"));
+  const stateBefore = await Deno.readFile(state);
+
+  await put(root, "assets/a.blp", "second");
+  await put(root, "assets/b.blp");
+  const plan = await planAssets(root, map, state, defaults);
+  assertEquals(plan.changes.map((change) => change.before !== undefined), [true, false, true]);
+  // b.blp turning into a folder after planning makes the second write fail, after a.blp was overwritten.
+  await Deno.mkdir(join(map, "b.blp"));
+  await assertRejects(() => applyAssetPlan(plan, state), MoonwellError);
+  assertEquals(await Deno.readFile(join(map, "a.blp")), assetBefore);
+  assertEquals(await Deno.readFile(join(map, "war3map.imp")), impBefore);
+  assertEquals(await Deno.readFile(state), stateBefore);
 });

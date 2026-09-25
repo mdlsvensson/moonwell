@@ -64,7 +64,16 @@ async function readState(file: string): Promise<AssetState> {
   }
   const seen = new Set<string>();
   for (const [name, digest] of Object.entries(record.files as Record<string, unknown>)) {
-    targetPath(name);
+    try {
+      targetPath(name);
+    } catch (error) {
+      if (!(error instanceof MoonwellError)) throw error;
+      throw new MoonwellError(`The asset ownership state is invalid: ${error.message}`, {
+        file,
+        hint: error.hint,
+        cause: error,
+      });
+    }
     if (typeof digest !== "string" || !/^[a-f0-9]{64}$/.test(digest)) invalid(`${name} has no valid hash`);
     if (seen.has(pathKey(name))) invalid(`${name} is listed twice`);
     seen.add(pathKey(name));
@@ -86,10 +95,12 @@ export async function planAssets(
       hint: "Set map.folder to a folder under maps/ saved by World Editor in folder format.",
     });
   }
-  const files = await scanFiles(mapDir);
   const managed = new Map(
     Object.entries((await readState(stateFile)).files).map(([name, digest]) => [pathKey(name), { name, digest }]),
   );
+  // Nothing to import and nothing owned: leave the map (and its war3map.imp) completely alone.
+  if (assets.length === 0 && managed.size === 0) return { assets, changes: [], state: { version: 1, files: {} } };
+  const files = await scanFiles(mapDir);
   const impFile = await safeJoin(mapDir, files.get("war3map.imp") ?? "war3map.imp");
   const impBytes = await readIfExists(impFile);
   const imports = impBytes === undefined ? [] : readImports(impBytes, impFile);
@@ -109,10 +120,13 @@ export async function planAssets(
   for (const [key] of managed) {
     const current = files.get(key);
     if (current === undefined) continue;
-    const bytes = await Deno.readFile(await safeJoin(mapDir, current));
+    const file = await safeJoin(mapDir, current);
+    const bytes = await Deno.readFile(file);
     if ((await sha256Hex(bytes)) !== managed.get(key)!.digest) {
       throw new MoonwellError(`${current} was modified in the map after assets:sync wrote it.`, {
-        hint: "Move your edited copy into assets/ or restore the file, then sync again.",
+        file,
+        hint: "assets:sync owns this file in the source map (a build stages a copy of it). " +
+          "Move your edited copy into assets/, or restore the file in the source map, then run assets:sync.",
       });
     }
   }
