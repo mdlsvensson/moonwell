@@ -56,5 +56,7 @@ Publish the Pkl package before the CLI: a new project's `init` resolves `moonwel
    URIs redirect to these release assets.
 4. `cd cli && deno publish`. It opens the browser to authorize with JSR. The first time, create the `@moonwell` scope
    and its `cli` package on jsr.io.
-5. Check the published release from outside the repo: `deno run -A jsr:@moonwell/cli@<version> init my-map`, then
-   `cd my-map && deno task build`.
+5. Check the published release from outside the repo:
+   `deno run -A --min-dep-age=0 jsr:@moonwell/cli@<version> init my-map`, then in `my-map`
+   `deno run -A --min-dep-age=0 jsr:@moonwell/cli@<version> build`. Deno refuses versions published less than 24 hours
+   ago unless `--min-dep-age=0` is passed, so the project's own `deno task build` only works after that.
