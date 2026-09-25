@@ -32,7 +32,10 @@ function referenceKey(path: string): string {
 
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
 
-/** A reference's status: whether the game ships its path and, in a project (`targets` given), whether a build imports it. */
+/**
+ * A reference's status: whether the game ships its path and, in a project (`targets` given), whether a build imports
+ * it.
+ */
 function pathStatus(path: string, gamePaths: Set<string>, targets: Set<string> | undefined): PathStatus {
   const inGame = gamePaths.has(gamePathKey(path));
   if (targets === undefined) return inGame ? "in-game path" : "custom path";
