@@ -2,7 +2,10 @@ import { decodeBase64 } from "@std/encoding/base64";
 import { GAME_PATHS_GZIP_BASE64 } from "../embedded/game-paths.ts";
 import { gunzip } from "../shared/compression.ts";
 
-/** Texture types the game treats as one texture: Reforged stores what models call .tif/.blp as .dds (HD) or .blp (SD). */
+/**
+ * Texture types the game treats as one texture: Reforged stores what models call .tif/.blp as .dds (HD) or .blp
+ * (SD).
+ */
 export const TEXTURE_EXTENSIONS: readonly string[] = ["blp", "dds", "tga", "tif", "tiff", "png", "jpg"];
 const KEPT_EXTENSIONS = new Set(["mdx", "mdl", "pkfx", ...TEXTURE_EXTENSIONS]);
 

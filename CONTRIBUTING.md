@@ -36,20 +36,22 @@ export the file names of the game's CASC storage (for example with CascView) to 
 ## Release gate (manual, before every release)
 
 1. Run every check above from a clean checkout.
-2. `cd template`, run `deno task setup` (it creates `moonwell.local.pkl` if missing; check its `gameExecutable`), then
+2. Confirm `cli/data/game-paths.txt` starts with `# Warcraft III <version>`, not the "Not generated yet" placeholder:
+   with the placeholder every in-game path is reported as `custom path, not imported`.
+3. `cd template`, run `deno task setup` (it creates `moonwell.local.pkl` if missing; check its `gameExecutable`), then
    `deno task test`. Confirm "Moonwell is running." prints and the footman north of the heroes changes colour every
    second (with ally colour mode off: Alt+A toggles it, and while it is on every unit shows blue, teal or red). Confirm
    the Warcraft III window is visible and stays open after the CLI exits.
-3. Add `error "gate"` inside the `on_main` hook, run `deno task test` again, and confirm the on-screen error names
+4. Add `error "gate"` inside the `on_main` hook, run `deno task test` again, and confirm the on-screen error names
    `src/main.yue` and the right line. Record which chunk-name form the game used.
-4. Run `deno task build --minify` and play `dist/bin/map.w3x` directly.
-5. Open the packed map in World Editor and confirm it loads.
-6. Assets, in a throwaway project so `template/` stays clean (a stray file there fails the embedded-template test):
+5. Run `deno task build --minify` and play `dist/bin/map.w3x` directly.
+6. Open the packed map in World Editor and confirm it loads.
+7. Assets, in a throwaway project so `template/` stays clean (a stray file there fails the embedded-template test):
    `deno run -A cli/src/main.ts init --link <temp dir>/assets-check`, then in that project put a `.blp` icon at
    `assets/ReplaceableTextures/CommandButtons/BTNMoonwell.blp` and run `deno task test`; the map must load. Close World
    Editor, run `deno task assets:sync`, open `maps/map.w3x` and confirm the Import Manager lists
    `ReplaceableTextures\CommandButtons\BTNMoonwell.blp`. Delete the icon, sync again and confirm it is gone.
-7. Record the Warcraft III and World Editor versions in the changelog.
+8. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
 
