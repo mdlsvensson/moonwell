@@ -10,6 +10,7 @@ export function isRelevantChange(root: string, path: string): boolean {
   const rel = toPosix(relative(root, path));
   if (rel.startsWith("src/generated/")) return false;
   if (rel.startsWith("src/")) return rel.endsWith(".yue");
+  if (rel.startsWith("assets/")) return true;
   return /^moonwell(\.local)?\.pkl$/.test(rel) || rel === "PklProject" || rel === "PklProject.deps.json";
 }
 
@@ -38,6 +39,10 @@ export async function dev(
     Deno.watchFs(join(ctx.root, "src"), { recursive: true }),
     Deno.watchFs(ctx.root, { recursive: false }),
   ];
+  // assets/ is optional; a folder created after dev starts is picked up on the next dev run.
+  if (await exists(join(ctx.root, "assets"), { isDirectory: true })) {
+    watchers.push(Deno.watchFs(join(ctx.root, "assets"), { recursive: true }));
+  }
   const closeWatchers = () => {
     for (const watcher of watchers) {
       try {
@@ -52,7 +57,7 @@ export async function dev(
   try {
     if (options.signal?.aborted) closeWatchers();
     else options.signal?.addEventListener("abort", closeWatchers, { once: true });
-    ctx.logger.info("Watching src/ and the project manifests. Press Ctrl+C to stop.");
+    ctx.logger.info("Watching src/, assets/ and the project manifests. Press Ctrl+C to stop.");
 
     const schedule = () => {
       clearTimeout(timer);

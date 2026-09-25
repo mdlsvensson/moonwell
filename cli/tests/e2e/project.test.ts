@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { exists } from "@std/fs";
 import { fromFileUrl, join } from "@std/path";
+import { readImports } from "../../src/assets/imports.ts";
 import { test } from "../../src/commands/test.ts";
 import { projectLocalPkl } from "../../src/project-files.ts";
 import { type CommandContext, createContext } from "../../src/context.ts";
@@ -36,6 +37,33 @@ Deno.test("init → build produces an archive with the injected bundle", async (
   assertStringIncludes(lua, '__mw.boot("main")');
   assert(await archive.read("war3map.w3i"));
   assert((await archive.listfile()).includes("war3map.lua"));
+});
+
+Deno.test("build imports assets/ into the archive and war3map.imp", async () => {
+  const project = await newProject();
+  const bytes = new Uint8Array([0, 1, 2, 250, 255]);
+  await Deno.mkdir(join(project, "assets", "Models"), { recursive: true });
+  await Deno.writeFile(join(project, "assets", "Models", "unit.mdx"), bytes);
+  const built = await deno(["task", "build"], project);
+  assertEquals(built.code, 0, built.text);
+
+  const archive = openMpq(await Deno.readFile(join(project, "dist", "bin", "map.w3x")));
+  assertEquals(await archive.read("Models\\unit.mdx"), bytes);
+  const imports = readImports((await archive.read("war3map.imp"))!);
+  assert(imports.some((entry) => entry.flag === 13 && entry.path === "Models\\unit.mdx"), JSON.stringify(imports));
+  assertEquals(await exists(join(project, ".asset-state")), false, "a build never writes ownership state");
+  assertEquals(await exists(join(project, "maps", "map.w3x", "Models")), false, "a build never touches the source map");
+});
+
+Deno.test("check reports an asset problem", async () => {
+  const project = await newProject();
+  const manifest = join(project, "moonwell.pkl");
+  const text = await Deno.readTextFile(manifest);
+  assertStringIncludes(text, "paths {}");
+  await Deno.writeTextFile(manifest, text.replace("paths {}", 'paths { ["missing.blp"] = "x.blp" }'));
+  const checked = await deno(["task", "check"], project);
+  assertEquals(checked.code, 1, checked.text);
+  assertStringIncludes(checked.text, "does not exist");
 });
 
 Deno.test("a failed build deletes the previous archive", async () => {
