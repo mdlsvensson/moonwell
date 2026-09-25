@@ -1,4 +1,5 @@
 import { parseArgs } from "@std/cli/parse-args";
+import { existsSync } from "@std/fs";
 import { join } from "@std/path";
 import { build } from "./commands/build.ts";
 import { check } from "./commands/check.ts";
@@ -47,7 +48,9 @@ export async function main(
     write(USAGE);
     return 0;
   }
-  const logger = createLogger({ write, file: command === "init" ? undefined : join(root, "dist", "moonwell.log") });
+  // Only a project gets dist/moonwell.log; running elsewhere must not create dist/.
+  const inProject = command !== "init" && existsSync(join(root, "moonwell.pkl"));
+  const logger = createLogger({ write, file: inProject ? join(root, "dist", "moonwell.log") : undefined });
   const ctx = createContext(root, logger);
   const stage = { entry: flags.entry, minify: flags.minify ? true : undefined };
   // Ctrl+C: dev stops watching and returns once its running check has released the build lock; other commands

@@ -8,9 +8,10 @@ import { removeFileIfExists, toPosix } from "../shared/fs.ts";
 import { withBuildLock } from "../shared/lock.ts";
 
 /** Builds <build.folder>/<map.folder>; a failed build leaves no archive behind. */
-export function build(ctx: CommandContext, options: StageOptions = {}): Promise<string> {
+export async function build(ctx: CommandContext, options: StageOptions = {}): Promise<string> {
+  // Loading is read-only; doing it before taking the lock creates nothing outside a project.
+  const project = await loadProject(ctx.root, ctx.run);
   return withBuildLock(join(ctx.root, "dist"), async () => {
-    const project = await loadProject(ctx.root, ctx.run);
     const output = await archivePath(ctx.root, project);
     await removeFileIfExists(output);
     try {
