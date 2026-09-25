@@ -71,6 +71,25 @@ Builds import assets into the staged copy only. To see them in World Editor, clo
 `.asset-state/`. It never overwrites or deletes a file it does not own, and it refuses to touch an owned file you edited
 in the map.
 
+To check that a model's textures are imported, run `deno task assets:paths assets/Models/Knight.mdx`. It lists every
+file the model references (textures, particle models, attachments) and whether a build imports it. A path that is not
+found is either a built-in game file or a missing import. Run it without a file to check every model under `assets/`, or
+on a model outside a project to see what it needs before importing it.
+
+## Icons
+
+`init` creates World Editor's icon folders under `assets/`. Icons named the game's way import at the paths the object
+editor expects:
+
+| Folder                                        | File name                                 | For                                  |
+| --------------------------------------------- | ----------------------------------------- | ------------------------------------ |
+| `ReplaceableTextures/CommandButtons/`         | `BTN<Name>.blp`                           | Abilities, units, items and upgrades |
+| `ReplaceableTextures/CommandButtonsDisabled/` | `DISBTN<Name>.blp`, `DISPASBTN<Name>.blp` | Greyed-out versions                  |
+| `ReplaceableTextures/PassiveButtons/`         | `PASBTN<Name>.blp`                        | Passive abilities                    |
+
+Give every `BTN<Name>` a matching `DISBTN<Name>`, and every `PASBTN<Name>` a matching `DISPASBTN<Name>`: the game shows
+a placeholder where a disabled icon is missing.
+
 ## Commands
 
 | Command                                          | What                                                                             |
@@ -81,6 +100,7 @@ in the map.
 | `deno task check`                                | Compile and validate without building                                            |
 | `deno task assets:check`                         | Show what `assets:sync` would change in the source map                           |
 | `deno task assets:sync`                          | Write `assets/` into the source map for World Editor (close the map first)       |
+| `deno task assets:paths [file]`                  | List the files a model references, and whether `assets/` has them                |
 | `deno task setup`                                | Create a missing `moonwell.local.pkl` and download the pinned YueScript compiler |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,

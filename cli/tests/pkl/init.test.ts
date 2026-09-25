@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { exists } from "@std/fs";
 import { join } from "@std/path";
+import { collectAssets } from "../../src/assets/collect.ts";
 import { init } from "../../src/commands/init.ts";
 import { createContext } from "../../src/context.ts";
 import { DEFAULT_GAME_EXECUTABLE } from "../../src/project-files.ts";
@@ -29,6 +30,10 @@ Deno.test("init --link scaffolds a project that loads", async () => {
   assertEquals(loaded.map.folder, "map.w3x");
   assertEquals(loaded.launch.gameExecutable, DEFAULT_GAME_EXECUTABLE);
   assertEquals(loaded.launch.args, ["-launch", "-windowmode", "windowed"]);
+  for (const folder of ["CommandButtons", "CommandButtonsDisabled", "PassiveButtons"]) {
+    assert(await exists(join(project, "assets", "ReplaceableTextures", folder), { isDirectory: true }), folder);
+  }
+  assertEquals(await collectAssets(project, loaded.assets), [], "the icon folders import nothing");
 });
 
 Deno.test("init refuses a non-empty directory", async () => {
