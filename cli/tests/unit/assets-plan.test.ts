@@ -151,6 +151,28 @@ Deno.test("a failed sync undoes the writes it already made", async () => {
   assert((await Deno.stat(join(map, "b.blp"))).isDirectory);
 });
 
+Deno.test("an incomplete rollback names the failure and every file it could not restore", async () => {
+  const { map } = await fixture();
+  const encode = (value: string) => new TextEncoder().encode(value);
+  const old = join(map, "old.blp");
+  await put(map, "old.blp", "old");
+  // Deleting old.blp and then writing old.blp/inner.blp makes old.blp a folder, so it cannot be restored as a file.
+  const plan = {
+    assets: [],
+    changes: [
+      { file: old, before: encode("old") },
+      { file: join(old, "inner.blp"), after: encode("new") },
+      { file: join(map, "gone.blp"), before: encode("missing"), after: encode("new") },
+    ],
+    state: { version: 1 as const, files: {} },
+  };
+  const error = await assertRejects(() => applyAssetPlan(plan), MoonwellError);
+  assert(error.message.includes("changed after the assets were checked"), error.message);
+  assert(error.message.includes(`could not be restored: ${old} (`), error.message);
+  assert(error.hint?.includes("version control"));
+  assert(error.cause instanceof MoonwellError);
+});
+
 Deno.test("with no assets and nothing owned, war3map.imp is left untouched", async () => {
   const { root, map, state } = await fixture();
   const plan = await planAssets(root, map, state, defaults);
