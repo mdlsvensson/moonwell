@@ -38,7 +38,12 @@ carry the same number, and a unit test enforces it.
    `src/main.yue` and the right line. Record which chunk-name form the game used.
 4. Run `deno task build --minify` and play `dist/bin/map.w3x` directly.
 5. Open the packed map in World Editor and confirm it loads.
-6. Record the Warcraft III and World Editor versions in the changelog.
+6. Assets, in a throwaway project so `template/` stays clean (a stray file there fails the embedded-template test):
+   `deno run -A cli/src/main.ts init --link <temp dir>/assets-check`, then in that project put a `.blp` icon at
+   `assets/ReplaceableTextures/CommandButtons/BTNMoonwell.blp` and run `deno task test`; the map must load. Close World
+   Editor, run `deno task assets:sync`, open `maps/map.w3x` and confirm the Import Manager lists
+   `ReplaceableTextures\CommandButtons\BTNMoonwell.blp`. Delete the icon, sync again and confirm it is gone.
+7. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
 

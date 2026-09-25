@@ -12,14 +12,9 @@ export async function renderEmbedded(repo: string = REPO): Promise<Map<string, s
   const runtime = await Deno.readTextFile(join(repo, "cli", "runtime", "moonwell.lua"));
   out.set("cli/src/embedded/runtime.ts", `${HEADER}export const RUNTIME_LUA: string = ${JSON.stringify(runtime)};\n`);
 
-  const templateDir = join(repo, "template");
-  const excluded = new Set<string>(TEMPLATE_EXCLUDE);
-  const entries: string[] = [];
-  for (const path of await listFiles(templateDir)) {
-    if (excluded.has(path) || path.startsWith("dist/")) continue;
-    const bytes = await Deno.readFile(join(templateDir, ...path.split("/")));
-    entries.push(`  { path: ${JSON.stringify(path)}, base64: ${JSON.stringify(encodeBase64(bytes))} },`);
-  }
+  const entries = (await templateEntries(repo)).map((file) =>
+    `  { path: ${JSON.stringify(file.path)}, base64: ${JSON.stringify(file.base64)} },`
+  );
   out.set(
     "cli/src/embedded/template.ts",
     `${HEADER}export const TEMPLATE_FILES: ReadonlyArray<{ path: string; base64: string }> = [\n${
@@ -27,6 +22,18 @@ export async function renderEmbedded(repo: string = REPO): Promise<Map<string, s
     }\n];\n`,
   );
   return out;
+}
+
+/** Every file init copies from template/, in listing order, as base64. */
+export async function templateEntries(repo: string = REPO): Promise<Array<{ path: string; base64: string }>> {
+  const templateDir = join(repo, "template");
+  const excluded = new Set<string>(TEMPLATE_EXCLUDE);
+  const entries: Array<{ path: string; base64: string }> = [];
+  for (const path of await listFiles(templateDir)) {
+    if (excluded.has(path) || path.startsWith("dist/")) continue;
+    entries.push({ path, base64: encodeBase64(await Deno.readFile(join(templateDir, ...path.split("/")))) });
+  }
+  return entries;
 }
 
 if (import.meta.main) {
