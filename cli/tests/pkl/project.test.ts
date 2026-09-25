@@ -29,4 +29,5 @@ Deno.test("loadProject evaluates a real project against the local package", asyn
   assertEquals(project.map.folder, "hero.w3x");
   assertEquals(project.launch.gameExecutable, "C:/wc3.exe");
   assertEquals(project.yue, { version: "0.34.2", path: null });
+  assertEquals(project.assets, { paths: {}, exclude: [] });
 });

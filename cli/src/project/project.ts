@@ -11,6 +11,7 @@ export interface Project {
   build: { folder: string; minify: boolean };
   launch: { gameExecutable: string | null; args: string[] };
   yue: { version: string; path: string | null };
+  assets: { paths: Record<string, string>; exclude: string[] };
 }
 
 export const PKL_INSTALL_HINT =
@@ -134,12 +135,19 @@ export function parseProject(root: string, value: unknown, file: string): Projec
     Array.isArray(input) && input.every((item) => typeof item === "string")
       ? input as string[]
       : fail(path, "a list of strings");
+  const stringRecord = (input: unknown, path: string): Record<string, string> => {
+    const value = record(input, path);
+    return Object.values(value).every((item) => typeof item === "string")
+      ? value as Record<string, string>
+      : fail(path, "a mapping of strings");
+  };
 
   const data = record(value, "the manifest");
   const map = record(data.map, "map");
   const buildConfig = record(data.build, "build");
   const launch = record(data.launch, "launch");
   const yue = record(data.yue, "yue");
+  const assets = record(data.assets, "assets");
   return {
     root,
     map: { folder: string(map.folder, "map.folder"), entry: string(map.entry, "map.entry") },
@@ -149,5 +157,6 @@ export function parseProject(root: string, value: unknown, file: string): Projec
       args: strings(launch.args, "launch.args"),
     },
     yue: { version: string(yue.version, "yue.version"), path: nullableString(yue.path, "yue.path") },
+    assets: { paths: stringRecord(assets.paths, "assets.paths"), exclude: strings(assets.exclude, "assets.exclude") },
   };
 }

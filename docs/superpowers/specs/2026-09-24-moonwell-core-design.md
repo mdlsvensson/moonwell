@@ -79,7 +79,7 @@ moonwell/
   schema/                   Pkl package "moonwell"
     PklProject              package block (name, baseUri, version, packageZipUrl)
     Project.pkl             root manifest schema
-    MapSettings.pkl  Assets.pkl  Objects.pkl  ObjectFile.pkl
+    MapSettings.pkl  Objects.pkl  ObjectFile.pkl   (AssetsConfig lives in Project.pkl)
     objects/                Unit/Hero/Building/Item/Ability/Buff/Upgrade classes
     generated/              Bases.pkl, *Props.pkl (generated from metadata, committed)
     tests/                  Pkl-level tests (pkl test)

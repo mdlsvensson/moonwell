@@ -17,6 +17,7 @@ const FULL = {
   build: { folder: "dist/bin", minify: false },
   launch: { args: ["-launch"] },
   yue: { version: "0.34.2" },
+  assets: { paths: {}, exclude: [] },
 };
 
 Deno.test("parseProject maps omitted nullable fields to null", () => {
@@ -27,7 +28,16 @@ Deno.test("parseProject maps omitted nullable fields to null", () => {
     build: { folder: "dist/bin", minify: false },
     launch: { gameExecutable: null, args: ["-launch"] },
     yue: { version: "0.34.2", path: null },
+    assets: { paths: {}, exclude: [] },
   });
+});
+
+Deno.test("parseProject reads assets and rejects a wrong shape", () => {
+  const assets = { paths: { "a.blp": "Textures\\a.blp" }, exclude: ["credits/"] };
+  assertEquals(parseProject("/p", { ...FULL, assets }, "moonwell.pkl").assets, assets);
+  for (const bad of [{ paths: [], exclude: [] }, { paths: { a: 1 }, exclude: [] }, { paths: {}, exclude: "x" }]) {
+    assertThrows(() => parseProject("/p", { ...FULL, assets: bad }, "moonwell.pkl"), MoonwellError, "assets");
+  }
 });
 
 Deno.test("parseProject rejects a schema mismatch", () => {
