@@ -1,4 +1,6 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
+import { exists } from "@std/fs";
+import { join } from "@std/path";
 import { main } from "../../src/main.ts";
 import { VERSION } from "../../src/version.ts";
 
@@ -30,4 +32,13 @@ Deno.test("command failures are formatted and return 1", async () => {
   const { code, output } = await run(["check"]);
   assertEquals(code, 1);
   assertStringIncludes(output, "error:");
+});
+
+Deno.test("commands outside a project leave no dist/ behind", async () => {
+  const root = await Deno.makeTempDir();
+  for (const command of ["check", "build", "test"]) {
+    const { code } = await run([command], root);
+    assertEquals(code, 1);
+  }
+  assertEquals(await exists(join(root, "dist")), false);
 });
