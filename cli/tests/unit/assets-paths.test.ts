@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { join } from "@std/path";
 import { assetsPaths } from "../../src/commands/assets-paths.ts";
 import { createContext } from "../../src/context.ts";
@@ -37,5 +37,11 @@ Deno.test("outside a project, assets:paths lists a model's paths without a found
 Deno.test("outside a project, assets:paths needs a file, and the file must exist", async () => {
   const { ctx } = await outside();
   await assertRejects(() => assetsPaths(ctx), MoonwellError, "needs a model file");
-  await assertRejects(() => assetsPaths(ctx, "missing.mdx"), MoonwellError, "does not exist");
+  const missing = await assertRejects(() => assetsPaths(ctx, "missing.mdx"), MoonwellError, "does not exist");
+  assertStringIncludes(missing.hint ?? "", "relative to the project folder");
+});
+
+Deno.test("assets:paths reports a folder passed as the model as a user error", async () => {
+  const { ctx } = await outside();
+  await assertRejects(() => assetsPaths(ctx, "."), MoonwellError, "is a folder, not a model file");
 });

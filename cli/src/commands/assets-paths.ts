@@ -34,8 +34,17 @@ export async function assetsPaths(ctx: CommandContext, file?: string): Promise<M
     try {
       bytes = await Deno.readFile(path);
     } catch (error) {
-      if (error instanceof Deno.errors.NotFound) throw new MoonwellError(`${file} does not exist.`);
-      throw error;
+      if (error instanceof Deno.errors.NotFound) {
+        throw new MoonwellError(`${file} does not exist.`, {
+          hint: "Model paths are relative to the project folder, e.g. assets/Models/Knight.mdx.",
+        });
+      }
+      // Windows reports reading a folder as a plain error or PermissionDenied, so ask the file system directly.
+      if ((await Deno.stat(path).catch(() => undefined))?.isDirectory) {
+        throw new MoonwellError(`${file} is a folder, not a model file.`);
+      }
+      const reason = error instanceof Error ? error.message : String(error);
+      throw new MoonwellError(`${file} could not be read: ${reason}`, { cause: error });
     }
     const inside = relative(ctx.root, path);
     const heading = inside.startsWith("..") || isAbsolute(inside) ? toPosix(path) : toPosix(inside);
