@@ -1,6 +1,6 @@
 import { decodeBase64 } from "@std/encoding/base64";
 import { exists } from "@std/fs";
-import { dirname, fromFileUrl, join, relative, resolve } from "@std/path";
+import { dirname, fromFileUrl, isAbsolute, join, relative, resolve, toFileUrl } from "@std/path";
 import type { CommandContext } from "../context.ts";
 import { TEMPLATE_FILES } from "../embedded/template.ts";
 import { projectDenoJson, projectLocalPkl, projectPklProject } from "../project-files.ts";
@@ -75,6 +75,14 @@ function localLinks(target: string): { cli: string; pkl: string } {
     throw new MoonwellError("--link only works when Moonwell runs from a local checkout.");
   }
   const repo = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..", "..");
-  const link = (path: string) => toPosix(relative(target, path));
-  return { cli: link(join(repo, "cli", "src", "main.ts")), pkl: link(join(repo, "schema")) };
+  return { cli: linkPath(target, join(repo, "cli", "src", "main.ts")), pkl: linkPath(target, join(repo, "schema")) };
+}
+
+/**
+ * How a linked project refers to `path` in this checkout: a relative path, or a file URL when there is none (another
+ * drive on Windows). Pkl would read a bare `D:/...` as a URI with the scheme `d`.
+ */
+export function linkPath(target: string, path: string): string {
+  const inside = relative(target, path);
+  return isAbsolute(inside) ? toFileUrl(path).href : toPosix(inside);
 }

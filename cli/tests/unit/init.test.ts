@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { exists } from "@std/fs";
 import { join } from "@std/path";
-import { init } from "../../src/commands/init.ts";
+import { init, linkPath } from "../../src/commands/init.ts";
 import { type CommandContext, createContext } from "../../src/context.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import type { Runner } from "../../src/shared/process.ts";
@@ -53,4 +53,22 @@ Deno.test("init refuses a target that is a file", async () => {
     MoonwellError,
     "not a directory",
   );
+});
+
+Deno.test("linkPath is relative when the target shares a root with the checkout", () => {
+  const repo = join(Deno.cwd(), "moonwell", "schema");
+  const target = join(Deno.cwd(), "maps", "my-map");
+  assertEquals(linkPath(target, repo), "../../moonwell/schema");
+});
+
+Deno.test({
+  name: "linkPath is a file URL when the target is on another drive (Windows)",
+  ignore: Deno.build.os !== "windows",
+  fn: () => {
+    // Pkl reads a bare `D:/...` as a URI with scheme `d`, so a path across drives must be a file URL.
+    assertEquals(
+      linkPath(String.raw`C:\Temp\my-map`, String.raw`D:\a\moonwell\schema`),
+      "file:///D:/a/moonwell/schema",
+    );
+  },
 });
