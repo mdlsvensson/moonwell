@@ -7,7 +7,7 @@ const repo = (path: string) => fromFileUrl(new URL(`../../../${path}`, import.me
 Deno.test("projectDenoJson runs every task through the given CLI", () => {
   const json = JSON.parse(projectDenoJson("jsr:@moonwell/cli@0.1.0"));
   assertEquals(json.tasks.build, "deno run -A jsr:@moonwell/cli@0.1.0 build");
-  assertEquals(Object.keys(json.tasks), ["build", "test", "dev", "check", "setup"]);
+  assertEquals(Object.keys(json.tasks), ["build", "test", "dev", "check", "setup", "assets:check", "assets:sync"]);
   assertEquals("nodeModulesDir" in json, false);
 });
 

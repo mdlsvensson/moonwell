@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Assets: files under `assets/` are imported into builds. The manifest's `assets` block maps them to exact paths and
+  excludes files. The `assets:check` and `assets:sync` commands write them into the source map for World Editor, with
+  ownership tracking and rollback.
+
 ## 0.1.0 (2026-09-25)
 
 First release: the toolchain.
