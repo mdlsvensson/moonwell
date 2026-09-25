@@ -9,7 +9,9 @@ Deno.test("loadProject evaluates a real project against the local package", asyn
   const root = await Deno.makeTempDir();
   const pkl = join(root, "pkl");
   await Deno.mkdir(pkl);
-  for (const file of ["PklProject", "Project.pkl"]) await Deno.copyFile(join(PKL_DIR, file), join(pkl, file));
+  for (const file of ["PklProject", "Project.pkl", "MapSettings.pkl"]) {
+    await Deno.copyFile(join(PKL_DIR, file), join(pkl, file));
+  }
   await Deno.writeTextFile(
     join(root, "PklProject"),
     `amends "pkl:Project"\n\ndependencies {\n  ["moonwell"] = import("pkl/PklProject")\n}\n`,
@@ -30,4 +32,5 @@ Deno.test("loadProject evaluates a real project against the local package", asyn
   assertEquals(project.launch.gameExecutable, "C:/wc3.exe");
   assertEquals(project.yue, { version: "0.34.2", path: null });
   assertEquals(project.assets, { paths: {}, exclude: [] });
+  assertEquals(project.settings.info, {});
 });

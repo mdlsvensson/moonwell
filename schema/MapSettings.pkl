@@ -1,0 +1,81 @@
+/// Map settings override the source map during staging. Null fields inherit its values.
+module moonwell.MapSettings
+
+typealias MapText = String(!contains("\u{0}"))
+typealias SectionName = String(matches(Regex("[A-Za-z_][A-Za-z0-9_]*")))
+typealias FieldName = String(matches(Regex("[A-Za-z_][A-Za-z0-9_]*")))
+typealias FieldValue = String(!contains("\n"), !contains("\r"), !contains("\u{0}"))
+
+class MapInfo {
+  name: MapText?
+  author: MapText?
+  description: MapText?
+  recommendedPlayers: MapText?
+}
+
+class LoadingScreen {
+  /// World Editor campaign background index; -1 selects a custom model.
+  background: Int(isBetween(-1, 2147483647))?
+  model: MapText?
+  text: MapText?
+  title: MapText?
+  subtitle: MapText?
+}
+
+/// Empty strings explicitly clear text. All other null fields inherit the source map.
+info: MapInfo = new {}
+loadingScreen: LoadingScreen = new {}
+
+/// Raw section/key overrides for war3mapMisc.txt. A raw key must agree with a matching typed gameplay setting.
+gameplayConstants: Mapping<SectionName, Mapping<FieldName, FieldValue>> = new {}
+
+/// Raw section/key overrides for war3mapSkin.txt. Names are case insensitive in Warcraft.
+gameInterface: Mapping<SectionName, Mapping<FieldName, FieldValue>> = new {}
+
+class Player {
+  name: MapText?
+  controller: ("user"|"computer"|"neutral"|"rescuable")?
+  race: ("selectable"|"human"|"orc"|"undead"|"nightelf")?
+  fixedStart: Boolean?
+  x: Float(isBetween(-10000000, 10000000))?
+  y: Float(isBetween(-10000000, 10000000))?
+}
+
+class Force {
+  name: MapText?
+  allied: Boolean?
+  alliedVictory: Boolean?
+  sharedVision: Boolean?
+  sharedControl: Boolean?
+  sharedAdvancedControl: Boolean?
+}
+
+/// Warcraft stores colors as red, green, blue, alpha, each from 0 to 255. A List replaces an inherited color.
+typealias Color = List<Int(isBetween(0, 255))>(length == 4)
+class Fog {
+  enabled: Boolean?
+  /// Fog style: 0 linear, 1 exponential, or 2 exponential squared.
+  style: Int(isBetween(0, 2))?
+  start: Float(isBetween(-10000000, 10000000))?
+  end: Float(isBetween(-10000000, 10000000))?
+  density: Float(isBetween(0, 1))?
+  color: Color?
+}
+class Environment {
+  soundEnvironment: MapText?
+  waterColor: Color?
+  fog: Fog = new {}
+}
+class Gameplay {
+  heroMaxLevel: Int(isBetween(1, 10000))?
+  foodLimit: Int(isBetween(0, 300))?
+}
+
+/// Override existing zero-based player slot IDs and force indices, 0 through 23. Membership is inherited.
+/// Custom-force edits require enabling custom forces in World Editor first; this block cannot create forces.
+typealias SlotId = String(matches(Regex("([0-9]|1[0-9]|2[0-3])")))
+players: Mapping<SlotId, Player> = new {}
+forces: Mapping<SlotId, Force> = new {}
+environment: Environment = new {}
+/// Typed conveniences; conflicting raw values are rejected.
+gameplay: Gameplay = new {}

@@ -4,6 +4,7 @@ import { projectLocalPkl } from "../project-files.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { type Runner, runProcess } from "../shared/process.ts";
 import { VERSION } from "../version.ts";
+import { type MapSettings, validateMapSettings } from "../settings/options.ts";
 
 export interface Project {
   root: string;
@@ -12,6 +13,7 @@ export interface Project {
   launch: { gameExecutable: string | null; args: string[] };
   yue: { version: string; path: string | null };
   assets: { paths: Record<string, string>; exclude: string[] };
+  settings: MapSettings;
 }
 
 export const PKL_INSTALL_HINT =
@@ -159,5 +161,6 @@ export function parseProject(root: string, value: unknown, file: string): Projec
     },
     yue: { version: string(yue.version, "yue.version"), path: nullableString(yue.path, "yue.path") },
     assets: { paths: stringRecord(assets.paths, "assets.paths"), exclude: strings(assets.exclude, "assets.exclude") },
+    settings: validateMapSettings(data.settings === undefined ? {} : data.settings, file),
   };
 }

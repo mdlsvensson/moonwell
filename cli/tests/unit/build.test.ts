@@ -3,6 +3,7 @@ import { join } from "@std/path";
 import { archivePath } from "../../src/commands/build.ts";
 import type { Project } from "../../src/project/project.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
+import { validateMapSettings } from "../../src/settings/options.ts";
 
 function project(root: string, folder: string): Project {
   return {
@@ -12,6 +13,7 @@ function project(root: string, folder: string): Project {
     launch: { gameExecutable: null, args: [] },
     yue: { version: "0.34.2", path: null },
     assets: { paths: {}, exclude: [] },
+    settings: validateMapSettings({}),
   };
 }
 
