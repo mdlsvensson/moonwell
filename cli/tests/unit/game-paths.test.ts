@@ -15,6 +15,11 @@ Deno.test("normalizeGamePath strips storage prefixes and keeps only model-refere
     "abilities/spells/human/heal/heal.mdl",
   );
   assertEquals(normalizeGamePath("  Effects/Fire.pkfx  "), "effects/fire.pkfx");
+  // Reforged stores its particle effects baked, as .pkb (the real CASC export has no .pkfx).
+  assertEquals(
+    normalizeGamePath("war3.w3mod:_de.w3mod:abilities\\ribbon\\chainlightning.pkb"),
+    "abilities/ribbon/chainlightning.pkb",
+  );
   assertEquals(normalizeGamePath("war3.w3mod:Sound/Music/mp3Music/ArthasTheme.mp3"), undefined);
   assertEquals(normalizeGamePath("war3.w3mod:Units/UnitData.slk"), undefined);
   assertEquals(normalizeGamePath(""), undefined);
