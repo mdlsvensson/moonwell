@@ -5,6 +5,8 @@
 /// Machine-specific values belong in `moonwell.local.pkl`, which amends `moonwell.pkl` and is git-ignored.
 module moonwell.Project
 
+import "MapSettings.pkl"
+
 /// `path` split on `/` and `\`, without empty and `.` segments.
 local const function segments(path: String): List<String> =
   path.replaceAll("\\", "/").split("/").filter((segment) -> segment != "" && segment != ".")
@@ -75,3 +77,4 @@ build: BuildConfig = new {}
 launch: LaunchConfig = new {}
 yue: YueConfig = new {}
 assets: AssetsConfig = new {}
+settings: MapSettings = new {}

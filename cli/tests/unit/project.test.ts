@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from "@std/assert";
 import { join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
+import { validateMapSettings } from "../../src/settings/options.ts";
 import type { Runner } from "../../src/shared/process.ts";
 import { projectLocalPkl } from "../../src/project-files.ts";
 import {
@@ -29,7 +30,18 @@ Deno.test("parseProject maps omitted nullable fields to null", () => {
     launch: { gameExecutable: null, args: ["-launch"] },
     yue: { version: "0.34.2", path: null },
     assets: { paths: {}, exclude: [] },
+    settings: validateMapSettings({}),
   });
+});
+
+Deno.test("parseProject defaults absent settings and validates malformed settings with the manifest path", () => {
+  assertEquals(parseProject("/p", FULL, "moonwell.pkl").settings, validateMapSettings({}));
+  const error = assertThrows(
+    () => parseProject("/p", { ...FULL, settings: { players: { "24": {} } } }, "moonwell.local.pkl"),
+    MoonwellError,
+    "players",
+  );
+  assertEquals(error.file, "moonwell.local.pkl");
 });
 
 Deno.test("parseProject reads assets and rejects a wrong shape", () => {

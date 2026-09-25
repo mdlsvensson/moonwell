@@ -68,6 +68,76 @@ facts {
     t.catch(() -> (Project) { assets { paths { ["a.blp"] = "" } } }.assets.paths.toMap()).contains("isEmpty")
     t.catch(() -> (Project) { assets { exclude = List("") } }.assets.exclude).contains("isEmpty")
   }
+  ["settings inherit and colors replace"] {
+    Project.settings.info.name == null
+    Project.settings.players.isEmpty
+    Project.settings.environment.fog.enabled == null
+    (Project) { settings { environment { waterColor = List(1, 2, 3, 4) } } }
+      .settings.environment.waterColor == List(1, 2, 3, 4)
+    ((Project) { settings { environment { waterColor = List(1, 2, 3, 4) } } }) {
+      settings { environment { waterColor = List(5, 6, 7, 8) } }
+    }.settings.environment.waterColor == List(5, 6, 7, 8)
+  }
+  ["settings reject invalid mapping values"] {
+    t.catch(() -> (Project) { settings { players { ["24"] {} } } }.settings.players.toMap()).contains("matches")
+    t.catch(() -> (Project) { settings { gameplayConstants { ["Misc"] { ["X"] = "a\nb" } } } }
+      .settings.gameplayConstants["Misc"].toMap()).contains("contains")
+  }
+  ["settings numeric bounds and colors"] {
+    (Project) { settings { loadingScreen { background = -1 }; gameplay { heroMaxLevel = 1; foodLimit = 0 } } }
+      .settings.loadingScreen.background == -1
+    t.catch(() -> (Project) { settings { loadingScreen { background = -2 } } }.settings.loadingScreen.background)
+      .contains("isBetween")
+    t.catch(() -> (Project) { settings { gameplay { heroMaxLevel = 0 } } }.settings.gameplay.heroMaxLevel)
+      .contains("isBetween")
+    t.catch(() -> (Project) { settings { gameplay { foodLimit = 301 } } }.settings.gameplay.foodLimit)
+      .contains("isBetween")
+    t.catch(() -> (Project) { settings { environment { waterColor = List(0, 0, 0) } } }.settings.environment.waterColor)
+      .contains("length")
+    t.catch(() -> (Project) { settings { environment { waterColor = List(0, 0, 0, 256) } } }
+      .settings.environment.waterColor).contains("isBetween")
+  }
+  ["settings names and nullable fields"] {
+    (Project) { settings { info { name = "" }; players { ["0"] { controller = "user"; race = "nightelf" } } } }
+      .settings.info.name == ""
+    Project.settings.loadingScreen.model == null
+    Project.settings.gameplay.foodLimit == null
+    Project.settings.environment.waterColor == null
+    t.catch(() -> (Project) { settings { players { ["0"] { controller = "elf" } } } }
+      .settings.players["0"].controller).contains("Expected")
+    t.catch(() -> (Project) { settings { players { ["0"] { race = "elf" } } } }
+      .settings.players["0"].race).contains("Expected")
+  }
+  ["settings accept all player and force choices"] {
+    for (choice in List("user", "computer", "neutral", "rescuable")) {
+      (Project) { settings { players { ["0"] { controller = choice } } } }.settings.players["0"].controller == choice
+    }
+    for (choice in List("selectable", "human", "orc", "undead", "nightelf")) {
+      (Project) { settings { players { ["0"] { race = choice } } } }.settings.players["0"].race == choice
+    }
+    (Project) { settings { forces { ["23"] { allied = false; alliedVictory = true; sharedVision = false
+      sharedControl = true; sharedAdvancedControl = false } } } }.settings.forces["23"].sharedAdvancedControl == false
+    t.catch(() -> (Project) { settings { forces { ["0"] { allied = 1 } } } }.settings.forces["0"].allied)
+      .contains("Boolean")
+  }
+  ["settings enforce remaining numeric endpoints"] {
+    (Project) { settings { loadingScreen { background = 2147483647 } } }.settings.loadingScreen.background == 2147483647
+    t.catch(() -> (Project) { settings { loadingScreen { background = 2147483648 } } }.settings.loadingScreen.background)
+      .contains("isBetween")
+    (Project) { settings { gameplay { heroMaxLevel = 10000; foodLimit = 300 } } }.settings.gameplay.foodLimit == 300
+    t.catch(() -> (Project) { settings { gameplay { heroMaxLevel = 10001 } } }.settings.gameplay.heroMaxLevel)
+      .contains("isBetween")
+    (Project) { settings { players { ["0"] { x = -10000000.0; y = 10000000.0 } } } }.settings.players["0"].x == -10000000.0
+    t.catch(() -> (Project) { settings { players { ["0"] { y = 10000000.1 } } } }.settings.players["0"].y)
+      .contains("isBetween")
+    (Project) { settings { environment { fog { style = 2; density = 1.0 } } } }.settings.environment.fog.style == 2
+    t.catch(() -> (Project) { settings { environment { fog { style = 3 } } } }.settings.environment.fog.style)
+      .contains("isBetween")
+    t.catch(() -> (Project) { settings { environment { fog { density = 1.1 } } } }.settings.environment.fog.density)
+      .contains("isBetween")
+    t.catch(() -> (Project) { settings { environment { fog { color = List(0, 0, 0, 1.5) } } } }
+      .settings.environment.fog.color).contains("Int")
+  }
   ["an amending project renders as JSON"] {
     parsed.map.folder == "hero.w3x"
     parsed.map.entry == "src/main.yue"
