@@ -5,7 +5,9 @@ import type { Project } from "./project/project.ts";
 export type Spawn = (command: string, args: string[]) => void;
 
 export const spawnDetached: Spawn = (command, args) => {
-  const child = new Deno.Command(command, { args, stdin: "null", stdout: "null", stderr: "null" }).spawn();
+  // Without `detached` the game dies when the CLI exits (verified on Windows).
+  const child = new Deno.Command(command, { args, detached: true, stdin: "null", stdout: "null", stderr: "null" })
+    .spawn();
   child.unref();
 };
 
