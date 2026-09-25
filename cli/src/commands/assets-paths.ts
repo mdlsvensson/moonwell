@@ -14,7 +14,10 @@ export interface ModelReport {
   refs: Array<ModelPath & { found?: boolean }>;
 }
 
-/** How a reference and an import are compared: any letter case, either separator, .mdl as .mdx (the game swaps them). */
+/**
+ * How a reference is compared with the import targets (keyed by `pathKey`): any letter case, either separator, and a
+ * requested .mdl as the .mdx, which the game loads instead. An imported .mdl is never loaded, so targets keep theirs.
+ */
 function referenceKey(path: string): string {
   return pathKey(path).replace(/\.mdl$/, ".mdx");
 }
@@ -25,7 +28,7 @@ const plural = (count: number, word: string) => `${count} ${word}${count === 1 ?
 export async function assetsPaths(ctx: CommandContext, file?: string): Promise<ModelReport[]> {
   const inProject = await exists(join(ctx.root, "moonwell.pkl"));
   const assets = inProject ? await collectAssets(ctx.root, (await loadProject(ctx.root, ctx.run)).assets) : [];
-  const targets = inProject ? new Set(assets.map((asset) => referenceKey(asset.target))) : undefined;
+  const targets = inProject ? new Set(assets.map((asset) => pathKey(asset.target))) : undefined;
 
   const models: Array<{ heading: string; bytes: Uint8Array }> = [];
   if (file !== undefined) {

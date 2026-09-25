@@ -28,12 +28,14 @@ Deno.test("assets:paths marks references found through targets, mappings and .md
           texture("", 1),
         ),
       ),
-      chunk("PREM", emitter("Models\\Glow.mdl")),
+      chunk("PREM", concat(emitter("Models\\Glow.mdl"), emitter("Models\\Only.mdx"))),
     ),
   );
   await put(root, "assets/Textures/knight.BLP", new Uint8Array([1])); // letter case must not matter
   await put(root, "assets/art/cape.blp", new Uint8Array([2]));
   await put(root, "assets/Models/Glow.mdx", mdx());
+  // An imported .mdl satisfies nothing: the game swaps a requested .mdl for the .mdx, never the other way.
+  await put(root, "assets/Models/Only.mdl", new TextEncoder().encode("Version {\n\tFormatVersion 800,\n}\n"));
   const manifest = join(root, "moonwell.pkl");
   const text = await Deno.readTextFile(manifest);
   assertStringIncludes(text, "paths {}");
@@ -52,14 +54,20 @@ Deno.test("assets:paths marks references found through targets, mappings and .md
     ["Textures\\Missing.blp", false],
     [null, undefined],
     ["Models\\Glow.mdl", true],
+    ["Models\\Only.mdx", false],
   ]);
   assertEquals(
     logger.lines.at(-1),
-    "1 model, 5 paths: 3 found in assets/, 1 not found (built-in game files or missing imports).",
+    "1 model, 6 paths: 3 found in assets/, 2 not found (built-in game files or missing imports).",
   );
 
   const all = await assetsPaths(ctx);
-  assertEquals(all.map((report) => report.heading), ["assets/Models/Glow.mdx", "assets/Models/Knight.mdx"]);
+  assertEquals(all.map((report) => report.heading), [
+    "assets/Models/Glow.mdx",
+    "assets/Models/Knight.mdx",
+    "assets/Models/Only.mdl",
+  ]);
   assertEquals(all[0].refs, []);
+  assertEquals(all[2].refs, []);
   assertStringIncludes(logger.lines.join("\n"), "  (no referenced files)");
 });
