@@ -12,7 +12,8 @@ export interface Project {
   yue: { version: string; path: string | null };
 }
 
-const PKL_INSTALL_HINT = "Install Pkl 0.32 or newer: https://pkl-lang.org/main/current/pkl-cli/index.html#installation";
+export const PKL_INSTALL_HINT =
+  "Install Pkl 0.32 or newer: https://pkl-lang.org/main/current/pkl-cli/index.html#installation";
 
 /** Evaluates moonwell.local.pkl (or moonwell.pkl) in `root` and returns the typed project. */
 export async function loadProject(root: string, run: Runner = runProcess): Promise<Project> {
@@ -46,15 +47,11 @@ export async function loadProject(root: string, run: Runner = runProcess): Promi
   try {
     value = JSON.parse(result.stdout);
   } catch (cause) {
-    throw new MoonwellError(
-      `pkl eval printed output that is not valid JSON:
-${result.stdout.trim().slice(0, 500)}`,
-      {
-        file,
-        cause,
-        hint: "Check that pkl on PATH is Pkl 0.32 or newer and that no other program is named pkl.",
-      },
-    );
+    throw new MoonwellError(`pkl eval printed output that is not valid JSON:\n${result.stdout.trim().slice(0, 500)}`, {
+      file,
+      cause,
+      hint: "Check that pkl on PATH is Pkl 0.32 or newer and that no other program is named pkl.",
+    });
   }
   return parseProject(root, value, file);
 }
