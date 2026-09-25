@@ -1,5 +1,6 @@
 import { copy, walk } from "@std/fs";
 import { dirname, relative, SEPARATOR } from "@std/path";
+import { MoonwellError } from "./errors.ts";
 
 export function toPosix(path: string): string {
   return path.split(SEPARATOR).join("/");
@@ -16,7 +17,7 @@ export async function removeIfExists(path: string): Promise<void> {
   try {
     await Deno.remove(path, { recursive: true });
   } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) throw error;
+    if (!(error instanceof Deno.errors.NotFound)) throw inUseError(error, path);
   }
 }
 
@@ -25,8 +26,16 @@ export async function removeFileIfExists(path: string): Promise<void> {
   try {
     await Deno.remove(path);
   } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) throw error;
+    if (!(error instanceof Deno.errors.NotFound)) throw inUseError(error, path);
   }
+}
+
+/** A clear error when another program (on Windows: EBUSY) holds `path` open, else `error` unchanged. */
+function inUseError(error: unknown, path: string): unknown {
+  if ((error as { code?: string }).code !== "EBUSY") return error;
+  return new MoonwellError(`${path} is in use by another program.`, {
+    hint: "Close Warcraft III or World Editor if it has this map open, then try again.",
+  });
 }
 
 /** Replaces `destination` with a copy of `source`. */
