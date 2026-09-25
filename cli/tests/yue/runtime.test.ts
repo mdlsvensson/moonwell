@@ -17,11 +17,14 @@ const FAKE_MAP = [
 
 const REPORT = "\nconfig()\nmain()\nio.write(table.concat(LOG, '|'), '\\n', table.concat(PRINTED, '\\n'), '\\n')\n";
 
-async function runMap(modules: Array<{ name: string; source: string }>): Promise<{ log: string; printed: string }> {
+async function runMap(
+  modules: Array<{ name: string; source: string }>,
+  minify = false,
+): Promise<{ log: string; printed: string }> {
   const compiled = modules.map((module) => ({ ...module, sourcePath: `src/${module.name.split(".").join("/")}.yue` }));
   const script = injectBundle(
     FAKE_MAP,
-    (firstLine) => emitBundle({ runtime: RUNTIME_LUA, modules: compiled, entry: "main", firstLine }),
+    (firstLine) => emitBundle({ runtime: RUNTIME_LUA, modules: compiled, entry: "main", firstLine, minify }),
   ) + REPORT;
   const dir = await Deno.makeTempDir();
   await Deno.writeTextFile(join(dir, "war3map.lua"), script);
@@ -60,6 +63,12 @@ Deno.test("an entry that fails to load is reported and the map still runs", asyn
   assertEquals(log, "config|main");
   assertStringIncludes(printed, "[moonwell] load main failed");
   assertStringIncludes(printed, "src/main.yue:1: boot failed");
+});
+
+Deno.test("minified bundles report the module file without a line number", async () => {
+  const { printed } = await runMap([{ name: "main", source: 'local x = 1\nerror("boot failed")' }], true);
+  assertStringIncludes(printed, "src/main.yue: boot failed");
+  assertEquals(printed.includes("src/main.yue:2"), false);
 });
 
 Deno.test("format_error leaves positions outside modules untouched", async () => {

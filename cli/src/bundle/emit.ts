@@ -7,9 +7,12 @@ function sourceLines(text: string): string[] {
   return lines;
 }
 
-/** Renders the bundle block; `firstLine` is the war3map.lua line number the leading "do" will occupy. */
+/**
+ * Renders the bundle block; `firstLine` is the war3map.lua line number the leading "do" will occupy.
+ * Minified modules keep no source lines, so their errors name the module file only.
+ */
 export function emitBundle(
-  input: { runtime: string; modules: CompiledModule[]; entry: string; firstLine: number },
+  input: { runtime: string; modules: CompiledModule[]; entry: string; firstLine: number; minify?: boolean },
 ): string {
   const out: string[] = ["do", ...sourceLines(input.runtime)];
   const ranges: string[] = [];
@@ -24,7 +27,9 @@ export function emitBundle(
     );
     out.push("end)");
   }
-  out.push("__mw.lines = {", ...ranges, "}", "__mw.install()", `__mw.boot(${JSON.stringify(input.entry)})`, "end");
+  out.push("__mw.lines = {", ...ranges, "}");
+  if (input.minify) out.push("__mw.minified = true");
+  out.push("__mw.install()", `__mw.boot(${JSON.stringify(input.entry)})`, "end");
   return out.join("\n") + "\n";
 }
 

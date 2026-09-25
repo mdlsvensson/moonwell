@@ -210,7 +210,8 @@ a fresh one.
 - **Incremental builds.** A content-hash manifest (`dist/stage/lua/.hashes.json`) lets repeat
   builds and `dev` compile only changed files. Deleted sources remove their outputs.
 - **Errors.** Compiler errors are reported with the `.yue` file and line and fail the build.
-- **`--minify`** adds `-m`. Line mapping is then disabled, and errors report module names only.
+- **`--minify`** adds `-m`. Line mapping is then disabled: the bundle sets `__mw.minified`, and errors
+  name the module's `.yue` file without a line number.
 - **Module name.** A module's name is its path relative to `src/`, without the extension,
   with `/` replaced by `.`. For example, `src/heroes/captain.yue` is `heroes.captain`.
 

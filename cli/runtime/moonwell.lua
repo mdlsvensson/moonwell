@@ -5,6 +5,8 @@ local __mw = {
   modules = {},
   loaded = {},
   lines = {},
+  -- Set by minified builds: line numbers then say nothing about the .yue source.
+  minified = false,
   hooks = { before_config = {}, on_config = {}, before_main = {}, on_main = {} },
 }
 
@@ -29,13 +31,16 @@ function __mw.require(name)
   return result
 end
 
--- Maps an absolute war3map.lua line to "src/file.yue:<line>", or nil outside modules.
+-- Maps an absolute war3map.lua line to "src/file.yue:<line>" ("src/file.yue" when minified), or nil outside modules.
 local function map_line(line)
   local lines = __mw.lines
   for i = #lines, 1, -1 do
     local entry = lines[i]
     if line >= entry[1] then
       if line <= entry[2] then
+        if __mw.minified then
+          return entry[4]
+        end
         return entry[4] .. ":" .. (line - entry[1] + 1)
       end
       return nil

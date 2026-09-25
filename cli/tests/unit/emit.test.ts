@@ -21,6 +21,13 @@ Deno.test("emitBundle wraps modules and records absolute line ranges", () => {
   assertStringIncludes(bundle, '__mw.install()\n__mw.boot("main")\nend\n');
 });
 
+Deno.test("emitBundle marks minified bundles so errors name modules without lines", () => {
+  const plain = emitBundle({ runtime: "", modules, entry: "main", firstLine: 1 });
+  const minified = emitBundle({ runtime: "", modules, entry: "main", firstLine: 1, minify: true });
+  assertEquals(plain.includes("__mw.minified = true"), false);
+  assertStringIncludes(minified, '"src/main.yue"},\n}\n__mw.minified = true\n__mw.install()');
+});
+
 Deno.test("injectBundle appends after the map script and passes the first line", () => {
   const script = "function config()\nend\nfunction main()\nend";
   let seen = 0;
