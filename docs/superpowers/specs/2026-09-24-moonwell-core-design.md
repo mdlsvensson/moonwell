@@ -206,7 +206,9 @@ a fresh one.
 
 ### 5.2 Compile
 
-- **Invocation:** `yue --target=5.3 -r -t dist/stage/lua src`.
+- **Invocation:** one `yue --target=5.3 -r -o dist/stage/lua/<path>.lua src/<path>.yue` per changed
+  file (up to 8 at a time), rather than a single `-t` call over the directory. Per-file calls
+  make incremental builds possible and tie each compiler error to its file and line.
 - **Incremental builds.** A content-hash manifest (`dist/stage/lua/.hashes.json`) lets repeat
   builds and `dev` compile only changed files. Deleted sources remove their outputs.
 - **Errors.** Compiler errors are reported with the `.yue` file and line and fail the build.
