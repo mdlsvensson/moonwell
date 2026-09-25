@@ -17,3 +17,8 @@ build {
 launch {
   args = List("-launch", "-windowmode", "windowed")  // passed to Warcraft III before -loadfile <map>
 }
+
+assets {
+  paths {}                // assets/ file → exact in-map path, e.g. ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"#
+  exclude = List()        // files under assets/, or folders ending in /, to leave out
+}

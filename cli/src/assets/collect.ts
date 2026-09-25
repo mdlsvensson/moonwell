@@ -1,14 +1,10 @@
+import type { Project } from "../project/project.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { sha256Hex } from "../shared/fs.ts";
 import { assetPath, pathKey, safeJoin, scanFiles, targetPath } from "./paths.ts";
 
-/** The manifest's `assets` block. */
-export interface AssetsConfig {
-  /** Path under assets/ → exact in-map path. */
-  paths: Record<string, string>;
-  /** Files under assets/, or folders ending in `/`, that are not imported. */
-  exclude: string[];
-}
+/** The manifest's `assets` block: `paths` maps assets/ files to exact in-map paths; `exclude` leaves files out. */
+export type AssetsConfig = Project["assets"];
 
 /** A file under assets/ and the in-map path it is imported as. */
 export interface Asset {

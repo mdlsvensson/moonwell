@@ -61,7 +61,17 @@ class YueConfig {
   path: String?
 }
 
+class AssetsConfig {
+  /// Files under `assets/` keep their relative path in the map. Map one here to import it at an exact in-map path,
+  /// such as `["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"#`.
+  paths: Mapping<String(!isEmpty), String(!isEmpty)> = new {}
+
+  /// Files under `assets/`, or folders ending in `/`, that are not imported. Names starting with `.` never are.
+  exclude: List<String(!isEmpty)> = List()
+}
+
 map: MapConfig = new {}
 build: BuildConfig = new {}
 launch: LaunchConfig = new {}
 yue: YueConfig = new {}
+assets: AssetsConfig = new {}

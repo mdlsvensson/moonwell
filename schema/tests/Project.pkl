@@ -19,6 +19,8 @@ facts {
     Project.launch.args == List("-launch", "-windowmode", "windowed")
     Project.yue.version == "0.34.2"
     Project.yue.path == null
+    Project.assets.paths.isEmpty
+    Project.assets.exclude == List()
   }
   ["overrides are accepted"] {
     (Project) { map { folder = "hero.w3x"; entry = "src/game/init.yue" } }.map.entry == "src/game/init.yue"
@@ -56,6 +58,16 @@ facts {
   ["yue version must be semver"] {
     t.catch(() -> (Project) { yue { version = "latest" } }.yue.version).contains("matches")
   }
+  ["assets accept paths and excludes"] {
+    (Project) { assets { paths { ["icons/a.blp"] = #"ReplaceableTextures\CommandButtons\BTNA.blp"# } } }
+      .assets.paths["icons/a.blp"] == #"ReplaceableTextures\CommandButtons\BTNA.blp"#
+    (Project) { assets { exclude = List("credits/") } }.assets.exclude == List("credits/")
+  }
+  ["asset paths and excludes cannot be empty"] {
+    t.catch(() -> (Project) { assets { paths { [""] = "x.blp" } } }.assets.paths.toMap()).contains("isEmpty")
+    t.catch(() -> (Project) { assets { paths { ["a.blp"] = "" } } }.assets.paths.toMap()).contains("isEmpty")
+    t.catch(() -> (Project) { assets { exclude = List("") } }.assets.exclude).contains("isEmpty")
+  }
   ["an amending project renders as JSON"] {
     parsed.map.folder == "hero.w3x"
     parsed.map.entry == "src/main.yue"
@@ -66,5 +78,7 @@ facts {
     !parsed.launch.hasProperty("gameExecutable")
     parsed.yue.version == "0.34.2"
     !parsed.yue.hasProperty("path")
+    parsed.assets.paths is Dynamic
+    parsed.assets.exclude.toList() == List()
   }
 }
