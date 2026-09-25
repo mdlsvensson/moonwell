@@ -31,8 +31,8 @@ carry the same number, and a unit test enforces it.
 
 1. Run every check above from a clean checkout.
 2. `cd template`, run `deno task setup` (it creates `moonwell.local.pkl` if missing; check its `gameExecutable`), then
-   `deno task test`. Confirm "Moonwell is running." prints and the footman changes colour every second. Confirm the
-   Warcraft III window is visible and stays open after the CLI exits.
+   `deno task test`. Confirm "Moonwell is running." prints and the footman north of the heroes changes tint every
+   second. Confirm the Warcraft III window is visible and stays open after the CLI exits.
 3. Add `error "gate"` inside the `on_main` hook, run `deno task test` again, and confirm the on-screen error names
    `src/main.yue` and the right line. Record which chunk-name form the game used.
 4. Run `deno task build --minify` and play `dist/bin/map.w3x` directly.

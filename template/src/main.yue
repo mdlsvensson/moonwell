@@ -2,6 +2,7 @@ import "moonwell" as mw
 
 mw.on_main ->
   print "Moonwell is running."
-  unit = CreateUnit Player(0), FourCC("hfoo"), 0, 0, 270
+  -- A footman just north of the preplaced heroes, tinted a new colour every second.
+  unit = CreateUnit Player(0), FourCC("hfoo"), 45, -650, 270
   TimerStart CreateTimer!, 1.0, true, ->
-    SetUnitColor unit, ConvertPlayerColor GetRandomInt 0, 23
+    SetUnitVertexColor unit, GetRandomInt(0, 255), GetRandomInt(0, 255), GetRandomInt(0, 255), 255
