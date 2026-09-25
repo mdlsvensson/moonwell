@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            pkl-asset: pkl-linux-amd64
+            pkl-binary: pkl
+          - os: windows-latest
+            pkl-asset: pkl-windows-amd64.exe
+            pkl-binary: pkl.exe
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.9.x
+
+      - name: Install Pkl 0.32.1
+        run: |
+          mkdir -p "$RUNNER_TEMP/pkl"
+          curl -fsSL -o "$RUNNER_TEMP/pkl/${{ matrix.pkl-binary }}" \
+            "https://github.com/apple/pkl/releases/download/0.32.1/${{ matrix.pkl-asset }}"
+          chmod +x "$RUNNER_TEMP/pkl/${{ matrix.pkl-binary }}"
+          echo "$RUNNER_TEMP/pkl" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/pkl/${{ matrix.pkl-binary }}" --version
+
+      - run: pkl --version
+      - run: deno task check
+      - run: deno task lint
+      - run: deno fmt --check
+      - run: deno task test
+      - run: deno task test:runtime
+      - run: deno task test:pkl
+      - run: deno task test:e2e
