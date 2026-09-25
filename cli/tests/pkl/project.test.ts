@@ -3,7 +3,7 @@ import { fromFileUrl, join } from "@std/path";
 import { loadProject } from "../../src/project/project.ts";
 import { runProcess } from "../../src/shared/process.ts";
 
-const PKL_DIR = fromFileUrl(new URL("../../../pkl", import.meta.url));
+const PKL_DIR = fromFileUrl(new URL("../../../schema", import.meta.url));
 
 Deno.test("loadProject evaluates a real project against the local package", async () => {
   const root = await Deno.makeTempDir();

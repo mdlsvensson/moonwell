@@ -18,12 +18,8 @@ cd my-map
 deno task build
 ```
 
-Then create `moonwell.local.pkl` to point at your game and play:
-
-```pkl
-amends "moonwell.pkl"
-launch { gameExecutable = "C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe" }
-```
+`init` also writes `moonwell.local.pkl`, which points `launch.gameExecutable` at the default Battle.net install. If your
+game is elsewhere, fix the path there, then play:
 
 ```powershell
 deno task test
@@ -31,13 +27,16 @@ deno task test
 
 ## A project
 
-| Path                 | What                                                                                      |
-| -------------------- | ----------------------------------------------------------------------------------------- |
-| `moonwell.pkl`       | Project manifest (`amends "@moonwell/Project.pkl"`); commented examples show every option |
-| `moonwell.local.pkl` | Your machine's overrides, git-ignored                                                     |
-| `src/main.yue`       | Gameplay entry                                                                            |
-| `maps/map.w3x/`      | World Editor map (folder format, Lua script mode)                                         |
-| `dist/`              | Build output                                                                              |
+| Path                 | What                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------ |
+| `moonwell.pkl`       | Project manifest (`amends "@moonwell/Project.pkl"`), shared by the team; everyday settings written out |
+| `moonwell.local.pkl` | This machine's settings, such as the game path; git-ignored, and `deno task setup` recreates it        |
+| `src/main.yue`       | Gameplay entry                                                                                         |
+| `maps/map.w3x/`      | World Editor map (folder format, Lua script mode)                                                      |
+| `dist/`              | Build output                                                                                           |
+
+`moonwell.local.pkl` amends `moonwell.pkl`, so any setting can be overridden there for your machine only. Lists such as
+`launch.args` are replaced, not extended: `args = List("-launch", "-windowmode", "fullscreen")`.
 
 Gameplay registers hooks with the `moonwell` module:
 
@@ -54,17 +53,39 @@ inside hooks.
 
 ## Commands
 
-| Command                                          | What                                   |
-| ------------------------------------------------ | -------------------------------------- |
-| `deno task build [--entry src/x.yue] [--minify]` | Build `dist/bin/<map>.w3x`             |
-| `deno task test [--entry src/x.yue]`             | Stage the map and launch Warcraft III  |
-| `deno task dev`                                  | Re-check on every save                 |
-| `deno task check`                                | Compile and validate without building  |
-| `deno task setup`                                | Download the pinned YueScript compiler |
+| Command                                          | What                                                                             |
+| ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `deno task build [--entry src/x.yue] [--minify]` | Build `dist/bin/<map>.w3x`                                                       |
+| `deno task test [--entry src/x.yue]`             | Stage the map and launch Warcraft III                                            |
+| `deno task dev`                                  | Re-check on every save                                                           |
+| `deno task check`                                | Compile and validate without building                                            |
+| `deno task setup`                                | Create a missing `moonwell.local.pkl` and download the pinned YueScript compiler |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
-else in `%LOCALAPPDATA%\moonwell` on Windows, else in `$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`. Set
-`yue { path = "..." }` in `moonwell.local.pkl` to use your own build.
+else in `%LOCALAPPDATA%\moonwell` on Windows, else in `$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`.
+
+## Advanced settings
+
+These are not in the generated files and keep their defaults unless you add them. The schema, `Project.pkl` in the
+`moonwell` Pkl package, documents every setting.
+
+| Setting       | Default  | What                                                                                        |
+| ------------- | -------- | ------------------------------------------------------------------------------------------- |
+| `yue.version` | `0.34.2` | YueScript compiler version. Only versions this CLI release pins a checksum for are accepted |
+| `yue.path`    | none     | Your own `yue` binary instead of the downloaded one. Set it in `moonwell.local.pkl`         |
+
+```pkl
+yue {
+  path = "C:\\tools\\yue.exe"
+}
+```
+
+## Editor support
+
+Nothing needs an editor plugin: the `pkl` and `deno` command-line tools do all the work. Editors with Pkl support (the
+Pkl extension for VS Code, the IntelliJ plugin) add completion and hover docs for `moonwell.pkl`. They find the schema
+through `PklProject`, so run their "sync projects" command once after `init`. If the extension cannot find `pkl`, set
+its CLI path (`pkl.cli.path` in VS Code).
 
 ## Credits
 

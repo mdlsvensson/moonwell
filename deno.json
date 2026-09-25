@@ -10,7 +10,7 @@
   "tasks": {
     "test": "deno test -A cli/tests/unit",
     "test:runtime": "deno test -A cli/tests/yue",
-    "test:pkl": "pkl test pkl/tests/Project.pkl && deno test -A cli/tests/pkl",
+    "test:pkl": "pkl test schema/tests/Project.pkl && deno test -A cli/tests/pkl",
     "test:e2e": "deno test -A cli/tests/e2e",
     "check": "deno check cli/src/main.ts tools/gen.ts",
     "lint": "deno lint",

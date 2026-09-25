@@ -16,12 +16,16 @@ facts {
     Project.build.folder == "dist/bin"
     Project.build.minify == false
     Project.launch.gameExecutable == null
-    Project.launch.args.toList() == List("-launch", "-windowmode", "windowed")
+    Project.launch.args == List("-launch", "-windowmode", "windowed")
     Project.yue.version == "0.34.2"
     Project.yue.path == null
   }
   ["overrides are accepted"] {
     (Project) { map { folder = "hero.w3x"; entry = "src/game/init.yue" } }.map.entry == "src/game/init.yue"
+  }
+  ["launch args replace the default instead of appending to it"] {
+    (Project) { launch { args = List("-launch") } }.launch.args == List("-launch")
+    (Project) { launch { args = List() } }.launch.args.isEmpty
   }
   ["map folder must end in .w3x"] {
     t.catch(() -> (Project) { map { folder = "hero" } }.map.folder).contains("endsWith")

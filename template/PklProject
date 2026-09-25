@@ -1,5 +1,5 @@
 amends "pkl:Project"
 
 dependencies {
-  ["moonwell"] = import("../pkl/PklProject")
+  ["moonwell"] = import("../schema/PklProject")
 }

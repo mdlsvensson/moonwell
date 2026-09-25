@@ -2,6 +2,7 @@ import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { exists } from "@std/fs";
 import { fromFileUrl, join } from "@std/path";
 import { test } from "../../src/commands/test.ts";
+import { projectLocalPkl } from "../../src/project-files.ts";
 import { type CommandContext, createContext } from "../../src/context.ts";
 import { silentLogger } from "../support/logger.ts";
 import { openMpq } from "../support/mpq-reader.ts";
@@ -69,10 +70,27 @@ Deno.test("test stages the map and launches the game on the staged folder", asyn
   assertStringIncludes(await Deno.readTextFile(join(staged, "war3map.lua")), '__mw.boot("main")');
 });
 
+Deno.test("setup recreates a missing moonwell.local.pkl and keeps an existing one", async () => {
+  const project = await newProject();
+  const local = join(project, "moonwell.local.pkl");
+  await Deno.remove(local);
+  const created = await deno(["task", "setup"], project);
+  assertEquals(created.code, 0, created.text);
+  assertEquals(await Deno.readTextFile(local), projectLocalPkl());
+
+  const mine = `amends "moonwell.pkl"\nlaunch { gameExecutable = "/games/wc3.exe" }\n`;
+  await Deno.writeTextFile(local, mine);
+  const kept = await deno(["task", "setup"], project);
+  assertEquals(kept.code, 0, kept.text);
+  assertEquals(await Deno.readTextFile(local), mine);
+});
+
 Deno.test("build refuses a build.folder that would overwrite the source map", async () => {
   const project = await newProject();
   const manifest = join(project, "moonwell.pkl");
-  await Deno.writeTextFile(manifest, `${await Deno.readTextFile(manifest)}\nbuild { folder = "maps" }\n`);
+  const text = await Deno.readTextFile(manifest);
+  assertStringIncludes(text, 'folder = "dist/bin"');
+  await Deno.writeTextFile(manifest, text.replace('folder = "dist/bin"', 'folder = "maps"'));
   const built = await deno(["task", "build"], project);
   assertEquals(built.code, 1, built.text);
   assertStringIncludes(built.text, "isReservedFolder");

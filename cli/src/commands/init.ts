@@ -3,7 +3,7 @@ import { exists } from "@std/fs";
 import { dirname, fromFileUrl, join, relative, resolve } from "@std/path";
 import type { CommandContext } from "../context.ts";
 import { TEMPLATE_FILES } from "../embedded/template.ts";
-import { projectDenoJson, projectPklProject } from "../project-files.ts";
+import { projectDenoJson, projectLocalPkl, projectPklProject } from "../project-files.ts";
 import { checkPkl, PKL_INSTALL_HINT } from "../project/project.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { removeIfExists, toPosix } from "../shared/fs.ts";
@@ -36,7 +36,9 @@ export async function init(dir: string, ctx: CommandContext, options: { link?: b
     await undoInit(target, existed);
     throw error;
   }
-  ctx.logger.info(`Created ${dir}. Next: cd ${dir} && deno task build`);
+  ctx.logger.info(
+    `Created ${dir}. Check launch.gameExecutable in moonwell.local.pkl, then: cd ${dir} && deno task build`,
+  );
   return target;
 }
 
@@ -51,6 +53,7 @@ async function writeProject(target: string, links: { cli: string; pkl: string } 
     join(target, "PklProject"),
     projectPklProject(links ? { local: links.pkl } : { version: VERSION }),
   );
+  await Deno.writeTextFile(join(target, "moonwell.local.pkl"), projectLocalPkl());
 }
 
 /** Removes what init wrote: the whole directory if init created it, else only its contents (it was empty). */
@@ -73,5 +76,5 @@ function localLinks(target: string): { cli: string; pkl: string } {
   }
   const repo = resolve(dirname(fromFileUrl(import.meta.url)), "..", "..", "..");
   const link = (path: string) => toPosix(relative(target, path));
-  return { cli: link(join(repo, "cli", "src", "main.ts")), pkl: link(join(repo, "pkl")) };
+  return { cli: link(join(repo, "cli", "src", "main.ts")), pkl: link(join(repo, "schema")) };
 }
