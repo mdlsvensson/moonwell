@@ -2,7 +2,8 @@ import "moonwell" as mw
 
 mw.on_main ->
   print "Moonwell is running."
-  -- A footman just north of the preplaced heroes, tinted a new colour every second.
+  -- A footman just north of the preplaced heroes, changing player colour every second.
+  -- Ally colour mode (Alt+A) overrides player colours; turn it off to see the change.
   unit = CreateUnit Player(0), FourCC("hfoo"), 45, -650, 270
   TimerStart CreateTimer!, 1.0, true, ->
-    SetUnitVertexColor unit, GetRandomInt(0, 255), GetRandomInt(0, 255), GetRandomInt(0, 255), 255
+    SetUnitColor unit, GetPlayerColor Player GetRandomInt 0, bj_MAX_PLAYERS - 1
