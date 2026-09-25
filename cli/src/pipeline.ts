@@ -84,7 +84,8 @@ export async function prepareStage(
   const script = await Deno.readTextFile(scriptPath);
   const bundled = injectBundle(
     script,
-    (firstLine) => emitBundle({ runtime: RUNTIME_LUA, modules, entry, firstLine }),
+    (firstLine) =>
+      emitBundle({ runtime: RUNTIME_LUA, modules, entry, firstLine, minify: options.minify ?? project.build.minify }),
     scriptLabel,
   );
   await Deno.writeTextFile(scriptPath, bundled);

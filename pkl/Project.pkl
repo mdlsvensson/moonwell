@@ -36,7 +36,7 @@ class BuildConfig {
   /// It cannot contain `..`, and cannot be or be under `maps`, `src` or `dist/stage`.
   folder: String(isRelativeFolder(this), !isReservedFolder(this)) = "dist/bin"
 
-  /// Minify compiled Lua. Error positions then report module names only.
+  /// Minify compiled Lua. Runtime errors then name the `.yue` file without a line number.
   minify: Boolean = false
 }
 

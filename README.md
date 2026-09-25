@@ -3,7 +3,8 @@
 **Build Warcraft III maps with YueScript gameplay and Pkl project data.**
 
 - Gameplay in [YueScript](https://github.com/IppClub/YueScript), compiled to Lua 5.3 and bundled into your map. Only the
-  modules you import are included, and runtime errors point at your `.yue` lines.
+  modules you import are included, and runtime errors point at your `.yue` lines (in `--minify` builds, at the `.yue`
+  file only).
 - Project configuration in [Pkl](https://pkl-lang.org), validated against the versioned `moonwell` schema package.
 - A Deno command-line tool: no Node.js, no `package.json`, no `node_modules`.
 
