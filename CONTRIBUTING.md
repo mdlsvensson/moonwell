@@ -27,6 +27,12 @@ Never add `package.json`, `node_modules` or `npm:` imports.
 Versions must agree. `cli/deno.json` `version`, `cli/src/version.ts` and `schema/PklProject` `package.version` always
 carry the same number, and a unit test enforces it.
 
+## In-game path list
+
+`assets:paths` knows which paths the game ships from `cli/data/game-paths.txt`. To regenerate it after a game patch,
+export the file names of the game's CASC storage (for example with CascView) to a text file, one per line, then run
+`deno task gen:game-paths <that file> <game version>` and `deno task gen`, and commit both files.
+
 ## Release gate (manual, before every release)
 
 1. Run every check above from a clean checkout.

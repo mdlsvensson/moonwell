@@ -28,7 +28,7 @@ Commands:
   check                          Compile and validate without building a map
   assets:check                   Show what assets:sync would change in the source map
   assets:sync                    Write assets/ into the source map (close it in World Editor first)
-  assets:paths [file]            List the files a model references and whether a build imports them
+  assets:paths [file]            List the files a model references, as in-game or custom paths
 
 Options:
   -h, --help                     Show this help

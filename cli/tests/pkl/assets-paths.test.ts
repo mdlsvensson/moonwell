@@ -3,6 +3,7 @@ import { dirname, join } from "@std/path";
 import { assetsPaths } from "../../src/commands/assets-paths.ts";
 import { init } from "../../src/commands/init.ts";
 import { createContext } from "../../src/context.ts";
+import { parseGamePaths } from "../../src/models/game-paths.ts";
 import { silentLogger } from "../support/logger.ts";
 import { chunk, concat, emitter, mdx, texture } from "../support/mdx.ts";
 
@@ -12,7 +13,7 @@ async function put(root: string, file: string, bytes: Uint8Array): Promise<void>
   await Deno.writeFile(path, bytes);
 }
 
-Deno.test("assets:paths marks references found through targets, mappings and .mdl/.mdx", async () => {
+Deno.test("assets:paths classifies references as in-game or custom, imported or not", async () => {
   const parent = await Deno.makeTempDir({ prefix: "moonwell-paths-" });
   const root = await init(join(parent, "my-map"), createContext(parent, silentLogger()), { link: true });
   await put(
@@ -46,22 +47,23 @@ Deno.test("assets:paths marks references found through targets, mappings and .md
 
   const logger = silentLogger();
   const ctx = { ...createContext(root, logger), logger };
-  const [knight] = await assetsPaths(ctx, "assets/Models/Knight.mdx");
+  const gamePaths = parseGamePaths("# test\ntextures/knight.dds\ntextures/missing.blp\n");
+  const [knight] = await assetsPaths(ctx, "assets/Models/Knight.mdx", { gamePaths });
   assertEquals(knight.heading, "assets/Models/Knight.mdx");
-  assertEquals(knight.refs.map((ref) => [ref.path, ref.found]), [
-    ["Textures\\Knight.blp", true],
-    ["Textures\\Cape.blp", true],
-    ["Textures\\Missing.blp", false],
+  assertEquals(knight.refs.map((ref) => [ref.path, ref.status]), [
+    ["Textures\\Knight.blp", "in-game path, replaced"],
+    ["Textures\\Cape.blp", "custom path, imported"],
+    ["Textures\\Missing.blp", "in-game path"],
     [null, undefined],
-    ["Models\\Glow.mdl", true],
-    ["Models\\Only.mdx", false],
+    ["Models\\Glow.mdl", "custom path, imported"],
+    ["Models\\Only.mdx", "custom path, not imported"],
   ]);
   assertEquals(
     logger.lines.at(-1),
-    "1 model, 6 paths: 3 found in assets/, 2 not found (built-in game files or missing imports).",
+    "1 model, 6 paths: 2 in-game, 2 custom imported, 1 custom not imported.",
   );
 
-  const all = await assetsPaths(ctx);
+  const all = await assetsPaths(ctx, undefined, { gamePaths });
   assertEquals(all.map((report) => report.heading), [
     "assets/Models/Glow.mdx",
     "assets/Models/Knight.mdx",

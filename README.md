@@ -72,9 +72,11 @@ Builds import assets into the staged copy only. To see them in World Editor, clo
 in the map.
 
 To check that a model's textures are imported, run `deno task assets:paths assets/Models/Knight.mdx`. It lists every
-file the model references (textures, particle models, attachments) and whether a build imports it. A path that is not
-found is either a built-in game file or a missing import. Run it without a file to check every model under `assets/`, or
-on a model outside a project to see what it needs before importing it.
+file the model references (textures, particle models, attachments), shown the way World Editor's Import Manager shows
+paths, and says what each one is: an `in-game path` the game ships (or `in-game path, replaced` when you import a file
+over it), a `custom path, imported`, or a `custom path, not imported`, which the model will be missing. Run it without a
+file to check every model under `assets/`, or on a model outside a project to see which custom paths it needs you to
+import.
 
 ## Icons
 
@@ -100,7 +102,7 @@ a placeholder where a disabled icon is missing.
 | `deno task check`                                | Compile and validate without building                                            |
 | `deno task assets:check`                         | Show what `assets:sync` would change in the source map                           |
 | `deno task assets:sync`                          | Write `assets/` into the source map for World Editor (close the map first)       |
-| `deno task assets:paths [file]`                  | List the files a model references, and whether a build imports them              |
+| `deno task assets:paths [file]`                  | List the files a model references, as in-game or custom paths                    |
 | `deno task setup`                                | Create a missing `moonwell.local.pkl` and download the pinned YueScript compiler |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
