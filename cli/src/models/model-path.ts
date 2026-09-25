@@ -24,7 +24,7 @@ export function describeModelPath(ref: ModelPath): string {
 }
 
 export function modelError(file: string, problem: string): MoonwellError {
-  return new MoonwellError(`${file} is not a readable model: ${problem}.`, {
+  return new MoonwellError(`Not a readable model: ${problem}.`, {
     file,
     hint: "Re-export it from your modelling tool, or open it in a model viewer to check it.",
   });

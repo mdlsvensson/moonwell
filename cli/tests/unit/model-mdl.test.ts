@@ -79,8 +79,9 @@ Deno.test("readMdlPaths reads every path-bearing block and ignores the rest", ()
 
 Deno.test("readMdlPaths rejects broken text with a MoonwellError naming the file", () => {
   for (const text of ['Bitmap { Image "Textures\\A.blp', "}", 'Textures 1 { Bitmap { Image "a.blp", }']) {
-    const error = assertThrows(() => readMdlPaths(text, "assets/Knight.mdl"), MoonwellError, "not a readable model");
+    const error = assertThrows(() => readMdlPaths(text, "assets/Knight.mdl"), MoonwellError, "Not a readable model");
     assertEquals(error.file, "assets/Knight.mdl");
+    assertEquals(error.message.includes("Knight.mdl"), false, "the file is printed once, from error.file");
   }
 });
 
@@ -91,4 +92,29 @@ Deno.test("modelPaths picks the reader from the content", () => {
   ]);
   const blp = new Uint8Array([0x42, 0x4c, 0x50, 0x31, 0, 0, 0, 0]); // a BLP texture, not a model
   assertThrows(() => modelPaths(blp, "icon.blp"), MoonwellError, "neither a binary MDX nor a text MDL");
+});
+
+Deno.test("modelPaths rejects text that is not a model: it has no Version or Model block", () => {
+  const texts = [
+    "",
+    "hello world",
+    "version https://git-lfs.github.com/spec/v1\noid sha256:abc\nsize 123\n", // a Git LFS pointer
+    'Textures 1 {\n\tBitmap {\n\t\tImage "a.blp",\n\t}\n}\n', // a block, but no Version or Model
+    "Textures 1 {\n\tVersion {\n\t}\n}\n", // a nested Version block does not count
+  ];
+  for (const text of texts) {
+    const error = assertThrows(
+      () => modelPaths(new TextEncoder().encode(text), "assets/Knight.mdx"),
+      MoonwellError,
+      "Not a readable model: it has no Version or Model block.",
+    );
+    assertEquals(error.file, "assets/Knight.mdx");
+  }
+  const short = new Uint8Array([0x4d, 0x44]); // "MD": too short to be an MDX
+  assertThrows(() => modelPaths(short, "assets/Knight.mdx"), MoonwellError, "Not a readable model");
+});
+
+Deno.test("readMdlPaths accepts a model with only a Version block, or only a Model block", () => {
+  assertEquals(readMdlPaths("Version {\n\tFormatVersion 800,\n}\n", "a.mdl"), []);
+  assertEquals(readMdlPaths('Model "A" {\n\tNumGeosets 0,\n}\n', "a.mdl"), []);
 });
