@@ -67,7 +67,8 @@ A reference is `in-game path, replaced` when it is both imported and in-game.
   2. Lowercase it and turn `\` into `/`.
   3. Drop storage prefixes: everything up to the last `:` (e.g. `war3.w3mod:`), then every leading folder up to and
      including the last folder whose name ends in `.w3mod` or `.mpq` (e.g. `_hd.w3mod/`, `_locales/enus.w3mod/`).
-  4. Keep only the file types a model can reference: `mdx`, `mdl`, `pkfx`, and the texture extensions above.
+  4. Keep only the file types a model can reference: `mdx`, `mdl`, `pkfx`, `pkb` (Reforged stores particle effects baked as
+     `.pkb`), and the texture extensions above.
 
   It writes the header and the sorted, unique paths.
 - **Embedding:** `deno task gen` compresses the file with gzip into `cli/src/embedded/game-paths.ts`

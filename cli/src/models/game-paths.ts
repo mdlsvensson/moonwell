@@ -7,7 +7,7 @@ import { gunzip } from "../shared/compression.ts";
  * (SD).
  */
 export const TEXTURE_EXTENSIONS: readonly string[] = ["blp", "dds", "tga", "tif", "tiff", "png", "jpg"];
-const KEPT_EXTENSIONS = new Set(["mdx", "mdl", "pkfx", ...TEXTURE_EXTENSIONS]);
+const KEPT_EXTENSIONS = new Set(["mdx", "mdl", "pkfx", "pkb", ...TEXTURE_EXTENSIONS]);
 
 const extensionOf = (path: string) => /\.([a-z0-9]+)$/.exec(path)?.[1];
 
