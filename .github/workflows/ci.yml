@@ -24,6 +24,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The Windows runner checks out on D: but keeps temp folders on C:. Tests create linked projects in temp
+      # folders, and `init --link` needs them on the checkout's drive (Pkl cannot load a local dependency across drives).
+      - name: Keep temp folders on the checkout's drive
+        if: runner.os == 'Windows'
+        run: |
+          echo "TMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
+          echo "TEMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
+
       - uses: denoland/setup-deno@v2
         with:
           deno-version: 2.9.x
