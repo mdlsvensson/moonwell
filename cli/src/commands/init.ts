@@ -4,20 +4,43 @@ import { dirname, fromFileUrl, join, relative, resolve } from "@std/path";
 import type { CommandContext } from "../context.ts";
 import { TEMPLATE_FILES } from "../embedded/template.ts";
 import { projectDenoJson, projectPklProject } from "../project-files.ts";
+import { checkPkl, PKL_INSTALL_HINT } from "../project/project.ts";
 import { MoonwellError } from "../shared/errors.ts";
-import { toPosix } from "../shared/fs.ts";
+import { removeIfExists, toPosix } from "../shared/fs.ts";
 import { VERSION } from "../version.ts";
 
-/** Scaffolds a project into `dir` (new or empty) and resolves its Pkl dependencies. */
+/** Scaffolds a project into `dir` (new or empty) and resolves its Pkl dependencies. A failed init leaves nothing. */
 export async function init(dir: string, ctx: CommandContext, options: { link?: boolean } = {}): Promise<string> {
   const target = resolve(ctx.root, dir);
-  if (await exists(target)) {
+  const existed = await exists(target);
+  if (existed) {
+    if (!(await exists(target, { isDirectory: true }))) {
+      throw new MoonwellError(`${dir} is not a directory.`, { hint: "Choose a new or empty directory." });
+    }
     for await (const _ of Deno.readDir(target)) {
       throw new MoonwellError(`${dir} is not empty.`, { hint: "Choose a new or empty directory." });
     }
   }
   const links = options.link ? localLinks(target) : undefined;
+  await checkPkl(ctx.run);
 
+  try {
+    await writeProject(target, links);
+    const result = await ctx.run("pkl", ["project", "resolve"], { cwd: target, hint: PKL_INSTALL_HINT });
+    if (result.code !== 0) {
+      throw new MoonwellError(`pkl project resolve failed:\n${(result.stderr || result.stdout).trim()}`, {
+        file: join(dir, "PklProject"),
+      });
+    }
+  } catch (error) {
+    await undoInit(target, existed);
+    throw error;
+  }
+  ctx.logger.info(`Created ${dir}. Next: cd ${dir} && deno task build`);
+  return target;
+}
+
+async function writeProject(target: string, links: { cli: string; pkl: string } | undefined): Promise<void> {
   for (const file of TEMPLATE_FILES) {
     const path = join(target, ...file.path.split("/"));
     await Deno.mkdir(dirname(path), { recursive: true });
@@ -28,18 +51,19 @@ export async function init(dir: string, ctx: CommandContext, options: { link?: b
     join(target, "PklProject"),
     projectPklProject(links ? { local: links.pkl } : { version: VERSION }),
   );
+}
 
-  const result = await ctx.run("pkl", ["project", "resolve"], {
-    cwd: target,
-    hint: "Install Pkl 0.32 or newer: https://pkl-lang.org/main/current/pkl-cli/index.html#installation",
-  });
-  if (result.code !== 0) {
-    throw new MoonwellError(`pkl project resolve failed:\n${(result.stderr || result.stdout).trim()}`, {
-      file: join(dir, "PklProject"),
-    });
+/** Removes what init wrote: the whole directory if init created it, else only its contents (it was empty). */
+async function undoInit(target: string, existed: boolean): Promise<void> {
+  try {
+    if (!existed) {
+      await removeIfExists(target);
+      return;
+    }
+    for await (const entry of Deno.readDir(target)) await removeIfExists(join(target, entry.name));
+  } catch {
+    // Best effort: the original error matters more.
   }
-  ctx.logger.info(`Created ${dir}. Next: cd ${dir} && deno task build`);
-  return target;
 }
 
 /** Paths from `target` to this checkout's CLI entry and Pkl package; only valid when running from files. */
