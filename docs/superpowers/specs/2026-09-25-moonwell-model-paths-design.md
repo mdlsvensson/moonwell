@@ -97,7 +97,8 @@ a stack of block names. A block opens as `Name [ "label" | number ] {`.
 
 - In a `Bitmap` block: `Image "<path>"` and `ReplaceableId <n>` make one `texture` when the block closes. The same
   empty-path rule as MDX applies.
-- In a `ParticleEmitter` block: `Path "<path>"` makes a `particle model`, or a `particle texture` when the block has the
+- In a `ParticleEmitter` block: `Path "<path>"`, read from the block itself or from its nested `Particle` block (where
+  exporters write it), makes a `particle model`, or a `particle texture` when the emitter block has the
   `EmitterUsesTGA` flag and not `EmitterUsesMDL`.
 - In an `Attachment` block: `Path` makes an `attachment`.
 - In a `ParticleEmitterPopcorn` block: `Path` makes a `popcorn`.
