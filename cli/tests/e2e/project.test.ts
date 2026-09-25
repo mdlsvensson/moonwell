@@ -100,10 +100,21 @@ Deno.test("dev re-checks when a source file changes", async () => {
   const waitFor = async (text: string) => {
     const deadline = Date.now() + 60_000;
     while (!seen.includes(text)) {
-      if (Date.now() > deadline) throw new Error(`timed out waiting for "${text}"; output:\n${seen}`);
-      const { value, done } = await reader.read();
-      if (done) throw new Error(`dev exited early; output:\n${seen}`);
-      seen += value;
+      // Race each read against the time left, so a silent dev process cannot hang the test.
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(`timed out waiting for "${text}"; output:\n${seen}`)),
+          Math.max(0, deadline - Date.now()),
+        );
+      });
+      try {
+        const { value, done } = await Promise.race([reader.read(), timeout]);
+        if (done) throw new Error(`dev exited early; output:\n${seen}`);
+        seen += value;
+      } finally {
+        clearTimeout(timer);
+      }
     }
   };
   try {
