@@ -6,6 +6,7 @@
     "check": "deno run -A ../cli/src/main.ts check",
     "setup": "deno run -A ../cli/src/main.ts setup",
     "assets:check": "deno run -A ../cli/src/main.ts assets:check",
-    "assets:sync": "deno run -A ../cli/src/main.ts assets:sync"
+    "assets:sync": "deno run -A ../cli/src/main.ts assets:sync",
+    "assets:paths": "deno run -A ../cli/src/main.ts assets:paths"
   }
 }

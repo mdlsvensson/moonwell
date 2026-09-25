@@ -1,6 +1,7 @@
 import { parseArgs } from "@std/cli/parse-args";
 import { existsSync } from "@std/fs";
 import { join } from "@std/path";
+import { assetsPaths } from "./commands/assets-paths.ts";
 import { assets } from "./commands/assets.ts";
 import { build } from "./commands/build.ts";
 import { check } from "./commands/check.ts";
@@ -27,6 +28,7 @@ Commands:
   check                          Compile and validate without building a map
   assets:check                   Show what assets:sync would change in the source map
   assets:sync                    Write assets/ into the source map (close it in World Editor first)
+  assets:paths [file]            List the files a model references and whether assets/ has them
 
 Options:
   -h, --help                     Show this help
@@ -98,6 +100,9 @@ export async function main(
         break;
       case "assets:sync":
         await assets(ctx, "sync");
+        break;
+      case "assets:paths":
+        await assetsPaths(ctx, flags._[1] === undefined ? undefined : String(flags._[1]));
         break;
       default:
         write(`Unknown command '${command}'.\n\n${USAGE}`);

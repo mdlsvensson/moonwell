@@ -43,8 +43,8 @@ Deno.test("commands outside a project leave no dist/ behind", async () => {
   assertEquals(await exists(join(root, "dist")), false);
 });
 
-Deno.test("assets:check and assets:sync are known commands", async () => {
-  for (const command of ["assets:check", "assets:sync"]) {
+Deno.test("the assets commands are known commands", async () => {
+  for (const command of ["assets:check", "assets:sync", "assets:paths"]) {
     const { code, output } = await run([command]);
     assertEquals(code, 1);
     assertEquals(output.includes("Unknown command"), false, output);

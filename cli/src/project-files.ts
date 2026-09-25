@@ -1,5 +1,14 @@
 /** Tasks every project's deno.json exposes. */
-export const PROJECT_TASKS = ["build", "test", "dev", "check", "setup", "assets:check", "assets:sync"] as const;
+export const PROJECT_TASKS = [
+  "build",
+  "test",
+  "dev",
+  "check",
+  "setup",
+  "assets:check",
+  "assets:sync",
+  "assets:paths",
+] as const;
 
 export const PACKAGE_BASE_URI = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell";
 
