@@ -129,6 +129,10 @@ assets: Assets = new {}
 objects: Objects = new {}
 ```
 
+`map.folder` and `build.folder` must be relative paths without `..` (no leading `/` or `\`, no drive letter).
+`build.folder` also cannot be, or be under, `maps`, `src` or `dist/stage`, because a build deletes the previous
+archive. As a second guard, `build` refuses an output path outside the project or one that is a directory.
+
 Every field is optional with defaults. The `moonwell.pkl` written by `init` contains:
 - the `amends` line;
 - the objects wiring line (§6.1);

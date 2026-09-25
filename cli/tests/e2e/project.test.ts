@@ -1,4 +1,5 @@
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
+import { exists } from "@std/fs";
 import { fromFileUrl, join } from "@std/path";
 import { openMpq } from "../support/mpq-reader.ts";
 
@@ -31,6 +32,16 @@ Deno.test("init → build produces an archive with the injected bundle", async (
   assertStringIncludes(lua, '__mw.boot("main")');
   assert(await archive.read("war3map.w3i"));
   assert((await archive.listfile()).includes("war3map.lua"));
+});
+
+Deno.test("build refuses a build.folder that would overwrite the source map", async () => {
+  const project = await newProject();
+  const manifest = join(project, "moonwell.pkl");
+  await Deno.writeTextFile(manifest, `${await Deno.readTextFile(manifest)}\nbuild { folder = "maps" }\n`);
+  const built = await deno(["task", "build"], project);
+  assertEquals(built.code, 1, built.text);
+  assertStringIncludes(built.text, "isReservedFolder");
+  assert(await exists(join(project, "maps", "map.w3x", "war3map.lua")), "the source map was deleted");
 });
 
 Deno.test("check reports a YueScript syntax error with its source position", async () => {
