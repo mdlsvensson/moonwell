@@ -6,6 +6,8 @@
 - `schema/`: the `moonwell` Pkl package. (Not named `pkl/`: on Windows a `pkl` folder in the working directory shadows
   the `pkl` executable for tools that launch it from the repo root.)
 - `template/`: the project `init` scaffolds. It links to `../cli` and `../schema`, so use it to try changes.
+  `init --link <dir>` creates such a linked project elsewhere; on Windows it must be on the same drive as the checkout,
+  because Pkl cannot load a local dependency from another drive.
 - `tools/gen.ts`: regenerates `cli/src/embedded/` from `cli/runtime/` and `template/`. Run it after changing either; a
   unit test fails when the embedded copies are stale.
 

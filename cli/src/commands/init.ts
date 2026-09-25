@@ -1,6 +1,6 @@
 import { decodeBase64 } from "@std/encoding/base64";
 import { exists } from "@std/fs";
-import { dirname, fromFileUrl, isAbsolute, join, relative, resolve, toFileUrl } from "@std/path";
+import { dirname, fromFileUrl, isAbsolute, join, parse, relative, resolve } from "@std/path";
 import type { CommandContext } from "../context.ts";
 import { TEMPLATE_FILES } from "../embedded/template.ts";
 import { projectDenoJson, projectLocalPkl, projectPklProject } from "../project-files.ts";
@@ -79,10 +79,16 @@ function localLinks(target: string): { cli: string; pkl: string } {
 }
 
 /**
- * How a linked project refers to `path` in this checkout: a relative path, or a file URL when there is none (another
- * drive on Windows). Pkl would read a bare `D:/...` as a URI with the scheme `d`.
+ * How a linked project refers to `path` in this checkout: always a relative path. On Windows there is none across drives,
+ * and Pkl cannot load a local dependency from another drive (PklProject.deps.json cannot record the path), so that fails.
  */
 export function linkPath(target: string, path: string): string {
   const inside = relative(target, path);
-  return isAbsolute(inside) ? toFileUrl(path).href : toPosix(inside);
+  if (isAbsolute(inside)) {
+    throw new MoonwellError("--link needs the project on the same drive as this Moonwell checkout.", {
+      hint: `Create the project on ${parse(path).root} (Pkl cannot load a local dependency from another drive), ` +
+        "or use the published package with a plain `init`.",
+    });
+  }
+  return toPosix(inside);
 }

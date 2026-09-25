@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from "@std/assert";
 import { exists } from "@std/fs";
 import { join } from "@std/path";
 import { init, linkPath } from "../../src/commands/init.ts";
@@ -62,13 +62,15 @@ Deno.test("linkPath is relative when the target shares a root with the checkout"
 });
 
 Deno.test({
-  name: "linkPath is a file URL when the target is on another drive (Windows)",
+  name: "linkPath refuses a target on another drive (Windows)",
   ignore: Deno.build.os !== "windows",
   fn: () => {
-    // Pkl reads a bare `D:/...` as a URI with scheme `d`, so a path across drives must be a file URL.
-    assertEquals(
-      linkPath(String.raw`C:\Temp\my-map`, String.raw`D:\a\moonwell\schema`),
-      "file:///D:/a/moonwell/schema",
+    // Pkl cannot load a local dependency from another drive: PklProject.deps.json has no way to express the path.
+    const error = assertThrows(
+      () => linkPath(String.raw`C:\Temp\my-map`, String.raw`D:\a\moonwell\schema`),
+      MoonwellError,
+      "same drive",
     );
+    assertStringIncludes(error.hint ?? "", "D:");
   },
 });
