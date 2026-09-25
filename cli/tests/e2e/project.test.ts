@@ -1,6 +1,9 @@
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { exists } from "@std/fs";
 import { fromFileUrl, join } from "@std/path";
+import { test } from "../../src/commands/test.ts";
+import { type CommandContext, createContext } from "../../src/context.ts";
+import { silentLogger } from "../support/logger.ts";
 import { openMpq } from "../support/mpq-reader.ts";
 
 const REPO = fromFileUrl(new URL("../../../", import.meta.url));
@@ -32,6 +35,38 @@ Deno.test("init → build produces an archive with the injected bundle", async (
   assertStringIncludes(lua, '__mw.boot("main")');
   assert(await archive.read("war3map.w3i"));
   assert((await archive.listfile()).includes("war3map.lua"));
+});
+
+Deno.test("a failed build deletes the previous archive", async () => {
+  const project = await newProject();
+  const archive = join(project, "dist", "bin", "map.w3x");
+  const built = await deno(["task", "build"], project);
+  assertEquals(built.code, 0, built.text);
+  assert(await exists(archive));
+  await Deno.writeTextFile(join(project, "src", "main.yue"), "x = \n  if then\n");
+  const failed = await deno(["task", "build"], project);
+  assertEquals(failed.code, 1, failed.text);
+  assertEquals(await exists(archive), false, "the stale archive survived a failed build");
+});
+
+Deno.test("test stages the map and launches the game on the staged folder", async () => {
+  const project = await newProject();
+  const exe = join(project, "Warcraft III.exe");
+  await Deno.writeTextFile(exe, "");
+  await Deno.writeTextFile(
+    join(project, "moonwell.local.pkl"),
+    `amends "moonwell.pkl"\nlaunch { gameExecutable = #"${exe}"# }\n`,
+  );
+  const calls: Array<[string, string[]]> = [];
+  const ctx: CommandContext = {
+    ...createContext(project, silentLogger()),
+    spawn: (command, args) => calls.push([command, args]),
+  };
+  await test(ctx, {});
+
+  const staged = join(project, "dist", "stage", "map.w3x");
+  assertEquals(calls, [[exe, ["-launch", "-windowmode", "windowed", "-loadfile", staged]]]);
+  assertStringIncludes(await Deno.readTextFile(join(staged, "war3map.lua")), '__mw.boot("main")');
 });
 
 Deno.test("build refuses a build.folder that would overwrite the source map", async () => {
