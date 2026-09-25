@@ -1,10 +1,11 @@
-import { assert, assertEquals, assertRejects } from "@std/assert";
+import { assert, assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
+import { exists } from "@std/fs";
 import { join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { createLogger } from "../../src/shared/log.ts";
 import { runProcess } from "../../src/shared/process.ts";
 import { listFiles, removeIfExists, replaceDir, sha256Hex, writeTextIfChanged } from "../../src/shared/fs.ts";
-import { withBuildLock } from "../../src/shared/lock.ts";
+import { releaseHeldLocks, withBuildLock } from "../../src/shared/lock.ts";
 import { deflate, deflateRaw, inflate, inflateRaw } from "../../src/shared/compression.ts";
 
 Deno.test("createLogger writes to the sink and appends to the log file", async () => {
@@ -83,6 +84,25 @@ Deno.test("withBuildLock rejects a concurrent build and releases afterwards", as
     await assertRejects(() => withBuildLock(dir, () => Promise.resolve()), MoonwellError, "Another Moonwell build");
   });
   assertEquals(await withBuildLock(dir, () => Promise.resolve(7)), 7);
+});
+
+Deno.test("the build lock records the holder's PID and the concurrent-build hint names it", async () => {
+  const dir = await Deno.makeTempDir();
+  const lockPath = join(dir, ".lock");
+  await withBuildLock(dir, async () => {
+    assertEquals(await Deno.readTextFile(lockPath), String(Deno.pid));
+    const error = await assertRejects(() => withBuildLock(dir, () => Promise.resolve()), MoonwellError);
+    assertStringIncludes(error.hint ?? "", `If process ${Deno.pid} is not running, delete ${lockPath}`);
+  });
+});
+
+Deno.test("releaseHeldLocks removes the locks this process holds", async () => {
+  const dir = await Deno.makeTempDir();
+  await withBuildLock(dir, async () => {
+    releaseHeldLocks();
+    assertEquals(await exists(join(dir, ".lock")), false);
+  });
+  releaseHeldLocks();
 });
 
 Deno.test("compression round trips; deflate emits a zlib header", async () => {

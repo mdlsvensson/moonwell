@@ -31,22 +31,38 @@ export async function dev(
     Deno.watchFs(join(ctx.root, "src"), { recursive: true }),
     Deno.watchFs(ctx.root, { recursive: false }),
   ];
-  options.signal?.addEventListener("abort", () => watchers.forEach((watcher) => watcher.close()));
-  ctx.logger.info("Watching src/ and the project manifests. Press Ctrl+C to stop.");
-
+  const closeWatchers = () => {
+    for (const watcher of watchers) {
+      try {
+        watcher.close();
+      } catch {
+        // Already closed.
+      }
+    }
+  };
   let timer: ReturnType<typeof setTimeout> | undefined;
   let running = Promise.resolve();
-  const schedule = () => {
+  try {
+    if (options.signal?.aborted) closeWatchers();
+    else options.signal?.addEventListener("abort", closeWatchers, { once: true });
+    ctx.logger.info("Watching src/ and the project manifests. Press Ctrl+C to stop.");
+
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        running = running.then(cycle);
+      }, options.debounceMs ?? 150);
+    };
+    await Promise.all(watchers.map(async (watcher) => {
+      for await (const event of watcher) {
+        if (event.paths.some((path) => isRelevantChange(ctx.root, path))) schedule();
+      }
+    }));
+  } finally {
+    options.signal?.removeEventListener("abort", closeWatchers);
+    closeWatchers();
     clearTimeout(timer);
-    timer = setTimeout(() => {
-      running = running.then(cycle);
-    }, options.debounceMs ?? 150);
-  };
-  await Promise.all(watchers.map(async (watcher) => {
-    for await (const event of watcher) {
-      if (event.paths.some((path) => isRelevantChange(ctx.root, path))) schedule();
-    }
-  }));
-  clearTimeout(timer);
-  await running;
+    // The running check holds the build lock; waiting for it releases the lock.
+    await running;
+  }
 }

@@ -8,6 +8,7 @@ import { setup } from "./commands/setup.ts";
 import { test } from "./commands/test.ts";
 import { createContext } from "./context.ts";
 import { formatError, MoonwellError } from "./shared/errors.ts";
+import { releaseHeldLocks } from "./shared/lock.ts";
 import { createLogger } from "./shared/log.ts";
 import { VERSION } from "./version.ts";
 
@@ -49,6 +50,19 @@ export async function main(
   const logger = createLogger({ write, file: command === "init" ? undefined : join(root, "dist", "moonwell.log") });
   const ctx = createContext(root, logger);
   const stage = { entry: flags.entry, minify: flags.minify ? true : undefined };
+  // Ctrl+C: dev stops watching and returns once its running check has released the build lock; other commands
+  // (and a second Ctrl+C in dev) remove the lock this process holds and exit at once.
+  const interrupt = new AbortController();
+  const onSigint = () => {
+    if (command === "dev" && !interrupt.signal.aborted) {
+      interrupt.abort();
+      return;
+    }
+    releaseHeldLocks();
+    Deno.exit(130);
+  };
+  const handlesSigint = ["build", "test", "check", "dev"].includes(command);
+  if (handlesSigint) Deno.addSignalListener("SIGINT", onSigint);
   try {
     switch (command) {
       case "init": {
@@ -67,7 +81,8 @@ export async function main(
         await test(ctx, stage);
         break;
       case "dev":
-        await dev(ctx);
+        await dev(ctx, { signal: interrupt.signal });
+        if (interrupt.signal.aborted) return 130;
         break;
       case "check":
         await check(ctx);
@@ -80,6 +95,8 @@ export async function main(
   } catch (error) {
     logger.error(formatError(error));
     return 1;
+  } finally {
+    if (handlesSigint) Deno.removeSignalListener("SIGINT", onSigint);
   }
 }
 
