@@ -25,13 +25,15 @@ The hard constraints of the core design still apply: no Node.js and no npm packa
 - **Without a file**, it reports every `.mdx`/`.mdl` the build would import from `assets/` (after `assets.paths` and
   `assets.exclude`), one block per model, in import order.
 - **Found** means the path is an in-map path the build would produce: an asset's target after `assets.paths` mapping and
-  `exclude`. Matching ignores letter case and `/` versus `\`, and treats `.mdl` and `.mdx` as the same file, because the
-  game loads the `.mdx` when a model asks for the `.mdl`.
+  `exclude`. Matching ignores letter case and `/` versus `\`. A reference ending in `.mdl` also matches the imported
+  `.mdx`, because the game loads the `.mdx` when a model asks for the `.mdl`. The rule applies to references only: an
+  imported `.mdl` is never loaded, so it does not satisfy a reference to either `.mdl` or `.mdx`.
 - **Outside a Moonwell project** (no `moonwell.pkl`), the command still lists the paths, without the found / not-found
   column. Without a file argument outside a project, it fails with a hint to pass a file.
 - It only reports and always exits 0 once the model has been read. A path that is not found is often a built-in game
   file, so failing on it would be wrong.
-- An unreadable model fails with a `MoonwellError` naming the file.
+- An unreadable model fails with a `MoonwellError` naming the file (in its `file` field, printed once by the error
+  formatter), with the message `Not a readable model: <problem>.`
 
 Example output:
 
@@ -86,7 +88,7 @@ as "replaceable texture (slot N)".
 
 **Errors:** a file shorter than a chunk header, a chunk or record running past its parent's end, a `TEXS`/`FAFX` size
 that is not a multiple of the record size, or an `inclusiveSize` smaller than its fixed fields each throw
-`MoonwellError` ("<file> is not a readable model: ..."), with a hint to re-export it.
+`MoonwellError` ("Not a readable model: <problem>.", naming the file in its `file` field), with a hint to re-export it.
 
 The layouts were checked against the open-source mdx-m3-viewer MDLX parser.
 
@@ -104,7 +106,9 @@ a stack of block names. A block opens as `Name [ "label" | number ] {`.
 - In a `ParticleEmitterPopcorn` block: `Path` makes a `popcorn`.
 - In a `FaceFX` block: `Path` makes a `face effect`.
 
-Everything else is ignored. An unterminated string or unbalanced braces throw the same `MoonwellError`.
+Everything else is ignored. An unterminated string or unbalanced braces throw the same `MoonwellError`. An MDL must open
+a top-level `Version` or `Model` block (real exporters write both); otherwise it is not a readable model. This keeps an
+empty file, plain text or a Git LFS pointer from being reported as a model with no references.
 
 ## 4. The command module
 
@@ -112,7 +116,8 @@ Everything else is ignored. An unterminated string or unbalanced braces throw th
 
 - It loads the project when `moonwell.pkl` exists, then collects the in-map targets with the existing `collectAssets`.
   This reads the files but writes nothing and takes no build lock.
-- With a file argument, the path is resolved against the current directory, read and reported.
+- With a file argument, the path is resolved against the project folder (where `deno task` runs), not the shell's
+  current directory, then read and reported.
 - Without one, it reports each collected asset whose target ends in `.mdx` or `.mdl`, using the bytes already read. Its
   heading is `assets/<source>`.
 - Output goes through the logger, like the other commands. The column layout pads the kind and path columns to the

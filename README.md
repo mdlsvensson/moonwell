@@ -100,7 +100,7 @@ a placeholder where a disabled icon is missing.
 | `deno task check`                                | Compile and validate without building                                            |
 | `deno task assets:check`                         | Show what `assets:sync` would change in the source map                           |
 | `deno task assets:sync`                          | Write `assets/` into the source map for World Editor (close the map first)       |
-| `deno task assets:paths [file]`                  | List the files a model references, and whether `assets/` has them                |
+| `deno task assets:paths [file]`                  | List the files a model references, and whether a build imports them              |
 | `deno task setup`                                | Create a missing `moonwell.local.pkl` and download the pinned YueScript compiler |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
