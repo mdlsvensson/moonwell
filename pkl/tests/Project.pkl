@@ -30,6 +30,25 @@ facts {
     t.catch(() -> (Project) { map { entry = "main.yue" } }.map.entry).contains("startsWith")
     t.catch(() -> (Project) { map { entry = "src/main.lua" } }.map.entry).contains("endsWith")
   }
+  ["build folder accepts relative output folders"] {
+    (Project) { build { folder = "dist/bin" } }.build.folder == "dist/bin"
+    (Project) { build { folder = "out" } }.build.folder == "out"
+    (Project) { build { folder = #"build\maps"# } }.build.folder == #"build\maps"#
+  }
+  ["build folder must be relative without .."] {
+    for (path in List("../x", #"out\..\.."#, "C:/x", #"D:\x"#, "/x", #"\x"#, "", ".")) {
+      t.catch(() -> (Project) { build { folder = path } }.build.folder).contains("isRelativeFolder")
+    }
+  }
+  ["build folder cannot be or be under maps, src or dist/stage"] {
+    for (path in List("maps", "maps/x", "./maps", "Maps", "src", #"src\x"#, "dist/stage", #"dist\stage\x"#)) {
+      t.catch(() -> (Project) { build { folder = path } }.build.folder).contains("isReservedFolder")
+    }
+  }
+  ["map folder must be relative without .."] {
+    t.catch(() -> (Project) { map { folder = "../x.w3x" } }.map.folder).contains("isRelativeFolder")
+    t.catch(() -> (Project) { map { folder = "C:/x.w3x" } }.map.folder).contains("isRelativeFolder")
+  }
   ["yue version must be semver"] {
     t.catch(() -> (Project) { yue { version = "latest" } }.yue.version).contains("matches")
   }

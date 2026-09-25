@@ -4,9 +4,28 @@
 /// Machine-specific values belong in `moonwell.local.pkl`, which amends `moonwell.pkl`.
 module moonwell.Project
 
+/// `path` split on `/` and `\`, without empty and `.` segments.
+local const function segments(path: String): List<String> =
+  path.replaceAll("\\", "/").split("/").filter((segment) -> segment != "" && segment != ".")
+
+/// A non-empty relative path: no leading `/` or `\`, no drive letter and no `..` segment.
+local const function isRelativeFolder(path: String): Boolean =
+  !segments(path).isEmpty
+    && !path.startsWith("/")
+    && !path.startsWith("\\")
+    && !path.matches(Regex(#"[A-Za-z]:.*"#))
+    && !segments(path).contains("..")
+
+/// Whether `path` is, or is under, a folder Moonwell reads from or stages into.
+local const function isReservedFolder(path: String): Boolean =
+  let (parts = segments(path).map((segment) -> segment.toLowerCase()))
+    parts.firstOrNull == "maps"
+      || parts.firstOrNull == "src"
+      || (parts.length >= 2 && parts[0] == "dist" && parts[1] == "stage")
+
 class MapConfig {
   /// Folder under `maps/` holding the World Editor source map (folder format, Lua script mode).
-  folder: String(endsWith(".w3x")) = "map.w3x"
+  folder: String(endsWith(".w3x"), isRelativeFolder(this)) = "map.w3x"
 
   /// Gameplay entry file, relative to the project root.
   entry: String(startsWith("src/"), endsWith(".yue")) = "src/main.yue"
@@ -14,7 +33,8 @@ class MapConfig {
 
 class BuildConfig {
   /// Folder, relative to the project root, that receives the packed `.w3x`.
-  folder: String = "dist/bin"
+  /// It cannot contain `..`, and cannot be or be under `maps`, `src` or `dist/stage`.
+  folder: String(isRelativeFolder(this), !isReservedFolder(this)) = "dist/bin"
 
   /// Minify compiled Lua. Error positions then report module names only.
   minify: Boolean = false

@@ -20,6 +20,15 @@ export async function removeIfExists(path: string): Promise<void> {
   }
 }
 
+/** Removes a file. Never recursive, so a directory with contents fails instead of being deleted. */
+export async function removeFileIfExists(path: string): Promise<void> {
+  try {
+    await Deno.remove(path);
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+}
+
 /** Replaces `destination` with a copy of `source`. */
 export async function replaceDir(source: string, destination: string): Promise<void> {
   await removeIfExists(destination);
