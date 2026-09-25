@@ -31,7 +31,7 @@ export async function init(dir: string, ctx: CommandContext, options: { link?: b
 
   const result = await ctx.run("pkl", ["project", "resolve"], {
     cwd: target,
-    notFoundHint: "Install Pkl 0.32 or newer: https://pkl-lang.org/main/current/pkl-cli/index.html#installation",
+    hint: "Install Pkl 0.32 or newer: https://pkl-lang.org/main/current/pkl-cli/index.html#installation",
   });
   if (result.code !== 0) {
     throw new MoonwellError(`pkl project resolve failed:\n${(result.stderr || result.stdout).trim()}`, {

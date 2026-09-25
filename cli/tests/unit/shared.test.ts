@@ -30,10 +30,22 @@ Deno.test("runProcess captures output and exit code", async () => {
 
 Deno.test("runProcess reports a missing command as MoonwellError with the hint", async () => {
   const error = await assertRejects(
-    () => runProcess("definitely-not-a-command-moonwell", [], { notFoundHint: "install it" }),
+    () => runProcess("definitely-not-a-command-moonwell", [], { hint: "install it" }),
     MoonwellError,
   );
   assertEquals(error.hint, "install it");
+});
+
+Deno.test("runProcess reports any spawn failure as MoonwellError with the hint", async () => {
+  const dir = await Deno.makeTempDir();
+  // A directory fails as NotFound on Windows and PermissionDenied on Linux; a non-executable file fails with a
+  // plain Error on Windows ("not a valid Win32 application") and PermissionDenied on Linux.
+  const junk = join(dir, "junk.exe");
+  await Deno.writeTextFile(junk, "not a program");
+  for (const command of [dir, junk]) {
+    const error = await assertRejects(() => runProcess(command, [], { hint: "fix it" }), MoonwellError, command);
+    assertEquals(error.hint, "fix it");
+  }
 });
 
 Deno.test("listFiles returns sorted posix relative paths", async () => {

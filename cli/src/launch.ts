@@ -1,9 +1,11 @@
 import { exists } from "@std/fs";
 import { MoonwellError } from "./shared/errors.ts";
+import { spawnError } from "./shared/process.ts";
 import type { Project } from "./project/project.ts";
 
 export type Spawn = (command: string, args: string[]) => void;
 
+/** Starts `command` without waiting for it; it keeps running after Moonwell exits. Throws if it cannot start. */
 export const spawnDetached: Spawn = (command, args) => {
   // Without `detached` the game dies when the CLI exits (verified on Windows).
   const child = new Deno.Command(command, { args, detached: true, stdin: "null", stdout: "null", stderr: "null" })
@@ -16,6 +18,8 @@ const LOCAL_EXAMPLE = [
   '  amends "moonwell.pkl"',
   '  launch { gameExecutable = "C:\\\\Program Files (x86)\\\\Warcraft III\\\\_retail_\\\\x86_64\\\\Warcraft III.exe" }',
 ].join("\n");
+
+const FIX_EXECUTABLE = "Fix launch.gameExecutable in moonwell.local.pkl to point at Warcraft III.exe.";
 
 /** Starts Warcraft III on `mapPath` (a staged folder map or a .w3x). */
 export async function launchGame(
@@ -30,8 +34,18 @@ export async function launchGame(
   if (!(await exists(executable))) {
     throw new MoonwellError(`Game executable not found: ${executable}`, {
       file: "moonwell.local.pkl",
-      hint: "Fix launch.gameExecutable to point at Warcraft III.exe.",
+      hint: FIX_EXECUTABLE,
     });
   }
-  spawn(executable, [...launch.args, "-loadfile", mapPath]);
+  if (!(await exists(executable, { isFile: true }))) {
+    throw new MoonwellError(`Game executable ${executable} is not a file.`, {
+      file: "moonwell.local.pkl",
+      hint: FIX_EXECUTABLE,
+    });
+  }
+  try {
+    spawn(executable, [...launch.args, "-loadfile", mapPath]);
+  } catch (error) {
+    throw spawnError(executable, error, { file: "moonwell.local.pkl", hint: FIX_EXECUTABLE });
+  }
 }

@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { exists } from "@std/fs";
 import { join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
@@ -50,7 +50,8 @@ Deno.test("ensureYue downloads, verifies and caches the compiler once", async ()
 
 Deno.test("ensureYue rejects a checksum mismatch and installs nothing", async () => {
   const { deps, cacheRoot } = await setup({ sha: "0".repeat(64) });
-  await assertRejects(() => ensureYue({ version: "9.9.9", path: null }, deps), MoonwellError, "checksum");
+  const error = await assertRejects(() => ensureYue({ version: "9.9.9", path: null }, deps), MoonwellError, "checksum");
+  assertStringIncludes(error.hint ?? "", "yue.path");
   assertEquals(await exists(join(cacheRoot, "yue", "9.9.9")), false);
 });
 

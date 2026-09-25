@@ -1,9 +1,29 @@
-import { assert } from "@std/assert";
+import { assert, assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { exists } from "@std/fs";
 import { join, toFileUrl } from "@std/path";
+import { launchGame } from "../../src/launch.ts";
+import { MoonwellError } from "../../src/shared/errors.ts";
 
 const REPO = join(import.meta.dirname!, "..", "..", "..");
 const LAUNCH = toFileUrl(join(REPO, "cli", "src", "launch.ts")).href;
+
+Deno.test("launchGame rejects a directory as the game executable", async () => {
+  const dir = await Deno.makeTempDir();
+  const error = await assertRejects(
+    () => launchGame({ gameExecutable: dir, args: [] }, "map", () => {}),
+    MoonwellError,
+    "is not a file",
+  );
+  assertEquals(error.file, "moonwell.local.pkl");
+  assertStringIncludes(error.hint ?? "", "moonwell.local.pkl");
+});
+
+Deno.test("launchGame reports a game that fails to start as MoonwellError", async () => {
+  const exe = join(await Deno.makeTempDir(), "Warcraft III.exe");
+  await Deno.writeTextFile(exe, "not a program");
+  const error = await assertRejects(() => launchGame({ gameExecutable: exe, args: [] }, "map"), MoonwellError, exe);
+  assertStringIncludes(error.hint ?? "", "moonwell.local.pkl");
+});
 
 Deno.test("spawnDetached keeps the child running after the CLI process exits", async () => {
   const dir = await Deno.makeTempDir();

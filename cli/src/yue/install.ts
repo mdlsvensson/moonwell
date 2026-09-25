@@ -95,7 +95,8 @@ export async function ensureYue(config: { version: string; path: string | null }
   const actual = await sha256Hex(archive);
   if (actual !== asset.sha256) {
     throw new MoonwellError(`YueScript download checksum mismatch (expected ${asset.sha256}, got ${actual}).`, {
-      hint: "Retry the download. If it keeps failing, report it; do not bypass the check.",
+      hint:
+        "Retry the download. If it keeps failing, report it, or build yue yourself and set yue.path in moonwell.local.pkl; do not bypass the check.",
     });
   }
 

@@ -1,12 +1,12 @@
 import { exists } from "@std/fs";
-import { join } from "@std/path";
+import { join, relative } from "@std/path";
 import { emitBundle, injectBundle } from "./bundle/emit.ts";
 import { resolveGraph } from "./bundle/graph.ts";
 import type { CommandContext } from "./context.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
 import type { Project } from "./project/project.ts";
 import { MoonwellError } from "./shared/errors.ts";
-import { replaceDir } from "./shared/fs.ts";
+import { replaceDir, toPosix } from "./shared/fs.ts";
 import { type CompiledModule, compileSources } from "./yue/compile.ts";
 import { ensureYue } from "./yue/install.ts";
 
@@ -62,7 +62,19 @@ export async function prepareStage(
     });
   }
   const mapDir = join(ctx.root, "dist", "stage", "map");
-  await replaceDir(source, mapDir);
+  try {
+    await replaceDir(source, mapDir);
+  } catch (cause) {
+    throw new MoonwellError(
+      `Staging the map into ${toPosix(relative(ctx.root, mapDir))} failed: ${
+        cause instanceof Error ? cause.message : String(cause)
+      }`,
+      {
+        cause,
+        hint: "Close Warcraft III or World Editor if they have dist/stage open, then retry.",
+      },
+    );
+  }
 
   const scriptPath = join(mapDir, "war3map.lua");
   const scriptLabel = `maps/${project.map.folder}/war3map.lua`;
