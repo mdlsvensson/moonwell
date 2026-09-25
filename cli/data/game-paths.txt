@@ -1,0 +1,1 @@
+# Not generated yet: run `deno task gen:game-paths <listfile> <game version>` (see CONTRIBUTING.md).

@@ -15,3 +15,6 @@ export const deflateRaw = (data: Uint8Array) =>
   transform(data, new CompressionStream("deflate-raw") as unknown as Duplex);
 export const inflateRaw = (data: Uint8Array) =>
   transform(data, new DecompressionStream("deflate-raw") as unknown as Duplex);
+/** gzip (the embedded in-game path list). */
+export const gzip = (data: Uint8Array) => transform(data, new CompressionStream("gzip") as unknown as Duplex);
+export const gunzip = (data: Uint8Array) => transform(data, new DecompressionStream("gzip") as unknown as Duplex);
