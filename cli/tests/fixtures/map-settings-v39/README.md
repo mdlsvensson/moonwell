@@ -22,3 +22,13 @@ Format-39 observations used by the reader:
 Unknown fields are preserved verbatim. These observations establish this fixture's
 layout; they do not identify every new field or establish when it was introduced.
 Legacy layout reference: https://github.com/ChiefOfGxBxL/WC3MapSpecification/blob/master/Info/0-33.md
+
+## `war3map-colors.w3i`
+
+`war3map.w3i` after the maintainer opened the map in World Editor 3.00 on 2026-09-26, turned on custom water
+tint with red (255, 0, 0), set the fog colour to red (255, 0, 0), picked the "Dungeon" sound environment, and
+saved. It shows that colours are stored blue, green, red, alpha; that water tint sets flag `0x10000`; and that the
+sound environment is stored by its internal name (`Dungeon`). World Editor also rewrote the save counter (offset 4),
+the unknown field at offset 141, and the three camera zoom values (1250).
+
+SHA-256: `fcd917acdc17ae8f8f10790fbec9e4d7dcba54dfeeab1b64ec7af0913992f122`

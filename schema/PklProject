@@ -3,7 +3,7 @@ amends "pkl:Project"
 package {
   name = "moonwell"
   baseUri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/\(name)"
-  version = "0.1.0"
+  version = "0.2.0"
   packageZipUrl = "https://github.com/mdlsvensson/moonwell/releases/download/\(name)@\(version)/\(name)@\(version).zip"
   description = "Schemas for Moonwell Warcraft III map projects."
   license = "MIT"

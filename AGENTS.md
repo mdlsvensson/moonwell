@@ -21,7 +21,8 @@ over, and updated on 2026-09-26 after Plan 2b.
 - **Released:** 0.1.0, on JSR (`@moonwell/cli@0.1.0`) and as a GitHub release (`moonwell@0.1.0`). It contains the
   toolchain: `init`, `setup`, `build`, `test`, `dev`, `check`; the YueScript bundler with runtime hooks; the MPQ writer;
   and the manifest in Pkl.
-- **Done on `main`, unreleased:**
+- **0.2.0 prepared on `main`, not yet published** (versions bumped, CHANGELOG written; the maintainer publishes per
+  CONTRIBUTING's Publishing steps). It contains:
   - Assets (Plan 2a): `assets/` is imported into builds. The manifest's `assets { paths {}; exclude = List() }` maps and
     excludes files. `assets:check` / `assets:sync` write the assets into the source map with ownership in
     `.asset-state/`.
@@ -36,16 +37,19 @@ over, and updated on 2026-09-26 after Plan 2b.
     byte, make the matching World Editor call edits in `war3map.lua`, and merge `war3mapMisc.txt` and `war3mapSkin.txt`,
     after staging and before assets and bundle injection. The source map is never written. `settings:check` reports the
     files that would change; `check` and `dev` run the same planner. Code is in `cli/src/settings/` and `cli/src/w3i/`.
-    **Awaiting the maintainer's in-game release gate** (CONTRIBUTING step 8); nothing in game has been verified yet.
+    The in-game release gate (CONTRIBUTING step 8) passed 2026-09-26 after three fixes: no `SetPlayerName` (it crashed
+    lobby creation), the hero level key is `MaxHeroLevel`, and w3i colours are stored blue, green, red, alpha (fixture
+    `cli/tests/fixtures/map-settings-v39/war3map-colors.w3i`). Sound environments use World Editor's internal names,
+    such as `Default` or `Dungeon`.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `eea99d9`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Plan 2c: object data** (spec §6.1): custom units, heroes, buildings, items, abilities, buffs and upgrades in Pkl,
-   written into the map's modification files (`w3u`/`w3t`/`w3h`/`w3a`/`w3q` and their `war3mapSkin.*` counterparts),
-   plus the generated `src/generated/objects.yue`.
+1. **Plan 2c: object data** (next feature, 0.3.0) (spec §6.1): custom units, heroes, buildings, items, abilities, buffs
+   and upgrades in Pkl, written into the map's modification files (`w3u`/`w3t`/`w3h`/`w3a`/`w3q` and their
+   `war3mapSkin.*` counterparts), plus the generated `src/generated/objects.yue`.
    - **Blocked on the maintainer.** It needs the game's SLKs (`UnitMetaData`, `AbilityMetaData`, `AbilityBuffMetaData`,
      `UpgradeMetaData`, and the `UnitData`/`ItemData`/`AbilityData`/`AbilityBuffData`/`UpgradeData` id lists), extracted
      with CascView. It also needs a small test map saved by World Editor 3.00 with one custom object of each kind, to
@@ -54,9 +58,7 @@ over, and updated on 2026-09-26 after Plan 2b.
      reader/writer.
    - Object data runs before settings in the pipeline (spec §7 of the map settings design).
    - Payoff: the template can restore the original footman-as-Captain (object data swaps its model).
-2. **Release 0.2.0** after the maintainer has passed the release gate for 2b (or after 2c). Follow CONTRIBUTING's
-   release gate and publishing steps.
-   - Bump the version in `cli/deno.json`, `cli/src/version.ts` and `schema/PklProject`.
+2. **Publish 0.2.0** if it is not on JSR yet: CONTRIBUTING's Publishing steps 2 to 5 (versions are already bumped).
    - `pkl project package` may need `--skip-publish-check` in sandboxed shells.
    - For 24 hours after publishing, Deno blocks the new version unless you pass `--min-dep-age=0`.
 

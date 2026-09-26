@@ -8,17 +8,17 @@ Deno.test("text patches preserve unrelated content and update duplicate keys", (
     const original = [
       "// keep",
       "[Misc]",
-      "HeroMaxLevel=10",
+      "MaxHeroLevel=10",
       "Keep=42",
       "[Other]",
       "X=y",
       "[misc]",
-      "heromaxlevel=12",
+      "maxherolevel=12",
       "",
     ].join(nl);
-    const sections = { Misc: { HeroMaxLevel: "25", Added: "0" }, CustomSkin: { Text: "" } };
+    const sections = { Misc: { MaxHeroLevel: "25", Added: "0" }, CustomSkin: { Text: "" } };
     const patched = patchSettingsText(original, sections);
-    for (const line of ["// keep", "Keep=42", "X=y", "HeroMaxLevel=25", "heromaxlevel=25", "Added=0", "Text="]) {
+    for (const line of ["// keep", "Keep=42", "X=y", "MaxHeroLevel=25", "maxherolevel=25", "Added=0", "Text="]) {
       assertStringIncludes(patched, line);
     }
     assertStringIncludes(patched, `[Other]${nl}X=y`);
