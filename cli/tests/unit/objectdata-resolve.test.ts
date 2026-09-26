@@ -242,6 +242,19 @@ Deno.test("rule: an unknown properties key, with the nearest friendly names", ()
   );
 });
 
+Deno.test("rule: a friendly name shared by base-specific fields none of which applies is an unknown key", () => {
+  // 'damage' names Hbz2 (Blizzard) and Ucs1 (Carrion Swarm) only; neither is the one field to blame for Holy Light.
+  assertEquals(problem([["abilities", "holy", { id: "A000", base: "AHhb", properties: { damage: 1 } }]]), [
+    `abilities["holy"].properties["damage"]: no field that applies to 'AHhb' (Holy Light) has this rawcode or name.`,
+    "Did you mean 'amountHealedOrDamaged'?",
+  ]);
+  // A name that only one field has still says why that field does not apply.
+  assertEquals(
+    problem([["abilities", "holy", { id: "A000", base: "AHhb", properties: { chanceToMiss: 1 } }]])[0],
+    `abilities["holy"].properties["chanceToMiss"]: 'Crs' (Chance to Miss) does not apply to 'AHhb' (Holy Light).`,
+  );
+});
+
 Deno.test("rule: an unknown typed field is a schema version problem", () => {
   assertEquals(problem([["units", "captain", { id: "h000", base: "hfoo", typed: { hitPoints: 1 } }]]), [
     `units["captain"].hitPoints: 'hitPoints' is not a field of units.`,
@@ -276,6 +289,28 @@ Deno.test("rule: a List on a field that is not per level", () => {
     `units["worker"].properties["ubui"]: 'ubui' (Structures Built) is not per level, so it takes one list, not a List of lists.`,
     "Write one List<String>.",
   ]);
+});
+
+Deno.test("rule: an empty List on a per-level field that is not a list field sets no levels", () => {
+  assertEquals(problem([["abilities", "holy", { id: "A000", base: "AHhb", typed: { manaCost: [] } }]]), [
+    `abilities["holy"].manaCost: an empty List sets no levels.`,
+    "Use null to inherit every level from the base.",
+  ]);
+  assertEquals(
+    problem([["upgrades", "swords", { id: "R000", base: "Rhme", properties: { gnam: [] } }]])[0],
+    `upgrades["swords"].properties["gnam"]: an empty List sets no levels.`,
+  );
+});
+
+Deno.test("rule: an object's own levels below 1", () => {
+  assertEquals(problem([["abilities", "holy", { id: "A000", base: "AHhb", typed: { levels: 0, manaCost: [1] } }]]), [
+    `abilities["holy"].levels: 'alev' (Levels) must be at least 1, got 0.`,
+    "Every object has at least one level; use null to keep the base's.",
+  ]);
+  assertEquals(
+    problem([["upgrades", "swords", { id: "R000", base: "Rhme", properties: { glvl: -2 } }]])[0],
+    `upgrades["swords"].properties["glvl"]: 'glvl' (Levels) must be at least 1, got -2.`,
+  );
 });
 
 Deno.test("rule: more List entries than the base's levels", () => {

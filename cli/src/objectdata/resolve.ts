@@ -41,10 +41,12 @@ export interface ResolvedObject {
 const LEVELED: ReadonlySet<Category> = new Set(["abilities", "upgrades"]);
 /** The field that sets an object's own level count. */
 const LEVELS_FIELD: Partial<Record<Category, string>> = { abilities: "alev", upgrades: "glvl" };
-// Unleveled fields in leveled tables: level 0 and data pointer 0 (names fixture, w3a name; V6).
+// Unleveled fields in leveled tables: level 0 and data pointer 0 (names fixture, the w3a name; the reference library
+// writes level 0 and data pointer 0 for every field too).
 const UNLEVELED = 0;
 // Per-level fields: levels 1..n, data pointer from the metadata `data` column (A = 1). The names fixture shows level 1
-// for the w3q name only; per-level numbering is proven by the gate (Task 9).
+// and data pointer 0 for the w3q name (a per-level field with no data column); the reference library never wrote
+// per-level values. Per-level numbering: proven by the gate (Task 9).
 const FIRST_LEVEL = 1;
 const FLOAT32_MAX = 3.4028234663852886e38;
 
@@ -207,8 +209,13 @@ function resolveFields(
     setBy.set(field.id, route);
     entries.push({ field, path, value });
   };
-  const anyNamed = (name: string) =>
-    metadata.fields[FIELD_SOURCE[category].fields].find((field) => field.name === name);
+  const fieldList = metadata.fields[FIELD_SOURCE[category].fields];
+  const anyNamed = (name: string) => fieldList.find((field) => field.name === name);
+  // A name several base-specific fields share, none of them applying to the base, blames no single field.
+  const onlyNamed = (name: string) => {
+    const named = fieldList.filter((field) => field.name === name);
+    return named.length === 1 ? named[0] : undefined;
+  };
 
   for (const [name, value] of Object.entries(object.typed)) {
     const field = fieldByName(metadata, category, object.base, name) ?? anyNamed(name);
@@ -220,7 +227,7 @@ function resolveFields(
     // A rawcode first, then a friendly name (spec §4.3). The game's one three-letter rawcode (`Crs`) is stored padded.
     const field = fieldByRawcode(metadata, category, key) ??
       (key.length === 3 ? fieldByRawcode(metadata, category, `${key}\0`) : undefined) ??
-      fieldByName(metadata, category, object.base, key) ?? anyNamed(key);
+      fieldByName(metadata, category, object.base, key) ?? onlyNamed(key);
     if (field !== undefined) {
       add(field, `.${route}`, route, value);
       continue;
@@ -240,6 +247,15 @@ function resolveFields(
   const ownLevels = typeof levelsEntry?.value === "number" && Number.isInteger(levelsEntry.value)
     ? levelsEntry.value
     : undefined;
+  // A count below 1 is reported once; lists are then not checked against it.
+  const badLevels = levelsEntry !== undefined && ownLevels !== undefined && ownLevels < 1;
+  if (badLevels) {
+    report(
+      levelsEntry.path,
+      `${describeField(levelsEntry.field)} must be at least 1, got ${ownLevels}.`,
+      "Every object has at least one level; use null to keep the base's.",
+    );
+  }
   // 18 standard abilities (Attack, the Build abilities, ...) have 0 levels in the game data, yet every ability has at
   // least one level in game, so a base count of 0 allows one entry unless the object sets its own levels.
   const baseLevels = Math.max(base.levels ?? 1, 1);
@@ -261,7 +277,12 @@ function resolveFields(
       );
       continue;
     }
-    if (setsLevels) {
+    if (setsLevels && items.length === 0) {
+      report(path, "an empty List sets no levels.", "Use null to inherit every level from the base.");
+      continue;
+    }
+    if (badLevels && field === levelsEntry.field) continue;
+    if (setsLevels && !badLevels) {
       const count = ownLevels ?? baseLevels;
       if (items.length > count) {
         const levelsName = metadata.fields[FIELD_SOURCE[category].fields]

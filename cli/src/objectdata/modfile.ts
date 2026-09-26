@@ -161,13 +161,14 @@ export interface NewObject {
   mods: { field: string; level: number; column: number; value: ModValue }[];
 }
 
-// The names fixture shows set count 1 and flag 0 per object, and end token 0 after each custom modification.
-// v1/v2 objects (no set fields, end token 0) are derived from it, not seen in a save: to verify (V16).
+// v3: set count 1 and flag 0 per object, end token 0 after each custom modification (names fixture, V3 and V4).
+// v1/v2: no set fields and end token 0, as the reference library writes version 2 files (mdx-m3-viewer-th
+// `ModifiedObject.save` and `Modification.save`, whose end token defaults to 0; war3-objectdata-th, used in game).
 const SET_COUNT = 1;
 const SET_FLAG = 0;
 const END_TOKEN = 0;
 // Version and empty original table of a file World Editor 3.00 writes when the map has none (names fixture).
-const NEW_FILE_VERSION = 3;
+export const NEW_FILE_VERSION = 3;
 const FLOAT32_MAX = 3.4028234663852886e38;
 
 /** Encodes Moonwell's objects. Bad values are internal errors: the resolver rejects them before planning. */
