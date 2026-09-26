@@ -4,19 +4,19 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over.
+over, and updated on 2026-09-26 after Plan 2b.
 
 ## Read first
 
 - `docs/superpowers/specs/2026-09-24-moonwell-core-design.md` is the **binding design** for the whole project. Its §6
-  describes the data layers still to build: §6.1 object data and §6.3 map settings. §6.2 assets is done.
+  describes the data layers: §6.1 object data is still to build; §6.2 assets and §6.3 map settings are done.
 - `README.md` (user docs), `CONTRIBUTING.md` (checks, release gate, publishing), `CHANGELOG.md` (0.1.0 released,
   `## Unreleased` lists what is done since).
-- Later specs, all implemented: `2026-09-25-moonwell-model-paths-design.md` and
-  `2026-09-25-moonwell-in-game-paths-design.md`. Plans for everything built so far are in `docs/superpowers/plans/`;
-  follow their style when writing new plans.
+- Later specs, all implemented: `2026-09-25-moonwell-model-paths-design.md`,
+  `2026-09-25-moonwell-in-game-paths-design.md` and `2026-09-25-moonwell-map-settings-design.md`. Plans for everything
+  built so far are in `docs/superpowers/plans/`; follow their style when writing new plans.
 
-## State (2026-09-25)
+## State (2026-09-26)
 
 - **Released:** 0.1.0, on JSR (`@moonwell/cli@0.1.0`) and as a GitHub release (`moonwell@0.1.0`). It contains the
   toolchain: `init`, `setup`, `build`, `test`, `dev`, `check`; the YueScript bundler with runtime hooks; the MPQ writer;
@@ -30,27 +30,20 @@ over.
     Import Manager. It uses an embedded list of 42,127 in-game paths generated from WC3 3.0.0.24268
     (`cli/data/game-paths.txt`).
   - `init` creates the icon folders `assets/ReplaceableTextures/{CommandButtons,CommandButtonsDisabled,PassiveButtons}`.
+  - Map settings (Plan 2b, `docs/superpowers/plans/2026-09-25-moonwell-map-settings.md`): the manifest's
+    `settings { info, loadingScreen, gameplay, players, forces, environment, gameplayConstants, gameInterface }` (schema
+    in `schema/MapSettings.pkl`). Builds patch the staged `war3map.w3i` (versions 18, 25, 28, 31, 32, 33, 39) byte for
+    byte, make the matching World Editor call edits in `war3map.lua`, and merge `war3mapMisc.txt` and `war3mapSkin.txt`,
+    after staging and before assets and bundle injection. The source map is never written. `settings:check` reports the
+    files that would change; `check` and `dev` run the same planner. Code is in `cli/src/settings/` and `cli/src/w3i/`.
+    **Awaiting the maintainer's in-game release gate** (CONTRIBUTING step 8); nothing in game has been verified yet.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `eea99d9`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Plan 2b: map settings** (spec §6.3). Needs nothing from the maintainer.
-   - **What:**
-     `settings { info, loadingScreen, gameplayConstants, gameInterface, gameplay, players, forces, environment }` in the
-     manifest. It patches `war3map.w3i` (versions 18, 25, 28, 31, 32, 33, 39), merges `war3mapMisc.txt` and
-     `war3mapSkin.txt`, and makes coordinated `config()` edits in `war3map.lua`. It also adds a `settings:check`
-     command. Settings are applied to the staged map after staging and before bundle injection.
-   - **Reference implementation to port** (read only; it's TypeScript with some npm dependencies you must not copy):
-     `C:\Users\mdlsvensson\Repo\wc3-dev-framework\scripts\map-settings\` (`settings.ts`, `map-info.ts`, `binary.ts`,
-     `lua.ts`, `options.ts`), with its schema in `map-settings-schema.pkl` and tests in
-     `scripts\tests\map-settings*.ts`. Its `lua.ts` uses `createRequire`; replace that with plain Deno code.
-   - **Template rule, decided with the maintainer:** the template's `settings` block writes out every setting with its
-     default value. A setting stays commented out only when it needs a World Editor step first, and its comment names
-     that step. Lists are Pkl `List`, never `Listing` (amending a `Listing` default appends to it). Advanced settings
-     are left out of the template but documented. See spec §3.3.
-2. **Plan 2c: object data** (spec §6.1): custom units, heroes, buildings, items, abilities, buffs and upgrades in Pkl,
+1. **Plan 2c: object data** (spec §6.1): custom units, heroes, buildings, items, abilities, buffs and upgrades in Pkl,
    written into the map's modification files (`w3u`/`w3t`/`w3h`/`w3a`/`w3q` and their `war3mapSkin.*` counterparts),
    plus the generated `src/generated/objects.yue`.
    - **Blocked on the maintainer.** It needs the game's SLKs (`UnitMetaData`, `AbilityMetaData`, `AbilityBuffMetaData`,
@@ -59,8 +52,10 @@ over.
      confirm the version-3 file format and the skin split (spec §11).
    - The reference framework used the npm `war3-objectdata-th` package for this; Moonwell must write its own
      reader/writer.
+   - Object data runs before settings in the pipeline (spec §7 of the map settings design).
    - Payoff: the template can restore the original footman-as-Captain (object data swaps its model).
-3. **Release 0.2.0** after 2b (or 2c). Follow CONTRIBUTING's release gate and publishing steps.
+2. **Release 0.2.0** after the maintainer has passed the release gate for 2b (or after 2c). Follow CONTRIBUTING's
+   release gate and publishing steps.
    - Bump the version in `cli/deno.json`, `cli/src/version.ts` and `schema/PklProject`.
    - `pkl project package` may need `--skip-publish-check` in sandboxed shells.
    - For 24 hours after publishing, Deno blocks the new version unless you pass `--min-dep-age=0`.

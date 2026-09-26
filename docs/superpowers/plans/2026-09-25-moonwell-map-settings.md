@@ -88,7 +88,7 @@ order for review clarity. Keep `cli/src/map/w3i.ts` and the existing bundler lex
   `hasExtendedSettings(settings: MapSettings): boolean`, `hasSettings(settings: MapSettings): boolean`.
 - `validateMapSettings` accepts `{}`; callers use `{}` for absent settings. An explicitly null top-level value fails.
 
-- [ ] **Step 1: Write failing normalization and validation tests.**
+- [x] **Step 1: Write failing normalization and validation tests.**
 
 ```ts
 import { assertEquals, assertThrows } from "@std/assert";
@@ -131,11 +131,11 @@ Also add boundary tables for both integer ranges, background maximum, every cont
 finite coordinate limits, fog style/density, and colors with wrong length/fractional/out-of-range channels. Each
 boundary table has one accepted endpoint and one rejected value beyond it.
 
-- [ ] **Step 2: Run the focused tests and observe the missing-module failure.**
+- [x] **Step 2: Run the focused tests and observe the missing-module failure.**
 
 Run: `deno test -A cli/tests/unit/settings-options.test.ts`.
 
-- [ ] **Step 3: Port and normalize the TypeScript contract.**
+- [x] **Step 3: Port and normalize the TypeScript contract.**
 
 Use these public types (all members of the root exist; only leaf overrides are optional):
 
@@ -205,7 +205,7 @@ export function hasSettings(s: MapSettings): boolean {
 }
 ```
 
-- [ ] **Step 4: Add failing schema facts, then port the schema and wire Project.**
+- [x] **Step 4: Add failing schema facts, then port the schema and wire Project.**
 
 Add these facts to `schema/tests/Project.pkl` before adding the properties:
 
@@ -252,7 +252,7 @@ Update the existing expected Project object with `validateMapSettings({})`. Add 
 and a malformed settings object through `parseProject`, proving that `moonwell.local.pkl` propagates into the error.
 Add Pkl fact groups for each range/enum and nullable field group using the same `t.catch` pattern.
 
-- [ ] **Step 5: Verify, review, and commit when the full gate is green.**
+- [x] **Step 5: Verify, review, and commit when the full gate is green.**
 
 Run focused unit/schema tests, then all seven checks. Review every field against spec §3 and confirm there is no
 new Pkl invocation. Commit: `feat: add map settings schema and manifest validation`.
@@ -271,7 +271,7 @@ new Pkl invocation. Commit: `feat: add map settings schema and manifest validati
 - Support exports `SETTINGS_FIXTURE: URL`, `fixtureBytes(): Promise<Uint8Array>`,
   `fixtureLua(): Promise<string>`, `syntheticMapInfo(version: number): Uint8Array`.
 
-- [ ] **Step 1: Copy the editor fixture and add independent golden tests.**
+- [x] **Step 1: Copy the editor fixture and add independent golden tests.**
 
 Copy the three fixture files from reference `scripts/tests/fixtures/map-settings-v39/` unchanged. Verify binary
 SHA-256 `969a64caa8c04393fd79dc0418378e410fa1cb33f0fe2a39f6cc3761646438ce` with `Get-FileHash`.
@@ -316,9 +316,9 @@ Deno.test("invalid required map structure is a file error", async () => {
 });
 ```
 
-- [ ] **Step 2: Run `deno test -A cli/tests/unit/settings-w3i.test.ts`; observe missing reader/patch modules.**
+- [x] **Step 2: Run `deno test -A cli/tests/unit/settings-w3i.test.ts`; observe missing reader/patch modules.**
 
-- [ ] **Step 3: Port the complete reader and patcher, hardening expected failures.**
+- [x] **Step 3: Port the complete reader and patcher, hardening expected failures.**
 
 Port reference `map-info.ts` and `binary.ts` into the specified files. Import types/options from Task 1. Thread
 `file = "war3map.w3i"` through the reader and patcher. Convert malformed-data errors, fatal UTF-8 decode errors,
@@ -341,7 +341,7 @@ each player's fixed-start value. Validate effective fog numeric values before ge
 NaN/infinite fog data must fail when fog is being edited. Preserve non-fog edits on maps where unused fog values
 are irrelevant. Preserve source bytes for no-op settings without trying to decode them.
 
-- [ ] **Step 4: Add a synthetic fixture builder and all-version preservation tests.**
+- [x] **Step 4: Add a synthetic fixture builder and all-version preservation tests.**
 
 Add this independent test builder; never import the production reader into it:
 
@@ -391,7 +391,7 @@ v18 rejects model including `""`; 18/25 reject extended settings. Add bad-versio
 count, duplicate-ID, invalid-controller/race/fixedStart, nonfinite coordinate, absent record, disabled custom forces,
 and fog-start-after-inherited-end cases using byte spans or pinned fixture offsets. All must throw `MoonwellError`.
 
-- [ ] **Step 5: Run focused tests, review preservation/layout evidence, run full gate, then commit.**
+- [x] **Step 5: Run focused tests, review preservation/layout evidence, run full gate, then commit.**
 
 Commit: `feat: patch map settings in supported w3i formats`.
 
@@ -404,7 +404,7 @@ Commit: `feat: patch map settings in supported w3i formats`.
 - Produces `patchSettingsText(source: string, sections: Sections): string` and
   `gameplaySections(settings: MapSettings, file?: string): Sections` (a fresh merged mapping).
 
-- [ ] **Step 1: Add failing preservation and conflict tests.**
+- [x] **Step 1: Add failing preservation and conflict tests.**
 
 ```ts
 import { assertEquals, assertStringIncludes, assertThrows } from "@std/assert";
@@ -437,9 +437,9 @@ Deno.test("typed gameplay merges are case insensitive without mutating settings"
 });
 ```
 
-- [ ] **Step 2: Run `deno test -A cli/tests/unit/settings-text.test.ts`; observe missing-module failure.**
+- [x] **Step 2: Run `deno test -A cli/tests/unit/settings-text.test.ts`; observe missing-module failure.**
 
-- [ ] **Step 3: Port `patchSettingsText` verbatim from reference `settings.ts` and extract the typed merge.**
+- [x] **Step 3: Port `patchSettingsText` verbatim from reference `settings.ts` and extract the typed merge.**
 
 ```ts
 export function gameplaySections(settings: MapSettings, file = "moonwell.pkl"): Sections {
@@ -467,7 +467,7 @@ export function gameplaySections(settings: MapSettings, file = "moonwell.pkl"): 
 Add tests for tab-indented keys, section-header comments, case-only matching, empty sections, and replacing a key's
 entire value line. No semantic parsing of raw values or inline comments is introduced.
 
-- [ ] **Step 4: Verify focused tests and review nonmutation/newline behavior; run full gate and commit.**
+- [x] **Step 4: Verify focused tests and review nonmutation/newline behavior; run full gate and commit.**
 
 Commit: `feat: merge gameplay constants and game interface settings`.
 
@@ -489,7 +489,7 @@ export function playerId(tokens: LuaToken[]): number | undefined;
 `literalNumber` accepts a single finite Lua numeral or unary-minus numeral. `playerId` accepts precisely
 `Player(<literal integer>)`; it rejects members, arithmetic expressions, extra arguments, and noninteger IDs.
 
-- [ ] **Step 1: Add failing tests for statement boundaries before writing the reader.**
+- [x] **Step 1: Add failing tests for statement boundaries before writing the reader.**
 
 ```ts
 import { assertEquals, assertThrows } from "@std/assert";
@@ -534,9 +534,9 @@ Add cases where fake calls occur in escaped quoted strings, comments at every to
 anonymous functions, chained calls, return expressions, and `until` conditions. Add a fixture test that finds exactly
 one global `config`, `main`, `InitCustomPlayerSlots`, and `InitCustomTeams` and the expected direct native calls.
 
-- [ ] **Step 2: Run `deno test -A cli/tests/unit/settings-lua-structure.test.ts`; observe missing-module failure.**
+- [x] **Step 2: Run `deno test -A cli/tests/unit/settings-lua-structure.test.ts`; observe missing-module failure.**
 
-- [ ] **Step 3: Implement a ranged lexer and recursive statement reader.**
+- [x] **Step 3: Implement a ranged lexer and recursive statement reader.**
 
 Do not alter `bundle/lexer.ts`. Use its long-bracket recognition as the starting algorithm, but retain numbers and
 ranges and reject missing terminators rather than treating EOF as a close. Recognize longest symbols first:
@@ -591,7 +591,7 @@ For hexadecimal fractional literals, `literalNumber` returns undefined; they can
 A plain decimal/hex integer and signed decimal float must work. All tokens, even ignored
 expressions, must be structurally consumed so the next statement cannot be mistaken for part of the previous one.
 
-- [ ] **Step 4: Add source-range and parser-regression assertions, then verify and review.**
+- [x] **Step 4: Add source-range and parser-regression assertions, then verify and review.**
 
 Assert exact `source.slice(call.start, call.end)` for multiline calls and no-whitespace `A();B()` statements. Ensure
 each `LuaFunction` range includes its whole declaration and `endStart` points to its own terminal `end`, not a nested
@@ -610,7 +610,7 @@ Commit: `feat: read Lua statement ranges for safe settings edits`.
 - Produces `luaString(value: string): string`,
   `patchSettingsLua(source: string, settings: MapSettings, patchedW3i: Uint8Array, file?: string): string`.
 
-- [ ] **Step 1: Add failing binary/Lua consistency tests using the real fixture.**
+- [x] **Step 1: Add failing binary/Lua consistency tests using the real fixture.**
 
 ```ts
 import { assertEquals, assertStringIncludes, assertThrows } from "@std/assert";
@@ -646,9 +646,9 @@ Deno.test("missing or duplicate editor calls refuse an edit", async () => {
 });
 ```
 
-- [ ] **Step 2: Run `deno test -A cli/tests/unit/settings-lua.test.ts`; observe missing-module failure.**
+- [x] **Step 2: Run `deno test -A cli/tests/unit/settings-lua.test.ts`; observe missing-module failure.**
 
-- [ ] **Step 3: Port the reference's edit logic using Task 4 instead of its parser.**
+- [x] **Step 3: Port the reference's edit logic using Task 4 instead of its parser.**
 
 Port `luaString` unchanged. Port the body of `patchSettingsLua`, replacing AST access with `LuaFunction`/`LuaCall`
 ranges and `literalNumber`/`playerId`. The mechanical mapping is:
@@ -694,7 +694,7 @@ Re-read patched source with `readLuaFunctions` before returning. Add tests for w
 team mismatch, expression IDs, duplicate optional calls, missing main anchor, Unicode/control strings, force false
 values, fog enabled=false, and effective float32 rounding. A settings-free call returns the source unchanged.
 
-- [ ] **Step 4: Add executed tests with stubbed natives, then run the runtime suite.**
+- [x] **Step 4: Add executed tests with stubbed natives, then run the runtime suite.**
 
 Use `testYue()` from `cli/tests/support/yue.ts` and `runProcess` as the existing runtime tests do. Execute the patched
 real fixture in a temporary Lua file. Before fixture code, define `Player(id)` to return `id`, define every uppercase
@@ -732,7 +732,7 @@ Write `script` to a temporary file, execute `["-e", file]`, and assert exit 0 pl
 fixture test, assert captured controller/race/fixed-start/team/alliance and water/sound/fog calls, and that environment
 calls precede unit creation. Run default values plus representative false/zero/empty overrides.
 
-- [ ] **Step 5: Review safe refusals and effective execution, run full gate, then commit.**
+- [x] **Step 5: Review safe refusals and effective execution, run full gate, then commit.**
 
 Commit: `feat: coordinate map settings with editor Lua initialization`.
 
@@ -748,7 +748,7 @@ Commit: `feat: coordinate map settings with editor Lua initialization`.
 - Produces `settingsMapDir(root: string, mapFolder: string): Promise<string>` to validate source folder existence,
   directory type, and that it is the expected `maps/<mapFolder>` location; it does not read settings files.
 
-- [ ] **Step 1: Add failing source-preservation tests.**
+- [x] **Step 1: Add failing source-preservation tests.**
 
 ```ts
 import { assertEquals, assertRejects } from "@std/assert";
@@ -781,9 +781,9 @@ Deno.test("planning validates every change before writes and application filters
 });
 ```
 
-- [ ] **Step 2: Run `deno test -A cli/tests/unit/settings-plan.test.ts`; observe missing-module failure.**
+- [x] **Step 2: Run `deno test -A cli/tests/unit/settings-plan.test.ts`; observe missing-module failure.**
 
-- [ ] **Step 3: Port planning to async reads and stable changed-file results.**
+- [x] **Step 3: Port planning to async reads and stable changed-file results.**
 
 Port reference `planMapSettings`, using Task 3's `gameplaySections` before any file reads and Task 1's normalized
 settings without mutating them. Read only the files needed by active fields. Info/loading/extended settings read
@@ -813,7 +813,7 @@ hint. The `settingsMapDir` helper uses `resolve`/`relative` containment checks a
 non-directory paths with a manifest/map-folder hint. It does not create directories. Plan results use only the four
 hardcoded internal filenames; raw mapping names never become filesystem paths.
 
-- [ ] **Step 4: Add read-failure and text-only/no-op cases; verify and review.**
+- [x] **Step 4: Add read-failure and text-only/no-op cases; verify and review.**
 
 Test missing required w3i/Lua, directory in place of an optional text file, missing optional text files, raw-only
 configuration requiring no w3i/Lua, null-only maps requiring no reads, all-four-files stable order, invalid Lua after
@@ -831,7 +831,7 @@ Run focused tests and full gate. Commit: `feat: plan and apply staged map settin
 
 **Interfaces:** `settingsCheck(ctx: CommandContext): Promise<SettingsChange[]>`; report without installing Yue or locking.
 
-- [ ] **Step 1: Add a failing real-Pkl command test.**
+- [x] **Step 1: Add a failing real-Pkl command test.**
 
 ```ts
 import { assertEquals, assertStringIncludes } from "@std/assert";
@@ -861,9 +861,9 @@ Deno.test("settings:check evaluates the manifest without staging or compiling", 
 });
 ```
 
-- [ ] **Step 2: Run `deno test -A cli/tests/pkl/settings.test.ts`; observe missing-module failure.**
+- [x] **Step 2: Run `deno test -A cli/tests/pkl/settings.test.ts`; observe missing-module failure.**
 
-- [ ] **Step 3: Implement command and dispatch.**
+- [x] **Step 3: Implement command and dispatch.**
 
 ```ts
 import { basename } from "@std/path";
@@ -890,7 +890,7 @@ Add the main switch case/import/help line and the `PROJECT_TASKS` entry. Generat
 task format, `deno run -A ../cli/src/main.ts settings:check`. No extra signal handler is necessary: the command holds
 no build lock. Keep logging behavior consistent with existing main.
 
-- [ ] **Step 4: Add the enabled everyday template block with exact defaults.**
+- [x] **Step 4: Add the enabled everyday template block with exact defaults.**
 
 ```pkl
 // null inherits the World Editor map; empty text clears a text field.
@@ -956,7 +956,7 @@ settings group with explicit overrides, a local color replacement, invalid lazy 
 conflict through `loadProject`. A fake `ctx.run` wrapper can count executed commands and reject any command other
 than `pkl`, proving the dedicated check never invokes Yue.
 
-- [ ] **Step 5: Verify scaffold/help/default behavior, review schema parity, run full gate, then commit.**
+- [x] **Step 5: Verify scaffold/help/default behavior, review schema parity, run full gate, then commit.**
 
 Commit: `feat: expose settings check and editable template defaults`.
 
@@ -967,7 +967,7 @@ extend dev integration coverage. Exercise the existing build cleanup without ref
 
 **Interfaces:** Existing command signatures remain compatible; `Project.settings` and Task 6's planner are consumed.
 
-- [ ] **Step 1: Write a failing archive test with representative settings.**
+- [x] **Step 1: Write a failing archive test with representative settings.**
 
 Use the existing `cli/tests/e2e/project.test.ts` pattern: create an `init --link` temporary project through the local
 CLI, amend its local manifest, invoke `deno task build`, and read with `openMpq`. Keep helpers local to this new file
@@ -995,9 +995,9 @@ and Lua contains the expected native calls followed by bundle injection. Assert 
 appears as an imported asset. Build again and compare the four settings files byte-for-byte to the first build.
 Compare source files byte-for-byte to their snapshots after both builds.
 
-- [ ] **Step 2: Run `deno test -A cli/tests/e2e/settings.test.ts`; observe unchanged map settings in the archive.**
+- [x] **Step 2: Run `deno test -A cli/tests/e2e/settings.test.ts`; observe unchanged map settings in the archive.**
 
-- [ ] **Step 3: Add planning/application immediately after staging and before asset application.**
+- [x] **Step 3: Add planning/application immediately after staging and before asset application.**
 
 In `prepareStage`, after `replaceDir` succeeds and before the asset ownership/planning block, add:
 
@@ -1020,7 +1020,7 @@ if (hasSettings(project.settings)) {
 Keep the old no-source-map behavior for empty settings. `dev` already calls `check` and watches manifests, so do not
 add a second settings watcher or planner there.
 
-- [ ] **Step 4: Add failure cleanup and check/dev regression tests.**
+- [x] **Step 4: Add failure cleanup and check/dev regression tests.**
 
 After a successful build, set an absent player override and rebuild; expect exit 1, a `MoonwellError` diagnostic,
 no old archive, and source preservation. Separately configure an info-name edit and remove its required Lua call
@@ -1035,14 +1035,14 @@ Add a `check` test that reports a Lua/team mismatch without staging. Extend the 
 write a valid Pkl manifest containing an absent player setting, and wait for the settings diagnostic using the
 existing bounded output-reader timeout. Preserve Windows/Linux cleanup with `finally`.
 
-- [ ] **Step 5: Exercise the staged test path without launching the game.**
+- [x] **Step 5: Exercise the staged test path without launching the game.**
 
 Use a real `CommandContext` with `spawn` replaced by a recording function and a temporary empty file as the game
 executable, as `project.test.ts` already does. Call the existing `test(ctx, {})` command. Assert the launch argument
 points to `dist/stage/map.w3x`, the staged map contains settings plus the runtime, and source files are unchanged.
 Exercise a minified build and assert settings Lua still precedes bundle emission and module error metadata.
 
-- [ ] **Step 6: Review pipeline order, error paths, and source snapshots; run full gate, then commit.**
+- [x] **Step 6: Review pipeline order, error paths, and source snapshots; run full gate, then commit.**
 
 Commit: `feat: apply and validate settings throughout the map pipeline`.
 
@@ -1050,7 +1050,7 @@ Commit: `feat: apply and validate settings throughout the map pipeline`.
 
 **Files:** Modify `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`; update this plan's checkboxes as work completes.
 
-- [ ] **Step 1: Document the settings workflow and advanced mappings.**
+- [x] **Step 1: Document the settings workflow and advanced mappings.**
 
 Add a README Map settings section with this minimal example:
 
@@ -1077,7 +1077,7 @@ Say that raw values are strings, names match ignoring case, unrelated entries/co
 overrides of the same key must agree exactly. Label `CustomSkin/Test` as a merge-syntax example, not a promise that
 Warcraft III interprets that invented key. Note advanced schemas live in `MapSettings.pkl` as well as `Project.pkl`.
 
-- [ ] **Step 2: Extend the manual release gate and Unreleased changelog.**
+- [x] **Step 2: Extend the manual release gate and Unreleased changelog.**
 
 CONTRIBUTING: in an `init --link` throwaway project, configure a name/loading title, valid existing slot/team settings,
 fog/water/sound, and typed gameplay constants. Run settings check, launch staged map, and play a packed minified map.
@@ -1098,7 +1098,7 @@ For native execution, use the execution skill's final independent review; for su
 and final reviews. Resolve findings before claiming completion. Keep task reviews meaningful even when a commit is
 deferred until all required suites pass.
 
-- [ ] **Step 4: Run the complete check suite and commit the final documentation.**
+- [x] **Step 4: Run the complete check suite and commit the final documentation.**
 
 Run all commands under Completion. Commit: `docs: document map settings and release verification`.
 

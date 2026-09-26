@@ -92,6 +92,61 @@ editor expects:
 Give every `BTN<Name>` a matching `DISBTN<Name>`, and every `PASBTN<Name>` a matching `DISPASBTN<Name>`: the game shows
 a placeholder where a disabled icon is missing.
 
+## Map settings
+
+The `settings` block in `moonwell.pkl` overrides the map's own settings: its name and loading screen, player slots,
+forces, environment and gameplay constants. `init` writes every everyday setting out at `null`, so a new project keeps
+everything the map has. Set only what you want to change:
+
+```pkl
+settings {
+  info { name = "My Map"; author = "" }
+  gameplay { heroMaxLevel = 25; foodLimit = 200 }
+  environment { waterColor = List(20, 40, 80, 255) }
+}
+```
+
+- **Inheritance and clearing.** A `null` or omitted setting keeps the map's value. `false`, `0` and `""` are real
+  values: `author = ""` clears the author. Text you set is written as literal text; text you leave alone keeps its
+  `TRIGSTR_*` reference into `war3map.wts`, which Moonwell never rewrites.
+- **Colors** are `List(red, green, blue, alpha)`, each 0 to 255, and replace the map's color whole. Setting `waterColor`
+  turns on the map's custom water tint. `fog.enabled` switches fog on or off; the other fog fields do not switch it on.
+  After inheriting any value you leave out, fog `start` must not exceed `end`.
+- **Staged copy only.** Builds and `deno task test` write settings into the staged copy in `dist/stage/`, never into
+  `maps/<folder>`, so World Editor keeps showing the map's own values. Open the built map to see them. Settings are
+  applied after staging and before assets and the gameplay bundle, and never appear in `war3map.imp`.
+- **Map versions.** The map info file (`war3map.w3i`) must be version 18, 25, 28, 31, 32, 33 or 39; World Editor 3.00
+  saves version 39. A loading-screen `model` needs version 25 or later. `players`, `forces` and `environment` need
+  version 28 or later and Lua as the script language. If a map is refused, open it in World Editor and save it again in
+  folder format with Lua as the script language.
+- **Existing players and forces only.** `players["3"]` is the slot World Editor shows as Player 4 (IDs are zero-based, 0
+  to 23), and `forces["0"]` is the first force. Settings change existing slots and forces; they never add or remove one
+  or change which players are on a team. Create slots in World Editor's Scenario > Player Properties and save first.
+- **Custom forces.** Force settings need custom forces: in World Editor, open Scenario > Force Properties, turn on Use
+  Custom Forces, set up the teams, and save the map. The template's commented `forces` example says the same.
+- **Editor Lua calls.** World Editor writes some settings into `war3map.lua` too, and Moonwell edits those calls to
+  match: `SetMapName` and `SetMapDescription` in `config()`, the player calls in `InitCustomPlayerSlots()`, the team
+  calls in `InitCustomTeams()`, and the sound, water and fog calls in `main()` (before `CreateAllUnits()` or
+  `InitBlizzard()`). It needs each call exactly where World Editor puts it and refuses, naming `war3map.lua`, when the
+  script does not look like World Editor's, for example after hand edits to those functions. Re-saving the map in World
+  Editor restores them. Your gameplay code is not affected.
+
+`deno task settings:check` checks the settings against the source map without building and lists the internal files a
+build would change:
+
+```text
+  war3map.w3i
+  war3map.lua
+  war3mapMisc.txt
+Map settings valid: 3 internal file(s) would change during build.
+```
+
+`deno task check` (and so `dev`) checks settings the same way; with no settings set it does not need the source map.
+Mistakes in the manifest name the manifest that was evaluated (`moonwell.local.pkl` when it exists, else
+`moonwell.pkl`). Problems with the map name the file under `maps/<folder>/`, such as `maps/map.w3x/war3map.w3i`. Map
+files are matched ignoring letter case, as Warcraft III does: a map saved with `war3mapskin.txt` is patched under that
+name.
+
 ## Commands
 
 | Command                                          | What                                                                             |
@@ -103,6 +158,7 @@ a placeholder where a disabled icon is missing.
 | `deno task assets:check`                         | Show what `assets:sync` would change in the source map                           |
 | `deno task assets:sync`                          | Write `assets/` into the source map for World Editor (close the map first)       |
 | `deno task assets:paths [file]`                  | List the files a model references, as in-game or custom paths                    |
+| `deno task settings:check`                       | Show which internal map files the settings would change, without building        |
 | `deno task setup`                                | Create a missing `moonwell.local.pkl` and download the pinned YueScript compiler |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
@@ -123,6 +179,30 @@ yue {
   path = "C:\\tools\\yue.exe"
 }
 ```
+
+### Raw gameplay constants and game interface
+
+`settings.gameplayConstants` and `settings.gameInterface` set any section and key in `war3mapMisc.txt` (World Editor's
+Gameplay Constants) and `war3mapSkin.txt` (Game Interface). They are left out of the template; their schema is in
+`MapSettings.pkl`, which `Project.pkl` imports.
+
+```pkl
+settings {
+  gameplayConstants { ["Misc"] { ["HeroMaxLevel"] = "25" } }
+  gameInterface { ["CustomSkin"] { ["Test"] = "value" } }
+}
+```
+
+`CustomSkin`/`Test` only shows the syntax: it is an invented key, and nothing says Warcraft III reads it.
+
+- Values are strings, written as they are: `"25"`, not `25`. A value is one line, and `""` writes an empty `Key=`.
+- Section and key names are letters, digits and `_`, and match the file's names ignoring letter case. The file keeps its
+  own spelling. Two names in one mapping that differ only in case are an error.
+- Every matching key is replaced, a missing key is added to its section, and a missing section or file is created. Other
+  sections, keys and comments stay as they are.
+- `gameplay.heroMaxLevel` and `gameplay.foodLimit` write `[Misc] HeroMaxLevel` and `[Misc] FoodCeiling`. If you set the
+  same key raw as well, the two must agree exactly: `heroMaxLevel = 25` with `["HeroMaxLevel"] = "25"` is accepted, with
+  `"025"` it is an error.
 
 ## Editor support
 

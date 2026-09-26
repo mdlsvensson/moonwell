@@ -8,6 +8,15 @@
 - `assets:paths` lists the files a model (`.mdx` or `.mdl`) references as in-game or custom paths, and whether the
   project imports them.
 - `init` creates World Editor's icon folders under `assets/ReplaceableTextures/`.
+- Map settings: the manifest's `settings` block sets the map's name, author, description and loading screen, existing
+  player slots and forces, sound environment, water colour and fog, and hero level and food limits. Advanced raw
+  `gameplayConstants` and `gameInterface` mappings set any key in `war3mapMisc.txt` and `war3mapSkin.txt`. Null settings
+  keep the map's values; the new project template writes every everyday setting out at `null`.
+- Builds apply settings to the staged map: `war3map.w3i` is patched byte for byte (versions 18, 25, 28, 31, 32, 33 and
+  39), the matching World Editor calls in `war3map.lua` are edited to agree, and the text files are merged key by key.
+  The source map in `maps/` is never changed.
+- `settings:check` lists the internal files the settings would change, without building or writing the map. `check` and
+  `dev` validate settings too.
 
 ## 0.1.0 (2026-09-25)
 
