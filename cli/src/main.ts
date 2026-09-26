@@ -7,6 +7,8 @@ import { build } from "./commands/build.ts";
 import { check } from "./commands/check.ts";
 import { dev } from "./commands/dev.ts";
 import { init } from "./commands/init.ts";
+import { objectsCheck } from "./commands/objects-check.ts";
+import { objectsEval } from "./commands/objects-eval.ts";
 import { settingsCheck } from "./commands/settings-check.ts";
 import { setup } from "./commands/setup.ts";
 import { test } from "./commands/test.ts";
@@ -31,6 +33,8 @@ Commands:
   assets:sync                    Write assets/ into the source map (close it in World Editor first)
   assets:paths [file]            List the files a model references, as in-game or custom paths
   settings:check                 Show which internal map files the settings would change
+  objects:eval                   Print the validated custom objects as JSON
+  objects:check                  Show which internal map files the objects would change
 
 Options:
   -h, --help                     Show this help
@@ -40,6 +44,8 @@ export async function main(
   args: string[],
   root: string = Deno.cwd(),
   write: (line: string) => void = (line) => console.error(line),
+  /** Command output meant for other programs (objects:eval JSON); everything else, logs included, goes to `write`. */
+  print: (text: string) => void = (text) => console.log(text),
 ): Promise<number> {
   const flags = parseArgs(args, {
     string: ["entry"],
@@ -108,6 +114,12 @@ export async function main(
         break;
       case "settings:check":
         await settingsCheck(ctx);
+        break;
+      case "objects:eval":
+        await objectsEval(ctx, print);
+        break;
+      case "objects:check":
+        await objectsCheck(ctx);
         break;
       default:
         write(`Unknown command '${command}'.\n\n${USAGE}`);

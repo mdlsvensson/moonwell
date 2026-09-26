@@ -5,6 +5,8 @@ import { emitBundle, injectBundle } from "./bundle/emit.ts";
 import { resolveGraph } from "./bundle/graph.ts";
 import type { CommandContext } from "./context.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
+import { refreshObjectIds } from "./objectdata/ids.ts";
+import { applyObjectPlan, type ObjectPlan, planObjectData } from "./objectdata/plan.ts";
 import type { Project } from "./project/project.ts";
 import { applySettingsPlan, planMapSettings } from "./settings/plan.ts";
 import { MoonwellError } from "./shared/errors.ts";
@@ -49,12 +51,27 @@ export async function compileProject(
   return { modules: resolveGraph(entry, output.load, BUILTIN_MODULES), entry };
 }
 
+/**
+ * Plans the manifest's objects against the source map `maps/<map.folder>` (read-only; spec §9.1). Without objects
+ * nothing is read and the map folder is not required.
+ */
+export function planProjectObjects(ctx: CommandContext, project: Project): Promise<ObjectPlan> {
+  return planObjectData(join(ctx.root, "maps", project.map.folder), project.objects, {
+    manifest: project.manifest,
+    sourceLabel: `maps/${project.map.folder}`,
+  });
+}
+
 /** Compiles gameplay, stages the source map into dist/stage/<map.folder> and injects the bundle. */
 export async function prepareStage(
   ctx: CommandContext,
   project: Project,
   options: StageOptions,
 ): Promise<{ mapDir: string; modules: CompiledModule[] }> {
+  // Objects are planned before compiling, so invalid objects fail before the slow steps and the generated module the
+  // gameplay imports is current. The same bytes are applied to the staged copy below (spec §9.1).
+  const objects = await planProjectObjects(ctx, project);
+  await refreshObjectIds(ctx.root, objects.generated);
   const { modules, entry } = await compileProject(ctx, project, options);
   const source = join(ctx.root, "maps", project.map.folder);
   if (!(await exists(source))) {
@@ -74,6 +91,11 @@ export async function prepareStage(
       hint: "Close Warcraft III or World Editor if they have dist/stage open, then retry.",
     });
   }
+  await applyObjectPlan(objects, mapDir);
+  if (objects.objects.length > 0) {
+    ctx.logger.info(`Added ${objects.objects.length} custom object(s) to ${objects.changes.length} file(s).`);
+  }
+
   // Settings patch the staged copy only, before assets and bundle injection; errors name the source files to fix.
   // Every change is planned before any is written, so a refused setting leaves the staged map unpatched.
   const sourceLabel = `maps/${project.map.folder}`;

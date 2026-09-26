@@ -3,17 +3,31 @@ import { join } from "@std/path";
 import { collectAssets } from "../assets/collect.ts";
 import { assetLocations, planAssets } from "../assets/plan.ts";
 import type { CommandContext } from "../context.ts";
-import { compileProject } from "../pipeline.ts";
+import { assertObjectIdsCurrent, refreshObjectIds } from "../objectdata/ids.ts";
+import { compileProject, planProjectObjects } from "../pipeline.ts";
 import { loadProject } from "../project/project.ts";
 import { hasSettings } from "../settings/options.ts";
 import { planMapSettings, settingsMapDir } from "../settings/plan.ts";
 import { withBuildLock } from "../shared/lock.ts";
 
+export interface CheckOptions {
+  /** Rewrite src/generated/objects.yue when stale instead of failing (dev's refresh, spec §9.2). */
+  refreshObjectIds?: boolean;
+}
+
 /** Compiles every module and resolves the graph; no map is staged or packed. */
-export async function check(ctx: CommandContext): Promise<{ modules: number; entry: string; assets: number }> {
+export async function check(
+  ctx: CommandContext,
+  options: CheckOptions = {},
+): Promise<{ modules: number; entry: string; assets: number }> {
   // Loading is read-only; doing it before taking the lock creates nothing outside a project.
   const project = await loadProject(ctx.root, ctx.run);
   return withBuildLock(join(ctx.root, "dist"), async () => {
+    // Objects are planned against the source map in build order (before compiling) and never applied. check never
+    // writes the generated module; it fails when it is stale.
+    const objects = await planProjectObjects(ctx, project);
+    if (options.refreshObjectIds) await refreshObjectIds(ctx.root, objects.generated);
+    await assertObjectIdsCurrent(ctx.root, objects.generated);
     const { modules, entry } = await compileProject(ctx, project, {});
     // Settings are planned against the source map, in build order, and never written. Without active settings,
     // check still passes when the source map is missing, as it always has.

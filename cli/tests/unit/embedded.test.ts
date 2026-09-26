@@ -59,3 +59,12 @@ Deno.test("schema/generated matches cli/data/metadata.json (run `deno task gen`)
   ].sort();
   assertEquals(differences, [], "schema/generated is out of date: run `deno task gen`.");
 });
+
+Deno.test("the template's .gitattributes never converts line endings in maps/ or assets/", () => {
+  // Both are copied into the map byte for byte; a normalized CRLF file would build differently on each checkout.
+  const file = TEMPLATE_FILES.find((entry) => entry.path === ".gitattributes");
+  assert(file !== undefined, "template/.gitattributes is missing");
+  const lines = new TextDecoder().decode(decodeBase64(file.base64)).split("\n");
+  assert(lines.includes("maps/** binary"), "maps/** must be binary");
+  assert(lines.includes("assets/** -text"), "assets/** must be -text");
+});

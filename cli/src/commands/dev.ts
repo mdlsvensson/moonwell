@@ -11,10 +11,14 @@ export function isRelevantChange(root: string, path: string): boolean {
   if (rel.startsWith("src/generated/")) return false;
   if (rel.startsWith("src/")) return rel.endsWith(".yue");
   if (rel.startsWith("assets/")) return true;
+  if (rel.startsWith("objects/")) return rel.endsWith(".pkl");
   return /^moonwell(\.local)?\.pkl$/.test(rel) || rel === "PklProject" || rel === "PklProject.deps.json";
 }
 
-/** Re-runs `check` whenever sources or manifests change, until `signal` aborts. */
+/**
+ * Re-runs `check` whenever sources, objects or manifests change, until `signal` aborts. Each cycle first refreshes
+ * src/generated/objects.yue; dev ignores src/generated/, so that write does not trigger another cycle.
+ */
 export async function dev(
   ctx: CommandContext,
   options: { signal?: AbortSignal; debounceMs?: number } = {},
@@ -27,7 +31,7 @@ export async function dev(
   }
   const cycle = async () => {
     try {
-      await check(ctx);
+      await check(ctx, { refreshObjectIds: true });
     } catch (error) {
       ctx.logger.error(formatError(error));
     }
@@ -39,9 +43,13 @@ export async function dev(
     Deno.watchFs(join(ctx.root, "src"), { recursive: true }),
     Deno.watchFs(ctx.root, { recursive: false }),
   ];
-  // assets/ is optional; a folder created after dev starts is picked up on the next dev run.
-  const watchesAssets = await exists(join(ctx.root, "assets"), { isDirectory: true });
-  if (watchesAssets) watchers.push(Deno.watchFs(join(ctx.root, "assets"), { recursive: true }));
+  // assets/ and objects/ are optional; a folder created after dev starts is picked up on the next dev run.
+  const watched = ["src/"];
+  for (const folder of ["assets", "objects"]) {
+    if (!(await exists(join(ctx.root, folder), { isDirectory: true }))) continue;
+    watchers.push(Deno.watchFs(join(ctx.root, folder), { recursive: true }));
+    watched.push(`${folder}/`);
+  }
   const closeWatchers = () => {
     for (const watcher of watchers) {
       try {
@@ -56,9 +64,7 @@ export async function dev(
   try {
     if (options.signal?.aborted) closeWatchers();
     else options.signal?.addEventListener("abort", closeWatchers, { once: true });
-    ctx.logger.info(
-      `Watching ${watchesAssets ? "src/, assets/" : "src/"} and the project manifests. Press Ctrl+C to stop.`,
-    );
+    ctx.logger.info(`Watching ${watched.join(", ")} and the project manifests. Press Ctrl+C to stop.`);
 
     const schedule = () => {
       clearTimeout(timer);

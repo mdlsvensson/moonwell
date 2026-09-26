@@ -5,6 +5,7 @@ import {
   OBJECT_IDS_FILE,
   objectIdsStatus,
   packId,
+  refreshObjectIds,
   renderObjectIds,
   writeObjectIds,
 } from "../../src/objectdata/ids.ts";
@@ -102,7 +103,7 @@ Deno.test("assertObjectIdsCurrent fails on a stale or missing file with the rege
     assertEquals(
       [missing.message, missing.file, missing.hint],
       [
-        "src/generated/objects.yue is missing, but the manifest has objects.",
+        "The file is missing, but the manifest has objects.",
         "src/generated/objects.yue",
         "Run deno task build, test or dev to regenerate it.",
       ],
@@ -112,12 +113,39 @@ Deno.test("assertObjectIdsCurrent fails on a stale or missing file with the rege
     assertEquals(
       [stale.message, stale.file, stale.hint],
       [
-        "src/generated/objects.yue does not match the objects in the manifest.",
+        "The file does not match the objects in the manifest.",
         "src/generated/objects.yue",
         "Run deno task build, test or dev to regenerate it.",
       ],
     );
     await writeObjectIds(root, withObjects);
     await assertObjectIdsCurrent(root, withObjects);
+  });
+});
+
+Deno.test("objectIdsStatus reads a CRLF checkout (core.autocrlf) as the same module", async () => {
+  await withDir(async (root) => {
+    const withObjects = renderObjectIds([{ category: "units", key: "captain", id: "h000" }]);
+    await writeObjectIds(root, withObjects.replaceAll("\n", "\r\n"));
+    assertEquals(await objectIdsStatus(root, withObjects), "current");
+    await assertObjectIdsCurrent(root, withObjects);
+    // A lone CR is a real difference.
+    await Deno.writeTextFile(join(root, OBJECT_IDS_FILE), withObjects.replaceAll("\n", "\r"));
+    assertEquals(await objectIdsStatus(root, withObjects), "stale");
+  });
+});
+
+Deno.test("refreshObjectIds writes only a stale or missing module, never an unneeded empty one", async () => {
+  await withDir(async (root) => {
+    const withObjects = renderObjectIds([{ category: "units", key: "captain", id: "h000" }]);
+    const file = join(root, OBJECT_IDS_FILE);
+    assertEquals(await refreshObjectIds(root, EMPTY), false);
+    assertEquals(await Deno.stat(file).then(() => true, () => false), false, "no objects creates no file");
+    assertEquals(await refreshObjectIds(root, withObjects), true);
+    assertEquals(await Deno.readTextFile(file), withObjects);
+    await Deno.writeTextFile(file, withObjects.replaceAll("\n", "\r\n"));
+    assertEquals(await refreshObjectIds(root, withObjects), false, "a CRLF checkout is left alone");
+    assertEquals(await refreshObjectIds(root, EMPTY), true, "removing every object empties the module");
+    assertEquals(await Deno.readTextFile(file), EMPTY);
   });
 });

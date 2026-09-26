@@ -6,8 +6,14 @@ import { VERSION } from "../../src/version.ts";
 
 async function run(args: string[], root?: string) {
   const lines: string[] = [];
-  const code = await main(args, root ?? await Deno.makeTempDir(), (line) => lines.push(line));
-  return { code, output: lines.join("\n") };
+  const printed: string[] = [];
+  const code = await main(
+    args,
+    root ?? await Deno.makeTempDir(),
+    (line) => lines.push(line),
+    (text) => printed.push(text),
+  );
+  return { code, output: lines.join("\n"), stdout: printed.join("\n") };
 }
 
 Deno.test("--help and no command print usage", async () => {
@@ -16,11 +22,13 @@ Deno.test("--help and no command print usage", async () => {
     assertEquals(code, 0);
     assertStringIncludes(output, "Usage: moonwell <command>");
     assertStringIncludes(output, "settings:check");
+    assertStringIncludes(output, "objects:eval");
+    assertStringIncludes(output, "objects:check");
   }
 });
 
 Deno.test("--version prints the version", async () => {
-  assertEquals(await run(["--version"]), { code: 0, output: VERSION });
+  assertEquals(await run(["--version"]), { code: 0, output: VERSION, stdout: "" });
 });
 
 Deno.test("unknown commands fail with usage", async () => {
@@ -44,10 +52,19 @@ Deno.test("commands outside a project leave no dist/ behind", async () => {
   assertEquals(await exists(join(root, "dist")), false);
 });
 
-Deno.test("the assets and settings commands are known commands", async () => {
-  for (const command of ["assets:check", "assets:sync", "assets:paths", "settings:check"]) {
+Deno.test("the assets, settings and objects commands are known commands", async () => {
+  for (
+    const command of ["assets:check", "assets:sync", "assets:paths", "settings:check", "objects:eval", "objects:check"]
+  ) {
     const { code, output } = await run([command]);
     assertEquals(code, 1);
     assertEquals(output.includes("Unknown command"), false, output);
   }
+});
+
+Deno.test("a failing objects:eval prints its error to the log writer and nothing to stdout", async () => {
+  const { code, output, stdout } = await run(["objects:eval"]);
+  assertEquals(code, 1);
+  assertStringIncludes(output, "error:");
+  assertEquals(stdout, "");
 });

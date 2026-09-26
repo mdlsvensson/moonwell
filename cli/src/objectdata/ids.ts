@@ -61,7 +61,18 @@ export async function objectIdsStatus(root: string, expected: string): Promise<"
     }
     return expected === renderObjectIds([]) ? "current" : "missing";
   }
-  return current === expected ? "current" : "stale";
+  // A Windows checkout with core.autocrlf has CRLF line endings; the module is the same.
+  return current.replaceAll("\r\n", "\n") === expected ? "current" : "stale";
+}
+
+/**
+ * Brings the generated module under `root` up to date with `expected` (build, test and dev, spec §8). Writes nothing
+ * when it is current, so a project without objects gets no file and a CRLF checkout is not rewritten.
+ * Returns whether it wrote.
+ */
+export async function refreshObjectIds(root: string, expected: string): Promise<boolean> {
+  if ((await objectIdsStatus(root, expected)) === "current") return false;
+  return await writeObjectIds(root, expected);
 }
 
 /** `check`'s staleness rule (spec §8): fails when the generated module is stale, or missing while there are objects. */
@@ -70,8 +81,8 @@ export async function assertObjectIdsCurrent(root: string, expected: string): Pr
   if (status === "current") return;
   throw new MoonwellError(
     status === "missing"
-      ? `${OBJECT_IDS_FILE} is missing, but the manifest has objects.`
-      : `${OBJECT_IDS_FILE} does not match the objects in the manifest.`,
+      ? "The file is missing, but the manifest has objects."
+      : "The file does not match the objects in the manifest.",
     { file: OBJECT_IDS_FILE, hint: REGENERATE },
   );
 }

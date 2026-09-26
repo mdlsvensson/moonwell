@@ -21,6 +21,7 @@ Deno.test("init --link scaffolds a project that loads", async () => {
       "maps/map.w3x/war3map.lua",
       "PklProject.deps.json",
       ".gitignore",
+      ".gitattributes",
     ]
   ) {
     assert(await exists(join(project, file)), file);

@@ -8,6 +8,8 @@
     "assets:check": "deno run -A ../cli/src/main.ts assets:check",
     "assets:sync": "deno run -A ../cli/src/main.ts assets:sync",
     "assets:paths": "deno run -A ../cli/src/main.ts assets:paths",
-    "settings:check": "deno run -A ../cli/src/main.ts settings:check"
+    "settings:check": "deno run -A ../cli/src/main.ts settings:check",
+    "objects:eval": "deno run -A ../cli/src/main.ts objects:eval",
+    "objects:check": "deno run -A ../cli/src/main.ts objects:check"
   }
 }
