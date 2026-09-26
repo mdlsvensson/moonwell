@@ -347,7 +347,8 @@ class Reader {
       const precedence = Object.hasOwn(PRECEDENCE, operator) ? PRECEDENCE[operator] : 0;
       if (precedence < minimum) break;
       this.at++;
-      this.expression(precedence + (operator === "^" || operator === ".." ? 0 : 1));
+      // Consuming a right-associative chain iteratively keeps long `..` chains within the depth limit.
+      this.expression(precedence + 1);
     }
     this.depth--;
   }
