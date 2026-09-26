@@ -75,16 +75,17 @@ export the file names of the game's CASC storage (for example with CascView) to 
       `cooldown = List(1, 2, 3, 4)` and `properties { ["amountHealedOrDamaged"] = List(111, 222, 333, 444) }` (set
       `heroSkin` to the same list, as the game data does for every hero); a custom buff for that ability's `buffs`, with
       a new `icon`; a custom item with a new `name`, `goldCost` and `interfaceIcon`; and a custom building based on the
-      Blacksmith (`hbla`) whose `researchesAvailable` is a custom upgrade with `levels = 2` and per-level names
-      (`name = List("...", "...")`). Run `deno task objects:check`: it lists the ten files and reports
+      Blacksmith (`hbla`) whose `researchesAvailable` is a custom upgrade with `levels = 2` and per-level names and
+      tooltips (`name = List("...", "...")`, `tooltip = List("...", "...")`). Run `deno task objects:check`: it lists the ten files and reports
       `src/generated/objects.yue` stale until the next build. In `main.yue`, create the hero, the building and the item
       for player 0 (from `objects.heroes`, `objects.buildings` and `objects.items`), raise the hero to level 7
       (`SetHeroLevel hero, 7, false`; a hero ability's level 4 needs hero level 7), and give player 0 gold and lumber
       for the research (`SetPlayerState Player(0), PLAYER_STATE_RESOURCE_GOLD, 5000`, and the same for lumber).
    3. Run `deno task test`. The hero shows its name and strength. Learning the ability shows its level 1 to 4 tooltips,
       and healing a wounded unit heals 111, 222, 333 and 444 at the four levels, with the four cooldowns. The item shows
-      its name and icon. The building offers the upgrade under both level names (level 2, like the Blacksmith's, needs a
-      Keep, so it shows greyed out).
+      its name and icon. The building offers only the custom upgrade; its button shows the level 1 tooltip, and after
+      researching level 1 the level 2 tooltip (the research button shows the tooltip, not the name; level 2, like the
+      Blacksmith's, needs a Keep, so it shows greyed out).
    4. In World Editor, change the standard Footman's hit points in the project's `maps/map.w3x` and save. Run
       `deno task build --minify`, play `dist/bin/map.w3x`, and confirm the Footman change survived next to the Moonwell
       objects.
