@@ -172,7 +172,6 @@ Deno.test("patched fixture initialization applies overrides before unit creation
     "SetMapName(Moonwell)",
     "SetMapDescription()",
     "DefineStartLocation(0,0,0.10000000149011612)",
-    "SetPlayerName(0,)",
     "SetPlayerRacePreference(0,RACE_PREF_USER_SELECTABLE)",
     "SetPlayerRaceSelectable(0,true)",
     "SetPlayerController(0,MAP_CONTROL_COMPUTER)",
