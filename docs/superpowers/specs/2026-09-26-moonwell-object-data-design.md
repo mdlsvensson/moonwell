@@ -1,7 +1,7 @@
 # Moonwell Object Data (Plan 2c) — Design
 
 - **Date:** 2026-09-26
-- **Status:** Draft, awaiting the maintainer's inputs (§12) and approval
+- **Status:** Approved by the maintainer 2026-09-26, with the recommended answers to Q1–Q3 (§14)
 - **Builds on:** `2026-09-24-moonwell-core-design.md`, §§3, 4, 5, 6.1, 9 and 11; `2026-09-25-moonwell-map-settings-design.md`
   (pipeline placement, planner pattern, fixture provenance)
 - **Scope:** Custom units, heroes, buildings, items, abilities, buffs and upgrades authored in Pkl and written into the
@@ -648,6 +648,9 @@ Answered in the fixture README by the plan's first task, with offsets; each answ
   names (`HP`, `file`). Agreed?
 - **Q3** Modifying standard objects from Pkl (for example changing the Footman itself) is out of scope for 0.3.0;
   World Editor edits to them are preserved. Agreed, or is it needed in this plan?
+
+**Answers (maintainer, 2026-09-26):** Q1 yes, ability-specific fields go through `properties` for 0.3.0. Q2 yes,
+World Editor labels. Q3 yes, standard-object modification from Pkl is out of scope for 0.3.0.
 
 ## 15. Implementation order
 
