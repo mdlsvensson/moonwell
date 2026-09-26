@@ -22,8 +22,7 @@ over, and updated on 2026-09-26 after Plan 2c.
 - **Released:** 0.1.0, on JSR (`@moonwell/cli@0.1.0`) and as a GitHub release (`moonwell@0.1.0`). It contains the
   toolchain: `init`, `setup`, `build`, `test`, `dev`, `check`; the YueScript bundler with runtime hooks; the MPQ writer;
   and the manifest in Pkl.
-- **0.2.0 prepared on `main`, not yet published** (versions bumped, CHANGELOG written; the maintainer publishes per
-  CONTRIBUTING's Publishing steps). It contains:
+- **Released 0.2.0** (2026-09-26, JSR `@moonwell/cli@0.2.0` and GitHub release `moonwell@0.2.0`). It contains:
   - Assets (Plan 2a): `assets/` is imported into builds. The manifest's `assets { paths {}; exclude = List() }` maps and
     excludes files. `assets:check` / `assets:sync` write the assets into the source map with ownership in
     `.asset-state/`.
@@ -42,8 +41,8 @@ over, and updated on 2026-09-26 after Plan 2c.
     lobby creation), the hero level key is `MaxHeroLevel`, and w3i colours are stored blue, green, red, alpha (fixture
     `cli/tests/fixtures/map-settings-v39/war3map-colors.w3i`). Sound environments use World Editor's internal names,
     such as `Default` or `Dungeon`.
-- **0.3.0 prepared on `main`, not yet published** (versions bumped, CHANGELOG written). It adds object data (Plan 2c,
-  `docs/superpowers/plans/2026-09-26-moonwell-object-data.md`): custom objects in Pkl under `objects/` (schema
+- **Released 0.3.0** (2026-09-26, JSR `@moonwell/cli@0.3.0` and GitHub release `moonwell@0.3.0`). It adds object data
+  (Plan 2c, `docs/superpowers/plans/2026-09-26-moonwell-object-data.md`): custom objects in Pkl under `objects/` (schema
   `schema/ObjectFile.pkl`, `Objects.pkl`, `objects/`, and `generated/*Props.pkl` rendered by `deno task gen` from
   `cli/data/metadata.json`, which `deno task gen:metadata` builds from the game's SLKs). Builds append them to the
   staged map's modification files and their `war3mapSkin.*` counterparts, keeping World Editor's bytes, and write
@@ -58,12 +57,9 @@ over, and updated on 2026-09-26 after Plan 2c.
 
 ## Next work, in order
 
-1. **Publish 0.2.0** if it is not on JSR yet: Publishing steps 2 to 5, run from a checkout of the `v0.2.0` tag (the
-   `moonwell@0.2.0` release goes on that commit), since `main` carries 0.3.0.
-2. **Publish 0.3.0** from `main` per CONTRIBUTING's Publishing steps.
-   - `pkl project package` may need `--skip-publish-check` in sandboxed shells.
-   - For 24 hours after publishing, Deno blocks the new version unless you pass `--min-dep-age=0`.
-3. **Next sub-project:** not yet chosen; ask the maintainer.
+1. **Next sub-project:** not yet chosen; ask the maintainer.
+
+Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
 ## How work was done here, and should continue
 
