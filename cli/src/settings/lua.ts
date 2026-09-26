@@ -159,12 +159,8 @@ export function patchSettingsLua(
         fail(`InitCustomPlayerSlots() must call SetPlayerStartLocation(${player}, ${index}) to match war3map.w3i.`);
       }
       const inserted: string[] = [];
-      if (values.name !== undefined) {
-        const text = `SetPlayerName(${player}, ${luaString(record.name.value)})`;
-        const existing = optional(forPlayer(slots, "SetPlayerName", 2, id), `SetPlayerName(${player})`);
-        if (existing) replace(existing, text);
-        else inserted.push(text);
-      }
+      // A player's name lives only in war3map.w3i: World Editor writes no SetPlayerName, and calling it from
+      // config() crashes Warcraft III 3.0.0.24268 when the lobby is created.
       if (values.controller !== undefined) {
         replace(
           one(forPlayer(slots, "SetPlayerController", 2, id), `SetPlayerController(${player})`),

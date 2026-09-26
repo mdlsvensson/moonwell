@@ -85,7 +85,7 @@ Deno.test("player edits replace, insert and remove only that player's calls", as
     source
       .replace(
         "SetPlayerStartLocation(Player(0), 0)\r\nForcePlayerStartLocation(Player(0), 0)\r\n",
-        'SetPlayerStartLocation(Player(0), 0)\r\nSetPlayerName(Player(0), "Hero")\r\n',
+        "SetPlayerStartLocation(Player(0), 0)\r\n",
       )
       .replace(
         "SetPlayerRacePreference(Player(0), RACE_PREF_HUMAN)",
@@ -97,18 +97,19 @@ Deno.test("player edits replace, insert and remove only that player's calls", as
   assertEquals(await patch({ players: { "1": { fixedStart: true } } }, unforced), source);
   // Player 11 is the fifth record, so its start location is 4; an existing matching call is kept.
   assertEquals(await patch({ players: { "11": { fixedStart: true, controller: "computer" } } }, source), source);
+  // A name changes only war3map.w3i; an existing SetPlayerName call is left alone.
   const named = source.replace(
     "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
     'SetPlayerColor(Player(1), ConvertPlayerColor(1))\r\nSetPlayerName(Player(1), "TRIGSTR_006")',
   );
   assertEquals(
     await patch({ players: { "1": { name: "Tab\there ✓", controller: "rescuable" } } }, named),
-    named.replace('SetPlayerName(Player(1), "TRIGSTR_006")', 'SetPlayerName(Player(1), "Tab\\009here ✓")')
-      .replace(
-        "SetPlayerController(Player(1), MAP_CONTROL_USER)",
-        "SetPlayerController(Player(1), MAP_CONTROL_RESCUABLE)",
-      ),
+    named.replace(
+      "SetPlayerController(Player(1), MAP_CONTROL_USER)",
+      "SetPlayerController(Player(1), MAP_CONTROL_RESCUABLE)",
+    ),
   );
+  assertEquals(await patch({ players: { "0": { name: "Hero" } } }, source), source);
 });
 
 Deno.test("start coordinates use effective float32 map-info values", async () => {
@@ -155,13 +156,6 @@ Deno.test("unsafe player, team and environment shapes are refused", async () => 
   await refuses(
     { players: { "0": { fixedStart: true } } },
     source.replace("ForcePlayerStartLocation(Player(0), 0)", "ForcePlayerStartLocation(Player(0), 1)"),
-  );
-  await refuses(
-    { players: { "0": { name: "x" } } },
-    source.replace(
-      "SetPlayerColor(Player(0),",
-      'SetPlayerName(Player(0), "a")\r\nSetPlayerName(Player(0), "b")\r\nSetPlayerColor(Player(0),',
-    ),
   );
   await refuses(
     { players: { "0": { race: "orc" } } },
