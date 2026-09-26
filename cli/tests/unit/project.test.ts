@@ -4,6 +4,7 @@ import { MoonwellError } from "../../src/shared/errors.ts";
 import { validateMapSettings } from "../../src/settings/options.ts";
 import type { Runner } from "../../src/shared/process.ts";
 import { projectLocalPkl } from "../../src/project-files.ts";
+import { VERSION } from "../../src/version.ts";
 import {
   checkPackageVersion,
   checkPkl,
@@ -131,7 +132,7 @@ Deno.test("loadProject prefers moonwell.local.pkl and parses pkl output", async 
   const root = await Deno.makeTempDir();
   await Deno.writeTextFile(join(root, "moonwell.pkl"), "");
   await Deno.writeTextFile(join(root, "moonwell.local.pkl"), "");
-  await Deno.writeTextFile(join(root, "PklProject.deps.json"), LOCAL_DEPS.replace("0.1.3", "0.1.0"));
+  await Deno.writeTextFile(join(root, "PklProject.deps.json"), LOCAL_DEPS.replace("0.1.3", VERSION));
   const run = fakeRunner({
     "pkl --version": { stdout: "Pkl 0.32.1" },
     "pkl eval --format json --project-dir . moonwell.local.pkl": { stdout: JSON.stringify(FULL) },
@@ -142,7 +143,7 @@ Deno.test("loadProject prefers moonwell.local.pkl and parses pkl output", async 
 Deno.test("loadProject reports pkl evaluation errors", async () => {
   const root = await Deno.makeTempDir();
   await Deno.writeTextFile(join(root, "moonwell.pkl"), "");
-  await Deno.writeTextFile(join(root, "PklProject.deps.json"), LOCAL_DEPS.replace("0.1.3", "0.1.0"));
+  await Deno.writeTextFile(join(root, "PklProject.deps.json"), LOCAL_DEPS.replace("0.1.3", VERSION));
   const run = fakeRunner({
     "pkl --version": { stdout: "Pkl 0.32.1" },
     "pkl eval": { code: 1, stderr: "–– Pkl Error ––\nType constraint violated" },
@@ -168,7 +169,7 @@ Deno.test("loadProject explains a corrupt PklProject.deps.json", async () => {
 Deno.test("loadProject explains pkl output that is not JSON", async () => {
   const root = await Deno.makeTempDir();
   await Deno.writeTextFile(join(root, "moonwell.pkl"), "");
-  await Deno.writeTextFile(join(root, "PklProject.deps.json"), LOCAL_DEPS.replace("0.1.3", "0.1.0"));
+  await Deno.writeTextFile(join(root, "PklProject.deps.json"), LOCAL_DEPS.replace("0.1.3", VERSION));
   const run = fakeRunner({ "pkl --version": { stdout: "Pkl 0.32.1" }, "pkl eval": { stdout: "map { }" } });
   await assertRejects(() => loadProject(root, run), MoonwellError, "not valid JSON");
 });
