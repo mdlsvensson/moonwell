@@ -53,7 +53,18 @@ export the file names of the game's CASC storage (for example with CascView) to 
    `assets/ReplaceableTextures/CommandButtons/BTNMoonwell.blp` and run `deno task test`; the map must load. Close World
    Editor, run `deno task assets:sync`, open `maps/map.w3x` and confirm the Import Manager lists
    `ReplaceableTextures\CommandButtons\BTNMoonwell.blp`. Delete the icon, sync again and confirm it is gone.
-8. Record the Warcraft III and World Editor versions in the changelog.
+8. Map settings, in another throwaway project from `init --link`. In its `moonwell.pkl`, set `info.name` and
+   `loadingScreen.title`; a `players` entry for a slot the map has (such as `["0"]` with a `name`, `race` and
+   `fixedStart`); `environment.soundEnvironment`, `environment.waterColor` and fog (`enabled = true`, `start`, `end`,
+   `color`); and `gameplay.heroMaxLevel` and `gameplay.foodLimit`. For team settings, first enable custom forces in
+   World Editor (Scenario > Force Properties), save the map, and set `forces["0"]`, such as `name`, `allied` and
+   `sharedVision`. Run `deno task settings:check` and confirm it lists `war3map.w3i`, `war3map.lua` and
+   `war3mapMisc.txt`. Run `deno task test`, then `deno task build --minify` and play `dist/bin/map.w3x` from the game's
+   Maps folder. Confirm the lobby shows the map name, the slot and the team, and in the game the fog, water colour and
+   ambient sound, the food ceiling, and that a hero cannot level past the set maximum. Open the packed map in World
+   Editor and confirm Map Description, Loading Screen, Player Properties, Force Properties, Map Options (fog, water) and
+   Gameplay Constants show the configured values. Confirm `maps/map.w3x` is unchanged (`git status`).
+9. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
 
