@@ -411,8 +411,17 @@ Deno.test("object files are found in any letter case and written back under the 
   });
 });
 
+/** Whether this file system keeps two names that differ only in letter case apart (Linux usually; Windows never). */
+async function caseSensitive(dir: string): Promise<boolean> {
+  await Deno.writeTextFile(join(dir, "probe"), "");
+  const sensitive = await Deno.stat(join(dir, "PROBE")).then(() => false, () => true);
+  await Deno.remove(join(dir, "probe"));
+  return sensitive;
+}
+
 Deno.test("two object files differing only in letter case fail naming the file and write nothing", async () => {
   await withDir(async (dir) => {
+    if (!(await caseSensitive(dir))) return; // Such a map cannot exist on this file system.
     await Deno.writeFile(join(dir, "war3map.w3a"), await namesFixtureBytes("war3map.w3a"));
     await Deno.writeFile(join(dir, "war3map.W3A"), await namesFixtureBytes("war3map.w3a"));
     const before = await snapshot(dir);

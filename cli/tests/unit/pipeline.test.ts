@@ -72,7 +72,9 @@ async function stageProject(objects: Project["objects"], settings: unknown = {})
     ...createContext(root, logger),
     run: async (_command, args) => {
       const generated = await exists(join(root, OBJECT_IDS_FILE));
-      events.push(`compile ${args.at(-1)?.slice(join(root, "src").length + 1)} (objects.yue ${generated})`);
+      events.push(
+        `compile ${args.at(-1)?.slice(join(root, "src").length + 1).replaceAll("\\", "/")} (objects.yue ${generated})`,
+      );
       await Deno.writeTextFile(args[3], "local x = 1\n");
       return { code: 0, stdout: "", stderr: "" };
     },
