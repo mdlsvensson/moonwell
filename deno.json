@@ -18,6 +18,9 @@
     "gen": "deno run -A tools/gen.ts",
     "gen:game-paths": "deno run -A tools/gen-game-paths.ts"
   },
-  "fmt": { "lineWidth": 120, "exclude": ["cli/src/embedded", "template", "docs"] },
+  "fmt": {
+    "lineWidth": 120,
+    "exclude": ["cli/src/embedded", "cli/tests/fixtures/map-settings-v39", "template", "docs"]
+  },
   "lint": { "exclude": ["cli/src/embedded", "template"] }
 }
