@@ -615,6 +615,13 @@ V6 and V7.
 Any map saved by an older World Editor (before 1.32) that has custom objects. It would give a real v1/v2 fixture
 (V16); without it those versions are covered by synthetic fixtures only.
 
+## 12.4 Revision (maintainer, 2026-09-26)
+
+The §12.2 map is dropped. The maintainer's names-only save (`cli/tests/fixtures/objects-v3-names`), the game data, and
+the object-data library the earlier TypeScript framework used in game (`war3-objectdata-th` 0.2.11 with
+`mdx-m3-viewer-th`, MIT, reference only) answer V1–V13 except per-level numbering, which the in-game gate (§11)
+proves. See the plan's "What is already known" for the answers.
+
 ## 13. To verify against the fixture
 
 Answered in the fixture README by the plan's first task, with offsets; each answer is then pinned by a unit test.

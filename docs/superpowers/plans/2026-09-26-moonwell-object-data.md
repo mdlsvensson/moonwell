@@ -27,7 +27,7 @@ plus the binding core design §6.1 and the map settings design §7 (pipeline slo
   session it is at `/tmp/gamedata/` (from `/mnt/project-files/moonwell/game-data/game-data-3.0.0.24268.zip`).
 - Every binary format claim is pinned by a test against a World Editor save before production code relies on it.
   A claim not yet pinned is written as a named constant with a `// to verify (Vn)` comment and a failing-if-wrong test
-  added in the fixture checkpoint (Task 6).
+  added in the reference cross-check (Task 6).
 - Pkl lists are `List`, never `Listing`. Force lazy mapping checks with `.toMap()` in Pkl tests.
 - Regenerate embedded files after template or metadata changes (`deno task gen`). Nothing scratch in `template/`.
 - Do not bump versions or publish.
@@ -50,8 +50,15 @@ game data export:
 | V11 | Metadata columns match the spec's table. There is no `skin` column; `netsafe` = 1 marks exactly the name, tooltip, hotkey, button position, icon, model and art fields, and every field the names fixture wrote to a skin file has `netsafe` 1. Items: `useItem` rows of `unitmetadata.slk`. Ability level count: `abilitydata.slk` column `levels`; upgrades: `upgradedata.slk` column `maxlevel`. | game data |
 | V12 | `unitbalance.slk` has `isbldg`. 123 standard unit ids start with an uppercase letter; the generator must check each is a hero (e.g. via `unitui.slk`/`unitdata.slk` hero markers) before relying on the rule. | game data |
 
-Still open until the full fixture map (spec §12.2) arrives: V4 for the original table, V5 for every non-name field and
-for modified standard objects, V6 for per-level data fields, V7 for int/real/unreal/bool/list values, V8, V9, V13.
+**Decision (maintainer, 2026-09-26): no further World Editor fixture map.** The remaining format questions are
+answered by the object-data library the maintainer's earlier TypeScript framework used in game: npm
+`war3-objectdata-th` 0.2.11 with `mdx-m3-viewer-th` (both MIT). It confirms the modification layout above, `netsafe`
+as the skin flag, and the var types: `int`, `bool`, `*Flags` and the enum-like int types (`attackBits`, `channelType`,
+`deathType`, `defenseTypeInt`, `detectionType`, `spellDetail`, `teamColor`, `techAvail`) are 0; `real` 1; `unreal`
+and any other numeric type 2; strings and lists 3. It wrote version 2 files; Moonwell keeps version 3, which World
+Editor 3.00 writes (names fixture). That library never wrote per-level values, so per-level data (level 1..n,
+data pointer from the metadata `data` column, A = 1) and a changed level count follow the community layout and are
+proven by the in-game gate (Task 9). The library is a reference only: nothing from it is vendored.
 
 ## File Structure
 
@@ -70,10 +77,8 @@ for modified standard objects, V6 for per-level data fields, V7 for int/real/unr
 | `cli/src/objectdata/ids.ts` | Rawcode packing, `objects.yue` rendering, staleness |
 | `cli/src/commands/objects-eval.ts`, `objects-check.ts` | New commands |
 | `cli/tests/support/objectdata.ts` | Fixture paths, synthetic file builder, miniature metadata |
-| `cli/tests/fixtures/objects-v3/` | The full World Editor save (Task 6) |
 
-Task order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. Tasks 1–5 need only the names fixture and the game data. Task 6
-starts with the fixture checkpoint and is blocked until the maintainer delivers the §12.2 map.
+Task order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. No task needs further maintainer input before the gate.
 
 ---
 
@@ -81,7 +86,7 @@ starts with the fixture checkpoint and is blocked until the maintainer delivers 
 
 **Files:** Create `cli/src/objectdata/modfile.ts`, `cli/tests/support/objectdata.ts`,
 `cli/tests/unit/objectdata-modfile.test.ts`. Modify root `deno.json` `fmt.exclude` to add
-`cli/tests/fixtures/objects-v3-names` (and later `objects-v3`).
+`cli/tests/fixtures/objects-v3-names`.
 
 **Interfaces:**
 
@@ -218,23 +223,21 @@ export function resolveObjects(objects: ProjectObjects, existingIds: Set<string>
   the names fixture where it shows them.
 - [ ] **Step 3: Review, full gate, commit** `feat(objects): resolve and validate custom objects`.
 
-### Task 6: Fixture checkpoint, planner and generated ids (blocked on the §12.2 map)
+### Task 6: Planner and generated ids
 
-**Files:** Create `cli/tests/fixtures/objects-v3/` (files from `objects-fixture.w3x` unchanged, plus README with
-provenance, SHA-256, the maintainer's value record and V1–V13 answers with offsets), `cli/src/objectdata/plan.ts`,
-`cli/src/objectdata/ids.ts`, `cli/tests/unit/objectdata-{fixture,plan,ids}.test.ts`.
+**Files:** Create `cli/src/objectdata/plan.ts`, `cli/src/objectdata/ids.ts`,
+`cli/tests/unit/objectdata-{plan,ids}.test.ts`.
 
-- [ ] **Step 1: Fixture checkpoint.** Commit the save and README. Write `objectdata-fixture.test.ts` asserting the
-  maintainer's recorded values through the reader, and pinning each open V answer. Replace every `// to verify`
-  constant with the observed value. If an answer contradicts the spec, stop, update the spec, and ask the maintainer
-  to approve the revision before Step 2.
+- [ ] **Step 1: Reference cross-check.** Replace every `// to verify` constant with the value the names fixture or the
+  reference library (Decision above) gives, citing which. Per-level level and data pointer numbering stay marked
+  `// proven by the gate (Task 9)`.
 - [ ] **Step 2: Failing planner tests:** read-only on success and failure (snapshot the source folder); no objects
   needs no map; case-insensitive file names and two-spellings failure; changed files in the spec's stable order; skin
-  split per the fixture; objects sorted by id; collision with existing custom ids in any table; a source file with
+  split by `skin`; objects sorted by id; collision with existing custom ids in any table; a source file with
   a duplicate custom id inside it fails naming the file (spec §5.2).
-- [ ] **Step 3: Known answer:** resolved objects equivalent to the fixture's custom objects, planned against the
-  `objects-empty` save, reproduce World Editor's files byte for byte, with `TRIGSTR_*` values substituted for literal
-  strings. Any remaining difference is documented in the README and justified, or fixed.
+- [ ] **Step 3: Known answer:** the names fixture's objects planned against a map without object files reproduce
+  World Editor's files byte for byte (with `TRIGSTR_*` values substituted), and one object of each var type encodes as
+  the reference library's `Modification.save` layout would.
 - [ ] **Step 4: `ids.ts` tests:** big-endian packing (`h000` = 1747988528), key sort, category order, the exact
   header, and staleness (missing file with objects fails; no objects and no file passes).
 - [ ] **Step 5: Implement, review, full gate, commit** `feat(objects): plan object data against the source map`.
@@ -258,8 +261,7 @@ provenance, SHA-256, the maintainer's value record and V1–V13 answers with off
 Modify `template/moonwell.pkl`, `template/src/main.yue`, `template/deno.json`, embedded output, README, CONTRIBUTING
 (new gate step 9), CHANGELOG (Unreleased), AGENTS.md.
 
-- [ ] **Step 1:** The Captain's model path comes from the fixture (the maintainer set the Captain's model on the
-  custom Footman). Write the template files and regenerate.
+- [ ] **Step 1:** The Captain's model path comes from the game data (`unitskin.txt`, the Captain's `file` entry). Write the template files and regenerate.
 - [ ] **Step 2: Failing e2e** per spec §10.3, then pass.
 - [ ] **Step 3:** Docs per spec §11. **Step 4: Review, full gate, commit** `feat(objects): template Captain and docs`.
 
