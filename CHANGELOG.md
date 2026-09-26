@@ -22,6 +22,8 @@
 
 ### Release gate
 
+Assets (CONTRIBUTING step 7) passed 2026-09-26, tested by the maintainer.
+
 Map settings (CONTRIBUTING step 8) passed 2026-09-26 on Warcraft III Reforged 3.0.0.24268 and World Editor 3.00, after
 three fixes the gate found: a player name no longer adds `SetPlayerName` (it crashed the game on lobby creation), the
 hero level constant is `MaxHeroLevel`, and map-info colours are written blue, green, red, alpha.
