@@ -5,10 +5,10 @@ import type { Project } from "../../src/project/project.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { validateMapSettings } from "../../src/settings/options.ts";
 
-function project(root: string, folder: string): Project {
+function project(root: string, folder: string, manifest = "moonwell.pkl"): Project {
   return {
     root,
-    manifest: "moonwell.pkl",
+    manifest,
     map: { folder: "map.w3x", entry: "src/main.yue" },
     build: { folder, minify: false },
     launch: { gameExecutable: null, args: [] },
@@ -33,4 +33,16 @@ Deno.test("archivePath refuses a path outside the project", async () => {
   const root = await Deno.makeTempDir();
   await assertRejects(() => archivePath(root, project(root, "..")), MoonwellError, "outside the project");
   await assertRejects(() => archivePath(root, project(root, "../other")), MoonwellError, "outside the project");
+});
+
+Deno.test("archivePath errors name the evaluated manifest", async () => {
+  const root = await Deno.makeTempDir();
+  await Deno.mkdir(join(root, "maps", "map.w3x"), { recursive: true });
+  for (const folder of ["..", "maps"]) {
+    const error = await assertRejects(
+      () => archivePath(root, project(root, folder, "moonwell.local.pkl")),
+      MoonwellError,
+    );
+    assertEquals(error.file, "moonwell.local.pkl");
+  }
 });

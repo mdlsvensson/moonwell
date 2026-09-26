@@ -1,5 +1,5 @@
 import { isAbsolute, join, relative, resolve, SEPARATOR } from "@std/path";
-import { safeJoin } from "../assets/paths.ts";
+import { pathKey, safeJoin } from "../assets/paths.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { patchMapInfo } from "../w3i/patch.ts";
 import { patchSettingsLua } from "./lua.ts";
@@ -44,6 +44,43 @@ async function readMapFile(path: string, file: string, optional: boolean): Promi
   }
 }
 
+const SETTINGS_FILES = ["war3map.w3i", "war3map.lua", "war3mapMisc.txt", "war3mapSkin.txt"];
+
+/**
+ * The names the settings files have in `dir`, by case-insensitive key, as Warcraft III and Windows match them: a map
+ * saved with war3mapskin.txt is patched under that name rather than gaining a second war3mapSkin.txt. A missing folder
+ * lists nothing, so required files then fail as missing.
+ */
+async function settingsFileNames(dir: string, label: (name: string) => string): Promise<Map<string, string>> {
+  const names = new Map<string, string>();
+  const wanted = new Set(SETTINGS_FILES.map(pathKey));
+  let entries: Deno.DirEntry[];
+  try {
+    entries = await Array.fromAsync(Deno.readDir(dir));
+  } catch (cause) {
+    if (cause instanceof Deno.errors.NotFound) return names;
+    const reason = cause instanceof Error ? cause.message : String(cause);
+    throw new MoonwellError(`Reading the map folder for map settings failed: ${reason}`, {
+      file: label(""),
+      cause,
+      hint: "Check that the map folder is readable.",
+    });
+  }
+  for (const name of entries.map((entry) => entry.name).sort()) {
+    const key = pathKey(name);
+    if (!wanted.has(key)) continue;
+    const other = names.get(key);
+    if (other !== undefined) {
+      throw new MoonwellError(`Map files ${other} and ${name} differ only in letter case.`, {
+        file: label(name),
+        hint: "Warcraft III ignores letter case in map paths; delete or rename one of them in the source map.",
+      });
+    }
+    names.set(key, name);
+  }
+  return names;
+}
+
 /** Decodes strict UTF-8, keeping a byte-order mark aside so it survives re-encoding. */
 function decodeText(bytes: Uint8Array, file: string): { bom: string; text: string } {
   let text: string;
@@ -74,28 +111,31 @@ export async function planMapSettings(
   const misc = gameplaySections(settings, manifestFile);
   const skin = settings.gameInterface;
   const dir = resolve(mapDir);
-  const label = (name: string) => sourceLabel === undefined ? join(dir, name) : `${sourceLabel}/${name}`;
+  const label = (name: string) =>
+    sourceLabel === undefined ? join(dir, name) : name === "" ? sourceLabel : `${sourceLabel}/${name}`;
+  const names = await settingsFileNames(dir, label);
+  const existing = (name: string) => names.get(pathKey(name)) ?? name;
   const changes: SettingsChange[] = [];
   const extended = hasExtendedSettings(settings);
 
   const needsW3i = extended || Object.keys(settings.info).length > 0 || Object.keys(settings.loadingScreen).length > 0;
   const needsLua = extended || settings.info.name !== undefined || settings.info.description !== undefined;
   if (needsW3i) {
-    const w3iPath = join(dir, "war3map.w3i"), w3iFile = label("war3map.w3i");
+    const w3iName = existing("war3map.w3i"), w3iPath = join(dir, w3iName), w3iFile = label(w3iName);
     const w3i = await readMapFile(w3iPath, w3iFile, false);
     const patched = patchMapInfo(w3i, settings, w3iFile);
     if (!equalBytes(patched, w3i)) changes.push({ file: w3iPath, bytes: patched });
     if (needsLua) {
-      const luaPath = join(dir, "war3map.lua"), luaFile = label("war3map.lua");
+      const luaName = existing("war3map.lua"), luaPath = join(dir, luaName), luaFile = label(luaName);
       const { bom, text } = decodeText(await readMapFile(luaPath, luaFile, false), luaFile);
       const lua = patchSettingsLua(text, settings, patched, luaFile);
       if (lua !== text) changes.push({ file: luaPath, bytes: new TextEncoder().encode(bom + lua) });
     }
   }
 
-  for (const [name, sections] of [["war3mapMisc.txt", misc], ["war3mapSkin.txt", skin]] as const) {
+  for (const [canonical, sections] of [["war3mapMisc.txt", misc], ["war3mapSkin.txt", skin]] as const) {
     if (!hasEntries(sections)) continue;
-    const path = join(dir, name), file = label(name);
+    const name = existing(canonical), path = join(dir, name), file = label(name);
     const source = await readMapFile(path, file, true);
     const { bom, text } = source === undefined ? { bom: "", text: "" } : decodeText(source, file);
     const merged = patchSettingsText(text, sections);
