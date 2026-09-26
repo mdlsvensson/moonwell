@@ -38,18 +38,18 @@ over, and updated on 2026-09-26 after Plan 2b.
     after staging and before assets and bundle injection. The source map is never written. `settings:check` reports the
     files that would change; `check` and `dev` run the same planner. Code is in `cli/src/settings/` and `cli/src/w3i/`.
     The in-game release gate (CONTRIBUTING step 8) passed 2026-09-26 after three fixes: no `SetPlayerName` (it crashed
-    lobby creation), the hero level key is `MaxHeroLevel`, and w3i colours are stored blue, green, red, alpha
-    (fixture `cli/tests/fixtures/map-settings-v39/war3map-colors.w3i`). Sound environments use World Editor's internal
-    names, such as `Default` or `Dungeon`.
+    lobby creation), the hero level key is `MaxHeroLevel`, and w3i colours are stored blue, green, red, alpha (fixture
+    `cli/tests/fixtures/map-settings-v39/war3map-colors.w3i`). Sound environments use World Editor's internal names,
+    such as `Default` or `Dungeon`.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `eea99d9`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Plan 2c: object data** (next feature, 0.3.0) (spec §6.1): custom units, heroes, buildings, items, abilities, buffs and upgrades in Pkl,
-   written into the map's modification files (`w3u`/`w3t`/`w3h`/`w3a`/`w3q` and their `war3mapSkin.*` counterparts),
-   plus the generated `src/generated/objects.yue`.
+1. **Plan 2c: object data** (next feature, 0.3.0) (spec §6.1): custom units, heroes, buildings, items, abilities, buffs
+   and upgrades in Pkl, written into the map's modification files (`w3u`/`w3t`/`w3h`/`w3a`/`w3q` and their
+   `war3mapSkin.*` counterparts), plus the generated `src/generated/objects.yue`.
    - **Blocked on the maintainer.** It needs the game's SLKs (`UnitMetaData`, `AbilityMetaData`, `AbilityBuffMetaData`,
      `UpgradeMetaData`, and the `UnitData`/`ItemData`/`AbilityData`/`AbilityBuffData`/`UpgradeData` id lists), extracted
      with CascView. It also needs a small test map saved by World Editor 3.00 with one custom object of each kind, to
