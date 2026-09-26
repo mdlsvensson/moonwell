@@ -232,6 +232,14 @@ Deno.test("deeply nested input fails safely instead of overflowing the JavaScrip
   }
 });
 
+Deno.test("long right-associative chains are consumed without counting as nesting", () => {
+  for (const operator of ["..", "^"]) {
+    const chain = Array(1000).fill("a").join(operator);
+    const functions = readLuaFunctions(`function config() local s = ${chain} X() end`, "map.lua");
+    assertEquals(functions[0].calls.map((call) => call.name), ["X"]);
+  }
+});
+
 Deno.test("token ranges preserve numeral, operator and string spellings", () => {
   const source =
     '-- 🌙\r\nfunction config() Capture(1..2, 0X.8p-2, .5E+2, a//b, a<<b, a>>b, a~=b, a<=b, a>=b, a==b, [=[text]=], "one\\\r\ntwo"); end';
