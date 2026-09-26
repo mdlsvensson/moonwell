@@ -68,7 +68,7 @@ settings {
     // }
   }
   environment {
-    soundEnvironment = null
+    soundEnvironment = null  // World Editor's name, e.g. "Default" or "Dungeon"
     waterColor = null  // List(red, green, blue, alpha), each 0..255
     fog {
       enabled = null

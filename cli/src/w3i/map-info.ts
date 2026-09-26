@@ -64,6 +64,12 @@ class MapInfoReader {
   }
 }
 
+// Colors are stored blue, green, red, alpha (confirmed with World Editor 3.00); fields are returned red first.
+function bgra(r: MapInfoReader) {
+  const [blue, green, red, alpha] = Array.from({ length: 4 }, () => r.number(false, 1));
+  return [red, green, blue, alpha];
+}
+
 export function readMapInfo(bytes: Uint8Array, extended = false, file = "war3map.w3i") {
   const r = new MapInfoReader(bytes, file);
   const version = r.number().value;
@@ -87,13 +93,13 @@ export function readMapInfo(bytes: Uint8Array, extended = false, file = "war3map
     start: r.number(true),
     end: r.number(true),
     density: r.number(true),
-    color: Array.from({ length: 4 }, () => r.number(false, 1)),
+    color: bgra(r),
   };
   r.skip(4);
   if (version === 39) r.skip(24);
   const soundEnvironment = r.text();
   r.skip(1);
-  const waterColor = Array.from({ length: 4 }, () => r.number(false, 1));
+  const waterColor = bgra(r);
   if (r.number().value !== 1) r.invalid("map settings require Lua script mode");
   if (version >= 31) r.skip(8);
   if (version >= 32) r.skip(8);

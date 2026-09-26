@@ -78,7 +78,7 @@ Raw section and key names match `[A-Za-z_][A-Za-z0-9_]*`; duplicate names differ
 each override mapping. Values may be empty but cannot contain CR, LF, or NUL. Dictionary handling must treat names
 such as `constructor` as data, not inherited object properties.
 
-`gameplay.heroMaxLevel` maps to `[Misc] HeroMaxLevel`; `gameplay.foodLimit` maps to `[Misc] FoodCeiling`. A raw override
+`gameplay.heroMaxLevel` maps to `[Misc] MaxHeroLevel`; `gameplay.foodLimit` maps to `[Misc] FoodCeiling`. A raw override
 of the same key is accepted only if its string exactly equals the typed value's decimal representation. Matching
 section/key names ignores case. This conflict check concerns configured overrides, not the source file's old value.
 
