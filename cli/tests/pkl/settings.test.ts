@@ -192,7 +192,8 @@ Deno.test("settings:check names the map file when a coordinated Lua edit is unsa
     const before = await snapshot(join(root, "maps"));
     await writeLocal(root, 'settings { info { name = "No call" } }');
     const error = await assertRejects(() => settingsCheck(pklOnlyContext(root).ctx), MoonwellError);
-    assertEquals(error.file, lua);
+    // Relative like build, check and the missing-folder error, so all commands name the same file.
+    assertEquals(error.file, "maps/map.w3x/war3map.lua");
     assertEquals(await snapshot(join(root, "maps")), before);
   });
 });

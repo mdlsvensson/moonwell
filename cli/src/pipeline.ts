@@ -6,6 +6,7 @@ import { resolveGraph } from "./bundle/graph.ts";
 import type { CommandContext } from "./context.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
 import type { Project } from "./project/project.ts";
+import { applySettingsPlan, planMapSettings } from "./settings/plan.ts";
 import { MoonwellError } from "./shared/errors.ts";
 import { replaceDir, toPosix } from "./shared/fs.ts";
 import { type CompiledModule, compileSources } from "./yue/compile.ts";
@@ -73,6 +74,13 @@ export async function prepareStage(
       hint: "Close Warcraft III or World Editor if they have dist/stage open, then retry.",
     });
   }
+  // Settings patch the staged copy only, before assets and bundle injection; errors name the source files to fix.
+  // Every change is planned before any is written, so a refused setting leaves the staged map unpatched.
+  const sourceLabel = `maps/${project.map.folder}`;
+  const settings = await planMapSettings(mapDir, project.settings, project.manifest, sourceLabel);
+  await applySettingsPlan(settings);
+  if (settings.length > 0) ctx.logger.info(`Applied map settings to ${settings.length} internal file(s).`);
+
   // A build reads the ownership state (to know which source-map files assets:sync owns) but never writes it:
   // applyAssetPlan gets no state file, so only the staged copy changes.
   const { stateFile } = await assetLocations(ctx.root, project.map.folder);
@@ -81,7 +89,7 @@ export async function prepareStage(
   if (assets.assets.length > 0) ctx.logger.info(`Imported ${assets.assets.length} asset(s).`);
 
   const scriptPath = join(mapDir, "war3map.lua");
-  const scriptLabel = `maps/${project.map.folder}/war3map.lua`;
+  const scriptLabel = `${sourceLabel}/war3map.lua`;
   if (!(await exists(scriptPath))) {
     throw new MoonwellError("The map has no war3map.lua.", {
       file: scriptLabel,
