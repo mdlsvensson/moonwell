@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "@std/assert";
+import { assertEquals, assertStringIncludes, assertThrows } from "@std/assert";
 import { hasExtendedSettings, hasSettings, validateMapSettings } from "../../src/settings/options.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 
@@ -101,4 +101,36 @@ Deno.test("settings copy nested values and retain raw constructor keys", () => {
   input.gameplayConstants.Misc.FoodCeiling = "1";
   assertEquals(result.environment.waterColor, [1, 2, 3, 4]);
   assertEquals(result.gameplayConstants.Misc.FoodCeiling, "0");
+});
+
+Deno.test("settings validation errors name the settings path once", () => {
+  const cases: [unknown, string][] = [
+    [[], "settings must be an object."],
+    [{ other: {} }, "Unknown map setting: settings.other"],
+    [{ info: [] }, "settings.info must be an object."],
+    [{ info: { title: "x" } }, "Unknown map setting: settings.info.title"],
+    [{ info: { name: 1 } }, "Invalid map setting: settings.info.name"],
+    [{ players: { "24": {} } }, "settings.players keys must be IDs from 0 to 23: 24"],
+    [{ players: { "7": { x: "1" } } }, 'Invalid map setting: settings.players["7"].x'],
+    [{ forces: { "0": { team: 1 } } }, 'Unknown map setting: settings.forces["0"].team'],
+    [{ environment: { fog: { density: 2 } } }, "Invalid map setting: settings.environment.fog.density"],
+    [{ gameplayConstants: { Misc: {}, misc: {} } }, "Invalid or duplicate settings.gameplayConstants section: misc"],
+    [{ gameInterface: { Frame: { X: "a", x: "b" } } }, 'Invalid or duplicate settings.gameInterface["Frame"] key: x'],
+    [{ gameplayConstants: { Misc: { X: "a\nb" } } }, 'settings.gameplayConstants["Misc"]["X"] must be a single-line'],
+    [{ gameInterface: { Frame: [] } }, 'settings.gameInterface["Frame"] must be an object.'],
+  ];
+  for (const [input, message] of cases) {
+    const error = assertThrows(() => validateMapSettings(input, "moonwell.local.pkl"), MoonwellError);
+    assertStringIncludes(error.message, message);
+    assertEquals(error.message.includes("settings.settings"), false, error.message);
+  }
+});
+
+Deno.test("whole-number coordinates and fog values are accepted as numbers", () => {
+  const settings = validateMapSettings({
+    players: { "0": { x: 256, y: -896 } },
+    environment: { fog: { start: 100, end: 1000, density: 1 } },
+  });
+  assertEquals(settings.players["0"], { x: 256, y: -896 });
+  assertEquals(settings.environment.fog, { start: 100, end: 1000, density: 1 });
 });

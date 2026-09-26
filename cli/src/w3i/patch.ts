@@ -18,7 +18,7 @@ export function patchMapInfo(bytes: Uint8Array, settings: MapSettings, file = "w
     const field = map.loadingScreen[key as keyof typeof map.loadingScreen];
     if (!field) {
       return fail(
-        "Custom loading-screen models require w3i version 25 or later.",
+        "settings.loadingScreen.model: custom loading-screen models require w3i version 25 or later.",
         "Save the map in a newer World Editor.",
       );
     }
@@ -30,7 +30,10 @@ export function patchMapInfo(bytes: Uint8Array, settings: MapSettings, file = "w
     for (const [id, values] of Object.entries(settings.players)) {
       const player = d.players.find((entry) => entry.id.value === +id);
       if (!player) {
-        return fail(`Player ${id} does not exist in the source map.`, "Create this player slot in World Editor first.");
+        return fail(
+          `settings.players[${JSON.stringify(id)}]: player ${id} does not exist in the source map.`,
+          "Create this player slot in World Editor first.",
+        );
       }
       for (const [key, value] of Object.entries(values)) {
         const numeric = key === "controller"
@@ -45,10 +48,13 @@ export function patchMapInfo(bytes: Uint8Array, settings: MapSettings, file = "w
     }
     for (const [index, values] of Object.entries(settings.forces)) {
       const force = d.forces[+index];
-      if (!force) fail(`Force ${index} does not exist in the source map.`, "Create this force in World Editor first.");
+      const path = `settings.forces[${JSON.stringify(index)}]`;
+      if (!force) {
+        fail(`${path}: force ${index} does not exist in the source map.`, "Create this force in World Editor first.");
+      }
       if (!(flags & 0x40)) {
         fail(
-          "Force overrides require custom forces enabled in the source map.",
+          `${path}: force overrides require custom forces enabled in the source map.`,
           "Enable custom forces in World Editor first.",
         );
       }
@@ -76,7 +82,7 @@ export function patchMapInfo(bytes: Uint8Array, settings: MapSettings, file = "w
       const density = fog.density ?? d.fog.density.value;
       if (![start, end, density].every(Number.isFinite) || start > end) {
         fail(
-          "Fog start, end and density must be finite, and start must not exceed end.",
+          "settings.environment.fog: start, end and density must be finite, and start must not exceed end.",
           "Check fog values in World Editor or set valid fog values in settings.",
         );
       }

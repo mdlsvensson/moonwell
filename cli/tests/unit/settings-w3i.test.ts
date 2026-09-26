@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "@std/assert";
+import { assertEquals, assertStringIncludes, assertThrows } from "@std/assert";
 import { validateMapSettings } from "../../src/settings/options.ts";
 import { patchMapInfo } from "../../src/w3i/patch.ts";
 import { readMapInfo } from "../../src/w3i/map-info.ts";
@@ -149,4 +149,23 @@ Deno.test("force edits require the editor's custom-forces flag", () => {
   const source = syntheticMapInfo(39);
   new DataView(source.buffer).setInt32(readMapInfo(source).flags.start, 0, true);
   expectMapError(() => patchMapInfo(source, settings({ forces: { "0": { name: "X" } } }), "map/war3map.w3i"));
+});
+
+Deno.test("map-dependent errors name the settings path that needs the map", () => {
+  const source = syntheticMapInfo(39);
+  const noForces = syntheticMapInfo(39);
+  new DataView(noForces.buffer).setInt32(readMapInfo(noForces).flags.start, 0, true);
+  const cases: [Uint8Array, unknown, string][] = [
+    [source, { players: { "7": { name: "P" } } }, 'settings.players["7"]: player 7 does not exist in the source map.'],
+    [source, { forces: { "1": { name: "F" } } }, 'settings.forces["1"]: force 1 does not exist in the source map.'],
+    [noForces, { forces: { "0": { name: "F" } } }, 'settings.forces["0"]: force overrides require custom forces'],
+    [source, { environment: { fog: { start: 6000 } } }, "settings.environment.fog: start, end and density must be"],
+    [syntheticMapInfo(18), { loadingScreen: { model: "" } }, "settings.loadingScreen.model: custom loading-screen"],
+  ];
+  for (const [bytes, input, message] of cases) {
+    assertStringIncludes(
+      expectMapError(() => patchMapInfo(bytes, settings(input), "map/war3map.w3i")).message,
+      message,
+    );
+  }
 });

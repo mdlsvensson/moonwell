@@ -18,12 +18,12 @@ const decode = (bytes: Uint8Array | undefined) => new TextDecoder().decode(bytes
 /** The representative override from the plan: every settings group that touches the four internal files. */
 const SETTINGS = `settings {
   info { name = "Moonwell settings test"; description = "Built settings" }
-  players { ["0"] { controller = "computer"; race = "orc"; fixedStart = false; x = 256.0 } }
+  players { ["0"] { controller = "computer"; race = "orc"; fixedStart = false; x = 256 } }
   forces { ["0"] { allied = false; sharedVision = false; alliedVictory = true } }
   environment {
     soundEnvironment = "Mountains"
     waterColor = List(10, 20, 30, 255)
-    fog { enabled = true; start = 100.0; end = 1000.0 }
+    fog { enabled = true; start = 100; end = 1000.5 }
   }
   gameplay { heroMaxLevel = 25; foodLimit = 200 }
   gameInterface { ["CustomSkin"] { ["Test"] = "value" } }
@@ -104,7 +104,7 @@ Deno.test("build applies settings to the archive only, repeatably, and never to 
   assertEquals(player.x.value, 256);
   assertEquals(details.soundEnvironment.value, "Mountains");
   assertEquals(details.waterColor.map((channel) => channel.value), [10, 20, 30, 255]);
-  assertEquals([details.fog.start.value, details.fog.end.value], [100, 1000]);
+  assertEquals([details.fog.start.value, details.fog.end.value], [100, 1000.5]);
 
   assertSettingsLua(decode(await archive.read("war3map.lua")));
   const misc = decode(await archive.read("war3mapMisc.txt"));
@@ -156,7 +156,10 @@ Deno.test("a settings failure after a successful build removes the old archive a
   const before = await snapshot(sourceMap(project));
   const absent = await deno(["task", "build"], project);
   assertEquals(absent.code, 1, absent.text);
-  assertStringIncludes(absent.text, "error: maps/map.w3x/war3map.w3i › Player 5 does not exist in the source map.");
+  assertStringIncludes(
+    absent.text,
+    'error: maps/map.w3x/war3map.w3i › settings.players["5"]: player 5 does not exist in the source map.',
+  );
   assertEquals(await exists(archiveOf(project)), false, "the stale archive survived a failed settings build");
   assertEquals(await snapshot(sourceMap(project)), before);
 
@@ -218,7 +221,7 @@ Deno.test("check validates settings against the source map without staging", asy
   await writeLocal(project, 'settings { info { name = "Needs a map" } }\n');
   const missing = await deno(["task", "check"], project);
   assertEquals(missing.code, 1, missing.text);
-  assertStringIncludes(missing.text, "error: maps/map.w3x › Source map folder maps/map.w3x not found.");
+  assertStringIncludes(missing.text, "error: moonwell.local.pkl › Source map folder maps/map.w3x not found.");
 });
 
 Deno.test("test stages settings with the runtime, and a minified build keeps settings before the bundle", async () => {
@@ -283,7 +286,9 @@ Deno.test("dev reports a settings error when the manifest changes", async () => 
   try {
     await waitFor("Watching src/");
     await writeLocal(project, 'settings { players { ["5"] { name = "Absent" } } }\n');
-    await waitFor("error: maps/map.w3x/war3map.w3i › Player 5 does not exist in the source map.");
+    await waitFor(
+      'error: maps/map.w3x/war3map.w3i › settings.players["5"]: player 5 does not exist in the source map.',
+    );
   } finally {
     child.kill();
     await reader.cancel();

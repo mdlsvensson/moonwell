@@ -17,7 +17,7 @@ export function patchSettingsText(source: string, sections: Sections): string {
       let insertion = -1;
       let found = false;
       for (let i = 0; i < lines.length; i++) {
-        const header = lines[i].match(/^\s*\[([^\]]+)\]\s*(?:\/\/.*)?$/);
+        const header = lines[i].match(/^\s*\[([^\]]+)\]\s*(?:(?:\/\/|;).*)?$/);
         if (header) active = header[1].toLowerCase() === section.toLowerCase();
         if (!active) continue;
         if (lines[i].trim() !== "") insertion = i + 1;
