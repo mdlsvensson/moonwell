@@ -153,3 +153,118 @@ export function readModFile(bytes: Uint8Array, kind: TableKind, file: string): M
   if (r.offset !== bytes.length) r.invalid("trailing bytes after the custom objects");
   return { version, original, custom };
 }
+
+/** An object Moonwell adds to the custom table. `level` and `column` must be 0 in simple tables. */
+export interface NewObject {
+  base: string;
+  id: string;
+  mods: { field: string; level: number; column: number; value: ModValue }[];
+}
+
+// The names fixture shows set count 1 and flag 0 per object, and end token 0 after each custom modification.
+// v1/v2 objects (no set fields, end token 0) are derived from it, not seen in a save: to verify (V16).
+const SET_COUNT = 1;
+const SET_FLAG = 0;
+const END_TOKEN = 0;
+// Version and empty original table of a file World Editor 3.00 writes when the map has none (names fixture).
+const NEW_FILE_VERSION = 3;
+const FLOAT32_MAX = 3.4028234663852886e38;
+
+/** Encodes Moonwell's objects. Bad values are internal errors: the resolver rejects them before planning. */
+class ModFileWriter {
+  readonly chunks: Uint8Array[] = [];
+
+  int(value: number): void {
+    if (!Number.isInteger(value) || value < -(2 ** 31) || value >= 2 ** 31) {
+      throw new Error(`Cannot write ${value} as an int32.`);
+    }
+    const bytes = new Uint8Array(4);
+    new DataView(bytes.buffer).setInt32(0, value, true);
+    this.chunks.push(bytes);
+  }
+
+  float(value: number): void {
+    if (!Number.isFinite(value) || Math.abs(value) > FLOAT32_MAX) {
+      throw new Error(`Cannot write ${value} as a float32.`);
+    }
+    const bytes = new Uint8Array(4);
+    new DataView(bytes.buffer).setFloat32(0, value, true);
+    this.chunks.push(bytes);
+  }
+
+  id(value: string): void {
+    const codes = Array.from(value, (c) => c.charCodeAt(0));
+    if (codes.length !== 4 || codes.some((code) => code > 0xff)) {
+      throw new Error(`Cannot write ${JSON.stringify(value)} as an object id: it must be 4 Latin-1 characters.`);
+    }
+    this.chunks.push(new Uint8Array(codes));
+  }
+
+  text(value: string): void {
+    if (value.includes("\0") || !value.isWellFormed()) {
+      throw new Error(`Cannot write ${JSON.stringify(value)}: it contains NUL or an unpaired surrogate.`);
+    }
+    this.chunks.push(new TextEncoder().encode(value), new Uint8Array(1));
+  }
+
+  object({ base, id, mods }: NewObject, version: number, kind: TableKind): void {
+    this.id(base);
+    this.id(id);
+    if (version >= 3) {
+      this.int(SET_COUNT);
+      this.int(SET_FLAG);
+    }
+    this.int(mods.length);
+    for (const { field, level, column, value } of mods) {
+      this.id(field);
+      this.int(VAR_TYPES.indexOf(value.type));
+      if (kind === "leveled") {
+        this.int(level);
+        this.int(column);
+      } else if (level !== 0 || column !== 0) {
+        throw new Error(`Cannot write ${field} at level ${level}, column ${column}: a simple table has neither.`);
+      }
+      if (value.type === "string") this.text(value.value);
+      else if (value.type === "int") this.int(value.value);
+      else this.float(value.value);
+      this.int(END_TOKEN);
+    }
+  }
+
+  bytes(): Uint8Array {
+    const out = new Uint8Array(this.chunks.reduce((size, chunk) => size + chunk.length, 0));
+    let offset = 0;
+    for (const chunk of this.chunks) {
+      out.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return out;
+  }
+}
+
+/**
+ * Appends `objects`, in the order given, to the custom table of `source`, copying every existing byte verbatim.
+ * Without `source`, writes a new file with an empty original table.
+ */
+export function appendObjects(
+  source: Uint8Array | undefined,
+  kind: TableKind,
+  objects: NewObject[],
+  file: string,
+): Uint8Array {
+  const w = new ModFileWriter();
+  if (source === undefined) {
+    w.int(NEW_FILE_VERSION);
+    w.int(0);
+    w.int(objects.length);
+    for (const object of objects) w.object(object, NEW_FILE_VERSION, kind);
+    return w.bytes();
+  }
+  const { version, custom } = readModFile(source, kind, file);
+  w.chunks.push(source.subarray(0, custom.countOffset));
+  w.int(custom.objects.length + objects.length);
+  // The custom table runs to the end of the file: the reader rejects trailing bytes.
+  w.chunks.push(source.subarray(custom.start, custom.stop));
+  for (const object of objects) w.object(object, version, kind);
+  return w.bytes();
+}

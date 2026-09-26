@@ -1,5 +1,14 @@
 import { assertEquals, assertStringIncludes, assertThrows } from "@std/assert";
-import { type ModFile, readModFile, tableKind } from "../../src/objectdata/modfile.ts";
+import {
+  appendObjects,
+  type ModFile,
+  type ModValue,
+  type NewObject,
+  type ObjectEntry,
+  readModFile,
+  type TableKind,
+  tableKind,
+} from "../../src/objectdata/modfile.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { buildModFile, namesFixtureBytes, type SyntheticObject } from "../support/objectdata.ts";
 
@@ -202,4 +211,175 @@ Deno.test("a view with a nonzero byte offset parses the same as a copy", async (
     const view = padded.subarray(3, 3 + bytes.length);
     assertEquals(readModFile(view, tableKind(file), file), readModFile(bytes, tableKind(file), file));
   }
+});
+
+const APPENDED: NewObject[] = [
+  {
+    base: "hfoo",
+    id: "X001",
+    mods: [
+      { field: "uhpm", level: 0, column: 0, value: { type: "int", value: -250 } },
+      { field: "umvs", level: 2, column: 1, value: { type: "real", value: 0.1 } },
+      { field: "ucbs", level: 0, column: 3, value: { type: "unreal", value: 1.3 } },
+      { field: "unam", level: 1, column: 0, value: { type: "string", value: "Møønwell" } },
+    ],
+  },
+  { base: "hpea", id: "X002", mods: [] },
+];
+
+// APPENDED as the table kind allows it: simple tables have no level or column.
+const appendedFor = (kind: TableKind): NewObject[] =>
+  APPENDED.map(({ base, id, mods }) => ({
+    base,
+    id,
+    mods: kind === "leveled" ? mods : mods.map((mod) => ({ ...mod, level: 0, column: 0 })),
+  }));
+
+// What the reader should return for APPENDED, given the table kind.
+const appendedAsRead = (kind: TableKind) =>
+  appendedFor(kind).map((object) => ({
+    base: object.base,
+    id: object.id,
+    sets: [{
+      flag: 0,
+      mods: object.mods.map(({ field, level, column, value }) => ({
+        field,
+        level,
+        column,
+        value: value.type === "string" ? value : { type: value.type, value: Math.fround(value.value) },
+        end: "\0\0\0\0",
+      })),
+    }],
+  }));
+
+const withoutOffsets = (objects: ObjectEntry[]) =>
+  objects.map(({ base, id, sets }) => ({
+    base,
+    id,
+    sets: sets.map(({ flag, mods }) => ({ flag, mods: mods.map(({ start: _, stop: __, ...mod }) => mod) })),
+  }));
+
+Deno.test("appending each names fixture object to no file reproduces World Editor's main and skin files", async () => {
+  for (const name of NAMES) {
+    for (const skin of [false, true]) {
+      const file = `${skin ? "war3mapSkin" : "war3map"}.${name.ext}`;
+      const mods = skin === name.skin
+        ? [{ field: name.field, level: name.level, column: 0, value: { type: "string" as const, value: name.value } }]
+        : [];
+      const bytes = appendObjects(undefined, tableKind(file), [{ base: name.base, id: name.id, mods }], file);
+      assertEquals(bytes, await namesFixtureBytes(file), file);
+    }
+  }
+});
+
+Deno.test("appending to every names fixture file keeps its bytes and adds the objects last", async () => {
+  for (const name of NAMES) {
+    for (const skin of ["war3map", "war3mapSkin"]) {
+      const file = `${skin}.${name.ext}`;
+      const kind = tableKind(file);
+      const source = await namesFixtureBytes(file);
+      const before = readModFile(source, kind, file);
+      const bytes = appendObjects(source, kind, appendedFor(kind), file);
+      const { countOffset, start, stop } = before.custom;
+      assertEquals(bytes.subarray(0, countOffset), source.subarray(0, countOffset), file);
+      assertEquals(bytes.subarray(countOffset, start), int32(before.custom.objects.length + 2), file);
+      assertEquals(bytes.subarray(start, stop), source.subarray(start, stop), file);
+      const after = readModFile(bytes, kind, file);
+      assertEquals(after.version, 3, file);
+      assertEquals(after.original, before.original, file);
+      assertEquals(after.custom.objects.slice(0, -2), before.custom.objects, file);
+      assertEquals(withoutOffsets(after.custom.objects.slice(-2)), appendedAsRead(kind), file);
+      assertEquals(after.custom.stop, bytes.length, file);
+    }
+  }
+});
+
+Deno.test("appending no objects returns the source bytes", async () => {
+  for (const file of ["war3map.w3u", "war3mapSkin.w3q", "war3map.w3d"]) {
+    const source = await namesFixtureBytes(file);
+    assertEquals(appendObjects(source, tableKind(file), [], file), source, file);
+  }
+});
+
+Deno.test("synthetic v1, v2 and v3 sources get objects in their own version's shape", () => {
+  const original: SyntheticObject[] = [{
+    base: "hpea",
+    id: "\0\0\0\0",
+    mods: [{ field: "ugol", value: { type: "int", value: 90 } }],
+  }];
+  const existing: SyntheticObject[] = [
+    { base: "hfoo", id: "h001", mods: [{ field: "unam", level: 2, value: { type: "string", value: "A" } }] },
+    { base: "hfoo", id: "h002", mods: [{ field: "utip", value: { type: "string", value: "B" }, end: "h002" }] },
+  ];
+  // A v3 object with two sets and a nonzero flag, which Moonwell never writes, must still be copied verbatim.
+  const multiSet: SyntheticObject = {
+    base: "hfoo",
+    id: "h003",
+    sets: [{ flag: 7, mods: [] }, { flag: 0, mods: [{ field: "uhpm", value: { type: "int", value: 5 } }] }],
+  };
+  for (const version of [1, 2, 3]) {
+    for (const kind of ["simple", "leveled"] as const) {
+      const custom = version >= 3 ? [...existing, multiSet] : existing;
+      const source = buildModFile({ version, original, custom }, kind);
+      const appended = appendedFor(kind);
+      assertEquals(
+        appendObjects(source, kind, appended, "war3map.w3u"),
+        buildModFile({ version, original, custom: [...custom, ...appended] }, kind),
+        `v${version} ${kind}`,
+      );
+    }
+  }
+});
+
+Deno.test("appending to a malformed source is the reader's file error", async () => {
+  const valid = await namesFixtureBytes("war3mapSkin.w3u");
+  const error = assertThrows(
+    () => appendObjects(valid.subarray(0, 20), "simple", appendedFor("simple"), "map/war3mapSkin.w3u"),
+    MoonwellError,
+  );
+  assertEquals(error.file, "map/war3mapSkin.w3u");
+});
+
+Deno.test("values the resolver should have rejected are internal errors", () => {
+  const append = (object: Partial<NewObject>, value?: ModValue) => () =>
+    appendObjects(undefined, "leveled", [{
+      base: "hfoo",
+      id: "X001",
+      mods: value ? [{ field: "unam", level: 0, column: 0, value }] : [],
+      ...object,
+    }], "war3map.w3a");
+  const expectInternal = (fn: () => unknown, problem: string) => {
+    const error = assertThrows(fn, Error, problem);
+    assertEquals(error instanceof MoonwellError, false, problem);
+  };
+  expectInternal(append({}, { type: "string", value: "a\0b" }), "NUL");
+  expectInternal(append({}, { type: "string", value: "a\uD800b" }), "surrogate");
+  for (const value of [NaN, Infinity, -Infinity, 3.5e38, -1e39]) {
+    expectInternal(append({}, { type: "real", value }), "float32");
+    expectInternal(append({}, { type: "unreal", value }), "float32");
+  }
+  for (const value of [2147483648, -2147483649, 1.5, NaN]) {
+    expectInternal(append({}, { type: "int", value }), "int32");
+  }
+  expectInternal(
+    append({ mods: [{ field: "unam", level: 2 ** 31, column: 0, value: { type: "int", value: 1 } }] }),
+    "int32",
+  );
+  for (const id of ["X01", "X0001", "X00€", ""]) {
+    expectInternal(append({ id }), "object id");
+    expectInternal(append({ base: id }), "object id");
+    expectInternal(
+      append({ mods: [{ field: id, level: 0, column: 0, value: { type: "int", value: 1 } }] }),
+      "object id",
+    );
+  }
+  for (const [level, column] of [[1, 0], [0, 1]]) {
+    const mods = [{ field: "unam", level, column, value: { type: "int" as const, value: 1 } }];
+    expectInternal(
+      () => appendObjects(undefined, "simple", [{ base: "hfoo", id: "X001", mods }], "war3map.w3u"),
+      "simple table",
+    );
+  }
+  // The largest finite float32 and Latin-1 ids are accepted.
+  append({ id: "\0\xff\xe9A" }, { type: "real", value: -3.4028234663852886e38 })();
 });
