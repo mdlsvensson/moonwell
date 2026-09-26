@@ -1,0 +1,10 @@
+/// A custom upgrade.
+///
+/// Omitted or `null` properties inherit from `base`. See `Object.pkl` for `base` and `properties`.
+module moonwell.objects.Upgrade
+
+extends "../generated/UpgradeProps.pkl"
+
+/// The object's own id: four ASCII letters or digits, such as `"R000"`.
+/// Gameplay code reads it from `src/generated/objects.yue`.
+id: String(matches(Regex(#"[A-Za-z0-9]{4}"#)))

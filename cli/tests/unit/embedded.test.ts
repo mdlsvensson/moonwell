@@ -5,7 +5,7 @@ import { GAME_PATHS_GZIP_BASE64 } from "../../src/embedded/game-paths.ts";
 import { METADATA_GZIP_BASE64 } from "../../src/embedded/metadata.ts";
 import { TEMPLATE_FILES } from "../../src/embedded/template.ts";
 import { gunzip } from "../../src/shared/compression.ts";
-import { renderEmbedded, REPO, templateEntries } from "../../../tools/gen.ts";
+import { renderEmbedded, renderGeneratedSchema, REPO, templateEntries } from "../../../tools/gen.ts";
 
 Deno.test("the embedded runtime is up to date (run `deno task gen`)", async () => {
   const path = "cli/src/embedded/runtime.ts";
@@ -41,4 +41,21 @@ Deno.test("the embedded object metadata matches cli/data/metadata.json (run `den
   const embedded = new TextDecoder().decode(await gunzip(decodeBase64(METADATA_GZIP_BASE64)));
   const source = await Deno.readTextFile(join(REPO, "cli", "data", "metadata.json"));
   assert(embedded === source, "cli/src/embedded/metadata.ts is stale: run `deno task gen`.");
+});
+
+Deno.test("schema/generated matches cli/data/metadata.json (run `deno task gen`)", async () => {
+  const expected = await renderGeneratedSchema();
+  const folder = join(REPO, "schema", "generated");
+  const actual = new Map<string, string>();
+  for await (const entry of Deno.readDir(folder)) {
+    actual.set(`schema/generated/${entry.name}`, await Deno.readTextFile(join(folder, entry.name)));
+  }
+  const differences = [
+    ...[...actual.keys()].filter((path) => !expected.has(path)).map((path) => `stray:   ${path}`),
+    ...[...expected.keys()].filter((path) => !actual.has(path)).map((path) => `missing: ${path}`),
+    ...[...expected].filter(([path, text]) => actual.has(path) && actual.get(path) !== text).map(([path]) =>
+      `stale:   ${path}`
+    ),
+  ].sort();
+  assertEquals(differences, [], "schema/generated is out of date: run `deno task gen`.");
 });

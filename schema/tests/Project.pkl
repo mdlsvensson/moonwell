@@ -163,5 +163,7 @@ facts {
     !parsed.yue.hasProperty("path")
     parsed.assets.paths is Dynamic
     parsed.assets.exclude.toList() == List()
+    parsed.objects.heroes is Dynamic
+    parsed.objects.upgrades is Dynamic
   }
 }

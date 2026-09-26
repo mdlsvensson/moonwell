@@ -1,0 +1,18 @@
+/// What every custom object has, whatever its category. The typed properties come from the generated `*Props`
+/// modules; see the module of each category (`Unit.pkl`, `Hero.pkl`, ...).
+abstract module moonwell.objects.Object
+
+/// A value in `properties`: a scalar, a `List` of scalars (levels, or a comma-separated list), or a `List` of
+/// `List<String>` (per-level lists).
+typealias Value = Boolean|Number|String|List<Boolean|Number|String|List<String>>
+
+/// The standard object this one copies, by its four-character id, such as `"hfoo"` (Footman).
+base: String(length == 4)
+
+/// The file this object is defined in, relative to `moonwell.pkl`. `Objects.merge` sets it; do not set it yourself.
+source: String?
+
+/// Fields without a typed property, keyed by friendly name or by field rawcode, such as
+/// `["amountHealedDamaged"] = List(200, 400, 600)` on a Holy Light copy. The CLI checks the key, the value and
+/// whether the field applies to `base`. `null` inherits from the base.
+properties: Mapping<String, Value?> = new {}

@@ -1,0 +1,199 @@
+amends "pkl:test"
+
+import "pkl:json"
+import "pkl:test" as t
+import "../ObjectFile.pkl"
+import "../Objects.pkl"
+import "../Project.pkl"
+
+local valueError = "Expected value of type `Boolean|Number|String"
+
+local oneHero = (ObjectFile) { heroes { ["paladin"] { id = "H000"; base = "Hpal" } } }
+local oneUnit = (ObjectFile) { units { ["captain"] { id = "h000"; base = "hfoo"; source = "ignored" } } }
+
+/// A manifest that uses the public wiring over the files in `fixtures/objects/`.
+local merged = Objects.merge(import*("fixtures/objects/**.pkl"))
+local mergedJson = new json.Parser {}.parse(new JsonRenderer {}.renderValue(merged)) as Dynamic
+
+facts {
+  ["defaults are empty"] {
+    Project.objects.heroes.isEmpty
+    Project.objects.units.isEmpty
+    Project.objects.buildings.isEmpty
+    Project.objects.items.isEmpty
+    Project.objects.abilities.isEmpty
+    Project.objects.buffs.isEmpty
+    Project.objects.upgrades.isEmpty
+    ObjectFile.heroes.isEmpty
+    Objects.merge(new Mapping {}).units.isEmpty
+  }
+  ["merge keys each object's source by its file"] {
+    Objects.merge(new Mapping { ["objects/a.pkl"] = oneHero; ["objects/b/c.pkl"] = oneUnit }).heroes["paladin"].source
+      == "objects/a.pkl"
+    Objects.merge(new Mapping { ["objects/a.pkl"] = oneHero; ["objects/b/c.pkl"] = oneUnit }).units["captain"].source
+      == "objects/b/c.pkl"
+  }
+  ["merge through import* matches nested folders and keys by relative path"] {
+    merged.heroes["paladin"].source == "fixtures/objects/heroes.pkl"
+    merged.abilities["holyLight"].source == "fixtures/objects/nested/deeper/holy.pkl"
+    merged.units.keys == Set("captain")
+    mergedJson.heroes.paladin.id == "H000"
+  }
+  ["the same key in one category of two files names both files"] {
+    t.catch(() -> Objects.merge(new Mapping { ["objects/a.pkl"] = oneHero; ["objects/b.pkl"] = oneHero }).heroes)
+      .contains("objects/a.pkl")
+    t.catch(() -> Objects.merge(new Mapping { ["objects/a.pkl"] = oneHero; ["objects/b.pkl"] = oneHero }).heroes)
+      .contains("objects/b.pkl")
+    t.catch(() -> Objects.merge(new Mapping { ["objects/a.pkl"] = oneHero; ["objects/b.pkl"] = oneHero }).heroes)
+      .contains("heroes[\"paladin\"]")
+  }
+  ["objects written or amended after the merge are typed and their keys checked"] {
+    (Objects.merge(new Mapping { ["objects/a.pkl"] = oneHero })) { heroes { ["paladin"] { name = "Sir" } } }
+      .heroes["paladin"].name == "Sir"
+    (Objects.merge(new Mapping { ["objects/a.pkl"] = oneHero })) { units { ["extra"] { id = "h001"; base = "hfoo" } } }
+      .units["extra"].hitPointsMaximumBase == null
+    t.catch(() -> (Objects) { units { ["end"] { id = "h000"; base = "hfoo" } } }.units.toMap()).contains("isKeyword")
+    t.catch(() -> (Objects.merge(new Mapping {})) { units { ["2a"] { id = "h000"; base = "hfoo" } } }.units.toMap())
+      .contains("matches")
+  }
+  ["the same key in different categories is not a clash for Pkl"] {
+    Objects.merge(new Mapping {
+      ["a.pkl"] = oneHero
+      ["b.pkl"] = (ObjectFile) { units { ["paladin"] { id = "h001"; base = "hfoo" } } }
+    }).units["paladin"].source == "b.pkl"
+  }
+  ["keys follow the identifier pattern"] {
+    (ObjectFile) { units { ["_footman2"] { id = "h000"; base = "hfoo" } } }.units.toMap().length == 1
+    for (key in List("2foot", "foot-man", "foot man", "", "föot")) {
+      t.catch(() -> (ObjectFile) { units { [key] { id = "h000"; base = "hfoo" } } }.units.toMap()).contains("matches")
+    }
+  }
+  ["keys cannot be Lua or YueScript keywords"] {
+    for (key in List("end", "and", "nil", "local", "function", "class", "import", "export", "switch", "unless")) {
+      t.catch(() -> (ObjectFile) { units { [key] { id = "h000"; base = "hfoo" } } }.units.toMap())
+        .contains("isKeyword")
+    }
+    (ObjectFile) { units { ["End"] { id = "h000"; base = "hfoo" } } }.units.toMap().length == 1
+  }
+  ["hero ids start with an uppercase letter"] {
+    (ObjectFile) { heroes { ["a"] { id = "H0aZ"; base = "Hpal" } } }.heroes["a"].id == "H0aZ"
+    for (bad in List("h000", "0000", "H00", "H0000", "H00_", "Hé00")) {
+      t.catch(() -> (ObjectFile) { heroes { ["a"] { id = bad; base = "Hpal" } } }.heroes["a"].id).contains("matches")
+    }
+  }
+  ["unit and building ids do not start with an uppercase letter"] {
+    (ObjectFile) { units { ["a"] { id = "h0aZ"; base = "hfoo" } } }.units["a"].id == "h0aZ"
+    (ObjectFile) { buildings { ["a"] { id = "0abc"; base = "hbla" } } }.buildings["a"].id == "0abc"
+    for (bad in List("H000", "h00", "h0000", "h-00")) {
+      t.catch(() -> (ObjectFile) { units { ["a"] { id = bad; base = "hfoo" } } }.units["a"].id).contains("matches")
+      t.catch(() -> (ObjectFile) { buildings { ["a"] { id = bad; base = "hbla" } } }.buildings["a"].id)
+        .contains("matches")
+    }
+  }
+  ["item, ability, buff and upgrade ids take any four alphanumerics"] {
+    (ObjectFile) { items { ["a"] { id = "I000"; base = "ratf" } } }.items["a"].id == "I000"
+    (ObjectFile) { abilities { ["a"] { id = "a000"; base = "AHhb" } } }.abilities["a"].id == "a000"
+    (ObjectFile) { buffs { ["a"] { id = "B000"; base = "BHbd" } } }.buffs["a"].id == "B000"
+    (ObjectFile) { upgrades { ["a"] { id = "0000"; base = "Rhme" } } }.upgrades["a"].id == "0000"
+    t.catch(() -> (ObjectFile) { items { ["a"] { id = "I00"; base = "ratf" } } }.items["a"].id).contains("matches")
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A 00"; base = "AHhb" } } }.abilities["a"].id)
+      .contains("matches")
+    t.catch(() -> (ObjectFile) { buffs { ["a"] { id = "B0000"; base = "BHbd" } } }.buffs["a"].id).contains("matches")
+    t.catch(() -> (ObjectFile) { upgrades { ["a"] { id = "R_00"; base = "Rhme" } } }.upgrades["a"].id)
+      .contains("matches")
+  }
+  ["id and base are required"] {
+    t.catch(() -> (ObjectFile) { units { ["a"] { base = "hfoo" } } }.units["a"].id).contains("property `id`")
+    t.catch(() -> (ObjectFile) { units { ["a"] { id = "h000" } } }.units["a"].base).contains("property `base`")
+  }
+  ["base has four characters"] {
+    t.catch(() -> (ObjectFile) { units { ["a"] { id = "h000"; base = "hfo" } } }.units["a"].base).contains("length")
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhbx" } } }.abilities["a"].base)
+      .contains("length")
+  }
+  ["typed scalar properties"] {
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; hitPointsMaximumBase = 500 } } }
+      .units["a"].hitPointsMaximumBase == 500
+    t.catch(() -> (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; hitPointsMaximumBase = 5.5 } } }
+      .units["a"].hitPointsMaximumBase).contains("Int")
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; isABuilding = false } } }.units["a"].isABuilding == false
+    t.catch(() -> (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; isABuilding = 1 } } }
+      .units["a"].isABuilding).contains("Boolean")
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; scalingValue = 1 } } }.units["a"].scalingValue == 1
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; scalingValue = 1.25 } } }.units["a"].scalingValue == 1.25
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; name = "" } } }.units["a"].name == ""
+    t.catch(() -> (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; name = 1 } } }.units["a"].name)
+      .contains("String")
+    (ObjectFile) { heroes { ["a"] { id = "H000"; base = "Hpal"; startingStrength = 30 } } }
+      .heroes["a"].startingStrength == 30
+    (ObjectFile) { items { ["a"] { id = "I000"; base = "ratf"; goldCost = 0 } } }.items["a"].goldCost == 0
+    (ObjectFile) { buffs { ["a"] { id = "B000"; base = "BHbd"; tooltip = "x" } } }.buffs["a"].tooltip == "x"
+  }
+  ["properties default to null"] {
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo" } } }.units["a"].hitPointsMaximumBase == null
+    (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb" } } }.abilities["a"].cooldown == null
+  }
+  ["class membership follows the metadata"] {
+    // Heroes have hero-only fields; units and buildings do not.
+    t.catch(() -> (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; startingStrength = 1 } } }
+      .units["a"]).contains("startingStrength")
+    t.catch(() -> (ObjectFile) { buildings { ["a"] { id = "h000"; base = "hbla"; level = 1 } } }
+      .buildings["a"]).contains("level")
+    // Ability-specific fields go through `properties`.
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; chanceToMiss = 1 } } }
+      .abilities["a"]).contains("chanceToMiss")
+  }
+  ["per-level properties take a scalar or a List"] {
+    (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; cooldown = 5 } } }.abilities["a"].cooldown == 5
+    (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; cooldown = List(5, 4.5) } } }
+      .abilities["a"].cooldown == List(5, 4.5)
+    (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; manaCost = List(75, 80) } } }
+      .abilities["a"].manaCost == List(75, 80)
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; manaCost = List(1.5) } } }
+      .abilities["a"].manaCost).contains("Int")
+    (ObjectFile) { upgrades { ["a"] { id = "R000"; base = "Rhme"; name = List("One", "Two") } } }
+      .upgrades["a"].name == List("One", "Two")
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; cooldown = List("5") } } }
+      .abilities["a"].cooldown).contains("Number")
+  }
+  ["non-per-level scalars do not take a List"] {
+    t.catch(() -> (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; hitPointsMaximumBase = List(1) } } }
+      .units["a"].hitPointsMaximumBase).contains("Int")
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; levels = List(4) } } }
+      .abilities["a"].levels).contains("Int")
+  }
+  ["list properties take a String or a List<String>"] {
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; normal = "AHhb,Adef" } } }.units["a"].normal
+      == "AHhb,Adef"
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; normal = List("AHhb", "Adef") } } }.units["a"].normal
+      == List("AHhb", "Adef")
+    (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; normal = List() } } }.units["a"].normal == List()
+    t.catch(() -> (ObjectFile) { units { ["a"] { id = "h000"; base = "hfoo"; normal = List(List("AHhb")) } } }
+      .units["a"].normal).contains("String")
+  }
+  ["per-level list properties also take a List<List<String>>"] {
+    (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; targetsAllowed = "ground,air" } } }
+      .abilities["a"].targetsAllowed == "ground,air"
+    (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; targetsAllowed = List("ground", "air") } } }
+      .abilities["a"].targetsAllowed == List("ground", "air")
+    (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"
+      targetsAllowed = List(List("ground"), List("ground", "air")) } } }
+      .abilities["a"].targetsAllowed == List(List("ground"), List("ground", "air"))
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; targetsAllowed = List(1) } } }
+      .abilities["a"].targetsAllowed).contains("String")
+  }
+  ["properties take scalars and lists by any key"] {
+    (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"; properties {
+      ["Hhb1"] = List(111, 222.5); ["amountHealedDamaged"] = 100; ["aher"] = false
+      ["atar"] = List(List("ground"), List("air")); ["anam"] = "Holy"; ["alev"] = null
+    } } } }.abilities["a"].properties.toMap().length == 6
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"
+      properties { ["x"] = new Dynamic {} } } } }.abilities["a"].properties.toMap()).contains(valueError)
+    t.catch(() -> (ObjectFile) { abilities { ["a"] { id = "A000"; base = "AHhb"
+      properties { ["x"] = List(Map()) } } } }.abilities["a"].properties.toMap()).contains(valueError)
+  }
+  ["a file must amend ObjectFile.pkl"] {
+    t.catch(() -> Objects.merge(new Mapping { ["objects/a.pkl"] = new Dynamic { heroes {} } }).heroes)
+      .contains("ObjectFile")
+  }
+}

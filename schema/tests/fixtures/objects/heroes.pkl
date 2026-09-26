@@ -1,0 +1,15 @@
+amends "../../../ObjectFile.pkl"
+
+heroes {
+  ["paladin"] {
+    id = "H000"
+    base = "Hpal"
+  }
+}
+
+units {
+  ["captain"] {
+    id = "h000"
+    base = "hfoo"
+  }
+}

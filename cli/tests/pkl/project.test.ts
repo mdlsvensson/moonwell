@@ -1,4 +1,5 @@
 import { assertEquals } from "@std/assert";
+import { copy } from "@std/fs";
 import { fromFileUrl, join } from "@std/path";
 import { loadProject } from "../../src/project/project.ts";
 import { runProcess } from "../../src/shared/process.ts";
@@ -8,10 +9,8 @@ const PKL_DIR = fromFileUrl(new URL("../../../schema", import.meta.url));
 Deno.test("loadProject evaluates a real project against the local package", async () => {
   const root = await Deno.makeTempDir();
   const pkl = join(root, "pkl");
-  await Deno.mkdir(pkl);
-  for (const file of ["PklProject", "Project.pkl", "MapSettings.pkl"]) {
-    await Deno.copyFile(join(PKL_DIR, file), join(pkl, file));
-  }
+  await copy(PKL_DIR, pkl);
+  await Deno.remove(join(pkl, "tests"), { recursive: true });
   await Deno.writeTextFile(
     join(root, "PklProject"),
     `amends "pkl:Project"\n\ndependencies {\n  ["moonwell"] = import("pkl/PklProject")\n}\n`,

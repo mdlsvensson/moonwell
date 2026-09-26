@@ -1,0 +1,11 @@
+/// A custom building.
+///
+/// Omitted or `null` properties inherit from `base`. See `Object.pkl` for `base` and `properties`.
+module moonwell.objects.Building
+
+extends "../generated/BuildingProps.pkl"
+
+/// The object's own id: four ASCII letters or digits, not starting with an uppercase letter (the game would treat it as
+/// a hero), such as `"h001"`.
+/// Gameplay code reads it from `src/generated/objects.yue`.
+id: String(matches(Regex(#"[a-z0-9][A-Za-z0-9]{3}"#)))

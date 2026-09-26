@@ -1,0 +1,46 @@
+/// One file of custom objects under `objects/`. Start each file with `amends "@moonwell/ObjectFile.pkl"`; organise the
+/// files however you like (by category, or a hero with its abilities and buffs in one file).
+///
+/// Each category maps a key to an object. The key names the object in gameplay code (`objects.units.captain` from
+/// `src/generated/objects.yue`), so it must be an identifier and not a Lua or YueScript keyword. Keys are unique per
+/// category across all files.
+///
+/// ```
+/// units {
+///   ["captain"] {
+///     id = "h000"
+///     base = "hfoo"
+///     name = "Captain"
+///   }
+/// }
+/// ```
+module moonwell.ObjectFile
+
+import "objects/Ability.pkl"
+import "objects/Buff.pkl"
+import "objects/Building.pkl"
+import "objects/Hero.pkl"
+import "objects/Item.pkl"
+import "objects/Unit.pkl"
+import "objects/Upgrade.pkl"
+
+/// Lua 5.3 keywords and the words YueScript reserves.
+local const keywords: Set<String> = Set(
+  "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto", "if", "in", "local", "nil", "not",
+  "or", "repeat", "return", "then", "true", "until", "while",
+  "as", "class", "close", "continue", "export", "extends", "from", "global", "import", "macro", "switch", "try",
+  "unless", "using", "when", "with"
+)
+
+local const function isKeyword(key: String): Boolean = keywords.contains(key)
+
+/// An object key: letters, digits and `_`, not starting with a digit, and not a Lua or YueScript keyword.
+typealias Key = String(matches(Regex("[A-Za-z_][A-Za-z0-9_]*")), !isKeyword(this))
+
+heroes: Mapping<Key, Hero> = new {}
+units: Mapping<Key, Unit> = new {}
+buildings: Mapping<Key, Building> = new {}
+items: Mapping<Key, Item> = new {}
+abilities: Mapping<Key, Ability> = new {}
+buffs: Mapping<Key, Buff> = new {}
+upgrades: Mapping<Key, Upgrade> = new {}

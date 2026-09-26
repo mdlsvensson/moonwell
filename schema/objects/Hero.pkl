@@ -1,0 +1,11 @@
+/// A custom hero.
+///
+/// Omitted or `null` properties inherit from `base`. See `Object.pkl` for `base` and `properties`.
+module moonwell.objects.Hero
+
+extends "../generated/HeroProps.pkl"
+
+/// The object's own id: four ASCII letters or digits, starting with an uppercase letter (the game treats exactly those
+/// unit ids as heroes), such as `"H000"`.
+/// Gameplay code reads it from `src/generated/objects.yue`.
+id: String(matches(Regex(#"[A-Z][A-Za-z0-9]{3}"#)))

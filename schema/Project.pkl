@@ -7,6 +7,7 @@
 module moonwell.Project
 
 import "MapSettings.pkl"
+import "Objects.pkl"
 
 /// `path` split on `/` and `\`, without empty and `.` segments.
 local const function segments(path: String): List<String> =
@@ -79,3 +80,7 @@ launch: LaunchConfig = new {}
 yue: YueConfig = new {}
 assets: AssetsConfig = new {}
 settings: MapSettings = new {}
+
+/// Custom units, heroes, buildings, items, abilities, buffs and upgrades, written into the built map. Wire in the files
+/// under `objects/` with `import "@moonwell/Objects.pkl"` and `objects = Objects.merge(import*("objects/**.pkl"))`.
+objects: Objects = new {}

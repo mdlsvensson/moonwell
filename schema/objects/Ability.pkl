@@ -1,0 +1,11 @@
+/// A custom ability. Fields specific to one base ability (Holy Light's "Amount Healed/Damaged", ...) have no
+/// typed property: set them through `properties`.
+///
+/// Omitted or `null` properties inherit from `base`. See `Object.pkl` for `base` and `properties`.
+module moonwell.objects.Ability
+
+extends "../generated/AbilityProps.pkl"
+
+/// The object's own id: four ASCII letters or digits, such as `"A000"`.
+/// Gameplay code reads it from `src/generated/objects.yue`.
+id: String(matches(Regex(#"[A-Za-z0-9]{4}"#)))

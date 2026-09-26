@@ -1,0 +1,8 @@
+amends "../../../../../ObjectFile.pkl"
+
+abilities {
+  ["holyLight"] {
+    id = "A000"
+    base = "AHhb"
+  }
+}

@@ -1,0 +1,57 @@
+/// Every custom object of a project, merged from the files under `objects/`. `moonwell.pkl` wires them in with:
+///
+/// ```
+/// import "@moonwell/Objects.pkl"
+/// objects = Objects.merge(import*("objects/**.pkl"))
+/// ```
+module moonwell.Objects
+
+import "ObjectFile.pkl"
+import "objects/Ability.pkl"
+import "objects/Buff.pkl"
+import "objects/Building.pkl"
+import "objects/Hero.pkl"
+import "objects/Item.pkl"
+import "objects/Unit.pkl"
+import "objects/Upgrade.pkl"
+
+heroes: Mapping<ObjectFile.Key, Hero> = new {}
+units: Mapping<ObjectFile.Key, Unit> = new {}
+buildings: Mapping<ObjectFile.Key, Building> = new {}
+items: Mapping<ObjectFile.Key, Item> = new {}
+abilities: Mapping<ObjectFile.Key, Ability> = new {}
+buffs: Mapping<ObjectFile.Key, Buff> = new {}
+upgrades: Mapping<ObjectFile.Key, Upgrade> = new {}
+
+/// Merges object files keyed by path, as `import*` returns them, and sets each object's `source` to its file's key.
+/// Throws when two files define the same key in the same category, naming both files.
+function merge(files: Mapping<String, ObjectFile>): module = (module) {
+  heroes { ...mergeCategory(files, "heroes", (file) -> file.heroes) }
+  units { ...mergeCategory(files, "units", (file) -> file.units) }
+  buildings { ...mergeCategory(files, "buildings", (file) -> file.buildings) }
+  items { ...mergeCategory(files, "items", (file) -> file.items) }
+  abilities { ...mergeCategory(files, "abilities", (file) -> file.abilities) }
+  buffs { ...mergeCategory(files, "buffs", (file) -> file.buffs) }
+  upgrades { ...mergeCategory(files, "upgrades", (file) -> file.upgrades) }
+}
+
+local function mergeCategory(
+  files: Mapping<String, ObjectFile>,
+  category: String,
+  select: (ObjectFile) -> Mapping<String, Any>
+): Mapping =
+  let (owners = files.toMap().entries.flatMap((entry) -> select.apply(entry.value).keys.toList().map((key) ->
+    Pair(key, entry.key))).groupBy((owner) -> owner.first))
+  let (clashes = owners.filter((_, list) -> list.length > 1))
+    if (!clashes.isEmpty)
+      throw(clashes.entries.map((clash) ->
+        "\(category)[\"\(clash.key)\"] is defined in both \(clash.value[0].second) and \(clash.value[1].second).")
+        .join("\n"))
+    else
+      new Mapping {
+        for (path, file in files) {
+          for (key, object in select.apply(file)) {
+            [key] = (object) { source = path }
+          }
+        }
+      }
