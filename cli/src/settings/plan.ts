@@ -20,12 +20,12 @@ const equalBytes = (a: Uint8Array, b: Uint8Array) =>
 
 const hasEntries = (sections: Sections) => Object.values(sections).some((entries) => Object.keys(entries).length > 0);
 
-/** Reads a map file; `undefined` only when an optional file does not exist. */
-async function readMapFile(file: string, optional: true): Promise<Uint8Array | undefined>;
-async function readMapFile(file: string, optional: false): Promise<Uint8Array>;
-async function readMapFile(file: string, optional: boolean): Promise<Uint8Array | undefined> {
+/** Reads a map file; `undefined` only when an optional file does not exist. Errors name `file`, not `path`. */
+async function readMapFile(path: string, file: string, optional: true): Promise<Uint8Array | undefined>;
+async function readMapFile(path: string, file: string, optional: false): Promise<Uint8Array>;
+async function readMapFile(path: string, file: string, optional: boolean): Promise<Uint8Array | undefined> {
   try {
-    return await Deno.readFile(file);
+    return await Deno.readFile(path);
   } catch (cause) {
     if (cause instanceof Deno.errors.NotFound) {
       if (optional) return undefined;
@@ -58,43 +58,49 @@ function decodeText(bytes: Uint8Array, file: string): { bom: string; text: strin
 /**
  * Computes every internal-file change the settings make to the map folder `mapDir`, without writing anything.
  * Returns changed files only, in the order war3map.w3i, war3map.lua, war3mapMisc.txt, war3mapSkin.txt.
+ *
+ * `manifestFile` is the evaluated manifest that map-independent errors name. `sourceLabel` is the folder that map-file
+ * errors name, such as `maps/map.w3x` when `mapDir` is a staged copy: the user fixes the source, not the copy. Without
+ * it errors name the absolute path in `mapDir`. Returned changes always carry absolute paths in `mapDir`.
  */
 export async function planMapSettings(
   mapDir: string,
   settings: MapSettings,
   manifestFile?: string,
+  sourceLabel?: string,
 ): Promise<SettingsChange[]> {
   if (!hasSettings(settings)) return [];
   // Map-independent conflicts fail before any map file is read.
   const misc = gameplaySections(settings, manifestFile);
   const skin = settings.gameInterface;
   const dir = resolve(mapDir);
+  const label = (name: string) => sourceLabel === undefined ? join(dir, name) : `${sourceLabel}/${name}`;
   const changes: SettingsChange[] = [];
   const extended = hasExtendedSettings(settings);
 
   const needsW3i = extended || Object.keys(settings.info).length > 0 || Object.keys(settings.loadingScreen).length > 0;
   const needsLua = extended || settings.info.name !== undefined || settings.info.description !== undefined;
   if (needsW3i) {
-    const w3iFile = join(dir, "war3map.w3i");
-    const w3i = await readMapFile(w3iFile, false);
+    const w3iPath = join(dir, "war3map.w3i"), w3iFile = label("war3map.w3i");
+    const w3i = await readMapFile(w3iPath, w3iFile, false);
     const patched = patchMapInfo(w3i, settings, w3iFile);
-    if (!equalBytes(patched, w3i)) changes.push({ file: w3iFile, bytes: patched });
+    if (!equalBytes(patched, w3i)) changes.push({ file: w3iPath, bytes: patched });
     if (needsLua) {
-      const luaFile = join(dir, "war3map.lua");
-      const { bom, text } = decodeText(await readMapFile(luaFile, false), luaFile);
+      const luaPath = join(dir, "war3map.lua"), luaFile = label("war3map.lua");
+      const { bom, text } = decodeText(await readMapFile(luaPath, luaFile, false), luaFile);
       const lua = patchSettingsLua(text, settings, patched, luaFile);
-      if (lua !== text) changes.push({ file: luaFile, bytes: new TextEncoder().encode(bom + lua) });
+      if (lua !== text) changes.push({ file: luaPath, bytes: new TextEncoder().encode(bom + lua) });
     }
   }
 
   for (const [name, sections] of [["war3mapMisc.txt", misc], ["war3mapSkin.txt", skin]] as const) {
     if (!hasEntries(sections)) continue;
-    const file = join(dir, name);
-    const source = await readMapFile(file, true);
+    const path = join(dir, name), file = label(name);
+    const source = await readMapFile(path, file, true);
     const { bom, text } = source === undefined ? { bom: "", text: "" } : decodeText(source, file);
     const merged = patchSettingsText(text, sections);
     if (source === undefined || merged !== text) {
-      changes.push({ file, bytes: new TextEncoder().encode(bom + merged) });
+      changes.push({ file: path, bytes: new TextEncoder().encode(bom + merged) });
     }
   }
   return changes;

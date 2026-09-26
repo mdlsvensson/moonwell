@@ -269,3 +269,27 @@ Deno.test("the settings source map must be an existing folder under maps/", asyn
     assertEquals(outside.file, "moonwell.local.pkl");
   });
 });
+
+Deno.test("a source label names the map file the user edits while changes keep absolute staged paths", async () => {
+  await withDir(async (dir) => {
+    const label = "maps/map.w3x";
+    const plan = (input: unknown) => planMapSettings(dir, validateMapSettings(input), "moonwell.local.pkl", label);
+    const refuses = async (input: unknown, file: string) => {
+      const error = await assertRejects(() => plan(input), MoonwellError);
+      assertEquals(error.file, file);
+    };
+    await refuses({ loadingScreen: { title: "T" } }, `${label}/war3map.w3i`);
+    await Deno.writeFile(join(dir, "war3map.w3i"), await fixtureBytes());
+    await refuses({ players: { "5": { name: "Absent" } } }, `${label}/war3map.w3i`);
+    await refuses({ info: { name: "Needs Lua" } }, `${label}/war3map.lua`);
+    await Deno.writeTextFile(join(dir, "war3map.lua"), (await fixtureLua()).replace("SetMapName(", "Other("));
+    await refuses({ info: { name: "Refused" } }, `${label}/war3map.lua`);
+    await Deno.writeTextFile(join(dir, "war3map.lua"), await fixtureLua());
+    await Deno.mkdir(join(dir, "war3mapSkin.txt"));
+    await refuses({ gameInterface: { A: { B: "c" } } }, `${label}/war3mapSkin.txt`);
+    await Deno.writeFile(join(dir, "war3mapMisc.txt"), new Uint8Array([0xc3]));
+    await refuses({ gameplay: { foodLimit: 1 } }, `${label}/war3mapMisc.txt`);
+    const changes = await plan({ info: { name: "Labelled" } });
+    assertEquals(changes.map((change) => change.file), ["war3map.w3i", "war3map.lua"].map((f) => join(dir, f)));
+  });
+});
