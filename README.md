@@ -188,7 +188,7 @@ Gameplay Constants) and `war3mapSkin.txt` (Game Interface). They are left out of
 
 ```pkl
 settings {
-  gameplayConstants { ["Misc"] { ["HeroMaxLevel"] = "25" } }
+  gameplayConstants { ["Misc"] { ["MaxHeroLevel"] = "25" } }
   gameInterface { ["CustomSkin"] { ["Test"] = "value" } }
 }
 ```
@@ -200,8 +200,8 @@ settings {
   own spelling. Two names in one mapping that differ only in case are an error.
 - Every matching key is replaced, a missing key is added to its section, and a missing section or file is created. Other
   sections, keys and comments stay as they are.
-- `gameplay.heroMaxLevel` and `gameplay.foodLimit` write `[Misc] HeroMaxLevel` and `[Misc] FoodCeiling`. If you set the
-  same key raw as well, the two must agree exactly: `heroMaxLevel = 25` with `["HeroMaxLevel"] = "25"` is accepted, with
+- `gameplay.heroMaxLevel` and `gameplay.foodLimit` write `[Misc] MaxHeroLevel` and `[Misc] FoodCeiling`. If you set the
+  same key raw as well, the two must agree exactly: `heroMaxLevel = 25` with `["MaxHeroLevel"] = "25"` is accepted, with
   `"025"` it is an error.
 
 ## Editor support

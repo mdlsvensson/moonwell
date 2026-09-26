@@ -108,7 +108,7 @@ Deno.test("build applies settings to the archive only, repeatably, and never to 
 
   assertSettingsLua(decode(await archive.read("war3map.lua")));
   const misc = decode(await archive.read("war3mapMisc.txt"));
-  assertStringIncludes(misc, "HeroMaxLevel=25");
+  assertStringIncludes(misc, "MaxHeroLevel=25");
   assertStringIncludes(misc, "FoodCeiling=200");
   assertStringIncludes(decode(await archive.read("war3mapSkin.txt")), "[CustomSkin]\nTest=value");
   const imported = readImports((await archive.read("war3map.imp"))!).map((entry) => entry.path.toLowerCase());

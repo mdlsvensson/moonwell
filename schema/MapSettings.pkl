@@ -28,7 +28,7 @@ loadingScreen: LoadingScreen = new {}
 
 /// Advanced: raw section/key overrides for war3mapMisc.txt (World Editor's Gameplay Constants), such as
 /// `gameplayConstants { ["Misc"] { ["DefenseArmor"] = "0.05" } }`. Names match case-insensitively, and a raw
-/// key must equal a matching typed `gameplay` setting (`HeroMaxLevel`, `FoodCeiling`) when both are set.
+/// key must equal a matching typed `gameplay` setting (`MaxHeroLevel`, `FoodCeiling`) when both are set.
 /// Left out of the project template.
 gameplayConstants: Mapping<SectionName, Mapping<FieldName, FieldValue>> = new {}
 
