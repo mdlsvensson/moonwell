@@ -59,7 +59,7 @@ export async function prepareStage(
   const source = join(ctx.root, "maps", project.map.folder);
   if (!(await exists(source))) {
     throw new MoonwellError(`Source map folder maps/${project.map.folder} not found.`, {
-      file: "moonwell.pkl",
+      file: project.manifest,
       hint: "Set map.folder to a folder under maps/ saved by World Editor in folder format.",
     });
   }

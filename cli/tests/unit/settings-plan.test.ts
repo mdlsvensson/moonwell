@@ -293,3 +293,51 @@ Deno.test("a source label names the map file the user edits while changes keep a
     assertEquals(changes.map((change) => change.file), ["war3map.w3i", "war3map.lua"].map((f) => join(dir, f)));
   });
 });
+
+/** Whether this file system keeps two names that differ only in letter case apart (Linux usually; Windows never). */
+async function caseSensitive(dir: string): Promise<boolean> {
+  await Deno.writeTextFile(join(dir, "probe"), "");
+  const sensitive = await Deno.stat(join(dir, "PROBE")).then(() => false, () => true);
+  await Deno.remove(join(dir, "probe"));
+  return sensitive;
+}
+
+Deno.test("settings files are found in any letter case and written back under the existing name", async () => {
+  await withDir(async (dir) => {
+    await Deno.writeFile(join(dir, "WAR3MAP.W3I"), await fixtureBytes());
+    await Deno.writeTextFile(join(dir, "War3Map.Lua"), await fixtureLua());
+    await Deno.writeTextFile(join(dir, "war3mapskin.txt"), "[A]\nOld=1\n");
+    await Deno.writeTextFile(join(dir, "WAR3MAPMISC.TXT"), "[Misc]\n");
+    const plan = await planMapSettings(
+      dir,
+      validateMapSettings({ info: { name: "Cased" }, gameplay: { foodLimit: 7 }, gameInterface: { A: { B: "c" } } }),
+      undefined,
+      "maps/map.w3x",
+    );
+    assertEquals(
+      plan.map((change) => change.file),
+      ["WAR3MAP.W3I", "War3Map.Lua", "WAR3MAPMISC.TXT", "war3mapskin.txt"].map((name) => join(dir, name)),
+    );
+    assertEquals(decode(plan[3].bytes), "[A]\nOld=1\nB=c\n");
+    await applySettingsPlan(plan);
+    const names = (await Array.fromAsync(Deno.readDir(dir))).map((entry) => entry.name).sort();
+    assertEquals(names, ["WAR3MAP.W3I", "WAR3MAPMISC.TXT", "War3Map.Lua", "war3mapskin.txt"]);
+  });
+});
+
+Deno.test("two settings files differing only in letter case are a map-file error", async () => {
+  await withDir(async (dir) => {
+    if (!(await caseSensitive(dir))) return; // Such a map cannot exist on this file system.
+    await Deno.writeTextFile(join(dir, "war3mapSkin.txt"), "[A]\n");
+    await Deno.writeTextFile(join(dir, "war3mapskin.txt"), "[A]\n");
+    const before = await snapshot(dir);
+    const error = await assertRejects(
+      () => planMapSettings(dir, validateMapSettings({ gameInterface: { A: { B: "c" } } }), undefined, "maps/map.w3x"),
+      MoonwellError,
+      "differ only in letter case",
+    );
+    assertEquals(error.file, "maps/map.w3x/war3mapskin.txt");
+    assertEquals(Boolean(error.hint), true);
+    assertEquals(await snapshot(dir), before);
+  });
+});

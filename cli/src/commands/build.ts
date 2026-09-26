@@ -35,14 +35,14 @@ export async function archivePath(root: string, project: Project): Promise<strin
   const inside = relative(resolve(root), output);
   if (inside === "" || inside === ".." || inside.startsWith(`..${SEPARATOR}`) || isAbsolute(inside)) {
     throw new MoonwellError(`The build output ${output} is outside the project.`, {
-      file: "moonwell.pkl",
+      file: project.manifest,
       hint: "Set build.folder to a folder inside the project, such as dist/bin.",
     });
   }
   const isDirectory = await Deno.stat(output).then((info) => info.isDirectory, () => false);
   if (isDirectory) {
     throw new MoonwellError(`The build output ${toPosix(inside)} is a directory; refusing to replace it.`, {
-      file: "moonwell.pkl",
+      file: project.manifest,
       hint: "Set build.folder to a folder that only holds build output, such as dist/bin.",
     });
   }

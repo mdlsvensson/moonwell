@@ -85,6 +85,9 @@ function assertSettingsLua(lua: string) {
 Deno.test("build applies settings to the archive only, repeatably, and never to the source map", async () => {
   const project = await newProject();
   await writeLocal(project, SETTINGS);
+  // A real asset, so war3map.imp exists and the settings files are shown not to be imported beside it.
+  await Deno.mkdir(join(project, "assets", "Models"), { recursive: true });
+  await Deno.writeFile(join(project, "assets", "Models", "unit.mdx"), new Uint8Array([1, 2, 3]));
   const before = await snapshot(sourceMap(project));
 
   const first = await deno(["task", "build"], project);
@@ -108,8 +111,8 @@ Deno.test("build applies settings to the archive only, repeatably, and never to 
   assertStringIncludes(misc, "HeroMaxLevel=25");
   assertStringIncludes(misc, "FoodCeiling=200");
   assertStringIncludes(decode(await archive.read("war3mapSkin.txt")), "[CustomSkin]\nTest=value");
-  const imp = await archive.read("war3map.imp");
-  const imported = imp === undefined ? [] : readImports(imp).map((entry) => entry.path.toLowerCase());
+  const imported = readImports((await archive.read("war3map.imp"))!).map((entry) => entry.path.toLowerCase());
+  assertEquals(imported, ["models\\unit.mdx"]);
   for (const name of SETTINGS_FILES) assert(!imported.includes(name.toLowerCase()), `${name} imported as an asset`);
 
   const firstFiles = await Promise.all(SETTINGS_FILES.map((name) => archive.read(name)));
@@ -118,6 +121,28 @@ Deno.test("build applies settings to the archive only, repeatably, and never to 
   const rebuilt = openMpq(await Deno.readFile(archiveOf(project)));
   assertEquals(await Promise.all(SETTINGS_FILES.map((name) => rebuilt.read(name))), firstFiles);
   assertEquals(await snapshot(sourceMap(project)), before);
+});
+
+Deno.test("build patches a settings file saved in another letter case instead of adding a second one", async () => {
+  const project = await newProject();
+  await Deno.writeTextFile(join(sourceMap(project), "war3mapskin.txt"), "[CustomSkin]\nOld=1\n");
+  await writeLocal(project, 'settings { gameInterface { ["CustomSkin"] { ["Test"] = "value" } } }\n');
+  const built = await deno(["task", "build"], project);
+  assertEquals(built.code, 0, built.text);
+  const skin = decode(await openMpq(await Deno.readFile(archiveOf(project))).read("war3mapSkin.txt"));
+  assertEquals(skin, "[CustomSkin]\nOld=1\nTest=value\n");
+  const staged = await Array.fromAsync(Deno.readDir(join(project, "dist", "stage", "map.w3x")));
+  assertEquals(staged.filter((entry) => entry.name.toLowerCase() === "war3mapskin.txt").map((e) => e.name), [
+    "war3mapskin.txt",
+  ]);
+});
+
+Deno.test("build names the selected local manifest when map.folder is missing", async () => {
+  const project = await newProject();
+  await writeLocal(project, 'map { folder = "missing.w3x" }\n');
+  const built = await deno(["task", "build"], project);
+  assertEquals(built.code, 1, built.text);
+  assertStringIncludes(built.text, "error: moonwell.local.pkl › Source map folder maps/missing.w3x not found.");
 });
 
 Deno.test("a settings failure after a successful build removes the old archive and leaves the source untouched", async () => {
