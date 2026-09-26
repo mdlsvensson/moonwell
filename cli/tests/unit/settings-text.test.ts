@@ -46,7 +46,7 @@ Deno.test("text patches recognize tab-indented keys and case-only section and ke
 Deno.test("text patches add keys to empty sections and create missing sections", () => {
   assertEquals(
     patchSettingsText("[Misc]\n[Skin]\n", { Misc: { FoodCeiling: "0" }, Skin: { Text: "" }, New: { Value: "1" } }),
-    "[Misc]\nFoodCeiling=0\n[Skin]\n\nText=\n\n[New]\nValue=1",
+    "[Misc]\nFoodCeiling=0\n[Skin]\nText=\n\n[New]\nValue=1\n",
   );
 });
 
@@ -55,4 +55,27 @@ Deno.test("text patches replace the entire existing value line", () => {
     patchSettingsText("[Misc]\nFoodCeiling=100 ; stale note\n", { Misc: { FoodCeiling: "200" } }),
     "[Misc]\nFoodCeiling=200\n",
   );
+});
+
+Deno.test("text patches keep the INI layout: no stray blank lines, final newline kept", () => {
+  for (const nl of ["\n", "\r\n"]) {
+    const lines = (...parts: string[]) => parts.join(nl);
+    const cases: [string, Record<string, Record<string, string>>, string][] = [
+      // A new key follows the section's last entry, and the final newline survives.
+      [lines("[Misc]", "A=1", ""), { Misc: { B: "2" } }, lines("[Misc]", "A=1", "B=2", "")],
+      // A blank line separating sections stays between them, not before the new key.
+      [lines("[A]", "X=1", "", "[B]", "Y=2", ""), { A: { K: "v" } }, lines("[A]", "X=1", "K=v", "", "[B]", "Y=2", "")],
+      // A new section gets one blank separator line and keeps the final newline.
+      [lines("[A]", "X=1", ""), { New: { K: "v" } }, lines("[A]", "X=1", "", "[New]", "K=v", "")],
+      // No second separator when the source already ends with a blank line.
+      [lines("[A]", "X=1", "", ""), { New: { K: "v" } }, lines("[A]", "X=1", "", "[New]", "K=v", "")],
+      // Without a final newline in the source, none is added.
+      [lines("[A]", "X=1"), { New: { K: "v" } }, lines("[A]", "X=1", "", "[New]", "K=v")],
+    ];
+    for (const [source, sections, expected] of cases) {
+      const patched = patchSettingsText(source, sections);
+      assertEquals(patched, expected);
+      assertEquals(patchSettingsText(patched, sections), patched);
+    }
+  }
 });
