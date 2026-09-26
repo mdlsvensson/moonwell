@@ -1088,7 +1088,7 @@ Warcraft III/World Editor versions when the gate is run.
 CHANGELOG under Unreleased: map settings in the manifest, coordinated map/Lua edits, read-only settings check, and
 source-map preservation. Do not record a release or bump any version.
 
-- [ ] **Step 3: Perform a final spec/implementation review.**
+- [x] **Step 3: Perform a final spec/implementation review.**
 
 Review all changes against spec §§3–10. Confirm tests actually exercise every Review Focus item. Confirm no Node/npm
 imports were copied, no generated file is stale, and fixtures carry provenance. Check error messages name one file
