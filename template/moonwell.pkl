@@ -4,6 +4,11 @@
 
 amends "@moonwell/Project.pkl"
 
+import "@moonwell/Objects.pkl"
+
+// Custom units, heroes, items, abilities and more: one or more files under objects/, merged here.
+objects = Objects.merge(import*("objects/**.pkl"))
+
 map {
   folder = "map.w3x"      // World Editor map folder under maps/ (folder format, Lua script mode)
   entry = "src/main.yue"  // gameplay entry point

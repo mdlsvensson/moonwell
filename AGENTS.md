@@ -4,17 +4,18 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-26 after Plan 2b.
+over, and updated on 2026-09-26 after Plan 2c.
 
 ## Read first
 
 - `docs/superpowers/specs/2026-09-24-moonwell-core-design.md` is the **binding design** for the whole project. Its §6
-  describes the data layers: §6.1 object data is still to build; §6.2 assets and §6.3 map settings are done.
+  describes the data layers: §6.1 object data, §6.2 assets and §6.3 map settings are all implemented.
 - `README.md` (user docs), `CONTRIBUTING.md` (checks, release gate, publishing), `CHANGELOG.md` (0.1.0 released,
   `## Unreleased` lists what is done since).
 - Later specs, all implemented: `2026-09-25-moonwell-model-paths-design.md`,
-  `2026-09-25-moonwell-in-game-paths-design.md` and `2026-09-25-moonwell-map-settings-design.md`. Plans for everything
-  built so far are in `docs/superpowers/plans/`; follow their style when writing new plans.
+  `2026-09-25-moonwell-in-game-paths-design.md`, `2026-09-25-moonwell-map-settings-design.md` and
+  `2026-09-26-moonwell-object-data-design.md`. Plans for everything built so far are in `docs/superpowers/plans/`;
+  follow their style when writing new plans.
 
 ## State (2026-09-26)
 
@@ -41,24 +42,26 @@ over, and updated on 2026-09-26 after Plan 2b.
     lobby creation), the hero level key is `MaxHeroLevel`, and w3i colours are stored blue, green, red, alpha (fixture
     `cli/tests/fixtures/map-settings-v39/war3map-colors.w3i`). Sound environments use World Editor's internal names,
     such as `Default` or `Dungeon`.
+- **Object data (Plan 2c, `docs/superpowers/plans/2026-09-26-moonwell-object-data.md`) implemented on `main`, awaiting
+  the maintainer's in-game gate (CONTRIBUTING step 9).** Custom objects in Pkl under `objects/` (schema
+  `schema/ObjectFile.pkl`, `Objects.pkl`, `objects/`, and `generated/*Props.pkl` rendered by `deno task gen` from
+  `cli/data/metadata.json`, which `deno task gen:metadata` builds from the game's SLKs). Builds append them to the
+  staged map's modification files and their `war3mapSkin.*` counterparts, keeping World Editor's bytes, and write
+  `src/generated/objects.yue`; `check` fails when it is stale. `objects:check` and `objects:eval` are new. Code is in
+  `cli/src/objectdata/`; the World Editor save the reader and writer are tested against is
+  `cli/tests/fixtures/objects-v3-names/`. Per-level values and changed level counts follow the community layout and are
+  proven only by the gate. The template's footman is the Captain (`template/objects/units.pkl`).
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `eea99d9`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Plan 2c: object data** (next feature, 0.3.0) (spec §6.1): custom units, heroes, buildings, items, abilities, buffs
-   and upgrades in Pkl, written into the map's modification files (`w3u`/`w3t`/`w3h`/`w3a`/`w3q` and their
-   `war3mapSkin.*` counterparts), plus the generated `src/generated/objects.yue`.
-   - **Blocked on the maintainer.** It needs the game's SLKs (`UnitMetaData`, `AbilityMetaData`, `AbilityBuffMetaData`,
-     `UpgradeMetaData`, and the `UnitData`/`ItemData`/`AbilityData`/`AbilityBuffData`/`UpgradeData` id lists), extracted
-     with CascView. It also needs a small test map saved by World Editor 3.00 with one custom object of each kind, to
-     confirm the version-3 file format and the skin split (spec §11).
-   - The reference framework used the npm `war3-objectdata-th` package for this; Moonwell must write its own
-     reader/writer.
-   - Object data runs before settings in the pipeline (spec §7 of the map settings design).
-   - Payoff: the template can restore the original footman-as-Captain (object data swaps its model).
-2. **Publish 0.2.0** if it is not on JSR yet: CONTRIBUTING's Publishing steps 2 to 5 (versions are already bumped).
+1. **Object data release gate** (CONTRIBUTING step 9, Plan 2c Task 9): walk the maintainer through it in a throwaway
+   project; fix what it finds with a regression test each, and record the result in CHANGELOG.
+2. **Publish 0.2.0** if it is not on JSR yet: Publishing steps 2 to 5, run from a checkout of the `v0.2.0` tag (the
+   `moonwell@0.2.0` release goes on that commit), since `main` now carries the unreleased object data.
+3. **Release 0.3.0:** bump the versions and publish per CONTRIBUTING's Publishing steps.
    - `pkl project package` may need `--skip-publish-check` in sandboxed shells.
    - For 24 hours after publishing, Deno blocks the new version unless you pass `--min-dep-age=0`.
 
@@ -79,9 +82,10 @@ over, and updated on 2026-09-26 after Plan 2b.
   error is reported as an internal "please report" error, so user mistakes must never reach it.
 - **Style:** file system code is async. `deno fmt` uses width 120; `template/`, `docs/` and `cli/src/embedded/` are
   excluded. `deno fmt --check` and `deno lint` must be clean.
-- **Generated files:** after changing `template/`, `cli/runtime/moonwell.lua` or `cli/data/game-paths.txt`, run
-  `deno task gen`; the embedded modules in `cli/src/embedded/` are freshness-tested. Nothing stray may be left in
-  `template/`: every file there is embedded into `init`, and a stray file fails the embedded-template test.
+- **Generated files:** after changing `template/`, `cli/runtime/moonwell.lua`, `cli/data/game-paths.txt` or
+  `cli/data/metadata.json`, run `deno task gen`; the embedded modules in `cli/src/embedded/` and `schema/generated/` are
+  freshness-tested. Nothing stray may be left in `template/`: every file there is embedded into `init`, and a stray file
+  fails the embedded-template test. `template/src/generated/objects.yue` must match `template/objects/` (e2e).
 - **Pkl:** `pkl` 0.32 is required. A module property can't be named `output`, because it clashes with Pkl's built-in.
   Pkl `Mapping` values are type-checked lazily: tests that expect a constraint error must force the values (`.toMap()`).
 

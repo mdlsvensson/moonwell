@@ -17,22 +17,24 @@ import { silentLogger } from "../support/logger.ts";
 
 const CATEGORIES = ["heroes", "units", "buildings", "items", "abilities", "buffs", "upgrades"];
 
-/** Scaffolds an `init --link` project with the spec's two wiring lines, runs `body`, and removes the folder. */
+const WIRING = '\nimport "@moonwell/Objects.pkl"\n';
+
+/**
+ * Scaffolds an `init --link` project without the template's Captain, so each test starts from no objects, runs `body`,
+ * and removes the folder. `wiring = false` also removes the template's `objects = Objects.merge(...)` wiring.
+ */
 async function withProject(body: (root: string) => Promise<void>, wiring = true): Promise<void> {
   const parent = await Deno.makeTempDir({ prefix: "moonwell-objects-" });
   try {
     const root = await init(join(parent, "map"), createContext(parent, silentLogger()), { link: true });
-    if (wiring) {
+    await Deno.remove(join(root, "objects"), { recursive: true });
+    await Deno.remove(join(root, OBJECT_IDS_FILE));
+    if (!wiring) {
       const manifest = join(root, "moonwell.pkl");
       const text = await Deno.readTextFile(manifest);
-      await Deno.writeTextFile(
-        manifest,
-        text.replace(
-          'amends "@moonwell/Project.pkl"\n',
-          'amends "@moonwell/Project.pkl"\n\nimport "@moonwell/Objects.pkl"\n',
-        ) +
-          '\nobjects = Objects.merge(import*("objects/**.pkl"))\n',
-      );
+      const unwired = text.replace(WIRING, "").replace(/\n.*\nobjects = Objects\.merge\(.*\)\n/, "\n");
+      assert(!unwired.includes("Objects"), unwired);
+      await Deno.writeTextFile(manifest, unwired);
     }
     await body(root);
   } finally {

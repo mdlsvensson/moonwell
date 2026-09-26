@@ -32,6 +32,8 @@ deno task test
 | `moonwell.pkl`       | Project manifest (`amends "@moonwell/Project.pkl"`), shared by the team; everyday settings written out |
 | `moonwell.local.pkl` | This machine's settings, such as the game path; git-ignored, and `deno task setup` recreates it        |
 | `src/main.yue`       | Gameplay entry                                                                                         |
+| `objects/`           | Custom units, heroes, items, abilities and more, in Pkl                                                |
+| `src/generated/`     | `objects.yue`, the ids of those objects for gameplay code; written by builds, commit it                |
 | `maps/map.w3x/`      | World Editor map (folder format, Lua script mode)                                                      |
 | `assets/`            | Files to import into the map                                                                           |
 | `.asset-state/`      | Which source-map files `assets:sync` owns; commit it                                                   |
@@ -147,6 +149,113 @@ Mistakes in the manifest name the manifest that was evaluated (`moonwell.local.p
 files are matched ignoring letter case, as Warcraft III does: a map saved with `war3mapskin.txt` is patched under that
 name.
 
+## Objects
+
+Custom units, heroes, buildings, items, abilities, buffs and upgrades are written in Pkl under `objects/`. Builds add
+them to the map's object data (`war3map.w3u` and the other modification files, and their `war3mapSkin.*` counterparts),
+in the staged copy only. `moonwell.pkl` merges every file under `objects/`, in any folders:
+
+```pkl
+import "@moonwell/Objects.pkl"
+objects = Objects.merge(import*("objects/**.pkl"))
+```
+
+Every file there amends `@moonwell/ObjectFile.pkl` and fills any of the mappings `heroes`, `units`, `buildings`,
+`items`, `abilities`, `buffs` and `upgrades`. Put shared helpers in a module outside `objects/` and import them, since
+every `.pkl` file under `objects/` is merged as an object file. The template's Captain:
+
+```pkl
+amends "@moonwell/ObjectFile.pkl"
+
+units {
+  ["captain"] {
+    id = "h000"
+    base = "hfoo"
+    name = "Captain"
+    modelFile = #"units\human\TheCaptain\TheCaptain"#
+    iconGameInterface = #"ReplaceableTextures\CommandButtons\BTNTheCaptain.blp"#
+  }
+}
+```
+
+- **Keys** name the object in gameplay code and are unique per category across all files: letters, digits and `_`, not a
+  Lua or YueScript keyword.
+- **`id`** is the new object's four-letter rawcode, unique across all categories and not a standard object's. Heroes
+  start with an uppercase letter; units and buildings must not.
+- **`base`** is the standard object it copies. Objects based on other custom objects are not supported.
+- **Fields** have friendly names made from World Editor's labels: `Hit Points Maximum (Base)` is `hitPointsMaximumBase`.
+  Hover a field in an editor with Pkl support to see its label and rawcode, or read the generated `*Props.pkl` modules
+  in the `moonwell` package.
+
+Builds write `src/generated/objects.yue` with each object's id, so gameplay code does not repeat rawcodes:
+
+```yue
+import "moonwell" as mw
+import "generated.objects" as objects
+
+mw.on_main ->
+  CreateUnit Player(0), objects.units.captain, 0, 0, 270
+```
+
+`build`, `test` and `dev` rewrite it when the objects change. Commit it; `check` fails when it is stale.
+
+### Values and levels
+
+- A value sets the field; on a per-level field it sets level 1. A `List` on a per-level field sets levels 1, 2, ..., and
+  later levels keep the base's values: `cooldown = List(8, 7, 6)`. It may not have more entries than the object's level
+  count (its own `levels`, else the base's).
+- List fields, such as a unit's `normal` abilities, take a comma-separated `String` or a `List<String>`:
+  `normal = List("Adef", "Aslo")`. On a per-level list field, a `List<List<String>>` sets levels.
+- `null` or a field left out keeps the base's value. `false`, `0`, `""` and, on a list field, `List()` are real values.
+- Text is written as literal text; Moonwell never creates `TRIGSTR_` references or changes `war3map.wts`.
+
+Abilities, buffs and upgrades have typed fields only for what every object of the category shares. Fields specific to
+some abilities, such as Holy Light's heal amount, go in `properties`, keyed by friendly name or rawcode:
+
+```pkl
+abilities {
+  ["holy_light"] {
+    id = "A000"
+    base = "AHhb"
+    levels = 4
+    properties { ["amountHealedOrDamaged"] = List(111, 222, 333, 444) }  // or ["Hhb1"]
+  }
+}
+```
+
+A field set twice (typed and in `properties`, or by name and by rawcode) is an error, as is a field that does not apply
+to the base.
+
+### Errors and commands
+
+Pkl reports type and pattern errors with file and line. Moonwell then checks the objects against the game data and the
+map, and reports every problem at once, each with the file, object and field:
+
+```text
+error: objects/heroes.pkl › heroes["paladin"].base: 'Hpla' is not a standard hero.
+hint: Did you mean 'Hpal' (Paladin), 'Hpb1' (Paladin) or 'Hpb2' (Paladin)?
+```
+
+`deno task objects:check` validates without building, lists the internal files a build would change, and says whether
+`src/generated/objects.yue` is current. `check` and `dev` run the same checks. `deno task objects:eval` prints every
+resolved object as JSON: its id, base and source file, and each field's rawcode, name, level, data column and value.
+
+### World Editor objects
+
+Objects made in World Editor stay as they are: modified standard objects and custom objects in the source map are copied
+byte for byte, and Moonwell's objects are added next to them. An `id` already used by a World Editor custom object is an
+error; change the Pkl id or delete the object in World Editor. Builds start from the source map every time, so objects
+never pile up.
+
+Not supported yet:
+
+- Modifying standard objects from Pkl (modify them in World Editor); editing or removing objects made in World Editor.
+- Doodads and destructables, which World Editor's files keep as they are.
+- `TRIGSTR_` references and localized labels.
+- Objects based on custom objects, placing units, and per-unit skins.
+- Importing `.w3o` exports or reading packed `.w3x` maps.
+- Value ranges and named values for fields such as attack types: fields take their plain `Int`, `Number` or `String`.
+
 ## Commands
 
 | Command                                          | What                                                                             |
@@ -159,6 +268,8 @@ name.
 | `deno task assets:sync`                          | Write `assets/` into the source map for World Editor (close the map first)       |
 | `deno task assets:paths [file]`                  | List the files a model references, as in-game or custom paths                    |
 | `deno task settings:check`                       | Show which internal map files the settings would change, without building        |
+| `deno task objects:check`                        | Validate the objects and show which internal map files they would change         |
+| `deno task objects:eval`                         | Print the resolved objects as JSON                                               |
 | `deno task setup`                                | Create a missing `moonwell.local.pkl` and download the pinned YueScript compiler |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,

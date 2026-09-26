@@ -41,7 +41,7 @@ export the file names of the game's CASC storage (for example with CascView) to 
 2. Confirm `cli/data/game-paths.txt` starts with `# Warcraft III <version>`, not the "Not generated yet" placeholder:
    with the placeholder every in-game path is reported as `custom path, not imported`.
 3. `cd template`, run `deno task setup` (it creates `moonwell.local.pkl` if missing; check its `gameExecutable`), then
-   `deno task test`. Confirm "Moonwell is running." prints and the footman north of the heroes changes colour every
+   `deno task test`. Confirm "Moonwell is running." prints and the Captain north of the heroes changes colour every
    second (with ally colour mode off: Alt+A toggles it, and while it is on every unit shows blue, teal or red). Confirm
    the Warcraft III window is visible and stays open after the CLI exits.
 4. Add `error "gate"` inside the `on_main` hook, run `deno task test` again, and confirm the on-screen error names
@@ -64,7 +64,36 @@ export the file names of the game's CASC storage (for example with CascView) to 
    ambient sound, the food ceiling, and that a hero cannot level past the set maximum. Open the packed map in World
    Editor and confirm Map Description, Loading Screen, Player Properties, Force Properties, Map Options (fog, water) and
    Gameplay Constants show the configured values. Confirm `maps/map.w3x` is unchanged (`git status`).
-9. Record the Warcraft III and World Editor versions in the changelog.
+9. Object data, in another throwaway project: `deno run -A cli/src/main.ts init --link <temp dir>/objects-check`. It
+   must be linked: a packaged project resolves `moonwell@0.2.0`, which has no `Objects.pkl`. Commit it to a new git
+   repository (`git init`) so sub-step 5 can use `git status`. This proves what the tests cannot: that the game and
+   World Editor read the files Moonwell writes, including per-level values past level 1.
+   1. Run `deno task test`. Confirm the unit north of the heroes is the Captain (its model, name and icon) and still
+      changes colour.
+   2. Add `objects/gate.pkl` with: a hero based on the Paladin (`Hpal`) with a custom `name` and `startingStrength`,
+      whose `hero` abilities are a custom ability based on Holy Light (`AHhb`) with `levels = 4`,
+      `cooldown = List(1, 2, 3, 4)` and `properties { ["amountHealedOrDamaged"] = List(111, 222, 333, 444) }` (set
+      `heroSkin` to the same list, as the game data does for every hero); a custom buff for that ability's `buffs`, with
+      a new `icon`; a custom item with a new `name`, `goldCost` and `interfaceIcon`; and a custom building based on the
+      Blacksmith (`hbla`) whose `researchesAvailable` is a custom upgrade with `levels = 2` and per-level names
+      (`name = List("...", "...")`). Run `deno task objects:check`: it lists the ten files and reports
+      `src/generated/objects.yue` stale until the next build. In `main.yue`, create the hero, the building and the item
+      for player 0 (from `objects.heroes`, `objects.buildings` and `objects.items`), raise the hero to level 7
+      (`SetHeroLevel hero, 7, false`; a hero ability's level 4 needs hero level 7), and give player 0 gold and lumber
+      for the research (`SetPlayerState Player(0), PLAYER_STATE_RESOURCE_GOLD, 5000`, and the same for lumber).
+   3. Run `deno task test`. The hero shows its name and strength. Learning the ability shows its level 1 to 4 tooltips,
+      and healing a wounded unit heals 111, 222, 333 and 444 at the four levels, with the four cooldowns. The item shows
+      its name and icon. The building offers the upgrade under both level names (level 2, like the Blacksmith's, needs a
+      Keep, so it shows greyed out).
+   4. In World Editor, change the standard Footman's hit points in the project's `maps/map.w3x` and save. Run
+      `deno task build --minify`, play `dist/bin/map.w3x`, and confirm the Footman change survived next to the Moonwell
+      objects.
+   5. Open the packed map in World Editor. The Object Editor lists every custom object under Custom with the configured
+      values: the per-level heal amounts and upgrade names, the item's price, the skin fields (models, icons), and the
+      buff's icon (Holy Light applies no buff in game, so the buff is only checked here). Confirm `maps/map.w3x` is
+      unchanged apart from sub-step 4's edit (`git status`), and that a second build leaves `src/generated/objects.yue`
+      unchanged.
+10. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
 

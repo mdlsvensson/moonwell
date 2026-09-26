@@ -5,6 +5,7 @@ import { readImports } from "../../src/assets/imports.ts";
 import { build } from "../../src/commands/build.ts";
 import { test } from "../../src/commands/test.ts";
 import { type CommandContext, createContext } from "../../src/context.ts";
+import { OBJECT_IDS_FILE, renderObjectIds } from "../../src/objectdata/ids.ts";
 import { readMapInfo } from "../../src/w3i/map-info.ts";
 import { silentLogger } from "../support/logger.ts";
 import { SETTINGS_FIXTURE } from "../support/map-settings.ts";
@@ -213,8 +214,10 @@ Deno.test("check validates settings against the source map without staging", asy
   assertEquals(await exists(join(project, "dist", "stage", "map.w3x")), false, "check staged the map");
   assertEquals(await snapshot(sourceMap(project)), before, "check wrote planned settings into the source map");
 
-  // With no active settings, check keeps working without a source map.
+  // With no active settings and no objects (the template's Captain removed), check keeps working without a source map.
   await writeLocal(project, "");
+  await Deno.remove(join(project, "objects"), { recursive: true });
+  await Deno.writeTextFile(join(project, OBJECT_IDS_FILE), renderObjectIds([]));
   await Deno.remove(sourceMap(project), { recursive: true });
   const unmapped = await deno(["task", "check"], project);
   assertEquals(unmapped.code, 0, unmapped.text);

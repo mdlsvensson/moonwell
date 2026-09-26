@@ -1,9 +1,10 @@
 import "moonwell" as mw
+import "generated.objects" as objects
 
 mw.on_main ->
   print "Moonwell is running."
-  -- A footman just north of the preplaced heroes, changing player colour every second.
+  -- The Captain (objects/units.pkl) just north of the preplaced heroes, changing player colour every second.
   -- Ally colour mode (Alt+A) overrides player colours; turn it off to see the change.
-  unit = CreateUnit Player(0), FourCC("hfoo"), 45, -650, 270
+  unit = CreateUnit Player(0), objects.units.captain, 45, -650, 270
   TimerStart CreateTimer!, 1.0, true, ->
     SetUnitColor unit, GetPlayerColor Player GetRandomInt 0, bj_MAX_PLAYERS - 1

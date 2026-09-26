@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Object data: custom units, heroes, buildings, items, abilities, buffs and upgrades in Pkl files under `objects/`,
+  merged by `moonwell.pkl` and typed by the `moonwell` package's `ObjectFile.pkl`, with friendly field names from World
+  Editor's labels, per-level values as a `List`, and `properties` for ability-specific fields by name or rawcode.
+- Builds add the objects to the staged map's modification files and their `war3mapSkin.*` counterparts. World Editor's
+  own objects, including modified standard objects, are kept byte for byte; the source map is never changed.
+- Builds write `src/generated/objects.yue` with every object's id for gameplay code; `check` fails when it is stale.
+- Every object problem is reported at once, with its file, object and field, and the nearest standard ids or field names
+  as hints.
+- `objects:check` validates the objects and lists the files a build would change; `objects:eval` prints the resolved
+  objects as JSON. `check` and `dev` validate objects too, and `dev` watches `objects/`.
+- The template's footman is now the Captain, a custom unit in `objects/units.pkl`.
+- New projects get a `.gitattributes` that checks text out with LF line endings and keeps World Editor's map files and
+  `assets/` byte for byte.
+
 ## 0.2.0 (2026-09-26)
 
 - Assets: files under `assets/` are imported into builds. The manifest's `assets` block maps them to exact paths and
