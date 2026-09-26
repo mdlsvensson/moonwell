@@ -301,8 +301,8 @@ object:
   v1/v2:   modifications
 modifications: int32 count, then count of:
   char[4] fieldId
-  leveled tables only: int32 level, int32 dataPointer
   int32  varType                    0 int, 1 real, 2 unreal, 3 string
+  leveled tables only: int32 level, int32 dataPointer   (after varType: confirmed, objects-v3-names)
   value                             int32 | float32 | float32 | UTF-8, NUL-terminated
   int32  endToken                   0, or an object id
 ```

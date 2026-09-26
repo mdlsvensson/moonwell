@@ -230,7 +230,8 @@ provenance, SHA-256, the maintainer's value record and V1–V13 answers with off
   to approve the revision before Step 2.
 - [ ] **Step 2: Failing planner tests:** read-only on success and failure (snapshot the source folder); no objects
   needs no map; case-insensitive file names and two-spellings failure; changed files in the spec's stable order; skin
-  split per the fixture; objects sorted by id; collision with existing custom ids in any table.
+  split per the fixture; objects sorted by id; collision with existing custom ids in any table; a source file with
+  a duplicate custom id inside it fails naming the file (spec §5.2).
 - [ ] **Step 3: Known answer:** resolved objects equivalent to the fixture's custom objects, planned against the
   `objects-empty` save, reproduce World Editor's files byte for byte, with `TRIGSTR_*` values substituted for literal
   strings. Any remaining difference is documented in the README and justified, or fixed.
