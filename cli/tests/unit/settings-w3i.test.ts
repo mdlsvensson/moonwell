@@ -28,6 +28,26 @@ Deno.test("v39 loading patch preserves independently recorded extension and tail
   assertEquals(readMapInfo(bytes, true).details!.forces[0].flags.start, 563);
 });
 
+Deno.test("colours, water tint and sound environment match a World Editor save", async () => {
+  const source = await fixtureBytes();
+  const editor = await Deno.readFile(new URL("../fixtures/map-settings-v39/war3map-colors.w3i", import.meta.url));
+  const red = [255, 0, 0, 255];
+  const details = readMapInfo(editor, true).details!;
+  assertEquals(details.waterColor.map((channel) => channel.value), red);
+  assertEquals(details.fog.color.map((channel) => channel.value), red);
+  assertEquals(details.soundEnvironment.value, "Dungeon");
+  const patched = patchMapInfo(
+    source,
+    settings({ environment: { soundEnvironment: "Dungeon", waterColor: red, fog: { enabled: true, color: red } } }),
+  );
+  assertEquals(patched.length, editor.length);
+  // World Editor also rewrote its save counter, an unknown field and the three camera zoom values.
+  const editorOnly = new Set([4, 141, 230, 231, 234, 235, 238, 239]);
+  for (let i = 0; i < editor.length; i++) {
+    if (!editorOnly.has(i)) assertEquals(patched[i], editor[i], `byte ${i}`);
+  }
+});
+
 Deno.test("invalid required map structure is a file error", async () => {
   const bytes = await fixtureBytes();
   for (const length of [2, 145, 157, 250, 280, 570]) {

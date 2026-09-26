@@ -67,6 +67,8 @@ class Fog {
   color: Color?
 }
 class Environment {
+  /// World Editor's internal sound environment name, such as `"Default"` or `"Dungeon"` (Scenario > Map Options >
+  /// Custom Sound Environment). An empty string selects `"Default"`.
   soundEnvironment: MapText?
   waterColor: Color?
   fog: Fog = new {}
