@@ -26,10 +26,15 @@ class LoadingScreen {
 info: MapInfo = new {}
 loadingScreen: LoadingScreen = new {}
 
-/// Raw section/key overrides for war3mapMisc.txt. A raw key must agree with a matching typed gameplay setting.
+/// Advanced: raw section/key overrides for war3mapMisc.txt (World Editor's Gameplay Constants), such as
+/// `gameplayConstants { ["Misc"] { ["DefenseArmor"] = "0.05" } }`. Names match case-insensitively, and a raw
+/// key must equal a matching typed `gameplay` setting (`HeroMaxLevel`, `FoodCeiling`) when both are set.
+/// Left out of the project template.
 gameplayConstants: Mapping<SectionName, Mapping<FieldName, FieldValue>> = new {}
 
-/// Raw section/key overrides for war3mapSkin.txt. Names are case insensitive in Warcraft.
+/// Advanced: raw section/key overrides for war3mapSkin.txt (World Editor's Game Interface), such as
+/// `gameInterface { ["CustomSkin"] { ["Key"] = "value" } }`. Names are case insensitive in Warcraft.
+/// Left out of the project template.
 gameInterface: Mapping<SectionName, Mapping<FieldName, FieldValue>> = new {}
 
 class Player {

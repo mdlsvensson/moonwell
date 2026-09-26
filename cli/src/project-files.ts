@@ -8,6 +8,7 @@ export const PROJECT_TASKS = [
   "assets:check",
   "assets:sync",
   "assets:paths",
+  "settings:check",
 ] as const;
 
 export const PACKAGE_BASE_URI = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell";

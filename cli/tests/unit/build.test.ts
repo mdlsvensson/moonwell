@@ -8,6 +8,7 @@ import { validateMapSettings } from "../../src/settings/options.ts";
 function project(root: string, folder: string): Project {
   return {
     root,
+    manifest: "moonwell.pkl",
     map: { folder: "map.w3x", entry: "src/main.yue" },
     build: { folder, minify: false },
     launch: { gameExecutable: null, args: [] },

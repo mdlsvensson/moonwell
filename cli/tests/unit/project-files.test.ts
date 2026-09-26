@@ -16,6 +16,7 @@ Deno.test("projectDenoJson runs every task through the given CLI", () => {
     "assets:check",
     "assets:sync",
     "assets:paths",
+    "settings:check",
   ]);
   assertEquals("nodeModulesDir" in json, false);
 });
