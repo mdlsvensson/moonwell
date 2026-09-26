@@ -76,11 +76,12 @@ export the file names of the game's CASC storage (for example with CascView) to 
       `heroSkin` to the same list, as the game data does for every hero); a custom buff for that ability's `buffs`, with
       a new `icon`; a custom item with a new `name`, `goldCost` and `interfaceIcon`; and a custom building based on the
       Blacksmith (`hbla`) whose `researchesAvailable` is a custom upgrade with `levels = 2` and per-level names and
-      tooltips (`name = List("...", "...")`, `tooltip = List("...", "...")`). Run `deno task objects:check`: it lists the ten files and reports
-      `src/generated/objects.yue` stale until the next build. In `main.yue`, create the hero, the building and the item
-      for player 0 (from `objects.heroes`, `objects.buildings` and `objects.items`), raise the hero to level 7
-      (`SetHeroLevel hero, 7, false`; a hero ability's level 4 needs hero level 7), and give player 0 gold and lumber
-      for the research (`SetPlayerState Player(0), PLAYER_STATE_RESOURCE_GOLD, 5000`, and the same for lumber).
+      tooltips (`name = List("...", "...")`, `tooltip = List("...", "...")`). Run `deno task objects:check`: it lists
+      the ten files and reports `src/generated/objects.yue` stale until the next build. In `main.yue`, create the hero,
+      the building and the item for player 0 (from `objects.heroes`, `objects.buildings` and `objects.items`), raise the
+      hero to level 7 (`SetHeroLevel hero, 7, false`; a hero ability's level 4 needs hero level 7), and give player 0
+      gold and lumber for the research (`SetPlayerState Player(0), PLAYER_STATE_RESOURCE_GOLD, 5000`, and the same for
+      lumber).
    3. Run `deno task test`. The hero shows its name and strength. Learning the ability shows its level 1 to 4 tooltips,
       and healing a wounded unit heals 111, 222, 333 and 444 at the four levels, with the four cooldowns. The item shows
       its name and icon. The building offers only the custom upgrade; its button shows the level 1 tooltip, and after
