@@ -1,10 +1,16 @@
 import { MoonwellError } from "../shared/errors.ts";
 import type { MapSettings, Sections } from "./options.ts";
 
-/** Merge raw Warcraft section/key values without discarding unrelated editor settings. */
+/**
+ * Merge raw Warcraft section/key values without discarding unrelated editor settings. A new key goes after the last
+ * non-blank line of its (last matching) section; a new section is appended after one blank line. The source's
+ * newline style and final newline are kept.
+ */
 export function patchSettingsText(source: string, sections: Sections): string {
   const newline = source.includes("\r\n") ? "\r\n" : "\n";
   const lines = source ? source.split(/\r?\n/) : [];
+  const finalNewline = lines.at(-1) === "" && lines.length > 1;
+  if (finalNewline) lines.pop();
   for (const [section, entries] of Object.entries(sections)) {
     for (const [key, value] of Object.entries(entries)) {
       let active = false;
@@ -14,7 +20,7 @@ export function patchSettingsText(source: string, sections: Sections): string {
         const header = lines[i].match(/^\s*\[([^\]]+)\]\s*(?:\/\/.*)?$/);
         if (header) active = header[1].toLowerCase() === section.toLowerCase();
         if (!active) continue;
-        insertion = i + 1;
+        if (lines[i].trim() !== "") insertion = i + 1;
         const field = lines[i].match(/^(\s*)([^=\s]+)\s*=/);
         if (field && field[2].toLowerCase() === key.toLowerCase()) {
           lines[i] = `${field[1]}${field[2]}=${value}`;
@@ -23,13 +29,13 @@ export function patchSettingsText(source: string, sections: Sections): string {
       }
       if (!found) {
         if (insertion === -1) {
-          if (lines.length && lines.at(-1) !== "") lines.push("");
+          if (lines.length && lines.at(-1)!.trim() !== "") lines.push("");
           lines.push(`[${section}]`, `${key}=${value}`);
         } else lines.splice(insertion, 0, `${key}=${value}`);
       }
     }
   }
-  return lines.join(newline);
+  return lines.join(newline) + (finalNewline ? newline : "");
 }
 
 /** Return a fresh merge of raw and typed gameplay settings. */

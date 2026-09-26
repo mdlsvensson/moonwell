@@ -86,8 +86,7 @@ Deno.test("applied plans contain the patched bytes of each internal file", async
     assertEquals(plan.length, 3);
     await applySettingsPlan(plan);
     assertStringIncludes(await Deno.readTextFile(join(dir, "war3map.lua")), 'SetMapName("Planned")');
-    const misc = await Deno.readTextFile(join(dir, "war3mapMisc.txt"));
-    assertEquals(misc.split("\r\n").filter(Boolean), ["[Misc]", "Keep=1", "HeroMaxLevel=25"]);
+    assertEquals(await Deno.readTextFile(join(dir, "war3mapMisc.txt")), "[Misc]\r\nKeep=1\r\nHeroMaxLevel=25\r\n");
   });
 });
 
@@ -108,7 +107,7 @@ Deno.test("all four internal files are returned in stable order", async () => {
       ["war3map.w3i", "war3map.lua", "war3mapMisc.txt", "war3mapSkin.txt"].map((file) => join(dir, file)),
     );
     assertEquals(decode(plan[2].bytes), "[Misc]\nGoldCost=1");
-    assertEquals(decode(plan[3].bytes), "[Existing]\nX=1\n\n[CustomSkin]\nTest=value");
+    assertEquals(decode(plan[3].bytes), "[Existing]\nX=1\n\n[CustomSkin]\nTest=value\n");
   });
 });
 
@@ -212,7 +211,7 @@ Deno.test("a UTF-8 byte-order mark survives Lua and text edits", async () => {
     assertEquals(plan.length, 3);
     for (const change of plan.slice(1)) assertEquals([...change.bytes.subarray(0, 3)], bom);
     assertEquals(plan[1].bytes[3], lua[0]);
-    assertEquals(decode(plan[2].bytes), "[A]\n\nB=c");
+    assertEquals(decode(plan[2].bytes), "[A]\nB=c\n");
   });
 });
 
@@ -258,6 +257,13 @@ Deno.test("the settings source map must be an existing folder under maps/", asyn
       assertEquals(Boolean(error.hint), true);
     }
     await Deno.mkdir(join(root, "outside"));
+    // Build stages through safeJoin, which refuses links below the project; settings checks agree with it.
+    const type = Deno.build.os === "windows" ? "junction" : "dir";
+    await Deno.symlink(join(root, "outside"), join(root, "maps", "link.w3x"), { type });
+    await assertRejects(() => settingsMapDir(root, "link.w3x"), MoonwellError, "Symlinks");
+    await Deno.rename(join(root, "maps"), join(root, "real-maps"));
+    await Deno.symlink(join(root, "real-maps"), join(root, "maps"), { type });
+    await assertRejects(() => settingsMapDir(root, "map.w3x"), MoonwellError, "Symlinks");
     const outside = await assertRejects(() => settingsMapDir(root, "../outside", "moonwell.local.pkl"), MoonwellError);
     assertStringIncludes(outside.message, "maps/");
     assertEquals(outside.file, "moonwell.local.pkl");

@@ -1,4 +1,5 @@
 import { isAbsolute, join, relative, resolve, SEPARATOR } from "@std/path";
+import { safeJoin } from "../assets/paths.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { patchMapInfo } from "../w3i/patch.ts";
 import { patchSettingsLua } from "./lua.ts";
@@ -114,11 +115,13 @@ export async function applySettingsPlan(changes: SettingsChange[]): Promise<void
   }
 }
 
-/** The source map folder `maps/<mapFolder>` that settings are checked against; it must be an existing folder. */
+/**
+ * The source map folder `maps/<mapFolder>` that settings are checked against: an existing real folder, reached without
+ * symlinks, exactly as build and test locate it.
+ */
 export async function settingsMapDir(root: string, mapFolder: string, manifestFile = "moonwell.pkl"): Promise<string> {
   const maps = resolve(root, "maps");
-  const dir = resolve(maps, mapFolder);
-  const inside = relative(maps, dir);
+  const inside = relative(maps, resolve(maps, mapFolder));
   const label = `maps/${mapFolder}`;
   if (inside === "" || inside.split(SEPARATOR)[0] === ".." || isAbsolute(inside)) {
     throw new MoonwellError(`map.folder must name a folder inside maps/, not "${mapFolder}".`, {
@@ -126,6 +129,8 @@ export async function settingsMapDir(root: string, mapFolder: string, manifestFi
       hint: "Set map.folder to the name of the map folder under maps/, such as map.w3x.",
     });
   }
+  // The same check as the build's staging source: no path segment below the project may be a symlink or junction.
+  const dir = await safeJoin(root, label);
   let info: Deno.FileInfo;
   try {
     info = await Deno.stat(dir);
