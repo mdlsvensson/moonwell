@@ -15,6 +15,7 @@ Deno.test("--help and no command print usage", async () => {
     const { code, output } = await run(args);
     assertEquals(code, 0);
     assertStringIncludes(output, "Usage: moonwell <command>");
+    assertStringIncludes(output, "settings:check");
   }
 });
 
@@ -43,8 +44,8 @@ Deno.test("commands outside a project leave no dist/ behind", async () => {
   assertEquals(await exists(join(root, "dist")), false);
 });
 
-Deno.test("the assets commands are known commands", async () => {
-  for (const command of ["assets:check", "assets:sync", "assets:paths"]) {
+Deno.test("the assets and settings commands are known commands", async () => {
+  for (const command of ["assets:check", "assets:sync", "assets:paths", "settings:check"]) {
     const { code, output } = await run([command]);
     assertEquals(code, 1);
     assertEquals(output.includes("Unknown command"), false, output);

@@ -5,9 +5,12 @@ import { MoonwellError } from "../shared/errors.ts";
 import { type Runner, runProcess } from "../shared/process.ts";
 import { VERSION } from "../version.ts";
 import { type MapSettings, validateMapSettings } from "../settings/options.ts";
+import { gameplaySections } from "../settings/text.ts";
 
 export interface Project {
   root: string;
+  /** The manifest that was evaluated, relative to `root`: moonwell.local.pkl when it exists, else moonwell.pkl. */
+  manifest: string;
   map: { folder: string; entry: string };
   build: { folder: string; minify: boolean };
   launch: { gameExecutable: string | null; args: string[] };
@@ -151,8 +154,12 @@ export function parseProject(root: string, value: unknown, file: string): Projec
   const yue = record(data.yue, "yue");
   // Moonwell 0.1.0 schema packages have no assets block; within 0.1.x a missing one means no configuration.
   const assets = data.assets === undefined ? { paths: {}, exclude: [] } : record(data.assets, "assets");
+  const settings = validateMapSettings(data.settings === undefined ? {} : data.settings, file);
+  // Typed/raw gameplay-constant conflicts need no map, so they fail here and name the evaluated manifest.
+  gameplaySections(settings, file);
   return {
     root,
+    manifest: file,
     map: { folder: string(map.folder, "map.folder"), entry: string(map.entry, "map.entry") },
     build: { folder: string(buildConfig.folder, "build.folder"), minify: boolean(buildConfig.minify, "build.minify") },
     launch: {
@@ -161,6 +168,6 @@ export function parseProject(root: string, value: unknown, file: string): Projec
     },
     yue: { version: string(yue.version, "yue.version"), path: nullableString(yue.path, "yue.path") },
     assets: { paths: stringRecord(assets.paths, "assets.paths"), exclude: strings(assets.exclude, "assets.exclude") },
-    settings: validateMapSettings(data.settings === undefined ? {} : data.settings, file),
+    settings,
   };
 }

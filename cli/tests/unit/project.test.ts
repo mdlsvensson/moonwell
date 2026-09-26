@@ -25,6 +25,7 @@ Deno.test("parseProject maps omitted nullable fields to null", () => {
   const project = parseProject("/p", FULL, "moonwell.pkl");
   assertEquals(project, {
     root: "/p",
+    manifest: "moonwell.pkl",
     map: { folder: "map.w3x", entry: "src/main.yue" },
     build: { folder: "dist/bin", minify: false },
     launch: { gameExecutable: null, args: ["-launch"] },
@@ -42,6 +43,20 @@ Deno.test("parseProject defaults absent settings and validates malformed setting
     "players",
   );
   assertEquals(error.file, "moonwell.local.pkl");
+});
+
+Deno.test("parseProject rejects conflicting typed and raw gameplay constants and keeps settings unmerged", () => {
+  const settings = { gameplay: { foodLimit: 200 }, gameplayConstants: { misc: { foodceiling: "100" } } };
+  const error = assertThrows(
+    () => parseProject("/p", { ...FULL, settings }, "moonwell.local.pkl"),
+    MoonwellError,
+    "FoodCeiling",
+  );
+  assertEquals(error.file, "moonwell.local.pkl");
+  const agreeing = { ...settings, gameplayConstants: { misc: { foodceiling: "200" } } };
+  const project = parseProject("/p", { ...FULL, settings: agreeing }, "moonwell.pkl");
+  assertEquals(project.manifest, "moonwell.pkl");
+  assertEquals(project.settings.gameplayConstants, { misc: { foodceiling: "200" } });
 });
 
 Deno.test("parseProject reads assets and rejects a wrong shape", () => {

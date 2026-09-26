@@ -1,7 +1,8 @@
 /// Root schema for a Moonwell project's `moonwell.pkl`.
 ///
 /// Every property has a default, so a manifest only needs what it changes. The template's `moonwell.pkl` spells out the
-/// everyday settings; the advanced ones (the whole `yue` block) are left out and keep their defaults unless set.
+/// everyday settings; the advanced ones (the whole `yue` block and the raw `settings.gameplayConstants` and
+/// `settings.gameInterface` mappings) are left out and keep their defaults unless set.
 /// Machine-specific values belong in `moonwell.local.pkl`, which amends `moonwell.pkl` and is git-ignored.
 module moonwell.Project
 

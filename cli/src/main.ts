@@ -7,6 +7,7 @@ import { build } from "./commands/build.ts";
 import { check } from "./commands/check.ts";
 import { dev } from "./commands/dev.ts";
 import { init } from "./commands/init.ts";
+import { settingsCheck } from "./commands/settings-check.ts";
 import { setup } from "./commands/setup.ts";
 import { test } from "./commands/test.ts";
 import { createContext } from "./context.ts";
@@ -29,6 +30,7 @@ Commands:
   assets:check                   Show what assets:sync would change in the source map
   assets:sync                    Write assets/ into the source map (close it in World Editor first)
   assets:paths [file]            List the files a model references, as in-game or custom paths
+  settings:check                 Show which internal map files the settings would change
 
 Options:
   -h, --help                     Show this help
@@ -103,6 +105,9 @@ export async function main(
         break;
       case "assets:paths":
         await assetsPaths(ctx, flags._[1] === undefined ? undefined : String(flags._[1]));
+        break;
+      case "settings:check":
+        await settingsCheck(ctx);
         break;
       default:
         write(`Unknown command '${command}'.\n\n${USAGE}`);
