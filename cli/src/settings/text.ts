@@ -43,7 +43,7 @@ export function gameplaySections(settings: MapSettings, file = "moonwell.pkl"): 
   const sections: Sections = Object.fromEntries(
     Object.entries(settings.gameplayConstants).map(([name, fields]) => [name, { ...fields }]),
   );
-  for (const [typed, raw] of [["heroMaxLevel", "HeroMaxLevel"], ["foodLimit", "FoodCeiling"]] as const) {
+  for (const [typed, raw] of [["heroMaxLevel", "MaxHeroLevel"], ["foodLimit", "FoodCeiling"]] as const) {
     const value = settings.gameplay[typed];
     if (value === undefined) continue;
     const section = Object.keys(sections).find((key) => key.toLowerCase() === "misc") ?? "Misc";

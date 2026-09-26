@@ -86,7 +86,7 @@ Deno.test("applied plans contain the patched bytes of each internal file", async
     assertEquals(plan.length, 3);
     await applySettingsPlan(plan);
     assertStringIncludes(await Deno.readTextFile(join(dir, "war3map.lua")), 'SetMapName("Planned")');
-    assertEquals(await Deno.readTextFile(join(dir, "war3mapMisc.txt")), "[Misc]\r\nKeep=1\r\nHeroMaxLevel=25\r\n");
+    assertEquals(await Deno.readTextFile(join(dir, "war3mapMisc.txt")), "[Misc]\r\nKeep=1\r\nMaxHeroLevel=25\r\n");
   });
 });
 
