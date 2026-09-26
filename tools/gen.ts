@@ -30,6 +30,14 @@ export async function renderEmbedded(repo: string = REPO): Promise<Map<string, s
       JSON.stringify(encodeBase64(await gzip(gamePaths)))
     };\n`,
   );
+
+  const metadata = await Deno.readFile(join(repo, "cli", "data", "metadata.json"));
+  out.set(
+    "cli/src/embedded/metadata.ts",
+    `${HEADER}/** cli/data/metadata.json, gzip-compressed. */\nexport const METADATA_GZIP_BASE64: string = ${
+      JSON.stringify(encodeBase64(await gzip(metadata)))
+    };\n`,
+  );
   return out;
 }
 

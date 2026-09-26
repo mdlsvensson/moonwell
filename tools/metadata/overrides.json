@@ -1,0 +1,12 @@
+{
+  "names": {
+    "abilities": {
+      "Owk4": "backstabDamageEnabled",
+      "Tau1": "preferHostiles",
+      "Tau2": "preferFriendlies",
+      "Tau3": "maxUnits"
+    },
+    "upgrades": { "gcls": "upgradeClass" }
+  },
+  "removed": {}
+}
