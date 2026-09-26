@@ -4,6 +4,7 @@ import { archivePath } from "../../src/commands/build.ts";
 import type { Project } from "../../src/project/project.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { validateMapSettings } from "../../src/settings/options.ts";
+import { emptyObjects } from "../../src/objectdata/manifest.ts";
 
 function project(root: string, folder: string, manifest = "moonwell.pkl"): Project {
   return {
@@ -15,6 +16,7 @@ function project(root: string, folder: string, manifest = "moonwell.pkl"): Proje
     yue: { version: "0.34.2", path: null },
     assets: { paths: {}, exclude: [] },
     settings: validateMapSettings({}),
+    objects: emptyObjects(),
   };
 }
 

@@ -1,4 +1,5 @@
 import type { ModValue, TableKind } from "../../src/objectdata/modfile.ts";
+import type { FieldMeta, Metadata } from "../../src/objectdata/metadata.ts";
 
 export const NAMES_FIXTURE = new URL("../fixtures/objects-v3-names/", import.meta.url);
 export const namesFixtureBytes = (name: string) => Deno.readFile(new URL(name, NAMES_FIXTURE));
@@ -74,4 +75,154 @@ export function buildModFile(
     }
   }
   return new Uint8Array(out);
+}
+
+/** A field of the miniature metadata; defaults describe an unleveled `int` field with no restrictions. */
+export function metaField(id: string, name: string, extra: Partial<FieldMeta> = {}): FieldMeta {
+  return {
+    id,
+    name,
+    label: name,
+    category: "stats",
+    type: "int",
+    storage: "int",
+    list: false,
+    perLevel: false,
+    column: 0,
+    skin: false,
+    use: [],
+    specific: [],
+    notSpecific: [],
+    ...extra,
+  };
+}
+
+const UNIT_USES: FieldMeta["use"] = ["unit", "hero", "building"];
+
+/**
+ * Hand-written miniature metadata, shaped like cli/data/metadata.json, so resolution tests do not change when the game
+ * data is regenerated. Labels and rawcodes follow the game's where they exist.
+ */
+export function miniMetadata(): Metadata {
+  return {
+    format: 1,
+    game: "1.2.3.4",
+    fields: {
+      units: [
+        metaField("uacq", "acquisitionRange", {
+          label: "Acquisition Range",
+          type: "unreal",
+          storage: "unreal",
+          use: UNIT_USES,
+        }),
+        metaField("ubui", "structuresBuilt", {
+          label: "Structures Built",
+          category: "techtree",
+          type: "unitList",
+          storage: "string",
+          list: true,
+          use: ["unit", "hero"],
+        }),
+        metaField("uhpm", "hitPointsMaximumBase", { label: "Hit Points Maximum (Base)", use: UNIT_USES }),
+        metaField("unam", "name", {
+          label: "Name",
+          category: "text",
+          type: "string",
+          storage: "string",
+          skin: true,
+          use: ["unit", "hero", "building", "item"],
+        }),
+        metaField("usca", "scalingValue", {
+          label: "Scaling Value",
+          category: "art",
+          type: "real",
+          storage: "real",
+          skin: true,
+          use: UNIT_USES,
+        }),
+        metaField("ustr", "startingStrength", { label: "Starting Strength", use: ["hero"] }),
+      ],
+      items: [
+        metaField("iper", "perishable", { label: "Perishable", type: "bool", use: ["item"] }),
+        metaField("unam", "name", {
+          label: "Name",
+          category: "text",
+          type: "string",
+          storage: "string",
+          skin: true,
+          use: ["unit", "hero", "building", "item"],
+        }),
+      ],
+      abilities: [
+        metaField("Crs\0", "chanceToMiss", {
+          label: "Chance to Miss",
+          category: "data",
+          type: "unreal",
+          storage: "unreal",
+          perLevel: true,
+          column: 1,
+          specific: ["Acrs"],
+        }),
+        metaField("Hhb1", "amountHealedOrDamaged", {
+          label: "Amount Healed/Damaged",
+          category: "data",
+          type: "unreal",
+          storage: "unreal",
+          perLevel: true,
+          column: 1,
+          specific: ["AHhb"],
+        }),
+        metaField("abuf", "buffs", { label: "Buffs", type: "buffList", storage: "string", list: true, perLevel: true }),
+        metaField("aher", "heroAbility", { label: "Hero Ability", type: "bool" }),
+        metaField("alev", "levels", { label: "Levels" }),
+        metaField("amcs", "manaCost", { label: "Mana Cost", perLevel: true }),
+        metaField("anam", "name", { label: "Name", category: "text", type: "string", storage: "string", skin: true }),
+        metaField("aran", "castRange", { label: "Cast Range", type: "unreal", storage: "unreal", perLevel: true }),
+        metaField("aret", "tooltipLearn", {
+          label: "Tooltip - Learn",
+          category: "text",
+          type: "string",
+          storage: "string",
+          skin: true,
+          notSpecific: ["Aatk"],
+        }),
+      ],
+      buffs: [
+        metaField("feff", "isAnEffect", { label: "Is an Effect", type: "bool" }),
+        metaField("ftip", "tooltip", {
+          label: "Tooltip",
+          category: "text",
+          type: "string",
+          storage: "string",
+          skin: true,
+        }),
+      ],
+      upgrades: [
+        metaField("gba1", "effect1Base", { label: "Effect 1 - Base", type: "unreal", storage: "unreal" }),
+        metaField("glvl", "levels", { label: "Levels" }),
+        metaField("gnam", "name", {
+          label: "Name",
+          category: "text",
+          type: "string",
+          storage: "string",
+          perLevel: true,
+          skin: true,
+        }),
+      ],
+    },
+    bases: {
+      heroes: { Hamg: { name: "Archmage" }, Hmkg: { name: "Mountain King" }, Hpal: { name: "Paladin" } },
+      units: { hfoo: { name: "Footman" }, hkni: { name: "Knight" }, hpea: { name: "Peasant" } },
+      buildings: { hbar: { name: "Barracks" }, htow: { name: "Town Hall" } },
+      items: { ckng: { name: "Crown of Kings +5" }, ratf: { name: "Claws of Attack +15" } },
+      abilities: {
+        AHbu: { name: "Build (Human)", levels: 0 },
+        AHhb: { name: "Holy Light", levels: 3 },
+        Aatk: { name: "Attack", levels: 0 },
+        Acrs: { name: "Curse", levels: 1 },
+      },
+      buffs: { BHbd: { name: "Blizzard" }, Bcrs: { name: "Curse" } },
+      upgrades: { Rhar: { name: "Iron Plating", levels: 3 }, Rhme: { name: "Iron Forged Swords", levels: 3 } },
+    },
+  };
 }

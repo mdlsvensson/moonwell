@@ -142,7 +142,8 @@ export function nearestBases(
     .map(({ id, name }) => ({ id, name }));
 }
 
-function editDistance(a: string, b: string): number {
+/** Levenshtein distance between `a` and `b`. */
+export function editDistance(a: string, b: string): number {
   let previous = Array.from({ length: b.length + 1 }, (_, j) => j);
   for (let i = 1; i <= a.length; i++) {
     const current = [i];

@@ -2,6 +2,7 @@ import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from 
 import { join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { validateMapSettings } from "../../src/settings/options.ts";
+import { emptyObjects, SCHEMA_HINT } from "../../src/objectdata/manifest.ts";
 import type { Runner } from "../../src/shared/process.ts";
 import { projectLocalPkl } from "../../src/project-files.ts";
 import { VERSION } from "../../src/version.ts";
@@ -33,7 +34,26 @@ Deno.test("parseProject maps omitted nullable fields to null", () => {
     yue: { version: "0.34.2", path: null },
     assets: { paths: {}, exclude: [] },
     settings: validateMapSettings({}),
+    objects: emptyObjects(),
   });
+});
+
+Deno.test("parseProject reads objects, defaulting sources to the evaluated manifest", () => {
+  const objects = {
+    units: {
+      captain: { id: "h000", base: "hfoo", source: "objects/units.pkl", properties: {} },
+      local: { id: "h001", base: "hfoo", properties: {} },
+    },
+  };
+  const project = parseProject("/p", { ...FULL, objects }, "moonwell.local.pkl");
+  assertEquals(project.objects.units.captain.source, "objects/units.pkl");
+  assertEquals(project.objects.units.local.source, "moonwell.local.pkl");
+  const error = assertThrows(
+    () => parseProject("/p", { ...FULL, objects: { units: { a: { base: "hfoo" } } } }, "moonwell.pkl"),
+    MoonwellError,
+    'objects.units["a"].id must be a string.',
+  );
+  assertEquals([error.file, error.hint], ["moonwell.pkl", SCHEMA_HINT]);
 });
 
 Deno.test("parseProject defaults absent settings and validates malformed settings with the manifest path", () => {

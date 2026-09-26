@@ -13,6 +13,6 @@ base: String(length == 4)
 source: String?
 
 /// Fields without a typed property, keyed by friendly name or by field rawcode, such as
-/// `["amountHealedDamaged"] = List(200, 400, 600)` on a Holy Light copy. The CLI checks the key, the value and
+/// `["amountHealedOrDamaged"] = List(200, 400, 600)` on a Holy Light copy. The CLI checks the key, the value and
 /// whether the field applies to `base`. `null` inherits from the base.
 properties: Mapping<String, Value?> = new {}

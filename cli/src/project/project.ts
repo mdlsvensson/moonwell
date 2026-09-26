@@ -6,6 +6,7 @@ import { type Runner, runProcess } from "../shared/process.ts";
 import { VERSION } from "../version.ts";
 import { type MapSettings, validateMapSettings } from "../settings/options.ts";
 import { gameplaySections } from "../settings/text.ts";
+import { parseObjects, type ProjectObjects, SCHEMA_HINT } from "../objectdata/manifest.ts";
 
 export interface Project {
   root: string;
@@ -17,6 +18,8 @@ export interface Project {
   yue: { version: string; path: string | null };
   assets: { paths: Record<string, string>; exclude: string[] };
   settings: MapSettings;
+  /** Custom objects, shape-checked only: resolving them needs the metadata and the source map (planner). */
+  objects: ProjectObjects;
 }
 
 export const PKL_INSTALL_HINT =
@@ -124,7 +127,7 @@ export function parseProject(root: string, value: unknown, file: string): Projec
   const fail = (path: string, expected: string): never => {
     throw new MoonwellError(`${path} must be ${expected}.`, {
       file,
-      hint: "Is the moonwell Pkl package the version this CLI expects?",
+      hint: SCHEMA_HINT,
     });
   };
   const record = (input: unknown, path: string): Record<string, unknown> =>
@@ -157,6 +160,7 @@ export function parseProject(root: string, value: unknown, file: string): Projec
   const settings = validateMapSettings(data.settings === undefined ? {} : data.settings, file);
   // Typed/raw gameplay-constant conflicts need no map, so they fail here and name the evaluated manifest.
   gameplaySections(settings, file);
+  const objects = parseObjects(data.objects, file);
   return {
     root,
     manifest: file,
@@ -169,5 +173,6 @@ export function parseProject(root: string, value: unknown, file: string): Projec
     yue: { version: string(yue.version, "yue.version"), path: nullableString(yue.path, "yue.path") },
     assets: { paths: stringRecord(assets.paths, "assets.paths"), exclude: strings(assets.exclude, "assets.exclude") },
     settings,
+    objects,
   };
 }
