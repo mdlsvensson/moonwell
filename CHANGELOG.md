@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 (2026-09-26)
+
 - Assets: files under `assets/` are imported into builds. The manifest's `assets` block maps them to exact paths and
   excludes files. The `assets:check` and `assets:sync` commands write them into the source map for World Editor, with
   ownership tracking and rollback.
@@ -17,6 +19,17 @@
   The source map in `maps/` is never changed.
 - `settings:check` lists the internal files the settings would change, without building or writing the map. `check` and
   `dev` validate settings too.
+
+### Release gate
+
+Map settings (CONTRIBUTING step 8) passed 2026-09-26 on Warcraft III Reforged 3.0.0.24268 and World Editor 3.00, after
+three fixes the gate found: a player name no longer adds `SetPlayerName` (it crashed the game on lobby creation), the
+hero level constant is `MaxHeroLevel`, and map-info colours are written blue, green, red, alpha.
+
+- The lobby shows the map name, author, description, player name and race, and the force name.
+- In game, the fog and water are red, the food ceiling is 50 and a hero stops at the maximum level.
+- The packed map opens in World Editor with the configured description, loading screen, player and force properties,
+  fog, water tint, sound environment and gameplay constants.
 
 ## 0.1.0 (2026-09-25)
 

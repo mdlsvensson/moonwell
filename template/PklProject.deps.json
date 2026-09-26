@@ -3,7 +3,7 @@
   "resolvedDependencies": {
     "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0": {
       "type": "local",
-      "uri": "projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.1.0",
+      "uri": "projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.2.0",
       "path": "../schema"
     }
   }
