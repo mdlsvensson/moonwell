@@ -42,28 +42,28 @@ over, and updated on 2026-09-26 after Plan 2c.
     lobby creation), the hero level key is `MaxHeroLevel`, and w3i colours are stored blue, green, red, alpha (fixture
     `cli/tests/fixtures/map-settings-v39/war3map-colors.w3i`). Sound environments use World Editor's internal names,
     such as `Default` or `Dungeon`.
-- **Object data (Plan 2c, `docs/superpowers/plans/2026-09-26-moonwell-object-data.md`) implemented on `main`, awaiting
-  the maintainer's in-game gate (CONTRIBUTING step 9).** Custom objects in Pkl under `objects/` (schema
+- **0.3.0 prepared on `main`, not yet published** (versions bumped, CHANGELOG written). It adds object data (Plan 2c,
+  `docs/superpowers/plans/2026-09-26-moonwell-object-data.md`): custom objects in Pkl under `objects/` (schema
   `schema/ObjectFile.pkl`, `Objects.pkl`, `objects/`, and `generated/*Props.pkl` rendered by `deno task gen` from
   `cli/data/metadata.json`, which `deno task gen:metadata` builds from the game's SLKs). Builds append them to the
   staged map's modification files and their `war3mapSkin.*` counterparts, keeping World Editor's bytes, and write
   `src/generated/objects.yue`; `check` fails when it is stale. `objects:check` and `objects:eval` are new. Code is in
   `cli/src/objectdata/`; the World Editor save the reader and writer are tested against is
-  `cli/tests/fixtures/objects-v3-names/`. Per-level values and changed level counts follow the community layout and are
-  proven only by the gate. The template's footman is the Captain (`template/objects/units.pkl`).
+  `cli/tests/fixtures/objects-v3-names/`. The in-game gate (CONTRIBUTING step 9) passed 2026-09-26, including per-level
+  ability values and upgrade tooltips. The research button shows an upgrade's `tooltip`, not its `name`. The template's
+  footman is the Captain (`template/objects/units.pkl`).
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `eea99d9`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Object data release gate** (CONTRIBUTING step 9, Plan 2c Task 9): walk the maintainer through it in a throwaway
-   project; fix what it finds with a regression test each, and record the result in CHANGELOG.
-2. **Publish 0.2.0** if it is not on JSR yet: Publishing steps 2 to 5, run from a checkout of the `v0.2.0` tag (the
-   `moonwell@0.2.0` release goes on that commit), since `main` now carries the unreleased object data.
-3. **Release 0.3.0:** bump the versions and publish per CONTRIBUTING's Publishing steps.
+1. **Publish 0.2.0** if it is not on JSR yet: Publishing steps 2 to 5, run from a checkout of the `v0.2.0` tag (the
+   `moonwell@0.2.0` release goes on that commit), since `main` carries 0.3.0.
+2. **Publish 0.3.0** from `main` per CONTRIBUTING's Publishing steps.
    - `pkl project package` may need `--skip-publish-check` in sandboxed shells.
    - For 24 hours after publishing, Deno blocks the new version unless you pass `--min-dep-age=0`.
+3. **Next sub-project:** not yet chosen; ask the maintainer.
 
 ## How work was done here, and should continue
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0 (2026-09-26)
+
 - Object data: custom units, heroes, buildings, items, abilities, buffs and upgrades in Pkl files under `objects/`,
   merged by `moonwell.pkl` and typed by the `moonwell` package's `ObjectFile.pkl`, with friendly field names from World
   Editor's labels, per-level values as a `List`, and `properties` for ability-specific fields by name or rawcode.
@@ -15,6 +17,17 @@
 - The template's footman is now the Captain, a custom unit in `objects/units.pkl`.
 - New projects get a `.gitattributes` that checks text out with LF line endings and keeps World Editor's map files and
   `assets/` byte for byte.
+
+### Release gate
+
+Object data (CONTRIBUTING step 9) passed 2026-09-26 on Warcraft III Reforged 3.0.0.24268 and World Editor 3.00, tested
+by the maintainer.
+
+- In game, the Captain shows its model, name and icon. A hero based on the Paladin shows its custom name and strength
+  and learns a custom Holy Light to level 4, which heals the four per-level amounts. A custom item shows its name and
+  icon. A custom Blacksmith offers only its custom upgrade, with each level's tooltip.
+- A Footman modified in World Editor's source map keeps its change next to the Moonwell objects.
+- The packed map opens in World Editor, and the Object Editor lists the custom objects with their values.
 
 ## 0.2.0 (2026-09-26)
 
