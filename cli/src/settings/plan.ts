@@ -128,7 +128,7 @@ export async function planMapSettings(
     if (needsLua) {
       const luaName = existing("war3map.lua"), luaPath = join(dir, luaName), luaFile = label(luaName);
       const { bom, text } = decodeText(await readMapFile(luaPath, luaFile, false), luaFile);
-      const lua = patchSettingsLua(text, settings, patched, luaFile);
+      const lua = patchSettingsLua(text, settings, patched, luaFile, w3iFile);
       if (lua !== text) changes.push({ file: luaPath, bytes: new TextEncoder().encode(bom + lua) });
     }
   }
@@ -162,8 +162,10 @@ export async function applySettingsPlan(changes: SettingsChange[]): Promise<void
 }
 
 /**
- * The source map folder `maps/<mapFolder>` that settings are checked against: an existing real folder, reached without
- * symlinks, exactly as build and test locate it.
+ * The source map folder `maps/<mapFolder>` that settings are checked against: an existing real folder. It is the folder
+ * build and test stage, but checked more strictly than their staging, which only tests that the path exists: here
+ * map.folder must stay inside maps/ and no path segment below the project may be a symlink or junction. A missing
+ * folder names the manifest, as build does, since map.folder is what to fix.
  */
 export async function settingsMapDir(root: string, mapFolder: string, manifestFile = "moonwell.pkl"): Promise<string> {
   const maps = resolve(root, "maps");
@@ -175,7 +177,6 @@ export async function settingsMapDir(root: string, mapFolder: string, manifestFi
       hint: "Set map.folder to the name of the map folder under maps/, such as map.w3x.",
     });
   }
-  // The same check as the build's staging source: no path segment below the project may be a symlink or junction.
   const dir = await safeJoin(root, label);
   let info: Deno.FileInfo;
   try {
@@ -190,7 +191,7 @@ export async function settingsMapDir(root: string, mapFolder: string, manifestFi
       });
     }
     throw new MoonwellError(`Source map folder ${label} not found.`, {
-      file: label,
+      file: manifestFile,
       cause,
       hint: "Set map.folder to a folder under maps/ saved by World Editor in folder format.",
     });

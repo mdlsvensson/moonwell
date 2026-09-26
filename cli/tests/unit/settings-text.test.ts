@@ -79,3 +79,12 @@ Deno.test("text patches keep the INI layout: no stray blank lines, final newline
     }
   }
 });
+
+Deno.test("section headers followed by ; or // comments are recognised", () => {
+  for (const header of ["[Misc] ; comment", "[Misc]; comment", "[Misc] // comment", "  [Misc]\t;"]) {
+    assertEquals(
+      patchSettingsText(`${header}\nA=1\n`, { Misc: { B: "2" } }),
+      `${header}\nA=1\nB=2\n`,
+    );
+  }
+});

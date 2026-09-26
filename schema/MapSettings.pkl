@@ -42,8 +42,8 @@ class Player {
   controller: ("user"|"computer"|"neutral"|"rescuable")?
   race: ("selectable"|"human"|"orc"|"undead"|"nightelf")?
   fixedStart: Boolean?
-  x: Float(isBetween(-10000000, 10000000))?
-  y: Float(isBetween(-10000000, 10000000))?
+  x: Number(isBetween(-10000000, 10000000))?
+  y: Number(isBetween(-10000000, 10000000))?
 }
 
 class Force {
@@ -61,9 +61,9 @@ class Fog {
   enabled: Boolean?
   /// Fog style: 0 linear, 1 exponential, or 2 exponential squared.
   style: Int(isBetween(0, 2))?
-  start: Float(isBetween(-10000000, 10000000))?
-  end: Float(isBetween(-10000000, 10000000))?
-  density: Float(isBetween(0, 1))?
+  start: Number(isBetween(-10000000, 10000000))?
+  end: Number(isBetween(-10000000, 10000000))?
+  density: Number(isBetween(0, 1))?
   color: Color?
 }
 class Environment {

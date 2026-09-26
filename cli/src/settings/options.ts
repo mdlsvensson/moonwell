@@ -75,7 +75,7 @@ export function validateMapSettings(value: unknown, file?: string): MapSettings 
     }
     return Object.fromEntries(result);
   };
-  const config = record(value, "Map settings");
+  const config = record(value, "settings");
   const groups = [
     "info",
     "loadingScreen",
@@ -86,13 +86,15 @@ export function validateMapSettings(value: unknown, file?: string): MapSettings 
     "gameplayConstants",
     "gameInterface",
   ];
-  for (const key of Object.keys(config)) if (!groups.includes(key)) fail(`Unknown map setting: ${key}`);
+  for (const key of Object.keys(config)) if (!groups.includes(key)) fail(`Unknown map setting: settings.${key}`);
 
   const indexed = <T>(group: string, rules: Record<string, Rule>): Record<string, T> => {
     const result: [string, T][] = [];
-    for (const [id, entry] of Object.entries(record(config[group] ?? {}, group))) {
-      if (!/^(0|[1-9][0-9]?)$/.test(id) || Number(id) > 23) fail(`${group} keys must be IDs from 0 to 23: ${id}`);
-      const parsed = fields(entry, `${group}.${id}`, rules);
+    for (const [id, entry] of Object.entries(record(config[group] ?? {}, `settings.${group}`))) {
+      if (!/^(0|[1-9][0-9]?)$/.test(id) || Number(id) > 23) {
+        fail(`settings.${group} keys must be IDs from 0 to 23: ${id}`);
+      }
+      const parsed = fields(entry, `settings.${group}[${JSON.stringify(id)}]`, rules);
       if (Object.keys(parsed).length) result.push([id, parsed as T]);
     }
     return Object.fromEntries(result);
@@ -109,13 +111,13 @@ export function validateMapSettings(value: unknown, file?: string): MapSettings 
     name: text,
     ...Object.fromEntries(Object.keys(forceBits).map((key) => [key, boolean])),
   });
-  const environment = fields(config.environment ?? {}, "environment", {
+  const environment = fields(config.environment ?? {}, "settings.environment", {
     soundEnvironment: text,
     waterColor: color,
     fog: (entry) => entry !== null && typeof entry === "object" && !Array.isArray(entry),
   }) as EnvironmentOptions;
   if (environment.fog) {
-    environment.fog = fields(environment.fog, "environment.fog", {
+    environment.fog = fields(environment.fog, "settings.environment.fog", {
       enabled: boolean,
       style: integer(0, 2),
       start: number,
@@ -125,17 +127,17 @@ export function validateMapSettings(value: unknown, file?: string): MapSettings 
     }) as NonNullable<EnvironmentOptions["fog"]>;
     if (!Object.keys(environment.fog).length) delete environment.fog;
   }
-  const gameplay = fields(config.gameplay ?? {}, "gameplay", {
+  const gameplay = fields(config.gameplay ?? {}, "settings.gameplay", {
     heroMaxLevel: integer(1, 10000),
     foodLimit: integer(0, 300),
   }) as MapSettings["gameplay"];
-  const info = fields(config.info ?? {}, "info", {
+  const info = fields(config.info ?? {}, "settings.info", {
     name: text,
     author: text,
     description: text,
     recommendedPlayers: text,
   }) as MapSettings["info"];
-  const loadingScreen = fields(config.loadingScreen ?? {}, "loadingScreen", {
+  const loadingScreen = fields(config.loadingScreen ?? {}, "settings.loadingScreen", {
     background: integer(-1, 2147483647),
     model: text,
     text,
@@ -145,19 +147,20 @@ export function validateMapSettings(value: unknown, file?: string): MapSettings 
   const sections = (group: string): Sections => {
     const result: [string, Record<string, string>][] = [];
     const seen = new Set<string>();
-    for (const [section, values] of Object.entries(record(config[group] ?? {}, group))) {
+    for (const [section, values] of Object.entries(record(config[group] ?? {}, `settings.${group}`))) {
       if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(section) || seen.has(section.toLowerCase())) {
-        fail(`Invalid or duplicate ${group} section: ${section}`);
+        fail(`Invalid or duplicate settings.${group} section: ${section}`);
       }
       seen.add(section.toLowerCase());
       const entries: [string, string][] = [];
       const keys = new Set<string>();
-      for (const [key, entry] of Object.entries(record(values, `${group}.${section}`))) {
+      const path = `settings.${group}[${JSON.stringify(section)}]`;
+      for (const [key, entry] of Object.entries(record(values, path))) {
         if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) || keys.has(key.toLowerCase())) {
-          fail(`Invalid or duplicate ${group} key: ${section}.${key}`);
+          fail(`Invalid or duplicate ${path} key: ${key}`);
         }
         if (typeof entry !== "string" || /[\r\n\0]/.test(entry)) {
-          fail(`${group}.${section}.${key} must be a single-line string.`);
+          fail(`${path}[${JSON.stringify(key)}] must be a single-line string.`);
         }
         keys.add(key.toLowerCase());
         entries.push([key, entry as string]);

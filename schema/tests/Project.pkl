@@ -138,6 +138,19 @@ facts {
     t.catch(() -> (Project) { settings { environment { fog { color = List(0, 0, 0, 1.5) } } } }
       .settings.environment.fog.color).contains("Int")
   }
+  ["settings coordinates and fog distances accept whole numbers"] {
+    (Project) { settings { players { ["0"] { x = 256; y = -896 } } } }.settings.players["0"].x == 256
+    (Project) { settings { players { ["0"] { x = 256; y = -896 } } } }.settings.players["0"].y == -896
+    (Project) { settings { environment { fog { start = 100; end = 1000; density = 1 } } } }
+      .settings.environment.fog.end == 1000
+    (Project) { settings { environment { fog { density = 0 } } } }.settings.environment.fog.density == 0
+    t.catch(() -> (Project) { settings { players { ["0"] { x = 10000001 } } } }.settings.players["0"].x)
+      .contains("isBetween")
+    t.catch(() -> (Project) { settings { environment { fog { density = 2 } } } }.settings.environment.fog.density)
+      .contains("isBetween")
+    t.catch(() -> (Project) { settings { players { ["0"] { x = "1" } } } }.settings.players["0"].x)
+      .contains("Expected")
+  }
   ["an amending project renders as JSON"] {
     parsed.map.folder == "hero.w3x"
     parsed.map.entry == "src/main.yue"

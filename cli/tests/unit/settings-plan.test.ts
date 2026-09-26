@@ -257,7 +257,9 @@ Deno.test("the settings source map must be an existing folder under maps/", asyn
       assertEquals(Boolean(error.hint), true);
     }
     await Deno.mkdir(join(root, "outside"));
-    // Build stages through safeJoin, which refuses links below the project; settings checks agree with it.
+    const absent = await assertRejects(() => settingsMapDir(root, "absent.w3x", "moonwell.local.pkl"), MoonwellError);
+    assertEquals(absent.file, "moonwell.local.pkl");
+    // Stricter than build's staging (which only tests existence): links below the project are refused.
     const type = Deno.build.os === "windows" ? "junction" : "dir";
     await Deno.symlink(join(root, "outside"), join(root, "maps", "link.w3x"), { type });
     await assertRejects(() => settingsMapDir(root, "link.w3x"), MoonwellError, "Symlinks");

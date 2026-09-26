@@ -202,6 +202,7 @@ Deno.test("settings:check refuses a missing source map folder and names it", asy
   await withProject(async (root) => {
     await writeLocal(root, 'map { folder = "other.w3x" }\nsettings { info { name = "x" } }');
     const error = await assertRejects(() => settingsCheck(pklOnlyContext(root).ctx), MoonwellError, "not found");
-    assertEquals(error.file, "maps/other.w3x");
+    // Named like build names it: map.folder in the evaluated manifest is what to fix.
+    assertEquals(error.file, "moonwell.local.pkl");
   });
 });

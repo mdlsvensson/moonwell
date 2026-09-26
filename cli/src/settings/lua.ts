@@ -50,12 +50,16 @@ function applyLuaEdits(source: string, edits: Edit[]): string {
 
 const number = (value: number): string => String(value);
 
-/** Coordinates editor-generated Lua with already patched map info; returns the source unchanged when nothing applies. */
+/**
+ * Coordinates editor-generated Lua with already patched map info; returns the source unchanged when nothing applies.
+ * `file` names the Lua file and `w3iFile` the map info in errors.
+ */
 export function patchSettingsLua(
   source: string,
   settings: MapSettings,
   patchedW3i: Uint8Array,
   file = "war3map.lua",
+  w3iFile = "war3map.w3i",
 ): string {
   const flagKeys = Object.keys(forceBits) as (keyof typeof forceBits)[];
   const info = (["name", "description"] as const).filter((key) => settings.info[key] !== undefined);
@@ -70,7 +74,7 @@ export function patchSettingsLua(
   const fail = (message: string, hint = RESAVE): never => {
     throw new MoonwellError(`Cannot apply map settings to Lua: ${message}`, { file, hint });
   };
-  const map = readMapInfo(patchedW3i, hasExtendedSettings(settings));
+  const map = readMapInfo(patchedW3i, hasExtendedSettings(settings), w3iFile);
   const functions = readLuaFunctions(source, file);
   const edits: Edit[] = [];
   const eol = source.includes("\r\n") ? "\r\n" : "\n";

@@ -283,3 +283,13 @@ Deno.test("Lua strings escape quotes, backslashes and control characters as deci
   assertEquals(luaString("\r\n1\x001"), '"\\013\\0101\\0001"');
   assertEquals(luaString(""), '""');
 });
+
+Deno.test("unreadable patched map info is reported against the map-info file", async () => {
+  const settings = validateMapSettings({ info: { name: "X" } });
+  const source = await fixtureLua();
+  const error = assertThrows(
+    () => patchSettingsLua(source, settings, new Uint8Array([1, 2]), "maps/m/war3map.lua", "maps/m/war3map.w3i"),
+    MoonwellError,
+  );
+  assertEquals(error.file, "maps/m/war3map.w3i");
+});
