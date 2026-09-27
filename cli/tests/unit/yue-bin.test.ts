@@ -3,13 +3,7 @@ import { join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import type { Runner } from "../../src/shared/process.ts";
 import { spawnError } from "../../src/shared/process.ts";
-import {
-  checkYueOnPath,
-  hasLuaLanguageServer,
-  installYueBin,
-  pathCommand,
-  reportEditorTools,
-} from "../../src/yue/bin.ts";
+import { checkYueOnPath, installYueBin, pathCommand, reportEditorTools } from "../../src/yue/bin.ts";
 import { silentLogger } from "../support/logger.ts";
 
 const missing: Runner = (command) => Promise.reject(spawnError(command, new Deno.errors.NotFound("no")));
@@ -42,13 +36,10 @@ Deno.test("checkYueOnPath tells the pinned version, another version and a missin
 });
 
 Deno.test("pathCommand gives a PowerShell command on Windows and a profile line elsewhere", () => {
-  assertStringIncludes(
+  assertEquals(
     pathCommand("C:\\Users\\me\\AppData\\Local\\moonwell\\bin", "windows"),
-    "[Environment]::SetEnvironmentVariable",
-  );
-  assertStringIncludes(
-    pathCommand("C:\\Users\\me\\AppData\\Local\\moonwell\\bin", "windows"),
-    "C:\\Users\\me\\AppData\\Local\\moonwell\\bin",
+    "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + " +
+      "';C:\\Users\\me\\AppData\\Local\\moonwell\\bin', 'User')",
   );
   assertEquals(
     pathCommand("/home/me/.cache/moonwell/bin", "linux"),
@@ -56,25 +47,38 @@ Deno.test("pathCommand gives a PowerShell command on Windows and a profile line 
   );
 });
 
-Deno.test("hasLuaLanguageServer runs lua-language-server --version", async () => {
-  assertEquals(await hasLuaLanguageServer(reports("3.13.0\n")), true);
-  assertEquals(await hasLuaLanguageServer(missing), false);
+Deno.test("pathCommand keeps spaces and doubles single quotes in the Windows folder", () => {
+  assertStringIncludes(
+    pathCommand("C:\\Users\\Jane Doe\\AppData\\Local\\moonwell\\bin", "windows"),
+    "+ ';C:\\Users\\Jane Doe\\AppData\\Local\\moonwell\\bin', 'User')",
+  );
+  assertStringIncludes(
+    pathCommand("C:\\Users\\O'Brien\\AppData\\Local\\moonwell\\bin", "windows"),
+    "+ ';C:\\Users\\O''Brien\\AppData\\Local\\moonwell\\bin', 'User')",
+  );
 });
 
-Deno.test("reportEditorTools warns about yue on PATH and mentions lua-language-server", async () => {
+Deno.test("reportEditorTools warns once about yue on PATH, and says nothing when it is right", async () => {
   const binDir = "/home/me/.cache/moonwell/bin";
   const options = { version: "0.34.2", binDir, os: "linux" as const };
-  const wrongYue: Runner = (command, args) =>
-    command === "yue" ? reports("Yuescript version: 0.30.0\n")(command, args) : missing(command, args);
   const logger = silentLogger();
-  await reportEditorTools(wrongYue, logger, options);
+  await reportEditorTools(reports("Yuescript version: 0.30.0\n"), logger, options);
+  assertEquals(logger.lines.length, 1);
   assertStringIncludes(logger.lines[0], "warning: yue on PATH is version 0.30.0");
+  assertStringIncludes(logger.lines[0], "Run this once in your shell, then open a new terminal and restart VS Code");
   assertStringIncludes(logger.lines[0], pathCommand(binDir, "linux"));
-  assertEquals(logger.lines.length, 2, "and one line about lua-language-server");
 
   const quiet = silentLogger();
-  const allFound: Runner = (command, args) =>
-    reports(command === "yue" ? "Yuescript version: 0.34.2\n" : "3.13.0\n")(command, args);
-  await reportEditorTools(allFound, quiet, options);
+  await reportEditorTools(reports("Yuescript version: 0.34.2\n"), quiet, options);
   assertEquals(quiet.lines, []);
+});
+
+Deno.test("reportEditorTools tells Windows users to run the command in PowerShell", async () => {
+  const binDir = "C:\\Users\\me\\AppData\\Local\\moonwell\\bin";
+  const logger = silentLogger();
+  await reportEditorTools(missing, logger, { version: "0.34.2", binDir, os: "windows" });
+  assertEquals(logger.lines.length, 1);
+  assertStringIncludes(logger.lines[0], "warning: yue is not on PATH");
+  assertStringIncludes(logger.lines[0], "Run this once in PowerShell, then open a new terminal and restart VS Code");
+  assertStringIncludes(logger.lines[0], pathCommand(binDir, "windows"));
 });

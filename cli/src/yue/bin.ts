@@ -5,9 +5,6 @@ import type { Logger } from "../shared/log.ts";
 import type { Runner } from "../shared/process.ts";
 import { yueVersion } from "./install.ts";
 
-const LUALS_MESSAGE = "For completion and hover in VS Code, also install the Lua extension (sumneko.lua), " +
-  "which brings lua-language-server.";
-
 async function hashIfFile(path: string): Promise<string | undefined> {
   try {
     return await sha256Hex(await Deno.readFile(path));
@@ -54,25 +51,23 @@ export async function checkYueOnPath(run: Runner, version: string): Promise<"ok"
   return found === undefined ? "missing" : { version: found };
 }
 
-/** The one-time command that adds `binDir` to the user PATH. Moonwell never runs it itself (spec §4.3). */
+/**
+ * The one-time command that adds `binDir` to the user PATH: PowerShell on Windows, a shell line elsewhere. Moonwell
+ * never runs it itself (spec §4.3).
+ */
 export function pathCommand(binDir: string, os: typeof Deno.build.os): string {
   if (os === "windows") {
-    return `[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";${binDir}", "User")`;
+    // A single-quoted PowerShell literal takes the folder as is; only `'` needs doubling.
+    const entry = `;${binDir}`.replaceAll("'", "''");
+    return `[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + '${entry}', 'User')`;
   }
   return `echo 'export PATH="${binDir}:$PATH"' >> ~/.profile`;
 }
 
-/** Whether lua-language-server runs from PATH. */
-export async function hasLuaLanguageServer(run: Runner): Promise<boolean> {
-  try {
-    return (await run("lua-language-server", ["--version"])).code === 0;
-  } catch (error) {
-    if (error instanceof MoonwellError) return false;
-    throw error;
-  }
-}
-
-/** Logs what VS Code's YueScript extension still needs on this machine (spec §4.3). */
+/**
+ * Logs what VS Code's YueScript extension still needs on this machine: `yue` on PATH (spec §4.3). The extension finds
+ * lua-language-server in the Lua extension (sumneko.lua), which the template's .vscode/extensions.json recommends.
+ */
 export async function reportEditorTools(
   run: Runner,
   logger: Logger,
@@ -81,10 +76,11 @@ export async function reportEditorTools(
   const onPath = await checkYueOnPath(run, options.version);
   if (onPath !== "ok") {
     const problem = onPath === "missing" ? "is not on PATH" : `on PATH is version ${onPath.version}`;
+    const shell = options.os === "windows" ? "PowerShell" : "your shell";
     logger.warn(
       `yue ${problem}; VS Code's YueScript extension needs YueScript ${options.version} there. ` +
-        `Run this once, then restart VS Code:\n  ${pathCommand(options.binDir, options.os)}`,
+        `Run this once in ${shell}, then open a new terminal and restart VS Code:\n` +
+        `  ${pathCommand(options.binDir, options.os)}`,
     );
   }
-  if (!(await hasLuaLanguageServer(run))) logger.info(LUALS_MESSAGE);
 }
