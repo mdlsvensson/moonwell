@@ -2,11 +2,12 @@
 
 ## Unreleased
 
+## 0.3.1 (2026-09-27)
+
 - Fixed: after World Editor 3.00 saved a map with synced assets, every command that reads `war3map.imp` (`build`,
   `assets:check`, `assets:sync`) failed with "unknown flag 29". World Editor saves custom-path imports with flag 29,
   which is now read as a custom path. `assets:sync` keeps the flag an owned import already has, so saving in World
   Editor leaves nothing to sync.
-
 - `assets:paths` with no file argument reports every model it can read and marks each unreadable one in its place,
   instead of stopping at the first; the command still fails when any model was unreadable.
 - Ctrl+C during `assets:sync` undoes every change it already made to the source map and exits with code 130. A second
@@ -14,6 +15,13 @@
 - `assets:sync` writes no `.asset-state/<map>.json` when it owns no files, and removes the file once the last asset is
   gone. An invalid path in the state file now carries the state file's hint.
 - `assets:paths` reads large text `.mdl` models with far less memory (about a tenth for a 70 MB model).
+
+### Release gate
+
+Assets (CONTRIBUTING step 7) passed 2026-09-27 on Warcraft III Reforged 3.0.0.24268 and World Editor 3.00, tested by the
+maintainer, including a World Editor save after `assets:sync`: both custom imports came back with flag 29,
+`assets:check` reported no changes and `build` succeeded. The other steps were not re-run; this release changes only
+asset code.
 
 ## 0.3.0 (2026-09-26)
 
