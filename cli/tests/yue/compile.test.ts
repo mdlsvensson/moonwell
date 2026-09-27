@@ -32,6 +32,8 @@ Deno.test("compileSources compiles modules and loads them by dotted name", async
     "src/util/math.yue": "export double = (x) -> x * 2\n",
   });
   const output = await compileSources({ yue, root, minify: false });
+  assertEquals(Object.keys(output.hashes).sort(), ["main.yue", "util/math.yue"]);
+  assertEquals(output.hashes["main.yue"].length, 64);
   const main = output.load("main")!;
   assertEquals(main.sourcePath, "src/main.yue");
   assertStringIncludes(main.source, 'require("util.math")');

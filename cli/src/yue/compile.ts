@@ -14,6 +14,8 @@ export interface CompiledModule {
 
 export interface CompileOutput {
   outDir: string;
+  /** SHA-256 of each compiled source, keyed by its POSIX path under src/, e.g. "heroes/captain.yue". */
+  hashes: Record<string, string>;
   load(name: string): CompiledModule | undefined;
 }
 
@@ -87,6 +89,7 @@ export async function compileSources(options: {
   const modules = new Set(sources.map((file) => file.slice(0, -4).split("/").join(".")));
   return {
     outDir,
+    hashes,
     load(name: string): CompiledModule | undefined {
       if (!modules.has(name)) return undefined;
       const relative = name.split(".").join("/");
@@ -117,7 +120,7 @@ async function readManifest(path: string): Promise<Manifest | undefined> {
 }
 
 /** yue prints "Failed to compile: <file>", then "<line>: <message>" and a source excerpt. */
-function compileError(file: string, output: string): MoonwellError {
+export function compileError(file: string, output: string): MoonwellError {
   const detail = output.split(/\r?\n/).filter((line) => !line.startsWith("Failed to compile")).join("\n").trim();
   const match = /^(\d+): (.+)$/m.exec(output);
   return new MoonwellError(match ? `${match[2]}\n${detail}` : detail || "YueScript compilation failed.", {
@@ -126,7 +129,7 @@ function compileError(file: string, output: string): MoonwellError {
   });
 }
 
-async function forEachLimited<T>(items: T[], limit: number, fn: (item: T) => Promise<void>): Promise<void> {
+export async function forEachLimited<T>(items: T[], limit: number, fn: (item: T) => Promise<void>): Promise<void> {
   let next = 0;
   const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
     while (next < items.length) await fn(items[next++]);
