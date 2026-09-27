@@ -6,6 +6,8 @@
   instead of stopping at the first; the command still fails when any model was unreadable.
 - Ctrl+C during `assets:sync` undoes every change it already made to the source map and exits with code 130. A second
   Ctrl+C still exits at once.
+- An asset can be imported as `war3mapPreview.tga`, the lobby's custom preview image. Every other `war3map` path is
+  still reserved.
 - `assets:paths` reads large text `.mdl` models with far less memory (about a tenth for a 70 MB model).
 
 ## 0.3.0 (2026-09-26)
