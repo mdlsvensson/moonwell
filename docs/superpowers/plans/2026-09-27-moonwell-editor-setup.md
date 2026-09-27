@@ -250,11 +250,11 @@ git commit -m "test: World Editor 3.00 Lua globals fixture and Plan 3a answers"
 
 | Claim | Answer | Consequence |
 | --- | --- | --- |
-| V1 macro import through `include` | | If it fails, Plan 3c revisits how the extension finds `moonwell.macros`; 3a keeps `include` |
-| V2 `---@meta moonwell` / `generated.objects` | | If it fails, Task 4 renders the two modules as plain files under `.moonwell/types/` named `moonwell.lua` and `generated/objects.lua` and adds `.moonwell/types/?.lua` to `runtime.path` |
-| V3 LuaLS found without PATH | | Decides Task 8's lua-language-server check (both branches are written out there) |
-| V4 file names and letter case | | Task 3's reader uses these names |
-| V5 `war3map.lua` globals shape | | Task 5's type rules are checked against the fixture |
+| V1 macro import through `include` | Works: the extension's server (0.2.9) resolves `moonwell.macros` through `include` and expands `$FourCC` | If it fails, Plan 3c revisits how the extension finds `moonwell.macros`; 3a keeps `include` |
+| V2 `---@meta moonwell` / `generated.objects` | Works, when the editor is opened on the project folder itself (LuaLS reads `.luarc.json` from the first workspace folder). `objects.units = {}` draws a `missing-fields` warning: `objects.d.lua` disables it (ledger ruling) | If it fails, Task 4 renders the two modules as plain files under `.moonwell/types/` named `moonwell.lua` and `generated/objects.lua` and adds `.moonwell/types/?.lua` to `runtime.path` |
+| V3 LuaLS found without PATH | Yes: the extension used the Lua extension's (`sumneko.lua` 3.19.1) bundled server with nothing on PATH | Decides Task 8's lua-language-server check (both branches are written out there) |
+| V4 file names and letter case | `war3.w3mod/scripts/common.j` and `war3.w3mod/scripts/blizzard.j`, lower case | Task 3's reader uses these names |
+| V5 `war3map.lua` globals shape | As the Task 5 table: `udg_Score = 0` (initial value set later in `InitGlobals`), `0.0`, `""`, `false`, `nil`, `__jarray(0)`, `{}`; `gg_trg_`, `gg_rct_`, `gg_cam_`. A placed unit gets no `gg_unit_` global unless a trigger uses it | Task 5's type rules are checked against the fixture; its fixture test checks `gg_rct_`/`gg_cam_` instead of `gg_unit_` |
 | V6 Lua globals present and removed; `os`, `debug`, `package` keys | | Task 3's `lua-extras.json`; Task 7's `runtime.builtin` |
 
 ---
