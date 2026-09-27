@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 (2026-09-27)
 
 - Editor support for VS Code's YueScript extension: new projects get `yueconfig.yue`, `.luarc.json` and a recommendation
   of the YueScript and Lua (`sumneko.lua`) extensions, and `check`, `build`, `test` and `dev` write LuaLS declarations
@@ -28,7 +28,16 @@
   default, so a project that relies on `global *`, `global ^` or globals defined elsewhere should list them in
   `lint.globals`, or set `lint.unknownGlobals = "warning"` for a while.
 
-### Release gate (so far)
+### Release gate
+
+Passed 2026-09-27 on Warcraft III Reforged 3.0.0.24268 and World Editor 3.00.
+
+Steps 1 to 6 (CONTRIBUTING), tested by the maintainer in `template/` apart from steps 1 and 2: every check passes from a
+clean checkout, and `cli/data/game-paths.txt` is the 3.0.0.24268 list. `deno task test` prints "Moonwell is running.",
+the Captain changes colour and the Footman stands beside it, and the game window stays open after the CLI exits. An
+`error "gate"` in `on_main` shows `[moonwell] on_main failed: src/main.yue:6: gate`. The `--minify` build plays from
+`dist/bin/map.w3x`, and the packed map opens in World Editor. Steps 7 to 9 (assets, map settings, object data) were not
+re-run: this release does not change their code.
 
 Editor and unknown globals (CONTRIBUTING step 10) passed 2026-09-27, tested by the maintainer in Antigravity IDE (a VS
 Code fork) with the YueScript extension 0.2.9 and the Lua extension 3.19.1, and re-run in full after Plan 3b:

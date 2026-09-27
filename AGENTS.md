@@ -99,8 +99,11 @@ over, and updated on 2026-09-27 after Plan 3c.
 
 ## Next work, in order
 
-1. **Release 0.4.0:** 3a, 3b and 3c are released together. Run the whole release gate in CONTRIBUTING, including step
-   11, then publish as its "Publishing" section says.
+1. **Publish 0.4.0** (3a, 3b and 3c together). The gate passed and the version is bumped (CHANGELOG `## 0.4.0`); the
+   maintainer packages the schema, creates the `moonwell@0.4.0` GitHub release on the pushed release commit, publishes
+   to JSR and checks it from outside the repo (CONTRIBUTING "Publishing" steps 2–5). Then mark 0.4.0 released here.
+2. **Sub-project 4** (importing existing Lua code; see Backlog) needs a design first. Ask the maintainer what comes
+   next.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
