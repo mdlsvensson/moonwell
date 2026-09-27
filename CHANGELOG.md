@@ -11,6 +11,11 @@
   cache's `bin` folder, and prints the command that puts it on PATH when `yue` is missing there or another version.
 - `setup` now also plans the project's objects to write the editor declarations, so objects that do not resolve, or a
   missing or unreadable source map when there are objects, make `setup` fail as they make `check` fail.
+- `check`, `build`, `test` and `dev` report every global a gameplay file uses that nothing defines, with its file, line
+  and column and the nearest known name (`Did you mean CreateUnit?`). Known globals are the game's natives, Blizzard.j
+  functions and globals and Lua libraries, the source map's `war3map.lua` globals, names declared with `global` under
+  `src/` and the new `lint.globals` list. `lint.unknownGlobals = "warning"` reports them without failing. New projects
+  show the `lint` block in `moonwell.pkl`.
 - After upgrading, run `deno task setup` once: it adds the editor files and the new `.gitignore` lines. Until then,
   `check` and `build` leave `.moonwell/` untracked in a 0.3 project.
 

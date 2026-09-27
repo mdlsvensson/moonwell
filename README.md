@@ -102,6 +102,27 @@ the map in World Editor to pick up new `gg_` and `udg_` globals.
   `objects/`. They find the schema through `PklProject`, so run their "sync projects" command once after `init`. If the
   extension cannot find `pkl`, set its CLI path (`pkl.cli.path` in VS Code).
 
+## Unknown globals
+
+`check`, `build`, `test` and `dev` stop on a global that nothing defines, which is almost always a typo:
+
+```text
+error: src/main.yue:8:10 › Unknown global CreatUnit.
+hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.
+```
+
+A global is known when it is a native, a Blizzard.j function or global, or a Lua library the game provides; a global or
+function of the source map's `war3map.lua` (such as `gg_unit_Hpal_0002` or `udg_Score`; run the command again after
+saving the map in World Editor); a name declared with `global` in any file under `src/` (`global Score = 0`,
+`global a, b`); or a name listed in `lint.globals` in `moonwell.pkl`. Fields are not checked: `math.floor` checks only
+`math`.
+
+`global *` and `global ^` make later assignments global without naming them, so Moonwell cannot see those names; list
+them in `lint.globals`. To report unknown globals without failing, set `lint { unknownGlobals = "warning" }`. In the
+editor, lua-language-server underlines the same names as you type.
+
+The check runs the compiler's `yue -g` on each changed file and caches the result in `dist/stage/lua/`.
+
 ## Assets
 
 Every file under `assets/` is imported into the built map at its relative path: `assets/Models/unit.mdx` becomes

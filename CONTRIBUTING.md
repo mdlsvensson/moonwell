@@ -116,8 +116,11 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
     `deno task check`, confirm typing `gg_unit_` offers every placed unit a trigger uses, including the template's
     `gg_unit_Hblm_0003` and `gg_unit_Hpal_0002`. Create `src/heroes/captain.yue` with
     `export default { greet: -> print "Hello" }`, add `import "heroes.captain"` to `src/main.yue`, save both, and
-    confirm `captain.greet` completes after the import (lua-language-server indexes the git-ignored `.lua` files).
-    Confirm `git status` shows no `.moonwell/` and no `src/**/*.lua` files.
+    confirm `captain.greet` completes after the import (lua-language-server indexes the git-ignored `.lua` files). Type
+    `CreatUnit` for `CreateUnit` in `src/main.yue`: the editor underlines it, and `deno task check` fails with
+    `src/main.yue:<line>:<column> › Unknown global CreatUnit.` and `Did you mean CreateUnit?`. Set
+    `lint { unknownGlobals = "warning" }` in `moonwell.pkl` and confirm `deno task build` succeeds and prints the same
+    lines as warnings; then undo both changes. Confirm `git status` shows no `.moonwell/` and no `src/**/*.lua` files.
 11. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing

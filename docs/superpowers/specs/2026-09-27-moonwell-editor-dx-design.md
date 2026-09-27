@@ -201,8 +201,8 @@ entry.
 ### 5.2 Running
 
 After compiling, Moonwell runs `yue -g --path <project>/.moonwell/yue/?.lua <file>` for each source file, eight at a
-time, like compiling. Results are cached per file hash next to the compile hashes (`dist/stage/lua/.hashes.json`), so
-only changed files run `yue -g` again. A change to `war3map.lua`, to `lint.globals` or to the Moonwell version
+time, like compiling. Results are cached per file hash in `dist/stage/lua/.globals.json`, next to the compile hashes,
+so only changed files run `yue -g` again. A change to `war3map.lua`, to `lint.globals` or to the Moonwell version
 re-evaluates every file's cached names without re-running `yue`.
 
 It runs in `check`, `build`, `test` and `dev`, after compiling, so a syntax error is still reported as a compile
@@ -230,8 +230,10 @@ error: src/main.yue:7:11 › Unknown global CreatUnit.
 hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.
 ```
 
-The suggestion reuses the nearest-name matching from object data. With `"warning"`, the same lines are printed as
-warnings and the command continues.
+The suggestion reuses the nearest-name matching from object data, with a tighter threshold (at most a quarter of the
+name's length in edits), since it searches thousands of names; a standard-library name the game removes (`io`) gets
+`Warcraft III's Lua does not provide io.` instead. With `"warning"`, the same lines are printed as warnings and the
+command continues.
 
 ### 5.5 Not covered
 

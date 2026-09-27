@@ -4,7 +4,7 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-27 after Plan 3a.
+over, and updated on 2026-09-27 after Plan 3b.
 
 ## Read first
 
@@ -15,7 +15,7 @@ over, and updated on 2026-09-27 after Plan 3a.
 - Later specs, all implemented: `2026-09-25-moonwell-model-paths-design.md`,
   `2026-09-25-moonwell-in-game-paths-design.md`, `2026-09-25-moonwell-map-settings-design.md` and
   `2026-09-26-moonwell-object-data-design.md`. `2026-09-27-moonwell-editor-dx-design.md` (sub-project 3) is being
-  implemented: Plan 3a is done, 3b and 3c are not. Plans for everything built so far are in `docs/superpowers/plans/`;
+  implemented: Plans 3a and 3b are done, 3c is not. Plans for everything built so far are in `docs/superpowers/plans/`;
   follow their style when writing new plans.
 
 ## State (2026-09-27)
@@ -76,15 +76,19 @@ over, and updated on 2026-09-27 after Plan 3a.
   `.luarc.json` sets it to 10000. On Windows the extension 0.2.9 opens a console window for `yue` (it does not hide it).
   Our fix, `windowsHide: true` on its two `spawn` calls (pigpigyyy/yuescript-vscode#11), was merged 2026-09-27 and
   awaits an extension release; then drop the README note.
+- **Plan 3b done, unreleased** (`docs/superpowers/plans/2026-09-27-moonwell-unknown-globals.md`): the unknown-global
+  check. `compileProject` runs `yue -g` per changed source (cache `dist/stage/lua/.globals.json`, code in
+  `cli/src/lint/`), builds the known names from `natives.json`, the source map's `war3map.lua`, `global` lines under
+  `src/` and `lint.globals`, and throws a `ProblemsError` (or warns, with `lint.unknownGlobals = "warning"`). Name
+  matching is in `cli/src/shared/names.ts`, shared with object data.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `e312e4a` (release 0.3.1).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Plan 3b, the unknown-global check:** write it from spec §5 of
-   `docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md`. Then Plan 3c (macros); 3a, 3b and 3c are released
-   together as 0.4.0.
+1. **Plan 3c, macros:** write it from spec §6 of `docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md`.
+2. **Release 0.4.0:** 3a, 3b and 3c are released together, after the full release gate in CONTRIBUTING.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
