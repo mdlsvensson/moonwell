@@ -255,7 +255,7 @@ git commit -m "test: World Editor 3.00 Lua globals fixture and Plan 3a answers"
 | V3 LuaLS found without PATH | Yes: the extension used the Lua extension's (`sumneko.lua` 3.19.1) bundled server with nothing on PATH | Decides Task 8's lua-language-server check (both branches are written out there) |
 | V4 file names and letter case | `war3.w3mod/scripts/common.j` and `war3.w3mod/scripts/blizzard.j`, lower case | Task 3's reader uses these names |
 | V5 `war3map.lua` globals shape | As the Task 5 table: `udg_Score = 0` (initial value set later in `InitGlobals`), `0.0`, `""`, `false`, `nil`, `__jarray(0)`, `{}`; `gg_trg_`, `gg_rct_`, `gg_cam_`. A placed unit gets no `gg_unit_` global unless a trigger uses it | Task 5's type rules are checked against the fixture; its fixture test checks `gg_rct_`/`gg_cam_` instead of `gg_unit_` |
-| V6 Lua globals present and removed; `os`, `debug`, `package` keys | | Task 3's `lua-extras.json`; Task 7's `runtime.builtin` |
+| V6 Lua globals present and removed; `os`, `debug`, `package` keys | Missing in 3.0.0.24268: `collectgarbage`, `dofile`, `loadfile`, `debug`, `io`, `package`. `os` has only `clock`, `date`, `difftime`, `time`. `FourCC` and `__jarray` exist. (`require` exists in a Moonwell map: the runtime defines it.) | Task 3's `lua-extras.json`; Task 7's `runtime.builtin` |
 
 ---
 
