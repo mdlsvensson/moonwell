@@ -35,6 +35,15 @@ carry the same number, and a unit test enforces it.
 export the file names of the game's CASC storage (for example with CascView) to a text file, one per line, then run
 `deno task gen:game-paths <that file> <game version>` and `deno task gen`, and commit both files.
 
+## Natives
+
+The editor declarations come from `cli/data/natives.json`: the names, types and signatures of `common.j` and
+`blizzard.j`, plus the Lua globals the game provides and removes from `tools/natives/lua-extras.json` (hand-written,
+from an in-game probe). For a new game version, export `war3.w3mod/scripts/common.j` and `war3.w3mod/scripts/blizzard.j`
+from the game's CASC storage with CascView, keeping those relative paths, then run
+`deno task gen:natives <export folder> <game version>` and `deno task gen`, and commit `cli/data/natives.json` and
+`cli/src/embedded/natives.ts`. Comments in the `.j` files are Blizzard's text and are not copied.
+
 ## Release gate (manual, before every release)
 
 1. Run every check above from a clean checkout.
@@ -97,7 +106,16 @@ export the file names of the game's CASC storage (for example with CascView) to 
       buff's icon (Holy Light applies no buff in game, so the buff is only checked here). Confirm `maps/map.w3x` is
       unchanged apart from sub-step 4's edit (`git status`), and that a second build leaves `src/generated/objects.yue`
       unchanged.
-10. Record the Warcraft III and World Editor versions in the changelog.
+10. Editor, in another throwaway project: `deno run -A cli/src/main.ts init --link <temp dir>/editor-check`, committed
+    to a new git repository (`git init`). Run `deno task setup` there and, if it prints a PATH command, run it once in
+    PowerShell, then open a new terminal. Open the project folder itself in VS Code (File > Open Folder; opened any
+    other way, lua-language-server finds no `.luarc.json`) and install the YueScript and Lua extensions it recommends.
+    In `src/main.yue`, confirm that hovering or completing `CreateUnit` shows its parameter names and types, and that
+    `mw.on_main` and `objects.units.captain` complete. In World Editor, place a unit in `maps/map.w3x`, reference it in
+    a trigger (World Editor writes a `gg_unit_...` global only for a unit a trigger uses) and save; after
+    `deno task check`, confirm the unit's `gg_unit_...` global completes. Confirm `git status` shows no `.moonwell/` and
+    no `src/*.lua` files.
+11. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
 

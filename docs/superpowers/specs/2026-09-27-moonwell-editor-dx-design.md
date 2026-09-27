@@ -64,8 +64,8 @@ and writes `cli/data/natives.json`, committed. Like `gen:metadata`, it is run on
 
 The parser handles the subset of JASS these files use: `type X extends Y`, `native`/`constant native` declarations,
 `function ... takes ... returns ...` headers in `blizzard.j` (bodies are skipped), and the `globals ... endglobals`
-blocks with `constant`, `array` and initial values. Comments are kept when they sit directly above a declaration
-(**To verify:** whether 3.0.0.24268's files carry doc comments; if they do, they become hover documentation).
+blocks with `constant`, `array` and initial values. Comments are not kept: they are Blizzard's text, and the repo
+never copies it.
 
 ### 3.2 Lua extras
 
@@ -89,7 +89,7 @@ map the plan provides, not from memory.
     {
       "name": "CreateUnit", "source": "common.j", "constant": false,
       "params": [{ "name": "id", "type": "player" }, { "name": "unitid", "type": "integer" }],
-      "returns": "unit", "doc": null
+      "returns": "unit"
     }
   ],
   "globals": [
@@ -128,7 +128,7 @@ docset are all rendered from `natives.json`, so they cannot disagree.
 - **`.luarc.json`:** `runtime.version: "Lua 5.3"`; `runtime.path: ["src/?.lua", "src/?/init.lua"]`;
   `workspace.library: [".moonwell/types"]`; `workspace.ignoreDir: ["dist", "maps"]` (so LuaLS does not index World
   Editor's `war3map.lua`); `runtime.builtin` disabling the libraries the game removes (§3.2).
-- **`.vscode/extensions.json`:** recommends `LiJin.yuescript`.
+- **`.vscode/extensions.json`:** recommends `LiJin.yuescript` and `sumneko.lua`.
 - **`.gitignore`** gains `.moonwell/` and `src/**/*.lua` (the extension's output on save).
 
 These are template files, so they are embedded and covered by the embedded-template test like the rest of
@@ -162,7 +162,8 @@ user PATH (PowerShell on Windows, a shell profile line on Linux). **Decision:** 
 (maintainer's choice, option A). A copy locked by a running editor on Windows (`EBUSY`) is a `MoonwellError` telling
 the user to close VS Code and retry.
 
-`setup` also reports whether it found `lua-language-server`, with the install link if not.
+`setup` does not look for lua-language-server: the YueScript extension uses the one bundled with the Lua extension
+(`sumneko.lua`), which `.vscode/extensions.json` recommends (V3).
 
 ### 4.4 Documentation
 

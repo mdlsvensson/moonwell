@@ -37,6 +37,10 @@ deno task test
 | `maps/map.w3x/`      | World Editor map (folder format, Lua script mode)                                                      |
 | `assets/`            | Files to import into the map                                                                           |
 | `.asset-state/`      | Which source-map files `assets:sync` owns; commit it                                                   |
+| `yueconfig.yue`      | Settings for VS Code's YueScript extension; builds do not read it                                      |
+| `.luarc.json`        | Settings for lua-language-server in the editor                                                         |
+| `.vscode/`           | `extensions.json`, which recommends the YueScript and Lua extensions                                   |
+| `.moonwell/`         | Declarations for the editor, written by `check`, `build`, `test`, `dev` and `setup`; git-ignored       |
 | `dist/`              | Build output                                                                                           |
 
 `moonwell.local.pkl` amends `moonwell.pkl`, so any setting can be overridden there for your machine only. Lists such as
@@ -54,6 +58,42 @@ mw.on_main ->
 Hooks: `before_config`, `on_config`, `before_main`, `on_main`. A failing hook prints its error with the `.yue` file and
 line, and the other hooks still run. Module top-level code runs while the map script loads, so create game objects
 inside hooks.
+
+## Editor setup
+
+VS Code with two extensions gives `.yue` files completion, hover, signature help and type warnings for the game's API.
+
+1. Install [VS Code](https://code.visualstudio.com/), then open the project folder itself (File > Open Folder). VS Code
+   offers the two extensions the project recommends: YueScript (`LiJin.yuescript`) and Lua (`sumneko.lua`). Install
+   both. The YueScript extension uses the lua-language-server that the Lua extension brings, so nothing else needs
+   installing.
+2. Run `deno task setup` in the project. It adds the editor files and `.gitignore` lines an older project lacks (it
+   never overwrites a file) and keeps a copy of the project's pinned YueScript in the cache's `bin` folder
+   (`%LOCALAPPDATA%\moonwell\bin` on Windows; with `yue.path` set, your own binary's folder counts instead). The
+   extension runs `yue` from PATH and has no setting for its location, so when `yue` is missing there or another
+   version, `setup` prints a command that adds the `bin` folder to your user PATH. Run it once (in PowerShell on
+   Windows), then open a new terminal and restart VS Code. Moonwell never changes PATH itself.
+3. Always open the project folder itself, as in step 1. lua-language-server reads `.luarc.json` only from the first
+   folder of the workspace: opened as a parent folder, a single file or a second workspace folder, nothing is
+   recognised.
+
+You get completion, hover and signatures for every native and Blizzard.j function and global of Warcraft III
+3.0.0.24268, `import "moonwell"`, `import "generated.objects"` and the map's own `gg_` and `udg_` globals, and a warning
+for a `unit` passed where a `player` is expected. The declarations live in `.moonwell/types/`; `check`, `build`, `test`
+and `dev` keep them current, so run `deno task check` after saving the map in World Editor to pick up new `gg_` and
+`udg_` globals.
+
+- **`.lua` files next to your `.yue` files.** The extension writes `src/<name>.lua` each time you save a `.yue` file. It
+  needs them for lua-language-server. They are git-ignored, and builds never use them: Moonwell compiles `src/**/*.yue`
+  itself.
+- **The game's Lua.** Warcraft III 3.0.0.24268 runs Lua 5.3 without `collectgarbage`, `dofile`, `loadfile`, `debug`,
+  `io` and `package`, and its `os` has only `clock`, `date`, `difftime` and `time`. `.luarc.json` turns off `io`,
+  `debug` and `package` in the editor; lua-language-server cannot turn off single functions, so the editor does not flag
+  the others.
+- **Pkl.** Pkl files need no editor plugin: the `pkl` and `deno` command-line tools do all the work. Editors with Pkl
+  support (the Pkl extension for VS Code, the IntelliJ plugin) add completion and hover docs for `moonwell.pkl` and
+  `objects/`. They find the schema through `PklProject`, so run their "sync projects" command once after `init`. If the
+  extension cannot find `pkl`, set its CLI path (`pkl.cli.path` in VS Code).
 
 ## Assets
 
@@ -270,7 +310,7 @@ Not supported yet:
 | `deno task settings:check`                       | Show which internal map files the settings would change, without building        |
 | `deno task objects:check`                        | Validate the objects and show which internal map files they would change         |
 | `deno task objects:eval`                         | Print the resolved objects as JSON                                               |
-| `deno task setup`                                | Create a missing `moonwell.local.pkl` and download the pinned YueScript compiler |
+| `deno task setup`                                | Create a missing `moonwell.local.pkl`, download YueScript and prepare the editor |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
 else in `%LOCALAPPDATA%\moonwell` on Windows, else in `$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`.
@@ -314,13 +354,6 @@ settings {
 - `gameplay.heroMaxLevel` and `gameplay.foodLimit` write `[Misc] MaxHeroLevel` and `[Misc] FoodCeiling`. If you set the
   same key raw as well, the two must agree exactly: `heroMaxLevel = 25` with `["MaxHeroLevel"] = "25"` is accepted, with
   `"025"` it is an error.
-
-## Editor support
-
-Nothing needs an editor plugin: the `pkl` and `deno` command-line tools do all the work. Editors with Pkl support (the
-Pkl extension for VS Code, the IntelliJ plugin) add completion and hover docs for `moonwell.pkl`. They find the schema
-through `PklProject`, so run their "sync projects" command once after `init`. If the extension cannot find `pkl`, set
-its CLI path (`pkl.cli.path` in VS Code).
 
 ## Credits
 

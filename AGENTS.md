@@ -4,7 +4,7 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-27 after the small assets fixes.
+over, and updated on 2026-09-27 after Plan 3a.
 
 ## Read first
 
@@ -14,7 +14,8 @@ over, and updated on 2026-09-27 after the small assets fixes.
   `## Unreleased` lists what is done since).
 - Later specs, all implemented: `2026-09-25-moonwell-model-paths-design.md`,
   `2026-09-25-moonwell-in-game-paths-design.md`, `2026-09-25-moonwell-map-settings-design.md` and
-  `2026-09-26-moonwell-object-data-design.md`. Plans for everything built so far are in `docs/superpowers/plans/`;
+  `2026-09-26-moonwell-object-data-design.md`. `2026-09-27-moonwell-editor-dx-design.md` (sub-project 3) is being
+  implemented: Plan 3a is done, 3b and 3c are not. Plans for everything built so far are in `docs/superpowers/plans/`;
   follow their style when writing new plans.
 
 ## State (2026-09-27)
@@ -56,15 +57,29 @@ over, and updated on 2026-09-27 after the small assets fixes.
   deferred: `assets:paths` reports every readable model before failing, and tokenizes `.mdl` lazily. Ctrl+C during
   `assets:sync` rolls back. There is no empty state file, and the state-file hint is fixed. The assets release gate
   (CONTRIBUTING step 7, with the World Editor save) passed 2026-09-27.
+- **Plan 3a done, unreleased** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-editor-setup.md`): editor
+  support for VS Code's YueScript extension (`LiJin.yuescript`) with the Lua extension (`sumneko.lua`), whose bundled
+  lua-language-server the YueScript extension uses. `deno task gen:natives <folder> <version>` (`tools/gen-natives.ts`,
+  parser in `tools/natives/jass.ts`) reads `war3.w3mod/scripts/common.j` and `blizzard.j` exported with CascView into
+  `cli/data/natives.json` (names, types and signatures only; comments are Blizzard's text and are not copied), plus the
+  hand-written `tools/natives/lua-extras.json`. `check`, `build`, `test`, `dev` and `setup` write
+  `.moonwell/types/{natives,moonwell,objects,map}.d.lua` (git-ignored; code in `cli/src/editor/`); `map.d.lua` comes
+  from the source map's `war3map.lua` (fixture `cli/tests/fixtures/map-globals-we3/`). The template has `yueconfig.yue`,
+  `.luarc.json` and `.vscode/extensions.json`, and `.gitignore` gains `.moonwell/` and `src/**/*.lua`. `setup` adds
+  those to older projects without overwriting, copies the pinned yue to `<cache>/bin` and prints the PATH command when
+  `yue` on PATH is missing or another version (`cli/src/yue/bin.ts`). Found by an in-game probe: the game's Lua lacks
+  `collectgarbage`, `dofile`, `loadfile`, `debug`, `io` and `package`, and `os` has only `clock`, `date`, `difftime` and
+  `time`. The editor must be opened on the project folder itself: lua-language-server reads `.luarc.json` only from the
+  first workspace folder. The editor gate (CONTRIBUTING step 10, plan Task 10) is the maintainer's to run.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `e312e4a` (release 0.3.1).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Editor & DX (sub-project 3):** spec `docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md` (sections
-   approved in chat 2026-09-27; the written spec awaits the maintainer's review). Then Plan 3a (natives data,
-   declarations, editor setup), 3b (unknown-global check), 3c (macros), released together as 0.4.0.
+1. **Plan 3b, the unknown-global check:** write it from spec §5 of
+   `docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md` once the maintainer has passed the editor gate (Plan
+   3a's Task 10). Then Plan 3c (macros); 3a, 3b and 3c are released together as 0.4.0.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -85,10 +100,11 @@ Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` dow
   error is reported as an internal "please report" error, so user mistakes must never reach it.
 - **Style:** file system code is async. `deno fmt` uses width 120; `template/`, `docs/` and `cli/src/embedded/` are
   excluded. `deno fmt --check` and `deno lint` must be clean.
-- **Generated files:** after changing `template/`, `cli/runtime/moonwell.lua`, `cli/data/game-paths.txt` or
-  `cli/data/metadata.json`, run `deno task gen`; the embedded modules in `cli/src/embedded/` and `schema/generated/` are
-  freshness-tested. Nothing stray may be left in `template/`: every file there is embedded into `init`, and a stray file
-  fails the embedded-template test. `template/src/generated/objects.yue` must match `template/objects/` (e2e).
+- **Generated files:** after changing `template/`, `cli/runtime/moonwell.lua`, `cli/data/game-paths.txt`,
+  `cli/data/metadata.json` or `cli/data/natives.json`, run `deno task gen`; the embedded modules in `cli/src/embedded/`
+  and `schema/generated/` are freshness-tested. Nothing stray may be left in `template/`: every file there is embedded
+  into `init`, and a stray file fails the embedded-template test. `template/src/generated/objects.yue` must match
+  `template/objects/` (e2e).
 - **Pkl:** `pkl` 0.32 is required. A module property can't be named `output`, because it clashes with Pkl's built-in.
   Pkl `Mapping` values are type-checked lazily: tests that expect a constraint error must force the values (`.toMap()`).
 

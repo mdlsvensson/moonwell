@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Editor support for VS Code's YueScript extension: new projects get `yueconfig.yue`, `.luarc.json` and a recommendation
+  of the YueScript and Lua (`sumneko.lua`) extensions, and `check`, `build`, `test` and `dev` write LuaLS declarations
+  to `.moonwell/types/` for every native, Blizzard.j function and global of Warcraft III 3.0.0.24268, the Moonwell
+  runtime, the project's object ids and the map's own globals. `.gitignore` gains `.moonwell/` and `src/**/*.lua` (the
+  `.lua` files the extension writes on save). See "Editor setup" in the README.
+- `setup` adds the editor files and `.gitignore` lines older projects lack, keeps a copy of the pinned YueScript in the
+  cache's `bin` folder, and prints the command that puts it on PATH when `yue` is missing there or another version.
+- `setup` now plans the project's objects to write the editor declarations, so invalid Pkl under `objects/` makes
+  `setup` fail, as it makes `check` fail.
+
 ## 0.3.1 (2026-09-27)
 
 - Fixed: after World Editor 3.00 saved a map with synced assets, every command that reads `war3map.imp` (`build`,
