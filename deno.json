@@ -25,6 +25,7 @@
     "exclude": [
       "cli/src/embedded",
       "cli/data/metadata.json",
+      "cli/data/natives.json",
       "cli/tests/fixtures/map-settings-v39",
       "cli/tests/fixtures/objects-v3-names",
       "template",

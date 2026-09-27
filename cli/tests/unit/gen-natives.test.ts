@@ -119,3 +119,29 @@ Deno.test("buildNatives refuses a name declared twice", () => {
     "CreateThing",
   );
 });
+
+Deno.test("buildNatives refuses a Lua global named like a JASS function", () => {
+  assertThrows(
+    () =>
+      buildNatives("9.9.9", parseJass(COMMON, "common.j"), parseJass(BLIZZARD, "blizzard.j"), {
+        functions: [],
+        globals: ["CreateThing"],
+        removed: [],
+      }),
+    Error,
+    "CreateThing",
+  );
+});
+
+Deno.test("buildNatives refuses a Lua name both provided and removed", () => {
+  assertThrows(
+    () =>
+      buildNatives("9.9.9", parseJass(COMMON, "common.j"), parseJass(BLIZZARD, "blizzard.j"), {
+        functions: [],
+        globals: ["print", "io"],
+        removed: ["io"],
+      }),
+    Error,
+    "io",
+  );
+});

@@ -30,12 +30,17 @@ export function buildNatives(gameVersion: string, common: JassFile, blizzard: Ja
     ...g,
     source: g.source as "common.j" | "blizzard.j",
   }));
+  const entries: Array<[name: string, where: string]> = [
+    ...[...functions, ...globals].map((e): [string, string] => [e.name, e.source]),
+    ...[...common.types, ...blizzard.types].map((t): [string, string] => [t.name, "type"]),
+    ...extras.globals.map((name): [string, string] => [name, "lua.globals"]),
+    ...extras.removed.map((name): [string, string] => [name, "lua.removed"]),
+  ];
   const seen = new Map<string, string>();
-  for (const entry of [...functions, ...globals, ...common.types, ...blizzard.types]) {
-    const where = "source" in entry ? entry.source : "type";
-    const previous = seen.get(entry.name);
-    if (previous !== undefined) throw new Error(`${entry.name} is declared twice (${previous} and ${where}).`);
-    seen.set(entry.name, where);
+  for (const [name, where] of entries) {
+    const previous = seen.get(name);
+    if (previous !== undefined) throw new Error(`${name} is declared twice (${previous} and ${where}).`);
+    seen.set(name, where);
   }
   return {
     gameVersion,

@@ -60685,7 +60685,6 @@
       "_G",
       "_VERSION",
       "assert",
-      "collectgarbage",
       "coroutine",
       "error",
       "getmetatable",
@@ -60693,6 +60692,7 @@
       "load",
       "math",
       "next",
+      "os",
       "pairs",
       "pcall",
       "print",
@@ -60700,6 +60700,7 @@
       "rawget",
       "rawlen",
       "rawset",
+      "require",
       "select",
       "setmetatable",
       "string",
@@ -60711,7 +60712,12 @@
       "xpcall"
     ],
     "removed": [
-      "io"
+      "collectgarbage",
+      "debug",
+      "dofile",
+      "io",
+      "loadfile",
+      "package"
     ]
   }
 }
