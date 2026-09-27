@@ -28,7 +28,8 @@ Deno.test("assetPath normalizes separators and rejects unsafe paths", () => {
   assertEquals(pathKey("Textures\\A.BLP"), "textures/a.blp");
 });
 
-Deno.test("targetPath rejects map internals but allows war3mapImported and the preview image", () => {
+Deno.test("targetPath rejects map internals but allows war3mapImported", () => {
+  // Reforged ignores war3mapPreview.tga (the map list shows war3mapMap.blp), so it stays reserved like the rest.
   for (
     const reserved of [
       "war3map.lua",
@@ -37,14 +38,12 @@ Deno.test("targetPath rejects map internals but allows war3mapImported and the p
       "scripts/war3map.j",
       "(listfile)",
       "war3mapMap.blp",
-      "war3mapPreview.blp",
+      "war3mapPreview.tga",
     ]
   ) {
     assertThrows(() => targetPath(reserved), MoonwellError, "Reserved");
   }
   assertEquals(targetPath("war3mapImported/sound.wav"), "war3mapImported/sound.wav");
-  assertEquals(targetPath("war3mapPreview.tga"), "war3mapPreview.tga");
-  assertEquals(targetPath("War3mapPreview.TGA"), "War3mapPreview.TGA");
 });
 
 Deno.test("collectAssets maps, excludes, skips dotfiles and sorts by target", async () => {

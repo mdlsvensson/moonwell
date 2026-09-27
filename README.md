@@ -68,9 +68,6 @@ assets {
 }
 ```
 
-Assets cannot replace the map's internal files, such as `war3map.lua` or `war3map.imp`. The one exception is
-`war3mapPreview.tga`, the custom preview image the lobby shows: put it at `assets/war3mapPreview.tga`.
-
 Builds import assets into the staged copy only. To see them in World Editor, close the map there and run
 `deno task assets:sync`. It writes the files and `war3map.imp` into `maps/<folder>`, and records what it owns in
 `.asset-state/`. It never overwrites or deletes a file it does not own, and it refuses to touch an owned file you edited

@@ -51,17 +51,17 @@ over, and updated on 2026-09-27 after the small assets fixes.
   `cli/tests/fixtures/objects-v3-names/`. The in-game gate (CONTRIBUTING step 9) passed 2026-09-26, including per-level
   ability values and upgrade tooltips. The research button shows an upgrade's `tooltip`, not its `name`. The template's
   footman is the Captain (`template/objects/units.pkl`).
-- **Unreleased** (2026-09-27, `CHANGELOG.md` `## Unreleased`): the small assets items that were deferred. `assets:paths`
-  reports every readable model before failing, and tokenizes `.mdl` lazily. Ctrl+C during `assets:sync` rolls back.
-  `war3mapPreview.tga` is importable. There is no empty state file, and the state-file hint is fixed. The
-  `war3mapPreview.tga` check in the assets release gate (CONTRIBUTING step 7) has not been run yet.
+- **Unreleased** (2026-09-27, `CHANGELOG.md` `## Unreleased`): World Editor 3.00's import flag 29 is read, and kept on
+  sync. Also the small assets items that were deferred: `assets:paths` reports every readable model before failing, and
+  tokenizes `.mdl` lazily. Ctrl+C during `assets:sync` rolls back. There is no empty state file, and the state-file hint
+  is fixed. The assets release gate (CONTRIBUTING step 7, with the World Editor save) passed 2026-09-27.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `db03b66`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Patch release 0.3.1** of the unreleased fixes, once the maintainer has run the `war3mapPreview.tga` gate check.
+1. **Patch release 0.3.1** of the unreleased fixes.
 2. **Next sub-project:** the maintainer chooses between Editor & DX (roadmap item 3; recommended first) and Libraries &
    runtime (item 4). Ask.
 
@@ -123,3 +123,12 @@ deno task test:e2e      # needs pkl and yue
 ## Open, deliberately deferred (small)
 
 - `assets:sync` checks for Ctrl+C only while writing; one pressed during planning takes effect when writing starts.
+
+## Backlog (features for later, each needs a short design first)
+
+- **Custom map preview for Reforged.** Reforged ignores `war3mapPreview.tga`/`.blp` (a long-standing game bug): the map
+  list and lobby show `war3mapMap.blp`, the minimap. So `war3mapPreview.tga` stays a reserved asset path (tested). A
+  manifest setting such as `settings.info.preview = "preview.blp"` could do the known workaround in the staged map:
+  import the image as `war3mapMap.blp`, keep World Editor's minimap under another name, and call
+  `BlzChangeMinimapTerrainTex("<that name>")` at game start (in `war3map.lua`, like the other settings edits). See
+  github.com/inwc3/ReforgedMapPreviewReplacer. Needs an in-game check of the map list and of the in-game minimap.

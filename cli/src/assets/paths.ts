@@ -25,14 +25,11 @@ export function assetPath(value: string): string {
   return normalized;
 }
 
-/**
- * An in-map path an asset may be imported as. Map internals such as war3map.lua are never replaced; the lobby's custom
- * preview image, war3mapPreview.tga, is the one war3map file a map imports.
- */
+/** An in-map path an asset may be imported as. Map internals such as war3map.lua are never replaced. */
 export function targetPath(value: string): string {
   const normalized = assetPath(value);
   const internal = /^(?:war3map|war3campaign|\(listfile\)|\(attributes\)|\(signature\))/i.test(normalized) &&
-    !/^war3mapImported\//i.test(normalized) && !/^war3mapPreview\.tga$/i.test(normalized);
+    !/^war3mapImported\//i.test(normalized);
   if (internal || /^scripts\/war3map\./i.test(normalized)) {
     throw new MoonwellError(`Reserved map path: ${value}`, {
       hint: "Assets cannot replace map internals such as war3map.lua or war3map.imp.",
