@@ -52,10 +52,11 @@ export the file names of the game's CASC storage (for example with CascView) to 
    `deno run -A cli/src/main.ts init --link <temp dir>/assets-check`, then in that project put a `.blp` icon at
    `assets/ReplaceableTextures/CommandButtons/BTNMoonwell.blp` and run `deno task test`; the map must load. Close World
    Editor, run `deno task assets:sync`, open `maps/map.w3x` and confirm the Import Manager lists
-   `ReplaceableTextures\CommandButtons\BTNMoonwell.blp`. Delete the icon, sync again and confirm it is gone. Put a
-   256x256 `.tga` at `assets/war3mapPreview.tga`, run `deno task test` and confirm the lobby shows it as the map's
-   preview. Run `deno task assets:sync`, open the map in World Editor, save it, close it, and confirm
-   `deno task assets:check` reports no changes (World Editor kept the imported preview as it was).
+   `ReplaceableTextures\CommandButtons\BTNMoonwell.blp`. Save the map in World Editor and close it, then confirm
+   `deno task assets:check` reports no changes and `deno task build` succeeds (World Editor 3.00 saves the import with
+   flag 29). Delete the icon, sync again and confirm it is gone. Put a 256x256 `.tga` at `assets/war3mapPreview.tga`,
+   run `deno task test` and confirm the lobby shows it as the map's preview. Run `deno task assets:sync`, open the map
+   in World Editor, save it, close it, and confirm `deno task assets:check` reports no changes.
 8. Map settings, in another throwaway project from `init --link`. In its `moonwell.pkl`, set `info.name` and
    `loadingScreen.title`; a `players` entry for a slot the map has (such as `["0"]` with a `name`, `race` and
    `fixedStart`); `environment.soundEnvironment`, `environment.waterColor` and fog (`enabled = true`, `start`, `end`,

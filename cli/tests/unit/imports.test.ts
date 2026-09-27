@@ -1,4 +1,5 @@
 import { assertEquals, assertThrows } from "@std/assert";
+import { fromFileUrl } from "@std/path";
 import { importPath, readImports, writeImports } from "../../src/assets/imports.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 
@@ -8,6 +9,15 @@ Deno.test("war3map.imp round trips default and custom-path entries", () => {
   assertEquals(importPath(entries[0]), "war3mapImported\\default.blp");
   assertEquals(importPath(entries[1]), "Textures\\custom.blp");
   assertEquals(readImports(writeImports([])), []);
+});
+
+Deno.test("World Editor 3.00's flag 29 is a custom path", async () => {
+  // assets:sync wrote this entry with flag 13; World Editor 3.00 saved it back with flag 29.
+  const saved = fromFileUrl(new URL("../fixtures/imports-we3/war3map-flag29.imp", import.meta.url));
+  const entries = readImports(await Deno.readFile(saved));
+  assertEquals(entries, [{ flag: 29, path: "wa3mapPreview.tga" }]);
+  assertEquals(importPath(entries[0]), "wa3mapPreview.tga");
+  assertEquals(writeImports(entries), await Deno.readFile(saved));
 });
 
 Deno.test("readImports rejects corrupt data with a MoonwellError naming the file", () => {

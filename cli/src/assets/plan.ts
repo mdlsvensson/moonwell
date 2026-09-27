@@ -176,8 +176,17 @@ export async function planAssets(
   }
 
   if (assets.length > 0 || managed.size > 0) {
-    const merged = imports.filter((entry) => !managed.has(pathKey(importPath(entry))));
-    merged.push(...assets.map((asset) => ({ flag: 13, path: asset.target.replaceAll("/", "\\") })));
+    // An owned entry keeps the flag World Editor saved it with (3.00 turns 13 into 29), so a save changes nothing.
+    const ownedFlags = new Map<string, number>();
+    const merged = imports.filter((entry) => {
+      const key = pathKey(importPath(entry));
+      if (managed.has(key)) ownedFlags.set(key, entry.flag);
+      return !managed.has(key);
+    });
+    merged.push(...assets.map((asset) => ({
+      flag: ownedFlags.get(pathKey(asset.target)) ?? 13,
+      path: asset.target.replaceAll("/", "\\"),
+    })));
     const after = writeImports(merged);
     if (!equalBytes(after, impBytes)) changes.push({ file: impFile, before: impBytes, after });
   }

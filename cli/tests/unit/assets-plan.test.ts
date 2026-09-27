@@ -81,6 +81,27 @@ Deno.test("sync updates, renames and deletes only owned files; a staged copy lea
   assertEquals(await text(map, "unmanaged.txt"), "keep");
 });
 
+Deno.test("sync keeps the flag World Editor saved on an owned import", async () => {
+  const { root, map, state } = await fixture();
+  await put(root, "assets/Textures/a.blp");
+  await put(root, "assets/Textures/b.blp");
+  await applyAssetPlan(await planAssets(root, map, state, defaults), state);
+  // World Editor 3.00 rewrites flag 13 as 29 when it saves the map.
+  await Deno.writeFile(
+    join(map, "war3map.imp"),
+    writeImports([{ flag: 29, path: "Textures\\a.blp" }, { flag: 29, path: "Textures\\b.blp" }]),
+  );
+  assertEquals((await planAssets(root, map, state, defaults)).changes, []);
+
+  await put(root, "assets/Textures/c.blp");
+  await applyAssetPlan(await planAssets(root, map, state, defaults), state);
+  assertEquals(await entries(map), [
+    { flag: 29, path: "Textures\\a.blp" },
+    { flag: 29, path: "Textures\\b.blp" },
+    { flag: 13, path: "Textures\\c.blp" },
+  ]);
+});
+
 Deno.test("conflicts and edited owned files fail before anything changes", async () => {
   const { root, map, state } = await fixture();
   await put(root, "assets/a.blp");

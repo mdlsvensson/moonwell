@@ -114,6 +114,9 @@ deno task test:e2e      # needs pkl and yue
   timer and trigger callbacks are silent in the game; wrap diagnostics in `pcall`.
 - **Model files:** in text `.mdl`, a particle emitter's `Path` sits inside a nested `Particle { }` block. Reforged
   stores particle effects as `.pkb`, and references `.tif` textures that the game stores as `.dds`.
+- **World Editor rewrites what it saves:** WE 3.00 saves a custom-path import in `war3map.imp` as flag 29, not the
+  documented 13 (fixture `cli/tests/fixtures/imports-we3/`). Any gate step that writes into the source map must also
+  save the map in World Editor and then run the commands again.
 - **Deno quirks:** it refuses JSR versions published less than 24 hours ago unless you pass `--min-dep-age=0`. A locked
   file on Windows surfaces as a plain `Error` with code `EBUSY`, not a `Deno.errors` class.
 

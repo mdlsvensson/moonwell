@@ -2,16 +2,20 @@ import { MoonwellError } from "../shared/errors.ts";
 
 /** One entry of war3map.imp (version 1), the World Editor's import index. */
 export interface ImportEntry {
-  /** 0, 5 or 8: the file lives under war3mapImported\. 10 or 13: `path` is the full in-map path. */
+  /**
+   * 0, 5 or 8: the file lives under war3mapImported\. 10, 13 or 29: `path` is the full in-map path. World Editor 3.00
+   * saves custom-path imports as 29 (13 plus the undocumented bit 0x10).
+   */
   flag: number;
   path: string;
 }
 
-const FLAGS = new Set([0, 5, 8, 10, 13]);
+const CUSTOM_PATH_FLAGS = new Set([10, 13, 29]);
+const FLAGS = new Set([0, 5, 8, ...CUSTOM_PATH_FLAGS]);
 
 /** The in-map path of an import. */
 export function importPath(entry: ImportEntry): string {
-  return entry.flag === 10 || entry.flag === 13 ? entry.path : `war3mapImported\\${entry.path}`;
+  return CUSTOM_PATH_FLAGS.has(entry.flag) ? entry.path : `war3mapImported\\${entry.path}`;
 }
 
 export function readImports(bytes: Uint8Array, file = "war3map.imp"): ImportEntry[] {

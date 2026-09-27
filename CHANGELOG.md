@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Fixed: after World Editor 3.00 saved a map with synced assets, every command that reads `war3map.imp` (`build`,
+  `assets:check`, `assets:sync`) failed with "unknown flag 29". World Editor saves custom-path imports with flag 29,
+  which is now read as a custom path. `assets:sync` keeps the flag an owned import already has, so saving in World
+  Editor leaves nothing to sync.
+
 - `assets:paths` with no file argument reports every model it can read and marks each unreadable one in its place,
   instead of stopping at the first; the command still fails when any model was unreadable.
 - Ctrl+C during `assets:sync` undoes every change it already made to the source map and exits with code 130. A second
