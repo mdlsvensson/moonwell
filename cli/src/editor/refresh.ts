@@ -16,12 +16,18 @@ export interface EditorInputs {
   natives?: Natives;
 }
 
-async function readIfExists(path: string): Promise<string | undefined> {
+/** Reads the source map's script; `undefined` when there is none. `label` is its POSIX path for error messages. */
+async function readSourceScript(path: string, label: string): Promise<string | undefined> {
   try {
     return await Deno.readTextFile(path);
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return undefined;
-    throw error;
+  } catch (cause) {
+    if (cause instanceof Deno.errors.NotFound) return undefined;
+    const reason = cause instanceof Error ? cause.message : String(cause);
+    throw new MoonwellError(`Reading ${label} failed: ${reason}`, {
+      file: label,
+      cause,
+      hint: "map.folder must be a map World Editor saved in folder format; re-save it that way.",
+    });
   }
 }
 
@@ -31,7 +37,7 @@ async function readIfExists(path: string): Promise<string | undefined> {
  */
 export async function refreshEditorFiles(root: string, inputs: EditorInputs): Promise<string[]> {
   const source = `${inputs.mapFolder}/war3map.lua`;
-  const script = await readIfExists(join(root, ...source.split("/")));
+  const script = await readSourceScript(join(root, ...source.split("/")), source);
   const files: Array<[string, string]> = [
     ["natives.d.lua", renderNativesDeclarations(inputs.natives ?? await loadNatives())],
     ["moonwell.d.lua", RUNTIME_DECLARATIONS],

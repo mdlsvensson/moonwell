@@ -4,5 +4,6 @@
   "runtime.builtin": { "io": "disable", "debug": "disable", "package": "disable" },
   "workspace.library": [".moonwell/types"],
   "workspace.ignoreDir": ["dist", "maps"],
+  "workspace.useGitIgnore": false,
   "workspace.checkThirdParty": false
 }

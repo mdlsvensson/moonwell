@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { encodeBase64 } from "@std/encoding/base64";
+import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
 import { join } from "@std/path";
 import { addEditorFiles, EDITOR_FILES } from "../../src/editor/scaffold.ts";
 import { TEMPLATE_FILES } from "../../src/embedded/template.ts";
@@ -15,6 +15,12 @@ const FILES = [
 Deno.test("the template ships every editor file", () => {
   const paths = new Set(TEMPLATE_FILES.map((file) => file.path));
   for (const path of EDITOR_FILES) assertEquals(paths.has(path), true, path);
+});
+
+Deno.test("the template's .luarc.json lets LuaLS index the compiled .lua files that .gitignore lists", () => {
+  const file = TEMPLATE_FILES.find((entry) => entry.path === ".luarc.json");
+  const config = JSON.parse(new TextDecoder().decode(decodeBase64(file!.base64)));
+  assertEquals(config["workspace.useGitIgnore"], false);
 });
 
 Deno.test("addEditorFiles adds missing files and .gitignore lines, and never overwrites", async () => {
