@@ -13,8 +13,8 @@ Moonwell projects are written in YueScript, and today nothing tells an author th
 game runs the code. This sub-project gives authors three things, all driven by one data file generated from the game's
 own `common.j` and `Blizzard.j`:
 
-1. **Editor support.** In VS Code with the YueScript extension (`LiJin.yuescript`) and lua-language-server (LuaLS),
-   `.yue` files get completion, hover, signature help and diagnostics for every native, Blizzard.j function and global,
+1. **Editor support.** In VS Code with the YueScript extension (`LiJin.yuescript`) and lua-language-server (LuaLS)
+   (bundled with the Lua extension, `sumneko.lua`), `.yue` files get completion, hover, signature help and diagnostics for every native, Blizzard.j function and global,
    the Moonwell runtime, the project's object ids and the map's own globals.
 2. **Unknown-global check.** `check`, `build`, `test` and `dev` report every global a gameplay file uses that nothing
    defines, with the nearest known name as a hint, in any editor or none.
@@ -167,8 +167,9 @@ the user to close VS Code and retry.
 
 ### 4.4 Documentation
 
-README gains an "Editor setup" section: install VS Code, the YueScript extension and lua-language-server; run
-`deno task setup`; add `yue` to PATH with the printed command; reload VS Code.
+README gains an "Editor setup" section: install VS Code and the recommended YueScript (`LiJin.yuescript`) and Lua
+(`sumneko.lua`) extensions, and open the project folder itself; run `deno task setup`; run the printed PATH command
+once, open a new terminal and restart VS Code.
 
 ## 5. Unknown-global check
 
@@ -279,8 +280,8 @@ Expected failures throw `MoonwellError` with `file` and `hint`, as everywhere el
 
 A new CONTRIBUTING step, in a throwaway project from `init --link`:
 
-1. Open the project in VS Code with the YueScript extension and lua-language-server installed, after `deno task
-   setup` and the PATH step. Confirm completion and hover for `CreateUnit` (parameter names and types),
+1. Open the project in VS Code with the YueScript and Lua extensions installed, after `deno task setup` and the
+   PATH step. Confirm completion and hover for `CreateUnit` (parameter names and types),
    `mw.on_main` and `objects.units.captain`; save the map in World Editor with a preplaced unit and confirm its
    `gg_unit_...` global completes after `deno task check`.
 2. Type `CreatUnit`: the editor underlines it, and `deno task check` fails naming it and suggesting `CreateUnit`. Set

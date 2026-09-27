@@ -1681,6 +1681,11 @@ git commit -m "feat(editor): yueconfig.yue, .luarc.json and VS Code recommendati
 
 ### Task 8: `yue` on PATH and lua-language-server
 
+> **Changed during execution:** the lua-language-server check was dropped (V3: the YueScript extension uses the Lua
+> extension's bundled server, which is never on PATH). `setup` warns only about `yue` on PATH, and
+> `template/.vscode/extensions.json` recommends `LiJin.yuescript` and `sumneko.lua`. The Windows PATH command uses
+> single-quoted PowerShell literals.
+
 **Files:**
 - Create: `cli/src/yue/bin.ts`
 - Modify: `cli/src/commands/setup.ts`

@@ -68,8 +68,8 @@ VS Code with two extensions gives `.yue` files completion, hover, signature help
    both. The YueScript extension uses the lua-language-server that the Lua extension brings, so nothing else needs
    installing.
 2. Run `deno task setup` in the project. It adds the editor files and `.gitignore` lines an older project lacks (it
-   never overwrites a file) and keeps a copy of the project's pinned YueScript in the cache's `bin` folder
-   (`%LOCALAPPDATA%\moonwell\bin` on Windows; with `yue.path` set, your own binary's folder counts instead). The
+   never overwrites a file) and keeps a copy of the project's pinned YueScript in the cache's `bin` folder (by default
+   `%LOCALAPPDATA%\moonwell\bin` on Windows; with `yue.path` set, your own binary's folder counts instead). The
    extension runs `yue` from PATH and has no setting for its location, so when `yue` is missing there or another
    version, `setup` prints a command that adds the `bin` folder to your user PATH. Run it once (in PowerShell on
    Windows), then open a new terminal and restart VS Code. Moonwell never changes PATH itself.
@@ -83,7 +83,7 @@ for a `unit` passed where a `player` is expected. The declarations live in `.moo
 and `dev` keep them current, so run `deno task check` after saving the map in World Editor to pick up new `gg_` and
 `udg_` globals.
 
-- **`.lua` files next to your `.yue` files.** The extension writes `src/<name>.lua` each time you save a `.yue` file. It
+- **`.lua` files next to your `.yue` files.** The extension writes a `.lua` file next to each saved `.yue` file. It
   needs them for lua-language-server. They are git-ignored, and builds never use them: Moonwell compiles `src/**/*.yue`
   itself.
 - **The game's Lua.** Warcraft III 3.0.0.24268 runs Lua 5.3 without `collectgarbage`, `dofile`, `loadfile`, `debug`,
