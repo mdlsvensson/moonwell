@@ -124,8 +124,8 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
 11. Macros and the game's Lua, in the step 10 project: run `deno task test` and confirm a standard Footman stands beside
     the Captain (the template makes it with `$FourCC("hfoo")`). Then replace `src/main.yue` with the Lua probe below,
     run `deno task test`, and confirm the message log (F12) shows
-    `missing: collectgarbage dofile loadfile debug io package` and `os: clock date difftime time`, the lists
-    `tools/natives/lua-extras.json` records; restore `src/main.yue` afterwards.
+    `missing: collectgarbage dofile loadfile debug io package` (the `removed` list in `tools/natives/lua-extras.json`)
+    and `os: clock date difftime time` (as README's "The game's Lua" says); restore `src/main.yue` afterwards.
 
     ```yue
     import "moonwell" as mw
