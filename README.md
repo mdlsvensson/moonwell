@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="mw.gif" alt="Moonwell" width="160" />
+  <img src="mw.gif" alt="Moonwell" width="256" />
 </p>
 <p align="center">
   <i>Multilingual Warcraft III modding framework</i>
