@@ -76,11 +76,12 @@ over, and updated on 2026-09-27 after Plan 3b.
   `.luarc.json` sets it to 10000. On Windows the extension 0.2.9 opens a console window for `yue` (it does not hide it).
   Our fix, `windowsHide: true` on its two `spawn` calls (pigpigyyy/yuescript-vscode#11), was merged 2026-09-27 and
   awaits an extension release; then drop the README note.
-- **Plan 3b done, unreleased** (`docs/superpowers/plans/2026-09-27-moonwell-unknown-globals.md`): the unknown-global
-  check. `compileProject` runs `yue -g` per changed source (cache `dist/stage/lua/.globals.json`, code in
+- **Plan 3b done, unreleased** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-unknown-globals.md`): the
+  unknown-global check. `compileProject` runs `yue -g` per changed source (cache `dist/stage/lua/.globals.json`, code in
   `cli/src/lint/`), builds the known names from `natives.json`, the source map's `war3map.lua`, `global` lines under
   `src/` and `lint.globals`, and throws a `ProblemsError` (or warns, with `lint.unknownGlobals = "warning"`). Name
-  matching is in `cli/src/shared/names.ts`, shared with object data.
+  matching is in `cli/src/shared/names.ts`, shared with object data. Its gate (the unknown-global part of CONTRIBUTING
+  step 10, plan Task 6) has not been run yet.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `e312e4a` (release 0.3.1).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.

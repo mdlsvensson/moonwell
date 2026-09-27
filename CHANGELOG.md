@@ -12,19 +12,21 @@
 - `setup` now also plans the project's objects to write the editor declarations, so objects that do not resolve, or a
   missing or unreadable source map when there are objects, make `setup` fail as they make `check` fail.
 - `check`, `build`, `test` and `dev` report every global a gameplay file uses that nothing defines, with its file, line
-  and column and the nearest known name (`Did you mean CreateUnit?`). Known globals are the game's natives, Blizzard.j
-  functions and globals and Lua libraries, the source map's `war3map.lua` globals, names declared with `global` under
-  `src/` and the new `lint.globals` list. `lint.unknownGlobals = "warning"` reports them without failing. New projects
-  show the `lint` block in `moonwell.pkl`.
+  and column and the nearest known name (`Did you mean CreateUnit?`). Known globals are the game's natives, every
+  common.j and Blizzard.j function, global and constant, the game's Lua libraries, the source map's `war3map.lua`
+  globals, names declared with `global` under `src/` and the new `lint.globals` list. `lint.unknownGlobals = "warning"`
+  reports them without failing. New projects show the `lint` block in `moonwell.pkl`.
 - After upgrading, run `deno task setup` once: it adds the editor files and the new `.gitignore` lines. Until then,
-  `check` and `build` leave `.moonwell/` untracked in a 0.3 project.
+  `check` and `build` leave `.moonwell/` untracked in a 0.3 project. `check` and `build` now fail on unknown globals by
+  default, so a project that relies on `global *`, `global ^` or globals defined elsewhere should list them in
+  `lint.globals`, or set `lint.unknownGlobals = "warning"` for a while.
 
 ### Release gate (so far)
 
-Editor (CONTRIBUTING step 10) passed 2026-09-27, tested by the maintainer in Antigravity IDE (a VS Code fork) with the
-YueScript extension 0.2.9 and the Lua extension 3.19.1: completion and hover for natives, `mw.on_main`,
-`objects.units.captain`, the map's `gg_unit_` globals and a second project module, and no generated files in
-`git status`.
+The editor part of CONTRIBUTING step 10 passed 2026-09-27; its unknown-global part is still to run. The editor part was
+tested by the maintainer in Antigravity IDE (a VS Code fork) with the YueScript extension 0.2.9 and the Lua extension
+3.19.1: completion and hover for natives, `mw.on_main`, `objects.units.captain`, the map's `gg_unit_` globals and a
+second project module, and no generated files in `git status`.
 
 ## 0.3.1 (2026-09-27)
 

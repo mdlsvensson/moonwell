@@ -111,11 +111,11 @@ error: src/main.yue:8:10 › Unknown global CreatUnit.
 hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.
 ```
 
-A global is known when it is a native, a Blizzard.j function or global, or a Lua library the game provides; a global or
-function of the source map's `war3map.lua` (such as `gg_unit_Hpal_0002` or `udg_Score`; run the command again after
-saving the map in World Editor); a name declared with `global` in any file under `src/` (`global Score = 0`,
-`global a, b`); or a name listed in `lint.globals` in `moonwell.pkl`. Fields are not checked: `math.floor` checks only
-`math`.
+A global is known when it is a native, any function, global or constant of common.j or Blizzard.j (such as
+`PLAYER_NEUTRAL_AGGRESSIVE`), or a Lua library the game provides; a global or function of the source map's `war3map.lua`
+(such as `gg_unit_Hpal_0002` or `udg_Score`; run the command again after saving the map in World Editor); a name
+declared with `global` in any file under `src/` (`global Score = 0`, `global a, b`); or a name listed in `lint.globals`
+in `moonwell.pkl`. Fields are not checked: `math.floor` checks only `math`.
 
 `global *` and `global ^` make later assignments global without naming them, so Moonwell cannot see those names; list
 them in `lint.globals`. To report unknown globals without failing, set `lint { unknownGlobals = "warning" }`. In the
