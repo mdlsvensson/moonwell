@@ -66,10 +66,15 @@ Deno.test("classes are declared parents first, so LuaLS never sees an unknown pa
 
 Deno.test("moonwell.d.lua declares the runtime module's hooks", () => {
   assertEquals(RUNTIME_DECLARATIONS.split("\n")[0], "---@meta moonwell");
+  // A YueScript function returns its last expression, so hook callbacks may return anything.
   for (const hook of ["before_config", "on_config", "before_main", "on_main"]) {
-    assertStringIncludes(RUNTIME_DECLARATIONS, `---@param fn fun()\nfunction moonwell.${hook}(fn) end\n`);
+    assertStringIncludes(RUNTIME_DECLARATIONS, `---@param fn fun(): ...\nfunction moonwell.${hook}(fn) end\n`);
   }
   assertStringIncludes(RUNTIME_DECLARATIONS, "function moonwell.format_error(message) end\n");
+});
+
+Deno.test("moonwell.d.lua declares require, which .luarc.json's disabled package library would otherwise remove", () => {
+  assertStringIncludes(RUNTIME_DECLARATIONS, "---@param name string\n---@return any\nfunction require(name) end\n");
 });
 
 Deno.test("objects.d.lua declares every category, keys sorted, with rawcodes", () => {

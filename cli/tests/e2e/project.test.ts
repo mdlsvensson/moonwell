@@ -47,7 +47,9 @@ Deno.test("check writes the editor declarations for the template project", async
   assertStringIncludes(await Deno.readTextFile(join(types, "natives.d.lua")), "function CreateUnit(");
   assertStringIncludes(await Deno.readTextFile(join(types, "objects.d.lua")), "---@field captain integer h000");
   assertStringIncludes(await Deno.readTextFile(join(types, "map.d.lua")), "---@type unit\ngg_unit_Hblm_0003 = nil");
-  assertStringIncludes(await Deno.readTextFile(join(types, "moonwell.d.lua")), "function moonwell.on_main(fn) end");
+  const runtime = await Deno.readTextFile(join(types, "moonwell.d.lua"));
+  assertStringIncludes(runtime, "function moonwell.on_main(fn) end");
+  assertStringIncludes(runtime, "function require(name) end");
 });
 
 Deno.test("build imports assets/ into the archive and war3map.imp", async () => {

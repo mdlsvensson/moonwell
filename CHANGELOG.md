@@ -7,6 +7,10 @@
   to `.moonwell/types/` for every native, Blizzard.j function and global of Warcraft III 3.0.0.24268, the Moonwell
   runtime, the project's object ids and the map's own globals. `.gitignore` gains `.moonwell/` and `src/**/*.lua` (the
   `.lua` files the extension writes on save). See "Editor setup" in the README.
+- The editor declarations include `require`, so `import` lines are not flagged as an undefined global (the game's Lua
+  has no `package` library, which `.luarc.json` turns off, but the Moonwell runtime defines `require`). Hook callbacks
+  may return a value, so a YueScript callback, which returns its last expression, is not flagged as returning too many
+  values.
 - `setup` adds the editor files and `.gitignore` lines older projects lack, keeps a copy of the pinned YueScript in the
   cache's `bin` folder, and prints the command that puts it on PATH when `yue` is missing there or another version.
 - `setup` now also plans the project's objects to write the editor declarations, so objects that do not resolve, or a
