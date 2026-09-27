@@ -20,6 +20,9 @@
   common.j and Blizzard.j function, global and constant, the game's Lua libraries, the source map's `war3map.lua`
   globals, names declared with `global` under `src/` and the new `lint.globals` list. `lint.unknownGlobals = "warning"`
   reports them without failing. New projects show the `lint` block in `moonwell.pkl`.
+- Macros: `import "moonwell.macros" as {:$FourCC}` gives gameplay code `$FourCC "hfoo"`, which compiles to the rawcode's
+  integer (`1751543663`) and fails the compile on anything but a 4-character string literal. The template creates a
+  standard Footman with it next to the Captain.
 - After upgrading, run `deno task setup` once: it adds the editor files and the new `.gitignore` lines. Until then,
   `check` and `build` leave `.moonwell/` untracked in a 0.3 project. `check` and `build` now fail on unknown globals by
   default, so a project that relies on `global *`, `global ^` or globals defined elsewhere should list them in

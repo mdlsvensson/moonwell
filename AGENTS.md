@@ -4,7 +4,7 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-27 after Plan 3b.
+over, and updated on 2026-09-27 after Plan 3c.
 
 ## Read first
 
@@ -14,9 +14,9 @@ over, and updated on 2026-09-27 after Plan 3b.
   `## Unreleased` lists what is done since).
 - Later specs, all implemented: `2026-09-25-moonwell-model-paths-design.md`,
   `2026-09-25-moonwell-in-game-paths-design.md`, `2026-09-25-moonwell-map-settings-design.md` and
-  `2026-09-26-moonwell-object-data-design.md`. `2026-09-27-moonwell-editor-dx-design.md` (sub-project 3) is being
-  implemented: Plans 3a and 3b are done, 3c is not. Plans for everything built so far are in `docs/superpowers/plans/`;
-  follow their style when writing new plans.
+  `2026-09-26-moonwell-object-data-design.md`. `2026-09-27-moonwell-editor-dx-design.md` (sub-project 3) is implemented
+  by Plans 3a, 3b and 3c, which are not released yet. Plans for everything built so far are in
+  `docs/superpowers/plans/`; follow their style when writing new plans.
 
 ## State (2026-09-27)
 
@@ -86,14 +86,20 @@ over, and updated on 2026-09-27 after Plan 3b.
   editor diagnostics without the editor, run the Lua extension's bundled server:
   `<extensions>/sumneko.lua-<version>/server/bin/lua-language-server --check=<project> --checklevel=Hint` after
   compiling the `.yue` files with `yue -l -c --target=5.3` (what the YueScript extension writes on save).
+- **Plan 3c done, unreleased** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-macros.md`): macros.
+  `cli/runtime/macros.yue` (embedded as `MACROS_YUE`) exports `$FourCC`; `refreshEditorFiles` writes it to
+  `.moonwell/yue/moonwell/macros.yue`, and every `yue` run gets `--path <root>/.moonwell/yue/?.lua`
+  (`cli/src/yue/macros.ts`), with the module's hash in the compile and `yue -g` cache keys. The macro module must not
+  have a backslash inside a string literal: yue 0.34.2 fails to load such a macro. The template's Footman uses
+  `$FourCC`. Its gate (CONTRIBUTING step 11) has not been run yet.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `e312e4a` (release 0.3.1).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Plan 3c, macros:** write it from spec §6 of `docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md`.
-2. **Release 0.4.0:** 3a, 3b and 3c are released together, after the full release gate in CONTRIBUTING.
+1. **Release 0.4.0:** 3a, 3b and 3c are released together. Run the whole release gate in CONTRIBUTING, including step
+   11, then publish as its "Publishing" section says.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -114,11 +120,11 @@ Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` dow
   error is reported as an internal "please report" error, so user mistakes must never reach it.
 - **Style:** file system code is async. `deno fmt` uses width 120; `template/`, `docs/` and `cli/src/embedded/` are
   excluded. `deno fmt --check` and `deno lint` must be clean.
-- **Generated files:** after changing `template/`, `cli/runtime/moonwell.lua`, `cli/data/game-paths.txt`,
-  `cli/data/metadata.json` or `cli/data/natives.json`, run `deno task gen`; the embedded modules in `cli/src/embedded/`
-  and `schema/generated/` are freshness-tested. Nothing stray may be left in `template/`: every file there is embedded
-  into `init`, and a stray file fails the embedded-template test. `template/src/generated/objects.yue` must match
-  `template/objects/` (e2e).
+- **Generated files:** after changing `template/`, `cli/runtime/moonwell.lua`, `cli/runtime/macros.yue`,
+  `cli/data/game-paths.txt`, `cli/data/metadata.json` or `cli/data/natives.json`, run `deno task gen`; the embedded
+  modules in `cli/src/embedded/` and `schema/generated/` are freshness-tested. Nothing stray may be left in `template/`:
+  every file there is embedded into `init`, and a stray file fails the embedded-template test.
+  `template/src/generated/objects.yue` must match `template/objects/` (e2e).
 - **Pkl:** `pkl` 0.32 is required. A module property can't be named `output`, because it clashes with Pkl's built-in.
   Pkl `Mapping` values are type-checked lazily: tests that expect a constraint error must force the values (`.toMap()`).
 

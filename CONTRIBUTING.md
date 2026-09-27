@@ -121,7 +121,33 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
     `src/main.yue:<line>:<column> › Unknown global CreatUnit.` and `Did you mean CreateUnit?`. Set
     `lint { unknownGlobals = "warning" }` in `moonwell.pkl` and confirm `deno task build` succeeds and prints the same
     lines as warnings; then undo both changes. Confirm `git status` shows no `.moonwell/` and no `src/**/*.lua` files.
-11. Record the Warcraft III and World Editor versions in the changelog.
+11. Macros and the game's Lua, in the step 10 project: run `deno task test` and confirm a standard Footman stands beside
+    the Captain (the template makes it with `$FourCC("hfoo")`). Then replace `src/main.yue` with the Lua probe below,
+    run `deno task test`, and confirm the message log (F12) shows
+    `missing: collectgarbage dofile loadfile debug io package` and `os: clock date difftime time`, the lists
+    `tools/natives/lua-extras.json` records; restore `src/main.yue` afterwards.
+
+    ```yue
+    import "moonwell" as mw
+
+    names = {
+      "assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs", "load", "loadfile", "next", "pairs",
+      "pcall", "print", "rawequal", "rawget", "rawlen", "rawset", "require", "select", "setmetatable", "tonumber",
+      "tostring", "type", "xpcall", "_VERSION", "_G", "coroutine", "debug", "io", "math", "os", "package", "string",
+      "table", "utf8", "FourCC", "__jarray"
+    }
+
+    mw.on_main ->
+      missing = [name for name in *names when _G[name] == nil]
+      print "missing: " .. table.concat missing, " "
+      for lib in *{"os", "debug", "package"}
+        t = _G[lib]
+        if type(t) == "table"
+          keys = [key for key in pairs t]
+          table.sort keys
+          print lib .. ": " .. table.concat keys, " "
+    ```
+12. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
 

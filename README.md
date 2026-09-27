@@ -110,7 +110,7 @@ the map in World Editor to pick up new `gg_` and `udg_` globals.
 `check`, `build`, `test` and `dev` stop on a global that nothing defines, which is almost always a typo:
 
 ```text
-error: src/main.yue:8:10 › Unknown global CreatUnit.
+error: src/main.yue:9:10 › Unknown global CreatUnit.
 hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.
 ```
 
@@ -126,6 +126,24 @@ editor, lua-language-server underlines most of the same names as you type; it do
 flag `collectgarbage`, `dofile` or `loadfile`.
 
 The check runs the compiler's `yue -g` on each changed file and caches the result in `dist/stage/lua/`.
+
+## Macros
+
+Macros run while the code compiles. Import them from `moonwell.macros`:
+
+```yue
+import "moonwell.macros" as {:$FourCC}
+
+footman = CreateUnit Player(0), $FourCC("hfoo"), 0, 0, 270
+```
+
+`$FourCC "hfoo"` is the rawcode `'hfoo'` as the integer the game's functions take (`1751543663`), written into the
+compiled code, so the game never converts it. It takes one string literal of exactly four characters; anything else,
+such as a variable or `"hfo"`, fails the compile at that line. For your own objects, use the ids in `generated.objects`
+instead.
+
+The macro module is written to `.moonwell/yue/moonwell/macros.yue` by `setup`, `check`, `build`, `test` and `dev`, where
+the compiler and the editor's YueScript extension find it. It adds nothing to the map.
 
 ## Assets
 
