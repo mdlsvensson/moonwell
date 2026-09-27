@@ -8,7 +8,7 @@ import { entryModuleName, prepareStage } from "../../src/pipeline.ts";
 import { launchGame } from "../../src/launch.ts";
 import type { Project } from "../../src/project/project.ts";
 import { validateMapSettings } from "../../src/settings/options.ts";
-import { MoonwellError, ObjectDataError } from "../../src/shared/errors.ts";
+import { formatError, MoonwellError, ObjectDataError, ProblemsError } from "../../src/shared/errors.ts";
 import { silentLogger } from "../support/logger.ts";
 
 Deno.test("entryModuleName converts src paths to dotted names", () => {
@@ -59,7 +59,7 @@ const captain = (extra: Partial<ManifestObject> = {}): ManifestObject => ({
  * A project on a copy of the template map whose Yue compiler is a stand-in: each compile records what the pipeline
  * had done by then and writes an empty Lua module, so the order of the steps is observable without yue or Pkl.
  */
-async function stageProject(objects: Project["objects"], settings: unknown = {}) {
+async function stageProject(objects: Project["objects"], settings: unknown = {}, globals = "") {
   const root = await Deno.makeTempDir({ prefix: "moonwell-pipeline-" });
   await copy(TEMPLATE_MAP, join(root, "maps", "map.w3x"));
   await Deno.mkdir(join(root, "src"));
@@ -71,6 +71,7 @@ async function stageProject(objects: Project["objects"], settings: unknown = {})
   const ctx: CommandContext = {
     ...createContext(root, logger),
     run: async (_command, args) => {
+      if (args[0] === "-g") return { code: 0, stdout: globals, stderr: "" };
       const generated = await exists(join(root, OBJECT_IDS_FILE));
       events.push(
         `compile ${args.at(-1)?.slice(join(root, "src").length + 1).replaceAll("\\", "/")} (objects.yue ${generated})`,
@@ -144,6 +145,21 @@ Deno.test("prepareStage fails on invalid objects before compiling or staging", a
     assertEquals(error.file, "objects/units.pkl");
     assertEquals(events, []);
     assertEquals(await exists(join(root, OBJECT_IDS_FILE)), false);
+    assertEquals(await exists(join(root, "dist", "stage", "map.w3x")), false);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("prepareStage fails on an unknown global after compiling, before staging the map", async () => {
+  const { root, ctx, project } = await stageProject(emptyObjects(), {}, "CreatUnit 1 1\n");
+  try {
+    const error = await assertRejects(() => prepareStage(ctx, project, {}), ProblemsError);
+    assertEquals(
+      formatError(error),
+      "error: src/main.yue:1:1 › Unknown global CreatUnit.\n" +
+        "hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.",
+    );
     assertEquals(await exists(join(root, "dist", "stage", "map.w3x")), false);
   } finally {
     await Deno.remove(root, { recursive: true });

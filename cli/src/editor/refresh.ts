@@ -17,7 +17,7 @@ export interface EditorInputs {
 }
 
 /** Reads the source map's script; `undefined` when there is none. `label` is its POSIX path for error messages. */
-async function readSourceScript(path: string, label: string): Promise<string | undefined> {
+export async function readSourceScript(path: string, label: string): Promise<string | undefined> {
   try {
     return await Deno.readTextFile(path);
   } catch (cause) {

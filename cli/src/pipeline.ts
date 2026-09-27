@@ -6,6 +6,7 @@ import { resolveGraph } from "./bundle/graph.ts";
 import type { CommandContext } from "./context.ts";
 import { refreshEditorFiles } from "./editor/refresh.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
+import { checkUnknownGlobals } from "./lint/unknown-globals.ts";
 import { refreshObjectIds } from "./objectdata/ids.ts";
 import { applyObjectPlan, type ObjectPlan, planObjectData } from "./objectdata/plan.ts";
 import type { Project } from "./project/project.ts";
@@ -35,7 +36,7 @@ export function entryModuleName(entryPath: string): string {
   return posix.slice("src/".length, -".yue".length).split("/").join(".");
 }
 
-/** Compiles src/ and resolves the reachable module graph from the entry. */
+/** Compiles src/, resolves the reachable module graph from the entry and checks for unknown globals. */
 export async function compileProject(
   ctx: CommandContext,
   project: Project,
@@ -49,7 +50,10 @@ export async function compileProject(
     run: ctx.run,
   });
   const entry = entryModuleName(options.entry ?? project.map.entry);
-  return { modules: resolveGraph(entry, output.load, BUILTIN_MODULES), entry };
+  const modules = resolveGraph(entry, output.load, BUILTIN_MODULES);
+  // After compiling and resolving, so syntax errors and missing modules are reported first (spec §5.2).
+  await checkUnknownGlobals(ctx, project, { yue, hashes: output.hashes });
+  return { modules, entry };
 }
 
 /**
