@@ -154,6 +154,31 @@ Deno.test("a failed sync undoes the writes it already made", async () => {
   assert((await Deno.stat(join(map, "b.blp"))).isDirectory);
 });
 
+Deno.test("an interrupted sync changes nothing, and one interrupted midway undoes its writes", async () => {
+  const { root, map, state } = await fixture();
+  await put(root, "assets/a.blp");
+  await put(root, "assets/b.blp");
+  const plan = await planAssets(root, map, state, defaults);
+
+  const before = await assertRejects(() => applyAssetPlan(plan, state, AbortSignal.abort()), MoonwellError);
+  assertEquals(before.message, "Interrupted; every change was undone.");
+  assertEquals(await exists(join(map, "a.blp")), false);
+
+  // The signal reads as aborted from the second change on, after a.blp was written.
+  let reads = 0;
+  const midway = {
+    get aborted() {
+      return ++reads > 1;
+    },
+  } as AbortSignal;
+  const error = await assertRejects(() => applyAssetPlan(plan, state, midway), MoonwellError);
+  assertEquals(error.message, "Interrupted; every change was undone.");
+  assert(reads > 1);
+  assertEquals(await exists(join(map, "a.blp")), false);
+  assertEquals(await exists(join(map, "war3map.imp")), false);
+  assertEquals(await exists(state), false);
+});
+
 Deno.test("an incomplete rollback names the failure and every file it could not restore", async () => {
   const { map } = await fixture();
   const encode = (value: string) => new TextEncoder().encode(value);

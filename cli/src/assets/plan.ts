@@ -194,8 +194,11 @@ export async function planAssets(
   };
 }
 
-/** Applies a plan, undoing every change already made if one fails. Writes `stateFile` too when it is given. */
-export async function applyAssetPlan(plan: AssetPlan, stateFile?: string): Promise<void> {
+/**
+ * Applies a plan, undoing every change already made if one fails or `signal` aborts (Ctrl+C). Writes `stateFile` too
+ * when it is given.
+ */
+export async function applyAssetPlan(plan: AssetPlan, stateFile?: string, signal?: AbortSignal): Promise<void> {
   const changes = [...plan.changes];
   if (stateFile !== undefined) {
     const before = await readIfExists(stateFile);
@@ -203,8 +206,10 @@ export async function applyAssetPlan(plan: AssetPlan, stateFile?: string): Promi
     if (!equalBytes(before, after)) changes.push({ file: stateFile, before, after });
   }
   const applied: FileChange[] = [];
+  const interrupted = new Error("interrupted");
   try {
     for (const change of changes) {
+      if (signal?.aborted) throw interrupted;
       if (!equalBytes(await readIfExists(change.file), change.before)) {
         throw new MoonwellError(`${change.file} changed after the assets were checked.`, {
           hint: "Close World Editor and anything else writing to the map, then retry.",
@@ -236,6 +241,7 @@ export async function applyAssetPlan(plan: AssetPlan, stateFile?: string): Promi
       );
     }
     if (error instanceof MoonwellError) throw error;
+    if (error === interrupted) throw new MoonwellError("Interrupted; every change was undone.");
     throw new MoonwellError(`Writing assets failed: ${reasonOf(error)}. Every change was undone.`, { cause: error });
   }
 }

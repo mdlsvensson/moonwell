@@ -7,8 +7,15 @@ import { MoonwellError } from "../shared/errors.ts";
 import { toPosix } from "../shared/fs.ts";
 import { withBuildLock } from "../shared/lock.ts";
 
-/** assets:check shows what assets:sync would change; assets:sync writes assets/ into the source map for World Editor. */
-export async function assets(ctx: CommandContext, mode: "check" | "sync"): Promise<AssetPlan> {
+/**
+ * assets:check shows what assets:sync would change; assets:sync writes assets/ into the source map for World Editor,
+ * undoing its writes if `signal` aborts (Ctrl+C) before it finishes.
+ */
+export async function assets(
+  ctx: CommandContext,
+  mode: "check" | "sync",
+  options: { signal?: AbortSignal } = {},
+): Promise<AssetPlan> {
   // Loading is read-only; doing it before taking the lock creates nothing outside a project.
   const project = await loadProject(ctx.root, ctx.run);
   return withBuildLock(join(ctx.root, "dist"), async () => {
@@ -27,7 +34,7 @@ export async function assets(ctx: CommandContext, mode: "check" | "sync"): Promi
       ctx.logger.info(`${change.after === undefined ? "delete" : "write"} ${toPosix(relative(ctx.root, change.file))}`);
     }
     if (mode === "sync") {
-      await applyAssetPlan(plan, stateFile);
+      await applyAssetPlan(plan, stateFile, options.signal);
       ctx.logger.info(
         `Synced ${plan.assets.length} asset(s) into maps/${project.map.folder} (${plan.changes.length} file change(s)). ` +
           "Reopen the map in World Editor.",

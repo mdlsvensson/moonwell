@@ -66,11 +66,12 @@ export async function main(
   const logger = createLogger({ write, file: inProject ? join(root, "dist", "moonwell.log") : undefined });
   const ctx = createContext(root, logger);
   const stage = { entry: flags.entry, minify: flags.minify ? true : undefined };
-  // Ctrl+C: dev stops watching and returns once its running check has released the build lock; other commands
-  // (and a second Ctrl+C in dev) remove the lock this process holds and exit at once.
+  // Ctrl+C: dev stops watching and returns once its running check has released the build lock, and assets:sync undoes
+  // the writes it made to the source map; other commands (and a second Ctrl+C) remove the lock this process holds and
+  // exit at once.
   const interrupt = new AbortController();
   const onSigint = () => {
-    if (command === "dev" && !interrupt.signal.aborted) {
+    if ((command === "dev" || command === "assets:sync") && !interrupt.signal.aborted) {
       interrupt.abort();
       return;
     }
@@ -107,7 +108,7 @@ export async function main(
         await assets(ctx, "check");
         break;
       case "assets:sync":
-        await assets(ctx, "sync");
+        await assets(ctx, "sync", { signal: interrupt.signal });
         break;
       case "assets:paths":
         await assetsPaths(ctx, flags._[1] === undefined ? undefined : String(flags._[1]));
@@ -128,7 +129,7 @@ export async function main(
     return 0;
   } catch (error) {
     logger.error(formatError(error));
-    return 1;
+    return interrupt.signal.aborted ? 130 : 1;
   } finally {
     if (handlesSigint) Deno.removeSignalListener("SIGINT", onSigint);
   }

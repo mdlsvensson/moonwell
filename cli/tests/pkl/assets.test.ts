@@ -1,10 +1,11 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertRejects } from "@std/assert";
 import { exists } from "@std/fs";
 import { join } from "@std/path";
 import { readImports } from "../../src/assets/imports.ts";
 import { assets } from "../../src/commands/assets.ts";
 import { init } from "../../src/commands/init.ts";
 import { createContext } from "../../src/context.ts";
+import { MoonwellError } from "../../src/shared/errors.ts";
 import { silentLogger } from "../support/logger.ts";
 
 async function project(): Promise<string> {
@@ -37,4 +38,18 @@ Deno.test("assets:check plans without writing; assets:sync writes the source map
   assertEquals(Object.keys(state.files), ["icons/a.blp"]);
 
   assertEquals((await assets(ctx, "check")).changes, [], "after a sync there is nothing left to do");
+});
+
+Deno.test("an interrupted assets:sync leaves the source map and ownership state unchanged", async () => {
+  const root = await project();
+  await Deno.mkdir(join(root, "assets", "icons"), { recursive: true });
+  await Deno.writeTextFile(join(root, "assets", "icons", "a.blp"), "icon");
+  const ctx = createContext(root, silentLogger());
+  await assertRejects(
+    () => assets(ctx, "sync", { signal: AbortSignal.abort() }),
+    MoonwellError,
+    "Interrupted; every change was undone.",
+  );
+  assertEquals(await exists(join(root, "maps", "map.w3x", "icons")), false);
+  assertEquals(await exists(join(root, ".asset-state")), false);
 });
