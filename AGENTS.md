@@ -62,8 +62,9 @@ over, and updated on 2026-09-27 after the small assets fixes.
 
 ## Next work, in order
 
-1. **Next sub-project:** the maintainer chooses between Editor & DX (roadmap item 3; recommended first) and Libraries &
-   runtime (item 4). Ask.
+1. **Editor & DX (sub-project 3):** spec `docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md` (sections
+   approved in chat 2026-09-27; the written spec awaits the maintainer's review). Then Plan 3a (natives data,
+   declarations, editor setup), 3b (unknown-global check), 3c (macros), released together as 0.4.0.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -132,3 +133,8 @@ deno task test:e2e      # needs pkl and yue
   import the image as `war3mapMap.blp`, keep World Editor's minimap under another name, and call
   `BlzChangeMinimapTerrainTex("<that name>")` at game start (in `war3map.lua`, like the other settings edits). See
   github.com/inwc3/ReforgedMapPreviewReplacer. Needs an in-game check of the map list and of the in-game minimap.
+- **Fennel support.** The maintainer chose YueScript (2026-09-27) for its familiar syntax and VS Code support, with
+  Fennel as a later option: a fennel-ls docset rendered from `cli/data/natives.json` (sub-project 3), plus a Fennel
+  compile step next to the YueScript one.
+- **Importing existing Lua code** (a Lua library or `.lua` modules in `src/`) belongs to sub-project 4; the bundler
+  compiles only `.yue` today.
