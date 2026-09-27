@@ -35,6 +35,7 @@ Deno.test("init → build produces an archive with the injected bundle", async (
   assertStringIncludes(lua, "function main()");
   assertStringIncludes(lua, '__mw.define("main", function(...)');
   assertStringIncludes(lua, '__mw.boot("main")');
+  assertStringIncludes(lua, "1751543663"); // the template's $FourCC "hfoo"
   assert(await archive.read("war3map.w3i"));
   assert((await archive.listfile()).includes("war3map.lua"));
 });
@@ -50,6 +51,24 @@ Deno.test("check writes the editor declarations for the template project", async
   const runtime = await Deno.readTextFile(join(types, "moonwell.d.lua"));
   assertStringIncludes(runtime, "function moonwell.on_main(fn) end");
   assertStringIncludes(runtime, "function require(name) end");
+  assertStringIncludes(
+    await Deno.readTextFile(join(project, ".moonwell", "yue", "moonwell", "macros.yue")),
+    "export macro FourCC",
+  );
+});
+
+Deno.test("check reports a $FourCC that is not a 4-character literal at its file and line", async () => {
+  const project = await newProject();
+  const main = join(project, "src", "main.yue");
+  const text = await Deno.readTextFile(main);
+  assert(text.includes('$FourCC("hfoo")'), text);
+  await Deno.writeTextFile(main, text.replace('$FourCC("hfoo")', '$FourCC("hfo")'));
+  const checked = await deno(["task", "check"], project);
+  assertEquals(checked.code, 1, checked.text);
+  assertStringIncludes(
+    checked.text,
+    'error: src/main.yue:13 › $FourCC needs a string literal of exactly 4 characters, such as "hfoo".',
+  );
 });
 
 Deno.test("build imports assets/ into the archive and war3map.imp", async () => {

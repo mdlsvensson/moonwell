@@ -23,7 +23,7 @@ async function edit(path: string, from: string, to: string): Promise<void> {
   await Deno.writeTextFile(path, text.replace(from, to));
 }
 
-const TYPO = "error: src/main.yue:8:10 › Unknown global CreatUnit.\n" +
+const TYPO = "error: src/main.yue:9:10 › Unknown global CreatUnit.\n" +
   "hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.";
 
 Deno.test("check fails on a misspelt native, naming its position and the nearest name", async () => {
