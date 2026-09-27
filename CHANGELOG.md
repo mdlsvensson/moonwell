@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- `assets:paths` with no file argument reports every model it can read and marks each unreadable one in its place,
+  instead of stopping at the first; the command still fails when any model was unreadable.
+
 ## 0.3.0 (2026-09-26)
 
 - Object data: custom units, heroes, buildings, items, abilities, buffs and upgrades in Pkl files under `objects/`,

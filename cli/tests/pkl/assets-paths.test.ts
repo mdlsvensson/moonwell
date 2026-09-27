@@ -1,9 +1,10 @@
-import { assertEquals, assertStringIncludes } from "@std/assert";
+import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { dirname, join } from "@std/path";
 import { assetsPaths } from "../../src/commands/assets-paths.ts";
 import { init } from "../../src/commands/init.ts";
 import { createContext } from "../../src/context.ts";
 import { parseGamePaths } from "../../src/models/game-paths.ts";
+import { MoonwellError } from "../../src/shared/errors.ts";
 import { silentLogger } from "../support/logger.ts";
 import { chunk, concat, emitter, mdx, texture } from "../support/mdx.ts";
 
@@ -72,4 +73,26 @@ Deno.test("assets:paths classifies references as in-game or custom, imported or 
   assertEquals(all[0].refs, []);
   assertEquals(all[2].refs, []);
   assertStringIncludes(logger.lines.join("\n"), "  (no referenced files)");
+});
+
+Deno.test("assets:paths reports every readable model before failing on an unreadable one", async () => {
+  const parent = await Deno.makeTempDir({ prefix: "moonwell-paths-" });
+  const root = await init(join(parent, "my-map"), createContext(parent, silentLogger()), { link: true });
+  await put(root, "assets/Models/A.mdl", new TextEncoder().encode("Model {\n}\nBroken {\n"));
+  await put(root, "assets/Models/B.mdx", mdx(chunk("TEXS", texture("Textures\\B.blp"))));
+  const logger = silentLogger();
+  const ctx = { ...createContext(root, logger), logger };
+  const error = await assertRejects(
+    () => assetsPaths(ctx, undefined, { gamePaths: parseGamePaths("textures/b.blp\n") }),
+    MoonwellError,
+    "1 model could not be read",
+  );
+  assertStringIncludes(error.hint ?? "", "assets/Models/A.mdl");
+  assertEquals(logger.lines, [
+    "assets/Models/A.mdl",
+    "  (unreadable: Not a readable model: the Broken block is never closed.)",
+    "assets/Models/B.mdx",
+    `  texture  Textures\\B.blp  in-game path`,
+    "2 models, 1 path: 1 in-game, 0 custom imported, 0 custom not imported, 1 model unreadable.",
+  ]);
 });

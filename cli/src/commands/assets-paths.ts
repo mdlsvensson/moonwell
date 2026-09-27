@@ -92,16 +92,35 @@ export async function assetsPaths(
 
   const gamePaths = options.gamePaths ?? await loadGamePaths();
   if (gamePaths.size === 0) ctx.logger.warn("Moonwell's in-game path list is empty, so every path shows as custom.");
-  const reports: ModelReport[] = models.map((model) => ({
-    heading: model.heading,
-    refs: modelPaths(model.bytes, model.heading).map((ref) =>
-      ref.path === null ? ref : { ...ref, status: pathStatus(ref.path, gamePaths, targets) }
-    ),
-  }));
+  // With no file given, an unreadable model is reported in its place instead of hiding every other model.
+  const reports: ModelReport[] = [];
+  const unreadable: string[] = [];
+  const entries: Array<ModelReport | { heading: string; failure: string }> = [];
+  for (const model of models) {
+    let refs: ModelPath[];
+    try {
+      refs = modelPaths(model.bytes, model.heading);
+    } catch (error) {
+      if (file !== undefined || !(error instanceof MoonwellError)) throw error;
+      unreadable.push(model.heading);
+      entries.push({ heading: model.heading, failure: error.message });
+      continue;
+    }
+    const report = {
+      heading: model.heading,
+      refs: refs.map((ref) => ref.path === null ? ref : { ...ref, status: pathStatus(ref.path, gamePaths, targets) }),
+    };
+    reports.push(report);
+    entries.push(report);
+  }
 
   const label = (ref: ModelPath) => describeModelPath(ref).replaceAll("/", "\\");
-  for (const report of reports) {
+  for (const report of entries) {
     ctx.logger.info(report.heading);
+    if ("failure" in report) {
+      ctx.logger.info(`  (unreadable: ${report.failure})`);
+      continue;
+    }
     if (report.refs.length === 0) ctx.logger.info("  (no referenced files)");
     const kindWidth = Math.max(0, ...report.refs.map((ref) => ref.kind.length));
     const labelWidth = Math.max(0, ...report.refs.map((ref) => label(ref).length));
@@ -113,17 +132,23 @@ export async function assetsPaths(
   }
   const statuses = reports.flatMap((report) => report.refs.map((ref) => ref.status));
   const count = (...wanted: PathStatus[]) => statuses.filter((status) => status && wanted.includes(status)).length;
-  const summary = `${plural(reports.length, "model")}, ${plural(statuses.length, "path")}: ${
+  const summary = `${plural(models.length, "model")}, ${plural(statuses.length, "path")}: ${
     count("in-game path", "in-game path, replaced")
   } in-game`;
+  const failed = unreadable.length === 0 ? "" : `, ${plural(unreadable.length, "model")} unreadable`;
   if (targets === undefined) {
-    ctx.logger.info(`${summary}, ${count("custom path")} custom.`);
+    ctx.logger.info(`${summary}, ${count("custom path")} custom${failed}.`);
   } else {
     ctx.logger.info(
       `${summary}, ${count("custom path, imported")} custom imported, ${
         count("custom path, not imported")
-      } custom not imported.`,
+      } custom not imported${failed}.`,
     );
+  }
+  if (unreadable.length > 0) {
+    throw new MoonwellError(`${plural(unreadable.length, "model")} could not be read.`, {
+      hint: `Re-export or remove ${unreadable.join(", ")}; the report above lists why each one is unreadable.`,
+    });
   }
   return reports;
 }
