@@ -8,6 +8,8 @@
   Ctrl+C still exits at once.
 - An asset can be imported as `war3mapPreview.tga`, the lobby's custom preview image. Every other `war3map` path is
   still reserved.
+- `assets:sync` writes no `.asset-state/<map>.json` when it owns no files, and removes the file once the last asset is
+  gone. An invalid path in the state file now carries the state file's hint.
 - `assets:paths` reads large text `.mdl` models with far less memory (about a tenth for a 70 MB model).
 
 ## 0.3.0 (2026-09-26)

@@ -127,6 +127,22 @@ Deno.test("existing folder spelling is reused and forged state cannot target map
   );
   const reserved = await assertRejects(() => planAssets(root, map, state, defaults), MoonwellError, "Reserved");
   assertEquals(reserved.file, state);
+  assert(reserved.hint?.startsWith("Restore it from version control."), reserved.hint);
+});
+
+Deno.test("sync writes no state file when it owns nothing, and removes one it no longer needs", async () => {
+  const { root, map, state } = await fixture();
+  await applyAssetPlan(await planAssets(root, map, state, defaults), state);
+  assertEquals(await exists(state), false);
+
+  await put(root, "assets/a.blp");
+  await applyAssetPlan(await planAssets(root, map, state, defaults), state);
+  assertEquals(await exists(state), true);
+
+  await Deno.remove(join(root, "assets", "a.blp"));
+  await applyAssetPlan(await planAssets(root, map, state, defaults), state);
+  assertEquals(await exists(join(map, "a.blp")), false);
+  assertEquals(await exists(state), false);
 });
 
 Deno.test("new folders planned in one run share one spelling", async () => {

@@ -45,11 +45,9 @@ async function readIfExists(file: string): Promise<Uint8Array | undefined> {
 async function readState(file: string): Promise<AssetState> {
   const bytes = await readIfExists(file);
   if (bytes === undefined) return { version: 1, files: {} };
+  const hint = "Restore it from version control. It records which map files assets:sync owns.";
   const invalid = (problem: string): never => {
-    throw new MoonwellError(`The asset ownership state is invalid: ${problem}.`, {
-      file,
-      hint: "Restore it from version control. It records which map files assets:sync owns.",
-    });
+    throw new MoonwellError(`The asset ownership state is invalid: ${problem}.`, { file, hint });
   };
   let state: unknown;
   try {
@@ -68,11 +66,7 @@ async function readState(file: string): Promise<AssetState> {
       targetPath(name);
     } catch (error) {
       if (!(error instanceof MoonwellError)) throw error;
-      throw new MoonwellError(`The asset ownership state is invalid: ${error.message}`, {
-        file,
-        hint: error.hint,
-        cause: error,
-      });
+      throw new MoonwellError(`The asset ownership state is invalid: ${error.message}`, { file, hint, cause: error });
     }
     if (typeof digest !== "string" || !/^[a-f0-9]{64}$/.test(digest)) invalid(`${name} has no valid hash`);
     if (seen.has(pathKey(name))) invalid(`${name} is listed twice`);
@@ -201,8 +195,11 @@ export async function planAssets(
 export async function applyAssetPlan(plan: AssetPlan, stateFile?: string, signal?: AbortSignal): Promise<void> {
   const changes = [...plan.changes];
   if (stateFile !== undefined) {
+    // Owning nothing needs no state file, so an old one is removed.
     const before = await readIfExists(stateFile);
-    const after = new TextEncoder().encode(`${JSON.stringify(plan.state, null, 2)}\n`);
+    const after = Object.keys(plan.state.files).length === 0
+      ? undefined
+      : new TextEncoder().encode(`${JSON.stringify(plan.state, null, 2)}\n`);
     if (!equalBytes(before, after)) changes.push({ file: stateFile, before, after });
   }
   const applied: FileChange[] = [];
