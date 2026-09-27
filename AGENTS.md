@@ -80,8 +80,12 @@ over, and updated on 2026-09-27 after Plan 3b.
   unknown-global check. `compileProject` runs `yue -g` per changed source (cache `dist/stage/lua/.globals.json`, code in
   `cli/src/lint/`), builds the known names from `natives.json`, the source map's `war3map.lua`, `global` lines under
   `src/` and `lint.globals`, and throws a `ProblemsError` (or warns, with `lint.unknownGlobals = "warning"`). Name
-  matching is in `cli/src/shared/names.ts`, shared with object data. Its gate (the unknown-global part of CONTRIBUTING
-  step 10, plan Task 6) has not been run yet.
+  matching is in `cli/src/shared/names.ts`, shared with object data. Its gate (CONTRIBUTING step 10, re-run in full)
+  passed 2026-09-27 after one editor fix: `moonwell.d.lua` declares `require` (`.luarc.json` turns off LuaLS's `package`
+  library, which removed it) and types hook callbacks `fun(): ...` (YueScript returns the last expression). To check
+  editor diagnostics without the editor, run the Lua extension's bundled server:
+  `<extensions>/sumneko.lua-<version>/server/bin/lua-language-server --check=<project> --checklevel=Hint` after
+  compiling the `.yue` files with `yue -l -c --target=5.3` (what the YueScript extension writes on save).
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `e312e4a` (release 0.3.1).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.

@@ -27,10 +27,18 @@
 
 ### Release gate (so far)
 
-The editor part of CONTRIBUTING step 10 passed 2026-09-27; its unknown-global part is still to run. The editor part was
-tested by the maintainer in Antigravity IDE (a VS Code fork) with the YueScript extension 0.2.9 and the Lua extension
-3.19.1: completion and hover for natives, `mw.on_main`, `objects.units.captain`, the map's `gg_unit_` globals and a
-second project module, and no generated files in `git status`.
+Editor and unknown globals (CONTRIBUTING step 10) passed 2026-09-27, tested by the maintainer in Antigravity IDE (a VS
+Code fork) with the YueScript extension 0.2.9 and the Lua extension 3.19.1, and re-run in full after Plan 3b:
+
+- In the editor: completion and hover for natives, `mw.on_main`, `objects.units.captain`, a second project module, and
+  the `gg_unit_` global of a unit placed in World Editor and used by a trigger. `CreatUnit` is underlined.
+- `deno task check` fails with `src/main.yue:9:10 › Unknown global CreatUnit.` and `Did you mean CreateUnit?`; with
+  `lint.unknownGlobals = "warning"`, `deno task build` prints the same lines as warnings and succeeds. `git status`
+  shows no generated files.
+- The re-run found two editor warnings, now fixed: `import` lines were flagged as using an undefined `require`, and a
+  hook callback whose last line has a value was flagged as returning too many values. The fix was checked with the Lua
+  extension's lua-language-server run on the project from the command line (`--check`): no warnings remain for the
+  template's code, and `CreatUnit` is still flagged.
 
 ## 0.3.1 (2026-09-27)
 
