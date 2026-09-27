@@ -32,4 +32,5 @@ Deno.test("loadProject evaluates a real project against the local package", asyn
   assertEquals(project.yue, { version: "0.34.2", path: null });
   assertEquals(project.assets, { paths: {}, exclude: [] });
   assertEquals(project.settings.info, {});
+  assertEquals(project.lint, { unknownGlobals: "error", globals: [] });
 });

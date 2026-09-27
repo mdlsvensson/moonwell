@@ -28,6 +28,13 @@ assets {
   exclude = List()        // files under assets/, or folders ending in /, to leave out
 }
 
+// Globals your gameplay code uses must be defined somewhere: by the game, the map's triggers, a `global` line in
+// src/, or this list. check, build, test and dev report any other as a likely typo.
+lint {
+  unknownGlobals = "error"  // "warning" reports unknown globals without failing the command
+  globals = List()          // extra global names to allow, e.g. List("MyLibrary")
+}
+
 // Map settings, applied to the built map only; the World Editor map is never changed. `deno task settings:check`
 // lists what they would change. null inherits the World Editor map; empty text clears a text field.
 // Advanced raw overrides (gameplayConstants, gameInterface) are documented in @moonwell/MapSettings.pkl.

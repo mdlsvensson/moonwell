@@ -21,6 +21,19 @@ facts {
     Project.yue.path == null
     Project.assets.paths.isEmpty
     Project.assets.exclude == List()
+    Project.lint.unknownGlobals == "error"
+    Project.lint.globals == List()
+  }
+  ["lint accepts warning and Lua names"] {
+    (Project) { lint { unknownGlobals = "warning" } }.lint.unknownGlobals == "warning"
+    (Project) { lint { globals = List("MyLibrary", "_private", "x2") } }.lint.globals == List("MyLibrary", "_private", "x2")
+  }
+  ["lint rejects other levels and names that are not Lua names"] {
+    t.catch(() -> (Project) { lint { unknownGlobals = "off" } }.lint.unknownGlobals).contains("off")
+    t.catch(() -> (Project) { lint { globals = List("2x") } }.lint.globals).contains("isLuaName")
+    t.catch(() -> (Project) { lint { globals = List("my.lib") } }.lint.globals).contains("isLuaName")
+    t.catch(() -> (Project) { lint { globals = List("") } }.lint.globals).contains("isLuaName")
+    t.catch(() -> (Project) { lint { globals = List("end") } }.lint.globals).contains("isLuaName")
   }
   ["overrides are accepted"] {
     (Project) { map { folder = "hero.w3x"; entry = "src/game/init.yue" } }.map.entry == "src/game/init.yue"
@@ -163,6 +176,7 @@ facts {
     !parsed.yue.hasProperty("path")
     parsed.assets.paths is Dynamic
     parsed.assets.exclude.toList() == List()
+    parsed.lint.unknownGlobals == "error"
     parsed.objects.heroes is Dynamic
     parsed.objects.upgrades is Dynamic
   }

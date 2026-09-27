@@ -91,6 +91,7 @@ async function stageProject(objects: Project["objects"], settings: unknown = {})
     launch: { gameExecutable: null, args: [] },
     yue: { version: "0.34.2", path: yue },
     assets: { paths: {}, exclude: [] },
+    lint: { unknownGlobals: "error", globals: [] },
     settings: validateMapSettings(settings),
     objects,
   };

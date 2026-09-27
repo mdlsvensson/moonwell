@@ -28,6 +28,16 @@ local const function isReservedFolder(path: String): Boolean =
       || parts.firstOrNull == "src"
       || (parts.length >= 2 && parts[0] == "dist" && parts[1] == "stage")
 
+/// Lua 5.3's reserved words, which cannot name a global.
+local const luaKeywords = Set(
+  "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto", "if", "in", "local", "nil", "not",
+  "or", "repeat", "return", "then", "true", "until", "while"
+)
+
+/// A Lua name: letters, digits and `_`, not starting with a digit, and not a reserved word.
+local const function isLuaName(name: String): Boolean =
+  name.matches(Regex(#"[A-Za-z_][A-Za-z0-9_]*"#)) && !luaKeywords.contains(name)
+
 class MapConfig {
   /// Folder under `maps/` holding the World Editor source map (folder format, Lua script mode).
   folder: String(endsWith(".w3x"), isRelativeFolder(this)) = "map.w3x"
@@ -74,11 +84,24 @@ class AssetsConfig {
   exclude: List<String(!isEmpty)> = List()
 }
 
+class LintConfig {
+  /// What `check`, `build`, `test` and `dev` do with a global that nothing defines. Known globals are the game's
+  /// natives, Blizzard.j functions and globals, the Lua libraries the game provides, the globals and functions of the
+  /// source map's `war3map.lua`, names declared with `global` in any file under `src/`, and `globals` below.
+  /// `"error"` fails the command; `"warning"` reports each one and continues.
+  unknownGlobals: "error"|"warning" = "error"
+
+  /// Extra global names to allow, such as those a `global *` or `global ^` file creates: Moonwell does not detect
+  /// those.
+  globals: List<String(isLuaName(this))> = List()
+}
+
 map: MapConfig = new {}
 build: BuildConfig = new {}
 launch: LaunchConfig = new {}
 yue: YueConfig = new {}
 assets: AssetsConfig = new {}
+lint: LintConfig = new {}
 settings: MapSettings = new {}
 
 /// Custom units, heroes, buildings, items, abilities, buffs and upgrades, written into the built map. Wire in the files

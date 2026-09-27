@@ -35,7 +35,21 @@ Deno.test("parseProject maps omitted nullable fields to null", () => {
     assets: { paths: {}, exclude: [] },
     settings: validateMapSettings({}),
     objects: emptyObjects(),
+    lint: { unknownGlobals: "error", globals: [] },
   });
+});
+
+Deno.test("parseProject reads the lint block", () => {
+  const project = parseProject("/p", { ...FULL, lint: { unknownGlobals: "warning", globals: ["MyLibrary"] } }, "m.pkl");
+  assertEquals(project.lint, { unknownGlobals: "warning", globals: ["MyLibrary"] });
+});
+
+Deno.test("parseProject rejects an unknown lint level", () => {
+  assertThrows(
+    () => parseProject("/p", { ...FULL, lint: { unknownGlobals: "off", globals: [] } }, "m.pkl"),
+    MoonwellError,
+    'lint.unknownGlobals must be "error" or "warning"',
+  );
 });
 
 Deno.test("parseProject reads objects, defaulting sources to the evaluated manifest", () => {

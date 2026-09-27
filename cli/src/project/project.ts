@@ -17,6 +17,8 @@ export interface Project {
   launch: { gameExecutable: string | null; args: string[] };
   yue: { version: string; path: string | null };
   assets: { paths: Record<string, string>; exclude: string[] };
+  /** The unknown-global check (spec §5.3). */
+  lint: { unknownGlobals: "error" | "warning"; globals: string[] };
   settings: MapSettings;
   /** Custom objects, shape-checked only: resolving them needs the metadata and the source map (planner). */
   objects: ProjectObjects;
@@ -149,6 +151,8 @@ export function parseProject(root: string, value: unknown, file: string): Projec
       ? value as Record<string, string>
       : fail(path, "a mapping of strings");
   };
+  const level = (input: unknown, path: string): "error" | "warning" =>
+    input === "error" || input === "warning" ? input : fail(path, '"error" or "warning"');
 
   const data = record(value, "the manifest");
   const map = record(data.map, "map");
@@ -157,6 +161,8 @@ export function parseProject(root: string, value: unknown, file: string): Projec
   const yue = record(data.yue, "yue");
   // Moonwell 0.1.0 schema packages have no assets block; within 0.1.x a missing one means no configuration.
   const assets = data.assets === undefined ? { paths: {}, exclude: [] } : record(data.assets, "assets");
+  // Every 0.4 schema package has a lint block; a manifest without one (unit fixtures) gets the defaults.
+  const lint = data.lint === undefined ? { unknownGlobals: "error", globals: [] } : record(data.lint, "lint");
   const settings = validateMapSettings(data.settings === undefined ? {} : data.settings, file);
   // Typed/raw gameplay-constant conflicts need no map, so they fail here and name the evaluated manifest.
   gameplaySections(settings, file);
@@ -172,6 +178,10 @@ export function parseProject(root: string, value: unknown, file: string): Projec
     },
     yue: { version: string(yue.version, "yue.version"), path: nullableString(yue.path, "yue.path") },
     assets: { paths: stringRecord(assets.paths, "assets.paths"), exclude: strings(assets.exclude, "assets.exclude") },
+    lint: {
+      unknownGlobals: level(lint.unknownGlobals, "lint.unknownGlobals"),
+      globals: strings(lint.globals, "lint.globals"),
+    },
     settings,
     objects,
   };
