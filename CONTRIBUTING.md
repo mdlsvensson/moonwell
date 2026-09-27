@@ -110,9 +110,11 @@ Publish the Pkl package before the CLI: a new project's `init` resolves `moonwel
 2. `pkl project package schema/` writes `.out/moonwell@<version>/`. It ends by asking pkg.pkl-lang.org whether the
    version is already published; if that check crashes (seen in sandboxed shells: "Unable to establish loopback
    connection"), add `--skip-publish-check`, which is safe for a version that was never released.
-3. Create a GitHub release in `mdlsvensson/moonwell` with a new tag `moonwell@<version>` on the pushed commit. Attach
-   `moonwell@<version>.zip` and the metadata file `moonwell@<version>` (no extension). `package://pkg.pkl-lang.org/...`
-   URIs redirect to these release assets.
+3. Push the release commit first: `--target main` tags whatever `main` is on GitHub, and 0.3.1 was first tagged on the
+   commit before its version bump. Create a GitHub release in `mdlsvensson/moonwell` with a new tag `moonwell@<version>`
+   on the pushed commit, and check that the tag names the release commit. Attach `moonwell@<version>.zip` and the
+   metadata file `moonwell@<version>` (no extension). `package://pkg.pkl-lang.org/...` URIs redirect to these release
+   assets.
 4. `cd cli && deno publish`. It opens the browser to authorize with JSR. The first time, create the `@moonwell` scope
    and its `cli` package on jsr.io.
 5. Check the published release from outside the repo:
