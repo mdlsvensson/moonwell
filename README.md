@@ -138,9 +138,9 @@ footman = CreateUnit Player(0), $FourCC("hfoo"), 0, 0, 270
 ```
 
 `$FourCC "hfoo"` is the rawcode `'hfoo'` as the integer the game's functions take (`1751543663`), written into the
-compiled code, so the game never converts it. It takes one string literal of exactly four characters; anything else,
-such as a variable or `"hfo"`, fails the compile at that line. For your own objects, use the ids in `generated.objects`
-instead.
+compiled code, so the game never converts it. It takes one string literal of exactly four printable ASCII characters,
+with no escapes or `#{}` interpolation; anything else, such as a variable or `"hfo"`, fails the compile at that line.
+For your own objects, use the ids in `generated.objects` instead.
 
 The macro module is written to `.moonwell/yue/moonwell/macros.yue` by `setup`, `check`, `build`, `test` and `dev`, where
 the compiler and the editor's YueScript extension find it. It adds nothing to the map.
