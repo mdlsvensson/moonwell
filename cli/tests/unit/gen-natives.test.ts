@@ -1,5 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { parseJass } from "../../../tools/natives/jass.ts";
+import { buildNatives } from "../../../tools/gen-natives.ts";
 
 // Hand-written miniature JASS in the shape of common.j and blizzard.j; never copied from the game files.
 const COMMON = `// a leading comment
@@ -83,4 +84,38 @@ Deno.test("parseJass names the file and line of anything it does not understand"
   assertThrows(() => parseJass("type unit extends widget\nlibrary Foo\n", "common.j"), Error, "common.j:2");
   assertThrows(() => parseJass("function F takes nothing returns nothing\n", "blizzard.j"), Error, "blizzard.j:1");
   assertThrows(() => parseJass("globals\n    what is this\nendglobals\n", "common.j"), Error, "common.j:2");
+});
+
+Deno.test("buildNatives merges both files and the Lua extras, sorted by name", () => {
+  const natives = buildNatives(
+    "9.9.9",
+    parseJass(COMMON, "common.j"),
+    parseJass(BLIZZARD, "blizzard.j"),
+    {
+      functions: [{ name: "FourCC", params: [{ name: "id", type: "string" }], returns: "integer" }],
+      globals: ["print", "math"],
+      removed: ["io"],
+    },
+  );
+  assertEquals(natives.gameVersion, "9.9.9");
+  assertEquals(natives.types.map((t) => t.name), ["agent", "unit", "widget"]);
+  assertEquals(natives.functions.map((f) => `${f.source}:${f.name}`), [
+    "blizzard.j:ConstantBJ",
+    "common.j:CreateThing",
+    "common.j:DoNothing",
+    "lua:FourCC",
+    "common.j:GetThing",
+    "blizzard.j:HelperBJ",
+  ]);
+  assertEquals(natives.globals.map((g) => g.name), ["MAX_THINGS", "SLASHES", "bj_ANGLE", "counts"]);
+  assertEquals(natives.lua, { globals: ["math", "print"], removed: ["io"] });
+});
+
+Deno.test("buildNatives refuses a name declared twice", () => {
+  const common = parseJass(COMMON, "common.j");
+  assertThrows(
+    () => buildNatives("9.9.9", common, common, { functions: [], globals: [], removed: [] }),
+    Error,
+    "CreateThing",
+  );
 });

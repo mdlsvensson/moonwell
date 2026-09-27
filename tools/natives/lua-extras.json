@@ -1,0 +1,36 @@
+{
+  "functions": [
+    { "name": "FourCC", "params": [{ "name": "id", "type": "string" }], "returns": "integer" },
+    { "name": "__jarray", "params": [{ "name": "default", "type": "any" }], "returns": "table" }
+  ],
+  "globals": [
+    "_G",
+    "_VERSION",
+    "assert",
+    "collectgarbage",
+    "coroutine",
+    "error",
+    "getmetatable",
+    "ipairs",
+    "load",
+    "math",
+    "next",
+    "pairs",
+    "pcall",
+    "print",
+    "rawequal",
+    "rawget",
+    "rawlen",
+    "rawset",
+    "select",
+    "setmetatable",
+    "string",
+    "table",
+    "tonumber",
+    "tostring",
+    "type",
+    "utf8",
+    "xpcall"
+  ],
+  "removed": ["io"]
+}

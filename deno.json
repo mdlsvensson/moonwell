@@ -12,12 +12,13 @@
     "test:runtime": "deno test -A cli/tests/yue",
     "test:pkl": "pkl test schema/tests/Project.pkl schema/tests/Objects.pkl && deno test -A cli/tests/pkl",
     "test:e2e": "deno test -A cli/tests/e2e",
-    "check": "deno check cli/src/main.ts tools/gen.ts tools/gen-game-paths.ts tools/gen-metadata.ts",
+    "check": "deno check cli/src/main.ts tools/gen.ts tools/gen-game-paths.ts tools/gen-metadata.ts tools/gen-natives.ts",
     "lint": "deno lint",
     "fmt": "deno fmt",
     "gen": "deno run -A tools/gen.ts",
     "gen:game-paths": "deno run -A tools/gen-game-paths.ts",
-    "gen:metadata": "deno run -A tools/gen-metadata.ts"
+    "gen:metadata": "deno run -A tools/gen-metadata.ts",
+    "gen:natives": "deno run -A tools/gen-natives.ts"
   },
   "fmt": {
     "lineWidth": 120,

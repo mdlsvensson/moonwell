@@ -40,6 +40,14 @@ export async function renderEmbedded(repo: string = REPO): Promise<Map<string, s
       JSON.stringify(encodeBase64(await gzip(metadata)))
     };\n`,
   );
+
+  const natives = await Deno.readFile(join(repo, "cli", "data", "natives.json"));
+  out.set(
+    "cli/src/embedded/natives.ts",
+    `${HEADER}/** cli/data/natives.json, gzip-compressed. */\nexport const NATIVES_GZIP_BASE64: string = ${
+      JSON.stringify(encodeBase64(await gzip(natives)))
+    };\n`,
+  );
   return out;
 }
 
