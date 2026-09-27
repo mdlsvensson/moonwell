@@ -39,6 +39,17 @@ Deno.test("init → build produces an archive with the injected bundle", async (
   assert((await archive.listfile()).includes("war3map.lua"));
 });
 
+Deno.test("check writes the editor declarations for the template project", async () => {
+  const project = await newProject();
+  const checked = await deno(["task", "check"], project);
+  assertEquals(checked.code, 0, checked.text);
+  const types = join(project, ".moonwell", "types");
+  assertStringIncludes(await Deno.readTextFile(join(types, "natives.d.lua")), "function CreateUnit(");
+  assertStringIncludes(await Deno.readTextFile(join(types, "objects.d.lua")), "---@field captain integer h000");
+  assertStringIncludes(await Deno.readTextFile(join(types, "map.d.lua")), "---@type unit\ngg_unit_Hblm_0003 = nil");
+  assertStringIncludes(await Deno.readTextFile(join(types, "moonwell.d.lua")), "function moonwell.on_main(fn) end");
+});
+
 Deno.test("build imports assets/ into the archive and war3map.imp", async () => {
   const project = await newProject();
   const bytes = new Uint8Array([0, 1, 2, 250, 255]);

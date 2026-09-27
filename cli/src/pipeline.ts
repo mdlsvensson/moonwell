@@ -4,6 +4,7 @@ import { applyAssetPlan, assetLocations, planAssets } from "./assets/plan.ts";
 import { emitBundle, injectBundle } from "./bundle/emit.ts";
 import { resolveGraph } from "./bundle/graph.ts";
 import type { CommandContext } from "./context.ts";
+import { refreshEditorFiles } from "./editor/refresh.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
 import { refreshObjectIds } from "./objectdata/ids.ts";
 import { applyObjectPlan, type ObjectPlan, planObjectData } from "./objectdata/plan.ts";
@@ -72,6 +73,7 @@ export async function prepareStage(
   // gameplay imports is current. The same bytes are applied to the staged copy below (spec §9.1).
   const objects = await planProjectObjects(ctx, project);
   await refreshObjectIds(ctx.root, objects.generated);
+  await refreshEditorFiles(ctx.root, { objects: objects.objects, mapFolder: `maps/${project.map.folder}` });
   const { modules, entry } = await compileProject(ctx, project, options);
   const source = join(ctx.root, "maps", project.map.folder);
   if (!(await exists(source))) {

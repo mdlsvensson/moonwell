@@ -3,6 +3,7 @@ import { join } from "@std/path";
 import { collectAssets } from "../assets/collect.ts";
 import { assetLocations, planAssets } from "../assets/plan.ts";
 import type { CommandContext } from "../context.ts";
+import { refreshEditorFiles } from "../editor/refresh.ts";
 import { assertObjectIdsCurrent, refreshObjectIds } from "../objectdata/ids.ts";
 import { compileProject, planProjectObjects } from "../pipeline.ts";
 import { loadProject } from "../project/project.ts";
@@ -28,6 +29,7 @@ export async function check(
     const objects = await planProjectObjects(ctx, project);
     if (options.refreshObjectIds) await refreshObjectIds(ctx.root, objects.generated);
     await assertObjectIdsCurrent(ctx.root, objects.generated);
+    await refreshEditorFiles(ctx.root, { objects: objects.objects, mapFolder: `maps/${project.map.folder}` });
     const { modules, entry } = await compileProject(ctx, project, {});
     // Settings are planned against the source map, in build order, and never written. Without active settings,
     // check still passes when the source map is missing, as it always has.
