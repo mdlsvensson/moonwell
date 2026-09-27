@@ -4,7 +4,7 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-26 after Plan 2c.
+over, and updated on 2026-09-27 after the small assets fixes.
 
 ## Read first
 
@@ -17,7 +17,7 @@ over, and updated on 2026-09-26 after Plan 2c.
   `2026-09-26-moonwell-object-data-design.md`. Plans for everything built so far are in `docs/superpowers/plans/`;
   follow their style when writing new plans.
 
-## State (2026-09-26)
+## State (2026-09-27)
 
 - **Released:** 0.1.0, on JSR (`@moonwell/cli@0.1.0`) and as a GitHub release (`moonwell@0.1.0`). It contains the
   toolchain: `init`, `setup`, `build`, `test`, `dev`, `check`; the YueScript bundler with runtime hooks; the MPQ writer;
@@ -51,13 +51,19 @@ over, and updated on 2026-09-26 after Plan 2c.
   `cli/tests/fixtures/objects-v3-names/`. The in-game gate (CONTRIBUTING step 9) passed 2026-09-26, including per-level
   ability values and upgrade tooltips. The research button shows an upgrade's `tooltip`, not its `name`. The template's
   footman is the Captain (`template/objects/units.pkl`).
-- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `eea99d9`.
+- **Unreleased** (2026-09-27, `CHANGELOG.md` `## Unreleased`): the small assets items that were deferred. `assets:paths`
+  reports every readable model before failing, and tokenizes `.mdl` lazily. Ctrl+C during `assets:sync` rolls back.
+  `war3mapPreview.tga` is importable. There is no empty state file, and the state-file hint is fixed. The
+  `war3mapPreview.tga` check in the assets release gate (CONTRIBUTING step 7) has not been run yet.
+- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `db03b66`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Next sub-project:** not yet chosen; ask the maintainer.
+1. **Patch release 0.3.1** of the unreleased fixes, once the maintainer has run the `war3mapPreview.tga` gate check.
+2. **Next sub-project:** the maintainer chooses between Editor & DX (roadmap item 3; recommended first) and Libraries &
+   runtime (item 4). Ask.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -113,9 +119,4 @@ deno task test:e2e      # needs pkl and yue
 
 ## Open, deliberately deferred (small)
 
-- `assets:paths`: with no file argument, one unreadable model aborts the whole report. Very large `.mdl` files use a lot
-  of memory, because the tokenizer builds an array.
-- `assets:sync` on Ctrl+C has no rollback (the reference framework behaves the same). A target starting with `war3map`
-  (e.g. `war3mapPreview.tga`) is rejected as reserved.
-- The asset state-file error carries a slightly off hint. `assets:sync` with no assets writes an empty
-  `.asset-state/<map>.json`.
+- `assets:sync` checks for Ctrl+C only while writing; one pressed during planning takes effect when writing starts.
