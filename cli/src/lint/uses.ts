@@ -89,7 +89,15 @@ export async function listGlobalUses(options: {
       failures.push(compileError(label, `${result.stdout}\n${result.stderr}`));
       return;
     }
-    const uses = parseGlobalUses(result.stdout, label);
+    let uses: GlobalUse[];
+    try {
+      uses = parseGlobalUses(result.stdout, label);
+    } catch (error) {
+      // Collected like a failed run, so the other workers finish and the files that succeeded are cached.
+      if (!(error instanceof MoonwellError)) throw error;
+      failures.push(error);
+      return;
+    }
     files[file] = { hash: options.hashes[file], uses: uses.map((use) => [use.name, use.line, use.column]) };
   });
 

@@ -16,6 +16,8 @@ export interface CompileOutput {
   outDir: string;
   /** SHA-256 of each compiled source, keyed by its POSIX path under src/, e.g. "heroes/captain.yue". */
   hashes: Record<string, string>;
+  /** The text of each compiled source (the bytes that were hashed, as UTF-8), keyed like `hashes`. */
+  sources: Record<string, string>;
   load(name: string): CompiledModule | undefined;
 }
 
@@ -51,9 +53,13 @@ export async function compileSources(options: {
   const previous = await readManifest(manifestPath);
   const settings = `${options.yue}|${options.minify ? "minify" : "rewrite"}`;
   const hashes: Record<string, string> = {};
+  const texts: Record<string, string> = {};
   const pending: string[] = [];
+  const decoder = new TextDecoder();
   for (const file of sources) {
-    hashes[file] = await sha256Hex(await Deno.readFile(join(srcDir, file)));
+    const bytes = await Deno.readFile(join(srcDir, file));
+    hashes[file] = await sha256Hex(bytes);
+    texts[file] = decoder.decode(bytes);
     const upToDate = previous?.settings === settings && previous.files[file] === hashes[file] &&
       await exists(join(outDir, luaPath(file)));
     if (!upToDate) pending.push(file);
@@ -70,6 +76,7 @@ export async function compileSources(options: {
     const result = await run(options.yue, ["--target=5.3", mode, "-o", output, join(srcDir, file)]);
     if (result.code !== 0) {
       delete hashes[file];
+      delete texts[file];
       await removeIfExists(output);
       failures.push(compileError(`src/${file}`, `${result.stdout}\n${result.stderr}`));
     }
@@ -90,6 +97,7 @@ export async function compileSources(options: {
   return {
     outDir,
     hashes,
+    sources: texts,
     load(name: string): CompiledModule | undefined {
       if (!modules.has(name)) return undefined;
       const relative = name.split(".").join("/");

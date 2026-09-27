@@ -102,17 +102,16 @@ Deno.test("unknownGlobalProblems reports every unknown use in file, line and col
   );
 });
 
-/** A project whose compiler is a stand-in printing `outputs[<path under src/>]` for `yue -g`. */
+/**
+ * A project whose compiler is a stand-in printing `outputs[<path under src/>]` for `yue -g`. The sources reach the
+ * check only through `compiled.sources`; nothing is written under src/, so the check must not read the files again.
+ */
 async function lintProject(
   sources: Record<string, string>,
   outputs: Record<string, string>,
   options: { lint?: Project["lint"]; mapScript?: string } = {},
 ) {
   const root = await Deno.makeTempDir({ prefix: "moonwell-lint-" });
-  for (const [file, text] of Object.entries(sources)) {
-    await Deno.mkdir(join(root, "src", ...file.split("/").slice(0, -1)), { recursive: true });
-    await Deno.writeTextFile(join(root, "src", ...file.split("/")), text);
-  }
   if (options.mapScript !== undefined) {
     await Deno.mkdir(join(root, "maps", "map.w3x"), { recursive: true });
     await Deno.writeTextFile(join(root, "maps", "map.w3x", "war3map.lua"), options.mapScript);
@@ -138,7 +137,7 @@ async function lintProject(
     objects: emptyObjects(),
   };
   const hashes = Object.fromEntries(Object.keys(sources).map((file, i) => [file, `h${i}`]));
-  return { root, ctx, logger, project, compiled: { yue: "yue", hashes } };
+  return { root, ctx, logger, project, compiled: { yue: "yue", hashes, sources } };
 }
 
 Deno.test("checkUnknownGlobals accepts map, declared and lint.globals names", async () => {

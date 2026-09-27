@@ -71,12 +71,14 @@ export function unknownGlobalProblems(
   const hintFor = (name: string): string => {
     let hint = hints.get(name);
     if (hint === undefined) {
-      const closest = closestNames(known, name);
-      hint = removed.includes(name)
-        ? `Warcraft III's Lua does not provide ${name}.`
-        : closest.length > 0
-        ? `Did you mean ${joinWords(closest, "or")}? ${UNKNOWN_GLOBAL_HINT}`
-        : UNKNOWN_GLOBAL_HINT;
+      if (removed.includes(name)) {
+        hint = `Warcraft III's Lua does not provide ${name}.`;
+      } else {
+        const closest = closestNames(known, name);
+        hint = closest.length > 0
+          ? `Did you mean ${joinWords(closest, "or")}? ${UNKNOWN_GLOBAL_HINT}`
+          : UNKNOWN_GLOBAL_HINT;
+      }
       hints.set(name, hint);
     }
     return hint;
@@ -100,20 +102,19 @@ export function unknownGlobalProblems(
 }
 
 /**
- * Checks every compiled source for unknown globals (spec §5). With `lint.unknownGlobals = "error"` any unknown use
- * throws a `ProblemsError` listing all of them; with `"warning"` they are logged and returned.
+ * Checks every compiled source for unknown globals (spec §5). `compiled.sources` holds the text of each source, keyed
+ * like `compiled.hashes`. With `lint.unknownGlobals = "error"` any unknown use throws a `ProblemsError` listing all of
+ * them; with `"warning"` they are logged and returned.
  */
 export async function checkUnknownGlobals(
   ctx: CommandContext,
   project: Project,
-  compiled: { yue: string; hashes: Record<string, string> },
+  compiled: { yue: string; hashes: Record<string, string>; sources: Record<string, string> },
   natives?: Natives,
 ): Promise<Problem[]> {
   const uses = await listGlobalUses({ yue: compiled.yue, root: ctx.root, hashes: compiled.hashes, run: ctx.run });
-  const declared: string[] = [];
-  for (const file of Object.keys(compiled.hashes)) {
-    declared.push(...declaredGlobals(await Deno.readTextFile(join(ctx.root, "src", ...file.split("/")))));
-  }
+  // The text compileSources hashed: reading the files again could fail or see other bytes (e.g. during dev).
+  const declared = Object.values(compiled.sources).flatMap(declaredGlobals);
   const label = `maps/${project.map.folder}/war3map.lua`;
   const script = await readSourceScript(join(ctx.root, ...label.split("/")), label);
   const data = natives ?? await loadNatives();

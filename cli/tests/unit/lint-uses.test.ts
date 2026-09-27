@@ -103,3 +103,26 @@ Deno.test("listGlobalUses reports a failed yue -g like a compile error", async (
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test("listGlobalUses reports unreadable yue -g output and still caches the other files", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-uses-" });
+  try {
+    const hashes = { "bad.yue": "h1", "good.yue": "h2" };
+    const first = stubYue(root, { "bad.yue": ok("Score one 8\n"), "good.yue": ok("print 1 1\n") });
+    const error = await assertRejects(
+      () => listGlobalUses({ yue: "yue", root, hashes, run: first.run }),
+      MoonwellError,
+      "Score one 8",
+    );
+    assertEquals(error.file, "src/bad.yue");
+
+    const second = stubYue(root, { "bad.yue": ok("Score 1 8\n") });
+    assertEquals(await listGlobalUses({ yue: "yue", root, hashes, run: second.run }), {
+      "bad.yue": [{ name: "Score", line: 1, column: 8 }],
+      "good.yue": [{ name: "print", line: 1, column: 1 }],
+    });
+    assertEquals(second.calls, ["bad.yue"]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

@@ -52,7 +52,7 @@ export async function compileProject(
   const entry = entryModuleName(options.entry ?? project.map.entry);
   const modules = resolveGraph(entry, output.load, BUILTIN_MODULES);
   // After compiling and resolving, so syntax errors and missing modules are reported first (spec §5.2).
-  await checkUnknownGlobals(ctx, project, { yue, hashes: output.hashes });
+  await checkUnknownGlobals(ctx, project, { yue, hashes: output.hashes, sources: output.sources });
   return { modules, entry };
 }
 
