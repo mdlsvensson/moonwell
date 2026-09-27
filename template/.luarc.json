@@ -5,5 +5,6 @@
   "workspace.library": [".moonwell/types"],
   "workspace.ignoreDir": ["dist", "maps"],
   "workspace.useGitIgnore": false,
-  "workspace.checkThirdParty": false
+  "workspace.checkThirdParty": false,
+  "completion.maxSuggestCount": 10000
 }

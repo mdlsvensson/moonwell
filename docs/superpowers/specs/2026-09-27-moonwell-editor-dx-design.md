@@ -137,7 +137,8 @@ docset are all rendered from `natives.json`, so they cannot disagree.
   Editor's `war3map.lua`); `workspace.useGitIgnore: false`, because `.gitignore` lists `src/**/*.lua` and LuaLS would
   otherwise skip the `.lua` files the extension writes, so an `import` of another project module would not complete;
   `workspace.checkThirdParty: false`; `runtime.builtin` disabling the libraries the game removes (`io`, `debug`,
-  `package`; §3.2).
+  `package`; §3.2); `completion.maxSuggestCount: 10000`, because the extension asks for completion at a placeholder
+  word, so the typed prefix never narrows the list and LuaLS's default of 100 would hide most of the ~5,000 globals.
 - **`.vscode/extensions.json`:** recommends `LiJin.yuescript` and `sumneko.lua`.
 - **`.gitignore`** gains `.moonwell/` and `src/**/*.lua` (the extension's output on save).
 

@@ -1,8 +1,9 @@
-import { assertEquals } from "@std/assert";
+import { assert, assertEquals } from "@std/assert";
 import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
 import { join } from "@std/path";
 import { addEditorFiles, EDITOR_FILES } from "../../src/editor/scaffold.ts";
 import { TEMPLATE_FILES } from "../../src/embedded/template.ts";
+import { loadNatives } from "../../src/natives/natives.ts";
 
 const b64 = (text: string) => encodeBase64(new TextEncoder().encode(text));
 const FILES = [
@@ -17,10 +18,16 @@ Deno.test("the template ships every editor file", () => {
   for (const path of EDITOR_FILES) assertEquals(paths.has(path), true, path);
 });
 
-Deno.test("the template's .luarc.json lets LuaLS index the compiled .lua files that .gitignore lists", () => {
+Deno.test("the template's .luarc.json indexes the compiled .lua files and suggests every game global", async () => {
   const file = TEMPLATE_FILES.find((entry) => entry.path === ".luarc.json");
   const config = JSON.parse(new TextDecoder().decode(decodeBase64(file!.base64)));
   assertEquals(config["workspace.useGitIgnore"], false);
+  // The YueScript extension asks for completion at a placeholder word, so the typed prefix never narrows the list:
+  // LuaLS must be allowed to suggest every native and game global at once.
+  const natives = await loadNatives();
+  const names = natives.functions.length + natives.globals.length;
+  const limit = config["completion.maxSuggestCount"];
+  assert(typeof limit === "number" && limit >= names, `completion.maxSuggestCount ${limit} < ${names} names`);
 });
 
 Deno.test("addEditorFiles adds missing files and .gitignore lines, and never overwrites", async () => {
