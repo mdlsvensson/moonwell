@@ -4,6 +4,7 @@
 
 - `assets:paths` with no file argument reports every model it can read and marks each unreadable one in its place,
   instead of stopping at the first; the command still fails when any model was unreadable.
+- `assets:paths` reads large text `.mdl` models with far less memory (about a tenth for a 70 MB model).
 
 ## 0.3.0 (2026-09-26)
 

@@ -12,8 +12,8 @@ interface Block {
   flags: Set<string>;
 }
 
-function tokenize(text: string, file: string): Token[] {
-  const tokens: Token[] = [];
+/** Yields tokens one at a time, so a large model never holds all of its tokens in memory. */
+function* tokenize(text: string, file: string): Generator<Token> {
   let i = 0;
   while (i < text.length) {
     const char = text[i];
@@ -23,21 +23,20 @@ function tokenize(text: string, file: string): Token[] {
       const end = text.indexOf("\n", i);
       i = end < 0 ? text.length : end;
     } else if (char === "{" || char === "}" || char === ",") {
-      tokens.push({ type: char, value: char });
+      yield { type: char, value: char };
       i++;
     } else if (char === '"') {
       const end = text.indexOf('"', i + 1);
       if (end < 0) throw modelError(file, "a string is never closed");
-      tokens.push({ type: "string", value: text.slice(i + 1, end) });
+      yield { type: "string", value: text.slice(i + 1, end) };
       i = end + 1;
     } else {
       let end = i;
       while (end < text.length && !/[\s{},"]/.test(text[end])) end++;
-      tokens.push({ type: "word", value: text.slice(i, end) });
+      yield { type: "word", value: text.slice(i, end) };
       i = end;
     }
   }
-  return tokens;
 }
 
 /** The reference a closed block makes, if it is a path-bearing block with a path. */
