@@ -124,10 +124,11 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
 11. Macros and the game's Lua, in the step 10 project: run `deno task test` and confirm a standard Footman stands beside
     the Captain (the template makes it with `$FourCC("hfoo")`). In the editor (the project opened as step 10 says),
     confirm `src/main.yue` shows no error on the `moonwell.macros` import or on `$FourCC("hfoo")`, and that hovering
-    `$FourCC("hfoo")` is quiet (the YueScript extension finds the module through `yueconfig.yue`'s `include`). Then
-    replace `src/main.yue` with the Lua probe below, run `deno task test`, and confirm the message log (F12) shows
+    `$FourCC("hfoo")` is quiet (the YueScript extension finds the module through `yueconfig.yue`'s `include`). Then save
+    the Lua probe below as `src/probe.yue`, run `deno task test --entry src/probe.yue`, and confirm the game shows
     `missing: collectgarbage dofile loadfile debug io package` (the `removed` list in `tools/natives/lua-extras.json`)
-    and `os: clock date difftime time` (as README's "The game's Lua" says); restore `src/main.yue` afterwards.
+    and `os: clock date difftime time` (as README's "The game's Lua" says). Printed lines show on screen for a few
+    seconds only; the message log (F12) does not keep them. Delete `src/probe.yue` afterwards.
 
     ```yue
     import "moonwell" as mw
