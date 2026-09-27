@@ -14,6 +14,8 @@ export async function renderEmbedded(repo: string = REPO): Promise<Map<string, s
   const out = new Map<string, string>();
   const runtime = await Deno.readTextFile(join(repo, "cli", "runtime", "moonwell.lua"));
   out.set("cli/src/embedded/runtime.ts", `${HEADER}export const RUNTIME_LUA: string = ${JSON.stringify(runtime)};\n`);
+  const macros = await Deno.readTextFile(join(repo, "cli", "runtime", "macros.yue"));
+  out.set("cli/src/embedded/macros.ts", `${HEADER}export const MACROS_YUE: string = ${JSON.stringify(macros)};\n`);
 
   const entries = (await templateEntries(repo)).map((file) =>
     `  { path: ${JSON.stringify(file.path)}, base64: ${JSON.stringify(file.base64)} },`

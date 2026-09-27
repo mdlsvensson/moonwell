@@ -15,6 +15,12 @@ Deno.test("the embedded runtime is up to date (run `deno task gen`)", async () =
   assert(await Deno.readTextFile(join(REPO, path)) === expected, `${path} is stale: run \`deno task gen\`.`);
 });
 
+Deno.test("the embedded macro module is up to date (run `deno task gen`)", async () => {
+  const path = "cli/src/embedded/macros.ts";
+  const expected = (await renderEmbedded()).get(path);
+  assert(await Deno.readTextFile(join(REPO, path)) === expected, `${path} is stale: run \`deno task gen\`.`);
+});
+
 Deno.test("the embedded template matches template/ (run `deno task gen`)", async () => {
   const embedded = new Map(TEMPLATE_FILES.map((file) => [file.path, file.base64]));
   const actual = new Map((await templateEntries()).map((file) => [file.path, file.base64]));
