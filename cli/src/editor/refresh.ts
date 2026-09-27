@@ -60,7 +60,7 @@ export async function refreshEditorFiles(root: string, inputs: EditorInputs): Pr
       throw new MoonwellError(`Writing ${path} failed: ${reason}`, {
         file: path,
         cause,
-        hint: "The editor reads .moonwell/; make sure it is a folder you can write, then retry.",
+        hint: "Moonwell's compiler and the editor read .moonwell/; make sure it is a folder you can write, then retry.",
       });
     }
   }

@@ -1,6 +1,7 @@
-import { assert, assertEquals, assertStringIncludes } from "@std/assert";
+import { assert, assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { dirname, join } from "@std/path";
 import { MACROS_YUE } from "../../src/embedded/macros.ts";
+import { MoonwellError } from "../../src/shared/errors.ts";
 import { sha256Hex } from "../../src/shared/fs.ts";
 import { runProcess } from "../../src/shared/process.ts";
 import { macroPathArgs, MACROS_FILE, macroSearch } from "../../src/yue/macros.ts";
@@ -38,6 +39,10 @@ Deno.test("$FourCC turns a 4-character string literal into the rawcode's integer
   const hero = await compile('$FourCC "Hpal"');
   assert(hero.ok, hero.text);
   assertStringIncludes(hero.text, "1215324524");
+  // A single-quoted string does not interpolate, so '#{a}' is its own four characters.
+  const literal = await compile("$FourCC '#{a}'");
+  assert(literal.ok, literal.text);
+  assertStringIncludes(literal.text, "595288445");
 });
 
 Deno.test("$FourCC refuses anything but a 4-character string literal", async () => {
@@ -53,6 +58,7 @@ Deno.test("$FourCC refuses anything but a 4-character string literal", async () 
       '$FourCC "hé!"',
       "$FourCC [[hfoo]]",
       '$FourCC "hfoo", "x"',
+      '$FourCC "#{x}"',
     ]
   ) {
     const result = await compile(call);
@@ -67,4 +73,13 @@ Deno.test("macroSearch points yue at .moonwell/yue and hashes the module", async
   assertEquals(search.hash, await sha256Hex(new TextEncoder().encode(MACROS_YUE)));
   assertEquals(macroPathArgs(search), ["--path", search.path]);
   assertEquals(macroPathArgs(undefined), []);
+});
+
+Deno.test("macroSearch refuses a project folder whose path has ';' or '?'", async () => {
+  for (const root of ["/pro;ject", "/pro?ject"]) {
+    const error = await assertRejects(() => macroSearch(root), MoonwellError);
+    assertStringIncludes(error.message, "YueScript's module search cannot handle");
+    assertEquals(error.file, root);
+    assertStringIncludes(error.hint ?? "", "Move the project to a folder whose path has neither character.");
+  }
 });

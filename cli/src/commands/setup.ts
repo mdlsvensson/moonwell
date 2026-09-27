@@ -10,7 +10,7 @@ import { ensureYue } from "../yue/install.ts";
 /**
  * Creates moonwell.local.pkl if this checkout has none, installs the project's pinned compiler into the user cache,
  * keeps a copy in the cache's bin folder for the editor and reports what the editor still needs, adds the editor files
- * a project lacks, and writes .moonwell/types.
+ * a project lacks, and writes .moonwell/types and the macro module (.moonwell/yue/moonwell/macros.yue).
  */
 export async function setup(ctx: CommandContext): Promise<string> {
   const project = await loadProject(ctx.root, ctx.run);

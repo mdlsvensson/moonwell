@@ -62,7 +62,8 @@ async function readCache(path: string): Promise<Cache | undefined> {
 
 /**
  * The globals each source uses, keyed like `hashes` (paths under src/). Runs `yue -g` only for files whose hash or
- * compiler changed since the last run (spec §5.2); `yue -g` cannot share a run with compiling, so it runs separately.
+ * compiler changed since the last run (spec §5.2), and for every file when the macro module changed; `yue -g` cannot
+ * share a run with compiling, so it runs separately.
  */
 export async function listGlobalUses(options: {
   yue: string;

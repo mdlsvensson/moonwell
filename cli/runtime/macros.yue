@@ -7,6 +7,8 @@ export macro FourCC = (code = "", ...) ->
   quote = code\sub 1, 1
   text = code\sub 2, -2
   valid = select("#", ...) == 0 and (quote == '"' or quote == "'") and code\sub(-1) == quote and #text == 4
+  -- A double-quoted string interpolates #{...}, so its text is not its value.
+  valid = false if quote == '"' and text\find '#{', 1, true
   if valid
     for i = 1, 4
       byte = text\byte i
