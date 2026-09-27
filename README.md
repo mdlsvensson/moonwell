@@ -119,7 +119,8 @@ saving the map in World Editor); a name declared with `global` in any file under
 
 `global *` and `global ^` make later assignments global without naming them, so Moonwell cannot see those names; list
 them in `lint.globals`. To report unknown globals without failing, set `lint { unknownGlobals = "warning" }`. In the
-editor, lua-language-server underlines the same names as you type.
+editor, lua-language-server underlines most of the same names as you type; it does not know `lint.globals`, and does not
+flag `collectgarbage`, `dofile` or `loadfile`.
 
 The check runs the compiler's `yue -g` on each changed file and caches the result in `dist/stage/lua/`.
 
