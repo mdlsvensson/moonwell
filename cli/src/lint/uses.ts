@@ -2,6 +2,7 @@ import { dirname, join } from "@std/path";
 import { MoonwellError } from "../shared/errors.ts";
 import { type Runner, runProcess } from "../shared/process.ts";
 import { compileError, forEachLimited } from "../yue/compile.ts";
+import { macroPathArgs, type MacroSearch } from "../yue/macros.ts";
 
 /** One global a source file reads or writes, at its 1-based position. */
 export interface GlobalUse {
@@ -19,7 +20,7 @@ interface CacheEntry {
 }
 
 interface Cache {
-  /** The compiler path; another compiler lists again. */
+  /** The compiler path and the macro module's hash; either changing lists every file again. */
   settings: string;
   files: Record<string, CacheEntry>;
 }
@@ -67,16 +68,18 @@ export async function listGlobalUses(options: {
   yue: string;
   root: string;
   hashes: Record<string, string>;
+  macros?: MacroSearch;
   run?: Runner;
   concurrency?: number;
 }): Promise<Record<string, GlobalUse[]>> {
   const run = options.run ?? runProcess;
   const cachePath = join(options.root, ...USES_CACHE.split("/"));
   const previous = await readCache(cachePath);
+  const settings = options.macros === undefined ? options.yue : `${options.yue}|${options.macros.hash}`;
   const files: Record<string, CacheEntry> = {};
   const pending: string[] = [];
   for (const [file, hash] of Object.entries(options.hashes)) {
-    const cached = previous?.settings === options.yue ? previous.files[file] : undefined;
+    const cached = previous?.settings === settings ? previous.files[file] : undefined;
     if (cached?.hash === hash) files[file] = cached;
     else pending.push(file);
   }
@@ -84,7 +87,11 @@ export async function listGlobalUses(options: {
   const failures: MoonwellError[] = [];
   await forEachLimited(pending, options.concurrency ?? 8, async (file) => {
     const label = `src/${file}`;
-    const result = await run(options.yue, ["-g", join(options.root, "src", ...file.split("/"))]);
+    const result = await run(options.yue, [
+      "-g",
+      ...macroPathArgs(options.macros),
+      join(options.root, "src", ...file.split("/")),
+    ]);
     if (result.code !== 0) {
       failures.push(compileError(label, `${result.stdout}\n${result.stderr}`));
       return;
@@ -103,7 +110,7 @@ export async function listGlobalUses(options: {
 
   const sorted = Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
   await Deno.mkdir(dirname(cachePath), { recursive: true });
-  await Deno.writeTextFile(cachePath, JSON.stringify({ settings: options.yue, files: sorted }, null, 2));
+  await Deno.writeTextFile(cachePath, JSON.stringify({ settings, files: sorted }, null, 2));
   if (failures.length > 0) {
     failures.sort((a, b) => (a.file ?? "").localeCompare(b.file ?? ""));
     throw failures[0];

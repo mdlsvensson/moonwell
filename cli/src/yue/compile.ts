@@ -3,6 +3,7 @@ import { dirname, join } from "@std/path";
 import { MoonwellError } from "../shared/errors.ts";
 import { listFiles, removeIfExists, sha256Hex } from "../shared/fs.ts";
 import { type Runner, runProcess } from "../shared/process.ts";
+import { macroPathArgs, type MacroSearch } from "./macros.ts";
 
 export interface CompiledModule {
   /** Dotted module name, e.g. "heroes.captain". */
@@ -31,6 +32,8 @@ export async function compileSources(options: {
   yue: string;
   root: string;
   minify: boolean;
+  /** Where `import "moonwell.macros"` is found; every yue run gets its `--path` (spec §6). */
+  macros?: MacroSearch;
   run?: Runner;
   concurrency?: number;
 }): Promise<CompileOutput> {
@@ -51,7 +54,7 @@ export async function compileSources(options: {
 
   const manifestPath = join(outDir, ".hashes.json");
   const previous = await readManifest(manifestPath);
-  const settings = `${options.yue}|${options.minify ? "minify" : "rewrite"}`;
+  const settings = `${options.yue}|${options.minify ? "minify" : "rewrite"}|${options.macros?.hash ?? "no macros"}`;
   const hashes: Record<string, string> = {};
   const texts: Record<string, string> = {};
   const pending: string[] = [];
@@ -73,7 +76,14 @@ export async function compileSources(options: {
     const output = join(outDir, luaPath(file));
     await Deno.mkdir(dirname(output), { recursive: true });
     const mode = options.minify ? "-m" : "-r";
-    const result = await run(options.yue, ["--target=5.3", mode, "-o", output, join(srcDir, file)]);
+    const result = await run(options.yue, [
+      "--target=5.3",
+      mode,
+      "-o",
+      output,
+      ...macroPathArgs(options.macros),
+      join(srcDir, file),
+    ]);
     if (result.code !== 0) {
       delete hashes[file];
       delete texts[file];
@@ -127,11 +137,16 @@ async function readManifest(path: string): Promise<Manifest | undefined> {
   }
 }
 
-/** yue prints "Failed to compile: <file>", then "<line>: <message>" and a source excerpt. */
+/**
+ * yue prints "Failed to compile: <file>", then "<line>: <message>" and a source excerpt. A failing macro's message
+ * starts with "failed to expand macro: (macro <name>):<line>: ", a line of the macro module rather than of the file, so
+ * the first line of the error drops it; the excerpt keeps the compiler's full text.
+ */
 export function compileError(file: string, output: string): MoonwellError {
   const detail = output.split(/\r?\n/).filter((line) => !line.startsWith("Failed to compile")).join("\n").trim();
   const match = /^(\d+): (.+)$/m.exec(output);
-  return new MoonwellError(match ? `${match[2]}\n${detail}` : detail || "YueScript compilation failed.", {
+  const headline = match?.[2].replace(/^failed to expand macro: \(macro [^)]*\):\d+: /, "");
+  return new MoonwellError(match ? `${headline}\n${detail}` : detail || "YueScript compilation failed.", {
     file,
     line: match ? Number(match[1]) : undefined,
   });

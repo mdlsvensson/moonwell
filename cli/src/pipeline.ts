@@ -15,6 +15,7 @@ import { MoonwellError } from "./shared/errors.ts";
 import { replaceDir, toPosix } from "./shared/fs.ts";
 import { type CompiledModule, compileSources } from "./yue/compile.ts";
 import { ensureYue } from "./yue/install.ts";
+import { macroSearch } from "./yue/macros.ts";
 
 export interface StageOptions {
   /** Entry file overriding map.entry, relative to the project root. */
@@ -43,16 +44,18 @@ export async function compileProject(
   options: StageOptions,
 ): Promise<{ modules: CompiledModule[]; entry: string }> {
   const yue = await ensureYue(project.yue, ctx.install);
+  const macros = await macroSearch(ctx.root);
   const output = await compileSources({
     yue,
     root: ctx.root,
     minify: options.minify ?? project.build.minify,
+    macros,
     run: ctx.run,
   });
   const entry = entryModuleName(options.entry ?? project.map.entry);
   const modules = resolveGraph(entry, output.load, BUILTIN_MODULES);
   // After compiling and resolving, so syntax errors and missing modules are reported first (spec §5.2).
-  await checkUnknownGlobals(ctx, project, { yue, hashes: output.hashes, sources: output.sources });
+  await checkUnknownGlobals(ctx, project, { yue, hashes: output.hashes, sources: output.sources, macros });
   return { modules, entry };
 }
 

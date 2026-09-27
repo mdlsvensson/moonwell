@@ -126,3 +126,24 @@ Deno.test("listGlobalUses reports unreadable yue -g output and still caches the 
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test("listGlobalUses gives yue -g the macro path and keys its cache on the macro module", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-uses-" });
+  try {
+    const calls: string[][] = [];
+    const run: Runner = (_command, args) => {
+      calls.push(args);
+      return Promise.resolve(ok("print 1 1\n"));
+    };
+    const hashes = { "main.yue": "h1" };
+    const macros = { path: join(root, ".moonwell", "yue", "?.lua"), hash: "m1" };
+    await listGlobalUses({ yue: "yue", root, hashes, run, macros });
+    assertEquals(calls, [["-g", "--path", macros.path, join(root, "src", "main.yue")]]);
+    await listGlobalUses({ yue: "yue", root, hashes, run, macros });
+    assertEquals(calls.length, 1, "unchanged: cached");
+    await listGlobalUses({ yue: "yue", root, hashes, run, macros: { ...macros, hash: "m2" } });
+    assertEquals(calls.length, 2, "a changed macro module lists every file again");
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

@@ -1,8 +1,10 @@
 import { join } from "@std/path";
+import { MACROS_YUE } from "../embedded/macros.ts";
 import { loadNatives, type Natives } from "../natives/natives.ts";
 import type { ResolvedObject } from "../objectdata/resolve.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { writeTextIfChanged } from "../shared/fs.ts";
+import { MACROS_FILE } from "../yue/macros.ts";
 import { renderNativesDeclarations, renderObjectDeclarations, RUNTIME_DECLARATIONS } from "./declarations.ts";
 import { readMapGlobals, renderMapDeclarations } from "./map-globals.ts";
 
@@ -32,21 +34,24 @@ export async function readSourceScript(path: string, label: string): Promise<str
 }
 
 /**
- * Brings `.moonwell/types/` under `root` up to date for the editor (spec §4.2). Each file is written only when its
- * content differs. Returns the POSIX paths it wrote.
+ * Brings `.moonwell/` under `root` up to date: the editor declarations in `.moonwell/types/` and the macro module (spec
+ * §§4.2, 6). Each file is written only when its content differs. Returns the POSIX paths it wrote.
  */
 export async function refreshEditorFiles(root: string, inputs: EditorInputs): Promise<string[]> {
   const source = `${inputs.mapFolder}/war3map.lua`;
   const script = await readSourceScript(join(root, ...source.split("/")), source);
   const files: Array<[string, string]> = [
-    ["natives.d.lua", renderNativesDeclarations(inputs.natives ?? await loadNatives())],
-    ["moonwell.d.lua", RUNTIME_DECLARATIONS],
-    ["objects.d.lua", renderObjectDeclarations(inputs.objects)],
-    ["map.d.lua", renderMapDeclarations(script === undefined ? undefined : readMapGlobals(script), source)],
+    [`${EDITOR_TYPES_DIR}/natives.d.lua`, renderNativesDeclarations(inputs.natives ?? await loadNatives())],
+    [`${EDITOR_TYPES_DIR}/moonwell.d.lua`, RUNTIME_DECLARATIONS],
+    [`${EDITOR_TYPES_DIR}/objects.d.lua`, renderObjectDeclarations(inputs.objects)],
+    [
+      `${EDITOR_TYPES_DIR}/map.d.lua`,
+      renderMapDeclarations(script === undefined ? undefined : readMapGlobals(script), source),
+    ],
+    [MACROS_FILE, MACROS_YUE],
   ];
   const written: string[] = [];
-  for (const [name, text] of files) {
-    const path = `${EDITOR_TYPES_DIR}/${name}`;
+  for (const [path, text] of files) {
     try {
       if (await writeTextIfChanged(join(root, ...path.split("/")), text)) written.push(path);
     } catch (cause) {

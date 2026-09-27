@@ -9,6 +9,7 @@ import { launchGame } from "../../src/launch.ts";
 import type { Project } from "../../src/project/project.ts";
 import { validateMapSettings } from "../../src/settings/options.ts";
 import { formatError, MoonwellError, ObjectDataError, ProblemsError } from "../../src/shared/errors.ts";
+import { MACROS_FILE } from "../../src/yue/macros.ts";
 import { silentLogger } from "../support/logger.ts";
 
 Deno.test("entryModuleName converts src paths to dotted names", () => {
@@ -68,9 +69,11 @@ async function stageProject(objects: Project["objects"], settings: unknown = {},
   await Deno.writeTextFile(yue, "");
   const logger = silentLogger();
   const events: string[] = [];
+  const calls: Array<{ args: string[]; macros: boolean }> = [];
   const ctx: CommandContext = {
     ...createContext(root, logger),
     run: async (_command, args) => {
+      calls.push({ args, macros: await exists(join(root, ...MACROS_FILE.split("/"))) });
       if (args[0] === "-g") return { code: 0, stdout: globals, stderr: "" };
       const generated = await exists(join(root, OBJECT_IDS_FILE));
       events.push(
@@ -96,7 +99,7 @@ async function stageProject(objects: Project["objects"], settings: unknown = {},
     settings: validateMapSettings(settings),
     objects,
   };
-  return { root, ctx, logger, events, project };
+  return { root, ctx, logger, events, project, calls };
 }
 
 const withCaptain = () => ({ ...emptyObjects(), units: { captain: captain() } });
@@ -174,6 +177,23 @@ Deno.test("prepareStage applies objects after staging and before map settings", 
     await assertRejects(() => prepareStage(ctx, project, {}), MoonwellError, "needed by the configured settings");
     assert(await exists(stagedFile(root, "war3map.w3u")));
     assert(await exists(stagedFile(root, "war3mapSkin.w3u")));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("prepareStage writes the macro module before any yue run and gives every run its path", async () => {
+  const { root, ctx, project, calls } = await stageProject(emptyObjects());
+  try {
+    await prepareStage(ctx, project, {});
+    const path = join(root, ".moonwell", "yue", "?.lua");
+    assertEquals(calls.map((call) => call.args[0] === "-g" ? "-g" : "compile"), ["compile", "-g"]);
+    for (const call of calls) {
+      assert(call.macros, "the macro module exists before yue runs");
+      const at = call.args.indexOf("--path");
+      assertEquals(call.args[at + 1], path);
+      assertEquals(at + 2, call.args.length - 1, "--path comes right before the source file");
+    }
   } finally {
     await Deno.remove(root, { recursive: true });
   }

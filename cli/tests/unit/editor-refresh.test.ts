@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { join } from "@std/path";
 import { refreshEditorFiles } from "../../src/editor/refresh.ts";
+import { MACROS_YUE } from "../../src/embedded/macros.ts";
 import type { Natives } from "../../src/natives/natives.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 
@@ -27,14 +28,16 @@ const inputs = {
   natives: NATIVES,
 };
 
-Deno.test("refreshEditorFiles writes the four declaration files, then only what changed", async () => {
+Deno.test("refreshEditorFiles writes the declarations and the macro module, then only what changed", async () => {
   const root = await project(true);
   assertEquals(await refreshEditorFiles(root, inputs), [
     ".moonwell/types/natives.d.lua",
     ".moonwell/types/moonwell.d.lua",
     ".moonwell/types/objects.d.lua",
     ".moonwell/types/map.d.lua",
+    ".moonwell/yue/moonwell/macros.yue",
   ]);
+  assertEquals(await Deno.readTextFile(join(root, ".moonwell", "yue", "moonwell", "macros.yue")), MACROS_YUE);
   assertStringIncludes(await Deno.readTextFile(join(root, ".moonwell", "types", "map.d.lua")), "udg_Score = nil");
   assertEquals(await refreshEditorFiles(root, inputs), []);
   await Deno.writeTextFile(join(root, "maps", "map.w3x", "war3map.lua"), "udg_Other = 0\n");

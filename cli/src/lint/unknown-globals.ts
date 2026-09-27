@@ -6,6 +6,7 @@ import { loadNatives, type Natives } from "../natives/natives.ts";
 import type { Project } from "../project/project.ts";
 import { formatProblem, MAX_PROBLEMS, type Problem, ProblemsError } from "../shared/errors.ts";
 import { closestNames, joinWords } from "../shared/names.ts";
+import type { MacroSearch } from "../yue/macros.ts";
 import { type GlobalUse, listGlobalUses } from "./uses.ts";
 
 export const UNKNOWN_GLOBAL_HINT =
@@ -109,10 +110,16 @@ export function unknownGlobalProblems(
 export async function checkUnknownGlobals(
   ctx: CommandContext,
   project: Project,
-  compiled: { yue: string; hashes: Record<string, string>; sources: Record<string, string> },
+  compiled: { yue: string; hashes: Record<string, string>; sources: Record<string, string>; macros?: MacroSearch },
   natives?: Natives,
 ): Promise<Problem[]> {
-  const uses = await listGlobalUses({ yue: compiled.yue, root: ctx.root, hashes: compiled.hashes, run: ctx.run });
+  const uses = await listGlobalUses({
+    yue: compiled.yue,
+    root: ctx.root,
+    hashes: compiled.hashes,
+    macros: compiled.macros,
+    run: ctx.run,
+  });
   // The text compileSources hashed: reading the files again could fail or see other bytes (e.g. during dev).
   const declared = Object.values(compiled.sources).flatMap(declaredGlobals);
   const label = `maps/${project.map.folder}/war3map.lua`;

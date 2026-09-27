@@ -4,6 +4,8 @@ import { dirname, join } from "@std/path";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { type Runner, runProcess } from "../../src/shared/process.ts";
 import { compileSources } from "../../src/yue/compile.ts";
+import { MACROS_YUE } from "../../src/embedded/macros.ts";
+import { MACROS_FILE, macroSearch } from "../../src/yue/macros.ts";
 import { testYue } from "../support/yue.ts";
 
 async function project(files: Record<string, string>): Promise<string> {
@@ -83,4 +85,53 @@ Deno.test("compileSources rejects dots in file names", async () => {
   const yue = await testYue();
   const root = await project({ "src/a.b.yue": "export x = 1\n" });
   await assertRejects(() => compileSources({ yue, root, minify: false }), MoonwellError, "dots");
+});
+
+Deno.test("compileSources expands $FourCC through the macro module", async () => {
+  const yue = await testYue();
+  const root = await project({
+    [MACROS_FILE]: MACROS_YUE,
+    "src/main.yue": 'import "moonwell.macros" as {:$FourCC}\nexport footman = $FourCC "hfoo"\n',
+  });
+  const output = await compileSources({ yue, root, minify: false, macros: await macroSearch(root) });
+  assertStringIncludes(output.load("main")!.source, "1751543663");
+});
+
+Deno.test("a changed macro module recompiles every file", async () => {
+  const yue = await testYue();
+  const root = await project({
+    [MACROS_FILE]: MACROS_YUE,
+    "src/a.yue": "export x = 1\n",
+    "src/b.yue": "export y = 2\n",
+  });
+  const macros = await macroSearch(root);
+  await compileSources({ yue, root, minify: false, macros });
+  const unchanged = countingRunner();
+  await compileSources({ yue, root, minify: false, macros, run: unchanged.run });
+  assertEquals(unchanged.compiled.length, 0);
+  const changed = countingRunner();
+  await compileSources({ yue, root, minify: false, macros: { ...macros, hash: "another" }, run: changed.run });
+  assertEquals(changed.compiled.length, 2);
+});
+
+Deno.test("a failed macro names the file and line, with the macro's own message", async () => {
+  const yue = await testYue();
+  const root = await project({
+    [MACROS_FILE]: MACROS_YUE,
+    "src/main.yue": 'import "moonwell.macros" as {:$FourCC}\nx = 1\ny = $FourCC "hfo"\n',
+  });
+  const error = await assertRejects(
+    () => compileSources({ yue, root, minify: false, macros: undefined }).then(() => undefined),
+    MoonwellError,
+  );
+  assertStringIncludes(error.message, "moonwell.macros", "without --path the module is not found");
+  const failed = await assertRejects(
+    async () => compileSources({ yue, root, minify: false, macros: await macroSearch(root) }),
+    MoonwellError,
+  );
+  assertEquals([failed.file, failed.line], ["src/main.yue", 3]);
+  assert(
+    failed.message.startsWith('$FourCC needs a string literal of exactly 4 characters, such as "hfoo".\n'),
+    failed.message,
+  );
 });
