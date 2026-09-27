@@ -1,6 +1,7 @@
 import { decodeBase64 } from "@std/encoding/base64";
 import { METADATA_GZIP_BASE64 } from "../embedded/metadata.ts";
 import { gunzip } from "../shared/compression.ts";
+import { editDistance } from "../shared/names.ts";
 
 /** The five field lists: one per modification-file family (`w3u`, `w3t`, `w3a`, `w3h`, `w3q`). */
 export const FIELD_CATEGORIES = ["units", "items", "abilities", "buffs", "upgrades"] as const;
@@ -140,19 +141,6 @@ export function nearestBases(
     .sort((a, b) => a.distance - b.distance || b.prefix - a.prefix || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
     .slice(0, n)
     .map(({ id, name }) => ({ id, name }));
-}
-
-/** Levenshtein distance between `a` and `b`. */
-export function editDistance(a: string, b: string): number {
-  let previous = Array.from({ length: b.length + 1 }, (_, j) => j);
-  for (let i = 1; i <= a.length; i++) {
-    const current = [i];
-    for (let j = 1; j <= b.length; j++) {
-      current[j] = Math.min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-    }
-    previous = current;
-  }
-  return previous[b.length];
 }
 
 function sharedPrefix(a: string, b: string): number {

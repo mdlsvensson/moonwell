@@ -16,38 +16,61 @@ export class MoonwellError extends Error {
 /** One problem of several, each reported on its own `error:` line with its own hint. */
 export interface Problem {
   file: string;
+  /** 1-based source position, when the problem has one. */
+  line?: number;
+  column?: number;
   message: string;
   hint?: string;
 }
 
-/** Every problem found in the custom objects; `file`, `message` and `hint` are the first problem's. */
-export class ObjectDataError extends MoonwellError {
+/** Several problems found at once; `file`, `line`, `message` and `hint` are the first problem's. */
+export class ProblemsError extends MoonwellError {
   readonly problems: Problem[];
 
   constructor(problems: Problem[]) {
-    if (problems.length === 0) throw new Error("ObjectDataError needs at least one problem.");
-    super(problems[0].message, { file: problems[0].file, hint: problems[0].hint });
-    this.name = "ObjectDataError";
+    if (problems.length === 0) throw new Error("A ProblemsError needs at least one problem.");
+    super(problems[0].message, { file: problems[0].file, line: problems[0].line, hint: problems[0].hint });
+    this.name = "ProblemsError";
     this.problems = problems;
   }
 }
 
-/** How many problems of an `ObjectDataError` are printed before `and N more`. */
-const MAX_PROBLEMS = 20;
+/** Every problem found in the custom objects. */
+export class ObjectDataError extends ProblemsError {
+  constructor(problems: Problem[]) {
+    super(problems);
+    this.name = "ObjectDataError";
+  }
+}
 
-function formatOne(message: string, file?: string, line?: number, hint?: string): string {
-  const where = file === undefined ? "" : `${file}${line === undefined ? "" : `:${line}`} › `;
-  return `error: ${where}${message}${hint ? `\nhint: ${hint}` : ""}`;
+/** How many problems of a `ProblemsError` are printed before `and N more`. */
+export const MAX_PROBLEMS = 20;
+
+/** What `formatProblem` prints: a `Problem`, or a `MoonwellError`. */
+export interface ProblemText {
+  file?: string;
+  line?: number;
+  column?: number;
+  message: string;
+  hint?: string;
+}
+
+/** `file:line:column › message` and a `hint:` line, without the `error:` or `warning:` prefix. */
+export function formatProblem(problem: ProblemText): string {
+  const column = problem.column === undefined ? "" : `:${problem.column}`;
+  const position = problem.line === undefined ? "" : `:${problem.line}${column}`;
+  const where = problem.file === undefined ? "" : `${problem.file}${position} › `;
+  return `${where}${problem.message}${problem.hint ? `\nhint: ${problem.hint}` : ""}`;
 }
 
 /** Renders an error for the terminal and the log file. */
 export function formatError(error: unknown): string {
-  if (error instanceof ObjectDataError) {
-    const lines = error.problems.slice(0, MAX_PROBLEMS).map((p) => formatOne(p.message, p.file, undefined, p.hint));
+  if (error instanceof ProblemsError) {
+    const lines = error.problems.slice(0, MAX_PROBLEMS).map((problem) => `error: ${formatProblem(problem)}`);
     const more = error.problems.length - MAX_PROBLEMS;
     return [...lines, ...(more > 0 ? [`and ${more} more`] : [])].join("\n");
   }
-  if (error instanceof MoonwellError) return formatOne(error.message, error.file, error.line, error.hint);
+  if (error instanceof MoonwellError) return `error: ${formatProblem(error)}`;
   const detail = error instanceof Error ? (error.stack ?? error.message) : String(error);
   return `internal error: ${detail}\nThis is a bug in Moonwell; please report it.`;
 }

@@ -1,5 +1,5 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
-import { formatError, MoonwellError, ObjectDataError } from "../../src/shared/errors.ts";
+import { formatError, formatProblem, MoonwellError, ObjectDataError, ProblemsError } from "../../src/shared/errors.ts";
 
 Deno.test("formatError prints file, line, message and hint", () => {
   const error = new MoonwellError("unexpected symbol", {
@@ -57,4 +57,46 @@ Deno.test("formatError prints each object problem with its own hint, at most 20,
       .length,
     20,
   );
+});
+
+Deno.test("formatError prints each problem with its line and column when it has them", () => {
+  const error = new ProblemsError([
+    {
+      file: "src/main.yue",
+      line: 7,
+      column: 11,
+      message: "Unknown global CreatUnit.",
+      hint: "Did you mean CreateUnit?",
+    },
+    { file: "src/main.yue", line: 9, message: "second" },
+    { file: "objects/a.pkl", message: "third" },
+  ]);
+  assertEquals(
+    formatError(error),
+    [
+      "error: src/main.yue:7:11 › Unknown global CreatUnit.",
+      "hint: Did you mean CreateUnit?",
+      "error: src/main.yue:9 › second",
+      "error: objects/a.pkl › third",
+    ].join("\n"),
+  );
+  assertEquals([error instanceof MoonwellError, error.file, error.line, error.message], [
+    true,
+    "src/main.yue",
+    7,
+    "Unknown global CreatUnit.",
+  ]);
+});
+
+Deno.test("formatProblem has no prefix, so warnings can use it", () => {
+  assertEquals(
+    formatProblem({ file: "src/a.yue", line: 1, column: 2, message: "m", hint: "h" }),
+    "src/a.yue:1:2 › m\nhint: h",
+  );
+  assertEquals(formatProblem({ message: "m" }), "m");
+});
+
+Deno.test("ObjectDataError is a ProblemsError", () => {
+  const error = new ObjectDataError([{ file: "objects/a.pkl", message: "first" }]);
+  assertEquals([error instanceof ProblemsError, error.name], [true, "ObjectDataError"]);
 });

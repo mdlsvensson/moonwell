@@ -1,4 +1,5 @@
 import { ObjectDataError, type Problem } from "../shared/errors.ts";
+import { editDistance, joinWords } from "../shared/names.ts";
 import type { ModValue } from "./modfile.ts";
 import {
   appliesTo,
@@ -6,7 +7,6 @@ import {
   baseOf,
   CATEGORIES,
   type Category,
-  editDistance,
   FIELD_SOURCE,
   fieldByName,
   fieldByRawcode,
@@ -69,13 +69,6 @@ const SINGULAR: Record<Category, string> = {
   upgrades: "upgrade",
 };
 const USE_PLURAL: Record<Use, string> = { unit: "units", hero: "heroes", building: "buildings", item: "items" };
-
-/** `a`, `a or b`, `a, b or c`; with `max`, the rest as `and N more`. */
-function joinWords(words: string[], conjunction: "and" | "or", max = words.length): string {
-  const shown = words.slice(0, max);
-  if (words.length > max) return `${shown.join(", ")} and ${words.length - max} more`;
-  return shown.length < 2 ? shown.join("") : `${shown.slice(0, -1).join(", ")} ${conjunction} ${shown.at(-1)}`;
-}
 
 /** A rawcode as authors write it: `Crs`, not the padded `Crs\0` the files store. */
 const rawcode = (id: string) => id.replace(/\0+$/, "");
