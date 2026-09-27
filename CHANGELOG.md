@@ -9,8 +9,10 @@
   `.lua` files the extension writes on save). See "Editor setup" in the README.
 - `setup` adds the editor files and `.gitignore` lines older projects lack, keeps a copy of the pinned YueScript in the
   cache's `bin` folder, and prints the command that puts it on PATH when `yue` is missing there or another version.
-- `setup` now plans the project's objects to write the editor declarations, so invalid Pkl under `objects/` makes
-  `setup` fail, as it makes `check` fail.
+- `setup` now also plans the project's objects to write the editor declarations, so objects that do not resolve, or a
+  missing or unreadable source map when there are objects, make `setup` fail as they make `check` fail.
+- After upgrading, run `deno task setup` once: it adds the editor files and the new `.gitignore` lines. Until then,
+  `check` and `build` leave `.moonwell/` untracked in a 0.3 project.
 
 ## 0.3.1 (2026-09-27)
 

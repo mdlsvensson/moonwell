@@ -113,8 +113,10 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
     In `src/main.yue`, confirm that hovering or completing `CreateUnit` shows its parameter names and types, and that
     `mw.on_main` and `objects.units.captain` complete. In World Editor, place a unit in `maps/map.w3x`, reference it in
     a trigger (World Editor writes a `gg_unit_...` global only for a unit a trigger uses) and save; after
-    `deno task check`, confirm the unit's `gg_unit_...` global completes. Confirm `git status` shows no `.moonwell/` and
-    no `src/*.lua` files.
+    `deno task check`, confirm the unit's `gg_unit_...` global completes. Create `src/heroes/captain.yue` with
+    `export default { greet: -> print "Hello" }`, add `import "heroes.captain"` to `src/main.yue`, save both, and
+    confirm `captain.greet` completes after the import (lua-language-server indexes the git-ignored `.lua` files).
+    Confirm `git status` shows no `.moonwell/` and no `src/**/*.lua` files.
 11. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing

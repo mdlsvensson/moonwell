@@ -72,7 +72,9 @@ VS Code with two extensions gives `.yue` files completion, hover, signature help
    `%LOCALAPPDATA%\moonwell\bin` on Windows; with `yue.path` set, your own binary's folder counts instead). The
    extension runs `yue` from PATH and has no setting for its location, so when `yue` is missing there or another
    version, `setup` prints a command that adds the `bin` folder to your user PATH. Run it once (in PowerShell on
-   Windows), then open a new terminal and restart VS Code. Moonwell never changes PATH itself.
+   Windows), then open a new terminal and restart VS Code. Moonwell never changes PATH itself. Projects that pin
+   different YueScript versions share the one `yue` in the `bin` folder: each `setup` replaces it with that project's
+   version.
 3. Always open the project folder itself, as in step 1. lua-language-server reads `.luarc.json` only from the first
    folder of the workspace: opened as a parent folder, a single file or a second workspace folder, nothing is
    recognised.
@@ -80,8 +82,8 @@ VS Code with two extensions gives `.yue` files completion, hover, signature help
 You get completion, hover and signatures for every native and Blizzard.j function and global of Warcraft III
 3.0.0.24268, `import "moonwell"`, `import "generated.objects"` and the map's own `gg_` and `udg_` globals, and a warning
 for a `unit` passed where a `player` is expected. The declarations live in `.moonwell/types/`; `check`, `build`, `test`
-and `dev` keep them current, so run `deno task check` after saving the map in World Editor to pick up new `gg_` and
-`udg_` globals.
+and `dev` keep them current, so run `deno task check` (or save any `.yue` file while `deno task dev` runs) after saving
+the map in World Editor to pick up new `gg_` and `udg_` globals.
 
 - **`.lua` files next to your `.yue` files.** The extension writes a `.lua` file next to each saved `.yue` file. It
   needs them for lua-language-server. They are git-ignored, and builds never use them: Moonwell compiles `src/**/*.yue`

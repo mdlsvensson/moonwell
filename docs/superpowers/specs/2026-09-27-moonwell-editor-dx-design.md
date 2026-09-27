@@ -13,15 +13,16 @@ Moonwell projects are written in YueScript, and today nothing tells an author th
 game runs the code. This sub-project gives authors three things, all driven by one data file generated from the game's
 own `common.j` and `Blizzard.j`:
 
-1. **Editor support.** In VS Code with the YueScript extension (`LiJin.yuescript`) and lua-language-server (LuaLS)
-   (bundled with the Lua extension, `sumneko.lua`), `.yue` files get completion, hover, signature help and diagnostics for every native, Blizzard.j function and global,
-   the Moonwell runtime, the project's object ids and the map's own globals.
+1. **Editor support.** In VS Code with the YueScript extension (`LiJin.yuescript`) and lua-language-server (LuaLS,
+   bundled with the Lua extension `sumneko.lua`), `.yue` files get completion, hover, signature help and diagnostics
+   for every native, Blizzard.j function and global, the Moonwell runtime, the project's object ids and the map's own
+   globals.
 2. **Unknown-global check.** `check`, `build`, `test` and `dev` report every global a gameplay file uses that nothing
    defines, with the nearest known name as a hint, in any editor or none.
 3. **Macros.** `$FourCC("hfoo")` compiles to the integer `1751543663`, checked at compile time.
 
-Success means: a new project opened in VS Code with the two tools installed completes and type-checks natives without
-further setup beyond putting `yue` on PATH; a typo in a global fails `check` with the file, line, column and a
+Success means: a new project opened in VS Code with the two extensions installed completes and type-checks natives
+without further setup beyond putting `yue` on PATH; a typo in a global fails `check` with the file, line, column and a
 suggestion; `$FourCC` works in the game; and the release gate (§9) passes on Warcraft III Reforged 3.0.0.24268.
 
 Decisions are marked **Decision:** with a one-line rationale. Claims not yet confirmed are marked **To verify** and
@@ -72,12 +73,17 @@ never copies it.
 The game's Lua mode defines names outside both files and removes parts of the Lua standard library. A hand-written,
 reviewed list, `tools/natives/lua-extras.json`, records both:
 
-- `functions`: names the game adds, with a signature, e.g. `FourCC(id: string): integer`.
-- `stdlib`: the standard-library globals the game provides, with the fields that exist (e.g. `os` with only the
-  functions the game keeps), and the ones it removes (e.g. `io`).
+- `functions`: names the game adds, with a signature, e.g. `FourCC(id: string): integer` and `__jarray`. The
+  generator puts them in `natives.json`'s `functions` with `source: "lua"`.
+- `globals`: the standard-library globals the game provides, by root name (e.g. `os`, `string`).
+- `removed`: the standard-library globals the game removes (e.g. `io`).
 
-**To verify:** the exact list, in the game (release gate step 4, §9). The first version comes from a small Lua probe
-map the plan provides, not from memory.
+There is no per-library list of the fields that exist. **Verified (V6, Plan 3a Task 1, with the Lua probe map in
+3.0.0.24268):** the game lacks `collectgarbage`, `dofile`, `loadfile`, `debug`, `io` and `package`; `os` has only
+`clock`, `date`, `difftime` and `time`; `FourCC` and `__jarray` exist (`require` exists in a Moonwell map because the
+runtime defines it). LuaLS can only disable whole libraries, so `.luarc.json` disables `io`, `debug` and `package`
+(§4.1); the editor still offers `collectgarbage`, `dofile`, `loadfile` and the missing `os` functions. Release gate
+step 4 (§9) re-checks the list in the game.
 
 ### 3.3 Shape
 
@@ -95,11 +101,12 @@ map the plan provides, not from memory.
   "globals": [
     { "name": "bj_MAX_PLAYERS", "source": "blizzard.j", "type": "integer", "constant": true, "array": false }
   ],
-  "lua": { "functions": [], "stdlib": { "provided": {}, "removed": [] } }
+  "lua": { "globals": ["_G", "assert", "os"], "removed": ["debug", "io"] }
 }
 ```
 
-Every list is sorted by name so regeneration produces stable diffs.
+`lua.globals` and `lua.removed` are root names (§3.2). Lua-only functions such as `FourCC` and `__jarray` are entries
+of `functions` with `source: "lua"`. Every list is sorted by name so regeneration produces stable diffs.
 
 ### 3.4 Type mapping
 
@@ -127,7 +134,10 @@ docset are all rendered from `natives.json`, so they cannot disagree.
   the declarations, and this file stays small and hand-editable instead of listing thousands of names.
 - **`.luarc.json`:** `runtime.version: "Lua 5.3"`; `runtime.path: ["src/?.lua", "src/?/init.lua"]`;
   `workspace.library: [".moonwell/types"]`; `workspace.ignoreDir: ["dist", "maps"]` (so LuaLS does not index World
-  Editor's `war3map.lua`); `runtime.builtin` disabling the libraries the game removes (§3.2).
+  Editor's `war3map.lua`); `workspace.useGitIgnore: false`, because `.gitignore` lists `src/**/*.lua` and LuaLS would
+  otherwise skip the `.lua` files the extension writes, so an `import` of another project module would not complete;
+  `workspace.checkThirdParty: false`; `runtime.builtin` disabling the libraries the game removes (`io`, `debug`,
+  `package`; §3.2).
 - **`.vscode/extensions.json`:** recommends `LiJin.yuescript` and `sumneko.lua`.
 - **`.gitignore`** gains `.moonwell/` and `src/**/*.lua` (the extension's output on save).
 
@@ -259,6 +269,10 @@ Expected failures throw `MoonwellError` with `file` and `hint`, as everywhere el
 - `gen:natives` input that does not parse names the `.j` file and line (repo-only tool, but same style).
 - A `war3map.lua` whose `globals` block cannot be read names `maps/<folder>/war3map.lua`, with a hint to re-save the
   map in World Editor.
+- A source map `war3map.lua` that cannot be read for any reason but its absence (for example `war3map.lua` is a folder,
+  or, on Linux, `map.folder` names a packed `.w3x` file) names `maps/<folder>/war3map.lua`, with the hint that
+  `map.folder` must be a map World Editor saved in folder format. A missing `war3map.lua` is not an error: `map.d.lua`
+  then says there is no source map. (Windows reports reading through a file as missing.)
 - A malformed `lint` block is a Pkl error on `moonwell.pkl`, like the other blocks.
 - `setup` failing to copy `yue` (`EBUSY` on Windows) or to write `.moonwell/` says what to close or check.
 
@@ -292,15 +306,19 @@ A new CONTRIBUTING step, in a throwaway project from `init --link`:
 
 ## 10. To verify (Plan 3a's first task)
 
-1. The extension resolves `import "moonwell.macros" as {:$FourCC}` through `include: [".moonwell/yue"]`.
-2. LuaLS resolves `import "moonwell"` and `import "generated.objects"` to the `---@meta moonwell` and
-   `---@meta generated.objects` declarations in `workspace.library`.
-3. The extension finds a lua-language-server installed by the official LuaLS VS Code extension (`sumneko.lua`), or
-   needs `yuescript.luaLS.executablePath`. If it needs the setting, `init` writes it to `.vscode/settings.json` and
-   `setup` fills in the detected path.
-4. The exact CASC paths of `common.j` and `blizzard.j` in 3.0.0.24268, and whether they carry doc comments (§3.1).
-5. The shape of World Editor 3.00's Lua `globals` block with typed `udg_` variables and preplaced units (§4.2).
-6. The standard library the game's Lua mode provides (§3.2), with the Lua probe map.
+All six were answered in Plan 3a Task 1; the plan's results table has the details.
+
+1. The extension resolves `import "moonwell.macros" as {:$FourCC}` through `include: [".moonwell/yue"]`: yes,
+   answered in Plan 3a Task 1.
+2. LuaLS resolves `import "moonwell"` and `import "generated.objects"` to the `---@meta` declarations in
+   `workspace.library`: yes, when VS Code opens the project folder itself; answered in Plan 3a Task 1.
+3. The extension finds lua-language-server: yes, it uses the one bundled with `sumneko.lua` with nothing on PATH and
+   no setting (§4.3); answered in Plan 3a Task 1.
+4. The CASC paths: `war3.w3mod/scripts/common.j` and `war3.w3mod/scripts/blizzard.j`, lower case; answered in Plan 3a
+   Task 1.
+5. World Editor 3.00's Lua `globals` block: as the `map-globals-we3` fixture; a placed unit gets a `gg_unit_` global
+   only when a trigger uses it; answered in Plan 3a Task 1.
+6. The game's Lua standard library: as §3.2 records (V6); answered in Plan 3a Task 1.
 
 ## 11. Inputs needed from the maintainer
 
