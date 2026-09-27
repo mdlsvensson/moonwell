@@ -91,8 +91,9 @@ over, and updated on 2026-09-27 after Plan 3c.
   `.moonwell/yue/moonwell/macros.yue`, and every `yue` run gets `--path <root>/.moonwell/yue/?.lua`
   (`cli/src/yue/macros.ts`), with the module's hash in the compile and `yue -g` cache keys. The macro module must not
   have a backslash inside a string literal: yue 0.34.2 fails to load such a macro. The template's standard Footman, next
-  to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING step 11) has not been run yet.
-- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `e312e4a` (release 0.3.1).
+  to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING step 11) passed in part: the Footman shows in game; the Lua
+  probe and the editor check are still to run.
+- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `929080e` (Plans 3a–3c).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 

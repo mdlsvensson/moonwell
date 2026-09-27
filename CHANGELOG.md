@@ -43,6 +43,13 @@ Code fork) with the YueScript extension 0.2.9 and the Lua extension 3.19.1, and 
   extension's lua-language-server run on the project from the command line (`--check`): no warnings remain for the
   template's code, and `CreatUnit` is still flagged.
 
+Macros (CONTRIBUTING step 11), in part, 2026-09-27, on Warcraft III Reforged 3.0.0.24268: in a new project,
+`deno task
+test` shows the standard Footman made with `$FourCC("hfoo")` beside the Captain, tested by the maintainer.
+The built map contains `CreateUnit(Player(0), 1751543663, -45, -650, 270)`, and the Lua extension's lua-language-server,
+run from the command line on the `.lua` the YueScript extension writes, finds no problems in the project. Still to run:
+the Lua probe, and the macro import and `$FourCC` in the editor itself.
+
 ## 0.3.1 (2026-09-27)
 
 - Fixed: after World Editor 3.00 saved a map with synced assets, every command that reads `war3map.imp` (`build`,
