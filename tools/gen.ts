@@ -57,13 +57,22 @@ export async function renderGeneratedSchema(repo: string = REPO): Promise<Map<st
   return renderSchema(metadata);
 }
 
+/**
+ * What builds, `check`/`setup` and the YueScript extension write inside a project, git-ignored there: never part of
+ * the template, even when those commands have run in template/.
+ */
+function isGenerated(path: string): boolean {
+  return path.startsWith("dist/") || path.startsWith(".moonwell/") ||
+    (path.startsWith("src/") && path.endsWith(".lua"));
+}
+
 /** Every file init copies from template/, in listing order, as base64. */
 export async function templateEntries(repo: string = REPO): Promise<Array<{ path: string; base64: string }>> {
   const templateDir = join(repo, "template");
   const excluded = new Set<string>(TEMPLATE_EXCLUDE);
   const entries: Array<{ path: string; base64: string }> = [];
   for (const path of await listFiles(templateDir)) {
-    if (excluded.has(path) || path.startsWith("dist/")) continue;
+    if (excluded.has(path) || isGenerated(path)) continue;
     entries.push({ path, base64: encodeBase64(await Deno.readFile(join(templateDir, ...path.split("/")))) });
   }
   return entries;

@@ -124,6 +124,29 @@ Deno.test("setup recreates a missing moonwell.local.pkl and keeps an existing on
   assertEquals(await Deno.readTextFile(local), mine);
 });
 
+Deno.test("setup gives a project from before the editor files what it lacks, and writes .moonwell/types", async () => {
+  const project = await newProject();
+  // A 0.3 project: no editor files, the old .gitignore.
+  for (const path of ["yueconfig.yue", ".luarc.json", ".vscode"]) {
+    await Deno.remove(join(project, path), { recursive: true });
+  }
+  await Deno.writeTextFile(join(project, ".gitignore"), "dist/\nmoonwell.local.pkl\n.pkl-lsp/\n");
+  const result = await deno(["task", "setup"], project);
+  assertEquals(result.code, 0, result.text);
+  for (const path of ["yueconfig.yue", ".luarc.json", ".vscode/extensions.json"]) {
+    assertEquals(await exists(join(project, path)), true, path);
+  }
+  assertStringIncludes(await Deno.readTextFile(join(project, ".gitignore")), ".moonwell/\nsrc/**/*.lua\n");
+  assertEquals(await exists(join(project, ".moonwell", "types", "natives.d.lua")), true);
+  assertStringIncludes(result.text, "Added yueconfig.yue for the editor.");
+
+  const mine = "return { build: false }\n";
+  await Deno.writeTextFile(join(project, "yueconfig.yue"), mine);
+  const again = await deno(["task", "setup"], project);
+  assertEquals(again.code, 0, again.text);
+  assertEquals(await Deno.readTextFile(join(project, "yueconfig.yue")), mine);
+});
+
 Deno.test("build refuses a build.folder that would overwrite the source map", async () => {
   const project = await newProject();
   const manifest = join(project, "moonwell.pkl");

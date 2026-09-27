@@ -1,0 +1,8 @@
+{
+  "runtime.version": "Lua 5.3",
+  "runtime.path": ["src/?.lua", "src/?/init.lua"],
+  "runtime.builtin": { "io": "disable", "debug": "disable", "package": "disable" },
+  "workspace.library": [".moonwell/types"],
+  "workspace.ignoreDir": ["dist", "maps"],
+  "workspace.checkThirdParty": false
+}

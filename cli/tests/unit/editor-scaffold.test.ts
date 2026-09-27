@@ -1,0 +1,39 @@
+import { assertEquals } from "@std/assert";
+import { encodeBase64 } from "@std/encoding/base64";
+import { join } from "@std/path";
+import { addEditorFiles, EDITOR_FILES } from "../../src/editor/scaffold.ts";
+import { TEMPLATE_FILES } from "../../src/embedded/template.ts";
+
+const b64 = (text: string) => encodeBase64(new TextEncoder().encode(text));
+const FILES = [
+  { path: "yueconfig.yue", base64: b64("return {}\n") },
+  { path: ".luarc.json", base64: b64("{}\n") },
+  { path: ".vscode/extensions.json", base64: b64('{"recommendations":[]}\n') },
+  { path: "src/main.yue", base64: b64("print 1\n") },
+];
+
+Deno.test("the template ships every editor file", () => {
+  const paths = new Set(TEMPLATE_FILES.map((file) => file.path));
+  for (const path of EDITOR_FILES) assertEquals(paths.has(path), true, path);
+});
+
+Deno.test("addEditorFiles adds missing files and .gitignore lines, and never overwrites", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-scaffold-" });
+  await Deno.writeTextFile(join(root, ".luarc.json"), "mine\n");
+  await Deno.writeTextFile(join(root, ".gitignore"), "dist/\r\n.moonwell/\r\n");
+  assertEquals(await addEditorFiles(root, FILES), [
+    "yueconfig.yue",
+    ".vscode/extensions.json",
+    ".gitignore (src/**/*.lua)",
+  ]);
+  assertEquals(await Deno.readTextFile(join(root, ".luarc.json")), "mine\n");
+  assertEquals(await Deno.readTextFile(join(root, "yueconfig.yue")), "return {}\n");
+  assertEquals(await Deno.readTextFile(join(root, ".gitignore")), "dist/\r\n.moonwell/\r\nsrc/**/*.lua\n");
+  assertEquals(await addEditorFiles(root, FILES), []);
+});
+
+Deno.test("addEditorFiles creates .gitignore when there is none", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-scaffold-" });
+  await addEditorFiles(root, FILES);
+  assertEquals(await Deno.readTextFile(join(root, ".gitignore")), ".moonwell/\nsrc/**/*.lua\n");
+});

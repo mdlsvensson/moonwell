@@ -32,6 +32,22 @@ Deno.test("the embedded template matches template/ (run `deno task gen`)", async
   );
 });
 
+Deno.test("templateEntries skips what a project generates: dist/, .moonwell/ and src/**/*.lua", async () => {
+  const repo = await Deno.makeTempDir({ prefix: "moonwell-template-" });
+  const files = [
+    "template/.moonwell/types/x.d.lua",
+    "template/src/main.lua",
+    "template/src/main.yue",
+    "template/dist/a",
+  ];
+  for (const path of files) {
+    const target = join(repo, ...path.split("/"));
+    await Deno.mkdir(join(target, ".."), { recursive: true });
+    await Deno.writeTextFile(target, "x\n");
+  }
+  assertEquals((await templateEntries(repo)).map((file) => file.path), ["src/main.yue"]);
+});
+
 Deno.test("the embedded in-game path list matches cli/data/game-paths.txt (run `deno task gen`)", async () => {
   const embedded = new TextDecoder().decode(await gunzip(decodeBase64(GAME_PATHS_GZIP_BASE64)));
   const source = await Deno.readTextFile(join(REPO, "cli", "data", "game-paths.txt"));
