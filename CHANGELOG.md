@@ -14,6 +14,13 @@
 - After upgrading, run `deno task setup` once: it adds the editor files and the new `.gitignore` lines. Until then,
   `check` and `build` leave `.moonwell/` untracked in a 0.3 project.
 
+### Release gate (so far)
+
+Editor (CONTRIBUTING step 10) passed 2026-09-27, tested by the maintainer in Antigravity IDE (a VS Code fork) with the
+YueScript extension 0.2.9 and the Lua extension 3.19.1: completion and hover for natives, `mw.on_main`,
+`objects.units.captain`, the map's `gg_unit_` globals and a second project module, and no generated files in
+`git status`.
+
 ## 0.3.1 (2026-09-27)
 
 - Fixed: after World Editor 3.00 saved a map with synced assets, every command that reads `war3map.imp` (`build`,

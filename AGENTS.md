@@ -70,7 +70,10 @@ over, and updated on 2026-09-27 after Plan 3a.
   `yue` on PATH is missing or another version (`cli/src/yue/bin.ts`). Found by an in-game probe: the game's Lua lacks
   `collectgarbage`, `dofile`, `loadfile`, `debug`, `io` and `package`, and `os` has only `clock`, `date`, `difftime` and
   `time`. The editor must be opened on the project folder itself: lua-language-server reads `.luarc.json` only from the
-  first workspace folder. The editor gate (CONTRIBUTING step 10, plan Task 10) is the maintainer's to run.
+  first workspace folder. The editor gate (CONTRIBUTING step 10, plan Task 10) passed 2026-09-27 in Antigravity IDE with
+  LiJin.yuescript 0.2.9 and sumneko.lua 3.19.1, after one fix: lua-language-server suggests at most
+  `completion.maxSuggestCount` globals (default 100), and the extension completes at a placeholder word, so
+  `.luarc.json` sets it to 10000. On Windows the extension opens a console window for `yue` (it does not hide it).
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `e312e4a` (release 0.3.1).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
@@ -78,8 +81,8 @@ over, and updated on 2026-09-27 after Plan 3a.
 ## Next work, in order
 
 1. **Plan 3b, the unknown-global check:** write it from spec §5 of
-   `docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md` once the maintainer has passed the editor gate (Plan
-   3a's Task 10). Then Plan 3c (macros); 3a, 3b and 3c are released together as 0.4.0.
+   `docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md`. Then Plan 3c (macros); 3a, 3b and 3c are released
+   together as 0.4.0.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
