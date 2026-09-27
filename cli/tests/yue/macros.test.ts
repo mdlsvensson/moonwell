@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { dirname, join } from "@std/path";
 import { MACROS_YUE } from "../../src/embedded/macros.ts";
+import { sha256Hex } from "../../src/shared/fs.ts";
 import { runProcess } from "../../src/shared/process.ts";
 import { macroPathArgs, MACROS_FILE, macroSearch } from "../../src/yue/macros.ts";
 import { testYue } from "../support/yue.ts";
@@ -35,6 +36,7 @@ Deno.test("$FourCC turns a 4-character string literal into the rawcode's integer
     assertEquals(result.text.includes("moonwell.macros"), false, "the macro import leaves nothing in the Lua");
   }
   const hero = await compile('$FourCC "Hpal"');
+  assert(hero.ok, hero.text);
   assertStringIncludes(hero.text, "1215324524");
 });
 
@@ -48,7 +50,9 @@ Deno.test("$FourCC refuses anything but a 4-character string literal", async () 
       "$FourCC 1234",
       '$FourCC "h\\oo"',
       '$FourCC "héé"',
+      '$FourCC "hé!"',
       "$FourCC [[hfoo]]",
+      '$FourCC "hfoo", "x"',
     ]
   ) {
     const result = await compile(call);
@@ -60,7 +64,7 @@ Deno.test("$FourCC refuses anything but a 4-character string literal", async () 
 Deno.test("macroSearch points yue at .moonwell/yue and hashes the module", async () => {
   const search = await macroSearch("/project");
   assertEquals(search.path, join("/project", ".moonwell", "yue", "?.lua"));
-  assertEquals(search.hash.length, 64);
+  assertEquals(search.hash, await sha256Hex(new TextEncoder().encode(MACROS_YUE)));
   assertEquals(macroPathArgs(search), ["--path", search.path]);
   assertEquals(macroPathArgs(undefined), []);
 });

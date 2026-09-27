@@ -3,10 +3,10 @@
 -- to the map.
 
 -- $FourCC "hfoo" is a rawcode as the integer the game uses, 1751543663: its four characters' bytes, big-endian.
-export macro FourCC = (code = "") ->
+export macro FourCC = (code = "", ...) ->
   quote = code\sub 1, 1
   text = code\sub 2, -2
-  valid = (quote == '"' or quote == "'") and code\sub(-1) == quote and #text == 4
+  valid = select("#", ...) == 0 and (quote == '"' or quote == "'") and code\sub(-1) == quote and #text == 4
   if valid
     for i = 1, 4
       byte = text\byte i
