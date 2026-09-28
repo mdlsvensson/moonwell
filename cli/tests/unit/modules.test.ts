@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { dirname, join } from "@std/path";
 import { collectModules, libraryModuleRoots, moduleLoader, PROJECT_MODULE_ROOTS } from "../../src/bundle/modules.ts";
 import { luaTopLevelGlobals } from "../../src/lint/lua-globals.ts";
@@ -202,5 +202,25 @@ Deno.test("in a library, a .lua file beside a .yue file of the same stem is its 
     ]);
   } finally {
     await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("a dotted or built-in name in a library suggests narrowing the library's dir", async () => {
+  const roots = [...PROJECT_MODULE_ROOTS, ...libraryModuleRoots(["ex"])];
+  for (
+    const [path, message] of [
+      [".moonwell/libraries/ex/a.b.lua", "cannot contain dots"],
+      [".moonwell/libraries/ex/moonwell.lua", "Module moonwell is built into Moonwell"],
+    ]
+  ) {
+    const root = await project({ "src/main.yue": "x = 1\n", [path]: "" });
+    try {
+      const error = await assertRejects(() => collectModules(root, roots), MoonwellError, message);
+      assertEquals(error.file, path);
+      assertStringIncludes(error.hint ?? "", "narrow the library's `dir` in moonwell.pkl");
+      assertEquals(error.hint?.includes("rename"), false, error.hint);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
   }
 });

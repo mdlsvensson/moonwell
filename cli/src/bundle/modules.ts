@@ -9,6 +9,9 @@ export type ModuleKind = "yue" | "lua";
 /** Modules provided by the runtime rather than by src/ or lua/; no project module may take their names. */
 export const BUILTIN_MODULES: ReadonlySet<string> = new Set(["moonwell"]);
 
+/** The end of a hint for a library's file, which is not the project's to rename. */
+const NARROW_DIR = "narrow the library's `dir` in moonwell.pkl so it leaves this file out.";
+
 /** A gameplay module on disk (spec §5.1). */
 export interface SourceModule {
   /** Dotted name, e.g. "utils.timer". */
@@ -69,13 +72,21 @@ export async function collectModules(
       if (stem.split("/").some((segment) => segment.includes("."))) {
         throw new MoonwellError("Module file and folder names cannot contain dots.", {
           file: path,
-          hint: "Dots separate module names in `import`; rename the file or folder.",
+          hint: `Dots separate module names in \`import\`; ${
+            moduleRoot.library === undefined ? "rename the file or folder." : NARROW_DIR
+          }`,
         });
       }
       const module: SourceModule = { name: stem.split("/").join("."), path, kind: moduleRoot.kind };
       if (moduleRoot.library !== undefined) module.library = moduleRoot.library;
       for (const name of claimedNames(module.name)) {
         if (BUILTIN_MODULES.has(name)) {
+          if (module.library !== undefined) {
+            throw new MoonwellError(`Module ${name} is built into Moonwell; ${path} takes its name.`, {
+              file: path,
+              hint: `\`require\` of a built-in name always loads the built-in module; ${NARROW_DIR}`,
+            });
+          }
           throw new MoonwellError(`Module ${name} is built into Moonwell; rename ${path}.`, {
             file: path,
             hint: "`require` of a built-in name always loads the built-in module, never a project file.",
