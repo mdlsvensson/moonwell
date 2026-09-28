@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Documentation: approved design and implementation plan for the separate `moonwell-wrappers` library (sub-project 4c),
+  with its local implementation and pending manual release gates recorded in AGENTS.md. No CLI behavior changes.
+
 ## 0.5.0 (2026-09-28)
 
 - Lua modules: `.lua` files in `lua/` are modules named by their path, sharing one namespace with `src/` (a name both
