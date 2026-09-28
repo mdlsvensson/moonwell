@@ -6,7 +6,8 @@
   define fails the build), and `x/init.lua` answers to `x`. They are bundled unchanged when required, and runtime errors
   in them name the `.lua` file and line, also in `--minify` builds. Their top-level globals are known to the
   unknown-global check. New projects have a `lua/` folder, and `.luarc.json` resolves it in the editor; `setup` adds the
-  entries to older projects' `.luarc.json`.
+  entries to older projects' `.luarc.json`. `dev` watches `lua/`. A leading byte order mark and a `#` first line are
+  skipped, as standalone Lua does, and `moonwell` is reserved for the built-in module.
 
 ## 0.4.0 (2026-09-28)
 

@@ -75,8 +75,10 @@ checked (`yue -g` reads only YueScript). The globals a Lua module defines at its
 - `function Name(` (not `function Name.x(` or `Name:x(`), and
 - a statement `Name = ...` or `Name, Other = ...` without `local`,
 
-at block depth 0, outside any function, `do`, `if`, loop or table constructor. Globals a Lua file assigns only inside
-functions are not seen; they belong in `lint.globals`, as the README says.
+at block depth 0, outside any function, `do`, `if`, loop or table constructor. A name the file declares at its top
+level with `local a, b`, `local a = ...` or `local function a` is left out, so `local Timer` followed by `Timer = {}` is
+not a global. Globals a Lua file assigns only inside functions are not seen; they belong in `lint.globals`, as the
+README says.
 
 ### 3.5 Editor
 

@@ -34,6 +34,7 @@ deno task test
 | `moonwell.pkl`       | Project manifest (`amends "@moonwell/Project.pkl"`), shared by the team; everyday settings written out |
 | `moonwell.local.pkl` | This machine's settings, such as the game path; git-ignored, and `deno task setup` recreates it        |
 | `src/main.yue`       | Gameplay entry                                                                                         |
+| `lua/`               | Plain Lua modules, bundled when gameplay code requires them (see "Lua modules")                        |
 | `objects/`           | Custom units, heroes, items, abilities and more, in Pkl                                                |
 | `src/generated/`     | `objects.yue`, the ids of those objects for gameplay code; written by builds, commit it                |
 | `maps/map.w3x/`      | World Editor map (folder format, Lua script mode)                                                      |
@@ -57,9 +58,9 @@ mw.on_main ->
   print "Hello from YueScript"
 ```
 
-Hooks: `before_config`, `on_config`, `before_main`, `on_main`. A failing hook prints its error with the `.yue` file and
-line, and the other hooks still run. Module top-level code runs while the map script loads, so create game objects
-inside hooks.
+Hooks: `before_config`, `on_config`, `before_main`, `on_main`. A failing hook prints its error with the `.yue` or `.lua`
+file and line, and the other hooks still run. Module top-level code runs while the map script loads, so create game
+objects inside hooks.
 
 ## Editor setup
 
@@ -116,8 +117,9 @@ hint: Did you mean CreateUnit? Declare your own globals with `global`, or add th
 A global is known when it is a native, any function, global or constant of common.j or Blizzard.j (such as
 `PLAYER_NEUTRAL_AGGRESSIVE`), or a Lua library the game provides; a global or function of the source map's `war3map.lua`
 (such as `gg_unit_Hpal_0002` or `udg_Score`; run the command again after saving the map in World Editor); a name
-declared with `global` in any file under `src/` (`global Score = 0`, `global a, b`); or a name listed in `lint.globals`
-in `moonwell.pkl`. Fields are not checked: `math.floor` checks only `math`.
+declared with `global` in any file under `src/` (`global Score = 0`, `global a, b`); a global a module in `lua/` defines
+at its top level (see "Lua modules"); or a name listed in `lint.globals` in `moonwell.pkl`. Fields are not checked:
+`math.floor` checks only `math`.
 
 `global *` and `global ^` make later assignments global without naming them, so Moonwell cannot see those names; list
 them in `lint.globals`. To report unknown globals without failing, set `lint { unknownGlobals = "warning" }`. In the
@@ -160,9 +162,11 @@ Lua modules are bundled as they are, only when something requires them, and runt
 and line, also in `--minify` builds (Lua modules are not minified). The unknown-global check does not read `.lua` files,
 but the globals a Lua file defines at its top level (`function CountUp(`, `Count = 0`) count as known in your YueScript.
 The scan recognises top-level `function Name(` definitions and `Name = …` or `A, B = …` statements that start a line (or
-follow `;`); globals assigned inside functions, after a label on the same line, or through `_G` are not seen and belong
-in `lint.globals`. The editor resolves `lua/` through `.luarc.json`'s `runtime.path`; `deno task setup` adds the entries
-to a project made by an older Moonwell.
+follow `;`), leaving out any name the file declares `local` at its top level (`local Timer` before `Timer = {}`);
+globals assigned inside functions, after a label on the same line, or through `_G` are not seen and belong in
+`lint.globals`. As in standalone Lua, a leading byte order mark and a first line starting with `#` are skipped. The name
+`moonwell` is the built-in module's, so `lua/moonwell.lua` fails the build. The editor resolves `lua/` through
+`.luarc.json`'s `runtime.path`; `deno task setup` adds the entries to a project made by an older Moonwell.
 
 `src/**/*.lua` stays reserved for the `.lua` files the YueScript extension writes on save, so keep your own Lua in
 `lua/`.
@@ -373,7 +377,7 @@ Not supported yet:
 | Command                                          | What                                                                             |
 | ------------------------------------------------ | -------------------------------------------------------------------------------- |
 | `deno task build [--entry src/x.yue] [--minify]` | Build `dist/bin/<map>.w3x`                                                       |
-| `deno task test [--entry src/x.yue]`             | Stage the map and launch Warcraft III                                            |
+| `deno task test [--entry src/x.yue] [--minify]`  | Stage the map and launch Warcraft III                                            |
 | `deno task dev`                                  | Re-check on every save                                                           |
 | `deno task check`                                | Compile and validate without building                                            |
 | `deno task assets:check`                         | Show what `assets:sync` would change in the source map                           |
