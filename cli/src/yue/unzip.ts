@@ -5,17 +5,27 @@ const END_OF_CENTRAL_DIRECTORY = 0x06054b50;
 const CENTRAL_FILE_HEADER = 0x02014b50;
 const LOCAL_FILE_HEADER = 0x04034b50;
 
-/** Extracts every file entry (stored or deflated) of a non-ZIP64 archive. */
+/** The offset of the end-of-central-directory record. */
+function endOfCentralDirectory(bytes: Uint8Array): number {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 0xffff); i--) {
+    if (view.getUint32(i, true) === END_OF_CENTRAL_DIRECTORY) return i;
+  }
+  throw new MoonwellError("Invalid zip archive: end of central directory not found.");
+}
+
+/** The archive comment of the end-of-central-directory record; GitHub's tag archives hold the commit SHA there. */
+export function zipComment(bytes: Uint8Array): string {
+  const end = endOfCentralDirectory(bytes);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const length = view.getUint16(end + 20, true);
+  return new TextDecoder().decode(bytes.subarray(end + 22, end + 22 + length));
+}
+
+/** Extracts every file entry (stored or deflated) of a non-ZIP64 archive; directory entries are skipped. */
 export async function extractZip(bytes: Uint8Array): Promise<Map<string, Uint8Array>> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  let end = -1;
-  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 0xffff); i--) {
-    if (view.getUint32(i, true) === END_OF_CENTRAL_DIRECTORY) {
-      end = i;
-      break;
-    }
-  }
-  if (end < 0) throw new MoonwellError("Invalid zip archive: end of central directory not found.");
+  const end = endOfCentralDirectory(bytes);
   const count = view.getUint16(end + 10, true);
   let offset = view.getUint32(end + 16, true);
   if (count === 0xffff || offset === 0xffffffff) throw new MoonwellError("ZIP64 archives are not supported.");

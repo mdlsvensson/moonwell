@@ -1,8 +1,12 @@
 import { deflateRaw } from "../../src/shared/compression.ts";
 
-/** Minimal zip writer for tests (CRC fields are zero; the reader under test does not check them). */
+/**
+ * Minimal zip writer for tests (CRC fields are zero; the reader under test does not check them). `comment` is the
+ * archive comment after the end record, where GitHub's tag archives hold the commit SHA.
+ */
 export async function makeZip(
   entries: Array<{ name: string; data: Uint8Array; deflate?: boolean }>,
+  comment = "",
 ): Promise<Uint8Array> {
   const encoder = new TextEncoder();
   const locals: Uint8Array[] = [];
@@ -45,7 +49,9 @@ export async function makeZip(
   ev.setUint16(10, entries.length, true);
   ev.setUint32(12, centralSize, true);
   ev.setUint32(16, offset, true);
-  const parts = [...locals, ...centrals, end];
+  const commentBytes = encoder.encode(comment);
+  ev.setUint16(20, commentBytes.length, true);
+  const parts = [...locals, ...centrals, end, commentBytes];
   const out = new Uint8Array(parts.reduce((sum, part) => sum + part.length, 0));
   let at = 0;
   for (const part of parts) {
