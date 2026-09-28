@@ -159,9 +159,10 @@ CountUp!
 Lua modules are bundled as they are, only when something requires them, and runtime errors in them name the `.lua` file
 and line, also in `--minify` builds (Lua modules are not minified). The unknown-global check does not read `.lua` files,
 but the globals a Lua file defines at its top level (`function CountUp(`, `Count = 0`) count as known in your YueScript.
-Only top-level `function Name(` and `Name = …` statements that start a line (or follow `;`) are recognised; globals
-assigned inside functions, after a label or through `_G` need `lint.globals`. The editor resolves `lua/` through
-`.luarc.json`'s `runtime.path`; `deno task setup` adds the entries to a project made by an older Moonwell.
+The scan recognises top-level `function Name(` definitions and `Name = …` or `A, B = …` statements that start a line (or
+follow `;`); globals assigned inside functions, after a label on the same line, or through `_G` are not seen and belong
+in `lint.globals`. The editor resolves `lua/` through `.luarc.json`'s `runtime.path`; `deno task setup` adds the entries
+to a project made by an older Moonwell.
 
 `src/**/*.lua` stays reserved for the `.lua` files the YueScript extension writes on save, so keep your own Lua in
 `lua/`.
