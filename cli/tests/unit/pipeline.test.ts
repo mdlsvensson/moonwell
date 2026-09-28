@@ -96,6 +96,7 @@ async function stageProject(objects: Project["objects"], settings: unknown = {},
     yue: { version: "0.34.2", path: yue },
     assets: { paths: {}, exclude: [] },
     lint: { unknownGlobals: "error", globals: [] },
+    libraries: {},
     settings: validateMapSettings(settings),
     objects,
   };

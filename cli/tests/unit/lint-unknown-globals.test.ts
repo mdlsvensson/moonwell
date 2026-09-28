@@ -133,6 +133,7 @@ async function lintProject(
     yue: { version: "0.34.2", path: null },
     assets: { paths: {}, exclude: [] },
     lint: options.lint ?? { unknownGlobals: "error", globals: [] },
+    libraries: {},
     settings: validateMapSettings({}),
     objects: emptyObjects(),
   };

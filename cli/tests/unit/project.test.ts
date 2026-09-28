@@ -36,7 +36,28 @@ Deno.test("parseProject maps omitted nullable fields to null", () => {
     settings: validateMapSettings({}),
     objects: emptyObjects(),
     lint: { unknownGlobals: "error", globals: [] },
+    libraries: {},
   });
+});
+
+Deno.test("parseProject reads libraries and requires github with tag unless path is set", () => {
+  const project = parseProject("/p", {
+    ...FULL,
+    libraries: {
+      example: { github: "mdlsvensson/moonwell-example-lib", tag: "v0.1.0", dir: "src" },
+      mine: { path: "../mine", dir: "" },
+    },
+  }, "m.pkl");
+  assertEquals(project.libraries, {
+    example: { github: "mdlsvensson/moonwell-example-lib", tag: "v0.1.0", path: null, dir: "src" },
+    mine: { github: null, tag: null, path: "../mine", dir: "" },
+  });
+  const error = assertThrows(
+    () => parseProject("/p", { ...FULL, libraries: { half: { github: "a/b", dir: "" } } }, "m.pkl"),
+    MoonwellError,
+    'libraries["half"] needs both github and tag, or a path.',
+  );
+  assertEquals(error.file, "m.pkl");
 });
 
 Deno.test("parseProject reads the lint block", () => {

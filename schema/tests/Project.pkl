@@ -23,6 +23,24 @@ facts {
     Project.assets.exclude == List()
     Project.lint.unknownGlobals == "error"
     Project.lint.globals == List()
+    Project.libraries.isEmpty
+  }
+  ["libraries accept GitHub tags and local paths"] {
+    local project = (Project) {
+      libraries {
+        ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.1.0"; dir = "src" }
+        ["mine"] { path = "../mine" }
+      }
+    }
+    project.libraries.toMap()["example"].dir == "src"
+    project.libraries.toMap()["mine"].dir == ""
+  }
+  ["libraries reject bad keys, repositories and folders"] {
+    t.catch(() -> (Project) { libraries { ["no spaces"] { path = "x" } } }.libraries.toMap()).contains("matches")
+    t.catch(() -> (Project) { libraries { ["x"] { github = "no-slash"; tag = "v1" } } }.libraries.toMap()["x"].github)
+      .contains("matches")
+    t.catch(() -> (Project) { libraries { ["x"] { path = "p"; dir = "../up" } } }.libraries.toMap()["x"].dir)
+      .contains("isRelativeFolder")
   }
   ["lint accepts warning and Lua names"] {
     (Project) { lint { unknownGlobals = "warning" } }.lint.unknownGlobals == "warning"

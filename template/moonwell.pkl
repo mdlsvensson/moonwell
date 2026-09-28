@@ -35,6 +35,12 @@ lint {
   globals = List()          // extra global names to allow, e.g. List("MyLibrary")
 }
 
+// Libraries: modules from a GitHub tag or a local folder, named by their path in the library. moonwell.lock records
+// each tag's commit; commit it. See "Libraries" in Moonwell's README.
+libraries {
+  // ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.1.0"; dir = "src" }
+}
+
 // Map settings, applied to the built map only; the World Editor map is never changed. `deno task settings:check`
 // lists what they would change. null inherits the World Editor map; empty text clears a text field.
 // Advanced raw overrides (gameplayConstants, gameInterface) are documented in @moonwell/MapSettings.pkl.

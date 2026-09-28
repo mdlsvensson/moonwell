@@ -33,4 +33,5 @@ Deno.test("loadProject evaluates a real project against the local package", asyn
   assertEquals(project.assets, { paths: {}, exclude: [] });
   assertEquals(project.settings.info, {});
   assertEquals(project.lint, { unknownGlobals: "error", globals: [] });
+  assertEquals(project.libraries, {});
 });

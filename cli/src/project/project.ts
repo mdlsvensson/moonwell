@@ -19,9 +19,20 @@ export interface Project {
   assets: { paths: Record<string, string>; exclude: string[] };
   /** The unknown-global check (spec §5.3). */
   lint: { unknownGlobals: "error" | "warning"; globals: string[] };
+  /** Libraries of modules by key (spec: Lua modules and libraries). */
+  libraries: Record<string, Library>;
   settings: MapSettings;
   /** Custom objects, shape-checked only: resolving them needs the metadata and the source map (planner). */
   objects: ProjectObjects;
+}
+
+/** A library of YueScript and Lua modules: a GitHub tag, or a local folder when `path` is set. */
+export interface Library {
+  github: string | null;
+  tag: string | null;
+  path: string | null;
+  /** The folder inside the library that module names start from; empty for its root. */
+  dir: string;
 }
 
 export const PKL_INSTALL_HINT =
@@ -163,6 +174,25 @@ export function parseProject(root: string, value: unknown, file: string): Projec
   const assets = data.assets === undefined ? { paths: {}, exclude: [] } : record(data.assets, "assets");
   // Every 0.4 schema package has a lint block; a manifest without one (unit fixtures) gets the defaults.
   const lint = data.lint === undefined ? { unknownGlobals: "error", globals: [] } : record(data.lint, "lint");
+  // Every 0.5 schema package has a libraries block; a manifest without one (unit fixtures) has none.
+  const libraries: Record<string, Library> = {};
+  for (const [key, value] of Object.entries(data.libraries === undefined ? {} : record(data.libraries, "libraries"))) {
+    const path = `libraries["${key}"]`;
+    const library = record(value, path);
+    const parsed: Library = {
+      github: nullableString(library.github, `${path}.github`),
+      tag: nullableString(library.tag, `${path}.tag`),
+      path: nullableString(library.path, `${path}.path`),
+      dir: library.dir === undefined ? "" : string(library.dir, `${path}.dir`),
+    };
+    if (parsed.path === null && (parsed.github === null || parsed.tag === null)) {
+      throw new MoonwellError(`${path} needs both github and tag, or a path.`, {
+        file,
+        hint: 'For example: ["example"] { github = "owner/repo"; tag = "v1.0.0" }, or path = "../my-library".',
+      });
+    }
+    libraries[key] = parsed;
+  }
   const settings = validateMapSettings(data.settings === undefined ? {} : data.settings, file);
   // Typed/raw gameplay-constant conflicts need no map, so they fail here and name the evaluated manifest.
   gameplaySections(settings, file);
@@ -182,6 +212,7 @@ export function parseProject(root: string, value: unknown, file: string): Projec
       unknownGlobals: level(lint.unknownGlobals, "lint.unknownGlobals"),
       globals: strings(lint.globals, "lint.globals"),
     },
+    libraries,
     settings,
     objects,
   };

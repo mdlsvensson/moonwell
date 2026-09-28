@@ -16,6 +16,7 @@ function project(root: string, folder: string, manifest = "moonwell.pkl"): Proje
     yue: { version: "0.34.2", path: null },
     assets: { paths: {}, exclude: [] },
     lint: { unknownGlobals: "error", globals: [] },
+    libraries: {},
     settings: validateMapSettings({}),
     objects: emptyObjects(),
   };

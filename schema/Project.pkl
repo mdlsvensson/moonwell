@@ -96,12 +96,33 @@ class LintConfig {
   globals: List<String(isLuaName(this))> = List()
 }
 
+/// A library of YueScript and Lua modules: a GitHub tag, or a local folder (spec: Lua modules and libraries).
+class Library {
+  /// A GitHub repository, "owner/repo". With `tag`, Moonwell downloads that tag; moonwell.lock records its commit.
+  github: String(matches(Regex(#"[A-Za-z0-9-]+/[A-Za-z0-9._-]+"#)))?
+
+  /// The tag to download.
+  tag: String(!isEmpty)?
+
+  /// A local folder instead, relative to the project or absolute. When set, `github` and `tag` are ignored: set it in
+  /// moonwell.local.pkl to work on a library next to the map.
+  path: String(!isEmpty)?
+
+  /// The folder inside the library that module names start from, such as "src". Empty for the library's root.
+  dir: String(isEmpty || isRelativeFolder(this)) = ""
+}
+
 map: MapConfig = new {}
 build: BuildConfig = new {}
 launch: LaunchConfig = new {}
 yue: YueConfig = new {}
 assets: AssetsConfig = new {}
 lint: LintConfig = new {}
+
+/// Libraries of modules, named by their path in the library (`import "example.loud"`). The key names the library's
+/// folder in .moonwell/libraries/.
+libraries: Mapping<String(matches(Regex(#"[A-Za-z0-9_-]+"#))), Library> = new {}
+
 settings: MapSettings = new {}
 
 /// Custom units, heroes, buildings, items, abilities, buffs and upgrades, written into the built map. Wire in the files
