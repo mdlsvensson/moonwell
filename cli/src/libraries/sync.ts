@@ -1,4 +1,4 @@
-import { dirname, join, resolve } from "@std/path";
+import { dirname, isAbsolute, join, relative, resolve, SEPARATOR } from "@std/path";
 import type { Library } from "../project/project.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { listFiles, removeIfExists, writeTextIfChanged } from "../shared/fs.ts";
@@ -43,7 +43,15 @@ export async function syncLibraries(
     if (library.path !== null) await syncLocal(root, folder, key, library.path, library.dir, manifest);
     else next[key] = await syncGitHub(folder, key, library, lock[key], manifest, deps);
   }
-  await writeLock(root, next);
+  try {
+    await writeLock(root, next);
+  } catch (cause) {
+    throw new MoonwellError(`Writing ${LOCK_FILE} failed: ${reasonOf(cause)}`, {
+      file: LOCK_FILE,
+      cause,
+      hint: "Close programs that have moonwell.lock open, and check it is not read-only.",
+    });
+  }
 }
 
 /** Keys such as `Lib` and `lib` would share one folder on Windows. */
@@ -84,19 +92,30 @@ async function syncLocal(root: string, folder: string, key: string, path: string
       hint: "Set the library's path (and dir) to a folder that holds its modules.",
     });
   }
+  if (isWithin(folder, source)) {
+    throw new MoonwellError(`Library ${key}: ${source} contains this project's ${LIBRARIES_DIR}.`, {
+      file: manifest,
+      hint: "Point the library's path (and dir) at the folder that holds its modules, not at the project.",
+    });
+  }
+  const files = new Map<string, Uint8Array>();
+  try {
+    for (const file of await listFiles(source)) {
+      if (file !== STAMP) files.set(file, await Deno.readFile(join(source, ...file.split("/"))));
+    }
+  } catch (cause) {
+    throw new MoonwellError(`Reading library ${key} from ${source} failed: ${reasonOf(cause)}`, {
+      file: manifest,
+      cause,
+      hint: "Check the library's path and that its files can be read.",
+    });
+  }
   const target = join(folder, key);
   await writing(key, async () => {
-    const files = (await listFiles(source)).filter((file) => file !== STAMP);
-    for (const file of files) {
-      await writeBytesIfChanged(
-        join(target, ...file.split("/")),
-        await Deno.readFile(join(source, ...file.split("/"))),
-      );
-    }
+    for (const [file, data] of files) await writeBytesIfChanged(join(target, ...file.split("/")), data);
     await Deno.mkdir(target, { recursive: true });
-    const wanted = new Set(files);
     for (const file of await listFiles(target)) {
-      if (file !== STAMP && !wanted.has(file)) await Deno.remove(join(target, ...file.split("/")));
+      if (file !== STAMP && !files.has(file)) await Deno.remove(join(target, ...file.split("/")));
     }
     await writeTextIfChanged(join(target, STAMP), stampText({ path: source }));
   });
@@ -113,6 +132,12 @@ async function syncGitHub(
 ): Promise<LockEntry> {
   const [github, tag, dir] = [library.github!, library.tag!, library.dir];
   const repository = github.split("/")[1];
+  if (tag.split("/").some((segment) => segment === "." || segment === "..")) {
+    throw new MoonwellError(`Library ${key}: ${tag} is not a tag name.`, {
+      file: manifest,
+      hint: `Use the tag's name as it appears at https://github.com/${github}/tags.`,
+    });
+  }
   if (repository === "." || repository === "..") {
     throw new MoonwellError(`Library ${key}: ${github} is not a GitHub repository.`, {
       file: manifest,
@@ -185,6 +210,13 @@ function sameEntry(stamp: unknown, entry: LockEntry): boolean {
   if (typeof stamp !== "object" || stamp === null) return false;
   const fields = stamp as Record<string, unknown>;
   return (["github", "tag", "dir", "commit", "files"] as const).every((field) => fields[field] === entry[field]);
+}
+
+/** Whether `path` is `folder` or inside it; ignoring case on Windows, whose file systems usually do. */
+function isWithin(path: string, folder: string): boolean {
+  const fold = (value: string) => Deno.build.os === "windows" ? value.toLowerCase() : value;
+  const between = relative(fold(folder), fold(path));
+  return between === "" || (!isAbsolute(between) && between !== ".." && !between.startsWith(`..${SEPARATOR}`));
 }
 
 const stampText = (value: object) => `${JSON.stringify(value, null, 2)}\n`;

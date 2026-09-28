@@ -203,3 +203,80 @@ Deno.test("library keys that differ only by case are refused", async () => {
     assertEquals(requests.length, 0);
   });
 });
+
+Deno.test("a tag with a . or .. segment is refused before any download", async () => {
+  await withRoot(async (root) => {
+    for (const tag of ["..", ".", "../../other/repo", "v1/./x", "a/.."]) {
+      const { fetch, requests } = server({});
+      const error = await assertRejects(
+        () => syncLibraries(root, { ex: github(tag) }, "moonwell.pkl", { fetch, logger: silentLogger() }),
+        MoonwellError,
+        `Library ex: ${tag} is not a tag name.`,
+      );
+      assertEquals(error.file, "moonwell.pkl");
+      assertEquals(error.hint, "Use the tag's name as it appears at https://github.com/owner/lib/tags.");
+      assertEquals(requests.length, 0);
+    }
+  });
+});
+
+Deno.test("a lock that cannot be written is a MoonwellError", async () => {
+  await withRoot(async (root) => {
+    const archives = { [archiveUrl("owner/lib", "v0.1.0")]: await archive(COMMIT_A, { "src/a.lua": "1" }) };
+    // The lock is read before the download and written after it: a folder in its place makes the write fail.
+    const fetch = async (url: string) => {
+      await Deno.mkdir(join(root, "moonwell.lock", "in-the-way"), { recursive: true });
+      return server(archives).fetch(url);
+    };
+    const error = await assertRejects(
+      () => syncLibraries(root, { ex: github() }, "moonwell.pkl", { fetch, logger: silentLogger() }),
+      MoonwellError,
+      "Writing moonwell.lock failed: ",
+    );
+    assertEquals(error.file, "moonwell.lock");
+    assertEquals(error.hint, "Close programs that have moonwell.lock open, and check it is not read-only.");
+  });
+});
+
+Deno.test("a local library that cannot be read names its source", async () => {
+  await withRoot(async (root) => {
+    const source = join(root, "lib");
+    await Deno.mkdir(source);
+    try {
+      await Deno.symlink(join(root, "missing.lua"), join(source, "broken.lua"), { type: "file" });
+    } catch {
+      return; // On Windows, symbolic links need Developer Mode or an administrator (CI has one): skip without them.
+    }
+    const local: Library = { github: null, tag: null, path: "lib", dir: "" };
+    const error = await assertRejects(
+      () => syncLibraries(root, { mine: local }, "moonwell.pkl", { fetch: server({}).fetch, logger: silentLogger() }),
+      MoonwellError,
+      `Reading library mine from ${source} failed: `,
+    );
+    assertEquals(error.file, "moonwell.pkl");
+    assertEquals(error.hint, "Check the library's path and that its files can be read.");
+  });
+});
+
+Deno.test("a local library that holds the project's .moonwell/libraries is refused", async () => {
+  await withRoot(async (root) => {
+    await Deno.writeTextFile(join(root, "a.lua"), "return 1");
+    await Deno.mkdir(join(root, ".moonwell"));
+    const deps = { fetch: server({}).fetch, logger: silentLogger() };
+    for (const path of [root, Deno.build.os === "windows" ? root.toUpperCase() : root, join(root, ".moonwell")]) {
+      const local: Library = { github: null, tag: null, path, dir: "" };
+      const error = await assertRejects(
+        () => syncLibraries(root, { mine: local }, "moonwell.pkl", deps),
+        MoonwellError,
+        "contains this project's .moonwell/libraries.",
+      );
+      assertEquals(error.message, `Library mine: ${path} contains this project's .moonwell/libraries.`);
+      assertEquals(error.file, "moonwell.pkl");
+      assertEquals(
+        error.hint,
+        "Point the library's path (and dir) at the folder that holds its modules, not at the project.",
+      );
+    }
+    assertEquals(await exists(join(root, ".moonwell", "libraries", "mine")), false);
+  });
+});
