@@ -2,7 +2,9 @@
   <img src="mw.gif" alt="Moonwell" width="256" />
 </p>
 <p align="center">
-  <i>Multilingual modding framework for Warcraft III: Reforged</i></ br>
+  <i>Multilingual modding framework for Warcraft III: Reforged</i>
+</p>
+<p align="center" style="font-size: 10px;">
   <a href="https://www.hiveworkshop.com/">Hive Workshop</a>
 </p>
 
