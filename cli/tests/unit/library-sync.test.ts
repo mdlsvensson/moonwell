@@ -141,6 +141,27 @@ Deno.test("a local library is copied, changed files only, and never locked", asy
   });
 });
 
+Deno.test("a local override keeps the library's lock entry, and switching back checks it", async () => {
+  await withRoot(async (root) => {
+    const first = server({ [archiveUrl("owner/lib", "v0.1.0")]: await archive(COMMIT_A, { "src/a.lua": "1" }) });
+    await syncLibraries(root, { ex: github() }, "moonwell.pkl", { fetch: first.fetch, logger: silentLogger() });
+    const locked = await Deno.readTextFile(join(root, "moonwell.lock"));
+    const source = join(root, "lib");
+    await Deno.mkdir(source);
+    await Deno.writeTextFile(join(source, "a.lua"), "local");
+    const local: Library = { ...github(), path: source, dir: "" };
+    await syncLibraries(root, { ex: local }, "moonwell.pkl", { fetch: first.fetch, logger: silentLogger() });
+    assertEquals(await read(root, ".moonwell/libraries/ex/a.lua"), "local");
+    assertEquals(await Deno.readTextFile(join(root, "moonwell.lock")), locked, "moonwell.local.pkl leaves the lock");
+    const moved = server({ [archiveUrl("owner/lib", "v0.1.0")]: await archive(COMMIT_B, { "src/a.lua": "2" }) });
+    await assertRejects(
+      () => syncLibraries(root, { ex: github() }, "moonwell.pkl", { fetch: moved.fetch, logger: silentLogger() }),
+      MoonwellError,
+      "moved",
+    );
+  });
+});
+
 Deno.test("a library removed from the manifest leaves .moonwell/libraries and the lock", async () => {
   await withRoot(async (root) => {
     const { fetch } = server({ [archiveUrl("owner/lib", "v0.1.0")]: await archive(COMMIT_A, { "src/a.lua": "1" }) });

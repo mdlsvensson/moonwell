@@ -22,7 +22,8 @@ export interface SyncDeps {
 
 /**
  * Brings `.moonwell/libraries/<key>/` up to date for every library of the manifest, and `moonwell.lock` with the
- * GitHub ones (spec §4.2, §4.3). A GitHub library whose folder already holds its lock entry is not downloaded again.
+ * GitHub ones (spec §4.2, §4.3). A GitHub library whose folder already holds its lock entry is not downloaded again;
+ * a local library keeps the lock entry it had.
  */
 export async function syncLibraries(
   root: string,
@@ -40,8 +41,12 @@ export async function syncLibraries(
   const next: Record<string, LockEntry> = {};
   for (const key of keys) {
     const library = libraries[key];
-    if (library.path !== null) await syncLocal(root, folder, key, library.path, library.dir, manifest);
-    else next[key] = await syncGitHub(folder, key, library, lock[key], manifest, deps);
+    if (library.path !== null) {
+      await syncLocal(root, folder, key, library.path, library.dir, manifest);
+      // A path usually comes from moonwell.local.pkl, which is not committed: keep the committed lock entry, so
+      // switching back still checks the tag.
+      if (lock[key] !== undefined) next[key] = lock[key];
+    } else next[key] = await syncGitHub(folder, key, library, lock[key], manifest, deps);
   }
   try {
     await writeLock(root, next);

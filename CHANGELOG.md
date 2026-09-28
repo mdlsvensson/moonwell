@@ -14,8 +14,8 @@
   editor sees them in `.moonwell/lua/`; `setup` adds it to older projects' `.luarc.json`.
 - Changed: `global` lines and the top-level globals of Lua modules count as known names only for modules the map
   requires (its entry, or the `--entry` file, and every module reached from it). Files under `src/` that the map does
-  not require are no longer checked for unknown globals. A global declared only in a file nothing imports now fails the
-  check where a required module uses it: import the file, or add the name to `lint.globals`.
+  not require are no longer checked for unknown globals. A global declared only in a file nothing imports is now
+  reported as unknown where a required module uses it: import the file, or add the name to `lint.globals`.
 
 ### Release gate (so far)
 

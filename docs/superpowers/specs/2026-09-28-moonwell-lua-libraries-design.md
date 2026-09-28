@@ -130,8 +130,8 @@ The template's `moonwell.pkl` shows an empty `libraries {}` block with a comment
 during Plan 4b):
 
 - **GitHub:** download `codeload.github.com/<owner>/<repo>/zip/refs/tags/<tag>`, read the commit from the zip comment,
-  strip the archive's single top folder whatever its name, keep the files under `dir`, and write them to a temporary folder that replaces
-  `.moonwell/libraries/<key>/` only when complete. A stamp file in it (`.moonwell-library.json`) records the lock entry
+  strip the archive's single top folder whatever its name, keep the files under `dir`, and write them to a temporary
+  folder that replaces `.moonwell/libraries/<key>/` only when complete. A stamp file in it (`.moonwell-library.json`) records the lock entry
   it holds; a library whose stamp equals its lock entry is not downloaded again.
 - **Local `path`:** the files under `<path>/<dir>` are copied into `.moonwell/libraries/<key>/`, writing only changed
   files and removing files that disappeared; no lock entry.
@@ -165,7 +165,9 @@ A committed JSON file at the project root:
 - A library whose `github`, `tag` and `dir` match its entry but whose download has another `commit` or `files`: the
   command fails, naming the library, the tag and both commits ("the tag moved"), with the hint to delete the library's
   entry from `moonwell.lock` if the move was intended.
-- Entries for libraries no longer in the manifest, and for libraries that are now local, are removed.
+- Entries for libraries no longer in the manifest are removed. A library that is now local keeps its entry: its `path`
+  usually comes from the uncommitted `moonwell.local.pkl`, so it must not change the committed lock, and switching back
+  to the tag checks the download against the entry. (Amended 2026-09-28 during Plan 4b.)
 - The file is written only when its content changes, sorted by key, with two-space indentation. It is removed when no
   GitHub library remains.
 

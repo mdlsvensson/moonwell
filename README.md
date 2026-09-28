@@ -203,10 +203,11 @@ To work on a library next to your map, point it at a local folder in `moonwell.l
 libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }
 ```
 
-`path` wins over `github`, and `dev` watches that folder. Local libraries are never locked. Library code is not checked
-for unknown globals, but the globals a required library module defines count as known. `check`, `build`, `test` and
-`dev` write every library module to `.moonwell/lua/` as Lua (a YueScript module compiled), where the editor finds it;
-`setup`, which does not compile, writes the Lua modules only.
+`path` wins over `github`, and `dev` watches that folder. A local library keeps its entry in `moonwell.lock`, so
+switching back to the tag still checks it. Library code is not checked for unknown globals, but the globals a required
+library module defines count as known. `check`, `build`, `test` and `dev` write every library module to `.moonwell/lua/`
+as Lua (a YueScript module compiled), where the editor finds it; `setup`, which does not compile, writes the Lua modules
+only.
 
 ## Assets
 

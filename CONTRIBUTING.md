@@ -168,8 +168,8 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
     library's modules give no duplicate-definition diagnostics between `.moonwell/libraries/` and `.moonwell/lua/`.
     Delete `.moonwell/`, run `deno task check` again, and confirm `moonwell.lock` is unchanged. Finally clone the
     library next to the project, point `moonwell.local.pkl` at it
-    (`libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }`), change `hello` there, and confirm
-    `deno task test` runs the change.
+    (`libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }`), change `hello` in its
+    `src/example/greet.lua`, and confirm `deno task test` runs the change and `moonwell.lock` is unchanged.
 13. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
