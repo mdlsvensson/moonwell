@@ -3,8 +3,8 @@
 ## Unreleased
 
 - Documentation: approved design and implementation plan for the separate `moonwell-wrappers` library (sub-project 4c),
-  with its local implementation and passed in-game release gate recorded in AGENTS.md. First published-tag consumption
-  remains pending. No CLI behavior changes.
+  released as `mdlsvensson/moonwell-wrappers` `v0.1.0` after its in-game and first-tag consumption gates (recorded in
+  AGENTS.md). No CLI behavior changes.
 
 ## 0.5.0 (2026-09-28)
 

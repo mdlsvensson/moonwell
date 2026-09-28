@@ -209,5 +209,7 @@ eq(callCount("RemoveUnit"), 0)
   3.0.0.24268; World Editor 3.00 (file version 3.0.0.24268). The probe screenshot shows both intentional errors and
   subsequent ticks/death/cleanup in F12, correcting the earlier blanket statement about print retention. Disposable
   gate projects, logs and map hashes are under the wrapper repository's ignored `.test-work/release-gate-2026-09-28/`.
-- Remaining external work: creation/push of the remote and immutable first tag, then GitHub
-  consumption gate. These are release tasks, not claims made by the local implementation. Both repositories stay on main.
+- Release: `mdlsvensson/moonwell-wrappers` was created, main pushed and `v0.1.0` tagged on `c1209f5`
+  (GitHub pre-release). The first GitHub-tag consumption gate passed 2026-09-28 with Moonwell 0.5.0: check, normal and
+  minified builds; `moonwell.lock` recorded `c1209f5`, the fetched files matched the tag's `src/`, and the lock stayed
+  unchanged after removing the map's `.moonwell/`. Recorded in the wrapper repository as `3a62111`.

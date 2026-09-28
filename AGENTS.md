@@ -121,26 +121,24 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
   beside a `.yue` of the same stem is its compiled output; a local override keeps the lock entry. Its gate (CONTRIBUTING
   step 12, the libraries part) passed 2026-09-28.
 - **CI** (GitHub Actions, Ubuntu and Windows, with `test:network`) is green as of commit `632c765` (Plan 4b).
-- **Plan 4c, implemented locally, unreleased** (2026-09-28): annotated Lua wrappers in the separate sibling
+- **Plan 4c, released as wrappers `v0.1.0`** (2026-09-28): annotated Lua wrappers in the separate sibling
   `../moonwell-wrappers` repository, commit `3b923d5` on main. Player, Unit, Timer, Trigger, Group and Effect use
   explicit methods, stable handle identity and explicit cleanup. Consume with `path = "../moonwell-wrappers"` and
-  `dir = "src"`; intended remote is `mdlsvensson/moonwell-wrappers` (not created or published by this work). Its 23
+  `dir = "src"`, or from GitHub `mdlsvensson/moonwell-wrappers` tag `v0.1.0` (commit `c1209f5`, a pre-release). Its 23
   behavior tests, Lua 5.3.6 syntax check, real Moonwell normal/minified builds, bundle runtime and LuaLS 3.19.1
   positive/negative fixtures pass. `fromHandle` is conservatively nullable in LuaLS: narrow or assert the result. All
   six wrappers are exercised by its `examples/gate.yue`. The maintainer passed normal gameplay/cleanup, intentional
   callback-error recovery, minified gameplay and World Editor opening on 2026-09-28 (game 3.0.0.24268, editor 3.00).
-  First published-tag consumption remains pending in its CONTRIBUTING.md. Moonwell CLI code is unchanged.
+  First published-tag consumption passed 2026-09-28: a fresh map locked `v0.1.0` to `c1209f5`, and the lock stayed
+  unchanged after removing `.moonwell/`. Moonwell CLI code is unchanged.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Finish sub-project 4c's release gate.** Its approved spec is
-   `docs/superpowers/specs/2026-09-28-moonwell-wrappers-design.md`; implementation and verification progress is in
-   `docs/superpowers/plans/2026-09-28-moonwell-wrappers.md`. Product code lives in the separate sibling repository
-   `../moonwell-wrappers`, written in annotated Lua. The in-game gate passed; publication and the first GitHub-tag
-   consumption check remain pending. Follow that repository's CONTRIBUTING.md. Broader wrapper coverage remains on the
-   backlog.
+1. **Choose the next sub-project from the backlog with the maintainer.** Sub-project 4c is released; nothing is selected
+   yet. Candidates include the broad wrapper library, the YueScript port of `wc3-lib` (4d) and the Reforged map preview.
+   Each needs a short design (or a spec, for a sub-project) approved first.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -219,11 +217,6 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   "No Node.js" rule shapes the design.
 - **C# support.** Gameplay in C#, compiled to Lua (for example with CSharp.lua). Added 2026-09-28; it builds on
   sub-project 4a's Lua modules.
-- **Typed wrappers over the natives** (sub-project 4c, a w3ts equivalent): an object-style API over `CreateUnit` and the
-  other natives, as a library. Selected for design on 2026-09-28: a focused foundation covering units, players, timers,
-  triggers, groups and effects, with consistent handle conversion and cleanup. The maintainer chose annotated Lua and a
-  separate repository using Moonwell's existing library configuration; the approved spec names
-  `mdlsvensson/moonwell-wrappers`.
 - **Broad wrapper library.** Deferred on 2026-09-28: extend 4c's focused foundation to cover most Warcraft handle types.
   Design the additional coverage separately after the foundation; broad coverage is outside 4c's first release.
 - **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
