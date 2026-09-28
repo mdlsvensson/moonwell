@@ -96,15 +96,17 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
   compile and `yue -g` cache keys. The macro module must not have a backslash inside a string literal: yue 0.34.2 fails
   to load such a macro. The template's standard Footman, next to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING
   step 11) passed 2026-09-27. Lua `print` output shows on screen only; the F12 message log does not keep it.
-- **Plan 4a done, unreleased** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules in
-  `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
+- **Released 0.5.0** (2026-09-28, JSR `@moonwell/cli@0.5.0` and GitHub release `moonwell@0.5.0`): sub-project 4, Plans
+  4a and 4b below. The release gate passed steps 1–6 and 12; 7–11 were not re-run (their code is unchanged).
+- **Plan 4a, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules
+  in `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
   or `<name>.init`; Lua modules are bundled unchanged and keep their lines in `--minify` builds (per-entry flag in the
   line table); `luaTopLevelGlobals` (`cli/src/lint/lua-globals.ts`) makes their top-level globals known; `mergeLuarc`
   lets `setup` add `.luarc.json` entries to older projects. Its gate (CONTRIBUTING step 12, the Lua modules part) passed
   2026-09-28.
-- **Plan 4b done, unreleased** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-libraries.md`): libraries, from
-  a GitHub tag or a local `path`, in the manifest's `libraries` block (spec §4). `cli/src/libraries/` reads the tag
+- **Plan 4b, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-libraries.md`): libraries,
+  from a GitHub tag or a local `path`, in the manifest's `libraries` block (spec §4). `cli/src/libraries/` reads the tag
   archive (`archive.ts`, `download.ts`), writes `moonwell.lock` (`lock.ts`) and syncs `.moonwell/libraries/<key>/`
   (`sync.ts`) at the start of every compile (`compileProject`) and in `setup`; a moved tag fails. Sync refuses keys that
   differ only by case, a `github` repository of `.`/`..`, a tag with `.`/`..` segments and a local library whose folder
@@ -122,8 +124,8 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
 
 ## Next work, in order
 
-1. **Release 0.5.0** (Plans 4a and 4b): step 12 passed; run the rest of the release gate (steps 1–6), then release
-   0.5.0.
+1. **Pick the next sub-project** from the backlog below with the maintainer (4c typed wrappers and 4d the wc3-lib port
+   build on libraries), and design it first.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

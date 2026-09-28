@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 (2026-09-28)
 
 - Lua modules: `.lua` files in `lua/` are modules named by their path, sharing one namespace with `src/` (a name both
   define fails the build), and `x/init.lua` answers to `x`. They are bundled unchanged when required, and runtime errors
@@ -20,7 +20,16 @@
   not require are no longer checked for unknown globals. A global declared only in a file nothing imports is now
   reported as unknown where a required module uses it: import the file, or add the name to `lint.globals`.
 
-### Release gate (so far)
+### Release gate
+
+Passed 2026-09-28 on Warcraft III Reforged 3.0.0.24268 and World Editor 3.00.
+
+Steps 1 to 6 (CONTRIBUTING), tested by the maintainer in `template/` apart from steps 1 and 2: every check passes from a
+clean checkout, including `test:network`, and `cli/data/game-paths.txt` is the 3.0.0.24268 list. `deno task test` prints
+"Moonwell is running." and the Captain changes colour; an `error "gate"` in `on_main` names `src/main.yue` and the right
+line. The `--minify` build plays from `dist/bin/map.w3x`, and the packed map opens in World Editor. Steps 7 to 11
+(assets, map settings, object data, editor, macros) were not re-run: this release does not change their code, and step
+12 covers its editor changes.
 
 Lua modules (CONTRIBUTING step 12, first part) passed 2026-09-28 on Warcraft III Reforged 3.0.0.24268, tested by the
 maintainer in a new project with a module (`lua/greeter.lua`) and a global-style file (`lua/counter.lua`) used from
