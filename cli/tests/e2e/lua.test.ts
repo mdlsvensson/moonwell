@@ -68,3 +68,17 @@ Deno.test("check reports an unknown global the Lua file does not define", async 
   assertEquals(checked.code, 1, checked.text);
   assertStringIncludes(checked.text, "Unknown global hidden.");
 });
+
+Deno.test("a Lua file's globals are known only when something requires it", async () => {
+  const project = await newProject();
+  await Deno.writeTextFile(join(project, "lua", "counter.lua"), "function CountUp() end\n");
+  const main = join(project, "src", "main.yue");
+  const base = await Deno.readTextFile(main);
+  await Deno.writeTextFile(main, `${base}\nCountUp!\n`);
+  const unrequired = await deno(["task", "check"], project);
+  assertEquals(unrequired.code, 1, unrequired.text);
+  assertStringIncludes(unrequired.text, "Unknown global CountUp.");
+  await Deno.writeTextFile(main, `${base}\nrequire "counter"\nCountUp!\n`);
+  const required = await deno(["task", "check"], project);
+  assertEquals(required.code, 0, required.text);
+});

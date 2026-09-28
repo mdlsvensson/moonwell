@@ -48,9 +48,10 @@ Deno.test("check accepts declared globals, lint.globals and the map's globals", 
   const project = await newProject();
   await Deno.writeTextFile(join(project, "src", "state.yue"), "global Round = 1\n");
   const main = join(project, "src", "main.yue");
+  const base = await Deno.readTextFile(main);
   await Deno.writeTextFile(
     main,
-    `${await Deno.readTextFile(main)}\nglobal Score = 0\nprint Score, Round, MyLibrary, gg_unit_Hblm_0003\n`,
+    `${base}\nimport "state"\nglobal Score = 0\nprint Score, Round, MyLibrary, gg_unit_Hblm_0003\n`,
   );
   await edit(join(project, "moonwell.pkl"), "globals = List()", 'globals = List("MyLibrary")');
   const checked = await deno(["task", "check"], project);

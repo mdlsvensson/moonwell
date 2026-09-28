@@ -104,7 +104,7 @@ Deno.test("unknownGlobalProblems reports every unknown use in file, line and col
 
 /**
  * A project whose compiler is a stand-in printing `outputs[<path under src/>]` for `yue -g`. The sources reach the
- * check only through `compiled.sources`; nothing is written under src/, so the check must not read the files again.
+ * check only through `compiled.declared`; nothing is written under src/, so the check must not read the files again.
  */
 async function lintProject(
   sources: Record<string, string>,
@@ -142,7 +142,7 @@ async function lintProject(
     ctx,
     logger,
     project,
-    compiled: { yue: "yue", hashes, sources, lua: (options.lua ?? []).map((source) => ({ source })) },
+    compiled: { yue: "yue", hashes, declared: { yue: Object.values(sources), lua: options.lua ?? [] } },
   };
 }
 

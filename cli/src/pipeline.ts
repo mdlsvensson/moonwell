@@ -58,9 +58,11 @@ export async function compileProject(
   await checkUnknownGlobals(ctx, project, {
     yue,
     hashes: output.hashes,
-    sources: output.sources,
     macros,
-    lua: sourceModules.filter((module) => module.kind === "lua"),
+    declared: {
+      yue: modules.filter((module) => module.kind !== "lua").map((module) => output.texts[module.sourcePath] ?? ""),
+      lua: modules.filter((module) => module.kind === "lua").map((module) => module.source),
+    },
   });
   return { modules, entry };
 }

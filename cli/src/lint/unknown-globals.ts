@@ -104,9 +104,10 @@ export function unknownGlobalProblems(
 }
 
 /**
- * Checks every compiled source for unknown globals (spec §5). `compiled.sources` holds the text of each source, keyed
- * like `compiled.hashes`. With `lint.unknownGlobals = "error"` any unknown use throws a `ProblemsError` listing all of
- * them; with `"warning"` they are logged and returned.
+ * Checks every compiled source (`compiled.hashes`) for unknown globals (spec §5). The names declared by
+ * `compiled.declared` are known: the pipeline passes the texts of the modules reachable from the entry, so a `global`
+ * line or a Lua top-level global counts only in a module the map requires. With `lint.unknownGlobals = "error"` any
+ * unknown use throws a `ProblemsError` listing all of them; with `"warning"` they are logged and returned.
  */
 export async function checkUnknownGlobals(
   ctx: CommandContext,
@@ -114,10 +115,12 @@ export async function checkUnknownGlobals(
   compiled: {
     yue: string;
     hashes: Record<string, string>;
-    sources: Record<string, string>;
     macros?: MacroSearch;
-    /** Lua modules: their top-level globals are known names (spec §3.4); they are not checked themselves. */
-    lua?: readonly { source?: string }[];
+    /**
+     * Texts whose globals are known names (spec §5.3, amended): the `global` lines of `yue` texts and the top-level
+     * globals of `lua` texts. The pipeline passes the modules reachable from the entry.
+     */
+    declared: { yue: readonly string[]; lua: readonly string[] };
   },
   natives?: Natives,
 ): Promise<Problem[]> {
@@ -129,8 +132,10 @@ export async function checkUnknownGlobals(
     run: ctx.run,
   });
   // The text compileSources hashed: reading the files again could fail or see other bytes (e.g. during dev).
-  const declared = Object.values(compiled.sources).flatMap(declaredGlobals);
-  for (const module of compiled.lua ?? []) declared.push(...luaTopLevelGlobals(module.source ?? ""));
+  const declared = [
+    ...compiled.declared.yue.flatMap(declaredGlobals),
+    ...compiled.declared.lua.flatMap(luaTopLevelGlobals),
+  ];
   const label = `maps/${project.map.folder}/war3map.lua`;
   const script = await readSourceScript(join(ctx.root, ...label.split("/")), label);
   const data = natives ?? await loadNatives();
