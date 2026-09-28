@@ -53,3 +53,6 @@ jobs:
       - run: deno task test:runtime
       - run: deno task test:pkl
       - run: deno task test:e2e
+      - run: deno task test:network
+        env:
+          MOONWELL_NETWORK_TESTS: "1"

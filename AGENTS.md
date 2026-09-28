@@ -149,6 +149,7 @@ deno task test          # unit tests; need neither pkl nor yue
 deno task test:runtime  # needs yue (installed by `deno task setup` in template/)
 deno task test:pkl      # needs pkl
 deno task test:e2e      # needs pkl and yue
+deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TESTS=1 (CI sets it)
 ```
 
 ## Pitfalls already paid for

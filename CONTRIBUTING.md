@@ -20,6 +20,7 @@ deno task test         # unit tests, no external tools
 deno task test:runtime # needs yue (downloaded automatically)
 deno task test:pkl     # needs pkl
 deno task test:e2e     # needs pkl and yue
+deno task test:network # needs the network; runs only with MOONWELL_NETWORK_TESTS=1 (CI sets it)
 ```
 
 `.github/workflows/ci.yml` runs all of these (plus `deno fmt --check`) on Ubuntu and Windows.
