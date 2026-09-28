@@ -150,7 +150,14 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
           table.sort keys
           print lib .. ": " .. table.concat keys, " "
     ```
-12. Record the Warcraft III and World Editor versions in the changelog.
+12. Lua modules and libraries, in another throwaway project from `init --link`: add `lua/greeter.lua` that returns a
+    table with a function that prints, and a global-style `lua/counter.lua` that defines a global function
+    (`function CountUp() print("counted") end`). Use both from `src/main.yue` (`import "greeter"`, `require "counter"`,
+    `CountUp!`). Confirm the editor completes the module's function and the global, `deno task check` passes, and in the
+    game (`deno task test`) both print. Then add `error "lua gate"` inside the module's function, run
+    `deno task test --minify`, and confirm the game's error names `lua/greeter.lua` and the right line (Lua modules keep
+    their lines in minified builds). Remove the error afterwards.
+13. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
 

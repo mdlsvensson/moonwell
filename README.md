@@ -144,6 +144,28 @@ For your own objects, use the ids in `generated.objects` instead.
 The macro module is written to `.moonwell/yue/moonwell/macros.yue` by `setup`, `check`, `build`, `test` and `dev`, where
 the compiler and the editor's YueScript extension find it. It adds nothing to the map.
 
+## Lua modules
+
+Plain Lua goes in `lua/`, next to `src/`. A file there is a module named by its path, like a `.yue` file in `src/`:
+`lua/utils/timer.lua` is `utils.timer`, and `lua/tools/init.lua` answers to `tools`. `src/` and `lua/` share one set of
+names; a name both define fails the build.
+
+```yue
+import "utils.timer" as timer   -- lua/utils/timer.lua
+require "counter"               -- a Lua file that defines globals
+CountUp!
+```
+
+Lua modules are bundled as they are, only when something requires them, and runtime errors in them name the `.lua` file
+and line, also in `--minify` builds (Lua modules are not minified). The unknown-global check does not read `.lua` files,
+but the globals a Lua file defines at its top level (`function CountUp(`, `Count = 0`) count as known in your YueScript.
+Only top-level `function Name(` and `Name = …` statements that start a line (or follow `;`) are recognised; globals
+assigned inside functions, after a label or through `_G` need `lint.globals`. The editor resolves `lua/` through
+`.luarc.json`'s `runtime.path`; `deno task setup` adds the entries to a project made by an older Moonwell.
+
+`src/**/*.lua` stays reserved for the `.lua` files the YueScript extension writes on save, so keep your own Lua in
+`lua/`.
+
 ## Assets
 
 Every file under `assets/` is imported into the built map at its relative path: `assets/Models/unit.mdx` becomes

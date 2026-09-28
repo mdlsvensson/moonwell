@@ -29,8 +29,8 @@ function __mw.require(name)
   return result
 end
 
--- Maps an absolute war3map.lua line to "src/file.yue:<line>" ("src/file.yue" when that module is
--- minified), or nil outside modules.
+-- Maps an absolute war3map.lua line to the module's source file and line, "src/<path>.yue:<line>" or
+-- "lua/<path>.lua:<line>" (only the file for a minified YueScript module), or nil outside modules.
 local function map_line(line)
   local lines = __mw.lines
   for i = #lines, 1, -1 do

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Lua modules: `.lua` files in `lua/` are modules named by their path, sharing one namespace with `src/` (a name both
+  define fails the build), and `x/init.lua` answers to `x`. They are bundled unchanged when required, and runtime errors
+  in them name the `.lua` file and line, also in `--minify` builds. Their top-level globals are known to the
+  unknown-global check. New projects have a `lua/` folder, and `.luarc.json` resolves it in the editor; `setup` adds the
+  entries to older projects' `.luarc.json`.
+
 ## 0.4.0 (2026-09-28)
 
 - Editor support for VS Code's YueScript extension: new projects get `yueconfig.yue`, `.luarc.json` and a recommendation

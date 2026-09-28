@@ -225,8 +225,9 @@ a fresh one.
 - **Incremental builds.** A content-hash manifest (`dist/stage/lua/.hashes.json`) lets repeat
   builds and `dev` compile only changed files. Deleted sources remove their outputs.
 - **Errors.** Compiler errors are reported with the `.yue` file and line and fail the build.
-- **`--minify`** adds `-m`. Line mapping is then disabled: the bundle sets `__mw.minified`, and errors
-  name the module's `.yue` file without a line number.
+- **`--minify`** adds `-m`. Line mapping is then disabled for YueScript modules: their line-table
+  entries carry a fifth field, `true`, and errors name the module's `.yue` file without a line number.
+  Lua modules from `lua/` are not minified and keep their lines.
 - **Module name.** A module's name is its path relative to `src/`, without the extension,
   with `/` replaced by `.`. For example, `src/heroes/captain.yue` is `heroes.captain`.
 

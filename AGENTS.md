@@ -96,14 +96,20 @@ over, and updated on 2026-09-28 after the 0.4.0 release.
   compile and `yue -g` cache keys. The macro module must not have a backslash inside a string literal: yue 0.34.2 fails
   to load such a macro. The template's standard Footman, next to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING
   step 11) passed 2026-09-27. Lua `print` output shows on screen only; the F12 message log does not keep it.
+- **Plan 4a done, unreleased** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules in
+  `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
+  (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
+  or `<name>.init`; Lua modules are bundled unchanged and keep their lines in `--minify` builds (per-entry flag in the
+  line table); `luaTopLevelGlobals` (`cli/src/lint/lua-globals.ts`) makes their top-level globals known; `mergeLuarc`
+  lets `setup` add `.luarc.json` entries to older projects. Its gate (CONTRIBUTING step 12, the Lua modules part) has
+  not been run yet.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `a9a2e15` (release 0.4.0).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Sub-project 4a and 4b** (chosen 2026-09-28): Lua modules in the bundler (4a) and library sync, the `libraries` key
-   (4b). Being designed; the spec goes in `docs/superpowers/specs/`. 4c and 4d are in the Backlog.
+1. **Plan 4b** (libraries, spec §4): write it from the spec, then run CONTRIBUTING step 12 in full and release 0.5.0.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
