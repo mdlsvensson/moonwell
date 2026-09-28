@@ -102,8 +102,8 @@ over, and updated on 2026-09-28 after the 0.4.0 release.
 
 ## Next work, in order
 
-1. **Ask the maintainer what comes next.** Candidates: sub-project 4 (importing existing Lua code) and the other Backlog
-   items; each needs a design first.
+1. **Sub-project 4a and 4b** (chosen 2026-09-28): Lua modules in the bundler (4a) and library sync, the `libraries` key
+   (4b). Being designed; the spec goes in `docs/superpowers/specs/`. 4c and 4d are in the Backlog.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -176,5 +176,13 @@ deno task test:e2e      # needs pkl and yue
 - **Fennel support.** The maintainer chose YueScript (2026-09-27) for its familiar syntax and VS Code support, with
   Fennel as a later option: a fennel-ls docset rendered from `cli/data/natives.json` (sub-project 3), plus a Fennel
   compile step next to the YueScript one.
-- **Importing existing Lua code** (a Lua library or `.lua` modules in `src/`) belongs to sub-project 4; the bundler
-  compiles only `.yue` today.
+- **TypeScript support.** Gameplay in TypeScript, compiled to Lua (as TypeScriptToLua does in wc3-dev-framework), next
+  to YueScript. Added 2026-09-28; it builds on sub-project 4a's Lua modules. TypeScriptToLua is an npm package, so the
+  "No Node.js" rule shapes the design.
+- **C# support.** Gameplay in C#, compiled to Lua (for example with CSharp.lua). Added 2026-09-28; it builds on
+  sub-project 4a's Lua modules.
+- **Typed wrappers over the natives** (sub-project 4c, a w3ts equivalent): an object-style API over `CreateUnit` and the
+  other natives, as a library. Moved here 2026-09-28 when sub-project 4 was split.
+- **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
+  scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
+  Moved here 2026-09-28; it depends on 4b's library sync.
