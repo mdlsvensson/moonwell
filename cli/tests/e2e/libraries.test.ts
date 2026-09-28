@@ -67,6 +67,11 @@ Deno.test("a local library's modules build, and its editor view and folder are w
   assertStringIncludes(lua, '"example.greet", ".moonwell/libraries/ex/example/greet.lua"}');
   assert(await exists(join(project, ".moonwell", "libraries", "ex", "example", "loud.yue")));
   assertEquals(await exists(join(project, "moonwell.lock")), false, "a local library is not locked");
+  assertStringIncludes(
+    await Deno.readTextFile(join(project, ".moonwell", "lua", "example", "loud.lua")),
+    "shout",
+  );
+  assert(await exists(join(project, ".moonwell", "lua", "example", "greet.lua")));
 });
 
 Deno.test("a project module that clashes with a library module fails check, naming both", async () => {

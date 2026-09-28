@@ -11,6 +11,7 @@ import {
   PROJECT_MODULE_ROOTS,
 } from "./bundle/modules.ts";
 import type { CommandContext } from "./context.ts";
+import { refreshLibraryView } from "./editor/library-view.ts";
 import { refreshEditorFiles } from "./editor/refresh.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
 import { syncLibraries } from "./libraries/sync.ts";
@@ -51,8 +52,9 @@ export function syncProjectLibraries(ctx: CommandContext, project: Project): Pro
 }
 
 /**
- * Syncs the libraries, compiles src/ and the libraries' YueScript, resolves the reachable module graph (src/, lua/ and
- * the libraries) from the entry and checks for unknown globals.
+ * Syncs the libraries, compiles src/ and the libraries' YueScript, writes the editor's view of the libraries
+ * (.moonwell/lua), resolves the reachable module graph (src/, lua/ and the libraries) from the entry and checks for
+ * unknown globals.
  */
 export async function compileProject(
   ctx: CommandContext,
@@ -74,6 +76,7 @@ export async function compileProject(
     run: ctx.run,
     modules: sourceModules,
   });
+  await refreshLibraryView(ctx.root, sourceModules, output.loadModule);
   const entry = entryModuleName(options.entry ?? project.map.entry);
   const modules = resolveGraph(entry, moduleLoader(sourceModules, output.loadModule), BUILTIN_MODULES);
   // Only the src/ modules the map requires are checked; `output.hashes` is keyed by path under src/.

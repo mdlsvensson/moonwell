@@ -43,6 +43,22 @@ export async function addEditorFiles(
 /** The .luarc.json arrays setup keeps up to date in projects made by an older Moonwell (spec §3.5). */
 const LUARC_ARRAYS = ["runtime.path", "workspace.library"] as const;
 
+type LuarcArray = typeof LUARC_ARRAYS[number];
+
+/** The template's `runtime.path` and `workspace.library` entries, from the embedded `.luarc.json`. */
+export function luarcTemplateEntries(
+  files: ReadonlyArray<{ path: string; base64: string }> = TEMPLATE_FILES,
+): Record<LuarcArray, string[]> {
+  const file = files.find((entry) => entry.path === ".luarc.json");
+  if (!file) throw new Error("The embedded template has no .luarc.json.");
+  const template = JSON.parse(new TextDecoder().decode(decodeBase64(file.base64))) as Record<string, unknown>;
+  return Object.fromEntries(LUARC_ARRAYS.map((key) => {
+    const entries = template[key];
+    if (!Array.isArray(entries)) throw new Error(`The embedded template's .luarc.json has no ${key} array.`);
+    return [key, entries.map(String)];
+  })) as Record<LuarcArray, string[]>;
+}
+
 /**
  * Adds the template's `runtime.path` and `workspace.library` entries that the project's .luarc.json lacks, keeping every
  * other key and value, and rewrites it as formatted JSON when it adds any (spec §3.5). Returns the entries it added, or
@@ -55,9 +71,7 @@ export async function mergeLuarc(
 ): Promise<string[] | undefined> {
   const path = join(root, ".luarc.json");
   if (!(await exists(path))) return [];
-  const file = files.find((entry) => entry.path === ".luarc.json");
-  if (!file) throw new Error("The embedded template has no .luarc.json.");
-  const template = JSON.parse(new TextDecoder().decode(decodeBase64(file.base64))) as Record<string, string[]>;
+  const template = luarcTemplateEntries(files);
   let text: string;
   try {
     text = await Deno.readTextFile(path);

@@ -1,7 +1,7 @@
 import { assert, assertEquals, assertRejects } from "@std/assert";
 import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
 import { join } from "@std/path";
-import { addEditorFiles, EDITOR_FILES, mergeLuarc } from "../../src/editor/scaffold.ts";
+import { addEditorFiles, EDITOR_FILES, luarcTemplateEntries, mergeLuarc } from "../../src/editor/scaffold.ts";
 import { TEMPLATE_FILES } from "../../src/embedded/template.ts";
 import { loadNatives } from "../../src/natives/natives.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
@@ -63,15 +63,22 @@ Deno.test("mergeLuarc adds the template's missing runtime.path and workspace.lib
         "diagnostics.globals": ["X"],
       }),
     );
-    assertEquals(await mergeLuarc(root), ["src/?/init.lua", "lua/?.lua", "lua/?/init.lua"]);
+    assertEquals(await mergeLuarc(root), ["src/?/init.lua", "lua/?.lua", "lua/?/init.lua", ".moonwell/lua"]);
     const config = JSON.parse(await Deno.readTextFile(join(root, ".luarc.json")));
     assertEquals(config["runtime.path"], ["src/?.lua", "src/?/init.lua", "lua/?.lua", "lua/?/init.lua"]);
-    assertEquals(config["workspace.library"], [".moonwell/types", "extra"]);
+    assertEquals(config["workspace.library"], [".moonwell/types", "extra", ".moonwell/lua"]);
     assertEquals(config["diagnostics.globals"], ["X"]);
     assertEquals(await mergeLuarc(root), []);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test("luarcTemplateEntries lists the template's runtime.path and workspace.library", () => {
+  assertEquals(luarcTemplateEntries(), {
+    "runtime.path": ["src/?.lua", "src/?/init.lua", "lua/?.lua", "lua/?/init.lua"],
+    "workspace.library": [".moonwell/types", ".moonwell/lua"],
+  });
 });
 
 Deno.test("mergeLuarc leaves a .luarc.json that is not a JSON object alone", async () => {
