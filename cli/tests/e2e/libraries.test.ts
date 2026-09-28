@@ -107,3 +107,14 @@ Deno.test("setup writes a local library's Lua modules to .moonwell/lua, even wit
   );
   assert(await exists(join(project, ".moonwell", "types", "natives.d.lua")));
 });
+
+Deno.test("setup writes .moonwell/types and the macro module before a library that fails to sync", async () => {
+  const project = await newProject();
+  const missing = join(await Deno.makeTempDir({ prefix: "moonwell-lib-" }), "missing");
+  await useLibrary(project, missing);
+  const result = await deno(["task", "setup"], project);
+  assertEquals(result.code, 1, result.text);
+  assertStringIncludes(result.text, "is not a folder");
+  assert(await exists(join(project, ".moonwell", "types", "natives.d.lua")));
+  assert(await exists(join(project, ".moonwell", "yue", "moonwell", "macros.yue")));
+});

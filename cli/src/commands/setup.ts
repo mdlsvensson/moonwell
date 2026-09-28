@@ -12,9 +12,9 @@ import { ensureYue } from "../yue/install.ts";
 /**
  * Creates moonwell.local.pkl if this checkout has none, installs the project's pinned compiler into the user cache,
  * keeps a copy in the cache's bin folder for the editor and reports what the editor still needs, adds the editor files
- * a project lacks, adds the `.luarc.json` entries an older project lacks, syncs the manifest's libraries into
- * .moonwell/libraries (and moonwell.lock) and their Lua modules into .moonwell/lua, and writes .moonwell/types and the
- * macro module (.moonwell/yue/moonwell/macros.yue).
+ * a project lacks, adds the `.luarc.json` entries an older project lacks, writes .moonwell/types and the macro module
+ * (.moonwell/yue/moonwell/macros.yue), then syncs the manifest's libraries into .moonwell/libraries (and moonwell.lock)
+ * and their Lua modules into .moonwell/lua.
  */
 export async function setup(ctx: CommandContext): Promise<string> {
   const project = await loadProject(ctx.root, ctx.run);
@@ -45,11 +45,13 @@ export async function setup(ctx: CommandContext): Promise<string> {
   } else if (merged.length > 0) {
     ctx.logger.info(`Added ${merged.join(", ")} to .luarc.json.`);
   }
-  await syncProjectLibraries(ctx, project);
   const objects = await planProjectObjects(ctx, project);
   await refreshEditorFiles(ctx.root, { objects: objects.objects, mapFolder: `maps/${project.map.folder}` });
-  // Last, so a bad library file cannot keep .moonwell/types and the macro module from being written. Setup does not
-  // compile, so the view gets the libraries' Lua modules only; check and build report clashes with src/ and lua/.
+  // After the editor files (spec §4.2), so a library that cannot be fetched (offline, no such tag, a moved tag) or read
+  // cannot keep .moonwell/types and the macro module from being written.
+  await syncProjectLibraries(ctx, project);
+  // Last, for the same reason with a bad library file. Setup does not compile, so the view gets the libraries' Lua
+  // modules only; check and build report clashes with src/ and lua/.
   await refreshLibraryView(
     ctx.root,
     await collectModules(ctx.root, libraryModuleRoots(Object.keys(project.libraries))),
