@@ -1,7 +1,8 @@
 import { exists } from "@std/fs";
 import { dirname, join } from "@std/path";
+import { collectModules, type SourceModule } from "../bundle/modules.ts";
 import { MoonwellError } from "../shared/errors.ts";
-import { listFiles, removeIfExists, sha256Hex } from "../shared/fs.ts";
+import { removeIfExists, sha256Hex } from "../shared/fs.ts";
 import { type Runner, runProcess } from "../shared/process.ts";
 import { macroPathArgs, type MacroSearch } from "./macros.ts";
 
@@ -11,6 +12,8 @@ export interface CompiledModule {
   /** POSIX path relative to the project root, e.g. "src/heroes/captain.yue". */
   sourcePath: string;
   source: string;
+  /** "lua" for a Lua module, which the bundle never minifies; YueScript when absent. */
+  kind?: "yue" | "lua";
 }
 
 export interface CompileOutput {
@@ -34,23 +37,18 @@ export async function compileSources(options: {
   minify: boolean;
   /** Where `import "moonwell.macros"` is found; every yue run gets its `--path` (spec §6). */
   macros?: MacroSearch;
+  /** The project's modules (`collectModules`); listed from disk when absent. Only YueScript modules under src/ compile. */
+  modules?: readonly SourceModule[];
   run?: Runner;
   concurrency?: number;
 }): Promise<CompileOutput> {
   const run = options.run ?? runProcess;
   const srcDir = join(options.root, "src");
   const outDir = join(options.root, "dist", "stage", "lua");
-  if (!(await exists(srcDir))) throw new MoonwellError("The src/ folder is missing.", { file: options.root });
-
-  const sources = (await listFiles(srcDir)).filter((file) => file.endsWith(".yue"));
-  for (const file of sources) {
-    if (file.slice(0, -4).split("/").some((segment) => segment.includes("."))) {
-      throw new MoonwellError("Module file and folder names cannot contain dots.", {
-        file: `src/${file}`,
-        hint: "Dots separate module names in `import`; rename the file or folder.",
-      });
-    }
-  }
+  const modules = options.modules ?? await collectModules(options.root);
+  const sources = modules
+    .filter((module) => module.kind === "yue" && module.path.startsWith("src/"))
+    .map((module) => module.path.slice("src/".length));
 
   const manifestPath = join(outDir, ".hashes.json");
   const previous = await readManifest(manifestPath);
@@ -103,13 +101,13 @@ export async function compileSources(options: {
     });
   }
 
-  const modules = new Set(sources.map((file) => file.slice(0, -4).split("/").join(".")));
+  const names = new Set(sources.map((file) => file.slice(0, -4).split("/").join(".")));
   return {
     outDir,
     hashes,
     sources: texts,
     load(name: string): CompiledModule | undefined {
-      if (!modules.has(name)) return undefined;
+      if (!names.has(name)) return undefined;
       const relative = name.split(".").join("/");
       try {
         return {
