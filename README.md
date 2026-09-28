@@ -2,14 +2,12 @@
   <img src="mw.gif" alt="Moonwell" width="256" />
 </p>
 <p align="center">
-  <i>Multilingual Warcraft III modding framework</i>
+  <i>Multilingual modding framework for Warcraft III: Reforged</i>
 </p>
 
-- Gameplay in [YueScript](https://github.com/IppClub/YueScript), compiled to Lua 5.3 and bundled into your map. Only the
-  modules you import are included, and runtime errors point at your `.yue` lines (in `--minify` builds, at the `.yue`
-  file only).
-- Project configuration in [Pkl](https://pkl-lang.org), validated against the versioned `moonwell` schema package.
-- A Deno command-line tool: no Node.js, no `package.json`, no `node_modules`.
+- Write gameplay in any language that transpiles to lua. TypeScript, YueScript, Fennel, C#. And use pkl for data and configuration.
+- Say goodbye to the Object Editor, Trigger Editor, Asset Manager and other dated World Editor tools.
+- A Deno cli: no Node.js, no `package.json`, no `node_modules`.
 
 ## Quickstart
 
@@ -21,8 +19,7 @@ cd my-map
 deno task build
 ```
 
-`init` also writes `moonwell.local.pkl`, which points `launch.gameExecutable` at the default Battle.net install. If your
-game is elsewhere, fix the path there, then play:
+`init` writes `moonwell.local.pkl`, which points `launch.gameExecutable` at the default Battle.net install. If your game is elsewhere, fix the path there, then run:
 
 ```powershell
 deno task test
