@@ -5,7 +5,7 @@
   <i>Multilingual modding framework for Warcraft III: Reforged</i>
 </p>
 <p align="center">
-  <a href="https://www.hiveworkshop.com/" style="font-size: 10px;">Hive Workshop</a>
+  <a href="https://www.hiveworkshop.com/">Hive Workshop</a>
 </p>
 
 
