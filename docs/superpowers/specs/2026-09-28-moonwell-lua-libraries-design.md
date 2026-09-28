@@ -69,6 +69,10 @@ Top-level `local` variables of a Lua module stay local to it (the wrapper is a f
 
 ### 3.4 Unknown globals
 
+Amended 2026-09-28 during Plan 4b: the check covers only the `src/` modules reachable from the entry (the map's entry,
+or `--entry`, and every module reached from it through `import`/`require`), and only those reachable modules' `global`
+lines and top-level Lua globals are known names. A file nothing imports is not checked, and its globals do not count.
+
 The unknown-global check (editor-dx spec §5) still checks only the project's `src/**/*.yue`. `.lua` files are not
 checked (`yue -g` reads only YueScript). The globals a Lua module defines at its top level become known names:
 
@@ -121,11 +125,12 @@ The template's `moonwell.pkl` shows an empty `libraries {}` block with a comment
 
 ### 4.2 Fetching
 
-`setup`, `check`, `build`, `test` and `dev` bring `.moonwell/libraries/<key>/` up to date first, after loading the
-project and before planning objects:
+`check`, `build`, `test` and `dev` bring `.moonwell/libraries/<key>/` up to date at the start of every compile
+(`compileProject`, after the objects are planned), and `setup` does after adding the editor files (amended 2026-09-28
+during Plan 4b):
 
 - **GitHub:** download `codeload.github.com/<owner>/<repo>/zip/refs/tags/<tag>`, read the commit from the zip comment,
-  strip the top folder, keep the files under `dir`, and write them to a temporary folder that replaces
+  strip the archive's single top folder whatever its name, keep the files under `dir`, and write them to a temporary folder that replaces
   `.moonwell/libraries/<key>/` only when complete. A stamp file in it (`.moonwell-library.json`) records the lock entry
   it holds; a library whose stamp equals its lock entry is not downloaded again.
 - **Local `path`:** the files under `<path>/<dir>` are copied into `.moonwell/libraries/<key>/`, writing only changed
@@ -161,7 +166,8 @@ A committed JSON file at the project root:
   command fails, naming the library, the tag and both commits ("the tag moved"), with the hint to delete the library's
   entry from `moonwell.lock` if the move was intended.
 - Entries for libraries no longer in the manifest, and for libraries that are now local, are removed.
-- The file is written only when its content changes, sorted by key, with two-space indentation.
+- The file is written only when its content changes, sorted by key, with two-space indentation. It is removed when no
+  GitHub library remains.
 
 ### 4.4 Library modules
 
@@ -189,8 +195,11 @@ Resolving a name (§3.2) looks it up in the collected list. The graph, reachabil
 
 ### 5.3 Unknown globals
 
-The check (editor-dx spec §5) runs `yue -g` on the project's `src/**/*.yue` only. Known names add: `global` lines of
-library `.yue` modules, and top-level globals (§3.4) of every `.lua` module, the project's and the libraries'.
+Amended 2026-09-28 during Plan 4b: known names come from the modules reachable from the entry, not from every module.
+
+The check (editor-dx spec §5) runs `yue -g` on the `src/**/*.yue` modules reachable from the entry only. Known names
+add: `global` lines of every reachable `.yue` module, the project's and the libraries', and top-level globals (§3.4) of
+every reachable `.lua` module, the project's and the libraries'.
 
 ### 5.4 Editor view of libraries
 
@@ -262,7 +271,8 @@ A new CONTRIBUTING step, in a throwaway `init --link` project on Warcraft III Re
 ## 10. Inputs needed from the maintainer
 
 - A public GitHub repository with at least one tag, holding a small library (a `.lua` and a `.yue` module), for the
-  network test and the gate — for example `mdlsvensson/moonwell-example-lib`, or an existing Warcraft III Lua library.
+  network test and the gate: `mdlsvensson/moonwell-example-lib`, tag `v0.1.0` (commit
+  `13e35535c481fddd267533cc513f86b55b313b66`), with its modules under `src/`.
 - One run of V1–V3 in the editor and the game during Plan 4a, and the release gate (§8).
 
 ## 11. Implementation order

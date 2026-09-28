@@ -43,7 +43,8 @@ deno task test
 | `yueconfig.yue`      | Settings for VS Code's YueScript extension; builds do not read it                                      |
 | `.luarc.json`        | Settings for lua-language-server in the editor                                                         |
 | `.vscode/`           | `extensions.json`, which recommends the YueScript and Lua extensions                                   |
-| `.moonwell/`         | Declarations for the editor, written by `check`, `build`, `test`, `dev` and `setup`; git-ignored       |
+| `moonwell.lock`      | The commit of each library's GitHub tag (see "Libraries"); commit it                                   |
+| `.moonwell/`         | Libraries and editor declarations, written by `check`, `build`, `test`, `dev` and `setup`; git-ignored |
 | `dist/`              | Build output                                                                                           |
 
 `moonwell.local.pkl` amends `moonwell.pkl`, so any setting can be overridden there for your machine only. Lists such as
@@ -117,9 +118,13 @@ hint: Did you mean CreateUnit? Declare your own globals with `global`, or add th
 A global is known when it is a native, any function, global or constant of common.j or Blizzard.j (such as
 `PLAYER_NEUTRAL_AGGRESSIVE`), or a Lua library the game provides; a global or function of the source map's `war3map.lua`
 (such as `gg_unit_Hpal_0002` or `udg_Score`; run the command again after saving the map in World Editor); a name
-declared with `global` in any file under `src/` (`global Score = 0`, `global a, b`); a global a module in `lua/` defines
-at its top level (see "Lua modules"); or a name listed in `lint.globals` in `moonwell.pkl`. Fields are not checked:
-`math.floor` checks only `math`.
+declared with `global` (`global Score = 0`, `global a, b`), or defined at the top level of a Lua file (see "Lua
+modules"), in a module the map requires: its entry (`map.entry`, or `--entry`), and every module reached from it through
+`import`/`require`, including library modules; or a name listed in `lint.globals` in `moonwell.pkl`. Fields are not
+checked: `math.floor` checks only `math`.
+
+Only the files under `src/` that the map requires are checked. A file nothing imports is not checked, and its `global`
+lines do not count; library modules are not checked either.
 
 `global *` and `global ^` make later assignments global without naming them, so Moonwell cannot see those names; list
 them in `lint.globals`. To report unknown globals without failing, set `lint { unknownGlobals = "warning" }`. In the
@@ -160,16 +165,48 @@ CountUp!
 
 Lua modules are bundled as they are, only when something requires them, and runtime errors in them name the `.lua` file
 and line, also in `--minify` builds (Lua modules are not minified). The unknown-global check does not read `.lua` files,
-but the globals a Lua file defines at its top level (`function CountUp(`, `Count = 0`) count as known in your YueScript.
-The scan recognises top-level `function Name(` definitions and `Name = …` or `A, B = …` statements that start a line (or
-follow `;`), leaving out any name the file declares `local` at its top level (`local Timer` before `Timer = {}`);
-globals assigned inside functions, after a label on the same line, or through `_G` are not seen and belong in
-`lint.globals`. As in standalone Lua, a leading byte order mark and a first line starting with `#` are skipped. The name
-`moonwell` is the built-in module's, so `lua/moonwell.lua` fails the build. The editor resolves `lua/` through
-`.luarc.json`'s `runtime.path`; `deno task setup` adds the entries to a project made by an older Moonwell.
+but the globals a required Lua file defines at its top level (`function CountUp(`, `Count = 0`) count as known in your
+YueScript. The scan recognises top-level `function Name(` definitions and `Name = …` or `A, B = …` statements that start
+a line (or follow `;`), leaving out any name the file declares `local` at its top level (`local Timer` before
+`Timer = {}`); globals assigned inside functions, after a label on the same line, or through `_G` are not seen and
+belong in `lint.globals`. As in standalone Lua, a leading byte order mark and a first line starting with `#` are
+skipped. The name `moonwell` is the built-in module's, so `lua/moonwell.lua` fails the build. The editor resolves `lua/`
+through `.luarc.json`'s `runtime.path`; `deno task setup` adds the entries to a project made by an older Moonwell.
 
 `src/**/*.lua` stays reserved for the `.lua` files the YueScript extension writes on save, so keep your own Lua in
 `lua/`.
+
+## Libraries
+
+A library is a folder of YueScript and Lua modules from a GitHub tag or a local folder. List libraries in
+`moonwell.pkl`:
+
+```pkl
+libraries {
+  ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.1.0"; dir = "src" }
+}
+```
+
+The key names the library's folder in `.moonwell/libraries/`, so keys must differ by more than case. `dir` is the folder
+inside the library that module names start from; leave it out for the library's root. A library's modules keep their own
+names (`import "example.loud"`), and share one set of names with `src/` and `lua/`: a name two of them define fails the
+build.
+
+`check`, `build`, `test`, `dev` and `setup` download a library that is missing or whose `tag` or `dir` changed into
+`.moonwell/libraries/<key>/` (git-ignored), and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`: a
+fresh clone then gets the same code, and if a tag is moved on GitHub, the command fails instead of using the new code.
+To upgrade, change `tag`.
+
+To work on a library next to your map, point it at a local folder in `moonwell.local.pkl`:
+
+```pkl
+libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }
+```
+
+`path` wins over `github`, and `dev` watches that folder. Local libraries are never locked. Library code is not checked
+for unknown globals, but the globals a required library module defines count as known. `check`, `build`, `test` and
+`dev` write every library module to `.moonwell/lua/` as Lua (a YueScript module compiled), where the editor finds it;
+`setup`, which does not compile, writes the Lua modules only.
 
 ## Assets
 

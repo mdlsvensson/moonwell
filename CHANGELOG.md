@@ -8,6 +8,14 @@
   unknown-global check. New projects have a `lua/` folder, and `.luarc.json` resolves it in the editor; `setup` adds the
   entries to older projects' `.luarc.json`. `dev` watches `lua/`. A leading byte order mark and a `#` first line are
   skipped, as standalone Lua does, and `moonwell` is reserved for the built-in module.
+- Libraries: the new `libraries` block in `moonwell.pkl` brings YueScript and Lua modules from a GitHub tag (`github`,
+  `tag`, `dir`) or a local folder (`path`) into `.moonwell/libraries/`, and `moonwell.lock` records each tag's commit; a
+  moved tag fails the command. Library modules keep their own names and share one namespace with `src/` and `lua/`. The
+  editor sees them in `.moonwell/lua/`; `setup` adds it to older projects' `.luarc.json`.
+- Changed: `global` lines and the top-level globals of Lua modules count as known names only for modules the map
+  requires (its entry, or the `--entry` file, and every module reached from it). Files under `src/` that the map does
+  not require are no longer checked for unknown globals. A global declared only in a file nothing imports now fails the
+  check where a required module uses it: import the file, or add the name to `lint.globals`.
 
 ### Release gate (so far)
 

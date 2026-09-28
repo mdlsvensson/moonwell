@@ -4,7 +4,7 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-28 after the 0.4.0 release.
+over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
 
 ## Read first
 
@@ -18,7 +18,7 @@ over, and updated on 2026-09-28 after the 0.4.0 release.
   by Plans 3a, 3b and 3c, released together as 0.4.0. Plans for everything built so far are in
   `docs/superpowers/plans/`; follow their style when writing new plans.
 
-## State (2026-09-27)
+## State (2026-09-28)
 
 - **Released:** 0.1.0, on JSR (`@moonwell/cli@0.1.0`) and as a GitHub release (`moonwell@0.1.0`). It contains the
   toolchain: `init`, `setup`, `build`, `test`, `dev`, `check`; the YueScript bundler with runtime hooks; the MPQ writer;
@@ -102,15 +102,27 @@ over, and updated on 2026-09-28 after the 0.4.0 release.
   or `<name>.init`; Lua modules are bundled unchanged and keep their lines in `--minify` builds (per-entry flag in the
   line table); `luaTopLevelGlobals` (`cli/src/lint/lua-globals.ts`) makes their top-level globals known; `mergeLuarc`
   lets `setup` add `.luarc.json` entries to older projects. Its gate (CONTRIBUTING step 12, the Lua modules part) passed
-  2026-09-28. Plan 4b should start by keying compile outputs by project-relative path: `compileSources` and
-  `moduleLoader`'s `loadCompiled` still assume every YueScript module is under `src/` (final-review note).
+  2026-09-28.
+- **Plan 4b done, unreleased** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-libraries.md`): libraries, from
+  a GitHub tag or a local `path`, in the manifest's `libraries` block (spec §4). `cli/src/libraries/` reads the tag
+  archive (`archive.ts`, `download.ts`), writes `moonwell.lock` (`lock.ts`) and syncs `.moonwell/libraries/<key>/`
+  (`sync.ts`) at the start of every compile (`compileProject`) and in `setup`; a moved tag fails. Sync refuses keys that
+  differ only by case, a `github` repository of `.`/`..`, a tag with `.`/`..` segments and a local library whose folder
+  contains the project's `.moonwell/libraries`. Library modules join the one namespace (`libraryModuleRoots`). Compile
+  outputs are keyed by project path (`outputPathOf` in `cli/src/yue/compile.ts`: libraries under
+  `dist/stage/lua/.libraries/<key>/`). `cli/src/editor/library-view.ts` writes `.moonwell/lua/` (`setup`: the Lua
+  modules only). Known names come from the resolved graph, and only the `src/` modules the map requires are checked.
+  `isWithin` is shared in `cli/src/shared/fs.ts`. The example library is `mdlsvensson/moonwell-example-lib` `v0.1.0`
+  (commit `13e35535c481fddd267533cc513f86b55b313b66`), which `deno task test:network` downloads. The gate (CONTRIBUTING
+  step 12, the libraries part) has not run yet.
 - **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `8c20362` (Plan 4a).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Plan 4b** (libraries, spec §4): write it from the spec, then run CONTRIBUTING step 12 in full and release 0.5.0.
+1. **Release 0.5.0** (Plans 4a and 4b): run CONTRIBUTING step 12 in full, then the whole release gate, then release
+   0.5.0.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

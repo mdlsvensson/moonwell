@@ -158,6 +158,18 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
     game (`deno task test`) both print. Then add `error "lua gate"` inside the module's function, run
     `deno task test --minify`, and confirm the game's error names `lua/greeter.lua` and the right line (Lua modules keep
     their lines in minified builds). Remove the error afterwards.
+
+    Then add the example library by tag in `moonwell.pkl`
+    (`libraries { ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.1.0"; dir = "src" } }`), use it
+    from `src/main.yue` (`import "example.loud"`, `print loud.shout "Moonwell"`), run `deno task check` and commit
+    `moonwell.lock`. Confirm the editor completes `loud.shout`, and the game prints the shout. Check with the Lua
+    extension's bundled lua-language-server, in the editor or from the command line
+    (`<extensions>/sumneko.lua-<version>/server/bin/lua-language-server --check=<project> --checklevel=Hint`), that the
+    library's modules give no duplicate-definition diagnostics between `.moonwell/libraries/` and `.moonwell/lua/`.
+    Delete `.moonwell/`, run `deno task check` again, and confirm `moonwell.lock` is unchanged. Finally clone the
+    library next to the project, point `moonwell.local.pkl` at it
+    (`libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }`), change `hello` there, and confirm
+    `deno task test` runs the change.
 13. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
