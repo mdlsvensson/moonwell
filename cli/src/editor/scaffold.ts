@@ -2,6 +2,7 @@ import { decodeBase64 } from "@std/encoding/base64";
 import { exists } from "@std/fs";
 import { dirname, join } from "@std/path";
 import { TEMPLATE_FILES } from "../embedded/template.ts";
+import { MoonwellError } from "../shared/errors.ts";
 
 /** Committed files VS Code's YueScript extension and lua-language-server read (spec §4.1). */
 export const EDITOR_FILES: readonly string[] = ["yueconfig.yue", ".luarc.json", ".vscode/extensions.json"];
@@ -45,7 +46,8 @@ const LUARC_ARRAYS = ["runtime.path", "workspace.library"] as const;
 /**
  * Adds the template's `runtime.path` and `workspace.library` entries that the project's .luarc.json lacks, keeping every
  * other key and value, and rewrites it as formatted JSON when it adds any (spec §3.5). Returns the entries it added, or
- * `undefined` when the file is not a JSON object (it is then left alone). A missing file adds nothing.
+ * `undefined` when the file is not a JSON object (it is then left alone). A missing file adds nothing; a leading byte
+ * order mark is ignored. A file that cannot be read or written fails with a `MoonwellError`.
  */
 export async function mergeLuarc(
   root: string,
@@ -56,11 +58,18 @@ export async function mergeLuarc(
   const file = files.find((entry) => entry.path === ".luarc.json");
   if (!file) throw new Error("The embedded template has no .luarc.json.");
   const template = JSON.parse(new TextDecoder().decode(decodeBase64(file.base64))) as Record<string, string[]>;
+  let text: string;
+  try {
+    text = await Deno.readTextFile(path);
+  } catch (cause) {
+    throw luarcError("Reading", cause);
+  }
   let config: unknown;
   try {
-    config = JSON.parse(await Deno.readTextFile(path));
-  } catch {
-    return undefined;
+    config = JSON.parse(text.startsWith("\uFEFF") ? text.slice(1) : text);
+  } catch (error) {
+    if (error instanceof SyntaxError) return undefined;
+    throw error;
   }
   if (config === null || typeof config !== "object" || Array.isArray(config)) return undefined;
   const settings = config as Record<string, unknown>;
@@ -78,6 +87,22 @@ export async function mergeLuarc(
       }
     }
   }
-  if (added.length > 0) await Deno.writeTextFile(path, `${JSON.stringify(settings, null, 2)}\n`);
+  if (added.length > 0) {
+    try {
+      await Deno.writeTextFile(path, `${JSON.stringify(settings, null, 2)}\n`);
+    } catch (cause) {
+      throw luarcError("Writing", cause);
+    }
+  }
   return added;
+}
+
+function luarcError(action: "Reading" | "Writing", cause: unknown): MoonwellError {
+  const reason = cause instanceof Error ? cause.message : String(cause);
+  return new MoonwellError(`${action} .luarc.json failed: ${reason}`, {
+    file: ".luarc.json",
+    cause,
+    hint: "Close any program that has .luarc.json open and check that it is a file you can read and write, then run " +
+      "setup again.",
+  });
 }

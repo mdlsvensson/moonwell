@@ -6,6 +6,7 @@ import { createLogger } from "../../src/shared/log.ts";
 import { runProcess } from "../../src/shared/process.ts";
 import {
   listFiles,
+  readSourceText,
   removeFileIfExists,
   removeIfExists,
   replaceDir,
@@ -80,6 +81,41 @@ Deno.test("writeTextIfChanged only writes differing content", async () => {
   assertEquals(await writeTextIfChanged(file, "a"), false);
   assertEquals(await writeTextIfChanged(file, "b"), true);
   assertEquals(await Deno.readTextFile(file), "b");
+});
+
+Deno.test("readSourceText strips a leading BOM and blanks a first line starting with #, as Lua's loadfile does", async () => {
+  const dir = await Deno.makeTempDir();
+  try {
+    const file = join(dir, "x.lua");
+    await Deno.writeTextFile(file, "\uFEFFCount = 0\n");
+    assertEquals(await readSourceText(file, "lua/x.lua"), "Count = 0\n");
+    await Deno.writeTextFile(file, "\uFEFF#!/usr/bin/lua\r\nCount = 0\n# not the first line\n");
+    const text = await readSourceText(file, "lua/x.lua");
+    assertEquals(text, "\r\nCount = 0\n# not the first line\n");
+    assertEquals(text.split("\n").length, 4, "line numbers stay");
+    await Deno.writeTextFile(file, "#only line");
+    assertEquals(await readSourceText(file, "lua/x.lua"), "");
+    await Deno.writeTextFile(file, "Count = 0 -- \uFEFF kept\n");
+    assertEquals(await readSourceText(file, "lua/x.lua"), "Count = 0 -- \uFEFF kept\n");
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
+
+Deno.test("readSourceText reports a file it cannot read as a MoonwellError naming the label", async () => {
+  const dir = await Deno.makeTempDir();
+  try {
+    await Deno.mkdir(join(dir, "x.lua"));
+    const error = await assertRejects(() => readSourceText(join(dir, "x.lua"), "lua/x.lua"), MoonwellError);
+    assertStringIncludes(error.message, "Reading lua/x.lua failed");
+    assertEquals(error.file, "lua/x.lua");
+    assert(error.cause !== undefined);
+    assertStringIncludes(error.hint ?? "", "readable");
+    const missing = await assertRejects(() => readSourceText(join(dir, "gone.lua"), "lua/gone.lua"), MoonwellError);
+    assertEquals(missing.file, "lua/gone.lua");
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
 });
 
 Deno.test("removeIfExists ignores missing paths", async () => {

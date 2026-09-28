@@ -26,7 +26,7 @@ Commands:
   init <dir> [--link]            Create a project (--link: use this local Moonwell checkout)
   setup                          Install the pinned YueScript compiler
   build [--entry f] [--minify]   Build <build.folder>/<map.folder>
-  test [--entry f]               Stage the map and launch Warcraft III
+  test [--entry f] [--minify]    Stage the map and launch Warcraft III
   dev                            Watch sources and report errors on save
   check                          Compile and validate without building a map
   assets:check                   Show what assets:sync would change in the source map

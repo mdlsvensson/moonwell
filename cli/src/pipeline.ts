@@ -3,7 +3,7 @@ import { join, relative } from "@std/path";
 import { applyAssetPlan, assetLocations, planAssets } from "./assets/plan.ts";
 import { emitBundle, injectBundle } from "./bundle/emit.ts";
 import { resolveGraph } from "./bundle/graph.ts";
-import { collectModules, moduleLoader } from "./bundle/modules.ts";
+import { BUILTIN_MODULES, collectModules, moduleLoader } from "./bundle/modules.ts";
 import type { CommandContext } from "./context.ts";
 import { refreshEditorFiles } from "./editor/refresh.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
@@ -24,9 +24,6 @@ export interface StageOptions {
   /** Overrides build.minify when set. */
   minify?: boolean;
 }
-
-/** Modules provided by the runtime rather than by src/. */
-export const BUILTIN_MODULES: ReadonlySet<string> = new Set(["moonwell"]);
 
 export function entryModuleName(entryPath: string): string {
   const posix = entryPath.replaceAll("\\", "/").replace(/^\.\//, "");

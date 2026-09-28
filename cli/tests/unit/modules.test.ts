@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { dirname, join } from "@std/path";
 import { collectModules, moduleLoader } from "../../src/bundle/modules.ts";
+import { luaTopLevelGlobals } from "../../src/lint/lua-globals.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 
 async function project(files: Record<string, string>): Promise<string> {
@@ -28,6 +29,39 @@ Deno.test("collectModules lists YueScript in src/ and Lua in lua/, named by path
       { name: "counter", path: "lua/counter.lua", kind: "lua", source: "Count = 0\n" },
       { name: "tools.init", path: "lua/tools/init.lua", kind: "lua", source: "return {}\n" },
     ]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("collectModules reads a Lua file saved with a BOM without it, so the scan sees its first line", async () => {
+  const root = await project({ "src/main.yue": "x = 1\n", "lua/x.lua": "\uFEFFCounter = 0\n" });
+  try {
+    const [, lua] = await collectModules(root);
+    assertEquals(lua.source, "Counter = 0\n");
+    assertEquals(luaTopLevelGlobals(lua.source ?? ""), ["Counter"]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("collectModules refuses a module that is or claims a built-in module's name", async () => {
+  for (const path of ["lua/moonwell.lua", "lua/moonwell/init.lua", "src/moonwell.yue"]) {
+    const root = await project({ "src/main.yue": "x = 1\n", [path]: "" });
+    try {
+      const error = await assertRejects(
+        () => collectModules(root),
+        MoonwellError,
+        `Module moonwell is built into Moonwell; rename ${path}.`,
+      );
+      assertEquals(error.file, path);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+  const root = await project({ "src/main.yue": "x = 1\n", "lua/moonwell/extra.lua": "" });
+  try {
+    assertEquals((await collectModules(root)).map((module) => module.name), ["main", "moonwell.extra"]);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

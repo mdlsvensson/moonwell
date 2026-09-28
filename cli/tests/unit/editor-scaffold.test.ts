@@ -1,9 +1,10 @@
-import { assert, assertEquals } from "@std/assert";
+import { assert, assertEquals, assertRejects } from "@std/assert";
 import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
 import { join } from "@std/path";
 import { addEditorFiles, EDITOR_FILES, mergeLuarc } from "../../src/editor/scaffold.ts";
 import { TEMPLATE_FILES } from "../../src/embedded/template.ts";
 import { loadNatives } from "../../src/natives/natives.ts";
+import { MoonwellError } from "../../src/shared/errors.ts";
 
 const b64 = (text: string) => encodeBase64(new TextEncoder().encode(text));
 const FILES = [
@@ -82,6 +83,63 @@ Deno.test("mergeLuarc leaves a .luarc.json that is not a JSON object alone", asy
     assertEquals(await Deno.readTextFile(join(root, ".luarc.json")), text);
     await Deno.remove(join(root, ".luarc.json"));
     assertEquals(await mergeLuarc(root), [], "no file: nothing to merge");
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+async function luarcProject(text: string): Promise<string> {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-luarc-" });
+  await Deno.writeTextFile(join(root, ".luarc.json"), text);
+  return root;
+}
+
+const TEMPLATE_LUARC = JSON.parse(
+  new TextDecoder().decode(decodeBase64(TEMPLATE_FILES.find((file) => file.path === ".luarc.json")!.base64)),
+);
+
+Deno.test("mergeLuarc gives a missing key the template's whole array and leaves a non-array value alone", async () => {
+  const root = await luarcProject(JSON.stringify({ "workspace.library": "not an array" }));
+  try {
+    assertEquals(await mergeLuarc(root), TEMPLATE_LUARC["runtime.path"]);
+    const config = JSON.parse(await Deno.readTextFile(join(root, ".luarc.json")));
+    assertEquals(config["runtime.path"], TEMPLATE_LUARC["runtime.path"]);
+    assertEquals(config["workspace.library"], "not an array");
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("mergeLuarc leaves JSON that is not an object alone", async () => {
+  for (const text of ["[]", "null", "3"]) {
+    const root = await luarcProject(text);
+    try {
+      assertEquals(await mergeLuarc(root), undefined, text);
+      assertEquals(await Deno.readTextFile(join(root, ".luarc.json")), text);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});
+
+Deno.test("mergeLuarc merges a .luarc.json saved with a BOM", async () => {
+  const root = await luarcProject(`\uFEFF${JSON.stringify({ "runtime.path": TEMPLATE_LUARC["runtime.path"] })}`);
+  try {
+    assertEquals(await mergeLuarc(root), TEMPLATE_LUARC["workspace.library"]);
+    const config = JSON.parse(await Deno.readTextFile(join(root, ".luarc.json")));
+    assertEquals(config["workspace.library"], TEMPLATE_LUARC["workspace.library"]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("mergeLuarc reports a .luarc.json it cannot read as a MoonwellError", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-luarc-" });
+  try {
+    await Deno.mkdir(join(root, ".luarc.json"));
+    const error = await assertRejects(() => mergeLuarc(root), MoonwellError, ".luarc.json");
+    assertEquals(error.file, ".luarc.json");
+    assert((error.hint ?? "") !== "");
   } finally {
     await Deno.remove(root, { recursive: true });
   }

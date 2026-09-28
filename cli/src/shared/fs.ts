@@ -57,6 +57,28 @@ export async function writeTextIfChanged(path: string, text: string): Promise<bo
   return true;
 }
 
+/**
+ * Reads a source file as standalone Lua's loadfile sees it: without a leading byte order mark, and with a first line
+ * that starts with `#` (a shebang) blanked, keeping its line break so line numbers stay. `label` is the file's POSIX
+ * path relative to the project, for error messages.
+ */
+export async function readSourceText(path: string, label: string): Promise<string> {
+  let text: string;
+  try {
+    text = await Deno.readTextFile(path);
+  } catch (cause) {
+    const reason = cause instanceof Error ? cause.message : String(cause);
+    throw new MoonwellError(`Reading ${label} failed: ${reason}`, {
+      file: label,
+      cause,
+      hint: "Close any program that has the file open and check that it is a readable file, then try again.",
+    });
+  }
+  if (text.startsWith("\uFEFF")) text = text.slice(1);
+  if (text.startsWith("#")) text = text.replace(/^[^\r\n]*/, "");
+  return text;
+}
+
 export async function sha256Hex(bytes: Uint8Array): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", bytes.slice());
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");

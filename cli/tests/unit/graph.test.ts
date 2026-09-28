@@ -30,6 +30,17 @@ Deno.test("resolveGraph reports a missing module where it is required", () => {
   assertEquals(error.line, 3);
 });
 
+Deno.test("resolveGraph's missing-module hint names every file form it looks for", () => {
+  const error = assertThrows(
+    () => resolveGraph("main", modules({ main: 'require("game.units")' }), BUILTINS),
+    MoonwellError,
+  );
+  assertEquals(
+    error.hint,
+    "Expected src/game/units.yue, lua/game/units.lua or lua/game/units/init.lua. Built-in modules: moonwell.",
+  );
+});
+
 Deno.test("resolveGraph reports a missing entry", () => {
   assertThrows(() => resolveGraph("main", modules({}), BUILTINS), MoonwellError, "Module 'main' not found");
 });

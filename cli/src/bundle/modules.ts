@@ -1,10 +1,13 @@
 import { exists } from "@std/fs";
 import { join } from "@std/path";
 import { MoonwellError } from "../shared/errors.ts";
-import { listFiles } from "../shared/fs.ts";
+import { listFiles, readSourceText } from "../shared/fs.ts";
 import type { CompiledModule } from "../yue/compile.ts";
 
 export type ModuleKind = "yue" | "lua";
+
+/** Modules provided by the runtime rather than by src/ or lua/; no project module may take their names. */
+export const BUILTIN_MODULES: ReadonlySet<string> = new Set(["moonwell"]);
 
 /** A gameplay module on disk (spec §5.1). */
 export interface SourceModule {
@@ -33,8 +36,9 @@ export const PROJECT_MODULE_ROOTS: readonly ModuleRoot[] = [
 ];
 
 /**
- * Lists every module under `roots`, in root order and then by path. Fails on a dotted file or folder name (spec §3.1)
- * and on two files with one name (spec §3.2).
+ * Lists every module under `roots`, in root order and then by path. Fails on a dotted file or folder name (spec §3.1),
+ * on two files with one name (spec §3.2) and on a file that takes a built-in module's name. Lua sources are read as
+ * Lua's loadfile reads them (`readSourceText`).
  */
 export async function collectModules(
   root: string,
@@ -59,8 +63,13 @@ export async function collectModules(
         });
       }
       const module: SourceModule = { name: stem.split("/").join("."), path, kind: moduleRoot.kind };
-      if (module.kind === "lua") module.source = await Deno.readTextFile(join(dir, ...file.split("/")));
       for (const name of claimedNames(module.name)) {
+        if (BUILTIN_MODULES.has(name)) {
+          throw new MoonwellError(`Module ${name} is built into Moonwell; rename ${path}.`, {
+            file: path,
+            hint: "`require` of a built-in name always loads the built-in module, never a project file.",
+          });
+        }
         const clash = byName.get(name);
         if (clash !== undefined) {
           throw new MoonwellError(`Module ${name} is defined by ${clash.path} and ${path}.`, {
@@ -70,6 +79,7 @@ export async function collectModules(
         }
         byName.set(name, module);
       }
+      if (module.kind === "lua") module.source = await readSourceText(join(dir, ...file.split("/")), path);
       modules.push(module);
     }
   }

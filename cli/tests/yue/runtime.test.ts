@@ -1,6 +1,7 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
 import { join } from "@std/path";
 import { emitBundle, injectBundle } from "../../src/bundle/emit.ts";
+import { collectModules } from "../../src/bundle/modules.ts";
 import { RUNTIME_LUA } from "../../src/embedded/runtime.ts";
 import { runProcess } from "../../src/shared/process.ts";
 import { testYue } from "../support/yue.ts";
@@ -85,6 +86,28 @@ Deno.test("a Lua module keeps its line numbers in a minified bundle", async () =
     },
   ], true);
   assertStringIncludes(printed, "lua/lib.lua:3: lua failed");
+});
+
+Deno.test("a Lua file saved with a BOM and a # first line loads in the bundle and keeps its line numbers", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-runtime-bom-" });
+  try {
+    await Deno.mkdir(join(root, "src"));
+    await Deno.mkdir(join(root, "lua"));
+    await Deno.writeTextFile(join(root, "src", "main.yue"), "");
+    await Deno.writeTextFile(
+      join(root, "lua", "lib.lua"),
+      '\uFEFF#!/usr/bin/lua\nGreeting = "hi"\nlocal M = {}\nfunction M.fail()\n  error("lua failed")\nend\nreturn M\n',
+    );
+    const lib = (await collectModules(root)).find((module) => module.name === "lib");
+    const { log, printed } = await runMap([
+      { name: "main", source: 'local lib = require("lib")\nlog(Greeting)\nlib.fail()' },
+      { name: "lib", source: lib?.source ?? "", sourcePath: "lua/lib.lua", kind: "lua" },
+    ]);
+    assertEquals(log, "hi|config|main");
+    assertStringIncludes(printed, "lua/lib.lua:5: lua failed");
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 Deno.test("format_error leaves positions outside modules untouched", async () => {

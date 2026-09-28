@@ -24,6 +24,7 @@ Deno.test("--help and no command print usage", async () => {
     assertStringIncludes(output, "settings:check");
     assertStringIncludes(output, "objects:eval");
     assertStringIncludes(output, "objects:check");
+    assertStringIncludes(output, "test [--entry f] [--minify]");
   }
 });
 

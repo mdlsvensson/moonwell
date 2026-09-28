@@ -27,6 +27,26 @@ Deno.test("luaTopLevelGlobals finds top-level global functions and assignments o
   assertEquals(luaTopLevelGlobals(source), ["OnInit", "Timer", "A", "B", "x", "Y", "Last"]);
 });
 
+Deno.test("luaTopLevelGlobals leaves out names declared local at the top level", () => {
+  const source = [
+    "local Timer",
+    "Timer = {}",
+    "local Name",
+    "function Name() end",
+    "local A, B = 1, 2",
+    "A, B, C = 3, 4, 5",
+    "local function helper() end",
+    "helper = nil",
+    "function f()",
+    "  local Inner",
+    "end",
+    "Inner = 1",
+    "local t = { local_like = 1 }",
+    "Global = 1",
+  ].join("\n");
+  assertEquals(luaTopLevelGlobals(source), ["C", "f", "Inner", "Global"]);
+});
+
 Deno.test("luaTopLevelGlobals finds nothing in a module that returns a table", () => {
   assertEquals(luaTopLevelGlobals("local M = {}\nfunction M.greet() end\nreturn M\n"), []);
 });

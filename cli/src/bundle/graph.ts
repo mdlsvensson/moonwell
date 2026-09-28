@@ -28,7 +28,9 @@ export function resolveGraph(
       throw new MoonwellError(`Module '${name}' not found.`, {
         file: from?.module.sourcePath,
         line: from?.line,
-        hint: `Expected src/${path}.yue or lua/${path}.lua. Built-in modules: ${[...builtins].join(", ")}.`,
+        hint: `Expected src/${path}.yue, lua/${path}.lua or lua/${path}/init.lua. Built-in modules: ${
+          [...builtins].join(", ")
+        }.`,
       });
     }
     state.set(name, "visiting");
