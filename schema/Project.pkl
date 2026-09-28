@@ -87,8 +87,10 @@ class AssetsConfig {
 class LintConfig {
   /// What `check`, `build`, `test` and `dev` do with a global that nothing defines. Known globals are the game's
   /// natives, Blizzard.j functions and globals, the Lua libraries the game provides, the globals and functions of the
-  /// source map's `war3map.lua`, names declared with `global` in any file under `src/`, and `globals` below.
-  /// `"error"` fails the command; `"warning"` reports each one and continues.
+  /// source map's `war3map.lua`, names declared with `global` and the top-level globals of Lua modules in the modules
+  /// the map requires (its entry and every module reached through `import` or `require`), and `globals` below. Only
+  /// the `src/` modules the map requires are checked. `"error"` fails the command; `"warning"` reports each one and
+  /// continues.
   unknownGlobals: "error"|"warning" = "error"
 
   /// Extra global names to allow, such as those a `global *` or `global ^` file creates: Moonwell does not detect
