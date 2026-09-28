@@ -11,7 +11,8 @@
 - Libraries: the new `libraries` block in `moonwell.pkl` brings YueScript and Lua modules from a GitHub tag (`github`,
   `tag`, `dir`) or a local folder (`path`) into `.moonwell/libraries/`, and `moonwell.lock` records each tag's commit; a
   moved tag fails the command. Library modules keep their own names and share one namespace with `src/` and `lua/`. The
-  editor sees them in `.moonwell/lua/`; `setup` adds it to older projects' `.luarc.json`.
+  editor sees them in `.moonwell/lua/`, and `.luarc.json` leaves the copies in `.moonwell/libraries/` out of the
+  workspace; `setup` adds both entries to older projects' `.luarc.json`.
 - Changed: `global` lines and the top-level globals of Lua modules count as known names only for modules the map
   requires (its entry, or the `--entry` file, and every module reached from it). Files under `src/` that the map does
   not require are no longer checked for unknown globals. A global declared only in a file nothing imports is now

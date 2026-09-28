@@ -41,11 +41,11 @@ export async function addEditorFiles(
 }
 
 /** The .luarc.json arrays setup keeps up to date in projects made by an older Moonwell (spec §3.5). */
-const LUARC_ARRAYS = ["runtime.path", "workspace.library"] as const;
+const LUARC_ARRAYS = ["runtime.path", "workspace.library", "workspace.ignoreDir"] as const;
 
 type LuarcArray = typeof LUARC_ARRAYS[number];
 
-/** The template's `runtime.path` and `workspace.library` entries, from the embedded `.luarc.json`. */
+/** The template's `runtime.path`, `workspace.library` and `workspace.ignoreDir` entries, from the embedded `.luarc.json`. */
 export function luarcTemplateEntries(
   files: ReadonlyArray<{ path: string; base64: string }> = TEMPLATE_FILES,
 ): Record<LuarcArray, string[]> {
@@ -60,8 +60,8 @@ export function luarcTemplateEntries(
 }
 
 /**
- * Adds the template's `runtime.path` and `workspace.library` entries that the project's .luarc.json lacks, keeping every
- * other key and value, and rewrites it as formatted JSON when it adds any (spec §3.5). Returns the entries it added, or
+ * Adds the template's `runtime.path`, `workspace.library` and `workspace.ignoreDir` entries that the project's
+ * .luarc.json lacks, keeping every other key and value, and rewrites it as formatted JSON when it adds any (spec §3.5). Returns the entries it added, or
  * `undefined` when the file is not a JSON object (it is then left alone). A missing file adds nothing; a leading byte
  * order mark is ignored. A file that cannot be read or written fails with a `MoonwellError`.
  */

@@ -23,6 +23,8 @@ Deno.test("the template's .luarc.json indexes the compiled .lua files and sugges
   const file = TEMPLATE_FILES.find((entry) => entry.path === ".luarc.json");
   const config = JSON.parse(new TextDecoder().decode(decodeBase64(file!.base64)));
   assertEquals(config["workspace.useGitIgnore"], false);
+  // The library view in .moonwell/lua is what the editor should see; the copies it is made from are not workspace files.
+  assert(config["workspace.ignoreDir"].includes(".moonwell/libraries"));
   // The YueScript extension asks for completion at a placeholder word, so the typed prefix never narrows the list:
   // LuaLS must be allowed to suggest every native and game global at once.
   const natives = await loadNatives();
@@ -52,7 +54,7 @@ Deno.test("addEditorFiles creates .gitignore when there is none", async () => {
   assertEquals(await Deno.readTextFile(join(root, ".gitignore")), ".moonwell/\nsrc/**/*.lua\n");
 });
 
-Deno.test("mergeLuarc adds the template's missing runtime.path and workspace.library entries, keeping the rest", async () => {
+Deno.test("mergeLuarc adds the template's missing runtime.path, workspace.library and ignoreDir entries", async () => {
   const root = await Deno.makeTempDir({ prefix: "moonwell-luarc-" });
   try {
     await Deno.writeTextFile(
@@ -60,13 +62,21 @@ Deno.test("mergeLuarc adds the template's missing runtime.path and workspace.lib
       JSON.stringify({
         "runtime.path": ["src/?.lua"],
         "workspace.library": [".moonwell/types", "extra"],
+        "workspace.ignoreDir": ["dist", "maps"],
         "diagnostics.globals": ["X"],
       }),
     );
-    assertEquals(await mergeLuarc(root), ["src/?/init.lua", "lua/?.lua", "lua/?/init.lua", ".moonwell/lua"]);
+    assertEquals(await mergeLuarc(root), [
+      "src/?/init.lua",
+      "lua/?.lua",
+      "lua/?/init.lua",
+      ".moonwell/lua",
+      ".moonwell/libraries",
+    ]);
     const config = JSON.parse(await Deno.readTextFile(join(root, ".luarc.json")));
     assertEquals(config["runtime.path"], ["src/?.lua", "src/?/init.lua", "lua/?.lua", "lua/?/init.lua"]);
     assertEquals(config["workspace.library"], [".moonwell/types", "extra", ".moonwell/lua"]);
+    assertEquals(config["workspace.ignoreDir"], ["dist", "maps", ".moonwell/libraries"]);
     assertEquals(config["diagnostics.globals"], ["X"]);
     assertEquals(await mergeLuarc(root), []);
   } finally {
@@ -74,10 +84,11 @@ Deno.test("mergeLuarc adds the template's missing runtime.path and workspace.lib
   }
 });
 
-Deno.test("luarcTemplateEntries lists the template's runtime.path and workspace.library", () => {
+Deno.test("luarcTemplateEntries lists the template's runtime.path, workspace.library and ignoreDir", () => {
   assertEquals(luarcTemplateEntries(), {
     "runtime.path": ["src/?.lua", "src/?/init.lua", "lua/?.lua", "lua/?/init.lua"],
     "workspace.library": [".moonwell/types", ".moonwell/lua"],
+    "workspace.ignoreDir": ["dist", "maps", ".moonwell/libraries"],
   });
 });
 
@@ -108,7 +119,10 @@ const TEMPLATE_LUARC = JSON.parse(
 Deno.test("mergeLuarc gives a missing key the template's whole array and leaves a non-array value alone", async () => {
   const root = await luarcProject(JSON.stringify({ "workspace.library": "not an array" }));
   try {
-    assertEquals(await mergeLuarc(root), TEMPLATE_LUARC["runtime.path"]);
+    assertEquals(await mergeLuarc(root), [
+      ...TEMPLATE_LUARC["runtime.path"],
+      ...TEMPLATE_LUARC["workspace.ignoreDir"],
+    ]);
     const config = JSON.parse(await Deno.readTextFile(join(root, ".luarc.json")));
     assertEquals(config["runtime.path"], TEMPLATE_LUARC["runtime.path"]);
     assertEquals(config["workspace.library"], "not an array");
@@ -132,7 +146,10 @@ Deno.test("mergeLuarc leaves JSON that is not an object alone", async () => {
 Deno.test("mergeLuarc merges a .luarc.json saved with a BOM", async () => {
   const root = await luarcProject(`\uFEFF${JSON.stringify({ "runtime.path": TEMPLATE_LUARC["runtime.path"] })}`);
   try {
-    assertEquals(await mergeLuarc(root), TEMPLATE_LUARC["workspace.library"]);
+    assertEquals(await mergeLuarc(root), [
+      ...TEMPLATE_LUARC["workspace.library"],
+      ...TEMPLATE_LUARC["workspace.ignoreDir"],
+    ]);
     const config = JSON.parse(await Deno.readTextFile(join(root, ".luarc.json")));
     assertEquals(config["workspace.library"], TEMPLATE_LUARC["workspace.library"]);
   } finally {

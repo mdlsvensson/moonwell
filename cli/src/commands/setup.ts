@@ -38,9 +38,10 @@ export async function setup(ctx: CommandContext): Promise<string> {
     const entries = luarcTemplateEntries();
     const paths = entries["runtime.path"].join(", ");
     const libraries = entries["workspace.library"].join(", ");
+    const ignored = entries["workspace.ignoreDir"].join(", ");
     ctx.logger.warn(
       ".luarc.json is not plain JSON, so setup left it alone. Make sure its runtime.path has " +
-        `${paths} and its workspace.library has ${libraries}.`,
+        `${paths}, its workspace.library has ${libraries} and its workspace.ignoreDir has ${ignored}.`,
     );
   } else if (merged.length > 0) {
     ctx.logger.info(`Added ${merged.join(", ")} to .luarc.json.`);

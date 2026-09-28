@@ -89,10 +89,10 @@ README says.
 The template's `.luarc.json` gains `lua/?.lua` and `lua/?/init.lua` in `runtime.path`, so lua-language-server resolves
 `import "utils.timer"` to the workspace file and completes its fields and globals (**To verify**, V1).
 
-`setup` adds missing entries to an existing project's `.luarc.json` arrays (`runtime.path`, `workspace.library`),
-keeping every other key and value. **Decision:** this is the only file `setup` edits rather than creates, because
-projects from 0.4 would otherwise not resolve `lua/`; it only inserts missing array entries and rewrites the file as
-formatted JSON.
+`setup` adds missing entries to an existing project's `.luarc.json` arrays (`runtime.path`, `workspace.library`, and
+`workspace.ignoreDir` since §5.4's amendment), keeping every other key and value. **Decision:** this is the only file
+`setup` edits rather than creates, because projects from 0.4 would otherwise not resolve `lua/`; it only inserts missing
+array entries and rewrites the file as formatted JSON.
 
 `init` creates `lua/` with a `.gitkeep`, so the folder is visible in a new project.
 
@@ -213,9 +213,11 @@ every reachable `.lua` module, the project's and the libraries'.
 lua-language-server reads Lua, and each library sits under its own key. After compiling, Moonwell writes
 `.moonwell/lua/` (git-ignored, under `.moonwell/`): every library module as `<module path>.lua`, a Lua module copied
 and a YueScript module as its compiled Lua. `.luarc.json`'s `workspace.library` gains `.moonwell/lua`, so
-`import "core.scheduler"` completes (**To verify**, V2). Files are written only when their content differs; files of
-modules that disappeared are removed. `setup`, which does not compile, writes the Lua modules only, and keeps the
-files of YueScript modules as the last compile wrote them (amended 2026-09-28 during Plan 4b).
+`import "core.scheduler"` completes (**To verify**, V2). `workspace.ignoreDir` gains `.moonwell/libraries`: without
+it, lua-language-server diagnoses the library copies as workspace files (amended 2026-09-28 during Plan 4b). Files
+are written only when their content differs; files of modules that disappeared are removed. `setup`, which does not
+compile, writes the Lua modules only, and keeps the files of YueScript modules as the last compile wrote them (amended
+2026-09-28 during Plan 4b).
 
 ### 5.5 `dev`
 

@@ -3,7 +3,7 @@
   "runtime.path": ["src/?.lua", "src/?/init.lua", "lua/?.lua", "lua/?/init.lua"],
   "runtime.builtin": { "io": "disable", "debug": "disable", "package": "disable" },
   "workspace.library": [".moonwell/types", ".moonwell/lua"],
-  "workspace.ignoreDir": ["dist", "maps"],
+  "workspace.ignoreDir": ["dist", "maps", ".moonwell/libraries"],
   "workspace.useGitIgnore": false,
   "workspace.checkThirdParty": false,
   "completion.maxSuggestCount": 10000
