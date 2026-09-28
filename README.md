@@ -2,8 +2,11 @@
   <img src="mw.gif" alt="Moonwell" width="256" />
 </p>
 <p align="center">
-  <i>Multilingual modding framework for Warcraft III: Reforged</i>
+  <i>Multilingual modding framework for Warcraft III: Reforged</i></ br>
+  <a href="https://www.hiveworkshop.com/">Hive Workshop</a>
 </p>
+
+
 
 - Write gameplay in any language that transpiles to lua. TypeScript, YueScript, Fennel, C#. And use pkl for data and
   configuration.
