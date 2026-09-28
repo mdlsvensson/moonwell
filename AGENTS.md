@@ -217,6 +217,9 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   "No Node.js" rule shapes the design.
 - **C# support.** Gameplay in C#, compiled to Lua (for example with CSharp.lua). Added 2026-09-28; it builds on
   sub-project 4a's Lua modules.
+- **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
+  sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
+  declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
 - **Broad wrapper library.** Deferred on 2026-09-28: extend 4c's focused foundation to cover most Warcraft handle types.
   Design the additional coverage separately after the foundation; broad coverage is outside 4c's first release.
 - **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
