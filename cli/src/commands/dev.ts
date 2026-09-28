@@ -17,6 +17,11 @@ export function isRelevantChange(root: string, path: string): boolean {
   return /^moonwell(\.local)?\.pkl$/.test(rel) || rel === "PklProject" || rel === "PklProject.deps.json";
 }
 
+/** Changes in a local library's `folder` that sync copies: anything outside dot-folders such as `.git/`. */
+export function isLibraryChange(folder: string, path: string): boolean {
+  return !toPosix(relative(folder, path)).split("/").some((segment) => segment.startsWith("."));
+}
+
 /** The folders local libraries are copied from (`path` and `dir`, resolved against the project), in key order. */
 export function localLibraryFolders(root: string, project: Project): string[] {
   return localLibraries(root, project).map(({ folder }) => folder);
@@ -72,12 +77,16 @@ export async function dev(
     watchers.push({ watcher: Deno.watchFs(join(ctx.root, folder), { recursive: true }), relevant: projectChange });
     watched.push(`${folder}/`);
   }
-  // A local library's files are copied into .moonwell/libraries/ by each cycle, so any change in its folder counts.
-  // A folder that holds this project's .moonwell/ is skipped: sync refuses it, and watching it would loop.
+  // A local library's modules are copied into .moonwell/libraries/ by each cycle, so a change in its folder counts,
+  // except under dot-folders such as .git/, which sync skips. A folder that holds this project's .moonwell/ is skipped:
+  // sync refuses it, and watching it would loop.
   for (const { folder, label } of libraries) {
     if (isWithin(join(ctx.root, ".moonwell"), folder)) continue;
     if (!(await exists(folder, { isDirectory: true }))) continue;
-    watchers.push({ watcher: Deno.watchFs(folder, { recursive: true }), relevant: () => true });
+    watchers.push({
+      watcher: Deno.watchFs(folder, { recursive: true }),
+      relevant: (path) => isLibraryChange(folder, path),
+    });
     watched.push(label);
   }
   const closeWatchers = () => {

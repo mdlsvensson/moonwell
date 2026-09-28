@@ -135,6 +135,9 @@ during Plan 4b):
   it holds; a library whose stamp equals its lock entry is not downloaded again.
 - **Local `path`:** the files under `<path>/<dir>` are copied into `.moonwell/libraries/<key>/`, writing only changed
   files and removing files that disappeared; no lock entry.
+- Amended 2026-09-28 during Plan 4b: neither kind keeps a file inside a folder whose name starts with `.` (such as
+  `.git/` or `.github/`), and a local library copies only its `.yue` and `.lua` files. `files` in the lock hashes the
+  files kept. `dev` ignores changes under a local library's dot-folders.
 - A folder in `.moonwell/libraries/` whose key is no longer in the manifest is removed.
 
 **Decision:** automatic, like the pinned `yue` download (maintainer's choice, approach 1), so a clone needs no extra

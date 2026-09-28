@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { join, resolve } from "@std/path";
-import { dev, isRelevantChange, localLibraryFolders } from "../../src/commands/dev.ts";
+import { dev, isLibraryChange, isRelevantChange, localLibraryFolders } from "../../src/commands/dev.ts";
 import { type CommandContext, createContext } from "../../src/context.ts";
 import type { Project } from "../../src/project/project.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
@@ -35,6 +35,14 @@ Deno.test("localLibraryFolders lists the folders of local libraries only", () =>
     },
   } as unknown as Project);
   assertEquals(folders, [resolve(root, "..", "mine", "src")]);
+});
+
+Deno.test("isLibraryChange ignores changes under a local library's dot-folders", () => {
+  const folder = join("C:", "lib", "src");
+  assertEquals(isLibraryChange(folder, join(folder, "example", "greet.lua")), true);
+  assertEquals(isLibraryChange(folder, join(folder, "example")), true);
+  assertEquals(isLibraryChange(folder, join(folder, ".git", "index")), false);
+  assertEquals(isLibraryChange(folder, join(folder, "example", ".cache", "x.lua")), false);
 });
 
 Deno.test("dev fails with MoonwellError before any work when src/ is missing", async () => {

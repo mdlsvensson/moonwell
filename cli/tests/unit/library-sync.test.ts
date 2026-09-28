@@ -301,3 +301,47 @@ Deno.test("a local library that holds the project's .moonwell/libraries is refus
     assertEquals(await exists(join(root, ".moonwell", "libraries", "mine")), false);
   });
 });
+
+Deno.test("a local library copies only its .yue and .lua files outside dot-folders", async () => {
+  await withRoot(async (root) => {
+    const source = join(root, "lib");
+    for (
+      const [path, data] of Object.entries({
+        "a.lua": "return 1",
+        "b.yue": "x = 1",
+        "README.md": "# lib",
+        ".git/hooks/x.lua": "return 0",
+        ".git/HEAD": "ref: refs/heads/main",
+        "tools/.cache/c.lua": "return 0",
+      })
+    ) {
+      await Deno.mkdir(join(source, ...path.split("/").slice(0, -1)), { recursive: true });
+      await Deno.writeTextFile(join(source, ...path.split("/")), data);
+    }
+    const local: Library = { github: null, tag: null, path: source, dir: "" };
+    const deps = { fetch: () => Promise.reject(new Error("no network in this test")), logger: silentLogger() };
+    // A copy made before only modules were copied: the other files go.
+    await Deno.mkdir(join(root, ".moonwell", "libraries", "mine"), { recursive: true });
+    await Deno.writeTextFile(join(root, ".moonwell", "libraries", "mine", "README.md"), "# old");
+    await syncLibraries(root, { mine: local }, "moonwell.pkl", deps);
+    const target = join(root, ".moonwell", "libraries", "mine");
+    const files: string[] = [];
+    for await (const entry of Deno.readDir(target)) files.push(entry.name);
+    assertEquals(files.sort(), [".moonwell-library.json", "a.lua", "b.yue"]);
+  });
+});
+
+Deno.test("a GitHub library keeps no file under a dot-folder", async () => {
+  await withRoot(async (root) => {
+    const { fetch } = server({
+      [archiveUrl("owner/lib", "v0.1.0")]: await archive(COMMIT_A, {
+        "a.lua": "return 1",
+        ".github/workflows/x.lua": "return 0",
+        "LICENSE": "MIT",
+      }),
+    });
+    await syncLibraries(root, { ex: github("v0.1.0", "") }, "moonwell.pkl", { fetch, logger: silentLogger() });
+    assertEquals(await exists(join(root, ".moonwell", "libraries", "ex", ".github")), false);
+    assertEquals(await read(root, ".moonwell/libraries/ex/LICENSE"), "MIT", "GitHub files keep every extension");
+  });
+});

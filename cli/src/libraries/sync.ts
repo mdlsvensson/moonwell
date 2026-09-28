@@ -87,7 +87,10 @@ async function removeStale(folder: string, keys: Set<string>): Promise<void> {
   for (const name of names) if (!keys.has(name)) await writing(name, () => removeIfExists(join(folder, name)));
 }
 
-/** Copies `<path>/<dir>` into the library's folder, writing only changed files and removing those that went away. */
+/**
+ * Copies the modules (`.yue` and `.lua` files) under `<path>/<dir>`, outside dot-folders such as `.git/`, into the
+ * library's folder, writing only changed files and removing every other file.
+ */
 async function syncLocal(root: string, folder: string, key: string, path: string, dir: string, manifest: string) {
   const source = resolve(root, path, dir);
   const info = await Deno.stat(source).catch(() => undefined);
@@ -105,8 +108,8 @@ async function syncLocal(root: string, folder: string, key: string, path: string
   }
   const files = new Map<string, Uint8Array>();
   try {
-    for (const file of await listFiles(source)) {
-      if (file !== STAMP) files.set(file, await Deno.readFile(join(source, ...file.split("/"))));
+    for (const file of await listModuleFiles(source)) {
+      files.set(file, await Deno.readFile(join(source, ...file.split("/"))));
     }
   } catch (cause) {
     throw new MoonwellError(`Reading library ${key} from ${source} failed: ${reasonOf(cause)}`, {
@@ -124,6 +127,18 @@ async function syncLocal(root: string, folder: string, key: string, path: string
     }
     await writeTextIfChanged(join(target, STAMP), stampText({ path: source }));
   });
+}
+
+/** The `.yue` and `.lua` files under `dir` as POSIX paths, never looking inside a folder whose name starts with `.`. */
+async function listModuleFiles(dir: string, prefix = ""): Promise<string[]> {
+  const files: string[] = [];
+  for await (const entry of Deno.readDir(dir)) {
+    if (entry.name.startsWith(".")) continue;
+    const path = `${prefix}${entry.name}`;
+    if (entry.isDirectory) files.push(...await listModuleFiles(join(dir, entry.name), `${path}/`));
+    else if (/\.(yue|lua)$/.test(entry.name)) files.push(path);
+  }
+  return files;
 }
 
 /** Downloads a GitHub library unless its folder holds its lock entry; returns its lock entry. */
@@ -176,13 +191,18 @@ async function syncGitHub(
   return entry;
 }
 
-/** The files under `dir` (all of them when it is empty), relative to it; never a file named like the stamp. */
+/**
+ * The files under `dir` (all of them when it is empty), relative to it, except those in a folder or with a name that
+ * starts with `.` (such as `.github/`, and the stamp).
+ */
 function keepDir(files: Map<string, Uint8Array>, dir: string): Map<string, Uint8Array> {
   const prefix = dir.split(/[\\/]/).filter((segment) => segment !== "" && segment !== ".").join("/");
   const kept = new Map<string, Uint8Array>();
   for (const [path, data] of files) {
     const relative = prefix === "" ? path : path.startsWith(`${prefix}/`) ? path.slice(prefix.length + 1) : undefined;
-    if (relative !== undefined && relative !== STAMP) kept.set(relative, data);
+    if (relative !== undefined && !relative.split("/").some((segment) => segment.startsWith("."))) {
+      kept.set(relative, data);
+    }
   }
   return kept;
 }
