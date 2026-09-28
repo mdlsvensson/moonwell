@@ -5,7 +5,8 @@
   <i>Multilingual modding framework for Warcraft III: Reforged</i>
 </p>
 
-- Write gameplay in any language that transpiles to lua. TypeScript, YueScript, Fennel, C#. And use pkl for data and configuration.
+- Write gameplay in any language that transpiles to lua. TypeScript, YueScript, Fennel, C#. And use pkl for data and
+  configuration.
 - Say goodbye to the Object Editor, Trigger Editor, Asset Manager and other dated World Editor tools.
 - A Deno cli: no Node.js, no `package.json`, no `node_modules`.
 
@@ -19,7 +20,8 @@ cd my-map
 deno task build
 ```
 
-`init` writes `moonwell.local.pkl`, which points `launch.gameExecutable` at the default Battle.net install. If your game is elsewhere, fix the path there, then run:
+`init` writes `moonwell.local.pkl`, which points `launch.gameExecutable` at the default Battle.net install. If your game
+is elsewhere, fix the path there, then run:
 
 ```powershell
 deno task test
