@@ -60,18 +60,25 @@ export async function collectModules(
       }
       const module: SourceModule = { name: stem.split("/").join("."), path, kind: moduleRoot.kind };
       if (module.kind === "lua") module.source = await Deno.readTextFile(join(dir, ...file.split("/")));
-      const clash = byName.get(module.name);
-      if (clash !== undefined) {
-        throw new MoonwellError(`Module ${module.name} is defined by ${clash.path} and ${path}.`, {
-          file: path,
-          hint: "Rename one of them: module names are shared by src/ and lua/.",
-        });
+      for (const name of claimedNames(module.name)) {
+        const clash = byName.get(name);
+        if (clash !== undefined) {
+          throw new MoonwellError(`Module ${name} is defined by ${clash.path} and ${path}.`, {
+            file: path,
+            hint: "Rename one of them: module names are shared by src/ and lua/.",
+          });
+        }
+        byName.set(name, module);
       }
-      byName.set(module.name, module);
       modules.push(module);
     }
   }
   return modules;
+}
+
+/** The names a module answers to: its own and, for `<parent>.init`, `<parent>` too (`moduleLoader`, spec §3.2). */
+function claimedNames(name: string): string[] {
+  return name.endsWith(".init") ? [name, name.slice(0, -".init".length)] : [name];
 }
 
 /**

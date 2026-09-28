@@ -70,6 +70,35 @@ Deno.test("collectModules refuses a name two files define, naming both", async (
   }
 });
 
+Deno.test("collectModules refuses an init module next to a module of its parent's name", async () => {
+  const cases = [
+    { files: ["src/tools.yue", "lua/tools/init.lua"], first: "src/tools.yue", second: "lua/tools/init.lua" },
+    { files: ["lua/tools.lua", "lua/tools/init.lua"], first: "lua/tools.lua", second: "lua/tools/init.lua" },
+  ];
+  for (const { files, first, second } of cases) {
+    const root = await project({ "src/main.yue": "x = 1\n", ...Object.fromEntries(files.map((path) => [path, ""])) });
+    try {
+      const error = await assertRejects(
+        () => collectModules(root),
+        MoonwellError,
+        `Module tools is defined by ${first} and ${second}.`,
+      );
+      assertEquals(error.file, second);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});
+
+Deno.test("collectModules lets a top-level init module claim only its own name", async () => {
+  const root = await project({ "src/main.yue": "x = 1\n", "lua/init.lua": "" });
+  try {
+    assertEquals((await collectModules(root)).map((module) => module.name), ["main", "init"]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test("moduleLoader resolves a name, then <name>.init, under the name that was required", () => {
   const modules = [
     { name: "main", path: "src/main.yue", kind: "yue" as const },
@@ -81,4 +110,11 @@ Deno.test("moduleLoader resolves a name, then <name>.init, under the name that w
   assertEquals(load("tools"), { name: "tools", sourcePath: "lua/tools/init.lua", source: "return {}", kind: "lua" });
   assertEquals(load("tools.init")?.name, "tools.init");
   assertEquals(load("missing"), undefined);
+
+  const gameInit = { name: "game.init", sourcePath: "src/game/init.yue", source: "local y = 2" };
+  const loadGame = moduleLoader(
+    [{ name: "game.init", path: "src/game/init.yue", kind: "yue" as const }],
+    (name) => name === "game.init" ? gameInit : undefined,
+  );
+  assertEquals(loadGame("game"), { ...gameInit, name: "game" });
 });
