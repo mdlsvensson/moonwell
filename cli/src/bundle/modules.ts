@@ -18,6 +18,8 @@ export interface SourceModule {
   kind: ModuleKind;
   /** A Lua module's text; YueScript modules are read when they are compiled. */
   source?: string;
+  /** The library key for a library's module. */
+  library?: string;
 }
 
 /** A folder of modules, relative to the project root, and the kind of file it holds. */
@@ -27,6 +29,8 @@ export interface ModuleRoot {
   kind: ModuleKind;
   /** Whether a missing folder is an error. */
   required: boolean;
+  /** The library key when the folder is a library's (spec §4.4). */
+  library?: string;
 }
 
 /** The project's own modules: YueScript in src/ and Lua in lua/ (spec §3.1). src/**\/*.lua is the editor's output. */
@@ -63,6 +67,7 @@ export async function collectModules(
         });
       }
       const module: SourceModule = { name: stem.split("/").join("."), path, kind: moduleRoot.kind };
+      if (moduleRoot.library !== undefined) module.library = moduleRoot.library;
       for (const name of claimedNames(module.name)) {
         if (BUILTIN_MODULES.has(name)) {
           throw new MoonwellError(`Module ${name} is built into Moonwell; rename ${path}.`, {
@@ -74,7 +79,9 @@ export async function collectModules(
         if (clash !== undefined) {
           throw new MoonwellError(`Module ${name} is defined by ${clash.path} and ${path}.`, {
             file: path,
-            hint: "Rename one of them: module names are shared by src/ and lua/.",
+            hint: module.library !== undefined || clash.library !== undefined
+              ? "Rename one of them, or narrow the library's `dir`: module names are shared by src/, lua/ and libraries."
+              : "Rename one of them: module names are shared by src/ and lua/.",
           });
         }
         byName.set(name, module);
@@ -86,6 +93,18 @@ export async function collectModules(
   return modules;
 }
 
+/** A YueScript and a Lua root over `.moonwell/libraries/<key>` for each library, in key order (spec §4.4). */
+export function libraryModuleRoots(keys: readonly string[]): ModuleRoot[] {
+  return [...keys].sort().flatMap((key) =>
+    (["yue", "lua"] as const).map((kind) => ({
+      dir: `.moonwell/libraries/${key}`,
+      kind,
+      required: false,
+      library: key,
+    }))
+  );
+}
+
 /** The names a module answers to: its own and, for `<parent>.init`, `<parent>` too (`moduleLoader`, spec §3.2). */
 function claimedNames(name: string): string[] {
   return name.endsWith(".init") ? [name, name.slice(0, -".init".length)] : [name];
@@ -93,19 +112,20 @@ function claimedNames(name: string): string[] {
 
 /**
  * Resolves `require` names for the bundler: the name, then `<name>.init`, Lua's `?/init.lua` convention (spec §3.2).
- * A Lua module is its own source; a YueScript module is its compiled output from `loadCompiled`. Either is returned
- * under the name it was required by, which is the name the bundle defines it with.
+ * A Lua module is its own source; a YueScript module is its compiled output, which `loadCompiled` gives for the
+ * module (from src/ or a library). Either is returned under the name it was required by, which is the name the bundle
+ * defines it with.
  */
 export function moduleLoader(
   modules: readonly SourceModule[],
-  loadCompiled: (name: string) => CompiledModule | undefined,
+  loadCompiled: (module: SourceModule) => CompiledModule | undefined,
 ): (name: string) => CompiledModule | undefined {
   const byName = new Map(modules.map((module) => [module.name, module]));
   return (name) => {
     const module = byName.get(name) ?? byName.get(`${name}.init`);
     if (module === undefined) return undefined;
     if (module.kind === "lua") return { name, sourcePath: module.path, source: module.source ?? "", kind: "lua" };
-    const compiled = loadCompiled(module.name);
+    const compiled = loadCompiled(module);
     return compiled && { ...compiled, name };
   };
 }

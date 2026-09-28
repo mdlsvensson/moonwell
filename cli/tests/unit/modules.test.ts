@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { dirname, join } from "@std/path";
-import { collectModules, moduleLoader } from "../../src/bundle/modules.ts";
+import { collectModules, libraryModuleRoots, moduleLoader, PROJECT_MODULE_ROOTS } from "../../src/bundle/modules.ts";
 import { luaTopLevelGlobals } from "../../src/lint/lua-globals.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 
@@ -139,7 +139,7 @@ Deno.test("moduleLoader resolves a name, then <name>.init, under the name that w
     { name: "tools.init", path: "lua/tools/init.lua", kind: "lua" as const, source: "return {}" },
   ];
   const compiled = { name: "main", sourcePath: "src/main.yue", source: "local x = 1" };
-  const load = moduleLoader(modules, (name) => name === "main" ? compiled : undefined);
+  const load = moduleLoader(modules, (module) => module.name === "main" ? compiled : undefined);
   assertEquals(load("main"), compiled);
   assertEquals(load("tools"), { name: "tools", sourcePath: "lua/tools/init.lua", source: "return {}", kind: "lua" });
   assertEquals(load("tools.init")?.name, "tools.init");
@@ -148,7 +148,37 @@ Deno.test("moduleLoader resolves a name, then <name>.init, under the name that w
   const gameInit = { name: "game.init", sourcePath: "src/game/init.yue", source: "local y = 2" };
   const loadGame = moduleLoader(
     [{ name: "game.init", path: "src/game/init.yue", kind: "yue" as const }],
-    (name) => name === "game.init" ? gameInit : undefined,
+    (module) => module.name === "game.init" ? gameInit : undefined,
   );
   assertEquals(loadGame("game"), { ...gameInit, name: "game" });
+});
+
+Deno.test("libraryModuleRoots gives each library a YueScript and a Lua root, in key order", () => {
+  assertEquals(libraryModuleRoots(["b", "a"]), [
+    { dir: ".moonwell/libraries/a", kind: "yue", required: false, library: "a" },
+    { dir: ".moonwell/libraries/a", kind: "lua", required: false, library: "a" },
+    { dir: ".moonwell/libraries/b", kind: "yue", required: false, library: "b" },
+    { dir: ".moonwell/libraries/b", kind: "lua", required: false, library: "b" },
+  ]);
+});
+
+Deno.test("a clash with a library module names both files and suggests narrowing dir", async () => {
+  const root = await project({
+    "src/main.yue": "x = 1\n",
+    "lua/example/greet.lua": "return {}\n",
+    ".moonwell/libraries/ex/example/greet.lua": "return {}\n",
+  });
+  try {
+    const error = await assertRejects(
+      () => collectModules(root, [...PROJECT_MODULE_ROOTS, ...libraryModuleRoots(["ex"])]),
+      MoonwellError,
+      "Module example.greet is defined by lua/example/greet.lua and .moonwell/libraries/ex/example/greet.lua.",
+    );
+    assertEquals(
+      error.hint,
+      "Rename one of them, or narrow the library's `dir`: module names are shared by src/, lua/ and libraries.",
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });

@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { exists } from "@std/fs";
 import { dirname, join } from "@std/path";
+import { collectModules, libraryModuleRoots, PROJECT_MODULE_ROOTS } from "../../src/bundle/modules.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { type Runner, runProcess } from "../../src/shared/process.ts";
 import { compileSources } from "../../src/yue/compile.ts";
@@ -44,6 +45,24 @@ Deno.test("compileSources compiles modules and loads them by dotted name", async
   assertEquals(output.load("missing"), undefined);
   assertEquals(output.load("util/math"), undefined);
   assertEquals(output.load("Util.Math"), undefined);
+});
+
+Deno.test("compileSources compiles library YueScript into dist/stage/lua/.libraries/<key>/", async () => {
+  const yue = await testYue();
+  const root = await project({
+    "src/main.yue": 'import "example.loud"\n',
+    ".moonwell/libraries/ex/example/loud.yue": "export shout = (name) -> name\\upper!\n",
+  });
+  const modules = await collectModules(root, [...PROJECT_MODULE_ROOTS, ...libraryModuleRoots(["ex"])]);
+  const output = await compileSources({ yue, root, minify: false, modules });
+  const library = modules.find((module) => module.name === "example.loud")!;
+  assertEquals(library.library, "ex");
+  const compiled = output.loadModule(library)!;
+  assertEquals(compiled.sourcePath, ".moonwell/libraries/ex/example/loud.yue");
+  assertStringIncludes(compiled.source, "upper");
+  assert(await exists(join(root, "dist", "stage", "lua", ".libraries", "ex", "example", "loud.lua")));
+  assertEquals(Object.keys(output.hashes), ["main.yue"], "the unknown-global check still sees src/ only");
+  assertEquals(Object.keys(output.texts).sort(), [".moonwell/libraries/ex/example/loud.yue", "src/main.yue"]);
 });
 
 Deno.test("compileSources only recompiles changed files and removes deleted outputs", async () => {

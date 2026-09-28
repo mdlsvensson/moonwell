@@ -22,7 +22,12 @@ export interface CompileOutput {
   hashes: Record<string, string>;
   /** The text of each compiled source (the bytes that were hashed, as UTF-8), keyed like `hashes`. */
   sources: Record<string, string>;
+  /** The text of every compiled YueScript source, src/ and libraries, keyed by its POSIX path under the project root. */
+  texts: Record<string, string>;
+  /** A src/ module's compiled output by dotted name. */
   load(name: string): CompiledModule | undefined;
+  /** Any compiled YueScript module's output; its `sourcePath` is the module's project path. */
+  loadModule(module: SourceModule): CompiledModule | undefined;
 }
 
 interface Manifest {
@@ -30,48 +35,64 @@ interface Manifest {
   files: Record<string, string>;
 }
 
-/** Compiles every .yue file under src/ into dist/stage/lua, recompiling only changed files. */
+/**
+ * Where a YueScript source compiles to, under dist/stage/lua: `src/x.yue` → `x.lua`,
+ * `.moonwell/libraries/<key>/x.yue` → `.libraries/<key>/x.lua`.
+ */
+export function outputPathOf(path: string): string {
+  const lua = path.replace(/\.yue$/, ".lua");
+  if (lua.startsWith("src/")) return lua.slice("src/".length);
+  if (lua.startsWith(".moonwell/libraries/")) return `.libraries/${lua.slice(".moonwell/libraries/".length)}`;
+  throw new Error(`No compile output location for ${path}.`);
+}
+
+/** Compiles every YueScript module, src/ and libraries, into dist/stage/lua, recompiling only changed files. */
 export async function compileSources(options: {
   yue: string;
   root: string;
   minify: boolean;
   /** Where `import "moonwell.macros"` is found; every yue run gets its `--path` (spec §6). */
   macros?: MacroSearch;
-  /** The project's modules (`collectModules`); listed from disk when absent. Only YueScript modules under src/ compile. */
+  /** The project's modules (`collectModules`); listed from disk when absent. Every YueScript module compiles. */
   modules?: readonly SourceModule[];
   run?: Runner;
   concurrency?: number;
 }): Promise<CompileOutput> {
   const run = options.run ?? runProcess;
-  const srcDir = join(options.root, "src");
   const outDir = join(options.root, "dist", "stage", "lua");
   const modules = options.modules ?? await collectModules(options.root);
-  const sources = modules
-    .filter((module) => module.kind === "yue" && module.path.startsWith("src/"))
-    .map((module) => module.path.slice("src/".length));
+  const yueModules = modules.filter((module) => module.kind === "yue");
+  const outputOf = (path: string) => join(outDir, ...outputPathOf(path).split("/"));
 
   const manifestPath = join(outDir, ".hashes.json");
   const previous = await readManifest(manifestPath);
-  const settings = `${options.yue}|${options.minify ? "minify" : "rewrite"}|${options.macros?.hash ?? "no macros"}`;
-  const hashes: Record<string, string> = {};
+  // "paths|" marks a manifest keyed by project path; an older one was keyed by the path under src/.
+  const format = "paths|";
+  const flavour = options.minify ? "minify" : "rewrite";
+  const settings = `${format}${options.yue}|${flavour}|${options.macros?.hash ?? "no macros"}`;
+  /** Keyed by project path, like the manifest. */
+  const fileHashes: Record<string, string> = {};
   const texts: Record<string, string> = {};
   const pending: string[] = [];
   const decoder = new TextDecoder();
-  for (const file of sources) {
-    const bytes = await Deno.readFile(join(srcDir, file));
-    hashes[file] = await sha256Hex(bytes);
-    texts[file] = decoder.decode(bytes);
-    const upToDate = previous?.settings === settings && previous.files[file] === hashes[file] &&
-      await exists(join(outDir, luaPath(file)));
-    if (!upToDate) pending.push(file);
+  for (const { path } of yueModules) {
+    const bytes = await Deno.readFile(join(options.root, ...path.split("/")));
+    fileHashes[path] = await sha256Hex(bytes);
+    texts[path] = decoder.decode(bytes);
+    const upToDate = previous?.settings === settings && previous.files[path] === fileHashes[path] &&
+      await exists(outputOf(path));
+    if (!upToDate) pending.push(path);
   }
-  for (const file of Object.keys(previous?.files ?? {})) {
-    if (!(file in hashes)) await removeIfExists(join(outDir, luaPath(file)));
+  // `outputPathOf` does not map an older manifest's keys, so its outputs are left in place.
+  if (previous?.settings?.startsWith(format)) {
+    for (const path of Object.keys(previous.files ?? {})) {
+      if (!(path in fileHashes)) await removeIfExists(outputOf(path));
+    }
   }
 
   const failures: MoonwellError[] = [];
-  await forEachLimited(pending, options.concurrency ?? 8, async (file) => {
-    const output = join(outDir, luaPath(file));
+  await forEachLimited(pending, options.concurrency ?? 8, async (path) => {
+    const output = outputOf(path);
     await Deno.mkdir(dirname(output), { recursive: true });
     const mode = options.minify ? "-m" : "-r";
     const result = await run(options.yue, [
@@ -80,18 +101,18 @@ export async function compileSources(options: {
       "-o",
       output,
       ...macroPathArgs(options.macros),
-      join(srcDir, file),
+      join(options.root, ...path.split("/")),
     ]);
     if (result.code !== 0) {
-      delete hashes[file];
-      delete texts[file];
+      delete fileHashes[path];
+      delete texts[path];
       await removeIfExists(output);
-      failures.push(compileError(`src/${file}`, `${result.stdout}\n${result.stderr}`));
+      failures.push(compileError(path, `${result.stdout}\n${result.stderr}`));
     }
   });
 
   await Deno.mkdir(outDir, { recursive: true });
-  await Deno.writeTextFile(manifestPath, JSON.stringify({ settings, files: hashes }, null, 2));
+  await Deno.writeTextFile(manifestPath, JSON.stringify({ settings, files: fileHashes }, null, 2));
   if (failures.length > 0) {
     failures.sort((a, b) => (a.file ?? "").localeCompare(b.file ?? ""));
     if (failures.length === 1) throw failures[0];
@@ -101,30 +122,40 @@ export async function compileSources(options: {
     });
   }
 
-  const names = new Set(sources.map((file) => file.slice(0, -4).split("/").join(".")));
+  const hashes: Record<string, string> = {};
+  const sources: Record<string, string> = {};
+  for (const [path, hash] of Object.entries(fileHashes)) {
+    if (!path.startsWith("src/")) continue;
+    hashes[path.slice("src/".length)] = hash;
+    sources[path.slice("src/".length)] = texts[path];
+  }
+  const srcModules = new Map(
+    yueModules.filter((module) => module.path.startsWith("src/")).map((module) => [module.name, module]),
+  );
+  function loadModule(module: SourceModule): CompiledModule | undefined {
+    if (module.kind !== "yue" || !(module.path in texts)) return undefined;
+    try {
+      return {
+        name: module.name,
+        sourcePath: module.path,
+        source: Deno.readTextFileSync(outputOf(module.path)),
+      };
+    } catch (error) {
+      if (error instanceof Deno.errors.NotFound) return undefined;
+      throw error;
+    }
+  }
   return {
     outDir,
     hashes,
-    sources: texts,
+    sources,
+    texts,
     load(name: string): CompiledModule | undefined {
-      if (!names.has(name)) return undefined;
-      const relative = name.split(".").join("/");
-      try {
-        return {
-          name,
-          sourcePath: `src/${relative}.yue`,
-          source: Deno.readTextFileSync(join(outDir, `${relative}.lua`)),
-        };
-      } catch (error) {
-        if (error instanceof Deno.errors.NotFound) return undefined;
-        throw error;
-      }
+      const module = srcModules.get(name);
+      return module && loadModule(module);
     },
+    loadModule,
   };
-}
-
-function luaPath(file: string): string {
-  return file.replace(/\.yue$/, ".lua");
 }
 
 async function readManifest(path: string): Promise<Manifest | undefined> {
