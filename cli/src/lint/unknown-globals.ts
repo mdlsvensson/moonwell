@@ -7,6 +7,7 @@ import type { Project } from "../project/project.ts";
 import { formatProblem, MAX_PROBLEMS, type Problem, ProblemsError } from "../shared/errors.ts";
 import { closestNames, joinWords } from "../shared/names.ts";
 import type { MacroSearch } from "../yue/macros.ts";
+import { luaTopLevelGlobals } from "./lua-globals.ts";
 import { type GlobalUse, listGlobalUses } from "./uses.ts";
 
 export const UNKNOWN_GLOBAL_HINT =
@@ -110,7 +111,14 @@ export function unknownGlobalProblems(
 export async function checkUnknownGlobals(
   ctx: CommandContext,
   project: Project,
-  compiled: { yue: string; hashes: Record<string, string>; sources: Record<string, string>; macros?: MacroSearch },
+  compiled: {
+    yue: string;
+    hashes: Record<string, string>;
+    sources: Record<string, string>;
+    macros?: MacroSearch;
+    /** Lua modules: their top-level globals are known names (spec §3.4); they are not checked themselves. */
+    lua?: readonly { source?: string }[];
+  },
   natives?: Natives,
 ): Promise<Problem[]> {
   const uses = await listGlobalUses({
@@ -122,6 +130,7 @@ export async function checkUnknownGlobals(
   });
   // The text compileSources hashed: reading the files again could fail or see other bytes (e.g. during dev).
   const declared = Object.values(compiled.sources).flatMap(declaredGlobals);
+  for (const module of compiled.lua ?? []) declared.push(...luaTopLevelGlobals(module.source ?? ""));
   const label = `maps/${project.map.folder}/war3map.lua`;
   const script = await readSourceScript(join(ctx.root, ...label.split("/")), label);
   const data = natives ?? await loadNatives();

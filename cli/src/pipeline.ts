@@ -58,7 +58,13 @@ export async function compileProject(
   const entry = entryModuleName(options.entry ?? project.map.entry);
   const modules = resolveGraph(entry, moduleLoader(sourceModules, output.load), BUILTIN_MODULES);
   // After compiling and resolving, so syntax errors and missing modules are reported first (spec §5.2).
-  await checkUnknownGlobals(ctx, project, { yue, hashes: output.hashes, sources: output.sources, macros });
+  await checkUnknownGlobals(ctx, project, {
+    yue,
+    hashes: output.hashes,
+    sources: output.sources,
+    macros,
+    lua: sourceModules.filter((module) => module.kind === "lua"),
+  });
   return { modules, entry };
 }
 

@@ -109,7 +109,7 @@ Deno.test("unknownGlobalProblems reports every unknown use in file, line and col
 async function lintProject(
   sources: Record<string, string>,
   outputs: Record<string, string>,
-  options: { lint?: Project["lint"]; mapScript?: string } = {},
+  options: { lint?: Project["lint"]; mapScript?: string; lua?: string[] } = {},
 ) {
   const root = await Deno.makeTempDir({ prefix: "moonwell-lint-" });
   if (options.mapScript !== undefined) {
@@ -137,8 +137,27 @@ async function lintProject(
     objects: emptyObjects(),
   };
   const hashes = Object.fromEntries(Object.keys(sources).map((file, i) => [file, `h${i}`]));
-  return { root, ctx, logger, project, compiled: { yue: "yue", hashes, sources } };
+  return {
+    root,
+    ctx,
+    logger,
+    project,
+    compiled: { yue: "yue", hashes, sources, lua: (options.lua ?? []).map((source) => ({ source })) },
+  };
 }
+
+Deno.test("checkUnknownGlobals knows the globals a Lua module defines at its top level", async () => {
+  const { root, ctx, project, compiled } = await lintProject(
+    { "main.yue": "CountUp!\n" },
+    { "main.yue": "CountUp 1 1\n" },
+    { lua: ["Count = 0\nfunction CountUp()\n  Count = Count + 1\nend\n"] },
+  );
+  try {
+    assertEquals(await checkUnknownGlobals(ctx, project, compiled, NATIVES), []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
 
 Deno.test("checkUnknownGlobals accepts map, declared and lint.globals names", async () => {
   const { root, ctx, project, compiled } = await lintProject(
