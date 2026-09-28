@@ -96,8 +96,9 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
   compile and `yue -g` cache keys. The macro module must not have a backslash inside a string literal: yue 0.34.2 fails
   to load such a macro. The template's standard Footman, next to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING
   step 11) passed 2026-09-27. Lua `print` output shows on screen only; the F12 message log does not keep it.
-- **Released 0.5.0** (2026-09-28, JSR `@moonwell/cli@0.5.0` and GitHub release `moonwell@0.5.0`): sub-project 4, Plans
-  4a and 4b below. The release gate passed steps 1–6 and 12; 7–11 were not re-run (their code is unchanged).
+- **Released 0.5.0** (2026-09-28, JSR `@moonwell/cli@0.5.0` and GitHub release `moonwell@0.5.0` on `27d093a`, checked
+  with `init` and `build` from JSR): sub-project 4, Plans 4a and 4b below. The release gate passed steps 1–6 and 12;
+  7–11 were not re-run (their code is unchanged).
 - **Plan 4a, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules
   in `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
