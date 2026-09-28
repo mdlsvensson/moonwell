@@ -45,7 +45,9 @@ const LUARC_ARRAYS = ["runtime.path", "workspace.library", "workspace.ignoreDir"
 
 type LuarcArray = typeof LUARC_ARRAYS[number];
 
-/** The template's `runtime.path`, `workspace.library` and `workspace.ignoreDir` entries, from the embedded `.luarc.json`. */
+/**
+ * The template's `runtime.path`, `workspace.library` and `workspace.ignoreDir` entries, from the embedded `.luarc.json`.
+ */
 export function luarcTemplateEntries(
   files: ReadonlyArray<{ path: string; base64: string }> = TEMPLATE_FILES,
 ): Record<LuarcArray, string[]> {
@@ -61,9 +63,10 @@ export function luarcTemplateEntries(
 
 /**
  * Adds the template's `runtime.path`, `workspace.library` and `workspace.ignoreDir` entries that the project's
- * .luarc.json lacks, keeping every other key and value, and rewrites it as formatted JSON when it adds any (spec §3.5). Returns the entries it added, or
- * `undefined` when the file is not a JSON object (it is then left alone). A missing file adds nothing; a leading byte
- * order mark is ignored. A file that cannot be read or written fails with a `MoonwellError`.
+ * .luarc.json lacks, keeping every other key and value, and rewrites it as formatted JSON when it adds any (spec §3.5).
+ * Returns the entries it added, or `undefined` when the file is not a JSON object (it is then left alone). A missing
+ * file adds nothing; a leading byte order mark is ignored. A file that cannot be read or written fails with a
+ * `MoonwellError`.
  */
 export async function mergeLuarc(
   root: string,
