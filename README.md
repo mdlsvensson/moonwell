@@ -190,7 +190,7 @@ libraries {
 The key names the library's folder in `.moonwell/libraries/`, so keys must differ by more than case. `dir` is the folder
 inside the library that module names start from; leave it out for the library's root. A library's modules keep their own
 names (`import "example.loud"`), and share one set of names with `src/` and `lua/`: a name two of them define fails the
-build.
+build. A `.lua` file next to a `.yue` file of the same name in a library is its compiled output, and is skipped.
 
 `check`, `build`, `test`, `dev` and `setup` download a library that is missing or whose `tag` or `dir` changed into
 `.moonwell/libraries/<key>/` (git-ignored), and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`: a

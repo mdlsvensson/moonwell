@@ -174,7 +174,9 @@ A committed JSON file at the project root:
 ### 4.4 Library modules
 
 A library's modules are the `.yue` and `.lua` files under its folder, named by their path there (§3.1 rules). They
-join the one namespace (§3.2) under their own names: a library's internal `require "core.x"` keeps working.
+join the one namespace (§3.2) under their own names: a library's internal `require "core.x"` keeps working. A `.lua`
+file beside a `.yue` file of the same stem (`core/x.lua` next to `core/x.yue`) is that module's compiled output, as the
+editor writes it on save, and is skipped (amended 2026-09-28 during Plan 4b).
 **Decision:** no prefix by key (maintainer's choice, option A), because rewriting a library's own requires is fragile.
 
 Libraries cannot declare dependencies on other libraries: the map lists every library it uses. A library module that

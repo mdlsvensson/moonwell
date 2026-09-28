@@ -31,6 +31,11 @@ async function exampleLibrary(): Promise<string> {
     join(dir, "src", "example", "loud.yue"),
     'import "example.greet"\n\nexport shout = (name) -> greet.hello(name)\\upper!\n',
   );
+  // What the editor's YueScript extension writes on save: loud.yue's compiled output, which must not be a module.
+  await Deno.writeTextFile(
+    join(dir, "src", "example", "loud.lua"),
+    'return { shout = function() return "stale" end }\n',
+  );
   await Deno.writeTextFile(
     join(dir, "src", "example", "globals.lua"),
     "function ExampleAdd(a, b)\n  return a + b\nend\n",
@@ -65,6 +70,8 @@ Deno.test("a local library's modules build, and its editor view and folder are w
   const lua = new TextDecoder().decode(await archive.read("war3map.lua"));
   assertStringIncludes(lua, '__mw.define("example.loud", function(...)');
   assertStringIncludes(lua, '"example.greet", ".moonwell/libraries/ex/example/greet.lua"}');
+  assertStringIncludes(lua, '".moonwell/libraries/ex/example/loud.yue"');
+  assert(!lua.includes('"stale"'), "the compiled loud.lua beside loud.yue is not bundled");
   assert(await exists(join(project, ".moonwell", "libraries", "ex", "example", "loud.yue")));
   assertEquals(await exists(join(project, "moonwell.lock")), false, "a local library is not locked");
   assertStringIncludes(

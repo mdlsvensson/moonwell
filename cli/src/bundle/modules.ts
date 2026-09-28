@@ -41,8 +41,9 @@ export const PROJECT_MODULE_ROOTS: readonly ModuleRoot[] = [
 
 /**
  * Lists every module under `roots`, in root order and then by path. Fails on a dotted file or folder name (spec §3.1),
- * on two files with one name (spec §3.2) and on a file that takes a built-in module's name. Lua sources are read as
- * Lua's loadfile reads them (`readSourceText`).
+ * on two files with one name (spec §3.2) and on a file that takes a built-in module's name. In a library root, a `.lua`
+ * file beside a `.yue` file of the same stem is that module's compiled output and is skipped (spec §4.4). Lua sources
+ * are read as Lua's loadfile reads them (`readSourceText`).
  */
 export async function collectModules(
   root: string,
@@ -57,7 +58,12 @@ export async function collectModules(
       continue;
     }
     const extension = `.${moduleRoot.kind}`;
-    for (const file of (await listFiles(dir)).filter((path) => path.endsWith(extension))) {
+    const files = await listFiles(dir);
+    // In a library, YueScript and Lua share one folder: a .lua beside a .yue of the same stem is its compiled output.
+    const compiled = moduleRoot.library !== undefined && moduleRoot.kind === "lua"
+      ? new Set(files.filter((file) => file.endsWith(".yue")).map((file) => `${file.slice(0, -".yue".length)}.lua`))
+      : new Set<string>();
+    for (const file of files.filter((path) => path.endsWith(extension) && !compiled.has(path))) {
       const path = `${moduleRoot.dir}/${file}`;
       const stem = file.slice(0, -extension.length);
       if (stem.split("/").some((segment) => segment.includes("."))) {

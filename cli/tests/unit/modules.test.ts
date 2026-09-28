@@ -182,3 +182,25 @@ Deno.test("a clash with a library module names both files and suggests narrowing
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test("in a library, a .lua file beside a .yue file of the same stem is its compiled output, not a module", async () => {
+  const root = await project({
+    "src/main.yue": "x = 1\n",
+    ".moonwell/libraries/ex/example/loud.yue": "x = 1\n",
+    ".moonwell/libraries/ex/example/loud.lua": "-- compiled\n",
+    ".moonwell/libraries/ex/kit/init.yue": "x = 1\n",
+    ".moonwell/libraries/ex/kit/init.lua": "-- compiled\n",
+    ".moonwell/libraries/ex/example/greet.lua": "return {}\n",
+  });
+  try {
+    const modules = await collectModules(root, [...PROJECT_MODULE_ROOTS, ...libraryModuleRoots(["ex"])]);
+    assertEquals(modules.map(({ name, path, kind }) => ({ name, path, kind })), [
+      { name: "main", path: "src/main.yue", kind: "yue" },
+      { name: "example.loud", path: ".moonwell/libraries/ex/example/loud.yue", kind: "yue" },
+      { name: "kit.init", path: ".moonwell/libraries/ex/kit/init.yue", kind: "yue" },
+      { name: "example.greet", path: ".moonwell/libraries/ex/example/greet.lua", kind: "lua" },
+    ]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
