@@ -192,9 +192,9 @@ inside the library that module names start from; leave it out for the library's 
 names (`import "example.loud"`), and share one set of names with `src/` and `lua/`: a name two of them define fails the
 build. A `.lua` file next to a `.yue` file of the same name in a library is its compiled output, and is skipped.
 
-`check`, `build`, `test`, `dev` and `setup` download a library that is missing or whose `tag` or `dir` changed into
-`.moonwell/libraries/<key>/` (git-ignored), and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`: a
-fresh clone then gets the same code, and if a tag is moved on GitHub, the command fails instead of using the new code.
+`check`, `build`, `test`, `dev` and `setup` download a library that is missing or whose `github`, `tag` or `dir` changed
+into `.moonwell/libraries/<key>/` (git-ignored), and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`:
+a fresh clone then gets the same code, and if a tag is moved on GitHub, the command fails instead of using the new code.
 To upgrade, change `tag`.
 
 To work on a library next to your map, point it at a local folder in `moonwell.local.pkl`:
@@ -203,11 +203,13 @@ To work on a library next to your map, point it at a local folder in `moonwell.l
 libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }
 ```
 
-`path` wins over `github`, and `dev` watches that folder. A local library keeps its entry in `moonwell.lock`, so
-switching back to the tag still checks it. Library code is not checked for unknown globals, but the globals a required
-library module defines count as known. `check`, `build`, `test` and `dev` write every library module to `.moonwell/lua/`
-as Lua (a YueScript module compiled), where the editor finds it; `setup`, which does not compile, writes the Lua modules
-and leaves the YueScript ones as the last compile wrote them.
+`path` wins over `github`. Its `.yue` and `.lua` files are copied into `.moonwell/libraries/<key>/` (folders whose name
+starts with `.`, such as `.git/`, are skipped), so errors in them name the copy there, not your checkout. `dev` watches
+the folder, but picks the folders to watch when it starts: restart it after adding a local library. A local library
+keeps its entry in `moonwell.lock`, so switching back to the tag still checks it. Library code is not checked for
+unknown globals, but the globals a required library module defines count as known. `check`, `build`, `test` and `dev`
+write every library module to `.moonwell/lua/` as Lua (a YueScript module compiled), where the editor finds it; `setup`,
+which does not compile, writes the Lua modules and leaves the YueScript ones as the last compile wrote them.
 
 ## Assets
 
