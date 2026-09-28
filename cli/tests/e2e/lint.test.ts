@@ -57,3 +57,15 @@ Deno.test("check accepts declared globals, lint.globals and the map's globals", 
   const checked = await deno(["task", "check"], project);
   assertEquals(checked.code, 0, checked.text);
 });
+
+Deno.test("check lints only the files the map requires, and knows only their globals", async () => {
+  const project = await newProject();
+  await Deno.writeTextFile(join(project, "src", "extra.yue"), "global Extra = 1\nprint Extra\n");
+  const unimported = await deno(["task", "check"], project);
+  assertEquals(unimported.code, 0, unimported.text);
+  const main = join(project, "src", "main.yue");
+  await Deno.writeTextFile(main, `${await Deno.readTextFile(main)}\nprint Extra\n`);
+  const used = await deno(["task", "check"], project);
+  assertEquals(used.code, 1, used.text);
+  assertStringIncludes(used.text, "Unknown global Extra.");
+});

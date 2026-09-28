@@ -54,10 +54,16 @@ export async function compileProject(
   });
   const entry = entryModuleName(options.entry ?? project.map.entry);
   const modules = resolveGraph(entry, moduleLoader(sourceModules, output.loadModule), BUILTIN_MODULES);
+  // Only the src/ modules the map requires are checked; `output.hashes` is keyed by path under src/.
+  const reachable = new Set(
+    modules.filter((module) => module.sourcePath.startsWith("src/")).map((module) =>
+      module.sourcePath.slice("src/".length)
+    ),
+  );
   // After compiling and resolving, so syntax errors and missing modules are reported first (spec §5.2).
   await checkUnknownGlobals(ctx, project, {
     yue,
-    hashes: output.hashes,
+    hashes: Object.fromEntries(Object.entries(output.hashes).filter(([file]) => reachable.has(file))),
     macros,
     declared: {
       yue: modules.filter((module) => module.kind !== "lua").map((module) => output.texts[module.sourcePath] ?? ""),

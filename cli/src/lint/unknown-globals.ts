@@ -104,7 +104,7 @@ export function unknownGlobalProblems(
 }
 
 /**
- * Checks every compiled source (`compiled.hashes`) for unknown globals (spec §5). The names declared by
+ * Checks the compiled sources in `compiled.hashes` for unknown globals (spec §5). The names declared by
  * `compiled.declared` are known: the pipeline passes the texts of the modules reachable from the entry, so a `global`
  * line or a Lua top-level global counts only in a module the map requires. With `lint.unknownGlobals = "error"` any
  * unknown use throws a `ProblemsError` listing all of them; with `"warning"` they are logged and returned.
@@ -114,6 +114,7 @@ export async function checkUnknownGlobals(
   project: Project,
   compiled: {
     yue: string;
+    /** The sources to check, keyed by path under src/; the pipeline passes the ones reachable from the entry. */
     hashes: Record<string, string>;
     macros?: MacroSearch;
     /**
