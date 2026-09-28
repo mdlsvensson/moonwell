@@ -207,7 +207,7 @@ libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }
 switching back to the tag still checks it. Library code is not checked for unknown globals, but the globals a required
 library module defines count as known. `check`, `build`, `test` and `dev` write every library module to `.moonwell/lua/`
 as Lua (a YueScript module compiled), where the editor finds it; `setup`, which does not compile, writes the Lua modules
-only.
+and leaves the YueScript ones as the last compile wrote them.
 
 ## Assets
 

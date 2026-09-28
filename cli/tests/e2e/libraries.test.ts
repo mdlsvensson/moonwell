@@ -79,6 +79,9 @@ Deno.test("a local library's modules build, and its editor view and folder are w
     "shout",
   );
   assert(await exists(join(project, ".moonwell", "lua", "example", "greet.lua")));
+  const setup = await deno(["task", "setup"], project);
+  assertEquals(setup.code, 0, setup.text);
+  assert(await exists(join(project, ".moonwell", "lua", "example", "loud.lua")), "setup keeps the compiled view");
 });
 
 Deno.test("a project module that clashes with a library module fails check, naming both", async () => {

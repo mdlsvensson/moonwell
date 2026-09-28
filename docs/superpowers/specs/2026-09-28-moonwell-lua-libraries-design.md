@@ -211,7 +211,8 @@ lua-language-server reads Lua, and each library sits under its own key. After co
 `.moonwell/lua/` (git-ignored, under `.moonwell/`): every library module as `<module path>.lua`, a Lua module copied
 and a YueScript module as its compiled Lua. `.luarc.json`'s `workspace.library` gains `.moonwell/lua`, so
 `import "core.scheduler"` completes (**To verify**, V2). Files are written only when their content differs; files of
-modules that disappeared are removed. `setup`, which does not compile, writes the Lua modules only.
+modules that disappeared are removed. `setup`, which does not compile, writes the Lua modules only, and keeps the
+files of YueScript modules as the last compile wrote them (amended 2026-09-28 during Plan 4b).
 
 ### 5.5 `dev`
 

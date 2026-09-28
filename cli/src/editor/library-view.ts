@@ -10,8 +10,9 @@ export const LIBRARY_VIEW_DIR = ".moonwell/lua";
 /**
  * Brings `.moonwell/lua/` up to date with the libraries' modules (spec §5.4): each module with a `library` as
  * `<name with "." as "/">.lua`, a Lua module's source or a YueScript module's compiled output from `loadCompiled`
- * (skipped when there is none). Files are written only when their content differs, and every other file under the
- * folder is removed. Returns the POSIX paths it wrote.
+ * (skipped when there is none). Without `loadCompiled`, a YueScript module's existing file is kept as it is. Files are
+ * written only when their content differs, and every other file under the folder is removed. Returns the POSIX paths it
+ * wrote.
  */
 export async function refreshLibraryView(
   root: string,
@@ -23,17 +24,23 @@ export async function refreshLibraryView(
   try {
     // Inside the try: reading a compiled output can fail too (e.g. a file another program holds).
     const files = new Map<string, string>();
+    // Without a loader (setup), a YueScript module's view from the last compile stays until the next one.
+    const kept = new Set<string>();
     for (const module of modules) {
       if (module.library === undefined) continue;
+      const file = `${module.name.split(".").join("/")}.lua`;
+      if (module.kind === "yue" && loadCompiled === undefined) {
+        kept.add(file);
+        continue;
+      }
       const text = module.kind === "lua" ? module.source ?? "" : loadCompiled?.(module)?.source;
-      if (text === undefined) continue;
-      files.set(`${module.name.split(".").join("/")}.lua`, text);
+      if (text !== undefined) files.set(file, text);
     }
     for (const [file, text] of files) {
       if (await writeTextIfChanged(join(dir, ...file.split("/")), text)) written.push(`${LIBRARY_VIEW_DIR}/${file}`);
     }
     for (const file of await existingFiles(dir)) {
-      if (!files.has(file)) await removeFileIfExists(join(dir, ...file.split("/")));
+      if (!files.has(file) && !kept.has(file)) await removeFileIfExists(join(dir, ...file.split("/")));
     }
   } catch (cause) {
     if (cause instanceof MoonwellError) throw cause;

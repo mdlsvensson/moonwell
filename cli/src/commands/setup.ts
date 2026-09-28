@@ -51,7 +51,7 @@ export async function setup(ctx: CommandContext): Promise<string> {
   // cannot keep .moonwell/types and the macro module from being written.
   await syncProjectLibraries(ctx, project);
   // Last, for the same reason with a bad library file. Setup does not compile, so the view gets the libraries' Lua
-  // modules only; check and build report clashes with src/ and lua/.
+  // modules and keeps the YueScript modules' last compiled output; check and build report clashes with src/ and lua/.
   await refreshLibraryView(
     ctx.root,
     await collectModules(ctx.root, libraryModuleRoots(Object.keys(project.libraries))),

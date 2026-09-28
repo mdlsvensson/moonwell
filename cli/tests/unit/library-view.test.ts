@@ -58,3 +58,34 @@ Deno.test("refreshLibraryView reports a compiled output it cannot read as a Moon
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test("refreshLibraryView without a loader keeps the views of YueScript library modules it cannot compile", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-view-" });
+  try {
+    const loud: SourceModule = {
+      name: "example.loud",
+      path: ".moonwell/libraries/ex/example/loud.yue",
+      kind: "yue",
+      library: "ex",
+    };
+    const greet: SourceModule = {
+      name: "example.greet",
+      path: ".moonwell/libraries/ex/example/greet.lua",
+      kind: "lua",
+      source: "return 1",
+      library: "ex",
+    };
+    const view = join(root, ".moonwell", "lua", "example", "loud.lua");
+    await refreshLibraryView(
+      root,
+      [loud, greet],
+      () => ({ name: loud.name, sourcePath: loud.path, source: "return 3" }),
+    );
+    assertEquals(await refreshLibraryView(root, [loud, greet]), [], "setup, after a check");
+    assertEquals(await Deno.readTextFile(view), "return 3");
+    await refreshLibraryView(root, [greet]);
+    assertEquals(await exists(view), false, "a module that went away loses its view");
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
