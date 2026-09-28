@@ -101,9 +101,10 @@ over, and updated on 2026-09-28 after the 0.4.0 release.
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
   or `<name>.init`; Lua modules are bundled unchanged and keep their lines in `--minify` builds (per-entry flag in the
   line table); `luaTopLevelGlobals` (`cli/src/lint/lua-globals.ts`) makes their top-level globals known; `mergeLuarc`
-  lets `setup` add `.luarc.json` entries to older projects. Its gate (CONTRIBUTING step 12, the Lua modules part) has
-  not been run yet.
-- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `a9a2e15` (release 0.4.0).
+  lets `setup` add `.luarc.json` entries to older projects. Its gate (CONTRIBUTING step 12, the Lua modules part) passed
+  2026-09-28. Plan 4b should start by keying compile outputs by project-relative path: `compileSources` and
+  `moduleLoader`'s `loadCompiled` still assume every YueScript module is under `src/` (final-review note).
+- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `8c20362` (Plan 4a).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 

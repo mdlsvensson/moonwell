@@ -9,6 +9,14 @@
   entries to older projects' `.luarc.json`. `dev` watches `lua/`. A leading byte order mark and a `#` first line are
   skipped, as standalone Lua does, and `moonwell` is reserved for the built-in module.
 
+### Release gate (so far)
+
+Lua modules (CONTRIBUTING step 12, first part) passed 2026-09-28 on Warcraft III Reforged 3.0.0.24268, tested by the
+maintainer in a new project with a module (`lua/greeter.lua`) and a global-style file (`lua/counter.lua`) used from
+`src/main.yue`: both print in the game; an error inside the module in a `--minify` build names `lua/greeter.lua:5`; the
+editor completes the module's function and knows the global. `deno task check` and `build` pass, and the Lua extension's
+lua-language-server, run from the command line, resolves the module and flags an unknown global.
+
 ## 0.4.0 (2026-09-28)
 
 - Editor support for VS Code's YueScript extension: new projects get `yueconfig.yue`, `.luarc.json` and a recommendation
