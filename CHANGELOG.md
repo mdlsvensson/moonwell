@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0 (2026-09-27)
+## 0.4.0 (2026-09-28)
 
 - Editor support for VS Code's YueScript extension: new projects get `yueconfig.yue`, `.luarc.json` and a recommendation
   of the YueScript and Lua (`sumneko.lua`) extensions, and `check`, `build`, `test` and `dev` write LuaLS declarations

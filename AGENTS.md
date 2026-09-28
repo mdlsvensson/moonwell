@@ -4,18 +4,18 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-27 after Plan 3c.
+over, and updated on 2026-09-28 after the 0.4.0 release.
 
 ## Read first
 
 - `docs/superpowers/specs/2026-09-24-moonwell-core-design.md` is the **binding design** for the whole project. Its §6
   describes the data layers: §6.1 object data, §6.2 assets and §6.3 map settings are all implemented.
-- `README.md` (user docs), `CONTRIBUTING.md` (checks, release gate, publishing), `CHANGELOG.md` (0.1.0 released,
-  `## Unreleased` lists what is done since).
+- `README.md` (user docs), `CONTRIBUTING.md` (checks, release gate, publishing), `CHANGELOG.md` (one section per
+  release, each with its release gate; add `## Unreleased` above the newest for work done since).
 - Later specs, all implemented: `2026-09-25-moonwell-model-paths-design.md`,
   `2026-09-25-moonwell-in-game-paths-design.md`, `2026-09-25-moonwell-map-settings-design.md` and
   `2026-09-26-moonwell-object-data-design.md`. `2026-09-27-moonwell-editor-dx-design.md` (sub-project 3) is implemented
-  by Plans 3a, 3b and 3c, which are not released yet. Plans for everything built so far are in
+  by Plans 3a, 3b and 3c, released together as 0.4.0. Plans for everything built so far are in
   `docs/superpowers/plans/`; follow their style when writing new plans.
 
 ## State (2026-09-27)
@@ -57,10 +57,14 @@ over, and updated on 2026-09-27 after Plan 3c.
   deferred: `assets:paths` reports every readable model before failing, and tokenizes `.mdl` lazily. Ctrl+C during
   `assets:sync` rolls back. There is no empty state file, and the state-file hint is fixed. The assets release gate
   (CONTRIBUTING step 7, with the World Editor save) passed 2026-09-27.
-- **Plan 3a done, unreleased** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-editor-setup.md`): editor
-  support for VS Code's YueScript extension (`LiJin.yuescript`) with the Lua extension (`sumneko.lua`), whose bundled
-  lua-language-server the YueScript extension uses. `deno task gen:natives <folder> <version>` (`tools/gen-natives.ts`,
-  parser in `tools/natives/jass.ts`) reads `war3.w3mod/scripts/common.j` and `blizzard.j` exported with CascView into
+- **Released 0.4.0** (2026-09-28, JSR `@moonwell/cli@0.4.0` and GitHub release `moonwell@0.4.0` on `a9a2e15`, checked
+  with `init` and `build` from JSR): sub-project 3, Plans 3a, 3b and 3c below. The release gate passed steps 1–6, 10 and
+  11; 7–9 were not re-run (their code is unchanged). Pkl's HTTP client fails in Claude's shells with "Unable to
+  establish loopback connection", even outside the sandbox, so the maintainer runs the JSR `init` check.
+- **Plan 3a** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-editor-setup.md`): editor support for VS Code's
+  YueScript extension (`LiJin.yuescript`) with the Lua extension (`sumneko.lua`), whose bundled lua-language-server the
+  YueScript extension uses. `deno task gen:natives <folder> <version>` (`tools/gen-natives.ts`, parser in
+  `tools/natives/jass.ts`) reads `war3.w3mod/scripts/common.j` and `blizzard.j` exported with CascView into
   `cli/data/natives.json` (names, types and signatures only; comments are Blizzard's text and are not copied), plus the
   hand-written `tools/natives/lua-extras.json`. `check`, `build`, `test`, `dev` and `setup` write
   `.moonwell/types/{natives,moonwell,objects,map}.d.lua` (git-ignored; code in `cli/src/editor/`); `map.d.lua` comes
@@ -76,34 +80,30 @@ over, and updated on 2026-09-27 after Plan 3c.
   `.luarc.json` sets it to 10000. On Windows the extension 0.2.9 opens a console window for `yue` (it does not hide it).
   Our fix, `windowsHide: true` on its two `spawn` calls (pigpigyyy/yuescript-vscode#11), was merged 2026-09-27 and
   awaits an extension release; then drop the README note.
-- **Plan 3b done, unreleased** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-unknown-globals.md`): the
-  unknown-global check. `compileProject` runs `yue -g` per changed source (cache `dist/stage/lua/.globals.json`, code in
-  `cli/src/lint/`), builds the known names from `natives.json`, the source map's `war3map.lua`, `global` lines under
-  `src/` and `lint.globals`, and throws a `ProblemsError` (or warns, with `lint.unknownGlobals = "warning"`). Name
-  matching is in `cli/src/shared/names.ts`, shared with object data. Its gate (CONTRIBUTING step 10, re-run in full)
-  passed 2026-09-27 after one editor fix: `moonwell.d.lua` declares `require` (`.luarc.json` turns off LuaLS's `package`
-  library, which removed it) and types hook callbacks `fun(): ...` (YueScript returns the last expression). To check
-  editor diagnostics without the editor, run the Lua extension's bundled server:
+- **Plan 3b** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-unknown-globals.md`): the unknown-global check.
+  `compileProject` runs `yue -g` per changed source (cache `dist/stage/lua/.globals.json`, code in `cli/src/lint/`),
+  builds the known names from `natives.json`, the source map's `war3map.lua`, `global` lines under `src/` and
+  `lint.globals`, and throws a `ProblemsError` (or warns, with `lint.unknownGlobals = "warning"`). Name matching is in
+  `cli/src/shared/names.ts`, shared with object data. Its gate (CONTRIBUTING step 10, re-run in full) passed 2026-09-27
+  after one editor fix: `moonwell.d.lua` declares `require` (`.luarc.json` turns off LuaLS's `package` library, which
+  removed it) and types hook callbacks `fun(): ...` (YueScript returns the last expression). To check editor diagnostics
+  without the editor, run the Lua extension's bundled server:
   `<extensions>/sumneko.lua-<version>/server/bin/lua-language-server --check=<project> --checklevel=Hint` after
   compiling the `.yue` files with `yue -l -c --target=5.3` (what the YueScript extension writes on save).
-- **Plan 3c done, unreleased** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-macros.md`): macros.
-  `cli/runtime/macros.yue` (embedded as `MACROS_YUE`) exports `$FourCC`; `refreshEditorFiles` writes it to
-  `.moonwell/yue/moonwell/macros.yue`, and every `yue` run gets `--path <root>/.moonwell/yue/?.lua`
-  (`cli/src/yue/macros.ts`), with the module's hash in the compile and `yue -g` cache keys. The macro module must not
-  have a backslash inside a string literal: yue 0.34.2 fails to load such a macro. The template's standard Footman, next
-  to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING step 11) passed 2026-09-27. Lua `print` output shows on screen
-  only; the F12 message log does not keep it.
-- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `929080e` (Plans 3a–3c).
+- **Plan 3c** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-macros.md`): macros. `cli/runtime/macros.yue`
+  (embedded as `MACROS_YUE`) exports `$FourCC`; `refreshEditorFiles` writes it to `.moonwell/yue/moonwell/macros.yue`,
+  and every `yue` run gets `--path <root>/.moonwell/yue/?.lua` (`cli/src/yue/macros.ts`), with the module's hash in the
+  compile and `yue -g` cache keys. The macro module must not have a backslash inside a string literal: yue 0.34.2 fails
+  to load such a macro. The template's standard Footman, next to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING
+  step 11) passed 2026-09-27. Lua `print` output shows on screen only; the F12 message log does not keep it.
+- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `a9a2e15` (release 0.4.0).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Publish 0.4.0** (3a, 3b and 3c together). The gate passed and the version is bumped (CHANGELOG `## 0.4.0`); the
-   maintainer packages the schema, creates the `moonwell@0.4.0` GitHub release on the pushed release commit, publishes
-   to JSR and checks it from outside the repo (CONTRIBUTING "Publishing" steps 2–5). Then mark 0.4.0 released here.
-2. **Sub-project 4** (importing existing Lua code; see Backlog) needs a design first. Ask the maintainer what comes
-   next.
+1. **Ask the maintainer what comes next.** Candidates: sub-project 4 (importing existing Lua code) and the other Backlog
+   items; each needs a design first.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
