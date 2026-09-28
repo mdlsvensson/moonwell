@@ -28,6 +28,14 @@ maintainer in a new project with a module (`lua/greeter.lua`) and a global-style
 editor completes the module's function and knows the global. `deno task check` and `build` pass, and the Lua extension's
 lua-language-server, run from the command line, resolves the module and flags an unknown global.
 
+Libraries (CONTRIBUTING step 12, second part) passed 2026-09-28 in a new project using
+`mdlsvensson/moonwell-example-lib` `v0.1.0` by tag: `check` downloads it and locks commit `13e3553`; the editor
+completes `loud.shout`, and the game shows the shout. Deleting `.moonwell/` and checking again leaves `moonwell.lock`
+unchanged. Pointed at a local clone through `moonwell.local.pkl`, the game shows the changed `hello`, `moonwell.lock`
+stays unchanged, and a `loud.lua` the editor wrote beside `loud.yue` in the clone does not break `check`; switching back
+to the tag downloads it again and checks it against the lock. lua-language-server, run from the command line, reports no
+duplicate definitions. CI runs the network test (`test:network`) on Ubuntu and Windows.
+
 ## 0.4.0 (2026-09-28)
 
 - Editor support for VS Code's YueScript extension: new projects get `yueconfig.yue`, `.luarc.json` and a recommendation

@@ -113,15 +113,16 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
   `dist/stage/lua/.libraries/<key>/`). `cli/src/editor/library-view.ts` writes `.moonwell/lua/` (`setup`: the Lua
   modules only). Known names come from the resolved graph, and only the `src/` modules the map requires are checked.
   `isWithin` is shared in `cli/src/shared/fs.ts`. The example library is `mdlsvensson/moonwell-example-lib` `v0.1.0`
-  (commit `13e35535c481fddd267533cc513f86b55b313b66`), which `deno task test:network` downloads. The gate (CONTRIBUTING
-  step 12, the libraries part) has not run yet.
-- **CI** (GitHub Actions, Ubuntu and Windows) is green as of commit `8c20362` (Plan 4a).
+  (commit `13e35535c481fddd267533cc513f86b55b313b66`), which `deno task test:network` downloads. In a library, a `.lua`
+  beside a `.yue` of the same stem is its compiled output; a local override keeps the lock entry. Its gate (CONTRIBUTING
+  step 12, the libraries part) passed 2026-09-28.
+- **CI** (GitHub Actions, Ubuntu and Windows, with `test:network`) is green as of commit `632c765` (Plan 4b).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Release 0.5.0** (Plans 4a and 4b): run CONTRIBUTING step 12 in full, then the whole release gate, then release
+1. **Release 0.5.0** (Plans 4a and 4b): step 12 passed; run the rest of the release gate (steps 1–6), then release
    0.5.0.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
