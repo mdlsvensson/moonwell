@@ -95,7 +95,8 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
   and every `yue` run gets `--path <root>/.moonwell/yue/?.lua` (`cli/src/yue/macros.ts`), with the module's hash in the
   compile and `yue -g` cache keys. The macro module must not have a backslash inside a string literal: yue 0.34.2 fails
   to load such a macro. The template's standard Footman, next to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING
-  step 11) passed 2026-09-27. Lua `print` output shows on screen only; the F12 message log does not keep it.
+  step 11) passed 2026-09-27. That probe reported screen-only `print` output; the later 4c gate confirmed wrapper
+  callback errors, ticks and cleanup messages were retained in F12 on 3.0.0.24268.
 - **Released 0.5.0** (2026-09-28, JSR `@moonwell/cli@0.5.0` and GitHub release `moonwell@0.5.0` on `27d093a`, checked
   with `init` and `build` from JSR): sub-project 4, Plans 4a and 4b below. The release gate passed steps 1–6 and 12;
   7–11 were not re-run (their code is unchanged).
@@ -126,8 +127,9 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
   `dir = "src"`; intended remote is `mdlsvensson/moonwell-wrappers` (not created or published by this work). Its 23
   behavior tests, Lua 5.3.6 syntax check, real Moonwell normal/minified builds, bundle runtime and LuaLS 3.19.1
   positive/negative fixtures pass. `fromHandle` is conservatively nullable in LuaLS: narrow or assert the result. All
-  six wrappers are exercised by its `examples/gate.yue`, which builds and type-checks; maintainer game execution and
-  first published-tag consumption remain pending in its CONTRIBUTING.md. Moonwell CLI code is unchanged.
+  six wrappers are exercised by its `examples/gate.yue`. The maintainer passed normal gameplay/cleanup, intentional
+  callback-error recovery, minified gameplay and World Editor opening on 2026-09-28 (game 3.0.0.24268, editor 3.00).
+  First published-tag consumption remains pending in its CONTRIBUTING.md. Moonwell CLI code is unchanged.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -136,8 +138,9 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
 1. **Finish sub-project 4c's release gate.** Its approved spec is
    `docs/superpowers/specs/2026-09-28-moonwell-wrappers-design.md`; implementation and verification progress is in
    `docs/superpowers/plans/2026-09-28-moonwell-wrappers.md`. Product code lives in the separate sibling repository
-   `../moonwell-wrappers`, written in annotated Lua. The in-game gate and first GitHub-tag consumption check remain
-   pending; follow that repository's CONTRIBUTING.md. Broader wrapper coverage remains on the backlog.
+   `../moonwell-wrappers`, written in annotated Lua. The in-game gate passed; publication and the first GitHub-tag
+   consumption check remain pending. Follow that repository's CONTRIBUTING.md. Broader wrapper coverage remains on the
+   backlog.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

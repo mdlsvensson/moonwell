@@ -204,5 +204,10 @@ eq(callCount("RemoveUnit"), 0)
   16-file Lua 5.3.6 syntax check and all consumer/editor integration checks pass. Library committed as `3b923d5`.
 - Parent repository verification: check/lint/format pass; 443 unit, 28 runtime, 25 Pkl integration, 32 e2e and 1 network
   tests pass, plus the Pkl schema tests. The initial formatting finding in AGENTS.md was fixed and formatting rechecked.
-- Remaining external work: maintainer in-game gate, creation/push of the remote and immutable first tag, then GitHub
+- 2026-09-28 manual gate: maintainer confirmed normal gameplay including cleanup, intentional callback-error recovery
+  through later ticks and cleanup, minified packed-map gameplay, and opening the packed map in World Editor. Game
+  3.0.0.24268; World Editor 3.00 (file version 3.0.0.24268). The probe screenshot shows both intentional errors and
+  subsequent ticks/death/cleanup in F12, correcting the earlier blanket statement about print retention. Disposable
+  gate projects, logs and map hashes are under the wrapper repository's ignored `.test-work/release-gate-2026-09-28/`.
+- Remaining external work: creation/push of the remote and immutable first tag, then GitHub
   consumption gate. These are release tasks, not claims made by the local implementation. Both repositories stay on main.

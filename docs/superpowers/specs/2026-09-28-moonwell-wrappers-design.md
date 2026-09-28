@@ -1,8 +1,8 @@
 # Moonwell Native Wrappers (sub-project 4c) — Design
 
 - **Date:** 2026-09-28
-- **Status:** Approved and implemented locally on 2026-09-28. Automated checks pass; in-game and first-tag release
-  gates remain pending. Library commit: `3b923d5` in the separate `moonwell-wrappers` repository.
+- **Status:** Approved and implemented locally on 2026-09-28. Automated and in-game checks pass; first-tag consumption
+  remains pending. Library commit: `3b923d5` in the separate `moonwell-wrappers` repository.
 - **Builds on:** `2026-09-28-moonwell-lua-libraries-design.md` (4a and 4b, released in Moonwell 0.5.0).
 - **Target:** First independent library release, `v0.1.0`.
 
@@ -203,7 +203,8 @@ disable the trigger. The library promises no traceback or source-line rewriting 
 No debug, io, package, filesystem, dynamic require or unavailable Lua library is required.
 
 Callbacks are synchronous and must not yield or use TriggerSleepAction. Scheduling further work uses timers. Print
-errors are visible on screen; the handoff notes that Warcraft's F12 log does not retain print output.
+errors are visible on screen. The maintainer's 2026-09-28 gate also confirmed wrapper callback errors, ticks and cleanup
+messages in Warcraft 3.0.0.24268's F12 log.
 
 ## 7. Types and module dependencies
 
