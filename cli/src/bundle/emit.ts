@@ -9,7 +9,7 @@ function sourceLines(text: string): string[] {
 
 /**
  * Renders the bundle block; `firstLine` is the war3map.lua line number the leading "do" will occupy.
- * Minified modules keep no source lines, so their errors name the module file only.
+ * Minified YueScript modules keep no source lines, so their errors name the file only; Lua modules keep theirs.
  */
 export function emitBundle(
   input: { runtime: string; modules: CompiledModule[]; entry: string; firstLine: number; minify?: boolean },
@@ -22,13 +22,16 @@ export function emitBundle(
     const start = nextLine();
     const body = sourceLines(module.source);
     out.push(...body);
+    // A Lua module is its own source, never minified, so it keeps its lines (spec §3.3).
+    const minified = input.minify === true && module.kind !== "lua";
     ranges.push(
-      `{${start}, ${start + body.length - 1}, ${JSON.stringify(module.name)}, ${JSON.stringify(module.sourcePath)}},`,
+      `{${start}, ${start + body.length - 1}, ${JSON.stringify(module.name)}, ${JSON.stringify(module.sourcePath)}${
+        minified ? ", true" : ""
+      }},`,
     );
     out.push("end)");
   }
   out.push("__mw.lines = {", ...ranges, "}");
-  if (input.minify) out.push("__mw.minified = true");
   out.push("__mw.install()", `__mw.boot(${JSON.stringify(input.entry)})`, "end");
   return out.join("\n") + "\n";
 }

@@ -24,10 +24,11 @@ export function resolveGraph(
     }
     const module = load(name);
     if (!module) {
+      const path = name.split(".").join("/");
       throw new MoonwellError(`Module '${name}' not found.`, {
         file: from?.module.sourcePath,
         line: from?.line,
-        hint: `Expected src/${name.split(".").join("/")}.yue. Built-in modules: ${[...builtins].join(", ")}.`,
+        hint: `Expected src/${path}.yue or lua/${path}.lua. Built-in modules: ${[...builtins].join(", ")}.`,
       });
     }
     state.set(name, "visiting");

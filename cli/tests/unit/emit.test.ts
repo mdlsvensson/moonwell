@@ -21,11 +21,14 @@ Deno.test("emitBundle wraps modules and records absolute line ranges", () => {
   assertStringIncludes(bundle, '__mw.install()\n__mw.boot("main")\nend\n');
 });
 
-Deno.test("emitBundle marks minified bundles so errors name modules without lines", () => {
-  const plain = emitBundle({ runtime: "", modules, entry: "main", firstLine: 1 });
-  const minified = emitBundle({ runtime: "", modules, entry: "main", firstLine: 1, minify: true });
-  assertEquals(plain.includes("__mw.minified = true"), false);
-  assertStringIncludes(minified, '"src/main.yue"},\n}\n__mw.minified = true\n__mw.install()');
+Deno.test("emitBundle marks minified YueScript modules; Lua modules keep their lines", () => {
+  const lua = { name: "lib", sourcePath: "lua/lib.lua", source: "return {}", kind: "lua" as const };
+  const plain = emitBundle({ runtime: "", modules: [...modules, lua], entry: "main", firstLine: 1 });
+  const minified = emitBundle({ runtime: "", modules: [...modules, lua], entry: "main", firstLine: 1, minify: true });
+  assertEquals(plain.includes(", true},"), false);
+  assertStringIncludes(minified, '"main", "src/main.yue", true},');
+  assertStringIncludes(minified, '"lib", "lua/lib.lua"},');
+  assertEquals(minified.includes("__mw.minified"), false);
 });
 
 Deno.test("injectBundle appends after the map script and passes the first line", () => {

@@ -3,6 +3,7 @@ import { join, relative } from "@std/path";
 import { applyAssetPlan, assetLocations, planAssets } from "./assets/plan.ts";
 import { emitBundle, injectBundle } from "./bundle/emit.ts";
 import { resolveGraph } from "./bundle/graph.ts";
+import { collectModules, moduleLoader } from "./bundle/modules.ts";
 import type { CommandContext } from "./context.ts";
 import { refreshEditorFiles } from "./editor/refresh.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
@@ -37,7 +38,7 @@ export function entryModuleName(entryPath: string): string {
   return posix.slice("src/".length, -".yue".length).split("/").join(".");
 }
 
-/** Compiles src/, resolves the reachable module graph from the entry and checks for unknown globals. */
+/** Compiles src/, resolves the reachable module graph (src/ and lua/) from the entry and checks for unknown globals. */
 export async function compileProject(
   ctx: CommandContext,
   project: Project,
@@ -45,15 +46,17 @@ export async function compileProject(
 ): Promise<{ modules: CompiledModule[]; entry: string }> {
   const yue = await ensureYue(project.yue, ctx.install);
   const macros = await macroSearch(ctx.root);
+  const sourceModules = await collectModules(ctx.root);
   const output = await compileSources({
     yue,
     root: ctx.root,
     minify: options.minify ?? project.build.minify,
     macros,
     run: ctx.run,
+    modules: sourceModules,
   });
   const entry = entryModuleName(options.entry ?? project.map.entry);
-  const modules = resolveGraph(entry, output.load, BUILTIN_MODULES);
+  const modules = resolveGraph(entry, moduleLoader(sourceModules, output.load), BUILTIN_MODULES);
   // After compiling and resolving, so syntax errors and missing modules are reported first (spec §5.2).
   await checkUnknownGlobals(ctx, project, { yue, hashes: output.hashes, sources: output.sources, macros });
   return { modules, entry };

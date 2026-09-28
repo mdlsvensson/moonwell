@@ -18,10 +18,13 @@ const FAKE_MAP = [
 const REPORT = "\nconfig()\nmain()\nio.write(table.concat(LOG, '|'), '\\n', table.concat(PRINTED, '\\n'), '\\n')\n";
 
 async function runMap(
-  modules: Array<{ name: string; source: string }>,
+  modules: Array<{ name: string; source: string; sourcePath?: string; kind?: "yue" | "lua" }>,
   minify = false,
 ): Promise<{ log: string; printed: string }> {
-  const compiled = modules.map((module) => ({ ...module, sourcePath: `src/${module.name.split(".").join("/")}.yue` }));
+  const compiled = modules.map((module) => ({
+    ...module,
+    sourcePath: module.sourcePath ?? `src/${module.name.split(".").join("/")}.yue`,
+  }));
   const script = injectBundle(
     FAKE_MAP,
     (firstLine) => emitBundle({ runtime: RUNTIME_LUA, modules: compiled, entry: "main", firstLine, minify }),
@@ -69,6 +72,19 @@ Deno.test("minified bundles report the module file without a line number", async
   const { printed } = await runMap([{ name: "main", source: 'local x = 1\nerror("boot failed")' }], true);
   assertStringIncludes(printed, "src/main.yue: boot failed");
   assertEquals(printed.includes("src/main.yue:2"), false);
+});
+
+Deno.test("a Lua module keeps its line numbers in a minified bundle", async () => {
+  const { printed } = await runMap([
+    { name: "main", source: 'local lib = require("lib")\nlib.fail()' },
+    {
+      name: "lib",
+      source: 'local M = {}\nfunction M.fail()\n  error("lua failed")\nend\nreturn M',
+      sourcePath: "lua/lib.lua",
+      kind: "lua",
+    },
+  ], true);
+  assertStringIncludes(printed, "lua/lib.lua:3: lua failed");
 });
 
 Deno.test("format_error leaves positions outside modules untouched", async () => {

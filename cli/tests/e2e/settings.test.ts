@@ -252,7 +252,7 @@ Deno.test("test stages settings with the runtime, and a minified build keeps set
   assertSettingsLua(lua);
   const bundle = lua.indexOf("__mw.lines = {");
   assert(bundle > lua.indexOf('SetMapName("Moonwell settings test")'), "module error metadata precedes settings");
-  assert(lua.indexOf("__mw.minified = true") > bundle, "the minified bundle was not emitted");
+  assert(lua.indexOf('"src/main.yue", true},') > bundle, "the minified bundle was not emitted");
   assertEquals(await snapshot(sourceMap(project)), before);
 });
 
