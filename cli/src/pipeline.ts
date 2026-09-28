@@ -3,10 +3,17 @@ import { join, relative } from "@std/path";
 import { applyAssetPlan, assetLocations, planAssets } from "./assets/plan.ts";
 import { emitBundle, injectBundle } from "./bundle/emit.ts";
 import { resolveGraph } from "./bundle/graph.ts";
-import { BUILTIN_MODULES, collectModules, moduleLoader } from "./bundle/modules.ts";
+import {
+  BUILTIN_MODULES,
+  collectModules,
+  libraryModuleRoots,
+  moduleLoader,
+  PROJECT_MODULE_ROOTS,
+} from "./bundle/modules.ts";
 import type { CommandContext } from "./context.ts";
 import { refreshEditorFiles } from "./editor/refresh.ts";
 import { RUNTIME_LUA } from "./embedded/runtime.ts";
+import { syncLibraries } from "./libraries/sync.ts";
 import { checkUnknownGlobals } from "./lint/unknown-globals.ts";
 import { refreshObjectIds } from "./objectdata/ids.ts";
 import { applyObjectPlan, type ObjectPlan, planObjectData } from "./objectdata/plan.ts";
@@ -35,15 +42,30 @@ export function entryModuleName(entryPath: string): string {
   return posix.slice("src/".length, -".yue".length).split("/").join(".");
 }
 
-/** Compiles src/, resolves the reachable module graph (src/ and lua/) from the entry and checks for unknown globals. */
+/** Brings .moonwell/libraries/ up to date with the manifest's libraries (spec §4.2). */
+export function syncProjectLibraries(ctx: CommandContext, project: Project): Promise<void> {
+  return syncLibraries(ctx.root, project.libraries, project.manifest, {
+    fetch: ctx.install.fetch,
+    logger: ctx.logger,
+  });
+}
+
+/**
+ * Syncs the libraries, compiles src/ and the libraries' YueScript, resolves the reachable module graph (src/, lua/ and
+ * the libraries) from the entry and checks for unknown globals.
+ */
 export async function compileProject(
   ctx: CommandContext,
   project: Project,
   options: StageOptions,
 ): Promise<{ modules: CompiledModule[]; entry: string }> {
+  await syncProjectLibraries(ctx, project);
   const yue = await ensureYue(project.yue, ctx.install);
   const macros = await macroSearch(ctx.root);
-  const sourceModules = await collectModules(ctx.root);
+  const sourceModules = await collectModules(ctx.root, [
+    ...PROJECT_MODULE_ROOTS,
+    ...libraryModuleRoots(Object.keys(project.libraries)),
+  ]);
   const output = await compileSources({
     yue,
     root: ctx.root,

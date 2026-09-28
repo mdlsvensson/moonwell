@@ -1,7 +1,8 @@
 import { assertEquals, assertRejects } from "@std/assert";
-import { join } from "@std/path";
-import { dev, isRelevantChange } from "../../src/commands/dev.ts";
+import { join, resolve } from "@std/path";
+import { dev, isRelevantChange, localLibraryFolders } from "../../src/commands/dev.ts";
 import { type CommandContext, createContext } from "../../src/context.ts";
+import type { Project } from "../../src/project/project.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { silentLogger } from "../support/logger.ts";
 
@@ -23,6 +24,17 @@ Deno.test("isRelevantChange watches Yue sources, Lua modules, assets, object fil
   assertEquals(check("lua", "notes.txt"), false);
   assertEquals(check("dist", "stage", "lua", "main.lua"), false);
   assertEquals(check("README.md"), false);
+});
+
+Deno.test("localLibraryFolders lists the folders of local libraries only", () => {
+  const root = Deno.cwd();
+  const folders = localLibraryFolders(root, {
+    libraries: {
+      mine: { github: null, tag: null, path: "../mine", dir: "src" },
+      remote: { github: "o/r", tag: "v1", path: null, dir: "" },
+    },
+  } as unknown as Project);
+  assertEquals(folders, [resolve(root, "..", "mine", "src")]);
 });
 
 Deno.test("dev fails with MoonwellError before any work when src/ is missing", async () => {

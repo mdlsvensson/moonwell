@@ -2,7 +2,7 @@ import { dirname, join } from "@std/path";
 import type { CommandContext } from "../context.ts";
 import { refreshEditorFiles } from "../editor/refresh.ts";
 import { addEditorFiles, mergeLuarc } from "../editor/scaffold.ts";
-import { planProjectObjects } from "../pipeline.ts";
+import { planProjectObjects, syncProjectLibraries } from "../pipeline.ts";
 import { ensureLocalManifest, loadProject } from "../project/project.ts";
 import { installYueBin, reportEditorTools } from "../yue/bin.ts";
 import { ensureYue } from "../yue/install.ts";
@@ -10,8 +10,9 @@ import { ensureYue } from "../yue/install.ts";
 /**
  * Creates moonwell.local.pkl if this checkout has none, installs the project's pinned compiler into the user cache,
  * keeps a copy in the cache's bin folder for the editor and reports what the editor still needs, adds the editor files
- * a project lacks, adds the `.luarc.json` entries an older project lacks, and writes .moonwell/types and the macro
- * module (.moonwell/yue/moonwell/macros.yue).
+ * a project lacks, adds the `.luarc.json` entries an older project lacks, syncs the manifest's libraries into
+ * .moonwell/libraries (and moonwell.lock), and writes .moonwell/types and the macro module
+ * (.moonwell/yue/moonwell/macros.yue).
  */
 export async function setup(ctx: CommandContext): Promise<string> {
   const project = await loadProject(ctx.root, ctx.run);
@@ -39,6 +40,7 @@ export async function setup(ctx: CommandContext): Promise<string> {
   } else if (merged.length > 0) {
     ctx.logger.info(`Added ${merged.join(", ")} to .luarc.json.`);
   }
+  await syncProjectLibraries(ctx, project);
   const objects = await planProjectObjects(ctx, project);
   await refreshEditorFiles(ctx.root, { objects: objects.objects, mapFolder: `maps/${project.map.folder}` });
   return binary;

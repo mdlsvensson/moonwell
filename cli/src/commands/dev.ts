@@ -1,6 +1,7 @@
 import { exists } from "@std/fs";
-import { join, relative } from "@std/path";
+import { isAbsolute, join, relative, resolve } from "@std/path";
 import type { CommandContext } from "../context.ts";
+import { loadProject, type Project } from "../project/project.ts";
 import { formatError, MoonwellError } from "../shared/errors.ts";
 import { toPosix } from "../shared/fs.ts";
 import { check } from "./check.ts";
@@ -16,9 +17,24 @@ export function isRelevantChange(root: string, path: string): boolean {
   return /^moonwell(\.local)?\.pkl$/.test(rel) || rel === "PklProject" || rel === "PklProject.deps.json";
 }
 
+/** The folders local libraries are copied from (`path` and `dir`, resolved against the project), in key order. */
+export function localLibraryFolders(root: string, project: Project): string[] {
+  return localLibraries(root, project).map(({ folder }) => folder);
+}
+
+/** Each local library's folder, and its label: the folder as the manifest writes it (`path`, then `dir`). */
+function localLibraries(root: string, project: Project): { folder: string; label: string }[] {
+  return Object.keys(project.libraries).sort().flatMap((key) => {
+    const { path, dir } = project.libraries[key];
+    if (path === null) return [];
+    return [{ folder: resolve(root, path, dir), label: toPosix(join(path, dir)).replace(/\/?$/, "/") }];
+  });
+}
+
 /**
- * Re-runs `check` whenever sources, objects or manifests change, until `signal` aborts. Each cycle first refreshes
- * src/generated/objects.yue; dev ignores src/generated/, so that write does not trigger another cycle.
+ * Re-runs `check` whenever sources, objects, manifests or local libraries change, until `signal` aborts. Each cycle
+ * first refreshes src/generated/objects.yue; dev ignores src/generated/, so that write does not trigger another cycle.
+ * .moonwell/ is never watched: each cycle's library sync writes there.
  */
 export async function dev(
   ctx: CommandContext,
@@ -39,20 +55,33 @@ export async function dev(
   };
   await cycle();
 
+  // A manifest that does not load has no libraries to watch; the first cycle has already reported why.
+  const project = await loadProject(ctx.root, ctx.run).catch(() => undefined);
+  const libraries = project === undefined ? [] : localLibraries(ctx.root, project);
+
   // Start watching before announcing it, so a save made right after the message is never missed.
-  const watchers = [
-    Deno.watchFs(join(ctx.root, "src"), { recursive: true }),
-    Deno.watchFs(ctx.root, { recursive: false }),
+  const projectChange = (path: string) => isRelevantChange(ctx.root, path);
+  const watchers: { watcher: Deno.FsWatcher; relevant: (path: string) => boolean }[] = [
+    { watcher: Deno.watchFs(join(ctx.root, "src"), { recursive: true }), relevant: projectChange },
+    { watcher: Deno.watchFs(ctx.root, { recursive: false }), relevant: projectChange },
   ];
   // assets/, objects/ and lua/ are optional; a folder created after dev starts is picked up on the next dev run.
   const watched = ["src/"];
   for (const folder of ["assets", "objects", "lua"]) {
     if (!(await exists(join(ctx.root, folder), { isDirectory: true }))) continue;
-    watchers.push(Deno.watchFs(join(ctx.root, folder), { recursive: true }));
+    watchers.push({ watcher: Deno.watchFs(join(ctx.root, folder), { recursive: true }), relevant: projectChange });
     watched.push(`${folder}/`);
   }
+  // A local library's files are copied into .moonwell/libraries/ by each cycle, so any change in its folder counts.
+  // A folder that holds this project's .moonwell/ is skipped: sync refuses it, and watching it would loop.
+  for (const { folder, label } of libraries) {
+    if (isWithin(folder, join(ctx.root, ".moonwell"))) continue;
+    if (!(await exists(folder, { isDirectory: true }))) continue;
+    watchers.push({ watcher: Deno.watchFs(folder, { recursive: true }), relevant: () => true });
+    watched.push(label);
+  }
   const closeWatchers = () => {
-    for (const watcher of watchers) {
+    for (const { watcher } of watchers) {
       try {
         watcher.close();
       } catch {
@@ -73,9 +102,9 @@ export async function dev(
         running = running.then(cycle);
       }, options.debounceMs ?? 150);
     };
-    await Promise.all(watchers.map(async (watcher) => {
+    await Promise.all(watchers.map(async ({ watcher, relevant }) => {
       for await (const event of watcher) {
-        if (event.paths.some((path) => isRelevantChange(ctx.root, path))) schedule();
+        if (event.paths.some(relevant)) schedule();
       }
     }));
   } finally {
@@ -85,4 +114,10 @@ export async function dev(
     // The running check holds the build lock; waiting for it releases the lock.
     await running;
   }
+}
+
+/** Whether `path` is `folder` or inside it. */
+function isWithin(folder: string, path: string): boolean {
+  const rel = relative(folder, path);
+  return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
 }
