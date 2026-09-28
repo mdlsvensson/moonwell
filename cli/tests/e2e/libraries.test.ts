@@ -86,3 +86,17 @@ Deno.test("a project module that clashes with a library module fails check, nami
     "Module example.greet is defined by lua/example/greet.lua and .moonwell/libraries/ex/example/greet.lua.",
   );
 });
+
+Deno.test("setup writes a local library's Lua modules to .moonwell/lua, even with a module clash in lua/", async () => {
+  const project = await newProject();
+  await useLibrary(project, await exampleLibrary());
+  await Deno.mkdir(join(project, "lua", "example"), { recursive: true });
+  await Deno.writeTextFile(join(project, "lua", "example", "greet.lua"), "return {}\n");
+  const result = await deno(["task", "setup"], project);
+  assertEquals(result.code, 0, result.text);
+  assertStringIncludes(
+    await Deno.readTextFile(join(project, ".moonwell", "lua", "example", "greet.lua")),
+    "Hello, ",
+  );
+  assert(await exists(join(project, ".moonwell", "types", "natives.d.lua")));
+});

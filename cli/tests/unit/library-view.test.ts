@@ -1,8 +1,9 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertRejects } from "@std/assert";
 import { exists } from "@std/fs";
 import { join } from "@std/path";
 import type { SourceModule } from "../../src/bundle/modules.ts";
 import { refreshLibraryView } from "../../src/editor/library-view.ts";
+import { MoonwellError } from "../../src/shared/errors.ts";
 
 Deno.test("refreshLibraryView writes library modules as Lua by module path, then only changes", async () => {
   const root = await Deno.makeTempDir({ prefix: "moonwell-view-" });
@@ -33,6 +34,26 @@ Deno.test("refreshLibraryView writes library modules as Lua by module path, then
     assertEquals(await refreshLibraryView(root, modules.slice(0, 3)), []);
     assertEquals(await exists(join(root, ".moonwell", "lua", "kit", "init.lua")), false, "gone modules are removed");
     assertEquals(await exists(join(root, ".moonwell", "lua", "example", "loud.lua")), false, "no compiled Lua: none");
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("refreshLibraryView reports a compiled output it cannot read as a MoonwellError", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-view-" });
+  try {
+    const modules: SourceModule[] = [
+      { name: "example.loud", path: ".moonwell/libraries/ex/example/loud.yue", kind: "yue", library: "ex" },
+    ];
+    const error = await assertRejects(
+      () =>
+        refreshLibraryView(root, modules, () => {
+          throw new Error("EBUSY: resource busy or locked");
+        }),
+      MoonwellError,
+      "Writing .moonwell/lua failed: EBUSY",
+    );
+    assertEquals(error.file, ".moonwell/lua");
   } finally {
     await Deno.remove(root, { recursive: true });
   }

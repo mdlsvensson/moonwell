@@ -18,16 +18,17 @@ export async function refreshLibraryView(
   modules: readonly SourceModule[],
   loadCompiled?: (module: SourceModule) => CompiledModule | undefined,
 ): Promise<string[]> {
-  const files = new Map<string, string>();
-  for (const module of modules) {
-    if (module.library === undefined) continue;
-    const text = module.kind === "lua" ? module.source ?? "" : loadCompiled?.(module)?.source;
-    if (text === undefined) continue;
-    files.set(`${module.name.split(".").join("/")}.lua`, text);
-  }
   const dir = join(root, ...LIBRARY_VIEW_DIR.split("/"));
   const written: string[] = [];
   try {
+    // Inside the try: reading a compiled output can fail too (e.g. a file another program holds).
+    const files = new Map<string, string>();
+    for (const module of modules) {
+      if (module.library === undefined) continue;
+      const text = module.kind === "lua" ? module.source ?? "" : loadCompiled?.(module)?.source;
+      if (text === undefined) continue;
+      files.set(`${module.name.split(".").join("/")}.lua`, text);
+    }
     for (const [file, text] of files) {
       if (await writeTextIfChanged(join(dir, ...file.split("/")), text)) written.push(`${LIBRARY_VIEW_DIR}/${file}`);
     }

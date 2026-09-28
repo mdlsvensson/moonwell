@@ -1,5 +1,5 @@
 import { dirname, join } from "@std/path";
-import { collectModules, libraryModuleRoots, PROJECT_MODULE_ROOTS } from "../bundle/modules.ts";
+import { collectModules, libraryModuleRoots } from "../bundle/modules.ts";
 import type { CommandContext } from "../context.ts";
 import { refreshLibraryView } from "../editor/library-view.ts";
 import { refreshEditorFiles } from "../editor/refresh.ts";
@@ -46,12 +46,13 @@ export async function setup(ctx: CommandContext): Promise<string> {
     ctx.logger.info(`Added ${merged.join(", ")} to .luarc.json.`);
   }
   await syncProjectLibraries(ctx, project);
-  // Setup does not compile, so the view gets the libraries' Lua modules only.
-  await refreshLibraryView(
-    ctx.root,
-    await collectModules(ctx.root, [...PROJECT_MODULE_ROOTS, ...libraryModuleRoots(Object.keys(project.libraries))]),
-  );
   const objects = await planProjectObjects(ctx, project);
   await refreshEditorFiles(ctx.root, { objects: objects.objects, mapFolder: `maps/${project.map.folder}` });
+  // Last, so a bad library file cannot keep .moonwell/types and the macro module from being written. Setup does not
+  // compile, so the view gets the libraries' Lua modules only; check and build report clashes with src/ and lua/.
+  await refreshLibraryView(
+    ctx.root,
+    await collectModules(ctx.root, libraryModuleRoots(Object.keys(project.libraries))),
+  );
   return binary;
 }
