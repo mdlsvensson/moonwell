@@ -4,6 +4,18 @@
 <p align="center">
   <i>Multilingual modding framework for Warcraft III: Reforged</i>
 </p>
+<p align="center">
+  <a href="https://www.hiveworkshop.com/">
+    <img 
+      src="https://cdn.hiveworkshop.com/data/styles/7/styles/vindit-reforged/hive-logo.png" 
+      alt="Hive Workshop" 
+      style="height: 36px; width: auto; vertical-align: middle;" 
+    />
+  </a>
+</p>
+
+
+
 
 - Write gameplay in any language that transpiles to lua. TypeScript, YueScript, Fennel, C#. And use pkl for data and
   configuration.
