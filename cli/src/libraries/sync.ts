@@ -1,7 +1,7 @@
-import { dirname, isAbsolute, join, relative, resolve, SEPARATOR } from "@std/path";
+import { dirname, join, resolve } from "@std/path";
 import type { Library } from "../project/project.ts";
 import { MoonwellError } from "../shared/errors.ts";
-import { listFiles, removeIfExists, writeTextIfChanged } from "../shared/fs.ts";
+import { isWithin, listFiles, removeIfExists, writeTextIfChanged } from "../shared/fs.ts";
 import type { Logger } from "../shared/log.ts";
 import { filesHash } from "./archive.ts";
 import { downloadTag, type Fetch, reasonOf } from "./download.ts";
@@ -210,13 +210,6 @@ function sameEntry(stamp: unknown, entry: LockEntry): boolean {
   if (typeof stamp !== "object" || stamp === null) return false;
   const fields = stamp as Record<string, unknown>;
   return (["github", "tag", "dir", "commit", "files"] as const).every((field) => fields[field] === entry[field]);
-}
-
-/** Whether `path` is `folder` or inside it; ignoring case on Windows, whose file systems usually do. */
-function isWithin(path: string, folder: string): boolean {
-  const fold = (value: string) => Deno.build.os === "windows" ? value.toLowerCase() : value;
-  const between = relative(fold(folder), fold(path));
-  return between === "" || (!isAbsolute(between) && between !== ".." && !between.startsWith(`..${SEPARATOR}`));
 }
 
 const stampText = (value: object) => `${JSON.stringify(value, null, 2)}\n`;

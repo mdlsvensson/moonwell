@@ -37,7 +37,8 @@ Deno.test("resolveGraph's missing-module hint names every file form it looks for
   );
   assertEquals(
     error.hint,
-    "Expected src/game/units.yue, lua/game/units.lua or lua/game/units/init.lua. Built-in modules: moonwell.",
+    "Expected src/game/units.yue, lua/game/units.lua, lua/game/units/init.lua or a module of a library in " +
+      "moonwell.pkl. Built-in modules: moonwell.",
   );
 });
 

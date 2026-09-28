@@ -1,9 +1,16 @@
 import { copy, walk } from "@std/fs";
-import { dirname, relative, SEPARATOR } from "@std/path";
+import { dirname, isAbsolute, relative, SEPARATOR } from "@std/path";
 import { MoonwellError } from "./errors.ts";
 
 export function toPosix(path: string): string {
   return path.split(SEPARATOR).join("/");
+}
+
+/** Whether `path` is `folder` or inside it; ignoring case on Windows, whose file systems usually do. */
+export function isWithin(path: string, folder: string): boolean {
+  const fold = (value: string) => Deno.build.os === "windows" ? value.toLowerCase() : value;
+  const between = relative(fold(folder), fold(path));
+  return between === "" || (!isAbsolute(between) && between !== ".." && !between.startsWith(`..${SEPARATOR}`));
 }
 
 /** All files below `dir`, as sorted POSIX paths relative to `dir`. */

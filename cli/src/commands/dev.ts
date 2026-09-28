@@ -1,9 +1,9 @@
 import { exists } from "@std/fs";
-import { isAbsolute, join, relative, resolve } from "@std/path";
+import { join, relative, resolve } from "@std/path";
 import type { CommandContext } from "../context.ts";
 import { loadProject, type Project } from "../project/project.ts";
 import { formatError, MoonwellError } from "../shared/errors.ts";
-import { toPosix } from "../shared/fs.ts";
+import { isWithin, toPosix } from "../shared/fs.ts";
 import { check } from "./check.ts";
 
 /** Changes that should trigger a re-check. Generated sources are excluded to avoid feedback loops. */
@@ -75,7 +75,7 @@ export async function dev(
   // A local library's files are copied into .moonwell/libraries/ by each cycle, so any change in its folder counts.
   // A folder that holds this project's .moonwell/ is skipped: sync refuses it, and watching it would loop.
   for (const { folder, label } of libraries) {
-    if (isWithin(folder, join(ctx.root, ".moonwell"))) continue;
+    if (isWithin(join(ctx.root, ".moonwell"), folder)) continue;
     if (!(await exists(folder, { isDirectory: true }))) continue;
     watchers.push({ watcher: Deno.watchFs(folder, { recursive: true }), relevant: () => true });
     watched.push(label);
@@ -114,10 +114,4 @@ export async function dev(
     // The running check holds the build lock; waiting for it releases the lock.
     await running;
   }
-}
-
-/** Whether `path` is `folder` or inside it. */
-function isWithin(folder: string, path: string): boolean {
-  const rel = relative(folder, path);
-  return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
 }

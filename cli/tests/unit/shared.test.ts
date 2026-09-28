@@ -5,6 +5,7 @@ import { MoonwellError } from "../../src/shared/errors.ts";
 import { createLogger } from "../../src/shared/log.ts";
 import { runProcess } from "../../src/shared/process.ts";
 import {
+  isWithin,
   listFiles,
   readSourceText,
   removeFileIfExists,
@@ -116,6 +117,17 @@ Deno.test("readSourceText reports a file it cannot read as a MoonwellError namin
   } finally {
     await Deno.remove(dir, { recursive: true });
   }
+});
+
+Deno.test("isWithin: a path is within itself and its descendants, not its siblings or its parent", () => {
+  const folder = join("projects", "map");
+  assert(isWithin(folder, folder));
+  assert(isWithin(join(folder, "src", "main.yue"), folder));
+  assert(isWithin(join(folder, "..map", "x"), folder), "a name starting with two dots is inside");
+  assert(!isWithin(join("projects", "map-2"), folder));
+  assert(!isWithin(join("projects", "other", "x"), folder));
+  assert(!isWithin("projects", folder));
+  assertEquals(isWithin(join("Projects", "MAP", "src"), folder), Deno.build.os === "windows", "case on Windows only");
 });
 
 Deno.test("removeIfExists ignores missing paths", async () => {
