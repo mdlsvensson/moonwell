@@ -38,3 +38,46 @@ export async function addEditorFiles(
   }
   return added;
 }
+
+/** The .luarc.json arrays setup keeps up to date in projects made by an older Moonwell (spec §3.5). */
+const LUARC_ARRAYS = ["runtime.path", "workspace.library"] as const;
+
+/**
+ * Adds the template's `runtime.path` and `workspace.library` entries that the project's .luarc.json lacks, keeping every
+ * other key and value, and rewrites it as formatted JSON when it adds any (spec §3.5). Returns the entries it added, or
+ * `undefined` when the file is not a JSON object (it is then left alone). A missing file adds nothing.
+ */
+export async function mergeLuarc(
+  root: string,
+  files: ReadonlyArray<{ path: string; base64: string }> = TEMPLATE_FILES,
+): Promise<string[] | undefined> {
+  const path = join(root, ".luarc.json");
+  if (!(await exists(path))) return [];
+  const file = files.find((entry) => entry.path === ".luarc.json");
+  if (!file) throw new Error("The embedded template has no .luarc.json.");
+  const template = JSON.parse(new TextDecoder().decode(decodeBase64(file.base64))) as Record<string, string[]>;
+  let config: unknown;
+  try {
+    config = JSON.parse(await Deno.readTextFile(path));
+  } catch {
+    return undefined;
+  }
+  if (config === null || typeof config !== "object" || Array.isArray(config)) return undefined;
+  const settings = config as Record<string, unknown>;
+  const added: string[] = [];
+  for (const key of LUARC_ARRAYS) {
+    const current = settings[key];
+    if (current === undefined) {
+      settings[key] = [...template[key]];
+      added.push(...template[key]);
+    } else if (Array.isArray(current)) {
+      for (const entry of template[key]) {
+        if (current.includes(entry)) continue;
+        current.push(entry);
+        added.push(entry);
+      }
+    }
+  }
+  if (added.length > 0) await Deno.writeTextFile(path, `${JSON.stringify(settings, null, 2)}\n`);
+  return added;
+}

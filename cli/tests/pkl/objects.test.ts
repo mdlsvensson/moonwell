@@ -301,7 +301,9 @@ Deno.test("dev refreshes objects.yue on start and when a file under objects/ cha
     try {
       await waitFor(() => Promise.resolve(logger.lines.some((line) => line.startsWith("Watching "))), "watching");
       assert(
-        logger.lines.includes("Watching src/, assets/, objects/ and the project manifests. Press Ctrl+C to stop."),
+        logger.lines.includes(
+          "Watching src/, assets/, objects/, lua/ and the project manifests. Press Ctrl+C to stop.",
+        ),
         logger.lines.join("\n"),
       );
       assertEquals(

@@ -10,6 +10,7 @@ export function isRelevantChange(root: string, path: string): boolean {
   const rel = toPosix(relative(root, path));
   if (rel.startsWith("src/generated/")) return false;
   if (rel.startsWith("src/")) return rel.endsWith(".yue");
+  if (rel.startsWith("lua/")) return rel.endsWith(".lua");
   if (rel.startsWith("assets/")) return true;
   if (rel.startsWith("objects/")) return rel.endsWith(".pkl");
   return /^moonwell(\.local)?\.pkl$/.test(rel) || rel === "PklProject" || rel === "PklProject.deps.json";
@@ -43,9 +44,9 @@ export async function dev(
     Deno.watchFs(join(ctx.root, "src"), { recursive: true }),
     Deno.watchFs(ctx.root, { recursive: false }),
   ];
-  // assets/ and objects/ are optional; a folder created after dev starts is picked up on the next dev run.
+  // assets/, objects/ and lua/ are optional; a folder created after dev starts is picked up on the next dev run.
   const watched = ["src/"];
-  for (const folder of ["assets", "objects"]) {
+  for (const folder of ["assets", "objects", "lua"]) {
     if (!(await exists(join(ctx.root, folder), { isDirectory: true }))) continue;
     watchers.push(Deno.watchFs(join(ctx.root, folder), { recursive: true }));
     watched.push(`${folder}/`);
