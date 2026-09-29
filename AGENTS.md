@@ -159,27 +159,19 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   Drain Life), `lightning:setColor` shows no visible change, and effects attached to items and destructables are not
   drawn (the last two documented in the wrappers README). Tag consumption passed: a fresh map locked `v0.3.0` to
   `1277875`. The disposable gate map is `../wrappers-gate` (`deno task gate <run>`, one command per run).
+- **Wrappers v0.3.1, native caveats** (2026-09-29): from the w3ts and WCSharp comparisons (`docs/superpowers/research/`)
+  and an in-game probe run (`../wrappers-gate`, `deno task gate probe`; results in the WCSharp note §9). README notes
+  measured by the probe and a labelled "Reported native caveats" section, `Image.create` raising on a wrong path
+  (Warcraft returns an image with handle id -1, not nil), and setter checks that flip booleans. The in-game gate was not
+  re-run by the maintainer's decision. Moonwell now knows `UnitAlive` (added to `tools/natives/lua-extras.json`,
+  `natives.json` regenerated from the same `common.j` export with no other change); the wrappers' `unit:isAlive()` is
+  unchanged, so the library still works with Moonwell 0.5.0.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Wrappers v0.3.1** (chosen 2026-09-29 from the w3ts and WCSharp comparisons; short design in chat first). The probe
-   run is done: two runs in `../wrappers-gate` (`deno task gate probe`, results in `PROBE-RESULTS.md` there and in
-   `docs/superpowers/research/2026-09-29-wcsharp-comparison.md` §9). The patch covers:
-   - README notes from the w3ts comparison §2.1 and §7.1: locale-dependent `getName()`, sound limits, Locust in
-     `enumOfPlayer`, `getRemaining` after a pause, unit notes, restore-life semantics, image layering.
-   - README notes from the WCSharp comparison §7.2: `GetHandleId` is prone to desyncs in Lua; lightning z is absolute;
-     `setFacing` turns at the unit's turn rate; orders issued inside a unit's own attack event can lock its AI.
-   - The probe results: `sound:play()` on a sound that is still playing cuts it off and plays nothing; `splat:finish()`
-     fades the splat and `reset()` does not bring it back; `lightning:setColor` shows neither colour nor alpha; Healing
-     Wave and Spirit Link fade by themselves, like Chain Lightning.
-   - Two code candidates for the design: `Image.create` raising when the image's handle id is -1 (a wrong path gives a
-     non-nil invalid image), and `unit:isAlive()` using `UnitAlive`, which exists in map Lua (Moonwell would add it to
-     `tools/natives/lua-extras.json` so the unknown-global check and editor know it).
-   - Forwarding tests that use non-default values (the item `setInvulnerable` test passes `true`, which would miss a
-     hard-coded flag; see `2026-09-29-wrappers-advantages.md` §11).
-2. **Choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the editor error
+1. **Choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the editor error
    for effects attached to items and destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview.
    Each needs a short design or a spec first. Release B and 4d have design inputs in the w3ts comparison §2.1; 4d also
    in the WCSharp comparison §2.1, whose systems are the closest prior art.

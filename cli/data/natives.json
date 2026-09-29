@@ -42705,6 +42705,18 @@
       "returns": "boolean"
     },
     {
+      "name": "UnitAlive",
+      "params": [
+        {
+          "name": "id",
+          "type": "unit"
+        }
+      ],
+      "returns": "boolean",
+      "source": "lua",
+      "constant": false
+    },
+    {
       "name": "UnitApplyTimedLife",
       "source": "common.j",
       "constant": false,

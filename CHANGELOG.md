@@ -5,6 +5,10 @@
 - Documentation: approved design and implementation plan for the separate `moonwell-wrappers` library (sub-project 4c),
   released as `mdlsvensson/moonwell-wrappers` `v0.1.0` after its in-game and first-tag consumption gates (recorded in
   AGENTS.md). No CLI behavior changes.
+- Natives: `UnitAlive(unit)`, a common.ai native that map Lua can call (confirmed on Warcraft III 3.0.0.24268 by the
+  wrappers probe run, 2026-09-29), is now known: the unknown-global check accepts it and `natives.d.lua` declares it.
+- Documentation: research notes comparing w3ts and WCSharp with `moonwell-wrappers`, with the probe results
+  (`docs/superpowers/research/`).
 
 ## 0.5.0 (2026-09-28)
 

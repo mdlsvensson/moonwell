@@ -1,6 +1,7 @@
 {
   "functions": [
     { "name": "FourCC", "params": [{ "name": "id", "type": "string" }], "returns": "integer" },
+    { "name": "UnitAlive", "params": [{ "name": "id", "type": "unit" }], "returns": "boolean" },
     { "name": "__jarray", "params": [{ "name": "default", "type": "any" }], "returns": "table" }
   ],
   "globals": [
