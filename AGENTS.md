@@ -177,22 +177,22 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   count change from 0 to 5 works, and new multiboard cells show an eye icon (`../wrappers-gate/PROBE-UI-RESULTS.md`).
   The classic UI gate passed normal and minified (`deno task gate ui`, `ui-min`), and the packed map opened in World
   Editor.
-- **Wrappers v0.5.0, frames, implemented; in-game gate pending** (spec
-  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-frames-design.md`, plan
+- **Wrappers v0.5.0, frames, released** (2026-09-29, GitHub pre-release `v0.5.0` on `b91ffd4`; tag consumption passed;
+  spec `docs/superpowers/specs/2026-09-29-moonwell-wrappers-frames-design.md`, plan
   `docs/superpowers/plans/2026-09-29-moonwell-wrappers-frames.md`): release C of the UI backlog item. `wrappers.frame`
   with an owned tree (owned frames, template parts, borrowed game frames), automatic create contexts, per-frame event
-  callbacks with the player and synced event data, `releaseFocusFor`, `setVisibleFor` and `Frame.loadTOC`. Automated
-  checks pass; the maintainer runs the gate map's `frame-init` probe, then CONTRIBUTING's gate with `frames = true`
-  (`deno task gate frames`, then `frames-min`).
+  callbacks with the player and synced event data, `releaseFocusFor`, `setVisibleFor` and `Frame.loadTOC`. The gate
+  map's `frame-init` probe (`../wrappers-gate/PROBE-FRAME-RESULTS.md`) found on 3.0.0.24268: origin frames exist in
+  `on_main`; the game's own templates (nine tried, including `ScriptDialogButton` and `EscMenuBackdrop`) create without
+  a TOC; an unknown template gives nil; destroying a frame removes its children, including a re-parented one; a clicked
+  button keeps the keyboard focus until `releaseFocusFor`. The frames gate passed normal and minified
+  (`deno task gate frames`, `frames-min`).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Finish wrappers v0.5.0:** the `frame-init` probe and the in-game gate (the wrappers repo's CONTRIBUTING steps 9 and
-   10, in `../wrappers-gate`); record the probe's answers in README; then release it like v0.4.0 (tag `v0.5.0`, tag
-   consumption gate).
-2. **Then choose the next sub-project with the maintainer:** the editor error for effects attached to items and
+1. **Choose the next sub-project with the maintainer:** the editor error for effects attached to items and
    destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview. Each needs a short design or a spec
    first. 4d has design inputs in the w3ts comparison §2.1 and the WCSharp comparison §2.1, whose systems are the
    closest prior art.
@@ -279,9 +279,9 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
 - **UI wrappers, releases B and C.** Split 2026-09-29 from "UI and presentation wrappers"; release A (presentation) is
   wrappers v0.3.0. B is wrappers v0.4.0, released 2026-09-29 (spec
-  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`). C is wrappers v0.5.0, implemented (spec
-  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-frames-design.md`), gate pending. B's `ui-init` probe
-  (2026-09-29) measured w3ts's classic UI notes; the results are in the wrappers README and the w3ts comparison.
+  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`). C is wrappers v0.5.0, released 2026-09-29
+  (spec `docs/superpowers/specs/2026-09-29-moonwell-wrappers-frames-design.md`). B's `ui-init` probe (2026-09-29)
+  measured w3ts's classic UI notes; the results are in the wrappers README and the w3ts comparison.
 - **Assets shipped by libraries.** A library could ship files such as a frame template `.toc` and its `.fdf` files for
   the map to import (added 2026-09-29 with wrappers v0.5.0, whose README shows the manual recipe). Needs a design for
   where they live in a library and how they join the map's `assets/` import.

@@ -11,6 +11,7 @@
   (`docs/superpowers/research/`).
 - Documentation: design and implementation plan for `moonwell-wrappers` v0.4.0 (classic UI: dialogs, multiboards,
   leaderboards, quests, defeat conditions, timer dialogs), released 2026-09-29.
+- Documentation: design and implementation plan for `moonwell-wrappers` v0.5.0 (frames), released 2026-09-29.
 
 ## 0.5.0 (2026-09-28)
 
