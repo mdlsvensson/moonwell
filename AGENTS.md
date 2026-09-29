@@ -155,8 +155,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 
 ## Next work, in order
 
-1. **Finish wrappers v0.3.0:** the maintainer's in-game gate (CONTRIBUTING step 7 of the wrappers repo, normal and
-   minified), including the first-play sound check; then release it like v0.2.0 (tag `v0.3.0`, tag consumption gate).
+1. **Finish wrappers v0.3.0:** the maintainer's in-game gate (CONTRIBUTING steps 7–8 of the wrappers repo (normal and
+   minified)), including the first-play sound check; then release it like v0.2.0 (tag `v0.3.0`, tag consumption gate).
 2. **Then choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the YueScript
    port of `wc3-lib` (4d) or the Reforged map preview. Each needs a short design or a spec first.
 
@@ -247,8 +247,10 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
   Battle.net. Covers at least: the wrappers weak-cache gate (`examples/gate.yue`, two players past its 50-second probe,
   no desync, each machine's probe line recorded), `Player:isLocal()`, `Group:enumSelected`, map settings (players,
-  forces, alliances) in a real lobby, map transfer of packed normal and minified builds, and any later feature with
-  multiplayer effects. Until then, release gates record these as deferred, not passed.
+  forces, alliances) in a real lobby, map transfer of packed normal and minified builds, the wrappers v0.3.0 local
+  visibility (`setVisibleFor`, `playFor`, the `player` options of `TextTag.float` and `Sound.playOnce`) and whether
+  `sound:getDuration()` agrees across machines, and any later feature with multiplayer effects. Until then, release
+  gates record these as deferred, not passed.
 - **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
   scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
   Moved here 2026-09-28; it depends on 4b's library sync.
