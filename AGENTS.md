@@ -162,9 +162,19 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 
 ## Next work, in order
 
-1. **Choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the editor error
+1. **Wrappers probe run** (chosen 2026-09-29 from the w3ts comparison,
+   `docs/superpowers/research/2026-09-29-w3ts-comparison.md` §7): one in-game run in `../wrappers-gate` that checks
+   whether `UnitAlive` exists in map Lua, what `CreateImage` returns for a wrong path and whether `image:destroy()`
+   survives it, a splat without `finish()` as control for the ubersplat finding, and `sound:play()` while the sound
+   still plays. Its results decide the wording of item 2.
+2. **Wrappers v0.3.1, doc patch** (chosen the same day; short design in chat first): the README notes in the comparison
+   §2.1 and §7.1 (locale-dependent `getName()`, sound limits, Locust in `enumOfPlayer`, `getRemaining` after a pause,
+   unit notes, restore-life semantics, image layering), the probe results, and forwarding tests that use non-default
+   values (the item `setInvulnerable` test passes `true`, which would miss a hard-coded flag; see
+   `2026-09-29-wrappers-advantages.md` §11).
+3. **Choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the editor error
    for effects attached to items and destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview.
-   Each needs a short design or a spec first.
+   Each needs a short design or a spec first. Release B and 4d have design inputs in the comparison §2.1.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -248,7 +258,17 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
 - **UI wrappers, releases B and C.** Split 2026-09-29 from "UI and presentation wrappers"; release A (presentation) is
   wrappers v0.3.0. B, v0.4.0: dialog and button, multiboard, leaderboard, quest, timer dialog. C, v0.5.0: the `BlzFrame`
-  API, with its own ownership design (TOC/FDF loading, parent trees, local frames).
+  API, with its own ownership design (TOC/FDF loading, parent trees, local frames). Inputs for B, from the w3ts
+  comparison §2.1 (w3ts's notes, not yet measured by us): `CreateQuest`, `CreateLeaderboard` and `CreateMultiboard`
+  crash the game in global initialisation, and dialogs and multiboards cannot be shown at map init (use a zero-second
+  timer, as our gates do); `MultiboardSetRowCount` is safe only one row at a time; every `MultiboardGetItem` handle must
+  be released with `MultiboardReleaseItem`; `IsMultiboardMinimized` is machine-local; dialog buttons die with
+  `DialogClear`/`DialogDestroy`, so button wrappers need an ownership rule; leaderboards start with no rows. The gate
+  must cover creation and display timing.
+- **Wrappers candidate additions** (from the w3ts comparison §6, chosen 2026-09-29 as backlog candidates, each needing a
+  short design): `WeatherEffect` (`AddWeatherEffect`, enable, remove); spell effects from ability data
+  (`AddSpellEffectById`, for example `Effect.flashSpell`); more Trigger registrations (player state, key, mouse, sync,
+  alliance change, game state, timer expire); event helpers such as `Unit.fromEvent()`.
 - **Editor error for effects attached to items and destructables.** The v0.3.0 gate (2026-09-29, game 3.0.0.24268)
   showed that Warcraft drew no effect attached to an item (Claws of Attack, two effect models) or a destructable (a
   summer tree). `Effect.attach` and `Effect.flashOn` accept any Widget, like the native, and the README documents the

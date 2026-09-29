@@ -95,8 +95,10 @@ Worth adopting in our README where the method exists, or keeping for later desig
 5. **The timer is passed to its callback.** No `GetExpiredTimer`, which w3ts itself flags as possibly crashing.
 6. **Identity for owned objects.** Our strong caches keep Timer, Trigger, Group and the presentation wrappers identical
    for their whole life. Weak caches are used only for Unit, Item and Destructable, which the game can remove by itself,
-   and the README warns against weak-keyed game tables. w3ts's weak keys apply to every type, so a trigger wrapper
-   nothing references can be recreated as a new object by `Trigger.fromEvent()`, losing anything stored on it.
+   and the README warns against weak-keyed game tables. w3ts keys every type weakly by the handle userdata, so whether a
+   wrapper survives depends on when the game's Lua releases that userdata, which neither library controls or documents.
+   w3ts also never removes a destroyed object's entry; we drop it on disposal, so a later wrapper of a reused handle is
+   always fresh.
 7. **Desync discipline.** No getters for machine-local values (w3ts exposes them, marked `@async` in comments only);
    local visibility compares with the local player and passes the result to the same native on every machine;
    `Sound.playOnce` with `player` plays at volume 0 elsewhere so every machine starts and releases the sound alike.
@@ -181,3 +183,8 @@ Not a to-do list: many are deliberate omissions. Listed so a later design can ch
 4. **Candidate additions:** WeatherEffect, spell effects (for example `Effect.flashSpell`), more Trigger registrations,
    event helpers.
 5. **4d design inputs:** sync chunking and file I/O as summarised in section 2.1.
+
+**Chosen 2026-09-29:** all five went onto Moonwell's AGENTS.md. Items 2 and 1 are "Next work" items 1 and 2; items 3
+and 4 extend the release B backlog entry and add "Wrappers candidate additions"; item 5 is referenced from the next
+sub-project choice. The maintainer also asked for `2026-09-29-wrappers-advantages.md`, which explains section 3 with
+code examples.
