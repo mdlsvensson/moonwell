@@ -243,11 +243,12 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **UI wrappers, releases B and C.** Split 2026-09-29 from "UI and presentation wrappers"; release A (presentation) is
   wrappers v0.3.0. B, v0.4.0: dialog and button, multiboard, leaderboard, quest, timer dialog. C, v0.5.0: the `BlzFrame`
   API, with its own ownership design (TOC/FDF loading, parent trees, local frames).
-- **Editor error for effects attached to items.** The v0.3.0 gate (2026-09-29, game 3.0.0.24268) showed that Warcraft
-  drew no effect attached to an item (Claws of Attack, two effect models). `Effect.attach` and `Effect.flashOn` accept
-  any Widget, like the native, and the README documents the limit. The maintainer wants the editor (LuaLS) to flag an
-  Item argument there, for example with a Unit|Destructable parameter type, while runtime behavior may stay permissive
-  for custom item models.
+- **Editor error for effects attached to items and destructables.** The v0.3.0 gate (2026-09-29, game 3.0.0.24268)
+  showed that Warcraft drew no effect attached to an item (Claws of Attack, two effect models) or a destructable (a
+  summer tree). `Effect.attach` and `Effect.flashOn` accept any Widget, like the native, and the README documents the
+  limit. The maintainer wants the editor (LuaLS) to flag an Item argument there (decided for items; destructables follow
+  the same evidence), for example with a Unit parameter type, while runtime behavior may stay permissive for custom
+  models.
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
   Battle.net. Covers at least: the wrappers weak-cache gate (`examples/gate.yue`, two players past its 50-second probe,
