@@ -167,22 +167,22 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   decision. Moonwell now knows `UnitAlive` (added to `tools/natives/lua-extras.json`, `natives.json` regenerated from
   the same `common.j` export with no other change); the wrappers' `unit:isAlive()` is unchanged, so the library still
   works with Moonwell 0.5.0.
-- **Wrappers v0.4.0, classic UI, implemented; in-game gate pending** (spec
-  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`, plan
+- **Wrappers v0.4.0, classic UI, released** (2026-09-29, GitHub pre-release `v0.4.0` on `7e8ef13`; tag consumption
+  passed; spec `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`, plan
   `docs/superpowers/plans/2026-09-29-moonwell-wrappers-classic-ui.md`): release B of the UI backlog item. Dialog
   (per-button callbacks, buttons owned by the dialog), Multiboard (one-based cell methods that release every cell
   handle, rows changed one at a time), Leaderboard (items keyed by player), Quest with QuestItem, DefeatCondition and
-  TimerDialog. Automated checks pass; the maintainer runs the gate map's `ui-init` probe, then CONTRIBUTING's gate with
-  `ui = true` (`deno task gate ui`, then `ui-min`).
+  TimerDialog. The gate map's `ui-init` probe measured w3ts's classic UI notes on 3.0.0.24268: dialogs and multiboards
+  shown directly in `on_main` do not appear, creating quests, leaderboards and multiboards there works, a direct row
+  count change from 0 to 5 works, and new multiboard cells show an eye icon (`../wrappers-gate/PROBE-UI-RESULTS.md`).
+  The classic UI gate passed normal and minified (`deno task gate ui`, `ui-min`), and the packed map opened in World
+  Editor.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Finish wrappers v0.4.0:** the in-game gate (the wrappers repo's CONTRIBUTING steps 8 and 9: `deno task gate ui` and
-   `ui-min` in `../wrappers-gate`; the `ui-init` probe passed and is recorded), then release it like v0.3.0 (tag
-   `v0.4.0`, tag consumption gate).
-2. **Then choose the next sub-project with the maintainer:** wrappers release C (frames), the editor error for effects
+1. **Choose the next sub-project with the maintainer:** wrappers release C (frames), the editor error for effects
    attached to items and destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview. Each needs a
    short design or a spec first. 4d has design inputs in the w3ts comparison §2.1 and the WCSharp comparison §2.1, whose
    systems are the closest prior art.
@@ -268,10 +268,10 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
   declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
 - **UI wrappers, releases B and C.** Split 2026-09-29 from "UI and presentation wrappers"; release A (presentation) is
-  wrappers v0.3.0. B, v0.4.0: implemented (spec
-  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`), gate pending. C, v0.5.0: the `BlzFrame`
-  API, with its own ownership design (TOC/FDF loading, parent trees, local frames). B's `ui-init` probe (2026-09-29)
-  measured w3ts's classic UI notes; the results are in the wrappers README and the w3ts comparison.
+  wrappers v0.3.0. B is wrappers v0.4.0, released 2026-09-29 (spec
+  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`). C, v0.5.0: the `BlzFrame` API, with its
+  own ownership design (TOC/FDF loading, parent trees, local frames). B's `ui-init` probe (2026-09-29) measured w3ts's
+  classic UI notes; the results are in the wrappers README and the w3ts comparison.
 - **Wrappers candidate additions** (from the w3ts comparison §6, chosen 2026-09-29 as backlog candidates, each needing a
   short design): `WeatherEffect` (`AddWeatherEffect`, enable, remove); spell effects from ability data
   (`AddSpellEffectById`, for example `Effect.flashSpell`); more Trigger registrations (player state, key, mouse, sync,

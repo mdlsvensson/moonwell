@@ -9,6 +9,8 @@
   wrappers probe run, 2026-09-29), is now known: the unknown-global check accepts it and `natives.d.lua` declares it.
 - Documentation: research notes comparing w3ts and WCSharp with `moonwell-wrappers`, with the probe results
   (`docs/superpowers/research/`).
+- Documentation: design and implementation plan for `moonwell-wrappers` v0.4.0 (classic UI: dialogs, multiboards,
+  leaderboards, quests, defeat conditions, timer dialogs), released 2026-09-29.
 
 ## 0.5.0 (2026-09-28)
 
