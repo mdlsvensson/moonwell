@@ -164,23 +164,22 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 
 ## Next work, in order
 
-1. **Wrappers probe run** (chosen 2026-09-29 from the w3ts comparison,
-   `docs/superpowers/research/2026-09-29-w3ts-comparison.md` §7): one in-game run in `../wrappers-gate` that checks
-   whether `UnitAlive` exists in map Lua, what `CreateImage` returns for a wrong path and whether `image:destroy()`
-   survives it, a splat without `finish()` as control for the ubersplat finding, and `sound:play()` while the sound
-   still plays. Added after the WCSharp comparison (§7.1): lightning alpha on the Drain Life bolt and a colour tint on a
-   light-coloured bolt (WCSharp fades bolts through `SetLightningColor`, so our "no visible change" may be a poor test);
-   `Effect.flash` with several models, including one without a death animation (WCSharp delays destruction because some
-   effects do not show when destroyed at once); whether decay and `RemoveUnit` fire the world-bounds leave-region event.
-   Its results decide the wording of item 2.
-2. **Wrappers v0.3.1, doc patch** (chosen the same day; short design in chat first): the README notes in the comparison
-   §2.1 and §7.1 (locale-dependent `getName()`, sound limits, Locust in `enumOfPlayer`, `getRemaining` after a pause,
-   unit notes, restore-life semantics, image layering), the probe results, and forwarding tests that use non-default
-   values (the item `setInvulnerable` test passes `true`, which would miss a hard-coded flag; see
-   `2026-09-29-wrappers-advantages.md` §11). From the WCSharp comparison §7.2: `GetHandleId` is prone to desyncs in Lua;
-   lightning z is absolute; `setFacing` turns at the unit's turn rate; orders issued inside a unit's own attack event
-   can lock its AI (delay them); `Effect.flash` depends on the model's death animation.
-3. **Choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the editor error
+1. **Wrappers v0.3.1** (chosen 2026-09-29 from the w3ts and WCSharp comparisons; short design in chat first). The probe
+   run is done: two runs in `../wrappers-gate` (`deno task gate probe`, results in `PROBE-RESULTS.md` there and in
+   `docs/superpowers/research/2026-09-29-wcsharp-comparison.md` §9). The patch covers:
+   - README notes from the w3ts comparison §2.1 and §7.1: locale-dependent `getName()`, sound limits, Locust in
+     `enumOfPlayer`, `getRemaining` after a pause, unit notes, restore-life semantics, image layering.
+   - README notes from the WCSharp comparison §7.2: `GetHandleId` is prone to desyncs in Lua; lightning z is absolute;
+     `setFacing` turns at the unit's turn rate; orders issued inside a unit's own attack event can lock its AI.
+   - The probe results: `sound:play()` on a sound that is still playing cuts it off and plays nothing; `splat:finish()`
+     fades the splat and `reset()` does not bring it back; `lightning:setColor` shows neither colour nor alpha; Healing
+     Wave and Spirit Link fade by themselves, like Chain Lightning.
+   - Two code candidates for the design: `Image.create` raising when the image's handle id is -1 (a wrong path gives a
+     non-nil invalid image), and `unit:isAlive()` using `UnitAlive`, which exists in map Lua (Moonwell would add it to
+     `tools/natives/lua-extras.json` so the unknown-global check and editor know it).
+   - Forwarding tests that use non-default values (the item `setInvulnerable` test passes `true`, which would miss a
+     hard-coded flag; see `2026-09-29-wrappers-advantages.md` §11).
+2. **Choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the editor error
    for effects attached to items and destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview.
    Each needs a short design or a spec first. Release B and 4d have design inputs in the w3ts comparison §2.1; 4d also
    in the WCSharp comparison §2.1, whose systems are the closest prior art.
@@ -287,9 +286,10 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
   maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
   keeps a live-looking wrapper whose handle is dead. WCSharp detects removal as a unit leaving a region that covers the
-  world bounds. Depends on the probe run (next work item 1) showing that decay and `RemoveUnit` fire that event on
-  3.0.0.24268. Open questions: it needs a trigger and a region created by the library (today modules create nothing at
-  import), the event timing relative to other callbacks, and whether it removes the need for the weak cache.
+  world bounds. **The probe run (2026-09-29) found that this does not work on 3.0.0.24268:** the leave event fired for
+  none of `RemoveUnit`, an exploded death, a summoned timed-life death or a normal death left 120 s to decay (enter did
+  fire at creation). Another detection method would be needed (for example the undefend-order trick unit indexers use);
+  unexplored.
 - **Editor error for effects attached to items and destructables.** The v0.3.0 gate (2026-09-29, game 3.0.0.24268)
   showed that Warcraft drew no effect attached to an item (Claws of Attack, two effect models) or a destructable (a
   summer tree). `Effect.attach` and `Effect.flashOn` accept any Widget, like the native, and the README documents the

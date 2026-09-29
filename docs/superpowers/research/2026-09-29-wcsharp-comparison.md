@@ -160,3 +160,25 @@ and removed units.
 - **Breadth and systems (w3ts comparison §4):** WCSharp is broader still, and its systems are the closest prior art for
   4d.
 - **Tests (advantages §11):** neither library has behaviour tests; WCSharp's static API checker is worth copying.
+
+## 9. Verified in game (probe run, 2026-09-29)
+
+Two runs of the probe map (`../wrappers-gate/src/probe.yue`, results in `../wrappers-gate/PROBE-RESULTS.md`) on
+Warcraft III 3.0.0.24268 answered the open questions from this note and the w3ts note:
+
+| Question | Answer on 3.0.0.24268 |
+| --- | --- |
+| `UnitAlive` callable from map Lua | Yes; it agrees with `isAlive()` before and after a kill |
+| World-bounds leave on unit removal (WCSharp's "unit is removed") | No: not for `RemoveUnit`, an exploded death, a summoned timed-life death, or a normal death left 120 s to decay (the corpse's disappearance was not checked on screen); enter did fire at creation |
+| `SetLightningColor` visible | No: neither colour (v0.3.0 gate) nor alpha 0.2 on Drain Life |
+| Lightning types that fade by themselves | Chain Lightning (v0.3.0 gate), Healing Wave (`HWPB`) and Spirit Link (`SPLK`); Drain Life stays |
+| `FinishUbersplat` | Works: the splat fades, while a control splat stays (w3ts's "does nothing" is outdated) |
+| `ResetUbersplat` after `finish` | No visible effect: the splat does not come back |
+| `StartSound` on a sound that is still playing | Cuts the playing sound off, and nothing plays |
+| `CreateImage` with a wrong path | A non-nil image whose `GetHandleId` is -1 (a valid image had 8); `DestroyImage` on it does not crash |
+| `Effect.flash` (create and destroy at once) | All six standard models tested showed, the same as when destroyed 0.1 s later; WCSharp's concern was not reproduced |
+
+What this settles: `UnitAlive` can be used (Moonwell's natives list lacks it); automatic Unit disposal cannot be built on
+the world-bounds leave event; the README's advice not to rely on `lightning:setColor` stands and now covers alpha; the
+`Effect.flash` risk from section 2 did not materialise for standard models; `Image.create` cannot detect a wrong path by
+nil, but can by handle id -1.

@@ -18,6 +18,11 @@ moonwell-wrappers v0.3.0 (commit `1277875`). Nothing here is a decision; section
   obsolete as prone to desyncs in Lua; ours exposes no handle id.
 - Breadth and systems (section 4): WCSharp is broader still, and its systems are the closest prior art for 4d.
 
+**Verified in game** (probe run, 2026-09-29; table in the WCSharp note, section 9): `UnitAlive` exists; `FinishUbersplat`
+works and `ResetUbersplat` does not bring a finished splat back; replaying a sound that still plays cuts it off; a wrong
+image path gives an image with handle id -1 whose `DestroyImage` does not crash (w3ts's crash warning did not hold);
+`Effect.flash` showed for six standard models.
+
 ## 1. What w3ts is
 
 - TypeScript compiled to Lua 5.3 with TypeScriptToLua. About 6,000 lines of handle classes (about 30 classes in 28 files;
