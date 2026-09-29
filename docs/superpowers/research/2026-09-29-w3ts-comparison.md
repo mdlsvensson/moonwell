@@ -23,6 +23,12 @@ works and `ResetUbersplat` does not bring a finished splat back; replaying a sou
 image path gives an image with handle id -1 whose `DestroyImage` does not crash (w3ts's crash warning did not hold);
 `Effect.flash` showed for six standard models.
 
+**Verified in game for release B** (`ui-init` probe, 2026-09-29, 3.0.0.24268; `../wrappers-gate/PROBE-UI-RESULTS.md`):
+a dialog and a multiboard shown directly in `on_main` did not appear (w3ts's note holds); creating a quest, leaderboard
+and multiboard in `on_main` did not crash, and each worked later (w3ts's crash is about global initialisation, not
+probed); one `MultiboardSetRowCount` from 0 to 5 worked (the one-row-at-a-time note did not reproduce; the wrapper
+steps anyway); a new multiboard's cells show an eye icon and no text.
+
 ## 1. What w3ts is
 
 - TypeScript compiled to Lua 5.3 with TypeScriptToLua. About 6,000 lines of handle classes (about 30 classes in 28 files;

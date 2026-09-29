@@ -270,13 +270,8 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **UI wrappers, releases B and C.** Split 2026-09-29 from "UI and presentation wrappers"; release A (presentation) is
   wrappers v0.3.0. B, v0.4.0: implemented (spec
   `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`), gate pending. C, v0.5.0: the `BlzFrame`
-  API, with its own ownership design (TOC/FDF loading, parent trees, local frames). Inputs for B, from the w3ts
-  comparison §2.1 (w3ts's notes, not yet measured by us): `CreateQuest`, `CreateLeaderboard` and `CreateMultiboard`
-  crash the game in global initialisation, and dialogs and multiboards cannot be shown at map init (use a zero-second
-  timer, as our gates do); `MultiboardSetRowCount` is safe only one row at a time; every `MultiboardGetItem` handle must
-  be released with `MultiboardReleaseItem`; `IsMultiboardMinimized` is machine-local; dialog buttons die with
-  `DialogClear`/`DialogDestroy`, so button wrappers need an ownership rule; leaderboards start with no rows. The gate
-  must cover creation and display timing.
+  API, with its own ownership design (TOC/FDF loading, parent trees, local frames). B's `ui-init` probe (2026-09-29)
+  measured w3ts's classic UI notes; the results are in the wrappers README and the w3ts comparison.
 - **Wrappers candidate additions** (from the w3ts comparison §6, chosen 2026-09-29 as backlog candidates, each needing a
   short design): `WeatherEffect` (`AddWeatherEffect`, enable, remove); spell effects from ability data
   (`AddSpellEffectById`, for example `Effect.flashSpell`); more Trigger registrations (player state, key, mouse, sync,
