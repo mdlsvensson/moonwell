@@ -4,7 +4,7 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented.
+over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again after wrappers v0.3.0 was implemented.
 
 ## Read first
 
