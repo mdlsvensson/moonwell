@@ -3250,3 +3250,9 @@ in-game gate (steps 1–9 in CONTRIBUTING, including LAN). Do not push, tag or p
   Trigger-only bundle checks, gate builds), direct LuaLS over `src` clean. The integration LuaLS runs do not diagnose
   library files, so each task also ran LuaLS directly over `src`.
 - Pending (maintainer): the in-game gate in the wrappers CONTRIBUTING, including the LAN run, then tag consumption.
+- 2026-09-29 in-game gate: the first run showed that text printed while the map loads never reaches the log; the gate
+  now starts from a zero-second timer (`5417ce6`). Passed on game 3.0.0.24268: startup messages, events, cleanups,
+  probes, minified, World Editor, and the weak cache probe (`collected=true stale=true identity=true`). The second
+  `-gate` was not observed. The two-player run is deferred to the pre-1.0 online checks (LAN removed from the game).
+- Released 2026-09-29: GitHub pre-release `v0.2.0` on `7baa81e`; tag consumption passed (lock unchanged after cache
+  removal). Results recorded in `63b2933`.

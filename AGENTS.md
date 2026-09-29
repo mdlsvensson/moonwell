@@ -131,27 +131,25 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented.
   callback-error recovery, minified gameplay and World Editor opening on 2026-09-28 (game 3.0.0.24268, editor 3.00).
   First published-tag consumption passed 2026-09-28: a fresh map locked `v0.1.0` to `c1209f5`, and the lock stayed
   unchanged after removing `.moonwell/`. Moonwell CLI code is unchanged.
-- **Wrappers v0.2.0, broad coverage** (2026-09-29, spec
+- **Wrappers v0.2.0, broad coverage, released** (2026-09-29, spec
   `docs/superpowers/specs/2026-09-28-moonwell-wrappers-broad-design.md`, plan
-  `docs/superpowers/plans/2026-09-28-moonwell-wrappers-broad.md`): implemented in `../moonwell-wrappers` on main at
-  `830cf31` (not tagged). Adds Item, Destructable, Rect, Region and Force; deeper Unit, Player, Trigger (predicate
-  conditions, removable action/condition tokens) and Group (filtered enumerations, `forEach`, `first`); a widget layer;
-  weak Unit/Item/Destructable caches. Wrapper arguments convert through the loaded registries, so a module imports
-  another only to return its wrappers. Automated checks pass: 69 behavior tests, Lua 5.3.6 syntax, Moonwell
-  normal/minified builds, LuaLS positive and 8 negative diagnostics, and a Trigger-only bundle check. The integration
-  LuaLS runs do not diagnose the library's own files; check `src` with a direct LuaLS run. The in-game gate (with a weak
-  cache probe that changes game state only at fixed times, self-removing action and condition, and a two-player LAN run)
-  and tag consumption are pending.
+  `docs/superpowers/plans/2026-09-28-moonwell-wrappers-broad.md`): GitHub pre-release `v0.2.0` of
+  `mdlsvensson/moonwell-wrappers` on commit `7baa81e`. Adds Item, Destructable, Rect, Region and Force; deeper Unit,
+  Player, Trigger (predicate conditions, removable action/condition tokens) and Group (filtered enumerations, `forEach`,
+  `first`); a widget layer; weak Unit/Item/Destructable caches. Wrapper arguments convert through the loaded registries,
+  so a module imports another only to return its wrappers. Automated checks pass: 69 behavior tests, Lua 5.3.6 syntax,
+  Moonwell normal/minified builds, LuaLS positive and 8 negative diagnostics, and a Trigger-only bundle check. The
+  integration LuaLS runs do not diagnose the library's own files; check `src` with a direct LuaLS run. The in-game gate
+  passed 2026-09-29 (game 3.0.0.24268): the weak cache probe printed `collected=true stale=true identity=true`, and the
+  self-removing action and condition ran. Text printed while a map loads never reaches the screen or the log, so the
+  gate starts from a zero-second timer. The two-player desync run is deferred to the online checks before 1.0 (Backlog).
+  Tag consumption passed: a fresh map locked `v0.2.0` to `7baa81e`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Wrappers v0.2.0 release gate.** The maintainer runs the in-game gate in `../moonwell-wrappers/CONTRIBUTING.md`,
-   including the weak cache probe. The two-player run is deferred to the online checks before 1.0 (Backlog). If the
-   probe fails (`collected=true` with `stale=false` or `identity=false`), apply the spec's fallback: strong widget
-   caches plus `forget()`. Then update the README's tag, tag `v0.2.0` and run tag consumption.
-2. **Choose the next sub-project from the backlog with the maintainer.** Candidates include the UI and presentation
+1. **Choose the next sub-project from the backlog with the maintainer.** Candidates include the UI and presentation
    wrappers, the YueScript port of `wc3-lib` (4d) and the Reforged map preview. Each needs a short design (or a spec,
    for a sub-project) approved first.
 
