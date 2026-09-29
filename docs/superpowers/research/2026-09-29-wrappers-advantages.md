@@ -83,6 +83,11 @@ continuing afterwards:
 
 A failing condition counts as false, as a failing native condition does, but the error is printed first.
 
+**Compared with WCSharp** (`2026-09-29-wcsharp-comparison.md`): its guards print only in debug builds, and they cover a
+whole batch. In release builds, `Delay` and its event dispatcher still catch errors but print nothing, and one failing
+action ends the batch: the rest of `Delay`'s queue is dropped unrun, and later registrations miss that event. Ours
+wraps each callback separately, always, so one failure affects nothing else.
+
 ## 3. No native filters or conditions to leak
 
 **w3ts.** Every enumeration wraps its callback in `Filter()` and every `addCondition` in `Condition()`, and nothing ever
@@ -187,6 +192,10 @@ which the game can remove by itself, are cached weakly (by value); the v0.2.0 ga
 
 Disposal removes the cache entry (section 1), so a handle the game reuses later gets a fresh wrapper, never a dead one.
 
+**Compared with WCSharp:** WCSharp.Api has no wrappers at all (the handle is the object and every call compiles to the
+native), so it has no identity problem to solve. Against such a zero-cost API, our caches are the cost of wrapping, not
+an advantage; the advantage that remains is wrappers that know they are disposed.
+
 ## 7. No getters that answer differently on each machine
 
 **w3ts.** Machine-local values are ordinary getters, marked only in doc comments:
@@ -209,6 +218,10 @@ SetSoundVolume(raw, (o.player == nil or o.player == GetLocalPlayer()) and o.volu
 StartSound(raw)
 KillSoundWhenDone(raw)
 ```
+
+Handle ids are the same trap. w3ts exposes `GetHandleId` as `Handle.id`, and WCSharp marks `GetHandleId` obsolete
+everywhere because in Lua it is "prone to desyncs", most likely because an id is recycled only once every reference
+is released, which in Lua depends on each machine's garbage collector. Ours exposes no id; its registry keys by the handle itself, as WCSharp recommends.
 
 The one deliberate exception, `sound:playFor(player)`, starts the sound only on that player's machine; spec §4 and the
 README record it. `player:isLocal()` is documented: never change synchronized state inside a branch on it. (Our

@@ -19,6 +19,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   `docs/superpowers/plans/`; follow their style when writing new plans.
 - `docs/superpowers/research/2026-09-29-w3ts-comparison.md` compares w3ts with moonwell-wrappers v0.3.0: native caveats
   we lacked, inputs for wrappers release B and for 4d, and follow-ups for the maintainer to choose from.
+  `2026-09-29-wrappers-advantages.md` explains our advantages with code examples, and `2026-09-29-wcsharp-comparison.md`
+  does the same comparison for WCSharp (C#) and revises the w3ts conclusions (§8).
 
 ## State (2026-09-29)
 
@@ -166,15 +168,22 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    `docs/superpowers/research/2026-09-29-w3ts-comparison.md` §7): one in-game run in `../wrappers-gate` that checks
    whether `UnitAlive` exists in map Lua, what `CreateImage` returns for a wrong path and whether `image:destroy()`
    survives it, a splat without `finish()` as control for the ubersplat finding, and `sound:play()` while the sound
-   still plays. Its results decide the wording of item 2.
+   still plays. Added after the WCSharp comparison (§7.1): lightning alpha on the Drain Life bolt and a colour tint on a
+   light-coloured bolt (WCSharp fades bolts through `SetLightningColor`, so our "no visible change" may be a poor test);
+   `Effect.flash` with several models, including one without a death animation (WCSharp delays destruction because some
+   effects do not show when destroyed at once); whether decay and `RemoveUnit` fire the world-bounds leave-region event.
+   Its results decide the wording of item 2.
 2. **Wrappers v0.3.1, doc patch** (chosen the same day; short design in chat first): the README notes in the comparison
    §2.1 and §7.1 (locale-dependent `getName()`, sound limits, Locust in `enumOfPlayer`, `getRemaining` after a pause,
    unit notes, restore-life semantics, image layering), the probe results, and forwarding tests that use non-default
    values (the item `setInvulnerable` test passes `true`, which would miss a hard-coded flag; see
-   `2026-09-29-wrappers-advantages.md` §11).
+   `2026-09-29-wrappers-advantages.md` §11). From the WCSharp comparison §7.2: `GetHandleId` is prone to desyncs in Lua;
+   lightning z is absolute; `setFacing` turns at the unit's turn rate; orders issued inside a unit's own attack event
+   can lock its AI (delay them); `Effect.flash` depends on the model's death animation.
 3. **Choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the editor error
    for effects attached to items and destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview.
-   Each needs a short design or a spec first. Release B and 4d have design inputs in the comparison §2.1.
+   Each needs a short design or a spec first. Release B and 4d have design inputs in the w3ts comparison §2.1; 4d also
+   in the WCSharp comparison §2.1, whose systems are the closest prior art.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

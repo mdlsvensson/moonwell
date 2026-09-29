@@ -5,6 +5,19 @@ issues our own gates found), where our wrappers are ahead, where they are behind
 cover. Compared: w3ts 3.0.2 (`cipherxof/w3ts` master, a downloaded copy; types from `war3-types-strict` 1.33.0) and
 moonwell-wrappers v0.3.0 (commit `1277875`). Nothing here is a decision; section 7 lists follow-ups for the maintainer.
 
+**Revised after the WCSharp comparison** (`2026-09-29-wcsharp-comparison.md`, §8). Where this note's conclusions changed:
+
+- `UnitAlive` (section 2): WCSharp relies on it too, so the evidence is stronger; the probe remains.
+- `Effect.flash` (not raised here): WCSharp works around effects that do not show when destroyed at once in Reforged.
+  Our flash depends on the model's death animation; the probe run now covers it.
+- Lightning colour (section 2): WCSharp fades bolts through `SetLightningColor`'s alpha and treats the colour as a
+  multiplier on the texture, which weakens our "no visible change" conclusion; the probe run now covers it.
+- Identity (section 3, point 6): our caches are the cost of wrapping. They are an advantage over w3ts's weak-keyed
+  wrappers, not over a zero-cost API such as WCSharp.Api, where the handle is the object.
+- Desync discipline (section 3, point 7): add that w3ts's `Handle.id` returns `GetHandleId`, which WCSharp marks
+  obsolete as prone to desyncs in Lua; ours exposes no handle id.
+- Breadth and systems (section 4): WCSharp is broader still, and its systems are the closest prior art for 4d.
+
 ## 1. What w3ts is
 
 - TypeScript compiled to Lua 5.3 with TypeScriptToLua. About 6,000 lines of handle classes (about 30 classes in 28 files;
