@@ -17,6 +17,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   `2026-09-26-moonwell-object-data-design.md`. `2026-09-27-moonwell-editor-dx-design.md` (sub-project 3) is implemented
   by Plans 3a, 3b and 3c, released together as 0.4.0. Plans for everything built so far are in
   `docs/superpowers/plans/`; follow their style when writing new plans.
+- `docs/superpowers/research/2026-09-29-w3ts-comparison.md` compares w3ts with moonwell-wrappers v0.3.0: native caveats
+  we lacked, inputs for wrappers release B and for 4d, and follow-ups for the maintainer to choose from.
 
 ## State (2026-09-29)
 
