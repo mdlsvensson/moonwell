@@ -148,9 +148,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented.
 ## Next work, in order
 
 1. **Wrappers v0.2.0 release gate.** The maintainer runs the in-game gate in `../moonwell-wrappers/CONTRIBUTING.md`,
-   including the weak cache probe and a two-player LAN run. If the probe fails (`collected=true` with `stale=false` or
-   `identity=false`, or a desync), apply the spec's fallback: strong widget caches plus `forget()`. Then update the
-   README's tag, tag `v0.2.0` and run tag consumption.
+   including the weak cache probe. The two-player run is deferred to the online checks before 1.0 (Backlog). If the
+   probe fails (`collected=true` with `stale=false` or `identity=false`), apply the spec's fallback: strong widget
+   caches plus `forget()`. Then update the README's tag, tag `v0.2.0` and run tag consumption.
 2. **Choose the next sub-project from the backlog with the maintainer.** Candidates include the UI and presentation
    wrappers, the YueScript port of `wc3-lib` (4d) and the Reforged map preview. Each needs a short design (or a spec,
    for a sub-project) approved first.
@@ -238,6 +238,12 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **UI and presentation wrappers.** Dialog and button, multiboard, leaderboard, quest, timer dialog and frame; sound,
   text tag, lightning, image, ubersplat and fog modifier; item and destructable enumeration. Deferred from wrappers
   v0.2.0 (2026-09-28).
+- **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
+  every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
+  Battle.net. Covers at least: the wrappers weak-cache gate (`examples/gate.yue`, two players past its 50-second probe,
+  no desync, each machine's probe line recorded), `Player:isLocal()`, `Group:enumSelected`, map settings (players,
+  forces, alliances) in a real lobby, map transfer of packed normal and minified builds, and any later feature with
+  multiplayer effects. Until then, release gates record these as deferred, not passed.
 - **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
   scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
   Moved here 2026-09-28; it depends on 4b's library sync.
