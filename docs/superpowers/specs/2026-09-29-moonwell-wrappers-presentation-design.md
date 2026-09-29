@@ -142,9 +142,10 @@ section revised before release.
 - `create(path, width, height, x, y, imageType) -> Image`: CreateImage(path, width, height, 0, x - width / 2,
   y - height / 2, 0, 0, 0, 0, imageType), then SetImageRenderAlways(raw, true) and ShowImage(raw, true), because a new
   image is otherwise not drawn. `x, y` is the **center**. README lists the image types (1 selection, 2 indicator,
-  3 occlusion mask, 4 ubersplat) and the file requirements.
+  3 occlusion mask, 4 ubersplat).
 - The wrapper keeps its size in a private weak-keyed table (never iterated), so `setPosition(x, y, z?)` also centers:
-  SetImagePosition(raw, x - width / 2, y - height / 2, z or 0).
+  SetImagePosition(raw, x - width / 2, y - height / 2, z or 0). An image wrapped with `fromHandle` has no known size, so
+  its `setPosition` raises `size unknown for a wrapped image; use SetImagePosition` rather than silently not centering.
 - `show(b)` (ShowImage), `setVisibleFor(player)`, `setColor(r, g, b, a)` (SetImageColor),
   `setConstantHeight(flag, height)`, `setAboveWater(flag, useWaterAlpha)`, `setType(imageType)`.
 - `destroy()` (DestroyImage).
