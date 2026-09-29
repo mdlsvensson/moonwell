@@ -159,13 +159,14 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   Drain Life), `lightning:setColor` shows no visible change, and effects attached to items and destructables are not
   drawn (the last two documented in the wrappers README). Tag consumption passed: a fresh map locked `v0.3.0` to
   `1277875`. The disposable gate map is `../wrappers-gate` (`deno task gate <run>`, one command per run).
-- **Wrappers v0.3.1, native caveats** (2026-09-29): from the w3ts and WCSharp comparisons (`docs/superpowers/research/`)
-  and an in-game probe run (`../wrappers-gate`, `deno task gate probe`; results in the WCSharp note §9). README notes
-  measured by the probe and a labelled "Reported native caveats" section, `Image.create` raising on a wrong path
-  (Warcraft returns an image with handle id -1, not nil), and setter checks that flip booleans. The in-game gate was not
-  re-run by the maintainer's decision. Moonwell now knows `UnitAlive` (added to `tools/natives/lua-extras.json`,
-  `natives.json` regenerated from the same `common.j` export with no other change); the wrappers' `unit:isAlive()` is
-  unchanged, so the library still works with Moonwell 0.5.0.
+- **Wrappers v0.3.1, native caveats, released** (2026-09-29, GitHub pre-release `v0.3.1` on `94d650f`; tag consumption
+  passed): from the w3ts and WCSharp comparisons (`docs/superpowers/research/`) and an in-game probe run
+  (`../wrappers-gate`, `deno task gate probe`; results in the WCSharp note §9). README notes measured by the probe and a
+  labelled "Reported native caveats" section, `Image.create` raising on a wrong path (Warcraft returns an image with
+  handle id -1, not nil), and setter checks that flip booleans. The in-game gate was not re-run by the maintainer's
+  decision. Moonwell now knows `UnitAlive` (added to `tools/natives/lua-extras.json`, `natives.json` regenerated from
+  the same `common.j` export with no other change); the wrappers' `unit:isAlive()` is unchanged, so the library still
+  works with Moonwell 0.5.0.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
