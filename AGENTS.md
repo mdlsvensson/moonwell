@@ -179,9 +179,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 
 ## Next work, in order
 
-1. **Finish wrappers v0.4.0:** the `ui-init` probe and the in-game gate (the wrappers repo's CONTRIBUTING step 8, normal
-   and minified); record the probe's answers in README and move the measured w3ts notes out of the backlog item below;
-   then release it like v0.3.0 (tag `v0.4.0`, tag consumption gate).
+1. **Finish wrappers v0.4.0:** the in-game gate (the wrappers repo's CONTRIBUTING steps 8 and 9: `deno task gate ui` and
+   `ui-min` in `../wrappers-gate`; the `ui-init` probe passed and is recorded), then release it like v0.3.0 (tag
+   `v0.4.0`, tag consumption gate).
 2. **Then choose the next sub-project with the maintainer:** wrappers release C (frames), the editor error for effects
    attached to items and destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview. Each needs a
    short design or a spec first. 4d has design inputs in the w3ts comparison §2.1 and the WCSharp comparison §2.1, whose
