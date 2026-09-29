@@ -3229,3 +3229,24 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 Report to the maintainer: commits in both repositories, test counts, the integration evidence, and the pending
 in-game gate (steps 1–9 in CONTRIBUTING, including LAN). Do not push, tag or publish.
+
+## Execution ledger
+
+- 2026-09-28: executed with superpowers:subagent-driven-development (a fresh Opus implementer per task, a task review
+  after each, one final whole-branch review). Commits on `main` in `../moonwell-wrappers`, base `4f91f8d`.
+- Tasks 1–6 and 8: clean reviews (commits `1df3ebe`, `cfc941a`, `95d594f`, `b9b90a5`, `b2f851d`, `9443c7f`, `737d2ab`).
+- Task 7: one fix round (`f1b28ba`). Ruling: `forEach` and group filters wrap the whole snapshot before any callback,
+  overriding this plan's lazy wrapping; spec §8 says `forEach` iterates a `getUnits()` snapshot, and lazy wrapping
+  revived a unit removed mid-loop as a live wrapper.
+- Task 8 deviations accepted: the need-check-nil fixture goes through a local (LuaLS 3.19.1 does not flag chained
+  calls); the gate's churn probe allocates throwaway tables. Ruling: the gate adds a self-removing chat action.
+- Task 9: Steps 1–5 in `2e6776a`, one fix round (`88be7ef`). Ruling: the gate's weak cache probe creates and removes
+  units only at fixed times and only prints GC and check results; the plan's GC-gated creation would itself desync the
+  LAN gate. `deno fmt` fixed the pre-existing README formatting.
+- Final review: ready "with fixes"; one fix wave (`830cf31`) switched the gate ability to Storm Bolt (Slow has one
+  level), added a self-removing condition to the gate and stand-in tests, documented that weak tables keyed by widget
+  wrappers are nondeterministic, and made group filter errors blame the caller. Scoped re-review: all addressed.
+- Result: 69 behavior tests in 13 suites, Lua 5.3.6 syntax, integration (8 negative diagnostics, Unit-only and
+  Trigger-only bundle checks, gate builds), direct LuaLS over `src` clean. The integration LuaLS runs do not diagnose
+  library files, so each task also ran LuaLS directly over `src`.
+- Pending (maintainer): the in-game gate in the wrappers CONTRIBUTING, including the LAN run, then tag consumption.

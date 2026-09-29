@@ -4,7 +4,7 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
 as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
 rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
+over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented.
 
 ## Read first
 
@@ -18,7 +18,7 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
   by Plans 3a, 3b and 3c, released together as 0.4.0. Plans for everything built so far are in
   `docs/superpowers/plans/`; follow their style when writing new plans.
 
-## State (2026-09-28)
+## State (2026-09-29)
 
 - **Released:** 0.1.0, on JSR (`@moonwell/cli@0.1.0`) and as a GitHub release (`moonwell@0.1.0`). It contains the
   toolchain: `init`, `setup`, `build`, `test`, `dev`, `check`; the YueScript bundler with runtime hooks; the MPQ writer;
@@ -131,14 +131,29 @@ over, and updated on 2026-09-28 after the 0.4.0 release and Plan 4b.
   callback-error recovery, minified gameplay and World Editor opening on 2026-09-28 (game 3.0.0.24268, editor 3.00).
   First published-tag consumption passed 2026-09-28: a fresh map locked `v0.1.0` to `c1209f5`, and the lock stayed
   unchanged after removing `.moonwell/`. Moonwell CLI code is unchanged.
+- **Wrappers v0.2.0, broad coverage** (2026-09-29, spec
+  `docs/superpowers/specs/2026-09-28-moonwell-wrappers-broad-design.md`, plan
+  `docs/superpowers/plans/2026-09-28-moonwell-wrappers-broad.md`): implemented in `../moonwell-wrappers` on main at
+  `830cf31` (not tagged). Adds Item, Destructable, Rect, Region and Force; deeper Unit, Player, Trigger (predicate
+  conditions, removable action/condition tokens) and Group (filtered enumerations, `forEach`, `first`); a widget layer;
+  weak Unit/Item/Destructable caches. Wrapper arguments convert through the loaded registries, so a module imports
+  another only to return its wrappers. Automated checks pass: 69 behavior tests, Lua 5.3.6 syntax, Moonwell
+  normal/minified builds, LuaLS positive and 8 negative diagnostics, and a Trigger-only bundle check. The integration
+  LuaLS runs do not diagnose the library's own files; check `src` with a direct LuaLS run. The in-game gate (with a weak
+  cache probe that changes game state only at fixed times, self-removing action and condition, and a two-player LAN run)
+  and tag consumption are pending.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Choose the next sub-project from the backlog with the maintainer.** Sub-project 4c is released; nothing is selected
-   yet. Candidates include the broad wrapper library, the YueScript port of `wc3-lib` (4d) and the Reforged map preview.
-   Each needs a short design (or a spec, for a sub-project) approved first.
+1. **Wrappers v0.2.0 release gate.** The maintainer runs the in-game gate in `../moonwell-wrappers/CONTRIBUTING.md`,
+   including the weak cache probe and a two-player LAN run. If the probe fails (`collected=true` with `stale=false` or
+   `identity=false`, or a desync), apply the spec's fallback: strong widget caches plus `forget()`. Then update the
+   README's tag, tag `v0.2.0` and run tag consumption.
+2. **Choose the next sub-project from the backlog with the maintainer.** Candidates include the UI and presentation
+   wrappers, the YueScript port of `wc3-lib` (4d) and the Reforged map preview. Each needs a short design (or a spec,
+   for a sub-project) approved first.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -220,8 +235,9 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
   sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
   declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
-- **Broad wrapper library.** Deferred on 2026-09-28: extend 4c's focused foundation to cover most Warcraft handle types.
-  Design the additional coverage separately after the foundation; broad coverage is outside 4c's first release.
+- **UI and presentation wrappers.** Dialog and button, multiboard, leaderboard, quest, timer dialog and frame; sound,
+  text tag, lightning, image, ubersplat and fog modifier; item and destructable enumeration. Deferred from wrappers
+  v0.2.0 (2026-09-28).
 - **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
   scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
   Moved here 2026-09-28; it depends on 4b's library sync.
