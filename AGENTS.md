@@ -278,6 +278,18 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   short design): `WeatherEffect` (`AddWeatherEffect`, enable, remove); spell effects from ability data
   (`AddSpellEffectById`, for example `Effect.flashSpell`); more Trigger registrations (player state, key, mouse, sync,
   alliance change, game state, timer expire); event helpers such as `Unit.fromEvent()`.
+- **Static native-call check for the wrappers** (WCSharp comparison §7.3; backlogged 2026-09-29, the maintainer wants to
+  know more before deciding). A check in the wrappers' `deno task test` that reads every native call in `src/wrappers/`
+  and compares it with `cli/data/natives.json`: the native exists, and the argument count matches. It would catch a
+  wrong native name or a missing argument without game or doubles, as WCSharp's Roslyn API checker does for its
+  templates. Open questions: how to find calls reliably in Lua (a tokenizer, not a regex), and how the wrappers
+  repository gets `natives.json` (copy, or read from `../moonwell`).
+- **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
+  maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
+  keeps a live-looking wrapper whose handle is dead. WCSharp detects removal as a unit leaving a region that covers the
+  world bounds. Depends on the probe run (next work item 1) showing that decay and `RemoveUnit` fire that event on
+  3.0.0.24268. Open questions: it needs a trigger and a region created by the library (today modules create nothing at
+  import), the event timing relative to other callbacks, and whether it removes the need for the weak cache.
 - **Editor error for effects attached to items and destructables.** The v0.3.0 gate (2026-09-29, game 3.0.0.24268)
   showed that Warcraft drew no effect attached to an item (Claws of Attack, two effect models) or a destructable (a
   summer tree). `Effect.attach` and `Effect.flashOn` accept any Widget, like the native, and the README documents the
