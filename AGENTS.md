@@ -144,14 +144,21 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented.
   self-removing action and condition ran. Text printed while a map loads never reaches the screen or the log, so the
   gate starts from a zero-second timer. The two-player desync run is deferred to the online checks before 1.0 (Backlog).
   Tag consumption passed: a fresh map locked `v0.2.0` to `7baa81e`.
+- **Wrappers v0.3.0, presentation, implemented; in-game gate pending** (spec
+  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-presentation-design.md`, plan
+  `docs/superpowers/plans/2026-09-29-moonwell-wrappers-presentation.md`): release A of the UI and presentation backlog
+  item. TextTag, Sound, Lightning, Image, Ubersplat and FogModifier (owned objects only), `TextTag.float`,
+  `Sound.playOnce`, `Effect.flash`/`flashOn`, `setVisibleFor`/`playFor`, deeper Effect and `Item`/`Destructable`
+  `enumInRect`. Automated checks pass; the maintainer runs CONTRIBUTING's gate with `presentation = true`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Choose the next sub-project from the backlog with the maintainer.** Candidates include the UI and presentation
-   wrappers, the YueScript port of `wc3-lib` (4d) and the Reforged map preview. Each needs a short design (or a spec,
-   for a sub-project) approved first.
+1. **Finish wrappers v0.3.0:** the maintainer's in-game gate (CONTRIBUTING step 7 of the wrappers repo, normal and
+   minified), including the first-play sound check; then release it like v0.2.0 (tag `v0.3.0`, tag consumption gate).
+2. **Then choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the YueScript
+   port of `wc3-lib` (4d) or the Reforged map preview. Each needs a short design or a spec first.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -233,9 +240,9 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
   sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
   declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
-- **UI and presentation wrappers.** Dialog and button, multiboard, leaderboard, quest, timer dialog and frame; sound,
-  text tag, lightning, image, ubersplat and fog modifier; item and destructable enumeration. Deferred from wrappers
-  v0.2.0 (2026-09-28).
+- **UI wrappers, releases B and C.** Split 2026-09-29 from "UI and presentation wrappers"; release A (presentation) is
+  wrappers v0.3.0. B, v0.4.0: dialog and button, multiboard, leaderboard, quest, timer dialog. C, v0.5.0: the `BlzFrame`
+  API, with its own ownership design (TOC/FDF loading, parent trees, local frames).
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
   Battle.net. Covers at least: the wrappers weak-cache gate (`examples/gate.yue`, two players past its 50-second probe,
