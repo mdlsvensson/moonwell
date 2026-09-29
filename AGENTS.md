@@ -144,21 +144,25 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   self-removing action and condition ran. Text printed while a map loads never reaches the screen or the log, so the
   gate starts from a zero-second timer. The two-player desync run is deferred to the online checks before 1.0 (Backlog).
   Tag consumption passed: a fresh map locked `v0.2.0` to `7baa81e`.
-- **Wrappers v0.3.0, presentation, implemented; in-game gate pending** (spec
+- **Wrappers v0.3.0, presentation, released** (2026-09-29, GitHub pre-release `v0.3.0` of
+  `mdlsvensson/moonwell-wrappers` on commit `1277875`; spec
   `docs/superpowers/specs/2026-09-29-moonwell-wrappers-presentation-design.md`, plan
   `docs/superpowers/plans/2026-09-29-moonwell-wrappers-presentation.md`): release A of the UI and presentation backlog
   item. TextTag, Sound, Lightning, Image, Ubersplat and FogModifier (owned objects only), `TextTag.float`,
   `Sound.playOnce`, `Effect.flash`/`flashOn`, `setVisibleFor`/`playFor`, deeper Effect and `Item`/`Destructable`
-  `enumInRect`. Automated checks pass; the maintainer runs CONTRIBUTING's gate with `presentation = true`.
+  `enumInRect`. Automated checks pass (107 behavior tests). The in-game gate passed 2026-09-29, normal and minified,
+  after four gate fixes found in game: trees snap to a 64-unit grid, Chain Lightning fades by itself (the gate uses
+  Drain Life), `lightning:setColor` shows no visible change, and effects attached to items and destructables are not
+  drawn (the last two documented in the wrappers README). Tag consumption passed: a fresh map locked `v0.3.0` to
+  `1277875`. The disposable gate map is `../wrappers-gate` (`deno task gate <run>`, one command per run).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
 ## Next work, in order
 
-1. **Finish wrappers v0.3.0:** the maintainer's in-game gate (CONTRIBUTING steps 7–8 of the wrappers repo (normal and
-   minified)), including the first-play sound check; then release it like v0.2.0 (tag `v0.3.0`, tag consumption gate).
-2. **Then choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the YueScript
-   port of `wc3-lib` (4d) or the Reforged map preview. Each needs a short design or a spec first.
+1. **Choose the next sub-project with the maintainer:** wrappers release B (classic UI), C (frames), the editor error
+   for effects attached to items and destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview.
+   Each needs a short design or a spec first.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
