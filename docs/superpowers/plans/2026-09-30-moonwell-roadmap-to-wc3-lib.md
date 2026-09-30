@@ -236,6 +236,16 @@ The maintainer picks the findings to act on, by multiple-choice questions.
 
 ### 2.2 Refactor release (wrappers v0.6.0; spec, plan and full gate)
 
+**Released 2026-09-30:** wrappers `v0.6.0` on `933b580`; tag consumption passed.
+- **Spec and plan:** `2026-09-30-moonwell-wrappers-refactor`.
+- **In game:**
+  - Errors point at the caller.
+  - The fixed method cost fell from about 120 ns to 70 ns.
+  - Enumerating 20 units costs 27.0 µs, down from 29.2 µs.
+  - The missile tick is unchanged: natives dominate it.
+  - A removed unit's `exists()` reads `false` from the next frame.
+- **Gate:** frames and the minified runs were not re-run, by the maintainer's decision.
+
 It contains:
 
 - the chosen findings;

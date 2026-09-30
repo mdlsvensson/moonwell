@@ -199,6 +199,18 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   Moonwell 0.5.1): roadmap item 0.3. `Effect.attach` and `Effect.flashOn` take a Unit in the editor, so LuaLS flags an
   Item or a Destructable (17 expected negative diagnostics); the runtime still accepts any widget. The in-game gate was
   not re-run (annotations only).
+- **Wrappers v0.6.0, the refactor after the review, released** (2026-09-30, GitHub pre-release `v0.6.0` on `933b580`;
+  tag consumption passed; review `docs/superpowers/research/2026-09-30-wrappers-review.md`, spec and plan
+  `2026-09-30-moonwell-wrappers-refactor`). Roadmap 2.2.
+  - Wrapper errors point at the calling line. A tail call into a raising helper had dropped the position entirely, and
+    `tests/blame.lua` sweeps every class.
+  - A one-lookup method prologue: the fixed cost per method fell from about 120 ns to 70 ns in game. One-table
+    enumeration: 20 units cost 27.0 µs, down from 29.2 µs.
+  - `isAlive()` through `UnitAlive`, so the library needs Moonwell 0.5.1 or later.
+  - `exists()` on Unit, Item and Destructable. A unit removed by raw code reads `false` only from the next frame.
+  - Options errors are reported in sorted order, and the README has a per-module API reference.
+  - The in-game gate passed `core`, `probes`, `presentation`, `ui` and `perf`. Frames and the minified runs were not
+    re-run, by the maintainer's decision.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -212,8 +224,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    (`docs/superpowers/research/2026-09-30-wrappers-performance.md`) and 1.3
    (`docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`). D1 is decided (option (c), a mix; damage event data
    goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
-   (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). Next: the spec for wrappers v0.6.0
-   (roadmap 2.2), then its plan.
+   (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). 2.2 is released as wrappers
+   v0.6.0. Next is 2.3: the spec for wrappers v0.7.0, the port prerequisites (`unit:getCollisionSize()`,
+   `unit:setPathing(flag)`, sync, and damage event data).
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -256,6 +269,10 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 ```
 
 ## Pitfalls already paid for
+
+- **In-game error positions are bundle lines:** Moonwell bundles every module into one `war3map.lua` chunk. An error
+  message caught with `pcall` (not a hook error, which Moonwell maps back to the source) reads `war3map.lua:<line>`.
+  Look the line up in the built `dist/stage/map.w3x/war3map.lua`, where each module starts at a `__mw.define` line.
 
 - **YueScript `//` empties a file:** yue 0.34.2 with `-r` or `-m` (both of Moonwell's build modes) writes a 0-byte Lua
   file for any source that uses floor division, and exits 0; without those flags it compiles correctly. Found 2026-09-30
