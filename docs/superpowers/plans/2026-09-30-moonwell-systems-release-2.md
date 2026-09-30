@@ -1033,11 +1033,12 @@ end)
 test('dispose removes every dummy in cast order and refuses new casts', function()
     local clock = Scheduler.new(1)
     local dummies = Dummies.new(clock)
-    local first = dummies:cast(request({duration = 4})).getUnit
-    dummies:cast(request({duration = 4}))
+    local first = dummies:cast(request({duration = 4})):getUnit().handle
+    local second = dummies:cast(request({duration = 4})):getUnit().handle
     dummies:dispose(); dummies:dispose()
     eq(dummies:getCount(), 0); eq(clock:getPending(), 0); eq(callCount('RemoveUnit'), 2)
-    eq(type(first), 'function')
+    expectCall('RemoveUnit', second) -- the last removal was the second cast
+    eq(first.removed, true)
     failsAt(function() dummies:cast(request()) end, 'Dummies.cast: the manager is disposed')
 end)
 
@@ -1292,9 +1293,6 @@ function DummyLease:dispose() release(Check.receiver(self, DummyLease, 'DummyLea
 return Dummies
 ```
 
-(`dummies:cast(request({duration = 4})).getUnit` in the dispose test only reads a method; it keeps the test free of a
-live-lease reference.)
-
 - [ ] **Step 4:** `yue -e tests/run.lua; echo "exit $?"` → `dummy: SUITE PASSED: 7 tests`, `exit 0`.
 
 - [ ] **Step 5: Commit** `src/systems/dummy.lua tests/dummy.lua tests/suites.lua` —
@@ -1349,8 +1347,8 @@ local lease = dummies:cast({owner = owner, typeId = 1697656880, x = 0, y = 0, ab
 print(lease:isOrderAccepted(), dummies:sourceOf(lease:getUnit()), dummies:getCount())
 ```
 
-Replace `1701biggest` with the integer `1697656880` (`'e000'`) — the typo guard above is deliberate: the implementer
-must type the rawcode integer, not copy an invalid token. `1215324524` is `'Hpal'`, `1095267428` is `'AHtb'`.
+Rawcodes as integers (computed with a FourCC script): `1215324524` is `'Hpal'`, `1697656880` is `'e000'`,
+`1095267426` is `'AHtb'`.
 
 Append to `tests/editor-negative.lua` before `return true`:
 
