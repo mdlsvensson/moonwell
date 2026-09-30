@@ -192,10 +192,10 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 
 ## Next work, in order
 
-1. **Choose the next sub-project with the maintainer:** the editor error for effects attached to items and
-   destructables, the YueScript port of `wc3-lib` (4d) or the Reforged map preview. Each needs a short design or a spec
-   first. 4d has design inputs in the w3ts comparison §2.1 and the WCSharp comparison §2.1, whose systems are the
-   closest prior art.
+1. **Follow the roadmap** `docs/superpowers/plans/2026-09-30-moonwell-roadmap-to-wc3-lib.md` (approved 2026-09-30). It
+   orders everything toward the YueScript port of `wc3-lib` (4d): phase 0 free wins, phase 1 groundwork (static
+   native-call check, performance measurement, port-needs inventory, probe batch), phase 2 the wrappers review and
+   refactor, phase 3 the port, phase 4 the rest of the backlog. Its last table maps every backlog item to its place.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -253,10 +253,6 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   save the map in World Editor and then run the commands again.
 - **Deno quirks:** it refuses JSR versions published less than 24 hours ago unless you pass `--min-dep-age=0`. A locked
   file on Windows surfaces as a plain `Error` with code `EBUSY`, not a `Deno.errors` class.
-
-## Open, deliberately deferred (small)
-
-- `assets:sync` checks for Ctrl+C only while writing; one pressed during planning takes effect when writing starts.
 
 ## Backlog (features for later, each needs a short design first)
 

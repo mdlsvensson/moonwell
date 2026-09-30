@@ -12,6 +12,9 @@
 - Documentation: design and implementation plan for `moonwell-wrappers` v0.4.0 (classic UI: dialogs, multiboards,
   leaderboards, quests, defeat conditions, timer dialogs), released 2026-09-29.
 - Documentation: design and implementation plan for `moonwell-wrappers` v0.5.0 (frames), released 2026-09-29.
+- `assets:sync` stops at Ctrl+C while it plans, before printing or writing anything, and then says that nothing was
+  written; an interrupt during writing still undoes every change.
+- Documentation: the roadmap from `moonwell-wrappers` v0.5.0 to the `wc3-lib` port.
 
 ## 0.5.0 (2026-09-28)
 

@@ -48,7 +48,7 @@ Deno.test("an interrupted assets:sync leaves the source map and ownership state 
   await assertRejects(
     () => assets(ctx, "sync", { signal: AbortSignal.abort() }),
     MoonwellError,
-    "Interrupted; every change was undone.",
+    "Interrupted; nothing was written.",
   );
   assertEquals(await exists(join(root, "maps", "map.w3x", "icons")), false);
   assertEquals(await exists(join(root, ".asset-state")), false);

@@ -75,14 +75,24 @@ async function readState(file: string): Promise<AssetState> {
   return record as AssetState;
 }
 
-/** Checks every asset, import and owned file, and returns the changes. Writes nothing. */
+const INTERRUPTED_BEFORE_WRITING = "Interrupted; nothing was written.";
+
+/**
+ * Checks every asset, import and owned file, and returns the changes. Writes nothing. Stops with an error between files
+ * once `signal` aborts (Ctrl+C).
+ */
 export async function planAssets(
   root: string,
   mapDir: string,
   stateFile: string,
   config: AssetsConfig,
+  signal?: AbortSignal,
 ): Promise<AssetPlan> {
+  const stopIfInterrupted = () => {
+    if (signal?.aborted) throw new MoonwellError(INTERRUPTED_BEFORE_WRITING);
+  };
   const assets = await collectAssets(root, config);
+  stopIfInterrupted();
   if (!(await lstatOrUndefined(mapDir))?.isDirectory) {
     throw new MoonwellError(`The map folder ${mapDir} does not exist.`, {
       file: "moonwell.pkl",
@@ -112,6 +122,7 @@ export async function planAssets(
 
   // Every owned file must be unchanged, including files this plan would delete.
   for (const [key] of managed) {
+    stopIfInterrupted();
     const current = files.get(key);
     if (current === undefined) continue;
     const file = await safeJoin(mapDir, current);
@@ -128,6 +139,7 @@ export async function planAssets(
   const changes: FileChange[] = [];
   const plannedFolders = new Map<string, string>();
   for (const asset of assets) {
+    stopIfInterrupted();
     const key = pathKey(asset.target);
     if (!managed.has(key) && (files.has(key) || importKeys.has(key))) {
       throw new MoonwellError(`Asset ${asset.target} conflicts with a file or import already in the map.`, {
@@ -247,7 +259,11 @@ export async function applyAssetPlan(plan: AssetPlan, stateFile?: string, signal
       );
     }
     if (error instanceof MoonwellError) throw error;
-    if (error === interrupted) throw new MoonwellError("Interrupted; every change was undone.");
+    if (error === interrupted) {
+      throw new MoonwellError(
+        applied.length === 0 ? INTERRUPTED_BEFORE_WRITING : "Interrupted; every change was undone.",
+      );
+    }
     throw new MoonwellError(`Writing assets failed: ${reasonOf(error)}. Every change was undone.`, { cause: error });
   }
 }

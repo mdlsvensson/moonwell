@@ -9,7 +9,7 @@ import { withBuildLock } from "../shared/lock.ts";
 
 /**
  * assets:check shows what assets:sync would change; assets:sync writes assets/ into the source map for World Editor,
- * undoing its writes if `signal` aborts (Ctrl+C) before it finishes.
+ * stopping before it writes if `signal` aborts (Ctrl+C) while planning, and undoing its writes if it aborts later.
  */
 export async function assets(
   ctx: CommandContext,
@@ -28,7 +28,7 @@ export async function assets(
         });
       }
     }
-    const plan = await planAssets(ctx.root, mapDir, stateFile, project.assets);
+    const plan = await planAssets(ctx.root, mapDir, stateFile, project.assets, options.signal);
     for (const asset of plan.assets) ctx.logger.info(`${asset.source} -> ${asset.target.replaceAll("/", "\\")}`);
     for (const change of plan.changes) {
       ctx.logger.info(`${change.after === undefined ? "delete" : "write"} ${toPosix(relative(ctx.root, change.file))}`);

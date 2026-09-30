@@ -198,7 +198,7 @@ Deno.test("an interrupted sync changes nothing, and one interrupted midway undoe
   const plan = await planAssets(root, map, state, defaults);
 
   const before = await assertRejects(() => applyAssetPlan(plan, state, AbortSignal.abort()), MoonwellError);
-  assertEquals(before.message, "Interrupted; every change was undone.");
+  assertEquals(before.message, "Interrupted; nothing was written.");
   assertEquals(await exists(join(map, "a.blp")), false);
 
   // The signal reads as aborted from the second change on, after a.blp was written.
@@ -213,6 +213,29 @@ Deno.test("an interrupted sync changes nothing, and one interrupted midway undoe
   assert(reads > 1);
   assertEquals(await exists(join(map, "a.blp")), false);
   assertEquals(await exists(join(map, "war3map.imp")), false);
+  assertEquals(await exists(state), false);
+});
+
+Deno.test("planning stops at an interrupt, before anything is written", async () => {
+  const { root, map, state } = await fixture();
+  await put(root, "assets/a.blp");
+  await put(root, "assets/b.blp");
+  const error = await assertRejects(
+    () => planAssets(root, map, state, defaults, AbortSignal.abort()),
+    MoonwellError,
+  );
+  assertEquals(error.message, "Interrupted; nothing was written.");
+
+  // The signal reads as aborted from the second asset on, so planning stops midway.
+  let reads = 0;
+  const midway = {
+    get aborted() {
+      return ++reads > 1;
+    },
+  } as AbortSignal;
+  await assertRejects(() => planAssets(root, map, state, defaults, midway), MoonwellError);
+  assert(reads > 1);
+  assertEquals(await exists(join(map, "a.blp")), false);
   assertEquals(await exists(state), false);
 });
 
