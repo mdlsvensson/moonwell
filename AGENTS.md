@@ -253,7 +253,9 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **YueScript `//` empties a file:** yue 0.34.2 with `-r` or `-m` (both of Moonwell's build modes) writes a 0-byte Lua
   file for any source that uses floor division, and exits 0; without those flags it compiles correctly. Found 2026-09-30
   when a gate-map probe built as one module instead of eleven. `compileSources` now fails on an empty output for a file
-  with code (`emptyOutputError` in `cli/src/yue/compile.ts`). Write `math.floor(a / b)`.
+  with code (`emptyOutputError` in `cli/src/yue/compile.ts`). Write `math.floor(a / b)`. Reported upstream as
+  IppClub/YueScript#256; once a fixed yue is pinned, the floor-division test in `cli/tests/yue/compile.test.ts` fails
+  and should become a test that such a file compiles.
 
 - **Backslashes in shell-written files:** Git Bash heredocs and `sed` turn `\\` into `\`. Write files that contain
   backslashes (Windows paths, regexes, Pkl raw strings) with a file-editing tool, not the shell, and check them.
