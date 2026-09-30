@@ -25,6 +25,8 @@ Steps 1 and 2 (CONTRIBUTING) passed 2026-09-30 on Windows: every check passes fr
 maintainer's decision: this release changes no code that runs in the game or in World Editor (a native name the editor
 and the unknown-global check know, and `assets:sync`'s interrupt handling, which unit and Pkl tests cover).
 
+Published to JSR 2026-09-30; the maintainer checked `init` and `build` from `jsr:@moonwell/cli@0.5.1`.
+
 ## 0.5.0 (2026-09-28)
 
 - Lua modules: `.lua` files in `lua/` are modules named by their path, sharing one namespace with `src/` (a name both

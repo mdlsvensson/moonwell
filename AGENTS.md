@@ -104,10 +104,10 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 - **Released 0.5.0** (2026-09-28, JSR `@moonwell/cli@0.5.0` and GitHub release `moonwell@0.5.0` on `27d093a`, checked
   with `init` and `build` from JSR): sub-project 4, Plans 4a and 4b below. The release gate passed steps 1–6 and 12;
   7–11 were not re-run (their code is unchanged).
-- **Released 0.5.1** (2026-09-30, GitHub release `moonwell@0.5.1`; JSR `@moonwell/cli@0.5.1` is published by the
-  maintainer): roadmap phase 0. `UnitAlive` is a known native, `assets:sync` stops at Ctrl+C while planning, and the
-  README's `yue` console-window note is gone. Gate steps 1 and 2 passed; 3 to 12 were not re-run (no game-facing
-  change).
+- **Released 0.5.1** (2026-09-30, JSR `@moonwell/cli@0.5.1` and GitHub release `moonwell@0.5.1` on `c883e4c`, checked
+  with `init` and `build` from JSR): roadmap phase 0. `UnitAlive` is a known native, `assets:sync` stops at Ctrl+C while
+  planning, and the README's `yue` console-window note is gone. Gate steps 1 and 2 passed; 3 to 12 were not re-run (no
+  game-facing change).
 - **Plan 4a, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules
   in `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
