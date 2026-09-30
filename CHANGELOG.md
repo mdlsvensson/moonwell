@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Builds stop with an error naming the file when YueScript reports success but writes no Lua for a file with code.
+  YueScript 0.34.2 does this, in normal and minified builds, for any file that uses the floor division operator `//`,
+  which until now silently left that module out of the map. README: write `math.floor(a / b)` instead.
+
 ## 0.5.1 (2026-09-30)
 
 - `assets:sync` stops at Ctrl+C while it plans, before printing or writing anything, and then says that nothing was

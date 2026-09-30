@@ -100,6 +100,35 @@ Deno.test("compileSources reports syntax errors with file and line", async () =>
   assertEquals(error.line, 2);
 });
 
+Deno.test("an empty compile output for a file with code fails instead of dropping the module", async () => {
+  const yue = await testYue();
+  const root = await project({
+    "src/main.yue": "-- a comment\nexport x = 1\n",
+    "src/notes.yue": "-- only comments\n\n",
+  });
+  // yue reports success but writes nothing, as 0.34.2 does for `//`; the output file follows `-o`.
+  const run: Runner = async (command, args, options) => {
+    const result = await runProcess(command, args, options);
+    if (args[args.length - 1].endsWith("main.yue")) {
+      await Deno.writeFile(args[args.indexOf("-o") + 1], new Uint8Array());
+    }
+    return result;
+  };
+  const error = await assertRejects(() => compileSources({ yue, root, minify: false, run }), MoonwellError);
+  assertEquals(error.file, "src/main.yue");
+  assertStringIncludes(error.message, "no Lua");
+  assertStringIncludes(error.hint ?? "", "//");
+});
+
+Deno.test("a file using floor division fails, normal and minified (yue 0.34.2 empties it)", async () => {
+  const yue = await testYue();
+  for (const minify of [false, true]) {
+    const root = await project({ "src/main.yue": "x = 7 // 2\nprint x\n" });
+    const error = await assertRejects(() => compileSources({ yue, root, minify }), MoonwellError);
+    assertEquals(error.file, "src/main.yue");
+  }
+});
+
 Deno.test("compileSources rejects dots in file names", async () => {
   const yue = await testYue();
   const root = await project({ "src/a.b.yue": "export x = 1\n" });

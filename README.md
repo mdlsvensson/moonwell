@@ -72,6 +72,10 @@ Hooks: `before_config`, `on_config`, `before_main`, `on_main`. A failing hook pr
 file and line, and the other hooks still run. Module top-level code runs while the map script loads, so create game
 objects inside hooks.
 
+Do not use the floor division operator `//`: YueScript 0.34.2 compiles a file that uses it to no Lua at all, in normal
+and minified builds, while reporting success. Moonwell stops the build with an error naming the file; write
+`math.floor(a / b)` instead.
+
 ## Editor setup
 
 VS Code with two extensions gives `.yue` files completion, hover, signature help and type warnings for the game's API.

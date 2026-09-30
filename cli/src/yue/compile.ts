@@ -103,11 +103,14 @@ export async function compileSources(options: {
       ...macroPathArgs(options.macros),
       join(options.root, ...path.split("/")),
     ]);
-    if (result.code !== 0) {
+    const failure = result.code !== 0
+      ? compileError(path, `${result.stdout}\n${result.stderr}`)
+      : await emptyOutputError(path, output, texts[path]);
+    if (failure) {
       delete fileHashes[path];
       delete texts[path];
       await removeIfExists(output);
-      failures.push(compileError(path, `${result.stdout}\n${result.stderr}`));
+      failures.push(failure);
     }
   });
 
@@ -171,6 +174,21 @@ async function readManifest(path: string): Promise<Manifest | undefined> {
  * starts with "failed to expand macro: (macro <name>):<line>: ", a line of the macro module rather than of the file, so
  * the first line of the error drops it; the excerpt keeps the compiler's full text.
  */
+/**
+ * yue 0.34.2 reports success but writes an empty file for a source that uses floor division (`//`), with both `-r` and
+ * `-m`; the module would silently vanish from the build. A source without code (blank or comment lines) writes no file.
+ */
+async function emptyOutputError(file: string, output: string, source: string): Promise<MoonwellError | undefined> {
+  const info = await Deno.stat(output).catch(() => undefined);
+  if (info?.size !== 0) return undefined;
+  if (source.split(/\r?\n/).every((line) => /^\s*(--.*)?$/.test(line))) return undefined;
+  return new MoonwellError(`YueScript reported success but wrote no Lua for ${file}, although the file has code.`, {
+    file,
+    hint: "YueScript 0.34.2 does this for a file that uses the floor division operator `//`. " +
+      "Write math.floor(a / b) instead.",
+  });
+}
+
 export function compileError(file: string, output: string): MoonwellError {
   const detail = output.split(/\r?\n/).filter((line) => !line.startsWith("Failed to compile")).join("\n").trim();
   const match = /^(\d+): (.+)$/m.exec(output);
