@@ -173,6 +173,14 @@ Two open questions from the port-needs note concern the wrappers:
   is 20 lines, and a public module would be more API to keep stable.
 - **Ordered collections:** where they live. Recommendation: in the port. The wrappers keep ordered arrays inline.
 
+## Decided (2026-09-30)
+
+The maintainer chose **all findings** for v0.6.0:
+- **Code:** R1 and R11, R2 and R3, R4, R5, and R12 (sorted field names).
+- **Docs:** R6, R7 and R9.
+
+R8 and R10 stay as recommended: no change. The port prerequisites (2.3) get their own spec and release, v0.7.0.
+
 ## Proposed v0.6.0 (if every recommendation is taken)
 
 **Code:**

@@ -211,7 +211,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1), and so are 1.1 (wrappers `227e142`) and 1.2
    (`docs/superpowers/research/2026-09-30-wrappers-performance.md`) and 1.3
    (`docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`). D1 is decided (option (c), a mix; damage event data
-   goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete; next is 2.1, the wrappers review.
+   goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
+   (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). Next: the spec for wrappers v0.6.0
+   (roadmap 2.2), then its plan.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

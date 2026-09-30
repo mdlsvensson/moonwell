@@ -204,6 +204,12 @@ event data (reading and changing a hit).
 
 ### 2.1 Review (research note; the maintainer chooses the findings)
 
+**Done 2026-09-30:** `docs/superpowers/research/2026-09-30-wrappers-review.md`.
+- It found no correctness bugs.
+- The maintainer chose every finding for v0.6.0: error locations (R1, R11), a cheaper method prologue (R2),
+  one-table enumeration (R3), `UnitAlive` (R4), `exists()` (R5), sorted option errors (R12), and the docs R6, R7 and R9.
+- The port prerequisites (2.3) are a separate v0.7.0.
+
 A module-by-module audit of `src/wrappers/`, its internals, its tests and its docs. The result is a list of numbered
 findings, each with a severity and a recommendation. It checks:
 
