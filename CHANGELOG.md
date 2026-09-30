@@ -5,6 +5,8 @@
 - Documentation: the `moonwell-wrappers` v0.5.1 review, the performance and port-needs research notes with their probe
   results, and the designs and implementation plans for `moonwell-wrappers` v0.6.0 (the refactor after the review) and
   v0.7.0 (the port prerequisites: damage events, sync, collision size and pathing), both released 2026-09-30.
+- Documentation: the design of `moonwell-systems`, the `wc3-lib` port, and the plan for its release 1 (v0.1.0, released
+  2026-09-30); a backlog item for replacing Deno.
 
 ## 0.5.2 (2026-09-30)
 

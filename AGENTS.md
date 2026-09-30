@@ -220,6 +220,17 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - The gate map's new `port` run passed. It measured: `isAttack` is false for `damageTarget` even with `attack` true; a
     type change before armor works, after armor it does nothing; the outer hit's setters still work after a nested hit;
     `setPathing(false)` does not make move orders cross trees; sync prefixes of 16, 17 and 32 characters arrive whole.
+- **moonwell-systems v0.1.0, release 1 of the `wc3-lib` port, released** (2026-09-30, public repository
+  `mdlsvensson/moonwell-systems`, GitHub pre-release `v0.1.0` on `1725436`; tag consumption passed with wrappers
+  `v0.7.0`; spec `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`, plan
+  `docs/superpowers/plans/2026-09-30-moonwell-systems-release-1.md`). Roadmap phase 3, release 1.
+  - `systems.scheduler` (heap clock, `start()` on one wrappers Timer), `systems.signal`, `systems.scope` and
+    `systems.time` (32-bit range, `Time.localUtc()` through `os.time()`).
+  - Annotated Lua on the wrappers, with no port interfaces; failures are printed or passed to `onError`, never rethrown.
+  - Its tooling has no Deno: `yue -e tests/run.lua`, `tools/check.lua` and `tools/integration.lua` (Lua, through
+    `io.popen`).
+  - The in-game gate (`deno task gate systems` in `../wrappers-gate`, whose local manifest now lists both libraries)
+    passed: the scheduler kept time with a Warcraft timer to within 4 µs.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -234,8 +245,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    (`docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`). D1 is decided (option (c), a mix; damage event data
    goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
    (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). 2.2 is released as wrappers v0.6.0
-   and 2.3 as wrappers v0.7.0, so phase 2 is complete. Next is phase 3: the spec for the `wc3-lib` port (its "Spec
-   decisions" and the port-needs note's open questions, §5).
+   and 2.3 as wrappers v0.7.0, so phase 2 is complete. Phase 3 is under way: moonwell-systems v0.1.0 (release 1:
+   scheduler, signal, scope, time) is released. Next is the spec for release 2 (dummy, buffs and aura, and
+   `systems.internal.ordered`), building on Part 1 of `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -363,4 +375,9 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
   Moved here 2026-09-28; it depends on 4b's library sync. The 1.4 probe found `wc3-lib`'s Preload local store broken in
   game for codes over one chunk (lines cut at 259 characters, which can crash the game on load; appending inside the
-  file has no effect): port-needs note §6.5.
+  file has no effect): port-needs note §6.5. Under way as `mdlsvensson/moonwell-systems` (annotated Lua, not YueScript,
+  by the maintainer's choice); v0.1.0 is released.
+- **Replace Deno in Moonwell's toolchain.** The maintainer's plan (2026-09-30): the project has nothing to do with
+  TypeScript, so Deno should go eventually, from the CLI and from the wrappers' tools. moonwell-systems already needs
+  none (its tools are Lua run with `yue -e`). Needs a design: what replaces the CLI's runtime, JSR publishing and the
+  test suites.
