@@ -81,9 +81,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   first workspace folder. The editor gate (CONTRIBUTING step 10, plan Task 10) passed 2026-09-27 in Antigravity IDE with
   LiJin.yuescript 0.2.9 and sumneko.lua 3.19.1, after one fix: lua-language-server suggests at most
   `completion.maxSuggestCount` globals (default 100), and the extension completes at a placeholder word, so
-  `.luarc.json` sets it to 10000. On Windows the extension 0.2.9 opens a console window for `yue` (it does not hide it).
-  Our fix, `windowsHide: true` on its two `spawn` calls (pigpigyyy/yuescript-vscode#11), was merged 2026-09-27 and
-  awaits an extension release; then drop the README note.
+  `.luarc.json` sets it to 10000. On Windows the extension 0.2.9 opened a console window for `yue`; our fix,
+  `windowsHide: true` on its two `spawn` calls (pigpigyyy/yuescript-vscode#11), shipped in extension 0.2.10
+  (2026-09-27), and the maintainer confirmed on 2026-09-30 that no window opens.
 - **Plan 3b** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-unknown-globals.md`): the unknown-global check.
   `compileProject` runs `yue -g` per changed source (cache `dist/stage/lua/.globals.json`, code in `cli/src/lint/`),
   builds the known names from `natives.json`, the source map's `war3map.lua`, `global` lines under `src/` and
@@ -104,6 +104,10 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 - **Released 0.5.0** (2026-09-28, JSR `@moonwell/cli@0.5.0` and GitHub release `moonwell@0.5.0` on `27d093a`, checked
   with `init` and `build` from JSR): sub-project 4, Plans 4a and 4b below. The release gate passed steps 1–6 and 12;
   7–11 were not re-run (their code is unchanged).
+- **Released 0.5.1** (2026-09-30, GitHub release `moonwell@0.5.1`; JSR `@moonwell/cli@0.5.1` is published by the
+  maintainer): roadmap phase 0. `UnitAlive` is a known native, `assets:sync` stops at Ctrl+C while planning, and the
+  README's `yue` console-window note is gone. Gate steps 1 and 2 passed; 3 to 12 were not re-run (no game-facing
+  change).
 - **Plan 4a, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules
   in `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name

@@ -1,20 +1,29 @@
 # Changelog
 
-## Unreleased
+## 0.5.1 (2026-09-30)
 
-- Documentation: approved design and implementation plan for the separate `moonwell-wrappers` library (sub-project 4c),
-  released as `mdlsvensson/moonwell-wrappers` `v0.1.0` after its in-game and first-tag consumption gates (recorded in
-  AGENTS.md). No CLI behavior changes.
+- `assets:sync` stops at Ctrl+C while it plans, before printing or writing anything, and then says that nothing was
+  written; an interrupt during writing still undoes every change.
 - Natives: `UnitAlive(unit)`, a common.ai native that map Lua can call (confirmed on Warcraft III 3.0.0.24268 by the
   wrappers probe run, 2026-09-29), is now known: the unknown-global check accepts it and `natives.d.lua` declares it.
+- README: the note about a `yue` console window on Windows is gone. YueScript extension 0.2.10 hides the window (our
+  fix, pigpigyyy/yuescript-vscode#11).
+- Documentation: approved design and implementation plan for the separate `moonwell-wrappers` library (sub-project 4c),
+  released as `mdlsvensson/moonwell-wrappers` `v0.1.0` after its in-game and first-tag consumption gates (recorded in
+  AGENTS.md).
 - Documentation: research notes comparing w3ts and WCSharp with `moonwell-wrappers`, with the probe results
   (`docs/superpowers/research/`).
 - Documentation: design and implementation plan for `moonwell-wrappers` v0.4.0 (classic UI: dialogs, multiboards,
   leaderboards, quests, defeat conditions, timer dialogs), released 2026-09-29.
 - Documentation: design and implementation plan for `moonwell-wrappers` v0.5.0 (frames), released 2026-09-29.
-- `assets:sync` stops at Ctrl+C while it plans, before printing or writing anything, and then says that nothing was
-  written; an interrupt during writing still undoes every change.
 - Documentation: the roadmap from `moonwell-wrappers` v0.5.0 to the `wc3-lib` port.
+
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-09-30 on Windows: every check passes from a clean checkout, including
+`test:network`, and `cli/data/game-paths.txt` is the 3.0.0.24268 list. Steps 3 to 12 were not re-run, by the
+maintainer's decision: this release changes no code that runs in the game or in World Editor (a native name the editor
+and the unknown-global check know, and `assets:sync`'s interrupt handling, which unit and Pkl tests cover).
 
 ## 0.5.0 (2026-09-28)
 

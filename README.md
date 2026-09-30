@@ -101,11 +101,6 @@ the map in World Editor to pick up new `gg_` and `udg_` globals.
 - **`.lua` files next to your `.yue` files.** The extension writes a `.lua` file next to each saved `.yue` file. It
   needs them for lua-language-server. They are git-ignored, and builds never use them: Moonwell compiles `src/**/*.yue`
   itself.
-- **A `yue` console window on Windows.** Whenever VS Code starts or reloads, the YueScript extension starts `yue` in a
-  console window (with Windows Terminal as the default terminal, a terminal tab running `yue.exe`). Leave it open:
-  closing it stops the extension's completion until the next reload. This is the extension's behaviour, not Moonwell's:
-  version 0.2.9 does not hide the process's window. The fix is merged upstream (pigpigyyy/yuescript-vscode#11) and ships
-  in the extension's next release.
 - **The game's Lua.** Warcraft III 3.0.0.24268 runs Lua 5.3 without `collectgarbage`, `dofile`, `loadfile`, `debug`,
   `io` and `package`, and its `os` has only `clock`, `date`, `difftime` and `time`. `.luarc.json` turns off `io`,
   `debug` and `package` in the editor; lua-language-server cannot turn off single functions, so the editor does not flag
