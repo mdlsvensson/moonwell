@@ -1,10 +1,18 @@
 # Changelog
 
-## Unreleased
+## 0.5.2 (2026-09-30)
 
 - Builds stop with an error naming the file when YueScript reports success but writes no Lua for a file with code.
   YueScript 0.34.2 does this, in normal and minified builds, for any file that uses the floor division operator `//`,
-  which until now silently left that module out of the map. README: write `math.floor(a / b)` instead.
+  which until now silently left that module out of the map. README: write `math.floor(a / b)` instead. Reported upstream
+  as IppClub/YueScript#256.
+
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-09-30 on Windows, and CI passed on Ubuntu and Windows: every check, including
+two new compile tests (an empty output for a file with code fails; a file using `//` fails, normal and minified). Steps
+3 to 12 were not re-run: the release only adds a failure after compilation, and the e2e tests build real maps, normal
+and minified.
 
 ## 0.5.1 (2026-09-30)
 

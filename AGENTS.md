@@ -108,6 +108,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   with `init` and `build` from JSR): roadmap phase 0. `UnitAlive` is a known native, `assets:sync` stops at Ctrl+C while
   planning, and the README's `yue` console-window note is gone. Gate steps 1 and 2 passed; 3 to 12 were not re-run (no
   game-facing change).
+- **Released 0.5.2** (2026-09-30, GitHub release `moonwell@0.5.2`; JSR `@moonwell/cli@0.5.2` is published by the
+  maintainer): builds fail when yue writes no Lua for a file with code (the `//` pitfall below). Gate steps 1 and 2
+  passed; 3 to 12 were not re-run.
 - **Plan 4a, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules
   in `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
