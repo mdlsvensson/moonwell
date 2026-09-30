@@ -211,7 +211,7 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1), and so are 1.1 (wrappers `227e142`) and 1.2
    (`docs/superpowers/research/2026-09-30-wrappers-performance.md`) and 1.3
    (`docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`). D1 is decided (option (c), a mix; damage event data
-   goes in the wrappers). Next is 1.4, the probe batch.
+   goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete; next is 2.1, the wrappers review.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -313,8 +313,10 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   keeps a live-looking wrapper whose handle is dead. WCSharp detects removal as a unit leaving a region that covers the
   world bounds. **The probe run (2026-09-29) found that this does not work on 3.0.0.24268:** the leave event fired for
   none of `RemoveUnit`, an exploded death, a summoned timed-life death or a normal death left 120 s to decay (enter did
-  fire at creation). Another detection method would be needed (for example the undefend-order trick unit indexers use);
-  unexplored.
+  fire at creation). **The 1.4 probe (2026-09-30) found the undefend-order trick does work:** a unit with a Defend copy
+  gets order 852056 twice at death (Defend level 1) and twice at removal (level 0), for all four cases, with no false
+  positives (port-needs note §6.3). It needs a custom ability in every map's object data; polling type ids, as `wc3-lib`
+  does, needs none.
 - **Editor error for effects attached to items and destructables.** The v0.3.0 gate (2026-09-29, game 3.0.0.24268)
   showed that Warcraft drew no effect attached to an item (Claws of Attack, two effect models) or a destructable (a
   summer tree). `Effect.attach` and `Effect.flashOn` accept any Widget, like the native, and the README documents the
@@ -331,4 +333,6 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   gates record these as deferred, not passed.
 - **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
   scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
-  Moved here 2026-09-28; it depends on 4b's library sync.
+  Moved here 2026-09-28; it depends on 4b's library sync. The 1.4 probe found `wc3-lib`'s Preload local store broken in
+  game for codes over one chunk (lines cut at 259 characters, which can crash the game on load; appending inside the
+  file has no effect): port-needs note §6.5.

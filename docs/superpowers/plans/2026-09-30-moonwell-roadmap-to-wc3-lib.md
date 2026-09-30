@@ -152,6 +152,16 @@ A research note that maps what `wc3-lib`'s adapters and cores use against the wr
 
 ### 1.4 Probe batch for the port (gate map, one run: `deno task gate probe-port`)
 
+**Done 2026-09-30:** results in the port-needs note, §6.
+- `os.time()` works, and integers wrap silently at 2^31.
+- The undefend order detects removal: Defend level 0; death is level 1.
+- Sync arrives in order but silently cuts at 255 characters.
+- Preload keeps 259 characters per line; a cut line crashed the game on read.
+- Appending chunks inside a Preload file does not work, so `wc3-lib`'s local store cannot read back codes over one
+  chunk.
+
+**Phase 1 is complete.**
+
 These are questions that single-player can answer:
 
 - **Does `os.time` work?** The two records disagree:
