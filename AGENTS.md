@@ -108,9 +108,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   with `init` and `build` from JSR): roadmap phase 0. `UnitAlive` is a known native, `assets:sync` stops at Ctrl+C while
   planning, and the README's `yue` console-window note is gone. Gate steps 1 and 2 passed; 3 to 12 were not re-run (no
   game-facing change).
-- **Released 0.5.2** (2026-09-30, GitHub release `moonwell@0.5.2`; JSR `@moonwell/cli@0.5.2` is published by the
-  maintainer): builds fail when yue writes no Lua for a file with code (the `//` pitfall below). Gate steps 1 and 2
-  passed; 3 to 12 were not re-run.
+- **Released 0.5.2** (2026-09-30, JSR `@moonwell/cli@0.5.2` and GitHub release `moonwell@0.5.2` on `e459d1d`): builds
+  fail when yue writes no Lua for a file with code (the `//` pitfall below). Gate steps 1 and 2 passed; 3 to 12 were not
+  re-run.
 - **Plan 4a, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules
   in `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
@@ -208,8 +208,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    orders everything toward the YueScript port of `wc3-lib` (4d): phase 0 free wins, phase 1 groundwork (static
    native-call check, performance measurement, port-needs inventory, probe batch), phase 2 the wrappers review and
    refactor, phase 3 the port, phase 4 the rest of the backlog. Its last table maps every backlog item to its place.
-   Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1), and so is 1.1 (wrappers `227e142`). The next item
-   is 1.2, the performance measurement.
+   Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1), and so are 1.1 (wrappers `227e142`) and 1.2
+   (`docs/superpowers/research/2026-09-30-wrappers-performance.md`). The next item is 1.3, the port-needs inventory.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

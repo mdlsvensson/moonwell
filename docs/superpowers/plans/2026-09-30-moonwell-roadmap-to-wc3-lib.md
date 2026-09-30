@@ -104,6 +104,13 @@ counts at no cost. The port's library reuses the same check.
 
 ### 1.2 Performance measurement (research, gate-map probe)
 
+**Done 2026-09-30:** `docs/superpowers/research/2026-09-30-wrappers-performance.md`.
+- A wrapped native call costs about 120 ns more than the raw call (1.26–1.38 times).
+- A wrapped enumeration of 20 units costs 1.5 times the raw one.
+- A 100-missile tick takes 1.69 ms through the wrappers against 0.97 ms raw: 5.4% of a tick against 3.1%.
+- The note proposes a budget (a system's work under 10% of a tick) and two review candidates (a cheaper method
+  prologue and cheaper enumeration), and leans towards option (c) for D1.
+
 The WCSharp note (§4.1) asks for a performance budget before 4d builds systems on top of the wrappers.
 
 - **What to measure,** using `os.clock` in the gate map, each over N calls, raw native against wrapper:
@@ -140,16 +147,20 @@ A research note that maps what `wc3-lib`'s adapters and cores use against the wr
 
 These are questions that single-player can answer:
 
-- **Does `os.time` exist?** The two records disagree:
+- **Does `os.time` work?** The two records disagree:
   - Moonwell's Plan 3a probe lists `os.time`;
   - `wc3-lib`'s `AGENTS.md` fact 3 says it does not exist.
-- **Number width.** Check `math.maxinteger`, whether integers wrap past 2^31−1, and float precision above 2^24.
-  `wc3-lib` says they are 32-bit; the port's codec and scheduler depend on it.
+
+  The 1.2 probe found that it exists as a function, so what remains is whether calling it works and what it returns.
+- **Number width.** Partly answered by the 1.2 probe: `math.maxinteger` is 2^31−1 and `2^24 + 1` equals `2^24`. So
+  integers are 32-bit and floats single precision, as `wc3-lib` says; the port's codec and scheduler depend on it.
+  What remains is whether integers wrap past 2^31−1.
 - **Unit removal detection** with the undefend-order trick that unit indexers use. This decides the backlog item
   "Automatic disposal of Unit wrappers on removal". The world-bounds leave event already failed (the probe of
   2026-09-29).
 - **`BlzSendSyncData` round trip** for the local player: the 255-character limit and the order of messages.
-- **Preload write and read round trip** on the local machine.
+- **Preload write and read round trip** on the local machine. The write works: the 1.2 probe wrote its results with
+  Preload. The read back is still open.
 
 Questions that need two machines (for example `GetLocationZ` differing between them) join the online checks in phase 4.
 
