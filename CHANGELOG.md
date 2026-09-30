@@ -3,8 +3,8 @@
 ## Unreleased
 
 - Documentation: the `moonwell-wrappers` v0.5.1 review, the performance and port-needs research notes with their probe
-  results, and the design and implementation plan for `moonwell-wrappers` v0.6.0 (the refactor after the review),
-  released 2026-09-30.
+  results, and the designs and implementation plans for `moonwell-wrappers` v0.6.0 (the refactor after the review) and
+  v0.7.0 (the port prerequisites: damage events, sync, collision size and pathing), both released 2026-09-30.
 
 ## 0.5.2 (2026-09-30)
 

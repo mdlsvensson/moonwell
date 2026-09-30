@@ -211,6 +211,15 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - Options errors are reported in sorted order, and the README has a per-module API reference.
   - The in-game gate passed `core`, `probes`, `presentation`, `ui` and `perf`. Frames and the minified runs were not
     re-run, by the maintainer's decision.
+- **Wrappers v0.7.0, the port prerequisites, released** (2026-09-30, GitHub pre-release `v0.7.0` on `e9c2880`; tag
+  consumption passed; spec and plan `2026-09-30-moonwell-wrappers-port-prerequisites`). Roadmap 2.3.
+  - `unit:getCollisionSize()` and `unit:setPathing(flag)`.
+  - `wrappers.damage`: `onDamaging`/`onDamaged` listeners with one shared event per hit; DAMAGING events set the amount
+    and the three types, DAMAGED events only the amount; setters raise once the hit's listeners have run.
+  - `wrappers.sync`: `Sync.send` raises over 255 bytes (the game cuts silently); `Sync.on`/`Sync.off` per prefix.
+  - The gate map's new `port` run passed. It measured: `isAttack` is false for `damageTarget` even with `attack` true; a
+    type change before armor works, after armor it does nothing; the outer hit's setters still work after a nested hit;
+    `setPathing(false)` does not make move orders cross trees; sync prefixes of 16, 17 and 32 characters arrive whole.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -224,9 +233,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    (`docs/superpowers/research/2026-09-30-wrappers-performance.md`) and 1.3
    (`docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`). D1 is decided (option (c), a mix; damage event data
    goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
-   (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). 2.2 is released as wrappers
-   v0.6.0. Next is 2.3: the spec for wrappers v0.7.0, the port prerequisites (`unit:getCollisionSize()`,
-   `unit:setPathing(flag)`, sync, and damage event data).
+   (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). 2.2 is released as wrappers v0.6.0
+   and 2.3 as wrappers v0.7.0, so phase 2 is complete. Next is phase 3: the spec for the `wc3-lib` port (its "Spec
+   decisions" and the port-needs note's open questions, §5).
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

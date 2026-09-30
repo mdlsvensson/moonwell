@@ -264,6 +264,11 @@ What D1 assigned to the wrappers. Likely candidates from the backlog's "Wrappers
 - **Event helpers** such as `Unit.fromEvent()`.
 - **Automatic Unit disposal on removal,** if 1.4 found a working detection method.
 
+**Released 2026-09-30:** wrappers `v0.7.0` on `e9c2880`; tag consumption passed. D1 and the maintainer's scope choice
+kept it to `unit:getCollisionSize()`, `unit:setPathing(flag)`, `wrappers.damage` and `wrappers.sync` (spec and plan
+`2026-09-30-moonwell-wrappers-port-prerequisites`). Event helpers, timer-expiry registration and automatic Unit disposal
+stay in phase 4.1 and the backlog.
+
 ## Phase 3: the wc3-lib port (sub-project 4d; spec first)
 
 ### Spec decisions
