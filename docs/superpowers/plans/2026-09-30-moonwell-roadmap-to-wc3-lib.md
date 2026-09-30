@@ -181,6 +181,15 @@ With 1.2 and 1.3 in hand, decide how the port's adapters reach the game:
 
 This decides how much of 1.3's "missing" list becomes wrappers work in phase 2.
 
+**Decided 2026-09-30: (c), a mix** (the port-needs note, §4).
+- The port's public API takes and returns wrappers, and its adapters use wrapper methods.
+- Raw natives stay in four places: Preload files with the tooltip mailbox, ground height, walkability sampling, and the
+  innermost per-tick loops on objects the system owns.
+- The maintainer also decided that **damage event data belongs in the wrappers**, usable by any map.
+
+So 2.3 adds `unit:getCollisionSize()`, `unit:setPathing(flag)`, sync (registration, sending, event data) and damage
+event data (reading and changing a hit).
+
 ## Phase 2: wrappers review and refactor
 
 ### 2.1 Review (research note; the maintainer chooses the findings)

@@ -210,8 +210,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    refactor, phase 3 the port, phase 4 the rest of the backlog. Its last table maps every backlog item to its place.
    Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1), and so are 1.1 (wrappers `227e142`) and 1.2
    (`docs/superpowers/research/2026-09-30-wrappers-performance.md`) and 1.3
-   (`docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`). Next: the maintainer's decision D1 (how the port's
-   adapters reach the game; both notes recommend option (c), a mix), then 1.4, the probe batch.
+   (`docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`). D1 is decided (option (c), a mix; damage event data
+   goes in the wrappers). Next is 1.4, the probe batch.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
