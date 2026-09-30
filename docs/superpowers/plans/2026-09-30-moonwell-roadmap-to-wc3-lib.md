@@ -31,6 +31,10 @@ The order is:
 
 ## Phase 0: free wins
 
+**Done 2026-09-30.** 0.1: the maintainer confirmed that extension 0.2.10 opens no window, and the note is gone. 0.2:
+Moonwell 0.5.1 (GitHub release `moonwell@0.5.1` on `c883e4c`; gate steps 3 to 12 not re-run by the maintainer's
+decision). 0.3: wrappers v0.5.1 (`af9961e`, tag consumption passed).
+
 Each item here is small and needs nothing else first. Do them in this order.
 
 ### 0.1 Drop the `yue` console-window note (docs only)

@@ -191,6 +191,10 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   a TOC; an unknown template gives nil; destroying a frame removes its children, including a re-parented one; a clicked
   button keeps the keyboard focus until `releaseFocusFor`. The frames gate passed normal and minified
   (`deno task gate frames`, `frames-min`).
+- **Wrappers v0.5.1, released** (2026-09-30, GitHub pre-release `v0.5.1` on `af9961e`; tag consumption passed with
+  Moonwell 0.5.1): roadmap item 0.3. `Effect.attach` and `Effect.flashOn` take a Unit in the editor, so LuaLS flags an
+  Item or a Destructable (17 expected negative diagnostics); the runtime still accepts any widget. The in-game gate was
+  not re-run (annotations only).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -200,6 +204,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    orders everything toward the YueScript port of `wc3-lib` (4d): phase 0 free wins, phase 1 groundwork (static
    native-call check, performance measurement, port-needs inventory, probe batch), phase 2 the wrappers review and
    refactor, phase 3 the port, phase 4 the rest of the backlog. Its last table maps every backlog item to its place.
+   Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1); the next item is 1.1, the static native-call check,
+   which needs a short design first.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
