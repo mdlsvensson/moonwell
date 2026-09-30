@@ -125,6 +125,13 @@ The WCSharp note (§4.1) asks for a performance budget before 4d builds systems 
 
 ### 1.3 Port-needs inventory (research)
 
+**Done 2026-09-30:** `docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`.
+- Of 76 natives `wc3-lib` calls, the wrappers call 46. Damage event data, sync, `SetUnitPathing`,
+  `BlzGetUnitCollisionSize` and walkability are missing; Preload files and ground height are best left raw.
+- New design inputs: the port needs insertion-ordered collections, because `pairs` over handle-keyed tables can desync.
+  Handle ids must not order anything; the port uses sequence numbers it owns.
+- The note recommends option (c) for D1 and lists five open questions for the port's spec.
+
 A research note that maps what `wc3-lib`'s adapters and cores use against the wrappers.
 
 - **Every native call** is marked covered, missing, or best left raw. A first pass over the adapters found these not
