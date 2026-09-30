@@ -147,7 +147,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   `first`); a widget layer; weak Unit/Item/Destructable caches. Wrapper arguments convert through the loaded registries,
   so a module imports another only to return its wrappers. Automated checks pass: 69 behavior tests, Lua 5.3.6 syntax,
   Moonwell normal/minified builds, LuaLS positive and 8 negative diagnostics, and a Trigger-only bundle check. The
-  integration LuaLS runs do not diagnose the library's own files; check `src` with a direct LuaLS run. The in-game gate
+  integration LuaLS runs do diagnose the library's copies in `.moonwell/lua/` (planted checks, 2026-09-30), and since
+  roadmap item 1.1 integration also checks `src/wrappers` on its own against the native declarations. The in-game gate
   passed 2026-09-29 (game 3.0.0.24268): the weak cache probe printed `collected=true stale=true identity=true`, and the
   self-removing action and condition ran. Text printed while a map loads never reaches the screen or the log, so the
   gate starts from a zero-second timer. The two-player desync run is deferred to the online checks before 1.0 (Backlog).
@@ -204,8 +205,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    orders everything toward the YueScript port of `wc3-lib` (4d): phase 0 free wins, phase 1 groundwork (static
    native-call check, performance measurement, port-needs inventory, probe batch), phase 2 the wrappers review and
    refactor, phase 3 the port, phase 4 the rest of the backlog. Its last table maps every backlog item to its place.
-   Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1); the next item is 1.1, the static native-call check,
-   which needs a short design first.
+   Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1), and so is 1.1 (wrappers `227e142`). The next item
+   is 1.2, the performance measurement.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -295,12 +296,6 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   short design): `WeatherEffect` (`AddWeatherEffect`, enable, remove); spell effects from ability data
   (`AddSpellEffectById`, for example `Effect.flashSpell`); more Trigger registrations (player state, key, mouse, sync,
   alliance change, game state, timer expire); event helpers such as `Unit.fromEvent()`.
-- **Static native-call check for the wrappers** (WCSharp comparison §7.3; backlogged 2026-09-29, the maintainer wants to
-  know more before deciding). A check in the wrappers' `deno task test` that reads every native call in `src/wrappers/`
-  and compares it with `cli/data/natives.json`: the native exists, and the argument count matches. It would catch a
-  wrong native name or a missing argument without game or doubles, as WCSharp's Roslyn API checker does for its
-  templates. Open questions: how to find calls reliably in Lua (a tokenizer, not a regex), and how the wrappers
-  repository gets `natives.json` (copy, or read from `../moonwell`).
 - **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
   maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
   keeps a live-looking wrapper whose handle is dead. WCSharp detects removal as a unit leaving a region that covers the

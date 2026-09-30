@@ -1,0 +1,5 @@
+amends "pkl:Project"
+
+dependencies {
+  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.5.1" }
+}

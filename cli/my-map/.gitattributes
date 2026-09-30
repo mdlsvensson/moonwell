@@ -1,0 +1,5 @@
+# Git line endings: text files check out with LF everywhere, as Moonwell writes them (src/generated/objects.yue).
+# World Editor's map files and assets/ (imported into the map as they are) are kept byte for byte.
+* text=auto eol=lf
+maps/** binary
+assets/** -text

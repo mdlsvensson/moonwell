@@ -1,0 +1,100 @@
+// Moonwell project manifest, shared by everyone working on the map.
+// Every setting and its documentation: @moonwell/Project.pkl (hover a name in an editor with Pkl support).
+// Settings for your machine only, such as the game path, go in moonwell.local.pkl.
+
+amends "@moonwell/Project.pkl"
+
+import "@moonwell/Objects.pkl"
+
+// Custom units, heroes, items, abilities and more: one or more files under objects/, merged here.
+objects = Objects.merge(import*("objects/**.pkl"))
+
+map {
+  folder = "map.w3x"      // World Editor map folder under maps/ (folder format, Lua script mode)
+  entry = "src/main.yue"  // gameplay entry point
+}
+
+build {
+  folder = "dist/bin"     // where the packed .w3x goes
+  minify = false          // true shrinks the script, but runtime errors lose their line numbers
+}
+
+launch {
+  args = List("-launch", "-windowmode", "windowed")  // passed to Warcraft III before -loadfile <map>
+}
+
+assets {
+  paths {}                // assets/ file → exact in-map path, e.g. ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"#
+  exclude = List()        // files under assets/, or folders ending in /, to leave out
+}
+
+// Globals your gameplay code uses must be defined somewhere: by the game, the map's triggers, a `global` line in
+// src/, or this list. check, build, test and dev report any other as a likely typo.
+lint {
+  unknownGlobals = "error"  // "warning" reports unknown globals without failing the command
+  globals = List()          // extra global names to allow, e.g. List("MyLibrary")
+}
+
+// Libraries: modules from a GitHub tag or a local folder, named by their path in the library. moonwell.lock records
+// each tag's commit; commit it. See "Libraries" in Moonwell's README.
+libraries {
+  // ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.1.0"; dir = "src" }
+}
+
+// Map settings, applied to the built map only; the World Editor map is never changed. `deno task settings:check`
+// lists what they would change. null inherits the World Editor map; empty text clears a text field.
+// Advanced raw overrides (gameplayConstants, gameInterface) are documented in @moonwell/MapSettings.pkl.
+settings {
+  info {
+    name = null
+    author = null
+    description = null
+    recommendedPlayers = null
+  }
+  loadingScreen {
+    background = null  // -1 selects a custom model
+    model = null       // in-map model path; requires map-info version 25+
+    text = null
+    title = null
+    subtitle = null
+  }
+  gameplay {
+    heroMaxLevel = null
+    foodLimit = null
+  }
+  players {
+    // IDs name existing World Editor slots; create additional slots there and save first.
+    ["0"] {
+      name = null
+      controller = null  // "user", "computer", "neutral" or "rescuable"
+      race = null        // "selectable", "human", "orc", "undead" or "nightelf"
+      fixedStart = null
+      x = null
+      y = null
+    }
+  }
+  forces {
+    // First enable custom forces in World Editor's Scenario → Force Properties,
+    // configure this team, and save the map. Indices refer to existing teams.
+    // ["0"] {
+    //   name = null
+    //   allied = null
+    //   alliedVictory = null
+    //   sharedVision = null
+    //   sharedControl = null
+    //   sharedAdvancedControl = null
+    // }
+  }
+  environment {
+    soundEnvironment = null  // World Editor's name, e.g. "Default" or "Dungeon"
+    waterColor = null  // List(red, green, blue, alpha), each 0..255
+    fog {
+      enabled = null
+      style = null     // 0..2, World Editor fog style
+      start = null
+      end = null
+      density = null   // 0..1
+      color = null     // List(red, green, blue, alpha), each 0..255
+    }
+  }
+}

@@ -77,6 +77,16 @@ decision (item D1) be made from evidence.
 
 ### 1.1 Static native-call check (backlog; short design first)
 
+**Done 2026-09-30, differently from the plan below** (wrappers `227e142`). A planted test showed that LuaLS with
+Moonwell's `natives.d.lua` already reports a misspelt native (`undefined-global`), a missing or extra argument
+(`missing-parameter`, `redundant-parameter`) and a wrong type (`param-type-mismatch`). So the maintainer approved
+automating the direct LuaLS run in the wrappers' `test:integration` instead of writing a tokenizer:
+- it checks `src/wrappers` against the native declarations, and every library file must be clean;
+- `tests/natives-negative.lua` must report exactly its four planted mistakes.
+
+The consumer's positive run turned out to diagnose the library's copies in `.moonwell/lua/` as well. The port's library
+can reuse the same pattern.
+
 A check in the wrappers' `deno task test`. It reads every native call in `src/wrappers/` and compares it with Moonwell's
 `cli/data/natives.json`, checking that:
 
@@ -250,7 +260,7 @@ Every item needs a short design first, as the backlog says.
 | ------------------------------------------------------------- | -------------------- |
 | `assets:sync` Ctrl+C during planning (deferred)               | 0.2                  |
 | Editor error for effects attached to items and destructables  | 0.3                  |
-| Static native-call check for the wrappers                     | 1.1                  |
+| Static native-call check for the wrappers                     | 1.1 (done)           |
 | Automatic disposal of Unit wrappers on removal                | 1.4 probe, then 2.3  |
 | Wrappers candidate additions                                  | 2.3 (port needs), 4.1 |
 | YueScript port of `wc3-lib` (4d)                              | Phase 3              |
