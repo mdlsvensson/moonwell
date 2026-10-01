@@ -7,7 +7,7 @@
   v0.7.0 (the port prerequisites: damage events, sync, collision size and pathing), both released 2026-09-30.
 - Documentation: the design of `moonwell-systems`, the `wc3-lib` port, and the plan for its release 1 (v0.1.0, released
   2026-09-30); a backlog item for replacing Deno. The design and plan of its release 2 (v0.2.0: buffs, auras and
-  dummies, released 2026-10-01).
+  dummies, released 2026-10-01), and of its release 3 (v0.3.0: the damage pipeline).
 
 ## 0.5.2 (2026-09-30)
 
