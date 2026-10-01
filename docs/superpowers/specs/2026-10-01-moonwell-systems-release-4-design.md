@@ -164,10 +164,11 @@ For each missile, in launch order, with `dt` the scheduler's step:
 5. The end point is the position plus velocity times `seconds`. With `followGround`, its z is the ground there plus
    `height`.
 6. **Candidates:** one reused group enumerates the units within reach of the segment's midpoint: half the segment's
-   horizontal length, plus `radius`, plus `maxTargetRadius`. For each unit not yet hit, the target sphere has
-   the unit's position, a centre height of ground + `GetUnitFlyHeight` + `targetOffset`, and a radius of
-   `BlzGetUnitCollisionSize`, capped at `maxTargetRadius`. The swept test is the segment against a sphere of the two
-   radii added.
+   horizontal length, plus `radius`, plus `maxTargetRadius`. A unit not yet hit is first asked
+   `IsUnitInRangeXY` around that midpoint, with half the length plus `radius` (§12); most units fail it and are read
+   no further. For the others, the target sphere has the unit's position, a centre height of ground +
+   `GetUnitFlyHeight` + `targetOffset`, and a radius of `BlzGetUnitCollisionSize`, capped at `maxTargetRadius`. The
+   swept test is the segment against a sphere of the two radii added.
 7. Contacts are ordered by fraction, with ties in the engine's enumeration order.
 8. For each contact, while the missile is active: the unit must still be alive and pass `filter`; then it is marked
    hit, the missile moves to the contact point, `onHit` runs, and at `maxHits` the missile ends with `'hit-limit'`. A
@@ -309,3 +310,24 @@ The plan's code was prototyped and checked with mutations before it was written 
   blame sweep reaches their methods.
 - The gate also writes its lines to `CustomMapData\moonwell-systems-physics.pld`, so the log need not be
   screenshotted.
+
+## 12. Departures found at the gate (2026-10-01)
+
+The first gate run passed its missile and knockback steps but read 3.603 ms per step for 100 missiles among 20
+footmen, over the budget of §3, and two of its steps could not be judged by eye. A second probe
+(`../wrappers-gate/PROBE-MISSILE-PERF-RESULTS.md`) measured the natives before the loop was changed:
+
+- `GroupEnumUnitsInRange` tests unit origins, and clears the group before it fills it. So the search keeps its
+  `maxTargetRadius` (§6.2 step 6), and the group is never cleared between steps.
+- `IsUnitInRangeXY` is true up to its range plus the unit's collision size, in every direction, for units and
+  buildings. A unit the step touches is within half the step, `radius` and its own radius of the step's midpoint, so
+  this one native rules out a unit that is too far, and nothing else is read from it. The first loop read seven
+  natives from every enumerated unit; in the probe the search fell from 4.1 ms to 1.9 ms per step.
+- Knockback pathing costs about 3 µs per unit and step with `'none'`, 4 µs with `'terrain'` and 27 µs with
+  `'obstacles'` (the item placement). 100 knockbacks under `'obstacles'` read 2.647 ms per step: within the budget,
+  and documented in the README.
+- The gate (§9) is two runs. `deno task gate systems-physics` covers steps 1 to 6, 8 and the missile half of 9; its
+  homing bolt starts at right angles to its target, because the first one finished its turn in two steps and looked
+  straight. `deno task gate systems-knockback` (`examples/gate-knockback.yue`) covers step 7 and the knockback half
+  of 9 with one footman at a time, each push announced a second before it happens: five simultaneous pushes could
+  not be followed.
