@@ -60,6 +60,9 @@ Found while prototyping; the spec records them (§10).
   code.
 - An empty text is an answer of its own (`<request>.0.0.S`), and a piece that arrives twice is malformed.
 - A file whose chunks do not add up to its header's length is `damaged`.
+- **Found while executing:** a dry run of the compiled gate example, on stub natives outside the game, showed that
+  its `ask` step disposed the sync system from the `absent` answer, one step after asking and before the local
+  clock's answer could arrive. The example below disposes it at the end instead.
 
 ## File Structure
 
@@ -2716,19 +2719,20 @@ saveGate = (owner) ->
       say "7 a migration: coins", data and data.coins, reason
       newSaves\dispose!
 
-  -- 8. Asking a machine for a local value, and a slot without a human.
+  -- 8. Asking a machine for a local value, and a slot without a human. The second answer comes first: it needs no
+  -- message.
+  sync = Sync.new clock
+  sync\start!
   clock\after 6.5, ->
-    sync = Sync.new clock
-    sync\start!
     sync\ask owner, (-> tostring Time.localUtc!), (text, reason) ->
       say "8 ask: the local clock arrived:", text ~= nil and #text > 0, reason
     sync\ask Player.fromIndex(5), (-> "never"), (text, reason) ->
       say "8 ask a slot without a human:", text, reason
-      sync\dispose!
 
   -- 9. Every borrowed tooltip reads as it did before the run.
   clock\after 8, ->
     say "9 tooltips unchanged:", tooltips! == before
+    sync\dispose!
     saves\dispose!
     clock\dispose!
     say "gate done"
@@ -2926,7 +2930,7 @@ also go to `Documents\Warcraft III\CustomMapData\moonwell-systems-save.pld`, and
 42. At 4 s: `Save 6 saving took <ms> ms, and reading and sending <ms> ms`, then
     `Save 6 the largest save: true of 8189 symbols arrived after <s> s`. Record the three numbers.
 43. At 5.5 s: `Save 7 a migration: coins 400 nil`.
-44. At 6.5 s, in either order: `Save 8 ask a slot without a human: nil absent` and
+44. At 6.5 s: `Save 8 ask a slot without a human: nil absent`, then
     `Save 8 ask: the local clock arrived: true nil`.
 45. At 8 s: `Save 9 tooltips unchanged: true`, then `Save gate done`.
 46. No `[systems] … failed` line prints in the run, and `CustomMapData\moonwell-gate\` holds `slot1.pld`,
