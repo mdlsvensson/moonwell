@@ -358,12 +358,11 @@ One plan, `docs/superpowers/plans/2026-10-01-moonwell-wrappers-additions.md`, of
 2. The four Trigger registrations.
 3. `fromEvent()` on the six classes.
 4. `wrappers.weathereffect`.
-5. `wrappers.input`: keys.
-6. `wrappers.input`: the mouse.
-7. The blame sweep, the LuaLS fixtures and integration.
-8. Docs.
-9. The gate additions and the gate map's `additions` run.
-10. Release.
+5. `wrappers.input` (one task: the module is one file with one listener set; keys and the mouse are separate tests).
+6. The blame sweep, the LuaLS fixtures and integration.
+7. Docs.
+8. The gate additions and the gate map's `additions` run.
+9. Release.
 
 ## 11. Out of scope
 
