@@ -231,6 +231,16 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
     `io.popen`).
   - The in-game gate (`deno task gate systems` in `../wrappers-gate`, whose local manifest now lists both libraries)
     passed: the scheduler kept time with a Warcraft timer to within 4 µs.
+- **moonwell-systems v0.2.0, release 2 of the port, released** (2026-10-01, GitHub pre-release `v0.2.0` on `afabc3d`;
+  tag consumption passed; spec `docs/superpowers/specs/2026-09-30-moonwell-systems-release-2-design.md`, plan
+  `docs/superpowers/plans/2026-09-30-moonwell-systems-release-2.md`).
+  - `systems.buffs` (Units only; refresh, replace, stack and independent stacking; the store polls its units every 0.25
+    s and clears removed, disposed and dead ones), `systems.aura` (members keep the query's order, never a handle-id
+    sort) and `systems.dummy` (fresh units, `sourceOf` for attribution), on `systems.internal.ordered`.
+  - The README has the Pkl definition of the dummy unit type (`modelFile = ".mdl"` draws nothing; confirmed in game).
+  - User callbacks are typed `fun(...): ...`: YueScript returns a callback's last expression, and LuaLS flagged that
+    against `fun()` parameters (the gate example found it).
+  - The in-game gate (`deno task gate systems`, now both releases, about 18 s) passed.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -246,8 +256,9 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
    (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). 2.2 is released as wrappers v0.6.0
    and 2.3 as wrappers v0.7.0, so phase 2 is complete. Phase 3 is under way: moonwell-systems v0.1.0 (release 1:
-   scheduler, signal, scope, time) is released. Next is the spec for release 2 (dummy, buffs and aura, and
-   `systems.internal.ordered`), building on Part 1 of `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`.
+   scheduler, signal, scope, time) and v0.2.0 (release 2: buffs, aura, dummy) are released. Next is the spec for release
+   3 (`systems.damage`, the pipeline on `wrappers.damage`, using `Dummies:sourceOf` for attribution), building on Part 1
+   of `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

@@ -295,7 +295,8 @@ Each release gets its own plan and gate:
 **Spec:** `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md` (2026-09-30): the library is
 `mdlsvensson/moonwell-systems`, annotated Lua on the wrappers, with Lua-only tooling. **Release 1 released
 2026-09-30:** moonwell-systems `v0.1.0` on `1725436` (plan `2026-09-30-moonwell-systems-release-1`); gate and tag
-consumption passed.
+consumption passed. **Release 2 released 2026-10-01:** `v0.2.0` on `afabc3d` (spec and plan
+`2026-09-30-moonwell-systems-release-2`); gate and tag consumption passed.
 
 ## Phase 4: after the port (the rest of the backlog, in suggested order)
 
