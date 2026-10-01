@@ -31,11 +31,26 @@ Deno.test("writeLock writes sorted JSON, readLock reads it back, and no librarie
 Deno.test("readLock refuses a lock file it cannot read", async () => {
   const root = await Deno.makeTempDir({ prefix: "moonwell-lock-" });
   try {
-    for (const text of ["not json", '{"libraries": {"a": {"github": 1}}}', "[]"]) {
+    const numbered = JSON.stringify({ libraries: { a: { ...ENTRY, assets: 5 } } });
+    for (const text of ["not json", '{"libraries": {"a": {"github": 1}}}', "[]", numbered]) {
       await Deno.writeTextFile(join(root, LOCK_FILE), text);
       const error = await assertRejects(() => readLock(root), MoonwellError);
       assertEquals(error.file, LOCK_FILE);
     }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("an entry keeps its assets hash, written last, and an entry without one gets no such key", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-lock-" });
+  try {
+    const shipping = { ...ENTRY, assets: "sha256:def" };
+    await writeLock(root, { plain: ENTRY, shipping: { assets: "sha256:def", ...ENTRY } });
+    const libraries = JSON.parse(await Deno.readTextFile(join(root, LOCK_FILE))).libraries;
+    assertEquals(Object.keys(libraries.shipping), ["github", "tag", "dir", "commit", "files", "assets"]);
+    assertEquals(Object.keys(libraries.plain), ["github", "tag", "dir", "commit", "files"]);
+    assertEquals(await readLock(root), { plain: ENTRY, shipping });
   } finally {
     await Deno.remove(root, { recursive: true });
   }
