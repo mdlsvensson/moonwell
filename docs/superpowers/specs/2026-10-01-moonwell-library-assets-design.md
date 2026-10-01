@@ -116,8 +116,9 @@ An entry gains `assets`, only when the library ships assets:
   by Moonwell 0.5 stays valid.
 - `assets` is the same kind of hash over the kept asset files.
 - "The tag moved" is decided as today, by `commit` and `files`, and also by `assets` when the entry has it. An entry
-  without `assets` whose download has the same `commit` and `files` gains the field without an error: that is the
-  upgrade from 0.5.
+  without `assets` whose download ships assets is compared by `commit` alone and gains the field without an error:
+  that is the upgrade from 0.5, whose `files` hash may have counted files that are assets now (a library whose modules
+  start at its root).
 
 ## 5. Importing
 
@@ -221,7 +222,20 @@ One plan, `docs/superpowers/plans/2026-10-01-moonwell-library-assets.md`, of tes
 7. Docs.
 8. Release 0.6.0.
 
-## 12. Out of scope
+## 12. Departures found while planning
+
+The plan's code was built and run in a scratch clone first (2026-10-01). It found:
+
+- **The upgrade from a 0.5 lock compares the commit alone** when the download ships assets (§4.4, amended above).
+- **The plan's order** puts the lock (task 3 here) before the sync (task 2), which writes the new field.
+- **`assets:check`, `assets:sync` and `assets:paths` are tested in-process with real Pkl** (`cli/tests/pkl/`), beside
+  one end-to-end build test, instead of all end to end.
+- **Errors about a library's file name it as a URL** for a GitHub library
+  (`https://github.com/<owner>/<repo>/blob/<tag>/moonwell-library.json`) and as its path for a local one.
+- **The template's commented library example** now names the example library's `v0.2.0` without `dir`. That tag was
+  pushed on 2026-10-01 (commit `0b69cfa`) so the network test could be written against it.
+
+## 13. Out of scope
 
 - **Object data shipped by libraries** (the maintainer's choice, §1).
 - **Mapping or excluding a library's files from the map's manifest:** a map overrides a file by shipping its own at
