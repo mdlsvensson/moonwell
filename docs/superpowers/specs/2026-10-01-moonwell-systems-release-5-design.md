@@ -73,7 +73,7 @@ Codec.new({version, secret, schemas})
 codec:encode(data, binding = "")   -> code
 codec:decode(code, binding = "")   -> data            or  nil, reason, detail?
 codec:getVersion()                 -> integer
-codec:getMaxLength()               -> integer   the longest code the current schema can produce
+codec:getMaxLength()               -> integer   the longest code any of its schemas can produce
 ```
 
 - `version`: the current version, 1 to 9999. `encode` writes this one.
@@ -92,16 +92,17 @@ codec:getMaxLength()               -> integer   the longest code the current sch
 
 - Numbers are whole. A map that wants 12.5 stores 125: the game's floats are single precision, so fractions do not
   survive exactly. A float with a whole value (`3.0`) is accepted and stored as the integer.
-- `Codec.new` checks everything above and raises at the caller. It also raises when the current schema's longest
-  code would pass 8,192 symbols.
+- `Codec.new` checks everything above and raises at the caller. It also raises when a schema's longest code would
+  pass 8,192 symbols.
 - `encode` raises at the caller when the data does not fit the current schema, naming the field:
   `[systems] Codec.encode: field "gold": expected a whole number from 0 to 1000000`. A key that the schema does not
   have raises too (the first in sorted order), so a misspelled key is found.
 - `decode` never raises for a bad code: codes come from files and other machines. Its reasons:
-  - `format`: not a code (a symbol outside the alphabet, too short, an unknown layout, bits missing or left over);
+  - `format`: not a code (not a string, a symbol outside the alphabet, too short or too long, an unknown layout);
   - `checksum`: the check value does not match: an edited code, another secret or another binding;
   - `version`: no schema for the code's version;
-  - `schema`: the bits do not fit that version's schema, which means a schema changed without a new version;
+  - `schema`: the bits do not fit that version's schema (some are missing, left over or out of range), which means
+    a schema changed without a new version;
   - `migration`: a `migrate` function is missing, failed, or returned data that does not fit the next schema. `detail`
     is the message.
 - A `binding` is any string, typically the player's name: a code decodes only with the binding it was encoded with.
@@ -262,3 +263,18 @@ Then tag `v0.5.0` and check tag consumption with every gate example.
 
 Codes for typing; nested records; non-integer numbers; compression; encryption; saving on a schedule; and the
 two-player checks, which wait for the online step before Moonwell 1.0 with the other deferred ones.
+
+## 10. Departures found while planning (2026-10-01)
+
+The plan's code was prototyped, compared with a second implementation of the layout written from §4.1 alone, and
+checked with mutations before it was written down. That changed these details:
+
+- **The longest code counts every version** (§4, §6): a file saved under an older schema can be longer than any
+  code of the current one, and it must still fit the carriers and the sync limit. `getMaxLength()` is the longest
+  code of any schema, and the 8,192-symbol limit applies to each.
+- After the check value matches, every mismatch with the schema is `schema`; `format` is only for text that is not a
+  code at all (§4).
+- An empty text is an answer of its own in `systems.sync` (`<request>.0.0.S`), and a piece that arrives twice is
+  malformed.
+- A file whose chunks do not add up to the length in its header is `damaged`, even when each chunk alone looks
+  right.

@@ -9,7 +9,8 @@
   2026-09-30); a backlog item for replacing Deno. The design and plan of its release 2 (v0.2.0: buffs, auras and
   dummies, released 2026-10-01), of its release 3 (v0.3.0: the damage pipeline, released 2026-10-01) and of its release
   4 (v0.4.0: geometry, terrain, missiles and knockbacks, released 2026-10-01), with the measurements of its two probes
-  in that spec.
+  in that spec. The design and plan of its release 5 (v0.5.0: save codes, sync and save files), with the measurements of
+  three Preload probes in that spec.
 
 ## 0.5.2 (2026-09-30)
 
