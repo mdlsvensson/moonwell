@@ -1,10 +1,11 @@
 import { exists } from "@std/fs";
 import { isAbsolute, join, relative, resolve } from "@std/path";
-import { collectAssets } from "../assets/collect.ts";
+import { type Asset, collectProjectAssets } from "../assets/collect.ts";
 import { pathKey } from "../assets/paths.ts";
 import type { CommandContext } from "../context.ts";
 import { gamePathKey, loadGamePaths } from "../models/game-paths.ts";
 import { describeModelPath, type ModelPath, modelPaths } from "../models/paths.ts";
+import { libraryKeys, syncProjectLibraries } from "../pipeline.ts";
 import { loadProject } from "../project/project.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { toPosix } from "../shared/fs.ts";
@@ -44,14 +45,22 @@ function pathStatus(path: string, gamePaths: Set<string>, targets: Set<string> |
   return imported ? "custom path, imported" : "custom path, not imported";
 }
 
-/** Lists the files a model references (one file, or every model under assets/) as in-game or custom paths. */
+/**
+ * Lists the files a model references (one file, or every model under assets/ and among the files the libraries ship)
+ * as in-game or custom paths. In a project it syncs the libraries first: the files they ship count as imported.
+ */
 export async function assetsPaths(
   ctx: CommandContext,
   file?: string,
   options: { gamePaths?: Set<string> } = {},
 ): Promise<ModelReport[]> {
   const inProject = await exists(join(ctx.root, "moonwell.pkl"));
-  const assets = inProject ? await collectAssets(ctx.root, (await loadProject(ctx.root, ctx.run)).assets) : [];
+  let assets: Asset[] = [];
+  if (inProject) {
+    const project = await loadProject(ctx.root, ctx.run);
+    await syncProjectLibraries(ctx, project);
+    assets = (await collectProjectAssets(ctx.root, project.assets, libraryKeys(project))).assets;
+  }
   const targets = inProject ? new Set(assets.map((asset) => pathKey(asset.target))) : undefined;
 
   const models: Array<{ heading: string; bytes: Uint8Array }> = [];
@@ -82,7 +91,11 @@ export async function assetsPaths(
     });
   } else {
     for (const asset of assets) {
-      if (/\.(mdx|mdl)$/i.test(asset.target)) models.push({ heading: `assets/${asset.source}`, bytes: asset.bytes });
+      if (!/\.(mdx|mdl)$/i.test(asset.target)) continue;
+      const heading = asset.library === undefined
+        ? `assets/${asset.source}`
+        : `library ${asset.library}: ${asset.source}`;
+      models.push({ heading, bytes: asset.bytes });
     }
     if (models.length === 0) {
       ctx.logger.info("No models under assets/.");

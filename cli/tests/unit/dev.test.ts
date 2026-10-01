@@ -26,15 +26,44 @@ Deno.test("isRelevantChange watches Yue sources, Lua modules, assets, object fil
   assertEquals(check("README.md"), false);
 });
 
-Deno.test("localLibraryFolders lists the folders of local libraries only", () => {
+Deno.test("localLibraryFolders lists the folders of local libraries only", async () => {
   const root = Deno.cwd();
-  const folders = localLibraryFolders(root, {
+  const folders = await localLibraryFolders(root, {
     libraries: {
       mine: { github: null, tag: null, path: "../mine", dir: "src" },
       remote: { github: "o/r", tag: "v1", path: null, dir: "" },
     },
   } as unknown as Project);
   assertEquals(folders, [resolve(root, "..", "mine", "src")]);
+});
+
+Deno.test("localLibraryFolders takes the module and assets folders from a library's own file", async () => {
+  const root = await Deno.makeTempDir({ prefix: "moonwell-dev-" });
+  try {
+    for (const [name, file] of [["described", '{"dir":"src","assets":"art"}'], ["broken", "{"], ["rooted", "{}"]]) {
+      await Deno.mkdir(join(root, name));
+      await Deno.writeTextFile(join(root, name, "moonwell-library.json"), file);
+    }
+    const local = (path: string, dir = "") => ({ github: null, tag: null, path, dir });
+    const folders = await localLibraryFolders(root, {
+      libraries: {
+        a: local("described"),
+        b: local("described", "lua"),
+        c: local("broken"),
+        d: local("rooted"),
+      },
+    } as unknown as Project);
+    assertEquals(folders, [
+      join(root, "described", "src"),
+      join(root, "described", "art"),
+      join(root, "described", "lua"),
+      join(root, "described", "art"),
+      join(root, "broken"),
+      join(root, "rooted"),
+    ]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 Deno.test("isLibraryChange ignores changes under a local library's dot-folders", () => {

@@ -43,7 +43,12 @@ export function entryModuleName(entryPath: string): string {
   return posix.slice("src/".length, -".yue".length).split("/").join(".");
 }
 
-/** Brings .moonwell/libraries/ up to date with the manifest's libraries (spec §4.2). */
+/** The keys of the manifest's libraries, whose shipped files join the asset import (spec: library assets §5). */
+export function libraryKeys(project: Project): string[] {
+  return Object.keys(project.libraries);
+}
+
+/** Brings .moonwell/libraries/ and .moonwell/library-assets/ up to date with the manifest's libraries. */
 export function syncProjectLibraries(ctx: CommandContext, project: Project): Promise<void> {
   return syncLibraries(ctx.root, project.libraries, project.manifest, {
     fetch: ctx.install.fetch,
@@ -154,8 +159,9 @@ export async function prepareStage(
   // A build reads the ownership state (to know which source-map files assets:sync owns) but never writes it:
   // applyAssetPlan gets no state file, so only the staged copy changes.
   const { stateFile } = await assetLocations(ctx.root, project.map.folder);
-  const assets = await planAssets(ctx.root, mapDir, stateFile, project.assets);
+  const assets = await planAssets(ctx.root, mapDir, stateFile, project.assets, undefined, libraryKeys(project));
   await applyAssetPlan(assets);
+  for (const line of assets.replaced) ctx.logger.info(line);
   if (assets.assets.length > 0) ctx.logger.info(`Imported ${assets.assets.length} asset(s).`);
 
   const scriptPath = join(mapDir, "war3map.lua");

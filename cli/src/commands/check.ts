@@ -1,11 +1,11 @@
 import { exists } from "@std/fs";
 import { join } from "@std/path";
-import { collectAssets } from "../assets/collect.ts";
+import { collectProjectAssets } from "../assets/collect.ts";
 import { assetLocations, planAssets } from "../assets/plan.ts";
 import type { CommandContext } from "../context.ts";
 import { refreshEditorFiles } from "../editor/refresh.ts";
 import { assertObjectIdsCurrent, refreshObjectIds } from "../objectdata/ids.ts";
-import { compileProject, planProjectObjects } from "../pipeline.ts";
+import { compileProject, libraryKeys, planProjectObjects } from "../pipeline.ts";
 import { loadProject } from "../project/project.ts";
 import { hasSettings } from "../settings/options.ts";
 import { planMapSettings, settingsMapDir } from "../settings/plan.ts";
@@ -38,9 +38,11 @@ export async function check(
       await planMapSettings(settingsSource, project.settings, project.manifest, `maps/${project.map.folder}`);
     }
     const { mapDir, stateFile } = await assetLocations(ctx.root, project.map.folder);
-    const assets = (await exists(mapDir))
-      ? (await planAssets(ctx.root, mapDir, stateFile, project.assets)).assets
-      : await collectAssets(ctx.root, project.assets);
+    // After compileProject, which syncs the libraries: the files they ship are assets too.
+    const { assets, replaced } = (await exists(mapDir))
+      ? await planAssets(ctx.root, mapDir, stateFile, project.assets, undefined, libraryKeys(project))
+      : await collectProjectAssets(ctx.root, project.assets, libraryKeys(project));
+    for (const line of replaced) ctx.logger.info(line);
     ctx.logger.info(`Check passed: ${modules.length} module(s) reachable from ${entry}, ${assets.length} asset(s).`);
     return { modules: modules.length, entry, assets: assets.length };
   });

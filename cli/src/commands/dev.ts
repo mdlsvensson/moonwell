@@ -1,6 +1,7 @@
 import { exists } from "@std/fs";
-import { join, relative, resolve } from "@std/path";
+import { basename, join, relative, resolve } from "@std/path";
 import type { CommandContext } from "../context.ts";
+import { LIBRARY_FILE, type LibraryFile, parseLibraryFile } from "../libraries/manifest.ts";
 import { loadProject, type Project } from "../project/project.ts";
 import { formatError, MoonwellError } from "../shared/errors.ts";
 import { isWithin, toPosix } from "../shared/fs.ts";
@@ -22,18 +23,43 @@ export function isLibraryChange(folder: string, path: string): boolean {
   return !toPosix(relative(folder, path)).split("/").some((segment) => segment.startsWith("."));
 }
 
-/** The folders local libraries are copied from (`path` and `dir`, resolved against the project), in key order. */
-export function localLibraryFolders(root: string, project: Project): string[] {
-  return localLibraries(root, project).map(({ folder }) => folder);
+/**
+ * The folders local libraries are copied from, resolved against the project, in key order: each library's module
+ * folder and, when its moonwell-library.json names one, its assets folder.
+ */
+export async function localLibraryFolders(root: string, project: Project): Promise<string[]> {
+  return (await localLibraries(root, project)).flatMap(({ folders }) => folders.map(({ folder }) => folder));
 }
 
-/** Each local library's folder, and its label: the folder as the manifest writes it (`path`, then `dir`). */
-function localLibraries(root: string, project: Project): { folder: string; label: string }[] {
-  return Object.keys(project.libraries).sort().flatMap((key) => {
+/**
+ * Each local library's root, and its folders with their labels: a folder as the manifest and the library's file write
+ * it (`path`, then `dir` or `assets`). A library file that cannot be read counts as none: the cycle reports it.
+ */
+async function localLibraries(
+  root: string,
+  project: Project,
+): Promise<{ base: string; folders: { folder: string; label: string }[] }[]> {
+  const libraries = [];
+  for (const key of Object.keys(project.libraries).sort()) {
     const { path, dir } = project.libraries[key];
-    if (path === null) return [];
-    return [{ folder: resolve(root, path, dir), label: toPosix(join(path, dir)).replace(/\/?$/, "/") }];
-  });
+    if (path === null) continue;
+    const base = resolve(root, path);
+    let described: LibraryFile = { dir: null, assets: null };
+    try {
+      described = parseLibraryFile(key, await Deno.readFile(join(base, LIBRARY_FILE)), LIBRARY_FILE);
+    } catch {
+      // No file, or one the next cycle's sync reports.
+    }
+    const named = [dir !== "" ? dir : described.dir ?? "", ...(described.assets === null ? [] : [described.assets])];
+    libraries.push({
+      base,
+      folders: named.map((folder) => ({
+        folder: resolve(base, folder),
+        label: toPosix(join(path, folder)).replace(/\/?$/, "/"),
+      })),
+    });
+  }
+  return libraries;
 }
 
 /**
@@ -62,7 +88,7 @@ export async function dev(
 
   // A manifest that does not load has no libraries to watch; the first cycle has already reported why.
   const project = await loadProject(ctx.root, ctx.run).catch(() => undefined);
-  const libraries = project === undefined ? [] : localLibraries(ctx.root, project);
+  const libraries = project === undefined ? [] : await localLibraries(ctx.root, project);
 
   // Start watching before announcing it, so a save made right after the message is never missed.
   const projectChange = (path: string) => isRelevantChange(ctx.root, path);
@@ -77,17 +103,24 @@ export async function dev(
     watchers.push({ watcher: Deno.watchFs(join(ctx.root, folder), { recursive: true }), relevant: projectChange });
     watched.push(`${folder}/`);
   }
-  // A local library's modules are copied into .moonwell/libraries/ by each cycle, so a change in its folder counts,
-  // except under dot-folders such as .git/, which sync skips. A folder that holds this project's .moonwell/ is skipped:
-  // sync refuses it, and watching it would loop.
-  for (const { folder, label } of libraries) {
-    if (isWithin(join(ctx.root, ".moonwell"), folder)) continue;
-    if (!(await exists(folder, { isDirectory: true }))) continue;
+  // A local library's modules and assets are copied into .moonwell/ by each cycle, so a change in its folders counts,
+  // except under dot-folders such as .git/, which sync skips; and so does a change of its moonwell-library.json. A
+  // folder that holds this project's .moonwell/ is skipped: sync refuses it, and watching it would loop.
+  for (const { base, folders } of libraries) {
+    for (const { folder, label } of folders) {
+      if (isWithin(join(ctx.root, ".moonwell"), folder)) continue;
+      if (!(await exists(folder, { isDirectory: true }))) continue;
+      watchers.push({
+        watcher: Deno.watchFs(folder, { recursive: true }),
+        relevant: (path) => isLibraryChange(folder, path),
+      });
+      watched.push(label);
+    }
+    if (isWithin(join(ctx.root, ".moonwell"), base) || !(await exists(base, { isDirectory: true }))) continue;
     watchers.push({
-      watcher: Deno.watchFs(folder, { recursive: true }),
-      relevant: (path) => isLibraryChange(folder, path),
+      watcher: Deno.watchFs(base, { recursive: false }),
+      relevant: (path) => basename(path) === LIBRARY_FILE,
     });
-    watched.push(label);
   }
   const closeWatchers = () => {
     for (const { watcher } of watchers) {

@@ -2,14 +2,16 @@ import { exists } from "@std/fs";
 import { join, relative } from "@std/path";
 import { applyAssetPlan, assetLocations, type AssetPlan, planAssets } from "../assets/plan.ts";
 import type { CommandContext } from "../context.ts";
+import { libraryKeys, syncProjectLibraries } from "../pipeline.ts";
 import { loadProject } from "../project/project.ts";
 import { MoonwellError } from "../shared/errors.ts";
 import { toPosix } from "../shared/fs.ts";
 import { withBuildLock } from "../shared/lock.ts";
 
 /**
- * assets:check shows what assets:sync would change; assets:sync writes assets/ into the source map for World Editor,
- * stopping before it writes if `signal` aborts (Ctrl+C) while planning, and undoing its writes if it aborts later.
+ * assets:check shows what assets:sync would change; assets:sync writes assets/ and the files the libraries ship into
+ * the source map for World Editor, stopping before it writes if `signal` aborts (Ctrl+C) while planning, and undoing
+ * its writes if it aborts later. Both sync the libraries first.
  */
 export async function assets(
   ctx: CommandContext,
@@ -28,8 +30,13 @@ export async function assets(
         });
       }
     }
-    const plan = await planAssets(ctx.root, mapDir, stateFile, project.assets, options.signal);
-    for (const asset of plan.assets) ctx.logger.info(`${asset.source} -> ${asset.target.replaceAll("/", "\\")}`);
+    await syncProjectLibraries(ctx, project);
+    const plan = await planAssets(ctx.root, mapDir, stateFile, project.assets, options.signal, libraryKeys(project));
+    for (const asset of plan.assets) {
+      const source = asset.library === undefined ? asset.source : `library ${asset.library}: ${asset.source}`;
+      ctx.logger.info(`${source} -> ${asset.target.replaceAll("/", "\\")}`);
+    }
+    for (const line of plan.replaced) ctx.logger.info(line);
     for (const change of plan.changes) {
       ctx.logger.info(`${change.after === undefined ? "delete" : "write"} ${toPosix(relative(ctx.root, change.file))}`);
     }
