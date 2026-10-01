@@ -164,7 +164,7 @@ For each missile, in launch order, with `dt` the scheduler's step:
 5. The end point is the position plus velocity times `seconds`. With `followGround`, its z is the ground there plus
    `height`.
 6. **Candidates:** one reused group enumerates the units within reach of the segment's midpoint: half the segment's
-   horizontal length, plus `radius`, plus `maxTargetRadius`. For each living unit not yet hit, the target sphere has
+   horizontal length, plus `radius`, plus `maxTargetRadius`. For each unit not yet hit, the target sphere has
    the unit's position, a centre height of ground + `GetUnitFlyHeight` + `targetOffset`, and a radius of
    `BlzGetUnitCollisionSize`, capped at `maxTargetRadius`. The swept test is the segment against a sphere of the two
    radii added.
@@ -219,7 +219,8 @@ End reasons: `'completed'`, `'replaced'`, `'interrupted'`, `'invalid'`, `'blocke
   the decaying speed), from where the unit is now. So over the whole duration it moves `distance`, plus whatever the
   unit walked.
 - **It moves with `SetUnitX/Y`:** the unit keeps its order and is never paused (§2). Stunning it is the map's choice.
-- **`'invalid'`:** the Unit wrapper is disposed, the game removed the unit, or it is dead.
+- **`'invalid'`:** the unit is dead or removed (`UnitAlive` is false). That covers a disposed wrapper: a Unit wrapper
+  is only disposed by `remove()`.
 - **Pathing**, checked before each move; a refused move ends the knockback with `'blocked'`:
 
   | `pathing` | A move is refused when |
@@ -292,3 +293,19 @@ Then tag `v0.4.0` and check tag consumption with every gate example.
 A spatial grid (add it only after measuring a real slowdown); missiles that hit destructables, items or other
 missiles; bouncing; units as missile visuals; pausing or stunning knocked units; destroying trees in a knockback's
 path; persistence (release 5).
+
+## 11. Departures found while planning (2026-10-01)
+
+The plan's code was prototyped and checked with mutations before it was written down. That changed these details:
+
+- An Effect handed to a missile may be destroyed by its owner first: the wrappers' `destroy()` is idempotent, so the
+  missile's own destroy then does nothing.
+- A missile's age is the plain sum of its steps (the last step is cut to the lifetime that remains, and the sum then
+  equals the lifetime); only the distance flown is set to exactly `maxRange`.
+- Dead units are skipped when a contact is handled, not when candidates are collected (§6.2 steps 6 and 8): one
+  native fewer for every living unit near a missile's path.
+- A knockback step that moves nowhere takes no pathing sample.
+- The modules expose their classes (`Missiles.Missile`, `Knockbacks.Knockback`), as `DamageSystem.Hit` does, so the
+  blame sweep reaches their methods.
+- The gate also writes its lines to `CustomMapData\moonwell-systems-physics.pld`, so the log need not be
+  screenshotted.
