@@ -272,6 +272,29 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - The gate has two runs, `deno task gate systems-physics` and `deno task gate systems-knockback`. Both passed. The
     knockbacks got their own run, one footman at a time with each push announced first, because the maintainer could not
     follow five pushes at once; and a turn in a gate step must be large enough to see.
+- **moonwell-systems v0.5.0, release 5 and the last of the port, released** (2026-10-01, GitHub pre-release `v0.5.0` on
+  `11331a8`; tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-systems-release-5-design.md`, plan
+  `docs/superpowers/plans/2026-10-01-moonwell-systems-release-5.md`).
+  - `systems.codec` (save codes packed by a versioned schema into 64 symbols: integers by their range, booleans, strings
+    and lists, with a check value keyed by a map secret, a binding and migrations), `systems.sync` (`ask` one player's
+    machine for a local value; the answer reaches every machine at the same moment) and `systems.savefile` (`save` and
+    `load` in a local file, with the steps that run on one machine only inside the library).
+  - Three probes came before the design (`../wrappers-gate/PROBE-PRELOAD-RESULTS.md`), measured on 3.0.0.24268: Lua
+    cannot be run from a Preload file (`//!beginusercode` does nothing); a game cache carries text, but `InitGameCache`
+    makes a new handle on every call, so a file read on one machine would make handles on that machine only; a file
+    whose JASS names a global of blizzard.j crashes the game; tooltips make no handles, and only level 0 of an ability's
+    tooltip and extended tooltip keep text, so a file carries one chunk per ability field; 48 of 50 standard unit
+    abilities can carry text; 45 sync packets of 250 bytes sent in one burst arrive whole and in order within 0.1 s.
+  - The game's integers are 32-bit and the test runner's 64-bit: the codec writes at most 16 bits at a time, masks the
+    one multiplication that is meant to wrap, and its fixed codes are compared in game by the gate. A second
+    implementation written from the spec's layout gave the same codes.
+  - The in-game gate (`deno task gate systems-save`, one machine, nothing to watch) passed: the three fixed codes
+    matched; the largest save (8189 symbols, 44 tooltips, 38 packets) took 10 ms to write and 64 ms to read and send. A
+    dry run of the compiled gate on stub natives, outside the game, found a bug in the gate example before the
+    maintainer ran it.
+  - Two machines are untested: the online checks before 1.0 cover the sync and save systems.
+  - yue 0.34.2 writes an empty file for a source with a bitwise operator, as for `//` (IppClub/YueScript#256 is fixed in
+    0.34.3 for `//`; Moonwell still pins 0.34.2).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -287,11 +310,11 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
    (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). 2.2 is released as wrappers v0.6.0
    and 2.3 as wrappers v0.7.0, so phase 2 is complete. Phase 3 is under way: moonwell-systems v0.1.0 (release 1:
-   scheduler, signal, scope, time), v0.2.0 (release 2: buffs, aura, dummy), v0.3.0 (release 3: damage) and v0.4.0
-   (release 4: geometry, terrain, missile, knockback) are released. Next is the spec for release 5, the last
-   (persistence: codec, save file and sync), building on Part 1 of
-   `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`. It starts with a probe of the Preload carrier:
-   `wc3-lib`'s local store is broken in game for codes over one chunk (port-needs note §6.5).
+   scheduler, signal, scope, time), v0.2.0 (release 2: buffs, aura, dummy), v0.3.0 (release 3: damage), v0.4.0 (release
+   4: geometry, terrain, missile, knockback) and v0.5.0 (release 5: codec, sync, savefile) are released, so phase 3 is
+   complete: the port of `wc3-lib` is done. Next is phase 4, the rest of the backlog in the roadmap's suggested order;
+   every item needs a short design first. A separate small change is waiting too: pin YueScript 0.34.3, which fixes the
+   `//` bug upstream, and check whether it fixes bitwise operators.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -420,7 +443,7 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   Moved here 2026-09-28; it depends on 4b's library sync. The 1.4 probe found `wc3-lib`'s Preload local store broken in
   game for codes over one chunk (lines cut at 259 characters, which can crash the game on load; appending inside the
   file has no effect): port-needs note §6.5. Under way as `mdlsvensson/moonwell-systems` (annotated Lua, not YueScript,
-  by the maintainer's choice); v0.1.0 to v0.4.0 are released.
+  by the maintainer's choice); complete: v0.1.0 to v0.5.0 are released (2026-10-01).
 - **Replace Deno in Moonwell's toolchain.** The maintainer's plan (2026-09-30): the project has nothing to do with
   TypeScript, so Deno should go eventually, from the CLI and from the wrappers' tools. moonwell-systems already needs
   none (its tools are Lua run with `yue -e`). Needs a design: what replaces the CLI's runtime, JSR publishing and the

@@ -299,7 +299,8 @@ consumption passed. **Release 2 released 2026-10-01:** `v0.2.0` on `afabc3d` (sp
 `2026-09-30-moonwell-systems-release-2`); gate and tag consumption passed. **Release 3 released 2026-10-01:** `v0.3.0`
 on `d67d3fc` (spec and plan `2026-10-01-moonwell-systems-release-3`); gate and tag consumption passed. **Release 4
 released 2026-10-01:** `v0.4.0` on `cfa21b6` (spec and plan `2026-10-01-moonwell-systems-release-4`); both gate
-runs and tag consumption passed.
+runs and tag consumption passed. **Release 5 released 2026-10-01:** `v0.5.0` on `11331a8` (spec and plan
+`2026-10-01-moonwell-systems-release-5`); gate and tag consumption passed. **Phase 3 is complete.**
 
 ## Phase 4: after the port (the rest of the backlog, in suggested order)
 
@@ -330,7 +331,7 @@ Every item needs a short design first, as the backlog says.
 | Static native-call check for the wrappers                     | 1.1 (done)           |
 | Automatic disposal of Unit wrappers on removal                | 1.4 probe, then 2.3  |
 | Wrappers candidate additions                                  | 2.3 (port needs), 4.1 |
-| YueScript port of `wc3-lib` (4d)                              | Phase 3              |
+| YueScript port of `wc3-lib` (4d)                              | Phase 3 (done)       |
 | Assets shipped by libraries                                   | 4.2                  |
 | Custom map preview for Reforged                               | 4.3                  |
 | Fennel, TypeScript, C# and Teal support                       | 4.4                  |
