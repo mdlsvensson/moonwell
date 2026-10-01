@@ -31,6 +31,11 @@ export interface MapSettings {
   gameplay: { heroMaxLevel?: number; foodLimit?: number };
   gameplayConstants: Sections;
   gameInterface: Sections;
+  /**
+   * `settings.info.preview`: the picture shown in the game's map list, as a path from the project folder. Kept apart
+   * from `info`, whose fields are all stored in war3map.w3i.
+   */
+  preview?: string;
 }
 
 export const controllers = ["", "user", "computer", "neutral", "rescuable"] as const;
@@ -131,12 +136,14 @@ export function validateMapSettings(value: unknown, file?: string): MapSettings 
     heroMaxLevel: integer(1, 10000),
     foodLimit: integer(0, 300),
   }) as MapSettings["gameplay"];
-  const info = fields(config.info ?? {}, "settings.info", {
+  const { preview, ...info } = fields(config.info ?? {}, "settings.info", {
     name: text,
     author: text,
     description: text,
     recommendedPlayers: text,
-  }) as MapSettings["info"];
+    // Empty text clears the other fields; a picture has nothing to clear.
+    preview: (entry) => text(entry) && entry !== "",
+  }) as MapSettings["info"] & { preview?: string };
   const loadingScreen = fields(config.loadingScreen ?? {}, "settings.loadingScreen", {
     background: integer(-1, 2147483647),
     model: text,
@@ -178,6 +185,7 @@ export function validateMapSettings(value: unknown, file?: string): MapSettings 
     gameplay,
     gameplayConstants: sections("gameplayConstants"),
     gameInterface: sections("gameInterface"),
+    ...(preview === undefined ? {} : { preview }),
   };
 }
 
@@ -186,7 +194,7 @@ export function hasExtendedSettings(settings: MapSettings): boolean {
 }
 
 export function hasSettings(settings: MapSettings): boolean {
-  return hasExtendedSettings(settings) || Object.keys(settings.info).length > 0 ||
+  return hasExtendedSettings(settings) || settings.preview !== undefined || Object.keys(settings.info).length > 0 ||
     Object.keys(settings.loadingScreen).length > 0 || Object.keys(settings.gameplay).length > 0 ||
     [settings.gameplayConstants, settings.gameInterface].some((sections) =>
       Object.values(sections).some((entries) => Object.keys(entries).length > 0)

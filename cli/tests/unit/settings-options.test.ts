@@ -134,3 +134,19 @@ Deno.test("whole-number coordinates and fog values are accepted as numbers", () 
   assertEquals(settings.players["0"], { x: 256, y: -896 });
   assertEquals(settings.environment.fog, { start: 100, end: 1000, density: 1 });
 });
+
+Deno.test("settings.info.preview is kept apart from the fields stored in the map info", () => {
+  const s = validateMapSettings({ info: { name: "N", preview: "art/preview.tga" } });
+  assertEquals(s.info, { name: "N" });
+  assertEquals(s.preview, "art/preview.tga");
+  const only = validateMapSettings({ info: { preview: "p.blp" } });
+  assertEquals([hasSettings(only), hasExtendedSettings(only)], [true, false]);
+  const none = validateMapSettings({ info: { preview: null } });
+  assertEquals("preview" in none, false);
+  assertEquals(hasSettings(none), false);
+  for (const bad of ["", 5, "a\0b"]) {
+    const error = assertThrows(() => validateMapSettings({ info: { preview: bad } }, "moonwell.pkl"), MoonwellError);
+    assertStringIncludes(error.message, "Invalid map setting: settings.info.preview");
+    assertEquals(error.file, "moonwell.pkl");
+  }
+});

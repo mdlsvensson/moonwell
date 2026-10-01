@@ -1,9 +1,10 @@
 import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
-import { join } from "@std/path";
+import { dirname, join } from "@std/path";
 import { validateMapSettings } from "../../src/settings/options.ts";
 import { applySettingsPlan, planMapSettings, settingsMapDir } from "../../src/settings/plan.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 import { fixtureBytes, fixtureLua } from "../support/map-settings.ts";
+import { blp, pixels, tga } from "../support/pictures.ts";
 
 async function withDir(run: (dir: string) => Promise<void>): Promise<void> {
   const dir = await Deno.makeTempDir();
@@ -44,7 +45,7 @@ async function refusesWithoutWrites(dir: string, input: unknown, file: string): 
   return error;
 }
 
-const decode = (bytes: Uint8Array) => new TextDecoder().decode(bytes);
+const decode = (bytes: Uint8Array | null) => new TextDecoder().decode(bytes!);
 
 Deno.test("planning validates every change before writes and application filters unchanged files", async () => {
   await withDir(async (dir) => {
@@ -209,8 +210,8 @@ Deno.test("a UTF-8 byte-order mark survives Lua and text edits", async () => {
       validateMapSettings({ info: { name: "BOM" }, gameInterface: { A: { B: "c" } } }),
     );
     assertEquals(plan.length, 3);
-    for (const change of plan.slice(1)) assertEquals([...change.bytes.subarray(0, 3)], bom);
-    assertEquals(plan[1].bytes[3], lua[0]);
+    for (const change of plan.slice(1)) assertEquals([...change.bytes!.subarray(0, 3)], bom);
+    assertEquals(plan[1].bytes![3], lua[0]);
     assertEquals(decode(plan[2].bytes), "[A]\nB=c\n");
   });
 });
@@ -341,5 +342,176 @@ Deno.test("two settings files differing only in letter case are a map-file error
     assertEquals(error.file, "maps/map.w3x/war3mapskin.txt");
     assertEquals(Boolean(error.hint), true);
     assertEquals(await snapshot(dir), before);
+  });
+});
+
+const MINIMAP_BYTES = new Uint8Array([66, 76, 80, 49, 9, 9]);
+const MINIMAP_CALL = 'BlzChangeMinimapTerrainTex("war3mapMinimap.blp")';
+
+/** A map folder with World Editor's minimap, and a project folder beside it holding `picture` at `path`. */
+async function withPreview(
+  path: string,
+  picture: Uint8Array,
+  run: (dir: string, root: string) => Promise<void>,
+): Promise<void> {
+  await withDir(async (base) => {
+    const dir = join(base, "map.w3x"), root = join(base, "project");
+    await Deno.mkdir(dir);
+    await writeFixture(dir);
+    await Deno.writeFile(join(dir, "war3mapMap.blp"), MINIMAP_BYTES);
+    await Deno.mkdir(dirname(join(root, path)), { recursive: true });
+    await Deno.writeFile(join(root, path), picture);
+    await run(dir, root);
+  });
+}
+
+const previewOf = (path: string, more: Record<string, unknown> = {}) =>
+  validateMapSettings({ ...more, info: { ...(more.info as Record<string, unknown>), preview: path } });
+
+Deno.test("a BLP preview takes the minimap's place, which is kept under another name and called for", async () => {
+  const picture = blp();
+  await withPreview("preview.blp", picture, async (dir, root) => {
+    // The preview alone needs no map info: the plan works without the file.
+    await Deno.remove(join(dir, "war3map.w3i"));
+    const plan = await planMapSettings(dir, previewOf("preview.blp"), "moonwell.pkl", undefined, root);
+    const files = ["war3map.lua", "war3mapMinimap.blp", "war3mapMap.blp"];
+    assertEquals(plan.map((change) => change.file), files.map((file) => join(dir, file)));
+    assertEquals(plan[1].bytes, MINIMAP_BYTES);
+    assertEquals(plan[2].bytes, picture);
+    const lua = await fixtureLua();
+    assertEquals(decode(plan[0].bytes).length, lua.length + MINIMAP_CALL.length + (lua.includes("\r\n") ? 2 : 1));
+    assertStringIncludes(decode(plan[0].bytes), MINIMAP_CALL);
+    // Planning wrote nothing; applying writes exactly the plan.
+    assertEquals(await Deno.readFile(join(dir, "war3mapMap.blp")), MINIMAP_BYTES);
+    await applySettingsPlan(plan);
+    assertEquals(await Deno.readFile(join(dir, "war3mapMap.blp")), picture);
+    assertEquals(await Deno.readFile(join(dir, "war3mapMinimap.blp")), MINIMAP_BYTES);
+    assertStringIncludes(await Deno.readTextFile(join(dir, "war3map.lua")), MINIMAP_CALL);
+  });
+});
+
+Deno.test("a TGA preview removes the minimap's BLP and goes in as war3mapMap.tga, rewritten", async () => {
+  const picture = pixels();
+  await withPreview("art/Preview.TGA", tga(picture, { rle: true, depth: 24, fromTop: true }), async (dir, root) => {
+    const plan = await planMapSettings(dir, previewOf("art/Preview.TGA"), "moonwell.pkl", undefined, root);
+    const files = ["war3map.lua", "war3mapMinimap.blp", "war3mapMap.blp", "war3mapMap.tga"];
+    assertEquals(plan.map((change) => change.file), files.map((file) => join(dir, file)));
+    assertEquals(plan[1].bytes, MINIMAP_BYTES);
+    assertEquals(plan[2].bytes, null);
+    assertEquals(plan[3].bytes, tga(picture, { alpha: 255 }));
+    await applySettingsPlan(plan);
+    assertEquals((await Array.fromAsync(Deno.readDir(dir))).map((entry) => entry.name).sort(), [
+      "war3map.lua",
+      "war3map.w3i",
+      "war3mapMap.tga",
+      "war3mapMinimap.blp",
+    ]);
+    assertEquals(await Deno.readFile(join(dir, "war3mapMap.tga")), plan[3].bytes);
+  });
+});
+
+Deno.test("the preview's files follow the other settings, and both Lua edits go into one change", async () => {
+  await withPreview("preview.blp", blp(512), async (dir, root) => {
+    const settings = previewOf("preview.blp", {
+      info: { name: "Both" },
+      gameplay: { foodLimit: 200 },
+      gameInterface: { CustomSkin: { Test: "value" } },
+    });
+    assertEquals(settings.info, { name: "Both" });
+    const plan = await planMapSettings(dir, settings, "moonwell.pkl", undefined, root);
+    const files = ["war3map.w3i", "war3map.lua", "war3mapMisc.txt", "war3mapSkin.txt"];
+    assertEquals(
+      plan.map((change) => change.file),
+      [...files, "war3mapMinimap.blp", "war3mapMap.blp"].map((file) => join(dir, file)),
+    );
+    assertStringIncludes(decode(plan[1].bytes), 'SetMapName("Both")');
+    assertStringIncludes(decode(plan[1].bytes), MINIMAP_CALL);
+  });
+});
+
+Deno.test("the minimap is found in any letter case and replaced under the name it has", async () => {
+  await withPreview("preview.blp", blp(), async (dir, root) => {
+    await Deno.rename(join(dir, "war3mapMap.blp"), join(dir, "WAR3MAPMAP.BLP"));
+    const plan = await planMapSettings(dir, previewOf("preview.blp"), "moonwell.pkl", undefined, root);
+    assertEquals(plan.slice(1).map((change) => change.file), [
+      join(dir, "war3mapMinimap.blp"),
+      join(dir, "WAR3MAPMAP.BLP"),
+    ]);
+  });
+});
+
+Deno.test("a preview is refused when the map lacks its minimap or already has one of the preview's names", async () => {
+  await withPreview("preview.tga", tga(pixels()), async (dir, root) => {
+    const plan = () =>
+      assertRejects(
+        () => planMapSettings(dir, previewOf("preview.tga"), "moonwell.pkl", "maps/map.w3x", root),
+        MoonwellError,
+      );
+    for (const taken of ["war3mapminimap.blp", "War3mapMap.TGA"]) {
+      await Deno.writeFile(join(dir, taken), new Uint8Array([1]));
+      const before = await snapshot(dir);
+      const error = await plan();
+      assertEquals(error.message, `The map already has ${taken}, a name the preview picture needs.`);
+      assertEquals(error.file, `maps/map.w3x/${taken}`);
+      assertEquals(Boolean(error.hint), true);
+      assertEquals(await snapshot(dir), before);
+      await Deno.remove(join(dir, taken));
+    }
+    await Deno.remove(join(dir, "war3mapMap.blp"));
+    const missing = await plan();
+    assertStringIncludes(missing.message, "The map has no war3mapMap.blp");
+    assertEquals(missing.file, "maps/map.w3x/war3mapMap.blp");
+    assertStringIncludes(missing.hint!, "World Editor");
+  });
+});
+
+Deno.test("a preview setting that names no usable picture is refused before any map file is read", async () => {
+  await withPreview("preview.tga", tga(pixels()), async (_, root) => {
+    await Deno.mkdir(join(root, "assets"));
+    await Deno.writeFile(join(root, "assets", "preview.tga"), tga(pixels()));
+    await Deno.mkdir(join(root, "folder.tga"));
+    await Deno.writeFile(join(root, "preview.png"), tga(pixels()));
+    await Deno.writeFile(join(root, "small.tga"), tga(pixels()).slice(0, 100));
+    // No map folder at all: the setting and the picture are checked first.
+    const absent = join(root, "no-map");
+    const refused = async (path: string, message: string, file = "moonwell.local.pkl") => {
+      const error = await assertRejects(
+        () => planMapSettings(absent, previewOf(path), "moonwell.local.pkl", "maps/map.w3x", root),
+        MoonwellError,
+      );
+      assertStringIncludes(error.message, message);
+      assertEquals(error.file, file);
+      assertEquals(Boolean(error.hint), true);
+    };
+    await refused("missing.tga", "settings.info.preview names a file that does not exist: missing.tga");
+    await refused("folder.tga", "settings.info.preview does not name a file: folder.tga");
+    await refused("assets/preview.tga", "settings.info.preview names a file under assets/: assets/preview.tga");
+    await refused("Assets\\preview.tga", "settings.info.preview names a file under assets/: Assets/preview.tga");
+    for (const outside of ["../preview.tga", "/preview.tga", "C:\\preview.tga", "art//preview.tga"]) {
+      await refused(outside, `settings.info.preview must be a path inside the project, not "${outside}".`);
+    }
+    await refused("preview.png", "The preview picture must be a .tga or a .blp file.", "preview.png");
+    await refused("small.tga", "The preview picture is cut short", "small.tga");
+    // With the picture in order, the map folder is what is missing.
+    await refused("preview.tga", "The map has no war3mapMap.blp", "maps/map.w3x/war3mapMap.blp");
+  });
+});
+
+Deno.test("a preview cannot be planned without the project folder", async () => {
+  await withDir(async (dir) => {
+    const error = await assertRejects(() => planMapSettings(dir, previewOf("preview.tga")), Error);
+    assertEquals(error instanceof MoonwellError, false);
+    assertStringIncludes(error.message, "needs the project folder");
+  });
+});
+
+Deno.test("staged application removes a file, and reports one it could not remove", async () => {
+  await withDir(async (dir) => {
+    const file = join(dir, "war3mapMap.blp");
+    await Deno.writeFile(file, MINIMAP_BYTES);
+    await applySettingsPlan([{ file, bytes: null }]);
+    assertEquals(await snapshot(dir), {});
+    const error = await assertRejects(() => applySettingsPlan([{ file, bytes: null }]), MoonwellError);
+    assertEquals(error.file, file);
   });
 });
