@@ -378,10 +378,11 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    4: geometry, terrain, missile, knockback) and v0.5.0 (release 5: codec, sync, savefile) are released, so phase 3 is
    complete: the port of `wc3-lib` is done. Phase 4 is under way, in the roadmap's suggested order: item 1 (the wrappers
    additions) is released as wrappers v0.8.0, item 2 (assets shipped by libraries) as Moonwell 0.6.0, and item 3 (the
-   custom map preview) as Moonwell 0.7.0. Next is item 4, other gameplay languages, Teal first; every item needs a short
-   design first. Two small changes are waiting too: pin YueScript 0.34.3, which fixes the `//` bug upstream, and check
-   whether it fixes bitwise operators; and add a `moonwell-library.json` with `{"dir": "src"}` to the wrappers and
-   systems libraries in their next releases, so maps can leave `dir` out.
+   custom map preview) as Moonwell 0.7.0. What is left follows the roadmap's phase 5, the order the maintainer set on
+   2026-10-01, which is also the order of the Backlog below: replace Deno; other gameplay languages and the YueScript
+   pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal of Unit wrappers; PNG as a
+   preview format; the key release `onKeyDown` depends on; and last, the online checks before 1.0. Every item needs a
+   short design first.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -451,15 +452,25 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **Deno quirks:** it refuses JSR versions published less than 24 hours ago unless you pass `--min-dep-age=0`. A locked
   file on Windows surfaces as a plain `Error` with code `EBUSY`, not a `Deno.errors` class.
 
-## Backlog (features for later, each needs a short design first)
+## Backlog (in the maintainer's order of 2026-10-01; each needs a short design first)
 
-- **Custom map preview for Reforged.** Done in Moonwell 0.7.0 (2026-10-01) as `settings.info.preview`. The entry as it
-  was: Reforged ignores `war3mapPreview.tga`/`.blp` (a long-standing game bug): the map list and lobby show
-  `war3mapMap.blp`, the minimap. So `war3mapPreview.tga` stays a reserved asset path (tested). A manifest setting such
-  as `settings.info.preview = "preview.blp"` could do the known workaround in the staged map: import the image as
-  `war3mapMap.blp`, keep World Editor's minimap under another name, and call `BlzChangeMinimapTerrainTex("<that name>")`
-  at game start (in `war3map.lua`, like the other settings edits). See github.com/inwc3/ReforgedMapPreviewReplacer.
-  Needs an in-game check of the map list and of the in-game minimap.
+Entries that are done were removed on 2026-10-01: the custom map preview (Moonwell 0.7.0), assets shipped by libraries
+(0.6.0), the wrappers candidate additions (wrappers v0.8.0), the UI wrappers releases B and C (v0.4.0, v0.5.0), the
+editor error for effects attached to items and destructables (v0.5.1) and the port of `wc3-lib` (moonwell-systems v0.1.0
+to v0.5.0). The State section above records each.
+
+1. **Replace Deno**
+
+- **Replace Deno in Moonwell's toolchain.** The maintainer's plan (2026-09-30): the project has nothing to do with
+  TypeScript, so Deno should go eventually, from the CLI and from the wrappers' tools. moonwell-systems already needs
+  none (its tools are Lua run with `yue -e`). Needs a design: what replaces the CLI's runtime, JSR publishing and the
+  test suites.
+
+2. **Other gameplay languages, and the YueScript pin**
+
+- **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
+  sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
+  declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
 - **Fennel support.** The maintainer chose YueScript (2026-09-27) for its familiar syntax and VS Code support, with
   Fennel as a later option: a fennel-ls docset rendered from `cli/data/natives.json` (sub-project 3), plus a Fennel
   compile step next to the YueScript one.
@@ -468,23 +479,19 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   "No Node.js" rule shapes the design.
 - **C# support.** Gameplay in C#, compiled to Lua (for example with CSharp.lua). Added 2026-09-28; it builds on
   sub-project 4a's Lua modules.
-- **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
-  sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
-  declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
-- **UI wrappers, releases B and C.** Split 2026-09-29 from "UI and presentation wrappers"; release A (presentation) is
-  wrappers v0.3.0. B is wrappers v0.4.0, released 2026-09-29 (spec
-  `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`). C is wrappers v0.5.0, released 2026-09-29
-  (spec `docs/superpowers/specs/2026-09-29-moonwell-wrappers-frames-design.md`). B's `ui-init` probe (2026-09-29)
-  measured w3ts's classic UI notes; the results are in the wrappers README and the w3ts comparison.
-- **Assets shipped by libraries.** Done in Moonwell 0.6.0 (2026-10-01), for files; object data stays in the map. The
-  entry as it was: a library could ship files such as a frame template `.toc` and its `.fdf` files for the map to import
-  (added 2026-09-29 with wrappers v0.5.0, whose README shows the manual recipe). Needs a design for where they live in a
-  library and how they join the map's `assets/` import.
-- **Wrappers candidate additions** (from the w3ts comparison §6, chosen 2026-09-29 as backlog candidates, each needing a
-  short design): `WeatherEffect` (`AddWeatherEffect`, enable, remove); spell effects from ability data
-  (`AddSpellEffectById`, for example `Effect.flashSpell`); more Trigger registrations (player state, key, mouse, sync,
-  alliance change, game state, timer expire); event helpers such as `Unit.fromEvent()`. Done: wrappers v0.8.0
-  (2026-10-01), with keys and the mouse as `wrappers.input` and spell effects as `Effect.abilityArt`.
+- **Pin YueScript 0.34.3.** It fixes the `//` bug upstream (IppClub/YueScript#256); check whether it also fixes bitwise
+  operators, for which 0.34.2 writes an empty file too. Once it is pinned, the floor-division test in
+  `cli/tests/yue/compile.test.ts` fails and should become a test that such a file compiles, and the README's and this
+  file's `//` notes go.
+
+3. **`moonwell-library.json` in the libraries**
+
+- **Add `moonwell-library.json` with `{"dir": "src"}` to moonwell-wrappers and moonwell-systems,** in their next
+  releases, so a map can leave `dir` out of its manifest (Moonwell 0.6.0 reads the file). Their READMEs and the
+  tag-consumption checks then use the short form.
+
+4. **Automatic disposal of Unit wrappers**
+
 - **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
   maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
   keeps a live-looking wrapper whose handle is dead. WCSharp detects removal as a unit leaving a region that covers the
@@ -494,12 +501,24 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   gets order 852056 twice at death (Defend level 1) and twice at removal (level 0), for all four cases, with no false
   positives (port-needs note §6.3). It needs a custom ability in every map's object data; polling type ids, as `wc3-lib`
   does, needs none.
-- **Editor error for effects attached to items and destructables.** The v0.3.0 gate (2026-09-29, game 3.0.0.24268)
-  showed that Warcraft drew no effect attached to an item (Claws of Attack, two effect models) or a destructable (a
-  summer tree). `Effect.attach` and `Effect.flashOn` accept any Widget, like the native, and the README documents the
-  limit. The maintainer wants the editor (LuaLS) to flag an Item argument there (decided for items; destructables follow
-  the same evidence), for example with a Unit parameter type, while runtime behavior may stay permissive for custom
-  models.
+
+5. **PNG as a preview format**
+
+- **`settings.info.preview` naming a `.png`.** Left out of Moonwell 0.7.0 by the maintainer's choice. Moonwell would
+  read the PNG (inflate, the five filters, the colour types an image editor writes) and write the same TGA it writes
+  today, so nothing changes in the game. About 150 lines and their tests. Whatever replaces Deno decides what inflate is
+  available.
+
+6. **The key release `onKeyDown` depends on**
+
+- **A key release the game never sends.** `wrappers.input`'s `onKeyDown` runs once per press because the module keeps
+  whether each listened key is held (wrappers v0.8.0). If the game drops a release, for example when the window loses
+  focus while a key is down, the next press would be taken for a repeat and lost. Untested: probe it on one machine
+  (hold a key, switch away, let go, switch back, press again), and if a release can be lost, decide how the held state
+  recovers.
+
+7. **Online multiplayer and desync checks, then 1.0**
+
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
   Battle.net. Covers at least: the wrappers weak-cache gate (`examples/gate.yue`, two players past its 50-second probe,
@@ -509,13 +528,3 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   `sound:getDuration()` agrees across machines, the wrappers v0.8.0 input listeners and `weather:enableFor`, the
   Moonwell 0.7.0 preview picture in the lobby of a hosted game, and any later feature with multiplayer effects. Until
   then, release gates record these as deferred, not passed.
-- **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
-  scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
-  Moved here 2026-09-28; it depends on 4b's library sync. The 1.4 probe found `wc3-lib`'s Preload local store broken in
-  game for codes over one chunk (lines cut at 259 characters, which can crash the game on load; appending inside the
-  file has no effect): port-needs note §6.5. Under way as `mdlsvensson/moonwell-systems` (annotated Lua, not YueScript,
-  by the maintainer's choice); complete: v0.1.0 to v0.5.0 are released (2026-10-01).
-- **Replace Deno in Moonwell's toolchain.** The maintainer's plan (2026-09-30): the project has nothing to do with
-  TypeScript, so Deno should go eventually, from the CLI and from the wrappers' tools. moonwell-systems already needs
-  none (its tools are Lua run with `yue -e`). Needs a design: what replaces the CLI's runtime, JSR publishing and the
-  test suites.

@@ -12,6 +12,7 @@ The order is:
 2. The review of moonwell-wrappers, then its refactor.
 3. The port.
 4. The rest of the backlog.
+5. To 1.0, in the order the maintainer set on 2026-10-01.
 
 ## Where we are
 
@@ -327,26 +328,54 @@ Every item needs a short design first, as the backlog says.
    **Released 2026-10-01** as Moonwell 0.7.0 (spec and plan `2026-10-01-moonwell-map-preview`): `settings.info.preview`
    names a TGA or BLP that takes the minimap's place in the built map, and a call at the end of `main()` gives the game
    its minimap back. Two probes came first.
-4. **Other gameplay languages.** Teal first: its compiler is Lua, so it needs no Node.js, and its types map to the
-   annotated Lua we already write. Then Fennel, TypeScript and C#; the last two need an answer to the "no Node.js" rule.
-5. **Online multiplayer and desync checks: the very last step before 1.0,** as the maintainer decided. The backlog entry
-   lists what they cover. They now also cover:
+4. **Other gameplay languages** and 5. **Online multiplayer and desync checks:** moved to phase 5 (items 5.2 and 5.7),
+   whose order the maintainer set on 2026-10-01.
+
+## Phase 5: to 1.0 (the maintainer's order, 2026-10-01)
+
+Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entries that were done were removed from
+`AGENTS.md`. Every item here needs a short design first; small bounded ones get it in chat.
+
+1. **Replace Deno in the toolchain.** The project has nothing to do with TypeScript: Deno goes from the CLI and from the
+   wrappers' tools (moonwell-systems needs none already). The design decides what replaces the CLI's runtime, JSR
+   publishing and the test suites. It comes first so that everything after it is built once, on the new toolchain.
+2. **Other gameplay languages, and the YueScript pin.**
+   - Teal first: its compiler is Lua, so it needs no Node.js, and its types map to the annotated Lua we already write.
+   - Then Fennel, TypeScript and C#; the last two need an answer to the "no Node.js" rule.
+   - Pin YueScript 0.34.3, which fixes the `//` bug upstream (IppClub/YueScript#256), and check whether it fixes
+     bitwise operators too.
+3. **`moonwell-library.json` with `{"dir": "src"}` in moonwell-wrappers and moonwell-systems,** so maps can leave `dir`
+   out.
+4. **Automatic disposal of Unit wrappers on removal.** The maintainer has not chosen a way yet: the undefend-order
+   trick works but needs a custom ability in every map; polling type ids needs none (1.4 probe, port-needs note §6.3).
+5. **PNG as a preview format** for `settings.info.preview`, written into the map as the TGA of Moonwell 0.7.0.
+6. **The key release `onKeyDown` depends on.** Probe whether the game can drop a key release (wrappers v0.8.0 keeps
+   whether each key is held), and decide how the held state recovers if it can.
+7. **Online multiplayer and desync checks: the very last step before 1.0,** as the maintainer decided. The backlog
+   entry in `AGENTS.md` lists what they cover. They also cover:
    - the port's sync and save systems;
    - synchronized time;
-   - the machine-local questions left over from 1.4.
+   - the machine-local questions left over from 1.4;
+   - the wrappers v0.8.0 input listeners and `weather:enableFor`;
+   - the Moonwell 0.7.0 preview picture in the lobby of a hosted game.
 
 ## Backlog coverage
 
 | Backlog item                                                  | Where                |
 | ------------------------------------------------------------- | -------------------- |
 | `assets:sync` Ctrl+C during planning (deferred)               | 0.2                  |
-| Editor error for effects attached to items and destructables  | 0.3                  |
+| Editor error for effects attached to items and destructables  | 0.3 (done)           |
 | Static native-call check for the wrappers                     | 1.1 (done)           |
-| Automatic disposal of Unit wrappers on removal                | 1.4 probe, then 2.3  |
+| Automatic disposal of Unit wrappers on removal                | 1.4 probe, then 5.4  |
 | Wrappers candidate additions                                  | 2.3, 4.1 (done)      |
 | YueScript port of `wc3-lib` (4d)                              | Phase 3 (done)       |
 | Assets shipped by libraries                                   | 4.2 (done)           |
 | Custom map preview for Reforged                               | 4.3 (done)           |
-| Fennel, TypeScript, C# and Teal support                       | 4.4                  |
-| Online multiplayer and desync checks                          | 4.5 (last before 1.0) |
+| Replace Deno in the toolchain                                 | 5.1                  |
+| Fennel, TypeScript, C# and Teal support                       | 5.2                  |
+| Pin YueScript 0.34.3                                          | 5.2                  |
+| `moonwell-library.json` in the wrappers and systems libraries | 5.3                  |
+| PNG as a preview format                                       | 5.5                  |
+| The key release `onKeyDown` depends on                        | 5.6                  |
+| Online multiplayer and desync checks                          | 5.7 (last before 1.0) |
 | UI wrappers, releases B and C                                 | Done (v0.4.0, v0.5.0) |
