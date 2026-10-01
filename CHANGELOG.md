@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.7.0 (2026-10-01)
+
+- **A picture of your own in the game's map list.** `settings.info.preview = "preview.tga"` names a `.tga` or a `.blp`
+  of 256×256 or 512×512 pixels, at a path from the project folder. Reforged ignores `war3mapPreview.tga` and shows the
+  map's minimap file, so a build puts the picture in the minimap's place in the staged map, keeps World Editor's minimap
+  as `war3mapMinimap.blp`, and adds one call at the end of `main()` in `war3map.lua`
+  (`BlzChangeMinimapTerrainTex("war3mapMinimap.blp")`), so the game itself shows the normal minimap. The source map is
+  never changed.
+- The picture is checked strictly, because one the game cannot read closes the game the moment the map is selected in
+  the list. A TGA (24 or 32 bits, plain or run-length encoded, rows from the top or the bottom) is written into the map
+  again in the one layout the game was seen to accept, fully opaque. A BLP must be a BLP1 with JPEG or palette content
+  and is used as it is. Another size, format or extension fails `build`, `test`, `check`, `dev` and `settings:check`.
+- `settings:check` lists the preview's files, a file a build removes as `war3mapMap.blp (removed)`. `dev` starts a cycle
+  when the picture changes.
+- An asset named `war3mapPreview.*` or `war3mapMap.*` is refused as before; its hint now names the setting.
+- Limits, in the README: the game draws its start location markers over the picture, placed for a 256×256 one; and a
+  World Editor trigger that sets the minimap at map initialization is overridden by the build's call (gameplay code in
+  an `on_main` hook runs later and wins).
+- Documentation: the design and plan (`2026-10-01-moonwell-map-preview`), with the measurements of two probes.
+
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-01 on Windows, and CI passed on Ubuntu and Windows: the type check, lint and
+format; 486 unit tests, 30 runtime tests, the Pkl tests (47, and 28 Pkl-backed tests), 34 end-to-end tests and 2 network
+tests. Among them: a real build whose packed map holds `war3mapMap.tga` and `war3mapMinimap.blp`, no `war3mapMap.blp`,
+and the call as the last statement of `main()`. 62 mutations of the new code are each caught by a test.
+
+Two probes came before the design, on Warcraft III Reforged 3.0.0.24268 (`../wrappers-gate/PROBE-PREVIEW-RESULTS.md`):
+eight maps in the single-player map list, and three maps for the call's behavior and timing.
+
+The new step 13 (the map preview) passed 2026-10-01 on Warcraft III Reforged 3.0.0.24268, tested by the maintainer: a
+map built from a 24-bit TGA written by Pillow showed the picture in the single-player map list and the normal minimap in
+the game. Steps 3 to 12 were not re-run: their code is unchanged.
+
 ## 0.6.0 (2026-10-01)
 
 - **Libraries can ship files for the map.** A library names a folder of them in a `moonwell-library.json` at its root

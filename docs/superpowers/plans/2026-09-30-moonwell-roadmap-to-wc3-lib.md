@@ -323,6 +323,10 @@ Every item needs a short design first, as the backlog says.
    its module folder and a folder of files for the map in its own `moonwell-library.json`. Files only, by the
    maintainer's choice: object data stays in the map, and the dummy unit stays a pasted Pkl block.
 3. **Custom map preview for Reforged.**
+
+   **Released 2026-10-01** as Moonwell 0.7.0 (spec and plan `2026-10-01-moonwell-map-preview`): `settings.info.preview`
+   names a TGA or BLP that takes the minimap's place in the built map, and a call at the end of `main()` gives the game
+   its minimap back. Two probes came first.
 4. **Other gameplay languages.** Teal first: its compiler is Lua, so it needs no Node.js, and its types map to the
    annotated Lua we already write. Then Fennel, TypeScript and C#; the last two need an answer to the "no Node.js" rule.
 5. **Online multiplayer and desync checks: the very last step before 1.0,** as the maintainer decided. The backlog entry
@@ -342,7 +346,7 @@ Every item needs a short design first, as the backlog says.
 | Wrappers candidate additions                                  | 2.3, 4.1 (done)      |
 | YueScript port of `wc3-lib` (4d)                              | Phase 3 (done)       |
 | Assets shipped by libraries                                   | 4.2 (done)           |
-| Custom map preview for Reforged                               | 4.3                  |
+| Custom map preview for Reforged                               | 4.3 (done)           |
 | Fennel, TypeScript, C# and Teal support                       | 4.4                  |
 | Online multiplayer and desync checks                          | 4.5 (last before 1.0) |
 | UI wrappers, releases B and C                                 | Done (v0.4.0, v0.5.0) |

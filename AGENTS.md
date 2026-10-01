@@ -131,6 +131,30 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - The example library has a `v0.2.0` tag (commit `0b69cfa`) with such a file and one asset; the network test downloads
     both tags. Its tags must never be moved.
   - Gate steps 1 and 2 passed; 3 to 12 were not re-run. No in-game run, by the maintainer's choice.
+- **0.7.0, the custom map preview** (2026-10-01; spec
+  `docs/superpowers/specs/2026-10-01-moonwell-map-preview-design.md`, plan
+  `docs/superpowers/plans/2026-10-01-moonwell-map-preview.md`). Roadmap phase 4, item 3.
+  - `settings.info.preview` names a `.tga` or `.blp` of 256×256 or 512×512 pixels, at a path from the project folder
+    (not under `assets/`). In the staged map a build keeps World Editor's `war3mapMap.blp` as `war3mapMinimap.blp`, puts
+    the picture in its place (`war3mapMap.blp`, or `war3mapMap.tga` with the `.blp` removed) and adds
+    `BlzChangeMinimapTerrainTex("war3mapMinimap.blp")` as the last statement of `main()` in `war3map.lua`.
+  - Code: `cli/src/settings/picture.ts` (the BLP1 check; a TGA is rewritten as plain, 32 bits, rows from the bottom,
+    opaque), `preview.ts` (reads the manifest's file), `patchMinimapLua` in `lua.ts`, and `planMapSettings`, which now
+    takes the project folder and can return a change that removes a file (`bytes: null`). The validated settings keep
+    `preview` beside `info`, not inside it: the map-info code walks every `info` field.
+  - Two probes came before the design (`../wrappers-gate/PROBE-PREVIEW-RESULTS.md`, `preview-probe.ts`), measured on
+    3.0.0.24268 in the single-player map list: `war3mapPreview.tga` is still ignored; a `war3mapMap.blp` holding TGA or
+    DDS bytes closes the game the moment the map is selected; `war3mapMap.tga` is shown when the map has no
+    `war3mapMap.blp`; the start location markers are drawn over the picture and placed for 256×256.
+    `BlzChangeMinimapTerrainTex` draws the picture it names at once, returns false for a missing file, and works after
+    World Editor's `main` body or from a zero-second timer; called before that body it returns true, does nothing, and
+    confuses the calls after it.
+  - A World Editor trigger that sets the minimap at map initialization runs inside `main`, before the build's call, and
+    is overridden. Gameplay code in an `on_main` hook runs later and wins.
+  - Test pictures are built in code (`cli/tests/support/pictures.ts`); Pillow reads BLP1, TGA and DDS, which checked the
+    probe's hand-written files before they went into the game.
+  - Gate steps 1, 2 and the new step 13 passed (the maintainer saw the picture in the list and the normal minimap in the
+    game); 3 to 12 were not re-run.
 - **Plan 4a, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules
   in `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
@@ -352,11 +376,11 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    scheduler, signal, scope, time), v0.2.0 (release 2: buffs, aura, dummy), v0.3.0 (release 3: damage), v0.4.0 (release
    4: geometry, terrain, missile, knockback) and v0.5.0 (release 5: codec, sync, savefile) are released, so phase 3 is
    complete: the port of `wc3-lib` is done. Phase 4 is under way, in the roadmap's suggested order: item 1 (the wrappers
-   additions) is released as wrappers v0.8.0, and item 2 (assets shipped by libraries) as Moonwell 0.6.0. Next is item
-   3, the custom map preview for Reforged; every item needs a short design first. Two small changes are waiting too: pin
-   YueScript 0.34.3, which fixes the `//` bug upstream, and check whether it fixes bitwise operators; and add a
-   `moonwell-library.json` with `{"dir": "src"}` to the wrappers and systems libraries in their next releases, so maps
-   can leave `dir` out.
+   additions) is released as wrappers v0.8.0, item 2 (assets shipped by libraries) as Moonwell 0.6.0, and item 3 (the
+   custom map preview) as Moonwell 0.7.0. Next is item 4, other gameplay languages, Teal first; every item needs a short
+   design first. Two small changes are waiting too: pin YueScript 0.34.3, which fixes the `//` bug upstream, and check
+   whether it fixes bitwise operators; and add a `moonwell-library.json` with `{"dir": "src"}` to the wrappers and
+   systems libraries in their next releases, so maps can leave `dir` out.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -428,12 +452,13 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 
 ## Backlog (features for later, each needs a short design first)
 
-- **Custom map preview for Reforged.** Reforged ignores `war3mapPreview.tga`/`.blp` (a long-standing game bug): the map
-  list and lobby show `war3mapMap.blp`, the minimap. So `war3mapPreview.tga` stays a reserved asset path (tested). A
-  manifest setting such as `settings.info.preview = "preview.blp"` could do the known workaround in the staged map:
-  import the image as `war3mapMap.blp`, keep World Editor's minimap under another name, and call
-  `BlzChangeMinimapTerrainTex("<that name>")` at game start (in `war3map.lua`, like the other settings edits). See
-  github.com/inwc3/ReforgedMapPreviewReplacer. Needs an in-game check of the map list and of the in-game minimap.
+- **Custom map preview for Reforged.** Done in Moonwell 0.7.0 (2026-10-01) as `settings.info.preview`. The entry as it
+  was: Reforged ignores `war3mapPreview.tga`/`.blp` (a long-standing game bug): the map list and lobby show
+  `war3mapMap.blp`, the minimap. So `war3mapPreview.tga` stays a reserved asset path (tested). A manifest setting such
+  as `settings.info.preview = "preview.blp"` could do the known workaround in the staged map: import the image as
+  `war3mapMap.blp`, keep World Editor's minimap under another name, and call `BlzChangeMinimapTerrainTex("<that name>")`
+  at game start (in `war3map.lua`, like the other settings edits). See github.com/inwc3/ReforgedMapPreviewReplacer.
+  Needs an in-game check of the map list and of the in-game minimap.
 - **Fennel support.** The maintainer chose YueScript (2026-09-27) for its familiar syntax and VS Code support, with
   Fennel as a later option: a fennel-ls docset rendered from `cli/data/natives.json` (sub-project 3), plus a Fennel
   compile step next to the YueScript one.
@@ -480,8 +505,9 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   no desync, each machine's probe line recorded), `Player:isLocal()`, `Group:enumSelected`, map settings (players,
   forces, alliances) in a real lobby, map transfer of packed normal and minified builds, the wrappers v0.3.0 local
   visibility (`setVisibleFor`, `playFor`, the `player` options of `TextTag.float` and `Sound.playOnce`) and whether
-  `sound:getDuration()` agrees across machines, the wrappers v0.8.0 input listeners and `weather:enableFor`, and any
-  later feature with multiplayer effects. Until then, release gates record these as deferred, not passed.
+  `sound:getDuration()` agrees across machines, the wrappers v0.8.0 input listeners and `weather:enableFor`, the
+  Moonwell 0.7.0 preview picture in the lobby of a hosted game, and any later feature with multiplayer effects. Until
+  then, release gates record these as deferred, not passed.
 - **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
   scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
   Moved here 2026-09-28; it depends on 4b's library sync. The 1.4 probe found `wc3-lib`'s Preload local store broken in
