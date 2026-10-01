@@ -318,6 +318,10 @@ Every item needs a short design first, as the backlog says.
 2. **Assets shipped by libraries.** Frame template `.toc` and `.fdf` files, and possibly other files a library needs.
    The port's dummy units need object data from the map. Whether libraries should ship object data too can be designed
    together with this.
+
+   **Released 2026-10-01** as Moonwell 0.6.0 (spec and plan `2026-10-01-moonwell-library-assets`): a library names
+   its module folder and a folder of files for the map in its own `moonwell-library.json`. Files only, by the
+   maintainer's choice: object data stays in the map, and the dummy unit stays a pasted Pkl block.
 3. **Custom map preview for Reforged.**
 4. **Other gameplay languages.** Teal first: its compiler is Lua, so it needs no Node.js, and its types map to the
    annotated Lua we already write. Then Fennel, TypeScript and C#; the last two need an answer to the "no Node.js" rule.
@@ -337,7 +341,7 @@ Every item needs a short design first, as the backlog says.
 | Automatic disposal of Unit wrappers on removal                | 1.4 probe, then 2.3  |
 | Wrappers candidate additions                                  | 2.3, 4.1 (done)      |
 | YueScript port of `wc3-lib` (4d)                              | Phase 3 (done)       |
-| Assets shipped by libraries                                   | 4.2                  |
+| Assets shipped by libraries                                   | 4.2 (done)           |
 | Custom map preview for Reforged                               | 4.3                  |
 | Fennel, TypeScript, C# and Teal support                       | 4.4                  |
 | Online multiplayer and desync checks                          | 4.5 (last before 1.0) |

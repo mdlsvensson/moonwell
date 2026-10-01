@@ -111,6 +111,25 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 - **Released 0.5.2** (2026-09-30, JSR `@moonwell/cli@0.5.2` and GitHub release `moonwell@0.5.2` on `e459d1d`): builds
   fail when yue writes no Lua for a file with code (the `//` pitfall below). Gate steps 1 and 2 passed; 3 to 12 were not
   re-run.
+- **0.6.0, assets shipped by libraries** (2026-10-01; spec
+  `docs/superpowers/specs/2026-10-01-moonwell-library-assets-design.md`, plan
+  `docs/superpowers/plans/2026-10-01-moonwell-library-assets.md`). Roadmap phase 4, item 2.
+  - A library describes itself in a `moonwell-library.json` at its root: `dir` (its module folder) and `assets` (a
+    folder of files for the map). JSON, not Pkl, because it is read from a download before anything of the library is
+    trusted. An unknown key fails. The manifest's `dir` still wins when it is set; no schema change.
+  - Files only: the maintainer chose to keep object data in the map, so the dummy unit of `systems.dummy` stays a pasted
+    Pkl block.
+  - `cli/src/libraries/manifest.ts` reads the file. `sync.ts` keeps the assets in `.moonwell/library-assets/<key>/`,
+    writes an `assets` hash into the lock entry, and stamps library folders with `layout: 2`, so the first run after
+    upgrading downloads every GitHub library once more. A lock entry from 0.5 without `assets` is compared by commit
+    alone when the download ships assets.
+  - `collectProjectAssets` (`cli/src/assets/collect.ts`) adds the libraries' files to the map's own: the map's file wins
+    at the same in-map path, with a line saying so, and two libraries at one path fail. `planAssets` takes the library
+    keys, so builds, `check`, `assets:check`, `assets:sync` and `assets:paths` all see one list. The three assets
+    commands now sync the libraries first.
+  - The example library has a `v0.2.0` tag (commit `0b69cfa`) with such a file and one asset; the network test downloads
+    both tags. Its tags must never be moved.
+  - Gate steps 1 and 2 passed; 3 to 12 were not re-run. No in-game run, by the maintainer's choice.
 - **Plan 4a, released in 0.5.0** (2026-09-28, `docs/superpowers/plans/2026-09-28-moonwell-lua-modules.md`): Lua modules
   in `lua/` (spec `docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md`). `collectModules`
   (`cli/src/bundle/modules.ts`) lists `src/**/*.yue` and `lua/**/*.lua` as one namespace; `moduleLoader` resolves a name
@@ -332,9 +351,11 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    scheduler, signal, scope, time), v0.2.0 (release 2: buffs, aura, dummy), v0.3.0 (release 3: damage), v0.4.0 (release
    4: geometry, terrain, missile, knockback) and v0.5.0 (release 5: codec, sync, savefile) are released, so phase 3 is
    complete: the port of `wc3-lib` is done. Phase 4 is under way, in the roadmap's suggested order: item 1 (the wrappers
-   additions) is released as wrappers v0.8.0. Next is item 2, assets shipped by libraries; every item needs a short
-   design first. A separate small change is waiting too: pin YueScript 0.34.3, which fixes the `//` bug upstream, and
-   check whether it fixes bitwise operators.
+   additions) is released as wrappers v0.8.0, and item 2 (assets shipped by libraries) as Moonwell 0.6.0. Next is item
+   3, the custom map preview for Reforged; every item needs a short design first. Two small changes are waiting too: pin
+   YueScript 0.34.3, which fixes the `//` bug upstream, and check whether it fixes bitwise operators; and add a
+   `moonwell-library.json` with `{"dir": "src"}` to the wrappers and systems libraries in their next releases, so maps
+   can leave `dir` out.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -428,9 +449,10 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`). C is wrappers v0.5.0, released 2026-09-29
   (spec `docs/superpowers/specs/2026-09-29-moonwell-wrappers-frames-design.md`). B's `ui-init` probe (2026-09-29)
   measured w3ts's classic UI notes; the results are in the wrappers README and the w3ts comparison.
-- **Assets shipped by libraries.** A library could ship files such as a frame template `.toc` and its `.fdf` files for
-  the map to import (added 2026-09-29 with wrappers v0.5.0, whose README shows the manual recipe). Needs a design for
-  where they live in a library and how they join the map's `assets/` import.
+- **Assets shipped by libraries.** Done in Moonwell 0.6.0 (2026-10-01), for files; object data stays in the map. The
+  entry as it was: a library could ship files such as a frame template `.toc` and its `.fdf` files for the map to import
+  (added 2026-09-29 with wrappers v0.5.0, whose README shows the manual recipe). Needs a design for where they live in a
+  library and how they join the map's `assets/` import.
 - **Wrappers candidate additions** (from the w3ts comparison §6, chosen 2026-09-29 as backlog candidates, each needing a
   short design): `WeatherEffect` (`AddWeatherEffect`, enable, remove); spell effects from ability data
   (`AddSpellEffectById`, for example `Effect.flashSpell`); more Trigger registrations (player state, key, mouse, sync,

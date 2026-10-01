@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.6.0 (2026-10-01)
 
 - **Libraries can ship files for the map.** A library names a folder of them in a `moonwell-library.json` at its root
   (`{ "dir": "src", "assets": "assets" }`), and every map that lists the library imports those files, each at its path
@@ -26,6 +26,17 @@
 - Documentation: the design and plan of `moonwell-wrappers` v0.8.0 (input listeners, weather effects, art from ability
   data, four Trigger registrations and `fromEvent()`, released 2026-10-01), with the measurements of its two probes in
   that spec.
+
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-01 on Windows: the type check, lint and format; 466 unit tests, 30 runtime
+tests, the Pkl tests (46, and 27 Pkl-backed tests), 33 end-to-end tests and 2 network tests. Among them: a real build
+whose staged map holds a local library's file and lists it in `war3map.imp`, with the map's own file replacing another;
+`assets:check`, `assets:sync` and `assets:paths` with a library's files; and the downloads of
+`mdlsvensson/moonwell-example-lib` `v0.2.0` (which ships a file and names its own module folder) and `v0.1.0` (which
+locks to the entry it always had). 34 mutations of the new code are each caught by a test. Steps 3 to 12 were not
+re-run: the release decides which files enter the import path that step 7 already covered in the game and in World
+Editor, and the end-to-end test checks the staged map's bytes.
 
 ## 0.5.2 (2026-09-30)
 
