@@ -98,7 +98,9 @@ class LintConfig {
   globals: List<String(isLuaName(this))> = List()
 }
 
-/// A library of YueScript and Lua modules: a GitHub tag, or a local folder (spec: Lua modules and libraries).
+/// A library of YueScript and Lua modules, and of the files it ships for the map: a GitHub tag, or a local folder
+/// (specs: Lua modules and libraries; library assets). A library may describe its layout in a moonwell-library.json
+/// at its root: `dir`, the folder its module names start from, and `assets`, the folder whose files the map imports.
 class Library {
   /// A GitHub repository, "owner/repo". With `tag`, Moonwell downloads that tag; moonwell.lock records its commit.
   github: String(matches(Regex(#"[A-Za-z0-9-]+/[A-Za-z0-9._-]+"#)))?
@@ -106,11 +108,12 @@ class Library {
   /// The tag to download.
   tag: String(!isEmpty)?
 
-  /// A local folder instead, relative to the project or absolute. When set, `github` and `tag` are ignored: set it in
-  /// moonwell.local.pkl to work on a library next to the map.
+  /// A local folder instead, the library's root, relative to the project or absolute. When set, `github` and `tag` are
+  /// ignored: set it in moonwell.local.pkl to work on a library next to the map.
   path: String(!isEmpty)?
 
-  /// The folder inside the library that module names start from, such as "src". Empty for the library's root.
+  /// The folder inside the library that module names start from, such as "src". Leave it empty for a library that
+  /// names its own in moonwell-library.json; without that file, empty is the library's root.
   dir: String(isEmpty || isRelativeFolder(this)) = ""
 }
 

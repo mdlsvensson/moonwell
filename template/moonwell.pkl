@@ -35,10 +35,10 @@ lint {
   globals = List()          // extra global names to allow, e.g. List("MyLibrary")
 }
 
-// Libraries: modules from a GitHub tag or a local folder, named by their path in the library. moonwell.lock records
-// each tag's commit; commit it. See "Libraries" in Moonwell's README.
+// Libraries: modules, and files for the map, from a GitHub tag or a local folder. Modules are named by their path in
+// the library. moonwell.lock records each tag's commit; commit it. See "Libraries" in Moonwell's README.
 libraries {
-  // ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.1.0"; dir = "src" }
+  // ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.2.0" }
 }
 
 // Map settings, applied to the built map only; the World Editor map is never changed. `deno task settings:check`
