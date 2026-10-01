@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes, assertThrows } from "@std/assert";
 import { validateMapSettings } from "../../src/settings/options.ts";
-import { luaString, patchSettingsLua } from "../../src/settings/lua.ts";
+import { luaString, patchMinimapLua, patchSettingsLua } from "../../src/settings/lua.ts";
 import { readLuaFunctions } from "../../src/settings/lua-structure.ts";
 import { patchMapInfo } from "../../src/w3i/patch.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
@@ -286,4 +286,52 @@ Deno.test("unreadable patched map info is reported against the map-info file", a
     MoonwellError,
   );
   assertEquals(error.file, "maps/m/war3map.w3i");
+});
+
+const MINIMAP_CALL = 'BlzChangeMinimapTerrainTex("war3mapMinimap.blp")';
+
+Deno.test("the minimap call becomes the last statement of main, on a line of its own", async () => {
+  const lua = await fixtureLua();
+  const eol = lua.includes("\r\n") ? "\r\n" : "\n";
+  const patched = patchMinimapLua(lua);
+  assertEquals(patched.length, lua.length + MINIMAP_CALL.length + eol.length);
+  assertStringIncludes(patched, `RunInitializationTriggers()${eol}${MINIMAP_CALL}${eol}end${eol}`);
+  const main = readLuaFunctions(patched).find((entry) => entry.name === "main")!;
+  assertEquals(main.calls.at(-1)!.name, "BlzChangeMinimapTerrainTex");
+  assertEquals(main.calls.at(-2)!.name, "RunInitializationTriggers");
+  // The other functions are untouched: the call is in main alone.
+  assertEquals(patched.split(MINIMAP_CALL).length, 2);
+});
+
+Deno.test("the minimap call keeps the script's line ending and the indentation of main's end", () => {
+  assertEquals(
+    patchMinimapLua("function main()\r\n  InitBlizzard()\r\n  end\r\n"),
+    `function main()\r\n  InitBlizzard()\r\n  ${MINIMAP_CALL}\r\n  end\r\n`,
+  );
+  assertEquals(patchMinimapLua("function main()\nend\n"), `function main()\n${MINIMAP_CALL}\nend\n`);
+  assertEquals(
+    patchMinimapLua("function main() InitBlizzard() end"),
+    `function main() InitBlizzard() ${MINIMAP_CALL} end`,
+  );
+});
+
+Deno.test("the minimap call needs exactly one global main", () => {
+  for (
+    const [source, count] of [["function config()\nend\n", 0], ["function main()\nend\nfunction main()\nend\n", 2]]
+  ) {
+    const error = assertThrows(() => patchMinimapLua(source as string, "map/war3map.lua"), MoonwellError);
+    assertStringIncludes(error.message, `expected exactly one global function main(), found ${count}.`);
+    assertEquals(error.file, "map/war3map.lua");
+    assertEquals(Boolean(error.hint), true);
+  }
+});
+
+Deno.test("the minimap call goes in beside the other Lua settings", async () => {
+  const patched = patchMinimapLua(
+    await patch({ info: { name: "Both" }, environment: { soundEnvironment: "Dungeon" } }),
+  );
+  assertStringIncludes(patched, 'SetMapName("Both")');
+  assertStringIncludes(patched, 'NewSoundEnvironment("Dungeon")');
+  const main = readLuaFunctions(patched).find((entry) => entry.name === "main")!;
+  assertEquals(main.calls.at(-1)!.name, "BlzChangeMinimapTerrainTex");
 });

@@ -306,3 +306,28 @@ export function patchSettingsLua(
   }
   return patched;
 }
+
+/** The name under which a build with a preview picture keeps World Editor's minimap in the map. */
+export const KEPT_MINIMAP = "war3mapMinimap.blp";
+
+/**
+ * Adds the call that gives the game World Editor's minimap back, as the last statement of main(): a build with a
+ * preview picture has put that picture in the minimap's place. The call has no effect before World Editor's main
+ * body has run (probe of 2026-10-01), and gameplay hooks run after main(), so a minimap they set still wins.
+ */
+export function patchMinimapLua(source: string, file = "war3map.lua"): string {
+  const found = readLuaFunctions(source, file).filter((entry) => entry.name === "main");
+  if (found.length !== 1) {
+    throw new MoonwellError(
+      `Cannot apply map settings to Lua: expected exactly one global function main(), found ${found.length}.`,
+      { file, hint: RESAVE },
+    );
+  }
+  const at = found[0].endStart;
+  const prefix = source.slice(source.lastIndexOf("\n", at - 1) + 1, at);
+  const eol = source.includes("\r\n") ? "\r\n" : "\n";
+  // On a line of its own when `end` starts its line; otherwise a space keeps it apart from the statement before.
+  const call = `BlzChangeMinimapTerrainTex(${luaString(KEPT_MINIMAP)})` +
+    (/^[ \t]*$/.test(prefix) ? eol + prefix : " ");
+  return applyLuaEdits(source, [{ start: at, end: at, text: call }]);
+}
