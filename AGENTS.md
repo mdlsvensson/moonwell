@@ -111,7 +111,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
 - **Released 0.5.2** (2026-09-30, JSR `@moonwell/cli@0.5.2` and GitHub release `moonwell@0.5.2` on `e459d1d`): builds
   fail when yue writes no Lua for a file with code (the `//` pitfall below). Gate steps 1 and 2 passed; 3 to 12 were not
   re-run.
-- **0.6.0, assets shipped by libraries** (2026-10-01; spec
+- **Released 0.6.0, assets shipped by libraries** (2026-10-01, JSR `@moonwell/cli@0.6.0` and GitHub release
+  `moonwell@0.6.0` on `88d74b2`, checked with `init` and `build` from JSR; spec
   `docs/superpowers/specs/2026-10-01-moonwell-library-assets-design.md`, plan
   `docs/superpowers/plans/2026-10-01-moonwell-library-assets.md`). Roadmap phase 4, item 2.
   - A library describes itself in a `moonwell-library.json` at its root: `dir` (its module folder) and `assets` (a

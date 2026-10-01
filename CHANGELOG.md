@@ -38,6 +38,8 @@ locks to the entry it always had). 34 mutations of the new code are each caught 
 re-run: the release decides which files enter the import path that step 7 already covered in the game and in World
 Editor, and the end-to-end test checks the staged map's bytes.
 
+Published to JSR 2026-10-01; `init` and `build` from `jsr:@moonwell/cli@0.6.0` were checked in a new folder.
+
 ## 0.5.2 (2026-09-30)
 
 - Builds stop with an error naming the file when YueScript reports success but writes no Lua for a file with code.
