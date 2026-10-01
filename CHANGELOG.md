@@ -34,6 +34,8 @@ The new step 13 (the map preview) passed 2026-10-01 on Warcraft III Reforged 3.0
 map built from a 24-bit TGA written by Pillow showed the picture in the single-player map list and the normal minimap in
 the game. Steps 3 to 12 were not re-run: their code is unchanged.
 
+Published to JSR 2026-10-01; the maintainer checked `init` and `build` from `jsr:@moonwell/cli@0.7.0`.
+
 ## 0.6.0 (2026-10-01)
 
 - **Libraries can ship files for the map.** A library names a folder of them in a `moonwell-library.json` at its root
