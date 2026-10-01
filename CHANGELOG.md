@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **Libraries can ship files for the map.** A library names a folder of them in a `moonwell-library.json` at its root
+  (`{ "dir": "src", "assets": "assets" }`), and every map that lists the library imports those files, each at its path
+  in that folder, with the map's own assets: in builds, `check`, `assets:check`, `assets:sync` and `assets:paths`. The
+  map's own file wins over a library's at the same in-map path, and the command says so; two libraries at one path fail.
+  The same file can name the library's module folder (`dir`), so a map may leave `dir` out of its manifest; a `dir` in
+  the manifest still wins.
+- `moonwell.lock` records an `assets` hash for a library that ships files. Existing lock files stay valid. The first run
+  after upgrading downloads each GitHub library once more.
+- `assets:check`, `assets:sync` and `assets:paths` sync the libraries first, as `check` and `setup` do.
+- A local library's `path` is the library's root: its `moonwell-library.json` is read from there, and `dev` watches its
+  assets folder and that file.
+- The template's commented library example names `mdlsvensson/moonwell-example-lib` `v0.2.0`, which has such a file.
 - Documentation: the `moonwell-wrappers` v0.5.1 review, the performance and port-needs research notes with their probe
   results, and the designs and implementation plans for `moonwell-wrappers` v0.6.0 (the refactor after the review) and
   v0.7.0 (the port prerequisites: damage events, sync, collision size and pathing), both released 2026-09-30.

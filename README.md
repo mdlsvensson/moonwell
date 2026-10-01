@@ -186,38 +186,52 @@ through `.luarc.json`'s `runtime.path`; `deno task setup` adds the entries to a 
 
 ## Libraries
 
-A library is a folder of YueScript and Lua modules from a GitHub tag or a local folder. List libraries in
-`moonwell.pkl`:
+A library is a folder of YueScript and Lua modules, and of files for the map, from a GitHub tag or a local folder. List
+libraries in `moonwell.pkl`:
 
 ```pkl
 libraries {
-  ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.1.0"; dir = "src" }
+  ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.2.0" }
 }
 ```
 
-The key names the library's folder in `.moonwell/libraries/`, so keys must differ by more than case. `dir` is the folder
-inside the library that module names start from; leave it out for the library's root. A library's modules keep their own
-names (`import "example.loud"`), and share one set of names with `src/` and `lua/`: a name two of them define fails the
-build. A `.lua` file next to a `.yue` file of the same name in a library is its compiled output, and is skipped.
+The key names the library's folder in `.moonwell/libraries/`, so keys must differ by more than case. A library's modules
+keep their own names (`import "example.loud"`), and share one set of names with `src/` and `lua/`: a name two of them
+define fails the build. A `.lua` file next to a `.yue` file of the same name in a library is its compiled output, and is
+skipped.
 
-`check`, `build`, `test`, `dev` and `setup` download a library that is missing or whose `github`, `tag` or `dir` changed
-into `.moonwell/libraries/<key>/` (git-ignored), and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`:
-a fresh clone then gets the same code, and if a tag is moved on GitHub, the command fails instead of using the new code.
-To upgrade, change `tag`.
+A library describes its own layout in a `moonwell-library.json` at its root:
 
-To work on a library next to your map, point it at a local folder in `moonwell.local.pkl`:
-
-```pkl
-libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }
+```json
+{ "dir": "src", "assets": "assets" }
 ```
 
-`path` wins over `github`. Its `.yue` and `.lua` files are copied into `.moonwell/libraries/<key>/` (folders whose name
-starts with `.`, such as `.git/`, are skipped), so errors in them name the copy there, not your checkout. `dev` watches
-the folder, but picks the folders to watch when it starts: restart it after adding a local library. A local library
-keeps its entry in `moonwell.lock`, so switching back to the tag still checks it. Library code is not checked for
-unknown globals, but the globals a required library module defines count as known. `check`, `build`, `test` and `dev`
-write every library module to `.moonwell/lua/` as Lua (a YueScript module compiled), where the editor finds it; `setup`,
-which does not compile, writes the Lua modules and leaves the YueScript ones as the last compile wrote them.
+- `dir` is the folder module names start from. A library without the file needs it in the manifest instead
+  (`["old"] { github = "owner/repo"; tag = "v1.0.0"; dir = "src" }`), and a `dir` in the manifest always wins. With
+  neither, module names start at the library's root.
+- `assets` is a folder of files the map imports, each at its path in that folder: see [Assets](#assets).
+
+Both are optional. Any other key fails, naming the library: it may be written for a newer Moonwell.
+
+`check`, `build`, `test`, `dev` and `setup` download a library that is missing or whose `github`, `tag` or `dir` changed
+into `.moonwell/libraries/<key>/`, and its files for the map into `.moonwell/library-assets/<key>/` (both git-ignored),
+and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`: a fresh clone then gets the same code, and if a
+tag is moved on GitHub, the command fails instead of using the new code. To upgrade, change `tag`.
+
+To work on a library next to your map, point it at a local folder, the library's root, in `moonwell.local.pkl`:
+
+```pkl
+libraries { ["example"] { path = "../moonwell-example-lib" } }
+```
+
+`path` wins over `github`. Its `.yue` and `.lua` files, and the files of its assets folder, are copied into `.moonwell/`
+(folders whose name starts with `.`, such as `.git/`, are skipped), so errors in them name the copy there, not your
+checkout. `dev` watches those folders, but picks the folders to watch when it starts: restart it after adding a local
+library. A local library keeps its entry in `moonwell.lock`, so switching back to the tag still checks it. Library code
+is not checked for unknown globals, but the globals a required library module defines count as known. `check`, `build`,
+`test` and `dev` write every library module to `.moonwell/lua/` as Lua (a YueScript module compiled), where the editor
+finds it; `setup`, which does not compile, writes the Lua modules and leaves the YueScript ones as the last compile
+wrote them.
 
 ## Assets
 
@@ -231,6 +245,17 @@ assets {
   exclude = List("credits/")
 }
 ```
+
+The files a library ships (the `assets` folder of its `moonwell-library.json`, see [Libraries](#libraries)) are imported
+too, each at its path in that folder; `paths` and `exclude` apply to your own files only. When one of your files and a
+library's have the same in-map path, yours is imported and the command says so:
+`assets/Textures/Golem.blp replaces library golems's Textures/Golem.blp`. That is how you swap a library's icon or
+model. Two libraries with a file at the same path fail the build. `assets:check` lists a library's files as
+`library <key>: <file>`, `assets:sync` writes them into the source map with your own, and `assets:paths` counts them as
+imported and checks a library's models too.
+
+If you write a library, keep its files under a folder of its own, such as `assets/war3mapImported/<library>/`, so they
+clash with no map's and no other library's.
 
 Builds import assets into the staged copy only. To see them in World Editor, close the map there and run
 `deno task assets:sync`. It writes the files and `war3map.imp` into `maps/<folder>`, and records what it owns in
