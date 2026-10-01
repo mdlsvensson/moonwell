@@ -253,6 +253,25 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
     Warcraft sends DAMAGED for a hit set to 0; magic damage on a spell-immune unit fires DAMAGING but no DAMAGED; Storm
     Bolt causes two hits (0, then 100, not reduced by armor); a real attack reads `isAttack` true.
   - LuaLS's `--check` mangles a project path that contains `--`, such as Claude's scratchpad folder.
+- **moonwell-systems v0.4.0, release 4 of the port, released** (2026-10-01, GitHub pre-release `v0.4.0` on `cfa21b6`;
+  tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-systems-release-4-design.md`, plan
+  `docs/superpowers/plans/2026-10-01-moonwell-systems-release-4.md`).
+  - `systems.geometry` (vector functions on plain numbers), `systems.terrain` (ground height, walkability, `isClear` and
+    the world bounds), `systems.missile` (swept collision, heights above the ground, a filter per missile, piercing,
+    range, gravity, steering, `followGround`, an effect that faces its travel) and `systems.knockback` (one per unit, by
+    angle, distance and duration, with pathing policies).
+  - A probe before the design (`../wrappers-gate/PROBE-PHYSICS-RESULTS.md`) measured on 3.0.0.24268: `IsTerrainPathable`
+    sees only terrain, and placing an item sees trees and buildings; `SetUnitX` keeps a unit's order and
+    `SetUnitPosition` clears it; a unit's absolute height is `GetLocationZ` plus `GetUnitFlyHeight`; an effect's yaw 0
+    points east and a positive pitch points its nose down.
+  - The first gate read 3.603 ms per step for 100 missiles among 20 footmen, over the 3 ms budget. A second probe
+    (`../wrappers-gate/PROBE-MISSILE-PERF-RESULTS.md`) measured: `GroupEnumUnitsInRange` tests unit origins and clears
+    its group first; `IsUnitInRangeXY` is true up to its range plus the unit's collision size; a native costs 0.3 to 0.5
+    µs. The missile step now asks `IsUnitInRangeXY` first, and the gate read 1.597 ms. 100 knockbacks under the default
+    `"obstacles"` pathing read 2.528 ms (`"terrain"` costs about a seventh of that).
+  - The gate has two runs, `deno task gate systems-physics` and `deno task gate systems-knockback`. Both passed. The
+    knockbacks got their own run, one footman at a time with each push announced first, because the maintainer could not
+    follow five pushes at once; and a turn in a gate step must be large enough to see.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -268,10 +287,11 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
    (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). 2.2 is released as wrappers v0.6.0
    and 2.3 as wrappers v0.7.0, so phase 2 is complete. Phase 3 is under way: moonwell-systems v0.1.0 (release 1:
-   scheduler, signal, scope, time), v0.2.0 (release 2: buffs, aura, dummy) and v0.3.0 (release 3: damage) are released.
-   Next is the spec for release 4 (`systems.geometry`, `systems.terrain`, `systems.missile` and `systems.knockback`: the
-   hot loops, with a performance probe), building on Part 1 of
-   `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`.
+   scheduler, signal, scope, time), v0.2.0 (release 2: buffs, aura, dummy), v0.3.0 (release 3: damage) and v0.4.0
+   (release 4: geometry, terrain, missile, knockback) are released. Next is the spec for release 5, the last
+   (persistence: codec, save file and sync), building on Part 1 of
+   `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`. It starts with a probe of the Preload carrier:
+   `wc3-lib`'s local store is broken in game for codes over one chunk (port-needs note §6.5).
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -400,7 +420,7 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   Moved here 2026-09-28; it depends on 4b's library sync. The 1.4 probe found `wc3-lib`'s Preload local store broken in
   game for codes over one chunk (lines cut at 259 characters, which can crash the game on load; appending inside the
   file has no effect): port-needs note §6.5. Under way as `mdlsvensson/moonwell-systems` (annotated Lua, not YueScript,
-  by the maintainer's choice); v0.1.0 to v0.3.0 are released.
+  by the maintainer's choice); v0.1.0 to v0.4.0 are released.
 - **Replace Deno in Moonwell's toolchain.** The maintainer's plan (2026-09-30): the project has nothing to do with
   TypeScript, so Deno should go eventually, from the CLI and from the wrappers' tools. moonwell-systems already needs
   none (its tools are Lua run with `yue -e`). Needs a design: what replaces the CLI's runtime, JSR publishing and the
