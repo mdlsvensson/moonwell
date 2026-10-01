@@ -131,7 +131,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - The example library has a `v0.2.0` tag (commit `0b69cfa`) with such a file and one asset; the network test downloads
     both tags. Its tags must never be moved.
   - Gate steps 1 and 2 passed; 3 to 12 were not re-run. No in-game run, by the maintainer's choice.
-- **0.7.0, the custom map preview** (2026-10-01; spec
+- **Released 0.7.0, the custom map preview** (2026-10-01, JSR `@moonwell/cli@0.7.0` and GitHub release
+  `moonwell@0.7.0` on `4ffe9c4`, checked with `init` and `build` from JSR; spec
   `docs/superpowers/specs/2026-10-01-moonwell-map-preview-design.md`, plan
   `docs/superpowers/plans/2026-10-01-moonwell-map-preview.md`). Roadmap phase 4, item 3.
   - `settings.info.preview` names a `.tga` or `.blp` of 256×256 or 512×512 pixels, at a path from the project folder
