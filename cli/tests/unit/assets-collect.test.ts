@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects, assertThrows } from "@std/assert";
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from "@std/assert";
 import { dirname, join } from "@std/path";
 import { collectAssets, collectProjectAssets } from "../../src/assets/collect.ts";
 import { assetPath, pathKey, safeJoin, scanFiles, targetPath } from "../../src/assets/paths.ts";
@@ -42,6 +42,14 @@ Deno.test("targetPath rejects map internals but allows war3mapImported", () => {
     ]
   ) {
     assertThrows(() => targetPath(reserved), MoonwellError, "Reserved");
+  }
+  // The names tried for a map list picture point at the setting that does it; other internals do not.
+  const hint = (path: string) => assertThrows(() => targetPath(path), MoonwellError).hint!;
+  for (const picture of ["war3mapPreview.tga", "WAR3MAPPREVIEW.BLP", "war3mapMap.blp", "war3mapMap.tga"]) {
+    assertStringIncludes(hint(picture), "settings.info.preview");
+  }
+  for (const other of ["war3map.lua", "war3mapMisc.txt", "scripts/war3map.j", "war3mapPreviews/a.tga"]) {
+    assertEquals(hint(other), "Assets cannot replace map internals such as war3map.lua or war3map.imp.");
   }
   assertEquals(targetPath("war3mapImported/sound.wav"), "war3mapImported/sound.wav");
 });

@@ -152,7 +152,7 @@ export async function prepareStage(
   // Settings patch the staged copy only, before assets and bundle injection; errors name the source files to fix.
   // Every change is planned before any is written, so a refused setting leaves the staged map unpatched.
   const sourceLabel = `maps/${project.map.folder}`;
-  const settings = await planMapSettings(mapDir, project.settings, project.manifest, sourceLabel);
+  const settings = await planMapSettings(mapDir, project.settings, project.manifest, sourceLabel, ctx.root);
   await applySettingsPlan(settings);
   if (settings.length > 0) ctx.logger.info(`Applied map settings to ${settings.length} internal file(s).`);
 

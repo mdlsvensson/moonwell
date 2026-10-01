@@ -10,8 +10,11 @@ import { planMapSettings, type SettingsChange, settingsMapDir } from "../setting
 export async function settingsCheck(ctx: CommandContext): Promise<SettingsChange[]> {
   const project = await loadProject(ctx.root, ctx.run);
   const mapDir = await settingsMapDir(ctx.root, project.map.folder, project.manifest);
-  const changes = await planMapSettings(mapDir, project.settings, project.manifest, `maps/${project.map.folder}`);
-  for (const change of changes) ctx.logger.info(`  ${basename(change.file)}`);
+  const label = `maps/${project.map.folder}`;
+  const changes = await planMapSettings(mapDir, project.settings, project.manifest, label, ctx.root);
+  for (const change of changes) {
+    ctx.logger.info(`  ${basename(change.file)}${change.bytes === null ? " (removed)" : ""}`);
+  }
   ctx.logger.info(`Map settings valid: ${changes.length} internal file(s) would change during build.`);
   return changes;
 }

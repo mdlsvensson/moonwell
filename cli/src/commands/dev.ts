@@ -1,5 +1,5 @@
 import { exists } from "@std/fs";
-import { basename, join, relative, resolve } from "@std/path";
+import { basename, dirname, join, relative, resolve } from "@std/path";
 import type { CommandContext } from "../context.ts";
 import { LIBRARY_FILE, type LibraryFile, parseLibraryFile } from "../libraries/manifest.ts";
 import { loadProject, type Project } from "../project/project.ts";
@@ -63,9 +63,9 @@ async function localLibraries(
 }
 
 /**
- * Re-runs `check` whenever sources, objects, manifests or local libraries change, until `signal` aborts. Each cycle
- * first refreshes src/generated/objects.yue; dev ignores src/generated/, so that write does not trigger another cycle.
- * .moonwell/ is never watched: each cycle's library sync writes there.
+ * Re-runs `check` whenever sources, objects, manifests, local libraries or the preview picture change, until `signal`
+ * aborts. Each cycle first refreshes src/generated/objects.yue; dev ignores src/generated/, so that write does not
+ * trigger another cycle. .moonwell/ is never watched: each cycle's library sync writes there.
  */
 export async function dev(
   ctx: CommandContext,
@@ -121,6 +121,19 @@ export async function dev(
       watcher: Deno.watchFs(base, { recursive: false }),
       relevant: (path) => basename(path) === LIBRARY_FILE,
     });
+  }
+  // The preview picture is one file anywhere in the project: its folder is watched for that file alone. Like the
+  // library folders, it is the one the manifest named when dev started.
+  const preview = project?.settings.preview;
+  if (preview !== undefined) {
+    const file = resolve(ctx.root, preview);
+    if (await exists(dirname(file), { isDirectory: true })) {
+      watchers.push({
+        watcher: Deno.watchFs(dirname(file), { recursive: false }),
+        relevant: (path) => relative(file, path) === "",
+      });
+      watched.push(toPosix(preview));
+    }
   }
   const closeWatchers = () => {
     for (const { watcher } of watchers) {

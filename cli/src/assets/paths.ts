@@ -32,7 +32,10 @@ export function targetPath(value: string): string {
     !/^war3mapImported\//i.test(normalized);
   if (internal || /^scripts\/war3map\./i.test(normalized)) {
     throw new MoonwellError(`Reserved map path: ${value}`, {
-      hint: "Assets cannot replace map internals such as war3map.lua or war3map.imp.",
+      // The two names a map list picture is usually tried under: one Reforged ignores, one builds write themselves.
+      hint: /^war3map(?:Preview|Map)\./i.test(normalized)
+        ? "For a picture of your own in the game's map list, set settings.info.preview in moonwell.pkl."
+        : "Assets cannot replace map internals such as war3map.lua or war3map.imp.",
     });
   }
   return normalized;

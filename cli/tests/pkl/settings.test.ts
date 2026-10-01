@@ -10,6 +10,7 @@ import { MoonwellError } from "../../src/shared/errors.ts";
 import { runProcess } from "../../src/shared/process.ts";
 import { hasSettings, validateMapSettings } from "../../src/settings/options.ts";
 import { silentLogger } from "../support/logger.ts";
+import { blp, pixels, tga } from "../support/pictures.ts";
 
 /** Scaffolds an `init --link` project in a temporary folder, runs `body`, and removes the folder. */
 async function withProject(body: (root: string) => Promise<void>): Promise<void> {
@@ -79,7 +80,15 @@ Deno.test("settings:check evaluates the manifest without staging or compiling", 
 Deno.test("the template's settings block is a no-op on the template map", async () => {
   await withProject(async (root) => {
     const manifest = await Deno.readTextFile(join(root, "moonwell.pkl"));
-    for (const field of ["recommendedPlayers = null", "background = null", "fixedStart = null", "density = null"]) {
+    for (
+      const field of [
+        "recommendedPlayers = null",
+        "preview = null",
+        "background = null",
+        "fixedStart = null",
+        "density = null",
+      ]
+    ) {
       assertStringIncludes(manifest, field);
     }
     assertEquals(manifest.includes("Listing"), false);
@@ -204,5 +213,49 @@ Deno.test("settings:check refuses a missing source map folder and names it", asy
     const error = await assertRejects(() => settingsCheck(pklOnlyContext(root).ctx), MoonwellError, "not found");
     // Named like build names it: map.folder in the evaluated manifest is what to fix.
     assertEquals(error.file, "moonwell.local.pkl");
+  });
+});
+
+Deno.test("settings:check lists the files of a preview picture, and the one it removes", async () => {
+  await withProject(async (root) => {
+    const before = await snapshot(join(root, "maps"));
+    await Deno.mkdir(join(root, "art"));
+    await Deno.writeFile(join(root, "art", "preview.tga"), tga(pixels(), { depth: 24 }));
+    await writeLocal(root, 'settings { info { preview = "art/preview.tga" } }');
+    assertEquals((await loadProject(root)).settings, { ...validateMapSettings({}), preview: "art/preview.tga" });
+    const { ctx, logger } = pklOnlyContext(root);
+    const changes = await settingsCheck(ctx);
+    assertEquals(changes[3].bytes, tga(pixels(), { alpha: 255 }));
+    assertEquals(logger.lines, [
+      "  war3map.lua",
+      "  war3mapMinimap.blp",
+      "  war3mapMap.blp (removed)",
+      "  war3mapMap.tga",
+      "Map settings valid: 4 internal file(s) would change during build.",
+    ]);
+
+    // A BLP replaces the minimap under its own name, beside another setting.
+    await Deno.writeFile(join(root, "preview.blp"), blp(512));
+    await writeLocal(root, 'settings { info { author = "Someone"; preview = "preview.blp" } }');
+    const second = pklOnlyContext(root);
+    await settingsCheck(second.ctx);
+    assertEquals(second.logger.lines.slice(0, -1), [
+      "  war3map.w3i",
+      "  war3map.lua",
+      "  war3mapMinimap.blp",
+      "  war3mapMap.blp",
+    ]);
+    assertEquals(await snapshot(join(root, "maps")), before);
+
+    // The setting and the picture are refused by name.
+    await writeLocal(root, 'settings { info { preview = "missing.tga" } }');
+    const missing = await assertRejects(() => settingsCheck(pklOnlyContext(root).ctx), MoonwellError);
+    assertStringIncludes(missing.message, "settings.info.preview names a file that does not exist: missing.tga");
+    assertEquals(missing.file, "moonwell.local.pkl");
+    await Deno.writeFile(join(root, "preview.blp"), tga(pixels()));
+    await writeLocal(root, 'settings { info { preview = "preview.blp" } }');
+    const wrong = await assertRejects(() => settingsCheck(pklOnlyContext(root).ctx), MoonwellError);
+    assertStringIncludes(wrong.message, "The preview picture is not a BLP file");
+    assertEquals(wrong.file, "preview.blp");
   });
 });

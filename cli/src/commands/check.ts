@@ -35,7 +35,13 @@ export async function check(
     // check still passes when the source map is missing, as it always has.
     if (hasSettings(project.settings)) {
       const settingsSource = await settingsMapDir(ctx.root, project.map.folder, project.manifest);
-      await planMapSettings(settingsSource, project.settings, project.manifest, `maps/${project.map.folder}`);
+      await planMapSettings(
+        settingsSource,
+        project.settings,
+        project.manifest,
+        `maps/${project.map.folder}`,
+        ctx.root,
+      );
     }
     const { mapDir, stateFile } = await assetLocations(ctx.root, project.map.folder);
     // After compileProject, which syncs the libraries: the files they ship are assets too.

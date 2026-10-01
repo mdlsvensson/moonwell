@@ -10,6 +10,7 @@ import { readMapInfo } from "../../src/w3i/map-info.ts";
 import { silentLogger } from "../support/logger.ts";
 import { SETTINGS_FIXTURE } from "../support/map-settings.ts";
 import { openMpq } from "../support/mpq-reader.ts";
+import { pixels, tga } from "../support/pictures.ts";
 
 const REPO = fromFileUrl(new URL("../../../", import.meta.url));
 const MAIN = join(REPO, "cli", "src", "main.ts");
@@ -256,8 +257,11 @@ Deno.test("test stages settings with the runtime, and a minified build keeps set
   assertEquals(await snapshot(sourceMap(project)), before);
 });
 
-Deno.test("dev reports a settings error when the manifest changes", async () => {
+Deno.test("dev reports a settings error when the manifest or the preview picture changes", async () => {
   const project = await newProject();
+  await Deno.mkdir(join(project, "art"));
+  await Deno.writeFile(join(project, "art", "preview.tga"), tga(pixels()));
+  await writeLocal(project, 'settings { info { preview = "art/preview.tga" } }\n');
   const child = new Deno.Command(Deno.execPath(), {
     args: ["run", "-A", MAIN, "dev"],
     cwd: project,
@@ -287,7 +291,10 @@ Deno.test("dev reports a settings error when the manifest changes", async () => 
     }
   };
   try {
-    await waitFor("Watching src/");
+    await waitFor(", art/preview.tga and the project manifests.");
+    // The picture is watched where the manifest named it: a file that is no longer a TGA is reported at once.
+    await Deno.writeFile(join(project, "art", "preview.tga"), new Uint8Array(40));
+    await waitFor("error: art/preview.tga › The preview picture is a TGA of image type 0, not a true-colour picture.");
     await writeLocal(project, 'settings { players { ["5"] { name = "Absent" } } }\n');
     await waitFor(
       'error: maps/map.w3x/war3map.w3i › settings.players["5"]: player 5 does not exist in the source map.',
@@ -297,4 +304,42 @@ Deno.test("dev reports a settings error when the manifest changes", async () => 
     await reader.cancel();
     await child.status;
   }
+});
+
+Deno.test("build puts a preview picture in the minimap's place and gives the game its minimap back", async () => {
+  const project = await newProject();
+  const minimap = await Deno.readFile(join(sourceMap(project), "war3mapMap.blp"));
+  await Deno.writeFile(join(project, "preview.tga"), tga(pixels(512), { rle: true, fromTop: true }));
+  await writeLocal(project, 'settings { info { name = "With a preview"; preview = "preview.tga" } }\n');
+  const before = await snapshot(sourceMap(project));
+
+  const built = await deno(["task", "build"], project);
+  assertEquals(built.code, 0, built.text);
+  assertStringIncludes(built.text, "Applied map settings to 5 internal file(s).");
+  const archive = openMpq(await Deno.readFile(archiveOf(project)));
+  assertEquals(await archive.read("war3mapMap.tga"), tga(pixels(512), { alpha: 255 }));
+  assertEquals(await archive.read("war3mapMinimap.blp"), minimap);
+  assertEquals(await archive.read("war3mapMap.blp"), undefined);
+  // The call is World Editor's last statement of main, which the bundle's wrapper runs before the on_main hooks.
+  const lua = decode(await archive.read("war3map.lua"));
+  const call = lua.indexOf('BlzChangeMinimapTerrainTex("war3mapMinimap.blp")');
+  assert(
+    call > lua.indexOf("RunInitializationTriggers()") && call < lua.indexOf('__mw.boot("main")'),
+    "call misplaced",
+  );
+  assertEquals(lua.slice(call).split(/\r?\n/)[1], "end");
+  assertStringIncludes(lua, 'SetMapName("With a preview")');
+  assertEquals(await snapshot(sourceMap(project)), before);
+
+  // check plans the same against the source map, and names a picture it cannot use.
+  await Deno.writeFile(join(project, "preview.tga"), tga(pixels()).slice(0, 5000));
+  const checked = await deno(["task", "check"], project);
+  assertEquals(checked.code, 1, checked.text);
+  assertStringIncludes(
+    checked.text,
+    "error: preview.tga › The preview picture is cut short: its pixel data ends early.",
+  );
+  const rebuilt = await deno(["task", "build"], project);
+  assertEquals(rebuilt.code, 1, rebuilt.text);
+  assertEquals(await exists(archiveOf(project)), false, "an archive was built with a refused picture");
 });
