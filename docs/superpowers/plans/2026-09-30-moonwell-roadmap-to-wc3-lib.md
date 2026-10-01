@@ -339,9 +339,12 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
 1. **Replace Deno in the toolchain.** The project has nothing to do with TypeScript: Deno goes from the CLI and from the
    wrappers' tools (moonwell-systems needs none already). The design decides what replaces the CLI's runtime, JSR
    publishing and the test suites. It comes first so that everything after it is built once, on the new toolchain.
-2. **Other gameplay languages, and the YueScript pin.**
-   - Teal first: its compiler is Lua, so it needs no Node.js, and its types map to the annotated Lua we already write.
-   - Then Fennel, TypeScript and C#; the last two need an answer to the "no Node.js" rule.
+   The report `docs/superpowers/research/2026-10-01-replacing-deno.md` gives the reasons and the paths; the design
+   starts when the maintainer says so.
+2. **Other gameplay languages, and the YueScript pin.** The maintainer targets Lua, Teal, Fennel and YueScript only
+   (2026-10-01): TypeScript and C# support are dropped.
+   - Teal first: its compiler is Lua, and its types map to the annotated Lua we already write.
+   - Then Fennel.
    - Pin YueScript 0.34.3, which fixes the `//` bug upstream (IppClub/YueScript#256), and check whether it fixes
      bitwise operators too.
 3. **`moonwell-library.json` with `{"dir": "src"}` in moonwell-wrappers and moonwell-systems,** so maps can leave `dir`
@@ -372,7 +375,8 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
 | Assets shipped by libraries                                   | 4.2 (done)           |
 | Custom map preview for Reforged                               | 4.3 (done)           |
 | Replace Deno in the toolchain                                 | 5.1                  |
-| Fennel, TypeScript, C# and Teal support                       | 5.2                  |
+| Teal and Fennel support                                       | 5.2                  |
+| TypeScript and C# support                                     | Dropped 2026-10-01   |
 | Pin YueScript 0.34.3                                          | 5.2                  |
 | `moonwell-library.json` in the wrappers and systems libraries | 5.3                  |
 | PNG as a preview format                                       | 5.5                  |

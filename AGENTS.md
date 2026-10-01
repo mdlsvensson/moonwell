@@ -464,7 +464,9 @@ to v0.5.0). The State section above records each.
 - **Replace Deno in Moonwell's toolchain.** The maintainer's plan (2026-09-30): the project has nothing to do with
   TypeScript, so Deno should go eventually, from the CLI and from the wrappers' tools. moonwell-systems already needs
   none (its tools are Lua run with `yue -e`). Needs a design: what replaces the CLI's runtime, JSR publishing and the
-  test suites.
+  test suites. The report `docs/superpowers/research/2026-10-01-replacing-deno.md` gives the reasons, what Deno does for
+  the project today, and the paths to choose from; the maintainer asked for the report only and will say when the design
+  starts.
 
 2. **Other gameplay languages, and the YueScript pin**
 
@@ -474,11 +476,7 @@ to v0.5.0). The State section above records each.
 - **Fennel support.** The maintainer chose YueScript (2026-09-27) for its familiar syntax and VS Code support, with
   Fennel as a later option: a fennel-ls docset rendered from `cli/data/natives.json` (sub-project 3), plus a Fennel
   compile step next to the YueScript one.
-- **TypeScript support.** Gameplay in TypeScript, compiled to Lua (as TypeScriptToLua does in wc3-dev-framework), next
-  to YueScript. Added 2026-09-28; it builds on sub-project 4a's Lua modules. TypeScriptToLua is an npm package, so the
-  "No Node.js" rule shapes the design.
-- **C# support.** Gameplay in C#, compiled to Lua (for example with CSharp.lua). Added 2026-09-28; it builds on
-  sub-project 4a's Lua modules.
+- TypeScript and C# support were dropped on 2026-10-01: the maintainer targets Lua, Teal, Fennel and YueScript only.
 - **Pin YueScript 0.34.3.** It fixes the `//` bug upstream (IppClub/YueScript#256); check whether it also fixes bitwise
   operators, for which 0.34.2 writes an empty file too. Once it is pinned, the floor-division test in
   `cli/tests/yue/compile.test.ts` fails and should become a test that such a file compiles, and the README's and this
