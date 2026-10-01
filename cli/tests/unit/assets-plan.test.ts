@@ -253,6 +253,7 @@ Deno.test("an incomplete rollback names the failure and every file it could not 
       { file: join(map, "gone.blp"), before: encode("missing"), after: encode("new") },
     ],
     state: { version: 1 as const, files: {} },
+    replaced: [],
   };
   const error = await assertRejects(() => applyAssetPlan(plan), MoonwellError);
   assert(error.message.includes("changed after the assets were checked"), error.message);
@@ -272,7 +273,7 @@ Deno.test("with no assets and nothing owned, a build never reads war3map.imp", a
   const { root, map, state } = await fixture();
   await Deno.writeFile(join(map, "war3map.imp"), new Uint8Array([9, 9]));
   const plan = await planAssets(root, map, state, defaults);
-  assertEquals(plan, { assets: [], changes: [], state: { version: 1, files: {} } });
+  assertEquals(plan, { assets: [], replaced: [], changes: [], state: { version: 1, files: {} } });
 });
 
 Deno.test("a failed sync restores the files it overwrote byte for byte", async () => {
@@ -295,4 +296,51 @@ Deno.test("a failed sync restores the files it overwrote byte for byte", async (
   assertEquals(await Deno.readFile(join(map, "a.blp")), assetBefore);
   assertEquals(await Deno.readFile(join(map, "war3map.imp")), impBefore);
   assertEquals(await Deno.readFile(state), stateBefore);
+});
+
+Deno.test("the files libraries ship are planned like the map's own, and owned by a sync", async () => {
+  const { root, map, state } = await fixture();
+  await put(root, "assets/Models/Own.mdx", "own");
+  await put(root, "assets/icons/shared.blp", "the map's");
+  await put(root, ".moonwell/library-assets/ui/war3mapImported/ui/frames.toc", "toc");
+  await put(root, ".moonwell/library-assets/ui/icons/shared.blp", "the library's");
+  await put(root, ".moonwell/library-assets/unlisted/never.txt", "not in the manifest");
+
+  const plan = await planAssets(root, map, state, defaults, undefined, ["ui"]);
+  assertEquals(plan.assets.map((asset) => [asset.library, asset.source, asset.target]), [
+    [undefined, "icons/shared.blp", "icons/shared.blp"],
+    [undefined, "Models/Own.mdx", "Models/Own.mdx"],
+    ["ui", "war3mapImported/ui/frames.toc", "war3mapImported/ui/frames.toc"],
+  ]);
+  assertEquals(plan.replaced, ["assets/icons/shared.blp replaces library ui's icons/shared.blp"]);
+  await applyAssetPlan(plan, state);
+  assertEquals(await text(map, "war3mapImported/ui/frames.toc"), "toc");
+  assertEquals(await text(map, "icons/shared.blp"), "the map's");
+  assertEquals(
+    (await entries(map)).map((entry) => entry.path).sort(),
+    ["Models\\Own.mdx", "icons\\shared.blp", "war3mapImported\\ui\\frames.toc"],
+  );
+  assertEquals((await planAssets(root, map, state, defaults, undefined, ["ui"])).changes, []);
+
+  // Without the library, the next sync deletes the file it owned.
+  const without = await planAssets(root, map, state, defaults);
+  assertEquals(without.replaced, []);
+  await applyAssetPlan(without, state);
+  assertEquals(await exists(join(map, "war3mapImported", "ui", "frames.toc")), false);
+  assertEquals((await entries(map)).map((entry) => entry.path).sort(), ["Models\\Own.mdx", "icons\\shared.blp"]);
+});
+
+Deno.test("a library file that clashes with the map's own copy names the library", async () => {
+  const { root, map, state } = await fixture();
+  await put(root, ".moonwell/library-assets/ui/Models/Golem.mdx", "library");
+  await put(map, "Models/Golem.mdx", "editor");
+  const error = await assertRejects(
+    () => planAssets(root, map, state, defaults, undefined, ["ui"]),
+    MoonwellError,
+  );
+  assertEquals(
+    error.message,
+    "Asset Models/Golem.mdx of library ui conflicts with a file or import already in the map.",
+  );
+  assertEquals(error.hint, "Remove the map's own copy in World Editor's Import Manager.");
 });

@@ -1,7 +1,7 @@
 import { dirname, join } from "@std/path";
 import { MoonwellError } from "../shared/errors.ts";
 import { removeFileIfExists, sha256Hex } from "../shared/fs.ts";
-import { type Asset, type AssetsConfig, collectAssets } from "./collect.ts";
+import { type Asset, type AssetsConfig, collectProjectAssets } from "./collect.ts";
 import { importPath, readImports, writeImports } from "./imports.ts";
 import { assetPath, lstatOrUndefined, pathKey, safeJoin, scanFiles, targetPath } from "./paths.ts";
 
@@ -20,6 +20,8 @@ export interface FileChange {
 
 export interface AssetPlan {
   assets: Asset[];
+  /** A line for each library file that one of the map's own assets replaces. */
+  replaced: string[];
   changes: FileChange[];
   /** Ownership after applying the plan. */
   state: AssetState;
@@ -78,8 +80,8 @@ async function readState(file: string): Promise<AssetState> {
 const INTERRUPTED_BEFORE_WRITING = "Interrupted; nothing was written.";
 
 /**
- * Checks every asset, import and owned file, and returns the changes. Writes nothing. Stops with an error between files
- * once `signal` aborts (Ctrl+C).
+ * Checks every asset (the map's own and those of `libraries`, by key), import and owned file, and returns the changes.
+ * Writes nothing. Stops with an error between files once `signal` aborts (Ctrl+C).
  */
 export async function planAssets(
   root: string,
@@ -87,11 +89,12 @@ export async function planAssets(
   stateFile: string,
   config: AssetsConfig,
   signal?: AbortSignal,
+  libraries: readonly string[] = [],
 ): Promise<AssetPlan> {
   const stopIfInterrupted = () => {
     if (signal?.aborted) throw new MoonwellError(INTERRUPTED_BEFORE_WRITING);
   };
-  const assets = await collectAssets(root, config);
+  const { assets, replaced } = await collectProjectAssets(root, config, libraries);
   stopIfInterrupted();
   if (!(await lstatOrUndefined(mapDir))?.isDirectory) {
     throw new MoonwellError(`The map folder ${mapDir} does not exist.`, {
@@ -103,7 +106,9 @@ export async function planAssets(
     Object.entries((await readState(stateFile)).files).map(([name, digest]) => [pathKey(name), { name, digest }]),
   );
   // Nothing to import and nothing owned: leave the map (and its war3map.imp) completely alone.
-  if (assets.length === 0 && managed.size === 0) return { assets, changes: [], state: { version: 1, files: {} } };
+  if (assets.length === 0 && managed.size === 0) {
+    return { assets, replaced, changes: [], state: { version: 1, files: {} } };
+  }
   const files = await scanFiles(mapDir);
   const impFile = await safeJoin(mapDir, files.get("war3map.imp") ?? "war3map.imp");
   const impBytes = await readIfExists(impFile);
@@ -142,8 +147,11 @@ export async function planAssets(
     stopIfInterrupted();
     const key = pathKey(asset.target);
     if (!managed.has(key) && (files.has(key) || importKeys.has(key))) {
-      throw new MoonwellError(`Asset ${asset.target} conflicts with a file or import already in the map.`, {
-        hint: "Import it under another path with assets.paths, or remove the map's own copy.",
+      const owner = asset.library === undefined ? "" : ` of library ${asset.library}`;
+      throw new MoonwellError(`Asset ${asset.target}${owner} conflicts with a file or import already in the map.`, {
+        hint: asset.library === undefined
+          ? "Import it under another path with assets.paths, or remove the map's own copy."
+          : "Remove the map's own copy in World Editor's Import Manager.",
       });
     }
     // Reuse the spelling of existing folders, and of folders planned earlier, so letter case stays consistent.
@@ -204,6 +212,7 @@ export async function planAssets(
   }
   return {
     assets,
+    replaced,
     changes,
     state: { version: 1, files: Object.fromEntries(assets.map((asset) => [asset.target, asset.hash])) },
   };

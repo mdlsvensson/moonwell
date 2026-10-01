@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import { dirname, join } from "@std/path";
-import { collectAssets } from "../../src/assets/collect.ts";
+import { collectAssets, collectProjectAssets } from "../../src/assets/collect.ts";
 import { assetPath, pathKey, safeJoin, scanFiles, targetPath } from "../../src/assets/paths.ts";
 import { MoonwellError } from "../../src/shared/errors.ts";
 
@@ -125,4 +125,73 @@ Deno.test("safeJoin accepts a root that is itself a link but rejects a link belo
 
   await Deno.symlink(join(parent, "assets"), join(real, "inner"), { type });
   await assertRejects(() => safeJoin(linkedRoot, "inner/x.blp"), MoonwellError, "Symlinks");
+});
+
+Deno.test("library assets follow the map's own, by key, and import at their path in the library", async () => {
+  const root = await projectRoot();
+  await put(root, "assets/Models/Own.mdx", "own");
+  await put(root, ".moonwell/library-assets/zeta/Sounds/Horn.wav", "horn");
+  await put(root, ".moonwell/library-assets/alpha/war3mapImported/alpha/frames.toc", "toc");
+  await put(root, ".moonwell/library-assets/alpha/.hidden/x.txt", "hidden");
+  await put(root, ".moonwell/library-assets/other/never.txt", "not in the manifest");
+  const { assets, replaced } = await collectProjectAssets(root, defaults, ["zeta", "alpha", "none"]);
+  assertEquals(assets.map((asset) => [asset.library, asset.source, asset.target]), [
+    [undefined, "Models/Own.mdx", "Models/Own.mdx"],
+    ["zeta", "Sounds/Horn.wav", "Sounds/Horn.wav"],
+    ["alpha", "war3mapImported/alpha/frames.toc", "war3mapImported/alpha/frames.toc"],
+  ]);
+  assertEquals(new TextDecoder().decode(assets[1].bytes), "horn");
+  assertEquals(replaced, []);
+  assertEquals(await collectProjectAssets(root, defaults, []), { assets: [assets[0]], replaced: [] });
+});
+
+Deno.test("the map's own asset replaces a library's at the same in-map path, in any letter case", async () => {
+  const root = await projectRoot();
+  await put(root, "assets/custom/golem.blp", "the map's");
+  await put(root, "assets/Models/own.mdx", "the map's model");
+  await put(root, ".moonwell/library-assets/lib/Textures/Golem.blp", "the library's");
+  await put(root, ".moonwell/library-assets/lib/models/Own.mdx", "the library's model");
+  await put(root, ".moonwell/library-assets/lib/Textures/Other.blp", "kept");
+  const config = { paths: { "custom/golem.blp": "textures/golem.blp" }, exclude: [] };
+  const { assets, replaced } = await collectProjectAssets(root, config, ["lib"]);
+  assertEquals(assets.map((asset) => [asset.library, asset.target]), [
+    [undefined, "Models/own.mdx"],
+    [undefined, "textures/golem.blp"],
+    ["lib", "Textures/Other.blp"],
+  ]);
+  assertEquals(replaced, [
+    "assets/custom/golem.blp replaces library lib's Textures/Golem.blp",
+    "assets/Models/own.mdx replaces library lib's models/Own.mdx",
+  ]);
+});
+
+Deno.test("two libraries at one in-map path fail, unless the map's own file replaces both", async () => {
+  const root = await projectRoot();
+  await put(root, ".moonwell/library-assets/a/UI/Frame.fdf", "a");
+  await put(root, ".moonwell/library-assets/b/ui/frame.fdf", "b");
+  const error = await assertRejects(() => collectProjectAssets(root, defaults, ["b", "a"]), MoonwellError);
+  assertEquals(error.message, "Libraries a and b both import ui\\frame.fdf.");
+  assertEquals(error.file, "moonwell.pkl");
+  assertEquals(
+    error.hint,
+    "Drop one of the libraries, or put your own file at that path under assets/ to replace both.",
+  );
+  await put(root, "assets/UI/Frame.fdf", "the map's");
+  const { assets, replaced } = await collectProjectAssets(root, defaults, ["b", "a"]);
+  assertEquals(assets.map((asset) => asset.library), [undefined]);
+  assertEquals(replaced.length, 2);
+});
+
+Deno.test("a library file with a reserved path, or inside another asset file, is refused", async () => {
+  const reserved = await projectRoot();
+  await put(reserved, ".moonwell/library-assets/bad/war3map.lua", "script");
+  const error = await assertRejects(() => collectProjectAssets(reserved, defaults, ["bad"]), MoonwellError);
+  assertEquals(error.message, "Library bad: Reserved map path: war3map.lua");
+  assertEquals(error.file, ".moonwell/library-assets/bad");
+  assertEquals(error.hint, "Report it to the library's author, or use another version of the library.");
+
+  const nested = await projectRoot();
+  await put(nested, "assets/data", "a file");
+  await put(nested, ".moonwell/library-assets/lib/data/inner.txt", "inside it");
+  await assertRejects(() => collectProjectAssets(nested, defaults, ["lib"]), MoonwellError, "file/folder collision");
 });
