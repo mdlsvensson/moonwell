@@ -241,6 +241,18 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - User callbacks are typed `fun(...): ...`: YueScript returns a callback's last expression, and LuaLS flagged that
     against `fun()` parameters (the gate example found it).
   - The in-game gate (`deno task gate systems`, now both releases, about 18 s) passed.
+- **moonwell-systems v0.3.0, release 3 of the port, released** (2026-10-01, GitHub pre-release `v0.3.0` on `d67d3fc`;
+  tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-systems-release-3-design.md`, plan
+  `docs/superpowers/plans/2026-10-01-moonwell-systems-release-3.md`).
+  - `systems.damage`: `beforeArmor`, `afterArmor` and `observe` listeners on `wrappers.damage`; a Hit changes through
+    setter methods that raise at the listener's line, and only the hit being handled may change; `deal` queues script
+    damage so it never nests and carries `metadata`; `sourceOf` credits a hit to another Unit (`dummies\sourceOf`).
+  - Only failures are reported: a missing or unpaired DAMAGED event and a rejected native call are silent.
+  - The plan's code was run in a scratch copy before it was written down, and the plan was assembled from those files.
+  - The in-game gate has its own run (`deno task gate systems-damage`, about 10 s) and passed. Measured on 3.0.0.24268:
+    Warcraft sends DAMAGED for a hit set to 0; magic damage on a spell-immune unit fires DAMAGING but no DAMAGED; Storm
+    Bolt causes two hits (0, then 100, not reduced by armor); a real attack reads `isAttack` true.
+  - LuaLS's `--check` mangles a project path that contains `--`, such as Claude's scratchpad folder.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -256,9 +268,10 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
    (`docs/superpowers/research/2026-09-30-wrappers-review.md`; every finding chosen). 2.2 is released as wrappers v0.6.0
    and 2.3 as wrappers v0.7.0, so phase 2 is complete. Phase 3 is under way: moonwell-systems v0.1.0 (release 1:
-   scheduler, signal, scope, time) and v0.2.0 (release 2: buffs, aura, dummy) are released. Next is the spec for release
-   3 (`systems.damage`, the pipeline on `wrappers.damage`, using `Dummies:sourceOf` for attribution), building on Part 1
-   of `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`.
+   scheduler, signal, scope, time), v0.2.0 (release 2: buffs, aura, dummy) and v0.3.0 (release 3: damage) are released.
+   Next is the spec for release 4 (`systems.geometry`, `systems.terrain`, `systems.missile` and `systems.knockback`: the
+   hot loops, with a performance probe), building on Part 1 of
+   `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -387,7 +400,7 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   Moved here 2026-09-28; it depends on 4b's library sync. The 1.4 probe found `wc3-lib`'s Preload local store broken in
   game for codes over one chunk (lines cut at 259 characters, which can crash the game on load; appending inside the
   file has no effect): port-needs note §6.5. Under way as `mdlsvensson/moonwell-systems` (annotated Lua, not YueScript,
-  by the maintainer's choice); v0.1.0 is released.
+  by the maintainer's choice); v0.1.0 to v0.3.0 are released.
 - **Replace Deno in Moonwell's toolchain.** The maintainer's plan (2026-09-30): the project has nothing to do with
   TypeScript, so Deno should go eventually, from the CLI and from the wrappers' tools. moonwell-systems already needs
   none (its tools are Lua run with `yue -e`). Needs a design: what replaces the CLI's runtime, JSR publishing and the

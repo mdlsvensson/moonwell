@@ -296,7 +296,8 @@ Each release gets its own plan and gate:
 `mdlsvensson/moonwell-systems`, annotated Lua on the wrappers, with Lua-only tooling. **Release 1 released
 2026-09-30:** moonwell-systems `v0.1.0` on `1725436` (plan `2026-09-30-moonwell-systems-release-1`); gate and tag
 consumption passed. **Release 2 released 2026-10-01:** `v0.2.0` on `afabc3d` (spec and plan
-`2026-09-30-moonwell-systems-release-2`); gate and tag consumption passed.
+`2026-09-30-moonwell-systems-release-2`); gate and tag consumption passed. **Release 3 released 2026-10-01:** `v0.3.0`
+on `d67d3fc` (spec and plan `2026-10-01-moonwell-systems-release-3`); gate and tag consumption passed.
 
 ## Phase 4: after the port (the rest of the backlog, in suggested order)
 

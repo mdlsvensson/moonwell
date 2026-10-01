@@ -145,7 +145,8 @@ Hits with no source run the pipeline too (`source` and `dealer` nil), so shields
 
 - A DAMAGED event takes the newest pending frame with the same dealer, target and `isAttack`. Native hits nest, so the
   newest match is the right one.
-- Warcraft does not always send DAMAGED (`wc3-lib` notes a hit fully blocked by spell immunity; the gate records it).
+- Warcraft does not always send DAMAGED. Measured by the v0.3.0 gate on 3.0.0.24268: magic damage on a spell-immune
+  unit fires DAMAGING and no DAMAGED, while a hit set to 0 in DAMAGING still gets its DAMAGED event.
   A zero-second one-shot Timer, started by the first damage event after it last fired, drops every frame still
   pending and then runs queued deals. A dropped hit gets no `afterArmor` or observer call.
 - A request's own frame that is still pending when its `damageTarget` call returns is dropped at once, so its metadata
