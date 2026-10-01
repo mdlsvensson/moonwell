@@ -246,6 +246,10 @@ assets {
 }
 ```
 
+An asset cannot take the name of one of the map's own files, such as `war3map.lua`. That includes `war3mapPreview.tga`,
+which Reforged ignores, and `war3mapMap.blp`: for a picture of your own in the game's map list, see
+[A picture in the map list](#a-picture-in-the-map-list).
+
 The files a library ships (the `assets` folder of its `moonwell-library.json`, see [Libraries](#libraries)) are imported
 too, each at its path in that folder; `paths` and `exclude` apply to your own files only. When one of your files and a
 library's have the same in-map path, yours is imported and the command says so:
@@ -322,6 +326,39 @@ settings {
   script does not look like World Editor's, for example after hand edits to those functions. Re-saving the map in World
   Editor restores them. Your gameplay code is not affected.
 
+### A picture in the map list
+
+`settings.info.preview` names a picture that the game's map list shows for the map, instead of its minimap:
+
+```pkl
+settings {
+  info { preview = "preview.tga" }
+}
+```
+
+- **The file.** A `.tga` or a `.blp` of 256×256 or 512×512 pixels, at a path from the project folder. Keep it beside
+  `moonwell.pkl`, not under `assets/`. Every image editor exports TGA: 24 or 32 bits, with or without RLE compression.
+  Moonwell writes it into the map again in the one layout the game is known to read, fully opaque. A BLP must be a
+  Warcraft III BLP (BLP1) and is used as it is.
+- **Strict on purpose.** A picture the game cannot read closes the game the moment the map is selected in the list, for
+  everyone who has the map. So a file of another size, format or extension fails the build and `check`.
+- **What a build does.** Reforged's map list shows the map's minimap file, `war3mapMap.blp`, and ignores the
+  `war3mapPreview.tga` of older versions. A build puts your picture in the minimap's place, keeps World Editor's minimap
+  in the map as `war3mapMinimap.blp`, and adds one call at the end of `main()` in `war3map.lua`,
+  `BlzChangeMinimapTerrainTex("war3mapMinimap.blp")`, so the game itself shows the normal minimap. As with every
+  setting, only the staged copy changes.
+- **Start locations.** The game draws its start location markers over the picture, placed for a 256×256 one. On a
+  512×512 picture they sit smaller and toward the top left.
+- **A minimap of your own.** Gameplay code that calls `BlzChangeMinimapTerrainTex` in an `on_main` hook, or later, runs
+  after the build's call and wins. A World Editor trigger that sets the minimap at map initialization runs before it and
+  is overridden: set the minimap from gameplay code instead.
+- **The source map** must have its `war3mapMap.blp`, which World Editor writes at every save, and no file named
+  `war3mapMinimap.blp` or `war3mapMap.tga`.
+
+This was measured on Warcraft III Reforged 3.0.0.24268, in the single-player map list.
+
+### Checking settings
+
 `deno task settings:check` checks the settings against the source map without building and lists the internal files a
 build would change:
 
@@ -331,6 +368,8 @@ build would change:
   war3mapMisc.txt
 Map settings valid: 3 internal file(s) would change during build.
 ```
+
+A file a build removes is listed as `war3mapMap.blp (removed)`; that happens for a TGA picture.
 
 `deno task check` (and so `dev`) checks settings the same way; with no settings set it does not need the source map.
 Mistakes in the manifest name the manifest that was evaluated (`moonwell.local.pkl` when it exists, else

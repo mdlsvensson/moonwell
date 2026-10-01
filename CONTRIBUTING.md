@@ -170,7 +170,13 @@ from the game's CASC storage with CascView, keeping those relative paths, then r
     library next to the project, point `moonwell.local.pkl` at it
     (`libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }`), change `hello` in its
     `src/example/greet.lua`, and confirm `deno task test` runs the change and `moonwell.lock` is unchanged.
-13. Record the Warcraft III and World Editor versions in the changelog.
+13. Map preview, in another throwaway project from `init --link`: put a 256×256 `.tga` beside `moonwell.pkl` and set
+    `settings.info.preview` to its name. Confirm `deno task settings:check` lists `war3map.lua`, `war3mapMinimap.blp`,
+    `war3mapMap.blp (removed)` and `war3mapMap.tga`. Run `deno task build` and copy `dist/bin/map.w3x` into the game's
+    `Maps` folder. Open the single-player custom game screen and select the map: the list must show the picture, not the
+    minimap. Start the game: the minimap must show the terrain, not the picture. A picture the game cannot read closes
+    the game when the map is selected, so a crash there is this step failing.
+14. Record the Warcraft III and World Editor versions in the changelog.
 
 ## Publishing
 

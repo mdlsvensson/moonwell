@@ -1,7 +1,7 @@
 # Moonwell Custom Map Preview (Moonwell 0.7.0) — Design
 
 - **Date:** 2026-10-01
-- **Status:** The design was approved in chat on 2026-10-01; this written spec awaits review.
+- **Status:** Approved by the maintainer on 2026-10-01.
 - **Builds on:** `2026-09-25-moonwell-map-settings-design.md` (settings patch the staged map only; the planner returns
   the new bytes of internal files). Everything in it still applies unless this spec changes it explicitly.
 - **Roadmap:** phase 4, item 3, and the backlog entry "Custom map preview for Reforged".
@@ -190,8 +190,24 @@ One plan, `docs/superpowers/plans/2026-10-01-moonwell-map-preview.md`, of test-f
 6. Docs and the gate step.
 7. Release 0.7.0.
 
-## 12. Out of scope
+## 12. Departures found while planning
 
+The plan's code was built and run in a scratch clone first (2026-10-01). It found:
+
+- **`readPreviewPicture(bytes, file)`** takes the extension from the file's name instead of a parameter of its own.
+- **`preview` is kept beside `info`** in the validated settings (`MapSettings.preview`), not inside it: every other
+  `info` field is stored in `war3map.w3i`, and the map-info code walks them all.
+- **The call's line has the indentation of `main`'s `end`**, not of its body. World Editor indents neither.
+- **`dev`'s "Watching" line names the picture.**
+- **A World Editor trigger that sets the minimap at map initialization is overridden:** it runs inside `main`, before
+  the build's call. The README says to set the minimap from gameplay code instead. An earlier point for the call is not
+  known to work: before World Editor's main body it does nothing (§2).
+- **The settings tests with a manifest** run in-process with real Pkl (`cli/tests/pkl/settings.test.ts`), beside one
+  end-to-end build and the `dev` test.
+
+## 13. Out of scope
+
+- **A minimap set by a World Editor trigger at map initialization** (§12).
 - **PNG and other formats** (the maintainer's choice, §1).
 - **Other sizes**, non-square pictures and resizing: only what was seen to work is accepted.
 - **Hiding the start location markers** on the picture: no way to do it is known.
