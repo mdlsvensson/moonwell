@@ -310,6 +310,11 @@ Every item needs a short design first, as the backlog says.
    - `WeatherEffect`;
    - spell effects from ability data (`Effect.flashSpell` via `AddSpellEffectById`);
    - the remaining Trigger registrations: player state, key, mouse, alliance change and game state.
+
+   **Released 2026-10-01** as wrappers `v0.8.0` on `d823b1b` (spec and plan
+   `2026-10-01-moonwell-wrappers-additions`): `wrappers.input` for keys and the mouse, `wrappers.weathereffect`,
+   `Effect.abilityArt` in place of spell-effect constructors, four Trigger registrations (with timer expiry) and
+   `fromEvent()`. The gate and tag consumption passed.
 2. **Assets shipped by libraries.** Frame template `.toc` and `.fdf` files, and possibly other files a library needs.
    The port's dummy units need object data from the map. Whether libraries should ship object data too can be designed
    together with this.
@@ -330,7 +335,7 @@ Every item needs a short design first, as the backlog says.
 | Editor error for effects attached to items and destructables  | 0.3                  |
 | Static native-call check for the wrappers                     | 1.1 (done)           |
 | Automatic disposal of Unit wrappers on removal                | 1.4 probe, then 2.3  |
-| Wrappers candidate additions                                  | 2.3 (port needs), 4.1 |
+| Wrappers candidate additions                                  | 2.3, 4.1 (done)      |
 | YueScript port of `wc3-lib` (4d)                              | Phase 3 (done)       |
 | Assets shipped by libraries                                   | 4.2                  |
 | Custom map preview for Reforged                               | 4.3                  |

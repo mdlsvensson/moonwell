@@ -11,6 +11,9 @@
   4 (v0.4.0: geometry, terrain, missiles and knockbacks, released 2026-10-01), with the measurements of its two probes
   in that spec. The design and plan of its release 5 (v0.5.0: save codes, sync and save files, released 2026-10-01),
   with the measurements of three Preload probes in that spec. The port of `wc3-lib` is complete.
+- Documentation: the design and plan of `moonwell-wrappers` v0.8.0 (input listeners, weather effects, art from ability
+  data, four Trigger registrations and `fromEvent()`, released 2026-10-01), with the measurements of its two probes in
+  that spec.
 
 ## 0.5.2 (2026-09-30)
 

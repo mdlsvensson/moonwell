@@ -295,6 +295,25 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - Two machines are untested: the online checks before 1.0 cover the sync and save systems.
   - yue 0.34.2 writes an empty file for a source with a bitwise operator, as for `//` (IppClub/YueScript#256 is fixed in
     0.34.3 for `//`; Moonwell still pins 0.34.2).
+- **Wrappers v0.8.0, the additions the port did not need, released** (2026-10-01, GitHub pre-release `v0.8.0` on
+  `d823b1b`; tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-wrappers-additions-design.md`,
+  plan `docs/superpowers/plans/2026-10-01-moonwell-wrappers-additions.md`). Roadmap phase 4, item 1.
+  - `wrappers.input` (key and mouse listeners for one player, with the event's data and a token to remove them),
+    `wrappers.weathereffect`, `Effect.abilityArt` (the model path or lightning code an ability's data names),
+    `registerPlayerStateEvent`, `registerPlayerAllianceChange`, `registerGameStateEvent` and `registerTimerExpireEvent`
+    on Trigger, and `fromEvent()` on Unit, Player, Item, Destructable, Timer and Region.
+  - One change to existing behavior: the four Effect constructors raise for a model that is not a string.
+  - Two probes came before the design (`../wrappers-gate/PROBE-EXTRAS-RESULTS.md`), measured on 3.0.0.24268: a held key
+    repeats about 30 times a second; the game matches modifier keys exactly, so the module registers all 16
+    combinations; typing in chat fires no key event; mouse move fires 150 to 190 times a second; an unknown weather id
+    gives a handle with id -1, not nil; `GetAbilityEffectById` reads `""` for a missing entry and the last entry for
+    every index past the end; a timer-expiry trigger fires before the timer's callback; a player state event fires at
+    every change to a value that satisfies the comparison; an alliance change event carries no player.
+  - `onKeyDown` runs once per press by default: the module keeps whether each listened key is held. A release the game
+    never sends would cost one press; that is untested.
+  - The in-game gate (`deno task gate additions`) passed: its printed lines are read from a file, the maintainer watched
+    rain and one effect, and six input steps were advanced with Esc. All 21 weather ids of the README were created.
+  - A `wrappers.event` module with every event response was rejected: it would bundle every widget class.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -312,9 +331,10 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    and 2.3 as wrappers v0.7.0, so phase 2 is complete. Phase 3 is under way: moonwell-systems v0.1.0 (release 1:
    scheduler, signal, scope, time), v0.2.0 (release 2: buffs, aura, dummy), v0.3.0 (release 3: damage), v0.4.0 (release
    4: geometry, terrain, missile, knockback) and v0.5.0 (release 5: codec, sync, savefile) are released, so phase 3 is
-   complete: the port of `wc3-lib` is done. Next is phase 4, the rest of the backlog in the roadmap's suggested order;
-   every item needs a short design first. A separate small change is waiting too: pin YueScript 0.34.3, which fixes the
-   `//` bug upstream, and check whether it fixes bitwise operators.
+   complete: the port of `wc3-lib` is done. Phase 4 is under way, in the roadmap's suggested order: item 1 (the wrappers
+   additions) is released as wrappers v0.8.0. Next is item 2, assets shipped by libraries; every item needs a short
+   design first. A separate small change is waiting too: pin YueScript 0.34.3, which fixes the `//` bug upstream, and
+   check whether it fixes bitwise operators.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -414,7 +434,8 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
 - **Wrappers candidate additions** (from the w3ts comparison §6, chosen 2026-09-29 as backlog candidates, each needing a
   short design): `WeatherEffect` (`AddWeatherEffect`, enable, remove); spell effects from ability data
   (`AddSpellEffectById`, for example `Effect.flashSpell`); more Trigger registrations (player state, key, mouse, sync,
-  alliance change, game state, timer expire); event helpers such as `Unit.fromEvent()`.
+  alliance change, game state, timer expire); event helpers such as `Unit.fromEvent()`. Done: wrappers v0.8.0
+  (2026-10-01), with keys and the mouse as `wrappers.input` and spell effects as `Effect.abilityArt`.
 - **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
   maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
   keeps a live-looking wrapper whose handle is dead. WCSharp detects removal as a unit leaving a region that covers the
@@ -436,8 +457,8 @@ deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TES
   no desync, each machine's probe line recorded), `Player:isLocal()`, `Group:enumSelected`, map settings (players,
   forces, alliances) in a real lobby, map transfer of packed normal and minified builds, the wrappers v0.3.0 local
   visibility (`setVisibleFor`, `playFor`, the `player` options of `TextTag.float` and `Sound.playOnce`) and whether
-  `sound:getDuration()` agrees across machines, and any later feature with multiplayer effects. Until then, release
-  gates record these as deferred, not passed.
+  `sound:getDuration()` agrees across machines, the wrappers v0.8.0 input listeners and `weather:enableFor`, and any
+  later feature with multiplayer effects. Until then, release gates record these as deferred, not passed.
 - **YueScript port of `wc3-lib`** (sub-project 4d): `@mdlsvensson/wc3-lib` (TypeScript on JSR, about 6,000 lines:
   scheduler, buffs, dummies, damage, missiles and knockback, save codes) ported to YueScript as a Moonwell library.
   Moved here 2026-09-28; it depends on 4b's library sync. The 1.4 probe found `wc3-lib`'s Preload local store broken in
