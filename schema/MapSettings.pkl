@@ -11,6 +11,11 @@ class MapInfo {
   author: MapText?
   description: MapText?
   recommendedPlayers: MapText?
+
+  /// A picture for the game's map list, shown there instead of the minimap: a `.tga` or `.blp` file of 256x256 (or
+  /// 512x512) pixels, as a path from the project folder, such as `"preview.tga"`. It may not lie under `assets/`.
+  /// Builds put it in the minimap's place and keep World Editor's minimap for the game itself.
+  preview: String(!isEmpty, !contains("\u{0}"))?
 }
 
 class LoadingScreen {

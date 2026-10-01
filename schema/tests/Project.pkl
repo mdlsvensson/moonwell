@@ -109,6 +109,11 @@ facts {
       settings { environment { waterColor = List(5, 6, 7, 8) } }
     }.settings.environment.waterColor == List(5, 6, 7, 8)
   }
+  ["settings take a preview picture's path"] {
+    Project.settings.info.preview == null
+    (Project) { settings { info { preview = "art/preview.tga" } } }.settings.info.preview == "art/preview.tga"
+    t.catch(() -> (Project) { settings { info { preview = "" } } }.settings.info.preview).contains("isEmpty")
+  }
   ["settings reject invalid mapping values"] {
     t.catch(() -> (Project) { settings { players { ["24"] {} } } }.settings.players.toMap()).contains("matches")
     t.catch(() -> (Project) { settings { gameplayConstants { ["Misc"] { ["X"] = "a\nb" } } } }
