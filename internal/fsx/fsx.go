@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -129,6 +130,10 @@ func Reason(err error) string {
 	var linkErr *os.LinkError
 	if errors.As(err, &linkErr) {
 		return linkErr.Err.Error()
+	}
+	var execErr *exec.Error
+	if errors.As(err, &execErr) {
+		return execErr.Err.Error()
 	}
 	return err.Error()
 }
