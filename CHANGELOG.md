@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.0 (2026-10-02)
+
+- **The preview picture can be a PNG.** `settings.info.preview` takes a `.png` beside a `.tga` and a `.blp`, with the
+  same rules: 256×256 or 512×512 pixels, at a path from the project folder, not under `assets/`.
+- A PNG of any kind is read: 8 or 16 bits, colour, grey or palette, interlaced or not. Transparency is dropped and each
+  pixel keeps the colour the file stores for it, as for a TGA.
+- Nothing changes in the game: a build writes a PNG into the map as the same `war3mapMap.tga` it writes for a TGA of
+  that picture.
+- A PNG of another size fails before its pixels are read, and a file that is not a PNG or cannot be read fails `check`
+  and the build, naming the file. The message for another extension now reads
+  `must be a .tga, a .blp or a .png file`.
+- **To get it in a project,** install this version (run the install line again), set `moonwell@0.9.0` in `PklProject`
+  and run `pkl project resolve`. The 0.9.0 program refuses a project that is still on a 0.8 package, and says so.
+
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-02 on Windows, and CI passed on Ubuntu and Windows. Steps 3 to 13 were not
+re-run, by the maintainer's decision: the picture reaches the map in the layout step 13 passed for 0.7.0, and a test
+shows that a PNG and a TGA of one picture give the same bytes.
+
 ## 0.8.1 (2026-10-02)
 
 - **YueScript 0.34.3 is the compiler,** in place of 0.34.2. The floor division operator `//` now works: 0.34.2

@@ -1,8 +1,11 @@
 package settings
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
+	"image/color"
+	"image/png"
 	"os"
 	"strings"
 
@@ -154,6 +157,69 @@ func rewriteTGA(data []byte, file string) ([]byte, error) {
 	return output, nil
 }
 
+const (
+	pngSignature = "\x89PNG\r\n\x1a\n"
+	pngHint      = "Export the picture again from an image editor as a PNG of 256x256 pixels."
+)
+
+// stored is the colour a decoded PNG pixel holds, at 8 bits a channel, whatever its alpha: the colour is read as it
+// is stored, not through the alpha, and of a 16-bit sample the high byte counts.
+func stored(pixel color.Color) (red, green, blue byte) {
+	// The decoder gives a pixel with transparency as one of these two kinds. The general conversion below would
+	// read a 16-bit one through its alpha and lose colour; every other kind is opaque, and comes out as it is.
+	switch c := pixel.(type) {
+	case color.NRGBA:
+		return c.R, c.G, c.B
+	case color.NRGBA64:
+		return byte(c.R >> 8), byte(c.G >> 8), byte(c.B >> 8)
+	}
+	c := color.NRGBAModel.Convert(pixel).(color.NRGBA)
+	return c.R, c.G, c.B
+}
+
+// rewritePNG decodes a PNG of any kind and writes it as the TGA that rewriteTGA writes: plain, 32 bits, rows from
+// the bottom, every pixel opaque. The size is judged from the header, before a pixel is decoded.
+func rewritePNG(data []byte, file string) ([]byte, error) {
+	if !bytes.HasPrefix(data, []byte(pngSignature)) {
+		return nil, refuseWith(file, "is not a PNG file: it does not start with a PNG signature.", pngHint)
+	}
+	unreadable := func(err error) error {
+		return &diag.Error{
+			Msg:   "The preview picture is a PNG that could not be read: " + strings.TrimPrefix(err.Error(), "png: ") + ".",
+			File:  file,
+			Cause: err,
+			Hint:  pngHint,
+		}
+	}
+	header, err := png.DecodeConfig(bytes.NewReader(data))
+	if err != nil {
+		return nil, unreadable(err)
+	}
+	if err := checkSize(file, uint32(header.Width), uint32(header.Height)); err != nil {
+		return nil, err
+	}
+	picture, err := png.Decode(bytes.NewReader(data))
+	if err != nil {
+		return nil, unreadable(err)
+	}
+	width, height, corner := header.Width, header.Height, picture.Bounds().Min
+	output := make([]byte, tgaHeader+width*height*4)
+	output[2] = 2
+	binary.LittleEndian.PutUint16(output[12:], uint16(width))
+	binary.LittleEndian.PutUint16(output[14:], uint16(height))
+	output[16] = 32
+	output[17] = 8
+	for y := range height {
+		to := tgaHeader + (height-1-y)*width*4
+		for x := range width {
+			red, green, blue := stored(picture.At(corner.X+x, corner.Y+y))
+			output[to], output[to+1], output[to+2], output[to+3] = blue, green, red, 255
+			to += 4
+		}
+	}
+	return output, nil
+}
+
 // extension is the file's extension with its dot, in lower case; a name that only starts with a dot has none.
 func extension(file string) string {
 	base := file[strings.LastIndexAny(file, `/\`)+1:]
@@ -178,8 +244,14 @@ func ReadPicture(data []byte, file string) (*Picture, error) {
 			return nil, err
 		}
 		return &Picture{Extension: "tga", Bytes: rewritten}, nil
+	case ".png":
+		rewritten, err := rewritePNG(data, file)
+		if err != nil {
+			return nil, err
+		}
+		return &Picture{Extension: "tga", Bytes: rewritten}, nil
 	}
-	return nil, refuse(file, "must be a .tga or a .blp file.")
+	return nil, refuse(file, "must be a .tga, a .blp or a .png file.")
 }
 
 // LoadPreview reads the picture that settings.info.preview names: preview is a path from the project folder root.

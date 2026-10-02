@@ -446,6 +446,23 @@ func TestATGAPreviewRemovesTheMinimapsBLPAndGoesInAsATGARewritten(t *testing.T) 
 	}
 }
 
+func TestAPNGPreviewGoesIntoTheMapAsTheSameFilesAsATGAOfThePicture(t *testing.T) {
+	picture := testkit.NewPixels(256)
+	tgaDir, tgaRoot := withPreview(t, "preview.tga", testkit.TGA(picture, testkit.TGAOptions{}))
+	expected := plan(t, tgaDir, previewOf("preview.tga"), settings.PlanOptions{ManifestFile: "moonwell.pkl", Root: tgaRoot})
+	dir, root := withPreview(t, "art/Preview.PNG", testkit.PNG(picture, "rgba"))
+	changes := plan(t, dir, previewOf("art/Preview.PNG"), settings.PlanOptions{ManifestFile: "moonwell.pkl", Root: root})
+	wantNames(t, changes, "war3map.lua", "war3mapMinimap.blp", "war3mapMap.blp", "war3mapMap.tga")
+	for index, change := range changes {
+		if change.Remove != expected[index].Remove || !bytes.Equal(change.Bytes, expected[index].Bytes) {
+			t.Errorf("%s differs from the plan for the TGA", change.Name)
+		}
+	}
+	if !changes[2].Remove || !bytes.Equal(changes[3].Bytes, testkit.TGA(picture, testkit.TGAOptions{Alpha: opaque()})) {
+		t.Error("the picture in the plan is not the opaque TGA of the PNG")
+	}
+}
+
 func TestThePreviewsFilesFollowTheOtherSettingsAndBothLuaEditsGoIntoOneChange(t *testing.T) {
 	dir, root := withPreview(t, "preview.blp", testkit.BLP(512, 1))
 	document := `{"info":{"name":"Both","preview":"preview.blp"},"gameplay":{"foodLimit":200},
@@ -488,6 +505,7 @@ func TestAPreviewSettingThatNamesNoUsablePictureIsRefusedBeforeAnyMapFileIsRead(
 	_, root := withPreview(t, "preview.tga", plainTGA())
 	testkit.WriteFile(t, root, "assets/preview.tga", plainTGA())
 	os.Mkdir(filepath.Join(root, "folder.tga"), 0o777)
+	testkit.WriteFile(t, root, "preview.jpg", plainTGA())
 	testkit.WriteFile(t, root, "preview.png", plainTGA())
 	testkit.WriteFile(t, root, "small.tga", plainTGA()[:100])
 	// No map folder at all: the setting and the picture are checked first.
@@ -509,7 +527,8 @@ func TestAPreviewSettingThatNamesNoUsablePictureIsRefusedBeforeAnyMapFileIsRead(
 	for _, outside := range []string{"../preview.tga", "/preview.tga", `C:\preview.tga`, "art//preview.tga"} {
 		refused(outside, `settings.info.preview must be a path inside the project, not "`+outside+`".`, manifest)
 	}
-	refused("preview.png", "The preview picture must be a .tga or a .blp file.", "preview.png")
+	refused("preview.jpg", "The preview picture must be a .tga, a .blp or a .png file.", "preview.jpg")
+	refused("preview.png", "The preview picture is not a PNG file", "preview.png")
 	refused("small.tga", "The preview picture is cut short", "small.tga")
 	// With the picture in order, the map folder is what is missing.
 	refused("preview.tga", "The map has no war3mapMap.blp", "maps/map.w3x/war3mapMap.blp")

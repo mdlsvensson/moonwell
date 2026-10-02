@@ -50,7 +50,7 @@ settings {
     author = null
     description = null
     recommendedPlayers = null
-    preview = null     // a 256x256 .tga or .blp for the game's map list, e.g. "preview.tga" beside this file
+    preview = null     // a 256x256 .png, .tga or .blp for the game's map list, e.g. "preview.png" beside this file
   }
   loadingScreen {
     background = null  // -1 selects a custom model

@@ -167,16 +167,113 @@ func TestABLPTheGameCouldNotReadIsRefused(t *testing.T) {
 	refusedPicture(t, whole[:len(whole)-1], file, "its first mipmap lies outside the file.")
 }
 
+func TestAPNGOfAnyKindGoesInAsTheTGAThatATGAOfTheSamePictureGives(t *testing.T) {
+	kinds := map[string][]string{
+		"colour": {"rgba", "rgb", "rgba16", "rgb16", "interlaced"},
+		"grey":   {"grey", "grey16", "palette"},
+	}
+	for _, size := range []int{256, 512} {
+		for name, picture := range map[string]testkit.Pixels{"colour": testkit.NewPixels(size), "grey": testkit.GreyPixels(size)} {
+			expected, err := settings.ReadPicture(testkit.TGA(picture, testkit.TGAOptions{}), "preview.tga")
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, kind := range kinds[name] {
+				result, err := settings.ReadPicture(testkit.PNG(picture, kind), "art/Preview.PNG")
+				if err != nil || result.Extension != "tga" || !bytes.Equal(result.Bytes, expected.Bytes) {
+					t.Errorf("size %d, %s: %v", size, kind, err)
+				}
+			}
+		}
+	}
+}
+
+func TestAPNGsTransparencyIsDroppedAndItsStoredColourKept(t *testing.T) {
+	// The picture's alpha is 7 everywhere, and then 0: a reader that blends with a background, or that reads the
+	// colour through the alpha, changes every pixel, and loses a fully transparent one altogether.
+	for _, alpha := range []byte{7, 0} {
+		picture := testkit.NewPixels(256)
+		for at := 3; at < len(picture.RGBA); at += 4 {
+			picture.RGBA[at] = alpha
+		}
+		expected := testkit.TGA(picture, testkit.TGAOptions{Alpha: opaque()})
+		for _, kind := range []string{"rgba", "rgba16", "interlaced"} {
+			result, err := settings.ReadPicture(testkit.PNG(picture, kind), "preview.png")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !bytes.Equal(result.Bytes, expected) {
+				t.Errorf("alpha %d, %s: the picture is not the opaque TGA of its stored colours", alpha, kind)
+			}
+			// Blue, green, red, alpha of the bottom-left pixel, whose red is its row number.
+			if got := result.Bytes[18:22]; !bytes.Equal(got, []byte{200, 40, 255, 255}) {
+				t.Errorf("alpha %d, %s: the first pixel is %v", alpha, kind, got)
+			}
+		}
+	}
+}
+
+func TestAPNGsSizeIsJudgedBeforeItsPixelsAreRead(t *testing.T) {
+	const file = "preview.png"
+	// These files hold a header and no pixel: only a reader that decodes first would call them damaged.
+	e := refusedPicture(t, testkit.PNGHeader(128, 128, false), file, "is 128x128 pixels; it must be 256x256 or 512x512.")
+	if !strings.Contains(e.Hint, "256x256") {
+		t.Errorf("hint = %q", e.Hint)
+	}
+	refusedPicture(t, testkit.PNGHeader(512, 256, false), file, "is 512x256 pixels")
+	refusedPicture(t, testkit.PNGHeader(256, 512, true), file, "is 256x512 pixels")
+	refusedPicture(t, testkit.PNGHeader(60000, 60000, false), file, "is 60000x60000 pixels")
+	refusedPicture(t, testkit.PNG(testkit.NewPixels(64), "rgb"), file, "is 64x64 pixels")
+}
+
+func TestAFileThatIsNotAReadablePNGIsRefused(t *testing.T) {
+	const file = "preview.png"
+	// A TGA under a .png name is read as a PNG and refused, never passed through.
+	other := refusedPicture(t, testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{}), file,
+		"is not a PNG file: it does not start with a PNG signature.")
+	if !strings.Contains(other.Hint, "PNG") {
+		t.Errorf("hint = %q", other.Hint)
+	}
+	refusedPicture(t, nil, file, "is not a PNG file")
+	whole := testkit.PNG(testkit.NewPixels(256), "rgb")
+	const unreadable = "is a PNG that could not be read: "
+	damaged := []struct {
+		name string
+		data []byte
+	}{
+		{"the signature alone", whole[:8]},
+		{"a header cut short", whole[:20]},
+		{"a header and no pixel", testkit.PNGHeader(256, 256, false)},
+		{"pixel data cut short", whole[:len(whole)/2]},
+		{"no end", whole[:len(whole)-12]},
+	}
+	for _, entry := range damaged {
+		e := refusedPicture(t, entry.data, file, unreadable)
+		if e.Cause == nil || !strings.HasSuffix(e.Msg, ".") || strings.HasSuffix(e.Msg, "..") {
+			t.Errorf("%s: %+v", entry.name, e)
+		}
+	}
+	// One changed byte inside the pixel data fails its chunk's check value.
+	changed := slices.Clone(whole)
+	changed[len(changed)/2] ^= 0xff
+	refusedPicture(t, changed, file, unreadable)
+}
+
 func TestTheExtensionDecidesHowAPictureIsReadAndAnotherExtensionIsRefused(t *testing.T) {
+	const message = "must be a .tga, a .blp or a .png file."
 	picture := testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{})
-	e := refusedPicture(t, picture, "preview.png", "must be a .tga or a .blp file.")
+	e := refusedPicture(t, picture, "preview.jpg", message)
 	if !strings.Contains(e.Hint, "TGA") {
 		t.Errorf("hint = %q", e.Hint)
 	}
-	refusedPicture(t, picture, "preview", "must be a .tga or a .blp file.")
-	refusedPicture(t, picture, "art/.tga", "must be a .tga or a .blp file.")
-	// A BLP under a .tga name is read as a TGA and refused, never passed through.
+	refusedPicture(t, picture, "preview", message)
+	refusedPicture(t, picture, "art/.tga", message)
+	refusedPicture(t, testkit.PNG(testkit.NewPixels(256), "rgb"), "art/.png", message)
+	// A BLP or a PNG under a .tga name is read as a TGA and refused, never passed through.
 	if _, err := settings.ReadPicture(testkit.BLP(256, 1), "preview.tga"); err == nil {
 		t.Error("a BLP under a .tga name was accepted")
+	}
+	if _, err := settings.ReadPicture(testkit.PNG(testkit.NewPixels(256), "rgb"), "preview.tga"); err == nil {
+		t.Error("a PNG under a .tga name was accepted")
 	}
 }

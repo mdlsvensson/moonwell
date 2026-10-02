@@ -65,15 +65,18 @@ program and the package must have the same major and minor version; `moonwell` r
 of the two to change. To install one version, use its own script:
 
 ```powershell
-irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.8.1/install.ps1 | iex
+irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.9.0/install.ps1 | iex
 ```
+
+To move a project to a newer Moonwell, install that version, change the package's version in the project's
+`PklProject` (for example `moonwell@0.8.1` to `moonwell@0.9.0`) and run `pkl project resolve`.
 
 ### Upgrading a project from 0.7
 
 Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four steps:
 
 1. Install `moonwell`, as above.
-2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.8.1`.
+2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.9.0`.
 3. Run `pkl project resolve`.
 4. Delete `deno.json` and `deno.lock`. Where you ran `deno task build`, run `moonwell build`; the same goes for every
    other command.
@@ -381,14 +384,17 @@ settings {
 
 ```pkl
 settings {
-  info { preview = "preview.tga" }
+  info { preview = "preview.png" }
 }
 ```
 
-- **The file.** A `.tga` or a `.blp` of 256×256 or 512×512 pixels, at a path from the project folder. Keep it beside
-  `moonwell.pkl`, not under `assets/`. Every image editor exports TGA: 24 or 32 bits, with or without RLE compression.
-  Moonwell writes it into the map again in the one layout the game is known to read, fully opaque. A BLP must be a
-  Warcraft III BLP (BLP1) and is used as it is.
+- **The file.** A `.png`, a `.tga` or a `.blp` of 256×256 or 512×512 pixels, at a path from the project folder. Keep
+  it beside `moonwell.pkl`, not under `assets/`.
+  - A PNG of any kind is read: 8 or 16 bits, colour, grey or palette, interlaced or not. A TGA must be true colour,
+    24 or 32 bits, with or without RLE compression.
+  - Moonwell writes a PNG or a TGA into the map as a TGA in the one layout the game is known to read, fully opaque:
+    transparency is dropped, and each pixel keeps the colour the file stores for it.
+  - A BLP must be a Warcraft III BLP (BLP1) and is used as it is.
 - **Strict on purpose.** A picture the game cannot read closes the game the moment the map is selected in the list, for
   everyone who has the map. So a file of another size, format or extension fails the build and `check`.
 - **What a build does.** Reforged's map list shows the map's minimap file, `war3mapMap.blp`, and ignores the
