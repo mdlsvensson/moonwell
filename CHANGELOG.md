@@ -18,7 +18,11 @@
 
 Steps 1 and 2 (CONTRIBUTING) passed 2026-10-02 on Windows, and CI passed on Ubuntu and Windows. Steps 3 to 13 were not
 re-run, by the maintainer's decision: the picture reaches the map in the layout step 13 passed for 0.7.0, and a test
-shows that a PNG and a TGA of one picture give the same bytes.
+shows that a PNG and a TGA of one picture give the same bytes. A PNG written by Windows' own encoder was built into a
+map as well, and its pixels read back from the map's `war3mapMap.tga`.
+
+Published 2026-10-02 as the GitHub release `moonwell@0.9.0`, built by the release workflow, whose last job ran the
+README's install line on Ubuntu and Windows, then `moonwell init my-map` and `moonwell build`.
 
 ## 0.8.1 (2026-10-02)
 

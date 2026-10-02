@@ -526,6 +526,23 @@ same bytes.
     3.0.0.24268: a sweep in the instant of a raw `RemoveUnit` or an exploding death sees neither; the default timer
     disposed the removed unit after 0.25 s; a sweep costs about 0.45 microseconds per wrapper; the removed unit's
     handle id was not used again two seconds later.
+- **Released 0.9.0, PNG as a preview format** (2026-10-02, GitHub release `moonwell@0.9.0` on `abdb115`, a full
+  release marked latest; the workflow's install job ran the README's own line on both systems, and the line was fetched
+  again from Windows PowerShell afterwards; a short design in chat, approved by the maintainer). No in-game run, by the
+  maintainer's decision.
+  - `settings.info.preview` takes a `.png` too. `rewritePNG` (`internal/settings/picture.go`) decodes it with
+    `image/png` and writes the layout `rewriteTGA` writes, so the map gets the same `war3mapMap.tga` as for a TGA of
+    that picture; a test compares the two byte for byte.
+  - The size comes from `png.DecodeConfig`, before any pixel is decoded, so a wrong-sized or huge file fails fast.
+  - Transparency is dropped and the stored colour kept, as for a TGA. The decoder's two kinds with transparency
+    (`color.NRGBA`, `color.NRGBA64`) are read directly: Go's general conversion reads a 16-bit colour through its
+    alpha and loses it at low alpha. Of a 16-bit sample the high byte counts.
+  - Test PNGs are built in code (`testkit.PNG`, eight kinds). Go's encoder does not interlace, so the interlaced one
+    is written by hand (`interlacedPNG`), and `testkit.PNGHeader` is a header with no pixel.
+  - Checked once outside the tests: a PNG written by .NET's encoder (`System.Drawing`), built into a map, with four
+    pixels read back from `war3mapMap.tga`.
+  - A minor version bump means every project must move: the 0.9.0 program refuses a project on a 0.8 package. The
+    README has the three steps. A project linked to the checkout needs `pkl project resolve` (done for the gate map).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -549,8 +566,8 @@ same bytes.
    2026-10-01 and changed on 2026-10-02, which is also the order of the Backlog below: replace Deno (done: Moonwell
    0.8.0); the YueScript pin (done: Moonwell 0.8.1); `moonwell-library.json` in the wrappers and systems libraries
    (done: wrappers v0.8.1 and systems v0.5.1); automatic disposal of Unit wrappers (done: wrappers v0.9.0); PNG as a
-   preview format; the key release `onKeyDown` depends on; the online checks before 1.0; and Teal and Fennel, moved to
-   the end on 2026-10-02. Every item needs a short design first.
+   preview format (done: Moonwell 0.9.0); the key release `onKeyDown` depends on; the online checks before 1.0; and
+   Teal and Fennel, moved to the end on 2026-10-02. Every item needs a short design first.
    **Now:** nothing is under way; backlog item 1 is next, when the maintainer says so.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
@@ -642,15 +659,10 @@ to v0.5.0). Replacing Deno was removed on 2026-10-02 (Moonwell 0.8.0, with the s
 entries below were renumbered. The YueScript pin (Moonwell 0.8.1) and `moonwell-library.json` in the two libraries
 (wrappers v0.8.1, systems v0.5.1) were removed the same day, with a renumbering each, and so was the automatic disposal
 of Unit wrappers (wrappers v0.9.0, by polling; what the probes found about the world-bounds region, which does not
-work, and the undefend order, which does, is in the port-needs note §6.3). The State section above records each.
+work, and the undefend order, which does, is in the port-needs note §6.3), and PNG as a preview format (Moonwell
+0.9.0). The State section above records each.
 
-1. **PNG as a preview format**
-
-- **`settings.info.preview` naming a `.png`.** Left out of Moonwell 0.7.0 by the maintainer's choice. Moonwell would
-  read the PNG and write the same TGA it writes today, so nothing changes in the game. Go's standard library decodes
-  PNG (`image/png`), so this is the size check, the conversion to the TGA's pixels, and their tests.
-
-2. **The key release `onKeyDown` depends on**
+1. **The key release `onKeyDown` depends on**
 
 - **A key release the game never sends.** `wrappers.input`'s `onKeyDown` runs once per press because the module keeps
   whether each listened key is held (wrappers v0.8.0). If the game drops a release, for example when the window loses
@@ -658,7 +670,7 @@ work, and the undefend order, which does, is in the port-needs note §6.3). The 
   (hold a key, switch away, let go, switch back, press again), and if a release can be lost, decide how the held state
   recovers.
 
-3. **Online multiplayer and desync checks, then 1.0**
+2. **Online multiplayer and desync checks, then 1.0**
 
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
@@ -671,7 +683,7 @@ work, and the undefend order, which does, is in the port-needs note §6.3). The 
   of a hosted game, and any later feature with multiplayer effects. Until then, release gates record these as deferred,
   not passed.
 
-4. **Other gameplay languages: Teal and Fennel**
+3. **Other gameplay languages: Teal and Fennel**
 
 Moved to the end of the list by the maintainer on 2026-10-02 (not enough capacity for it that week); whether it comes
 before or after 1.0 is theirs to say.

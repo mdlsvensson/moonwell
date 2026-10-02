@@ -360,6 +360,7 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
    **Done 2026-10-02** as wrappers `v0.9.0`: the maintainer chose polling (`Unit.autoDispose`, `Unit.sweep`); the
    in-game gate and tag consumption passed.
 5. **PNG as a preview format** for `settings.info.preview`, written into the map as the TGA of Moonwell 0.7.0.
+   **Done 2026-10-02** as Moonwell 0.9.0.
 6. **The key release `onKeyDown` depends on.** Probe whether the game can drop a key release (wrappers v0.8.0 keeps
    whether each key is held), and decide how the held state recovers if it can.
 7. **Online multiplayer and desync checks: the very last step before 1.0,** as the maintainer decided. The backlog
@@ -387,7 +388,7 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
 | TypeScript and C# support                                     | Dropped 2026-10-01   |
 | Pin YueScript 0.34.3                                          | 5.2                  |
 | `moonwell-library.json` in the wrappers and systems libraries | 5.3 (done)           |
-| PNG as a preview format                                       | 5.5                  |
+| PNG as a preview format                                       | 5.5 (done)           |
 | The key release `onKeyDown` depends on                        | 5.6                  |
 | Online multiplayer and desync checks                          | 5.7 (last before 1.0) |
 | UI wrappers, releases B and C                                 | Done (v0.4.0, v0.5.0) |
