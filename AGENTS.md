@@ -543,6 +543,19 @@ same bytes.
     pixels read back from `war3mapMap.tga`.
   - A minor version bump means every project must move: the 0.9.0 program refuses a project on a 0.8 package. The
     README has the three steps. A project linked to the checkout needs `pkl project resolve` (done for the gate map).
+- **Wrappers v0.9.1, the lost key release, released** (2026-10-02, GitHub pre-release `v0.9.1` on `24b1511`; tag
+  consumption passed; a probe, then a short design in chat).
+  - The probe (`yue -e gate.lua probe-release`, `../wrappers-gate/PROBE-RELEASE-RESULTS.md`) measured on 3.0.0.24268:
+    the game sends no release for a key let go while it takes no keyboard input, which was so after Alt+Tab, after a
+    click on another window, with the chat box open and with the menu open. In all four the next press did not reach
+    an `onKeyDown` listener. A release with Shift held as well arrived. The first repeat comes 0.50 s after a press,
+    and pressing another key stops the repeats of a held one.
+  - The fix: `onKeyDown` counts a down that comes more than two seconds of game time after the key's last down as a
+    new press. Game time is one timer the first key listener starts. The second probe run confirmed it for Alt+Tab,
+    the click and the chat box.
+  - What stays, and is in the README: `onKeyUp` never runs for a lost release, so a map's own "key is held" state can
+    stick; and a press inside the window is still skipped. In single player, game time stands still in the menu and
+    runs slower while the game is in the background (8.73 s counted as 3.19 s).
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -566,9 +579,10 @@ same bytes.
    2026-10-01 and changed on 2026-10-02, which is also the order of the Backlog below: replace Deno (done: Moonwell
    0.8.0); the YueScript pin (done: Moonwell 0.8.1); `moonwell-library.json` in the wrappers and systems libraries
    (done: wrappers v0.8.1 and systems v0.5.1); automatic disposal of Unit wrappers (done: wrappers v0.9.0); PNG as a
-   preview format (done: Moonwell 0.9.0); the key release `onKeyDown` depends on; the online checks before 1.0; and
-   Teal and Fennel, moved to the end on 2026-10-02. Every item needs a short design first.
-   **Now:** nothing is under way; backlog item 1 is next, when the maintainer says so.
+   preview format (done: Moonwell 0.9.0); the key release `onKeyDown` depends on (done: wrappers v0.9.1); the online
+   checks before 1.0; and Teal and Fennel, moved to the end on 2026-10-02. Every item needs a short design first.
+   **Now:** nothing is under way. Both items left wait for the maintainer: the online checks need a second player on
+   Battle.net, and Teal and Fennel were put last on 2026-10-02.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -666,18 +680,10 @@ to v0.5.0). Replacing Deno was removed on 2026-10-02 (Moonwell 0.8.0, with the s
 entries below were renumbered. The YueScript pin (Moonwell 0.8.1) and `moonwell-library.json` in the two libraries
 (wrappers v0.8.1, systems v0.5.1) were removed the same day, with a renumbering each, and so was the automatic disposal
 of Unit wrappers (wrappers v0.9.0, by polling; what the probes found about the world-bounds region, which does not
-work, and the undefend order, which does, is in the port-needs note §6.3), and PNG as a preview format (Moonwell
-0.9.0). The State section above records each.
+work, and the undefend order, which does, is in the port-needs note §6.3), PNG as a preview format (Moonwell 0.9.0)
+and the key release `onKeyDown` depends on (wrappers v0.9.1). The State section above records each.
 
-1. **The key release `onKeyDown` depends on**
-
-- **A key release the game never sends.** `wrappers.input`'s `onKeyDown` runs once per press because the module keeps
-  whether each listened key is held (wrappers v0.8.0). If the game drops a release, for example when the window loses
-  focus while a key is down, the next press would be taken for a repeat and lost. Untested: probe it on one machine
-  (hold a key, switch away, let go, switch back, press again), and if a release can be lost, decide how the held state
-  recovers.
-
-2. **Online multiplayer and desync checks, then 1.0**
+1. **Online multiplayer and desync checks, then 1.0**
 
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
@@ -686,11 +692,12 @@ work, and the undefend order, which does, is in the port-needs note §6.3), and 
   forces, alliances) in a real lobby, map transfer of packed normal and minified builds, the wrappers v0.3.0 local
   visibility (`setVisibleFor`, `playFor`, the `player` options of `TextTag.float` and `Sound.playOnce`) and whether
   `sound:getDuration()` agrees across machines, the wrappers v0.8.0 input listeners and `weather:enableFor`, the
-  wrappers v0.9.0 sweep (`Unit.autoDispose` running on both machines), the Moonwell 0.7.0 preview picture in the lobby
-  of a hosted game, and any later feature with multiplayer effects. Until then, release gates record these as deferred,
-  not passed.
+  wrappers v0.9.0 sweep (`Unit.autoDispose` running on both machines), the wrappers v0.9.1 rule for a lost key release
+  (one player switches away with a key held; both machines must count the same presses), the Moonwell 0.7.0 preview
+  picture in the lobby of a hosted game, and any later feature with multiplayer effects. Until then, release gates
+  record these as deferred, not passed.
 
-3. **Other gameplay languages: Teal and Fennel**
+2. **Other gameplay languages: Teal and Fennel**
 
 Moved to the end of the list by the maintainer on 2026-10-02 (not enough capacity for it that week); whether it comes
 before or after 1.0 is theirs to say.
