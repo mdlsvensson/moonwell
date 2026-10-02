@@ -1,10 +1,11 @@
 # AGENTS.md: handoff for coding agents
 
 Moonwell is a Warcraft III map development framework. Gameplay is written in YueScript and compiled to Lua 5.3; project
-data is written in Pkl; the toolchain is a Deno CLI published to JSR as `@moonwell/cli`. The Pkl schemas are published
-as the Pkl package `moonwell` (a GitHub release tagged `moonwell@<version>`). This file tells you what exists, the
-rules, the known pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing
-over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again after wrappers v0.3.0 was implemented.
+data is written in Pkl; the toolchain is one Go program, `moonwell`, installed by a script from the GitHub release (up
+to 0.7.0 it was a Deno CLI published to JSR as `@moonwell/cli`). The Pkl schemas are published as the Pkl package
+`moonwell`, in the same release, tagged `moonwell@<version>`. This file tells you what exists, the rules, the known
+pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing over, and has
+been updated after every piece of work since.
 
 ## Read first
 
@@ -22,7 +23,14 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   `2026-09-29-wrappers-advantages.md` explains our advantages with code examples, and `2026-09-29-wcsharp-comparison.md`
   does the same comparison for WCSharp (C#) and revises the w3ts conclusions (§8).
 
-## State (2026-09-29)
+## State (2026-10-02)
+
+Entries up to 0.7.0 describe the TypeScript CLI and name its files (`cli/src/...`, `cli/tests/...`, `deno task ...`).
+That code is gone since Plan 5e. The Go package of the same area is under `internal/` (`cli/src/settings/` is
+`internal/settings`, `cli/src/objectdata/` is `internal/objects`, `cli/src/libraries/` is `internal/library`), fixtures
+are in `internal/testkit/testdata/`, `cli/data/` is `data/`, `cli/runtime/` is `runtime/`, and a `deno task <name>` is
+`moonwell <name>`. What the entries say about behaviour, formats and the game still holds: the Go program writes the
+same bytes.
 
 - **Released:** 0.1.0, on JSR (`@moonwell/cli@0.1.0`) and as a GitHub release (`moonwell@0.1.0`). It contains the
   toolchain: `init`, `setup`, `build`, `test`, `dev`, `check`; the YueScript bundler with runtime hooks; the MPQ writer;
@@ -359,14 +367,14 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - The in-game gate (`deno task gate additions`) passed: its printed lines are read from a file, the maintainer watched
     rain and one effect, and six input steps were advanced with Esc. All 21 weather ids of the README were created.
   - A `wrappers.event` module with every event response was rejected: it would bundle every widget class.
-- **Replacing Deno with Go, under way** (roadmap 5.1; spec
+- **Deno replaced by Go: Moonwell 0.8.0, implemented, awaiting its gate and release** (roadmap 5.1; spec
   `docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md`, approved 2026-10-02). The maintainer chose Go,
   one `moonwell` executable on the PATH installed by a script from the GitHub release, the standard library only, every
   test ported, releases built by CI from the tag, and a redesign in idiomatic Go checked from outside: a contract (same
-  commands, same written bytes, same messages) and a conformance suite that runs both CLIs. Six plans, 5a to 5f; the
-  TypeScript in `cli/` stays working until 5e, and the Go code carries version 0.7.0 until then.
+  commands, same written bytes, same messages) and a conformance suite that ran both CLIs. Six plans, 5a to 5f; the
+  TypeScript stayed working until 5e deleted it.
   - **Plan 5a, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-foundations.md`): the module
-    (`go.mod` at the root, no dependencies; `embed.go` embeds `template/`, `cli/runtime/` and `cli/data/`) and the
+    (`go.mod` at the root, no dependencies; `embed.go` embeds `template/`, `runtime/` and `data/`) and the
     packages `internal/text`, `diag`, `names`, `fsx`, `binio`, `ordered`, `mapdir`, `luasrc`, `w3i`, `mpq`, `models`,
     `natives` and `testkit`, with their tests. Nothing is reachable from a command yet.
   - `internal/text` is where JavaScript and Go strings differ (UTF-16 length and sort order, `JSON.stringify`,
@@ -424,6 +432,26 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
     (`internal/cli/process_windows_test.go`).
   - Another agent (Codex) wrote the tests of Plan 5d's Task 4 and the conformance suite while Claude was out of usage;
     its notes are in the git-ignored `.superpowers/sdd/`, with an audit of what Plans 5e and 5f must cover.
+  - **Plan 5e, implemented up to the release** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-cutover.md`):
+    the generators in Go (`tools/gen`, with the SLK, INI and JASS parsers as packages below it); `cli/`, the TypeScript
+    generators, every `deno.json` and the conformance suite deleted; `cli/runtime` and `cli/data` moved to `runtime/`
+    and `data/`; `install.ps1`, `install.sh` and `.github/workflows/release.yml`; version 0.8.0; the documents.
+  - The Go generators reproduce what the TypeScript ones wrote: `schema/generated/` byte for byte (then its first line
+    was changed to name `go run ./tools/gen` and `data/metadata.json`), and `natives.json`, `metadata.json` and
+    `game-paths.txt` regenerate unchanged from the maintainer's exports: `~/Downloads/Work` (the scripts),
+    `~/moonwell-game-data/3.0.0.24268` (the object data) and `~/Downloads/exported-listfile.txt` (the file names).
+  - `gen metadata` takes the game version, as before. A `repeat` or `data` cell that is not a number fails the
+    generator, where JavaScript wrote `null`.
+  - The install scripts carry the version literally, and a test checks it against `version.go`. Their tests run them
+    against a local server through `MOONWELL_INSTALL_BASE`; on Windows `MOONWELL_INSTALL_NO_PATH=1` keeps a test from
+    changing the user's PATH. `install.sh` runs for real only on Linux (CI).
+  - The release workflow calls `ci.yml` (`workflow_call`), builds both executables, packages the Pkl schema, creates the
+    release with the changelog's section as its notes, and then installs the release on both systems and builds a new
+    project there. That last job replaces the "check from JSR", and runs where Pkl's downloads work.
+  - The Pkl schema's own tests (`schema/tests/`) run from `schema_test.go`. The compiler a test needs is downloaded by
+    `yuetest.Need`, also on CI: nothing installs it beforehand any more.
+  - The sibling repositories' Deno tools (`deno task test`, `gate`, `integration`) still call
+    `../moonwell/cli/src/main.ts` and are broken until Plan 5f.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -447,8 +475,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    2026-10-01, which is also the order of the Backlog below: replace Deno; other gameplay languages and the YueScript
    pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal of Unit wrappers; PNG as a
    preview format; the key release `onKeyDown` depends on; and last, the online checks before 1.0. Every item needs a
-   short design first. **Now:** replacing Deno, by the Go spec's plans in order (State above says which are done). Each
-   plan is written when the one before it is implemented.
+   short design first. **Now:** the gate and release of 0.8.0 (Plan 5e, Task 6: the maintainer runs gate steps 1 to 6,
+   then the tag is pushed and the release workflow read), and Plan 5f, the Deno tools of the three sibling repositories.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -458,48 +486,37 @@ Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` dow
   each with exact code and tests. Then implement task by task, test-first, with a review after each task and a final
   review. The maintainer approves each spec before it is implemented.
 - **Small bounded changes** get a short design in chat and the maintainer's approval first.
-- Commit directly on `main`. The maintainer pushes; then check CI (`gh run list`, `gh run view <id> --log-failed`; `gh`
-  is at `C:\Program Files\GitHub CLI`).
+- Commit directly on `main`. Claude pushes once the checks pass (the maintainer said so on 2026-10-02), then checks CI
+  (`gh run list`, `gh run view <id> --log-failed`; `gh` is at `C:\Program Files\GitHub CLI`). A release is a pushed tag
+  (CONTRIBUTING, Publishing); the maintainer's gate comes first.
 
 ## Hard rules
 
-- **No Node.js:** no `package.json`, no `node_modules`, no `npm:` or `node:` specifiers anywhere. Only `jsr:@std/*`,
-  from the existing import maps.
-- **Errors:** expected failures throw `MoonwellError` (`cli/src/shared/errors.ts`) with `file` and `hint`. Any other
-  error is reported as an internal "please report" error, so user mistakes must never reach it.
-- **Style:** file system code is async. `deno fmt` uses width 120; `template/`, `docs/` and `cli/src/embedded/` are
-  excluded. `deno fmt --check` and `deno lint` must be clean.
-- **Generated files:** after changing `template/`, `cli/runtime/moonwell.lua`, `cli/runtime/macros.yue`,
-  `cli/data/game-paths.txt`, `cli/data/metadata.json` or `cli/data/natives.json`, run `deno task gen`; the embedded
-  modules in `cli/src/embedded/` and `schema/generated/` are freshness-tested. Nothing stray may be left in `template/`:
-  every file there is embedded into `init`, and a stray file fails the embedded-template test.
-  `template/src/generated/objects.yue` must match `template/objects/` (e2e).
+- **Standard library only:** no third-party Go module and no cgo. `go.mod` has no `require`, and `module_test.go` keeps
+  it so. No Node.js and no Deno anywhere.
+- **Errors:** an expected failure is a `*diag.Error` (or `diag.Problems`) with the file and a hint (`internal/diag`).
+  Any other error, and any panic, is reported as an internal "please report" error, so a user's mistake must never
+  reach it. Operating system errors are wrapped where they happen.
+- **Style:** `gofmt` and `go vet` are clean. Markdown is wrapped at 120 by hand: nothing formats it any more.
+- **Generated files:** after changing `data/metadata.json`, run `go run ./tools/gen`; a test fails when
+  `schema/generated/` is stale. `template/`, `runtime/` and `data/` need no step: they are embedded at build time.
+  Nothing stray may be left in `template/`: every file there goes into every project `init` creates, and
+  `module_test.go` pins the list. `template/src/generated/objects.yue` must match `template/objects/` (an end-to-end
+  test).
+- **Versions:** `version.go`, `schema/PklProject`, `install.ps1` and `install.sh` carry the same number; tests check it.
 - **Pkl:** `pkl` 0.32 is required. A module property can't be named `output`, because it clashes with Pkl's built-in.
   Pkl `Mapping` values are type-checked lazily: tests that expect a constraint error must force the values (`.toMap()`).
 
 ## Checks (all must pass before a commit)
 
 ```
-deno task check
-deno task lint
-deno fmt --check
-deno task test          # unit tests; need neither pkl nor yue
-deno task test:runtime  # needs yue (installed by `deno task setup` in template/)
-deno task test:pkl      # needs pkl
-deno task test:e2e      # needs pkl and yue
-deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TESTS=1 (CI sets it)
-```
-
-And for the Go code, until it replaces the lines above (Plan 5e):
-
-```
 go vet ./...
 gofmt -l .      # must print nothing
-go test ./...
+go test ./...   # with MOONWELL_REQUIRE_TOOLS=1 MOONWELL_NETWORK_TESTS=1, as CI runs it
 ```
 
-Go's rules (spec §11): the standard library only (no `require` in `go.mod`, no cgo; `module_test.go` checks it);
-expected failures are `*diag.Error` or `diag.Problems` with the TypeScript's message, file and hint.
+Without `MOONWELL_REQUIRE_TOOLS=1`, a test that needs `pkl` or the compiler is skipped when the tool is missing, which
+hides what it would have found. On Windows also run `GOOS=linux go vet ./...`: some files are built per system.
 
 ## Pitfalls already paid for
 
@@ -509,10 +526,10 @@ expected failures are `*diag.Error` or `diag.Problems` with the TypeScript's mes
 
 - **YueScript `//` empties a file:** yue 0.34.2 with `-r` or `-m` (both of Moonwell's build modes) writes a 0-byte Lua
   file for any source that uses floor division, and exits 0; without those flags it compiles correctly. Found 2026-09-30
-  when a gate-map probe built as one module instead of eleven. `compileSources` now fails on an empty output for a file
-  with code (`emptyOutputError` in `cli/src/yue/compile.ts`). Write `math.floor(a / b)`. Reported upstream as
-  IppClub/YueScript#256; once a fixed yue is pinned, the floor-division test in `cli/tests/yue/compile.test.ts` fails
-  and should become a test that such a file compiles.
+  when a gate-map probe built as one module instead of eleven. A compile now fails on an empty output for a file with
+  code (`emptyOutputError` in `internal/yue/compile.go`). Write `math.floor(a / b)`. Reported upstream as
+  IppClub/YueScript#256; once a fixed yue is pinned, the floor-division test in `internal/yue/yue_test.go` fails and
+  should become a test that such a file compiles.
 
 - **Backslashes in shell-written files:** Git Bash heredocs and `sed` turn `\\` into `\`. Write files that contain
   backslashes (Windows paths, regexes, Pkl raw strings) with a file-editing tool, not the shell, and check them.
@@ -524,10 +541,18 @@ expected failures are `*diag.Error` or `diag.Problems` with the TypeScript's mes
 - **Model files:** in text `.mdl`, a particle emitter's `Path` sits inside a nested `Particle { }` block. Reforged
   stores particle effects as `.pkb`, and references `.tif` textures that the game stores as `.dds`.
 - **World Editor rewrites what it saves:** WE 3.00 saves a custom-path import in `war3map.imp` as flag 29, not the
-  documented 13 (fixture `cli/tests/fixtures/imports-we3/`). Any gate step that writes into the source map must also
-  save the map in World Editor and then run the commands again.
-- **Deno quirks:** it refuses JSR versions published less than 24 hours ago unless you pass `--min-dep-age=0`. A locked
-  file on Windows surfaces as a plain `Error` with code `EBUSY`, not a `Deno.errors` class.
+  documented 13 (fixture `internal/testkit/testdata/imports-we3/`). Any gate step that writes into the source map must
+  also save the map in World Editor and then run the commands again.
+- **Bytes that must stay as the TypeScript wrote them:** projects built by 0.7.0 expect the same files from 0.8.0, and
+  the conformance suite that proved it is gone. A change to code that writes a file or a message can break that
+  silently where Go and JavaScript differ: key order of JSON objects (`ordered.Map`), `JSON.stringify` (`text.Quote`,
+  `ordered.Stringify`: Go's encoder escapes `<`, `>`, `&`), string length and sort order in UTF-16 units
+  (`text.UTF16Len`, `text.Compare`), `\s` and `trim` (`text.SpaceClass`, `text.Trim`), case mapping (`text.Upper`,
+  `text.Lower`), number-to-text (`text.Number`), and lossy UTF-8 decoding (`text.Lossy`). The spec's §5 has the list.
+- **Shell pitfalls with Go sources:** a `﻿`, `\x..` or `\b` escape written through a heredoc, `sed` or `awk`
+  becomes the character itself. Write such lines with a file-editing tool. `gofmt -l .` also looks into dot-folders
+  such as `.superpowers/`.
+- **Windows consoles in tests:** see Plan 5d's note above on interrupting a program.
 
 ## Backlog (in the maintainer's order of 2026-10-01; each needs a short design first)
 
@@ -538,25 +563,23 @@ to v0.5.0). The State section above records each.
 
 1. **Replace Deno**
 
-- **Replace Deno in Moonwell's toolchain.** The maintainer's plan (2026-09-30): the project has nothing to do with
-  TypeScript, so Deno should go eventually, from the CLI and from the wrappers' tools. moonwell-systems already needs
-  none (its tools are Lua run with `yue -e`). Needs a design: what replaces the CLI's runtime, JSR publishing and the
-  test suites. The report `docs/superpowers/research/2026-10-01-replacing-deno.md` gives the reasons, what Deno does for
-  the project today, and the paths to choose from; the maintainer asked for the report only and will say when the design
-  starts.
+- **What is left of it:** the gate and release of Moonwell 0.8.0 (Plan 5e, Task 6), and Plan 5f: the Deno tools of
+  moonwell-wrappers (`tools/test.ts`, `run.ts`, `check-lua.ts`, `integration.ts`), moonwell-systems
+  (`tools/integration.lua` runs the Deno CLI) and wrappers-gate (`gate.ts`, `preview-probe.ts`) become Lua run with
+  `yue -e`, and find `moonwell` on the PATH or through `MOONWELL` (spec §10). The State section records the rest.
 
 2. **Other gameplay languages, and the YueScript pin**
 
 - **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
   sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
-  declarations (`.d.tl`) could be rendered from `cli/data/natives.json` like the editor's `natives.d.lua`.
+  declarations (`.d.tl`) could be rendered from `data/natives.json` like the editor's `natives.d.lua`.
 - **Fennel support.** The maintainer chose YueScript (2026-09-27) for its familiar syntax and VS Code support, with
-  Fennel as a later option: a fennel-ls docset rendered from `cli/data/natives.json` (sub-project 3), plus a Fennel
+  Fennel as a later option: a fennel-ls docset rendered from `data/natives.json` (sub-project 3), plus a Fennel
   compile step next to the YueScript one.
 - TypeScript and C# support were dropped on 2026-10-01: the maintainer targets Lua, Teal, Fennel and YueScript only.
 - **Pin YueScript 0.34.3.** It fixes the `//` bug upstream (IppClub/YueScript#256); check whether it also fixes bitwise
   operators, for which 0.34.2 writes an empty file too. Once it is pinned, the floor-division test in
-  `cli/tests/yue/compile.test.ts` fails and should become a test that such a file compiles, and the README's and this
+  `internal/yue/yue_test.go` fails and should become a test that such a file compiles, and the README's and this
   file's `//` notes go.
 
 3. **`moonwell-library.json` in the libraries**
@@ -580,9 +603,8 @@ to v0.5.0). The State section above records each.
 5. **PNG as a preview format**
 
 - **`settings.info.preview` naming a `.png`.** Left out of Moonwell 0.7.0 by the maintainer's choice. Moonwell would
-  read the PNG (inflate, the five filters, the colour types an image editor writes) and write the same TGA it writes
-  today, so nothing changes in the game. About 150 lines and their tests. Whatever replaces Deno decides what inflate is
-  available.
+  read the PNG and write the same TGA it writes today, so nothing changes in the game. Go's standard library decodes
+  PNG (`image/png`), so this is the size check, the conversion to the TGA's pixels, and their tests.
 
 6. **The key release `onKeyDown` depends on**
 

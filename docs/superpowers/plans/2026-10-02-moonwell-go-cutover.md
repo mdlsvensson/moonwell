@@ -59,6 +59,19 @@ interface given here; a task is done when its inventory rows are ported and pass
 - **The sibling repositories' Deno tools stop working** when `cli/` is deleted, until Plan 5f, which follows at
   once.
 
+## Amendments made while implementing
+
+- **The checks of a release are `ci.yml` itself:** it gained a `workflow_call` trigger, and `release.yml` calls it,
+  so the two cannot drift apart.
+- **The release's notes** are the changelog's section for the version, up to its first `###` heading, with a link to
+  the changelog.
+- **`template/moonwell.local.pkl` is not a tracked file** (it is git-ignored; `init` writes the text from
+  `project.LocalPkl`), so only `template/moonwell.pkl` and `template/yueconfig.yue` changed their comments.
+- **The install scripts refuse four cases** in their test: a wrong checksum, a file the checksums do not list, a
+  missing download and missing checksums. Each leaves the installed file as it was.
+- **`internal/cli/unit_test.go`** compared the `PklProject` that `init` writes with a literal `0.7.0` in a condition
+  that could not fail; it now compares with `moonwell.Version`.
+
 ## File structure
 
 ```
@@ -123,8 +136,8 @@ type File struct { Types []Type; Functions []Function; Globals []Global }
 func Parse(text, source string) (File, error)
 ```
 
-- [ ] JavaScript's `\s` and `.trim()` are `text.SpaceClass` and `text.Trim`; `JSON.stringify` is `text.Quote`.
-- [ ] Commit: `go: the generators' parsers`.
+- [x] JavaScript's `\s` and `.trim()` are `text.SpaceClass` and `text.Trim`; `JSON.stringify` is `text.Quote`.
+- [x] Commit: `go: the generators' parsers`.
 
 ### Task 2: The generators
 
@@ -142,44 +155,44 @@ func RenderMetadata(metadata *objects.Metadata) string
 func GenerateGamePaths(list, version, target string) (int, error)
 ```
 
-- [ ] `objects` exports what the schema needs: `objects.FieldSource(category) (fields, use string)`.
-- [ ] `main` finds the checkout by walking up from the working directory to the `go.mod` of this module.
-- [ ] With the old header line and the old paths, `go run ./tools/gen` leaves `schema/generated/` unchanged.
-- [ ] The three data files regenerate unchanged from the maintainer's exports.
-- [ ] Commit: `go: the generators`.
+- [x] `objects` exports what the schema needs: `objects.FieldSource(category) (fields, use string)`.
+- [x] `main` finds the checkout by walking up from the working directory to the `go.mod` of this module.
+- [x] With the old header line and the old paths, `go run ./tools/gen` leaves `schema/generated/` unchanged.
+- [x] The three data files regenerate unchanged from the maintainer's exports.
+- [x] Commit: `go: the generators`.
 
 ### Task 3: The cutover
 
-- [ ] `git mv cli/runtime runtime` and `git mv cli/data data`; `embed.go` and the generators read the new paths.
-- [ ] Delete `cli/`, the TypeScript under `tools/`, `deno.json`, `deno.lock`, `template/deno.json` and
+- [x] `git mv cli/runtime runtime` and `git mv cli/data data`; `embed.go` and the generators read the new paths.
+- [x] Delete `cli/`, the TypeScript under `tools/`, `deno.json`, `deno.lock`, `template/deno.json` and
       `internal/conformance/`. `embed.go`'s exclusion list loses `deno.json`.
-- [ ] The generated header's new line; regenerate; the diff is seven lines.
-- [ ] `template/moonwell.pkl`, `template/yueconfig.yue` and `template/moonwell.local.pkl` say `moonwell <command>`.
-- [ ] `.gitattributes` loses the `cli/tests/fixtures/**` line; `ci.yml` loses Deno and `MOONWELL_CONFORMANCE`.
-- [ ] `schema_test.go` runs the Pkl schema's tests.
-- [ ] Commit: `Remove the Deno toolchain`.
+- [x] The generated header's new line; regenerate; the diff is seven lines.
+- [x] `template/moonwell.pkl`, `template/yueconfig.yue` and `template/moonwell.local.pkl` say `moonwell <command>`.
+- [x] `.gitattributes` loses the `cli/tests/fixtures/**` line; `ci.yml` loses Deno and `MOONWELL_CONFORMANCE`.
+- [x] `schema_test.go` runs the Pkl schema's tests.
+- [x] Commit: `Remove the Deno toolchain`.
 
 ### Task 4: Installing and releasing
 
 **Produces:** `install.ps1`, `install.sh`, `.github/workflows/release.yml`, `install_test.go`.
 
-- [ ] Each script: downloads the executable for the machine and `checksums.txt` from
+- [x] Each script: downloads the executable for the machine and `checksums.txt` from
       `https://github.com/mdlsvensson/moonwell/releases/download/moonwell@<version>`, compares the SHA-256, refuses a
       mismatch without touching an installed executable, and writes the file (spec §8.2).
-- [ ] `install_test.go` serves a stand-in executable and its checksums from a local server and runs the script of
+- [x] `install_test.go` serves a stand-in executable and its checksums from a local server and runs the script of
       the machine's system: a good download installs, a wrong checksum fails and leaves the old file.
-- [ ] `release.yml` (spec §8.1): the version check, the checks of `ci.yml`, the two executables, the Pkl package,
+- [x] `release.yml` (spec §8.1): the version check, the checks of `ci.yml`, the two executables, the Pkl package,
       the checksums, the release, and the install job on both systems.
-- [ ] Commit: `Install scripts and the release workflow`.
+- [x] Commit: `Install scripts and the release workflow`.
 
 ### Task 5: Version 0.8.0 and the documents
 
-- [ ] `version.go`, `schema/PklProject`, both scripts: `0.8.0`. `pkl project resolve` in `template/`.
-- [ ] `README.md`: installing, every command line, the section on upgrading from 0.7.
-- [ ] `CONTRIBUTING.md`: the layout, the checks, the release gate's commands, publishing.
-- [ ] `AGENTS.md`: the state, the rules of spec §11, the pitfalls (the Deno quirks go; spec §5 stays as a pitfall).
-- [ ] `CHANGELOG.md`: 0.8.0, with the conformance suite's last green commit; the roadmap's item 5.1.
-- [ ] Commit: `Moonwell 0.8.0`.
+- [x] `version.go`, `schema/PklProject`, both scripts: `0.8.0`. `pkl project resolve` in `template/`.
+- [x] `README.md`: installing, every command line, the section on upgrading from 0.7.
+- [x] `CONTRIBUTING.md`: the layout, the checks, the release gate's commands, publishing.
+- [x] `AGENTS.md`: the state, the rules of spec §11, the pitfalls (the Deno quirks go; spec §5 stays as a pitfall).
+- [x] `CHANGELOG.md`: 0.8.0, with the conformance suite's last green commit; the roadmap's item 5.1.
+- [x] Commit: `Moonwell 0.8.0`.
 
 ### Task 6: The gate and the release
 

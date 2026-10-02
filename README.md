@@ -17,31 +17,76 @@
 - Write gameplay in any language that transpiles to lua. TypeScript, YueScript, Fennel, C#. And use pkl for data and
   configuration.
 - Say goodbye to the Object Editor, Trigger Editor, Asset Manager and other dated World Editor tools.
-- A Deno cli: no Node.js, no `package.json`, no `node_modules`.
+- One `moonwell` program: no Node.js, no `package.json`, no `node_modules`.
 
 ## Quickstart
 
-Install [Deno](https://deno.com/) 2.9+ and [Pkl](https://pkl-lang.org) 0.32+.
+Install [Pkl](https://pkl-lang.org) 0.32+, then Moonwell. On Windows, in PowerShell:
 
 ```powershell
-deno run -A jsr:@moonwell/cli init my-map
+irm https://github.com/mdlsvensson/moonwell/releases/latest/download/install.ps1 | iex
+```
+
+On Linux:
+
+```sh
+curl -fsSL https://github.com/mdlsvensson/moonwell/releases/latest/download/install.sh | sh
+```
+
+Then create a project and build it:
+
+```powershell
+moonwell init my-map
 cd my-map
-deno task build
+moonwell build
 ```
 
 `init` writes `moonwell.local.pkl`, which points `launch.gameExecutable` at the default Battle.net install. If your game
 is elsewhere, fix the path there, then run:
 
 ```powershell
-deno task test
+moonwell test
 ```
+
+## Installing and upgrading
+
+The install line downloads one program, `moonwell`, from the GitHub release, checks it against the release's checksums
+and puts it on your PATH:
+
+- **Windows:** `%LOCALAPPDATA%\moonwell\bin\moonwell.exe` (`MOONWELL_CACHE\bin` when that variable is set). The script
+  adds the folder to your user PATH; open a new terminal afterwards. It is the folder `moonwell setup` keeps `yue` in
+  for the editor, so one PATH entry serves both.
+- **Linux:** `~/.local/bin/moonwell`. The script says so when that folder is not on your PATH.
+
+Moonwell is built for Windows and Linux on x86-64. Run the line again to upgrade: there is no update command.
+
+A project names the Moonwell it is written for in its `PklProject`, as the version of the `moonwell` Pkl package. The
+program and the package must have the same major and minor version; `moonwell` refuses another project and says which
+of the two to change. To install one version, use its own script:
+
+```powershell
+irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.8.0/install.ps1 | iex
+```
+
+### Upgrading a project from 0.7
+
+Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four steps:
+
+1. Install `moonwell`, as above.
+2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.8.0`.
+3. Run `pkl project resolve`.
+4. Delete `deno.json` and `deno.lock`. Where you ran `deno task build`, run `moonwell build`; the same goes for every
+   other command.
+
+Nothing else changes: the manifest, the map, the libraries, the caches under `dist/` and `.moonwell/`, and the files a
+build writes are the same.
 
 ## A project
 
 | Path                 | What                                                                                                   |
 | -------------------- | ------------------------------------------------------------------------------------------------------ |
 | `moonwell.pkl`       | Project manifest (`amends "@moonwell/Project.pkl"`), shared by the team; everyday settings written out |
-| `moonwell.local.pkl` | This machine's settings, such as the game path; git-ignored, and `deno task setup` recreates it        |
+| `moonwell.local.pkl` | This machine's settings, such as the game path; git-ignored, and `moonwell setup` recreates it         |
 | `src/main.yue`       | Gameplay entry                                                                                         |
 | `lua/`               | Plain Lua modules, bundled when gameplay code requires them (see "Lua modules")                        |
 | `objects/`           | Custom units, heroes, items, abilities and more, in Pkl                                                |
@@ -84,7 +129,7 @@ VS Code with two extensions gives `.yue` files completion, hover, signature help
    offers the two extensions the project recommends: YueScript (`LiJin.yuescript`) and Lua (`sumneko.lua`). Install
    both. The YueScript extension uses the lua-language-server that the Lua extension brings, so nothing else needs
    installing.
-2. Run `deno task setup` in the project. It adds the editor files and `.gitignore` lines an older project lacks (it
+2. Run `moonwell setup` in the project. It adds the editor files and `.gitignore` lines an older project lacks (it
    never overwrites a file) and keeps a copy of the project's pinned YueScript in the cache's `bin` folder (by default
    `%LOCALAPPDATA%\moonwell\bin` on Windows; with `yue.path` set, your own binary's folder counts instead). The
    extension runs `yue` from PATH and has no setting for its location, so when `yue` is missing there or another
@@ -99,7 +144,7 @@ VS Code with two extensions gives `.yue` files completion, hover, signature help
 You get completion, hover and signatures for every native and Blizzard.j function and global of Warcraft III
 3.0.0.24268, `import "moonwell"`, `import "generated.objects"` and the map's own `gg_` and `udg_` globals, and a warning
 for a `unit` passed where a `player` is expected. The declarations live in `.moonwell/types/`; `check`, `build`, `test`
-and `dev` keep them current, so run `deno task check` (or save any `.yue` file while `deno task dev` runs) after saving
+and `dev` keep them current, so run `moonwell check` (or save any `.yue` file while `moonwell dev` runs) after saving
 the map in World Editor to pick up new `gg_` and `udg_` globals.
 
 - **`.lua` files next to your `.yue` files.** The extension writes a `.lua` file next to each saved `.yue` file. It
@@ -109,7 +154,7 @@ the map in World Editor to pick up new `gg_` and `udg_` globals.
   `io` and `package`, and its `os` has only `clock`, `date`, `difftime` and `time`. `.luarc.json` turns off `io`,
   `debug` and `package` in the editor; lua-language-server cannot turn off single functions, so the editor does not flag
   the others.
-- **Pkl.** Pkl files need no editor plugin: the `pkl` and `deno` command-line tools do all the work. Editors with Pkl
+- **Pkl.** Pkl files need no editor plugin: the `pkl` and `moonwell` programs do all the work. Editors with Pkl
   support (the Pkl extension for VS Code, the IntelliJ plugin) add completion and hover docs for `moonwell.pkl` and
   `objects/`. They find the schema through `PklProject`, so run their "sync projects" command once after `init`. If the
   extension cannot find `pkl`, set its CLI path (`pkl.cli.path` in VS Code).
@@ -179,7 +224,7 @@ a line (or follow `;`), leaving out any name the file declares `local` at its to
 `Timer = {}`); globals assigned inside functions, after a label on the same line, or through `_G` are not seen and
 belong in `lint.globals`. As in standalone Lua, a leading byte order mark and a first line starting with `#` are
 skipped. The name `moonwell` is the built-in module's, so `lua/moonwell.lua` fails the build. The editor resolves `lua/`
-through `.luarc.json`'s `runtime.path`; `deno task setup` adds the entries to a project made by an older Moonwell.
+through `.luarc.json`'s `runtime.path`; `moonwell setup` adds the entries to a project made by an older Moonwell.
 
 `src/**/*.lua` stays reserved for the `.lua` files the YueScript extension writes on save, so keep your own Lua in
 `lua/`.
@@ -262,11 +307,11 @@ If you write a library, keep its files under a folder of its own, such as `asset
 clash with no map's and no other library's.
 
 Builds import assets into the staged copy only. To see them in World Editor, close the map there and run
-`deno task assets:sync`. It writes the files and `war3map.imp` into `maps/<folder>`, and records what it owns in
+`moonwell assets:sync`. It writes the files and `war3map.imp` into `maps/<folder>`, and records what it owns in
 `.asset-state/`. It never overwrites or deletes a file it does not own, and it refuses to touch an owned file you edited
 in the map.
 
-To check that a model's textures are imported, run `deno task assets:paths assets/Models/Knight.mdx`. It lists every
+To check that a model's textures are imported, run `moonwell assets:paths assets/Models/Knight.mdx`. It lists every
 file the model references (textures, particle models, attachments), shown the way World Editor's Import Manager shows
 paths, and says what each one is: an `in-game path` the game ships (or `in-game path, replaced` when you import a file
 over it), a `custom path, imported`, or a `custom path, not imported`, which the model will be missing. Run it without a
@@ -307,7 +352,7 @@ settings {
 - **Colors** are `List(red, green, blue, alpha)`, each 0 to 255, and replace the map's color whole. Setting `waterColor`
   turns on the map's custom water tint. `fog.enabled` switches fog on or off; the other fog fields do not switch it on.
   After inheriting any value you leave out, fog `start` must not exceed `end`.
-- **Staged copy only.** Builds and `deno task test` write settings into the staged copy in `dist/stage/`, never into
+- **Staged copy only.** Builds and `moonwell test` write settings into the staged copy in `dist/stage/`, never into
   `maps/<folder>`, so World Editor keeps showing the map's own values. Open the built map to see them. Settings are
   applied after staging and before assets and the gameplay bundle, and never appear in `war3map.imp`.
 - **Map versions.** The map info file (`war3map.w3i`) must be version 18, 25, 28, 31, 32, 33 or 39; World Editor 3.00
@@ -359,7 +404,7 @@ This was measured on Warcraft III Reforged 3.0.0.24268, in the single-player map
 
 ### Checking settings
 
-`deno task settings:check` checks the settings against the source map without building and lists the internal files a
+`moonwell settings:check` checks the settings against the source map without building and lists the internal files a
 build would change:
 
 ```text
@@ -371,7 +416,7 @@ Map settings valid: 3 internal file(s) would change during build.
 
 A file a build removes is listed as `war3mapMap.blp (removed)`; that happens for a TGA picture.
 
-`deno task check` (and so `dev`) checks settings the same way; with no settings set it does not need the source map.
+`moonwell check` (and so `dev`) checks settings the same way; with no settings set it does not need the source map.
 Mistakes in the manifest name the manifest that was evaluated (`moonwell.local.pkl` when it exists, else
 `moonwell.pkl`). Problems with the map name the file under `maps/<folder>/`, such as `maps/map.w3x/war3map.w3i`. Map
 files are matched ignoring letter case, as Warcraft III does: a map saved with `war3mapskin.txt` is patched under that
@@ -464,8 +509,8 @@ error: objects/heroes.pkl › heroes["paladin"].base: 'Hpla' is not a standard h
 hint: Did you mean 'Hpal' (Paladin), 'Hpb1' (Paladin) or 'Hpb2' (Paladin)?
 ```
 
-`deno task objects:check` validates without building, lists the internal files a build would change, and says whether
-`src/generated/objects.yue` is current. `check` and `dev` run the same checks. `deno task objects:eval` prints every
+`moonwell objects:check` validates without building, lists the internal files a build would change, and says whether
+`src/generated/objects.yue` is current. `check` and `dev` run the same checks. `moonwell objects:eval` prints every
 resolved object as JSON: its id, base and source file, and each field's rawcode, name, level, data column and value.
 
 ### World Editor objects
@@ -486,19 +531,20 @@ Not supported yet:
 
 ## Commands
 
-| Command                                          | What                                                                             |
-| ------------------------------------------------ | -------------------------------------------------------------------------------- |
-| `deno task build [--entry src/x.yue] [--minify]` | Build `dist/bin/<map>.w3x`                                                       |
-| `deno task test [--entry src/x.yue] [--minify]`  | Stage the map and launch Warcraft III                                            |
-| `deno task dev`                                  | Re-check on every save                                                           |
-| `deno task check`                                | Compile and validate without building                                            |
-| `deno task assets:check`                         | Show what `assets:sync` would change in the source map                           |
-| `deno task assets:sync`                          | Write `assets/` into the source map for World Editor (close the map first)       |
-| `deno task assets:paths [file]`                  | List the files a model references, as in-game or custom paths                    |
-| `deno task settings:check`                       | Show which internal map files the settings would change, without building        |
-| `deno task objects:check`                        | Validate the objects and show which internal map files they would change         |
-| `deno task objects:eval`                         | Print the resolved objects as JSON                                               |
-| `deno task setup`                                | Create a missing `moonwell.local.pkl`, download YueScript and prepare the editor |
+| Command                                         | What                                                                             |
+| ----------------------------------------------- | -------------------------------------------------------------------------------- |
+| `moonwell init <dir>`                           | Create a project in a new folder                                                 |
+| `moonwell build [--entry src/x.yue] [--minify]` | Build `dist/bin/<map>.w3x`                                                       |
+| `moonwell test [--entry src/x.yue] [--minify]`  | Stage the map and launch Warcraft III                                            |
+| `moonwell dev`                                  | Re-check on every save                                                           |
+| `moonwell check`                                | Compile and validate without building                                            |
+| `moonwell assets:check`                         | Show what `assets:sync` would change in the source map                           |
+| `moonwell assets:sync`                          | Write `assets/` into the source map for World Editor (close the map first)       |
+| `moonwell assets:paths [file]`                  | List the files a model references, as in-game or custom paths                    |
+| `moonwell settings:check`                       | Show which internal map files the settings would change, without building        |
+| `moonwell objects:check`                        | Validate the objects and show which internal map files they would change         |
+| `moonwell objects:eval`                         | Print the resolved objects as JSON                                               |
+| `moonwell setup`                                | Create a missing `moonwell.local.pkl`, download YueScript and prepare the editor |
 
 The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
 else in `%LOCALAPPDATA%\moonwell` on Windows, else in `$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`.

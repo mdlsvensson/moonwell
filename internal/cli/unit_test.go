@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/internal/cli"
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
@@ -322,7 +323,7 @@ func TestInitWritesTheTemplateWithoutADenoJsonAndEndsWithTheNextCommand(t *testi
 	if exists(target, "deno.json") || exists(target, "PklProject.deps.json") {
 		t.Error("init wrote a deno.json, or the template's resolved dependencies")
 	}
-	if got := read(t, target, "PklProject"); got != project.PklProject("0.7.0", "") && !strings.Contains(got, "moonwell/moonwell@") {
+	if got := read(t, target, "PklProject"); got != project.PklProject(moonwell.Version, "") {
 		t.Errorf("PklProject =\n%s", got)
 	}
 	if got := read(t, target, "moonwell.local.pkl"); got != project.LocalPkl() {

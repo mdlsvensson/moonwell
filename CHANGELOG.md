@@ -1,19 +1,43 @@
 # Changelog
 
-## Unreleased
+## 0.8.0 (2026-10-02)
 
-- **Moonwell is moving from Deno to Go** (design `2026-10-02-moonwell-go-toolchain-design`): one `moonwell` executable
-  in place of Deno, JSR and `deno.json`. Nothing changes for a project until 0.8.0; the TypeScript CLI stays in place
-  and tested meanwhile.
-- Plan 5a (`2026-10-02-moonwell-go-foundations`): the Go module and its first packages, checked by CI beside the Deno
-  checks.
-- Plan 5b (`2026-10-02-moonwell-go-planners`): reading the manifest, and planning map settings, object data and assets,
-  in Go.
-- Plan 5c (`2026-10-02-moonwell-go-compile`): libraries, the YueScript compiler, the bundle, the unknown-global check,
-  the editor's files and the staged map, in Go.
-- Plan 5d (`2026-10-02-moonwell-go-commands`): the `moonwell` program with every command, and a conformance suite that
-  runs it beside the Deno CLI on the same projects and compares what they print and write. Its last green run on Ubuntu
-  and Windows is commit `e786070`.
+- **Moonwell is one program, `moonwell`, and no longer needs Deno.** Install it with one line (PowerShell on Windows,
+  `sh` on Linux; see the README), then run `moonwell build` where you ran `deno task build`. The same goes for every
+  command: `init`, `setup`, `build`, `test`, `dev`, `check`, `assets:check`, `assets:sync`, `assets:paths`,
+  `settings:check`, `objects:eval` and `objects:check`, with the same flags.
+- **Nothing else changes for a project.** The manifest, the Pkl package, the map formats, the libraries and the editor
+  support are as in 0.7.0, and a build writes the same files, byte for byte. The caches under `dist/` and `.moonwell/`
+  carry over, so the first build after upgrading recompiles and downloads nothing.
+- **Upgrading a project from 0.7:** install `moonwell`; set `moonwell@0.8.0` in `PklProject`; run
+  `pkl project resolve`; delete `deno.json` and `deno.lock`. `moonwell setup` says so when it finds a `deno.json` an
+  older Moonwell wrote. A new project has no `deno.json`, and `init` ends with `cd <dir> && moonwell build`.
+- **A project is pinned by its Pkl package version.** The program refuses a project whose `moonwell` package has
+  another major or minor version, and its hint gives the install line of the version the project wants.
+- Messages that named a `deno task` name the `moonwell` command. The reason an operating system gives inside a message
+  ("Reading x failed: ...") is worded by Go now. Everything else a command prints is unchanged.
+- The packed `.w3x` holds the same files in the same order with the same contents; its compressed bytes differ,
+  because Go's zlib compressor is not Deno's.
+- `dev` looks at the watched files four times a second instead of waiting for the operating system's events. It
+  watches what it watched before.
+- Releases are built by GitHub Actions from the tag: `moonwell-windows-amd64.exe` and `moonwell-linux-amd64` with their
+  SHA-256 checksums, the two install scripts, and the Pkl package. Nothing is published to JSR again;
+  `@moonwell/cli@0.7.0` is the last version there.
+- For contributors: the code is Go with the standard library only (`cmd/moonwell`, `internal/`, `tools/gen`), the
+  TypeScript and every `deno.json` are gone, and the checks are `go vet ./...`, `gofmt -l .` and `go test ./...`.
+- Documentation: the design (`2026-10-02-moonwell-go-toolchain-design`) and its plans (`2026-10-02-moonwell-go-*`).
+
+### How it was checked
+
+The Go program is a redesign, not a translation, so it was checked from outside. Every test of the TypeScript CLI has a
+Go counterpart (626 tests in 35 packages). While both programs existed, a conformance suite ran each of them on its own
+copy of the same project and compared the exit code, every printed line, every written file, and the packed map
+unpacked: a new project, the gate map with both libraries, a project with every map setting, one with objects of every
+category, one with assets on World Editor 3.00's import file, a preview picture as TGA and as BLP, Lua modules with the
+example library by tag, and five failing projects. Its last green run on Ubuntu and Windows is commit `e786070`; it
+found one difference on the way (the folder in `setup`'s PATH command when `yue.path` is set), which was fixed. The
+generators were checked the same way: the Go ones write `schema/generated/`, `natives.json`, `metadata.json` and
+`game-paths.txt` as the TypeScript ones did, from the same game exports.
 
 ## 0.7.0 (2026-10-01)
 
