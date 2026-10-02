@@ -411,6 +411,19 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - Go is at `C:\Program Files\Go\bin` (1.27.0) and is not on the PATH of Claude's shell: prefix commands with
     `export PATH="$PATH:/c/Program Files/Go/bin"`. In files written by Claude's tools, a `\uFEFF` escape becomes a real
     byte order mark, which Go refuses in source: write `"\xEF\xBB\xBF"`.
+  - **Plan 5d, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-commands.md`): `watch` (a
+    polling watcher), `cli` (the argument parser, the command table and every command) and `cmd/moonwell`, with the
+    Pkl-backed and end-to-end tests, a test that builds the program and runs it, and the conformance suite
+    (`internal/conformance`, `MOONWELL_CONFORMANCE=1`), which runs both CLIs on the same projects.
+  - The conformance suite's last green run on Ubuntu and Windows is commit `e786070`. It found one difference, on the
+    runner where `yue` is not on the PATH: the folder in `setup`'s PATH command (fixed, `yue.DirAsWritten`).
+  - Unknown flags are ignored, as the Deno CLI's parser ignored them; `cli.ParseArgs` was compared with it on 28 command
+    lines.
+  - Interrupting a program in a test on Windows: Ctrl+C is switched off below a process started in a new process group,
+    and `AttachConsole` removes the handlers Go installed. Send Ctrl+Break to the program's own process group
+    (`internal/cli/process_windows_test.go`).
+  - Another agent (Codex) wrote the tests of Plan 5d's Task 4 and the conformance suite while Claude was out of usage;
+    its notes are in the git-ignored `.superpowers/sdd/`, with an audit of what Plans 5e and 5f must cover.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 

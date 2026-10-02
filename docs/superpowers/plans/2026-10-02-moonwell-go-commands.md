@@ -50,6 +50,27 @@ here; a task is done when its inventory rows are ported and pass. Test-first.
 - **The conformance suite** (`internal/conformance`, test-only) runs with `MOONWELL_CONFORMANCE=1` when `deno`, `pkl`
   and the repository's `cli/` are present. It goes away with the TypeScript in Plan 5e.
 
+## Amendments made while implementing
+
+- **The conformance suite found one difference,** on the Windows runner, where `yue` is not on the PATH: with
+  `yue.path` set, `setup`'s PATH command named the compiler's folder with backslashes, where the Deno CLI keeps the
+  separators the manifest wrote. `yue.DirAsWritten` fixes it. Nothing else differed in 35 compared command lines
+  (38 with the gate map, which only a machine with `../wrappers-gate` runs).
+- **Its last green run** on Ubuntu and Windows is commit `e786070` (CI run 37007905168).
+- **What it compares beyond the spec's list:** the source map and `.asset-state/` after every command, the files
+  `init` and `setup` write (`.gitignore`, `.luarc.json`, `.vscode/`, `yueconfig.yue`, the manifests, `PklProject`
+  and its resolved dependencies), and the packed map's hash table, block sizes and flags, and the fixed fields of
+  its header. Each project pins `yue.path` to one compiler, so neither CLI installs one.
+- **The interrupt test on Windows** sends Ctrl+Break to the program's own process group, from a second copy of the
+  test program that joins the program's console. Ctrl+C is switched off below a process started in a new process
+  group, as test runners are; and joining a console removes the sender's own handlers, so the event must not reach
+  it. Go reports both keys as `os.Interrupt`.
+- **Test files** differ from the inventory's names: `unit_test.go` holds the cases of `build`, `dev`, `init`,
+  `assets-paths` and `launch`; `cli_test.go` those of `main` and the argument parser; `process_test.go` the test of
+  the real program. `pkl/objects.test.ts` has 11 cases, not 12. Every case of the inventory is ported.
+- **Who wrote what:** the tests of Task 4 from the settings script onward, and the conformance suite, were written
+  by another agent (Codex, GPT) while Claude was out of usage, and reviewed, run and fixed by Claude afterwards.
+
 ## File structure
 
 ```
@@ -105,8 +126,8 @@ func New(roots []Root) *Watcher // takes the first pass at once
 func (w *Watcher) Poll() bool   // another pass: whether a relevant file appeared, went or changed size or time
 ```
 
-- [ ] A root that is missing or unreadable holds nothing; it is not an error.
-- [ ] Commit: `go: watch`.
+- [x] A root that is missing or unreadable holds nothing; it is not an error.
+- [x] Commit: `go: watch`.
 
 ### Task 2: `cli`: arguments, the table, launching
 
@@ -128,8 +149,8 @@ func LaunchGame(launch project.Launch, mapPath string, spawn func(string, []stri
 func SpawnDetached(command string, args []string) error
 ```
 
-- [ ] `Run` recovers a panic and prints it as an internal error with the stack.
-- [ ] Commit: `go: cli, arguments and launching`.
+- [x] `Run` recovers a panic and prints it as an internal error with the stack.
+- [x] Commit: `go: cli, arguments and launching`.
 
 ### Task 3: the commands
 
@@ -160,16 +181,16 @@ func IsLibraryChange(folder, path string) bool
 func LocalLibraryFolders(root string, p *project.Project) []string
 ```
 
-- [ ] `objects:eval` prints with `ordered.Stringify(…, 2)`: categories in their fixed order, objects in manifest
+- [x] `objects:eval` prints with `ordered.Stringify(…, 2)`: categories in their fixed order, objects in manifest
       order, each field's keys in today's order.
-- [ ] Commit: `go: the commands`.
+- [x] Commit: `go: the commands`.
 
 ### Task 4: `cmd/moonwell` and the tests on real projects
 
-- [ ] `cmd/moonwell/main.go`: the working directory, stderr and stdout, the two-stage Ctrl+C.
-- [ ] The `yue`-backed tests of `bundle`, `objects` and `settings`.
-- [ ] The `pkl`-backed and end-to-end tests of the inventory.
-- [ ] Commit: `go: cmd/moonwell and the end-to-end tests`.
+- [x] `cmd/moonwell/main.go`: the working directory, stderr and stdout, the two-stage Ctrl+C.
+- [x] The `yue`-backed tests of `bundle`, `objects` and `settings`.
+- [x] The `pkl`-backed and end-to-end tests of the inventory.
+- [x] Commit: `go: cmd/moonwell and the end-to-end tests`.
 
 ### Task 5: the conformance suite
 
@@ -178,12 +199,12 @@ copies, runs the Deno CLI (`deno run -A <repo>/cli/src/main.ts`) in one and `cli
 exit code, the printed lines (after replacing each copy's path, and the texts §2 exempts), the written files, and the
 packed map unpacked (`testkit`'s MPQ reader).
 
-- [ ] CI sets `MOONWELL_CONFORMANCE=1` on both systems.
-- [ ] Every difference found is either fixed in the Go code or recorded here as a deviation with its reason.
-- [ ] Commit: `go: the conformance suite`.
+- [x] CI sets `MOONWELL_CONFORMANCE=1` on both systems.
+- [x] Every difference found is either fixed in the Go code or recorded here as a deviation with its reason.
+- [x] Commit: `go: the conformance suite`.
 
 ### Task 6: Close the plan
 
-- [ ] Every check from a clean tree; `AGENTS.md` and `CHANGELOG.md` say Plan 5d is implemented, with its deviations
+- [x] Every check from a clean tree; `AGENTS.md` and `CHANGELOG.md` say Plan 5d is implemented, with its deviations
       and the conformance suite's green run.
-- [ ] Commit: `docs: Plan 5d of the Go toolchain is implemented`.
+- [x] Commit: `docs: Plan 5d of the Go toolchain is implemented`.

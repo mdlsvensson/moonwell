@@ -11,6 +11,9 @@
   in Go.
 - Plan 5c (`2026-10-02-moonwell-go-compile`): libraries, the YueScript compiler, the bundle, the unknown-global check,
   the editor's files and the staged map, in Go.
+- Plan 5d (`2026-10-02-moonwell-go-commands`): the `moonwell` program with every command, and a conformance suite that
+  runs it beside the Deno CLI on the same projects and compares what they print and write. Its last green run on Ubuntu
+  and Windows is commit `e786070`.
 
 ## 0.7.0 (2026-10-01)
 
