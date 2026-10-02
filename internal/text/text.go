@@ -107,6 +107,13 @@ func IsSpace(r rune) bool {
 	return r >= 0x2000 && r <= 0x200A
 }
 
+// SpaceClass is JavaScript's \s as a character class for Go's regular expressions, whose own \s is ASCII only and
+// has no vertical tab.
+const SpaceClass = `[\t\n\v\f\r \x{A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}]`
+
+// NotLineBreak is JavaScript's `.` as a character class: anything but a line terminator.
+const NotLineBreak = `[^\n\r\x{2028}\x{2029}]`
+
 // Trim is String.prototype.trim.
 func Trim(s string) string { return strings.TrimFunc(s, IsSpace) }
 
