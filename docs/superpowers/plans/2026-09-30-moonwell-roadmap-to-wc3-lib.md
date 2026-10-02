@@ -354,7 +354,7 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
      bitwise operators too. **Done 2026-10-02 as Moonwell 0.8.1:** `//` works; bitwise operators still fail in the
      compiler's rewrite and minify steps, now with an error that Moonwell reports at the source line.
 3. **`moonwell-library.json` with `{"dir": "src"}` in moonwell-wrappers and moonwell-systems,** so maps can leave `dir`
-   out.
+   out. **Done 2026-10-02** as wrappers `v0.8.1` and systems `v0.5.1`; tag consumption passed for both without `dir`.
 4. **Automatic disposal of Unit wrappers on removal.** The maintainer has not chosen a way yet: the undefend-order
    trick works but needs a custom ability in every map; polling type ids needs none (1.4 probe, port-needs note §6.3).
 5. **PNG as a preview format** for `settings.info.preview`, written into the map as the TGA of Moonwell 0.7.0.
@@ -384,7 +384,7 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
 | Teal and Fennel support                                       | 5.2                  |
 | TypeScript and C# support                                     | Dropped 2026-10-01   |
 | Pin YueScript 0.34.3                                          | 5.2                  |
-| `moonwell-library.json` in the wrappers and systems libraries | 5.3                  |
+| `moonwell-library.json` in the wrappers and systems libraries | 5.3 (done)           |
 | PNG as a preview format                                       | 5.5                  |
 | The key release `onKeyDown` depends on                        | 5.6                  |
 | Online multiplayer and desync checks                          | 5.7 (last before 1.0) |

@@ -497,6 +497,18 @@ same bytes.
   - Both libraries' tools and documents name 0.34.3. `moonwell setup` in a project replaces the `yue` on the PATH with
     that project's version, and the wrappers' test runner demands the pinned one.
   - No in-game run, by the maintainer's decision.
+- **Wrappers v0.8.1 and moonwell-systems v0.5.1, `moonwell-library.json`, released** (2026-10-02, GitHub pre-releases
+  `v0.8.1` on `c8e434b` and `v0.5.1` on `46ebd6f`; a short design in chat, approved by the maintainer). Each library
+  has a `moonwell-library.json` with `{ "dir": "src" }` at its root, so a map on Moonwell 0.6.0 or later leaves `dir`
+  out of its `libraries` entry. No file under either `src/` changed, so no in-game run.
+  - Their READMEs show the short form and say when `dir = "src"` is still needed: Moonwell 0.5, or an older tag.
+  - Both integration tools and the gate map's `moonwell.local.pkl` name the libraries by `path` alone, so the files
+    are what every run exercises.
+  - Tag consumption passed for both with Moonwell 0.8.1: fresh maps whose entries have no `dir` locked the two tags,
+    with `"dir": ""` in `moonwell.lock`, built the gate examples normal and minified, and kept the lock after
+    `.moonwell/` was removed.
+  - A project linked to the checkout (`init --link`, such as the gate map) stops evaluating when the checkout's
+    version changes: Pkl compares it with the project's `PklProject.deps.json`. Run `pkl project resolve` there.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -518,9 +530,10 @@ same bytes.
    additions) is released as wrappers v0.8.0, item 2 (assets shipped by libraries) as Moonwell 0.6.0, and item 3 (the
    custom map preview) as Moonwell 0.7.0. What is left follows the roadmap's phase 5, the order the maintainer set on
    2026-10-01 and changed on 2026-10-02, which is also the order of the Backlog below: replace Deno (done: Moonwell
-   0.8.0); the YueScript pin (done: Moonwell 0.8.1); `moonwell-library.json` in the wrappers and systems libraries;
-   automatic disposal of Unit wrappers; PNG as a preview format; the key release `onKeyDown` depends on; the online
-   checks before 1.0; and Teal and Fennel, moved to the end on 2026-10-02. Every item needs a short design first.
+   0.8.0); the YueScript pin (done: Moonwell 0.8.1); `moonwell-library.json` in the wrappers and systems libraries
+   (done: wrappers v0.8.1 and systems v0.5.1); automatic disposal of Unit wrappers; PNG as a preview format; the key
+   release `onKeyDown` depends on; the online checks before 1.0; and Teal and Fennel, moved to the end on 2026-10-02.
+   Every item needs a short design first.
    **Now:** nothing is under way; backlog item 1 is next, when the maintainer says so.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
@@ -609,16 +622,11 @@ Entries that are done were removed on 2026-10-01: the custom map preview (Moonwe
 (0.6.0), the wrappers candidate additions (wrappers v0.8.0), the UI wrappers releases B and C (v0.4.0, v0.5.0), the
 editor error for effects attached to items and destructables (v0.5.1) and the port of `wc3-lib` (moonwell-systems v0.1.0
 to v0.5.0). Replacing Deno was removed on 2026-10-02 (Moonwell 0.8.0, with the sibling repositories' tools), and the
-entries below were renumbered. The YueScript pin was removed the same day (Moonwell 0.8.1), and they were renumbered
-again. The State section above records each.
+entries below were renumbered. The YueScript pin (Moonwell 0.8.1) and `moonwell-library.json` in the two libraries
+(wrappers v0.8.1, systems v0.5.1) were removed the same day, with a renumbering each. The State section above records
+each.
 
-1. **`moonwell-library.json` in the libraries**
-
-- **Add `moonwell-library.json` with `{"dir": "src"}` to moonwell-wrappers and moonwell-systems,** in their next
-  releases, so a map can leave `dir` out of its manifest (Moonwell 0.6.0 reads the file). Their READMEs and the
-  tag-consumption checks then use the short form.
-
-2. **Automatic disposal of Unit wrappers**
+1. **Automatic disposal of Unit wrappers**
 
 - **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
   maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
@@ -630,13 +638,13 @@ again. The State section above records each.
   positives (port-needs note §6.3). It needs a custom ability in every map's object data; polling type ids, as `wc3-lib`
   does, needs none.
 
-3. **PNG as a preview format**
+2. **PNG as a preview format**
 
 - **`settings.info.preview` naming a `.png`.** Left out of Moonwell 0.7.0 by the maintainer's choice. Moonwell would
   read the PNG and write the same TGA it writes today, so nothing changes in the game. Go's standard library decodes
   PNG (`image/png`), so this is the size check, the conversion to the TGA's pixels, and their tests.
 
-4. **The key release `onKeyDown` depends on**
+3. **The key release `onKeyDown` depends on**
 
 - **A key release the game never sends.** `wrappers.input`'s `onKeyDown` runs once per press because the module keeps
   whether each listened key is held (wrappers v0.8.0). If the game drops a release, for example when the window loses
@@ -644,7 +652,7 @@ again. The State section above records each.
   (hold a key, switch away, let go, switch back, press again), and if a release can be lost, decide how the held state
   recovers.
 
-5. **Online multiplayer and desync checks, then 1.0**
+4. **Online multiplayer and desync checks, then 1.0**
 
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
@@ -656,7 +664,7 @@ again. The State section above records each.
   Moonwell 0.7.0 preview picture in the lobby of a hosted game, and any later feature with multiplayer effects. Until
   then, release gates record these as deferred, not passed.
 
-6. **Other gameplay languages: Teal and Fennel**
+5. **Other gameplay languages: Teal and Fennel**
 
 Moved to the end of the list by the maintainer on 2026-10-02 (not enough capacity for it that week); whether it comes
 before or after 1.0 is theirs to say.
