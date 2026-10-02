@@ -367,8 +367,13 @@ same bytes.
   - The in-game gate (`deno task gate additions`) passed: its printed lines are read from a file, the maintainer watched
     rain and one effect, and six input steps were advanced with Esc. All 21 weather ids of the README were created.
   - A `wrappers.event` module with every event response was rejected: it would bundle every widget class.
-- **Deno replaced by Go: Moonwell 0.8.0, implemented, awaiting its gate and release** (roadmap 5.1; spec
-  `docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md`, approved 2026-10-02). The maintainer chose Go,
+- **Released 0.8.0, Deno replaced by Go** (2026-10-02, GitHub release `moonwell@0.8.0` on `ebf51d9`, built by the
+  release workflow, whose last job installed it on Ubuntu and Windows with the install line and built a new project;
+  nothing went to JSR; roadmap 5.1; spec
+  `docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md`, approved 2026-10-02). Gate steps 1 to 6 passed,
+  3 to 6 run by the maintainer with the program built from the release commit; 7 to 13 are covered by the conformance
+  suite. Still open: the maintainer running the install line on their own machine (does SmartScreen warn?). The
+  maintainer chose Go,
   one `moonwell` executable on the PATH installed by a script from the GitHub release, the standard library only, every
   test ported, releases built by CI from the tag, and a redesign in idiomatic Go checked from outside: a contract (same
   commands, same written bytes, same messages) and a conformance suite that ran both CLIs. Six plans, 5a to 5f; the
@@ -432,7 +437,7 @@ same bytes.
     (`internal/cli/process_windows_test.go`).
   - Another agent (Codex) wrote the tests of Plan 5d's Task 4 and the conformance suite while Claude was out of usage;
     its notes are in the git-ignored `.superpowers/sdd/`, with an audit of what Plans 5e and 5f must cover.
-  - **Plan 5e, implemented up to the release** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-cutover.md`):
+  - **Plan 5e, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-cutover.md`):
     the generators in Go (`tools/gen`, with the SLK, INI and JASS parsers as packages below it); `cli/`, the TypeScript
     generators, every `deno.json` and the conformance suite deleted; `cli/runtime` and `cli/data` moved to `runtime/`
     and `data/`; `install.ps1`, `install.sh` and `.github/workflows/release.yml`; version 0.8.0; the documents.
@@ -487,12 +492,11 @@ same bytes.
    complete: the port of `wc3-lib` is done. Phase 4 is under way, in the roadmap's suggested order: item 1 (the wrappers
    additions) is released as wrappers v0.8.0, item 2 (assets shipped by libraries) as Moonwell 0.6.0, and item 3 (the
    custom map preview) as Moonwell 0.7.0. What is left follows the roadmap's phase 5, the order the maintainer set on
-   2026-10-01, which is also the order of the Backlog below: replace Deno; other gameplay languages and the YueScript
-   pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal of Unit wrappers; PNG as a
-   preview format; the key release `onKeyDown` depends on; and last, the online checks before 1.0. Every item needs a
-   short design first. **Now:** the gate and release of 0.8.0 (Plan 5e, Task 6: the maintainer runs gate steps 1 to 6
-   with a `moonwell` built from the checkout, then the tag is pushed and the release workflow read, then the
-   maintainer runs the install line once). After that, backlog item 2.
+   2026-10-01, which is also the order of the Backlog below: replace Deno (done: Moonwell 0.8.0); other gameplay
+   languages and the YueScript pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal
+   of Unit wrappers; PNG as a preview format; the key release `onKeyDown` depends on; and last, the online checks before
+   1.0. Every item needs a short design first. **Now:** backlog item 1, other gameplay languages and the YueScript pin;
+   its design starts when the maintainer says so. One loose end of 0.8.0: the maintainer's own run of the install line.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -575,14 +579,10 @@ hides what it would have found. On Windows also run `GOOS=linux go vet ./...`: s
 Entries that are done were removed on 2026-10-01: the custom map preview (Moonwell 0.7.0), assets shipped by libraries
 (0.6.0), the wrappers candidate additions (wrappers v0.8.0), the UI wrappers releases B and C (v0.4.0, v0.5.0), the
 editor error for effects attached to items and destructables (v0.5.1) and the port of `wc3-lib` (moonwell-systems v0.1.0
-to v0.5.0). The State section above records each.
+to v0.5.0). Replacing Deno was removed on 2026-10-02 (Moonwell 0.8.0, with the sibling repositories' tools), and the
+entries below were renumbered. The State section above records each.
 
-1. **Replace Deno**
-
-- **What is left of it:** the gate and release of Moonwell 0.8.0 (Plan 5e, Task 6; CONTRIBUTING, Publishing). The code,
-  the documents and the sibling repositories' tools are done (State above). Remove this entry once 0.8.0 is released.
-
-2. **Other gameplay languages, and the YueScript pin**
+1. **Other gameplay languages, and the YueScript pin**
 
 - **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
   sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
@@ -596,13 +596,13 @@ to v0.5.0). The State section above records each.
   `internal/yue/yue_test.go` fails and should become a test that such a file compiles, and the README's and this
   file's `//` notes go.
 
-3. **`moonwell-library.json` in the libraries**
+2. **`moonwell-library.json` in the libraries**
 
 - **Add `moonwell-library.json` with `{"dir": "src"}` to moonwell-wrappers and moonwell-systems,** in their next
   releases, so a map can leave `dir` out of its manifest (Moonwell 0.6.0 reads the file). Their READMEs and the
   tag-consumption checks then use the short form.
 
-4. **Automatic disposal of Unit wrappers**
+3. **Automatic disposal of Unit wrappers**
 
 - **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
   maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
@@ -614,13 +614,13 @@ to v0.5.0). The State section above records each.
   positives (port-needs note §6.3). It needs a custom ability in every map's object data; polling type ids, as `wc3-lib`
   does, needs none.
 
-5. **PNG as a preview format**
+4. **PNG as a preview format**
 
 - **`settings.info.preview` naming a `.png`.** Left out of Moonwell 0.7.0 by the maintainer's choice. Moonwell would
   read the PNG and write the same TGA it writes today, so nothing changes in the game. Go's standard library decodes
   PNG (`image/png`), so this is the size check, the conversion to the TGA's pixels, and their tests.
 
-6. **The key release `onKeyDown` depends on**
+5. **The key release `onKeyDown` depends on**
 
 - **A key release the game never sends.** `wrappers.input`'s `onKeyDown` runs once per press because the module keeps
   whether each listened key is held (wrappers v0.8.0). If the game drops a release, for example when the window loses
@@ -628,7 +628,7 @@ to v0.5.0). The State section above records each.
   (hold a key, switch away, let go, switch back, press again), and if a release can be lost, decide how the held state
   recovers.
 
-7. **Online multiplayer and desync checks, then 1.0**
+6. **Online multiplayer and desync checks, then 1.0**
 
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on

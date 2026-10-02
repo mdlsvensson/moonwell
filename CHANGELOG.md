@@ -54,6 +54,10 @@ run by hand, with the `moonwell` built from the release commit (CONTRIBUTING, st
 - Steps 7 to 13 were not run by hand: they are covered by the conformance suite, whose last green run is commit
   `e786070`.
 
+Published 2026-10-02 as the GitHub release `moonwell@0.8.0`, built by the release workflow from the tag. Its last job
+ran the install line of the release on Ubuntu and Windows, then `moonwell init my-map` and `moonwell build`, on machines
+that had neither the program nor the Pkl package.
+
 ## 0.7.0 (2026-10-01)
 
 - **A picture of your own in the game's map list.** `settings.info.preview = "preview.tga"` names a `.tga` or a `.blp`

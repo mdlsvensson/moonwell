@@ -196,7 +196,9 @@ func GenerateGamePaths(list, version, target string) (int, error)
 
 ### Task 6: The gate and the release
 
-- [ ] The maintainer runs gate steps 1 to 6 with a `moonwell` built from the checkout.
-- [ ] Push, then push the tag `moonwell@0.8.0`; the release workflow is green, including its install job.
+- [x] The maintainer runs gate steps 1 to 6 with a `moonwell` built from the checkout. (Passed 2026-10-02.)
+- [x] Push, then push the tag `moonwell@0.8.0`; the release workflow is green, including its install job. (Run
+      37028600154, on commit `ebf51d9`: the version check, the checks on both systems, the release, and the install
+      job on Ubuntu and Windows.)
 - [ ] The maintainer runs the install line once and reports whether SmartScreen warned.
-- [ ] `AGENTS.md` and `CHANGELOG.md` record the release. Commit: `docs: Moonwell 0.8.0 is released`.
+- [x] `AGENTS.md` and `CHANGELOG.md` record the release. Commit: `docs: Moonwell 0.8.0 is released`.
