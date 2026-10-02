@@ -1,8 +1,9 @@
 # Moonwell in Go: Replacing Deno (Moonwell 0.8.0) — Design
 
 - **Date:** 2026-10-02
-- **Status:** Designed with the maintainer in chat on 2026-10-02, part by part; this written spec awaits the
-  maintainer's review.
+- **Status:** Approved by the maintainer on 2026-10-02. Plan 5a
+  (`docs/superpowers/plans/2026-10-02-moonwell-go-foundations.md`) amends the package table of §3.1 and the key order
+  of §4.4.
 - **Builds on:** `docs/superpowers/research/2026-10-01-replacing-deno.md` (the reasons, what Deno does for the project,
   the paths). This spec takes its Path 6 and replaces its §9 lean.
 - **Roadmap:** phase 5, item 1, and the backlog entry "Replace Deno".
