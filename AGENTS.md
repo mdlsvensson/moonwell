@@ -501,8 +501,9 @@ same bytes.
    2026-10-01 and changed on 2026-10-02, which is also the order of the Backlog below: replace Deno (done: Moonwell
    0.8.0); the YueScript pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal of Unit
    wrappers; PNG as a preview format; the key release `onKeyDown` depends on; the online checks before 1.0; and Teal
-   and Fennel, moved to the end on 2026-10-02. Every item needs a short design first. **Now:** backlog item 1, the
-   YueScript pin: measured, and its short design is with the maintainer for approval.
+   and Fennel, moved to the end on 2026-10-02. Every item needs a short design first. **Now:** nothing is under way. Backlog
+   item 1, the YueScript pin, is measured and has a short design (below), which the maintainer put off on 2026-10-02
+   ("not now"); ask before starting it.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -609,6 +610,12 @@ entries below were renumbered. The State section above records each.
     `9f47c8c7d3b6aa6e439786ae4708b9e070edbb01876712e1212917decd01d916`; the same archive layout as 0.34.2.
   - Also to change: `schema/Project.pkl`'s default (so it needs a release), and the libraries' tools, which demand
     0.34.2 of the `yue` on the PATH (`moonwell setup` replaces that one with the project's version).
+- **The design shown to the maintainer, not yet approved** (they answered "not now" on 2026-10-02): 0.34.3 becomes the
+  default and 0.34.2 stays a known version; the floor-division test becomes "such a file compiles", and a new test
+  covers a bitwise operator; a compile that fails with `Failed to rewrite` or `Failed to minify` gets a Moonwell error
+  naming the `.yue` file, with a hint to put bitwise code in a Lua module under `lua/` (bundled as written; the game's
+  Lua 5.3 has the operators); the `//` notes leave the README and this file; both libraries' tools and documents move
+  to 0.34.3; released as 0.8.1. Already decided for when it starts: no in-game run before that release.
 
 2. **`moonwell-library.json` in the libraries**
 
