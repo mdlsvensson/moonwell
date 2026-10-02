@@ -200,5 +200,6 @@ func GenerateGamePaths(list, version, target string) (int, error)
 - [x] Push, then push the tag `moonwell@0.8.0`; the release workflow is green, including its install job. (Run
       37028600154, on commit `ebf51d9`: the version check, the checks on both systems, the release, and the install
       job on Ubuntu and Windows.)
-- [ ] The maintainer runs the install line once and reports whether SmartScreen warned.
+- [x] The maintainer runs the install line once and reports whether SmartScreen warned. (2026-10-02: installed, no
+      warning.)
 - [x] `AGENTS.md` and `CHANGELOG.md` record the release. Commit: `docs: Moonwell 0.8.0 is released`.

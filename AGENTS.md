@@ -372,7 +372,7 @@ same bytes.
   nothing went to JSR; roadmap 5.1; spec
   `docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md`, approved 2026-10-02). Gate steps 1 to 6 passed,
   3 to 6 run by the maintainer with the program built from the release commit; 7 to 13 are covered by the conformance
-  suite. Still open: the maintainer running the install line on their own machine (does SmartScreen warn?). Their
+  suite. The maintainer then ran the install line on their own machine: no SmartScreen or Defender warning. Their
   first try failed for another reason: five minutes after publishing, the release was marked as a pre-release like
   every release before it, GitHub's "latest" skips pre-releases, and the README's
   `releases/latest/download/install.ps1` answered 404 (Windows PowerShell 5.1 says "The connection was closed
@@ -502,7 +502,7 @@ same bytes.
    languages and the YueScript pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal
    of Unit wrappers; PNG as a preview format; the key release `onKeyDown` depends on; and last, the online checks before
    1.0. Every item needs a short design first. **Now:** backlog item 1, other gameplay languages and the YueScript pin;
-   its design starts when the maintainer says so. One loose end of 0.8.0: the maintainer's own run of the install line.
+   its design starts when the maintainer says so.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 

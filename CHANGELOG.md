@@ -60,7 +60,8 @@ that had neither the program nor the Pkl package.
 
 At first the README's install line answered 404: the release had been marked as a pre-release, like every
 release before it, and GitHub's `releases/latest` skips those. From 0.8.0 on, Moonwell's releases are full releases, and
-the release workflow now runs the README's line itself.
+the release workflow now runs the README's line itself. The maintainer then installed 0.8.0 with that line on Windows:
+the downloaded program started without a SmartScreen warning.
 
 ## 0.7.0 (2026-10-01)
 
