@@ -478,7 +478,9 @@ same bytes.
     is `~/.vscode/extensions/sumneko.lua-3.19.1-win32-x64/server/bin/lua-language-server.exe` (`MOONWELL_LUALS`).
     Until the maintainer installs `moonwell` 0.8.0, build one (`go build -o <file> ./cmd/moonwell`) and name it in
     `MOONWELL`.
-- **Moonwell 0.8.1, YueScript 0.34.3** (2026-10-02; a short design in chat, approved by the maintainer). 0.34.3 is the
+- **Released 0.8.1, YueScript 0.34.3** (2026-10-02, GitHub release `moonwell@0.8.1` on `98fbdac`, a full release marked
+  latest; the workflow's install job ran the README's own line on both systems, and the line was fetched again from
+  Windows PowerShell afterwards; a short design in chat, approved by the maintainer). 0.34.3 is the
   default compiler (`yue.DefaultVersion`, `schema/Project.pkl`); 0.34.2 stays in `yue.Known`, because a project on the
   0.8.0 Pkl package still names it.
   - Measured before the design, 0.34.3 against 0.34.2: `//` compiles with `-r` and `-m` and the Lua runs. Bitwise

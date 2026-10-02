@@ -21,6 +21,9 @@ Steps 1 and 2 (CONTRIBUTING) passed 2026-10-02 on Windows, and CI passed on Ubun
 re-run, by the maintainer's decision: compiled Lua is unchanged for code that built before, and `//` is an operator of
 the game's Lua 5.3.
 
+Published 2026-10-02 as the GitHub release `moonwell@0.8.1`, built by the release workflow, whose last job ran the
+README's install line on Ubuntu and Windows, then `moonwell init my-map` and `moonwell build`.
+
 ## 0.8.0 (2026-10-02)
 
 - **Moonwell is one program, `moonwell`, and no longer needs Deno.** Install it with one line (PowerShell on Windows,
