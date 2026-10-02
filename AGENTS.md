@@ -498,11 +498,11 @@ same bytes.
    complete: the port of `wc3-lib` is done. Phase 4 is under way, in the roadmap's suggested order: item 1 (the wrappers
    additions) is released as wrappers v0.8.0, item 2 (assets shipped by libraries) as Moonwell 0.6.0, and item 3 (the
    custom map preview) as Moonwell 0.7.0. What is left follows the roadmap's phase 5, the order the maintainer set on
-   2026-10-01, which is also the order of the Backlog below: replace Deno (done: Moonwell 0.8.0); other gameplay
-   languages and the YueScript pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal
-   of Unit wrappers; PNG as a preview format; the key release `onKeyDown` depends on; and last, the online checks before
-   1.0. Every item needs a short design first. **Now:** backlog item 1, other gameplay languages and the YueScript pin;
-   its design starts when the maintainer says so.
+   2026-10-01 and changed on 2026-10-02, which is also the order of the Backlog below: replace Deno (done: Moonwell
+   0.8.0); the YueScript pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal of Unit
+   wrappers; PNG as a preview format; the key release `onKeyDown` depends on; the online checks before 1.0; and Teal
+   and Fennel, moved to the end on 2026-10-02. Every item needs a short design first. **Now:** backlog item 1, the
+   YueScript pin: measured, and its short design is with the maintainer for approval.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -590,19 +590,25 @@ editor error for effects attached to items and destructables (v0.5.1) and the po
 to v0.5.0). Replacing Deno was removed on 2026-10-02 (Moonwell 0.8.0, with the sibling repositories' tools), and the
 entries below were renumbered. The State section above records each.
 
-1. **Other gameplay languages, and the YueScript pin**
+1. **The YueScript pin**
 
-- **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
-  sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
-  declarations (`.d.tl`) could be rendered from `data/natives.json` like the editor's `natives.d.lua`.
-- **Fennel support.** The maintainer chose YueScript (2026-09-27) for its familiar syntax and VS Code support, with
-  Fennel as a later option: a fennel-ls docset rendered from `data/natives.json` (sub-project 3), plus a Fennel
-  compile step next to the YueScript one.
-- TypeScript and C# support were dropped on 2026-10-01: the maintainer targets Lua, Teal, Fennel and YueScript only.
-- **Pin YueScript 0.34.3.** It fixes the `//` bug upstream (IppClub/YueScript#256); check whether it also fixes bitwise
-  operators, for which 0.34.2 writes an empty file too. Once it is pinned, the floor-division test in
-  `internal/yue/yue_test.go` fails and should become a test that such a file compiles, and the README's and this
-  file's `//` notes go.
+- **Pin YueScript 0.34.3.** It fixes the `//` bug upstream (IppClub/YueScript#256). Once it is pinned, the
+  floor-division test in `internal/yue/yue_test.go` fails and should become a test that such a file compiles, and the
+  README's and this file's `//` notes go.
+- **Measured on 2026-10-02, before the design** (0.34.3 for Windows, compared with 0.34.2):
+  - `//` compiles with `-r` and `-m`, and the Lua runs.
+  - Bitwise operators (`&`, `|`, `~`, `<<`, `>>`) are not fixed, but no longer silent: with `-r` or `-m` the compiler
+    exits with 2 and `Failed to rewrite: <file>` (or `Failed to minify`), then `>> :<line>:<column>: Unexpected Symbol`.
+    It leaves the plain compiled Lua behind. Moonwell reports it as a compile failure of the `.yue` file, with the
+    compiler's text, an absolute path and a line of the Lua output.
+  - 24 YueScript sources (the template, both libraries' examples and fixtures, the gate map's probes) compile to the
+    same bytes with both versions, in both modes.
+  - Moonwell's tests pass with 0.34.3 except the floor-division test, as intended.
+  - Release assets, with the hashes GitHub lists: `yue-windows-x64.7z`
+    `548b2fe699f46080cbca6c3d5951df2bcbcbb6bbdd215744054020962e6b7075`, `yue-linux-x86_64.zip`
+    `9f47c8c7d3b6aa6e439786ae4708b9e070edbb01876712e1212917decd01d916`; the same archive layout as 0.34.2.
+  - Also to change: `schema/Project.pkl`'s default (so it needs a release), and the libraries' tools, which demand
+    0.34.2 of the `yue` on the PATH (`moonwell setup` replaces that one with the project's version).
 
 2. **`moonwell-library.json` in the libraries**
 
@@ -647,3 +653,16 @@ entries below were renumbered. The State section above records each.
   `sound:getDuration()` agrees across machines, the wrappers v0.8.0 input listeners and `weather:enableFor`, the
   Moonwell 0.7.0 preview picture in the lobby of a hosted game, and any later feature with multiplayer effects. Until
   then, release gates record these as deferred, not passed.
+
+7. **Other gameplay languages: Teal and Fennel**
+
+Moved to the end of the list by the maintainer on 2026-10-02 (not enough capacity for it that week); whether it comes
+before or after 1.0 is theirs to say.
+
+- **Teal support.** Gameplay in Teal (typed Lua, compiled by `tl`), next to YueScript. Added 2026-09-28; it builds on
+  sub-project 4a's Lua modules. The `tl` compiler is itself written in Lua, so it can run without Node.js; its type
+  declarations (`.d.tl`) could be rendered from `data/natives.json` like the editor's `natives.d.lua`.
+- **Fennel support.** The maintainer chose YueScript (2026-09-27) for its familiar syntax and VS Code support, with
+  Fennel as a later option: a fennel-ls docset rendered from `data/natives.json` (sub-project 3), plus a Fennel
+  compile step next to the YueScript one.
+- TypeScript and C# support were dropped on 2026-10-01: the maintainer targets Lua, Teal, Fennel and YueScript only.

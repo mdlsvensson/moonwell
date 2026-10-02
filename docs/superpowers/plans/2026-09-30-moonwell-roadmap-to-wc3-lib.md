@@ -345,7 +345,8 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
    `moonwell` program, the standard library only) and implemented by Plans 5a to 5e
    (`2026-10-02-moonwell-go-foundations`, `-planners`, `-compile`, `-commands`, `-cutover`) as Moonwell 0.8.0, and
    Plan 5f (`-siblings`) took Deno out of the three sibling repositories. Released 2026-10-02 (`moonwell@0.8.0`).
-2. **Other gameplay languages, and the YueScript pin.** The maintainer targets Lua, Teal, Fennel and YueScript only
+2. **Other gameplay languages, and the YueScript pin.** **Order changed on 2026-10-02:** the pin stays here; Teal and
+   Fennel move to the end of this phase's list. The maintainer targets Lua, Teal, Fennel and YueScript only
    (2026-10-01): TypeScript and C# support are dropped.
    - Teal first: its compiler is Lua, and its types map to the annotated Lua we already write.
    - Then Fennel.
