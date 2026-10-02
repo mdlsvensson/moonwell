@@ -241,3 +241,12 @@ func SHA256Hex(b []byte) string {
 	sum := sha256.Sum256(b)
 	return hex.EncodeToString(sum[:])
 }
+
+// Resolve returns path when it is absolute, and otherwise path under base: how a path written in a manifest is
+// read against the folder it is relative to.
+func Resolve(base, path string) string {
+	if filepath.IsAbs(path) {
+		return filepath.Clean(path)
+	}
+	return filepath.Join(base, path)
+}

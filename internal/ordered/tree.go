@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"strconv"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/text"
@@ -19,6 +20,7 @@ type Object = Map[any]
 // float64, bool or nil for the rest. Objects keep their key order.
 func Decode(data []byte) (any, error) {
 	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
 	value, err := decodeValue(decoder)
 	if err != nil {
 		return nil, err
@@ -68,6 +70,11 @@ func decodeValue(decoder *json.Decoder) (any, error) {
 		}
 		_, err := decoder.Token()
 		return array, err
+	}
+	if number, ok := token.(json.Number); ok {
+		// As JSON.parse: a number too large for a double is an infinity.
+		value, _ := strconv.ParseFloat(string(number), 64)
+		return value, nil
 	}
 	return token, nil
 }

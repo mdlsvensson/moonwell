@@ -109,7 +109,10 @@ func IsSpace(r rune) bool {
 
 // SpaceClass is JavaScript's \s as a character class for Go's regular expressions, whose own \s is ASCII only and
 // has no vertical tab.
-const SpaceClass = `[\t\n\v\f\r \x{A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}]`
+const SpaceClass = "[" + SpaceSet + "]"
+
+// SpaceSet is the inside of SpaceClass, for building other classes such as "[^=" + SpaceSet + "]".
+const SpaceSet = `\t\n\v\f\r \x{A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}`
 
 // NotLineBreak is JavaScript's `.` as a character class: anything but a line terminator.
 const NotLineBreak = `[^\n\r\x{2028}\x{2029}]`
