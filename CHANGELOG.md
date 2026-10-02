@@ -9,6 +9,8 @@
   checks.
 - Plan 5b (`2026-10-02-moonwell-go-planners`): reading the manifest, and planning map settings, object data and assets,
   in Go.
+- Plan 5c (`2026-10-02-moonwell-go-compile`): libraries, the YueScript compiler, the bundle, the unknown-global check,
+  the editor's files and the staged map, in Go.
 
 ## 0.7.0 (2026-10-01)
 

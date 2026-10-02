@@ -42,6 +42,25 @@ here; a task is done when its inventory rows are ported and pass. Test-first.
 - **Caches** (`.hashes.json`, `.globals.json`) keep their names and shapes, written with `ordered.Stringify`, so a
   project's existing caches stay valid and nothing recompiles after the switch.
 
+## Amendments made while implementing
+
+- **`internal/yuetest`, not `testkit.NeedYue`.** `testkit` is imported by the tests of packages that `yue` depends on
+  (`luasrc`), so a helper that imports `yue` cannot live there. Tests call `yuetest.Need(t)`.
+- **`text.LocaleCompare`.** The TypeScript sorts the failed files of a compile with `localeCompare`, which is not
+  code-unit order (`_` before digits before letters, `a` before `B`). `text.LocaleCompare` reproduces it for ASCII
+  (compared with Deno on 3,999 pairs); characters past ASCII sort after the letters, which is a deviation.
+- **`yue.Output` has `Texts` and `Load`, no `sources`.** The TypeScript's `sources` (texts keyed by path under src/)
+  had no caller; `Texts["src/" + path]` is the same text.
+- **`yue.OnPath`** replaces `checkYueOnPath`'s three-way result with `(version, found, err)`.
+- **`library.HTTPFetch`** is the real downloader; `pipeline.NewEnv` leaves `Spawn` for Plan 5d, which ports
+  `launch.ts`, and the two `launchGame` cases of `pipeline.test.ts` move there with it.
+- **Test files** are fewer than the inventory names: `library_test.go` and `sync_test.go` hold the six library files'
+  cases, `bundle_test.go` the three bundle files', `editor_test.go` the five editor files', and `install_test.go`,
+  `uses_test.go` and `yue_test.go` the rest. Every case of the inventory is ported.
+- **Deviations:** an unreadable `.hashes.json` or `.globals.json` (wrong shapes inside valid JSON) is treated as
+  absent instead of failing with an internal error; "Known versions" are listed sorted; the hint for a compiler copy
+  that cannot be replaced says `moonwell setup`.
+
 ## File structure
 
 ```
@@ -132,11 +151,11 @@ func Sync(ctx context.Context, root string, libraries *ordered.Map[project.Libra
 
 `Files` is a set of files by POSIX path that keeps the order they were added in (a JavaScript `Map`).
 
-- [ ] The lock file's text is byte for byte the TypeScript's: keys sorted, each entry's fields in the order github,
+- [x] The lock file's text is byte for byte the TypeScript's: keys sorted, each entry's fields in the order github,
       tag, dir, commit, files, assets, two-space indentation, a final newline.
-- [ ] The stamp `.moonwell-library.json` keeps its fields and `layout: 2`, so a project synced by 0.7.0 is not
+- [x] The stamp `.moonwell-library.json` keeps its fields and `layout: 2`, so a project synced by 0.7.0 is not
       downloaded again.
-- [ ] Commit: `go: logging and library`.
+- [x] Commit: `go: logging and library`.
 
 ### Task 2: `bundle`
 
@@ -180,8 +199,8 @@ func Emit(input EmitInput) string
 func Inject(script string, bundle func(firstLine int) string, file string) (string, error)
 ```
 
-- [ ] Names and paths in the bundle are quoted with `text.Quote` (`JSON.stringify`).
-- [ ] Commit: `go: bundle`.
+- [x] Names and paths in the bundle are quoted with `text.Quote` (`JSON.stringify`).
+- [x] Commit: `go: bundle`.
 
 ### Task 3: `yue`
 
@@ -242,9 +261,9 @@ func ParseGlobalUses(output, file string) ([]GlobalUse, error)
 func ListGlobalUses(ctx context.Context, options UsesOptions) (map[string][]GlobalUse, error)
 ```
 
-- [ ] `yue` runs in parallel, eight at a time by default, with a buffered channel as the limit.
-- [ ] The Windows archive is 7-Zip and is unpacked by Windows' own `tar.exe`, as today.
-- [ ] Commit: `go: yue`.
+- [x] `yue` runs in parallel, eight at a time by default, with a buffered channel as the limit.
+- [x] The Windows archive is 7-Zip and is unpacked by Windows' own `tar.exe`, as today.
+- [x] Commit: `go: yue`.
 
 ### Task 4: `lint` and `editor`
 
@@ -294,8 +313,8 @@ func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, 
 func RefreshLibraryView(root string, modules []bundle.SourceModule, loadCompiled func(bundle.SourceModule) (*bundle.CompiledModule, error)) ([]string, error)
 ```
 
-- [ ] `.luarc.json` is rewritten with `ordered.Stringify(…, 2)` and a final newline, keeping the file's key order.
-- [ ] Commit: `go: lint and editor`.
+- [x] `.luarc.json` is rewritten with `ordered.Stringify(…, 2)` and a final newline, keeping the file's key order.
+- [x] Commit: `go: lint and editor`.
 
 ### Task 5: `pipeline`
 
@@ -327,9 +346,9 @@ func PrepareStage(ctx context.Context, env *Env, p *project.Project, options Sta
 func AcquireLock(distDir string) (release func(), err error)
 ```
 
-- [ ] Commit: `go: pipeline`.
+- [x] Commit: `go: pipeline`.
 
 ### Task 6: Close the plan
 
-- [ ] Every check from a clean tree; `AGENTS.md` and `CHANGELOG.md` say Plan 5c is implemented, with its deviations.
-- [ ] Commit: `docs: Plan 5c of the Go toolchain is implemented`.
+- [x] Every check from a clean tree; `AGENTS.md` and `CHANGELOG.md` say Plan 5c is implemented, with its deviations.
+- [x] Commit: `docs: Plan 5c of the Go toolchain is implemented`.

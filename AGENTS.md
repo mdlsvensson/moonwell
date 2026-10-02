@@ -396,6 +396,18 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
     for byte, and the patched `war3map.lua` and `war3map.w3i` equal the expected text and World Editor's save.
   - Recorded deviation: "the string contains an unpaired surrogate" cannot occur (Go's JSON decoder turns one into
     U+FFFD first).
+  - **Plan 5c, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-compile.md`): `logging`,
+    `library` (tag archives through `archive/zip`, the lock, the sync), `bundle` (modules, the require graph, the bundle
+    text), `yue` (installing the compiler, compiling with the hash cache, `yue -g`), `lint`, `editor` and `pipeline`
+    (`Env`, `CompileProject`, `PlanObjects`, `PrepareStage`, the build lock). The whole build short of packing now runs
+    in Go; no command reaches it yet.
+  - The caches keep their names and shapes (`.hashes.json`, `.globals.json`, the library stamp with `layout: 2`), so a
+    project built by 0.7.0 recompiles and downloads nothing after the switch.
+  - Tests that need the real compiler call `yuetest.Need(t)` (`MOONWELL_TEST_YUE`, else the pinned compiler from the
+    user cache). It is its own package because `testkit` is imported by tests of packages `yue` depends on.
+  - `text.LocaleCompare` stands in for JavaScript's `localeCompare`, which orders the failed files of a compile:
+    identical to Deno for ASCII, not past it.
+  - A Bash command that starts `python` hangs Claude's shell until it times out (twice now): never call it.
   - Go is at `C:\Program Files\Go\bin` (1.27.0) and is not on the PATH of Claude's shell: prefix commands with
     `export PATH="$PATH:/c/Program Files/Go/bin"`. In files written by Claude's tools, a `\uFEFF` escape becomes a real
     byte order mark, which Go refuses in source: write `"\xEF\xBB\xBF"`.
