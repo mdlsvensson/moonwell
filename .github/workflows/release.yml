@@ -10,7 +10,20 @@ permissions:
   contents: write
 
 jobs:
+  # First, so that a tag on the wrong commit fails before anything is checked or built. The install scripts' version
+  # is checked against version.go by a test, which the check job runs.
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: The tag, version.go and schema/PklProject agree
+        run: |
+          version="${GITHUB_REF_NAME#moonwell@}"
+          grep -qF "const Version = \"$version\"" version.go || { echo "version.go is not at $version"; exit 1; }
+          grep -qF "version = \"$version\"" schema/PklProject || { echo "schema/PklProject is not at $version"; exit 1; }
+
   check:
+    needs: version
     uses: ./.github/workflows/ci.yml
 
   release:
@@ -30,13 +43,8 @@ jobs:
           chmod +x "$RUNNER_TEMP/pkl/pkl"
           echo "$RUNNER_TEMP/pkl" >> "$GITHUB_PATH"
 
-      # The install scripts' version is checked against version.go by a test, which the check job ran.
-      - name: The tag, version.go and schema/PklProject agree
-        run: |
-          version="${GITHUB_REF_NAME#moonwell@}"
-          echo "VERSION=$version" >> "$GITHUB_ENV"
-          grep -qF "const Version = \"$version\"" version.go || { echo "version.go is not at $version"; exit 1; }
-          grep -qF "version = \"$version\"" schema/PklProject || { echo "schema/PklProject is not at $version"; exit 1; }
+      - name: The version, from the tag
+        run: echo "VERSION=${GITHUB_REF_NAME#moonwell@}" >> "$GITHUB_ENV"
 
       - name: Build the executables
         env:

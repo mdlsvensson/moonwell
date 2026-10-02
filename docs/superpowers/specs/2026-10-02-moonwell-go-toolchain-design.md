@@ -1,9 +1,12 @@
 # Moonwell in Go: Replacing Deno (Moonwell 0.8.0) — Design
 
 - **Date:** 2026-10-02
-- **Status:** Approved by the maintainer on 2026-10-02. Plan 5a
-  (`docs/superpowers/plans/2026-10-02-moonwell-go-foundations.md`) amends the package table of §3.1 and the key order
-  of §4.4.
+- **Status:** Approved by the maintainer on 2026-10-02. Implemented by Plans 5a to 5f
+  (`docs/superpowers/plans/2026-10-02-moonwell-go-*.md`), each of which records what it changed: Plan 5a amends the
+  package table of §3.1 and the key order of §4.4; Plan 5c replaces §5's byte order for compile failures with
+  `text.LocaleCompare`; Plan 5e changes the first line of the generated schema files (§9) and gives `gen metadata` the
+  game version; Plan 5f makes `MOONWELL` an executable, not a command line (§10). What is left is the gate and release
+  of 0.8.0 (§11).
 - **Builds on:** `docs/superpowers/research/2026-10-01-replacing-deno.md` (the reasons, what Deno does for the project,
   the paths). This spec takes its Path 6 and replaces its §9 lean.
 - **Roadmap:** phase 5, item 1, and the backlog entry "Replace Deno".
