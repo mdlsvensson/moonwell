@@ -38,7 +38,7 @@ func Setup(ctx context.Context, env *pipeline.Env) (string, error) {
 	env.Log.Info("YueScript " + p.Yue.Version + ": " + binary)
 	binDir := filepath.Join(env.Install.CacheRoot, "bin")
 	if p.Yue.Path != nil {
-		binDir = filepath.Dir(*p.Yue.Path)
+		binDir = yue.DirAsWritten(*p.Yue.Path)
 	} else {
 		path, copied, err := yue.InstallBin(binary, env.Install.CacheRoot)
 		if err != nil {

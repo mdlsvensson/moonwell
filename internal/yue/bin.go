@@ -72,6 +72,30 @@ func OnPath(ctx context.Context, run proc.RunFunc) (version string, found bool, 
 	return version, version != "", nil
 }
 
+// DirAsWritten is the folder of path with the separators the path was written with: the manifest's yue.path may use
+// "/" on Windows, and the PATH command shows that folder to the user. filepath.Dir would rewrite them.
+func DirAsWritten(path string) string {
+	root := len(filepath.VolumeName(path))
+	end := len(path)
+	for end > root && os.IsPathSeparator(path[end-1]) {
+		end--
+	}
+	for end > root && !os.IsPathSeparator(path[end-1]) {
+		end--
+	}
+	if end == root {
+		if root > 0 {
+			return path[:root]
+		}
+		return "."
+	}
+	// path[:end] ends with the separators before the last name; the root keeps one of them.
+	for end > root+1 && os.IsPathSeparator(path[end-1]) {
+		end--
+	}
+	return path[:end]
+}
+
 // PathCommand is the one-time command that adds binDir to the user's PATH: PowerShell on Windows, a shell line
 // elsewhere. Moonwell never runs it itself.
 func PathCommand(binDir, goos string) string {

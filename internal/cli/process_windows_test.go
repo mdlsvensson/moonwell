@@ -41,8 +41,9 @@ func processInterruptHelper() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	// The event goes to every process on the console, this one included.
-	signal.Ignore(os.Interrupt)
+	// The event goes to every process on the console, this one included: taking the signal keeps this one alive.
+	// (signal.Ignore does not: Go then leaves the event to Windows, which ends the process.)
+	signal.Notify(make(chan os.Signal, 1), os.Interrupt)
 	kernel.NewProc("FreeConsole").Call()
 	if result, _, err := kernel.NewProc("AttachConsole").Call(uintptr(pid)); result == 0 {
 		fmt.Fprintln(os.Stderr, "AttachConsole:", err)

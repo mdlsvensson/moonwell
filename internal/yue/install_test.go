@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"testing"
@@ -293,5 +294,28 @@ func TestReportEditorToolsTellsWindowsUsersToRunTheCommandInPowerShell(t *testin
 		!strings.Contains(log.Lines[0], "Run this once in PowerShell, then open a new terminal and restart VS Code") ||
 		!strings.HasSuffix(log.Lines[0], yue.PathCommand(binDir, "windows")) {
 		t.Errorf("log = %q", log.Lines)
+	}
+}
+
+func TestDirAsWrittenKeepsTheSeparatorsOfThePath(t *testing.T) {
+	cases := map[string]string{
+		"/opt/yue/0.34.2/yue": "/opt/yue/0.34.2",
+		"/opt/yue//yue":       "/opt/yue",
+		"/opt/yue/bin/":       "/opt/yue",
+		"/yue":                "/",
+		"yue":                 ".",
+		"tools/yue":           "tools",
+	}
+	if runtime.GOOS == "windows" {
+		cases["C:/Users/me/yue/0.34.2/yue.exe"] = "C:/Users/me/yue/0.34.2"
+		cases[`C:\Users\me\yue\yue.exe`] = `C:\Users\me\yue`
+		cases[`C:\Users/me\yue.exe`] = `C:\Users/me`
+		cases["C:/yue.exe"] = "C:/"
+		cases[`C:\yue.exe`] = `C:\`
+	}
+	for path, want := range cases {
+		if got := yue.DirAsWritten(path); got != want {
+			t.Errorf("DirAsWritten(%q) = %q, want %q", path, got, want)
+		}
 	}
 }
