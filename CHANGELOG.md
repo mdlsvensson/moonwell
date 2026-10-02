@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Moonwell is moving from Deno to Go** (design `2026-10-02-moonwell-go-toolchain-design`): one `moonwell` executable
+  in place of Deno, JSR and `deno.json`. Nothing changes for a project until 0.8.0; the TypeScript CLI stays in place
+  and tested meanwhile.
+- Plan 5a (`2026-10-02-moonwell-go-foundations`): the Go module and its first packages, checked by CI beside the Deno
+  checks.
+
 ## 0.7.0 (2026-10-01)
 
 - **A picture of your own in the game's map list.** `settings.info.preview = "preview.tga"` names a `.tga` or a `.blp`

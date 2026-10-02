@@ -123,20 +123,20 @@ func TemplateFiles() ([]TemplateFile, error)
 var TemplateExclude = []string{"deno.json", "PklProject", "PklProject.deps.json", "moonwell.local.pkl"}
 ```
 
-- [ ] `go.mod`: `module github.com/mdlsvensson/moonwell` and `go 1.27`.
-- [ ] `embed.go`: `//go:embed all:template` and the five single-file embeds. `TemplateFiles` walks the embedded
+- [x] `go.mod`: `module github.com/mdlsvensson/moonwell` and `go 1.27`.
+- [x] `embed.go`: `//go:embed all:template` and the five single-file embeds. `TemplateFiles` walks the embedded
       tree, skips `TemplateExclude` and what a project generates (`dist/`, `.moonwell/`, `src/**/*.lua`), and sorts
       with `text.Less`.
-- [ ] `module_test.go`: `go.mod` has no `require` and no Go file under the module imports `"C"`; `TemplateFiles`
-      equals a list written out in the test (the 29 files `git ls-files template` gives, less the excluded four);
+- [x] `module_test.go`: `go.mod` has no `require` and no Go file under the module imports `"C"`; `TemplateFiles`
+      equals a list written out in the test (the 30 files `git ls-files template` gives, less the excluded ones);
       `skipsGenerated` is tested on its own with the four paths of the TypeScript test; `.gitattributes` in the
       template has `maps/** binary` and `assets/** -text`; `Version` equals the `version` in `schema/PklProject`.
-- [ ] `.gitattributes`: add `**/testdata/** binary`.
-- [ ] `deno.json`: add `"internal"` to `fmt.exclude` (fixture copies must not be reformatted).
-- [ ] `ci.yml`: after `setup-deno`, `actions/setup-go@v5` with `go-version-file: go.mod`; after the Deno steps,
+- [x] `.gitattributes`: add `**/testdata/** binary`.
+- [x] `deno.json`: add `"internal"` to `fmt.exclude` (fixture copies must not be reformatted).
+- [x] `ci.yml`: after `setup-deno`, `actions/setup-go@v5` with `go-version-file: go.mod`; after the Deno steps,
       `go vet ./...`, a step that fails when `gofmt -l .` prints anything, and `go test ./...` with
       `MOONWELL_REQUIRE_TOOLS: "1"` and `MOONWELL_NETWORK_TESTS: "1"`.
-- [ ] Commit: `go: the module, embedded files and CI`.
+- [x] Commit: `go: the module, embedded files and CI`.
 
 ### Task 2: `text`
 
@@ -160,17 +160,17 @@ func Decode(b []byte) string    // new TextDecoder().decode: Lossy, then a leadi
 func Strict(b []byte) (string, bool) // fatal TextDecoder: false for bad bytes; a leading BOM removed
 ```
 
-- [ ] Tests: `UTF16Len("a🌙")` is 3; `Less` puts `""` after `"🌙"` (JavaScript's order) where byte order has
+- [x] Tests: `UTF16Len("a🌙")` is 3; `Less` puts `""` after `"🌙"` (JavaScript's order) where byte order has
       it before; `Quote` of a string with `"`, `\`, a newline, U+0007, `<`, `é`, U+2028 gives `JSON.stringify`'s
       output (`"\""`, `"\\"`, `"\n"`, `"\u0007"`, `<` and `é` and U+2028 unescaped); `IsSpace` accepts U+00A0 and
       U+FEFF and rejects U+200B; `Lossy` of `FF FF` is two U+FFFD and of `E2 82 41` is one U+FFFD then `A`
       (one replacement per maximal invalid prefix); `Upper("straße")` is `STRASSE`; `Lower("İ")` is `i̇`.
-- [ ] `Lossy` follows the Encoding Standard's UTF-8 decoder: a lead byte with too few valid continuation bytes is
+- [x] `Lossy` follows the Encoding Standard's UTF-8 decoder: a lead byte with too few valid continuation bytes is
       one replacement, and the byte that broke the sequence is read again.
-- [ ] `Upper` and `Lower` use `strings.ToUpper`/`ToLower` plus the special cases that occur in file names: `ß` to
+- [x] `Upper` and `Lower` use `strings.ToUpper`/`ToLower` plus the special cases that occur in file names: `ß` to
       `SS`, the ligatures U+FB00 to U+FB06, `İ` to `i` and U+0307. **Deviation, recorded:** other entries of
       Unicode's SpecialCasing table and the final sigma rule are not reproduced.
-- [ ] Commit: `go: text, where JavaScript and Go strings differ`.
+- [x] Commit: `go: text, where JavaScript and Go strings differ`.
 
 ### Task 3: `diag` and `names`
 
@@ -217,9 +217,9 @@ func JoinWords(words []string, conjunction string, max int) string // max < 0: a
 func Closest(names []string, key string, max int) []string
 ```
 
-- [ ] `Format` of any other error: `internal error: <err.Error()>` and `This is a bug in Moonwell; please report it.`
-- [ ] `EditDistance` counts UTF-16 units, as the TypeScript does.
-- [ ] Commit: `go: diag and names`.
+- [x] `Format` of any other error: `internal error: <err.Error()>` and `This is a bug in Moonwell; please report it.`
+- [x] `EditDistance` counts UTF-16 units, as the TypeScript does.
+- [x] Commit: `go: diag and names`.
 
 ### Task 4: `fsx`
 
@@ -244,11 +244,11 @@ func RelPath(value string) (string, error)            // assetPath: "Invalid ass
 func SafeJoin(root, relative string) (string, error)
 ```
 
-- [ ] "In use by another program" is `syscall.EBUSY`, or on Windows the sharing violation (`syscall.Errno(32)`); the
+- [x] "In use by another program" is `syscall.EBUSY`, or on Windows the sharing violation (`syscall.Errno(32)`); the
       Windows-only test holds a file open through PowerShell as the TypeScript test does.
-- [ ] `ReadSource` decodes with `text.Lossy`, as `Deno.readTextFile` does.
-- [ ] `RelPath` rejects control characters by UTF-16 unit, `<>:"|?*`, a trailing dot or space, and the device names.
-- [ ] Commit: `go: fsx`.
+- [x] `ReadSource` decodes with `text.Lossy`, as `Deno.readTextFile` does.
+- [x] `RelPath` rejects control characters by UTF-16 unit, `<>:"|?*`, a trailing dot or space, and the device names.
+- [x] Commit: `go: fsx`.
 
 ### Task 5: `binio`, `ordered`, `mapdir`
 
@@ -324,12 +324,12 @@ type Change struct {
 func Apply(dir string, changes []Change, failure string) error
 ```
 
-- [ ] `ordered` tests: document order kept; `{"b":1,"10":2,"2":3,"a":4}` ranges `2, 10, b, a`; `"01"` and `"-1"`
+- [x] `ordered` tests: document order kept; `{"b":1,"10":2,"2":3,"a":4}` ranges `2, 10, b, a`; `"01"` and `"-1"`
       are not indexes; a repeated key keeps its first place and its last value; `null` gives an empty map; marshal
       writes the same order.
-- [ ] `mapdir.Names` sorts entries with `text.Sort` before matching, as both TypeScript functions do, so the error
+- [x] `mapdir.Names` sorts entries with `text.Sort` before matching, as both TypeScript functions do, so the error
       for two spellings names the same pair in the same order.
-- [ ] Commit: `go: binio, ordered and mapdir`.
+- [x] Commit: `go: binio, ordered and mapdir`.
 
 ### Task 6: `luasrc`
 
@@ -405,15 +405,15 @@ runs to the end, a bad numeral takes `[0-9A-Za-z_.]` and exponent signs, an unkn
 - `Requires` and `TopLevelGlobals` ignore faults. They read a view of the tokens that is the old lenient stream:
   numbers left out and every symbol except a run of dots split into single characters. So their code is a direct
   port.
-- [ ] **Deviations, recorded.** For Lua the game itself would reject, or for two escapes the lenient lexer got wrong,
+- [x] **Deviations, recorded.** For Lua the game itself would reject, or for two escapes the lenient lexer got wrong,
       `Requires` and `TopLevelGlobals` can differ from 0.7.0: a quoted string with `\z` before a line break or a
       backslash before CRLF now continues (it ended at the break); a line break that ends an unterminated string now
       counts as a line; `1..2` is three tokens (it was one dropped number). Whitespace is JavaScript's `\s` in both
       scanners (the lenient lexer knew ASCII only).
-- [ ] `ReadMapGlobals` stays line-based with the TypeScript's four patterns.
-- [ ] The fixtures `map-settings-v39/war3map.lua` and `map-globals-we3/war3map.lua` come from `testkit` (Task 9
+- [x] `ReadMapGlobals` stays line-based with the TypeScript's four patterns.
+- [x] The fixtures `map-settings-v39/war3map.lua` and `map-globals-we3/war3map.lua` come from `testkit` (Task 9
       creates it; this task adds `internal/testkit/fixtures.go` and the copied `testdata/` first).
-- [ ] Commit: `go: luasrc, one Lua tokenizer and its scanners`.
+- [x] Commit: `go: luasrc, one Lua tokenizer and its scanners`.
 
 ### Task 7: `w3i`
 
@@ -488,11 +488,11 @@ func ByteEdit(f Field[uint8], value uint8) Edit
 func ApplyEdits(source []byte, edits []Edit) ([]byte, error)
 ```
 
-- [ ] The reader keeps the first failure and reads nothing after it, so the error for a cut-off file is the
+- [x] The reader keeps the first failure and reads nothing after it, so the error for a cut-off file is the
       TypeScript's (`truncated war3map.w3i`, `unterminated string in war3map.w3i`, invalid UTF-8) and never a later
       check's.
-- [ ] `testkit.SyntheticMapInfo(version)` is `syntheticMapInfo` of `tests/support/map-settings.ts`.
-- [ ] Commit: `go: w3i reader and byte edits`.
+- [x] `testkit.SyntheticMapInfo(version)` is `syntheticMapInfo` of `tests/support/map-settings.ts`.
+- [x] Commit: `go: w3i reader and byte edits`.
 
 ### Task 8: `mpq`
 
@@ -535,13 +535,13 @@ func (m *MPQ) Read(name string) ([]byte, bool, error)
 func (m *MPQ) Listfile() ([]string, error)
 ```
 
-- [ ] Sectors are compressed with `compress/zlib` at the default level; a sector is stored raw unless the compressed
+- [x] Sectors are compressed with `compress/zlib` at the default level; a sector is stored raw unless the compressed
       form plus its mask byte is smaller, as today. **Outside the contract (spec §2):** the compressed bytes differ
       from Deno's.
-- [ ] `testkit` must not import `mpq` (it would be a cycle for `mpq`'s own tests): `testkit.OpenMPQ` takes the hash
+- [x] `testkit` must not import `mpq` (it would be a cycle for `mpq`'s own tests): `testkit.OpenMPQ` takes the hash
       and decrypt functions it needs from a tiny copy of the crypt table, or the MPQ tests live in package
       `mpq_test`. Use the second: `testkit` imports `mpq`, and `mpq`'s tests are an external test package.
-- [ ] Commit: `go: the MPQ writer and map packing`.
+- [x] Commit: `go: the MPQ writer and map packing`.
 
 ### Task 9: `models`, `natives`, `testkit`
 
@@ -610,16 +610,16 @@ type Natives struct {
 func Load() *Natives // the embedded natives.json, parsed once
 ```
 
-- [ ] `testkit` gains the MDX builders of `tests/support/mdx.ts` (`MDX`, `Chunk`, `Texture`, `Emitter`,
+- [x] `testkit` gains the MDX builders of `tests/support/mdx.ts` (`MDX`, `Chunk`, `Texture`, `Emitter`,
       `Attachment`, `Popcorn`, `FaceEffect`, `Concat`, `U32`, `SetU32`).
-- [ ] A `natives` test: `Load` finds `CreateUnit` with its six parameters and `UnitAlive`, and `collectgarbage`
+- [x] A `natives` test: `Load` finds `CreateUnit` with its six parameters and `UnitAlive`, and `collectgarbage`
       among the removed Lua globals.
-- [ ] Commit: `go: models, natives and the test kit`.
+- [x] Commit: `go: models, natives and the test kit`.
 
 ### Task 10: Close the plan
 
-- [ ] Run every check of Global Constraints from a clean tree.
-- [ ] Fill the inventory table's numbers with what was ported; a difference from the plan is explained in the table.
-- [ ] `AGENTS.md`: under State, a paragraph for Plan 5a (what exists, the deviations of Tasks 2 and 6, how to run
+- [x] Run every check of Global Constraints from a clean tree.
+- [x] Fill the inventory table's numbers with what was ported; a difference from the plan is explained in the table.
+- [x] `AGENTS.md`: under State, a paragraph for Plan 5a (what exists, the deviations of Tasks 2 and 6, how to run
       Go here). `CHANGELOG.md`: under `## Unreleased`, one line.
-- [ ] Commit: `docs: Plan 5a of the Go toolchain is implemented`.
+- [x] Commit: `docs: Plan 5a of the Go toolchain is implemented`.

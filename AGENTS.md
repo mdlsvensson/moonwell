@@ -359,6 +359,31 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - The in-game gate (`deno task gate additions`) passed: its printed lines are read from a file, the maintainer watched
     rain and one effect, and six input steps were advanced with Esc. All 21 weather ids of the README were created.
   - A `wrappers.event` module with every event response was rejected: it would bundle every widget class.
+- **Replacing Deno with Go, under way** (roadmap 5.1; spec
+  `docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md`, approved 2026-10-02). The maintainer chose Go,
+  one `moonwell` executable on the PATH installed by a script from the GitHub release, the standard library only, every
+  test ported, releases built by CI from the tag, and a redesign in idiomatic Go checked from outside: a contract (same
+  commands, same written bytes, same messages) and a conformance suite that runs both CLIs. Six plans, 5a to 5f; the
+  TypeScript in `cli/` stays working until 5e, and the Go code carries version 0.7.0 until then.
+  - **Plan 5a, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-foundations.md`): the module
+    (`go.mod` at the root, no dependencies; `embed.go` embeds `template/`, `cli/runtime/` and `cli/data/`) and the
+    packages `internal/text`, `diag`, `names`, `fsx`, `binio`, `ordered`, `mapdir`, `luasrc`, `w3i`, `mpq`, `models`,
+    `natives` and `testkit`, with their tests. Nothing is reachable from a command yet.
+  - `internal/text` is where JavaScript and Go strings differ (UTF-16 length and sort order, `JSON.stringify`,
+    JavaScript's `\s` and case mapping, lossy UTF-8 decoding). Use it wherever a string reaches a file or a message.
+  - `ordered.Map` keeps JavaScript's key order, which is not plain insertion order: keys that are array indexes (`"0"`,
+    `"7"`) come first, in numeric order.
+  - `luasrc` has one tokenizer for the four places that read Lua. Compared with the TypeScript on 126 real Lua files
+    (both libraries, the template, the fixtures): identical requires, globals, functions and map globals. Recorded
+    deviations, all for Lua the game would reject or escapes the old lenient lexer got wrong: `\z` before a line break
+    and a backslash before CRLF continue a string; a line break ending an unterminated string counts as a line; `1..2`
+    is three tokens.
+  - `text.Upper` and `text.Lower` reproduce only the special cases that occur in file names (`ß`, the `ﬀ` ligatures,
+    `İ`), not all of Unicode's SpecialCasing.
+  - The reason an operating system gives inside a message ("Reading x failed: ...") is Go's wording, not Deno's.
+  - Go is at `C:\Program Files\Go\bin` (1.27.0) and is not on the PATH of Claude's shell: prefix commands with
+    `export PATH="$PATH:/c/Program Files/Go/bin"`. In files written by Claude's tools, a `\uFEFF` escape becomes a real
+    byte order mark, which Go refuses in source: write `"\xEF\xBB\xBF"`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -382,7 +407,8 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
    2026-10-01, which is also the order of the Backlog below: replace Deno; other gameplay languages and the YueScript
    pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal of Unit wrappers; PNG as a
    preview format; the key release `onKeyDown` depends on; and last, the online checks before 1.0. Every item needs a
-   short design first.
+   short design first. **Now:** replacing Deno, by the Go spec's plans in order (State above says which are done). Each
+   plan is written when the one before it is implemented.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -423,6 +449,17 @@ deno task test:pkl      # needs pkl
 deno task test:e2e      # needs pkl and yue
 deno task test:network  # needs the network; runs only with MOONWELL_NETWORK_TESTS=1 (CI sets it)
 ```
+
+And for the Go code, until it replaces the lines above (Plan 5e):
+
+```
+go vet ./...
+gofmt -l .      # must print nothing
+go test ./...
+```
+
+Go's rules (spec §11): the standard library only (no `require` in `go.mod`, no cgo; `module_test.go` checks it);
+expected failures are `*diag.Error` or `diag.Problems` with the TypeScript's message, file and hint.
 
 ## Pitfalls already paid for
 
