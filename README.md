@@ -14,10 +14,14 @@
   </a>
 </p>
 
-- Write gameplay in any language that transpiles to lua. TypeScript, YueScript, Fennel, C#. And use pkl for data and
-  configuration.
-- Say goodbye to the Object Editor, Trigger Editor, Asset Manager and other dated World Editor tools.
-- One `moonwell` program: no Node.js, no `package.json`, no `node_modules`.
+- Gameplay with [YueScript](https://yuescript.org/), [Teal](https://teal-language.org/), [Fennel](https://fennel-lang.org/).
+- [Pkl](https://pkl-lang.org) for object data, assets and configuration.
+- Annotated lua wrappers for Warcraft III natives.
+- Full systems suite including damage engine, physics, missiles, save/load, and more.
+- Powerful cli written in Go.
+- Asset import pipeline: Just drop em in, sync and voilà.
+- Print mdx texture paths to the console.
+- Map settings management in pkl.
 
 ## Quickstart
 
