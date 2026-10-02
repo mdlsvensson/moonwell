@@ -24,6 +24,9 @@ var background = context.Background()
 // and exits, and its child that outlives it.
 func TestMain(m *testing.M) {
 	switch os.Getenv("MOONWELL_TEST_ROLE") {
+	case "interrupt":
+		processInterruptHelper()
+		os.Exit(0)
 	case "parent":
 		os.Setenv("MOONWELL_TEST_ROLE", "child")
 		if err := cli.SpawnDetached(os.Args[0], nil); err != nil {
