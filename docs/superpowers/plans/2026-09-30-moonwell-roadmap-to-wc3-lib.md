@@ -343,8 +343,8 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
    starts when the maintainer says so.
    **Status (2026-10-02):** designed (`docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md`: Go, one
    `moonwell` program, the standard library only) and implemented by Plans 5a to 5e
-   (`2026-10-02-moonwell-go-foundations`, `-planners`, `-compile`, `-commands`, `-cutover`) as Moonwell 0.8.0. What is
-   left: the gate and release of 0.8.0, and Plan 5f, the Deno tools of the three sibling repositories.
+   (`2026-10-02-moonwell-go-foundations`, `-planners`, `-compile`, `-commands`, `-cutover`) as Moonwell 0.8.0, and
+   Plan 5f (`-siblings`) took Deno out of the three sibling repositories. What is left: the gate and release of 0.8.0.
 2. **Other gameplay languages, and the YueScript pin.** The maintainer targets Lua, Teal, Fennel and YueScript only
    (2026-10-01): TypeScript and C# support are dropped.
    - Teal first: its compiler is Lua, and its types map to the annotated Lua we already write.

@@ -25,6 +25,7 @@
   `@moonwell/cli@0.7.0` is the last version there.
 - For contributors: the code is Go with the standard library only (`cmd/moonwell`, `internal/`, `tools/gen`), the
   TypeScript and every `deno.json` are gone, and the checks are `go vet ./...`, `gofmt -l .` and `go test ./...`.
+  The tools of moonwell-wrappers, moonwell-systems and the gate map are Lua run with `yue -e`, and run `moonwell`.
 - Documentation: the design (`2026-10-02-moonwell-go-toolchain-design`) and its plans (`2026-10-02-moonwell-go-*`).
 
 ### How it was checked

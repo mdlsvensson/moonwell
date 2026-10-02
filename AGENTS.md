@@ -450,8 +450,23 @@ same bytes.
     project there. That last job replaces the "check from JSR", and runs where Pkl's downloads work.
   - The Pkl schema's own tests (`schema/tests/`) run from `schema_test.go`. The compiler a test needs is downloaded by
     `yuetest.Need`, also on CI: nothing installs it beforehand any more.
-  - The sibling repositories' Deno tools (`deno task test`, `gate`, `integration`) still call
-    `../moonwell/cli/src/main.ts` and are broken until Plan 5f.
+  - **Plan 5f, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-siblings.md`): no Deno in the
+    three sibling repositories. moonwell-wrappers (`9e5489b`): `tools/test.lua`, `check.lua`, `integration.lua` on
+    `tools/lib.lua`, with the same results as the Deno tools (34 suites, 218 tests, 27 expected negative diagnostics, 4
+    planted native mistakes). moonwell-systems (`5043c48`): `tools/integration.lua` runs `moonwell`. wrappers-gate (not
+    a git repository): `gate.lua` and `preview-probe.lua`. No library code changed, so there are no tags.
+  - The tools run `moonwell` from the PATH, or the executable `MOONWELL` names. It must be an executable, not a command
+    line: `go run ./cmd/moonwell` would run in the checkout, not in the consumer project. `init --link` runs with the
+    Moonwell checkout (`MOONWELL_REPO`, else `../moonwell`) as its working directory, because the Go program finds the
+    checkout by walking up from there. The program and that checkout must agree in major and minor version.
+  - Checked by comparing packed maps: the three gate maps built since the last library change (`additions`,
+    `probe-extras`, `probe-input`) hold the same 23 files as the Deno CLI built, and the preview probe's maps 9 to 11
+    the same 27. `preview-probe.lua` no longer reaches into the CLI's code: it builds each variant with
+    `moonwell build` in a linked project of its own under `gate-maps/preview/project/`.
+  - On this machine: `luac` 5.3.6 is `../moonwell-wrappers/.tools/lua53/luac53.exe` (`MOONWELL_LUAC`), and LuaLS 3.19.1
+    is `~/.vscode/extensions/sumneko.lua-3.19.1-win32-x64/server/bin/lua-language-server.exe` (`MOONWELL_LUALS`).
+    Until the maintainer installs `moonwell` 0.8.0, build one (`go build -o <file> ./cmd/moonwell`) and name it in
+    `MOONWELL`.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -475,8 +490,9 @@ same bytes.
    2026-10-01, which is also the order of the Backlog below: replace Deno; other gameplay languages and the YueScript
    pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal of Unit wrappers; PNG as a
    preview format; the key release `onKeyDown` depends on; and last, the online checks before 1.0. Every item needs a
-   short design first. **Now:** the gate and release of 0.8.0 (Plan 5e, Task 6: the maintainer runs gate steps 1 to 6,
-   then the tag is pushed and the release workflow read), and Plan 5f, the Deno tools of the three sibling repositories.
+   short design first. **Now:** the gate and release of 0.8.0 (Plan 5e, Task 6: the maintainer runs gate steps 1 to 6
+   with a `moonwell` built from the checkout, then the tag is pushed and the release workflow read, then the
+   maintainer runs the install line once). After that, backlog item 2.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -563,10 +579,8 @@ to v0.5.0). The State section above records each.
 
 1. **Replace Deno**
 
-- **What is left of it:** the gate and release of Moonwell 0.8.0 (Plan 5e, Task 6), and Plan 5f: the Deno tools of
-  moonwell-wrappers (`tools/test.ts`, `run.ts`, `check-lua.ts`, `integration.ts`), moonwell-systems
-  (`tools/integration.lua` runs the Deno CLI) and wrappers-gate (`gate.ts`, `preview-probe.ts`) become Lua run with
-  `yue -e`, and find `moonwell` on the PATH or through `MOONWELL` (spec §10). The State section records the rest.
+- **What is left of it:** the gate and release of Moonwell 0.8.0 (Plan 5e, Task 6; CONTRIBUTING, Publishing). The code,
+  the documents and the sibling repositories' tools are done (State above). Remove this entry once 0.8.0 is released.
 
 2. **Other gameplay languages, and the YueScript pin**
 
