@@ -4,20 +4,20 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"os/signal"
 	"strconv"
 	"syscall"
 )
 
 const (
-	createNewConsole = 0x10
-	ctrlBreakEvent   = 1
+	createNewConsole      = 0x10
+	createNewProcessGroup = 0x200
+	ctrlBreakEvent        = 1
 )
 
-// configureDevProcess gives the program a hidden console of its own, so that an interrupt sent to that console
-// reaches the program and not the test runner.
+// configureDevProcess gives the program a hidden console and a process group of its own, so that an interrupt can be
+// sent to it alone: not to the test runner, and not to the process that sends it.
 func configureDevProcess(cmd *exec.Cmd) {
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: createNewConsole}
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: createNewConsole | createNewProcessGroup}
 }
 
 // interruptDevProcess sends the program an interrupt from a second copy of the test program, which joins the
@@ -31,9 +31,10 @@ func interruptDevProcess(cmd *exec.Cmd) error {
 	return nil
 }
 
-// processInterruptHelper is the sender. It sends Ctrl+Break, which Go reports as os.Interrupt just like Ctrl+C:
-// Ctrl+C is switched off for every process below one started in a new process group, as test runners often are, and
-// Ctrl+Break cannot be switched off.
+// processInterruptHelper is the sender. It sends Ctrl+Break, which Go reports as os.Interrupt just like Ctrl+C, to
+// the program's process group. Ctrl+C would not do: it is switched off for a process started in a new process
+// group and for everything below it, and it cannot be sent to one group. The sender must stay out of the event's
+// way: joining a console removes the handlers Go installed, so the event would end it.
 func processInterruptHelper() {
 	kernel := syscall.NewLazyDLL("kernel32.dll")
 	pid, err := strconv.Atoi(os.Getenv("MOONWELL_TEST_INTERRUPT_PID"))
@@ -41,15 +42,12 @@ func processInterruptHelper() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	// The event goes to every process on the console, this one included: taking the signal keeps this one alive.
-	// (signal.Ignore does not: Go then leaves the event to Windows, which ends the process.)
-	signal.Notify(make(chan os.Signal, 1), os.Interrupt)
 	kernel.NewProc("FreeConsole").Call()
 	if result, _, err := kernel.NewProc("AttachConsole").Call(uintptr(pid)); result == 0 {
 		fmt.Fprintln(os.Stderr, "AttachConsole:", err)
 		os.Exit(1)
 	}
-	if result, _, err := kernel.NewProc("GenerateConsoleCtrlEvent").Call(ctrlBreakEvent, 0); result == 0 {
+	if result, _, err := kernel.NewProc("GenerateConsoleCtrlEvent").Call(ctrlBreakEvent, uintptr(pid)); result == 0 {
 		fmt.Fprintln(os.Stderr, "GenerateConsoleCtrlEvent:", err)
 		os.Exit(1)
 	}
