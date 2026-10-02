@@ -381,6 +381,21 @@ over, and updated on 2026-09-29 after wrappers v0.2.0 was implemented and again 
   - `text.Upper` and `text.Lower` reproduce only the special cases that occur in file names (`ß`, the `ﬀ` ligatures,
     `İ`), not all of Unicode's SpecialCasing.
   - The reason an operating system gives inside a message ("Reading x failed: ...") is Go's wording, not Deno's.
+  - **Plan 5b, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-planners.md`): `proc`,
+    `project` (the manifest evaluated by `pkl`), `settings`, `objects` and `assets`, with `text.Number` (JavaScript's
+    number-to-text, compared with Deno on 20,000 values), `ordered.Decode` and `ordered.Stringify` (`JSON.parse` and
+    `JSON.stringify` with ordered objects) and `layout` (the project's folder names).
+  - Every manifest check runs over the ordered JSON tree, in the TypeScript's order, so the first problem in document
+    order is the one reported; structs are what the checks produce. `encoding/json` struct decoding is used only for our
+    own data files.
+  - The three planners return `mapdir.Change` values named relative to the map folder; assets keep a journal of their
+    own (`assets.FileChange`, absolute paths, the content before) because they write into the source map and undo it.
+  - Texts that named Deno are already changed in the Go code: `moonwell setup` in `moonwell.local.pkl`,
+    `Run moonwell build, test or dev` for a stale `objects.yue`, and the version-mismatch hint of the spec's §8.3.
+  - Known answers that pass: the names fixture's objects planned against an empty map give World Editor's ten files byte
+    for byte, and the patched `war3map.lua` and `war3map.w3i` equal the expected text and World Editor's save.
+  - Recorded deviation: "the string contains an unpaired surrogate" cannot occur (Go's JSON decoder turns one into
+    U+FFFD first).
   - Go is at `C:\Program Files\Go\bin` (1.27.0) and is not on the PATH of Claude's shell: prefix commands with
     `export PATH="$PATH:/c/Program Files/Go/bin"`. In files written by Claude's tools, a `\uFEFF` escape becomes a real
     byte order mark, which Go refuses in source: write `"\xEF\xBB\xBF"`.

@@ -7,6 +7,8 @@
   and tested meanwhile.
 - Plan 5a (`2026-10-02-moonwell-go-foundations`): the Go module and its first packages, checked by CI beside the Deno
   checks.
+- Plan 5b (`2026-10-02-moonwell-go-planners`): reading the manifest, and planning map settings, object data and assets,
+  in Go.
 
 ## 0.7.0 (2026-10-01)
 

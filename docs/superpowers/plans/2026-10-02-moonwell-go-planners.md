@@ -124,13 +124,13 @@ func Run(ctx context.Context, command string, args []string, options Options) (R
 func SpawnError(command string, err error, hint, file string) *diag.Error
 ```
 
-- [ ] `Number` tests: `0`, `-0` (prints `0`), `128`, `-896`, `0.5`, `1/255` (`0.00392156862745098`), `float64(float32(0.1))`
+- [x] `Number` tests: `0`, `-0` (prints `0`), `128`, `-896`, `0.5`, `1/255` (`0.00392156862745098`), `float64(float32(0.1))`
       (`0.10000000149011612`), `1e21` (`1e+21`), `1e-7`, `123456789012345680000`, `0.000001`, `1.5e-7`, infinities
       and NaN.
-- [ ] `Stringify` writes numbers with `text.Number`, strings with `text.Quote`, objects in `Map` order, and with an
+- [x] `Stringify` writes numbers with `text.Number`, strings with `text.Quote`, objects in `Map` order, and with an
       indent the layout of `JSON.stringify(v, null, 2)` (`{}` and `[]` for empty ones).
-- [ ] `Run` decodes output with `text.Decode`. A non-zero exit is a `Result`, not an error.
-- [ ] Commit: `go: Number, the ordered JSON tree, layout and proc`.
+- [x] `Run` decodes output with `text.Decode`. A non-zero exit is a `Result`, not an error.
+- [x] Commit: `go: Number, the ordered JSON tree, layout and proc`.
 
 ### Task 2: `project`
 
@@ -187,10 +187,10 @@ func PklProject(version, local string) string // local != "": a project linked t
 func LocalPkl() string
 ```
 
-- [ ] **Texts that named Deno, changed now** (spec §2 exempts them): `LocalPkl`'s first comment says
+- [x] **Texts that named Deno, changed now** (spec §2 exempts them): `LocalPkl`'s first comment says
       `moonwell setup`; `CheckPackageVersion`'s hint is the spec's §8.3 hint, with the install line of the machine's
       shell; `projectDenoJson` and `PROJECT_TASKS` are not ported.
-- [ ] Commit: `go: project, the manifest evaluated by pkl`.
+- [x] Commit: `go: project, the manifest evaluated by pkl`.
 
 ### Task 3: `settings`
 
@@ -267,11 +267,11 @@ func Apply(mapDir string, changes []mapdir.Change) error
 func MapDir(root, mapFolder, manifestFile string) (string, error)
 ```
 
-- [ ] The Lua patch works in byte offsets where the TypeScript works in UTF-16 offsets; both only slice.
-- [ ] Numbers written into Lua (`DefineStartLocation`, `SetTerrainFogEx`) go through `text.Number` of the float32
+- [x] The Lua patch works in byte offsets where the TypeScript works in UTF-16 offsets; both only slice.
+- [x] Numbers written into Lua (`DefineStartLocation`, `SetTerrainFogEx`) go through `text.Number` of the float32
       widened to a float64, as JavaScript reads a float32.
-- [ ] `testkit` gains the picture builders of `tests/support/pictures.ts`.
-- [ ] Commit: `go: settings`.
+- [x] `testkit` gains the picture builders of `tests/support/pictures.ts`.
+- [x] Commit: `go: settings`.
 
 ### Task 4: `objects`
 
@@ -368,12 +368,12 @@ func PlanObjects(mapDir string, manifest Manifest, options PlanOptions) (*Plan, 
 func Apply(plan *Plan, stagedDir string) error
 ```
 
-- [ ] Problems are `diag.Problems`, in the TypeScript's order.
-- [ ] **Deviation, recorded:** "the string contains an unpaired surrogate" cannot occur: Go's JSON decoder turns an
+- [x] Problems are `diag.Problems`, in the TypeScript's order.
+- [x] **Deviation, recorded:** "the string contains an unpaired surrogate" cannot occur: Go's JSON decoder turns an
       unpaired surrogate into U+FFFD before the check. Its test case is dropped.
-- [ ] `AssertIDsCurrent`'s hint names `moonwell build` (spec §2 exemption).
-- [ ] `testkit` gains the miniature metadata and modification-file builders of `tests/support/objectdata.ts`.
-- [ ] Commit: `go: objects`.
+- [x] `AssertIDsCurrent`'s hint names `moonwell build` (spec §2 exemption).
+- [x] `testkit` gains the miniature metadata and modification-file builders of `tests/support/objectdata.ts`.
+- [x] Commit: `go: objects`.
 
 ### Task 5: `assets`
 
@@ -426,12 +426,12 @@ func PlanAssets(ctx context.Context, root, mapDir, stateFile string, config Conf
 func ApplyPlan(ctx context.Context, plan *Plan, stateFile string) error
 ```
 
-- [ ] `project.Project.Assets` is an `assets.Config`... **no**: `assets` must not import `project` and `project`
+- [x] `project.Project.Assets` is an `assets.Config`... **no**: `assets` must not import `project` and `project`
       need not import `assets`; `project` keeps its own two fields and `pipeline` (Plan 5c) builds the `Config`.
-- [ ] Commit: `go: assets`.
+- [x] Commit: `go: assets`.
 
 ### Task 6: Close the plan
 
-- [ ] Every check from a clean tree; the inventory's numbers filled in.
-- [ ] `AGENTS.md` (State) and `CHANGELOG.md` (Unreleased) say Plan 5b is implemented, with its deviations.
-- [ ] Commit: `docs: Plan 5b of the Go toolchain is implemented`.
+- [x] Every check from a clean tree; the inventory's numbers filled in.
+- [x] `AGENTS.md` (State) and `CHANGELOG.md` (Unreleased) say Plan 5b is implemented, with its deviations.
+- [x] Commit: `docs: Plan 5b of the Go toolchain is implemented`.

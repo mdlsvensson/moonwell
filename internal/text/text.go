@@ -150,3 +150,20 @@ func isASCII(s string) bool {
 	}
 	return true
 }
+
+// TruncateUTF16 returns the start of s, at most limit UTF-16 code units long: JavaScript's s.slice(0, limit), but
+// never cutting a character in two.
+func TruncateUTF16(s string, limit int) string {
+	units := 0
+	for i, r := range s {
+		size := 1
+		if r >= 0x10000 {
+			size = 2
+		}
+		if units+size > limit {
+			return s[:i]
+		}
+		units += size
+	}
+	return s
+}
