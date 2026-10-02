@@ -36,6 +36,10 @@ jobs:
         with:
           deno-version: 2.9.x
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
       - name: Install Pkl 0.32.1
         run: |
           mkdir -p "$RUNNER_TEMP/pkl"
@@ -55,4 +59,19 @@ jobs:
       - run: deno task test:e2e
       - run: deno task test:network
         env:
+          MOONWELL_NETWORK_TESTS: "1"
+
+      # The Go toolchain that replaces the Deno one (docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md).
+      - run: go vet ./...
+      - name: gofmt
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "Run gofmt on:"
+            echo "$unformatted"
+            exit 1
+          fi
+      - run: go test ./...
+        env:
+          MOONWELL_REQUIRE_TOOLS: "1"
           MOONWELL_NETWORK_TESTS: "1"

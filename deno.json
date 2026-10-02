@@ -30,7 +30,8 @@
       "cli/tests/fixtures/map-settings-v39",
       "cli/tests/fixtures/objects-v3-names",
       "template",
-      "docs"
+      "docs",
+      "internal"
     ]
   },
   "lint": { "exclude": ["cli/src/embedded", "template"] }
