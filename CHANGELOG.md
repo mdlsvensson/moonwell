@@ -40,6 +40,20 @@ found one difference on the way (the folder in `setup`'s PATH command when `yue.
 generators were checked the same way: the Go ones write `schema/generated/`, `natives.json`, `metadata.json` and
 `game-paths.txt` as the TypeScript ones did, from the same game exports.
 
+### Release gate
+
+A staged map folder equal to 0.7.0's is a folder that passed its gates, so what is new to the game and the machine was
+run by hand, with the `moonwell` built from the release commit (CONTRIBUTING, steps 1 to 6):
+
+- Steps 1 and 2 passed 2026-10-02 on Windows, and CI passed on Ubuntu and Windows: `go vet`, `gofmt` and 626 tests,
+  with `pkl`, the YueScript compiler and the network required.
+- Steps 3 to 6 passed 2026-10-02, run by the maintainer (their setup is Warcraft III Reforged 3.0.0.24268 with World
+  Editor 3.00): `setup` and `test` in the template, with the game started and left open by the program and the Captain
+  changing colour; the error position of a failing hook; a minified build played as a packed map; and the packed map
+  opened in World Editor.
+- Steps 7 to 13 were not run by hand: they are covered by the conformance suite, whose last green run is commit
+  `e786070`.
+
 ## 0.7.0 (2026-10-01)
 
 - **A picture of your own in the game's map list.** `settings.info.preview = "preview.tga"` names a `.tga` or a `.blp`
