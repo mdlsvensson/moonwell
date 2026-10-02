@@ -1,0 +1,118 @@
+name: Release
+
+# A pushed tag moonwell@<version> builds and publishes that version: the two executables with their checksums, the
+# install scripts and the Pkl package, as one GitHub release. Then both systems install it from the release.
+on:
+  push:
+    tags: ["moonwell@*"]
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install Pkl 0.32.1
+        run: |
+          mkdir -p "$RUNNER_TEMP/pkl"
+          curl -fsSL -o "$RUNNER_TEMP/pkl/pkl" "https://github.com/apple/pkl/releases/download/0.32.1/pkl-linux-amd64"
+          chmod +x "$RUNNER_TEMP/pkl/pkl"
+          echo "$RUNNER_TEMP/pkl" >> "$GITHUB_PATH"
+
+      # The install scripts' version is checked against version.go by a test, which the check job ran.
+      - name: The tag, version.go and schema/PklProject agree
+        run: |
+          version="${GITHUB_REF_NAME#moonwell@}"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          grep -qF "const Version = \"$version\"" version.go || { echo "version.go is not at $version"; exit 1; }
+          grep -qF "version = \"$version\"" schema/PklProject || { echo "schema/PklProject is not at $version"; exit 1; }
+
+      - name: Build the executables
+        env:
+          CGO_ENABLED: "0"
+          GOARCH: amd64
+        run: |
+          mkdir out
+          GOOS=linux go build -trimpath -ldflags "-s -w" -o out/moonwell-linux-amd64 ./cmd/moonwell
+          GOOS=windows go build -trimpath -ldflags "-s -w" -o out/moonwell-windows-amd64.exe ./cmd/moonwell
+          (cd out && sha256sum moonwell-linux-amd64 moonwell-windows-amd64.exe > checksums.txt)
+          cp install.ps1 install.sh out/
+          out/moonwell-linux-amd64 --version
+
+      - name: Package the Pkl schema
+        run: |
+          pkl project package schema/
+          cp ".out/moonwell@$VERSION/moonwell@$VERSION.zip" ".out/moonwell@$VERSION/moonwell@$VERSION" out/
+
+      # The notes are the version's entries in the changelog, up to its release gate.
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          awk -v version="$VERSION" '
+            /^## / { inside = index($0, "## " version " ") == 1 || $0 == "## " version; next }
+            /^### / { inside = 0 }
+            inside { print }
+          ' CHANGELOG.md > notes.md
+          printf '\nSee the [changelog](https://github.com/mdlsvensson/moonwell/blob/main/CHANGELOG.md) for the details and the release gate.\n' >> notes.md
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "v$VERSION" --notes-file notes.md out/*
+
+  # What a map author does: the install line of this version, then a new project and a build of it.
+  install:
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            pkl-asset: pkl-linux-amd64
+            pkl-binary: pkl
+          - os: windows-latest
+            pkl-asset: pkl-windows-amd64.exe
+            pkl-binary: pkl.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Pkl 0.32.1
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/pkl"
+          curl -fsSL -o "$RUNNER_TEMP/pkl/${{ matrix.pkl-binary }}" \
+            "https://github.com/apple/pkl/releases/download/0.32.1/${{ matrix.pkl-asset }}"
+          chmod +x "$RUNNER_TEMP/pkl/${{ matrix.pkl-binary }}"
+          echo "$RUNNER_TEMP/pkl" >> "$GITHUB_PATH"
+
+      - name: Run the install line (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          curl -fsSL "https://github.com/mdlsvensson/moonwell/releases/download/$GITHUB_REF_NAME/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run the install line (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          irm "https://github.com/mdlsvensson/moonwell/releases/download/$env:GITHUB_REF_NAME/install.ps1" | iex
+          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $env:LOCALAPPDATA 'moonwell\bin')
+
+      - name: Create a project and build it
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#moonwell@}"
+          test "$(moonwell --version 2>&1)" = "$version"
+          cd "$RUNNER_TEMP"
+          moonwell init my-map
+          cd my-map
+          moonwell build
+          test -f dist/bin/map.w3x
