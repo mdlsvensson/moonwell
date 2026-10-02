@@ -5,7 +5,7 @@
 #   curl -fsSL https://github.com/mdlsvensson/moonwell/releases/latest/download/install.sh | sh
 set -eu
 
-version="0.8.0"
+version="0.8.1"
 base="${MOONWELL_INSTALL_BASE:-https://github.com/mdlsvensson/moonwell/releases/download/moonwell@$version}"
 
 fail() {

@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.8.1 (2026-10-02)
+
+- **YueScript 0.34.3 is the compiler,** in place of 0.34.2. The floor division operator `//` now works: 0.34.2
+  compiled a file that used it to no Lua at all.
+- **To get it in a project,** install this version (run the install line again), set `moonwell@0.8.1` in `PklProject`
+  and run `pkl project resolve`. A project that stays on the 0.8.0 package keeps YueScript 0.34.2 and builds as before,
+  with either program.
+- **Bitwise operators (`&`, `|`, `~`, `<<`, `>>`) still do not build from YueScript,** but they now fail with a
+  message that says so, at the line that uses one, instead of the compiler's own text or an empty file:
+  `YueScript compiled this file but could not rewrite its Lua`. Put such code in a Lua file under `lua/`, which is
+  bundled as written; the game's Lua 5.3 has the operators.
+- Nothing else changes in a build: 24 YueScript sources (the template, both libraries' examples, the gate map's
+  probes) compile to the same Lua with both versions, in normal and minified builds.
+- `moonwell setup` puts the new compiler in the `bin` folder for the editor, as it does for any version.
+
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-02 on Windows, and CI passed on Ubuntu and Windows. Steps 3 to 13 were not
+re-run, by the maintainer's decision: compiled Lua is unchanged for code that built before, and `//` is an operator of
+the game's Lua 5.3.
+
 ## 0.8.0 (2026-10-02)
 
 - **Moonwell is one program, `moonwell`, and no longer needs Deno.** Install it with one line (PowerShell on Windows,

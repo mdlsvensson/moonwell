@@ -65,7 +65,7 @@ program and the package must have the same major and minor version; `moonwell` r
 of the two to change. To install one version, use its own script:
 
 ```powershell
-irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.8.0/install.ps1 | iex
+irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.8.1/install.ps1 | iex
 ```
 
 ### Upgrading a project from 0.7
@@ -73,7 +73,7 @@ irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.8.0/ins
 Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four steps:
 
 1. Install `moonwell`, as above.
-2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.8.0`.
+2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.8.1`.
 3. Run `pkl project resolve`.
 4. Delete `deno.json` and `deno.lock`. Where you ran `deno task build`, run `moonwell build`; the same goes for every
    other command.
@@ -117,9 +117,13 @@ Hooks: `before_config`, `on_config`, `before_main`, `on_main`. A failing hook pr
 file and line, and the other hooks still run. Module top-level code runs while the map script loads, so create game
 objects inside hooks.
 
-Do not use the floor division operator `//`: YueScript 0.34.2 compiles a file that uses it to no Lua at all, in normal
-and minified builds, while reporting success. Moonwell stops the build with an error naming the file; write
-`math.floor(a / b)` instead.
+Bitwise operators (`&`, `|`, `~`, `<<`, `>>`) do not build from YueScript: the compiler writes them, but its step that
+prepares the Lua for the map does not read them, and Moonwell stops the build with an error at the line. Put that code
+in a Lua file under `lua/` (see "Lua modules"), where the operators work as the game's Lua 5.3 has them.
+
+A project made with Moonwell 0.8.0 or earlier uses YueScript 0.34.2, which compiles a file that uses floor division
+(`//`) to no Lua at all; Moonwell stops that build too. Set `moonwell@0.8.1` or later in `PklProject` and run
+`pkl project resolve` to get YueScript 0.34.3, where `//` works.
 
 ## Editor setup
 
@@ -556,7 +560,7 @@ These are not in the generated files and keep their defaults unless you add them
 
 | Setting       | Default  | What                                                                                        |
 | ------------- | -------- | ------------------------------------------------------------------------------------------- |
-| `yue.version` | `0.34.2` | YueScript compiler version. Only versions this CLI release pins a checksum for are accepted |
+| `yue.version` | `0.34.3` | YueScript compiler version. Only versions this CLI release pins a checksum for are accepted |
 | `yue.path`    | none     | Your own `yue` binary instead of the downloaded one. Set it in `moonwell.local.pkl`         |
 
 ```pkl

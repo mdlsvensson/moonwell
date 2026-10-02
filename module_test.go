@@ -163,3 +163,20 @@ func TestEmbeddedDataIsPresent(t *testing.T) {
 		t.Error("the metadata or the natives are not embedded")
 	}
 }
+
+// The README shows the version in two places that a reader copies: the install line of one version, and the package
+// version a project moves to.
+func TestTheREADMENamesThisVersion(t *testing.T) {
+	readme, err := os.ReadFile("README.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, text := range []string{
+		"releases/download/moonwell@" + Version + "/install.ps1",
+		"becomes `moonwell@" + Version + "`",
+	} {
+		if !strings.Contains(string(readme), text) {
+			t.Errorf("README.md lacks %q: update the version it shows", text)
+		}
+	}
+}

@@ -347,7 +347,7 @@ same bytes.
     maintainer ran it.
   - Two machines are untested: the online checks before 1.0 cover the sync and save systems.
   - yue 0.34.2 writes an empty file for a source with a bitwise operator, as for `//` (IppClub/YueScript#256 is fixed in
-    0.34.3 for `//`; Moonwell still pins 0.34.2).
+    0.34.3 for `//`, which Moonwell pins since 0.8.1; bitwise operators fail there with an error).
 - **Wrappers v0.8.0, the additions the port did not need, released** (2026-10-01, GitHub pre-release `v0.8.0` on
   `d823b1b`; tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-wrappers-additions-design.md`,
   plan `docs/superpowers/plans/2026-10-01-moonwell-wrappers-additions.md`). Roadmap phase 4, item 1.
@@ -478,6 +478,23 @@ same bytes.
     is `~/.vscode/extensions/sumneko.lua-3.19.1-win32-x64/server/bin/lua-language-server.exe` (`MOONWELL_LUALS`).
     Until the maintainer installs `moonwell` 0.8.0, build one (`go build -o <file> ./cmd/moonwell`) and name it in
     `MOONWELL`.
+- **Moonwell 0.8.1, YueScript 0.34.3** (2026-10-02; a short design in chat, approved by the maintainer). 0.34.3 is the
+  default compiler (`yue.DefaultVersion`, `schema/Project.pkl`); 0.34.2 stays in `yue.Known`, because a project on the
+  0.8.0 Pkl package still names it.
+  - Measured before the design, 0.34.3 against 0.34.2: `//` compiles with `-r` and `-m` and the Lua runs. Bitwise
+    operators are not fixed but no longer silent: the compiler exits with 2, prints `Failed to rewrite: <file>` (or
+    `Failed to minify`) and `>> :<line>:<column>: <reason>`, and leaves the plain compiled Lua behind. 24 YueScript
+    sources (the template, both libraries' examples and fixtures, the gate map's probes) compile to the same bytes
+    with both versions, in both modes.
+  - `rewriteError` (`internal/yue/compile.go`) turns that failure into a Moonwell error with a hint to use a Lua module
+    under `lua/`. In a normal build it finds the source line: each line of the Lua the compiler leaves ends with
+    ` -- <source line>`. Minified Lua has no such marks, so that error names the file only.
+  - The reason text varies by operator (`Unexpected Symbol`, `Unexpected symbol`, `primary expression expected`), so
+    the message quotes it and the hint is the same for all.
+  - `module_test.go` now also checks the two places where the README shows the version.
+  - Both libraries' tools and documents name 0.34.3. `moonwell setup` in a project replaces the `yue` on the PATH with
+    that project's version, and the wrappers' test runner demands the pinned one.
+  - No in-game run, by the maintainer's decision.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -499,11 +516,10 @@ same bytes.
    additions) is released as wrappers v0.8.0, item 2 (assets shipped by libraries) as Moonwell 0.6.0, and item 3 (the
    custom map preview) as Moonwell 0.7.0. What is left follows the roadmap's phase 5, the order the maintainer set on
    2026-10-01 and changed on 2026-10-02, which is also the order of the Backlog below: replace Deno (done: Moonwell
-   0.8.0); the YueScript pin; `moonwell-library.json` in the wrappers and systems libraries; automatic disposal of Unit
-   wrappers; PNG as a preview format; the key release `onKeyDown` depends on; the online checks before 1.0; and Teal
-   and Fennel, moved to the end on 2026-10-02. Every item needs a short design first. **Now:** nothing is under way. Backlog
-   item 1, the YueScript pin, is measured and has a short design (below), which the maintainer put off on 2026-10-02
-   ("not now"); ask before starting it.
+   0.8.0); the YueScript pin (done: Moonwell 0.8.1); `moonwell-library.json` in the wrappers and systems libraries;
+   automatic disposal of Unit wrappers; PNG as a preview format; the key release `onKeyDown` depends on; the online
+   checks before 1.0; and Teal and Fennel, moved to the end on 2026-10-02. Every item needs a short design first.
+   **Now:** nothing is under way; backlog item 1 is next, when the maintainer says so.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
 
@@ -551,12 +567,14 @@ hides what it would have found. On Windows also run `GOOS=linux go vet ./...`: s
   message caught with `pcall` (not a hook error, which Moonwell maps back to the source) reads `war3map.lua:<line>`.
   Look the line up in the built `dist/stage/map.w3x/war3map.lua`, where each module starts at a `__mw.define` line.
 
-- **YueScript `//` empties a file:** yue 0.34.2 with `-r` or `-m` (both of Moonwell's build modes) writes a 0-byte Lua
-  file for any source that uses floor division, and exits 0; without those flags it compiles correctly. Found 2026-09-30
-  when a gate-map probe built as one module instead of eleven. A compile now fails on an empty output for a file with
-  code (`emptyOutputError` in `internal/yue/compile.go`). Write `math.floor(a / b)`. Reported upstream as
-  IppClub/YueScript#256; once a fixed yue is pinned, the floor-division test in `internal/yue/yue_test.go` fails and
-  should become a test that such a file compiles.
+- **YueScript and bitwise operators:** yue compiles `&`, `|`, `~`, `<<` and `>>`, but its rewrite (`-r`) and minify
+  (`-m`) steps, Moonwell's two build modes, do not read them. 0.34.3, pinned since Moonwell 0.8.1, exits with 2 and
+  `Failed to rewrite: <file>`, and Moonwell reports that at the source line with a hint (`rewriteError` in
+  `internal/yue/compile.go`). Write such code in a Lua module under `lua/`: it is bundled as written.
+- **YueScript 0.34.2 empties a file** that uses `//` or a bitwise operator, with `-r` or `-m`, and exits 0 (found
+  2026-09-30 when a gate-map probe built as one module instead of eleven; IppClub/YueScript#256). 0.34.3 fixed `//`.
+  0.34.2 stays a known version for projects on the 0.8.0 Pkl package, and a compile still fails on an empty output for
+  a file with code (`emptyOutputError`).
 
 - **Backslashes in shell-written files:** Git Bash heredocs and `sed` turn `\\` into `\`. Write files that contain
   backslashes (Windows paths, regexes, Pkl raw strings) with a file-editing tool, not the shell, and check them.
@@ -589,41 +607,16 @@ Entries that are done were removed on 2026-10-01: the custom map preview (Moonwe
 (0.6.0), the wrappers candidate additions (wrappers v0.8.0), the UI wrappers releases B and C (v0.4.0, v0.5.0), the
 editor error for effects attached to items and destructables (v0.5.1) and the port of `wc3-lib` (moonwell-systems v0.1.0
 to v0.5.0). Replacing Deno was removed on 2026-10-02 (Moonwell 0.8.0, with the sibling repositories' tools), and the
-entries below were renumbered. The State section above records each.
+entries below were renumbered. The YueScript pin was removed the same day (Moonwell 0.8.1), and they were renumbered
+again. The State section above records each.
 
-1. **The YueScript pin**
-
-- **Pin YueScript 0.34.3.** It fixes the `//` bug upstream (IppClub/YueScript#256). Once it is pinned, the
-  floor-division test in `internal/yue/yue_test.go` fails and should become a test that such a file compiles, and the
-  README's and this file's `//` notes go.
-- **Measured on 2026-10-02, before the design** (0.34.3 for Windows, compared with 0.34.2):
-  - `//` compiles with `-r` and `-m`, and the Lua runs.
-  - Bitwise operators (`&`, `|`, `~`, `<<`, `>>`) are not fixed, but no longer silent: with `-r` or `-m` the compiler
-    exits with 2 and `Failed to rewrite: <file>` (or `Failed to minify`), then `>> :<line>:<column>: Unexpected Symbol`.
-    It leaves the plain compiled Lua behind. Moonwell reports it as a compile failure of the `.yue` file, with the
-    compiler's text, an absolute path and a line of the Lua output.
-  - 24 YueScript sources (the template, both libraries' examples and fixtures, the gate map's probes) compile to the
-    same bytes with both versions, in both modes.
-  - Moonwell's tests pass with 0.34.3 except the floor-division test, as intended.
-  - Release assets, with the hashes GitHub lists: `yue-windows-x64.7z`
-    `548b2fe699f46080cbca6c3d5951df2bcbcbb6bbdd215744054020962e6b7075`, `yue-linux-x86_64.zip`
-    `9f47c8c7d3b6aa6e439786ae4708b9e070edbb01876712e1212917decd01d916`; the same archive layout as 0.34.2.
-  - Also to change: `schema/Project.pkl`'s default (so it needs a release), and the libraries' tools, which demand
-    0.34.2 of the `yue` on the PATH (`moonwell setup` replaces that one with the project's version).
-- **The design shown to the maintainer, not yet approved** (they answered "not now" on 2026-10-02): 0.34.3 becomes the
-  default and 0.34.2 stays a known version; the floor-division test becomes "such a file compiles", and a new test
-  covers a bitwise operator; a compile that fails with `Failed to rewrite` or `Failed to minify` gets a Moonwell error
-  naming the `.yue` file, with a hint to put bitwise code in a Lua module under `lua/` (bundled as written; the game's
-  Lua 5.3 has the operators); the `//` notes leave the README and this file; both libraries' tools and documents move
-  to 0.34.3; released as 0.8.1. Already decided for when it starts: no in-game run before that release.
-
-2. **`moonwell-library.json` in the libraries**
+1. **`moonwell-library.json` in the libraries**
 
 - **Add `moonwell-library.json` with `{"dir": "src"}` to moonwell-wrappers and moonwell-systems,** in their next
   releases, so a map can leave `dir` out of its manifest (Moonwell 0.6.0 reads the file). Their READMEs and the
   tag-consumption checks then use the short form.
 
-3. **Automatic disposal of Unit wrappers**
+2. **Automatic disposal of Unit wrappers**
 
 - **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
   maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
@@ -635,13 +628,13 @@ entries below were renumbered. The State section above records each.
   positives (port-needs note §6.3). It needs a custom ability in every map's object data; polling type ids, as `wc3-lib`
   does, needs none.
 
-4. **PNG as a preview format**
+3. **PNG as a preview format**
 
 - **`settings.info.preview` naming a `.png`.** Left out of Moonwell 0.7.0 by the maintainer's choice. Moonwell would
   read the PNG and write the same TGA it writes today, so nothing changes in the game. Go's standard library decodes
   PNG (`image/png`), so this is the size check, the conversion to the TGA's pixels, and their tests.
 
-5. **The key release `onKeyDown` depends on**
+4. **The key release `onKeyDown` depends on**
 
 - **A key release the game never sends.** `wrappers.input`'s `onKeyDown` runs once per press because the module keeps
   whether each listened key is held (wrappers v0.8.0). If the game drops a release, for example when the window loses
@@ -649,7 +642,7 @@ entries below were renumbered. The State section above records each.
   (hold a key, switch away, let go, switch back, press again), and if a release can be lost, decide how the held state
   recovers.
 
-6. **Online multiplayer and desync checks, then 1.0**
+5. **Online multiplayer and desync checks, then 1.0**
 
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
@@ -661,7 +654,7 @@ entries below were renumbered. The State section above records each.
   Moonwell 0.7.0 preview picture in the lobby of a hosted game, and any later feature with multiplayer effects. Until
   then, release gates record these as deferred, not passed.
 
-7. **Other gameplay languages: Teal and Fennel**
+6. **Other gameplay languages: Teal and Fennel**
 
 Moved to the end of the list by the maintainer on 2026-10-02 (not enough capacity for it that week); whether it comes
 before or after 1.0 is theirs to say.

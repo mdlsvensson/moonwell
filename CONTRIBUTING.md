@@ -46,8 +46,8 @@ adds the tests that download the example library, and `MOONWELL_TEST_YUE` names 
 - **Errors.** An expected failure is a `*diag.Error` (or `diag.Problems`) with the file and a hint. Any other error, and
   any panic, is reported as an internal "please report" error, so a user's mistake must never reach it.
 - **Style.** `gofmt` and `go vet` are clean. Markdown is wrapped at 120 by hand.
-- **Versions must agree.** `version.go`, `schema/PklProject` and both install scripts carry the same number, and tests
-  check it.
+- **Versions must agree.** `version.go`, `schema/PklProject`, both install scripts and the README's examples carry the
+  same number, and tests check it.
 - **Generated files.** After changing `data/metadata.json`, run `go run ./tools/gen`; a test fails when
   `schema/generated/` is stale. `template/`, `runtime/` and `data/` need no step: they are embedded when the program is
   built.
@@ -221,7 +221,8 @@ data files hold.
 A release is built by `.github/workflows/release.yml` from a tag `moonwell@<version>`. The tag's name is fixed: the Pkl
 package's download address is built from it.
 
-1. Set the version in `version.go`, `schema/PklProject`, `install.ps1` and `install.sh`, re-resolve the template's Pkl
+1. Set the version in `version.go`, `schema/PklProject`, `install.ps1`, `install.sh` and the README's two examples (a
+   test names any that was missed), re-resolve the template's Pkl
    dependencies (`cd template && pkl project resolve`), and write the changelog's section, headed
    `## <version> (<date>)`: the release notes are its entries up to the first `###` heading. Commit, push, and wait for
    CI.

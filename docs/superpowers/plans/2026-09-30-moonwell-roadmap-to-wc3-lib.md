@@ -351,7 +351,8 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
    - Teal first: its compiler is Lua, and its types map to the annotated Lua we already write.
    - Then Fennel.
    - Pin YueScript 0.34.3, which fixes the `//` bug upstream (IppClub/YueScript#256), and check whether it fixes
-     bitwise operators too.
+     bitwise operators too. **Done 2026-10-02 as Moonwell 0.8.1:** `//` works; bitwise operators still fail in the
+     compiler's rewrite and minify steps, now with an error that Moonwell reports at the source line.
 3. **`moonwell-library.json` with `{"dir": "src"}` in moonwell-wrappers and moonwell-systems,** so maps can leave `dir`
    out.
 4. **Automatic disposal of Unit wrappers on removal.** The maintainer has not chosen a way yet: the undefend-order
