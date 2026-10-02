@@ -75,3 +75,4 @@ jobs:
         env:
           MOONWELL_REQUIRE_TOOLS: "1"
           MOONWELL_NETWORK_TESTS: "1"
+          MOONWELL_CONFORMANCE: "1"
