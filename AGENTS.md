@@ -372,7 +372,13 @@ same bytes.
   nothing went to JSR; roadmap 5.1; spec
   `docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md`, approved 2026-10-02). Gate steps 1 to 6 passed,
   3 to 6 run by the maintainer with the program built from the release commit; 7 to 13 are covered by the conformance
-  suite. Still open: the maintainer running the install line on their own machine (does SmartScreen warn?). The
+  suite. Still open: the maintainer running the install line on their own machine (does SmartScreen warn?). Their
+  first try failed for another reason: five minutes after publishing, the release was marked as a pre-release like
+  every release before it, GitHub's "latest" skips pre-releases, and the README's
+  `releases/latest/download/install.ps1` answered 404 (Windows PowerShell 5.1 says "The connection was closed
+  unexpectedly" for that). The maintainer chose full releases for Moonwell from 0.8.0 on (the two libraries stay
+  pre-releases); 0.8.0 is unmarked, the workflow passes `--latest`, and its install job now runs the README's own
+  line, which it had not: it used the versioned address, so it passed while the README's line was broken. The
   maintainer chose Go,
   one `moonwell` executable on the PATH installed by a script from the GitHub release, the standard library only, every
   test ported, releases built by CI from the tag, and a redesign in idiomatic Go checked from outside: a contract (same
@@ -573,6 +579,8 @@ hides what it would have found. On Windows also run `GOOS=linux go vet ./...`: s
   becomes the character itself. Write such lines with a file-editing tool. `gofmt -l .` also looks into dot-folders
   such as `.superpowers/`.
 - **Windows consoles in tests:** see Plan 5d's note above on interrupting a program.
+- **Never mark a Moonwell release as a pre-release:** the install line needs `releases/latest`, which skips them
+  (CONTRIBUTING, Publishing). After a release, fetch the README's line itself, not only the versioned address.
 
 ## Backlog (in the maintainer's order of 2026-10-01; each needs a short design first)
 

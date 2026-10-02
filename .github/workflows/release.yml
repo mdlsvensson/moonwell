@@ -75,9 +75,12 @@ jobs:
             inside { print }
           ' CHANGELOG.md > notes.md
           printf '\nSee the [changelog](https://github.com/mdlsvensson/moonwell/blob/main/CHANGELOG.md) for the details and the release gate.\n' >> notes.md
-          gh release create "$GITHUB_REF_NAME" --verify-tag --title "v$VERSION" --notes-file notes.md out/*
+          # A full release, marked as the latest: the README's install line is releases/latest/download/..., and
+          # GitHub's "latest" skips a pre-release.
+          gh release create "$GITHUB_REF_NAME" --verify-tag --latest --title "v$VERSION" --notes-file notes.md out/*
 
-  # What a map author does: the install line of this version, then a new project and a build of it.
+  # What a map author does: the README's install line, which must serve this version, then a new project and a build
+  # of it.
   install:
     needs: release
     strategy:
@@ -105,14 +108,14 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          curl -fsSL "https://github.com/mdlsvensson/moonwell/releases/download/$GITHUB_REF_NAME/install.sh" | sh
+          curl -fsSL https://github.com/mdlsvensson/moonwell/releases/latest/download/install.sh | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run the install line (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          irm "https://github.com/mdlsvensson/moonwell/releases/download/$env:GITHUB_REF_NAME/install.ps1" | iex
+          irm https://github.com/mdlsvensson/moonwell/releases/latest/download/install.ps1 | iex
           Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $env:LOCALAPPDATA 'moonwell\bin')
 
       - name: Create a project and build it
@@ -125,3 +128,11 @@ jobs:
           cd my-map
           moonwell build
           test -f dist/bin/map.w3x
+
+      # The address of one version, which the version-mismatch hint gives.
+      - name: This version's own install scripts are served
+        shell: bash
+        run: |
+          for script in install.ps1 install.sh; do
+            curl -fsSL -o /dev/null "https://github.com/mdlsvensson/moonwell/releases/download/$GITHUB_REF_NAME/$script"
+          done

@@ -58,6 +58,10 @@ Published 2026-10-02 as the GitHub release `moonwell@0.8.0`, built by the releas
 ran the install line of the release on Ubuntu and Windows, then `moonwell init my-map` and `moonwell build`, on machines
 that had neither the program nor the Pkl package.
 
+At first the README's install line answered 404: the release had been marked as a pre-release, like every
+release before it, and GitHub's `releases/latest` skips those. From 0.8.0 on, Moonwell's releases are full releases, and
+the release workflow now runs the README's line itself.
+
 ## 0.7.0 (2026-10-01)
 
 - **A picture of your own in the game's map list.** `settings.info.preview = "preview.tga"` names a `.tga` or a `.blp`

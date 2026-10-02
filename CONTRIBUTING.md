@@ -235,3 +235,8 @@ package's download address is built from it.
    Windows it runs the install line of the new version, then `moonwell init my-map` and `moonwell build`.
 5. On your own machine, run the install line once and build a project. A release that fails after the tag is pushed is
    fixed with a new version, not by moving the tag: projects and the Pkl package index remember what a tag held.
+
+A Moonwell release is a full release, never a pre-release. The README's install line downloads from
+`releases/latest/download/`, and GitHub's "latest" skips pre-releases: marking the newest release as a pre-release
+makes that line answer 404, which Windows PowerShell reports as "The connection was closed unexpectedly". The workflow
+creates the release as the latest one, and its install job runs the README's line, so it fails if that ever breaks.
