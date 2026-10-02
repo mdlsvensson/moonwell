@@ -113,3 +113,24 @@ func TestDecodeAndStrictDropALeadingByteOrderMark(t *testing.T) {
 		t.Error("Strict accepted invalid bytes")
 	}
 }
+
+// The expected signs are what Deno's localeCompare gives.
+func TestLocaleCompareOrdersASCIIAsJavaScriptsLocaleCompareDoes(t *testing.T) {
+	for _, c := range []struct {
+		a, b string
+		want int
+	}{
+		{"a", "B", -1}, {"a", "A", -1}, {"ab", "Aa", 1}, {"aB", "Ab", -1}, {"a\x01b", "ab", 0}, {"a b", "ab", -1},
+		{"a", "a ", -1}, {"src/a_b.yue", "src/a/b.yue", -1}, {"src/Z.yue", "src/a.yue", 1}, {"$/b1", "/~0$", 1},
+		{"/~0$", "~b1x", -1}, {"", "", 0}, {"x", "", 1}, {"9", "a", -1}, {"_", "0", -1},
+	} {
+		if got := LocaleCompare(c.a, c.b); got != c.want {
+			t.Errorf("LocaleCompare(%q, %q) = %d, want %d", c.a, c.b, got, c.want)
+		}
+	}
+	names := []string{"b", "A", "a", "_", "1", "B"}
+	slices.SortStableFunc(names, LocaleCompare)
+	if want := []string{"_", "1", "a", "A", "b", "B"}; !slices.Equal(names, want) {
+		t.Errorf("sorted = %q", names)
+	}
+}
