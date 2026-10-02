@@ -37,6 +37,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+          cache: false # no dependencies, so no go.sum to key a cache on
 
       - name: Install Pkl 0.32.1
         run: |
