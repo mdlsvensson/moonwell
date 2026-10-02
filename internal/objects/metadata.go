@@ -198,3 +198,10 @@ func sharedPrefix(a, b string) int {
 	}
 	return length
 }
+
+// FieldSource names the field list that objects of category are written with and, for the categories of the unit
+// file, the use value a field must have to apply to them ("" for the others).
+func FieldSource(category Category) (fields, use string) {
+	source := fieldSource[category]
+	return source.fields, source.use
+}
