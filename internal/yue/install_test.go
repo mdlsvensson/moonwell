@@ -177,7 +177,9 @@ func TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler(t *testing.T) {
 }
 
 func TestKnownVersionsPinTheDefaultForWindowsAndLinux(t *testing.T) {
-	if yue.DefaultVersion != "0.34.2" ||
+	if yue.DefaultVersion != "0.34.3" ||
+		yue.Known["0.34.3"]["windows-x86_64"].SHA256 != "548b2fe699f46080cbca6c3d5951df2bcbcbb6bbdd215744054020962e6b7075" ||
+		yue.Known["0.34.3"]["linux-x86_64"].SHA256 != "9f47c8c7d3b6aa6e439786ae4708b9e070edbb01876712e1212917decd01d916" ||
 		yue.Known["0.34.2"]["windows-x86_64"].SHA256 != "367e79f450dc60d96d248c8e1d97b4ec47729b963f64226888fb8e111fc349bf" ||
 		yue.Known["0.34.2"]["linux-x86_64"].SHA256 != "fffcaa3624bc61e0a2a40cb117fe59460d6503d08348857229ce7d2b2f2b7c2d" {
 		t.Errorf("Known = %+v", yue.Known)

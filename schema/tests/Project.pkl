@@ -17,7 +17,7 @@ facts {
     Project.build.minify == false
     Project.launch.gameExecutable == null
     Project.launch.args == List("-launch", "-windowmode", "windowed")
-    Project.yue.version == "0.34.2"
+    Project.yue.version == "0.34.3"
     Project.yue.path == null
     Project.assets.paths.isEmpty
     Project.assets.exclude == List()
@@ -195,7 +195,7 @@ facts {
     parsed.launch.args is Listing
     parsed.launch.args.toList() == List("-launch", "-windowmode", "windowed")
     !parsed.launch.hasProperty("gameExecutable")
-    parsed.yue.version == "0.34.2"
+    parsed.yue.version == "0.34.3"
     !parsed.yue.hasProperty("path")
     parsed.assets.paths is Dynamic
     parsed.assets.exclude.toList() == List()

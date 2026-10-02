@@ -400,7 +400,7 @@ func TestLoadEvaluatesARealProjectAgainstTheLocalPackage(t *testing.T) {
 		t.Fatal(diag.Format(err))
 	}
 	if p.Map.Folder != "hero.w3x" || p.Launch.GameExecutable == nil || *p.Launch.GameExecutable != "C:/wc3.exe" ||
-		p.Yue.Version != "0.34.2" || p.Yue.Path != nil || p.Assets.Paths.Len() != 0 || len(p.Assets.Exclude) != 0 ||
+		p.Yue.Version != "0.34.3" || p.Yue.Path != nil || p.Assets.Paths.Len() != 0 || len(p.Assets.Exclude) != 0 ||
 		p.Settings.Has() || p.Lint.UnknownGlobals != "error" || len(p.Lint.Globals) != 0 || p.Libraries.Len() != 0 {
 		t.Errorf("project = %+v", p)
 	}

@@ -5,7 +5,7 @@ package yue
 import "runtime"
 
 // DefaultVersion is the compiler version a project gets unless its manifest says otherwise.
-const DefaultVersion = "0.34.2"
+const DefaultVersion = "0.34.3"
 
 // Asset is a compiler build Moonwell can download.
 type Asset struct {
@@ -22,6 +22,21 @@ const releases = "https://github.com/IppClub/YueScript/releases/download"
 // Known are the compiler builds Moonwell can install, by version and then by platform, with checksums verified
 // when the version was pinned.
 var Known = map[string]map[string]Asset{
+	"0.34.3": {
+		"windows-x86_64": {
+			URL:     releases + "/v0.34.3/yue-windows-x64.7z",
+			SHA256:  "548b2fe699f46080cbca6c3d5951df2bcbcbb6bbdd215744054020962e6b7075",
+			Archive: "7z",
+			Binary:  "yue.exe",
+		},
+		"linux-x86_64": {
+			URL:     releases + "/v0.34.3/yue-linux-x86_64.zip",
+			SHA256:  "9f47c8c7d3b6aa6e439786ae4708b9e070edbb01876712e1212917decd01d916",
+			Archive: "zip",
+			Binary:  "yue",
+		},
+	},
+	// The default up to Moonwell 0.8.0: a project on an older Pkl package still names it.
 	"0.34.2": {
 		"windows-x86_64": {
 			URL:     releases + "/v0.34.2/yue-windows-x64.7z",

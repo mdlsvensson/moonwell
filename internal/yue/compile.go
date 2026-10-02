@@ -205,7 +205,10 @@ func Compile(ctx context.Context, options CompileOptions) (*Output, error) {
 		lock.Unlock()
 		var failure *diag.Error
 		if result.Code != 0 {
-			failure = CompileError(path, result.Stdout+"\n"+result.Stderr)
+			printed := result.Stdout + "\n" + result.Stderr
+			if failure = rewriteError(path, target, printed); failure == nil {
+				failure = CompileError(path, printed)
+			}
 		} else {
 			failure = emptyOutputError(path, target, source)
 		}
@@ -315,9 +318,47 @@ func emptyOutputError(file, output, source string) *diag.Error {
 	return &diag.Error{
 		Msg:  "YueScript reported success but wrote no Lua for " + file + ", although the file has code.",
 		File: file,
-		Hint: "YueScript 0.34.2 does this for a file that uses the floor division operator `//`. " +
-			"Write math.floor(a / b) instead.",
+		Hint: "YueScript 0.34.2 does this for a file that uses the floor division operator `//` or a bitwise operator. " +
+			"Use YueScript 0.34.3 (the default from Moonwell 0.8.1 on), or write math.floor(a / b) instead.",
 	}
+}
+
+var (
+	rewriteFailure = regexp.MustCompile(`(?m)^Failed to (rewrite|minify): `)
+	rewriteReason  = regexp.MustCompile(`(?m)^>> :([0-9]+):[0-9]+: (` + text.NotLineBreak + `+)`)
+	lineMark       = regexp.MustCompile(` -- ([0-9]+)$`)
+)
+
+// rewriteError is the failure of a compile whose YueScript was fine but whose Lua the compiler could not rewrite
+// (-r) or minify (-m): that step does not read Lua 5.3's bitwise operators. yue prints "Failed to rewrite: <output>"
+// and ">> :<line>:<column>: <reason>", a position in the Lua it leaves at output. In a normal build each line of
+// that Lua ends with its source line as a comment, which gives the error its line; minified Lua has no such marks.
+// It returns nil for any other failure.
+func rewriteError(file, output, printed string) *diag.Error {
+	step := rewriteFailure.FindStringSubmatch(printed)
+	if step == nil {
+		return nil
+	}
+	failure := &diag.Error{
+		Msg:  "YueScript compiled this file but could not " + step[1] + " its Lua.",
+		File: file,
+		Hint: "That step of YueScript does not read Lua 5.3's bitwise operators (&, |, ~, <<, >>). If the file uses one, " +
+			"move that code to a Lua module under lua/, which is bundled as written.",
+	}
+	reason := rewriteReason.FindStringSubmatch(printed)
+	if reason == nil {
+		return failure
+	}
+	failure.Msg = strings.TrimSuffix(failure.Msg, ".") + ": " + text.Trim(reason[2])
+	if data, err := os.ReadFile(output); err == nil {
+		lines := strings.Split(strings.ReplaceAll(string(data), "\r\n", "\n"), "\n")
+		if at, _ := strconv.Atoi(reason[1]); at >= 1 && at <= len(lines) {
+			if mark := lineMark.FindStringSubmatch(lines[at-1]); mark != nil {
+				failure.Line, _ = strconv.Atoi(mark[1])
+			}
+		}
+	}
+	return failure
 }
 
 var (

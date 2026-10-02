@@ -212,16 +212,41 @@ func TestAnEmptyCompileOutputForAFileWithCodeFailsInsteadOfDroppingTheModule(t *
 	}
 }
 
-func TestAFileUsingFloorDivisionFailsNormalAndMinified(t *testing.T) {
+func TestAFileUsingFloorDivisionCompilesNormalAndMinified(t *testing.T) {
 	compiler := yuetest.Need(t)
-	// yue 0.34.2 empties such a file. Once a fixed compiler is pinned this test fails, and becomes a test that the
-	// file compiles.
+	// yue 0.34.2 emptied such a file; 0.34.3, the pinned version, compiles it.
 	for _, minify := range []bool{false, true} {
 		root := project(t, "src/main.yue", "x = 7 // 2\nprint x\n")
-		_, err := yue.Compile(background, yue.CompileOptions{Yue: compiler, Root: root, Minify: minify})
-		if e := asError(t, err, "floor division"); e.File != "src/main.yue" {
-			t.Errorf("minify %v: %+v", minify, e)
+		output := compile(t, yue.CompileOptions{Yue: compiler, Root: root, Minify: minify})
+		if main := load(t, output, "main"); main == nil || !strings.Contains(main.Source, "//") {
+			t.Errorf("minify %v: main = %+v", minify, main)
 		}
+	}
+}
+
+func TestAFileUsingABitwiseOperatorFailsAtItsLineWithAHint(t *testing.T) {
+	compiler := yuetest.Need(t)
+	// yue compiles the operators, but the step that rewrites or minifies the Lua does not read them: it fails and
+	// leaves the Lua it could not rewrite, which the build must not use.
+	const source = "x = 1\n\n\nflags = x & 3\nprint flags\n"
+	root := project(t, "src/main.yue", source)
+	_, err := yue.Compile(background, yue.CompileOptions{Yue: compiler, Root: root})
+	e := asError(t, err, "a bitwise operator")
+	if e.Msg != "YueScript compiled this file but could not rewrite its Lua: Unexpected Symbol `&` in source." ||
+		e.File != "src/main.yue" || e.Line != 4 || !strings.Contains(e.Hint, "bitwise operators") || !strings.Contains(e.Hint, "lua/") {
+		t.Errorf("error = %+v", e)
+	}
+	if fsx.Exists(filepath.Join(root, "dist", "stage", "lua", "main.lua")) {
+		t.Error("the Lua that could not be rewritten was left behind")
+	}
+
+	// A minified build has no line to give: the Lua it fails on carries no line marks.
+	root = project(t, "src/main.yue", source)
+	_, err = yue.Compile(background, yue.CompileOptions{Yue: compiler, Root: root, Minify: true})
+	e = asError(t, err, "a bitwise operator, minified")
+	if e.Msg != "YueScript compiled this file but could not minify its Lua: Unexpected Symbol `&` in source." ||
+		e.File != "src/main.yue" || e.Line != 0 || !strings.Contains(e.Hint, "bitwise operators") {
+		t.Errorf("minified: error = %+v", e)
 	}
 }
 

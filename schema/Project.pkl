@@ -68,7 +68,7 @@ class LaunchConfig {
 class YueConfig {
   /// YueScript compiler version. Moonwell downloads it and verifies it against a checksum pinned in the CLI, so only
   /// versions that CLI release knows are accepted. Leave unset to use the version pinned by this schema release.
-  version: String(matches(Regex(#"\d+\.\d+\.\d+"#))) = "0.34.2"
+  version: String(matches(Regex(#"\d+\.\d+\.\d+"#))) = "0.34.3"
 
   /// Path to a `yue` binary to use instead of downloading one, for example a compiler you built yourself.
   /// Set it in `moonwell.local.pkl`, since the path is specific to your machine.
