@@ -357,6 +357,8 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
    out. **Done 2026-10-02** as wrappers `v0.8.1` and systems `v0.5.1`; tag consumption passed for both without `dir`.
 4. **Automatic disposal of Unit wrappers on removal.** The maintainer has not chosen a way yet: the undefend-order
    trick works but needs a custom ability in every map; polling type ids needs none (1.4 probe, port-needs note §6.3).
+   **Done 2026-10-02** as wrappers `v0.9.0`: the maintainer chose polling (`Unit.autoDispose`, `Unit.sweep`); the
+   in-game gate and tag consumption passed.
 5. **PNG as a preview format** for `settings.info.preview`, written into the map as the TGA of Moonwell 0.7.0.
 6. **The key release `onKeyDown` depends on.** Probe whether the game can drop a key release (wrappers v0.8.0 keeps
    whether each key is held), and decide how the held state recovers if it can.
@@ -375,7 +377,7 @@ Items 1 to 3 of phase 4 are released. Before this phase began, the backlog entri
 | `assets:sync` Ctrl+C during planning (deferred)               | 0.2                  |
 | Editor error for effects attached to items and destructables  | 0.3 (done)           |
 | Static native-call check for the wrappers                     | 1.1 (done)           |
-| Automatic disposal of Unit wrappers on removal                | 1.4 probe, then 5.4  |
+| Automatic disposal of Unit wrappers on removal                | 1.4 probe, 5.4 (done) |
 | Wrappers candidate additions                                  | 2.3, 4.1 (done)      |
 | YueScript port of `wc3-lib` (4d)                              | Phase 3 (done)       |
 | Assets shipped by libraries                                   | 4.2 (done)           |

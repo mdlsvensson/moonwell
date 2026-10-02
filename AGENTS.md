@@ -509,6 +509,23 @@ same bytes.
     `.moonwell/` was removed.
   - A project linked to the checkout (`init --link`, such as the gate map) stops evaluating when the checkout's
     version changes: Pkl compares it with the project's `PklProject.deps.json`. Run `pkl project resolve` there.
+- **Wrappers v0.9.0, automatic disposal of Unit wrappers, released** (2026-10-02, GitHub pre-release `v0.9.0` on
+  `7347705`; tag consumption passed; a short design in chat, after the maintainer chose polling over the undefend
+  order).
+  - `Unit.autoDispose(interval?)` starts one game timer that runs `Unit.sweep()` every 0.25 seconds by default and
+    returns a stop function; nothing runs until a map calls it. `Unit.sweep()` disposes the wrapper of every unit whose
+    type id reads 0. A swept wrapper is like one `remove()` was called on. A corpse and a dead hero stay valid.
+  - One change to existing behavior: `exists()` on Unit, Item and Destructable answers `false` for a disposed wrapper;
+    before, it raised.
+  - The sweep returns nothing and has no callback, on purpose: it walks a weak cache, so its order and the set of
+    wrappers it meets differ between machines. A "unit was removed" listener would need an ordered list.
+  - Items and destructables are not swept, and the undefend order is left as a possible exact second source.
+  - moonwell-systems needed no change: every place that keeps a unit across ticks already guards against a disposed
+    wrapper, and its suites and integration pass against v0.9.0.
+  - The in-game gate (`yue -e gate.lua dispose`, about four seconds, lines read from a file) passed. Measured on
+    3.0.0.24268: a sweep in the instant of a raw `RemoveUnit` or an exploding death sees neither; the default timer
+    disposed the removed unit after 0.25 s; a sweep costs about 0.45 microseconds per wrapper; the removed unit's
+    handle id was not used again two seconds later.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -531,9 +548,9 @@ same bytes.
    custom map preview) as Moonwell 0.7.0. What is left follows the roadmap's phase 5, the order the maintainer set on
    2026-10-01 and changed on 2026-10-02, which is also the order of the Backlog below: replace Deno (done: Moonwell
    0.8.0); the YueScript pin (done: Moonwell 0.8.1); `moonwell-library.json` in the wrappers and systems libraries
-   (done: wrappers v0.8.1 and systems v0.5.1); automatic disposal of Unit wrappers; PNG as a preview format; the key
-   release `onKeyDown` depends on; the online checks before 1.0; and Teal and Fennel, moved to the end on 2026-10-02.
-   Every item needs a short design first.
+   (done: wrappers v0.8.1 and systems v0.5.1); automatic disposal of Unit wrappers (done: wrappers v0.9.0); PNG as a
+   preview format; the key release `onKeyDown` depends on; the online checks before 1.0; and Teal and Fennel, moved to
+   the end on 2026-10-02. Every item needs a short design first.
    **Now:** nothing is under way; backlog item 1 is next, when the maintainer says so.
 
 Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` downloads from that tag.
@@ -623,28 +640,17 @@ Entries that are done were removed on 2026-10-01: the custom map preview (Moonwe
 editor error for effects attached to items and destructables (v0.5.1) and the port of `wc3-lib` (moonwell-systems v0.1.0
 to v0.5.0). Replacing Deno was removed on 2026-10-02 (Moonwell 0.8.0, with the sibling repositories' tools), and the
 entries below were renumbered. The YueScript pin (Moonwell 0.8.1) and `moonwell-library.json` in the two libraries
-(wrappers v0.8.1, systems v0.5.1) were removed the same day, with a renumbering each. The State section above records
-each.
+(wrappers v0.8.1, systems v0.5.1) were removed the same day, with a renumbering each, and so was the automatic disposal
+of Unit wrappers (wrappers v0.9.0, by polling; what the probes found about the world-bounds region, which does not
+work, and the undefend order, which does, is in the port-needs note §6.3). The State section above records each.
 
-1. **Automatic disposal of Unit wrappers**
-
-- **Automatic disposal of Unit wrappers on removal** (WCSharp comparison §2.1 and §7.5; backlogged 2026-09-29, the
-  maintainer wants to know more before deciding). Today a unit the game removes by itself (decay, removal by other code)
-  keeps a live-looking wrapper whose handle is dead. WCSharp detects removal as a unit leaving a region that covers the
-  world bounds. **The probe run (2026-09-29) found that this does not work on 3.0.0.24268:** the leave event fired for
-  none of `RemoveUnit`, an exploded death, a summoned timed-life death or a normal death left 120 s to decay (enter did
-  fire at creation). **The 1.4 probe (2026-09-30) found the undefend-order trick does work:** a unit with a Defend copy
-  gets order 852056 twice at death (Defend level 1) and twice at removal (level 0), for all four cases, with no false
-  positives (port-needs note §6.3). It needs a custom ability in every map's object data; polling type ids, as `wc3-lib`
-  does, needs none.
-
-2. **PNG as a preview format**
+1. **PNG as a preview format**
 
 - **`settings.info.preview` naming a `.png`.** Left out of Moonwell 0.7.0 by the maintainer's choice. Moonwell would
   read the PNG and write the same TGA it writes today, so nothing changes in the game. Go's standard library decodes
   PNG (`image/png`), so this is the size check, the conversion to the TGA's pixels, and their tests.
 
-3. **The key release `onKeyDown` depends on**
+2. **The key release `onKeyDown` depends on**
 
 - **A key release the game never sends.** `wrappers.input`'s `onKeyDown` runs once per press because the module keeps
   whether each listened key is held (wrappers v0.8.0). If the game drops a release, for example when the window loses
@@ -652,7 +658,7 @@ each.
   (hold a key, switch away, let go, switch back, press again), and if a release can be lost, decide how the held state
   recovers.
 
-4. **Online multiplayer and desync checks, then 1.0**
+3. **Online multiplayer and desync checks, then 1.0**
 
 - **Online multiplayer and desync checks: the very last step before 1.0.** The maintainer decided (2026-09-29) that
   every online and desync check waits until then: Reforged's latest patch removed LAN, and it needs a second player on
@@ -661,10 +667,11 @@ each.
   forces, alliances) in a real lobby, map transfer of packed normal and minified builds, the wrappers v0.3.0 local
   visibility (`setVisibleFor`, `playFor`, the `player` options of `TextTag.float` and `Sound.playOnce`) and whether
   `sound:getDuration()` agrees across machines, the wrappers v0.8.0 input listeners and `weather:enableFor`, the
-  Moonwell 0.7.0 preview picture in the lobby of a hosted game, and any later feature with multiplayer effects. Until
-  then, release gates record these as deferred, not passed.
+  wrappers v0.9.0 sweep (`Unit.autoDispose` running on both machines), the Moonwell 0.7.0 preview picture in the lobby
+  of a hosted game, and any later feature with multiplayer effects. Until then, release gates record these as deferred,
+  not passed.
 
-5. **Other gameplay languages: Teal and Fennel**
+4. **Other gameplay languages: Teal and Fennel**
 
 Moved to the end of the list by the maintainer on 2026-10-02 (not enough capacity for it that week); whether it comes
 before or after 1.0 is theirs to say.
