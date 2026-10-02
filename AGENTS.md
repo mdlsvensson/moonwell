@@ -647,6 +647,13 @@ hides what it would have found. On Windows also run `GOOS=linux go vet ./...`: s
   becomes the character itself. Write such lines with a file-editing tool. `gofmt -l .` also looks into dot-folders
   such as `.superpowers/`.
 - **Windows consoles in tests:** see Plan 5d's note above on interrupting a program.
+- **Claude's tools see their own `%LOCALAPPDATA%\moonwell`:** the Claude desktop app is an MSIX package on the
+  maintainer's machine, so every process it starts reads and writes
+  `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Local\moonwell` in place of the real folder. The program,
+  the `yue` beside it and the compiler cache that Claude sees are its own copies, and gate step 1 run by Claude
+  updates only that copy. Never say what the maintainer has installed from what a tool reads there (2026-10-02: a
+  working install was reported as failed, and a compiler "already cached" was downloaded again by the maintainer's
+  `setup`). The repositories and `Documents` are not redirected.
 - **Never mark a Moonwell release as a pre-release:** the install line needs `releases/latest`, which skips them
   (CONTRIBUTING, Publishing). After a release, fetch the README's line itself, not only the versioned address.
 
