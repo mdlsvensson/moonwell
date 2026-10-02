@@ -16,27 +16,27 @@ var templateFS embed.FS
 
 // RuntimeLua is the Lua runtime bundled into every map.
 //
-//go:embed cli/runtime/moonwell.lua
+//go:embed runtime/moonwell.lua
 var RuntimeLua string
 
 // MacrosYue is the macro module projects import as "moonwell.macros".
 //
-//go:embed cli/runtime/macros.yue
+//go:embed runtime/macros.yue
 var MacrosYue string
 
 // GamePaths is the list of paths the game ships, one per line.
 //
-//go:embed cli/data/game-paths.txt
+//go:embed data/game-paths.txt
 var GamePaths string
 
 // Metadata is the object-data metadata, as JSON.
 //
-//go:embed cli/data/metadata.json
+//go:embed data/metadata.json
 var Metadata []byte
 
 // Natives is the game's natives, as JSON.
 //
-//go:embed cli/data/natives.json
+//go:embed data/natives.json
 var Natives []byte
 
 // TemplateFile is one file of the project template.
@@ -46,7 +46,7 @@ type TemplateFile struct {
 }
 
 // TemplateExclude names the template files init writes itself, or never writes.
-var TemplateExclude = []string{"deno.json", "PklProject", "PklProject.deps.json", "moonwell.local.pkl"}
+var TemplateExclude = []string{"PklProject", "PklProject.deps.json", "moonwell.local.pkl"}
 
 // TemplateFiles returns every file init copies from the template, sorted by path.
 func TemplateFiles() ([]TemplateFile, error) {

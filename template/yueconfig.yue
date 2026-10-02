@@ -6,7 +6,7 @@ return
   build: true
   reserve_line_number: true
   reserve_comment: true
-  -- Unknown globals are reported by lua-language-server, from .moonwell/types, and by `deno task check`.
+  -- Unknown globals are reported by lua-language-server, from .moonwell/types, and by `moonwell check`.
   lint_global: false
   -- Where `import "moonwell.macros"` is found; Moonwell writes that folder.
   include:

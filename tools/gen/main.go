@@ -26,11 +26,11 @@ import (
 
 const (
 	// generatedBy and metadataPath go into the first line of each generated schema file.
-	generatedBy  = "deno task gen"
-	metadataPath = "cli/data/metadata.json"
+	generatedBy  = "go run ./tools/gen"
+	metadataPath = "data/metadata.json"
 
-	nativesPath   = "cli/data/natives.json"
-	gamePathsPath = "cli/data/game-paths.txt"
+	nativesPath   = "data/natives.json"
+	gamePathsPath = "data/game-paths.txt"
 	overridesPath = "tools/metadata/overrides.json"
 	extrasPath    = "tools/natives/lua-extras.json"
 	schemaFolder  = "schema/generated"

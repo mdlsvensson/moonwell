@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # The release workflow runs these checks before it builds anything.
+  workflow_call:
 
 jobs:
   test:
@@ -32,10 +34,6 @@ jobs:
           echo "TMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
           echo "TEMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
 
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: 2.9.x
-
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
@@ -50,18 +48,6 @@ jobs:
           "$RUNNER_TEMP/pkl/${{ matrix.pkl-binary }}" --version
 
       - run: pkl --version
-      - run: deno task check
-      - run: deno task lint
-      - run: deno fmt --check
-      - run: deno task test
-      - run: deno task test:runtime
-      - run: deno task test:pkl
-      - run: deno task test:e2e
-      - run: deno task test:network
-        env:
-          MOONWELL_NETWORK_TESTS: "1"
-
-      # The Go toolchain that replaces the Deno one (docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md).
       - run: go vet ./...
       - name: gofmt
         run: |
@@ -71,8 +57,8 @@ jobs:
             echo "$unformatted"
             exit 1
           fi
+      # A missing pkl or YueScript compiler fails a test instead of skipping it; the compiler is downloaded once.
       - run: go test ./...
         env:
           MOONWELL_REQUIRE_TOOLS: "1"
           MOONWELL_NETWORK_TESTS: "1"
-          MOONWELL_CONFORMANCE: "1"

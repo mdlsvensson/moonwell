@@ -154,7 +154,7 @@ func TestTheTemplatesGitattributesNeverConvertsMapsOrAssets(t *testing.T) {
 
 func TestEmbeddedDataIsPresent(t *testing.T) {
 	if !strings.HasPrefix(GamePaths, "# Warcraft III ") {
-		t.Error("cli/data/game-paths.txt does not start with its version header")
+		t.Error("data/game-paths.txt does not start with its version header")
 	}
 	if !strings.Contains(RuntimeLua, "__mw") || !strings.Contains(MacrosYue, "FourCC") {
 		t.Error("the runtime or the macro module is not embedded")
