@@ -19,6 +19,9 @@ Steps 1 and 2 (CONTRIBUTING) passed 2026-10-03 on Windows, and CI passed on Ubun
 re-run: nothing that reaches a map changed. The program was also run with no `pkl` on the PATH and an empty cache:
 `init --link` downloaded Pkl 0.32.1 once, `setup` copied it to `bin` and printed the PATH command, and `check` passed.
 
+Published 2026-10-03 as the GitHub release `moonwell@0.9.1`, built by the release workflow, whose last job ran the
+README's install line on Ubuntu and Windows, then `moonwell init my-map` and `moonwell build`.
+
 ## 0.9.0 (2026-10-02)
 
 - **The preview picture can be a PNG.** `settings.info.preview` takes a `.png` beside a `.tga` and a `.blp`, with the

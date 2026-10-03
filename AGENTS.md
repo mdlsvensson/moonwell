@@ -556,8 +556,11 @@ same bytes.
   - What stays, and is in the README: `onKeyUp` never runs for a lost release, so a map's own "key is held" state can
     stick; and a press inside the window is still skipped. In single player, game time stands still in the menu and
     runs slower while the game is in the background (8.73 s counted as 3.19 s).
-- **Unreleased: a pinned Pkl** (2026-10-03, a short design in chat, approved by the maintainer). Users no longer
-  install Pkl first.
+- **Released 0.9.1, a pinned Pkl** (2026-10-03, GitHub release `moonwell@0.9.1` on `a9c4309`, a full release marked
+  latest; the workflow's install job ran the README's own line on both systems, and the line was fetched again
+  afterwards; a short design in chat, approved by the maintainer). Users no longer install Pkl first. Gate steps 1
+  and 2 passed; 3 to 13 were not re-run (nothing that reaches a map changed). A project on the 0.9.0 package needs
+  no change; linked projects need `pkl project resolve` (done for the gate map and its preview project).
   - `pkl.Ensure` (`internal/pkl`) asks `pkl --version`. It returns `pkl` when that is 0.32 or newer. Otherwise it
     downloads Pkl 0.32.1 (one executable of about 100 MB per platform, no archive) into `<cache>/pkl/0.32.1/`,
     checks its SHA-256 and its `--version`, and returns that path. An older `pkl` on PATH gets a warning; the
@@ -567,7 +570,9 @@ same bytes.
     `Env.PklDownloads` is `pkl.Known`; the cli tests' `newEnv` sets it to nil, so a stand-in pkl never leads to a
     download or to a Pkl an earlier run left in the user's cache.
   - `moonwell setup` copies the pinned Pkl to `<cache>/bin` (`pkl.KeepForShell`, the maintainer's choice), so a
-    `pkl project resolve` typed by the user finds it, and prints the PATH command when `pkl` is still not found.
+    `pkl project resolve` typed by the user finds it, and prints the PATH command when `pkl` is still not found. It
+    does so before it loads the project: a project on another minor version's package does not load, and moving it
+    takes that very command.
     `fsx.CopyProgram` is shared with `yue.InstallBin`.
   - The checksums match GitHub's digests of the release assets. The network test downloads the real executable into
     the user's cache and runs it. Checked by hand with no `pkl` on PATH and an empty cache: `init --link` downloaded
@@ -686,6 +691,10 @@ hides what it would have found. On Windows also run `GOOS=linux go vet ./...`: s
   updates only that copy. Never say what the maintainer has installed from what a tool reads there (2026-10-02: a
   working install was reported as failed, and a compiler "already cached" was downloaded again by the maintainer's
   `setup`). The repositories and `Documents` are not redirected.
+- **No `pkl` on PATH since 2026-10-03:** the winget Pkl was removed from the maintainer's machine once 0.9.1 pinned
+  one. For the checks (`MOONWELL_REQUIRE_TOOLS=1`) and `pkl project resolve`, add the pinned copy in Claude's cache to
+  the shell's PATH: `export PATH="$PATH:$(cygpath "$LOCALAPPDATA")/moonwell/pkl/0.32.1"` (the network test puts it
+  there).
 - **Never mark a Moonwell release as a pre-release:** the install line needs `releases/latest`, which skips them
   (CONTRIBUTING, Publishing). After a release, fetch the README's line itself, not only the versioned address.
 
