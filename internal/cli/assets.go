@@ -10,7 +10,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/assets"
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/pipeline"
-	"github.com/mdlsvensson/moonwell/internal/project"
 )
 
 // Assets is assets:check and, with sync, assets:sync. The first shows what the second would change; the second
@@ -19,7 +18,7 @@ import (
 // libraries first.
 func Assets(ctx context.Context, env *pipeline.Env, sync bool) (*assets.Plan, error) {
 	// Loading only reads; doing it before taking the lock creates nothing outside a project.
-	p, err := project.Load(ctx, env.Root, env.Run)
+	p, err := pipeline.LoadProject(ctx, env)
 	if err != nil {
 		return nil, err
 	}

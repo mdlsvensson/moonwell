@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- **Pkl no longer has to be installed first.** Moonwell uses the `pkl` on the PATH when it is Pkl 0.32 or newer, as
+  before. Otherwise it downloads Pkl 0.32.1 once into its cache (about 100 MB, checked against a pinned checksum) and
+  runs that. Before, a missing or older `pkl` stopped every command.
+- An older `pkl` on the PATH is reported with a warning, since a `pkl` command you type yourself still runs it.
+- `moonwell setup` copies Moonwell's own Pkl to the cache's `bin` folder, next to `yue`, so `pkl project resolve` works
+  from a shell. On Windows the install line already put that folder on the PATH; elsewhere `setup` prints the command
+  that does.
+- Moonwell downloads Pkl for Windows and Linux on x86-64. On another system (a Moonwell built from source), a missing
+  or older `pkl` fails as before, with the install hint.
+
 ## 0.9.0 (2026-10-02)
 
 - **The preview picture can be a PNG.** `settings.info.preview` takes a `.png` beside a `.tga` and a `.blp`, with the

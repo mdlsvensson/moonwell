@@ -26,7 +26,7 @@ func relative(root, path string) string {
 // Build builds <build.folder>/<map.folder> and returns the archive's path. A failed build leaves no archive behind.
 func Build(ctx context.Context, env *pipeline.Env, options pipeline.StageOptions) (string, error) {
 	// Loading only reads; doing it before taking the lock creates nothing outside a project.
-	p, err := project.Load(ctx, env.Root, env.Run)
+	p, err := pipeline.LoadProject(ctx, env)
 	if err != nil {
 		return "", err
 	}

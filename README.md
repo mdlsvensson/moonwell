@@ -25,7 +25,7 @@
 
 ## Quickstart
 
-Install [Pkl](https://pkl-lang.org) 0.32+, then Moonwell. On Windows, in PowerShell:
+Install Moonwell. On Windows, in PowerShell:
 
 ```powershell
 irm https://github.com/mdlsvensson/moonwell/releases/latest/download/install.ps1 | iex
@@ -63,6 +63,11 @@ and puts it on your PATH:
 - **Linux:** `~/.local/bin/moonwell`. The script says so when that folder is not on your PATH.
 
 Moonwell is built for Windows and Linux on x86-64. Run the line again to upgrade: there is no update command.
+
+Moonwell evaluates projects with [Pkl](https://pkl-lang.org). It uses the `pkl` on your PATH when that is Pkl 0.32 or
+newer. Otherwise it downloads Pkl 0.32.1 (about 100 MB, once, checked against a pinned checksum) into its cache and runs
+that, with a warning when the `pkl` on your PATH is older. `moonwell setup` then copies it next to `yue` in the `bin`
+folder above, so a `pkl` command you type, such as `pkl project resolve`, finds it too.
 
 A project names the Moonwell it is written for in its `PklProject`, as the version of the `moonwell` Pkl package. The
 program and the package must have the same major and minor version; `moonwell` refuses another project and says which
@@ -560,8 +565,9 @@ Not supported yet:
 | `moonwell objects:eval`                         | Print the resolved objects as JSON                                               |
 | `moonwell setup`                                | Create a missing `moonwell.local.pkl`, download YueScript and prepare the editor |
 
-The compiler is downloaded once per version and verified by checksum. It is cached in `MOONWELL_CACHE` when that is set,
-else in `%LOCALAPPDATA%\moonwell` on Windows, else in `$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`.
+The compiler, and Pkl when Moonwell needs its own, are downloaded once per version and verified by checksum. They are
+cached in `MOONWELL_CACHE` when that is set, else in `%LOCALAPPDATA%\moonwell` on Windows, else in
+`$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`. `setup` also copies Moonwell's own Pkl to that folder's `bin`.
 
 ## Advanced settings
 

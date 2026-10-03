@@ -10,18 +10,27 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/bundle"
 	"github.com/mdlsvensson/moonwell/internal/editor"
 	"github.com/mdlsvensson/moonwell/internal/pipeline"
+	"github.com/mdlsvensson/moonwell/internal/pkl"
 	"github.com/mdlsvensson/moonwell/internal/project"
 	"github.com/mdlsvensson/moonwell/internal/yue"
 )
 
-// Setup prepares a checkout of a project for work. It creates moonwell.local.pkl if there is none, installs the
+// Setup prepares a checkout of a project for work. It keeps a copy of the pinned Pkl in the cache's bin folder when
+// Moonwell runs that one, creates moonwell.local.pkl if there is none, installs the
 // project's pinned compiler into the user's cache, keeps a copy in the cache's bin folder for the editor and says
 // what the editor still needs, adds the editor files and the .luarc.json entries an older project lacks, writes
 // .moonwell/types and the macro module, and then syncs the manifest's libraries into .moonwell/libraries (and
 // moonwell.lock) and their Lua modules into .moonwell/lua. It returns the compiler's path.
 func Setup(ctx context.Context, env *pipeline.Env) (string, error) {
-	p, err := project.Load(ctx, env.Root, env.Run)
+	p, err := pipeline.LoadProject(ctx, env)
 	if err != nil {
+		return "", err
+	}
+	program, err := env.Pkl(ctx)
+	if err != nil {
+		return "", err
+	}
+	if err := pkl.KeepForShell(ctx, program, env.PklDeps(), runtime.GOOS); err != nil {
 		return "", err
 	}
 	created, err := project.EnsureLocalManifest(env.Root)

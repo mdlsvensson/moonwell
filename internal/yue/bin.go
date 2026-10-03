@@ -3,10 +3,8 @@ package yue
 import (
 	"context"
 	"errors"
-	"io/fs"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
@@ -18,9 +16,8 @@ import (
 // InstallBin copies the pinned compiler to <cacheRoot>/bin/, the folder users put on PATH for the editor, unless an
 // identical copy is already there.
 func InstallBin(binary, cacheRoot string) (path string, copied bool, err error) {
-	binDir := filepath.Join(cacheRoot, "bin")
-	path = filepath.Join(binDir, filepath.Base(binary))
-	copied, err = copyIfChanged(binary, binDir, path)
+	path = filepath.Join(cacheRoot, "bin", filepath.Base(binary))
+	copied, err = fsx.CopyProgram(binary, path)
 	if err != nil {
 		return path, false, &diag.Error{
 			Msg:   "Copying YueScript to " + path + " failed: " + fsx.Reason(err),
@@ -29,32 +26,6 @@ func InstallBin(binary, cacheRoot string) (path string, copied bool, err error) 
 		}
 	}
 	return path, copied, nil
-}
-
-func copyIfChanged(binary, binDir, path string) (bool, error) {
-	wanted, err := os.ReadFile(binary)
-	if err != nil {
-		return false, err
-	}
-	existing, err := os.ReadFile(path)
-	if err == nil && fsx.SHA256Hex(existing) == fsx.SHA256Hex(wanted) {
-		return false, nil
-	}
-	if err != nil && !errors.Is(err, fs.ErrNotExist) {
-		return false, err
-	}
-	if err := os.MkdirAll(binDir, 0o777); err != nil {
-		return false, err
-	}
-	if err := os.WriteFile(path, wanted, 0o777); err != nil {
-		return false, err
-	}
-	if runtime.GOOS != "windows" {
-		if err := os.Chmod(path, 0o755); err != nil {
-			return false, err
-		}
-	}
-	return true, nil
 }
 
 // OnPath says what `yue` on PATH is: found is false when there is none (or it names no version), and version is

@@ -556,6 +556,22 @@ same bytes.
   - What stays, and is in the README: `onKeyUp` never runs for a lost release, so a map's own "key is held" state can
     stick; and a press inside the window is still skipped. In single player, game time stands still in the menu and
     runs slower while the game is in the background (8.73 s counted as 3.19 s).
+- **Unreleased: a pinned Pkl** (2026-10-03, a short design in chat, approved by the maintainer). Users no longer
+  install Pkl first.
+  - `pkl.Ensure` (`internal/pkl`) asks `pkl --version`. It returns `pkl` when that is 0.32 or newer. Otherwise it
+    downloads Pkl 0.32.1 (one executable of about 100 MB per platform, no archive) into `<cache>/pkl/0.32.1/`,
+    checks its SHA-256 and its `--version`, and returns that path. An older `pkl` on PATH gets a warning; the
+    maintainer chose that over failing. A platform with no download keeps the old errors and `pkl.InstallHint`.
+  - `pipeline.Env.Pkl` finds the program once per Env (so `dev` warns once), and `pipeline.LoadProject` is what
+    commands call; `project.Load` takes the program and no longer checks the version. `init` resolves with it.
+    `Env.PklDownloads` is `pkl.Known`; the cli tests' `newEnv` sets it to nil, so a stand-in pkl never leads to a
+    download or to a Pkl an earlier run left in the user's cache.
+  - `moonwell setup` copies the pinned Pkl to `<cache>/bin` (`pkl.KeepForShell`, the maintainer's choice), so a
+    `pkl project resolve` typed by the user finds it, and prints the PATH command when `pkl` is still not found.
+    `fsx.CopyProgram` is shared with `yue.InstallBin`.
+  - The checksums match GitHub's digests of the release assets. The network test downloads the real executable into
+    the user's cache and runs it. Checked by hand with no `pkl` on PATH and an empty cache: `init --link` downloaded
+    it once, `setup` copied it and printed the PATH command, and `check` passed.
 - **The manual release gate passed for 0.1.0** in the game. The maintainer plays on Warcraft III Reforged 3.0.0.24268
   with World Editor 3.00, on Windows.
 
@@ -610,7 +626,9 @@ Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` dow
   `module_test.go` pins the list. `template/src/generated/objects.yue` must match `template/objects/` (an end-to-end
   test).
 - **Versions:** `version.go`, `schema/PklProject`, `install.ps1` and `install.sh` carry the same number; tests check it.
-- **Pkl:** `pkl` 0.32 is required. A module property can't be named `output`, because it clashes with Pkl's built-in.
+- **Pkl:** Pkl 0.32 or newer. Commands find it through `pipeline.Env.Pkl` (`pkl.Ensure`, `internal/pkl`): the `pkl` on
+  PATH when it is 0.32 or newer, else the pinned 0.32.1 (`pkl.Known`, with checksums) in `<cache>/pkl/`. Never run
+  `"pkl"` by name from a command. Tests run the `pkl` on PATH. A module property can't be named `output`, because it clashes with Pkl's built-in.
   Pkl `Mapping` values are type-checked lazily: tests that expect a constraint error must force the values (`.toMap()`).
 
 ## Checks (all must pass before a commit)

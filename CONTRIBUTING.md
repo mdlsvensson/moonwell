@@ -36,8 +36,9 @@ go test ./...
 ```
 
 `go test` runs everything. A test that needs `pkl` or the YueScript compiler is skipped when it is missing (the compiler
-is downloaded once into the user's cache); with `MOONWELL_REQUIRE_TOOLS=1` it fails instead. `MOONWELL_NETWORK_TESTS=1`
-adds the tests that download the example library, and `MOONWELL_TEST_YUE` names a compiler to use.
+is downloaded once into the user's cache; `pkl` must be on the PATH, since tests do not use the Pkl that `moonwell`
+downloads for itself); with `MOONWELL_REQUIRE_TOOLS=1` it fails instead. `MOONWELL_NETWORK_TESTS=1` adds the tests
+that download the example library and the pinned Pkl, and `MOONWELL_TEST_YUE` names a compiler to use.
 `.github/workflows/ci.yml` runs the three commands on Ubuntu and Windows with both variables set.
 
 ## Rules

@@ -1,7 +1,6 @@
 package project
 
 import (
-	"context"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -9,34 +8,7 @@ import (
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/ordered"
-	"github.com/mdlsvensson/moonwell/internal/proc"
-	"github.com/mdlsvensson/moonwell/internal/text"
 )
-
-var pklVersion = regexp.MustCompile(`Pkl (\d+)\.(\d+)\.(\d+)`)
-
-// CheckPkl fails unless `pkl` is Pkl 0.32 or newer.
-func CheckPkl(ctx context.Context, run proc.RunFunc) error {
-	result, err := run(ctx, "pkl", []string{"--version"}, proc.Options{Hint: PklInstallHint})
-	if err != nil {
-		return err
-	}
-	match := pklVersion.FindStringSubmatch(result.Stdout)
-	tooOld := false
-	if match != nil {
-		major, _ := strconv.Atoi(match[1])
-		minor, _ := strconv.Atoi(match[2])
-		tooOld = major == 0 && minor < 32
-	}
-	if match == nil || tooOld {
-		found := text.Trim(result.Stdout)
-		if found == "" {
-			found = "unknown"
-		}
-		return &diag.Error{Msg: "Moonwell needs Pkl 0.32 or newer (found: " + found + ").", Hint: PklInstallHint}
-	}
-	return nil
-}
 
 var (
 	moonwellPackage = regexp.MustCompile(`/moonwell@\d+$`)

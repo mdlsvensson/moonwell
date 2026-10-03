@@ -26,7 +26,7 @@ type CheckResult struct {
 // src/generated/objects.yue when it is stale instead of failing, which is what dev does.
 func Check(ctx context.Context, env *pipeline.Env, refreshObjectIDs bool) (CheckResult, error) {
 	// Loading only reads; doing it before taking the lock creates nothing outside a project.
-	p, err := project.Load(ctx, env.Root, env.Run)
+	p, err := pipeline.LoadProject(ctx, env)
 	if err != nil {
 		return CheckResult{}, err
 	}

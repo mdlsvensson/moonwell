@@ -51,10 +51,11 @@ func Init(ctx context.Context, env *pipeline.Env, dir string, options InitOption
 			return "", err
 		}
 	}
-	if err := project.CheckPkl(ctx, env.Run); err != nil {
+	pkl, err := env.Pkl(ctx)
+	if err != nil {
 		return "", err
 	}
-	if err := writeProject(ctx, env, target, dir, local); err != nil {
+	if err := writeProject(ctx, env, target, dir, local, pkl); err != nil {
 		undoInit(target, existed)
 		return "", err
 	}
@@ -62,7 +63,7 @@ func Init(ctx context.Context, env *pipeline.Env, dir string, options InitOption
 	return target, nil
 }
 
-func writeProject(ctx context.Context, env *pipeline.Env, target, dir, local string) error {
+func writeProject(ctx context.Context, env *pipeline.Env, target, dir, local, pkl string) error {
 	files, err := moonwell.TemplateFiles()
 	if err != nil {
 		return err
@@ -80,7 +81,7 @@ func writeProject(ctx context.Context, env *pipeline.Env, target, dir, local str
 			return err
 		}
 	}
-	result, err := env.Run(ctx, "pkl", []string{"project", "resolve"}, proc.Options{Dir: target, Hint: project.PklInstallHint})
+	result, err := env.Run(ctx, pkl, []string{"project", "resolve"}, proc.Options{Dir: target})
 	if err != nil {
 		return err
 	}

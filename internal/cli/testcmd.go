@@ -5,13 +5,12 @@ import (
 	"path/filepath"
 
 	"github.com/mdlsvensson/moonwell/internal/pipeline"
-	"github.com/mdlsvensson/moonwell/internal/project"
 )
 
 // Test stages the map as a folder and starts Warcraft III on it.
 func Test(ctx context.Context, env *pipeline.Env, options pipeline.StageOptions) error {
 	// Loading only reads; doing it before taking the lock creates nothing outside a project.
-	p, err := project.Load(ctx, env.Root, env.Run)
+	p, err := pipeline.LoadProject(ctx, env)
 	if err != nil {
 		return err
 	}

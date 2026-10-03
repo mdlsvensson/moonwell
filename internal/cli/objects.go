@@ -8,7 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/objects"
 	"github.com/mdlsvensson/moonwell/internal/ordered"
 	"github.com/mdlsvensson/moonwell/internal/pipeline"
-	"github.com/mdlsvensson/moonwell/internal/project"
 )
 
 // Evaluated renders resolved objects as objects:eval prints them: every category in the fixed order, each with its
@@ -52,7 +51,7 @@ func Evaluated(resolved []objects.Resolved) *ordered.Map[any] {
 // It reads the source map only to validate against the objects already in it: no compiler, no staging, no build
 // lock.
 func ObjectsEval(ctx context.Context, env *pipeline.Env, print func(string)) (*ordered.Map[any], error) {
-	p, err := project.Load(ctx, env.Root, env.Run)
+	p, err := pipeline.LoadProject(ctx, env)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +68,7 @@ func ObjectsEval(ctx context.Context, env *pipeline.Env, print func(string)) (*o
 // src/generated/objects.yue is current. It reads the source map and the generated module only: no compiler, no
 // staging, no build lock. Invalid objects or a stale module fail.
 func ObjectsCheck(ctx context.Context, env *pipeline.Env) (*objects.Plan, error) {
-	p, err := project.Load(ctx, env.Root, env.Run)
+	p, err := pipeline.LoadProject(ctx, env)
 	if err != nil {
 		return nil, err
 	}

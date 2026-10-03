@@ -7,14 +7,13 @@ import (
 
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/internal/pipeline"
-	"github.com/mdlsvensson/moonwell/internal/project"
 	"github.com/mdlsvensson/moonwell/internal/settings"
 )
 
 // SettingsCheck lists the internal map files the manifest's settings would change during a build. It reads the
 // source map only: no compiler, no staging, no build lock.
 func SettingsCheck(ctx context.Context, env *pipeline.Env) ([]mapdir.Change, error) {
-	p, err := project.Load(ctx, env.Root, env.Run)
+	p, err := pipeline.LoadProject(ctx, env)
 	if err != nil {
 		return nil, err
 	}

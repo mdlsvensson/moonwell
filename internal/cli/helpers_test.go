@@ -54,7 +54,10 @@ func asError(t *testing.T, err error, what string) *diag.Error {
 // newEnv is the real world for root, with a logger that records its lines.
 func newEnv(root string) (*pipeline.Env, *testkit.Recorder) {
 	log := testkit.NewRecorder()
-	return pipeline.NewEnv(root, log.Logger), log
+	env := pipeline.NewEnv(root, log.Logger)
+	// A test's stand-in pkl must never lead to the real download (or to a Pkl an earlier run left in the user's cache).
+	env.PklDownloads = nil
+	return env, log
 }
 
 // outcome is what a command line printed and how it ended.

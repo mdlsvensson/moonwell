@@ -12,7 +12,7 @@ import (
 
 func load(t *testing.T, root string) *project.Project {
 	t.Helper()
-	p, err := project.Load(background, root, proc.Run)
+	p, err := project.Load(background, root, "pkl", proc.Run)
 	if err != nil {
 		t.Fatal(err)
 	}

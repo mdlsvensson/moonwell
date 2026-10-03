@@ -20,6 +20,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/models"
 	"github.com/mdlsvensson/moonwell/internal/ordered"
 	"github.com/mdlsvensson/moonwell/internal/pipeline"
+	"github.com/mdlsvensson/moonwell/internal/pkl"
 	"github.com/mdlsvensson/moonwell/internal/proc"
 	"github.com/mdlsvensson/moonwell/internal/project"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
@@ -271,6 +272,38 @@ func TestInitChecksThePklVersionBeforeWritingAnything(t *testing.T) {
 	_, err := cli.Init(background, initEnv(t, parent, "Pkl 0.31.0", 0), target, linked(t))
 	if e := asError(t, err, "an old Pkl"); !strings.Contains(e.Msg, "0.32") || fsx.Exists(target) {
 		t.Errorf("error = %+v", e)
+	}
+}
+
+func TestInitResolvesWithThePinnedPklWhenPklOnPathIsOld(t *testing.T) {
+	parent := t.TempDir()
+	target := filepath.Join(parent, "my-map")
+	env, log := newEnv(parent)
+	env.Install.CacheRoot = t.TempDir()
+	env.Install.Platform = "linux-x86_64"
+	env.PklDownloads = pkl.Known
+	env.Install.Fetch = func(context.Context, string) (int, []byte, error) {
+		t.Error("Init downloaded Pkl although it is in the cache")
+		return 0, nil, errors.New("no download")
+	}
+	pinned := testkit.WriteFile(t, filepath.Join(env.Install.CacheRoot, "pkl", pkl.Version), "pkl", nil)
+	var resolvedWith string
+	env.Run = func(_ context.Context, command string, args []string, _ proc.Options) (proc.Result, error) {
+		switch line := strings.Join(args, " "); {
+		case command == "pkl" && line == "--version":
+			return proc.Result{Stdout: "Pkl 0.31.0 (Linux)"}, nil
+		case line == "project resolve":
+			resolvedWith = command
+			return proc.Result{}, nil
+		}
+		t.Errorf("unexpected command: %s %v", command, args)
+		return proc.Result{}, errors.New("unexpected command")
+	}
+	if _, err := cli.Init(background, env, target, linked(t)); err != nil {
+		t.Fatal(diag.Format(err))
+	}
+	if resolvedWith != pinned || len(log.Lines) == 0 || !strings.HasPrefix(log.Lines[0], "warning: pkl on PATH is older than 0.32") {
+		t.Errorf("resolved with %q, log %q", resolvedWith, log.Lines)
 	}
 }
 

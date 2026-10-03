@@ -17,7 +17,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/internal/models"
 	"github.com/mdlsvensson/moonwell/internal/pipeline"
-	"github.com/mdlsvensson/moonwell/internal/project"
 	"github.com/mdlsvensson/moonwell/internal/text"
 )
 
@@ -99,7 +98,7 @@ func AssetsPaths(ctx context.Context, env *pipeline.Env, file string, gamePaths 
 	var imported []*assets.Asset
 	var targets map[string]bool
 	if inProject {
-		p, err := project.Load(ctx, env.Root, env.Run)
+		p, err := pipeline.LoadProject(ctx, env)
 		if err != nil {
 			return nil, err
 		}

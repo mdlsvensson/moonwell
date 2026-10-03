@@ -132,7 +132,7 @@ func Dev(ctx context.Context, env *pipeline.Env, options DevOptions) error {
 	cycle()
 
 	// A manifest that does not load has no libraries to watch; the first cycle has already said why.
-	p, err := project.Load(working, env.Root, env.Run)
+	p, err := pipeline.LoadProject(working, env)
 	if err != nil {
 		p = nil
 	}

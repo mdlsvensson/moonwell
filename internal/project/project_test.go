@@ -248,22 +248,6 @@ func fakeRunner(outputs map[string]output) proc.RunFunc {
 	}
 }
 
-func TestCheckPklRequiresPkl032OrNewer(t *testing.T) {
-	run := fakeRunner(map[string]output{"pkl --version": {stdout: "Pkl 0.32.1 (Windows 10.0, native)"}})
-	if err := project.CheckPkl(background, run); err != nil {
-		t.Error(err)
-	}
-	for found, message := range map[string]string{
-		"Pkl 0.31.0 (Linux)": "Moonwell needs Pkl 0.32 or newer (found: Pkl 0.31.0 (Linux)).",
-		"":                   "Moonwell needs Pkl 0.32 or newer (found: unknown).",
-	} {
-		err := project.CheckPkl(background, fakeRunner(map[string]output{"pkl --version": {stdout: found}}))
-		if e := asError(t, err, found); e.Msg != message || e.Hint != project.PklInstallHint {
-			t.Errorf("error = %+v", e)
-		}
-	}
-}
-
 func projectFolder(t *testing.T, files map[string]string) string {
 	t.Helper()
 	root := t.TempDir()
@@ -273,15 +257,14 @@ func projectFolder(t *testing.T, files map[string]string) string {
 	return root
 }
 
-func TestLoadPrefersMoonwellLocalPklAndParsesPklOutput(t *testing.T) {
+func TestLoadPrefersMoonwellLocalPklAndParsesPklOutputOfTheProgramItIsGiven(t *testing.T) {
 	root := projectFolder(t, map[string]string{
 		"moonwell.pkl": "", "moonwell.local.pkl": "", "PklProject.deps.json": localDeps(moonwell.Version),
 	})
 	run := fakeRunner(map[string]output{
-		"pkl --version": {stdout: "Pkl 0.32.1"},
-		"pkl eval --format json --project-dir . moonwell.local.pkl": {stdout: manifest("")},
+		"/cache/pkl/0.32.1/pkl eval --format json --project-dir . moonwell.local.pkl": {stdout: manifest("")},
 	})
-	p, err := project.Load(background, root, run)
+	p, err := project.Load(background, root, "/cache/pkl/0.32.1/pkl", run)
 	if err != nil || p.Map.Folder != "map.w3x" || p.Manifest != "moonwell.local.pkl" || p.Root != root {
 		t.Errorf("Load = %+v, %v", p, err)
 	}
@@ -293,7 +276,7 @@ func TestLoadReportsPklEvaluationErrors(t *testing.T) {
 		"pkl --version": {stdout: "Pkl 0.32.1"},
 		"pkl eval":      {code: 1, stderr: "–– Pkl Error ––\nType constraint violated\n"},
 	})
-	_, err := project.Load(background, root, run)
+	_, err := project.Load(background, root, "pkl", run)
 	e := asError(t, err, "an evaluation error")
 	if e.Msg != "Evaluating moonwell.pkl failed:\n–– Pkl Error ––\nType constraint violated" || e.File != "moonwell.pkl" {
 		t.Errorf("error = %+v", e)
@@ -303,22 +286,22 @@ func TestLoadReportsPklEvaluationErrors(t *testing.T) {
 func TestLoadExplainsAMissingManifestAndMissingOrCorruptDependencies(t *testing.T) {
 	version := fakeRunner(map[string]output{"pkl --version": {stdout: "Pkl 0.32.1"}})
 	empty := t.TempDir()
-	_, err := project.Load(background, empty, version)
+	_, err := project.Load(background, empty, "pkl", version)
 	if e := asError(t, err, "no manifest"); e.Msg != "No moonwell.pkl found in this directory." || e.File != empty ||
 		!strings.Contains(e.Hint, "moonwell init") {
 		t.Errorf("error = %+v", e)
 	}
-	_, err = project.Load(background, projectFolder(t, map[string]string{"moonwell.pkl": ""}), version)
+	_, err = project.Load(background, projectFolder(t, map[string]string{"moonwell.pkl": ""}), "pkl", version)
 	if e := asError(t, err, "no deps"); e.Msg != "PklProject.deps.json is missing." || e.File != "PklProject" {
 		t.Errorf("error = %+v", e)
 	}
 	root := projectFolder(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": "{ not json"})
-	_, err = project.Load(background, root, version)
+	_, err = project.Load(background, root, "pkl", version)
 	if e := asError(t, err, "corrupt deps"); !strings.Contains(e.Msg, "PklProject.deps.json") || !strings.Contains(e.Hint, "pkl project resolve") {
 		t.Errorf("error = %+v", e)
 	}
 	stale := projectFolder(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": localDeps("0.1.0")})
-	_, err = project.Load(background, stale, version)
+	_, err = project.Load(background, stale, "pkl", version)
 	if e := asError(t, err, "another version"); !strings.Contains(e.Msg, "does not match Moonwell CLI "+moonwell.Version) {
 		t.Errorf("error = %+v", e)
 	}
@@ -327,7 +310,7 @@ func TestLoadExplainsAMissingManifestAndMissingOrCorruptDependencies(t *testing.
 func TestLoadExplainsPklOutputThatIsNotJSON(t *testing.T) {
 	root := projectFolder(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": localDeps(moonwell.Version)})
 	run := fakeRunner(map[string]output{"pkl --version": {stdout: "Pkl 0.32.1"}, "pkl eval": {stdout: "map { }\n"}})
-	_, err := project.Load(background, root, run)
+	_, err := project.Load(background, root, "pkl", run)
 	if e := asError(t, err, "not JSON"); e.Msg != "pkl eval printed output that is not valid JSON:\nmap { }" || e.Hint == "" {
 		t.Errorf("error = %+v", e)
 	}
@@ -395,7 +378,7 @@ func TestLoadEvaluatesARealProjectAgainstTheLocalPackage(t *testing.T) {
 	if err != nil || resolved.Code != 0 {
 		t.Fatalf("pkl project resolve: %v\n%s", err, resolved.Stderr)
 	}
-	p, err := project.Load(background, root, proc.Run)
+	p, err := project.Load(background, root, "pkl", proc.Run)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}

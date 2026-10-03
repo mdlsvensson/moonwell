@@ -2,6 +2,7 @@
 package fsx
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
@@ -195,6 +196,34 @@ func CopyFile(source, destination string) error {
 		return err
 	}
 	return out.Close()
+}
+
+// CopyProgram copies the executable source to destination, creating its folder, unless destination already holds the
+// same bytes. It reports whether it copied.
+func CopyProgram(source, destination string) (bool, error) {
+	wanted, err := os.ReadFile(source)
+	if err != nil {
+		return false, err
+	}
+	existing, err := os.ReadFile(destination)
+	if err == nil && bytes.Equal(existing, wanted) {
+		return false, nil
+	}
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return false, err
+	}
+	if err := os.MkdirAll(filepath.Dir(destination), 0o777); err != nil {
+		return false, err
+	}
+	if err := os.WriteFile(destination, wanted, 0o777); err != nil {
+		return false, err
+	}
+	if runtime.GOOS != "windows" {
+		if err := os.Chmod(destination, 0o755); err != nil {
+			return false, err
+		}
+	}
+	return true, nil
 }
 
 // WriteIfChanged writes content unless the file already has exactly that content. It reports whether it wrote.

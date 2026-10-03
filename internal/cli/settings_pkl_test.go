@@ -112,7 +112,7 @@ func TestPklSettingsErrorsNameLocalManifest(t *testing.T) {
 		{`settings { gameplay { foodLimit = 200 } gameplayConstants { ["misc"] { ["foodceiling"] = "100" } } }`, "FoodCeiling"},
 	} {
 		writeLocal(t, root, tc.body)
-		_, err := project.Load(background, root, proc.Run)
+		_, err := project.Load(background, root, "pkl", proc.Run)
 		e := asError(t, err, "settings")
 		contains(t, e.Msg, tc.message)
 		if e.File != "moonwell.local.pkl" {

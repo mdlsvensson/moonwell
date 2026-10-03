@@ -79,9 +79,6 @@ type Library struct {
 	Dir string
 }
 
-// PklInstallHint says how to get Pkl.
-const PklInstallHint = "Install Pkl 0.32 or newer: https://pkl-lang.org/main/current/pkl-cli/index.html#installation"
-
 // EnsureLocalManifest creates moonwell.local.pkl in root unless it exists, and reports whether it did. It never
 // overwrites.
 func EnsureLocalManifest(root string) (bool, error) {
@@ -99,11 +96,9 @@ func EnsureLocalManifest(root string) (bool, error) {
 	return true, file.Close()
 }
 
-// Load evaluates moonwell.local.pkl (or moonwell.pkl) in root and returns the typed project.
-func Load(ctx context.Context, root string, run proc.RunFunc) (*Project, error) {
-	if err := CheckPkl(ctx, run); err != nil {
-		return nil, err
-	}
+// Load evaluates moonwell.local.pkl (or moonwell.pkl) in root with the pkl program (Pkl 0.32 or newer, as pkl.Ensure
+// finds it) and returns the typed project.
+func Load(ctx context.Context, root, pkl string, run proc.RunFunc) (*Project, error) {
 	file := "moonwell.pkl"
 	if fsx.Exists(filepath.Join(root, "moonwell.local.pkl")) {
 		file = "moonwell.local.pkl"
@@ -133,8 +128,7 @@ func Load(ctx context.Context, root string, run proc.RunFunc) (*Project, error) 
 	if err := CheckPackageVersion(packageVersion, moonwell.Version); err != nil {
 		return nil, err
 	}
-	result, err := run(ctx, "pkl", []string{"eval", "--format", "json", "--project-dir", ".", file},
-		proc.Options{Dir: root, Hint: PklInstallHint})
+	result, err := run(ctx, pkl, []string{"eval", "--format", "json", "--project-dir", ".", file}, proc.Options{Dir: root})
 	if err != nil {
 		return nil, err
 	}
