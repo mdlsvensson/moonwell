@@ -17,14 +17,13 @@ already returns: World Editor's minimap kept as `war3mapMinimap.blp`, the pictur
 **Spec:** `docs/superpowers/specs/2026-10-01-moonwell-map-preview-design.md`.
 
 **Verified in advance:** every change below was built and run on 2026-10-01 in a scratch clone of the repository
-(`../moonwell-proto7`, on `6da3a9a`): type check, lint and format; 486 unit tests, 30 runtime, the Pkl tests (47 and 28
+(`../moonwell-proto7`, on `4acfcbf`): type check, lint and format; 486 unit tests, 30 runtime, the Pkl tests (47 and 28
 Pkl-backed), 34 end-to-end and 2 network tests passed. 62 mutations of the new code are each caught by a test. The
-diffs are that clone's, against `6da3a9a`.
+diffs are that clone's, against `4acfcbf`.
 
 ## Global Constraints
 
-- **Repository:** `C:\Users\mdlsvensson\Repo\moonwell`. Commit on `main`, explicit paths only. End every commit message
-  with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- **Repository:** `C:\Users\mdlsvensson\Repo\moonwell`. Commit on `main`, explicit paths only.
 - **No Node.js:** no `package.json`, no `npm:` or `node:` specifiers; only `jsr:@std/*` from the import map.
 - **Errors:** expected failures throw `MoonwellError` with `file` and `hint`.
 - **Checks**, each its own command, all green before a commit: `deno task check`, `deno task lint`, `deno fmt --check`,
@@ -1774,7 +1773,7 @@ attached, and confirm the tag names the release commit.
 > In `C:\Users\mdlsvensson\Repo\moonwell\cli`: `deno publish`.
 
 Then check it from a scratch folder: `deno run -A --min-dep-age=0 jsr:@moonwell/cli@0.7.0 init my-map`, and in `my-map`
-`deno run -A --min-dep-age=0 jsr:@moonwell/cli@0.7.0 build` (both worked from Claude's shell for 0.6.0; if Pkl cannot
+`deno run -A --min-dep-age=0 jsr:@moonwell/cli@0.7.0 build` (both worked from the agent's shell for 0.6.0; if Pkl cannot
 reach the network there, ask the maintainer to run them).
 
 - [ ] **Step 9: Record the published check** in `CHANGELOG.md` and `AGENTS.md` ("checked with `init` and `build` from

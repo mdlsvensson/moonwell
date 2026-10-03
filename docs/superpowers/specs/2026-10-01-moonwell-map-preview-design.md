@@ -170,7 +170,7 @@ Errors, all naming the source map's file to fix:
 ## 10. Release gate
 
 Steps 1 and 2 of CONTRIBUTING, and one new in-game step, run once by the maintainer in a throwaway project from
-`init --link` with a TGA picture Claude generates:
+`init --link` with a TGA picture the agent generates:
 
 1. Build, and copy the packed map into the game's map folder.
 2. The map list shows the picture, not the minimap.

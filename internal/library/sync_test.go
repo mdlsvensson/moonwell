@@ -675,7 +675,7 @@ func TestNetworkTheExampleLibrarysFirstTagDownloadsAndLocksItsCommitAsItAlwaysHa
 	sync(t, root, block, deps)
 	want := library.LockEntry{
 		GitHub: "mdlsvensson/moonwell-example-lib", Tag: "v0.1.0", Dir: "src",
-		Commit: "13e35535c481fddd267533cc513f86b55b313b66", Files: exampleModules,
+		Commit: "c07126f080c3887ba667596d08aa21df3b3a20f7", Files: exampleModules,
 	}
 	if got := readLock(t, root)["example"]; !sameEntry(got, want) {
 		t.Errorf("lock = %+v", got)
@@ -701,7 +701,7 @@ func TestNetworkTheExampleLibrarysSecondTagNamesItsModuleFolderAndShipsAFileLock
 	assets := "sha256:d40d3370a1e0e14f411273c8a5051158371a1e798f58b23e6b424fbb1f27eadb"
 	want := library.LockEntry{
 		GitHub: "mdlsvensson/moonwell-example-lib", Tag: "v0.2.0",
-		Commit: "0b69cfadeac0ca69d249df68411b5edb82f4f2a8", Files: exampleModules, Assets: &assets,
+		Commit: "58ab3cbbba900f66e5ec235f805f4b117640b406", Files: exampleModules, Assets: &assets,
 	}
 	if got := readLock(t, root)["example"]; !sameEntry(got, want) {
 		t.Errorf("lock = %+v", got)

@@ -22,8 +22,7 @@ so it is not a tail call. A sweep test proves both for every class. The other it
 
 ## Global Constraints
 
-- **Repository and commits:** all code is in `C:\Users\mdlsvensson\Repo\moonwell-wrappers`. Commit on `main`. End every
-  commit message with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- **Repository and commits:** all code is in `C:\Users\mdlsvensson\Repo\moonwell-wrappers`. Commit on `main`.
 - **Tooling:** no Node.js, no npm packages, no `node:` or `npm:` specifiers.
 - **No behaviour change beyond the spec:** no public signature changes, and no error message text changes.
 - **Levels, counted from the function that calls `error`:**
@@ -386,9 +385,7 @@ git add tests/support.lua tests/blame.lua tests/unit.lua tests/trigger.lua tests
 git commit -m "fix: wrapper errors point at the caller's line
 
 Explicit error levels with a depth for helper frames, a one-lookup happy path in registry.require, and no tail calls
-into raising helpers (a tail call dropped the position entirely). A sweep checks every class.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+into raising helpers (a tail call dropped the position entirely). A sweep checks every class."
 ```
 
 ### Task 4: Options: levels, depth and sorted checks
@@ -527,9 +524,7 @@ end
 
 ```bash
 git add src/wrappers/internal/options.lua src/wrappers/multiboard.lua tests/options.lua tests/texttag.lua tests/multiboard.lua
-git commit -m "fix: options errors point at the caller and come in sorted order
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "fix: options errors point at the caller and come in sorted order"
 ```
 
 ### Task 5: One-table enumeration
@@ -619,9 +614,7 @@ nothing.
 
 ```bash
 git add src/wrappers/group.lua tests/group.lua
-git commit -m "perf: group enumeration builds one table
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "perf: group enumeration builds one table"
 ```
 
 ### Task 6: `isAlive` through `UnitAlive`; `exists()`
@@ -707,9 +700,7 @@ function Destructable:exists() return GetDestructableTypeId(registry.require(sel
 
 ```bash
 git add src/wrappers/unit.lua src/wrappers/item.lua src/wrappers/destructable.lua tests/unit.lua tests/item.lua tests/destructable.lua tests/editor-positive.lua
-git commit -m "feat: isAlive uses UnitAlive; exists() for units, items and destructables
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: isAlive uses UnitAlive; exists() for units, items and destructables"
 ```
 
 ### Task 7: Documentation
@@ -797,9 +788,7 @@ Add `## Unreleased` with one bullet per change:
 
 ```bash
 git add README.md CHANGELOG.md CONTRIBUTING.md AGENTS.md
-git commit -m "docs: per-module API reference, the callback rule, conventions and exists()
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "docs: per-module API reference, the callback rule, conventions and exists()"
 ```
 
 ### Task 8: Gate additions
@@ -846,9 +835,7 @@ Add the expected lines:
 
 ```bash
 git add examples/gate.yue CONTRIBUTING.md
-git commit -m "test: gate checks exists() after raw removal and where errors point
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "test: gate checks exists() after raw removal and where errors point"
 ```
 
 ### Task 9: Release candidate, gate and release

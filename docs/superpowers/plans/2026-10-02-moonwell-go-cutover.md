@@ -22,7 +22,7 @@ interface given here; a task is done when its inventory rows are ported and pass
 - Standard library only. `gofmt -l .` prints nothing; `go vet ./...` and `go test ./...` pass before every commit.
 - The generators' output is byte-identical to the TypeScript generators', except the first line of each
   `schema/generated/*.pkl` (see Decisions).
-- The conformance suite's last green run on both systems is commit `e786070` (CI run 37007905168). Nothing
+- The conformance suite's last green run on both systems is commit `f82dd66` (CI run 37007905168). Nothing
   in `internal/` changes its behaviour after that commit in this plan; texts in `template/` that name Deno do.
 - Release tags are `moonwell@<version>`.
 - Go is not on the PATH of the agent's shell: `export PATH="$PATH:/c/Program Files/Go/bin"`.
@@ -198,7 +198,7 @@ func GenerateGamePaths(list, version, target string) (int, error)
 
 - [x] The maintainer runs gate steps 1 to 6 with a `moonwell` built from the checkout. (Passed 2026-10-02.)
 - [x] Push, then push the tag `moonwell@0.8.0`; the release workflow is green, including its install job. (Run
-      37028600154, on commit `ebf51d9`: the version check, the checks on both systems, the release, and the install
+      37028600154, on commit `393e8bb`: the version check, the checks on both systems, the release, and the install
       job on Ubuntu and Windows.)
 - [x] The maintainer runs the install line once and reports whether SmartScreen warned. (2026-10-02: installed, no
       warning.)

@@ -33,8 +33,8 @@ The order is:
 ## Phase 0: free wins
 
 **Done 2026-09-30.** 0.1: the maintainer confirmed that extension 0.2.10 opens no window, and the note is gone. 0.2:
-Moonwell 0.5.1 (GitHub release `moonwell@0.5.1` on `c883e4c`; gate steps 3 to 12 not re-run by the maintainer's
-decision). 0.3: wrappers v0.5.1 (`af9961e`, tag consumption passed).
+Moonwell 0.5.1 (GitHub release `moonwell@0.5.1` on `8a86425`; gate steps 3 to 12 not re-run by the maintainer's
+decision). 0.3: wrappers v0.5.1 (`26c208d`, tag consumption passed).
 
 Each item here is small and needs nothing else first. Do them in this order.
 
@@ -78,7 +78,7 @@ decision (item D1) be made from evidence.
 
 ### 1.1 Static native-call check (backlog; short design first)
 
-**Done 2026-09-30, differently from the plan below** (wrappers `227e142`). A planted test showed that LuaLS with
+**Done 2026-09-30, differently from the plan below** (wrappers `216c4a3`). A planted test showed that LuaLS with
 Moonwell's `natives.d.lua` already reports a misspelt native (`undefined-global`), a missing or extra argument
 (`missing-parameter`, `redundant-parameter`) and a wrong type (`param-type-mismatch`). So the maintainer approved
 automating the direct LuaLS run in the wrappers' `test:integration` instead of writing a tokenizer:
@@ -237,7 +237,7 @@ The maintainer picks the findings to act on, by multiple-choice questions.
 
 ### 2.2 Refactor release (wrappers v0.6.0; spec, plan and full gate)
 
-**Released 2026-09-30:** wrappers `v0.6.0` on `933b580`; tag consumption passed.
+**Released 2026-09-30:** wrappers `v0.6.0` on `e908b2e`; tag consumption passed.
 - **Spec and plan:** `2026-09-30-moonwell-wrappers-refactor`.
 - **In game:**
   - Errors point at the caller.
@@ -265,7 +265,7 @@ What D1 assigned to the wrappers. Likely candidates from the backlog's "Wrappers
 - **Event helpers** such as `Unit.fromEvent()`.
 - **Automatic Unit disposal on removal,** if 1.4 found a working detection method.
 
-**Released 2026-09-30:** wrappers `v0.7.0` on `e9c2880`; tag consumption passed. D1 and the maintainer's scope choice
+**Released 2026-09-30:** wrappers `v0.7.0` on `9a8456e`; tag consumption passed. D1 and the maintainer's scope choice
 kept it to `unit:getCollisionSize()`, `unit:setPathing(flag)`, `wrappers.damage` and `wrappers.sync` (spec and plan
 `2026-09-30-moonwell-wrappers-port-prerequisites`). Event helpers, timer-expiry registration and automatic Unit disposal
 stay in phase 4.1 and the backlog.
@@ -295,12 +295,12 @@ Each release gets its own plan and gate:
 
 **Spec:** `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md` (2026-09-30): the library is
 `mdlsvensson/moonwell-systems`, annotated Lua on the wrappers, with Lua-only tooling. **Release 1 released
-2026-09-30:** moonwell-systems `v0.1.0` on `1725436` (plan `2026-09-30-moonwell-systems-release-1`); gate and tag
-consumption passed. **Release 2 released 2026-10-01:** `v0.2.0` on `afabc3d` (spec and plan
+2026-09-30:** moonwell-systems `v0.1.0` on `0b51fd1` (plan `2026-09-30-moonwell-systems-release-1`); gate and tag
+consumption passed. **Release 2 released 2026-10-01:** `v0.2.0` on `c20f013` (spec and plan
 `2026-09-30-moonwell-systems-release-2`); gate and tag consumption passed. **Release 3 released 2026-10-01:** `v0.3.0`
-on `d67d3fc` (spec and plan `2026-10-01-moonwell-systems-release-3`); gate and tag consumption passed. **Release 4
-released 2026-10-01:** `v0.4.0` on `cfa21b6` (spec and plan `2026-10-01-moonwell-systems-release-4`); both gate
-runs and tag consumption passed. **Release 5 released 2026-10-01:** `v0.5.0` on `11331a8` (spec and plan
+on `63027c9` (spec and plan `2026-10-01-moonwell-systems-release-3`); gate and tag consumption passed. **Release 4
+released 2026-10-01:** `v0.4.0` on `b75d024` (spec and plan `2026-10-01-moonwell-systems-release-4`); both gate
+runs and tag consumption passed. **Release 5 released 2026-10-01:** `v0.5.0` on `5866744` (spec and plan
 `2026-10-01-moonwell-systems-release-5`); gate and tag consumption passed. **Phase 3 is complete.**
 
 ## Phase 4: after the port (the rest of the backlog, in suggested order)
@@ -312,7 +312,7 @@ Every item needs a short design first, as the backlog says.
    - spell effects from ability data (`Effect.flashSpell` via `AddSpellEffectById`);
    - the remaining Trigger registrations: player state, key, mouse, alliance change and game state.
 
-   **Released 2026-10-01** as wrappers `v0.8.0` on `d823b1b` (spec and plan
+   **Released 2026-10-01** as wrappers `v0.8.0` on `75724ac` (spec and plan
    `2026-10-01-moonwell-wrappers-additions`): `wrappers.input` for keys and the mouse, `wrappers.weathereffect`,
    `Effect.abilityArt` in place of spell-effect constructors, four Trigger registrations (with timer expiry) and
    `fromEvent()`. The gate and tag consumption passed.

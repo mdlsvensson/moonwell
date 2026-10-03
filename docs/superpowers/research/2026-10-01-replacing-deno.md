@@ -25,7 +25,7 @@ TypeScript and C# support are dropped. Nothing a map author writes or runs is Ja
 
 ## 2. What Deno does for Moonwell today
 
-Measured on `main` at `15c9fec`.
+Measured on `main` at `d214bc8`.
 
 ### 2.1 The code
 
@@ -70,7 +70,7 @@ no regular expressions built in (its own patterns are weaker), so both come from
 ### 2.4 What a release needs from Deno
 
 - `deno publish` to JSR, which only the maintainer can run (it opens a browser to sign in).
-- Then a check of `init` and `build` from JSR, which fails in Claude's shells whenever Pkl has to download.
+- Then a check of `init` and `build` from JSR, which fails in the agent's shells whenever Pkl has to download.
 - The Pkl package is released separately, as a GitHub release. So a release already has two homes.
 
 ### 2.5 What is already not Deno

@@ -42,8 +42,7 @@
 - Every expected failure throws `MoonwellError { message, file?, line?, hint? }`. Exit code is 1 on any failure.
 - Line endings are LF in the repo (`.gitattributes`). Template map files are binary (never normalized).
 - Windows is the primary platform, and every unit test must also pass on Linux.
-- Commit after every task. End each commit message with:
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+- Commit after every task.
 
 ## File Structure
 
@@ -265,9 +264,7 @@ Expected: PASS (4 tests). `deno.lock` is created. Commit it.
 
 ```bash
 git add .gitattributes .gitignore deno.json deno.lock cli
-git commit -m "feat: scaffold repository, MoonwellError and version
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: scaffold repository, MoonwellError and version"
 ```
 
 ---
@@ -584,9 +581,7 @@ Expected: PASS (all tests in `errors.test.ts` and `shared.test.ts`). If `deno ch
 
 ```bash
 git add cli
-git commit -m "feat: shared logging, process, fs, lock and compression helpers
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: shared logging, process, fs, lock and compression helpers"
 ```
 
 ---
@@ -735,9 +730,7 @@ Expected: PASS.
 
 ```bash
 git add pkl cli/tests/unit/versions-consistent.test.ts
-git commit -m "feat: moonwell Pkl package with Project schema
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: moonwell Pkl package with Project schema"
 ```
 
 ---
@@ -1058,9 +1051,7 @@ Expected: the Pkl facts pass and the Deno test passes.
 
 ```bash
 git add cli
-git commit -m "feat: load and validate moonwell.pkl projects
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: load and validate moonwell.pkl projects"
 ```
 
 ---
@@ -1232,9 +1223,7 @@ Expected: PASS.
 
 ```bash
 git add cli
-git commit -m "feat: minimal zip extraction for compiler downloads
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: minimal zip extraction for compiler downloads"
 ```
 
 ---
@@ -1556,9 +1545,7 @@ Expected: PASS.
 
 ```bash
 git add cli
-git commit -m "feat: download, verify and cache the YueScript compiler
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: download, verify and cache the YueScript compiler"
 ```
 
 ---
@@ -1825,9 +1812,7 @@ Expected: PASS (4 tests). If the syntax-error test reports line 3 instead of 2, 
 
 ```bash
 git add cli
-git commit -m "feat: incremental YueScript compilation with located errors
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: incremental YueScript compilation with located errors"
 ```
 
 ---
@@ -2063,9 +2048,7 @@ Expected: PASS.
 
 ```bash
 git add cli
-git commit -m "feat: Lua lexer that finds literal require calls
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: Lua lexer that finds literal require calls"
 ```
 
 ---
@@ -2207,9 +2190,7 @@ Expected: PASS.
 
 ```bash
 git add cli
-git commit -m "feat: require graph with missing, dynamic and cycle errors
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: require graph with missing, dynamic and cycle errors"
 ```
 
 ---
@@ -2363,9 +2344,7 @@ Expected: PASS.
 
 ```bash
 git add cli
-git commit -m "feat: emit module bundle and inject it into war3map.lua
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: emit module bundle and inject it into war3map.lua"
 ```
 
 ---
@@ -2656,9 +2635,7 @@ Expected: PASS. The runtime tests show hook order, error isolation and `src/main
 
 ```bash
 git add cli tools
-git commit -m "feat: Lua runtime with hooks, require shim and source-mapped errors
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: Lua runtime with hooks, require shim and source-mapped errors"
 ```
 
 ---
@@ -3043,9 +3020,7 @@ Expected: PASS.
 
 ```bash
 git add cli
-git commit -m "feat: MPQ v1 archive writer with compressed sectors
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: MPQ v1 archive writer with compressed sectors"
 ```
 
 ---
@@ -3230,9 +3205,7 @@ Expected: PASS.
 
 ```bash
 git add cli
-git commit -m "feat: pack staged map folders into w3x archives
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: pack staged map folders into w3x archives"
 ```
 
 ---
@@ -3672,9 +3645,7 @@ Expected: PASS, and `deno check` reports no type errors.
 
 ```bash
 git add cli
-git commit -m "feat: build, test, check and setup commands with CLI entry
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: build, test, check and setup commands with CLI entry"
 ```
 
 ---
@@ -4009,9 +3980,7 @@ Expected: PASS. The embedded freshness test covers `template.ts`.
 
 ```bash
 git add deno.json cli tools template
-git commit -m "feat: project template and init command
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: project template and init command"
 ```
 
 ---
@@ -4130,9 +4099,7 @@ Expected: PASS.
 
 ```bash
 git add cli
-git commit -m "feat: dev watch mode re-checks on save
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: dev watch mode re-checks on save"
 ```
 
 ---
@@ -4411,9 +4378,7 @@ Expected: all PASS. Fix any `deno lint` findings in source (not by disabling rul
 
 ```bash
 git add cli README.md CONTRIBUTING.md LICENSE
-git commit -m "test: end-to-end init/build/check/dev; docs and license
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "test: end-to-end init/build/check/dev; docs and license"
 ```
 
 ---

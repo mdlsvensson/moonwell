@@ -101,7 +101,7 @@ const commitA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 const commitB = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 
 func TestReadGitHubArchiveStripsTheSingleTopFolderAndReadsTheCommit(t *testing.T) {
-	const commit = "13e35535c481fddd267533cc513f86b55b313b66"
+	const commit = "c07126f080c3887ba667596d08aa21df3b3a20f7"
 	archive := testkit.MakeZip(t, []testkit.ZipEntry{
 		{Name: "lib-0.1.0/README.md", Data: []byte("# lib")},
 		{Name: "lib-0.1.0/src/example/greet.lua", Data: []byte("return {}"), Deflate: true},
@@ -185,7 +185,7 @@ func TestArchiveURLEncodesTheTag(t *testing.T) {
 func entry(assets *string) library.LockEntry {
 	return library.LockEntry{
 		GitHub: "mdlsvensson/moonwell-example-lib", Tag: "v0.1.0", Dir: "src",
-		Commit: "13e35535c481fddd267533cc513f86b55b313b66", Files: "sha256:abc", Assets: assets,
+		Commit: "c07126f080c3887ba667596d08aa21df3b3a20f7", Files: "sha256:abc", Assets: assets,
 	}
 }
 
@@ -213,7 +213,7 @@ func TestWriteLockWritesSortedJSONReadLockReadsItBackAndNoLibrariesRemovesTheFil
 	}
 	content, _ := os.ReadFile(filepath.Join(root, library.LockFile))
 	one := "{\n      \"github\": \"mdlsvensson/moonwell-example-lib\",\n      \"tag\": \"v0.1.0\",\n      \"dir\": \"src\",\n" +
-		"      \"commit\": \"13e35535c481fddd267533cc513f86b55b313b66\",\n      \"files\": \"sha256:abc\"\n    }"
+		"      \"commit\": \"c07126f080c3887ba667596d08aa21df3b3a20f7\",\n      \"files\": \"sha256:abc\"\n    }"
 	if want := "{\n  \"libraries\": {\n    \"a\": " + one + ",\n    \"z\": " + one + "\n  }\n}\n"; string(content) != want {
 		t.Errorf("moonwell.lock is\n%s\nwant\n%s", content, want)
 	}

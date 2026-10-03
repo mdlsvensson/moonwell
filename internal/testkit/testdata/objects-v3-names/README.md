@@ -1,7 +1,7 @@
 # World Editor object fixture: one new object per tab, name only
 
 Saved by the maintainer with World Editor 3.00 (Warcraft III 3.0.0.24268) on 2026-09-26: one new custom object on each
-Object Editor tab, with only its name changed, in the template map. Copied unchanged from that save (commit `10a2441`).
+Object Editor tab, with only its name changed, in the template map. Copied unchanged from that save (commit `1c31fab`).
 This is actual editor output.
 
 | File                              | Base → custom id | Changed field                               |

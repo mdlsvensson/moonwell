@@ -1,6 +1,6 @@
 # moonwell-wrappers v0.5.1 review (2026-09-30)
 
-Roadmap item 2.1 (`docs/superpowers/plans/2026-09-30-moonwell-roadmap-to-wc3-lib.md`), reviewed by Claude on Opus 5.5.
+Roadmap item 2.1 (`docs/superpowers/plans/2026-09-30-moonwell-roadmap-to-wc3-lib.md`), reviewed by the coding agent.
 The maintainer chooses the findings for the refactor release (2.2).
 
 ## Scope and method

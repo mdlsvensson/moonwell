@@ -24,8 +24,7 @@ from `docs/superpowers/specs/2026-09-25-moonwell-model-paths-design.md`.
   import maps.
 - Expected failures throw `MoonwellError`. File system code is async.
 - `deno fmt` (line width 120) and `deno lint` must be clean. Run `deno fmt` on changed files before every commit.
-- Commits go directly on `main`. Every commit message ends with the trailer
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Commits go directly on `main`.
 - Git Bash heredocs and `sed` turn `\\` into `\`. Write files that contain backslashes with a file-editing tool, then
   check each backslash.
 - Checks, from the repo root: `deno task check`, `deno task lint`, `deno fmt --check`, `deno task test`,
@@ -294,7 +293,7 @@ Expected: all pass.
 deno fmt
 deno lint
 git add cli/src/models/game-paths.ts cli/src/shared/compression.ts cli/src/embedded/game-paths.ts cli/data/game-paths.txt tools deno.json cli/tests/unit/game-paths.test.ts cli/tests/unit/embedded.test.ts
-git commit -m "feat(models): an embedded list of in-game paths" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(models): an embedded list of in-game paths"
 ```
 
 ---
@@ -531,7 +530,7 @@ Expected: all pass.
 
 ```bash
 git add cli/src/commands/assets-paths.ts cli/src/main.ts cli/tests README.md CHANGELOG.md CONTRIBUTING.md
-git commit -m "feat(assets): assets:paths reports in-game and custom paths" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(assets): assets:paths reports in-game and custom paths"
 ```
 
 ---

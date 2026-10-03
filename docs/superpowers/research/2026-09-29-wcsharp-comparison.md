@@ -3,7 +3,7 @@
 The same exercise as `2026-09-29-w3ts-comparison.md`, for the C# library WCSharp: what it is, what we learn (especially
 about the issues our gates found), where our wrappers are ahead or behind, and what it changes in the w3ts conclusions
 (section 8). Compared: WCSharp 3.3.9 (`Orden4/WCSharp` master, commit `77fbe8e`, 2026-04-05; its generated `Docs/`
-folder was not read) and moonwell-wrappers v0.3.0 (commit `1277875`). Nothing here is a decision.
+folder was not read) and moonwell-wrappers v0.3.0 (commit `5da96d8`). Nothing here is a decision.
 
 ## 1. What WCSharp is
 

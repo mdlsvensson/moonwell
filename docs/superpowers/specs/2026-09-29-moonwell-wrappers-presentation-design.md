@@ -3,7 +3,7 @@
 - **Date:** 2026-09-29
 - **Status:** Approved in chat on 2026-09-29; awaiting review of this written spec.
 - **Builds on:** `2026-09-28-moonwell-wrappers-design.md` (v0.1.0) and `2026-09-28-moonwell-wrappers-broad-design.md`
-  (v0.2.0, tag commit `7baa81e`). Everything in those specs still applies unless this one changes it explicitly.
+  (v0.2.0, tag commit `4b2c845`). Everything in those specs still applies unless this one changes it explicitly.
 - **Target:** wrappers `v0.3.0` in the separate `mdlsvensson/moonwell-wrappers` repository. No Moonwell CLI change.
 
 ## 1. Intent and scope

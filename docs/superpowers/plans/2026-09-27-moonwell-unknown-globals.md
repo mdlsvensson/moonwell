@@ -30,8 +30,8 @@ follows, and 0.4.0 is released after it.
 - The message format is the spec's (§5.4), exactly:
   `error: src/main.yue:7:11 › Unknown global CreatUnit.` then
   ``hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.``
-- Every task: failing test first, then code, then the full gate (below), then one commit on `main` ending with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Do not push; the maintainer pushes. Do not bump versions.
+- Every task: failing test first, then code, then the full gate (below), then one commit on `main`.
+  Do not push; the maintainer pushes. Do not bump versions.
 
 **Full gate (before every commit):**
 
@@ -328,9 +328,7 @@ Expected: PASS (the existing object-data and error tests are unchanged and still
 
 ```bash
 git add cli/src/shared/names.ts cli/src/shared/errors.ts cli/src/objectdata/metadata.ts cli/src/objectdata/resolve.ts cli/tests/unit/names.test.ts cli/tests/unit/errors.test.ts
-git commit -m "refactor: shared name matching, and problems with source positions
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "refactor: shared name matching, and problems with source positions"
 ```
 
 ---
@@ -506,9 +504,7 @@ evaluates with the new block).
 
 ```bash
 git add schema/Project.pkl schema/tests/Project.pkl cli/src/project/project.ts template/moonwell.pkl cli/src/embedded/template.ts cli/tests/unit/project.test.ts cli/tests/unit/pipeline.test.ts cli/tests/unit/build.test.ts cli/tests/pkl/project.test.ts
-git commit -m "feat(lint): the lint block in moonwell.pkl
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(lint): the lint block in moonwell.pkl"
 ```
 
 ---
@@ -816,9 +812,7 @@ Expected: PASS.
 
 ```bash
 git add cli/src/lint/uses.ts cli/src/yue/compile.ts cli/tests/unit/lint-uses.test.ts cli/tests/yue/uses.test.ts cli/tests/yue/compile.test.ts
-git commit -m "feat(lint): list each source's globals with yue -g, cached per file hash
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(lint): list each source's globals with yue -g, cached per file hash"
 ```
 
 ---
@@ -1328,9 +1322,7 @@ Expected: PASS. The existing e2e, runtime and Pkl tests still pass: the template
 
 ```bash
 git add cli/src/lint/unknown-globals.ts cli/src/editor/refresh.ts cli/src/pipeline.ts cli/tests/unit/lint-unknown-globals.test.ts cli/tests/unit/pipeline.test.ts cli/tests/e2e/lint.test.ts
-git commit -m "feat(lint): report unknown globals in check, build, test and dev
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(lint): report unknown globals in check, build, test and dev"
 ```
 
 ---
@@ -1420,9 +1412,7 @@ Run: `deno fmt --check` (README, CHANGELOG, CONTRIBUTING and AGENTS.md are forma
 
 ```bash
 git add README.md CHANGELOG.md CONTRIBUTING.md AGENTS.md docs/superpowers/specs/2026-09-27-moonwell-editor-dx-design.md
-git commit -m "docs: the unknown-global check
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "docs: the unknown-global check"
 ```
 
 ---

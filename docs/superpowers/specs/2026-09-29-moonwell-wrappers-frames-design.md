@@ -4,7 +4,7 @@
 - **Status:** Approved in chat on 2026-09-29; awaiting review of this written spec.
 - **Builds on:** the wrapper specs for v0.1.0 (`2026-09-28-moonwell-wrappers-design.md`), v0.2.0
   (`2026-09-28-moonwell-wrappers-broad-design.md`), v0.3.0 (`2026-09-29-moonwell-wrappers-presentation-design.md`) and
-  v0.4.0 (`2026-09-29-moonwell-wrappers-classic-ui-design.md`, released on `7e8ef13`). Everything in those specs still
+  v0.4.0 (`2026-09-29-moonwell-wrappers-classic-ui-design.md`, released on `be7dc97`). Everything in those specs still
   applies unless this one changes it explicitly.
 - **Target:** wrappers `v0.5.0` in the separate `mdlsvensson/moonwell-wrappers` repository. No Moonwell CLI change.
 

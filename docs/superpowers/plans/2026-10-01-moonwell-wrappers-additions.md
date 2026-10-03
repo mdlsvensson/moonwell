@@ -25,8 +25,7 @@ code are each caught by a test. The compiled gate ran to its end on stub natives
 
 - **Repository:** `C:\Users\mdlsvensson\Repo\moonwell-wrappers`; Moonwell records in
   `C:\Users\mdlsvensson\Repo\moonwell`; the gate map in `C:\Users\mdlsvensson\Repo\wrappers-gate` (not under git).
-  Commit on `main`, explicit paths only. End every commit message with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+  Commit on `main`, explicit paths only.
 - **Checks**, each its own command, from the repository root:
   - `deno task check`
   - `deno task lint`

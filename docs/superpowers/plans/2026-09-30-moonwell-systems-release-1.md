@@ -23,9 +23,8 @@ receiver checks. The tooling is Lua run with `yue -e`: `tests/run.lua` runs suit
 ## Global Constraints
 
 - **Repositories:** the library is `C:\Users\mdlsvensson\Repo\moonwell-systems` (created in Task 1); Moonwell records
-  are in `C:\Users\mdlsvensson\Repo\moonwell`. Commit on `main`, staging explicit paths only. End every commit message
-  with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Commit only when the task's checks pass, and run each
-  check as its own command (never behind a pipe that hides its exit code).
+  are in `C:\Users\mdlsvensson\Repo\moonwell`. Commit on `main`, staging explicit paths only. Commit only when the
+  task's checks pass, and run each check as its own command (never behind a pipe that hides its exit code).
 - **No Node.js, no Deno configuration** in the new repository; tools are Lua run with `yue -e`.
 - **Messages:** `[systems] <Class>.<method>: <problem>`. Exact texts used in this plan:
   `expected Scheduler`, `expected Signal`, `expected Scope`, `expected a callback function`,

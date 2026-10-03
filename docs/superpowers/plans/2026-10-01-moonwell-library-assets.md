@@ -17,14 +17,13 @@ the same in-map path, two libraries at one path fail. The one asset list then se
 **Spec:** `docs/superpowers/specs/2026-10-01-moonwell-library-assets-design.md`.
 
 **Verified in advance:** every change below was built and run on 2026-10-01 in a scratch clone of the repository
-(`../moonwell-proto6`, eight commits on `a038c96`): type check, lint and format; 466 unit tests, 30 runtime, the Pkl
+(`../moonwell-proto6`, eight commits on `b316afb`): type check, lint and format; 466 unit tests, 30 runtime, the Pkl
 tests and 27 Pkl-backed tests, 33 end-to-end and 2 network tests passed. 34 mutations of the new code are each caught by
-a test. The diffs are that clone's, against `a038c96`.
+a test. The diffs are that clone's, against `b316afb`.
 
 ## Global Constraints
 
-- **Repository:** `C:\Users\mdlsvensson\Repo\moonwell`. Commit on `main`, explicit paths only. End every commit message
-  with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- **Repository:** `C:\Users\mdlsvensson\Repo\moonwell`. Commit on `main`, explicit paths only.
 - **No Node.js:** no `package.json`, no `npm:` or `node:` specifiers; only `jsr:@std/*` from the import map.
 - **Errors:** expected failures throw `MoonwellError` with `file` and `hint`.
 - **Checks**, each its own command, all green before a commit: `deno task check`, `deno task lint`, `deno fmt --check`,
@@ -40,7 +39,7 @@ a test. The diffs are that clone's, against `a038c96`.
 
 Recorded in the spec's §12: the lock task comes before the sync task; the upgrade from a 0.5 lock compares the commit
 alone when the download ships assets; the commands are tested in-process with real Pkl beside one end-to-end test;
-the template's example names the example library's `v0.2.0`, which was pushed while planning (commit `0b69cfa`).
+the template's example names the example library's `v0.2.0`, which was pushed while planning (commit `58ab3cb`).
 
 ## File Structure
 
@@ -1994,7 +1993,7 @@ git commit -m "feat: commands import, list and watch the files libraries ship"
 `cli/tests/network/libraries.test.ts`.
 
 The example library's `v0.2.0` tag is already on GitHub (`mdlsvensson/moonwell-example-lib`, commit
-`0b69cfadeac0ca69d249df68411b5edb82f4f2a8`): a `moonwell-library.json` with `dir` `src` and `assets` `assets`, and one
+`58ab3cbbba900f66e5ec235f805f4b117640b406`): a `moonwell-library.json` with `dir` `src` and `assets` `assets`, and one
 file, `assets/war3mapImported/example/hello.txt`. Its tags are never moved.
 
 - [ ] **Step 1: The network test.** Replace `cli/tests/network/libraries.test.ts` with:
@@ -2015,7 +2014,7 @@ const SHIPPING = { github: "mdlsvensson/moonwell-example-lib", tag: "v0.2.0", pa
 const MODULES = "sha256:b2a02000abc725476fcc6a72806632851fff48bc26179d2169b27c1ecc3b88c3";
 
 Deno.test({
-  name: "the example library's v0.1.0 tag downloads and locks commit 13e3553, as it always has",
+  name: "the example library's v0.1.0 tag downloads and locks commit c07126f, as it always has",
   ignore: !enabled,
   async fn() {
     const root = await Deno.makeTempDir({ prefix: "moonwell-network-" });
@@ -2027,7 +2026,7 @@ Deno.test({
         github: "mdlsvensson/moonwell-example-lib",
         tag: "v0.1.0",
         dir: "src",
-        commit: "13e35535c481fddd267533cc513f86b55b313b66",
+        commit: "c07126f080c3887ba667596d08aa21df3b3a20f7",
         files: MODULES,
       });
       for (const file of ["greet.lua", "loud.yue", "globals.lua"]) {
@@ -2055,7 +2054,7 @@ Deno.test({
         github: "mdlsvensson/moonwell-example-lib",
         tag: "v0.2.0",
         dir: "",
-        commit: "0b69cfadeac0ca69d249df68411b5edb82f4f2a8",
+        commit: "58ab3cbbba900f66e5ec235f805f4b117640b406",
         files: MODULES,
         assets: "sha256:d40d3370a1e0e14f411273c8a5051158371a1e798f58b23e6b424fbb1f27eadb",
       });

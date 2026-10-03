@@ -56,7 +56,7 @@ here; a task is done when its inventory rows are ported and pass. Test-first.
   `yue.path` set, `setup`'s PATH command named the compiler's folder with backslashes, where the Deno CLI keeps the
   separators the manifest wrote. `yue.DirAsWritten` fixes it. Nothing else differed in 35 compared command lines
   (38 with the gate map, which only a machine with `../wrappers-gate` runs).
-- **Its last green run** on Ubuntu and Windows is commit `e786070` (CI run 37007905168).
+- **Its last green run** on Ubuntu and Windows is commit `f82dd66` (CI run 37007905168).
 - **What it compares beyond the spec's list:** the source map and `.asset-state/` after every command, the files
   `init` and `setup` write (`.gitignore`, `.luarc.json`, `.vscode/`, `yueconfig.yue`, the manifests, `PklProject`
   and its resolved dependencies), and the packed map's hash table, block sizes and flags, and the fixed fields of
@@ -69,7 +69,7 @@ here; a task is done when its inventory rows are ported and pass. Test-first.
   `assets-paths` and `launch`; `cli_test.go` those of `main` and the argument parser; `process_test.go` the test of
   the real program. `pkl/objects.test.ts` has 11 cases, not 12. Every case of the inventory is ported.
 - **Who wrote what:** the tests of Task 4 from the settings script onward, and the conformance suite, were written
-  by another agent (Codex, GPT) while Claude was out of usage, and reviewed, run and fixed by Claude afterwards.
+  by another agent (Codex, GPT) while the main agent was out of usage, and reviewed, run and fixed by it afterwards.
 
 ## File structure
 

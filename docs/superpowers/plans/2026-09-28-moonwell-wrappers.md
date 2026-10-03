@@ -212,4 +212,4 @@ eq(callCount("RemoveUnit"), 0)
 - Release: `mdlsvensson/moonwell-wrappers` was created, main pushed and `v0.1.0` tagged on `c1209f5`
   (GitHub pre-release). The first GitHub-tag consumption gate passed 2026-09-28 with Moonwell 0.5.0: check, normal and
   minified builds; `moonwell.lock` recorded `c1209f5`, the fetched files matched the tag's `src/`, and the lock stayed
-  unchanged after removing the map's `.moonwell/`. Recorded in the wrapper repository as `3a62111`.
+  unchanged after removing the map's `.moonwell/`. Recorded in the wrapper repository as `e820feb`.

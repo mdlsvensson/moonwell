@@ -3,7 +3,7 @@
 - **Date:** 2026-09-29
 - **Status:** Approved in chat on 2026-09-29; awaiting review of this written spec.
 - **Builds on:** `2026-09-28-moonwell-wrappers-design.md` (v0.1.0), `2026-09-28-moonwell-wrappers-broad-design.md`
-  (v0.2.0) and `2026-09-29-moonwell-wrappers-presentation-design.md` (v0.3.0, release A; v0.3.1 on `94d650f` added
+  (v0.2.0) and `2026-09-29-moonwell-wrappers-presentation-design.md` (v0.3.0, release A; v0.3.1 on `b37aef4` added
   native caveats). Everything in those specs still applies unless this one changes it explicitly.
 - **Inputs:** the w3ts comparison §2.1 (`docs/superpowers/research/2026-09-29-w3ts-comparison.md`), whose classic UI
   notes are w3ts's and not yet measured by us.

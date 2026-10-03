@@ -233,7 +233,7 @@ The plan's code was built and run in a scratch clone first (2026-10-01). It foun
 - **Errors about a library's file name it as a URL** for a GitHub library
   (`https://github.com/<owner>/<repo>/blob/<tag>/moonwell-library.json`) and as its path for a local one.
 - **The template's commented library example** now names the example library's `v0.2.0` without `dir`. That tag was
-  pushed on 2026-10-01 (commit `0b69cfa`) so the network test could be written against it.
+  pushed on 2026-10-01 (commit `58ab3cb`) so the network test could be written against it.
 
 ## 13. Out of scope
 

@@ -27,8 +27,7 @@ layout alone. 92 mutations of the four new modules are each caught by a test.
 
 - **Repository:** `C:\Users\mdlsvensson\Repo\moonwell-systems`; Moonwell records in `C:\Users\mdlsvensson\Repo\moonwell`;
   the gate map in `C:\Users\mdlsvensson\Repo\wrappers-gate` (not under git). Commit on `main`, explicit paths only,
-  each check run as its own command. End every commit message with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+  each check run as its own command.
 - **Checks**, from the repository root:
   - `yue -e tests/run.lua`
   - `MOONWELL_LUAC=../moonwell-wrappers/.tools/lua53/luac53.exe yue -e tools/check.lua`

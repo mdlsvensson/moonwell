@@ -32,8 +32,8 @@ this plan.
   when `MOONWELL_NETWORK_TESTS=1`.
 - Paths: `.moonwell/libraries/<key>/` (library files), `.moonwell/lua/` (editor view), `moonwell.lock` (project root,
   committed), `dist/stage/lua/.libraries/<key>/` (compiled library YueScript).
-- Every task: failing test first, then code, then the full gate (below), then one commit on `main` ending with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Do not push; the maintainer pushes. Do not bump versions.
+- Every task: failing test first, then code, then the full gate (below), then one commit on `main`.
+  Do not push; the maintainer pushes. Do not bump versions.
 
 **Full gate (before every commit):**
 
@@ -44,7 +44,7 @@ deno task check && deno task lint && deno fmt --check && deno task test && deno 
 ## Facts this plan relies on (checked 2026-09-28)
 
 - The test library [mdlsvensson/moonwell-example-lib](https://github.com/mdlsvensson/moonwell-example-lib), tag
-  `v0.1.0` (lightweight) on commit `13e35535c481fddd267533cc513f86b55b313b66`, holds `src/example/greet.lua` (a module
+  `v0.1.0` (lightweight) on commit `c07126f080c3887ba667596d08aa21df3b3a20f7`, holds `src/example/greet.lua` (a module
   table with `hello(name)`), `src/example/loud.yue` (`import "example.greet"`, `export shout`) and
   `src/example/globals.lua` (globals `ExampleVersion` and `ExampleAdd`), plus `README.md` and `LICENSE`.
 - Its archive from `https://codeload.github.com/mdlsvensson/moonwell-example-lib/zip/refs/tags/v0.1.0` has the single
@@ -268,9 +268,7 @@ Expected: PASS (the existing compile tests, including the recompile counts, stil
 
 ```bash
 git add cli/src/yue/compile.ts cli/src/bundle/modules.ts cli/src/pipeline.ts cli/tests/yue/compile.test.ts cli/tests/unit/modules.test.ts
-git commit -m "refactor(libraries): compile outputs by project path, and module roots for libraries
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "refactor(libraries): compile outputs by project path, and module roots for libraries"
 ```
 
 ---
@@ -358,9 +356,7 @@ Expected: PASS.
 
 ```bash
 git add cli/src/lint/unknown-globals.ts cli/src/pipeline.ts cli/tests/unit/lint-unknown-globals.test.ts cli/tests/e2e/lint.test.ts cli/tests/e2e/lua.test.ts
-git commit -m "feat(lint): only modules the map requires make their globals known
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(lint): only modules the map requires make their globals known"
 ```
 
 ---
@@ -516,9 +512,7 @@ Expected: PASS.
 
 ```bash
 git add schema/Project.pkl schema/tests/Project.pkl cli/src/project/project.ts template/moonwell.pkl cli/src/embedded/template.ts cli/tests
-git commit -m "feat(libraries): the libraries block in moonwell.pkl
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(libraries): the libraries block in moonwell.pkl"
 ```
 
 ---
@@ -553,7 +547,7 @@ import { MoonwellError } from "../../src/shared/errors.ts";
 import { zipComment } from "../../src/yue/unzip.ts";
 import { makeZip } from "../support/zip.ts";
 
-const COMMIT = "13e35535c481fddd267533cc513f86b55b313b66";
+const COMMIT = "c07126f080c3887ba667596d08aa21df3b3a20f7";
 const text = (value: string) => new TextEncoder().encode(value);
 
 Deno.test("zipComment reads the end record's comment", async () => {
@@ -607,7 +601,7 @@ const ENTRY = {
   github: "mdlsvensson/moonwell-example-lib",
   tag: "v0.1.0",
   dir: "src",
-  commit: "13e35535c481fddd267533cc513f86b55b313b66",
+  commit: "c07126f080c3887ba667596d08aa21df3b3a20f7",
   files: "sha256:abc",
 };
 
@@ -777,9 +771,7 @@ Expected: PASS.
 
 ```bash
 git add cli/src/yue/unzip.ts cli/src/libraries/archive.ts cli/src/libraries/lock.ts cli/tests/support/zip.ts cli/tests/unit/library-archive.test.ts cli/tests/unit/library-lock.test.ts
-git commit -m "feat(libraries): read GitHub tag archives and moonwell.lock
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(libraries): read GitHub tag archives and moonwell.lock"
 ```
 
 ---
@@ -1044,9 +1036,7 @@ Expected: PASS.
 
 ```bash
 git add cli/src/libraries/sync.ts cli/tests/unit/library-sync.test.ts
-git commit -m "feat(libraries): sync libraries from GitHub tags and local folders
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(libraries): sync libraries from GitHub tags and local folders"
 ```
 
 ---
@@ -1187,9 +1177,7 @@ Expected: PASS.
 
 ```bash
 git add cli/src/pipeline.ts cli/src/commands/setup.ts cli/src/commands/dev.ts cli/tests/e2e/libraries.test.ts cli/tests/unit/dev.test.ts
-git commit -m "feat(libraries): sync and bundle libraries in check, build, test, dev and setup
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(libraries): sync and bundle libraries in check, build, test, dev and setup"
 ```
 
 ---
@@ -1305,9 +1293,7 @@ Expected: PASS.
 
 ```bash
 git add cli/src/editor/library-view.ts cli/src/editor/scaffold.ts cli/src/pipeline.ts cli/src/commands/setup.ts template/.luarc.json cli/src/embedded/template.ts cli/tests/unit/library-view.test.ts cli/tests/unit/editor-scaffold.test.ts cli/tests/e2e/libraries.test.ts
-git commit -m "feat(libraries): .moonwell/lua, the editor's view of library modules
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(libraries): .moonwell/lua, the editor's view of library modules"
 ```
 
 ---
@@ -1335,7 +1321,7 @@ const enabled = Deno.env.get("MOONWELL_NETWORK_TESTS") === "1";
 const EXAMPLE = { github: "mdlsvensson/moonwell-example-lib", tag: "v0.1.0", path: null, dir: "src" };
 
 Deno.test({
-  name: "the example library's v0.1.0 tag downloads and locks commit 13e3553",
+  name: "the example library's v0.1.0 tag downloads and locks commit c07126f",
   ignore: !enabled,
   async fn() {
     const root = await Deno.makeTempDir({ prefix: "moonwell-network-" });
@@ -1343,7 +1329,7 @@ Deno.test({
       const requests: string[] = [];
       const deps = { fetch: (url: string) => (requests.push(url), fetch(url)), logger: silentLogger() };
       await syncLibraries(root, { example: EXAMPLE }, "moonwell.pkl", deps);
-      assertEquals((await readLock(root)).example.commit, "13e35535c481fddd267533cc513f86b55b313b66");
+      assertEquals((await readLock(root)).example.commit, "c07126f080c3887ba667596d08aa21df3b3a20f7");
       for (const file of ["greet.lua", "loud.yue", "globals.lua"]) {
         assert(await exists(join(root, ".moonwell", "libraries", "example", "example", file)), file);
       }
@@ -1379,9 +1365,7 @@ it, say so in the report) and `deno task test:network` without the variable (1 i
 
 ```bash
 git add cli/tests/network/libraries.test.ts deno.json .github/workflows/ci.yml AGENTS.md CONTRIBUTING.md
-git commit -m "test(libraries): download the example library by tag, in CI
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "test(libraries): download the example library by tag, in CI"
 ```
 
 ---
@@ -1480,9 +1464,7 @@ Run: `deno fmt --check`.
 
 ```bash
 git add README.md CHANGELOG.md CONTRIBUTING.md AGENTS.md docs/superpowers/specs/2026-09-28-moonwell-lua-libraries-design.md
-git commit -m "docs: libraries
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "docs: libraries"
 ```
 
 ---

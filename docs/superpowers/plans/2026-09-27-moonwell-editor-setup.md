@@ -30,8 +30,8 @@ stable `bin/` folder and tells the user how to put it on PATH.
 - Blizzard's game files are never committed and their text is never copied: `natives.json` records names, types and
   signatures only. Test fixtures are hand-written miniature JASS.
 - Write files containing backslashes with a file-editing tool, never a shell heredoc or `sed`.
-- Every task: failing test first, then code, then the full gate (below), then one commit on `main` ending with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Do not push; the maintainer pushes. Do not bump versions.
+- Every task: failing test first, then code, then the full gate (below), then one commit on `main`.
+  Do not push; the maintainer pushes. Do not bump versions.
 
 **Full gate (before every commit):**
 

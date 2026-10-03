@@ -4,7 +4,7 @@ Moonwell is a Warcraft III map development framework. Gameplay is written in Yue
 data is written in Pkl; the toolchain is one Go program, `moonwell`, installed by a script from the GitHub release (up
 to 0.7.0 it was a Deno CLI published to JSR as `@moonwell/cli`). The Pkl schemas are published as the Pkl package
 `moonwell`, in the same release, tagged `moonwell@<version>`. This file tells you what exists, the rules, the known
-pitfalls, and what to do next. It was written by the previous agent (Claude) on 2026-09-25 when handing over, and has
+pitfalls, and what to do next. It was written by the previous coding agent on 2026-09-25 when handing over, and has
 been updated after every piece of work since.
 
 ## Read first
@@ -69,9 +69,9 @@ same bytes.
   deferred: `assets:paths` reports every readable model before failing, and tokenizes `.mdl` lazily. Ctrl+C during
   `assets:sync` rolls back. There is no empty state file, and the state-file hint is fixed. The assets release gate
   (CONTRIBUTING step 7, with the World Editor save) passed 2026-09-27.
-- **Released 0.4.0** (2026-09-28, JSR `@moonwell/cli@0.4.0` and GitHub release `moonwell@0.4.0` on `a9a2e15`, checked
+- **Released 0.4.0** (2026-09-28, JSR `@moonwell/cli@0.4.0` and GitHub release `moonwell@0.4.0` on `27cd6ec`, checked
   with `init` and `build` from JSR): sub-project 3, Plans 3a, 3b and 3c below. The release gate passed steps 1–6, 10 and
-  11; 7–9 were not re-run (their code is unchanged). Pkl's HTTP client fails in Claude's shells with "Unable to
+  11; 7–9 were not re-run (their code is unchanged). Pkl's HTTP client fails in the agent's shells with "Unable to
   establish loopback connection", even outside the sandbox, so the maintainer runs the JSR `init` check.
 - **Plan 3a** (2026-09-27, `docs/superpowers/plans/2026-09-27-moonwell-editor-setup.md`): editor support for VS Code's
   YueScript extension (`LiJin.yuescript`) with the Lua extension (`sumneko.lua`), whose bundled lua-language-server the
@@ -109,18 +109,18 @@ same bytes.
   to load such a macro. The template's standard Footman, next to the Captain, uses `$FourCC`. Its gate (CONTRIBUTING
   step 11) passed 2026-09-27. That probe reported screen-only `print` output; the later 4c gate confirmed wrapper
   callback errors, ticks and cleanup messages were retained in F12 on 3.0.0.24268.
-- **Released 0.5.0** (2026-09-28, JSR `@moonwell/cli@0.5.0` and GitHub release `moonwell@0.5.0` on `27d093a`, checked
+- **Released 0.5.0** (2026-09-28, JSR `@moonwell/cli@0.5.0` and GitHub release `moonwell@0.5.0` on `c60c9bf`, checked
   with `init` and `build` from JSR): sub-project 4, Plans 4a and 4b below. The release gate passed steps 1–6 and 12;
   7–11 were not re-run (their code is unchanged).
-- **Released 0.5.1** (2026-09-30, JSR `@moonwell/cli@0.5.1` and GitHub release `moonwell@0.5.1` on `c883e4c`, checked
+- **Released 0.5.1** (2026-09-30, JSR `@moonwell/cli@0.5.1` and GitHub release `moonwell@0.5.1` on `8a86425`, checked
   with `init` and `build` from JSR): roadmap phase 0. `UnitAlive` is a known native, `assets:sync` stops at Ctrl+C while
   planning, and the README's `yue` console-window note is gone. Gate steps 1 and 2 passed; 3 to 12 were not re-run (no
   game-facing change).
-- **Released 0.5.2** (2026-09-30, JSR `@moonwell/cli@0.5.2` and GitHub release `moonwell@0.5.2` on `e459d1d`): builds
+- **Released 0.5.2** (2026-09-30, JSR `@moonwell/cli@0.5.2` and GitHub release `moonwell@0.5.2` on `3cf28ab`): builds
   fail when yue writes no Lua for a file with code (the `//` pitfall below). Gate steps 1 and 2 passed; 3 to 12 were not
   re-run.
 - **Released 0.6.0, assets shipped by libraries** (2026-10-01, JSR `@moonwell/cli@0.6.0` and GitHub release
-  `moonwell@0.6.0` on `88d74b2`, checked with `init` and `build` from JSR; spec
+  `moonwell@0.6.0` on `21440bc`, checked with `init` and `build` from JSR; spec
   `docs/superpowers/specs/2026-10-01-moonwell-library-assets-design.md`, plan
   `docs/superpowers/plans/2026-10-01-moonwell-library-assets.md`). Roadmap phase 4, item 2.
   - A library describes itself in a `moonwell-library.json` at its root: `dir` (its module folder) and `assets` (a
@@ -136,11 +136,11 @@ same bytes.
     at the same in-map path, with a line saying so, and two libraries at one path fail. `planAssets` takes the library
     keys, so builds, `check`, `assets:check`, `assets:sync` and `assets:paths` all see one list. The three assets
     commands now sync the libraries first.
-  - The example library has a `v0.2.0` tag (commit `0b69cfa`) with such a file and one asset; the network test downloads
+  - The example library has a `v0.2.0` tag (commit `58ab3cb`) with such a file and one asset; the network test downloads
     both tags. Its tags must never be moved.
   - Gate steps 1 and 2 passed; 3 to 12 were not re-run. No in-game run, by the maintainer's choice.
 - **Released 0.7.0, the custom map preview** (2026-10-01, JSR `@moonwell/cli@0.7.0` and GitHub release `moonwell@0.7.0`
-  on `4ffe9c4`, checked with `init` and `build` from JSR; spec
+  on `98f0146`, checked with `init` and `build` from JSR; spec
   `docs/superpowers/specs/2026-10-01-moonwell-map-preview-design.md`, plan
   `docs/superpowers/plans/2026-10-01-moonwell-map-preview.md`). Roadmap phase 4, item 3.
   - `settings.info.preview` names a `.tga` or `.blp` of 256×256 or 512×512 pixels, at a path from the project folder
@@ -181,10 +181,10 @@ same bytes.
   `dist/stage/lua/.libraries/<key>/`). `cli/src/editor/library-view.ts` writes `.moonwell/lua/` (`setup`: the Lua
   modules only). Known names come from the resolved graph, and only the `src/` modules the map requires are checked.
   `isWithin` is shared in `cli/src/shared/fs.ts`. The example library is `mdlsvensson/moonwell-example-lib` `v0.1.0`
-  (commit `13e35535c481fddd267533cc513f86b55b313b66`), which `deno task test:network` downloads. In a library, a `.lua`
+  (commit `c07126f080c3887ba667596d08aa21df3b3a20f7`), which `deno task test:network` downloads. In a library, a `.lua`
   beside a `.yue` of the same stem is its compiled output; a local override keeps the lock entry. Its gate (CONTRIBUTING
   step 12, the libraries part) passed 2026-09-28.
-- **CI** (GitHub Actions, Ubuntu and Windows, with `test:network`) is green as of commit `632c765` (Plan 4b).
+- **CI** (GitHub Actions, Ubuntu and Windows, with `test:network`) is green as of commit `05b8d25` (Plan 4b).
 - **Plan 4c, released as wrappers `v0.1.0`** (2026-09-28): annotated Lua wrappers in the separate sibling
   `../moonwell-wrappers` repository, commit `3b923d5` on main. Player, Unit, Timer, Trigger, Group and Effect use
   explicit methods, stable handle identity and explicit cleanup. Consume with `path = "../moonwell-wrappers"` and
@@ -198,7 +198,7 @@ same bytes.
 - **Wrappers v0.2.0, broad coverage, released** (2026-09-29, spec
   `docs/superpowers/specs/2026-09-28-moonwell-wrappers-broad-design.md`, plan
   `docs/superpowers/plans/2026-09-28-moonwell-wrappers-broad.md`): GitHub pre-release `v0.2.0` of
-  `mdlsvensson/moonwell-wrappers` on commit `7baa81e`. Adds Item, Destructable, Rect, Region and Force; deeper Unit,
+  `mdlsvensson/moonwell-wrappers` on commit `4b2c845`. Adds Item, Destructable, Rect, Region and Force; deeper Unit,
   Player, Trigger (predicate conditions, removable action/condition tokens) and Group (filtered enumerations, `forEach`,
   `first`); a widget layer; weak Unit/Item/Destructable caches. Wrapper arguments convert through the loaded registries,
   so a module imports another only to return its wrappers. Automated checks pass: 69 behavior tests, Lua 5.3.6 syntax,
@@ -208,9 +208,9 @@ same bytes.
   passed 2026-09-29 (game 3.0.0.24268): the weak cache probe printed `collected=true stale=true identity=true`, and the
   self-removing action and condition ran. Text printed while a map loads never reaches the screen or the log, so the
   gate starts from a zero-second timer. The two-player desync run is deferred to the online checks before 1.0 (Backlog).
-  Tag consumption passed: a fresh map locked `v0.2.0` to `7baa81e`.
+  Tag consumption passed: a fresh map locked `v0.2.0` to `4b2c845`.
 - **Wrappers v0.3.0, presentation, released** (2026-09-29, GitHub pre-release `v0.3.0` of
-  `mdlsvensson/moonwell-wrappers` on commit `1277875`; spec
+  `mdlsvensson/moonwell-wrappers` on commit `5da96d8`; spec
   `docs/superpowers/specs/2026-09-29-moonwell-wrappers-presentation-design.md`, plan
   `docs/superpowers/plans/2026-09-29-moonwell-wrappers-presentation.md`): release A of the UI and presentation backlog
   item. TextTag, Sound, Lightning, Image, Ubersplat and FogModifier (owned objects only), `TextTag.float`,
@@ -219,8 +219,8 @@ same bytes.
   after four gate fixes found in game: trees snap to a 64-unit grid, Chain Lightning fades by itself (the gate uses
   Drain Life), `lightning:setColor` shows no visible change, and effects attached to items and destructables are not
   drawn (the last two documented in the wrappers README). Tag consumption passed: a fresh map locked `v0.3.0` to
-  `1277875`. The disposable gate map is `../wrappers-gate` (`deno task gate <run>`, one command per run).
-- **Wrappers v0.3.1, native caveats, released** (2026-09-29, GitHub pre-release `v0.3.1` on `94d650f`; tag consumption
+  `5da96d8`. The disposable gate map is `../wrappers-gate` (`deno task gate <run>`, one command per run).
+- **Wrappers v0.3.1, native caveats, released** (2026-09-29, GitHub pre-release `v0.3.1` on `b37aef4`; tag consumption
   passed): from the w3ts and WCSharp comparisons (`docs/superpowers/research/`) and an in-game probe run
   (`../wrappers-gate`, `deno task gate probe`; results in the WCSharp note §9). README notes measured by the probe and a
   labelled "Reported native caveats" section, `Image.create` raising on a wrong path (Warcraft returns an image with
@@ -228,7 +228,7 @@ same bytes.
   decision. Moonwell now knows `UnitAlive` (added to `tools/natives/lua-extras.json`, `natives.json` regenerated from
   the same `common.j` export with no other change); the wrappers' `unit:isAlive()` is unchanged, so the library still
   works with Moonwell 0.5.0.
-- **Wrappers v0.4.0, classic UI, released** (2026-09-29, GitHub pre-release `v0.4.0` on `7e8ef13`; tag consumption
+- **Wrappers v0.4.0, classic UI, released** (2026-09-29, GitHub pre-release `v0.4.0` on `be7dc97`; tag consumption
   passed; spec `docs/superpowers/specs/2026-09-29-moonwell-wrappers-classic-ui-design.md`, plan
   `docs/superpowers/plans/2026-09-29-moonwell-wrappers-classic-ui.md`): release B of the UI backlog item. Dialog
   (per-button callbacks, buttons owned by the dialog), Multiboard (one-based cell methods that release every cell
@@ -238,7 +238,7 @@ same bytes.
   count change from 0 to 5 works, and new multiboard cells show an eye icon (`../wrappers-gate/PROBE-UI-RESULTS.md`).
   The classic UI gate passed normal and minified (`deno task gate ui`, `ui-min`), and the packed map opened in World
   Editor.
-- **Wrappers v0.5.0, frames, released** (2026-09-29, GitHub pre-release `v0.5.0` on `b91ffd4`; tag consumption passed;
+- **Wrappers v0.5.0, frames, released** (2026-09-29, GitHub pre-release `v0.5.0` on `76d515c`; tag consumption passed;
   spec `docs/superpowers/specs/2026-09-29-moonwell-wrappers-frames-design.md`, plan
   `docs/superpowers/plans/2026-09-29-moonwell-wrappers-frames.md`): release C of the UI backlog item. `wrappers.frame`
   with an owned tree (owned frames, template parts, borrowed game frames), automatic create contexts, per-frame event
@@ -248,11 +248,11 @@ same bytes.
   a TOC; an unknown template gives nil; destroying a frame removes its children, including a re-parented one; a clicked
   button keeps the keyboard focus until `releaseFocusFor`. The frames gate passed normal and minified
   (`deno task gate frames`, `frames-min`).
-- **Wrappers v0.5.1, released** (2026-09-30, GitHub pre-release `v0.5.1` on `af9961e`; tag consumption passed with
+- **Wrappers v0.5.1, released** (2026-09-30, GitHub pre-release `v0.5.1` on `26c208d`; tag consumption passed with
   Moonwell 0.5.1): roadmap item 0.3. `Effect.attach` and `Effect.flashOn` take a Unit in the editor, so LuaLS flags an
   Item or a Destructable (17 expected negative diagnostics); the runtime still accepts any widget. The in-game gate was
   not re-run (annotations only).
-- **Wrappers v0.6.0, the refactor after the review, released** (2026-09-30, GitHub pre-release `v0.6.0` on `933b580`;
+- **Wrappers v0.6.0, the refactor after the review, released** (2026-09-30, GitHub pre-release `v0.6.0` on `e908b2e`;
   tag consumption passed; review `docs/superpowers/research/2026-09-30-wrappers-review.md`, spec and plan
   `2026-09-30-moonwell-wrappers-refactor`). Roadmap 2.2.
   - Wrapper errors point at the calling line. A tail call into a raising helper had dropped the position entirely, and
@@ -264,7 +264,7 @@ same bytes.
   - Options errors are reported in sorted order, and the README has a per-module API reference.
   - The in-game gate passed `core`, `probes`, `presentation`, `ui` and `perf`. Frames and the minified runs were not
     re-run, by the maintainer's decision.
-- **Wrappers v0.7.0, the port prerequisites, released** (2026-09-30, GitHub pre-release `v0.7.0` on `e9c2880`; tag
+- **Wrappers v0.7.0, the port prerequisites, released** (2026-09-30, GitHub pre-release `v0.7.0` on `9a8456e`; tag
   consumption passed; spec and plan `2026-09-30-moonwell-wrappers-port-prerequisites`). Roadmap 2.3.
   - `unit:getCollisionSize()` and `unit:setPathing(flag)`.
   - `wrappers.damage`: `onDamaging`/`onDamaged` listeners with one shared event per hit; DAMAGING events set the amount
@@ -274,7 +274,7 @@ same bytes.
     type change before armor works, after armor it does nothing; the outer hit's setters still work after a nested hit;
     `setPathing(false)` does not make move orders cross trees; sync prefixes of 16, 17 and 32 characters arrive whole.
 - **moonwell-systems v0.1.0, release 1 of the `wc3-lib` port, released** (2026-09-30, public repository
-  `mdlsvensson/moonwell-systems`, GitHub pre-release `v0.1.0` on `1725436`; tag consumption passed with wrappers
+  `mdlsvensson/moonwell-systems`, GitHub pre-release `v0.1.0` on `0b51fd1`; tag consumption passed with wrappers
   `v0.7.0`; spec `docs/superpowers/specs/2026-09-30-moonwell-systems-design.md`, plan
   `docs/superpowers/plans/2026-09-30-moonwell-systems-release-1.md`). Roadmap phase 3, release 1.
   - `systems.scheduler` (heap clock, `start()` on one wrappers Timer), `systems.signal`, `systems.scope` and
@@ -284,7 +284,7 @@ same bytes.
     `io.popen`).
   - The in-game gate (`deno task gate systems` in `../wrappers-gate`, whose local manifest now lists both libraries)
     passed: the scheduler kept time with a Warcraft timer to within 4 µs.
-- **moonwell-systems v0.2.0, release 2 of the port, released** (2026-10-01, GitHub pre-release `v0.2.0` on `afabc3d`;
+- **moonwell-systems v0.2.0, release 2 of the port, released** (2026-10-01, GitHub pre-release `v0.2.0` on `c20f013`;
   tag consumption passed; spec `docs/superpowers/specs/2026-09-30-moonwell-systems-release-2-design.md`, plan
   `docs/superpowers/plans/2026-09-30-moonwell-systems-release-2.md`).
   - `systems.buffs` (Units only; refresh, replace, stack and independent stacking; the store polls its units every 0.25
@@ -294,7 +294,7 @@ same bytes.
   - User callbacks are typed `fun(...): ...`: YueScript returns a callback's last expression, and LuaLS flagged that
     against `fun()` parameters (the gate example found it).
   - The in-game gate (`deno task gate systems`, now both releases, about 18 s) passed.
-- **moonwell-systems v0.3.0, release 3 of the port, released** (2026-10-01, GitHub pre-release `v0.3.0` on `d67d3fc`;
+- **moonwell-systems v0.3.0, release 3 of the port, released** (2026-10-01, GitHub pre-release `v0.3.0` on `63027c9`;
   tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-systems-release-3-design.md`, plan
   `docs/superpowers/plans/2026-10-01-moonwell-systems-release-3.md`).
   - `systems.damage`: `beforeArmor`, `afterArmor` and `observe` listeners on `wrappers.damage`; a Hit changes through
@@ -305,8 +305,8 @@ same bytes.
   - The in-game gate has its own run (`deno task gate systems-damage`, about 10 s) and passed. Measured on 3.0.0.24268:
     Warcraft sends DAMAGED for a hit set to 0; magic damage on a spell-immune unit fires DAMAGING but no DAMAGED; Storm
     Bolt causes two hits (0, then 100, not reduced by armor); a real attack reads `isAttack` true.
-  - LuaLS's `--check` mangles a project path that contains `--`, such as Claude's scratchpad folder.
-- **moonwell-systems v0.4.0, release 4 of the port, released** (2026-10-01, GitHub pre-release `v0.4.0` on `cfa21b6`;
+  - LuaLS's `--check` mangles a project path that contains `--`, such as the agent's scratchpad folder.
+- **moonwell-systems v0.4.0, release 4 of the port, released** (2026-10-01, GitHub pre-release `v0.4.0` on `b75d024`;
   tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-systems-release-4-design.md`, plan
   `docs/superpowers/plans/2026-10-01-moonwell-systems-release-4.md`).
   - `systems.geometry` (vector functions on plain numbers), `systems.terrain` (ground height, walkability, `isClear` and
@@ -326,7 +326,7 @@ same bytes.
     knockbacks got their own run, one footman at a time with each push announced first, because the maintainer could not
     follow five pushes at once; and a turn in a gate step must be large enough to see.
 - **moonwell-systems v0.5.0, release 5 and the last of the port, released** (2026-10-01, GitHub pre-release `v0.5.0` on
-  `11331a8`; tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-systems-release-5-design.md`, plan
+  `5866744`; tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-systems-release-5-design.md`, plan
   `docs/superpowers/plans/2026-10-01-moonwell-systems-release-5.md`).
   - `systems.codec` (save codes packed by a versioned schema into 64 symbols: integers by their range, booleans, strings
     and lists, with a check value keyed by a map secret, a binding and migrations), `systems.sync` (`ask` one player's
@@ -349,7 +349,7 @@ same bytes.
   - yue 0.34.2 writes an empty file for a source with a bitwise operator, as for `//` (IppClub/YueScript#256 is fixed in
     0.34.3 for `//`, which Moonwell pins since 0.8.1; bitwise operators fail there with an error).
 - **Wrappers v0.8.0, the additions the port did not need, released** (2026-10-01, GitHub pre-release `v0.8.0` on
-  `d823b1b`; tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-wrappers-additions-design.md`,
+  `75724ac`; tag consumption passed; spec `docs/superpowers/specs/2026-10-01-moonwell-wrappers-additions-design.md`,
   plan `docs/superpowers/plans/2026-10-01-moonwell-wrappers-additions.md`). Roadmap phase 4, item 1.
   - `wrappers.input` (key and mouse listeners for one player, with the event's data and a token to remove them),
     `wrappers.weathereffect`, `Effect.abilityArt` (the model path or lightning code an ability's data names),
@@ -367,7 +367,7 @@ same bytes.
   - The in-game gate (`deno task gate additions`) passed: its printed lines are read from a file, the maintainer watched
     rain and one effect, and six input steps were advanced with Esc. All 21 weather ids of the README were created.
   - A `wrappers.event` module with every event response was rejected: it would bundle every widget class.
-- **Released 0.8.0, Deno replaced by Go** (2026-10-02, GitHub release `moonwell@0.8.0` on `ebf51d9`, built by the
+- **Released 0.8.0, Deno replaced by Go** (2026-10-02, GitHub release `moonwell@0.8.0` on `393e8bb`, built by the
   release workflow, whose last job installed it on Ubuntu and Windows with the install line and built a new project;
   nothing went to JSR; roadmap 5.1; spec
   `docs/superpowers/specs/2026-10-02-moonwell-go-toolchain-design.md`, approved 2026-10-02). Gate steps 1 to 6 passed,
@@ -426,23 +426,23 @@ same bytes.
     user cache). It is its own package because `testkit` is imported by tests of packages `yue` depends on.
   - `text.LocaleCompare` stands in for JavaScript's `localeCompare`, which orders the failed files of a compile:
     identical to Deno for ASCII, not past it.
-  - A Bash command that starts `python` hangs Claude's shell until it times out (twice now): never call it.
-  - Go is at `C:\Program Files\Go\bin` (1.27.0) and is not on the PATH of Claude's shell: prefix commands with
-    `export PATH="$PATH:/c/Program Files/Go/bin"`. In files written by Claude's tools, a `\uFEFF` escape becomes a real
-    byte order mark, which Go refuses in source: write `"\xEF\xBB\xBF"`.
+  - A Bash command that starts `python` hangs the agent's shell until it times out (twice now): never call it.
+  - Go is at `C:\Program Files\Go\bin` (1.27.0) and is not on the PATH of the agent's shell: prefix commands with
+    `export PATH="$PATH:/c/Program Files/Go/bin"`. In files written by the agent's tools, a `\uFEFF` escape becomes a
+    real byte order mark, which Go refuses in source: write `"\xEF\xBB\xBF"`.
   - **Plan 5d, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-commands.md`): `watch` (a
     polling watcher), `cli` (the argument parser, the command table and every command) and `cmd/moonwell`, with the
     Pkl-backed and end-to-end tests, a test that builds the program and runs it, and the conformance suite
     (`internal/conformance`, `MOONWELL_CONFORMANCE=1`), which runs both CLIs on the same projects.
-  - The conformance suite's last green run on Ubuntu and Windows is commit `e786070`. It found one difference, on the
+  - The conformance suite's last green run on Ubuntu and Windows is commit `f82dd66`. It found one difference, on the
     runner where `yue` is not on the PATH: the folder in `setup`'s PATH command (fixed, `yue.DirAsWritten`).
   - Unknown flags are ignored, as the Deno CLI's parser ignored them; `cli.ParseArgs` was compared with it on 28 command
     lines.
   - Interrupting a program in a test on Windows: Ctrl+C is switched off below a process started in a new process group,
     and `AttachConsole` removes the handlers Go installed. Send Ctrl+Break to the program's own process group
     (`internal/cli/process_windows_test.go`).
-  - Another agent (Codex) wrote the tests of Plan 5d's Task 4 and the conformance suite while Claude was out of usage;
-    its notes are in the git-ignored `.superpowers/sdd/`, with an audit of what Plans 5e and 5f must cover.
+  - Another agent (Codex) wrote the tests of Plan 5d's Task 4 and the conformance suite while the main agent was out
+    of usage; its notes are in the git-ignored `.superpowers/sdd/`, with an audit of what Plans 5e and 5f must cover.
   - **Plan 5e, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-cutover.md`):
     the generators in Go (`tools/gen`, with the SLK, INI and JASS parsers as packages below it); `cli/`, the TypeScript
     generators, every `deno.json` and the conformance suite deleted; `cli/runtime` and `cli/data` moved to `runtime/`
@@ -462,9 +462,9 @@ same bytes.
   - The Pkl schema's own tests (`schema/tests/`) run from `schema_test.go`. The compiler a test needs is downloaded by
     `yuetest.Need`, also on CI: nothing installs it beforehand any more.
   - **Plan 5f, implemented** (2026-10-02, `docs/superpowers/plans/2026-10-02-moonwell-go-siblings.md`): no Deno in the
-    three sibling repositories. moonwell-wrappers (`9e5489b`): `tools/test.lua`, `check.lua`, `integration.lua` on
+    three sibling repositories. moonwell-wrappers (`4c169a2`): `tools/test.lua`, `check.lua`, `integration.lua` on
     `tools/lib.lua`, with the same results as the Deno tools (34 suites, 218 tests, 27 expected negative diagnostics, 4
-    planted native mistakes). moonwell-systems (`5043c48`): `tools/integration.lua` runs `moonwell`. wrappers-gate (not
+    planted native mistakes). moonwell-systems (`0745a64`): `tools/integration.lua` runs `moonwell`. wrappers-gate (not
     a git repository): `gate.lua` and `preview-probe.lua`. No library code changed, so there are no tags.
   - The tools run `moonwell` from the PATH, or the executable `MOONWELL` names. It must be an executable, not a command
     line: `go run ./cmd/moonwell` would run in the checkout, not in the consumer project. `init --link` runs with the
@@ -478,7 +478,7 @@ same bytes.
     is `~/.vscode/extensions/sumneko.lua-3.19.1-win32-x64/server/bin/lua-language-server.exe` (`MOONWELL_LUALS`).
     Until the maintainer installs `moonwell` 0.8.0, build one (`go build -o <file> ./cmd/moonwell`) and name it in
     `MOONWELL`.
-- **Released 0.8.1, YueScript 0.34.3** (2026-10-02, GitHub release `moonwell@0.8.1` on `98fbdac`, a full release marked
+- **Released 0.8.1, YueScript 0.34.3** (2026-10-02, GitHub release `moonwell@0.8.1` on `8915d54`, a full release marked
   latest; the workflow's install job ran the README's own line on both systems, and the line was fetched again from
   Windows PowerShell afterwards; a short design in chat, approved by the maintainer). 0.34.3 is the
   default compiler (`yue.DefaultVersion`, `schema/Project.pkl`); 0.34.2 stays in `yue.Known`, because a project on the
@@ -498,7 +498,7 @@ same bytes.
     that project's version, and the wrappers' test runner demands the pinned one.
   - No in-game run, by the maintainer's decision.
 - **Wrappers v0.8.1 and moonwell-systems v0.5.1, `moonwell-library.json`, released** (2026-10-02, GitHub pre-releases
-  `v0.8.1` on `c8e434b` and `v0.5.1` on `46ebd6f`; a short design in chat, approved by the maintainer). Each library
+  `v0.8.1` on `4d1d6e9` and `v0.5.1` on `8792bb3`; a short design in chat, approved by the maintainer). Each library
   has a `moonwell-library.json` with `{ "dir": "src" }` at its root, so a map on Moonwell 0.6.0 or later leaves `dir`
   out of its `libraries` entry. No file under either `src/` changed, so no in-game run.
   - Their READMEs show the short form and say when `dir = "src"` is still needed: Moonwell 0.5, or an older tag.
@@ -510,7 +510,7 @@ same bytes.
   - A project linked to the checkout (`init --link`, such as the gate map) stops evaluating when the checkout's
     version changes: Pkl compares it with the project's `PklProject.deps.json`. Run `pkl project resolve` there.
 - **Wrappers v0.9.0, automatic disposal of Unit wrappers, released** (2026-10-02, GitHub pre-release `v0.9.0` on
-  `7347705`; tag consumption passed; a short design in chat, after the maintainer chose polling over the undefend
+  `0b6c180`; tag consumption passed; a short design in chat, after the maintainer chose polling over the undefend
   order).
   - `Unit.autoDispose(interval?)` starts one game timer that runs `Unit.sweep()` every 0.25 seconds by default and
     returns a stop function; nothing runs until a map calls it. `Unit.sweep()` disposes the wrapper of every unit whose
@@ -526,7 +526,7 @@ same bytes.
     3.0.0.24268: a sweep in the instant of a raw `RemoveUnit` or an exploding death sees neither; the default timer
     disposed the removed unit after 0.25 s; a sweep costs about 0.45 microseconds per wrapper; the removed unit's
     handle id was not used again two seconds later.
-- **Released 0.9.0, PNG as a preview format** (2026-10-02, GitHub release `moonwell@0.9.0` on `abdb115`, a full
+- **Released 0.9.0, PNG as a preview format** (2026-10-02, GitHub release `moonwell@0.9.0` on `ae07103`, a full
   release marked latest; the workflow's install job ran the README's own line on both systems, and the line was fetched
   again from Windows PowerShell afterwards; a short design in chat, approved by the maintainer). No in-game run, by the
   maintainer's decision.
@@ -543,7 +543,7 @@ same bytes.
     pixels read back from `war3mapMap.tga`.
   - A minor version bump means every project must move: the 0.9.0 program refuses a project on a 0.8 package. The
     README has the three steps. A project linked to the checkout needs `pkl project resolve` (done for the gate map).
-- **Wrappers v0.9.1, the lost key release, released** (2026-10-02, GitHub pre-release `v0.9.1` on `24b1511`; tag
+- **Wrappers v0.9.1, the lost key release, released** (2026-10-02, GitHub pre-release `v0.9.1` on `667cdc5`; tag
   consumption passed; a probe, then a short design in chat).
   - The probe (`yue -e gate.lua probe-release`, `../wrappers-gate/PROBE-RELEASE-RESULTS.md`) measured on 3.0.0.24268:
     the game sends no release for a key let go while it takes no keyboard input, which was so after Alt+Tab, after a
@@ -556,7 +556,7 @@ same bytes.
   - What stays, and is in the README: `onKeyUp` never runs for a lost release, so a map's own "key is held" state can
     stick; and a press inside the window is still skipped. In single player, game time stands still in the menu and
     runs slower while the game is in the background (8.73 s counted as 3.19 s).
-- **Released 0.9.1, a pinned Pkl** (2026-10-03, GitHub release `moonwell@0.9.1` on `a9c4309`, a full release marked
+- **Released 0.9.1, a pinned Pkl** (2026-10-03, GitHub release `moonwell@0.9.1` on `2d5c978`, a full release marked
   latest; the workflow's install job ran the README's own line on both systems, and the line was fetched again
   afterwards; a short design in chat, approved by the maintainer). Users no longer install Pkl first. Gate steps 1
   and 2 passed; 3 to 13 were not re-run (nothing that reaches a map changed). A project on the 0.9.0 package needs
@@ -586,7 +586,7 @@ same bytes.
    orders everything toward the YueScript port of `wc3-lib` (4d): phase 0 free wins, phase 1 groundwork (static
    native-call check, performance measurement, port-needs inventory, probe batch), phase 2 the wrappers review and
    refactor, phase 3 the port, phase 4 the rest of the backlog. Its last table maps every backlog item to its place.
-   Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1), and so are 1.1 (wrappers `227e142`) and 1.2
+   Phase 0 is done (2026-09-30: Moonwell 0.5.1 and wrappers v0.5.1), and so are 1.1 (wrappers `216c4a3`) and 1.2
    (`docs/superpowers/research/2026-09-30-wrappers-performance.md`) and 1.3
    (`docs/superpowers/research/2026-09-30-wc3-lib-port-needs.md`). D1 is decided (option (c), a mix; damage event data
    goes in the wrappers), and 1.4 ran (port-needs note §6). Phase 1 is complete, and so is 2.1
@@ -613,7 +613,9 @@ Release tags must be `moonwell@<version>`: the Pkl package's `packageZipUrl` dow
   each with exact code and tests. Then implement task by task, test-first, with a review after each task and a final
   review. The maintainer approves each spec before it is implemented.
 - **Small bounded changes** get a short design in chat and the maintainer's approval first.
-- Commit directly on `main`. Claude pushes once the checks pass (the maintainer said so on 2026-10-02), then checks CI
+- Commit directly on `main`, as the maintainer's git identity, with no co-author trailer or other agent attribution in
+  commits, tags, releases or files (the maintainer's rule since 2026-10-03; the history was rewritten to remove the
+  old ones). The agent pushes once the checks pass (the maintainer said so on 2026-10-02), then checks CI
   (`gh run list`, `gh run view <id> --log-failed`; `gh` is at `C:\Program Files\GitHub CLI`). A release is a pushed tag
   (CONTRIBUTING, Publishing); the maintainer's gate comes first.
 
@@ -684,17 +686,17 @@ hides what it would have found. On Windows also run `GOOS=linux go vet ./...`: s
   becomes the character itself. Write such lines with a file-editing tool. `gofmt -l .` also looks into dot-folders
   such as `.superpowers/`.
 - **Windows consoles in tests:** see Plan 5d's note above on interrupting a program.
-- **Claude's tools see their own `%LOCALAPPDATA%\moonwell`:** the Claude desktop app is an MSIX package on the
+- **The agent's tools see their own `%LOCALAPPDATA%\moonwell`:** the agent's desktop app is an MSIX package on the
   maintainer's machine, so every process it starts reads and writes
-  `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Local\moonwell` in place of the real folder. The program,
-  the `yue` beside it and the compiler cache that Claude sees are its own copies, and gate step 1 run by Claude
+  `%LOCALAPPDATA%\Packages\<the app's package>\LocalCache\Local\moonwell` in place of the real folder. The program,
+  the `yue` beside it and the compiler cache that the agent sees are its own copies, and gate step 1 run by the agent
   updates only that copy. Never say what the maintainer has installed from what a tool reads there (2026-10-02: a
   working install was reported as failed, and a compiler "already cached" was downloaded again by the maintainer's
   `setup`). The repositories and `Documents` are not redirected.
 - **No `pkl` on PATH since 2026-10-03:** the winget Pkl was removed from the maintainer's machine once 0.9.1 pinned
-  one. For the checks (`MOONWELL_REQUIRE_TOOLS=1`) and `pkl project resolve`, add the pinned copy in Claude's cache to
-  the shell's PATH: `export PATH="$PATH:$(cygpath "$LOCALAPPDATA")/moonwell/pkl/0.32.1"` (the network test puts it
-  there).
+  one. For the checks (`MOONWELL_REQUIRE_TOOLS=1`) and `pkl project resolve`, add the pinned copy in the agent's cache
+  to the shell's PATH: `export PATH="$PATH:$(cygpath "$LOCALAPPDATA")/moonwell/pkl/0.32.1"` (the network test puts
+  it there).
 - **Never mark a Moonwell release as a pre-release:** the install line needs `releases/latest`, which skips them
   (CONTRIBUTING, Publishing). After a release, fetch the README's line itself, not only the versioned address.
 

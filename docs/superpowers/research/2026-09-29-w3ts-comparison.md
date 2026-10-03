@@ -3,7 +3,7 @@
 Context gathering, not a design: what the TypeScript library w3ts does, what we learn from it (especially about the
 issues our own gates found), where our wrappers are ahead, where they are behind, and the gaps inside what we already
 cover. Compared: w3ts 3.0.2 (`cipherxof/w3ts` master, a downloaded copy; types from `war3-types-strict` 1.33.0) and
-moonwell-wrappers v0.3.0 (commit `1277875`). Nothing here is a decision; section 7 lists follow-ups for the maintainer.
+moonwell-wrappers v0.3.0 (commit `5da96d8`). Nothing here is a decision; section 7 lists follow-ups for the maintainer.
 
 **Revised after the WCSharp comparison** (`2026-09-29-wcsharp-comparison.md`, §8). Where this note's conclusions changed:
 

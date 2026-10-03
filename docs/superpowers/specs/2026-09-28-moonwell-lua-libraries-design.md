@@ -37,7 +37,7 @@ Checked on 2026-09-28:
 - **GitHub tag archives.** `https://codeload.github.com/<owner>/<repo>/zip/refs/tags/<tag>` (tag URL-encoded; `@` as
   `%40`) and `https://github.com/<owner>/<repo>/archive/refs/tags/<tag>.zip` return the same bytes (HTTP 200). The zip
   has one top folder (`moonwell-moonwell-0.4.0/` for repository `moonwell`, tag `moonwell@0.4.0`), and its zip comment
-  is the tag's 40-character commit SHA (`a9a2e159c323c72d626d8193a3e80ad2ce50180f`). A missing tag returns HTTP 404.
+  is the tag's 40-character commit SHA (`27cd6ecf70f565375755e52ff9d8efab7a7d65fc`). A missing tag returns HTTP 404.
 - **`cli/src/yue/unzip.ts`** extracts stored and deflated entries of non-ZIP64 archives, which is what GitHub serves.
 - **The bundler's Lua lexer** (`cli/src/bundle/lexer.ts`) already finds `require("x")`/`require "x"` in any Lua,
   skipping comments and strings; `resolveGraph` follows them.
@@ -154,7 +154,7 @@ A committed JSON file at the project root:
       "github": "mdlsvensson/wc3-lib-yue",
       "tag": "v0.1.0",
       "dir": "src",
-      "commit": "a9a2e159c323c72d626d8193a3e80ad2ce50180f",
+      "commit": "27cd6ecf70f565375755e52ff9d8efab7a7d65fc",
       "files": "sha256:<hex>"
     }
   }
@@ -282,7 +282,7 @@ A new CONTRIBUTING step, in a throwaway `init --link` project on Warcraft III Re
 
 - A public GitHub repository with at least one tag, holding a small library (a `.lua` and a `.yue` module), for the
   network test and the gate: `mdlsvensson/moonwell-example-lib`, tag `v0.1.0` (commit
-  `13e35535c481fddd267533cc513f86b55b313b66`), with its modules under `src/`.
+  `c07126f080c3887ba667596d08aa21df3b3a20f7`), with its modules under `src/`.
 - One run of V1–V3 in the editor and the game during Plan 4a, and the release gate (§8).
 
 ## 11. Implementation order

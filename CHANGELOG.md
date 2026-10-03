@@ -105,7 +105,7 @@ Go counterpart (626 tests in 35 packages). While both programs existed, a confor
 copy of the same project and compared the exit code, every printed line, every written file, and the packed map
 unpacked: a new project, the gate map with both libraries, a project with every map setting, one with objects of every
 category, one with assets on World Editor 3.00's import file, a preview picture as TGA and as BLP, Lua modules with the
-example library by tag, and five failing projects. Its last green run on Ubuntu and Windows is commit `e786070`; it
+example library by tag, and five failing projects. Its last green run on Ubuntu and Windows is commit `f82dd66`; it
 found one difference on the way (the folder in `setup`'s PATH command when `yue.path` is set), which was fixed. The
 generators were checked the same way: the Go ones write `schema/generated/`, `natives.json`, `metadata.json` and
 `game-paths.txt` as the TypeScript ones did, from the same game exports.
@@ -122,7 +122,7 @@ run by hand, with the `moonwell` built from the release commit (CONTRIBUTING, st
   changing colour; the error position of a failing hook; a minified build played as a packed map; and the packed map
   opened in World Editor.
 - Steps 7 to 13 were not run by hand: they are covered by the conformance suite, whose last green run is commit
-  `e786070`.
+  `f82dd66`.
 
 Published 2026-10-02 as the GitHub release `moonwell@0.8.0`, built by the release workflow from the tag. Its last job
 ran the install line of the release on Ubuntu and Windows, then `moonwell init my-map` and `moonwell build`, on machines
@@ -288,7 +288,7 @@ editor completes the module's function and knows the global. `deno task check` a
 lua-language-server, run from the command line, resolves the module and flags an unknown global.
 
 Libraries (CONTRIBUTING step 12, second part) passed 2026-09-28 in a new project using
-`mdlsvensson/moonwell-example-lib` `v0.1.0` by tag: `check` downloads it and locks commit `13e3553`; the editor
+`mdlsvensson/moonwell-example-lib` `v0.1.0` by tag: `check` downloads it and locks commit `c07126f`; the editor
 completes `loud.shout`, and the game shows the shout. Deleting `.moonwell/` and checking again leaves `moonwell.lock`
 unchanged. Pointed at a local clone through `moonwell.local.pkl`, the game shows the changed `hello`, `moonwell.lock`
 stays unchanged, and a `loud.lua` the editor wrote beside `loud.yue` in the clone does not break `check`; switching back

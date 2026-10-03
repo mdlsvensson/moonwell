@@ -30,8 +30,7 @@ plan)**, 2b Map settings, 2c Object data. This plan must not touch map settings 
 - File system code is async (`Deno.readFile`, `Deno.lstat`, ...), matching the rest of `cli/src`.
 - Formatting and lint: `deno fmt` (line width 120) and `deno lint` must be clean. Run `deno fmt` on changed files
   before every commit.
-- Commits go directly on `main`. Every commit message ends with the trailer
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Commits go directly on `main`.
 - Settings-file rule (spec §3.3): the template's `moonwell.pkl` writes out everyday settings with their default values.
   Nothing is commented out unless it needs a World Editor step first. Lists in the schema are `List`, not `Listing`.
 - After changing anything under `template/`, run `deno task gen`. `cli/tests/unit/embedded.test.ts` fails when
@@ -198,7 +197,7 @@ above contain.
 deno fmt cli/src/assets/imports.ts cli/tests/unit/imports.test.ts
 deno lint
 git add cli/src/assets/imports.ts cli/tests/unit/imports.test.ts
-git commit -m "feat(assets): read and write war3map.imp" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(assets): read and write war3map.imp"
 ```
 
 ---
@@ -540,7 +539,7 @@ Expected: PASS (6 tests). On Windows, the case-collision half of the last test i
 deno fmt cli/src/assets cli/tests/unit/assets-collect.test.ts
 deno lint
 git add cli/src/assets/paths.ts cli/src/assets/collect.ts cli/tests/unit/assets-collect.test.ts
-git commit -m "feat(assets): validate asset paths and collect imports from assets/" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(assets): validate asset paths and collect imports from assets/"
 ```
 
 ---
@@ -993,7 +992,7 @@ Expected: all pass.
 deno fmt cli/src/assets cli/tests/unit/assets-plan.test.ts
 deno lint
 git add cli/src/assets/plan.ts cli/tests/unit/assets-plan.test.ts
-git commit -m "feat(assets): plan and apply asset imports with ownership and rollback" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(assets): plan and apply asset imports with ownership and rollback"
 ```
 
 ---
@@ -1187,7 +1186,7 @@ Expected: all pass. The pkl `init` test loads the new template, so the `assets` 
 deno fmt
 deno lint
 git add schema cli/src/project/project.ts cli/src/assets/collect.ts cli/tests template cli/src/embedded docs/superpowers/specs
-git commit -m "feat(assets): assets block in the manifest and the template" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(assets): assets block in the manifest and the template"
 ```
 
 ---
@@ -1339,7 +1338,7 @@ Expected: all pass, including the two new e2e tests.
 deno fmt
 deno lint
 git add cli/src/pipeline.ts cli/src/commands/check.ts cli/src/commands/dev.ts cli/tests
-git commit -m "feat(assets): import assets into builds; check and dev cover assets" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(assets): import assets into builds; check and dev cover assets"
 ```
 
 ---
@@ -1576,7 +1575,7 @@ Expected: all pass.
 
 ```bash
 git add cli/src/commands/assets.ts cli/src/main.ts cli/src/project-files.ts template/deno.json cli/src/embedded cli/tests README.md CHANGELOG.md
-git commit -m "feat(assets): assets:check and assets:sync commands" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(assets): assets:check and assets:sync commands"
 ```
 
 ---

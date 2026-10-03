@@ -19,8 +19,7 @@ v0.7.0, Moonwell 0.5.2).
 ## Global Constraints
 
 - **Repository:** `C:\Users\mdlsvensson\Repo\moonwell-systems`; Moonwell records in `C:\Users\mdlsvensson\Repo\moonwell`.
-  Commit on `main`, explicit paths only, each check run as its own command. End every commit message with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+  Commit on `main`, explicit paths only, each check run as its own command.
 - **Checks:** `yue -e tests/run.lua`, `yue -e tools/check.lua` (with `MOONWELL_LUAC`), `yue -e tools/integration.lua`
   (with `MOONWELL_LUALS`).
 - **Messages:** `[systems] <Class>.<method>: <problem>`. New texts: `expected Unit`, `expected Player`,

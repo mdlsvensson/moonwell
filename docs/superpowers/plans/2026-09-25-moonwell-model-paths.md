@@ -27,8 +27,7 @@ binding. The asset code this builds on is in `cli/src/assets/` (Plan 2a).
   `<file> is not a readable model: <problem>.` and a hint to re-export it.
 - File system code is async.
 - `deno fmt` (line width 120) and `deno lint` must be clean. Run `deno fmt` on changed files before every commit.
-- Commits go directly on `main`. Every commit message ends with the trailer
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Commits go directly on `main`.
 - Git Bash heredocs and `sed` turn `\\` into `\`. Write files that contain backslashes with a file-editing tool, then
   check each backslash.
 - After changing anything under `template/`, run `deno task gen`, because `cli/tests/unit/embedded.test.ts` checks it.
@@ -430,7 +429,7 @@ Expected: PASS (5 tests). Then run `deno task test`: all pass.
 deno fmt cli/src/models cli/tests/support/mdx.ts cli/tests/unit/model-mdx.test.ts
 deno lint
 git add cli/src/models cli/tests/support/mdx.ts cli/tests/unit/model-mdx.test.ts
-git commit -m "feat(models): read the file paths a binary MDX model references" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(models): read the file paths a binary MDX model references"
 ```
 
 ---
@@ -705,7 +704,7 @@ Expected: PASS (3 tests). Then run `deno task test`: all pass.
 deno fmt cli/src/models cli/tests/unit/model-mdl.test.ts
 deno lint
 git add cli/src/models cli/tests/unit/model-mdl.test.ts
-git commit -m "feat(models): read text MDL models and detect the format" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(models): read text MDL models and detect the format"
 ```
 
 ---
@@ -1018,7 +1017,7 @@ Expected: all pass.
 deno fmt
 deno lint
 git add cli/src/commands/assets-paths.ts cli/src/main.ts cli/src/project-files.ts template/deno.json cli/src/embedded cli/tests
-git commit -m "feat(assets): assets:paths lists the files a model references" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(assets): assets:paths lists the files a model references"
 ```
 
 ---
@@ -1121,7 +1120,7 @@ Expected: all pass.
 
 ```bash
 git add template/assets cli/src/embedded cli/tests/pkl/init.test.ts README.md CHANGELOG.md
-git commit -m "feat(template): World Editor icon folders under assets/" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(template): World Editor icon folders under assets/"
 ```
 
 ## Manual check (after all tasks; needs a real model)

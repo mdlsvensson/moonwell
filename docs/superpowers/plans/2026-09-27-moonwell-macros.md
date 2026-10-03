@@ -29,8 +29,8 @@ and the Plan 3c rows of §§8, 9 and 12. Plans 3a and 3b are done; 0.4.0 is rele
 - The macro's error text is exactly the spec's (§6):
   `$FourCC needs a string literal of exactly 4 characters, such as "hfoo".`
 - `$FourCC("hfoo")` and `$FourCC "hfoo"` compile to `1751543663`; `$FourCC "Hpal"` to `1215324524`.
-- Every task: failing test first, then code, then the full gate (below), then one commit on `main` ending with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Do not push; the maintainer pushes. Do not bump versions.
+- Every task: failing test first, then code, then the full gate (below), then one commit on `main`.
+  Do not push; the maintainer pushes. Do not bump versions.
 
 **Full gate (before every commit):**
 
@@ -263,9 +263,7 @@ Expected: PASS.
 
 ```bash
 git add cli/runtime/macros.yue tools/gen.ts cli/src/embedded/macros.ts cli/src/yue/macros.ts cli/tests/yue/macros.test.ts cli/tests/unit/embedded.test.ts
-git commit -m "feat(macros): the moonwell.macros module with \$FourCC
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(macros): the moonwell.macros module with \$FourCC"
 ```
 
 ---
@@ -507,9 +505,7 @@ macro yet, and `check` writes the module before compiling).
 
 ```bash
 git add cli/src/editor/refresh.ts cli/src/yue/compile.ts cli/src/lint/uses.ts cli/src/lint/unknown-globals.ts cli/src/pipeline.ts cli/tests/unit/editor-refresh.test.ts cli/tests/unit/lint-uses.test.ts cli/tests/unit/pipeline.test.ts cli/tests/yue/compile.test.ts cli/tests/yue/uses.test.ts
-git commit -m "feat(macros): every yue run finds moonwell.macros, and a changed macro redoes the caches
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(macros): every yue run finds moonwell.macros, and a changed macro redoes the caches"
 ```
 
 ---
@@ -590,9 +586,7 @@ Expected: PASS.
 
 ```bash
 git add template/src/main.yue cli/src/embedded/template.ts cli/tests/e2e/project.test.ts cli/tests/e2e/lint.test.ts
-git commit -m "feat(template): a standard Footman created with \$FourCC
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(template): a standard Footman created with \$FourCC"
 ```
 
 ---
@@ -700,9 +694,7 @@ Run: `deno fmt --check`.
 
 ```bash
 git add README.md CHANGELOG.md CONTRIBUTING.md AGENTS.md
-git commit -m "docs: macros
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "docs: macros"
 ```
 
 ---

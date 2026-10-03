@@ -406,9 +406,7 @@ example message.
 
 ```bash
 git add src tests tools
-git commit -m "feat: registry lookup, weak unit cache and widget layer
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: registry lookup, weak unit cache and widget layer"
 ```
 
 ---
@@ -729,9 +727,7 @@ Run the full check list. Expected: all pass.
 
 ```bash
 git add src tests
-git commit -m "feat: add Item and Destructable wrappers
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add Item and Destructable wrappers"
 ```
 
 ---
@@ -1105,9 +1101,7 @@ Run the full check list. Expected: all pass (the new nil-filter lines produce no
 
 ```bash
 git add src tests
-git commit -m "feat: add Rect, Region and Force wrappers
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add Rect, Region and Force wrappers"
 ```
 
 ---
@@ -1670,9 +1664,7 @@ Run the full check list. Expected: all pass.
 
 ```bash
 git add src tests
-git commit -m "feat: deepen Unit with hero, ability, inventory, state and order methods
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: deepen Unit with hero, ability, inventory, state and order methods"
 ```
 
 ---
@@ -1865,9 +1857,7 @@ Run the full check list. Expected: all pass.
 
 ```bash
 git add src tests
-git commit -m "feat: deepen Player with resources, alliances, tech and slot methods
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: deepen Player with resources, alliances, tech and slot methods"
 ```
 
 ---
@@ -2403,9 +2393,7 @@ trigger.lua no longer has a local named Player).
 
 ```bash
 git add src tests
-git commit -m "feat: trigger events, predicate conditions and removable actions
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: trigger events, predicate conditions and removable actions"
 ```
 
 ---
@@ -2696,9 +2684,7 @@ Run the full check list. Expected: all pass.
 
 ```bash
 git add src tests
-git commit -m "feat: group enumerations with Lua filters, forEach and first
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: group enumerations with Lua filters, forEach and first"
 ```
 
 ---
@@ -2998,9 +2984,7 @@ LuaLS does not flag `trigger:removeAction(trigger:addCondition(...))`, add the a
 
 ```bash
 git add tests tools examples src
-git commit -m "test: editor fixtures, trigger-only bundle check and v0.2.0 gate example
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "test: editor fixtures, trigger-only bundle check and v0.2.0 gate example"
 ```
 
 ---
@@ -3180,15 +3164,13 @@ Run `deno fmt` (formats the markdown tables), then the full check list. Expected
 
 ```bash
 git add README.md CHANGELOG.md CONTRIBUTING.md AGENTS.md
-git commit -m "docs: document wrappers v0.2.0 and its release gate
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "docs: document wrappers v0.2.0 and its release gate"
 ```
 
 - [ ] **Step 6: Independent final review**
 
 Request a fresh-context review (superpowers:requesting-code-review) of the whole v0.2.0 diff
-(`git diff 3a62111..HEAD` in `moonwell-wrappers`) against the spec, with the "Review focus" list above. Fix important
+(`git diff e820feb..HEAD` in `moonwell-wrappers`) against the spec, with the "Review focus" list above. Fix important
 findings test-first, re-run all checks, and commit fixes separately.
 
 - [ ] **Step 7: Update Moonwell `AGENTS.md` and this plan**
@@ -3220,9 +3202,7 @@ tasks), then commit in Moonwell:
 
 ```bash
 git add AGENTS.md docs/superpowers/plans/2026-09-28-moonwell-wrappers-broad.md
-git commit -m "docs: record wrappers v0.2.0 implementation state
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "docs: record wrappers v0.2.0 implementation state"
 ```
 
 - [ ] **Step 8: Hand off**
@@ -3233,17 +3213,17 @@ in-game gate (steps 1–9 in CONTRIBUTING, including LAN). Do not push, tag or p
 ## Execution ledger
 
 - 2026-09-28: executed with superpowers:subagent-driven-development (a fresh Opus implementer per task, a task review
-  after each, one final whole-branch review). Commits on `main` in `../moonwell-wrappers`, base `4f91f8d`.
-- Tasks 1–6 and 8: clean reviews (commits `1df3ebe`, `cfc941a`, `95d594f`, `b9b90a5`, `b2f851d`, `9443c7f`, `737d2ab`).
-- Task 7: one fix round (`f1b28ba`). Ruling: `forEach` and group filters wrap the whole snapshot before any callback,
+  after each, one final whole-branch review). Commits on `main` in `../moonwell-wrappers`, base `64712cc`.
+- Tasks 1–6 and 8: clean reviews (commits `b1de7b7`, `9ed343c`, `e6bd3de`, `4e4c1fe`, `33b94be`, `09ebc25`, `e8a7c12`).
+- Task 7: one fix round (`974b278`). Ruling: `forEach` and group filters wrap the whole snapshot before any callback,
   overriding this plan's lazy wrapping; spec §8 says `forEach` iterates a `getUnits()` snapshot, and lazy wrapping
   revived a unit removed mid-loop as a live wrapper.
 - Task 8 deviations accepted: the need-check-nil fixture goes through a local (LuaLS 3.19.1 does not flag chained
   calls); the gate's churn probe allocates throwaway tables. Ruling: the gate adds a self-removing chat action.
-- Task 9: Steps 1–5 in `2e6776a`, one fix round (`88be7ef`). Ruling: the gate's weak cache probe creates and removes
+- Task 9: Steps 1–5 in `482327c`, one fix round (`90cdbb6`). Ruling: the gate's weak cache probe creates and removes
   units only at fixed times and only prints GC and check results; the plan's GC-gated creation would itself desync the
   LAN gate. `deno fmt` fixed the pre-existing README formatting.
-- Final review: ready "with fixes"; one fix wave (`830cf31`) switched the gate ability to Storm Bolt (Slow has one
+- Final review: ready "with fixes"; one fix wave (`faa54f3`) switched the gate ability to Storm Bolt (Slow has one
   level), added a self-removing condition to the gate and stand-in tests, documented that weak tables keyed by widget
   wrappers are nondeterministic, and made group filter errors blame the caller. Scoped re-review: all addressed.
 - Result: 69 behavior tests in 13 suites, Lua 5.3.6 syntax, integration (8 negative diagnostics, Unit-only and
@@ -3251,8 +3231,8 @@ in-game gate (steps 1–9 in CONTRIBUTING, including LAN). Do not push, tag or p
   library files, so each task also ran LuaLS directly over `src`.
 - Pending (maintainer): the in-game gate in the wrappers CONTRIBUTING, including the LAN run, then tag consumption.
 - 2026-09-29 in-game gate: the first run showed that text printed while the map loads never reaches the log; the gate
-  now starts from a zero-second timer (`5417ce6`). Passed on game 3.0.0.24268: startup messages, events, cleanups,
+  now starts from a zero-second timer (`7f4261f`). Passed on game 3.0.0.24268: startup messages, events, cleanups,
   probes, minified, World Editor, and the weak cache probe (`collected=true stale=true identity=true`). The second
   `-gate` was not observed. The two-player run is deferred to the pre-1.0 online checks (LAN removed from the game).
-- Released 2026-09-29: GitHub pre-release `v0.2.0` on `7baa81e`; tag consumption passed (lock unchanged after cache
-  removal). Results recorded in `63b2933`.
+- Released 2026-09-29: GitHub pre-release `v0.2.0` on `4b2c845`; tag consumption passed (lock unchanged after cache
+  removal). Results recorded in `b661fbd`.

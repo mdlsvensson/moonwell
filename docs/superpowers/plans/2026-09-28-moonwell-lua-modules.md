@@ -32,8 +32,8 @@ after it.
 - Module names: a path under its folder with `/` as `.`; folder and file names cannot contain dots. The error text
   stays `Module file and folder names cannot contain dots.` with the hint
   ``Dots separate module names in `import`; rename the file or folder.``
-- Every task: failing test first, then code, then the full gate (below), then one commit on `main` ending with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Do not push; the maintainer pushes. Do not bump versions.
+- Every task: failing test first, then code, then the full gate (below), then one commit on `main`.
+  Do not push; the maintainer pushes. Do not bump versions.
 
 **Full gate (before every commit):**
 
@@ -48,7 +48,7 @@ deno task check && deno task lint && deno fmt --check && deno task test && deno 
 | V1 lua-language-server resolves `lua/` modules through `runtime.path` | Yes. With `lua/?.lua` and `lua/?/init.lua` in `runtime.path`, `require("tools")` resolved to `lua/tools.lua` and `require("kit")` to `lua/kit/init.lua` (a call with a wrong argument type against each `---@param` was flagged), and a global defined at the top of `lua/counter.lua` was not flagged while an unknown one was. Checked with sumneko.lua 3.19.1's server `--check`. |
 | V2 it resolves a module under a `workspace.library` folder | Yes: `require("core.scheduler")` resolved to `.moonwell/lua/core/scheduler.lua` with `.moonwell/lua` in `workspace.library` (Plan 4b uses this). |
 | V3 the game runs a bundled global-style Lua library | Moved to the release gate (Task 7): it needs this plan's bundling first. Plain Lua semantics: a global assigned inside the module's wrapper function is a real global. |
-| V4 annotated and lightweight tags both give the commit in the archive comment | Yes: `IppClub/YueScript` `v0.34.2` (annotated, tag object `e346f11…`) gives commit `3c5cbf6fc9ddff95798b9853ccb74607a9a6783d`; `mdlsvensson/moonwell` `moonwell@0.4.0` (lightweight) gives `a9a2e15…` (Plan 4b). |
+| V4 annotated and lightweight tags both give the commit in the archive comment | Yes: `IppClub/YueScript` `v0.34.2` (annotated, tag object `e346f11…`) gives commit `3c5cbf6fc9ddff95798b9853ccb74607a9a6783d`; `mdlsvensson/moonwell` `moonwell@0.4.0` (lightweight) gives `27cd6ec…` (Plan 4b). |
 
 ## Decisions this plan adds to the spec
 
@@ -338,9 +338,7 @@ Expected: PASS (the compile test "rejects dots in file names" still passes throu
 
 ```bash
 git add cli/src/bundle/modules.ts cli/src/yue/compile.ts cli/tests/unit/modules.test.ts
-git commit -m "feat(lua): collect modules from src/ and lua/, one namespace
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(lua): collect modules from src/ and lua/, one namespace"
 ```
 
 ---
@@ -458,9 +456,7 @@ Expected: PASS.
 
 ```bash
 git add cli/src/pipeline.ts cli/src/bundle/emit.ts cli/src/bundle/graph.ts cli/runtime/moonwell.lua cli/src/embedded/runtime.ts cli/tests/unit/emit.test.ts cli/tests/yue/runtime.test.ts
-git commit -m "feat(lua): bundle lua/ modules, keeping their lines in minified builds
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(lua): bundle lua/ modules, keeping their lines in minified builds"
 ```
 
 ---
@@ -628,9 +624,7 @@ Expected: PASS.
 
 ```bash
 git add cli/src/lint/lua-globals.ts cli/src/lint/unknown-globals.ts cli/src/pipeline.ts cli/tests/unit/lua-globals.test.ts cli/tests/unit/lint-unknown-globals.test.ts
-git commit -m "feat(lua): globals a Lua module defines at its top level are known
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(lua): globals a Lua module defines at its top level are known"
 ```
 
 ---
@@ -791,9 +785,7 @@ Expected: PASS.
 
 ```bash
 git add template/.luarc.json template/lua/.gitkeep cli/src/embedded/template.ts cli/src/editor/scaffold.ts cli/src/commands/setup.ts cli/src/commands/dev.ts cli/tests/unit/editor-scaffold.test.ts cli/tests/unit/dev.test.ts
-git commit -m "feat(lua): lua/ in new projects, .luarc.json and dev; setup adds the paths to older projects
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat(lua): lua/ in new projects, .luarc.json and dev; setup adds the paths to older projects"
 ```
 
 ---
@@ -888,9 +880,7 @@ commit, and say so in the report.
 
 ```bash
 git add cli/tests/e2e/lua.test.ts
-git commit -m "test(lua): end-to-end Lua modules
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "test(lua): end-to-end Lua modules"
 ```
 
 ---
@@ -979,9 +969,7 @@ Run: `deno fmt --check` (fix with `deno fmt <file>` if it reflows).
 
 ```bash
 git add README.md CHANGELOG.md CONTRIBUTING.md AGENTS.md
-git commit -m "docs: Lua modules
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "docs: Lua modules"
 ```
 
 ---

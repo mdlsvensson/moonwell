@@ -24,8 +24,8 @@ the firing is over. `sync.lua` checks the prefix and a 255-byte limit before `Bl
 ## Global Constraints
 
 - **Repository and commits:** code is in `C:\Users\mdlsvensson\Repo\moonwell-wrappers`; Moonwell records in
-  `C:\Users\mdlsvensson\Repo\moonwell`. Commit on `main`, staging explicit paths only (never `git add -A`). End every
-  commit message with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Commit only when the task's checks pass.
+  `C:\Users\mdlsvensson\Repo\moonwell`. Commit on `main`, staging explicit paths only (never `git add -A`). Commit
+  only when the task's checks pass.
 - **Tooling:** no Node.js, no npm packages, no `node:` or `npm:` specifiers.
 - **Additions only:** no existing public signature, error message or behavior changes.
 - **Error locations:** every error raised by the new code points at the line that called the public function or method.
