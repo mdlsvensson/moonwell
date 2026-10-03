@@ -74,7 +74,7 @@ program and the package must have the same major and minor version; `moonwell` r
 of the two to change. To install one version, use its own script:
 
 ```powershell
-irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.9.0/install.ps1 | iex
+irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.9.1/install.ps1 | iex
 ```
 
 To move a project to a newer Moonwell, install that version, change the package's version in the project's
@@ -85,7 +85,7 @@ To move a project to a newer Moonwell, install that version, change the package'
 Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four steps:
 
 1. Install `moonwell`, as above.
-2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.9.0`.
+2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.9.1`.
 3. Run `pkl project resolve`.
 4. Delete `deno.json` and `deno.lock`. Where you ran `deno task build`, run `moonwell build`; the same goes for every
    other command.

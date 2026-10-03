@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.1 (2026-10-03)
 
 - **Pkl no longer has to be installed first.** Moonwell uses the `pkl` on the PATH when it is Pkl 0.32 or newer, as
   before. Otherwise it downloads Pkl 0.32.1 once into its cache (about 100 MB, checked against a pinned checksum) and
@@ -8,9 +8,16 @@
 - An older `pkl` on the PATH is reported with a warning, since a `pkl` command you type yourself still runs it.
 - `moonwell setup` copies Moonwell's own Pkl to the cache's `bin` folder, next to `yue`, so `pkl project resolve` works
   from a shell. On Windows the install line already put that folder on the PATH; elsewhere `setup` prints the command
-  that does.
+  that does. It does so before it reads the project, so it works in a project that is still on an older package.
 - Moonwell downloads Pkl for Windows and Linux on x86-64. On another system (a Moonwell built from source), a missing
   or older `pkl` fails as before, with the install hint.
+- **Nothing to change in a project:** this version reads projects on the `moonwell@0.9.0` package as they are.
+
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-03 on Windows, and CI passed on Ubuntu and Windows. Steps 3 to 13 were not
+re-run: nothing that reaches a map changed. The program was also run with no `pkl` on the PATH and an empty cache:
+`init --link` downloaded Pkl 0.32.1 once, `setup` copied it to `bin` and printed the PATH command, and `check` passed.
 
 ## 0.9.0 (2026-10-02)
 

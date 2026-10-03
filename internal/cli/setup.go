@@ -22,15 +22,17 @@ import (
 // .moonwell/types and the macro module, and then syncs the manifest's libraries into .moonwell/libraries (and
 // moonwell.lock) and their Lua modules into .moonwell/lua. It returns the compiler's path.
 func Setup(ctx context.Context, env *pipeline.Env) (string, error) {
-	p, err := pipeline.LoadProject(ctx, env)
-	if err != nil {
-		return "", err
-	}
+	// Before the manifest: a project on another Moonwell's package does not load, and moving it takes a
+	// `pkl project resolve` that must find Pkl.
 	program, err := env.Pkl(ctx)
 	if err != nil {
 		return "", err
 	}
 	if err := pkl.KeepForShell(ctx, program, env.PklDeps(), runtime.GOOS); err != nil {
+		return "", err
+	}
+	p, err := pipeline.LoadProject(ctx, env)
+	if err != nil {
 		return "", err
 	}
 	created, err := project.EnsureLocalManifest(env.Root)
