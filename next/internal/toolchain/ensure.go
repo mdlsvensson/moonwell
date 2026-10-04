@@ -153,7 +153,8 @@ func machine() string {
 
 // ---- errors ----
 
-// errUnknownVersion names the manifest, where a project says which compiler it wants.
+// errUnknownVersion names the manifest, where a project says which compiler it wants. Only the compiler's
+// version comes from a manifest: an unknown version of Pkl is a caller's bug, and is worded the same.
 func errUnknownVersion(tool Tool, version string) error {
 	known := slices.Sorted(maps.Keys(tool.Versions))
 	return &diag.Error{

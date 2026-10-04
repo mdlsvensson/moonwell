@@ -21,3 +21,12 @@ func NeedPkl(t testing.TB) string {
 	t.Skip("pkl is not on the PATH")
 	return ""
 }
+
+// NeedNetwork skips the test unless MOONWELL_NETWORK_TESTS=1, which CI sets: a test that downloads runs only
+// where it is asked for.
+func NeedNetwork(t testing.TB) {
+	t.Helper()
+	if os.Getenv("MOONWELL_NETWORK_TESTS") != "1" {
+		t.Skip("set MOONWELL_NETWORK_TESTS=1 to run the tests that use the network")
+	}
+}

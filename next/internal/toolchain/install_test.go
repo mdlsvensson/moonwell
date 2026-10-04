@@ -263,6 +263,29 @@ func TestAFolderInThePlaceOfTheInstallThatHoldsNoProgramIsRefusedByItsName(t *te
 	}
 }
 
+// A move that fails while nothing is at the place of the install is the system's failure: there is no folder to
+// remove, so the hint does not ask for it.
+func TestAMoveIntoPlaceThatFailsWithNothingInItsWayIsRefusedWithTheSystemsReason(t *testing.T) {
+	e, _, _, tool := yueInstaller(t, "")
+	e.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
+		// The staging folder goes away under the install, so the rename has nothing to move.
+		if err := os.RemoveAll(filepath.Dir(program)); err != nil {
+			t.Error(err)
+		}
+		return yueOf("9.9.9")(ctx, program, args, options)
+	}
+	_, err := Ensure(background, e, tool, "9.9.9")
+	failure := asError(t, err, "a move that fails")
+	target := filepath.Join(e.CacheDir, "yue", "9.9.9")
+	if !strings.HasPrefix(failure.Msg, "Installing YueScript failed: ") || failure.File != target ||
+		failure.Hint == "" || strings.Contains(failure.Hint, "Remove ") || failure.Cause == nil {
+		t.Errorf("error = %+v, at %q, with the hint %q", failure, failure.File, failure.Hint)
+	}
+	if left := holds(t, filepath.Join(e.CacheDir, "yue")); len(left) != 0 {
+		t.Errorf("something was left in the cache: %q", left)
+	}
+}
+
 func TestACacheFolderThatCannotBeMadeIsRefusedByItsName(t *testing.T) {
 	e, _, _, tool := yueInstaller(t, "")
 	e.Run = noProgram(t)
@@ -305,7 +328,7 @@ func TestAStagingFolderThatCannotBeRemovedIsNamedInAWarning(t *testing.T) {
 	}
 }
 
-func TestTheInstalledProgramMayBeRunByEveryUser(t *testing.T) {
+func TestTheInstalledProgramMayBeRun(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("Windows keeps no permission to run a file")
 	}

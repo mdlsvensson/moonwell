@@ -1,11 +1,13 @@
 package toolchain
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -25,6 +27,9 @@ import (
 // what each program prints, the platform) and one cache folder, which is emptied between the two, so that a path
 // in a message or a logged line is the same in both.
 //
+//   - The other tree's lists of downloads, yue.Known and pkl.Known, against YueScript.Versions and Pkl.Versions:
+//     each download's version, platform, address, checksum, kind of archive and program name, six of them, and
+//     the two versions the trees take unless told otherwise.
 //   - The other tree's yue.Ensure against Compiler, and its pkl.Ensure against PklProgram: what is refused; then
 //     the program returned, the addresses asked and the programs run with their arguments in their order, and
 //     every file and folder of the cache with its bytes; and the lines logged, byte for byte. The cases are every
@@ -49,8 +54,9 @@ import (
 //   - The version a downloaded program reports: the other tree says "Downloaded compiler reports", and for Pkl
 //     shows the whole line the program printed where this tree shows the version in it, or "unknown". The kind,
 //     the file, the hint and the version expected must be the other tree's, and the version this tree names
-//     must be in what the other tree shows. Pinned by TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler and
-//     TestPklProgramRefusesADownloadThatFailsOrIsNotThePinnedPkl.
+//     must be the one in what the other tree shows, by the other tree's own expression (versionShown):
+//     "unknown" only where that names none. Pinned by TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler
+//     and TestPklProgramRefusesADownloadThatFailsOrIsNotThePinnedPkl.
 //
 // Not among the inputs:
 //
@@ -68,7 +74,12 @@ import (
 //   - White space outside ASCII around a version, and more than one known version whose order by bytes is not the
 //     order by UTF-16 units: this tree reads ASCII's white space and sorts by bytes
 //     (TestReportedVersionFindsTheVersionInWhatAProgramPrints, TestTheKnownVersionsAreListedInByteOrder).
-//   - The version of a program on standard error for Pkl: the other tree reads Pkl's standard output only.
+//   - A Pkl that prints its version on standard error. This tree reads what a program prints on both streams,
+//     for both tools; the other tree read Pkl's standard output only, and the compiler's on both. The row "Pkl,
+//     its version on standard error" of TestReportedVersionFindsTheVersionInWhatAProgramPrints pins the one
+//     rule. Every program of the cases here prints on standard output.
+//   - A move into place that the system refuses with nothing in its way: the other tree passes the system's
+//     error on (TestAMoveIntoPlaceThatFailsWithNothingInItsWayIsRefusedWithTheSystemsReason).
 
 // answer is what happens when a program is run on a machine.
 type answer struct {
@@ -251,12 +262,12 @@ func (c *tally) refusals(t *testing.T, what string, want, got error) (bothFailed
 }
 
 // sameVersions checks the two messages of a downloaded program that reports another version: both end with the
-// same version expected, the version this tree names is in what the other tree shows or is "unknown", and the
-// messages differ.
+// same version expected, the version this tree names is the one in what the other tree shows, "unknown" only
+// where that names none, and the messages differ.
 func sameVersions(t *testing.T, what, want, got string) {
 	t.Helper()
 	const before, between = " reports version ", ", expected "
-	_, wantRest, wantOK := strings.Cut(want, before)
+	wantTool, wantRest, wantOK := strings.Cut(want, before)
 	gotTool, gotRest, gotOK := strings.Cut(got, before)
 	wantShown, wantExpected, wantSplit := cutLast(wantRest, between)
 	gotShown, gotExpected, gotSplit := cutLast(gotRest, between)
@@ -265,11 +276,29 @@ func sameVersions(t *testing.T, what, want, got string) {
 		t.Errorf("%s: not two messages of a reported version: want %q, got %q", what, want, got)
 	case wantExpected != gotExpected:
 		t.Errorf("%s: the version expected differs: want %q, got %q", what, want, got)
-	case gotShown != "unknown" && !strings.Contains(wantShown, gotShown):
-		t.Errorf("%s: the version reported differs: want %q, got %q", what, want, got)
+	case gotShown != versionShown(wantTool, wantShown):
+		t.Errorf("%s: the version reported differs: the other tree shows %q, which names %q, and this tree names %q",
+			what, wantShown, versionShown(wantTool, wantShown), gotShown)
 	case want == got:
 		t.Errorf("%s: the message is the other tree's, so it is none that this tree words anew: %q", what, want)
 	}
+}
+
+// otherTreesPklVersion is the other tree's expression for the version in the line a Pkl prints, written out
+// here: this tree's own expression is what the comparison holds to it.
+var otherTreesPklVersion = regexp.MustCompile(`Pkl (\d+)\.(\d+)\.(\d+)`)
+
+// versionShown is the version in what the other tree shows of a downloaded program, as this tree must name it:
+// "unknown" where it names none. For the compiler the other tree shows the version itself, or "unknown"; for
+// Pkl it shows the line the program printed, in which its expression finds the version.
+func versionShown(tool, shown string) string {
+	if tool == "Downloaded compiler" {
+		return shown
+	}
+	if match := otherTreesPklVersion.FindStringSubmatch(shown); match != nil {
+		return strings.Join(match[1:], ".")
+	}
+	return "unknown"
 }
 
 // cutLast cuts text around the last separator in it.
@@ -325,6 +354,50 @@ func (c tally) check(t *testing.T, want tally) {
 	t.Helper()
 	if c != want {
 		t.Errorf("the oracle compared %+v, want %+v", c, want)
+	}
+}
+
+// ---- the pinned downloads ----
+
+// pinned is one download of a tool, as both trees list it.
+type pinned struct {
+	Tool, Version, Platform, URL, SHA256, Archive, Binary string
+}
+
+// byToolVersionAndPlatform sorts downloads, which both trees keep in maps.
+func byToolVersionAndPlatform(downloads []pinned) []pinned {
+	slices.SortFunc(downloads, func(a, b pinned) int {
+		return cmp.Or(cmp.Compare(a.Tool, b.Tool), cmp.Compare(a.Version, b.Version), cmp.Compare(a.Platform, b.Platform))
+	})
+	return downloads
+}
+
+// The lists of downloads are what every install trusts: an address and the checksum its file must have. A
+// character that changes in one of them here fails this test for as long as the other tree is there.
+func TestThePinnedDownloadsAgainstTheOtherTreesKnown(t *testing.T) {
+	var want, got []pinned
+	for version, platforms := range oldyue.Known {
+		for platform, asset := range platforms {
+			want = append(want, pinned{"yue", version, platform, asset.URL, asset.SHA256, asset.Archive, asset.Binary})
+		}
+	}
+	// The other tree lists Pkl's one version by platform, as bare executables: its assets name no archive.
+	for platform, asset := range oldpkl.Known {
+		want = append(want, pinned{"pkl", oldpkl.Version, platform, asset.URL, asset.SHA256, "", asset.Binary})
+	}
+	for _, tool := range []Tool{YueScript, Pkl} {
+		for version, platforms := range tool.Versions {
+			for platform, asset := range platforms {
+				got = append(got, pinned{tool.Name, version, platform, asset.URL, asset.SHA256, asset.Archive, asset.Binary})
+			}
+		}
+	}
+	oracle.Values(t, "the pinned downloads", byToolVersionAndPlatform(want), byToolVersionAndPlatform(got))
+	oracle.Bytes(t, "the compiler's version unless a manifest names one", []byte(oldyue.DefaultVersion), []byte(YueVersion))
+	oracle.Bytes(t, "the version of Pkl", []byte(oldpkl.Version), []byte(PklVersion))
+	// Two versions of the compiler and one of Pkl, each for Windows and for Linux.
+	if len(want) != 6 || len(got) != 6 {
+		t.Errorf("the oracle compared %d downloads of the other tree with %d of this one, want 6 and 6", len(want), len(got))
 	}
 }
 

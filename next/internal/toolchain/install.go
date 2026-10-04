@@ -80,7 +80,7 @@ func (in install) discard(staging string) {
 	}
 }
 
-// unpack puts the program of the download into staging, where every user may run it.
+// unpack puts the program of the download into staging, as a file that may be run.
 func (in install) unpack(download []byte, staging string) error {
 	staged := in.programIn(staging)
 	if err := os.MkdirAll(filepath.Dir(staged), 0o777); err != nil {
@@ -92,7 +92,7 @@ func (in install) unpack(download []byte, staging string) error {
 	if !fsx.Exists(staged) {
 		return errNoProgram(in.tool, in.asset.Binary)
 	}
-	// Windows keeps no permission to run a file; every other system needs it set.
+	// Windows keeps no permission to run a file; on every other system the program may be run once it is set.
 	if runtime.GOOS == "windows" {
 		return nil
 	}
@@ -204,12 +204,20 @@ func (in install) askVersion(staging string) error {
 // moveIntoPlace renames the staging folder to the target and returns the program there.
 func (in install) moveIntoPlace(staging string) (string, error) {
 	program := in.programIn(in.target)
-	// A failed rename with the program in place means another process finished the same install first: theirs is
-	// kept, and passed the same checks.
-	if err := os.Rename(staging, in.target); err != nil && !fsx.Exists(program) {
+	err := os.Rename(staging, in.target)
+	switch {
+	case err == nil:
+		return program, nil
+	case fsx.Exists(program):
+		// A failed rename with the program in place means another process finished the same install first: theirs
+		// is kept, and passed the same checks.
+		return program, nil
+	case fsx.Exists(in.target):
 		return "", errInTheWay(in.tool, in.target, err)
 	}
-	return program, nil
+	// Nothing is in the way, so the system refused the move itself: Windows does while another program, a virus
+	// scanner for one, has the fresh file open.
+	return "", errNotInstalled(in.tool, in.target, err)
 }
 
 // ---- errors ----
@@ -255,7 +263,7 @@ func errOtherVersion(tool Tool, found, version string) error {
 	}
 }
 
-// errNotInstalled is a file or a folder of the cache that could not be written.
+// errNotInstalled is a file or a folder of the cache that could not be written, or moved into place.
 func errNotInstalled(tool Tool, path string, cause error) error {
 	return &diag.Error{
 		Msg:   "Installing " + tool.Title + " failed: " + fsx.Reason(cause),
@@ -265,7 +273,7 @@ func errNotInstalled(tool Tool, path string, cause error) error {
 	}
 }
 
-// errInTheWay is a target that could not be made and holds no program: something else is in its place.
+// errInTheWay is a target that is there and holds no program, so the install cannot be moved to it.
 func errInTheWay(tool Tool, target string, cause error) error {
 	return &diag.Error{
 		Msg:   "Installing " + tool.Title + " failed: " + fsx.Reason(cause),

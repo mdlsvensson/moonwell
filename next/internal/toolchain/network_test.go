@@ -2,11 +2,11 @@ package toolchain_test
 
 import (
 	"context"
-	"os"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/env"
+	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/toolchain"
 	"github.com/mdlsvensson/moonwell/next/internal/tooltest"
 )
@@ -15,9 +15,7 @@ import (
 // with the checksums and the addresses the package carries, each run once to read its version. A program that is
 // in the user's cache is not downloaded again. It is in a test package of its own, as tooltest imports toolchain.
 func TestThePinnedProgramsAreDownloadedForRealAndReportTheirVersions(t *testing.T) {
-	if os.Getenv("MOONWELL_NETWORK_TESTS") != "1" {
-		t.Skip("set MOONWELL_NETWORK_TESTS=1 to run the test that uses the network")
-	}
+	testkit.NeedNetwork(t)
 	ctx := context.Background()
 	world := env.New("", env.NewLogger(func(string) {}, ""))
 

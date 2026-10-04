@@ -1,8 +1,6 @@
 package toolchain
 
 import (
-	"archive/zip"
-	"bytes"
 	"context"
 	"errors"
 	"io/fs"
@@ -55,24 +53,14 @@ func noProgram(t testing.TB) env.RunFunc {
 	return untouched.Run
 }
 
-// zipOf is a zip archive of entries, each a name and what the file holds, in the order given.
-func zipOf(t testing.TB, entries ...string) []byte {
+// zipOf is a zip archive of files, each a name and what the file holds, in the order given.
+func zipOf(t testing.TB, files ...string) []byte {
 	t.Helper()
-	var out bytes.Buffer
-	writer := zip.NewWriter(&out)
-	for i := 0; i < len(entries); i += 2 {
-		file, err := writer.CreateHeader(&zip.FileHeader{Name: entries[i], Method: zip.Deflate})
-		if err != nil {
-			t.Fatal(err)
-		}
-		if _, err := file.Write([]byte(entries[i+1])); err != nil {
-			t.Fatal(err)
-		}
+	var entries []testkit.ZipEntry
+	for i := 0; i < len(files); i += 2 {
+		entries = append(entries, testkit.ZipEntry{Name: files[i], Data: []byte(files[i+1]), Deflate: true})
 	}
-	if err := writer.Close(); err != nil {
-		t.Fatal(err)
-	}
-	return out.Bytes()
+	return testkit.Zip(t, "", entries...)
 }
 
 // world is a test world on Linux whose one download is body, at address. It counts the downloads, and no program

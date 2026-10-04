@@ -1,8 +1,8 @@
 // Package testkit holds what Moonwell's tests share: files and folders written and read back and the fixtures World
 // Editor saved, files held so that they cannot be read or written (MakeUnreadable, MakeUnwritable), a test world
 // for the commands and the logger that keeps its lines (Recorder), byte helpers, builders for map info, object
-// files, MDX models and pictures, a reader of the archives Moonwell writes, and the way to a program a test needs
-// (NeedPkl).
+// files, MDX models, pictures and zip archives (Zip), a reader of the archives Moonwell writes, and the way to
+// what a test needs from the machine: a program (NeedPkl) and the network (NeedNetwork).
 //
 // It is imported by tests only. Of Moonwell's packages it knows env, binio and the formats it builds or reads
 // (war3/objmod and war3/mpq), so the tests of those two packages are external test packages. Most helpers take a

@@ -258,6 +258,8 @@ func TestReportedVersionFindsTheVersionInWhatAProgramPrints(t *testing.T) {
 		{"another program", YueScript, "not a compiler", "", ""},
 		{"nothing", YueScript, "", "", ""},
 		{"Pkl", Pkl, "Pkl 0.32.1 (Windows 10.0, native)\n", "", "0.32.1"},
+		// One rule for both tools: what a program prints is read on both streams.
+		{"Pkl, its version on standard error", Pkl, "", "Pkl 0.32.1 (Linux 6.8, native)\n", "0.32.1"},
 		{"Pkl without a third number", Pkl, "Pkl 0.32", "", ""},
 	}
 	for _, tc := range tests {
