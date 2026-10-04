@@ -1,7 +1,10 @@
-// Package testkit holds what Moonwell's tests share: the folder of the checkout, files and folders written and read
-// back, the files World Editor saved, builders for binary data, a recording logger and a test world for the commands.
-// Its helpers take a testing.TB and fail the test themselves. It is imported by tests only, and it knows no package
-// of Moonwell but env and binio.
+// Package testkit holds what Moonwell's tests share: files and folders written and read back and the fixtures World
+// Editor saved, a test world for the commands, byte helpers, builders for map info, object files and MDX models, and
+// a reader of the archives Moonwell writes.
+//
+// It is imported by tests only. Of Moonwell's packages it knows env, binio and the formats it builds or reads
+// (war3/objmod and war3/mpq), so the tests of those two packages are external test packages. Most helpers take a
+// testing.TB and fail the test themselves; the archive reader returns errors.
 package testkit
 
 import (
