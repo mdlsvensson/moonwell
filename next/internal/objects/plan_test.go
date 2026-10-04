@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"io/fs"
 	"math"
 	"os"
 	"path/filepath"
@@ -545,28 +544,6 @@ func TestObjectFilesAreFoundInAnyLetterCaseAndChangedUnderTheNameTheMapHas(t *te
 	testkit.WriteFile(t, dir, "war3mapskin.w3u", []byte{3, 0, 0})
 	if e := planError(t, dir, captainOnly); e.File != mapLabel+"/war3mapskin.w3u" {
 		t.Errorf("error = %+v", e)
-	}
-}
-
-func TestTwoObjectFilesThatDifferOnlyInLetterCaseAreRefusedWhereTheMapIsOpened(t *testing.T) {
-	dir := t.TempDir()
-	if !testkit.CaseSensitive(t, dir) {
-		t.Skip("such a map cannot exist on this file system")
-	}
-	testkit.WriteFile(t, dir, "war3map.w3a", fixture(t, "war3map.w3a"))
-	testkit.WriteFile(t, dir, "war3map.W3A", fixture(t, "war3map.w3a"))
-	// Plan is given an open folder, and a folder with two such files does not open.
-	_, err := mapdir.Open(dir, mapLabel)
-	e := asError(t, err, "two spellings of one object file")
-	if e.File != mapLabel+"/war3map.w3a" || !strings.Contains(e.Msg, "differ only in letter case") || !strings.Contains(e.Hint, "letter case") {
-		t.Errorf("error = %+v", e)
-	}
-}
-
-func TestAMissingMapFolderIsRefusedWhereTheMapIsOpenedForItsCallerToWord(t *testing.T) {
-	// Plan is given an open folder: whoever opens it says which setting names a folder that is not there.
-	if _, err := mapdir.Open(filepath.Join(t.TempDir(), "missing"), mapLabel); !errors.Is(err, fs.ErrNotExist) {
-		t.Errorf("Open = %v, want an error that is fs.ErrNotExist", err)
 	}
 }
 

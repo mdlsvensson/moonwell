@@ -213,11 +213,25 @@ func TestEvalJSONWritesANumberAsJSONDoesAndHasOneZero(t *testing.T) {
 	}
 }
 
+func TestEvalJSONWritesNullForANumberThatIsNotFinite(t *testing.T) {
+	// Resolve returns no such number; JSON has no text for one, and what is printed must stay JSON.
+	for _, number := range []float64{math.Inf(1), math.Inf(-1), math.NaN()} {
+		printed := objects.EvalJSON(oneValue("captain", objects.Value{Type: objmod.Unreal, Number: number}))
+		if got := valueLine(t, printed); got != "null" {
+			t.Errorf("%v is printed as %s, want null", number, got)
+		}
+		if !json.Valid(printed) {
+			t.Errorf("%v: what is printed is not JSON:\n%s", number, printed)
+		}
+	}
+}
+
 func TestEvalJSONEscapesOnlyTheQuoteTheBackslashAndControlCharacters(t *testing.T) {
 	cases := []struct{ name, text, want string }{
 		{"markup", "<b>Tom & Jerry</b>", `"<b>Tom & Jerry</b>"`},
 		{"a quote and a backslash", `say "hi" \ bye`, `"say \"hi\" \\ bye"`},
 		{"a line break and a tab", "one\ntwo\tthree\r", `"one\ntwo\tthree\r"`},
+		{"a backspace and a form feed", "one\btwo\fthree", `"one\btwo\fthree"`},
 		{"a control character", "a\x01b\x1fc", "\"a\x5cu0001b\x5cu001fc\""},
 		{"a letter outside ASCII", "caf\xc3\xa9", "\"caf\xc3\xa9\""},
 		{"a line separator", "a\xe2\x80\xa8b", "\"a\xe2\x80\xa8b\""},

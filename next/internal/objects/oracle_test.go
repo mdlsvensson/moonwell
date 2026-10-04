@@ -2,6 +2,7 @@ package objects_test
 
 import (
 	"fmt"
+	"maps"
 	"os/exec"
 	"path/filepath"
 	"reflect"
@@ -35,9 +36,9 @@ import (
 // plan change by change (the names in order, then the bytes of each file), with the objects and the ids module.
 //
 // The inputs are every case of the tables that the tests of resolve.go, fields.go and values.go run, the two
-// manifests of the reporting tests, a manifest with an object of every category and a value of every kind, two
-// manifests with the numbers and the texts that are printed in a way of their own, and the objects of the
-// template as real pkl prints them.
+// manifests of the reporting tests, a manifest with an object of every category and a value of every kind, the
+// same objects under ids that no map folder has, two manifests with the numbers and the texts that are printed in
+// a way of their own, and the objects of the template as real pkl prints them.
 //
 // Left out, for the one difference that is meant: a problem whose message holds a number below 0.000001 or from
 // 1e21. This tree writes such a number in plain decimal and the other with an exponent
@@ -71,6 +72,10 @@ const everyKind = `{
 	"buffs":{"aura":{"id":"B000","base":"Bcrs","tooltip":"","isAnEffect":true}},
 	"upgrades":{"swords":{"id":"R000","base":"Rhme","levels":4,"name":["I","II","III","IV"],"properties":{"gba1":1.5}}}}`
 
+// everyFile is the objects of everyKind under ids that no map folder of this file has (H900, h900 and so on), so
+// that they plan in every folder whose files read, and are appended to each of its ten object files.
+var everyFile = regexp.MustCompile(`"id":"(.)0`).ReplaceAllString(everyKind, `"id":"${1}9`)
+
 // printedNumbers is an ability with a real at every level: numbers at every power of ten that a real reaches,
 // and those at the two edges where the way a number is printed changes, below 0.000001 and from 1e21. Its id is
 // one that no map folder of this file has.
@@ -90,10 +95,11 @@ func printedNumbers() string {
 }
 
 // printedTexts is a unit whose key and source hold markup and a quote, and whose name holds the characters JSON
-// escapes and those that only some encoders escape: markup, a control character, U+007F, U+2028, U+2029, and
-// characters outside ASCII. Its id is one that no map folder of this file has.
+// escapes, each of those with a short escape among them, and those that only some encoders escape: markup, a
+// control character, U+007F, U+2028, U+2029, and characters outside ASCII. Its id is one that no map folder of
+// this file has.
 const printedTexts = `{"units":{"<b>\"Tom\" & Jerry</b>":{"id":"h900","base":"hfoo","source":"objects/a&b<c>.pkl",` +
-	`"name":"<i>\"q\" \\ \n \t ` + "\x5cu0001 \x5cu007f \x5cu2028 \x5cu2029 caf\xc3\xa9 \xf0\x9f\x98\x80" + `"}}}`
+	`"name":"<i>\"q\" \\ \b \f \n \r \t ` + "\x5cu0001 \x5cu007f \x5cu2028 \x5cu2029 caf\xc3\xa9 \xf0\x9f\x98\x80" + `"}}}`
 
 // input is a manifest as pkl prints it, and the custom ids of the map it is resolved for.
 type input struct {
@@ -122,6 +128,7 @@ func tableInputs() []input {
 	many, existing := unitsInTheMap(23)
 	add("twenty-three problems", many, existing)
 	add("an object of every category and a value of every kind", everyKind, nil)
+	add("an object for every object file, under ids no map folder has", everyFile, nil)
 	add("numbers as objects:eval prints them", printedNumbers(), nil)
 	add("texts as objects:eval prints them", printedTexts, nil)
 	add("a number that no float64 holds", onlyTheOtherTreeReads, nil)
@@ -199,8 +206,12 @@ func printedByTheOtherTree(resolved []oldobjects.Resolved) []byte {
 	return []byte(ordered.Stringify(oldcli.Evaluated(resolved), 2))
 }
 
-// tally counts what an oracle compared. files is the changed files of the plans it compared byte by byte.
-type tally struct{ refused, resolved, reworded, undecoded, files int }
+// tally counts what an oracle compared. files is the changed files of the plans it compared byte by byte, and
+// names is the names those files have.
+type tally struct {
+	refused, resolved, reworded, undecoded, files int
+	names                                         map[string]bool
+}
 
 // compare gives one input to both trees and compares all they return.
 func compare(t *testing.T, m pair, in input, count *tally) {
@@ -388,6 +399,9 @@ type sourceMap struct {
 	name       string
 	files      map[string][]byte
 	unreadable bool // an object file of it does not read, so every plan with objects is refused
+	// changed is how many files the plans for it must reach between them: the ten object files, or the five main
+	// files of a map from before skin files.
+	changed int
 }
 
 // heldFile is an object file of a version, in the layout the name's extension has, that changes a standard object
@@ -426,11 +440,11 @@ func sourceMaps(t *testing.T) []sourceMap {
 	// An id that is not ASCII, as a message writes it out.
 	twice := []testkit.SyntheticObject{{Base: "BNab", ID: "\xc3\xa9001"}, {Base: "Bcrs", ID: "\xc3\xa9001"}}
 	return []sourceMap{
-		{name: "the names fixture", files: names},
-		{name: "an empty map folder"},
-		{name: "files of version 1", files: olderFiles(1)},
-		{name: "files of version 2", files: olderFiles(2)},
-		{name: "files under other spellings", files: map[string][]byte{
+		{name: "the names fixture", files: names, changed: 10},
+		{name: "an empty map folder", changed: 10},
+		{name: "files of version 1", files: olderFiles(1), changed: 5},
+		{name: "files of version 2", files: olderFiles(2), changed: 5},
+		{name: "files under other spellings", changed: 10, files: map[string][]byte{
 			"WAR3MAP.W3U": heldFile("war3map.w3u", 3, "Zu00"), "war3mapskin.w3u": heldFile("war3mapSkin.w3u", 3, "Zu00"),
 			"War3Map.w3A": heldFile("war3map.w3a", 3, "Za00"),
 		}},
@@ -462,8 +476,8 @@ func planned(dir string, read manifest.Objects, metadata *objects.Metadata) (*ob
 }
 
 // sameChanges compares the changes of the two plans: the names of the files in order, then the bytes of each. It
-// returns how many files it compared byte by byte.
-func sameChanges(t *testing.T, what string, want, got []mapdir.Change) int {
+// counts the files it compared byte by byte, and notes their names.
+func sameChanges(t *testing.T, what string, want, got []mapdir.Change, count *tally) {
 	t.Helper()
 	names := func(changes []mapdir.Change) []string {
 		names := []string{}
@@ -476,11 +490,14 @@ func sameChanges(t *testing.T, what string, want, got []mapdir.Change) int {
 		return names
 	}
 	oracle.Values(t, what+": the changed files", names(want), names(got))
-	compared := min(len(want), len(got))
-	for i := range compared {
-		oracle.Bytes(t, what+": "+want[i].Name, want[i].Bytes, got[i].Bytes)
+	if count.names == nil {
+		count.names = map[string]bool{}
 	}
-	return compared
+	for i := range min(len(want), len(got)) {
+		oracle.Bytes(t, what+": "+want[i].Name, want[i].Bytes, got[i].Bytes)
+		count.files++
+		count.names[want[i].Name] = true
+	}
 }
 
 // comparePlans gives one input and one map folder to both trees and compares all they return.
@@ -492,6 +509,9 @@ func comparePlans(t *testing.T, m pair, source sourceMap, dir string, in input, 
 	})
 	p, err := manifest.Decode("/p", in.file, []byte(in.document))
 	if err != nil {
+		// Counted here, before the other tree's refusal is looked at, and not among the reworded as compare counts
+		// it: in a folder whose files do not read the other tree refuses this input for the file, with no number
+		// in its words, so only the input itself says that it is the one this tree cannot decode.
 		count.undecoded++
 		if in.document != project(onlyTheOtherTreeReads) {
 			t.Errorf("%s: this tree does not decode the manifest, and it is not the one with a number no float64 holds: %v", what, err)
@@ -515,7 +535,7 @@ func comparePlans(t *testing.T, m pair, source sourceMap, dir string, in input, 
 	for _, change := range want.Changes {
 		wanted = append(wanted, mapdir.Change(change))
 	}
-	count.files += sameChanges(t, what, wanted, got.Changes)
+	sameChanges(t, what, wanted, got.Changes, count)
 	oracle.Values(t, what+": the objects", converted(t, want.Objects), got.Objects)
 	oracle.Bytes(t, what+": the ids module", []byte(want.Generated), []byte(got.IDs))
 	count.resolved++
@@ -565,8 +585,11 @@ func TestOracleOnPlanningTheObjectFiles(t *testing.T) {
 				t.Errorf("%s: %d plans compared, want %d", what, compared, len(inputs)-want.reworded-want.undecoded)
 			case source.unreadable && (count.refused != want.refused || count.resolved != want.resolved || count.files != 0):
 				t.Errorf("%s: compared %+v, want %+v", what, count, want)
-			case !source.unreadable && (count.refused == 0 || count.resolved <= empty || count.files == 0):
-				t.Errorf("%s: compared %+v, want refusals, plans that change files, and their files", what, count)
+			case !source.unreadable && (count.refused == 0 || count.resolved <= empty):
+				t.Errorf("%s: compared %+v, want refusals and plans that change files", what, count)
+			case len(count.names) != source.changed:
+				t.Errorf("%s: the plans compared reach %d files, want %d: %q",
+					what, len(count.names), source.changed, slices.Sorted(maps.Keys(count.names)))
 			}
 		}
 	}
