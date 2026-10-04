@@ -46,8 +46,10 @@ import (
 // left out when the other tree's result is such an error, which is counted: once on those systems, and never on
 // Windows, where both trees say the same and are compared. That this tree refuses it too is still looked at.
 //
-// TestOracleOnAPreviewThatCannotBeRead compares nothing when it is run as root on a system other than Windows:
-// root reads a file without permissions, so the test is skipped there.
+// TestOracleOnAPreviewThatCannotBeRead compares nothing, and is skipped, where the test cannot make a file that
+// is there and cannot be read: as root on a system other than Windows, since root reads a file without
+// permissions, and on a Windows that lets the file be read although the test holds it with no sharing and an
+// exclusive lock.
 //
 // Not among the inputs:
 //
