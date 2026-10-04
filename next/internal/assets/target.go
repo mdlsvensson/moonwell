@@ -1,11 +1,3 @@
-// Package assets imports files into a map: those under a project's assets/ folder and those its libraries ship.
-// It resolves each file's in-map path, keeps war3map.imp in step, and for assets:sync writes into the source
-// map and records which files it owns. For assets:paths it reports the files that models reference: which of
-// them the game ships, by the list of the game's paths that the program carries, and which a build imports.
-//
-// It takes folders and returns assets and changes; for the report it takes the bytes of models and returns the
-// references with their statuses, and the report as lines. It does not know where a library's files come from,
-// and it prints nothing: the command prints a report, and decides what a model that cannot be read means for it.
 package assets
 
 import (

@@ -1,3 +1,15 @@
+// Package settings applies the manifest's map settings to a map folder: it patches war3map.w3i, brings
+// war3map.lua into line with it, merges the two settings text files, and puts a preview picture in the
+// minimap's place.
+//
+// It takes a project and a map folder, and returns the changes to the map's files. Beside the map's files it
+// reads one file: the preview picture the settings name, from the project folder. It writes nothing.
+//
+// The shape of the settings is Pkl's to check. What is checked here is what Pkl cannot see: what a setting needs
+// of the map it is for, a typed gameplay constant against a raw one, and names that differ only in letter case.
+// The package must not know how a map is built or launched, nor the object data and the imported files of a map.
+//
+// Of Moonwell it imports manifest, mapdir, diag, fsx, and war3/w3i, war3/lua, war3/txt and war3/picture.
 package settings
 
 import (

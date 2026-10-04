@@ -1,10 +1,3 @@
-// Package objects turns the manifest's custom objects into the object files of a map: it resolves and checks
-// them against the game's metadata and the objects the map already has, plans the files, and renders the module
-// of their ids and the JSON that objects:eval prints. It takes the manifest's objects and a map folder and returns
-// changes. It writes nothing but the generated ids module, and only when asked.
-//
-// It must not know how the manifest was evaluated, which command asked, or anything of the other areas. Of
-// Moonwell it imports manifest, mapdir, diag, fsx and war3/objmod, and the root package for the embedded metadata.
 package objects
 
 import (
