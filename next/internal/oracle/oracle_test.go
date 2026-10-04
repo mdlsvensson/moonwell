@@ -1,6 +1,7 @@
 package oracle
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -53,6 +54,28 @@ func TestBytes(t *testing.T) {
 			}
 		})
 	}
+}
+
+// hidden keeps its data where reflection of exported fields cannot see it.
+type hidden struct{ data string }
+
+func (h hidden) MarshalJSON() ([]byte, error) { return json.Marshal(h.data) }
+
+// texty is a text marshaler with a pointer receiver.
+type texty struct{ data string }
+
+func (t *texty) MarshalText() ([]byte, error) { return []byte(t.data), nil }
+
+// tkey is a map key that marshals as text.
+type tkey struct{ data string }
+
+func (k tkey) MarshalText() ([]byte, error) { return []byte(k.data), nil }
+
+type Inner struct{ Tag string }
+
+type withEmbedded struct {
+	*Inner
+	Name string
 }
 
 type oldShape struct {
@@ -126,6 +149,116 @@ func TestValues(t *testing.T) {
 			name: "equal invalid bytes",
 			want: oldShape{Name: "x\xffy", Tags: []string{"\xfe"}},
 			got:  newShape{Name: "x\xffy", Tags: []string{"\xfe"}},
+		},
+		{
+			name:     "a string difference at the root",
+			want:     "x\xffy",
+			got:      "x\xfey",
+			contains: "(root)",
+		},
+		{
+			name:     "a marshaler hides its data",
+			want:     hidden{"x\xffy"},
+			got:      hidden{"x\xfey"},
+			contains: "cannot be compared",
+		},
+		{
+			name: "equal data behind a marshaler",
+			want: hidden{"x\xffy"},
+			got:  hidden{"x\xffy"},
+		},
+		{
+			name:     "a marshaler in a field",
+			want:     struct{ Inner hidden }{hidden{"x\xffy"}},
+			got:      struct{ Inner hidden }{hidden{"x\xfey"}},
+			contains: "Inner",
+		},
+		{
+			name:     "a text marshaler with a pointer receiver",
+			want:     struct{ T *texty }{&texty{"x\xffy"}},
+			got:      struct{ T *texty }{&texty{"x\xfey"}},
+			contains: "cannot be compared",
+		},
+		{
+			name:     "a string against a text marshaler",
+			want:     "x\xffy",
+			got:      &texty{"x\xfey"},
+			contains: "cannot be compared",
+		},
+		{
+			name:     "a struct against a map",
+			want:     struct{ A string }{"x\xffy"},
+			got:      map[string]string{"A": "x\xfey"},
+			contains: "cannot be compared",
+		},
+		{
+			name:     "a map against a struct",
+			want:     map[string]string{"A": "x\xffy"},
+			got:      struct{ A string }{"x\xfey"},
+			contains: "cannot be compared",
+		},
+		{
+			name: "a field renamed in Go keeps its JSON name",
+			want: struct {
+				Title string `json:"name"`
+			}{"x\xffy"},
+			got: struct {
+				Name string `json:"name"`
+			}{"x\xfey"},
+			contains: `name: want "x\xffy"`,
+		},
+		{
+			name: "a field renamed in Go, equal",
+			want: struct {
+				Title string `json:"name"`
+			}{"x\xffy"},
+			got: struct {
+				Name string `json:"name"`
+			}{"x\xffy"},
+		},
+		{
+			name: "a field only on one side",
+			want: struct{ A string }{"s"},
+			got: struct {
+				A, B string `json:",omitempty"`
+			}{A: "s"},
+			contains: "B",
+		},
+		{
+			name: "a field left out of the JSON on its own side",
+			want: struct{ A string }{"s"},
+			got: struct {
+				A      string
+				Hidden string `json:"-"`
+			}{A: "s", Hidden: "x"},
+		},
+		{
+			name:     "map keys with a text marshaler",
+			want:     map[tkey]string{{"x\xffy"}: "v"},
+			got:      map[string]string{"x\xfey": "v"},
+			contains: "cannot be compared",
+		},
+		{
+			name:     "an integer key against a string key",
+			want:     map[int]string{1: "a"},
+			got:      map[string]string{"1": "a"},
+			contains: "cannot be compared",
+		},
+		{
+			name: "integer keys of different types",
+			want: map[int]string{1: "a"},
+			got:  map[uint8]string{1: "a"},
+		},
+		{
+			name:     "strings differ behind an embedded pointer",
+			want:     withEmbedded{Inner: &Inner{"x\xffy"}},
+			got:      withEmbedded{Inner: &Inner{"x\xfey"}},
+			contains: "Tag",
+		},
+		{
+			name: "a nil embedded pointer",
+			want: withEmbedded{Name: "n"},
+			got:  withEmbedded{Name: "n"},
 		},
 	}
 	for _, tt := range tests {

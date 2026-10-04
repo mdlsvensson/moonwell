@@ -8,6 +8,7 @@ package oracle
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"reflect"
 	"strings"
@@ -43,9 +44,13 @@ func firstDifference(a, b []byte) int {
 	return shorter
 }
 
-// Values fails the test when the JSON of got differs from the JSON of want, or when two strings in them differ in
-// any byte (JSON writes every invalid UTF-8 byte as U+FFFD, so it cannot tell them apart). Two values of different
-// packages whose exported fields have the same names and values are the same.
+// Values fails the test when the JSON of got differs from the JSON of want. When the JSON is equal it also walks both
+// values and fails when two strings differ in any byte, because JSON writes every invalid UTF-8 byte as U+FFFD. The
+// walk pairs struct fields by their JSON name, follows pointers and interfaces, and treats a slice and an array alike.
+// It fails, saying where, wherever it cannot pair the two sides: a type that writes its own JSON (MarshalJSON or
+// MarshalText, unless both sides have one type and equal values), a struct against a map, a field only one side has,
+// or map keys that are not strings on both sides or integers on both sides. Two values of different packages whose
+// exported fields have the same JSON names and values are the same.
 func Values(t testing.TB, what string, want, got any) {
 	t.Helper()
 	wantJSON, err := marshal(want)
@@ -63,9 +68,14 @@ func Values(t testing.TB, what string, want, got any) {
 		t.Errorf("%s: values differ at line %d:\nwant: %s\ngot:  %s", what, line, wantLine, gotLine)
 		return
 	}
-	if diff, found := firstStringDifference("", reflect.ValueOf(want), reflect.ValueOf(got)); found {
+	diff, found := firstStringDifference("", reflect.ValueOf(want), reflect.ValueOf(got))
+	switch {
+	case found && diff.cannot != "":
+		t.Errorf("%s: the JSON is equal but the values cannot be compared string by string at %s (%s); "+
+			"convert the wanted value into the shape of the actual one first", what, cmp.Or(diff.path, "(root)"), diff.cannot)
+	case found:
 		t.Errorf("%s: strings differ in bytes that JSON cannot show, at %s: want %s, got %s",
-			what, diff.path, diff.want, diff.got)
+			what, cmp.Or(diff.path, "(root)"), diff.want, diff.got)
 	}
 }
 
