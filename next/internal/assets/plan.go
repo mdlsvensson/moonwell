@@ -25,9 +25,9 @@ type Result struct {
 	planned *mapdir.Folder // the folder the plan was made from, which is the one Sync writes into
 }
 
-// Plan checks every asset, import and owned file of the map folder, and returns the changes: the assets to
-// write, the owned files that no asset wants to remove, and war3map.imp. It writes nothing, and stops between
-// files once ctx is cancelled.
+// Plan checks every asset, import and owned file of the map folder, and returns the changes: the assets are
+// written, the owned files that no asset wants are removed, and war3map.imp lists the assets. It writes
+// nothing, and stops between files once ctx is cancelled.
 //
 // The changes replace and remove only files that owned lists and that hold what it says they hold. A file of
 // the map that is not owned, an import World Editor made, and an owned file with other bytes are refused. Every
@@ -93,7 +93,8 @@ func stopIfInterrupted(ctx context.Context) error {
 // ---- the checks ----
 
 // checkPaths fails when an asset or an owned file has an in-map path that TargetPath refuses, and when two
-// assets have one path: what Collect and ReadState never return.
+// assets have one path: what Collect and ReadState never return. Two owned entries with one path pass: the
+// later one counts (ownedByKey), and the file is checked and removed once.
 func (p *planner) checkPaths() error {
 	taken := map[string]bool{}
 	for _, asset := range p.assets {
@@ -122,9 +123,7 @@ func (p *planner) readIndex() error {
 	}
 	p.imported = map[string]bool{}
 	if !found {
-		// The plan writes the file, so the map must have a place for it: a folder under its name is refused here.
-		_, err := p.folder.Place(indexName)
-		return err
+		return p.placeForIndex()
 	}
 	file := p.folder.Label(indexName)
 	if p.imports, err = imp.Read(data, file); err != nil {
@@ -142,6 +141,17 @@ func (p *planner) readIndex() error {
 		p.imported[mapdir.Key(path)] = true
 	}
 	return nil
+}
+
+// placeForIndex fails when a map without war3map.imp has no place for the one the plan writes: a folder under
+// that name, which Place refuses and names as the file of its error.
+func (p *planner) placeForIndex() error {
+	_, err := p.folder.Place(indexName)
+	var failure *diag.Error
+	if errors.As(err, &failure) {
+		return errIndexIsAFolder(failure.File)
+	}
+	return err
 }
 
 // ownedUnchanged fails unless every owned file the map has holds what the state says, the files the plan
@@ -259,6 +269,10 @@ func (p *planner) indexChange(assets []Asset) []mapdir.Change {
 	for _, entry := range p.imports {
 		key := mapdir.Key(entry.MapPath())
 		if _, owned := p.owned[key]; owned {
+			// Whatever the flag is, it is kept, and the asset's entry below is written with the whole in-map path.
+			// Under a flag without a custom path (0, 5 or 8) World Editor reads that path below war3mapImported\,
+			// so such an entry names war3mapImported\war3mapImported\..., a file the map does not have, and the
+			// next plan takes it for an import of the editor's own and adds a second entry for the asset.
 			flags[key] = entry.Flag
 			continue
 		}
@@ -304,6 +318,15 @@ func errNotAnAssetPath(what, path string, refusal error) error {
 
 func errSamePath(path string) error {
 	return fmt.Errorf("Cannot plan the assets: two assets have the in-map path %q.", path)
+}
+
+func errIndexIsAFolder(file string) error {
+	return &diag.Error{
+		Msg:  "war3map.imp in the map is a folder, not a file.",
+		File: file,
+		Hint: "The map has a folder where its index of imports belongs. Remove that folder from the source map, " +
+			"or open and re-save the map in World Editor.",
+	}
 }
 
 func errImportPath(path, file string) error {

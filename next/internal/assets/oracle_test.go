@@ -1399,11 +1399,34 @@ func seededStories(t testing.TB) []story {
 		one("a file appears where a new asset goes, after the plan", holding("assets/0.blp", "assets/a.blp"),
 			run{meddle: putting(m+"a.blp", "the editor's"), refused: byName, about: m + "a.blp"}),
 		one("the state file cannot be written", holding("assets/a.blp"),
-			run{syncCtx: func(t testing.TB, root string) *countdown {
-				// The third ask is the one before the state file: a.blp and the index are written by then.
-				return &countdown{Context: context.Background(), limit: never,
-					before: map[int]func(){3: func() { putting(state+"/in the way.txt", "another program's")(t, root) }}}
-			}, refused: byName, about: state}),
+			run{syncCtx: beforeAsk(3, putting(state+"/in the way.txt", "another program's")), refused: byName, about: state}),
+		// Another program gets at the state file after the sync began. The ask before the state file is the last:
+		// the second where a.blp alone is written, the third where the index is written too.
+		{"the state file is changed before it is written",
+			project{files: holding("assets/a.blp")},
+			[]run{{}, {edit: putting("assets/a.blp", "second"), syncCtx: beforeAsk(2, putting(state, "another program's")),
+				refused: byName, about: state}}},
+		{"the state file is removed before it is written",
+			project{files: holding("assets/a.blp")},
+			[]run{{}, {edit: putting("assets/a.blp", "second"), syncCtx: beforeAsk(2, removing(state)), refused: byName, about: state}}},
+		one("a state file is made before the first is written", holding("assets/a.blp"),
+			run{syncCtx: beforeAsk(3, putting(state, "another program's")), refused: byName, about: state}),
+		{"the state file is changed before it is removed",
+			project{files: holding("assets/a.blp")},
+			[]run{{}, {edit: removing("assets/a.blp"), syncCtx: beforeAsk(3, putting(state, "another program's")),
+				refused: byName, about: state}}},
+		// Neither tree looks again at a state file that needs no write.
+		{"the state file is changed while a sync that does not write it writes the index",
+			project{files: holding("assets/a.blp")},
+			[]run{{}, {edit: putting(m+"war3map.imp", indexOf()), syncCtx: beforeAsk(1, putting(state, "another program's"))}}},
+	}
+}
+
+// beforeAsk is a context that is never cancelled, and before an ask, counted from 1, has another program do
+// something in the project.
+func beforeAsk(ask int, meddle func(testing.TB, string)) func(testing.TB, string) *countdown {
+	return func(t testing.TB, root string) *countdown {
+		return &countdown{Context: context.Background(), limit: never, before: map[int]func(){ask: func() { meddle(t, root) }}}
 	}
 }
 
@@ -1419,10 +1442,10 @@ func TestOracleOnThePlanAndTheSync(t *testing.T) {
 			runs, entries = runs+1, entries+files
 		}
 	}
-	// Thirty-one runs of the scenarios and thirty-six seeded ones.
-	want := map[string]int{"": 42, byName: 23, reworded: 1, bySystem: 1}
-	if !maps.Equal(compared, want) || runs != 67 || entries != 707 {
-		t.Errorf("%d runs compared, by how they were refused: %v, with %d files and folders; want 67 runs, %v and 707",
+	// Thirty-one runs of the scenarios and forty-five seeded ones.
+	want := map[string]int{"": 47, byName: 27, reworded: 1, bySystem: 1}
+	if !maps.Equal(compared, want) || runs != 76 || entries != 775 {
+		t.Errorf("%d runs compared, by how they were refused: %v, with %d files and folders; want 76 runs, %v and 775",
 			runs, compared, entries, want)
 	}
 }

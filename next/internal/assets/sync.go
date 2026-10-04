@@ -20,8 +20,10 @@ import (
 // over; another folder has no such record, and is refused as the caller's bug.
 //
 // The state file is written last, so that it never lists a file that was not written. A state that owns nothing
-// has no file: one that is there is removed. The folder of the state file is made when it is needed. Folders
-// made for new files stay when the files are taken out again.
+// has no file: one that is there is removed. A state file that is written or removed is guarded as a map file
+// is: one that another program wrote, made or removed after the sync began stops the sync, and is kept. A state
+// file that holds the state already is not written, and not looked at again. The folder of the state file is
+// made when it is needed. Folders made for new files stay when the files are taken out again.
 func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, stateFile string) error {
 	if result.planned != folder {
 		return errOtherFolder()
@@ -39,9 +41,12 @@ func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, stateFile 
 	return undone(failure, touched, unrestored(folder, journal.Undo()))
 }
 
-// stateWrite is what a sync does to the state file: it writes bytes, or removes the file.
+// stateWrite is what a sync does to the state file: it writes bytes, or removes the file. It keeps what the file
+// was when the sync began, to compare with just before.
 type stateWrite struct {
 	file   string
+	held   []byte // what the file held when the sync began
+	found  bool   // whether it was there
 	bytes  []byte
 	remove bool
 }
@@ -53,17 +58,19 @@ func stateChange(file string, state State) (*stateWrite, error) {
 	if err != nil {
 		return nil, err
 	}
+	change := &stateWrite{file: file, held: held, found: found}
 	if len(state.Files) == 0 {
 		if !found {
 			return nil, nil
 		}
-		return &stateWrite{file: file, remove: true}, nil
+		change.remove = true
+		return change, nil
 	}
-	written := state.Bytes()
-	if found && bytes.Equal(held, written) {
+	change.bytes = state.Bytes()
+	if found && bytes.Equal(held, change.bytes) {
 		return nil, nil
 	}
-	return &stateWrite{file: file, bytes: written}, nil
+	return change, nil
 }
 
 // write makes the changes of the view in the map folder and then the change of the state file, all through
@@ -78,9 +85,12 @@ func write(ctx context.Context, view *mapdir.Folder, state *stateWrite, journal 
 	return state.apply(journal)
 }
 
-// apply writes or removes the state file through journal.
+// apply writes or removes the state file through journal, unless the file is not what it was when the sync began.
 func (s *stateWrite) apply(journal *fsx.Journal) error {
-	var err error
+	err := s.asItWas()
+	if err != nil {
+		return err
+	}
 	if s.remove {
 		err = journal.Remove(s.file)
 	} else {
@@ -88,6 +98,19 @@ func (s *stateWrite) apply(journal *fsx.Journal) error {
 	}
 	if err != nil {
 		return errStateNotWritten(s.file, err)
+	}
+	return nil
+}
+
+// asItWas fails unless the state file is what it was when the sync began: there with the same bytes, or not
+// there. Another program that wrote, made or removed it in between has its file kept.
+func (s *stateWrite) asItWas() error {
+	held, found, err := readIfThere(s.file)
+	switch {
+	case err != nil:
+		return err
+	case found != s.found || !bytes.Equal(held, s.held):
+		return errStateChanged(s.file)
 	}
 	return nil
 }
@@ -166,6 +189,16 @@ func errOtherFolder() error {
 
 func errInterruptedAndUndone() error {
 	return &diag.Error{Msg: "Interrupted; every change was undone."}
+}
+
+// errStateChanged is mapdir's refusal of a map file that changed after the plan, for the state file, which is
+// named by its path.
+func errStateChanged(file string) error {
+	return &diag.Error{
+		Msg:  file + " changed after the assets were checked.",
+		File: file,
+		Hint: "Close World Editor and anything else writing to the map, then retry.",
+	}
 }
 
 // errStateNotWritten is the failure of the state file's write, in the shape of mapdir's failure of a map file's:

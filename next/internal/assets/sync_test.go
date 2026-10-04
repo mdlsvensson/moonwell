@@ -327,7 +327,11 @@ func TestSyncRefusesAFileThatChangedAfterThePlanAndWritesOverNothing(t *testing.
 		return func(s *site) { put(s.t, s.mapDir, name, content...) }
 	}
 	saves := func(s *site) { s.setImports(imp.Entry{Flag: 5, Path: "sound.wav"}) }
-	removes := func(s *site) { os.Remove(filepath.Join(s.mapDir, "replaced.blp")) }
+	removes := func(s *site) {
+		if err := os.Remove(filepath.Join(s.mapDir, "replaced.blp")); err != nil {
+			s.t.Fatal(err)
+		}
+	}
 	tests := []struct {
 		name    string
 		meddle  func(s *site)
@@ -364,6 +368,85 @@ func TestSyncRefusesAFileThatChangedAfterThePlanAndWritesOverNothing(t *testing.
 			}
 			s.unchanged(before, "a refused sync")
 		})
+	}
+}
+
+// Another program gets at the state file between the start of the sync and the ask before the state file, which
+// is the last. The sync has changed the map by then.
+func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.T) {
+	writes := func(s *site) { put(s.t, s.root, ".asset-state/map.w3x.json", "another program's") }
+	removes := func(s *site) {
+		if err := os.Remove(s.state); err != nil {
+			s.t.Fatal(err)
+		}
+	}
+	tests := []struct {
+		name    string
+		owned   bool   // whether a sync before this one wrote a state file
+		asset   string // what assets/a.blp holds at the sync; "" for a project without the file
+		meddle  func(s *site)
+		lastAsk int
+		state   string // what the state file holds afterwards
+	}{
+		{"changed before it is written", true, "second", writes, 2, "another program's"},
+		{"removed before it is written", true, "second", removes, 2, missing},
+		{"made before it is written", false, "first", writes, 3, "another program's"},
+		{"changed before it is removed", true, "", writes, 3, "another program's"},
+		{"removed before it is removed", true, "", removes, 3, missing},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newSite(t)
+			if tt.owned {
+				put(t, s.root, "assets/a.blp", "first")
+				s.synced(noBlock)
+			}
+			if err := os.RemoveAll(filepath.Join(s.root, "assets", "a.blp")); err != nil {
+				t.Fatal(err)
+			}
+			if tt.asset != "" {
+				put(t, s.root, "assets/a.blp", tt.asset)
+			}
+			folder, result := s.planned(noBlock)
+			before := testkit.Snapshot(t, s.mapDir)
+			ctx := &countdown{Context: background, limit: never, before: map[int]func(){tt.lastAsk: func() { tt.meddle(s) }}}
+
+			e := asError(t, Sync(ctx, folder, result, s.state), "a sync whose state file changed")
+			if e.Msg != s.state+" changed after the assets were checked." || e.File != s.state ||
+				!strings.Contains(e.Hint, "Close World Editor") {
+				t.Errorf("error = %+v", e)
+			}
+			if ctx.asks != tt.lastAsk {
+				t.Errorf("the sync asked %d times, want the state file to be its ask %d and its last", ctx.asks, tt.lastAsk)
+			}
+			if after := testkit.Snapshot(t, s.mapDir); !maps.EqualFunc(before, after, slices.Equal) {
+				t.Errorf("the map holds %q, want what it held before the sync", slices.Sorted(maps.Keys(after)))
+			}
+			if got := s.stateText(); got != tt.state {
+				t.Errorf("the state file holds %q, want %q: what the other program left", got, tt.state)
+			}
+		})
+	}
+}
+
+// A state file that holds the state already is not written, and so it is not looked at again.
+func TestAStateFileThatNeedsNoWriteIsNotLookedAtAgain(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/a.blp")
+	s.synced(noBlock)
+	s.setImports()
+	folder, result := s.planned(noBlock)
+	if got := names(result.Changes); !slices.Equal(got, []string{"war3map.imp"}) {
+		t.Fatalf("the changes are %q", got)
+	}
+	ctx := &countdown{Context: background, limit: never, before: map[int]func(){1: func() {
+		put(t, s.root, ".asset-state/map.w3x.json", "another program's")
+	}}}
+	if err := Sync(ctx, folder, result, s.state); err != nil || ctx.asks != 1 {
+		t.Errorf("Sync = %v after %d asks, want it to finish after the one ask of the index", err, ctx.asks)
+	}
+	if len(s.imports()) != 1 || s.stateText() != "another program's" {
+		t.Error("the index is not written, or the state file is")
 	}
 }
 

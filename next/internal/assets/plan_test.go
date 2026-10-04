@@ -324,15 +324,20 @@ func TestAnAssetBelowAFileOfTheMapIsRefusedAlsoWhenTheFileIsOwned(t *testing.T) 
 }
 
 func TestAnAssetNamedAsAFolderOfTheMapIsRefused(t *testing.T) {
+	empty := func(s *site) {
+		if err := os.Mkdir(filepath.Join(s.mapDir, "Textures"), 0o777); err != nil {
+			s.t.Fatal(err)
+		}
+	}
 	tests := []struct {
 		name  string
 		setup func(s *site)
 	}{
 		{"a folder with a file in it", func(s *site) { put(s.t, s.mapDir, "Textures/a.blp") }},
-		{"an empty folder", func(s *site) { os.Mkdir(filepath.Join(s.mapDir, "Textures"), 0o777) }},
+		{"an empty folder", empty},
 		// The file the state lists is a folder in the map: it is not checked as an owned file, and not replaced.
 		{"a folder where the state lists a file", func(s *site) {
-			os.Mkdir(filepath.Join(s.mapDir, "Textures"), 0o777)
+			empty(s)
 			put(s.t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures", zeros}}}.Bytes()))
 		}},
 	}
@@ -396,11 +401,14 @@ func TestPlanRefusesAnIndexOfImportsItCannotUse(t *testing.T) {
 func TestAFolderNamedAsTheIndexOfImportsIsRefusedBeforeAnythingIsPlanned(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
-	put(t, s.mapDir, "war3map.imp/stray.txt")
+	put(t, s.mapDir, "War3Map.imp/stray.txt")
+	before := testkit.Snapshot(t, s.root)
 	e := s.refusedPlan(noBlock)
-	if !strings.Contains(e.Msg, "war3map.imp would replace a folder in the map") || e.File != mapLabel+"/war3map.imp" || e.Hint == "" {
-		t.Errorf("error = %+v", e)
+	if !strings.Contains(e.Msg, "is a folder") || e.File != mapLabel+"/War3Map.imp" ||
+		!strings.Contains(e.Hint, "Remove that folder") || strings.Contains(e.Hint, "another path") {
+		t.Errorf("error = %+v, want the folder named as the map spells it, and a hint that fits the index", e)
 	}
+	s.unchanged(before, "a refused plan")
 }
 
 func TestPlanStopsAtAnInterruptBetweenFilesAndWritesNothing(t *testing.T) {
