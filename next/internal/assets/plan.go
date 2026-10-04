@@ -170,12 +170,12 @@ func (p *planner) readIndex() error {
 	return nil
 }
 
-// placeForIndex fails when a map without war3map.imp has no place for the one the plan writes: a folder under
-// that name, which Place refuses and names as the file of its error.
+// placeForIndex fails when a map without war3map.imp has no place for the one the plan writes: the map has a
+// folder under that name, which Place names as the file of its refusal.
 func (p *planner) placeForIndex() error {
 	_, err := p.folder.Place(indexName)
 	var failure *diag.Error
-	if errors.As(err, &failure) {
+	if p.folder.IsFolder(indexName) && errors.As(err, &failure) {
 		return errIndexIsAFolder(failure.File)
 	}
 	return err
@@ -225,17 +225,17 @@ func (p *planner) roomFor(asset Asset) error {
 }
 
 // noPlace is the refusal of an asset that the folder has no place for. Place refuses a name for one of two
-// reasons and names what is in the way as the file of its error: a folder under the asset's own path, or a file
-// on the way to it.
+// reasons, and the folder is asked which: the map has a folder under the asset's own path, or a file on the way
+// to it. Either is what Place names as the file of its error.
 func (p *planner) noPlace(asset Asset, refusal error) error {
 	var failure *diag.Error
 	if !errors.As(refusal, &failure) {
 		return refusal
 	}
-	inTheWay := strings.TrimPrefix(failure.File, p.folder.Label("")+"/")
-	if mapdir.Key(inTheWay) == mapdir.Key(asset.Target) {
+	if p.folder.IsFolder(asset.Target) {
 		return errOntoAFolder(asset, failure.File)
 	}
+	inTheWay := strings.TrimPrefix(failure.File, p.folder.Label("")+"/")
 	return errThroughAFile(inTheWay, asset, failure.File)
 }
 

@@ -189,7 +189,7 @@ func (c *collection) addOwnFile(folder *mapdir.Folder, source string, mapped map
 // one of the map's own has is replaced by it.
 func (c *collection) addLibrary(root string, library Library) error {
 	label := labelOf(root, library.Dir)
-	if err := refuseLinked(library.Dir); err != nil {
+	if err := refuseLinked(library.Dir, label); err != nil {
 		return err
 	}
 	folder, err := open(library.Dir, label)
@@ -216,11 +216,11 @@ func labelOf(root, dir string) string {
 	return filepath.ToSlash(dir)
 }
 
-// refuseLinked fails when a link stands in place of a library's folder. A link is made on this machine and is not
-// among what the library ships, so the failure is not the library's.
-func refuseLinked(dir string) error {
+// refuseLinked fails when a link stands in place of a library's folder, which errors name by label. A link is made
+// on this machine and is not among what the library ships, so the failure is not the library's.
+func refuseLinked(dir, label string) error {
 	if info, err := fsx.Lstat(dir); err == nil && info != nil && fsx.IsLink(info) {
-		return fsx.LinkError(dir)
+		return errLinkedFolder(dir, label)
 	}
 	return nil
 }
@@ -364,6 +364,17 @@ func errTwoLibraries(manifestFile, first, second, target string) error {
 		File: manifestFile,
 		Hint: "Drop one of the libraries, or put your own file at that path under assets/ to replace both.",
 	}
+}
+
+// errLinkedFolder is fsx.LinkError for the link at dir, with the folder as its file: label, the name the folder
+// has in every other error about it.
+func errLinkedFolder(dir, label string) error {
+	err := fsx.LinkError(dir)
+	var failure *diag.Error
+	if errors.As(err, &failure) {
+		failure.File = label
+	}
+	return err
 }
 
 func errInLibrary(library, label string, failure *diag.Error) error {

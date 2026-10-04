@@ -284,11 +284,39 @@ func TestAMapWithoutAFileTheSettingsNeedIsRefusedByThatFile(t *testing.T) {
 	missing(`{"environment":{"soundEnvironment":"Mountains"}}`, "war3map.lua")
 	// A force's name has no call in the script, and a map with forces of its own must have its script all the same.
 	missing(`{"forces":{"0":{"name":"Blue"}}}`, "war3map.lua")
-	// A folder is not the file.
-	if err := os.Mkdir(filepath.Join(dir, "war3map.lua"), 0o777); err != nil {
-		t.Fatal(err)
+}
+
+// A folder is not the file, and it is not refused as a file the map lacks: a look into the map folder shows the
+// name there. The documents for the minimap also name a player the fixture lacks: the minimap is looked for
+// before the map info is read, which would refuse the player.
+func TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder(t *testing.T) {
+	absent := `"players":{"5":{"name":"Absent"}}`
+	tests := []struct{ name, folder, document string }{
+		{"war3map.w3i", "war3map.w3i", `{"loadingScreen":{"title":"T"}}`},
+		{"war3map.lua", "war3map.lua", `{"info":{"name":"Needs the script"}}`},
+		{"war3map.lua", "war3map.lua", `{"info":{"preview":"preview.tga"}}`},
+		{"war3mapMap.blp", "war3mapMap.blp", `{"info":{"preview":"preview.tga"},` + absent + `}`},
+		{"war3mapMap.blp", "war3mapMap.blp", `{"info":{"preview":"preview.blp"},` + absent + `}`},
+		// The file is named as the settings name it, whatever the folder's letter case.
+		{"war3map.w3i", "WAR3MAP.W3I", `{"loadingScreen":{"title":"T"}}`},
 	}
-	missing(`{"info":{"name":"Needs the script"}}`, "war3map.lua")
+	for _, tt := range tests {
+		t.Run(tt.folder+" for "+tt.document, func(t *testing.T) {
+			dir, root := withPreview(t, "preview.tga", plainTGA())
+			testkit.WriteFile(t, root, "preview.blp", testkit.BLP(256, 1))
+			if err := os.Remove(filepath.Join(dir, tt.name)); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Mkdir(filepath.Join(dir, tt.folder), 0o777); err != nil {
+				t.Fatal(err)
+			}
+			failure := refusedPlan(t, dir, root, tt.document, mapLabel+"/"+tt.name)
+			if !strings.Contains(failure.Msg, tt.name+" in the map is a folder, not a file") ||
+				!strings.Contains(failure.Hint, "Remove") || !strings.Contains(failure.Hint, "World Editor") {
+				t.Errorf("error = %+v", failure)
+			}
+		})
+	}
 }
 
 func TestAFolderWhereATextFileGoesIsRefusedAndNotTakenForAMapWithoutTheFile(t *testing.T) {
@@ -610,11 +638,8 @@ func TestAPreviewIsRefusedWhenTheMapLacksItsMinimapOrHasOneOfTheNamesThePreviewA
 			t.Fatal(err)
 		}
 	}
-	// A folder is not the minimap, and a map info that would be refused is not read before the minimap is missed.
+	// A map info that would be refused is not read before the minimap is missed.
 	if err := os.Remove(filepath.Join(dir, "war3mapMap.blp")); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Mkdir(filepath.Join(dir, "war3mapMap.blp"), 0o777); err != nil {
 		t.Fatal(err)
 	}
 	absent := `{"info":{"preview":"preview.tga"},"players":{"5":{"name":"Absent"}}}`

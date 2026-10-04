@@ -9,17 +9,21 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/env"
 )
 
-// standIn is a testing.TB that records what Fatalf and Skip were told instead of stopping the test, so a test can
-// watch a helper fail or skip. Only the methods the helpers call are replaced.
+// standIn is a testing.TB that records what Fatalf, Errorf and Skip were told instead of stopping or failing the
+// test, so a test can watch a helper fail or skip. Only the methods the helpers call are replaced. As a
+// testing.T does, it takes calls from several goroutines at once.
 type standIn struct {
 	testing.TB
 	real    *testing.T
-	failed  []string
+	guard   sync.Mutex
+	failed  []string // what Fatalf was told, which stops a test
+	errors  []string // what Errorf was told, which fails a test and lets it go on
 	skipped []string
 }
 
@@ -31,9 +35,18 @@ func (s *standIn) Cleanup(f func()) {
 	s.real.Cleanup(f)
 }
 func (s *standIn) Fatalf(format string, args ...any) {
+	s.guard.Lock()
+	defer s.guard.Unlock()
 	s.failed = append(s.failed, fmt.Sprintf(format, args...))
 }
+func (s *standIn) Errorf(format string, args ...any) {
+	s.guard.Lock()
+	defer s.guard.Unlock()
+	s.errors = append(s.errors, fmt.Sprintf(format, args...))
+}
 func (s *standIn) Skip(args ...any) {
+	s.guard.Lock()
+	defer s.guard.Unlock()
 	s.skipped = append(s.skipped, fmt.Sprint(args...))
 }
 
@@ -75,13 +88,72 @@ func TestEnvFailsTheTestWhenRunFetchOrSpawnIsCalled(t *testing.T) {
 			stand := newStandIn(t)
 			world, _ := Env(stand, t.TempDir())
 			err := tc.call(world)
-			if len(stand.failed) != 1 || !strings.Contains(stand.failed[0], tc.want) {
-				t.Errorf("failures = %q, want one that names %q", stand.failed, tc.want)
+			if len(stand.errors) != 1 || !strings.Contains(stand.errors[0], tc.want) {
+				t.Errorf("failures = %q, want one that names %q", stand.errors, tc.want)
 			}
-			if err == nil {
-				t.Error("the call returned no error after failing the test")
+			// The call may come from a goroutine that is not the test's, which a stop would end alone.
+			if len(stand.failed) != 0 {
+				t.Errorf("the test was stopped: %q", stand.failed)
+			}
+			if err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Errorf("the call returned %v after failing the test, want an error that names %q", err, tc.want)
 			}
 		})
+	}
+}
+
+// Code under test may run programs and log from goroutines of its own. Each of them must get its error back and
+// have its failure and its lines kept, and none may stop the test.
+func TestEnvAndItsRecorderTakeCallsFromSeveralGoroutinesAtOnce(t *testing.T) {
+	const goroutines, calls = 8, 50
+	stand := newStandIn(t)
+	world, recorder := Env(stand, t.TempDir())
+	returned := make([]int, goroutines) // by goroutine, the errors its calls returned
+	var running sync.WaitGroup
+	for g := range goroutines {
+		running.Go(func() {
+			for call := range calls {
+				program := fmt.Sprintf("program %d of %d", call, g)
+				if _, err := world.Run(context.Background(), program, nil, env.RunOptions{}); err != nil {
+					returned[g]++
+				}
+				if _, _, err := world.Fetch(context.Background(), "https://example.test/"+program); err != nil {
+					returned[g]++
+				}
+				if err := world.Spawn(program, nil); err != nil {
+					returned[g]++
+				}
+				world.Log.Info(program)
+				recorder.Warn(program)
+				_ = recorder.Lines()
+			}
+		})
+	}
+	running.Wait()
+
+	for g, count := range returned {
+		if count != 3*calls {
+			t.Errorf("goroutine %d got %d errors from its calls, want %d", g, count, 3*calls)
+		}
+	}
+	if want := 3 * goroutines * calls; len(stand.errors) != want || len(stand.failed) != 0 {
+		t.Errorf("%d failures recorded and %d stops, want %d and none", len(stand.errors), len(stand.failed), want)
+	}
+	lines := recorder.Lines()
+	if len(lines) != 2*goroutines*calls {
+		t.Fatalf("the recorder kept %d lines, want %d", len(lines), 2*goroutines*calls)
+	}
+	// Each goroutine's lines are whole and in the order it logged them.
+	next := make([]int, goroutines)
+	for i, line := range lines {
+		var call, g int
+		if _, err := fmt.Sscanf(strings.TrimPrefix(line, "warning: "), "program %d of %d", &call, &g); err != nil {
+			t.Fatalf("line %d is %q", i, line)
+		}
+		if g < 0 || g >= goroutines || call != next[g]/2 {
+			t.Fatalf("line %d is %q, out of the order its goroutine logged in", i, line)
+		}
+		next[g]++
 	}
 }
 
@@ -111,8 +183,13 @@ func TestRecorderKeepsEveryLevelInOrder(t *testing.T) {
 	recorder.Warn("two")
 	recorder.Error("three")
 	want := []string{"one", "warning: two", "three"}
-	if !reflect.DeepEqual(recorder.Lines, want) {
-		t.Errorf("Lines = %q, want %q", recorder.Lines, want)
+	if got := recorder.Lines(); !reflect.DeepEqual(got, want) {
+		t.Errorf("Lines = %q, want %q", got, want)
+	}
+	// The lines a caller gets are its own.
+	recorder.Lines()[0] = "changed"
+	if got := recorder.Lines(); !reflect.DeepEqual(got, want) {
+		t.Errorf("after changing the lines it returned, Lines = %q, want %q", got, want)
 	}
 }
 

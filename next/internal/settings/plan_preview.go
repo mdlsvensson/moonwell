@@ -41,8 +41,8 @@ func (p *planner) roomFor(preview *picture.Picture) error {
 	if preview == nil {
 		return nil
 	}
-	if !p.folder.Has(savedMinimap) {
-		return errNoMinimap(p.folder.Label(savedMinimap))
+	if err := p.hasMinimap(); err != nil {
+		return err
 	}
 	for _, added := range []string{KeptMinimap, tgaName} {
 		if p.folder.Has(added) {
@@ -53,6 +53,18 @@ func (p *planner) roomFor(preview *picture.Picture) error {
 		}
 	}
 	return nil
+}
+
+// hasMinimap fails unless the map has the minimap World Editor saves. A folder under the minimap's name is not
+// the minimap, and is refused as a folder where the file belongs, not as a minimap the map lacks.
+func (p *planner) hasMinimap() error {
+	switch {
+	case p.folder.Has(savedMinimap):
+		return nil
+	case p.folder.IsFolder(savedMinimap):
+		return errFolderForFile(savedMinimap, p.folder.Label(savedMinimap))
+	}
+	return errNoMinimap(p.folder.Label(savedMinimap))
 }
 
 // preview puts the picture in the minimap's place and keeps the minimap under KeptMinimap. A BLP takes the

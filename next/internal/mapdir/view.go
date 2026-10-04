@@ -1,11 +1,13 @@
 package mapdir
 
 import (
+	"fmt"
 	"maps"
 	"slices"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 )
 
 // Change is the complete new content of one file, or its removal.
@@ -128,9 +130,16 @@ func (f *Folder) spelled(name string) string {
 }
 
 // Place is the spelling a new file at name is written under: folders the map already has, or that an earlier
-// change planned, keep their spelling. It fails when a folder on the way is a file, or name is a folder. A file
-// the map has on disk is on the way in a view that removes it too. It is the name With gives a change to name.
+// change planned, keep their spelling. It fails when a folder on the way is a file, or name is a folder, with an
+// error that names what is in the way as its file. A file the map has on disk is on the way in a view that
+// removes it too. It is the name With gives a change to name.
+//
+// A name that fsx.RelPath does not take fails with a plain error. A planner asks for the place of a fixed name or
+// of one it has checked, so such a name is its bug, and it shows here, at the planner, before the plan is written.
 func (f *Folder) Place(name string) (string, error) {
+	if _, ok := fsx.RelPath(name); !ok {
+		return "", errNoPlaceForSuchAName(name)
+	}
 	placed := f.spelled(name)
 	if file, ok := f.fileOnTheWay(placed); ok {
 		return "", errFileOnTheWay(f.Name(file), name, f.Label(file))
@@ -155,6 +164,12 @@ func (f *Folder) fileOnTheWay(name string) (file string, found bool) {
 }
 
 // ---- errors ----
+
+// errNoPlaceForSuchAName is not a diag error: no planner asks for the place of a name it has not checked, so it
+// must be reported as Moonwell's own fault.
+func errNoPlaceForSuchAName(name string) error {
+	return fmt.Errorf("Cannot place %q: it is not a relative path that a file of a map can have.", name)
+}
 
 func errFileOnTheWay(blocking, name, file string) error {
 	return &diag.Error{

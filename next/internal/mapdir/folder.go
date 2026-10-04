@@ -8,8 +8,9 @@
 //
 // For the author of a planner. A planner is given a Folder and returns Changes; it writes nothing. It reads every
 // file it changes, removes or relies on through the folder (Read, Has, Name), in any letter case; it asks Place for
-// the name of a file the map does not have; and it returns the changes. Its caller lays them over the folder with
-// With, and stages the view with StageTo or writes it into the map with ApplyInPlace.
+// the name of a file the map does not have, and IsFolder whether a name it finds no file under is a folder of the
+// map; and it returns the changes. Its caller lays them over the folder with With, and stages the view with
+// StageTo or writes it into the map with ApplyInPlace.
 //
 // Open refuses, wherever in the folder it is:
 //
@@ -26,8 +27,10 @@
 // Before their first write, StageTo and ApplyInPlace check the whole plan, and refuse it when a change has a name
 // that no file can have (one fsx.RelPath does not take), when a new file is named as a folder of the map, and when
 // a new file would be below a file of the map, also one the plan removes: no file of a map becomes a folder. Place
-// refuses the last two with an error a user can act on, so a plan refused by this check is its planner's bug, and
-// the error is a plain one. StageTo also refuses to stage over the source map.
+// refuses all three before that: the first with a plain error, since a planner hands it a fixed name or one it has
+// checked, and the last two with an error a user can act on, which names what is in the way as its file. So a plan
+// refused by this check is its planner's bug, and the error is a plain one. StageTo also refuses to stage over the
+// source map.
 //
 // ApplyInPlace writes only where the folder is still what was seen. Before each write it checks the file: one the
 // scan found must be there, with the bytes that were read if any view of the folder read it, and one the scan did
@@ -139,6 +142,16 @@ func (f *Folder) Has(name string) bool {
 		return !f.changes[at].Remove
 	}
 	return f.found.has(name)
+}
+
+// IsFolder reports whether the map has a folder under this name, by any letter case: one the scan found, or one a
+// planned change makes. A removal takes a file away and leaves its folder, so a folder the scan found stays one
+// in a view that removes every file in it. A folder that only planned files make is one as long as the view
+// plans a file in it: it is none once every such write is taken back. A file is not a folder, and neither is the
+// map folder itself, under "".
+func (f *Folder) IsFolder(name string) bool {
+	_, is := f.folder(Key(name))
+	return is
 }
 
 // Name is the spelling the folder has for name, else name as given. A file that a view removes keeps its spelling,

@@ -2,6 +2,8 @@ package mapdir
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"reflect"
 	"slices"
 	"strings"
@@ -208,10 +210,6 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			folder, _ := open(t, disk)
-			placed, err := folder.Place(c.given)
-			if err != nil || placed != c.stored {
-				t.Errorf("Place(%q) = %q, %v, want %q", c.given, placed, err, c.stored)
-			}
 			view := folder.With([]Change{put(c.given, "new")})
 			if got, want := names(view.Changes()), []string{c.stored}; !slices.Equal(got, want) {
 				t.Errorf("Changes names the files %q, want %q", got, want)
@@ -384,6 +382,70 @@ func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 		}
 		if !contains(e.Msg, c.name) {
 			t.Errorf("Place(%q) does not name what was asked for: %q", c.name, e.Msg)
+		}
+	}
+}
+
+// A planner asks for the place of a fixed name or of one it has checked, so a name no file can have is its bug:
+// it shows at the planner, as a plain error, and not only when the plan is written.
+func TestPlaceRefusesANameNoFileCanHaveAsItsCallersBug(t *testing.T) {
+	folder, _ := open(t, map[string]string{"war3map.w3i": "info", "Textures/Old.blp": "old"})
+	unwritable := []string{
+		"", "/WAR3MAP.W3I", "//war3map.w3i", "/textures/New.blp", "a//b", "a/../b", "./war3map.w3i", "new/",
+		"../outside.txt", "textures//New.blp", `TEXTURES\..\WAR3MAP.W3I`, "what?.blp", "Sound/nul.mp3", "Sound/a.mp3 ",
+	}
+	for _, name := range unwritable {
+		placed, err := folder.Place(name)
+		text := asPlannersBug(t, err)
+		if placed != "" || !contains(text, fmt.Sprintf("Cannot place %q", name)) || !contains(text, "relative path") {
+			t.Errorf("Place(%q) = %q, %q, want a refusal that names it", name, placed, text)
+		}
+	}
+}
+
+func TestIsFolderIsAFolderTheScanFoundOrOneAPlannedChangeMakes(t *testing.T) {
+	dir := write(t, map[string]string{"Textures/Old.blp": "old", "Units/Hero/a.txt": "", "war3map.lua": "script"})
+	if err := os.Mkdir(filepath.Join(dir, "Empty"), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	folder, err := Open(dir, label)
+	if err != nil {
+		t.Fatal(err)
+	}
+	planned := folder.With([]Change{put("Sound/Music/theme.mp3", "theme"), drop("Units/Hero/a.txt")})
+	takenBack := planned.With([]Change{drop("sound/music/THEME.mp3")})
+	oneLeft := planned.With([]Change{put("sound/Effects/hit.wav", "hit")}).With([]Change{drop("Sound/Music/theme.mp3")})
+	cases := []struct {
+		what string
+		view *Folder
+		name string
+		want bool
+	}{
+		{"a folder of the map", folder, "Textures", true},
+		{"in another letter case", folder, "textures", true},
+		{"a folder below a folder, with a backslash", folder, `UNITS\hero`, true},
+		{"a folder without a file", folder, "empty", true},
+		{"a file of the map", folder, "war3map.lua", false},
+		{"a file in a folder", folder, "Textures/Old.blp", false},
+		{"a name the map does not have", folder, "Sound", false},
+		{"the map folder itself", folder, "", false},
+		{"a folder's name with a slash after it", folder, "Textures/", false},
+		{"a folder a planned file makes", planned, "sound", true},
+		{"and the folder below it", planned, "SOUND/music", true},
+		{"the planned file itself", planned, "Sound/Music/theme.mp3", false},
+		// A removal takes a file away and leaves the folder it was in.
+		{"a folder of the map whose one file the view removes", planned, "units/hero", true},
+		{"and the folder above it", planned, "Units", true},
+		// A folder that only planned files make is one as long as the view plans a file in it.
+		{"a planned folder whose one write is taken back", takenBack, "sound", false},
+		{"and the folder that was below it", takenBack, "sound/music", false},
+		{"a planned folder with one of its two writes taken back", oneLeft, "sound", true},
+		{"the folder of the write that is left", oneLeft, "Sound/effects", true},
+		{"the folder of the write that is taken back", oneLeft, "sound/music", false},
+	}
+	for _, c := range cases {
+		if got := c.view.IsFolder(c.name); got != c.want {
+			t.Errorf("%s: IsFolder(%q) = %v, want %v", c.what, c.name, got, c.want)
 		}
 	}
 }

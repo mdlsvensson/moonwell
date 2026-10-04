@@ -173,16 +173,19 @@ func setsKeys(sections []txt.Section) bool {
 
 // ---- reading and changing the map's files ----
 
-// required is the bytes of a file the settings need the map to have, in any letter case.
+// required is the bytes of a file the settings need the map to have, in any letter case. A folder under the name
+// is not the file, and is refused as a folder where the file belongs, not as a file the map lacks.
 func (p *planner) required(name string) ([]byte, error) {
 	data, found, err := p.folder.Read(name)
 	switch {
 	case err != nil:
 		return nil, err
-	case !found:
-		return nil, errMissing(p.folder.Label(name))
+	case found:
+		return data, nil
+	case p.folder.IsFolder(name):
+		return nil, errFolderForFile(name, p.folder.Label(name))
 	}
-	return data, nil
+	return nil, errMissing(p.folder.Label(name))
 }
 
 // requiredText is required for a file that is text: its byte order mark, and the text after it.
@@ -228,6 +231,16 @@ const resaveMap = "Open and re-save the map in World Editor in folder format wit
 
 func errMissing(file string) error {
 	return &diag.Error{Msg: "A map file needed by the configured settings is missing.", File: file, Hint: resaveMap}
+}
+
+// errFolderForFile is raised for the minimap a preview needs too, in plan_preview.go.
+func errFolderForFile(name, file string) error {
+	return &diag.Error{
+		Msg:  name + " in the map is a folder, not a file.",
+		File: file,
+		Hint: "The map has a folder where a file the configured settings need belongs. Remove that folder from the " +
+			"source map, or open and re-save the map in World Editor.",
+	}
 }
 
 func errNotText(file string) error {

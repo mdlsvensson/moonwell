@@ -76,8 +76,9 @@ import (
 //     (TestCollectRefusesALinkBelowTheProjectFolder). The other tree names the link by its path on disk and
 //     this tree by its path from the project folder, as the file of the error. Both must refuse and name the
 //     same link, with the same hint; a link in a library's folder is the library's failure in both. A link in
-//     place of a library's folder is compared whole: it is no failure of the library in either tree, and both
-//     give the plain link error with the path on disk and the hint to replace the link.
+//     place of a library's folder is no failure of the library in either tree, and both say so in the same
+//     words, with the path on disk and the hint to replace the link; the other tree's error has no file, and
+//     this tree's has the folder, by its path from the project folder. Four refusals, all in part.
 //   - A file where assets/ or a library's folder should be (TestAFileWhereAFolderOfAssetsShouldBeIsRefused). The
 //     other tree says "Expected a folder" with the path on disk and, for assets/, neither file nor hint; this
 //     tree names the folder from the project folder, as the file of the error too, with a hint. Both must
@@ -479,14 +480,14 @@ func TestOracleOnALink(t *testing.T) {
 		libraries         []string
 		start             string // the words before the place of the link
 		wantFile, gotFile string
-		whole             bool // whether the two trees refuse in the same words
+		sameWords         bool // whether this tree's message names the link by its path on disk too
 	}{
 		{"inside assets", "assets/Icons/linked", nil, words, "", "assets/Icons/linked", false},
 		{"in place of assets", "assets", nil, words, "", "assets", false},
 		{"inside a library's folder", library + "/linked", []string{"ui"}, inLibrary + words, library, library, false},
-		{"in place of a library's folder", library, []string{"ui"}, words, "", "", true},
+		{"in place of a library's folder", library, []string{"ui"}, words, "", library, true},
 	}
-	inPart, whole := 0, 0
+	inPart := 0
 	for _, tt := range tests {
 		p := project{name: "a link " + tt.name, folders: []string{path.Dir(tt.link)}, libraries: tt.libraries}
 		root, outside := p.onDisk(t), t.TempDir()
@@ -495,21 +496,22 @@ func TestOracleOnALink(t *testing.T) {
 		testkit.LinkDir(t, outside, onDisk)
 		wantErr, gotErr := refusals(t, p, root)
 		want, got, ok := bothDiag(t, p.name, wantErr, gotErr)
-		switch {
-		case !ok:
-		case tt.whole:
-			if oracle.Refusals(t, p.name, wantErr, gotErr) && want.Msg == tt.start+onDisk {
-				whole++
-			}
-		case want.Msg != tt.start+onDisk || want.File != tt.wantFile || got.Msg != tt.start+tt.link ||
-			got.File != tt.gotFile || got.Hint != want.Hint:
-			t.Errorf("%s: the refusals differ in more than how they name the link:\nwant: %+v\ngot:  %+v", p.name, want, got)
-		default:
-			inPart++
+		if !ok {
+			continue
 		}
+		named := tt.link
+		if tt.sameWords {
+			named = onDisk
+		}
+		if want.Msg != tt.start+onDisk || want.File != tt.wantFile || got.Msg != tt.start+named ||
+			got.File != tt.gotFile || got.Hint != want.Hint {
+			t.Errorf("%s: the refusals differ in more than how they name the link:\nwant: %+v\ngot:  %+v", p.name, want, got)
+			continue
+		}
+		inPart++
 	}
-	if inPart != 3 || whole != 1 {
-		t.Errorf("%d refusals compared in part and %d whole, want 3 and 1", inPart, whole)
+	if inPart != 4 {
+		t.Errorf("%d refusals compared in part, want 4", inPart)
 	}
 }
 

@@ -199,14 +199,27 @@ func TestCollectRefusesALinkBelowTheProjectFolder(t *testing.T) {
 			t.Errorf("error = %+v", e)
 		}
 	})
-	// The link is on this machine and not among what the library ships, so the failure is not the library's.
+	// The link is on this machine and not among what the library ships, so the failure is not the library's. Its
+	// file is the folder, by its path from the project folder, as for a link in place of assets.
 	t.Run("in place of a library's folder", func(t *testing.T) {
 		root := t.TempDir()
 		put(t, root, "libraries/other/a.blp")
 		link := filepath.Join(root, "libraries", "ui")
 		testkit.LinkDir(t, outside, link)
 		e := refused(t, root, noBlock, "ui")
-		if e.Msg != "Symlinks are not supported: "+link || !strings.Contains(e.Hint, "Replace the link") {
+		if e.Msg != "Symlinks are not supported: "+link || e.File != "libraries/ui" ||
+			!strings.Contains(e.Hint, "Replace the link") {
+			t.Errorf("error = %+v", e)
+		}
+	})
+	// A library's folder outside the project is named by its path.
+	t.Run("in place of a library's folder outside the project", func(t *testing.T) {
+		root := t.TempDir()
+		link := filepath.Join(t.TempDir(), "ui")
+		testkit.LinkDir(t, outside, link)
+		_, _, err := Collect(root, blockOf(t, noBlock), manifestName, []Library{{Key: "ui", Dir: link}})
+		e := asError(t, err, "a library behind a link")
+		if e.Msg != "Symlinks are not supported: "+link || e.File != filepath.ToSlash(link) {
 			t.Errorf("error = %+v", e)
 		}
 	})
