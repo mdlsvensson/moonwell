@@ -112,7 +112,9 @@ func Read(data []byte, file string, depth Depth) (*Info, error) {
 // reader reads the file front to back. The byte reader keeps its first failure and returns zeroes after it, so the
 // parts below read straight through and Read asks once after each depth what went wrong. A value that is wrong is
 // passed to refuse, which drops it when the bytes had already run out: such a value is a zero that was never in
-// the file. The error is then the first thing wrong in the file, in the order of its bytes.
+// the file. The error is then the first thing that was found wrong. A value is judged where it stands, but the
+// player records are judged after all of them are read, so bytes that run out in a later record are reported, and
+// not a wrong value in a record before it.
 type reader struct {
 	data    *binio.Reader
 	file    string

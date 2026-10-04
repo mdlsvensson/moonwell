@@ -65,6 +65,10 @@ func TestClosestFindsNamesAFewEditsAwayIgnoringCaseNearestFirst(t *testing.T) {
 		// At most max, ties broken by name.
 		{[]string{"ae", "ad", "ac", "ab"}, "aa", 3, []string{"ab", "ac", "ad"}},
 		{[]string{"ae", "ad", "ac", "ab"}, "aa", 1, []string{"ab"}},
+		{[]string{"ae", "ad", "ac", "ab"}, "aa", 0, nil},
+		// A negative max is no cap, as JoinWords reads one.
+		{[]string{"ae", "ad", "ac", "ab"}, "aa", -1, []string{"ab", "ac", "ad", "ae"}},
+		{names, "io", -1, nil},
 		// A nearer name comes before one that sorts first.
 		{[]string{"abcdefaa", "abcdefgx", "abcdefgh"}, "abcdefgi", 3, []string{"abcdefgh", "abcdefgx", "abcdefaa"}},
 		// A character outside the basic plane is one edit, which a five-character name allows.

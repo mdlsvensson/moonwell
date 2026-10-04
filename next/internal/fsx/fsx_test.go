@@ -53,8 +53,10 @@ func TestListFilesReturnsPosixRelativePathsSortedByBytes(t *testing.T) {
 	write(t, filepath.Join(dir, "z.txt"), "")
 	write(t, filepath.Join(dir, "a", "b", "c.txt"), "")
 	write(t, filepath.Join(dir, "Y.txt"), "")
+	// A walk meets a.txt after the folder a; by bytes "." comes before "/", so only a sort puts it first.
+	write(t, filepath.Join(dir, "a.txt"), "")
 	got, err := ListFiles(dir)
-	if err != nil || !slices.Equal(got, []string{"Y.txt", "a/b/c.txt", "z.txt"}) {
+	if err != nil || !slices.Equal(got, []string{"Y.txt", "a.txt", "a/b/c.txt", "z.txt"}) {
 		t.Errorf("ListFiles = %q, %v", got, err)
 	}
 }
@@ -142,6 +144,34 @@ func TestDecodeText(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			if got := DecodeText([]byte(c.bytes)); got != c.want {
 				t.Errorf("DecodeText(%q) = %q, want %q", c.bytes, got, c.want)
+			}
+		})
+	}
+}
+
+func TestTextWithMarkKeepsTheMarkAsideAndRefusesInvalidBytes(t *testing.T) {
+	for _, c := range []struct {
+		name, bytes, mark, text string
+		ok                      bool
+	}{
+		{"no mark", "Count = 0\n", "", "Count = 0\n", true},
+		{"a mark", bom + "Count = 0\n", bom, "Count = 0\n", true},
+		{"a mark only", bom, bom, "", true},
+		{"an empty file", "", "", "", true},
+		{"only the first mark is kept aside", bom + bom + "a", bom, bom + "a", true},
+		{"a mark further in is text", "a" + bom, "", "a" + bom, true},
+		{"text outside ASCII", bom + "h\xC3\xA9ro\n", bom, "h\xC3\xA9ro\n", true},
+		{"an invalid byte", "a\xFFb", "", "", false},
+		{"an invalid byte after a mark", bom + "a\xFFb", "", "", false},
+		{"a mark cut short", "\xEF\xBB", "", "", false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			mark, text, ok := TextWithMark([]byte(c.bytes))
+			if mark != c.mark || text != c.text || ok != c.ok {
+				t.Errorf("TextWithMark(%q) = %q, %q, %v, want %q, %q, %v", c.bytes, mark, text, ok, c.mark, c.text, c.ok)
+			}
+			if ok && mark+text != c.bytes {
+				t.Errorf("the mark and the text make %q, want the bytes given", mark+text)
 			}
 		})
 	}

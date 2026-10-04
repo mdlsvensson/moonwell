@@ -1,6 +1,7 @@
 package mapdir
 
 import (
+	"cmp"
 	"errors"
 	"io/fs"
 	"net"
@@ -88,33 +89,78 @@ func TestOpenRefusesAFolderThatIsALink(t *testing.T) {
 	}
 }
 
-func TestOpenRefusesANameWithABackslash(t *testing.T) {
+// unusable are names a file system with "/" separators can hold and Windows cannot: each is one name, not a path.
+var unusable = []struct{ why, name string }{
+	{"a backslash", `Textures\Icon.blp`},
+	{"a control character", "a\tb.txt"},
+	{"a question mark", "what?.blp"},
+	{"an asterisk", "any*.blp"},
+	{"a colon", "c:icon.blp"},
+	{"a quote", `"icon".blp`},
+	{"an angle bracket", "<icon>.blp"},
+	{"a bar", "a|b.blp"},
+	{"a dot at the end", "icon."},
+	{"a space at the end", "icon.blp "},
+	{"a device", "con"},
+	{"a device with an extension", "NUL.txt"},
+	{"a numbered device", "Com1.blp"},
+}
+
+// named is an entry of a folder with a name of the test's choosing. It has nothing but the name: the scan must
+// refuse the entry before it asks for more.
+type named struct {
+	fs.DirEntry
+	name string
+}
+
+func (n named) Name() string { return n.name }
+
+func TestTheScanRefusesAnEntryWithANameWindowsCannotHold(t *testing.T) {
+	for _, c := range unusable {
+		for _, below := range []string{"", "Units/Hero"} {
+			t.Run(c.why+" in "+cmp.Or(below, "the top folder"), func(t *testing.T) {
+				w := walker{label: label, found: &listing{}}
+				path := join(below, c.name)
+				e := asError(t, w.add(path, named{name: c.name}))
+				if !contains(e.Msg, "cannot be used in a map") || !contains(e.Msg, "Windows") || !contains(e.Msg, path) ||
+					e.File != label+"/"+path || !contains(e.Hint, "source map") {
+					t.Errorf("error = %+v, want it at %s", e, label+"/"+path)
+				}
+			})
+		}
+	}
+}
+
+func TestANameWindowsCanHoldIsUsable(t *testing.T) {
+	for _, name := range []string{"war3map.w3i", "Icon 1.blp", ".hidden", "..b", "console.txt", "h\xC3\xA9ro.mdx", "a.b.c"} {
+		if !usable(name) {
+			t.Errorf("usable(%q) is false", name)
+		}
+	}
+}
+
+func TestOpenRefusesANameWindowsCannotHold(t *testing.T) {
 	if filepath.Separator == '\\' {
-		t.Skip("a name cannot hold a backslash on this system")
+		t.Skip("this system cannot hold such names")
 	}
-	// Where "/" separates, each of these is one name; none of them is a path.
-	cases := []struct {
-		name string
-		make func(t *testing.T, dir string)
-		at   string
-	}{
-		{"a file", func(t *testing.T, dir string) { testkit.WriteFile(t, dir, `Textures\Icon.blp`, nil) },
-			`Textures\Icon.blp`},
-		{"a file below a folder", func(t *testing.T, dir string) { testkit.WriteFile(t, dir, `Units/a\b.mdx`, nil) },
-			`Units/a\b.mdx`},
-		{"a folder", func(t *testing.T, dir string) { testkit.WriteFile(t, dir, `Sound\Music/theme.mp3`, nil) },
-			`Sound\Music`},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			dir := write(t, map[string]string{"war3map.w3i": "info"})
-			c.make(t, dir)
-			_, err := Open(dir, label)
-			e := asError(t, err)
-			if !contains(e.Msg, "backslash") || !contains(e.Msg, c.at) || e.File != label+"/"+c.at || e.Hint == "" {
-				t.Errorf("error = %+v, want it at %s", e, label+"/"+c.at)
-			}
-		})
+	for _, c := range unusable {
+		// As a file at the top, as a file below a folder, and as a folder: the error is at the entry so named.
+		for _, at := range []struct{ how, file, entry string }{
+			{"a file", c.name, c.name},
+			{"a file below a folder", "Units/" + c.name, "Units/" + c.name},
+			{"a folder", c.name + "/theme.mp3", c.name},
+		} {
+			t.Run(c.why+" in the name of "+at.how, func(t *testing.T) {
+				dir := write(t, map[string]string{"war3map.w3i": "info"})
+				testkit.WriteFile(t, dir, at.file, nil)
+				_, err := Open(dir, label)
+				e := asError(t, err)
+				if !contains(e.Msg, "cannot be used in a map") || !contains(e.Msg, at.entry) ||
+					e.File != label+"/"+at.entry || e.Hint == "" {
+					t.Errorf("error = %+v, want it at %s", e, label+"/"+at.entry)
+				}
+			})
+		}
 	}
 }
 

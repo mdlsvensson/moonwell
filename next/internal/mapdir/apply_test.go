@@ -9,6 +9,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
@@ -113,15 +114,18 @@ func TestStageToRemovesAFileThatIsAlreadyGone(t *testing.T) {
 	}
 }
 
+// unwritable are names of changes that no file can have: each could leave the folder it is written into, or
+// name another file than it seems to. With keeps them as given.
+var unwritable = []struct{ name, file string }{
+	{"a path that leaves the folder", "../outside.txt"},
+	{"a leading slash before a file the map has", "/WAR3MAP.W3I"},
+	{"an empty folder name", "a//b"},
+	{"a way out of a folder", "a/../b"},
+}
+
 func TestStageToNamesTheFileItCouldNotWrite(t *testing.T) {
 	const hint = "Close Warcraft III or World Editor if they have dist/stage open, then retry."
-	cases := []struct {
-		name, file string
-	}{
-		{"a folder where the file goes", "Textures"},
-		{"a path that leaves the stage", "../outside.txt"},
-	}
-	for _, c := range cases {
+	for _, c := range unwritable {
 		t.Run(c.name, func(t *testing.T) {
 			folder, dir := open(t, sourceMap)
 			source := snapshot(t, dir)
@@ -129,17 +133,129 @@ func TestStageToNamesTheFileItCouldNotWrite(t *testing.T) {
 			stage := filepath.Join(parent, "stage", "map.w3x")
 			err := folder.With([]Change{put(c.file, "data")}).StageTo(stage)
 			e := asError(t, err)
-			if !contains(e.Msg, "Staging the map failed") || e.Cause == nil || e.Hint != hint ||
-				e.File != filepath.Join(stage, filepath.FromSlash(c.file)) {
+			if !contains(e.Msg, "Staging the map failed") || !contains(e.Msg, "Invalid path") || e.Cause == nil ||
+				e.Hint != hint || e.File != filepath.Join(stage, filepath.FromSlash(c.file)) {
 				t.Errorf("error = %+v", e)
 			}
 			if fsx.Exists(filepath.Join(parent, "stage", "outside.txt")) {
 				t.Error("a file was written outside the stage")
 			}
+			// The stage is the copy and no more: the change landed on no file of it.
+			if got := snapshot(t, stage); !reflect.DeepEqual(got, source) {
+				t.Errorf("the stage holds %v, want the copy %v", got, source)
+			}
 			if got := snapshot(t, dir); !reflect.DeepEqual(got, source) {
 				t.Errorf("staging changed the source map: %v", got)
 			}
 		})
+	}
+}
+
+// misplaced are plans the map has no place for. Each has a good change first, to show that nothing is written.
+var misplaced = []struct {
+	name    string
+	changes []Change
+	words   []string // of the error
+}{
+	{"a change named as a folder of the map",
+		[]Change{put("war3mapskin.txt", "merged"), put("textures", "data")},
+		[]string{"Cannot write textures", "the folder Textures of the map"}},
+	{"a change through a file of the map",
+		[]Change{put("war3mapskin.txt", "merged"), put("WAR3MAP.W3I/x.txt", "data")},
+		[]string{"Cannot write WAR3MAP.W3I/x.txt", "goes through war3map.w3i, a file of the map"}},
+	{"a change through a file below a folder",
+		[]Change{put("war3mapskin.txt", "merged"), put("textures/old.blp/deep/x.txt", "data")},
+		[]string{"Cannot write Textures/old.blp/deep/x.txt", "goes through Textures/Old.blp, a file of the map"}},
+	// Of two changes that have no place beside each other, the one planned first is named.
+	{"a new file named as the folder a later change makes",
+		[]Change{put("war3mapskin.txt", "merged"), put("Sound", "data"), put("sound/theme.mp3", "theme")},
+		[]string{"Cannot write Sound", "the folder sound of the map"}},
+	{"a new file below the name a later change writes as a file",
+		[]Change{put("war3mapskin.txt", "merged"), put("Sound/Music/theme.mp3", "theme"), put("sound", "data")},
+		[]string{"Cannot write Sound/Music/theme.mp3", "goes through sound, a file of the map"}},
+}
+
+// asPlannersBug is the text of an error that must not be one a user is told to act on.
+func asPlannersBug(t *testing.T, err error) string {
+	t.Helper()
+	if err == nil {
+		t.Fatal("got no error")
+	}
+	var expected *diag.Error
+	if errors.As(err, &expected) {
+		t.Fatalf("got the *diag.Error %+v, want a plain error", expected)
+	}
+	return err.Error()
+}
+
+func TestStageToRefusesAChangeTheMapHasNoPlaceForBeforeItWrites(t *testing.T) {
+	for _, c := range misplaced {
+		t.Run(c.name, func(t *testing.T) {
+			folder, dir := open(t, sourceMap)
+			source := snapshot(t, dir)
+			stage := filepath.Join(t.TempDir(), "map.w3x")
+			testkit.WriteFile(t, stage, "left.txt", []byte("from an earlier build"))
+			earlier := snapshot(t, stage)
+			text := asPlannersBug(t, folder.With(c.changes).StageTo(stage))
+			for _, words := range c.words {
+				if !contains(text, words) {
+					t.Errorf("error = %q, want it to say %q", text, words)
+				}
+			}
+			if got := snapshot(t, stage); !reflect.DeepEqual(got, earlier) {
+				t.Errorf("the stage holds %v, want it untouched: %v", got, earlier)
+			}
+			if got := snapshot(t, dir); !reflect.DeepEqual(got, source) {
+				t.Errorf("staging changed the source map: %v", got)
+			}
+		})
+	}
+}
+
+func TestApplyInPlaceRefusesAChangeTheMapHasNoPlaceForBeforeItWrites(t *testing.T) {
+	for _, c := range misplaced {
+		t.Run(c.name, func(t *testing.T) {
+			folder, dir := open(t, sourceMap)
+			source := snapshot(t, dir)
+			var journal fsx.Journal
+			text := asPlannersBug(t, folder.With(c.changes).ApplyInPlace(context.Background(), &journal))
+			for _, words := range c.words {
+				if !contains(text, words) {
+					t.Errorf("error = %q, want it to say %q", text, words)
+				}
+			}
+			if got := snapshot(t, dir); journal.Len() != 0 || !reflect.DeepEqual(got, source) {
+				t.Errorf("the journal touched %d files; the map holds %v, want %v", journal.Len(), got, source)
+			}
+		})
+	}
+}
+
+func TestAFileTheViewRemovesIsNoFileOnTheWay(t *testing.T) {
+	changes := []Change{drop("WAR3MAP.W3I"), put("war3map.w3i/x.txt", "data")}
+	want := map[string]string{
+		"war3map.w3i":       "<folder>",
+		"war3map.w3i/x.txt": "data",
+		"war3mapMap.blp":    "minimap",
+		"war3mapskin.txt":   "skin",
+		"Textures":          "<folder>",
+		"Textures/Old.blp":  "old",
+	}
+	folder, dir := open(t, sourceMap)
+	view := folder.With(changes)
+	stage := filepath.Join(t.TempDir(), "map.w3x")
+	if err := view.StageTo(stage); err != nil {
+		t.Fatal(err)
+	}
+	if got := snapshot(t, stage); !reflect.DeepEqual(got, want) {
+		t.Errorf("the stage holds %v, want %v", got, want)
+	}
+	var journal fsx.Journal
+	if err := view.ApplyInPlace(context.Background(), &journal); err != nil {
+		t.Fatal(err)
+	}
+	if got := snapshot(t, dir); !reflect.DeepEqual(got, want) {
+		t.Errorf("the map holds %v, want %v", got, want)
 	}
 }
 
@@ -391,13 +507,7 @@ func TestApplyInPlaceStopsBetweenTwoChanges(t *testing.T) {
 }
 
 func TestApplyInPlaceNamesTheFileItCouldNotWrite(t *testing.T) {
-	cases := []struct {
-		name, file string
-	}{
-		{"a file where a folder of the new file goes", "war3map.w3i/x.txt"},
-		{"a path that leaves the map", "../outside.txt"},
-	}
-	for _, c := range cases {
+	for _, c := range unwritable {
 		t.Run(c.name, func(t *testing.T) {
 			folder, dir := open(t, sourceMap)
 			before := snapshot(t, filepath.Dir(dir))
@@ -405,11 +515,12 @@ func TestApplyInPlaceNamesTheFileItCouldNotWrite(t *testing.T) {
 			changes := []Change{put(c.file, "data"), put("war3mapskin.txt", "never written")}
 			err := folder.With(changes).ApplyInPlace(context.Background(), &journal)
 			e := asError(t, err)
-			if !contains(e.Msg, "Writing a map file failed: ") || e.File != label+"/"+c.file || e.Cause == nil {
+			if !contains(e.Msg, "Writing a map file failed: Invalid path") || e.File != label+"/"+c.file ||
+				e.Cause == nil {
 				t.Errorf("error = %+v", e)
 			}
-			if got := snapshot(t, filepath.Dir(dir)); !reflect.DeepEqual(got, before) {
-				t.Errorf("a failed write left %v, want %v", got, before)
+			if got := snapshot(t, filepath.Dir(dir)); journal.Len() != 0 || !reflect.DeepEqual(got, before) {
+				t.Errorf("the journal touched %d files; a failed write left %v, want %v", journal.Len(), got, before)
 			}
 		})
 	}

@@ -6,9 +6,10 @@ import (
 	"strings"
 )
 
-// Closest returns up to max of names that are close to key, for a "did you mean" hint. A name is close when it is
-// within a quarter of key's length in edits, and at least one edit is always allowed; letter case is ignored. The
-// nearest name comes first, and names equally near are in byte order. key itself is never returned.
+// Closest returns up to max of names that are close to key, for a "did you mean" hint; with max < 0, every close
+// name. A name is close when it is within a quarter of key's length in edits, and at least one edit is always
+// allowed; letter case is ignored. The nearest name comes first, and names equally near are in byte order. key
+// itself is never returned.
 func Closest(names []string, key string, max int) []string {
 	matches := near(names, key)
 	slices.SortStableFunc(matches, func(a, b match) int {
@@ -17,8 +18,11 @@ func Closest(names []string, key string, max int) []string {
 		}
 		return strings.Compare(a.name, b.name)
 	})
+	if max < 0 || max > len(matches) {
+		max = len(matches)
+	}
 	var closest []string
-	for _, m := range matches[:min(len(matches), max)] {
+	for _, m := range matches[:max] {
 		closest = append(closest, m.name)
 	}
 	return closest

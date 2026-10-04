@@ -7,18 +7,20 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/env"
 )
 
-// standIn is a testing.TB that records what Fatalf was told instead of stopping the test, so a test can watch a helper
-// fail. Only the methods the helpers call are replaced.
+// standIn is a testing.TB that records what Fatalf and Skip were told instead of stopping the test, so a test can
+// watch a helper fail or skip. Only the methods the helpers call are replaced.
 type standIn struct {
 	testing.TB
-	real   *testing.T
-	failed []string
+	real    *testing.T
+	failed  []string
+	skipped []string
 }
 
 func newStandIn(t *testing.T) *standIn { return &standIn{real: t} }
@@ -30,6 +32,9 @@ func (s *standIn) Cleanup(f func()) {
 }
 func (s *standIn) Fatalf(format string, args ...any) {
 	s.failed = append(s.failed, fmt.Sprintf(format, args...))
+}
+func (s *standIn) Skip(args ...any) {
+	s.skipped = append(s.skipped, fmt.Sprint(args...))
 }
 
 func TestFixtureReturnsTheBytesOfAFileUnderTestdata(t *testing.T) {
@@ -156,6 +161,73 @@ func TestRepoRootIsTheFolderWithGoMod(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(RepoRoot(t), "go.mod")); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestRepoRootFailsTheTestOnceWhereNoFolderAboveHasGoMod(t *testing.T) {
+	t.Chdir(t.TempDir())
+	stand := newStandIn(t)
+	root := RepoRoot(stand)
+	if root != "" {
+		if _, err := os.Stat(filepath.Join(root, "go.mod")); err == nil {
+			t.Skipf("there is a go.mod above the temporary folder, in %s", root)
+		}
+	}
+	if root != "" || len(stand.failed) != 1 || !strings.Contains(stand.failed[0], "go.mod") {
+		t.Errorf("RepoRoot = %q with the failures %q, want none and one that names go.mod", root, stand.failed)
+	}
+}
+
+func TestNeedPklFindsPklOnThePathAndElseSkipsOrFailsTheTest(t *testing.T) {
+	program := "pkl"
+	if runtime.GOOS == "windows" {
+		program = "pkl.exe"
+	}
+	tests := []struct {
+		name          string
+		onPath        bool
+		require       string // MOONWELL_REQUIRE_TOOLS
+		skips, fails  int
+		failureNaming string
+	}{
+		{name: "pkl on the PATH", onPath: true},
+		{name: "pkl on the PATH, tools required", onPath: true, require: "1"},
+		{name: "no pkl", skips: 1},
+		{name: "no pkl, tools required", require: "1", fails: 1, failureNaming: "MOONWELL_REQUIRE_TOOLS"},
+		{name: "no pkl, another value than 1", require: "0", skips: 1},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			t.Setenv("PATH", dir)
+			t.Setenv("MOONWELL_REQUIRE_TOOLS", tc.require)
+			if tc.onPath {
+				if err := os.Chmod(WriteFile(t, dir, program, nil), 0o755); err != nil {
+					t.Fatal(err)
+				}
+			}
+			stand := newStandIn(t)
+			got := NeedPkl(stand)
+			if len(stand.skipped) != tc.skips || len(stand.failed) != tc.fails {
+				t.Errorf("skipped %q and failed %q, want %d and %d", stand.skipped, stand.failed, tc.skips, tc.fails)
+			}
+			if tc.fails == 1 && len(stand.failed) == 1 && !strings.Contains(stand.failed[0], tc.failureNaming) {
+				t.Errorf("failure = %q, want it to name %s", stand.failed[0], tc.failureNaming)
+			}
+			if want := filepath.Join(dir, program); tc.onPath && !sameFile(got, want) {
+				t.Errorf("NeedPkl = %q, want %q", got, want)
+			}
+			if !tc.onPath && got != "" {
+				t.Errorf("NeedPkl = %q without a pkl", got)
+			}
+		})
+	}
+}
+
+// sameFile reports whether two paths name one existing file, however each spells it.
+func sameFile(a, b string) bool {
+	aInfo, aErr := os.Stat(a)
+	bInfo, bErr := os.Stat(b)
+	return aErr == nil && bErr == nil && os.SameFile(aInfo, bInfo)
 }
 
 func TestCaseSensitiveLeavesNoProbeBehind(t *testing.T) {

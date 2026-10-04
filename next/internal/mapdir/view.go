@@ -17,8 +17,9 @@ type Change struct {
 
 // With is a view of the folder with changes laid over it. The receiver is not changed. A change to a file the
 // folder has is renamed to the spelling it has there; removing a file it does not have does nothing. A new file
-// keeps its own name, below folders spelled as the map spells them, or as the first change to name them did. The
-// view keeps each change's Bytes; it does not copy them.
+// keeps its own name, below folders spelled as the map spells them, or as the first change to name them did. A
+// name that cannot be written is kept as given, and StageTo and ApplyInPlace refuse it. The view keeps each
+// change's Bytes; it does not copy them.
 func (f *Folder) With(changes []Change) *Folder {
 	view := *f
 	view.changes = slices.Clone(f.changes)
@@ -109,21 +110,20 @@ func (f *Folder) folder(key string) (string, bool) {
 }
 
 // spelled is the name a file is planned under. A file the view knows keeps its spelling. A new file keeps its own
-// name, with "/", and each folder on its way is spelled as the folder has it.
+// name, with "/", below the deepest folder on its way that the view knows, which is spelled as the view has it.
+// Nothing else of a name is tidied: one that cannot be written (a leading slash, an empty folder name, "..")
+// would become the name of another file, so it stays what it is for the write to refuse.
 func (f *Folder) spelled(name string) string {
 	name = slashed(name)
 	if known, ok := f.spelling(Key(name)); ok {
 		return known
 	}
-	parts := strings.Split(name, "/")
-	placed := ""
-	for _, part := range parts[:len(parts)-1] {
-		placed = join(placed, part)
-		if existing, ok := f.folder(Key(placed)); ok {
-			placed = existing
+	for end := strings.LastIndexByte(name, '/'); end >= 0; end = strings.LastIndexByte(name[:end], '/') {
+		if existing, ok := f.folder(Key(name[:end])); ok {
+			return existing + name[end:]
 		}
 	}
-	return join(placed, parts[len(parts)-1])
+	return name
 }
 
 // Place is the spelling a new file at name is written under: folders the map already has, or that an earlier

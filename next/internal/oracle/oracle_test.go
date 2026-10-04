@@ -360,3 +360,151 @@ func TestErrors(t *testing.T) {
 		})
 	}
 }
+
+// oldError and newError are one expected failure as each tree raises it.
+func oldError(msg, file string, line, column int, hint string) *olddiag.Error {
+	return &olddiag.Error{Msg: msg, File: file, Line: line, Column: column, Hint: hint, Cause: errors.New("old cause")}
+}
+
+func newError(msg, file string, line, column int, hint string) *newdiag.Error {
+	return &newdiag.Error{Msg: msg, File: file, Line: line, Column: column, Hint: hint, Cause: errors.New("new cause")}
+}
+
+func TestRefusals(t *testing.T) {
+	plain := errors.New("plain")
+	oldProblems := olddiag.Problems{
+		{File: "a.pkl", Line: 1, Column: 2, Msg: "first", Hint: "one"},
+		{File: "b.pkl", Line: 3, Column: 4, Msg: "second", Hint: "two"},
+	}
+	newProblems := func(change func(problems newdiag.Problems)) newdiag.Problems {
+		problems := newdiag.Problems{
+			{File: "a.pkl", Line: 1, Column: 2, Msg: "first", Hint: "one"},
+			{File: "b.pkl", Line: 3, Column: 4, Msg: "second", Hint: "two"},
+		}
+		change(problems)
+		return problems
+	}
+	tests := []struct {
+		name       string
+		want, got  error
+		bothFailed bool
+		contains   []string // none when the comparison must pass
+	}{
+		{name: "both nil"},
+		{name: "only want failed", want: plain, contains: []string{"got no error"}},
+		{name: "only got failed", got: plain, contains: []string{"unexpected error"}},
+		{name: "two errors that are not diag errors", want: plain, got: errors.New("other words"), bothFailed: true},
+		{
+			name: "two equal diag errors, whatever their causes", bothFailed: true,
+			want: oldError("m", "x.lua", 3, 4, "h"), got: newError("m", "x.lua", 3, 4, "h"),
+		},
+		{
+			name: "Msg differs", bothFailed: true, contains: []string{`Msg differs: want "m", got "other"`},
+			want: oldError("m", "x.lua", 3, 4, "h"), got: newError("other", "x.lua", 3, 4, "h"),
+		},
+		{
+			name: "File differs", bothFailed: true, contains: []string{`File differs: want "x.lua", got "y.lua"`},
+			want: oldError("m", "x.lua", 3, 4, "h"), got: newError("m", "y.lua", 3, 4, "h"),
+		},
+		{
+			name: "Line differs", bothFailed: true, contains: []string{`Line differs: want "3", got "9"`},
+			want: oldError("m", "x.lua", 3, 4, "h"), got: newError("m", "x.lua", 9, 4, "h"),
+		},
+		{
+			name: "Column differs", bothFailed: true, contains: []string{`Column differs: want "4", got "0"`},
+			want: oldError("m", "x.lua", 3, 4, "h"), got: newError("m", "x.lua", 3, 0, "h"),
+		},
+		{
+			name: "Hint differs", bothFailed: true, contains: []string{`Hint differs: want "h", got ""`},
+			want: oldError("m", "x.lua", 3, 4, "h"), got: newError("m", "x.lua", 3, 4, ""),
+		},
+		{
+			name: "every field that differs is named", bothFailed: true,
+			contains: []string{"Msg differs", "Line differs", "Hint differs"},
+			want:     oldError("m", "x.lua", 3, 4, "h"), got: newError("n", "x.lua", 5, 4, "i"),
+		},
+		{
+			name: "an expected failure became a plain error", bothFailed: true,
+			contains: []string{"want a *diag.Error", "got an error that is not a diag error"},
+			want:     oldError("m", "x.lua", 0, 0, "h"), got: plain,
+		},
+		{
+			name: "a plain error became an expected failure", bothFailed: true,
+			contains: []string{"want an error that is not a diag error", "got a *diag.Error"},
+			want:     plain, got: newError("m", "x.lua", 0, 0, "h"),
+		},
+		{
+			name: "equal problems", bothFailed: true,
+			want: oldProblems, got: newProblems(func(newdiag.Problems) {}),
+		},
+		{
+			name: "problems of different lengths", bothFailed: true, contains: []string{"want 2 problems, got 1"},
+			want: oldProblems, got: newProblems(func(newdiag.Problems) {})[:1],
+		},
+		{
+			name: "a field of a later problem differs", bothFailed: true,
+			contains: []string{`problem 2: Column differs: want "4", got "5"`},
+			want:     oldProblems, got: newProblems(func(problems newdiag.Problems) { problems[1].Column = 5 }),
+		},
+		{
+			name: "problems in another order", bothFailed: true,
+			contains: []string{"problem 1: Msg differs", "problem 2: Msg differs"},
+			want:     oldProblems,
+			got:      newProblems(func(problems newdiag.Problems) { problems[0], problems[1] = problems[1], problems[0] }),
+		},
+		{
+			name: "problems against an error", bothFailed: true,
+			contains: []string{"want diag.Problems", "got a *diag.Error"},
+			want:     oldProblems[:1], got: newError("first", "a.pkl", 1, 2, "one"),
+		},
+		{
+			name: "an error against problems", bothFailed: true,
+			contains: []string{"want a *diag.Error", "got diag.Problems"},
+			want:     oldError("first", "a.pkl", 1, 2, "one"), got: newProblems(func(newdiag.Problems) {})[:1],
+		},
+		{
+			name: "wrapped on both sides, equal", bothFailed: true,
+			want: fmt.Errorf("outer: %w", oldError("m", "x.lua", 3, 4, "h")),
+			got:  fmt.Errorf("another outer: %w", newError("m", "x.lua", 3, 4, "h")),
+		},
+		{
+			name: "wrapped on both sides, a field differs", bothFailed: true, contains: []string{"File differs"},
+			want: fmt.Errorf("outer: %w", oldError("m", "x.lua", 3, 4, "h")),
+			got:  fmt.Errorf("outer: %w", newError("m", "y.lua", 3, 4, "h")),
+		},
+		{
+			name: "wrapped problems, equal", bothFailed: true,
+			want: fmt.Errorf("outer: %w", oldProblems),
+			got:  fmt.Errorf("outer: %w", newProblems(func(newdiag.Problems) {})),
+		},
+		{
+			name: "a wrapped expected failure became a wrapped plain error", bothFailed: true,
+			contains: []string{"got an error that is not a diag error"},
+			want:     fmt.Errorf("outer: %w", oldError("m", "x.lua", 3, 4, "h")),
+			got:      fmt.Errorf("outer: %w", plain),
+		},
+		{
+			name: "a diag error of the other tree is not one", bothFailed: true,
+			contains: []string{"got an error that is not a diag error"},
+			want:     oldError("m", "x.lua", 3, 4, "h"), got: oldError("m", "x.lua", 3, 4, "h"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := &recorder{TB: t}
+			bothFailed := Refusals(rec, "thing", tt.want, tt.got)
+			if bothFailed != tt.bothFailed {
+				t.Errorf("bothFailed = %v, want %v", bothFailed, tt.bothFailed)
+			}
+			report := rec.failed()
+			if len(tt.contains) == 0 && report != "" {
+				t.Fatalf("reported %q, want a pass", report)
+			}
+			for _, words := range append([]string{"thing"}, tt.contains...) {
+				if len(tt.contains) != 0 && !strings.Contains(report, words) {
+					t.Errorf("reported %q, want it to name %q", report, words)
+				}
+			}
+		})
+	}
+}

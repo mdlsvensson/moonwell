@@ -1,5 +1,6 @@
-// Package lua reads Lua 5.3 source without running it, and writes Lua literals. It takes source text and returns
-// tokens and what scanners find in them. It knows nothing of modules, bundles or maps beyond war3map.lua's shape.
+// Package lua reads Lua 5.3 source without running it, writes Lua literals, and splices edits into a source. It
+// takes source text and returns tokens, what scanners find in them, and the source with edits made. It knows
+// nothing of modules, bundles or maps beyond war3map.lua's shape.
 package lua
 
 import (

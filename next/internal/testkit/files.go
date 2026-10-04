@@ -1,6 +1,7 @@
 // Package testkit holds what Moonwell's tests share: files and folders written and read back and the fixtures World
 // Editor saved, a test world for the commands and the logger that keeps its lines (Recorder), byte helpers, builders
-// for map info, object files, MDX models and pictures, and a reader of the archives Moonwell writes.
+// for map info, object files, MDX models and pictures, a reader of the archives Moonwell writes, and the way to a
+// program a test needs (NeedPkl).
 //
 // It is imported by tests only. Of Moonwell's packages it knows env, binio and the formats it builds or reads
 // (war3/objmod and war3/mpq), so the tests of those two packages are external test packages. Most helpers take a
@@ -15,13 +16,14 @@ import (
 	"testing"
 )
 
-// RepoRoot returns the root of the Moonwell checkout: the folder with go.mod, found by walking up from the folder the
-// test runs in.
+// RepoRoot returns the root of the Moonwell checkout: the folder with go.mod, found by walking up from the working
+// folder. A test starts in the folder of its package, so call RepoRoot before changing the working folder.
 func RepoRoot(t testing.TB) string {
 	t.Helper()
 	dir, err := os.Getwd()
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("no working folder to look for go.mod from: %v", err)
+		return ""
 	}
 	for {
 		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
@@ -30,6 +32,7 @@ func RepoRoot(t testing.TB) string {
 		parent := filepath.Dir(dir)
 		if parent == dir {
 			t.Fatalf("no go.mod in the working folder or any folder above it")
+			return ""
 		}
 		dir = parent
 	}

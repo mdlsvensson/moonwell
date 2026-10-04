@@ -184,6 +184,55 @@ func TestWithSpellsTheFoldersOfANewFileAsTheMapAndEarlierChangesDo(t *testing.T)
 	}
 }
 
+func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *testing.T) {
+	disk := map[string]string{"war3map.w3i": "info", "Textures/Old.blp": "old"}
+	cases := []struct {
+		name          string
+		given, stored string
+	}{
+		// None of these can be written. Each must reach the write as it was given, so that it is refused there and
+		// is not taken for the file its tidied name would be.
+		{"a leading slash before a file the map has", "/WAR3MAP.W3I", "/WAR3MAP.W3I"},
+		{"two leading slashes", "//war3map.w3i", "//war3map.w3i"},
+		{"a leading slash before a folder the map has", "/textures/New.blp", "/textures/New.blp"},
+		{"an empty folder name", "a//b", "a//b"},
+		{"a way out of a folder", "a/../b", "a/../b"},
+		{"a dot", "./war3map.w3i", "./war3map.w3i"},
+		{"a slash at the end", "new/", "new/"},
+		{"no name", "", ""},
+		// The folder the map has is respelled; what follows it stays.
+		{"an empty folder name below a folder the map has", "textures//New.blp", "Textures//New.blp"},
+		{"a way out of a folder the map has", `TEXTURES\..\WAR3MAP.W3I`, "Textures/../WAR3MAP.W3I"},
+		{"a new folder below a folder the map has", "textures/Sub/Deep/New.blp", "Textures/Sub/Deep/New.blp"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			folder, _ := open(t, disk)
+			placed, err := folder.Place(c.given)
+			if err != nil || placed != c.stored {
+				t.Errorf("Place(%q) = %q, %v, want %q", c.given, placed, err, c.stored)
+			}
+			view := folder.With([]Change{put(c.given, "new")})
+			if got, want := names(view.Changes()), []string{c.stored}; !slices.Equal(got, want) {
+				t.Errorf("Changes names the files %q, want %q", got, want)
+			}
+			// The files the map has are as they were.
+			if got := read(t, view, "war3map.w3i"); got != "info" {
+				t.Errorf("the view reads war3map.w3i as %q", got)
+			}
+		})
+	}
+}
+
+func TestWithGivesTwoSpellingsOfAFolderOne(t *testing.T) {
+	folder, _ := open(t, map[string]string{"textures/Old.blp": "old"})
+	view := folder.With([]Change{put("Textures/new.blp", "new"), put("Sound/a.mp3", "a"), put("sound/b.mp3", "b")})
+	want := []string{"textures/new.blp", "Sound/a.mp3", "Sound/b.mp3"}
+	if got := names(view.Changes()); !slices.Equal(got, want) {
+		t.Errorf("Changes names the files %q, want %q", got, want)
+	}
+}
+
 // names is the name of each change.
 func names(changes []Change) []string {
 	listed := []string{}
