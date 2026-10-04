@@ -8,7 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/txt"
-	"github.com/mdlsvensson/moonwell/next/internal/war3/w3i"
 )
 
 // The files of a map that settings change, by the names World Editor gives them. A map may spell them in another
@@ -95,13 +94,13 @@ func (p *planner) script(s manifest.Settings, patchedInfo []byte, withPreview bo
 		p.failure = err
 		return
 	}
-	edited, err := p.edited(source, s, patchedInfo, withPreview)
+	patched, err := p.patchedScript(source, s, patchedInfo, withPreview)
 	if err != nil {
 		p.failure = err
 		return
 	}
-	if edited != source {
-		p.write(scriptName, []byte(mark+edited))
+	if patched != source {
+		p.write(scriptName, []byte(mark+patched))
 	}
 }
 
@@ -112,28 +111,14 @@ func needsScript(s manifest.Settings) bool {
 	return needsDetails(s) || s.Info.Name != nil || s.Info.Description != nil
 }
 
-// edited is the text of the script with the settings in it, and with the minimap call for a preview.
-func (p *planner) edited(source string, s manifest.Settings, patchedInfo []byte, withPreview bool) (string, error) {
+// patchedScript is the text of the script with the settings in it, and with the minimap call for a preview.
+func (p *planner) patchedScript(source string, s manifest.Settings, patchedInfo []byte, withPreview bool) (string, error) {
 	file := p.folder.Label(scriptName)
-	edited, err := patchLuaAfter(source, s, patchedInfo, file, p.folder.Label(infoName))
+	patched, err := patchLuaAfter(source, s, patchedInfo, file, p.folder.Label(infoName))
 	if err != nil || !withPreview {
-		return edited, err
+		return patched, err
 	}
-	return patchMinimap(edited, file)
-}
-
-// patchLuaAfter is patchLua for a map info given as the bytes patchInfo returned. The bytes are read only when a
-// setting has a counterpart in the script, and as deep as the settings need; bytes that do not read are refused
-// by infoLabel, the name of the map info.
-func patchLuaAfter(source string, s manifest.Settings, patchedInfo []byte, file, infoLabel string) (string, error) {
-	if !setsLua(s) {
-		return source, nil
-	}
-	info, err := w3i.Read(patchedInfo, infoLabel, depthFor(s))
-	if err != nil {
-		return "", err
-	}
-	return patchLua(source, s, info, file)
+	return patchMinimap(patched, file)
 }
 
 // text merges the sections into the text file under name. A map without the file is merged into as one whose
@@ -208,13 +193,15 @@ func (p *planner) write(name string, data []byte) {
 }
 
 // change adds a change, under the spelling the map has for the file. A file the map does not have keeps the name
-// given; where the map has a folder under that name, the plan is refused.
+// given; where the map has a folder under that name, the plan is refused. After a failure nothing is added, so a
+// step that makes several changes stops at the first that fails.
 func (p *planner) change(change mapdir.Change) {
+	if p.failure != nil {
+		return
+	}
 	placed, err := p.folder.Place(change.Name)
 	if err != nil {
-		if p.failure == nil {
-			p.failure = err
-		}
+		p.failure = err
 		return
 	}
 	change.Name = placed

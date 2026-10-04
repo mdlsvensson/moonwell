@@ -10,19 +10,31 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/war3/w3i"
 )
 
-// KeptMinimap is the name under which a build with a preview picture keeps World Editor's minimap in the map.
+// KeptMinimap is the file a build with a preview picture keeps World Editor's minimap in: a copy of what the map
+// has as savedMinimap, which the picture replaces.
 const KeptMinimap = "war3mapMinimap.blp"
 
-// patchLua brings the Lua World Editor generated into line with the map info as it is after patchInfo. It
-// returns the source unchanged when no setting has a Lua counterpart. file names the Lua file in errors.
-//
-// The script says what the map info says, also for a value the settings leave alone, so info is the map info as
-// w3i.Read returns it after patchInfo: read Extended when a player, a force or the environment is set. Without a
-// setting that has a Lua counterpart, neither the source nor info is read.
-func patchLua(source string, s manifest.Settings, info *w3i.Info, file string) (string, error) {
+// patchLuaAfter brings the Lua World Editor generated into line with the map info, given as the bytes patchInfo
+// returned. It returns the source as it is when no setting has a Lua counterpart: then neither the source nor
+// the bytes are read. Otherwise the bytes are read as deep as the settings need; bytes that do not read are
+// refused by infoLabel, the name of the map info. file names the Lua file in errors.
+func patchLuaAfter(source string, s manifest.Settings, patchedInfo []byte, file, infoLabel string) (string, error) {
 	if !setsLua(s) {
 		return source, nil
 	}
+	info, err := w3i.Read(patchedInfo, infoLabel, depthFor(s))
+	if err != nil {
+		return "", err
+	}
+	return patchLua(source, s, info, file)
+}
+
+// patchLua is patchLuaAfter for a map info already read. It is asked only for settings with a Lua counterpart:
+// patchLuaAfter, its one caller, returns the source as it is for the others.
+//
+// The script says what the map info says, also for a value the settings leave alone, so info is the map info as
+// w3i.Read returns it after patchInfo: read Extended when a player, a force or the environment is set.
+func patchLua(source string, s manifest.Settings, info *w3i.Info, file string) (string, error) {
 	if info == nil || info.Details == nil && needsDetails(s) {
 		return "", errNoMapInfo(file)
 	}
@@ -63,7 +75,8 @@ func (p *patcher) text(native, value string) {
 	p.replace(p.unique(p.function("config"), native, 1), native+"("+lua.Quote(value)+")")
 }
 
-// edited is the source with the edits made. It is read once more: a script that no longer reads is refused.
+// edited is the source with the edits made. It is read once more: a script that does not read after the edits is
+// refused.
 func (p *patcher) edited() (string, error) {
 	result, err := lua.ApplyEdits(p.source, p.edits)
 	if err != nil {
@@ -81,7 +94,7 @@ func (p *patcher) edited() (string, error) {
 //
 // The call stands on a line of its own when the `end` of main() starts its line; otherwise a space keeps it apart
 // from the statement before. Where main() ends in a return that gives a value, no statement can follow: the
-// result is read once more, and a script that no longer reads is refused.
+// result is read once more, and a script that does not read after the edits is refused.
 func patchMinimap(source, file string) (string, error) {
 	p, err := newPatcher(source, file)
 	if err != nil {

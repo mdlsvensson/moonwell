@@ -114,7 +114,15 @@ import (
 // Compared in part: a map file that cannot be read. This tree reads through mapdir, which says "Reading a map
 // file failed", and the other tree says "Reading a map file for map settings failed"
 // (TestAMapFileThatCannotBeReadIsRefusedByItsNameAndNotTakenForAnEmptyFile). The two refusals must have the same
-// file, hint and reason after those words (TestOracleOnAMapFileThatCannotBeRead).
+// file, hint and reason after those words (TestOracleOnAMapFileThatCannotBeRead), for each of the four files a
+// plan reads.
+//
+// Compared in part: a map with a folder under a name a preview adds. The other tree takes the folder for a file
+// and says "The map already has ..., a name the preview picture needs"; this tree asks mapdir for the file's
+// place, which says "... would replace a folder in the map"
+// (TestAFolderUnderANameThePreviewAddsIsRefusedBeforeAMapFileIsRead). Both must refuse before the map info is
+// read, for a preview of each kind, and name the same file (TestOracleOnAFolderUnderANameAPreviewAdds): twelve
+// refusals.
 //
 // TestOracleOnAPreviewThatCannotBeRead and TestOracleOnAMapFileThatCannotBeRead compare nothing, and are
 // skipped, where the test cannot make a file that is there and cannot be read: as root on a system other than
@@ -123,8 +131,8 @@ import (
 //
 // Not among the inputs:
 //
-//   - A map folder with a folder under the name of a file a plan reads or writes. The other tree fails to read
-//     it as a file. In this tree a folder is not a file: the file is missing, or mapdir refuses to write it
+//   - A map folder with a folder under the name of a file a plan reads. The other tree fails to read it as a
+//     file. In this tree a folder is not a file: the file is missing, or mapdir refuses to write it
 //     (TestAMapWithoutAFileTheSettingsNeedIsRefusedByThatFile,
 //     TestAFolderWhereATextFileGoesIsRefusedAndNotTakenForAMapWithoutTheFile,
 //     TestAPreviewIsRefusedWhenTheMapLacksItsMinimapOrHasOneOfTheNamesThePreviewAdds).
@@ -1435,20 +1443,65 @@ func TestOracleOnThePlan(t *testing.T) {
 	}
 }
 
+func TestOracleOnAFolderUnderANameAPreviewAdds(t *testing.T) {
+	root := planProject(t)
+	type entries struct {
+		folder string
+		file   string // a file under the other name the preview adds, or ""
+	}
+	// The last map has both names: both trees look at the name the minimap is kept under first.
+	maps := []entries{{folder: "war3mapMinimap.blp"}, {folder: "war3mapMap.tga"}, {folder: "War3mapMap.TGA"},
+		{folder: "war3mapMinimap.blp", file: "war3mapMap.tga"}}
+	compared := 0
+	for _, held := range maps {
+		dir := fixtureMap(t)
+		testkit.WriteFile(t, dir, "war3mapMap.blp", minimapBytes)
+		if err := os.Mkdir(filepath.Join(dir, held.folder), 0o777); err != nil {
+			t.Fatal(err)
+		}
+		if held.file != "" {
+			testkit.WriteFile(t, dir, held.file, []byte{1})
+		}
+		for _, preview := range []string{"preview.blp", "preview.tga", "art/Preview.PNG"} {
+			what := fmt.Sprintf("a folder %s, a file %q, the preview %s", held.folder, held.file, preview)
+			// The player is one the fixture lacks: both trees must refuse for the name before they read the map info.
+			read := inBothTrees(t, root, `{"info":{"preview":"`+preview+`"},"players":{"5":{"name":"Absent"}}}`)
+			_, wantErr := planOfOld(dir, root, read)
+			_, gotErr := Plan(openMap(t, dir), read.project)
+			want, wantIs := wantErr.(*olddiag.Error)
+			got, gotIs := gotErr.(*diag.Error)
+			if !wantIs || !gotIs {
+				t.Errorf("%s: the refusals are %v and %v, want a diag error of each tree", what, wantErr, gotErr)
+				continue
+			}
+			if want.Msg != "The map already has "+held.folder+", a name the preview picture needs." ||
+				!strings.HasSuffix(got.Msg, " would replace a folder in the map.") || got.File != want.File || got.Hint == "" {
+				t.Errorf("%s: the refusals differ in more than their words:\nwant: %+v\ngot:  %+v", what, want, got)
+			}
+			compared++
+		}
+	}
+	if compared != 12 {
+		t.Errorf("%d refusals compared, want 12", compared)
+	}
+}
+
 func TestOracleOnAMapFileThatCannotBeRead(t *testing.T) {
 	const wantStart, gotStart = "Reading a map file for map settings failed: ", "Reading a map file failed: "
 	tests := []struct{ name, document string }{
 		{"war3map.w3i", `{"loadingScreen":{"title":"T"}}`},
 		{"war3map.lua", `{"info":{"name":"N"}}`},
 		{"war3mapSkin.txt", `{"gameInterface":{"A":{"B":"c"}}}`},
+		// The minimap, which a plan with a preview reads last, to keep it.
+		{"war3mapMap.blp", previewAt("preview.tga")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dir := fixtureMap(t)
+			dir, root := withPreview(t, "preview.tga", plainTGA())
 			testkit.WriteFile(t, dir, "war3mapSkin.txt", []byte("[A]\n"))
 			makeUnreadable(t, filepath.Join(dir, tt.name))
-			read := inBothTrees(t, "", tt.document)
-			_, wantErr := planOfOld(dir, "", read)
+			read := inBothTrees(t, root, tt.document)
+			_, wantErr := planOfOld(dir, root, read)
 			_, gotErr := Plan(openMap(t, dir), read.project)
 			want, wantIs := wantErr.(*olddiag.Error)
 			got, gotIs := gotErr.(*diag.Error)

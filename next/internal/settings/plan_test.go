@@ -179,19 +179,38 @@ func TestTextSettingsNeedNeitherTheMapInfoNorTheScript(t *testing.T) {
 	wantNames(t, planned(t, dir, "", `{"gameInterface":{"A":{"B":"c"}}}`), "war3mapSkin.txt")
 }
 
-// A plan for no folder at all: one that read a map file would stop the test.
+// refusingMaps is two map folders that between them refuse a plan for every file it reads, by the file's name. In
+// the first every file is there and is not what it should be: a map info that is none, and a script and text
+// files that are not UTF-8. The second has no file, so a plan that asks for the map info or the script fails for
+// a file that is missing, also where it would not go on to read what the file holds.
+func refusingMaps(t testing.TB) []*mapdir.Folder {
+	t.Helper()
+	dir := t.TempDir()
+	testkit.WriteFile(t, dir, "war3map.w3i", []byte("not a map info"))
+	for _, name := range []string{"war3map.lua", "war3mapMisc.txt", "war3mapSkin.txt"} {
+		testkit.WriteFile(t, dir, name, []byte{0xff})
+	}
+	return []*mapdir.Folder{openMap(t, dir), openMap(t, t.TempDir())}
+}
+
 func TestSettingsThatSetNothingPlanNoChangeAndReadNoMapFile(t *testing.T) {
-	for _, document := range []string{
+	documents := []string{
 		`{}`,
 		`{"info":{"name":null},"players":{"5":{"name":null}},"environment":{"fog":{}},
 			"gameplayConstants":{"Misc":{}},"gameInterface":{"CustomSkin":{}}}`,
 		`{"info":{"name":null,"preview":null},"players":{"23":{"name":null}},"environment":{"fog":{}}}`,
 		// An override with nothing set is skipped: its slot need not exist in the map.
 		`{"players":{"23":{},"7":{"name":null}},"forces":{"7":{}}}`,
-	} {
-		changes, err := Plan(nil, projectOf(t, "", document))
-		if err != nil || len(changes) != 0 {
-			t.Errorf("%s: the plan changes %q: %v", document, namesOf(changes), err)
+	}
+	for _, folder := range refusingMaps(t) {
+		for _, document := range documents {
+			changes, err := Plan(folder, projectOf(t, "", document))
+			if err != nil {
+				t.Errorf("%s: the plan read a map file: %s", document, diag.Format(err))
+			}
+			if len(changes) != 0 {
+				t.Errorf("%s: the plan changes %q", document, namesOf(changes))
+			}
 		}
 	}
 }
@@ -294,13 +313,15 @@ func TestAMapFileThatCannotBeReadIsRefusedByItsNameAndNotTakenForAnEmptyFile(t *
 		{"war3mapMisc.txt", `{"gameplay":{"heroMaxLevel":5}}`},
 		{"war3map.w3i", `{"loadingScreen":{"title":"T"}}`},
 		{"war3map.lua", `{"info":{"name":"N"}}`},
+		// The minimap is read for a preview, which keeps it; it is the last file a plan reads.
+		{"war3mapMap.blp", previewAt("preview.tga")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dir := fixtureMap(t)
+			dir, root := withPreview(t, "preview.tga", plainTGA())
 			testkit.WriteFile(t, dir, "war3mapMisc.txt", []byte("[Misc]\n"))
 			makeUnreadable(t, filepath.Join(dir, tt.name))
-			changes, err := planIn(t, dir, "", tt.document)
+			changes, err := planIn(t, dir, root, tt.document)
 			failure := asError(t, err, tt.document)
 			if failure.File != mapLabel+"/"+tt.name || !strings.Contains(failure.Msg, "Reading a map file failed") ||
 				failure.Hint == "" || changes != nil {
@@ -341,8 +362,10 @@ func TestAScriptThatDoesNotTakeTheSettingsRefusesThePlanAfterTheMapInfoWasPatche
 
 // ---- what does not depend on the map ----
 
-// Each plan is for no folder at all: one that read a map file before it refused would stop the test.
+// Each document also sets the map's name, and each is planned for the maps whose every file refuses a plan: one
+// that read a map file before it refused the constants would fail for that file.
 func TestConstantsThatCannotBeWrittenAreRefusedByTheManifestBeforeAMapFileIsRead(t *testing.T) {
+	folders := refusingMaps(t)
 	tests := []struct{ name, document, words string }{
 		{"a typed constant against a raw one",
 			`{"info":{"name":"N"},"gameplay":{"foodLimit":200},"gameplayConstants":{"MISC":{"foodCeiling":"1"}}}`,
@@ -350,18 +373,21 @@ func TestConstantsThatCannotBeWrittenAreRefusedByTheManifestBeforeAMapFileIsRead
 		{"two spellings of a section",
 			`{"info":{"name":"N"},"gameInterface":{"A":{"k":"v"},"a":{}}}`, "duplicate settings.gameInterface section: a"},
 		{"two spellings in the interface are told before a typed constant against a raw one",
-			`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"}},"gameInterface":{"A":{},"a":{}}}`,
+			`{"info":{"name":"N"},"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"}},
+				"gameInterface":{"A":{},"a":{}}}`,
 			"duplicate settings.gameInterface section: a"},
 		{"two spellings in both blocks: the constants come first",
-			`{"gameInterface":{"A":{},"a":{}},"gameplayConstants":{"Misc":{},"misc":{}}}`,
+			`{"info":{"name":"N"},"gameInterface":{"A":{},"a":{}},"gameplayConstants":{"Misc":{},"misc":{}}}`,
 			"duplicate settings.gameplayConstants section: misc"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			changes, err := Plan(nil, projectOf(t, "", tt.document))
-			failure := asError(t, err, tt.document)
-			if failure.File != manifestName || !strings.Contains(failure.Msg, tt.words) || failure.Hint == "" || changes != nil {
-				t.Errorf("error = %+v, want %q", failure, tt.words)
+			for _, folder := range folders {
+				changes, err := Plan(folder, projectOf(t, "", tt.document))
+				failure := asError(t, err, tt.document)
+				if failure.File != manifestName || !strings.Contains(failure.Msg, tt.words) || failure.Hint == "" || changes != nil {
+					t.Errorf("error = %+v, want %q", failure, tt.words)
+				}
 			}
 		})
 	}
@@ -584,45 +610,66 @@ func TestAPreviewIsRefusedWhenTheMapLacksItsMinimapOrHasOneOfTheNamesThePreviewA
 			t.Fatal(err)
 		}
 	}
-	// A folder under a name the preview adds is in the way of the file.
-	if err := os.Mkdir(filepath.Join(dir, "war3mapMinimap.blp"), 0o777); err != nil {
-		t.Fatal(err)
-	}
-	failure := refusedPlan(t, dir, root, previewAt("preview.tga"), mapLabel+"/war3mapMinimap.blp")
-	if !strings.Contains(failure.Msg, "would replace a folder") {
-		t.Errorf("error = %+v", failure)
-	}
 	// A folder is not the minimap, and a map info that would be refused is not read before the minimap is missed.
-	for _, remove := range []string{"war3mapMinimap.blp", "war3mapMap.blp"} {
-		if err := os.Remove(filepath.Join(dir, remove)); err != nil {
-			t.Fatal(err)
-		}
+	if err := os.Remove(filepath.Join(dir, "war3mapMap.blp")); err != nil {
+		t.Fatal(err)
 	}
 	if err := os.Mkdir(filepath.Join(dir, "war3mapMap.blp"), 0o777); err != nil {
 		t.Fatal(err)
 	}
 	absent := `{"info":{"preview":"preview.tga"},"players":{"5":{"name":"Absent"}}}`
-	failure = refusedPlan(t, dir, root, absent, mapLabel+"/war3mapMap.blp")
+	failure := refusedPlan(t, dir, root, absent, mapLabel+"/war3mapMap.blp")
 	if !strings.Contains(failure.Msg, "The map has no war3mapMap.blp") || !strings.Contains(failure.Hint, "World Editor") {
 		t.Errorf("error = %+v", failure)
 	}
 }
 
-// The path rules of the setting are loadPreview's, and its tests hold them. Here each plan but the last is for no
-// folder at all: one that read a map file before it refused the picture would stop the test.
+// Each document also names a player the fixture lacks: a plan that read the map info before it looked at the
+// names would refuse for the player.
+func TestAFolderUnderANameThePreviewAddsIsRefusedBeforeAMapFileIsRead(t *testing.T) {
+	tests := []struct {
+		name, path string
+		picture    []byte
+		folder     string
+	}{
+		{"a BLP preview, which writes no TGA", "preview.blp", testkit.BLP(256, 1), "war3mapMap.tga"},
+		{"a TGA preview", "preview.tga", plainTGA(), "war3mapMinimap.blp"},
+		{"a TGA preview and its name in another spelling", "preview.tga", plainTGA(), "War3mapMap.TGA"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dir, root := withPreview(t, tt.path, tt.picture)
+			if err := os.Mkdir(filepath.Join(dir, tt.folder), 0o777); err != nil {
+				t.Fatal(err)
+			}
+			document := `{"info":{"preview":` + strconv.Quote(tt.path) + `},"players":{"5":{"name":"Absent"}}}`
+			failure := refusedPlan(t, dir, root, document, mapLabel+"/"+tt.folder)
+			if !strings.Contains(failure.Msg, "would replace a folder in the map") {
+				t.Errorf("error = %+v", failure)
+			}
+		})
+	}
+}
+
+// The path rules of the setting are loadPreview's, and its tests hold them. Here each document also sets the map's
+// name, and each but the last is planned for the maps whose every file refuses a plan, which have no minimap: a
+// plan that looked at the map before it refused the picture would fail for a file of the map.
 func TestAPreviewThatIsNoUsablePictureIsRefusedBeforeAMapFileIsRead(t *testing.T) {
 	_, root := withPreview(t, "preview.tga", plainTGA())
 	testkit.WriteFile(t, root, "small.tga", plainTGA()[:100])
+	folders := refusingMaps(t)
 	tests := []struct{ path, words, file string }{
 		{"missing.tga", "settings.info.preview names a file that does not exist: missing.tga", manifestName},
 		{"../preview.tga", "settings.info.preview must be a path inside the project", manifestName},
 		{"small.tga", "The preview picture is cut short", "small.tga"},
 	}
 	for _, tt := range tests {
-		changes, err := Plan(nil, projectOf(t, root, `{"info":{"name":"N","preview":`+strconv.Quote(tt.path)+`}}`))
-		failure := asError(t, err, tt.path)
-		if !strings.Contains(failure.Msg, tt.words) || failure.File != tt.file || failure.Hint == "" || changes != nil {
-			t.Errorf("preview %q: %+v, want %q naming %s", tt.path, failure, tt.words, tt.file)
+		for _, folder := range folders {
+			changes, err := Plan(folder, projectOf(t, root, `{"info":{"name":"N","preview":`+strconv.Quote(tt.path)+`}}`))
+			failure := asError(t, err, tt.path)
+			if !strings.Contains(failure.Msg, tt.words) || failure.File != tt.file || failure.Hint == "" || changes != nil {
+				t.Errorf("preview %q: %+v, want %q naming %s", tt.path, failure, tt.words, tt.file)
+			}
 		}
 	}
 	// With the picture in order, the map is what is looked at: an empty one lacks the minimap.

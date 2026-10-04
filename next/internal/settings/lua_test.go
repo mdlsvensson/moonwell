@@ -156,8 +156,8 @@ func TestSettingsWithoutLuaCounterpartsReturnTheSourceUnchangedWithoutReadingIt(
 		t.Errorf("unreadable Lua was touched: %q", got)
 	}
 	// Neither is the map info looked at: there is none here.
-	if got, err := patchLua("function (((unreadable", settingsOf(t, metadataOnly), nil, luaFile); err != nil || got != "function (((unreadable" {
-		t.Errorf("patchLua without a map info = %q, %v", got, err)
+	if got, err := afterInfo("function (((unreadable", settingsOf(t, metadataOnly), nil); err != nil || got != "function (((unreadable" {
+		t.Errorf("patchLuaAfter without a map info = %q, %v", got, err)
 	}
 }
 

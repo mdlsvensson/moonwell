@@ -55,8 +55,8 @@ func patchInfo(data []byte, s manifest.Settings, file string) ([]byte, error) {
 	p.forces(s.Forces)
 	p.environment(s.Environment)
 	p.mapFlags()
-	if p.refusal != nil {
-		return nil, p.refusal
+	if p.failure != nil {
+		return nil, p.failure
 	}
 	patched, err := w3i.ApplyEdits(data, p.edits)
 	if err != nil {
@@ -103,20 +103,20 @@ func depthFor(s manifest.Settings) w3i.Depth {
 	return w3i.Basic
 }
 
-// infoPatch gathers the edits of one map info. It keeps the first refusal: the steps after it go on and add edits
+// infoPatch gathers the edits of one map info. It keeps the first failure: the steps after it go on and add edits
 // that are never made.
 type infoPatch struct {
 	info    *w3i.Info
 	file    string
 	flags   int32 // the map flags as the settings leave them
 	edits   []w3i.Edit
-	refusal error
+	failure error
 }
 
 // refuse records why the settings do not go into this map, unless an earlier reason is recorded.
 func (p *infoPatch) refuse(reason error) {
-	if p.refusal == nil {
-		p.refusal = reason
+	if p.failure == nil {
+		p.failure = reason
 	}
 }
 
