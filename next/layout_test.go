@@ -53,6 +53,10 @@ func allowed(from, to string) bool {
 	switch {
 	case slices.Contains(testOnly, to):
 		return slices.Contains(testOnly, from)
+	case from == "testkit" && slices.Contains(areas, to):
+		// The tests of the foundations import testkit, and every area imports a foundation: an area in testkit
+		// would be an import cycle in those tests.
+		return false
 	case slices.Contains(testOnly, from):
 		return true
 	case isFormat(from):
