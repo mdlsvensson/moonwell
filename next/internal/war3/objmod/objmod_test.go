@@ -500,30 +500,131 @@ func oneMod(mod objmod.NewMod) []objmod.NewObject {
 	return []objmod.NewObject{{Base: id("hfoo"), ID: id("X001"), Mods: []objmod.NewMod{mod}}}
 }
 
+// unwritable is objects that Append must refuse, and the words its error has.
+type unwritable struct {
+	name    string
+	kind    objmod.TableKind
+	objects []objmod.NewObject
+	words   string
+}
+
+// refusedByAppend checks that Append refuses the objects, added to no source and to a source, with an error that
+// is not a file error and has the words, and that it returns no bytes.
+func refusedByAppend(t *testing.T, cases []unwritable) {
+	t.Helper()
+	for _, c := range cases {
+		for _, source := range [][]byte{nil, testkit.BuildModFile(2, nil, nil, c.kind)} {
+			data, err := objmod.Append(source, c.kind, c.objects, "war3map.w3a")
+			var fileError *diag.Error
+			if err == nil || errors.As(err, &fileError) || !strings.Contains(err.Error(), c.words) {
+				t.Errorf("%s: error = %v, want one with %q that is not a *diag.Error", c.name, err, c.words)
+			}
+			if data != nil {
+				t.Errorf("%s: refused objects returned % X", c.name, data)
+			}
+		}
+	}
+}
+
 func TestWhatAppendCannotWriteIsAnErrorThatIsNotAFileError(t *testing.T) {
-	text := func(s string) objmod.NewMod { return objmod.NewMod{Field: id("unam"), Value: textValue(s)} }
-	for _, c := range []struct {
-		name  string
-		kind  objmod.TableKind
-		mod   objmod.NewMod
-		words string
-	}{
+	text := func(s string) []objmod.NewObject {
+		return oneMod(objmod.NewMod{Field: id("unam"), Value: textValue(s)})
+	}
+	refusedByAppend(t, []unwritable{
 		{"a text with a NUL", objmod.Leveled, text("a\x00b"), "NUL"},
 		{"a text that is not UTF-8", objmod.Leveled, text("a\xFFb"), "UTF-8"},
 		{"a text with a NUL in a simple table", objmod.Simple, text("\x00"), "NUL"},
 		{"a level in a simple table", objmod.Simple,
-			objmod.NewMod{Field: id("unam"), Level: 1, Value: intValue(1)}, "simple table"},
+			oneMod(objmod.NewMod{Field: id("unam"), Level: 1, Value: intValue(1)}), "simple table"},
 		{"a column in a simple table", objmod.Simple,
-			objmod.NewMod{Field: id("unam"), Column: 1, Value: intValue(1)}, "simple table"},
+			oneMod(objmod.NewMod{Field: id("unam"), Column: 1, Value: intValue(1)}), "simple table"},
+	})
+}
+
+func TestAppendRefusesAValueTypeThatIsNoneOfTheFour(t *testing.T) {
+	var cases []unwritable
+	// The last is 3, the type of a string, in its low 32 bits, which are the ones a file stores.
+	for _, valueType := range []objmod.ValueType{-1, 4, 7, 1<<32 | 3} {
+		value := objmod.Value{Type: valueType, Int: 1, Real: 1, Text: "a"}
+		for _, kind := range []objmod.TableKind{objmod.Simple, objmod.Leveled} {
+			cases = append(cases, unwritable{
+				fmt.Sprintf("the value type %d in a table of kind %d", valueType, kind), kind,
+				oneMod(objmod.NewMod{Field: id("unam"), Value: value}), fmt.Sprintf("value type %d", valueType),
+			})
+		}
+	}
+	refusedByAppend(t, cases)
+}
+
+func TestAppendRefusesARealThatIsNotFinite(t *testing.T) {
+	var cases []unwritable
+	for _, c := range []struct {
+		number float32
+		words  string
+	}{
+		{float32(math.NaN()), "NaN"},
+		{math.Float32frombits(0x7F800001), "NaN"},
+		{float32(math.Inf(1)), "+Inf"},
+		{float32(math.Inf(-1)), "-Inf"},
 	} {
-		for _, source := range [][]byte{nil, testkit.BuildModFile(2, nil, nil, c.kind)} {
-			data, err := objmod.Append(source, c.kind, oneMod(c.mod), "war3map.w3a")
-			var fileError *diag.Error
-			if err == nil || errors.As(err, &fileError) || !strings.Contains(err.Error(), c.words) {
-				t.Errorf("%s: error = %v, want one about %s that is not a *diag.Error", c.name, err, c.words)
+		for _, value := range []objmod.Value{realValue(c.number), unrealValue(c.number)} {
+			cases = append(cases, unwritable{
+				fmt.Sprintf("%v as a value of type %d", c.number, value.Type), objmod.Leveled,
+				oneMod(objmod.NewMod{Field: id("umvs"), Value: value}), c.words,
+			})
+		}
+	}
+	refusedByAppend(t, cases)
+	// Only a real is looked at: the Real of an int or of a string is not written.
+	for _, value := range []objmod.Value{
+		{Type: objmod.Int, Int: 1, Real: float32(math.NaN())},
+		{Type: objmod.String, Text: "a", Real: float32(math.Inf(1))},
+	} {
+		mustAppend(t, nil, objmod.Leveled, oneMod(objmod.NewMod{Field: id("unam"), Value: value}), "war3map.w3a")
+	}
+}
+
+func TestAppendRefusesAnIDOfFourNULs(t *testing.T) {
+	mods := []objmod.NewMod{{Field: id("unam"), Value: intValue(1)}}
+	refusedByAppend(t, []unwritable{
+		{"an object without a base", objmod.Simple,
+			[]objmod.NewObject{{ID: id("X001"), Mods: mods}}, "its base is four NUL bytes"},
+		{"an object without an id", objmod.Simple,
+			[]objmod.NewObject{{Base: id("hfoo"), Mods: mods}}, "its id is four NUL bytes"},
+		{"an object without a base, an id or a modification", objmod.Leveled,
+			[]objmod.NewObject{{}}, "its base is four NUL bytes"},
+		{"a modification without a field", objmod.Leveled,
+			oneMod(objmod.NewMod{Value: intValue(1)}), "its field is four NUL bytes"},
+		{"a second object without an id", objmod.Leveled,
+			[]objmod.NewObject{{Base: id("hfoo"), ID: id("X001"), Mods: mods}, {Base: id("hfoo")}},
+			"its id is four NUL bytes"},
+	})
+	// An id with NUL bytes in it is an id as long as one byte is not NUL.
+	partly := objmod.ID{0, 0, 0, 1}
+	object := objmod.NewObject{Base: partly, ID: partly, Mods: []objmod.NewMod{{Field: partly, Value: intValue(1)}}}
+	mustAppend(t, nil, objmod.Simple, []objmod.NewObject{object}, "war3map.w3u")
+}
+
+// TestAppendLeavesItsSourceAsItIs gives Append a source with spare capacity, where an append in place would go.
+func TestAppendLeavesItsSourceAsItIs(t *testing.T) {
+	for _, file := range []string{"war3mapSkin.w3u", "war3mapSkin.w3q"} {
+		kind := objmod.KindOf(file)
+		whole := fixture(t, file)
+		for _, added := range [][]objmod.NewObject{nil, {}, appended(kind)} {
+			buffer := bytes.Repeat([]byte{0xAA}, len(whole)+4096)
+			source := buffer[:copy(buffer, whole)]
+			before := bytes.Clone(buffer)
+			data := mustAppend(t, source, kind, added, file)
+			if !bytes.Equal(buffer, before) {
+				t.Errorf("%s with %d objects: Append changed its source or the bytes after it", file, len(added))
 			}
-			if data != nil {
-				t.Errorf("%s: a refused object returned % X", c.name, data)
+			// Nothing written into the result may show in the source, or in the capacity it has to spare.
+			data = append(data, 0x55)
+			for i := range data {
+				data[i] = 0x55
+			}
+			if !bytes.Equal(buffer, before) {
+				t.Errorf("%s with %d objects: the result shares its bytes with the source", file, len(added))
 			}
 		}
 	}
@@ -554,8 +655,8 @@ func TestAppendWritesEveryNumberAndEveryID(t *testing.T) {
 		{"the largest int", intValue(math.MaxInt32), 0x7FFFFFFF},
 		{"the real furthest below zero", realValue(-math.MaxFloat32), 0xFF7FFFFF},
 		{"a real that needs every bit", unrealValue(math.Float32frombits(0x3DCCCCCD)), 0x3DCCCCCD},
-		{"a real that is infinite", realValue(float32(math.Inf(1))), 0x7F800000},
-		{"a real that is not a number", unrealValue(math.Float32frombits(0x7FC00001)), 0x7FC00001},
+		{"an unreal below zero", unrealValue(-1.5), 0xBFC00000},
+		{"the smallest real above zero", realValue(math.Float32frombits(1)), 1},
 		// The text of a value that is not a String is not written, so nothing is wrong with it.
 		{"an int with a text", objmod.Value{Type: objmod.Int, Int: 7, Text: "a\x00b"}, 7},
 	} {

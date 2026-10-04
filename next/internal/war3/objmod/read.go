@@ -91,7 +91,8 @@ type File struct {
 // count that cannot be one.
 const maxSets = 64
 
-// Read reads an object modification file. file is the name its errors give.
+// Read reads an object modification file. file is the name its errors give. A file that does not read gives nil
+// and a diag error that says the first thing wrong with it.
 func Read(data []byte, kind TableKind, file string) (*File, error) {
 	r := &reader{data: binio.NewReader(data), kind: kind, file: file}
 	parsed := r.whole()
@@ -156,6 +157,7 @@ func (r *reader) whole() *File {
 	return parsed
 }
 
+// table reads a count of objects and then that many objects.
 func (r *reader) table() Table {
 	table := Table{CountOffset: r.data.Offset(), Objects: []Object{}}
 	r.times(r.count("object", r.smallestObject()), func() {
@@ -165,6 +167,7 @@ func (r *reader) table() Table {
 	return table
 }
 
+// object reads the base and the id of an object and then its sets.
 func (r *reader) object() Object {
 	object := Object{Start: r.data.Offset()}
 	object.Base, object.ID = r.id(), r.id()
@@ -188,6 +191,8 @@ func (r *reader) setCount() int {
 	return int(count)
 }
 
+// set reads the flag of a set, which a file has from version 3 on, then a count of modifications and that many
+// modifications.
 func (r *reader) set() Set {
 	set := Set{Mods: []Modification{}}
 	if r.version >= 3 {
@@ -199,6 +204,9 @@ func (r *reader) set() Set {
 	return set
 }
 
+// modification reads a field, the number of a value type, in a leveled table a level and a column, then the value
+// and the end token. The type is checked after the level and the column are read, so a file that ends inside them
+// is cut short and not of an unknown type.
 func (r *reader) modification() Modification {
 	mod := Modification{Start: r.data.Offset()}
 	mod.Field = r.id()
@@ -272,6 +280,7 @@ func (r *reader) smallestModification() int {
 
 // ---- values ----
 
+// id reads the four bytes of an id. Any four bytes are one.
 func (r *reader) id() ID {
 	var id ID
 	copy(id[:], r.data.Bytes(len(id)))

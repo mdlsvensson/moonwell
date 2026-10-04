@@ -39,7 +39,7 @@ func saidByTheOtherTree(err error) said {
 	if errors.As(err, &failure) {
 		return said{true, failure.Msg, failure.File, failure.Hint, failure.Line, failure.Column}
 	}
-	return said{Msg: refusedText(err.Error())}
+	return said{Msg: reduced(err.Error())}
 }
 
 func saidByThisTree(err error) said {
@@ -47,13 +47,19 @@ func saidByThisTree(err error) said {
 	if errors.As(err, &failure) {
 		return said{true, failure.Msg, failure.File, failure.Hint, failure.Line, failure.Column}
 	}
-	return said{Msg: refusedText(err.Error())}
+	return said{Msg: reduced(err.Error())}
 }
 
-// refusedText reduces the refusal of a text, which is not a diag error, to the text it names. It is the one
-// sentence the two trees word differently: this tree quotes the text as Go does and calls bytes that are not UTF-8
-// by that name. Every text the oracle has refused starts with a word of its own in small letters, which both ways of
-// quoting leave as it is, so the comparison still tells which text was refused. Any other message is compared whole.
+// reduced is the message of an error that is not a diag error, with the two refusals the trees spell differently
+// brought to what they share. Any other message is compared whole.
+func reduced(message string) string {
+	return refusedReal(refusedText(message))
+}
+
+// refusedText reduces the refusal of a text to the text it names. The two trees word the sentence differently:
+// this tree quotes the text as Go does and calls bytes that are not UTF-8 by that name. Every text the oracle has
+// refused starts with a word of its own in small letters, which both ways of quoting leave as it is, so the
+// comparison still tells which text was refused.
 func refusedText(message string) string {
 	quoted, found := strings.CutPrefix(message, `Cannot write "`)
 	if !found || !strings.Contains(message, ": it contains NUL or ") {
@@ -61,6 +67,20 @@ func refusedText(message string) string {
 	}
 	end := strings.IndexFunc(quoted, func(r rune) bool { return r < 'a' || r > 'z' })
 	return "refuses the text that starts with " + quoted[:max(end, 0)]
+}
+
+// infinities turns the other tree's spelling of the two infinite numbers into this tree's.
+var infinities = strings.NewReplacer("-Infinity", "-Inf", "Infinity", "+Inf")
+
+// refusedReal reduces the refusal of a real that is not finite to the number it names. The sentence is the same
+// in both trees; the other tree writes an infinite number out as Infinity and this one as +Inf.
+func refusedReal(message string) string {
+	number, found := strings.CutPrefix(message, "Cannot write ")
+	number, isReal := strings.CutSuffix(number, " as a float32.")
+	if !found || !isReal {
+		return message
+	}
+	return "refuses the real " + infinities.Replace(number)
 }
 
 // errors compares two errors: that both are nil or both are not, and for two errors every word they say.
@@ -442,15 +462,38 @@ var (
 	kinds    = []objmod.TableKind{objmod.Simple, objmod.Leveled}
 )
 
-// syntheticSources returns a synthetic file of every version and kind.
-func syntheticSources() []input {
-	var files []input
+// synthetic is a file for the test kit to build.
+type synthetic struct {
+	name             string
+	version          int32
+	kind             objmod.TableKind
+	original, custom []testkit.SyntheticObject
+}
+
+// syntheticFiles returns three files of every version and kind: one with objects in both tables, one whose custom
+// table is empty, as in a map that only changes standard objects, and one with both tables empty.
+func syntheticFiles() []synthetic {
+	var files []synthetic
 	for _, version := range versions {
 		for _, kind := range kinds {
 			original, custom := syntheticTables(version)
 			name := fmt.Sprintf("synthetic version %d, kind %d", version, kind)
-			files = append(files, input{name, testkit.BuildModFile(version, original, custom, kind), kind})
+			files = append(files,
+				synthetic{name, version, kind, original, custom},
+				synthetic{name + " without custom objects", version, kind, original, nil},
+				synthetic{name + " without objects", version, kind, nil, nil},
+			)
 		}
+	}
+	return files
+}
+
+// syntheticSources returns the synthetic files as the test kit of this tree builds them.
+func syntheticSources() []input {
+	var files []input
+	for _, file := range syntheticFiles() {
+		data := testkit.BuildModFile(file.version, file.original, file.custom, file.kind)
+		files = append(files, input{file.name, data, file.kind})
 	}
 	return files
 }
@@ -512,7 +555,9 @@ func edgeObjects(kind objmod.TableKind) []objmod.NewObject {
 	objects := []objmod.NewObject{
 		{Base: id("hfoo"), ID: id("X001"), Mods: mods},
 		{Base: objmod.ID{0, 0xFF, 0xE9, 'A'}, ID: objmod.ID{0xFF, 0xFF, 0xFF, 0xFF}},
-		{Mods: []objmod.NewMod{{Field: objmod.ID{0x80, 0, 0x7F, 0xA0}, Value: intValue(3)}}},
+		{Base: objmod.ID{0, 0, 0, 1}, ID: objmod.ID{1, 0, 0, 0}, Mods: []objmod.NewMod{
+			{Field: objmod.ID{0x80, 0, 0x7F, 0xA0}, Value: intValue(3)}, {Field: objmod.ID{0, 0, 1, 0}, Value: intValue(4)},
+		}},
 	}
 	if kind == objmod.Leveled {
 		objects = append(objects, objmod.NewObject{Base: id("AHbz"), ID: id("A001"), Mods: []objmod.NewMod{
@@ -635,40 +680,42 @@ func TestOracleOnAppendingWorldEditorsObjects(t *testing.T) {
 	t.Logf("%d appends, %d comparisons", appends, c.count)
 }
 
-// TestOracleOnSyntheticSources builds a file of every version and kind with both test kits, and appends to each:
-// objects of every value type, no objects, objects at the edges of what the values hold, and its own custom
-// objects again.
+// TestOracleOnSyntheticSources builds the files of every version and kind with both test kits (with objects in both
+// tables, with an empty custom table, with two empty tables) and appends to each: objects of every value type, no
+// objects, objects at the edges of what the values hold, and its own custom objects again.
 func TestOracleOnSyntheticSources(t *testing.T) {
 	c := &comparison{t: t}
-	for _, version := range versions {
-		for _, kind := range kinds {
-			name := fmt.Sprintf("synthetic version %d, kind %d", version, kind)
-			original, custom := syntheticTables(version)
-			source := testkit.BuildModFile(version, original, custom, kind)
-			c.bytes(name+": the two builders",
-				oldkit.BuildModFile(version, otherSynthetic(t, original), otherSynthetic(t, custom), otherKind(kind)), source)
-			if err := c.reads(name, source, kind); err != nil {
-				t.Fatalf("%s: the other tree does not read it: %v", name, err)
-			}
-			own := customObjects(mustRead(t, source, kind, name))
-			for _, added := range []struct {
-				name    string
-				objects []objmod.NewObject
-			}{
-				{"two objects", appended(kind)},
-				{"no objects", nil},
-				{"an empty list of objects", []objmod.NewObject{}},
-				{"objects at the edges", edgeObjects(kind)},
-				{"its own custom objects", own},
-			} {
-				what := name + ": " + added.name
-				if err := c.appends(what, source, kind, added.objects); err != nil {
-					t.Errorf("%s: the other tree wrote nothing: %v", what, err)
-				}
+	files := syntheticFiles()
+	for _, file := range files {
+		kind := file.kind
+		source := testkit.BuildModFile(file.version, file.original, file.custom, kind)
+		other := oldkit.BuildModFile(file.version, otherSynthetic(t, file.original), otherSynthetic(t, file.custom),
+			otherKind(kind))
+		c.bytes(file.name+": the two builders", other, source)
+		if err := c.reads(file.name, source, kind); err != nil {
+			t.Fatalf("%s: the other tree does not read it: %v", file.name, err)
+		}
+		own := customObjects(mustRead(t, source, kind, file.name))
+		for _, added := range []struct {
+			name    string
+			objects []objmod.NewObject
+		}{
+			{"two objects", appended(kind)},
+			{"no objects", nil},
+			{"an empty list of objects", []objmod.NewObject{}},
+			{"objects at the edges", edgeObjects(kind)},
+			{"its own custom objects", own},
+		} {
+			what := file.name + ": " + added.name
+			if err := c.appends(what, source, kind, added.objects); err != nil {
+				t.Errorf("%s: the other tree wrote nothing: %v", what, err)
 			}
 		}
 	}
-	t.Logf("%d comparisons", c.count)
+	if len(files) != 18 {
+		t.Errorf("%d synthetic files, want 18: three of each version and kind", len(files))
+	}
+	t.Logf("%d files, %d comparisons", len(files), c.count)
 }
 
 // TestOracleOnNewFiles appends to no source, which gives a new file.
@@ -889,12 +936,17 @@ func TestOracleOnMutatedFiles(t *testing.T) {
 }
 
 // TestOracleOnObjectsThatCannotBeWritten appends what both trees refuse: a text with a NUL or bytes that are not
-// UTF-8, and a level or a column in a simple table. Neither refusal is a diag error, and the first modification
-// that cannot be written is the one named.
+// UTF-8, a real that is infinite or not a number, and a level or a column in a simple table. No refusal is a diag
+// error, and the first modification that cannot be written is the one named.
 func TestOracleOnObjectsThatCannotBeWritten(t *testing.T) {
 	c := &comparison{t: t}
 	unam := id("unam")
 	text := func(s string) objmod.NewMod { return objmod.NewMod{Field: unam, Value: textValue(s)} }
+	notANumber, infinite := float32(math.NaN()), float32(math.Inf(1))
+	nan := objmod.NewMod{Field: id("umvs"), Value: realValue(notANumber)}
+	above := objmod.NewMod{Field: id("ucbs"), Value: unrealValue(infinite)}
+	below := objmod.NewMod{Field: id("umvs"), Value: realValue(-infinite)}
+	levelOnReal := objmod.NewMod{Field: id("umvs"), Column: 2, Value: unrealValue(notANumber)}
 	level := objmod.NewMod{Field: id("ulev"), Level: 1, Value: intValue(1)}
 	column := objmod.NewMod{Field: id("ucol"), Column: -2, Value: realValue(1)}
 	good := objmod.NewMod{Field: id("uhpm"), Value: intValue(5)}
@@ -929,6 +981,19 @@ func TestOracleOnObjectsThatCannotBeWritten(t *testing.T) {
 			[]objmod.NewObject{object(text("fifth\xFF")), object(level)}},
 		{"a level in the first object and a text in the second", objmod.Simple,
 			[]objmod.NewObject{object(level), object(text("fifth\xFF"))}},
+		{"a real that is not a number", objmod.Leveled, one(nan)},
+		{"an unreal that is infinite", objmod.Simple, one(above)},
+		{"a real that is infinite below zero", objmod.Leveled, one(below)},
+		{"an unreal that is not a number", objmod.Simple,
+			one(objmod.NewMod{Field: unam, Value: unrealValue(math.Float32frombits(0xFFC00001))})},
+		{"three reals, the one that is not a number first", objmod.Leveled, one(good, nan, above, below)},
+		{"three reals, the one that is not a number last", objmod.Leveled, one(below, good, above, nan)},
+		{"a text and then a real", objmod.Leveled, one(text("first\x00"), above)},
+		{"a real and then a text", objmod.Simple, one(above, text("first\x00"))},
+		{"a real and then a column", objmod.Simple, one(below, column)},
+		{"a column and then a real", objmod.Simple, one(column, below)},
+		{"a column on a real that cannot be written", objmod.Simple, one(levelOnReal)},
+		{"a real in the second object", objmod.Leveled, []objmod.NewObject{object(good), object(good, nan)}},
 	}
 	for _, x := range cases {
 		sources := []input{{name: "no source"}}
@@ -954,24 +1019,55 @@ func TestOracleOnObjectsThatCannotBeWritten(t *testing.T) {
 	t.Logf("%d cases, %d comparisons", len(cases), c.count)
 }
 
-// TestOracleOnAValueTypeThatIsNoneOfTheFour pins what Append writes for a value whose type is not one of the
-// four, which is a bug in its caller: the other tree writes -1 as the type and the number as a real, so the one
-// such type both trees can be given is -1.
-func TestOracleOnAValueTypeThatIsNoneOfTheFour(t *testing.T) {
-	c := &comparison{t: t}
-	for _, kind := range kinds {
-		otherMod := oldobjects.NewMod{Field: "unam", Value: oldobjects.ModValue{Type: "bool", Number: 1.5, Text: "a text"}}
-		other := oldobjects.NewObject{Base: "hfoo", ID: "X001", Mods: []oldobjects.NewMod{otherMod}}
-		want, wantErr := oldobjects.AppendObjects(nil, otherKind(kind), []oldobjects.NewObject{other}, modFile)
-		value := objmod.Value{Type: objmod.ValueType(-1), Int: 9, Real: 1.5, Text: "a text"}
-		got, gotErr := objmod.Append(nil, kind, oneMod(objmod.NewMod{Field: id("unam"), Value: value}), modFile)
-		what := fmt.Sprintf("a value of type -1 in a new file of kind %d", kind)
-		c.errors(what, wantErr, gotErr)
-		c.bytes(what, want, got)
-		if wantErr != nil || len(want) == 0 {
-			t.Errorf("%s: the other tree wrote nothing: %v", what, wantErr)
+// TestWhatTheOtherTreeWritesAndThisTreeRefuses records the two places where Append differs from the other tree
+// on purpose, so it compares nothing through the oracle. Both are bugs in the caller that the other tree writes
+// into the file without an error:
+//
+//   - a value whose type is none of the four, which the other tree writes as type -1 with the number as a real,
+//     and which neither tree reads back;
+//   - an id of four NUL bytes as the base or the id of an object or as the field of a modification, which is an
+//     id the caller forgot to set.
+func TestWhatTheOtherTreeWritesAndThisTreeRefuses(t *testing.T) {
+	noType := oldobjects.ModValue{Type: "bool", Number: 1.5, Text: "a text"}
+	one := oldobjects.IntValue(1)
+	for _, c := range []struct {
+		name      string
+		other     oldobjects.NewObject
+		this      objmod.NewObject
+		words     string
+		readsBack bool // whether the file the other tree writes is one that reads
+	}{
+		{"a value type that is none of the four",
+			oldobjects.NewObject{Base: "hfoo", ID: "X001", Mods: []oldobjects.NewMod{{Field: "unam", Value: noType}}},
+			oneMod(objmod.NewMod{Field: id("unam"), Value: objmod.Value{Type: -1, Real: 1.5, Text: "a text"}})[0],
+			"value type -1", false},
+		{"a base of four NULs",
+			oldobjects.NewObject{Base: nulls, ID: "X001"},
+			objmod.NewObject{ID: id("X001")}, "its base is four NUL bytes", true},
+		{"an id of four NULs",
+			oldobjects.NewObject{Base: "hfoo", ID: nulls},
+			objmod.NewObject{Base: id("hfoo")}, "its id is four NUL bytes", true},
+		{"a field of four NULs",
+			oldobjects.NewObject{Base: "hfoo", ID: "X001", Mods: []oldobjects.NewMod{{Field: nulls, Value: one}}},
+			oneMod(objmod.NewMod{Value: intValue(1)})[0], "its field is four NUL bytes", true},
+	} {
+		for _, kind := range kinds {
+			what := fmt.Sprintf("%s in a table of kind %d", c.name, kind)
+			written, err := oldobjects.AppendObjects(nil, otherKind(kind), []oldobjects.NewObject{c.other}, modFile)
+			if err != nil || len(written) == 0 {
+				t.Errorf("%s: the other tree writes nothing, so this is no difference any more: %v", what, err)
+			}
+			if _, err := objmod.Read(written, kind, modFile); (err == nil) != c.readsBack {
+				t.Errorf("%s: reading what the other tree wrote gives the error %v", what, err)
+			}
+			data, err := objmod.Append(nil, kind, []objmod.NewObject{c.this}, modFile)
+			var fileError *diag.Error
+			if err == nil || errors.As(err, &fileError) || !strings.Contains(err.Error(), c.words) {
+				t.Errorf("%s: this tree's error is %v, want one with %q that is not a *diag.Error", what, err, c.words)
+			}
+			if data != nil {
+				t.Errorf("%s: this tree's refusal returned % X", what, data)
+			}
 		}
-		c.reads(what+", read again", want, kind)
 	}
-	t.Logf("%d comparisons", c.count)
 }

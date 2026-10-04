@@ -2,6 +2,7 @@ package objmod
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"unicode/utf8"
 
@@ -11,7 +12,8 @@ import (
 // NewFileVersion is the version of a file World Editor 3.00 writes when the map has none.
 const NewFileVersion = 3
 
-// NewMod is one modification of an object to append. Level and Column must be 0 in a simple table.
+// NewMod is one modification of an object to append. Level and Column must be 0 in a simple table. Value must
+// have one of the four types, and a Real or an Unreal must be a finite number.
 type NewMod struct {
 	Field  ID
 	Level  int32
@@ -26,8 +28,19 @@ type NewObject struct {
 }
 
 // Append adds objects, in order, to the custom table of source and copies everything else. A nil source gives a
-// new file with an empty original table. A source that does not read is Read's error. Any other error is a bug in
-// the caller, not a problem with the map: a level or a column in a simple table, or a text the file cannot hold.
+// new file with an empty original table. The source is not changed and the result shares no bytes with it.
+//
+// A source that does not read is Read's error. Any other error is a bug in the caller, not a problem with the
+// map, and so is not a diag error. Append refuses, and then returns no bytes:
+//
+//   - an object whose Base or ID, or a modification whose Field, is four NUL bytes: an id that was never set;
+//   - a value whose Type is none of the four;
+//   - a Level or a Column other than 0 in a simple table, which stores neither;
+//   - a String whose Text has a NUL, which would end it early, or is not UTF-8;
+//   - a Real or an Unreal that is infinite or not a number.
+//
+// It does not judge what a value means: any int, any finite real and any other text is written. Only the objects
+// it adds are checked. What the source holds is copied as it is.
 func Append(source []byte, kind TableKind, objects []NewObject, file string) ([]byte, error) {
 	w, err := begin(source, kind, len(objects), file)
 	if err != nil {
@@ -88,7 +101,7 @@ func (w *writer) object(object NewObject) {
 }
 
 // modification writes one modification with the end token World Editor 3.00 writes, four NUL bytes. The type goes
-// into the file as its number, and a type that is none of the four is written with the value of a real.
+// into the file as its number.
 func (w *writer) modification(mod NewMod) {
 	w.out.Write(mod.Field[:])
 	w.out.I32(int32(mod.Value.Type))
@@ -107,41 +120,52 @@ func (w *writer) modification(mod NewMod) {
 	w.out.I32(0) // the end token
 }
 
-// unwritable returns why the objects cannot be written, or nil: the first modification, in the order they are
-// written, that a file of this kind has no way to hold.
+// unwritable returns why the objects cannot be written, or nil: the first thing wrong with them, in the order
+// they would be written.
 func unwritable(objects []NewObject, kind TableKind) error {
 	for _, object := range objects {
-		for _, mod := range object.Mods {
-			if err := refused(mod, kind); err != nil {
-				return err
-			}
+		if err := refused(object, kind); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-// refused returns why one modification cannot be written, or nil. A simple table has no place for a level or a
-// column. A text ends at its first NUL, and the file's texts are UTF-8.
-func refused(mod NewMod, kind TableKind) error {
-	text := mod.Value.Text
-	switch {
-	case kind == Simple && (mod.Level != 0 || mod.Column != 0):
-		return errNoLevels(mod)
-	case mod.Value.Type == String && (strings.Contains(text, "\x00") || !utf8.ValidString(text)):
-		return errText(text)
+// refused returns why one object cannot be written, or nil. It looks at the object in the order of its bytes: its
+// two ids, then of each modification the field, the type, the level and the column, and the value. Every reason
+// is a bug in the caller, so none is a diag error: each must be reported as Moonwell's own fault.
+func refused(object NewObject, kind TableKind) error {
+	if object.Base == (ID{}) {
+		return fmt.Errorf("Cannot write the object %q: its base is four NUL bytes.", object.ID)
+	}
+	if object.ID == (ID{}) {
+		return fmt.Errorf("Cannot write an object based on %q: its id is four NUL bytes.", object.Base)
+	}
+	for _, mod := range object.Mods {
+		value := mod.Value
+		switch {
+		case mod.Field == (ID{}):
+			return fmt.Errorf("Cannot write a modification of %q: its field is four NUL bytes.", object.ID)
+		case value.Type < Int || value.Type > String:
+			return fmt.Errorf("Cannot write %s: its value type %d is none of the four.", mod.Field, value.Type)
+		case kind == Simple && (mod.Level != 0 || mod.Column != 0):
+			return fmt.Errorf("Cannot write %s at level %d, column %d: a simple table has neither.",
+				mod.Field, mod.Level, mod.Column)
+		case value.Type == String && !storable(value.Text):
+			return fmt.Errorf("Cannot write %q: it contains NUL or invalid UTF-8.", value.Text)
+		case (value.Type == Real || value.Type == Unreal) && !finite(value.Real):
+			return fmt.Errorf("Cannot write %v as a float32.", value.Real)
+		}
 	}
 	return nil
 }
 
-// ---- errors ----
-
-// errNoLevels is not a diag error: it must be reported as Moonwell's own fault.
-func errNoLevels(mod NewMod) error {
-	return fmt.Errorf("Cannot write %s at level %d, column %d: a simple table has neither.",
-		mod.Field, mod.Level, mod.Column)
+// storable reports whether a file can hold the text: a NUL would end it early, and the file's texts are UTF-8.
+func storable(text string) bool {
+	return !strings.Contains(text, "\x00") && utf8.ValidString(text)
 }
 
-// errText is not a diag error: it must be reported as Moonwell's own fault.
-func errText(text string) error {
-	return fmt.Errorf("Cannot write %q: it contains NUL or invalid UTF-8.", text)
+// finite reports whether a real is a number and not infinite.
+func finite(number float32) bool {
+	return !math.IsNaN(float64(number)) && !math.IsInf(float64(number), 0)
 }
