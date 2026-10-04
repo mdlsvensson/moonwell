@@ -1,9 +1,12 @@
 package mapdir
 
 import (
+	"fmt"
 	"reflect"
 	"slices"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
@@ -90,6 +93,12 @@ func TestChangesHoldsEachFileOnceInTheOrderFirstPlanned(t *testing.T) {
 		{"and written once more it is planned last",
 			[][]Change{{put("new.txt", "1"), put("b.txt", "1")}, {drop("new.txt")}, {put("new.txt", "2")}},
 			[]Change{put("b.txt", "1"), put("new.txt", "2")}},
+		{"a new file removed in the call that planned it changes nothing",
+			[][]Change{{put("new.txt", "1"), put("b.txt", "1"), drop("NEW.txt"), put("other.txt", "1")}},
+			[]Change{put("b.txt", "1"), put("other.txt", "1")}},
+		{"and written once more in that call it is planned last, as it is then named",
+			[][]Change{{put("new.txt", "1"), put("b.txt", "1"), drop("new.txt"), put("New.txt", "2")}},
+			[]Change{put("b.txt", "1"), put("New.txt", "2")}},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -100,7 +109,120 @@ func TestChangesHoldsEachFileOnceInTheOrderFirstPlanned(t *testing.T) {
 			if got := view.Changes(); !slices.EqualFunc(got, c.want, sameChange) {
 				t.Errorf("Changes = %s, want %s", show(got), show(c.want))
 			}
+			// Each change is found where Changes lists it.
+			for _, change := range c.want {
+				content := string(change.Bytes)
+				if change.Remove {
+					content = "<missing>"
+				}
+				if got := read(t, view, change.Name); got != content {
+					t.Errorf("the view reads %s as %q, want %q", change.Name, got, content)
+				}
+			}
 		})
+	}
+}
+
+func TestWithSpellsTheFoldersOfANewFileAsTheMapAndEarlierChangesDo(t *testing.T) {
+	disk := map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script"}
+	cases := []struct {
+		name  string
+		steps [][]string // the new files of each With, as a planner names them
+		want  []string   // as the view names them, in the order planned
+	}{
+		{"two spellings of a new folder in one call",
+			[][]string{{"Sound/a.mp3", "sound/b.mp3"}}, []string{"Sound/a.mp3", "Sound/b.mp3"}},
+		{"and in two calls",
+			[][]string{{"Sound/a.mp3"}, {`SOUND\b.mp3`}}, []string{"Sound/a.mp3", "Sound/b.mp3"}},
+		{"a folder the map has",
+			[][]string{{"textures/New.blp", `TEXTURES\Sub\Other.blp`}},
+			[]string{"Textures/New.blp", "Textures/Sub/Other.blp"}},
+		{"nested new folders keep the first spellings",
+			[][]string{{"A/B/x"}, {"a/b/y", "a/C/z", "A/c/b/w"}}, []string{"A/B/x", "A/B/y", "A/C/z", "A/C/b/w"}},
+		{"the last name of a new file stays as given",
+			[][]string{{"Sound/Theme.mp3", "sound/THEME.wav"}}, []string{"Sound/Theme.mp3", "Sound/THEME.wav"}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			folder, _ := open(t, disk)
+			view := folder
+			var given []string
+			for _, step := range c.steps {
+				var changes []Change
+				for _, name := range step {
+					changes = append(changes, put(name, name))
+				}
+				view = view.With(changes)
+				given = append(given, step...)
+			}
+			if got := names(view.Changes()); !slices.Equal(got, c.want) {
+				t.Errorf("Changes names the files %q, want %q", got, c.want)
+			}
+			wantFiles := append([]string{"Textures/Old.blp", "war3map.lua"}, c.want...)
+			if got := view.Files(); !slices.Equal(got, wantFiles) {
+				t.Errorf("Files = %q, want %q", got, wantFiles)
+			}
+			// Laid one file a view, each file gets the name Place gave before it was laid: the same name.
+			one := folder
+			for i, name := range given {
+				if got := view.Name(strings.ToUpper(name)); got != c.want[i] {
+					t.Errorf("Name of %s in capitals = %q, want %q", name, got, c.want[i])
+				}
+				if got := read(t, view, name); got != name {
+					t.Errorf("the view reads %s as %q", name, got)
+				}
+				placed, err := one.Place(name)
+				if err != nil || placed != c.want[i] {
+					t.Errorf("Place(%q) = %q, %v, want %q", name, placed, err, c.want[i])
+				}
+				one = one.With([]Change{put(name, name)})
+				if got := one.Name(name); got != placed {
+					t.Errorf("With stores %s as %q, Place said %q", name, got, placed)
+				}
+			}
+		})
+	}
+}
+
+// names is the name of each change.
+func names(changes []Change) []string {
+	listed := []string{}
+	for _, change := range changes {
+		listed = append(listed, change.Name)
+	}
+	return listed
+}
+
+func TestWithLaysManyNewFilesInOneCallQuickly(t *testing.T) {
+	folder, _ := open(t, map[string]string{"war3map.w3i": "info"})
+	const count = 20000
+	changes := make([]Change, count)
+	for i := range changes {
+		// The first file of each of fifty folders spells the folders; the rest name them in lower case.
+		name := fmt.Sprintf("units/folder%d/Model%d.mdx", i%50, i)
+		if i < 50 {
+			name = fmt.Sprintf("Units/Folder%d/Model%d.mdx", i, i)
+		}
+		changes[i] = Change{Name: name}
+	}
+	start := time.Now()
+	view := folder.With(changes)
+	planned := view.Changes()
+	files := view.Files()
+	took := time.Since(start)
+
+	if len(planned) != count || len(files) != count+1 {
+		t.Fatalf("the view plans %d changes and has %d files, want %d and %d", len(planned), len(files), count, count+1)
+	}
+	for i, change := range planned {
+		if want := fmt.Sprintf("Units/Folder%d/Model%d.mdx", i%50, i); change.Name != want {
+			t.Fatalf("change %d is named %q, want %q", i, change.Name, want)
+		}
+	}
+	// The work is in proportion to the files: a slow machine does it in a fraction of this bound, while work that
+	// grows with the square of them does not.
+	if took > 2*time.Second {
+		t.Errorf("laying %d new files took %v", count, took)
 	}
 }
 

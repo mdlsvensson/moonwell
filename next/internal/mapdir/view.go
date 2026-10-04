@@ -16,7 +16,9 @@ type Change struct {
 }
 
 // With is a view of the folder with changes laid over it. The receiver is not changed. A change to a file the
-// folder has is renamed to the spelling it has there; removing a file it does not have does nothing.
+// folder has is renamed to the spelling it has there; removing a file it does not have does nothing. A new file
+// keeps its own name, below folders spelled as the map spells them, or as the first change to name them did. The
+// view keeps each change's Bytes; it does not copy them.
 func (f *Folder) With(changes []Change) *Folder {
 	view := *f
 	view.changes = slices.Clone(f.changes)
@@ -25,6 +27,7 @@ func (f *Folder) With(changes []Change) *Folder {
 	for _, change := range changes {
 		view.lay(change)
 	}
+	view.compact()
 	return &view
 }
 
@@ -33,14 +36,15 @@ func (f *Folder) Changes() []Change { return slices.Clone(f.changes) }
 
 // lay puts one change over the view. A later change to a file takes the place of the earlier one.
 func (f *Folder) lay(change Change) {
-	change.Name = f.Name(slashed(change.Name))
+	change.Name = f.spelled(change.Name)
 	key := Key(change.Name)
 	at, planned := f.planned[key]
 	switch {
 	case change.Remove && !f.Has(change.Name):
 		// Nothing to remove, or the file is removed already.
 	case change.Remove && !f.found.has(change.Name):
-		f.unplan(at)
+		// A planned new file: its write is taken back, and compact takes it out of the list.
+		delete(f.planned, key)
 	case planned:
 		f.changes[at] = change
 	default:
@@ -50,31 +54,52 @@ func (f *Folder) lay(change Change) {
 	}
 }
 
-// unplan drops the change at a position: the planned write of a file that is not on disk, when a later change
-// removes the file again. What follows moves up, and the folders the planned writes are in are found anew.
-func (f *Folder) unplan(at int) {
-	f.changes = slices.Delete(f.changes, at, at+1)
+// compact takes out of the list the writes that lay left unplanned, and finds the places of the rest, and the
+// folders they are in, anew. Without such writes it does nothing.
+func (f *Folder) compact() {
+	if len(f.changes) == len(f.planned) {
+		return
+	}
+	stays := func(at int) bool {
+		planned, ok := f.planned[Key(f.changes[at].Name)]
+		return ok && planned == at
+	}
+	kept := make([]Change, 0, len(f.planned))
+	for at, change := range f.changes {
+		if stays(at) {
+			kept = append(kept, change)
+		}
+	}
+	f.changes = kept
 	clear(f.planned)
 	clear(f.made)
-	for i, change := range f.changes {
-		f.planned[Key(change.Name)] = i
+	for at, change := range f.changes {
+		f.planned[Key(change.Name)] = at
 		f.makeFolders(change.Name)
 	}
 }
 
-// makeFolders notes the folders a planned file is in. The first spelling planned for a folder stays.
+// foldersOf is each folder a file is in, the top one first: "a" and "a/b" for "a/b/c.txt".
+func foldersOf(name string) []string {
+	var folders []string
+	for i := range len(name) {
+		if name[i] == '/' {
+			folders = append(folders, name[:i])
+		}
+	}
+	return folders
+}
+
+// makeFolders notes the folders a changed file is in. The first spelling planned for a folder stays.
 func (f *Folder) makeFolders(name string) {
-	parts := strings.Split(name, "/")
-	folder := ""
-	for _, part := range parts[:len(parts)-1] {
-		folder = join(folder, part)
+	for _, folder := range foldersOf(name) {
 		if _, noted := f.made[Key(folder)]; !noted {
 			f.made[Key(folder)] = folder
 		}
 	}
 }
 
-// folder is the spelling of the folder under key: the one on disk, else the one a planned write is in.
+// folder is the spelling of the folder under key: the one on disk, else the one a changed file is in.
 func (f *Folder) folder(key string) (string, bool) {
 	if path, ok := f.found.folders[key]; ok {
 		return path, true
@@ -83,25 +108,38 @@ func (f *Folder) folder(key string) (string, bool) {
 	return path, ok
 }
 
-// Place is the spelling a new file at name is written under: folders the map already has, or that an earlier
-// change planned, keep their spelling. It fails when a folder on the way is a file, or name is a folder.
-func (f *Folder) Place(name string) (string, error) {
-	parts := strings.Split(slashed(name), "/")
+// spelled is the name a file is planned under. A file the view knows keeps its spelling. A new file keeps its own
+// name, with "/", and each folder on its way is spelled as the folder has it.
+func (f *Folder) spelled(name string) string {
+	name = slashed(name)
+	if known, ok := f.spelling(Key(name)); ok {
+		return known
+	}
+	parts := strings.Split(name, "/")
 	placed := ""
 	for _, part := range parts[:len(parts)-1] {
 		placed = join(placed, part)
-		if f.Has(placed) {
-			return "", errFileOnTheWay(f.Name(placed), name, f.Label(placed))
-		}
 		if existing, ok := f.folder(Key(placed)); ok {
 			placed = existing
 		}
 	}
-	placed = join(placed, parts[len(parts)-1])
+	return join(placed, parts[len(parts)-1])
+}
+
+// Place is the spelling a new file at name is written under: folders the map already has, or that an earlier
+// change planned, keep their spelling. It fails when a folder on the way is a file, or name is a folder. It is
+// the name With gives a change to name.
+func (f *Folder) Place(name string) (string, error) {
+	placed := f.spelled(name)
+	for _, folder := range foldersOf(placed) {
+		if f.Has(folder) {
+			return "", errFileOnTheWay(f.Name(folder), name, f.Label(folder))
+		}
+	}
 	if existing, ok := f.folder(Key(placed)); ok {
 		return "", errOntoAFolder(name, join(f.label, existing))
 	}
-	return f.Name(placed), nil
+	return placed, nil
 }
 
 // ---- errors ----

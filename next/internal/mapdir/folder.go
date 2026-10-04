@@ -9,7 +9,6 @@ package mapdir
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -99,14 +98,19 @@ func (f *Folder) Has(name string) bool {
 // Name is the spelling the folder has for name, else name as given. A file that a view removes keeps its spelling,
 // so an error about it names the file as the map on disk spells it.
 func (f *Folder) Name(name string) string {
-	key := Key(name)
-	if at, ok := f.planned[key]; ok {
-		return f.changes[at].Name
-	}
-	if spelled, ok := f.found.names[key]; ok {
+	if spelled, ok := f.spelling(Key(name)); ok {
 		return spelled
 	}
 	return name
+}
+
+// spelling is the name of the file under key: the one its planned change has, else the one on disk.
+func (f *Folder) spelling(key string) (string, bool) {
+	if at, ok := f.planned[key]; ok {
+		return f.changes[at].Name, true
+	}
+	spelled, ok := f.found.names[key]
+	return spelled, ok
 }
 
 // Read is the content of the file under name, in any letter case: what a planned change writes, else what is on
@@ -124,12 +128,21 @@ func (f *Folder) Read(name string) (data []byte, found bool, err error) {
 	if !ok {
 		return nil, false, nil
 	}
-	data, err = os.ReadFile(filepath.Join(f.dir, filepath.FromSlash(spelled)))
-	if err != nil {
+	if data, err = readBelow(f.dir, spelled); err != nil {
 		return nil, false, errUnreadable(f.Label(spelled), err)
 	}
 	f.remember(key, data)
 	return data, true, nil
+}
+
+// readBelow reads the file at path below dir without following a link: where one stands in place of the file, or
+// of a folder on the way to it, the read fails. The scan refused every link, so such a one was made after it.
+func readBelow(dir, path string) ([]byte, error) {
+	file, err := fsx.SafeJoin(dir, path)
+	if err != nil {
+		return nil, err
+	}
+	return os.ReadFile(file)
 }
 
 // remember notes what a file held when it was first read from disk, for ApplyInPlace to compare with. A later

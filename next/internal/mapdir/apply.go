@@ -10,8 +10,12 @@ import (
 )
 
 // StageTo replaces dir with a copy of the folder and writes the view's changes into the copy. The folder itself is
-// only read.
+// only read: a dir that is the folder, a folder it is in or a folder inside it is refused, since replacing that
+// would remove or write the folder.
 func (f *Folder) StageTo(dir string) error {
+	if fsx.IsWithin(dir, f.dir) || fsx.IsWithin(f.dir, dir) {
+		return errStageOverSource(dir, f.label)
+	}
 	if err := fsx.ReplaceDir(f.dir, dir); err != nil {
 		return errStaging(dir, err)
 	}
@@ -41,7 +45,8 @@ func stage(dir string, change Change) error {
 
 // ApplyInPlace writes the view's changes into the folder itself, through journal. Before each write it checks
 // that the file is as the folder saw it: present or absent as scanned, and with the same bytes if it was read.
-// It stops with ctx's error once ctx is cancelled. It undoes nothing: the caller owns the journal.
+// A file no view of the folder read is checked for its presence only, so a caller that needs its bytes guarded
+// reads it first. It stops with ctx's error once ctx is cancelled. It undoes nothing: the caller owns the journal.
 func (f *Folder) ApplyInPlace(ctx context.Context, journal *fsx.Journal) error {
 	for _, change := range f.changes {
 		if err := ctx.Err(); err != nil {
@@ -107,6 +112,14 @@ func (f *Folder) asRead(name, path string) error {
 }
 
 // ---- errors ----
+
+func errStageOverSource(dir, label string) error {
+	return &diag.Error{
+		Msg:  "Staging the map into " + fsx.ToPosix(dir) + " would replace the source map " + label + ".",
+		File: label,
+		Hint: "Stage into a folder that is not the source map, a folder it is in or a folder inside it.",
+	}
+}
 
 func errStaging(file string, cause error) error {
 	return &diag.Error{

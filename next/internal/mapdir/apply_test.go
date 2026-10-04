@@ -52,6 +52,8 @@ func TestStageToWritesTheChangesIntoACopy(t *testing.T) {
 		drop("war3mapmap.blp"),
 		put("war3mapSkin.txt", "merged"),
 		put("Sound/Music/theme.mp3", "theme"),
+		put("sound/effects/hit.wav", "hit"),
+		put("textures/New.blp", "new"),
 	})
 	source := snapshot(t, dir)
 	// The stage is below folders that do not exist the first time, and holds an older copy the second time.
@@ -62,9 +64,12 @@ func TestStageToWritesTheChangesIntoACopy(t *testing.T) {
 		"war3mapskin.txt":       "merged",
 		"Textures":              "<folder>",
 		"Textures/Old.blp":      "old",
+		"Textures/New.blp":      "new",
 		"Sound":                 "<folder>",
 		"Sound/Music":           "<folder>",
 		"Sound/Music/theme.mp3": "theme",
+		"Sound/effects":         "<folder>",
+		"Sound/effects/hit.wav": "hit",
 	}
 	for _, round := range []string{"into a new folder", "over an older stage"} {
 		if err := view.StageTo(stage); err != nil {
@@ -72,6 +77,10 @@ func TestStageToWritesTheChangesIntoACopy(t *testing.T) {
 		}
 		if got := snapshot(t, stage); !reflect.DeepEqual(got, want) {
 			t.Errorf("%s: the stage holds %v, want %v", round, got, want)
+		}
+		// Each folder has one spelling, so the staged map is one the scan accepts.
+		if _, err := Open(stage, label); err != nil {
+			t.Errorf("%s: the staged map cannot be opened: %v", round, err)
 		}
 		if got := snapshot(t, dir); !reflect.DeepEqual(got, source) {
 			t.Errorf("%s: staging changed the source map: %v", round, got)
@@ -145,6 +154,84 @@ func TestStageToNamesTheStageItCouldNotReplace(t *testing.T) {
 	e := asError(t, folder.StageTo(stage))
 	if !contains(e.Msg, "Staging the map failed") || e.File != stage || e.Cause == nil || e.Hint == "" {
 		t.Errorf("error = %+v", e)
+	}
+}
+
+func TestStageToRefusesAStageThatOverlapsTheSourceMap(t *testing.T) {
+	cases := []struct {
+		name  string
+		stage func(dir string) string
+	}{
+		{"the source map itself", func(dir string) string { return dir }},
+		{"a folder the source map is in", func(dir string) string { return filepath.Dir(filepath.Dir(dir)) }},
+		{"a folder inside the source map", func(dir string) string { return filepath.Join(dir, "dist", "map.w3x") }},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			project := t.TempDir()
+			dir := filepath.Join(project, "maps", "map.w3x")
+			testkit.WriteFile(t, project, "moonwell.pkl", []byte("manifest"))
+			for name, content := range sourceMap {
+				testkit.WriteFile(t, dir, name, []byte(content))
+			}
+			folder, err := Open(dir, label)
+			if err != nil {
+				t.Fatal(err)
+			}
+			before := testkit.Snapshot(t, project)
+			err = folder.With([]Change{put("war3map.w3i", "patched"), put("new.txt", "new")}).StageTo(c.stage(dir))
+			e := asError(t, err)
+			if !contains(e.Msg, "source map") || e.File != label || e.Hint == "" {
+				t.Errorf("error = %+v", e)
+			}
+			if after := testkit.Snapshot(t, project); !reflect.DeepEqual(after, before) {
+				t.Errorf("the project holds %v, want it untouched: %v", after, before)
+			}
+		})
+	}
+}
+
+func TestStageToDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
+	folder, dir := open(t, sourceMap)
+	view := folder.With([]Change{put("textures/old.blp", "patched"), put("Textures/New.blp", "new")})
+	outside := linkAway(t, dir)
+	before := snapshot(t, outside)
+	stage := filepath.Join(t.TempDir(), "map.w3x")
+	// How the copy fails differs by system (the link is copied as a link, or cannot be copied); that it fails, and
+	// that nothing is written where the link points, does not.
+	if e := asError(t, view.StageTo(stage)); !contains(e.Msg, "Staging the map failed") {
+		t.Errorf("error = %+v", e)
+	}
+	if after := snapshot(t, outside); !reflect.DeepEqual(after, before) {
+		t.Errorf("the folder the link points at holds %v, want %v", after, before)
+	}
+}
+
+func TestApplyInPlaceDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
+	cases := []struct {
+		name   string
+		change Change
+		at     string
+	}{
+		{"a file the map had", put("textures/old.blp", "patched"), "Textures/Old.blp"},
+		{"a file to remove", drop("Textures/Old.blp"), "Textures/Old.blp"},
+		{"a new file", put("textures/New.blp", "new"), "Textures/New.blp"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			folder, dir := open(t, sourceMap)
+			view := folder.With([]Change{c.change})
+			outside := linkAway(t, dir)
+			before := snapshot(t, outside)
+			var journal fsx.Journal
+			e := asError(t, view.ApplyInPlace(context.Background(), &journal))
+			if !contains(e.Msg, "Writing a map file failed") || !contains(e.Msg, "Symlinks") || e.File != label+"/"+c.at {
+				t.Errorf("error = %+v", e)
+			}
+			if after := snapshot(t, outside); journal.Len() != 0 || !reflect.DeepEqual(after, before) {
+				t.Errorf("the journal touched %d files; the folder the link points at holds %v", journal.Len(), after)
+			}
+		})
 	}
 }
 
@@ -268,6 +355,38 @@ func TestApplyInPlaceStopsAtACancelledContext(t *testing.T) {
 	}
 	if got := snapshot(t, dir); journal.Len() != 0 || !reflect.DeepEqual(got, before) {
 		t.Errorf("a cancelled apply touched %d files; the map holds %v", journal.Len(), got)
+	}
+}
+
+// cancelledAfter is a context that is cancelled once Err has been asked a number of times. ApplyInPlace asks once
+// before each change.
+type cancelledAfter struct {
+	context.Context
+	asks int
+}
+
+func (c *cancelledAfter) Err() error {
+	if c.asks == 0 {
+		return context.Canceled
+	}
+	c.asks--
+	return nil
+}
+
+func TestApplyInPlaceStopsBetweenTwoChanges(t *testing.T) {
+	folder, dir := open(t, sourceMap)
+	view := folder.With([]Change{put("war3map.w3i", "patched"), put("war3mapskin.txt", "merged"), put("new.txt", "new")})
+	var journal fsx.Journal
+	err := view.ApplyInPlace(&cancelledAfter{Context: context.Background(), asks: 1}, &journal)
+	if !errors.Is(err, context.Canceled) {
+		t.Errorf("ApplyInPlace = %v, want the context's error", err)
+	}
+	after := filesOf(snapshot(t, dir))
+	if after["war3map.w3i"] != "patched" || after["war3mapskin.txt"] != "skin" || journal.Len() != 1 {
+		t.Errorf("the journal touched %d files and the map holds %v, want only war3map.w3i written", journal.Len(), after)
+	}
+	if _, written := after["new.txt"]; written {
+		t.Error("new.txt was written after the context was cancelled")
 	}
 }
 

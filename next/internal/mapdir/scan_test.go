@@ -71,7 +71,9 @@ func TestOpenRefusesALinkInsideTheMap(t *testing.T) {
 	testkit.WriteFile(t, outside, "stray.blp", nil)
 	testkit.LinkDir(t, outside, filepath.Join(dir, "Textures", "linked"))
 	_, err := Open(dir, label)
-	if e := asError(t, err); !contains(e.Msg, "Symlinks") || !contains(e.Msg, label+"/Textures/linked") || e.Hint == "" {
+	e := asError(t, err)
+	if !contains(e.Msg, "Symlinks") || !contains(e.Msg, label+"/Textures/linked") || e.Hint == "" ||
+		e.File != label+"/Textures/linked" {
 		t.Errorf("error = %+v", e)
 	}
 }
@@ -81,8 +83,38 @@ func TestOpenRefusesAFolderThatIsALink(t *testing.T) {
 	link := filepath.Join(filepath.Dir(dir), "linked.w3x")
 	testkit.LinkDir(t, dir, link)
 	_, err := Open(link, label)
-	if e := asError(t, err); !contains(e.Msg, "Symlinks") || !contains(e.Msg, label) {
+	if e := asError(t, err); !contains(e.Msg, "Symlinks") || !contains(e.Msg, label) || e.File != label {
 		t.Errorf("error = %+v", e)
+	}
+}
+
+func TestOpenRefusesANameWithABackslash(t *testing.T) {
+	if filepath.Separator == '\\' {
+		t.Skip("a name cannot hold a backslash on this system")
+	}
+	// Where "/" separates, each of these is one name; none of them is a path.
+	cases := []struct {
+		name string
+		make func(t *testing.T, dir string)
+		at   string
+	}{
+		{"a file", func(t *testing.T, dir string) { testkit.WriteFile(t, dir, `Textures\Icon.blp`, nil) },
+			`Textures\Icon.blp`},
+		{"a file below a folder", func(t *testing.T, dir string) { testkit.WriteFile(t, dir, `Units/a\b.mdx`, nil) },
+			`Units/a\b.mdx`},
+		{"a folder", func(t *testing.T, dir string) { testkit.WriteFile(t, dir, `Sound\Music/theme.mp3`, nil) },
+			`Sound\Music`},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			dir := write(t, map[string]string{"war3map.w3i": "info"})
+			c.make(t, dir)
+			_, err := Open(dir, label)
+			e := asError(t, err)
+			if !contains(e.Msg, "backslash") || !contains(e.Msg, c.at) || e.File != label+"/"+c.at || e.Hint == "" {
+				t.Errorf("error = %+v, want it at %s", e, label+"/"+c.at)
+			}
+		})
 	}
 }
 

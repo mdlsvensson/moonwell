@@ -53,6 +53,19 @@ func read(t *testing.T, folder *Folder, name string) string {
 
 func contains(text, words string) bool { return strings.Contains(text, words) }
 
+// linkAway replaces the folder Textures of the map at dir with a link to a folder outside the map, which holds an
+// Old.blp of its own, and returns that folder. It stands for a link made after the map was scanned.
+func linkAway(t *testing.T, dir string) (outside string) {
+	t.Helper()
+	outside = filepath.Join(filepath.Dir(dir), "outside")
+	testkit.WriteFile(t, outside, "Old.blp", []byte("outside the map"))
+	if err := os.RemoveAll(filepath.Join(dir, "Textures")); err != nil {
+		t.Fatal(err)
+	}
+	testkit.LinkDir(t, outside, filepath.Join(dir, "Textures"))
+	return outside
+}
+
 func asError(t *testing.T, err error) *diag.Error {
 	t.Helper()
 	var e *diag.Error
@@ -145,6 +158,19 @@ func TestReadNamesTheFileItCannotRead(t *testing.T) {
 	}
 	if e.File != label+"/war3map.w3i" || !contains(e.Msg, "Reading a map file failed") || e.Cause == nil ||
 		!contains(e.Hint, "locked") {
+		t.Errorf("error = %+v", e)
+	}
+}
+
+func TestReadDoesNotFollowALinkMadeAfterTheScan(t *testing.T) {
+	folder, dir := open(t, map[string]string{"war3map.w3i": "info", "Textures/Old.blp": "old"})
+	linkAway(t, dir)
+	data, found, err := folder.Read("textures/old.blp")
+	e := asError(t, err)
+	if data != nil || found {
+		t.Errorf("Read = %q, %v: it read through the link", data, found)
+	}
+	if e.File != label+"/Textures/Old.blp" || !contains(e.Msg, "Symlinks") {
 		t.Errorf("error = %+v", e)
 	}
 }
