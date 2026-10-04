@@ -82,7 +82,10 @@ func Quote(s string) string {
 }
 
 // Number writes v as a Lua number literal in plain decimal, with the fewest digits that read back as v. v is
-// finite.
+// finite. A zero is written 0 whatever its sign: -0 and 0 are the same integer to Lua.
 func Number(v float64) string {
+	if v == 0 {
+		return "0"
+	}
 	return strconv.FormatFloat(v, 'f', -1, 64)
 }

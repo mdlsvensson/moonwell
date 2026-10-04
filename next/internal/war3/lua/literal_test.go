@@ -1,6 +1,9 @@
 package lua
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 // argument returns the tokens of the one argument of a call statement.
 func argument(t *testing.T, source string) []Token {
@@ -108,6 +111,10 @@ func TestNumberWritesPlainDecimalWithTheFewestDigits(t *testing.T) {
 		{float64(float32(0.1)), "0.10000000149011612"},
 		{0, "0"},
 		{255.0 / 255, "1"},
+		// A zero has one spelling; a number below 0 keeps its sign, however small.
+		{math.Copysign(0, -1), "0"},
+		{-1e-7, "-0.0000001"},
+		{-float64(math.SmallestNonzeroFloat32), "-0.000000000000000000000000000000000000000000001401298464324817"},
 	} {
 		got := Number(c.value)
 		if got != c.want {

@@ -5,17 +5,22 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"maps"
 	"math"
 	"os"
 	"path/filepath"
 	"runtime"
 	"slices"
+	"strconv"
+	"strings"
+	"sync"
 	"syscall"
 	"testing"
 
 	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/ordered"
 	oldsettings "github.com/mdlsvensson/moonwell/internal/settings"
+	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
@@ -35,9 +40,35 @@ import (
 //     sections: this tree makes that check where the sections are used.
 //   - LoadPreview against loadPreview, on a project folder with a picture of each kind: what is refused, else
 //     the extension and the bytes of the picture.
+//   - PatchLua against patchLua, for every document and every script: what is refused, else the text as bytes.
+//     The map info given to both is what patchInfo returns for the fixture's; the other tree takes it as bytes,
+//     this tree as w3i.Read reads those bytes (afterInfo, the way a plan does it). The same on the fixture's
+//     script for every map info of mapInfos with the settings in it, and for every one as it is, those that do
+//     not read among them.
+//   - PatchMinimapLua against patchMinimap, for every script and for scripts with settings in them.
 //
 // The documents are every one that the other tree's tests give its Validate and see accepted, one that sets
-// every setting, and for the constants every pairing of a typed constant with a raw one.
+// every setting, and for the constants every pairing of a typed constant with a raw one. The script is given
+// more: numbers that are a zero below 0, and for each block with a counterpart in the script a document for
+// every subset of its settings. The scripts are the fixture's, every one the other tree's tests of the Lua give
+// it, and the fixture's in other layouts. Every script is paired with every document but those of the subsets,
+// which are paired with the fixture's script and with one layout of it: reading a script is what takes the time
+// here, and the settings of the subsets are set, together, by documents that every script is paired with.
+//
+// Left out, for the one difference in what is written into the script that is meant: a script into which a
+// number goes that is not 0 and is below 0.000001 in size, or 1e21 or larger. The other tree writes such a number
+// with an exponent, this tree in plain decimal
+// (TestANumberIsWrittenInPlainDecimalHoweverSmallOrLargeAndAZeroAsZero). The numbers a script takes are the map
+// info's, which holds each as a float32: a setting of 0.000001 is stored as a number below it and is in the
+// class, and a setting of 1e-46 is stored as 0 and is not. So the class is decided on the map info given to both
+// trees, for the values the settings make the script take, and not on the document. A script is left out only
+// when the other tree did not refuse it; it is counted, this tree must not refuse it either, and the two texts
+// must differ, or the class is wider than the difference.
+//
+// Compared in part, and counted: a script that does not read. This tree says where by line and column and the
+// other tree by a count of characters at the end of its message, a difference that the oracle of war3/lua holds,
+// place by place. Here the two refusals must have the same file and hint, and the same message before the place
+// (TestAScriptThatDoesNotReadIsRefusedWithItsLineAndColumn). It is decided on the other tree's refusal.
 //
 // Left out, for the one difference that is meant: a preview path that runs through a file
 // ("preview.tga/inner.tga"), on a system that calls that "not a directory". There the other tree passes the
@@ -56,6 +87,8 @@ import (
 //   - A document whose shape the other tree refuses (a wrong name, range or type): that is Pkl's to refuse.
 //   - A section or a key whose name looks like a number. Neither tree is given one: the schema and the other
 //     tree's Validate both take only names that start with a letter or an underscore.
+//   - A script whose SetPlayerTeam names a team below 0.000001 in size or from 1e21, where a refusal shows the
+//     team: this tree shows it in plain decimal (TestATeamInARefusalIsWrittenInPlainDecimal).
 
 // bothTrees is one settings document as each tree reads it.
 type bothTrees struct {
@@ -605,5 +638,373 @@ func TestOracleOnAPreviewBehindALink(t *testing.T) {
 	testkit.LinkDir(t, outside, filepath.Join(root, "art"))
 	if !comparePreviews(t, root, "art/preview.tga") {
 		t.Error("both trees read a picture behind a link")
+	}
+}
+
+// ---- the script ----
+
+// block is one block of the settings with a counterpart in the script: where its settings are written, and a
+// value for each. The fog's settings are a block inside the environment's.
+type block struct {
+	open     string
+	settings []string
+	inner    string // what opens the block inside, or "" without one
+	within   []string
+	close    string
+}
+
+var blocks = []block{
+	{open: `{"info":{`, close: `}}`, settings: []string{
+		`"name":"Subset"`, `"author":"A"`, `"description":"One|nTwo"`, `"recommendedPlayers":"2"`, `"preview":"p.tga"`}},
+	{open: `{"players":{"0":{`, close: `}}}`, settings: []string{
+		`"name":"Hero"`, `"controller":"computer"`, `"race":"undead"`, `"fixedStart":false`, `"x":-512.25`, `"y":1024.5`}},
+	// Player 11 is the map's fifth, so its start location is not its id.
+	{open: `{"players":{"11":{`, close: `}}}`, settings: []string{
+		`"name":""`, `"controller":"user"`, `"race":"selectable"`, `"fixedStart":false`, `"x":0.1`, `"y":-0.3`}},
+	{open: `{"forces":{"0":{`, close: `}}}`, settings: []string{
+		`"name":"Blue"`, `"allied":false`, `"alliedVictory":true`, `"sharedVision":false`, `"sharedControl":true`,
+		`"sharedAdvancedControl":true`}},
+	{open: `{"forces":{"1":{`, close: `}}}`, settings: []string{
+		`"name":""`, `"allied":true`, `"alliedVictory":true`, `"sharedVision":true`, `"sharedControl":false`,
+		`"sharedAdvancedControl":false`}},
+	{open: `{"environment":{`, close: `}}`, settings: []string{`"soundEnvironment":"Mountains"`, `"waterColor":[10,20,30,40]`},
+		inner: `"fog":{`, within: []string{
+			`"enabled":true`, `"style":2`, `"start":500.5`, `"end":4000`, `"density":0.75`, `"color":[50,60,70,80]`}},
+}
+
+// document is the block with the settings of the subset: bit i of the subset is setting i, the settings of the
+// block inside after the block's own.
+func (b block) document(subset int) string {
+	chosen := func(settings []string, first int) []string {
+		var result []string
+		for i, setting := range settings {
+			if subset&(1<<(first+i)) != 0 {
+				result = append(result, setting)
+			}
+		}
+		return result
+	}
+	parts := chosen(b.settings, 0)
+	if b.inner != "" {
+		parts = append(parts, b.inner+strings.Join(chosen(b.within, len(b.settings)), ",")+"}")
+	}
+	return b.open + strings.Join(parts, ",") + b.close
+}
+
+// subsetDocuments is, for each block, a document for every subset of its settings.
+func subsetDocuments() []string {
+	var documents []string
+	for _, b := range blocks {
+		for subset := range 1 << (len(b.settings) + len(b.within)) {
+			documents = append(documents, b.document(subset))
+		}
+	}
+	return documents
+}
+
+// The documents with a zero below 0: set as one, or what the map info keeps of a number too small for it.
+var zeroDocuments = []string{
+	`{"players":{"0":{"x":-0.0,"y":0}}}`,
+	`{"players":{"0":{"x":1e-46,"y":-1e-46}}}`,
+	`{"environment":{"fog":{"enabled":true,"start":-0.0,"end":-0.0,"density":-0.0,"color":[1,2,3,4]}}}`,
+}
+
+// The documents with a number that the two trees write apart, beside the one among everyDocuments, and after
+// them documents with such a number that no script takes: of a fog that is not shown, and of a player whose
+// position is not set.
+var apartDocuments = []string{
+	`{"players":{"0":{"x":0.000001}}}`,
+	`{"players":{"1":{"x":7},"11":{"y":-0.0000001}}}`,
+	`{"environment":{"fog":{"enabled":true,"start":-0.0000001,"density":1e-7}}}`,
+	`{"environment":{"fog":{"enabled":false,"density":1e-7}}}`,
+	`{"environment":{"fog":{"density":1e-7}}}`,
+}
+
+// scriptDocuments is the documents that every script is patched for.
+func scriptDocuments() []string {
+	return slices.Concat(documents(), zeroDocuments, apartDocuments)
+}
+
+// script is a war3map.lua, or a text given as one.
+type script struct{ name, text string }
+
+// scripts is the fixture's script, every script the other tree's tests of the Lua patch or see refused, and the
+// fixture's in other layouts.
+func scripts(t *testing.T) []script {
+	t.Helper()
+	fixture := fixtureLua(t)
+	all := []script{
+		{"the fixture", fixture},
+		{"without SetMapName", swapped(t, fixture, "SetMapName(", "Other(")},
+		{"with a second config()", fixture + "\nfunction config() SetMapName(\"x\") end"},
+		{"with SetMapName of an object", swapped(t, fixture, "SetMapName(", "object.SetMapName(")},
+		{"a script that does not read", "function (((unreadable"},
+		{"with player 1 not held to its start", swapped(t, fixture, "ForcePlayerStartLocation(Player(1), 1)\r\n", "")},
+		{"with a SetPlayerName", swapped(t, fixture, "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
+			"SetPlayerColor(Player(1), ConvertPlayerColor(1))\r\nSetPlayerName(Player(1), \"TRIGSTR_006\")")},
+		{"a main() alone, indented", indentedMain},
+	}
+	for _, shape := range unsafeShapes {
+		all = append(all, script{fmt.Sprintf("with %q for %q", shape.new, shape.old), swapped(t, fixture, shape.old, shape.new)})
+	}
+	for _, c := range joinable {
+		all = append(all, script{fmt.Sprintf("the script %q", c.source), c.source})
+	}
+	for _, source := range slices.Concat(slices.Sorted(maps.Keys(minimapSources)), slices.Sorted(maps.Keys(withoutOneMain))) {
+		all = append(all, script{fmt.Sprintf("the script %q", source), source})
+	}
+	return append(all, layouts(t, fixture)...)
+}
+
+// layouts is the fixture's script written in other ways that say the same.
+func layouts(t *testing.T, fixture string) []script {
+	t.Helper()
+	oneLine := strings.ReplaceAll(swapped(t, fixture, "--\r\n", ""), "\r\n", " ")
+	together := swapped(t, fixture, "SetPlayerStartLocation(Player(0), 0)\r\nForcePlayerStartLocation(Player(0), 0)\r\nSetPlayerColor",
+		"SetPlayerStartLocation(Player(0), 0)ForcePlayerStartLocation(Player(0), 0)SetPlayerColor")
+	together = swapped(t, together, "NewSoundEnvironment(\"Default\")\r\n", "")
+	together = swapped(t, together, "SetMapMusic(\"Music\", true, 0)\r\nCreateAllUnits()\r\n",
+		"SetMapMusic(\"Music\", true, 0)\r\nNewSoundEnvironment(\"Default\")ResetTerrainFog()CreateAllUnits()")
+	return []script{
+		{"with the line endings of Unix", strings.ReplaceAll(fixture, "\r\n", "\n")},
+		{"with a semicolon after every call", strings.ReplaceAll(fixture, ")\r\n", ");\r\n")},
+		{"with every line indented", strings.ReplaceAll(fixture, "\r\n", "\r\n\t  ")},
+		{"on one line", oneLine},
+		{"on one line with semicolons", strings.ReplaceAll(oneLine, ") ", "); ")},
+		{"with calls that touch", together},
+	}
+}
+
+// writtenApart reports whether the settings make a script take, from the map info given as bytes, a number that
+// the two trees write apart: a position of a player whose position is set, or a start, an end or a density of a
+// fog that is set and shown, that is not 0 and is below 0.000001 in size or from 1e21.
+func writtenApart(s manifest.Settings, patchedInfo []byte) bool {
+	info, err := w3i.Read(patchedInfo, infoFile, w3i.Extended)
+	if err != nil {
+		return false
+	}
+	apart := func(values ...float32) bool {
+		return slices.ContainsFunc(values, func(value float32) bool {
+			size := math.Abs(float64(value))
+			return size != 0 && (size < 0.000001 || size >= 1e21)
+		})
+	}
+	for _, player := range info.Details.Players {
+		override := s.Players[strconv.Itoa(int(player.ID.Value))]
+		if (override.X != nil || override.Y != nil) && apart(player.X.Value, player.Y.Value) {
+			return true
+		}
+	}
+	fog := info.Details.Fog
+	return s.Environment.Fog != (manifest.Fog{}) && info.Flags.Value&fogOn != 0 &&
+		apart(fog.Start.Value, fog.End.Value, fog.Density.Value)
+}
+
+// unreadIn is the refusal of the other tree when it is that of its Lua reader for a script that does not read,
+// and nil for any other error.
+func unreadIn(err error) *olddiag.Error {
+	if failure, ok := err.(*olddiag.Error); ok && strings.HasPrefix(failure.Msg, "Cannot safely read map Lua: ") {
+		return failure
+	}
+	return nil
+}
+
+// compareUnread compares the refusals of a script that the other tree's Lua reader refuses, in everything but
+// the place: the same file, the same hint, and the same message before the other tree's " at character N".
+func compareUnread(t *testing.T, what string, want *olddiag.Error, got error) {
+	t.Helper()
+	failure, ok := got.(*diag.Error)
+	switch {
+	case !ok:
+		t.Errorf("%s: got %v, want the refusal of a script that does not read: %v", what, got, want)
+	case failure.File != want.File || failure.Hint != want.Hint || failure.Line == 0 || failure.Column == 0 ||
+		want.Msg != failure.Msg && !strings.HasPrefix(want.Msg, failure.Msg+" at character "):
+		t.Errorf("%s: the refusals of a script that does not read differ:\nwant: %+v\ngot:  %+v", what, want, failure)
+	}
+}
+
+// scriptCounts is what came of the scripts both trees were given.
+type scriptCounts struct{ refused, unread, changed, unchanged, leftOut int }
+
+// compareScripts gives both trees one script, one document and one map info as bytes, and counts what came of it.
+func (c *scriptCounts) compareScripts(t *testing.T, what, source string, old *oldsettings.Settings, s manifest.Settings, info []byte) {
+	t.Helper()
+	want, wantErr := oldsettings.PatchLua(source, old, info, luaFile, infoFile)
+	got, gotErr := afterInfo(source, s, info)
+	unread := unreadIn(wantErr)
+	switch {
+	case unread != nil:
+		compareUnread(t, what, unread, gotErr)
+		c.unread++
+	case oracle.Refusals(t, what, wantErr, gotErr):
+		c.refused++
+	case wantErr == nil && writtenApart(s, info):
+		c.leftOut++
+		if gotErr == nil && got == want {
+			t.Errorf("%s: left out, and both trees write the same", what)
+		}
+	case want == source:
+		oracle.Bytes(t, what, []byte(want), []byte(got))
+		c.unchanged++
+	default:
+		oracle.Bytes(t, what, []byte(want), []byte(got))
+		c.changed++
+	}
+}
+
+// add counts what another count has.
+func (c *scriptCounts) add(other scriptCounts) {
+	c.refused += other.refused
+	c.unread += other.unread
+	c.changed += other.changed
+	c.unchanged += other.unchanged
+	c.leftOut += other.leftOut
+}
+
+// together runs each piece of work on one of as many goroutines as the machine runs at once, and adds up what
+// they counted. Each pair of a script and a document has both trees read the script twice, and there are
+// thousands of pairs: one after the other they take several seconds.
+func together(work []func(*scriptCounts)) scriptCounts {
+	counts := make([]scriptCounts, runtime.GOMAXPROCS(0))
+	queue := make(chan func(*scriptCounts))
+	var workers sync.WaitGroup
+	for i := range counts {
+		workers.Go(func() {
+			for piece := range queue {
+				piece(&counts[i])
+			}
+		})
+	}
+	for _, piece := range work {
+		queue <- piece
+	}
+	close(queue)
+	workers.Wait()
+	var sum scriptCounts
+	for _, count := range counts {
+		sum.add(count)
+	}
+	return sum
+}
+
+// onTheFixturesInfo puts the settings of each document into the fixture's map info and gives both trees each
+// script with the result. It returns what came of the scripts, and how many documents the map info refused.
+func onTheFixturesInfo(t *testing.T, documents []string, sources []script) (counted scriptCounts, notInTheMap int) {
+	t.Helper()
+	fixture := fixtureInfo(t)
+	var work []func(*scriptCounts)
+	for _, document := range documents {
+		old, project := accepted(t, "", document)
+		info, err := patchInfo(fixture, project.Settings, infoFile)
+		if err != nil {
+			notInTheMap++
+			continue
+		}
+		work = append(work, func(c *scriptCounts) {
+			for _, source := range sources {
+				c.compareScripts(t, source.name+", settings "+document, source.text, old, project.Settings, info)
+			}
+		})
+	}
+	return together(work), notInTheMap
+}
+
+func TestOracleOnTheScript(t *testing.T) {
+	all, sources := scriptDocuments(), scripts(t)
+	counted, notInTheMap := onTheFixturesInfo(t, all, sources)
+	if len(all) != 137 || len(sources) != 47 || notInTheMap != 10 {
+		t.Errorf("%d documents, %d of them not for the fixture's map info, and %d scripts; want 137, 10 and 47",
+			len(all), notInTheMap, len(sources))
+	}
+	// 127 documents for 47 scripts. 39 of the documents set nothing the script has, and leave all 47 as they
+	// are; each of the other 88 is refused by the two scripts that do not read. Four documents put a number
+	// into the script that the trees write apart (the fourth of everyDocuments, and the first three of
+	// apartDocuments): the pairs of them that the other tree does not refuse are left out, which are 12, 32, 30
+	// and 39 of the 47 of each.
+	want := scriptCounts{refused: 1177, unread: 2 * 88, changed: 2374, unchanged: 39*47 + 296, leftOut: 12 + 32 + 30 + 39}
+	if counted != want {
+		t.Errorf("the scripts came to %+v, want %+v", counted, want)
+	}
+}
+
+func TestOracleOnTheScriptForEverySubsetOfABlock(t *testing.T) {
+	all, sources := subsetDocuments(), scripts(t)
+	// The script as World Editor writes it, and the layout least like it. The other scripts are compared for
+	// the documents of TestOracleOnTheScript, which set every setting among them.
+	layout := slices.IndexFunc(sources, func(source script) bool { return source.name == "on one line with semicolons" })
+	counted, notInTheMap := onTheFixturesInfo(t, all, []script{sources[0], sources[layout]})
+	// 32 subsets of the description, 64 of each of two players and two forces, 256 of the environment.
+	if len(all) != 32+4*64+256 || notInTheMap != 0 {
+		t.Errorf("%d documents, %d of them not for the fixture's map info; want 544 and 0", len(all), notInTheMap)
+	}
+	// What leaves a script as it is: the 8 subsets of the description without a name or a description, the
+	// subset with nothing and the one with only a name of each player and each force, and the environment with
+	// nothing. Every other subset changes both scripts, and none is refused.
+	unchanged := 2 * (8 + 4*2 + 1)
+	if want := (scriptCounts{changed: 2*len(all) - unchanged, unchanged: unchanged}); counted != want {
+		t.Errorf("the scripts came to %+v, want %+v", counted, want)
+	}
+}
+
+// unreadInfos are bytes that are no map info, beside those of mapInfos.
+var unreadInfos = []mapInfo{{"two bytes", []byte{1, 2}}}
+
+func TestOracleOnTheScriptOfEveryMapInfo(t *testing.T) {
+	source, infos := fixtureLua(t), slices.Concat(mapInfos(t), unreadInfos)
+	var withSettings, without []func(*scriptCounts)
+	for _, document := range scriptDocuments() {
+		old, project := accepted(t, "", document)
+		for _, info := range infos {
+			what := info.name + ", settings " + document
+			// A map info as it is stands for one of another map: the settings may name what it lacks.
+			without = append(without, func(c *scriptCounts) {
+				c.compareScripts(t, what+", not in the map info", source, old, project.Settings, info.data)
+			})
+			if patched, err := patchInfo(info.data, project.Settings, infoFile); err == nil {
+				withSettings = append(withSettings, func(c *scriptCounts) {
+					c.compareScripts(t, what, source, old, project.Settings, patched)
+				})
+			}
+		}
+	}
+	// The fixture's script is that of the fixture's map info: for another map info it is mostly refused, for a
+	// player or a force that is not where the script has it.
+	want := scriptCounts{refused: 79, changed: 646, unchanged: 635, leftOut: 24}
+	if counted := together(withSettings); counted != want || len(withSettings) != 1384 {
+		t.Errorf("%d scripts for a map info with the settings came to %+v, want 1384 and %+v", len(withSettings), counted, want)
+	}
+	want = scriptCounts{refused: 772, changed: 422, unchanged: 998}
+	if counted := together(without); counted != want || len(without) != 137*16 {
+		t.Errorf("%d scripts for a map info as it is came to %+v, want %d and %+v", len(without), counted, 137*16, want)
+	}
+}
+
+func TestOracleOnTheMinimapCall(t *testing.T) {
+	sources := scripts(t)
+	for _, document := range luaDocuments {
+		if result, err := withSettings(t, document, fixtureLua(t)); err == nil {
+			sources = append(sources, script{"the fixture with settings " + document, result})
+		}
+	}
+	added, refused, unread := 0, 0, 0
+	for _, source := range sources {
+		want, wantErr := oldsettings.PatchMinimapLua(source.text, luaFile)
+		got, gotErr := patchMinimap(source.text, luaFile)
+		switch failure := unreadIn(wantErr); {
+		case failure != nil:
+			compareUnread(t, source.name, failure, gotErr)
+			unread++
+		case oracle.Refusals(t, source.name, wantErr, gotErr):
+			refused++
+		default:
+			oracle.Bytes(t, source.name, []byte(want), []byte(got))
+			added++
+		}
+	}
+	// Of the 47 scripts two have no main() or two, and two do not read; every document of luaDocuments goes
+	// into the fixture's script.
+	if added != 43+len(luaDocuments) || refused != 2 || unread != 2 {
+		t.Errorf("the call went into %d scripts, %d refused it and %d do not read; want %d, 2 and 2",
+			added, refused, unread, 43+len(luaDocuments))
 	}
 }
