@@ -4,7 +4,9 @@
 //
 // It takes the folder's path and the label errors name it by, and names of files relative to the folder. It returns
 // the files' bytes and spellings, and Changes: the complete new content of a file, or its removal. A failure a user
-// can act on is a *diag.Error that names the file by the label. It imports no package of Moonwell but diag and fsx.
+// can act on is a *diag.Error that names the file by the label. Name and Label spell a file as the map does, and a
+// folder of the map too, so that a planner's error about a folder where a file belongs names the folder as it is
+// spelled. It imports no package of Moonwell but diag and fsx.
 //
 // For the author of a planner. A planner is given a Folder and returns Changes; it writes nothing. It reads every
 // file it changes, removes or relies on through the folder (Read, Has, Name), in any letter case; it asks Place for
@@ -110,8 +112,8 @@ func Open(dir, label string) (*Folder, error) {
 // Dir is the folder's path on disk.
 func (f *Folder) Dir() string { return f.dir }
 
-// Label is how errors name the file: the folder's label, "/", and the spelling Name gives. Label("") is the folder
-// itself.
+// Label is how errors name a file or a folder of the map: the map folder's label, "/", and the spelling Name
+// gives, which is the map's own for a file and for a folder it has. Label("") is the map folder itself.
 func (f *Folder) Label(name string) string {
 	if name == "" {
 		return f.label
@@ -147,17 +149,24 @@ func (f *Folder) Has(name string) bool {
 // IsFolder reports whether the map has a folder under this name, by any letter case: one the scan found, or one a
 // planned change makes. A removal takes a file away and leaves its folder, so a folder the scan found stays one
 // in a view that removes every file in it. A folder that only planned files make is one as long as the view
-// plans a file in it: it is none once every such write is taken back. A file is not a folder, and neither is the
-// map folder itself, under "".
+// plans a file in it: it is none once every such write is taken back. The map folder itself, under "", is none.
+//
+// In a view whose every new file got its name from Place, a name is a file or a folder and never both. A view
+// with a change below a file has that file's name as both; the check before the first write refuses such a plan.
 func (f *Folder) IsFolder(name string) bool {
 	_, is := f.folder(Key(name))
 	return is
 }
 
-// Name is the spelling the folder has for name, else name as given. A file that a view removes keeps its spelling,
-// so an error about it names the file as the map on disk spells it.
+// Name is the spelling the map has for name: that of the file under it, else that of the folder under it, one the
+// scan found or one a planned change makes, else name as given. A file that a view removes keeps its spelling. So
+// an error names a file or a folder as the map spells it, and what the map has neither of as the caller does.
 func (f *Folder) Name(name string) string {
-	if spelled, ok := f.spelling(Key(name)); ok {
+	key := Key(name)
+	if spelled, ok := f.spelling(key); ok {
+		return spelled
+	}
+	if spelled, ok := f.folder(key); ok {
 		return spelled
 	}
 	return name

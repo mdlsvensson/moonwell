@@ -126,9 +126,10 @@ import (
 // Compared in part: a map with a folder under the name of a file the settings need (war3map.w3i, war3map.lua, and
 // war3mapMap.blp for a preview). The other tree fails to read the folder as a file and says "Reading a map file
 // for map settings failed", with the system's reason; this tree says that the name is a folder, not a file
-// (TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder). Both must refuse and name the same file
-// (TestOracleOnAFolderUnderAFileTheSettingsNeed): five refusals. The other tree meets the minimap's folder last,
-// when it reads the minimap to keep it, and this tree first, before it reads a map file.
+// (TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder). Both must refuse and name the same file, which
+// is the folder as the map spells it (TestOracleOnAFolderUnderAFileTheSettingsNeed): six refusals, one of them
+// for a folder in another letter case. The other tree meets the minimap's folder last, when it reads the minimap
+// to keep it, and this tree first, before it reads a map file.
 //
 // TestOracleOnAPreviewThatCannotBeRead and TestOracleOnAMapFileThatCannotBeRead compare nothing, and are
 // skipped, where the test cannot make a file that is there and cannot be read: as root on a system other than
@@ -140,9 +141,6 @@ import (
 //   - A map folder with a folder under the name of one of the two text files. The other tree fails to read it
 //     as a file. In this tree a folder is not a file: the map has no such text file, and mapdir refuses to write
 //     one there (TestAFolderWhereATextFileGoesIsRefusedAndNotTakenForAMapWithoutTheFile).
-//   - A map folder with a folder under another spelling of the name of a file the settings need (WAR3MAP.W3I).
-//     The other tree names the file as the folder is spelled, and this tree as the settings name it, as it does
-//     for a file the map lacks (TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder).
 //   - A map folder that is not there, and one with two paths that differ only in letter case: mapdir.Open
 //     refuses both before there is a folder to plan for.
 //   - A plan without the manifest's name, for which the other tree says moonwell.pkl: a project knows its
@@ -1495,24 +1493,26 @@ func TestOracleOnAFolderUnderANameAPreviewAdds(t *testing.T) {
 
 func TestOracleOnAFolderUnderAFileTheSettingsNeed(t *testing.T) {
 	const wantStart, gotWords = "Reading a map file for map settings failed: ", " in the map is a folder, not a file."
-	tests := []struct{ name, document string }{
-		{"war3map.w3i", `{"loadingScreen":{"title":"T"}}`},
-		{"war3map.lua", `{"info":{"name":"N"}}`},
+	tests := []struct{ name, folder, document string }{
+		{"war3map.w3i", "war3map.w3i", `{"loadingScreen":{"title":"T"}}`},
+		{"war3map.lua", "war3map.lua", `{"info":{"name":"N"}}`},
 		// A preview alone reads the script, for the call that gives the minimap back, and no map info.
-		{"war3map.lua", previewAt("preview.tga")},
+		{"war3map.lua", "war3map.lua", previewAt("preview.tga")},
 		// The minimap, for a picture that is written beside its file and for one that takes its file.
-		{"war3mapMap.blp", previewAt("preview.tga")},
-		{"war3mapMap.blp", previewAt("preview.blp")},
+		{"war3mapMap.blp", "war3mapMap.blp", previewAt("preview.tga")},
+		{"war3mapMap.blp", "war3mapMap.blp", previewAt("preview.blp")},
+		// Both trees name the folder as the map spells it.
+		{"war3map.w3i", "WAR3MAP.W3I", `{"loadingScreen":{"title":"T"}}`},
 	}
 	compared := 0
 	for _, tt := range tests {
-		what := "a folder " + tt.name + ", settings " + tt.document
+		what := "a folder " + tt.folder + ", settings " + tt.document
 		dir, root := withPreview(t, "preview.tga", plainTGA())
 		testkit.WriteFile(t, root, "preview.blp", testkit.BLP(256, 1))
 		if err := os.Remove(filepath.Join(dir, tt.name)); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.Mkdir(filepath.Join(dir, tt.name), 0o777); err != nil {
+		if err := os.Mkdir(filepath.Join(dir, tt.folder), 0o777); err != nil {
 			t.Fatal(err)
 		}
 		read := inBothTrees(t, root, tt.document)
@@ -1524,14 +1524,14 @@ func TestOracleOnAFolderUnderAFileTheSettingsNeed(t *testing.T) {
 			t.Errorf("%s: the refusals are %v and %v, want a diag error of each tree", what, wantErr, gotErr)
 			continue
 		}
-		if !strings.HasPrefix(want.Msg, wantStart) || got.Msg != tt.name+gotWords || got.File != want.File || got.Hint == "" {
+		if !strings.HasPrefix(want.Msg, wantStart) || got.Msg != tt.folder+gotWords || got.File != want.File || got.Hint == "" {
 			t.Errorf("%s: the refusals differ in more than their words:\nwant: %+v\ngot:  %+v", what, want, got)
 			continue
 		}
 		compared++
 	}
-	if compared != 5 {
-		t.Errorf("%d refusals compared, want 5", compared)
+	if compared != 6 {
+		t.Errorf("%d refusals compared, want 6", compared)
 	}
 }
 

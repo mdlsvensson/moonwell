@@ -141,6 +141,39 @@ func TestAFolderOfTheMapIsNotAFile(t *testing.T) {
 	}
 }
 
+// An error about a folder of the map names it as the map spells it, as one about a file does.
+func TestAFolderIsNamedAsItIsSpelled(t *testing.T) {
+	folder, _ := open(t, map[string]string{"Textures/Old.blp": "old", "Units/Hero/a.txt": "", "WAR3MAP.LUA": "script"})
+	planned := folder.With([]Change{put("Sound/Music/theme.mp3", "theme"), drop("units/hero/A.TXT")})
+	takenBack := planned.With([]Change{drop("sound/music/theme.mp3")})
+	cases := []struct {
+		what        string
+		view        *Folder
+		asked, name string
+	}{
+		{"a folder of the map", folder, "textures", "Textures"},
+		{"a folder below a folder, with a backslash", folder, `UNITS\hero`, "Units/Hero"},
+		{"a folder a planned file makes", planned, "sound", "Sound"},
+		{"and the folder below it", planned, "SOUND/music", "Sound/Music"},
+		{"a folder of the map whose one file the view removes", planned, "units/HERO", "Units/Hero"},
+		// A file has the name first: a folder and a file never share one in a plan that can be written.
+		{"a file of the map", folder, "war3map.lua", "WAR3MAP.LUA"},
+		{"a file the view removes", planned, "UNITS/HERO/a.txt", "Units/Hero/a.txt"},
+		// A name the view has neither a file nor a folder under stays as given.
+		{"a name the map does not have", folder, "sound", "sound"},
+		{"a new file below a folder of the map", folder, "textures/New.blp", "textures/New.blp"},
+		{"a planned folder whose one write is taken back", takenBack, "sound/MUSIC", "sound/MUSIC"},
+	}
+	for _, c := range cases {
+		if got := c.view.Name(c.asked); got != c.name {
+			t.Errorf("%s: Name(%q) = %q, want %q", c.what, c.asked, got, c.name)
+		}
+		if got := c.view.Label(c.asked); got != label+"/"+c.name {
+			t.Errorf("%s: Label(%q) = %q, want %q", c.what, c.asked, got, label+"/"+c.name)
+		}
+	}
+}
+
 func TestReadNamesTheFileItCannotRead(t *testing.T) {
 	folder, dir := open(t, map[string]string{"war3map.w3i": "info"})
 	// A folder where the scan saw a file: reading it fails on every system.

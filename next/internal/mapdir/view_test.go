@@ -205,7 +205,6 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 		// The folder the map has is respelled; what follows it stays.
 		{"an empty folder name below a folder the map has", "textures//New.blp", "Textures//New.blp"},
 		{"a way out of a folder the map has", `TEXTURES\..\WAR3MAP.W3I`, "Textures/../WAR3MAP.W3I"},
-		{"a new folder below a folder the map has", "textures/Sub/Deep/New.blp", "Textures/Sub/Deep/New.blp"},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -335,6 +334,8 @@ func TestPlaceKeepsTheSpellingOfFoldersAndFilesTheMapHas(t *testing.T) {
 	}{
 		{folder, "textures/New.blp", "Textures/New.blp"},
 		{folder, `TEXTURES\sub\New.blp`, "Textures/sub/New.blp"},
+		// Two new folders below a folder the map has are spelled as given.
+		{folder, "textures/Sub/Deep/New.blp", "Textures/Sub/Deep/New.blp"},
 		{folder, "textures/old.BLP", "Textures/Old.blp"},
 		{folder, "WAR3MAP.LUA", "war3map.lua"},
 		{folder, "top.txt", "top.txt"},
@@ -373,6 +374,8 @@ func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 			label + "/Sound/Music/theme.mp3"},
 		{folder, "textures", "textures would replace a folder in the map", label + "/Textures"},
 		{planned, "sound/MUSIC", "sound/MUSIC would replace a folder in the map", label + "/Sound/Music"},
+		// A removal leaves the folder: one whose only file the view removes is in the way, as IsFolder says.
+		{removing, "TEXTURES", "TEXTURES would replace a folder in the map", label + "/Textures"},
 	}
 	for _, c := range cases {
 		got, err := c.view.Place(c.name)

@@ -297,8 +297,9 @@ func TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder(t *testing.T) {
 		{"war3map.lua", "war3map.lua", `{"info":{"preview":"preview.tga"}}`},
 		{"war3mapMap.blp", "war3mapMap.blp", `{"info":{"preview":"preview.tga"},` + absent + `}`},
 		{"war3mapMap.blp", "war3mapMap.blp", `{"info":{"preview":"preview.blp"},` + absent + `}`},
-		// The file is named as the settings name it, whatever the folder's letter case.
+		// The folder is named as the map spells it.
 		{"war3map.w3i", "WAR3MAP.W3I", `{"loadingScreen":{"title":"T"}}`},
+		{"war3mapMap.blp", "War3mapMap.BLP", `{"info":{"preview":"preview.tga"},` + absent + `}`},
 	}
 	for _, tt := range tests {
 		t.Run(tt.folder+" for "+tt.document, func(t *testing.T) {
@@ -310,8 +311,8 @@ func TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder(t *testing.T) {
 			if err := os.Mkdir(filepath.Join(dir, tt.folder), 0o777); err != nil {
 				t.Fatal(err)
 			}
-			failure := refusedPlan(t, dir, root, tt.document, mapLabel+"/"+tt.name)
-			if !strings.Contains(failure.Msg, tt.name+" in the map is a folder, not a file") ||
+			failure := refusedPlan(t, dir, root, tt.document, mapLabel+"/"+tt.folder)
+			if !strings.Contains(failure.Msg, tt.folder+" in the map is a folder, not a file") ||
 				!strings.Contains(failure.Hint, "Remove") || !strings.Contains(failure.Hint, "World Editor") {
 				t.Errorf("error = %+v", failure)
 			}

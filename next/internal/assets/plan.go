@@ -171,14 +171,12 @@ func (p *planner) readIndex() error {
 }
 
 // placeForIndex fails when a map without war3map.imp has no place for the one the plan writes: the map has a
-// folder under that name, which Place names as the file of its refusal.
+// folder under that name. The name has no folder on its way, so nothing else can be in its place.
 func (p *planner) placeForIndex() error {
-	_, err := p.folder.Place(indexName)
-	var failure *diag.Error
-	if p.folder.IsFolder(indexName) && errors.As(err, &failure) {
-		return errIndexIsAFolder(failure.File)
+	if p.folder.IsFolder(indexName) {
+		return errIndexIsAFolder(p.folder.Label(indexName))
 	}
-	return err
+	return nil
 }
 
 // ownedUnchanged fails unless every owned file the map has holds what the state says, the files the plan
@@ -225,15 +223,17 @@ func (p *planner) roomFor(asset Asset) error {
 }
 
 // noPlace is the refusal of an asset that the folder has no place for. Place refuses a name for one of two
-// reasons, and the folder is asked which: the map has a folder under the asset's own path, or a file on the way
-// to it. Either is what Place names as the file of its error.
+// reasons, and the folder is asked which: the map has a folder under the asset's own path, which the folder
+// names, or a file on the way to it. That file is named by the file of Place's error alone: a file the map has on
+// disk is on the way in a view that removes it too, and the folder has no other answer that tells such a file
+// from a folder the asset would make.
 func (p *planner) noPlace(asset Asset, refusal error) error {
 	var failure *diag.Error
-	if !errors.As(refusal, &failure) {
+	switch {
+	case !errors.As(refusal, &failure):
 		return refusal
-	}
-	if p.folder.IsFolder(asset.Target) {
-		return errOntoAFolder(asset, failure.File)
+	case p.folder.IsFolder(asset.Target):
+		return errOntoAFolder(asset, p.folder.Label(asset.Target))
 	}
 	inTheWay := strings.TrimPrefix(failure.File, p.folder.Label("")+"/")
 	return errThroughAFile(inTheWay, asset, failure.File)

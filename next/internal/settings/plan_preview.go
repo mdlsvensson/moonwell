@@ -62,7 +62,7 @@ func (p *planner) hasMinimap() error {
 	case p.folder.Has(savedMinimap):
 		return nil
 	case p.folder.IsFolder(savedMinimap):
-		return errFolderForFile(savedMinimap, p.folder.Label(savedMinimap))
+		return errFolderForFile(p.folder.Name(savedMinimap), p.folder.Label(savedMinimap))
 	}
 	return errNoMinimap(p.folder.Label(savedMinimap))
 }

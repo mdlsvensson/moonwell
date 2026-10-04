@@ -183,7 +183,7 @@ func (p *planner) required(name string) ([]byte, error) {
 	case found:
 		return data, nil
 	case p.folder.IsFolder(name):
-		return nil, errFolderForFile(name, p.folder.Label(name))
+		return nil, errFolderForFile(p.folder.Name(name), p.folder.Label(name))
 	}
 	return nil, errMissing(p.folder.Label(name))
 }
@@ -233,10 +233,11 @@ func errMissing(file string) error {
 	return &diag.Error{Msg: "A map file needed by the configured settings is missing.", File: file, Hint: resaveMap}
 }
 
-// errFolderForFile is raised for the minimap a preview needs too, in plan_preview.go.
-func errFolderForFile(name, file string) error {
+// errFolderForFile names the folder as the map spells it. It is raised for the minimap a preview needs too, in
+// plan_preview.go.
+func errFolderForFile(folder, file string) error {
 	return &diag.Error{
-		Msg:  name + " in the map is a folder, not a file.",
+		Msg:  folder + " in the map is a folder, not a file.",
 		File: file,
 		Hint: "The map has a folder where a file the configured settings need belongs. Remove that folder from the " +
 			"source map, or open and re-save the map in World Editor.",
