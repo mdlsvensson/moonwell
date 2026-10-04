@@ -5,6 +5,42 @@
 // It takes the folder's path and the label errors name it by, and names of files relative to the folder. It returns
 // the files' bytes and spellings, and Changes: the complete new content of a file, or its removal. A failure a user
 // can act on is a *diag.Error that names the file by the label. It imports no package of Moonwell but diag and fsx.
+//
+// For the author of a planner. A planner is given a Folder and returns Changes; it writes nothing. It reads every
+// file it changes, removes or relies on through the folder (Read, Has, Name), in any letter case; it asks Place for
+// the name of a file the map does not have; and it returns the changes. Its caller lays them over the folder with
+// With, and stages the view with StageTo or writes it into the map with ApplyInPlace.
+//
+// Open refuses, wherever in the folder it is:
+//
+//   - a link, and a map folder that is itself a link;
+//   - a map folder that is a file;
+//   - an entry that is neither a file nor a folder;
+//   - a name Windows cannot hold: one with a backslash, a control character or any of < > : " | ? *, one that ends
+//     with a dot or a space, and a device name such as CON or NUL;
+//   - two paths that differ only in letter case;
+//   - a folder that cannot be listed.
+//
+// A map folder that is not there fails with the system's error, for the caller to word.
+//
+// Before their first write, StageTo and ApplyInPlace check the whole plan, and refuse it when a change has a name
+// that no file can have (one fsx.RelPath does not take), when a new file is named as a folder of the map, and when
+// a new file would be below a file of the map, also one the plan removes: no file of a map becomes a folder. Place
+// refuses the last two with an error a user can act on, so a plan refused by this check is its planner's bug, and
+// the error is a plain one. StageTo also refuses to stage over the source map.
+//
+// ApplyInPlace writes only where the folder is still what was seen. Before each write it checks the file: one the
+// scan found must be there, with the bytes that were read if any view of the folder read it, and one the scan did
+// not find must not be there. A file nobody read is checked for its presence alone, so a planner reads what it
+// replaces or removes.
+//
+// An error of this package carries a Cause exactly when the system failed: a folder that cannot be listed, a file
+// that cannot be read or written, a stage that cannot be made. It carries none when the content of the map, or a
+// plan for it, is refused: a link, a name that cannot be used, two spellings of one path, an entry that is no
+// regular file, a file that is no folder, a new file without a place, a stage over the source map, a file that
+// changed after the plan. A link made after the scan is met by a read or a write, which fails as the system's
+// with the link's refusal as its Cause. Callers tell the two kinds apart by the Cause, as the assets area does to
+// say whose failure it is, so every error added to this package keeps the rule.
 package mapdir
 
 import (
@@ -47,6 +83,16 @@ type Folder struct {
 
 // Open scans dir, which must be an existing real folder. label is how errors name it, such as "maps/map.w3x".
 // A missing dir is an error that satisfies errors.Is(err, fs.ErrNotExist); the caller words it.
+//
+// It refuses what a map folder cannot hold, each with a *diag.Error at the path it is found at:
+//
+//   - a link, anywhere below dir, and a dir that is itself a link;
+//   - a dir that is a file, not a folder;
+//   - an entry that is neither a file nor a folder;
+//   - an entry with a name Windows cannot hold: a backslash, a control character or any of < > : " | ? * in it,
+//     a dot or a space at its end, or a device name such as CON or NUL;
+//   - two paths that differ only in letter case, of files or of folders;
+//   - a folder that cannot be listed, which alone of these is the system's failure and has a Cause.
 func Open(dir, label string) (*Folder, error) {
 	found, err := scan(dir, label)
 	if err != nil {

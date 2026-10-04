@@ -1,0 +1,155 @@
+package mapdir
+
+import (
+	"context"
+	"net"
+	"os"
+	"path/filepath"
+	"runtime"
+	"testing"
+
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
+	"github.com/mdlsvensson/moonwell/next/internal/testkit"
+)
+
+// The two kinds of failure a user can act on. A caller tells them apart by the cause.
+const (
+	refused = false // what the map holds, or a plan for it, is refused
+	failed  = true  // the system failed
+)
+
+// causes is each failure of the package that a user can act on, with the words that tell its message from the
+// others' and a way to provoke it. A row that cannot be provoked on this system skips itself.
+var causes = []struct {
+	name    string
+	words   string
+	system  bool
+	provoke func(t *testing.T) error
+}{
+	// ---- the content of the map is refused: Open ----
+	{"a link inside the map", "Symlinks are not supported", refused, func(t *testing.T) error {
+		dir := write(t, map[string]string{"Textures/Icon.blp": "icon"})
+		outside := filepath.Join(filepath.Dir(dir), "outside")
+		testkit.WriteFile(t, outside, "stray.blp", nil)
+		testkit.LinkDir(t, outside, filepath.Join(dir, "Textures", "linked"))
+		_, err := Open(dir, label)
+		return err
+	}},
+	{"a map folder that is a link", "Symlinks are not supported", refused, func(t *testing.T) error {
+		dir := write(t, sourceMap)
+		link := filepath.Join(filepath.Dir(dir), "linked.w3x")
+		testkit.LinkDir(t, dir, link)
+		_, err := Open(link, label)
+		return err
+	}},
+	{"a name that cannot be used", "cannot be used in a map", refused, func(t *testing.T) error {
+		w := walker{label: label, found: &listing{}}
+		return w.add("what?.blp", named{name: "what?.blp"})
+	}},
+	{"two spellings of one path", "differ only in letter case", refused, func(t *testing.T) error {
+		w := walker{label: label, found: &listing{names: map[string]string{"a.txt": "A.txt"}}}
+		return w.add("a.txt", named{name: "a.txt"})
+	}},
+	{"an entry that is no regular file", "is not a regular file", refused, func(t *testing.T) error {
+		if runtime.GOOS == "windows" {
+			t.Skip("a socket's file made on Windows could not be removed again, so the test would leave it behind")
+		}
+		dir := write(t, sourceMap)
+		// The path of a socket must be short, so it is made from inside the folder.
+		t.Chdir(dir)
+		listener, err := net.Listen("unix", "socket")
+		if err != nil {
+			t.Skipf("cannot make a socket here: %v", err)
+		}
+		defer listener.Close()
+		_, err = Open(dir, label)
+		return err
+	}},
+	{"a file that is no folder", "is not a folder", refused, func(t *testing.T) error {
+		_, err := Open(testkit.WriteFile(t, t.TempDir(), "map.w3x", []byte("an archive")), label)
+		return err
+	}},
+
+	// ---- a plan for the map is refused: Place, StageTo, ApplyInPlace ----
+	{"a new file below a file of the map", "is a file, not a folder", refused, func(t *testing.T) error {
+		folder, _ := open(t, sourceMap)
+		_, err := folder.Place("war3map.w3i/x.txt")
+		return err
+	}},
+	{"a new file named as a folder of the map", "would replace a folder", refused, func(t *testing.T) error {
+		folder, _ := open(t, sourceMap)
+		_, err := folder.Place("textures")
+		return err
+	}},
+	{"a stage that is the source map", "would replace the source map", refused, func(t *testing.T) error {
+		folder, dir := open(t, sourceMap)
+		return folder.StageTo(dir)
+	}},
+	{"a file that changed after it was read", "changed after", refused, func(t *testing.T) error {
+		folder, dir := open(t, sourceMap)
+		read(t, folder, "war3map.w3i")
+		testkit.WriteFile(t, dir, "war3map.w3i", []byte("edited elsewhere"))
+		return folder.With([]Change{put("war3map.w3i", "patched")}).ApplyInPlace(context.Background(), &fsx.Journal{})
+	}},
+
+	// ---- the system failed ----
+	{"a folder that cannot be listed", "Reading the map folder failed", failed, func(t *testing.T) error {
+		// A folder that is gone by the time the scan enters it.
+		w := walker{dir: write(t, sourceMap), label: label, found: &listing{}}
+		return w.walk("Gone")
+	}},
+	{"a file that cannot be read", "Reading a map file failed", failed, func(t *testing.T) error {
+		folder, dir := open(t, sourceMap)
+		// A folder where the scan saw a file: reading it fails on every system.
+		file := filepath.Join(dir, "war3map.w3i")
+		if err := os.Remove(file); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Mkdir(file, 0o777); err != nil {
+			t.Fatal(err)
+		}
+		_, _, err := folder.Read("war3map.w3i")
+		return err
+	}},
+	{"a read through a link made after the scan", "Reading a map file failed: Symlinks", failed, func(t *testing.T) error {
+		folder, dir := open(t, sourceMap)
+		linkAway(t, dir)
+		_, _, err := folder.Read("Textures/Old.blp")
+		return err
+	}},
+	{"a stage that cannot be made", "Staging the map failed", failed, func(t *testing.T) error {
+		folder, _ := open(t, sourceMap)
+		// A file where the folder the stage goes into should be.
+		blocked := testkit.WriteFile(t, t.TempDir(), "dist", nil)
+		return folder.StageTo(filepath.Join(blocked, "map.w3x"))
+	}},
+	{"a file that cannot be written", "Writing a map file failed", failed, func(t *testing.T) error {
+		folder, dir := open(t, sourceMap)
+		view := folder.With([]Change{put("Sound/theme.mp3", "theme")})
+		// A file made after the scan, where the new folder goes.
+		testkit.WriteFile(t, dir, "Sound", []byte("in the way"))
+		return view.ApplyInPlace(context.Background(), &fsx.Journal{})
+	}},
+	{"a write through a link made after the scan", "Writing a map file failed: Symlinks", failed, func(t *testing.T) error {
+		folder, dir := open(t, sourceMap)
+		view := folder.With([]Change{put("Textures/New.blp", "new")})
+		linkAway(t, dir)
+		return view.ApplyInPlace(context.Background(), &fsx.Journal{})
+	}},
+}
+
+// An error of the package carries a cause exactly when the system failed. Callers word the two kinds apart, and
+// decide by the cause whose failure it is.
+func TestAnErrorHasACauseExactlyWhenTheSystemFailed(t *testing.T) {
+	for _, c := range causes {
+		t.Run(c.name, func(t *testing.T) {
+			e := asError(t, c.provoke(t))
+			if !contains(e.Msg, c.words) || e.File == "" || e.Hint == "" {
+				t.Fatalf("error = %+v, want the failure that says %q, with a file and a hint", e, c.words)
+			}
+			if hasCause := e.Cause != nil; hasCause != c.system {
+				t.Errorf("the cause is %v, want one exactly when the system failed (%v): %+v", e.Cause, c.system, e)
+			}
+		})
+	}
+}
