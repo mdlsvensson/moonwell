@@ -9,6 +9,7 @@ package oracle
 import (
 	"bytes"
 	"encoding/json"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -42,8 +43,9 @@ func firstDifference(a, b []byte) int {
 	return shorter
 }
 
-// Values fails the test when the JSON of got differs from the JSON of want. Two values of different packages
-// whose exported fields have the same names and values are the same.
+// Values fails the test when the JSON of got differs from the JSON of want, or when two strings in them differ in
+// any byte (JSON writes every invalid UTF-8 byte as U+FFFD, so it cannot tell them apart). Two values of different
+// packages whose exported fields have the same names and values are the same.
 func Values(t testing.TB, what string, want, got any) {
 	t.Helper()
 	wantJSON, err := marshal(want)
@@ -56,11 +58,15 @@ func Values(t testing.TB, what string, want, got any) {
 		t.Errorf("%s: cannot encode the actual value: %v", what, err)
 		return
 	}
-	if wantJSON == gotJSON {
+	if wantJSON != gotJSON {
+		line, wantLine, gotLine := firstLineDifference(wantJSON, gotJSON)
+		t.Errorf("%s: values differ at line %d:\nwant: %s\ngot:  %s", what, line, wantLine, gotLine)
 		return
 	}
-	line, wantLine, gotLine := firstLineDifference(wantJSON, gotJSON)
-	t.Errorf("%s: values differ at line %d:\nwant: %s\ngot:  %s", what, line, wantLine, gotLine)
+	if diff, found := firstStringDifference("", reflect.ValueOf(want), reflect.ValueOf(got)); found {
+		t.Errorf("%s: strings differ in bytes that JSON cannot show, at %s: want %s, got %s",
+			what, diff.path, diff.want, diff.got)
+	}
 }
 
 // marshal encodes a value as indented JSON, leaving markup characters as they are.
@@ -95,9 +101,9 @@ func lineOr(lines []string, i int) string {
 	return "(end)"
 }
 
-// Errors fails the test unless want and got are both nil or both errors. When both are *diag.Error of their
-// trees, their File fields must be equal too. It reports whether both failed, in which case there is no output
-// to compare.
+// Errors fails the test unless want and got are both nil or both errors. When want is a diag error, got must be one
+// of its own tree too, with an equal File; an error that is not a diag error in want may become one in got. It
+// reports whether both failed, in which case there is no output to compare.
 func Errors(t testing.TB, what string, want, got error) (bothFailed bool) {
 	t.Helper()
 	switch {
@@ -112,7 +118,10 @@ func Errors(t testing.TB, what string, want, got error) (bothFailed bool) {
 	}
 	wantProblem, wantIsDiag := olddiag.First(want)
 	gotProblem, gotIsDiag := newdiag.First(got)
-	if wantIsDiag && gotIsDiag && wantProblem.File != gotProblem.File {
+	switch {
+	case wantIsDiag && !gotIsDiag:
+		t.Errorf("%s: an expected failure became an error that is not a diag error: want %v, got %v", what, want, got)
+	case wantIsDiag && wantProblem.File != gotProblem.File:
 		t.Errorf("%s: error File differs: want %q, got %q", what, wantProblem.File, gotProblem.File)
 	}
 	return true

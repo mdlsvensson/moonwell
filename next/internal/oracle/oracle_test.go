@@ -92,6 +92,41 @@ func TestValues(t *testing.T) {
 			got:      map[string]string{"k": "<i>&"},
 			contains: "<i>&",
 		},
+		{
+			name:     "invalid bytes differ in a field",
+			want:     oldShape{Name: "x\xffy"},
+			got:      newShape{Name: "x\xfey"},
+			contains: `Name: want "x\xffy", got "x\xfey"`,
+		},
+		{
+			name:     "invalid bytes differ in a slice element",
+			want:     oldShape{Tags: []string{"a", "x\xffy"}},
+			got:      newShape{Tags: []string{"a", "x\xfey"}},
+			contains: "Tags[1]",
+		},
+		{
+			name:     "an invalid byte against the replacement character",
+			want:     oldShape{Name: "x\xffy"},
+			got:      newShape{Name: "x�y"},
+			contains: "Name",
+		},
+		{
+			name:     "invalid bytes differ in a map key",
+			want:     map[string]int{"x\xffy": 1},
+			got:      map[string]int{"x\xfey": 1},
+			contains: `\xff`,
+		},
+		{
+			name:     "invalid bytes differ behind a pointer and an interface",
+			want:     struct{ Any any }{&oldShape{Name: "x\xffy"}},
+			got:      struct{ Any any }{&newShape{Name: "x\xfey"}},
+			contains: "Any.Name",
+		},
+		{
+			name: "equal invalid bytes",
+			want: oldShape{Name: "x\xffy", Tags: []string{"\xfe"}},
+			got:  newShape{Name: "x\xffy", Tags: []string{"\xfe"}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -147,9 +182,29 @@ func TestErrors(t *testing.T) {
 			got:  &newdiag.Error{Msg: "a", File: "x.lua"},
 		},
 		{
-			name: "one is not a diag error", bothFailed: true,
+			name: "an expected failure became a plain error", bothFailed: true, contains: "not a diag error",
 			want: &olddiag.Error{Msg: "a", File: "x.lua"},
 			got:  plain,
+		},
+		{
+			name: "a plain error became an expected failure", bothFailed: true,
+			want: plain,
+			got:  &newdiag.Error{Msg: "a", File: "x.lua"},
+		},
+		{
+			name: "wrapped on both sides, same file", bothFailed: true,
+			want: fmt.Errorf("outer: %w", &olddiag.Error{Msg: "a", File: "x.lua"}),
+			got:  fmt.Errorf("outer: %w", &newdiag.Error{Msg: "a", File: "x.lua"}),
+		},
+		{
+			name: "wrapped on both sides, different file", bothFailed: true, contains: "File",
+			want: fmt.Errorf("outer: %w", &olddiag.Error{Msg: "a", File: "x.lua"}),
+			got:  fmt.Errorf("outer: %w", &newdiag.Error{Msg: "a", File: "y.lua"}),
+		},
+		{
+			name: "a wrapped expected failure became a plain error", bothFailed: true, contains: "not a diag error",
+			want: fmt.Errorf("outer: %w", &olddiag.Error{Msg: "a", File: "x.lua"}),
+			got:  fmt.Errorf("outer: %w", plain),
 		},
 	}
 	for _, tt := range tests {
