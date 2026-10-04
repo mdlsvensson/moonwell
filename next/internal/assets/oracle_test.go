@@ -40,24 +40,31 @@ import (
 //   - The writer of the state file, reached through the other tree's ApplyPlan, against State.Bytes: byte for
 //     byte, and read back by ReadState.
 //
-// Compared in part, and counted. The first four are what a folder cannot hold or give, which this tree leaves to
+// Compared in part, and counted. The first five are what a folder cannot hold or give, which this tree leaves to
 // mapdir and its words: assets/ and each library's folder are read through mapdir.Open, as a map folder is.
 //
-//   - A link, in assets/ or in a library's folder, or in place of either
+//   - A link in assets/, in place of assets/, or in a library's folder
 //     (TestCollectRefusesALinkBelowTheProjectFolder). The other tree names the link by its path on disk and
 //     this tree by its path from the project folder, as the file of the error. Both must refuse and name the
-//     same link, with the same hint but for one: a link in place of a library's folder is the library's failure
-//     in this tree, and a plain link in the other.
+//     same link, with the same hint; a link in a library's folder is the library's failure in both. A link in
+//     place of a library's folder is compared whole: it is no failure of the library in either tree, and both
+//     give the plain link error with the path on disk and the hint to replace the link.
+//   - A file where assets/ or a library's folder should be (TestAFileWhereAFolderOfAssetsShouldBeIsRefused). The
+//     other tree says "Expected a folder" with the path on disk and, for assets/, neither file nor hint; this
+//     tree names the folder from the project folder, as the file of the error too, with a hint. Both must
+//     refuse and name the same place; a library's folder is the library's failure in both, with one hint.
 //   - Two paths that differ only in letter case (TestCollectRefusesTwoSpellingsOfOnePath), on a file system
 //     that holds both. Both must refuse and name the second of the two.
 //   - A name Windows cannot hold (TestCollectRefusesANameWindowsCannotHold), on a system that holds one. The
 //     other tree calls it an invalid asset path; both must refuse and name the file. A name with a backslash is
 //     a path to the other tree, which then fails to read a file that is not there, as an error that is not a
 //     diag error: there only the refusal itself is compared.
-//   - A file that cannot be read (TestAnAssetThatCannotBeReadIsRefusedByItsName,
-//     TestALibrarysFileThatCannotBeReadIsTheLibrarysFailure). The other tree passes the system's error on as
-//     an error that is not a diag error. It is decided on that, and this tree must refuse the file by its name.
-//     The test is skipped where a file cannot be made unreadable.
+//   - A file that cannot be read, of the map's own or of a library (TestAnAssetThatCannotBeReadIsRefusedByItsName,
+//     TestALibrarysFileThatCannotBeReadIsRefusedByItsNameAndIsNotTheLibrarysFailure). The other tree passes
+//     the system's error on, which names the file's path on disk, as an error that is not a diag error; a
+//     command shows that as an internal error. It is decided on that. This tree must refuse with mapdir's
+//     failure at the same file, and in neither tree is it a library's. The test is skipped where a file cannot
+//     be made unreadable.
 //   - A map folder's name that is no path, for the place of the state file. The other tree places the map
 //     folder first and names that path; this tree names the state file's
 //     (TestStateFileIsUnderAssetStateByTheMapFoldersName).
@@ -77,6 +84,8 @@ import (
 //     (TestReadStateKeepsThePathsAsWrittenInTheOrderWritten). Such a path is among the refused states.
 //   - A link above a library's folder (.moonwell as a junction): this tree is given the folder and does not
 //     know the way to it.
+//   - Names and library keys with a character beyond the basic plane beside one from U+E000 to U+FFFF: this tree
+//     orders by bytes and the other by UTF-16 units (TestBeyondTheBasicPlaneAssetsAndLibrariesAreOrderedByBytes).
 
 // oldManifest is the manifest the other tree names in every error about the assets block.
 const oldManifest = "moonwell.pkl"
@@ -326,7 +335,6 @@ func seededProjects() []project {
 			files: holding("assets/.git/config", "assets/icons/.DS_Store", "assets/icons/..b", "assets/icons/a.blp")},
 		{name: "only a dot file", files: holding("assets/.keep")},
 		{name: "an empty assets folder", folders: []string{"assets"}},
-		{name: "a file where assets should be", files: map[string]string{"assets": "a file"}, refused: true},
 		// One mapping has no order, so the two trees agree on a source that looks like a number.
 		{name: "a source that looks like a number",
 			files: holding("assets/7", "assets/a.blp"), block: `{"paths":{"7":"seven.blp"}}`},
@@ -334,8 +342,6 @@ func seededProjects() []project {
 			files: holding(s+"a/data", s+"b/data/inner.txt"), libraries: []string{"a", "b"}, refused: true},
 		{name: "one of the map's own assets inside a library's file",
 			files: holding("assets/data/inner.txt", s+"lib/data"), libraries: []string{"lib"}, refused: true},
-		{name: "a file where a library's folder should be",
-			files: map[string]string{s + "ui": "a file"}, libraries: []string{"ui"}, refused: true},
 		{name: "a library file named as the JASS script in its folder",
 			files: holding(s + "bad/scripts/war3map.j"), libraries: []string{"bad"}, refused: true},
 		{name: "three libraries, the first and the last at one path",
@@ -374,9 +380,9 @@ func TestOracleOnWhatAProjectImports(t *testing.T) {
 			collected++
 		}
 	}
-	// Refused: three scenarios, the forty-two refused blocks and eleven seeded projects.
-	if refused != 56 || collected != 44 {
-		t.Errorf("%d projects refused and %d collected, want 56 and 44", refused, collected)
+	// Refused: three scenarios, the forty-two refused blocks and nine seeded projects.
+	if refused != 54 || collected != 44 {
+		t.Errorf("%d projects refused and %d collected, want 54 and 44", refused, collected)
 	}
 }
 
@@ -405,18 +411,18 @@ func TestOracleOnALink(t *testing.T) {
 	const library = layout.LibraryAssetsDir + "/ui"
 	const words, inLibrary = "Symlinks are not supported: ", "Library ui: "
 	tests := []struct {
-		name, link          string // where the link is, from the project folder
-		libraries           []string
-		wantStart, gotStart string // the words before the place of the link
-		wantFile, gotFile   string
-		sameHint            bool
+		name, link        string // where the link is, from the project folder
+		libraries         []string
+		start             string // the words before the place of the link
+		wantFile, gotFile string
+		whole             bool // whether the two trees refuse in the same words
 	}{
-		{"inside assets", "assets/Icons/linked", nil, words, words, "", "assets/Icons/linked", true},
-		{"in place of assets", "assets", nil, words, words, "", "assets", true},
-		{"inside a library's folder", library + "/linked", []string{"ui"}, inLibrary + words, inLibrary + words, library, library, true},
-		{"in place of a library's folder", library, []string{"ui"}, words, inLibrary + words, "", library, false},
+		{"inside assets", "assets/Icons/linked", nil, words, "", "assets/Icons/linked", false},
+		{"in place of assets", "assets", nil, words, "", "assets", false},
+		{"inside a library's folder", library + "/linked", []string{"ui"}, inLibrary + words, library, library, false},
+		{"in place of a library's folder", library, []string{"ui"}, words, "", "", true},
 	}
-	compared := 0
+	inPart, whole := 0, 0
 	for _, tt := range tests {
 		p := project{name: "a link " + tt.name, folders: []string{path.Dir(tt.link)}, libraries: tt.libraries}
 		root, outside := p.onDisk(t), t.TempDir()
@@ -425,17 +431,57 @@ func TestOracleOnALink(t *testing.T) {
 		testkit.LinkDir(t, outside, onDisk)
 		wantErr, gotErr := refusals(t, p, root)
 		want, got, ok := bothDiag(t, p.name, wantErr, gotErr)
+		switch {
+		case !ok:
+		case tt.whole:
+			if oracle.Refusals(t, p.name, wantErr, gotErr) && want.Msg == tt.start+onDisk {
+				whole++
+			}
+		case want.Msg != tt.start+onDisk || want.File != tt.wantFile || got.Msg != tt.start+tt.link ||
+			got.File != tt.gotFile || got.Hint != want.Hint:
+			t.Errorf("%s: the refusals differ in more than how they name the link:\nwant: %+v\ngot:  %+v", p.name, want, got)
+		default:
+			inPart++
+		}
+	}
+	if inPart != 3 || whole != 1 {
+		t.Errorf("%d refusals compared in part and %d whole, want 3 and 1", inPart, whole)
+	}
+}
+
+func TestOracleOnAFileWhereAFolderShouldBe(t *testing.T) {
+	const library = layout.LibraryAssetsDir + "/ui"
+	const words = "Expected a folder: "
+	tests := []struct {
+		name, file string // the file, from the project folder
+		libraries  []string
+		before     string // what a library's failure starts with
+		wantFile   string
+	}{
+		{"assets", "assets", nil, "", ""},
+		{"a library's folder", library, []string{"ui"}, "Library ui: ", library},
+	}
+	compared := 0
+	for _, tt := range tests {
+		p := project{name: "a file in place of " + tt.name, files: map[string]string{tt.file: "a file"}, libraries: tt.libraries}
+		root := p.onDisk(t)
+		wantErr, gotErr := refusals(t, p, root)
+		want, got, ok := bothDiag(t, p.name, wantErr, gotErr)
 		if !ok {
 			continue
 		}
-		if want.Msg != tt.wantStart+onDisk || want.File != tt.wantFile || got.Msg != tt.gotStart+tt.link ||
-			got.File != tt.gotFile || (got.Hint == want.Hint) != tt.sameHint {
-			t.Errorf("%s: the refusals differ in more than how they name the link:\nwant: %+v\ngot:  %+v", p.name, want, got)
+		// The other tree has the message alone for assets, with the path on disk in it; a library's failure has the
+		// same file and hint in both.
+		sameHint := tt.wantFile == "" || got.Hint == want.Hint
+		if want.Msg != tt.before+words+filepath.Join(root, filepath.FromSlash(tt.file)) || want.File != tt.wantFile ||
+			got.Msg != tt.before+words+tt.file || got.File != tt.file || got.Hint == "" || !sameHint {
+			t.Errorf("%s: the refusals differ in more than how they name the file:\nwant: %+v\ngot:  %+v", p.name, want, got)
+			continue
 		}
 		compared++
 	}
-	if compared != 4 {
-		t.Errorf("%d refusals compared, want 4", compared)
+	if compared != 2 {
+		t.Errorf("%d refusals compared, want 2", compared)
 	}
 }
 
@@ -530,20 +576,25 @@ func TestOracleOnAFileThatCannotBeRead(t *testing.T) {
 		gotFile    string
 	}{
 		{"one of the map's own assets", "assets/Icons/held.blp", nil, "assets/Icons/held.blp"},
-		{"a library's file", library + "/Icons/held.blp", []string{"ui"}, library},
+		{"a library's file", library + "/Icons/held.blp", []string{"ui"}, library + "/Icons/held.blp"},
 	}
 	compared := 0
 	for _, tt := range tests {
 		p := project{name: tt.name, files: holding("assets/a.blp", tt.held), libraries: tt.libraries}
 		root := p.onDisk(t)
-		makeUnreadable(t, filepath.Join(root, filepath.FromSlash(tt.held)))
+		onDisk := filepath.Join(root, filepath.FromSlash(tt.held))
+		makeUnreadable(t, onDisk)
 		wantErr, gotErr := refusals(t, p, root)
 		if _, expected := olddiag.First(wantErr); expected || !oracle.Errors(t, p.name, wantErr, gotErr) {
 			t.Errorf("%s: the refusals are %v and %v, want an error that is not a diag error of the other tree", p.name, wantErr, gotErr)
 			continue
 		}
-		if got := asError(t, gotErr, p.name); got.File != tt.gotFile {
-			t.Errorf("%s: this tree's refusal is at %q, want %q", p.name, got.File, tt.gotFile)
+		// Both name the file, the other tree by its path on disk in the system's error, and neither says that the
+		// failure is a library's.
+		got := asError(t, gotErr, p.name)
+		if !strings.Contains(wantErr.Error(), onDisk) || got.File != tt.gotFile || !strings.HasPrefix(got.Msg, "Reading a map file failed: ") {
+			t.Errorf("%s: the refusals do not name the same file:\nwant: %v\ngot:  %+v", p.name, wantErr, got)
+			continue
 		}
 		compared++
 	}

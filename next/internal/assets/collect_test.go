@@ -199,12 +199,14 @@ func TestCollectRefusesALinkBelowTheProjectFolder(t *testing.T) {
 			t.Errorf("error = %+v", e)
 		}
 	})
+	// The link is on this machine and not among what the library ships, so the failure is not the library's.
 	t.Run("in place of a library's folder", func(t *testing.T) {
 		root := t.TempDir()
 		put(t, root, "libraries/other/a.blp")
-		testkit.LinkDir(t, outside, filepath.Join(root, "libraries", "ui"))
+		link := filepath.Join(root, "libraries", "ui")
+		testkit.LinkDir(t, outside, link)
 		e := refused(t, root, noBlock, "ui")
-		if e.Msg != "Library ui: Symlinks are not supported: libraries/ui" || e.File != "libraries/ui" {
+		if e.Msg != "Symlinks are not supported: "+link || !strings.Contains(e.Hint, "Replace the link") {
 			t.Errorf("error = %+v", e)
 		}
 	})
@@ -246,13 +248,15 @@ func TestCollectRefusesANameWindowsCannotHold(t *testing.T) {
 func TestAFileWhereAFolderOfAssetsShouldBeIsRefused(t *testing.T) {
 	root := t.TempDir()
 	file := put(t, root, "assets", "a file")
-	if e := refused(t, root, noBlock); e.Msg != "Expected a folder: "+file {
+	e := refused(t, root, noBlock)
+	if e.Msg != "Expected a folder: assets" || e.File != "assets" || !strings.Contains(e.Hint, "remove the file") {
 		t.Errorf("error = %+v", e)
 	}
 	os.Remove(file)
-	file = put(t, root, "libraries/ui", "a file")
-	e := refused(t, root, noBlock, "ui")
-	if e.Msg != "Library ui: Expected a folder: "+file || e.File != "libraries/ui" || !strings.Contains(e.Hint, "library's author") {
+	// A library that ships a file where its folder of files should be: that is the library's.
+	put(t, root, "libraries/ui", "a file")
+	e = refused(t, root, noBlock, "ui")
+	if e.Msg != "Library ui: Expected a folder: libraries/ui" || e.File != "libraries/ui" || !strings.Contains(e.Hint, "library's author") {
 		t.Errorf("error = %+v", e)
 	}
 }
@@ -267,12 +271,38 @@ func TestAnAssetThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 	}
 }
 
-func TestALibrarysFileThatCannotBeReadIsTheLibrarysFailure(t *testing.T) {
+func TestALibrarysFileThatCannotBeReadIsRefusedByItsNameAndIsNotTheLibrarysFailure(t *testing.T) {
 	root := t.TempDir()
 	makeUnreadable(t, put(t, root, "libraries/ui/Icons/held.blp"))
 	e := refused(t, root, noBlock, "ui")
-	if !strings.HasPrefix(e.Msg, "Library ui: Reading") || e.File != "libraries/ui" || !strings.Contains(e.Hint, "library's author") {
+	// What the system refuses is not for the library's author to mend: the error is the read's own, at the file.
+	if !strings.HasPrefix(e.Msg, "Reading") || e.File != "libraries/ui/Icons/held.blp" || e.Cause == nil ||
+		e.Hint == "" || strings.Contains(e.Hint, "library's author") {
 		t.Errorf("error = %+v", e)
+	}
+}
+
+func TestBeyondTheBasicPlaneAssetsAndLibrariesAreOrderedByBytes(t *testing.T) {
+	// U+FF41 is three bytes that start with EF, and U+1F600 four that start with F0: by bytes the first comes
+	// first, where an order by UTF-16 units puts the second, which is two surrogates, before it.
+	const high, beyond = "\xef\xbd\x81", "\xf0\x9f\x98\x80"
+	root := t.TempDir()
+	for _, name := range []string{beyond + ".blp", high + ".blp", "shared.blp"} {
+		put(t, root, "assets/"+name)
+	}
+	put(t, root, "libraries/"+beyond+"/shared.blp")
+	put(t, root, "libraries/"+high+"/shared.blp")
+	collected, replaced := collect(t, root, noBlock, beyond, high)
+	if got := sources(collected); !slices.Equal(got, []string{"shared.blp", high + ".blp", beyond + ".blp"}) {
+		t.Errorf("assets = %q", got)
+	}
+	// The libraries are taken in the order of their keys, which the lines about their files show.
+	want := []string{
+		"assets/shared.blp replaces library " + high + "'s shared.blp",
+		"assets/shared.blp replaces library " + beyond + "'s shared.blp",
+	}
+	if !slices.Equal(replaced, want) {
+		t.Errorf("replaced = %q", replaced)
 	}
 }
 

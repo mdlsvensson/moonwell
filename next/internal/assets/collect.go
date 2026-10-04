@@ -189,6 +189,9 @@ func (c *collection) addOwnFile(folder *mapdir.Folder, source string, mapped map
 // one of the map's own has is replaced by it.
 func (c *collection) addLibrary(root string, library Library) error {
 	label := labelOf(root, library.Dir)
+	if err := refuseLinked(library.Dir); err != nil {
+		return err
+	}
 	folder, err := open(library.Dir, label)
 	if err != nil {
 		return inLibrary(err, library.Key, label)
@@ -213,8 +216,17 @@ func labelOf(root, dir string) string {
 	return filepath.ToSlash(dir)
 }
 
-// addShipped adds one file of a library, unless one of the map's own is imported at its path. What is wrong with
-// the file is the library's failure; two libraries at one path are the project's.
+// refuseLinked fails when a link stands in place of a library's folder. A link is made on this machine and is not
+// among what the library ships, so the failure is not the library's.
+func refuseLinked(dir string) error {
+	if info, err := fsx.Lstat(dir); err == nil && info != nil && fsx.IsLink(info) {
+		return fsx.LinkError(dir)
+	}
+	return nil
+}
+
+// addShipped adds one file of a library, unless one of the map's own is imported at its path. A path the file may
+// not have is the library's failure; two libraries at one path are the project's.
 func (c *collection) addShipped(folder *mapdir.Folder, library, label, source string) error {
 	target, err := TargetPath(source)
 	if err != nil {
@@ -236,11 +248,13 @@ func (c *collection) replace(other Asset, library, source, target string) error 
 	return nil
 }
 
-// inLibrary turns an expected failure into the library's, which the map's author can only report. Nil and any
-// other error stay as they are.
+// inLibrary turns a failure about what a library's folder contains into the library's, which the map's author can
+// only report: a path no asset may have, and what a folder of map files cannot hold. A failure with a cause is
+// the system's (a file or a folder that cannot be read) and stays as it is, at the file it names with its own
+// hint. So do nil and an error that is not an expected failure.
 func inLibrary(err error, library, label string) error {
 	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	if !errors.As(err, &failure) || failure.Cause != nil {
 		return err
 	}
 	return errInLibrary(library, label, failure)
@@ -253,7 +267,7 @@ func inLibrary(err error, library, label string) error {
 // refused as it is for a map folder: these files become map files.
 func open(dir, label string) (*mapdir.Folder, error) {
 	if info, err := fsx.Lstat(dir); err == nil && info != nil && !info.IsDir() && !fsx.IsLink(info) {
-		return nil, errNotAFolder(dir)
+		return nil, errNotAFolder(label)
 	}
 	folder, err := mapdir.Open(dir, label)
 	// Only the folder itself may be missing. A folder below it that is gone by the time it is listed is an
@@ -308,6 +322,8 @@ func (c *collection) sortByTarget() {
 
 // ---- errors ----
 
+// errInvalidPath, for a source or an exclusion that is no path, is with TargetPath in target.go.
+
 const blockHint = "Fix the assets block in moonwell.pkl."
 
 func errNoSuchFile(manifestFile, source string) error {
@@ -359,6 +375,10 @@ func errInLibrary(library, label string, failure *diag.Error) error {
 	}
 }
 
-func errNotAFolder(dir string) error {
-	return &diag.Error{Msg: "Expected a folder: " + dir}
+func errNotAFolder(label string) error {
+	return &diag.Error{
+		Msg:  "Expected a folder: " + label,
+		File: label,
+		Hint: "Make " + label + " a folder that holds the files to import, or remove the file.",
+	}
 }
