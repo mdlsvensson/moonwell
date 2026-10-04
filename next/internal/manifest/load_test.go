@@ -230,7 +230,7 @@ func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
 		t.Errorf("assets = %+v, lint = %+v, libraries = %+v", p.Assets, p.Lint, p.Libraries)
 	}
 	// The template writes player 0 with every field null: the override is there, and sets nothing.
-	if player, written := p.Settings.Players["0"]; !written || player != (Player{}) || p.Settings.Info != (Info{}) {
+	if player, written := p.Settings.Players[0]; !written || player != (Player{}) || p.Settings.Info != (Info{}) {
 		t.Errorf("player 0 = %+v, written %v; info = %+v", player, written, p.Settings.Info)
 	}
 	captain, _ := p.Objects.Units.Get("captain")
@@ -307,7 +307,7 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 	if target, _ := p.Assets.Paths.Get("icons/BTNSword.blp"); target != `ReplaceableTextures\CommandButtons\BTNSword.blp` {
 		t.Errorf("the asset path = %q", target)
 	}
-	player, force, fog := p.Settings.Players["0"], p.Settings.Forces["0"], p.Settings.Environment.Fog
+	player, force, fog := p.Settings.Players[0], p.Settings.Forces[0], p.Settings.Environment.Fog
 	if *player.Y != -896.5 || *player.X != 0 || *player.FixedStart || *force.Allied || *fog.Enabled || *fog.Density != 0 {
 		t.Errorf("player = %+v, force = %+v, fog = %+v", player, force, fog)
 	}

@@ -12,7 +12,6 @@ import (
 	"reflect"
 	"runtime"
 	"slices"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -855,7 +854,7 @@ func writtenApart(s manifest.Settings, patchedInfo []byte) bool {
 		})
 	}
 	for _, player := range info.Details.Players {
-		override := s.Players[strconv.Itoa(int(player.ID.Value))]
+		override := s.Players[int(player.ID.Value)]
 		if (override.X != nil || override.Y != nil) && apart(player.X.Value, player.Y.Value) {
 			return true
 		}

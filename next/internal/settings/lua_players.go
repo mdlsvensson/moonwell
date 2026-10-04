@@ -3,7 +3,6 @@ package settings
 import (
 	"fmt"
 	"slices"
-	"strconv"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
@@ -25,7 +24,7 @@ type slot struct {
 // A player's name is stored in the map info alone: World Editor writes no SetPlayerName, and a call of it from
 // config() crashes Warcraft III 3.0.0.24268 when the lobby is created. An override that sets only a name still
 // asks that the script has the player as the map info has it.
-func (p *patcher) players(overrides map[string]manifest.Player, details *w3i.Details) {
+func (p *patcher) players(overrides map[int]manifest.Player, details *w3i.Details) {
 	if !anySet(overrides) {
 		return
 	}
@@ -40,7 +39,7 @@ func (p *patcher) players(overrides map[string]manifest.Player, details *w3i.Det
 }
 
 // player edits the calls of one player: those the override has a setting for.
-func (p *patcher) player(config, slots lua.Function, override manifest.Player, id string, details *w3i.Details) {
+func (p *patcher) player(config, slots lua.Function, override manifest.Player, id int, details *w3i.Details) {
 	s, found := p.slot(id, details)
 	if !found {
 		return
@@ -61,14 +60,13 @@ func (p *patcher) player(config, slots lua.Function, override manifest.Player, i
 }
 
 // slot is the map's player in the slot of the id. A setting for a player the map info lacks is refused.
-func (p *patcher) slot(id string, details *w3i.Details) (slot, bool) {
-	number, _ := strconv.Atoi(id) // a slot id is a number: the schema lets no other through
-	at := slices.IndexFunc(details.Players, func(player w3i.Player) bool { return int(player.ID.Value) == number })
+func (p *patcher) slot(id int, details *w3i.Details) (slot, bool) {
+	at := slices.IndexFunc(details.Players, func(player w3i.Player) bool { return int(player.ID.Value) == id })
 	if at < 0 {
-		p.refuse(errPlayerNotInInfo(p.file, number))
+		p.refuse(errPlayerNotInInfo(p.file, id))
 		return slot{}, false
 	}
-	return slot{id: number, player: fmt.Sprintf("Player(%d)", number), location: at, record: details.Players[at]}, true
+	return slot{id: id, player: fmt.Sprintf("Player(%d)", id), location: at, record: details.Players[at]}, true
 }
 
 // startLocation is the call that gives the player its start location, which must be the one the map info gives

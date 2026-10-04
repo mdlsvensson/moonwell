@@ -292,7 +292,7 @@ func TestAControllerOrARaceWithoutANumberIsNotTheUsersMistake(t *testing.T) {
 	source := testkit.SyntheticMapInfo(39)
 	for _, name := range []string{"elf", ""} {
 		for _, player := range []manifest.Player{{Race: &name}, {Controller: &name}} {
-			_, err := patchInfo(source, manifest.Settings{Players: map[string]manifest.Player{"0": player}}, infoFile)
+			_, err := patchInfo(source, manifest.Settings{Players: map[int]manifest.Player{0: player}}, infoFile)
 			if _, expected := diag.First(err); err == nil || expected || !strings.Contains(err.Error(), "has no number") {
 				t.Errorf("the name %q: error = %v, want one that is not a diag error", name, err)
 			}

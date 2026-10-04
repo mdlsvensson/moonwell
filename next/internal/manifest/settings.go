@@ -1,18 +1,16 @@
 package manifest
 
 import (
-	"cmp"
 	"maps"
 	"slices"
-	"strings"
 )
 
 // Settings is the manifest's settings block: MapSettings.pkl. A nil field is not set: the map keeps its own value.
 type Settings struct {
 	Info              Info                     `json:"info"`
 	LoadingScreen     LoadingScreen            `json:"loadingScreen"`
-	Players           map[string]Player        `json:"players"` // by slot id, "0" to "23"
-	Forces            map[string]Force         `json:"forces"`
+	Players           map[int]Player           `json:"players"` // by slot, 0 to 23, which pkl prints as "0" to "23"
+	Forces            map[int]Force            `json:"forces"`  // by slot, as the players
 	Environment       Environment              `json:"environment"`
 	Gameplay          Gameplay                 `json:"gameplay"`
 	GameplayConstants Ordered[Ordered[string]] `json:"gameplayConstants"` // section, key, value, as written
@@ -80,10 +78,7 @@ type Gameplay struct {
 	FoodLimit    *int `json:"foodLimit"`
 }
 
-// Slots returns the slot ids of overrides in the order of their numbers. A slot id is a number from 0 to 23
-// written without a leading zero, so the shorter of two ids is the smaller number.
-func Slots[V any](overrides map[string]V) []string {
-	return slices.SortedFunc(maps.Keys(overrides), func(a, b string) int {
-		return cmp.Or(cmp.Compare(len(a), len(b)), strings.Compare(a, b))
-	})
+// Slots returns the slots of overrides, sorted.
+func Slots[V any](overrides map[int]V) []int {
+	return slices.Sorted(maps.Keys(overrides))
 }

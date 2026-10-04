@@ -3,7 +3,6 @@ package settings
 import (
 	"fmt"
 	"slices"
-	"strconv"
 
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/lua"
@@ -28,34 +27,34 @@ type teamCall struct {
 	team   float64
 }
 
-// flagged is the ids, in slot order, of the forces whose override sets an alliance flag. A force's name is stored
-// in the map info alone.
-func flagged(overrides map[string]manifest.Force) []string {
-	var ids []string
-	for _, id := range manifest.Slots(overrides) {
-		override := overrides[id]
+// flagged is the slots, in their order, of the forces whose override sets an alliance flag. A force's name is
+// stored in the map info alone.
+func flagged(overrides map[int]manifest.Force) []int {
+	var slots []int
+	for _, slot := range manifest.Slots(overrides) {
+		override := overrides[slot]
 		override.Name = nil
 		if override != (manifest.Force{}) {
-			ids = append(ids, id)
+			slots = append(slots, slot)
 		}
 	}
-	return ids
+	return slots
 }
 
 // forces adds, at the end of InitCustomTeams(), the states of the players of each force whose override sets an
 // alliance flag: every state the map info has for the force, also those the override leaves alone. They stand
 // after the calls World Editor wrote, so they are the ones that hold.
-func (p *patcher) forces(overrides map[string]manifest.Force, details *w3i.Details) {
-	ids := flagged(overrides)
-	if len(ids) == 0 {
+func (p *patcher) forces(overrides map[int]manifest.Force, details *w3i.Details) {
+	indexes := flagged(overrides)
+	if len(indexes) == 0 {
 		return
 	}
 	p.unique(p.function("config"), "InitCustomTeams", 0)
 	teams := p.function("InitCustomTeams")
 	calls := p.teamCalls(teams)
 	var states []string
-	for _, id := range ids {
-		states = append(states, p.force(id, details, calls)...)
+	for _, index := range indexes {
+		states = append(states, p.force(index, details, calls)...)
 	}
 	p.insertBefore(teams.EndStart, states)
 }
@@ -75,10 +74,9 @@ func (p *patcher) teamCalls(teams lua.Function) []teamCall {
 	return calls
 }
 
-// force is the states of one force, after it is seen that the script puts into the force's team the players the
-// map info has in the force, and no other.
-func (p *patcher) force(id string, details *w3i.Details, calls []teamCall) []string {
-	index, _ := strconv.Atoi(id) // a slot id is a number: the schema lets no other through
+// force is the states of the force in a slot, which is its place among the map info's forces, after it is seen
+// that the script puts into the force's team the players the map info has in the force, and no other.
+func (p *patcher) force(index int, details *w3i.Details, calls []teamCall) []string {
 	if index >= len(details.Forces) {
 		p.refuse(errForceNotInInfo(p.file, index))
 		return nil

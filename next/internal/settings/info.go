@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"slices"
-	"strconv"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
@@ -78,7 +77,7 @@ func needsDetails(s manifest.Settings) bool {
 
 // anySet reports whether one of the overrides sets something. An override with nothing set is skipped everywhere,
 // so its slot need not exist in the map.
-func anySet[V comparable](overrides map[string]V) bool {
+func anySet[V comparable](overrides map[int]V) bool {
 	var nothing V
 	for _, override := range overrides {
 		if override != nothing {
@@ -138,15 +137,15 @@ func (p *infoPatch) loadingScreen(screen manifest.LoadingScreen) {
 }
 
 // players edits the player of each override that sets something, in slot order.
-func (p *infoPatch) players(overrides map[string]manifest.Player) {
-	for _, id := range manifest.Slots(overrides) {
-		override := overrides[id]
+func (p *infoPatch) players(overrides map[int]manifest.Player) {
+	for _, slot := range manifest.Slots(overrides) {
+		override := overrides[slot]
 		if override == (manifest.Player{}) {
 			continue
 		}
-		player, found := p.player(id)
+		player, found := p.player(slot)
 		if !found {
-			p.refuse(errNoPlayer(p.file, id))
+			p.refuse(errNoPlayer(p.file, slot))
 			continue
 		}
 		p.text(player.Name, override.Name)
@@ -158,12 +157,8 @@ func (p *infoPatch) players(overrides map[string]manifest.Player) {
 	}
 }
 
-// player is the map's player in the slot of the id. A map has a record only for the slots it uses, in any order.
-func (p *infoPatch) player(id string) (w3i.Player, bool) {
-	slot, err := strconv.Atoi(id)
-	if err != nil {
-		return w3i.Player{}, false
-	}
+// player is the map's player in the slot. A map has a record only for the slots it uses, in any order.
+func (p *infoPatch) player(slot int) (w3i.Player, bool) {
 	players := p.info.Details.Players
 	at := slices.IndexFunc(players, func(player w3i.Player) bool { return int(player.ID.Value) == slot })
 	if at < 0 {
@@ -173,18 +168,18 @@ func (p *infoPatch) player(id string) (w3i.Player, bool) {
 }
 
 // forces edits the force of each override that sets something, in slot order.
-func (p *infoPatch) forces(overrides map[string]manifest.Force) {
-	for _, id := range manifest.Slots(overrides) {
-		override := overrides[id]
+func (p *infoPatch) forces(overrides map[int]manifest.Force) {
+	for _, slot := range manifest.Slots(overrides) {
+		override := overrides[slot]
 		if override == (manifest.Force{}) {
 			continue
 		}
-		force, found := p.force(id)
+		force, found := p.force(slot)
 		switch {
 		case !found:
-			p.refuse(errNoForce(p.file, id))
+			p.refuse(errNoForce(p.file, slot))
 		case p.info.Flags.Value&customForces == 0:
-			p.refuse(errNoCustomForces(p.file, id))
+			p.refuse(errNoCustomForces(p.file, slot))
 		default:
 			p.text(force.Name, override.Name)
 			p.edits = append(p.edits, w3i.IntEdit(force.Flags, alliances(force.Flags.Value, override)))
@@ -192,14 +187,13 @@ func (p *infoPatch) forces(overrides map[string]manifest.Force) {
 	}
 }
 
-// force is the map's force of the id, which is its place among the forces.
-func (p *infoPatch) force(id string) (w3i.Force, bool) {
+// force is the map's force in the slot, which is its place among the forces.
+func (p *infoPatch) force(slot int) (w3i.Force, bool) {
 	forces := p.info.Details.Forces
-	at, err := strconv.Atoi(id)
-	if err != nil || at < 0 || at >= len(forces) {
+	if slot < 0 || slot >= len(forces) {
 		return w3i.Force{}, false
 	}
-	return forces[at], true
+	return forces[slot], true
 }
 
 // alliances is a force's flags with each bit the override sets turned on or off.
@@ -344,25 +338,27 @@ func errNoLoadingModel(file string) error {
 	}
 }
 
-func errNoPlayer(file, id string) error {
+// A slot is named as the manifest writes it: a text between quotes, as the key of a Pkl mapping.
+
+func errNoPlayer(file string, slot int) error {
 	return &diag.Error{
-		Msg:  "settings.players[" + strconv.Quote(id) + "]: player " + id + " does not exist in the source map.",
+		Msg:  fmt.Sprintf(`settings.players["%d"]: player %d does not exist in the source map.`, slot, slot),
 		File: file,
 		Hint: "Create this player slot in World Editor first.",
 	}
 }
 
-func errNoForce(file, id string) error {
+func errNoForce(file string, slot int) error {
 	return &diag.Error{
-		Msg:  "settings.forces[" + strconv.Quote(id) + "]: force " + id + " does not exist in the source map.",
+		Msg:  fmt.Sprintf(`settings.forces["%d"]: force %d does not exist in the source map.`, slot, slot),
 		File: file,
 		Hint: "Create this force in World Editor first.",
 	}
 }
 
-func errNoCustomForces(file, id string) error {
+func errNoCustomForces(file string, slot int) error {
 	return &diag.Error{
-		Msg:  "settings.forces[" + strconv.Quote(id) + "]: force overrides require custom forces enabled in the source map.",
+		Msg:  fmt.Sprintf(`settings.forces["%d"]: force overrides require custom forces enabled in the source map.`, slot),
 		File: file,
 		Hint: "Enable custom forces in World Editor first.",
 	}

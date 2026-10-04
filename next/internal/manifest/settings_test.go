@@ -19,7 +19,7 @@ func TestASettingThatIsNullOrLeftOutIsNotSet(t *testing.T) {
 	if s.Info != (Info{}) || s.LoadingScreen != (LoadingScreen{}) || s.Environment != (Environment{}) || s.Gameplay != (Gameplay{}) {
 		t.Errorf("settings of nulls and empty blocks hold a value: %+v", s)
 	}
-	player, written := s.Players["23"]
+	player, written := s.Players[23]
 	if !written || player != (Player{}) || len(s.Forces) != 0 {
 		t.Errorf("player 23 = %+v, written %v; forces = %+v", player, written, s.Forces)
 	}
@@ -33,7 +33,7 @@ func TestAnExplicitFalseZeroAndEmptyTextAreSet(t *testing.T) {
 	if s.Info.Name == nil || *s.Info.Name != "" || s.Info.Author != nil {
 		t.Errorf("info = %+v", s.Info)
 	}
-	player := s.Players["0"]
+	player := s.Players[0]
 	if player.FixedStart == nil || *player.FixedStart || player.X == nil || *player.X != 0 || player.Y != nil || player.Name != nil {
 		t.Errorf("player 0 = %+v", player)
 	}
@@ -64,7 +64,7 @@ func TestColoursAndRawSectionsKeepWhatWasWritten(t *testing.T) {
 
 func TestWholeNumberCoordinatesAndFogValuesAreNumbers(t *testing.T) {
 	s := settingsOf(t, `{"players":{"0":{"x":256,"y":-896}},"environment":{"fog":{"start":100,"end":1000,"density":1}}}`)
-	if player := s.Players["0"]; *player.X != 256 || *player.Y != -896 {
+	if player := s.Players[0]; *player.X != 256 || *player.Y != -896 {
 		t.Errorf("player = %v, %v", *player.X, *player.Y)
 	}
 	fog := s.Environment.Fog
@@ -100,10 +100,10 @@ func TestDecodeReadsEverySetting(t *testing.T) {
 		LoadingScreen: LoadingScreen{
 			Background: ptr(int32(-1)), Model: ptr("M"), Text: ptr("T"), Title: ptr("Ti"), Subtitle: ptr("S"),
 		},
-		Players: map[string]Player{"3": {
+		Players: map[int]Player{3: {
 			Name: ptr("P"), Controller: ptr("computer"), Race: ptr("orc"), FixedStart: ptr(true), X: ptr(1.5), Y: ptr(-2.0),
 		}},
-		Forces: map[string]Force{"1": {
+		Forces: map[int]Force{1: {
 			Name: ptr("F"), Allied: ptr(true), AlliedVictory: ptr(false), SharedVision: ptr(true),
 			SharedControl: ptr(false), SharedAdvancedControl: ptr(true),
 		}},
@@ -129,25 +129,32 @@ func TestDecodeReadsEverySetting(t *testing.T) {
 func TestSlotsComeInTheOrderOfTheirNumbers(t *testing.T) {
 	tests := []struct {
 		name      string
-		overrides map[string]Player
-		want      []string
+		overrides map[int]Player
+		want      []int
 	}{
-		{"ten after two", map[string]Player{"10": {}, "2": {}, "0": {}}, []string{"0", "2", "10"}},
-		{"every slot", map[string]Player{"23": {}, "9": {}, "19": {}, "1": {}, "20": {}}, []string{"1", "9", "19", "20", "23"}},
+		{"ten after two", map[int]Player{10: {}, 2: {}, 0: {}}, []int{0, 2, 10}},
+		{"every slot", map[int]Player{23: {}, 9: {}, 19: {}, 1: {}, 20: {}}, []int{1, 9, 19, 20, 23}},
 		{"none", nil, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Slots(tt.overrides); !slices.Equal(got, tt.want) {
-				t.Errorf("Slots = %q, want %q", got, tt.want)
+				t.Errorf("Slots = %v, want %v", got, tt.want)
 			}
 		})
 	}
+}
+
+// Pkl prints a slot as a text, "0" to "23". It is read as the number it is.
+func TestTheSlotsOfPlayersAndForcesAreReadAsNumbers(t *testing.T) {
 	s := settingsOf(t, `{"players":{"10":{"name":"k"},"2":{"name":"c"},"0":{"name":"a"}},"forces":{"11":{},"3":{}}}`)
-	if got := Slots(s.Players); !slices.Equal(got, []string{"0", "2", "10"}) {
-		t.Errorf("players = %q", got)
+	if got := Slots(s.Players); !slices.Equal(got, []int{0, 2, 10}) {
+		t.Errorf("players = %v", got)
 	}
-	if got := Slots(s.Forces); !slices.Equal(got, []string{"3", "11"}) {
-		t.Errorf("forces = %q", got)
+	if got := Slots(s.Forces); !slices.Equal(got, []int{3, 11}) {
+		t.Errorf("forces = %v", got)
+	}
+	if text(s.Players[10].Name) != "k" || text(s.Players[2].Name) != "c" || text(s.Players[0].Name) != "a" {
+		t.Errorf("players = %+v, want each under the number of its slot", s.Players)
 	}
 }
