@@ -39,69 +39,74 @@ func Plan(folder *mapdir.Folder, p *manifest.Project) ([]mapdir.Change, error) {
 		return nil, err
 	}
 	plan := &planner{folder: folder}
-	plan.roomFor(preview)
-	info := plan.mapInfo(s)
-	plan.script(s, info, preview != nil)
-	plan.text(miscName, misc)
-	plan.text(skinName, skin)
-	plan.preview(preview)
-	if plan.failure != nil {
-		return nil, plan.failure
+	if err := plan.roomFor(preview); err != nil {
+		return nil, err
+	}
+	info, err := plan.mapInfo(s)
+	if err != nil {
+		return nil, err
+	}
+	if err := plan.script(s, info, preview != nil); err != nil {
+		return nil, err
+	}
+	if err := plan.text(miscName, misc); err != nil {
+		return nil, err
+	}
+	if err := plan.text(skinName, skin); err != nil {
+		return nil, err
+	}
+	if err := plan.preview(preview); err != nil {
+		return nil, err
 	}
 	return plan.changes, nil
 }
 
-// planner gathers the changes of one plan. It keeps the first failure: a step after it does nothing.
+// planner gathers the changes of one plan. Each step returns its failure, and Plan stops at the first.
 type planner struct {
 	folder  *mapdir.Folder
 	changes []mapdir.Change
-	failure error
 }
 
 // ---- the steps, in the order of their changes; those of a preview are in plan_preview.go ----
 
 // mapInfo patches war3map.w3i and returns the file as the settings leave it, which the script is brought into
 // line with. Without a setting that is stored in the file, it is not read and nothing is returned.
-func (p *planner) mapInfo(s manifest.Settings) []byte {
-	if p.failure != nil || !setsInfo(s) {
-		return nil
+func (p *planner) mapInfo(s manifest.Settings) ([]byte, error) {
+	if !setsInfo(s) {
+		return nil, nil
 	}
 	data, err := p.required(infoName)
 	if err != nil {
-		p.failure = err
-		return nil
+		return nil, err
 	}
 	patched, err := patchInfo(data, s, p.folder.Label(infoName))
 	if err != nil {
-		p.failure = err
-		return nil
+		return nil, err
 	}
 	if !bytes.Equal(patched, data) {
-		p.write(infoName, patched)
+		if err := p.write(infoName, patched); err != nil {
+			return nil, err
+		}
 	}
-	return patched
+	return patched, nil
 }
 
 // script brings war3map.lua into line with the patched map info and, for a map that gets a preview picture, adds
 // the call that gives the game World Editor's minimap back. Both edits go into one change. A byte order mark is
 // kept aside and put back in front of what is written.
-func (p *planner) script(s manifest.Settings, patchedInfo []byte, withPreview bool) {
-	if p.failure != nil || !needsScript(s) && !withPreview {
-		return
+func (p *planner) script(s manifest.Settings, patchedInfo []byte, withPreview bool) error {
+	if !needsScript(s) && !withPreview {
+		return nil
 	}
 	mark, source, err := p.requiredText(scriptName)
 	if err != nil {
-		p.failure = err
-		return
+		return err
 	}
 	patched, err := p.patchedScript(source, s, patchedInfo, withPreview)
-	if err != nil {
-		p.failure = err
-		return
+	if err != nil || patched == source {
+		return err
 	}
-	if patched != source {
-		p.write(scriptName, []byte(mark+patched))
-	}
+	return p.write(scriptName, []byte(mark+patched))
 }
 
 // needsScript reports whether the settings are of a kind the script takes part in: the map's name and
@@ -125,23 +130,23 @@ func (p *planner) patchedScript(source string, s manifest.Settings, patchedInfo 
 // file holds nothing, and so gets a file with the sections alone; a file that holds every value already is not
 // changed. Without a key to set, the file is not read. A byte order mark is kept aside and put back in front of
 // what is written.
-func (p *planner) text(name string, sections []txt.Section) {
-	if p.failure != nil || !setsKeys(sections) {
-		return
+func (p *planner) text(name string, sections []txt.Section) error {
+	if !setsKeys(sections) {
+		return nil
 	}
 	data, _, err := p.folder.Read(name)
 	if err != nil {
-		p.failure = err
-		return
+		return err
 	}
 	mark, source, err := p.textOf(name, data)
 	if err != nil {
-		p.failure = err
-		return
+		return err
 	}
-	if merged := txt.Merge(source, sections); merged != source {
-		p.write(name, []byte(mark+merged))
+	merged := txt.Merge(source, sections)
+	if merged == source {
+		return nil
 	}
+	return p.write(name, []byte(mark+merged))
 }
 
 // setsKeys reports whether a section has a key to set. Sections without keys write nothing.
@@ -188,24 +193,20 @@ func (p *planner) textOf(name string, data []byte) (mark, text string, err error
 }
 
 // write plans the file under name to hold data.
-func (p *planner) write(name string, data []byte) {
-	p.change(mapdir.Change{Name: name, Bytes: data})
+func (p *planner) write(name string, data []byte) error {
+	return p.change(mapdir.Change{Name: name, Bytes: data})
 }
 
 // change adds a change, under the spelling the map has for the file. A file the map does not have keeps the name
-// given; where the map has a folder under that name, the plan is refused. After a failure nothing is added, so a
-// step that makes several changes stops at the first that fails.
-func (p *planner) change(change mapdir.Change) {
-	if p.failure != nil {
-		return
-	}
+// given; where the map has a folder under that name, the plan is refused.
+func (p *planner) change(change mapdir.Change) error {
 	placed, err := p.folder.Place(change.Name)
 	if err != nil {
-		p.failure = err
-		return
+		return err
 	}
 	change.Name = placed
 	p.changes = append(p.changes, change)
+	return nil
 }
 
 // ---- errors ----

@@ -34,44 +34,44 @@ func previewOf(p *manifest.Project) (*picture.Picture, error) {
 // the minimap's place, so the map must have a minimap, and the two names the preview adds must be free: of a
 // file, and of a folder, which mapdir refuses a file's place to. Both names are checked for a picture of either
 // kind, the name the minimap is kept under first.
-func (p *planner) roomFor(preview *picture.Picture) {
+func (p *planner) roomFor(preview *picture.Picture) error {
 	if preview == nil {
-		return
+		return nil
 	}
 	if !p.folder.Has(savedMinimap) {
-		p.failure = errNoMinimap(p.folder.Label(savedMinimap))
-		return
+		return errNoMinimap(p.folder.Label(savedMinimap))
 	}
 	for _, added := range []string{KeptMinimap, tgaName} {
 		if p.folder.Has(added) {
-			p.failure = errNameTaken(p.folder.Name(added), p.folder.Label(added))
-			return
+			return errNameTaken(p.folder.Name(added), p.folder.Label(added))
 		}
 		if _, err := p.folder.Place(added); err != nil {
-			p.failure = err
-			return
+			return err
 		}
 	}
+	return nil
 }
 
 // preview puts the picture in the minimap's place and keeps the minimap under KeptMinimap. A BLP takes the
 // minimap's file; any other picture is a TGA, which goes in beside the minimap's file, and that file is removed.
-func (p *planner) preview(preview *picture.Picture) {
-	if p.failure != nil || preview == nil {
-		return
+func (p *planner) preview(preview *picture.Picture) error {
+	if preview == nil {
+		return nil
 	}
 	kept, err := p.required(savedMinimap)
 	if err != nil {
-		p.failure = err
-		return
+		return err
 	}
-	p.write(KeptMinimap, kept)
+	if err := p.write(KeptMinimap, kept); err != nil {
+		return err
+	}
 	if preview.Extension == "blp" {
-		p.write(savedMinimap, preview.Bytes)
-		return
+		return p.write(savedMinimap, preview.Bytes)
 	}
-	p.change(mapdir.Change{Name: savedMinimap, Remove: true})
-	p.write(tgaName, preview.Bytes)
+	if err := p.change(mapdir.Change{Name: savedMinimap, Remove: true}); err != nil {
+		return err
+	}
+	return p.write(tgaName, preview.Bytes)
 }
 
 // ---- errors ----

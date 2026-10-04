@@ -48,10 +48,17 @@ func Plan(ctx context.Context, folder *mapdir.Folder, assets []Asset, owned Stat
 		return &Result{Assets: []Asset{}, Changes: []mapdir.Change{}, planned: folder}, nil
 	}
 	p := &planner{ctx: ctx, folder: folder, assets: assets, order: owned.Files, owned: ownedByKey(owned)}
-	for _, step := range []func() error{p.checkPaths, p.readIndex, p.ownedUnchanged, p.roomForAssets} {
-		if err := step(); err != nil {
-			return nil, err
-		}
+	if err := p.checkPaths(); err != nil {
+		return nil, err
+	}
+	if err := p.readIndex(); err != nil {
+		return nil, err
+	}
+	if err := p.ownedUnchanged(); err != nil {
+		return nil, err
+	}
+	if err := p.roomForAssets(); err != nil {
+		return nil, err
 	}
 	changes, spelled := p.writes()
 	changes = append(changes, p.removals(spelled)...)
