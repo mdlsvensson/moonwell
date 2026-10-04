@@ -13,18 +13,21 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/war3/txt"
 )
 
-// What this file leaves out, and why. The two trees agree on every text and every name made of ASCII without a
-// vertical tab, and those are compared here. They differ by intent in two things, and the inputs that show the
-// difference are pinned in txt_test.go and given to neither tree here:
+// What this file leaves out, and why. The two trees agree on every text and every name made of ASCII, and those
+// are compared here. They differ by intent in three things. The inputs that show a difference are pinned in
+// txt_test.go and given to neither tree in a comparison; TestOracleLeavesOutOnlyWhatTheTreesMergeDifferently proves
+// of each that the other tree makes another text of it.
 //
-//   - White space. The other tree takes a wider set for white space than this tree's space, tab, form feed,
-//     carriage return and line feed: also the vertical tab, the no-break space and the other spaces outside ASCII,
-//     the byte order mark, and the line and paragraph separators, which it also refuses in a header's comment.
-//     Left out: a source with one of those characters beside a header or a key, alone on a line, or in a header's
-//     comment (TestOnlyASCIIWhiteSpaceIsWhiteSpace).
-//   - Letter case. The other tree compares two names by their small letters and this tree by case folding. Left
-//     out: the long s against s, the final sigma against sigma, and the dotted capital I against an i with a dot
-//     above (TestNamesMatchByCaseFoldingOutsideASCIIToo). Other letters outside ASCII are compared.
+//   - White space outside ASCII. The other tree takes the no-break space, the other spaces outside ASCII, the byte
+//     order mark and the line and paragraph separators for white space, and this tree takes them for text. Left
+//     out: a source with one of those characters beside a header or a key or alone on a line, and a key that holds
+//     one (TestOnlyASCIIWhiteSpaceIsWhiteSpace). The same characters inside a value, a comment or a section name
+//     are compared.
+//   - A line or paragraph separator inside the comment that follows a header. The other tree takes such a line
+//     for no header and this tree takes it for one (TestALineOrParagraphSeparatorIsPartOfAHeadersComment).
+//   - Letter case outside ASCII. The other tree compares two names by their small letters and this tree by case
+//     folding. Left out: the long s against s, the final sigma against sigma, and the dotted capital I against an
+//     i with a dot above (TestNamesMatchByCaseFoldingOutsideASCIIToo). Other letters outside ASCII are compared.
 //
 // A list that holds a section or a key twice in one spelling cannot be given to the other tree, whose sections are
 // maps: TestMergeTakesTheSameNameTwice covers it for this tree alone.
@@ -85,7 +88,7 @@ func (c *comparison) merges(what, source string, sections []txt.Section) {
 // there and not compared gives another text in the other tree. One that comes to give the same text belongs in a
 // comparison.
 func TestOracleLeavesOutOnlyWhatTheTreesMergeDifferently(t *testing.T) {
-	leftOut := slices.Concat(whiteSpaceMerges(), caseFoldingMerges())
+	leftOut := slices.Concat(whiteSpaceMerges(), separatorMerges(), caseFoldingMerges())
 	for _, m := range leftOut {
 		if other := oldsettings.PatchText(m.source, otherTreeSections(t, m.name, m.sections)); other == m.want {
 			t.Errorf("%s: both trees give %q, so the merge need not be left out", m.name, other)
@@ -109,7 +112,9 @@ func TestOracleOnTheCarriedMerges(t *testing.T) {
 
 // shapedSources are sources in each shape a file may have: empty, with LF and with CRLF, with and without a final
 // newline, a key and a section that come twice, headers followed by comments, indented keys, and names in other
-// ASCII letter case than the sections ask for.
+// ASCII letter case than the sections ask for. The last bodies hold characters that are white space outside ASCII
+// in the places where they are text to both trees: inside a value, a comment and a section name, and the
+// next-line character, which is white space to neither, before a header.
 func shapedSources() []string {
 	bodies := [][]string{
 		{},
@@ -127,6 +132,9 @@ func shapedSources() []string {
 		{"[Misc] not a header", "[Skin", "Skin]", "[]", "=1", "FoodCeiling", "[Misc]=1", "[Text=x]"},
 		{"[Misc]", "Food Ceiling=1", "FoodCeiling==2", "FoodCeiling =", " \t "},
 		{"[Sk\xC3\xA5n]", "T\xC3\xA9xt=m\xC3\xA5ne \xE6\x9C\x88", "[Misc]", "FoodCeiling=\xC3\x85"},
+		{"\v[Misc]\v", "\vFoodCeiling\v=\v100", "\v", "\v[Skin]\v; texts", "Text=old", "\v \t\f"},
+		{"[Misc]", "FoodCeiling=1\xC2\xA02", "// a\xC2\xA0note", "; b\xE2\x80\xA8c", "[Mi\xC2\xA0sc]", "Text=a\xC2\xA0b\xE3\x80\x80"},
+		{"[Skin] ; a\xC2\xA0note", "Text=\xC2\xA0", "\xC2\x85[Misc]", "FoodCeiling=100"},
 	}
 	var sources []string
 	for _, body := range bodies {
@@ -157,6 +165,9 @@ func shapedSections() [][]txt.Section {
 		sections(section("Misc", "FoodCeiling", " 5 ; five"), section("Skin", "Text", "[x]")),
 		sections(section("Skin", "Text", "one\ntwo"), section("two", "K", "v"), section("Misc", "FoodCeiling", "one\r\n[Late]"),
 			section("Late", "K", "v")),
+		sections(section("mi\xC2\xA0SC", "text", "new", "Added", "x\xC2\xA0y"), section("Misc", "FoodCeiling", "3\xC2\xA04")),
+		// Names that are written and not found again: every merge adds them once more.
+		sections(section("Misc", "Food Ceiling", "1", "a=b", "2"), section("A]B", "K", "1")),
 	}
 }
 
@@ -186,7 +197,9 @@ var (
 )
 
 // space is white space that both trees take for white space, or none.
-func (g generator) space() string { return g.pick("", "", "", " ", "\t", "  ", " \t", "\f", "\r") }
+func (g generator) space() string {
+	return g.pick("", "", "", " ", "\t", "  ", " \t", "\f", "\r", "\v")
+}
 
 // line is one line of a source: a header, a line that sets a key, a blank line, a comment, or something that is
 // none of them.

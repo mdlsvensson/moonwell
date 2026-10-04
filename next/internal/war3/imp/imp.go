@@ -127,18 +127,22 @@ func errTruncated(file string) error {
 	return errUnreadable(file, "it is truncated")
 }
 
+// errVersion says that the file is of another version than the one this package reads.
 func errVersion(file string, found uint32) error {
 	return errUnreadable(file, fmt.Sprintf("version %d is not supported (expected %d)", found, version))
 }
 
+// errFlag says that the entry at index, counted from 0, has a flag that is none of the six.
 func errFlag(file string, index uint32, flag uint8) error {
 	return errUnreadable(file, fmt.Sprintf("entry %d has unknown flag %d", index, flag))
 }
 
+// errEmptyPath says that the path of the entry at index is its NUL and nothing else.
 func errEmptyPath(file string, index uint32) error {
 	return errUnreadable(file, fmt.Sprintf("entry %d has an empty path", index))
 }
 
+// errNotUTF8 says that the path of the entry at index holds bytes that are not UTF-8.
 func errNotUTF8(file string, index uint32) error {
 	return errUnreadable(file, fmt.Sprintf("entry %d is not valid UTF-8", index))
 }

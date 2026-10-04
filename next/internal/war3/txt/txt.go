@@ -4,7 +4,8 @@
 // Merge takes the text of such a file, decoded and without a byte order mark, and the sections to set, each with
 // its fields in the order to apply them. It returns the new text. A file is lines: a header `[Name]` opens a
 // section, a line `Key=Value` sets a key in the section it stands in, and every other line is kept as it is.
-// White space is ASCII white space throughout: a space, a tab, a form feed, a carriage return, a line feed.
+// White space is ASCII white space throughout: a space, a tab, a vertical tab, a form feed, a carriage return, a
+// line feed.
 //
 // The package must not know which file a text belongs to, how the file is read or written, or which settings
 // Moonwell sets: names and values are written as they are given.
@@ -74,15 +75,21 @@ func (d document) joined() string {
 	return text
 }
 
+// whiteSpace is the six white space characters of ASCII, as the inside of a character class. The `\s` of regexp
+// has five of them: it leaves the vertical tab out.
+const whiteSpace = `\t\n\v\f\r `
+
 var (
 	// header matches a line that opens a section and captures the section's name. Only white space and a comment
-	// that starts with `//` or `;` may stand beside the brackets. A carriage return inside the comment, one that
-	// ended no line, makes the line no header.
-	header = regexp.MustCompile(`^\s*\[([^\]]+)\]\s*(?:(?://|;)[^\r\n]*)?$`)
+	// that starts with `//` or `;` may stand beside the brackets. The comment holds no carriage return. A carriage
+	// return left inside a line ended a line for whoever wrote it, so what follows it may be another line of the
+	// file and not comment; such a line is not taken for a header, and nothing is merged into a section whose
+	// lines cannot be told apart.
+	header = regexp.MustCompile(`^[` + whiteSpace + `]*\[([^\]]+)\][` + whiteSpace + `]*(?:(?://|;)[^\r\n]*)?$`)
 	// setting matches the start of a line that sets a key, and captures the line's indent and the key.
-	setting = regexp.MustCompile(`^(\s*)([^=\s]+)\s*=`)
+	setting = regexp.MustCompile(`^([` + whiteSpace + `]*)([^=` + whiteSpace + `]+)[` + whiteSpace + `]*=`)
 	// blank matches a line of nothing but white space.
-	blank = regexp.MustCompile(`^\s*$`)
+	blank = regexp.MustCompile(`^[` + whiteSpace + `]*$`)
 )
 
 // set gives a field its value in the section: in the lines that set its key, or else on a line of its own.

@@ -174,12 +174,17 @@ func edgeMerges() []merge {
 		{"a line without an equals sign sets no key", "[A]\nK\n", sections(section("A", "K", "2")), "[A]\nK\nK=2\n"},
 		{"a value is written as given", "[A]\nK=1\n", sections(section("A", "K", " x ; y = z ")), "[A]\nK= x ; y = z \n"},
 		{"a form feed is white space", "\f[A]\f\n\fK\f=1\n", sections(section("A", "K", "2")), "\f[A]\f\n\fK=2\n"},
+		{"a vertical tab before a header", "\v[Misc]\nA=1\n", sections(section("Misc", "B", "2")), "\v[Misc]\nA=1\nB=2\n"},
+		{"a vertical tab after a header and around a key", "[Misc]\v\n\vA\v=\v1\n", sections(section("Misc", "A", "2")),
+			"[Misc]\v\n\vA=2\n"},
+		{"a vertical tab before a key", "[Misc]\n\vA=1\n", sections(section("Misc", "A", "2")), "[Misc]\n\vA=2\n"},
+		{"a line of one vertical tab inside a section", "[Misc]\nA=1\n\v\n[Other]\n", sections(section("Misc", "B", "2")),
+			"[Misc]\nA=1\nB=2\n\v\n[Other]\n"},
+		{"a last line of one vertical tab", "[A]\nX=1\n\v", sections(section("Misc", "B", "2")), "[A]\nX=1\n\v\n[Misc]\nB=2"},
 		{"a carriage return that ends no line is white space", "[A]\r\r\nK=1\r\n\r\r\n[B]\r\n", sections(section("A", "N", "2")),
 			"[A]\r\r\nK=1\r\nN=2\r\n\r\r\n[B]\r\n"},
 		{"a carriage return in a header's comment", "[A] ; a\rb\nK=1\n", sections(section("A", "K", "2")),
 			"[A] ; a\rb\nK=1\n\n[A]\nK=2\n"},
-		{"a value with a line break", "[A]\nK=1\n", sections(section("A", "K", "1\n[B]"), section("B", "X", "2")),
-			"[A]\nK=1\n[B]\n\n[B]\nX=2\n"},
 	}
 }
 
@@ -187,10 +192,47 @@ func TestMergeAtTheEdgesOfTheLayout(t *testing.T) {
 	check(t, edgeMerges())
 }
 
-// carriedMerges are all the merges above.
-func carriedMerges() []merge {
+// settledMerges are all the merges above. Merging the text of one again changes nothing.
+func settledMerges() []merge {
 	return slices.Concat(duplicateKeyMerges(), tabAndCaseMerges(), emptyAndMissingSectionMerges(), wholeLineMerges(),
 		layoutMerges(), headerCommentMerges(), edgeMerges())
+}
+
+// regrown is a merge whose text grows when it is merged again, and the text the second merge gives.
+type regrown struct {
+	merge
+	again string
+}
+
+// regrowingMerges set names and values that Merge writes and cannot find in what it wrote: a key with a space or
+// an equals sign in it reads back as another key, a section name with a closing bracket as no header, and a value
+// with a line break as two lines. Each merge adds them once more.
+func regrowingMerges() []regrown {
+	return []regrown{
+		{merge{"a key with a space", "[A]\n", sections(section("A", "my key", "1")), "[A]\nmy key=1\n"},
+			"[A]\nmy key=1\nmy key=1\n"},
+		{merge{"a key with an equals sign", "[A]\n", sections(section("A", "a=b", "1")), "[A]\na=b=1\n"},
+			"[A]\na=b=1\na=b=1\n"},
+		{merge{"a section name with a closing bracket", "", sections(section("A]B", "K", "1")), "[A]B]\nK=1"},
+			"[A]B]\nK=1\n\n[A]B]\nK=1"},
+		{merge{"a value with a line break", "[A]\nK=1\n", sections(section("A", "K", "1\n[B]"), section("B", "X", "2")),
+			"[A]\nK=1\n[B]\n\n[B]\nX=2\n"}, "[A]\nK=1\n[B]\n[B]\n\n[B]\nX=2\n"},
+	}
+}
+
+func TestMergingAgainAddsWhatItCannotFindInItsOwnText(t *testing.T) {
+	for _, r := range regrowingMerges() {
+		check(t, []merge{r.merge, {r.name + ", merged again", r.want, r.sections, r.again}})
+	}
+}
+
+// carriedMerges are the settled merges and the first merge of each regrowing one.
+func carriedMerges() []merge {
+	carried := settledMerges()
+	for _, r := range regrowingMerges() {
+		carried = append(carried, r.merge)
+	}
+	return carried
 }
 
 // TestMergeTakesTheSameNameTwice gives Merge what only a list can hold: a section and a key that come twice in
@@ -204,10 +246,7 @@ func TestMergeTakesTheSameNameTwice(t *testing.T) {
 }
 
 func TestMergingAgainChangesNothing(t *testing.T) {
-	for _, m := range carriedMerges() {
-		if strings.Contains(m.name, "a value with a line break") {
-			continue // the break makes two lines of the one when the text is taken apart again
-		}
+	for _, m := range settledMerges() {
 		if again := txt.Merge(m.want, m.sections); again != m.want {
 			t.Errorf("%s: merging %q twice gives %q", m.name, m.want, again)
 		}
@@ -217,7 +256,8 @@ func TestMergingAgainChangesNothing(t *testing.T) {
 func TestMergingNoSectionsReturnsTheSource(t *testing.T) {
 	sources := []string{"", "\n", "\r\n", "\n\n", "a", "a\n", "a\r\n", "a\r\nb", "\n[A]\n\nK = 1 ; note\n\n\n", " \t\n", "a\r", "a\r\r\n"}
 	for _, m := range carriedMerges() {
-		if !strings.Contains(m.name, "mixed line breaks") {
+		// A source with both newline styles comes back with one.
+		if lf := strings.ReplaceAll(m.source, "\r\n", ""); !strings.Contains(m.source, "\r\n") || !strings.Contains(lf, "\n") {
 			sources = append(sources, m.source)
 		}
 	}
@@ -239,24 +279,36 @@ func whiteSpaceMerges() []merge {
 		{"a no-break space after a header", "[Misc]\xC2\xA0\nA=1\n", add, "[Misc]\xC2\xA0\nA=1\n\n[Misc]\nB=2\n"},
 		{"a no-break space before a key", "[Misc]\n\xC2\xA0A=1\n", set, "[Misc]\n\xC2\xA0A=1\nA=2\n"},
 		{"a no-break space after a key", "[Misc]\nA\xC2\xA0=1\n", set, "[Misc]\nA\xC2\xA0=1\nA=2\n"},
+		{"a no-break space inside a key", "[Misc]\nA\xC2\xA0B=1\n", sections(section("Misc", "A\xC2\xA0B", "2")),
+			"[Misc]\nA\xC2\xA0B=2\n"},
 		{"a line of one no-break space inside a section", "[Misc]\nA=1\n\xC2\xA0\n[Other]\n", add,
 			"[Misc]\nA=1\n\xC2\xA0\nB=2\n[Other]\n"},
 		{"a last line of one no-break space", "[A]\nX=1\n\xC2\xA0", add, "[A]\nX=1\n\xC2\xA0\n\n[Misc]\nB=2"},
 		{"an ideographic space before a header", "\xE3\x80\x80[Misc]\nA=1\n", add, "\xE3\x80\x80[Misc]\nA=1\n\n[Misc]\nB=2\n"},
 		{"a byte order mark before a header", "\xEF\xBB\xBF[Misc]\nA=1\n", add, "\xEF\xBB\xBF[Misc]\nA=1\n\n[Misc]\nB=2\n"},
-		{"a vertical tab before a header", "\v[Misc]\nA=1\n", add, "\v[Misc]\nA=1\n\n[Misc]\nB=2\n"},
-		{"a vertical tab before a key", "[Misc]\n\vA=1\n", set, "[Misc]\n\vA=1\nA=2\n"},
-		{"a line of one vertical tab inside a section", "[Misc]\nA=1\n\v\n[Other]\n", add, "[Misc]\nA=1\n\v\nB=2\n[Other]\n"},
+	}
+}
+
+// White space is a space, a tab, a vertical tab, a form feed, a carriage return and a line feed, and nothing
+// else: any other character is part of the name or the text it stands in.
+func TestOnlyASCIIWhiteSpaceIsWhiteSpace(t *testing.T) {
+	check(t, whiteSpaceMerges())
+}
+
+// separatorMerges have one of Unicode's two line separators inside the comment that follows a header.
+func separatorMerges() []merge {
+	add := sections(section("Misc", "B", "2"))
+	return []merge{
 		{"a line separator in a header's comment", "[Misc] ; a\xE2\x80\xA8b\nA=1\n", add, "[Misc] ; a\xE2\x80\xA8b\nA=1\nB=2\n"},
 		{"a paragraph separator in a header's comment", "[Misc] // a\xE2\x80\xA9b\nA=1\n", add,
 			"[Misc] // a\xE2\x80\xA9b\nA=1\nB=2\n"},
 	}
 }
 
-// White space is a space, a tab, a form feed, a carriage return and a line feed, and nothing else: any other
-// character is part of the name or the text it stands in.
-func TestOnlyASCIIWhiteSpaceIsWhiteSpace(t *testing.T) {
-	check(t, whiteSpaceMerges())
+// Unicode's line separator and paragraph separator end no line of these files, so one inside a header's comment
+// is part of the comment, and the line is a header.
+func TestALineOrParagraphSeparatorIsPartOfAHeadersComment(t *testing.T) {
+	check(t, separatorMerges())
 }
 
 // caseFoldingMerges have names that only some ways of comparing letters outside ASCII take for the same.
