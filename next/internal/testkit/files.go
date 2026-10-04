@@ -1,6 +1,6 @@
 // Package testkit holds what Moonwell's tests share: files and folders written and read back and the fixtures World
-// Editor saved, a test world for the commands, byte helpers, builders for map info, object files and MDX models, and
-// a reader of the archives Moonwell writes.
+// Editor saved, a test world for the commands and the logger that keeps its lines (Recorder), byte helpers, builders
+// for map info, object files, MDX models and pictures, and a reader of the archives Moonwell writes.
 //
 // It is imported by tests only. Of Moonwell's packages it knows env, binio and the formats it builds or reads
 // (war3/objmod and war3/mpq), so the tests of those two packages are external test packages. Most helpers take a
