@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/objmod"
@@ -248,7 +249,7 @@ type rawcodes struct{ err error }
 func (r *rawcodes) of(text string) objmod.ID {
 	id, ok := objmod.ParseID(text)
 	if !ok && r.err == nil {
-		r.err = fmt.Errorf("Cannot write %s to an object file: a rawcode is 4 Latin-1 characters.", quoted(text))
+		r.err = fmt.Errorf("Cannot write %s to an object file: a rawcode is 4 Latin-1 characters.", fsx.Quoted(text))
 	}
 	return id
 }

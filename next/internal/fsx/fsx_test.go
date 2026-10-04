@@ -2,7 +2,9 @@ package fsx
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -174,6 +176,51 @@ func TestTextWithMarkKeepsTheMarkAsideAndRefusesInvalidBytes(t *testing.T) {
 				t.Errorf("the mark and the text make %q, want the bytes given", mark+text)
 			}
 		})
+	}
+}
+
+func TestQuotedEscapesTheQuoteTheBackslashAndTheControlCharacters(t *testing.T) {
+	// How the escape of a control character without a short one starts: a backslash, the letter u and two zeros.
+	const long = `\` + "u00"
+	for _, c := range []struct{ name, text, want string }{
+		{"no text", "", `""`},
+		{"plain text", "Models/unit.mdx", `"Models/unit.mdx"`},
+		{"the quote and the backslash", `a"b\c`, `"a\"b\\c"`},
+		{"each short escape", "\b\f\n\r\t", `"\b\f\n\r\t"`},
+		{"the first and the last control character", "\x00\x1F", `"` + long + "00" + long + `1f"`},
+		{"hexadecimal digits in lower case", "\x0B\x1A\x1E", `"` + long + "0b" + long + "1a" + long + `1e"`},
+		{"markup and the slash", "<a href='x/y'>&</a>", `"<a href='x/y'>&</a>"`},
+		{"DEL", "a\x7Fb", "\"a\x7Fb\""},
+		{"a character outside ASCII", "h\xC3\xA9ro", "\"h\xC3\xA9ro\""},
+		{"the line and the paragraph separator", "\xE2\x80\xA8\xE2\x80\xA9", "\"\xE2\x80\xA8\xE2\x80\xA9\""},
+		{"a character beyond the basic plane", "\xF0\x9F\x8C\x99", "\"\xF0\x9F\x8C\x99\""},
+		{"a byte that is not UTF-8", "a\xFFb", "\"a\xFFb\""},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			if got := Quoted(c.text); got != c.want {
+				t.Errorf("Quoted(%q) = %s, want %s", c.text, got, c.want)
+			}
+		})
+	}
+}
+
+// Of the 256 bytes, the quote, the backslash and those below a space are escaped, and no other. What is written
+// for a byte of ASCII is JSON, which reads back as the byte.
+func TestQuotedEscapesExactlyTheBytesItMustAndWritesJSON(t *testing.T) {
+	for b := range 256 {
+		text := string([]byte{byte(b)})
+		got := Quoted(text)
+		escaped := b < 0x20 || b == '"' || b == '\\'
+		if kept := got == `"`+text+`"`; kept == escaped {
+			t.Errorf("Quoted of the byte %#02x = %s, want it escaped: %v", b, got, escaped)
+		}
+		if escaped && b < 0x20 && shortEscapes[byte(b)] == "" && got != fmt.Sprintf(`"\u00%02x"`, b) {
+			t.Errorf("Quoted of the byte %#02x = %s, want the escape with four hexadecimal digits in lower case", b, got)
+		}
+		var back string
+		if err := json.Unmarshal([]byte(got), &back); b < 0x80 && (err != nil || back != text) {
+			t.Errorf("Quoted of the byte %#02x = %s, which reads back as %q, %v", b, got, back, err)
+		}
 	}
 }
 

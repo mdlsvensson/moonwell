@@ -8,6 +8,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 )
 
@@ -78,7 +79,7 @@ func (s *subject) entries() []entry {
 		}
 	}
 	for key, value := range s.object.Properties.All() {
-		route := "properties[" + quoted(key) + "]"
+		route := "properties[" + fsx.Quoted(key) + "]"
 		if field := s.propertyField(key); field != nil {
 			kept.add(field, "."+route, route, value)
 		} else {

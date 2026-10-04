@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/objmod"
 )
@@ -113,15 +114,15 @@ func (p *printer) member() {
 // key starts a member of an object: its name, for the value that is written next.
 func (p *printer) key(name string) {
 	p.member()
-	p.out.WriteString(quoted(name))
+	p.out.WriteString(fsx.Quoted(name))
 	p.out.WriteString(": ")
 }
 
-// text writes a member that is a text. Only the quote, the backslash and the control characters are escaped:
-// markup characters and characters outside ASCII are written as they are.
+// text writes a member that is a text, as fsx.Quoted writes one. Only the quote, the backslash and the control
+// characters are escaped: markup characters and characters outside ASCII are written as they are.
 func (p *printer) text(key, value string) {
 	p.key(key)
-	p.out.WriteString(quoted(value))
+	p.out.WriteString(fsx.Quoted(value))
 }
 
 func (p *printer) truth(key string, value bool) {

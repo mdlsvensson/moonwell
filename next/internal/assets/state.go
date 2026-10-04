@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/fs"
 	"os"
 	"regexp"
@@ -122,7 +121,8 @@ func inState(err error, file string) error {
 }
 
 // Bytes is the state as its file holds it: the version, then the files in the order given, with two spaces of
-// indentation and a final line break.
+// indentation and a final line break. A path and a hash are written as fsx.Quoted writes them, so that a state
+// file a project has committed is not written anew for the same state.
 func (s State) Bytes() []byte {
 	var out bytes.Buffer
 	out.WriteString("{\n  \"version\": 1,\n  \"files\": {")
@@ -130,36 +130,13 @@ func (s State) Bytes() []byte {
 		if i > 0 {
 			out.WriteByte(',')
 		}
-		out.WriteString("\n    " + quoted(file.Path) + ": " + quoted(file.Hash))
+		out.WriteString("\n    " + fsx.Quoted(file.Path) + ": " + fsx.Quoted(file.Hash))
 	}
 	if len(s.Files) > 0 {
 		out.WriteString("\n  ")
 	}
 	out.WriteString("}\n}\n")
 	return out.Bytes()
-}
-
-// escapes is the characters that quoted writes as a backslash and a letter.
-var escapes = map[byte]string{'"': `\"`, '\\': `\\`, '\b': `\b`, '\f': `\f`, '\n': `\n`, '\r': `\r`, '\t': `\t`}
-
-// quoted writes text between double quotes, as JSON does: the quote, the backslash and the control characters are
-// escaped, and every other byte is kept.
-func quoted(text string) string {
-	var out bytes.Buffer
-	out.WriteByte('"')
-	for i := range len(text) {
-		c := text[i]
-		switch escape, short := escapes[c]; {
-		case short:
-			out.WriteString(escape)
-		case c < 0x20:
-			fmt.Fprintf(&out, `\u%04x`, c)
-		default:
-			out.WriteByte(c)
-		}
-	}
-	out.WriteByte('"')
-	return out.String()
 }
 
 // ---- errors ----

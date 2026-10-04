@@ -1,10 +1,10 @@
 package objects
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/objmod"
 )
@@ -83,7 +83,7 @@ func (s *subject) report(path string, wrong fault) {
 
 // resolve checks one object and returns it resolved; false for an object whose base is unknown.
 func (r *resolver) resolve(category manifest.Category, key string, object manifest.Object) (Resolved, bool) {
-	s := &subject{resolver: r, category: category, at: string(category) + "[" + quoted(key) + "]", object: object}
+	s := &subject{resolver: r, category: category, at: string(category) + "[" + fsx.Quoted(key) + "]", object: object}
 	s.checkID()
 	s.claimID()
 	base, known := r.metadata.Bases[category][object.Base]
@@ -140,29 +140,6 @@ func fourLettersOrDigits(id string) bool {
 		}
 	}
 	return true
-}
-
-// escapes is the characters that quoted writes as a backslash and a letter.
-var escapes = map[byte]string{'"': `\"`, '\\': `\\`, '\b': `\b`, '\f': `\f`, '\n': `\n`, '\r': `\r`, '\t': `\t`}
-
-// quoted writes text between double quotes, as JSON does: the quote, the backslash and the control characters are
-// escaped, and every other byte is kept.
-func quoted(text string) string {
-	var out strings.Builder
-	out.WriteByte('"')
-	for i := range len(text) {
-		c := text[i]
-		switch escape, short := escapes[c]; {
-		case short:
-			out.WriteString(escape)
-		case c < 0x20:
-			fmt.Fprintf(&out, `\u%04x`, c)
-		default:
-			out.WriteByte(c)
-		}
-	}
-	out.WriteByte('"')
-	return out.String()
 }
 
 // named writes a standard object or a field for a message: its id as authors write it, and its name.
