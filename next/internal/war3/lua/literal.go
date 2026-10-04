@@ -62,7 +62,7 @@ func PlayerID(tokens []Token) (int, bool) {
 }
 
 // Quote writes s as a Lua string literal. Control characters are three-digit decimal escapes, so that a digit after
-// one stays apart from it.
+// one stays apart from it. A byte that is not valid UTF-8 is written as U+FFFD.
 func Quote(s string) string {
 	var b strings.Builder
 	b.WriteByte('"')

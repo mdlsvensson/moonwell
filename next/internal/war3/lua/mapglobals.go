@@ -28,7 +28,7 @@ var handleTypes = map[string]string{
 }
 
 // space is one character of Lua's white space, for a regular expression.
-const space = `[ \t\n\v\f\r]`
+var space = "[" + regexp.QuoteMeta(whiteSpace) + "]"
 
 var (
 	functionLine = regexp.MustCompile(`^function` + space + `+([A-Za-z_]\w*)` + space + `*\(`)
@@ -52,7 +52,10 @@ func ReadMapGlobals(script string) MapGlobals {
 			result.Functions = append(result.Functions, function[1])
 			continue
 		}
-		if global, ok := declaration(line); declarations && ok {
+		if !declarations {
+			continue
+		}
+		if global, ok := declaration(line); ok {
 			result.Globals = append(result.Globals, global)
 		}
 	}

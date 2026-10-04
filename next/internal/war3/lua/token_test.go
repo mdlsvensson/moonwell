@@ -120,6 +120,31 @@ func TestATokenHasItsKindItsTextAndItsPlace(t *testing.T) {
 	}
 }
 
+func TestAfterZOnlyLuasOwnWhiteSpaceIsSkipped(t *testing.T) {
+	// A space and a line break after \z are skipped, so the string goes on to its closing quote.
+	tokens, fault := Tokenize("a = \"x\\z \n y\" b")
+	if want := []string{"a", "=", "\"x\\z \n y\"", "b"}; fault != nil || !slices.Equal(raws(tokens), want) {
+		t.Errorf("tokens = %q, fault = %+v", raws(tokens), fault)
+	}
+	// Lua's \z stops at a no-break space (the first source) and at a byte order mark (the second): neither is white
+	// space to Lua. The line break after it is then not skipped, and ends the string unclosed.
+	for _, c := range []struct {
+		source string
+		raws   []string
+	}{
+		{"a = \"x\\z\xC2\xA0\n y\" b", []string{"a", "=", "\"x\\z\xC2\xA0", "y", "\" b"}},
+		{"a = \"x\\z\xEF\xBB\xBF\n y\" b", []string{"a", "=", "\"x\\z\xEF\xBB\xBF", "y", "\" b"}},
+	} {
+		tokens, fault := Tokenize(c.source)
+		if fault == nil || fault.Msg != "unescaped newline in quoted string" || fault.Offset != 4 {
+			t.Errorf("Tokenize(%q) fault = %+v, want an unescaped newline at 4", c.source, fault)
+		}
+		if got := raws(tokens); !slices.Equal(got, c.raws) {
+			t.Errorf("Tokenize(%q) = %q, want %q", c.source, got, c.raws)
+		}
+	}
+}
+
 func TestOnlyLuasOwnWhiteSpaceSeparatesTokens(t *testing.T) {
 	if tokens, fault := Tokenize("a\t\v\f\r\n b"); fault != nil || !slices.Equal(raws(tokens), []string{"a", "b"}) {
 		t.Errorf("tokens = %q, fault = %+v", raws(tokens), fault)

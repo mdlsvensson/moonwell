@@ -98,6 +98,22 @@ func TestADeclarationIsTypedByItsValueUnlessItsNameSaysWhatItHolds(t *testing.T)
 	}
 }
 
+func TestOnlyLuasOwnWhiteSpaceIsLeftOutOfAValue(t *testing.T) {
+	for _, c := range []struct{ name, line, want string }{
+		// A line separator (U+2028) is an ordinary character to Lua, so a value may hold one.
+		{"a line separator in a string", "udg_A = \"x\xE2\x80\xA8y\"", "string"},
+		// A no-break space is not white space to Lua: it stays in the value, which is then no integer.
+		{"a no-break space after a number", "udg_A = 5\xC2\xA0", "any"},
+		// A space, a tab and a carriage return are white space to Lua, and are left out.
+		{"white space after a number", "udg_A = 5 \t\r", "integer"},
+	} {
+		globals := ReadMapGlobals(c.line + "\n").Globals
+		if !slices.Equal(globals, []Global{{"udg_A", c.want}}) {
+			t.Errorf("%s: declares %+v, want udg_A of type %s", c.name, globals, c.want)
+		}
+	}
+}
+
 func TestOnlyALineThatStartsWithANameOrAFunctionIsRead(t *testing.T) {
 	globals := ReadMapGlobals(strings.Join([]string{
 		" udg_Indented = 1",

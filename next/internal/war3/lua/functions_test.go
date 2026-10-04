@@ -396,6 +396,7 @@ func TestMismatchedDelimitersAndInvalidStatementShapesAreRefused(t *testing.T) {
 var placedErrors = []refusal{
 	{"-- \U0001F319\nend", "expected a name", 2, 1},
 	{"--[[\U0001F319]] end", "expected a name", 1, 9},
+	{"--[[\U0001F319]] x = @", "unsupported symbol", 1, 13},
 	{"function config()\r\n  X(0x)\r\nend", "invalid numeral", 2, 5},
 	{"function config()\n  local s = '\U0001F319' .. \nend", "expected a name", 3, 1},
 	{"function config()\n", "unterminated block", 2, 1},

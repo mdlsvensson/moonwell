@@ -6,13 +6,16 @@ import (
 	"math/rand/v2"
 	"os"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
 	"testing"
 
+	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/luasrc"
 	"github.com/mdlsvensson/moonwell/internal/settings"
+	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
@@ -39,19 +42,104 @@ func compareScanners(t *testing.T, what, source string) {
 	wantFunctions, wantErr := luasrc.Functions(source, "war3map.lua")
 	gotFunctions, gotErr := Functions(source, "war3map.lua")
 	if oracle.Errors(t, what+": functions", wantErr, gotErr) {
+		compareRefusals(t, what+": the refusal", source, wantErr, gotErr)
 		return
 	}
 	oracle.Values(t, what+": functions", wantFunctions, gotFunctions)
-	if t.Failed() {
-		return // the two lists may not pair
+	wantArguments, gotArguments := argumentsOfTheOtherTree(wantFunctions), argumentsOf(gotFunctions)
+	if len(wantArguments) != len(gotArguments) {
+		return // the functions differ, which is reported above, and their arguments do not pair
 	}
-	for i, function := range wantFunctions {
-		for j, call := range function.Calls {
-			for k, argument := range call.Args {
-				compareLiterals(t, what+": an argument of "+call.Name, argument, gotFunctions[i].Calls[j].Args[k])
-			}
+	for i, argument := range wantArguments {
+		compareLiterals(t, what+": argument "+strconv.Itoa(i), argument, gotArguments[i])
+	}
+}
+
+// argumentsOf returns every argument of every call statement, in order.
+func argumentsOf(functions []Function) [][]Token {
+	var arguments [][]Token
+	for _, function := range functions {
+		for _, call := range function.Calls {
+			arguments = append(arguments, call.Args...)
 		}
 	}
+	return arguments
+}
+
+func argumentsOfTheOtherTree(functions []luasrc.Function) [][]luasrc.Token {
+	var arguments [][]luasrc.Token
+	for _, function := range functions {
+		for _, call := range function.Calls {
+			arguments = append(arguments, call.Args...)
+		}
+	}
+	return arguments
+}
+
+// refusalOf is what an error of Functions says, in the shape both trees are compared in.
+type refusalOf struct {
+	Msg, Hint    string
+	Line, Column int
+}
+
+var atCharacter = regexp.MustCompile(` at character (\d+)$`)
+
+// compareRefusals compares the errors of both trees for a source that both refuse. This tree names the place of an
+// error as a line and a column, counted in characters; that difference is meant, so the other tree's place is
+// turned into a line and a column here before the two are compared. The other tree ends its message with
+// ` at character N`, N being a UTF-16 offset into the source; an error that comes from a tokenizer fault has no such
+// ending, and its place is the byte offset of the fault its tokenizer reports.
+func compareRefusals(t *testing.T, what, source string, want, got error) {
+	t.Helper()
+	var wanted *olddiag.Error
+	var given *diag.Error
+	if !errors.As(want, &wanted) || !errors.As(got, &given) {
+		t.Errorf("%s: an error is not a diag error: want %v, got %v", what, want, got)
+		return
+	}
+	msg, offset := wanted.Msg, -1
+	if place := atCharacter.FindStringSubmatch(wanted.Msg); place != nil {
+		units, _ := strconv.Atoi(place[1])
+		msg, offset = strings.TrimSuffix(wanted.Msg, place[0]), offsetOfUnit(source, units)
+	} else if _, fault := luasrc.Tokenize(source); fault != nil {
+		offset = fault.Offset
+	} else {
+		t.Errorf("%s: the other tree's error has no place and its tokenizer no fault: %v", what, want)
+		return
+	}
+	line, column := lineAndColumn(source, offset)
+	oracle.Values(t, what, refusalOf{msg, wanted.Hint, line, column},
+		refusalOf{given.Msg, given.Hint, given.Line, given.Column})
+}
+
+// offsetOfUnit is the byte offset in text of the character that starts at the UTF-16 unit; the length of the text
+// when it has no more units. A character above U+FFFF is two units, any other one, a byte that is not text one.
+func offsetOfUnit(text string, unit int) int {
+	units := 0
+	for offset, character := range text {
+		if units >= unit {
+			return offset
+		}
+		units++
+		if character > 0xFFFF {
+			units++
+		}
+	}
+	return len(text)
+}
+
+// lineAndColumn walks the text up to the byte offset and counts: a line feed starts a line, and every other
+// character, or byte that is not text, is one column.
+func lineAndColumn(text string, offset int) (line, column int) {
+	line, column = 1, 1
+	for _, character := range text[:offset] {
+		if character == '\n' {
+			line, column = line+1, 1
+		} else {
+			column++
+		}
+	}
+	return line, column
 }
 
 // compareLiterals compares what the literal helpers of both sides make of the same tokens.
@@ -266,13 +354,14 @@ func hasWiderSpace(text string) bool {
 // is where the two trees must still agree on every token, fault and refusal.
 func TestOracleOnMutatedSources(t *testing.T) {
 	random := rand.New(rand.NewPCG(8, 2026))
-	compared := 0
+	made, compared := 0, 0
 	for _, c := range oracleSources() {
 		if len(c.source) > 3000 {
 			continue
 		}
 		for range 20 {
 			mutated := mutate(random, c.source)
+			made++
 			if hasWiderSpace(mutated) {
 				continue
 			}
@@ -283,7 +372,10 @@ func TestOracleOnMutatedSources(t *testing.T) {
 			}
 		}
 	}
-	t.Logf("%d mutated sources", compared)
+	t.Logf("%d mutated sources compared of %d made", compared, made)
+	if compared < 2000 || compared*10 < made*9 {
+		t.Errorf("only %d of %d mutated sources were compared; want 2000 or more, and nine in ten", compared, made)
+	}
 }
 
 func TestOracleOnQuote(t *testing.T) {
