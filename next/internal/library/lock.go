@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"maps"
 	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 
@@ -24,9 +23,37 @@ type LockEntry struct {
 	Assets                          *string // the hash of the files it ships for the map; nil when it ships none
 }
 
-// ReadLock returns the lock's entries by library key; none when there is no lock file.
+// lockAt is the path on disk of the lock of the project at root. A link in its place is refused, and nothing is
+// read or written: the lock is committed, so a project can come with a link there, and what is read through it
+// is another file, and what is written through it lies outside the project. Any other failure to look at the
+// place is worded by failed.
+func lockAt(root string, failed func(cause error) error) (string, error) {
+	path, err := fsx.SafeJoin(root, LockFile)
+	var refused *diag.Error
+	switch {
+	case err == nil:
+		return path, nil
+	case errors.As(err, &refused):
+		return "", errRefusedPath(LockFile, refused)
+	}
+	return "", failed(err)
+}
+
+// refuseLinkedLock refuses a link in the lock's place, and nothing else: a place that cannot be looked at is
+// ReadLock's to refuse, where the lock is read.
+func refuseLinkedLock(root string) error {
+	_, err := lockAt(root, func(error) error { return nil })
+	return err
+}
+
+// ReadLock returns the lock's entries by library key; none when there is no lock file. A link in the lock's place
+// is refused.
 func ReadLock(root string) (map[string]LockEntry, error) {
-	data, err := os.ReadFile(filepath.Join(root, LockFile))
+	path, err := lockAt(root, errUnreadableLock)
+	if err != nil {
+		return nil, err
+	}
+	data, err := os.ReadFile(path)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		return map[string]LockEntry{}, nil
@@ -87,9 +114,12 @@ func entryOf(written json.RawMessage) (LockEntry, bool) {
 }
 
 // WriteLock writes the entries sorted by key, and only when the file's text changes. No entries removes the file.
+// A link in the lock's place is refused, and stays.
 func WriteLock(root string, entries map[string]LockEntry) error {
-	path := filepath.Join(root, LockFile)
-	var err error
+	path, err := lockAt(root, errUnwritableLock)
+	if err != nil {
+		return err
+	}
 	if len(entries) == 0 {
 		err = fsx.RemoveFile(path)
 	} else {

@@ -3,6 +3,9 @@ package library
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -45,6 +48,37 @@ const (
 	commitA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	commitB = "c07126f080c3887ba667596d08aa21df3b3a20f7"
 )
+
+// linkedLocks is the kinds of link that a lock's place can hold.
+var linkedLocks = []string{"a link to a lock", "a link to nothing", "a link to a folder"}
+
+// linkTheLock puts a link of the kind in the lock's place of the project at root, to a place in the folder
+// beside. The test is skipped where the machine cannot make the link: a link to a file, or to nothing, takes a
+// right that Windows does not give everyone.
+func linkTheLock(t *testing.T, kind, root, beside string) {
+	t.Helper()
+	link, target := filepath.Join(root, LockFile), filepath.Join(beside, "nothing.lock")
+	switch kind {
+	case "a link to a folder":
+		testkit.WriteFile(t, beside, "folder/kept.txt", []byte("kept"))
+		testkit.LinkDir(t, filepath.Join(beside, "folder"), link)
+		return
+	case "a link to a lock":
+		target = testkit.WriteFile(t, beside, "their.lock", []byte(lockText(map[string]LockEntry{"ex": entryOfTest(nil)})))
+	}
+	if err := os.Symlink(target, link); err != nil {
+		t.Skipf("cannot create a symlink here: %v", err)
+	}
+}
+
+// refusedLink fails the test unless err is the refusal of a link at path, with file as its file.
+func refusedLink(t *testing.T, err error, what, path, file string) {
+	t.Helper()
+	failure := asError(t, err, what)
+	if failure.Msg != "Symlinks are not supported: "+path || failure.File != file || !strings.Contains(failure.Hint, "real files") {
+		t.Errorf("%s: %+v", what, failure)
+	}
+}
 
 // entries is the entries of a test archive: each a name and what the file holds, in the order given.
 func entries(files ...string) []testkit.ZipEntry {

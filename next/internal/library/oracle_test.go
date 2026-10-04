@@ -97,22 +97,40 @@ import (
 //     other tree must not refuse in them (TestADownloadedFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten,
 //     TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten, and the two tests of
 //     local files).
-//   - A sync of a project with a link at a folder that Sync writes or removes. The other tree writes and removes
-//     through the link; this tree refuses the link first. Decided and compared as the class before it
-//     (TestALinkAtAFolderOfTheLibrariesIsRefusedBeforeAnythingGoesThroughIt).
+//   - A sync of a project with a link at a folder that Sync writes or removes: .moonwell, one of the two
+//     folders, a library's folder, and, for a local library, a folder below its folder or its stamp. The other
+//     tree writes and removes through the link; this tree refuses the link first. Decided and compared as the
+//     class before it (TestALinkAtAFolderOfTheLibrariesIsRefusedBeforeAnythingGoesThroughIt).
+//   - A sync of a project with a link in the lock's place. The other tree reads the lock through the link and
+//     writes it through, which makes a file outside the project when the link leads nowhere; this tree refuses
+//     the link before it removes or downloads anything. Decided and compared as the two classes before it. A
+//     link to a folder is among the links; links to a file and to nothing have an oracle of their own, which is
+//     skipped where the machine cannot make such a link (TestReadLockRefusesALinkInTheLocksPlace,
+//     TestWriteLockRefusesALinkInTheLocksPlace,
+//     TestALinkInTheLocksPlaceIsRefusedBeforeAnythingIsRemovedOrDownloaded).
+//   - A tag that both trees download and fail to write over a library that is there. This tree removes the stamp
+//     of the library's module folder before it replaces the folders, so that an update that stops between the
+//     two is downloaded again; the other tree leaves the stamp. The class is decided on the scenario, which
+//     names the stamp: the refusals must be the same, and everything the sync left but that stamp
+//     (TestAnUpdateThatIsInterruptedBetweenItsTwoFoldersIsFetchedAgain,
+//     TestAFileOfADownloadThatLiesWhereAFolderOfItDoesFailsAndTheLibraryIsFetchedAgain).
 //
 // Not among the inputs:
 //
-//   - A library key that is the name of a device on Windows (aux, nul): what the other tree does with a folder
-//     of such a name depends on the Windows it runs on. This tree refuses the key
-//     (TestALibraryKeyThatWindowsCannotHoldAsAFolderIsRefused).
+//   - A library key that is the name of a device on Windows (aux, con, nul): what the other tree does with a
+//     folder of such a name depends on the Windows it runs on. This tree refuses the key on every system, as a
+//     mistake of the manifest (TestALibraryKeyThatWindowsCannotHoldAsAFolderIsRefused).
 //   - Two GitHub libraries whose keys are whole numbers, in one project: the two trees write the lock in another
 //     order, which the oracle of writing the lock compares.
-//   - A local library, with files for the map, whose module folder in the project has a file where a folder of
-//     the library goes: on a system that names that failure when the path is looked at, this tree refuses before
-//     the files for the map are written, and the other tree after (TestAFolderThatCannotBeWrittenNamesTheFolder).
+//   - A local library whose copy in the project spells a file or a folder in another letter case than the
+//     library does, after a rename in the library: where letter case is ignored, the other tree removes the file
+//     from the copy on every sync. This tree makes the copy anew in the library's spelling
+//     (TestALocalLibraryRenamedInLetterCaseOnlyIsCopiedAnewInItsSpelling).
+//   - A local library whose copy has a file where a folder of the library goes, or a folder where a file goes,
+//     after a file of the library became a folder or the reverse: the other tree fails on every sync. This tree
+//     makes the copy anew (TestAFileOfALocalLibraryThatBecameAFolderOrAFolderThatBecameAFileIsCopiedAnew).
 //   - A local library with a file whose name has a backslash, which only a system other than Windows holds: this
-//     tree refuses it as a name Windows cannot hold
+//     tree refuses it as a name that cannot be used
 //     (TestALocalFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten).
 //   - Of the other tree's tests of Sync: the two that download from GitHub, and the path of a project in capital
 //     letters, which only Windows takes for the project's own. Its local library with a link that leads nowhere
@@ -1024,6 +1042,9 @@ type syncStep struct {
 	// refusedAnew is the words of this tree's refusal of a sync that the other tree does: a class the header
 	// names. Such a sync is the last of its scenario, since the two projects differ after it.
 	refusedAnew string
+	// withoutStamp is the stamp, as a path below the folder the project lies in, that this tree alone removes
+	// in a sync that both trees fail to write: a class the header names, and the last sync of its scenario.
+	withoutStamp string
 }
 
 // syncScenario is syncs of one project, one after another.
@@ -1244,12 +1265,16 @@ func (c *tally) syncs(t *testing.T, home string, scenario syncScenario) {
 	want, got := scenario.played(t, home, theOtherTree), scenario.played(t, home, thisTree)
 	for i, step := range scenario.steps {
 		what := scenario.name + ": " + step.name
-		if step.refusedAnew != "" {
+		if step.refusedAnew != "" || step.withoutStamp != "" {
 			if i != len(scenario.steps)-1 {
 				t.Errorf("%s: a sync that the trees do differently is not the last of its scenario", what)
 			}
 			c.inPart++
-			refusedAnew(t, what, step.refusedAnew, want[i], got[i])
+			if step.refusedAnew != "" {
+				refusedAnew(t, what, step.refusedAnew, want[i], got[i])
+			} else {
+				withoutStamp(t, what, step.withoutStamp, want[i], got[i])
+			}
 			continue
 		}
 		if c.whole(t, what, want[i].err, got[i].err) {
@@ -1276,6 +1301,26 @@ func refusedAnew(t *testing.T, what, words string, want, got syncOf) {
 		t.Errorf("%s: this tree wrote %q before it refused", what, got.left.Written)
 	}
 	oracle.Values(t, what+": the files after the refusal", got.before, got.left.Files)
+}
+
+// withoutStamp holds a sync that both trees fail to write, of the class the header names: the refusals are the
+// same, and so is everything the sync left but the stamp, which the other tree's project has and this tree's
+// has not.
+func withoutStamp(t *testing.T, what, stamp string, want, got syncOf) {
+	t.Helper()
+	if !oracle.Refusals(t, what, want.err, got.err) {
+		t.Errorf("%s: the two trees do not both fail: %v and %v", what, want.err, got.err)
+	}
+	if held, there := want.left.Files[stamp]; !there || held == nil {
+		t.Errorf("%s: the other tree's project has no stamp %s", what, stamp)
+	}
+	if _, there := got.left.Files[stamp]; there {
+		t.Errorf("%s: this tree's project has the stamp %s", what, stamp)
+	}
+	butTheStamp := want.left
+	butTheStamp.Files = maps.Clone(want.left.Files)
+	delete(butTheStamp.Files, stamp)
+	oracle.Values(t, what, butTheStamp, got.left)
 }
 
 // syncScenarios is the scenarios both trees must play alike: those the other tree's tests carry, and seeded
@@ -1504,8 +1549,8 @@ func syncScenarios(t *testing.T, home string) (carried, seeded []syncScenario) {
 		}},
 		{"a tag with a file where a folder of it lies", []syncStep{
 			{name: "a first sync", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA, "a.lua", "kept"))},
-			{name: "the tag that cannot be written", libraries: ex("v0.2.0", ""), served: at(v2, of(commitB, "a.lua", "new", "b", "a file", "b/c.lua", "below it"))},
-			{name: "the first tag again", libraries: ex("v0.1.0", "")},
+			{name: "the tag that cannot be written", libraries: ex("v0.2.0", ""), served: at(v2, of(commitB, "a.lua", "new", "b", "a file", "b/c.lua", "below it")),
+				withoutStamp: "project/.moonwell/libraries/ex/" + stampFile},
 		}},
 		{"the manifest's dir in other spellings", []syncStep{
 			{name: "src/", libraries: ex("v0.1.0", "src/"), served: ships},
@@ -1610,7 +1655,7 @@ func unusableScenarios(t *testing.T) []syncScenario {
 	return scenarios
 }
 
-// The four oracles of Sync run beside the other tests (t.Parallel): each plays its scenarios in folders of its
+// The five oracles of Sync run beside the other tests (t.Parallel): each plays its scenarios in folders of its
 // own and shares nothing with the rest.
 
 func TestOracleOnSyncingAsTheOtherTreesTestsDo(t *testing.T) {
@@ -1633,8 +1678,9 @@ func TestOracleOnSyncingSeededProjects(t *testing.T) {
 		compared.syncs(t, home, scenario)
 	}
 	// The scenarios of the list, the stamps, and the libraries with a file that cannot be used, each after a
-	// sync of a tag without it.
-	compared.check(t, tally{refused: 12, results: 23 + 22 + 8, inPart: 8})
+	// sync of a tag without it. In part: those libraries, and the tag that cannot be written, whose stamp this
+	// tree removes.
+	compared.check(t, tally{refused: 11, results: 22 + 22 + 8, inPart: 8 + 1})
 }
 
 // linkScenarios is projects and local libraries with a link in them: those both trees sync alike, and those of
@@ -1705,7 +1751,57 @@ func linkScenarios(t *testing.T, home string) []syncScenario {
 			{name: "the link", libraries: mine, refusedAnew: refused,
 				before: all(beside, local, emptyFolders("project/.moonwell/library-assets/mine"), linked("project/.moonwell/library-assets/mine/sub", "beside"))},
 		}},
+		{"a link to a folder in the lock's place", []syncStep{
+			{name: "the link", libraries: ex, served: served, refusedAnew: refused,
+				before: all(beside, with("project/.moonwell/libraries/gone/a.lua", "1"), linked("project/moonwell.lock", "beside"))},
+		}},
 	}
+}
+
+// linkedFile makes a link to a file, or to nothing where there is no such file. Both are paths below the folder
+// the project lies in. The test is skipped where the machine cannot make the link.
+func linkedFile(link, target string) func(*testing.T, string) {
+	return func(t *testing.T, home string) {
+		err := os.Symlink(filepath.Join(home, filepath.FromSlash(target)), filepath.Join(home, filepath.FromSlash(link)))
+		if err != nil {
+			t.Skipf("cannot create a symlink here: %v", err)
+		}
+	}
+}
+
+// linkedLockScenarios is projects with a link to a file in the lock's place, of the class the header names: the
+// other tree reads the lock through the link, and writes it through.
+func linkedLockScenarios(t *testing.T) []syncScenario {
+	const refused = "Symlinks are not supported: "
+	served := map[string][]byte{urlV1: tagArchive(t, commitA, "a.lua", "1")}
+	theirs := with("beside/their.lock", lockText(map[string]LockEntry{"other": {GitHub: "owner/other", Tag: "v1", Commit: commitB, Files: "sha256:x"}}))
+	stale := with("project/.moonwell/libraries/gone/a.lua", "1")
+	return []syncScenario{
+		{"a link to nothing in the lock's place", []syncStep{
+			{name: "a tag", libraries: block("ex", fromGitHub("v0.1.0", "")), served: served, refusedAnew: refused,
+				before: all(emptyFolders("beside"), stale, linkedFile("project/moonwell.lock", "beside/their.lock"))},
+		}},
+		{"a link to a lock in the lock's place", []syncStep{
+			{name: "a tag", libraries: block("ex", fromGitHub("v0.1.0", "")), served: served, refusedAnew: refused,
+				before: all(theirs, stale, linkedFile("project/moonwell.lock", "beside/their.lock"))},
+		}},
+		{"a link to a lock in the lock's place, without libraries", []syncStep{
+			{name: "none", libraries: block(), refusedAnew: refused,
+				before: all(theirs, stale, linkedFile("project/moonwell.lock", "beside/their.lock"))},
+		}},
+	}
+}
+
+// TestOracleOnSyncingAProjectWithALinkedLock needs links to files, which Windows lets only some users make: it
+// is skipped where the machine cannot make one.
+func TestOracleOnSyncingAProjectWithALinkedLock(t *testing.T) {
+	t.Parallel()
+	var compared tally
+	home := filepath.Join(t.TempDir(), "home")
+	for _, scenario := range linkedLockScenarios(t) {
+		compared.syncs(t, home, scenario)
+	}
+	compared.check(t, tally{inPart: 3})
 }
 
 func TestOracleOnSyncingAProjectWithLinks(t *testing.T) {
@@ -1716,8 +1812,8 @@ func TestOracleOnSyncingAProjectWithLinks(t *testing.T) {
 		compared.syncs(t, home, scenario)
 	}
 	// Alike: the links that are removed or passed over, and the one that is read as a file. In part: the links
-	// that are refused, two of them after a first sync.
-	compared.check(t, tally{refused: 1, results: 6 + 2, inPart: 8})
+	// that are refused, two of them after a first sync, and the link in the lock's place.
+	compared.check(t, tally{refused: 1, results: 6 + 2, inPart: 8 + 1})
 }
 
 // ---- one project, both trees ----

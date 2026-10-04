@@ -4,6 +4,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"testing"
@@ -274,5 +275,41 @@ func TestALockThatCannotBeWrittenOrRemovedIsRefusedByItsName(t *testing.T) {
 		if !fsx.Exists(filepath.Join(root, LockFile, "in the way")) {
 			t.Errorf("%s: the folder in the lock's place lost its file", name)
 		}
+	}
+}
+
+// The lock is committed, so a project can come with a link in its place: what is read through it is another
+// file, and what is written through it lies outside the project.
+
+func TestReadLockRefusesALinkInTheLocksPlace(t *testing.T) {
+	for _, kind := range linkedLocks {
+		t.Run(kind, func(t *testing.T) {
+			root, beside := t.TempDir(), t.TempDir()
+			linkTheLock(t, kind, root, beside)
+			entries, err := ReadLock(root)
+			refusedLink(t, err, kind, filepath.Join(root, LockFile), LockFile)
+			if entries != nil {
+				t.Errorf("a lock that is refused comes with %+v", entries)
+			}
+		})
+	}
+}
+
+func TestWriteLockRefusesALinkInTheLocksPlace(t *testing.T) {
+	for _, kind := range linkedLocks {
+		t.Run(kind, func(t *testing.T) {
+			for name, entries := range map[string]map[string]LockEntry{"written": {"a": entryOfTest(nil)}, "removed": nil} {
+				root, beside := t.TempDir(), t.TempDir()
+				linkTheLock(t, kind, root, beside)
+				before, _ := filesBelow(t, beside)
+				refusedLink(t, WriteLock(root, entries), name, filepath.Join(root, LockFile), LockFile)
+				if after, _ := filesBelow(t, beside); !reflect.DeepEqual(after, before) {
+					t.Errorf("%s: the lock was written or removed through the link: %v", name, slices.Sorted(maps.Keys(after)))
+				}
+				if info, err := fsx.Lstat(filepath.Join(root, LockFile)); err != nil || info == nil || !fsx.IsLink(info) {
+					t.Errorf("%s: the link is gone", name)
+				}
+			}
+		})
 	}
 }

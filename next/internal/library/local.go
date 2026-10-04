@@ -1,8 +1,10 @@
 package library
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -23,13 +25,14 @@ func syncLocal(root string, at folders, path, dir, manifestFile string) (shipsAs
 		return false, err
 	}
 	// Both folders are planned before either is written: a link in one of them is refused with nothing written.
-	modules, err := mirrorOf(root, modulesOf(at.key), kept.modules, stampOfFolder(from.modules))
+	stamp := file{stampFile, []byte(stampOfFolder(from.modules))}
+	modules, err := mirrorOf(root, modulesOf(at.key), append(slices.Clone(kept.modules), stamp))
 	if err != nil {
 		return false, err
 	}
 	writeAssets := func() error { return removeAssets(at) }
 	if kept.shipsAssets {
-		assets, err := mirrorOf(root, assetsOf(at.key), kept.assets, "")
+		assets, err := mirrorOf(root, assetsOf(at.key), kept.assets)
 		if err != nil {
 			return false, err
 		}
@@ -91,7 +94,7 @@ func describedAt(key, libraryFile string) (Described, error) {
 // readLocal reads the files that are kept of a local library. The folder of the files for the map holds no
 // modules, also when it lies inside the module folder.
 func readLocal(key string, from sources, manifestFile string) (shipped, error) {
-	kept := shipped{shipsAssets: from.assets != ""}
+	kept := shipped{shipsAssets: from.assets != "", local: true}
 	var err error
 	if kept.modules, err = readBelow(from.modules, isModule, from.assets); err == nil && kept.shipsAssets {
 		kept.assets, err = readBelow(from.assets, anyFile, "")
@@ -157,75 +160,134 @@ func listBelow(dir, prefix string, wanted func(name string) bool, skip string) (
 
 // ---- writing its copy ----
 
-// mirror is a folder of the project that is made to hold exactly the files of a local library.
+// mirror is a folder of the project that is made to hold exactly the files of a local library, the stamp among
+// them where the folder has one.
 type mirror struct {
 	label   string   // the folder, from the project folder
 	folder  string   // the folder on disk
 	files   []file   // what it holds afterwards
 	targets []string // where each of the files lies on disk
-	stamp   string   // the stamp it holds beside the files; "" for none
-	stampAt string   // where the stamp lies on disk
+	anew    bool     // the folder is removed and made again: something in it lies where a file cannot be written
 }
 
-// mirrorOf plans the mirror of files in the folder label of the project at root, with a stamp when one is
-// given. Nothing is written: a link at the folder, at one of the files or on the way to one is refused here.
-func mirrorOf(root, label string, files []file, stamp string) (mirror, error) {
-	planned := mirror{label: label, files: files, stamp: stamp, targets: make([]string, len(files))}
+// mirrorOf plans the mirror of files in the folder label of the project at root. Nothing is written: a link at
+// the folder, at one of the files or on the way to one is refused here.
+func mirrorOf(root, label string, files []file) (mirror, error) {
+	planned := mirror{label: label, files: files, targets: make([]string, len(files))}
 	var err error
 	if planned.folder, err = inProject(root, label, label); err != nil {
 		return mirror{}, err
 	}
+	planned.anew = liesInTheWay(planned.folder, files)
 	for i, f := range files {
-		if planned.targets[i], err = inProject(root, label+"/"+f.name, label); err != nil {
-			return mirror{}, err
-		}
-	}
-	if stamp != "" {
-		if planned.stampAt, err = inProject(root, label+"/"+stampFile, label); err != nil {
-			return mirror{}, err
+		path := label + "/" + f.name
+		var refused *diag.Error
+		// A folder that is made anew is reached again when it is written: what lies in the way of a file keeps
+		// some systems from looking at the file's place at all.
+		switch planned.targets[i], err = fsx.SafeJoin(root, path); {
+		case errors.As(err, &refused):
+			return mirror{}, errRefusedPath(path, refused)
+		case err != nil && !planned.anew:
+			return mirror{}, errUnwritable(label, err)
 		}
 	}
 	return planned, nil
 }
 
-// write makes the folder hold the files and the stamp: a file whose bytes changed is written, every file that
-// is not among them is removed, and the stamp is written last.
+// liesInTheWay reports whether the folder holds something where a file of the library cannot be written: a file
+// in the place of the folder itself or of a folder on the way to a file, or a folder in the place of a file. A
+// library gets there when a file of it becomes a folder of the same name, or the reverse. A link is none of
+// these: it is refused where the path is reached.
+func liesInTheWay(folder string, files []file) bool {
+	if info, err := fsx.Lstat(folder); err == nil && info != nil && !info.IsDir() && !fsx.IsLink(info) {
+		return true
+	}
+	for _, f := range files {
+		path, segments := folder, strings.Split(f.name, "/")
+		for i, segment := range segments {
+			path = filepath.Join(path, segment)
+			info, err := fsx.Lstat(path)
+			if err != nil || info == nil || fsx.IsLink(info) {
+				break
+			}
+			if isFile := i == len(segments)-1; info.IsDir() == isFile {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// write makes the folder hold the files: a file whose bytes changed is written, and every file that is not among
+// them is removed. Where that cannot give the library's own names, the folder is removed and every file written
+// again: the folder is the program's own, and module names tell letter case apart.
 func (m mirror) write() error {
-	if err := m.writeFiles(); err != nil {
+	anew := m.anew
+	if !anew {
+		var err error
+		if anew, err = m.writeChanged(); err != nil {
+			return errUnwritable(m.label, err)
+		}
+	}
+	if !anew {
+		return nil
+	}
+	if err := writeAnew(m.folder, m.files); err != nil {
+		return errUnwritable(m.label, err)
+	}
+	// A library without files has its folder all the same.
+	if err := os.MkdirAll(m.folder, 0o777); err != nil {
 		return errUnwritable(m.label, err)
 	}
 	return nil
 }
 
-// writeFiles does what write says. Its failures are the system's.
-func (m mirror) writeFiles() error {
-	kept := map[string]bool{}
+// writeChanged writes the files whose bytes changed, and removes every file of the folder that is not among
+// them. It removes nothing, and says so, when the folder spells a file in another letter case than the library
+// does: where letter case is ignored, the file was written under the folder's spelling, and removing that name
+// would remove the file. Its failures are the system's.
+func (m mirror) writeChanged() (spelledAnother bool, err error) {
 	for i, f := range m.files {
-		kept[f.name] = true
 		if _, err := fsx.WriteIfChanged(m.targets[i], string(f.data)); err != nil {
-			return err
+			return false, err
 		}
 	}
 	if err := os.MkdirAll(m.folder, 0o777); err != nil {
-		return err
+		return false, err
 	}
 	existing, err := fsx.ListFiles(m.folder)
 	if err != nil {
-		return err
+		return false, err
+	}
+	others, spelledAnother := m.others(existing)
+	if spelledAnother {
+		return true, nil
+	}
+	for _, name := range others {
+		if err := os.Remove(filepath.Join(m.folder, filepath.FromSlash(name))); err != nil {
+			return false, err
+		}
+	}
+	return false, nil
+}
+
+// others is the names among existing, as the folder spells them, that are none of the files; and whether one of
+// them is a file in another letter case.
+func (m mirror) others(existing []string) (others []string, spelledAnother bool) {
+	kept, folded := map[string]bool{}, map[string]bool{}
+	for _, f := range m.files {
+		kept[f.name], folded[strings.ToLower(f.name)] = true, true
 	}
 	for _, name := range existing {
-		if kept[name] || (m.stamp != "" && name == stampFile) {
-			continue
-		}
-		if err := os.Remove(filepath.Join(m.folder, filepath.FromSlash(name))); err != nil {
-			return err
+		switch {
+		case kept[name]:
+		case folded[strings.ToLower(name)]:
+			return nil, true
+		default:
+			others = append(others, name)
 		}
 	}
-	if m.stamp == "" {
-		return nil
-	}
-	_, err = fsx.WriteIfChanged(m.stampAt, m.stamp)
-	return err
+	return others, false
 }
 
 // ---- errors ----

@@ -190,20 +190,37 @@ func short(commit string, length int) string { return commit[:min(length, len(co
 
 // ---- writing what is kept ----
 
-// writeDownloaded makes the library's two folders hold what is kept of a tag. The files for the map are written
-// first and the stamp, which is in the module folder, last: a sync that is interrupted leaves folders that hold
-// no entry, and they are downloaded again.
+// writeDownloaded makes the library's two folders hold what is kept of a tag. From its first step to its last
+// the folders hold no entry, so a sync that is interrupted anywhere between them is downloaded again: the stamp
+// the module folder has is removed first, then the files for the map are replaced, and the module folder, which
+// comes with the stamp of the tag, is replaced last.
 func writeDownloaded(root string, at folders, kept shipped, entry LockEntry) error {
-	var err error
-	if !kept.shipsAssets {
-		err = removeAssets(at)
-	} else {
+	err := dropStamp(at)
+	switch {
+	case err != nil:
+		return err
+	case kept.shipsAssets:
 		err = replace(root, AssetsDir, at.key, kept.assets, "")
+	default:
+		err = removeAssets(at)
 	}
 	if err != nil {
 		return err
 	}
 	return replace(root, ModulesDir, at.key, kept.modules, stampOf(entry))
+}
+
+// dropStamp removes the stamp of the library's module folder. A stamp that is no file is left: no entry is read
+// from it.
+func dropStamp(at folders) error {
+	stamp := filepath.Join(at.modules, stampFile)
+	if info, err := fsx.Lstat(stamp); err != nil || info == nil || info.IsDir() {
+		return nil
+	}
+	if err := fsx.RemoveFile(stamp); err != nil {
+		return errUnwritable(modulesOf(at.key), err)
+	}
+	return nil
 }
 
 // replace writes the files, and the stamp when one is given, into the folder .<key>.tmp of dir, which then takes

@@ -60,6 +60,10 @@ func Sync(ctx context.Context, e *env.Env, libraries map[string]manifest.Library
 	if err := refuseKeys(keys, manifestFile); err != nil {
 		return nil, err
 	}
+	// Before anything is removed: the lock is read after the folders of libraries that left are gone.
+	if err := refuseLinkedLock(e.Root); err != nil {
+		return nil, err
+	}
 	// Before any library is synced: where letter case is ignored, a folder lib that is left of another library
 	// would take the files of the library Lib, and be removed afterwards.
 	if err := removeStale(e.Root, keys); err != nil {
@@ -112,22 +116,34 @@ func isKey(key string) bool {
 // left. The two folders are the program's own: a project keeps nothing else in them. An entry that is a link is
 // removed as the link it is, and what it points to stays.
 func removeStale(root string, keys []string) error {
-	for _, dir := range []string{ModulesDir, AssetsDir} {
-		folder, err := inProject(root, dir, dir)
-		if err != nil {
-			return err
+	// Both folders are reached before anything is removed from either: a link at the second is refused with the
+	// first as it was.
+	modules, err := inProject(root, ModulesDir, ModulesDir)
+	if err != nil {
+		return err
+	}
+	assets, err := inProject(root, AssetsDir, AssetsDir)
+	if err != nil {
+		return err
+	}
+	if err := removeOthers(modules, ModulesDir, keys); err != nil {
+		return err
+	}
+	return removeOthers(assets, AssetsDir, keys)
+}
+
+// removeOthers removes every entry of folder whose name is not among the keys. dir names the folder in errors.
+func removeOthers(folder, dir string, keys []string) error {
+	entries, err := os.ReadDir(folder)
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return errUnwritable(dir, err)
+	}
+	for _, entry := range entries {
+		if slices.Contains(keys, entry.Name()) {
+			continue
 		}
-		entries, err := os.ReadDir(folder)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			return errUnwritable(dir, err)
-		}
-		for _, entry := range entries {
-			if slices.Contains(keys, entry.Name()) {
-				continue
-			}
-			if err := fsx.RemoveAll(filepath.Join(folder, entry.Name())); err != nil {
-				return errUnwritable(dir+"/"+entry.Name(), err)
-			}
+		if err := fsx.RemoveAll(filepath.Join(folder, entry.Name())); err != nil {
+			return errUnwritable(dir+"/"+entry.Name(), err)
 		}
 	}
 	return nil
@@ -140,6 +156,11 @@ func syncEach(
 ) ([]Synced, map[string]LockEntry, error) {
 	synced, entries := make([]Synced, 0, len(keys)), map[string]LockEntry{}
 	for _, key := range keys {
+		// A sync that is stopped ends between two libraries, with the context's own error: a local library is
+		// synced without a download that would see it.
+		if err := ctx.Err(); err != nil {
+			return nil, nil, err
+		}
 		var locked *LockEntry
 		if entry, isLocked := lock[key]; isLocked {
 			locked = &entry
@@ -251,20 +272,21 @@ type shipped struct {
 	modules     []file
 	assets      []file
 	shipsAssets bool // the library names a folder of files for the map
+	local       bool // the library is a folder of the user's own, whose files the user can rename
 }
 
 // refuseUnusable refuses a library with a file that not every system can hold where it is written.
 func (s shipped) refuseUnusable(key, manifestFile string) error {
-	if err := refuseUnusableNames(key, "module", s.modules, manifestFile); err != nil {
+	if err := s.refuseUnusableNames(key, "module", s.modules, manifestFile); err != nil {
 		return err
 	}
-	return refuseUnusableNames(key, "assets", s.assets, manifestFile)
+	return s.refuseUnusableNames(key, "assets", s.assets, manifestFile)
 }
 
 // refuseUnusableNames refuses files of one folder of a library that a folder cannot hold on every system: a file
 // with a name Windows cannot hold, and two files whose paths differ only in letter case, which are one file
 // there. kind names the folder: "module" or "assets".
-func refuseUnusableNames(key, kind string, files []file, manifestFile string) error {
+func (s shipped) refuseUnusableNames(key, kind string, files []file, manifestFile string) error {
 	names := make([]string, len(files))
 	for i, f := range files {
 		names[i] = f.name
@@ -273,10 +295,10 @@ func refuseUnusableNames(key, kind string, files []file, manifestFile string) er
 	spelled := map[string]string{} // each path by its spelling in lower case
 	for _, name := range names {
 		if _, portable := fsx.RelPath(name); !portable || !insideLibrary(name) {
-			return errUnusableName(key, kind, name, manifestFile)
+			return errUnusableName(key, kind, name, manifestFile, s.local)
 		}
 		if other, taken := spelled[strings.ToLower(name)]; taken {
-			return errTwoSpellings(key, kind, other, name, manifestFile)
+			return errTwoSpellings(key, kind, other, name, manifestFile, s.local)
 		}
 		spelled[strings.ToLower(name)] = name
 	}
@@ -312,10 +334,10 @@ func errNeitherLocalNorOfGitHub(key string) error {
 
 func errUnusableKey(key, manifestFile string) error {
 	return &diag.Error{
-		Msg:  "Library " + key + ": Windows cannot hold a folder of that name.",
+		Msg:  "Library " + key + ": its key is a name that Windows keeps for a device.",
 		File: manifestFile,
-		Hint: "Give the library another key: each library gets a folder in " + ModulesDir + "/, and " + key +
-			" is the name of a device there.",
+		Hint: "Give the library another key: each library gets a folder of its key's name in " + ModulesDir +
+			"/, and Windows cannot make a folder named " + key + ".",
 	}
 }
 
@@ -345,18 +367,29 @@ func errUnwritable(path string, cause error) error {
 	}
 }
 
-func errUnusableName(key, kind, name, manifestFile string) error {
+// The two refusals of a file that cannot be used have a hint for the one who can act on it: the author of a
+// downloaded library, or the user, whose own folder a local library is.
+
+func errUnusableName(key, kind, name, manifestFile string, local bool) error {
+	hint := reportHint
+	if local {
+		hint = "Rename the file in the library, or set the library's dir to a folder without it."
+	}
 	return &diag.Error{
 		Msg:  "Library " + key + ": " + name + " in its " + kind + " folder has a name that Windows cannot hold.",
 		File: manifestFile,
-		Hint: reportHint,
+		Hint: hint,
 	}
 }
 
-func errTwoSpellings(key, kind, first, second, manifestFile string) error {
+func errTwoSpellings(key, kind, first, second, manifestFile string, local bool) error {
+	hint := reportHint
+	if local {
+		hint = "Rename one of them in the library, or set the library's dir to a folder without them."
+	}
 	return &diag.Error{
 		Msg:  "Library " + key + ": " + first + " and " + second + " in its " + kind + " folder differ only in letter case.",
 		File: manifestFile,
-		Hint: reportHint,
+		Hint: hint,
 	}
 }
