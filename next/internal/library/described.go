@@ -1,12 +1,3 @@
-// Package library brings a project's libraries of modules up to date: GitHub tag archives and local folders are
-// copied into .moonwell/libraries/ and .moonwell/library-assets/, and moonwell.lock records what the tags resolved
-// to.
-//
-// It takes the manifest's libraries and the outside world, and returns where each library lies.
-//
-// It knows nothing of modules, of maps or of what is done with the files.
-//
-// Of Moonwell it imports manifest, env, diag and fsx.
 package library
 
 import (

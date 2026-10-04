@@ -19,8 +19,12 @@ import (
 	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
 	oldlibrary "github.com/mdlsvensson/moonwell/internal/library"
 	"github.com/mdlsvensson/moonwell/internal/ordered"
+	oldproject "github.com/mdlsvensson/moonwell/internal/project"
+	oldtestkit "github.com/mdlsvensson/moonwell/internal/testkit"
 	oldtext "github.com/mdlsvensson/moonwell/internal/text"
+	"github.com/mdlsvensson/moonwell/next/internal/env"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
+	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
@@ -49,6 +53,16 @@ import (
 //     seeded repositories and tags.
 //   - DownloadTag against downloadTag: what is refused, else the commit and the files; and the addresses asked.
 //     The network fails, answers with every kind of status, and serves archives of every kind.
+//   - Sync against Sync. Each tree plays a scenario, which is syncs of one project one after another with changes
+//     between them, from nothing and at one path: the other tree first, then the folder is emptied and this tree
+//     plays it. After each sync: what is refused; every file and folder of the project and beside it, by its
+//     bytes (.moonwell/, moonwell.lock, and the local libraries, which must stay as they are); which files were
+//     written at all; the lines logged; the addresses asked. Where neither refuses, what this tree's Sync
+//     returns is held against the folders the other tree made. The scenarios are those of the other tree's
+//     tests, and seeded ones: local libraries and tags side by side, libraries that gain and lose files for the
+//     map, locks and stamps of every kind, spellings of the manifest's dir, and folders that cannot be written.
+//   - Sync after Sync on one folder: a project that one tree synced is synced by the other. It must download
+//     nothing, write nothing and leave every file as it is, in both directions.
 //
 // Compared in part, and counted (tally.inPart). Each class is decided on the input or on the other tree's
 // result, and the two trees must differ on it.
@@ -76,9 +90,33 @@ import (
 //   - A lock that cannot be written or removed. The other tree's WriteLock passes the system's error on, and its
 //     Sync words it; this tree's WriteLock words it, in the words of that Sync, which are written out here
 //     (TestALockThatCannotBeWrittenOrRemovedIsRefusedByItsName).
+//   - A sync of a library with a kept file that a folder cannot hold on every system: a name Windows cannot hold,
+//     or two paths that differ only in letter case. The other tree writes them, as far as the system lets it;
+//     this tree refuses the library before it writes anything. The class is decided on the scenario, which names
+//     the words of the refusal: this tree must refuse in those words and leave every file as it was, and the
+//     other tree must not refuse in them (TestADownloadedFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten,
+//     TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten, and the two tests of
+//     local files).
+//   - A sync of a project with a link at a folder that Sync writes or removes. The other tree writes and removes
+//     through the link; this tree refuses the link first. Decided and compared as the class before it
+//     (TestALinkAtAFolderOfTheLibrariesIsRefusedBeforeAnythingGoesThroughIt).
 //
 // Not among the inputs:
 //
+//   - A library key that is the name of a device on Windows (aux, nul): what the other tree does with a folder
+//     of such a name depends on the Windows it runs on. This tree refuses the key
+//     (TestALibraryKeyThatWindowsCannotHoldAsAFolderIsRefused).
+//   - Two GitHub libraries whose keys are whole numbers, in one project: the two trees write the lock in another
+//     order, which the oracle of writing the lock compares.
+//   - A local library, with files for the map, whose module folder in the project has a file where a folder of
+//     the library goes: on a system that names that failure when the path is looked at, this tree refuses before
+//     the files for the map are written, and the other tree after (TestAFolderThatCannotBeWrittenNamesTheFolder).
+//   - A local library with a file whose name has a backslash, which only a system other than Windows holds: this
+//     tree refuses it as a name Windows cannot hold
+//     (TestALocalFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten).
+//   - Of the other tree's tests of Sync: the two that download from GitHub, and the path of a project in capital
+//     letters, which only Windows takes for the project's own. Its local library with a link that leads nowhere
+//     is here a link to a folder under a module's name, which no system reads as a file either.
 //   - A lock file with a part of a character that is cut short inside a string (the first two bytes of three):
 //     this tree reads each byte that is not UTF-8 as one U+FFFD, as encoding/json does, and the other tree reads
 //     such a run as one. A byte that is no part of a character reads as one U+FFFD in both, and is among the
@@ -971,4 +1009,777 @@ func TestOracleOnDownloadingATag(t *testing.T) {
 	}
 	// The refusals are those of the list and the paths that would not stay inside the library.
 	compared.check(t, tally{refused: 21 + 10, results: 7, inPart: 6})
+}
+
+// ---- syncing ----
+
+// syncStep is one sync of a project, and what changes before it.
+type syncStep struct {
+	name      string
+	before    func(t *testing.T, home string) // what changes in the folder the project lies in
+	libraries map[string]manifest.Library
+	served    map[string][]byte // the archives of tags by their address; no other address is there
+	// answers is what the network answers to every address, in place of served.
+	answers func(root string) (int, []byte, error)
+	// refusedAnew is the words of this tree's refusal of a sync that the other tree does: a class the header
+	// names. Such a sync is the last of its scenario, since the two projects differ after it.
+	refusedAnew string
+}
+
+// syncScenario is syncs of one project, one after another.
+type syncScenario struct {
+	name  string
+	steps []syncStep
+}
+
+// leftBy is what a sync left, as both trees are compared by.
+type leftBy struct {
+	Files   map[string]*string // every file below the folder the project lies in, by what it holds; nil for a folder
+	Written []string           // the files that were written, whatever they held before
+	Lines   []string           // the lines logged
+	Asked   []string           // the addresses asked
+}
+
+// syncOf is one sync as a tree did it.
+type syncOf struct {
+	before map[string]*string // the files before it
+	left   leftBy
+	lies   []Synced // what this tree's Sync returned
+	err    error
+}
+
+// syncedAs is where a library lies, as both trees are compared by.
+type syncedAs struct{ Key, Modules, Assets string }
+
+// syncing is the Sync of a tree, on the project at root.
+type syncing func(t *testing.T, root string, libraries map[string]manifest.Library, fetch env.FetchFunc) (lines []string, lies []Synced, err error)
+
+func theOtherTree(_ *testing.T, root string, libraries map[string]manifest.Library, fetch env.FetchFunc) ([]string, []Synced, error) {
+	log := oldtestkit.NewRecorder()
+	block := &ordered.Map[oldproject.Library]{}
+	for _, key := range slices.Sorted(maps.Keys(libraries)) {
+		library := libraries[key]
+		block.Set(key, oldproject.Library{GitHub: library.GitHub, Tag: library.Tag, Path: library.Path, Dir: library.Dir})
+	}
+	err := oldlibrary.Sync(background, root, block, manifestFile, oldlibrary.Deps{Fetch: oldlibrary.Fetch(fetch), Log: log.Logger})
+	return log.Lines, nil, err
+}
+
+// thisTree hands Sync the parts of the outside world that it uses: the project folder, the log and the network.
+func thisTree(_ *testing.T, root string, libraries map[string]manifest.Library, fetch env.FetchFunc) ([]string, []Synced, error) {
+	log := testkit.NewRecorder()
+	lies, err := Sync(background, &env.Env{Root: root, Log: log.Logger, Fetch: fetch}, libraries, manifestFile)
+	return log.Lines(), lies, err
+}
+
+// with writes files below the folder the project lies in: each a path and what the file holds.
+func with(files ...string) func(*testing.T, string) {
+	return func(t *testing.T, home string) { put(t, home, files...) }
+}
+
+// without removes files and folders below the folder the project lies in.
+func without(paths ...string) func(*testing.T, string) {
+	return func(t *testing.T, home string) {
+		for _, path := range paths {
+			discard(t, home, path)
+		}
+	}
+}
+
+// emptyFolders makes folders below the folder the project lies in.
+func emptyFolders(paths ...string) func(*testing.T, string) {
+	return func(t *testing.T, home string) {
+		for _, path := range paths {
+			if err := os.MkdirAll(filepath.Join(home, filepath.FromSlash(path)), 0o777); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+}
+
+// linked makes a link to the folder target. Both are paths below the folder the project lies in.
+func linked(link, target string) func(*testing.T, string) {
+	return func(t *testing.T, home string) {
+		testkit.LinkDir(t, filepath.Join(home, filepath.FromSlash(target)), filepath.Join(home, filepath.FromSlash(link)))
+	}
+}
+
+// all is changes, one after another.
+func all(changes ...func(*testing.T, string)) func(*testing.T, string) {
+	return func(t *testing.T, home string) {
+		for _, change := range changes {
+			change(t, home)
+		}
+	}
+}
+
+// filesBelow is every file and folder below dir: a file by what it holds, a folder as nil, and a link, which is
+// not followed, by a word. written is the files that were written since makeOld.
+func filesBelow(t *testing.T, dir string) (files map[string]*string, written []string) {
+	t.Helper()
+	files = map[string]*string{}
+	eachBelow(t, dir, func(path, name string, info fs.FileInfo) {
+		switch {
+		case info.IsDir():
+			files[name] = nil
+		case fsx.IsLink(info):
+			word := "a link"
+			files[name] = &word
+		default:
+			data, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			held := string(data)
+			files[name] = &held
+			if !info.ModTime().Equal(longAgo) {
+				written = append(written, name)
+			}
+		}
+	})
+	return files, written
+}
+
+// eachBelow calls visit for every file, folder and link below dir, with its path on disk and its path from dir.
+func eachBelow(t *testing.T, dir string, visit func(path, name string, info fs.FileInfo)) {
+	t.Helper()
+	err := filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil || path == dir {
+			return err
+		}
+		info, err := entry.Info()
+		if err != nil {
+			return err
+		}
+		below, err := filepath.Rel(dir, path)
+		visit(path, filepath.ToSlash(below), info)
+		return err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// makeOld sets the time every file below dir was last written to longAgo.
+func makeOld(t *testing.T, dir string) {
+	t.Helper()
+	eachBelow(t, dir, func(path, _ string, info fs.FileInfo) {
+		if !info.Mode().IsRegular() || info.ModTime().Equal(longAgo) {
+			return
+		}
+		if err := os.Chtimes(path, longAgo, longAgo); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+// played is the scenario as a tree plays it in the folder home, from nothing. The project is home/project.
+func (s syncScenario) played(t *testing.T, home string, sync syncing) []syncOf {
+	t.Helper()
+	root := filepath.Join(home, "project")
+	if err := os.RemoveAll(home); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(root, 0o777); err != nil {
+		t.Fatal(err)
+	}
+	var syncs []syncOf
+	for _, step := range s.steps {
+		if step.before != nil {
+			step.before(t, home)
+		}
+		makeOld(t, home)
+		var done syncOf
+		if step.refusedAnew != "" {
+			done.before, _ = filesBelow(t, home)
+		}
+		fetch := func(_ context.Context, url string) (int, []byte, error) {
+			done.left.Asked = append(done.left.Asked, url)
+			if step.answers != nil {
+				return step.answers(root)
+			}
+			if body, there := step.served[url]; there {
+				return 200, slices.Clone(body), nil
+			}
+			return 404, []byte("Not Found"), nil
+		}
+		done.left.Lines, done.lies, done.err = sync(t, root, step.libraries, fetch)
+		done.left.Files, done.left.Written = filesBelow(t, home)
+		syncs = append(syncs, done)
+	}
+	return syncs
+}
+
+// liesIn is where each library lies in the files a sync left: its module folder, which must be there, and its
+// folder of files for the map when there is one.
+func liesIn(t *testing.T, what string, files map[string]*string, libraries map[string]manifest.Library) []syncedAs {
+	t.Helper()
+	lies := []syncedAs{}
+	for _, key := range slices.Sorted(maps.Keys(libraries)) {
+		at := syncedAs{Key: key, Modules: ".moonwell/libraries/" + key}
+		if held, there := files["project/"+at.Modules]; !there || held != nil {
+			t.Errorf("%s: the other tree left no folder %s", what, at.Modules)
+		}
+		assets := ".moonwell/library-assets/" + key
+		if held, there := files["project/"+assets]; there && held == nil {
+			at.Assets = assets
+		}
+		lies = append(lies, at)
+	}
+	return lies
+}
+
+// liesAs is what this tree's Sync returned, as it is compared.
+func liesAs(lies []Synced) []syncedAs {
+	compared := []syncedAs{}
+	for _, at := range lies {
+		compared = append(compared, syncedAs(at))
+	}
+	return compared
+}
+
+// syncs has both trees play a scenario at one path, the other tree first, and compares each sync of it.
+func (c *tally) syncs(t *testing.T, home string, scenario syncScenario) {
+	t.Helper()
+	want, got := scenario.played(t, home, theOtherTree), scenario.played(t, home, thisTree)
+	for i, step := range scenario.steps {
+		what := scenario.name + ": " + step.name
+		if step.refusedAnew != "" {
+			if i != len(scenario.steps)-1 {
+				t.Errorf("%s: a sync that the trees do differently is not the last of its scenario", what)
+			}
+			c.inPart++
+			refusedAnew(t, what, step.refusedAnew, want[i], got[i])
+			continue
+		}
+		if c.whole(t, what, want[i].err, got[i].err) {
+			oracle.Values(t, what+": what Sync returns", liesIn(t, what, want[i].left.Files, step.libraries), liesAs(got[i].lies))
+		} else if got[i].lies != nil {
+			t.Errorf("%s: a sync that is refused returns %+v", what, got[i].lies)
+		}
+		oracle.Values(t, what, want[i].left, got[i].left)
+	}
+}
+
+// refusedAnew holds a sync of a class the header names: this tree refuses it in the words given, writes no file
+// and leaves every file as it was, and the other tree does not refuse it in those words.
+func refusedAnew(t *testing.T, what, words string, want, got syncOf) {
+	t.Helper()
+	var theirs *olddiag.Error
+	if errors.As(want.err, &theirs) && strings.Contains(theirs.Msg, words) {
+		t.Errorf("%s: the other tree refuses it in the same words: %v", what, want.err)
+	}
+	if failure := asError(t, got.err, what); !strings.Contains(failure.Msg, words) || got.lies != nil {
+		t.Errorf("%s: this tree says %q and returns %+v, want a refusal with %q", what, failure.Msg, got.lies, words)
+	}
+	if got.left.Written != nil {
+		t.Errorf("%s: this tree wrote %q before it refused", what, got.left.Written)
+	}
+	oracle.Values(t, what+": the files after the refusal", got.before, got.left.Files)
+}
+
+// syncScenarios is the scenarios both trees must play alike: those the other tree's tests carry, and seeded
+// ones, with those of the class of files that cannot be used, which the header names. The project is
+// home/project, and the local libraries lie beside it.
+func syncScenarios(t *testing.T, home string) (carried, seeded []syncScenario) {
+	root, lib := filepath.Join(home, "project"), filepath.Join(home, "lib")
+	v2, v3 := archiveURL("owner/lib", "v0.2.0"), archiveURL("owner/lib", "v0.3.0")
+	of := func(commit string, files ...string) []byte { return tagArchive(t, commit, files...) }
+	at := func(address string, archive []byte) map[string][]byte { return map[string][]byte{address: archive} }
+	ex := func(tag, dir string) map[string]manifest.Library { return block("ex", fromGitHub(tag, dir)) }
+	mine := func(path, dir string) map[string]manifest.Library { return block("mine", fromFolder(path, dir)) }
+	plain := at(urlV1, of(commitA, "README.md", "# lib", "src/example/greet.lua", "return {}"))
+	one := at(urlV1, of(commitA, "src/a.lua", "1"))
+	ships := at(urlV1, of(commitA, shipping...))
+	// A lock entry and a stamp as a Moonwell that knows no files for the map leaves them: no hash of such files,
+	// and no layout.
+	before := `{"github":"owner/lib","tag":"v0.1.0","dir":"src","commit":"` + commitA + `","files":"sha256:from-0.5"}`
+	overridden := fromGitHub("v0.1.0", "")
+	overridden.Path = &lib
+	carried = []syncScenario{
+		{"a tag", []syncStep{
+			{name: "a first sync", libraries: ex("v0.1.0", "src"), served: plain},
+			{name: "a second with nothing to do", libraries: ex("v0.1.0", "src"), served: plain},
+			{name: "a third without the network", libraries: ex("v0.1.0", "src")},
+		}},
+		{"a tag that moved, and a tag that changed", []syncStep{
+			{name: "a first sync", libraries: ex("v0.1.0", "src"), served: one},
+			{name: "the tag moved, the folders hold it", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitB, "src/a.lua", "2"))},
+			{name: "the tag moved, the folders gone", before: without("project/.moonwell"), libraries: ex("v0.1.0", "src"),
+				served: at(urlV1, of(commitB, "src/a.lua", "2"))},
+			{name: "another tag", libraries: ex("v0.2.0", "src"), served: at(v2, of(commitB, "src/a.lua", "2"))},
+		}},
+		{"downloads that fail", []syncStep{
+			{name: "no such tag", libraries: ex("v0.1.0", "src")},
+			{name: "no answer", libraries: ex("v0.1.0", "src"),
+				answers: func(string) (int, []byte, error) { return 0, nil, errors.New("network down") }},
+			{name: "the server fails", libraries: ex("v0.1.0", "src"), answers: func(string) (int, []byte, error) { return 503, nil, nil }},
+			{name: "a page", libraries: ex("v0.1.0", "src"), served: at(urlV1, []byte("<html>"))},
+			{name: "no module folder", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitA, "lib/a.lua", "1"))},
+			{name: "no files at all", libraries: ex("v0.1.0", ""), served: at(urlV1, testkit.Zip(t, commitA))},
+			{name: "no files but those below a dot", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA, ".github/x.lua", "1"))},
+		}},
+		{"a local library", []syncStep{
+			{name: "a first sync", before: with("lib/src/example/greet.lua", "return 1", "lib/src/example/old.lua", "return 0"),
+				libraries: mine(lib, "src")},
+			{name: "a file changed, one gone and one new", libraries: mine(lib, "src"),
+				before: all(without("lib/src/example/old.lua"), with("lib/src/example/greet.lua", "return 2", "lib/src/example/same.lua", "same"))},
+			{name: "nothing changed", libraries: mine(lib, "src")},
+			{name: "by a path from the project", libraries: mine("../lib", "src")},
+			{name: "its path gone", libraries: mine(filepath.Join(lib, "missing"), "src")},
+			{name: "its dir gone", libraries: mine("../lib", "lua")},
+		}},
+		{"a local library in place of a tag", []syncStep{
+			{name: "the tag", libraries: ex("v0.1.0", "src"), served: one},
+			{name: "the local library", before: with("lib/a.lua", "local"), libraries: block("ex", overridden), served: one},
+			{name: "the tag again, moved", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitB, "src/a.lua", "2"))},
+			{name: "the tag again, as it was", libraries: ex("v0.1.0", "src"), served: one},
+		}},
+		{"a library that leaves the manifest", []syncStep{
+			{name: "a first sync", libraries: ex("v0.1.0", "src"), served: one},
+			{name: "the library gone", before: with("project/.moonwell/libraries/.ex.tmp/a.lua", "left by an interrupted sync"),
+				libraries: block(), served: one},
+		}},
+		{"archives with paths that leave the library", []syncStep{
+			{name: "../x.lua", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitA, "src/a.lua", "1", "../x.lua", "2"))},
+			{name: "src/../../x.lua", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitA, "src/a.lua", "1", "src/../../x.lua", "2"))},
+			{name: "src/./a.lua", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitA, "src/a.lua", "1", "src/./a.lua", "2"))},
+			{name: "src//a.lua", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitA, "src/a.lua", "1", "src//a.lua", "2"))},
+			{name: `src/a\b.lua`, libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitA, "src/a.lua", "1", `src/a\b.lua`, "2"))},
+			{name: "src/c:.lua", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitA, "src/a.lua", "1", "src/c:.lua", "2"))},
+		}},
+		{"names that are refused before any download", []syncStep{
+			{name: "the repository .", libraries: block("ex", githubLibrary("owner/.", "v0.1.0", "")), served: one},
+			{name: "the repository ..", libraries: block("ex", githubLibrary("owner/..", "v0.1.0", "")), served: one},
+			{name: "the tag ..", libraries: ex("..", "src"), served: one},
+			{name: "the tag .", libraries: ex(".", "src"), served: one},
+			{name: "the tag ../../other/repo", libraries: ex("../../other/repo", "src"), served: one},
+			{name: "the tag v1/./x", libraries: ex("v1/./x", "src"), served: one},
+			{name: "the tag a/..", libraries: ex("a/..", "src"), served: one},
+			{name: "two keys that differ only in letter case", before: with("project/.moonwell/libraries/stale/a.lua", "stale"),
+				libraries: block("lib", fromGitHub("v0.1.0", "src"), "Lib", fromGitHub("v0.1.0", "src")), served: one},
+		}},
+		{"a lock that cannot be written", []syncStep{
+			// The lock is read before the download and written after it: a folder in its place makes the write fail.
+			{name: "a folder in its place", libraries: ex("v0.1.0", "src"), answers: func(root string) (int, []byte, error) {
+				if err := os.MkdirAll(filepath.Join(root, LockFile, "in-the-way"), 0o777); err != nil {
+					t.Error(err)
+				}
+				return 200, slices.Clone(one[urlV1]), nil
+			}},
+		}},
+		{"a local library that holds the project's libraries", []syncStep{
+			{name: "the project", before: all(with("project/a.lua", "return 1"), emptyFolders("project/.moonwell")), libraries: mine(root, "")},
+			{name: "the project, by a path from it", libraries: mine(".", "")},
+			{name: "its .moonwell", libraries: mine(filepath.Join(root, ".moonwell"), "")},
+			{name: "the folder of the libraries", libraries: mine(".moonwell/libraries", "")},
+			{name: "the folder the project lies in", libraries: mine("..", "")},
+			{name: "the project by the dir", before: with("project/src/a.lua", "return 2"), libraries: mine("src", "..")},
+		}},
+		{"a local library's modules", []syncStep{
+			{name: "only .yue and .lua, and nothing below a dot", libraries: mine(lib, ""), before: with(
+				"lib/a.lua", "return 1", "lib/b.yue", "x = 1", "lib/README.md", "# lib", "lib/.git/hooks/x.lua", "return 0",
+				"lib/.git/HEAD", "ref: refs/heads/main", "lib/tools/.cache/c.lua", "return 0", "lib/lua", "no module", "lib/c.lua.txt", "no module",
+				"lib/deep/er/d.yue", "y = 2", "lib/.hidden.lua", "return 0", "lib/empty.lua", "",
+				// A file of the copy that is no module of the library.
+				"project/.moonwell/libraries/mine/README.md", "# old", "project/.moonwell/libraries/mine/gone/x.lua", "return 0")},
+		}},
+		{"a tag's files", []syncStep{
+			{name: "nothing below a dot", libraries: ex("v0.1.0", ""),
+				served: at(urlV1, of(commitA, "a.lua", "return 1", ".github/workflows/x.lua", "return 0", "LICENSE", "MIT", "b/.c/d.lua", "0", ".e.lua", "0"))},
+		}},
+		{"the library's file names its module folder", []syncStep{
+			{name: "the library's dir", libraries: ex("v0.1.0", ""),
+				served: at(urlV1, of(commitA, "moonwell-library.json", `{"dir":"src"}`, "src/a.lua", "from src", "other/b.lua", "from other"))},
+			{name: "the manifest's dir wins", libraries: ex("v0.1.0", "other"),
+				served: at(urlV1, of(commitA, "moonwell-library.json", `{"dir":"src"}`, "src/a.lua", "from src", "other/b.lua", "from other"))},
+		}},
+		{"a library's files for the map", []syncStep{
+			{name: "a first sync", libraries: ex("v0.1.0", ""), served: ships},
+			{name: "a second with nothing to do", libraries: ex("v0.1.0", ""), served: ships},
+			{name: "the folder of every library's files gone", before: without("project/.moonwell/library-assets"), libraries: ex("v0.1.0", ""), served: ships},
+			{name: "the library's folder of files gone", before: without("project/.moonwell/library-assets/ex"), libraries: ex("v0.1.0", ""), served: ships},
+			{name: "a file in place of that folder", before: all(without("project/.moonwell/library-assets/ex"), with("project/.moonwell/library-assets/ex", "a file")),
+				libraries: ex("v0.1.0", ""), served: ships},
+		}},
+		{"files for the map inside the module folder", []syncStep{
+			{name: "a tag", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA,
+				"moonwell-library.json", `{"assets":"assets"}`, "a.lua", "module", "assets/b.lua", "asset", "assetsmore/c.lua", "module"))},
+		}},
+		{"a library's file that names what is not there, and one that is refused", []syncStep{
+			{name: "no files for the map", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA, "moonwell-library.json", `{"assets":"art"}`, "a.lua", "1"))},
+			{name: "no modules", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA, "moonwell-library.json", `{"dir":"lua"}`, "a.lua", "1"))},
+			{name: "an unknown key", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA, "moonwell-library.json", `{"objects":"objects"}`, "a.lua", "1"))},
+			{name: "no JSON", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA, "moonwell-library.json", `{`, "a.lua", "1"))},
+			{name: "only files for the map below a dot", libraries: ex("v0.1.0", ""),
+				served: at(urlV1, of(commitA, "moonwell-library.json", `{"assets":"art"}`, "a.lua", "1", "art/.x", "1"))},
+			{name: "a tag with a slash", libraries: ex("release/1.0", ""),
+				served: at(archiveURL("owner/lib", "release/1.0"), of(commitA, "moonwell-library.json", `{"dir":"lua"}`, "a.lua", "1"))},
+		}},
+		{"folders and a lock that know no files for the map", []syncStep{
+			{name: "fetched once more", libraries: ex("v0.1.0", "src"), served: ships, before: with("project/moonwell.lock", `{"libraries":{"ex":`+before+`}}`,
+				"project/.moonwell/libraries/ex/.moonwell-library.json", before, "project/.moonwell/libraries/ex/example/greet.lua", "return {}")},
+			{name: "a second with nothing to do", libraries: ex("v0.1.0", "src"), served: ships},
+			{name: "the same lock against another commit", libraries: ex("v0.1.0", "src"), served: at(urlV1, of(commitB, shipping...)),
+				before: all(with("project/moonwell.lock", `{"libraries":{"ex":`+before+`}}`), without("project/.moonwell"))},
+		}},
+		{"other files for the map under the same commit", []syncStep{
+			{name: "a first sync", libraries: ex("v0.1.0", ""), served: ships},
+			{name: "another file for the map", before: without("project/.moonwell"), libraries: ex("v0.1.0", ""),
+				served: at(urlV1, of(commitA, changed(shipping, "assets/Models/Golem.mdx", "another model")...))},
+		}},
+		{"other modules under the same commit", []syncStep{
+			{name: "a first sync", libraries: ex("v0.1.0", ""), served: ships},
+			{name: "another module", before: without("project/.moonwell"), libraries: ex("v0.1.0", ""),
+				served: at(urlV1, of(commitA, changed(shipping, "src/example/greet.lua", "return 1")...))},
+		}},
+		{"libraries that stop shipping files for the map, or leave", []syncStep{
+			{name: "two that ship", libraries: block("ex", fromGitHub("v0.1.0", ""), "other", fromGitHub("v0.1.0", "")), served: ships},
+			{name: "one ships none, one is gone", libraries: ex("v0.2.0", "src"), served: at(v2, of(commitB, "src/a.lua", "1"))},
+		}},
+		{"a local library's file", []syncStep{
+			{name: "a first sync", libraries: mine("../lib", ""), before: with(
+				"lib/moonwell-library.json", `{"dir":"src","assets":"assets"}`, "lib/src/a.lua", "return 1", "lib/other/b.lua", "return 2",
+				"lib/assets/icons/BTNGolem.blp", "icon", "lib/assets/old.txt", "old", "lib/assets/.DS_Store", "no", "lib/assets/.cache/x.bin", "no")},
+			{name: "the manifest's dir, and other files for the map", libraries: mine("../lib", "other"),
+				before: all(without("lib/assets/old.txt"), with("lib/assets/icons/BTNGolem.blp", "new icon"))},
+			{name: "a folder of files for the map that is not there", libraries: mine("../lib", ""),
+				before: with("lib/moonwell-library.json", `{"dir":"src","assets":"missing"}`)},
+			{name: "no files for the map", libraries: mine("../lib", ""), before: with("lib/moonwell-library.json", `{"dir":"src"}`)},
+			{name: "a file that is refused", libraries: mine("../lib", ""), before: with("lib/moonwell-library.json", `{"dir":7}`)},
+			{name: "a folder of files for the map that is empty", libraries: mine("../lib", ""),
+				before: all(with("lib/moonwell-library.json", `{"assets":"none"}`), emptyFolders("lib/none"))},
+			{name: "a folder in the file's place", libraries: mine("../lib", ""),
+				before: all(without("lib/moonwell-library.json"), emptyFolders("lib/moonwell-library.json"))},
+		}},
+		{"a local library's files for the map inside its module folder", []syncStep{
+			{name: "a first sync", libraries: mine(lib, ""), before: with("lib/moonwell-library.json", `{"assets":"files/assets"}`,
+				"lib/a.lua", "return 1", "lib/files/b.lua", "return 2", "lib/files/assets/c.lua", "an asset", "lib/files/assets/d.mdx", "model")},
+		}},
+	}
+	seeded = []syncScenario{
+		{"a local library and two tags side by side", []syncStep{
+			{name: "a first sync", before: with("lib/a.lua", "return 1", "lib/moonwell-library.json", `{"assets":"art"}`, "lib/art/x.blp", "x"),
+				libraries: block("a", fromGitHub("v0.1.0", ""), "b", fromFolder("../lib", ""), "c", fromGitHub("v0.2.0", "src")),
+				served:    map[string][]byte{urlV1: ships[urlV1], v2: of(commitB, "src/a.lua", "1")}},
+			{name: "a second with nothing to do", libraries: block("a", fromGitHub("v0.1.0", ""), "b", fromFolder("../lib", ""), "c", fromGitHub("v0.2.0", "src"))},
+			{name: "the local one is a tag, and a tag the local one", served: map[string][]byte{urlV1: ships[urlV1]},
+				libraries: block("a", fromFolder("../lib", ""), "b", fromGitHub("v0.1.0", ""), "c", fromGitHub("v0.2.0", "src"))},
+			{name: "one of them alone", libraries: block("b", fromGitHub("v0.1.0", ""))},
+			{name: "the second fails", libraries: block("a", fromGitHub("v0.1.0", ""), "b", fromGitHub("v0.1.0", ""), "c", fromGitHub("v0.3.0", "")),
+				served: map[string][]byte{urlV1: ships[urlV1]}},
+			{name: "none", libraries: block()},
+		}},
+		{"a library that gains files for the map and loses them", []syncStep{
+			{name: "none", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA, "a.lua", "1"))},
+			{name: "some", libraries: ex("v0.2.0", ""), served: at(v2, of(commitB, shipping...))},
+			{name: "none again", libraries: ex("v0.3.0", ""), served: at(v3, of(commitA, "a.lua", "1"))},
+		}},
+		{"a project without libraries", []syncStep{
+			{name: "nothing there", libraries: block()},
+			{name: "folders of libraries that left, and a lock", libraries: block(), before: with(
+				"project/moonwell.lock", lockText(map[string]LockEntry{"gone": {GitHub: "owner/lib", Tag: "v1", Commit: commitA, Files: "sha256:x"}}),
+				"project/.moonwell/libraries/gone/a.lua", "1", "project/.moonwell/libraries/.gone.tmp/a.lua", "1",
+				"project/.moonwell/libraries/a file", "1", "project/.moonwell/library-assets/gone/x.blp", "1",
+				"project/.moonwell/yue/moonwell/macros.yue", "not a library's", "project/src/main.yue", "not a library's")},
+			{name: "a lock that is no lock", libraries: block(), before: with("project/moonwell.lock", "{}")},
+		}},
+		{"locks", []syncStep{
+			{name: "no JSON", libraries: ex("v0.1.0", "src"), served: one, before: with("project/moonwell.lock", "not json")},
+			{name: "no lock", libraries: ex("v0.1.0", "src"), served: one, before: with("project/moonwell.lock", `{"libraries":[]}`)},
+			{name: "libraries that left, and none of this one", libraries: ex("v0.1.0", "src"), served: one, before: with("project/moonwell.lock",
+				lockText(map[string]LockEntry{"gone": {GitHub: "owner/lib", Tag: "v1", Commit: commitA, Files: "sha256:x"}}))},
+			{name: "the same lock in another text", libraries: ex("v0.1.0", "src"), served: one, before: with("project/moonwell.lock",
+				`{"libraries":{"ex":{"files":"`+filesHash(filesOfTest("a.lua", "1"))+`","commit":"`+commitA+`","dir":"src","tag":"v0.1.0","github":"owner/lib"}},"more":1}`)},
+			{name: "a commit that is short, and the tag moved", libraries: ex("v0.1.0", "src"), served: one, before: all(without("project/.moonwell"),
+				with("project/moonwell.lock", `{"libraries":{"ex":{"files":"f","commit":"abc","dir":"src","tag":"v0.1.0","github":"owner/lib"}}}`))},
+			{name: "another repository under the tag", libraries: ex("v0.1.0", "src"), served: one, before: with("project/moonwell.lock",
+				`{"libraries":{"ex":{"files":"f","commit":"abc","dir":"src","tag":"v0.1.0","github":"other/lib"}}}`)},
+		}},
+		{"a sync that was interrupted", []syncStep{
+			{name: "a first sync", libraries: ex("v0.1.0", ""), served: ships},
+			{name: "the stamp gone, and folders left behind", libraries: ex("v0.1.0", ""), served: ships, before: all(
+				without("project/.moonwell/libraries/ex/.moonwell-library.json"),
+				with("project/.moonwell/libraries/.ex.tmp/half.lua", "half", "project/.moonwell/library-assets/.ex.tmp/half.blp", "half"))},
+		}},
+		{"a tag with a file where a folder of it lies", []syncStep{
+			{name: "a first sync", libraries: ex("v0.1.0", ""), served: at(urlV1, of(commitA, "a.lua", "kept"))},
+			{name: "the tag that cannot be written", libraries: ex("v0.2.0", ""), served: at(v2, of(commitB, "a.lua", "new", "b", "a file", "b/c.lua", "below it"))},
+			{name: "the first tag again", libraries: ex("v0.1.0", "")},
+		}},
+		{"the manifest's dir in other spellings", []syncStep{
+			{name: "src/", libraries: ex("v0.1.0", "src/"), served: ships},
+			{name: "./src", libraries: ex("v0.1.0", "./src"), served: ships},
+			{name: `src\example`, libraries: ex("v0.1.0", `src\example`), served: ships},
+			{name: "src/./example/", libraries: ex("v0.1.0", "src/./example/"), served: ships},
+			{name: "src/..", libraries: ex("v0.1.0", "src/.."), served: ships},
+			{name: "/", libraries: ex("v0.1.0", "/"), served: ships},
+			{name: "assets", libraries: ex("v0.1.0", "assets"), served: ships},
+			{name: "sr", libraries: ex("v0.1.0", "sr"), served: ships},
+		}},
+		{"folders that are files", []syncStep{
+			{name: ".moonwell, for a tag", before: with("project/.moonwell", "a file"), libraries: ex("v0.1.0", "src"), served: one},
+			{name: ".moonwell, for a local library", before: with("lib/a.lua", "1"), libraries: mine("../lib", "")},
+			{name: "the folder of the libraries", before: all(without("project/.moonwell"), with("project/.moonwell/libraries", "a file")),
+				libraries: ex("v0.1.0", "src"), served: one},
+			{name: "the folder of a library", before: all(without("project/.moonwell"), with("project/.moonwell/libraries/ex", "a file")),
+				libraries: ex("v0.1.0", "src"), served: one},
+		}},
+	}
+	return carried, append(append(seeded, stampScenario(t)), unusableScenarios(t)...)
+}
+
+// githubLibrary is a library of a repository at a tag.
+func githubLibrary(repository, tag, dir string) manifest.Library {
+	return manifest.Library{GitHub: &repository, Tag: &tag, Dir: dir}
+}
+
+// changed is the files with another content for one of them.
+func changed(files []string, name, content string) []string {
+	other := slices.Clone(files)
+	other[slices.Index(other, name)+1] = content
+	return other
+}
+
+// stampScenario is a library whose folder holds one stamp after another, and each time the lock entry the first
+// of them is of.
+func stampScenario(t *testing.T) syncScenario {
+	entry := LockEntry{GitHub: "owner/lib", Tag: "v0.1.0", Commit: commitA, Files: filesHash(filesOfTest("a.lua", "1"))}
+	held := stampOf(entry)
+	served := map[string][]byte{urlV1: tagArchive(t, commitA, "a.lua", "1")}
+	stamps := []struct{ name, stamp string }{
+		{"the stamp of the entry", held},
+		{"the layout as another number of the same value", strings.Replace(held, `"layout": 2`, `"layout": 2.0`, 1)},
+		{"the layout with an exponent", strings.Replace(held, `"layout": 2`, `"layout": 0.2e1`, 1)},
+		{"members in another order, and more of them", `{"layout":2,"more":[],"files":"` + entry.Files + `","commit":"` + commitA +
+			`","dir":"","tag":"v0.1.0","github":"owner/lib"}`},
+		{"the layout twice, the last the right one", strings.Replace(held, `"layout": 2`, `"layout": 3, "layout": 2`, 1)},
+		{"the layout twice, the last another", strings.Replace(held, `"layout": 2`, `"layout": 2, "layout": 3`, 1)},
+		{"another layout", strings.Replace(held, `"layout": 2`, `"layout": 3`, 1)},
+		{"the layout as a text", strings.Replace(held, `"layout": 2`, `"layout": "2"`, 1)},
+		{"the layout as nothing", strings.Replace(held, `"layout": 2`, `"layout": null`, 1)},
+		{"no layout", strings.Replace(held, ",\n  \"layout\": 2", "", 1)},
+		{"another commit", strings.Replace(held, commitA, commitB, 1)},
+		{"another hash of the files", strings.Replace(held, entry.Files, "sha256:other", 1)},
+		{"another dir", strings.Replace(held, `"dir": ""`, `"dir": "src"`, 1)},
+		{"a hash of files for the map", strings.Replace(held, `"layout"`, `"assets": "sha256:x", "layout"`, 1)},
+		{"a member missing", strings.Replace(held, `"tag": "v0.1.0",`, "", 1)},
+		{"a member of another kind", strings.Replace(held, `"tag": "v0.1.0",`, `"tag": 1,`, 1)},
+		{"no JSON", held + "}"},
+		{"a byte order mark", mark + held},
+		{"no object", "[" + held + "]"},
+		{"nothing", ""},
+		{"the stamp of a local library", stampOfFolder(`C:\libs\mine`)},
+	}
+	scenario := syncScenario{name: "stamps"}
+	for _, s := range stamps {
+		scenario.steps = append(scenario.steps, syncStep{name: s.name, libraries: block("ex", fromGitHub("v0.1.0", "")), served: served,
+			before: with("project/moonwell.lock", lockText(map[string]LockEntry{"ex": entry}),
+				"project/.moonwell/libraries/ex/a.lua", "1", "project/.moonwell/libraries/ex/"+stampFile, s.stamp)})
+	}
+	scenario.steps = append(scenario.steps, syncStep{name: "no stamp", libraries: block("ex", fromGitHub("v0.1.0", "")), served: served,
+		before: without("project/.moonwell/libraries/ex/" + stampFile)})
+	return scenario
+}
+
+// unusableScenarios is libraries with a kept file that a folder cannot hold on every system: a class the header
+// names.
+func unusableScenarios(t *testing.T) []syncScenario {
+	const cannotHold, differ = " folder has a name that Windows cannot hold.", " folder differ only in letter case."
+	unusable := []struct{ name, file, words string }{
+		{"a module named as a device", "src/aux.lua", "aux.lua in its module" + cannotHold},
+		{"a module that is a device's name", "src/nul", "nul in its module" + cannotHold},
+		{"a module whose name ends with a dot", "src/a.lua.", "a.lua. in its module" + cannotHold},
+		{"a module in a folder whose name ends with a space", "src/dir /a.lua", "dir /a.lua in its module" + cannotHold},
+		{"a module with a question mark", "src/what?.lua", "what?.lua in its module" + cannotHold},
+		{"a file for the map named as a device", "assets/prn.blp", "prn.blp in its assets" + cannotHold},
+		{"two modules that differ in letter case", "src/Example/Greet.lua", "Example/Greet.lua and example/greet.lua in its module" + differ},
+		{"two files for the map that differ in letter case", "assets/models/golem.mdx", "Models/Golem.mdx and models/golem.mdx in its assets" + differ},
+	}
+	var scenarios []syncScenario
+	for _, u := range unusable {
+		served := map[string][]byte{
+			urlV1:                             tagArchive(t, commitA, shipping...),
+			archiveURL("owner/lib", "v0.2.0"): tagArchive(t, commitB, append(slices.Clone(shipping), u.file, "x")...),
+		}
+		scenarios = append(scenarios, syncScenario{u.name, []syncStep{
+			{name: "a tag without it", libraries: block("ex", fromGitHub("v0.1.0", "")), served: served},
+			{name: "a tag with it", libraries: block("ex", fromGitHub("v0.2.0", "")), served: served, refusedAnew: u.words},
+		}})
+	}
+	return scenarios
+}
+
+// The four oracles of Sync run beside the other tests (t.Parallel): each plays its scenarios in folders of its
+// own and shares nothing with the rest.
+
+func TestOracleOnSyncingAsTheOtherTreesTestsDo(t *testing.T) {
+	t.Parallel()
+	var compared tally
+	home := filepath.Join(t.TempDir(), "home")
+	carried, _ := syncScenarios(t, home)
+	for _, scenario := range carried {
+		compared.syncs(t, home, scenario)
+	}
+	compared.check(t, tally{refused: 43, results: 37})
+}
+
+func TestOracleOnSyncingSeededProjects(t *testing.T) {
+	t.Parallel()
+	var compared tally
+	home := filepath.Join(t.TempDir(), "home")
+	_, seeded := syncScenarios(t, home)
+	for _, scenario := range seeded {
+		compared.syncs(t, home, scenario)
+	}
+	// The scenarios of the list, the stamps, and the libraries with a file that cannot be used, each after a
+	// sync of a tag without it.
+	compared.check(t, tally{refused: 12, results: 23 + 22 + 8, inPart: 8})
+}
+
+// linkScenarios is projects and local libraries with a link in them: those both trees sync alike, and those of
+// the class the header names.
+func linkScenarios(t *testing.T, home string) []syncScenario {
+	const refused = "Symlinks are not supported: "
+	lib := filepath.Join(home, "lib")
+	beside := with("beside/kept.txt", "kept", "beside/module.lua", "return 1", "beside/ex/kept.txt", "kept")
+	served := map[string][]byte{urlV1: tagArchive(t, commitA, shipping...)}
+	ex := block("ex", fromGitHub("v0.1.0", ""))
+	local := with("lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/sub/b.lua", "2", "lib/files/x.blp", "x", "lib/files/sub/y.blp", "y")
+	mine := block("mine", fromFolder(lib, ""))
+	return []syncScenario{
+		// Alike: a link that is no folder of a library is removed as the link it is, and a link in a local
+		// library is no folder of it.
+		{"links among the folders of libraries that left", []syncStep{
+			{name: "removed, and nothing behind them", libraries: ex, served: served, before: all(beside,
+				with("project/.moonwell/libraries/gone/a.lua", "1"), emptyFolders("project/.moonwell/library-assets"),
+				linked("project/.moonwell/libraries/other", "beside"), linked("project/.moonwell/libraries/gone/inside", "beside"),
+				linked("project/.moonwell/libraries/.ex.tmp", "beside"), linked("project/.moonwell/library-assets/.ex.tmp", "beside"))},
+		}},
+		{"links in the folders of a tag that is fetched again", []syncStep{
+			{name: "a first sync", libraries: ex, served: served},
+			{name: "replaced, and nothing behind them", libraries: ex, served: served, before: all(beside,
+				without("project/.moonwell/libraries/ex/"+stampFile), linked("project/.moonwell/libraries/ex/inside", "beside"),
+				linked("project/.moonwell/library-assets/ex/Models/inside", "beside"))},
+		}},
+		{"links in the copy of a local library", []syncStep{
+			{name: "a first sync", libraries: mine, before: local},
+			{name: "removed, and nothing behind them", libraries: mine, before: all(beside,
+				linked("project/.moonwell/libraries/mine/inside", "beside"), linked("project/.moonwell/library-assets/mine/sub/inside", "beside"))},
+		}},
+		{"links in a local library", []syncStep{
+			{name: "a link to a folder is no folder", libraries: mine, before: all(beside, local, linked("lib/linked", "beside"))},
+			{name: "a link named as a module is read as a file", libraries: mine, before: linked("lib/linked.lua", "beside")},
+		}},
+		// The class the header names.
+		{"a link at .moonwell", []syncStep{
+			{name: "a tag", libraries: ex, served: served, before: all(beside, linked("project/.moonwell", "beside")), refusedAnew: refused},
+		}},
+		{"a link at .moonwell, without libraries", []syncStep{
+			{name: "none", libraries: block(), before: all(beside, with("beside/libraries/ex/kept.txt", "kept"), linked("project/.moonwell", "beside")),
+				refusedAnew: refused},
+		}},
+		{"a link at the folder of the files for the map", []syncStep{
+			{name: "a tag", libraries: ex, served: served, refusedAnew: refused,
+				before: all(beside, emptyFolders("project/.moonwell"), linked("project/.moonwell/library-assets", "beside"))},
+		}},
+		{"a link at a tag's module folder", []syncStep{
+			{name: "a first sync", libraries: ex, served: served},
+			{name: "the link", libraries: ex, served: served, refusedAnew: refused,
+				before: all(beside, without("project/.moonwell/libraries/ex"), linked("project/.moonwell/libraries/ex", "beside"))},
+		}},
+		{"a link at a tag's folder of files for the map", []syncStep{
+			{name: "a first sync", libraries: ex, served: served},
+			{name: "the link", libraries: ex, served: served, refusedAnew: refused,
+				before: all(beside, without("project/.moonwell/library-assets/ex"), linked("project/.moonwell/library-assets/ex", "beside"))},
+		}},
+		{"a link at a local library's module folder", []syncStep{
+			{name: "the link", libraries: mine, refusedAnew: refused,
+				before: all(beside, local, emptyFolders("project/.moonwell/libraries"), linked("project/.moonwell/libraries/mine", "beside"))},
+		}},
+		{"a link below a local library's module folder", []syncStep{
+			{name: "the link", libraries: mine, refusedAnew: refused,
+				before: all(beside, local, emptyFolders("project/.moonwell/libraries/mine"), linked("project/.moonwell/libraries/mine/sub", "beside"))},
+		}},
+		{"a link below a local library's folder of files for the map", []syncStep{
+			{name: "the link", libraries: mine, refusedAnew: refused,
+				before: all(beside, local, emptyFolders("project/.moonwell/library-assets/mine"), linked("project/.moonwell/library-assets/mine/sub", "beside"))},
+		}},
+	}
+}
+
+func TestOracleOnSyncingAProjectWithLinks(t *testing.T) {
+	t.Parallel()
+	var compared tally
+	home := filepath.Join(t.TempDir(), "home")
+	for _, scenario := range linkScenarios(t, home) {
+		compared.syncs(t, home, scenario)
+	}
+	// Alike: the links that are removed or passed over, and the one that is read as a file. In part: the links
+	// that are refused, two of them after a first sync.
+	compared.check(t, tally{refused: 1, results: 6 + 2, inPart: 8})
+}
+
+// ---- one project, both trees ----
+
+func TestOracleOnAProjectThatTheOtherTreeSynced(t *testing.T) {
+	t.Parallel()
+	v2 := archiveURL("owner/lib", "v0.2.0")
+	served := map[string][]byte{urlV1: tagArchive(t, commitA, shipping...), v2: tagArchive(t, commitB, "src/a.lua", "1", "README.md", "# lib")}
+	local := with("lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/sub/b.yue", "2", "lib/files/x.blp", "x")
+	overridden, beside := fromGitHub("v0.2.0", "sub"), "../lib"
+	overridden.Path = &beside
+	projects := []struct {
+		name      string
+		before    func(*testing.T, string)
+		libraries map[string]manifest.Library
+	}{
+		{"a tag", nil, block("ex", fromGitHub("v0.2.0", "src"))},
+		{"a tag whose library names its folders", nil, block("ex", fromGitHub("v0.1.0", ""))},
+		{"a tag whose module folder the manifest names", nil, block("ex", fromGitHub("v0.1.0", "src/example"))},
+		{"a local library", local, block("mine", fromFolder("../lib", ""))},
+		{"a local library by its sub folder", local, block("mine", fromFolder("../lib", "sub"))},
+		{"tags and a local library", local, block("a", fromGitHub("v0.1.0", ""), "b", fromFolder("../lib", ""), "c", fromGitHub("v0.2.0", "src"), "9", fromGitHub("v0.2.0", ""))},
+		{"a local library in place of a tag", local, block("ex", overridden)},
+	}
+	trees := []struct {
+		name          string
+		first, second syncing
+	}{{"the other tree, then this tree", theOtherTree, thisTree}, {"this tree, then the other tree", thisTree, theOtherTree}}
+	compared := 0
+	for _, project := range projects {
+		for _, order := range trees {
+			what := project.name + ": " + order.name
+			home := filepath.Join(t.TempDir(), "home")
+			root := filepath.Join(home, "project")
+			emptyFolders("project")(t, home)
+			if project.before != nil {
+				project.before(t, home)
+			}
+			downloads := 0
+			fetch := func(_ context.Context, url string) (int, []byte, error) {
+				downloads++
+				return 200, slices.Clone(served[url]), nil
+			}
+			if _, _, err := order.first(t, root, project.libraries, fetch); err != nil || downloads == 0 && project.before == nil {
+				t.Fatalf("%s: the first sync: %v, after %d downloads", what, err, downloads)
+			}
+			makeOld(t, home)
+			before, _ := filesBelow(t, home)
+			downloads = 0
+			lines, lies, err := order.second(t, root, project.libraries, fetch)
+			after, written := filesBelow(t, home)
+			if err != nil || downloads != 0 || lines != nil || written != nil {
+				t.Errorf("%s: the second sync: %v, %d downloads, the lines %q, and it wrote %q", what, err, downloads, lines, written)
+			}
+			oracle.Values(t, what+": the files after the second sync", before, after)
+			if lies != nil {
+				oracle.Values(t, what+": what Sync returns", liesIn(t, what, before, project.libraries), liesAs(lies))
+			}
+			compared++
+		}
+	}
+	if compared != 14 {
+		t.Errorf("the oracle compared %d projects, want 14", compared)
+	}
 }
