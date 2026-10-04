@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/luasrc"
 	"github.com/mdlsvensson/moonwell/internal/ordered"
 	oldsettings "github.com/mdlsvensson/moonwell/internal/settings"
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -51,9 +52,10 @@ import (
 // every setting, and for the constants every pairing of a typed constant with a raw one. The script is given
 // more: numbers that are a zero below 0, and for each block with a counterpart in the script a document for
 // every subset of its settings. The scripts are the fixture's, every one the other tree's tests of the Lua give
-// it, and the fixture's in other layouts. Every script is paired with every document but those of the subsets,
-// which are paired with the fixture's script and with one layout of it: reading a script is what takes the time
-// here, and the settings of the subsets are set, together, by documents that every script is paired with.
+// it, and the fixture's in other layouts, each with and without a call that a setting adds. Every script is
+// paired with every document but those of the subsets, which are paired with the fixture's script and with one
+// layout of it: reading a script is what takes the time here, and the settings of the subsets are set, together,
+// by documents that every script is paired with.
 //
 // Left out, for the one difference in what is written into the script that is meant: a script into which a
 // number goes that is not 0 and is below 0.000001 in size, or 1e21 or larger. The other tree writes such a number
@@ -64,6 +66,12 @@ import (
 // trees, for the values the settings make the script take, and not on the document. A script is left out only
 // when the other tree did not refuse it; it is counted, this tree must not refuse it either, and the two texts
 // must differ, or the class is wider than the difference.
+//
+// Left out, for the one difference in the minimap call that is meant: a script whose main() ends in a return
+// that gives a value. The other tree writes the call after it and returns a script that Lua cannot load; this
+// tree reads its result once more and refuses it
+// (TestTheMinimapCallIsRefusedWhereItWouldStandAfterAReturnedValue). It is decided on the other tree's result,
+// which its own reader of Lua does not read, and counted: one script.
 //
 // Compared in part, and counted: a script that does not read. This tree says where by line and column and the
 // other tree by a count of characters at the end of its message, a difference that the oracle of war3/lua holds,
@@ -733,13 +741,14 @@ type script struct{ name, text string }
 func scripts(t *testing.T) []script {
 	t.Helper()
 	fixture := fixtureLua(t)
+	notHeld := swapped(t, fixture, "ForcePlayerStartLocation(Player(1), 1)\r\n", "")
 	all := []script{
 		{"the fixture", fixture},
 		{"without SetMapName", swapped(t, fixture, "SetMapName(", "Other(")},
 		{"with a second config()", fixture + "\nfunction config() SetMapName(\"x\") end"},
 		{"with SetMapName of an object", swapped(t, fixture, "SetMapName(", "object.SetMapName(")},
 		{"a script that does not read", "function (((unreadable"},
-		{"with player 1 not held to its start", swapped(t, fixture, "ForcePlayerStartLocation(Player(1), 1)\r\n", "")},
+		{"with player 1 not held to its start", notHeld},
 		{"with a SetPlayerName", swapped(t, fixture, "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
 			"SetPlayerColor(Player(1), ConvertPlayerColor(1))\r\nSetPlayerName(Player(1), \"TRIGSTR_006\")")},
 		{"a main() alone, indented", indentedMain},
@@ -753,11 +762,16 @@ func scripts(t *testing.T) []script {
 	for _, source := range slices.Concat(slices.Sorted(maps.Keys(minimapSources)), slices.Sorted(maps.Keys(withoutOneMain))) {
 		all = append(all, script{fmt.Sprintf("the script %q", source), source})
 	}
-	return append(all, layouts(t, fixture)...)
+	// A call that is added takes its line ending, its indentation and its semicolon from the layout, and the one
+	// call a setting adds to a player is the one that holds the player to its start: each layout comes once more
+	// without that call for player 1.
+	all = append(all, layouts(t, "", fixture)...)
+	return append(all, layouts(t, "with player 1 not held to its start, ", notHeld)...)
 }
 
-// layouts is the fixture's script written in other ways that say the same.
-func layouts(t *testing.T, fixture string) []script {
+// layouts is a script of the fixture's shape written in other ways that say the same. Each is named by what
+// stands before its name.
+func layouts(t *testing.T, before, fixture string) []script {
 	t.Helper()
 	oneLine := strings.ReplaceAll(swapped(t, fixture, "--\r\n", ""), "\r\n", " ")
 	together := swapped(t, fixture, "SetPlayerStartLocation(Player(0), 0)\r\nForcePlayerStartLocation(Player(0), 0)\r\nSetPlayerColor",
@@ -766,12 +780,12 @@ func layouts(t *testing.T, fixture string) []script {
 	together = swapped(t, together, "SetMapMusic(\"Music\", true, 0)\r\nCreateAllUnits()\r\n",
 		"SetMapMusic(\"Music\", true, 0)\r\nNewSoundEnvironment(\"Default\")ResetTerrainFog()CreateAllUnits()")
 	return []script{
-		{"with the line endings of Unix", strings.ReplaceAll(fixture, "\r\n", "\n")},
-		{"with a semicolon after every call", strings.ReplaceAll(fixture, ")\r\n", ");\r\n")},
-		{"with every line indented", strings.ReplaceAll(fixture, "\r\n", "\r\n\t  ")},
-		{"on one line", oneLine},
-		{"on one line with semicolons", strings.ReplaceAll(oneLine, ") ", "); ")},
-		{"with calls that touch", together},
+		{before + "with the line endings of Unix", strings.ReplaceAll(fixture, "\r\n", "\n")},
+		{before + "with a semicolon after every call", strings.ReplaceAll(fixture, ")\r\n", ");\r\n")},
+		{before + "with every line indented", strings.ReplaceAll(fixture, "\r\n", "\r\n\t  ")},
+		{before + "on one line", oneLine},
+		{before + "on one line with semicolons", strings.ReplaceAll(oneLine, ") ", "); ")},
+		{before + "with calls that touch", together},
 	}
 }
 
@@ -912,16 +926,16 @@ func onTheFixturesInfo(t *testing.T, documents []string, sources []script) (coun
 func TestOracleOnTheScript(t *testing.T) {
 	all, sources := scriptDocuments(), scripts(t)
 	counted, notInTheMap := onTheFixturesInfo(t, all, sources)
-	if len(all) != 137 || len(sources) != 47 || notInTheMap != 10 {
-		t.Errorf("%d documents, %d of them not for the fixture's map info, and %d scripts; want 137, 10 and 47",
+	if len(all) != 137 || len(sources) != 53 || notInTheMap != 10 {
+		t.Errorf("%d documents, %d of them not for the fixture's map info, and %d scripts; want 137, 10 and 53",
 			len(all), notInTheMap, len(sources))
 	}
-	// 127 documents for 47 scripts. 39 of the documents set nothing the script has, and leave all 47 as they
+	// 127 documents for 53 scripts. 39 of the documents set nothing the script has, and leave all 53 as they
 	// are; each of the other 88 is refused by the two scripts that do not read. Four documents put a number
 	// into the script that the trees write apart (the fourth of everyDocuments, and the first three of
-	// apartDocuments): the pairs of them that the other tree does not refuse are left out, which are 12, 32, 30
-	// and 39 of the 47 of each.
-	want := scriptCounts{refused: 1177, unread: 2 * 88, changed: 2374, unchanged: 39*47 + 296, leftOut: 12 + 32 + 30 + 39}
+	// apartDocuments): the pairs of them that the other tree does not refuse are left out, which are 18, 38, 36
+	// and 45 of the 53 of each.
+	want := scriptCounts{refused: 1177, unread: 2 * 88, changed: 2830, unchanged: 39*53 + 344, leftOut: 18 + 38 + 36 + 45}
 	if counted != want {
 		t.Errorf("the scripts came to %+v, want %+v", counted, want)
 	}
@@ -979,14 +993,25 @@ func TestOracleOnTheScriptOfEveryMapInfo(t *testing.T) {
 	}
 }
 
+// broken reports whether the other tree returned, without an error, a script that its own reader of Lua does
+// not read.
+func broken(result string, err error) bool {
+	if err != nil {
+		return false
+	}
+	_, unread := luasrc.Functions(result, luaFile)
+	return unread != nil
+}
+
 func TestOracleOnTheMinimapCall(t *testing.T) {
-	sources := scripts(t)
+	sources := append(scripts(t),
+		script{"a main() that returns a value", mainReturnsValue}, script{"a main() that returns", mainReturns})
 	for _, document := range luaDocuments {
 		if result, err := withSettings(t, document, fixtureLua(t)); err == nil {
 			sources = append(sources, script{"the fixture with settings " + document, result})
 		}
 	}
-	added, refused, unread := 0, 0, 0
+	added, refused, unread, leftOut := 0, 0, 0, 0
 	for _, source := range sources {
 		want, wantErr := oldsettings.PatchMinimapLua(source.text, luaFile)
 		got, gotErr := patchMinimap(source.text, luaFile)
@@ -994,6 +1019,14 @@ func TestOracleOnTheMinimapCall(t *testing.T) {
 		case failure != nil:
 			compareUnread(t, source.name, failure, gotErr)
 			unread++
+		case broken(want, wantErr):
+			// Left out, for the difference that is meant: the other tree writes the call after a returned
+			// value and hands back a script the game cannot load. This tree reads its result once more and
+			// refuses it (TestTheMinimapCallIsRefusedWhereItWouldStandAfterAReturnedValue).
+			leftOut++
+			if failure, ok := gotErr.(*diag.Error); !ok || !strings.Contains(failure.Msg, "could not be read back safely") {
+				t.Errorf("%s: the other tree's script does not read, and this tree returns %q, %v", source.name, got, gotErr)
+			}
 		case oracle.Refusals(t, source.name, wantErr, gotErr):
 			refused++
 		default:
@@ -1001,10 +1034,12 @@ func TestOracleOnTheMinimapCall(t *testing.T) {
 			added++
 		}
 	}
-	// Of the 47 scripts two have no main() or two, and two do not read; every document of luaDocuments goes
-	// into the fixture's script.
-	if added != 43+len(luaDocuments) || refused != 2 || unread != 2 {
-		t.Errorf("the call went into %d scripts, %d refused it and %d do not read; want %d, 2 and 2",
-			added, refused, unread, 43+len(luaDocuments))
+	// Of the 53 scripts two have no main() or two, and two do not read; every document of luaDocuments goes
+	// into the fixture's script. Of the two scripts whose main() returns, the one that returns nothing takes the
+	// call, and the one that returns a value is the one left out.
+	wantAdded := 49 + 1 + len(luaDocuments)
+	if added != wantAdded || refused != 2 || unread != 2 || leftOut != 1 {
+		t.Errorf("the call went into %d scripts, %d refused it, %d do not read and %d are left out; want %d, 2, 2 and 1",
+			added, refused, unread, leftOut, wantAdded)
 	}
 }

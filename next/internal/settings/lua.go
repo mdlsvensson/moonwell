@@ -80,7 +80,8 @@ func (p *patcher) edited() (string, error) {
 // World Editor wrote for main() has run, and gameplay hooks run after main(), so a minimap they set still wins.
 //
 // The call stands on a line of its own when the `end` of main() starts its line; otherwise a space keeps it apart
-// from the statement before.
+// from the statement before. Where main() ends in a return that gives a value, no statement can follow: the
+// result is read once more, and a script that no longer reads is refused.
 func patchMinimap(source, file string) (string, error) {
 	p, err := newPatcher(source, file)
 	if err != nil {
@@ -90,7 +91,7 @@ func patchMinimap(source, file string) (string, error) {
 	if p.failure != nil {
 		return "", p.failure
 	}
-	return lua.ApplyEdits(source, p.edits)
+	return p.edited()
 }
 
 // ---- errors ----

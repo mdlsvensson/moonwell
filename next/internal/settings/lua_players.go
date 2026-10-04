@@ -82,16 +82,35 @@ func (p *patcher) startLocation(slots lua.Function, s slot) lua.Call {
 	return start
 }
 
+// controller writes who controls the player.
 func (p *patcher) controller(slots lua.Function, s slot) {
+	controller, known := named(controllers, s.record.Controller.Value)
+	if !known {
+		p.refuse(errNoController(p.file, s))
+		return
+	}
 	p.replace(
 		p.one(p.forPlayer(slots, "SetPlayerController", 2, s.id), "SetPlayerController("+s.player+")"),
-		"SetPlayerController("+s.player+", MAP_CONTROL_"+strings.ToUpper(controllers[s.record.Controller.Value])+")",
+		"SetPlayerController("+s.player+", MAP_CONTROL_"+strings.ToUpper(controller)+")",
 	)
+}
+
+// named is the name a number of the map info has, which is the name in its place among names, and whether it has
+// one. The empty name stands where a number has none.
+func named(names []string, number int32) (string, bool) {
+	if number < 0 || int(number) >= len(names) || names[number] == "" {
+		return "", false
+	}
+	return names[number], true
 }
 
 // race writes the race the player prefers, and whether the player may choose another.
 func (p *patcher) race(slots lua.Function, s slot) {
-	race := races[s.record.Race.Value]
+	race, known := named(races, s.record.Race.Value)
+	if !known {
+		p.refuse(errNoRace(p.file, s))
+		return
+	}
 	preference := strings.ToUpper(race)
 	if race == "selectable" {
 		preference = "USER_SELECTABLE"
@@ -124,8 +143,12 @@ func (p *patcher) fixedStart(slots lua.Function, s slot, start lua.Call) {
 }
 
 // position writes where the player's start location is. Both coordinates are the map info's, also the one the
-// override does not set.
+// override does not set, so both must be numbers.
 func (p *patcher) position(config lua.Function, s slot) {
+	if !finite(s.record.X.Value, s.record.Y.Value) {
+		p.refuse(errNoPosition(p.file, s))
+		return
+	}
 	var locations []lua.Call
 	for _, call := range p.callsNamed(config, "DefineStartLocation", 3) {
 		number, ok := lua.LiteralNumber(call.Args[0])
@@ -163,4 +186,19 @@ func errForcedElsewhere(file string, s slot) error {
 
 func errUnknownLocation(file string) error {
 	return errLua(file, "cannot identify a DefineStartLocation index in config().")
+}
+
+func errNoController(file string, s slot) error {
+	return errLuaHint(file, fmt.Sprintf("player %d has controller %d in the map info, which is not a controller.",
+		s.id, s.record.Controller.Value), resaveInfo)
+}
+
+func errNoRace(file string, s slot) error {
+	return errLuaHint(file, fmt.Sprintf("player %d has race %d in the map info, which is not a race.",
+		s.id, s.record.Race.Value), resaveInfo)
+}
+
+func errNoPosition(file string, s slot) error {
+	return errLuaHint(file, fmt.Sprintf("player %d has a start position in the map info that is not a number.", s.id),
+		resaveInfo)
 }

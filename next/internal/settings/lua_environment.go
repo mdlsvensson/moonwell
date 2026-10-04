@@ -74,7 +74,8 @@ func (p *patcher) water(main lua.Function, details *w3i.Details) string {
 }
 
 // fog is the call for the map's fog: the one that sets it when the map shows fog, and the one that resets it
-// when it does not. Both kinds are taken out first, since either, left where it is, undoes the other.
+// when it does not. Both kinds are taken out first, since either, left where it is, undoes the other. The numbers
+// of a fog that is shown go into the script as the map info has them, so they must be numbers.
 func (p *patcher) fog(main lua.Function, info *w3i.Info) string {
 	p.withdraw(main, "SetTerrainFogEx", 7)
 	p.withdraw(main, "ResetTerrainFog", 0)
@@ -82,6 +83,10 @@ func (p *patcher) fog(main lua.Function, info *w3i.Info) string {
 		return "ResetTerrainFog()"
 	}
 	fog := info.Details.Fog
+	if !finite(fog.Start.Value, fog.End.Value, fog.Density.Value) {
+		p.refuse(errNoFog(p.file))
+		return ""
+	}
 	number := func(value float32) string { return lua.Number(float64(value)) }
 	// The native takes each colour channel as a part of 1, and no alpha.
 	channel := func(i int) string { return lua.Number(float64(fog.Color[i].Value) / 255) }
@@ -93,4 +98,8 @@ func (p *patcher) fog(main lua.Function, info *w3i.Info) string {
 
 func errNoAnchor(file string) error {
 	return errLua(file, "main() must call CreateAllUnits() or InitBlizzard() directly.")
+}
+
+func errNoFog(file string) error {
+	return errLuaHint(file, "the fog of the map info has a start, an end or a density that is not a number.", resaveInfo)
 }

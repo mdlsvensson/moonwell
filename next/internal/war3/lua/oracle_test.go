@@ -3,6 +3,7 @@ package lua
 import (
 	"errors"
 	"io/fs"
+	"math"
 	"math/rand/v2"
 	"os"
 	"path/filepath"
@@ -15,6 +16,7 @@ import (
 	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/luasrc"
 	"github.com/mdlsvensson/moonwell/internal/settings"
+	oldtext "github.com/mdlsvensson/moonwell/internal/text"
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
@@ -375,6 +377,47 @@ func TestOracleOnMutatedSources(t *testing.T) {
 	t.Logf("%d mutated sources compared of %d made", compared, made)
 	if compared < 2000 || compared*10 < made*9 {
 		t.Errorf("only %d of %d mutated sources were compared; want 2000 or more, and nine in ten", compared, made)
+	}
+}
+
+// numbers are values a script is given: zeros of both signs, whole values, values with many digits, colour
+// channels as parts of 1, and values a map info holds, which are float32 values widened. Each is 0, or from
+// 0.000001 up to 1e21 in size.
+//
+// Not among them, for the one difference that is meant: a value below 0.000001 in size that is not 0, or from
+// 1e21. The other tree writes such a value with an exponent, Number in plain decimal
+// (TestNumberWritesPlainDecimalWithTheFewestDigits).
+func numbers() []float64 {
+	values := []float64{
+		0, math.Copysign(0, -1), 1, -1, 2, 255, 5000, 10000000, -10000000, 4294967296, 1e15, 1e20, -1e20,
+		999999999999999900000, 0.000001, -0.000001, 0.0000011, 0.1, -0.5, 0.2, 0.30000000000000004, 1234567.891,
+		math.Pi, -math.E, 123456789.12345679, 0.00392156862745098, 1.7976931348623157e20, 9007199254740993,
+	}
+	for channel := range 256 {
+		values = append(values, float64(channel)/255)
+	}
+	for _, stored := range []float32{0.0000011, 0.1, 0.3, -0.3, 0.75, 44.7, -860.1, 3.208, 269.898, 128, -896, 500.5, 16777216, 1e7, 3.4e20} {
+		values = append(values, float64(stored))
+	}
+	// A float32 of every size in the range, of each sign: 1.2345678 times each power of two from 2^-19 to 2^69.
+	for power := -19; power < 70; power++ {
+		stored := float32(math.Ldexp(1.2345678, power))
+		values = append(values, float64(stored), -float64(stored))
+	}
+	return values
+}
+
+func TestOracleOnNumber(t *testing.T) {
+	values := numbers()
+	for _, value := range values {
+		if size := math.Abs(value); size != 0 && (size < 0.000001 || size >= 1e21) {
+			t.Fatalf("%v is a value the two trees write apart, and no value for this oracle", value)
+		}
+		what := "Number of " + strconv.FormatFloat(value, 'g', -1, 64)
+		oracle.Bytes(t, what, []byte(oldtext.Number(value)), []byte(Number(value)))
+	}
+	if len(values) != 28+256+15+2*89 {
+		t.Errorf("%d values, want %d", len(values), 28+256+15+2*89)
 	}
 }
 

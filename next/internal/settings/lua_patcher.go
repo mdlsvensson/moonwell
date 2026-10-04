@@ -2,6 +2,7 @@ package settings
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -247,10 +248,26 @@ func startsWithName(text string) bool {
 	return first == '_' || first >= 'A' && first <= 'Z' || first >= 'a' && first <= 'z'
 }
 
+// ---- the map info ----
+
+// finite reports whether every value is a number. The script takes a value of the map info as it is, and a file
+// that a tool or a hand changed can hold one that is none.
+func finite(values ...float32) bool {
+	for _, value := range values {
+		if math.IsInf(float64(value), 0) || math.IsNaN(float64(value)) {
+			return false
+		}
+	}
+	return true
+}
+
 // ---- errors ----
 
 // resaveLua is the hint of a script whose shape is not the one World Editor writes.
 const resaveLua = "Re-save the map in World Editor to restore its generated Lua initialization."
+
+// resaveInfo is the hint of a map info with a value World Editor does not write.
+const resaveInfo = "Re-save the map in World Editor to restore its map info."
 
 // errLua says that the settings do not go into the script as it is, and why.
 func errLua(file, problem string) error {

@@ -237,6 +237,26 @@ func TestPlayerEditsReplaceInsertAndRemoveOnlyThatPlayersCalls(t *testing.T) {
 	}
 }
 
+func TestAnAddedCallStandsAndEndsAsTheCallItFollows(t *testing.T) {
+	notHeld := swapped(t, fixtureLua(t), "ForcePlayerStartLocation(Player(1), 1)\r\n", "")
+	oneLine := strings.ReplaceAll(swapped(t, notHeld, "--\r\n", ""), "\r\n", " ")
+	for _, c := range []struct{ source, want string }{
+		{strings.ReplaceAll(notHeld, "\r\n", "\n"),
+			"\nSetPlayerStartLocation(Player(1), 1)\nForcePlayerStartLocation(Player(1), 1)\nSetPlayerColor"},
+		{strings.ReplaceAll(notHeld, ")\r\n", ");\r\n"),
+			"\r\nSetPlayerStartLocation(Player(1), 1);\r\nForcePlayerStartLocation(Player(1), 1);\r\nSetPlayerColor"},
+		{strings.ReplaceAll(notHeld, "\r\n", "\r\n\t  "),
+			"\r\n\t  SetPlayerStartLocation(Player(1), 1)\r\n\t  ForcePlayerStartLocation(Player(1), 1)\r\n\t  SetPlayerColor"},
+		{oneLine, " SetPlayerStartLocation(Player(1), 1) ForcePlayerStartLocation(Player(1), 1) SetPlayerColor"},
+		{strings.ReplaceAll(oneLine, ") ", "); "),
+			" SetPlayerStartLocation(Player(1), 1); ForcePlayerStartLocation(Player(1), 1); SetPlayerColor"},
+	} {
+		if script := inLine(t, `{"players":{"1":{"fixedStart":true}}}`, c.source); !strings.Contains(script, c.want) {
+			t.Errorf("the patched Lua lacks %q", c.want)
+		}
+	}
+}
+
 func TestStartCoordinatesUseEffectiveFloat32MapInfoValues(t *testing.T) {
 	script := inLine(t, `{"players":{"11":{"x":0.1}}}`, fixtureLua(t))
 	for _, line := range []string{
@@ -621,6 +641,92 @@ func TestTheMinimapCallNeedsExactlyOneGlobalMain(t *testing.T) {
 	_, err := patchMinimap("function main(", luaFile)
 	if failure := asError(t, err, "a script that does not read"); failure.File != luaFile {
 		t.Errorf("the error names %q", failure.File)
+	}
+}
+
+// The scripts whose main() ends in a return. After a return that gives a value no statement can stand; a return
+// that gives none takes the call as its value, which Lua then makes.
+const (
+	mainReturnsValue = "function main()\n  InitBlizzard()\n  return 1\nend\n"
+	mainReturns      = "function main()\n  InitBlizzard()\n  return\nend\n"
+)
+
+func TestTheMinimapCallIsRefusedWhereItWouldStandAfterAReturnedValue(t *testing.T) {
+	_, err := patchMinimap(mainReturnsValue, luaFile)
+	failure := asError(t, err, mainReturnsValue)
+	if failure.File != luaFile || failure.Hint == "" || !strings.Contains(failure.Msg, "the edited script could not be read back safely") {
+		t.Errorf("the error names %q, hints %q and says %q", failure.File, failure.Hint, failure.Msg)
+	}
+	var cause *diag.Error
+	if !errors.As(failure.Cause, &cause) || !strings.Contains(cause.Msg, "return must end its block") {
+		t.Errorf("the cause is %v", failure.Cause)
+	}
+	want := "function main()\n  InitBlizzard()\n  return\n" + minimapCall + "\nend\n"
+	if got, err := patchMinimap(mainReturns, luaFile); err != nil || got != want {
+		t.Errorf("patchMinimap(%q) = %q, %v", mainReturns, got, err)
+	}
+}
+
+// damaged is the fixture's map info as read, with what the change does to its first player or its fog.
+func damaged(t *testing.T, change func(player *w3i.Player, fog *w3i.Fog)) *w3i.Info {
+	t.Helper()
+	info := readInfo(t, fixtureInfo(t), w3i.Extended)
+	info.Flags.Value |= fogOn
+	change(&info.Details.Players[0], &info.Details.Fog)
+	return info
+}
+
+func TestAMapInfoWithAValueTheScriptCannotTakeIsRefused(t *testing.T) {
+	nan, endless := float32(math.NaN()), float32(math.Inf(-1))
+	for _, c := range []struct {
+		document, words string
+		change          func(player *w3i.Player, fog *w3i.Fog)
+	}{
+		{`{"players":{"0":{"controller":"computer"}}}`, "player 0 has controller 9 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Controller.Value = 9 }},
+		{`{"players":{"0":{"controller":"computer"}}}`, "player 0 has controller 0 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Controller.Value = 0 }},
+		{`{"players":{"0":{"controller":"computer"}}}`, "player 0 has controller -1 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Controller.Value = -1 }},
+		{`{"players":{"0":{"race":"orc"}}}`, "player 0 has race 5 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Race.Value = 5 }},
+		{`{"players":{"0":{"race":"orc"}}}`, "player 0 has race -2 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Race.Value = -2 }},
+		{`{"players":{"0":{"x":1}}}`, "player 0 has a start position in the map info that is not a number",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Y.Value = nan }},
+		{`{"players":{"0":{"y":1}}}`, "player 0 has a start position in the map info that is not a number",
+			func(player *w3i.Player, _ *w3i.Fog) { player.X.Value = endless }},
+		{`{"environment":{"fog":{"style":1}}}`, "the fog of the map info has a start, an end or a density that is not a number",
+			func(_ *w3i.Player, fog *w3i.Fog) { fog.Density.Value = nan }},
+		{`{"environment":{"fog":{"style":1}}}`, "the fog of the map info has a start, an end or a density that is not a number",
+			func(_ *w3i.Player, fog *w3i.Fog) { fog.Start.Value = endless }},
+	} {
+		_, err := patchLua(fixtureLua(t), settingsOf(t, c.document), damaged(t, c.change), luaFile)
+		failure := asError(t, err, c.document)
+		if failure.File != luaFile || !strings.Contains(failure.Msg, c.words) || !strings.Contains(failure.Hint, "Re-save the map in World Editor") {
+			t.Errorf("%s: the error names %q, says %q and hints %q; want %q in it", c.document, failure.File, failure.Msg, failure.Hint, c.words)
+		}
+	}
+}
+
+func TestAValueOfTheMapInfoThatNoSettingMakesTheScriptTakeIsNotLookedAt(t *testing.T) {
+	broken := damaged(t, func(player *w3i.Player, fog *w3i.Fog) {
+		player.Controller.Value, player.Race.Value, player.X.Value = 9, 9, float32(math.NaN())
+		fog.End.Value = float32(math.Inf(1))
+	})
+	for _, document := range []string{
+		`{"players":{"0":{"name":"Hero","fixedStart":true},"1":{"controller":"computer","race":"orc","x":1}}}`,
+		`{"environment":{"soundEnvironment":"Cave","waterColor":[1,2,3,4]}}`,
+	} {
+		if _, err := patchLua(fixtureLua(t), settingsOf(t, document), broken, luaFile); err != nil {
+			t.Errorf("%s: %v", document, err)
+		}
+	}
+	// A fog that is not shown is reset, and none of its numbers is written.
+	broken.Flags.Value &^= fogOn
+	script, err := patchLua(fixtureLua(t), settingsOf(t, `{"environment":{"fog":{"style":1}}}`), broken, luaFile)
+	if err != nil || !strings.Contains(script, "ResetTerrainFog()\r\nCreateAllUnits()") {
+		t.Errorf("a fog that is not shown: %v", err)
 	}
 }
 
