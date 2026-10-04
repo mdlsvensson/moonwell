@@ -1,6 +1,7 @@
 package fsx
 
 import (
+	"bytes"
 	"errors"
 	"io/fs"
 	"os"
@@ -42,15 +43,24 @@ func (j *Journal) Remove(path string) error {
 	return RemoveFile(path)
 }
 
-// Len is how many files the journal has touched so far. A file touched twice counts twice.
+// Len is how many times the journal has touched a file so far. A file touched twice counts twice, and a write that
+// failed and a remove of a file that was not there count too.
 func (j *Journal) Len() int { return len(j.touched) }
 
-// Undo puts back every file the journal touched, newest first, and forgets them. It goes on past a file it cannot
-// put back and returns each of those as "path (reason)". Folders that Write created stay.
-func (j *Journal) Undo() (unrestored []string) {
+// Unrestored is a file Undo could not put back: the path the journal was given, and the system's error as it came,
+// for the caller to word (with Reason, for one).
+type Unrestored struct {
+	Path string
+	Err  error
+}
+
+// Undo puts back every file the journal touched, newest first, and forgets them. A file that already holds what it
+// held, as after a write or a remove that failed before changing it, is left alone. Undo goes on past a file it
+// cannot put back and returns each of those. Folders that Write created stay.
+func (j *Journal) Undo() (unrestored []Unrestored) {
 	for _, t := range slices.Backward(j.touched) {
 		if err := t.restore(); err != nil {
-			unrestored = append(unrestored, t.path+" ("+Reason(err)+")")
+			unrestored = append(unrestored, Unrestored{Path: t.path, Err: err})
 		}
 	}
 	j.touched = nil
@@ -68,10 +78,24 @@ func (j *Journal) remember(path string) error {
 	return nil
 }
 
-// restore makes the file what it was: its bytes again, or gone again.
+// restore makes the file what it was: its bytes again, or gone again. A file that is already so is left alone, so
+// a file the journal could not change (read-only, or held by another program) is not one it fails to put back.
 func (t touch) restore() error {
+	if t.asItWas() {
+		return nil
+	}
 	if !t.existed {
 		return RemoveFile(t.path)
 	}
 	return os.WriteFile(t.path, t.before, 0o666)
+}
+
+// asItWas reports whether the file holds what it held before the touch: the same bytes, or still no file. A file
+// that cannot be read now is not known to, so restore tries it.
+func (t touch) asItWas() bool {
+	now, err := os.ReadFile(t.path)
+	if !t.existed {
+		return errors.Is(err, fs.ErrNotExist)
+	}
+	return err == nil && bytes.Equal(now, t.before)
 }

@@ -4,6 +4,7 @@ import (
 	"go/parser"
 	"go/token"
 	"io/fs"
+	"path"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -17,8 +18,17 @@ const (
 )
 
 var (
-	foundations = []string{"manifest", "mapdir", "env", "diag", "fsx", "binio"}
-	areas       = []string{"objects", "settings", "assets", "script", "library", "editor", "toolchain"}
+	// foundations is each foundation with the packages of the new tree it may import: what its package comment
+	// says it imports, and no more. No foundation imports a war3/… package.
+	foundations = map[string][]string{
+		"diag":     nil,
+		"binio":    nil,
+		"fsx":      {"diag"},
+		"env":      {"diag", "fsx"},
+		"mapdir":   {"diag", "fsx"},
+		"manifest": {"env", "diag", "fsx"},
+	}
+	areas = []string{"objects", "settings", "assets", "script", "library", "editor", "toolchain"}
 	// belowFormats is what a war3/… package may import besides other war3/… packages.
 	belowFormats = []string{"diag", "fsx", "binio"}
 	testOnly     = []string{"testkit", "oracle"}
@@ -26,15 +36,20 @@ var (
 
 func isFormat(pkg string) bool { return strings.HasPrefix(pkg, "war3/") }
 
+func isFoundation(pkg string) bool {
+	_, is := foundations[pkg]
+	return is
+}
+
 func onAShelf(pkg string) bool {
-	return isFormat(pkg) || pkg == "build" || pkg == "cli" || slices.Contains(foundations, pkg) ||
+	return isFormat(pkg) || pkg == "build" || pkg == "cli" || isFoundation(pkg) ||
 		slices.Contains(areas, pkg) || slices.Contains(testOnly, pkg)
 }
 
 // allowed reports whether a non-test file of package from may import package to. Both are paths below
 // next/internal.
 func allowed(from, to string) bool {
-	below := isFormat(to) || slices.Contains(foundations, to)
+	below := isFormat(to) || isFoundation(to)
 	switch {
 	case slices.Contains(testOnly, to):
 		return slices.Contains(testOnly, from)
@@ -42,8 +57,8 @@ func allowed(from, to string) bool {
 		return true
 	case isFormat(from):
 		return isFormat(to) || slices.Contains(belowFormats, to)
-	case slices.Contains(foundations, from):
-		return below
+	case isFoundation(from):
+		return slices.Contains(foundations[from], to)
 	case from == "editor" && (to == "objects" || to == "script"):
 		return true
 	case slices.Contains(areas, from):
@@ -56,27 +71,38 @@ func allowed(from, to string) bool {
 	return false
 }
 
+// shelved is the package of a file as a path below internal, and whether the file is below internal at all. The
+// file is a path below this folder with "/" separators.
+func shelved(file string) (pkg string, is bool) {
+	pkg, is = strings.CutPrefix(path.Dir(file)+"/", "internal/")
+	return strings.TrimSuffix(pkg, "/"), is
+}
+
+// Every Go file below this folder keeps off the old tree, unless it is an oracle_test.go or in the package oracle.
+// The files below internal are also on the shelves: each package is on one, and imports only what its shelf may.
 func TestImportsOnlyGoDownTheShelves(t *testing.T) {
-	err := filepath.WalkDir("internal", func(path string, entry fs.DirEntry, err error) error {
-		if err != nil || entry.IsDir() || !strings.HasSuffix(path, ".go") {
+	err := filepath.WalkDir(".", func(file string, entry fs.DirEntry, err error) error {
+		if err != nil || entry.IsDir() || !strings.HasSuffix(file, ".go") {
 			return err
 		}
-		file, err := parser.ParseFile(token.NewFileSet(), path, nil, parser.ImportsOnly)
+		parsed, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ImportsOnly)
 		if err != nil {
 			return err
 		}
-		from := filepath.ToSlash(strings.TrimPrefix(filepath.Dir(path), "internal"+string(filepath.Separator)))
-		if !onAShelf(from) {
-			t.Errorf("%s: package %s is on no shelf; add it to this test and to the spec's layout", path, from)
+		file = filepath.ToSlash(file)
+		from, onShelves := shelved(file)
+		if onShelves && !onAShelf(from) {
+			t.Errorf("%s: package %s is on no shelf; add it to this test and to the spec's layout", file, from)
 		}
-		isTest := strings.HasSuffix(path, "_test.go")
-		for _, spec := range file.Imports {
+		isTest := strings.HasSuffix(file, "_test.go")
+		for _, spec := range parsed.Imports {
 			target, _ := strconv.Unquote(spec.Path.Value)
-			if strings.HasPrefix(target, oldTree) && filepath.Base(path) != "oracle_test.go" && from != "oracle" {
-				t.Errorf("%s imports the old tree (%s); only oracle_test.go files may", path, target)
+			if strings.HasPrefix(target, oldTree) && path.Base(file) != "oracle_test.go" && from != "oracle" {
+				t.Errorf("%s imports the old tree (%s); only oracle_test.go files may", file, target)
 			}
-			if to, inNewTree := strings.CutPrefix(target, newTree); inNewTree && !isTest && !allowed(from, to) {
-				t.Errorf("%s: package %s must not import %s", path, from, to)
+			to, inNewTree := strings.CutPrefix(target, newTree)
+			if inNewTree && onShelves && !isTest && !allowed(from, to) {
+				t.Errorf("%s: package %s must not import %s", file, from, to)
 			}
 		}
 		return nil

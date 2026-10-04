@@ -38,7 +38,7 @@ type Folder struct {
 	dir, label string
 	found      *listing          // what Open found on disk
 	hashes     map[string]string // by key, the SHA-256 of each file as it was first read from disk
-	// The planned changes: one a file, in the order first planned. A change to a file that is not on disk is always
+	// The planned changes: one per file, in the order first planned. A change to a file that is not on disk is always
 	// a write.
 	changes []Change
 	planned map[string]int    // by key, where in changes a file's change is

@@ -268,7 +268,7 @@ func TestApplyInPlaceWritesThroughTheJournalWhichCanUndoIt(t *testing.T) {
 		t.Errorf("the journal has touched %d files, want 4: nothing may be written past it", journal.Len())
 	}
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
-		t.Errorf("unrestored = %q", unrestored)
+		t.Errorf("unrestored = %v", unrestored)
 	}
 	// The journal puts files back; the folders made for them stay.
 	if got := filesOf(snapshot(t, dir)); !reflect.DeepEqual(got, filesOf(before)) {

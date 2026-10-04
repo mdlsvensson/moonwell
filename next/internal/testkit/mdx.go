@@ -1,6 +1,7 @@
 package testkit
 
-// Builders for binary MDX models, using the layouts in the model-paths spec §3.1.
+// Builders for binary MDX models: the file with its chunks, and the entries and records of the chunks that hold
+// file paths (textures, particle emitters, attachments, popcorn effects and face effects).
 
 const (
 	EmitterUsesMDL = 0x8000

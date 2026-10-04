@@ -3,7 +3,6 @@ package fsx
 import (
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 )
 
@@ -38,7 +37,7 @@ func TestJournalUndoPutsBackEveryFileItWroteOrRemoved(t *testing.T) {
 	}
 
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
-		t.Errorf("unrestored = %q", unrestored)
+		t.Errorf("unrestored = %v", unrestored)
 	}
 	for _, c := range []struct{ path, want string }{{created, "<missing>"}, {changed, "before"}, {removed, "kept"}} {
 		if got := read(t, c.path); got != c.want {
@@ -63,7 +62,7 @@ func TestJournalUndoGoesNewestFirst(t *testing.T) {
 		}
 	}
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
-		t.Errorf("unrestored = %q", unrestored)
+		t.Errorf("unrestored = %v", unrestored)
 	}
 	if got := read(t, file); got != "first" {
 		t.Errorf("the file holds %q, want what it held before the first write", got)
@@ -93,17 +92,40 @@ func TestJournalUndoReturnsAFileItCannotPutBackAndRestoresTheOthers(t *testing.T
 	t.Cleanup(func() { os.Chmod(stuck, 0o666) })
 
 	unrestored := journal.Undo()
-	if len(unrestored) != 1 || !strings.HasPrefix(unrestored[0], stuck+" (") || !strings.HasSuffix(unrestored[0], ")") {
-		t.Fatalf("unrestored = %q, want only %s with a reason", unrestored, stuck)
-	}
-	reason := strings.TrimPrefix(unrestored[0], stuck)
-	if strings.Contains(reason, stuck) || strings.Contains(reason, "open ") {
-		t.Errorf("the reason %q repeats Go's operation and path", reason)
+	if len(unrestored) != 1 || unrestored[0].Path != stuck || unrestored[0].Err == nil {
+		t.Fatalf("unrestored = %v, want only %s with the system's error", unrestored, stuck)
 	}
 	if got := read(t, stuck); got != "after" {
 		t.Errorf("the read-only file holds %q", got)
 	}
 	if got := read(t, created); got != "<missing>" {
 		t.Errorf("the file written first holds %q; the undo stopped at the failure", got)
+	}
+}
+
+func TestJournalUndoLeavesAFileThatAFailedWriteDidNotChange(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root may write a read-only file, so the write would not fail")
+	}
+	locked := filepath.Join(t.TempDir(), "locked.txt")
+	write(t, locked, "before")
+	if err := os.Chmod(locked, 0o444); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.Chmod(locked, 0o666) })
+
+	var journal Journal
+	if err := journal.Write(locked, []byte("after")); err == nil {
+		t.Fatal("writing a read-only file succeeded")
+	}
+	if journal.Len() != 1 {
+		t.Errorf("the journal has touched %d files, want 1: a failed write is a touch", journal.Len())
+	}
+	// Putting the file back would fail as the write did, but there is nothing to put back.
+	if unrestored := journal.Undo(); len(unrestored) != 0 {
+		t.Errorf("unrestored = %v, want none: the file holds what it held", unrestored)
+	}
+	if got := read(t, locked); got != "before" {
+		t.Errorf("the read-only file holds %q, want what it held before the write", got)
 	}
 }

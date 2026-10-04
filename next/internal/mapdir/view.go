@@ -31,7 +31,7 @@ func (f *Folder) With(changes []Change) *Folder {
 	return &view
 }
 
-// Changes is what the view changes in the folder on disk: one Change a file, in the order first planned.
+// Changes is what the view changes in the folder on disk: one Change per file, in the order first planned.
 func (f *Folder) Changes() []Change { return slices.Clone(f.changes) }
 
 // lay puts one change over the view. A later change to a file takes the place of the earlier one.

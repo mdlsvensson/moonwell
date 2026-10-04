@@ -1,5 +1,6 @@
 // Package env is everything Moonwell uses from outside the program, gathered in one struct: running another program,
-// downloading an address, starting the game, the logger, the per-user cache folder and the platform.
+// downloading an address, starting a program that outlives Moonwell, the logger, the per-user cache folder and the
+// platform.
 //
 // New takes a project folder and a logger and returns the Env of the real world; a test builds an Env of its own, or
 // replaces the parts it wants to watch or to keep from happening. Run takes a program and its arguments and returns
