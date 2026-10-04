@@ -161,6 +161,9 @@ func compare(t *testing.T, m pair, in input, count *tally) {
 	switch {
 	case reworded(wantErr) && err != nil:
 		count.reworded, count.undecoded = count.reworded+1, count.undecoded+1
+		if in.document != project(onlyTheOtherTreeReads) {
+			t.Errorf("%s: this tree does not decode the manifest, and it is not the one with a number no float64 holds: %v", what, err)
+		}
 		return
 	case reworded(wantErr):
 		count.reworded++

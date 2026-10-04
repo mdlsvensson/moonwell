@@ -15,7 +15,8 @@ import (
 )
 
 // The tests of resolve.go, fields.go and values.go give Resolve the objects of a manifest as pkl prints them, from
-// the tables of cases each file holds. The oracle gives every case of those tables to both trees.
+// the tables of cases each file holds. The oracle runs every case of those tables too, so a case added to a table
+// is compared there.
 
 // accepted is objects that resolve, and what they resolve to.
 type accepted struct {

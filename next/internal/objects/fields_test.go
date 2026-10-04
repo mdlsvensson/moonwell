@@ -109,6 +109,8 @@ var fieldRules = []refused{
 	// The lists of an object whose own count is below 1 are not counted against it.
 	{name: "an ability's own levels of 0", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","levels":0,"manaCost":[1]}}}`,
 		at: `abilities["holy"].levels`, says: "'alev' (Levels) must be at least 1, got 0.", hint: "at least one level; use null"},
+	{name: "an ability's own levels of the zero below 0", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","levels":-0.0}}}`,
+		at: `abilities["holy"].levels`, says: "'alev' (Levels) must be at least 1, got 0.", hint: "at least one level; use null"},
 	{name: "an upgrade's own levels below 0", document: `{"upgrades":{"swords":{"id":"R000","base":"Rhme","properties":{"glvl":-2}}}}`,
 		at: `upgrades["swords"].properties["glvl"]`, says: "'glvl' (Levels) must be at least 1, got -2.", hint: "at least one level"},
 	{name: "more levels than the base ability has", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","castRange":[1,2,3,4]}}}`,

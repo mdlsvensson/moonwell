@@ -1,6 +1,7 @@
 package objects_test
 
 import (
+	"maps"
 	"regexp"
 	"slices"
 	"testing"
@@ -80,20 +81,20 @@ func TestMetadataFriendlyNamesAreValidAndUniqueAmongTheFieldsAnObjectCanHave(t *
 			}
 		}
 	}
-	// One base of every category but abilities, whose fields depend on the base: there, every base that some field
-	// is specific to.
+	// One base of every category, the first by id; and of the abilities, whose fields depend on the base, every base
+	// too, with every base that some field is specific to.
 	for _, category := range manifest.Categories {
-		var bases []string
-		for id := range metadata.Bases[category] {
-			bases = append(bases, id)
-			if category != "abilities" {
-				break
-			}
+		bases := slices.Sorted(maps.Keys(metadata.Bases[category]))
+		if len(bases) == 0 {
+			t.Errorf("no standard %s", category)
+			continue
 		}
 		if category == "abilities" {
 			for _, field := range metadata.Fields["abilities"] {
 				bases = append(bases, field.Specific...)
 			}
+		} else {
+			bases = bases[:1]
 		}
 		slices.Sort(bases)
 		for _, base := range slices.Compact(bases) {
