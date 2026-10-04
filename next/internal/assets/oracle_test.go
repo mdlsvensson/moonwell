@@ -14,10 +14,15 @@ import (
 	"strings"
 	"testing"
 
+	moonwell "github.com/mdlsvensson/moonwell"
 	oldassets "github.com/mdlsvensson/moonwell/internal/assets"
+	oldcli "github.com/mdlsvensson/moonwell/internal/cli"
 	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/layout"
+	"github.com/mdlsvensson/moonwell/internal/logging"
+	oldmodels "github.com/mdlsvensson/moonwell/internal/models"
 	"github.com/mdlsvensson/moonwell/internal/ordered"
+	"github.com/mdlsvensson/moonwell/internal/pipeline"
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
@@ -52,6 +57,17 @@ import (
 //     which it copies before it plans, is taken away before the folders are compared. The stories are every
 //     scenario of the other tree's tests of the plan, and seeded ones.
 //   - The same for a context that is cancelled at every ask of a plan and of a sync, one after the other.
+//   - GamePathKey against GamePathKey, on every line of the list of the game's paths that the program carries
+//     and on seeded paths: stems with every ending the keys tell apart and more, each as written, in capitals
+//     and with backslashes.
+//   - ParseGamePaths against ParseGamePaths and LoadGamePaths against LoadGamePaths: the list the program
+//     carries, and seeded lists with comments, blank lines, either line end and white space around the paths.
+//   - The report of one model outside a project. The other tree's steps of the report are inside its command,
+//     AssetsPaths, which outside a project needs only a folder and the model's file: its references with their
+//     statuses against ReportModels, the lines it logs against RenderReports byte for byte, and what it refuses
+//     a model with against the reason this tree reports. Inside a project the command loads the manifest and
+//     syncs the libraries first, which is not this package's; the statuses of a project and their lines are held
+//     by the tests of report.go, with the lines the other tree's tests expect.
 //
 // Compared in part, and counted. The first five are what a folder cannot hold or give, which this tree leaves to
 // mapdir and its words: assets/ and each library's folder are read through mapdir.Open, as a map folder is.
@@ -120,6 +136,15 @@ import (
 //   - A plan the other tree's ApplyPlan takes and this tree cannot make: one that turns a file of the map into
 //     a folder, which the other tree's test of an undo builds by hand. The stories reach an undo that cannot put
 //     a file back through a context that changes the map between two writes.
+//   - A path with a capital I with a dot, for the keys of the game's paths, alone and in a list: this tree folds
+//     each letter to one letter, a plain i, and the other tree to an i and a combining dot
+//     (TestGamePathKeyFoldsEachLetterToOneLetter). Counted, and each must differ.
+//   - A list of the game's paths with a byte order mark or a next-line character (U+0085) at the edge of a line:
+//     this tree takes Unicode's white space off a line, which the second is and the first is not, and to the
+//     other tree the first is white space and the second is not
+//     (TestParseGamePathsTakesTheWhiteSpaceOffEachLine). Counted, and each must differ.
+//   - A model's path with a character beyond the basic plane, for the lines of the report: this tree pads a
+//     column by characters and the other by UTF-16 units (TestTheColumnsOfAReportArePaddedByCharacters).
 
 // oldManifest is the manifest the other tree names in every error about the assets block.
 const oldManifest = "moonwell.pkl"
@@ -1513,5 +1538,257 @@ func TestOracleOnAMapFileThatCannotBeRead(t *testing.T) {
 	}
 	if compared != 2 {
 		t.Errorf("%d refusals compared, want 2", compared)
+	}
+}
+
+// ---- the game's paths ----
+
+// The characters the two trees take differently. Each is a class that is left out, counted, and seen to differ.
+const (
+	dottedI       = "\xc4\xb0"     // U+0130, a capital I with a dot
+	byteOrderMark = "\xef\xbb\xbf" // U+FEFF
+	nextLine      = "\xc2\x85"     // U+0085
+)
+
+// carriedLines is every line of the list of the game's paths that the program carries, its header among them.
+func carriedLines() []string {
+	var lines []string
+	for line := range strings.Lines(moonwell.GamePaths) {
+		lines = append(lines, strings.TrimRight(line, "\r\n"))
+	}
+	return lines
+}
+
+// seededGamePaths is paths as a model may name them: each stem with each ending, as written, in capitals and
+// with backslashes. The endings are every one a key tells apart, and ones it must not.
+func seededGamePaths() []string {
+	stems := []string{
+		"textures/black32", "Units/Human/Footman/Footman", "a", "", "folder.blp/name", "folder.mdl/name", "two..dots",
+		"caf\xc3\xa9/\xc3\x89cole", "stra\xc3\x9fe/gro\xc3\x9f", "\xce\x9f\xce\x94\xce\x9f\xce\xa3/\xce\xa3", "\xe2\x84\xaaelvin/\xc5\xbf",
+		dottedI + "con/a", "icon/" + dottedI,
+	}
+	endings := []string{
+		"", ".", ".blp", ".dds", ".tga", ".tif", ".tiff", ".png", ".jpg", ".jpeg", ".bmp", ".mdl", ".mdx", ".pkb",
+		".pkfx", ".wav", ".blp.mdl", ".mdl.blp", ".mdl.mdl", ".tif.tiff", ".blp ", ".b lp", ".blp/", ".mdl/", "blp", "mdl",
+	}
+	var paths []string
+	for _, stem := range stems {
+		for _, ending := range endings {
+			path := stem + ending
+			paths = append(paths, path, strings.ToUpper(path), strings.ReplaceAll(path, "/", `\`))
+		}
+	}
+	slices.Sort(paths)
+	return slices.Compact(paths)
+}
+
+func TestOracleOnTheKeyOfAGamePath(t *testing.T) {
+	compared, leftOut := 0, 0
+	for _, path := range slices.Concat(carriedLines(), seededGamePaths()) {
+		want, got := oldmodels.GamePathKey(path), GamePathKey(path)
+		if strings.Contains(path, dottedI) {
+			leftOut++
+			if want == got {
+				t.Errorf("the path %q is left out, and both trees give it the key %q", path, got)
+			}
+			continue
+		}
+		oracle.Values(t, "the key of the path "+path, want, got)
+		compared++
+	}
+	// The list of Warcraft III 3.0.0.24268 has 42128 lines; 782 of the seeded paths are without the letter.
+	if compared != 42128+782 || leftOut != 156 {
+		t.Errorf("%d keys compared and %d left out, want 42910 and 156", compared, leftOut)
+	}
+}
+
+// around is a short list with white inside and around each of its lines: a path, a comment, a line of white
+// alone, and a path with white in it.
+func around(white string) string {
+	return white + "textures/a.blp" + white + "\n" + white + "# a comment" + white + "\n" + white + "\n" +
+		"units/b" + white + "c.mdl" + white
+}
+
+// seededLists is lists of the game's paths as a file may hold them, without the characters the two trees take
+// differently: the seeded paths under either line end and between comments and blank lines, and a short list
+// with each kind of white space around its lines, and with characters that are none.
+func seededLists() []string {
+	paths := slices.DeleteFunc(seededGamePaths(), func(path string) bool { return strings.Contains(path, dottedI) })
+	lists := []string{
+		"", "\n", "\r\n", "# only a comment", "# only a comment\n", "#\n#\n", "textures/a.blp", "textures/a.blp\n\n\n",
+		strings.Join(paths, "\n"), strings.Join(paths, "\n") + "\n", strings.Join(paths, "\r\n") + "\r\n",
+		strings.Join(paths, "\r"), "# header\n\n" + strings.Join(paths, "\n\n# between\n"),
+		" \t" + strings.Join(paths, " \t\n \t"), "#" + strings.Join(paths, "\n#"), " #" + strings.Join(paths, "\n\t#"),
+	}
+	whites := []string{
+		" ", "\t", "\v", "\f", "\r", "\xc2\xa0", "\xe1\x9a\x80", "\xe2\x80\x83", "\xe2\x80\xa8", "\xe2\x80\xa9", "\xe2\x80\xaf",
+		"\xe2\x81\x9f", "\xe3\x80\x80",
+		// None of these is white space.
+		"\x00", "\x1f", "\xe2\x80\x8b", "\xe1\xa0\x8e", "\xff", "_",
+	}
+	for _, white := range whites {
+		lists = append(lists, around(white))
+	}
+	return lists
+}
+
+// differingLists is lists with a character the two trees take differently, each of which they must read
+// differently.
+func differingLists() []string {
+	return []string{
+		"textures/" + dottedI + ".blp\n", "units/a.mdx\n" + dottedI + "\n", "# " + dottedI + "\nI" + dottedI + "i.mdl",
+		around(byteOrderMark), byteOrderMark + "# Warcraft III 3.0\ntextures/a.blp\n", "textures/a.blp" + byteOrderMark,
+		around(nextLine), nextLine + "textures/a.blp\n", "textures/a.blp\n" + nextLine + "\n",
+	}
+}
+
+// takenDifferently reports whether a list of the game's paths holds a character the two trees take differently.
+func takenDifferently(list string) bool {
+	return strings.Contains(list, dottedI) || strings.Contains(list, byteOrderMark) || strings.Contains(list, nextLine)
+}
+
+func TestOracleOnAListOfGamePaths(t *testing.T) {
+	compared, leftOut := 0, 0
+	for i, list := range slices.Concat([]string{moonwell.GamePaths}, seededLists(), differingLists()) {
+		want, got := oldmodels.ParseGamePaths(list), ParseGamePaths(list)
+		if takenDifferently(list) {
+			leftOut++
+			if maps.Equal(want, got) {
+				t.Errorf("the list %q is left out, and both trees read it as %q", list, slices.Sorted(maps.Keys(got)))
+			}
+			continue
+		}
+		oracle.Values(t, fmt.Sprintf("the paths of list %d", i), want, got)
+		compared++
+	}
+	if compared != 36 || leftOut != 9 {
+		t.Errorf("%d lists compared and %d left out, want 36 and 9", compared, leftOut)
+	}
+	carried := LoadGamePaths()
+	oracle.Values(t, "the list the program carries", oldmodels.LoadGamePaths(), carried)
+	if len(carried) != 42114 {
+		t.Errorf("the list the program carries has %d keys, want the 42114 of Warcraft III 3.0.0.24268", len(carried))
+	}
+}
+
+// ---- the report of a model ----
+
+// reportedModel is a model for both trees to report, by the name of its file.
+type reportedModel struct {
+	file       string
+	data       []byte
+	unreadable bool // whether both trees fail to read it
+}
+
+// reportedGamePaths is the list of the game's paths the reported models are classified by.
+const reportedGamePaths = "# test\ntextures/knight.dds\nabilities/spells/human/heal.mdx\ndoodads/corn/plant1_normal.dds\n" +
+	"textures/spark.blp\nunits/human/knight/knight_portrait.mdx\n"
+
+// reportedText is a text model with a texture of each kind and two emitters.
+const reportedText = `Version {
+	FormatVersion 800,
+}
+Textures 4 {
+	Bitmap {
+		Image "Textures/Knight.blp",
+	}
+	Bitmap {
+		Image "",
+		ReplaceableId 2,
+	}
+	Bitmap {
+		Image "",
+		ReplaceableId 31,
+	}
+	Bitmap {
+		Image "war3mapImported\Cape.tga",
+	}
+}
+ParticleEmitter "Heal" {
+	EmitterUsesMDL,
+	Particle {
+		Path "Abilities\Spells\Human\Heal.mdl",
+	}
+}
+ParticleEmitter "Spark" {
+	EmitterUsesTGA,
+	Path "Textures\Spark.blp",
+}
+`
+
+// reportedModels is models of both formats with references of every kind and status a report outside a project
+// has, in columns of several widths, and models that cannot be read. No path has a character beyond the basic
+// plane.
+func reportedModels() []reportedModel {
+	everyKind := testkit.MDX(
+		testkit.Chunk("TEXS", testkit.Concat(testkit.Texture("Textures/Knight.blp", 0), testkit.Texture("", 1),
+			testkit.Texture("", 2), testkit.Texture("", 7), testkit.Texture(`Textures\Mine.blp`, 0))),
+		testkit.Chunk("PREM", testkit.Concat(testkit.Emitter(`Abilities\Spells\Human\Heal.mdl`, testkit.EmitterUsesMDL),
+			testkit.Emitter(`Textures\Spark.tga`, testkit.EmitterUsesTGA), testkit.Emitter("Models/Both.mdx", testkit.EmitterUsesMDL|testkit.EmitterUsesTGA),
+			testkit.Emitter(`Models\Neither.mdx`, 0))),
+		testkit.Chunk("ATCH", testkit.Attachment(`Units\Human\Knight\Knight_Portrait.mdl`)),
+		testkit.Chunk("CORN", testkit.Popcorn(`Particles\Fire.pkb`)),
+		testkit.Chunk("FAFX", testkit.FaceEffect("Node", `Units\Human\Knight\Knight.facefx`)),
+	)
+	return []reportedModel{
+		{file: "knight.mdx", data: everyKind},
+		{file: "Models/Deep/Knight.mdx", data: everyKind},
+		{file: "one.mdx", data: textured("Doodads/Corn/plant1_Normal.tif")},
+		{file: "custom.mdx", data: textured("a.blp", `a\very\long\path\to\a\texture\that\is\wider\than\any\status.blp`)},
+		{file: "slots.mdx", data: testkit.MDX(testkit.Chunk("TEXS", testkit.Concat(testkit.Texture("", 1), testkit.Texture("", 12))))},
+		{file: "accents.mdx", data: textured("Textures\\caf\xc3\xa9.blp", "Textures/\xc3\x89cole du Nord.blp", "Textures\\tab\there.blp", "x ")},
+		{file: "empty.mdx", data: testkit.MDX()},
+		{file: "text.mdl", data: []byte(reportedText)},
+		{file: "version.mdl", data: []byte("Version {\n\tFormatVersion 800,\n}\n")},
+		{file: "broken.mdl", data: []byte("Model {\n}\nBroken {\n"), unreadable: true},
+		{file: "cut.mdx", data: []byte("MDLXTEX"), unreadable: true},
+		{file: "short.mdx", data: testkit.MDX(testkit.Chunk("TEXS", make([]byte, 100))), unreadable: true},
+		{file: "picture.blp", data: []byte("BLP1\x00\x00\x00\x00"), unreadable: true},
+		{file: "nothing.mdl", data: nil, unreadable: true},
+	}
+}
+
+// byOtherTree is the other tree's report of a model outside a project: the references with their statuses and
+// the lines it logs, or what it refuses the model with. Its command is given a folder that holds only the model.
+func (m reportedModel) byOtherTree(t testing.TB) (refs []oldcli.ModelRef, lines []string, err error) {
+	t.Helper()
+	root := t.TempDir()
+	testkit.WriteFile(t, root, m.file, m.data)
+	env := &pipeline.Env{Root: root, Log: logging.New(func(line string) { lines = append(lines, line) }, "")}
+	reports, err := oldcli.AssetsPaths(background, env, m.file, oldmodels.ParseGamePaths(reportedGamePaths))
+	if err != nil {
+		return nil, lines, err
+	}
+	if len(reports) != 1 || reports[0].Heading != m.file {
+		t.Fatalf("the other tree reports %s as %+v", m.file, reports)
+	}
+	return reports[0].Refs, lines, nil
+}
+
+func TestOracleOnTheReportOfAModelOutsideAProject(t *testing.T) {
+	read, unreadable := 0, 0
+	for _, m := range reportedModels() {
+		refs, lines, err := m.byOtherTree(t)
+		reports := ReportModels([]Model{{m.file, m.data}}, ParseGamePaths(reportedGamePaths), nil)
+		if m.unreadable {
+			failure := &olddiag.Error{}
+			if !errors.As(err, &failure) || len(lines) != 0 {
+				t.Errorf("%s: the other tree gives %v after the lines %q, want a refusal and no line", m.file, err, lines)
+				continue
+			}
+			oracle.Values(t, m.file+": why it is unreadable", failure.Msg, reports[0].Unreadable)
+			unreadable++
+			continue
+		}
+		if err != nil {
+			t.Errorf("%s: the other tree refuses it: %v", m.file, err)
+			continue
+		}
+		oracle.Values(t, m.file+": the references", refs, reports[0].Refs)
+		oracle.Values(t, m.file+": the lines", lines, RenderReports(reports, false))
+		read++
+	}
+	if read != 9 || unreadable != 5 {
+		t.Errorf("%d models read and %d unreadable in both trees, want 9 and 5", read, unreadable)
 	}
 }

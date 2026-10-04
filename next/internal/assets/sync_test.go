@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/imp"
 )
@@ -199,9 +200,11 @@ func TestASyncThatCannotWriteOverAnOwnedFileUndoesItsWritesAndLeavesTheFileAsItW
 	s.unchanged(before, "a failed sync")
 }
 
-// The state file is written last. When that write fails, every change of the map is made already: a file
-// replaced, a file added, a file removed and the index. Each is put back.
-func TestASyncThatCannotWriteItsStateRestoresTheMapByteForByte(t *testing.T) {
+// changedMap is a site whose map a sync has written once and whose next sync changes it in every way: a file
+// replaced, a file added, a file removed and the index. The state file is the fifth and last thing that sync
+// writes.
+func changedMap(t *testing.T) (*site, *mapdir.Folder, *Result) {
+	t.Helper()
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp", "first")
 	put(t, s.root, "assets/dropped.blp")
@@ -218,20 +221,52 @@ func TestASyncThatCannotWriteItsStateRestoresTheMapByteForByte(t *testing.T) {
 	if got, want := names(result.Changes), []string{"a.blp", "new.blp", "-dropped.blp", "war3map.imp"}; !slices.Equal(got, want) {
 		t.Fatalf("the changes are %q, want %q", got, want)
 	}
+	return s, folder, result
+}
+
+// mapIsChanged fails the test unless the map of a changedMap holds every change of its second sync.
+func (s *site) mapIsChanged() {
+	s.t.Helper()
+	if s.inMap("a.blp") != "second" || s.inMap("new.blp") != "asset" || s.inMap("dropped.blp") != missing {
+		s.t.Error("the map's changes are not made before the state file is written")
+	}
+}
+
+// The state file is written last. When that write fails, every change of the map is made already. Each is put
+// back, and the state file is as it was.
+func TestASyncThatCannotWriteItsStateRestoresTheMapByteForByte(t *testing.T) {
+	s, folder, result := changedMap(t)
+	before := testkit.Snapshot(t, s.root)
+	makeUnwritable(t, s.state)
+	ctx := &countdown{Context: background, limit: never, before: map[int]func(){5: s.mapIsChanged}}
+
+	e := asError(t, Sync(ctx, folder, result, s.state), "a sync that cannot write its state")
+	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
+		e.File != s.state || !strings.Contains(e.Hint, "can be written") || e.Cause == nil {
+		t.Errorf("error = %+v", e)
+	}
+	if ctx.asks != 5 {
+		t.Errorf("the sync asked %d times, want the state file to be its ask 5 and its last", ctx.asks)
+	}
+	s.unchanged(before, "a failed sync")
+}
+
+// The state file is read once more just before it is written. When it cannot be read at that moment, here
+// because a folder has taken its place, every change of the map is made already. Each is put back.
+func TestASyncThatCannotReadItsStateJustBeforeWritingItRestoresTheMapByteForByte(t *testing.T) {
+	s, folder, result := changedMap(t)
 	before := testkit.Snapshot(t, s.mapDir)
 	// Before the fifth ask, the one for the state file, a folder takes the state file's place.
 	ctx := &countdown{Context: background, limit: never, before: map[int]func(){5: func() {
-		if s.inMap("a.blp") != "second" || s.inMap("new.blp") != "asset" || s.inMap("dropped.blp") != missing {
-			t.Error("the map's changes are not made before the state file is written")
-		}
+		s.mapIsChanged()
 		if err := errors.Join(os.Remove(s.state), os.Mkdir(s.state, 0o777)); err != nil {
 			t.Fatal(err)
 		}
 	}}}
 
-	e := asError(t, Sync(ctx, folder, result, s.state), "a sync that cannot write its state")
+	e := asError(t, Sync(ctx, folder, result, s.state), "a sync that cannot read its state before it writes it")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
-		e.File != s.state || e.Hint == "" || e.Cause == nil {
+		e.File != s.state || !strings.Contains(e.Hint, "a readable file, not a folder") || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
 	if after := testkit.Snapshot(t, s.mapDir); !maps.EqualFunc(before, after, slices.Equal) {

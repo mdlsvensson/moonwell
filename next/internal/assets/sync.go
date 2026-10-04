@@ -42,7 +42,7 @@ func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, stateFile 
 }
 
 // stateWrite is what a sync does to the state file: it writes bytes, or removes the file. It keeps what the file
-// was when the sync began, to compare with just before.
+// was when the sync began, to compare with what the file is just before the write or the removal.
 type stateWrite struct {
 	file   string
 	held   []byte // what the file held when the sync began
