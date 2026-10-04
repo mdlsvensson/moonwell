@@ -26,10 +26,10 @@ import (
 // letter case, and is changed under the spelling it has. The files of a preview picture are named beside its
 // steps.
 const (
-	infoName   = "war3map.w3i"
-	scriptName = "war3map.lua"
-	miscName   = "war3mapMisc.txt"
-	skinName   = "war3mapSkin.txt"
+	infoName = "war3map.w3i"
+	luaName  = "war3map.lua"
+	miscName = "war3mapMisc.txt"
+	skinName = "war3mapSkin.txt"
 )
 
 // Plan computes every file the project's settings change in the map folder, and writes nothing. It returns the
@@ -58,7 +58,7 @@ func Plan(folder *mapdir.Folder, p *manifest.Project) ([]mapdir.Change, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := plan.script(s, info, preview != nil); err != nil {
+	if err := plan.lua(s, info, preview != nil); err != nil {
 		return nil, err
 	}
 	if err := plan.text(miscName, misc); err != nil {
@@ -81,8 +81,8 @@ type planner struct {
 
 // ---- the steps, in the order of their changes; those of a preview are in plan_preview.go ----
 
-// mapInfo patches war3map.w3i and returns the file as the settings leave it, which the script is brought into
-// line with. Without a setting that is stored in the file, it is not read and nothing is returned.
+// mapInfo patches war3map.w3i and returns the file as the settings leave it, which the Lua is brought into line
+// with. Without a setting that is stored in the file, it is not read and nothing is returned.
 func (p *planner) mapInfo(s manifest.Settings) ([]byte, error) {
 	if !setsInfo(s) {
 		return nil, nil
@@ -103,34 +103,34 @@ func (p *planner) mapInfo(s manifest.Settings) ([]byte, error) {
 	return patched, nil
 }
 
-// script brings war3map.lua into line with the patched map info and, for a map that gets a preview picture, adds
+// lua brings war3map.lua into line with the patched map info and, for a map that gets a preview picture, adds
 // the call that gives the game World Editor's minimap back. Both edits go into one change. A byte order mark is
 // kept aside and put back in front of what is written.
-func (p *planner) script(s manifest.Settings, patchedInfo []byte, withPreview bool) error {
-	if !needsScript(s) && !withPreview {
+func (p *planner) lua(s manifest.Settings, patchedInfo []byte, withPreview bool) error {
+	if !needsLua(s) && !withPreview {
 		return nil
 	}
-	mark, source, err := p.requiredText(scriptName)
+	mark, source, err := p.requiredText(luaName)
 	if err != nil {
 		return err
 	}
-	patched, err := p.patchedScript(source, s, patchedInfo, withPreview)
+	patched, err := p.patchedLua(source, s, patchedInfo, withPreview)
 	if err != nil || patched == source {
 		return err
 	}
-	return p.write(scriptName, []byte(mark+patched))
+	return p.write(luaName, []byte(mark+patched))
 }
 
-// needsScript reports whether the settings are of a kind the script takes part in: the map's name and
-// description, and the players, the forces and the environment, which only a map whose script is Lua has. The
-// script of such a map must be there and be text, also for a setting with no call of its own, as a force's name.
-func needsScript(s manifest.Settings) bool {
+// needsLua reports whether the settings are of a kind war3map.lua takes part in: the map's name and description,
+// and the players, the forces and the environment, which only a map with Lua as its script language has. The Lua
+// of such a map must be there and be text, also for a setting that setsLua does not count, as a force's name.
+func needsLua(s manifest.Settings) bool {
 	return needsDetails(s) || s.Info.Name != nil || s.Info.Description != nil
 }
 
-// patchedScript is the text of the script with the settings in it, and with the minimap call for a preview.
-func (p *planner) patchedScript(source string, s manifest.Settings, patchedInfo []byte, withPreview bool) (string, error) {
-	file := p.folder.Label(scriptName)
+// patchedLua is the text of war3map.lua with the settings in it, and with the minimap call for a preview.
+func (p *planner) patchedLua(source string, s manifest.Settings, patchedInfo []byte, withPreview bool) (string, error) {
+	file := p.folder.Label(luaName)
 	patched, err := patchLuaAfter(source, s, patchedInfo, file, p.folder.Label(infoName))
 	if err != nil || !withPreview {
 		return patched, err

@@ -9,8 +9,11 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/war3/picture"
 )
 
-// The files of a preview picture, beside KeptMinimap.
+// The files of a preview picture.
 const (
+	// KeptMinimap is the file a build with a preview picture keeps World Editor's minimap in: a copy of what the
+	// map has as savedMinimap, which the picture replaces. The call patchMinimap adds to war3map.lua names it.
+	KeptMinimap = "war3mapMinimap.blp"
 	// savedMinimap is the file World Editor saves the minimap as, which the game's map list shows: the place a
 	// preview picture takes.
 	savedMinimap = "war3mapMap.blp"

@@ -10,10 +10,6 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/war3/w3i"
 )
 
-// KeptMinimap is the file a build with a preview picture keeps World Editor's minimap in: a copy of what the map
-// has as savedMinimap, which the picture replaces.
-const KeptMinimap = "war3mapMinimap.blp"
-
 // patchLuaAfter brings the Lua World Editor generated into line with the map info, given as the bytes patchInfo
 // returned. It returns the source as it is when no setting has a Lua counterpart: then neither the source nor
 // the bytes are read. Otherwise the bytes are read as deep as the settings need; bytes that do not read are

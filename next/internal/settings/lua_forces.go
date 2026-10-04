@@ -89,11 +89,12 @@ func (p *patcher) force(index int, details *w3i.Details, calls []teamCall) []str
 	return states(members, force.Flags.Value)
 }
 
-// membersOf is the ids of the map's players that the force's mask has, in the order of the map info.
+// membersOf is the ids of the map's players that the force's mask has, in the order of the map info. The mask has
+// a bit for each slot, and a map info that w3i.Read accepts has no player outside the 24 slots.
 func membersOf(force w3i.Force, players []w3i.Player) []int {
 	var members []int
 	for _, player := range players {
-		if id := player.ID.Value; force.Players.Value&(1<<(uint(id)&31)) != 0 {
+		if id := player.ID.Value; force.Players.Value&(1<<uint(id)) != 0 {
 			members = append(members, int(id))
 		}
 	}

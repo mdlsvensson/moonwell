@@ -1286,7 +1286,7 @@ func planOfOld(dir, root string, read bothTrees) ([]mapdir.Change, error) {
 // breaksTheScript reports whether a plan of the other tree writes a script that its own reader of Lua does not
 // read.
 func breaksTheScript(changes []mapdir.Change, err error) bool {
-	change, written := changeTo(changes, scriptName)
+	change, written := changeTo(changes, luaName)
 	return written && broken(strings.TrimPrefix(string(change.Bytes), byteOrderMark), err)
 }
 
@@ -1368,7 +1368,7 @@ func (c *planCounts) comparePlans(t *testing.T, what string, source sourceMap, d
 		// Left out, for the difference that is meant: see TestOracleOnTheMinimapCall.
 		c.broken++
 		failure, ok := gotErr.(*diag.Error)
-		if !ok || failure.File != mapLabel+"/"+scriptName || !strings.Contains(failure.Msg, "could not be read back safely") {
+		if !ok || failure.File != mapLabel+"/"+luaName || !strings.Contains(failure.Msg, "could not be read back safely") {
 			t.Errorf("%s: the other tree's script does not read, and this tree returns %v", what, gotErr)
 		}
 	case oracle.Refusals(t, what, wantErr, gotErr):
@@ -1377,7 +1377,7 @@ func (c *planCounts) comparePlans(t *testing.T, what string, source sourceMap, d
 		// One tree refused alone, which Refusals has reported.
 	case writtenApart(read.project.Settings, info):
 		c.apart++
-		seen.compare(t, what, want, got, scriptName)
+		seen.compare(t, what, want, got, luaName)
 	case len(want) == 0:
 		seen.compare(t, what, want, got, "")
 		c.unchanged++
