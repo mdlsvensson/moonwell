@@ -98,10 +98,10 @@ func TestOrderedRefusesWhatIsNotAMapping(t *testing.T) {
 		name, document string
 		words          []string
 	}{
-		{"a list", `{"paths":[]}`, []string{"cannot unmarshal array"}},
-		{"a text", `{"paths":"x"}`, []string{"cannot unmarshal string"}},
-		{"a truth value", `{"paths":true}`, []string{"cannot unmarshal bool"}},
-		{"a number", `{"paths":3}`, []string{"cannot unmarshal number"}},
+		{"a list", `{"paths":[]}`, []string{"cannot unmarshal array into a mapping"}},
+		{"a text", `{"paths":"x"}`, []string{"cannot unmarshal string into a mapping"}},
+		{"a truth value", `{"paths":true}`, []string{"cannot unmarshal bool into a mapping"}},
+		{"a number", `{"paths":3}`, []string{"cannot unmarshal number into a mapping"}},
 		{"a value of another type", `{"paths":{"a.blp":"x","b.blp":3}}`, []string{"b.blp: ", "cannot unmarshal number"}},
 	}
 	for _, tt := range tests {
@@ -118,6 +118,88 @@ func TestOrderedRefusesWhatIsNotAMapping(t *testing.T) {
 					t.Errorf("the reason %q lacks %q", err, word)
 				}
 			}
+			if strings.Contains(err.Error(), "Ordered") {
+				t.Errorf("the reason %q names a type of this package", err)
+			}
 		})
 	}
+}
+
+// written is a value as JSON that leaves markup characters as they are, as the oracle writes values.
+func written(t *testing.T, value any) string {
+	t.Helper()
+	var out strings.Builder
+	encoder := json.NewEncoder(&out)
+	encoder.SetEscapeHTML(false)
+	if err := encoder.Encode(value); err != nil {
+		t.Fatal(err)
+	}
+	return strings.TrimSuffix(out.String(), "\n")
+}
+
+func TestOrderedPrintsItsKeysInTheirOrder(t *testing.T) {
+	texts := []struct{ name, document string }{
+		{"the order written", `{"b":"1","a":"2","c":"3"}`},
+		{"keys that look like numbers", `{"b":"1","10":"2","2":"3","0":"4"}`},
+		{"an empty mapping", `{}`},
+		{"markup and quotes", `{"a<b>&\"c\\":"<x> & \"y\""}`},
+	}
+	for _, tt := range texts {
+		t.Run(tt.name, func(t *testing.T) {
+			var o Ordered[string]
+			if err := json.Unmarshal([]byte(tt.document), &o); err != nil {
+				t.Fatal(err)
+			}
+			if got := written(t, o); got != tt.document {
+				t.Errorf("printed %s, want %s", got, tt.document)
+			}
+		})
+	}
+	t.Run("a mapping of mappings", func(t *testing.T) {
+		const document = `{"Misc":{"B":"1","A":"2"},"10":{},"2":{"10":"x","9":"y"}}`
+		var sections Ordered[Ordered[string]]
+		if err := json.Unmarshal([]byte(document), &sections); err != nil {
+			t.Fatal(err)
+		}
+		if got := written(t, sections); got != document {
+			t.Errorf("printed %s, want %s", got, document)
+		}
+	})
+	t.Run("values of several kinds", func(t *testing.T) {
+		const document = `{"n":1,"half":0.5,"t":true,"list":[1,2],"lists":[["a"],[]],"s":"x"}`
+		var properties Ordered[any]
+		if err := json.Unmarshal([]byte(document), &properties); err != nil {
+			t.Fatal(err)
+		}
+		if got := written(t, properties); got != document {
+			t.Errorf("printed %s, want %s", got, document)
+		}
+	})
+	t.Run("a mapping that holds nothing", func(t *testing.T) {
+		var held struct {
+			Never Ordered[string]  `json:"never"`
+			Null  Ordered[string]  `json:"null"`
+			None  *Ordered[string] `json:"none"`
+		}
+		if err := json.Unmarshal([]byte(`{"null":null}`), &held); err != nil {
+			t.Fatal(err)
+		}
+		if got, err := json.Marshal(held); err != nil || string(got) != `{"never":{},"null":{},"none":null}` {
+			t.Errorf("printed %s, %v", got, err)
+		}
+	})
+	t.Run("through the standard encoder", func(t *testing.T) {
+		var o Ordered[string]
+		o.Set("b", "<1>")
+		o.Set("a", "2")
+		// The standard encoder writes markup characters as escapes, in what a type prints of itself too.
+		got, err := json.Marshal(&o)
+		if err != nil || strings.ContainsAny(string(got), "<>") || !strings.HasPrefix(string(got), `{"b":"`) {
+			t.Fatalf("printed %s, %v", got, err)
+		}
+		var back Ordered[string]
+		if err := json.Unmarshal(got, &back); err != nil || entries(t, back) != "b=<1> a=2" {
+			t.Errorf("%s read back as %q, %v", got, entries(t, back), err)
+		}
+	})
 }

@@ -40,7 +40,8 @@ func (o *Objects) of(category Category) *Ordered[Object] {
 	return nil
 }
 
-// Of returns the objects of a category by key; a name that is no category has none.
+// Of returns the objects of a category by key, to read: the result shares its storage with o. A name that is no
+// category has none.
 func (o Objects) Of(category Category) Ordered[Object] {
 	if held := o.of(category); held != nil {
 		return *held

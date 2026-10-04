@@ -42,14 +42,34 @@ func Load(ctx context.Context, e *env.Env, pkl string) (*Project, error) {
 
 // Decode is the second half of Load: the JSON pkl printed, as a project. file is the manifest that was
 // evaluated: errors name it, and an object written in it has it as its source. A field the structs do not have is
-// passed over, because a later package of the same minor version may print one.
+// passed over, because a later package of the same minor version may print one. JSON that does not fit the
+// structs, or that lacks a text every project has, is no project, and is refused with one error.
 func Decode(root, file string, data []byte) (*Project, error) {
 	project := &Project{Root: root, File: file}
 	if err := json.Unmarshal(data, project); err != nil {
-		return nil, errNotAProject(file, err)
+		return nil, errNotAProject(file, strings.ReplaceAll(err.Error(), "json: ", ""), err)
+	}
+	if missing := project.missingTexts(); len(missing) > 0 {
+		return nil, errNotAProject(file, "it has no "+diag.JoinWords(missing, "and", -1), nil)
 	}
 	project.Objects.nameSources(file)
 	return project, nil
+}
+
+// missingTexts names the texts p lacks of the four the schema gives every project. JSON that fits the structs and
+// has none of them is the output of something that is no manifest: a file that amends another module, or none.
+// Nothing else of the shape is looked at here: it is Pkl's to check.
+func (p *Project) missingTexts() []string {
+	var missing []string
+	for _, text := range []struct{ name, value string }{
+		{"map.folder", p.Map.Folder}, {"map.entry", p.Map.Entry}, {"build.folder", p.Build.Folder},
+		{"yue.version", p.Yue.Version},
+	} {
+		if text.value == "" {
+			missing = append(missing, text.name)
+		}
+	}
+	return missing
 }
 
 // manifestFile is the manifest to evaluate: the local one, which amends the shared one, when it exists.
@@ -148,11 +168,12 @@ func errNotJSON(file, output string, cause error) error {
 	}
 }
 
-// errNotAProject is the failure for JSON that is not shaped like a project. Pkl checks the shape of a manifest
-// that amends the schema, so this manifest does not amend it, or amends the schema of another version.
-func errNotAProject(file string, cause error) error {
+// errNotAProject is the failure for JSON that is not shaped like a project; reason says in what. Pkl checks the
+// shape of a manifest that amends the schema, so this manifest does not amend it, or amends the schema of another
+// version.
+func errNotAProject(file, reason string, cause error) error {
 	return &diag.Error{
-		Msg:  file + " does not evaluate to a Moonwell project: " + strings.TrimPrefix(cause.Error(), "json: "),
+		Msg:  file + " does not evaluate to a Moonwell project: " + reason,
 		File: file,
 		Hint: "moonwell.pkl must amend \"@moonwell/Project.pkl\", and the moonwell package in PklProject must be of " +
 			"this program's version, " + moonwell.Version + ".",

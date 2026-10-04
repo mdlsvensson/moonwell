@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **A library with only `github`, or only `tag`, is now refused by Pkl.** `libraries` in `moonwell.pkl` takes a
+  `github` and a `tag`, or a `path`. Moonwell refused anything else before, in its own words; the schema now says
+  so itself, so the editor marks the line and Pkl's message names it. A manifest that built before still builds.
+
 ## 0.9.1 (2026-10-03)
 
 - **Pkl no longer has to be installed first.** Moonwell uses the `pkl` on the PATH when it is Pkl 0.32 or newer, as

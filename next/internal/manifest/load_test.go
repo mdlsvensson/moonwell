@@ -119,6 +119,8 @@ func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
 			"moonwell.pkl", []string{"not valid JSON"}, "Pkl 0.32"},
 		{"output that is not a project", project, evaluation(env.RunResult{Stdout: `{"map":[]}`}),
 			"moonwell.pkl", []string{"moonwell.pkl", "array", "map"}, "@moonwell/Project.pkl"},
+		{"output of a manifest that amends nothing", project, evaluation(env.RunResult{Stdout: "{}\n"}),
+			"moonwell.pkl", []string{"moonwell.pkl", "map.folder", "yue.version"}, "@moonwell/Project.pkl"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -313,12 +315,30 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 		text(p.Libraries["example"].Tag) != "v0.2.0" {
 		t.Errorf("libraries = %+v", p.Libraries)
 	}
+	// What pkl prints for the values of an object's properties, and the Go values they arrive as: a whole number
+	// is a float64 like any other number, and a List is a []any.
+	properties := map[Category]struct {
+		key        string
+		typed, raw any
+	}{
+		"heroes":    {"paladin", "Paladin", 1.0},
+		"units":     {"captain", "Captain", true},
+		"buildings": {"tower", "Tower", "x"},
+		"items":     {"sword", "Sword", []any{1.0, 2.0}},
+		"abilities": {"bolt", "Bolt", []any{[]any{"a"}}},
+		"buffs":     {"stun", "Stunned", 0.5},
+		"upgrades":  {"armor", []any{"One", "Two"}, "y"},
+	}
 	for _, category := range Categories {
-		objects := p.Objects.Of(category)
-		for key, object := range objects.All() {
-			if objects.Len() != 1 || object.Source != "moonwell.pkl" || object.Typed.Len() != 1 || object.Properties.Len() != 1 {
-				t.Errorf("%s: %d objects; %s = %+v", category, objects.Len(), key, object)
-			}
+		objects, want := p.Objects.Of(category), properties[category]
+		object, found := objects.Get(want.key)
+		if objects.Len() != 1 || !found || object.Source != "moonwell.pkl" || object.Typed.Len() != 1 || object.Properties.Len() != 1 {
+			t.Errorf("%s: %d objects; %s = %+v, found %v", category, objects.Len(), want.key, object, found)
+			continue
+		}
+		typed, _ := object.Typed.Get(object.Typed.Keys()[0])
+		if raw, _ := object.Properties.Get("raw"); !reflect.DeepEqual(raw, want.raw) || !reflect.DeepEqual(typed, want.typed) {
+			t.Errorf("%s: the typed property = %#v, want %#v; raw = %#v, want %#v", category, typed, want.typed, raw, want.raw)
 		}
 	}
 }

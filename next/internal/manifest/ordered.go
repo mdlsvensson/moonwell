@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"iter"
-	"reflect"
 	"slices"
 )
 
 // Ordered is a Pkl Mapping in the order it was written. The zero value is an empty mapping.
+//
+// A copy of an Ordered shares its storage with the original, as a copy of a map does: what Set does through one of
+// them may show in the other, or in a part of it. So only the owner of an Ordered calls Set, through the variable or
+// the field that holds it; a copy, such as what Objects.Of returns or a value passed to a function, is for reading.
 type Ordered[V any] struct {
 	keys   []string // in the order written
 	values map[string]V
@@ -59,7 +62,8 @@ func (o *Ordered[V]) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if opening != json.Delim('{') {
-		return &json.UnmarshalTypeError{Value: kindOf(opening), Type: reflect.TypeFor[Ordered[V]]()}
+		// In the decoder's words, with what the value should be in place of the name of a Go type.
+		return fmt.Errorf("cannot unmarshal %s into a mapping", kindOf(opening))
 	}
 	for decoder.More() {
 		if err := o.readEntry(decoder); err != nil {
@@ -68,6 +72,39 @@ func (o *Ordered[V]) UnmarshalJSON(data []byte) error {
 	}
 	_, err = decoder.Token() // the closing brace
 	return err
+}
+
+// MarshalJSON prints the mapping as a JSON object with its keys in their order; a mapping without keys is {}. It
+// leaves markup characters as they are: an encoder that writes them as escapes does so to what a type prints too.
+func (o Ordered[V]) MarshalJSON() ([]byte, error) {
+	var out bytes.Buffer
+	encoder := json.NewEncoder(&out)
+	encoder.SetEscapeHTML(false)
+	out.WriteByte('{')
+	for i, key := range o.keys {
+		if i > 0 {
+			out.WriteByte(',')
+		}
+		if err := printJSON(&out, encoder, key); err != nil {
+			return nil, err
+		}
+		out.WriteByte(':')
+		if err := printJSON(&out, encoder, o.values[key]); err != nil {
+			return nil, err
+		}
+	}
+	out.WriteByte('}')
+	return out.Bytes(), nil
+}
+
+// printJSON adds the JSON of a value to out, through the encoder that writes to it, without the line break an
+// encoder ends a value with.
+func printJSON(out *bytes.Buffer, encoder *json.Encoder, value any) error {
+	if err := encoder.Encode(value); err != nil {
+		return err
+	}
+	out.Truncate(out.Len() - 1)
+	return nil
 }
 
 // readEntry reads the next key and its value.

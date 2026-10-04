@@ -144,7 +144,7 @@ func TestDecodeReadsTheAssetsBlockInTheOrderItWasWritten(t *testing.T) {
 // know, and always prints every block: a block that is missing is not given a default here.
 func TestDecodeIgnoresAFieldItDoesNotKnowAndSuppliesNoDefault(t *testing.T) {
 	p := decoded(t, `{"later":{"x":1},"map":{"folder":"map.w3x","later":true,"entry":"src/main.yue"},
-		"build":{"folder":"dist/bin","minify":false,"later":[1]}}`, "moonwell.pkl")
+		"build":{"folder":"dist/bin","minify":false,"later":[1]},"yue":{"version":"0.34.3"}}`, "moonwell.pkl")
 	if p.Map != (Map{Folder: "map.w3x", Entry: "src/main.yue"}) || p.Build.Folder != "dist/bin" {
 		t.Errorf("map = %+v, build = %+v", p.Map, p.Build)
 	}
@@ -154,20 +154,34 @@ func TestDecodeIgnoresAFieldItDoesNotKnowAndSuppliesNoDefault(t *testing.T) {
 }
 
 func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
+	const mapBlock, buildBlock = `"map":{"folder":"map.w3x","entry":"src/main.yue"}`, `"build":{"folder":"dist/bin","minify":false}`
 	tests := []struct {
 		name, document string
-		words          []string
+		words          []string // of the message
+		without        []string // not in the message
 	}{
-		{"not an object", `[]`, []string{"array"}},
-		{"a block of another type", `{"map":3}`, []string{"number", "map"}},
-		{"a field of another type", `{"map":{"folder":3}}`, []string{"number", "map.folder"}},
-		{"a list of another type", `{"launch":{"args":[1]}}`, []string{"number", "launch.args"}},
-		{"a library of another type", `{"libraries":{"a":{"path":3}}}`, []string{"number", "libraries.a.path"}},
-		{"a player of another type", `{"settings":{"players":{"7":{"x":"1"}}}}`, []string{"string", "settings.players.7.x"}},
-		{"asset paths as a list", `{"assets":{"paths":[]}}`, []string{"array"}},
-		{"an object without a text for its id", `{"objects":{"units":{"a":{"id":3}}}}`, []string{"number", "a: id: "}},
-		{"a section that is not a mapping", `{"settings":{"gameInterface":{"Frame":[]}}}`, []string{"array", "Frame: "}},
-		{"not JSON", `map { }`, []string{"invalid character"}},
+		{"not an object", `[]`, []string{"array"}, nil},
+		{"a block of another type", `{"map":3}`, []string{"number", "map"}, nil},
+		{"a field of another type", `{"map":{"folder":3}}`, []string{"number", "map.folder"}, nil},
+		{"a list of another type", `{"launch":{"args":[1]}}`, []string{"number", "launch.args"}, nil},
+		{"a library of another type", `{"libraries":{"a":{"path":3}}}`, []string{"number", "libraries.a.path"}, nil},
+		{"a player of another type", `{"settings":{"players":{"7":{"x":"1"}}}}`, []string{"string", "settings.players.7.x"}, nil},
+		{"asset paths as a list", `{"assets":{"paths":[]}}`, []string{"array", "a mapping"}, nil},
+		{"an asset path of another type", `{"assets":{"paths":{"a.blp":3}}}`, []string{"number", "a.blp: "}, nil},
+		{"an object without a text for its id", `{"objects":{"units":{"a":{"id":3}}}}`, []string{"number", "a: id: "}, nil},
+		{"an object that is a list", `{"objects":{"units":{"a":[]}}}`, []string{"array", "a: ", "a mapping"}, nil},
+		{"a section that is not a mapping", `{"settings":{"gameInterface":{"Frame":"x"}}}`, []string{"string", "Frame: ", "a mapping"}, nil},
+		{"not JSON", `map { }`, []string{"invalid character"}, nil},
+		{"an empty document", `{}`, []string{"map.folder", "map.entry", "build.folder", "yue.version"}, nil},
+		{"null", `null`, []string{"map.folder", "map.entry", "build.folder", "yue.version"}, nil},
+		{"an empty map block", `{"map":{}}`, []string{"map.folder", "map.entry", "build.folder", "yue.version"}, nil},
+		{"no yue block", `{` + mapBlock + `,` + buildBlock + `}`, []string{"yue.version"}, []string{"map.", "build."}},
+		{"no entry", `{"map":{"folder":"map.w3x"},` + buildBlock + `,"yue":{"version":"0.34.3"}}`,
+			[]string{"map.entry"}, []string{"map.folder", "build.", "yue."}},
+		{"an empty build folder", `{` + mapBlock + `,"build":{"folder":""},"yue":{"version":"0.34.3"}}`,
+			[]string{"build.folder"}, []string{"map.", "yue."}},
+		{"another module's output", `{"heroes":{},"units":{"a":{"id":"h000","base":"hfoo"}}}`,
+			[]string{"map.folder", "yue.version"}, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -179,6 +193,12 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 			for _, word := range tt.words {
 				if !strings.Contains(failure.Msg, word) {
 					t.Errorf("the message %q lacks %q", failure.Msg, word)
+				}
+			}
+			// The reason is the decoder's, without the name of its package and without a type of this one.
+			for _, word := range append([]string{"json:", "Ordered", "Object"}, tt.without...) {
+				if strings.Contains(failure.Msg, word) {
+					t.Errorf("the message %q has %q", failure.Msg, word)
 				}
 			}
 			if !strings.Contains(failure.Hint, "@moonwell/Project.pkl") || !strings.Contains(failure.Hint, "PklProject") {

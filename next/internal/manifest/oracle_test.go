@@ -3,7 +3,6 @@ package manifest_test
 import (
 	"context"
 	"encoding/json"
-	"iter"
 	"strings"
 	"testing"
 
@@ -28,8 +27,10 @@ import (
 //     packages older than itself; this tree reads what a package of its own minor version prints, which always has
 //     the three (TestDecodeIgnoresAFieldItDoesNotKnowAndSuppliesNoDefault). Every document of the other tree's
 //     tests lacks one, so each is compared with the blocks it lacks added as pkl prints them, and is counted.
-//   - Output that is JSON and not shaped like a project. The other tree names the first wrong field in words of
-//     its own, and this tree gives the decoder's reason (TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError).
+//   - The words for output that is JSON and not shaped like a project. The other tree names the first wrong field
+//     in words of its own, and this tree gives the decoder's reason, or the texts every project has that are
+//     missing (TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError). That both refuse such a document, and
+//     the file they name, is compared.
 //   - The order of the library keys, which this tree sorts (TestDecodeReadsLibrariesOfBothKindsAndListsTheirKeysSorted),
 //     and of asset paths whose names are whole numbers, which the other tree moves to the front
 //     (TestOrderedDecodesAMappingInTheOrderItWasWritten). No document here has two libraries out of order or such
@@ -106,17 +107,8 @@ type plain struct {
 	Launch     manifest.Launch
 	Yue        manifest.Yue
 	Lint       manifest.Lint
-	AssetPaths [][2]string // a name and its target, in the order the tree holds them
-	Exclude    []string
+	Assets     manifest.Assets // the paths in the order the tree holds them
 	Libraries  map[string]manifest.Library
-}
-
-func pairs(entries iter.Seq2[string, string]) [][2]string {
-	var list [][2]string
-	for name, target := range entries {
-		list = append(list, [2]string{name, target})
-	}
-	return list
 }
 
 func plainOfOld(p *oldproject.Project) plain {
@@ -124,18 +116,21 @@ func plainOfOld(p *oldproject.Project) plain {
 	for key, library := range p.Libraries.All() {
 		libraries[key] = manifest.Library(library)
 	}
+	assets := manifest.Assets{Exclude: p.Assets.Exclude}
+	for name, target := range p.Assets.Paths.All() {
+		assets.Paths.Set(name, target)
+	}
 	return plain{
 		Root: p.Root, File: p.Manifest,
 		Map: manifest.Map(p.Map), Build: manifest.Build(p.Build), Launch: manifest.Launch(p.Launch),
-		Yue: manifest.Yue(p.Yue), Lint: manifest.Lint(p.Lint),
-		AssetPaths: pairs(p.Assets.Paths.All()), Exclude: p.Assets.Exclude, Libraries: libraries,
+		Yue: manifest.Yue(p.Yue), Lint: manifest.Lint(p.Lint), Assets: assets, Libraries: libraries,
 	}
 }
 
 func plainOfNew(p *manifest.Project) plain {
 	return plain{
 		Root: p.Root, File: p.File, Map: p.Map, Build: p.Build, Launch: p.Launch, Yue: p.Yue, Lint: p.Lint,
-		AssetPaths: pairs(p.Assets.Paths.All()), Exclude: p.Assets.Exclude, Libraries: p.Libraries,
+		Assets: p.Assets, Libraries: p.Libraries,
 	}
 }
 
@@ -169,14 +164,11 @@ func TestOracleOnThePlainBlocks(t *testing.T) {
 	for _, c := range carriedDocuments {
 		whole, lacked := completed(t, c.document)
 		compare(c.name+", with every block", whole)
-		if !lacked {
-			compare(c.name, c.document)
-			continue
+		if lacked {
+			leftOut++
 		}
-		leftOut++
-		want, got := read(t, c.name, c.document)
-		if sameJSON(t, want, got) {
-			t.Errorf("%s: both trees read the same of it, so it need not be left out", c.name)
+		if want, got := read(t, c.name, c.document); sameJSON(t, want, got) {
+			t.Errorf("%s: both trees read the same of it as it is written, so it need not be left out", c.name)
 		}
 	}
 	if leftOut != len(carriedDocuments) {
@@ -184,6 +176,64 @@ func TestOracleOnThePlainBlocks(t *testing.T) {
 	}
 	if compared != 1+len(carriedDocuments) {
 		t.Errorf("%d documents compared, want %d", compared, 1+len(carriedDocuments))
+	}
+}
+
+// The documents the other tree's tests give project.Parse to see it refuse the shape of the plain blocks, as those
+// tests build them, and four more that are no project at all.
+var refusedDocuments = []struct{ name, document string }{
+	{"a folder that is a number, and no entry", strings.Replace(carried(""), `"folder":"map.w3x","entry":"src/main.yue"`, `"folder":3`, 1)},
+	{"a list", `[]`},
+	{"a map block alone", `{"map":{}}`},
+	{"a build block that is a number", "{" + carriedBlocks + `,"build":3}`},
+	{"minify as a text", strings.Replace(carried(""), `"minify":false`, `"minify":"no"`, 1)},
+	{"an argument that is a number", strings.Replace(carried(""), `["-launch"]`, `[1]`, 1)},
+	{"a library's path that is a number", carried(`,"libraries":{"a":{"path":3}}`)},
+	{"an empty document", `{}`},
+	{"null", `null`},
+	{"no yue block", `{"map":{"folder":"map.w3x","entry":"src/main.yue"},"build":{"folder":"dist/bin","minify":false},"launch":{"args":[]}}`},
+	{"the objects of an object file", `{"heroes":{},"units":{"a":{"id":"h000","base":"hfoo"}}}`},
+}
+
+// lacksAText reports whether a document is an object without one of the four texts every project has: the folder
+// and the entry of its map, its build folder and the version of its compiler.
+func lacksAText(document string) bool {
+	var blocks map[string]json.RawMessage
+	if json.Unmarshal([]byte(document), &blocks) != nil || blocks == nil {
+		return false
+	}
+	for _, text := range [][2]string{{"map", "folder"}, {"map", "entry"}, {"build", "folder"}, {"yue", "version"}} {
+		var block map[string]json.RawMessage
+		if json.Unmarshal(blocks[text[0]], &block) != nil || block[text[1]] == nil {
+			return true
+		}
+	}
+	return false
+}
+
+// Both trees refuse a document that is no project, and name the manifest. Their words differ by decision: the
+// other tree names the first field it misses in words of its own.
+func TestOracleOnDocumentsThatAreNoProject(t *testing.T) {
+	refused, lacking := 0, 0
+	for _, c := range refusedDocuments {
+		tree, err := ordered.Decode([]byte(c.document))
+		if err != nil {
+			t.Fatalf("%s: %v", c.name, err)
+		}
+		_, want := oldproject.Parse("/p", tree, "moonwell.local.pkl")
+		_, got := manifest.Decode("/p", "moonwell.local.pkl", []byte(c.document))
+		if oracle.Errors(t, c.name, want, got) {
+			refused++
+		}
+		if lacksAText(c.document) {
+			lacking++
+		}
+	}
+	if refused != len(refusedDocuments) {
+		t.Errorf("both trees refused %d of %d documents", refused, len(refusedDocuments))
+	}
+	if lacking != 6 {
+		t.Errorf("%d documents lack one of the four texts, want 6", lacking)
 	}
 }
 
