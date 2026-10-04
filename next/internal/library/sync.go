@@ -284,8 +284,9 @@ func (s shipped) refuseUnusable(key, manifestFile string) error {
 }
 
 // refuseUnusableNames refuses files of one folder of a library that a folder cannot hold on every system: a file
-// with a name Windows cannot hold, and two files whose paths differ only in letter case, which are one file
-// there. kind names the folder: "module" or "assets".
+// with a name Windows cannot hold, two files whose paths differ only in letter case, which are one file there,
+// and two files in folders that differ only in letter case, which are one folder there. kind names the folder:
+// "module" or "assets".
 func (s shipped) refuseUnusableNames(key, kind string, files []file, manifestFile string) error {
 	names := make([]string, len(files))
 	for i, f := range files {
@@ -302,7 +303,32 @@ func (s shipped) refuseUnusableNames(key, kind string, files []file, manifestFil
 		}
 		spelled[strings.ToLower(name)] = name
 	}
+	if first, second, found := inFoldersOfTwoSpellings(names); found {
+		return errFoldersOfTwoSpellings(key, kind, first, second, manifestFile, s.local)
+	}
 	return nil
+}
+
+// inFoldersOfTwoSpellings finds two of the paths, which are in byte order, that lie in folders whose paths differ
+// only in letter case: for the first folder that is spelled in two ways, the first path of each spelling.
+func inFoldersOfTwoSpellings(paths []string) (first, second string, found bool) {
+	type spelling struct{ folder, path string } // a folder as it is spelled, and the first path that lies in it
+	spelled := map[string]spelling{}            // each folder by its spelling in lower case
+	for _, path := range paths {
+		for i, c := range path {
+			if c != '/' {
+				continue
+			}
+			folder := path[:i]
+			switch other, taken := spelled[strings.ToLower(folder)]; {
+			case !taken:
+				spelled[strings.ToLower(folder)] = spelling{folder, path}
+			case other.folder != folder:
+				return other.path, path, true
+			}
+		}
+	}
+	return "", "", false
 }
 
 // ---- the stamp ----
@@ -367,29 +393,41 @@ func errUnwritable(path string, cause error) error {
 	}
 }
 
-// The two refusals of a file that cannot be used have a hint for the one who can act on it: the author of a
-// downloaded library, or the user, whose own folder a local library is.
+// unusableHint is the hint of a refusal of files that cannot be used, for the one who can act on it: the author
+// of a downloaded library, or the user, whose own folder a local library is. The user can rename what, or have
+// the library's folder of that kind be one without them: the module folder is the dir of the manifest or of the
+// library's file, and the folder of the files for the map is the assets of the library's file.
+func unusableHint(local bool, kind, what, them string) string {
+	switch {
+	case !local:
+		return reportHint
+	case kind == "assets":
+		return "Rename " + what + " in the library, or set assets in the library's " + File + " to a folder without " + them + "."
+	}
+	return "Rename " + what + " in the library, or set the library's dir to a folder without " + them + "."
+}
 
 func errUnusableName(key, kind, name, manifestFile string, local bool) error {
-	hint := reportHint
-	if local {
-		hint = "Rename the file in the library, or set the library's dir to a folder without it."
-	}
 	return &diag.Error{
 		Msg:  "Library " + key + ": " + name + " in its " + kind + " folder has a name that Windows cannot hold.",
 		File: manifestFile,
-		Hint: hint,
+		Hint: unusableHint(local, kind, "the file", "it"),
 	}
 }
 
 func errTwoSpellings(key, kind, first, second, manifestFile string, local bool) error {
-	hint := reportHint
-	if local {
-		hint = "Rename one of them in the library, or set the library's dir to a folder without them."
-	}
 	return &diag.Error{
 		Msg:  "Library " + key + ": " + first + " and " + second + " in its " + kind + " folder differ only in letter case.",
 		File: manifestFile,
-		Hint: hint,
+		Hint: unusableHint(local, kind, "one of them", "them"),
+	}
+}
+
+func errFoldersOfTwoSpellings(key, kind, first, second, manifestFile string, local bool) error {
+	return &diag.Error{
+		Msg: "Library " + key + ": " + first + " and " + second + " in its " + kind +
+			" folder lie in folders that differ only in letter case.",
+		File: manifestFile,
+		Hint: unusableHint(local, kind, "one of the two folders", "them"),
 	}
 }

@@ -965,15 +965,28 @@ func TestAKeyTheManifestCannotHoldIsTheCallersBug(t *testing.T) {
 func TestASyncIsStoppedBetweenTwoLibraries(t *testing.T) {
 	root := t.TempDir()
 	put(t, root, "lib/a.lua", "return 1")
+	server := serving(map[string][]byte{urlV1: tagArchive(t, commitA, "a.lua", "1")})
 	e, _ := testkit.Env(t, root)
 	stopped, stop := context.WithCancel(background)
-	stop()
-	synced, err := Sync(stopped, e, block("a", fromFolder("lib", ""), "b", fromFolder("lib", "")), manifestFile)
+	// The sync is stopped while the first library is downloaded, and the download itself comes through.
+	e.Fetch = func(ctx context.Context, url string) (int, []byte, error) {
+		stop()
+		return server.fetch(ctx, url)
+	}
+	synced, err := Sync(stopped, e, block("a", fromGitHub("v0.1.0", ""), "b", fromFolder("lib", "")), manifestFile)
 	if err != context.Canceled || synced != nil {
 		t.Errorf("Sync returned %+v, %v; want the context's own error", synced, err)
 	}
-	if there(root, ".moonwell/libraries/a") || there(root, LockFile) {
-		t.Error("a sync that was stopped synced a library")
+	if got := filesIn(t, root, ".moonwell"); !slices.Equal(got, []string{"libraries/a/" + stampFile, "libraries/a/a.lua"}) || there(root, LockFile) {
+		t.Errorf("a sync that was stopped after its first library left %q", got)
+	}
+	// A sync that is stopped before its first library syncs none.
+	root = t.TempDir()
+	put(t, root, "lib/a.lua", "return 1")
+	e, _ = testkit.Env(t, root)
+	synced, err = Sync(stopped, e, block("a", fromFolder("lib", ""), "b", fromFolder("lib", "")), manifestFile)
+	if err != context.Canceled || synced != nil || there(root, ".moonwell") {
+		t.Errorf("Sync returned %+v, %v; want the context's own error and no library", synced, err)
 	}
 }
 
@@ -1051,32 +1064,79 @@ func TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsW
 			t.Errorf("%s: something was written: %v", c.says, filesIn(t, root, "."))
 		}
 	}
-	// A module and a file for the map lie in two folders, and two folders that differ in letter case hold
-	// files of other names.
+	// A module and a file for the map lie in two folders: their paths are not held against each other.
 	root := t.TempDir()
-	server := serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), "src/models/golem.mdx", "1", "src/Example/other.lua", "2")...)})
+	server := serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), "src/models/golem.mdx", "1", "src/assets/Models/x.lua", "2")...)})
 	sync(t, root, block("ex", fromGitHub("v0.1.0", "")), server)
 }
 
-// The hints of a local library's file that cannot be used: its files are the user's own to rename.
+func TestDownloadedFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
+	cases := []struct {
+		files  []string
+		says   string
+		folder string
+	}{
+		{[]string{"src/Util/a.lua", "1", "src/util/b.lua", "2"}, "Util/a.lua and util/b.lua", "module"},
+		{[]string{"src/Example/other.lua", "1"}, "Example/other.lua and example/greet.lua", "module"},
+		{[]string{"src/a/B/x.lua", "1", "src/a/b/deep/y.lua", "2"}, "a/B/x.lua and a/b/deep/y.lua", "module"},
+		{[]string{"src/a/b/x.lua", "1", "src/a/b/y.lua", "2", "src/A/z.lua", "3"}, "A/z.lua and a/b/x.lua", "module"},
+		{[]string{"assets/models/other.mdx", "1"}, "Models/Golem.mdx and models/other.mdx", "assets"},
+		{[]string{"assets/war3mapImported/LIB/x.toc", "1"}, "war3mapImported/LIB/x.toc and war3mapImported/lib/ui.toc", "assets"},
+	}
+	for _, c := range cases {
+		root, server := t.TempDir(), serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), c.files...)...)})
+		e := refusal(t, root, block("ex", fromGitHub("v0.1.0", "")), server, c.says)
+		if e.Msg != "Library ex: "+c.says+" in its "+c.folder+" folder lie in folders that differ only in letter case." ||
+			e.File != manifestFile || e.Hint != reportIt {
+			t.Errorf("%s: %+v", c.says, e)
+		}
+		if len(testkit.Snapshot(t, root)) != 0 {
+			t.Errorf("%s: something was written: %v", c.says, filesIn(t, root, "."))
+		}
+	}
+	// One folder may hold files in many folders of its own, and files of one name in two of them.
+	root := t.TempDir()
+	server := serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), "src/example/a/x.lua", "1", "src/example/b/x.lua", "2", "src/other/A.lua", "3")...)})
+	sync(t, root, block("ex", fromGitHub("v0.1.0", "")), server)
+}
+
+// The hints of a local library's file that cannot be used: its files are the user's own to rename. The folder of
+// the modules is the manifest's or the library's dir, and the folder of the files for the map is the assets of
+// the library's own file.
 const (
-	renameIt  = "Rename the file in the library, or set the library's dir to a folder without it."
-	renameOne = "Rename one of them in the library, or set the library's dir to a folder without them."
+	renameIt       = "Rename the file in the library, or set the library's dir to a folder without it."
+	renameOne      = "Rename one of them in the library, or set the library's dir to a folder without them."
+	renameAFolder  = "Rename one of the two folders in the library, or set the library's dir to a folder without them."
+	inItsAssets    = "set assets in the library's moonwell-library.json to a folder without "
+	renameAnAsset  = "Rename the file in the library, or " + inItsAssets + "it."
+	renameAssets   = "Rename one of them in the library, or " + inItsAssets + "them."
+	renameAnAssets = "Rename one of the two folders in the library, or " + inItsAssets + "them."
 )
 
 func TestAFileThatCannotBeUsedIsTheAuthorsToReportOrTheUsersOwnToRename(t *testing.T) {
-	for _, local := range []bool{false, true} {
-		name, two := reportIt, reportIt
-		if local {
-			name, two = renameIt, renameOne
-		}
-		kept := shipped{modules: filesOfTest("a.lua", "1", "aux.lua", "2"), local: local}
-		if e := asError(t, kept.refuseUnusable("ex", manifestFile), "a name"); e.Hint != name || e.File != manifestFile {
-			t.Errorf("local %v: %+v", local, e)
-		}
-		kept = shipped{modules: filesOfTest("a.lua", "1"), assets: filesOfTest("x.blp", "1", "X.blp", "2"), shipsAssets: true, local: local}
-		if e := asError(t, kept.refuseUnusable("ex", manifestFile), "two spellings"); e.Hint != two || e.File != manifestFile {
-			t.Errorf("local %v: %+v", local, e)
+	modules, assets := filesOfTest("a.lua", "1"), filesOfTest("x.blp", "1")
+	cases := []struct {
+		name          string
+		kept          shipped
+		local, author string // the hint for a local library, and for a downloaded one
+	}{
+		{"a module's name", shipped{modules: filesOfTest("a.lua", "1", "aux.lua", "2")}, renameIt, reportIt},
+		{"two modules", shipped{modules: filesOfTest("a.lua", "1", "A.lua", "2")}, renameOne, reportIt},
+		{"modules in two folders", shipped{modules: filesOfTest("u/a.lua", "1", "U/b.lua", "2")}, renameAFolder, reportIt},
+		{"an asset's name", shipped{modules: modules, assets: filesOfTest("nul", "1"), shipsAssets: true}, renameAnAsset, reportIt},
+		{"two assets", shipped{modules: modules, assets: append(assets, filesOfTest("X.blp", "2")...), shipsAssets: true}, renameAssets, reportIt},
+		{"assets in two folders", shipped{modules: modules, assets: filesOfTest("u/a", "1", "U/b", "2"), shipsAssets: true}, renameAnAssets, reportIt},
+	}
+	for _, c := range cases {
+		for _, local := range []bool{false, true} {
+			c.kept.local = local
+			want := c.author
+			if local {
+				want = c.local
+			}
+			if e := asError(t, c.kept.refuseUnusable("ex", manifestFile), c.name); e.Hint != want || e.File != manifestFile {
+				t.Errorf("%s, local %v: %+v", c.name, local, e)
+			}
 		}
 	}
 }
@@ -1107,9 +1167,12 @@ func TestALocalFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten(t *test
 			}
 			continue
 		}
-		failure := asError(t, err, c.name)
+		failure, hint := asError(t, err, c.name), renameIt
+		if c.folder == "assets" {
+			hint = renameAnAsset
+		}
 		if failure.Msg != "Library mine: "+c.shown+" in its "+c.folder+" folder has a name that Windows cannot hold." ||
-			failure.File != manifestFile || failure.Hint != renameIt {
+			failure.File != manifestFile || failure.Hint != hint {
 			t.Errorf("%q: %+v", c.name, failure)
 		}
 		if there(root, ".moonwell") {
@@ -1125,12 +1188,31 @@ func TestTwoLocalFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritte
 	}
 	put(t, root, "lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/files/x.blp", "x", "lib/files/X.blp", "X")
 	e := refusal(t, root, block("mine", fromFolder("lib", "")), nil, "two files for the map")
-	if e.Msg != "Library mine: X.blp and x.blp in its assets folder differ only in letter case." || e.File != manifestFile || e.Hint != renameOne {
+	if e.Msg != "Library mine: X.blp and x.blp in its assets folder differ only in letter case." || e.File != manifestFile || e.Hint != renameAssets {
 		t.Errorf("error = %+v", e)
 	}
 	put(t, root, "lib/A.lua", "2")
 	e = refusal(t, root, block("mine", fromFolder("lib", "")), nil, "two modules")
-	if e.Msg != "Library mine: A.lua and a.lua in its module folder differ only in letter case." || there(root, ".moonwell") {
+	if e.Msg != "Library mine: A.lua and a.lua in its module folder differ only in letter case." || e.Hint != renameOne || there(root, ".moonwell") {
+		t.Errorf("error = %+v", e)
+	}
+}
+
+func TestLocalFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
+	root := t.TempDir()
+	if !testkit.CaseSensitive(t, root) {
+		t.Skip("this file system holds no two folders that differ only in letter case; the case is covered on the other system's run")
+	}
+	put(t, root, "lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/files/Icons/x.blp", "x", "lib/files/icons/y.blp", "y")
+	e := refusal(t, root, block("mine", fromFolder("lib", "")), nil, "two folders of files for the map")
+	if e.Msg != "Library mine: Icons/x.blp and icons/y.blp in its assets folder lie in folders that differ only in letter case." ||
+		e.File != manifestFile || e.Hint != renameAnAssets {
+		t.Errorf("error = %+v", e)
+	}
+	put(t, root, "lib/Util/a.lua", "1", "lib/util/deep/b.lua", "2")
+	e = refusal(t, root, block("mine", fromFolder("lib", "")), nil, "two folders of modules")
+	if e.Msg != "Library mine: Util/a.lua and util/deep/b.lua in its module folder lie in folders that differ only in letter case." ||
+		e.Hint != renameAFolder || there(root, ".moonwell") {
 		t.Errorf("error = %+v", e)
 	}
 }
@@ -1333,6 +1415,73 @@ func TestAnUpdateThatIsInterruptedBetweenItsTwoFoldersIsFetchedAgain(t *testing.
 	sync(t, root, block("ex", fromGitHub("v0.1.0", "")), earlier)
 	if len(earlier.asked) != 2 || textOf(t, root, ".moonwell/library-assets/ex/Models/Golem.mdx") != "model" {
 		t.Errorf("%d downloads of the earlier tag; its model holds %q", len(earlier.asked), textOf(t, root, ".moonwell/library-assets/ex/Models/Golem.mdx"))
+	}
+}
+
+func TestALocalSyncThatStopsOverATagsFoldersLeavesNoStampOfTheTag(t *testing.T) {
+	root := t.TempDir()
+	tag := serving(map[string][]byte{urlV1: tagArchive(t, commitA, "a.lua", "the tag's", "z.lua", "the tag's")})
+	sync(t, root, block("ex", fromGitHub("v0.1.0", "")), tag)
+	put(t, root, "lib/a.lua", "local", "lib/z.lua", "local")
+	// The local library is copied over the tag's files, and the copy stops at a file that cannot be written.
+	stopped := false
+	t.Run("the local sync that stops", func(t *testing.T) {
+		testkit.MakeUnwritable(t, filepath.Join(root, ".moonwell", "libraries", "ex", "z.lua"))
+		e := refusal(t, root, block("ex", fromFolder("lib", "")), nil, "a file that cannot be written")
+		if !strings.HasPrefix(e.Msg, "Writing .moonwell/libraries/ex failed: ") || textOf(t, root, ".moonwell/libraries/ex/a.lua") != "local" ||
+			textOf(t, root, ".moonwell/libraries/ex/z.lua") != "the tag's" {
+			t.Fatalf("the local sync did not stop between two files: %+v", e)
+		}
+		stopped = true
+	})
+	if !stopped {
+		t.Skip("this system lets a file that is held be written; the case is covered on the other system's run")
+	}
+	// The manifest names the tag again: the folder holds a file of the local library, and no stamp says it is
+	// the tag's.
+	sync(t, root, block("ex", fromGitHub("v0.1.0", "")), tag)
+	if len(tag.asked) != 2 || textOf(t, root, ".moonwell/libraries/ex/a.lua") != "the tag's" {
+		t.Errorf("%d downloads of the tag; its module holds %q", len(tag.asked), textOf(t, root, ".moonwell/libraries/ex/a.lua"))
+	}
+}
+
+func TestALocalLibraryThatDidNotChangeKeepsItsStampAndATagsStampIsWrittenOver(t *testing.T) {
+	root := t.TempDir()
+	put(t, root, "lib/a.lua", "return 1", "other/a.lua", "return 1")
+	libraries := block("mine", fromFolder("lib", ""))
+	sync(t, root, libraries, nil)
+	makeOld(t, root)
+	sync(t, root, libraries, nil)
+	if _, written := filesBelow(t, root); written != nil {
+		t.Errorf("a local library that did not change wrote %q", written)
+	}
+	// Another local folder with the same files: the stamp alone is another's, and is written.
+	sync(t, root, block("mine", fromFolder("other", "")), nil)
+	if _, written := filesBelow(t, root); !slices.Equal(written, []string{".moonwell/libraries/mine/" + stampFile}) {
+		t.Errorf("another local folder with the same files wrote %q", written)
+	}
+	if want := stampOfFolder(filepath.Join(root, "other")); textOf(t, root, ".moonwell/libraries/mine/"+stampFile) != want {
+		t.Errorf("the stamp holds %s", textOf(t, root, ".moonwell/libraries/mine/"+stampFile))
+	}
+}
+
+func TestALinkAtTheSecondFolderIsRefusedWithNothingRemovedFromTheFirst(t *testing.T) {
+	root, beside := t.TempDir(), t.TempDir()
+	put(t, root, ".moonwell/libraries/gone/a.lua", "stale", ".moonwell/libraries/.gone.tmp/a.lua", "stale", "lib/a.lua", "return 1")
+	put(t, beside, "gone/kept.txt", "kept")
+	testkit.LinkDir(t, beside, filepath.Join(root, ".moonwell", "library-assets"))
+	project, _ := filesBelow(t, root)
+	target, _ := filesBelow(t, beside)
+	for name, libraries := range map[string]map[string]manifest.Library{"a local library": block("mine", fromFolder("lib", "")), "none": block()} {
+		e, _ := testkit.Env(t, root)
+		_, err := Sync(background, e, libraries, manifestFile)
+		refusedLink(t, err, name, filepath.Join(root, ".moonwell", "library-assets"), ".moonwell/library-assets")
+		if after, _ := filesBelow(t, root); !reflect.DeepEqual(after, project) {
+			t.Errorf("%s: the project holds %q after the refusal", name, slices.Sorted(maps.Keys(after)))
+		}
+		if after, _ := filesBelow(t, beside); !reflect.DeepEqual(after, target) {
+			t.Errorf("%s: the sync removed through the link: %q", name, slices.Sorted(maps.Keys(after)))
+		}
 	}
 }
 

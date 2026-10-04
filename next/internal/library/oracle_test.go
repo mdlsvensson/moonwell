@@ -90,13 +90,15 @@ import (
 //   - A lock that cannot be written or removed. The other tree's WriteLock passes the system's error on, and its
 //     Sync words it; this tree's WriteLock words it, in the words of that Sync, which are written out here
 //     (TestALockThatCannotBeWrittenOrRemovedIsRefusedByItsName).
-//   - A sync of a library with a kept file that a folder cannot hold on every system: a name Windows cannot hold,
-//     or two paths that differ only in letter case. The other tree writes them, as far as the system lets it;
+//   - A sync of a library with kept files that a folder cannot hold on every system: a name Windows cannot hold,
+//     two paths that differ only in letter case, or two paths in folders that differ only in letter case, which
+//     are one folder where letter case is ignored. The other tree writes them, as far as the system lets it;
 //     this tree refuses the library before it writes anything. The class is decided on the scenario, which names
 //     the words of the refusal: this tree must refuse in those words and leave every file as it was, and the
 //     other tree must not refuse in them (TestADownloadedFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten,
-//     TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten, and the two tests of
-//     local files).
+//     TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten,
+//     TestDownloadedFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten, and the three
+//     tests of local files).
 //   - A sync of a project with a link at a folder that Sync writes or removes: .moonwell, one of the two
 //     folders, a library's folder, and, for a local library, a folder below its folder or its stamp. The other
 //     tree writes and removes through the link; this tree refuses the link first. Decided and compared as the
@@ -132,6 +134,11 @@ import (
 //   - A local library with a file whose name has a backslash, which only a system other than Windows holds: this
 //     tree refuses it as a name that cannot be used
 //     (TestALocalFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten).
+//   - A local library whose copy fails to be written over the folders of a tag, or of another local folder: this
+//     tree removes the stamp that is not the library's own before it writes, so that the tag is downloaded again
+//     when the manifest names it again, and the other tree leaves the tag's stamp beside the local files. A copy
+//     that is written leaves the same files in both trees, and is among the scenarios
+//     (TestALocalSyncThatStopsOverATagsFoldersLeavesNoStampOfTheTag).
 //   - Of the other tree's tests of Sync: the two that download from GitHub, and the path of a project in capital
 //     letters, which only Windows takes for the project's own. Its local library with a link that leads nowhere
 //     is here a link to a folder under a module's name, which no system reads as a file either.
@@ -1640,6 +1647,10 @@ func unusableScenarios(t *testing.T) []syncScenario {
 		{"a file for the map named as a device", "assets/prn.blp", "prn.blp in its assets" + cannotHold},
 		{"two modules that differ in letter case", "src/Example/Greet.lua", "Example/Greet.lua and example/greet.lua in its module" + differ},
 		{"two files for the map that differ in letter case", "assets/models/golem.mdx", "Models/Golem.mdx and models/golem.mdx in its assets" + differ},
+		{"two modules in folders that differ in letter case", "src/Example/other.lua",
+			"Example/other.lua and example/greet.lua in its module folder lie in folders that differ only in letter case."},
+		{"two files for the map in folders that differ in letter case", "assets/war3mapImported/LIB/x.toc",
+			"war3mapImported/LIB/x.toc and war3mapImported/lib/ui.toc in its assets folder lie in folders that differ only in letter case."},
 	}
 	var scenarios []syncScenario
 	for _, u := range unusable {
@@ -1677,10 +1688,10 @@ func TestOracleOnSyncingSeededProjects(t *testing.T) {
 	for _, scenario := range seeded {
 		compared.syncs(t, home, scenario)
 	}
-	// The scenarios of the list, the stamps, and the libraries with a file that cannot be used, each after a
-	// sync of a tag without it. In part: those libraries, and the tag that cannot be written, whose stamp this
-	// tree removes.
-	compared.check(t, tally{refused: 11, results: 22 + 22 + 8, inPart: 8 + 1})
+	// The scenarios of the list, the stamps, and the libraries with files that cannot be used, each after a
+	// sync of a tag without them. In part: those libraries, and the tag that cannot be written, whose stamp
+	// this tree removes.
+	compared.check(t, tally{refused: 11, results: 22 + 22 + 10, inPart: 10 + 1})
 }
 
 // linkScenarios is projects and local libraries with a link in them: those both trees sync alike, and those of
@@ -1751,6 +1762,10 @@ func linkScenarios(t *testing.T, home string) []syncScenario {
 			{name: "the link", libraries: mine, refusedAnew: refused,
 				before: all(beside, local, emptyFolders("project/.moonwell/library-assets/mine"), linked("project/.moonwell/library-assets/mine/sub", "beside"))},
 		}},
+		{"a link at a local library's stamp", []syncStep{
+			{name: "the link", libraries: mine, refusedAnew: refused, before: all(beside, local,
+				emptyFolders("project/.moonwell/libraries/mine"), linked("project/.moonwell/libraries/mine/"+stampFile, "beside"))},
+		}},
 		{"a link to a folder in the lock's place", []syncStep{
 			{name: "the link", libraries: ex, served: served, refusedAnew: refused,
 				before: all(beside, with("project/.moonwell/libraries/gone/a.lua", "1"), linked("project/moonwell.lock", "beside"))},
@@ -1812,8 +1827,8 @@ func TestOracleOnSyncingAProjectWithLinks(t *testing.T) {
 		compared.syncs(t, home, scenario)
 	}
 	// Alike: the links that are removed or passed over, and the one that is read as a file. In part: the links
-	// that are refused, two of them after a first sync, and the link in the lock's place.
-	compared.check(t, tally{refused: 1, results: 6 + 2, inPart: 8 + 1})
+	// that are refused, two of them after a first sync, the link at a stamp and the link in the lock's place.
+	compared.check(t, tally{refused: 1, results: 6 + 2, inPart: 8 + 2})
 }
 
 // ---- one project, both trees ----

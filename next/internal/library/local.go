@@ -1,6 +1,7 @@
 package library
 
 import (
+	"bytes"
 	"errors"
 	"os"
 	"path/filepath"
@@ -24,25 +25,48 @@ func syncLocal(root string, at folders, path, dir, manifestFile string) (shipsAs
 	if err != nil {
 		return false, err
 	}
-	// Both folders are planned before either is written: a link in one of them is refused with nothing written.
 	stamp := file{stampFile, []byte(stampOfFolder(from.modules))}
-	modules, err := mirrorOf(root, modulesOf(at.key), append(slices.Clone(kept.modules), stamp))
+	writeAssets, writeModules, err := planCopies(root, at, kept, stamp)
 	if err != nil {
 		return false, err
 	}
-	writeAssets := func() error { return removeAssets(at) }
-	if kept.shipsAssets {
-		assets, err := mirrorOf(root, assetsOf(at.key), kept.assets)
-		if err != nil {
-			return false, err
-		}
-		writeAssets = assets.write
+	if err := dropOtherStamp(at, stamp.data); err != nil {
+		return false, err
 	}
 	// The files for the map first, and the modules, whose folder holds the stamp, last.
 	if err := writeAssets(); err != nil {
 		return false, err
 	}
-	return kept.shipsAssets, modules.write()
+	return kept.shipsAssets, writeModules()
+}
+
+// planCopies plans the two folders of a local library, and returns what writes each. Both are planned before
+// either is written: a link in one of them is refused with nothing written, and no stamp removed.
+func planCopies(root string, at folders, kept shipped, stamp file) (writeAssets, writeModules func() error, err error) {
+	modules, err := mirrorOf(root, modulesOf(at.key), append(slices.Clone(kept.modules), stamp))
+	if err != nil {
+		return nil, nil, err
+	}
+	if !kept.shipsAssets {
+		return func() error { return removeAssets(at) }, modules.write, nil
+	}
+	assets, err := mirrorOf(root, assetsOf(at.key), kept.assets)
+	if err != nil {
+		return nil, nil, err
+	}
+	return assets.write, modules.write, nil
+}
+
+// dropOtherStamp removes the stamp of the library's module folder when it is not own, the stamp of this local
+// library: the stamp of a tag, or of another folder. While the two folders are written they then hold no entry,
+// so a copy that stops halfway is not taken for the tag's files when the manifest names the tag again. The
+// library's own stamp stays, and a library that did not change writes nothing.
+func dropOtherStamp(at folders, own []byte) error {
+	held, err := os.ReadFile(filepath.Join(at.modules, stampFile))
+	if err != nil || bytes.Equal(held, own) {
+		return nil
+	}
+	return dropStamp(at)
 }
 
 // ---- reading the library ----
