@@ -125,8 +125,12 @@ assets: AssetsConfig = new {}
 lint: LintConfig = new {}
 
 /// Libraries of modules, named by their path in the library (`import "example.loud"`). The key names the library's
-/// folder in .moonwell/libraries/.
-libraries: Mapping<String(matches(Regex(#"[A-Za-z0-9_-]+"#))), Library> = new {}
+/// folder in .moonwell/libraries/. A library needs both `github` and `tag`, or a `path`:
+/// `["example"] { github = "owner/repo"; tag = "v1.0.0" }`, or `["mine"] { path = "../my-library" }`.
+libraries: Mapping<
+  String(matches(Regex(#"[A-Za-z0-9_-]+"#))),
+  Library(path != null || (github != null && tag != null))
+> = new {}
 
 settings: MapSettings = new {}
 

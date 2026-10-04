@@ -35,6 +35,15 @@ facts {
     project.libraries.toMap()["example"].dir == "src"
     project.libraries.toMap()["mine"].dir == ""
   }
+  ["a library needs github and tag, or a path"] {
+    t.catch(() -> (Project) { libraries { ["half"] { github = "a/b" } } }.libraries.toMap()["half"])
+      .contains("path != null")
+    t.catch(() -> (Project) { libraries { ["half"] { tag = "v1" } } }.libraries.toMap()["half"])
+      .contains("path != null")
+    t.catch(() -> (Project) { libraries { ["none"] {} } }.libraries.toMap()["none"]).contains("path != null")
+    (Project) { libraries { ["mine"] { path = "../mine" } } }.libraries.toMap()["mine"].path == "../mine"
+    (Project) { libraries { ["both"] { github = "a/b"; path = "../mine" } } }.libraries.toMap()["both"].path == "../mine"
+  }
   ["libraries reject bad keys, repositories and folders"] {
     t.catch(() -> (Project) { libraries { ["no spaces"] { path = "x" } } }.libraries.toMap()).contains("matches")
     t.catch(() -> (Project) { libraries { ["x"] { github = "no-slash"; tag = "v1" } } }.libraries.toMap()["x"].github)
