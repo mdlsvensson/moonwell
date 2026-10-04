@@ -539,3 +539,28 @@ func TestSyncRefusesAnotherFolderThanTheOneThePlanWasMadeFrom(t *testing.T) {
 	}
 	s.unchanged(before, "a refused sync")
 }
+
+// A sync writes the assets' changes and no other. A view that holds a change of another area can be planned on,
+// as a build does, and is refused by Sync: the other area's change would be written into the source map too.
+func TestSyncRefusesAFolderThatCarriesPlannedChanges(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/a.blp")
+	put(t, s.mapDir, "war3map.w3i", "the map's own")
+	view := s.open().With([]mapdir.Change{{Name: "war3map.w3i", Bytes: []byte("patched")}})
+	assets, _ := collect(t, s.root, noBlock)
+	result, err := Plan(background, view, assets, State{})
+	if err != nil {
+		t.Fatalf("Plan: %v", diag.Format(err))
+	}
+	if got, want := names(result.Changes), []string{"a.blp", "war3map.imp"}; !slices.Equal(got, want) {
+		t.Fatalf("the changes are %q, want %q", got, want)
+	}
+	before := testkit.Snapshot(t, s.root)
+
+	err = Sync(background, view, result, s.state)
+	var expected *diag.Error
+	if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "carries planned changes") {
+		t.Errorf("Sync = %v, want a plain error about the folder's planned changes", err)
+	}
+	s.unchanged(before, "a refused sync")
+}

@@ -19,6 +19,10 @@ import (
 // before it is replaced or removed, so a file that changed after the plan stops the sync and is not written
 // over; another folder has no such record, and is refused as the caller's bug.
 //
+// A sync writes the assets' changes and no other. A folder that is a view with planned changes, such as the
+// settings' in a build, would have those written into the source map too: it is refused as the caller's bug,
+// before anything is read or written. Plan takes such a view; a build stages it.
+//
 // The state file is written last, so that it never lists a file that was not written. A state that owns nothing
 // has no file: one that is there is removed. A state file that is written or removed is guarded as a map file
 // is: one that another program wrote, made or removed after the sync began stops the sync, and is kept. A state
@@ -27,6 +31,9 @@ import (
 func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, stateFile string) error {
 	if result.planned != folder {
 		return errOtherFolder()
+	}
+	if len(folder.Changes()) > 0 {
+		return errFolderWithChanges()
 	}
 	state, err := stateChange(stateFile, result.State)
 	if err != nil {
@@ -185,6 +192,12 @@ func reasonOf(failure error) string {
 // errOtherFolder is not a diag error: only a caller's bug gives Sync another folder than the plan's.
 func errOtherFolder() error {
 	return errors.New("Cannot sync the assets: the folder is not the folder the plan was made from.")
+}
+
+// errFolderWithChanges is not a diag error: assets:sync plans on the source map as it is on disk, so only a
+// caller's bug gives Sync a view that holds the changes of another planner.
+func errFolderWithChanges() error {
+	return errors.New("Cannot sync the assets: the folder carries planned changes, which a sync would write too.")
 }
 
 func errInterruptedAndUndone() error {
