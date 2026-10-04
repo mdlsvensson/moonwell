@@ -359,11 +359,16 @@ func TestPlaceKeepsTheSpellingOfFoldersAndFilesTheMapHas(t *testing.T) {
 func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 	folder, _ := open(t, map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script"})
 	planned := folder.With([]Change{put("Sound/Music/theme.mp3", "theme")})
+	removing := folder.With([]Change{drop("WAR3MAP.LUA"), drop("textures/old.blp")})
 	cases := []struct {
 		view              *Folder
 		name, words, file string
 	}{
 		{folder, "WAR3MAP.LUA/x.txt", "war3map.lua in the map is a file, not a folder", label + "/war3map.lua"},
+		// A file of the map never becomes a folder, so it is on the way even in a view that removes it.
+		{removing, "WAR3MAP.LUA/x.txt", "war3map.lua in the map is a file, not a folder", label + "/war3map.lua"},
+		{removing, "textures/old.blp/deep/x.txt", "Textures/Old.blp in the map is a file, not a folder",
+			label + "/Textures/Old.blp"},
 		{folder, "textures/old.blp/deep/x.txt", "Textures/Old.blp in the map is a file, not a folder",
 			label + "/Textures/Old.blp"},
 		{planned, "sound/music/theme.mp3/x.txt", "Sound/Music/theme.mp3 in the map is a file, not a folder",

@@ -438,8 +438,43 @@ func TestRefusals(t *testing.T) {
 			want: oldProblems, got: newProblems(func(newdiag.Problems) {}),
 		},
 		{
-			name: "problems of different lengths", bothFailed: true, contains: []string{"want 2 problems, got 1"},
+			name: "problems of different lengths, both lists shown", bothFailed: true,
+			contains: []string{
+				"want 2 problems, got 1",
+				"want:\n  {File:a.pkl Line:1 Column:2 Msg:first Hint:one}\n  {File:b.pkl Line:3 Column:4 Msg:second Hint:two}\n",
+				"got:\n  {File:a.pkl Line:1 Column:2 Msg:first Hint:one}",
+			},
 			want: oldProblems, got: newProblems(func(newdiag.Problems) {})[:1],
+		},
+		{
+			name: "an error caused by problems is the error, equal", bothFailed: true,
+			want: &olddiag.Error{Msg: "outer", File: "m.pkl", Hint: "h", Cause: oldProblems},
+			got:  &newdiag.Error{Msg: "outer", File: "m.pkl", Hint: "h", Cause: newProblems(func(newdiag.Problems) {})},
+		},
+		{
+			name: "an error caused by problems is the error, a field differs", bothFailed: true,
+			contains: []string{`Msg differs: want "outer", got "another outer"`, `File differs: want "m.pkl", got "n.pkl"`},
+			want:     &olddiag.Error{Msg: "outer", File: "m.pkl", Hint: "h", Cause: oldProblems},
+			got: &newdiag.Error{
+				Msg: "another outer", File: "n.pkl", Hint: "h", Cause: newProblems(func(newdiag.Problems) {}),
+			},
+		},
+		{
+			name: "an error caused by problems against the problems alone", bothFailed: true,
+			contains: []string{"want a *diag.Error", "got diag.Problems"},
+			want:     &olddiag.Error{Msg: "outer", File: "m.pkl", Hint: "h", Cause: oldProblems},
+			got:      newProblems(func(newdiag.Problems) {}),
+		},
+		{
+			name: "the problems alone against an error caused by them", bothFailed: true,
+			contains: []string{"want diag.Problems", "got a *diag.Error"},
+			want:     oldProblems,
+			got:      &newdiag.Error{Msg: "outer", File: "m.pkl", Hint: "h", Cause: newProblems(func(newdiag.Problems) {})},
+		},
+		{
+			name: "problems caused by nothing, wrapped twice", bothFailed: true,
+			want: fmt.Errorf("outer: %w", fmt.Errorf("inner: %w", oldProblems)),
+			got:  fmt.Errorf("outer: %w", newProblems(func(newdiag.Problems) {})),
 		},
 		{
 			name: "a field of a later problem differs", bothFailed: true,

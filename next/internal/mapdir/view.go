@@ -127,19 +127,30 @@ func (f *Folder) spelled(name string) string {
 }
 
 // Place is the spelling a new file at name is written under: folders the map already has, or that an earlier
-// change planned, keep their spelling. It fails when a folder on the way is a file, or name is a folder. It is
-// the name With gives a change to name.
+// change planned, keep their spelling. It fails when a folder on the way is a file, or name is a folder. A file
+// the map has on disk is on the way in a view that removes it too. It is the name With gives a change to name.
 func (f *Folder) Place(name string) (string, error) {
 	placed := f.spelled(name)
-	for _, folder := range foldersOf(placed) {
-		if f.Has(folder) {
-			return "", errFileOnTheWay(f.Name(folder), name, f.Label(folder))
-		}
+	if file, ok := f.fileOnTheWay(placed); ok {
+		return "", errFileOnTheWay(f.Name(file), name, f.Label(file))
 	}
 	if existing, ok := f.folder(Key(placed)); ok {
 		return "", errOntoAFolder(name, join(f.label, existing))
 	}
 	return placed, nil
+}
+
+// fileOnTheWay is the first folder a file at name would be in that is a file: one the map has on disk, or one the
+// view writes. A file on disk stays in the way when the view removes it, because no write may turn a file of the
+// map into a folder: the journal that undoes a failed apply puts files back, and it cannot put one back where a
+// folder was made.
+func (f *Folder) fileOnTheWay(name string) (file string, found bool) {
+	for _, folder := range foldersOf(name) {
+		if f.found.has(folder) || f.Has(folder) {
+			return folder, true
+		}
+	}
+	return "", false
 }
 
 // ---- errors ----

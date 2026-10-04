@@ -153,6 +153,9 @@ func bothFail(t testing.TB, what string, want, got error) bool {
 // of their trees or neither, and for diag errors the same Msg, File, Line, Column and Hint; for diag.Problems,
 // the same problems in the same order. It reports whether both failed, in which case there is no output to
 // compare.
+//
+// The diag error of a side is the outermost one on the chain that errors.Unwrap walks, so an error that wraps
+// several at once is read as one that is not a diag error.
 func Refusals(t testing.TB, what string, want, got error) (bothFailed bool) {
 	t.Helper()
 	if !bothFail(t, what, want, got) {
@@ -164,7 +167,8 @@ func Refusals(t testing.TB, what string, want, got error) (bothFailed bool) {
 		t.Errorf("%s: the errors are of different kinds: want %s (%v), got %s (%v)",
 			what, wanted.kind, want, actual.kind, got)
 	case len(wanted.problems) != len(actual.problems):
-		t.Errorf("%s: want %d problems, got %d", what, len(wanted.problems), len(actual.problems))
+		t.Errorf("%s: want %d problems, got %d\nwant:\n%sgot:\n%s",
+			what, len(wanted.problems), len(actual.problems), listed(wanted.problems), listed(actual.problems))
 	default:
 		for i := range wanted.problems {
 			for _, difference := range differences(wanted.problems[i], actual.problems[i]) {
@@ -197,36 +201,47 @@ func (r refusal) place(i int) string {
 	return fmt.Sprintf("problem %d: ", i+1)
 }
 
-// oldRefusal reads an error of the old tree. Its diag errors are found through whatever wraps them.
+// listed is each problem on a line of its own, with its fields named.
+func listed(problems []newdiag.Problem) string {
+	var lines strings.Builder
+	for _, problem := range problems {
+		fmt.Fprintf(&lines, "  %+v\n", problem)
+	}
+	return lines.String()
+}
+
+// oldRefusal reads an error of the old tree: the outermost diag error in it, which is err, or what err wraps, or
+// what that wraps. So a *diag.Error whose Cause is a diag.Problems is read as the *diag.Error, with its own
+// fields, and not as the problems under it.
 func oldRefusal(err error) refusal {
-	var many olddiag.Problems
-	var one *olddiag.Error
-	switch {
-	case errors.As(err, &many):
-		read := refusal{kind: manyFailures}
-		for _, problem := range many {
-			read.problems = append(read.problems, newdiag.Problem(problem))
+	for ; err != nil; err = errors.Unwrap(err) {
+		switch failure := err.(type) {
+		case olddiag.Problems:
+			read := refusal{kind: manyFailures}
+			for _, problem := range failure {
+				read.problems = append(read.problems, newdiag.Problem(problem))
+			}
+			return read
+		case *olddiag.Error:
+			return refusal{oneFailure, []newdiag.Problem{{
+				File: failure.File, Line: failure.Line, Column: failure.Column, Msg: failure.Msg, Hint: failure.Hint,
+			}}}
 		}
-		return read
-	case errors.As(err, &one):
-		return refusal{oneFailure, []newdiag.Problem{{
-			File: one.File, Line: one.Line, Column: one.Column, Msg: one.Msg, Hint: one.Hint,
-		}}}
 	}
 	return refusal{kind: plainError}
 }
 
 // newRefusal reads an error of the new tree, as oldRefusal reads one of the old.
 func newRefusal(err error) refusal {
-	var many newdiag.Problems
-	var one *newdiag.Error
-	switch {
-	case errors.As(err, &many):
-		return refusal{manyFailures, many}
-	case errors.As(err, &one):
-		return refusal{oneFailure, []newdiag.Problem{{
-			File: one.File, Line: one.Line, Column: one.Column, Msg: one.Msg, Hint: one.Hint,
-		}}}
+	for ; err != nil; err = errors.Unwrap(err) {
+		switch failure := err.(type) {
+		case newdiag.Problems:
+			return refusal{manyFailures, failure}
+		case *newdiag.Error:
+			return refusal{oneFailure, []newdiag.Problem{{
+				File: failure.File, Line: failure.Line, Column: failure.Column, Msg: failure.Msg, Hint: failure.Hint,
+			}}}
+		}
 	}
 	return refusal{kind: plainError}
 }
