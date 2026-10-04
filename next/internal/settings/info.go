@@ -264,22 +264,19 @@ func (p *infoPatch) fog(fog manifest.Fog) {
 // inOrder reports whether the fog as the settings leave it has a start, an end and a density that are numbers,
 // and does not start after its end. A value that is not set is the map's own.
 func inOrder(fog manifest.Fog, current w3i.Fog) bool {
-	start := or(fog.Start, current.Start.Value)
-	end := or(fog.End, current.End.Value)
-	density := or(fog.Density, current.Density.Value)
-	return finite(start) && finite(end) && finite(density) && start <= end
+	start := orInherited(fog.Start, current.Start.Value)
+	end := orInherited(fog.End, current.End.Value)
+	density := orInherited(fog.Density, current.Density.Value)
+	isNumber := func(value float64) bool { return !math.IsInf(value, 0) && !math.IsNaN(value) }
+	return isNumber(start) && isNumber(end) && isNumber(density) && start <= end
 }
 
-// or is the value a setting sets, or the map's own.
-func or(setting *float64, inherited float32) float64 {
+// orInherited is the fog value a setting sets, or the one the map has.
+func orInherited(setting *float64, inherited float32) float64 {
 	if setting != nil {
 		return *setting
 	}
 	return float64(inherited)
-}
-
-func finite(value float64) bool {
-	return !math.IsInf(value, 0) && !math.IsNaN(value)
 }
 
 // mapFlags writes the map flags when a setting turned one.

@@ -2,11 +2,14 @@ package settings
 
 import (
 	"bytes"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
@@ -100,17 +103,49 @@ func TestAPreviewThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
 	}
 }
 
-// A file where the path needs a folder is not found on Windows and is an error of its own on other systems.
-// Either way it is the user's to fix.
-func TestAPreviewPathThroughAFileIsRefusedAsTheUsersMistake(t *testing.T) {
+// A file where the path needs a folder: the picture does not exist, whatever the operating system calls that.
+func TestAPreviewPathThroughAFileNamesAFileThatDoesNotExist(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "preview.tga", plainTGA())
 	_, err := loadPreview(root, "preview.tga/inner.tga", manifestName)
 	failure := asError(t, err, "a path through a file")
-	names := failure.File == manifestName || failure.File == "preview.tga/inner.tga"
-	if !names || failure.Hint == "" {
+	if !strings.Contains(failure.Msg, "names a file that does not exist: preview.tga/inner.tga") ||
+		failure.File != manifestName || failure.Hint == "" {
 		t.Errorf("error = %+v", failure)
 	}
+}
+
+// What the operating system says on the way to the picture, given here as it says it on each system: a file
+// system gives only its own.
+func TestAFailureOnTheWayToThePreviewIsToldAsWhatTheUserCanFix(t *testing.T) {
+	const path = "art/preview.tga"
+	failed := func(reason error) error {
+		return &fs.PathError{Op: "lstat", Path: filepath.Join("project", "art", "preview.tga"), Err: reason}
+	}
+	t.Run("a file where the path needs a folder", func(t *testing.T) {
+		failure := asError(t, unreached(failed(syscall.ENOTDIR), path, manifestName), "not a directory")
+		if !strings.Contains(failure.Msg, "names a file that does not exist: "+path) || failure.File != manifestName ||
+			failure.Hint == "" {
+			t.Errorf("error = %+v", failure)
+		}
+	})
+	t.Run("a folder that may not be entered", func(t *testing.T) {
+		cause := failed(syscall.EACCES)
+		failure := asError(t, unreached(cause, path, manifestName), "permission denied")
+		if !strings.Contains(failure.Msg, "Reading the preview picture failed: ") || failure.File != path ||
+			failure.Cause != cause {
+			t.Errorf("error = %+v", failure)
+		}
+		if !strings.Contains(failure.Hint, "folder") || strings.Contains(failure.Hint, "locked") {
+			t.Errorf("the hint is %q, want one that fits a folder and claims no lock", failure.Hint)
+		}
+	})
+	t.Run("a link", func(t *testing.T) {
+		link := fsx.LinkError(filepath.Join("project", "art"))
+		if got := unreached(link, path, manifestName); got != link {
+			t.Errorf("error = %v, want the link's own", got)
+		}
+	})
 }
 
 func TestAPreviewBehindALinkIsRefused(t *testing.T) {

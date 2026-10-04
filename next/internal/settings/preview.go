@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"strings"
+	"syscall"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
@@ -42,12 +43,12 @@ func previewPath(preview, manifestFile string) (string, error) {
 func readPreview(root, path, manifestFile string) ([]byte, error) {
 	file, err := fsx.SafeJoin(root, path)
 	if err != nil {
-		return nil, orUnreadable(err, path)
+		return nil, unreached(err, path, manifestFile)
 	}
 	info, err := fsx.Lstat(file)
 	switch {
 	case err != nil:
-		return nil, errUnreadable(path, err)
+		return nil, unreached(err, path, manifestFile)
 	case info == nil:
 		return nil, errNoSuchFile(manifestFile, path)
 	case !info.Mode().IsRegular():
@@ -60,14 +61,19 @@ func readPreview(root, path, manifestFile string) ([]byte, error) {
 	return data, nil
 }
 
-// orUnreadable is a failure of the way to the picture: an expected failure as it is, such as a link, and the
-// operating system's as a failure to read the picture.
-func orUnreadable(err error, path string) error {
+// unreached is a failure on the way to the picture, as the user is told it. An expected failure, such as a link,
+// stays as it is. A file where the path needs a folder means that the picture does not exist: some systems say
+// so themselves and others call it "not a directory", and the refusal is the same on all of them. Anything else
+// is the operating system's reason, with the path it stopped at.
+func unreached(err error, path, manifestFile string) error {
 	var expected *diag.Error
-	if errors.As(err, &expected) {
+	switch {
+	case errors.As(err, &expected):
 		return err
+	case errors.Is(err, syscall.ENOTDIR):
+		return errNoSuchFile(manifestFile, path)
 	}
-	return errUnreadable(path, err)
+	return errUnreachable(path, err)
 }
 
 // ---- errors ----
@@ -107,11 +113,22 @@ func errNotAFile(manifestFile, path string) error {
 	}
 }
 
+// errUnreadable says that the picture is there and its bytes could not be read.
 func errUnreadable(path string, cause error) error {
 	return &diag.Error{
 		Msg:   "Reading the preview picture failed: " + fsx.Reason(cause),
 		File:  path,
 		Cause: cause,
 		Hint:  "Make sure no other program has the picture locked.",
+	}
+}
+
+// errUnreachable says that the operating system did not let the way to the picture be followed.
+func errUnreachable(path string, cause error) error {
+	return &diag.Error{
+		Msg:   "Reading the preview picture failed: " + fsx.Reason(cause),
+		File:  path,
+		Cause: cause,
+		Hint:  "Make sure the picture and every folder on the way to it can be read.",
 	}
 }

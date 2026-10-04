@@ -3,13 +3,17 @@ package settings
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"math"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
+	"syscall"
 	"testing"
 
+	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/ordered"
 	oldsettings "github.com/mdlsvensson/moonwell/internal/settings"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
@@ -35,12 +39,19 @@ import (
 // The documents are every one that the other tree's tests give its Validate and see accepted, one that sets
 // every setting, and for the constants every pairing of a typed constant with a raw one.
 //
+// Left out, for the one difference that is meant: a preview path that runs through a file
+// ("preview.tga/inner.tga"), on a system that calls that "not a directory". There the other tree passes the
+// system's error on as an error that is not a diag error, and this tree says on every system that the picture
+// does not exist (TestAPreviewPathThroughAFileNamesAFileThatDoesNotExist). The path is among the inputs. It is
+// left out when the other tree's result is such an error, which is counted: once on those systems, and never on
+// Windows, where both trees say the same and are compared. That this tree refuses it too is still looked at.
+//
+// TestOracleOnAPreviewThatCannotBeRead compares nothing when it is run as root on a system other than Windows:
+// root reads a file without permissions, so the test is skipped there.
+//
 // Not among the inputs:
 //
 //   - A document whose shape the other tree refuses (a wrong name, range or type): that is Pkl's to refuse.
-//   - A preview path that runs through a file ("preview.tga/inner.tga"). Where the operating system reports that
-//     as an error of its own, the other tree passes it on as an error that is not a diag error, and this tree
-//     says that the picture cannot be read (TestAPreviewPathThroughAFileIsRefusedAsTheUsersMistake).
 //   - A section or a key whose name looks like a number. Neither tree is given one: the schema and the other
 //     tree's Validate both take only names that start with a letter or an underscore.
 
@@ -510,6 +521,16 @@ func previewProject(t *testing.T) string {
 	return root
 }
 
+// fileOnTheWay is a path through a file of previewProject.
+const fileOnTheWay = "preview.tga/inner.tga"
+
+// passedOnAsItIs reports whether an error of the other tree is the operating system's word for a file where a
+// path needs a folder, passed on as an error that is not a diag error.
+func passedOnAsItIs(err error) bool {
+	var expected *olddiag.Error
+	return errors.Is(err, syscall.ENOTDIR) && !errors.As(err, &expected)
+}
+
 // previewPaths is the path of each file of previewProject, some in more than one spelling, and paths that name
 // no file of it or no file a preview may be.
 var previewPaths = []string{
@@ -517,7 +538,7 @@ var previewPaths = []string{
 	"assets2/preview.blp", `art\Preview.TGA`, `art\deep/grey.png`,
 	"assets/preview.tga", `Assets\preview.tga`, "ASSETS/missing.tga", "assets/", "assets",
 	"preview.jpg", "preview.png", "preview", ".tga", "small.tga", "tiny.tga", "world.blp", "empty.png",
-	"folder.tga", "art", "missing.tga", "art/missing.tga", "nowhere/preview.tga",
+	"folder.tga", "art", "missing.tga", "art/missing.tga", "nowhere/preview.tga", fileOnTheWay,
 	"../preview.tga", "/preview.tga", `C:\preview.tga`, "art//preview.tga", "", ".", "./preview.tga", "art/../preview.tga",
 	"preview.tga ", "preview.tga.", "con.tga", "art/nul", "pre\tview.tga", "what?.tga",
 }
@@ -541,17 +562,30 @@ func comparePreviews(t *testing.T, root, preview string) (refused bool) {
 
 func TestOracleOnThePreview(t *testing.T) {
 	root := previewProject(t)
-	read, refused := 0, 0
+	read, refused, leftOut := 0, 0, 0
 	for _, preview := range previewPaths {
-		if comparePreviews(t, root, preview) {
+		_, wantErr := oldsettings.LoadPreview(root, preview, manifestName)
+		switch {
+		case passedOnAsItIs(wantErr):
+			leftOut++
+			_, gotErr := loadPreview(root, preview, manifestName)
+			if !oracle.Errors(t, "the preview "+preview, wantErr, gotErr) {
+				t.Errorf("the preview %s: this tree reads a picture through a file", preview)
+			}
+		case comparePreviews(t, root, preview):
 			refused++
-		} else {
+		default:
 			read++
 		}
 	}
+	// Only the path through a file is left out, and only where the system has a word of its own for it.
+	wantLeftOut := 1
+	if runtime.GOOS == "windows" {
+		wantLeftOut = 0
+	}
 	// The first ten paths name a picture the game shows.
-	if read != 10 || refused != len(previewPaths)-10 {
-		t.Errorf("%d previews read and %d refused, want 10 and %d", read, refused, len(previewPaths)-10)
+	if wantRefused := len(previewPaths) - 10 - wantLeftOut; read != 10 || refused != wantRefused || leftOut != wantLeftOut {
+		t.Errorf("%d previews read, %d refused and %d left out, want 10, %d and %d", read, refused, leftOut, wantRefused, wantLeftOut)
 	}
 }
 
