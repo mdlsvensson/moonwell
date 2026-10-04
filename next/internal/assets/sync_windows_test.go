@@ -22,7 +22,7 @@ func TestASyncThatCannotRemoveAnOwnedFileUndoesItsWritesAndLeavesTheFileAsItWas(
 	}
 	folder, result := s.planned(noBlock)
 	before := testkit.Snapshot(t, s.root)
-	makeUnwritable(t, filepath.Join(s.mapDir, "dropped.blp"))
+	testkit.MakeUnwritable(t, filepath.Join(s.mapDir, "dropped.blp"))
 
 	e := asError(t, Sync(background, folder, result, s.state), "a sync that cannot remove a file")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||

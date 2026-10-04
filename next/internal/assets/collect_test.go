@@ -264,7 +264,7 @@ func TestAFileWhereAFolderOfAssetsShouldBeIsRefused(t *testing.T) {
 func TestAnAssetThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 	root := t.TempDir()
 	put(t, root, "assets/a.blp")
-	makeUnreadable(t, put(t, root, "assets/Icons/held.blp"))
+	testkit.MakeUnreadable(t, put(t, root, "assets/Icons/held.blp"))
 	e := refused(t, root, noBlock)
 	if !strings.Contains(e.Msg, "Reading") || e.File != "assets/Icons/held.blp" || e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
@@ -273,7 +273,7 @@ func TestAnAssetThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 
 func TestALibrarysFileThatCannotBeReadIsRefusedByItsNameAndIsNotTheLibrarysFailure(t *testing.T) {
 	root := t.TempDir()
-	makeUnreadable(t, put(t, root, "libraries/ui/Icons/held.blp"))
+	testkit.MakeUnreadable(t, put(t, root, "libraries/ui/Icons/held.blp"))
 	e := refused(t, root, noBlock, "ui")
 	// What the system refuses is not for the library's author to mend: the error is the read's own, at the file.
 	if !strings.HasPrefix(e.Msg, "Reading") || e.File != "libraries/ui/Icons/held.blp" || e.Cause == nil ||

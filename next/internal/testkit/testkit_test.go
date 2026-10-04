@@ -248,3 +248,32 @@ func TestLinkDirLinksToTheFolder(t *testing.T) {
 		t.Errorf("through the link: %q, %v", data, err)
 	}
 }
+
+func TestMakeUnreadableHoldsAFileUntilTheTestEnds(t *testing.T) {
+	path := WriteFile(t, t.TempDir(), "held.txt", []byte("held"))
+	t.Run("while it is held", func(t *testing.T) {
+		MakeUnreadable(t, path)
+		if data, err := os.ReadFile(path); err == nil {
+			t.Errorf("the held file was read: %q", data)
+		}
+	})
+	if data, err := os.ReadFile(path); err != nil || string(data) != "held" {
+		t.Errorf("after the test that held it: %q, %v", data, err)
+	}
+}
+
+func TestMakeUnwritableHoldsAFileThatCanStillBeReadUntilTheTestEnds(t *testing.T) {
+	path := WriteFile(t, t.TempDir(), "held.txt", []byte("held"))
+	t.Run("while it is held", func(t *testing.T) {
+		MakeUnwritable(t, path)
+		if data, err := os.ReadFile(path); err != nil || string(data) != "held" {
+			t.Errorf("reading the held file: %q, %v", data, err)
+		}
+		if err := os.WriteFile(path, []byte("written over"), 0o666); err == nil {
+			t.Error("the held file was written over")
+		}
+	})
+	if err := os.WriteFile(path, []byte("written over"), 0o666); err != nil {
+		t.Errorf("after the test that held it: %v", err)
+	}
+}

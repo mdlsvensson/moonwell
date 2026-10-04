@@ -684,7 +684,7 @@ func TestOracleOnThePreview(t *testing.T) {
 
 func TestOracleOnAPreviewThatCannotBeRead(t *testing.T) {
 	root := t.TempDir()
-	makeUnreadable(t, testkit.WriteFile(t, root, "art/preview.tga", plainTGA()))
+	testkit.MakeUnreadable(t, testkit.WriteFile(t, root, "art/preview.tga", plainTGA()))
 	if !comparePreviews(t, root, "art/preview.tga") {
 		t.Error("both trees read a picture that cannot be read")
 	}
@@ -1498,7 +1498,7 @@ func TestOracleOnAMapFileThatCannotBeRead(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dir, root := withPreview(t, "preview.tga", plainTGA())
 			testkit.WriteFile(t, dir, "war3mapSkin.txt", []byte("[A]\n"))
-			makeUnreadable(t, filepath.Join(dir, tt.name))
+			testkit.MakeUnreadable(t, filepath.Join(dir, tt.name))
 			read := inBothTrees(t, root, tt.document)
 			_, wantErr := planOfOld(dir, root, read)
 			_, gotErr := Plan(openMap(t, dir), read.project)

@@ -642,7 +642,7 @@ func TestOracleOnAFileThatCannotBeRead(t *testing.T) {
 		p := project{name: tt.name, files: holding("assets/a.blp", tt.held), libraries: tt.libraries}
 		root := p.onDisk(t)
 		onDisk := filepath.Join(root, filepath.FromSlash(tt.held))
-		makeUnreadable(t, onDisk)
+		testkit.MakeUnreadable(t, onDisk)
 		wantErr, gotErr := refusals(t, p, root)
 		if _, expected := olddiag.First(wantErr); expected || !oracle.Errors(t, p.name, wantErr, gotErr) {
 			t.Errorf("%s: the refusals are %v and %v, want an error that is not a diag error of the other tree", p.name, wantErr, gotErr)
@@ -1529,7 +1529,7 @@ func TestOracleOnAMapFileThatCannotBeRead(t *testing.T) {
 		oldRoot, newRoot := p.onDisk(t), p.onDisk(t)
 		r := run{refused: bySystem, about: m + held}
 		for _, root := range []string{oldRoot, newRoot} {
-			makeUnreadable(t, filepath.Join(root, filepath.FromSlash(r.about)))
+			testkit.MakeUnreadable(t, filepath.Join(root, filepath.FromSlash(r.about)))
 		}
 		want, got := r.inOtherTree(t, oldRoot), r.inThisTree(t, newRoot)
 		if r.refusals(t, "a plan that needs "+held, want.err, got.err, oldRoot, newRoot) == bySystem && want.plan == nil && got.plan == nil {

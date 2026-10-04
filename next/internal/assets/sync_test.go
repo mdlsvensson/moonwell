@@ -190,7 +190,7 @@ func TestASyncThatCannotWriteOverAnOwnedFileUndoesItsWritesAndLeavesTheFileAsItW
 	put(t, s.root, "assets/a.blp", "second")
 	folder, result := s.planned(noBlock)
 	before := testkit.Snapshot(t, s.root)
-	makeUnwritable(t, filepath.Join(s.mapDir, "a.blp"))
+	testkit.MakeUnwritable(t, filepath.Join(s.mapDir, "a.blp"))
 
 	e := asError(t, Sync(background, folder, result, s.state), "a sync that cannot write over a file")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
@@ -237,7 +237,7 @@ func (s *site) mapIsChanged() {
 func TestASyncThatCannotWriteItsStateRestoresTheMapByteForByte(t *testing.T) {
 	s, folder, result := changedMap(t)
 	before := testkit.Snapshot(t, s.root)
-	makeUnwritable(t, s.state)
+	testkit.MakeUnwritable(t, s.state)
 	ctx := &countdown{Context: background, limit: never, before: map[int]func(){5: s.mapIsChanged}}
 
 	e := asError(t, Sync(ctx, folder, result, s.state), "a sync that cannot write its state")

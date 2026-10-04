@@ -320,7 +320,7 @@ func TestAMapFileThatCannotBeReadIsRefusedByItsNameAndNotTakenForAnEmptyFile(t *
 		t.Run(tt.name, func(t *testing.T) {
 			dir, root := withPreview(t, "preview.tga", plainTGA())
 			testkit.WriteFile(t, dir, "war3mapMisc.txt", []byte("[Misc]\n"))
-			makeUnreadable(t, filepath.Join(dir, tt.name))
+			testkit.MakeUnreadable(t, filepath.Join(dir, tt.name))
 			changes, err := planIn(t, dir, root, tt.document)
 			failure := asError(t, err, tt.document)
 			if failure.File != mapLabel+"/"+tt.name || !strings.Contains(failure.Msg, "Reading a map file failed") ||

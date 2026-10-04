@@ -94,7 +94,7 @@ func TestAPreviewSettingThatNamesNoUsablePictureIsRefused(t *testing.T) {
 
 func TestAPreviewThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
 	root := t.TempDir()
-	makeUnreadable(t, testkit.WriteFile(t, root, "art/preview.tga", plainTGA()))
+	testkit.MakeUnreadable(t, testkit.WriteFile(t, root, "art/preview.tga", plainTGA()))
 	_, err := loadPreview(root, "art/preview.tga", manifestName)
 	failure := asError(t, err, "a picture that cannot be read")
 	if !strings.Contains(failure.Msg, "Reading the preview picture failed: ") || failure.File != "art/preview.tga" ||

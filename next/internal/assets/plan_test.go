@@ -476,7 +476,7 @@ func TestAMapFileThePlanNeedsAndCannotReadIsRefusedByItsName(t *testing.T) {
 			put(t, s.mapDir, "Textures/owned.blp")
 			s.owns("Textures/owned.blp")
 			s.setImports(imp.Entry{Flag: 13, Path: `Textures\owned.blp`})
-			makeUnreadable(t, filepath.Join(s.mapDir, filepath.FromSlash(held)))
+			testkit.MakeUnreadable(t, filepath.Join(s.mapDir, filepath.FromSlash(held)))
 			e := s.refusedPlan(noBlock)
 			if !strings.HasPrefix(e.Msg, "Reading a map file failed") || e.File != mapLabel+"/"+held || e.Cause == nil {
 				t.Errorf("error = %+v", e)
