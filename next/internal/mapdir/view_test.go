@@ -190,8 +190,8 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 		name          string
 		given, stored string
 	}{
-		// None of these can be written. Each must reach the write as it was given, so that it is refused there and
-		// is not taken for the file its tidied name would be.
+		// None of these can be written. Each stays in the plan as it was given, so that the check before the first
+		// write refuses the plan, and the name is not taken for the file its tidied name would be.
 		{"a leading slash before a file the map has", "/WAR3MAP.W3I", "/WAR3MAP.W3I"},
 		{"two leading slashes", "//war3map.w3i", "//war3map.w3i"},
 		{"a leading slash before a folder the map has", "/textures/New.blp", "/textures/New.blp"},

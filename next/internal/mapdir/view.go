@@ -112,7 +112,8 @@ func (f *Folder) folder(key string) (string, bool) {
 // spelled is the name a file is planned under. A file the view knows keeps its spelling. A new file keeps its own
 // name, with "/", below the deepest folder on its way that the view knows, which is spelled as the view has it.
 // Nothing else of a name is tidied: one that cannot be written (a leading slash, an empty folder name, "..")
-// would become the name of another file, so it stays what it is for the write to refuse.
+// would become the name of another file, so it stays what it is, and StageTo and ApplyInPlace refuse the plan
+// before they write anything.
 func (f *Folder) spelled(name string) string {
 	name = slashed(name)
 	if known, ok := f.spelling(Key(name)); ok {

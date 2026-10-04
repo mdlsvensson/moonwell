@@ -44,6 +44,30 @@ func makeUnreadable(t *testing.T, path string) {
 	}
 }
 
+// makeUnwritable holds the file at path the way a program does that lets others read it, and neither write nor
+// remove it. The file is let go when the test ends.
+//
+// The helper then tries to open the file for writing itself. A system on which it can cannot run the test, which
+// is skipped there.
+func makeUnwritable(t *testing.T, path string) {
+	t.Helper()
+	name, err := syscall.UTF16PtrFromString(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	handle, err := syscall.CreateFile(name, syscall.GENERIC_READ, syscall.FILE_SHARE_READ, nil, syscall.OPEN_EXISTING,
+		syscall.FILE_ATTRIBUTE_NORMAL, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { syscall.CloseHandle(handle) })
+	if file, err := os.OpenFile(path, os.O_WRONLY, 0); err == nil {
+		file.Close()
+		t.Skip("this system let a second program write a file that is held for reading only; " +
+			"the case is covered on the other system's run")
+	}
+}
+
 // lockWholeFile takes an exclusive lock on every byte the file has or could have, through the handle, until the
 // test ends. The lock starts at the offset an Overlapped names, which is the start of the file for a zero one.
 func lockWholeFile(t *testing.T, handle syscall.Handle) {

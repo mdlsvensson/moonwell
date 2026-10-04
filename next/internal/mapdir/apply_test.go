@@ -328,6 +328,56 @@ func TestApplyInPlaceDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
 	}
 }
 
+// stage is given the copy, which holds a link where the map holds one: a link made after the scan is copied as a
+// link on a system that can copy one. A change below it is not written through it.
+func TestStageDoesNotWriteAChangeThroughALinkInTheCopy(t *testing.T) {
+	_, dir := open(t, sourceMap)
+	outside := linkAway(t, dir)
+	before := snapshot(t, outside)
+	for _, change := range []Change{put("Textures/Old.blp", "patched"), put("Textures/New.blp", "new"), drop("Textures/Old.blp")} {
+		err := stage(dir, change)
+		if e := asError(t, err); !contains(e.Msg, "Symlinks are not supported") || !contains(e.Msg, filepath.Join(dir, "Textures")) {
+			t.Errorf("staging %s: error = %+v, want the link refused by its path", show([]Change{change}), e)
+		}
+	}
+	if after := snapshot(t, outside); !reflect.DeepEqual(after, before) {
+		t.Errorf("the folder the link points at holds %v, want %v", after, before)
+	}
+}
+
+func TestApplyInPlaceStopsAtAFileItCannotWrite(t *testing.T) {
+	folder, dir := open(t, sourceMap)
+	view := folder.With([]Change{put("war3mapskin.txt", "merged"), put("Sound/theme.mp3", "theme"), put("new.txt", "new")})
+	// A file made after the scan, where the second change's new folder goes. The check before the first write
+	// knows the scan only, and the check of the file itself finds no file at its path, as the scan did.
+	testkit.WriteFile(t, dir, "Sound", []byte("in the way"))
+	var journal fsx.Journal
+	e := asError(t, view.ApplyInPlace(context.Background(), &journal))
+	if !contains(e.Msg, "Writing a map file failed") || e.File != label+"/Sound/theme.mp3" || e.Cause == nil ||
+		!contains(e.Hint, "Close World Editor") {
+		t.Errorf("error = %+v", e)
+	}
+	after := filesOf(snapshot(t, dir))
+	if after["war3mapskin.txt"] != "merged" || after["Sound"] != "in the way" {
+		t.Errorf("the map holds %v, want the first change written and the file in the way as it was", after)
+	}
+	if _, written := after["new.txt"]; written {
+		t.Error("new.txt was written after the change that failed")
+	}
+	// The first change is in the journal, which puts it back. A system that fails the second write only when it
+	// makes the folder has the second change in the journal too.
+	if journal.Len() < 1 || journal.Len() > 2 {
+		t.Errorf("the journal has touched %d files, want the first change, and the second at most", journal.Len())
+	}
+	if unrestored := journal.Undo(); len(unrestored) != 0 {
+		t.Errorf("unrestored = %v", unrestored)
+	}
+	undone := filesOf(snapshot(t, dir))
+	if undone["war3mapskin.txt"] != "skin" || undone["Sound"] != "in the way" {
+		t.Errorf("after the undo the map holds %v, want the first change taken back", undone)
+	}
+}
+
 func TestApplyInPlaceWritesThroughTheJournalWhichCanUndoIt(t *testing.T) {
 	folder, dir := open(t, sourceMap)
 	before := snapshot(t, dir)
