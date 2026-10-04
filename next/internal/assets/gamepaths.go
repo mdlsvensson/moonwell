@@ -37,7 +37,9 @@ func loadedModel(key string) string {
 }
 
 // ParseGamePaths returns the keys of the paths a list names, one path on a line. A line that starts with "#"
-// and a blank line name none, and the white space around a line is not part of its path.
+// and a blank line name none, and the white space around a line is not part of its path. White space is what
+// Unicode calls so: a space, a tab, a no-break space and a next-line character (U+0085) among others are taken
+// off a line, and a byte order mark, which is none, is not.
 func ParseGamePaths(list string) map[string]bool {
 	keys := map[string]bool{}
 	for line := range strings.Lines(list) {

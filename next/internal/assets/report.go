@@ -81,7 +81,9 @@ func ReportModels(models []Model, gamePaths, targets map[string]bool) []ModelRep
 	return reports
 }
 
-// reportOn reads one model's references and gives each that has a path its status.
+// reportOn reads one model's references and gives each that has a path its status. Every error of the reader
+// becomes the line that says why the model is unreadable: this relies on model.Paths raising expected failures
+// only, about the bytes it is given, and none that would be Moonwell's own fault.
 func reportOn(found Model, gamePaths, targets map[string]bool) ModelReport {
 	report := ModelReport{Heading: found.Heading}
 	paths, err := model.Paths(found.Data, found.Heading)

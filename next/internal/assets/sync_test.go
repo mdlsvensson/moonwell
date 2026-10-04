@@ -485,6 +485,40 @@ func TestAStateFileThatNeedsNoWriteIsNotLookedAtAgain(t *testing.T) {
 	}
 }
 
+// A sync that leaves nothing owned, and finds no state file when it begins, has no state file to write or to
+// remove: it does not look for one again. A state file that another program makes while the map is written is
+// not guarded, and is left as that program wrote it.
+func TestAStateFileMadeDuringASyncThatOwnsNothingAndFoundNoneIsLeftAsItIs(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/a.blp")
+	s.synced(noBlock)
+	if err := os.Remove(filepath.Join(s.root, "assets", "a.blp")); err != nil {
+		t.Fatal(err)
+	}
+	folder, result := s.planned(noBlock)
+	if got := names(result.Changes); !slices.Equal(got, []string{"-a.blp", "war3map.imp"}) || len(result.State.Files) != 0 {
+		t.Fatalf("the changes are %q and the state owns %d files, want the owned file removed and nothing owned",
+			got, len(result.State.Files))
+	}
+	// The state file the plan was made from is gone by the time the sync begins.
+	if err := os.Remove(s.state); err != nil {
+		t.Fatal(err)
+	}
+	// Between the two writes of the map, another program makes a state file.
+	ctx := &countdown{Context: background, limit: never, before: map[int]func(){2: func() {
+		put(t, s.root, ".asset-state/map.w3x.json", "another program's")
+	}}}
+	if err := Sync(ctx, folder, result, s.state); err != nil || ctx.asks != 2 {
+		t.Errorf("Sync = %v after %d asks, want it to finish after the two asks of the map's changes", err, ctx.asks)
+	}
+	if s.inMap("a.blp") != missing || len(s.imports()) != 0 {
+		t.Error("the map's changes are not made")
+	}
+	if got := s.stateText(); got != "another program's" {
+		t.Errorf("the state file holds %q, want what the other program wrote", got)
+	}
+}
+
 func TestSyncRefusesAStateFileItCannotReadBeforeItWritesAnything(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")

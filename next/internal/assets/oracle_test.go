@@ -136,15 +136,20 @@ import (
 //   - A plan the other tree's ApplyPlan takes and this tree cannot make: one that turns a file of the map into
 //     a folder, which the other tree's test of an undo builds by hand. The stories reach an undo that cannot put
 //     a file back through a context that changes the map between two writes.
+//   - A model's path with a character beyond the basic plane, for the lines of the report: this tree pads a
+//     column by characters and the other by UTF-16 units. No model of reportedModels has such a path; the unit
+//     test TestTheColumnsOfAReportArePaddedByCharacters holds the difference.
+//
+// Left out, and counted: the paths and the lists of the game's paths with a character the two trees take
+// differently. They are among the inputs; each is left out and counted, and the two trees must differ on it.
+//
 //   - A path with a capital I with a dot, for the keys of the game's paths, alone and in a list: this tree folds
 //     each letter to one letter, a plain i, and the other tree to an i and a combining dot
-//     (TestGamePathKeyFoldsEachLetterToOneLetter). Counted, and each must differ.
+//     (TestGamePathKeyFoldsEachLetterToOneLetter).
 //   - A list of the game's paths with a byte order mark or a next-line character (U+0085) at the edge of a line:
 //     this tree takes Unicode's white space off a line, which the second is and the first is not, and to the
 //     other tree the first is white space and the second is not
-//     (TestParseGamePathsTakesTheWhiteSpaceOffEachLine). Counted, and each must differ.
-//   - A model's path with a character beyond the basic plane, for the lines of the report: this tree pads a
-//     column by characters and the other by UTF-16 units (TestTheColumnsOfAReportArePaddedByCharacters).
+//     (TestParseGamePathsTakesTheWhiteSpaceOffEachLine).
 
 // oldManifest is the manifest the other tree names in every error about the assets block.
 const oldManifest = "moonwell.pkl"
@@ -1444,6 +1449,12 @@ func seededStories(t testing.TB) []story {
 		{"the state file is changed while a sync that does not write it writes the index",
 			project{files: holding("assets/a.blp")},
 			[]run{{}, {edit: putting(m+"war3map.imp", indexOf()), syncCtx: beforeAsk(1, putting(state, "another program's"))}}},
+		// Nor does either tree look for a state file that a sync has neither to write nor to remove: the sync
+		// leaves nothing owned, and the state file is gone when it begins.
+		{"a state file is made while a sync that owns nothing, and found none, writes the map",
+			project{files: holding("assets/a.blp")},
+			[]run{{}, {edit: removing("assets/a.blp"), meddle: removing(state),
+				syncCtx: beforeAsk(2, putting(state, "another program's"))}}},
 	}
 }
 
@@ -1467,10 +1478,10 @@ func TestOracleOnThePlanAndTheSync(t *testing.T) {
 			runs, entries = runs+1, entries+files
 		}
 	}
-	// Thirty-one runs of the scenarios and forty-five seeded ones.
-	want := map[string]int{"": 47, byName: 27, reworded: 1, bySystem: 1}
-	if !maps.Equal(compared, want) || runs != 76 || entries != 775 {
-		t.Errorf("%d runs compared, by how they were refused: %v, with %d files and folders; want 76 runs, %v and 775",
+	// Thirty-one runs of the scenarios and forty-seven seeded ones.
+	want := map[string]int{"": 49, byName: 27, reworded: 1, bySystem: 1}
+	if !maps.Equal(compared, want) || runs != 78 || entries != 789 {
+		t.Errorf("%d runs compared, by how they were refused: %v, with %d files and folders; want 78 runs, %v and 789",
 			runs, compared, entries, want)
 	}
 }
