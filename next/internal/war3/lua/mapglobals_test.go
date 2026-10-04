@@ -1,0 +1,114 @@
+package lua
+
+import (
+	"slices"
+	"strings"
+	"testing"
+
+	"github.com/mdlsvensson/moonwell/next/internal/testkit"
+)
+
+func TestReadMapGlobalsTypesWorldEditorsVariablesByPrefixAndInitialValue(t *testing.T) {
+	globals := ReadMapGlobals(strings.Join([]string{
+		"gg_trg_Init = nil",
+		"gg_unit_hfoo_0001 = nil",
+		"gg_rct_Spawn = nil",
+		"udg_Score = 5",
+		"udg_Ratio = 0.0",
+		`udg_Name = ""`,
+		"udg_Flag = false",
+		"udg_Hero = nil",
+		"udg_Kills = __jarray(0)",
+		"udg_Spawns = {}",
+		"function InitGlobals()",
+		"udg_Late = 1",
+		"end",
+		"function main()",
+		"end",
+	}, "\r\n"))
+	want := []Global{
+		{"gg_trg_Init", "trigger"},
+		{"gg_unit_hfoo_0001", "unit"},
+		{"gg_rct_Spawn", "rect"},
+		{"udg_Score", "integer"},
+		{"udg_Ratio", "number"},
+		{"udg_Name", "string"},
+		{"udg_Flag", "boolean"},
+		{"udg_Hero", "any"},
+		{"udg_Kills", "integer[]"},
+		{"udg_Spawns", "any[]"},
+	}
+	if !slices.Equal(globals.Globals, want) {
+		t.Errorf("Globals = %+v, want %+v", globals.Globals, want)
+	}
+	if !slices.Equal(globals.Functions, []string{"InitGlobals", "main"}) {
+		t.Errorf("Functions = %q", globals.Functions)
+	}
+}
+
+func TestTheWorldEditor300FixtureDeclaresItsVariablesHandlesAndFunctions(t *testing.T) {
+	globals := ReadMapGlobals(string(testkit.Fixture(t, "map-globals-we3/war3map.lua")))
+	types := map[string]string{}
+	for _, global := range globals.Globals {
+		types[global.Name] = global.Type
+	}
+	for _, name := range []string{"udg_Score", "udg_Ratio", "udg_Name", "udg_Flag", "udg_Hero", "udg_Kills", "udg_Spawns"} {
+		if _, ok := types[name]; !ok {
+			t.Errorf("%s is not declared", name)
+		}
+	}
+	for name, want := range map[string]string{
+		"udg_Score":         "integer",
+		"udg_Kills":         "integer[]",
+		"gg_rct_Region_000": "rect",
+		"gg_cam_Camera_001": "camerasetup",
+	} {
+		if types[name] != want {
+			t.Errorf("%s has type %q, want %q", name, types[name], want)
+		}
+	}
+	for _, function := range []string{"InitGlobals", "CreateAllUnits", "InitCustomTriggers", "main", "config"} {
+		if !slices.Contains(globals.Functions, function) {
+			t.Errorf("function %s is not listed", function)
+		}
+	}
+}
+
+func TestADeclarationIsTypedByItsValueUnlessItsNameSaysWhatItHolds(t *testing.T) {
+	for _, c := range []struct{ line, name, want string }{
+		{"udg_A   =   -5  ", "udg_A", "integer"},
+		{"udg_A=-.5", "udg_A", "number"},
+		{"udg_A = 1.", "udg_A", "any"},
+		{"udg_A = true", "udg_A", "boolean"},
+		{`udg_A = "text" -- a comment`, "udg_A", "string"},
+		{`udg_A = __jarray( "" )`, "udg_A", "string[]"},
+		{"udg_A = __jarray(__jarray(0))", "udg_A", "integer[][]"},
+		{"udg_A = __jarray({})", "udg_A", "any[][]"},
+		{"udg_A = CreateGroup()", "udg_A", "any"},
+		{"gg_snd_Horn = 5", "gg_snd_Horn", "sound"},
+		{"gg_dest_Tree = nil", "gg_dest_Tree", "destructable"},
+		{"gg_item_Ring = nil", "gg_item_Ring", "item"},
+		{"gg_xyz_Other = 5", "gg_xyz_Other", "any"},
+		{"gg_Trg_Other = 5", "gg_Trg_Other", "integer"},
+	} {
+		globals := ReadMapGlobals(c.line + "\n").Globals
+		if !slices.Equal(globals, []Global{{c.name, c.want}}) {
+			t.Errorf("%q declares %+v, want %s of type %s", c.line, globals, c.name, c.want)
+		}
+	}
+}
+
+func TestOnlyALineThatStartsWithANameOrAFunctionIsRead(t *testing.T) {
+	globals := ReadMapGlobals(strings.Join([]string{
+		" udg_Indented = 1",
+		"local udg_Local = 1",
+		"udg_Field.x = 1",
+		" function Indented()",
+		"function Table.method()",
+		"function  Spaced  ()",
+		"udg_After = 1",
+	}, "\n"))
+	if len(globals.Globals) != 0 || !slices.Equal(globals.Functions, []string{"Spaced"}) {
+		t.Errorf("read %+v", globals)
+	}
+}
