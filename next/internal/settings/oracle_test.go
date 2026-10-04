@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"slices"
 	"strconv"
@@ -23,6 +24,7 @@ import (
 	oldsettings "github.com/mdlsvensson/moonwell/internal/settings"
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
+	"github.com/mdlsvensson/moonwell/next/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/txt"
@@ -35,10 +37,12 @@ import (
 //
 //   - PatchMapInfo against patchInfo, for every document and every map info: what is refused (kind, message,
 //     file and hint), else the patched bytes.
-//   - GameplaySections against gameplaySections, and the game interface sections the other tree's Validate
-//     returns against sections: what is refused, else the sections with their keys and values in order.
+//   - GameplaySections, and the game interface sections the other tree's Validate returns, against
+//     textSections: what is refused, else the sections with their keys and values in order.
 //   - What the other tree's Validate refuses for names that differ only in letter case, against the refusal of
-//     sections: this tree makes that check where the sections are used.
+//     textSections: this tree makes that check where the sections are used. Among the documents are one with
+//     two spellings in the interface beside a typed constant that disagrees with a raw one, and one with two
+//     spellings in both blocks: both trees must tell the same refusal of the two.
 //   - LoadPreview against loadPreview, on a project folder with a picture of each kind: what is refused, else
 //     the extension and the bytes of the picture.
 //   - PatchLua against patchLua, for every document and every script: what is refused, else the text as bytes.
@@ -47,6 +51,11 @@ import (
 //     script for every map info of mapInfos with the settings in it, and for every one as it is, those that do
 //     not read among them.
 //   - PatchMinimapLua against patchMinimap, for every script and for scripts with settings in them.
+//   - Plan against Plan, on map folders written to disk: what is refused, else the changes in their order, each
+//     by its name, whether it removes its file, and its bytes. The other tree is given the folder's path, the
+//     label errors name it by, the manifest's name and the project folder; this tree is given the folder as
+//     mapdir opens it under that label, and the project. A document that the other tree's Validate refuses is
+//     refused there, before its Plan: that refusal is compared with what this tree's Plan refuses.
 //
 // The documents are every one that the other tree's tests give its Validate and see accepted, one that sets
 // every setting, and for the constants every pairing of a typed constant with a raw one. The script is given
@@ -85,13 +94,45 @@ import (
 // left out when the other tree's result is such an error, which is counted: once on those systems, and never on
 // Windows, where both trees say the same and are compared. That this tree refuses it too is still looked at.
 //
-// TestOracleOnAPreviewThatCannotBeRead compares nothing, and is skipped, where the test cannot make a file that
-// is there and cannot be read: as root on a system other than Windows, since root reads a file without
-// permissions, and on a Windows that lets the file be read although the test holds it with no sharing and an
-// exclusive lock.
+// The plans are not every document for every map folder. What a document does to a map info, a script, a text
+// file or a picture is compared above, for every document; a plan adds which files it reads, what it refuses
+// first, what it leaves out as unchanged, and the names and the order of its changes, and those depend on the
+// kind of the document and on the files of the folder. So every document (those of the map info, of the
+// constants, and of the names that differ only in letter case) is planned for two folders: the fixture as it is,
+// which has neither optional text file and no minimap, and the fixture with every file a plan reads, each text
+// file behind a byte order mark, where the previews of each kind go in. And one document for each way through a
+// plan (routeDocuments) is planned for sixteen more folders (sourceMaps): the fixture with each optional file
+// alone, with all of them, with text files that hold nothing and under other spellings, and a folder for each
+// thing a plan refuses a map for. The plans run on several goroutines, as the scripts do.
+//
+// Left out of the plans, for the two differences in the script named above. A plan that puts a number into the
+// script that the trees write apart is decided as it is for the script, on the map info as the other tree's plan
+// leaves it; its other changes are compared, and the bytes of its script must differ. A plan with a preview for
+// a script whose main() ends in a return that gives a value is decided on the script the other tree's plan
+// writes; this tree must refuse it for the script. Both are counted for each folder.
+//
+// Compared in part: a map file that cannot be read. This tree reads through mapdir, which says "Reading a map
+// file failed", and the other tree says "Reading a map file for map settings failed"
+// (TestAMapFileThatCannotBeReadIsRefusedByItsNameAndNotTakenForAnEmptyFile). The two refusals must have the same
+// file, hint and reason after those words (TestOracleOnAMapFileThatCannotBeRead).
+//
+// TestOracleOnAPreviewThatCannotBeRead and TestOracleOnAMapFileThatCannotBeRead compare nothing, and are
+// skipped, where the test cannot make a file that is there and cannot be read: as root on a system other than
+// Windows, since root reads a file without permissions, and on a Windows that lets the file be read although the
+// test holds it with no sharing and an exclusive lock.
 //
 // Not among the inputs:
 //
+//   - A map folder with a folder under the name of a file a plan reads or writes. The other tree fails to read
+//     it as a file. In this tree a folder is not a file: the file is missing, or mapdir refuses to write it
+//     (TestAMapWithoutAFileTheSettingsNeedIsRefusedByThatFile,
+//     TestAFolderWhereATextFileGoesIsRefusedAndNotTakenForAMapWithoutTheFile,
+//     TestAPreviewIsRefusedWhenTheMapLacksItsMinimapOrHasOneOfTheNamesThePreviewAdds).
+//   - A map folder that is not there, and one with two paths that differ only in letter case: mapdir.Open
+//     refuses both before there is a folder to plan for.
+//   - A plan without the manifest's name, for which the other tree says moonwell.pkl: a project knows its
+//     manifest.
+//   - A map folder whose script does not read: the refusal is compared in part above, for the script.
 //   - A document whose shape the other tree refuses (a wrong name, range or type): that is Pkl's to refuse.
 //   - A section or a key whose name looks like a number. Neither tree is given one: the schema and the other
 //     tree's Validate both take only names that start with a letter or an underscore.
@@ -364,6 +405,10 @@ var duplicateDocuments = []string{
 	`{"gameInterface":{"A":{"k":"1","K":"2"},"a":{}}}`,
 	`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"},"MISC":{}}}`,
 	`{"gameplayConstants":{"A":{"B":"1"},"a":{"B":"1","b":"2"}}}`,
+	// Two spellings in the interface beside a typed constant that disagrees with a raw one, and two spellings in
+	// both blocks: which refusal is the one told.
+	`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"}},"gameInterface":{"A":{},"a":{}}}`,
+	`{"gameInterface":{"A":{},"a":{}},"gameplayConstants":{"Misc":{"Key":"1","KEY":"2"}}}`,
 }
 
 // ---- the map info ----
@@ -486,19 +531,20 @@ func TestOracleOnTheGameplayConstantsAndTheInterfaceSections(t *testing.T) {
 	for _, document := range all {
 		old, project := accepted(t, "", document)
 		want, wantErr := oldsettings.GameplaySections(old, manifestName)
-		got, gotErr := gameplaySections(project.Settings, manifestName)
+		got, skin, gotErr := textSections(project.Settings, manifestName)
 		if oracle.Refusals(t, "the constants of "+document, wantErr, gotErr) {
 			conflicts++
+			// The interface of a document whose constants are refused is compared all the same.
+			var err error
+			if skin, err = sections(project.Settings.GameInterface, "settings.gameInterface", manifestName); err != nil {
+				t.Errorf("the interface of %s: %v", document, err)
+			}
 		} else {
 			oracle.Values(t, "the constants of "+document, sectionsOfOld(&want), got)
 			merged++
 			if project.Settings.Gameplay != (manifest.Gameplay{}) {
 				typed++
 			}
-		}
-		skin, err := sections(project.Settings.GameInterface, "settings.gameInterface", manifestName)
-		if err != nil {
-			t.Errorf("the interface of %s: %v", document, err)
 		}
 		oracle.Values(t, "the interface of "+document, sectionsOfOld(&old.GameInterface), skin)
 		if len(skin) > 0 {
@@ -517,10 +563,7 @@ func TestOracleOnNamesThatDifferOnlyInLetterCase(t *testing.T) {
 	refused := 0
 	for _, document := range duplicateDocuments {
 		read := inBothTrees(t, "", document)
-		_, err := gameplaySections(read.project.Settings, manifestName)
-		if err == nil {
-			_, err = sections(read.project.Settings.GameInterface, "settings.gameInterface", manifestName)
-		}
+		_, _, err := textSections(read.project.Settings, manifestName)
 		if oracle.Refusals(t, document, read.refusal, err) {
 			refused++
 		}
@@ -879,26 +922,32 @@ func (c *scriptCounts) add(other scriptCounts) {
 // they counted. Each pair of a script and a document has both trees read the script twice, and there are
 // thousands of pairs: one after the other they take several seconds.
 func together(work []func(*scriptCounts)) scriptCounts {
-	counts := make([]scriptCounts, runtime.GOMAXPROCS(0))
-	queue := make(chan func(*scriptCounts))
-	var workers sync.WaitGroup
-	for i := range counts {
-		workers.Go(func() {
-			for piece := range queue {
-				piece(&counts[i])
-			}
-		})
-	}
-	for _, piece := range work {
-		queue <- piece
-	}
-	close(queue)
-	workers.Wait()
+	counts := make([]scriptCounts, len(work))
+	onEveryCore(len(work), func(piece int) { work[piece](&counts[piece]) })
 	var sum scriptCounts
 	for _, count := range counts {
 		sum.add(count)
 	}
 	return sum
+}
+
+// onEveryCore runs each piece of work on one of as many goroutines as the machine runs at once, and returns when
+// all are done.
+func onEveryCore(pieces int, work func(piece int)) {
+	queue := make(chan int)
+	var workers sync.WaitGroup
+	for range runtime.GOMAXPROCS(0) {
+		workers.Go(func() {
+			for piece := range queue {
+				work(piece)
+			}
+		})
+	}
+	for piece := range pieces {
+		queue <- piece
+	}
+	close(queue)
+	workers.Wait()
 }
 
 // onTheFixturesInfo puts the settings of each document into the fixture's map info and gives both trees each
@@ -1041,5 +1090,375 @@ func TestOracleOnTheMinimapCall(t *testing.T) {
 	if added != wantAdded || refused != 2 || unread != 2 || leftOut != 1 {
 		t.Errorf("the call went into %d scripts, %d refused it, %d do not read and %d are left out; want %d, 2, 2 and 1",
 			added, refused, unread, leftOut, wantAdded)
+	}
+}
+
+// ---- the plan ----
+
+// planProject is a project folder that holds, at each path a document names as its preview, a picture of the
+// kind the path says. The picture that documents name in two spellings is written under both: a file system
+// that keeps the spellings apart then has two files and another has one, and both give the same bytes for either.
+func planProject(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	picture := testkit.NewPixels(256)
+	packed := testkit.TGA(picture, testkit.TGAOptions{RLE: true, Depth: 24, FromTop: true})
+	for _, file := range []struct {
+		name string
+		data []byte
+	}{
+		{"preview.blp", testkit.BLP(256, 1)},
+		{"p.blp", testkit.BLP(512, 0)},
+		{"preview.tga", plainTGA()},
+		{"art/Preview.TGA", packed},
+		{"art/preview.tga", packed},
+		{"art/Preview.PNG", testkit.PNG(picture, "rgba")},
+		{"art/p.png", testkit.PNG(testkit.GreyPixels(256), "grey")},
+	} {
+		testkit.WriteFile(t, root, file.name, file.data)
+	}
+	return root
+}
+
+// routeDocuments is one document for each way through a plan: the settings of each file alone and together, a
+// preview of each kind alone and beside other settings, and what is refused before the map is read, by the map
+// info, and by neither.
+var routeDocuments = []string{
+	`{}`,
+	`{"info":{"author":"Someone"},"loadingScreen":{"title":"T"}}`,
+	`{"info":{"name":"Planned"},"gameplay":{"foodLimit":200}}`,
+	`{"environment":{"soundEnvironment":"Mountains"}}`,
+	// A force's name is stored in the map info alone, and the script is read all the same.
+	`{"forces":{"0":{"name":"Blue"}}}`,
+	`{"players":{"5":{"name":"Absent"}}}`,
+	// The text files of sourceMaps hold this constant, and lack the interface's key.
+	`{"gameplay":{"foodLimit":100}}`,
+	`{"gameInterface":{"A":{"B":"c"}}}`,
+	`{"gameplayConstants":{"Empty":{}},"gameInterface":{"Empty":{}}}`,
+	everyDocuments[0],
+	`{"info":{"preview":"preview.blp"}}`,
+	`{"info":{"preview":"preview.tga"}}`,
+	`{"info":{"preview":"art/Preview.PNG"}}`,
+	`{"info":{"name":"Both","preview":"preview.blp"},"gameplay":{"foodLimit":200},
+		"gameInterface":{"CustomSkin":{"Test":"value"}}}`,
+	`{"info":{"name":"N","preview":"missing.tga"}}`,
+	`{"info":{"name":"N","preview":"preview.blp"},"gameplay":{"foodLimit":200},"gameplayConstants":{"MISC":{"foodCeiling":"1"}}}`,
+	duplicateDocuments[0],
+}
+
+// planCounts is what came of the plans for one map folder.
+type planCounts struct{ refused, changed, unchanged, apart, broken int }
+
+// sourceMap is a map folder that both trees plan for.
+type sourceMap struct {
+	name  string
+	files map[string][]byte
+	// every says that every document is planned for the folder. For the others it is those of routeDocuments.
+	every bool
+	want  planCounts
+}
+
+// sourceMaps is the map folders the plans are compared for. The first two get every document: the fixture as
+// it is, which has neither of the optional text files and no minimap, and the fixture with every file a plan
+// reads, each text file behind a byte order mark. The others get the documents of routeDocuments: the fixture
+// with each optional file alone and with all, with files that hold nothing, under other spellings, and each
+// folder that a plan refuses for a file it lacks, cannot read as text or cannot patch, or for a name it has.
+func sourceMaps(t *testing.T) []sourceMap {
+	t.Helper()
+	info, script := fixtureInfo(t), fixtureLua(t)
+	misc := "[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+	skin := "[CustomSkin]\nTest=old\n\n[A]\nOld=1"
+	type files = map[string][]byte
+	fixture := func(more files) files {
+		all := files{"war3map.w3i": info, "war3map.lua": []byte(script)}
+		maps.Copy(all, more)
+		return all
+	}
+	returnsValue := swapped(t, script, "RunInitializationTriggers()\r\nend", "RunInitializationTriggers()\r\nreturn 1\r\nend")
+	// Of the 17 documents of routeDocuments, four are refused for every folder: the player the fixture lacks, the
+	// preview that is not there, the constant set twice, and the two spellings of a section. Two change nothing
+	// in any folder: the one that sets nothing, and the sections without keys.
+	return []sourceMap{
+		// One document puts a number into the script that the trees write apart (the fourth of everyDocuments).
+		// Without a minimap, the nine documents with a preview are refused; with every file, they are planned.
+		{name: "the fixture", every: true, files: fixture(nil), want: planCounts{refused: 43, changed: 170, unchanged: 12, apart: 1}},
+		{name: "every file, each text file behind a byte order mark", every: true,
+			want: planCounts{refused: 34, changed: 178, unchanged: 13, apart: 1}, files: fixture(files{
+				"war3map.lua": []byte(byteOrderMark + script), "war3mapMisc.txt": []byte(byteOrderMark + misc),
+				"war3mapSkin.txt": []byte(byteOrderMark + skin), "war3mapMap.blp": minimapBytes})},
+		// The constant the file holds already is no change.
+		{name: "every file", want: planCounts{refused: 4, changed: 10, unchanged: 3}, files: fixture(files{
+			"war3mapMisc.txt": []byte(misc), "war3mapSkin.txt": []byte(skin), "war3mapMap.blp": minimapBytes})},
+		// Without a minimap, the five documents with a preview are refused as well.
+		{name: "with war3mapMisc.txt alone", want: planCounts{refused: 9, changed: 5, unchanged: 3},
+			files: fixture(files{"war3mapMisc.txt": []byte(misc)})},
+		{name: "with war3mapSkin.txt alone", want: planCounts{refused: 9, changed: 6, unchanged: 2},
+			files: fixture(files{"war3mapSkin.txt": []byte(skin)})},
+		{name: "with the minimap alone", want: planCounts{refused: 4, changed: 11, unchanged: 2},
+			files: fixture(files{"war3mapMap.blp": minimapBytes})},
+		{name: "with text files that hold nothing", want: planCounts{refused: 9, changed: 6, unchanged: 2},
+			files: fixture(files{"war3mapMisc.txt": {}, "war3mapSkin.txt": {}})},
+		{name: "every file under another spelling", want: planCounts{refused: 4, changed: 10, unchanged: 3}, files: files{
+			"WAR3MAP.W3I": info, "War3Map.Lua": []byte(script), "WAR3MAPMISC.TXT": []byte(misc),
+			"war3mapskin.txt": []byte(skin), "WAR3MAPMAP.BLP": minimapBytes}},
+		// Only the two text files can be planned for a folder without a file.
+		{name: "an empty folder", want: planCounts{refused: 13, changed: 2, unchanged: 2}},
+		// The author and the loading screen need the map info alone; the force's name needs the script too.
+		{name: "without the script", want: planCounts{refused: 12, changed: 3, unchanged: 2},
+			files: files{"war3map.w3i": info, "war3mapMap.blp": minimapBytes}},
+		// A preview alone needs the script and the minimap, and no map info.
+		{name: "without the map info", want: planCounts{refused: 10, changed: 5, unchanged: 2},
+			files: files{"war3map.lua": []byte(script), "war3mapMap.blp": minimapBytes}},
+		{name: "a script that is not UTF-8", want: planCounts{refused: 12, changed: 3, unchanged: 2}, files: fixture(files{
+			"war3map.lua": {0x66, 0xff, 0x66}, "war3mapMap.blp": minimapBytes})},
+		{name: "text files that are not UTF-8", want: planCounts{refused: 12, changed: 3, unchanged: 2}, files: fixture(files{
+			"war3mapMisc.txt": {0xc3}, "war3mapSkin.txt": []byte(byteOrderMark + "[A]\n\xff")})},
+		// The three documents that set the map's name are refused by the script, after the map info was patched.
+		{name: "a script without SetMapName", want: planCounts{refused: 7, changed: 8, unchanged: 2}, files: fixture(files{
+			"war3map.lua": []byte(swapped(t, script, "SetMapName(", "Other(")), "war3mapMap.blp": minimapBytes})},
+		// The five documents with a preview are left out: the other tree writes the minimap call after the return.
+		{name: "a script whose main() returns a value", want: planCounts{refused: 4, changed: 6, unchanged: 2, broken: 5},
+			files: fixture(files{"war3map.lua": []byte(returnsValue), "war3mapMap.blp": minimapBytes})},
+		{name: "bytes that are no map info", want: planCounts{refused: 10, changed: 5, unchanged: 2}, files: fixture(files{
+			"war3map.w3i": []byte("not a map info"), "war3mapMap.blp": minimapBytes})},
+		// The five documents with a preview are refused for the name the map has already, of either kind of picture.
+		{name: "with the name the minimap is kept under", want: planCounts{refused: 9, changed: 6, unchanged: 2},
+			files: fixture(files{"war3mapMap.blp": minimapBytes, "war3mapminimap.blp": {1}})},
+		{name: "with the name a TGA preview takes", want: planCounts{refused: 9, changed: 6, unchanged: 2},
+			files: fixture(files{"war3mapMap.blp": minimapBytes, "War3mapMap.TGA": {1}})},
+	}
+}
+
+// onDisk writes the map folder into a temporary folder and returns its path.
+func (m sourceMap) onDisk(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir()
+	for name, data := range m.files {
+		testkit.WriteFile(t, dir, name, data)
+	}
+	return dir
+}
+
+// held is the bytes of the file the map folder has under name, in any letter case.
+func (m sourceMap) held(name string) []byte {
+	for spelled, data := range m.files {
+		if mapdir.Key(spelled) == mapdir.Key(name) {
+			return data
+		}
+	}
+	return nil
+}
+
+// changeTo is the change a plan makes to the file under name, in any letter case.
+func changeTo(changes []mapdir.Change, name string) (mapdir.Change, bool) {
+	for _, change := range changes {
+		if mapdir.Key(change.Name) == mapdir.Key(name) {
+			return change, true
+		}
+	}
+	return mapdir.Change{}, false
+}
+
+// planOfOld is the other tree's plan for the map folder at dir: the refusal of its Validate, which is where it
+// refuses names that differ only in letter case, else what its Plan returns, under the names this tree gives the
+// manifest and the map folder.
+func planOfOld(dir, root string, read bothTrees) ([]mapdir.Change, error) {
+	if read.refusal != nil {
+		return nil, read.refusal
+	}
+	changes, err := oldsettings.Plan(dir, read.old, oldsettings.PlanOptions{
+		ManifestFile: manifestName, SourceLabel: mapLabel, Root: root,
+	})
+	converted := make([]mapdir.Change, 0, len(changes))
+	for _, change := range changes {
+		converted = append(converted, mapdir.Change(change))
+	}
+	return converted, err
+}
+
+// breaksTheScript reports whether a plan of the other tree writes a script that its own reader of Lua does not
+// read.
+func breaksTheScript(changes []mapdir.Change, err error) bool {
+	change, written := changeTo(changes, scriptName)
+	return written && broken(strings.TrimPrefix(string(change.Bytes), byteOrderMark), err)
+}
+
+// reach is what the compared plans got to, over every map folder: how often the bytes of each file were
+// compared, by the key of its name, and how many of the changes compared remove their file.
+type reach struct {
+	files    map[string]int
+	removals int
+}
+
+// compare compares the changes of two plans: the names in order with which of them remove their file, then the
+// bytes of each. The file named by apart is the one that both trees are known to write apart: its bytes must
+// differ.
+func (r *reach) compare(t *testing.T, what string, want, got []mapdir.Change, apart string) {
+	t.Helper()
+	type entry struct {
+		Name   string
+		Remove bool
+	}
+	entries := func(changes []mapdir.Change) []entry {
+		listed := make([]entry, 0, len(changes))
+		for _, change := range changes {
+			listed = append(listed, entry{change.Name, change.Remove})
+		}
+		return listed
+	}
+	oracle.Values(t, what+": the changes", entries(want), entries(got))
+	for i := range min(len(want), len(got)) {
+		key := mapdir.Key(want[i].Name)
+		if apart != "" && key == mapdir.Key(apart) {
+			if bytes.Equal(want[i].Bytes, got[i].Bytes) {
+				t.Errorf("%s: left out, and both trees write the same %s", what, want[i].Name)
+			}
+			continue
+		}
+		oracle.Bytes(t, what+": "+want[i].Name, want[i].Bytes, got[i].Bytes)
+		r.files[key]++
+		if want[i].Remove {
+			r.removals++
+		}
+	}
+}
+
+// add counts what another reach has.
+func (r *reach) add(other reach) {
+	for key, count := range other.files {
+		r.files[key] += count
+	}
+	r.removals += other.removals
+}
+
+// add counts what another count has.
+func (c *planCounts) add(other planCounts) {
+	c.refused += other.refused
+	c.changed += other.changed
+	c.unchanged += other.unchanged
+	c.apart += other.apart
+	c.broken += other.broken
+}
+
+// comparePlans gives both trees one document, as each of them reads it, and the map folder that is on disk at
+// dir, and counts what came of it. It runs beside others of its kind: it opens the folder for itself, and it
+// reports and does not stop the test.
+func (c *planCounts) comparePlans(t *testing.T, what string, source sourceMap, dir string, read bothTrees, seen *reach) {
+	t.Helper()
+	want, wantErr := planOfOld(dir, read.project.Root, read)
+	folder, err := mapdir.Open(dir, mapLabel)
+	if err != nil {
+		t.Errorf("%s: %v", what, err)
+		return
+	}
+	got, gotErr := Plan(folder, read.project)
+	info := source.held(infoName)
+	if change, patched := changeTo(want, infoName); patched {
+		info = change.Bytes
+	}
+	switch {
+	case breaksTheScript(want, wantErr):
+		// Left out, for the difference that is meant: see TestOracleOnTheMinimapCall.
+		c.broken++
+		failure, ok := gotErr.(*diag.Error)
+		if !ok || failure.File != mapLabel+"/"+scriptName || !strings.Contains(failure.Msg, "could not be read back safely") {
+			t.Errorf("%s: the other tree's script does not read, and this tree returns %v", what, gotErr)
+		}
+	case oracle.Refusals(t, what, wantErr, gotErr):
+		c.refused++
+	case wantErr != nil || gotErr != nil:
+		// One tree refused alone, which Refusals has reported.
+	case writtenApart(read.project.Settings, info):
+		c.apart++
+		seen.compare(t, what, want, got, scriptName)
+	case len(want) == 0:
+		seen.compare(t, what, want, got, "")
+		c.unchanged++
+	default:
+		seen.compare(t, what, want, got, "")
+		c.changed++
+	}
+}
+
+// plansFor gives both trees each document for the map folder, which it writes to disk, and returns what came of
+// them. The plans run beside each other: each opens the folder for itself, and none writes to it.
+func plansFor(t *testing.T, source sourceMap, documents []string, root string) (planCounts, reach) {
+	t.Helper()
+	dir := source.onDisk(t)
+	before := testkit.Snapshot(t, dir)
+	read := make([]bothTrees, len(documents))
+	for i, document := range documents {
+		read[i] = inBothTrees(t, root, document)
+	}
+	counts, seen := make([]planCounts, len(documents)), make([]reach, len(documents))
+	onEveryCore(len(documents), func(i int) {
+		seen[i].files = map[string]int{}
+		counts[i].comparePlans(t, source.name+", settings "+documents[i], source, dir, read[i], &seen[i])
+	})
+	if !reflect.DeepEqual(testkit.Snapshot(t, dir), before) {
+		t.Errorf("%s: planning wrote to the map", source.name)
+	}
+	counted, reached := planCounts{}, reach{files: map[string]int{}}
+	for i := range documents {
+		counted.add(counts[i])
+		reached.add(seen[i])
+	}
+	return counted, reached
+}
+
+func TestOracleOnThePlan(t *testing.T) {
+	root := planProject(t)
+	every := slices.Concat(documents(), constantDocuments(), duplicateDocuments)
+	seen := reach{files: map[string]int{}}
+	for _, source := range sourceMaps(t) {
+		documents := routeDocuments
+		if source.every {
+			documents = every
+		}
+		counted, reached := plansFor(t, source, documents, root)
+		if counted != source.want {
+			t.Errorf("%s: the plans came to %+v, want %+v", source.name, counted, source.want)
+		}
+		seen.add(reached)
+	}
+	if len(every) != 226 || len(routeDocuments) != 17 {
+		t.Errorf("%d documents and %d of them for every map folder, want 226 and 17", len(every), len(routeDocuments))
+	}
+	// Every file a plan changes is compared, the picture as a BLP and as a TGA, and the minimap's file as one
+	// that is removed.
+	wantFiles := map[string]int{
+		"war3map.w3i": 194, "war3map.lua": 185, "war3mapmisc.txt": 210, "war3mapskin.txt": 53,
+		"war3mapminimap.blp": 33, "war3mapmap.blp": 33, "war3mapmap.tga": 21,
+	}
+	if !maps.Equal(seen.files, wantFiles) || seen.removals != 21 {
+		t.Errorf("the plans compared the bytes of %v and %d removals, want %v and 21", seen.files, seen.removals, wantFiles)
+	}
+}
+
+func TestOracleOnAMapFileThatCannotBeRead(t *testing.T) {
+	const wantStart, gotStart = "Reading a map file for map settings failed: ", "Reading a map file failed: "
+	tests := []struct{ name, document string }{
+		{"war3map.w3i", `{"loadingScreen":{"title":"T"}}`},
+		{"war3map.lua", `{"info":{"name":"N"}}`},
+		{"war3mapSkin.txt", `{"gameInterface":{"A":{"B":"c"}}}`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dir := fixtureMap(t)
+			testkit.WriteFile(t, dir, "war3mapSkin.txt", []byte("[A]\n"))
+			makeUnreadable(t, filepath.Join(dir, tt.name))
+			read := inBothTrees(t, "", tt.document)
+			_, wantErr := planOfOld(dir, "", read)
+			_, gotErr := Plan(openMap(t, dir), read.project)
+			want, wantIs := wantErr.(*olddiag.Error)
+			got, gotIs := gotErr.(*diag.Error)
+			if !wantIs || !gotIs {
+				t.Fatalf("the refusals are %v and %v, want a diag error of each tree", wantErr, gotErr)
+			}
+			reason, worded := strings.CutPrefix(want.Msg, wantStart)
+			if !worded || reason == "" || got.Msg != gotStart+reason || got.File != want.File || got.Hint != want.Hint {
+				t.Errorf("the refusals differ in more than their first words:\nwant: %+v\ngot:  %+v", want, got)
+			}
+		})
 	}
 }

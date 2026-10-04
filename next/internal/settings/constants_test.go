@@ -57,7 +57,7 @@ func TestTypedGameplayConstantsMergeIntoTheRawOnesWithoutRegardToLetterCase(t *t
 		t.Run(tt.name, func(t *testing.T) {
 			s := settingsOf(t, tt.document)
 			before := written(t, s.GameplayConstants)
-			merged, err := gameplaySections(s, manifestName)
+			merged, _, err := textSections(s, manifestName)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -90,7 +90,7 @@ func TestATypedGameplayConstantThatDisagreesWithARawOneIsRefusedByTheManifest(t 
 		t.Run(tt.name, func(t *testing.T) {
 			s := settingsOf(t, tt.document)
 			before := written(t, s.GameplayConstants)
-			_, err := gameplaySections(s, manifestName)
+			_, _, err := textSections(s, manifestName)
 			failure := asError(t, err, tt.document)
 			if failure.File != manifestName || !strings.Contains(failure.Msg, "Conflicting typed and raw gameplay constant: "+tt.constant) ||
 				!strings.Contains(failure.Hint, tt.setting) {
@@ -136,11 +136,39 @@ func TestNamesThatDifferOnlyInLetterCaseAreRefusedByTheManifest(t *testing.T) {
 	}
 }
 
-func TestTwoSpellingsOfASectionAreRefusedBeforeATypedConstantIsMerged(t *testing.T) {
-	s := settingsOf(t, `{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"},"MISC":{}}}`)
-	_, err := gameplaySections(s, manifestName)
-	if failure := asError(t, err, "two spellings"); !strings.Contains(failure.Msg, "section: MISC") {
-		t.Errorf("error = %+v", failure)
+func TestTwoSpellingsOfANameAreRefusedBeforeATypedConstantIsMergedAndTheConstantsBeforeTheInterface(t *testing.T) {
+	tests := []struct{ name, document, words string }{
+		{"two spellings of Misc, and a typed constant against a raw one",
+			`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"},"MISC":{}}}`,
+			"settings.gameplayConstants section: MISC"},
+		{"two spellings in the interface, and a typed constant against a raw one",
+			`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"}},"gameInterface":{"A":{},"a":{}}}`,
+			"settings.gameInterface section: a"},
+		{"two spellings in both blocks, the interface written first",
+			`{"gameInterface":{"A":{},"a":{}},"gameplayConstants":{"Misc":{"Key":"1","KEY":"2"}}}`,
+			`settings.gameplayConstants["Misc"] key: KEY`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			misc, skin, err := textSections(settingsOf(t, tt.document), manifestName)
+			failure := asError(t, err, tt.document)
+			if !strings.Contains(failure.Msg, tt.words) || failure.File != manifestName || misc != nil || skin != nil {
+				t.Errorf("error = %+v, want %q", failure, tt.words)
+			}
+		})
+	}
+}
+
+func TestTheSectionsOfBothTextFilesComeTogether(t *testing.T) {
+	s := settingsOf(t, `{"gameplay":{"foodLimit":7},"gameInterface":{"A":{"B":"c"}},"gameplayConstants":{"Other":{}}}`)
+	misc, skin, err := textSections(s, manifestName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wantMisc := []txt.Section{section("Other"), section("Misc", txt.Field{Key: "FoodCeiling", Value: "7"})}
+	wantSkin := []txt.Section{section("A", txt.Field{Key: "B", Value: "c"})}
+	if !reflect.DeepEqual(misc, wantMisc) || !reflect.DeepEqual(skin, wantSkin) {
+		t.Errorf("misc = %+v, skin = %+v", misc, skin)
 	}
 }
 

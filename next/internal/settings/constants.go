@@ -27,17 +27,34 @@ func typedConstants(gameplay manifest.Gameplay) []typedConstant {
 	}
 }
 
-// gameplaySections merges the typed gameplay constants into the raw ones. A typed value that disagrees with a
-// raw one fails, naming the manifest. The result is new: the settings are not changed.
-func gameplaySections(s manifest.Settings, manifestFile string) ([]txt.Section, error) {
-	merged, err := sections(s.GameplayConstants, "settings.gameplayConstants", manifestFile)
+// textSections is what the settings write into the two text files: into war3mapMisc.txt the raw gameplay
+// constants with the typed ones merged in, into war3mapSkin.txt the game interface. Names that differ only in
+// letter case are refused first, those of the constants before those of the interface, and then a typed constant
+// that disagrees with a raw one. Every refusal names the manifest. The result is new: the settings are not
+// changed.
+func textSections(s manifest.Settings, manifestFile string) (misc, skin []txt.Section, err error) {
+	raw, err := sections(s.GameplayConstants, "settings.gameplayConstants", manifestFile)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	for _, constant := range typedConstants(s.Gameplay) {
+	if skin, err = sections(s.GameInterface, "settings.gameInterface", manifestFile); err != nil {
+		return nil, nil, err
+	}
+	if misc, err = withTyped(raw, s.Gameplay, manifestFile); err != nil {
+		return nil, nil, err
+	}
+	return misc, skin, nil
+}
+
+// withTyped is the raw gameplay constants with the typed ones that are set merged in. A typed value that
+// disagrees with a raw one fails.
+func withTyped(raw []txt.Section, gameplay manifest.Gameplay, manifestFile string) ([]txt.Section, error) {
+	merged := raw
+	for _, constant := range typedConstants(gameplay) {
 		if constant.value == nil {
 			continue
 		}
+		var err error
 		if merged, err = withConstant(merged, constant, manifestFile); err != nil {
 			return nil, err
 		}

@@ -30,17 +30,10 @@ func fixtureInfo(t testing.TB) []byte {
 	return testkit.Fixture(t, "map-settings-v39/war3map.w3i")
 }
 
-// afterInfo brings a script into line with a map info given as the bytes patchInfo returned, the way a plan does
-// it: the map info is read only when a setting has a Lua counterpart, and as deep as the settings need.
+// afterInfo brings a script into line with a map info given as the bytes patchInfo returned, as a plan does it,
+// under the names these tests give the two files.
 func afterInfo(source string, s manifest.Settings, patchedInfo []byte) (string, error) {
-	if !setsLua(s) {
-		return patchLua(source, s, nil, luaFile)
-	}
-	info, err := w3i.Read(patchedInfo, infoFile, depthFor(s))
-	if err != nil {
-		return "", err
-	}
-	return patchLua(source, s, info, luaFile)
+	return patchLuaAfter(source, s, patchedInfo, luaFile, infoFile)
 }
 
 // withSettings puts the settings into the fixture's map info, and brings the script into line with the result.
