@@ -25,8 +25,27 @@ func TestEnsureLocalManifestCreatesMoonwellLocalPklOnceAndNeverOverwritesIt(t *t
 	if content, _ := os.ReadFile(local); string(content) != "mine" {
 		t.Errorf("the file was overwritten: %q", content)
 	}
-	if created, err := EnsureLocalManifest(filepath.Join(root, "no-such-folder")); err == nil || created {
-		t.Errorf("in a folder that does not exist: %v, %v", created, err)
+}
+
+// A folder under the name is there, as a file is: nothing is made, and nothing fails.
+func TestEnsureLocalManifestTakesAFolderUnderTheNameForTheUsers(t *testing.T) {
+	root := t.TempDir()
+	testkit.WriteFile(t, root, "moonwell.local.pkl/kept.txt", []byte("mine"))
+	if created, err := EnsureLocalManifest(root); err != nil || created {
+		t.Errorf("EnsureLocalManifest = %v, %v", created, err)
+	}
+	if content, _ := os.ReadFile(filepath.Join(root, "moonwell.local.pkl", "kept.txt")); string(content) != "mine" {
+		t.Errorf("the folder was changed: its file holds %q", content)
+	}
+}
+
+func TestEnsureLocalManifestNamesTheFileItCannotMake(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "no-such-folder")
+	created, err := EnsureLocalManifest(root)
+	failure := asError(t, err, "in a folder that does not exist")
+	if created || failure.File != "moonwell.local.pkl" || failure.Hint == "" || failure.Cause == nil ||
+		!strings.Contains(failure.Msg, "Creating moonwell.local.pkl failed: ") {
+		t.Errorf("created = %v, error = %+v", created, failure)
 	}
 }
 

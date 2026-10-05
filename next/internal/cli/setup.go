@@ -8,10 +8,8 @@ import (
 
 	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/next/internal/build"
-	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/editor"
 	"github.com/mdlsvensson/moonwell/next/internal/env"
-	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/library"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/objects"
@@ -68,7 +66,7 @@ func pklForShell(ctx context.Context, e *env.Env) (pkl string, err error) {
 func localManifest(e *env.Env) error {
 	created, err := manifest.EnsureLocalManifest(e.Root)
 	if err != nil {
-		return errLocalManifestNotWritten(err)
+		return err
 	}
 	if created {
 		e.Log.Info("Created moonwell.local.pkl. Check that launch.gameExecutable points at your Warcraft III.exe.")
@@ -207,16 +205,4 @@ func libraryView(e *env.Env, synced []library.Synced) error {
 	}
 	_, err = editor.RefreshLibraryView(e.Root, sources, nil)
 	return err
-}
-
-// ---- errors ----
-
-func errLocalManifestNotWritten(cause error) error {
-	return &diag.Error{
-		Msg:  "Creating moonwell.local.pkl failed: " + fsx.Reason(cause),
-		File: "moonwell.local.pkl",
-		Hint: "Make sure the project folder can be written and that moonwell.local.pkl is no folder, then run " +
-			"setup again.",
-		Cause: cause,
-	}
 }

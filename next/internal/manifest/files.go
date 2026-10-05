@@ -6,6 +6,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 )
 
 // PackageBaseURI is where the moonwell Pkl package is published, without its version.
@@ -42,18 +45,39 @@ func LocalPkl() string {
 }
 
 // EnsureLocalManifest creates moonwell.local.pkl in root unless it exists, and reports whether it did. It never
-// overwrites.
+// overwrites: what is under the name, a file or a folder, is the user's.
+//
+// A file that could not be written whole is removed, so that the next call does not take half a file for the
+// user's.
 func EnsureLocalManifest(root string) (created bool, err error) {
-	file, err := os.OpenFile(filepath.Join(root, localManifest), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
-	if errors.Is(err, fs.ErrExist) {
+	path := filepath.Join(root, localManifest)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
+	switch {
+	case errors.Is(err, fs.ErrExist):
 		return false, nil
+	case err != nil:
+		return false, errLocalManifestNotWritten(err)
+	}
+	_, err = file.WriteString(LocalPkl())
+	if closed := file.Close(); err == nil {
+		err = closed
 	}
 	if err != nil {
-		return false, err
+		// A removal that fails is passed over: the failure to write is what the user has to know.
+		_ = os.Remove(path)
+		return false, errLocalManifestNotWritten(err)
 	}
-	if _, err := file.WriteString(LocalPkl()); err != nil {
-		file.Close()
-		return false, err
+	return true, nil
+}
+
+// ---- errors ----
+
+func errLocalManifestNotWritten(cause error) error {
+	return &diag.Error{
+		Msg:  "Creating " + localManifest + " failed: " + fsx.Reason(cause),
+		File: localManifest,
+		Hint: "Make sure that the project folder is one you may write to and that its disk has room, then run " +
+			"moonwell setup again.",
+		Cause: cause,
 	}
-	return true, file.Close()
 }
