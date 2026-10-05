@@ -93,6 +93,35 @@ func TestInitRefusesATargetThatIsAFileOrIsNotEmpty(t *testing.T) {
 	}
 }
 
+// An empty name is no folder to make: it is refused as an init without its argument is, and is not read as the
+// working folder.
+func TestInitRefusesAnEmptyFolderName(t *testing.T) {
+	for _, args := range [][]string{{"init", ""}, {"init", "--", ""}, {"--link", "init", ""}} {
+		root := t.TempDir()
+		result := carriedIn(background, nothingRuns(t), root, args...)
+		if result.code != 1 || result.output != "error: init needs a directory.\nhint: moonwell init my-map" {
+			t.Errorf("%q: %+v", args, result)
+		}
+		if entries, err := os.ReadDir(root); err != nil || len(entries) != 0 {
+			t.Errorf("%q: the working folder holds %v (%v)", args, entries, err)
+		}
+	}
+}
+
+// A folder that the system cannot look at is named, with the system's reason: here a name no system can hold.
+func TestInitNamesAFolderItCannotLookAt(t *testing.T) {
+	parent := t.TempDir()
+	dir := "my\x00map"
+	_, err := created(nothingRuns(t), parent, dir, "")
+	e := asError(t, err, "a name with a NUL")
+	if e.File != dir || !strings.HasPrefix(e.Msg, "Reading "+dir+" failed: ") || e.Hint == "" || e.Cause == nil {
+		t.Errorf("error = %+v", e)
+	}
+	if entries, err := os.ReadDir(parent); err != nil || len(entries) != 0 {
+		t.Errorf("the folder holds %v (%v)", entries, err)
+	}
+}
+
 // A link that leads to nothing is no folder, and stays: an init that failed later would remove it as its own.
 func TestInitRefusesATargetThatIsALinkToNothing(t *testing.T) {
 	parent := t.TempDir()

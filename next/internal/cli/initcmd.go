@@ -23,7 +23,8 @@ import (
 // the project uses the Pkl package of the Moonwell checkout the command runs in, in place of the published one.
 func runInit(ctx context.Context, e *env.Env, c call) error {
 	arguments := c.said.arguments()
-	if len(arguments) == 0 {
+	// An empty name is no folder: read against the working folder, it would be the working folder itself.
+	if len(arguments) == 0 || arguments[0] == "" {
 		return errInitNeedsAFolder()
 	}
 	schema := "" // the published package
@@ -42,7 +43,7 @@ func runInit(ctx context.Context, e *env.Env, c call) error {
 // folder of the Pkl package the project is linked to, a checkout's schema/; "" is the published package.
 //
 // Nothing is written before the folder is known to be new or empty and Pkl is found. A project that could not be
-// written whole, or resolved, is removed again: a failed init leaves what was there, and nothing else.
+// written whole, or resolved, is undone, as undoInit says.
 func createProject(ctx context.Context, e *env.Env, dir, schema string) error {
 	target := fsx.Resolve(e.Root, dir)
 	existed, err := newOrEmpty(target, dir)
@@ -150,8 +151,11 @@ func resolve(ctx context.Context, e *env.Env, pkl, target, dir string) error {
 	return nil
 }
 
-// undoInit removes what init wrote: the whole folder when init made it, else only what is in it, since it was
-// empty. It does what it can: the failure that led here matters more than one of its own.
+// undoInit removes the project of an init that failed. When init made the folder, the folder goes, with all that
+// is in it. When the folder was there and empty, everything in it goes and the folder stays: a file that another
+// program put there since init looked goes too. The folders init made above the target stay.
+//
+// It does what it can: the failure that led here matters more than one of its own.
 func undoInit(target string, existed bool) {
 	if !existed {
 		_ = fsx.RemoveAll(target)
