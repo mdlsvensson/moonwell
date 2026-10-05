@@ -43,7 +43,17 @@ import (
 // a line that the mode refuses, and a wrong count; a file of the checkout that is not there; a folder that is no
 // checkout; and, started in a folder below the checkout, a list beside it and a list that is not there, each
 // named by a path from that folder. They are compared as every other run is, each by its class. The test builds
-// two programs and starts them some eighty times, takes a few seconds, and is skipped with -short.
+// two programs and starts them some eighty times, takes a few seconds, and is skipped with -short. A change to
+// this tree's generator that is given to go test with its flag -overlay reaches run and not the program that
+// the test builds: through GOFLAGS it reaches both.
+//
+// Where a run is started. Each tree carries a run out in one place (madeBy), and nothing is started there, by
+// either tree, as a program or in process, unless the folder of the run can lead a generator to no checkout but
+// the run's own (onlyItsOwnCheckout): no go.mod above the scratch folder so much as mentions this module, and at
+// or above the folder the line is run in a go.mod names the module exactly when the run is of a checkout. So a
+// generator that finds its checkout wrongly, or a temporary folder that was put inside a checkout, cannot make a
+// run write into the real data/. The helper that starts a program, and the one that calls run, refuse a folder
+// of the real checkout besides.
 //
 // Compared whole, with the other tree's as what is wanted, for every run of no class:
 //
@@ -76,12 +86,16 @@ import (
 // there and one that is a folder; a wrong count of arguments; a data folder that is not there, and a folder at
 // the place of the list; a run in a folder below the checkout; and a folder that is no checkout.
 //
-// Compared in part, and counted. A run of a class names it (class), and carries what the class needs of the run.
-// The class is decided by its predicate (the table classes), which reads the input, that is the command line,
-// the files it names and what the checkout holds before the run, and what the other tree made of the run, and
-// never what this tree made of it: a run that names a class whose predicate does not hold of it fails, and is
-// compared whole. A run that names no class is compared whole, whatever a predicate would say of it. What this
-// tree must make in a class is a value of this file. What a class does not name is compared whole.
+// Compared in part, and counted. A run of a class names it (class). The class is decided by its predicate, which
+// is the class's own and stands in the table classes, never in a run: it reads the input, that is the command
+// line, the files it names and what the checkout holds before the run, and what the other tree made of the run,
+// and never what this tree made of it. A run that names a class whose predicate does not hold of it fails, and
+// is compared whole. A run that names no class is compared whole, whatever a predicate would say of it. What a
+// run carries for its class is data and no predicate: which argument names a file (cannotGive), the words of a
+// refusal (refusal), the places in which the two trees write a file apart (apart). What this tree must make in
+// a class is a value of this file, or is made from what the other tree made, and is never made by this tree's
+// generator. What a class does not name is compared whole. TestOracleReportsARunThatIsNotOfTheClassItNames holds
+// these rules on runs that break each of them.
 //
 //   - FromCheckout, 8 runs (otherTreeNamesItsCheckout, fileOfTheCheckout): a failure of the system on a file or
 //     a folder of the checkout. The other tree says Go's own line, with the operation and the full path, and
@@ -96,32 +110,37 @@ import (
 //     TestTheModeWithoutANameNamesWhatTheSystemNamesWhenAFileIsInTheWayOfTheSchema).
 //   - AsGiven, 3 runs (cannotGiveWhatTheLineNames, fileAsGiven): a failure of the system on a file that the
 //     line names. The other tree says Go's own line, "error: open <path>: <reason>" or "error: read <path>:
-//     <reason>", and this tree "error: <path>: <reason>". The run carries which path of the line it is, and
-//     that the system cannot give it as a file (cannotGive): here the argument that names the list, which is not
-//     there or is a folder. The predicate is that, and that the other tree said one of the two lines about the
+//     <reason>", and this tree "error: <path>: <reason>". The run says which argument of the line names the
+//     path (cannotGive): here the one that names the list. The predicate is the row's: the input has no file at
+//     that path, since nothing is there or a folder is, and the other tree said one of the two lines about the
 //     path as the line gives it. This tree must say that line without its operation. The exit code, standard
 //     output and the checkout are compared whole (TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid).
 //   - CountRefused, 2 runs (moreAfterAnEmptyFirstArgument, refusedByThisTree): something after an empty first
 //     argument. The other tree passes over what follows an empty first argument and writes the schema; this tree
 //     refuses the line with the usage line of the mode without a name. The predicate is on the command line,
 //     and on how the other tree ended: with 0, and nothing on standard error. Not compared: anything else the
-//     other tree made of the line. This tree must end with 1, print nothing, say what the run holds (refusal),
-//     and leave the checkout as it was laid (TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments).
+//     other tree made of the line. This tree must end with 1, print nothing, say the words that the run holds
+//     (refusal), which are a text and decide nothing, and leave the checkout as it was laid
+//     (TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments).
 //   - CountOfPaths, 1 run (versionWithALineFeed, countsThePaths): a version with a line feed in it, for a list
 //     that names a path. The other tree counts the line breaks of what it writes, after the first, and this
 //     tree the paths. The predicate is on the command line. Not compared: the number in the printed line. The
 //     other tree must print the count of the line breaks after the first, and this tree the count of the lines
 //     after the version's own. The exit code, standard error and the checkout are compared whole
 //     (TestTheModeGamePathsFailsAndKeepsTheExistingListWhenNoPathIsRecognized).
-//   - The plan's accepted differences, which are the four classes after this one (holdsWhatTheRunCarries,
-//     acceptedDifference). The run carries the predicate (accepted.holds), which reads bytes of the input and
-//     nothing else: the list that the line names, or the labels and the categories of the metadata that the
-//     checkout holds. It also carries the files that the class does not compare, each with what this tree must
-//     write there (accepted.writes); a report of one that is written otherwise shows where the two part, and
-//     one line of each. The exit code, both streams, the names of all that the checkout holds and every other
-//     file are compared whole. The tally also says in how many of these runs the two trees write a file apart
-//     (Apart): all six.
-//   - WiderSpace, 3 runs (hasWiderSpaceAtAnEdge, labelsHold): white space outside ASCII, which the other tree
+//   - The plan's accepted differences, which are the four classes after this one (acceptedDifference). The
+//     predicate of each is on bytes of the input alone, and says where it reads them: the list that a line of
+//     game-paths names (inTheList), or the labels and the categories of the metadata of a checkout that the mode
+//     without a name is run in (inTheLabels). The run names the files that the two trees write apart, and in
+//     each the places: what the other tree wrote there, and what this tree must write in its stead (apart). That
+//     is the one form there is: a file of such a run is held to the other tree's text with those places changed,
+//     so everything outside them is compared with the other tree's, and no text of a whole file stands in a run,
+//     where this tree's generator could have made it. A place must be in the other tree's text exactly once,
+//     and the two trees must write it apart; a run in which they write the file alike fails, since the class is
+//     about a difference. A report of a file that is written otherwise shows where the two part, and one line of
+//     each. The exit code, both streams, the names of all that the checkout holds and every other file are
+//     compared whole.
+//   - WiderSpace, 3 runs (hasWiderSpaceAtAnEdge, isWiderSpace): white space outside ASCII, which the other tree
 //     takes off a line of the list, and writes as one space in a label and a category, and this tree takes for
 //     text. In a list: a line that starts or ends with such a character once its ASCII white space is off, a
 //     byte order mark at the very start of the list aside. In a metadata: a label or a category that holds one
@@ -166,8 +185,8 @@ import (
 // data/game-paths.txt states, and what each writes must be that file. Without the variable those runs are
 // skipped, and with MOONWELL_REQUIRE_EXPORTS=1 they fail instead; asked for alone with -run, and skipped, they
 // leave the test failing with "the oracle compared no run", which is so: an oracle that compared nothing has not
-// passed. The list is read and never written, and a report shows no more of what was made from it than an
-// offset, or one line.
+// passed. The list is read and never written, and a report shows no more of what a tree made from it, in a file
+// or on a stream, than an offset and one line.
 
 // ---- the oracle ----
 
@@ -197,7 +216,7 @@ func TestOracleOnWhatBothGeneratorsWriteSayAndHowTheyEnd(t *testing.T) {
 	}
 	fixtures.check(t, genTally{
 		counts: counts{
-			Runs: 70, Whole: 50, Passed: 36, Failed: 34, AsPrograms: 10, Files: 204, Committed: 21, Apart: 6,
+			Runs: 70, Whole: 50, Passed: 36, Failed: 34, AsPrograms: 10, Files: 204, Committed: 21,
 		},
 		Modes: map[string]int{"": 29, "game-paths": 41},
 		Classes: map[string]int{
@@ -230,9 +249,6 @@ type counts struct {
 	// The files of the checkouts that were compared byte for byte between the trees, and the files that each
 	// tree wrote and that were compared with the real checkout's.
 	Files, Committed int
-	// Of the runs of the accepted differences, those in which the trees write apart what the class does not
-	// compare.
-	Apart int
 }
 
 // genTally counts what the oracle compared.
@@ -284,28 +300,40 @@ type oracleRun struct {
 	asCommitted []string
 
 	// class names the class of the header that the run is of; "" for a run that is compared whole. The predicate
-	// of the class must hold of the run.
+	// of the class must hold of the run. What follows is what a class needs to know of a run: data, and no
+	// predicate.
 	class string
-	// cannotGive is, for a run of the class AsGiven, which path of the line the system cannot give as a file:
-	// the path as the line gives it, and whether the input is such.
-	cannotGive func(in input) (path string, cannot bool)
+	// cannotGive is, for a run of the class AsGiven, the path of the line that the system cannot give as a file.
+	cannotGive *named
 	// refusal is, for a run of a class in which this tree refuses a line that the other tree does not refuse,
 	// what this tree must write to standard error.
 	refusal string
-	// accepted is what a run of one of the plan's accepted differences carries.
-	accepted *accepted
+	// apart is, for a run of one of the plan's accepted differences, the files that the two trees write apart,
+	// by their paths from the checkout, each with the places in which they do.
+	apart map[string][]place
 }
 
-// accepted is what a run of one of the plan's accepted differences carries.
-type accepted struct {
-	// holds is the predicate of the class for the run. It reads bytes of the input: a file that the line names,
-	// or one that the checkout holds before the run.
-	holds func(in input) bool
-	// writes is the files that the class does not compare, by their paths from the checkout, each with what
-	// this tree must write there: a literal, or a text that the function of the runs works out from its own
-	// small fixture.
-	writes map[string]string
+// named is a path that a command line gives: the argument that names it, counted from 0, and, for a file below
+// a folder that the argument names, the file's path from that folder with "/".
+type named struct {
+	argument int
+	below    string
 }
+
+// in is the path as a program makes it of the line, and whether the line has the argument.
+func (n named) in(args []string) (string, bool) {
+	switch {
+	case n.argument >= len(args):
+		return "", false
+	case n.below == "":
+		return args[n.argument], true
+	}
+	return filepath.Join(args[n.argument], filepath.FromSlash(n.below)), true
+}
+
+// place is a place of a file that the two trees write apart: what the other tree writes there, and what this
+// tree must write in its stead. The other tree's is in its file exactly once.
+type place struct{ other, this string }
 
 // lineOfARun gives the arguments of a run. It writes the files that the line names by a full path into outside,
 // a folder that is in no checkout and that both trees read.
@@ -336,9 +364,7 @@ func (r oracleRun) args(t testing.TB, outside string) []string {
 func (r oracleRun) checkout(t testing.TB) checkout {
 	t.Helper()
 	c := checkout{t, t.TempDir()}
-	if r.noCheckout {
-		inNoCheckout(t, c.root)
-	} else {
+	if !r.noCheckout {
 		c.write("go.mod", moduleFile)
 	}
 	if r.lay != nil {
@@ -348,17 +374,44 @@ func (r oracleRun) checkout(t testing.TB) checkout {
 	return c
 }
 
-// inNoCheckout fails the test when a folder above dir has a go.mod that names this module. A run in a folder
-// that is no checkout would find that checkout and write into it, and the test's temporary folder may have been
-// put inside the real one.
-func inNoCheckout(t testing.TB, dir string) {
+// modulePath is the path of this module, as a go.mod of any kind mentions it.
+const modulePath = "github.com/mdlsvensson/moonwell"
+
+// onlyItsOwnCheckout stops the test unless a generator that is started in dir can find no checkout but the one
+// of the run, whose folder is root, however it looks for one. dir must be root or lie below it. No go.mod above
+// root may so much as mention this module: the test's temporary folder may have been put inside a checkout, and
+// a generator may walk past the go.mod it should stop at. And at or above dir, up to root, a go.mod names this
+// module exactly when the run is of a checkout.
+func onlyItsOwnCheckout(t testing.TB, root, dir string, ofACheckout bool) {
 	t.Helper()
-	for above := filepath.Dir(dir); ; above = filepath.Dir(above) {
-		if data, err := os.ReadFile(filepath.Join(above, "go.mod")); err == nil && moduleLine.Match(data) {
-			t.Fatalf("%s is inside the checkout %s: a run outside every checkout would write there", dir, above)
+	if below, err := filepath.Rel(root, dir); err != nil || !filepath.IsLocal(below) {
+		t.Fatalf("%s is not the folder of the run, %s, nor below it: nothing is started there", dir, root)
+		return
+	}
+	for above := filepath.Dir(root); ; above = filepath.Dir(above) {
+		data, err := os.ReadFile(filepath.Join(above, "go.mod"))
+		if err == nil && bytes.Contains(data, []byte(modulePath)) {
+			t.Fatalf("%s is inside a checkout, %s: a generator that is started there could write into it", root, above)
+			return
 		}
 		if above == filepath.Dir(above) {
-			return
+			break
+		}
+	}
+	if isCheckout := namesTheModuleUpTo(root, dir); isCheckout != ofACheckout {
+		t.Fatalf("at or above %s a go.mod names this module: %v; the run is of a checkout: %v",
+			dir, isCheckout, ofACheckout)
+	}
+}
+
+// namesTheModuleUpTo reports whether dir, or a folder above it up to root, has a go.mod that names this module.
+func namesTheModuleUpTo(root, dir string) bool {
+	for at := dir; ; at = filepath.Dir(at) {
+		if data, err := os.ReadFile(filepath.Join(at, "go.mod")); err == nil && moduleLine.Match(data) {
+			return true
+		}
+		if at == root || at == filepath.Dir(at) {
+			return false
 		}
 	}
 }
@@ -372,31 +425,35 @@ type outcome struct {
 	left           map[string][]byte // what the checkout holds afterwards
 }
 
-// otherTree starts the other tree's generator with the line, in a checkout of its own.
-func (o genOracle) otherTree(t *testing.T, r oracleRun, args []string) outcome {
+// madeBy has one tree carry a run out in a checkout of its own, and returns what the tree made of it. It is the
+// one place a run is started from, for either tree, and it starts nothing in a folder that could lead a
+// generator to another checkout than the run's.
+func (r oracleRun) madeBy(t testing.TB, carryOut func(c checkout) (code int, stdout, stderr string)) outcome {
 	t.Helper()
 	c := r.checkout(t)
+	onlyItsOwnCheckout(t, c.root, c.path(r.below), !r.noCheckout)
 	made := outcome{root: c.root, laid: c.all()}
-	made.code, made.stdout, made.stderr = startIn(t, o.other, c.path(r.below), args...)
+	made.code, made.stdout, made.stderr = carryOut(c)
 	made.left = c.all()
 	return made
 }
 
-// thisTree has this tree's generator carry the line out in a checkout of its own: through run, ended as main
-// ends it, or, for a run of the programs, by the program itself.
-func (o genOracle) thisTree(t *testing.T, r oracleRun, args []string) outcome {
-	t.Helper()
-	c := r.checkout(t)
-	made := outcome{root: c.root, laid: c.all()}
-	if r.asPrograms {
-		made.code, made.stdout, made.stderr = startIn(t, o.this, c.path(r.below), args...)
-	} else {
-		printed, err := c.runBelow(r.below, args...)
-		made.stdout = printed
-		made.stderr, made.code = ending(err)
+// otherTree is the other tree's way to carry a run out: its generator is started with the line.
+func (o genOracle) otherTree(t testing.TB, r oracleRun, args []string) func(checkout) (int, string, string) {
+	return func(c checkout) (int, string, string) { return startIn(t, o.other, c.path(r.below), args...) }
+}
+
+// thisTree is this tree's way to carry a run out: through run, ended as main ends it, or, for a run of the
+// programs, by the program itself.
+func (o genOracle) thisTree(t testing.TB, r oracleRun, args []string) func(checkout) (int, string, string) {
+	return func(c checkout) (code int, stdout, stderr string) {
+		if r.asPrograms {
+			return startIn(t, o.this, c.path(r.below), args...)
+		}
+		stdout, err := c.runBelow(r.below, args...)
+		stderr, code = ending(err)
+		return code, stdout, stderr
 	}
-	made.left = c.all()
-	return made
 }
 
 // holdsItsCheckout is where a tree put the full path of its checkout: a stream, or a file by its name.
@@ -426,7 +483,7 @@ const (
 
 // comparison is one run, as both trees made it.
 type comparison struct {
-	t         *testing.T
+	t         testing.TB
 	r         oracleRun
 	in        input
 	want, got outcome // the other tree's, and this tree's
@@ -435,15 +492,15 @@ type comparison struct {
 
 // compare has both trees make what they make of a run, each in a checkout of its own, and compares the two as
 // the class of the run says.
-func (o genOracle) compare(t *testing.T, r oracleRun, counted *genTally) {
+func (o genOracle) compare(t testing.TB, r oracleRun, counted *genTally) {
 	outside := t.TempDir()
 	args := r.args(t, outside)
-	named := testkit.Snapshot(t, outside)
-	want, got := o.otherTree(t, r, args), o.thisTree(t, r, args)
+	beside := testkit.Snapshot(t, outside)
+	want, got := r.madeBy(t, o.otherTree(t, r, args)), r.madeBy(t, o.thisTree(t, r, args))
 	if !reflect.DeepEqual(want.laid, got.laid) {
 		t.Fatalf("the run lays two checkouts that are not the same: %q and %q", entries(want.laid), entries(got.laid))
 	}
-	if !reflect.DeepEqual(testkit.Snapshot(t, outside), named) {
+	if !reflect.DeepEqual(testkit.Snapshot(t, outside), beside) {
 		t.Error("a tree wrote into the folder of the files that the line names")
 	}
 	c := comparison{t, r, input{args, r.below, want.laid}, want, got, counted}
@@ -489,7 +546,7 @@ func (c comparison) byItsClass() {
 		c.t.Errorf("the run names the class %q, and the oracle has none of that name", c.r.class)
 	case !of.is(c):
 		c.t.Errorf("the run names the class %s, whose predicate does not hold of it; the other tree ended with %d "+
-			"and said %q", of.name, c.want.code, c.want.stderr)
+			"and its first line on standard error is %q", of.name, c.want.code, firstLine(c.want.stderr))
 	default:
 		c.counted.Classes[of.name]++
 		of.compare(c)
@@ -514,12 +571,12 @@ func (c comparison) codes() {
 	oracle.Values(c.t, "the exit code", c.want.code, c.got.code)
 }
 
-// streams compares what the two trees wrote to one stream, and shows both texts when they differ.
+// streams compares what the two trees wrote to one stream, and shows the line of each where they part.
 func (c comparison) streams(stream, want, got string) {
 	c.t.Helper()
 	oracle.Bytes(c.t, stream, []byte(want), []byte(got))
 	if want != got {
-		c.t.Logf("%s of the other tree: %q\n%s of this tree: %q", stream, want, stream, got)
+		c.t.Logf("%s: %s", stream, parting(want, got))
 	}
 }
 
@@ -555,22 +612,28 @@ func entries(held map[string][]byte) []string {
 func (c comparison) mustSay(must string) {
 	c.t.Helper()
 	if c.got.stderr != must {
-		c.t.Errorf("this tree said %q, want %q", c.got.stderr, must)
+		c.t.Errorf("standard error: this tree does not say what it must: %s", parting(must, c.got.stderr))
 	}
 }
 
-// mustWrite fails the test unless this tree left exactly this text in a file. The report says where the two
-// part, and shows the line of each there, and no more of either.
+// mustWrite fails the test unless this tree left exactly this text in a file.
 func (c comparison) mustWrite(name, must string) {
 	c.t.Helper()
-	got := string(c.got.left[name])
-	if got == must {
-		return
+	if got := string(c.got.left[name]); got != must {
+		c.t.Errorf("%s: this tree does not write what it must: %s", name, parting(must, got))
 	}
-	at := partingOffset(got, must)
-	c.t.Errorf("%s: this tree does not write what the run holds for it: the two part at offset %d, where this "+
-		"tree wrote %q, want %q", name, at, lineAt(got, at), lineAt(must, at))
 }
+
+// parting says, for a report, where two texts part: the offset, and the line of each there. No report shows
+// more of what a tree printed or wrote than such a line.
+func parting(want, got string) string {
+	at := partingOffset(want, got)
+	return fmt.Sprintf("the two part at offset %d, where the line wanted is %q and the line got is %q",
+		at, lineAt(want, at), lineAt(got, at))
+}
+
+// firstLine is the first line of a text, for a report, cut as lineAt cuts a line.
+func firstLine(text string) string { return lineAt(text, 0) }
 
 // partingOffset is the offset of the first byte in which two texts differ: the length of the shorter when it is
 // the start of the other.
@@ -611,8 +674,9 @@ func (c comparison) withTheRealCheckout() {
 type class struct {
 	// name is the name of the class, in the header, in a run that is of it, and in the tally.
 	name string
-	// is is the predicate that decides the class. It reads the input, what the run carries for the class, and
-	// what the other tree made of the run; it never reads what this tree made.
+	// is is the predicate that decides the class. It reads the input and what the other tree made of the run,
+	// and of what the run carries for the class only the data that says where to read; it never reads what this
+	// tree made.
 	is func(c comparison) bool
 	// compare compares a run of the class: what the class does not name whole, and what it names against what
 	// this tree must make.
@@ -626,10 +690,10 @@ var classes = []class{
 	{"AsGiven", cannotGiveWhatTheLineNames, comparison.fileAsGiven},
 	{"CountRefused", moreAfterAnEmptyFirstArgument, comparison.refusedByThisTree},
 	{"CountOfPaths", versionWithALineFeed, comparison.countsThePaths},
-	{"WiderSpace", holdsWhatTheRunCarries, comparison.acceptedDifference},
-	{"DottedI", holdsWhatTheRunCarries, comparison.acceptedDifference},
-	{"NoUTF8", holdsWhatTheRunCarries, comparison.acceptedDifference},
-	{"ByBytes", holdsWhatTheRunCarries, comparison.acceptedDifference},
+	{"WiderSpace", either(inTheList(hasWiderSpaceAtAnEdge), inTheLabels(isWiderSpace)), comparison.acceptedDifference},
+	{"DottedI", inTheList(holdsADottedI), comparison.acceptedDifference},
+	{"NoUTF8", inTheList(hasNeighboursThatAreNoUTF8), comparison.acceptedDifference},
+	{"ByBytes", inTheList(hasCharactersOrderedApart), comparison.acceptedDifference},
 }
 
 // classNamed is the row of the classes for a name.
@@ -666,8 +730,8 @@ func (c comparison) fileOfTheCheckout() {
 	c.files()
 	must, shaped := lineFromTheCheckout(c.want.stderr, c.want.root)
 	if !shaped {
-		c.t.Errorf("the other tree said %q, which is no failure of the system on one file of its checkout",
-			c.want.stderr)
+		c.t.Errorf("the other tree's standard error starts %q, and is no failure of the system on one file of "+
+			"its checkout", firstLine(c.want.stderr))
 		return
 	}
 	c.mustSay(must)
@@ -687,27 +751,17 @@ func lineFromTheCheckout(line, root string) (string, bool) {
 	return "error: " + filepath.ToSlash(file) + ": " + reason, true
 }
 
-// cannotGiveWhatTheLineNames is the predicate of AsGiven: the run says which path of the line the system cannot
-// give as a file, the input is such, and the other tree said Go's own line of that path.
+// cannotGiveWhatTheLineNames is the predicate of AsGiven: the run says which path of the line it is about, the
+// input has no file there, since nothing is there or a folder is, and the other tree said Go's own line of that
+// path.
 func cannotGiveWhatTheLineNames(c comparison) bool {
 	if c.r.cannotGive == nil {
 		return false
 	}
-	named, cannot := c.r.cannotGive(c.in)
-	_, said := lineWithoutTheOperation(c.want.stderr, named)
-	return cannot && said
-}
-
-// fileNamedBy is, for a run of AsGiven, the file that an argument of the line names, counted from 0: the system
-// cannot give it when it is not there, or is a folder.
-func fileNamedBy(argument int) func(in input) (string, bool) {
-	return func(in input) (string, bool) {
-		if argument >= len(in.args) {
-			return "", false
-		}
-		_, isFile := in.given(in.args[argument])
-		return in.args[argument], !isFile
-	}
+	path, given := c.r.cannotGive.in(c.in.args)
+	_, isFile := c.in.given(path)
+	_, said := lineWithoutTheOperation(c.want.stderr, path)
+	return given && !isFile && said
 }
 
 // fileAsGiven compares a run of the class AsGiven: the line this tree says is the other tree's without the
@@ -716,8 +770,8 @@ func (c comparison) fileAsGiven() {
 	c.codes()
 	c.streams(standardOutput, c.want.stdout, c.got.stdout)
 	c.files()
-	named, _ := c.r.cannotGive(c.in)
-	must, _ := lineWithoutTheOperation(c.want.stderr, named)
+	path, _ := c.r.cannotGive.in(c.in.args)
+	must, _ := lineWithoutTheOperation(c.want.stderr, path)
 	c.mustSay(must)
 }
 
@@ -748,7 +802,8 @@ func (c comparison) refusedByThisTree() {
 		c.t.Error("the run holds nothing that this tree must say as it refuses the line")
 	}
 	if c.got.code != 1 || c.got.stdout != "" {
-		c.t.Errorf("this tree ended with %d and printed %q, want 1 and nothing", c.got.code, c.got.stdout)
+		c.t.Errorf("this tree ended with %d and printed %d bytes, the first line of them %q; want 1 and nothing",
+			c.got.code, len(c.got.stdout), firstLine(c.got.stdout))
 	}
 	c.mustSay(c.r.refusal)
 	if !reflect.DeepEqual(c.got.left, c.got.laid) {
@@ -773,42 +828,120 @@ func (c comparison) countsThePaths() {
 	version := c.in.args[2]
 	afterTheFirst := bytes.Count(c.want.left[gamePathsPath], []byte("\n")) - 1
 	if must := printed(afterTheFirst); c.want.stdout != must {
-		c.t.Errorf("the other tree printed %q, want %q: the line breaks after the first", c.want.stdout, must)
+		c.t.Errorf("the other tree does not print the count of the line breaks after the first: %s",
+			parting(must, c.want.stdout))
 	}
 	if must := printed(afterTheFirst - strings.Count(version, "\n")); c.got.stdout != must {
-		c.t.Errorf("this tree printed %q, want %q: the lines after the version's own", c.got.stdout, must)
+		c.t.Errorf("this tree does not print the count of the lines after the version's own: %s",
+			parting(must, c.got.stdout))
 	}
 }
 
-// holdsWhatTheRunCarries is the predicate of each of the plan's accepted differences: the run carries the
-// predicate of its class on the bytes of the input, and it holds.
-func holdsWhatTheRunCarries(c comparison) bool {
-	return c.r.accepted != nil && c.r.accepted.holds(c.in)
-}
-
-// acceptedDifference compares a run of one of the plan's accepted differences: this tree must write into the
-// files that the run names what the run holds for them, and everything else is compared whole. It counts the run
-// when the two trees write one of those files apart.
+// acceptedDifference compares a run of one of the plan's accepted differences: each file that the run names is
+// held to the other tree's text with the run's places changed, and everything else is compared whole.
 func (c comparison) acceptedDifference() {
-	apart := slices.Sorted(maps.Keys(c.r.accepted.writes))
-	if len(apart) == 0 {
-		c.t.Error("the run names no file that the class leaves to this tree")
+	files := slices.Sorted(maps.Keys(c.r.apart))
+	if len(files) == 0 {
+		c.t.Error("the run names no file that the two trees write apart")
 	}
 	c.codes()
 	c.streams(standardError, c.want.stderr, c.got.stderr)
 	c.streams(standardOutput, c.want.stdout, c.got.stdout)
-	c.files(apart...)
-	differ := false
-	for _, name := range apart {
-		c.mustWrite(name, c.r.accepted.writes[name])
-		differ = differ || !bytes.Equal(c.want.left[name], c.got.left[name])
-	}
-	if differ {
-		c.counted.Apart++
+	c.files(files...)
+	for _, name := range files {
+		c.writtenApart(name, c.r.apart[name])
 	}
 }
 
-// ---- the input, and the predicates on its bytes ----
+// writtenApart holds a file of an accepted difference to the other tree's text with the places changed that
+// the run names. It fails where a place is none, and where the two trees write the file alike: the class is
+// about a difference.
+func (c comparison) writtenApart(name string, places []place) {
+	theirs, ours := string(c.want.left[name]), string(c.got.left[name])
+	must, wrong := withPlaces(theirs, places)
+	switch {
+	case wrong != "":
+		c.t.Errorf("%s: %s", name, wrong)
+	case ours == theirs:
+		c.t.Errorf("%s: the two trees write the file alike: the class is about a difference, and there is none", name)
+	default:
+		c.mustWrite(name, must)
+	}
+}
+
+// withPlaces is the text of a file as the other tree wrote it, with each place written as this tree must write
+// it. It says what is wrong where a place is none: the run names no place, the two trees write the same there,
+// the text does not hold the other tree's words exactly once, or two places lie in one another.
+func withPlaces(text string, places []place) (changed, wrong string) {
+	if len(places) == 0 {
+		return "", "the run names no place in which the two trees write the file apart"
+	}
+	for _, p := range places {
+		switch count := strings.Count(text, p.other); {
+		case p.other == p.this:
+			return "", fmt.Sprintf("the run says that the two trees write %q alike, which is no place apart", p.other)
+		case count != 1:
+			return "", fmt.Sprintf("the other tree wrote %q %d times, want once", p.other, count)
+		}
+	}
+	inOrder := slices.SortedFunc(slices.Values(places), func(a, b place) int {
+		return strings.Index(text, a.other) - strings.Index(text, b.other)
+	})
+	var out strings.Builder
+	end := 0
+	for _, p := range inOrder {
+		at := strings.Index(text, p.other)
+		if at < end {
+			return "", fmt.Sprintf("the place %q lies in the place before it", p.other)
+		}
+		out.WriteString(text[end:at] + p.this)
+		end = at + len(p.other)
+	}
+	return out.String() + text[end:], ""
+}
+
+// The predicates of the accepted differences, by where they read the bytes of the input.
+
+// inTheList is a predicate on the bytes of the list that a line of game-paths names: the line has the two
+// arguments of the mode, and the first names a file.
+func inTheList(holds func(list []byte) bool) func(c comparison) bool {
+	return func(c comparison) bool {
+		if c.in.mode() != "game-paths" || len(c.in.args) != 3 {
+			return false
+		}
+		list, isFile := c.in.given(c.in.args[1])
+		return isFile && holds(list)
+	}
+}
+
+// inTheLabels is a predicate on the metadata of a checkout that the mode without a name is run in: a field has,
+// in its label or in its category, a character of the kind. It does not hold for a metadata that is no JSON.
+func inTheLabels(kind func(r rune) bool) func(c comparison) bool {
+	return func(c comparison) bool {
+		var metadata struct {
+			Fields map[string][]struct{ Label, Category string }
+		}
+		nameless := len(c.in.args) == 0 || (len(c.in.args) == 1 && c.in.args[0] == "")
+		if !nameless || json.Unmarshal(c.in.laid[metadataPath], &metadata) != nil {
+			return false
+		}
+		for _, fields := range metadata.Fields {
+			for _, field := range fields {
+				if strings.ContainsFunc(field.Label+field.Category, kind) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+}
+
+// either is a predicate that holds where one of two does.
+func either(a, b func(c comparison) bool) func(c comparison) bool {
+	return func(c comparison) bool { return a(c) || b(c) }
+}
+
+// ---- the input, and what a predicate asks of its bytes ----
 
 // input is what a run gives both trees: the command line, the folder of the checkout it is run in, and what the
 // checkout holds before it.
@@ -836,18 +969,6 @@ func (in input) given(name string) (data []byte, isFile bool) {
 	}
 	data, held := in.laid[path.Join(in.below, filepath.ToSlash(name))]
 	return data, held && data != nil
-}
-
-// ofTheFileNamedBy is a predicate on the bytes of the file that an argument of the line names, counted from 0.
-// It does not hold where the line has no such argument, or the argument names no file.
-func ofTheFileNamedBy(argument int, holds func(data []byte) bool) func(in input) bool {
-	return func(in input) bool {
-		if argument >= len(in.args) {
-			return false
-		}
-		data, isFile := in.given(in.args[argument])
-		return isFile && holds(data)
-	}
 }
 
 // The white space of ASCII, and a byte order mark.
@@ -906,27 +1027,6 @@ func hasCharactersOrderedApart(list []byte) bool {
 		below = below || (r >= 0xE000 && r <= 0xFFFF)
 	}
 	return above && below
-}
-
-// labelsHold is a predicate on the metadata that the checkout holds before the run: a field has, in its label
-// or in its category, a character of the kind. It does not hold for a metadata that is no JSON.
-func labelsHold(kind func(r rune) bool) func(in input) bool {
-	return func(in input) bool {
-		var metadata struct {
-			Fields map[string][]struct{ Label, Category string }
-		}
-		if json.Unmarshal(in.laid[metadataPath], &metadata) != nil {
-			return false
-		}
-		for _, fields := range metadata.Fields {
-			for _, field := range fields {
-				if strings.ContainsFunc(field.Label+field.Category, kind) {
-					return true
-				}
-			}
-		}
-		return false
-	}
 }
 
 // The readings that decide a class, each on lines and endings of its kind and of other kinds.
@@ -996,6 +1096,192 @@ func TestOracleReadsTheLinesAndTheEndingsThatDecideItsClasses(t *testing.T) {
 		at := partingOffset(c.a, c.b)
 		if got := [2]string{lineAt(c.a, at), lineAt(c.b, at)}; at != c.at || got != c.ofEach {
 			t.Errorf("%q and %q part at %d, with the lines %q; want %d and %q", c.a, c.b, at, got, c.at, c.ofEach)
+		}
+	}
+	const written = "one\ntwo\nthree\ntwo and two\n"
+	for _, c := range []struct {
+		places  []place
+		changed string
+		wrong   string // words of what is wrong with the places; "" for places that are sound
+	}{
+		{[]place{{"one\n", "ONE\n"}}, "ONE\ntwo\nthree\ntwo and two\n", ""},
+		{[]place{{"three\n", ""}, {"one\n", "1\n"}}, "1\ntwo\ntwo and two\n", ""},
+		{[]place{{"\ntwo\n", "\ntwo\nmore\n"}}, "one\ntwo\nmore\nthree\ntwo and two\n", ""},
+		{nil, "", "names no place"},
+		{[]place{{"three", "three"}}, "", "alike"},
+		{[]place{{"two", "2"}}, "", "3 times"},
+		{[]place{{"four", "4"}}, "", "0 times"},
+		{[]place{{"one\ntwo", "1"}, {"ne\ntwo\nthree", "2"}}, "", "lies in the place before it"},
+	} {
+		changed, wrong := withPlaces(written, c.places)
+		if changed != c.changed || (wrong == "") != (c.wrong == "") || !strings.Contains(wrong, c.wrong) {
+			t.Errorf("withPlaces(%q) = %q, %q; want %q and the words %q", c.places, changed, wrong, c.changed, c.wrong)
+		}
+	}
+	// The path of AsGiven is the argument, or a file below the folder that the argument names; the predicate
+	// asks that the input has no file there, and that the other tree's line is Go's own of that path.
+	missing := filepath.Join(root, "export")
+	below := filepath.Join(missing, "scripts", "common.j")
+	line := []string{"natives", missing, "1"}
+	goSaid, thisSaid := "error: open "+below+": the reason\n", "error: "+below+": the reason\n"
+	for name, c := range map[string]struct {
+		carried *named
+		said    string // the other tree's standard error
+		is      bool
+	}{
+		"a file below a folder that is not there":     {&named{1, "scripts/common.j"}, goSaid, true},
+		"the folder itself, of which the line is not": {&named{1, ""}, goSaid, false},
+		"another argument":                            {&named{2, "scripts/common.j"}, goSaid, false},
+		"an argument the line has not":                {&named{3, ""}, goSaid, false},
+		"nothing carried":                             {nil, goSaid, false},
+		"a line of this tree's shape":                 {&named{1, "scripts/common.j"}, thisSaid, false},
+	} {
+		made := comparison{r: oracleRun{cannotGive: c.carried}, in: input{args: line}, want: outcome{stderr: c.said}}
+		if is := cannotGiveWhatTheLineNames(made); is != c.is {
+			t.Errorf("%s: the predicate of AsGiven is %v, want %v", name, is, c.is)
+		}
+	}
+}
+
+// The folder a run is started in: nothing is started where a generator could find a checkout that is not the
+// run's own, however it looks for one.
+func TestOracleStartsNothingWhereAnotherCheckoutCouldBeFound(t *testing.T) {
+	const (
+		mentioned = "module example.com/other\n\nrequire " + modulePath + " v1.0.0\n"
+		// Words of the three refusals.
+		inside   = "is inside a checkout"
+		unnamed  = "names this module: false"
+		notBelow = "nor below it"
+	)
+	for name, c := range map[string]struct {
+		above     string // the go.mod of the folder above the run's; "" for none
+		own       string // the go.mod of the run's folder; "" for none
+		below     string // where the line is run, from the run's folder
+		elsewhere bool   // the line is run in a folder that is not the run's
+		ofOne     bool   // the run is of a checkout
+		refused   string // words of the refusal; "" for a folder in which a run may start
+	}{
+		"a checkout":                              {own: moduleFile, ofOne: true},
+		"a folder below a checkout":               {own: moduleFile, below: "tools/gen", ofOne: true},
+		"a folder that is no checkout":            {},
+		"a folder of another module":              {own: anotherModule},
+		"another module above":                    {above: anotherModule, own: moduleFile, ofOne: true},
+		"a checkout above a checkout":             {above: moduleFile, own: moduleFile, ofOne: true, refused: inside},
+		"a checkout above a folder that is none":  {above: moduleFile, refused: inside},
+		"a mention of the module above":           {above: mentioned, own: moduleFile, ofOne: true, refused: inside},
+		"a checkout where the run is of none":     {own: moduleFile, refused: "names this module: true"},
+		"no checkout where the run is of one":     {below: "tools", ofOne: true, refused: unnamed},
+		"another module where the run is of one":  {own: anotherModule, ofOne: true, refused: unnamed},
+		"a folder that is not the run's":          {own: moduleFile, elsewhere: true, ofOne: true, refused: notBelow},
+		"a folder above the run's, by two points": {own: moduleFile, below: "..", ofOne: true, refused: notBelow},
+	} {
+		outer := checkout{t, t.TempDir()}
+		root, dir := outer.folder("above/run"), outer.folder("above/run/"+c.below)
+		if c.elsewhere {
+			dir = outer.folder("above/other")
+		}
+		for at, text := range map[string]string{"above/go.mod": c.above, "above/run/go.mod": c.own} {
+			if text != "" {
+				outer.write(at, text)
+			}
+		}
+		heard := listenTo(t, func(tb testing.TB) { onlyItsOwnCheckout(tb, root, dir, c.ofOne) })
+		if (heard == "") != (c.refused == "") || !strings.Contains(heard, c.refused) {
+			t.Errorf("%s: the guard said %q, want the words %q", name, heard, c.refused)
+		}
+	}
+}
+
+// The rules of a class, each on a run that breaks it: the oracle must report the run, in the words that stand
+// beside it. The runs go through compare as every run does, the other tree's generator a program; the test
+// builds it, and is skipped with -short.
+func TestOracleReportsARunThatIsNotOfTheClassItNames(t *testing.T) {
+	if testing.Short() {
+		t.Skip("the test builds the other tree's generator and starts it for its runs: not with -short")
+	}
+	o := genOracle{other: builtProgram(t, "./tools/gen")}
+	ordinary := gamePathsOf("Units/A.mdx\n", "2.0.0")
+	noBreak := gamePathsOf("Units/A.mdx\n\xC2\xA0Units/B.mdx\n", "2.0.0")
+	notThere := func(_ testing.TB, outside string) []string {
+		return []string{"game-paths", filepath.Join(outside, "no-listfile.txt"), "2.0.0"}
+	}
+	// The reports of a run that is compared whole, and whose list or standard error the trees make apart.
+	const listDiffers, errorDiffers = gamePathsPath + ": differs at offset", standardError + ": differs at offset"
+	laidApart := 0
+	for _, probe := range []struct {
+		r       oracleRun
+		reports []string
+	}{
+		{oracleRun{name: "a class whose predicate does not hold", class: "FromCheckout", lay: oneBuff("fnam", "name")},
+			[]string{"names the class FromCheckout, whose predicate does not hold of it"}},
+		{oracleRun{name: "a class that the oracle has not", class: "NoSuchClass", lay: oneBuff("fnam", "name")},
+			[]string{`names the class "NoSuchClass", and the oracle has none of that name`}},
+		{oracleRun{name: "a no-break space named as a dotted I", class: "DottedI", lay: noList, line: noBreak,
+			apart: inTheListWritten("\nunits/b.mdx\n", "\n\xC2\xA0units/b.mdx\n")},
+			[]string{"names the class DottedI, whose predicate does not hold of it", listDiffers}},
+		{oracleRun{name: "a list without the difference of its class", class: "ByBytes", lay: noList, line: ordinary,
+			apart: inTheListWritten("\nunits/a.mdx\n", "\nunits/A.mdx\n")},
+			[]string{"names the class ByBytes, whose predicate does not hold of it"}},
+		{oracleRun{name: "a difference of the metadata named in a line of game-paths", class: "WiderSpace",
+			line: ordinary,
+			lay: func(c checkout) {
+				noList(c)
+				withFields(map[string][]objects.FieldMeta{"buffs": {field("fnbs", "noBreak", noBreakSpaces)}})(c)
+			}, apart: inTheListWritten("\nunits/a.mdx\n", "\nunits/A.mdx\n")},
+			[]string{"names the class WiderSpace, whose predicate does not hold of it"}},
+		{oracleRun{name: "a difference without a file", class: "WiderSpace", lay: noList, line: noBreak},
+			[]string{"names no file that the two trees write apart", gamePathsPath + ": differs at offset"}},
+		{oracleRun{name: "a difference, and no class named", lay: noList, line: noBreak},
+			[]string{gamePathsPath + ": differs at offset"}},
+		{oracleRun{name: "a class about a difference, and the trees write alike", class: "NoUTF8", lay: noList,
+			line:  gamePathsOf("Units/B\xE4\xB8.mdx\n", "2.0.0"),
+			apart: inTheListWritten("\nunits/b\xEF\xBF\xBD.mdx\n", "\nunits/b.mdx\n")},
+			[]string{"the class is about a difference, and there is none"}},
+		{oracleRun{name: "a place that the other tree did not write", class: "WiderSpace", lay: noList, line: noBreak,
+			apart: inTheListWritten("\nunits/c.mdx\n", "\n\xC2\xA0units/c.mdx\n")},
+			[]string{`the other tree wrote "\nunits/c.mdx\n" 0 times, want once`}},
+		{oracleRun{name: "a place that is written alike", class: "WiderSpace", lay: noList, line: noBreak,
+			apart: inTheListWritten("\nunits/b.mdx\n", "\nunits/b.mdx\n")},
+			[]string{"which is no place apart"}},
+		{oracleRun{name: "a place that this tree writes otherwise", class: "WiderSpace", lay: noList, line: noBreak,
+			apart: inTheListWritten("\nunits/b.mdx\n", "\n units/b.mdx\n")},
+			[]string{gamePathsPath + ": this tree does not write what it must: the two part at offset 33"}},
+		{oracleRun{name: "another file named than the one written apart", class: "WiderSpace", lay: noList,
+			line: noBreak, apart: map[string][]place{"go.mod": {{"module ", "modul "}}}},
+			[]string{listDiffers, "go.mod: the two trees write the file alike"}},
+		{oracleRun{name: "a refusal without its words", class: "CountRefused", line: words("", "more"),
+			lay: oneBuff("fnam", "name")},
+			[]string{"holds nothing that this tree must say"}},
+		{oracleRun{name: "a refusal of a line that the other tree refuses too", class: "CountRefused",
+			refusal: "error: Usage: go run ./tools/gen game-paths <listfile> <game version, e.g. 3.0.0.24268>\n",
+			line:    words("game-paths")},
+			[]string{"names the class CountRefused, whose predicate does not hold of it"}},
+		{oracleRun{name: "a file the system cannot give, and no argument named", class: "AsGiven", lay: anotherList,
+			line: notThere},
+			[]string{"names the class AsGiven, whose predicate does not hold of it", errorDiffers}},
+		{oracleRun{name: "an argument named that names a file", class: "AsGiven", cannotGive: &named{argument: 1},
+			lay: noList, line: ordinary},
+			[]string{"names the class AsGiven, whose predicate does not hold of it"}},
+		{oracleRun{name: "a file the system cannot give, and no class named", lay: anotherList, line: notThere},
+			[]string{"standard error: differs at offset"}},
+		{oracleRun{name: "a path from the working folder, given to run in the process of the test", below: "work",
+			line: words("game-paths", "listfile.txt", "2.0.0"),
+			lay: func(c checkout) {
+				noList(c)
+				c.write("work/listfile.txt", "Units/A.mdx\n")
+			}},
+			[]string{"the exit code: values differ"}},
+		{oracleRun{name: "two checkouts that are not laid alike", lay: func(c checkout) {
+			laidApart++
+			c.write(metadataPath, strings.Repeat(" ", laidApart)+"{}")
+		}},
+			[]string{"the run lays two checkouts that are not the same"}},
+	} {
+		heard := listenTo(t, func(tb testing.TB) { o.compare(tb, probe.r, newTally()) })
+		for _, words := range probe.reports {
+			if !strings.Contains(heard, words) {
+				t.Errorf("%s: the oracle reported\n%s\nwant a report with the words %q", probe.r.name, heard, words)
+			}
 		}
 	}
 }
@@ -1129,9 +1415,10 @@ func schemaRuns() []oracleRun {
 			line: words("", "more"), lay: oneBuff("fnam", "name")},
 		{name: "a label and a category with white space outside ASCII", class: "WiderSpace",
 			lay: withFields(map[string][]objects.FieldMeta{"buffs": {field("fnbs", "noBreak", noBreakSpaces)}}),
-			accepted: &accepted{labelsHold(isWiderSpace), map[string]string{"schema/generated/BuffProps.pkl": buffHead +
-				"\n/// \xC2\xA0No\xC2\xA0\xC2\xA0Break\xC2\xA0\n///\n" +
-				"/// Field `fnbs` (art\xC2\xA0and sound, `int`).\nnoBreak: Int?\n"}}},
+			apart: map[string][]place{"schema/generated/BuffProps.pkl": {
+				{"\n/// No Break\n", "\n/// \xC2\xA0No\xC2\xA0\xC2\xA0Break\xC2\xA0\n"},
+				{"(art and sound, ", "(art\xC2\xA0and sound, "},
+			}}},
 	}
 	return append(runs, noCheckoutRuns("the mode without a name", nil)...)
 }
@@ -1141,15 +1428,6 @@ func schemaRuns() []oracleRun {
 func noBreakSpaces(meta *objects.FieldMeta) {
 	meta.Label, meta.Category = "\xC2\xA0No\xC2\xA0\xC2\xA0Break\xC2\xA0", "art\xC2\xA0and sound"
 }
-
-// buffHead is the head of the module of buffs for a metadata of the tests. The dash is an em dash.
-const buffHead = "// GENERATED by `go run ./tools/gen` from data/metadata.json (game 1.2.3.4) \xE2\x80\x94 " +
-	"do not edit.\n" +
-	"\n" +
-	"/// The typed properties of `Buff.pkl`: the fields of buffs, named after their World Editor labels.\n" +
-	"abstract module moonwell.generated.BuffProps\n" +
-	"\n" +
-	"extends \"../objects/Object.pkl\"\n"
 
 // fieldsOfEveryKind is fields of every kind that the schema renders in its own way: every type of a property,
 // without and with levels; a bool that is stored as an int, as another kind of number, as a text, and without a
@@ -1331,11 +1609,11 @@ func gamePathsRuns() []oracleRun {
 			line: gamePathsOf("war3.w3mod:Sound/Hit.wav\nUnits/UnitData.slk\n", "2.0.0")},
 		{name: "a list that names nothing, into an empty data folder", lay: noList,
 			line: gamePathsOf("war3.w3mod:Sound/Hit.wav\n", "2.0.0")},
-		{name: "a list file that is not there", lay: anotherList, class: "AsGiven", cannotGive: fileNamedBy(1),
+		{name: "a list file that is not there", lay: anotherList, class: "AsGiven", cannotGive: &named{argument: 1},
 			line: func(_ testing.TB, outside string) []string {
 				return []string{"game-paths", filepath.Join(outside, "no-listfile.txt"), "2.0.0"}
 			}},
-		{name: "a folder for the list file", lay: anotherList, class: "AsGiven", cannotGive: fileNamedBy(1),
+		{name: "a folder for the list file", lay: anotherList, class: "AsGiven", cannotGive: &named{argument: 1},
 			line: func(t testing.TB, outside string) []string {
 				testkit.WriteFile(t, outside, "folder/listfile.txt", []byte("Units/A.mdx\n"))
 				return []string{"game-paths", filepath.Join(outside, "folder"), "2.0.0"}
@@ -1352,31 +1630,31 @@ func gamePathsRuns() []oracleRun {
 		{name: "a version with a line feed", lay: anotherList, class: "CountOfPaths",
 			line: gamePathsOf("Units/B.mdx\nUnits/A.mdx\nSound/Hit.wav\n", "2.0.0\nunits/new.mdx")},
 		{name: "a no-break space before a name of the list", lay: noList, class: "WiderSpace",
-			line:     gamePathsOf("Units/A.mdx\n\xC2\xA0Units/B.mdx\n", "2.0.0"),
-			accepted: theList(hasWiderSpaceAtAnEdge, "# Warcraft III 2.0.0\nunits/a.mdx\n\xC2\xA0units/b.mdx\n")},
+			line:  gamePathsOf("Units/A.mdx\n\xC2\xA0Units/B.mdx\n", "2.0.0"),
+			apart: inTheListWritten("\nunits/b.mdx\n", "\n\xC2\xA0units/b.mdx\n")},
 		{name: "a byte order mark at the start of the second line of the list", lay: noList, class: "WiderSpace",
-			line:     gamePathsOf("Units/A.mdx\n"+mark+"Units/B.mdx\n", "2.0.0"),
-			accepted: theList(hasWiderSpaceAtAnEdge, "# Warcraft III 2.0.0\nunits/a.mdx\n"+mark+"units/b.mdx\n")},
+			line:  gamePathsOf("Units/A.mdx\n"+mark+"Units/B.mdx\n", "2.0.0"),
+			apart: inTheListWritten("\nunits/b.mdx\n", "\n"+mark+"units/b.mdx\n")},
 		{name: "a capital I with a dot above in a name of the list", lay: noList, class: "DottedI",
-			line:     gamePathsOf("Units/\xC4\xB0.MDX\n", "2.0.0"),
-			accepted: theList(holdsADottedI, "# Warcraft III 2.0.0\nunits/i.mdx\n")},
+			line:  gamePathsOf("Units/\xC4\xB0.MDX\n", "2.0.0"),
+			apart: inTheListWritten("\nunits/i\xCC\x87.mdx\n", "\nunits/i.mdx\n")},
 		{name: "two bytes that are no UTF-8, side by side", lay: noList, class: "NoUTF8",
-			line:     gamePathsOf("Units\\B\xFF\xFE.mdx\n", "2.0.0"),
-			accepted: theList(hasNeighboursThatAreNoUTF8, "# Warcraft III 2.0.0\nunits/b\xEF\xBF\xBD.mdx\n")},
+			line:  gamePathsOf("Units\\B\xFF\xFE.mdx\n", "2.0.0"),
+			apart: inTheListWritten("\nunits/b\xEF\xBF\xBD\xEF\xBF\xBD.mdx\n", "\nunits/b\xEF\xBF\xBD.mdx\n")},
 		{name: "a character above U+FFFF beside one from U+E000 on", lay: noList, class: "ByBytes",
 			line: gamePathsOf("\xF0\x90\x80\x80.mdx\n\xEE\x80\x80.mdx\n", "2.0.0"),
-			accepted: theList(hasCharactersOrderedApart,
-				"# Warcraft III 2.0.0\n\xEE\x80\x80.mdx\n\xF0\x90\x80\x80.mdx\n")},
+			apart: inTheListWritten("\n\xF0\x90\x80\x80.mdx\n\xEE\x80\x80.mdx\n",
+				"\n\xEE\x80\x80.mdx\n\xF0\x90\x80\x80.mdx\n")},
 	}
 	runs = append(runs, changedLists(withLineFeeds+"\n")...)
 	runs = append(runs, noCheckoutRuns("game-paths", gamePathsOf("Units/A.mdx\n", "2.0.0"))...)
 	return append(runs, noCheckoutRuns("game-paths alone", words("game-paths"))...)
 }
 
-// theList is what a run of an accepted difference in a list carries: the predicate on the bytes of the list
-// that the line names, and what this tree must write into data/game-paths.txt.
-func theList(holds func(list []byte) bool, text string) *accepted {
-	return &accepted{ofTheFileNamedBy(1, holds), map[string]string{gamePathsPath: text}}
+// inTheListWritten is what a run of an accepted difference in a list carries: the one place of
+// data/game-paths.txt that the two trees write apart, as the other tree writes it and as this tree must.
+func inTheListWritten(other, this string) map[string][]place {
+	return map[string][]place{gamePathsPath: {{other, this}}}
 }
 
 // changedLists is a list after seeded changes, eight times: one to three changes of each, a line cut, a line
@@ -1436,7 +1714,7 @@ func programRuns() []oracleRun {
 				c.write("work/listfile.txt", "Units/B.mdx\nUnits/A.mdx\n")
 			}},
 		{name: "a list that is not there, by its name", below: "work", lay: anotherList,
-			class: "AsGiven", cannotGive: fileNamedBy(1), line: words("game-paths", "no-listfile.txt", "2.0.0")},
+			class: "AsGiven", cannotGive: &named{argument: 1}, line: words("game-paths", "no-listfile.txt", "2.0.0")},
 	}
 	for i := range runs {
 		runs[i].name, runs[i].asPrograms = "as programs: "+runs[i].name, true

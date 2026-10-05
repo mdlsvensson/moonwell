@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"os/exec"
@@ -109,11 +110,13 @@ func (c checkout) run(args ...string) (printed string, files map[string][]byte, 
 
 // runBelow runs one command line of the generator in a folder of the checkout, which it makes: below is its path
 // from the checkout with "/", and "" is the checkout itself. It returns what the run printed and the error the run
-// ended with.
+// ended with. It calls run for no folder of the real checkout.
 func (c checkout) runBelow(below string, args ...string) (printed string, err error) {
 	c.t.Helper()
+	dir := c.folder(below)
+	notInTheRealCheckout(c.t, dir)
 	var out bytes.Buffer
-	err = run(c.folder(below), args, &out)
+	err = run(dir, args, &out)
 	return out.String(), err
 }
 
@@ -166,6 +169,7 @@ func builtProgram(t testing.TB, pkg string) string {
 // generator writes into the checkout it finds.
 func startIn(t testing.TB, program, dir string, args ...string) (code int, stdout, stderr string) {
 	t.Helper()
+	notInTheRealCheckout(t, dir)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 	started := exec.CommandContext(ctx, program, args...)
@@ -180,6 +184,66 @@ func startIn(t testing.TB, program, dir string, args ...string) (code int, stdou
 		code = exited.ExitCode()
 	}
 	return code, printed.String(), said.String()
+}
+
+// notInTheRealCheckout stops the test when dir is the real checkout, the one these tests are part of, or a
+// folder below it. A generator writes into the checkout it finds, and the real one is only read: so no program
+// is started there, and run is not called for it. A folder that is no full path is one from the folder of the
+// test, which is in the real checkout.
+func notInTheRealCheckout(t testing.TB, dir string) {
+	t.Helper()
+	realCheckout, err := os.Stat(testkit.RepoRoot(t))
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+	full, err := filepath.Abs(dir)
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+	for at := full; ; at = filepath.Dir(at) {
+		if info, err := os.Stat(at); err == nil && os.SameFile(info, realCheckout) {
+			t.Fatalf("%q is in the real checkout, %s: no generator is run there", dir, at)
+			return
+		}
+		if at == filepath.Dir(at) {
+			return
+		}
+	}
+}
+
+// listener is a test that keeps what is reported to it, where a real test would fail: the reports of what must
+// fail are read through it. Everything else is the real test's.
+type listener struct {
+	testing.TB
+	reports []string
+}
+
+// stopped is what a listener raises where a real test would stop.
+type stopped struct{}
+
+func (l *listener) Helper()                   {}
+func (l *listener) Logf(string, ...any)       {}
+func (l *listener) Error(args ...any)         { l.reports = append(l.reports, fmt.Sprint(args...)) }
+func (l *listener) Errorf(f string, a ...any) { l.reports = append(l.reports, fmt.Sprintf(f, a...)) }
+func (l *listener) Fatal(args ...any)         { l.Error(args...); panic(stopped{}) }
+func (l *listener) Fatalf(f string, a ...any) { l.Errorf(f, a...); panic(stopped{}) }
+
+// listenTo runs what would fail a test with a listener for its test, up to where a real test would stop, and
+// returns what was reported, a report on a line.
+func listenTo(t testing.TB, reporting func(tb testing.TB)) string {
+	t.Helper()
+	heard := &listener{TB: t}
+	func() {
+		defer func() {
+			if raised := recover(); raised != nil && raised != (stopped{}) {
+				panic(raised)
+			}
+		}()
+		reporting(heard)
+	}()
+	return strings.Join(heard.reports, "\n")
 }
 
 // texts is the files among the outputs of a checkout, each with its text. The folders are left out.

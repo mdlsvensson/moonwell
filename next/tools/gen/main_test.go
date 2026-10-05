@@ -214,11 +214,38 @@ func TestAFailureInTheCheckoutNamesWhatTheSystemNamesByItsPathFromTheCheckout(t 
 		{at("mkdir", "schema"), "schema: the reason"},
 		{fmt.Errorf("writing: %w", at("mkdir", "schema")), "schema: the reason"},
 		{at("open", "..", "elsewhere", "file"), writing + ": the reason"},
+		// The folder of the checkout has no path from itself.
+		{at("mkdir"), writing + ": the reason"},
+		{at("mkdir", "schema", ".."), writing + ": the reason"},
 		{reason, writing + ": the reason"},
 	} {
 		if got := errInCheckout(checkout, writing, c.cause).Error(); got != c.want {
 			t.Errorf("errInCheckout for %q = %q, want %q", c.cause, got, c.want)
 		}
+	}
+}
+
+// The helpers that start a generator, as a program and through run, start none in the real checkout or below
+// it, whatever they are called with: a generator writes into the checkout it finds. A folder that is no full
+// path is one from the folder of the test, which is in the real checkout.
+func TestTheHelpersRunNoGeneratorInTheRealCheckout(t *testing.T) {
+	const refusal = "is in the real checkout"
+	root := testkit.RepoRoot(t)
+	for _, dir := range []string{root, filepath.Join(root, "next", "tools"), "", ".", filepath.Join("..", "..")} {
+		heard := listenTo(t, func(tb testing.TB) { notInTheRealCheckout(tb, dir) })
+		if !strings.Contains(heard, refusal) {
+			t.Errorf("the folder %q: got %q, want the refusal of a folder of the real checkout", dir, heard)
+		}
+	}
+	if heard := listenTo(t, func(tb testing.TB) { notInTheRealCheckout(tb, t.TempDir()) }); heard != "" {
+		t.Errorf("a folder of the test: got %q, want nothing", heard)
+	}
+	// The program is none that could be started, and the mode none that writes: a helper that went on would do
+	// nothing to the checkout either.
+	started := listenTo(t, func(tb testing.TB) { startIn(tb, "no-such-program", root) })
+	called := listenTo(t, func(tb testing.TB) { checkout{tb, root}.runBelow("", "no-such-mode") })
+	if !strings.Contains(started, refusal) || !strings.Contains(called, refusal) {
+		t.Errorf("startIn said %q and runBelow %q, want the refusal from both", started, called)
 	}
 }
 

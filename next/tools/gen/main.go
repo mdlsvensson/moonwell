@@ -179,12 +179,13 @@ func errFile(path string, cause error) error {
 
 // errInCheckout is a failure of the system on a file or a folder of the checkout, named by its path from the
 // checkout, so that what a run prints holds no path of the checkout. path is what the generator was reading or
-// writing. The failure names what the system's error names, where that lies in the checkout: it is path itself,
-// or the step on the way to it that the system could not take, such as a file at the place of a folder.
+// writing. The failure names what the system's error names, where that lies below the checkout: it is path
+// itself, or the step on the way to it that the system could not take, such as a file at the place of a folder.
+// The checkout's own folder has no path from itself: a failure on it is told of path.
 func errInCheckout(checkout, path string, cause error) error {
 	var failed *fs.PathError
 	if errors.As(cause, &failed) {
-		if below, err := filepath.Rel(checkout, failed.Path); err == nil && filepath.IsLocal(below) {
+		if below, err := filepath.Rel(checkout, failed.Path); err == nil && filepath.IsLocal(below) && below != "." {
 			path = filepath.ToSlash(below)
 		}
 	}
