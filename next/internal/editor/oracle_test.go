@@ -1,18 +1,25 @@
 package editor
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"io"
 	"io/fs"
 	"maps"
+	"math"
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 	"unicode/utf8"
 
+	moonwell "github.com/mdlsvensson/moonwell"
 	oldbundle "github.com/mdlsvensson/moonwell/internal/bundle"
+	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
 	oldeditor "github.com/mdlsvensson/moonwell/internal/editor"
 	oldluasrc "github.com/mdlsvensson/moonwell/internal/luasrc"
 	oldnatives "github.com/mdlsvensson/moonwell/internal/natives"
@@ -67,9 +74,70 @@ import (
 //     (TestOracleOnALinkBelowTheLibraryView). Both trees are handed the same module as values, twice. Of each
 //     step: the paths that were written, all that the view holds, and all that lies behind the link, which
 //     both trees remove as the link. It is skipped where the machine cannot make a link.
+//   - AddFiles of both trees (TestOracleOnAddingTheEditorFiles), on a project laid twice. The other tree takes
+//     the template the program carries where it is handed none, and this tree is handed the files of that
+//     template; any other template is handed to both as the same values. The projects are a .gitignore of each
+//     of 23 kinds (the cases of the other tree's tests among them: with and without a final line break, with the
+//     line ends of Windows, with a byte order mark, with white space around a line, with lines that only look
+//     like an ignore, empty), and 11 projects: new ones, one whose folder is not there, ones that have some of
+//     the files or all, ones that have a folder in the name of a file, and templates that lack a file. Of each
+//     call: what is refused (kind, message, file and hint), what is returned, and all that the project folder
+//     holds, the names of its folders too and each file byte for byte. A project whose first call is compared
+//     whole is given a second, which adds nothing.
+//   - MergeLuarc of both trees (TestOracleOnMergingTheLuarc), in the same way, on a .luarc.json of each of 55
+//     kinds and on 9 projects: the cases of the other tree's tests; text that is no JSON object (nothing, a
+//     value of another kind, comments, a comma after the last member or element, two values, two byte order
+//     marks); no file, a file with every entry, one that lacks each array, one that lacks an entry of each, one
+//     whose array is no list, for each of the three; white space of every kind; a key of the file twice and with
+//     escapes; entries that differ in letter case or a slash, entries with escapes, elements that are no
+//     strings; numbers and strings that are written as the other tree prints them; a folder in the name of the
+//     file; and templates of the test's own, some of which both trees refuse with an error that is no
+//     *diag.Error. Of each call: what is refused, what is returned (the entries and whether the file was
+//     merged), and all that the project folder holds, each file byte for byte.
+//   - AddFiles of both trees on a project with a link at .vscode (TestOracleOnALinkAtTheFolderOfAnEditorFile):
+//     what is returned, all that the project holds, and all that lies behind the link, through which both trees
+//     write the file. It is skipped where the machine cannot make a link.
 //
 // Compared in part, and counted:
 //
+//   - A .luarc.json that the other tree writes again and that holds, in a value or in the order of its keys,
+//     text that the other tree prints in another way than it is written. The other tree reads the file into
+//     values and prints them; this tree keeps the text of every token of a value, an element of one of the three
+//     arrays among them, and the order of the keys. The class
+//     is decided on the file and on the other tree's result: the other tree's file is not the file that was
+//     there, and the tokens of that file, each with the text it is written as (printedOtherwise), hold one of
+//     five kinds, each counted. What is refused, what is returned and every other file are compared whole. This
+//     tree's file must differ from the other tree's; must be the other tree's, byte for byte, once the other
+//     tree has read it and printed it again (otherPrints); and must have the keys of the file that was there
+//     in their order, and under each key the tokens of that file's value, before the entries that were added
+//     to it (keptAsWritten). The kinds, each a case of TestMergeLuarcKeepsTheTextOfEveryValue:
+//     a number whose text is not what the other tree prints for its value, such as 1.0, 1e3, -0, a whole number
+//     above 2^53, or 1e400, for which the other tree prints null ("a number");
+//     a string of a value, a key of an object in a value among them, whose text is not what the other tree
+//     prints for it, such as one with an escape it does not need, or with the escape of half a surrogate pair,
+//     for which the other tree prints U+FFFD ("a string");
+//     an object in a value that has a key twice, of which the other tree keeps the last value, or keys that
+//     look like the indexes of an array, which the other tree puts first and in the order of their numbers
+//     ("an object in a value");
+//     keys of the file itself that look like such indexes ("keys of the file that look like numbers");
+//     bytes that are not UTF-8, for which the other tree writes U+FFFD ("bytes that are not UTF-8").
+//   - A .gitignore with bytes that are not UTF-8, to which a line is added. The other tree decodes the file
+//     and writes U+FFFD for each faulty sequence of bytes; this tree keeps the bytes. The class is decided on
+//     the file and on the other tree's result, which is not the file that was there. What is returned and every
+//     other file are compared whole. This tree's file must start with the bytes that were there, must be the
+//     other tree's once it is decoded the other tree's way, and must differ from it
+//     (TestAddFilesKeepsTheBytesOfAGitignoreThatIsNotUTF8).
+//   - A .gitignore with a line that is an ignore only once white space outside ASCII is taken off it. The other
+//     tree takes off what JavaScript's trim does, U+00A0 and U+FEFF among it, and takes the line to be there;
+//     this tree takes off the white space of ASCII, and adds the line. The class is decided on the file
+//     (hasOuterSpace). Every other file is compared whole. This tree's file must be the other tree's with lines
+//     after it that are all ignores, and what it returns must be what the other tree returns and then
+//     .gitignore with those lines (TestAddFilesTakesOnlyWhiteSpaceOfASCIIOffALineOfGitignore).
+//   - A project in which AddFiles cannot read .gitignore or write a file. The other tree returns the system's
+//     error as it came, which is no *diag.Error; this tree's names the file. The class is decided on the other
+//     tree's error (isOfTheSystem). That both trees fail, what is returned and all that the project holds are
+//     compared whole; this tree's error must be a *diag.Error with the file and a hint
+//     (TestAddFilesReportsAFileItCannotWrite, TestAddFilesReportsAGitignoreItCannotRead).
 //   - The view of a Lua module of a library that holds bytes that are not UTF-8. The other tree decodes the
 //     module and writes U+FFFD in the place of each faulty sequence of bytes; this tree writes the bytes of the
 //     file. The class is decided on the project: a .lua file of a library with such bytes. The paths and the
@@ -127,6 +195,20 @@ import (
 //     (TestRefreshLibraryViewRefusesAModuleWhoseNameNamesNoFileOfTheFolder).
 //   - The projects that the two trees compile to other Lua, or find other modules in: those are compared where
 //     the modules are found and compiled, in script.
+//   - A template whose .luarc.json has, in one of the three arrays, an entry that is no string, or an entry
+//     twice. The other tree adds such an entry as a string of its JSON, with a number printed as JavaScript
+//     prints it, and gives a file without the array an entry as often as the template has it; this tree refuses
+//     the first as a mistake of its caller, and adds an entry once. The template is the program's own, and a
+//     test keeps its arrays (TestMergeLuarcWithATemplateItCannotReadIsAMistakeOfTheCaller,
+//     TestMergeLuarcGivesAnObjectWithoutTheArraysEveryEntryOfTheCarriedTemplate).
+//   - A key of the .luarc.json itself with bytes that are not UTF-8. Both trees read the key and write it again:
+//     the other tree with one U+FFFD for each faulty sequence of bytes, and this tree with one for each faulty
+//     byte (TestMergeLuarcWritesAKeyOfTheFileOnceAndWithTheEscapesItNeeds).
+//   - A .gitignore or a .luarc.json that cannot be written, which both trees refuse, the .luarc.json with the
+//     same words: the test kit holds such a file in a way that not every system honours, so no exact count
+//     could name it (TestAddFilesReportsAGitignoreItCannotWrite, TestMergeLuarcReportsAFileItCannotWrite).
+//   - A link to a file at one of the files, which both trees read and write through, as they do with the link at
+//     .vscode (TestTheScaffoldReadsAndWritesThroughALinkToAFile): not every account may make one.
 
 // same compares two texts byte for byte, and counts. A text that holds nothing compares nothing, and fails.
 func same(t *testing.T, texts *int, what, want, got string) {
@@ -891,5 +973,505 @@ func TestOracleOnALinkBelowTheLibraryView(t *testing.T) {
 	// second is the one that is compared in part.
 	if files != 2*3 || inPart != 1 {
 		t.Errorf("the oracle compared %d files whole and %d projects in part", files, inPart)
+	}
+}
+
+// ---- the scaffold ----
+
+// templatesOfBoth is a template as each tree is handed it. Without one, the other tree is handed none and takes
+// the template the program carries, and this tree is handed the files of that template.
+func templatesOfBoth(t *testing.T, template []moonwell.TemplateFile) (theirs, ours []moonwell.TemplateFile) {
+	t.Helper()
+	if template != nil {
+		return template, template
+	}
+	return nil, carried(t)
+}
+
+// sameButFor compares all that two projects hold, as sameFolders does, but for the file under the name but, of
+// which the names alone are compared. It returns how many files it compared byte for byte.
+func sameButFor(t *testing.T, what string, want, got map[string][]byte, but string) (files int) {
+	t.Helper()
+	oracle.Values(t, what+": what the project holds", slices.Sorted(maps.Keys(want)), slices.Sorted(maps.Keys(got)))
+	for name, data := range want {
+		if data == nil || name == but {
+			continue // a folder, or the file that is compared in part
+		}
+		oracle.Bytes(t, what+": "+name, data, got[name])
+		files++
+	}
+	return files
+}
+
+// addTally counts what the oracle of AddFiles compared.
+type addTally struct {
+	steps      int // calls, of each what is returned and what is refused
+	files      int // files compared byte for byte
+	unworded   int // calls the other tree refuses with the system's error as it came
+	faulty     int // calls on a .gitignore with bytes that are not UTF-8, which the other tree writes again
+	outerSpace int // calls on a .gitignore with white space outside ASCII around a line that is an ignore
+}
+
+// hasOuterSpace reports whether a .gitignore has a line that is one of the ignores once the white space that the
+// other tree knows is taken off it, and is none once the white space of ASCII is: the other tree takes the line
+// to be there, and this tree does not. A byte order mark at the start of the file is no part of its first line.
+func hasOuterSpace(held string) bool {
+	for line := range strings.SplitSeq(strings.TrimPrefix(held, mark), "\n") {
+		if slices.Contains(oldeditor.Ignores, oldtext.Trim(line)) && !slices.Contains(Ignores, strings.Trim(line, " \t\r\v\f")) {
+			return true
+		}
+	}
+	return false
+}
+
+// isOfTheSystem reports whether an error of the other tree is the system's as it came: a failure to read or
+// write a file, which is no *diag.Error there.
+func isOfTheSystem(err error) bool {
+	var failure *fs.PathError
+	var worded *olddiag.Error
+	return errors.As(err, &failure) && !errors.As(err, &worded)
+}
+
+// filesAdded gives both trees one call of AddFiles on the project, and compares it. It reports whether the call
+// was compared whole, and not refused.
+func (f twoFolders) filesAdded(t *testing.T, tally *addTally, what string, template []moonwell.TemplateFile) (whole bool) {
+	t.Helper()
+	held, _ := os.ReadFile(filepath.Join(f.other, ".gitignore"))
+	theirs, ours := templatesOfBoth(t, template)
+	want, wantErr := oldeditor.AddFiles(f.other, theirs)
+	got, gotErr := AddFiles(f.this, ours)
+	tally.steps++
+	wantHeld, gotHeld := heldIn(t, f.other), heldIn(t, f.this)
+	theirIgnores, ourIgnores := string(wantHeld[".gitignore"]), string(gotHeld[".gitignore"])
+	switch {
+	case isOfTheSystem(wantErr):
+		// The other tree's error is not worded for a user; this tree's names the file.
+		oracle.Errors(t, what, wantErr, gotErr)
+		if e := asError(t, gotErr, what); e.File == "" || e.Hint == "" || !strings.Contains(e.Msg, " "+e.File+" failed: ") {
+			t.Errorf("%s: this tree's error is %+v", what, e)
+		}
+		oracle.Values(t, what+": what is returned", want, got)
+		tally.files += sameButFor(t, what, wantHeld, gotHeld, "")
+		tally.unworded++
+	case !utf8.Valid(held) && theirIgnores != string(held):
+		oracle.Refusals(t, what, wantErr, gotErr)
+		oracle.Values(t, what+": what is returned", want, got)
+		tally.files += sameButFor(t, what, wantHeld, gotHeld, ".gitignore")
+		if !strings.HasPrefix(ourIgnores, string(held)) || oldtext.Lossy([]byte(ourIgnores)) != theirIgnores || ourIgnores == theirIgnores {
+			t.Errorf("%s: this tree's .gitignore is %q, and the other tree's %q", what, ourIgnores, theirIgnores)
+		}
+		tally.faulty++
+	case hasOuterSpace(string(held)):
+		oracle.Refusals(t, what, wantErr, gotErr)
+		tally.files += sameButFor(t, what, wantHeld, gotHeld, ".gitignore")
+		// This tree adds the lines that the other tree takes to be there, and names them last.
+		added, wereAdded := strings.CutPrefix(ourIgnores, theirIgnores)
+		lines := strings.Split(strings.TrimSuffix(added, "\n"), "\n")
+		if !wereAdded || len(got) != len(want)+1 || !slices.Equal(got[:len(want)], want) ||
+			got[len(want)] != ".gitignore ("+strings.Join(lines, ", ")+")" || slices.ContainsFunc(lines, isNoIgnore) {
+			t.Errorf("%s: this tree gives %q and the .gitignore %q, and the other tree %q and %q", what, got, ourIgnores, want, theirIgnores)
+		}
+		tally.outerSpace++
+	default:
+		refused := oracle.Refusals(t, what, wantErr, gotErr)
+		oracle.Values(t, what+": what is returned", want, got)
+		tally.files += sameButFor(t, what, wantHeld, gotHeld, "")
+		return !refused
+	}
+	return false
+}
+
+func isNoIgnore(line string) bool { return !slices.Contains(Ignores, line) }
+
+// gitignores is what a project holds as its .gitignore before both trees add the editor files to it.
+var gitignores = []struct{ what, held string }{
+	{"a final line break", "dist/\n"},
+	{"no final line break", "dist/"},
+	{"the line ends of Windows", "dist/\r\n.moonwell/\r\n"},
+	{"the line ends of Windows, and none at the end", "dist/\r\nsrc/**/*.lua"},
+	{"a carriage return alone", "dist/\r.moonwell/\r"},
+	{"a byte order mark before a line that is an ignore", mark + ".moonwell/\nsrc/**/*.lua\n"},
+	{"a byte order mark and white space before a line that is an ignore", mark + " \t.moonwell/\n"},
+	{"a byte order mark alone", mark},
+	{"white space of ASCII around the lines", ".moonwell/  \t\r\n \v\fsrc/**/*.lua\n"},
+	{"a line separator in a line, and a next line in a line", ".moonwell/" + lineSep + "src/**/*.lua\n.moonwell/\xc2\x85\n"},
+	{"lines that start with a slash", "/.moonwell/\n/src/**/*.lua\n"},
+	{"comments that name the ignores", "# .moonwell/\n#src/**/*.lua\n"},
+	{"a line that is negated", "!.moonwell/\n"},
+	{"another letter case, and no slash", ".Moonwell/\n.moonwell\nSRC/**/*.lua\n"},
+	{"an empty file", ""},
+	{"a line break alone", "\n"},
+	{"both lines", ".moonwell/\nsrc/**/*.lua\n"},
+	{"both lines, the last without a line break", "src/**/*.lua\n.moonwell/"},
+	{"characters outside ASCII", "caf" + eAcute + "/\n" + wideSpace + "\n"},
+	// Compared in part.
+	{"bytes that are not UTF-8", "caf\xe9/\n\xe2\x82\n.moonwell/\n\xff"},
+	{"bytes that are not UTF-8, and no line to add", "\xff\n.moonwell/\nsrc/**/*.lua\n"},
+	{"a space that does not break around the lines", ".moonwell/" + noBreak + "\n" + noBreak + "src/**/*.lua\n"},
+	{"a byte order mark that is not at the start of the file", "dist/\n" + mark + ".moonwell/\nsrc/**/*.lua" + mark + "\n"},
+}
+
+func TestOracleOnAddingTheEditorFiles(t *testing.T) {
+	var compared addTally
+	// Each project is given the files twice where the first call is compared whole: the second adds nothing.
+	twiceAdded := func(project twoFolders, what string, template []moonwell.TemplateFile) {
+		t.Helper()
+		if project.filesAdded(t, &compared, what, template) {
+			project.filesAdded(t, &compared, what+", a second time", template)
+		}
+	}
+	for _, g := range gitignores {
+		twiceAdded(twice(t, ".gitignore", g.held), "a .gitignore with "+g.what, smallTemplate)
+	}
+	every := []string{"yueconfig.yue", "mine\n", ".luarc.json", "{}", ".vscode/extensions.json", "", ".gitignore", ".moonwell/\nsrc/**/*.lua\n"}
+	projects := []struct {
+		what     string
+		project  twoFolders
+		template []moonwell.TemplateFile // nil is the template the program carries
+	}{
+		{"a new project, and the template the program carries", twice(t), nil},
+		{"a new project", twice(t), smallTemplate},
+		{"a folder that is not there", twoFolders{filepath.Join(t.TempDir(), "none", "deeper"), filepath.Join(t.TempDir(), "none", "deeper")}, nil},
+		{"a project with a file of its own", twice(t, ".luarc.json", "mine\n", ".gitignore", "dist/\r\n.moonwell/\r\n"), smallTemplate},
+		{"a project with every file", twice(t, every...), smallTemplate},
+		{"a project with every file, and a template without a file", twice(t, every...), []moonwell.TemplateFile{}},
+		{"folders in the names of two files", twice(t, "yueconfig.yue/kept.txt", "mine", ".luarc.json/kept.txt", "mine"), smallTemplate},
+		{"a template without the last file", twice(t), smallTemplate[:2]},
+		{"a template without a file", twice(t, "yueconfig.yue", "mine\n"), []moonwell.TemplateFile{}},
+		// Compared in part: the other tree's error is the system's.
+		{"a file in the name of the folder of a file", twice(t, ".vscode", "a file, not a folder"), smallTemplate},
+		{"a folder in the name of .gitignore", twice(t, ".gitignore/kept.txt", "mine"), smallTemplate},
+	}
+	for _, p := range projects {
+		twiceAdded(p.project, p.what, p.template)
+	}
+	// Of the 23 files, 20 are compared whole, in 2 calls each with 4 files, and 3 in part, in 1 call with 3 files
+	// beside the .gitignore: 1 with bytes that are not UTF-8, the other of the two being one that neither tree
+	// writes again, and 2 with white space outside ASCII. Of the 11 projects, 7 are compared whole in 2 calls
+	// each with 4 files; 2 are refused by both trees for their template, with 2 files and 1; and 2 are refused
+	// by the other tree with the system's error, with 3 files and 4.
+	want := addTally{steps: 20*2 + 3 + 7*2 + 2 + 2, files: 20*2*4 + 3*3 + 7*2*4 + 2 + 1 + 3 + 4, unworded: 2, faulty: 1, outerSpace: 2}
+	if compared != want {
+		t.Errorf("the oracle compared %+v, want %+v", compared, want)
+	}
+}
+
+// mergeTally counts what the oracle of MergeLuarc compared.
+type mergeTally struct {
+	steps   int // calls, of each what is returned and what is refused
+	files   int // files compared byte for byte
+	inPart  int // files compared in part, each of one kind or more of the kinds below
+	numbers int // of those, the files with a number that the other tree prints in another form
+	texts   int // with a string of a value that the other tree prints with other escapes
+	objects int // with an object in a value that has a key twice, or keys the other tree puts in another order
+	orders  int // with keys of the file itself that the other tree puts in another order
+	faulty  int // with bytes that are not UTF-8
+}
+
+// luarcKinds names what a .luarc.json holds that the other tree prints in another way than it is written.
+type luarcKinds struct{ number, text, object, order, faulty bool }
+
+// otherNumber is a number as the other tree prints it once it has read it.
+func otherNumber(written json.Number) string {
+	value, _ := strconv.ParseFloat(string(written), 64)
+	if math.IsInf(value, 0) {
+		return "null"
+	}
+	return oldtext.Number(value)
+}
+
+// noteKeys looks at the keys of an object that has ended, in the order they are written: those of the file
+// itself, which both trees read and write again, or those of an object in a value.
+func (k *luarcKinds) noteKeys(keys []string, ofTheFile bool) {
+	var theirs ordered.Map[bool]
+	var ours manifest.Ordered[bool]
+	for _, key := range keys {
+		theirs.Set(key, true)
+		ours.Set(key, true)
+	}
+	if ofTheFile {
+		k.order = k.order || !slices.Equal(theirs.Keys(), ours.Keys())
+	} else {
+		k.object = k.object || !slices.Equal(theirs.Keys(), keys)
+	}
+}
+
+// printedOtherwise reads the tokens of a .luarc.json that is a JSON object, each with the text it is written as,
+// and names what the other tree prints in another way than it is written. The text is read as the other tree
+// decodes it, so bytes that are not UTF-8 are a kind of their own, and no string with other escapes.
+func printedOtherwise(t *testing.T, held []byte) (kinds luarcKinds) {
+	t.Helper()
+	type level struct {
+		isObject, atKey bool
+		keys            []string
+	}
+	var open []level
+	text := oldtext.Decode(held)
+	kinds.faulty = !utf8.Valid(held)
+	decoder := json.NewDecoder(strings.NewReader(text))
+	decoder.UseNumber()
+	for at := int64(0); ; at = decoder.InputOffset() {
+		token, err := decoder.Token()
+		if err == io.EOF {
+			return kinds
+		}
+		if err != nil {
+			t.Fatalf("%v in %q", err, text)
+		}
+		written := strings.TrimLeft(text[at:decoder.InputOffset()], " \t\r\n,:")
+		depth := len(open)
+		isKey := depth > 0 && open[depth-1].isObject && open[depth-1].atKey
+		switch value := token.(type) {
+		case json.Delim:
+			if value == '{' || value == '[' {
+				open = append(open, level{isObject: value == '{', atKey: true})
+				continue
+			}
+			if open[depth-1].isObject {
+				kinds.noteKeys(open[depth-1].keys, depth == 1)
+			}
+			open = open[:depth-1]
+		case json.Number:
+			kinds.number = kinds.number || written != otherNumber(value)
+		case string:
+			// A key of the file itself is read and written again by both trees.
+			if !isKey || depth > 1 {
+				kinds.text = kinds.text || written != oldtext.Quote(value)
+			}
+			if isKey {
+				open[depth-1].keys = append(open[depth-1].keys, value)
+				open[depth-1].atKey = false
+				continue
+			}
+		}
+		// A value has ended: the object it is in comes to its next key.
+		if len(open) > 0 {
+			open[len(open)-1].atKey = true
+		}
+	}
+}
+
+// otherPrints is a .luarc.json as the other tree prints it once it has read it.
+func otherPrints(t *testing.T, held []byte) string {
+	t.Helper()
+	tree, err := ordered.Decode([]byte(oldtext.Decode(held)))
+	if err != nil {
+		t.Errorf("the other tree does not read %q: %v", held, err)
+		return ""
+	}
+	return ordered.Stringify(tree, 2) + "\n"
+}
+
+// keptAsWritten fails the test unless this tree's .luarc.json has the keys of the file it was, in their order
+// and before any other, and under each key the value of that file with the text of every token, whatever the
+// white space between the tokens. One of the three arrays may have more elements after those it had.
+func keptAsWritten(t *testing.T, what, held, ours string) {
+	t.Helper()
+	before, after := membersOf(t, held), membersOf(t, ours)
+	if keys := after.Keys(); len(keys) < before.Len() || !slices.Equal(keys[:before.Len()], before.Keys()) {
+		t.Errorf("%s: this tree's .luarc.json has the keys %q, and the file had %q", what, keys, before.Keys())
+	}
+	for key, value := range before.All() {
+		written, _ := after.Get(key)
+		was, is := onOneLine(value), onOneLine(written)
+		if slices.Contains(LuarcArrays, key) && strings.HasPrefix(was, "[") {
+			// Without the bracket that ends each of the two, and without the elements that were added.
+			was = strings.TrimSuffix(was, "]")
+			is = is[:min(len(is), len(was))]
+		}
+		oracle.Bytes(t, what+": the value of "+key+" on one line", []byte(was), []byte(is))
+	}
+}
+
+// merged is what MergeLuarc returns, but for its error.
+type merged struct {
+	Added  []string
+	Merged bool
+}
+
+// luarcMerged gives both trees one call of MergeLuarc on the project, and compares it. It reports whether the
+// call was compared whole, and not refused.
+func (f twoFolders) luarcMerged(t *testing.T, tally *mergeTally, what string, template []moonwell.TemplateFile) (whole bool) {
+	t.Helper()
+	held, heldErr := os.ReadFile(filepath.Join(f.other, ".luarc.json"))
+	theirs, ours := templatesOfBoth(t, template)
+	want, wantMerged, wantErr := oldeditor.MergeLuarc(f.other, theirs)
+	got, gotMerged, gotErr := MergeLuarc(f.this, ours)
+	tally.steps++
+	refused := oracle.Refusals(t, what, wantErr, gotErr)
+	oracle.Values(t, what+": what is returned", merged{want, wantMerged}, merged{got, gotMerged})
+	wantHeld, gotHeld := heldIn(t, f.other), heldIn(t, f.this)
+	theirFile, ourFile := wantHeld[".luarc.json"], gotHeld[".luarc.json"]
+	var kinds luarcKinds
+	if heldErr == nil && !bytes.Equal(theirFile, held) {
+		// The other tree wrote the file again.
+		kinds = printedOtherwise(t, held)
+	}
+	if kinds == (luarcKinds{}) {
+		tally.files += sameButFor(t, what, wantHeld, gotHeld, "")
+		return !refused
+	}
+	tally.files += sameButFor(t, what, wantHeld, gotHeld, ".luarc.json")
+	// This tree's file is not the other tree's, and is the other tree's once the other tree has read it and
+	// printed it again.
+	if bytes.Equal(ourFile, theirFile) || otherPrints(t, ourFile) != string(theirFile) {
+		t.Errorf("%s: this tree's .luarc.json is %q, and the other tree's %q", what, ourFile, theirFile)
+	}
+	keptAsWritten(t, what, string(held), string(ourFile))
+	tally.inPart++
+	for _, kind := range []struct {
+		is    bool
+		count *int
+	}{{kinds.number, &tally.numbers}, {kinds.text, &tally.texts}, {kinds.object, &tally.objects}, {kinds.order, &tally.orders}, {kinds.faulty, &tally.faulty}} {
+		if kind.is {
+			*kind.count++
+		}
+	}
+	return false
+}
+
+// everyEntry is the members of a .luarc.json that holds every entry of the carried template's arrays, without the
+// braces around them.
+const everyEntry = `"runtime.path":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"],` +
+	`"workspace.library":[".moonwell/types",".moonwell/lua"],"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]`
+
+// luarcs is what a project holds as its .luarc.json before both trees merge the carried template into it.
+var luarcs = []struct{ what, held string }{
+	// The cases of the other tree's tests.
+	{"entries that are lacking, and a key of its own", `{"runtime.path":["src/?.lua"],"workspace.library":[".moonwell/types","extra"],` +
+		`"workspace.ignoreDir":["dist","maps"],"diagnostics.globals":["X"]}`},
+	{"a comment", "// a comment\n{ \"runtime.path\": [] }\n"},
+	{"an array", "[]"},
+	{"null", "null"},
+	{"a number", "3"},
+	{"a value that is no array", `{"workspace.library":"not an array"}`},
+	{"a byte order mark", mark + `{"runtime.path":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"]}`},
+	// Text that is no JSON object.
+	{"nothing", ""},
+	{"white space alone", " \n"},
+	{"a string", `"text"`},
+	{"true", "true"},
+	{"two objects", "{} {}"},
+	{"a brace too many", "{}}"},
+	{"a brace too few", "{"},
+	{"a comma after the last member", "{ \"runtime.path\": [], }"},
+	{"a comma after the last element", "{ \"runtime.path\": [\"src/?.lua\",] }"},
+	{"a comment inside", "{ /* a comment */ }"},
+	{"keys in single quotes", "{'runtime.path': []}"},
+	{"two byte order marks", mark + mark + "{}"},
+	// Objects.
+	{"no members", "{}"},
+	{"no members, and white space around", " \r\n{\n} \r\n\t"},
+	{"every entry", "{" + everyEntry + "}"},
+	{"every entry, and a number in a form of its own", "{" + everyEntry + `,"n":1.0}`},
+	{"one entry lacking", "{" + lackingOne + "}"},
+	{"no runtime.path", `{"workspace.library":[".moonwell/types",".moonwell/lua"],"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`},
+	{"no workspace.library", `{"runtime.path":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"],"workspace.ignoreDir":["dist","maps"]}`},
+	{"no workspace.ignoreDir", `{"x":true,"runtime.path":["lua/?.lua"],"workspace.library":[]}`},
+	{"an entry lacking of each array", `{"runtime.path":["src/?.lua","src/?/init.lua","lua/?/init.lua"],"workspace.library":[".moonwell/lua"],` +
+		`"workspace.ignoreDir":[".moonwell/libraries","maps"]}`},
+	{"arrays without elements", `{"runtime.path":[],"workspace.library":[],"workspace.ignoreDir":[],"e":[],"o":{}}`},
+	{"a runtime.path that is null", `{"runtime.path":null}`},
+	{"a workspace.library that is an object", `{"workspace.library":{"a":[".moonwell/lua"]},"workspace.ignoreDir":["dist"]}`},
+	{"a workspace.ignoreDir that is a number", `{"workspace.ignoreDir":3,"runtime.path":["src/?.lua"]}`},
+	{"three values that are no arrays", `{"runtime.path":null,"workspace.library":{"a":1},"workspace.ignoreDir":3}`},
+	{"white space of every kind, and the line ends of Windows",
+		"{\r\n\t" + lackingOne + ",\r\n\t\"o\" : { \"a\" : [ ] , \"b\" : { } , \"c\":[1 , 2,[\n]] }\r\n}\r\n\r\n"},
+	{"white space in the three arrays", "{ \"runtime.path\" : [ \"src/?.lua\" ,\r\n\t\"lua/?.lua\" ] , \"workspace.library\" : [\n] ,\n" +
+		" \"workspace.ignoreDir\" :\t[ \"dist\" ] }"},
+	{"values of every kind", "{" + lackingOne + `,"a":null,"b":true,"c":false,"d":0,"e":-12.5,"f":"","g":[[],{}],"h":{"i":{"j":[1,"k"]}}}`},
+	{"a key of the file twice", `{"x":1,"runtime.path":["a"],` + lackingOne + `,"x":2}`},
+	{"a key of the file with escapes", `{"` + escapeU + `00e9\/<` + escapeU + `2028` + lineSep + `\"\\` + escapeU + `0001\b` + escapeU + `007f":1,` + lackingOne + `}`},
+	{"a key of an array with an escape", `{"runtime` + escapeU + `002epath":["src/?.lua"],"workspace.library":[],"workspace.ignoreDir":[]}`},
+	{"entries in another letter case, with a slash at the end, with a backslash", `{"runtime.path":["SRC/?.lua","src/?/init.lua/",` +
+		`"lua\\?.lua","lua/?/init.lua"],"workspace.library":[".moonwell/types/",".Moonwell/lua"],"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`},
+	{"entries with escapes, and none lacking", `{"runtime.path":["src\/?.lua","src/?/init.lua","lua/?.lua","lua/?/` + escapeU + `0069nit.lua"],` +
+		`"workspace.library":[".moonwell/types",".moonwell/lua"],"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`},
+	{"elements that are no strings", `{"runtime.path":[1,null,{"a":1},["src/?.lua"],true],"workspace.library":[".moonwell/types",".moonwell/lua"],` +
+		`"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`},
+	{"an entry twice", `{"runtime.path":["src/?.lua","src/?.lua"],"workspace.library":[".moonwell/lua",".moonwell/types",".moonwell/lua"],` +
+		`"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`},
+	{"strings that are written as the other tree prints them", "{" + lackingOne + `,"s":["` + eAcute + `","/","<","&",">","` + lineSep +
+		`","` + replaced + "\",\"\x7f\",\"" + escapeU + `0001","\b","\f","\n","\r","\t","\\","\""]}`},
+	{"numbers that are written as the other tree prints them", "{" + lackingOne + `,"n":[0,1,-1,1.5,-0.1,1e+21,1.5e-7,9007199254740992,123456789012345680000]}`},
+	// Compared in part.
+	{"numbers in forms of their own", "{" + lackingOne + `,"n":[1.0,1e3,1E+2,-0,0.10,9007199254740993,0.1234567890123456789,1e400,-1e-7,100000000000000000000000]}`},
+	{"a zero with a sign", "{" + lackingOne + `,"n":-0}`},
+	{"strings with escapes of their own", "{" + lackingOne + `,"s":["` + escapeU + `00e9","\/","` + escapeU + `003c","` + escapeU + `2028","` +
+		escapeU + `d800","` + escapeU + `007f","` + escapeU + `0008","` + escapeU + `D83D` + escapeU + `DE00"]}`},
+	{"an entry with an escape, and one lacking", `{"runtime.path":["src\/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"],` +
+		`"workspace.library":[".moonwell/types",".moonwell/lua"],"workspace.ignoreDir":["dist","maps"]}`},
+	{"a key twice in an object of a value", "{" + lackingOne + `,"o":{"x":1,"y":3,"x":2}}`},
+	{"keys that look like numbers in an object of a value", "{" + lackingOne + `,"o":[{"b":1,"10":2,"2":3}]}`},
+	{"a key with an escape in an object of a value", "{" + lackingOne + `,"o":{"\/":1}}`},
+	{"keys of the file that look like numbers", `{"b":1,"10":2,"2":3,` + lackingOne + `,"0":4}`},
+	{"bytes that are not UTF-8 in a value", "{" + lackingOne + ",\"s\":\"a\xff\xe2\x82 b\xc3\",\"t\":[\"\xff\"]}"},
+	{"a number, a string, an object and bytes of their own at once", `{"7":1.0,"1":"\/",` + lackingOne + ",\"o\":{\"x\":1,\"x\":\"\xff\"}}"},
+}
+
+func TestOracleOnMergingTheLuarc(t *testing.T) {
+	var compared mergeTally
+	// Each project is merged twice where the first call is compared whole: the second adds nothing.
+	twiceMerged := func(project twoFolders, what string, template []moonwell.TemplateFile) {
+		t.Helper()
+		if project.luarcMerged(t, &compared, what, template) {
+			project.luarcMerged(t, &compared, what+", a second time", template)
+		}
+	}
+	for _, l := range luarcs {
+		twiceMerged(twice(t, ".luarc.json", l.held, "src/main.yue", "print 1\n"), "a .luarc.json with "+l.what, nil)
+	}
+	own := luarcOnly(mark + `{"runtime.path":["a","b"],"workspace.library":["c"],"workspace.ignoreDir":[],"other":["d"]}`)
+	projects := []struct {
+		what     string
+		project  twoFolders
+		template []moonwell.TemplateFile // nil is the template the program carries
+	}{
+		{"no .luarc.json", twice(t, "src/main.yue", "print 1\n"), nil},
+		{"no .luarc.json, and no project", twoFolders{filepath.Join(t.TempDir(), "none"), filepath.Join(t.TempDir(), "none")}, nil},
+		{"no .luarc.json, and a template without one", twice(t), []moonwell.TemplateFile{}},
+		{"a folder in the name of .luarc.json", twice(t, ".luarc.json/kept.txt", "mine"), nil},
+		{"a template of its own", twice(t, ".luarc.json", `{"runtime.path":["b"]}`), own},
+		{"a template of its own, and a file that is no object", twice(t, ".luarc.json", "[]"), own},
+		// Both trees refuse a template that is not Moonwell's with an error that is no *diag.Error.
+		{"a template without the file", twice(t, ".luarc.json", "{}"), []moonwell.TemplateFile{}},
+		{"a template whose file has no arrays", twice(t, ".luarc.json", "{}"), smallTemplate},
+		{"a template whose file is no object", twice(t, ".luarc.json", "[]"), luarcOnly("[]")},
+	}
+	for _, p := range projects {
+		twiceMerged(p.project, p.what, p.template)
+	}
+	// Of the 55 files, each beside one other file, 45 are compared whole in 2 calls each, and 10 in part in 1
+	// call: the last 10 of the list, of which the very last is of every kind at once. Of the 9 projects, 5 are
+	// compared whole in 2 calls each, with 1 file, none, none, 1 and 1; and 4 are refused by both trees in 1
+	// call, with 1 file each.
+	want := mergeTally{
+		steps: 45*2 + 10 + 5*2 + 4, files: 45*2*2 + 10 + 3*2 + 4,
+		inPart: 10, numbers: 2 + 1, texts: 3 + 1, objects: 2 + 1, orders: 1 + 1, faulty: 1 + 1,
+	}
+	if compared != want {
+		t.Errorf("the oracle compared %+v, want %+v", compared, want)
+	}
+}
+
+// TestOracleOnALinkAtTheFolderOfAnEditorFile is skipped where the machine cannot make a link.
+func TestOracleOnALinkAtTheFolderOfAnEditorFile(t *testing.T) {
+	project, behind := linkedTwice(t, ".vscode", "settings.json", "{}")
+	files := 0
+	for step, added := range []int{4, 0} {
+		what := []string{"a link at .vscode", "a link at .vscode, a second time"}[step]
+		want, wantErr := oldeditor.AddFiles(project.other, smallTemplate)
+		got, gotErr := AddFiles(project.this, smallTemplate)
+		if wantErr != nil || gotErr != nil || len(want) != added {
+			t.Errorf("%s: the other tree added %q (%v), and this tree gives %v", what, want, wantErr, gotErr)
+		}
+		oracle.Values(t, what+": what is returned", want, got)
+		files += sameFolders(t, what+": the project", project.other, project.this)
+		files += sameFolders(t, what+": behind the link", behind[0], behind[1])
+	}
+	// After each of the 2 calls the project holds 4 files and the link, which is held as a file, and 2 files lie
+	// behind the link: the one that was laid there, and the one both trees write through the link.
+	if files != 2*(5+2) {
+		t.Errorf("the oracle compared %d files", files)
 	}
 }

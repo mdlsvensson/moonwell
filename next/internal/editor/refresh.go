@@ -1,13 +1,14 @@
 // Package editor writes the files a code editor reads: the declarations lua-language-server learns the game's
-// API, the project's objects and the map's globals from; the libraries' modules as Lua; and the files a new
-// project is given.
+// API, the project's objects and the map's globals from; the libraries' modules as Lua; and the editor files of
+// the project's own, where a project lacks them.
 //
 // It takes what objects and script found, and a project folder. RefreshTypes takes the resolved objects, what
 // the map's script defines, the name of that script and the game's API (script.LoadNatives), and writes the
 // declarations; RefreshLibraryView takes the modules and a way to each module's Lua, clears .moonwell/lua/ of
 // all that is no module's, and writes the libraries' modules there. Both write under .moonwell/ and return the
-// paths they wrote, from the project folder. The scaffold takes the template's files, and writes the project's
-// own editor files.
+// paths they wrote, from the project folder. AddFiles and MergeLuarc, the scaffold, take the template's files
+// (moonwell.TemplateFiles) and bring the project's own editor files up to date: yueconfig.yue, .luarc.json,
+// .vscode/extensions.json and the lines of .gitignore. They return what they added.
 //
 // It knows nothing of maps or of builds: it reads no map, evaluates no manifest and compiles nothing. What a
 // map's script defines and what a module compiles to are handed to it.
