@@ -46,7 +46,11 @@ type Result struct {
 // the gameplay is compiled against, and compiles it: the objects are planned first, so that invalid objects fail
 // ahead of the slow steps and the ids module the gameplay imports is current. The lower half plans the map: the
 // object files, the settings, the assets and last the program, each on the map as the steps above it leave it.
-// Plan logs nothing: the command says what became of the plan.
+// The steps that are more than a call are in steps.go.
+//
+// Plan itself logs nothing. Its steps log what they meet on the way, such as a library that is fetched, a
+// compiler that is downloaded, and an unknown global that is only a warning. Build, Test and Check say what
+// became of the plan: sayStaged in stage.go, packInto in archive.go, and sayChecked below.
 func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*Result, error) {
 	source, err := Source(p) // maps/<map.folder>, opened one way by every command
 	if err != nil {

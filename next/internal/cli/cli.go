@@ -50,6 +50,11 @@ type command struct {
 }
 
 // commands is every command Moonwell has, in the order the usage text lists them.
+//
+// A new command is a row here, and a function in a file of its own. A command that plans a build is a
+// door of package build and a file here that calls it, as build.go calls build.Build; any other command is a
+// file here that opens the project with build.Load and build.Source and calls its area, as settings.go calls
+// settings.Plan.
 var commands = []command{
 	{name: "init", usage: "init <dir> [--link]", help: "Create a project (--link: use this local Moonwell checkout)",
 		takes: arity{most: 1, without: errInitNeedsAFolder}, run: runInit},
