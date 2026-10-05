@@ -80,10 +80,16 @@ func Source(p *manifest.Project) (*mapdir.Folder, error) {
 // maps/, and is refused with the manifest as its file. No ".." is resolved against the part before it.
 func mapFolder(p *manifest.Project) (string, error) {
 	parts := partsOf(p.Map.Folder)
-	if startsAtARoot(p.Map.Folder) || len(parts) == 0 || slices.Contains(parts, "..") {
+	if leavesItsFolder(p.Map.Folder, parts) || len(parts) == 0 {
 		return "", errNotInsideMaps(p.File, p.Map.Folder)
 	}
 	return strings.Join(parts, "/"), nil
+}
+
+// leavesItsFolder reports whether a path, as a manifest writes one, is no path from the folder it is written
+// for: one that starts at a root, and one of whose parts, which are partsOf it, is "..".
+func leavesItsFolder(written string, parts []string) bool {
+	return startsAtARoot(written) || slices.Contains(parts, "..")
 }
 
 // partsOf is the parts of a path as a manifest writes one: what stands between its separators, "/" and "\",

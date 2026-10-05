@@ -6,6 +6,7 @@ package build
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/mdlsvensson/moonwell/next/internal/assets"
 	"github.com/mdlsvensson/moonwell/next/internal/env"
@@ -88,4 +89,115 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 	}
 	view = view.With(bundle)
 	return &Result{Map: view, Objects: objs, Settings: set, Assets: imported, Replaced: replaced, Program: program}, nil
+}
+
+// Build builds <build.folder>/<map.folder> and returns the archive's path. A failed build leaves no archive.
+//
+// Build, Test and Check evaluate the manifest before they take the lock, so that a command outside a project
+// makes no dist folder there.
+//
+// The archive of the build before is removed under the lock, before anything is planned; no step before the
+// last writes at its place, and the last removes what it wrote of an archive that it could not write whole.
+func Build(ctx context.Context, e *env.Env, opts Options) (archive string, err error) {
+	p, err := Load(ctx, e)
+	if err != nil {
+		return "", err
+	}
+	release, err := Acquire(e.Root)
+	if err != nil {
+		return "", err
+	}
+	defer release()
+	out, err := clearedArchive(p) // <build.folder>/<map.folder>, with no archive there
+	if err != nil {
+		return "", err
+	}
+	plan, err := Plan(ctx, e, p, opts)
+	if err != nil {
+		return "", err
+	}
+	if _, err := stage(e, p, plan); err != nil { // dist/stage/<map.folder>
+		return "", err
+	}
+	if err := packInto(e, plan, out); err != nil {
+		return "", err
+	}
+	return out.file, nil
+}
+
+// Test stages the map as a folder and starts Warcraft III on it. The map is staged before the game is looked
+// for, so a project without a game set has a stage to look at.
+func Test(ctx context.Context, e *env.Env, opts Options) error {
+	p, err := Load(ctx, e)
+	if err != nil {
+		return err
+	}
+	release, err := Acquire(e.Root)
+	if err != nil {
+		return err
+	}
+	defer release()
+	plan, err := Plan(ctx, e, p, opts)
+	if err != nil {
+		return err
+	}
+	staged, err := stage(e, p, plan) // dist/stage/<map.folder>
+	if err != nil {
+		return err
+	}
+	if err := launch(e, p.Launch, staged.file); err != nil {
+		return err
+	}
+	e.Log.Info("Launched Warcraft III with " + staged.label + ".")
+	return nil
+}
+
+// Check plans a build and stages nothing: it says what a build would hold, or why there would be none. It
+// leaves the ids module alone, and fails when that is not current.
+func Check(ctx context.Context, e *env.Env) (*Result, error) {
+	p, err := Load(ctx, e)
+	if err != nil {
+		return nil, err
+	}
+	release, err := Acquire(e.Root)
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+	plan, err := Plan(ctx, e, p, Options{KeepGenerated: true})
+	if err != nil {
+		return nil, err
+	}
+	sayChecked(e.Log, plan)
+	return plan, nil
+}
+
+// check is Check with the Pkl program given: for a command that checks again and again, and looks for Pkl once.
+// With refresh it writes the ids module, as a build does, where Check fails for a module that is not current.
+func check(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, error) {
+	p, err := loadWith(ctx, e, pkl)
+	if err != nil {
+		return nil, err
+	}
+	release, err := Acquire(e.Root)
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+	plan, err := Plan(ctx, e, p, Options{KeepGenerated: !refresh})
+	if err != nil {
+		return nil, err
+	}
+	sayChecked(e.Log, plan)
+	return plan, nil
+}
+
+// sayChecked logs what a planned build holds, for a check: the lines that say which of a library's files the
+// map's own replace, and the count of the modules and of the assets.
+func sayChecked(log *env.Logger, plan *Result) {
+	for _, line := range plan.Replaced {
+		log.Info(line)
+	}
+	log.Info("Check passed: " + strconv.Itoa(len(plan.Program.Modules)) + " module(s) reachable from " +
+		plan.Program.Entry + ", " + strconv.Itoa(len(plan.Assets.Assets)) + " asset(s).")
 }
