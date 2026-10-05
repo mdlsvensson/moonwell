@@ -372,9 +372,8 @@ func TestInsideAFolderOfModulesALinkToAFileIsReadAndALinkToAFolderIsNotEntered(t
 
 	elsewhere := files("real.lua", "return 'through the link'\n", "real.yue", "x = 3\n").lay(t)
 	for link, target := range map[string]string{"lua/through.lua": "real.lua", "src/also.yue": "real.yue"} {
-		if err := os.Symlink(filepath.Join(elsewhere, target), filepath.Join(root, filepath.FromSlash(link))); err != nil {
-			t.Skipf("cannot create a symlink to a file here: %v", err)
-		}
+		// Skipped where Windows keeps the right to make such a link from this account, and for that alone.
+		testkit.LinkFile(t, filepath.Join(elsewhere, target), filepath.Join(root, filepath.FromSlash(link)))
 	}
 	want := []Source{
 		{Name: "also", Path: "src/also.yue", Kind: Yue},

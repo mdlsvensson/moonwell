@@ -118,7 +118,8 @@ import (
 //     writes it through, which makes a file outside the project when the link leads nowhere; this tree refuses
 //     the link before it removes or downloads anything. Decided and compared as the two classes before it. A
 //     link to a folder is among the links; links to a file and to nothing have an oracle of their own, which is
-//     skipped where the machine cannot make such a link (TestReadLockRefusesALinkInTheLocksPlace,
+//     skipped where the account has not the right to make such a link, and for that alone: any other link
+//     that cannot be made fails its oracle (TestReadLockRefusesALinkInTheLocksPlace,
 //     TestWriteLockRefusesALinkInTheLocksPlace,
 //     TestALinkInTheLocksPlaceIsRefusedBeforeAnythingIsRemovedOrDownloaded).
 //   - A tag that both trees download and fail to write over a library that is there. This tree removes the stamp
@@ -1819,13 +1820,11 @@ func linkScenarios(t *testing.T, home string) []syncScenario {
 }
 
 // linkedFile makes a link to a file, or to nothing where there is no such file. Both are paths below the folder
-// the project lies in. The test is skipped where the machine cannot make the link.
+// the project lies in. The test is skipped where the account has not the right to make the link, which only
+// Windows keeps from one, and fails for any other link that cannot be made (testkit.LinkFile).
 func linkedFile(link, target string) func(*testing.T, string) {
 	return func(t *testing.T, home string) {
-		err := os.Symlink(filepath.Join(home, filepath.FromSlash(target)), filepath.Join(home, filepath.FromSlash(link)))
-		if err != nil {
-			t.Skipf("cannot create a symlink here: %v", err)
-		}
+		testkit.LinkFile(t, filepath.Join(home, filepath.FromSlash(target)), filepath.Join(home, filepath.FromSlash(link)))
 	}
 }
 
@@ -1852,8 +1851,8 @@ func linkedLockScenarios(t *testing.T) []syncScenario {
 	}
 }
 
-// TestOracleOnSyncingAProjectWithALinkedLock needs links to files, which Windows lets only some users make: it
-// is skipped where the machine cannot make one.
+// TestOracleOnSyncingAProjectWithALinkedLock needs links to files, which Windows lets only some accounts make: it
+// is skipped where this account has not the right to, and fails for any other link that cannot be made.
 func TestOracleOnSyncingAProjectWithALinkedLock(t *testing.T) {
 	t.Parallel()
 	var compared tally

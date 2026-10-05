@@ -73,7 +73,7 @@ import (
 //   - RefreshLibraryView of both trees on a project with a link below .moonwell/lua/ that is in no view's way
 //     (TestOracleOnALinkBelowTheLibraryView). Both trees are handed the same module as values, twice. Of each
 //     step: the paths that were written, all that the view holds, and all that lies behind the link, which
-//     both trees remove as the link. It is skipped where the machine cannot make a link.
+//     both trees remove as the link. It fails where the link, which is to a folder, cannot be made.
 //   - AddFiles of both trees (TestOracleOnAddingTheEditorFiles), on a project laid twice. The other tree takes
 //     the template the program carries where it is handed none, and this tree is handed the files of that
 //     template; any other template is handed to both as the same values. The projects are a .gitignore of each
@@ -98,7 +98,7 @@ import (
 //     of entries, by the key of their array.
 //   - AddFiles of both trees on a project with a link at .vscode (TestOracleOnALinkAtTheFolderOfAnEditorFile):
 //     what is returned, all that the project holds, and all that lies behind the link, through which both trees
-//     write the file. It is skipped where the machine cannot make a link.
+//     write the file. It fails where the link, which is to a folder, cannot be made.
 //
 // Compared in part, and counted:
 //
@@ -945,7 +945,7 @@ func linkedTwice(t *testing.T, link string, pairs ...string) (project twoFolders
 	return project, behind
 }
 
-// TestOracleOnALinkBelowTheLibraryView is skipped where the machine cannot make a link.
+// TestOracleOnALinkBelowTheLibraryView fails where its link, which is to a folder, cannot be made.
 func TestOracleOnALinkBelowTheLibraryView(t *testing.T) {
 	theirs, ours := greetOfBoth()
 	files, inPart := 0, 0
@@ -1505,7 +1505,7 @@ func TestOracleOnMergingTheLuarc(t *testing.T) {
 	}
 }
 
-// TestOracleOnALinkAtTheFolderOfAnEditorFile is skipped where the machine cannot make a link.
+// TestOracleOnALinkAtTheFolderOfAnEditorFile fails where its link, which is to a folder, cannot be made.
 func TestOracleOnALinkAtTheFolderOfAnEditorFile(t *testing.T) {
 	project, behind := linkedTwice(t, ".vscode", "settings.json", "{}")
 	files := 0

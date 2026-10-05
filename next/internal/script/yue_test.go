@@ -847,9 +847,8 @@ func TestASourceThatIsALinkIsCompiledThroughIt(t *testing.T) {
 	// link.
 	b := benchOf(t, mainOnly.and("elsewhere/real.yue", "x = 'behind the link'\n"))
 	at := filepath.Join(b.root, "src", "linked.yue")
-	if err := os.Symlink(filepath.Join(b.root, "elsewhere", "real.yue"), at); err != nil {
-		t.Skipf("cannot create a symlink to a file here: %v", err)
-	}
+	// Skipped where Windows keeps the right to make such a link from this account, and for that alone.
+	testkit.LinkFile(t, filepath.Join(b.root, "elsewhere", "real.yue"), at)
 	b.fake(nil)
 	result := b.compiles(fakeYue, false)
 	if lua := b.luaAt(result, "src/linked.yue"); lua != "-- src/linked.yue\n" || result.texts["src/linked.yue"] != "x = 'behind the link'\n" {

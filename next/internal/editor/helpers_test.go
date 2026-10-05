@@ -5,7 +5,6 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
-	"runtime"
 	"slices"
 	"strings"
 	"testing"
@@ -65,7 +64,7 @@ func asError(t testing.TB, err error, what string) *diag.Error {
 }
 
 // linkAt puts a link to a new folder at the path link below root, which uses "/", and returns where the link is
-// and the folder it leads to. The test is skipped where the machine cannot make the link.
+// and the folder it leads to. A link that cannot be made fails the test.
 func linkAt(t testing.TB, root, link string) (at, target string) {
 	t.Helper()
 	at, target = filepath.Join(root, filepath.FromSlash(link)), t.TempDir()
@@ -77,21 +76,14 @@ func linkAt(t testing.TB, root, link string) (at, target string) {
 }
 
 // linkToFile makes at a symlink to the file target, with the folders at is in. Windows lets only some accounts
-// make one, and the test is skipped there when this account may not; on any other system a link that cannot be
-// made fails the test.
+// make one, and the test is skipped there when this account may not, for that failure alone; any other failure
+// to make the link fails the test, on every system (testkit.LinkFile).
 func linkToFile(t testing.TB, target, at string) {
 	t.Helper()
 	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 		t.Fatal(err)
 	}
-	err := os.Symlink(target, at)
-	switch {
-	case err == nil:
-	case runtime.GOOS == "windows":
-		t.Skipf("this account may not make a symlink to a file on Windows: %v", err)
-	default:
-		t.Fatalf("a symlink to a file: %v", err)
-	}
+	testkit.LinkFile(t, target, at)
 }
 
 // entriesIn is the names of all there is below a folder, folders too, as the system spells them, from the folder

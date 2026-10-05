@@ -108,7 +108,7 @@ func (p project) libraries() []Library {
 }
 
 // linkTo lays the project to in a folder of its own and puts a link to that folder at the path link below root,
-// which uses "/". It returns where the link is. The test is skipped where the machine cannot make the link.
+// which uses "/". It returns where the link is. A link that cannot be made fails the test.
 func linkTo(t testing.TB, to project, root, link string) (at string) {
 	t.Helper()
 	at = filepath.Join(root, filepath.FromSlash(link))

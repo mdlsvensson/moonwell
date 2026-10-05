@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"slices"
 	"strings"
+	"syscall"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -372,8 +373,17 @@ func TestSafeJoinRefusesASymlinkBelowTheRoot(t *testing.T) {
 	if got, err := SafeJoin(root, "missing/b.txt"); err != nil || got != filepath.Join(root, "missing", "b.txt") {
 		t.Errorf("SafeJoin of a missing path = %q, %v", got, err)
 	}
-	if err := os.Symlink(filepath.Join(root, "real"), filepath.Join(root, "link")); err != nil {
-		t.Skipf("cannot create a symlink here: %v", err)
+	// Windows keeps the right to make a symlink from some accounts, and says so with its error 1314. The test is
+	// skipped for that failure alone: the junction of the next test needs no right. Any other symlink that
+	// cannot be made fails the test, on every system. testkit.LinkFile has the same rule; testkit imports this
+	// package, so the rule is written out here.
+	err = os.Symlink(filepath.Join(root, "real"), filepath.Join(root, "link"))
+	switch {
+	case err == nil:
+	case runtime.GOOS == "windows" && errors.Is(err, syscall.Errno(1314)):
+		t.Skipf("this account has not the right to make a symlink on Windows; the case is covered where it has: %v", err)
+	default:
+		t.Fatalf("no symlink was made: %v", err)
 	}
 	refusesTheLink(t, root)
 }

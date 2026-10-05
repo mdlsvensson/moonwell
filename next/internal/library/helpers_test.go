@@ -3,7 +3,6 @@ package library
 import (
 	"context"
 	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -53,8 +52,9 @@ const (
 var linkedLocks = []string{"a link to a lock", "a link to nothing", "a link to a folder"}
 
 // linkTheLock puts a link of the kind in the lock's place of the project at root, to a place in the folder
-// beside. The test is skipped where the machine cannot make the link: a link to a file, or to nothing, takes a
-// right that Windows does not give everyone.
+// beside. A link to a file, or to nothing, takes a right that Windows does not give every account: the test is
+// skipped where this account has not got it, and for that failure alone (testkit.LinkFile). Any other link that
+// cannot be made fails the test.
 func linkTheLock(t *testing.T, kind, root, beside string) {
 	t.Helper()
 	link, target := filepath.Join(root, LockFile), filepath.Join(beside, "nothing.lock")
@@ -66,9 +66,7 @@ func linkTheLock(t *testing.T, kind, root, beside string) {
 	case "a link to a lock":
 		target = testkit.WriteFile(t, beside, "their.lock", []byte(lockText(map[string]LockEntry{"ex": entryOfTest(nil)})))
 	}
-	if err := os.Symlink(target, link); err != nil {
-		t.Skipf("cannot create a symlink here: %v", err)
-	}
+	testkit.LinkFile(t, target, link)
 }
 
 // refusedLink fails the test unless err is the refusal of a link at path, with file as its file.

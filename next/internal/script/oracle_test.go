@@ -175,7 +175,7 @@ import (
 //     without modules, and reads the modules through a link on the way. This tree refuses the link. The other
 //     tree must find exactly the modules that are named here for each link, and this tree must refuse in the
 //     words of a link (TestALinkAtAFolderOfModulesIsRefused). The class is decided on the project, and has an
-//     oracle of its own, which is skipped where the machine cannot make a link.
+//     oracle of its own, which fails where a link cannot be made.
 //   - A compile in which several files fail, and the first of them by the bytes of their paths is not the first
 //     by the other tree's comparison, which puts a small letter before a capital one and "_" before "-". Each
 //     tree names its first. The class is decided on the other tree's result. The runs and the staging folder

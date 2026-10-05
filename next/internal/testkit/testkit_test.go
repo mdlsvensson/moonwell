@@ -3,6 +3,7 @@ package testkit
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"syscall"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/env"
@@ -48,6 +50,11 @@ func (s *standIn) Skip(args ...any) {
 	s.guard.Lock()
 	defer s.guard.Unlock()
 	s.skipped = append(s.skipped, fmt.Sprint(args...))
+}
+func (s *standIn) Skipf(format string, args ...any) {
+	s.guard.Lock()
+	defer s.guard.Unlock()
+	s.skipped = append(s.skipped, fmt.Sprintf(format, args...))
 }
 
 func TestFixtureReturnsTheBytesOfAFileUnderTestdata(t *testing.T) {
@@ -323,6 +330,68 @@ func TestLinkDirLinksToTheFolder(t *testing.T) {
 	LinkDir(t, target, link)
 	if data, err := os.ReadFile(filepath.Join(link, "file.txt")); err != nil || string(data) != "x" {
 		t.Errorf("through the link: %q, %v", data, err)
+	}
+}
+
+func TestALinkToAFolderThatCannotBeMadeFailsTheTest(t *testing.T) {
+	// The folder the link is to lie in is not there. That is a fault in what a test arranged and no trait of the
+	// machine, so the test fails: skipped, it would pass for having looked at nothing.
+	dir := t.TempDir()
+	WriteFile(t, dir, "target/file.txt", []byte("x"))
+	stand := newStandIn(t)
+	LinkDir(stand, filepath.Join(dir, "target"), filepath.Join(dir, "no", "such", "folder", "link"))
+	if len(stand.failed) != 1 || len(stand.skipped) != 0 || !strings.Contains(stand.failed[0], filepath.Join("no", "such", "folder", "link")) {
+		t.Errorf("failed %q, skipped %q, want one failure that names the link", stand.failed, stand.skipped)
+	}
+}
+
+func TestLinkFileLinksToTheFileOrSkipsTheTestWhereTheAccountMayNot(t *testing.T) {
+	dir := t.TempDir()
+	target, link := WriteFile(t, dir, "target.txt", []byte("x")), filepath.Join(dir, "link.txt")
+	stand := newStandIn(t)
+	LinkFile(stand, target, link)
+	switch {
+	case len(stand.failed) != 0:
+		t.Errorf("a link to a file failed the test: %q", stand.failed)
+	case len(stand.skipped) != 0:
+		// Only Windows keeps the right from an account, and the link is then not there.
+		if _, err := os.Lstat(link); runtime.GOOS != "windows" || len(stand.skipped) != 1 || err == nil {
+			t.Errorf("skipped %q on %s, and the link is there: %v", stand.skipped, runtime.GOOS, err == nil)
+		}
+	default:
+		if data, err := os.ReadFile(link); err != nil || string(data) != "x" {
+			t.Errorf("through the link: %q, %v", data, err)
+		}
+	}
+}
+
+func TestALinkToAFileThatCannotBeMadeFailsTheTest(t *testing.T) {
+	dir := t.TempDir()
+	target := WriteFile(t, dir, "target.txt", []byte("x"))
+	stand := newStandIn(t)
+	LinkFile(stand, target, filepath.Join(dir, "no", "such", "folder", "link.txt"))
+	// Windows tells an account that it has not the right before it looks at the place of the link, so there the
+	// test is skipped for a link that could not be made either way. Everywhere else the fault fails the test.
+	withoutTheRight := runtime.GOOS == "windows" && len(stand.skipped) == 1 && len(stand.failed) == 0
+	if !withoutTheRight && (len(stand.failed) != 1 || len(stand.skipped) != 0) {
+		t.Errorf("failed %q, skipped %q, want one failure", stand.failed, stand.skipped)
+	}
+}
+
+func TestOnlyTheRightThatWindowsKeepsFromAnAccountIsNoFaultOfALink(t *testing.T) {
+	link := func(reason error) error { return &os.LinkError{Op: "symlink", Old: "target", New: "link", Err: reason} }
+	if got := lacksTheRightToLink(link(syscall.Errno(1314))); got != (runtime.GOOS == "windows") {
+		t.Errorf("the right that is not held: %v on %s", got, runtime.GOOS)
+	}
+	// A path that is not there, a file that is there already, a failure that only reads as the one of the right,
+	// and none at all.
+	for _, other := range []error{
+		link(syscall.ENOENT), link(syscall.EEXIST), link(syscall.Errno(3)), link(syscall.Errno(5)),
+		errors.New("A required privilege is not held by the client."), nil,
+	} {
+		if lacksTheRightToLink(other) {
+			t.Errorf("%v is taken for the right that the account has not got", other)
+		}
 	}
 }
 
