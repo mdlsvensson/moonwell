@@ -41,19 +41,28 @@ func TestParseReadsSectionsUnquotesValuesAndKeepsTheLastDuplicateKey(t *testing.
 		"First":  {"Name": "Captain", "Tip": "Quoted; with = signs", "List": `"one","two"`, "Hotkey": "F"},
 		"Second": {"Empty": ""},
 	}
-	if got := ini.Parse(sections, nil); !reflect.DeepEqual(got, want) {
+	if got := ini.Parse(sections); !reflect.DeepEqual(got, want) {
 		t.Errorf("sections: %q, want %q", got, want)
 	}
 }
 
-func TestParseMergesIntoAnExistingResultLaterFilesWinning(t *testing.T) {
-	file := ini.Parse(merged, nil)
-	if later := ini.Parse(mergedLater, file); !reflect.DeepEqual(later, file) || len(later) != 2 {
-		t.Errorf("the file that is returned is %q, and the one that was given %q", later, file)
-	}
+func TestAddMergesIntoAnExistingResultLaterTextsWinning(t *testing.T) {
+	file := ini.Parse(merged)
+	file.Add(mergedLater)
 	want := ini.File{"a": {"Name": "Two", "Tip": "T"}, "b": {"Name": "B"}}
 	if !reflect.DeepEqual(file, want) {
 		t.Errorf("sections: %q, want %q", file, want)
+	}
+	// A text starts outside every section, the ones of the texts before it too.
+	file.Add("Name=Three\nTip=U\n")
+	if !reflect.DeepEqual(file, want) {
+		t.Errorf("after a text of keys without a section: %q, want %q", file, want)
+	}
+	// A file that has no section takes a text as Parse reads it.
+	added := ini.File{}
+	added.Add(sections)
+	if !reflect.DeepEqual(added, ini.Parse(sections)) {
+		t.Errorf("added to a file without sections: %q, want %q", added, ini.Parse(sections))
 	}
 }
 
@@ -82,7 +91,7 @@ var lines = []struct {
 
 func TestParseReadsLines(t *testing.T) {
 	for _, c := range lines {
-		if got := ini.Parse(c.text, nil); !reflect.DeepEqual(got, c.want) {
+		if got := ini.Parse(c.text); !reflect.DeepEqual(got, c.want) {
 			t.Errorf("%s: %q, want %q", c.name, got, c.want)
 		}
 	}
@@ -107,12 +116,12 @@ var widerSpace = []struct {
 
 func TestWhiteSpaceOutsideASCIIIsText(t *testing.T) {
 	for _, c := range widerSpace {
-		if got := ini.Parse(c.text, nil); !reflect.DeepEqual(got, c.want) {
+		if got := ini.Parse(c.text); !reflect.DeepEqual(got, c.want) {
 			t.Errorf("%s: %q, want %q", c.name, got, c.want)
 		}
 	}
 	// A parser is given text that is decoded, so it knows of no byte order mark: one at the start is text too.
-	if got := ini.Parse("\xEF\xBB\xBF[a]\nName=One\n", nil); len(got) != 0 {
+	if got := ini.Parse("\xEF\xBB\xBF[a]\nName=One\n"); len(got) != 0 {
 		t.Errorf("a byte order mark before the first header: %q, want no section", got)
 	}
 }

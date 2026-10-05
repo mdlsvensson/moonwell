@@ -43,8 +43,9 @@ endfunction
 `
 
 // corners has what the two scripts above have not: lines that end with a carriage return and a line feed, a tab
-// and a carriage return alone between two words, a quote with a backslash before it inside a string, a line in a
-// body that starts with endfunction and does not end the body, and a body that holds a line like a declaration.
+// and a carriage return alone between two words, a line in a body that starts with endfunction and does not end
+// the body, and a body that holds a line like a declaration. Its string with a quote after a backslash is read
+// the same however a comment is cut from that line: the script refused as m.j is what holds that.
 var corners = strings.Join([]string{
 	"type\tagent\textends\thandle\t",
 	"globals",
@@ -61,6 +62,11 @@ var corners = strings.Join([]string{
 	"constant function H takes nothing returns nothing",
 	"endfunction",
 }, "\r\n")
+
+// indented has a comment after globals, white space before and after endglobals, and an endfunction that is
+// indented: each ends its block all the same, so the native after them is read.
+const indented = "globals // g\n  integer a\n\tendglobals \nfunction F takes nothing returns nothing\n" +
+	"\tendfunction\nnative N takes nothing returns nothing\n"
 
 // noDeclaration is a script of white space and a comment.
 const noDeclaration = " \n// nothing\n"
@@ -147,6 +153,20 @@ func TestParseReadsTheCornersOfALine(t *testing.T) {
 	}
 }
 
+func TestABlockEndsWhateverStandsAroundTheWordThatEndsIt(t *testing.T) {
+	want := jass.File{
+		Types:   []jass.Type{},
+		Globals: []jass.Global{{Name: "a", Source: "indented.j", Type: "integer"}},
+		Functions: []jass.Function{
+			{Name: "F", Source: "indented.j", Params: []jass.Param{}, Returns: "nothing"},
+			{Name: "N", Source: "indented.j", Params: []jass.Param{}, Returns: "nothing"},
+		},
+	}
+	if got := parse(t, indented, "indented.j"); !reflect.DeepEqual(got, want) {
+		t.Errorf("got  %+v\nwant %+v", got, want)
+	}
+}
+
 // escape is a backslash, the letter u and the four digits: how a message writes a character it does not write as
 // it is.
 func escape(digits string) string { return `\` + "u" + digits }
@@ -169,6 +189,8 @@ var refused = []struct{ text, source, place, words string }{
 	{"globals\nstring S = \"a\rb\"\nendglobals\n", "i.j", "i.j:2: ", `cannot read "string S = \"a\rb\""`},
 	// Two slashes inside a string start no comment, so the carriage return after them is still in the line.
 	{"globals\nstring S = \"//a\rb\"\nendglobals\n", "l.j", "l.j:2: ", `cannot read "string S = \"//a\rb\""`},
+	// A quote after a backslash does not end its string, so the two slashes after it are inside the string too.
+	{"globals\nstring S = \"a\\\"//\rb\"\nendglobals\n", "m.j", "m.j:2: ", `cannot read "string S = \"a\\\"//\rb\""`},
 	// The line is quoted as it is written, comment and all, without the white space at its ends: the quote and
 	// the backslash have a backslash before them, a control character is written as an escape, and the markup
 	// characters, DEL and a character outside ASCII are written as they are.

@@ -1,8 +1,8 @@
 // Package ini reads the game's text files of sections, the editor's strings and the strings of each race:
 // [section] lines, key=value lines and // comment lines.
 //
-// It takes the text of a file, decoded, and the sections read from the files before it; it returns those
-// sections with the file's own added. It has no failure: a line that is none of the three is passed over.
+// It takes the text of a file, decoded, and returns its sections, or adds them to the sections read from the
+// files before it. It has no failure: a line that is none of the three is passed over.
 //
 // It must not know which sections and keys the generator reads, nor how a file is found and decoded: a byte order
 // mark is text to it, and its white space is ASCII.
@@ -18,24 +18,28 @@ type Section map[string]string
 // File is the sections by name.
 type File map[string]Section
 
-// Parse adds the sections of source to into and returns it; a nil into starts a new file. A key that comes
-// again, in this text or in a later one, has the later value. Lines before the first section are passed over.
-func Parse(source string, into File) File {
-	if into == nil {
-		into = File{}
-	}
+// Parse reads the sections of a text.
+func Parse(source string) File {
+	file := File{}
+	file.Add(source)
+	return file
+}
+
+// Add adds the sections of source to the file, which Parse made or which is File{}: a section the file has gains
+// the text's keys, and a key given again, in this text or in one added before, takes the later value. A text
+// starts outside every section, so its lines before the first [section] line are passed over.
+func (f File) Add(source string) {
 	var section Section
 	for _, raw := range strings.Split(strings.ReplaceAll(source, "\r\n", "\n"), "\n") {
 		line := trim(raw)
 		switch {
 		case line == "" || strings.HasPrefix(line, "//"):
 		case strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]"):
-			section = into.section(trim(line[1 : len(line)-1]))
+			section = f.section(trim(line[1 : len(line)-1]))
 		case section != nil:
 			section.set(line)
 		}
 	}
-	return into
 }
 
 // section is the section of the name, which is added to the file when it has none.

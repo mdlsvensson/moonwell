@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"maps"
-	"math/rand/v2"
 	"os"
-	"path/filepath"
 	"reflect"
 	"slices"
 	"strings"
@@ -15,6 +13,7 @@ import (
 	oldtext "github.com/mdlsvensson/moonwell/internal/text"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
+	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/tools/gen/jass"
 	oldjass "github.com/mdlsvensson/moonwell/tools/gen/jass"
 )
@@ -25,10 +24,11 @@ import (
 // them is compared whole, through the oracle: every type, every function with its parameters, every global, and
 // a refusal word for word, the quoted line in it too.
 //
-// The inputs are every script of jass_test.go, one of them with a mark at its start; seeded changes of those
-// scripts (a line cut, a line doubled, a quote dropped, ASCII white space put where the text has some, and at
-// its start and its end), every third with a mark at its start; and, on a machine that has the game's files,
-// common.j and blizzard.j of the export.
+// The inputs are every script of jass_test.go, two of them with a mark at their start; seeded changes of those
+// scripts, one to three of a text (a line cut, a line doubled, a quote dropped, a character of ASCII white space
+// put in at one place that is drawn), every third with a mark at its start; every placing of one character of
+// ASCII white space in those scripts, each of the six kinds at each edge of each line and at each white-space
+// character of a line; and, on a machine that has the game's files, common.j and blizzard.j of the export.
 //
 // One class of inputs is counted apart, decided by its bytes alone: a script with a character that is white
 // space outside ASCII (hasWiderSpace). The other tree trims such a character from a line, takes it for the white
@@ -88,6 +88,9 @@ func thisTree(data []byte) read {
 	return made
 }
 
+// alike reports whether the two trees make the same of an input.
+func alike(data []byte) bool { return reflect.DeepEqual(otherTree(data), thisTree(data)) }
+
 // hasWiderSpace reports whether the input has a character that the other tree takes for white space and this
 // tree for text: a no-break space, another space outside ASCII, a line or a paragraph separator, or a byte order
 // mark that is not at the start.
@@ -120,13 +123,13 @@ type comparison struct {
 func (c *comparison) input(what string, data []byte) {
 	c.t.Helper()
 	want, got := otherTree(data), thisTree(data)
-	alike := reflect.DeepEqual(want, got)
+	same := reflect.DeepEqual(want, got)
 	switch {
-	case hasWiderSpace(data) && alike:
+	case hasWiderSpace(data) && same:
 		c.widerAlike++
 	case hasWiderSpace(data):
 		c.widerApart++
-	case alike:
+	case same:
 		c.whole++
 		c.types, c.functions = c.types+len(want.File.Types), c.functions+len(want.File.Functions)
 		c.globals += len(want.File.Globals)
@@ -138,27 +141,10 @@ func (c *comparison) input(what string, data []byte) {
 		}
 		oracle.Values(c.t, what, want, got)
 	default:
-		line, lines := partingLine(data)
+		line, upTo := oracle.PartingLine(data, alike)
 		what = fmt.Sprintf("%s, read up to line %d, where the trees part", what, line)
-		oracle.Values(c.t, what, otherTree(lines), thisTree(lines))
+		oracle.Values(c.t, what, otherTree(upTo), thisTree(upTo))
 	}
-}
-
-// partingLine is the line of an input, counted from 1, at which the two trees part: they make the same of the
-// lines before it, and not of the lines up to it. It returns that line and the input up to it.
-func partingLine(data []byte) (int, []byte) {
-	lines := bytes.SplitAfter(data, []byte("\n"))
-	upTo := func(count int) []byte { return bytes.Join(lines[:count], nil) }
-	low, high := 0, len(lines)
-	for high-low > 1 {
-		middle := (low + high) / 2
-		if reflect.DeepEqual(otherTree(upTo(middle)), thisTree(upTo(middle))) {
-			low = middle
-		} else {
-			high = middle
-		}
-	}
-	return high, upTo(high)
 }
 
 // expect fails the test unless the tally is the one wanted.
@@ -173,7 +159,8 @@ func (c *comparison) expect(want tally) {
 // report.
 func testScripts() map[string]string {
 	named := map[string]string{
-		"common": common, "blizzard": blizzard, "corners": corners, "no declaration": noDeclaration,
+		"common": common, "blizzard": blizzard, "corners": corners, "indented": indented,
+		"no declaration": noDeclaration,
 	}
 	for i, c := range refused {
 		named[fmt.Sprintf("refused script %02d, of %s", i, c.source)] = c.text
@@ -192,88 +179,21 @@ func TestOracleOnTheScriptsOfTheTests(t *testing.T) {
 		c.input(wide.name, []byte(wide.text))
 	}
 	c.expect(tally{
-		whole: 20, marked: 2, refused: 15, types: 7, functions: 11, globals: 10, widerAlike: 1, widerApart: 4,
+		whole: 22, marked: 2, refused: 16, types: 7, functions: 13, globals: 11, widerAlike: 1, widerApart: 4,
 	})
 }
 
-// asciiSpace is the six characters of white space in ASCII.
-const asciiSpace = " \t\n\v\f\r"
-
-// changer makes the changes of one seed and one index, and counts the kinds of white space it puts in.
-type changer struct {
-	random *rand.Rand
-	put    map[byte]int
-}
-
-// change is the text after one change: a line cut, a line doubled, a quote dropped, or white space put in. A
-// text without a quote has white space put in for the third.
-func (c changer) change(text string) string {
-	lines := strings.Split(text, "\n")
-	line := c.random.IntN(len(lines))
-	quotes := offsetsOf(text, `"`)
-	switch kind := c.random.IntN(4); {
-	case kind == 0:
-		return strings.Join(slices.Delete(lines, line, line+1), "\n")
-	case kind == 1:
-		return strings.Join(slices.Insert(lines, line, lines[line]), "\n")
-	case kind == 2 && len(quotes) > 0:
-		at := quotes[c.random.IntN(len(quotes))]
-		return text[:at] + text[at+1:]
-	}
-	return c.space(text)
-}
-
-// space puts one character of ASCII white space, of any of the six kinds, where the text has white space: in
-// the place of a character, before it or after it; or at the start of the text, or at its end.
-func (c changer) space(text string) string {
-	kind := asciiSpace[c.random.IntN(len(asciiSpace))]
-	c.put[kind]++
-	places := offsetsOf(text, asciiSpace)
-	place := c.random.IntN(len(places) + 2)
-	switch {
-	case place == len(places):
-		return string(kind) + text
-	case place == len(places)+1:
-		return text + string(kind)
-	}
-	at := places[place]
-	switch c.random.IntN(3) {
-	case 0:
-		return text[:at] + string(kind) + text[at+1:]
-	case 1:
-		return text[:at] + string(kind) + text[at:]
-	}
-	return text[:at+1] + string(kind) + text[at+1:]
-}
-
-// offsetsOf is the offsets in text of every byte that is one of the characters.
-func offsetsOf(text, characters string) []int {
-	var offsets []int
-	for i := range len(text) {
-		if strings.IndexByte(characters, text[i]) >= 0 {
-			offsets = append(offsets, i)
-		}
-	}
-	return offsets
-}
-
-// The scripts of the tests, each changed in forty ways that are the same on every run: one to three changes of
-// a text, and a byte order mark before every third. A change is named by the seed and its index, which make it
-// again.
+// The scripts of the tests, each changed in forty ways that are the same on every run, and a byte order mark
+// before every third. A change is named by the seed and its index, which make it again.
 func TestOracleOnSeededChanges(t *testing.T) {
 	const seed, changesOfAScript = 2026_10_05, 40
 	c := &comparison{t: t}
-	put := map[byte]int{}
-	changed, index := 0, 0
+	changed, index := 0, uint64(0)
 	named := testScripts()
 	for _, name := range slices.Sorted(maps.Keys(named)) {
 		for range changesOfAScript {
 			index++
-			maker := changer{rand.New(rand.NewPCG(seed, uint64(index))), put}
-			text := named[name]
-			for range 1 + maker.random.IntN(3) {
-				text = maker.change(text)
-			}
+			text := oracle.Changed(named[name], seed, index)
 			if text != named[name] {
 				changed++
 			}
@@ -286,59 +206,34 @@ func TestOracleOnSeededChanges(t *testing.T) {
 			}
 		}
 	}
-	if len(put) != len(asciiSpace) {
-		t.Errorf("white space of %d kinds was put in, want all %d", len(put), len(asciiSpace))
+	if changed != 781 {
+		t.Errorf("%d of %d inputs differ from their script, want 781", changed, index)
 	}
-	if changed != 703 {
-		t.Errorf("%d of %d inputs differ from their script, want 703", changed, index)
-	}
-	c.expect(tally{whole: 720, marked: 240, refused: 514, types: 116, functions: 206, globals: 186})
+	c.expect(tally{whole: 800, marked: 266, refused: 581, types: 113, functions: 252, globals: 214})
 }
 
-// exportPath is a folder or a file of the game's files: the folder the environment variable names, and then each
-// name below it, found without regard to letter case. Without the variable the test is skipped, or fails when
-// MOONWELL_REQUIRE_EXPORTS is 1.
-func exportPath(t *testing.T, variable string, below ...string) string {
-	t.Helper()
-	folder := os.Getenv(variable)
-	if folder == "" && os.Getenv("MOONWELL_REQUIRE_EXPORTS") == "1" {
-		t.Fatalf("%s is not set, and MOONWELL_REQUIRE_EXPORTS=1 requires the game's files", variable)
-	}
-	if folder == "" {
-		t.Skipf("%s is not set: the game's files are not compared", variable)
-	}
-	for _, name := range below {
-		entries := exportEntries(t, folder, func(entry string) bool { return entry == name })
-		if len(entries) != 1 {
-			t.Fatalf("%s has %d entries named %s, want 1", folder, len(entries), name)
-		}
-		folder = filepath.Join(folder, entries[0])
-	}
-	return folder
-}
-
-// exportEntries is the names of the entries of a folder whose name in small letters is wanted, sorted.
-func exportEntries(t *testing.T, folder string, wanted func(lowerName string) bool) []string {
-	t.Helper()
-	entries, err := os.ReadDir(folder)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var names []string
-	for _, entry := range entries {
-		if wanted(strings.ToLower(entry.Name())) {
-			names = append(names, entry.Name())
+// The scripts of the tests with one character of ASCII white space put in, at every place and of every kind.
+func TestOracleOnEveryPlacingOfWhiteSpace(t *testing.T) {
+	c := &comparison{t: t}
+	named := testScripts()
+	for _, name := range slices.Sorted(maps.Keys(named)) {
+		for i, text := range oracle.Swept(named[name]) {
+			c.input(fmt.Sprintf("%s with white space put in, text %d: %q", name, i, text), []byte(text))
+			if t.Failed() {
+				t.FailNow()
+			}
 		}
 	}
-	return names
+	c.expect(tally{whole: 5034, refused: 1949, types: 4206, functions: 8092, globals: 7119})
 }
 
 // The two scripts of the game, read from the maintainer's export: this test reads the game's files, and takes
 // longer than the others. A report names a file and a line, and shows no more of the file than one value.
 func TestOracleOnTheScriptsOfTheGame(t *testing.T) {
+	export := testkit.NeedExport(t, "MOONWELL_GAME_SCRIPTS")
 	c := &comparison{t: t}
 	for _, name := range []string{"common.j", "blizzard.j"} {
-		data, err := os.ReadFile(exportPath(t, "MOONWELL_GAME_SCRIPTS", "war3.w3mod", "scripts", name))
+		data, err := os.ReadFile(export.Path("war3.w3mod", "scripts", name))
 		if err != nil {
 			t.Fatal(err)
 		}

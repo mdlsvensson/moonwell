@@ -2,8 +2,11 @@
 // deleted when the old code is.
 //
 // It takes the bytes, the values or the errors of both trees and reports through a testing.TB; it returns nothing
-// but whether both sides failed. It must not know what is being compared, and it is the one package outside the
-// oracle_test.go files that imports a package of the old tree (internal/diag, to read what an error says).
+// but whether both sides failed. It also makes, of a text of a test, the inputs that both trees are given: seeded
+// changes (Changed) and every placing of one white-space character (Swept); and it finds the line of an input at
+// which two readings part (PartingLine), for a report. It must not know what is being compared, and it is the one
+// package outside the oracle_test.go files that imports a package of the old tree (internal/diag, to read what
+// an error says).
 package oracle
 
 import (

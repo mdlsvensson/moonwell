@@ -2,8 +2,8 @@
 // Editor saved, links (LinkDir, LinkFile), files held so that they cannot be read or written (MakeUnreadable,
 // MakeUnwritable), a test world for the commands and the logger that keeps its lines (Recorder), byte helpers,
 // builders for map info, object files, MDX models, pictures and zip archives (Zip), a reader of the archives
-// Moonwell writes, and the way to what a test needs from the machine: a program (NeedPkl) and the network
-// (NeedNetwork).
+// Moonwell writes, and the way to what a test needs from the machine: a program (NeedPkl), the network
+// (NeedNetwork) and the game's files (NeedExport).
 //
 // It is imported by tests only. Of Moonwell's packages it knows env, binio and the formats it builds or reads
 // (war3/objmod and war3/mpq), so the tests of those two packages are external test packages. Most helpers take a

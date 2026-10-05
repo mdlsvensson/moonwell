@@ -118,6 +118,8 @@ var tables = []struct {
 	{"the rows are in the order of their Y, whatever the order of the records",
 		"C;X1;Y9;Kz\nC;X1;Y2;Ka\nC;X1;Y5;Kb\n", []map[string]string{{"a": "b"}, {"a": "z"}}},
 	{"only a header row", "C;X1;Y1;Ka\nE\n", nil},
+	{"columns and rows are in the order of their numbers, 10 after 2", numbered,
+		[]map[string]string{{"b": "2", "c": "1"}, {"a": "3"}}},
 }
 
 func TestParseReadsTables(t *testing.T) {
@@ -128,8 +130,28 @@ func TestParseReadsTables(t *testing.T) {
 	}
 }
 
-// emptyTables are texts without a cell: no text, no record, a cell after the end, and a record without a value.
-var emptyTables = []string{"", "ID;P\nE\n", "E\nC;X1;Y1;Ka\n", "C;X1;Y1\n"}
+// numbered has a column and a row with the number 10 beside ones with the numbers 1 and 2, and gives the cells of
+// its second row with the last column first.
+const numbered = "C;X1;Y1;Ka\nC;X2;Kb\nC;X10;Kc\nC;X10;Y2;K1\nC;X2;K2\nC;X1;Y10;K3\n"
+
+// A coordinate is a number: the tenth column comes after the second, and so does the tenth row. The first cell
+// of a row is the one in its lowest column.
+func TestColumnsAndRowsAreInTheOrderOfTheirNumbers(t *testing.T) {
+	table, err := slk.Parse(numbered, "numbered.slk")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(table.Columns, []string{"a", "b", "c"}) {
+		t.Errorf("columns: %q", table.Columns)
+	}
+	if len(table.Rows) != 2 || table.Rows[0].First() != "2" || table.Rows[1].First() != "3" {
+		t.Errorf("rows: %v, want the row of Y2 with the first cell 2, then the row of Y10", rows(t, numbered))
+	}
+}
+
+// emptyTables are texts without a cell: no text, no record, a cell after each form of the end, and a record
+// without a value.
+var emptyTables = []string{"", "ID;P\nE\n", "E\nC;X1;Y1;Ka\n", "E;x\nC;X1;Y1;Ka\n", "C;X1;Y1\n"}
 
 func TestATextWithoutACellIsAnEmptyTable(t *testing.T) {
 	for _, text := range emptyTables {
@@ -149,6 +171,10 @@ var malformed = []struct{ text, file, place, words string }{
 	{"C;X1;Y1;K\"ID\"\n\nC;X1;Y;K1\n", "e.slk", "e.slk:3: ", "bad Y coordinate ''"},
 	{"C;X1;Y1;K\"ID\"x\n", "f.slk", "f.slk:1: ", "expected ';' after a value"},
 	{"C;X1;Y99999999999999999999;K1\n", "g.slk", "g.slk:1: ", "bad Y coordinate"},
+	// A coordinate is digits and nothing else, and a cell needs an X as it needs a Y.
+	{"C;X+1;Y1;K1\n", "i.slk", "i.slk:1: ", "bad X coordinate '+1'"},
+	{"C;X1;Y-1;K1\n", "j.slk", "j.slk:1: ", "bad Y coordinate '-1'"},
+	{"C;Y1;K1\n", "k.slk", "k.slk:1: ", "without an X or Y coordinate"},
 }
 
 func TestParseNamesTheFileAndLineOfAMalformedRecord(t *testing.T) {
@@ -163,22 +189,40 @@ func TestParseNamesTheFileAndLineOfAMalformedRecord(t *testing.T) {
 	}
 }
 
+// emptyFields are tables with a record that has a field with nothing in it, each with the place of its error:
+// the field is the first of the record, it stands between two others, and it follows a quoted and a bare value.
+var emptyFields = []struct{ text, place string }{
+	{"C;;X1;Y1;K1\n", "h.slk:1: "},
+	{"C;X1;Y1;Ka\nC;X1;;Y2;K1\n", "h.slk:2: "},
+	{"C;X1;Y1;K\"a\";;\n", "h.slk:1: "},
+	{"C;X1;Y1;Ka;;b\n", "h.slk:1: "},
+}
+
+// Tables with two semicolons in a row that are no empty field: the two stand inside a quoted value, or after the
+// end of the table.
+const (
+	semicolonsInAValue    = "C;X1;Y1;Ka\nC;X1;Y2;K\"b;;c\"\n"
+	semicolonsAfterTheEnd = "C;X1;Y1;Ka\nE\nC;;X1;Y2;K1\n"
+)
+
 // A field holds at least the letter that says what it is. A record with two semicolons in a row outside a quoted
 // value has a field that holds nothing, and is refused with its line.
 func TestParseRefusesARecordWithAnEmptyField(t *testing.T) {
-	for _, c := range []struct{ text, place string }{
-		{"C;;X1;Y1;K1\n", "h.slk:1: "},
-		{"C;X1;Y1;Ka\nC;X1;;Y2;K1\n", "h.slk:2: "},
-		{"C;X1;Y1;K\"a\";;\n", "h.slk:1: "},
-		{"C;X1;Y1;Ka;;b\n", "h.slk:1: "},
-	} {
+	for _, c := range emptyFields {
 		_, err := slk.Parse(c.text, "h.slk")
 		if err == nil || !strings.HasPrefix(err.Error(), c.place) || !strings.Contains(err.Error(), "empty field") {
 			t.Errorf("%q: got %v, want an error at %q about an empty field", c.text, err, c.place)
 		}
 	}
-	if got := rows(t, "C;X1;Y1;Ka\nC;X1;Y2;K\"b;;c\"\n"); !reflect.DeepEqual(got, []map[string]string{{"a": "b;;c"}}) {
+	if got := rows(t, semicolonsInAValue); !reflect.DeepEqual(got, []map[string]string{{"a": "b;;c"}}) {
 		t.Errorf("two semicolons inside a quoted value: rows %v", got)
+	}
+	if got := rows(t, semicolonsAfterTheEnd); got != nil {
+		t.Errorf("two semicolons after the end of the table: rows %v", got)
+	}
+	// A fault that comes before the empty field in its record is the one that is reported.
+	if _, err := slk.Parse("C;Xa;;Y1;K1\n", "h.slk"); err == nil || !strings.Contains(err.Error(), "bad X coordinate") {
+		t.Errorf("a bad coordinate before an empty field: got %v", err)
 	}
 }
 
