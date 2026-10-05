@@ -1,7 +1,3 @@
-// Package build is the one place that knows in which order a map is built. It takes the outside world and a
-// project, and returns the map as it will be staged; Build, Test, Check and Dev are that plan and one more step.
-// It must not know how any area does its work, nor how a command line is read. It imports the areas, the
-// foundations and the root package.
 package build
 
 import (
