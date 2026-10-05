@@ -51,9 +51,13 @@ func (p project) and(pairs ...string) project {
 	return p
 }
 
-// lay writes the project's files into a new folder, in the order given, and returns the folder.
+// lay writes the project's files into a new folder, in the order given, and returns the folder. A project whose
+// files are not pairs fails the test.
 func (p project) lay(t testing.TB) string {
 	t.Helper()
+	if len(p.files)%2 != 0 {
+		t.Fatalf("a project's files are pairs of a path and a text, and %q, the last of them, has no text", p.files[len(p.files)-1])
+	}
 	root := t.TempDir()
 	for i := 0; i < len(p.files); i += 2 {
 		testkit.WriteFile(t, root, p.files[i], []byte(p.files[i+1]))

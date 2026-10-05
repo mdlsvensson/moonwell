@@ -107,7 +107,10 @@ func TestReadSourceDropsALeadingByteOrderMarkAndBlanksAFirstLineStartingWithHash
 		{bom + "#!/usr/bin/lua\r\nCount = 0\n# not the first line\n", "\r\nCount = 0\n# not the first line\n"},
 		{"#only line", ""},
 		{"Count = 0 -- " + bom + " kept\n", "Count = 0 -- " + bom + " kept\n"},
-		{"bad \xFF byte\n", "bad \uFFFD byte\n"},
+		// Bytes that are not UTF-8 stay as they are: one, a run, and a character that is cut short.
+		{"bad \xFF byte\n", "bad \xFF byte\n"},
+		{"s = '\xE9\xE9\xFF' -- \xE2\x80\n", "s = '\xE9\xE9\xFF' -- \xE2\x80\n"},
+		{bom + "#!lua \xFF\n-- \xC0\xC1", "\n-- \xC0\xC1"},
 	} {
 		write(t, file, c.content)
 		got, err := ReadSource(file, "lua/x.lua")

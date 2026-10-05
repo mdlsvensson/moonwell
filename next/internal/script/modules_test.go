@@ -2,6 +2,8 @@ package script
 
 import (
 	"errors"
+	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -163,8 +165,8 @@ func TestCollectLetsATopLevelInitModuleClaimOnlyItsOwnName(t *testing.T) {
 func TestCollectTakesTheLibrariesInTheOrderGivenEachYueScriptBeforeItsLua(t *testing.T) {
 	root := mainOnly.and(
 		"lua/own.lua", "",
-		librariesDir+"/a/one.lua", "", librariesDir+"/a/two.yue", "",
-		librariesDir+"/b/three.lua", "", librariesDir+"/b/four.yue", "",
+		inLibrary("a", "one.lua"), "", inLibrary("a", "two.yue"), "",
+		inLibrary("b", "three.lua"), "", inLibrary("b", "four.yue"), "",
 	).lay(t)
 	a, b := Library{Key: "a", Dir: librariesDir + "/a"}, Library{Key: "b", Dir: librariesDir + "/b"}
 	for _, c := range []struct {
@@ -186,7 +188,7 @@ func TestCollectTakesTheLibrariesInTheOrderGivenEachYueScriptBeforeItsLua(t *tes
 func TestAClashWithALibraryModuleNamesBothFilesAndSuggestsNarrowingDir(t *testing.T) {
 	failure := refused(t, mainOnly.with("ex").and(
 		"lua/example/greet.lua", "return {}\n",
-		librariesDir+"/ex/example/greet.lua", "return {}\n",
+		inLibrary("ex", "example/greet.lua"), "return {}\n",
 	), "a clash")
 	if failure.Msg != "Module example.greet is defined by lua/example/greet.lua and .moonwell/libraries/ex/example/greet.lua." ||
 		failure.File != ".moonwell/libraries/ex/example/greet.lua" ||
@@ -197,11 +199,11 @@ func TestAClashWithALibraryModuleNamesBothFilesAndSuggestsNarrowingDir(t *testin
 
 func TestInALibraryALuaFileBesideAYueFileOfTheSameStemIsItsCompiledOutputNotAModule(t *testing.T) {
 	got := collect(t, mainOnly.with("ex").and(
-		librariesDir+"/ex/example/loud.yue", "x = 1\n",
-		librariesDir+"/ex/example/loud.lua", "-- compiled\n",
-		librariesDir+"/ex/kit/init.yue", "x = 1\n",
-		librariesDir+"/ex/kit/init.lua", "-- compiled\n",
-		librariesDir+"/ex/example/greet.lua", "return {}\n",
+		inLibrary("ex", "example/loud.yue"), "x = 1\n",
+		inLibrary("ex", "example/loud.lua"), "-- compiled\n",
+		inLibrary("ex", "kit/init.yue"), "x = 1\n",
+		inLibrary("ex", "kit/init.lua"), "-- compiled\n",
+		inLibrary("ex", "example/greet.lua"), "return {}\n",
 	))
 	want := []Source{
 		{Name: "main", Path: "src/main.yue", Kind: Yue},
@@ -222,8 +224,8 @@ func TestInALibraryALuaFileBesideAYueFileOfTheSameStemIsItsCompiledOutputNotAMod
 
 func TestADottedOrBuiltInNameInALibrarySuggestsNarrowingTheLibrarysDir(t *testing.T) {
 	for path, message := range map[string]string{
-		".moonwell/libraries/ex/a.b.lua":      "cannot contain dots",
-		".moonwell/libraries/ex/moonwell.lua": "Module moonwell is built into Moonwell; .moonwell/libraries/ex/moonwell.lua takes its name.",
+		inLibrary("ex", "a.b.lua"):      "cannot contain dots",
+		inLibrary("ex", "moonwell.lua"): "Module moonwell is built into Moonwell; .moonwell/libraries/ex/moonwell.lua takes its name.",
 	} {
 		failure := refused(t, mainOnly.with("ex").and(path, ""), path)
 		if !strings.Contains(failure.Msg, message) || failure.File != path || strings.Contains(failure.Hint, "rename") ||
@@ -238,7 +240,7 @@ func TestALibraryWithoutAFolderHasNoModules(t *testing.T) {
 		"no folder":             mainOnly.with("ex"),
 		"a file for the folder": mainOnly.with("ex").and(librariesDir+"/ex", "a file, not a folder"),
 		"a file for .moonwell":  mainOnly.with("ex").and(".moonwell", "a file, not a folder"),
-		"no module in it":       mainOnly.with("ex").and(librariesDir+"/ex/notes.txt", "no module"),
+		"no module in it":       mainOnly.with("ex").and(inLibrary("ex", "notes.txt"), "no module"),
 	} {
 		if got := pathsOf(collect(t, p)); !slices.Equal(got, []string{"src/main.yue"}) {
 			t.Errorf("%s: paths = %q", what, got)
@@ -264,17 +266,53 @@ func TestCollectListsTheModulesOfAFolderInByteOrder(t *testing.T) {
 	}
 }
 
-func TestARunOfBytesThatAreNotUTF8InALuaModuleReadsAsOneReplacementCharacter(t *testing.T) {
-	one := "'" + replacement + "'"
-	for written, want := range map[string]string{
-		"a = '\xff'\n":               "a = " + one + "\n",
-		"a = '\xff\xfe\xc0'\n":       "a = " + one + "\n",
-		"a = '\xff' .. '\xe9\xe9'\n": "a = " + one + " .. " + one + "\n",
-		"a = '\xe2\x80\xff'\n":       "a = " + one + "\n",
+func TestALuaModulesTextIsTheBytesOfItsFile(t *testing.T) {
+	for what, written := range map[string]string{
+		"a byte that is not UTF-8":       "a = 1 \xff\n",
+		"a run of such bytes":            "a = 1 \xff\xfe\xc0\xc1\n",
+		"a character that is cut short":  "a = '\xe2\x80' .. '\xf0\x9f\x98'\n",
+		"such a byte inside a string":    "a = 'caf\xe9' .. \"\xe5\xe4\xf6\"\n",
+		"such a byte inside a comment":   "-- caf\xe9\nreturn 1 --[[ \xff\xff ]]\n",
+		"a written replacement beside":   "a = '" + replacement + "\xff" + replacement + "'\n",
+		"characters outside ASCII":       "a = '" + eAcute + beyond + "'\n",
+		"a byte order mark further in":   "a = '" + mark + "'\n",
+		"line ends of every kind":        "a = 1\r\nb = 2\rc = 3\n\n",
+		"a byte of zero and a form feed": "a = '\x00'\f\n",
 	} {
-		if module := luaModule(t, written); module.Text != want {
-			t.Errorf("text of %q = %q, want %q", written, module.Text, want)
+		if module := luaModule(t, written); module.Text != written {
+			t.Errorf("%s: the text of %q is %q", what, written, module.Text)
 		}
+	}
+	// A library's Lua module is read the same way.
+	sources := collect(t, mainOnly.with("ex").and(inLibrary("ex", "x.lua"), "return '\xff\xfe'\n"))
+	if len(sources) != 2 || sources[1].Text != "return '\xff\xfe'\n" {
+		t.Errorf("Collect = %+v", sources)
+	}
+}
+
+func TestInsideAFolderOfModulesALinkToAFileIsReadAndALinkToAFolderIsNotEntered(t *testing.T) {
+	root := mainOnly.and("lua/own.lua", "return 1\n").lay(t)
+	linkTo(t, files("deep.lua", "return 2\n", "more/deeper.lua", "return 3\n"), root, "lua/linked")
+	linkTo(t, files("other.yue", "x = 2\n"), root, "src/linked")
+	sources, err := Collect(root, nil)
+	if err != nil || !slices.Equal(pathsOf(sources), []string{"src/main.yue", "lua/own.lua"}) {
+		t.Errorf("with links to folders: Collect = %q, %v, want the modules that are not behind them", pathsOf(sources), err)
+	}
+
+	elsewhere := files("real.lua", "return 'through the link'\n", "real.yue", "x = 3\n").lay(t)
+	for link, target := range map[string]string{"lua/through.lua": "real.lua", "src/also.yue": "real.yue"} {
+		if err := os.Symlink(filepath.Join(elsewhere, target), filepath.Join(root, filepath.FromSlash(link))); err != nil {
+			t.Skipf("cannot create a symlink to a file here: %v", err)
+		}
+	}
+	want := []Source{
+		{Name: "also", Path: "src/also.yue", Kind: Yue},
+		{Name: "main", Path: "src/main.yue", Kind: Yue},
+		{Name: "own", Path: "lua/own.lua", Kind: Lua, Text: "return 1\n"},
+		{Name: "through", Path: "lua/through.lua", Kind: Lua, Text: "return 'through the link'\n"},
+	}
+	if sources, err = Collect(root, nil); err != nil || !reflect.DeepEqual(sources, want) {
+		t.Errorf("with links to files: Collect = %+v, %v, want %+v", sources, err, want)
 	}
 }
 
@@ -307,7 +345,7 @@ func TestALibraryThatNamesNoFolderOfTheProjectIsAMistakeOfTheCaller(t *testing.T
 		}
 	}
 	// A folder written with backslashes is the same folder.
-	p := mainOnly.with("ex").and(librariesDir+"/ex/x.lua", "")
+	p := mainOnly.with("ex").and(inLibrary("ex", "x.lua"), "")
 	sources, err := Collect(p.lay(t), []Library{{Key: "ex", Dir: `.moonwell\libraries\ex`}})
 	if err != nil || !slices.Equal(pathsOf(sources), []string{"src/main.yue", ".moonwell/libraries/ex/x.lua"}) {
 		t.Errorf("Collect = %q, %v", pathsOf(sources), err)
@@ -339,8 +377,31 @@ func TestAFolderOfModulesThatCannotBeListedIsRefusedByItsName(t *testing.T) {
 	t.Cleanup(func() { os.Chmod(closed, 0o777) })
 	_, err := Collect(root, nil)
 	failure := asError(t, err, "a closed folder")
-	if !strings.HasPrefix(failure.Msg, "Reading lua/ failed: ") || failure.File != "lua" || !strings.Contains(failure.Hint, "can be read") {
+	if !strings.HasPrefix(failure.Msg, "Reading lua/closed/ failed: ") || failure.File != "lua/closed" ||
+		!strings.Contains(failure.Hint, "can be read") {
 		t.Errorf("error = %+v", failure)
+	}
+}
+
+func TestAListingThatFailsBelowAFolderNamesTheFolderItFailedAt(t *testing.T) {
+	lua := folder{dir: "lua", path: filepath.Join(t.TempDir(), "lua"), kind: Lua}
+	denied := func(path string) error { return &fs.PathError{Op: "open", Path: path, Err: fs.ErrPermission} }
+	for what, c := range map[string]struct {
+		cause error
+		want  string
+	}{
+		"below the folder":    {denied(filepath.Join(lua.path, "a", "closed")), "lua/a/closed"},
+		"wrapped once more":   {fmt.Errorf("listing: %w", denied(filepath.Join(lua.path, "closed"))), "lua/closed"},
+		"at the folder":       {denied(lua.path), "lua"},
+		"outside the folder":  {denied(filepath.Dir(lua.path)), "lua"},
+		"beside the folder":   {denied(lua.path + "x"), "lua"},
+		"without a path":      {errors.New("the disk is gone"), "lua"},
+		"with a path of none": {denied(""), "lua"},
+	} {
+		failure := asError(t, errUnreadableFolder(lua.failedAt(c.cause), c.cause), what)
+		if !strings.HasPrefix(failure.Msg, "Reading "+c.want+"/ failed: ") || failure.File != c.want || failure.Cause != c.cause {
+			t.Errorf("%s: %+v, want the folder %s", what, failure, c.want)
+		}
 	}
 }
 

@@ -254,15 +254,16 @@ func writeIfChanged(path string, content []byte, mode fs.FileMode) (wrote bool, 
 	return true, nil
 }
 
-// ReadSource reads a source file as standalone Lua's loadfile sees it: decoded by DecodeText, and with a first line
-// that starts with `#` (a shebang) blanked. label is the file's path relative to the project with "/" separators,
-// for the error.
+// ReadSource reads a source file as standalone Lua's loadfile sees it, which is as bytes: a leading byte order
+// mark is dropped and a first line that starts with `#` (a shebang) is blanked, and every other byte is returned
+// as the file has it. Nothing is decoded, so the string may hold bytes that are not UTF-8. label is the file's
+// path relative to the project with "/" separators, for the error.
 func ReadSource(path, label string) (string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", errUnreadable(label, err)
 	}
-	return blankShebang(DecodeText(data)), nil
+	return blankShebang(strings.TrimPrefix(string(data), byteOrderMark)), nil
 }
 
 // blankShebang empties a first line that starts with `#` and keeps its line break, so line numbers stay.

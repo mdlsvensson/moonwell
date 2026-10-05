@@ -7,10 +7,12 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	oldbundle "github.com/mdlsvensson/moonwell/internal/bundle"
 	oldnatives "github.com/mdlsvensson/moonwell/internal/natives"
 	oldpipeline "github.com/mdlsvensson/moonwell/internal/pipeline"
+	oldtext "github.com/mdlsvensson/moonwell/internal/text"
 	oldyue "github.com/mdlsvensson/moonwell/internal/yue"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
@@ -30,27 +32,31 @@ import (
 //     file and hint), else every module in its order: its name, its path, its kind, its library and a Lua module's
 //     text. The projects are those of the other tree's tests of finding modules, and seeded ones: folders that are
 //     missing or are files, files that are no modules, names of every kind, init modules, built-in names,
-//     libraries beside the project and beside each other, Lua texts with a byte order mark, a first line for a
-//     shell and bytes that are not UTF-8, and projects with two faults, of which the first found is the one
-//     reported. The other tree is given the libraries' keys out of order, which it sorts; this tree is given the
-//     libraries in the order of their keys, as its caller gives them.
+//     libraries beside the project and beside each other, Lua texts with a byte order mark and a first line for a
+//     shell, and projects with two faults, of which the first found is the one reported. The other tree is given
+//     the libraries' keys out of order, which it sorts; this tree is given the libraries in the order of their
+//     keys, as its caller gives them.
 //   - bundle.CollectModules against Collect on a project with a Lua module that another program holds: the refusal,
 //     whole. It is skipped where the system lets the file be read.
 //   - yue.Macros against macrosOf: what is refused, else the search path and the hash of the macro module.
 //   - pipeline.EntryModuleName against EntryName: what is refused, else the name.
 //
-// Compared in part, and counted (tally.inPart). Each class is decided on the other tree's result, and the two
-// trees must differ on it.
+// Compared in part, and counted (tally.inPart). Each class is decided on the project or on the other tree's
+// result, and the two trees must differ on it.
 //
 //   - A project with module files whose order by bytes is not their order by UTF-16 units, which is so only where
 //     one name has a character beyond the basic plane and another one from U+E000 to U+FFFF in its place. This
-//     tree lists the files of a folder in the order of their bytes. The modules must be the other tree's, whole,
-//     with those of each folder and kind in byte order (TestCollectListsTheModulesOfAFolderInByteOrder).
-//   - A project with a Lua module that has two or more faulty sequences of bytes side by side, none of them
-//     UTF-8. The other tree reads each sequence as one U+FFFD and this tree reads the run of them as one, as
-//     fsx.ReadSource does. The modules must be the other tree's, whole, with each run of U+FFFD in a text as one
-//     (TestARunOfBytesThatAreNotUTF8InALuaModuleReadsAsOneReplacementCharacter). A single faulty sequence reads
-//     alike in both trees and is among the projects.
+//     tree lists the files of a folder in the order of their bytes. The class is decided on the other tree's
+//     result. The modules must be the other tree's, whole, with those of each folder and kind in byte order
+//     (TestCollectListsTheModulesOfAFolderInByteOrder).
+//   - A project with a Lua module that has a byte that is not UTF-8. The other tree decodes the file and puts
+//     U+FFFD in the place of each faulty sequence of bytes; this tree keeps the bytes of the file. The class is
+//     decided on the project, by the bytes it holds for a .lua file outside src/: in the other tree's result a
+//     U+FFFD that was written looks like one that was put there. The names, paths, kinds and libraries of the
+//     modules must be the other tree's, whole. Each text must be the other tree's once this tree's bytes are
+//     decoded the other tree's way, and must differ from it exactly where it is not UTF-8: so the two differ in
+//     the faulty bytes and in nothing else (TestALuaModulesTextIsTheBytesOfItsFile). A text with such bytes is
+//     never handed to oracle.Values, which compares by JSON, where a faulty byte is written as U+FFFD too.
 //   - A project with a link to a folder in the place of src/, of lua/ or of a library's folder, or on the way to
 //     a library's folder. The other tree refuses none: it takes a link in the place of a folder for a folder
 //     without modules, and reads the modules through a link on the way. This tree refuses the link. The other
@@ -234,15 +240,47 @@ func inByteOrder(sources []sourceAs) []sourceAs {
 	return sorted
 }
 
-// runsAsOne is modules with each run of U+FFFD in a text as one U+FFFD.
-func runsAsOne(sources []sourceAs) []sourceAs {
-	read := slices.Clone(sources)
-	for i := range read {
-		for strings.Contains(read[i].Text, replacement+replacement) {
-			read[i].Text = strings.ReplaceAll(read[i].Text, replacement+replacement, replacement)
+// hasFaultyLua reports whether a project holds a .lua file outside src/ whose bytes are not UTF-8: a Lua module
+// that the other tree decodes and this tree does not.
+func hasFaultyLua(p project) bool {
+	for i := 0; i+1 < len(p.files); i += 2 {
+		path, text := p.files[i], p.files[i+1]
+		if strings.HasSuffix(path, ".lua") && !strings.HasPrefix(path, "src/") && !utf8.ValidString(text) {
+			return true
 		}
 	}
-	return read
+	return false
+}
+
+// withoutTexts is modules by their names, paths, kinds and libraries.
+func withoutTexts(sources []sourceAs) []sourceAs {
+	bare := slices.Clone(sources)
+	for i := range bare {
+		bare[i].Text = ""
+	}
+	return bare
+}
+
+// keptBytes compares the texts of modules that pair up, the other tree's and this tree's, where this tree's may
+// hold bytes that are not UTF-8. Each text of the other tree must be this tree's bytes decoded the other tree's
+// way, and the two must differ exactly where this tree's is not UTF-8. It returns how many differ.
+func keptBytes(t *testing.T, what string, want, got []sourceAs) (differing int) {
+	t.Helper()
+	for i := range want {
+		faulty := !utf8.ValidString(got[i].Text)
+		if decoded := oldtext.Lossy([]byte(got[i].Text)); want[i].Text != decoded {
+			t.Errorf("%s: the text of %s is %q, which decodes to %q, and the other tree's is %q",
+				what, got[i].Path, got[i].Text, decoded, want[i].Text)
+		}
+		if differs := want[i].Text != got[i].Text; differs != faulty {
+			t.Errorf("%s: the text of %s differs between the trees: %v, and has bytes that are not UTF-8: %v",
+				what, got[i].Path, differs, faulty)
+		}
+		if faulty {
+			differing++
+		}
+	}
+	return differing
 }
 
 // named is a project and what a report calls it.
@@ -340,10 +378,8 @@ var seededProjects = []named{
 	{"a byte order mark inside", mainOnly.and("lua/x.lua", "x = '"+mark+"'\n")},
 	{"an empty Lua module", mainOnly.and("lua/x.lua", "")},
 	{"a # after the first line", mainOnly.and("lua/x.lua", "\n#x\nn = #t\n")},
-	{"a byte that is not UTF-8", mainOnly.and("lua/x.lua", "a = '\xff'\n")},
-	{"a character that is cut short", mainOnly.and("lua/x.lua", "a = '\xe2\x80'\nb = '\xf0\x9f\x98'\n")},
-	{"bytes that are not UTF-8, each alone", mainOnly.and("lua/x.lua", "a = '\xff' .. '\xfe' .. '\xc0'\n")},
 	{"a YueScript file with bytes that are not UTF-8", mainOnly.and("src/x.yue", "a = '\xff\xfe'\n")},
+	{"a Lua file in src with bytes that are not UTF-8", mainOnly.and("src/x.lua", "a = '\xff\xfe'\n")},
 	{"a replacement character written twice", mainOnly.and("lua/x.lua", "a = '"+replacement+"' .. '"+replacement+"'\n")},
 	// Libraries.
 	{"two libraries with one name", mainOnly.with("b", "a").and(inLibrary("a", "x.lua"), "", inLibrary("b", "x.lua"), "")},
@@ -387,8 +423,11 @@ var projectsInAnotherOrder = []named{
 	)},
 }
 
-// projectsWithRunsOfBytes is projects with a Lua module that has faulty sequences of bytes side by side.
-var projectsWithRunsOfBytes = []named{
+// projectsWithFaultyBytes is projects with a Lua module that has bytes that are not UTF-8.
+var projectsWithFaultyBytes = []named{
+	{"a byte", mainOnly.and("lua/x.lua", "a = '\xff'\n")},
+	{"a character that is cut short", mainOnly.and("lua/x.lua", "a = '\xe2\x80'\nb = '\xf0\x9f\x98'\n")},
+	{"bytes, each alone", mainOnly.and("lua/x.lua", "a = '\xff' .. '\xfe' .. '\xc0'\n")},
 	{"two bytes", mainOnly.and("lua/x.lua", "a = '\xff\xfe'\n")},
 	{"letters of another encoding", mainOnly.and("lua/x.lua", "a = '\xe9\xe9\xe9' -- \xe5\xe4\xf6\n")},
 	{"a cut character before a byte", mainOnly.and("lua/x.lua", "a = '\xe2\x80\xff'\n")},
@@ -399,30 +438,45 @@ func TestOracleOnFindingTheModules(t *testing.T) {
 	var compared tally
 	for _, c := range slices.Concat(projectsOfTheOtherTreesTests, seededProjects) {
 		want, got, wantErr, gotErr := collectsAt(c.of.lay(t), c.of)
+		if hasFaultyLua(c.of) {
+			t.Errorf("%s: the project has a Lua file with bytes that are not UTF-8, which is compared in part", c.name)
+			continue
+		}
 		if !compared.whole(t, c.name, wantErr, gotErr) {
 			continue
 		}
-		if !slices.Equal(want, inByteOrder(want)) || !slices.Equal(want, runsAsOne(want)) {
-			t.Errorf("%s: the project is of a class that is compared in part", c.name)
+		if !slices.Equal(want, inByteOrder(want)) {
+			t.Errorf("%s: the other tree lists the modules in another order than by bytes, which is compared in part", c.name)
 		}
 		oracle.Values(t, c.name, want, got)
 	}
-	inPart := func(projects []named, asThisTreeReads func([]sourceAs) []sourceAs) {
-		for _, c := range projects {
-			want, got, wantErr, gotErr := collectsAt(c.of.lay(t), c.of)
-			compared.inPart++
-			if wantErr != nil || gotErr != nil || len(want) == 0 || slices.Equal(want, got) {
-				t.Errorf("%s: the two trees read the project alike, or refuse it: %v and %v", c.name, wantErr, gotErr)
-				continue
-			}
-			oracle.Values(t, c.name, asThisTreeReads(want), got)
+	// Module files in another order: the other tree's modules, whole, in the order of their bytes.
+	for _, c := range projectsInAnotherOrder {
+		want, got, wantErr, gotErr := collectsAt(c.of.lay(t), c.of)
+		compared.inPart++
+		if wantErr != nil || gotErr != nil || hasFaultyLua(c.of) || len(want) == 0 || slices.Equal(want, got) {
+			t.Errorf("%s: the two trees list the modules in one order, or refuse the project: %v and %v", c.name, wantErr, gotErr)
+			continue
+		}
+		oracle.Values(t, c.name, inByteOrder(want), got)
+	}
+	// Lua modules with bytes that are not UTF-8: all but the texts whole, and the texts by their bytes.
+	for _, c := range projectsWithFaultyBytes {
+		want, got, wantErr, gotErr := collectsAt(c.of.lay(t), c.of)
+		compared.inPart++
+		if wantErr != nil || gotErr != nil || !hasFaultyLua(c.of) || len(want) != len(got) {
+			t.Errorf("%s: %d and %d modules, %v and %v, of a project with faulty bytes: %v",
+				c.name, len(want), len(got), wantErr, gotErr, hasFaultyLua(c.of))
+			continue
+		}
+		oracle.Values(t, c.name, withoutTexts(want), withoutTexts(got))
+		if keptBytes(t, c.name, want, got) == 0 {
+			t.Errorf("%s: the two trees read every text alike", c.name)
 		}
 	}
-	inPart(projectsInAnotherOrder, inByteOrder)
-	inPart(projectsWithRunsOfBytes, runsAsOne)
-	// Of the 21 projects of the other tree's tests 13 are refused, and of the 63 seeded ones 27; in part, 3 for
-	// their order and 4 for their bytes.
-	compared.check(t, tally{refused: 40, results: 44, inPart: 7})
+	// Of the 21 projects of the other tree's tests 13 are refused, and of the 61 seeded ones 27; in part, 3 for
+	// their order and 7 for their bytes.
+	compared.check(t, tally{refused: 40, results: 42, inPart: 10})
 }
 
 func TestOracleOnALuaModuleThatCannotBeRead(t *testing.T) {

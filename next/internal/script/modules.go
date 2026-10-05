@@ -14,6 +14,7 @@ package script
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -42,7 +43,11 @@ type Source struct {
 	Path    string // from the project folder, with "/", such as "lua/utils/timer.lua"
 	Kind    Kind
 	Library string // the library's key; "" for the project's own
-	Text    string // a Lua module's text; a YueScript module is read when it is compiled
+	// Text is a Lua module's text; a YueScript module is read when it is compiled. It is the bytes of the file,
+	// without a byte order mark at the start and with a first line for a shell blanked. Nothing is decoded, so it
+	// may hold bytes that are not UTF-8: it is not to be written as JSON or read character by character where
+	// the bytes must stay.
+	Text string
 }
 
 // Collect lists every module: YueScript under src/, Lua under lua/, then each library's, in that order and then
@@ -51,8 +56,11 @@ type Source struct {
 //
 // The libraries are taken in the order given and are not sorted: the caller passes them in the order of their
 // keys. A library's YueScript comes before its Lua; within a folder and a kind, the modules are in the order of
-// their paths' bytes. lua/ and a library's folder may be missing, and then hold no modules. A link in the place of
-// one of the folders, or on the way to it, is refused.
+// their paths' bytes. lua/ and a library's folder may be missing, and then hold no modules.
+//
+// A link in the place of one of the folders, or on the way to it, is refused. Inside a folder a link is taken as
+// the listing gives it: a link to a file that is named as a module is that module, and a Lua one is read through
+// the link; a link to a folder is not entered, so the modules behind it are not found.
 func Collect(root string, libraries []Library) ([]Source, error) {
 	folders, err := moduleFolders(root, libraries)
 	if err != nil {
@@ -179,7 +187,7 @@ func (c *collected) addFolder(f folder) error {
 func (f folder) moduleFiles() ([]string, error) {
 	files, err := fsx.ListFiles(f.path)
 	if err != nil {
-		return nil, errUnreadableFolder(f.dir, err)
+		return nil, errUnreadableFolder(f.failedAt(err), err)
 	}
 	outputs := f.compiledOutputs(files)
 	extension := "." + string(f.kind)
@@ -190,6 +198,20 @@ func (f folder) moduleFiles() ([]string, error) {
 		}
 	}
 	return modules, nil
+}
+
+// failedAt is the folder at which a listing of f failed, as a path from the project folder with "/": the folder
+// below f that the system's error names, and f itself where the error names none.
+func (f folder) failedAt(cause error) string {
+	var failure *fs.PathError
+	if !errors.As(cause, &failure) {
+		return f.dir
+	}
+	below, err := filepath.Rel(f.path, failure.Path)
+	if err != nil || below == "." || !filepath.IsLocal(below) {
+		return f.dir
+	}
+	return f.dir + "/" + fsx.ToPosix(below)
 }
 
 // compiledOutputs is the files among a library's that are no Lua modules. In a library, YueScript and Lua share

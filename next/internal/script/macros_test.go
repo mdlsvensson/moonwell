@@ -3,6 +3,7 @@ package script
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -12,22 +13,25 @@ import (
 )
 
 func TestMacrosOfPointsYueAtItsFolderAndHashesTheModule(t *testing.T) {
-	root := filepath.FromSlash("/project")
+	root, wantPath, wantFile := "/project", "/project/.moonwell/yue/?.lua", "/project/.moonwell/yue/moonwell/macros.yue"
+	if runtime.GOOS == "windows" {
+		root, wantPath, wantFile = `C:\project`, `C:\project\.moonwell\yue\?.lua`, `C:\project\.moonwell\yue\moonwell\macros.yue`
+	}
 	search, err := macrosOf(root)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if search.path != filepath.Join(root, ".moonwell", "yue", "?.lua") || search.hash != fsx.SHA256Hex([]byte(moonwell.MacrosYue)) {
-		t.Errorf("macrosOf = %+v", search)
+	if search.path != wantPath || search.hash != fsx.SHA256Hex([]byte(moonwell.MacrosYue)) {
+		t.Errorf("macrosOf = %+v, want the path %s", search, wantPath)
 	}
 	if MacrosFile != ".moonwell/yue/moonwell/macros.yue" {
 		t.Errorf("MacrosFile = %s", MacrosFile)
 	}
-	// The compiler puts the module's name in place of the "?" and tries the pattern with .yue: that is the file
-	// RefreshMacros writes.
-	found := strings.Replace(search.path, "?.lua", filepath.Join("moonwell", "macros.yue"), 1)
-	if found != filepath.Join(root, filepath.FromSlash(MacrosFile)) {
-		t.Errorf("the search path %s finds %s, and the macro module is %s", search.path, found, MacrosFile)
+	// The compiler puts the module's name in place of the "?", with the system's separator for its dot, and tries
+	// the pattern with .yue: that is the file RefreshMacros writes.
+	found := strings.Replace(search.path, "?.lua", "moonwell"+string(filepath.Separator)+"macros.yue", 1)
+	if written := filepath.Join(root, filepath.FromSlash(MacrosFile)); found != wantFile || written != wantFile {
+		t.Errorf("the search path %s finds %s, and the macro module is written to %s, want %s for both", search.path, found, written, wantFile)
 	}
 }
 
