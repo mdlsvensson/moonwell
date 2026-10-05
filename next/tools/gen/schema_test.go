@@ -57,7 +57,13 @@ func metadataWith(fields map[string][]objects.FieldMeta) *objects.Metadata {
 // the name.
 func metadataOfOneBuff(t testing.TB, id, name string) string {
 	t.Helper()
-	text, err := json.Marshal(metadataWith(map[string][]objects.FieldMeta{"buffs": {field(id, name, nil)}}))
+	return metadataText(t, map[string][]objects.FieldMeta{"buffs": {field(id, name, nil)}})
+}
+
+// metadataText is the text of a data/metadata.json of game 1.2.3.4 with the fields, by the list they are in.
+func metadataText(t testing.TB, fields map[string][]objects.FieldMeta) string {
+	t.Helper()
+	text, err := json.Marshal(metadataWith(fields))
 	if err != nil {
 		t.Fatal(err)
 	}

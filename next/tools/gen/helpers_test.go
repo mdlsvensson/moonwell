@@ -98,9 +98,25 @@ func realFiles(t testing.TB, name string) []string {
 // the folders the generator writes afterwards (outputs), and the error the run ended with.
 func (c checkout) run(args ...string) (printed string, files map[string][]byte, err error) {
 	c.t.Helper()
+	printed, err = c.runBelow("", args...)
+	return printed, c.outputs(), err
+}
+
+// runBelow runs one command line of the generator in a folder of the checkout, which it makes: below is its path
+// from the checkout with "/", and "" is the checkout itself. It returns what the run printed and the error the run
+// ended with.
+func (c checkout) runBelow(below string, args ...string) (printed string, err error) {
+	c.t.Helper()
 	var out bytes.Buffer
-	err = run(c.root, args, &out)
-	return out.String(), c.outputs(), err
+	err = run(c.folder(below), args, &out)
+	return out.String(), err
+}
+
+// all is everything the checkout holds, by its path from the checkout with "/": a file with its bytes, and a
+// folder as nil. A file that a run writes outside the folders of the generator shows here.
+func (c checkout) all() map[string][]byte {
+	c.t.Helper()
+	return testkit.Snapshot(c.t, c.root)
 }
 
 // outputs is what the checkout has at and below data/ and schema/generated/, by its path from the checkout with
