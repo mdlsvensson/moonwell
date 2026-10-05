@@ -116,10 +116,15 @@ func compileInput(
 	return in
 }
 
-// planAssets plans the import of the project's assets, and of the files its libraries ship, into the map as
-// view has it. It returns the plan, and the lines that say which of a library's files the map's own replace.
-func planAssets(
-	ctx context.Context, view *mapdir.Folder, p *manifest.Project, synced []library.Synced,
+// PlanAssets plans the import of the project's assets and of the files its synced libraries ship into folder,
+// against what assets:sync owns there. It returns the plan and the lines that say which of a library's files
+// the map's own replace. It writes nothing.
+//
+// It is the one way an import is planned. For Plan, folder is the map as the steps before this one leave it. A
+// command that imports and builds nothing gives it the source map itself, and no view of it: assets.Sync writes
+// the folder its plan was made from.
+func PlanAssets(
+	ctx context.Context, folder *mapdir.Folder, p *manifest.Project, synced []library.Synced,
 ) (imported *assets.Result, replaced []string, err error) {
 	found, replaced, err := Assets(p, synced)
 	if err != nil {
@@ -129,7 +134,7 @@ func planAssets(
 	if err != nil {
 		return nil, nil, err
 	}
-	imported, err = assets.Plan(ctx, view, found, owned)
+	imported, err = assets.Plan(ctx, folder, found, owned)
 	if err != nil {
 		return nil, nil, err
 	}

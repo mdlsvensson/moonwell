@@ -83,7 +83,7 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 		return nil, err
 	}
 	view = view.With(set)
-	imported, replaced, err := planAssets(ctx, view, p, synced)
+	imported, replaced, err := PlanAssets(ctx, view, p, synced)
 	if err != nil {
 		return nil, err
 	}

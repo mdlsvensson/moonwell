@@ -1,15 +1,20 @@
 package build
 
 import (
+	"fmt"
 	"os"
+	"reflect"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/editor"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
+	"github.com/mdlsvensson/moonwell/next/internal/library"
 	"github.com/mdlsvensson/moonwell/next/internal/objects"
 	"github.com/mdlsvensson/moonwell/next/internal/script"
+	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
 // The door is a command's that compiles nothing, such as setup: it runs no program, and the ids module, which
@@ -51,5 +56,52 @@ func TestRefreshDeclarationsWritesTheDeclarationsAndTheMacroModuleAndNoIDsModule
 	}
 	if runs := s.ranSoFar(); len(runs) != 0 {
 		t.Errorf("the door ran %+v", runs)
+	}
+}
+
+// The door is a build's step, and the whole plan of a command that imports and builds nothing, such as
+// assets:sync, which gives it the source map itself: the assets of the project and of the synced libraries, into
+// the folder it is given, against what the ownership state says a sync wrote there.
+func TestPlanAssetsPlansTheImportIntoTheFolderItIsGivenAgainstWhatTheStateOwns(t *testing.T) {
+	s := newStandIn(t)
+	s.put("assets/icons/sword.blp", "own sword")
+	s.put(".moonwell/library-assets/kit/icons/Sword.blp", "kit sword")
+	s.put(".moonwell/library-assets/kit/kit/axe.blp", "kit axe")
+	s.put("maps/map.w3x/icons/old.blp", "an asset of an earlier sync")
+	s.put("maps/map.w3x/icons/kept.blp", "a file World Editor imported")
+	s.put(".asset-state/map.w3x.json", "{\n  \"version\": 1,\n  \"files\": {\n    \"icons/old.blp\": \""+
+		fsx.SHA256Hex([]byte("an asset of an earlier sync"))+"\"\n  }\n}\n")
+	before := testkit.Snapshot(t, s.root)
+	source := openedSource(t, s)
+	plan, replaced, err := PlanAssets(background, source, s.project, []library.Synced{syncedLibrary("kit", true)})
+	if err != nil {
+		t.Fatal(diag.Format(err))
+	}
+	imported := []string{
+		"icons/sword.blp from icons/sword.blp of : own sword", "kit/axe.blp from kit/axe.blp of kit: kit axe",
+	}
+	if got := describedAssets(plan.Assets); !slices.Equal(got, imported) {
+		t.Errorf("the plan imports %q, want %q", got, imported)
+	}
+	if want := []string{"assets/icons/sword.blp replaces library kit's icons/Sword.blp"}; !slices.Equal(replaced, want) {
+		t.Errorf("replaced = %q, want %q", replaced, want)
+	}
+	var changes []string
+	for _, change := range plan.Changes {
+		changes = append(changes, fmt.Sprint(change.Name, " removed: ", change.Remove))
+	}
+	slices.Sort(changes)
+	changed := []string{
+		"icons/old.blp removed: true", "icons/sword.blp removed: false", "kit/axe.blp removed: false",
+		"war3map.imp removed: false",
+	}
+	if !slices.Equal(changes, changed) {
+		t.Errorf("the plan changes %q, want %q", changes, changed)
+	}
+	if !reflect.DeepEqual(testkit.Snapshot(t, s.root), before) {
+		t.Error("planning the import changed the project")
+	}
+	if lines := s.log.Lines(); len(lines) != 0 {
+		t.Errorf("the plan logged %q", lines)
 	}
 }
