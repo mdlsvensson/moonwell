@@ -309,7 +309,7 @@ func errNoSuchField(s *subject, key string) fault {
 func errDoesNotApply(s *subject, field *FieldMeta) fault {
 	base := describeBase(s.metadata, s.category, s.object.Base)
 	msg := describeField(field) + " does not apply to " + base + "."
-	if use := fieldSource[s.category].use; use != "" && !slices.Contains(field.Use, use) {
+	if _, use := FieldSource(s.category); use != "" && !slices.Contains(field.Use, use) {
 		var plurals []string
 		for _, use := range field.Use {
 			plurals = append(plurals, usePlural[use])

@@ -13,9 +13,6 @@ import (
 // The embedded metadata, generated from the game's files: what must hold of it whenever it is generated again.
 var metadata = objects.LoadMetadata()
 
-// fieldLists are the five lists of fields, one for each kind of object file.
-var fieldLists = []string{"units", "items", "abilities", "buffs", "upgrades"}
-
 // duplicates returns the values that occur more than once.
 func duplicates(values []string) []string {
 	var found []string
@@ -31,19 +28,49 @@ func TestLoadMetadataReturnsTheEmbeddedMetadataParsedOnce(t *testing.T) {
 	if objects.LoadMetadata() != metadata || metadata.Format != 1 || metadata.Game != "3.0.0.24268" {
 		t.Errorf("metadata = format %d, game %q", metadata.Format, metadata.Game)
 	}
-	for _, list := range fieldLists {
+	for _, list := range objects.FieldLists {
 		if len(metadata.Fields[list]) == 0 {
 			t.Errorf("no %s fields", list)
 		}
 	}
-	if len(metadata.Fields) != len(fieldLists) || len(metadata.Bases) != len(manifest.Categories) {
+	if len(metadata.Fields) != len(objects.FieldLists) || len(metadata.Bases) != len(manifest.Categories) {
 		t.Errorf("%d field lists and %d categories of bases", len(metadata.Fields), len(metadata.Bases))
+	}
+}
+
+func TestFieldSourceNamesTheListAndTheUseOfEveryCategory(t *testing.T) {
+	if want := []string{"units", "items", "abilities", "buffs", "upgrades"}; !slices.Equal(objects.FieldLists, want) {
+		t.Errorf("the lists of fields are %q, want %q", objects.FieldLists, want)
+	}
+	sources := map[manifest.Category][2]string{
+		"heroes": {"units", "hero"}, "units": {"units", "unit"}, "buildings": {"units", "building"},
+		"items": {"items", "item"}, "abilities": {"abilities", ""}, "buffs": {"buffs", ""},
+		"upgrades": {"upgrades", ""},
+		// A category there is none of has no list and no use.
+		"spells": {"", ""}, "": {"", ""},
+	}
+	for category, want := range sources {
+		if list, use := objects.FieldSource(category); list != want[0] || use != want[1] {
+			t.Errorf("the fields of %q are in the list %q with the use %q, want %q", category, list, use, want)
+		}
+	}
+	var lists []string
+	for _, category := range manifest.Categories {
+		list, _ := objects.FieldSource(category)
+		if _, tested := sources[category]; !tested || !slices.Contains(objects.FieldLists, list) {
+			t.Errorf("the fields of %s are in the list %q; tested here: %v", category, list, tested)
+		}
+		lists = append(lists, list)
+	}
+	// Every list is the list of some category, and the lists come in the order of their first category.
+	if lists = slices.Compact(lists); !slices.Equal(lists, objects.FieldLists) {
+		t.Errorf("the categories have the lists %q, want %q", lists, objects.FieldLists)
 	}
 }
 
 func TestMetadataHasUniqueSortedRawcodesInEveryFieldList(t *testing.T) {
 	rawcode := regexp.MustCompile(`^[A-Za-z0-9]{3}[A-Za-z0-9\x00]$`)
-	for _, list := range fieldLists {
+	for _, list := range objects.FieldLists {
 		var ids, padded []string
 		for _, field := range metadata.Fields[list] {
 			ids = append(ids, field.ID)
@@ -74,7 +101,7 @@ func TestMetadataHasUniqueSortedRawcodesInEveryFieldList(t *testing.T) {
 
 func TestMetadataFriendlyNamesAreValidAndUniqueAmongTheFieldsAnObjectCanHave(t *testing.T) {
 	name := regexp.MustCompile(`^[a-z][A-Za-z0-9]*$`)
-	for _, list := range fieldLists {
+	for _, list := range objects.FieldLists {
 		for _, field := range metadata.Fields[list] {
 			if !name.MatchString(field.Name) || slices.Contains([]string{"id", "base", "source", "properties"}, field.Name) {
 				t.Errorf("%s %s has the name %q", list, field.ID, field.Name)
@@ -110,7 +137,7 @@ func TestMetadataFriendlyNamesAreValidAndUniqueAmongTheFieldsAnObjectCanHave(t *
 }
 
 func TestMetadataStorageTypesDataColumnsAndApplicabilityAreConsistent(t *testing.T) {
-	for _, list := range fieldLists {
+	for _, list := range objects.FieldLists {
 		for _, field := range metadata.Fields[list] {
 			problem := func(what string) { t.Errorf("%s %s: %s", list, field.ID, what) }
 			if !slices.Contains([]string{"int", "real", "unreal", "string"}, field.Storage) {

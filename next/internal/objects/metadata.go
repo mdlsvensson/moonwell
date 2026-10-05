@@ -48,16 +48,26 @@ type Metadata struct {
 	Bases map[manifest.Category]map[string]BaseMeta `json:"bases"`
 }
 
-// fieldSource names, for each category, the list its objects' fields are in and, for the categories of the unit
-// file, the use a field must have to apply to them.
-var fieldSource = map[manifest.Category]struct{ fields, use string }{
-	"heroes":    {"units", "hero"},
-	"units":     {"units", "unit"},
-	"buildings": {"units", "building"},
-	"items":     {"items", "item"},
-	"abilities": {"abilities", ""},
-	"buffs":     {"buffs", ""},
-	"upgrades":  {"upgrades", ""},
+// FieldLists are the five lists of fields in data/metadata.json, in the file's order: one per kind of
+// modification file.
+var FieldLists = []string{"units", "items", "abilities", "buffs", "upgrades"}
+
+// FieldSource names the list a category's fields are in and, for the categories of the unit file, the use a
+// field must have to apply to them ("" for the others). Both are "" for a category there is none of.
+func FieldSource(category manifest.Category) (list, use string) {
+	switch category {
+	case "heroes":
+		return "units", "hero"
+	case "units":
+		return "units", "unit"
+	case "buildings":
+		return "units", "building"
+	case "items":
+		return "items", "item"
+	case "abilities", "buffs", "upgrades":
+		return string(category), ""
+	}
+	return "", ""
 }
 
 // embedded parses the metadata the program carries, once. The file is part of the program, so one that does not
@@ -75,12 +85,13 @@ func LoadMetadata() *Metadata { return embedded() }
 
 // fieldList is the list of fields that objects of the category are written with.
 func (m *Metadata) fieldList(category manifest.Category) []FieldMeta {
-	return m.Fields[fieldSource[category].fields]
+	list, _ := FieldSource(category)
+	return m.Fields[list]
 }
 
 // AppliesTo reports whether an object of the category that copies base has the field.
 func AppliesTo(field *FieldMeta, category manifest.Category, base string) bool {
-	if use := fieldSource[category].use; use != "" && !slices.Contains(field.Use, use) {
+	if _, use := FieldSource(category); use != "" && !slices.Contains(field.Use, use) {
 		return false
 	}
 	if len(field.Specific) > 0 && !slices.Contains(field.Specific, base) {
