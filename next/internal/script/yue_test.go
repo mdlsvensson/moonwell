@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -510,8 +511,9 @@ func TestEachOfGivesWhatEachItemGaveInTheOrderOfTheItems(t *testing.T) {
 	var order []int
 	gave, err := eachOf(items, func(item int) (string, error) {
 		if (item+1)%atOnce != 0 && item != count-1 {
-			// A wait that work in fewer than eight at a time would never see the end of is given up, and the
-			// order then tells.
+			// The wait has a bound, so that the test ends when the item after this one is not started while this
+			// one runs. What the test proves is the order of what was given when the work ends in another order,
+			// and that some of the work runs side by side; that eight run at a time is another test's.
 			select {
 			case <-ended[item+1]:
 			case <-time.After(5 * time.Second):
@@ -535,36 +537,65 @@ func TestEachOfGivesWhatEachItemGaveInTheOrderOfTheItems(t *testing.T) {
 
 func TestEachOfStartsNoWorkAfterAnErrorAndReturnsItWhenTheRunningWorkHasEnded(t *testing.T) {
 	first, later := errors.New("the first failure"), errors.New("a later failure")
-	release := make(chan struct{})
-	var guard sync.Mutex
-	started, running := 0, 0
-	_, err := eachOf(make([]int, 40), func(int) (int, error) {
-		guard.Lock()
-		started++
-		running++
-		mine := started
-		if started == atOnce {
-			close(release)
+	// The test runs in a bubble, where Wait returns once every other goroutine waits on a channel: the test then
+	// knows that eachOf has started all it will start, and taken all it was handed, with no guess at how long
+	// that takes. Work that never gets on is a deadlock there, which ends the test.
+	synctest.Test(t, func(t *testing.T) {
+		firstMayEnd, othersMayEnd, returned := make(chan struct{}), make(chan struct{}), make(chan struct{})
+		var guard sync.Mutex
+		started, running := 0, 0
+		counted := func() (int, int) {
+			guard.Lock()
+			defer guard.Unlock()
+			return started, running
 		}
-		guard.Unlock()
-		// Eight are in before any ends. Then one fails at once, and the seven others a while later.
-		<-release
-		if mine != 1 {
-			time.Sleep(50 * time.Millisecond)
+		var err error
+		go func() {
+			defer close(returned)
+			_, err = eachOf(make([]int, 40), func(int) (int, error) {
+				guard.Lock()
+				started++
+				running++
+				mine := started
+				guard.Unlock()
+				defer func() {
+					guard.Lock()
+					running--
+					guard.Unlock()
+				}()
+				if mine == 1 {
+					<-firstMayEnd
+					return 0, first
+				}
+				<-othersMayEnd
+				return 0, later
+			})
+		}()
+		// Eight are in, and each waits to be let go.
+		synctest.Wait()
+		if in, still := counted(); in != atOnce || still != atOnce {
+			t.Errorf("%d were started and %d run before any has ended, want 8 and 8", in, still)
 		}
-		guard.Lock()
-		running--
-		guard.Unlock()
-		if mine == 1 {
-			return 0, first
+		// One fails. eachOf takes its failure, starts no ninth, though thirty-two items are left, and does not
+		// return while the seven others run.
+		close(firstMayEnd)
+		synctest.Wait()
+		in, still := counted()
+		select {
+		case <-returned:
+			t.Errorf("eachOf returned %v while %d of its work still ran", err, still)
+		default:
 		}
-		return 0, later
+		if in != atOnce || still != atOnce-1 {
+			t.Errorf("after the first failure %d were started and %d run, want 8 and 7", in, still)
+		}
+		// The seven others fail after it, and theirs is not the error returned.
+		close(othersMayEnd)
+		<-returned
+		if in, still := counted(); err != first || in != atOnce || still != 0 {
+			t.Errorf("eachOf = %v; %d were started and %d still run, want the first failure, 8 and 0", err, in, still)
+		}
 	})
-	// The error is the first that came; no ninth work was started, though thirty-two items were left; and the
-	// seven that ran were waited for.
-	if err != first || started != atOnce || running != 0 {
-		t.Errorf("eachOf = %v; %d were started and %d still run, want the first failure, 8 and 0", err, started, running)
-	}
 }
 
 func TestAfterAnErrorThatIsNoCompileFailureNoFurtherCompilerIsStarted(t *testing.T) {

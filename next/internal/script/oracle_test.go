@@ -1,6 +1,7 @@
 package script
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -15,6 +16,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
+	moonwell "github.com/mdlsvensson/moonwell"
 	oldbundle "github.com/mdlsvensson/moonwell/internal/bundle"
 	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
 	oldlint "github.com/mdlsvensson/moonwell/internal/lint"
@@ -99,14 +101,33 @@ import (
 //     tree's parts are its macro search, CollectModules, yue.Compile, EntryModuleName, ResolveGraph over Loader
 //     and lint.Check, which is handed what CompileProject hands it and reads the map's script itself; this tree
 //     is handed what the script defines. Each project is compiled twice, the second time with what the first
-//     left, and for two cases after a file was written in between. Of each compile: the runs of the compiler, to compile and to list globals, by their sources;
-//     whether a file of uses is kept; what is refused (kind, message, file, line, column and hint, and for
-//     unknown globals every problem); else the entry's name, the modules in their order (name, path, whether
-//     Lua), the unknown globals that were let pass, the lines of the log, and, as bytes and never through JSON,
-//     the Lua of each module and of each YueScript module of a library. The cases are projects with modules of
-//     every kind, unknown globals as errors and as warnings, the names that are known for each reason, the
-//     faults of the graph, and projects with several faults, of which the one that the steps come to first is
-//     reported.
+//     left, and for two cases after a file was written in between. Of each compile: the runs of the compiler,
+//     to compile and to list globals, by their sources; whether a file of uses is kept; what is refused (kind,
+//     message, file, line, column and hint, and for unknown globals every problem); else the entry's name, the
+//     modules in their order (name, path, whether Lua), the unknown globals that were let pass, the lines of
+//     the log, and, as bytes and never through JSON, the Lua of each module and of each YueScript module of a
+//     library. The cases are projects with modules of every kind, unknown globals as errors and as warnings,
+//     the names that are known for each reason, the faults of the graph, and projects with several faults, of
+//     which the one that the steps come to first is reported.
+//   - bundle.Emit against Bundle (TestOracleOnTheBundle): the block of Lua, byte for byte, for programs that
+//     are made by hand, each bundled plain and minified, with the runtime and from the line that the case
+//     gives. Both trees are handed the same modules, with the same bytes of Lua. The cases are the programs of
+//     the other tree's tests of the bundle and of its tests that run one, and seeded ones: modules of both
+//     kinds, Lua with line ends of every kind, with and without a last one, without any text and with bytes
+//     that are not UTF-8, runtimes with blank lines, with carriage returns and without text, names outside
+//     ASCII and with a quote or a backslash, entries of every kind, and many modules.
+//   - The same, for every program that TestOracleOnMakingAProgram makes, with the runtime the program carries:
+//     the other tree bundles its modules, and this tree its Program, in the mode the program was compiled in,
+//     which is what a build does, and in the other mode.
+//   - The end of pipeline.PrepareStage against Inject (TestOracleOnPlacingTheBundle): what is refused (kind,
+//     message, file and hint), else the bytes of the script with the bundle after it. The other tree's side is
+//     what its build does with the script it has read: it decodes the bytes, has bundle.Inject append what
+//     bundle.Emit gives for the line it is told, with the runtime the program carries, and writes the text.
+//     This tree is given a map folder that holds the script, and its one change must be of war3map.lua. The
+//     scripts are two that World Editor saved (the fixtures), those of the other tree's tests, and seeded
+//     ones: line ends of every kind, with and without a last one, a byte order mark, scripts that lack main,
+//     config or both, and definitions that are indented, spread over lines, in a comment, in a string, or
+//     that only look like one.
 //
 // Compared in part, and counted (tally.inPart). Each class is decided on the project or on the other tree's
 // result, and the two trees must differ on it.
@@ -136,15 +157,6 @@ import (
 //     (TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReachedOneAgain,
 //     TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro). The same project with an edit of
 //     a source without the word is among the cases compared whole.
-//
-// Two things that both trees do alike, and that the cases hold so that it stays so:
-//
-//   - In a minified build a fault of the graph in a YueScript module is reported at line 1: the line of a
-//     require is its line in the module's Lua, and minified Lua is one line. The case "a missing module,
-//     minified" compares it (TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua).
-//   - A `global` line inside a block comment or a long string of a YueScript source declares its names: the
-//     source is read line by line. Two of the sources given to DeclaredGlobals are such
-//     (TestAGlobalLineInABlockCommentOrALongStringDeclaresItsNames).
 //   - A project with module files whose order by bytes is not their order by UTF-16 units, which is so only where
 //     one name has a character beyond the basic plane and another one from U+E000 to U+FFFF in its place. This
 //     tree lists the files of a folder in the order of their bytes. The class is decided on the other tree's
@@ -199,6 +211,46 @@ import (
 //     then, which keeps each source it was to compile without a hash, and the other tree writes none. The
 //     class is decided on the other tree's result: no hashes file. All else of the step is compared whole, and
 //     the step is counted among the refused as well (TestAStoppedRunLeavesNothingItWasToCompileUpToDate).
+//   - A bundle of a program in which the name of a module, the path of one or the entry holds a control
+//     character, U+007F or bytes that are not UTF-8. Each tree writes a name as a string of Lua in its own way.
+//     For a backspace, a tab, a line feed, a form feed and a carriage return the other tree writes a letter
+//     after the backslash (\b, \t, \n, \f, \r) and this tree three digits (\008, \009, \010, \012, \013), which
+//     Lua reads as the same byte. For any other character below U+0020 the other tree writes \u00 and two
+//     digits, which is no string of Lua, so that the script does not load, and this tree three digits. U+007F
+//     the other tree writes as it is, and this tree as \127. A byte that is not UTF-8 the other tree writes as
+//     it is, and this tree writes U+FFFD in its place. The class is decided on the program. The two bundles
+//     must differ, have as many lines, and be alike in every line but the definitions, the entries of the table
+//     of lines and the start of the entry, which are the lines that hold a name
+//     (TestANameAndAPathAreWrittenAsLuaStringsThatLuaReadsBackAsTheirBytes).
+//   - A map's script with a character outside ASCII that the other tree reads as white space (those named
+//     above), before the `function` of main or of config at the start of a line, or between that word, the
+//     name and the `(`: a place where that reading decides whether the function is defined. This tree reads
+//     the white space of Lua only, and takes a byte order mark at the very start of the script for no part of
+//     its first line, where the other tree takes it for white space: a mark there decides nothing, and is
+//     compared whole. The class is decided on the script: the other tree's expression for a definition finds
+//     main or config, and the same expression with the white space of Lua does not. The other tree must append
+//     the bundle, and this tree must refuse the script for the function the character stands at
+//     (TestMainAndConfigAreFoundAtTheStartOfALineWithTheWhiteSpaceOfLua). A script with such a character where
+//     it decides nothing is among the scripts compared whole.
+//   - A map's script with bytes that are not UTF-8. The other tree decodes the script before it appends the
+//     bundle, and writes U+FFFD for each faulty sequence of bytes; this tree keeps every byte. The class is
+//     decided on the script. A refusal is compared whole. Else this tree's bytes, decoded the other tree's
+//     way, must be the other tree's bytes, the two must differ, and this tree's must start with the script's
+//     own bytes: so the two differ in the faulty bytes of the script and in nothing else
+//     (TestInjectKeepsAByteOrderMarkAndBytesThatAreNotUTF8).
+//
+// Three things that both trees do alike, and that the cases hold so that it stays so:
+//
+//   - In a minified build a fault of the graph in a YueScript module is reported at line 1: the line of a
+//     require is its line in the module's Lua, and minified Lua is one line. The case "a missing module,
+//     minified" compares it (TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua).
+//   - A `global` line inside a block comment or a long string of a YueScript source declares its names: the
+//     source is read line by line. Two of the sources given to DeclaredGlobals are such
+//     (TestAGlobalLineInABlockCommentOrALongStringDeclaresItsNames).
+//   - A carriage return that no line feed follows ends no line of a module's Lua in the table of lines, nor of
+//     a map's script in the count that gives the bundle its first line, though Lua ends a line there. Programs
+//     and scripts with one are among the cases (TestAModulesLinesAreSplitAtLineFeedsAndAFinalLineBreakStartsNoLine,
+//     TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine).
 //
 // Not among the inputs:
 //
@@ -266,6 +318,18 @@ import (
 //     (TestAFileOfNativesThatDoesNotParseGivesNoNatives).
 //   - Writing the macro module: the other tree writes it among the editor's files, which the oracle of that
 //     package compares.
+//   - A map without a script, and a map with a folder under the script's name. The other tree refuses the first
+//     in the middle of its build, which does much else before, in words that this tree keeps; on the second it
+//     fails with the system's error, and this tree refuses the folder (TestInjectRefusesAMapWithoutAScript,
+//     TestInjectRefusesAFolderInThePlaceOfTheScriptAsAFolder).
+//   - A script that the map spells in another letter case, which the other tree finds only where the file
+//     system does, and this tree everywhere
+//     (TestInjectReadsTheScriptInAnyLetterCaseAndNamesTheChangeAsTheMapSpellsIt).
+//   - A script that cannot be read: the other tree passes the system's error on, and this tree names the file
+//     (TestInjectPassesOnAScriptThatCannotBeRead).
+//   - A script as changes that are planned and not yet written leave it: the other tree writes each step's
+//     changes into the staged map before the next step reads it
+//     (TestInjectTakesTheScriptAsThePlannedChangesLeaveIt).
 
 // tally counts what an oracle compared, by how.
 type tally struct {
@@ -1027,8 +1091,9 @@ func (s compileStep) stagedAlike(t *testing.T, what string) (files int) {
 // compileTally counts what an oracle of the compile compared.
 type compileTally struct {
 	tally
-	runs  int // runs of the compiler by the other tree, which this tree made alike
-	files int // files of the staging folder, compared by their bytes
+	runs    int // runs of the compiler by the other tree, which this tree made alike
+	files   int // files of the staging folder, compared by their bytes
+	bundles int // bundles of programs, compared by their bytes
 }
 
 // check fails the test unless the oracle compared exactly what is expected of it.
@@ -1073,6 +1138,7 @@ func (s *summed) add(part compileTally) {
 	s.total.inPart += part.inPart
 	s.total.runs += part.runs
 	s.total.files += part.files
+	s.total.bundles += part.bundles
 }
 
 // sideBySide runs the cases of an oracle side by side, each as a test of its own, and returns once all of them
@@ -2383,8 +2449,19 @@ type programAs struct {
 }
 
 // luaOfProgram is the Lua a compile of a project gives, which is compared as bytes: that of each module the entry
-// reaches, by its place in the order and its name, and that of each YueScript module of a library, by its path.
+// reaches, by its place in the order and its name, that of each YueScript module of a library, by its path, and
+// the two bundles of the program, under the names of bundlesOf.
 type luaOfProgram map[string]string
+
+// programsStart is the line that the bundles of the programs start on.
+const programsStart = 1234
+
+// bundlesOf is the bundles a luaOfProgram has of its program, with the runtime the program carries, by their
+// names there: the bundle in the mode the program was compiled in, which is what a build makes, and the bundle
+// in the other mode, with the same modules.
+func bundlesOf(minify bool) map[string]bool {
+	return map[string]bool{"the bundle": minify, "the bundle, in the other mode": !minify}
+}
 
 // otherParts is the other tree's compile of a project up to the check, in the order of its CompileProject: the
 // macro search, the modules, the compile, the entry's name and the graph. The libraries are not synced, no
@@ -2439,6 +2516,11 @@ func (tr *trees) otherProgram(c programCase) (programAs, luaOfProgram, error) {
 		return programAs{}, nil, err
 	}
 	as, text := programAs{Entry: entry, Logged: log.Lines}, luaOfProgram{}
+	for name, minify := range bundlesOf(c.minify) {
+		text[name] = oldbundle.Emit(oldbundle.EmitInput{
+			Runtime: moonwell.RuntimeLua, Modules: modules, Entry: entry, FirstLine: programsStart, Minify: minify,
+		})
+	}
 	for i, module := range modules {
 		as.Modules = append(as.Modules, moduleAs{Name: module.Name, Path: module.SourcePath, IsLua: module.Kind == oldbundle.Lua})
 		text[fmt.Sprintf("module %d, %s", i, module.Name)] = module.Source
@@ -2478,6 +2560,14 @@ func (tr *trees) thisProgram(c programCase) (programAs, luaOfProgram, error) {
 		return programAs{}, nil, err
 	}
 	as, text := programAs{Entry: program.Entry, Logged: log.Lines()}, luaOfProgram{}
+	if program.Minify != c.minify {
+		tr.t.Errorf("%s: the program is minified: %v, and the case: %v", c.name, program.Minify, c.minify)
+	}
+	for name, minify := range bundlesOf(c.minify) {
+		inMode := *program
+		inMode.Minify = minify
+		text[name] = Bundle(&inMode, moonwell.RuntimeLua, programsStart)
+	}
 	for i, module := range program.Modules {
 		as.Modules = append(as.Modules, moduleAs{Name: module.Name, Path: module.Path, IsLua: module.Kind == Lua})
 		text[fmt.Sprintf("module %d, %s", i, module.Name)] = module.Lua
@@ -2510,14 +2600,19 @@ func (tr *trees) ran() (other, this []string) {
 	return other, this
 }
 
-// programsAlike compares two programs whole, the Lua as bytes, and counts the texts of Lua it compared.
+// programsAlike compares two programs whole, the Lua as bytes, and counts the texts of Lua and the bundles it
+// compared.
 func (c *compileTally) programsAlike(t *testing.T, what string, want, got programAs, wantLua, gotLua luaOfProgram) {
 	t.Helper()
 	oracle.Values(t, what, want, got)
 	oracle.Values(t, what+": the modules with Lua", slices.Sorted(maps.Keys(wantLua)), slices.Sorted(maps.Keys(gotLua)))
 	for name, text := range wantLua {
 		oracle.Bytes(t, what+": the Lua of "+name, []byte(text), []byte(gotLua[name]))
-		c.files++
+		if _, isBundle := bundlesOf(false)[name]; isBundle {
+			c.bundles++
+		} else {
+			c.files++
+		}
 	}
 }
 
@@ -2725,7 +2820,9 @@ func TestOracleOnMakingAProgram(t *testing.T) {
 	// The 36 projects, each compiled twice. 24 are refused, of which 2 for a module without code, which is
 	// compared in part: 44 refusals whole and 4 in part. 12 are made a program of; the second compile of one of
 	// them comes after an edit of its macro module and is compared in part: 23 results whole. Those programs hold
-	// 26 modules, and their libraries 4 YueScript modules with Lua: 30 texts, each compared twice as bytes.
+	// 26 modules, and their libraries 4 YueScript modules with Lua: 30 texts, each compared twice as bytes. Each
+	// of the 24 compiles that gave a program is bundled by both trees in the mode it was compiled in, which is
+	// minified for 2 of them, and in the other mode: 48 bundles.
 	//
 	// The compiler runs 121 times for each tree. For the 34 projects that no file is written in: 65 times to
 	// compile and 27 to list globals in the first compiles, and 11 times in the second ones, to compile again
@@ -2733,5 +2830,418 @@ func TestOracleOnMakingAProgram(t *testing.T) {
 	// their own: 3 times to compile and 2 to list; then, after the edit of the macro module, the same 5 again,
 	// in this tree's folder as in a new one; and after the edit of the other source, 3: that source compiled and
 	// listed, and the macro module, which compiles to no Lua and so is compiled in every compile.
-	compared.total.check(t, compileTally{tally: tally{refused: 44, results: 23, inPart: 5}, runs: 121, files: 60})
+	compared.total.check(t, compileTally{tally: tally{refused: 44, results: 23, inPart: 5}, runs: 121, files: 60, bundles: 48})
+}
+
+// ---- the bundle ----
+
+// bundleCase is a program that is made by hand, and the runtime and the line both trees bundle it with.
+type bundleCase struct {
+	name      string
+	entry     string // the entry's name; "" is main
+	modules   []Module
+	runtime   string
+	firstLine int
+}
+
+// program is the case's program, plain or minified.
+func (c bundleCase) program(minify bool) *Program {
+	entry := c.entry
+	if entry == "" {
+		entry = "main"
+	}
+	return &Program{Entry: entry, Modules: c.modules, Minify: minify}
+}
+
+// otherBundle is the other tree's bundle of a program. A YueScript module is handed to it without a kind, which
+// is how that tree's compile gives one.
+func otherBundle(program *Program, runtime string, firstLine int) string {
+	var modules []oldbundle.CompiledModule
+	for _, module := range program.Modules {
+		compiled := oldbundle.CompiledModule{Name: module.Name, SourcePath: module.Path, Source: module.Lua}
+		if module.Kind == Lua {
+			compiled.Kind = oldbundle.Lua
+		}
+		modules = append(modules, compiled)
+	}
+	return oldbundle.Emit(oldbundle.EmitInput{
+		Runtime: runtime, Modules: modules, Entry: program.Entry, FirstLine: firstLine, Minify: program.Minify,
+	})
+}
+
+// writtenAnotherWay reports whether a name holds what the two trees write differently in a string of Lua: a
+// control character, U+007F, or bytes that are not UTF-8.
+func writtenAnotherWay(name string) bool {
+	return !utf8.ValidString(name) || strings.ContainsFunc(name, func(r rune) bool { return r < 0x20 || r == 0x7f })
+}
+
+// namedAnotherWay reports whether a program has a name the two trees write differently: the entry, the name of
+// a module, or a module's path.
+func namedAnotherWay(program *Program) bool {
+	return writtenAnotherWay(program.Entry) || slices.ContainsFunc(program.Modules, func(module Module) bool {
+		return writtenAnotherWay(module.Name) || writtenAnotherWay(module.Path)
+	})
+}
+
+// holdsAName reports whether a line of a bundle is one of those that hold a name: the definition of a module,
+// an entry of the table of lines, or the start of the entry.
+func holdsAName(line string) bool {
+	return strings.HasPrefix(line, "__mw.define(") || strings.HasPrefix(line, "__mw.boot(") ||
+		(strings.HasPrefix(line, "{") && strings.HasSuffix(line, "},"))
+}
+
+// alikeButForNames compares two bundles of a program with a name the trees write differently: they must differ,
+// have as many lines, and differ in no line but those that hold a name.
+func alikeButForNames(t *testing.T, what, want, got string) {
+	t.Helper()
+	wantLines, gotLines := strings.Split(want, "\n"), strings.Split(got, "\n")
+	if want == got || len(wantLines) != len(gotLines) {
+		t.Errorf("%s: the bundles are alike: %v, and have %d and %d lines", what, want == got, len(wantLines), len(gotLines))
+		return
+	}
+	for i := range wantLines {
+		if wantLines[i] != gotLines[i] && !(holdsAName(wantLines[i]) && holdsAName(gotLines[i])) {
+			t.Errorf("%s: line %d is %q in the other tree and %q in this tree, and holds no name", what, i+1, wantLines[i], gotLines[i])
+		}
+	}
+}
+
+// hooksLua is the entry of the other tree's test that runs hooks around config and main.
+const hooksLua = "local mw = require(\"moonwell\")\nlocal helper = require(\"util.helper\")\nmw.before_config(function() log(\"before_config\") end)\n" +
+	"mw.on_main(function() log(\"on_main \" .. helper.value) end)\nmw.on_main(function() error(\"hook failed\") end)\nreturn {}"
+
+// manyModules is forty modules of one to four lines each, by turns YueScript and Lua.
+func manyModules() []Module {
+	var modules []Module
+	for i := range 40 {
+		name, text := fmt.Sprintf("m%02d", i), strings.Repeat("x = 1\n", i%4+1)
+		if i%2 == 0 {
+			modules = append(modules, ofSrc(name, text))
+		} else {
+			modules = append(modules, ofLua(name, text))
+		}
+	}
+	return modules
+}
+
+// bundlesOfTheOtherTreesTests is the programs of the other tree's tests of its bundle, and of its tests that run
+// one in Lua, which bundle with the runtime the program carries.
+var bundlesOfTheOtherTreesTests = []bundleCase{
+	{name: "two modules, from line 10", modules: utilAndMain, runtime: "local __mw = {}\n-- runtime", firstLine: 10},
+	{name: "a Lua module, and no runtime", modules: append(slices.Clone(utilAndMain), ofLua("lib", "return {}")), firstLine: 1},
+	{name: "hooks", runtime: moonwell.RuntimeLua, firstLine: 7, modules: []Module{ofSrc("util.helper", "return { value = 42 }"), ofSrc("main", hooksLua)}},
+	{name: "an entry that fails", runtime: moonwell.RuntimeLua, firstLine: 7, modules: []Module{ofSrc("main", `error("boot failed")`)}},
+	{name: "two lines", runtime: moonwell.RuntimeLua, firstLine: 7, modules: []Module{ofSrc("main", "local x = 1\nerror(\"boot failed\")")}},
+	{name: "a Lua module that fails", runtime: moonwell.RuntimeLua, firstLine: 7, modules: []Module{
+		ofSrc("main", "local lib = require(\"lib\")\nlib.fail()"), ofLua("lib", failingLua),
+	}},
+	{name: "a Lua module with a blank first line", runtime: moonwell.RuntimeLua, firstLine: 7, modules: []Module{
+		ofSrc("main", "local lib = require(\"lib\")\nlog(Greeting)\nlib.fail()"), ofLua("lib", "\nGreeting = \"hi\"\n"+failingLua+"\n"),
+	}},
+}
+
+// seededBundles is programs that reach every way a bundle is written.
+var seededBundles = []bundleCase{
+	// The lines of a module.
+	{name: "a final line break", modules: []Module{ofSrc("main", "a = 1\nb = 2\n")}, runtime: "-- r\n", firstLine: 1},
+	{name: "no final line break", modules: []Module{ofSrc("main", "a = 1\nb = 2")}, runtime: "-- r\n", firstLine: 1},
+	{name: "two final line breaks", modules: []Module{ofLua("main", "a = 1\n\n")}, runtime: "-- r\n", firstLine: 1},
+	{name: "blank lines first", modules: []Module{ofLua("main", "\n\n\na = 1\n")}, runtime: "-- r\n", firstLine: 1},
+	{name: "carriage returns before the line feeds", modules: []Module{ofLua("lib", "a = 1\r\nb = 2\r\n"), ofSrc("main", "c = 3\r\nd = 4")}, runtime: "-- r\n", firstLine: 3},
+	{name: "a carriage return alone", modules: []Module{ofLua("lib", "a = 1\rb = 2\rc = 3"), ofSrc("main", "d = 4\r")}, runtime: "-- r\n", firstLine: 3},
+	{name: "line feeds before carriage returns", modules: []Module{ofLua("lib", "a = 1\n\rb = 2\n\r"), ofSrc("main", "\r\r\n\n\r\n")}, runtime: "-- r\n", firstLine: 3},
+	{name: "a module without text", modules: []Module{ofSrc("none", ""), ofLua("blank", ""), ofSrc("main", "\n"), ofLua("after", "x = 1")}, runtime: "-- r\n", firstLine: 2},
+	{name: "Lua with bytes that are not UTF-8", modules: []Module{ofLua("lib", "a = '\xff'\nb = '\xe2\x82'\n"), ofSrc("main", "-- \xe9\xe5\n\xc0 = 1")}, runtime: "-- r\n", firstLine: 2},
+	{name: "Lua that looks like a bundle", modules: []Module{ofLua("main", "end)\n__mw.define(\"x\", function(...)\n__mw.lines = {\n{1, 2, \"a\", \"b\"},\n}\nend")}, runtime: "-- r\n", firstLine: 2},
+	// The runtime.
+	{name: "a runtime with blank lines", modules: utilAndMain, runtime: "a = 1\n\n\nb = 2\n", firstLine: 1},
+	{name: "a runtime that is a line break", modules: utilAndMain, runtime: "\n", firstLine: 1},
+	{name: "a runtime of blank lines", modules: utilAndMain, runtime: "\n\n\n", firstLine: 1},
+	{name: "a runtime with carriage returns", modules: utilAndMain, runtime: "a = 1\r\n\r\nb = 2\r\n", firstLine: 5},
+	{name: "a runtime with a carriage return alone", modules: utilAndMain, runtime: "a = 1\rb = 2\n", firstLine: 5},
+	{name: "a runtime without a final line break", modules: utilAndMain, runtime: "a = 1\nb = 2", firstLine: 5},
+	{name: "the runtime the program carries, with carriage returns", modules: utilAndMain, runtime: strings.ReplaceAll(moonwell.RuntimeLua, "\n", "\r\n"), firstLine: 5},
+	// The first line.
+	{name: "from line 0", modules: utilAndMain, runtime: "-- r\n", firstLine: 0},
+	{name: "from a late line", modules: utilAndMain, runtime: moonwell.RuntimeLua, firstLine: 123456},
+	// The modules, and their names.
+	{name: "no modules", runtime: "-- r\n", firstLine: 1},
+	{name: "many modules", modules: manyModules(), entry: "m39", runtime: moonwell.RuntimeLua, firstLine: 4000},
+	{name: "Lua modules alone", modules: []Module{ofLua("a.b", "return 1\n"), ofLua("main", "return 2\n")}, runtime: "-- r\n", firstLine: 1},
+	{name: "a module of a library", runtime: "-- r\n", firstLine: 1, modules: []Module{
+		{Name: "kit", Path: inLibrary("ex", "kit/init.yue"), Kind: Yue, Library: "ex", Lua: "return 1\n"},
+		{Name: "plain", Path: inLibrary("ex", "plain.lua"), Kind: Lua, Library: "ex", Lua: "return 2\n"}, ofSrc("main", "require('kit')\n"),
+	}},
+	{name: "a module under two names", runtime: "-- r\n", firstLine: 1, modules: []Module{
+		{Name: "tools", Path: "lua/tools/init.lua", Kind: Lua, Lua: "return {}\n"}, {Name: "tools.init", Path: "lua/tools/init.lua", Kind: Lua, Lua: "return {}\n"},
+		ofSrc("main", "require('tools')\n"),
+	}},
+	{name: "an init module as the entry", entry: "game.init", modules: []Module{ofSrc("game.units", "return 3\n"), ofSrc("game.init", "return 4\n")}, runtime: "-- r\n", firstLine: 9},
+	{name: "names outside ASCII", entry: eAcute, runtime: "-- r\n", firstLine: 1, modules: []Module{
+		ofSrc(eAcute, "return 1\n"), ofLua(beyond+"."+fullWidthA, "return 2\n"), ofSrc(replacement, "return 3\n"), ofLua("a"+noBreakSpace+"b", "return 4\n"),
+		// U+0085 and U+2028: control characters and line ends outside ASCII, which both trees write as they are.
+		ofSrc("a\xc2\x85b", "return 5\n"), ofLua("a"+lineSeparator+"b", "return 6\n"),
+	}},
+	{name: "names with a quote, a backslash and a space", entry: `a"b`, runtime: "-- r\n", firstLine: 1, modules: []Module{
+		ofSrc(`a"b`, "return 1\n"), ofLua(`a\b`, "return 2\n"), ofSrc(`a\nb`, "return 3\n"), ofLua("a b", "return 4\n"), ofSrc(`\\"`, "return 5\n"),
+		ofLua("a'b]]--", "return 6\n"), ofSrc("~{},", "return 7\n"),
+	}},
+	{name: "no name at all", entry: " ", modules: []Module{{Kind: Lua, Lua: "return 1"}, {Name: " ", Path: " ", Kind: Yue, Lua: "return 2"}}, runtime: "-- r\n", firstLine: 1},
+}
+
+// bundlesNamedAnotherWay is programs with a name that the two trees write differently.
+var bundlesNamedAnotherWay = []bundleCase{
+	{name: "a tab in a name", modules: []Module{ofSrc("a\tb", "return 1\n"), ofSrc("main", "return 2\n")}, runtime: "-- r\n", firstLine: 1},
+	{name: "the control characters with a letter of their own", runtime: "-- r\n", firstLine: 1, modules: []Module{
+		ofLua("a\bb", "return 1\n"), ofLua("a\fb", "return 2\n"), ofLua("a\nb", "return 3\n"), ofLua("a\rb", "return 4\n"), ofSrc("main", "return 5\n"),
+	}},
+	{name: "other control characters", runtime: "-- r\n", firstLine: 1, modules: []Module{
+		ofLua("a\x00b", "return 1\n"), ofLua("a\x011", "return 2\n"), ofLua("a\vb", "return 3\n"), ofLua("a\x1fb", "return 4\n"), ofSrc("main", "return 5\n"),
+	}},
+	{name: "U+007F", modules: []Module{ofSrc("a\x7fb", "return 1\n"), ofSrc("main", "return 2\n")}, runtime: "-- r\n", firstLine: 1},
+	{name: "a control character in a path alone", modules: []Module{{Name: "main", Path: "src/a\tb/main.yue", Kind: Yue, Lua: "return 1\n"}}, runtime: "-- r\n", firstLine: 1},
+	{name: "a control character in the entry alone", entry: "a\x7f", modules: []Module{ofSrc("main", "return 1\n")}, runtime: "-- r\n", firstLine: 1},
+	{name: "a byte that is not UTF-8", modules: []Module{ofLua("a\xffb", "return 1\n"), ofSrc("main", "return 2\n")}, runtime: "-- r\n", firstLine: 1},
+	{name: "a character that is cut short", entry: "\xe2\x82", modules: []Module{ofSrc("\xe2\x82", "return 1\n"), ofLua("x"+eAcute[:1], "return 2\n")}, runtime: moonwell.RuntimeLua, firstLine: 50},
+}
+
+func TestOracleOnTheBundle(t *testing.T) {
+	var compared tally
+	for _, c := range slices.Concat(bundlesOfTheOtherTreesTests, seededBundles) {
+		for _, minify := range []bool{false, true} {
+			program, what := c.program(minify), fmt.Sprintf("%s, minified: %v", c.name, minify)
+			if namedAnotherWay(program) {
+				t.Errorf("%s: the program has a name the trees write differently, which is compared in part", what)
+				continue
+			}
+			oracle.Bytes(t, what, []byte(otherBundle(program, c.runtime, c.firstLine)), []byte(Bundle(program, c.runtime, c.firstLine)))
+			compared.results++
+		}
+	}
+	// A name that the trees write differently: all but the lines that hold a name.
+	for _, c := range bundlesNamedAnotherWay {
+		for _, minify := range []bool{false, true} {
+			program, what := c.program(minify), fmt.Sprintf("%s, minified: %v", c.name, minify)
+			compared.inPart++
+			if !namedAnotherWay(program) {
+				t.Errorf("%s: the program has no name the trees write differently", what)
+				continue
+			}
+			alikeButForNames(t, what, otherBundle(program, c.runtime, c.firstLine), Bundle(program, c.runtime, c.firstLine))
+		}
+	}
+	// The 7 programs of the other tree's tests and the 28 seeded ones, each plain and minified; in part, 8 programs.
+	compared.check(t, tally{results: 70, inPart: 16})
+}
+
+// ---- the bundle in a map ----
+
+// placedProgram is the program both trees place in the maps of these cases: minified, so that the table of lines
+// has entries of both kinds, each with the lines it has from the line the script ends on.
+var placedProgram = byHand(true, ofSrc("util", "return {}\n"), ofLua("lib", failingLua), ofSrc("main", "require('util')\nrequire('lib')\n"))
+
+// otherPlaced is what the other tree's build leaves in a map's script, as the end of its PrepareStage does it:
+// the bytes are decoded, bundle.Inject appends what bundle.Emit gives for the line it is told, with the runtime
+// the program carries, and the text is what is written.
+func otherPlaced(script []byte, program *Program) ([]byte, error) {
+	bundled, err := oldbundle.Inject(oldtext.Lossy(script), func(firstLine int) string {
+		return otherBundle(program, moonwell.RuntimeLua, firstLine)
+	}, mapLabel+"/war3map.lua")
+	if err != nil {
+		return nil, err
+	}
+	return []byte(bundled), nil
+}
+
+// thisPlaced is the bytes of the one change this tree's Inject returns for a map folder that holds the script.
+func thisPlaced(t *testing.T, what string, script []byte, program *Program) ([]byte, error) {
+	t.Helper()
+	changes, err := Inject(mapOf(t, "war3map.lua", string(script)), program)
+	if err != nil {
+		return nil, err
+	}
+	if len(changes) != 1 || changes[0].Name != "war3map.lua" || changes[0].Remove {
+		t.Errorf("%s: Inject returns %d changes, want one that writes war3map.lua", what, len(changes))
+		return nil, nil
+	}
+	return changes[0].Bytes, nil
+}
+
+// otherDefines is the other tree's expression for the definition of a function of a map's script, and
+// luaDefines the same expression with the white space of Lua in the place of that tree's own.
+func otherDefines(name string) *regexp.Regexp {
+	return regexp.MustCompile(`(?m)^` + oldtext.SpaceClass + `*function` + oldtext.SpaceClass + `+` + name + oldtext.SpaceClass + `*\(`)
+}
+
+func luaDefines(name string) *regexp.Regexp {
+	return regexp.MustCompile(`(?m)^[ \t\n\v\f\r]*function[ \t\n\v\f\r]+` + name + `[ \t\n\v\f\r]*\(`)
+}
+
+// foundAnotherWay is the function, main or config, that the other tree's expression finds in a script and the
+// same expression with the white space of Lua does not, once a byte order mark at the start is set aside; ""
+// when there is none. For such a script, white space outside ASCII decides whether the function is defined.
+func foundAnotherWay(script string) string {
+	for _, name := range []string{"main", "config"} {
+		if otherDefines(name).MatchString(script) && !luaDefines(name).MatchString(strings.TrimPrefix(script, mark)) {
+			return name
+		}
+	}
+	return ""
+}
+
+// scriptCase is a map's script.
+type scriptCase struct{ name, script string }
+
+const bothDefined = "function config()\nend\nfunction main()\nend\n"
+
+// scriptsOfTheOtherTreesTests is the scripts of the other tree's tests of Inject, and the stand-in for a map of
+// its tests that run a bundle.
+var scriptsOfTheOtherTreesTests = []scriptCase{
+	{"no final line break", "function config()\nend\nfunction main()\nend"},
+	{"carriage returns before the line feeds", "function config()\r\nend\r\nfunction main()\r\nend\r\n"},
+	{"no config", "function main()\nend\n"},
+	{"no main, and names that start with it", "local function main()\nend\nfunction config ()\nend\n  function  mainly()\nend"},
+	{"the stand-in for a map", standInMap},
+}
+
+// seededScripts is scripts that reach every way a script is read and ended.
+var seededScripts = []scriptCase{
+	// The end of the script, and its line ends.
+	{"a final line break", bothDefined},
+	{"blank lines at the end", bothDefined + "\n\n\n"},
+	{"carriage returns, and no final line break", "function config()\r\nend\r\nfunction main()\r\nend"},
+	{"a carriage return alone at the end", "function config()\nend\nfunction main()\nend\r"},
+	{"carriage returns alone, after the definitions", bothDefined + "-- a\r-- b\rx = 1\r"},
+	{"carriage returns alone, between the definitions", "function config()\rend\rfunction main()\rend\r"},
+	{"a carriage return alone before a definition", "\rfunction main()\n\r\rfunction config()\n"},
+	{"line feeds before carriage returns", "function config()\n\rend\n\rfunction main()\n\rend\n\r"},
+	{"one line for each", "function config() end\nfunction main() end"},
+	{"a late definition", strings.Repeat("-- a line\n", 500) + bothDefined + strings.Repeat("x = 1\n", 500)},
+	// A byte order mark.
+	{"a byte order mark", mark + "-- saved with a mark\n" + bothDefined},
+	{"a byte order mark, and no final line break", mark + "x = 1\nfunction config() end\nfunction main() end"},
+	{"a byte order mark and carriage returns", mark + "x = 1\r\nfunction config()\r\nend\r\nfunction main()\r\nend\r\n"},
+	{"a byte order mark before main", mark + "function main()\nend\nfunction config()\nend\n"},
+	{"a byte order mark and spaces before config", mark + " \tfunction config()\nend\nfunction main()\nend\n"},
+	{"a byte order mark, and no main", mark + "function config()\nend\n"},
+	// Scripts that lack a function.
+	{"no main", "function config()\nend\n"},
+	{"neither", "x = 1\n"},
+	{"nothing", ""},
+	{"line breaks alone", "\n\r\n\n"},
+	{"main without its bracket", "function main\nfunction config()\nend\n"},
+	{"main at the end, without its bracket", "function config()\nend\nfunction main"},
+	{"config assigned", "function main()\nend\nconfig = function()\nend\n"},
+	{"main as a local", "local function main()\nend\nfunction config()\nend\n"},
+	{"main as a field", "function M.main()\nend\nfunction M:main()\nend\nfunction config()\nend\n"},
+	{"longer names", "function mainly()\nend\nfunction main2()\nend\nfunction _main()\nend\nfunction config()\nend\n"},
+	{"other letter case", "Function main()\nend\nfunction Main()\nend\nFUNCTION MAIN()\nend\nfunction config()\nend\n"},
+	{"functionmain", "functionmain()\nend\nfunction config()\nend\n"},
+	{"main after a statement", "x = 1 function main()\nend\nfunction config()\nend\n"},
+	{"main after a semicolon", "x = 1; function main()\nend\nfunction config()\nend\n"},
+	{"config in a comment", "function main()\nend\n-- function config()\n"},
+	{"config in a string", "function main()\nend\ns = 'function config()'\n"},
+	{"a NUL after the name", "function main\x00()\nend\nfunction config()\nend\n"},
+	// Scripts that define both.
+	{"indented", "  function config()\n  end\n\tfunction main()\n\tend\n"},
+	{"every white space of Lua before", " \t\v\f\rfunction config()\nend\n\v\ffunction main()\nend\n"},
+	{"white space between the words", "function\tconfig\t(\t)\nend\nfunction  \v\fmain  \v\f()\nend\n"},
+	{"the words on lines of their own", "function\nconfig\n(\n)\nend\nfunction\r\n  main\r\n  ()\r\nend\r\n"},
+	{"blank lines before", "\n\n  \n\t\nfunction config()\nend\n\n\nfunction main()\nend\n"},
+	{"in a long comment", "--[[\nfunction main()\n]]\n--[==[\n  function config()\n]==]\n"},
+	{"in a long string", "s = [[\nfunction main()\nfunction config()\n]]\n"},
+	{"defined twice", bothDefined + bothDefined},
+	{"with parameters", "function config(a, b)\nend\nfunction main(...)\nend\n"},
+	{"a bracket alone", "function config(\nfunction main("},
+	{"Lua that no parser takes", "function config()\nend\nfunction main()\nend\n))) end end ]] \"\n"},
+	// Characters outside ASCII that decide nothing.
+	{"a no-break space in a comment", "-- a" + noBreakSpace + "b\n" + bothDefined},
+	{"a line separator after a statement", "x = 1" + lineSeparator + "function main()\nfunction config()\nend\nfunction main()\nend\n"},
+	{"a line separator before a function that is not there", "x = 1\n" + lineSeparator + "function other()\nend\n" + bothDefined},
+	{"a wide space where main is not defined", "function config()\nend\nx = 1 " + wideSpace + "function main()\nend\n"},
+	{"a mark in a string, and letters", "s = '" + mark + eAcute + beyond + replacement + "'\n" + bothDefined},
+	{"a no-break space after the bracket", "function config(" + noBreakSpace + ")\nend\nfunction main(" + paragraphEnd + ")\nend\n"},
+	{"a no-break space inside the name", "function ma" + noBreakSpace + "in()\nend\nfunction config()\nend\n"},
+}
+
+// scriptsFoundAnotherWay is scripts with white space outside ASCII where it decides whether main or config is
+// defined, each with the function it stands at.
+var scriptsFoundAnotherWay = []scriptCase{
+	{"a no-break space before main", "function config()\nend\n" + noBreakSpace + "function main()\nend\n"},
+	{"a no-break space after function", "function" + noBreakSpace + "config()\nend\nfunction main()\nend\n"},
+	{"a no-break space among spaces", "function config()\nend\nfunction " + noBreakSpace + " main()\nend\n"},
+	{"a wide space before the bracket", "function config" + wideSpace + "()\nend\nfunction main()\nend\n"},
+	{"a line separator before main", "function config()\nend\n" + lineSeparator + "function main()\nend\n"},
+	{"a paragraph separator after function", "function config()\nend\nfunction" + paragraphEnd + "main()\nend\n"},
+	{"a mark that is not at the start", "x = 1\n" + mark + "function config()\nend\nfunction main()\nend\n"},
+	{"a second mark at the start", mark + mark + "function main()\nend\nfunction config()\nend\n"},
+	{"an em space before config, and carriage returns", "function main()\r\nend\r\n\xe2\x80\x83function config()\r\nend\r\n"},
+}
+
+// scriptsWithFaultyBytes is scripts with bytes that are not UTF-8.
+var scriptsWithFaultyBytes = []scriptCase{
+	{"letters of another encoding", "-- caf\xe9 \xe5\xe4\xf6\n" + bothDefined},
+	{"a byte in a string", "s = '\xff'\n" + bothDefined + "t = '\xfe\xff'\n"},
+	{"a character that is cut short at the end", bothDefined + "-- \xe2\x82"},
+	{"a character that is cut short before a line break", bothDefined + "-- \xf0\x9f\x98\n"},
+	{"bytes, each alone, a mark and carriage returns", mark + "s = '\xff' .. '\xc0' .. '\xe2\x80\xff'\r\nfunction config()\r\nend\r\nfunction main()\r\nend"},
+	{"a byte before main, which is then not defined", "function config()\nend\n\xa0function main()\nend\n"},
+	{"a byte after function, where config is then not defined", "function main()\nend\nfunction\xa0config()\nend\n"},
+	{"a byte, and no main", "-- \xff\nfunction config()\nend\n"},
+}
+
+func TestOracleOnPlacingTheBundle(t *testing.T) {
+	var compared tally
+	fixtures := []scriptCase{
+		{"the script World Editor saved with the settings fixture", string(testkit.Fixture(t, "map-settings-v39/war3map.lua"))},
+		{"the script World Editor saved with globals", string(testkit.Fixture(t, "map-globals-we3/war3map.lua"))},
+	}
+	for _, c := range slices.Concat(fixtures, scriptsOfTheOtherTreesTests, seededScripts) {
+		if !utf8.ValidString(c.script) || foundAnotherWay(c.script) != "" {
+			t.Errorf("%s: the script has bytes that are not UTF-8, or white space that the trees read differently, and is compared in part", c.name)
+			continue
+		}
+		want, wantErr := otherPlaced([]byte(c.script), placedProgram)
+		got, gotErr := thisPlaced(t, c.name, []byte(c.script), placedProgram)
+		if compared.whole(t, c.name, wantErr, gotErr) {
+			oracle.Bytes(t, c.name, want, got)
+		}
+	}
+	// White space outside ASCII that decides: the other tree appends the bundle, and this tree refuses.
+	for _, c := range scriptsFoundAnotherWay {
+		want, wantErr := otherPlaced([]byte(c.script), placedProgram)
+		got, gotErr := thisPlaced(t, c.name, []byte(c.script), placedProgram)
+		compared.inPart++
+		lacks, refusal := foundAnotherWay(c.script), &diag.Error{}
+		if lacks == "" || !utf8.ValidString(c.script) || wantErr != nil || len(want) == 0 || got != nil || !errors.As(gotErr, &refusal) ||
+			refusal.Msg != "The map script does not define function "+lacks+"()." || refusal.File != mapLabel+"/war3map.lua" {
+			t.Errorf("%s: the other tree gives %d bytes, %v, and this tree %d bytes, %v, which must refuse the script for %q",
+				c.name, len(want), wantErr, len(got), gotErr, lacks)
+		}
+	}
+	// Bytes that are not UTF-8: a refusal whole, and else the bytes as each tree keeps them.
+	for _, c := range scriptsWithFaultyBytes {
+		want, wantErr := otherPlaced([]byte(c.script), placedProgram)
+		got, gotErr := thisPlaced(t, c.name, []byte(c.script), placedProgram)
+		compared.inPart++
+		if utf8.ValidString(c.script) || foundAnotherWay(c.script) != "" {
+			t.Errorf("%s: the script is UTF-8, or has white space that the trees read differently", c.name)
+		}
+		if oracle.Refusals(t, c.name, wantErr, gotErr) {
+			compared.refused++
+			continue
+		}
+		if wantErr != nil || gotErr != nil {
+			continue
+		}
+		oracle.Bytes(t, c.name+", decoded the other tree's way", want, []byte(oldtext.Lossy(got)))
+		if bytes.Equal(want, got) || !bytes.HasPrefix(got, []byte(c.script)) {
+			t.Errorf("%s: the two trees write the same bytes: %v, and this tree's start with the script's own: %v",
+				c.name, bytes.Equal(want, got), bytes.HasPrefix(got, []byte(c.script)))
+		}
+	}
+	// Of the 2 fixtures none is refused, of the 5 scripts of the other tree's tests 2, and of the 51 seeded ones
+	// 21: 23 refusals and 35 results whole. In part, 9 for their white space and 8 for their bytes, of which 3
+	// are refused by both trees, whole, and counted among the refusals too: 26.
+	compared.check(t, tally{refused: 26, results: 35, inPart: 17})
 }

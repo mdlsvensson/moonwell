@@ -321,13 +321,14 @@ func TestTheEntryIsTheModuleOfTheEntryFile(t *testing.T) {
 func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 	// The compiler writes no Lua for a source without code, so there is no module to put in the bundle. The
 	// file is there, so the refusal is not that of a module that is not found.
-	const hint = "YueScript writes no Lua for a file without code, and "
+	// The hint is true of a file of comments and of a file that only defines macros.
+	const hint, such = "YueScript writes no Lua for a file with nothing but comments and macros, and ", " is such a file."
 	b := programOf(t, mainOnly.and("src/game/notes.yue", "-- nothing yet\n"))
 	b.fake(map[string]answer{"src/main.yue": leavingLua("\nrequire('game.notes')\n"), "src/game/notes.yue": {}}, nil)
 	_, err := b.compile()
 	failure := asError(t, err, "a required module without code")
 	if failure.Msg != "Module 'game.notes' has no code." || failure.File != "src/main.yue" || failure.Line != 2 ||
-		failure.Hint != hint+"src/game/notes.yue has none." {
+		failure.Hint != hint+"src/game/notes.yue"+such {
 		t.Errorf("error = %+v", failure)
 	}
 	// An init module, required by its folder's name.
@@ -336,7 +337,7 @@ func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 	_, err = b.compile()
 	failure = asError(t, err, "a required init module without code")
 	if failure.Msg != "Module 'kit' has no code." || failure.File != "src/main.yue" || failure.Line != 1 ||
-		failure.Hint != hint+inLibrary("ex", "kit/init.yue")+" has none." {
+		failure.Hint != hint+inLibrary("ex", "kit/init.yue")+such {
 		t.Errorf("error = %+v", failure)
 	}
 	// The entry itself: nothing requires it, so the failure is at its own file, without a line.
@@ -344,7 +345,7 @@ func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 	b.fake(map[string]answer{"src/main.yue": {}}, nil)
 	_, err = b.compile()
 	failure = asError(t, err, "an entry without code")
-	if failure.Msg != "Module 'main' has no code." || failure.File != "src/main.yue" || failure.Line != 0 || failure.Hint != hint+"src/main.yue has none." {
+	if failure.Msg != "Module 'main' has no code." || failure.File != "src/main.yue" || failure.Line != 0 || failure.Hint != hint+"src/main.yue"+such {
 		t.Errorf("error = %+v", failure)
 	}
 }

@@ -35,9 +35,9 @@ type dependsOn struct {
 // know, so every source that may define a macro counts for every output: an edit, an arrival or a removal of
 // one compiles every source again, and an edit of any other source compiles that source alone.
 //
-// It follows the sources that Collect found, and nothing else. A Lua file or data that the body of a macro
-// loads while the compiler runs, and a macro module that the compiler finds outside the project's and the
-// libraries' sources, may change what a source compiles to without changing this.
+// It follows the sources that Collect found, and nothing else. A file that the body of a macro loads while the
+// compiler runs, and a macro module that the compiler finds outside the project's and the libraries' sources,
+// may change what a source compiles to without changing this.
 func macroSourcesOf(units []unit) string {
 	var holding []unit
 	for _, u := range units {

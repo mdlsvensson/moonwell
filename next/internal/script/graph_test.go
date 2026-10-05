@@ -27,19 +27,19 @@ const noCode = "\x00a source without code"
 
 // modulesOf loads modules by name from pairs of a name and the module's Lua: each is the YueScript module at
 // src/<name with "/" for each dot>.yue. A module whose Lua is noCode has a source and no Lua.
-func modulesOf(pairs ...string) func(name string) (found, error) {
-	return func(name string) (found, error) {
+func modulesOf(pairs ...string) func(name string) (leadsTo, error) {
+	return func(name string) (leadsTo, error) {
 		for i := 0; i+1 < len(pairs); i += 2 {
 			path := "src/" + strings.ReplaceAll(name, ".", "/") + ".yue"
 			switch {
 			case pairs[i] != name:
 			case pairs[i+1] == noCode:
-				return found{without: path}, nil
+				return leadsTo{without: path}, nil
 			default:
-				return found{module: &Module{Name: name, Path: path, Kind: Yue, Lua: pairs[i+1]}}, nil
+				return leadsTo{module: &Module{Name: name, Path: path, Kind: Yue, Lua: pairs[i+1]}}, nil
 			}
 		}
-		return found{}, nil
+		return leadsTo{}, nil
 	}
 }
 
@@ -66,13 +66,13 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 	}
 	// No module has the name.
 	for _, name := range []string{"missing", "kit", "main.init"} {
-		if got, err := load(name); got != (found{}) || err != nil {
+		if got, err := load(name); got != (leadsTo{}) || err != nil {
 			t.Errorf("load(%s) = %+v, %v, want no module", name, got, err)
 		}
 	}
 	// A module has the name, and its source compiled to no Lua: it is told from a name that no module has, by
 	// its file.
-	if got, err := load("pending"); got != (found{without: "src/pending.yue"}) || err != nil {
+	if got, err := load("pending"); got != (leadsTo{without: "src/pending.yue"}) || err != nil {
 		t.Errorf("load(pending) = %+v, %v, want the file of a module without Lua", got, err)
 	}
 
@@ -90,7 +90,7 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 	if got, err := loadGame("game"); err != nil || got.module == nil || *got.module != want {
 		t.Errorf("load(game) = %+v, %v, want %+v", got, err, want)
 	}
-	if got, err := loadGame("broken"); got != (found{}) || err != failure {
+	if got, err := loadGame("broken"); got != (leadsTo{}) || err != failure {
 		t.Errorf("load(broken) = %+v, %v, want the failure of the read", got, err)
 	}
 }
@@ -115,7 +115,7 @@ func TestReachedReturnsReachableModulesDependenciesFirst(t *testing.T) {
 
 func TestABuiltInModuleIsNeverLoaded(t *testing.T) {
 	asked := []string{}
-	modules, err := reached("main", func(name string) (found, error) {
+	modules, err := reached("main", func(name string) (leadsTo, error) {
 		asked = append(asked, name)
 		return modulesOf("main", `require("moonwell")`, "moonwell", "return 'a file of that name'")(name)
 	})
@@ -170,7 +170,7 @@ func TestReachedRefusesAModuleWithoutCodeAsOneAndNotAsOneThatIsNotFound(t *testi
 	_, err := reached("main", modulesOf("main", "\n\nrequire('game.notes')", "game.notes", noCode))
 	failure := asError(t, err, "a required module without code")
 	if failure.Msg != "Module 'game.notes' has no code." || failure.File != "src/main.yue" || failure.Line != 3 ||
-		!strings.Contains(failure.Hint, "src/game/notes.yue") || !strings.Contains(failure.Hint, "writes no Lua for a file without code") {
+		!strings.Contains(failure.Hint, "src/game/notes.yue") || !strings.Contains(failure.Hint, "writes no Lua for a file with nothing but comments and macros") {
 		t.Errorf("error = %+v", failure)
 	}
 	// The entry: no file requires it, so the failure is at its own file, without a line.
@@ -213,7 +213,7 @@ func TestReachedReportsACycleWithItsChain(t *testing.T) {
 
 func TestReachedPassesOnTheFailureOfALoad(t *testing.T) {
 	failure := errors.New("the output is gone")
-	modules, err := reached("main", func(string) (found, error) { return found{}, failure })
+	modules, err := reached("main", func(string) (leadsTo, error) { return leadsTo{}, failure })
 	if modules != nil || err != failure {
 		t.Errorf("reached = %+v, %v", modules, err)
 	}

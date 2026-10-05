@@ -1,14 +1,20 @@
-// Package script turns a project's source files into the Lua that goes into a map: it finds the modules, compiles
-// the YueScript ones, follows the requires from the entry, checks for globals nobody defines, and writes the
-// bundle.
+// Package script turns a project's source files into the Lua that goes into a map: it writes the macro module
+// the sources import, finds the modules, compiles the YueScript ones, follows the requires from the entry, checks
+// for globals nobody defines, renders the bundle, and plans the bundle's place at the end of the map's script.
 //
-// It takes a compiler, the libraries' folders and what the map's own script defines, and returns a Program; Inject
-// places a Program in a map folder as a change.
+// Compile takes a project folder, a compiler, the entry, the libraries' folders, the lint block, the game's API
+// (LoadNatives) and what the map's own script defines, and returns a Program. Bundle takes a Program, the
+// runtime and the line the bundle starts on, and returns the block of Lua. Inject takes a map folder and a
+// Program, and returns one change: the map's script with the bundle after it. Collect, EntryName and
+// RefreshMacros are steps of a compile that other packages take alone.
 //
-// It knows nothing of libraries' sources, of manifests beyond the lint block, or of how a map is built.
+// It knows nothing of where a library comes from, of manifests beyond the lint block, or of how a map is built.
+// Of a map it knows one file, war3map.lua: what it defines, which Compile is handed, and its bytes, which Inject
+// reads through the folder. It writes the macro module and what a compile leaves below dist/stage/lua, and no
+// file of a map.
 //
 // Of Moonwell it imports manifest, mapdir, war3/lua, env, diag, fsx and the root package, for the files the
-// program carries.
+// program carries: the macro module, the game's API and the runtime.
 package script
 
 import (

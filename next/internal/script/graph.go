@@ -8,9 +8,9 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/war3/lua"
 )
 
-// found is what a name that a require gives leads to: a module; or, for a module whose source compiled to no
+// leadsTo is what a name that a require gives leads to: a module; or, for a module whose source compiled to no
 // Lua, the file of that source; or neither, for a name that no module has.
-type found struct {
+type leadsTo struct {
 	module  *Module
 	without string // the path, from the project folder, of a YueScript source without an output
 }
@@ -20,31 +20,31 @@ type found struct {
 // the source, with ok false for a source without an output. Either is returned under the name it was required
 // by. A YueScript module without an output is told from a name that no module has: the compiler writes no Lua
 // for a source without code, and the file is there all the same.
-func loaderOf(sources []Source, read func(Source) (text string, ok bool, err error)) func(name string) (found, error) {
+func loaderOf(sources []Source, read func(Source) (text string, ok bool, err error)) func(name string) (leadsTo, error) {
 	byName := make(map[string]Source, len(sources))
 	for _, source := range sources {
 		byName[source.Name] = source
 	}
-	return func(name string) (found, error) {
+	return func(name string) (leadsTo, error) {
 		source, has := byName[name]
 		if !has {
 			if source, has = byName[name+".init"]; !has {
-				return found{}, nil
+				return leadsTo{}, nil
 			}
 		}
 		module := &Module{Name: name, Path: source.Path, Kind: source.Kind, Library: source.Library, Lua: source.Text}
 		if source.Kind == Lua {
-			return found{module: module}, nil
+			return leadsTo{module: module}, nil
 		}
 		text, ok, err := read(source)
 		switch {
 		case err != nil:
-			return found{}, err
+			return leadsTo{}, err
 		case !ok:
-			return found{without: source.Path}, nil
+			return leadsTo{without: source.Path}, nil
 		}
 		module.Lua = text
-		return found{module: module}, nil
+		return leadsTo{module: module}, nil
 	}
 }
 
@@ -54,7 +54,7 @@ func loaderOf(sources []Source, read func(Source) (text string, ok bool, err err
 // A name is visited once, and a built-in module is never loaded. A require is followed only when it is called
 // with one string literal: a module's name is what the bundle defines it by, so a name that is computed cannot
 // be followed. A failure of load is passed on as it is.
-func reached(entry string, load func(name string) (found, error)) ([]Module, error) {
+func reached(entry string, load func(name string) (leadsTo, error)) ([]Module, error) {
 	w := walk{load: load, state: map[string]int{}}
 	if err := w.visit(entry, required{}); err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ const (
 
 // walk is one walk of the requires.
 type walk struct {
-	load    func(name string) (found, error)
+	load    func(name string) (leadsTo, error)
 	state   map[string]int // by name; 0 for a name the walk has not come to
 	stack   []string       // the names whose requires are being followed, from the entry down
 	ordered []Module       // the modules whose requires have all been followed
@@ -151,7 +151,9 @@ func errNoModule(name string, at required) error {
 }
 
 // errNoCode refuses a module whose source, which is file, compiled to no Lua: there is nothing to put in the
-// bundle under its name. at is the require; the entry, which nothing requires, is refused at its own file.
+// bundle under its name. at is the require; the entry, which nothing requires, is refused at its own file. The
+// hint is true of every such source: a file without text, a file of comments, and a file that only defines
+// macros, which are for the compiler alone.
 func errNoCode(name, file string, at required) error {
 	if at.file == "" {
 		at = required{file: file}
@@ -160,7 +162,7 @@ func errNoCode(name, file string, at required) error {
 		Msg:  "Module '" + name + "' has no code.",
 		File: at.file,
 		Line: at.line,
-		Hint: "YueScript writes no Lua for a file without code, and " + file + " has none.",
+		Hint: "YueScript writes no Lua for a file with nothing but comments and macros, and " + file + " is such a file.",
 	}
 }
 
