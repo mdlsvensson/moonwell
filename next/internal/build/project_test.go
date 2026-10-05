@@ -128,25 +128,33 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 }
 
 func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
-	tests := []struct{ name, folder string }{
-		{"no name", ""},
-		{"maps itself", "."},
-		{"maps itself, the long way", "map.w3x/.."},
-		{"a folder beside maps", "../outside"},
-		{"the folder above the map, by way of maps", "../maps/map.w3x/.."},
-		{"a folder beside maps, with a backslash", `..\outside`},
-		{"the folder above the map, with backslashes", `..\maps\map.w3x\..`},
-		{"the folder above maps", ".."},
-		{"a path from the root", "/abs"},
-		{"a path from the root, with a backslash", `\abs`},
-		{"a path from a drive", `C:\x`},
-		{"a path from a drive, with a slash", "c:/maps/map.w3x"},
-		{"a name on a drive", "C:x.w3x"},
+	const notInside, unusable = "must name a folder inside maps/", "has a name that Windows cannot hold"
+	tests := []struct{ name, folder, words string }{
+		{"no name", "", notInside},
+		{"maps itself", ".", notInside},
+		{"maps itself, the long way", "map.w3x/..", notInside},
+		{"a folder beside maps", "../outside", notInside},
+		{"the folder above the map, by way of maps", "../maps/map.w3x/..", notInside},
+		{"a folder beside maps, with a backslash", `..\outside`, notInside},
+		{"the folder above the map, with backslashes", `..\maps\map.w3x\..`, notInside},
+		{"the folder above maps", "..", notInside},
+		{"a path from the root", "/abs", notInside},
+		{"a path from the root, with a backslash", `\abs`, notInside},
+		{"a path from a drive", `C:\x`, notInside},
+		{"a path from a drive, with a slash", "c:/maps/map.w3x", notInside},
+		{"a name on a drive", "C:x.w3x", notInside},
 		// No ".." is resolved: a path with one is refused, wherever it leads.
-		{"a way out and back in", "a/../b.w3x"},
-		{"a way out and back in, with backslashes", `a\..\map.w3x`},
-		{"parts that are dots alone", "./."},
-		{"separators alone", `/\/`},
+		{"a way out and back in", "a/../b.w3x", notInside},
+		{"a way out and back in, with backslashes", `a\..\map.w3x`, notInside},
+		{"parts that are dots alone", "./.", notInside},
+		{"separators alone", `/\/`, notInside},
+		// A name Windows cannot hold is refused by the manifest on every system, and not at a place below maps/.
+		{"a device's name", "con.w3x", unusable},
+		{"a character Windows forbids", "map?.w3x", unusable},
+		{"a folder that ends with a dot", `campaign\.\one.\map.w3x`, unusable},
+		{"a folder with a device's name", "campaign/nul/map.w3x", unusable},
+		{"a name that ends with a space", "map.w3x ", unusable},
+		{"a colon after the first letters", "my:map.w3x", unusable},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -157,8 +165,7 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 			s.project.File, s.project.Map.Folder = localManifest, tt.folder
 			source, err := Source(s.project)
 			e := asError(t, err, "map.folder "+tt.folder)
-			if source != nil || e.File != localManifest || e.Cause != nil ||
-				!strings.Contains(e.Msg, "must name a folder inside maps/") ||
+			if source != nil || e.File != localManifest || e.Cause != nil || !strings.Contains(e.Msg, tt.words) ||
 				!strings.Contains(e.Msg, `"`+tt.folder+`"`) || !strings.Contains(e.Hint, "such as map.w3x") {
 				t.Errorf("error = %+v", e)
 			}
@@ -231,25 +238,6 @@ func TestSourceRefusesALinkOnTheWayToTheMapAndALinkInTheMapsPlace(t *testing.T) 
 				t.Errorf("error = %+v", e)
 			}
 		})
-	}
-}
-
-// What fsx.Inside refuses of a folder inside maps comes in its words, at the folder: a name Windows cannot hold.
-func TestSourcePassesOnTheRefusalOfANameWindowsCannotHold(t *testing.T) {
-	tests := []struct{ folder, label string }{
-		{"con.w3x", "maps/con.w3x"},
-		{"map?.w3x", "maps/map?.w3x"},
-		{`campaign\.\one.\map.w3x`, "maps/campaign/one./map.w3x"},
-		{"campaign/nul/map.w3x", "maps/campaign/nul/map.w3x"},
-	}
-	for _, tt := range tests {
-		s := newStandIn(t)
-		s.project.File, s.project.Map.Folder = localManifest, tt.folder
-		source, err := Source(s.project)
-		e := asError(t, err, "map.folder "+tt.folder)
-		if source != nil || e.File != tt.label || !strings.Contains(e.Msg, "Invalid path: "+tt.label) || e.Hint == "" {
-			t.Errorf("map.folder %q: error = %+v", tt.folder, e)
-		}
 	}
 }
 
@@ -520,13 +508,18 @@ func TestStateFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 }
 
 func TestStateFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
-	for _, folder := range []string{"", "../outside", `C:\x`, "a/../b.w3x"} {
+	const notInside = "must name a folder inside maps/"
+	tests := []struct{ folder, words string }{
+		{"", notInside}, {"../outside", notInside}, {`C:\x`, notInside}, {"a/../b.w3x", notInside},
+		{"map?.w3x", "has a name that Windows cannot hold"},
+	}
+	for _, tt := range tests {
 		s := newStandIn(t)
-		s.project.File, s.project.Map.Folder = localManifest, folder
+		s.project.File, s.project.Map.Folder = localManifest, tt.folder
 		file, err := StateFile(s.project)
-		e := asError(t, err, "map.folder "+folder)
-		if file != "" || e.File != localManifest || !strings.Contains(e.Msg, "must name a folder inside maps/") {
-			t.Errorf("map.folder %q: StateFile = %q, %+v", folder, file, e)
+		e := asError(t, err, "map.folder "+tt.folder)
+		if file != "" || e.File != localManifest || !strings.Contains(e.Msg, tt.words) {
+			t.Errorf("map.folder %q: StateFile = %q, %+v", tt.folder, file, e)
 		}
 	}
 }

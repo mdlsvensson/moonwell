@@ -45,10 +45,10 @@ func loadWith(ctx context.Context, e *env.Env, pkl string) (*manifest.Project, e
 // Source opens the project's source map, maps/<map.folder>. Commands read it and never write into it, except
 // assets:sync.
 //
-// A map.folder that names no folder inside maps/, and a folder that is not there, are refused with the manifest
-// as their file: map.folder is what to put right. A link on the way to the folder, a name Windows cannot hold
-// and what a map folder cannot hold are refused by fsx.Inside and mapdir.Open, at the path they are found at; a
-// file in the folder's place, such as a packed map, is among the last.
+// A map.folder that names no folder inside maps/, one with a name Windows cannot hold, and a folder that is not
+// there, are refused with the manifest as their file: map.folder is what to put right. A link on the way to the
+// folder and what a map folder cannot hold are refused by fsx.Inside and mapdir.Open, at the path they are found
+// at; a file in the folder's place, such as a packed map, is among the last.
 func Source(p *manifest.Project) (*mapdir.Folder, error) {
 	folder, err := mapFolder(p)
 	if err != nil {
@@ -78,13 +78,26 @@ func Source(p *manifest.Project) (*mapdir.Folder, error) {
 // The value is read by the rule of schema/Project.pkl (segments, isRelativeFolder), as text, so that the answer
 // is the same on every system: it is split at "/" and "\", and its empty and "." parts are dropped. A value that
 // starts with a separator or a drive, one with a ".." part, and one with no part left names no folder inside
-// maps/, and is refused with the manifest as its file. No ".." is resolved against the part before it.
+// maps/, and is refused with the manifest as its file. No ".." is resolved against the part before it. So is a
+// value with a name Windows cannot hold: the map, its stage and its archive are named by it on every system.
 func mapFolder(p *manifest.Project) (string, error) {
 	parts := partsOf(p.Map.Folder)
-	if leavesItsFolder(p.Map.Folder, parts) || len(parts) == 0 {
+	switch {
+	case leavesItsFolder(p.Map.Folder, parts), len(parts) == 0:
 		return "", errNotInsideMaps(p.File, p.Map.Folder)
+	case !everySystemHolds(parts):
+		return "", errUnusableMapFolder(p.File, p.Map.Folder)
 	}
 	return strings.Join(parts, "/"), nil
+}
+
+// everySystemHolds reports whether a folder of these parts is one every system can make: whether each part is a
+// name fsx.RelPath takes, which Windows can hold. The schema lets a folder with another name through, and
+// fsx.Inside refuses the place of such a one in words for a file of the user's; a manifest's folder is refused
+// by the manifest, with the value.
+func everySystemHolds(parts []string) bool {
+	_, portable := fsx.RelPath(strings.Join(parts, "/"))
+	return portable
 }
 
 // leavesItsFolder reports whether a path, as a manifest writes one, is no path from the folder it is written
@@ -294,6 +307,18 @@ func errNotInsideMaps(manifestFile, folder string) error {
 		Msg:  `map.folder must name a folder inside maps/, not "` + folder + `".`,
 		File: manifestFile,
 		Hint: "Set map.folder to the name of the map folder under maps/, such as map.w3x.",
+	}
+}
+
+// unusableNames ends a refusal of a folder of the manifest that has a name Windows cannot hold.
+const unusableNames = `A name cannot hold a control character or any of < > : " | ? *, end with a dot or a ` +
+	"space, or be a device name such as CON or NUL."
+
+func errUnusableMapFolder(manifestFile, folder string) error {
+	return &diag.Error{
+		Msg:  `map.folder has a name that Windows cannot hold: "` + folder + `".`,
+		File: manifestFile,
+		Hint: "Set map.folder to the name of the map folder under maps/, such as map.w3x. " + unusableNames,
 	}
 }
 

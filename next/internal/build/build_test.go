@@ -176,32 +176,53 @@ func TestBuildPlansWithTheOptionsOfTheCommand(t *testing.T) {
 	}
 }
 
-// The project of the test has an object, so each failure comes after the plan's step for the objects went well.
-// What a build says it added, applied and imported is what it wrote into the stage: a build that fails before the
-// stage is written says none of it, and leaves the stage of the build before as it was.
+// The project of the test has an object, a setting and an asset, so a failure after the plan's step for each
+// would show a line that the plan logged. What a build says it added, applied and imported is what it wrote into
+// the stage: a build that fails before the stage is written says none of it, and leaves the stage of the build
+// before as it was.
 func TestAFailedBuildLeavesNoArchive(t *testing.T) {
+	whole := []string{objectsWith(captain("hfoo")), settingsNamed("Built")}
+	applied := []string{
+		"Added 1 custom object(s) to 2 file(s).", "Applied map settings to 2 internal file(s).", "Imported 1 asset(s).",
+	}
 	tests := []struct {
-		name  string
-		spoil func(s *standIn)
-		words string
-		logs  []string // what the failed build logs: nothing, unless it fails after the map is staged
+		name   string
+		blocks []string // the manifest of the build that goes well
+		spoil  func(s *standIn)
+		words  string
+		logs   []string // what the failed build logs: nothing, unless it fails after the map is staged
 	}{
-		{"a source the compiler refuses", func(s *standIn) {
+		{"a source the compiler refuses", whole, func(s *standIn) {
 			// The source is another than the one the build before compiled, so it is compiled again.
 			s.put("src/main.yue", "x = = 2\n")
 			s.refuses("src/main.yue", "1: unexpected token\n")
 		}, "unexpected token", nil},
-		{"a setting the map cannot take", func(s *standIn) {
+		{"a setting the map cannot take", whole, func(s *standIn) {
 			s.evaluatesTo(objectsWith(captain("hfoo")), refusedPlayer)
 		}, "player 23 does not exist", nil},
-		{"a map that cannot be packed", func(s *standIn) { s.remove("maps/map.w3x/war3map.w3i") },
-			"war3map.w3i is missing", []string{"Added 1 custom object(s) to 2 file(s).", "Packing archive..."}},
+		// The plan's last step: the objects, the settings and the assets are planned by then.
+		{"a script the bundle cannot be placed in", whole, func(s *standIn) {
+			script, _ := os.ReadFile(s.at("maps/map.w3x/war3map.lua"))
+			s.put("maps/map.w3x/war3map.lua", strings.ReplaceAll(string(script), "function main()", "function start()"))
+		}, "does not define function main()", nil},
+		// The settings need the file a map cannot be packed without, so this project has none.
+		{"a map that cannot be packed", whole[:1], func(s *standIn) { s.remove("maps/map.w3x/war3map.w3i") },
+			"war3map.w3i is missing", []string{applied[0], applied[2], "Packing archive..."}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t, objectsWith(captain("hfoo")))
+			s := newStandIn(t, tt.blocks...)
 			s.templateMap()
+			s.put("assets/icons/sword.blp", "own sword")
 			file, _ := built(t, s, Options{})
+			// The build that goes well says what the failed one must not: a line for each of the three it has.
+			said := applied
+			if len(tt.blocks) < len(whole) {
+				said = []string{applied[0], applied[2]}
+			}
+			if lines := s.log.Lines(); !slices.Equal(lines[:len(said)], said) {
+				t.Fatalf("the build that went well logged %q, want it to start with %q", lines, said)
+			}
 			before := filesBelow(t, s.at("dist/stage/map.w3x"))
 			logged := len(s.log.Lines())
 			tt.spoil(s)
@@ -388,34 +409,42 @@ func TestEveryDoorRefusesALinkAtDistBeforeItWritesAnything(t *testing.T) {
 					!strings.Contains(e.Hint, "Remove the link (or Windows junction) at dist") {
 					t.Errorf("error = %+v", e)
 				}
-				ReleaseHeld()
+				// No lock is where the link leads, before anything gives a lock back.
 				if !untouched(t, s, leadsTo, before) || len(s.compilerRan()) != 0 {
 					t.Error("the refused command wrote where the link leads or into the maps, or compiled")
+				}
+				ReleaseHeld()
+				if !untouched(t, s, leadsTo, before) {
+					t.Error("a release of every lock removed a file where the link leads")
 				}
 			})
 		}
 	}
 }
 
-// A link at dist/stage is met first by the compile, which keeps its cache below it and refuses the link in the
-// words fsx has for one, by its place on disk. Nothing is written where the link leads.
+// dist/stage is a real folder of the project too. The compile keeps its cache below it and comes before the
+// stage, so the plan looks at the folder before it compiles: a link in its place is refused as one at dist is,
+// by every door, and nothing is written where it leads.
 func TestEveryDoorRefusesALinkAtDistStage(t *testing.T) {
 	for _, d := range doors {
-		t.Run(d.name, func(t *testing.T) {
-			s := newStandIn(t)
-			s.withInfo(modernInfo)
-			leadsTo, before := linkedTo(t, s, "dist/stage", "")
-			e := asError(t, d.run(s), "dist/stage as a link")
-			if !strings.Contains(e.Msg, "Symlinks are not supported: "+s.at("dist/stage")) || e.Hint == "" {
-				t.Errorf("error = %+v", e)
-			}
-			if !untouched(t, s, leadsTo, before) || len(s.compilerRan()) != 0 {
-				t.Error("the refused command wrote where the link leads or into the maps, or compiled")
-			}
-			if fsx.Exists(lockOf(s.root)) || fsx.Exists(s.at("dist/bin")) {
-				t.Error("the refused command left its lock or an archive")
-			}
-		})
+		for _, target := range []string{"", "maps/map.w3x"} {
+			t.Run(d.name+" with dist/stage to "+cmp.Or(target, "a folder outside the project"), func(t *testing.T) {
+				s := newStandIn(t)
+				s.withInfo(modernInfo)
+				leadsTo, before := linkedTo(t, s, "dist/stage", target)
+				e := asError(t, d.run(s), "dist/stage as a link")
+				if e.File != "dist/stage" || !strings.HasPrefix(e.Msg, "dist/stage is a link: ") ||
+					!strings.Contains(e.Hint, "Remove the link (or Windows junction) at dist/stage") {
+					t.Errorf("error = %+v", e)
+				}
+				if !untouched(t, s, leadsTo, before) || len(s.compilerRan()) != 0 {
+					t.Error("the refused command wrote where the link leads or into the maps, or compiled")
+				}
+				if fsx.Exists(lockOf(s.root)) || fsx.Exists(s.at("dist/bin")) {
+					t.Error("the refused command left its lock or an archive")
+				}
+			})
+		}
 	}
 }
 

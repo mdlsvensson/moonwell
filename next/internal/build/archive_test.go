@@ -116,6 +116,24 @@ func TestArchiveOfRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArchi
 	}
 }
 
+// The map's folder names the stage and the archive too: a name in it that Windows cannot hold is refused for
+// both as it is for the source map, by the manifest, and not at a place below dist/.
+func TestTheStageAndTheArchiveRefuseAMapFolderWindowsCannotHoldByTheManifest(t *testing.T) {
+	for _, folder := range []string{"map?.w3x", "con.w3x", "campaign./one.w3x"} {
+		p := projectWith(t.TempDir(), "dist/bin", localManifest)
+		p.Map.Folder = folder
+		_, ofArchive := archiveOf(p)
+		_, ofStage := stagePlace(p)
+		for what, err := range map[string]error{"the archive": ofArchive, "the stage": ofStage} {
+			e := asError(t, err, what+" of map.folder "+folder)
+			if e.Msg != `map.folder has a name that Windows cannot hold: "`+folder+`".` || e.File != localManifest ||
+				!strings.Contains(e.Hint, "such as map.w3x") {
+				t.Errorf("%s of map.folder %q: error = %+v", what, folder, e)
+			}
+		}
+	}
+}
+
 func TestArchiveOfRefusesAFileOnTheWayToTheArchiveByItsName(t *testing.T) {
 	tests := []struct {
 		written string // build.folder

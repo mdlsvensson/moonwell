@@ -96,10 +96,10 @@ func buildFolder(p *manifest.Project, folder string) (string, error) {
 	case len(parts) == 0:
 		return "", errNoBuildFolder(p.File, written)
 	}
-	into := strings.Join(parts, "/")
-	if _, portable := fsx.RelPath(into); !portable {
+	if !everySystemHolds(parts) {
 		return "", errUnusableBuildFolder(p.File, written)
 	}
+	into := strings.Join(parts, "/")
 	if kept, isKept := keptFolder(parts); isKept {
 		return "", errOutputInKeptFolder(p.File, into+"/"+folder, kept)
 	}
@@ -178,8 +178,7 @@ func errUnusableBuildFolder(manifestFile, written string) error {
 	return &diag.Error{
 		Msg:  `build.folder has a name that Windows cannot hold: "` + written + `".`,
 		File: manifestFile,
-		Hint: insideHint + ` A name cannot hold a control character or any of < > : " | ? *, end with a dot or a ` +
-			"space, or be a device name such as CON or NUL.",
+		Hint: insideHint + " " + unusableNames,
 	}
 }
 

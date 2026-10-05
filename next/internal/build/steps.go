@@ -51,7 +51,8 @@ func idsModule(root, ids string, keep bool) error {
 }
 
 // compile turns the project's gameplay into its program: it finds the compiler the manifest names, compiles
-// every module, and follows the requires from the entry.
+// every module, and follows the requires from the entry. Before that it looks at the folder the maps are staged
+// in: a link there is refused as a link at any place a build writes, before a compiler is looked for.
 //
 // The editor's view of the libraries is written between the two steps of the compile, from the modules and not
 // from the program: it is then current also when a module is not found or a global is unknown, which is when it
@@ -60,6 +61,10 @@ func compile(
 	ctx context.Context, e *env.Env, p *manifest.Project, synced []library.Synced, globals *lua.MapGlobals,
 	opts Options,
 ) (*script.Program, error) {
+	// The compile keeps its cache below dist/stage, which is this package's to keep a real folder, as dist is.
+	if _, err := outputAt(p.Root, stageDir); err != nil {
+		return nil, err
+	}
 	compiler, err := toolchain.Compiler(ctx, e, p.Yue.Version, p.Yue.Path)
 	if err != nil {
 		return nil, err
