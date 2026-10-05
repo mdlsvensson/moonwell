@@ -418,13 +418,20 @@ func TestAssetsOfAProjectWithoutAnyAreNone(t *testing.T) {
 	}
 }
 
-func TestAssetsNamesTheManifestThatWasEvaluatedForAMistakeInItsBlock(t *testing.T) {
-	s := newStandIn(t, `"assets":{"paths":{"absent.blp":"icons\\Absent.blp"},"exclude":[]}`)
-	s.project.File = localManifest
-	found, replaced, err := Assets(s.project, nil)
-	e := asError(t, err, "a mapping of a file that is not there")
-	if found != nil || replaced != nil || e.File != localManifest || !strings.Contains(e.Msg, "assets/absent.blp") {
-		t.Errorf("error = %+v", e)
+// The assets block is written in the shared manifest, and its hint says so: a mistake in it names that file,
+// whichever manifest was evaluated.
+func TestAssetsNamesTheSharedManifestForAMistakeInItsBlock(t *testing.T) {
+	for _, evaluated := range []string{manifestName, localManifest} {
+		t.Run("evaluated from "+evaluated, func(t *testing.T) {
+			s := newStandIn(t, `"assets":{"paths":{"absent.blp":"icons\\Absent.blp"},"exclude":[]}`)
+			s.project.File = evaluated
+			found, replaced, err := Assets(s.project, nil)
+			e := asError(t, err, "a mapping of a file that is not there")
+			if found != nil || replaced != nil || e.File != "moonwell.pkl" || !strings.Contains(e.Msg, "assets/absent.blp") ||
+				!strings.Contains(e.Hint, "moonwell.pkl") {
+				t.Errorf("error = %+v", e)
+			}
+		})
 	}
 }
 
