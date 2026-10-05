@@ -156,12 +156,8 @@ func warnOfLuarc(e *env.Env, template []moonwell.TemplateFile) error {
 	return nil
 }
 
-// mapScript is a map's script, by the name World Editor gives it.
-const mapScript = "war3map.lua"
-
-// declarations writes what the editor reads of the project beside its sources: the declarations in
-// .moonwell/types, of the game's API, the project's objects and what the map's script defines, and the macro
-// module in .moonwell/yue. It opens the source map and resolves the objects as a build does, and compiles
+// declarations writes what the editor reads about the project: the declarations in .moonwell/types, and the
+// macro module in .moonwell/yue. It opens the source map and resolves the objects as a build does, and compiles
 // nothing. The ids module is a build's to write.
 func declarations(e *env.Env, p *manifest.Project) error {
 	source, err := build.Source(p)
@@ -176,14 +172,7 @@ func declarations(e *env.Env, p *manifest.Project) error {
 	if err != nil {
 		return err
 	}
-	_, err = editor.RefreshTypes(e.Root, editor.Types{
-		Objects: objs.Objects, Map: globals, MapLua: source.Label(mapScript), Natives: script.LoadNatives(),
-	})
-	if err != nil {
-		return err
-	}
-	_, err = script.RefreshMacros(e.Root)
-	return err
+	return build.RefreshDeclarations(e.Root, source, objs.Objects, globals)
 }
 
 // librariesAndTheirView syncs the manifest's libraries into .moonwell/, with moonwell.lock, and then writes the

@@ -188,6 +188,18 @@ func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing
 	}
 }
 
+// The ids module is what the gameplay imports, and a build's to write: setup declares the project's objects for
+// the editor, and leaves the module as it is, also when it is not there.
+func TestSetupDeclaresTheObjectsAndLeavesTheIDsModuleToABuild(t *testing.T) {
+	world, root := seeded(t), newProject(t, "my-map")
+	remove(t, root, "src/generated/objects.yue")
+	world.ok(t, root, "setup")
+	contains(t, read(t, root, ".moonwell/types/objects.d.lua"), "captain")
+	if exists(root, "src/generated/objects.yue") {
+		t.Error("setup wrote the ids module")
+	}
+}
+
 // ---- .luarc.json ----
 
 // A setup that ends well gives the build lock back, and keeps what it said in the project's log.

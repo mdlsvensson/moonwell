@@ -30,14 +30,7 @@ func writeGenerated(
 	if err := idsModule(e.Root, objs.IDs, opts.KeepGenerated); err != nil {
 		return err
 	}
-	_, err := editor.RefreshTypes(e.Root, editor.Types{
-		Objects: objs.Objects, Map: globals, MapLua: source.Label(scriptName), Natives: script.LoadNatives(),
-	})
-	if err != nil {
-		return err
-	}
-	_, err = script.RefreshMacros(e.Root)
-	return err
+	return RefreshDeclarations(e.Root, source, objs.Objects, globals)
 }
 
 // idsModule brings the ids module of the project at root up to date with ids, the module the objects render. A
@@ -47,6 +40,27 @@ func idsModule(root, ids string, keep bool) error {
 		return objects.AssertIDsCurrent(root, ids)
 	}
 	_, err := objects.RefreshIDs(root, ids)
+	return err
+}
+
+// RefreshDeclarations writes what the editor reads about the project at root: in .moonwell/types the
+// declarations of the game's API, of Moonwell's runtime, of the project's objects and of what the map's script
+// defines, and in .moonwell/yue the macro module. Each file is written only when its content differs. It does
+// not write the ids module, and runs no program: it is the whole of this step for a command that compiles
+// nothing, such as setup.
+//
+// source is the project's map as Source opens it, which names the script in the declarations; objs is the
+// resolved objects, and globals what MapGlobals gives for the map, nil for a map without a script.
+func RefreshDeclarations(
+	root string, source *mapdir.Folder, objs []objects.Resolved, globals *lua.MapGlobals,
+) error {
+	_, err := editor.RefreshTypes(root, editor.Types{
+		Objects: objs, Map: globals, MapLua: source.Label(scriptName), Natives: script.LoadNatives(),
+	})
+	if err != nil {
+		return err
+	}
+	_, err = script.RefreshMacros(root)
 	return err
 }
 
