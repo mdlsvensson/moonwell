@@ -17,6 +17,7 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/toolchain"
+	"github.com/mdlsvensson/moonwell/next/internal/tooltest"
 )
 
 var background = context.Background()
@@ -28,9 +29,14 @@ type outcome struct {
 	output, stdout string
 }
 
+// mark stands between the place of a failure and its message, as a line prints one: U+203A.
+const mark = "\xe2\x80\xba"
+
 // run runs a command line in root, as the program does: in the real world, whose cache is the user's. A test
-// runs so only a line that starts no program but the pkl on its PATH, and that asks for no compiler: such a line
-// downloads nothing and writes nothing into that cache.
+// runs so only a line that touches nothing of the user's: one that is refused or answered before it has a world,
+// one that starts no program, and one of a project that compiles, in a test that has asked for the compiler
+// (compiling): the compiler is then in the cache, and the line downloads nothing. A line that evaluates a
+// manifest and needs no compiler runs with okWithPklAlone or failsWithPklAlone, and setup in a seeded world.
 func run(root string, args ...string) outcome {
 	var lines, printed []string
 	code := Run(background, args, root, func(line string) { lines = append(lines, line) },
@@ -258,16 +264,81 @@ func realWorld(root string) (*env.Env, *testkit.Recorder) {
 }
 
 // newProject is a project that this package's init makes, linked to the schema of this checkout, in a folder
-// named name below a new temporary folder. It runs the real pkl, and needs it.
+// named name below a new temporary folder. It runs the real pkl, and needs it; its world lets pkl alone run, so
+// it downloads nothing.
 func newProject(t *testing.T, name string) string {
 	t.Helper()
 	testkit.NeedPkl(t)
 	parent := t.TempDir()
-	e, _ := realWorld(parent)
+	e, _, _ := pklOnly(t, parent)
 	if err := createProject(background, e, name, filepath.Join(testkit.RepoRoot(t), "schema")); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	return filepath.Join(parent, name)
+}
+
+// compiling is a project that init made, for a test that compiles it with the real compiler: it needs pkl and
+// the compiler, which tooltest.Yue leaves in the user's cache, where a line in the real world finds it. Such a
+// test takes a second or more, and is skipped with -short.
+func compiling(t *testing.T) string {
+	t.Helper()
+	if testing.Short() {
+		t.Skip("the test compiles a project with the real compiler, which takes its time: not with -short")
+	}
+	tooltest.Yue(t)
+	return newProject(t, "my-map")
+}
+
+// ownCache is a cache folder of the test's own that holds the pinned compiler at the place Moonwell looks for it,
+// copied from where tooltest.Yue finds one. A program whose MOONWELL_CACHE names the folder downloads no
+// compiler, and keeps what it writes for a shell and an editor out of the user's cache, whose bin folder is on
+// the PATH. It needs the compiler, and a platform that Moonwell pins one for: the cache has a place for no other.
+func ownCache(t *testing.T) string {
+	t.Helper()
+	compiler := tooltest.Yue(t)
+	asset, pinned := toolchain.YueScript.Versions[toolchain.YueVersion][env.CurrentPlatform()]
+	if !pinned {
+		t.Skip("Moonwell pins no compiler for this platform")
+	}
+	program, err := os.ReadFile(compiler)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cache := t.TempDir()
+	place := filepath.Join(cache, toolchain.YueScript.Name, toolchain.YueVersion, filepath.FromSlash(asset.Binary))
+	if err := os.MkdirAll(filepath.Dir(place), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(place, program, 0o777); err != nil {
+		t.Fatal(err)
+	}
+	return cache
+}
+
+// pklAlone is the world of pklOnly for a whole command line: the log is the line's own, so what a command says
+// is printed and kept as in the real world.
+func pklAlone(t *testing.T) world {
+	return func(root string, log *env.Logger) *env.Env {
+		e, _, _ := pklOnly(t, root)
+		e.Log = log
+		return e
+	}
+}
+
+// okWithPklAlone runs a command line that must succeed, in a world that lets pkl alone run: a line that
+// evaluates a manifest and needs no compiler. Whatever pkl the machine has, the line downloads nothing.
+func okWithPklAlone(t *testing.T, root string, args ...string) outcome {
+	t.Helper()
+	return endedWith(t, carriedIn(background, pklAlone(t), root, args...), 0, args)
+}
+
+// failsWithPklAlone runs a command line that must exit with 1, printing every part of wanted, in a world that
+// lets pkl alone run.
+func failsWithPklAlone(t *testing.T, root string, wanted []string, args ...string) outcome {
+	t.Helper()
+	result := endedWith(t, carriedIn(background, pklAlone(t), root, args...), 1, args)
+	contains(t, result.output, wanted...)
+	return result
 }
 
 // pklOnly is a world for root in which pkl is the one program that runs: every other program, every download

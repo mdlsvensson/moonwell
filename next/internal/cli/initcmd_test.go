@@ -348,7 +348,7 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 			t.Error(name)
 		}
 	}
-	e, _ := realWorld(root)
+	e, _, _ := pklOnly(t, root)
 	p, err := build.Load(background, e)
 	if err != nil {
 		t.Fatal(diag.Format(err))
@@ -364,7 +364,7 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 		}
 	}
 	// The folders of assets/ are kept by a file each, which is no asset.
-	if r := ok(t, root, "assets:check"); r.output != checked("0", "0") {
+	if r := okWithPklAlone(t, root, "assets:check"); r.output != checked("0", "0") {
 		t.Fatalf("assets:check in a new project: %+v", r)
 	}
 }

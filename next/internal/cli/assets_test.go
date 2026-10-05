@@ -5,8 +5,10 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync/atomic"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/env"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/imp"
@@ -292,17 +294,49 @@ func TestPklAssetsCommandsAreRefusedBesideARunningBuild(t *testing.T) {
 	}
 }
 
-// The whole lines, in the real world: what a command says is printed and kept in the project's log, and nothing
-// is printed for other programs.
+// The commands that sync the libraries hold the build lock while they do: a sync writes .moonwell/ and
+// moonwell.lock in several steps, and a build beside it would read them half written. The project's library is
+// one on GitHub, so its sync asks for a download: the world looks for the lock file as it is asked, and then
+// refuses the download, which ends the command.
+func TestPklTheAssetsCommandsHoldTheBuildLockWhileTheySyncTheLibraries(t *testing.T) {
+	for _, name := range []string{"assets:check", "assets:sync", "assets:paths"} {
+		root := newProject(t, "my-map")
+		edit(t, root, "moonwell.pkl", "libraries {\n",
+			"libraries {\n  [\"kit\"] { github = \"owner/kit\"; tag = \"v1.0.0\" }\n")
+		e, _, _ := pklOnly(t, root)
+		var asked, locked atomic.Int32
+		e.Fetch = func(_ context.Context, url string) (int, []byte, error) {
+			asked.Add(1)
+			if exists(root, "dist/.lock") {
+				locked.Add(1)
+			}
+			return 0, nil, &diag.Error{Msg: "tried to download " + url}
+		}
+		_, err := commandIn(t, background, e, name)
+		if err == nil || !strings.Contains(diag.Format(err), "owner/kit") {
+			t.Errorf("%s: the command ended with %v, want the failure of the library's download", name, err)
+		}
+		if asked.Load() == 0 || locked.Load() != asked.Load() {
+			t.Errorf("%s: the lock was held at %d of the %d downloads the sync asked for, want it at each, and "+
+				"one at least", name, locked.Load(), asked.Load())
+		}
+		if exists(root, "dist/.lock") {
+			t.Errorf("%s left the build lock behind", name)
+		}
+	}
+}
+
+// The whole lines: what a command says is printed and kept in the project's log, and nothing is printed for
+// other programs.
 func TestPklAssetsCommandLinesPrintAndKeepWhatTheySay(t *testing.T) {
 	root := newProject(t, "my-map")
 	write(t, root, "assets/icons/a.blp", "icon")
-	r := ok(t, root, "assets:check")
+	r := okWithPklAlone(t, root, "assets:check")
 	if r.stdout != "" || r.output != "icons/a.blp -> icons\\a.blp\nwrite maps/map.w3x/icons/a.blp\n"+
 		"write maps/map.w3x/war3map.imp\n"+checked("1", "2") {
 		t.Fatalf("assets:check: %+v", r)
 	}
-	r = ok(t, root, "assets:sync")
+	r = okWithPklAlone(t, root, "assets:sync")
 	if r.stdout != "" || !strings.HasSuffix(r.output, "\n"+synced("1", "2")) {
 		t.Fatalf("assets:sync: %+v", r)
 	}

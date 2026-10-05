@@ -194,9 +194,9 @@ func TestPklObjectsEvalStdoutOnlyWithoutCompilerOrLock(t *testing.T) {
 	if hero["source"] != "objects/heroes.pkl" || hero["fields"].([]any)[0].(map[string]any)["rawcode"] != "uhpm" {
 		t.Fatal(hero)
 	}
-	// The whole line, in the real world: the JSON is all that is printed, on the stream for other programs, as
-	// one text that the program ends with a line break.
-	r := ok(t, root, "objects:eval")
+	// The whole line: the JSON is all that is printed, on the stream for other programs, as one text that the
+	// program ends with a line break.
+	r := okWithPklAlone(t, root, "objects:eval")
 	if r.output != "" || r.stdout != printed[0] || !strings.HasPrefix(r.stdout, "{\n  \"heroes\": {") ||
 		!strings.HasSuffix(r.stdout, "}") {
 		t.Fatalf("%+v", r)
@@ -208,7 +208,7 @@ func TestPklObjectsEvalInvalidStderrOnly(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	write(t, root, "objects/units.pkl", objectFile(`units { ["captain"] { id = "h000"; base = "zzzz" } }`))
 	// "\xe2\x80\xba" is the mark between the place and the message.
-	r := fails(t, root, []string{
+	r := failsWithPklAlone(t, root, []string{
 		"error: objects/units.pkl \xe2\x80\xba units[\"captain\"].base: 'zzzz' is not a standard unit.",
 	}, "objects:eval")
 	if r.stdout != "" {
@@ -219,7 +219,7 @@ func TestPklObjectsEvalInvalidStderrOnly(t *testing.T) {
 func TestPklObjectsCommandsWithoutObjectsFolder(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	before := testkit.Snapshot(t, root)
-	r := ok(t, root, "objects:eval")
+	r := okWithPklAlone(t, root, "objects:eval")
 	assertEmptyObjects(t, jsonObject(t, r.stdout))
 	e, log, ran := pklOnly(t, root)
 	lines := logged(t, e, log, "objects:check")
@@ -257,14 +257,15 @@ func TestPklObjectsCheckMissingStaleCurrent(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	writeObjects(t, root)
 	before := testkit.Snapshot(t, filepath.Join(root, "maps"))
-	r := fails(t, root, []string{"  war3map.w3u\n  war3mapSkin.w3u\n" + idsLine("missing") + "\nerror: " +
+	r := failsWithPklAlone(t, root, []string{"  war3map.w3u\n  war3mapSkin.w3u\n" + idsLine("missing") + "\nerror: " +
 		objects.IDsFile + " \xe2\x80\xba The file is missing, but the manifest has objects.\n" +
 		"hint: Run moonwell build, test or dev to regenerate it."}, "objects:check")
 	if r.stdout != "" || exists(root, objects.IDsFile) || strings.Contains(r.output, "Object data valid") {
 		t.Fatalf("objects:check wrote the ids module, printed for other programs, or summed up a failure: %+v", r)
 	}
 	write(t, root, objects.IDsFile, objects.RenderIDs(nil))
-	r = fails(t, root, []string{idsLine("stale"), "does not match the objects in the manifest."}, "objects:check")
+	r = failsWithPklAlone(t, root,
+		[]string{idsLine("stale"), "does not match the objects in the manifest."}, "objects:check")
 	if strings.Contains(r.output, "Object data valid") {
 		t.Fatalf("objects:check summed up a failure:\n%s", r.output)
 	}
@@ -288,10 +289,10 @@ func TestPklObjectsCheckMissingStaleCurrent(t *testing.T) {
 func TestPklObjectsCommandsTakeNoBuildLock(t *testing.T) {
 	root := newProject(t, "map")
 	holdBuildLock(t, root)
-	if r := ok(t, root, "objects:check"); !strings.Contains(r.output, "Object data valid: 1 object(s)") {
+	if r := okWithPklAlone(t, root, "objects:check"); !strings.Contains(r.output, "Object data valid: 1 object(s)") {
 		t.Errorf("objects:check beside a build: %+v", r)
 	}
-	if r := ok(t, root, "objects:eval"); !strings.Contains(r.stdout, `"captain"`) {
+	if r := okWithPklAlone(t, root, "objects:eval"); !strings.Contains(r.stdout, `"captain"`) {
 		t.Errorf("objects:eval beside a build: %+v", r)
 	}
 	if !exists(root, "dist/.lock") {
@@ -335,9 +336,10 @@ func TestPklCheckRefusesMissingStaleBeforeCompile(t *testing.T) {
 	contains(t, diag.Format(err), "objects/bad.pkl")
 }
 
-// devIn runs dev in the world e beside the test, at a pace of milliseconds, until the test ends. until waits
-// for done to hold, however long the machine takes over it within a minute, and fails the test with what dev
-// logged when it does not, or when dev ends first.
+// devIn runs dev in the world e beside the test, at a pace of milliseconds, until the test ends: it is then told
+// to stop, and a dev that has not ended half a minute later fails the test. until waits for done to hold,
+// however long the machine takes over it within a minute, and fails the test with what dev logged when it does
+// not, or when dev ends first.
 func devIn(t *testing.T, e *env.Env, log *testkit.Recorder) (until func(what string, done func() bool)) {
 	t.Helper()
 	ctx, stop := context.WithCancel(background)
@@ -347,8 +349,13 @@ func devIn(t *testing.T, e *env.Env, log *testkit.Recorder) (until func(what str
 	}()
 	t.Cleanup(func() {
 		stop()
-		if err := <-ended; err != nil {
-			t.Errorf("dev = %v", diag.Format(err))
+		select {
+		case err := <-ended:
+			if err != nil {
+				t.Errorf("dev = %v", diag.Format(err))
+			}
+		case <-time.After(30 * time.Second):
+			t.Errorf("dev did not end when it was told to stop; it logged %q", log.Lines())
 		}
 	})
 	return func(what string, done func() bool) {

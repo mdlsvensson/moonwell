@@ -26,10 +26,11 @@ func settingsValid(count string) string {
 	return "Map settings valid: " + count + " internal file(s) would change during build."
 }
 
-// loaded is the manifest of the project at root, as the real pkl evaluates it.
+// loaded is the manifest of the project at root, as the real pkl evaluates it, in a world that lets pkl alone
+// run.
 func loaded(t *testing.T, root string) *manifest.Project {
 	t.Helper()
-	e, _ := realWorld(root)
+	e, _, _ := pklOnly(t, root)
 	p, err := build.Load(background, e)
 	if err != nil {
 		t.Fatal(diag.Format(err))
@@ -186,7 +187,7 @@ func TestPklSettingsErrorsNameLocalManifest(t *testing.T) {
 		if failure.File != "moonwell.local.pkl" {
 			t.Errorf("%s: the error names %q", c.message, failure.File)
 		}
-		fails(t, root, []string{"error: moonwell.local.pkl"}, "settings:check")
+		failsWithPklAlone(t, root, []string{"error: moonwell.local.pkl"}, "settings:check")
 	}
 }
 

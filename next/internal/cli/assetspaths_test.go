@@ -79,21 +79,17 @@ func TestAnEmptyInGamePathListIsAnnounced(t *testing.T) {
 
 func TestOutsideAProjectAssetsPathsNeedsAFileThatExistsAndIsNotAFolder(t *testing.T) {
 	root := t.TempDir()
-	held := testkit.WriteFile(t, root, "held.mdx", knight())
-	testkit.MakeUnreadable(t, held)
 	testkit.WriteFile(t, root, "notes.mdx", []byte("Model {\n}\nBroken {\n"))
 	for _, c := range []struct {
 		what, file string
 		msg, hint  string
 		named      string // the file the failure names
-		system     bool   // the failure is the system's, and has it as its cause
 	}{
 		{what: "no file", file: "", msg: "assets:paths needs a model file outside a Moonwell project.",
 			hint: "moonwell assets:paths assets/Models/Knight.mdx"},
 		{what: "a file that is not there", file: "missing.mdx", msg: "missing.mdx does not exist.",
 			hint: "Model paths are relative to the project folder, e.g. assets/Models/Knight.mdx."},
 		{what: "a folder", file: ".", msg: ". is a folder, not a model file."},
-		{what: "a file that cannot be read", file: "held.mdx", msg: "held.mdx could not be read: ", system: true},
 		// A file that is no model is refused in the words of the model's reader, which names it.
 		{what: "a file that is no model", file: "notes.mdx", msg: "Not a readable model: ", named: "notes.mdx",
 			hint: "Re-export it from your modelling tool, or open it in a model viewer to check it."},
@@ -102,12 +98,29 @@ func TestOutsideAProjectAssetsPathsNeedsAFileThatExistsAndIsNotAFolder(t *testin
 		lines, err := paths(e, log, c.file, "textures/knight.dds\n")
 		failure := asError(t, err, c.what)
 		if !strings.HasPrefix(failure.Msg, c.msg) || failure.Hint != c.hint || failure.File != c.named ||
-			(failure.Cause != nil) != c.system {
+			failure.Cause != nil {
 			t.Errorf("%s: error = %+v", c.what, failure)
 		}
 		if len(lines) != 0 {
 			t.Errorf("%s: assets:paths logged %q before it failed", c.what, lines)
 		}
+	}
+}
+
+// A model that is there and cannot be read is the system's failure, and has it as its cause. The test is one of
+// its own: where a file cannot be made unreadable, it is skipped, and the refusals above are tested all the same.
+func TestOutsideAProjectAssetsPathsNamesAFileItCannotRead(t *testing.T) {
+	root := t.TempDir()
+	testkit.MakeUnreadable(t, testkit.WriteFile(t, root, "held.mdx", knight()))
+	e, log := testkit.Env(t, root)
+	lines, err := paths(e, log, "held.mdx", "textures/knight.dds\n")
+	failure := asError(t, err, "a file that cannot be read")
+	if !strings.HasPrefix(failure.Msg, "held.mdx could not be read: ") || failure.Hint != "" || failure.File != "" ||
+		failure.Cause == nil {
+		t.Errorf("error = %+v", failure)
+	}
+	if len(lines) != 0 {
+		t.Errorf("assets:paths logged %q before it failed", lines)
 	}
 }
 
@@ -245,8 +258,8 @@ func TestPklAssetsPathsReportsReadableModelsBeforeFailure(t *testing.T) {
 		t.Fatalf("log =\n%s", strings.Join(lines, "\n"))
 	}
 	// The whole line: the failure ends the report, and is not printed ahead of it.
-	r := fails(t, root, []string{"assets/Models/A.mdl\n  (unreadable: ", "\nerror: 1 model could not be read.\nhint: "},
-		"assets:paths")
+	r := failsWithPklAlone(t, root,
+		[]string{"assets/Models/A.mdl\n  (unreadable: ", "\nerror: 1 model could not be read.\nhint: "}, "assets:paths")
 	if !strings.HasSuffix(r.output, "the report above lists why each one is unreadable.") || r.stdout != "" {
 		t.Errorf("%+v", r)
 	}
