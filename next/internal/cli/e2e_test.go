@@ -54,10 +54,19 @@ func builtScript(t *testing.T, root string) string {
 	return string(data)
 }
 
-// stageAndLaunch runs `moonwell test` in the project, whose local manifest is given body and a game that is a
-// file of the project. The world is the real one but for the game: what the line starts is kept, and must be
-// that game, once, with the manifest's arguments and the stage's path on disk. It returns that path.
+// stageAndLaunch runs `moonwell test` in the project, as launched does, and holds the staged script to the
+// manifest's entry. It returns the stage's path on disk.
 func stageAndLaunch(t *testing.T, root, body string) string {
+	t.Helper()
+	staged := launched(t, root, body, "test")
+	contains(t, read(t, staged, "war3map.lua"), `__mw.boot("main")`)
+	return staged
+}
+
+// launched runs a line of `moonwell test` in the project, whose local manifest is given body and a game that
+// is a file of the project. The world is the real one but for the game: what the line starts is kept, and must
+// be that game, once, with the manifest's arguments and the stage's path on disk. It returns that path.
+func launched(t *testing.T, root, body string, line ...string) string {
 	t.Helper()
 	game := filepath.Join(root, "Warcraft III.exe")
 	write(t, root, "Warcraft III.exe", "")
@@ -71,14 +80,13 @@ func stageAndLaunch(t *testing.T, root, body string) string {
 		}
 		return e
 	}
-	r := endedWith(t, carriedIn(background, withTheGame, root, "test"), 0, []string{"test"})
+	r := endedWith(t, carriedIn(background, withTheGame, root, line...), 0, line)
 	contains(t, r.output, "Launched Warcraft III with dist/stage/map.w3x.")
 	staged := filepath.Join(root, "dist", "stage", "map.w3x")
 	want := []string{game, "-launch", "-windowmode", "windowed", "-loadfile", staged}
 	if len(started) != 1 || !slices.Equal(started[0], want) {
 		t.Fatalf("the line started %q, want %q once", started, want)
 	}
-	contains(t, read(t, staged, "war3map.lua"), `__mw.boot("main")`)
 	return staged
 }
 
@@ -176,6 +184,29 @@ func TestE2EFailedBuildDeletesPreviousArchive(t *testing.T) {
 }
 
 func TestE2ETestStagesAndLaunches(t *testing.T) { stageAndLaunch(t, compiling(t), "") }
+
+// A test stages what its line says, as a build does: the entry that --entry names in place of the manifest's,
+// and with --minify the minified form, in which a module of the bundle is marked as one that has no line of its
+// source for a line of its own. Without the two flags the same project stages the manifest's entry, unmarked.
+func TestE2ETestStagesTheEntryAndTheFormThatItsLineNames(t *testing.T) {
+	root := compiling(t)
+	write(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
+	const otherEntry, minifiedOther = `__mw.boot("other")`, `"other", "src/other.yue", true},`
+	plain := read(t, stageAndLaunch(t, root, ""), "war3map.lua")
+	if strings.Contains(plain, otherEntry) || strings.Contains(plain, `.yue", true},`) {
+		t.Fatal("a test without flags staged another entry than the manifest's, or a minified module")
+	}
+	staged := read(t, launched(t, root, "", "test", "--entry", "src/other.yue", "--minify"), "war3map.lua")
+	// The script is named by what it lacks, and is not printed: it is a thousand lines.
+	for _, part := range []string{otherEntry, minifiedOther, `"Another entry."`} {
+		if !strings.Contains(staged, part) {
+			t.Errorf("a test with --entry src/other.yue --minify staged a script without %s", part)
+		}
+	}
+	if strings.Contains(staged, `__mw.boot("main")`) || strings.Contains(staged, `__mw.define("main"`) {
+		t.Fatal("a test with --entry staged the manifest's entry")
+	}
+}
 
 // ---- setup ----
 

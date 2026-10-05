@@ -29,8 +29,8 @@ import (
 // compared. The other tree's program is its cli.Run, and this tree's is Run: each reads the line, makes its own
 // outside world, which is the real one, and runs the command in it.
 //
-// The test needs Pkl and the compiler: most of its 148 command lines evaluate a manifest, and many compile. It
-// makes 28 seeds, takes about forty-five seconds, and is skipped with -short.
+// The test needs Pkl and the compiler: most of its 156 command lines evaluate a manifest, and many compile. It
+// makes 33 seeds, takes about fifty seconds, and is skipped with -short.
 //
 // How a line is run. A seed is made once: the other tree's init creates the template, linked to this checkout,
 // and every other project among the seeds is a copy of it into which the test writes the seed's files. For a
@@ -54,22 +54,25 @@ import (
 // of fails the test.
 //
 // The seeds (templateSeed and oracleSeeds) are the template as init leaves it; the template with a second
-// entry, without a game, without src/, and as a checkout that setup has work in; a project with an object of
-// every category on the object files World Editor saved, one with every setting but the preview, one with
-// assets, an ownership state and a local library that ships files, one with a single asset, and one with models;
-// a folder that is no project; eight projects with one fault each, which a command fails on; and nine projects
-// of the classes below.
+// entry, without a game, with both, without src/, and as a checkout that setup has work in; a project with an
+// object of every category on the object files World Editor saved, one with every setting but the preview, one
+// with a preview picture, one with assets, an ownership state and a local library that ships files, one with a
+// single asset, one with models, one with a model among its assets that cannot be read, and one with an unknown
+// global that its manifest makes a warning; a folder that is no project; nine projects with one fault each,
+// which a command fails on; and nine projects of the classes below.
 //
 // The lines (oracleRuns) are every command on the template, with the help, the version and a line without a
-// command; test without a game and dev without src/, which end by themselves; a build with another entry,
-// given in both ways, and with an entry that is none; setup where it has work, and again; the objects:,
-// settings: and assets: commands, with a build, a check and a setup, on the seeds that have objects, settings
-// and assets; a sync, a second sync, and a sync after an asset is removed; assets:paths with and without a
-// file, in a project and outside one; the commands that need a manifest, outside a project; what init refuses;
-// a failing line for each command, by a source that does not compile, an unknown global, an object that is not
-// valid, a setting the map refuses, an asset the manifest names and that is not there, an ids module that is
-// stale, an ownership state that is none, and a manifest that Pkl refuses; and the lines of the classes, with
-// the lines of the same seeds that are compared whole beside them.
+// command; test without a game, plain, minified and with another entry, and dev without src/, which end by
+// themselves; a build with another entry, given in both ways, and with an entry that is none; setup where it
+// has work, and again; the objects:, settings: and assets: commands, with a build, a check and a setup, on the
+// seeds that have objects, settings and assets; settings:check and a build with a preview picture, which takes
+// a file out of the map; a sync, a second sync, and a sync after an asset is removed; assets:paths with and
+// without a file, in a project and outside one, and with a model it cannot read; a build and a check that
+// warn; the commands that need a manifest, outside a project; what init refuses; a failing line for each
+// command, by a source that does not compile, an unknown global, an object that is not valid, a setting the
+// map refuses, an asset the manifest names and that is not there, an ids module that is stale and one that is
+// not there, an ownership state that is none, and a manifest that Pkl refuses; and the lines of the classes,
+// with the lines of the same seeds that are compared whole beside them.
 //
 // Compared whole, with the other tree's as what is wanted, for every line:
 //
@@ -79,11 +82,21 @@ import (
 //   - the lines for the terminal: each text the line writes there, in their order. A failure is one text, with
 //     its place, its message and its hint.
 //
-// And for the commands whose work is files, and that the build oracle does not run, the files they may write, by
-// name and byte for byte (itsWork): of assets:sync the whole of maps/ and of .asset-state/; of setup
-// .moonwell/types, .moonwell/yue, .moonwell/lua, moonwell.local.pkl, yueconfig.yue, .vscode/, .gitignore and
-// .luarc.json, and whether the cache has a bin folder afterwards. What that folder holds is the same file by
-// construction, and is not compared.
+// And what a line leaves of files, by name and byte for byte, by its command:
+//
+//   - of the commands whose work is files (itsWork), that work. Of assets:sync the whole of maps/ and of
+//     .asset-state/. Of setup .moonwell/types, .moonwell/yue, .moonwell/lua, moonwell.local.pkl, yueconfig.yue,
+//     .vscode/, .gitignore and .luarc.json, and whether the cache has a bin folder afterwards; what that folder
+//     holds is the same file by construction, and is not compared. Of test the whole of dist/stage/<map.folder>:
+//     both trees have staged the map when they look for the game, so a test without a game leaves all that a
+//     test makes. Of build the staged script, dist/stage/<map.folder>/war3map.lua; the rest of what a build
+//     leaves is the build oracle's. The entry and the form that --entry and --minify name are in no line that
+//     a build or a test says: they show in the staged script, which is why it is compared;
+//   - of the commands that write no work (writeNoWork: objects:eval, objects:check, settings:check, assets:check
+//     and assets:paths), the whole project folder, dist/ aside: the two trees must leave the same, which is the
+//     seed and, for the two assets commands, what a sync of the libraries writes. This is compared for the
+//     lines of no class: a class of such a command expects a refusal where the other tree went on, or the
+//     outcome of another seed.
 //
 // Compared in part, and counted. Each class is decided on the line, on the seed or on what the other tree
 // made of the line, and never on what this tree made of it; what this tree must make is a value of this file,
@@ -138,9 +151,10 @@ import (
 //     it. This tree plans every step before it writes, and logs the three lines when the stage is written (the
 //     spec's §8: "a build that fails logs none of them"). The class is decided on the line and on what the
 //     other tree made: the command is build, it ended with 1, it logged one of the three lines, and it did not
-//     log "Packing archive...", which it logs once its stage is whole. Not compared: the three lines. The
-//     refusal and every other line are compared whole. A test that finds no game has staged the whole map in
-//     both trees, and is compared whole (TestAFailedBuildLeavesNoArchive of build,
+//     log "Packing archive...", which it logs once its stage is whole. Not compared: the three lines, and the
+//     other tree's stage, which is patched in part. This tree must have staged nothing. The refusal and every
+//     other line are compared whole. A test that finds no game has staged the whole map in both trees, and is
+//     compared whole (TestAFailedBuildLeavesNoArchive of build,
 //     TestE2ESettingsFailureRemovesArchiveAndPlansAtomically).
 //   - FileNamed, 10 lines (fileNamed, with the tables namedByItsPlace and withoutAFile): a refusal about a
 //     file of the map that the other tree names by its place on disk, in its stage or in the source map, or to
@@ -158,13 +172,17 @@ import (
 //     TestAnAssetAtAFileOrAnImportTheMapHasAndDoesNotOwnIsRefused and
 //     TestAnOwnedFileEditedInTheMapIsRefusedAlsoWhenNoAssetWantsIt of assets).
 //   - DotFolder, 4 lines (asOnTheTemplate): a map.folder with a part that is a dot, "./map.w3x". The other
-//     tree refuses it where it plans the assets, by "Invalid asset path", and this tree reads it as the schema
-//     does and opens the map (the spec's §8, the row on map.folder and build.folder). The class is decided on
-//     the seed and on what the other tree made: the local manifest names that folder, and the last text the
-//     other tree wrote is that refusal. Not compared: anything the other tree made of the line. This tree
-//     must make of it what the other tree makes of the same line on the template, which is this seed but for
-//     the dot: the line is run once more for that, at the same place, and compared whole. A command that the
-//     other tree carries out on the seed is compared whole (TestSourceOpensTheMapFolderOfTheProject of build).
+//     tree refuses it by "Invalid asset path" where it first joins the map folder to the project folder, which
+//     is where it plans the assets in a build and a check, and where it opens the map in assets:check and
+//     settings:check; this tree reads the folder as the schema does and opens the map (the spec's §8, the row
+//     on map.folder and build.folder). The class is decided on the seed and on what the other tree made: the
+//     local manifest names that folder, and the last text the other tree wrote is that refusal. Not compared:
+//     anything the other tree made of the line. This tree must make of it what the other tree makes of the same
+//     line on the template: the line is run once more for that, at the same place, and compared whole, with the
+//     staged script of a build; the other tree must end it with 0 there. The seed is the template with a local
+//     manifest that holds the map block alone, where the template's names a game, which none of the lines
+//     looks for. A command that the other tree carries out on the seed is compared whole
+//     (TestSourceOpensTheMapFolderOfTheProject of build).
 //   - RefusedLater, 4 lines (asOnTheTemplate): a typed gameplay constant that is not the raw one of the same
 //     name. Both trees refuse it in the same words; the other tree as it loads the manifest, in every command,
 //     and this tree in the commands that plan the settings (the spec's §8: such values "are refused by the
@@ -173,19 +191,26 @@ import (
 //     and a raw FoodCeiling of another value, and the command is objects:eval, assets:check, assets:sync or
 //     assets:paths, which plan no settings; the other tree must have said that refusal and nothing else. Not
 //     compared: that refusal. This tree must make of the line what the other tree makes of it on the
-//     template, which is this seed but for the two constants, as for DotFolder. build, check and
-//     settings:check, which plan the settings, are refused by both trees and compared whole
-//     (TestConstantsThatCannotBeWrittenAreRefusedByTheManifestBeforeAMapFileIsRead of settings).
+//     template, as for DotFolder: the seed is the template with a local manifest that holds the settings block
+//     alone. build, check and settings:check, which plan the settings, are refused by both trees and compared
+//     whole (TestConstantsThatCannotBeWrittenAreRefusedByTheManifestBeforeAMapFileIsRead of settings).
 //
 // Not compared:
 //
 //   - dist/moonwell.log, which holds the time of each line (TestAProjectKeepsWhatACommandSaysInDistMoonwellLog).
-//   - The files a command leaves, but for those of assets:sync and of setup: what a build and a check leave is
-//     the build oracle's (next/internal/build/oracle_test.go), which compares the whole project folder, and
-//     the other commands write nothing but a library's copy, which the oracle of library compares.
+//   - What a build, a check and a dev leave, but for the staged script of a build: it is the build oracle's
+//     (next/internal/build/oracle_test.go), which compares the whole project folder of a build and of a check.
+//   - What a line of a class leaves, where the class says so above, and what a command that writes no work
+//     leaves on a line of a class.
 //
 // Not among the inputs:
 //
+//   - A check of a map without its war3map.lua: the other tree's check passes without the script, and this
+//     tree's fails wherever a build would (the spec's §8: "check fails wherever build would: no source map, no
+//     war3map.lua, a bundle that cannot be placed"). The seed has its map folder, so the line is of no class
+//     above, and none is made for it: a check is the plan of a build, and the plan's refusal of a map without
+//     a script is held by TestPlanNeedsTheSourceMapAndItsScript of build. A build of such a map is refused by
+//     both trees, and is among the build oracle's faults.
 //   - A link at dist: the other tree builds through it, and this tree refuses it, and keeps no log behind it
 //     (TestEveryDoorRefusesALinkAtDistBeforeItWritesAnything of build, TestALinkAtDistGetsNoLog,
 //     TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist).
@@ -228,8 +253,8 @@ func TestOracleOnWhatTheCommandLinesOfBothTreesSayAndLeave(t *testing.T) {
 		return
 	}
 	o.tally.check(t, commandTally{
-		Lines: 148, Whole: 102, Passed: 66, Failed: 82,
-		Terminal: 290, Printed: 4, Files: 276,
+		Lines: 156, Whole: 110, Passed: 70, Failed: 86,
+		Terminal: 321, Printed: 4, Files: 347, Kept: 1299,
 		Strict: 10, Closest: 1, MapOpenedFirst: 8, Lock: 6, StagedWhole: 6, FileNamed: 10, DotFolder: 4, RefusedLater: 4,
 	})
 }
@@ -240,8 +265,9 @@ type commandTally struct {
 	// with 0 and with 1.
 	Lines, Whole, Passed, Failed int
 	// The texts for the terminal and for other programs that were compared, and the files that were compared
-	// byte for byte.
-	Terminal, Printed, Files int
+	// byte for byte: those that are the work of a command, and those of the projects of the commands that write
+	// no work.
+	Terminal, Printed, Files, Kept int
 	// The command lines of each class of the header.
 	Strict, Closest, MapOpenedFirst, Lock, StagedWhole, FileNamed, DotFolder, RefusedLater int
 }
@@ -277,6 +303,10 @@ var oracleSeeds = []oracleSeed{
 		write(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
 	}},
 	{name: "no-game", lay: func(t *testing.T, root string) { writeLocal(t, root, noGame) }},
+	{name: "other-entry-and-no-game", lay: func(t *testing.T, root string) {
+		write(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
+		writeLocal(t, root, noGame)
+	}},
 	{name: "no-src", lay: func(t *testing.T, root string) { remove(t, root, "src") }},
 	// A checkout that setup has work in: no local manifest, no editor files, an older .gitignore, and a
 	// .luarc.json that lacks entries.
@@ -289,9 +319,26 @@ var oracleSeeds = []oracleSeed{
 	}},
 	{name: "objects", lay: layObjects},
 	{name: "settings", lay: laySettings},
+	// A preview picture, which a build puts in the place of the map's own: the settings take a file out of the map.
+	{name: "preview", lay: func(t *testing.T, root string) {
+		settingsMap(t, root)
+		picture := testkit.TGA(testkit.NewPixels(512), testkit.TGAOptions{RLE: true, FromTop: true})
+		testkit.WriteFile(t, root, "preview.tga", picture)
+		writeLocal(t, root, `settings { info { name = "With a preview"; preview = "preview.tga" } }`)
+	}},
 	{name: "assets", lay: layAssets},
 	{name: "one-asset", lay: func(t *testing.T, root string) { write(t, root, "assets/a.blp", "an asset") }},
 	{name: "models", lay: layModels},
+	// A model among the assets that is none, beside one that is.
+	{name: "unreadable-model", lay: func(t *testing.T, root string) {
+		write(t, root, "assets/Models/Broken.mdl", "Model {\n}\nBroken {\n")
+		testkit.WriteFile(t, root, "assets/Models/Knight.mdx", knight())
+	}},
+	// An unknown global that the manifest makes a warning.
+	{name: "warned-global", lay: func(t *testing.T, root string) {
+		appendTo(t, root, "src/main.yue", "\nCreatUnit Player(0), objects.units.captain, 0, 0, 0\n")
+		writeLocal(t, root, `lint { unknownGlobals = "warning" }`)
+	}},
 	{name: "outside", bare: true, lay: func(t *testing.T, root string) {
 		testkit.WriteFile(t, root, "knight.mdx", knight())
 		write(t, root, "notes.mdx", "Model {\n}\nBroken {\n")
@@ -315,6 +362,7 @@ var oracleSeeds = []oracleSeed{
 		writeLocal(t, root, `assets { paths { ["missing.blp"] = "x.blp" } }`)
 	}},
 	{name: "stale-ids", lay: func(t *testing.T, root string) { write(t, root, objects.IDsFile, "-- stale\n") }},
+	{name: "no-ids", lay: func(t *testing.T, root string) { remove(t, root, objects.IDsFile) }},
 	{name: "state-that-is-no-state", lay: func(t *testing.T, root string) {
 		write(t, root, ".asset-state/map.w3x.json", "not json")
 	}},
@@ -400,11 +448,17 @@ const everySetting = `settings {
 // laySettings writes the map info and the script World Editor saved for the settings fixture, a text file of the
 // game's interface for the settings to merge into, and every setting.
 func laySettings(t *testing.T, root string) {
+	settingsMap(t, root)
+	write(t, root, oracleMap+"/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
+	writeLocal(t, root, everySetting)
+}
+
+// settingsMap puts the map info and the script of the settings fixture into the project's map.
+func settingsMap(t *testing.T, root string) {
+	t.Helper()
 	for _, name := range []string{"war3map.w3i", "war3map.lua"} {
 		testkit.WriteFile(t, root, oracleMap+"/"+name, testkit.Fixture(t, "map-settings-v39/"+name))
 	}
-	write(t, root, oracleMap+"/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
-	writeLocal(t, root, everySetting)
 }
 
 // everyCategory is the body of an object file with an object of every category, none with an id the objects
@@ -601,6 +655,7 @@ var oracleRuns = []oracleRun{
 	// test without a game, which it looks for when the map is staged; dev without sources, which ends by itself.
 	on("no-game", "test"),
 	on("no-game", "test", "--minify"),
+	on("other-entry-and-no-game", "test", "--entry", "src/other.yue"),
 	on("no-src", "dev"),
 	// Another entry than the manifest's, and an entry that is none.
 	on("other-entry", "build", "--entry", "src/other.yue"),
@@ -620,6 +675,8 @@ var oracleRuns = []oracleRun{
 	on("settings", "settings:check"),
 	on("settings", "build"),
 	on("settings", "check"),
+	on("preview", "settings:check"),
+	on("preview", "build"),
 	on("assets", "assets:check"),
 	on("assets", "build"),
 	on("assets", "check"),
@@ -635,6 +692,10 @@ var oracleRuns = []oracleRun{
 	on("models", "assets:paths", "drafts/knight.mdx"),
 	on("models", "assets:paths", "drafts/notes.mdl"),
 	on("models", "assets:paths", "drafts/missing.mdx"),
+	on("unreadable-model", "assets:paths"),
+	// A warning among the lines of a build and of a check that pass.
+	on("warned-global", "build"),
+	on("warned-global", "check"),
 
 	// Outside a project: assets:paths with and without a file, the commands that need a manifest, and what init
 	// refuses.
@@ -671,6 +732,8 @@ var oracleRuns = []oracleRun{
 	on("stale-ids", "check"),
 	on("stale-ids", "objects:check"),
 	on("stale-ids", "build"),
+	on("no-ids", "check"),
+	on("no-ids", "objects:check"),
 	on("state-that-is-no-state", "assets:check"),
 	on("state-that-is-no-state", "assets:sync"),
 	on("state-that-is-no-state", "build"),
@@ -967,8 +1030,8 @@ func (o *commandOracle) compare(t *testing.T, run oracleRun) {
 	alone := len(run.lines()) == 1
 	for i, args := range run.lines() {
 		what := run.seed + ", " + said(args)
-		want := o.butForTheClasses(t, what, run.seed, args, alone, theirs[i], mine[i])
-		o.same(t, what, args, want, mine[i])
+		want, whole := o.butForTheClasses(t, what, run.seed, args, alone, theirs[i], mine[i])
+		o.same(t, what, args, want, mine[i], whole)
 		o.tally.Lines++
 		if theirs[i].Code == 0 {
 			o.tally.Passed++
@@ -978,8 +1041,9 @@ func (o *commandOracle) compare(t *testing.T, run oracleRun) {
 	}
 }
 
-// same compares what this tree made of a command line with what is wanted of it.
-func (o *commandOracle) same(t *testing.T, what string, args []string, want, got leftBy) {
+// same compares what this tree made of a command line with what is wanted of it: what was heard of the line,
+// and what the line left of files, by its command. whole says that the line is of no class.
+func (o *commandOracle) same(t *testing.T, what string, args []string, want, got leftBy, whole bool) {
 	t.Helper()
 	oracle.Values(t, what+": the exit code", want.Code, got.Code)
 	oracle.Bytes(t, what+": standard output", printed(want.Stdout), printed(got.Stdout))
@@ -996,19 +1060,49 @@ func (o *commandOracle) same(t *testing.T, what string, args []string, want, got
 	if command == "setup" {
 		oracle.Values(t, what+": the cache has a bin folder", want.bin, got.bin)
 	}
-	if want.files != nil {
+	switch {
+	case want.files == nil:
+	case slices.Contains(writeNoWork, command):
+		// A class of such a command expects a refusal where the other tree went on, or the outcome of another
+		// seed: the two folders are held against each other for a line of no class.
+		if whole {
+			o.tally.Kept += alike(t, what+": the project, dist/ aside", butDist(want.files), butDist(got.files))
+		}
+	default:
 		o.tally.Files += alike(t, what, within(want.files, itsWork[command]), within(got.files, itsWork[command]))
 	}
 }
 
+// oracleStage is where every project of the oracle is staged, from the project folder.
+const oracleStage = "dist/stage/map.w3x"
+
 // itsWork is the files and folders of a project that are the work of a command, for the commands whose work is
-// files and that the build oracle does not run: all that assets:sync may write, and all that setup may.
+// files: all that assets:sync may write, and all that setup may; the stage of a test, which is all that a test
+// leaves for the game; and of a build the staged script, which is where the entry and the form that the line
+// names show. The rest of what a build leaves is the build oracle's.
 var itsWork = map[string][]string{
 	"assets:sync": {"maps", ".asset-state"},
 	"setup": {
 		".moonwell/types", ".moonwell/yue", ".moonwell/lua", "moonwell.local.pkl", "yueconfig.yue", ".vscode",
 		".gitignore", ".luarc.json",
 	},
+	"test":  {oracleStage},
+	"build": {oracleStage + "/war3map.lua"},
+}
+
+// writeNoWork is the commands that only say or print what they find: they write nothing of their own, and of
+// the project only what a sync of the libraries does, which two of them start.
+var writeNoWork = []string{"objects:eval", "objects:check", "settings:check", "assets:check", "assets:paths"}
+
+// butDist is what a project folder holds outside dist/: the log of a line is there, with the time of each text.
+func butDist(files map[string][]byte) map[string][]byte {
+	held := map[string][]byte{}
+	for name, data := range files {
+		if name != "dist" && !strings.HasPrefix(name, "dist/") {
+			held[name] = data
+		}
+	}
+	return held
 }
 
 // within is what a project folder holds at the places named and below them.
@@ -1068,13 +1162,13 @@ func listed(texts []string) []string { return append([]string{}, texts...) }
 // is counted as compared whole.
 //
 // alone says that the line is the one line of its run: only such a line can be run once more, on another seed,
-// for a class that takes what it expects from there. got is what this tree made, for the one class that holds
-// it against the seed.
+// for a class that takes what it expects from there. got is what this tree made, for the classes that hold what
+// it left against the seed. whole says that the line is of no class.
 func (o *commandOracle) butForTheClasses(
 	t *testing.T, what, seed string, args []string, alone bool, left, got leftBy,
-) leftBy {
+) (want leftBy, whole bool) {
 	t.Helper()
-	want := leftBy{heard{left.Code, slices.Clone(left.Stdout), slices.Clone(left.Lines)}, left.files, left.bin}
+	want = leftBy{heard{left.Code, slices.Clone(left.Stdout), slices.Clone(left.Lines)}, left.files, left.bin}
 	before := o.tally
 	switch {
 	case o.strict(t, what, seed, args, &want, got):
@@ -1083,12 +1177,13 @@ func (o *commandOracle) butForTheClasses(
 	case o.lockTaken(t, what, seed, args, &want):
 	case o.asOnTheTemplate(t, what, seed, args, alone, &want):
 	}
-	o.stagedWhole(args, &want)
+	o.stagedWhole(t, what, args, &want, got)
 	o.fileNamed(seed, &want)
-	if o.tally == before {
+	whole = o.tally == before
+	if whole {
 		o.tally.Whole++
 	}
-	return want
+	return want, whole
 }
 
 // refusedWith is what is heard of a line that is refused, or of a command that fails, with this text and
@@ -1256,18 +1351,21 @@ const (
 // the seed with a typed constant against a raw one.
 var planNoSettings = []string{"objects:eval", "assets:check", "assets:sync", "assets:paths"}
 
-// asOnTheTemplate is the two classes of a seed that is the template but for one block of its local manifest,
-// which the other tree refuses and this tree does not look at, or reads as the template's: DotFolder, a map
-// folder with a part that is a dot, and RefusedLater, a typed gameplay constant against a raw one, for the
-// commands that plan no settings. This tree must make of the line what the other tree makes of it on the
-// template, at the same place: the line is run once more for that, and all of it is compared.
+// asOnTheTemplate is the two classes of a seed whose local manifest is one block that the other tree refuses,
+// and that this tree does not look at, or reads as the template's: DotFolder, a map folder with a part that is
+// a dot, and RefusedLater, a typed gameplay constant against a raw one, for the commands that plan no settings.
+// This tree must make of the line what the other tree makes of it on the template, at the same place: the line
+// is run once more for that, and all of it is compared. The other tree must carry the line out there: a
+// template that it fails on is nothing to expect of this tree.
+//
+// The template's local manifest is another: it names a game. No line of the two classes looks for one.
 func (o *commandOracle) asOnTheTemplate(t *testing.T, what, seed string, args []string, alone bool, want *leftBy) bool {
 	t.Helper()
 	local := o.localManifest(seed)
 	typed, raw := typedFoodLimit.FindStringSubmatch(local), rawFoodCeiling.FindStringSubmatch(local)
 	refusedAs := func(text string) bool { return want.Code == 1 && slices.Equal(want.Lines, []string{text}) }
 	switch {
-	// The other tree has said what it says before its assets step, where it refuses the folder.
+	// The other tree has said what it says before the step that first joins the map folder to the project.
 	case strings.Contains(local, dotMapFolder) && want.Code == 1 && len(want.Lines) > 0 &&
 		want.Lines[len(want.Lines)-1] == dotRefused:
 		o.tally.DotFolder++
@@ -1283,6 +1381,10 @@ func (o *commandOracle) asOnTheTemplate(t *testing.T, what, seed string, args []
 		t.Fatalf("%s: a line of this class is the one line of its run", what)
 	}
 	*want = o.through(t, templateSeed, seed, []step{cmdline(args...)}, otherTree)[0]
+	if want.Code != 0 {
+		t.Errorf("%s: the other tree ends the line with %d on the template, which is what the class expects of "+
+			"this tree; it said:\n%s", what, want.Code, strings.Join(want.Lines, "\n"))
+	}
 	return true
 }
 
@@ -1291,13 +1393,20 @@ var appliedToTheStage = regexp.MustCompile(`^(Added \d+ custom object\(s\) to \d
 	`Applied map settings to \d+ internal file\(s\)|Imported \d+ asset\(s\))\.$`)
 
 // stagedWhole is the class of a build that fails after the other tree has written objects, settings or assets
-// into its stage, and before its stage is whole: this tree must say none of the lines of those steps.
-func (o *commandOracle) stagedWhole(args []string, want *leftBy) {
+// into its stage, and before its stage is whole: this tree must say none of the lines of those steps, and must
+// have staged nothing. The other tree's stage, which is patched in part, is not compared.
+func (o *commandOracle) stagedWhole(t *testing.T, what string, args []string, want *leftBy, got leftBy) {
+	t.Helper()
 	if commandOf(args) != "build" || want.Code != 1 || slices.Contains(want.Lines, "Packing archive...") ||
 		!slices.ContainsFunc(want.Lines, appliedToTheStage.MatchString) {
 		return
 	}
 	want.Lines = slices.DeleteFunc(want.Lines, appliedToTheStage.MatchString)
+	want.files = nil
+	if staged := within(got.files, []string{oracleStage}); len(staged) != 0 {
+		t.Errorf("%s: this tree staged %d files and folders in a build that failed while it planned",
+			what, len(staged))
+	}
 	o.tally.StagedWhole++
 }
 
@@ -1306,14 +1415,14 @@ func (o *commandOracle) stagedWhole(args []string, want *leftBy) {
 var namedByItsPlace = map[string]string{
 	lockFile: lockFile, // the build lock, which is held
 	// A map without its info, missed when it is packed.
-	"dist/stage/map.w3x": oracleMap,
+	oracleStage: oracleMap,
 	// An index of imports that is too short to read, as a build reads it and as assets:check does.
-	"dist/stage/map.w3x/war3map.imp": oracleMap + "/war3map.imp",
-	oracleMap + "/war3map.imp":       oracleMap + "/war3map.imp",
+	oracleStage + "/war3map.imp": oracleMap + "/war3map.imp",
+	oracleMap + "/war3map.imp":   oracleMap + "/war3map.imp",
 	// A file that assets:sync owns and that was edited in the map, as a build finds it and as the assets
 	// commands do.
-	"dist/stage/map.w3x/a.blp": oracleMap + "/a.blp",
-	oracleMap + "/a.blp":       oracleMap + "/a.blp",
+	oracleStage + "/a.blp": oracleMap + "/a.blp",
+	oracleMap + "/a.blp":   oracleMap + "/a.blp",
 }
 
 // withoutAFile is the refusals about a file of the map to which the other tree gives no file, each by all that
