@@ -35,7 +35,7 @@ func writeGamePaths(checkout string, args []string, out io.Writer) error {
 		return errNoGamePaths()
 	}
 	if err := os.WriteFile(fileIn(checkout, gamePathsPath), []byte(text), 0o666); err != nil {
-		return errFile(gamePathsPath, err)
+		return errInCheckout(checkout, gamePathsPath, err)
 	}
 	fmt.Fprintln(out, "wrote "+gamePathsPath+": "+strconv.Itoa(count)+" paths.")
 	return nil

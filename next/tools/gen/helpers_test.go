@@ -2,11 +2,16 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
@@ -134,6 +139,47 @@ func (c checkout) outputs() map[string][]byte {
 		}
 	}
 	return found
+}
+
+// generatorPackage is the generator's package, as go build names it from the root of the module.
+const generatorPackage = "./next/tools/gen"
+
+// builtProgram builds a program of this module with the go that runs the tests, into a folder of the test, and
+// returns the file. pkg names the package from the root of the module, which is the folder the build runs in.
+// The build writes that file and nothing else; it takes a second or two.
+func builtProgram(t testing.TB, pkg string) string {
+	t.Helper()
+	program := filepath.Join(t.TempDir(), "gen")
+	if runtime.GOOS == "windows" {
+		program += ".exe"
+	}
+	build := exec.Command("go", "build", "-o", program, pkg)
+	build.Dir = testkit.RepoRoot(t)
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("%s does not build: %v\n%s", pkg, err, output)
+	}
+	return program
+}
+
+// startIn starts a built program with dir as its working folder, waits for its end, and returns its exit code
+// and what it wrote to each stream. dir is a folder of a scratch checkout, and never one of the real checkout: a
+// generator writes into the checkout it finds.
+func startIn(t testing.TB, program, dir string, args ...string) (code int, stdout, stderr string) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	started := exec.CommandContext(ctx, program, args...)
+	started.Dir = dir
+	var printed, said bytes.Buffer
+	started.Stdout, started.Stderr = &printed, &said
+	if err := started.Run(); err != nil {
+		var exited *exec.ExitError
+		if !errors.As(err, &exited) {
+			t.Fatal(err)
+		}
+		code = exited.ExitCode()
+	}
+	return code, printed.String(), said.String()
 }
 
 // texts is the files among the outputs of a checkout, each with its text. The folders are left out.

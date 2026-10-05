@@ -52,6 +52,14 @@ func TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes(t *tes
 		{"\xEF\xBB\xBFUnits/A.mdx", "\xEF\xBB\xBFunits/a.mdx", true},
 		// A capital I with a dot above is lowered to the plain letter i.
 		{"Units/\xC4\xB0.MDX", "units/i.mdx", true},
+		// White space is taken off the ends of a line, and not off the ends of a step inside it: after the colon,
+		// beside a slash and before the dot it is part of the path, and after the dot it makes another type.
+		{"war3.w3mod: Units/A.mdx", " units/a.mdx", true},
+		{"war3.w3mod:\tUnits/A.mdx", "\tunits/a.mdx", true},
+		{"Units / A.mdx", "units / a.mdx", true},
+		{"Units/A .mdx", "units/a .mdx", true},
+		{"Units/A. mdx", "units/a. mdx", false},
+		{"Units/A.mdx :", "", false},
 	} {
 		if got, ok := normalizeGamePath(c.line); got != c.want || ok != c.kept {
 			t.Errorf("normalizeGamePath(%q) = %q, %v, want %q, %v", c.line, got, ok, c.want, c.kept)

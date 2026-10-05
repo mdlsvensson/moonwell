@@ -26,6 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -170,10 +171,22 @@ func errUnknownMode(table []mode, name string) error {
 // errUsage refuses a line that gives a mode more arguments than it takes, or fewer, with the mode's usage line.
 func errUsage(chosen mode) error { return errors.New(chosen.usage) }
 
-// errFile is a failure of the system on a file or a folder: the path, and the system's reason without the
-// operation and the full path that Go puts before it. path names the file as the contributor knows it: one of the
-// checkout by its path from the checkout, so that what a run prints holds no path of the checkout, and one that
-// the command line names as the line gave it.
+// errFile is a failure of the system on a file or a folder that the command line names: the path as the line
+// gave it, and the system's reason without the operation and the full path that Go puts before it.
 func errFile(path string, cause error) error {
 	return fmt.Errorf("%s: %s", path, fsx.Reason(cause))
+}
+
+// errInCheckout is a failure of the system on a file or a folder of the checkout, named by its path from the
+// checkout, so that what a run prints holds no path of the checkout. path is what the generator was reading or
+// writing. The failure names what the system's error names, where that lies in the checkout: it is path itself,
+// or the step on the way to it that the system could not take, such as a file at the place of a folder.
+func errInCheckout(checkout, path string, cause error) error {
+	var failed *fs.PathError
+	if errors.As(cause, &failed) {
+		if below, err := filepath.Rel(checkout, failed.Path); err == nil && filepath.IsLocal(below) {
+			path = filepath.ToSlash(below)
+		}
+	}
+	return errFile(path, cause)
 }

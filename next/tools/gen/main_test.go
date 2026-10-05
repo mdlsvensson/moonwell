@@ -3,7 +3,10 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
+	"io/fs"
 	"maps"
+	"path/filepath"
 	"reflect"
 	"slices"
 	"strings"
@@ -189,6 +192,64 @@ func TestRunTakesTheNearerOfTwoCheckouts(t *testing.T) {
 	}
 	if left := outer.outputs(); !reflect.DeepEqual(left, above) {
 		t.Errorf("the checkout above holds %v, want what it held", slices.Sorted(maps.Keys(left)))
+	}
+}
+
+// A failure of the system on a file of the checkout names what the system's error names, by its path from the
+// checkout: the file itself, or the step on the way to it that the system could not take. An error that names
+// nothing, or something outside the checkout, is told of the file that was being read or written.
+func TestAFailureInTheCheckoutNamesWhatTheSystemNamesByItsPathFromTheCheckout(t *testing.T) {
+	const writing = "schema/generated/HeroProps.pkl"
+	checkout := filepath.Join(t.TempDir(), "checkout")
+	reason := errors.New("the reason")
+	at := func(op string, steps ...string) error {
+		return &fs.PathError{Op: op, Path: filepath.Join(append([]string{checkout}, steps...)...), Err: reason}
+	}
+	for _, c := range []struct {
+		cause error
+		want  string
+	}{
+		{at("open", "schema", "generated", "HeroProps.pkl"), "schema/generated/HeroProps.pkl: the reason"},
+		{at("mkdir", "schema", "generated"), "schema/generated: the reason"},
+		{at("mkdir", "schema"), "schema: the reason"},
+		{fmt.Errorf("writing: %w", at("mkdir", "schema")), "schema: the reason"},
+		{at("open", "..", "elsewhere", "file"), writing + ": the reason"},
+		{reason, writing + ": the reason"},
+	} {
+		if got := errInCheckout(checkout, writing, c.cause).Error(); got != c.want {
+			t.Errorf("errInCheckout for %q = %q, want %q", c.cause, got, c.want)
+		}
+	}
+}
+
+// The program itself, built and started in a scratch checkout: main gives run the folder of the process and the
+// arguments after the program's name, sends what a run prints to standard output and its complaint to standard
+// error, and ends with the code. The test builds the generator, which takes a second or two, and is skipped
+// with -short; it needs no tool but go.
+func TestTheProgramPrintsToStandardOutputAndComplainsOnStandardError(t *testing.T) {
+	if testing.Short() {
+		t.Skip("the test builds the generator and starts it: not with -short")
+	}
+	program := builtProgram(t, generatorPackage)
+	c := newCheckout(t)
+	c.folder("data")
+	list := exported(t, "listfile.txt", "war3.w3mod:Units/Human/Footman/Footman.mdx\n")
+
+	code, stdout, stderr := startIn(t, program, c.root, "game-paths", list, "2.0.0")
+	if code != 0 || stdout != "wrote data/game-paths.txt: 1 paths.\n" || stderr != "" {
+		t.Errorf("a line that is carried out: exit %d; stdout %q; stderr %q", code, stdout, stderr)
+	}
+	const written = "# Warcraft III 2.0.0\nunits/human/footman/footman.mdx\n"
+	if got := texts(c.outputs()); !maps.Equal(got, map[string]string{"data/game-paths.txt": written}) {
+		t.Errorf("a line that is carried out left %q in the checkout it was started in", got)
+	}
+
+	code, stdout, stderr = startIn(t, program, c.root, "game-paths", list)
+	if code != 1 || stdout != "" {
+		t.Errorf("a line that is refused: exit %d; stdout %q; stderr %q", code, stdout, stderr)
+	}
+	if !strings.HasPrefix(stderr, "error: Usage: go run ./tools/gen game-paths ") || !strings.HasSuffix(stderr, "\n") {
+		t.Errorf("a line that is refused said %q, want the usage line of the mode after \"error: \"", stderr)
 	}
 }
 

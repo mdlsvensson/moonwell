@@ -55,7 +55,7 @@ func writeSchema(checkout string, _ []string, out io.Writer) error {
 func readMetadata(checkout string) (*objects.Metadata, error) {
 	data, err := os.ReadFile(fileIn(checkout, metadataPath))
 	if err != nil {
-		return nil, errFile(metadataPath, err)
+		return nil, errInCheckout(checkout, metadataPath, err)
 	}
 	var metadata objects.Metadata
 	if err := json.Unmarshal(data, &metadata); err != nil {
@@ -70,7 +70,7 @@ func writeGenerated(checkout string, files []generatedFile, out io.Writer) error
 	for _, file := range files {
 		wrote, err := fsx.WriteIfChanged(fileIn(checkout, file.path), file.text)
 		if err != nil {
-			return errFile(file.path, err)
+			return errInCheckout(checkout, file.path, err)
 		}
 		if wrote {
 			fmt.Fprintln(out, "wrote "+file.path)
@@ -84,7 +84,7 @@ func writeGenerated(checkout string, files []generatedFile, out io.Writer) error
 func removeOthers(checkout string, files []generatedFile, out io.Writer) error {
 	entries, err := os.ReadDir(fileIn(checkout, schemaFolder))
 	if err != nil {
-		return errFile(schemaFolder, err)
+		return errInCheckout(checkout, schemaFolder, err)
 	}
 	for _, entry := range entries {
 		path := schemaFolder + "/" + entry.Name()
@@ -92,7 +92,7 @@ func removeOthers(checkout string, files []generatedFile, out io.Writer) error {
 			continue
 		}
 		if err := os.RemoveAll(fileIn(checkout, path)); err != nil {
-			return errFile(path, err)
+			return errInCheckout(checkout, path, err)
 		}
 		fmt.Fprintln(out, "removed "+path)
 	}
