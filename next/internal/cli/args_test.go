@@ -1,0 +1,216 @@
+package cli
+
+import (
+	"errors"
+	"reflect"
+	"strings"
+	"testing"
+
+	"github.com/mdlsvensson/moonwell/next/internal/diag"
+)
+
+// grammar is a command table for the parser's tests, with a command of each kind the grammar knows: three that
+// take no argument, two of them with flags of their own, one that cannot do without its argument, and one that
+// takes one argument at most. The parser reads a row's name and how many arguments it takes, and names its usage
+// in a hint.
+var grammar = []command{
+	{name: "build", usage: "build [--entry f] [--minify]"},
+	{name: "test", usage: "test [--entry f] [--minify]"},
+	{name: "check", usage: "check"},
+	{name: "init", usage: "init <dir> [--link]", takes: arity{most: 1, without: errNoFolderToMake}},
+	{name: "assets:paths", usage: "assets:paths [file]", takes: arity{most: 1}},
+}
+
+// errNoFolderToMake is the refusal of the stand-in init without its argument.
+func errNoFolderToMake() error {
+	return &diag.Error{Msg: "init needs a directory.", Hint: "moonwell init my-map"}
+}
+
+func TestParseReadsAWellFormedLine(t *testing.T) {
+	for _, c := range []struct {
+		args []string
+		want line
+	}{
+		{nil, line{}},
+		{[]string{"build"}, line{words: []string{"build"}}},
+		{[]string{"check"}, line{words: []string{"check"}}},
+
+		// Flags stand anywhere: before the command, after it, and between it and its argument.
+		{[]string{"build", "--minify"}, line{words: []string{"build"}, minify: true}},
+		{[]string{"--minify", "build"}, line{words: []string{"build"}, minify: true}},
+		{[]string{"init", "my-map", "--link"}, line{words: []string{"init", "my-map"}, link: true}},
+		{[]string{"--link", "init", "my-map"}, line{words: []string{"init", "my-map"}, link: true}},
+		{[]string{"init", "--link", "my-map"}, line{words: []string{"init", "my-map"}, link: true}},
+
+		// --entry takes its file from the next argument, or after "=".
+		{[]string{"build", "--entry", "src/a.yue", "--minify"},
+			line{words: []string{"build"}, entry: "src/a.yue", minify: true}},
+		{[]string{"--entry=src/a.yue", "test"}, line{words: []string{"test"}, entry: "src/a.yue"}},
+		{[]string{"--entry", "src/a.yue", "test"}, line{words: []string{"test"}, entry: "src/a.yue"}},
+		{[]string{"test", "--entry", `src\game\init.yue`}, line{words: []string{"test"}, entry: `src\game\init.yue`}},
+
+		// A flag given twice says one thing as long as it has one value.
+		{[]string{"build", "--minify", "--minify"}, line{words: []string{"build"}, minify: true}},
+		{[]string{"build", "--entry", "src/a.yue", "--entry=src/a.yue"},
+			line{words: []string{"build"}, entry: "src/a.yue"}},
+		{[]string{"-h", "--help"}, line{help: true}},
+
+		// The command's own arguments.
+		{[]string{"assets:paths"}, line{words: []string{"assets:paths"}}},
+		{[]string{"assets:paths", "units/Hero.mdx"}, line{words: []string{"assets:paths", "units/Hero.mdx"}}},
+		// A dash alone is no flag.
+		{[]string{"assets:paths", "-"}, line{words: []string{"assets:paths", "-"}}},
+		// What follows "--" is arguments, whatever it starts with; with nothing after it, "--" says nothing.
+		{[]string{"assets:paths", "--", "--odd.mdx"}, line{words: []string{"assets:paths", "--odd.mdx"}}},
+		{[]string{"init", "--link", "--", "-v"}, line{words: []string{"init", "-v"}, link: true}},
+		{[]string{"build", "--minify", "--"}, line{words: []string{"build"}, minify: true}},
+
+		// Help and version, in both forms, alone and beside a command.
+		{[]string{"--help"}, line{help: true}},
+		{[]string{"-h"}, line{help: true}},
+		{[]string{"--version"}, line{version: true}},
+		{[]string{"-v"}, line{version: true}},
+		{[]string{"build", "--help"}, line{words: []string{"build"}, help: true}},
+		{[]string{"-v", "build"}, line{words: []string{"build"}, version: true}},
+		{[]string{"--help", "--version"}, line{help: true, version: true}},
+		{[]string{"build", "--minify", "-h"}, line{words: []string{"build"}, minify: true, help: true}},
+		// A line that asks for the help or the version is not held to the argument its command needs.
+		{[]string{"init", "--help"}, line{words: []string{"init"}, help: true}},
+		{[]string{"-v", "init"}, line{words: []string{"init"}, version: true}},
+
+		// A command the table does not have is read as it is said: nothing is known of its flags and arguments.
+		{[]string{"frobnicate"}, line{words: []string{"frobnicate"}}},
+		{[]string{"frobnicate", "--minify", "a", "b"}, line{words: []string{"frobnicate", "a", "b"}, minify: true}},
+		{[]string{""}, line{words: []string{""}}},
+	} {
+		got, err := parse(c.args, grammar)
+		if err != nil {
+			t.Errorf("parse(%q) is refused: %s", c.args, diag.Format(err))
+		} else if !reflect.DeepEqual(got, c.want) {
+			t.Errorf("parse(%q) = %+v, want %+v", c.args, got, c.want)
+		}
+	}
+}
+
+func TestParseRefusesALineThatIsNotWellFormed(t *testing.T) {
+	for _, c := range []struct {
+		args []string
+		msg  []string // the message's distinguishing words
+		hint string   // words of the hint
+	}{
+		// A flag Moonwell does not have; the hint names the closest it has.
+		{[]string{"build", "--minfy"}, []string{"no flag", "'--minfy'"}, "Did you mean --minify?"},
+		{[]string{"test", "--entri", "src/a.yue"}, []string{"no flag", "'--entri'"}, "Did you mean --entry?"},
+		{[]string{"--Version"}, []string{"no flag", "'--Version'"}, "Did you mean --version?"},
+		{[]string{"build", "--verbose"}, []string{"no flag", "'--verbose'"}, "--help"},
+		{[]string{"--color=always", "build"}, []string{"no flag", "'--color'"}, "--help"},
+		{[]string{"-x", "build"}, []string{"no flag", "'-x'"}, "--help"},
+		{[]string{"build", "---minify"}, []string{"no flag", "'---minify'"}, "Did you mean --minify?"},
+		{[]string{"build", "--=x"}, []string{"no flag", "'--'"}, "--help"},
+		{[]string{"frobnicate", "--minfy"}, []string{"no flag", "'--minfy'"}, "Did you mean --minify?"},
+
+		// A flag the command does not have.
+		{[]string{"check", "--minify"}, []string{"check has no flag", "'--minify'"}, "build and test"},
+		{[]string{"--minify", "check"}, []string{"check has no flag", "'--minify'"}, "build and test"},
+		{[]string{"check", "--entry", "src/a.yue"}, []string{"check has no flag", "'--entry'"}, "build and test"},
+		{[]string{"build", "--link"}, []string{"build has no flag", "'--link'"}, "init"},
+		{[]string{"init", "my-map", "--minify"}, []string{"init has no flag", "'--minify'"}, "build and test"},
+		{[]string{"check", "--minify", "--help"}, []string{"check has no flag", "'--minify'"}, "build and test"},
+		// A command's flag on a line without a command.
+		{[]string{"--minify"}, []string{"'--minify'", "without a command"}, "build and test"},
+		{[]string{"--entry", "src/a.yue"}, []string{"'--entry'", "without a command"}, "build and test"},
+		{[]string{"--link", "--help"}, []string{"'--link'", "without a command"}, "init"},
+
+		// A switch given a value.
+		{[]string{"build", "--minify=true"}, []string{"'--minify'", "takes no value"}, "on its own"},
+		{[]string{"build", "--minify=false"}, []string{"'--minify'", "takes no value"}, "on its own"},
+		{[]string{"build", "--minify="}, []string{"'--minify'", "takes no value"}, "on its own"},
+		{[]string{"--help=true"}, []string{"'--help'", "takes no value"}, "on its own"},
+		{[]string{"init", "my-map", "--link=no"}, []string{"'--link'", "takes no value"}, "on its own"},
+		// After a switch, true and false are arguments.
+		{[]string{"build", "--minify", "false"}, []string{"build takes no arguments", "'false'"}, "moonwell build"},
+
+		// --entry without a file, with an empty one, and with one that is no entry.
+		{[]string{"build", "--entry"}, []string{"Entry ''", ".yue file under src/"}, "src/main.yue"},
+		{[]string{"build", "--entry", "--minify"}, []string{"Entry ''", ".yue file under src/"}, "src/main.yue"},
+		{[]string{"build", "--entry", "--", "src/a.yue"}, []string{"Entry ''", ".yue file under src/"}, "src/main.yue"},
+		{[]string{"build", "--entry", "-"}, []string{"Entry ''", ".yue file under src/"}, "src/main.yue"},
+		{[]string{"build", "--entry="}, []string{"Entry ''", ".yue file under src/"}, "src/main.yue"},
+		{[]string{"build", "--entry", ""}, []string{"Entry ''", ".yue file under src/"}, "src/main.yue"},
+		{[]string{"build", "--entry", "main.lua"}, []string{"Entry 'main.lua'"}, "src/main.yue"},
+		{[]string{"build", "--entry=lua/a.yue"}, []string{"Entry 'lua/a.yue'"}, "src/main.yue"},
+		// The argument after --entry is its file, the command's name too.
+		{[]string{"--entry", "build"}, []string{"Entry 'build'"}, "src/main.yue"},
+		// The file is refused as it is read: before the flag is held against the command.
+		{[]string{"check", "--entry"}, []string{"Entry ''"}, "src/main.yue"},
+
+		// A flag given twice with two values, which are compared as they are written.
+		{[]string{"build", "--entry", "src/a.yue", "--entry", "src/b.yue"},
+			[]string{"'--entry'", "twice", "'src/a.yue'", "'src/b.yue'"}, "once"},
+		{[]string{"build", "--entry=src/a.yue", "--entry=./src/a.yue"},
+			[]string{"'--entry'", "twice", "'src/a.yue'", "'./src/a.yue'"}, "once"},
+
+		// An argument the command does not take, and a command without the argument it needs.
+		{[]string{"build", "extra"}, []string{"build takes no arguments", "'extra'"}, "moonwell build"},
+		{[]string{"check", "a", "b"}, []string{"check takes no arguments", "'a'"}, "moonwell check"},
+		{[]string{"build", "extra", "--help"}, []string{"build takes no arguments", "'extra'"}, "moonwell build"},
+		{[]string{"build", "--", "--minify"}, []string{"build takes no arguments", "'--minify'"}, "moonwell build"},
+		{[]string{"build", "-"}, []string{"build takes no arguments", "'-'"}, "moonwell build"},
+		{[]string{"init", "a", "b"}, []string{"init takes one argument", "'b'"}, "moonwell init"},
+		{[]string{"init", "a", "--help", "b"}, []string{"init takes one argument", "'b'"}, "moonwell init"},
+		{[]string{"assets:paths", "a.mdx", "b.mdx"},
+			[]string{"assets:paths takes one argument", "'b.mdx'"}, "moonwell assets:paths"},
+		{[]string{"init"}, []string{"init needs a directory"}, "moonwell init my-map"},
+		{[]string{"init", "--link"}, []string{"init needs a directory"}, "moonwell init my-map"},
+
+		// A group of short flags, and every other argument of one dash and more than one character.
+		{[]string{"-hv"}, []string{"'-hv'", "one dash and one letter"}, "on its own"},
+		{[]string{"build", "-n5"}, []string{"'-n5'", "one dash and one letter"}, "on its own"},
+		{[]string{"-abc=5", "build"}, []string{"'-abc=5'", "one dash and one letter"}, "on its own"},
+		{[]string{"build", "-h=1"}, []string{"'-h=1'", "one dash and one letter"}, "on its own"},
+		{[]string{"build", "-minify"}, []string{"'-minify'", "one dash and one letter"}, "two dashes"},
+
+		// "--" before the command.
+		{[]string{"--", "build"}, []string{"'--'", "before the command"}, "command first"},
+		{[]string{"--"}, []string{"'--'", "before the command"}, "command first"},
+		{[]string{"--help", "--", "build"}, []string{"'--'", "before the command"}, "command first"},
+	} {
+		got, err := parse(c.args, grammar)
+		var refusal *diag.Error
+		if !errors.As(err, &refusal) {
+			t.Errorf("parse(%q) = %+v, %v; want a refusal that is a *diag.Error", c.args, got, err)
+			continue
+		}
+		for _, words := range c.msg {
+			if !strings.Contains(refusal.Msg, words) {
+				t.Errorf("parse(%q): the message %q is missing %q", c.args, refusal.Msg, words)
+			}
+		}
+		if refusal.Hint == "" || !strings.Contains(refusal.Hint, c.hint) {
+			t.Errorf("parse(%q): the hint %q is missing %q", c.args, refusal.Hint, c.hint)
+		}
+		if refusal.File != "" || !reflect.DeepEqual(got, line{}) {
+			t.Errorf("parse(%q): file %q and line %+v; a refused line has no file and says nothing", c.args,
+				refusal.File, got)
+		}
+	}
+}
+
+// Every flag of the table is told from every other: by its long form, and by its short form when it has one.
+func TestTheFlagsOfTheTableAreToldApart(t *testing.T) {
+	seen := map[string]bool{}
+	for _, f := range flags {
+		for _, form := range []string{"--" + f.name, "-" + f.short} {
+			if form == "-" {
+				continue
+			}
+			if seen[form] {
+				t.Errorf("two flags of the table are written %s", form)
+			}
+			seen[form] = true
+		}
+		if f.name == "" || len(f.short) > 1 || f.set == nil {
+			t.Errorf("the flag %+v has no name, a short form of more than one letter, or nothing to set", f)
+		}
+	}
+}
