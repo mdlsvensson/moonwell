@@ -7,6 +7,7 @@ import (
 	"io"
 	"maps"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -33,7 +34,7 @@ type hashes struct {
 
 // keptSource is a source as the hashes file keeps it.
 type keptSource struct {
-	Hash   string `json:"hash"`   // the SHA-256 of the source's bytes
+	Hash   string `json:"hash"`   // the SHA-256 of the source's bytes; "" while nothing vouches for its output
 	Output string `json:"output"` // where its Lua is, from the staging folder, with "/"
 }
 
@@ -47,35 +48,35 @@ func readHashes(root string) (hashes, error) {
 	return kept, nil
 }
 
-// namesOutputs reports whether every output the file names is a Lua file below the staging folder, written as a
-// compile writes it. A compile removes the outputs it finds there, so a file that names anything else is none
-// of its own.
+// namesOutputs reports whether every output the file names is a Lua file below the staging folder, by the
+// system's own rule for a path that stays below its folder. A compile joins the outputs it finds there with the
+// folder and removes them, so a file that names anything else is none of its own.
 func (h hashes) namesOutputs() bool {
 	for _, source := range h.Sources {
-		path, ok := fsx.RelPath(source.Output)
-		if !ok || path != source.Output || !strings.HasSuffix(path, ".lua") {
+		if !filepath.IsLocal(filepath.FromSlash(source.Output)) || !strings.HasSuffix(source.Output, ".lua") {
 			return false
 		}
 	}
 	return true
 }
 
-// stale is the units that are to be compiled: every unit when what the outputs depend on changed, and else the
-// ones whose source changed or whose output is not there.
-func (h hashes) stale(units []unit, now dependsOn) []unit {
-	var stale []unit
+// stale parts the units into those that are to be compiled and those that are up to date. Every unit is stale
+// when what the outputs depend on changed, and else the ones whose source changed or whose output is not there.
+// A source that is kept without a hash is stale whatever its text.
+func (h hashes) stale(units []unit, now dependsOn) (stale, upToDate []unit) {
 	for _, u := range units {
-		upToDate := h.dependsOn == now && h.Sources[u.path] == keptSource{Hash: u.hash, Output: u.under} && fsx.Exists(u.output)
-		if !upToDate {
+		if h.dependsOn == now && h.Sources[u.path] == (keptSource{Hash: u.hash, Output: u.under}) && fsx.Exists(u.output) {
+			upToDate = append(upToDate, u)
+		} else {
 			stale = append(stale, u)
 		}
 	}
-	return stale
+	return stale, upToDate
 }
 
 // removeGone removes each output of the last compile that no source compiles to now: that of a source that is
-// gone, and that of a library's module whose library has another key.
-func removeGone(root string, last hashes, units []unit) error {
+// gone, and that of a library's module whose library has another key. stage is the staging folder on disk.
+func removeGone(stage string, last hashes, units []unit) error {
 	current := map[string]bool{}
 	for _, u := range units {
 		current[u.under] = true
@@ -85,22 +86,24 @@ func removeGone(root string, last hashes, units []unit) error {
 		if current[under] {
 			continue
 		}
-		output, err := placeOf(root, stageDir+"/"+under, errUnremovableOutput)
-		if err != nil {
-			return err
-		}
-		if err := removeOutput(under, output); err != nil {
+		if err := removeOutput(under, filepath.Join(stage, filepath.FromSlash(under))); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-// writeHashes keeps the units whose Lua is at their outputs, with what those outputs depend on.
-func writeHashes(root string, now dependsOn, units []unit) error {
+// writeHashes keeps the units whose Lua is at their outputs, with what those outputs depend on, and the units
+// that are about to be compiled, each with its output and without a hash. The file vouches for no source without
+// a hash, and still says where its output is: so a run that is stopped leaves nothing up to date that it was to
+// compile, and the output of such a source is removed once the source is gone.
+func writeHashes(root string, now dependsOn, good, pending []unit) error {
 	kept := hashes{dependsOn: now, Sources: map[string]keptSource{}}
-	for _, u := range units {
+	for _, u := range good {
 		kept.Sources[u.path] = keptSource{Hash: u.hash, Output: u.under}
+	}
+	for _, u := range pending {
+		kept.Sources[u.path] = keptSource{Output: u.under}
 	}
 	return writeCache(root, hashesFile, kept)
 }
@@ -149,3 +152,9 @@ func writeCache(root, name string, kept any) error {
 	}
 	return nil
 }
+
+// ---- errors ----
+
+// The failures of this file are those of a file below the staging folder that cannot be read, written or
+// removed. They are worded where the compile words them for its outputs: errUnreadableOutput,
+// errUnwritableOutput and errUnremovableOutput, below the same line of yue.go.

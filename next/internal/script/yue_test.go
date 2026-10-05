@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"maps"
-	"math"
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"slices"
 	"strings"
 	"sync"
@@ -23,8 +23,7 @@ import (
 )
 
 // The tests that call bench.real run the real compiler, a few hundredths of a second for each file: they are the
-// slow ones of this package. Every other test gives the compile a compiler that is a function (bench.fake), or
-// reads what the compiler prints from a recorded run.
+// slow ones of this package. Every other test gives the compile a compiler that is a function (bench.fake).
 
 var background = context.Background()
 
@@ -612,20 +611,37 @@ func TestWhereASourceCompilesTo(t *testing.T) {
 		// A library's folder is where its sync put it: the output goes by the library's key and the module's name.
 		{Source{Name: "loud", Path: "vendor/kit/lua/loud.yue", Kind: Yue, Library: "kit-2"}, ".libraries/kit-2/loud.lua"},
 		{Source{Name: "src.x", Path: "elsewhere/src/x.yue", Kind: Yue, Library: "a"}, ".libraries/a/src/x.lua"},
+		{Source{Name: "x", Path: "vendor/x.yue", Kind: Yue, Library: "A_b-10"}, ".libraries/A_b-10/x.lua"},
+		// A file named by its extension alone is a module without a name, and one in a folder ends its name
+		// with a dot.
+		{Source{Name: "", Path: "src/.yue", Kind: Yue}, ".lua"},
+		{Source{Name: "a.", Path: "src/a/.yue", Kind: Yue}, "a/.lua"},
+		{Source{Name: "", Path: "vendor/kit/.yue", Kind: Yue, Library: "kit"}, ".libraries/kit/.lua"},
 	} {
 		if got, err := outputOf(c.source); got != c.want || err != nil {
 			t.Errorf("outputOf(%+v) = %q, %v, want %q", c.source, got, err, c.want)
 		}
 	}
-	// A module that is not where its name says is a mistake of the caller: a plain error, and nothing is compiled.
+	// A module that is not where its name says, and a library's key that is no plain name, are mistakes of the
+	// caller: a plain error, and nothing is compiled.
 	for _, source := range []Source{
-		{Name: "", Path: "src/.yue", Kind: Yue},
 		{Name: "main", Path: "src/other.yue", Kind: Yue},
 		{Name: "main", Path: "lua/main.yue", Kind: Yue},
 		{Name: "main", Path: "src/deep/main.yue", Kind: Yue},
 		{Name: "main", Path: "src/main.lua", Kind: Yue},
+		{Name: "", Path: "src/main.yue", Kind: Yue},
 		{Name: "loud", Path: "vendor/kit/quiet.yue", Kind: Yue, Library: "kit"},
 		{Name: "loud", Path: "loud.yue", Kind: Yue, Library: "kit"},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: ".."},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "."},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "../../.."},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "a/b"},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: `a\b`},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "a.b"},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "a b"},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "C:"},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: eAcute},
+		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "kit\n"},
 	} {
 		got, err := outputOf(source)
 		var expected *diag.Error
@@ -668,8 +684,37 @@ func TestAModuleWithoutAnOutputHasNoLua(t *testing.T) {
 	}
 }
 
-func TestALinkOnTheWayToAnOutputIsRefused(t *testing.T) {
-	for _, link := range []string{"dist", "dist/stage", "dist/stage/lua", "dist/stage/lua/game"} {
+func TestTheNamesCollectGivesPlaceEveryOutputBelowTheStagingFolder(t *testing.T) {
+	// A name is a path with a dot for each "/", and no file or folder on that path has a dot in its own name: so
+	// no step of an output's path is "." or "..", whatever the files are called.
+	p := files(
+		"src/main.yue", "", "src/.yue", "", "src/a/.yue", "", "src/a/b/init.yue", "", "src/my module.yue", "", "src/-.yue", "",
+		"src/_/_.yue", "", "src/init/init.yue", "",
+	).with("ex").and(inLibrary("ex", "kit/.yue"), "", inLibrary("ex", "deep/er/x.yue"), "")
+	b := benchOf(t, p)
+	sources, err := Collect(b.root, b.libraries)
+	if err != nil {
+		t.Fatal(err)
+	}
+	placed := 0
+	for _, source := range sources {
+		output, err := outputOf(source)
+		if err != nil || !filepath.IsLocal(filepath.FromSlash(output)) || !strings.HasSuffix(output, ".lua") {
+			t.Errorf("outputOf(%+v) = %q, %v, want a path that stays below its folder", source, output, err)
+			continue
+		}
+		if steps := strings.Split(output, "/"); slices.Contains(steps, ".") || slices.Contains(steps, "..") {
+			t.Errorf("outputOf(%+v) = %q, which has a step that is no name", source, output)
+		}
+		placed++
+	}
+	if placed != 10 {
+		t.Errorf("%d outputs were placed, want 10", placed)
+	}
+}
+
+func TestALinkOnTheWayToTheStagingFolderIsRefused(t *testing.T) {
+	for _, link := range []string{"dist", "dist/stage", "dist/stage/lua"} {
 		b := benchOf(t, files("src/game/units.yue", "x = 1\n"))
 		b.fake(nil)
 		elsewhere := files()
@@ -681,27 +726,119 @@ func TestALinkOnTheWayToAnOutputIsRefused(t *testing.T) {
 	}
 }
 
-func TestALinkAtASourceIsRefused(t *testing.T) {
-	b := benchOf(t, mainOnly.and("elsewhere/linked.yue", "x = 1\n"))
-	at := filepath.Join(b.root, "src", "linked.yue")
-	if err := os.Symlink(filepath.Join(b.root, "elsewhere", "linked.yue"), at); err != nil {
-		t.Skipf("cannot create a symlink to a file here: %v", err)
-	}
+func TestBelowTheStagingFolderALinkIsWrittenThrough(t *testing.T) {
+	// The staging folder is Moonwell's own: what is below it is not looked at for links.
+	b := benchOf(t, files("src/game/units.yue", "x = 1\n"))
 	b.fake(nil)
-	failure := b.refuses(fakeYue, false, "a link at a source")
-	if failure.Msg != "Symlinks are not supported: "+at || len(b.ran()) != 0 {
-		t.Errorf("error = %+v", failure)
+	at := linkTo(t, files(), b.root, "dist/stage/lua/game")
+	result := b.compiles(fakeYue, false)
+	if lua := b.luaAt(result, "src/game/units.yue"); lua != "-- src/game/units.yue\n" || !fsx.Exists(filepath.Join(at, "units.lua")) {
+		t.Errorf("the Lua is %q, and it is behind the link: %v", lua, fsx.Exists(filepath.Join(at, "units.lua")))
 	}
 }
 
-func TestASourceWhoseNameWindowsCannotHoldIsRefused(t *testing.T) {
-	// Such a file is only found on a system that holds the name; the compile is given one here.
+func TestASourceThatIsALinkIsCompiledThroughIt(t *testing.T) {
+	// A linked file that is named as a module is a module, as it is listed; its text is the file's behind the
+	// link.
+	b := benchOf(t, mainOnly.and("elsewhere/real.yue", "x = 'behind the link'\n"))
+	at := filepath.Join(b.root, "src", "linked.yue")
+	if err := os.Symlink(filepath.Join(b.root, "elsewhere", "real.yue"), at); err != nil {
+		t.Skipf("cannot create a symlink to a file here: %v", err)
+	}
+	b.fake(nil)
+	result := b.compiles(fakeYue, false)
+	if lua := b.luaAt(result, "src/linked.yue"); lua != "-- src/linked.yue\n" || result.texts["src/linked.yue"] != "x = 'behind the link'\n" {
+		t.Errorf("the Lua is %q and the text %q", lua, result.texts["src/linked.yue"])
+	}
+	if ran := b.ran(); !slices.Equal(ran, []string{"src/linked.yue", "src/main.yue"}) {
+		t.Errorf("the compiler ran on %q", ran)
+	}
+}
+
+func TestASourceIsCompiledUnderWhateverNameTheSystemHolds(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows holds no file with a question mark or a backslash in its name")
+	}
+	// A backslash in a name is a character of the name, and no separator.
+	question, backslash := "src/what?.yue", `src/back\slash.yue`
+	b := benchOf(t, mainOnly)
+	for _, path := range []string{question, backslash} {
+		if err := os.WriteFile(filepath.Join(b.root, path), []byte("x = 1\n"), 0o666); err != nil {
+			t.Skipf("this system holds no file named %s: %v", path, err)
+		}
+	}
+	b.fake(nil)
+	result := b.compiles(fakeYue, false)
+	for path, output := range map[string]string{question: "what?.lua", backslash: `back\slash.lua`} {
+		if lua := b.luaAt(result, path); lua != "-- "+path+"\n" || result.texts[path] != "x = 1\n" || result.lua[path] != filepath.Join(b.root, "dist", "stage", "lua", output) {
+			t.Errorf("%s: the Lua is %q, the text %q and the output %s", path, lua, result.texts[path], result.lua[path])
+		}
+	}
+	if ran := b.ran(); !slices.Equal(ran, []string{backslash, "src/main.yue", question}) {
+		t.Errorf("the compiler ran on %q", ran)
+	}
+	// The hashes file keeps such outputs too: nothing is compiled again, and a source that is gone loses its
+	// output.
+	b.remove(backslash)
+	b.compiles(fakeYue, false)
+	if ran := b.ran(); len(ran) != 0 || fsx.Exists(filepath.Join(b.root, "dist", "stage", "lua", `back\slash.lua`)) {
+		t.Errorf("the second compile ran on %q, and the output of the source that is gone is there: %v", ran,
+			fsx.Exists(filepath.Join(b.root, "dist", "stage", "lua", `back\slash.lua`)))
+	}
+}
+
+func TestASourceThatLosesItsCodeLosesItsLua(t *testing.T) {
+	// With a file at the output, the compiler rewrites or minifies that file where the source has no code, and
+	// with none it writes none. So the output of an earlier run is removed before the compiler runs.
+	for _, minify := range []bool{false, true} {
+		b := benchOf(t, files("src/main.yue", "export x = 1\n", "src/notes.yue", "export y = 2\n"))
+		yue := b.real()
+		first := b.compiles(yue, minify)
+		if lua := b.luaAt(first, "src/notes.yue"); !strings.Contains(lua, "2") {
+			t.Fatalf("minify %v: the Lua of notes.yue with code is\n%s", minify, lua)
+		}
+		b.ran()
+		b.write("src/notes.yue", "-- export y = 2\n")
+		for _, what := range []string{"once the code is a comment", "and on the next run"} {
+			result := b.compiles(yue, minify)
+			lua, ok, err := result.luaOf(b.source("src/notes.yue"))
+			// A source without an output is compiled on every run, as it is in a folder that was never built in.
+			if ran := b.ran(); lua != "" || ok || err != nil || fsx.Exists(b.staged("notes.lua")) || !slices.Equal(ran, []string{"src/notes.yue"}) {
+				t.Errorf("minify %v, %s: luaOf = %q, %v, %v; the output is there: %v; the compiler ran on %q",
+					minify, what, lua, ok, err, fsx.Exists(b.staged("notes.lua")), ran)
+			}
+		}
+	}
+}
+
+func TestACompilerThatWritesNothingLeavesNoLuaOfAnEarlierRun(t *testing.T) {
 	b := benchOf(t, mainOnly)
 	b.fake(nil)
-	sources := []Source{{Name: "what?", Path: "src/what?.yue", Kind: Yue}}
-	_, err := compileAll(background, b.world, fakeYue, false, b.search, sources)
-	if failure := asError(t, err, "a name with a question mark"); failure.Msg != "Invalid path: src/what?.yue" || len(b.ran()) != 0 {
-		t.Errorf("error = %+v", failure)
+	b.compiles(fakeYue, false)
+	if !fsx.Exists(b.staged("main.lua")) {
+		t.Fatal("the first compile left no output")
+	}
+	b.write("src/main.yue", "-- x = 1\n")
+	b.fake(map[string]answer{"src/main.yue": {}})
+	result := b.compiles(fakeYue, false)
+	if lua, ok, err := result.luaOf(b.source("src/main.yue")); lua != "" || ok || err != nil || fsx.Exists(b.staged("main.lua")) {
+		t.Errorf("luaOf = %q, %v, %v, and the output of the first compile is there: %v", lua, ok, err, fsx.Exists(b.staged("main.lua")))
+	}
+}
+
+func TestAFileThatCompiledAndThenUsesABitwiseOperatorFailsAtItsLine(t *testing.T) {
+	// The compiler writes the Lua it cannot rewrite itself, so the line is read from it with no earlier output
+	// there.
+	for minify, wantLine := range map[bool]int{false: 4, true: 0} {
+		b := benchOf(t, files("src/main.yue", "x = 1\nprint x\n"))
+		yue := b.real()
+		b.compiles(yue, minify)
+		b.write("src/main.yue", "x = 1\n\n\nflags = x & 3\nprint flags\n")
+		failure := b.refuses(yue, minify, "a bitwise operator in a file that compiled")
+		if failure.File != "src/main.yue" || failure.Line != wantLine || !strings.HasSuffix(failure.Msg, "its Lua: Unexpected Symbol `&` in source.") ||
+			fsx.Exists(b.staged("main.lua")) {
+			t.Errorf("minify %v: %+v, and the output is there: %v", minify, failure, fsx.Exists(b.staged("main.lua")))
+		}
 	}
 }
 
@@ -716,7 +853,7 @@ func TestASourceThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
 	}
 }
 
-func TestAnOutputThatCannotBeWrittenOrReadIsRefusedByItsPath(t *testing.T) {
+func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T) {
 	// A file where the output's folder must be.
 	b := benchOf(t, files("src/game/units.yue", "x = 1\n", "dist/stage/lua/game", "a file, not a folder"))
 	b.fake(nil)
@@ -725,212 +862,22 @@ func TestAnOutputThatCannotBeWrittenOrReadIsRefusedByItsPath(t *testing.T) {
 		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil || len(b.ran()) != 0 {
 		t.Errorf("error = %+v", failure)
 	}
-	// A folder where the output is: it is there, and it cannot be read as a file.
+	// A folder with a file in it where the output is: it cannot be removed before the compiler runs.
 	b = benchOf(t, mainOnly.and("dist/stage/lua/main.lua/kept.txt", ""))
+	b.fake(nil)
+	failure = b.refuses(fakeYue, false, "a folder for the output")
+	if !strings.HasPrefix(failure.Msg, "Removing dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" ||
+		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil || len(b.ran()) != 0 {
+		t.Errorf("error = %+v", failure)
+	}
+	// A folder where the output is, once the compile is over: it is there, and it cannot be read as a file.
+	b = benchOf(t, mainOnly)
 	b.fake(map[string]answer{"src/main.yue": {}})
 	result := b.compiles(fakeYue, false)
+	b.write("dist/stage/lua/main.lua/kept.txt", "")
 	_, ok, err := result.luaOf(b.source("src/main.yue"))
-	failure = asError(t, err, "a folder for the output")
+	failure = asError(t, err, "a folder for the output, read")
 	if ok || !strings.HasPrefix(failure.Msg, "Reading dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" || failure.Cause == nil {
 		t.Errorf("luaOf: ok %v, %+v", ok, failure)
-	}
-}
-
-// ---- what the compiler prints ----
-
-// What the pinned compiler, 0.34.3, printed on Windows for the sources named beside each, recorded from runs of
-// it with the arguments a compile gives it. The project folder is written as C:\project and the compiler's as
-// C:\yue; nothing else is changed. On Windows the compiler ends its lines with "\r\n".
-const (
-	// src/bad.yue: "x = 1\ny = \n  if then\n", with -r and with -m.
-	printedSyntax = "Failed to compile: C:\\project\\src\\bad.yue\r\n2: expected valid expression\r\n1 | x = 1\r\n2 | y = \r\n       ^\r\n3 |   if then\r\n\r\n"
-	// src/mac.yue: the macro import, "x = 1\ny = $FourCC \"hfo\"\n".
-	printedMacro = "Failed to compile: C:\\project\\src\\mac.yue\r\n" +
-		"3: failed to expand macro: (macro FourCC):21: $FourCC needs a string literal of exactly 4 characters, such as \"hfoo\".\r\n" +
-		"1 | import \"moonwell.macros\" as {:$FourCC}\r\n2 | x = 1\r\n3 | y = $FourCC \"hfo\"\r\n        ^\r\n\r\n"
-	// src/nomod.yue: "import \"nothing.here\" as {:$X}\nx = 1\n".
-	printedNoModule = "Failed to compile: C:\\project\\src\\nomod.yue\r\n1: module 'nothing.here' not found:\r\n" +
-		"\tno file \"C:\\project\\.moonwell\\yue\\nothing\\here.yue\"\r\n" +
-		"\tno file \"C:\\project\\src\\nothing\\here.yue\"\r\n" +
-		"\tno file \"C:\\yue\\lua\\nothing\\here.yue\"\r\n" +
-		"\tno file \"C:\\yue\\lua\\nothing\\here\\init.yue\"\r\n" +
-		"\tno file \"C:\\yue\\nothing\\here.yue\"\r\n" +
-		"\tno file \"C:\\yue\\nothing\\here\\init.yue\"\r\n" +
-		"\tno file \"C:\\yue\\..\\share\\lua\\5.4\\nothing\\here.yue\"\r\n" +
-		"\tno file \"C:\\yue\\..\\share\\lua\\5.4\\nothing\\here\\init.yue\"\r\n" +
-		"\tno file \".\\nothing\\here.yue\"\r\n" +
-		"\tno file \".\\nothing\\here\\init.yue\"\r\n" +
-		"1 | import \"nothing.here\" as {:$X}\r\n                             ^\r\n2 | x = 1\r\n\r\n"
-	// src/a.yue: "export x = '\xff'\n", a byte that is not UTF-8. The compiler names no line.
-	printedNoLine = "Failed to compile: C:\\project\\src\\a.yue\r\n\r\n"
-	// src/a.yue: "export x = 1\rexport y = 2\n", a carriage return alone, which the excerpt keeps.
-	printedLoneReturn = "Failed to compile: C:\\project\\src\\a.yue\r\n1: syntax error\r\n1 | export x = 1\rexport y = 2\r\n                 ^\r\n\r\n"
-
-	// src/bit.yue: "x = 1\n\n\nflags = x & 3\nprint flags\n", with -r: what was printed, and the Lua left at the
-	// output.
-	printedRewrite = "Failed to rewrite: C:\\project\\dist\\stage\\lua\\bit.lua\r\n>> :3:17: Unexpected Symbol `&` in source.\r\n"
-	leftByRewrite  = "-- [yue]: C:\\project\\src\\bit.yue\r\nlocal x = 1 -- 1\r\nlocal flags = x & 3 -- 4\r\nreturn print(flags) -- 5\r\n"
-	// The same source with -m.
-	printedMinify = "Failed to minify: C:\\project\\dist\\stage\\lua\\bit.lua\r\n>> :2:17: Unexpected Symbol `&` in source.\r\n"
-	leftByMinify  = "local x = 1\r\nlocal flags = x & 3\r\nreturn print(flags)\r\n"
-	// src/shl.yue: "a = 1\nb = a << 2\nc = ~a\n", with -r.
-	printedRewriteTilde = "Failed to rewrite: C:\\project\\dist\\stage\\lua\\shl.lua\r\n>> :4:12: Unexpected symbol `~` in source.\r\n"
-	leftByRewriteTilde  = "-- [yue]: C:\\project\\src\\shl.yue\r\nlocal a = 1 -- 1\r\nlocal b = a << 2 -- 2\r\nlocal c = ~a -- 3\r\n"
-)
-
-// asPrinted is what a compile reads of a run: what the compiler printed on its two streams, with a line break
-// between them.
-func asPrinted(stdout string) string { return stdout + "\n" }
-
-// withLineFeeds is a recorded text with the line ends of a system that ends its lines with "\n". It is made of
-// the recording, and is no recording itself.
-func withLineFeeds(recorded string) string { return strings.ReplaceAll(recorded, "\r\n", "\n") }
-
-func TestCompileErrorReadsTheLineAndTheMessageTheCompilerPrinted(t *testing.T) {
-	syntaxDetail := "2: expected valid expression\n1 | x = 1\n2 | y = \n       ^\n3 |   if then"
-	macroDetail := "3: failed to expand macro: (macro FourCC):21: " + fourCCMessage + "\n" +
-		"1 | import \"moonwell.macros\" as {:$FourCC}\n2 | x = 1\n3 | y = $FourCC \"hfo\"\n        ^"
-	for _, c := range []struct {
-		what, printed, wantMsg string
-		wantLine               int
-	}{
-		{"a syntax error", asPrinted(printedSyntax), "expected valid expression\n" + syntaxDetail, 2},
-		{"a syntax error, with line feeds", asPrinted(withLineFeeds(printedSyntax)), "expected valid expression\n" + syntaxDetail, 2},
-		// The macro's position, a line of the macro module, is dropped from the first line; the excerpt keeps it.
-		{"a failed macro", asPrinted(printedMacro), fourCCMessage + "\n" + macroDetail, 3},
-		{"a failed macro, with line feeds", asPrinted(withLineFeeds(printedMacro)), fourCCMessage + "\n" + macroDetail, 3},
-		{"a module that is not found", asPrinted(printedNoModule), "module 'nothing.here' not found:\n" +
-			strings.TrimSpace(withLineFeeds(strings.TrimPrefix(printedNoModule, "Failed to compile: C:\\project\\src\\nomod.yue\r\n"))), 1},
-		{"no numbered line", asPrinted(printedNoLine), "YueScript compilation failed.", 0},
-		{"a carriage return alone in the excerpt", asPrinted(printedLoneReturn),
-			"syntax error\n1: syntax error\n1 | export x = 1\rexport y = 2\n                 ^", 1},
-		// Made up, to show what the reading does with what the compiler does not print today.
-		{"nothing printed", "\n", "YueScript compilation failed.", 0},
-		{"white space only", " \t\r\n\v\f \n", "YueScript compilation failed.", 0},
-		{"no numbered line and some text", "Failed to compile: x\n  something else  \n", "something else", 0},
-		{"the message on the error stream", "\nFailed to compile: x\n7: late\n", "late\n7: late", 7},
-		{"a numbered line first", "12: first\n3: second", "first\n12: first\n3: second", 12},
-		{"a numbered line after a carriage return alone", "x\r4: after", "after\nx\r4: after", 4},
-		{"a number that is no line", "a 5: no\n", "a 5: no", 0},
-		{"a number without a message", "5: \n6:\n", "5: \n6:", 0},
-		{"a macro's position without a macro", "2: failed to expand macro: nothing", "failed to expand macro: nothing\n2: failed to expand macro: nothing", 2},
-		// A line beyond what a number holds is the greatest number.
-		{"a line of many digits", "99999999999999999999999: far", "far\n99999999999999999999999: far", math.MaxInt},
-		{"a line that only starts with the words", "Failed to compile\nFailed to compiler: x\n3: y", "y\n3: y", 3},
-	} {
-		failure := compileError("src/x.yue", c.printed)
-		if failure.Msg != c.wantMsg || failure.Line != c.wantLine || failure.File != "src/x.yue" || failure.Hint != "" || failure.Column != 0 {
-			t.Errorf("%s: compileError = %+v, want line %d and the message %q", c.what, failure, c.wantLine, c.wantMsg)
-		}
-	}
-}
-
-func TestRewriteErrorReadsTheStepTheReasonAndTheLineMarkOfTheLuaLeft(t *testing.T) {
-	const and, tilde = "Unexpected Symbol `&` in source.", "Unexpected symbol `~` in source."
-	for _, c := range []struct {
-		what, printed, left, wantMsg string
-		wantLine                     int
-	}{
-		{"a rewrite", asPrinted(printedRewrite), leftByRewrite, "YueScript compiled this file but could not rewrite its Lua: " + and, 4},
-		{"a rewrite, with line feeds", asPrinted(withLineFeeds(printedRewrite)), withLineFeeds(leftByRewrite),
-			"YueScript compiled this file but could not rewrite its Lua: " + and, 4},
-		// Minified Lua carries no line marks.
-		{"a minify", asPrinted(printedMinify), leftByMinify, "YueScript compiled this file but could not minify its Lua: " + and, 0},
-		{"a rewrite of another operator", asPrinted(printedRewriteTilde), leftByRewriteTilde,
-			"YueScript compiled this file but could not rewrite its Lua: " + tilde, 3},
-		// Made up.
-		{"no Lua left", asPrinted(printedRewrite), "", "YueScript compiled this file but could not rewrite its Lua: " + and, 0},
-		{"a line beyond the Lua left", "Failed to rewrite: x\n>> :9:1: far\n", "local x -- 1\n", "YueScript compiled this file but could not rewrite its Lua: far", 0},
-		{"line 0", "Failed to rewrite: x\n>> :0:1: zero\n", "local x -- 1\n", "YueScript compiled this file but could not rewrite its Lua: zero", 0},
-		{"a line without a mark", "Failed to rewrite: x\n>> :1:1: bare\n", "local x\nlocal y -- 2\n", "YueScript compiled this file but could not rewrite its Lua: bare", 0},
-		{"a mark that does not end the line", "Failed to rewrite: x\n>> :1:1: inside\n", "local x -- 1 \n", "YueScript compiled this file but could not rewrite its Lua: inside", 0},
-		{"no reason", "Failed to minify: x\n", "local x -- 1\n", "YueScript compiled this file but could not minify its Lua.", 0},
-		{"a reason with white space around it", "Failed to rewrite: x\n>> :1:1:  \t spaced \t\n", "local x -- 7\n",
-			"YueScript compiled this file but could not rewrite its Lua: spaced", 7},
-		{"the step on the error stream", "\nFailed to rewrite: x\n>> :2:1: late\n", "a -- 1\nb -- 12\n", "YueScript compiled this file but could not rewrite its Lua: late", 12},
-	} {
-		failure := rewriteError("src/x.yue", c.printed, c.left)
-		if failure == nil || failure.Msg != c.wantMsg || failure.Line != c.wantLine || failure.File != "src/x.yue" ||
-			!strings.Contains(failure.Hint, "bitwise operators (&, |, ~, <<, >>)") || !strings.Contains(failure.Hint, "lua/") {
-			t.Errorf("%s: rewriteError = %+v, want line %d and the message %q", c.what, failure, c.wantLine, c.wantMsg)
-		}
-	}
-	// Any other failure is no failure of that step.
-	for _, printed := range []string{asPrinted(printedSyntax), asPrinted(printedMacro), "\n", "x Failed to rewrite: y\n", "Failed to rewrite\n", "Failed to compile: Failed to rewrite: x\n"} {
-		if failure := rewriteError("src/x.yue", printed, leftByRewrite); failure != nil {
-			t.Errorf("rewriteError(%q) = %+v, want none", printed, failure)
-		}
-	}
-}
-
-func TestASourceHasCodeUnlessEveryLineIsBlankOrAComment(t *testing.T) {
-	for source, want := range map[string]bool{
-		"":                              false,
-		"\n\n":                          false,
-		"-- only comments\n\n":          false,
-		"  \t-- indented\r\n\r\n--\r\n": false,
-		" \t\v\f\r\n":                   false,
-		"-- a comment\nexport x = 1\n":  true,
-		"x = 1 -- a comment":            true,
-		"- not a comment\n":             true,
-		// A line ends at "\n": after a carriage return alone, the rest of the line is no comment.
-		"-- a\rx = 1\n": true,
-		// A block comment is told from code by its first line only.
-		"--[[ a\nb\n]]\n": true,
-		"--[[ a ]]\n":     false,
-	} {
-		if got := hasCode(source); got != want {
-			t.Errorf("hasCode(%q) = %v, want %v", source, got, want)
-		}
-	}
-}
-
-// Characters outside ASCII that are white space or line ends elsewhere, as the bytes they are.
-const (
-	noBreakSpace  = "\xc2\xa0"     // U+00A0
-	lineSeparator = "\xe2\x80\xa8" // U+2028
-	paragraphEnd  = "\xe2\x80\xa9" // U+2029
-	wideSpace     = "\xe3\x80\x80" // U+3000
-)
-
-func TestWhatTheCompilerPrintsIsReadWithWhiteSpaceAndLineEndsOfASCIIOnly(t *testing.T) {
-	// White space is " \t\n\v\f\r" and a line ends at "\n" or "\r": a character outside ASCII is part of the
-	// text it stands in.
-	for _, c := range []struct {
-		printed, wantMsg string
-		wantLine         int
-	}{
-		{"3: boom" + lineSeparator + "rest\n", "boom" + lineSeparator + "rest\n3: boom" + lineSeparator + "rest", 3},
-		{"3: boom" + paragraphEnd + "rest\n", "boom" + paragraphEnd + "rest\n3: boom" + paragraphEnd + "rest", 3},
-		{"x" + lineSeparator + "5: late\n", "x" + lineSeparator + "5: late", 0},
-		{"x" + paragraphEnd + "5: late\n", "x" + paragraphEnd + "5: late", 0},
-		{noBreakSpace + "oops" + wideSpace + "\n", noBreakSpace + "oops" + wideSpace, 0},
-		{mark + "\n", mark, 0},
-	} {
-		if failure := compileError("src/x.yue", c.printed); failure.Msg != c.wantMsg || failure.Line != c.wantLine {
-			t.Errorf("compileError(%q) = %+v, want line %d and the message %q", c.printed, failure, c.wantLine, c.wantMsg)
-		}
-	}
-	for reason, want := range map[string]string{
-		"a" + lineSeparator + "b": "a" + lineSeparator + "b",
-		"a" + paragraphEnd + "b":  "a" + paragraphEnd + "b",
-		"a" + noBreakSpace + " ":  "a" + noBreakSpace,
-		wideSpace + "a":           wideSpace + "a",
-	} {
-		failure := rewriteError("src/x.yue", "Failed to rewrite: x\n>> :1:1: "+reason+"\n", "")
-		if wantMsg := "YueScript compiled this file but could not rewrite its Lua: " + want; failure == nil || failure.Msg != wantMsg {
-			t.Errorf("rewriteError with the reason %q = %+v, want the message %q", reason, failure, wantMsg)
-		}
-	}
-	for source, want := range map[string]bool{
-		noBreakSpace + "-- a comment\n":    true,
-		wideSpace + "\n":                   true,
-		mark + "\n":                        true,
-		"-- a" + lineSeparator + "x = 1\n": false,
-		"-- a" + paragraphEnd + "x = 1\n":  false,
-	} {
-		if got := hasCode(source); got != want {
-			t.Errorf("hasCode(%q) = %v, want %v", source, got, want)
-		}
 	}
 }

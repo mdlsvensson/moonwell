@@ -1,6 +1,8 @@
 package script
 
 import (
+	"context"
+	"errors"
 	"maps"
 	"os"
 	"reflect"
@@ -9,6 +11,7 @@ import (
 	"testing"
 
 	moonwell "github.com/mdlsvensson/moonwell"
+	"github.com/mdlsvensson/moonwell/next/internal/env"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 )
 
@@ -200,7 +203,7 @@ func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 		"a source that is a string":    `{"compiler": "yue-of-the-test", "mode": "-r", "macros": "x", "sources": {"src/a.yue": "` + hashOfA + `"}}`,
 		"a hash that is a number":      strings.Replace(good, `"hash": "`+hashOfA+`"`, `"hash": 1`, 1),
 		"an output above the folder":   strings.Replace(good, `"output": "b.lua"`, `"output": "../b.lua"`, 1),
-		"an output with a backslash":   strings.Replace(good, `"output": "b.lua"`, `"output": "sub\\b.lua"`, 1),
+		"an output above, by a detour": strings.Replace(good, `"output": "b.lua"`, `"output": "a/../../b.lua"`, 1),
 		"an output that is no Lua":     strings.Replace(good, `"output": "b.lua"`, `"output": ".hashes.json"`, 1),
 		"an output without a name":     strings.Replace(good, `"output": "b.lua"`, `"output": ""`, 1),
 		"an output from the root":      strings.Replace(good, `"output": "b.lua"`, `"output": "/b.lua"`, 1),
@@ -233,6 +236,80 @@ func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 	b.compiles(fakeYue, false)
 	if ran := b.ran(); len(ran) != 0 || fsx.Exists(b.staged("b.lua")) {
 		t.Errorf("with the file as it was written, the compiler ran on %q, and b.lua is there: %v", ran, fsx.Exists(b.staged("b.lua")))
+	}
+}
+
+// stopAt gives the bench a compiler that is a function and that a run on one source stops: that run ends with
+// an error that is no failure of a compile, and leaves nothing. Every other run ends well and leaves its Lua.
+func (b *bench) stopAt(source string, stopped error) {
+	b.use(func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
+		if b.sourceOf(args) == source {
+			return env.RunResult{}, stopped
+		}
+		return env.RunResult{}, os.WriteFile(outputIn(args), []byte("-- "+b.sourceOf(args)+"\n"), 0o666)
+	})
+}
+
+func TestAStoppedRunLeavesNothingItWasToCompileUpToDate(t *testing.T) {
+	stopped := errors.New("stopped")
+	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/kept.yue", "y = 2\n", "src/stop.yue", "z = 3\n"))
+	b.fake(nil)
+	b.compiles(fakeYue, false)
+	b.ran()
+
+	// An edit, a new file, and a run that is stopped once it has compiled both.
+	b.write("src/a.yue", "x = 2\n")
+	b.write("src/new.yue", "w = 5\n")
+	b.write("src/stop.yue", "z = 4\n")
+	b.stopAt("src/stop.yue", stopped)
+	if result, err := b.compile(fakeYue, false); result != nil || err != stopped {
+		t.Fatalf("the stopped run: %+v, %v", result, err)
+	}
+	if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue", "src/new.yue", "src/stop.yue"}) || !fsx.Exists(b.staged("new.lua")) {
+		t.Fatalf("the stopped run ran the compiler on %q, and new.lua is there: %v", ran, fsx.Exists(b.staged("new.lua")))
+	}
+	// The hashes file vouches for the source the run did not touch, and for no other: those it was to compile
+	// are kept with their outputs and without a hash.
+	kept, err := readHashes(b.root)
+	want := map[string]keptSource{
+		"src/a.yue": {Output: "a.lua"}, "src/new.yue": {Output: "new.lua"}, "src/stop.yue": {Output: "stop.lua"},
+		"src/kept.yue": {Hash: fsx.SHA256Hex([]byte("y = 2\n")), Output: "kept.lua"},
+	}
+	if err != nil || !reflect.DeepEqual(kept.Sources, want) {
+		t.Errorf("after the stopped run the hashes file keeps %+v, %v, want %+v", kept.Sources, err, want)
+	}
+
+	// The edit undone and the new file deleted: the Lua at a.lua is of the edit, so a.yue is compiled again, and
+	// the output of the file that is gone is removed.
+	b.write("src/a.yue", "x = 1\n")
+	b.remove("src/new.yue")
+	b.fake(nil)
+	b.compiles(fakeYue, false)
+	if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue", "src/stop.yue"}) || fsx.Exists(b.staged("new.lua")) {
+		t.Errorf("after the stopped run the compiler ran on %q, and new.lua is there: %v", ran, fsx.Exists(b.staged("new.lua")))
+	}
+	b.compiles(fakeYue, false)
+	if ran := b.ran(); len(ran) != 0 {
+		t.Errorf("with nothing changed after that, the compiler ran on %q", ran)
+	}
+}
+
+func TestAStoppedRunInAnotherModeLeavesNothingUpToDate(t *testing.T) {
+	stopped := errors.New("stopped")
+	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
+	b.fake(nil)
+	b.compiles(fakeYue, false)
+	b.ran()
+	// A minified run that is stopped once a.lua is minified.
+	b.stopAt("src/b.yue", stopped)
+	if _, err := b.compile(fakeYue, true); err != stopped {
+		t.Fatalf("the stopped run: %v", err)
+	}
+	b.ran()
+	b.fake(nil)
+	b.compiles(fakeYue, false)
+	if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue", "src/b.yue"}) {
+		t.Errorf("normal again after the stopped minified run, the compiler ran on %q", ran)
 	}
 }
 

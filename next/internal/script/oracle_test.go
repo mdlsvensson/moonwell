@@ -61,7 +61,7 @@ import (
 //     tests make, and seeded ones: files that change, come, go, break and are mended, normal and minified and
 //     with another macro module, files without code, libraries, and sources of every kind of byte.
 //   - yue.CompileError against compileError: the failure, whole, for what the compiler printed in recorded runs
-//     (yue_test.go), for the same with the line ends of another system, and for seeded texts.
+//     (printed_test.go), for the same with the line ends of another system, and for seeded texts.
 //   - yue.Compile against compileAll with a compiler that is a function, the same one for both trees
 //     (TestOracleOnACompilerThatIsAFunction): all that is compared with the real compiler, for two compiles of
 //     each case. It reaches the other tree's reading of a rewrite that failed and of an empty output, which that
@@ -110,24 +110,46 @@ import (
 //     of a rewrite that failed (TestWhatTheCompilerPrintsIsReadWithWhiteSpaceAndLineEndsOfASCIIOnly). A text
 //     with such a character where it makes no difference is among the cases of the real compiler, compared
 //     whole.
+//   - A compile of a source that had code in an earlier compile and has none now. The other tree runs the
+//     compiler with the earlier output in place; the compiler writes no Lua for a source without code, and
+//     leaves that output, or minifies it once more, so the other tree keeps the Lua of code that is gone, and
+//     takes the source for up to date. This tree removes the output before the compiler runs, and has no Lua
+//     for the source, which it compiles again on every run, as both trees do in a folder that was never
+//     compiled in. The class is decided on the project and on the other tree's result: a source whose text
+//     has no code, and an output for it in the other tree's staging folder. The other tree must have that
+//     output and Lua for the source, and this tree neither. The refusal, the texts, the hashes and whether
+//     there is a hashes file are compared whole, and the runs, the staging folder and the Lua whole but for
+//     that source (TestASourceThatLosesItsCodeLosesItsLua).
+//   - A compile that is stopped by a compiler that cannot be started. This tree has written its hashes file by
+//     then, which keeps each source it was to compile without a hash, and the other tree writes none. The
+//     class is decided on the other tree's result: no hashes file. All else of the step is compared whole, and
+//     the step is counted among the refused as well (TestAStoppedRunLeavesNothingItWasToCompileUpToDate).
 //
 // Not among the inputs:
 //
-//   - The hashes file. Each tree writes its own there, and takes the other's for none
+//   - The hashes file's text. Each tree writes its own there, and takes the other's for none
 //     (TestAHashesFileInAnotherShapeCountsAsAbsent); whether a tree has one is compared.
 //   - The hash of a library's source, which this tree returns and the other does not
 //     (TestCompileAllCompilesALibrarysYueScriptIntoItsOwnFolder).
 //   - A compile without the macro search, which this tree does not have.
 //   - A module the real compiler does not find: its message names the folders that were searched, which are
 //     two for a project laid twice. What it prints for one is among the texts given to CompileError.
-//   - A link at a source or on the way to an output, a source whose name Windows cannot hold, and a file that
-//     cannot be read, written or removed: the other tree compiles through a link and passes the system's error
-//     on, and this tree refuses the link and names the file (TestALinkOnTheWayToAnOutputIsRefused,
-//     TestALinkAtASourceIsRefused, TestASourceWhoseNameWindowsCannotHoldIsRefused,
-//     TestASourceThatCannotBeReadIsRefusedByItsPath, TestAnOutputThatCannotBeWrittenOrReadIsRefusedByItsPath).
+//   - A link at dist/stage/lua or on the way to it: the other tree compiles through it, and this tree refuses
+//     it (TestALinkOnTheWayToTheStagingFolderIsRefused, TestALinkOnTheWayToTheHashesFileIsRefused).
+//   - A link at a source, a link below the staging folder, and a source whose name Windows cannot hold. Both
+//     trees read the source where its module was found and write through the link; a test of each needs a
+//     privilege or a system that not every machine has (TestASourceThatIsALinkIsCompiledThroughIt,
+//     TestBelowTheStagingFolderALinkIsWrittenThrough, TestASourceIsCompiledUnderWhateverNameTheSystemHolds).
+//   - A file that cannot be read, written or removed: the other tree passes the system's error on, and this
+//     tree names the file (TestASourceThatCannotBeReadIsRefusedByItsPath,
+//     TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath).
 //   - A compiler that cannot be started, or a cancelled context, with more than one source: how many compilers
 //     a tree starts before the first of them fails is a matter of timing in the other tree, and eight here
 //     (TestAfterAnErrorThatIsNoCompileFailureNoFurtherCompilerIsStarted). One source is among the cases.
+//   - A compile after one that was stopped: the other tree takes for up to date what the stopped one compiled
+//     and did not record, and this tree compiles it again (TestAStoppedRunLeavesNothingItWasToCompileUpToDate,
+//     TestAStoppedRunInAnotherModeLeavesNothingUpToDate).
+//   - A library whose key is no plain name, which no manifest has (TestWhereASourceCompilesTo).
 //   - A library whose folder is not .moonwell/libraries/<key>, as above
 //     (TestALibrarysModuleCompilesBelowItsKeyWhereverItsFolderIs).
 //   - A source whose name is outside ASCII, which the compiler does not open on every system.
@@ -876,14 +898,19 @@ func (s compileStep) ranAlike(t *testing.T, what string) (runs int) {
 	return len(s.wantRan)
 }
 
-// stagedAlike compares the staging folders of the two trees: the files and folders there are, each file's
-// bytes, and whether there is a hashes file. It returns how many files it compared by their bytes.
-func (s compileStep) stagedAlike(t *testing.T, what string) (files int) {
+// keptAlike compares whether the two trees have a hashes file.
+func (s compileStep) keptAlike(t *testing.T, what string) {
 	t.Helper()
-	oracle.Values(t, what+": what is in the staging folder", slices.Sorted(maps.Keys(s.wantStaged)), slices.Sorted(maps.Keys(s.gotStaged)))
 	if s.wantKept != s.gotKept {
 		t.Errorf("%s: the other tree has a hashes file: %v, and this tree: %v", what, s.wantKept, s.gotKept)
 	}
+}
+
+// stagedAlike compares the staging folders of the two trees but for their hashes files: the files and folders
+// there are, and each file's bytes. It returns how many files it compared by their bytes.
+func (s compileStep) stagedAlike(t *testing.T, what string) (files int) {
+	t.Helper()
+	oracle.Values(t, what+": what is in the staging folder", slices.Sorted(maps.Keys(s.wantStaged)), slices.Sorted(maps.Keys(s.gotStaged)))
 	for path, want := range s.wantStaged {
 		got, there := s.gotStaged[path]
 		if want == nil || !there {
@@ -910,13 +937,137 @@ func (c compileTally) check(t *testing.T, want compileTally) {
 	}
 }
 
-// whole compares all of a step: the runs, the staging folder, what is refused, and what the compile returned.
+// whole compares all of a step: the runs, the staging folder, whether there is a hashes file, what is refused,
+// and what the compile returned.
 func (c *compileTally) whole(t *testing.T, what string, step compileStep) {
+	t.Helper()
+	step.keptAlike(t, what)
+	c.butForTheHashesFile(t, what, step)
+}
+
+// butForTheHashesFile compares all of a step but whether there is a hashes file.
+func (c *compileTally) butForTheHashesFile(t *testing.T, what string, step compileStep) {
 	t.Helper()
 	c.runs += step.ranAlike(t, what)
 	c.files += step.stagedAlike(t, what)
 	if c.tally.whole(t, what, step.wantErr, step.gotErr) {
 		oracle.Values(t, what, step.want, step.got)
+	}
+}
+
+// summed is the tally of an oracle whose cases run side by side, each as a test of its own that counts what it
+// compared and adds it here when it is done.
+type summed struct {
+	guard sync.Mutex
+	total compileTally
+}
+
+// add adds what one case compared.
+func (s *summed) add(part compileTally) {
+	s.guard.Lock()
+	defer s.guard.Unlock()
+	s.total.refused += part.refused
+	s.total.results += part.results
+	s.total.inPart += part.inPart
+	s.total.runs += part.runs
+	s.total.files += part.files
+}
+
+// sideBySide runs the cases of an oracle side by side, each as a test of its own, and returns once all of them
+// are done. A case counts what it compared in the tally it is handed.
+func sideBySide[C any](t *testing.T, total *summed, cases []C, name func(C) string, run func(t *testing.T, c C, compared *compileTally)) {
+	t.Helper()
+	t.Run("cases", func(t *testing.T) {
+		for _, c := range cases {
+			t.Run(name(c), func(t *testing.T) {
+				t.Parallel()
+				var compared compileTally
+				run(t, c, &compared)
+				total.add(compared)
+			})
+		}
+	})
+}
+
+// withoutCode reports whether every line of a YueScript text is blank or a comment: a source the compiler
+// writes no Lua for.
+func withoutCode(text string) bool {
+	for line := range strings.SplitSeq(strings.TrimPrefix(text, mark), "\n") {
+		if line = strings.Trim(line, " \t\r"); line != "" && !strings.HasPrefix(line, "--") {
+			return false
+		}
+	}
+	return true
+}
+
+// otherOutput is where the other tree compiles a YueScript source to, from the staging folder.
+func otherOutput(source string) string {
+	lua := strings.TrimSuffix(source, ".yue") + ".lua"
+	if below, inSrc := strings.CutPrefix(lua, "src/"); inSrc {
+		return below
+	}
+	return ".libraries/" + strings.TrimPrefix(lua, librariesDir+"/")
+}
+
+// lostCode is the sources of a project, by their texts as they are now, that have no code and for which the
+// other tree's staging folder holds an output all the same: sources that had code in an earlier compile. The
+// other tree runs the compiler with that output in place, and the compiler then leaves it, or minifies it once
+// more; this tree removes the output first, and the compiler writes none.
+func lostCode(texts map[string]string, otherStaged map[string][]byte) []string {
+	var lost []string
+	for _, source := range slices.Sorted(maps.Keys(texts)) {
+		_, staged := otherStaged[otherOutput(source)]
+		if strings.HasSuffix(source, ".yue") && withoutCode(texts[source]) && staged {
+			lost = append(lost, source)
+		}
+	}
+	return lost
+}
+
+// without is the step but for sources: their runs, their outputs in the staging folders, and their Lua.
+func (s compileStep) without(sources []string) compileStep {
+	// The runs of the others, and nil where there are none, as a step has them.
+	others := func(ran []string) (kept []string) {
+		for _, source := range ran {
+			if !slices.Contains(sources, source) {
+				kept = append(kept, source)
+			}
+		}
+		return kept
+	}
+	rest := s
+	rest.wantRan, rest.gotRan = others(s.wantRan), others(s.gotRan)
+	rest.wantStaged, rest.gotStaged = maps.Clone(s.wantStaged), maps.Clone(s.gotStaged)
+	rest.want.Lua, rest.got.Lua = maps.Clone(s.want.Lua), maps.Clone(s.got.Lua)
+	for _, source := range sources {
+		delete(rest.wantStaged, otherOutput(source))
+		delete(rest.gotStaged, otherOutput(source))
+		delete(rest.want.Lua, source)
+		delete(rest.got.Lua, source)
+	}
+	return rest
+}
+
+// butForLostCode compares a step in which sources lost their code: the other tree must have an output and Lua
+// for each, and this tree neither; all else of the step is compared whole.
+func (c *compileTally) butForLostCode(t *testing.T, what string, step compileStep, lost []string) {
+	t.Helper()
+	c.inPart++
+	for _, source := range lost {
+		_, otherHasLua := step.want.Lua[source]
+		_, thisHasLua := step.got.Lua[source]
+		_, thisHasOutput := step.gotStaged[otherOutput(source)]
+		if step.wantErr != nil || step.gotErr != nil || !otherHasLua || thisHasLua || thisHasOutput {
+			t.Errorf("%s: %s has no code; the other tree has Lua for it: %v, this tree has: %v, and an output: %v (%v, %v)",
+				what, source, otherHasLua, thisHasLua, thisHasOutput, step.wantErr, step.gotErr)
+		}
+	}
+	rest := step.without(lost)
+	rest.keptAlike(t, what)
+	c.runs += rest.ranAlike(t, what)
+	c.files += rest.stagedAlike(t, what)
+	if !oracle.Refusals(t, what, rest.wantErr, rest.gotErr) && rest.wantErr == nil && rest.gotErr == nil {
+		oracle.Values(t, what, rest.want, rest.got)
 	}
 }
 
@@ -1028,6 +1179,9 @@ var seededCompileCases = []compileCase{
 		"src/init.yue", "export x = 1\n", "src/game/init.yue", "import \"game.units\"\n", "src/game/units.yue", "export y = 2\n",
 		"src/my module.yue", "export z = 3\n", "src/a/b/c/d.yue", "export w = 4\n", "lua/tools.lua", "return {}\n", "src/main.lua", "-- ignored\n",
 	)},
+	{name: "files named by their extension alone", steps: bothModesTwice, of: files(
+		"src/main.yue", "export x = 1\n", "src/.yue", "export y = 2\n", "src/a/.yue", "export z = 3\n",
+	)},
 	{name: "two libraries beside the project", steps: bothModesTwice, of: files("src/main.yue", "import \"kit\"\nimport \"other.tools\"\n").with("b", "a").and(
 		inLibrary("a", "kit/init.yue"), "export x = 1\n", inLibrary("a", "kit/init.lua"), "-- compiled\n", inLibrary("a", "plain.lua"), "return 1\n",
 		inLibrary("b", "other/tools.yue"), macroImport+"export y = $FourCC \"hfoo\"\n", inLibrary("b", "extra.yue"), "export z = 3\n",
@@ -1046,18 +1200,74 @@ var seededCompileCases = []compileCase{
 
 // casesFailedInAnotherOrder is projects in which several files fail, and the first of them by the bytes of
 // their paths is not the first by the other tree's comparison, which otherFirst is.
-var casesFailedInAnotherOrder = []struct {
-	name       string
-	failing    []string
-	otherFirst string
-}{
+var casesFailedInAnotherOrder = []failedInAnotherOrder{
 	{"a capital letter and a small one", []string{"src/Z.yue", "src/a.yue"}, "src/a.yue"},
 	{"an underscore and a hyphen", []string{"src/a_.yue", "src/a-.yue"}, "src/a_.yue"},
 	{"three files", []string{"src/B.yue", "src/C.yue", "src/a.yue"}, "src/a.yue"},
 }
 
+// compileBoth gives both trees the compiles of a case, in two folders of the case's own. A step in which a
+// source lost its code is compared but for that source, and every other step whole.
+func compileBoth(t *testing.T, yue string, c compileCase, compared *compileTally) {
+	tr := twoTrees(t, c.of, yue)
+	tr.empties = c.empties
+	texts := map[string]string{}
+	for i := 0; i+1 < len(c.of.files); i += 2 {
+		texts[c.of.files[i]] = c.of.files[i+1]
+	}
+	for _, step := range c.steps {
+		tr.change(step.written, step.removed)
+		for i := 0; i+1 < len(step.written); i += 2 {
+			texts[step.written[i]] = step.written[i+1]
+		}
+		for _, path := range step.removed {
+			delete(texts, path)
+		}
+		what, did := c.name+", "+step.what, tr.compile(step.minify, step.macros)
+		if lost := lostCode(texts, did.wantStaged); len(lost) > 0 {
+			compared.butForLostCode(t, what, did, lost)
+			continue
+		}
+		compared.whole(t, what, did)
+	}
+}
+
+// failedInAnotherOrder is a project in which several files fail, and the first of them by the bytes of their
+// paths is not the first by the other tree's comparison, which otherFirst is.
+type failedInAnotherOrder struct {
+	name       string
+	failing    []string
+	otherFirst string
+}
+
+// compileInAnotherOrder compares all of one compile but the file that the failure names, which is the first by
+// bytes here and the first by the other tree's comparison there.
+func compileInAnotherOrder(t *testing.T, yue string, c failedInAnotherOrder, compared *compileTally) {
+	p := files("src/ok.yue", "export x = 1\n")
+	for _, path := range c.failing {
+		p = p.and(path, badYue)
+	}
+	step := twoTrees(t, p, yue).compile(false, "")
+	compared.inPart++
+	step.keptAlike(t, c.name)
+	compared.runs += step.ranAlike(t, c.name)
+	compared.files += step.stagedAlike(t, c.name)
+	want, wantIs := olddiag.First(step.wantErr)
+	got, gotIs := diag.First(step.gotErr)
+	byBytes := slices.Min(c.failing)
+	if !wantIs || !gotIs || want.File != c.otherFirst || got.File != byBytes || byBytes == c.otherFirst {
+		t.Errorf("%s: the other tree names %q and this tree %q, want %q and %q: %v and %v",
+			c.name, want.File, got.File, c.otherFirst, byBytes, step.wantErr, step.gotErr)
+	}
+	// Every failing file has one text, so all but the file's name is alike.
+	want.File, got.File = "", ""
+	if want != olddiag.Problem(got) || !strings.HasSuffix(got.Msg, fmt.Sprintf("\n(%d more file(s) failed to compile)", len(c.failing)-1)) {
+		t.Errorf("%s: but for the file, the other tree gives %+v and this tree %+v", c.name, want, got)
+	}
+}
+
 // TestOracleOnCompiling runs the real compiler, for both trees: it is the slowest test of the package, at a few
-// seconds.
+// seconds. Its cases run side by side.
 func TestOracleOnCompiling(t *testing.T) {
 	yue := tooltest.Yue(t)
 	cases := slices.Concat(casesOfTheOtherTreesCompileTests, seededCompileCases)
@@ -1066,47 +1276,31 @@ func TestOracleOnCompiling(t *testing.T) {
 			name: "FourCC refuses " + call, steps: []change{{what: "normal"}}, of: files("src/main.yue", macroImport+"print "+call+"\n"),
 		})
 	}
-	var compared compileTally
-	for _, c := range cases {
-		tr := twoTrees(t, c.of, yue)
-		tr.empties = c.empties
-		for _, step := range c.steps {
-			tr.change(step.written, step.removed)
-			compared.whole(t, c.name+", "+step.what, tr.compile(step.minify, step.macros))
-		}
-	}
-	// A compiler that cannot be started. The project has one source: with more, how many runs a tree starts
-	// before the first of them fails is a matter of timing.
-	nowhere := twoTrees(t, files("src/a.yue", "export x = 1\n"), filepath.Join(t.TempDir(), "no-yue"))
-	compared.whole(t, "a compiler that is not there", nowhere.compile(false, ""))
+	var compared summed
+	sideBySide(t, &compared, cases, func(c compileCase) string { return c.name }, func(t *testing.T, c compileCase, compared *compileTally) {
+		compileBoth(t, yue, c, compared)
+	})
+	sideBySide(t, &compared, casesFailedInAnotherOrder, func(c failedInAnotherOrder) string { return c.name },
+		func(t *testing.T, c failedInAnotherOrder, compared *compileTally) {
+			compileInAnotherOrder(t, yue, c, compared)
+		})
 
-	// Several failed files in another order: all of the step but the file that is named, which is the first by
-	// bytes here and the first by the other tree's comparison there.
-	for _, c := range casesFailedInAnotherOrder {
-		p := files("src/ok.yue", "export x = 1\n")
-		for _, path := range c.failing {
-			p = p.and(path, badYue)
-		}
-		step := twoTrees(t, p, yue).compile(false, "")
-		compared.inPart++
-		compared.runs += step.ranAlike(t, c.name)
-		compared.files += step.stagedAlike(t, c.name)
-		want, wantIs := olddiag.First(step.wantErr)
-		got, gotIs := diag.First(step.gotErr)
-		byBytes := slices.Min(c.failing)
-		if !wantIs || !gotIs || want.File != c.otherFirst || got.File != byBytes || byBytes == c.otherFirst {
-			t.Errorf("%s: the other tree names %q and this tree %q, want %q and %q: %v and %v",
-				c.name, want.File, got.File, c.otherFirst, byBytes, step.wantErr, step.gotErr)
-		}
-		// Every failing file has one text, so all but the file's name is alike.
-		want.File, got.File = "", ""
-		if want != olddiag.Problem(got) || !strings.HasSuffix(got.Msg, fmt.Sprintf("\n(%d more file(s) failed to compile)", len(c.failing)-1)) {
-			t.Errorf("%s: but for the file, the other tree gives %+v and this tree %+v", c.name, want, got)
-		}
+	// A compiler that cannot be started. The project has one source: with more, how many runs a tree starts
+	// before the first of them fails is a matter of timing. This tree has a hashes file by then, which keeps
+	// the source without a hash, and the other tree has none: all else of the step is compared whole.
+	var stopped compileTally
+	nowhere := twoTrees(t, files("src/a.yue", "export x = 1\n"), filepath.Join(t.TempDir(), "no-yue")).compile(false, "")
+	stopped.butForTheHashesFile(t, "a compiler that is not there", nowhere)
+	stopped.inPart++
+	if nowhere.wantKept || !nowhere.gotKept {
+		t.Errorf("a compiler that is not there: the other tree has a hashes file: %v, and this tree: %v, want none and one", nowhere.wantKept, nowhere.gotKept)
 	}
-	// 36 compiles of the cases of the other tree's tests, of which 10 are refused, and 64 of the seeded ones,
-	// of which 21 are; the 11 calls FourCC refuses; the compiler that is not there. In part, the 3 orders.
-	compared.check(t, compileTally{tally: tally{refused: 43, results: 69, inPart: 3}, runs: 188, files: 216})
+	compared.add(stopped)
+
+	// 36 compiles of the cases of the other tree's tests, of which 10 are refused, and 68 of the seeded ones, of
+	// which 21 are and 3 are in part, for a source that lost its code; the 11 calls FourCC refuses; the compiler
+	// that is not there, which is also in part for its hashes file. In part besides, the 3 orders.
+	compared.total.check(t, compileTally{tally: tally{refused: 43, results: 70, inPart: 7}, runs: 192, files: 225})
 }
 
 // ---- what the compiler prints ----
@@ -1331,12 +1525,7 @@ func byPath(texts map[string]string) []sourceAs {
 	return listed
 }
 
-// casesReadAnotherWay is cases with a character that the two trees read differently, in a place where it makes
-// a difference: which tree refuses the case, and both do where what differs is the message.
-var casesReadAnotherWay = []struct {
-	scriptedCase
-	otherRefuses, thisRefuses bool
-}{
+var casesReadAnotherWay = []readAnotherWayCase{
 	// A source without code, by the white space and the line ends of one tree and not of the other.
 	{oneFile("a no-break space before a comment", noBreakSpace+"-- a comment\n", answer{lua: leaves("")}), false, true},
 	{oneFile("a line of a wide space", "-- a\n"+wideSpace+"\n", answer{lua: leaves("")}), false, true},
@@ -1349,67 +1538,88 @@ var casesReadAnotherWay = []struct {
 	{oneFile("a wide space at the start of the reason", bitYue, refusedAs(2, "Failed to rewrite: x\n>> :1:1: "+wideSpace+"a\n")), true, true},
 }
 
+// scriptedWhole gives both trees two compiles of a case, the second of what the first left, and compares each
+// whole.
+func scriptedWhole(t *testing.T, c scriptedCase, compared *compileTally) {
+	if hasFaultyBytes(c) || hasAnotherReading(c) {
+		t.Errorf("%s: the case has bytes or a character that the trees take differently, which is compared in part", c.name)
+		return
+	}
+	tr := twoTrees(t, c.of, fakeYue)
+	tr.script = answers(c.does)
+	compared.whole(t, c.name, tr.compile(c.minify, ""))
+	compared.whole(t, c.name+", again", tr.compile(c.minify, ""))
+}
+
+// scriptedWithFaultyBytes compares a compile that returns bytes that are not UTF-8: all but the texts and the
+// Lua whole, and those by their bytes.
+func scriptedWithFaultyBytes(t *testing.T, c scriptedCase, compared *compileTally) {
+	tr := twoTrees(t, c.of, fakeYue)
+	tr.script = answers(c.does)
+	step := tr.compile(c.minify, "")
+	compared.inPart++
+	step.keptAlike(t, c.name)
+	compared.runs += step.ranAlike(t, c.name)
+	compared.files += step.stagedAlike(t, c.name)
+	if step.wantErr != nil || step.gotErr != nil || !hasFaultyBytes(c) || hasAnotherReading(c) {
+		t.Errorf("%s: %v and %v, of a case with faulty bytes: %v", c.name, step.wantErr, step.gotErr, hasFaultyBytes(c))
+		return
+	}
+	wantTexts, gotTexts, wantLua, gotLua := byPath(step.want.Texts), byPath(step.got.Texts), byPath(step.want.Lua), byPath(step.got.Lua)
+	oracle.Values(t, c.name+": the hashes", step.want.Hashes, step.got.Hashes)
+	oracle.Values(t, c.name+": the sources with a text", pathsOfAs(wantTexts), pathsOfAs(gotTexts))
+	oracle.Values(t, c.name+": the modules with Lua", pathsOfAs(wantLua), pathsOfAs(gotLua))
+	if len(wantTexts) != len(gotTexts) || len(wantLua) != len(gotLua) {
+		return
+	}
+	if keptBytes(t, c.name+": a text", wantTexts, gotTexts)+keptBytes(t, c.name+": the Lua", wantLua, gotLua) == 0 {
+		t.Errorf("%s: the two trees read every text and all Lua alike", c.name)
+	}
+}
+
+// readAnotherWayCase is a case with a character that the two trees read differently, in a place where it makes
+// a difference: which tree refuses the case, and both do where what differs is the message.
+type readAnotherWayCase struct {
+	scriptedCase
+	otherRefuses, thisRefuses bool
+}
+
+// scriptedReadAnotherWay compares a compile with a character the trees read differently: the runs, and which
+// tree refuses; where both do, the staging folder, the hashes file and all of the failure but its message.
+func scriptedReadAnotherWay(t *testing.T, c readAnotherWayCase, compared *compileTally) {
+	tr := twoTrees(t, c.of, fakeYue)
+	tr.script = answers(c.does)
+	step := tr.compile(c.minify, "")
+	compared.inPart++
+	compared.runs += step.ranAlike(t, c.name)
+	want, wantIs := olddiag.First(step.wantErr)
+	got, gotIs := diag.First(step.gotErr)
+	if !hasAnotherReading(c.scriptedCase) || hasFaultyBytes(c.scriptedCase) || wantIs != c.otherRefuses || gotIs != c.thisRefuses ||
+		(step.wantErr != nil) != wantIs || (step.gotErr != nil) != gotIs {
+		t.Errorf("%s: the other tree refuses: %v, and this tree: %v, want %v and %v", c.name, step.wantErr, step.gotErr, c.otherRefuses, c.thisRefuses)
+		return
+	}
+	if !wantIs || !gotIs {
+		return
+	}
+	step.keptAlike(t, c.name)
+	compared.files += step.stagedAlike(t, c.name)
+	differ := want.Msg != got.Msg
+	want.Msg, got.Msg = "", ""
+	if !differ || want != olddiag.Problem(got) {
+		t.Errorf("%s: the other tree gives %v and this tree %v, which must differ in the message alone", c.name, step.wantErr, step.gotErr)
+	}
+}
+
+// TestOracleOnACompilerThatIsAFunction runs no compiler. Its cases run side by side.
 func TestOracleOnACompilerThatIsAFunction(t *testing.T) {
-	var compared compileTally
-	for _, c := range scriptedCases {
-		if hasFaultyBytes(c) || hasAnotherReading(c) {
-			t.Errorf("%s: the case has bytes or a character that the trees take differently, which is compared in part", c.name)
-			continue
-		}
-		tr := twoTrees(t, c.of, fakeYue)
-		tr.script = answers(c.does)
-		compared.whole(t, c.name, tr.compile(c.minify, ""))
-		// A second compile, of what the first left.
-		compared.whole(t, c.name+", again", tr.compile(c.minify, ""))
-	}
-	// Bytes that are not UTF-8: all but the texts and the Lua whole, and those by their bytes.
-	for _, c := range casesWithFaultyBytes {
-		tr := twoTrees(t, c.of, fakeYue)
-		tr.script = answers(c.does)
-		step := tr.compile(c.minify, "")
-		compared.inPart++
-		compared.runs += step.ranAlike(t, c.name)
-		compared.files += step.stagedAlike(t, c.name)
-		if step.wantErr != nil || step.gotErr != nil || !hasFaultyBytes(c) || hasAnotherReading(c) {
-			t.Errorf("%s: %v and %v, of a case with faulty bytes: %v", c.name, step.wantErr, step.gotErr, hasFaultyBytes(c))
-			continue
-		}
-		wantTexts, gotTexts, wantLua, gotLua := byPath(step.want.Texts), byPath(step.got.Texts), byPath(step.want.Lua), byPath(step.got.Lua)
-		oracle.Values(t, c.name+": the hashes", step.want.Hashes, step.got.Hashes)
-		oracle.Values(t, c.name+": the sources with a text", pathsOfAs(wantTexts), pathsOfAs(gotTexts))
-		oracle.Values(t, c.name+": the modules with Lua", pathsOfAs(wantLua), pathsOfAs(gotLua))
-		if len(wantTexts) != len(gotTexts) || len(wantLua) != len(gotLua) {
-			continue
-		}
-		if keptBytes(t, c.name+": a text", wantTexts, gotTexts)+keptBytes(t, c.name+": the Lua", wantLua, gotLua) == 0 {
-			t.Errorf("%s: the two trees read every text and all Lua alike", c.name)
-		}
-	}
-	// Characters the trees read differently: the runs, and which tree refuses; where both do, all but the
-	// message.
-	for _, c := range casesReadAnotherWay {
-		tr := twoTrees(t, c.of, fakeYue)
-		tr.script = answers(c.does)
-		step := tr.compile(c.minify, "")
-		compared.inPart++
-		compared.runs += step.ranAlike(t, c.name)
-		want, wantIs := olddiag.First(step.wantErr)
-		got, gotIs := diag.First(step.gotErr)
-		if !hasAnotherReading(c.scriptedCase) || hasFaultyBytes(c.scriptedCase) || wantIs != c.otherRefuses || gotIs != c.thisRefuses ||
-			(step.wantErr != nil) != wantIs || (step.gotErr != nil) != gotIs {
-			t.Errorf("%s: the other tree refuses: %v, and this tree: %v, want %v and %v", c.name, step.wantErr, step.gotErr, c.otherRefuses, c.thisRefuses)
-			continue
-		}
-		if wantIs && gotIs {
-			differ := want.Msg != got.Msg
-			want.Msg, got.Msg = "", ""
-			if !differ || want != olddiag.Problem(got) {
-				t.Errorf("%s: the other tree gives %v and this tree %v, which must differ in the message alone", c.name, step.wantErr, step.gotErr)
-			}
-		}
-	}
+	var compared summed
+	nameOf := func(c scriptedCase) string { return c.name }
+	sideBySide(t, &compared, scriptedCases, nameOf, scriptedWhole)
+	sideBySide(t, &compared, casesWithFaultyBytes, nameOf, scriptedWithFaultyBytes)
+	sideBySide(t, &compared, casesReadAnotherWay, func(c readAnotherWayCase) string { return c.name }, scriptedReadAnotherWay)
 	// The 54 cases, each compiled twice; in part, 6 for their bytes and 8 for the characters read another way.
-	compared.check(t, compileTally{tally: tally{refused: 84, results: 24, inPart: 14}, runs: 125, files: 38})
+	compared.total.check(t, compileTally{tally: tally{refused: 84, results: 24, inPart: 14}, runs: 125, files: 38})
 }
 
 // pathsOfAs is the paths of modules.
