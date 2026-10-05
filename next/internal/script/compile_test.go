@@ -318,14 +318,51 @@ func TestTheEntryIsTheModuleOfTheEntryFile(t *testing.T) {
 	}
 }
 
-func TestARequiredModuleWithoutCodeIsNotFound(t *testing.T) {
-	// The compiler writes no Lua for a source without code, so there is no module to put in the bundle.
-	b := programOf(t, mainOnly.and("src/notes.yue", "-- nothing yet\n"))
-	b.fake(map[string]answer{"src/main.yue": leavingLua("\nrequire('notes')\n"), "src/notes.yue": {}}, nil)
+func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
+	// The compiler writes no Lua for a source without code, so there is no module to put in the bundle. The
+	// file is there, so the refusal is not that of a module that is not found.
+	const hint = "YueScript writes no Lua for a file without code, and "
+	b := programOf(t, mainOnly.and("src/game/notes.yue", "-- nothing yet\n"))
+	b.fake(map[string]answer{"src/main.yue": leavingLua("\nrequire('game.notes')\n"), "src/game/notes.yue": {}}, nil)
 	_, err := b.compile()
 	failure := asError(t, err, "a required module without code")
-	if failure.Msg != "Module 'notes' not found." || failure.File != "src/main.yue" || failure.Line != 2 {
+	if failure.Msg != "Module 'game.notes' has no code." || failure.File != "src/main.yue" || failure.Line != 2 ||
+		failure.Hint != hint+"src/game/notes.yue has none." {
 		t.Errorf("error = %+v", failure)
+	}
+	// An init module, required by its folder's name.
+	b = programOf(t, mainOnly.with("ex").and(inLibrary("ex", "kit/init.yue"), "-- nothing yet\n"))
+	b.fake(map[string]answer{"src/main.yue": leavingLua("require('kit')\n"), inLibrary("ex", "kit/init.yue"): {}}, nil)
+	_, err = b.compile()
+	failure = asError(t, err, "a required init module without code")
+	if failure.Msg != "Module 'kit' has no code." || failure.File != "src/main.yue" || failure.Line != 1 ||
+		failure.Hint != hint+inLibrary("ex", "kit/init.yue")+" has none." {
+		t.Errorf("error = %+v", failure)
+	}
+	// The entry itself: nothing requires it, so the failure is at its own file, without a line.
+	b = programOf(t, files("src/main.yue", "-- nothing yet\n"))
+	b.fake(map[string]answer{"src/main.yue": {}}, nil)
+	_, err = b.compile()
+	failure = asError(t, err, "an entry without code")
+	if failure.Msg != "Module 'main' has no code." || failure.File != "src/main.yue" || failure.Line != 0 || failure.Hint != hint+"src/main.yue has none." {
+		t.Errorf("error = %+v", failure)
+	}
+}
+
+func TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua(t *testing.T) {
+	// The line of a require is its line in the module's Lua. A normal build keeps each statement on the line of
+	// its source; a minified one puts the module on one line, so the fault of a YueScript module is at line 1,
+	// wherever the import stands in the source. This test runs the real compiler, twice.
+	yue := tooltest.Yue(t)
+	for minify, line := range map[bool]int{false: 3, true: 1} {
+		b := programOf(t, files("src/main.yue", "x = 1\n\nimport \"nope\"\nprint x, nope\n"))
+		b.world.Run = env.Run
+		b.in.Yue, b.in.Minify = yue, minify
+		_, err := b.compile()
+		failure := asError(t, err, "a module that is not found")
+		if failure.Msg != "Module 'nope' not found." || failure.File != "src/main.yue" || failure.Line != line {
+			t.Errorf("minified %v: %+v, want line %d", minify, failure, line)
+		}
 	}
 }
 
@@ -333,6 +370,9 @@ func TestCompileFailsWhenTheLuaOfALibrarysModuleCannotBeRead(t *testing.T) {
 	loud := inLibrary("ex", "kit/loud.yue")
 	b := programOf(t, mainOnly.with("ex").and(loud, "z = 3\n"))
 	b.fake(nil, nil)
+	// The libraries' Lua is read once the compile is over and before the entry is looked at: with an entry that
+	// is no file of src/ as well, the failure of the read is the one reported.
+	b.in.Entry = "lua/main.lua"
 	scripted := b.world.Run
 	// A folder where the library's output is, once the compiler has run: it is there, and no file to read.
 	b.world.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
@@ -393,6 +433,74 @@ func TestACompileOfAProjectThatDidNotChangeRunsNoCompiler(t *testing.T) {
 	second := b.compiles()
 	if ran := b.ran(); len(ran) != 0 || !slices.Equal(second.Modules, first.Modules) {
 		t.Errorf("the second compile ran the compiler as %q, and gave %+v", ran, second.Modules)
+	}
+}
+
+func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReachedOneAgain(t *testing.T) {
+	library := inLibrary("ex", "kit/more.yue")
+	b := programOf(t, files(
+		"src/main.yue", "import \"m\" as {:$N}\nimport \"util\"\n", "src/m.yue", "export macro N = -> \"1\"\n",
+		"src/util.yue", "x = 1\n", "src/unreached.yue", "y = 2\n",
+	).with("ex"))
+	b.fake(map[string]answer{"src/main.yue": leavingLua("require('util')\n")}, nil)
+	b.compiles()
+	b.ran()
+	// What the compiler does when every source is compiled and every reached one listed, but for the sources
+	// that come and go.
+	lists := []string{"list src/main.yue", "list src/util.yue"}
+	every := append([]string{"compile src/m.yue", "compile src/main.yue", "compile src/unreached.yue", "compile src/util.yue"}, lists...)
+	with := func(runs ...string) []string {
+		return slices.Sorted(slices.Values(append(slices.Clone(every), runs...)))
+	}
+	for _, c := range []struct {
+		what    string
+		written []string // a path and a text
+		removed string
+		want    []string
+	}{
+		{what: "an edit of a reached source without the word", written: []string{"src/util.yue", "x = 2\n"}, want: []string{"compile src/util.yue", "list src/util.yue"}},
+		{what: "an edit of a source without the word that nothing requires", written: []string{"src/unreached.yue", "y = 3\n"}, want: []string{"compile src/unreached.yue"}},
+		{what: "nothing"},
+		{what: "an edit of the source with the word", written: []string{"src/m.yue", "export macro N = -> \"2\"\n"}, want: every},
+		{what: "nothing after that"},
+		{what: "a new source with the word in a comment", written: []string{"src/other.yue", "-- a macro may come here\n"}, want: with("compile src/other.yue")},
+		{what: "that source without the word", written: []string{"src/other.yue", "-- nothing comes here\n"}, want: with("compile src/other.yue")},
+		{what: "a library's new source with the word", written: []string{library, "macro K = -> 1\n"}, want: with("compile "+library, "compile src/other.yue")},
+		{what: "the project's source with the word removed", removed: "src/m.yue", want: []string{
+			"compile " + library, "compile src/main.yue", "compile src/other.yue", "compile src/unreached.yue", "compile src/util.yue", lists[0], lists[1],
+		}},
+		{what: "nothing at the end"},
+	} {
+		if c.written != nil {
+			testkit.WriteFile(t, b.root, c.written[0], []byte(c.written[1]))
+		}
+		if c.removed != "" {
+			if err := os.Remove(filepath.Join(b.root, filepath.FromSlash(c.removed))); err != nil {
+				t.Fatal(err)
+			}
+		}
+		b.compiles()
+		if ran := b.ran(); !slices.Equal(ran, c.want) {
+			t.Errorf("after %s the compiler ran as %q, want %q", c.what, ran, c.want)
+		}
+	}
+}
+
+func TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro(t *testing.T) {
+	// This test runs the real compiler. The project has a macro module of its own, which the compiler finds
+	// beside the source that imports it: what that source compiles to, and the globals it uses, are the macro's.
+	yue := tooltest.Yue(t)
+	b := programOf(t, files("src/m.yue", "export macro N = -> \"Foo\"\n", "src/main.yue", "import \"m\" as {:$N}\nprint $N!\n"))
+	b.world.Run = env.Run
+	b.in.Yue, b.in.Natives, b.in.Lint = yue, LoadNatives(), manifest.Lint{UnknownGlobals: "warning"}
+	for _, name := range []string{"Foo", "Bar"} {
+		testkit.WriteFile(t, b.root, "src/m.yue", []byte("export macro N = -> \""+name+"\"\n"))
+		program := b.compiles()
+		main := program.Modules[len(program.Modules)-1]
+		if main.Path != "src/main.yue" || !strings.Contains(main.Lua, "print("+name+")") ||
+			len(program.Unknown) != 1 || program.Unknown[0].Msg != "Unknown global "+name+"." {
+			t.Errorf("with the macro that gives %s: the Lua of %s is %q, and the unknown globals are %+v", name, main.Path, main.Lua, program.Unknown)
+		}
 	}
 }
 

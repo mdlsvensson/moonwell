@@ -23,7 +23,7 @@ import (
 // any unknown use fails, with a diag.Problems that holds all of them; else they are logged as warnings and
 // returned.
 func unknownGlobals(ctx context.Context, e *env.Env, in Input, m macros, output *compiled, modules []Module) ([]diag.Problem, error) {
-	uses, err := listUses(ctx, e, in.Yue, m, checkedAmong(modules, output))
+	uses, err := listUses(ctx, e, in.Yue, m, output.macroSources, checkedAmong(modules, output))
 	if err != nil {
 		return nil, err
 	}
@@ -225,14 +225,15 @@ type listed struct {
 
 // listUses gives the globals each source uses, by the source's path. The compiler lists the uses of a source
 // (`yue -g`), which it cannot do in the run that compiles it; it is run only for the sources whose text changed
-// since the last check, at most atOnce at a time, and for every source when the compiler or the macro module
-// changed.
+// since the last check, at most atOnce at a time, and for every source when the compiler, the macro module or
+// the sources that may define macros changed. macroSources is what the compile hashed those sources to: a macro
+// may give a source the globals it uses.
 //
 // A source the compiler refuses does not stop the others: the lists that were made are kept, and the failure
 // returned is that of the first such source by its path. Any other failure (a compiler that cannot be started,
 // a cancelled context) is returned as it is, and then nothing is kept.
-func listUses(ctx context.Context, e *env.Env, yue string, m macros, sources []checked) (map[string][]globalUse, error) {
-	now := listedWith{Compiler: yue, Macros: m.hash}
+func listUses(ctx context.Context, e *env.Env, yue string, m macros, macroSources string, sources []checked) (map[string][]globalUse, error) {
+	now := listedWith{Compiler: yue, Macros: m.hash, MacroSources: macroSources}
 	kept, err := readUses(e.Root, now)
 	if err != nil {
 		return nil, err

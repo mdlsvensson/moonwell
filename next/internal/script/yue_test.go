@@ -493,6 +493,80 @@ func TestAtMostEightCompilersRunAtATime(t *testing.T) {
 	}
 }
 
+func TestEachOfGivesWhatEachItemGaveInTheOrderOfTheItems(t *testing.T) {
+	// No items: nothing is started, and nothing is given.
+	if gave, err := eachOf(nil, func(int) (int, error) { t.Error("work was started without an item"); return 0, nil }); err != nil || len(gave) != 0 {
+		t.Errorf("of no items: %v, %v", gave, err)
+	}
+	// Work that ends out of order: each item waits for the one after it, so the last of every eight that run at
+	// a time ends first.
+	const count = 30
+	items := make([]int, count)
+	ended := make([]chan struct{}, count)
+	for i := range items {
+		items[i], ended[i] = i, make(chan struct{})
+	}
+	var guard sync.Mutex
+	var order []int
+	gave, err := eachOf(items, func(item int) (string, error) {
+		if (item+1)%atOnce != 0 && item != count-1 {
+			// A wait that work in fewer than eight at a time would never see the end of is given up, and the
+			// order then tells.
+			select {
+			case <-ended[item+1]:
+			case <-time.After(5 * time.Second):
+			}
+		}
+		guard.Lock()
+		order = append(order, item)
+		guard.Unlock()
+		close(ended[item])
+		return fmt.Sprint("of ", item), nil
+	})
+	if err != nil || len(gave) != count || slices.IsSorted(order) {
+		t.Fatalf("eachOf = %q, %v; the work ended in the order %v, which must not be that of the items", gave, err, order)
+	}
+	for i, result := range gave {
+		if result != fmt.Sprint("of ", i) {
+			t.Errorf("item %d gave %q", i, result)
+		}
+	}
+}
+
+func TestEachOfStartsNoWorkAfterAnErrorAndReturnsItWhenTheRunningWorkHasEnded(t *testing.T) {
+	first, later := errors.New("the first failure"), errors.New("a later failure")
+	release := make(chan struct{})
+	var guard sync.Mutex
+	started, running := 0, 0
+	_, err := eachOf(make([]int, 40), func(int) (int, error) {
+		guard.Lock()
+		started++
+		running++
+		mine := started
+		if started == atOnce {
+			close(release)
+		}
+		guard.Unlock()
+		// Eight are in before any ends. Then one fails at once, and the seven others a while later.
+		<-release
+		if mine != 1 {
+			time.Sleep(50 * time.Millisecond)
+		}
+		guard.Lock()
+		running--
+		guard.Unlock()
+		if mine == 1 {
+			return 0, first
+		}
+		return 0, later
+	})
+	// The error is the first that came; no ninth work was started, though thirty-two items were left; and the
+	// seven that ran were waited for.
+	if err != first || started != atOnce || running != 0 {
+		t.Errorf("eachOf = %v; %d were started and %d still run, want the first failure, 8 and 0", err, started, running)
+	}
+}
+
 func TestAfterAnErrorThatIsNoCompileFailureNoFurtherCompilerIsStarted(t *testing.T) {
 	notStarted := &diag.Error{Msg: "Cannot run 'yue': command not found."}
 	for what, stopped := range map[string]error{"a compiler that cannot be started": notStarted, "a cancelled context": context.Canceled} {

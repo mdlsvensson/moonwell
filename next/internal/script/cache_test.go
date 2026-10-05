@@ -41,6 +41,7 @@ func TestTheHashesFileHoldsWhatTheOutputsDependOnAndEachSourcesHash(t *testing.T
 		"  \"compiler\": \"yue-of-the-test\",\n" +
 		"  \"mode\": \"-r\",\n" +
 		"  \"macros\": \"" + fsx.SHA256Hex([]byte(moonwell.MacrosYue)) + "\",\n" +
+		"  \"macroSources\": \"\",\n" +
 		"  \"sources\": {\n" +
 		"    \".moonwell/libraries/ex/kit/loud.yue\": {\n" +
 		"      \"hash\": \"" + fsx.SHA256Hex([]byte("z = 3\n")) + "\",\n" +
@@ -376,23 +377,127 @@ func TestACacheFileIsReadBackAsItWasWrittenAndNotAsAnotherShape(t *testing.T) {
 	}
 }
 
+// ---- the sources that may define macros ----
+
+func TestASourceMayDefineMacrosWhenItHoldsTheWordMacro(t *testing.T) {
+	for text, want := range map[string]bool{
+		"macro N = -> 1":                  true,
+		"export macro N = -> 1":           true,
+		"macro\tN = -> 1":                 true,
+		"x = 1\n-- a macro, in a comment": true,
+		"macro":                           true,
+		"x = 1\nmacro":                    true,
+		"(macro)":                         true,
+		"$macro":                          true,
+		"x.macro":                         true,
+		"macro\r\n":                       true,
+		"macros and a macro":              true,
+		eAcute + "macro" + eAcute:         true, // only a letter, a digit or "_" of ASCII joins the word
+		"":                                false,
+		"macros":                          false,
+		"mymacro":                         false,
+		"macro_x":                         false,
+		"_macro":                          false,
+		"macro1":                          false,
+		"1macro":                          false,
+		"Macro N = -> 1":                  false,
+		"MACRO":                           false,
+		"mac ro":                          false,
+		macroImport + "print $FourCC 'x'": false,
+	} {
+		if got := holdsMacroWord(text); got != want {
+			t.Errorf("holdsMacroWord(%q) = %v, want %v", text, got, want)
+		}
+	}
+}
+
+func TestTheSourcesThatMayDefineMacrosAreAmongWhatEveryOutputDependsOn(t *testing.T) {
+	// member is what a compile of a project keeps, and returns, for the sources that may define macros.
+	member := func(p project) string {
+		t.Helper()
+		b := benchOf(t, p)
+		b.fake(nil)
+		result := b.compiles(fakeYue, false)
+		kept, err := readHashes(b.root)
+		if err != nil || kept.MacroSources != result.macroSources {
+			t.Fatalf("the hashes file keeps %q and the compile returns %q, %v", kept.MacroSources, result.macroSources, err)
+		}
+		return kept.MacroSources
+	}
+	hashed := func(text string) string { return fsx.SHA256Hex([]byte(text)) }
+	const one, edited, comment = "export macro N = -> 1\n", "export macro N = -> 2\n", "-- a macro\n"
+	inLib := inLibrary("ex", "kit/m.yue")
+	for _, c := range []struct {
+		what string
+		of   project
+		want string // the bytes that are hashed; "" for no source with the word
+	}{
+		{"no source with the word", mainOnly.and("src/tools.yue", macroImport), ""},
+		{"a Lua module with the word", mainOnly.and("lua/x.lua", comment), ""},
+		{"a file of src that is no module", mainOnly.and("src/notes.txt", one, "src/x.lua", comment), ""},
+		{"a source with the word", mainOnly.and("src/m.yue", one), "src/m.yue\x00" + hashed(one) + "\n"},
+		{"that source with another text", mainOnly.and("src/m.yue", edited), "src/m.yue\x00" + hashed(edited) + "\n"},
+		{"that source and another text beside it", files("src/main.yue", "x = 2\n", "src/m.yue", one), "src/m.yue\x00" + hashed(one) + "\n"},
+		{"two sources with the word", mainOnly.and("src/m.yue", one, "src/a/b.yue", comment),
+			"src/a/b.yue\x00" + hashed(comment) + "\nsrc/m.yue\x00" + hashed(one) + "\n"},
+		// In the order of the paths' bytes, which puts a library's before the project's own.
+		{"a library's source with the word", mainOnly.with("ex").and("src/m.yue", one, inLib, comment, inLibrary("ex", "kit/x.lua"), comment),
+			inLib + "\x00" + hashed(comment) + "\nsrc/m.yue\x00" + hashed(one) + "\n"},
+		{"a source with the word after a byte order mark", mainOnly.and("src/m.yue", mark+one), "src/m.yue\x00" + hashed(mark+one) + "\n"},
+	} {
+		want := ""
+		if c.want != "" {
+			want = hashed(c.want)
+		}
+		if got := member(c.of); got != want {
+			t.Errorf("%s: the sources that may define macros hash to %q, want %q", c.what, got, want)
+		}
+	}
+}
+
+func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAgain(t *testing.T) {
+	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n", "src/m.yue", "export macro N = -> 1\n"))
+	b.fake(nil)
+	b.compiles(fakeYue, false)
+	b.ran()
+	all := []string{"src/a.yue", "src/b.yue", "src/m.yue"}
+	for _, c := range []struct {
+		what, path, text string
+		want             []string
+	}{
+		{"an edit of a source without the word", "src/a.yue", "x = 2\n", []string{"src/a.yue"}},
+		{"an edit of the source with the word", "src/m.yue", "export macro N = -> 2\n", all},
+		{"the word in a source that had none", "src/b.yue", "y = 2 -- no macro\n", all},
+		{"that source without the word", "src/b.yue", "y = 3\n", all},
+		{"the word gone from the last source that has it", "src/m.yue", "z = 3\n", all},
+		{"an edit of that source", "src/m.yue", "z = 4\n", []string{"src/m.yue"}},
+	} {
+		b.write(c.path, c.text)
+		b.compiles(fakeYue, false)
+		if ran := b.ran(); !slices.Equal(ran, c.want) {
+			t.Errorf("after %s the compiler ran on %q, want %q", c.what, ran, c.want)
+		}
+	}
+}
+
 // ---- the globals each source uses ----
 
-// usesBench is a project folder without files, a compiler that is a listing, and the macro search a listing of
-// uses is given.
+// usesBench is a project folder without files, a compiler that is a listing, and what a listing of uses is
+// given beside its sources: the macro search, and the hash of the sources that may define macros.
 type usesBench struct {
-	t      *testing.T
-	root   string
-	world  *env.Env
-	yue    *listing
-	search macros
+	t            *testing.T
+	root         string
+	world        *env.Env
+	yue          *listing
+	search       macros
+	macroSources string
 }
 
 // usesBenchOf is a bench whose compiler prints what printed holds for each source, by its path.
 func usesBenchOf(t *testing.T, printed map[string]env.RunResult) *usesBench {
 	t.Helper()
 	root := t.TempDir()
-	b := &usesBench{t: t, root: root, yue: &listing{t: t, root: root, printed: printed}}
+	b := &usesBench{t: t, root: root, yue: &listing{t: t, root: root, printed: printed}, macroSources: "s1"}
 	b.world, _ = testkit.Env(t, root)
 	b.world.Run = b.yue.run
 	b.search = macros{path: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
@@ -405,7 +510,7 @@ func (b *usesBench) list(yue string, pairs ...string) (map[string][]globalUse, e
 	for i := 0; i+1 < len(pairs); i += 2 {
 		sources = append(sources, checked{path: pairs[i], hash: pairs[i+1]})
 	}
-	return listUses(background, b.world, yue, b.search, sources)
+	return listUses(background, b.world, yue, b.search, b.macroSources, sources)
 }
 
 // usesText is what the uses file holds; "" when there is none.
@@ -436,6 +541,7 @@ func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *test
 	want := `{
   "compiler": "yue",
   "macros": "m1",
+  "macroSources": "s1",
   "sources": {
     "src/heroes/captain.yue": {
       "hash": "h2",
@@ -497,14 +603,15 @@ func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *test
 	if _, err := b.list("other-yue", main, "h3"); err != nil || len(b.yue.ran()) != 0 {
 		t.Fatalf("one source of the two: %v", err)
 	}
-	kept, err := readUses(b.root, listedWith{Compiler: "other-yue", Macros: "m1"})
+	kept, err := readUses(b.root, listedWith{Compiler: "other-yue", Macros: "m1", MacroSources: "s1"})
 	if err != nil || len(kept) != 1 || kept[main].Hash != "h3" {
 		t.Errorf("the uses file keeps %+v, %v", kept, err)
 	}
 }
 
 func TestAUsesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
-	const good = `{"compiler": "yue", "macros": "m1", "sources": {"src/main.yue": {"hash": "h1", "uses": [{"name": "print", "line": 1, "column": 1}]}}}`
+	const with = `{"compiler": "yue", "macros": "m1", "macroSources": "s1", `
+	const good = with + `"sources": {"src/main.yue": {"hash": "h1", "uses": [{"name": "print", "line": 1, "column": 1}]}}}`
 	want := map[string][]globalUse{"src/main.yue": {{Name: "Zzz", Line: 1, Column: 1}}}
 	for what, text := range map[string]string{
 		"the shape of another version": `{"settings": "yue|m1", "files": {"main.yue": {"hash": "h1", "uses": [["print", 1, 1]]}}}`,
@@ -513,9 +620,9 @@ func TestAUsesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 		"null":                         "null",
 		"a member it has not":          strings.Replace(good, `"macros"`, `"mode": "-r", "macros"`, 1),
 		"text after it":                good + "x",
-		"sources that are a list":      `{"compiler": "yue", "macros": "m1", "sources": []}`,
-		"a source without uses":        `{"compiler": "yue", "macros": "m1", "sources": {"src/main.yue": {"hash": "h1"}}}`,
-		"uses that are null":           `{"compiler": "yue", "macros": "m1", "sources": {"src/main.yue": {"hash": "h1", "uses": null}}}`,
+		"sources that are a list":      with + `"sources": []}`,
+		"a source without uses":        with + `"sources": {"src/main.yue": {"hash": "h1"}}}`,
+		"uses that are null":           with + `"sources": {"src/main.yue": {"hash": "h1", "uses": null}}}`,
 		"a use that is a list":         strings.Replace(good, `{"name": "print", "line": 1, "column": 1}`, `["print", 1, 1]`, 1),
 		"a line that is a string":      strings.Replace(good, `"line": 1`, `"line": "1"`, 1),
 		"a line that is no integer":    strings.Replace(good, `"line": 1`, `"line": 1.5`, 1),
@@ -523,6 +630,8 @@ func TestAUsesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 		"a use with a member it lacks": strings.Replace(good, `"column": 1`, `"column": 1, "end": 2`, 1),
 		"another compiler":             strings.Replace(good, `"compiler": "yue"`, `"compiler": "another"`, 1),
 		"another macro module":         strings.Replace(good, `"macros": "m1"`, `"macros": "m2"`, 1),
+		"other sources with macros":    strings.Replace(good, `"macroSources": "s1"`, `"macroSources": "s2"`, 1),
+		"no sources with macros":       strings.Replace(good, `"macroSources": "s1", `, ``, 1),
 		"another hash":                 strings.Replace(good, `"hash": "h1"`, `"hash": "h0"`, 1),
 		"another source":               strings.Replace(good, `"src/main.yue"`, `"src/other.yue"`, 1),
 	} {
@@ -603,6 +712,13 @@ func TestTheCompilerIsGivenTheMacroPathAndTheUsesDependOnTheMacroModule(t *testi
 	list()
 	if len(b.yue.runs) != 2 {
 		t.Error("a changed macro module lists every file again")
+	}
+	// So do other sources that may define macros: the macros a source uses may be theirs.
+	b.macroSources = "s2"
+	list()
+	list()
+	if len(b.yue.runs) != 3 {
+		t.Errorf("after a change of the sources that may define macros, the compiler ran %d times in all, want 3", len(b.yue.runs))
 	}
 }
 

@@ -106,7 +106,8 @@ func reportedVersion(t *testing.T, yue string) string {
 // The recordings are of one version of the compiler, which is the one Moonwell downloads. A compiler of the
 // user's own that reports another version, named by MOONWELL_TEST_YUE, words its failures its own way: the test
 // is skipped for it, and says so. Without that variable the compiler is the one Moonwell downloads, and another
-// version fails the test: the recordings are then to be made again.
+// version fails the test: the recordings are then to be made again. A change of the version Moonwell downloads
+// records them again in the same commit.
 func TestTheCompilerPrintsWhatWasRecorded(t *testing.T) {
 	yue := tooltest.Yue(t)
 	if reported := reportedVersion(t, yue); reported != recordedVersion {

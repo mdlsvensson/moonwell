@@ -22,16 +22,24 @@ func luaByPath(pairs ...string) func(Source) (string, bool, error) {
 	}
 }
 
+// noCode stands for the Lua of a module, among the pairs of modulesOf, whose source has no code.
+const noCode = "\x00a source without code"
+
 // modulesOf loads modules by name from pairs of a name and the module's Lua: each is the YueScript module at
-// src/<name with "/" for each dot>.yue.
-func modulesOf(pairs ...string) func(name string) (*Module, error) {
-	return func(name string) (*Module, error) {
+// src/<name with "/" for each dot>.yue. A module whose Lua is noCode has a source and no Lua.
+func modulesOf(pairs ...string) func(name string) (found, error) {
+	return func(name string) (found, error) {
 		for i := 0; i+1 < len(pairs); i += 2 {
-			if pairs[i] == name {
-				return &Module{Name: name, Path: "src/" + strings.ReplaceAll(name, ".", "/") + ".yue", Kind: Yue, Lua: pairs[i+1]}, nil
+			path := "src/" + strings.ReplaceAll(name, ".", "/") + ".yue"
+			switch {
+			case pairs[i] != name:
+			case pairs[i+1] == noCode:
+				return found{without: path}, nil
+			default:
+				return found{module: &Module{Name: name, Path: path, Kind: Yue, Lua: pairs[i+1]}}, nil
 			}
 		}
-		return nil, nil
+		return found{}, nil
 	}
 }
 
@@ -52,15 +60,20 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 		// A Lua module is its own text, byte for byte.
 		"kit.bytes": {Name: "kit.bytes", Path: inLibrary("ex", "kit/bytes.lua"), Kind: Lua, Library: "ex", Lua: "return '\xff'"},
 	} {
-		if got, err := load(name); err != nil || got == nil || *got != want {
+		if got, err := load(name); err != nil || got.module == nil || *got.module != want || got.without != "" {
 			t.Errorf("load(%s) = %+v, %v, want %+v", name, got, err, want)
 		}
 	}
-	// No module has the name, or the module that has it has no Lua.
-	for _, name := range []string{"missing", "pending", "kit", "main.init"} {
-		if got, err := load(name); got != nil || err != nil {
+	// No module has the name.
+	for _, name := range []string{"missing", "kit", "main.init"} {
+		if got, err := load(name); got != (found{}) || err != nil {
 			t.Errorf("load(%s) = %+v, %v, want no module", name, got, err)
 		}
+	}
+	// A module has the name, and its source compiled to no Lua: it is told from a name that no module has, by
+	// its file.
+	if got, err := load("pending"); got != (found{without: "src/pending.yue"}) || err != nil {
+		t.Errorf("load(pending) = %+v, %v, want the file of a module without Lua", got, err)
 	}
 
 	failure := errors.New("the output is gone")
@@ -74,10 +87,10 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 		},
 	)
 	want := Module{Name: "game", Path: "src/game/init.yue", Kind: Yue, Lua: "local y = 2"}
-	if got, err := loadGame("game"); err != nil || got == nil || *got != want {
+	if got, err := loadGame("game"); err != nil || got.module == nil || *got.module != want {
 		t.Errorf("load(game) = %+v, %v, want %+v", got, err, want)
 	}
-	if got, err := loadGame("broken"); got != nil || err != failure {
+	if got, err := loadGame("broken"); got != (found{}) || err != failure {
 		t.Errorf("load(broken) = %+v, %v, want the failure of the read", got, err)
 	}
 }
@@ -102,7 +115,7 @@ func TestReachedReturnsReachableModulesDependenciesFirst(t *testing.T) {
 
 func TestABuiltInModuleIsNeverLoaded(t *testing.T) {
 	asked := []string{}
-	modules, err := reached("main", func(name string) (*Module, error) {
+	modules, err := reached("main", func(name string) (found, error) {
 		asked = append(asked, name)
 		return modulesOf("main", `require("moonwell")`, "moonwell", "return 'a file of that name'")(name)
 	})
@@ -152,6 +165,27 @@ func TestReachedReportsAMissingEntry(t *testing.T) {
 	}
 }
 
+func TestReachedRefusesAModuleWithoutCodeAsOneAndNotAsOneThatIsNotFound(t *testing.T) {
+	// A required module: at the requiring file's line, with the module's own file in the hint.
+	_, err := reached("main", modulesOf("main", "\n\nrequire('game.notes')", "game.notes", noCode))
+	failure := asError(t, err, "a required module without code")
+	if failure.Msg != "Module 'game.notes' has no code." || failure.File != "src/main.yue" || failure.Line != 3 ||
+		!strings.Contains(failure.Hint, "src/game/notes.yue") || !strings.Contains(failure.Hint, "writes no Lua for a file without code") {
+		t.Errorf("error = %+v", failure)
+	}
+	// The entry: no file requires it, so the failure is at its own file, without a line.
+	_, err = reached("main", modulesOf("main", noCode))
+	failure = asError(t, err, "an entry without code")
+	if failure.Msg != "Module 'main' has no code." || failure.File != "src/main.yue" || failure.Line != 0 || !strings.Contains(failure.Hint, "src/main.yue") {
+		t.Errorf("error = %+v", failure)
+	}
+	// It is come to in the order of the requires, as a module that is not found is.
+	_, err = reached("main", modulesOf("main", "require('nope')\nrequire('notes')", "notes", noCode))
+	if failure := asError(t, err, "a missing module before one without code"); failure.Msg != "Module 'nope' not found." {
+		t.Errorf("error = %+v", failure)
+	}
+}
+
 func TestReachedRefusesARequireThatIsNoSingleStringLiteral(t *testing.T) {
 	_, err := reached("main", modulesOf("main", "require('a')", "a", "\nrequire(name)"))
 	failure := asError(t, err, "a computed name")
@@ -179,7 +213,7 @@ func TestReachedReportsACycleWithItsChain(t *testing.T) {
 
 func TestReachedPassesOnTheFailureOfALoad(t *testing.T) {
 	failure := errors.New("the output is gone")
-	modules, err := reached("main", func(string) (*Module, error) { return nil, failure })
+	modules, err := reached("main", func(string) (found, error) { return found{}, failure })
 	if modules != nil || err != failure {
 		t.Errorf("reached = %+v, %v", modules, err)
 	}

@@ -31,10 +31,14 @@ type compiled struct {
 	texts  map[string]string // each YueScript source's text, by its path from the project folder
 	hashes map[string]string // the SHA-256 of each source's bytes, by the same path
 	lua    map[string]string // where each compiled file is, by the same path
+	// macroSources is macroSourcesOf the sources, of the texts above: what every output depends on beside its
+	// own source, the compiler and the macro module, and so what the globals a source uses depend on too.
+	macroSources string
 }
 
 // compileAll compiles every YueScript module into dist/stage/lua, at most eight at a time, and recompiles only
-// the files that changed since the last run.
+// the files that changed since the last run; and every file when the compiler, the mode, the macro module or a
+// source that may define macros changed (macroSourcesOf).
 //
 // A file the compiler refuses does not stop the others: the failure returned is that of the first such file by
 // its path, with the count of the others. Any other failure (a file that cannot be read or written, a compiler
@@ -52,7 +56,7 @@ func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macr
 	if err != nil {
 		return nil, err
 	}
-	now := dependsOn{Compiler: yue, Mode: modeOf(minify), Macros: m.hash}
+	now := dependsOn{Compiler: yue, Mode: modeOf(minify), Macros: m.hash, MacroSources: macroSourcesOf(units)}
 	last, err := readHashes(e.Root)
 	if err != nil {
 		return nil, err
@@ -75,7 +79,7 @@ func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macr
 	if len(failures) > 0 {
 		return nil, errNotCompiled(failures)
 	}
-	return compiledOf(units), nil
+	return compiledOf(units, now.MacroSources), nil
 }
 
 // luaOf reads a compiled module; ok is false when it has no output. The Lua is the bytes the compiler wrote:
@@ -208,9 +212,10 @@ func withoutFailed(units []unit, failures []*diag.Error) []unit {
 	return slices.DeleteFunc(slices.Clone(units), func(u unit) bool { return failed[u.path] })
 }
 
-// compiledOf is what a compile without failures left.
-func compiledOf(units []unit) *compiled {
-	result := &compiled{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}}
+// compiledOf is what a compile without failures left, with the sources that may define macros as it hashed
+// them.
+func compiledOf(units []unit, macroSources string) *compiled {
+	result := &compiled{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}, macroSources: macroSources}
 	for _, u := range units {
 		result.texts[u.path], result.hashes[u.path], result.lua[u.path] = u.text, u.hash, u.output
 	}

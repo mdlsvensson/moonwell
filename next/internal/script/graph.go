@@ -8,42 +8,53 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/war3/lua"
 )
 
+// found is what a name that a require gives leads to: a module; or, for a module whose source compiled to no
+// Lua, the file of that source; or neither, for a name that no module has.
+type found struct {
+	module  *Module
+	without string // the path, from the project folder, of a YueScript source without an output
+}
+
 // loaderOf finds the module of a name that a require gives: the module of that name, else `<name>.init`, as
 // Lua's `?/init.lua`. A Lua module is its own text; a YueScript module is its compiled Lua, which read gives for
 // the source, with ok false for a source without an output. Either is returned under the name it was required
-// by. No module is returned for a name that no module has, and none for a YueScript module without an output.
-func loaderOf(sources []Source, read func(Source) (text string, ok bool, err error)) func(name string) (*Module, error) {
+// by. A YueScript module without an output is told from a name that no module has: the compiler writes no Lua
+// for a source without code, and the file is there all the same.
+func loaderOf(sources []Source, read func(Source) (text string, ok bool, err error)) func(name string) (found, error) {
 	byName := make(map[string]Source, len(sources))
 	for _, source := range sources {
 		byName[source.Name] = source
 	}
-	return func(name string) (*Module, error) {
-		source, found := byName[name]
-		if !found {
-			if source, found = byName[name+".init"]; !found {
-				return nil, nil
+	return func(name string) (found, error) {
+		source, has := byName[name]
+		if !has {
+			if source, has = byName[name+".init"]; !has {
+				return found{}, nil
 			}
 		}
 		module := &Module{Name: name, Path: source.Path, Kind: source.Kind, Library: source.Library, Lua: source.Text}
 		if source.Kind == Lua {
-			return module, nil
+			return found{module: module}, nil
 		}
 		text, ok, err := read(source)
-		if err != nil || !ok {
-			return nil, err
+		switch {
+		case err != nil:
+			return found{}, err
+		case !ok:
+			return found{without: source.Path}, nil
 		}
 		module.Lua = text
-		return module, nil
+		return found{module: module}, nil
 	}
 }
 
 // reached walks the requires from the entry and returns the modules it reaches, each after the modules it
-// requires. load gives the module of a name, and nil for a name that has none.
+// requires. load says what a name leads to.
 //
 // A name is visited once, and a built-in module is never loaded. A require is followed only when it is called
 // with one string literal: a module's name is what the bundle defines it by, so a name that is computed cannot
 // be followed. A failure of load is passed on as it is.
-func reached(entry string, load func(name string) (*Module, error)) ([]Module, error) {
+func reached(entry string, load func(name string) (found, error)) ([]Module, error) {
 	w := walk{load: load, state: map[string]int{}}
 	if err := w.visit(entry, required{}); err != nil {
 		return nil, err
@@ -59,7 +70,7 @@ const (
 
 // walk is one walk of the requires.
 type walk struct {
-	load    func(name string) (*Module, error)
+	load    func(name string) (found, error)
 	state   map[string]int // by name; 0 for a name the walk has not come to
 	stack   []string       // the names whose requires are being followed, from the entry down
 	ordered []Module       // the modules whose requires have all been followed
@@ -80,21 +91,24 @@ func (w *walk) visit(name string, at required) error {
 	if w.state[name] == visiting {
 		return errCircular(append(slices.Clone(w.stack[slices.Index(w.stack, name):]), name), at)
 	}
-	module, err := w.load(name)
+	led, err := w.load(name)
 	if err != nil {
 		return err
 	}
-	if module == nil {
+	switch {
+	case led.without != "":
+		return errNoCode(name, led.without, at)
+	case led.module == nil:
 		return errNoModule(name, at)
 	}
 	w.state[name] = visiting
 	w.stack = append(w.stack, name)
-	if err := w.follow(module); err != nil {
+	if err := w.follow(led.module); err != nil {
 		return err
 	}
 	w.stack = w.stack[:len(w.stack)-1]
 	w.state[name] = visited
-	w.ordered = append(w.ordered, *module)
+	w.ordered = append(w.ordered, *led.module)
 	return nil
 }
 
@@ -133,6 +147,20 @@ func errNoModule(name string, at required) error {
 		Line: at.line,
 		Hint: "Expected src/" + path + ".yue, lua/" + path + ".lua, lua/" + path + "/init.lua or a module of a library in " +
 			"moonwell.pkl. Built-in modules: " + strings.Join(Builtins, ", ") + ".",
+	}
+}
+
+// errNoCode refuses a module whose source, which is file, compiled to no Lua: there is nothing to put in the
+// bundle under its name. at is the require; the entry, which nothing requires, is refused at its own file.
+func errNoCode(name, file string, at required) error {
+	if at.file == "" {
+		at = required{file: file}
+	}
+	return &diag.Error{
+		Msg:  "Module '" + name + "' has no code.",
+		File: at.file,
+		Line: at.line,
+		Hint: "YueScript writes no Lua for a file without code, and " + file + " has none.",
 	}
 }
 

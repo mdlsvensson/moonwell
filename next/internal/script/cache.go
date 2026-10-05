@@ -20,9 +20,64 @@ const hashesFile = ".hashes.json"
 // dependsOn is what every output of a compile depends on beside its own source. A compile with another value
 // compiles every source again.
 type dependsOn struct {
-	Compiler string `json:"compiler"` // the compiler's path
-	Mode     string `json:"mode"`     // -r or -m
-	Macros   string `json:"macros"`   // the SHA-256 of the macro module
+	Compiler     string `json:"compiler"`     // the compiler's path
+	Mode         string `json:"mode"`         // -r or -m
+	Macros       string `json:"macros"`       // the SHA-256 of the macro module
+	MacroSources string `json:"macroSources"` // macroSourcesOf the YueScript sources; "" when none may define a macro
+}
+
+// macroSourcesOf is the member of what every output depends on that stands for the macros the project and its
+// libraries write themselves: the SHA-256 over the path and the hash, in the order of the paths' bytes, of every
+// YueScript source that holds the word `macro`; "" when no source holds it.
+//
+// A source imports macros from another source (`import "m" as {:$N}`), and what it compiles to, and the globals
+// it uses, are then that other source's as much as its own. Which source imports which is the compiler's to
+// know, so every source that may define a macro counts for every output: an edit, an arrival or a removal of
+// one compiles every source again, and an edit of any other source compiles that source alone.
+//
+// It follows the sources that Collect found, and nothing else. A Lua file or data that the body of a macro
+// loads while the compiler runs, and a macro module that the compiler finds outside the project's and the
+// libraries' sources, may change what a source compiles to without changing this.
+func macroSourcesOf(units []unit) string {
+	var holding []unit
+	for _, u := range units {
+		if holdsMacroWord(u.text) {
+			holding = append(holding, u)
+		}
+	}
+	if len(holding) == 0 {
+		return ""
+	}
+	slices.SortFunc(holding, func(a, b unit) int { return strings.Compare(a.path, b.path) })
+	var hashed strings.Builder
+	for _, u := range holding {
+		hashed.WriteString(u.path + "\x00" + u.hash + "\n")
+	}
+	return fsx.SHA256Hex([]byte(hashed.String()))
+}
+
+// holdsMacroWord reports whether a text holds the word `macro`: those five bytes with no letter, digit or "_"
+// of ASCII directly before or after. A source that defines a macro for others holds it (`export macro N`), and
+// so does one that only says the word in a comment or a string: the test errs on the side of yes. `macros`, as
+// in `import "moonwell.macros"`, is another word.
+func holdsMacroWord(text string) bool {
+	const word = "macro"
+	for from := 0; ; {
+		at := strings.Index(text[from:], word)
+		if at < 0 {
+			return false
+		}
+		start, end := from+at, from+at+len(word)
+		if (start == 0 || !joinsAWord(text[start-1])) && (end == len(text) || !joinsAWord(text[end])) {
+			return true
+		}
+		from = start + 1
+	}
+}
+
+// joinsAWord reports whether a byte beside a word makes it another word: a letter, a digit or "_" of ASCII.
+func joinsAWord(b byte) bool {
+	return b == '_' || (b >= '0' && b <= '9') || (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')
 }
 
 // hashes is the content of the hashes file: what the outputs depend on, and each source whose output is good,
@@ -115,8 +170,9 @@ const usesFile = ".globals.json"
 // listedWith is what every list of uses depends on beside its own source. A check with another value lists the
 // uses of every source again.
 type listedWith struct {
-	Compiler string `json:"compiler"` // the compiler's path
-	Macros   string `json:"macros"`   // the SHA-256 of the macro module
+	Compiler     string `json:"compiler"`     // the compiler's path
+	Macros       string `json:"macros"`       // the SHA-256 of the macro module
+	MacroSources string `json:"macroSources"` // macroSourcesOf the YueScript sources, as the compile found them
 }
 
 // keptUses is the content of the uses file: what the lists depend on, and each source that was listed, by its
@@ -128,8 +184,10 @@ type keptUses struct {
 
 // sourceUses is a source as the uses file keeps it.
 type sourceUses struct {
-	Hash string      `json:"hash"` // the SHA-256 of the source's bytes
-	Uses []globalUse `json:"uses"` // the globals it uses, in the order the compiler lists them; never nil
+	Hash string `json:"hash"` // the SHA-256 of the source's bytes
+	// Uses is the globals it uses, in the order the compiler lists them; never nil. A name goes through JSON, so
+	// one with bytes that are not UTF-8 would come back changed; no valid source gives such a name.
+	Uses []globalUse `json:"uses"`
 }
 
 // readUses is the lists of the last check that hold now: each source's, by its path, when they were made with

@@ -143,6 +143,23 @@ func TestAGlobalLineIsReadWithWhiteSpaceOfASCIIOnly(t *testing.T) {
 	}
 }
 
+func TestAGlobalLineInABlockCommentOrALongStringDeclaresItsNames(t *testing.T) {
+	// A source is read line by line, and not as YueScript: a line that starts with `global` declares its names
+	// wherever it stands, so a name that only a comment or a string declares is known, and its uses are not
+	// reported.
+	for source, want := range map[string][]string{
+		"--[[\nglobal Zzz\n]]\nprint Zzz\n":     {"Zzz"},
+		"text = [[\n  global a, b = 1, 2\n]]\n": {"a", "b"},
+		"--[==[\nglobal class Boss\n]==]\n":     {"Boss"},
+		"x = [[\nglobal Yyy = 1 ]]\n":           {"Yyy"},
+		"-- global Commented\n":                 nil, // a comment that starts the line is no `global` line
+	} {
+		if got := declaredGlobals(source); !slices.Equal(got, want) {
+			t.Errorf("declaredGlobals(%q) = %q, want %q", source, got, want)
+		}
+	}
+}
+
 func TestKnownGlobalsJoinsTheNativesTheMapDeclaredNamesAndLintGlobals(t *testing.T) {
 	mapGlobals := &lua.MapGlobals{Globals: []lua.Global{{Name: "udg_Score", Type: "integer"}}, Functions: []string{"InitCustomTriggers"}}
 	known := knownGlobals(smallAPI(), mapGlobals, []string{"Round"}, []string{"MyLibrary"})
@@ -354,7 +371,7 @@ func TestASourceTheCompilerCannotListFailsTheCheckBeforeAnyProblem(t *testing.T)
 
 func TestListUsesReadsWhatTheRealCompilerPrints(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", "global Score = 0\nprint CreatUnit!\nx = math.floor 1.5\nprint Score, x\n"))
-	uses, err := listUses(background, b.world, b.real(), b.search, []checked{{path: "src/main.yue", hash: "h"}})
+	uses, err := listUses(background, b.world, b.real(), b.search, "", []checked{{path: "src/main.yue", hash: "h"}})
 	want := map[string][]globalUse{"src/main.yue": {
 		{Name: "Score", Line: 1, Column: 8},
 		{Name: "print", Line: 2, Column: 1},
@@ -370,7 +387,7 @@ func TestListUsesReadsWhatTheRealCompilerPrints(t *testing.T) {
 
 func TestWithTheMacroPathTheCompilerListsNoGlobalForAFourCCCall(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", macroImport+"print $FourCC \"hfoo\"\n"))
-	uses, err := listUses(background, b.world, b.real(), b.search, []checked{{path: "src/main.yue", hash: "h"}})
+	uses, err := listUses(background, b.world, b.real(), b.search, "", []checked{{path: "src/main.yue", hash: "h"}})
 	want := map[string][]globalUse{"src/main.yue": {{Name: "print", Line: 2, Column: 1}}}
 	if err != nil || !maps.EqualFunc(uses, want, slices.Equal) {
 		t.Errorf("listUses = %+v, %v", uses, err)

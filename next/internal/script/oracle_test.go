@@ -8,6 +8,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"strings"
 	"sync"
@@ -98,7 +99,7 @@ import (
 //     tree's parts are its macro search, CollectModules, yue.Compile, EntryModuleName, ResolveGraph over Loader
 //     and lint.Check, which is handed what CompileProject hands it and reads the map's script itself; this tree
 //     is handed what the script defines. Each project is compiled twice, the second time with what the first
-//     left. Of each compile: the runs of the compiler, to compile and to list globals, by their sources;
+//     left, and for two cases after a file was written in between. Of each compile: the runs of the compiler, to compile and to list globals, by their sources;
 //     whether a file of uses is kept; what is refused (kind, message, file, line, column and hint, and for
 //     unknown globals every problem); else the entry's name, the modules in their order (name, path, whether
 //     Lua), the unknown globals that were let pass, the lines of the log, and, as bytes and never through JSON,
@@ -116,6 +117,34 @@ import (
 //     text. For what the compiler prints, one tree refuses and the other does not, or the two read other names;
 //     for a `global` line, the two read other names (TestWhatYueGPrintsIsReadWithWhiteSpaceOfASCIIOnly,
 //     TestAGlobalLineIsReadWithWhiteSpaceOfASCIIOnly).
+//   - A walk, or a compile of a project, that comes to a module whose YueScript source compiled to no Lua: a
+//     source without code. The other tree says that the module is not found, with a hint that expects the very
+//     file that is there; this tree says that the module has no code, with a hint that names the file. The
+//     class is decided on the other tree's result and on the input: "not found" for a name that a YueScript
+//     module without an output answers to. Both must refuse at the same line, and at the same file, but for the
+//     entry, which the other tree refuses at no file and this tree at the entry's own; this tree's message and
+//     hint must be those of a module without code. For a compile the runs of the compiler and whether a file of
+//     uses is kept are compared whole (TestReachedRefusesAModuleWithoutCodeAsOneAndNotAsOneThatIsNotFound,
+//     TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode).
+//   - The second compile of a project after a YueScript source that holds the word `macro` changed: a source
+//     that may define macros for the others. The other tree compiles that source alone, and keeps the Lua and
+//     the list of globals of a source that uses its macros as they were. This tree compiles every source and
+//     lists every reached one again. The class is decided on the project: the file written between the two
+//     compiles. This tree's compile is compared whole, runs and all, with the other tree's compile of the same
+//     files in a folder that was never compiled in; and the other tree's compile in the folder it has compiled
+//     in must have run the compiler less often and must give other Lua
+//     (TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReachedOneAgain,
+//     TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro). The same project with an edit of
+//     a source without the word is among the cases compared whole.
+//
+// Two things that both trees do alike, and that the cases hold so that it stays so:
+//
+//   - In a minified build a fault of the graph in a YueScript module is reported at line 1: the line of a
+//     require is its line in the module's Lua, and minified Lua is one line. The case "a missing module,
+//     minified" compares it (TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua).
+//   - A `global` line inside a block comment or a long string of a YueScript source declares its names: the
+//     source is read line by line. Two of the sources given to DeclaredGlobals are such
+//     (TestAGlobalLineInABlockCommentOrALongStringDeclaresItsNames).
 //   - A project with module files whose order by bytes is not their order by UTF-16 units, which is so only where
 //     one name has a character beyond the basic plane and another one from U+E000 to U+FFFF in its place. This
 //     tree lists the files of a folder in the order of their bytes. The class is decided on the other tree's
@@ -1911,17 +1940,65 @@ var seededGraphs = []graphCase{
 	{name: "Lua of every kind of line end", entry: "main", modules: []given{inSrc("main", "local a = 1\r\nrequire 'a'\rrequire 'b'\n\rrequire 'nope'"), inSrc("a", ""), inSrc("b", "")}},
 }
 
+// notFound is the name of the module that an error of the other tree says is not found; "" for any other error.
+func notFound(err error) string {
+	problem, _ := olddiag.First(err)
+	name, starts := strings.CutPrefix(problem.Msg, "Module '")
+	name, ends := strings.CutSuffix(name, "' not found.")
+	if !starts || !ends {
+		return ""
+	}
+	return name
+}
+
+// withoutOutput is the file of the YueScript module of a walk that answers to a name and has no output; "" when
+// there is none.
+func (c graphCase) withoutOutput(name string) string {
+	for _, module := range c.modules {
+		if module.noOutput && (module.name == name || module.name == name+".init") {
+			return module.path
+		}
+	}
+	return ""
+}
+
+// refusedForNoCode compares the refusals of a module whose source, which is file, compiled to no Lua. The other
+// tree says that the module is not found, and this tree that it has no code, with a hint that names the file.
+// Both refuse at the same line, and at the same file but for the entry, which the other tree refuses at no file
+// and this tree at the entry's own.
+func refusedForNoCode(t *testing.T, what, name, file string, wantErr, gotErr error) {
+	t.Helper()
+	want, wantIs := olddiag.First(wantErr)
+	got, gotIs := diag.First(gotErr)
+	at := want.File
+	if at == "" {
+		at = file
+	}
+	if !wantIs || !gotIs || got.Msg != "Module '"+name+"' has no code." || got.File != at || got.Line != want.Line || got.Column != want.Column ||
+		!strings.Contains(got.Hint, file) || got.Hint == want.Hint {
+		t.Errorf("%s: the other tree gives %+v and this tree %+v, which must refuse %s for the file %s without code, at %s and the same line",
+			what, want, got, name, file, at)
+	}
+}
+
 func TestOracleOnTheGraph(t *testing.T) {
 	var compared tally
 	for _, c := range slices.Concat(graphsOfTheOtherTreesTests, seededGraphs) {
 		want, wantErr := c.otherWalk()
 		got, gotErr := c.thisWalk()
+		// A module without an output: the place whole, and the words each tree's own.
+		if name := notFound(wantErr); c.withoutOutput(name) != "" {
+			refusedForNoCode(t, c.name, name, c.withoutOutput(name), wantErr, gotErr)
+			compared.inPart++
+			continue
+		}
 		if compared.whole(t, c.name, wantErr, gotErr) {
 			oracle.Values(t, c.name, want, got)
 		}
 	}
-	// Of the 14 walks of the other tree's tests 9 are refused, and of the 40 seeded ones 23.
-	compared.check(t, tally{refused: 32, results: 22})
+	// Of the 14 walks of the other tree's tests 8 are refused whole, and of the 40 seeded ones 21; in part, the 3
+	// walks that come to a module without an output.
+	compared.check(t, tally{refused: 29, results: 22, inPart: 3})
 }
 
 // ---- what yue -g prints ----
@@ -2023,6 +2100,9 @@ var globalLines = []string{
 	"local global a", "global a\n\tglobal b\n  \tglobal c, d = 1", "global " + eAcute + ", b", "global a" + beyond, "global \xff, b", "global a\x00b, c",
 	"global a = 1 -- " + eAcute + "\nglobal class " + eAcute + "B\nglobal class B" + eAcute,
 	"if x\n  global nested = 1\nelse\n  global other", "global a\n\n\nglobal a\nglobal a, a",
+	// A `global` line inside a block comment and inside a long string: both trees read the source line by line,
+	// and take the line for a declaration.
+	"--[[\nglobal Zzz\n]]\nprint Zzz\n", "text = [[\n  global a, b = 1, 2\n]]\n",
 }
 
 // globalLinesAnotherWay is sources with a character that the two trees read differently, in a place where it
@@ -2051,7 +2131,7 @@ func TestOracleOnTheNamesAGlobalLineDeclares(t *testing.T) {
 			t.Errorf("the names declared by %q: the other tree reads %q and this tree %q, which must differ", source, want, got)
 		}
 	}
-	compared.check(t, tally{results: 60, inPart: 9})
+	compared.check(t, tally{results: 62, inPart: 9})
 }
 
 // apiAs is a game API of a few names, as both trees are given it; embedded is the one the program carries.
@@ -2277,6 +2357,7 @@ type programCase struct {
 	warns   bool     // lint.unknownGlobals is "warning", and else "error"
 	globals []string // lint.globals
 	refused bool     // both trees refuse the project
+	then    []string // files written before the second compile, as pairs of a path and a text
 }
 
 func (c programCase) entryFile() string {
@@ -2420,36 +2501,131 @@ func hasUses(root string) bool {
 	return fsx.Exists(filepath.Join(root, "dist", "stage", "lua", ".globals.json"))
 }
 
-// programBoth gives both trees two compiles of a project into a program, the second of what the first left,
-// and compares each whole: the runs of the compiler, whether a file of uses is kept, what is refused, and the
-// program, of which the Lua as bytes.
-func programBoth(t *testing.T, yue string, c programCase, compared *compileTally) {
-	tr := twoTrees(t, c.of, yue)
-	for _, what := range []string{c.name, c.name + ", again"} {
-		want, wantLua, wantErr := tr.otherProgram(c)
-		got, gotLua, gotErr := tr.thisProgram(c)
-		tr.guard.Lock()
-		wantRan, gotRan := slices.Sorted(slices.Values(tr.otherRan)), slices.Sorted(slices.Values(tr.thisRan))
-		tr.otherRan, tr.thisRan = nil, nil
-		tr.guard.Unlock()
-		oracle.Values(t, what+": the runs of the compiler", wantRan, gotRan)
-		compared.runs += len(wantRan)
-		if hasUses(tr.other) != hasUses(tr.this) {
-			t.Errorf("%s: the other tree keeps a file of uses: %v, and this tree: %v", what, hasUses(tr.other), hasUses(tr.this))
-		}
-		if (wantErr != nil) != c.refused {
-			t.Errorf("%s: the other tree gives %v, and the case is one that is refused: %v", what, wantErr, c.refused)
-		}
-		if !compared.tally.whole(t, what, wantErr, gotErr) {
+// ran is the runs of the compiler by each tree since this was last asked, sorted.
+func (tr *trees) ran() (other, this []string) {
+	tr.guard.Lock()
+	defer tr.guard.Unlock()
+	other, this = slices.Sorted(slices.Values(tr.otherRan)), slices.Sorted(slices.Values(tr.thisRan))
+	tr.otherRan, tr.thisRan = nil, nil
+	return other, this
+}
+
+// programsAlike compares two programs whole, the Lua as bytes, and counts the texts of Lua it compared.
+func (c *compileTally) programsAlike(t *testing.T, what string, want, got programAs, wantLua, gotLua luaOfProgram) {
+	t.Helper()
+	oracle.Values(t, what, want, got)
+	oracle.Values(t, what+": the modules with Lua", slices.Sorted(maps.Keys(wantLua)), slices.Sorted(maps.Keys(gotLua)))
+	for name, text := range wantLua {
+		oracle.Bytes(t, what+": the Lua of "+name, []byte(text), []byte(gotLua[name]))
+		c.files++
+	}
+}
+
+// withoutCodeIn is the file of the YueScript module of a project that answers to a name and has no code; "" when
+// there is none.
+func withoutCodeIn(p project, name string) string {
+	for i := 0; i+1 < len(p.files); i += 2 {
+		path, text := p.files[i], p.files[i+1]
+		below, isYue := strings.CutSuffix(path, ".yue")
+		if !isYue || !withoutCode(text) {
 			continue
 		}
-		oracle.Values(t, what, want, got)
-		oracle.Values(t, what+": the modules with Lua", slices.Sorted(maps.Keys(wantLua)), slices.Sorted(maps.Keys(gotLua)))
-		for name, text := range wantLua {
-			oracle.Bytes(t, what+": the Lua of "+name, []byte(text), []byte(gotLua[name]))
-			compared.files++
+		if ofSrc, is := strings.CutPrefix(below, "src/"); is {
+			below = ofSrc
+		} else if inALibrary, is := strings.CutPrefix(below, librariesDir+"/"); is {
+			_, below, _ = strings.Cut(inALibrary, "/")
+		}
+		if module := strings.ReplaceAll(below, "/", "."); module == name || module == name+".init" {
+			return path
 		}
 	}
+	return ""
+}
+
+// programStep gives both trees one compile of a project into a program and compares it: the runs of the
+// compiler, whether a file of uses is kept, what is refused, and the program, of which the Lua as bytes. A
+// project that is refused for a module without code is compared in part: the place whole, and the words each
+// tree's own.
+func (c *compileTally) programStep(t *testing.T, tr *trees, of programCase, what string) {
+	t.Helper()
+	want, wantLua, wantErr := tr.otherProgram(of)
+	got, gotLua, gotErr := tr.thisProgram(of)
+	wantRan, gotRan := tr.ran()
+	oracle.Values(t, what+": the runs of the compiler", wantRan, gotRan)
+	c.runs += len(wantRan)
+	if hasUses(tr.other) != hasUses(tr.this) {
+		t.Errorf("%s: the other tree keeps a file of uses: %v, and this tree: %v", what, hasUses(tr.other), hasUses(tr.this))
+	}
+	if (wantErr != nil) != of.refused {
+		t.Errorf("%s: the other tree gives %v, and the case is one that is refused: %v", what, wantErr, of.refused)
+	}
+	if name := notFound(wantErr); withoutCodeIn(tr.of, name) != "" {
+		refusedForNoCode(t, what, name, withoutCodeIn(tr.of, name), wantErr, gotErr)
+		c.inPart++
+		return
+	}
+	if c.tally.whole(t, what, wantErr, gotErr) {
+		c.programsAlike(t, what, want, got, wantLua, gotLua)
+	}
+}
+
+// macroWord finds the word `macro`, with no letter, digit or "_" of ASCII beside it.
+var macroWord = regexp.MustCompile(`\bmacro\b`)
+
+// changesMacros reports whether the files a case writes before its second compile change a YueScript source
+// that holds the word `macro`, before or after: a source that may define macros for the others.
+func changesMacros(c programCase) bool {
+	before := map[string]string{}
+	for i := 0; i+1 < len(c.of.files); i += 2 {
+		before[c.of.files[i]] = c.of.files[i+1]
+	}
+	for i := 0; i+1 < len(c.then); i += 2 {
+		path, after := c.then[i], c.then[i+1]
+		if strings.HasSuffix(path, ".yue") && before[path] != after && (macroWord.MatchString(before[path]) || macroWord.MatchString(after)) {
+			return true
+		}
+	}
+	return false
+}
+
+// afterMacrosChanged gives both trees the second compile of a project in which a source that may define macros
+// changed. The other tree compiles that source alone, and keeps the Lua and the globals of the sources that use
+// its macros as they were; this tree compiles every source again. So this tree is compared whole with the other
+// tree's compile of the same files in a folder that was never compiled in, runs and all, and the other tree's
+// compile in the folder it has compiled in must have run on less and must give other Lua.
+func (c *compileTally) afterMacrosChanged(t *testing.T, tr *trees, of programCase, what string) {
+	t.Helper()
+	_, staleLua, staleErr := tr.otherProgram(of)
+	got, gotLua, gotErr := tr.thisProgram(of)
+	staleRan, gotRan := tr.ran()
+	fresh := twoTrees(t, tr.of, tr.yue)
+	want, wantLua, wantErr := fresh.otherProgram(of)
+	wantRan, _ := fresh.ran()
+	c.inPart++
+	oracle.Values(t, what+": the runs of the compiler, in a new folder and in this tree's", wantRan, gotRan)
+	c.runs += len(wantRan)
+	if staleErr != nil || len(staleRan) >= len(gotRan) || maps.Equal(staleLua, gotLua) {
+		t.Errorf("%s: the other tree ran the compiler as %q and this tree as %q, and the Lua of both is alike: %v (%v)",
+			what, staleRan, gotRan, maps.Equal(staleLua, gotLua), staleErr)
+	}
+	if !oracle.Refusals(t, what, wantErr, gotErr) && wantErr == nil && gotErr == nil {
+		c.programsAlike(t, what, want, got, wantLua, gotLua)
+	}
+}
+
+// programBoth gives both trees two compiles of a project into a program, in two folders of the case's own: the
+// second of what the first left, after the files the case writes in between. A second compile after a change
+// of a source that may define macros is compared in part, and every other compile as programStep says.
+func programBoth(t *testing.T, yue string, c programCase, compared *compileTally) {
+	tr := twoTrees(t, c.of, yue)
+	compared.programStep(t, tr, c, c.name)
+	tr.change(c.then, nil)
+	tr.of = c.of.and(c.then...)
+	if changesMacros(c) {
+		compared.afterMacrosChanged(t, tr, c, c.name+", after the change")
+		return
+	}
+	compared.programStep(t, tr, c, c.name+", again")
 }
 
 const (
@@ -2466,6 +2642,13 @@ var everyKind = files(
 ).with("ex").and(
 	inLibrary("ex", "kit/init.yue"), shoutYue, inLibrary("ex", "kit/extra.yue"), "export x = Undefined\n",
 	inLibrary("ex", "kit/notes.yue"), "-- nothing\n", inLibrary("ex", "plain.lua"), "return 1\n",
+)
+
+// ownMacros is a project with a macro module of its own, which one source imports a macro from, and a source
+// that uses none.
+var ownMacros = files(
+	"src/m.yue", "export macro N = -> \"Foo\"\n", "src/main.yue", "import \"m\" as {:$N}\nimport \"other\"\nprint $N!\n",
+	"src/other.yue", "export x = 1\n",
 )
 
 // programCases is projects that both trees must make the same program of, or refuse alike. A project with
@@ -2517,6 +2700,9 @@ var programCases = []programCase{
 	{name: "a cycle", refused: true, of: files("src/main.yue", "import \"a\"\n", "src/a.yue", "\nimport \"b\"\n", "src/b.yue", "import \"a\"\nprint Zzz\n")},
 	{name: "a computed require", refused: true, of: files("src/main.yue", "name = \"a\"\nx = require name\n")},
 	{name: "a missing module, minified", refused: true, minify: true, of: files("src/main.yue", "x = 1\n\nimport \"nope\"\n")},
+	// A macro module of the project's own, and an edit before the second compile.
+	{name: "a macro module of the project's own, edited", warns: true, of: ownMacros, then: []string{"src/m.yue", "export macro N = -> \"Bar\"\n"}},
+	{name: "a source beside a macro module, edited", warns: true, of: ownMacros, then: []string{"src/other.yue", "export x = Zzz\n"}},
 	// Several faults.
 	{name: "a dotted module name and a syntax error", refused: true, of: files("src/main.yue", badYue, "lua/a.b.lua", "")},
 	{name: "a syntax error and an unknown global", refused: true, of: files("src/main.yue", "import \"bad\"\nprint Zzz\n", "src/bad.yue", badYue)},
@@ -2536,9 +2722,16 @@ func TestOracleOnMakingAProgram(t *testing.T) {
 	sideBySide(t, &compared, programCases, func(c programCase) string { return c.name }, func(t *testing.T, c programCase, compared *compileTally) {
 		programBoth(t, yue, c, compared)
 	})
-	// The 34 projects, each compiled twice: 24 are refused and 10 are made a program of. Those programs hold 22
-	// modules, and their libraries 4 YueScript modules with Lua: 26 texts, each compared twice as bytes. The
-	// compiler runs 103 times for each tree: 65 times to compile and 27 to list globals in the first compiles, and
-	// 11 times in the second ones, to compile again the sources that were refused and those without code.
-	compared.total.check(t, compileTally{tally: tally{refused: 48, results: 20}, runs: 103, files: 52})
+	// The 36 projects, each compiled twice. 24 are refused, of which 2 for a module without code, which is
+	// compared in part: 44 refusals whole and 4 in part. 12 are made a program of; the second compile of one of
+	// them comes after an edit of its macro module and is compared in part: 23 results whole. Those programs hold
+	// 26 modules, and their libraries 4 YueScript modules with Lua: 30 texts, each compared twice as bytes.
+	//
+	// The compiler runs 121 times for each tree. For the 34 projects that no file is written in: 65 times to
+	// compile and 27 to list globals in the first compiles, and 11 times in the second ones, to compile again
+	// the sources that were refused and those without code. For each of the two projects with a macro module of
+	// their own: 3 times to compile and 2 to list; then, after the edit of the macro module, the same 5 again,
+	// in this tree's folder as in a new one; and after the edit of the other source, 3: that source compiled and
+	// listed, and the macro module, which compiles to no Lua and so is compiled in every compile.
+	compared.total.check(t, compileTally{tally: tally{refused: 44, results: 23, inPart: 5}, runs: 121, files: 60})
 }
