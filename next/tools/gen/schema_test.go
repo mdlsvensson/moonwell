@@ -388,8 +388,16 @@ func TestTheModeWithoutANameWritesTheCommittedSchemaFromTheCommittedMetadata(t *
 	if got := texts(files); !maps.Equal(got, want) {
 		t.Errorf("the checkout holds %q, and not all of them as they are committed", slices.Sorted(maps.Keys(got)))
 	}
-	if printed, files, err = c.run(); err != nil || printed != "" || !maps.Equal(texts(files), want) {
-		t.Errorf("the second run printed %q and ended with %v", printed, err)
+	printed, files, err = c.run()
+	if err != nil {
+		t.Fatalf("the second run: %v", err)
+	}
+	if printed != "" {
+		t.Errorf("the second run printed %q, want nothing", printed)
+	}
+	if got := texts(files); !maps.Equal(got, want) {
+		t.Errorf("after the second run the checkout holds %q, and not all of them as they are committed",
+			slices.Sorted(maps.Keys(got)))
 	}
 }
 

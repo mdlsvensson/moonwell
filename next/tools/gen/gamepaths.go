@@ -27,8 +27,7 @@ func writeGamePaths(checkout string, args []string, out io.Writer) error {
 	listFile, version := args[0], args[1]
 	data, err := os.ReadFile(listFile)
 	if err != nil {
-		// The system's error names the file as the command line does.
-		return err
+		return errFile(listFile, err)
 	}
 	text := renderGamePaths(fsx.DecodeText(data), version)
 	count := pathCount(text, version)

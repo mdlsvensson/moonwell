@@ -167,6 +167,8 @@ func TestTheModeGamePathsFailsAndKeepsTheExistingListWhenNoPathIsRecognized(t *t
 	}
 }
 
+// A file that the command line names is named in a failure as the line gave it, and its failure has the shape of
+// one on a file of the checkout: the path, then the system's reason.
 func TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid(t *testing.T) {
 	c := newCheckout(t)
 	c.write("data/game-paths.txt", "# Warcraft III 1.0.0\nunits/old.mdx\n")
@@ -175,7 +177,9 @@ func TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid(t *testing.T) {
 	if err == nil {
 		t.Fatal("a listfile that is not there was read")
 	}
-	contains(t, err.Error(), missing)
+	if !strings.HasPrefix(err.Error(), missing+": ") || strings.Count(err.Error(), missing) != 1 {
+		t.Errorf("got %q, want the path as the line gave it, once, and then the reason", err)
+	}
 	if printed != "" || string(files["data/game-paths.txt"]) != "# Warcraft III 1.0.0\nunits/old.mdx\n" {
 		t.Errorf("the refused run printed %q and left %q", printed, texts(files))
 	}

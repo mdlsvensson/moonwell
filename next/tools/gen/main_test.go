@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"maps"
+	"reflect"
 	"slices"
 	"strings"
 	"testing"
@@ -117,30 +118,92 @@ func TestRunRefusesAFolderThatIsInNoCheckout(t *testing.T) {
 	}
 }
 
+// A run in the checkout, one folder down and three down writes the schema into the checkout, and nothing into
+// the folder it is run in, whatever line ending and white space the go.mod has.
 func TestRunFindsTheCheckoutAtOrAboveTheFolderItIsRunIn(t *testing.T) {
 	for name, module := range map[string]string{
 		"a line feed":                       moduleFile,
 		"a carriage return and a line feed": "module github.com/mdlsvensson/moonwell\r\n\r\ngo 1.27\r\n",
 		"white space around the name":       "// Moonwell\nmodule \t github.com/mdlsvensson/moonwell  \ngo 1.27\n",
 	} {
-		c := newCheckout(t)
-		c.write("go.mod", module)
-		c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
-		for _, below := range []string{"", "schema", "tools/gen/slk"} {
+		for _, below := range []string{"", "tools", "tools/gen/slk"} {
+			c := newCheckout(t)
+			c.write("go.mod", module)
+			c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
+			dir := c.folder(below)
 			var out bytes.Buffer
-			if err := run(c.folder(below), nil, &out); err != nil {
+			if err := run(dir, nil, &out); err != nil {
 				t.Errorf("%s, run in %q: %v", name, below, err)
+				continue
 			}
-		}
-		got := texts(c.outputs())
-		if len(got) != 8 || !strings.Contains(got["schema/generated/BuffProps.pkl"], "\nname: Int?\n") {
-			t.Errorf("%s: the checkout holds %v", name, slices.Sorted(maps.Keys(got)))
+			if printed := out.String(); strings.Count(printed, "wrote schema/generated/") != 7 {
+				t.Errorf("%s, run in %q: printed %q, want a line for each of the seven files", name, below, printed)
+			}
+			got := texts(c.outputs())
+			if len(got) != 8 || !strings.Contains(got["schema/generated/BuffProps.pkl"], "\nname: Int?\n") {
+				t.Errorf("%s, run in %q: the checkout holds %v", name, below, slices.Sorted(maps.Keys(got)))
+			}
+			if left := testkit.Snapshot(t, dir); below != "" && len(left) != 0 {
+				t.Errorf("%s: the run wrote %v into the folder %q", name, slices.Sorted(maps.Keys(left)), below)
+			}
 		}
 	}
 }
 
-func TestTheErrorLineIsWhatAFailingRunPrints(t *testing.T) {
-	if got := errorLine(errors.New("Unknown mode 'x'.")); got != "error: Unknown mode 'x'.\n" {
-		t.Errorf("errorLine = %q", got)
+// A go.mod of another module, between the folder of the run and the checkout, is passed over: the run is in the
+// checkout above it, reads the metadata there and writes there.
+func TestRunPassesOverTheGoModOfAnotherModuleOnItsWayUp(t *testing.T) {
+	c := newCheckout(t)
+	c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
+	c.write("other/go.mod", "module example.com/other\n")
+	c.write("other/data/metadata.json", metadataOfOneBuff(t, "foth", "other"))
+	var out bytes.Buffer
+	if err := run(c.folder("other/deeper"), nil, &out); err != nil {
+		t.Fatal(err)
+	}
+	all := testkit.Snapshot(t, c.root)
+	if !strings.Contains(string(all["schema/generated/BuffProps.pkl"]), "\nname: Int?\n") {
+		t.Errorf("the checkout holds %v, and no schema of its own metadata", slices.Sorted(maps.Keys(all)))
+	}
+	if _, wrote := all["other/schema"]; wrote {
+		t.Error("the run wrote a schema into the folder of the other module")
+	}
+}
+
+// Of two checkouts, one inside the other, the run is in the nearer one, and the one above is left as it is.
+func TestRunTakesTheNearerOfTwoCheckouts(t *testing.T) {
+	outer := newCheckout(t)
+	outer.write("data/metadata.json", metadataOfOneBuff(t, "fabo", "above"))
+	outer.write("schema/generated/Stray.pkl", "stray\n")
+	above := outer.outputs()
+	inner := checkout{t, outer.folder("inner")}
+	inner.write("go.mod", moduleFile)
+	inner.write("data/metadata.json", metadataOfOneBuff(t, "fnea", "nearer"))
+	var out bytes.Buffer
+	if err := run(inner.folder("deeper"), nil, &out); err != nil {
+		t.Fatal(err)
+	}
+	got := texts(inner.outputs())
+	if len(got) != 8 || !strings.Contains(got["schema/generated/BuffProps.pkl"], "\nnearer: Int?\n") {
+		t.Errorf("the nearer checkout holds %v, and no schema of its own metadata", slices.Sorted(maps.Keys(got)))
+	}
+	if left := outer.outputs(); !reflect.DeepEqual(left, above) {
+		t.Errorf("the checkout above holds %v, want what it held", slices.Sorted(maps.Keys(left)))
+	}
+}
+
+func TestARunEndsWithNothingAndZeroOrWithItsErrorAndOne(t *testing.T) {
+	for _, c := range []struct {
+		err       error
+		complaint string
+		code      int
+	}{
+		{nil, "", 0},
+		{errors.New("Unknown mode 'x'."), "error: Unknown mode 'x'.\n", 1},
+		{errors.New("Cannot render the Pkl schema:\none\ntwo"), "error: Cannot render the Pkl schema:\none\ntwo\n", 1},
+	} {
+		if complaint, code := ending(c.err); complaint != c.complaint || code != c.code {
+			t.Errorf("ending(%v) = %q, %d, want %q, %d", c.err, complaint, code, c.complaint, c.code)
+		}
 	}
 }

@@ -31,28 +31,6 @@ var schemaModules = []schemaModule{
 	{"abilities", "Ability"}, {"buffs", "Buff"}, {"upgrades", "Upgrade"},
 }
 
-// The names that no field can have as its property. Every part of the generator that gives a field its name, or
-// checks one, reads these two lists, so that a name is refused where it is made and not only where the schema is
-// rendered.
-var (
-	// reservedNames is the names that an object module has of itself: the properties of Object.pkl (base, source,
-	// properties), the id that the module of each category declares, and output, which every Pkl module has.
-	reservedNames = []string{"id", "base", "source", "properties", "output"}
-
-	// pklKeywords is the keywords of Pkl 0.32 and the words it reserves for a later version.
-	pklKeywords = strings.Fields("abstract amends as case class const delete else extends external false fixed for " +
-		"function hidden if import in is let local module new nothing null open out outer override private protected " +
-		"public read record super switch this throw trace true typealias unknown vararg when")
-)
-
-// nameIsTaken reports whether Pkl or an object module has the name already, so that no field's property can.
-func nameIsTaken(name string) bool {
-	return slices.Contains(reservedNames, name) || slices.Contains(pklKeywords, name)
-}
-
-// pklIdentifier is a name that Pkl reads as an identifier without quoting it.
-var pklIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
-
 // writeSchema is the mode without a name: it writes schema/generated/ from the object metadata of the checkout,
 // and removes whatever else lies there, since the folder holds nothing but the schema. It prints a line for each
 // file it wrote, which is none for a file that was as rendered, and for each entry it removed. It writes and
@@ -247,6 +225,28 @@ func pklType(field objects.FieldMeta) string {
 func oneLine(text string) string {
 	return strings.Join(strings.FieldsFunc(text, func(r rune) bool { return strings.ContainsRune(whiteSpace, r) }), " ")
 }
+
+// The names that no field can have as its property. Every part of the generator that gives a field its name, or
+// checks one, reads these two lists, so that a name is refused where it is made and not only where the schema is
+// rendered.
+var (
+	// reservedNames is the names that an object module has of itself: the properties of Object.pkl (base, source,
+	// properties), the id that the module of each category declares, and output, which every Pkl module has.
+	reservedNames = []string{"id", "base", "source", "properties", "output"}
+
+	// pklKeywords is the keywords of Pkl 0.32 and the words it reserves for a later version.
+	pklKeywords = strings.Fields("abstract amends as case class const delete else extends external false fixed for " +
+		"function hidden if import in is let local module new nothing null open out outer override private protected " +
+		"public read record super switch this throw trace true typealias unknown vararg when")
+)
+
+// nameIsTaken reports whether Pkl or an object module has the name already, so that no field's property can.
+func nameIsTaken(name string) bool {
+	return slices.Contains(reservedNames, name) || slices.Contains(pklKeywords, name)
+}
+
+// pklIdentifier is a name that Pkl reads as an identifier without quoting it.
+var pklIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 
 // ---- errors ----
 

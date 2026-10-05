@@ -12,9 +12,11 @@
 // files, and files of the checkout. It returns an error or none: what it makes is files below data/ and
 // schema/generated/ of the checkout, and printed lines that say what it wrote.
 //
-// It must not know the folder of the process nor its two streams, which main alone touches: run is given the
-// folder and where to print, so a test runs a whole command line in a checkout of its own. It knows nothing of a
-// project or of a map either: the program is not built from it.
+// It must not know the two streams of the process, nor ask which folder it is run in: main alone does, and run
+// is given the folder to find the checkout from and where to print, so a test runs a whole command line in a
+// checkout of its own. A path among the arguments that is no full path is read from the folder of the process all
+// the same, as any program reads one. It knows nothing of a project or of a map either: the program is not built
+// from it.
 //
 // Of Moonwell's packages it imports objects and manifest, for the fields and the categories the schema is made
 // of, assets, for the types of file that are a texture, and fsx.
@@ -65,15 +67,20 @@ func main() {
 	if err == nil {
 		err = run(dir, os.Args[1:], os.Stdout)
 	}
-	if err != nil {
-		fmt.Fprint(os.Stderr, errorLine(err))
-		os.Exit(1)
-	}
+	complaint, code := ending(err)
+	fmt.Fprint(os.Stderr, complaint)
+	os.Exit(code)
 }
 
-// errorLine is what a run that failed prints to standard error: one line, or more for a failure that lists what
-// it found.
-func errorLine(err error) string { return "error: " + err.Error() + "\n" }
+// ending is how a run ends: what goes to standard error, and the exit code. A run without an error says nothing
+// there and ends with 0. A run with one says "error: " and the error's message, ended by a line break, and ends
+// with 1; the message of a failure that lists what it found is several lines.
+func ending(err error) (complaint string, code int) {
+	if err == nil {
+		return "", 0
+	}
+	return "error: " + err.Error() + "\n", 1
+}
 
 // run does what one command line of the generator asks, in the checkout at or above dir, and prints to out what
 // it wrote. It writes only below that checkout.
@@ -163,9 +170,10 @@ func errUnknownMode(table []mode, name string) error {
 // errUsage refuses a line that gives a mode more arguments than it takes, or fewer, with the mode's usage line.
 func errUsage(chosen mode) error { return errors.New(chosen.usage) }
 
-// errFile is a failure of the system on a file or a folder of the checkout. It names the file by its path from
-// the checkout, and gives the system's reason without the full path Go puts before it: what a run prints holds
-// no path of the checkout.
+// errFile is a failure of the system on a file or a folder: the path, and the system's reason without the
+// operation and the full path that Go puts before it. path names the file as the contributor knows it: one of the
+// checkout by its path from the checkout, so that what a run prints holds no path of the checkout, and one that
+// the command line names as the line gave it.
 func errFile(path string, cause error) error {
 	return fmt.Errorf("%s: %s", path, fsx.Reason(cause))
 }
