@@ -53,7 +53,9 @@ func EnsureLocalManifest(root string) (created bool, err error) {
 	path := filepath.Join(root, localManifest)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
 	switch {
-	case errors.Is(err, fs.ErrExist):
+	// The look at the name is there for a folder under it: one system says of it that it exists, as of a file,
+	// and another that it is a folder, which is no answer of "exists".
+	case errors.Is(err, fs.ErrExist), err != nil && isTaken(path):
 		return false, nil
 	case err != nil:
 		return false, errLocalManifestNotWritten(err)
@@ -68,6 +70,13 @@ func EnsureLocalManifest(root string) (created bool, err error) {
 		return false, errLocalManifestNotWritten(err)
 	}
 	return true, nil
+}
+
+// isTaken reports whether something is under the name at path: a file, a folder, or a link, wherever it leads.
+// The name itself is looked at, and a look that fails finds nothing.
+func isTaken(path string) bool {
+	info, err := fsx.Lstat(path)
+	return err == nil && info != nil
 }
 
 // ---- errors ----
