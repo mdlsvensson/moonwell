@@ -38,9 +38,9 @@ type place struct {
 }
 
 // placeOf is a place Moonwell writes, with the way to it looked at; label is its path from the project folder,
-// with "/". The refusals are those of output, and that of a file where a folder on the way belongs.
+// with "/". The refusals are those of outputAt, and that of a file where a folder on the way belongs.
 func placeOf(root, label string) (place, error) {
-	file, err := output(root, label)
+	file, err := outputAt(root, label)
 	if err != nil {
 		return place{}, err
 	}
@@ -53,7 +53,7 @@ func placeOf(root, label string) (place, error) {
 // fileOnTheWay is the first folder on the way to label that is a file; label is a path from the project folder,
 // with "/". What stands at label itself is not looked at.
 //
-// output takes a file on the way for a place that nothing is at, and what a system then says of a write or a
+// outputAt takes a file on the way for a place that nothing is at, and what a system then says of a write or a
 // removal below the file differs from system to system. So the file is refused by its name, before either.
 func fileOnTheWay(root, label string) (file string, found bool) {
 	for at, char := range label {
@@ -157,10 +157,8 @@ func clearedArchive(p *manifest.Project) (place, error) {
 // archiveOf is where the project's archive goes: <build.folder>/<map.folder> from the project folder. Nothing
 // need be at the place.
 //
-// A build removes what is at the place and writes a file there, so the place is refused, with the manifest as
-// its file, where that would harm the project: a folder at the place, and a place inside the source map, where
-// a link at the first folder of build.folder leads. A source map that cannot be opened is not looked at here:
-// the plan refuses it, and then no archive is written.
+// A build removes what is at the place and writes a file there, so a folder at the place is refused, with the
+// manifest as its file.
 func archiveOf(p *manifest.Project) (place, error) {
 	folder, err := mapFolder(p)
 	if err != nil {
@@ -176,9 +174,6 @@ func archiveOf(p *manifest.Project) (place, error) {
 	}
 	if fsx.IsDir(out.file) {
 		return place{}, errOutputIsAFolder(p.File, out.label)
-	}
-	if source, err := Source(p); err == nil && source.Holds(out.file) {
-		return place{}, errOutputInSourceMap(p.File, out.label, source.Label(""))
 	}
 	return out, nil
 }
@@ -211,8 +206,7 @@ func buildFolder(p *manifest.Project, folder string) (string, error) {
 // src or dist/stage, as isReservedFolder of schema/Project.pkl has them. The schema compares in lower case, which
 // for these names is the lower case of ASCII: no other letter becomes one of theirs.
 //
-// output takes the first folder of a path as it is, a link too, so a build.folder that starts with maps would
-// have a build write through a link at maps.
+// An archive in one of them would stand among the source maps, among the gameplay, or in the stage of a map.
 func keptFolder(parts []string) (kept string, found bool) {
 	first := lowerASCII(parts[0])
 	switch {
@@ -503,15 +497,6 @@ func errOutputIsAFolder(manifestFile, output string) error {
 		Msg:  "The build output " + output + " is a directory; refusing to replace it.",
 		File: manifestFile,
 		Hint: outputOnlyHint,
-	}
-}
-
-func errOutputInSourceMap(manifestFile, output, sourceMap string) error {
-	return &diag.Error{
-		Msg:  "The build output " + output + " is inside the source map " + sourceMap + ", where a link leads.",
-		File: manifestFile,
-		Hint: "Replace the link in build.folder with a real folder, or set build.folder to a folder that only holds " +
-			"build output, such as dist/bin.",
 	}
 }
 

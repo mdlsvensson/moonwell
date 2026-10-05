@@ -63,16 +63,17 @@ func ReleaseHeld() {
 }
 
 // lockPlace is where the lock of the project at root is on disk, in a dist folder that is there: it is made when
-// the project has none. The dist folder may be a link, as output says; a link in the lock's place is refused.
+// the project has none. A link at dist or in the lock's place is refused, as outputAt says, before the folder is
+// made: no lock is written outside the project.
 func lockPlace(root string) (string, error) {
-	dir, err := output(root, distDir)
+	dir, err := outputAt(root, distDir)
 	if err != nil {
 		return "", err
 	}
 	if err := os.MkdirAll(dir, 0o777); err != nil {
 		return "", errNoDist(err)
 	}
-	return output(root, lockName)
+	return outputAt(root, lockName)
 }
 
 // take makes the lock file and notes it as held, in one step under the list's mutex: a release of every lock

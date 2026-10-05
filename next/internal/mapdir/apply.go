@@ -12,13 +12,10 @@ import (
 
 // StageTo replaces dir with a copy of the folder and writes the view's changes into the copy. The folder itself is
 // only read: a dir that is the folder, a folder it is in or a folder inside it is refused, since replacing that
-// would remove or write the folder. It is refused by the two paths as they are written, and by the folders they
-// lead to, so also where a link on the way to dir ends in or around the map (Holds, liesIn). One case is not
-// seen: a map folder that is itself reached through a link, with a dir that is a folder above where that link
-// leads. A change with a name no file can have, and a new file named as a folder of the map or below a file of
-// it, is a planner's bug: the plan is refused with a plain error before dir is touched.
+// would remove or write the folder. A change with a name no file can have, and a new file named as a folder of the
+// map or below a file of it, is a planner's bug: the plan is refused with a plain error before dir is touched.
 func (f *Folder) StageTo(dir string) error {
-	if f.Holds(dir) || f.liesIn(dir) {
+	if fsx.IsWithin(dir, f.dir) || fsx.IsWithin(f.dir, dir) {
 		return errStageOverSource(dir, f.label)
 	}
 	if err := f.fits(); err != nil {
@@ -33,90 +30,6 @@ func (f *Folder) StageTo(dir string) error {
 		}
 	}
 	return nil
-}
-
-// Holds reports whether dir is the map folder or a place inside it. Nothing need be at dir.
-//
-// The two paths are compared as they are written, and then by the folders they lead to, so that a link on the way
-// to dir does not hide where it ends. Of dir, the nearest folder at or above it is looked at: below that folder
-// the way to dir holds no folder, so no link to one. dir is inside the map when that folder is the map folder or
-// a folder the scan found in it, or when a folder written above it is the map folder, which finds a folder that
-// was made in the map after the scan. Folders are told apart by os.SameFile, and no path is resolved: what
-// resolves a path does not see through a junction of Windows.
-func (f *Folder) Holds(dir string) bool {
-	if fsx.IsWithin(dir, f.dir) {
-		return true
-	}
-	source, err := os.Stat(f.dir)
-	if err != nil {
-		return false
-	}
-	there, found := nearest(dir)
-	return found && (isOrIsBelow(there, source) || f.hasFolderAt(there))
-}
-
-// liesIn reports whether the map folder is dir or a place inside it: by the two paths as they are written, and
-// then by whether what is at dir is the map folder or a folder written above it.
-//
-// The folders above the map are taken from its path as it is written. So a map folder whose path goes through a
-// link, such as a project folder that is one, has folders above where the link leads that are not looked at: a
-// dir that is one of those is not seen to hold the map.
-func (f *Folder) liesIn(dir string) bool {
-	if fsx.IsWithin(f.dir, dir) {
-		return true
-	}
-	place, err := os.Stat(dir)
-	if err != nil {
-		return false
-	}
-	source, err := filepath.Abs(f.dir)
-	return err == nil && isOrIsBelow(source, place)
-}
-
-// nearest is the nearest folder at or above dir, as dir is written. A file at dir, or on the way to it, is no
-// folder: the folder it is in is the one to look at.
-func nearest(dir string) (path string, found bool) {
-	path, err := filepath.Abs(dir)
-	if err != nil {
-		return "", false
-	}
-	for !fsx.IsDir(path) {
-		above := filepath.Dir(path)
-		if above == path {
-			return "", false
-		}
-		path = above
-	}
-	return path, true
-}
-
-// isOrIsBelow reports whether path, or a folder above it as path is written, is the folder that folder describes.
-func isOrIsBelow(path string, folder os.FileInfo) bool {
-	for {
-		if info, err := os.Stat(path); err == nil && os.SameFile(info, folder) {
-			return true
-		}
-		above := filepath.Dir(path)
-		if above == path {
-			return false
-		}
-		path = above
-	}
-}
-
-// hasFolderAt reports whether what is at path is a folder the scan found in the map.
-func (f *Folder) hasFolderAt(path string) bool {
-	there, err := os.Stat(path)
-	if err != nil {
-		return false
-	}
-	for _, folder := range f.found.folders {
-		info, err := os.Stat(filepath.Join(f.dir, filepath.FromSlash(folder)))
-		if err == nil && os.SameFile(info, there) {
-			return true
-		}
-	}
-	return false
 }
 
 // fits fails unless the whole plan can be written: every change has a name that fsx.RelPath takes, and the map has

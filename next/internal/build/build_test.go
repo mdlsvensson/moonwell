@@ -1,6 +1,7 @@
 package build
 
 import (
+	"cmp"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -336,6 +337,101 @@ func TestBuildRefusesAFileOnTheWayToItsStageAndToItsArchive(t *testing.T) {
 			}
 			if held, _ := os.ReadFile(s.at(tt.file)); string(held) != "a file" || fsx.Exists(lockOf(s.root)) {
 				t.Errorf("the file on the way holds %q, or the build left its lock", held)
+			}
+		})
+	}
+}
+
+// ---- a link where a folder of the output goes ----
+
+// linkedTo makes a link in the stand-in project to a folder that holds a file: target is that folder from the
+// project folder, or "" for a folder outside the project. It returns the folder and what it and the project's
+// maps hold, for a look at both after the command.
+func linkedTo(t testing.TB, s *standIn, link, target string) (leadsTo string, before [2]map[string][]byte) {
+	t.Helper()
+	leadsTo = t.TempDir()
+	if target != "" {
+		leadsTo = s.folder(target)
+	}
+	testkit.WriteFile(t, leadsTo, "kept.txt", []byte("kept"))
+	s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash(link))))
+	before = [2]map[string][]byte{testkit.Snapshot(t, leadsTo), testkit.Snapshot(t, s.at("maps"))}
+	testkit.LinkDir(t, leadsTo, s.at(link))
+	return leadsTo, before
+}
+
+// untouched reports whether the folder a link leads to, and the project's maps, hold what they held.
+func untouched(t testing.TB, s *standIn, leadsTo string, before [2]map[string][]byte) bool {
+	t.Helper()
+	return reflect.DeepEqual(testkit.Snapshot(t, leadsTo), before[0]) &&
+		reflect.DeepEqual(testkit.Snapshot(t, s.at("maps")), before[1])
+}
+
+// dist is a real folder of the project. A link in its place is refused when the lock is taken, which is before
+// anything is written: so nothing is written where the link leads, not into the source map either.
+func TestEveryDoorRefusesALinkAtDistBeforeItWritesAnything(t *testing.T) {
+	for _, d := range doors {
+		for _, target := range []string{"", "maps/map.w3x", "maps"} {
+			t.Run(d.name+" with dist to "+cmp.Or(target, "a folder outside the project"), func(t *testing.T) {
+				s := newStandIn(t)
+				s.withInfo(modernInfo)
+				leadsTo, before := linkedTo(t, s, "dist", target)
+				e := asError(t, d.run(s), "dist as a link")
+				if e.File != "dist" || !strings.HasPrefix(e.Msg, "dist is a link: ") ||
+					!strings.Contains(e.Hint, "Remove the link (or Windows junction) at dist") {
+					t.Errorf("error = %+v", e)
+				}
+				ReleaseHeld()
+				if !untouched(t, s, leadsTo, before) || len(s.compilerRan()) != 0 {
+					t.Error("the refused command wrote where the link leads or into the maps, or compiled")
+				}
+			})
+		}
+	}
+}
+
+// A link at dist/stage is met first by the compile, which keeps its cache below it and refuses the link in the
+// words fsx has for one, by its place on disk. Nothing is written where the link leads.
+func TestEveryDoorRefusesALinkAtDistStage(t *testing.T) {
+	for _, d := range doors {
+		t.Run(d.name, func(t *testing.T) {
+			s := newStandIn(t)
+			s.withInfo(modernInfo)
+			leadsTo, before := linkedTo(t, s, "dist/stage", "")
+			e := asError(t, d.run(s), "dist/stage as a link")
+			if !strings.Contains(e.Msg, "Symlinks are not supported: "+s.at("dist/stage")) || e.Hint == "" {
+				t.Errorf("error = %+v", e)
+			}
+			if !untouched(t, s, leadsTo, before) || len(s.compilerRan()) != 0 {
+				t.Error("the refused command wrote where the link leads or into the maps, or compiled")
+			}
+			if fsx.Exists(lockOf(s.root)) || fsx.Exists(s.at("dist/bin")) {
+				t.Error("the refused command left its lock or an archive")
+			}
+		})
+	}
+}
+
+// The archive's place is Build's alone: Test and Check look at no folder of build.folder.
+func TestBuildRefusesALinkAtTheFirstFolderOfBuildFolderBeforeItPlans(t *testing.T) {
+	for _, target := range []string{"", "maps/map.w3x"} {
+		t.Run("to "+cmp.Or(target, "a folder outside the project"), func(t *testing.T) {
+			s := newStandIn(t, `"build":{"folder":"out/bin","minify":false}`)
+			s.withInfo(modernInfo)
+			// A file where the link leads that has the name of the archive, which a build removes.
+			leadsTo, _ := linkedTo(t, s, "out", target)
+			testkit.WriteFile(t, leadsTo, "bin/map.w3x", []byte("not an archive of this build"))
+			before := [2]map[string][]byte{testkit.Snapshot(t, leadsTo), testkit.Snapshot(t, s.at("maps"))}
+			file, err := Build(background, s.env, Options{})
+			e := asError(t, err, "the first folder of build.folder as a link")
+			if file != "" || e.File != "out/bin/map.w3x" || !strings.HasPrefix(e.Msg, "out is a link: ") {
+				t.Errorf("Build = %q, %+v", file, e)
+			}
+			if !untouched(t, s, leadsTo, before) || len(s.compilerRan()) != 0 {
+				t.Error("the refused build wrote or removed where the link leads, or compiled")
+			}
+			if fsx.Exists(lockOf(s.root)) {
+				t.Error("the refused build left its lock")
 			}
 		})
 	}

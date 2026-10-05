@@ -3,6 +3,7 @@ package build
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -76,23 +77,24 @@ func TestAReleaseLeavesTheLockOfALaterAcquisitionAlone(t *testing.T) {
 	}
 }
 
-func TestAcquireTakesTheLockBehindADistFolderThatIsALink(t *testing.T) {
-	needNewFilesBehindALink(t)
+func TestAcquireRefusesADistFolderThatIsALink(t *testing.T) {
 	root, elsewhere := t.TempDir(), t.TempDir()
+	testkit.WriteFile(t, elsewhere, "kept.txt", []byte("kept"))
+	before := testkit.Snapshot(t, elsewhere)
 	testkit.LinkDir(t, elsewhere, filepath.Join(root, "dist"))
 	release, err := Acquire(root)
-	if err != nil {
-		t.Fatal(diag.Format(err))
+	e := asError(t, err, "dist as a link")
+	if release != nil || e.File != "dist" || !strings.HasPrefix(e.Msg, "dist is a link: ") ||
+		!strings.Contains(e.Hint, "Remove the link (or Windows junction) at dist") || e.Cause != nil {
+		t.Errorf("error = %+v", e)
 	}
-	if data, _ := os.ReadFile(filepath.Join(elsewhere, ".lock")); string(data) != strconv.Itoa(os.Getpid()) {
-		t.Errorf("behind the link the lock holds %q", data)
+	// No lock is written through the link, and none is held.
+	if !reflect.DeepEqual(testkit.Snapshot(t, elsewhere), before) {
+		t.Errorf("the folder the link leads to holds %q", testkit.Snapshot(t, elsewhere))
 	}
-	if !lockIsHeld(t, root) {
-		t.Error("a second build took the lock behind the link")
-	}
-	release()
-	if held := testkit.Snapshot(t, elsewhere); len(held) != 0 {
-		t.Errorf("after the release the folder behind the link holds %q", held)
+	ReleaseHeld()
+	if !reflect.DeepEqual(testkit.Snapshot(t, elsewhere), before) {
+		t.Error("a release of every lock removed a file where the link leads")
 	}
 }
 
@@ -117,7 +119,7 @@ func TestAcquireRefusesAFileLinkInTheLocksPlace(t *testing.T) {
 			testkit.LinkFile(t, target, lockOf(root))
 			release, err := Acquire(root)
 			e := asError(t, err, tt.name)
-			if release != nil || e.File != "dist/.lock" || !strings.Contains(e.Msg, "Symlinks are not supported") {
+			if release != nil || e.File != "dist/.lock" || !strings.HasPrefix(e.Msg, "dist/.lock is a link: ") {
 				t.Errorf("error = %+v", e)
 			}
 			// Nothing is written through the link: what it leads to is as it was.
@@ -336,7 +338,7 @@ func TestAcquireRefusesAFolderLinkInTheLocksPlace(t *testing.T) {
 	testkit.LinkDir(t, t.TempDir(), lockOf(root))
 	release, err := Acquire(root)
 	e := asError(t, err, "the lock as a link")
-	if release != nil || e.File != "dist/.lock" || !strings.Contains(e.Msg, "Symlinks are not supported") {
+	if release != nil || e.File != "dist/.lock" || !strings.HasPrefix(e.Msg, "dist/.lock is a link: ") {
 		t.Errorf("error = %+v", e)
 	}
 }

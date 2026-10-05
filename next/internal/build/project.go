@@ -186,29 +186,46 @@ func StateFile(p *manifest.Project) (string, error) {
 	return assets.StateFile(p.Root, folder)
 }
 
-// output is the way to every place Moonwell writes what it builds: relative is the place from the project
+// outputAt is the way to every place Moonwell writes what it builds: relative is the place from the project
 // folder, with "/", such as dist/.lock. Nothing need be at the place.
 //
-// The first folder of the path is the user's own, and is taken as it is, a link too: dist/ may be a junction that
-// sends what is built off a folder another program keeps in step. Nothing is looked at for it. Everything below
-// it is Moonwell's, and is reached with fsx.Inside from that folder: a link below it, a path that leaves it and a
-// name Windows cannot hold are refused, with the whole path from the project folder as their file.
-func output(root, relative string) (string, error) {
+// The place is reached with fsx.Inside, so every folder on the way to it is a real folder of the project, the
+// first too: what a build writes, and what it removes to write it, stays in the project. A link on the way, or
+// at the place, is refused in words of this package's own, since what fsx.Inside says of a link is said of files
+// the user keeps, and these are Moonwell's to make. fsx.Inside's other refusals are passed on: a path that leaves
+// the project, a name Windows cannot hold, and a way the system cannot look at.
+func outputAt(root, relative string) (string, error) {
+	place, err := fsx.Inside(root, relative)
+	if err == nil {
+		return place, nil
+	}
+	if link, found := linkOnTheWay(root, relative); found {
+		return "", errLinkedOutput(link, relative)
+	}
+	return "", err
+}
+
+// linkOnTheWay is the first step of the way to relative that is a link, as a path from the project folder with
+// "/". It is found by a look at each step, the first step first, and not by what a refusal says: fsx names no
+// kind of refusal. A path that fsx.RelPath does not take has no steps to look at.
+func linkOnTheWay(root, relative string) (link string, found bool) {
 	slashed, portable := fsx.RelPath(relative)
 	if !portable {
-		// fsx.Inside refuses such a path in its own words, before it looks at any step.
-		return fsx.Inside(root, relative)
+		return "", false
 	}
-	first, below, nested := strings.Cut(slashed, "/")
-	top := filepath.Join(root, first)
-	if !nested {
-		return top, nil
+	for end := 1; end <= len(slashed); end++ {
+		if end < len(slashed) && slashed[end] != '/' {
+			continue
+		}
+		info, err := fsx.Lstat(filepath.Join(root, filepath.FromSlash(slashed[:end])))
+		if err != nil || info == nil {
+			return "", false // nothing is below a step that is not there, or that cannot be looked at
+		}
+		if fsx.IsLink(info) {
+			return slashed[:end], true
+		}
 	}
-	place, err := fsx.Inside(top, below)
-	if err != nil {
-		return "", errBelowOutput(err, below, relative)
-	}
-	return place, nil
+	return "", false
 }
 
 // ---- errors ----
@@ -240,20 +257,13 @@ func errFolderForScript(folder, file string) error {
 	}
 }
 
-// errBelowOutput is a refusal of fsx.Inside for the part of an output place below its first folder, named by the
-// whole path from the project folder: that path is its file, and takes the part's place in the one message that
-// starts with the part, that of a place the system cannot look at. A refusal in other words stays as it is said,
-// also below a folder that is named as its first word.
-func errBelowOutput(err error, below, relative string) error {
-	var refused *diag.Error
-	if !errors.As(err, &refused) {
-		return err
+// errLinkedOutput is the refusal of a link on the way to a place Moonwell writes: link is the step that is one,
+// and file the place, both from the project folder.
+func errLinkedOutput(link, file string) error {
+	return &diag.Error{
+		Msg:  link + " is a link: Moonwell writes what it builds into real files and folders.",
+		File: file,
+		Hint: "Remove the link (or Windows junction) at " + link + ", then try again: Moonwell makes what it needs " +
+			"there.",
 	}
-	named := *refused
-	named.File = relative
-	const unreachable = " cannot be reached: "
-	if reason, isUnreachable := strings.CutPrefix(named.Msg, below+unreachable); isUnreachable {
-		named.Msg = relative + unreachable + reason
-	}
-	return &named
 }

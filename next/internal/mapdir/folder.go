@@ -32,8 +32,7 @@
 // refuses all three before that: the first with a plain error, since a planner hands it a fixed name or one it has
 // checked, and the last two with an error a user can act on, which names what is in the way as its file. So a plan
 // refused by this check is its planner's bug, and the error is a plain one. StageTo also refuses to stage over the
-// source map, where the stage's path says so and where a link on it leads there. Holds tells a caller whether a
-// place of its own is in the map, by the same look.
+// source map.
 //
 // ApplyInPlace writes only where the folder is still what was seen. Before each write it checks the file: one the
 // scan found must be there, with the bytes that were read if any view of the folder read it, and one the scan did

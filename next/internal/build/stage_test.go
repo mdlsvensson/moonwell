@@ -447,40 +447,38 @@ func TestArchiveOfRefusesAFileOnTheWayToTheArchiveByItsName(t *testing.T) {
 	}
 }
 
-// The first folder of build.folder may be a link. One that leads into the source map would have the build
-// remove and write a file of the map.
-func TestArchiveOfRefusesAPlaceInsideTheSourceMapThroughALink(t *testing.T) {
+// Every folder on the way to the archive is a real one, the first folder of build.folder too: behind a link, a
+// build would remove and write a file where the link leads, which may be the source map.
+func TestArchiveOfRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 	tests := []struct {
 		name    string
-		target  string // what the folder out is a link to, from the project folder
-		refused bool
+		written string // build.folder
+		link    string // the step that is a link, from the project folder
+		target  string // what it is a link to, from the project folder
 	}{
-		{"the source map", "maps/map.w3x", true},
-		{"a folder of the source map", "maps/map.w3x/war3mapImported", true},
-		{"a folder beside the source map", "maps/other", false},
+		{"the first folder, to the source map", "out", "out", "maps/map.w3x/war3mapImported"},
+		{"the first folder, to a folder beside the source map", "out", "out", "maps/other"},
+		{"a folder below the first", "dist/bin", "dist/bin", "maps/other"},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(strings.ReplaceAll(tt.name, ",", ""), func(t *testing.T) {
 			root := t.TempDir()
-			testkit.WriteFile(t, root, "maps/map.w3x/war3mapImported/a.txt", []byte("asset"))
-			// A file of the map that has the archive's name: the place is inside the map with a file at it too.
+			// A file of the map that has the archive's name, where the first link leads.
 			testkit.WriteFile(t, root, "maps/map.w3x/war3mapImported/map.w3x", []byte("a file of the map"))
-			testkit.WriteFile(t, root, "maps/other/kept.txt", []byte("kept"))
+			testkit.WriteFile(t, root, "maps/other/map.w3x", []byte("a file beside the map"))
 			maps := testkit.Snapshot(t, filepath.Join(root, "maps"))
-			testkit.LinkDir(t, filepath.Join(root, filepath.FromSlash(tt.target)), filepath.Join(root, "out"))
-			at, err := archiveOf(projectWith(root, "out", localManifest))
-			if !tt.refused {
-				if err != nil || at.label != "out/map.w3x" {
-					t.Errorf("archiveOf = %+v, %v", at, err)
-				}
-				return
+			if err := os.MkdirAll(filepath.Dir(filepath.Join(root, filepath.FromSlash(tt.link))), 0o777); err != nil {
+				t.Fatal(err)
 			}
-			e := asError(t, err, "an archive in the source map")
-			if !strings.Contains(e.Msg, "inside the source map "+mapLabel) || e.File != localManifest || e.Hint == "" {
+			testkit.LinkDir(t, filepath.Join(root, filepath.FromSlash(tt.target)),
+				filepath.Join(root, filepath.FromSlash(tt.link)))
+			_, err := clearedArchive(projectWith(root, tt.written, localManifest))
+			e := asError(t, err, "a link on the way to the archive")
+			if !strings.HasPrefix(e.Msg, tt.link+" is a link: ") || e.File != tt.written+"/map.w3x" || e.Hint == "" {
 				t.Errorf("error = %+v", e)
 			}
 			if !reflect.DeepEqual(testkit.Snapshot(t, filepath.Join(root, "maps")), maps) {
-				t.Error("the look for the archive's place changed the maps")
+				t.Error("the look for the archive's place changed what the link leads to")
 			}
 		})
 	}
@@ -596,77 +594,43 @@ func TestStageNamesTheStageItCouldNotWriteFromTheProjectFolder(t *testing.T) {
 	}
 }
 
-// The stage is refused where it is the source map or lies inside it, also where only a link says so. dist may
-// be a link, and one that leads into the source map would have the map replaced by its own copy.
-func TestStageRefusesAStageInsideTheSourceMapThroughALinkAtDist(t *testing.T) {
+// Every folder on the way to the stage is a real one, dist too: behind a link the stage could be the source map
+// or lie in it, and staging would replace the map by its own copy.
+func TestStageRefusesALinkOnTheWayToTheStageByItsStep(t *testing.T) {
 	tests := []struct {
 		name   string
-		target string // what dist is a link to, from the project folder
+		link   string // the step that is a link, from the project folder
+		target string // what it is a link to, from the project folder
 	}{
-		{"the source map", "maps/map.w3x"},
-		{"a folder of the source map", "maps/map.w3x/war3mapImported"},
+		{"dist to the source map", "dist", "maps/map.w3x"},
+		{"dist to a folder of the source map", "dist", "maps/map.w3x/war3mapImported"},
+		{"dist to the folder the source map is in", "dist", "maps"},
+		{"dist/stage to a folder beside the source map", "dist/stage", "maps/other"},
+		{"the stage itself to the source map", "dist/stage/map.w3x", "maps/map.w3x"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t)
 			s.put("maps/map.w3x/war3mapImported/a.txt", "asset")
+			s.put("maps/other/kept.txt", "kept")
+			// The plan is made, and the compile's cache written, with a dist of the project's own: the link is
+			// there for the stage alone.
 			plan := planOf(t, s, Options{})
-			// The plan is made, and its cache written, with a dist of the project's own: the link is there for the
-			// stage alone, so that the map shows what the stage does to it.
-			s.remove("dist")
-			testkit.LinkDir(t, s.at(tt.target), s.at("dist"))
-			source := testkit.Snapshot(t, s.at("maps"))
+			s.remove(tt.link)
+			testkit.LinkDir(t, s.at(tt.target), s.at(tt.link))
+			maps := testkit.Snapshot(t, s.at("maps"))
 			_, err := stage(s.env, s.project, plan)
-			e := asError(t, err, "a stage in the source map")
-			if !strings.Contains(e.Msg, "would replace the source map") || e.File != mapLabel || e.Hint == "" {
+			e := asError(t, err, "a link on the way to the stage")
+			if !strings.HasPrefix(e.Msg, tt.link+" is a link: ") || e.File != "dist/stage/map.w3x" || e.Hint == "" {
 				t.Errorf("error = %+v", e)
 			}
-			if !reflect.DeepEqual(testkit.Snapshot(t, s.at("maps")), source) {
-				t.Error("the refused stage changed the source map")
+			if !reflect.DeepEqual(testkit.Snapshot(t, s.at("maps")), maps) {
+				t.Error("the refused stage changed the maps")
 			}
 			if lines := s.log.Lines(); len(lines) != 0 {
 				t.Errorf("logged %q", lines)
 			}
 		})
-	}
-}
-
-func TestStageRefusesALinkBelowDistOnTheWayToTheStage(t *testing.T) {
-	s := newStandIn(t)
-	plan := planOf(t, s, Options{})
-	elsewhere := t.TempDir()
-	s.remove("dist/stage")
-	testkit.LinkDir(t, elsewhere, s.at("dist/stage"))
-	_, err := stage(s.env, s.project, plan)
-	e := asError(t, err, "dist/stage as a link")
-	if !strings.Contains(e.Msg, "Symlinks are not supported") || e.File != "dist/stage/map.w3x" {
-		t.Errorf("error = %+v", e)
-	}
-	if held := testkit.Snapshot(t, elsewhere); len(held) != 0 {
-		t.Errorf("the folder the link leads to holds %q", held)
-	}
-}
-
-// dist may be a link to a folder beside the source map: the stage then lies in the folder the map is in, and is
-// no part of the map.
-func TestStageWritesBehindALinkAtDistThatLeadsBesideTheSourceMap(t *testing.T) {
-	needNewFilesBehindALink(t)
-	s := newStandIn(t)
-	// The plan is made with a dist of the project's own: the compile refuses a link on the way to its cache.
-	plan := planOf(t, s, Options{})
-	s.remove("dist")
-	testkit.LinkDir(t, s.at("maps"), s.at("dist"))
-	source := testkit.Snapshot(t, s.at("maps/map.w3x"))
-	at := stagedOf(t, s, plan)
-	if at.label != "dist/stage/map.w3x" {
-		t.Errorf("staged at %+v", at)
-	}
-	staged, _ := os.ReadFile(s.at("maps/stage/map.w3x/war3map.lua"))
-	if string(staged) != heldBy(t, plan.Map, "war3map.lua") {
-		t.Error("the stage behind the link does not hold the planned script")
-	}
-	if !reflect.DeepEqual(testkit.Snapshot(t, s.at("maps/map.w3x")), source) {
-		t.Error("staging changed the source map")
 	}
 }
 
