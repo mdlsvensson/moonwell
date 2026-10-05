@@ -2636,7 +2636,7 @@ func (tr *trees) thisProgram(c programCase) (programAs, luaOfProgram, error) {
 	world, log := testkit.Env(tr.t, tr.this)
 	world.Run = tr.thisRun
 	in := Input{
-		Yue: tr.yue, Entry: c.entryFile(), Minify: c.minify, Libraries: tr.of.libraries(),
+		Compiler: tr.yue, Entry: c.entryFile(), Minify: c.minify, Libraries: tr.of.libraries(),
 		Lint: manifest.Lint{UnknownGlobals: c.lintMode(), Globals: c.globals}, Natives: LoadNatives(),
 	}
 	if script, err := os.ReadFile(filepath.Join(tr.this, filepath.FromSlash(mapScript))); err == nil {

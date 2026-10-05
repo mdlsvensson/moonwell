@@ -238,7 +238,7 @@ func checkOf(t *testing.T, sources []string, printed map[string]string, lint man
 	b := &checkBench{t: t, yue: &listing{t: t, root: root, printed: map[string]env.RunResult{}}}
 	b.world, b.log = testkit.Env(t, root)
 	b.world.Run = b.yue.run
-	b.in = Input{Yue: "yue", Lint: lint, Natives: smallAPI()}
+	b.in = Input{Compiler: "yue", Lint: lint, Natives: smallAPI()}
 	if mapScript != "" {
 		b.in.Map = mapGlobalsOf(mapScript)
 	}

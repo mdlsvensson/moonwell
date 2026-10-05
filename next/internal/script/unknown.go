@@ -23,7 +23,7 @@ import (
 // any unknown use fails, with a diag.Problems that holds all of them; else they are logged as warnings and
 // returned.
 func unknownGlobals(ctx context.Context, e *env.Env, in Input, m macros, output *compiled, modules []Module) ([]diag.Problem, error) {
-	uses, err := listUses(ctx, e, in.Yue, m, output.macroSources, checkedAmong(modules, output))
+	uses, err := listUses(ctx, e, in.Compiler, m, output.macroSources, checkedAmong(modules, output))
 	if err != nil {
 		return nil, err
 	}

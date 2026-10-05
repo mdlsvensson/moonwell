@@ -3,8 +3,10 @@ package script
 import (
 	"context"
 	"errors"
+	"maps"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"sync"
@@ -47,7 +49,7 @@ func programAt(t *testing.T, root string, p project) *programBench {
 	t.Helper()
 	b := &programBench{t: t, root: root}
 	b.world, b.log = testkit.Env(t, root)
-	b.in = Input{Yue: fakeYue, Entry: "src/main.yue", Libraries: p.libraries(), Lint: asErrors, Natives: smallAPI()}
+	b.in = Input{Compiler: fakeYue, Entry: "src/main.yue", Libraries: p.libraries(), Lint: asErrors, Natives: smallAPI()}
 	return b
 }
 
@@ -117,11 +119,29 @@ func mapGlobalsOf(script string) *lua.MapGlobals {
 // sourceAt is the module at a path among those a program found.
 func sourceAt(t *testing.T, program *Program, path string) Source {
 	t.Helper()
-	at := slices.IndexFunc(program.Sources, func(source Source) bool { return source.Path == path })
+	return sourceIn(t, program.Sources, path)
+}
+
+// sourceIn is the module at a path among sources.
+func sourceIn(t *testing.T, sources []Source, path string) Source {
+	t.Helper()
+	at := slices.IndexFunc(sources, func(source Source) bool { return source.Path == path })
 	if at < 0 {
-		t.Fatalf("the program found no module at %s", path)
+		t.Fatalf("no module at %s was found", path)
 	}
-	return program.Sources[at]
+	return sources[at]
+}
+
+// luaOfEach is what lua gives for each of the sources, by the source's path; a source without Lua is not among
+// them.
+func luaOfEach(sources []Source, lua func(Source) (string, bool)) map[string]string {
+	texts := map[string]string{}
+	for _, source := range sources {
+		if text, ok := lua(source); ok {
+			texts[source.Path] = text
+		}
+	}
+	return texts
 }
 
 func TestCompileTurnsAProjectIntoAProgramWithTheRealCompiler(t *testing.T) {
@@ -139,7 +159,7 @@ func TestCompileTurnsAProjectIntoAProgramWithTheRealCompiler(t *testing.T) {
 	)
 	b := programOf(t, p)
 	b.world.Run = env.Run
-	b.in.Yue, b.in.Natives = yue, LoadNatives()
+	b.in.Compiler, b.in.Natives = yue, LoadNatives()
 	program := b.compiles()
 
 	type moduleAt struct{ Name, Path, Library string }
@@ -358,7 +378,7 @@ func TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua(t *testing.
 	for minify, line := range map[bool]int{false: 3, true: 1} {
 		b := programOf(t, files("src/main.yue", "x = 1\n\nimport \"nope\"\nprint x, nope\n"))
 		b.world.Run = env.Run
-		b.in.Yue, b.in.Minify = yue, minify
+		b.in.Compiler, b.in.Minify = yue, minify
 		_, err := b.compile()
 		failure := asError(t, err, "a module that is not found")
 		if failure.Msg != "Module 'nope' not found." || failure.File != "src/main.yue" || failure.Line != line {
@@ -493,7 +513,7 @@ func TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro(t *t
 	yue := tooltest.Yue(t)
 	b := programOf(t, files("src/m.yue", "export macro N = -> \"Foo\"\n", "src/main.yue", "import \"m\" as {:$N}\nprint $N!\n"))
 	b.world.Run = env.Run
-	b.in.Yue, b.in.Natives, b.in.Lint = yue, LoadNatives(), manifest.Lint{UnknownGlobals: "warning"}
+	b.in.Compiler, b.in.Natives, b.in.Lint = yue, LoadNatives(), manifest.Lint{UnknownGlobals: "warning"}
 	for _, name := range []string{"Foo", "Bar"} {
 		testkit.WriteFile(t, b.root, "src/m.yue", []byte("export macro N = -> \""+name+"\"\n"))
 		program := b.compiles()
@@ -502,6 +522,149 @@ func TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro(t *t
 			len(program.Unknown) != 1 || program.Unknown[0].Msg != "Unknown global "+name+"." {
 			t.Errorf("with the macro that gives %s: the Lua of %s is %q, and the unknown globals are %+v", name, main.Path, main.Lua, program.Unknown)
 		}
+	}
+}
+
+// The tests below are of the two steps of a compile, CompileSources and Link, which Compile takes in a row.
+
+func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testing.T) {
+	loud, empty, plain := inLibrary("ex", "kit/loud.yue"), inLibrary("ex", "kit/empty.yue"), inLibrary("ex", "plain.lua")
+	of := files("src/main.yue", "x = 1\n", "lua/tools.lua", "return 2\n").with("ex").and(
+		loud, "z = 3\n", empty, "-- nothing\n", plain, "return 1\n")
+	// What the first step has of each module, whatever the second finds: a Lua module's own text, and what the
+	// compiler wrote for a library's YueScript module. It has none for a source without code, and none for a
+	// YueScript module of the project's own, which is read when the requires lead to it.
+	wantLua := map[string]string{"lua/tools.lua": "return 2\n", plain: "return 1\n", loud: "-- " + loud + "\n"}
+	wantCompiles := []string{"compile " + empty, "compile " + loud, "compile src/main.yue"}
+	for _, c := range []struct {
+		name     string
+		entry    string
+		main     string // the Lua the compiler leaves for src/main.yue
+		uses     map[string]string
+		wantMsg  string   // how the message starts
+		wantFile string   // "" for a failure without a file
+		wantRuns []string // the runs of the compiler in the second step
+	}{
+		{name: "an unknown global", entry: "src/main.yue", main: "x = 1\n", uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
+			wantMsg: "Unknown global Zzz.", wantFile: "src/main.yue", wantRuns: []string{"list src/main.yue"}},
+		{name: "a required module that is not found", entry: "src/main.yue", main: "require('nope')\n",
+			wantMsg: "Module 'nope' not found.", wantFile: "src/main.yue"},
+		{name: "an entry that is no file of src", entry: "lua/main.lua", main: "x = 1\n",
+			wantMsg: "Entry 'lua/main.lua' must be a .yue file under src/."},
+	} {
+		laid := func() *programBench {
+			b := programOf(t, of)
+			b.fake(map[string]answer{"src/main.yue": leavingLua(c.main), empty: {}}, c.uses)
+			b.in.Entry = c.entry
+			return b
+		}
+		b := laid()
+		compiled, err := CompileSources(background, b.world, b.in)
+		if err != nil {
+			t.Errorf("%s: CompileSources = %v, want the sources compiled", c.name, err)
+			continue
+		}
+		found, err := Collect(b.root, of.libraries())
+		if ran := b.ran(); err != nil || !slices.Equal(compiled.Sources, found) || len(found) != 5 || !slices.Equal(ran, wantCompiles) {
+			t.Errorf("%s: the sources are %+v, want what Collect finds: %+v, %v; the compiler ran as %q", c.name, compiled.Sources, found, err, ran)
+		}
+		if got := luaOfEach(compiled.Sources, compiled.Lua); !maps.Equal(got, wantLua) {
+			t.Errorf("%s: before the link, the Lua is %q, want %q", c.name, got, wantLua)
+		}
+		program, linkErr := Link(background, b.world, compiled)
+		failure, isFailure := diag.First(linkErr)
+		if program != nil || !isFailure || !strings.HasPrefix(failure.Msg, c.wantMsg) || failure.File != c.wantFile {
+			t.Errorf("%s: Link = %+v, %v, want a failure of %q that starts %q", c.name, program, linkErr, c.wantFile, c.wantMsg)
+		}
+		if ran := b.ran(); !slices.Equal(ran, c.wantRuns) {
+			t.Errorf("%s: in the link the compiler ran as %q, want %q", c.name, ran, c.wantRuns)
+		}
+		// A link that failed leaves what the first step returned as it was: the view of the libraries is written
+		// from it whether the link is taken before or after.
+		if got := luaOfEach(compiled.Sources, compiled.Lua); !maps.Equal(got, wantLua) {
+			t.Errorf("%s: after the link, the Lua is %q, want %q", c.name, got, wantLua)
+		}
+		// Compile, on the same project laid anew, fails as the link does.
+		whole, compileErr := laid().compile()
+		if whole != nil || !reflect.DeepEqual(compileErr, linkErr) {
+			t.Errorf("%s: Compile = %+v, %#v, want the failure of the link: %#v", c.name, whole, compileErr, linkErr)
+		}
+	}
+}
+
+func TestTheTwoStepsInARowGiveTheProgramCompileGives(t *testing.T) {
+	loud, empty, plain := inLibrary("ex", "kit/loud.yue"), inLibrary("ex", "kit/empty.yue"), inLibrary("ex", "plain.lua")
+	of := files(
+		"src/main.yue", "import \"util\"\n", "src/util.yue", "x = 1\n", "src/unreached.yue", "y = 2\n", "src/notes.yue", "-- nothing\n",
+		"lua/tools.lua", "return '\xff'\n",
+	).with("ex").and(loud, "z = 3\n", empty, "-- nothing\n", plain, "return 1\n")
+	for _, minify := range []bool{false, true} {
+		laid := func() *programBench {
+			b := programOf(t, of)
+			b.fake(map[string]answer{
+				"src/main.yue":  leavingLua("local util = require('util')\nrequire('kit.loud')\n"),
+				"src/notes.yue": {}, empty: {},
+			}, map[string]string{"src/main.yue": "Zzz 1 1\n"})
+			b.in.Minify, b.in.Lint = minify, manifest.Lint{UnknownGlobals: "warning"}
+			return b
+		}
+		whole := laid()
+		want := whole.compiles()
+		if len(want.Modules) != 3 || len(want.Unknown) != 1 || len(want.Sources) != 8 {
+			t.Fatalf("minified %v: Compile = %+v, want three modules, an unknown global and eight sources", minify, want)
+		}
+		b := laid()
+		compiled, err := CompileSources(background, b.world, b.in)
+		if err != nil {
+			t.Fatalf("minified %v: CompileSources = %v", minify, err)
+		}
+		compiles, before := b.ran(), luaOfEach(compiled.Sources, compiled.Lua)
+		got, err := Link(background, b.world, compiled)
+		if err != nil {
+			t.Fatalf("minified %v: Link = %v", minify, err)
+		}
+		lists := b.ran()
+		if !reflect.DeepEqual(got, want) || !slices.Equal(b.log.Lines(), whole.log.Lines()) {
+			t.Errorf("minified %v: the two steps give %+v and log %q, want what Compile gives: %+v and %q",
+				minify, got, b.log.Lines(), want, whole.log.Lines())
+		}
+		wantLua := luaOfEach(want.Sources, want.Lua)
+		if gotLua := luaOfEach(got.Sources, got.Lua); !maps.Equal(gotLua, wantLua) || len(wantLua) != 5 {
+			t.Errorf("minified %v: the Lua after the two steps is %q, want that of Compile, of five modules: %q", minify, gotLua, wantLua)
+		}
+		// Each step runs the compiler for its own work, and the two for no more than Compile does: the first
+		// compiles, and the second lists the globals.
+		isList := func(run string) bool { return strings.HasPrefix(run, "list ") }
+		if slices.ContainsFunc(compiles, isList) || slices.ContainsFunc(lists, func(run string) bool { return !isList(run) }) ||
+			!slices.Equal(slices.Concat(compiles, lists), whole.ran()) {
+			t.Errorf("minified %v: the first step ran the compiler as %q and the second as %q", minify, compiles, lists)
+		}
+		// The link reads the Lua of the project's modules for itself, and leaves what the first step returned
+		// as it was: a second link of it gives the same program, and runs no compiler.
+		again, err := Link(background, b.world, compiled)
+		if ran := b.ran(); err != nil || !reflect.DeepEqual(again, want) || len(ran) != 0 {
+			t.Errorf("minified %v: a second link gives %+v, %v, and ran the compiler as %q", minify, again, err, ran)
+		}
+		if after := luaOfEach(compiled.Sources, compiled.Lua); !maps.Equal(after, before) || len(before) != 3 {
+			t.Errorf("minified %v: the Lua of what the first step returned is %q before the links and %q after", minify, before, after)
+		}
+	}
+}
+
+func TestAStepThatIsNotHandedWhatItNeedsIsAMistakeOfTheCaller(t *testing.T) {
+	b := programOf(t, mainOnly)
+	var expected *diag.Error
+	program, err := Link(background, b.world, nil)
+	if program != nil || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "CompileSources") {
+		t.Errorf("Link = %+v, %v, want a plain error that names CompileSources", program, err)
+	}
+	b.in.Natives = nil
+	compiled, err := CompileSources(background, b.world, b.in)
+	if compiled != nil || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "LoadNatives") {
+		t.Errorf("CompileSources = %+v, %v, want a plain error that names LoadNatives", compiled, err)
+	}
+	if fsx.Exists(filepath.Join(b.root, ".moonwell")) {
+		t.Error("the macro module is written although the compile was not begun")
 	}
 }
 

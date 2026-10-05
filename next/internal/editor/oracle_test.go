@@ -768,7 +768,7 @@ func (v viewTrees) thisView(t *testing.T, compile, minify bool) ([]string, error
 	world, _ := testkit.Env(t, v.this)
 	world.Run = env.Run
 	program, err := script.Compile(context.Background(), world, script.Input{
-		Yue: v.yue, Entry: "src/main.yue", Minify: minify, Libraries: libraries,
+		Compiler: v.yue, Entry: "src/main.yue", Minify: minify, Libraries: libraries,
 		Lint: manifest.Lint{UnknownGlobals: "warning"}, Natives: script.LoadNatives(),
 	})
 	if err != nil {
