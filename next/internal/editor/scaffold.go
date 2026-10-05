@@ -38,10 +38,18 @@ const (
 // .gitignore line appended. It never overwrites a file. It returns what it added.
 //
 // What is added is named as setup reports it: each file by its path, in the order of Files, and then .gitignore
-// with the lines it was given. The files are the project's own, which its user commits, and so is a link at one
-// of them or at .vscode: it is followed, and the file behind it is the one read and written.
+// with the lines it was given.
+//
+// The files are the project's own, which its user commits, and so is a link at one of them. A file behind a link
+// is there: one of Files is left as it is, and .gitignore is read and written through the link. A link that leads
+// to nothing, at one of Files or at .gitignore, is refused before anything is written, since a file written under
+// its name would be made where the link leads. A link to a folder at .vscode is followed.
 func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
-	added, err := addMissingFiles(root, template)
+	there, err := lookAtFiles(root)
+	if err != nil {
+		return nil, err
+	}
+	added, err := addMissingFiles(root, template, there)
 	if err != nil {
 		return nil, err
 	}
@@ -55,12 +63,46 @@ func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	return added, nil
 }
 
+// lookAtFiles reports, for each of Files and for .gitignore, whether there is something under its name. All four
+// are looked at before any is written, so that a link to nothing at one of them leaves the project as it is.
+func lookAtFiles(root string) (there map[string]bool, err error) {
+	there = map[string]bool{}
+	for _, file := range append(slices.Clone(Files), gitignoreFile) {
+		if there[file], err = isThere(root, file); err != nil {
+			return nil, err
+		}
+	}
+	return there, nil
+}
+
+// isThere reports whether there is something under the name of a file of the project: a file, a folder, or a link
+// that leads somewhere. The name itself is looked at, and no link is followed to answer; a link that leads to
+// nothing is refused. A look that fails is taken for nothing there: the write that follows says what is in the
+// way.
+func isThere(root, file string) (bool, error) {
+	at := onDisk(root, file)
+	info, err := fsx.Lstat(at)
+	switch {
+	case err != nil || info == nil:
+		return false, nil
+	case fsx.IsLink(info) && leadsNowhere(at):
+		return false, errLinkToNothing(file)
+	}
+	return true, nil
+}
+
+// leadsNowhere reports whether there is nothing where the link at a path leads.
+func leadsNowhere(link string) bool {
+	_, err := os.Stat(link)
+	return errors.Is(err, fs.ErrNotExist)
+}
+
 // addMissingFiles writes each of Files that is not there, from the template, and returns those it wrote. What is
 // there under the name of a file stays as it is, whatever it holds, and a folder too.
-func addMissingFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
+func addMissingFiles(root string, template []moonwell.TemplateFile, there map[string]bool) ([]string, error) {
 	added := []string{}
 	for _, file := range Files {
-		if fsx.Exists(onDisk(root, file)) {
+		if there[file] {
 			continue
 		}
 		data, err := templateFile(template, file)
@@ -143,8 +185,12 @@ var LuarcArrays = []string{"runtime.path", "workspace.library", "workspace.ignor
 // An entry is there when the array holds the same string, however it is written; an array that is not there is
 // given whole, at the end of the file, and a value under its key that is no array stays. Where the file is
 // rewritten, it is laid out with two spaces and a final line break, without a byte order mark: a key keeps its
-// place, and a value the text of each of its tokens, a number and a string as they are written. A link at the
-// file is followed, as AddFiles follows one.
+// place, and a value the text of each of its tokens, a number and a string as they are written. A key of the file
+// itself that comes twice is then written once, at its first place and with its last value, which is the value
+// that was merged.
+//
+// A file behind a link is read and written through the link. A link that leads to nothing is no file: nothing is
+// added, and nothing is written.
 func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, merged bool, err error) {
 	written, found, err := readIfThere(root, luarcFile)
 	switch {
@@ -153,7 +199,7 @@ func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, 
 	case !found:
 		return []string{}, true, nil
 	}
-	entries, err := templateEntries(template)
+	entries, err := LuarcTemplateEntries(template)
 	if err != nil {
 		return nil, false, err
 	}
@@ -180,11 +226,13 @@ func addLacking(config *manifest.Ordered[json.RawMessage], entries map[string][]
 	return added
 }
 
-// templateEntries is the entries of each of LuarcArrays in the template's .luarc.json, by the key of the array.
+// LuarcTemplateEntries is the entries of each of LuarcArrays in the template's .luarc.json, under the key of the
+// array and in the order the template lists them: what MergeLuarc adds where a project lacks it, and what setup
+// names to the user of a .luarc.json that MergeLuarc left alone.
 //
 // Its failures are plain errors: the template is Moonwell's own, and its .luarc.json is an object with the three
 // arrays of strings, so one that is not is a mistake in Moonwell and nothing the user can put right.
-func templateEntries(template []moonwell.TemplateFile) (map[string][]string, error) {
+func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string, error) {
 	data, err := templateFile(template, luarcFile)
 	if err != nil {
 		return nil, err
@@ -362,6 +410,16 @@ func writeFile(root, file string, data []byte) error {
 }
 
 // ---- errors ----
+
+// errLinkToNothing is the refusal of an editor file of the project that is a link to a file that is not there, by
+// its path from the project folder.
+func errLinkToNothing(file string) error {
+	return &diag.Error{
+		Msg:  file + " is a link to a file that does not exist.",
+		File: file,
+		Hint: "Remove the link, or create the file it leads to, then run setup again.",
+	}
+}
 
 // errNotRead is the failure to read an editor file of the project, by its path from the project folder.
 func errNotRead(file string, cause error) error {

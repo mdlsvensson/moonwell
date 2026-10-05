@@ -94,6 +94,8 @@ import (
 //     file; and templates of the test's own, some of which both trees refuse with an error that is no
 //     *diag.Error. Of each call: what is refused, what is returned (the entries and whether the file was
 //     merged), and all that the project folder holds, each file byte for byte.
+//   - LuarcTemplateEntries of both trees for the template the program carries, in the same test: the three lists
+//     of entries, by the key of their array.
 //   - AddFiles of both trees on a project with a link at .vscode (TestOracleOnALinkAtTheFolderOfAnEditorFile):
 //     what is returned, all that the project holds, and all that lies behind the link, through which both trees
 //     write the file. It is skipped where the machine cannot make a link.
@@ -110,7 +112,9 @@ import (
 //     tree's file must differ from the other tree's; must be the other tree's, byte for byte, once the other
 //     tree has read it and printed it again (otherPrints); and must have the keys of the file that was there
 //     in their order, and under each key the tokens of that file's value, before the entries that were added
-//     to it (keptAsWritten). The kinds, each a case of TestMergeLuarcKeepsTheTextOfEveryValue:
+//     to it (keptAsWritten); and must be laid out as this tree lays a file out, with two spaces, one final line
+//     break and no byte order mark (laidOutAnew). The kinds, each a case of
+//     TestMergeLuarcKeepsTheTextOfEveryValue:
 //     a number whose text is not what the other tree prints for its value, such as 1.0, 1e3, -0, a whole number
 //     above 2^53, or 1e400, for which the other tree prints null ("a number");
 //     a string of a value, a key of an object in a value among them, whose text is not what the other tree
@@ -200,15 +204,27 @@ import (
 //     prints it, and gives a file without the array an entry as often as the template has it; this tree refuses
 //     the first as a mistake of its caller, and adds an entry once. The template is the program's own, and a
 //     test keeps its arrays (TestMergeLuarcWithATemplateItCannotReadIsAMistakeOfTheCaller,
-//     TestMergeLuarcGivesAnObjectWithoutTheArraysEveryEntryOfTheCarriedTemplate).
+//     TestATemplateOfItsOwnGivesItsEntriesAndEachOfThemOnce, TestLuarcTemplateEntriesListsTheTemplatesArrays).
 //   - A key of the .luarc.json itself with bytes that are not UTF-8. Both trees read the key and write it again:
 //     the other tree with one U+FFFD for each faulty sequence of bytes, and this tree with one for each faulty
 //     byte (TestMergeLuarcWritesAKeyOfTheFileOnceAndWithTheEscapesItNeeds).
 //   - A .gitignore or a .luarc.json that cannot be written, which both trees refuse, the .luarc.json with the
 //     same words: the test kit holds such a file in a way that not every system honours, so no exact count
 //     could name it (TestAddFilesReportsAGitignoreItCannotWrite, TestMergeLuarcReportsAFileItCannotWrite).
-//   - A link to a file at one of the files, which both trees read and write through, as they do with the link at
-//     .vscode (TestTheScaffoldReadsAndWritesThroughALinkToAFile): not every account may make one.
+//   - A link to a file that is there, at .gitignore, at .luarc.json or at one of the three files: both trees read
+//     and write the first two through the link, and leave the third as it is
+//     (TestTheScaffoldReadsAndWritesThroughALinkToAFile). Not every account may make such a link.
+//   - A link that leads to nothing, at .gitignore or at one of the three files. The other tree takes the file to
+//     be missing and writes it through the link, so that a file is made where the link leads, which may be
+//     outside the project; where the link is a junction of Windows the write fails, with the system's error.
+//     This tree refuses the link with an error of its own before it writes anything
+//     (TestAddFilesRefusesALinkToNothingAndWritesNothing). At .luarc.json both trees take such a link for no
+//     file, and MergeLuarc adds nothing (TestMergeLuarcTakesALinkToNothingForNoFile).
+//   - A file that cannot be looked at for another reason than that it is not there, such as a folder that may
+//     not be searched, or a link that leads to itself. The other tree asks whether the file exists, and takes
+//     every failure to answer for a missing file; this tree reads .gitignore and .luarc.json, and reports the
+//     failure as one to read the file, and leaves one of the three files that is such a link as it is. The
+//     systems of the checks do not make such a file in the same way, so no exact count could name it.
 
 // same compares two texts byte for byte, and counts. A text that holds nothing compares nothing, and fails.
 func same(t *testing.T, texts *int, what, want, got string) {
@@ -1064,7 +1080,9 @@ func (f twoFolders) filesAdded(t *testing.T, tally *addTally, what string, templ
 	case hasOuterSpace(string(held)):
 		oracle.Refusals(t, what, wantErr, gotErr)
 		tally.files += sameButFor(t, what, wantHeld, gotHeld, ".gitignore")
-		// This tree adds the lines that the other tree takes to be there, and names them last.
+		// This tree adds the lines that the other tree takes to be there, and names them last. The comparison
+		// fits a file to which the other tree adds nothing: where it adds a line of its own, this tree's lines
+		// are not all after the other tree's file, and the comparison fails. The files of this class are such.
 		added, wereAdded := strings.CutPrefix(ourIgnores, theirIgnores)
 		lines := strings.Split(strings.TrimSuffix(added, "\n"), "\n")
 		if !wereAdded || len(got) != len(want)+1 || !slices.Equal(got[:len(want)], want) ||
@@ -1166,6 +1184,7 @@ type mergeTally struct {
 	objects int // with an object in a value that has a key twice, or keys the other tree puts in another order
 	orders  int // with keys of the file itself that the other tree puts in another order
 	faulty  int // with bytes that are not UTF-8
+	lists   int // lists of the carried template's entries, each compared whole
 }
 
 // luarcKinds names what a .luarc.json holds that the other tree prints in another way than it is written.
@@ -1283,6 +1302,27 @@ func keptAsWritten(t *testing.T, what, held, ours string) {
 	}
 }
 
+// laidOutAnew fails the test unless this tree's .luarc.json is laid out as this tree lays a file out, whatever
+// its tokens are: it is its own text on one line, laid out again with two spaces, and then one line break; and it
+// starts with no byte order mark.
+func laidOutAnew(t *testing.T, what string, ours []byte) {
+	t.Helper()
+	var onOne, laid bytes.Buffer
+	if err := json.Compact(&onOne, bytes.TrimSuffix(ours, []byte("\n"))); err != nil {
+		t.Errorf("%s: this tree's .luarc.json is no JSON (%v): %q", what, err, ours)
+		return
+	}
+	if err := json.Indent(&laid, onOne.Bytes(), "", "  "); err != nil {
+		t.Errorf("%s: this tree's .luarc.json on one line is no JSON (%v): %q", what, err, onOne.Bytes())
+		return
+	}
+	laid.WriteByte('\n')
+	oracle.Bytes(t, what+": the layout of the file", laid.Bytes(), ours)
+	if bytes.HasPrefix(ours, []byte(mark)) {
+		t.Errorf("%s: this tree's .luarc.json starts with a byte order mark", what)
+	}
+}
+
 // merged is what MergeLuarc returns, but for its error.
 type merged struct {
 	Added  []string
@@ -1318,6 +1358,7 @@ func (f twoFolders) luarcMerged(t *testing.T, tally *mergeTally, what string, te
 		t.Errorf("%s: this tree's .luarc.json is %q, and the other tree's %q", what, ourFile, theirFile)
 	}
 	keptAsWritten(t, what, string(held), string(ourFile))
+	laidOutAnew(t, what, ourFile)
 	tally.inPart++
 	for _, kind := range []struct {
 		is    bool
@@ -1441,13 +1482,23 @@ func TestOracleOnMergingTheLuarc(t *testing.T) {
 	for _, p := range projects {
 		twiceMerged(p.project, p.what, p.template)
 	}
+	// The entries of the template the program carries, by the key of their array: the other tree reads them from
+	// the template it takes when it is handed none, and this tree from the files of that template.
+	theirs, theirErr := oldeditor.LuarcTemplateEntries(nil)
+	ours, ourErr := LuarcTemplateEntries(carried(t))
+	if theirErr != nil || ourErr != nil {
+		t.Errorf("the entries of the carried template: the other tree gives %v, and this tree %v", theirErr, ourErr)
+	}
+	oracle.Values(t, "the entries of the carried template", theirs, ours)
+	compared.lists += len(theirs)
+
 	// Of the 55 files, each beside one other file, 45 are compared whole in 2 calls each, and 10 in part in 1
 	// call: the last 10 of the list, of which the very last is of every kind at once. Of the 9 projects, 5 are
 	// compared whole in 2 calls each, with 1 file, none, none, 1 and 1; and 4 are refused by both trees in 1
-	// call, with 1 file each.
+	// call, with 1 file each. The carried template has a list of entries for each of the 3 arrays.
 	want := mergeTally{
 		steps: 45*2 + 10 + 5*2 + 4, files: 45*2*2 + 10 + 3*2 + 4,
-		inPart: 10, numbers: 2 + 1, texts: 3 + 1, objects: 2 + 1, orders: 1 + 1, faulty: 1 + 1,
+		inPart: 10, numbers: 2 + 1, texts: 3 + 1, objects: 2 + 1, orders: 1 + 1, faulty: 1 + 1, lists: 3,
 	}
 	if compared != want {
 		t.Errorf("the oracle compared %+v, want %+v", compared, want)

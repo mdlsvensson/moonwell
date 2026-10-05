@@ -4,14 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"testing"
 
 	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/script"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
@@ -332,15 +336,169 @@ func TestAddFilesWithATemplateThatLacksAFileIsAMistakeOfTheCaller(t *testing.T) 
 	}
 }
 
-// The files are the project's own, which its user commits, and a link at one of them is the user's to make.
-func TestAddFilesWritesThroughALinkAtTheFolderOfAFile(t *testing.T) {
-	root := t.TempDir()
-	at, behind := linkAt(t, root, ".vscode")
-	if _, err := AddFiles(root, smallTemplate); err != nil {
+// The files are the project's own, which its user commits, and a link at .vscode is the user's to make: the file
+// is written into the folder it leads to, and a file that is there counts as the project's.
+func TestAddFilesFollowsALinkAtTheFolderOfAFile(t *testing.T) {
+	const written = `{"recommendations":[]}` + "\n"
+	cases := []struct {
+		name         string
+		file, text   string            // the file that lies behind the link
+		wantBehind   map[string]string // what lies behind the link afterwards
+		wantsItAdded bool
+	}{
+		{"no file behind the link", "settings.json", "{}", map[string]string{"settings.json": "{}", "extensions.json": written}, true},
+		{"the file behind the link", "extensions.json", "mine", map[string]string{"extensions.json": "mine"}, false},
+	}
+	for _, c := range cases {
+		root := t.TempDir()
+		at, behind := linkAt(t, root, ".vscode")
+		write(t, behind, c.file, c.text)
+		added, err := AddFiles(root, smallTemplate)
+		if err != nil || slices.Contains(added, ".vscode/extensions.json") != c.wantsItAdded {
+			t.Fatalf("%s: AddFiles = %q, %v", c.name, added, err)
+		}
+		if got := filesIn(t, behind); !maps.Equal(got, c.wantBehind) || isPlain(t, at) {
+			t.Errorf("%s: behind the link there is %q", c.name, got)
+		}
+	}
+}
+
+// everythingBelow is every entry below a folder by its path from it with "/": a file with its bytes, a folder as
+// "(a folder)", and a link as "(a link)". A link is not followed, so one that leads to nothing is held too.
+func everythingBelow(t testing.TB, dir string) map[string]string {
+	t.Helper()
+	held := map[string]string{}
+	err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, err error) error {
+		if err != nil || path == dir {
+			return err
+		}
+		below, err := filepath.Rel(dir, path)
+		if err != nil {
+			return err
+		}
+		info, err := entry.Info()
+		switch {
+		case err != nil:
+			return err
+		case fsx.IsLink(info):
+			held[filepath.ToSlash(below)] = "(a link)"
+		case entry.IsDir():
+			held[filepath.ToSlash(below)] = "(a folder)"
+		default:
+			data, err := os.ReadFile(path)
+			held[filepath.ToSlash(below)] = string(data)
+			return err
+		}
+		return nil
+	})
+	if err != nil {
 		t.Fatal(err)
 	}
-	if got := filesIn(t, behind); len(got) != 1 || got["extensions.json"] != `{"recommendations":[]}`+"\n" || isPlain(t, at) {
-		t.Errorf("behind the link there is %q", got)
+	return held
+}
+
+// toAFolderThatIsGone makes at a link to a folder beside the project, and removes the folder: a junction on
+// Windows, and a symlink elsewhere. It returns where the link leads.
+func toAFolderThatIsGone(t *testing.T, above, at string) string {
+	t.Helper()
+	gone := filepath.Join(above, "gone")
+	if err := os.Mkdir(gone, 0o777); err != nil {
+		t.Fatal(err)
+	}
+	testkit.LinkDir(t, gone, at)
+	if err := os.Remove(gone); err != nil {
+		t.Fatal(err)
+	}
+	return gone
+}
+
+// toAFileThatIsNotThere makes at a symlink to a file beside the project that is not there, and returns where the
+// link leads. The test is skipped on Windows where the account may not make such a link.
+func toAFileThatIsNotThere(t *testing.T, above, at string) string {
+	t.Helper()
+	missing := filepath.Join(above, "missing.txt")
+	linkToFile(t, missing, at)
+	return missing
+}
+
+// linksToNothing is the two kinds of a link that leads to nothing.
+var linksToNothing = []struct {
+	name string
+	make func(t *testing.T, above, at string) (leadsTo string)
+}{
+	{"a link to a folder that is gone", toAFolderThatIsGone},
+	{"a link to a file that is not there", toAFileThatIsNotThere},
+}
+
+// projectWithALinkToNothing is a project in a folder of its own, with a link that leads to nothing at one of its
+// files. It returns the folder above the project, which holds all that a call could write, the project, and
+// where the link leads.
+func projectWithALinkToNothing(t *testing.T, file string, link func(*testing.T, string, string) string) (above, root, leadsTo string) {
+	t.Helper()
+	above = t.TempDir()
+	root = filepath.Join(above, "project")
+	write(t, root, "src/main.yue", "print 1\n")
+	at := filepath.Join(root, filepath.FromSlash(file))
+	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	return above, root, link(t, above, at)
+}
+
+// A file written under the name of a link to nothing is made where the link leads, which may be anywhere: AddFiles
+// refuses the link, at each of the four places, before it writes anything.
+func TestAddFilesRefusesALinkToNothingAndWritesNothing(t *testing.T) {
+	for _, kind := range linksToNothing {
+		t.Run(kind.name, func(t *testing.T) {
+			for _, file := range append(slices.Clone(Files), ".gitignore") {
+				above, root, leadsTo := projectWithALinkToNothing(t, file, kind.make)
+				before := everythingBelow(t, above)
+				added, err := AddFiles(root, smallTemplate)
+				e := asError(t, err, file)
+				if added != nil || e.File != file || !strings.Contains(e.Msg, file+" is a link") || e.Hint == "" {
+					t.Errorf("%s: AddFiles = %q, %+v", file, added, e)
+				}
+				if after := everythingBelow(t, above); !maps.Equal(after, before) {
+					t.Errorf("%s: the folder above the project holds %q, and held %q", file, after, before)
+				}
+				if _, err := os.Lstat(leadsTo); !errors.Is(err, fs.ErrNotExist) {
+					t.Errorf("%s: where the link leads there is something (%v)", file, err)
+				}
+			}
+		})
+	}
+}
+
+// A link to nothing at .vscode is none of the four places: the folder cannot be made under its name, so the file
+// is reported as one that cannot be written, and nothing is made where the link leads.
+func TestAddFilesMakesNothingWhereALinkAtTheFolderOfAFileLeadsToNothing(t *testing.T) {
+	above, root, leadsTo := projectWithALinkToNothing(t, ".vscode", toAFolderThatIsGone)
+	added, err := AddFiles(root, smallTemplate)
+	e := asError(t, err, "a link to nothing at .vscode")
+	if added != nil || !strings.HasPrefix(e.Msg, "Writing .vscode/extensions.json failed: ") || e.File != ".vscode/extensions.json" {
+		t.Errorf("AddFiles = %q, %+v", added, e)
+	}
+	if _, err := os.Lstat(leadsTo); !errors.Is(err, fs.ErrNotExist) || isPlain(t, filepath.Join(root, ".vscode")) {
+		t.Errorf("where the link leads there is something (%v), or the link is one no more", err)
+	}
+	if held := everythingBelow(t, above); held["project/.vscode"] != "(a link)" || held["gone"] != "" {
+		t.Errorf("the folder above the project holds %q", held)
+	}
+}
+
+func TestMergeLuarcTakesALinkToNothingForNoFile(t *testing.T) {
+	for _, kind := range linksToNothing {
+		t.Run(kind.name, func(t *testing.T) {
+			above, root, _ := projectWithALinkToNothing(t, ".luarc.json", kind.make)
+			before := everythingBelow(t, above)
+			added, merged, err := MergeLuarc(root, carried(t))
+			if err != nil || !merged || added == nil || len(added) != 0 {
+				t.Errorf("MergeLuarc = %#v, %v, %v", added, merged, err)
+			}
+			if after := everythingBelow(t, above); !maps.Equal(after, before) {
+				t.Errorf("the folder above the project holds %q, and held %q", after, before)
+			}
+		})
 	}
 }
 
@@ -348,26 +506,27 @@ func TestAddFilesWritesThroughALinkAtTheFolderOfAFile(t *testing.T) {
 // to a file.
 func TestTheScaffoldReadsAndWritesThroughALinkToAFile(t *testing.T) {
 	root, behind := t.TempDir(), t.TempDir()
-	write(t, behind, "ignore", "dist/\n", "luarc", "{"+lackingOne+"}")
+	write(t, behind, "ignore", "dist/\n", "luarc", "{"+lackingOne+"}", "config", "mine\n")
 	linkToFile(t, filepath.Join(behind, "ignore"), filepath.Join(root, ".gitignore"))
 	linkToFile(t, filepath.Join(behind, "luarc"), filepath.Join(root, ".luarc.json"))
-	// A link to a file that is not there: the file is written where the link leads.
 	linkToFile(t, filepath.Join(behind, "config"), filepath.Join(root, "yueconfig.yue"))
+	// A file behind a link is there: yueconfig.yue and .luarc.json are not added, and stay as they are.
 	added, err := AddFiles(root, smallTemplate)
-	want := []string{"yueconfig.yue", ".vscode/extensions.json", ".gitignore (.moonwell/, src/**/*.lua)"}
+	want := []string{".vscode/extensions.json", ".gitignore (.moonwell/, src/**/*.lua)"}
 	if err != nil || !slices.Equal(added, want) {
 		t.Fatalf("AddFiles = %q, %v", added, err)
+	}
+	if got := read(t, behind, "luarc"); got != "{"+lackingOne+"}" {
+		t.Errorf("after AddFiles, behind the link, luarc = %q", got)
 	}
 	if added, merged, err := MergeLuarc(root, carried(t)); err != nil || !merged || !slices.Equal(added, []string{".moonwell/lua"}) {
 		t.Fatalf("MergeLuarc = %q, %v, %v", added, merged, err)
 	}
 	wantBehind := map[string]string{
-		"ignore": "dist/\n.moonwell/\nsrc/**/*.lua\n", "luarc": "{\n" + afterOne + "\n}\n", "config": "return {}\n",
+		"ignore": "dist/\n.moonwell/\nsrc/**/*.lua\n", "luarc": "{\n" + afterOne + "\n}\n", "config": "mine\n",
 	}
-	for name, text := range wantBehind {
-		if got := read(t, behind, name); got != text {
-			t.Errorf("behind the link, %s = %q", name, got)
-		}
+	if got := filesIn(t, behind); !maps.Equal(got, wantBehind) {
+		t.Errorf("behind the links there is %q", got)
 	}
 	for _, link := range []string{".gitignore", ".luarc.json", "yueconfig.yue"} {
 		if isPlain(t, filepath.Join(root, link)) {
@@ -568,9 +727,10 @@ func TestMergeLuarcKeepsTheTextOfEveryValue(t *testing.T) {
 			"{\n" + afterOne + ",\n  \"s\": " + faulty + ",\n  \"t\": [\n    " + faulty + "\n  ]\n}\n"},
 		{"a value of one of the three arrays",
 			`{"runtime.path":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"],"workspace.library":[".moonwell\/types",1.0,` +
-				`{"1":1,"0":0},"` + escapeU + `00e9"],"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`,
+				`{"1":1,"0":0},"` + escapeU + "00e9\",\"caf\xe9\"" + `],"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`,
 			"{\n" + strings.Replace(afterOne, "    \".moonwell/types\",\n",
-				"    \".moonwell\\/types\",\n    1.0,\n    {\n      \"1\": 1,\n      \"0\": 0\n    },\n    \""+escapeU+"00e9\",\n", 1) + "\n}\n"},
+				"    \".moonwell\\/types\",\n    1.0,\n    {\n      \"1\": 1,\n      \"0\": 0\n    },\n    \""+escapeU+"00e9\",\n"+
+					"    \"caf\xe9\",\n", 1) + "\n}\n"},
 	}
 	for _, c := range cases {
 		if got := mergedOne(t, c.name, c.held); got != c.want {
@@ -681,21 +841,57 @@ func TestMergeLuarcWithATemplateItCannotReadIsAMistakeOfTheCaller(t *testing.T) 
 		if added != nil || merged || read(t, root, ".luarc.json") != "{}" {
 			t.Errorf("%s: MergeLuarc = %q, %v", c.name, added, merged)
 		}
-	}
-	// A template of its own, with a byte order mark: its entries are what is added, and an array without entries
-	// is given to a file that lacks the key.
-	root := lay(t, ".luarc.json", "{}")
-	added, merged, err := MergeLuarc(root, luarcOnly(mark+"{"+arrays+"}"))
-	if err != nil || !merged || !slices.Equal(added, []string{"a", "b"}) {
-		t.Fatalf("MergeLuarc = %q, %v, %v", added, merged, err)
-	}
-	want := "{\n  \"runtime.path\": [\n    \"a\"\n  ],\n  \"workspace.library\": [\n    \"b\"\n  ],\n  \"workspace.ignoreDir\": []\n}\n"
-	if got := read(t, root, ".luarc.json"); got != want {
-		t.Errorf(".luarc.json = %q", got)
+		entries, err := LuarcTemplateEntries(c.template)
+		notADiagError(t, err, c.name, c.words...)
+		if entries != nil {
+			t.Errorf("%s: LuarcTemplateEntries = %q", c.name, entries)
+		}
 	}
 	// A project without the file asks nothing of the template.
 	if added, merged, err := MergeLuarc(t.TempDir(), nil); err != nil || !merged || len(added) != 0 {
 		t.Errorf("without a file and without a template: MergeLuarc = %q, %v, %v", added, merged, err)
+	}
+}
+
+func TestLuarcTemplateEntriesListsTheTemplatesArrays(t *testing.T) {
+	entries, err := LuarcTemplateEntries(carried(t))
+	want := map[string][]string{
+		"runtime.path": carriedPaths, "workspace.library": carriedLibrary, "workspace.ignoreDir": carriedIgnored,
+	}
+	if err != nil || !reflect.DeepEqual(entries, want) {
+		t.Errorf("LuarcTemplateEntries = %q, %v", entries, err)
+	}
+}
+
+// A template of the test's own, with a byte order mark, an entry that comes twice in an array and in two arrays,
+// and an array without entries.
+func TestATemplateOfItsOwnGivesItsEntriesAndEachOfThemOnce(t *testing.T) {
+	template := luarcOnly(mark + `{"runtime.path":["a","b","a"],"other":["x"],"workspace.library":["b","b"],"workspace.ignoreDir":[]}`)
+	// The door lists the arrays as the template has them, each under its key.
+	entries, err := LuarcTemplateEntries(template)
+	listed := map[string][]string{"runtime.path": {"a", "b", "a"}, "workspace.library": {"b", "b"}, "workspace.ignoreDir": nil}
+	if err != nil || !reflect.DeepEqual(entries, listed) {
+		t.Errorf("LuarcTemplateEntries = %#v, %v", entries, err)
+	}
+	cases := []struct {
+		name, held string
+		added      []string
+		want       string
+	}{
+		{"a file without the arrays", "{}", []string{"a", "b", "b"},
+			"{\n  \"runtime.path\": [\n    \"a\",\n    \"b\"\n  ],\n  \"workspace.library\": [\n    \"b\"\n  ],\n  \"workspace.ignoreDir\": []\n}\n"},
+		{"a file with some of the entries", `{"workspace.library":[],"runtime.path":["b"]}`, []string{"a", "b"},
+			"{\n  \"workspace.library\": [\n    \"b\"\n  ],\n  \"runtime.path\": [\n    \"b\",\n    \"a\"\n  ],\n  \"workspace.ignoreDir\": []\n}\n"},
+	}
+	for _, c := range cases {
+		root := lay(t, ".luarc.json", c.held)
+		added, merged, err := MergeLuarc(root, template)
+		if err != nil || !merged || !slices.Equal(added, c.added) {
+			t.Fatalf("%s: MergeLuarc = %q, %v, %v", c.name, added, merged, err)
+		}
+		if got := read(t, root, ".luarc.json"); got != c.want {
+			t.Errorf("%s: .luarc.json = %q", c.name, got)
+		}
 	}
 }
 

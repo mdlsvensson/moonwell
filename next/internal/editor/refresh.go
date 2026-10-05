@@ -1,6 +1,6 @@
 // Package editor writes the files a code editor reads: the declarations lua-language-server learns the game's
-// API, the project's objects and the map's globals from; the libraries' modules as Lua; and the editor files of
-// the project's own, where a project lacks them.
+// API, the project's objects and the map's globals from; the libraries' modules as Lua; and the project's own
+// editor files, where one is missing or lacks an entry.
 //
 // It takes what objects and script found, and a project folder. RefreshTypes takes the resolved objects, what
 // the map's script defines, the name of that script and the game's API (script.LoadNatives), and writes the
