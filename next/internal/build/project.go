@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -228,6 +229,64 @@ func linkOnTheWay(root, relative string) (link string, found bool) {
 	return "", false
 }
 
+// place is a file or a folder that Moonwell writes.
+type place struct {
+	file  string // where it is on disk
+	label string // its path from the project folder, with "/": how messages name it
+}
+
+// placeOf is a place Moonwell writes, with the way to it looked at; label is its path from the project folder,
+// with "/". The refusals are those of outputAt, and that of a file where a folder on the way belongs.
+func placeOf(root, label string) (place, error) {
+	file, err := outputAt(root, label)
+	if err != nil {
+		return place{}, err
+	}
+	if blocking, found := fileOnTheWay(root, label); found {
+		return place{}, errFileForFolder(blocking, label)
+	}
+	return place{file: file, label: label}, nil
+}
+
+// fileOnTheWay is the first folder on the way to label that is a file; label is a path from the project folder,
+// with "/". What stands at label itself is not looked at.
+//
+// outputAt takes a file on the way for a place that nothing is at, and what a system then says of a write or a
+// removal below the file differs from system to system. So the file is refused by its name, before either.
+func fileOnTheWay(root, label string) (file string, found bool) {
+	for at, char := range label {
+		if char != '/' {
+			continue
+		}
+		info, err := os.Stat(filepath.Join(root, filepath.FromSlash(label[:at])))
+		if err == nil && !info.IsDir() {
+			return label[:at], true
+		}
+	}
+	return "", false
+}
+
+// labelOf is a file at or below the place as its path from the project folder; file is where it is on disk. A
+// file that is not below the place is named as the place.
+func (at place) labelOf(file string) string {
+	below, err := filepath.Rel(at.file, file)
+	if err != nil || below == "." || !filepath.IsLocal(below) {
+		return at.label
+	}
+	return at.label + "/" + filepath.ToSlash(below)
+}
+
+// lowerASCII is text with its ASCII letters in lower case, and every other byte as it is.
+func lowerASCII(text string) string {
+	lowered := []byte(text)
+	for at, char := range lowered {
+		if char >= 'A' && char <= 'Z' {
+			lowered[at] = char + 'a' - 'A'
+		}
+	}
+	return string(lowered)
+}
+
 // ---- errors ----
 
 func errNotInsideMaps(manifestFile, folder string) error {
@@ -254,6 +313,14 @@ func errFolderForScript(folder, file string) error {
 		File: file,
 		Hint: "The map has a folder where its script belongs. Remove that folder from the source map, or save the " +
 			"map in World Editor with Lua as the script language.",
+	}
+}
+
+func errFileForFolder(file, wanted string) error {
+	return &diag.Error{
+		Msg:  file + " is a file, not a folder.",
+		File: file,
+		Hint: "Moonwell writes " + wanted + " below it: remove or rename the file, then try again.",
 	}
 }
 

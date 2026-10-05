@@ -57,15 +57,17 @@ func TestLaunchPassesTheLaunchArgsAndLoadfile(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
 	starts := recordingSpawn(e)
 	game := testkit.WriteFile(t, t.TempDir(), "Warcraft III.exe", nil)
-	how := manifest.Launch{GameExecutable: &game, Args: []string{"-launch"}}
+	// The manifest's arguments have room behind them, where an argument that was added in place would show.
+	args := make([]string, 1, 4)
+	args[0] = "-launch"
+	how := manifest.Launch{GameExecutable: &game, Args: args}
 	err := launch(e, how, "C:/map.w3x")
 	want := started{game, "-launch", "-loadfile", "C:/map.w3x"}
 	if err != nil || len(*starts) != 1 || !slices.Equal((*starts)[0], want) {
 		t.Errorf("started %q, %v, want %q", *starts, err, want)
 	}
-	// The manifest's arguments are its own still.
-	if !slices.Equal(how.Args, []string{"-launch"}) {
-		t.Errorf("the manifest's arguments are %q", how.Args)
+	if whole := args[:cap(args)]; !slices.Equal(whole, []string{"-launch", "", "", ""}) || len(how.Args) != 1 {
+		t.Errorf("the manifest's arguments are %q with %q behind them", how.Args, whole[1:])
 	}
 }
 

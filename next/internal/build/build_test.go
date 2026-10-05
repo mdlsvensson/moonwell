@@ -176,29 +176,34 @@ func TestBuildPlansWithTheOptionsOfTheCommand(t *testing.T) {
 	}
 }
 
+// The project of the test has an object, so each failure comes after the plan's step for the objects went well.
+// What a build says it added, applied and imported is what it wrote into the stage: a build that fails before the
+// stage is written says none of it, and leaves the stage of the build before as it was.
 func TestAFailedBuildLeavesNoArchive(t *testing.T) {
 	tests := []struct {
-		name   string
-		spoil  func(s *standIn)
-		words  string
-		staged bool // whether the failure comes after the map is staged
+		name  string
+		spoil func(s *standIn)
+		words string
+		logs  []string // what the failed build logs: nothing, unless it fails after the map is staged
 	}{
 		{"a source the compiler refuses", func(s *standIn) {
 			// The source is another than the one the build before compiled, so it is compiled again.
 			s.put("src/main.yue", "x = = 2\n")
 			s.refuses("src/main.yue", "1: unexpected token\n")
-		}, "unexpected token", false},
-		{"a setting the map cannot take", func(s *standIn) { s.evaluatesTo(refusedPlayer) },
-			"player 23 does not exist", false},
+		}, "unexpected token", nil},
+		{"a setting the map cannot take", func(s *standIn) {
+			s.evaluatesTo(objectsWith(captain("hfoo")), refusedPlayer)
+		}, "player 23 does not exist", nil},
 		{"a map that cannot be packed", func(s *standIn) { s.remove("maps/map.w3x/war3map.w3i") },
-			"war3map.w3i is missing", true},
+			"war3map.w3i is missing", []string{"Added 1 custom object(s) to 2 file(s).", "Packing archive..."}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t)
+			s := newStandIn(t, objectsWith(captain("hfoo")))
 			s.templateMap()
 			file, _ := built(t, s, Options{})
 			before := filesBelow(t, s.at("dist/stage/map.w3x"))
+			logged := len(s.log.Lines())
 			tt.spoil(s)
 			again, err := Build(background, s.env, Options{})
 			problem, expected := diag.First(err)
@@ -208,10 +213,12 @@ func TestAFailedBuildLeavesNoArchive(t *testing.T) {
 			if fsx.Exists(file) {
 				t.Error("the archive of the build before is there still")
 			}
-			// A build plans everything before it touches the stage: a failure of the plan leaves the stage of the
-			// build before as it was.
-			if after := filesBelow(t, s.at("dist/stage/map.w3x")); reflect.DeepEqual(after, before) == tt.staged {
-				t.Errorf("the stage changed: %v, want %v", !tt.staged, tt.staged)
+			if lines := s.log.Lines()[logged:]; !slices.Equal(lines, tt.logs) {
+				t.Errorf("the failed build logged %q, want %q", lines, tt.logs)
+			}
+			staged := len(tt.logs) != 0
+			if after := filesBelow(t, s.at("dist/stage/map.w3x")); reflect.DeepEqual(after, before) == staged {
+				t.Errorf("the stage changed: %v, want %v", !staged, staged)
 			}
 			if fsx.Exists(lockOf(s.root)) {
 				t.Error("the failed build left its lock")

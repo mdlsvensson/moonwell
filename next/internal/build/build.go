@@ -16,6 +16,7 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/objects"
 	"github.com/mdlsvensson/moonwell/next/internal/script"
 	"github.com/mdlsvensson/moonwell/next/internal/settings"
+	"github.com/mdlsvensson/moonwell/next/internal/toolchain"
 )
 
 // Options are what a command changes about a plan.
@@ -153,27 +154,18 @@ func Test(ctx context.Context, e *env.Env, opts Options) error {
 }
 
 // Check plans a build and stages nothing: it says what a build would hold, or why there would be none. It
-// leaves the ids module alone, and fails when that is not current.
+// leaves the ids module alone, and fails when that is not current: it is check with nothing refreshed.
 func Check(ctx context.Context, e *env.Env) (*Result, error) {
-	p, err := Load(ctx, e)
+	pkl, err := toolchain.PklProgram(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	release, err := Acquire(e.Root)
-	if err != nil {
-		return nil, err
-	}
-	defer release()
-	plan, err := Plan(ctx, e, p, Options{KeepGenerated: true})
-	if err != nil {
-		return nil, err
-	}
-	sayChecked(e.Log, plan)
-	return plan, nil
+	return check(ctx, e, pkl, false)
 }
 
-// check is Check with the Pkl program given: for a command that checks again and again, and looks for Pkl once.
-// With refresh it writes the ids module, as a build does, where Check fails for a module that is not current.
+// check is a check with the Pkl program given, so that a command that checks again and again looks for Pkl once:
+// the manifest, the lock, the plan, and what the plan holds, said in a line. With refresh it writes the ids
+// module, as a build does; without, it fails for a module that is not current.
 func check(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, error) {
 	p, err := loadWith(ctx, e, pkl)
 	if err != nil {
