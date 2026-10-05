@@ -228,8 +228,9 @@ func errFolderForScript(folder, file string) error {
 }
 
 // errBelowOutput is a refusal of fsx.Inside for the part of an output place below its first folder, named by the
-// whole path from the project folder: that path is its file, and takes the part's place where the message starts
-// with it.
+// whole path from the project folder: that path is its file, and takes the part's place in the one message that
+// starts with the part, that of a place the system cannot look at. A refusal in other words stays as it is said,
+// also below a folder that is named as its first word.
 func errBelowOutput(err error, below, relative string) error {
 	var refused *diag.Error
 	if !errors.As(err, &refused) {
@@ -237,8 +238,9 @@ func errBelowOutput(err error, below, relative string) error {
 	}
 	named := *refused
 	named.File = relative
-	if rest, starts := strings.CutPrefix(named.Msg, below+" "); starts {
-		named.Msg = relative + " " + rest
+	const unreachable = " cannot be reached: "
+	if reason, isUnreachable := strings.CutPrefix(named.Msg, below+unreachable); isUnreachable {
+		named.Msg = relative + unreachable + reason
 	}
 	return &named
 }

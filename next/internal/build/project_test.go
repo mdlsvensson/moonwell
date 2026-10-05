@@ -532,11 +532,14 @@ func TestOutputTakesItsFirstFolderAsItIsALinkToo(t *testing.T) {
 
 func TestOutputRefusesALinkBelowItsFirstFolderByTheWholePath(t *testing.T) {
 	tests := []struct {
-		name string
-		link string // the path that is a link
+		name  string
+		link  string // the path that is a link
+		place string // the place that is asked for
 	}{
-		{"a folder on the way", "dist/stage"},
-		{"the place itself", "dist/stage/map.w3x"},
+		{"a folder on the way", "dist/stage", "dist/stage/map.w3x"},
+		{"the place itself", "dist/stage/map.w3x", "dist/stage/map.w3x"},
+		// The refusal of a link starts with a word that a folder may be named by: it stays the refusal it is.
+		{"a place named as the refusal starts", "dist/Symlinks", "dist/Symlinks"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -546,10 +549,9 @@ func TestOutputRefusesALinkBelowItsFirstFolderByTheWholePath(t *testing.T) {
 				t.Fatal(err)
 			}
 			testkit.LinkDir(t, t.TempDir(), at)
-			place, err := output(root, "dist/stage/map.w3x")
+			place, err := output(root, tt.place)
 			e := asError(t, err, tt.name)
-			if place != "" || e.File != "dist/stage/map.w3x" || !strings.Contains(e.Msg, at) ||
-				!strings.Contains(e.Msg, "Symlinks are not supported") {
+			if place != "" || e.File != tt.place || !strings.HasPrefix(e.Msg, "Symlinks are not supported: "+at) {
 				t.Errorf("error = %+v", e)
 			}
 		})

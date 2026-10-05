@@ -98,11 +98,11 @@ func TestAcquireTakesTheLockBehindADistFolderThatIsALink(t *testing.T) {
 
 func TestAcquireRefusesAFileLinkInTheLocksPlace(t *testing.T) {
 	tests := []struct {
-		name   string
-		target func(dir string) string // what the link leads to
+		name  string
+		holds *string // what the file the link leads to holds; nil for a link to nothing
 	}{
-		{"a link to a file", func(dir string) string { return testkit.WriteFile(t, dir, "other", []byte("1")) }},
-		{"a link to nothing", func(dir string) string { return filepath.Join(dir, "nothing") }},
+		{"a link to a file", new("1")},
+		{"a link to nothing", nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -110,15 +110,23 @@ func TestAcquireRefusesAFileLinkInTheLocksPlace(t *testing.T) {
 			if err := os.MkdirAll(filepath.Join(root, "dist"), 0o777); err != nil {
 				t.Fatal(err)
 			}
-			target := tt.target(t.TempDir())
+			target := filepath.Join(t.TempDir(), "other")
+			if tt.holds != nil {
+				testkit.WriteFile(t, filepath.Dir(target), "other", []byte(*tt.holds))
+			}
 			testkit.LinkFile(t, target, lockOf(root))
 			release, err := Acquire(root)
 			e := asError(t, err, tt.name)
 			if release != nil || e.File != "dist/.lock" || !strings.Contains(e.Msg, "Symlinks are not supported") {
 				t.Errorf("error = %+v", e)
 			}
-			if fsx.Exists(filepath.Join(filepath.Dir(target), "nothing")) {
-				t.Error("a lock was written through the link")
+			// Nothing is written through the link: what it leads to is as it was.
+			held, err := os.ReadFile(target)
+			switch {
+			case tt.holds == nil && fsx.Exists(target):
+				t.Errorf("a lock was written through the link: %q", held)
+			case tt.holds != nil && (err != nil || string(held) != *tt.holds):
+				t.Errorf("the file the link leads to holds %q, %v", held, err)
 			}
 		})
 	}

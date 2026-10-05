@@ -3,6 +3,7 @@ package build
 import (
 	"context"
 	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -35,8 +36,9 @@ func asError(t testing.TB, err error, what string) *diag.Error {
 // needNewFilesBehindALink skips the test on a Windows whose temporary folder takes nothing new behind a link to a
 // folder. Windows keeps the temporary folder of a packaged app in a place it redirects for that app, and there
 // the making of a new file or folder behind a junction is answered with "the file exists", though none is there
-// and one is made behind the same junction in any other folder. The look is at the system alone: at a link and
-// a file of its own, with no code of this package. A test that writes behind a link at dist asks it first.
+// and one is made behind the same junction in any other folder. That answer on Windows is the one reason to
+// skip: any other failure to make the file fails the test. The look is at the system alone: at a link and a
+// file of its own, with no code of this package. A test that writes behind a link at dist asks it first.
 func needNewFilesBehindALink(t testing.TB) {
 	t.Helper()
 	folder, link := t.TempDir(), filepath.Join(t.TempDir(), "link")
@@ -46,10 +48,10 @@ func needNewFilesBehindALink(t testing.TB) {
 		file.Close()
 		return
 	}
-	if runtime.GOOS != "windows" {
-		t.Fatalf("no new file was made behind a link to a folder: %v", err)
+	if runtime.GOOS == "windows" && errors.Is(err, fs.ErrExist) {
+		t.Skipf("the temporary folder of this Windows takes no new file behind a junction: %v", err)
 	}
-	t.Skipf("the temporary folder of this Windows takes no new file behind a junction: %v", err)
+	t.Fatalf("no new file was made behind a link to a folder: %v", err)
 }
 
 // manifestName is the manifest of a stand-in project: the shared one, since the project has no local one.
