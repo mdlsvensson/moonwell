@@ -12,9 +12,6 @@ import (
 
 // This file holds the stage: the folder a planned map is written to, for the game to load and the user to read.
 
-// stageDir is the folder the maps are staged in, from the project folder.
-const stageDir = distDir + "/stage"
-
 // stage writes the planned map to dist/stage/<map.folder>, in place of what a build left there, and says what
 // was written into it of the project. It returns where the map is staged.
 func stage(e *env.Env, p *manifest.Project, plan *Result) (place, error) {

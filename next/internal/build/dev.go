@@ -104,7 +104,7 @@ func startingManifest(ctx context.Context, e *env.Env, pkl string) *manifest.Pro
 	if pkl == "" {
 		return nil
 	}
-	p, err := loadWith(ctx, e, pkl)
+	p, err := manifest.Load(ctx, e, pkl)
 	if err != nil {
 		return nil
 	}

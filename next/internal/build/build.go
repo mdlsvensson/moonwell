@@ -167,7 +167,7 @@ func Check(ctx context.Context, e *env.Env) (*Result, error) {
 // the manifest, the lock, the plan, and what the plan holds, said in a line. With refresh it writes the ids
 // module, as a build does; without, it fails for a module that is not current.
 func check(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, error) {
-	p, err := loadWith(ctx, e, pkl)
+	p, err := manifest.Load(ctx, e, pkl)
 	if err != nil {
 		return nil, err
 	}

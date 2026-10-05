@@ -17,12 +17,8 @@ import (
 // This file holds the archive as a file of the project: where a build puts it, what a build removes there, and
 // what it writes there.
 
-const (
-	// sourcesDir is the folder of a project's gameplay, from the project folder.
-	sourcesDir = "src"
-	// mapSuffix ends the name of a map: of its folder, and of its archive.
-	mapSuffix = ".w3x"
-)
+// mapSuffix ends the name of a map: of its folder, and of its archive.
+const mapSuffix = ".w3x"
 
 // clearedArchive is where the project's archive goes, with the archive of the build before removed.
 func clearedArchive(p *manifest.Project) (place, error) {
@@ -120,6 +116,17 @@ func keptFolder(parts []string) (kept string, found bool) {
 		return stageDir, true
 	}
 	return "", false
+}
+
+// lowerASCII is text with its ASCII letters in lower case, and every other byte as it is.
+func lowerASCII(text string) string {
+	lowered := []byte(text)
+	for at, char := range lowered {
+		if char >= 'A' && char <= 'Z' {
+			lowered[at] = char + 'a' - 'A'
+		}
+	}
+	return string(lowered)
 }
 
 // ---- what a build removes, and what it writes ----

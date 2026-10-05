@@ -12,12 +12,8 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 )
 
-const (
-	// distDir is the folder of a project that Moonwell writes what it builds into, from the project folder.
-	distDir = "dist"
-	// lockName is the build lock, from the project folder.
-	lockName = distDir + "/.lock"
-)
+// lockName is the build lock, from the project folder.
+const lockName = distDir + "/.lock"
 
 // holding is one taking of a lock: what the list keeps for the lock's file. A release gives back the lock only
 // while the list keeps the holding of its own call, so it never removes a lock that a later call took at the
