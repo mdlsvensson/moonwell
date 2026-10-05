@@ -28,8 +28,8 @@ import (
 // tree's build the same projects, and what they leave is compared file by file. The other tree's commands are
 // cli.Build and cli.Check, on a world of pipeline.NewEnv; this tree's are Build and Check, on a world of env.New.
 //
-// The test needs Pkl and the compiler, and runs both for every project: 45 projects are made, and 67 commands
-// are run by each tree, which takes about thirty-five seconds. It is skipped with -short.
+// The test needs Pkl and the compiler, and runs both for every project: 45 projects are made, the other tree
+// runs 73 commands and this tree 79, which takes about forty-five seconds. It is skipped with -short.
 //
 // How a project is run. A project is made once, as a seed: the other tree's init creates it, linked to this
 // checkout, and the test then writes the seed's files into it. For a command, the seed is copied to one place,
@@ -85,6 +85,24 @@ import (
 //
 // Of a check, also: that neither tree wrote a stage or an archive. Of a build that passes: that a file of the
 // stage and a file of the archive were compared.
+//
+// The upgrade in place, for three of the seeds (upgradedSeeds): the template, the modules, and everything. It is
+// what every user does on the day this tree takes the other's place: a build of this tree in a project folder
+// that a build of the other tree has left, with its stage, its archive, the copies of the libraries and their
+// stamps, the editor's files, and the cache of its compile, dist/stage/lua, whose two files are in a shape of
+// the other tree's own. No other run of this file meets any of that, since every other command runs on a fresh
+// copy. It takes the other tree to leave such a folder, so the run is written while that tree is there.
+//
+// Each of the three is upgraded twice (upgradeFrom). The other tree builds a fresh copy, plain the one time and
+// minified the other; this tree then runs its plain build in that same folder, and after it its check. Over the
+// plain build, each file that lies there is the file this tree makes. The minified build leaves compiled Lua
+// that a plain build does not make: a tree that took what lies in the cache for its own would stage it. What is
+// wanted is what this tree's plain build left of a fresh copy of the seed, in its ordinary run. The build over
+// the other tree's must give back and log the same, and leave the same project folder, whole: every part that
+// the trees are compared in, and the cache of the compile as well, which is this tree's own on both sides. It
+// must have compared a file of a stage, of an archive and of the cache. The check must pass, and give back and
+// log what this tree's check of a fresh copy did. The six runs are counted as Upgraded; their files and their
+// lines are not in the other counts, which are of the runs of both trees on a fresh copy.
 //
 // The refusals are 33 projects (oracleFaults), each built once: 32 with one fault and one with two. Eleven are
 // the faults a build meets step by step, and those of the classes below: an object with a base the game has not;
@@ -158,7 +176,8 @@ import (
 // Not compared:
 //
 //   - The cache of the compile, dist/stage/lua, and the folder dist/stage that it is the first to make: what a
-//     cache holds is each tree's own (the spec's §8: "Caches under dist/ and .moonwell/ are rebuilt once").
+//     cache holds is each tree's own (the spec's §8: "Caches under dist/ and .moonwell/ are rebuilt once"). It
+//     is compared between two runs of this tree, in the upgrade.
 //   - The bytes of the archive: its files are in the order of the planned map (the spec's §6), which is not the
 //     order the other tree packs its stage in. The archive is compared unpacked.
 //
@@ -178,7 +197,7 @@ import (
 //     modules seed is written by both trees without a download.
 //   - A version of the compiler that Moonwell does not know: the two trees word the hint of that refusal in two
 //     ways, which the oracle of toolchain compares and counts.
-//   - A build over what a build left: every command runs on a fresh copy
+//   - A build over what a build of the same tree left: but for the upgrade, every command runs on a fresh copy
 //     (TestStageWritesThePlannedMapInPlaceOfAnEarlierStageAndSaysWhatItHolds). What a second compile keeps is
 //     compared in script, and what a second sync keeps in library.
 //   - Another entry than the manifest's (TestPlanCompilesTheEntryAndInTheModeThatItsOptionsAndTheManifestName),
@@ -215,10 +234,13 @@ func TestOracleOnWhatTheBuildsOfBothTreesLeave(t *testing.T) {
 		t.Run(seed.name, func(t *testing.T) {
 			ran++
 			o.lay(t, seed)
-			plain := o.compare(t, seed.name, plainBuild)
-			minified := o.compare(t, seed.name, minifiedBuild)
-			o.compare(t, seed.name, plainCheck)
+			plain, built := o.compare(t, seed.name, plainBuild)
+			minified, _ := o.compare(t, seed.name, minifiedBuild)
+			_, checked := o.compare(t, seed.name, plainCheck)
 			coversItsRow(t, seed, plain, minified)
+			if slices.Contains(upgradedSeeds, seed.name) {
+				o.upgrade(t, seed.name, built, checked)
+			}
 		})
 	}
 	for _, fault := range oracleFaults {
@@ -234,6 +256,7 @@ func TestOracleOnWhatTheBuildsOfBothTreesLeave(t *testing.T) {
 			Builds: 22, Checks: 10, Refusals: 34,
 			Staged: 541, Packed: 504, Generated: 368, Libraries: 48, Kept: 2291, Lines: 103,
 			MapOpenedFirst: 1, StagedWhole: 14, NamedFromTheProject: 3, FileNamed: 2, RefusedLater: 1,
+			Upgraded: 6,
 		})
 	}
 }
@@ -248,6 +271,18 @@ type buildTally struct {
 	Lines int
 	// The runs of each class of the header.
 	MapOpenedFirst, StagedWhole, NamedFromTheProject, FileNamed, RefusedLater int
+	// The builds of this tree over what a build of the other tree left. The files and the lines of those runs
+	// are not among the counts above, which are of the runs of both trees on a fresh copy.
+	Upgraded int
+}
+
+// count adds the files of a comparison of two project folders to the tally, part by part.
+func (c *buildTally) count(files compared) {
+	c.Staged += files.staged
+	c.Packed += files.packed
+	c.Generated += files.generated
+	c.Libraries += files.libraries
+	c.Kept += files.kept
 }
 
 // check fails the test unless the oracle compared exactly what is expected of it.
@@ -908,7 +943,12 @@ func (o *buildOracle) oldTree(t *testing.T, seed string, command oracleCommand) 
 // command of the oracle starts.
 func (o *buildOracle) newTree(t *testing.T, seed string, command oracleCommand) leftBy {
 	t.Helper()
-	root := o.fresh(t, seed)
+	return newTreeIn(t, o.fresh(t, seed), command)
+}
+
+// newTreeIn runs a command of this tree in a project folder as it lies there, in the same world as newTree.
+func newTreeIn(t *testing.T, root string, command oracleCommand) leftBy {
+	t.Helper()
 	log := testkit.NewRecorder()
 	world := env.New(root, log.Logger)
 	world.Spawn = func(program string, args []string) error {
@@ -922,12 +962,13 @@ func (o *buildOracle) newTree(t *testing.T, seed string, command oracleCommand) 
 // ---- the comparison ----
 
 // compare runs a command of both trees on a seed, one after the other at one place, and compares what they
-// left: whole, but for the classes of the header. It returns what the other tree left.
-func (o *buildOracle) compare(t *testing.T, seed string, command oracleCommand) leftBy {
+// left: whole, but for the classes of the header. It returns what the other tree left, and what this tree left
+// as it was compared.
+func (o *buildOracle) compare(t *testing.T, seed string, command oracleCommand) (left, got leftBy) {
 	t.Helper()
 	what := seed + ", " + command.name
-	left := o.oldTree(t, seed, command)
-	got := o.newTree(t, seed, command)
+	left = o.oldTree(t, seed, command)
+	got = o.newTree(t, seed, command)
 	want := o.butForTheClasses(t, what, seed, left)
 	o.refusedLater(t, what, seed, left, &got)
 	before := o.tally
@@ -935,7 +976,7 @@ func (o *buildOracle) compare(t *testing.T, seed string, command oracleCommand) 
 	oracle.Values(t, what+": what the command gave back", want.answer, got.answer)
 	oracle.Values(t, what+": the logged lines", listed(want.lines), listed(got.lines))
 	o.tally.Lines += len(want.lines)
-	o.sameProject(t, what, want.files, got.files)
+	o.tally.count(sameProject(t, what, theOtherTree, want.files, got.files))
 	switch {
 	case failed:
 		o.tally.Refusals++
@@ -951,7 +992,7 @@ func (o *buildOracle) compare(t *testing.T, seed string, command oracleCommand) 
 		}
 		o.tally.Checks++
 	}
-	return left
+	return left, got
 }
 
 // listed is a list of lines that is never nil: no lines are no lines, whichever way a tree's logger keeps them.
@@ -967,27 +1008,39 @@ func wroteAMap(files map[string][]byte) bool {
 	return false
 }
 
-// sameProject compares all that the two trees left in the project folder, part by part, and counts the files.
-func (o *buildOracle) sameProject(t *testing.T, what string, want, got map[string][]byte) {
+// theOtherTree names the run whose project folder is what is wanted, in the comparisons of the two trees.
+const theOtherTree = "the other tree"
+
+// compared is the number of files that a comparison of two project folders compared byte for byte, by the part
+// of the project they are in.
+type compared struct{ staged, packed, generated, libraries, kept int }
+
+// sameProject compares all that two runs left in the project folder, part by part, and returns the number of
+// files it compared in each. want is what the run that wanted names left: the other tree, or a run of this tree
+// that another of its runs must equal.
+func sameProject(t *testing.T, what, wanted string, want, got map[string][]byte) compared {
 	t.Helper()
 	theirs, mine := inParts(want), inParts(got)
-	o.tally.Staged += alike(t, what+": the stage", theirs[staged], mine[staged])
-	o.tally.Generated += alike(t, what+": what a build generates", theirs[generated], mine[generated])
-	o.tally.Libraries += alike(t, what+": the libraries", theirs[libraries], mine[libraries])
-	o.tally.Kept += alike(t, what+": the rest of the project", theirs[kept], mine[kept])
-	o.tally.Packed += sameArchive(t, what+": the archive", theirs[packed][oracleArchive], mine[packed][oracleArchive])
+	return compared{
+		staged:    alike(t, what+": the stage", wanted, theirs[staged], mine[staged]),
+		generated: alike(t, what+": what a build generates", wanted, theirs[generated], mine[generated]),
+		libraries: alike(t, what+": the libraries", wanted, theirs[libraries], mine[libraries]),
+		kept:      alike(t, what+": the rest of the project", wanted, theirs[kept], mine[kept]),
+		packed: sameArchive(t, what+": the archive", wanted,
+			theirs[packed][oracleArchive], mine[packed][oracleArchive]),
+	}
 }
 
 // part is a part of a project folder, by what the oracle does with it.
 type part int
 
 const (
-	kept        part = iota // all that no command changes
-	staged                  // dist/stage/<map.folder>
-	packed                  // the archive, which is compared unpacked
-	generated               // what a build writes for the gameplay and for the editor, and the lock
-	libraries               // the copies of the libraries, each with its stamp
-	notCompared             // the cache of the compile: see the header
+	kept      part = iota // all that no command changes
+	staged                // dist/stage/<map.folder>
+	packed                // the archive, which is compared unpacked
+	generated             // what a build writes for the gameplay and for the editor, and the lock
+	libraries             // the copies of the libraries, each with its stamp
+	cache                 // the cache of the compile, which is each tree's own: see the header
 )
 
 // partOf is the part a file or a folder of a project belongs to, by its path from the project folder.
@@ -995,7 +1048,7 @@ func partOf(name string) part {
 	below := func(folder string) bool { return name == folder || strings.HasPrefix(name, folder+"/") }
 	switch {
 	case name == "dist/stage", below("dist/stage/lua"):
-		return notCompared
+		return cache
 	case below(oracleStage):
 		return staged
 	case name == oracleArchive:
@@ -1022,18 +1075,18 @@ func inParts(files map[string][]byte) map[part]map[string][]byte {
 	return parts
 }
 
-// alike compares what the two trees hold of one part of a project: the names, which of them are folders, and
-// each file byte for byte. It returns the number of files it compared.
-func alike(t *testing.T, what string, want, got map[string][]byte) (files int) {
+// alike compares what two runs hold of one part of a project: the names, which of them are folders, and each
+// file byte for byte. want is what the run that wanted names holds. It returns the number of files it compared.
+func alike(t *testing.T, what, wanted string, want, got map[string][]byte) (files int) {
 	t.Helper()
 	for _, name := range slices.Sorted(maps.Keys(want)) {
 		theirs, mine := want[name], got[name]
 		_, held := got[name]
 		switch {
 		case !held:
-			t.Errorf("%s: %s is not there, and the other tree has it", what, name)
+			t.Errorf("%s: %s is not there, and %s has it", what, name, wanted)
 		case (theirs == nil) != (mine == nil):
-			t.Errorf("%s: %s is a folder in one tree and a file in the other", what, name)
+			t.Errorf("%s: %s is a folder in one run and a file in the other", what, name)
 		case theirs != nil:
 			oracle.Bytes(t, what+": "+name, theirs, mine)
 			files++
@@ -1041,26 +1094,26 @@ func alike(t *testing.T, what string, want, got map[string][]byte) (files int) {
 	}
 	for _, name := range slices.Sorted(maps.Keys(got)) {
 		if _, held := want[name]; !held {
-			t.Errorf("%s: %s is there, and the other tree has none", what, name)
+			t.Errorf("%s: %s is there, and %s has none", what, name, wanted)
 		}
 	}
 	return files
 }
 
-// sameArchive compares the archives of the two trees, unpacked: what stands before each, the names each lists,
-// and each file byte for byte. It returns the number of files it compared: none where neither tree has an
-// archive.
-func sameArchive(t *testing.T, what string, want, got []byte) (files int) {
+// sameArchive compares the archives of two runs, unpacked: what stands before each, the names each lists, and
+// each file byte for byte. want is the archive of the run that wanted names. It returns the number of files it
+// compared: none where neither run has an archive.
+func sameArchive(t *testing.T, what, wanted string, want, got []byte) (files int) {
 	t.Helper()
 	if want == nil || got == nil {
 		if (want == nil) != (got == nil) {
-			t.Errorf("%s: one tree has an archive and the other has none (the other tree has one: %v)", what, want != nil)
+			t.Errorf("%s: one run has an archive and the other has none (%s has one: %v)", what, wanted, want != nil)
 		}
 		return 0
 	}
-	theirs, mine := unpacked(t, what+" of the other tree", want), unpacked(t, what, got)
+	theirs, mine := unpacked(t, what+" of "+wanted, want), unpacked(t, what, got)
 	oracle.Bytes(t, what+": what stands before the archive", theirs.before, mine.before)
-	return alike(t, what, theirs.files, mine.files)
+	return alike(t, what, wanted, theirs.files, mine.files)
 }
 
 // anArchive is an archive as the trees are compared by: what stands before it, and the files it lists.
@@ -1082,6 +1135,80 @@ func unpacked(t *testing.T, what string, data []byte) anArchive {
 		files[name] = []byte(fileOf(t, archive, name))
 	}
 	return anArchive{before: data[:archive.HeaderOffset], files: files}
+}
+
+// ---- the upgrade ----
+
+// upgradedSeeds are the seeds that this tree also builds over what the builds of the other tree left.
+var upgradedSeeds = []string{"template", "modules", "everything"}
+
+// aFreshCopy names the run whose project folder is what is wanted of a build over what the other tree left.
+const aFreshCopy = "this tree's build of a fresh copy"
+
+// The two files in which the other tree keeps what its compile left, for its next one.
+const (
+	cachedHashes = "dist/stage/lua/.hashes.json"
+	cachedUses   = "dist/stage/lua/.globals.json"
+)
+
+// upgrade builds a seed with this tree over what the other tree's plain build left, and over what its minified
+// build left. built and checked are what this tree's plain build and its check left of a fresh copy of the seed,
+// which the ordinary runs made.
+func (o *buildOracle) upgrade(t *testing.T, seed string, built, checked leftBy) {
+	t.Helper()
+	if built.err != nil || checked.err != nil {
+		t.Errorf("%s: this tree does not build and check a fresh copy: an upgrade has nothing to equal", seed)
+		return
+	}
+	for _, first := range []oracleCommand{plainBuild, minifiedBuild} {
+		o.upgradeFrom(t, seed, first, built, checked)
+	}
+}
+
+// upgradeFrom has the other tree run its build first on a fresh copy of a seed, and then, in that folder as the
+// other tree left it, this tree its plain build and after it its check. The build must leave the project folder,
+// the cache of the compile too, as built has it, give back and log what built did, and have compared a file of
+// a stage, of an archive and of the cache; the check must pass, and give back and log what checked did.
+func (o *buildOracle) upgradeFrom(t *testing.T, seed string, first oracleCommand, built, checked leftBy) {
+	t.Helper()
+	what := seed + ", build over the other tree's " + first.name
+	root := o.leftToBuildOver(t, what, seed, first)
+	over := newTreeIn(t, root, plainBuild)
+	if over.err != nil {
+		t.Errorf("%s: this tree does not build over what the other tree left: %v", what, diag.Format(over.err))
+	}
+	sameRun(t, what, built, over)
+	files := sameProject(t, what, aFreshCopy, built.files, over.files)
+	cached := alike(t, what+": the cache of the compile", aFreshCopy,
+		inParts(built.files)[cache], inParts(over.files)[cache])
+	if files.staged == 0 || files.packed == 0 || cached == 0 {
+		t.Errorf("%s: no file of a stage, of an archive or of the cache of the compile was compared", what)
+	}
+	again := newTreeIn(t, root, plainCheck)
+	if again.err != nil {
+		t.Errorf("%s: this tree's check does not pass after its build: %v", what, diag.Format(again.err))
+	}
+	sameRun(t, what+", then check", checked, again)
+	o.tally.Upgraded++
+}
+
+// leftToBuildOver has the other tree run a build on a fresh copy of a seed, and returns the project folder as
+// that build left it. The build must have left what an upgrade meets: a stage, an archive, and the two files of
+// its compile's cache.
+func (o *buildOracle) leftToBuildOver(t *testing.T, what, seed string, first oracleCommand) (root string) {
+	t.Helper()
+	left := o.oldTree(t, seed, first)
+	if left.err != nil || !wroteAMap(left.files) || left.files[cachedHashes] == nil || left.files[cachedUses] == nil {
+		t.Errorf("%s: the other tree left no build to build over: %v", what, left.err)
+	}
+	return filepath.Join(o.runs, seed)
+}
+
+// sameRun compares what two runs of this tree gave back and logged: got must be as want.
+func sameRun(t *testing.T, what string, want, got leftBy) {
+	t.Helper()
+	oracle.Values(t, what+": what the command gave back", want.answer, got.answer)
+	oracle.Values(t, what+": the logged lines", listed(want.lines), listed(got.lines))
 }
 
 // ---- the classes ----
