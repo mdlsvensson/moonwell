@@ -1,14 +1,3 @@
-// Package script turns a project's source files into the Lua that goes into a map: it finds the modules, compiles
-// the YueScript ones, follows the requires from the entry, checks for globals nobody defines, and writes the
-// bundle.
-//
-// It takes a compiler, the libraries' folders and what the map's own script defines, and returns a Program; Inject
-// places a Program in a map folder as a change.
-//
-// It knows nothing of libraries' sources, of manifests beyond the lint block, or of how a map is built.
-//
-// Of Moonwell it imports manifest, mapdir, war3/lua, env, diag, fsx and the root package, for the files the
-// program carries.
 package script
 
 import (

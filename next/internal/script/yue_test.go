@@ -853,6 +853,22 @@ func TestASourceThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
 	}
 }
 
+func TestAnOutputThatAnotherProgramHoldsIsRefusedByItsPathFromTheProjectFolder(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		t.Skip("only Windows refuses to remove a file that another program holds open")
+	}
+	b := benchOf(t, mainOnly.and("dist/stage/lua/main.lua", "-- of the last compile\n"))
+	b.fake(nil)
+	testkit.MakeUnwritable(t, b.staged("main.lua"))
+	// The output is removed before the compiler runs, and the system refuses that: the failure is the output's
+	// own, as any other failure to remove it, and not that of a map that the game holds.
+	failure := b.refuses(fakeYue, false, "an output that is held")
+	if !strings.HasPrefix(failure.Msg, "Removing dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" ||
+		failure.Hint != stageHint || strings.Contains(failure.Msg, b.root) || failure.Cause == nil || len(b.ran()) != 0 {
+		t.Errorf("error = %+v", failure)
+	}
+}
+
 func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T) {
 	// A file where the output's folder must be.
 	b := benchOf(t, files("src/game/units.yue", "x = 1\n", "dist/stage/lua/game", "a file, not a folder"))

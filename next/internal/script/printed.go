@@ -8,8 +8,9 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 )
 
-// This file reads what the compiler prints, and tells a source with code from one without. Its functions take
-// text and return what the text says: they run no program and read no file.
+// This file reads what the compiler prints, for a file it failed to compile and for the globals a source uses,
+// and tells a source with code from one without. Its functions take text and return what the text says: they
+// run no program and read no file.
 
 // luaSpace is the white space of Lua, which is that of YueScript and of what the compiler prints.
 const luaSpace = " \t\n\v\f\r"
@@ -102,6 +103,38 @@ func compileError(file, printed string) *diag.Error {
 	return errRefused(file, detail, 0)
 }
 
+// globalUse is one global a source reads or writes, at its position: the line and the column count from 1.
+type globalUse struct {
+	Name   string `json:"name"`
+	Line   int    `json:"line"`
+	Column int    `json:"column"`
+}
+
+var useLine = regexp.MustCompile(`^([^ \t\n\v\f\r]+) ([0-9]+) ([0-9]+)$`)
+
+// usesPrinted reads what `yue -g` prints for a source: a `NAME LINE COLUMN` on each line. A line ends at "\n" or
+// "\r\n", the white space around it is dropped, and a blank one is skipped. The first line that is anything else
+// is the failure, which names the source by file. A source that uses no global has a list without uses, which is
+// not nil.
+func usesPrinted(printed, file string) ([]globalUse, *diag.Error) {
+	uses := []globalUse{}
+	for _, raw := range lineEnd.Split(printed, -1) {
+		line := strings.Trim(raw, luaSpace)
+		if line == "" {
+			continue
+		}
+		use := useLine.FindStringSubmatch(line)
+		if use == nil {
+			return nil, errUnreadableUse(file, line)
+		}
+		// A position beyond what a number holds is the greatest number.
+		at, _ := strconv.Atoi(use[2])
+		column, _ := strconv.Atoi(use[3])
+		uses = append(uses, globalUse{Name: use[1], Line: at, Column: column})
+	}
+	return uses, nil
+}
+
 // ---- errors ----
 
 // errRefused is the failure of a file the compiler refused, in the compiler's words.
@@ -121,14 +154,11 @@ func errNotRewritten(file, step, ending string, line int) *diag.Error {
 	}
 }
 
-// errEmptyOutput is the failure of a compile that reported success and wrote an empty file for a source that
-// has code. YueScript 0.34.2 does that for a source that uses floor division (`//`) or a bitwise operator, with
-// both -r and -m, and the module would silently be missing from the build.
-func errEmptyOutput(file string) *diag.Error {
+// errUnreadableUse is the failure of a source for which `yue -g` printed a line that is no use of a global.
+func errUnreadableUse(file, line string) *diag.Error {
 	return &diag.Error{
-		Msg:  "YueScript reported success but wrote no Lua for " + file + ", although the file has code.",
+		Msg:  "yue -g printed a line Moonwell cannot read: " + line,
 		File: file,
-		Hint: "YueScript 0.34.2 does this for a file that uses the floor division operator `//` or a bitwise operator. " +
-			"Use YueScript 0.34.3 (the default from Moonwell 0.8.1 on), or write math.floor(a / b) instead.",
+		Hint: "Use a YueScript version Moonwell supports: remove yue.version and yue.path from the manifests.",
 	}
 }

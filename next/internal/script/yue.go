@@ -219,90 +219,102 @@ func compiledOf(units []unit) *compiled {
 
 // ---- running the compiler ----
 
-// compiler is how the sources of one compile are compiled.
+// compiler is how the compiler is run on the sources of one project: to compile them, and to list the globals
+// they use.
 type compiler struct {
 	ctx     context.Context
 	run     env.RunFunc
 	program string // the compiler's path
-	mode    string // -r or -m
+	mode    string // -r or -m, for a compile
 	search  string // the --path that finds the macro module
 }
 
-// outcome is how the compile of one source ended: failure for a file the compiler refused, err for anything
-// else that went wrong, and neither for a source the compiler took.
-type outcome struct {
-	failure *diag.Error
-	err     error
-}
-
-// compileEach compiles the units, at most atOnce at a time, and returns the failures of the files the compiler
-// refused. After any other error no further compiler is started, the ones that run are waited for, and the
-// first such error is returned.
+// eachOf does the work on every item, at most atOnce at a time, and returns what each gave, in the order of the
+// items. After an error no further work is started, the work that runs is waited for, and the first error is
+// returned.
 //
-// Only this function's own goroutine reads and writes what it counts and gathers; a compile hands its outcome
-// over the channel and touches nothing else that is shared. The function returns when every compile it started
-// has handed over its outcome, so none outlives it.
-func (c compiler) compileEach(units []unit) (failures []*diag.Error, err error) {
-	outcomes := make(chan outcome)
+// Only this function's own goroutine reads and writes what it counts and gathers; the work on an item hands
+// over what it gave on the channel and touches nothing else that is shared. The function returns when all the
+// work it started has handed over, so none outlives it.
+func eachOf[T, G any](items []T, work func(T) (G, error)) (gave []G, err error) {
+	type ended struct {
+		at   int
+		gave G
+		err  error
+	}
+	gave = make([]G, len(items))
+	over := make(chan ended)
 	next, running := 0, 0
 	for {
-		if err == nil && next < len(units) && running < atOnce {
-			go func(u unit) { outcomes <- c.compile(u) }(units[next])
+		if err == nil && next < len(items) && running < atOnce {
+			go func(at int) {
+				result, failed := work(items[at])
+				over <- ended{at, result, failed}
+			}(next)
 			next, running = next+1, running+1
 			continue
 		}
 		if running == 0 {
-			return failures, err
+			return gave, err
 		}
-		done := <-outcomes
+		done := <-over
 		running--
-		switch {
-		case done.err != nil && err == nil:
+		gave[done.at] = done.gave
+		if done.err != nil && err == nil {
 			err = done.err
-		case done.failure != nil:
-			failures = append(failures, done.failure)
 		}
 	}
 }
 
-// compile runs the compiler on one source, with no file at the source's output. With a file there, the compiler
-// rewrites or minifies that file where the source has no code, and with none it writes none: so the output of
-// an earlier run is removed first, and what is at the output afterwards is what this run wrote. The folder is
-// made before that, so a file in the folder's place is refused in the same words on every system.
+// compileEach compiles the units, at most atOnce at a time, and returns the failures of the files the compiler
+// refused. Any other error stops it, as eachOf says.
+func (c compiler) compileEach(units []unit) ([]*diag.Error, error) {
+	refused, err := eachOf(units, c.compile)
+	if err != nil {
+		return nil, err
+	}
+	return slices.DeleteFunc(refused, func(failure *diag.Error) bool { return failure == nil }), nil
+}
+
+// compile runs the compiler on one source, with no file at the source's output, and returns the failure of a
+// file the compiler refused: nil for a source it took. With a file at the output, the compiler rewrites or
+// minifies that file where the source has no code, and with none it writes none: so the output of an earlier
+// run is removed first, and what is at the output afterwards is what this run wrote. The folder is made before
+// that, so a file in the folder's place is refused in the same words on every system.
 //
 // A source the compiler refused has no file at its output afterwards either: the compiler leaves the Lua it
 // could not rewrite.
-func (c compiler) compile(u unit) outcome {
+func (c compiler) compile(u unit) (refused *diag.Error, err error) {
 	if err := os.MkdirAll(filepath.Dir(u.output), 0o777); err != nil {
-		return outcome{err: errUnwritableOutput(stageDir+"/"+u.under, err)}
+		return nil, errUnwritableOutput(stageDir+"/"+u.under, err)
 	}
 	if err := removeOutput(u.under, u.output); err != nil {
-		return outcome{err: err}
+		return nil, err
 	}
 	args := []string{"--target=5.3", c.mode, "-o", u.output, "--path", c.search, u.file}
 	result, err := c.run(c.ctx, c.program, args, env.RunOptions{})
 	if err != nil {
-		return outcome{err: err}
+		return nil, err
 	}
 	failure := u.failureOf(result)
 	if failure == nil {
-		return outcome{}
+		return nil, nil
 	}
 	if err := removeOutput(u.under, u.output); err != nil {
-		return outcome{err: err}
+		return nil, err
 	}
-	return outcome{failure: failure}
+	return failure, nil
 }
 
 // removeOutput removes a file of the staging folder: under is its path from there, with "/", and file its place
-// on disk. A file that is not there is no failure.
+// on disk. A file that is not there is no failure. Every other failure is the output's own, whatever the
+// system's reason: a file that another program holds is named from the project folder as any other is.
 func removeOutput(under, file string) error {
-	err := fsx.RemoveFile(file)
-	var expected *diag.Error
-	if err != nil && !errors.As(err, &expected) {
-		return errUnremovableOutput(stageDir+"/"+under, err)
+	err := os.Remove(file)
+	if err == nil || errors.Is(err, fs.ErrNotExist) {
+		return nil
 	}
-	return err
+	return errUnremovableOutput(stageDir+"/"+under, err)
 }
 
 // failureOf is the failure of a run of the compiler on the unit; nil for a run that went well. What the run
@@ -362,10 +374,27 @@ func errUnremovableOutput(path string, cause error) error {
 	return &diag.Error{Msg: "Removing " + path + " failed: " + fsx.Reason(cause), File: path, Hint: stageHint, Cause: cause}
 }
 
+// errEmptyOutput is the failure of a compile that reported success and wrote an empty file for a source that
+// has code. YueScript 0.34.2 does that for a source that uses floor division (`//`) or a bitwise operator, with
+// both -r and -m, and the module would silently be missing from the build.
+func errEmptyOutput(file string) *diag.Error {
+	return &diag.Error{
+		Msg:  "YueScript reported success but wrote no Lua for " + file + ", although the file has code.",
+		File: file,
+		Hint: "YueScript 0.34.2 does this for a file that uses the floor division operator `//` or a bitwise operator. " +
+			"Use YueScript 0.34.3 (the default from Moonwell 0.8.1 on), or write math.floor(a / b) instead.",
+	}
+}
+
+// firstByPath is the failure of the file that is first by the bytes of its path.
+func firstByPath(failures []*diag.Error) *diag.Error {
+	return slices.MinFunc(failures, func(a, b *diag.Error) int { return strings.Compare(a.File, b.File) })
+}
+
 // errNotCompiled is the failure of a compile in which the compiler refused files: that of the first file by the
 // bytes of its path and, when there are more, the count of the others in place of its hint.
 func errNotCompiled(failures []*diag.Error) error {
-	first := slices.MinFunc(failures, func(a, b *diag.Error) int { return strings.Compare(a.File, b.File) })
+	first := firstByPath(failures)
 	if len(failures) == 1 {
 		return first
 	}

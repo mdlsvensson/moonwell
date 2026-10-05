@@ -108,6 +108,62 @@ func writeHashes(root string, now dependsOn, good, pending []unit) error {
 	return writeCache(root, hashesFile, kept)
 }
 
+// usesFile is the file of the staging folder in which a check keeps the globals each source uses, for the next
+// one.
+const usesFile = ".globals.json"
+
+// listedWith is what every list of uses depends on beside its own source. A check with another value lists the
+// uses of every source again.
+type listedWith struct {
+	Compiler string `json:"compiler"` // the compiler's path
+	Macros   string `json:"macros"`   // the SHA-256 of the macro module
+}
+
+// keptUses is the content of the uses file: what the lists depend on, and each source that was listed, by its
+// path from the project folder.
+type keptUses struct {
+	listedWith
+	Sources map[string]sourceUses `json:"sources"`
+}
+
+// sourceUses is a source as the uses file keeps it.
+type sourceUses struct {
+	Hash string      `json:"hash"` // the SHA-256 of the source's bytes
+	Uses []globalUse `json:"uses"` // the globals it uses, in the order the compiler lists them; never nil
+}
+
+// readUses is the lists of the last check that hold now: each source's, by its path, when they were made with
+// what the lists depend on now. Without a file, with one in another shape or with one made with something else,
+// there are none, and every source is listed again. A link on the way to the file is refused.
+func readUses(root string, now listedWith) (map[string]sourceUses, error) {
+	kept, found, err := readCache[keptUses](root, usesFile)
+	if err != nil || !found || kept.listedWith != now || !kept.listsEverySource() {
+		return map[string]sourceUses{}, err
+	}
+	return kept.Sources, nil
+}
+
+// listsEverySource reports whether the file has a list of uses for each source it keeps, and a name for each
+// use. A source without a list would pass for one that uses no global, and its unknown globals for none: a file
+// that has such a source is none of this shape.
+func (k keptUses) listsEverySource() bool {
+	for _, source := range k.Sources {
+		if source.Uses == nil || slices.ContainsFunc(source.Uses, func(use globalUse) bool { return use.Name == "" }) {
+			return false
+		}
+	}
+	return k.Sources != nil
+}
+
+// writeUses keeps the lists of uses, each with the hash of the source it was made of, and what they depend on.
+//
+// A list is data and no file on disk: it is kept once it is made, and never while it is being made. So a check
+// that is stopped leaves the file as it was, which is true of every source it names, and the file needs no entry
+// for a source that is about to be listed, as the hashes file has for one that is about to be compiled.
+func writeUses(root string, now listedWith, lists map[string]sourceUses) error {
+	return writeCache(root, usesFile, keptUses{listedWith: now, Sources: lists})
+}
+
 // readCache reads a file that a compile keeps in the staging folder, as the T it was written from. found is
 // false without such a file: where there is none, where it cannot be read, and where it is no JSON in the shape
 // of T, which is so for text that is no JSON value, for a member T has not, for a value of another kind than

@@ -4,7 +4,9 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"slices"
 	"strings"
 	"testing"
 
@@ -75,12 +77,44 @@ func withoutSearchedFiles(printed string) string {
 	return strings.Join(kept, "\n")
 }
 
+// recordedVersion is the version of the compiler that the recordings are of.
+const recordedVersion = "0.34.3"
+
+// versionLine finds the version in what a compiler prints when it is asked for it: the version ends at the first
+// white space.
+var versionLine = regexp.MustCompile(`Yuescript version: ([^ \t\n\v\f\r]+)`)
+
+// reportedVersion is the version a compiler reports when it is asked with -v, on either stream; "" when what it
+// prints names none.
+func reportedVersion(t *testing.T, yue string) string {
+	t.Helper()
+	result, err := env.Run(background, yue, []string{"-v"}, env.RunOptions{})
+	if err != nil {
+		t.Fatalf("asking %s for its version: %v", yue, err)
+	}
+	if reported := versionLine.FindStringSubmatch(result.Stdout + result.Stderr); reported != nil {
+		return reported[1]
+	}
+	return ""
+}
+
 // TestTheCompilerPrintsWhatWasRecorded runs the real compiler on the source behind each recording, with the
 // arguments a compile gives it, and compares what it prints and leaves with the recording. On Windows the two
 // are the same once the folders are written as the recordings write them. On another system the recording is
 // taken with "\n" for each line end, and without the lines that name the files a module was looked for in.
+//
+// The recordings are of one version of the compiler, which is the one Moonwell downloads. A compiler of the
+// user's own that reports another version, named by MOONWELL_TEST_YUE, words its failures its own way: the test
+// is skipped for it, and says so. Without that variable the compiler is the one Moonwell downloads, and another
+// version fails the test: the recordings are then to be made again.
 func TestTheCompilerPrintsWhatWasRecorded(t *testing.T) {
 	yue := tooltest.Yue(t)
+	if reported := reportedVersion(t, yue); reported != recordedVersion {
+		if os.Getenv("MOONWELL_TEST_YUE") == "" {
+			t.Fatalf("the recordings are of YueScript %s, and the compiler Moonwell downloads reports %q: record them again", recordedVersion, reported)
+		}
+		t.Skipf("the recordings are of YueScript %s, and the compiler MOONWELL_TEST_YUE names reports %q", recordedVersion, reported)
+	}
 	const bit = "x = 1\n\n\nflags = x & 3\nprint flags\n"
 	for _, c := range []struct {
 		name, text, mode string // the source is src/<name>.yue
@@ -288,6 +322,59 @@ func TestWhatTheCompilerPrintsIsReadWithWhiteSpaceAndLineEndsOfASCIIOnly(t *test
 	} {
 		if got := hasCode(source); got != want {
 			t.Errorf("hasCode(%q) = %v, want %v", source, got, want)
+		}
+	}
+}
+
+// ---- what yue -g prints ----
+
+func TestUsesPrintedReadsOutputWithCarriageReturnsAndSkipsBlankLines(t *testing.T) {
+	uses, err := usesPrinted("Score 1 8\r\nCreatUnit 2 7\r\n\r\n", "src/main.yue")
+	want := []globalUse{{Name: "Score", Line: 1, Column: 8}, {Name: "CreatUnit", Line: 2, Column: 7}}
+	if err != nil || !slices.Equal(uses, want) {
+		t.Errorf("usesPrinted = %+v, %v", uses, err)
+	}
+	// Nothing printed is a list without uses, and not no list: the file was listed.
+	for _, printed := range []string{"", "\n", " \t\r\n\v\f\n"} {
+		if uses, err := usesPrinted(printed, "src/main.yue"); err != nil || uses == nil || len(uses) != 0 {
+			t.Errorf("usesPrinted(%q) = %#v, %v, want a list without uses", printed, uses, err)
+		}
+	}
+	// White space around a line is dropped, and a name is whatever has none.
+	uses, err = usesPrinted("\t a.b:c 10 200 \n", "src/main.yue")
+	if want := []globalUse{{Name: "a.b:c", Line: 10, Column: 200}}; err != nil || !slices.Equal(uses, want) {
+		t.Errorf("usesPrinted = %+v, %v", uses, err)
+	}
+}
+
+func TestUsesPrintedRefusesOutputItCannotRead(t *testing.T) {
+	// The first line that cannot be read is the one named, and no use is returned.
+	uses, failure := usesPrinted("print 1 1\nScore one 8\nx\n", "src/main.yue")
+	if uses != nil || failure == nil || failure.Msg != "yue -g printed a line Moonwell cannot read: Score one 8" ||
+		failure.File != "src/main.yue" || failure.Line != 0 ||
+		failure.Hint != "Use a YueScript version Moonwell supports: remove yue.version and yue.path from the manifests." {
+		t.Fatalf("usesPrinted = %+v, %+v", uses, failure)
+	}
+	for _, printed := range []string{"Score", "Score 1", "Score 1 8 9", "Score  1 8", "Score 1\t8", "Score -1 8", "1 8", "Score 1.0 8"} {
+		if uses, err := usesPrinted(printed+"\n", "src/main.yue"); err == nil {
+			t.Errorf("usesPrinted(%q) = %+v, want a refusal", printed, uses)
+		}
+	}
+}
+
+func TestWhatYueGPrintsIsReadWithWhiteSpaceOfASCIIOnly(t *testing.T) {
+	// A character outside ASCII is part of the name it stands in, and of the line it stands at the end of.
+	uses, err := usesPrinted("a"+noBreakSpace+"b 1 2\n"+wideSpace+" 3 4\n"+lineSeparator+"Score 5 6\n", "src/main.yue")
+	want := []globalUse{
+		{Name: "a" + noBreakSpace + "b", Line: 1, Column: 2}, {Name: wideSpace, Line: 3, Column: 4}, {Name: lineSeparator + "Score", Line: 5, Column: 6},
+	}
+	if err != nil || !slices.Equal(uses, want) {
+		t.Errorf("usesPrinted = %+v, %v", uses, err)
+	}
+	for _, printed := range []string{"Score 1 8" + noBreakSpace + "\n", "a 1 2" + paragraphEnd + "b 3 4\n", "Score" + wideSpace + "1 8\n"} {
+		uses, failure := usesPrinted(printed, "src/main.yue")
+		if failure == nil || !strings.HasPrefix(failure.Msg, "yue -g printed a line Moonwell cannot read: ") {
+			t.Errorf("usesPrinted(%q) = %+v, %+v, want a refusal", printed, uses, failure)
 		}
 	}
 }
