@@ -19,7 +19,8 @@
 // from it.
 //
 // Of Moonwell's packages it imports objects and manifest, for the fields and the categories the schema is made
-// of, assets, for the types of file that are a texture, and fsx.
+// of, script, for the natives as the program reads them, assets, for the types of file that are a texture, fsx,
+// and jass, its own parser of the game's two scripts.
 package main
 
 import (
@@ -59,6 +60,8 @@ type mode struct {
 // A new mode is a row here, a line in the package comment, and a function in a file of its own.
 var modes = []mode{
 	{name: "", usage: "Usage: " + commandLine, run: writeSchema},
+	{name: "natives", usage: "Usage: " + commandLine + " natives <exported folder> <game version>",
+		takes: 2, run: writeNatives},
 	{name: "game-paths", usage: "Usage: " + commandLine + " game-paths <listfile> <game version, e.g. 3.0.0.24268>",
 		takes: 2, run: writeGamePaths},
 }

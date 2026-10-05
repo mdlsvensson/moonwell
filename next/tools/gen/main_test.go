@@ -21,7 +21,8 @@ func TestRunRefusesAFirstArgumentThatNamesNoMode(t *testing.T) {
 	if err == nil {
 		t.Fatal("a mode the generator does not have was run")
 	}
-	contains(t, err.Error(), "Unknown mode 'nativs'", "game-paths", "without one, gen writes schema/generated")
+	contains(t, err.Error(),
+		"Unknown mode 'nativs'", "natives", "game-paths", "without one, gen writes schema/generated")
 	if printed != "" || len(files) != 0 {
 		t.Errorf("the refused line printed %q and left %v", printed, slices.Sorted(maps.Keys(files)))
 	}
@@ -49,11 +50,17 @@ func TestTheRefusalOfAnUnknownModeNamesTheModesOfTheTable(t *testing.T) {
 }
 
 func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
-	const gamePaths = "Usage: go run ./tools/gen game-paths <listfile> <game version, e.g. 3.0.0.24268>"
+	const (
+		natives   = "Usage: go run ./tools/gen natives <exported folder> <game version>"
+		gamePaths = "Usage: go run ./tools/gen game-paths <listfile> <game version, e.g. 3.0.0.24268>"
+	)
 	for _, c := range []struct {
 		args []string
 		want string
 	}{
+		{[]string{"natives"}, natives},
+		{[]string{"natives", "folder"}, natives},
+		{[]string{"natives", "folder", "1.2.3.4", "more"}, natives},
 		{[]string{"game-paths"}, gamePaths},
 		{[]string{"game-paths", "listfile.txt"}, gamePaths},
 		{[]string{"game-paths", "listfile.txt", "1.2.3.4", "more"}, gamePaths},

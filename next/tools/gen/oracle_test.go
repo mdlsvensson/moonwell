@@ -30,8 +30,9 @@ import (
 //
 // A run is one command line on one scratch checkout: a folder of the test with a go.mod that names this module
 // and what the run lays there. Each tree gets a checkout of its own, laid by the same function, since a run
-// writes; the two are compared by the paths from their checkouts. A file that the line names by its full path, a
-// list of file names, lies in a third folder that both trees read, and that must hold afterwards what it held.
+// writes; the two are compared by the paths from their checkouts. What the line names by its full path, a list
+// of file names or an export with the two scripts, lies in a third folder that both trees read, and that must
+// hold afterwards what it held.
 // No run is given the real checkout, or a folder below it, as the folder to run in: the real checkout is only
 // read.
 //
@@ -45,11 +46,12 @@ import (
 // builds this tree's generator too, next/tools/gen, and the runs of programRuns are given to both generators as
 // programs, each started in its own checkout (AsPrograms in the tally): for each mode a line that is carried out,
 // a line that the mode refuses, and a wrong count; a file of the checkout that is not there; a folder that is no
-// checkout; and, started in a folder below the checkout, a list beside it and a list that is not there, each
-// named by a path from that folder. They are compared as every other run is, each by its class. The test builds
-// two programs and starts them some eighty times, takes a few seconds, and is skipped with -short. A change to
-// this tree's generator that is given to go test with its flag -overlay reaches run and not the program that
-// the test builds: through GOFLAGS it reaches both.
+// checkout; Lua extras that the other tree's program panics on; and, started in a folder below the checkout, a
+// list and an export beside it, and a list and an export that are not there, each named by a path from that
+// folder. They are compared as every other run is, each by its class. The test builds two programs and starts
+// them some hundred and sixty times, takes some ten seconds, and is skipped with -short. A change to this tree's
+// generator that is given to go test with its flag -overlay reaches run and not the program that the test
+// builds: through GOFLAGS it reaches both.
 //
 // Where a run is started. Each tree carries a run out in one place (madeBy), and nothing is started there, by
 // either tree, as a program or in process, unless the folder of the run can lead a generator that walks up from
@@ -72,7 +74,8 @@ import (
 //     data/ and schema/generated/, and whatever else lies there, so that a file written elsewhere shows.
 //
 // For the runs that say so (asCommitted), what each tree writes is also compared with the file of the real
-// checkout: the schema of the committed metadata, and the list of the game's own list of file names.
+// checkout: the schema of the committed metadata, the list of the game's own list of file names, and the natives
+// of the game's own two scripts.
 //
 // Neither tree may put the full path of its checkout into what it prints or writes: the two checkouts are two
 // folders, and such a path would part the trees for no reason of theirs. The other tree's standard error is the
@@ -85,6 +88,18 @@ import (
 // fields share, a keyword, a reserved name, and every kind of name no property can have at once; a metadata that
 // is not there, without and with its folder, one that is a folder, one that is cut short and one that is no JSON;
 // a file at the place of the folder of the schema, and of the folder above it; and a folder that is no checkout.
+// The runs of natives (nativesRuns): the miniature scripts and Lua extras of natives_test.go, into an empty data
+// folder, over the natives of another version, and with the committed Lua extras; extras without a key, with
+// empty lists and a list that is null, and with a key twice; scripts with carriage returns and a byte order mark
+// at the start, which both trees pass over, the other tree as white space before the first word and this tree
+// as it decodes the file; scripts that declare nothing; one byte that is no UTF-8, in a comment, in a text and
+// in a line that is no declaration; a version that is empty, and one that a JSON text escapes; a run in a folder
+// below the checkout; a name declared twice, in every pair of places that the tests of natives_test.go name, and
+// two such names at once; a line of either script that is no declaration, a function and a globals block that
+// never end, and a script that does not parse beside extras that are no JSON; a wrong count of arguments; extras
+// that are cut short inside a text and after a colon, that hold nothing, that are no JSON, that start with a
+// byte order mark, that are a list and null, and that have something after their object; a function of the
+// extras that is no object; seeded changes of the miniature common.j; and a folder that is no checkout.
 // The runs of game-paths (gamePathsRuns): a list in every form the tests of gamepaths_test.go name (where the
 // game stores a file, both separators, mixed case, blank lines, a path named twice, types that are not kept),
 // with both kinds of line break; lines of other shapes, ASCII white space at the edges of a step inside a line
@@ -109,24 +124,32 @@ import (
 // compared whole. TestOracleReportsARunThatIsNotOfTheClassItNames holds these rules on runs that break each of
 // them.
 //
-//   - FromCheckout, 8 runs (otherTreeNamesItsCheckout, fileOfTheCheckout): a failure of the system on a file or
-//     a folder of the checkout. The other tree says Go's own line, with the operation and the full path, and
-//     this tree names the path from the checkout. The predicate is on what the other tree made: its standard
-//     error holds the path of its checkout. That line must be "error: ", one word, the full path of one file or
-//     folder of the checkout, ": " and the system's reason; this tree must say "error: ", that path from the
-//     checkout with "/", ": " and the same reason. The path is the one the system names: for a file at the
-//     place of a folder it is, on Windows, the step in the way, and on the other systems the file that was
-//     being read. The exit code, standard output and the checkout are compared whole
+//   - FromCheckout, 13 runs (otherTreeNamesItsCheckout, fileOfTheCheckout): a failure of the system on a file or
+//     a folder of the checkout: the metadata, the folder of the schema, the list of paths, the Lua extras, the
+//     natives. The other tree says Go's own line, with the operation and the full path, and this tree names the
+//     path from the checkout. The predicate is on what the other tree made: its standard error holds the path of
+//     its checkout. That line must be "error: ", one word, the full path of one file or folder of the checkout,
+//     ": " and the system's reason; this tree must say "error: ", that path from the checkout with "/", ": " and
+//     the same reason. The path is the one the system names: for a file at the place of a folder it is, on
+//     Windows, the step in the way, and on the other systems the file that was being read. The exit code,
+//     standard output and the checkout are compared whole
 //     (TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON,
 //     TestTheModeGamePathsNamesTheFileItCannotWriteByItsPathFromTheCheckout,
-//     TestTheModeWithoutANameNamesWhatTheSystemNamesWhenAFileIsInTheWayOfTheSchema).
-//   - AsGiven, 3 runs (cannotGiveWhatTheLineNames, fileAsGiven): a failure of the system on a file that the
+//     TestTheModeWithoutANameNamesWhatTheSystemNamesWhenAFileIsInTheWayOfTheSchema,
+//     TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives).
+//   - AsGiven, 9 runs (cannotGiveWhatTheLineNames, fileAsGiven): a failure of the system on a file that the
 //     line names. The other tree says Go's own line, "error: open <path>: <reason>" or "error: read <path>:
 //     <reason>", and this tree "error: <path>: <reason>". The run says which argument of the line names the
-//     path (cannotGive): here the one that names the list. The predicate is the row's: the input has no file at
-//     that path, since nothing is there or a folder is, and the other tree said one of the two lines about the
-//     path as the line gives it. This tree must say that line without its operation. The exit code, standard
-//     output and the checkout are compared whole (TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid).
+//     path (cannotGive): the one that names the list, or the one that names the folder of an export, with the
+//     path of a script from that folder. The two trees write the path of a script apart: the other tree joins
+//     the folder and the script's path as the system joins two paths, which on Windows is with "\" and on every
+//     system without what a path need not have, such as a "/" at the end of the folder; this tree writes the
+//     folder as the line gives it, "/", and the script's path with "/" (named.in, named.asGiven). The predicate
+//     is the row's: the input has no file at the path, since nothing is there or a folder is, and the other
+//     tree said one of the two lines about the path as it makes it. This tree must say that line without its
+//     operation, about the path as this tree names it. The exit code, standard output and the checkout are
+//     compared whole (TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid,
+//     TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives).
 //   - CountRefused, 2 runs (moreAfterAnEmptyFirstArgument, refusedByThisTree): something after an empty first
 //     argument. The other tree passes over what follows an empty first argument and writes the schema; this tree
 //     refuses the line with the usage line of the mode without a name. The predicate is on the command line,
@@ -134,6 +157,20 @@ import (
 //     other tree made of the line. This tree must end with 1, print nothing, say the words that the run holds
 //     (refusal), which are a text and decide nothing, and leave the checkout as it was laid
 //     (TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments).
+//   - The three classes after this one are of Lua extras that this tree refuses and the other tree does not
+//     (inTheExtras, refusedByThisTree). The predicate of each is on the extras that the checkout holds before a
+//     line of natives, read as a tree of JSON by this file's own reading, and on how the other tree ended. This
+//     tree must end, print and leave the checkout as in CountRefused, with the words that the run holds
+//     (TestDecodeExtrasRefusesWhatTheFileMustNotHold).
+//   - UnknownKey, 4 runs (hasAKeyThatIsNotRead, carriedOut): extras with a key that this tree does not read, in
+//     the file, in a function or in a parameter of one, a key of the file in other letters among them. The other
+//     tree carries the line out: it passes over such a key of the file, and writes such a key of a function or
+//     of a parameter into the natives.
+//   - LacksAKey, 3 runs (aNamedFunctionLacksAKey, carriedOut): a function of the extras with a name, and
+//     without its params or its returns. The other tree carries the line out, and writes the function with the
+//     keys it has.
+//   - NoName, 3 runs (aFunctionHasNoName, panicked): a function of the extras without a name. The other tree
+//     ends in a panic, with the exit code 2 and the stacks on standard error.
 //   - CountOfPaths, 1 run (versionWithALineFeed, countsThePaths): a version with a line feed in it, for a list
 //     that names a path. The other tree counts the line breaks of what it writes, after the first, and this
 //     tree the paths. The predicate is on the command line. Not compared: the number in the printed line. The
@@ -180,11 +217,39 @@ import (
 //
 // Not among the inputs:
 //
-//   - The modes natives and metadata, and a first argument that names no mode. This tree's table of modes has
-//     the rows of the modes it has, and its sentence for an unknown mode names the modes of the table, so until
-//     the table has all four that sentence is not the other tree's. The runs of a mode are added with the mode,
-//     and the unknown mode with the last of them (Tasks 4 and 5 of the plan): see fixtureRuns, onTheGamesFiles
-//     and classes.
+//   - The mode metadata, and a first argument that names no mode. This tree's table of modes has the rows of the
+//     modes it has, and its sentence for an unknown mode names the modes of the table, so until the table has
+//     all four that sentence is not the other tree's. The runs of a mode are added with the mode, and the
+//     unknown mode with the last of them (Task 5 of the plan): see fixtureRuns, onTheGamesFiles and classes.
+//   - Lua extras that are no JSON in a place where Go's two ways of reading a text word the fault apart. The
+//     other tree reads the extras token by token and this tree decodes them as one value. Of extras that are cut
+//     short after a bracket, after a comma or after a whole value, the other tree says "unexpected end of JSON
+//     input" and this tree "unexpected EOF"; of a comma before a closing bracket, each names another character.
+//     Where the two say the same, the runs are compared whole: a text that is cut short inside a text or before
+//     a value, one that holds nothing, and one that is no JSON from its first character.
+//   - Lua extras that are JSON of another shape: a text where a list belongs, a number among the globals, a name
+//     that is no text. This tree's sentence is Go's, and names a Go type of this tree; the other tree passes
+//     over a value that is no list and an entry that is no text, writes a params or a returns of any shape into
+//     the natives, and panics on a name that is no text (TestDecodeExtrasRefusesWhatTheFileMustNotHold holds
+//     that this tree refuses each, with the file).
+//   - A function of the extras, or a parameter of one, whose keys stand in another order than the committed
+//     extras have them (name, params, returns; name, type). The other tree writes the keys of a function of Lua
+//     in the order of the file, and this tree in the one order that data/natives.json has
+//     (TestRenderNativesWritesTheTextOfTheFile, TestDecodeExtrasReadsTheFunctionsAndTheTwoListsOfGlobals).
+//   - A function of the extras with null for a key, and a parameter without its name or its type. This tree
+//     refuses both; the other tree panics on null for a name, and otherwise writes null, or the parameter with
+//     the key it has (TestDecodeExtrasRefusesWhatTheFileMustNotHold).
+//   - A name of the extras with a character above U+FFFF, beside one with a character from U+E000 on: the other
+//     tree orders by UTF-16 units and this tree by bytes. A name of a script is of ASCII letters, digits and
+//     the underscore, and the two orders are one for those. The order by bytes is among the inputs for the list
+//     of paths, the class ByBytes.
+//   - A script with white space outside ASCII, which the other tree takes for the space between two words and
+//     this tree for text: the parser's own oracle (jass/oracle_test.go) is given such scripts, and counts them.
+//   - A script with two bytes side by side that are no UTF-8, in a line that is no declaration: the two trees
+//     quote the line apart in the refusal, with a replacement character for each part and with one for the run.
+//     Elsewhere in a script such bytes reach nothing that is written. The difference is among the inputs for the
+//     list of paths, the class NoUTF8. Neither of the game's two scripts has such white space or such bytes
+//     where it would show: the runs on them give the committed natives.
 //   - A metadata that is JSON of another shape, such as a text where a number belongs. The decoder's sentence
 //     names the Go type it was filling, which is a type of each tree's own: the sentence is Go's, and nothing
 //     holds the two trees to the same names (TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON holds
@@ -203,11 +268,14 @@ import (
 // Runs that need a variable. The runs on the game's files (onTheGamesFiles) are counted apart from the runs on
 // what the test writes, whose tally is the same on every machine. MOONWELL_GAME_LISTFILE names the game's list
 // of file names: both trees are given it with the version that the first line of the committed
-// data/game-paths.txt states, and what each writes must be that file. Without the variable those runs are
-// skipped, and with MOONWELL_REQUIRE_EXPORTS=1 they fail instead; asked for alone with -run, and skipped, they
-// leave the test failing with "the oracle compared no run", which is so: an oracle that compared nothing has not
-// passed. The list is read and never written, and a report shows no more of what a tree made from it, in a file
-// or on a stream, than an offset and one line.
+// data/game-paths.txt states, and what each writes must be that file. MOONWELL_GAME_SCRIPTS names the folder of
+// an export that has the game's two scripts: both trees are given it with the version that the committed
+// data/natives.json states and with the committed Lua extras, once with this tree's generator in the process of
+// the test and once with both as programs, and what each writes must be that file. Without its variable a group
+// of runs is skipped, and with MOONWELL_REQUIRE_EXPORTS=1 it fails instead; asked for alone with -run, and
+// skipped, the runs leave the test failing with "the oracle compared no run", which is so: an oracle that
+// compared nothing has not passed. The game's files are read and never written, and a report shows no more of
+// what a tree made from them, in a file or on a stream, than an offset and one line.
 
 // ---- the oracle ----
 
@@ -237,12 +305,12 @@ func TestOracleOnWhatBothGeneratorsWriteSayAndHowTheyEnd(t *testing.T) {
 	}
 	fixtures.check(t, genTally{
 		counts: counts{
-			Runs: 71, Whole: 50, Passed: 37, Failed: 34, AsPrograms: 10, Files: 205, Committed: 21,
+			Runs: 157, Whole: 115, Passed: 64, Failed: 93, AsPrograms: 16, Files: 370, Committed: 21,
 		},
-		Modes: map[string]int{"": 29, "game-paths": 42},
+		Modes: map[string]int{"": 29, "natives": 86, "game-paths": 42},
 		Classes: map[string]int{
-			"FromCheckout": 8, "AsGiven": 3, "CountRefused": 2, "CountOfPaths": 1,
-			"WiderSpace": 4, "DottedI": 1, "NoUTF8": 1, "ByBytes": 1,
+			"FromCheckout": 13, "AsGiven": 9, "CountRefused": 2, "UnknownKey": 4, "LacksAKey": 3, "NoName": 3,
+			"CountOfPaths": 1, "WiderSpace": 4, "DottedI": 1, "NoUTF8": 1, "ByBytes": 1,
 		},
 	})
 }
@@ -342,7 +410,8 @@ type named struct {
 	below    string
 }
 
-// in is the path as a program makes it of the line, and whether the line has the argument.
+// in is the path as a program makes it of the line, and whether the line has the argument: a file below a folder
+// is joined to the folder as the system joins two paths.
 func (n named) in(args []string) (string, bool) {
 	switch {
 	case n.argument >= len(args):
@@ -351,6 +420,18 @@ func (n named) in(args []string) (string, bool) {
 		return args[n.argument], true
 	}
 	return filepath.Join(args[n.argument], filepath.FromSlash(n.below)), true
+}
+
+// asGiven is the path as this tree names it in a message: the argument as the line gives it, and, for a file
+// below a folder, "/" and the file's path from the folder with "/". It is "" for a line without the argument.
+func (n named) asGiven(args []string) string {
+	switch {
+	case n.argument >= len(args):
+		return ""
+	case n.below == "":
+		return args[n.argument]
+	}
+	return args[n.argument] + "/" + n.below
 }
 
 // place is a place of a file or of a stream that the two trees write apart: what the other tree writes there,
@@ -725,6 +806,9 @@ var classes = []class{
 	{name: "FromCheckout", is: otherTreeNamesItsCheckout, compare: comparison.fileOfTheCheckout},
 	{name: "AsGiven", is: cannotGiveWhatTheLineNames, compare: comparison.fileAsGiven},
 	{name: "CountRefused", is: moreAfterAnEmptyFirstArgument, compare: comparison.refusedByThisTree},
+	{name: "UnknownKey", is: inTheExtras(hasAKeyThatIsNotRead, carriedOut), compare: comparison.refusedByThisTree},
+	{name: "LacksAKey", is: inTheExtras(aNamedFunctionLacksAKey, carriedOut), compare: comparison.refusedByThisTree},
+	{name: "NoName", is: inTheExtras(aFunctionHasNoName, panicked), compare: comparison.refusedByThisTree},
 	{name: "CountOfPaths", is: versionWithALineFeed, compare: comparison.countsThePaths},
 	{name: "WiderSpace", is: either(inTheList(hasWiderSpaceAtAnEdge), inTheLabels(isWiderSpace)),
 		compare: comparison.acceptedDifference, shows: widerSpaceShows},
@@ -800,29 +884,30 @@ func cannotGiveWhatTheLineNames(c comparison) bool {
 	}
 	path, given := c.r.cannotGive.in(c.in.args)
 	_, isFile := c.in.given(path)
-	_, said := lineWithoutTheOperation(c.want.stderr, path)
+	_, said := lineWithoutTheOperation(c.want.stderr, path, path)
 	return given && !isFile && said
 }
 
 // fileAsGiven compares a run of the class AsGiven: the line this tree says is the other tree's without the
-// operation, and everything else is compared whole.
+// operation, with the path as this tree names it, and everything else is compared whole.
 func (c comparison) fileAsGiven() {
 	c.codes()
 	c.streams(standardOutput, c.want.stdout, c.got.stdout)
 	c.files()
 	path, _ := c.r.cannotGive.in(c.in.args)
-	must, _ := lineWithoutTheOperation(c.want.stderr, path)
+	must, _ := lineWithoutTheOperation(c.want.stderr, path, c.r.cannotGive.asGiven(c.in.args))
 	c.mustSay(must)
 }
 
-// lineWithoutTheOperation is the line this tree must say of a file that the command line names by path and
-// that the system failed on, made of the line that the other tree said of it. The other tree's line is
-// "error: ", the operation, which is open or read, the path, ": " and the system's reason; this tree's is that
-// line without the operation. It is false for a line of another shape.
-func lineWithoutTheOperation(line, path string) (string, bool) {
+// lineWithoutTheOperation is the line this tree must say of a file that the command line names and that the
+// system failed on, made of the line that the other tree said of it. The other tree's line is "error: ", the
+// operation, which is open or read, the path as a program makes it of the line, ": " and the system's reason;
+// this tree's is "error: ", the path as this tree names it (as), ": " and that reason. It is false for a line of
+// another shape.
+func lineWithoutTheOperation(line, path, as string) (string, bool) {
 	for _, operation := range []string{"open", "read"} {
 		if reason, said := strings.CutPrefix(line, "error: "+operation+" "+path+": "); said {
-			return "error: " + path + ": " + reason, true
+			return "error: " + as + ": " + reason, true
 		}
 	}
 	return "", false
@@ -850,6 +935,93 @@ func (c comparison) refusedByThisTree() {
 		c.t.Errorf("this tree refused the line and left %q, want the checkout as it was laid: %q",
 			entries(c.got.left), entries(c.got.laid))
 	}
+}
+
+// inTheExtras is a predicate on the Lua extras of a checkout that the mode natives is run in, and on how the
+// other tree ended the line: the line has the two arguments of the mode, the extras are a JSON object of which
+// holds is true, and ended is true of what the other tree made.
+func inTheExtras(holds func(file map[string]any) bool, ended func(made outcome) bool) func(c comparison) bool {
+	return func(c comparison) bool {
+		var file map[string]any
+		if c.in.mode() != "natives" || len(c.in.args) != 3 || json.Unmarshal(c.in.laid[extrasPath], &file) != nil {
+			return false
+		}
+		return file != nil && holds(file) && ended(c.want)
+	}
+}
+
+// The keys that this tree reads in the Lua extras: of the file, of a function, and of a parameter of one. They
+// stand written here, and are not the generator's.
+var (
+	keysOfTheExtras = []string{"functions", "globals", "removed"}
+	keysOfAFunction = []string{"name", "params", "returns"}
+	keysOfAParam    = []string{"name", "type"}
+)
+
+// functionsIn is the functions of the Lua extras that are JSON objects.
+func functionsIn(file map[string]any) []map[string]any {
+	var functions []map[string]any
+	list, _ := file["functions"].([]any)
+	for _, entry := range list {
+		if function, isObject := entry.(map[string]any); isObject {
+			functions = append(functions, function)
+		}
+	}
+	return functions
+}
+
+// hasOtherKeys reports whether a JSON object has a key that is not among these, in these letters.
+func hasOtherKeys(object map[string]any, known []string) bool {
+	for key := range object {
+		if !slices.Contains(known, key) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasAKeyThatIsNotRead reports whether the Lua extras have a key that this tree does not read: in the file, in
+// a function, or in a parameter of a function.
+func hasAKeyThatIsNotRead(file map[string]any) bool {
+	if hasOtherKeys(file, keysOfTheExtras) {
+		return true
+	}
+	for _, function := range functionsIn(file) {
+		if hasOtherKeys(function, keysOfAFunction) {
+			return true
+		}
+		params, _ := function["params"].([]any)
+		for _, entry := range params {
+			if param, isObject := entry.(map[string]any); isObject && hasOtherKeys(param, keysOfAParam) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// aNamedFunctionLacksAKey reports whether a function of the Lua extras has a name that is a text, and has no
+// key params or no key returns.
+func aNamedFunctionLacksAKey(file map[string]any) bool {
+	for _, function := range functionsIn(file) {
+		_, named := function["name"].(string)
+		_, hasParams := function["params"]
+		_, hasReturns := function["returns"]
+		if named && !(hasParams && hasReturns) {
+			return true
+		}
+	}
+	return false
+}
+
+// aFunctionHasNoName reports whether a function of the Lua extras has no key name.
+func aFunctionHasNoName(file map[string]any) bool {
+	for _, function := range functionsIn(file) {
+		if _, has := function["name"]; !has {
+			return true
+		}
+	}
+	return false
 }
 
 // versionWithALineFeed is the predicate of CountOfPaths: the line is of game-paths with its two arguments, and
@@ -1147,8 +1319,36 @@ func TestOracleReadsTheLinesAndTheEndingsThatDecideItsClasses(t *testing.T) {
 		{"error: open other.txt: the reason\n", "", false},
 		{"error: list.txt: the reason\n", "", false},
 	} {
-		if got, shaped := lineWithoutTheOperation(c.line, "list.txt"); got != c.want || shaped != c.shaped {
+		got, shaped := lineWithoutTheOperation(c.line, "list.txt", "list.txt")
+		if got != c.want || shaped != c.shaped {
 			t.Errorf("lineWithoutTheOperation(%q) = %q, %v, want %q, %v", c.line, got, shaped, c.want, c.shaped)
+		}
+	}
+	// A file below a folder that the line names: the other tree joins the two as the system does, and this tree
+	// names the folder as the line gives it, and the file from there with "/".
+	export, script := filepath.Join("an", "export"), filepath.Join("an", "export", "scripts", "common.j")
+	for _, c := range []struct {
+		n       named
+		args    []string
+		in      string // the path as a program makes it
+		has     bool
+		asGiven string // the path as this tree names it
+	}{
+		{named{1, ""}, []string{"game-paths", "lists/list.txt", "1"}, "lists/list.txt", true, "lists/list.txt"},
+		{named{1, "scripts/common.j"}, []string{"natives", "an/export/", "1"}, script, true,
+			"an/export//scripts/common.j"},
+		{named{1, "scripts/common.j"}, []string{"natives", export, "1"}, script, true, export + "/scripts/common.j"},
+		{named{3, "scripts/common.j"}, []string{"natives", "export", "1"}, "", false, ""},
+	} {
+		in, has := c.n.in(c.args)
+		asGiven := c.n.asGiven(c.args)
+		if in != c.in || has != c.has || asGiven != c.asGiven {
+			t.Errorf("%+v of %q: a program makes %q, %v of it and this tree names %q; want %q, %v and %q",
+				c.n, c.args, in, has, asGiven, c.in, c.has, c.asGiven)
+		}
+		got, _ := lineWithoutTheOperation("error: open "+in+": the reason\n", in, asGiven)
+		if want := "error: " + c.asGiven + ": the reason\n"; has && got != want {
+			t.Errorf("%+v of %q: this tree must say %q, want %q", c.n, c.args, got, want)
 		}
 	}
 	const stack = "panic: a function without a name\n\ngoroutine 1 [running]:\nmain.main()\n"
@@ -1287,8 +1487,9 @@ func TestOracleCarriesOutNoRunThatItsGuardRefuses(t *testing.T) {
 		r       oracleRun
 		refused string // words of the refusal
 	}{
-		"a run in the folder above its checkout":       {oracleRun{below: ".."}, "nor below it"},
-		"a run of a checkout that has lost its go.mod": {oracleRun{lay: goMod(anotherModule)}, "names this module: false"},
+		"a run in the folder above its checkout": {oracleRun{below: ".."}, "nor below it"},
+		"a run of a checkout that has lost its go.mod": {
+			oracleRun{lay: goMod(anotherModule)}, "names this module: false"},
 		"a run of no checkout that is laid one": {
 			oracleRun{noCheckout: true, lay: goMod(moduleFile)}, "names this module: true"},
 	} {
@@ -1463,6 +1664,40 @@ func TestOracleReportsARunThatIsNotOfTheClassItNames(t *testing.T) {
 			[]string{"names the class AsGiven, whose predicate does not hold of it"}},
 		{oracleRun{name: "a file the system cannot give, and no class named", lay: anotherList, line: notThere},
 			[]string{"standard error: differs at offset"}},
+		{oracleRun{name: "a script the system cannot give, and the folder named that has it not", class: "AsGiven",
+			cannotGive: &named{argument: 1}, lay: luaExtras(miniExtrasText), line: withoutBlizzard},
+			[]string{"names the class AsGiven, whose predicate does not hold of it", errorDiffers}},
+		{oracleRun{name: "a script the system cannot give, and the other script named", class: "AsGiven",
+			cannotGive: &named{1, commonOfAnExport}, lay: luaExtras(miniExtrasText), line: withoutBlizzard},
+			[]string{"names the class AsGiven, whose predicate does not hold of it", errorDiffers}},
+		{oracleRun{name: "a script the system cannot give, and no class named", lay: luaExtras(miniExtrasText),
+			line: withoutBlizzard},
+			[]string{errorDiffers}},
+		{oracleRun{name: "extras that this tree reads, named as extras with a key too many", class: "UnknownKey",
+			lay: luaExtras(miniExtrasText), line: ofTheMiniatures,
+			refusal: keyNotRead("the file", "more", "functions, globals and removed")},
+			[]string{"names the class UnknownKey, whose predicate does not hold of it"}},
+		{oracleRun{name: "a key too many, in a line of another mode", class: "UnknownKey", line: ordinary,
+			lay:     luaExtras(`{"more": 1}`),
+			refusal: keyNotRead("the file", "more", "functions, globals and removed")},
+			[]string{"names the class UnknownKey, whose predicate does not hold of it"}},
+		{oracleRun{name: "a key too many, and no class named", lay: luaExtras(`{"more": 1}`), line: ofTheMiniatures},
+			[]string{"the exit code: values differ", standardError + ": length differs"}},
+		{oracleRun{name: "a function without params, named as one without a name", class: "NoName",
+			lay:     luaExtras(functionsOfTheExtras(`{"name": "Bare", "returns": "nothing"}`)),
+			line:    ofTheMiniatures,
+			refusal: keyLeftOut("the function Bare", "params")},
+			[]string{"names the class NoName, whose predicate does not hold of it", "the exit code: values differ"}},
+		{oracleRun{name: "a function without a name, named as one without params", class: "LacksAKey",
+			lay:     luaExtras(functionsOfTheExtras(`{"returns": "nothing"}`)),
+			line:    ofTheMiniatures,
+			refusal: keyLeftOut("function 1 of the list", "name")},
+			[]string{"names the class LacksAKey, whose predicate does not hold of it", "the exit code: values differ"}},
+		{oracleRun{name: "a refusal of the extras in other words than this tree's", class: "LacksAKey",
+			lay:     luaExtras(functionsOfTheExtras(`{"name": "Bare", "returns": "nothing"}`)),
+			line:    ofTheMiniatures,
+			refusal: keyLeftOut("the function Bare", "returns")},
+			[]string{standardError + ": this tree does not say what it must"}},
 		{oracleRun{name: "a path from the working folder, given to run in the process of the test", below: "work",
 			line: words("game-paths", "listfile.txt", "2.0.0"),
 			lay: func(c checkout) {
@@ -1491,7 +1726,7 @@ func TestOracleReportsARunThatIsNotOfTheClassItNames(t *testing.T) {
 // then the runs that both generators make as programs. The runs of a mode are a function of its own, and a new
 // mode's are added here.
 func fixtureRuns() []oracleRun {
-	return slices.Concat(schemaRuns(), gamePathsRuns(), programRuns())
+	return slices.Concat(schemaRuns(), nativesRuns(), gamePathsRuns(), programRuns())
 }
 
 // exportRuns is the runs on the game's files that one variable names, and the tally they must make.
@@ -1508,6 +1743,13 @@ var onTheGamesFiles = []exportRuns{
 	{"MOONWELL_GAME_LISTFILE", theGamesList, genTally{
 		counts: counts{Runs: 1, Whole: 1, Passed: 1, Files: 2, Committed: 1},
 		Modes:  map[string]int{"game-paths": 1},
+	}},
+	// The two scripts of that version, which the committed natives are made from: two runs of no class, one of
+	// them with both generators as programs, each with the go.mod, the Lua extras and the natives as the files
+	// of its checkout.
+	{"MOONWELL_GAME_SCRIPTS", theGamesScripts, genTally{
+		counts: counts{Runs: 2, Whole: 2, Passed: 2, AsPrograms: 1, Files: 6, Committed: 2},
+		Modes:  map[string]int{"natives": 2},
 	}},
 }
 
@@ -1720,6 +1962,284 @@ func fieldsWithUnusableNames() map[string][]objects.FieldMeta {
 	}
 }
 
+// ---- the runs of natives ----
+
+// The scripts of an export, each by its path from the folder of the export, as a run names the one that the
+// system cannot give.
+const (
+	commonOfAnExport   = "war3.w3mod/scripts/common.j"
+	blizzardOfAnExport = "war3.w3mod/scripts/blizzard.j"
+)
+
+// nativesOf is the line of the mode natives for an export with these two scripts, and for a version. The export
+// is a folder beside the checkouts.
+func nativesOf(common, blizzard, version string) lineOfARun {
+	return func(t testing.TB, outside string) []string {
+		testkit.WriteFile(t, outside, "export/"+commonOfAnExport, []byte(common))
+		testkit.WriteFile(t, outside, "export/"+blizzardOfAnExport, []byte(blizzard))
+		return []string{"natives", filepath.Join(outside, "export"), version}
+	}
+}
+
+// ofTheMiniatures is the line of the mode natives for the two miniature scripts.
+var ofTheMiniatures = nativesOf(miniCommon, miniBlizzard, "9.9.9")
+
+// withoutBlizzard is the line of the mode natives for an export that has the miniature common.j, and no
+// blizzard.j.
+func withoutBlizzard(t testing.TB, outside string) []string {
+	testkit.WriteFile(t, outside, "export/"+commonOfAnExport, []byte(miniCommon))
+	return []string{"natives", filepath.Join(outside, "export"), "9.9.9"}
+}
+
+// luaExtras lays Lua extras with this text, and a data folder that holds nothing.
+func luaExtras(text string) func(checkout) {
+	return func(c checkout) {
+		c.write(extrasPath, text)
+		c.folder("data")
+	}
+}
+
+// functionsOfTheExtras is the text of Lua extras whose functions are these, each written as a JSON object.
+func functionsOfTheExtras(functions ...string) string {
+	return `{"functions": [` + strings.Join(functions, ", ") + `], "globals": ["print"], "removed": ["io"]}`
+}
+
+// keyNotRead is what this tree says as it refuses Lua extras for a key that it does not read: what has the key,
+// the key, and the keys that it may have.
+func keyNotRead(holder, key, keys string) string {
+	return "error: tools/natives/lua-extras.json: " + holder + " has the key \"" + key +
+		"\", which the generator does not read. Its keys are " + keys + ": take the key out, or rename it.\n"
+}
+
+// keyLeftOut is what this tree says as it refuses Lua extras for a function without one of its keys: how the
+// function is named, and the key.
+func keyLeftOut(function, key string) string {
+	return "error: tools/natives/lua-extras.json: " + function + " has no \"" + key +
+		"\". Its keys are name, params and returns: write all of them.\n"
+}
+
+func nativesRuns() []oracleRun {
+	const whole = `{"name": "Whole", "params": [{"name": "id", "type": "string"}], "returns": "integer"}`
+	withBoth := func(text string) string { return mark + strings.ReplaceAll(text, "\n", "\r\n") }
+	with := func(blizzard string) lineOfARun { return nativesOf(miniCommon, blizzard, "9.9.9") }
+	runs := []oracleRun{
+		{name: "the miniature scripts and extras, into an empty data folder", lay: luaExtras(miniExtrasText),
+			line: ofTheMiniatures},
+		{name: "the miniature scripts, over the natives of another version", line: ofTheMiniatures,
+			lay: func(c checkout) {
+				luaExtras(miniExtrasText)(c)
+				c.write(nativesPath, "{\n  \"gameVersion\": \"1.0.0\"\n}\n")
+			}},
+		{name: "the miniature scripts with the committed extras", line: ofTheMiniatures,
+			lay: func(c checkout) {
+				c.carry(extrasPath)
+				c.folder("data")
+			}},
+		{name: "extras without a key", lay: luaExtras("{}"), line: ofTheMiniatures},
+		{name: "extras with empty lists, a list that is null, and a Lua function without a parameter",
+			lay: luaExtras(`{"functions": [{"name": "Bare", "params": [], "returns": "nothing"}], ` +
+				`"globals": [], "removed": null}`), line: ofTheMiniatures},
+		{name: "extras with a key twice", line: ofTheMiniatures,
+			lay: luaExtras(`{"globals": ["first"], "removed": ["io"], "globals": ["second", "print"]}`)},
+		{name: "scripts with carriage returns, and a byte order mark at the start of each",
+			lay: luaExtras(miniExtrasText), line: nativesOf(withBoth(miniCommon), withBoth(miniBlizzard), "9.9.9")},
+		{name: "scripts that declare nothing", lay: luaExtras(miniExtrasText),
+			line: nativesOf("", "// nothing\n\n", "9.9.9")},
+		{name: "one byte that is no UTF-8, in a comment and in a text of a script", lay: luaExtras(miniExtrasText),
+			line: nativesOf("// caf\xE9\n"+miniCommon+"globals\n    string odd = \"\xFF\" // \xFE\nendglobals\n",
+				miniBlizzard, "9.9.9")},
+		{name: "one byte that is no UTF-8, in a line that is no declaration", lay: luaExtras(miniExtrasText),
+			line: with("native Odd\xFF takes nothing returns nothing\n")},
+		{name: "a version that is empty", lay: luaExtras(miniExtrasText),
+			line: nativesOf(miniCommon, miniBlizzard, "")},
+		{name: "a version that a JSON text escapes", lay: luaExtras(miniExtrasText),
+			line: nativesOf(miniCommon, miniBlizzard, "1.0 \"beta\"\\\t<&>\x01\n\xC3\xA4")},
+		{name: "natives in a folder below the checkout", below: "tools/gen/slk", lay: luaExtras(miniExtrasText),
+			line: ofTheMiniatures},
+		{name: "a name declared in both scripts", lay: luaExtras(miniExtrasText), line: with(miniCommon)},
+		{name: "a Lua global named like a function", lay: luaExtras(`{"globals": ["CreateThing"]}`),
+			line: ofTheMiniatures},
+		{name: "a name both provided and removed", line: ofTheMiniatures,
+			lay: luaExtras(`{"functions": [], "globals": ["print", "io"], "removed": ["io"]}`)},
+		{name: "a Lua function named like a function of blizzard.j", line: ofTheMiniatures,
+			lay: luaExtras(`{"functions": [{"name": "HelperBJ", "params": [], "returns": "nothing"}]}`)},
+		{name: "a Lua global named like a global", lay: luaExtras(`{"globals": ["MAX_THINGS"]}`),
+			line: ofTheMiniatures},
+		{name: "a removed global named like a type", lay: luaExtras(`{"removed": ["widget"]}`), line: ofTheMiniatures},
+		{name: "a global in both scripts", lay: luaExtras(miniExtrasText),
+			line: with("globals\n    integer counts\nendglobals\n")},
+		{name: "a type named like a global", lay: luaExtras(miniExtrasText),
+			line: with("type counts extends handle\n")},
+		{name: "a type and a global, each declared twice", lay: luaExtras(miniExtrasText),
+			line: with("type agent extends handle\nglobals\n    real counts\nendglobals\n")},
+		{name: "a function and a Lua global, each declared twice", line: with(miniCommon),
+			lay: luaExtras(`{"globals": ["print", "print"]}`)},
+		{name: "a native twice in common.j", lay: luaExtras(miniExtrasText),
+			line: nativesOf(miniCommon+"native DoNothing takes nothing returns nothing\n", miniBlizzard, "9.9.9")},
+		{name: "a global twice in blizzard.j", lay: luaExtras(miniExtrasText),
+			line: with("globals\n    integer twice\n    real twice\nendglobals\n")},
+		{name: "a type in both scripts", lay: luaExtras(miniExtrasText), line: with("type unit extends handle\n")},
+		{name: "a Lua function twice", lay: luaExtras(functionsOfTheExtras(whole, whole)), line: ofTheMiniatures},
+		{name: "a Lua function named like a function of common.j", line: ofTheMiniatures,
+			lay: luaExtras(functionsOfTheExtras(`{"name": "GetThing", "params": [], "returns": "unit"}`))},
+		{name: "a Lua function named like a global of blizzard.j", line: ofTheMiniatures,
+			lay: luaExtras(functionsOfTheExtras(`{"name": "bj_ANGLE", "params": [], "returns": "real"}`))},
+		{name: "a Lua global named like a type", lay: luaExtras(`{"globals": ["widget"]}`), line: ofTheMiniatures},
+		{name: "a Lua global twice", lay: luaExtras(`{"globals": ["print", "math", "print"]}`), line: ofTheMiniatures},
+		{name: "a removed global named like a function of blizzard.j", lay: luaExtras(`{"removed": ["ConstantBJ"]}`),
+			line: ofTheMiniatures},
+		{name: "a line of common.j that is no declaration", lay: luaExtras(miniExtrasText),
+			line: nativesOf("type agent extends handle\n\nnative Broken takes returns nothing\n", miniBlizzard,
+				"9.9.9")},
+		{name: "a line of blizzard.j that is no declaration", lay: luaExtras(miniExtrasText),
+			line: with("globals\n    real = 0.0 // \"quoted\"\tand a tab\nendglobals\n")},
+		{name: "a function of blizzard.j that never ends", lay: luaExtras(miniExtrasText),
+			line: with("\n\nfunction Open takes nothing returns nothing\n    call DoNothing(null)\n")},
+		{name: "a globals block that never ends", lay: luaExtras(miniExtrasText),
+			line: nativesOf("globals\n    integer open\n", miniBlizzard, "9.9.9")},
+		{name: "a script that does not parse, and extras that are no JSON", lay: luaExtras("not JSON\n"),
+			line: with("not a declaration\n")},
+		{name: "natives alone", lay: luaExtras(miniExtrasText), line: words("natives")},
+		{name: "natives without a version", lay: luaExtras(miniExtrasText), line: words("natives", "export")},
+		{name: "natives with an argument too many", lay: luaExtras(miniExtrasText),
+			line: words("natives", "export", "9.9.9", "more")},
+		{name: "extras that are cut short", lay: luaExtras(`{"functions": [{ "name": "Fo`), line: ofTheMiniatures},
+		{name: "extras that are cut short after a colon", lay: luaExtras(`{"functions":`), line: ofTheMiniatures},
+		{name: "extras that hold nothing", lay: luaExtras(""), line: ofTheMiniatures},
+		{name: "extras that are no JSON", lay: luaExtras("not JSON\n"), line: ofTheMiniatures},
+		{name: "extras that start with a byte order mark", lay: luaExtras(mark + miniExtrasText),
+			line: ofTheMiniatures},
+		{name: "extras that are a list", lay: luaExtras("[]"), line: ofTheMiniatures},
+		{name: "extras that are null", lay: luaExtras("null"), line: ofTheMiniatures},
+		{name: "extras with something after the object", lay: luaExtras(miniExtrasText + "\n{}\n"),
+			line: ofTheMiniatures},
+		{name: "a function of the extras that is no object", lay: luaExtras(functionsOfTheExtras(whole, `"FourCC"`)),
+			line: ofTheMiniatures},
+
+		{name: "no extras, and no folder of theirs", class: "FromCheckout", lay: noList, line: ofTheMiniatures},
+		{name: "no extras in their folder", class: "FromCheckout", line: ofTheMiniatures,
+			lay: func(c checkout) {
+				noList(c)
+				c.folder("tools/natives")
+			}},
+		{name: "a folder at the place of the extras", class: "FromCheckout", line: ofTheMiniatures,
+			lay: func(c checkout) {
+				noList(c)
+				c.folder(extrasPath)
+			}},
+		{name: "no data folder for the natives", class: "FromCheckout", line: ofTheMiniatures,
+			lay: func(c checkout) { c.write(extrasPath, miniExtrasText) }},
+		{name: "a folder at the place of the natives", class: "FromCheckout", line: ofTheMiniatures,
+			lay: func(c checkout) {
+				luaExtras(miniExtrasText)(c)
+				c.write(nativesPath+"/held.txt", "held\n")
+			}},
+
+		{name: "no blizzard.j in the export", class: "AsGiven", cannotGive: &named{1, blizzardOfAnExport},
+			lay: luaExtras(miniExtrasText), line: withoutBlizzard},
+		{name: "no common.j in the export", class: "AsGiven", cannotGive: &named{1, commonOfAnExport},
+			lay: luaExtras(miniExtrasText),
+			line: func(t testing.TB, outside string) []string {
+				testkit.WriteFile(t, outside, "export/"+blizzardOfAnExport, []byte(miniBlizzard))
+				return []string{"natives", filepath.Join(outside, "export"), "9.9.9"}
+			}},
+		{name: "an export that is not there", class: "AsGiven", cannotGive: &named{1, commonOfAnExport},
+			lay: luaExtras(miniExtrasText),
+			line: func(_ testing.TB, outside string) []string {
+				return []string{"natives", filepath.Join(outside, "no-export"), "9.9.9"}
+			}},
+		{name: "an export that is not there, and no extras", class: "AsGiven",
+			cannotGive: &named{1, commonOfAnExport},
+			line: func(_ testing.TB, outside string) []string {
+				return []string{"natives", filepath.Join(outside, "no-export"), "9.9.9"}
+			}},
+		{name: "a folder at the place of common.j", class: "AsGiven", cannotGive: &named{1, commonOfAnExport},
+			lay: luaExtras(miniExtrasText),
+			line: func(t testing.TB, outside string) []string {
+				testkit.WriteFile(t, outside, "export/"+commonOfAnExport+"/held.txt", []byte("held\n"))
+				testkit.WriteFile(t, outside, "export/"+blizzardOfAnExport, []byte(miniBlizzard))
+				return []string{"natives", filepath.Join(outside, "export"), "9.9.9"}
+			}},
+
+		{name: "extras with a key that the file has not", class: "UnknownKey", line: ofTheMiniatures,
+			lay:     luaExtras(`{"functions": [], "globals": ["print"], "removed": [], "comment": "by hand"}`),
+			refusal: keyNotRead("the file", "comment", "functions, globals and removed")},
+		{name: "extras with a key in other letters", class: "UnknownKey", line: ofTheMiniatures,
+			lay:     luaExtras(`{"Globals": ["print"]}`),
+			refusal: keyNotRead("the file", "Globals", "functions, globals and removed")},
+		{name: "a function of the extras with a key that a function has not", class: "UnknownKey",
+			line: ofTheMiniatures,
+			lay: luaExtras(functionsOfTheExtras(
+				`{"name": "Noted", "params": [], "returns": "nothing", "note": "kept"}`, whole)),
+			refusal: keyNotRead("the function Noted", "note", "name, params and returns")},
+		{name: "a parameter of the extras with a key that a parameter has not", class: "UnknownKey",
+			line: ofTheMiniatures,
+			lay: luaExtras(functionsOfTheExtras(whole, `{"name": "Noted", "returns": "nothing", `+
+				`"params": [{"name": "id", "type": "string", "optional": true}]}`)),
+			refusal: keyNotRead("a parameter of the function Noted", "optional", "name and type")},
+
+		{name: "a function of the extras without params", class: "LacksAKey", line: ofTheMiniatures,
+			lay:     luaExtras(functionsOfTheExtras(whole, `{"name": "Bare", "returns": "nothing"}`)),
+			refusal: keyLeftOut("the function Bare", "params")},
+		{name: "a function of the extras without returns", class: "LacksAKey", line: ofTheMiniatures,
+			lay:     luaExtras(functionsOfTheExtras(`{"name": "Bare", "params": []}`, whole)),
+			refusal: keyLeftOut("the function Bare", "returns")},
+		{name: "a function of the extras with its name alone", class: "LacksAKey", line: ofTheMiniatures,
+			lay:     luaExtras(functionsOfTheExtras(`{"name": "Bare"}`)),
+			refusal: keyLeftOut("the function Bare", "params")},
+
+		{name: "a function of the extras without a name", class: "NoName", line: ofTheMiniatures,
+			lay:     luaExtras(functionsOfTheExtras(whole, `{"params": [], "returns": "nothing"}`)),
+			refusal: keyLeftOut("function 2 of the list", "name")},
+		{name: "a function of the extras that has nothing", class: "NoName", line: ofTheMiniatures,
+			lay:     luaExtras(functionsOfTheExtras(`{}`)),
+			refusal: keyLeftOut("function 1 of the list", "name")},
+	}
+	runs = append(runs, changedScripts()...)
+	runs = append(runs, noCheckoutRuns("natives", ofTheMiniatures)...)
+	return append(runs, noCheckoutRuns("natives alone", words("natives"))...)
+}
+
+// changedScripts is the miniature common.j after seeded changes, eight times, beside the miniature blizzard.j:
+// one to three changes of each, a line cut, a line doubled, or a character of ASCII white space put in. A change
+// is named by the seed and its index, which make it again.
+func changedScripts() []oracleRun {
+	const seed, changes = 2026_10_06, 8
+	var runs []oracleRun
+	for index := uint64(1); index <= changes; index++ {
+		runs = append(runs, oracleRun{
+			name: fmt.Sprintf("the miniature common.j, changed: seed %d, change %d", seed, index),
+			lay:  luaExtras(miniExtrasText),
+			line: nativesOf(oracle.Changed(miniCommon, seed, index), miniBlizzard, "9.9.9"),
+		})
+	}
+	return runs
+}
+
+// theGamesScripts is the runs on the game's two scripts, with the version that the committed natives state and
+// the committed Lua extras: what each tree writes is the committed data/natives.json. The second run starts this
+// tree's generator as a program too.
+func theGamesScripts(t testing.TB, export testkit.Export) []oracleRun {
+	var committed struct {
+		GameVersion string `json:"gameVersion"`
+	}
+	if err := json.Unmarshal(realFile(t, nativesPath), &committed); err != nil || committed.GameVersion == "" {
+		t.Fatalf("%s states no version of the game: %v", nativesPath, err)
+	}
+	run := oracleRun{
+		name:        "the game's two scripts, with the version of the committed natives",
+		line:        words("natives", export.Path(), committed.GameVersion),
+		asCommitted: []string{nativesPath},
+		lay: func(c checkout) {
+			c.carry(extrasPath)
+			c.folder("data")
+		},
+	}
+	asPrograms := run
+	asPrograms.name, asPrograms.asPrograms = "as programs: "+run.name, true
+	return []oracleRun{run, asPrograms}
+}
+
 // ---- the runs of game-paths ----
 
 // listOfAnotherVersion is a data/game-paths.txt that a run finds in its checkout.
@@ -1902,8 +2422,9 @@ func theGamesList(t testing.TB, export testkit.Export) []oracleRun {
 
 // programRuns is the runs in which this tree's generator is a program too: what only main can get wrong, and
 // what only a program can be given. For each mode a line that is carried out, a line that the mode refuses and a
-// wrong count; a file of the checkout that is not there; a folder that is no checkout; and, in a folder below
-// the checkout, a list beside it and a list that is not there, each named by a path from that folder.
+// wrong count; a file of the checkout that is not there; a folder that is no checkout; Lua extras that the other
+// tree's program panics on; and, in a folder below the checkout, a list and an export beside it, and a list and
+// an export that are not there, each named by a path from that folder.
 func programRuns() []oracleRun {
 	runs := []oracleRun{
 		{name: "the schema of one field", lay: oneBuff("fnam", "name")},
@@ -1924,6 +2445,22 @@ func programRuns() []oracleRun {
 			}},
 		{name: "a list that is not there, by its name", below: "work", lay: anotherList,
 			class: "AsGiven", cannotGive: &named{argument: 1}, line: words("game-paths", "no-listfile.txt", "2.0.0")},
+		{name: "the natives of the miniature scripts", lay: luaExtras(miniExtrasText), line: ofTheMiniatures},
+		{name: "a name declared in both scripts", lay: luaExtras(miniExtrasText),
+			line: nativesOf(miniCommon, miniCommon, "9.9.9")},
+		{name: "natives alone", lay: luaExtras(miniExtrasText), line: words("natives")},
+		{name: "an export beside the folder of the run, by its name", below: "work",
+			line: words("natives", "export", "9.9.9"),
+			lay: func(c checkout) {
+				luaExtras(miniExtrasText)(c)
+				c.write("work/export/"+commonOfAnExport, miniCommon)
+				c.write("work/export/"+blizzardOfAnExport, miniBlizzard)
+			}},
+		{name: "an export that is not there, by its name", below: "work", lay: luaExtras(miniExtrasText),
+			class: "AsGiven", cannotGive: &named{1, commonOfAnExport}, line: words("natives", "no-export", "9.9.9")},
+		{name: "a function of the extras without a name", class: "NoName", line: ofTheMiniatures,
+			lay:     luaExtras(functionsOfTheExtras(`{"params": [], "returns": "nothing"}`)),
+			refusal: keyLeftOut("function 1 of the list", "name")},
 	}
 	for i := range runs {
 		runs[i].name, runs[i].asPrograms = "as programs: "+runs[i].name, true
