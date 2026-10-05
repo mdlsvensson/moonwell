@@ -364,9 +364,8 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 		}
 	}
 	// The folders of assets/ are kept by a file each, which is no asset.
-	found, _, err := build.Assets(p, nil)
-	if err != nil || len(found) != 0 {
-		t.Fatalf("%v %+v", err, found)
+	if r := ok(t, root, "assets:check"); r.output != checked("0", "0") {
+		t.Fatalf("assets:check in a new project: %+v", r)
 	}
 }
 

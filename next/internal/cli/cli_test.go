@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -27,6 +28,12 @@ Commands:
   test [--entry f] [--minify]    Stage the map and launch Warcraft III
   dev                            Watch sources and report errors on save
   check                          Compile and validate without building a map
+  assets:check                   Show what assets:sync would change in the source map
+  assets:sync                    Write assets/ into the source map (close it in World Editor first)
+  assets:paths [file]            List the files a model references, as in-game or custom paths
+  settings:check                 Show which internal map files the settings would change
+  objects:eval                   Print the validated custom objects as JSON
+  objects:check                  Show which internal map files the objects would change
 
 Options:
   -h, --help                     Show this help
@@ -151,11 +158,20 @@ func TestAProjectKeepsWhatACommandSaysInDistMoonwellLog(t *testing.T) {
 func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	root := t.TempDir()
 	fails(t, root, []string{"error: ", "The src/ folder is missing."}, "dev")
-	for _, name := range []string{"check", "build", "test", "setup"} {
+	needManifest := []string{
+		"check", "build", "test", "setup", "assets:check", "assets:sync", "settings:check", "objects:eval",
+		"objects:check",
+	}
+	for _, name := range needManifest {
 		result := carried(t, background, root, name)
-		if result.code != 1 || !strings.Contains(result.output, "No moonwell.pkl found") {
+		if result.code != 1 || !strings.Contains(result.output, "No moonwell.pkl found") || result.stdout != "" {
 			t.Errorf("%s: %+v", name, result)
 		}
+	}
+	// assets:paths reads a model outside a project too, and is refused there only without one.
+	result := carried(t, background, root, "assets:paths")
+	if result.code != 1 || !strings.Contains(result.output, "assets:paths needs a model file") {
+		t.Errorf("assets:paths: %+v", result)
 	}
 	if exists(root, "dist") {
 		t.Error("a command outside a project made dist/")
@@ -163,10 +179,31 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	if entries, err := os.ReadDir(root); err != nil || len(entries) != 0 {
 		t.Errorf("a command outside a project left %v there (%v)", entries, err)
 	}
-	for _, name := range []string{"check", "build", "test", "dev", "setup"} {
+	for _, name := range append([]string{"dev", "assets:paths"}, needManifest...) {
 		if file := logFile(root, rowNamed(t, name)); file != "" {
 			t.Errorf("%s outside a project keeps a log in %s", name, file)
 		}
+	}
+}
+
+func TestTheAssetsSettingsAndObjectsCommandsAreKnownCommands(t *testing.T) {
+	for _, name := range []string{
+		"assets:check", "assets:sync", "assets:paths", "settings:check", "objects:eval", "objects:check",
+	} {
+		result := carried(t, background, t.TempDir(), name)
+		if result.code != 1 || strings.Contains(result.output, "Unknown command") ||
+			!strings.HasPrefix(result.output, "error: ") {
+			t.Errorf("%s: %+v", name, result)
+		}
+	}
+}
+
+// objects:eval is the one command that prints for other programs: its failure goes to the terminal as every
+// other does, and the other stream stays empty.
+func TestAFailingObjectsEvalPrintsItsErrorToTheLogWriterAndNothingToStdout(t *testing.T) {
+	result := carried(t, background, t.TempDir(), "objects:eval")
+	if result.code != 1 || !strings.Contains(result.output, "error:") || result.stdout != "" {
+		t.Errorf("%+v", result)
 	}
 }
 
@@ -220,7 +257,10 @@ func TestACommandThatWasInterruptedExitsWith130(t *testing.T) {
 	// Nothing ran, so there is nothing to report: not even the internal error a bare cancellation would be. The
 	// stand-in world answers a cancelled context as the real one does, with the context's error; the command
 	// stops at the first program it would run, which is pkl asked for its version.
-	for _, args := range [][]string{{"check"}, {"build"}, {"test"}, {"setup"}, {"init", "my-map"}} {
+	for _, args := range [][]string{
+		{"check"}, {"build"}, {"test"}, {"setup"}, {"init", "my-map"}, {"assets:check"}, {"assets:sync"},
+		{"settings:check"}, {"objects:eval"}, {"objects:check"},
+	} {
 		root := t.TempDir()
 		if result := carried(t, cancelled, root, args...); result.code != 130 || result.output != "" {
 			t.Errorf("%q: exit %d, printed %q", args, result.code, result.output)
@@ -386,6 +426,37 @@ func TestEveryCommandOfTheTableCanBeShownAndRun(t *testing.T) {
 			t.Errorf("two rows are named %s", c.name)
 		}
 		seen[c.name] = true
+	}
+}
+
+// The table lists the commands in the order of the usage text, and each takes the arguments its usage shows: one
+// at most where the usage names one, and none else.
+func TestTheTableHasTheTwelveCommandsInTheOrderOfTheUsage(t *testing.T) {
+	want := []string{
+		"init", "setup", "build", "test", "dev", "check", "assets:check", "assets:sync", "assets:paths",
+		"settings:check", "objects:eval", "objects:check",
+	}
+	var have []string
+	for _, c := range commands {
+		have = append(have, c.name)
+		takesOne := c.name == "init" || c.name == "assets:paths"
+		if (c.takes.most == 1) != takesOne || (c.takes.without != nil) != (c.name == "init") {
+			t.Errorf("%s takes %+v", c.name, c.takes)
+		}
+	}
+	if !slices.Equal(have, want) {
+		t.Errorf("the table has %q, want %q", have, want)
+	}
+}
+
+// A flag is held against the commands its row names: a name that is no command would be a flag nobody can give.
+func TestEveryCommandAFlagNamesIsARowOfTheTable(t *testing.T) {
+	for _, f := range flags {
+		for _, name := range f.commands {
+			if _, known := rowOf(commands, name); !known {
+				t.Errorf("%s is a flag of %q, which the command table does not have", f.written(), name)
+			}
+		}
 	}
 }
 

@@ -1,7 +1,8 @@
 // Package cli is Moonwell's command line: how a line is read, which command it names, and how the command's
 // outcome becomes printed lines and an exit code. It takes arguments and the two streams, and returns a code. It
-// must not know in which order a map is built. It imports build, the areas a command calls, the foundations and
-// the root package.
+// must not know in which order a map is built. It imports build, the areas a command calls, the foundations, the
+// format war3/model, whose reader refuses a file that assets:paths is given and that is no model, and the root
+// package.
 package cli
 
 import (
@@ -57,6 +58,19 @@ var commands = []command{
 	{name: "test", usage: "test [--entry f] [--minify]", help: "Stage the map and launch Warcraft III", run: runTest},
 	{name: "dev", usage: "dev", help: "Watch sources and report errors on save", run: runDev},
 	{name: "check", usage: "check", help: "Compile and validate without building a map", run: runCheck},
+	{name: "assets:check", usage: "assets:check", help: "Show what assets:sync would change in the source map",
+		run: runAssetsCheck},
+	{name: "assets:sync", usage: "assets:sync",
+		help: "Write assets/ into the source map (close it in World Editor first)", run: runAssetsSync},
+	{name: "assets:paths", usage: "assets:paths [file]",
+		help:  "List the files a model references, as in-game or custom paths",
+		takes: arity{most: 1}, run: runAssetsPaths},
+	{name: "settings:check", usage: "settings:check",
+		help: "Show which internal map files the settings would change", run: runSettingsCheck},
+	{name: "objects:eval", usage: "objects:eval", help: "Print the validated custom objects as JSON",
+		run: runObjectsEval},
+	{name: "objects:check", usage: "objects:check", help: "Show which internal map files the objects would change",
+		run: runObjectsCheck},
 }
 
 // rowOf is the row of a command table for the command of this name.

@@ -11,6 +11,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/next/internal/build"
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/env"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
@@ -28,7 +29,8 @@ type outcome struct {
 }
 
 // run runs a command line in root, as the program does: in the real world, whose cache is the user's. A test
-// runs so only a line that starts no program, downloads nothing and writes nothing into that cache.
+// runs so only a line that starts no program but the pkl on its PATH, and that asks for no compiler: such a line
+// downloads nothing and writes nothing into that cache.
 func run(root string, args ...string) outcome {
 	var lines, printed []string
 	code := Run(background, args, root, func(line string) { lines = append(lines, line) },
@@ -298,6 +300,70 @@ func pklOnly(t *testing.T, root string) (e *env.Env, log *testkit.Recorder, ran 
 		defer guard.Unlock()
 		return slices.Clone(programs)
 	}
+}
+
+// commandIn runs the command of this name, by its row of the table, in the world e, with the arguments of its
+// own that are given. It returns what the command printed for other programs, and the failure it ended with. A
+// command the table does not have ends the test.
+func commandIn(t *testing.T, ctx context.Context, e *env.Env, name string, arguments ...string) ([]string, error) {
+	t.Helper()
+	var printed []string
+	said := line{words: append([]string{name}, arguments...)}
+	err := rowNamed(t, name).run(ctx, e, call{said: said, print: func(text string) { printed = append(printed, text) }})
+	return printed, err
+}
+
+// logged runs the command of this name in the world e, which must end well, and returns the lines log holds
+// then: every line the world has logged.
+func logged(t *testing.T, e *env.Env, log *testkit.Recorder, name string, arguments ...string) []string {
+	t.Helper()
+	if _, err := commandIn(t, background, e, name, arguments...); err != nil {
+		t.Fatalf("moonwell %s failed:\n%s\nafter it logged %q", name, diag.Format(err), log.Lines())
+	}
+	return log.Lines()
+}
+
+// onlyPkl is what a pklOnly world ran, which must be pkl, at least once, and no other program.
+func onlyPkl(t *testing.T, ran func() []string) {
+	t.Helper()
+	programs := ran()
+	if len(programs) == 0 || slices.ContainsFunc(programs, func(program string) bool { return program != "pkl" }) {
+		t.Errorf("the command ran %q, want pkl alone", programs)
+	}
+}
+
+// writeLocal replaces moonwell.local.pkl of root with one that amends the shared manifest by body.
+func writeLocal(t *testing.T, root, body string) {
+	t.Helper()
+	write(t, root, "moonwell.local.pkl", "amends \"moonwell.pkl\"\n"+body+"\n")
+}
+
+// sameFiles compares two snapshots of a folder, for what: every file that is new, changed or gone fails the test.
+func sameFiles(t *testing.T, before, after map[string][]byte, what string) {
+	t.Helper()
+	for name, data := range after {
+		previous, was := before[name]
+		if !was {
+			t.Errorf("%s: %s is new", what, name)
+		} else if string(previous) != string(data) {
+			t.Errorf("%s: %s changed", what, name)
+		}
+	}
+	for name := range before {
+		if _, still := after[name]; !still {
+			t.Errorf("%s: %s is gone", what, name)
+		}
+	}
+}
+
+// holdBuildLock takes the build lock of root for the rest of the test, as a build that runs beside it does.
+func holdBuildLock(t *testing.T, root string) {
+	t.Helper()
+	release, err := build.Acquire(root)
+	if err != nil {
+		t.Fatal(diag.Format(err))
+	}
+	t.Cleanup(release)
 }
 
 // exampleLibrary is a folder that holds a library, outside any project: a Lua module, a YueScript module that
