@@ -7,12 +7,15 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/env"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/toolchain"
+	"github.com/mdlsvensson/moonwell/next/internal/tooltest"
 )
 
 var background = context.Background()
@@ -24,8 +27,9 @@ type outcome struct {
 	output, stdout string
 }
 
-// run runs a command line in root, as the program does: in the real world. A test runs so only a line that
-// starts no program and downloads nothing.
+// run runs a command line in root, as the program does: in the real world. A test runs so a line that starts
+// no program and downloads nothing, or else it asks for the programs the line runs first: testkit.NeedPkl,
+// tooltest.Yue.
 func run(root string, args ...string) outcome {
 	var lines, printed []string
 	code := Run(background, args, root, func(line string) { lines = append(lines, line) },
@@ -130,4 +134,126 @@ func read(t *testing.T, root, path string) string {
 		t.Fatal(err)
 	}
 	return string(data)
+}
+
+// write writes a file of root, with its folders; path uses "/".
+func write(t *testing.T, root, path, content string) {
+	t.Helper()
+	testkit.WriteFile(t, root, path, []byte(content))
+}
+
+// edit replaces from, which must be there, with to in a file of root.
+func edit(t *testing.T, root, path, from, to string) {
+	t.Helper()
+	content := read(t, root, path)
+	if !strings.Contains(content, from) {
+		t.Fatalf("%s does not contain %q:\n%s", path, from, content)
+	}
+	write(t, root, path, strings.Replace(content, from, to, 1))
+}
+
+// appendTo adds text to the end of a file of root.
+func appendTo(t *testing.T, root, path, more string) {
+	t.Helper()
+	write(t, root, path, read(t, root, path)+more)
+}
+
+// remove removes a file or a folder of root, with all that is in it.
+func remove(t *testing.T, root, path string) {
+	t.Helper()
+	if err := os.RemoveAll(filepath.Join(root, filepath.FromSlash(path))); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// asError is err as the expected failure it must be.
+func asError(t *testing.T, err error, what string) *diag.Error {
+	t.Helper()
+	var failure *diag.Error
+	if !errors.As(err, &failure) {
+		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
+	}
+	return failure
+}
+
+// realWorld is the real world for root, with a log that keeps its lines and prints none.
+func realWorld(root string) (*env.Env, *testkit.Recorder) {
+	log := testkit.NewRecorder()
+	return env.New(root, log.Logger), log
+}
+
+// newProject is a project that this package's init makes, linked to the schema of this checkout, in a folder
+// named name below a new temporary folder. It runs the real pkl, and needs it.
+func newProject(t *testing.T, name string) string {
+	t.Helper()
+	testkit.NeedPkl(t)
+	parent := t.TempDir()
+	e, _ := realWorld(parent)
+	if err := createProject(background, e, name, filepath.Join(testkit.RepoRoot(t), "schema")); err != nil {
+		t.Fatal(diag.Format(err))
+	}
+	return filepath.Join(parent, name)
+}
+
+// compiling is a project for the commands that need the YueScript compiler: it needs pkl and the compiler.
+func compiling(t *testing.T) string {
+	t.Helper()
+	tooltest.Yue(t)
+	return newProject(t, "my-map")
+}
+
+// pklOnly is a world for root in which pkl is the one program that runs: every other program, every download
+// and every start of the game is refused with a failure that says "tried to". Its cache is a new folder, so no
+// compiler is there. So a command that ends well in it needs no compiler and downloads nothing; one that needs
+// the compiler fails at its download, which toolchain words, with the refusal as the failure's cause. ran lists
+// the programs that were asked for, the refused among them.
+func pklOnly(t *testing.T, root string) (e *env.Env, log *testkit.Recorder, ran func() []string) {
+	t.Helper()
+	e, log = testkit.Env(t, root)
+	var guard sync.Mutex
+	var programs []string
+	e.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
+		guard.Lock()
+		programs = append(programs, program)
+		guard.Unlock()
+		if program != toolchain.Pkl.Name {
+			return env.RunResult{}, &diag.Error{Msg: "tried to run " + program}
+		}
+		return env.Run(ctx, program, args, options)
+	}
+	e.Fetch = func(_ context.Context, url string) (int, []byte, error) {
+		return 0, nil, &diag.Error{Msg: "tried to download " + url}
+	}
+	e.Spawn = func(program string, _ []string) error {
+		return &diag.Error{Msg: "tried to start " + program}
+	}
+	return e, log, func() []string {
+		guard.Lock()
+		defer guard.Unlock()
+		return slices.Clone(programs)
+	}
+}
+
+// exampleLibrary is a folder that holds a library, outside any project: a Lua module, a YueScript module that
+// imports it, a stale Lua file beside that one, and a Lua module that defines a global.
+func exampleLibrary(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir()
+	write(t, dir, "src/example/greet.lua",
+		"local M = {}\nfunction M.hello(name)\n return \"Hello, \" .. name\nend\nreturn M\n")
+	write(t, dir, "src/example/loud.yue",
+		"import \"example.greet\"\n\nexport shout = (name) -> greet.hello(name)\\upper!\n")
+	write(t, dir, "src/example/loud.lua", "return { shout = function() return \"stale\" end }\n")
+	write(t, dir, "src/example/globals.lua", "function ExampleAdd(a, b)\n return a + b\nend\n")
+	return dir
+}
+
+// useLibrary has the project at root take the library in a folder as its library "ex", on this machine alone,
+// and has its entry use the library's modules.
+func useLibrary(t *testing.T, root, library string) {
+	t.Helper()
+	appendTo(t, root, "moonwell.local.pkl",
+		"\nlibraries { [\"ex\"] { path = \""+filepath.ToSlash(library)+"\"; dir = \"src\" } }\n")
+	appendTo(t, root, "src/main.yue", "\nimport \"example.loud\"\nrequire \"example.globals\"\n"+
+		"print loud.shout \"Moonwell\"\nprint ExampleAdd 1, 2\n")
 }

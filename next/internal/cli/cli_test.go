@@ -21,6 +21,8 @@ const usage = `Moonwell VERSION: Warcraft III maps with YueScript gameplay and P
 Usage: moonwell <command> [options]
 
 Commands:
+  init <dir> [--link]            Create a project (--link: use this local Moonwell checkout)
+  setup                          Install the pinned YueScript compiler
   build [--entry f] [--minify]   Build <build.folder>/<map.folder>
   test [--entry f] [--minify]    Stage the map and launch Warcraft III
   dev                            Watch sources and report errors on save
@@ -149,7 +151,7 @@ func TestAProjectKeepsWhatACommandSaysInDistMoonwellLog(t *testing.T) {
 func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	root := t.TempDir()
 	fails(t, root, []string{"error: ", "The src/ folder is missing."}, "dev")
-	for _, name := range []string{"check", "build", "test"} {
+	for _, name := range []string{"check", "build", "test", "setup"} {
 		result := carried(t, background, root, name)
 		if result.code != 1 || !strings.Contains(result.output, "No moonwell.pkl found") {
 			t.Errorf("%s: %+v", name, result)
@@ -158,7 +160,10 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	if exists(root, "dist") {
 		t.Error("a command outside a project made dist/")
 	}
-	for _, name := range []string{"check", "build", "test", "dev"} {
+	if entries, err := os.ReadDir(root); err != nil || len(entries) != 0 {
+		t.Errorf("a command outside a project left %v there (%v)", entries, err)
+	}
+	for _, name := range []string{"check", "build", "test", "dev", "setup"} {
 		if file := logFile(root, rowNamed(t, name)); file != "" {
 			t.Errorf("%s outside a project keeps a log in %s", name, file)
 		}
@@ -170,8 +175,11 @@ func TestOnlyAProjectGetsALogAndInitNeverDoes(t *testing.T) {
 	if file, want := logFile(root, rowNamed(t, "check")), filepath.Join(root, "dist", "moonwell.log"); file != want {
 		t.Errorf("the log of a project is %q, want %q", file, want)
 	}
+	if file, want := logFile(root, rowNamed(t, "setup")), filepath.Join(root, "dist", "moonwell.log"); file != want {
+		t.Errorf("the log of a setup in a project is %q, want %q", file, want)
+	}
 	// init makes a project somewhere else: the folder it is run in is not its project.
-	if file := logFile(root, command{name: "init"}); file != "" {
+	if file := logFile(root, rowNamed(t, "init")); file != "" {
 		t.Errorf("init keeps a log in %s", file)
 	}
 }
@@ -197,6 +205,13 @@ func TestCommandFailuresAreFormattedAndReturn1(t *testing.T) {
 	if strings.Count(result.output, "error: ") != 1 {
 		t.Errorf("the failure is printed more than once:\n%s", result.output)
 	}
+	// init without its folder is refused as the line is read, in init's own words.
+	for _, args := range [][]string{{"init"}, {"init", "--link"}} {
+		result := run(t.TempDir(), args...)
+		if result.code != 1 || result.output != "error: init needs a directory.\nhint: moonwell init my-map" {
+			t.Errorf("%q: %+v", args, result)
+		}
+	}
 }
 
 func TestACommandThatWasInterruptedExitsWith130(t *testing.T) {
@@ -205,9 +220,14 @@ func TestACommandThatWasInterruptedExitsWith130(t *testing.T) {
 	// Nothing ran, so there is nothing to report: not even the internal error a bare cancellation would be. The
 	// stand-in world answers a cancelled context as the real one does, with the context's error; the command
 	// stops at the first program it would run, which is pkl asked for its version.
-	for _, command := range []string{"check", "build", "test"} {
-		if result := carried(t, cancelled, t.TempDir(), command); result.code != 130 || result.output != "" {
-			t.Errorf("%s: exit %d, printed %q", command, result.code, result.output)
+	for _, args := range [][]string{{"check"}, {"build"}, {"test"}, {"setup"}, {"init", "my-map"}} {
+		root := t.TempDir()
+		if result := carried(t, cancelled, root, args...); result.code != 130 || result.output != "" {
+			t.Errorf("%q: exit %d, printed %q", args, result.code, result.output)
+		}
+		// init looks for Pkl before it writes anything.
+		if entries, err := os.ReadDir(root); err != nil || len(entries) != 0 {
+			t.Errorf("%q: a command that was told to stop left %v (%v)", args, entries, err)
 		}
 	}
 }
