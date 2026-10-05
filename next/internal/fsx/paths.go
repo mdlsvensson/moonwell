@@ -63,7 +63,9 @@ func SafeJoin(root, relative string) (string, error) {
 // so is a way the system cannot look at, with its Cause.
 //
 // It is SafeJoin with every failure worded for a user: a caller passes its error on as it is. Nothing need be at
-// the place, and root itself is trusted, as SafeJoin says.
+// the place, and root itself is trusted, as SafeJoin says. A file on the way is the system's to judge: where the
+// system says that nothing is below a file, the place is returned, and where it does not look there, that is a
+// way it cannot look at.
 func Inside(root, relative string) (string, error) {
 	place, err := SafeJoin(root, relative)
 	var refused *diag.Error

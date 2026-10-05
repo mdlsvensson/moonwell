@@ -118,6 +118,26 @@ func TestInsideTrustsTheFolderItIsGiven(t *testing.T) {
 	}
 }
 
+// A file on the way to the place is the system's to judge. One system says that nothing is there, and Inside
+// gives the place, where the caller finds nothing; another does not look below a file, and Inside names the
+// path, with what the system said as the cause.
+func TestInsideLeavesAFileOnTheWayToTheSystem(t *testing.T) {
+	root := t.TempDir()
+	testkit.WriteFile(t, root, "maps", []byte("a file, not a folder"))
+	const relative = "maps/demo.w3x"
+	place, err := fsx.Inside(root, relative)
+	if err == nil {
+		if place != filepath.Join(root, "maps", "demo.w3x") {
+			t.Errorf("Inside(%q) = %q", relative, place)
+		}
+		return
+	}
+	failure := refusedInside(t, root, relative)
+	if failure.Cause == nil || failure.Msg != relative+" cannot be reached: "+fsx.Reason(failure.Cause) {
+		t.Errorf("Inside(%q): %+v", relative, failure)
+	}
+}
+
 // A name of three hundred letters is one that no system this program runs on can look at: each refuses it for
 // its length, and not as a name that nothing has.
 func TestInsideNamesAWayTheSystemCannotLookAt(t *testing.T) {
