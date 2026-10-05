@@ -652,7 +652,10 @@ func TestWithAnAssetsHashInTheLockChangedAssetsOrModulesUnderTheSameCommitAreAMo
 		files[slices.Index(files, changed[0])+1] = changed[1]
 		other := serving(map[string][]byte{urlV1: tagArchive(t, commitA, files...)})
 		e := refusal(t, root, libraries, other, changed[0])
-		if !strings.Contains(e.Msg, "moved from aaaaaaaaaaaa to aaaaaaaaaaaa since") || e.File != LockFile || there(root, ".moonwell/library-assets/ex") {
+		// The commit is the one the lock has, so the refusal names it once, and says that the files are others.
+		want := "Library ex: the files of tag v0.1.0 of owner/lib are not those moonwell.lock recorded for commit aaaaaaaaaaaa."
+		if e.Msg != want || e.File != LockFile || there(root, ".moonwell/library-assets/ex") ||
+			e.Hint != "If the move was intended, delete the library's entry from moonwell.lock and run the command again." {
 			t.Errorf("%s: %+v", changed[0], e)
 		}
 	}
@@ -1147,6 +1150,76 @@ func TestDownloadedFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnyth
 	root := t.TempDir()
 	server := serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), "src/example/a/x.lua", "1", "src/example/b/x.lua", "2", "src/other/A.lua", "3")...)})
 	sync(t, root, block("ex", fromGitHub("v0.1.0", "")), server)
+}
+
+func TestADownloadedFileAndAFolderThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
+	cases := []struct {
+		files  []string
+		says   string
+		folder string
+	}{
+		{[]string{"src/Util", "1", "src/util/b.lua", "2"}, "Util and util", "module"},
+		{[]string{"src/util", "1", "src/Util/b.lua", "2"}, "Util and util", "module"},
+		{[]string{"src/example/Greet.lua/inner.lua", "1"}, "example/Greet.lua and example/greet.lua", "module"},
+		{[]string{"src/a/B", "1", "src/a/b/c/d.lua", "2"}, "a/B and a/b", "module"},
+		{[]string{"assets/models", "1"}, "Models and models", "assets"},
+	}
+	for _, c := range cases {
+		root, server := t.TempDir(), serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), c.files...)...)})
+		e := refusal(t, root, block("ex", fromGitHub("v0.1.0", "")), server, c.says)
+		if e.Msg != "Library ex: "+c.says+" in its "+c.folder+" folder differ only in letter case." || e.File != manifestFile ||
+			e.Hint != reportIt {
+			t.Errorf("%s: %+v", c.says, e)
+		}
+		if len(testkit.Snapshot(t, root)) != 0 {
+			t.Errorf("%s: something was written: %v", c.says, filesIn(t, root, "."))
+		}
+	}
+}
+
+func TestAFileIsHeldAgainstAFolderInAnotherSpellingAndNotAgainstOneInItsOwn(t *testing.T) {
+	// A file and a folder in two spellings are refused whoever the library is of, by the two spellings, the first
+	// by bytes first.
+	for _, local := range []bool{false, true} {
+		kept := shipped{modules: filesOfTest("a.lua", "1", "Pack.lua", "2", "pack.lua/inner.lua", "3"), local: local}
+		hint := reportIt
+		if local {
+			hint = renameOne
+		}
+		e := asError(t, kept.refuseUnusable("ex", manifestFile), "a module and a folder")
+		if e.Msg != "Library ex: Pack.lua and pack.lua in its module folder differ only in letter case." || e.File != manifestFile || e.Hint != hint {
+			t.Errorf("local %v: %+v", local, e)
+		}
+	}
+	// In one spelling they are one name, which this check lets through: no system holds both, and the write of
+	// the second fails by itself. Nor is a file held against a folder of the other of the library's two folders.
+	for what, kept := range map[string]shipped{
+		"a file where a folder is":                  {modules: filesOfTest("util", "1", "util/b.lua", "2")},
+		"a module and a folder of the map's files":  {modules: filesOfTest("Icons", "1"), assets: filesOfTest("icons/x.blp", "2"), shipsAssets: true},
+		"a file whose name starts as a folder does": {modules: filesOfTest("Util.lua", "1", "util/b.lua", "2", "utility/c.lua", "3")},
+	} {
+		if err := kept.refuseUnusable("ex", manifestFile); err != nil {
+			t.Errorf("%s: %v", what, err)
+		}
+	}
+}
+
+func TestALocalFileAndAFolderThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
+	root := t.TempDir()
+	if !testkit.CaseSensitive(t, root) {
+		t.Skip("this file system holds no file and folder that differ only in letter case; the case is covered on the other system's run")
+	}
+	put(t, root, "lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/files/Icons", "a file", "lib/files/icons/y.blp", "y")
+	e := refusal(t, root, block("mine", fromFolder("lib", "")), nil, "a file for the map and a folder")
+	if e.Msg != "Library mine: Icons and icons in its assets folder differ only in letter case." || e.File != manifestFile || e.Hint != renameAssets {
+		t.Errorf("error = %+v", e)
+	}
+	discard(t, root, "lib/files/Icons")
+	put(t, root, "lib/Pack.lua", "1", "lib/pack.lua/inner.lua", "2")
+	e = refusal(t, root, block("mine", fromFolder("lib", "")), nil, "a module and a folder")
+	if e.Msg != "Library mine: Pack.lua and pack.lua in its module folder differ only in letter case." || e.Hint != renameOne || there(root, ".moonwell") {
+		t.Errorf("error = %+v", e)
+	}
 }
 
 // The hints of a local library's file that cannot be used: its files are the user's own to rename. The folder of

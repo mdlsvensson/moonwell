@@ -170,7 +170,7 @@ func entryMembers(entry LockEntry) []member {
 }
 
 // objectText writes members as a JSON object, each on a line of its own, two spaces further in than indent, where
-// the closing brace stands.
+// the closing brace stands. It needs at least one member: without any, the braces stand around an empty line.
 func objectText(members []member, indent string) string {
 	lines := make([]string, len(members))
 	for i, m := range members {

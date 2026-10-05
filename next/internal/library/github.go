@@ -313,10 +313,18 @@ func errNoAssetsOfTheLibrary(key, assets, tag, libraryFile string) error {
 	}
 }
 
+// errMoved refuses a tag that is something else than the lock recorded of it: from is the commit the lock has,
+// and to the commit the tag is at. Where the two are one commit, it is the files kept of the tag that are others,
+// and the refusal names the commit once and says so.
 func errMoved(key, github, tag, from, to string) error {
+	what := "tag " + tag + " of " + github + " moved from " + short(from, 12) + " to " + short(to, 12) +
+		" since " + LockFile + " recorded it."
+	if from == to {
+		what = "the files of tag " + tag + " of " + github + " are not those " + LockFile + " recorded for commit " +
+			short(to, 12) + "."
+	}
 	return &diag.Error{
-		Msg: "Library " + key + ": tag " + tag + " of " + github + " moved from " + short(from, 12) + " to " + short(to, 12) +
-			" since " + LockFile + " recorded it.",
+		Msg:  "Library " + key + ": " + what,
 		File: LockFile,
 		Hint: "If the move was intended, delete the library's entry from " + LockFile + " and run the command again.",
 	}

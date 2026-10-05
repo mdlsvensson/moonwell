@@ -284,9 +284,9 @@ func (s shipped) refuseUnusable(key, manifestFile string) error {
 }
 
 // refuseUnusableNames refuses files of one folder of a library that a folder cannot hold on every system: a file
-// with a name Windows cannot hold, two files whose paths differ only in letter case, which are one file there,
-// and two files in folders that differ only in letter case, which are one folder there. kind names the folder:
-// "module" or "assets".
+// with a name Windows cannot hold, two files whose paths differ only in letter case, which are one file there, a
+// file and a folder whose paths do, which are one name there, and two files in folders that differ only in
+// letter case, which are one folder there. kind names the folder: "module" or "assets".
 func (s shipped) refuseUnusableNames(key, kind string, files []file, manifestFile string) error {
 	names := make([]string, len(files))
 	for i, f := range files {
@@ -303,10 +303,34 @@ func (s shipped) refuseUnusableNames(key, kind string, files []file, manifestFil
 		}
 		spelled[strings.ToLower(name)] = name
 	}
+	if first, second, found := fileAndFolderOfTwoSpellings(names, spelled); found {
+		return errTwoSpellings(key, kind, first, second, manifestFile, s.local)
+	}
 	if first, second, found := inFoldersOfTwoSpellings(names); found {
 		return errFoldersOfTwoSpellings(key, kind, first, second, manifestFile, s.local)
 	}
 	return nil
+}
+
+// fileAndFolderOfTwoSpellings finds, among the paths, which are in byte order, a file and a folder that one of
+// them lies in whose paths differ only in letter case: the two as they are spelled, the first by bytes first.
+// spelled is each of the paths by its spelling in lower case.
+//
+// A file and a folder of one spelling are not found. They are one name on every system, which a library's
+// folder cannot hold twice anywhere: the write of the second fails by itself.
+func fileAndFolderOfTwoSpellings(paths []string, spelled map[string]string) (first, second string, found bool) {
+	for _, path := range paths {
+		for i, c := range path {
+			if c != '/' {
+				continue
+			}
+			folder := path[:i]
+			if file, taken := spelled[strings.ToLower(folder)]; taken && file != folder {
+				return min(file, folder), max(file, folder), true
+			}
+		}
+	}
+	return "", "", false
 }
 
 // inFoldersOfTwoSpellings finds two of the paths, which are in byte order, that lie in folders whose paths differ

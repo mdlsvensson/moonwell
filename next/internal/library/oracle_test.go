@@ -104,6 +104,12 @@ import (
 //     root without the files it ships for the map; this tree refuses the library by its file. Decided and
 //     compared as the class before it (TestALocalLibrarysFileThatCannotBeReadIsRefused,
 //     TestAFolderInThePlaceOfALocalLibrarysFileIsRefused).
+//   - A sync of a tag that is at the commit the lock recorded for it, with other kept files: other modules, or
+//     other files for the map. Both trees refuse it, with the lock as the file and one hint. The other tree says
+//     that the tag moved from that commit to that commit; this tree names the commit once and says that the files
+//     are others. The class is decided on the scenario, which names the commit: the other tree's message must
+//     name it twice, this tree's must be that message in its own words, and everything the sync left is compared
+//     whole (TestWithAnAssetsHashInTheLockChangedAssetsOrModulesUnderTheSameCommitAreAMovedTag).
 //   - A sync of a project with a link at a folder that Sync writes or removes: .moonwell, one of the two
 //     folders, a library's folder, and, for a local library, a folder below its folder or its stamp. The other
 //     tree writes and removes through the link; this tree refuses the link first. Decided and compared as the
@@ -136,6 +142,10 @@ import (
 //   - A local library whose copy has a file where a folder of the library goes, or a folder where a file goes,
 //     after a file of the library became a folder or the reverse: the other tree fails on every sync. This tree
 //     makes the copy anew (TestAFileOfALocalLibraryThatBecameAFolderOrAFolderThatBecameAFileIsCopiedAnew).
+//   - A library with a kept file and a folder of kept files whose paths differ only in letter case (Util beside
+//     util/b.lua): the other tree writes them, as far as the system lets it, and this tree refuses the library as
+//     it refuses two files that differ so. The scenarios have a file and a folder of one spelling, which both
+//     trees fail to write (TestADownloadedFileAndAFolderThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten).
 //   - A local library with a file whose name has a backslash, which only a system other than Windows holds: this
 //     tree refuses it as a name that cannot be used
 //     (TestALocalFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten).
@@ -1057,6 +1067,9 @@ type syncStep struct {
 	// withoutStamp is the stamp, as a path below the folder the project lies in, that this tree alone removes
 	// in a sync that both trees fail to write: a class the header names, and the last sync of its scenario.
 	withoutStamp string
+	// otherFiles is the commit of a tag that the lock recorded at that commit with other kept files: a class the
+	// header names. Both trees refuse the sync, each in its own words.
+	otherFiles string
 }
 
 // syncScenario is syncs of one project, one after another.
@@ -1277,6 +1290,11 @@ func (c *tally) syncs(t *testing.T, home string, scenario syncScenario) {
 	want, got := scenario.played(t, home, theOtherTree), scenario.played(t, home, thisTree)
 	for i, step := range scenario.steps {
 		what := scenario.name + ": " + step.name
+		if step.otherFiles != "" {
+			c.inPart++
+			otherFilesOfOneCommit(t, what, step.otherFiles, want[i], got[i])
+			continue
+		}
 		if step.refusedAnew != "" || step.withoutStamp != "" {
 			if i != len(scenario.steps)-1 {
 				t.Errorf("%s: a sync that the trees do differently is not the last of its scenario", what)
@@ -1333,6 +1351,26 @@ func withoutStamp(t *testing.T, what, stamp string, want, got syncOf) {
 	butTheStamp.Files = maps.Clone(want.left.Files)
 	delete(butTheStamp.Files, stamp)
 	oracle.Values(t, what, butTheStamp, got.left)
+}
+
+// otherFilesOfOneCommit holds a sync of the class the header names: a tag at the commit the lock recorded for it,
+// with other kept files. The other tree's refusal must name that commit twice, as the one the tag moved from and
+// the one it moved to; this tree's must be that refusal with the commit named once and the files said to be
+// others, with the same file and hint. Neither tree writes, and everything the sync left is compared whole.
+func otherFilesOfOneCommit(t *testing.T, what, commit string, want, got syncOf) {
+	t.Helper()
+	theirs := *oldFailure(t, want.err, what)
+	twice := " moved from " + commit[:12] + " to " + commit[:12] + " since " + LockFile + " recorded it."
+	tagged, namesItTwice := strings.CutSuffix(theirs.Msg, twice)
+	library, tag, isOfATag := strings.Cut(tagged, ": tag ")
+	if !namesItTwice || !isOfATag {
+		t.Errorf("%s: the other tree does not say that a tag moved from %s to %s: %q", what, commit[:12], commit[:12], theirs.Msg)
+	}
+	theirs.Msg = library + ": the files of tag " + tag + " are not those " + LockFile + " recorded for commit " + commit[:12] + "."
+	if !oracle.Refusals(t, what, &theirs, got.err) || got.lies != nil {
+		t.Errorf("%s: this tree does not refuse the sync, or returns %+v with its refusal: %v", what, got.lies, got.err)
+	}
+	oracle.Values(t, what, want.left, got.left)
 }
 
 // syncScenarios is the scenarios both trees must play alike: those the other tree's tests carry, and seeded
@@ -1482,12 +1520,12 @@ func syncScenarios(t *testing.T, home string) (carried, seeded []syncScenario) {
 		}},
 		{"other files for the map under the same commit", []syncStep{
 			{name: "a first sync", libraries: ex("v0.1.0", ""), served: ships},
-			{name: "another file for the map", before: without("project/.moonwell"), libraries: ex("v0.1.0", ""),
+			{name: "another file for the map", before: without("project/.moonwell"), libraries: ex("v0.1.0", ""), otherFiles: commitA,
 				served: at(urlV1, of(commitA, changed(shipping, "assets/Models/Golem.mdx", "another model")...))},
 		}},
 		{"other modules under the same commit", []syncStep{
 			{name: "a first sync", libraries: ex("v0.1.0", ""), served: ships},
-			{name: "another module", before: without("project/.moonwell"), libraries: ex("v0.1.0", ""),
+			{name: "another module", before: without("project/.moonwell"), libraries: ex("v0.1.0", ""), otherFiles: commitA,
 				served: at(urlV1, of(commitA, changed(shipping, "src/example/greet.lua", "return 1")...))},
 		}},
 		{"libraries that stop shipping files for the map, or leave", []syncStep{
@@ -1682,8 +1720,9 @@ func TestOracleOnSyncingAsTheOtherTreesTestsDo(t *testing.T) {
 	for _, scenario := range carried {
 		compared.syncs(t, home, scenario)
 	}
-	// In part: the local library with a folder in the place of its own file.
-	compared.check(t, tally{refused: 43, results: 36, inPart: 1})
+	// In part: the local library with a folder in the place of its own file, and the two tags with other files
+	// at the commit the lock recorded.
+	compared.check(t, tally{refused: 41, results: 36, inPart: 1 + 2})
 }
 
 func TestOracleOnSyncingSeededProjects(t *testing.T) {
