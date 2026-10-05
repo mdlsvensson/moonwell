@@ -28,8 +28,8 @@ import (
 // tree's build the same projects, and what they leave is compared file by file. The other tree's commands are
 // cli.Build and cli.Check, on a world of pipeline.NewEnv; this tree's are Build and Check, on a world of env.New.
 //
-// The test needs Pkl and the compiler, and runs both for every project: 39 projects are made, and 57 commands
-// are run by each tree, which takes about thirty seconds. It is skipped with -short.
+// The test needs Pkl and the compiler, and runs both for every project: 45 projects are made, and 67 commands
+// are run by each tree, which takes about thirty-five seconds. It is skipped with -short.
 //
 // How a project is run. A project is made once, as a seed: the other tree's init creates it, linked to this
 // checkout, and the test then writes the seed's files into it. For a command, the seed is copied to one place,
@@ -40,7 +40,7 @@ import (
 // of that, each tree builds a copy of the template once, and nothing of those two builds is compared: a tree
 // that has to download the compiler logs that it does, and does so in that build.
 //
-// The seeds are the rows of the table in the spec's §10.3 and one more (oracleSeeds), each on the template:
+// The seeds are the rows of the table in the spec's §10.3 and three more (oracleSeeds), each on the template:
 //
 //   - the template as init leaves it;
 //   - every setting set, but the preview, on the map info and the script of the fixture map-settings-v39, with a
@@ -53,12 +53,16 @@ import (
 //     file of the library;
 //   - a preview picture as a TGA of 512 pixels, as a BLP and as a PNG, a seed each;
 //   - Lua modules of the project, sources beside the entry, a local library with modules of both languages, an
-//     unknown global that is a warning, and a lock with an entry of that library and one of a library that the
-//     manifest has not;
-//   - an ids module that is not the objects', which a build writes anew and a check refuses.
+//     unknown global that is a warning, a global and a function that the map's script alone defines, and a lock
+//     with an entry of that library and one of a library that the manifest has not;
+//   - an ids module that is not the objects', which a build writes anew and a check refuses;
+//   - a map info of an older format, 28, whose archive stands behind a header of 512 bytes;
+//   - everything in one project, so that each step plans on what the steps before it changed: the objects, the
+//     settings with a preview, assets, a library that ships modules and files, and Lua modules.
 //
 // Each seed is built, built with minifying on, and checked. A seed must show that it covers its row: the build
-// of the other tree logs the lines the seed names, and its minified script is not its plain one.
+// of the other tree logs the lines the seed names, its minified script is not its plain one, and as many bytes
+// stand before its archive as the seed says, which is none for every seed but the one.
 //
 // Compared whole, with the other tree's as what is wanted, for every command of every project. It is all that
 // a command leaves: the whole project folder of each tree, and not a list of the files a build is known to
@@ -82,19 +86,21 @@ import (
 // Of a check, also: that neither tree wrote a stage or an archive. Of a build that passes: that a file of the
 // stage and a file of the archive were compared.
 //
-// The refusals are 29 projects with one fault each (oracleFaults), each built once. Eleven are the faults a
-// build meets step by step, and those of the classes below: an object with a base the game has not; a setting
-// for a player the map has not; an unknown global; a required module that is not there; an asset at the path of
-// a file the map holds; an asset at a path that a map keeps for a file of its format, war3map.w3e; a folder
-// where the archive goes; no source map; no source map and no objects; a map without its war3map.w3i; and a
-// build lock that was left behind. Eighteen are the other refusals a user can get: of the assets block (a mapped
+// The refusals are 33 projects (oracleFaults), each built once: 32 with one fault and one with two. Eleven are
+// the faults a build meets step by step, and those of the classes below: an object with a base the game has not;
+// a setting for a player the map has not; an unknown global; a required module that is not there; an asset at
+// the path of a file the map holds; an asset at a path that a map keeps for a file of its format, war3map.w3e; a
+// folder where the archive goes; no source map; no source map and no objects; a map without its war3map.w3i; and
+// a build lock that was left behind. Eighteen are the other refusals a user can get: of the assets block (a mapped
 // file that is not there, a mapped file that is left out, two libraries that ship one path); a typed gameplay
 // constant against a raw one; a source the compiler refuses, an entry that is not there, a module that two files
 // define; a library whose folder is not there, two library keys that differ in letter case, a yue.path to no
 // file; an object id the map has; a map without its script, a script without main, settings on a map without
 // its info, a preview picture that is no picture, a preview under assets/; a manifest that Pkl refuses; and a
-// folder that is no project. With the check of the seed whose ids module is stale, thirty runs are refused by
-// both trees; fifteen of them are compared whole, as the seeds are.
+// folder that is no project. Four more: a setting for a player the map has not together with a mapped file that
+// is not there, of which both trees refuse the setting, whose step comes first; a war3map.w3i and a war3map.imp
+// that are too short to read; and an ownership state that is no state. With the check of the seed whose ids
+// module is stale, 34 runs are refused by both trees; fifteen of them are compared whole, as the seeds are.
 //
 // Compared in part, and counted:
 //
@@ -119,18 +125,27 @@ import (
 //     packs the stage, and names a map without its war3map.w3i by the stage's whole path; this tree packs the
 //     planned map (the spec's §6), and names the source map, maps/<map.folder>. The other tree names a lock that
 //     is held by the lock's whole path, in the file and in the hint; this tree by dist/.lock (the spec's §8:
-//     "the lock's error names dist/.lock"). The class is decided on what the other tree left: the file of its
-//     error is the place on disk of its stage, or of the lock. Not compared: the file, and the path where the
-//     hint holds it. This tree must name the file from the project folder. The message, the rest of the hint and
-//     everything else are compared whole (TestPackRequiresTheMapInfo,
-//     TestAcquireRejectsAConcurrentBuildAndReleasesAfterwards).
-//   - An asset at the path of a file that the map holds and no state owns (fileNamed). Both trees refuse it in
-//     the same words; the other tree's refusal has no file, and this tree's names the file of the map,
-//     maps/<map.folder>/<path>. It is the difference that the oracle of assets counts as its class "By name",
-//     here as a build shows it. The class is decided on what the other tree left: its error is that refusal, by
-//     its message, and has no file. Not compared: the file. This tree must name the file of the map. The message,
-//     the hint and everything else are compared whole, within the class above, which the run is in too
-//     (TestAnAssetAtAFileOrAnImportTheMapHasAndDoesNotOwnIsRefused).
+//     "the lock's error names dist/.lock"). The other tree reads the index of imports in its stage, and names a
+//     war3map.imp that is too short to read by its place there; this tree reads the source map, and names
+//     maps/<map.folder>/war3map.imp (the spec's §8, the row on a file of the map that cannot be read, or is too
+//     short to read: it is a named error with the file). The class is decided on what the other tree left: the
+//     file of its error is the place on disk of its stage, of the index in its stage, or of the lock
+//     (namedByItsPlace). Not compared: the file, and the path where the hint holds it. This tree must name the
+//     file from the project folder. The message, the rest of the hint and everything else are compared whole
+//     (TestPackRequiresTheMapInfo, TestAcquireRejectsAConcurrentBuildAndReleasesAfterwards, and
+//     TestPlanRefusesAnIndexOfImportsItCannotUse of assets).
+//   - A refusal about a file of the map to which the other tree gives no file (fileNamed, with the table
+//     withoutAFile). Both trees refuse in the same words, and this tree names the file. One is an asset at the
+//     path of a file that the map holds and no state owns: this tree names maps/<map.folder>/<path>, and the hint
+//     is the other tree's. It is the difference that the oracle of assets counts as its class "By name", here as
+//     a build shows it. The other is a war3map.w3i that is too short to read, which is found when the map is
+//     packed: the other tree gives neither file nor hint, and this tree names maps/<map.folder>/war3map.w3i with
+//     the hint to save the map again (the same row of the spec's §8 as the index above). The class is decided on
+//     what the other tree left: its error is one of the two refusals, by its message, and has no file. Not
+//     compared: the file, and the hint where the other tree has none. This tree must give the file, and the hint,
+//     that the table holds. The message and everything else are compared whole; the run of the asset is in the
+//     class stagedWhole too (TestAnAssetAtAFileOrAnImportTheMapHasAndDoesNotOwnIsRefused of assets,
+//     TestPackNamesTheMapInfoItCannotRead).
 //   - A typed gameplay constant that is not the raw one of the same name (refusedLater). The other tree refuses
 //     it when it loads the manifest, before it writes anything; this tree when it plans the settings, after it
 //     has generated the editor's files and compiled (the spec's §8: such values "are refused by the commands
@@ -172,12 +187,26 @@ import (
 //     (TestTestStagesTheMapAndHandsTheGameTheStagesPath), and Dev checks again and again.
 //   - The faults through Check: a check of this tree fails wherever its build would (the spec's §8), where a
 //     check of the other tree can pass without the map (TestCheckLeavesTheIDsModuleAloneAndFailsWhereABuildWould).
+//   - The other refusals about one file of the map as the assets plan it, which the other tree names by its place
+//     in the stage, or in its message: an owned file that was edited in the map, an asset below a file of the
+//     map, an asset named as a folder of the map. The oracle of assets holds them, in its class "By name"
+//     (next/internal/assets/oracle_test.go).
+//   - The rows of the spec's §8 that change what a build makes of an input, for inputs that no seed has. Bytes
+//     that are not UTF-8 in war3map.lua, in a Lua module or in a compiled one, which a build keeps: the oracles
+//     of script and of settings (next/internal/script/oracle_test.go, inject_test.go and bundle_test.go;
+//     next/internal/settings/oracle_test.go). White space outside ASCII in war3map.lua and in the two text files:
+//     the oracles of war3/lua and of war3/txt (next/internal/war3/lua/oracle_test.go and token_test.go;
+//     next/internal/war3/txt/oracle_test.go). A link in the source map, two names in it that differ only in
+//     letter case, and a name Windows cannot hold, in the map, under assets/ or in a library's files, each of
+//     which fails every command that reads the map: the tests of mapdir (next/internal/mapdir/scan_test.go) and
+//     of assets (next/internal/assets/oracle_test.go and collect_test.go). A preview on a map whose main() ends
+//     in the return of a value, which is refused: next/internal/settings/lua_test.go.
 
 // ---- the oracle ----
 
 func TestOracleOnWhatTheBuildsOfBothTreesLeave(t *testing.T) {
 	if testing.Short() {
-		t.Skip("the build oracle runs Pkl and the compiler on 39 projects, which takes its time: not with -short")
+		t.Skip("the build oracle runs Pkl and the compiler on 45 projects, which takes its time: not with -short")
 	}
 	o := newBuildOracle(t)
 	o.warm(t)
@@ -202,9 +231,9 @@ func TestOracleOnWhatTheBuildsOfBothTreesLeave(t *testing.T) {
 	// A run of some of the projects, which -run asks for, has no tally to keep.
 	if ran == len(oracleSeeds)+len(oracleFaults) {
 		o.tally.check(t, buildTally{
-			Builds: 18, Checks: 8, Refusals: 30,
-			Staged: 406, Packed: 388, Generated: 302, Libraries: 33, Kept: 1890, Lines: 80,
-			MapOpenedFirst: 1, StagedWhole: 11, NamedFromTheProject: 2, FileNamed: 1, RefusedLater: 1,
+			Builds: 22, Checks: 10, Refusals: 34,
+			Staged: 541, Packed: 504, Generated: 368, Libraries: 48, Kept: 2291, Lines: 103,
+			MapOpenedFirst: 1, StagedWhole: 14, NamedFromTheProject: 3, FileNamed: 2, RefusedLater: 1,
 		})
 	}
 }
@@ -232,38 +261,58 @@ func (c buildTally) check(t *testing.T, want buildTally) {
 // ---- the projects ----
 
 // oracleProject is a project of the oracle: its name, what is written into a new project to make it, and, for
-// a seed, the lines that a build of it logs when the seed covers its row of the spec's table.
+// a seed, the two things that show the seed covers its row of the spec's table: the lines that a build of it
+// logs, and the number of bytes that stand before the archive of a build of it.
 type oracleProject struct {
-	name string
-	lay  func(t *testing.T, root string)
-	says []string
+	name   string
+	lay    func(t *testing.T, root string)
+	says   []string
+	before int
 }
+
+// What stands before the archive of a map: nothing, or the header of 512 bytes that a map of an older format
+// has.
+const (
+	noHeader  = 0
+	theHeader = 512
+)
 
 // oracleSeeds are the projects that both trees build, build minified and check.
 var oracleSeeds = []oracleProject{
 	{"template", func(*testing.T, string) {}, []string{
 		"Added 1 custom object(s) to 2 file(s).", "Built dist/bin/map.w3x (2 module(s)).",
-	}},
-	{"settings", laySettings, []string{"Applied map settings to 4 internal file(s)."}},
-	{"objects", layObjects, []string{"Added 7 custom object(s) to 10 file(s)."}},
+	}, noHeader},
+	{"settings", laySettings, []string{"Applied map settings to 4 internal file(s)."}, noHeader},
+	{"objects", layObjects, []string{"Added 7 custom object(s) to 10 file(s)."}, noHeader},
 	{"assets", layAssets, []string{
 		"assets/textures/golem.blp replaces library golems's Textures/Golem.blp", "Imported 5 asset(s).",
 		"Built dist/bin/map.w3x (3 module(s)).",
-	}},
-	{"preview-tga", layPreview("preview.tga", packedTGA), []string{"Applied map settings to 5 internal file(s)."}},
+	}, noHeader},
+	{"preview-tga", layPreview("preview.tga", packedTGA),
+		[]string{"Applied map settings to 5 internal file(s)."}, noHeader},
 	{"preview-blp", layPreview("art/preview.blp", testkit.BLP(256, 1)),
-		[]string{"Applied map settings to 4 internal file(s)."}},
+		[]string{"Applied map settings to 4 internal file(s)."}, noHeader},
 	{"preview-png", layPreview("preview.png", testkit.PNG(testkit.NewPixels(256), "rgba")),
-		[]string{"Applied map settings to 5 internal file(s)."}},
-	{"modules", layModules, []string{"Built dist/bin/map.w3x (9 module(s))."}},
+		[]string{"Applied map settings to 5 internal file(s)."}, noHeader},
+	{"modules", layModules, []string{"Built dist/bin/map.w3x (9 module(s))."}, noHeader},
 	// An ids module that is not the objects': a build writes it anew, and a check refuses it.
 	{"stale-ids", func(t *testing.T, root string) { put(t, root, "src/generated/objects.yue", "-- stale\n") },
-		[]string{"Built dist/bin/map.w3x (2 module(s))."}},
+		[]string{"Built dist/bin/map.w3x (2 module(s))."}, noHeader},
+	// A map info of format 28, which is packed behind a header.
+	{"older-format", func(t *testing.T, root string) {
+		testkit.WriteFile(t, root, "maps/map.w3x/war3map.w3i", testkit.SyntheticMapInfo(28))
+	}, []string{"Built dist/bin/map.w3x (2 module(s))."}, theHeader},
+	{"everything", layEverything, []string{
+		"Added 7 custom object(s) to 10 file(s).", "Applied map settings to 7 internal file(s).",
+		"assets/textures/golem.blp replaces library golems's Textures/Golem.blp", "Imported 4 asset(s).",
+		"Built dist/bin/map.w3x (6 module(s)).",
+	}, noHeader},
 }
 
-// oracleFaults are the projects with one fault each, which both trees refuse to build. The first eleven are the
-// faults a build meets step by step, and those of the header's classes; the rest are the other refusals a user
-// can get, one of each kind.
+// oracleFaults are the projects that both trees refuse to build, each with one fault but for the one that has
+// two. The first eleven are the faults a build meets step by step, and those of the header's classes; the next
+// eighteen are the other refusals a user can get, one of each kind; the last four are the two faults at once,
+// two map files that are too short to read, and a state that is none.
 var oracleFaults = []oracleProject{
 	{name: "invalid-object", lay: func(t *testing.T, root string) {
 		put(t, root, "objects/units.pkl",
@@ -376,6 +425,22 @@ var oracleFaults = []oracleProject{
 	{name: "not-a-project", lay: func(t *testing.T, root string) {
 		removeFrom(t, root, "moonwell.pkl")
 		removeFrom(t, root, "moonwell.local.pkl")
+	}},
+
+	// Two faults, of two steps: the one that is refused is the one whose step comes first.
+	{name: "refused-setting-and-mapped-asset-missing", lay: func(t *testing.T, root string) {
+		amendLocal(t, root, `settings { players { ["5"] { name = "Absent" } } }
+assets { paths { ["missing.blp"] = "x.blp" } }`)
+	}},
+	{name: "map-info-too-short", lay: func(t *testing.T, root string) {
+		put(t, root, "maps/map.w3x/war3map.w3i", "ab")
+	}},
+	{name: "index-too-short", lay: func(t *testing.T, root string) {
+		put(t, root, "maps/map.w3x/war3map.imp", "ab")
+		put(t, root, "assets/a.blp", "an asset")
+	}},
+	{name: "state-that-is-no-state", lay: func(t *testing.T, root string) {
+		put(t, root, ".asset-state/map.w3x.json", "not json")
 	}},
 }
 
@@ -582,8 +647,46 @@ lint { unknownGlobals = "warning"; globals = List("MyLibrary") }`)
 	appendTo(t, root, "src/main.yue", "\nimport \"tools\"\nimport \"state\"\nimport \"game.rules\" as rules\n"+
 		"require \"counter\"\nimport \"example.loud\"\nrequire \"example.globals\"\nCountUp!\n"+
 		"print tools.greet(\"Moonwell\"), Round, rules.limit, Count\nprint loud.shout \"Moonwell\"\n"+
-		"print ExampleAdd 1, 2\nprint MyLibrary, Unheard\n")
+		"print ExampleAdd 1, 2\nprint MyLibrary, Unheard\n"+usesTheMapsScript)
 	put(t, root, "moonwell.lock", `{"libraries": {`+lockEntry("gone", "b")+`, `+lockEntry("ex", "a")+"}}\n")
+}
+
+// usesTheMapsScript is gameplay that names a global and calls a function of the script World Editor saved for
+// the template's map and for the settings fixture: both are known to a build by what the script defines alone.
+const usesTheMapsScript = "print gg_trg_Initialization\nInitCustomTriggers!\n"
+
+// layEverything writes one project with all that the other seeds have a project each for, so that each step of
+// a build plans on what the steps before it changed: the object files World Editor saved and an object of every
+// category; every setting and a preview picture, on the map info and the script of the settings fixture, with a
+// text file to merge into; assets, one at a path from the manifest; a local library that ships a module of each
+// language and files for the map, one of which an asset of the map replaces; and Lua modules of the project.
+// The entry requires the modules and names what the map's script defines.
+func layEverything(t *testing.T, root string) {
+	layObjects(t, root)
+	settingsMap(t, root)
+	put(t, root, "maps/map.w3x/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
+	testkit.WriteFile(t, root, "preview.png", testkit.PNG(testkit.NewPixels(256), "rgba"))
+	const lastOfInfo = `recommendedPlayers = "2-4"`
+	if !strings.Contains(everySetting, lastOfInfo) {
+		t.Fatalf("the settings have no line %s to put the preview after", lastOfInfo)
+	}
+	withPreview := strings.Replace(everySetting, lastOfInfo, lastOfInfo+"\n    preview = \"preview.png\"", 1)
+
+	put(t, root, "assets/Models/unit.mdx", "\x00\x01\x02\xfa\xff")
+	put(t, root, "assets/icons/BTNSword.blp", "an icon")
+	put(t, root, "assets/textures/golem.blp", "texture from the map")
+	put(t, root, "libs/golems/moonwell-library.json", `{"dir":"src","assets":"assets"}`)
+	put(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
+	put(t, root, "libs/golems/src/golems/loud.yue", "import \"golems.names\"\n\nexport first = -> names.first\\upper!\n")
+	put(t, root, "libs/golems/assets/war3mapImported/golems/frames.toc", "toc from the library")
+	put(t, root, "libs/golems/assets/Textures/Golem.blp", "texture from the library")
+	put(t, root, "lua/tools/init.lua", greeterWith("greet"))
+	put(t, root, "lua/counter.lua", "Count = 0\nfunction CountUp()\n Count = Count + 1\nend\n")
+	amendLocal(t, root, withPreview+`
+assets { paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# } }
+libraries { ["golems"] { path = "libs/golems" } }`)
+	appendTo(t, root, "src/main.yue", "\nimport \"tools\"\nrequire \"counter\"\nimport \"golems.loud\"\nCountUp!\n"+
+		"print tools.greet(loud.first!), Count, objects.heroes.paladin\n"+usesTheMapsScript)
 }
 
 // greeterWith is a Lua module that returns a table with one function of this name, which greets.
@@ -642,7 +745,8 @@ func removeFrom(t *testing.T, root, name string) {
 }
 
 // coversItsRow fails the test for a seed that does not show what its row of the table is for: the plain build
-// of the other tree must log the lines the seed names, and its minified build must stage another script.
+// of the other tree must log the lines the seed names, its minified build must stage another script, and as
+// many bytes must stand before its archive as the seed says.
 func coversItsRow(t *testing.T, seed oracleProject, plain, minified leftBy) {
 	t.Helper()
 	for _, line := range seed.says {
@@ -653,6 +757,11 @@ func coversItsRow(t *testing.T, seed oracleProject, plain, minified leftBy) {
 	const script = oracleStage + "/war3map.lua"
 	if plain.files[script] == nil || bytes.Equal(plain.files[script], minified.files[script]) {
 		t.Errorf("%s: the other tree's minified build stages the script of its plain build, or none", seed.name)
+	}
+	if packed := plain.files[oracleArchive]; packed == nil {
+		t.Errorf("%s: the other tree's build left no archive", seed.name)
+	} else if before := opened(t, packed).HeaderOffset; before != seed.before {
+		t.Errorf("%s: %d bytes stand before the other tree's archive, want %d", seed.name, before, seed.before)
 	}
 }
 
@@ -1042,8 +1151,9 @@ func (o *buildOracle) stagedWhole(t *testing.T, what string, want *leftBy) {
 // namedByItsPlace is the files of a refusal that the other tree names by their place on disk, each by its path
 // from the project folder, with the name this tree gives the file.
 var namedByItsPlace = map[string]string{
-	oracleStage:  oracleMap,    // a map without its info, which is missed when the map is packed
-	"dist/.lock": "dist/.lock", // the build lock, which is held
+	oracleStage:                  oracleMap,                  // a map without its info, missed when it is packed
+	oracleStage + "/war3map.imp": oracleMap + "/war3map.imp", // an index of imports that is too short to read
+	"dist/.lock":                 "dist/.lock",               // the build lock, which is held
 }
 
 // namedFromTheProject is the class of a refusal whose file the other tree names by its place on disk: this
@@ -1065,25 +1175,41 @@ func (o *buildOracle) namedFromTheProject(seed string, want *leftBy) {
 	}
 }
 
-// conflictWithTheMap is the other tree's refusal of an asset at the path of a file that the map holds and no
-// state owns. It names the path in the map.
-var conflictWithTheMap = regexp.MustCompile(`^Asset (.+) conflicts with a file or import already in the map\.$`)
+// withoutAFile is the refusals about a file of the map to which the other tree gives no file, each by what its
+// message says, with the file this tree names, in which $1 is what the message names, and the hint this tree
+// gives where the other tree gives none.
+var withoutAFile = []struct {
+	says *regexp.Regexp
+	file string
+	hint string
+}{
+	// An asset at the path of a file that the map holds and no state owns. The other tree has a hint.
+	{regexp.MustCompile(`^Asset (.+) conflicts with a file or import already in the map\.$`), oracleMap + "/$1", ""},
+	// A map info that is too short to read, which is found when the map is packed.
+	{regexp.MustCompile(`^war3map\.w3i is truncated\.$`), oracleMap + "/war3map.w3i",
+		"Save the map again in World Editor."},
+}
 
-// fileNamed is the class of that refusal, to which the other tree gives no file: this tree must name the file
-// of the map, by the map's label.
+// fileNamed is the class of those refusals: this tree must name the file of the map, by the map's label, and
+// give the hint of the table where the other tree gives none.
 func (o *buildOracle) fileNamed(want *leftBy) {
 	failure, expected := want.err.(*olddiag.Error)
 	if !expected || failure.File != "" {
 		return
 	}
-	asset := conflictWithTheMap.FindStringSubmatch(failure.Msg)
-	if asset == nil {
+	for _, refusal := range withoutAFile {
+		if !refusal.says.MatchString(failure.Msg) || (failure.Hint == "") != (refusal.hint != "") {
+			continue
+		}
+		named := *failure
+		named.File = refusal.says.ReplaceAllString(failure.Msg, refusal.file)
+		if failure.Hint == "" {
+			named.Hint = refusal.hint
+		}
+		want.err = &named
+		o.tally.FileNamed++
 		return
 	}
-	named := *failure
-	named.File = oracleMap + "/" + asset[1]
-	want.err = &named
-	o.tally.FileNamed++
 }
 
 // A typed food limit and the raw constant it stands for, as a manifest sets them.
