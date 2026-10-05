@@ -19,9 +19,14 @@ import (
 // Lua, and its entry says so, with a `true` at its end; a Lua module is its own source, whatever the program is,
 // and is never marked.
 //
+// The program is one that Compile returned, and is there: Bundle has no error to return, and does not look for
+// what no such program has. In a program of Compile the entry's name, and every module's name and path, are
+// valid UTF-8, since Collect refuses a module file whose name is not, and every module has Lua.
+//
 // A name and a path are written as strings of Lua, by lua.Quote: a control character is three digits after a
-// backslash, and a byte that is not UTF-8 is written as U+FFFD, so a name with such a byte is not kept. A module
-// without Lua, which no program has, is defined with a body of one empty line.
+// backslash, and Lua reads the string back as the bytes of the name. Handed a name with a byte that is not
+// UTF-8 all the same, Bundle writes U+FFFD in the byte's place, which is another name than a require asks for.
+// Handed a module without Lua, it defines the module with a body of one empty line.
 func Bundle(program *Program, runtime string, firstLine int) string {
 	block := append([]string{"do"}, linesOf(runtime)...)
 	var table []string

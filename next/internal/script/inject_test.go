@@ -3,6 +3,7 @@ package script
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"maps"
 	"path/filepath"
 	"strings"
@@ -47,6 +48,20 @@ func placed(t testing.TB, folder *mapdir.Folder, program *Program) mapdir.Change
 	return changes[0]
 }
 
+// firstDifference says where two texts first differ, with what each holds from there on for a few bytes; "" for
+// texts that are alike.
+func firstDifference(got, want string) string {
+	if got == want {
+		return ""
+	}
+	at := 0
+	for at < len(got) && at < len(want) && got[at] == want[at] {
+		at++
+	}
+	return fmt.Sprintf("they differ first at byte %d, of %d and %d: got %q, want %q",
+		at, len(got), len(want), got[at:min(len(got), at+40)], want[at:min(len(want), at+40)])
+}
+
 func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T) {
 	const fourLines = "function config()\nend\nfunction main()\nend"
 	for _, c := range []struct {
@@ -68,9 +83,9 @@ func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T
 		before := testkit.Snapshot(t, folder.Dir())
 		change := placed(t, folder, small)
 		want := c.script + c.added + Bundle(small, moonwell.RuntimeLua, c.first)
-		if change.Name != "war3map.lua" || string(change.Bytes) != want {
-			t.Errorf("%s: the change is of %s, and its bytes are those of the script, %q and the bundle from line %d: %v",
-				c.name, change.Name, c.added, c.first, string(change.Bytes) == want)
+		if differs := firstDifference(string(change.Bytes), want); change.Name != "war3map.lua" || differs != "" {
+			t.Errorf("%s: the change is of %s; against the script, %q and the bundle from line %d, %s",
+				c.name, change.Name, c.added, c.first, differs)
 		}
 		if after := testkit.Snapshot(t, folder.Dir()); !maps.EqualFunc(before, after, bytes.Equal) {
 			t.Errorf("%s: Inject wrote into the map folder", c.name)
@@ -160,8 +175,8 @@ func TestInjectKeepsAByteOrderMarkAndBytesThatAreNotUTF8(t *testing.T) {
 		folder := mapOf(t, "war3map.lua", c.script)
 		got := string(placed(t, folder, small).Bytes)
 		lines := strings.Count(c.script+c.added, "\n")
-		if want := c.script + c.added + Bundle(small, moonwell.RuntimeLua, lines+1); got != want {
-			t.Errorf("%s: the script is not kept byte for byte before the bundle: %q", c.name, got[:min(len(got), len(c.script)+8)])
+		if differs := firstDifference(got, c.script+c.added+Bundle(small, moonwell.RuntimeLua, lines+1)); differs != "" {
+			t.Errorf("%s: the script is not kept byte for byte before the bundle: %s", c.name, differs)
 		}
 		// The folder's own bytes are not written into.
 		if kept, found, err := folder.Read("war3map.lua"); err != nil || !found || string(kept) != c.script {
@@ -211,12 +226,19 @@ func TestInjectTakesTheScriptAsThePlannedChangesLeaveIt(t *testing.T) {
 	folder := mapOf(t, "war3map.lua", onDisk)
 	view := folder.With([]mapdir.Change{{Name: "war3map.lua", Bytes: []byte(planned)}})
 	want := planned + "\n" + Bundle(small, moonwell.RuntimeLua, 6)
-	if change := placed(t, view, small); change.Name != "war3map.lua" || string(change.Bytes) != want {
-		t.Errorf("the change is of %s: %q", change.Name, change.Bytes[:min(len(change.Bytes), 80)])
+	change := placed(t, view, small)
+	if differs := firstDifference(string(change.Bytes), want); change.Name != "war3map.lua" || differs != "" {
+		t.Errorf("the change is of %s; against the planned script and the bundle from line 6, %s", change.Name, differs)
 	}
 	// What a view plans stays what it planned.
 	if kept, _, _ := view.Read("war3map.lua"); string(kept) != planned {
 		t.Errorf("after Inject the view reads the script as %q", kept)
+	}
+	// Laid over the view, the change takes the place of the planned one: the map's script is changed once, to
+	// the planned script with the bundle.
+	after := view.With([]mapdir.Change{change}).Changes()
+	if len(after) != 1 || after[0].Name != "war3map.lua" || after[0].Remove || string(after[0].Bytes) != want {
+		t.Errorf("with the change laid over it the view changes %d files, want war3map.lua alone, with the bundle", len(after))
 	}
 	if _, err := Inject(folder, small); err == nil {
 		t.Error("the folder itself, whose script defines no config, is not refused")

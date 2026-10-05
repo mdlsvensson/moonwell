@@ -211,16 +211,27 @@ import (
 //     then, which keeps each source it was to compile without a hash, and the other tree writes none. The
 //     class is decided on the other tree's result: no hashes file. All else of the step is compared whole, and
 //     the step is counted among the refused as well (TestAStoppedRunLeavesNothingItWasToCompileUpToDate).
+//   - A project with a module file whose name, or the name of a folder it is in below its folder of modules,
+//     is not valid UTF-8. The other tree lists the file as a module, which no require can name: it decodes the
+//     text of every module, and a name in a decoded text is valid UTF-8. This tree refuses the file, since a
+//     require of its own modules, whose text is bytes, would find it, and the bundle cannot hold its name. The
+//     class is decided on the project: a path of a .yue or .lua file that is not valid UTF-8 and has no dot in
+//     the names on it. The other tree must refuse nothing and list the file, and this tree must refuse it in
+//     the words of such a name, at the file (TestAModuleFileWhoseNameIsNotUTF8IsRefused,
+//     TestCollectRefusesAModuleFileWhoseNameIsNotUTF8). The class has an oracle of its own
+//     (TestOracleOnAModuleFileWhoseNameIsNotUTF8), which is skipped where the system holds no file of such a
+//     name; a file of such a name that is no module, and a module file of such a name that has a dot too, are
+//     compared whole there.
 //   - A bundle of a program in which the name of a module, the path of one or the entry holds a control
-//     character, U+007F or bytes that are not UTF-8. Each tree writes a name as a string of Lua in its own way.
-//     For a backspace, a tab, a line feed, a form feed and a carriage return the other tree writes a letter
-//     after the backslash (\b, \t, \n, \f, \r) and this tree three digits (\008, \009, \010, \012, \013), which
-//     Lua reads as the same byte. For any other character below U+0020 the other tree writes \u00 and two
-//     digits, which is no string of Lua, so that the script does not load, and this tree three digits. U+007F
-//     the other tree writes as it is, and this tree as \127. A byte that is not UTF-8 the other tree writes as
-//     it is, and this tree writes U+FFFD in its place. The class is decided on the program. The two bundles
-//     must differ, have as many lines, and be alike in every line but the definitions, the entries of the table
-//     of lines and the start of the entry, which are the lines that hold a name
+//     character or U+007F. Each tree writes a name as a string of Lua in its own way. For a backspace, a tab, a
+//     line feed, a form feed and a carriage return the other tree writes a letter after the backslash (\b, \t,
+//     \n, \f, \r) and this tree three digits (\008, \009, \010, \012, \013), which Lua reads as the same byte.
+//     For any other character below U+0020 the other tree writes \u00 and two digits, which is no string of
+//     Lua, so that the script does not load, and this tree three digits. U+007F the other tree writes as it
+//     is, and this tree as \127. The class is decided on the program. The two bundles must differ and have as
+//     many lines. A line may differ only if it holds a name: a definition, an entry of the table of lines, or
+//     the start of the entry; and such a line must be alike in both up to its first quote and after its last,
+//     which is where the lines of a module and the mark of a minified one stand
 //     (TestANameAndAPathAreWrittenAsLuaStringsThatLuaReadsBackAsTheirBytes).
 //   - A map's script with a character outside ASCII that the other tree reads as white space (those named
 //     above), before the `function` of main or of config at the start of a line, or between that word, the
@@ -251,6 +262,12 @@ import (
 //     a map's script in the count that gives the bundle its first line, though Lua ends a line there. Programs
 //     and scripts with one are among the cases (TestAModulesLinesAreSplitAtLineFeedsAndAFinalLineBreakStartsNoLine,
 //     TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine).
+//
+// One thing is the runtime's, which both trees put into the bundle as the program carries it, and which no case
+// holds: for a module whose path ends in war3map.lua, as lua/war3map.lua, format_error maps a position twice.
+// It writes the module's file and line for the position, and then takes the end of what it wrote,
+// `war3map.lua:<line>:`, for a position in the script, which it maps again when that line of the script lies in
+// a module.
 //
 // Not among the inputs:
 //
@@ -313,7 +330,13 @@ import (
 //   - Two module files whose names differ only in letter case in one folder, which only some file systems hold:
 //     both trees tell them apart as two modules, by the same rule as files in two folders, which are among the
 //     projects.
-//   - A file name that is not UTF-8, or that Windows cannot hold.
+//   - A file name that Windows cannot hold, and a file name that is not UTF-8 and that Windows cannot hold: a
+//     byte of another encoding, or a character that is cut short. The oracle of such names lays half of a pair
+//     of UTF-16 units, which both systems of the checks hold; the others are given to the step that names a
+//     module as strings (TestAModuleFileWhoseNameIsNotUTF8IsRefused).
+//   - A program with an entry, a module's name or a module's path that is not valid UTF-8, which no compile
+//     makes of a project: Collect refuses the file. What Bundle does when it is handed one is pinned by
+//     TestANameAndAPathAreWrittenAsLuaStringsThatLuaReadsBackAsTheirBytes.
 //   - A natives file that does not parse: the other tree stops the program there, and this tree gives no natives
 //     (TestAFileOfNativesThatDoesNotParseGivesNoNatives).
 //   - Writing the macro module: the other tree writes it among the editor's files, which the oracle of that
@@ -774,6 +797,71 @@ func TestOracleOnAProjectWithALinkAtAFolderOfModules(t *testing.T) {
 	if inPart != 5 {
 		t.Errorf("the oracle compared %d links, want 5", inPart)
 	}
+}
+
+// moduleOutsideUTF8 is the first file of a project that is a module file by its folder and its ending, has no
+// dot in a name on its path below that folder, and is not valid UTF-8 on that path; "" when there is none.
+func moduleOutsideUTF8(p project) string {
+	for i := 0; i+1 < len(p.files); i += 2 {
+		path := p.files[i]
+		isYue, isLua := strings.HasSuffix(path, ".yue"), strings.HasSuffix(path, ".lua")
+		below, isModule := "", false
+		if underSrc, is := strings.CutPrefix(path, "src/"); is {
+			below, isModule = underSrc, isYue
+		} else if underLua, is := strings.CutPrefix(path, "lua/"); is {
+			below, isModule = underLua, isLua
+		} else if underLibraries, is := strings.CutPrefix(path, librariesDir+"/"); is {
+			_, below, _ = strings.Cut(underLibraries, "/")
+			isModule = isYue || isLua
+		}
+		stem := strings.TrimSuffix(strings.TrimSuffix(below, ".yue"), ".lua")
+		if isModule && !utf8.ValidString(below) && !strings.Contains(stem, ".") {
+			return path
+		}
+	}
+	return ""
+}
+
+// TestOracleOnAModuleFileWhoseNameIsNotUTF8 lays files whose names hold half of a pair of UTF-16 units, and is
+// skipped on a system that holds no such name.
+func TestOracleOnAModuleFileWhoseNameIsNotUTF8(t *testing.T) {
+	var compared tally
+	// A module file of such a name: the other tree lists it, and this tree refuses it.
+	for _, c := range []named{
+		{"a YueScript file", mainOnly.and("src/a"+halfPair+".yue", "x = 1\n")},
+		{"a folder of Lua files", mainOnly.and("lua/"+halfPair+"/x.lua", "return 1\n", "lua/z.lua", "return 2\n")},
+		{"a folder below a folder", mainOnly.and("src/game/"+halfPair+"/units.yue", "")},
+		{"a library's YueScript", mainOnly.with("ex").and(inLibrary("ex", "kit/"+halfPair+".yue"), "")},
+		{"a library's Lua", mainOnly.with("ex").and(inLibrary("ex", halfPair+".lua"), "return 1\n")},
+	} {
+		faulty := moduleOutsideUTF8(c.of)
+		want, _, wantErr, gotErr := collectsAt(c.of.layAsNamed(t), c.of)
+		compared.inPart++
+		listed := slices.ContainsFunc(want, func(module sourceAs) bool { return module.Path == faulty })
+		refusal := &diag.Error{}
+		if faulty == "" || wantErr != nil || !listed || !errors.As(gotErr, &refusal) ||
+			refusal.Msg != "Module file and folder names must be valid UTF-8." || refusal.File != faulty {
+			t.Errorf("%s: the other tree lists %q among its modules: %v, %v, and this tree gives %v, which must refuse that file for its name",
+				c.name, faulty, listed, wantErr, gotErr)
+		}
+	}
+	// Such a name where it makes no module, and where a dot is refused before it: whole.
+	for _, c := range []named{
+		{"files that are no modules", mainOnly.and(
+			"src/"+halfPair+".txt", "", "lua/"+halfPair+"/readme.md", "", "src/"+halfPair+".lua", "", "lua/x"+halfPair+".yue", "",
+		)},
+		{"a name with a dot too", mainOnly.and("src/a.b"+halfPair+".yue", "")},
+	} {
+		if moduleOutsideUTF8(c.of) != "" {
+			t.Errorf("%s: the project has a module file whose name is not UTF-8, which is compared in part", c.name)
+			continue
+		}
+		want, got, wantErr, gotErr := collectsAt(c.of.layAsNamed(t), c.of)
+		if compared.whole(t, c.name, wantErr, gotErr) {
+			oracle.Values(t, c.name, want, got)
+		}
+	}
+	compared.check(t, tally{refused: 1, results: 1, inPart: 5})
 }
 
 // ---- the macro search ----
@@ -2870,17 +2958,26 @@ func otherBundle(program *Program, runtime string, firstLine int) string {
 }
 
 // writtenAnotherWay reports whether a name holds what the two trees write differently in a string of Lua: a
-// control character, U+007F, or bytes that are not UTF-8.
+// control character or U+007F.
 func writtenAnotherWay(name string) bool {
-	return !utf8.ValidString(name) || strings.ContainsFunc(name, func(r rune) bool { return r < 0x20 || r == 0x7f })
+	return strings.ContainsFunc(name, func(r rune) bool { return r < 0x20 || r == 0x7f })
 }
 
-// namedAnotherWay reports whether a program has a name the two trees write differently: the entry, the name of
-// a module, or a module's path.
-func namedAnotherWay(program *Program) bool {
-	return writtenAnotherWay(program.Entry) || slices.ContainsFunc(program.Modules, func(module Module) bool {
-		return writtenAnotherWay(module.Name) || writtenAnotherWay(module.Path)
+// anyName reports whether a name of a program is one of a kind: the entry, the name of a module, or a module's
+// path.
+func anyName(program *Program, is func(name string) bool) bool {
+	return is(program.Entry) || slices.ContainsFunc(program.Modules, func(module Module) bool {
+		return is(module.Name) || is(module.Path)
 	})
+}
+
+// namedAnotherWay reports whether a program has a name the two trees write differently.
+func namedAnotherWay(program *Program) bool { return anyName(program, writtenAnotherWay) }
+
+// namedOutsideUTF8 reports whether a program has a name that is not valid UTF-8: a program that no compile
+// makes, and that is not among the inputs.
+func namedOutsideUTF8(program *Program) bool {
+	return anyName(program, func(name string) bool { return !utf8.ValidString(name) })
 }
 
 // holdsAName reports whether a line of a bundle is one of those that hold a name: the definition of a module,
@@ -2890,8 +2987,18 @@ func holdsAName(line string) bool {
 		(strings.HasPrefix(line, "{") && strings.HasSuffix(line, "},"))
 }
 
-// alikeButForNames compares two bundles of a program with a name the trees write differently: they must differ,
-// have as many lines, and differ in no line but those that hold a name.
+// aroundNames is what a line that holds a name has before its first quote and after its last: all of the line
+// but its names. For an entry of the table of lines that is the two lines and the mark of a minified module.
+func aroundNames(line string) (before, after string) {
+	first, last := strings.IndexByte(line, '"'), strings.LastIndexByte(line, '"')
+	if first < 0 {
+		return line, ""
+	}
+	return line[:first], line[last+1:]
+}
+
+// alikeButForNames compares two bundles of a program with a name the trees write differently: they must differ
+// and have as many lines; a line may differ only if it holds a name, and must then be alike around its names.
 func alikeButForNames(t *testing.T, what, want, got string) {
 	t.Helper()
 	wantLines, gotLines := strings.Split(want, "\n"), strings.Split(got, "\n")
@@ -2900,8 +3007,13 @@ func alikeButForNames(t *testing.T, what, want, got string) {
 		return
 	}
 	for i := range wantLines {
-		if wantLines[i] != gotLines[i] && !(holdsAName(wantLines[i]) && holdsAName(gotLines[i])) {
-			t.Errorf("%s: line %d is %q in the other tree and %q in this tree, and holds no name", what, i+1, wantLines[i], gotLines[i])
+		if wantLines[i] == gotLines[i] {
+			continue
+		}
+		wantBefore, wantAfter := aroundNames(wantLines[i])
+		gotBefore, gotAfter := aroundNames(gotLines[i])
+		if !holdsAName(wantLines[i]) || !holdsAName(gotLines[i]) || wantBefore != gotBefore || wantAfter != gotAfter {
+			t.Errorf("%s: line %d is %q in the other tree and %q in this tree, which differ in more than a name", what, i+1, wantLines[i], gotLines[i])
 		}
 	}
 }
@@ -3001,8 +3113,9 @@ var bundlesNamedAnotherWay = []bundleCase{
 	{name: "U+007F", modules: []Module{ofSrc("a\x7fb", "return 1\n"), ofSrc("main", "return 2\n")}, runtime: "-- r\n", firstLine: 1},
 	{name: "a control character in a path alone", modules: []Module{{Name: "main", Path: "src/a\tb/main.yue", Kind: Yue, Lua: "return 1\n"}}, runtime: "-- r\n", firstLine: 1},
 	{name: "a control character in the entry alone", entry: "a\x7f", modules: []Module{ofSrc("main", "return 1\n")}, runtime: "-- r\n", firstLine: 1},
-	{name: "a byte that is not UTF-8", modules: []Module{ofLua("a\xffb", "return 1\n"), ofSrc("main", "return 2\n")}, runtime: "-- r\n", firstLine: 1},
-	{name: "a character that is cut short", entry: "\xe2\x82", modules: []Module{ofSrc("\xe2\x82", "return 1\n"), ofLua("x"+eAcute[:1], "return 2\n")}, runtime: moonwell.RuntimeLua, firstLine: 50},
+	{name: "modules of both kinds, of several lines, from a late line", entry: "a\tb", runtime: moonwell.RuntimeLua, firstLine: 50, modules: []Module{
+		ofSrc("a\tb", "x = 1\ny = 2\nreturn 1\n"), ofLua("x\x7f", "return 2\n"), ofLua("plain", "\n\nreturn 3"), ofSrc("y\x01", "return 4"),
+	}},
 }
 
 func TestOracleOnTheBundle(t *testing.T) {
@@ -3010,28 +3123,28 @@ func TestOracleOnTheBundle(t *testing.T) {
 	for _, c := range slices.Concat(bundlesOfTheOtherTreesTests, seededBundles) {
 		for _, minify := range []bool{false, true} {
 			program, what := c.program(minify), fmt.Sprintf("%s, minified: %v", c.name, minify)
-			if namedAnotherWay(program) {
-				t.Errorf("%s: the program has a name the trees write differently, which is compared in part", what)
+			if namedAnotherWay(program) || namedOutsideUTF8(program) {
+				t.Errorf("%s: the program has a name the trees write differently, which is compared in part, or one that is not UTF-8", what)
 				continue
 			}
 			oracle.Bytes(t, what, []byte(otherBundle(program, c.runtime, c.firstLine)), []byte(Bundle(program, c.runtime, c.firstLine)))
 			compared.results++
 		}
 	}
-	// A name that the trees write differently: all but the lines that hold a name.
+	// A name that the trees write differently: all but the names.
 	for _, c := range bundlesNamedAnotherWay {
 		for _, minify := range []bool{false, true} {
 			program, what := c.program(minify), fmt.Sprintf("%s, minified: %v", c.name, minify)
 			compared.inPart++
-			if !namedAnotherWay(program) {
-				t.Errorf("%s: the program has no name the trees write differently", what)
+			if !namedAnotherWay(program) || namedOutsideUTF8(program) {
+				t.Errorf("%s: the program has no name the trees write differently, or one that is not UTF-8", what)
 				continue
 			}
 			alikeButForNames(t, what, otherBundle(program, c.runtime, c.firstLine), Bundle(program, c.runtime, c.firstLine))
 		}
 	}
-	// The 7 programs of the other tree's tests and the 28 seeded ones, each plain and minified; in part, 8 programs.
-	compared.check(t, tally{results: 70, inPart: 16})
+	// The 7 programs of the other tree's tests and the 28 seeded ones, each plain and minified; in part, 7 programs.
+	compared.check(t, tally{results: 70, inPart: 14})
 }
 
 // ---- the bundle in a map ----
@@ -3124,6 +3237,7 @@ var seededScripts = []scriptCase{
 	{"a byte order mark before main", mark + "function main()\nend\nfunction config()\nend\n"},
 	{"a byte order mark and spaces before config", mark + " \tfunction config()\nend\nfunction main()\nend\n"},
 	{"a byte order mark, and no main", mark + "function config()\nend\n"},
+	{"a byte order mark alone", mark},
 	// Scripts that lack a function.
 	{"no main", "function config()\nend\n"},
 	{"neither", "x = 1\n"},
@@ -3240,8 +3354,8 @@ func TestOracleOnPlacingTheBundle(t *testing.T) {
 				c.name, bytes.Equal(want, got), bytes.HasPrefix(got, []byte(c.script)))
 		}
 	}
-	// Of the 2 fixtures none is refused, of the 5 scripts of the other tree's tests 2, and of the 51 seeded ones
-	// 21: 23 refusals and 35 results whole. In part, 9 for their white space and 8 for their bytes, of which 3
-	// are refused by both trees, whole, and counted among the refusals too: 26.
-	compared.check(t, tally{refused: 26, results: 35, inPart: 17})
+	// Of the 2 fixtures none is refused, of the 5 scripts of the other tree's tests 2, and of the 52 seeded ones
+	// 22: 24 refusals and 35 results whole. In part, 9 for their white space and 8 for their bytes, of which 3
+	// are refused by both trees, whole, and counted among the refusals too: 27.
+	compared.check(t, tally{refused: 27, results: 35, inPart: 17})
 }

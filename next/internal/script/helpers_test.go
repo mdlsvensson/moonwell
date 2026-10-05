@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
@@ -23,6 +24,11 @@ const (
 	replacement = "\xef\xbf\xbd"     // U+FFFD
 	beyond      = "\xf0\x9f\x98\x80" // U+1F600, beyond the basic plane
 )
+
+// halfPair is three bytes that are not UTF-8: U+D800, the first half of a pair of UTF-16 units, written as a
+// character of its own. It is what a file's name holds, on a system whose names are UTF-16 units, for a half
+// that has no other half; a system whose names are bytes holds the three bytes as they are.
+const halfPair = "\xed\xa0\x80"
 
 // inLibrary is the path of a library's file from the project folder: inLibrary("ex", "kit/init.yue").
 func inLibrary(key, file string) string { return librariesDir + "/" + key + "/" + file }
@@ -61,6 +67,32 @@ func (p project) lay(t testing.TB) string {
 	root := t.TempDir()
 	for i := 0; i < len(p.files); i += 2 {
 		testkit.WriteFile(t, root, p.files[i], []byte(p.files[i+1]))
+	}
+	return root
+}
+
+// layAsNamed is lay for a project with files whose names are not UTF-8. The test is skipped on a system that
+// does not hold such a name: one that refuses to write the file, and one that writes it under another name.
+func (p project) layAsNamed(t testing.TB) string {
+	t.Helper()
+	root := t.TempDir()
+	for i := 0; i+1 < len(p.files); i += 2 {
+		file := filepath.Join(root, filepath.FromSlash(p.files[i]))
+		if err := os.MkdirAll(filepath.Dir(file), 0o777); err != nil {
+			t.Skipf("this system holds no folder named as %q asks: %v", p.files[i], err)
+		}
+		if err := os.WriteFile(file, []byte(p.files[i+1]), 0o666); err != nil {
+			t.Skipf("this system holds no file named %q: %v", p.files[i], err)
+		}
+	}
+	held, err := fsx.ListFiles(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i+1 < len(p.files); i += 2 {
+		if !slices.Contains(held, p.files[i]) {
+			t.Skipf("this system holds the file named %q under another name: it lists %q", p.files[i], held)
+		}
 	}
 	return root
 }

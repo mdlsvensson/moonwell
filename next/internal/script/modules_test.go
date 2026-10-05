@@ -235,6 +235,77 @@ func TestADottedOrBuiltInNameInALibrarySuggestsNarrowingTheLibrarysDir(t *testin
 	}
 }
 
+// TestAModuleFileWhoseNameIsNotUTF8IsRefused names module files that are given as strings, so it runs on every
+// system, whatever names its files can have.
+func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
+	src, lua, library := folder{dir: "src", kind: Yue}, folder{dir: "lua", kind: Lua}, folder{dir: librariesDir + "/ex", kind: Lua, library: "ex"}
+	for _, c := range []struct {
+		of   folder
+		file string // from the folder, with "/"
+	}{
+		{src, "a\xffb.yue"},
+		{src, "game\xe9/units.yue"}, // a folder's name, in another encoding
+		{src, "a/b/\xe2\x82.yue"},   // a character that is cut short
+		{lua, "x/" + halfPair + ".lua"},
+		{lua, halfPair + "/init.lua"},
+		{lua, eAcute + "\xc3.lua"},
+	} {
+		path := c.of.dir + "/" + c.file
+		_, err := c.of.source(c.file)
+		failure := asError(t, err, path)
+		if failure.Msg != "Module file and folder names must be valid UTF-8." || failure.File != path ||
+			!strings.Contains(failure.Hint, "rename the file or folder") {
+			t.Errorf("%q: %+v", path, failure)
+		}
+	}
+	// A library's file is not the project's to rename.
+	_, err := library.source("kit/\xff.lua")
+	failure := asError(t, err, "a library's file")
+	if !strings.Contains(failure.Msg, "must be valid UTF-8") || failure.File != librariesDir+"/ex/kit/\xff.lua" ||
+		strings.Contains(failure.Hint, "rename") || !strings.Contains(failure.Hint, "narrow the library's `dir` in moonwell.pkl") {
+		t.Errorf("a library's file: %+v", failure)
+	}
+	// A name with a dot is refused for the dot, whatever its bytes.
+	_, err = src.source("a.b\xff.yue")
+	if failure := asError(t, err, "a dotted name"); !strings.Contains(failure.Msg, "cannot contain dots") {
+		t.Errorf("a dotted name: %+v", failure)
+	}
+	// Every name of valid UTF-8 is a module's, whatever its characters.
+	for file, name := range map[string]string{
+		eAcute + ".yue": eAcute, beyond + "/" + fullWidthA + ".yue": beyond + "." + fullWidthA, replacement + ".yue": replacement,
+		"a\x7fb.yue": "a\x7fb", "a b.yue": "a b", "a" + noBreakSpace + "b/c" + lineSeparator + ".yue": "a" + noBreakSpace + "b.c" + lineSeparator,
+	} {
+		if source, err := src.source(file); err != nil || source.Name != name || source.Path != "src/"+file {
+			t.Errorf("%q: %+v, %v", file, source, err)
+		}
+	}
+}
+
+// TestCollectRefusesAModuleFileWhoseNameIsNotUTF8 lays files whose names are not UTF-8, and is skipped on a
+// system that holds no such name.
+func TestCollectRefusesAModuleFileWhoseNameIsNotUTF8(t *testing.T) {
+	for _, path := range []string{"src/a" + halfPair + ".yue", "lua/" + halfPair + "/x.lua", "src/game/" + halfPair + "/units.yue"} {
+		p := mainOnly.and(path, "")
+		_, err := Collect(p.layAsNamed(t), p.libraries())
+		failure := asError(t, err, path)
+		if failure.Msg != "Module file and folder names must be valid UTF-8." || failure.File != path ||
+			!strings.Contains(failure.Hint, "rename the file or folder") {
+			t.Errorf("%q: %+v", path, failure)
+		}
+	}
+	inALibrary := mainOnly.with("ex").and(inLibrary("ex", "kit/"+halfPair+".yue"), "")
+	_, err := Collect(inALibrary.layAsNamed(t), inALibrary.libraries())
+	if failure := asError(t, err, "a library's file"); failure.File != inLibrary("ex", "kit/"+halfPair+".yue") || !strings.Contains(failure.Hint, "narrow the library's `dir`") {
+		t.Errorf("a library's file: %+v", failure)
+	}
+	// A file that is no module of its folder is not looked at, whatever its name.
+	others := mainOnly.and("src/"+halfPair+".txt", "", "lua/"+halfPair+"/readme.md", "", "src/"+halfPair+".lua", "", "lua/x"+halfPair+".yue", "")
+	sources, err := Collect(others.layAsNamed(t), others.libraries())
+	if got := pathsOf(sources); err != nil || !slices.Equal(got, []string{"src/main.yue"}) {
+		t.Errorf("files that are no modules: paths = %q, %v", got, err)
+	}
+}
+
 func TestALibraryWithoutAFolderHasNoModules(t *testing.T) {
 	for what, p := range map[string]project{
 		"no folder":             mainOnly.with("ex"),

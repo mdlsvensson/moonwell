@@ -144,7 +144,9 @@ var namesLuaReadsBack = []string{
 }
 
 // namesThatAreNotUTF8 are names with bytes that are not UTF-8, and each as Lua reads it back from the bundle:
-// with U+FFFD in the place of each such byte.
+// with U+FFFD in the place of each such byte. No program of Compile has such a name: Collect refuses the file
+// (TestAModuleFileWhoseNameIsNotUTF8IsRefused). They are here for what Bundle does when it is handed one all the
+// same.
 var namesThatAreNotUTF8 = [][2]string{
 	{"a\xffb", "a" + replacement + "b"},
 	{"\xe2\x82", replacement + replacement},

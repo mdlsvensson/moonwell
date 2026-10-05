@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
@@ -40,8 +41,9 @@ type Source struct {
 }
 
 // Collect lists every module: YueScript under src/, Lua under lua/, then each library's, in that order and then
-// by path. It fails on a dotted file or folder name, on two files with one name and on a file that takes a
-// built-in module's name. src/ must exist.
+// by path. It fails on a dotted file or folder name, on a module file whose name or folder is not valid UTF-8, on
+// two files with one name and on a file that takes a built-in module's name. src/ must exist. So the name of
+// every module it lists is valid UTF-8, and so is its path, below a library's folder as the caller names it.
 //
 // The libraries are taken in the order given and are not sorted: the caller passes them in the order of their
 // keys. A library's YueScript comes before its Lua; within a folder and a kind, the modules are in the order of
@@ -220,11 +222,18 @@ func (f folder) compiledOutputs(files []string) map[string]bool {
 
 // source is the module of a file of the folder, not yet read. Its name is the file's path from the folder without
 // the extension, with a dot for each "/": so no file or folder on that path may have a dot in its own name.
+//
+// The name is what a require asks for and what the bundle defines the module by, as a string in the map's script,
+// so it is valid UTF-8: a file whose path from the folder is not, in its own name or in a folder's, is refused. A
+// file system holds such a name where names are bytes, and where they are UTF-16 units, for half of a pair.
 func (f folder) source(file string) (Source, error) {
 	path := f.dir + "/" + file
 	stem := strings.TrimSuffix(file, "."+string(f.kind))
-	if strings.Contains(stem, ".") {
+	switch {
+	case strings.Contains(stem, "."):
 		return Source{}, errDottedName(path, f.library != "")
+	case !utf8.ValidString(file):
+		return Source{}, errNameNotUTF8(path, f.library != "")
 	}
 	return Source{Name: strings.ReplaceAll(stem, "/", "."), Path: path, Kind: f.kind, Library: f.library}, nil
 }
@@ -279,6 +288,19 @@ func errDottedName(path string, inLibrary bool) error {
 		Msg:  "Module file and folder names cannot contain dots.",
 		File: path,
 		Hint: "Dots separate module names in `import`; " + advice,
+	}
+}
+
+// errNameNotUTF8 refuses a module file whose path, which is not valid UTF-8, is given as it is.
+func errNameNotUTF8(path string, inLibrary bool) error {
+	advice := "rename the file or folder."
+	if inLibrary {
+		advice = narrowDir
+	}
+	return &diag.Error{
+		Msg:  "Module file and folder names must be valid UTF-8.",
+		File: path,
+		Hint: "A module is required by its name, which the map's script holds as text; " + advice,
 	}
 }
 
