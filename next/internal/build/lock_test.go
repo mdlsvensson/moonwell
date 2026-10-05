@@ -18,6 +18,112 @@ import (
 // lockOf is where the lock of the project at root is on disk.
 func lockOf(root string) string { return filepath.Join(root, "dist", ".lock") }
 
+// refusesABuildBesideAnother reports whether a failure is the refusal of a build while another holds the lock.
+func refusesABuildBesideAnother(e *diag.Error) bool {
+	return e.File == "dist/.lock" && strings.Contains(e.Msg, "Another Moonwell build is running")
+}
+
+// lockIsHeld reports whether the lock of the project at root is there and a build is refused for it.
+func lockIsHeld(t *testing.T, root string) bool {
+	t.Helper()
+	release, err := Acquire(root)
+	if err == nil {
+		release()
+		return false
+	}
+	return fsx.Exists(lockOf(root)) && refusesABuildBesideAnother(asError(t, err, "a build beside another"))
+}
+
+// A release gives back the lock its own call took, and no lock a later call took in the same project.
+func TestAReleaseLeavesTheLockOfALaterAcquisitionAlone(t *testing.T) {
+	tests := []struct {
+		name  string
+		given func() // how the first lock is given back before the second is taken
+	}{
+		{"after its own release", nil},
+		{"after a release of every lock", ReleaseHeld},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := t.TempDir()
+			first, err := Acquire(root)
+			if err != nil {
+				t.Fatal(diag.Format(err))
+			}
+			if tt.given == nil {
+				first()
+			} else {
+				tt.given()
+			}
+			second, err := Acquire(root)
+			if err != nil {
+				t.Fatal(diag.Format(err))
+			}
+			first()
+			if !lockIsHeld(t, root) {
+				t.Error("the release of the first acquisition gave the second one's lock back")
+			}
+			second()
+			if fsx.Exists(lockOf(root)) {
+				t.Error("the second lock is still there after its own release")
+			}
+			first()
+			second()
+			if lockIsHeld(t, root) {
+				t.Error("a lock is held after every release")
+			}
+		})
+	}
+}
+
+func TestAcquireTakesTheLockBehindADistFolderThatIsALink(t *testing.T) {
+	needNewFilesBehindALink(t)
+	root, elsewhere := t.TempDir(), t.TempDir()
+	testkit.LinkDir(t, elsewhere, filepath.Join(root, "dist"))
+	release, err := Acquire(root)
+	if err != nil {
+		t.Fatal(diag.Format(err))
+	}
+	if data, _ := os.ReadFile(filepath.Join(elsewhere, ".lock")); string(data) != strconv.Itoa(os.Getpid()) {
+		t.Errorf("behind the link the lock holds %q", data)
+	}
+	if !lockIsHeld(t, root) {
+		t.Error("a second build took the lock behind the link")
+	}
+	release()
+	if held := testkit.Snapshot(t, elsewhere); len(held) != 0 {
+		t.Errorf("after the release the folder behind the link holds %q", held)
+	}
+}
+
+func TestAcquireRefusesAFileLinkInTheLocksPlace(t *testing.T) {
+	tests := []struct {
+		name   string
+		target func(dir string) string // what the link leads to
+	}{
+		{"a link to a file", func(dir string) string { return testkit.WriteFile(t, dir, "other", []byte("1")) }},
+		{"a link to nothing", func(dir string) string { return filepath.Join(dir, "nothing") }},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := t.TempDir()
+			if err := os.MkdirAll(filepath.Join(root, "dist"), 0o777); err != nil {
+				t.Fatal(err)
+			}
+			target := tt.target(t.TempDir())
+			testkit.LinkFile(t, target, lockOf(root))
+			release, err := Acquire(root)
+			e := asError(t, err, tt.name)
+			if release != nil || e.File != "dist/.lock" || !strings.Contains(e.Msg, "Symlinks are not supported") {
+				t.Errorf("error = %+v", e)
+			}
+			if fsx.Exists(filepath.Join(filepath.Dir(target), "nothing")) {
+				t.Error("a lock was written through the link")
+			}
+		})
+	}
+}
+
 func TestAcquireRejectsAConcurrentBuildAndReleasesAfterwards(t *testing.T) {
 	root := t.TempDir()
 	release, err := Acquire(root)
@@ -31,8 +137,9 @@ func TestAcquireRejectsAConcurrentBuildAndReleasesAfterwards(t *testing.T) {
 	}
 	second, err := Acquire(root)
 	e := asError(t, err, "a second build")
-	if second != nil || e.Msg != "Another Moonwell build is running in this project." || e.File != "dist/.lock" ||
-		e.Hint != "Wait for it to finish. If process "+pid+" is not running, delete dist/.lock." || e.Cause != nil {
+	if second != nil || e.Cause != nil || !refusesABuildBesideAnother(e) ||
+		!strings.Contains(e.Hint, "If process "+pid+" is not running") ||
+		!strings.Contains(e.Hint, "delete dist/.lock") {
 		t.Errorf("error = %+v", e)
 	}
 	if data, _ := os.ReadFile(lockOf(root)); string(data) != pid {
@@ -74,8 +181,7 @@ func TestOfSeveralBuildsThatStartAtOnceOneTakesTheLock(t *testing.T) {
 			releases = append(releases, result.release)
 			continue
 		}
-		if e := asError(t, result.err, "a build beside another"); e.File != "dist/.lock" ||
-			!strings.Contains(e.Msg, "Another Moonwell build is running") {
+		if e := asError(t, result.err, "a build beside another"); !refusesABuildBesideAnother(e) {
 			t.Errorf("error = %+v", e)
 		}
 	}
@@ -126,7 +232,7 @@ func TestALockThatCannotBeReadNamesAnUnknownHolder(t *testing.T) {
 	}
 	release, err := Acquire(root)
 	e := asError(t, err, "a folder in the lock's place")
-	if release != nil || e.Msg != "Another Moonwell build is running in this project." || e.File != "dist/.lock" ||
+	if release != nil || !refusesABuildBesideAnother(e) ||
 		!strings.Contains(e.Hint, "If process unknown is not running") {
 		t.Errorf("error = %+v", e)
 	}
@@ -214,20 +320,7 @@ func TestAcquireNamesALockThatCannotBeWritten(t *testing.T) {
 	again()
 }
 
-func TestAcquireRefusesALinkOnTheWayToTheLock(t *testing.T) {
-	root, elsewhere := t.TempDir(), t.TempDir()
-	testkit.LinkDir(t, elsewhere, filepath.Join(root, "dist"))
-	release, err := Acquire(root)
-	e := asError(t, err, "dist as a link")
-	if release != nil || e.File != "dist" || !strings.Contains(e.Msg, "Symlinks are not supported") {
-		t.Errorf("error = %+v", e)
-	}
-	if held := testkit.Snapshot(t, elsewhere); len(held) != 0 {
-		t.Errorf("a lock was written through the link: %q", held)
-	}
-}
-
-func TestAcquireRefusesALinkInTheLocksPlace(t *testing.T) {
+func TestAcquireRefusesAFolderLinkInTheLocksPlace(t *testing.T) {
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, "dist"), 0o777); err != nil {
 		t.Fatal(err)

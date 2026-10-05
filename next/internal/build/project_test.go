@@ -1,6 +1,7 @@
 package build
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -93,8 +94,13 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 	}{
 		{"the folder below maps", "map.w3x", "maps/map.w3x", "maps/map.w3x"},
 		{"a folder further down", "campaign/one.w3x", "maps/campaign/one.w3x", "maps/campaign/one.w3x"},
-		{"a backslash separates on every system", `campaign\one.w3x`, "maps/campaign/one.w3x", `maps/campaign\one.w3x`},
+		{"a backslash separates on every system", `campaign\one.w3x`, "maps/campaign/one.w3x", "maps/campaign/one.w3x"},
 		{"a name that starts with two dots", "..one.w3x", "maps/..one.w3x", "maps/..one.w3x"},
+		// The schema drops the parts of a folder that are empty or ".", and so does the folder's label.
+		{"a part that is a dot", "./map.w3x", "maps/map.w3x", "maps/map.w3x"},
+		{"a part that is a dot, with a backslash", `.\map.w3x`, "maps/map.w3x", "maps/map.w3x"},
+		{"an empty part", "a//b.w3x", "maps/a/b.w3x", "maps/a/b.w3x"},
+		{"a separator at the end", `map.w3x\`, "maps/map.w3x", "maps/map.w3x"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -131,22 +137,29 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 		{"a folder beside maps, with a backslash", `..\outside`},
 		{"the folder above the map, with backslashes", `..\maps\map.w3x\..`},
 		{"the folder above maps", ".."},
-		{"a path from the root", "/maps/map.w3x"},
-		{"a path from the root, with a backslash", `\maps\map.w3x`},
-		{"a path from a drive", `C:\maps\map.w3x`},
+		{"a path from the root", "/abs"},
+		{"a path from the root, with a backslash", `\abs`},
+		{"a path from a drive", `C:\x`},
 		{"a path from a drive, with a slash", "c:/maps/map.w3x"},
+		{"a name on a drive", "C:x.w3x"},
+		// No ".." is resolved: a path with one is refused, wherever it leads.
+		{"a way out and back in", "a/../b.w3x"},
+		{"a way out and back in, with backslashes", `a\..\map.w3x`},
+		{"parts that are dots alone", "./."},
+		{"separators alone", `/\/`},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t)
 			// What the name could be taken for is there: the refusal is of the name, not of a missing folder.
 			s.folder("outside")
+			s.folder("maps/a")
 			s.project.File, s.project.Map.Folder = localManifest, tt.folder
 			source, err := Source(s.project)
 			e := asError(t, err, "map.folder "+tt.folder)
 			if source != nil || e.File != localManifest || e.Cause != nil ||
-				e.Msg != `map.folder must name a folder inside maps/, not "`+tt.folder+`".` ||
-				!strings.Contains(e.Hint, "such as map.w3x") {
+				!strings.Contains(e.Msg, "must name a folder inside maps/") ||
+				!strings.Contains(e.Msg, `"`+tt.folder+`"`) || !strings.Contains(e.Hint, "such as map.w3x") {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -173,8 +186,7 @@ func TestSourceNamesTheManifestForAMapFolderThatIsNotThere(t *testing.T) {
 			source, err := Source(s.project)
 			e := asError(t, err, tt.name)
 			if source != nil || e.File != localManifest || e.Cause != nil ||
-				e.Msg != "Source map folder maps/"+tt.folder+" not found." ||
-				e.Hint != "Set map.folder to a folder under maps/ saved by World Editor in folder format." {
+				!strings.Contains(e.Msg, "maps/"+tt.folder+" not found") || !strings.Contains(e.Hint, "folder format") {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -189,7 +201,7 @@ func TestAPackedMapFileWhereTheMapFolderShouldBeIsRefusedAsAFile(t *testing.T) {
 	s.project.File = localManifest
 	source, err := Source(s.project)
 	e := asError(t, err, "a file for the map folder")
-	if source != nil || e.File != "maps/map.w3x" || e.Msg != "Source map maps/map.w3x is not a folder." ||
+	if source != nil || e.File != "maps/map.w3x" || !strings.Contains(e.Msg, "is not a folder") ||
 		!strings.Contains(e.Hint, "folder format") || e.Cause != nil {
 		t.Errorf("error = %+v", e)
 	}
@@ -222,15 +234,39 @@ func TestSourceRefusesALinkOnTheWayToTheMapAndALinkInTheMapsPlace(t *testing.T) 
 	}
 }
 
-// What fsx.Inside refuses of a name that stays inside maps comes in its words, at the folder the name asks for.
-func TestSourcePassesOnTheRefusalOfANameThatNoFolderCanHave(t *testing.T) {
-	for _, folder := range []string{"con.w3x", "campaign/../map.w3x", "./map.w3x", "campaign//map.w3x", "map?.w3x"} {
+// What fsx.Inside refuses of a folder inside maps comes in its words, at the folder: a name Windows cannot hold.
+func TestSourcePassesOnTheRefusalOfANameWindowsCannotHold(t *testing.T) {
+	tests := []struct{ folder, label string }{
+		{"con.w3x", "maps/con.w3x"},
+		{"map?.w3x", "maps/map?.w3x"},
+		{`campaign\.\one.\map.w3x`, "maps/campaign/one./map.w3x"},
+		{"campaign/nul/map.w3x", "maps/campaign/nul/map.w3x"},
+	}
+	for _, tt := range tests {
 		s := newStandIn(t)
-		s.project.File, s.project.Map.Folder = localManifest, folder
+		s.project.File, s.project.Map.Folder = localManifest, tt.folder
 		source, err := Source(s.project)
-		e := asError(t, err, "map.folder "+folder)
-		if source != nil || e.File != "maps/"+folder || e.Msg != "Invalid path: maps/"+folder || e.Hint == "" {
-			t.Errorf("map.folder %q: error = %+v", folder, e)
+		e := asError(t, err, "map.folder "+tt.folder)
+		if source != nil || e.File != tt.label || !strings.Contains(e.Msg, "Invalid path: "+tt.label) || e.Hint == "" {
+			t.Errorf("map.folder %q: error = %+v", tt.folder, e)
+		}
+	}
+}
+
+func TestIsMissingTellsAFolderThatIsNotThereFromAnExpectedFailure(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want bool
+	}{
+		{"the system's error for a path that is not there",
+			&fs.PathError{Op: "lstat", Path: "maps", Err: fs.ErrNotExist}, true},
+		{"an expected failure for a folder that is gone", &diag.Error{Msg: "gone", Cause: fs.ErrNotExist}, false},
+		{"no error", nil, false},
+	}
+	for _, tt := range tests {
+		if got := isMissing(tt.err); got != tt.want {
+			t.Errorf("%s: isMissing = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
@@ -259,6 +295,7 @@ func openedSource(t testing.TB, s *standIn) *mapdir.Folder {
 
 func TestMapGlobalsIsWhatTheMapsScriptDefines(t *testing.T) {
 	s := newStandIn(t)
+	s.templateMap()
 	globals, err := MapGlobals(openedSource(t, s))
 	if err != nil {
 		t.Fatal(diag.Format(err))
@@ -310,8 +347,9 @@ func TestAScriptThatIsAFolderFails(t *testing.T) {
 		s.folder("maps/map.w3x/" + name)
 		globals, err := MapGlobals(openedSource(t, s))
 		e := asError(t, err, "a folder for a script")
-		if globals != nil || e.Msg != name+" in the map is a folder, not a file." || e.File != "maps/map.w3x/"+name ||
-			!strings.Contains(e.Hint, "Remove that folder") || e.Cause != nil {
+		if globals != nil || !strings.HasPrefix(e.Msg, name+" in the map is a folder") || e.Cause != nil ||
+			e.File != "maps/map.w3x/"+name || !strings.Contains(e.Hint, "a folder where its script belongs") ||
+			!strings.Contains(e.Hint, "with Lua as the script language") {
 			t.Errorf("%s: error = %+v", name, e)
 		}
 	}
@@ -434,6 +472,115 @@ func TestAssetsRefusesALibraryFolderThatLeavesTheProject(t *testing.T) {
 	found, replaced, err := Assets(s.project, []library.Synced{{Key: "kit", Modules: "x", Assets: "../kit"}})
 	e := asError(t, err, "a folder outside the project")
 	if found != nil || replaced != nil || e.File != "../kit" || !strings.Contains(e.Msg, "Invalid path") {
+		t.Errorf("error = %+v", e)
+	}
+}
+
+// A library's folder is named from the project folder in a failure, whatever form the project folder is given in.
+func TestAssetsNamesALibrarysFolderFromAProjectFolderThatIsGivenFromTheWorkingFolder(t *testing.T) {
+	s := newStandIn(t)
+	s.put(".moonwell/library-assets/kit/kit/axe.blp", "kit axe")
+	s.put(".moonwell/library-assets/art", "a file where the library's folder belongs")
+	t.Chdir(s.root)
+	s.project.Root = "."
+	found, _, err := Assets(s.project, []library.Synced{syncedLibrary("kit", true)})
+	want := []string{"kit/axe.blp from kit/axe.blp of kit: kit axe"}
+	if got := describedAssets(found); err != nil || !slices.Equal(got, want) {
+		t.Errorf("Assets = %q, %v", got, err)
+	}
+	_, _, err = Assets(s.project, []library.Synced{syncedLibrary("art", true), syncedLibrary("kit", true)})
+	e := asError(t, err, "a file for a library's folder")
+	if e.File != ".moonwell/library-assets/art" ||
+		!strings.Contains(e.Msg, "Expected a folder: .moonwell/library-assets/art") {
+		t.Errorf("error = %+v", e)
+	}
+}
+
+// ---- output ----
+
+func TestOutputIsThePlaceBelowTheProjectFolderWhateverIsThere(t *testing.T) {
+	root := t.TempDir()
+	tests := []struct{ relative, want string }{
+		{"dist", "dist"},
+		{"dist/.lock", "dist/.lock"},
+		{"dist/stage/campaign/one.w3x", "dist/stage/campaign/one.w3x"},
+		{`dist\stage\map.w3x`, "dist/stage/map.w3x"},
+		{"out/map.w3x", "out/map.w3x"},
+	}
+	for _, tt := range tests {
+		place, err := output(root, tt.relative)
+		if want := filepath.Join(root, filepath.FromSlash(tt.want)); err != nil || place != want {
+			t.Errorf("output(%q) = %q, %v, want %q", tt.relative, place, err, want)
+		}
+	}
+	if held := testkit.Snapshot(t, root); len(held) != 0 {
+		t.Errorf("asking for a place made %q", held)
+	}
+}
+
+func TestOutputTakesItsFirstFolderAsItIsALinkToo(t *testing.T) {
+	root, elsewhere := t.TempDir(), t.TempDir()
+	testkit.WriteFile(t, elsewhere, "stage/map.w3x/war3map.lua", nil)
+	testkit.LinkDir(t, elsewhere, filepath.Join(root, "dist"))
+	for _, relative := range []string{"dist", "dist/.lock", "dist/stage/map.w3x"} {
+		place, err := output(root, relative)
+		if want := filepath.Join(root, filepath.FromSlash(relative)); err != nil || place != want {
+			t.Errorf("output(%q) = %q, %v, want %q", relative, place, err, want)
+		}
+	}
+}
+
+func TestOutputRefusesALinkBelowItsFirstFolderByTheWholePath(t *testing.T) {
+	tests := []struct {
+		name string
+		link string // the path that is a link
+	}{
+		{"a folder on the way", "dist/stage"},
+		{"the place itself", "dist/stage/map.w3x"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := t.TempDir()
+			at := filepath.Join(root, filepath.FromSlash(tt.link))
+			if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
+				t.Fatal(err)
+			}
+			testkit.LinkDir(t, t.TempDir(), at)
+			place, err := output(root, "dist/stage/map.w3x")
+			e := asError(t, err, tt.name)
+			if place != "" || e.File != "dist/stage/map.w3x" || !strings.Contains(e.Msg, at) ||
+				!strings.Contains(e.Msg, "Symlinks are not supported") {
+				t.Errorf("error = %+v", e)
+			}
+		})
+	}
+}
+
+func TestOutputRefusesAPathThatLeavesTheProjectOrThatWindowsCannotHold(t *testing.T) {
+	root := t.TempDir()
+	for _, relative := range []string{
+		"", ".", "..", "../dist", "dist/..", "dist/../maps", "dist/stage/../../maps", "dist//stage", "dist/", "/dist",
+		`C:\dist`, "dist/con", "dist/stage/map?.w3x", "nul/x", `dist\..\maps`,
+	} {
+		place, err := output(root, relative)
+		e := asError(t, err, "the place "+relative)
+		if place != "" || e.File != relative || !strings.Contains(e.Msg, "Invalid path: "+relative) || e.Cause != nil {
+			t.Errorf("output(%q): error = %+v", relative, e)
+		}
+	}
+}
+
+func TestOutputNamesAPlaceTheSystemCannotLookAtByTheWholePath(t *testing.T) {
+	root := t.TempDir()
+	// The folder above the name is there, so that the system looks at the name and does not stop before it.
+	if err := os.Mkdir(filepath.Join(root, "dist"), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	relative := "dist/" + strings.Repeat("a", 300) + "/x"
+	place, err := output(root, relative)
+	e := asError(t, err, "a name the system cannot hold")
+	if place != "" || e.File != relative || e.Cause == nil || strings.Contains(e.Msg, root) ||
+		!strings.HasPrefix(e.Msg, relative+" cannot be reached") {
 		t.Errorf("error = %+v", e)
 	}
 }

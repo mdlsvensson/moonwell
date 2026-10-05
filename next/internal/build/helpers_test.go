@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"sync"
@@ -16,6 +17,7 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
+	"github.com/mdlsvensson/moonwell/next/internal/toolchain"
 )
 
 var background = context.Background()
@@ -30,6 +32,26 @@ func asError(t testing.TB, err error, what string) *diag.Error {
 	return failure
 }
 
+// needNewFilesBehindALink skips the test on a Windows whose temporary folder takes nothing new behind a link to a
+// folder. Windows keeps the temporary folder of a packaged app in a place it redirects for that app, and there
+// the making of a new file or folder behind a junction is answered with "the file exists", though none is there
+// and one is made behind the same junction in any other folder. The look is at the system alone: at a link and
+// a file of its own, with no code of this package. A test that writes behind a link at dist asks it first.
+func needNewFilesBehindALink(t testing.TB) {
+	t.Helper()
+	folder, link := t.TempDir(), filepath.Join(t.TempDir(), "link")
+	testkit.LinkDir(t, folder, link)
+	file, err := os.OpenFile(filepath.Join(link, "new"), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
+	if err == nil {
+		file.Close()
+		return
+	}
+	if runtime.GOOS != "windows" {
+		t.Fatalf("no new file was made behind a link to a folder: %v", err)
+	}
+	t.Skipf("the temporary folder of this Windows takes no new file behind a junction: %v", err)
+}
+
 // manifestName is the manifest of a stand-in project: the shared one, since the project has no local one.
 const manifestName = "moonwell.pkl"
 
@@ -40,7 +62,7 @@ var defaultBlocks = []string{
 	`"map":{"folder":"map.w3x","entry":"src/main.yue"}`,
 	`"build":{"folder":"dist/bin","minify":false}`,
 	`"launch":{"args":["-launch","-windowmode","windowed"]}`,
-	`"yue":{"version":"0.34.3"}`,
+	`"yue":{"version":"` + toolchain.YueVersion + `"}`,
 	`"assets":{"paths":{},"exclude":[]}`,
 	`"lint":{"unknownGlobals":"error","globals":[]}`,
 	`"libraries":{}`,
@@ -80,15 +102,21 @@ type ran struct {
 	dir     string
 }
 
+// smallScript is the script of the small map a stand-in project starts with: one global, and the two functions
+// every map's script defines.
+const smallScript = "udg_count = 0\nfunction main()\nend\nfunction config()\nend\n"
+
 // standIn is a project for the tests that need neither Pkl nor the compiler. It lies in a temporary folder: a
-// copy of the template's map, a small entry, and the two files a manifest is loaded by. Its world records the
+// small map that holds a script alone, a small entry, and the two files a manifest is loaded by. A test that
+// reads what a map World Editor saved holds asks for the template's map with templateMap. Its world records the
 // log, and its Run asks a stand-in for each program: pkl is answered with the manifest's JSON, a test adds the
 // programs it needs with answer, and a program nobody stands in for fails the test. Every run is kept in runs.
 type standIn struct {
-	t    testing.TB
-	root string // the project folder
-	env  *env.Env
-	log  *testkit.Recorder
+	t        testing.TB
+	checkout string // the Moonwell checkout, found before a test changes its working folder
+	root     string // the project folder
+	env      *env.Env
+	log      *testkit.Recorder
 	// project is what the manifest evaluates to: what Load gives for the project, made without Pkl.
 	project *manifest.Project
 
@@ -102,14 +130,8 @@ type standIn struct {
 // the defaults of their names: newStandIn(t, `"lint":{"unknownGlobals":"warning","globals":[]}`).
 func newStandIn(t testing.TB, blocks ...string) *standIn {
 	t.Helper()
-	s := &standIn{t: t, root: t.TempDir(), programs: map[string]program{}}
-	template := filepath.Join(testkit.RepoRoot(t), "template", "maps", "map.w3x")
-	if err := os.MkdirAll(s.at("maps"), 0o777); err != nil {
-		t.Fatal(err)
-	}
-	if err := fsx.CopyTree(template, s.at("maps/map.w3x")); err != nil {
-		t.Fatal(err)
-	}
+	s := &standIn{t: t, checkout: testkit.RepoRoot(t), root: t.TempDir(), programs: map[string]program{}}
+	s.put("maps/map.w3x/war3map.lua", smallScript)
 	s.put("src/main.yue", "x = 1\n")
 	s.put(manifestName, "// The stand-in for pkl prints what this manifest evaluates to, and reads no line of it.\n")
 	s.put("PklProject.deps.json", resolvedDeps)
@@ -118,6 +140,15 @@ func newStandIn(t testing.TB, blocks ...string) *standIn {
 	s.answer("pkl", s.pkl)
 	s.evaluatesTo(blocks...)
 	return s
+}
+
+// templateMap puts a copy of the template's map, which World Editor saved, in the place of the small map.
+func (s *standIn) templateMap() {
+	s.t.Helper()
+	s.remove("maps/map.w3x")
+	if err := fsx.CopyTree(filepath.Join(s.checkout, "template", "maps", "map.w3x"), s.at("maps/map.w3x")); err != nil {
+		s.t.Fatal(err)
+	}
 }
 
 // evaluatesTo makes the manifest one with the blocks in place of the defaults of their names: pkl prints it from

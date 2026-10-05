@@ -19,16 +19,24 @@ const (
 	lockName = distDir + "/.lock"
 )
 
-// held is the lock files this process made and has not given back, each by its place on disk.
+// holding is one taking of a lock: what the list keeps for the lock's file. A release gives back the lock only
+// while the list keeps the holding of its own call, so it never removes a lock that a later call took at the
+// same place. A holding has a size, so that two of them are never one pointer.
+type holding struct {
+	file string // the lock file's place on disk
+}
+
+// held is the locks this process took and has not given back, each by the place of its file on disk.
 //
 // It is the one piece of state this package keeps between calls. A second Ctrl+C ends the program from outside
 // the command that runs: what handles it knows no project and has no release function, and must still leave no
 // lock behind, which the next build would take for a build that is running (ReleaseHeld). It runs beside the
-// command that holds the lock, so the mutex guards every look at the list.
+// command that holds the lock, so the mutex guards every look at the list, and a lock file is made and removed
+// only under it: the list and the files of this process's locks never differ where another goroutine looks.
 var held = struct {
 	sync.Mutex
-	files map[string]bool
-}{files: map[string]bool{}}
+	locks map[string]*holding
+}{locks: map[string]*holding{}}
 
 // Acquire takes the build lock of the project at root, dist/.lock, which holds this process's id, so that a
 // second build in the project fails at once. release gives it back and may be called more than once.
@@ -37,43 +45,59 @@ func Acquire(root string) (release func(), err error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := writeLock(file); err != nil {
+	mine, err := take(file)
+	if err != nil {
 		return nil, err
 	}
-	hold(file)
-	return func() { giveBack(file) }, nil
+	return func() { giveBack(mine) }, nil
 }
 
 // ReleaseHeld removes every lock this process holds: for leaving on a second Ctrl+C without a stale lock.
 func ReleaseHeld() {
 	held.Lock()
 	defer held.Unlock()
-	for file := range held.files {
+	for file := range held.locks {
 		removeLock(file)
 	}
-	clear(held.files)
+	clear(held.locks)
 }
 
 // lockPlace is where the lock of the project at root is on disk, in a dist folder that is there: it is made when
-// the project has none. A link at dist/ or in the lock's place is refused, so that no lock is written outside
-// the project.
+// the project has none. The dist folder may be a link, as output says; a link in the lock's place is refused.
 func lockPlace(root string) (string, error) {
-	dir, err := fsx.Inside(root, distDir)
+	dir, err := output(root, distDir)
 	if err != nil {
 		return "", err
 	}
 	if err := os.MkdirAll(dir, 0o777); err != nil {
 		return "", errNoDist(err)
 	}
-	return fsx.Inside(root, lockName)
+	return output(root, lockName)
 }
 
-// writeLock makes the lock file with this process's id in it. A file that is there is another build's lock: it
-// is left as it is, and the build that holds it is named. A lock that could not be written whole is removed.
+// take makes the lock file and notes it as held, in one step under the list's mutex: a release of every lock
+// that runs beside it removes the file or does not see it yet, and never leaves it behind unnoted.
+func take(file string) (*holding, error) {
+	held.Lock()
+	defer held.Unlock()
+	if err := writeLock(file); err != nil {
+		return nil, err
+	}
+	mine := &holding{file: file}
+	held.locks[file] = mine
+	return mine, nil
+}
+
+// writeLock makes the lock file with this process's id in it. What is in the lock's place is another build's
+// lock: it is left as it is, and the build that holds it is named. A lock that could not be written whole is
+// removed.
+//
+// A folder in the lock's place is a lock that is held too, by nobody that can be named: one system says of it
+// that it is there, as of a file, and another that it is a folder.
 func writeLock(file string) error {
 	lock, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
 	switch {
-	case errors.Is(err, fs.ErrExist):
+	case errors.Is(err, fs.ErrExist), err != nil && fsx.IsDir(file):
 		return errHeld(holderOf(file))
 	case err != nil:
 		return errLockNotWritten(err)
@@ -99,21 +123,16 @@ func holderOf(file string) string {
 	return "unknown"
 }
 
-// hold notes a lock file as one this process holds.
-func hold(file string) {
+// giveBack removes the lock file of a holding and forgets the holding, as long as the list keeps it for the file.
+// A holding that was given back, by its own release or by a release of every lock, is not in the list: the list
+// then keeps nothing for the file, or the holding of a later call. A file that is there then is that call's lock,
+// or another process's, and is left alone.
+func giveBack(mine *holding) {
 	held.Lock()
 	defer held.Unlock()
-	held.files[file] = true
-}
-
-// giveBack removes a lock file this process holds, and forgets it. A lock that was given back already is left
-// alone, whoever holds a file in its place by now: another build may have taken the lock since.
-func giveBack(file string) {
-	held.Lock()
-	defer held.Unlock()
-	if held.files[file] {
-		delete(held.files, file)
-		removeLock(file)
+	if held.locks[mine.file] == mine {
+		delete(held.locks, mine.file)
+		removeLock(mine.file)
 	}
 }
 

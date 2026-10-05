@@ -8,7 +8,8 @@ import (
 	"context"
 	"errors"
 	"io/fs"
-	"path"
+	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/next/internal/assets"
@@ -48,14 +49,15 @@ func loadWith(ctx context.Context, e *env.Env, pkl string) (*manifest.Project, e
 // assets:sync.
 //
 // A map.folder that names no folder inside maps/, and a folder that is not there, are refused with the manifest
-// as their file: map.folder is what to put right. A link on the way to the folder, a name no folder can have and
-// what a map folder cannot hold are refused by fsx.Inside and mapdir.Open, at the path they are found at; a
+// as their file: map.folder is what to put right. A link on the way to the folder, a name Windows cannot hold
+// and what a map folder cannot hold are refused by fsx.Inside and mapdir.Open, at the path they are found at; a
 // file in the folder's place, such as a packed map, is among the last.
 func Source(p *manifest.Project) (*mapdir.Folder, error) {
-	label, err := mapLabel(p)
+	folder, err := mapFolder(p)
 	if err != nil {
 		return nil, err
 	}
+	label := mapsDir + "/" + folder
 	dir, err := fsx.Inside(p.Root, label)
 	if err != nil {
 		return nil, err
@@ -73,30 +75,39 @@ func Source(p *manifest.Project) (*mapdir.Folder, error) {
 	return source, err
 }
 
-// mapLabel is the source map's folder from the project folder, which is how errors name it: maps/ and map.folder
-// as the manifest writes it. A map.folder that does not name a folder inside maps/ is refused.
-func mapLabel(p *manifest.Project) (string, error) {
-	if !staysBelow(p.Map.Folder) {
+// mapFolder is the project's map.folder as everything in this package reads it: the folder below maps/, and
+// below the stage, with "/" between its parts, such as "campaign/one.w3x". Its last part is the map's name.
+//
+// The value is read by the rule of schema/Project.pkl (segments, isRelativeFolder), as text, so that the answer
+// is the same on every system: it is split at "/" and "\", and its empty and "." parts are dropped. A value that
+// starts with a separator or a drive, one with a ".." part, and one with no part left names no folder inside
+// maps/, and is refused with the manifest as its file. No ".." is resolved against the part before it.
+func mapFolder(p *manifest.Project) (string, error) {
+	parts := partsOf(p.Map.Folder)
+	if startsAtARoot(p.Map.Folder) || len(parts) == 0 || slices.Contains(parts, "..") {
 		return "", errNotInsideMaps(p.File, p.Map.Folder)
 	}
-	return mapsDir + "/" + p.Map.Folder, nil
+	return strings.Join(parts, "/"), nil
 }
 
-// staysBelow reports whether a path, as a manifest writes one, names a place below the folder it starts from:
-// not that folder itself, nothing above it and nothing beside it. The path is read as text, with "/" and "\"
-// both separating, so the answer is the same on every system. A path from a root or from a drive names no place
-// below any folder.
-func staysBelow(written string) bool {
-	slashed := strings.ReplaceAll(written, `\`, "/")
-	if strings.HasPrefix(slashed, "/") || startsWithDrive(slashed) {
-		return false
+// partsOf is the parts of a path as a manifest writes one: what stands between its separators, "/" and "\",
+// without the parts that are empty or ".".
+func partsOf(written string) []string {
+	var parts []string
+	for part := range strings.SplitSeq(strings.ReplaceAll(written, `\`, "/"), "/") {
+		if part != "" && part != "." {
+			parts = append(parts, part)
+		}
 	}
-	shortest := path.Clean(slashed)
-	return shortest != "." && shortest != ".." && !strings.HasPrefix(shortest, "../")
+	return parts
 }
 
-// startsWithDrive reports whether a path starts with a drive of Windows: a letter and a colon.
-func startsWithDrive(written string) bool {
+// startsAtARoot reports whether a path, as a manifest writes one, starts with a separator or with a drive of
+// Windows, which is an ASCII letter and a colon: such a path is not one from the folder it is written for.
+func startsAtARoot(written string) bool {
+	if strings.HasPrefix(written, "/") || strings.HasPrefix(written, `\`) {
+		return true
+	}
 	if len(written) < 2 || written[1] != ':' {
 		return false
 	}
@@ -141,22 +152,50 @@ func Assets(p *manifest.Project, synced []library.Synced) (found []assets.Asset,
 	return assets.Collect(p.Root, p.Assets, p.File, shipping)
 }
 
-// shippingLibraries is the libraries that ship files for the map, each with the folder of those files on disk.
-// The folder is reached from the project folder, so a link on the way to it is refused: .moonwell as a link, or
-// the folder itself.
+// shippingLibraries is the libraries that ship files for the map, each with the folder of those files. The way
+// to the folder is checked from the project folder, so a link on it is refused: .moonwell as a link, or the
+// folder itself. The folder is then named as the project folder is, with the library's path joined to it, and not
+// by the place fsx.Inside gives: assets.Collect names a library's folder from the project folder in its errors,
+// which it can for a project folder of any form only when both are of that form.
 func shippingLibraries(root string, synced []library.Synced) ([]assets.Library, error) {
 	var shipping []assets.Library
 	for _, lib := range synced {
 		if lib.Assets == "" {
 			continue
 		}
-		dir, err := fsx.Inside(root, lib.Assets)
-		if err != nil {
+		if _, err := fsx.Inside(root, lib.Assets); err != nil {
 			return nil, err
 		}
-		shipping = append(shipping, assets.Library{Key: lib.Key, Dir: dir})
+		// fsx.Inside took the path, so it is one that fsx.RelPath takes.
+		below, _ := fsx.RelPath(lib.Assets)
+		shipping = append(shipping, assets.Library{Key: lib.Key, Dir: filepath.Join(root, filepath.FromSlash(below))})
 	}
 	return shipping, nil
+}
+
+// output is the way to every place Moonwell writes what it builds: relative is the place from the project
+// folder, with "/", such as dist/.lock. Nothing need be at the place.
+//
+// The first folder of the path is the user's own, and is taken as it is, a link too: dist/ may be a junction that
+// sends what is built off a folder another program keeps in step. Nothing is looked at for it. Everything below
+// it is Moonwell's, and is reached with fsx.Inside from that folder: a link below it, a path that leaves it and a
+// name Windows cannot hold are refused, with the whole path from the project folder as their file.
+func output(root, relative string) (string, error) {
+	slashed, portable := fsx.RelPath(relative)
+	if !portable {
+		// fsx.Inside refuses such a path in its own words, before it looks at any step.
+		return fsx.Inside(root, relative)
+	}
+	first, below, nested := strings.Cut(slashed, "/")
+	top := filepath.Join(root, first)
+	if !nested {
+		return top, nil
+	}
+	place, err := fsx.Inside(top, below)
+	if err != nil {
+		return "", errBelowOutput(err, below, relative)
+	}
+	return place, nil
 }
 
 // ---- errors ----
@@ -177,12 +216,29 @@ func errNoMap(manifestFile, label string) error {
 	}
 }
 
-// errFolderForScript names the folder as the map spells it.
+// errFolderForScript names the folder as the map spells it. Its words are those script has for the same folder
+// when it adds the program to the map's script.
 func errFolderForScript(folder, file string) error {
 	return &diag.Error{
 		Msg:  folder + " in the map is a folder, not a file.",
 		File: file,
-		Hint: "The map has a folder where its script belongs. Remove that folder from the source map, or open and " +
-			"re-save the map in World Editor.",
+		Hint: "The map has a folder where its script belongs. Remove that folder from the source map, or save the " +
+			"map in World Editor with Lua as the script language.",
 	}
+}
+
+// errBelowOutput is a refusal of fsx.Inside for the part of an output place below its first folder, named by the
+// whole path from the project folder: that path is its file, and takes the part's place where the message starts
+// with it.
+func errBelowOutput(err error, below, relative string) error {
+	var refused *diag.Error
+	if !errors.As(err, &refused) {
+		return err
+	}
+	named := *refused
+	named.File = relative
+	if rest, starts := strings.CutPrefix(named.Msg, below+" "); starts {
+		named.Msg = relative + " " + rest
+	}
+	return &named
 }
