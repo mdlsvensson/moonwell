@@ -654,9 +654,15 @@ func TestTheTwoStepsInARowGiveTheProgramCompileGives(t *testing.T) {
 func TestAStepThatIsNotHandedWhatItNeedsIsAMistakeOfTheCaller(t *testing.T) {
 	b := programOf(t, mainOnly)
 	var expected *diag.Error
-	program, err := Link(background, b.world, nil)
-	if program != nil || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "CompileSources") {
-		t.Errorf("Link = %+v, %v, want a plain error that names CompileSources", program, err)
+	// Nothing, and a value that CompileSources did not make, which has no Lua of any module either.
+	for _, compiled := range []*Compiled{nil, {}} {
+		program, err := Link(background, b.world, compiled)
+		if program != nil || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "CompileSources") {
+			t.Errorf("Link(%+v) = %+v, %v, want a plain error that names CompileSources", compiled, program, err)
+		}
+	}
+	if lua, ok := (&Compiled{}).Lua(Source{Name: "main", Path: "src/main.yue", Kind: Yue}); ok || lua != "" {
+		t.Errorf("the Lua of a module of a value that CompileSources did not make = %q, %v", lua, ok)
 	}
 	b.in.Natives = nil
 	compiled, err := CompileSources(background, b.world, b.in)
