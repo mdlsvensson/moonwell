@@ -114,7 +114,8 @@ func LinkFile(t testing.TB, target, link string) {
 	switch {
 	case err == nil:
 	case lacksTheRightToLink(err):
-		t.Skipf("this account has not the right to make a symlink on Windows; the case is covered where it has: %v", err)
+		t.Skipf("this account has not the right to make a symlink on Windows; the case is covered where it has: %v",
+			err)
 	default:
 		t.Fatalf("no symlink was made at %s to %s: %v", link, target, err)
 	}

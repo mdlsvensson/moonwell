@@ -8,7 +8,9 @@
 // return the copy's path, the command that puts its folder on PATH, and log what a user still has to do.
 //
 // It must not know a project, a manifest or a build: a caller hands it the version and the yue.path that a
-// manifest names. It runs no program and downloads nothing by itself: both are asked of the Env it is handed.
+// manifest names. It runs no program and downloads nothing by itself: both are asked of the Env it is handed. Of
+// the environment it reads one variable itself, SystemRoot: the tar.exe of Windows is run by its full path, since
+// a tar on PATH may be another program, and the Env has no door to the environment.
 //
 // Of Moonwell it imports env, diag and fsx.
 package toolchain

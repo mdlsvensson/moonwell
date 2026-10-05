@@ -339,8 +339,9 @@ func TestALinkToAFolderThatCannotBeMadeFailsTheTest(t *testing.T) {
 	dir := t.TempDir()
 	WriteFile(t, dir, "target/file.txt", []byte("x"))
 	stand := newStandIn(t)
-	LinkDir(stand, filepath.Join(dir, "target"), filepath.Join(dir, "no", "such", "folder", "link"))
-	if len(stand.failed) != 1 || len(stand.skipped) != 0 || !strings.Contains(stand.failed[0], filepath.Join("no", "such", "folder", "link")) {
+	link := filepath.Join(dir, "no", "such", "folder", "link")
+	LinkDir(stand, filepath.Join(dir, "target"), link)
+	if len(stand.failed) != 1 || len(stand.skipped) != 0 || !strings.Contains(stand.failed[0], link) {
 		t.Errorf("failed %q, skipped %q, want one failure that names the link", stand.failed, stand.skipped)
 	}
 }

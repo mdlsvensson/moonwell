@@ -228,7 +228,7 @@ func addLacking(config *manifest.Ordered[json.RawMessage], entries map[string][]
 
 // LuarcTemplateEntries is the entries of each of LuarcArrays in the template's .luarc.json, under the key of the
 // array and in the order the template lists them: what MergeLuarc adds where a project lacks it, and what setup
-// names to the user of a .luarc.json that MergeLuarc left alone.
+// names to the user of a .luarc.json that MergeLuarc left alone. An array without entries has a nil list.
 //
 // Its failures are plain errors: the template is Moonwell's own, and its .luarc.json is an object with the three
 // arrays of strings, so one that is not is a mistake in Moonwell and nothing the user can put right.

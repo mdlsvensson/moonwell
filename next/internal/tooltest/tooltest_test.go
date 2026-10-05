@@ -93,6 +93,25 @@ func TestRunLuaFailsTheTestWhenTheFileEndsWithAnErrorOrAnExitCode(t *testing.T) 
 	}
 }
 
+func TestRunLuaFailsTheTestForAFileThatIsNotThere(t *testing.T) {
+	Yue(t)
+	// The compiler takes a name with no file behind it for code and runs it: `print(1)` is such a name, and
+	// would be returned as what a file printed. A folder is no file to run either.
+	dir := t.TempDir()
+	if err := os.Mkdir(filepath.Join(dir, "print(2)"), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"missing.lua", "print(1)", "print(2)"} {
+		test := &ended{}
+		got := RunLua(test, filepath.Join(dir, name))
+		if got != "" || len(test.failed) != 1 || len(test.skipped) != 0 || !strings.Contains(test.failed[0], name) ||
+			!strings.Contains(test.failed[0], "no file") {
+			t.Errorf("%s: RunLua = %q, failed %q, skipped %q, want one failure that names it as no file",
+				name, got, test.failed, test.skipped)
+		}
+	}
+}
+
 func TestRunLuaRunsNothingWithoutACompiler(t *testing.T) {
 	t.Setenv("MOONWELL_TEST_YUE", filepath.Join(t.TempDir(), "yue"))
 	t.Setenv("MOONWELL_REQUIRE_TOOLS", "")

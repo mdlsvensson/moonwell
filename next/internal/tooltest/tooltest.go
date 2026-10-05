@@ -51,9 +51,19 @@ func Yue(t testing.TB) string {
 // name.
 //
 // A file that ends with an error, or with another exit code than 0, fails the test with what it printed on both
-// streams. The compiler is the one Yue returns: without one the test is skipped, or failed, as there.
+// streams. So does a path with no file behind it, before anything is run: the compiler takes such a name for
+// code, and runs that. The compiler is the one Yue returns: without one the test is skipped, or failed, as there.
 func RunLua(t testing.TB, file string) string {
 	t.Helper()
+	info, err := os.Stat(file)
+	switch {
+	case err != nil:
+		t.Fatalf("%s is no file to run in Lua: %v", file, err)
+		return ""
+	case info.IsDir():
+		t.Fatalf("%s is no file to run in Lua: it is a folder", file)
+		return ""
+	}
 	compiler := Yue(t)
 	if compiler == "" {
 		return ""
