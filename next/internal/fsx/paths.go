@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"syscall"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 )
@@ -41,6 +42,12 @@ func isControl(r rune) bool { return r < 32 }
 // folder. root itself is trusted: the caller chose it (a project opened through a junction, say), so it is no way
 // out.
 func SafeJoin(root, relative string) (string, error) {
+	return joinBelow(root, relative, refuseLink)
+}
+
+// joinBelow joins relative under root, and has look see every step below root, the first step first: the first
+// failure of look ends it.
+func joinBelow(root, relative string, look func(path string) error) (string, error) {
 	current, err := filepath.Abs(root)
 	if err != nil {
 		return "", err
@@ -51,7 +58,7 @@ func SafeJoin(root, relative string) (string, error) {
 	}
 	for segment := range strings.SplitSeq(rel, "/") {
 		current = filepath.Join(current, segment)
-		if err := refuseLink(current); err != nil {
+		if err := look(current); err != nil {
 			return "", err
 		}
 	}
@@ -63,11 +70,10 @@ func SafeJoin(root, relative string) (string, error) {
 // so is a way the system cannot look at, with its Cause.
 //
 // It is SafeJoin with every failure worded for a user: a caller passes its error on as it is. Nothing need be at
-// the place, and root itself is trusted, as SafeJoin says. A file on the way is the system's to judge: where the
-// system says that nothing is below a file, the place is returned, and where it does not look there, that is a
-// way it cannot look at.
+// the place, and root itself is trusted, as SafeJoin says. A file on the way means that nothing is at the place,
+// on every system: the place is returned, a look at it finds nothing, and a write to it fails.
 func Inside(root, relative string) (string, error) {
-	place, err := SafeJoin(root, relative)
+	place, err := joinBelow(root, relative, stepInside)
 	var refused *diag.Error
 	switch {
 	case err == nil:
@@ -76,6 +82,18 @@ func Inside(root, relative string) (string, error) {
 		return "", errRefused(relative, refused)
 	}
 	return "", errUnreachable(relative, err)
+}
+
+// stepInside is refuseLink for a step of Inside: a step below a file is no failure. One system says of such a
+// step that it does not exist, and refuseLink takes that for no link; another says that what is above it is no
+// folder, which is the same answer in other words. No link is passed over: every step down to the file was
+// looked at, and nothing is below a file.
+func stepInside(path string) error {
+	err := refuseLink(path)
+	if errors.Is(err, syscall.ENOTDIR) {
+		return nil
+	}
+	return err
 }
 
 // refuseLink fails when path is a link. A path that does not exist is no link.

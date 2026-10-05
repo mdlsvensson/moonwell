@@ -90,6 +90,7 @@ jobs:
 
       - run: pkl --version
       # A missing pkl or YueScript compiler fails a test instead of skipping it; the compiler is downloaded once.
-      - run: go test -race ./next/internal/script/ ./next/internal/testkit/ ./next/internal/env/
+      # The detector is slow, and the tests of script run the real compiler: a package gets twenty minutes.
+      - run: go test -race -timeout 20m ./next/internal/script/ ./next/internal/testkit/ ./next/internal/env/
         env:
           MOONWELL_REQUIRE_TOOLS: "1"

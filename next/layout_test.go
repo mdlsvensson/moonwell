@@ -74,6 +74,10 @@ func allowed(from, to string) bool {
 		// The tests of the foundations import testkit, and every area imports a foundation: an area in testkit,
 		// or tooltest, which imports one, would be an import cycle in those tests.
 		return false
+	case slices.Contains(testOnly, from) && (to == "build" || to == "cli"):
+		// The tests of the areas import the test-only packages, and build and cli import the areas: either of the
+		// two in a test-only package would be an import cycle in those tests.
+		return false
 	case slices.Contains(testOnly, to):
 		return slices.Contains(testOnly, from)
 	case slices.Contains(testOnly, from):
@@ -250,7 +254,8 @@ func walkShelves(root string, report func(format string, args ...any)) error {
 //     package comment names, a format the formats and what is below them, an area the foundations and the
 //     formats and never another area, but for editor, which may import objects and script; build the areas and
 //     what is below them; cli build and what build may. A test-only package (testkit, oracle, tooltest) is
-//     imported by no such file but one of a test-only package, and testkit imports no area and not tooltest.
+//     imported by no such file but one of a test-only package; it imports neither build nor cli, and testkit
+//     imports no area and not tooltest.
 //   - A test file below internal follows the rule of its package, and may also import its own package and the
 //     test-only packages (allowedInATest). So the tests of an area import no other area, with editor's exception,
 //     and neither build nor cli; the tests of a foundation or a format import no area.
@@ -344,6 +349,27 @@ func TestTheWalkHoldsBuildAndCliToTheirShelves(t *testing.T) {
 		"internal/script/breaks.go: package script must not import build",
 		"internal/script/breaks.go: package script must not import cli",
 		"internal/env/breaks_test.go: a test of package env must not import build",
+	)
+}
+
+// The tests of the areas import the test-only packages, and build and cli import the areas: so a test-only
+// package imports neither of the two, in a test of its own neither. It may import an area, but for testkit.
+func TestTheWalkHoldsTheTestOnlyPackagesOffBuildAndCli(t *testing.T) {
+	walked(t, map[string]string{
+		"internal/testkit/keeps.go":      importing("testkit", newTree+"env", newTree+"war3/mpq"),
+		"internal/oracle/keeps.go":       importing("oracle", newTree+"script", newTree+"testkit", newTree+"diag"),
+		"internal/tooltest/keeps.go":     importing("tooltest", newTree+"toolchain", newTree+"env"),
+		"internal/testkit/breaks.go":     importing("testkit", newTree+"build", newTree+"cli"),
+		"internal/oracle/breaks.go":      importing("oracle", newTree+"cli"),
+		"internal/oracle/breaks_test.go": importing("oracle", newTree+"build", newTree+"oracle"),
+		"internal/tooltest/breaks.go":    importing("tooltest", newTree+"build", newTree+"cli"),
+	},
+		"internal/testkit/breaks.go: package testkit must not import build",
+		"internal/testkit/breaks.go: package testkit must not import cli",
+		"internal/oracle/breaks.go: package oracle must not import cli",
+		"internal/oracle/breaks_test.go: a test of package oracle must not import build",
+		"internal/tooltest/breaks.go: package tooltest must not import build",
+		"internal/tooltest/breaks.go: package tooltest must not import cli",
 	)
 }
 
@@ -495,6 +521,14 @@ func TestTheRulesOfTheShelvesForTestOnlyPackagesAndForTestFiles(t *testing.T) {
 		{"script", "build", false, false},
 		{"toolchain", "cli", false, false},
 		{"manifest", "build", true, false},
+		// A test-only package imports neither, in its tests neither; it may still import an area.
+		{"testkit", "build", false, false},
+		{"testkit", "cli", false, false},
+		{"oracle", "build", false, false},
+		{"oracle", "cli", true, false},
+		{"tooltest", "build", false, false},
+		{"tooltest", "cli", false, false},
+		{"oracle", "script", false, true},
 	}
 	for _, c := range cases {
 		got := allowed(c.from, c.to)

@@ -2,6 +2,7 @@ package fsx_test
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -118,23 +119,44 @@ func TestInsideTrustsTheFolderItIsGiven(t *testing.T) {
 	}
 }
 
-// A file on the way to the place is the system's to judge. One system says that nothing is there, and Inside
-// gives the place, where the caller finds nothing; another does not look below a file, and Inside names the
-// path, with what the system said as the cause.
-func TestInsideLeavesAFileOnTheWayToTheSystem(t *testing.T) {
+// A file on the way to a place means that nothing is there, on every system: Inside gives the place, a look at
+// it finds nothing, and a folder or a file cannot be made there. A link before the file is refused all the same.
+func TestInsideTakesAFileOnTheWayForNothingThere(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "maps", []byte("a file, not a folder"))
-	const relative = "maps/demo.w3x"
-	place, err := fsx.Inside(root, relative)
-	if err == nil {
-		if place != filepath.Join(root, "maps", "demo.w3x") {
-			t.Errorf("Inside(%q) = %q", relative, place)
+	testkit.WriteFile(t, root, "real/maps", []byte("a file, not a folder"))
+	for _, relative := range []string{
+		"maps/demo.w3x", "maps/demo.w3x/war3map.lua", "maps/demo.w3x/sub/war3map.lua", "real/maps/demo.w3x",
+		"real/maps/demo.w3x/war3map.lua",
+	} {
+		want := filepath.Join(root, filepath.FromSlash(relative))
+		place, err := fsx.Inside(root, relative)
+		if err != nil || place != want {
+			t.Errorf("Inside(%q) = %q, %v, want %q", relative, place, err, want)
+			continue
 		}
-		return
+		if fsx.Exists(place) {
+			t.Errorf("Inside(%q): something is at %s", relative, place)
+		}
+		if err := os.MkdirAll(place, 0o777); err == nil {
+			t.Errorf("Inside(%q): a folder was made at %s, below a file", relative, place)
+		}
+		if err := os.WriteFile(place, []byte("written"), 0o666); err == nil {
+			t.Errorf("Inside(%q): a file was written at %s, below a file", relative, place)
+		}
 	}
-	failure := refusedInside(t, root, relative)
-	if failure.Cause == nil || failure.Msg != relative+" cannot be reached: "+fsx.Reason(failure.Cause) {
-		t.Errorf("Inside(%q): %+v", relative, failure)
+	testkit.LinkDir(t, filepath.Join(root, "real"), filepath.Join(root, "link"))
+	for _, relative := range []string{"link/maps/demo.w3x", "link/maps/demo.w3x/sub/war3map.lua"} {
+		failure := refusedInside(t, root, relative)
+		if failure.Msg != "Symlinks are not supported: "+filepath.Join(root, "link") || failure.Cause != nil {
+			t.Errorf("Inside(%q): %+v", relative, failure)
+		}
+	}
+	for _, file := range []string{"maps", "real/maps"} {
+		data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(file)))
+		if string(data) != "a file, not a folder" {
+			t.Errorf("the file %s holds %q, %v", file, data, err)
+		}
 	}
 }
 

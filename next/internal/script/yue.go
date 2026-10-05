@@ -215,7 +215,9 @@ func withoutFailed(units []unit, failures []*diag.Error) []unit {
 // stagedOf is what a compile without failures left, with the sources that may define macros as it hashed
 // them.
 func stagedOf(units []unit, macroSources string) *staged {
-	result := &staged{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}, macroSources: macroSources}
+	result := &staged{
+		texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}, macroSources: macroSources,
+	}
 	for _, u := range units {
 		result.texts[u.path], result.hashes[u.path], result.lua[u.path] = u.text, u.hash, u.output
 	}
