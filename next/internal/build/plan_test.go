@@ -564,8 +564,12 @@ func TestPlanHandsTheCompileTheLintBlockAndWhatTheMapsScriptDefines(t *testing.T
 
 // ---- the libraries ----
 
-// What the gameplay and the editor read of the objects is written before the libraries are synced, which is the
-// first step that may need the network.
+// generatedFiles is what a plan writes for the gameplay and the editor to read, whatever becomes of its later
+// steps: the ids module, one of the declarations, and the macro module.
+var generatedFiles = []string{objects.IDsFile, editor.TypesDir + "/objects.d.lua", script.MacrosFile}
+
+// What the gameplay and the editor read is written before the libraries are synced, which is the first step
+// that may need the network: the editor finds `import "moonwell.macros"` also when a library cannot be fetched.
 func TestPlanWritesTheIDsModuleAndTheDeclarationsBeforeItSyncsTheLibraries(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")), localKit)
 	s.templateMap()
@@ -573,11 +577,34 @@ func TestPlanWritesTheIDsModuleAndTheDeclarationsBeforeItSyncsTheLibraries(t *te
 	if problem.File != manifestName || !strings.Contains(problem.Msg, "Library kit") {
 		t.Fatalf("problem = %+v", problem)
 	}
-	if !fsx.Exists(s.at(objects.IDsFile)) || !fsx.Exists(s.at(editor.TypesDir+"/objects.d.lua")) {
-		t.Error("the ids module or the declarations were not written before the sync failed")
+	for _, name := range generatedFiles {
+		if !fsx.Exists(s.at(name)) {
+			t.Errorf("%s was not written before the sync failed", name)
+		}
 	}
 	if runs := s.ranSoFar(); len(runs) != 0 {
 		t.Errorf("before the libraries were synced ran %+v", runs)
+	}
+}
+
+// A plan that finds no compiler has synced the libraries, and leaves what the gameplay and the editor read.
+func TestPlanThatFindsNoCompilerLeavesWhatItGeneratedAndTheLibraries(t *testing.T) {
+	s := newStandIn(t, objectsWith(captain("hfoo")), localKit)
+	s.templateMap()
+	s.put("libs/kit/kit/greet.lua", "return 1\n")
+	s.compiler = filepath.Join(t.TempDir(), "no-compiler-here")
+	s.evaluatesTo(objectsWith(captain("hfoo")), localKit, s.yueBlock(toolchain.YueVersion))
+	problem := firstProblem(t, s, Options{}, "a yue.path that is not there")
+	if !strings.Contains(problem.Msg, "yue.path does not exist") {
+		t.Fatalf("problem = %+v", problem)
+	}
+	for _, name := range append(slices.Clone(generatedFiles), ".moonwell/libraries/kit/kit/greet.lua") {
+		if !fsx.Exists(s.at(name)) {
+			t.Errorf("%s was not written before the compiler was looked for", name)
+		}
+	}
+	if runs := s.ranSoFar(); len(runs) != 0 || fsx.Exists(s.at("dist")) {
+		t.Errorf("without a compiler ran %+v, or the compile's folder was made", runs)
 	}
 }
 
@@ -643,25 +670,47 @@ func TestPlanImportsTheAssetsOfTheProjectAndOfItsLibrariesIntoThePlannedMap(t *t
 }
 
 // A build reads which files of the source map assets:sync owns, and never writes that down.
+//
+// The state file is named by the map's folder as every command reads it, not as the manifest writes it.
 func TestPlanReadsTheOwnershipStateAndNeverWritesIt(t *testing.T) {
-	s := newStandIn(t)
-	s.put("maps/map.w3x/icons/old.blp", "an asset of an earlier sync")
-	state := "{\n  \"version\": 1,\n  \"files\": {\n    \"icons/old.blp\": \"" +
-		fsx.SHA256Hex([]byte("an asset of an earlier sync")) + "\"\n  }\n}\n"
-	s.put(".asset-state/map.w3x.json", state)
-	result := planOf(t, s, Options{})
-	// The project has no assets, so the file that the state says a sync wrote leaves the planned map.
-	if result.Map.Has("icons/old.blp") || !fsx.Exists(s.at("maps/map.w3x/icons/old.blp")) {
-		t.Error("the owned file is in the planned map still, or left the source map")
+	tests := []struct {
+		name      string
+		folder    string // map.folder
+		at        string // where the map is, from the project folder
+		stateFile string
+	}{
+		{"the folder below maps", "map.w3x", "maps/map.w3x", ".asset-state/map.w3x.json"},
+		{"a folder written the long way", "./campaign//one.w3x", "maps/campaign/one.w3x",
+			".asset-state/campaign/one.w3x.json"},
 	}
-	if held, _ := os.ReadFile(s.at(".asset-state/map.w3x.json")); string(held) != state {
-		t.Errorf("after the plan the ownership state holds %q", held)
-	}
-	// A state that is none is refused by its name.
-	s.put(".asset-state/map.w3x.json", "not a state")
-	problem := firstProblem(t, s, Options{}, "a state file that is no state")
-	if !strings.Contains(problem.Msg, "ownership state is invalid") ||
-		!strings.HasSuffix(filepath.ToSlash(problem.File), ".asset-state/map.w3x.json") {
-		t.Errorf("problem = %+v", problem)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newStandIn(t, `"map":{"folder":"`+tt.folder+`","entry":"src/main.yue"}`)
+			s.folder(filepath.ToSlash(filepath.Dir(tt.at)))
+			if tt.at != "maps/map.w3x" {
+				if err := os.Rename(s.at("maps/map.w3x"), s.at(tt.at)); err != nil {
+					t.Fatal(err)
+				}
+			}
+			s.put(tt.at+"/icons/old.blp", "an asset of an earlier sync")
+			state := "{\n  \"version\": 1,\n  \"files\": {\n    \"icons/old.blp\": \"" +
+				fsx.SHA256Hex([]byte("an asset of an earlier sync")) + "\"\n  }\n}\n"
+			s.put(tt.stateFile, state)
+			result := planOf(t, s, Options{})
+			// The project has no assets, so the file that the state says a sync wrote leaves the planned map.
+			if result.Map.Has("icons/old.blp") || !fsx.Exists(s.at(tt.at+"/icons/old.blp")) {
+				t.Error("the owned file is in the planned map still, or left the source map")
+			}
+			if held, _ := os.ReadFile(s.at(tt.stateFile)); string(held) != state {
+				t.Errorf("after the plan the ownership state holds %q", held)
+			}
+			// A state that is none is refused by its name.
+			s.put(tt.stateFile, "not a state")
+			problem := firstProblem(t, s, Options{}, "a state file that is no state")
+			if !strings.Contains(problem.Msg, "ownership state is invalid") ||
+				!strings.HasSuffix(filepath.ToSlash(problem.File), tt.stateFile) {
+				t.Errorf("problem = %+v", problem)
+			}
+		})
 	}
 }

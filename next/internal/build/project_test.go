@@ -496,6 +496,41 @@ func TestAssetsNamesALibrarysFolderFromAProjectFolderThatIsGivenFromTheWorkingFo
 	}
 }
 
+// ---- StateFile ----
+
+func TestStateFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
+	tests := []struct{ folder, want string }{
+		{"map.w3x", ".asset-state/map.w3x.json"},
+		{"campaign/one.w3x", ".asset-state/campaign/one.w3x.json"},
+		{`campaign\one.w3x`, ".asset-state/campaign/one.w3x.json"},
+		{"./campaign//one.w3x", ".asset-state/campaign/one.w3x.json"},
+	}
+	for _, tt := range tests {
+		s := newStandIn(t)
+		s.project.Map.Folder = tt.folder
+		before := testkit.Snapshot(t, s.root)
+		file, err := StateFile(s.project)
+		if err != nil || file != s.at(tt.want) {
+			t.Errorf("map.folder %q: StateFile = %q, %v, want %q", tt.folder, file, err, s.at(tt.want))
+		}
+		if !reflect.DeepEqual(testkit.Snapshot(t, s.root), before) {
+			t.Errorf("map.folder %q: naming the state file changed the project", tt.folder)
+		}
+	}
+}
+
+func TestStateFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
+	for _, folder := range []string{"", "../outside", `C:\x`, "a/../b.w3x"} {
+		s := newStandIn(t)
+		s.project.File, s.project.Map.Folder = localManifest, folder
+		file, err := StateFile(s.project)
+		e := asError(t, err, "map.folder "+folder)
+		if file != "" || e.File != localManifest || !strings.Contains(e.Msg, "must name a folder inside maps/") {
+			t.Errorf("map.folder %q: StateFile = %q, %+v", folder, file, e)
+		}
+	}
+}
+
 // ---- output ----
 
 func TestOutputIsThePlaceBelowTheProjectFolderWhateverIsThere(t *testing.T) {

@@ -169,6 +169,17 @@ func shippingLibraries(root string, synced []library.Synced) ([]assets.Library, 
 	return shipping, nil
 }
 
+// StateFile is the file that records which files of the project's source map assets:sync owns. It is named by
+// the map's folder as mapFolder reads it, so every way to write one folder names one file; a map.folder that
+// names no folder inside maps/ is refused as Source refuses it. Nothing need be at the place.
+func StateFile(p *manifest.Project) (string, error) {
+	folder, err := mapFolder(p)
+	if err != nil {
+		return "", err
+	}
+	return assets.StateFile(p.Root, folder)
+}
+
 // output is the way to every place Moonwell writes what it builds: relative is the place from the project
 // folder, with "/", such as dist/.lock. Nothing need be at the place.
 //

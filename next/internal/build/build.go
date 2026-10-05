@@ -36,8 +36,9 @@ type Result struct {
 }
 
 // Plan computes everything a build of the project changes in its map, and writes nothing into the map. It writes
-// what a build generates beside it: the ids module, the editor's declarations and view of the libraries, the
-// libraries and their lock, and the compile's cache.
+// what a build generates beside it: the ids module, the editor's declarations, the macro module, the libraries
+// and their lock, the editor's view of the libraries, and the compile's cache. Of the libraries, the lock and
+// the view it also removes what is stale: what belongs to a library that left the manifest.
 //
 // Its steps are a build's, in a build's order, and the first that fails ends the plan. The upper half makes what
 // the gameplay is compiled against, and compiles it: the objects are planned first, so that invalid objects fail
@@ -58,14 +59,14 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 	if err != nil {
 		return nil, err
 	}
-	if err := writeGenerated(e, source, objs, globals, opts); err != nil { // src/generated/objects.yue, .moonwell/types
+	if err := writeGenerated(e, source, objs, globals, opts); err != nil { // the ids module, .moonwell/types and yue
 		return nil, err
 	}
-	synced, err := library.Sync(ctx, e, p.Libraries, p.File) // .moonwell/libraries, library-assets, moonwell.lock
+	synced, err := library.Sync(ctx, e, p.Libraries, p.File) // .moonwell/libraries and library-assets, moonwell.lock
 	if err != nil {
 		return nil, err
 	}
-	program, err := compile(ctx, e, p, synced, globals, opts) // .moonwell/yue, dist/stage/lua, .moonwell/lua
+	program, err := compile(ctx, e, p, synced, globals, opts) // dist/stage/lua, .moonwell/lua
 	if err != nil {
 		return nil, err
 	}

@@ -17,8 +17,13 @@ import (
 
 // This file holds the steps of Plan that are more than one call, in the order Plan takes them.
 
-// writeGenerated writes what the gameplay and the editor read of the objects and of the map's script: the ids
-// module, src/generated/objects.yue, and then the editor's declarations in .moonwell/types.
+// writeGenerated writes what the gameplay and the editor read beside the sources: the ids module,
+// src/generated/objects.yue, then the editor's declarations in .moonwell/types, and then the macro module in
+// .moonwell/yue, which `import "moonwell.macros"` finds.
+//
+// All three are written before a step that can fail for something outside the project, a library that cannot
+// be fetched or a compiler that is not found, so the editor has them after such a failure too. The compile
+// finds the macro module current, and writes nothing.
 func writeGenerated(
 	e *env.Env, source *mapdir.Folder, objs *objects.Result, globals *lua.MapGlobals, opts Options,
 ) error {
@@ -28,6 +33,10 @@ func writeGenerated(
 	_, err := editor.RefreshTypes(e.Root, editor.Types{
 		Objects: objs.Objects, Map: globals, MapLua: source.Label(scriptName), Natives: script.LoadNatives(),
 	})
+	if err != nil {
+		return err
+	}
+	_, err = script.RefreshMacros(e.Root)
 	return err
 }
 
@@ -108,14 +117,10 @@ func planAssets(
 	return imported, replaced, nil
 }
 
-// ownedFiles is the ownership state of the project's map: the files of the source map that assets:sync wrote,
-// which a plan may replace and remove. A build reads the state and never writes it.
+// ownedFiles is the ownership state of the project's map, read from StateFile: the files of the source map that
+// assets:sync wrote, which a plan may replace and remove. A build reads the state and never writes it.
 func ownedFiles(p *manifest.Project) (assets.State, error) {
-	folder, err := mapFolder(p)
-	if err != nil {
-		return assets.State{}, err
-	}
-	file, err := assets.StateFile(p.Root, folder)
+	file, err := StateFile(p)
 	if err != nil {
 		return assets.State{}, err
 	}
