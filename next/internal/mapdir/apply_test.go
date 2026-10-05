@@ -313,6 +313,11 @@ var insideThroughALink = []linked{
 		testkit.LinkDir(t, filepath.Join(dir, "Textures"), filepath.Join(elsewhere, "staged"))
 		return filepath.Join(elsewhere, "staged")
 	}},
+	// The place is a file of the map: what is looked at is the folder it is in.
+	{"a file below a link to a folder inside the source map", func(t *testing.T, project, dir, _ string) string {
+		testkit.LinkDir(t, filepath.Join(dir, "Textures"), filepath.Join(project, "dist"))
+		return filepath.Join(project, "dist", "Old.blp")
+	}},
 	{"a later folder below a link to the source map", func(t *testing.T, project, dir, _ string) string {
 		// The folder is made after the scan, so the scan has not found it.
 		testkit.LinkDir(t, dir, filepath.Join(project, "dist"))

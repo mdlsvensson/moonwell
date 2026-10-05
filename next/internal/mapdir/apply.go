@@ -38,11 +38,11 @@ func (f *Folder) StageTo(dir string) error {
 // Holds reports whether dir is the map folder or a place inside it. Nothing need be at dir.
 //
 // The two paths are compared as they are written, and then by the folders they lead to, so that a link on the way
-// to dir does not hide where it ends. Of dir, the nearest place at or above it that is there is looked at: what
-// is below that place is not there, so no link is in it. dir is inside the map when that place is the map folder
-// or a folder the scan found in it, or when a folder written above that place is the map folder, which finds a
-// folder that was made in the map after the scan. Folders are told apart by os.SameFile, and no path is resolved:
-// what resolves a path does not see through a junction of Windows.
+// to dir does not hide where it ends. Of dir, the nearest folder at or above it is looked at: below that folder
+// the way to dir holds no folder, so no link to one. dir is inside the map when that folder is the map folder or
+// a folder the scan found in it, or when a folder written above it is the map folder, which finds a folder that
+// was made in the map after the scan. Folders are told apart by os.SameFile, and no path is resolved: what
+// resolves a path does not see through a junction of Windows.
 func (f *Folder) Holds(dir string) bool {
 	if fsx.IsWithin(dir, f.dir) {
 		return true
@@ -73,13 +73,14 @@ func (f *Folder) liesIn(dir string) bool {
 	return err == nil && isOrIsBelow(source, place)
 }
 
-// nearest is the nearest path at or above dir, as dir is written, that something is at.
+// nearest is the nearest folder at or above dir, as dir is written. A file at dir, or on the way to it, is no
+// folder: the folder it is in is the one to look at.
 func nearest(dir string) (path string, found bool) {
 	path, err := filepath.Abs(dir)
 	if err != nil {
 		return "", false
 	}
-	for !fsx.Exists(path) {
+	for !fsx.IsDir(path) {
 		above := filepath.Dir(path)
 		if above == path {
 			return "", false
