@@ -284,6 +284,146 @@ func TestStageToRefusesAStageThatOverlapsTheSourceMap(t *testing.T) {
 	}
 }
 
+// linked is a project whose source map is opened, and a place that is beside the map as it is written.
+type linked struct {
+	name string
+	// place makes the links of the case and returns the place: project is the project folder, dir the source map
+	// in it, and elsewhere a folder outside the project.
+	place func(t *testing.T, project, dir, elsewhere string) string
+}
+
+// below is the place of a stage below a folder dist of the project that is a link to target.
+func below(target func(project, dir string) string) func(t *testing.T, project, dir, elsewhere string) string {
+	return func(t *testing.T, project, dir, _ string) string {
+		testkit.LinkDir(t, target(project, dir), filepath.Join(project, "dist"))
+		return filepath.Join(project, "dist", "stage", "map.w3x")
+	}
+}
+
+// insideThroughALink are places that are the source map, or lie inside it, only where a link leads.
+var insideThroughALink = []linked{
+	{"below a link to the source map", below(func(_, dir string) string { return dir })},
+	{"below a link to a folder inside the source map",
+		below(func(_, dir string) string { return filepath.Join(dir, "Textures") })},
+	{"a link to the source map", func(t *testing.T, _, dir, elsewhere string) string {
+		testkit.LinkDir(t, dir, filepath.Join(elsewhere, "staged"))
+		return filepath.Join(elsewhere, "staged")
+	}},
+	{"a link to a folder inside the source map", func(t *testing.T, _, dir, elsewhere string) string {
+		testkit.LinkDir(t, filepath.Join(dir, "Textures"), filepath.Join(elsewhere, "staged"))
+		return filepath.Join(elsewhere, "staged")
+	}},
+	{"a later folder below a link to the source map", func(t *testing.T, project, dir, _ string) string {
+		// The folder is made after the scan, so the scan has not found it.
+		testkit.LinkDir(t, dir, filepath.Join(project, "dist"))
+		if err := os.Mkdir(filepath.Join(dir, "stage"), 0o777); err != nil {
+			t.Fatal(err)
+		}
+		return filepath.Join(project, "dist", "stage", "map.w3x")
+	}},
+}
+
+// aroundThroughALink are places that hold the source map only where a link leads.
+var aroundThroughALink = []linked{
+	{"a link to the folder the source map is in", func(t *testing.T, project, _, elsewhere string) string {
+		testkit.LinkDir(t, filepath.Join(project, "maps"), filepath.Join(elsewhere, "staged"))
+		return filepath.Join(elsewhere, "staged")
+	}},
+	{"a link to the project", func(t *testing.T, project, _, elsewhere string) string {
+		testkit.LinkDir(t, project, filepath.Join(elsewhere, "staged"))
+		return filepath.Join(elsewhere, "staged")
+	}},
+	// The stage is the project folder itself, and no link: to replace it would remove the project.
+	{"the project below a link to the folder it is in", func(t *testing.T, project, _, elsewhere string) string {
+		testkit.LinkDir(t, filepath.Dir(project), filepath.Join(elsewhere, "up"))
+		return filepath.Join(elsewhere, "up", filepath.Base(project))
+	}},
+}
+
+// besideThroughALink are places that a link leads to, beside the source map.
+var besideThroughALink = []linked{
+	{"below a link to the folder the source map is in",
+		below(func(project, _ string) string { return filepath.Join(project, "maps") })},
+	{"below a link to a folder beside the source map", below(func(project, _ string) string {
+		return filepath.Join(project, "maps", "other.w3x")
+	})},
+	{"below a link to the project", below(func(project, _ string) string { return project })},
+}
+
+// openInAProject lays a project with the source map and a map beside it, and opens the source map.
+func openInAProject(t *testing.T) (folder *Folder, project, dir string) {
+	t.Helper()
+	project = t.TempDir()
+	dir = filepath.Join(project, "maps", "map.w3x")
+	for name, content := range sourceMap {
+		testkit.WriteFile(t, dir, name, []byte(content))
+	}
+	testkit.WriteFile(t, project, "maps/other.w3x/war3map.w3i", []byte("another map"))
+	folder, err := Open(dir, label)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return folder, project, dir
+}
+
+func TestHoldsTellsAPlaceInsideTheMapAlsoThroughALink(t *testing.T) {
+	written := []linked{
+		{"the map folder", func(_ *testing.T, _, dir, _ string) string { return dir }},
+		{"a folder of the map", func(_ *testing.T, _, dir, _ string) string { return filepath.Join(dir, "Textures") }},
+		{"a place in the map that nothing is at", func(_ *testing.T, _, dir, _ string) string {
+			return filepath.Join(dir, "dist", "bin")
+		}},
+	}
+	beside := []linked{
+		{"a folder beside the map", func(_ *testing.T, project, _, _ string) string {
+			return filepath.Join(project, "maps", "other.w3x")
+		}},
+		{"the folder the map is in", func(_ *testing.T, project, _, _ string) string {
+			return filepath.Join(project, "maps")
+		}},
+		{"a place in the project that nothing is at", func(_ *testing.T, project, _, _ string) string {
+			return filepath.Join(project, "dist", "stage", "map.w3x")
+		}},
+	}
+	groups := []struct {
+		want  bool
+		cases []linked
+	}{
+		{true, written}, {true, insideThroughALink},
+		{false, beside}, {false, besideThroughALink}, {false, aroundThroughALink},
+	}
+	for _, group := range groups {
+		for _, c := range group.cases {
+			t.Run(c.name, func(t *testing.T) {
+				folder, project, dir := openInAProject(t)
+				place := c.place(t, project, dir, t.TempDir())
+				if got := folder.Holds(place); got != group.want {
+					t.Errorf("Holds(%s) = %v, want %v", place, got, group.want)
+				}
+			})
+		}
+	}
+}
+
+func TestStageToRefusesAStageThatOverlapsTheSourceMapThroughALink(t *testing.T) {
+	for _, c := range slices.Concat(insideThroughALink, aroundThroughALink) {
+		t.Run(c.name, func(t *testing.T) {
+			folder, project, dir := openInAProject(t)
+			stage := c.place(t, project, dir, t.TempDir())
+			// The links are not among what is looked at: the maps of the project are, the source map among them.
+			before := testkit.Snapshot(t, filepath.Join(project, "maps"))
+			err := folder.With([]Change{put("war3map.w3i", "patched"), put("new.txt", "new")}).StageTo(stage)
+			e := asError(t, err)
+			if !contains(e.Msg, "would replace the source map") || e.File != label || e.Hint == "" || e.Cause != nil {
+				t.Errorf("error = %+v", e)
+			}
+			if after := testkit.Snapshot(t, filepath.Join(project, "maps")); !reflect.DeepEqual(after, before) {
+				t.Errorf("the maps hold %v, want them untouched: %v", after, before)
+			}
+		})
+	}
+}
+
 func TestStageToDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
 	folder, dir := open(t, sourceMap)
 	view := folder.With([]Change{put("textures/old.blp", "patched"), put("Textures/New.blp", "new")})
