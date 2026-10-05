@@ -19,7 +19,8 @@ import (
 // This file holds dev: the door and one cycle of it, when a check is due, what a project is watched for, and
 // which changes of a file count. The watcher itself is in watch.go.
 
-// Pace is how often dev looks at the files, and how long they must stay unchanged before it checks again.
+// Pace is how often dev looks at the files, and how long they must stay unchanged before it checks again. A
+// Debounce of zero is none: the look that finds a change starts the check.
 type Pace struct{ Interval, Debounce time.Duration }
 
 // DefaultPace is a look every 250 ms and a check 150 ms after the last change.
@@ -30,10 +31,13 @@ var DefaultPace = Pace{Interval: 250 * time.Millisecond, Debounce: 150 * time.Mi
 //
 // It returns nil when it was told to stop. A check that fails is logged, and the watching goes on. Each check
 // writes the ids module, as a build does. What a check writes is not watched, or each check would start the
-// next: nothing below dist/ and .moonwell/ is, and src/generated/ never counts.
+// next: of the project's own folders nothing below dist/ and .moonwell/ is, and src/generated/ never counts.
 //
-// What is watched is said once, by the manifest as it evaluates when Dev starts: a library the manifest names
-// later is watched by the next Dev. Pkl is looked for by each check until one finds it, and that program is kept.
+// The project's own folders are looked at before the first check, so what is saved in them while it runs is
+// checked after it: a source, an object file, an asset, a manifest. The local libraries and the preview picture
+// are known by the manifest, as it evaluates after the first check, and are watched from then: what is saved in
+// them while the first check runs is found by no look, and a library the manifest names later is watched by the
+// next Dev. Pkl is looked for by each check until one finds it, and that program is kept.
 func Dev(ctx context.Context, e *env.Env, pace Pace) error {
 	if pace.Interval <= 0 {
 		// A plain error: the pace is the command's own, DefaultPace or a test's, so one without an interval is a
@@ -41,28 +45,33 @@ func Dev(ctx context.Context, e *env.Env, pace Pace) error {
 		return errors.New("build.Dev: the pace has no interval; pass DefaultPace")
 	}
 	if !fsx.IsDir(filepath.Join(e.Root, sourcesDir)) {
-		return errNoSources()
+		return errNoSources(e.Root)
 	}
+	// The first look at the project's own folders comes before the first check, which writes nothing there that
+	// counts: the look after it finds what was saved meanwhile.
+	watch := ownFolders(e.Root)
+	files := newWatcher(watch.roots)
 	// Ctrl+C ends the watching and not a check that is under way: the check holds the build lock, and gives it
 	// back as it ends.
 	working := context.WithoutCancel(ctx)
 	pkl := cycle(working, e, "")
-	watch := watchedOf(e.Root, startingManifest(working, e, pkl))
-	// The first look is taken before the line that says what is watched: what is saved as the line appears is
+	named := namedFolders(e.Root, startingManifest(working, e, pkl))
+	files.add(named.roots...)
+	// Every first look is taken before the line that says what is watched: what is saved as the line appears is
 	// found by the next look.
-	files := newWatcher(watch.roots)
-	e.Log.Info(watch.line())
+	e.Log.Info(watch.and(named).line())
 
 	ticker := time.NewTicker(pace.Interval)
 	defer ticker.Stop()
 	var waiting unchecked
-	// A look, and a check, that ends after Dev was told to stop is the last.
+	// No check is started once Dev was told to stop. Told while a check runs, it returns as the check ends, and
+	// takes no further look; told while a look is taken, it starts no check for what that look found.
 	for ctx.Err() == nil {
 		select {
 		case <-ctx.Done():
 		case <-ticker.C:
 			changed := files.poll()
-			if waiting.due(changed, time.Now(), pace.Debounce) {
+			if ctx.Err() == nil && waiting.due(changed, time.Now(), pace.Debounce) {
 				pkl = cycle(working, e, pkl)
 			}
 		}
@@ -149,14 +158,14 @@ type watched struct {
 	labels []string // as the user writes them: src/, a library's folder with "/" at its end, the preview picture
 }
 
-// watchedOf is what dev watches of the project at dir. p is its manifest, nil for one that did not load: such a
-// project is watched for its own folders, and has no library and no preview picture to watch.
-func watchedOf(dir string, p *manifest.Project) watched {
-	all := ownFolders(dir)
+// namedFolders is what dev watches of the project at dir beside its own folders: what its manifest names, which
+// is its local libraries and its preview picture. p is the manifest, nil for one that did not load: such a
+// project has neither to watch.
+func namedFolders(dir string, p *manifest.Project) watched {
 	if p == nil {
-		return all
+		return watched{}
 	}
-	return all.and(libraryFolders(dir, p.Libraries)).and(previewPicture(dir, p.Settings.Info.Preview))
+	return libraryFolders(dir, p.Libraries).and(previewPicture(dir, p.Settings.Info.Preview))
 }
 
 // and is what w and more watch together.
@@ -280,10 +289,12 @@ func pathFrom(folder, path string) string {
 
 // ---- errors ----
 
-func errNoSources() error {
+// errNoSources names the project folder, as the refusal of a folder without a manifest does: the folder is what
+// is no project.
+func errNoSources(root string) error {
 	return &diag.Error{
 		Msg:  "The src/ folder is missing.",
-		File: sourcesDir,
+		File: root,
 		Hint: "Run dev from a Moonwell project folder, or create one with `moonwell init <dir>`.",
 	}
 }

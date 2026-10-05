@@ -229,6 +229,12 @@ func (s *standIn) everyFolder() {
 	s.put("libs/kit/files/icons/Sword.blp", "kit sword")
 }
 
+// watchedOf is all that Dev watches of the project at dir with the manifest p: its own folders, and what the
+// manifest names.
+func watchedOf(dir string, p *manifest.Project) watched {
+	return ownFolders(dir).and(namedFolders(dir, p))
+}
+
 func TestAProjectIsWatchedForItsSourcesItsManifestsItsLocalLibrariesAndItsPreviewPicture(t *testing.T) {
 	s := newStandIn(t, threeLocals, previewed)
 	s.everyFolder()
@@ -348,7 +354,7 @@ func TestDevFailsBeforeAnyWorkWhenSrcIsMissing(t *testing.T) {
 	root := t.TempDir()
 	e, log := testkit.Env(t, root) // a program that is run fails the test
 	failure := asError(t, Dev(background, e, DefaultPace), "no src")
-	if failure.Msg != "The src/ folder is missing." || failure.File != "src" ||
+	if failure.Msg != "The src/ folder is missing." || failure.File != root ||
 		failure.Hint != "Run dev from a Moonwell project folder, or create one with `moonwell init <dir>`." {
 		t.Errorf("error = %+v", failure)
 	}
@@ -513,23 +519,79 @@ func TestASaveDuringACheckIsCheckedAfterIt(t *testing.T) {
 	}
 }
 
-// The first look is taken before the line that says what is watched: what is saved as the line appears is found.
+// The project's own folders are looked at before the first check: a save made while it runs is found by the first
+// look after it, and checked as any change is. What the check itself writes, and what else is saved among the
+// generated sources, starts nothing.
+func TestASaveDuringTheFirstCheckIsCheckedAfterIt(t *testing.T) {
+	tests := []struct {
+		name   string
+		saved  string
+		passed int
+	}{
+		{"a source", "src/main.yue", 2},
+		{"a generated source", "src/generated/more.yue", 1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				// The project has an object, so the check writes the ids module among the generated sources.
+				s := newStandIn(t, objectsWith(captain("hfoo")))
+				s.templateMap()
+				s.folder("src/generated")
+				// The first program the first check runs saves the file.
+				var saves atomic.Bool
+				saves.Store(true)
+				run := s.env.Run
+				s.env.Run = func(
+					ctx context.Context, name string, args []string, options env.RunOptions,
+				) (env.RunResult, error) {
+					if saves.CompareAndSwap(true, false) {
+						s.save(tt.saved, "x = 12\n")
+					}
+					return run(ctx, name, args, options)
+				}
+				d := devOf(s, DefaultPace).start(t)
+				lines := s.log.Lines()
+				if len(lines) != 2 || lines[1] != watchingLine("src/") || !fsx.Exists(s.at(objects.IDsFile)) {
+					t.Fatalf("Dev logged %q, want a check, with its ids module, and what it watches", lines)
+				}
+				d.looks(1)
+				if passed, failed := s.checked(); passed != 1 || failed != 0 {
+					t.Errorf("%d check(s) passed and %d failed by the first look after the first check", passed, failed)
+				}
+				d.looks(8)
+				if passed, failed := s.checked(); passed != tt.passed || failed != 0 {
+					t.Errorf("%d check(s) passed and %d failed, want %d and 0", passed, failed, tt.passed)
+				}
+			})
+		})
+	}
+}
+
+// Every first look is taken before the line that says what is watched, that of a local library's folders too:
+// what is saved as the line appears is found.
 func TestASaveMadeAsDevSaysWhatItWatchesIsChecked(t *testing.T) {
-	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t)
-		recorded := s.env.Log
-		s.env.Log = env.NewLogger(func(line string) {
-			recorded.Info(line)
-			if strings.HasPrefix(line, "Watching ") {
-				s.save("src/main.yue", "x = 12\n")
-			}
-		}, "")
-		d := devOf(s, DefaultPace).start(t)
-		d.looks(2)
-		if passed, failed := s.checked(); passed != 2 || failed != 0 {
-			t.Errorf("%d check(s) passed and %d failed, want 2 and 0: Dev logged %q", passed, failed, s.log.Lines())
-		}
-	})
+	for _, saved := range []string{"src/main.yue", "libs/kit/modules/kit/greet.lua"} {
+		t.Run(saved, func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				s := newStandIn(t, localKit)
+				s.put("libs/kit/moonwell-library.json", `{"dir":"modules"}`)
+				s.put("libs/kit/modules/kit/greet.lua", "return 1\n")
+				recorded := s.env.Log
+				s.env.Log = env.NewLogger(func(line string) {
+					recorded.Info(line)
+					if strings.HasPrefix(line, "Watching ") {
+						s.save(saved, "x = 12\n")
+					}
+				}, "")
+				d := devOf(s, DefaultPace).start(t)
+				d.looks(2)
+				if passed, failed := s.checked(); passed != 2 || failed != 0 {
+					t.Errorf("%d check(s) passed and %d failed, want 2 and 0: %q", passed, failed, s.log.Lines())
+				}
+			})
+		})
+	}
 }
 
 func TestDevChecksAgainWhenALocalLibraryChanges(t *testing.T) {

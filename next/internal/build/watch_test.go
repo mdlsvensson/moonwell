@@ -105,6 +105,21 @@ func TestAMissingRootHoldsNothingAndIsWatchedOnceItExists(t *testing.T) {
 	}
 }
 
+func TestARootThatIsAddedIsLookedAtOnceAndWatchedFromThen(t *testing.T) {
+	first, second := t.TempDir(), t.TempDir()
+	w := newWatcher([]watchRoot{{dir: first, counts: anything}})
+	testkit.WriteFile(t, first, "a.txt", nil)
+	testkit.WriteFile(t, second, "b.txt", nil)
+	w.add(watchRoot{dir: second, deep: true, counts: anything})
+	if !w.poll() || w.poll() {
+		t.Error("what a root held as it was added is no change, and what changed in a root before is one still")
+	}
+	testkit.WriteFile(t, second, "below/c.txt", nil)
+	if !w.poll() || w.poll() {
+		t.Error("a new file in the root that was added is one change")
+	}
+}
+
 func TestEveryRootIsBroughtUpToDateEvenAfterAChangeWasFound(t *testing.T) {
 	first, second := t.TempDir(), t.TempDir()
 	w := newWatcher([]watchRoot{{dir: first, counts: anything}, {dir: second, counts: anything}})

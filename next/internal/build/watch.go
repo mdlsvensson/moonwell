@@ -34,11 +34,18 @@ type watcher struct {
 
 // newWatcher takes the first look at once, so that a change made right after it returns is noticed.
 func newWatcher(roots []watchRoot) *watcher {
-	w := &watcher{roots: roots, seen: make([]map[string]stamp, len(roots))}
-	for at, root := range roots {
-		w.seen[at] = root.files()
-	}
+	w := &watcher{}
+	w.add(roots...)
 	return w
+}
+
+// add has the watcher watch more roots, and takes the first look at each at once: what a root holds as it is
+// added is no change, and what changed in the roots before it is one still.
+func (w *watcher) add(roots ...watchRoot) {
+	for _, root := range roots {
+		w.roots = append(w.roots, root)
+		w.seen = append(w.seen, root.files())
+	}
 }
 
 // poll takes another look, and reports whether a file that counts for its root appeared, went away, or changed
