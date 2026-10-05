@@ -17,8 +17,13 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
-// folderHint ends a failure to write or remove a file of the view.
-const folderHint = "The editor reads .moonwell/; make sure it is a folder you can write, then retry."
+// The hints that end a failure to write a file of the view, to remove one, and to read the view's folder.
+const (
+	folderHint  = "The editor reads .moonwell/; make sure it is a folder you can write, then retry."
+	removalHint = "The editor reads .moonwell/lua/: close the file there if a program has it open, " +
+		"and make sure the folder is one you can write, then retry."
+	readingHint = "The editor reads .moonwell/; make sure it is a folder you can read, then retry."
+)
 
 // librarySources is the modules of a project with a library: two of the project's own, and of the library a Lua
 // module, a YueScript module and an init module.
@@ -498,29 +503,65 @@ func TestRefreshLibraryViewReportsAViewItCannotWrite(t *testing.T) {
 func TestAFileOfTheLibraryViewThatCannotBeRemovedIsReported(t *testing.T) {
 	root := lay(t, ".moonwell/lua/old/gone.lua", "return 0")
 	gone := filepath.Join(root, ".moonwell", "lua", "old", "gone.lua")
-	if runtime.GOOS == "windows" {
-		// A file another program holds: the failure is the one every removal of a held file gives.
-		// That failure has no file of its own: it names the file in its message, by its place on disk.
+	// What keeps a file from being removed is the system's own: on Windows that a program holds it, as an editor
+	// does with a view it shows, and elsewhere that the folder it is in may not be written.
+	switch {
+	case runtime.GOOS == "windows":
 		testkit.MakeUnwritable(t, gone)
-		written, err := RefreshLibraryView(root, nil, nil)
-		failure := asError(t, err, "a held file")
-		if !strings.Contains(failure.Msg, gone) || !strings.Contains(failure.Msg, "in use by another program") || failure.Hint == "" || written != nil {
-			t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	case os.Geteuid() == 0:
+		t.Skip("root may remove a file from a folder without the permission, so the removal would not fail")
+	default:
+		if err := os.Chmod(filepath.Dir(gone), 0o555); err != nil {
+			t.Fatal(err)
 		}
-		return
+		t.Cleanup(func() { os.Chmod(filepath.Dir(gone), 0o777) })
+	}
+	written, err := RefreshLibraryView(root, nil, nil)
+	failure := asError(t, err, "a file that cannot be removed")
+	if !strings.HasPrefix(failure.Msg, "Removing .moonwell/lua/old/gone.lua failed: ") || failure.File != ".moonwell/lua/old/gone.lua" ||
+		failure.Hint != removalHint || failure.Cause == nil || written != nil {
+		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	}
+	// The failure is the view's on every system: it names the file from the project folder alone, and no
+	// program that would have a map open.
+	if strings.Contains(failure.Msg, root) || strings.Contains(failure.Msg+failure.Hint, "Warcraft") {
+		t.Errorf("the failure is worded for another file: %+v", failure)
+	}
+}
+
+func TestAFolderOfTheLibraryViewThatCannotBeListedOrAViewThatCannotBeLookedAtIsAFailureToRead(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows lists a folder and looks at a file in it whatever its permissions; the case is covered on the other system's run")
 	}
 	if os.Geteuid() == 0 {
-		t.Skip("root may remove a file from a folder without the permission, so the removal would not fail")
+		t.Skip("root may list a folder without permissions, so the listing would not fail")
 	}
-	if err := os.Chmod(filepath.Dir(gone), 0o555); err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { os.Chmod(filepath.Dir(gone), 0o777) })
-	written, err := RefreshLibraryView(root, nil, nil)
-	failure := asError(t, err, "a file in a folder that cannot be written")
-	if !strings.HasPrefix(failure.Msg, "Removing .moonwell/lua/old/gone.lua failed: ") || failure.File != ".moonwell/lua/old/gone.lua" ||
-		failure.Hint != folderHint || failure.Cause == nil || written != nil {
-		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	// Without any permission the folder of a module cannot be listed. With the permission to read alone its
+	// files are listed, and none of them can be looked at; a system that looks at a file to list it fails at
+	// the listing there too.
+	for _, c := range []struct {
+		what  string
+		mode  os.FileMode
+		files []string // where the failure may show
+	}{
+		{"a folder that cannot be listed", 0, []string{".moonwell/lua"}},
+		{"a view that cannot be looked at", 0o444, []string{".moonwell/lua/kit/init.lua", ".moonwell/lua"}},
+	} {
+		root := t.TempDir()
+		if _, err := RefreshLibraryView(root, renamed("kit.init"), nil); err != nil {
+			t.Fatal(err)
+		}
+		kit := filepath.Join(root, ".moonwell", "lua", "kit")
+		if err := os.Chmod(kit, c.mode); err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { os.Chmod(kit, 0o777) })
+		written, err := RefreshLibraryView(root, renamed("kit.init"), nil)
+		failure := asError(t, err, c.what)
+		if !slices.Contains(c.files, failure.File) || !strings.HasPrefix(failure.Msg, "Reading "+failure.File+" failed: ") ||
+			failure.Hint != readingHint || failure.Cause == nil || written != nil {
+			t.Errorf("%s: RefreshLibraryView = %q, %+v", c.what, written, failure)
+		}
 	}
 }
 
@@ -545,7 +586,7 @@ func TestAFolderOfTheLibraryViewThatCannotBeRemovedIsReported(t *testing.T) {
 	written, err := RefreshLibraryView(root, renamed("kit.init"), nil)
 	failure := asError(t, err, "a folder that cannot be removed")
 	if !strings.HasPrefix(failure.Msg, "Removing .moonwell/lua/held/hollow failed: ") || failure.File != ".moonwell/lua/held/hollow" ||
-		failure.Hint != folderHint || failure.Cause == nil || written != nil {
+		failure.Hint != removalHint || failure.Cause == nil || written != nil {
 		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
 	}
 	// The folder is cleared before a view is written: the failure leaves the module without one.

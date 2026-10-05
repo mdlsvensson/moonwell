@@ -21,7 +21,8 @@ import (
 // that is there when it returns.
 //
 // A nil lua is no default but a second mode: that of a command that compiles nothing, such as setup, and so has
-// no Lua of a YueScript module to give. A caller that has compiled passes its Program's Lua.
+// no Lua of a YueScript module to give. A caller that has compiled passes the Lua of what script gave it: its
+// Compiled's, which is there before the requires are followed, or its Program's.
 //
 // The folder is first cleared of all that is no view, and then the views are written. A file stays only under
 // the exact name of a module's view, so a view under another spelling of that name is removed, and written again
@@ -124,19 +125,21 @@ func removeOthers(dir string, views []view) error {
 	case errors.Is(err, fs.ErrNotExist):
 		return nil // no folder: a project without library modules never had a view
 	case err != nil:
-		return errViewNotWritten(LibraryViewDir, err)
+		return errViewNotRead(LibraryViewDir, err)
 	}
 	named := map[string]bool{}
 	for _, v := range views {
 		named[v.file] = true
 	}
 	for _, file := range listed {
-		stays, err := isPlainFile(dir, file, named[file])
-		if err != nil {
-			return err
-		}
-		if stays {
-			continue
+		if named[file] {
+			plain, err := isPlainFile(dir, file)
+			if err != nil {
+				return err
+			}
+			if plain {
+				continue // a view, which stays
+			}
 		}
 		if err := removeBelow(dir, file); err != nil {
 			return err
@@ -145,15 +148,11 @@ func removeOthers(dir string, views []view) error {
 	return nil
 }
 
-// isPlainFile reports whether a listed file that is named as a view is one to keep: a file of its own, and no
-// link. A file that is not named as a view is not looked at.
-func isPlainFile(dir, file string, named bool) (bool, error) {
-	if !named {
-		return false, nil
-	}
+// isPlainFile reports whether a listed file, which is named as a view, is a file of its own, and no link.
+func isPlainFile(dir, file string) (bool, error) {
 	info, err := fsx.Lstat(filepath.Join(dir, filepath.FromSlash(file)))
 	if err != nil {
-		return false, errViewNotWritten(path.Join(LibraryViewDir, file), err)
+		return false, errViewNotRead(path.Join(LibraryViewDir, file), err)
 	}
 	return info != nil && !fsx.IsLink(info), nil
 }
@@ -202,7 +201,7 @@ func emptyFolders(dir string) ([]string, error) {
 	case errors.Is(err, fs.ErrNotExist):
 		return nil, nil
 	case err != nil:
-		return nil, errViewNotWritten(LibraryViewDir, err)
+		return nil, errViewNotRead(LibraryViewDir, err)
 	}
 	// The walk comes to a folder before it comes to what is below it.
 	slices.Reverse(folders)
@@ -210,12 +209,13 @@ func emptyFolders(dir string) ([]string, error) {
 }
 
 // removeBelow removes one file, or one folder that holds nothing; below is its path from the folder, with "/".
+// Every failure is the view's own, whatever the system's reason: a file that another program holds, which an
+// editor does with a view it shows, is named from the project folder as any other is.
 func removeBelow(dir, below string) error {
-	err := fsx.RemoveFile(filepath.Join(dir, filepath.FromSlash(below)))
-	if err != nil && !isExpected(err) {
+	if err := fsx.RemoveFile(filepath.Join(dir, filepath.FromSlash(below))); err != nil {
 		return errViewNotRemoved(path.Join(LibraryViewDir, below), err)
 	}
-	return err
+	return nil
 }
 
 // writeViews writes each view that does not hold its text already, in the order given, and returns the files it
@@ -241,8 +241,14 @@ func writeViews(dir string, views []view) (written []string, err error) {
 
 // ---- errors ----
 
-// viewHint ends a failure to write or remove a file or a folder of the view.
-const viewHint = "The editor reads .moonwell/; make sure it is a folder you can write, then retry."
+// The hints that end a failure of the view: to write a file or a folder of it, to read what the folder holds, and
+// to remove a file or a folder of it.
+const (
+	viewHint        = "The editor reads .moonwell/; make sure it is a folder you can write, then retry."
+	viewReadHint    = "The editor reads .moonwell/; make sure it is a folder you can read, then retry."
+	viewRemovalHint = "The editor reads " + LibraryViewDir + "/: close the file there if a program has it open, " +
+		"and make sure the folder is one you can write, then retry."
+)
 
 // errViewNotWritten is the failure to write file, a path from the project folder: a view, or the folder of the
 // view where the failure is of the folder itself.
@@ -250,7 +256,31 @@ func errViewNotWritten(file string, cause error) error {
 	return &diag.Error{Msg: "Writing " + file + " failed: " + fsx.Reason(cause), File: file, Hint: viewHint, Cause: cause}
 }
 
+// errViewNotRead is the failure to list the folder of the view, or to look at a file of it, by its path from the
+// project folder.
+func errViewNotRead(file string, cause error) error {
+	return &diag.Error{
+		Msg: "Reading " + file + " failed: " + fsx.Reason(cause), File: file, Hint: viewReadHint, Cause: cause,
+	}
+}
+
 // errViewNotRemoved is the failure to remove a file or a folder of the view, by its path from the project folder.
 func errViewNotRemoved(file string, cause error) error {
-	return &diag.Error{Msg: "Removing " + file + " failed: " + fsx.Reason(cause), File: file, Hint: viewHint, Cause: cause}
+	return &diag.Error{
+		Msg: "Removing " + file + " failed: " + removalReason(cause), File: file, Hint: viewRemovalHint, Cause: cause,
+	}
+}
+
+// removalReason is why a removal failed, as the system says it. A failure that fsx has worded, which it does for
+// a file that another program holds, names the file by its place on disk and a program that has a map open: of
+// such a failure the reason is that of its cause, and its message where it has none.
+func removalReason(failure error) string {
+	var worded *diag.Error
+	switch {
+	case !errors.As(failure, &worded):
+		return fsx.Reason(failure)
+	case worded.Cause != nil:
+		return fsx.Reason(worded.Cause)
+	}
+	return worded.Msg
 }
