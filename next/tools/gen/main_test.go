@@ -1,17 +1,18 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io/fs"
 	"maps"
+	"os"
 	"path/filepath"
 	"reflect"
 	"slices"
 	"strings"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
@@ -110,13 +111,12 @@ func TestRunRefusesAFolderThatIsInNoCheckout(t *testing.T) {
 		if module != "" {
 			testkit.WriteFile(t, dir, "go.mod", []byte(module))
 		}
-		var out bytes.Buffer
-		err := run(dir, []string{"no-such-mode"}, &out)
+		printed, err := checkout{t, dir}.runBelow("", "no-such-mode")
 		if err == nil || !strings.Contains(err.Error(), "in a Moonwell checkout") {
 			t.Errorf("%s: got %v, want the refusal of a folder that is in no checkout", name, err)
 		}
-		if out.Len() != 0 {
-			t.Errorf("%s: the refused run printed %q", name, out.String())
+		if printed != "" {
+			t.Errorf("%s: the refused run printed %q", name, printed)
 		}
 	}
 }
@@ -133,20 +133,19 @@ func TestRunFindsTheCheckoutAtOrAboveTheFolderItIsRunIn(t *testing.T) {
 			c := newCheckout(t)
 			c.write("go.mod", module)
 			c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
-			dir := c.folder(below)
-			var out bytes.Buffer
-			if err := run(dir, nil, &out); err != nil {
+			printed, err := c.runBelow(below)
+			if err != nil {
 				t.Errorf("%s, run in %q: %v", name, below, err)
 				continue
 			}
-			if printed := out.String(); strings.Count(printed, "wrote schema/generated/") != 7 {
+			if strings.Count(printed, "wrote schema/generated/") != 7 {
 				t.Errorf("%s, run in %q: printed %q, want a line for each of the seven files", name, below, printed)
 			}
 			got := texts(c.outputs())
 			if len(got) != 8 || !strings.Contains(got["schema/generated/BuffProps.pkl"], "\nname: Int?\n") {
 				t.Errorf("%s, run in %q: the checkout holds %v", name, below, slices.Sorted(maps.Keys(got)))
 			}
-			if left := testkit.Snapshot(t, dir); below != "" && len(left) != 0 {
+			if left := testkit.Snapshot(t, c.path(below)); below != "" && len(left) != 0 {
 				t.Errorf("%s: the run wrote %v into the folder %q", name, slices.Sorted(maps.Keys(left)), below)
 			}
 		}
@@ -160,8 +159,7 @@ func TestRunPassesOverTheGoModOfAnotherModuleOnItsWayUp(t *testing.T) {
 	c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
 	c.write("other/go.mod", "module example.com/other\n")
 	c.write("other/data/metadata.json", metadataOfOneBuff(t, "foth", "other"))
-	var out bytes.Buffer
-	if err := run(c.folder("other/deeper"), nil, &out); err != nil {
+	if _, err := c.runBelow("other/deeper"); err != nil {
 		t.Fatal(err)
 	}
 	all := testkit.Snapshot(t, c.root)
@@ -182,8 +180,7 @@ func TestRunTakesTheNearerOfTwoCheckouts(t *testing.T) {
 	inner := checkout{t, outer.folder("inner")}
 	inner.write("go.mod", moduleFile)
 	inner.write("data/metadata.json", metadataOfOneBuff(t, "fnea", "nearer"))
-	var out bytes.Buffer
-	if err := run(inner.folder("deeper"), nil, &out); err != nil {
+	if _, err := inner.runBelow("deeper"); err != nil {
 		t.Fatal(err)
 	}
 	got := texts(inner.outputs())
@@ -246,6 +243,20 @@ func TestTheHelpersRunNoGeneratorInTheRealCheckout(t *testing.T) {
 	called := listenTo(t, func(tb testing.TB) { checkout{tb, root}.runBelow("", "no-such-mode") })
 	if !strings.Contains(started, refusal) || !strings.Contains(called, refusal) {
 		t.Errorf("startIn said %q and runBelow %q, want the refusal from both", started, called)
+	}
+	// runBelow makes the folder it runs in, and asks before it makes one: a folder that the real checkout has
+	// not is refused, and is not there afterwards.
+	const below = "next/tools/gen/no-such-folder"
+	made := filepath.Join(root, filepath.FromSlash(below))
+	refused := listenTo(t, func(tb testing.TB) { checkout{tb, root}.runBelow(below, "no-such-mode") })
+	if !strings.Contains(refused, refusal) {
+		t.Errorf("runBelow said %q of a new folder of the real checkout, want the refusal", refused)
+	}
+	if fsx.Exists(made) {
+		t.Errorf("runBelow made %s in the real checkout before it refused the folder", below)
+		if err := os.Remove(made); err != nil {
+			t.Error(err)
+		}
 	}
 }
 

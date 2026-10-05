@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"maps"
 	"os"
 	"path"
@@ -29,7 +32,8 @@ import (
 // and what the run lays there. Each tree gets a checkout of its own, laid by the same function, since a run
 // writes; the two are compared by the paths from their checkouts. A file that the line names by its full path, a
 // list of file names, lies in a third folder that both trees read, and that must hold afterwards what it held.
-// No run has the real checkout, or a folder below it, as its working folder: the real checkout is only read.
+// No run is given the real checkout, or a folder below it, as the folder to run in: the real checkout is only
+// read.
 //
 // The two sides. The other tree's generator is a program: package main cannot be imported, so the test builds
 // tools/gen once, with the go that runs the tests, and starts it for every run with the checkout, or a folder
@@ -48,12 +52,17 @@ import (
 // the test builds: through GOFLAGS it reaches both.
 //
 // Where a run is started. Each tree carries a run out in one place (madeBy), and nothing is started there, by
-// either tree, as a program or in process, unless the folder of the run can lead a generator to no checkout but
-// the run's own (onlyItsOwnCheckout): no go.mod above the scratch folder so much as mentions this module, and at
-// or above the folder the line is run in a go.mod names the module exactly when the run is of a checkout. So a
-// generator that finds its checkout wrongly, or a temporary folder that was put inside a checkout, cannot make a
-// run write into the real data/. The helper that starts a program, and the one that calls run, refuse a folder
-// of the real checkout besides.
+// either tree, as a program or in process, unless the folder of the run can lead a generator that walks up from
+// the folder it is started in to no checkout but the run's own (onlyItsOwnCheckout): no go.mod above the scratch
+// folder so much as mentions this module, and at or above the folder the line is run in a go.mod names the
+// module exactly when the run is of a checkout. So a generator that takes the wrong go.mod on its way up, or a
+// temporary folder that was put inside a checkout, cannot make a run write into the real data/
+// (TestOracleCarriesOutNoRunThatItsGuardRefuses). The helper that starts a program, and the one that calls run,
+// refuse a folder of the real checkout besides, and the tests call run nowhere else. What the guards do not hold:
+// a run in the process of the test is given its scratch folder, and the folder of that process is this
+// package's, in the real checkout. A generator that asked the process for its folder, where run is given one,
+// would find the real checkout there, and no guard looks at that: run must not ask, as the package comment of
+// main.go says, and main alone does.
 //
 // Compared whole, with the other tree's as what is wanted, for every run of no class:
 //
@@ -92,10 +101,13 @@ import (
 // and never what this tree made of it. A run that names a class whose predicate does not hold of it fails, and
 // is compared whole. A run that names no class is compared whole, whatever a predicate would say of it. What a
 // run carries for its class is data and no predicate: which argument names a file (cannotGive), the words of a
-// refusal (refusal), the places in which the two trees write a file apart (apart). What this tree must make in
-// a class is a value of this file, or is made from what the other tree made, and is never made by this tree's
-// generator. What a class does not name is compared whole. TestOracleReportsARunThatIsNotOfTheClassItNames holds
-// these rules on runs that break each of them.
+// refusal (refusal), the places in which the two trees write a file or a stream apart (apart). What this tree
+// must make in a class is a value of this file, or is made from what the other tree made, and is never made by
+// this tree's generator. So a place is a literal: its two texts have a type of their own (literal), to which a
+// constant converts without a word, and a text that a function returned only where a file says literal(...),
+// which no test file of the package may (TestAPlaceOfTheOracleIsALiteral). What a class does not name is
+// compared whole. TestOracleReportsARunThatIsNotOfTheClassItNames holds these rules on runs that break each of
+// them.
 //
 //   - FromCheckout, 8 runs (otherTreeNamesItsCheckout, fileOfTheCheckout): a failure of the system on a file or
 //     a folder of the checkout. The other tree says Go's own line, with the operation and the full path, and
@@ -131,30 +143,39 @@ import (
 //   - The plan's accepted differences, which are the four classes after this one (acceptedDifference). The
 //     predicate of each is on bytes of the input alone, and says where it reads them: the list that a line of
 //     game-paths names (inTheList), or the labels and the categories of the metadata of a checkout that the mode
-//     without a name is run in (inTheLabels). The run names the files that the two trees write apart, and in
-//     each the places: what the other tree wrote there, and what this tree must write in its stead (apart). That
-//     is the one form there is: a file of such a run is held to the other tree's text with those places changed,
-//     so everything outside them is compared with the other tree's, and no text of a whole file stands in a run,
+//     without a name is run in (inTheLabels). The run names what the two trees make apart, a file by its path
+//     from the checkout and a stream by its name (standard output, standard error), and in each the places: what
+//     the other tree wrote there, and what this tree must write in its stead (apart). That is the one form there
+//     is: a file or a stream of such a run is held to the other tree's text with those places changed, so
+//     everything outside them is compared with the other tree's, and no text of a whole file stands in a run,
 //     where this tree's generator could have made it. A place must be in the other tree's text exactly once,
-//     and the two trees must write it apart; a run in which they write the file alike fails, since the class is
-//     about a difference. A report of a file that is written otherwise shows where the two part, and one line of
-//     each. The exit code, both streams, the names of all that the checkout holds and every other file are
-//     compared whole.
-//   - WiderSpace, 3 runs (hasWiderSpaceAtAnEdge, isWiderSpace): white space outside ASCII, which the other tree
+//     and the two trees must write it apart; a run in which they make the file or the stream alike fails, since
+//     the class is about a difference. A place must also be of the difference of its class, as the row of the
+//     class says what one looks like (shows): the bytes that the class is about are in what a tree writes there.
+//     A report of a text that is written otherwise shows where the two part, and one line of each. The exit
+//     code, a stream that the run does not name, the names of all that the checkout holds and every other file
+//     are compared whole.
+//   - WiderSpace, 4 runs (hasWiderSpaceAtAnEdge, isWiderSpace): white space outside ASCII, which the other tree
 //     takes off a line of the list, and writes as one space in a label and a category, and this tree takes for
 //     text. In a list: a line that starts or ends with such a character once its ASCII white space is off, a
-//     byte order mark at the very start of the list aside. In a metadata: a label or a category that holds one
+//     byte order mark at the very start of the list aside. A line that ends with one is, to this tree, of a
+//     type of file that is not kept: it leaves the path out and counts one path less, so such a run names the
+//     list and standard output. In a metadata: a label or a category that holds one. A place of the class holds
+//     such a character on one side (widerSpaceShows); where a line of the list ends with one a place need not,
+//     since this tree writes nothing of that line, and those places are a reader's to judge
 //     (TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes,
 //     TestRenderSchemaWritesALabelAndACategoryOnOneLine).
 //   - DottedI, 1 run (holdsADottedI): a list that holds U+0130, the capital I with a dot above, which the other
-//     tree lowers to an i and a combining dot and this tree to an i
-//     (TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes).
+//     tree lowers to an i and a combining dot and this tree to an i. A place of the class holds the i and the
+//     dot in what the other tree writes (TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes).
 //   - NoUTF8, 1 run (hasNeighboursThatAreNoUTF8): a list with two bytes side by side of which neither is
 //     UTF-8. The other tree writes a replacement character for each part that could have started a character,
-//     and this tree one for the run of them (TestTheModeGamePathsDecodesTheListAndCountsEachPathOnce).
+//     and this tree one for the run of them. A place of the class holds two replacement characters side by side
+//     in what the other tree writes (TestTheModeGamePathsDecodesTheListAndCountsEachPathOnce).
 //   - ByBytes, 1 run (hasCharactersOrderedApart): a list that holds a character above U+FFFF and one from
 //     U+E000 to U+FFFF, the replacement character of a byte that is no UTF-8 among them. The other tree orders
-//     the paths by UTF-16 units, which puts the first before the second, and this tree by bytes
+//     the paths by UTF-16 units, which puts the first before the second, and this tree by bytes. A place of the
+//     class holds both kinds of character in what the other tree writes
 //     (TestRenderGamePathsSortsThePathsByBytes).
 //
 // Not among the inputs:
@@ -216,12 +237,12 @@ func TestOracleOnWhatBothGeneratorsWriteSayAndHowTheyEnd(t *testing.T) {
 	}
 	fixtures.check(t, genTally{
 		counts: counts{
-			Runs: 70, Whole: 50, Passed: 36, Failed: 34, AsPrograms: 10, Files: 204, Committed: 21,
+			Runs: 71, Whole: 50, Passed: 37, Failed: 34, AsPrograms: 10, Files: 205, Committed: 21,
 		},
-		Modes: map[string]int{"": 29, "game-paths": 41},
+		Modes: map[string]int{"": 29, "game-paths": 42},
 		Classes: map[string]int{
 			"FromCheckout": 8, "AsGiven": 3, "CountRefused": 2, "CountOfPaths": 1,
-			"WiderSpace": 3, "DottedI": 1, "NoUTF8": 1, "ByBytes": 1,
+			"WiderSpace": 4, "DottedI": 1, "NoUTF8": 1, "ByBytes": 1,
 		},
 	})
 }
@@ -308,8 +329,9 @@ type oracleRun struct {
 	// refusal is, for a run of a class in which this tree refuses a line that the other tree does not refuse,
 	// what this tree must write to standard error.
 	refusal string
-	// apart is, for a run of one of the plan's accepted differences, the files that the two trees write apart,
-	// by their paths from the checkout, each with the places in which they do.
+	// apart is, for a run of one of the plan's accepted differences, what the two trees make apart, each with the
+	// places in which they do: a file by its path from the checkout, and a stream by its name, standardOutput or
+	// standardError.
 	apart map[string][]place
 }
 
@@ -331,9 +353,14 @@ func (n named) in(args []string) (string, bool) {
 	return filepath.Join(args[n.argument], filepath.FromSlash(n.below)), true
 }
 
-// place is a place of a file that the two trees write apart: what the other tree writes there, and what this
-// tree must write in its stead. The other tree's is in its file exactly once.
-type place struct{ other, this string }
+// place is a place of a file or of a stream that the two trees write apart: what the other tree writes there,
+// and what this tree must write in its stead. The other tree's is in its text exactly once.
+type place struct{ other, this literal }
+
+// literal is a text that stands written in a test file, as a place does. A constant converts to it without a
+// word; a text that a function returned, which this tree's generator could have made, converts only where the
+// file says literal(...), and no test file of the package may say that.
+type literal string
 
 // lineOfARun gives the arguments of a run. It writes the files that the line names by a full path into outside,
 // a folder that is in no checkout and that both trees read.
@@ -488,6 +515,7 @@ type comparison struct {
 	in        input
 	want, got outcome // the other tree's, and this tree's
 	counted   *genTally
+	of        class // the class that the run is compared as; the zero value for a run that is compared whole
 }
 
 // compare has both trees make what they make of a run, each in a checkout of its own, and compares the two as
@@ -503,7 +531,7 @@ func (o genOracle) compare(t testing.TB, r oracleRun, counted *genTally) {
 	if !reflect.DeepEqual(testkit.Snapshot(t, outside), beside) {
 		t.Error("a tree wrote into the folder of the files that the line names")
 	}
-	c := comparison{t, r, input{args, r.below, want.laid}, want, got, counted}
+	c := comparison{t: t, r: r, in: input{args, r.below, want.laid}, want: want, got: got, counted: counted}
 	c.count()
 	c.pathsOfTheCheckouts()
 	c.byItsClass()
@@ -549,6 +577,7 @@ func (c comparison) byItsClass() {
 			"and its first line on standard error is %q", of.name, c.want.code, firstLine(c.want.stderr))
 	default:
 		c.counted.Classes[of.name]++
+		c.of = of
 		of.compare(c)
 		return
 	}
@@ -616,12 +645,16 @@ func (c comparison) mustSay(must string) {
 	}
 }
 
-// mustWrite fails the test unless this tree left exactly this text in a file.
-func (c comparison) mustWrite(name, must string) {
-	c.t.Helper()
-	if got := string(c.got.left[name]); got != must {
-		c.t.Errorf("%s: this tree does not write what it must: %s", name, parting(must, got))
+// made is what each tree made at a name that a run gives for a text: a stream by its name, and every other name
+// a file of the checkout by its path from there.
+func (c comparison) made(name string) (theirs, ours string) {
+	switch name {
+	case standardOutput:
+		return c.want.stdout, c.got.stdout
+	case standardError:
+		return c.want.stderr, c.got.stderr
 	}
+	return string(c.want.left[name]), string(c.got.left[name])
 }
 
 // parting says, for a report, where two texts part: the offset, and the line of each there. No report shows
@@ -681,19 +714,26 @@ type class struct {
 	// compare compares a run of the class: what the class does not name whole, and what it names against what
 	// this tree must make.
 	compare func(c comparison)
+	// shows says, for a class whose runs name places, whether a place is of the difference that the class is
+	// about: the bytes of that difference are in what a tree writes there. nil for a class without places.
+	shows func(c comparison, p place) bool
 }
 
 // classes is every class of the header. A new class is a row here, a name in the runs that are of it, an entry
 // of the tally, and a paragraph of the header.
 var classes = []class{
-	{"FromCheckout", otherTreeNamesItsCheckout, comparison.fileOfTheCheckout},
-	{"AsGiven", cannotGiveWhatTheLineNames, comparison.fileAsGiven},
-	{"CountRefused", moreAfterAnEmptyFirstArgument, comparison.refusedByThisTree},
-	{"CountOfPaths", versionWithALineFeed, comparison.countsThePaths},
-	{"WiderSpace", either(inTheList(hasWiderSpaceAtAnEdge), inTheLabels(isWiderSpace)), comparison.acceptedDifference},
-	{"DottedI", inTheList(holdsADottedI), comparison.acceptedDifference},
-	{"NoUTF8", inTheList(hasNeighboursThatAreNoUTF8), comparison.acceptedDifference},
-	{"ByBytes", inTheList(hasCharactersOrderedApart), comparison.acceptedDifference},
+	{name: "FromCheckout", is: otherTreeNamesItsCheckout, compare: comparison.fileOfTheCheckout},
+	{name: "AsGiven", is: cannotGiveWhatTheLineNames, compare: comparison.fileAsGiven},
+	{name: "CountRefused", is: moreAfterAnEmptyFirstArgument, compare: comparison.refusedByThisTree},
+	{name: "CountOfPaths", is: versionWithALineFeed, compare: comparison.countsThePaths},
+	{name: "WiderSpace", is: either(inTheList(hasWiderSpaceAtAnEdge), inTheLabels(isWiderSpace)),
+		compare: comparison.acceptedDifference, shows: widerSpaceShows},
+	{name: "DottedI", is: inTheList(holdsADottedI), compare: comparison.acceptedDifference,
+		shows: theOtherTreeWrites(func(text string) bool { return strings.Contains(text, "i\xCC\x87") })},
+	{name: "NoUTF8", is: inTheList(hasNeighboursThatAreNoUTF8), compare: comparison.acceptedDifference,
+		shows: theOtherTreeWrites(func(text string) bool { return strings.Contains(text, replaced+replaced) })},
+	{name: "ByBytes", is: inTheList(hasCharactersOrderedApart), compare: comparison.acceptedDifference,
+		shows: theOtherTreeWrites(func(text string) bool { return hasCharactersOrderedApart([]byte(text)) })},
 }
 
 // classNamed is the row of the classes for a name.
@@ -837,67 +877,104 @@ func (c comparison) countsThePaths() {
 	}
 }
 
-// acceptedDifference compares a run of one of the plan's accepted differences: each file that the run names is
-// held to the other tree's text with the run's places changed, and everything else is compared whole.
+// acceptedDifference compares a run of one of the plan's accepted differences: each file and each stream that
+// the run names is held to the other tree's text with the run's places changed, and everything else is compared
+// whole.
 func (c comparison) acceptedDifference() {
-	files := slices.Sorted(maps.Keys(c.r.apart))
-	if len(files) == 0 {
-		c.t.Error("the run names no file that the two trees write apart")
+	names := slices.Sorted(maps.Keys(c.r.apart))
+	if len(names) == 0 {
+		c.t.Error("the run names nothing that the two trees write apart: no file, and no stream")
 	}
 	c.codes()
-	c.streams(standardError, c.want.stderr, c.got.stderr)
-	c.streams(standardOutput, c.want.stdout, c.got.stdout)
-	c.files(files...)
-	for _, name := range files {
+	for _, stream := range []string{standardError, standardOutput} {
+		if _, apart := c.r.apart[stream]; !apart {
+			theirs, ours := c.made(stream)
+			c.streams(stream, theirs, ours)
+		}
+	}
+	// A stream is no file of a checkout: among the names that files leaves out it does nothing.
+	c.files(names...)
+	for _, name := range names {
 		c.writtenApart(name, c.r.apart[name])
 	}
 }
 
-// writtenApart holds a file of an accepted difference to the other tree's text with the places changed that
-// the run names. It fails where a place is none, and where the two trees write the file alike: the class is
-// about a difference.
+// writtenApart holds a file or a stream of an accepted difference to the other tree's text with the places
+// changed that the run names. It fails where a place is none, where a place is not of the difference of the
+// class, and where the two trees write the text alike: the class is about a difference.
 func (c comparison) writtenApart(name string, places []place) {
-	theirs, ours := string(c.want.left[name]), string(c.got.left[name])
+	c.placesOfTheClass(name, places)
+	theirs, ours := c.made(name)
 	must, wrong := withPlaces(theirs, places)
 	switch {
 	case wrong != "":
 		c.t.Errorf("%s: %s", name, wrong)
 	case ours == theirs:
-		c.t.Errorf("%s: the two trees write the file alike: the class is about a difference, and there is none", name)
-	default:
-		c.mustWrite(name, must)
+		c.t.Errorf("%s: the two trees write it alike: the class is about a difference, and there is none", name)
+	case ours != must:
+		c.t.Errorf("%s: this tree does not write what it must: %s", name, parting(must, ours))
 	}
 }
 
-// withPlaces is the text of a file as the other tree wrote it, with each place written as this tree must write
-// it. It says what is wrong where a place is none: the run names no place, the two trees write the same there,
-// the text does not hold the other tree's words exactly once, or two places lie in one another.
-func withPlaces(text string, places []place) (changed, wrong string) {
-	if len(places) == 0 {
-		return "", "the run names no place in which the two trees write the file apart"
+// placesOfTheClass fails the test for each place that is not of the difference of the run's class, as the row
+// of the class says what one looks like.
+func (c comparison) placesOfTheClass(name string, places []place) {
+	if c.of.shows == nil {
+		c.t.Errorf("the class %s does not say what a place of it looks like", c.of.name)
+		return
 	}
 	for _, p := range places {
-		switch count := strings.Count(text, p.other); {
+		if !c.of.shows(c, p) {
+			c.t.Errorf("%s: the place %q, written %q by this tree, does not show the difference of the class %s",
+				name, p.other, p.this, c.of.name)
+		}
+	}
+}
+
+// withPlaces is the text of a file or a stream as the other tree wrote it, with each place written as this tree
+// must write it. It says what is wrong where a place is none: the run names no place, the two trees write the
+// same there, the text does not hold the other tree's words exactly once, or two places lie in one another.
+func withPlaces(text string, places []place) (changed, wrong string) {
+	if len(places) == 0 {
+		return "", "the run names no place in which the two trees write it apart"
+	}
+	at := func(p place) int { return strings.Index(text, string(p.other)) }
+	for _, p := range places {
+		switch count := strings.Count(text, string(p.other)); {
 		case p.other == p.this:
 			return "", fmt.Sprintf("the run says that the two trees write %q alike, which is no place apart", p.other)
 		case count != 1:
 			return "", fmt.Sprintf("the other tree wrote %q %d times, want once", p.other, count)
 		}
 	}
-	inOrder := slices.SortedFunc(slices.Values(places), func(a, b place) int {
-		return strings.Index(text, a.other) - strings.Index(text, b.other)
-	})
 	var out strings.Builder
 	end := 0
-	for _, p := range inOrder {
-		at := strings.Index(text, p.other)
-		if at < end {
+	for _, p := range slices.SortedFunc(slices.Values(places), func(a, b place) int { return at(a) - at(b) }) {
+		if at(p) < end {
 			return "", fmt.Sprintf("the place %q lies in the place before it", p.other)
 		}
-		out.WriteString(text[end:at] + p.this)
-		end = at + len(p.other)
+		out.WriteString(text[end:at(p)] + string(p.this))
+		end = at(p) + len(p.other)
 	}
 	return out.String() + text[end:], ""
+}
+
+// What a place of an accepted difference looks like, class by class.
+
+// replaced is the replacement character, U+FFFD, which stands for bytes that are no UTF-8.
+const replaced = "\xEF\xBF\xBD"
+
+// theOtherTreeWrites is what a place looks like in a class whose difference shows in what the other tree writes
+// there.
+func theOtherTreeWrites(holds func(text string) bool) func(c comparison, p place) bool {
+	return func(_ comparison, p place) bool { return holds(string(p.other)) }
+}
+
+// widerSpaceShows is what a place of WiderSpace looks like: a tree writes white space outside ASCII there. In a
+// run whose list has a line that ends with such a character, a place need not hold one: this tree leaves that
+// line out, and counts a path less.
+func widerSpaceShows(c comparison, p place) bool {
+	return strings.ContainsFunc(string(p.other+p.this), isWiderSpace) || inTheList(aLineEndsWithWiderSpace)(c)
 }
 
 // The predicates of the accepted differences, by where they read the bytes of the input.
@@ -993,6 +1070,17 @@ func hasWiderSpaceAtAnEdge(list []byte) bool {
 		first, _ := utf8.DecodeRuneInString(line)
 		last, _ := utf8.DecodeLastRuneInString(line)
 		if isWiderSpace(first) || isWiderSpace(last) {
+			return true
+		}
+	}
+	return false
+}
+
+// aLineEndsWithWiderSpace reports whether a line of a list ends with white space outside ASCII, once the ASCII
+// white space is off its end. A byte order mark at the very start of the list is no part of its first line.
+func aLineEndsWithWiderSpace(list []byte) bool {
+	for line := range strings.SplitSeq(strings.TrimPrefix(string(list), mark), "\n") {
+		if last, _ := utf8.DecodeLastRuneInString(strings.TrimRight(line, asciiSpace)); isWiderSpace(last) {
 			return true
 		}
 	}
@@ -1192,6 +1280,87 @@ func TestOracleStartsNothingWhereAnotherCheckoutCouldBeFound(t *testing.T) {
 	}
 }
 
+// The guard stands before every run: a run whose folder it refuses is carried out by no tree.
+func TestOracleCarriesOutNoRunThatItsGuardRefuses(t *testing.T) {
+	goMod := func(text string) func(checkout) { return func(c checkout) { c.write("go.mod", text) } }
+	for name, c := range map[string]struct {
+		r       oracleRun
+		refused string // words of the refusal
+	}{
+		"a run in the folder above its checkout":       {oracleRun{below: ".."}, "nor below it"},
+		"a run of a checkout that has lost its go.mod": {oracleRun{lay: goMod(anotherModule)}, "names this module: false"},
+		"a run of no checkout that is laid one": {
+			oracleRun{noCheckout: true, lay: goMod(moduleFile)}, "names this module: true"},
+	} {
+		started := false
+		heard := listenTo(t, func(tb testing.TB) {
+			c.r.madeBy(tb, func(checkout) (int, string, string) {
+				started = true
+				return 0, "", ""
+			})
+		})
+		if started || !strings.Contains(heard, c.refused) {
+			t.Errorf("%s: carried out: %v; the guard said %q, want the words %q", name, started, heard, c.refused)
+		}
+	}
+	started := false
+	heard := listenTo(t, func(tb testing.TB) {
+		oracleRun{below: "tools/gen"}.madeBy(tb, func(checkout) (int, string, string) {
+			started = true
+			return 0, "", ""
+		})
+	})
+	if !started || heard != "" {
+		t.Errorf("a run in a folder of its checkout: carried out: %v; the guard said %q, want nothing", started, heard)
+	}
+}
+
+// A place of the oracle is a literal: no test file of the package converts a text to the type that the two
+// texts of a place have, so what a place holds stands written in a file, where a reader sees it.
+func TestAPlaceOfTheOracleIsALiteral(t *testing.T) {
+	const converting = "package main\n\n" +
+		"var p = place{other: \"a\", this: literal(made())}\n" +
+		"var q = place{\"a\", (literal)(\"b\")}\n"
+	if found := conversionsToLiteral(t, "converting.go", converting); len(found) != 2 {
+		t.Fatalf("in a file with two conversions to literal the test finds %q", found)
+	}
+	files, err := filepath.Glob("*_test.go")
+	if err != nil || !slices.Contains(files, "oracle_test.go") {
+		t.Fatalf("the test files of the package are %q, and the oracle is not among them: %v", files, err)
+	}
+	for _, name := range files {
+		source, err := os.ReadFile(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, at := range conversionsToLiteral(t, name, string(source)) {
+			t.Errorf("%s converts a text to literal: a place holds what stands written in the file", at)
+		}
+	}
+}
+
+// conversionsToLiteral is where the source of a Go file converts a value to the type literal, each as the file,
+// the line and the column.
+func conversionsToLiteral(t testing.TB, name, source string) []string {
+	t.Helper()
+	positions := token.NewFileSet()
+	file, err := parser.ParseFile(positions, name, source, parser.SkipObjectResolution)
+	if err != nil {
+		t.Fatal(err)
+		return nil
+	}
+	var found []string
+	ast.Inspect(file, func(node ast.Node) bool {
+		if call, isCall := node.(*ast.CallExpr); isCall {
+			if converted, isName := ast.Unparen(call.Fun).(*ast.Ident); isName && converted.Name == "literal" {
+				found = append(found, positions.Position(call.Pos()).String())
+			}
+		}
+		return true
+	})
+	return found
+}
+
 // The rules of a class, each on a run that breaks it: the oracle must report the run, in the words that stand
 // beside it. The runs go through compare as every run does, the other tree's generator a program; the test
 // builds it, and is skipped with -short.
@@ -1230,7 +1399,37 @@ func TestOracleReportsARunThatIsNotOfTheClassItNames(t *testing.T) {
 			}, apart: inTheListWritten("\nunits/a.mdx\n", "\nunits/A.mdx\n")},
 			[]string{"names the class WiderSpace, whose predicate does not hold of it"}},
 		{oracleRun{name: "a difference without a file", class: "WiderSpace", lay: noList, line: noBreak},
-			[]string{"names no file that the two trees write apart", gamePathsPath + ": differs at offset"}},
+			[]string{"names nothing that the two trees write apart", gamePathsPath + ": differs at offset"}},
+		{oracleRun{name: "a place of another difference than the class's", class: "WiderSpace", lay: noList,
+			line:  gamePathsOf("\xC2\xA0Sound/Hit.wav\nUnits/\xC4\xB0.MDX\n", "2.0.0"),
+			apart: inTheListWritten("\nunits/i\xCC\x87.mdx\n", "\nunits/i.mdx\n")},
+			[]string{"does not show the difference of the class WiderSpace"}},
+		{oracleRun{name: "a place without the bytes of its class", class: "DottedI", lay: noList,
+			line:  gamePathsOf("Units/\xC4\xB0.MDX\n", "2.0.0"),
+			apart: inTheListWritten("\xCC\x87.mdx\n", ".mdx\n")},
+			[]string{"does not show the difference of the class DottedI"}},
+		{oracleRun{name: "a difference in what is printed, and the list alone named", class: "WiderSpace",
+			lay: noList, line: gamePathsOf(aNameThenWiderSpace, "2.0.0"), apart: inTheListWritten("units/b.mdx\n", "")},
+			[]string{standardOutput + ": differs at offset"}},
+		{oracleRun{name: "a stream named, and a place that it does not hold", class: "WiderSpace", lay: noList,
+			line: gamePathsOf(aNameThenWiderSpace, "2.0.0"),
+			apart: map[string][]place{
+				gamePathsPath:  {{"units/b.mdx\n", ""}},
+				standardOutput: {{": 3 paths.", ": 1 paths."}},
+			}},
+			[]string{standardOutput + `: the other tree wrote ": 3 paths." 0 times, want once`}},
+		{oracleRun{name: "a stream named that the trees write alike", class: "WiderSpace", lay: noList,
+			line: gamePathsOf(aNameThenWiderSpace, "2.0.0"),
+			apart: map[string][]place{
+				gamePathsPath:  {{"units/b.mdx\n", ""}},
+				standardOutput: {{": 2 paths.", ": 1 paths."}},
+				standardError:  {{"error: ", "error: no "}},
+			}},
+			[]string{standardError + `: the other tree wrote "error: " 0 times, want once`}},
+		{oracleRun{name: "a difference in how the trees end", class: "WiderSpace", lay: noList,
+			line: gamePathsOf("Units/B.mdx\xC2\xA0\n", "2.0.0"), apart: inTheListWritten("units/b.mdx\n", "")},
+			[]string{"the exit code: values differ", standardError + ": length differs",
+				standardOutput + ": length differs", "what the checkout holds: values differ"}},
 		{oracleRun{name: "a difference, and no class named", lay: noList, line: noBreak},
 			[]string{gamePathsPath + ": differs at offset"}},
 		{oracleRun{name: "a class about a difference, and the trees write alike", class: "NoUTF8", lay: noList,
@@ -1248,7 +1447,7 @@ func TestOracleReportsARunThatIsNotOfTheClassItNames(t *testing.T) {
 			[]string{gamePathsPath + ": this tree does not write what it must: the two part at offset 33"}},
 		{oracleRun{name: "another file named than the one written apart", class: "WiderSpace", lay: noList,
 			line: noBreak, apart: map[string][]place{"go.mod": {{"module ", "modul "}}}},
-			[]string{listDiffers, "go.mod: the two trees write the file alike"}},
+			[]string{listDiffers, "go.mod: the two trees write it alike"}},
 		{oracleRun{name: "a refusal without its words", class: "CountRefused", line: words("", "more"),
 			lay: oneBuff("fnam", "name")},
 			[]string{"holds nothing that this tree must say"}},
@@ -1635,6 +1834,12 @@ func gamePathsRuns() []oracleRun {
 		{name: "a byte order mark at the start of the second line of the list", lay: noList, class: "WiderSpace",
 			line:  gamePathsOf("Units/A.mdx\n"+mark+"Units/B.mdx\n", "2.0.0"),
 			apart: inTheListWritten("\nunits/b.mdx\n", "\n"+mark+"units/b.mdx\n")},
+		{name: "a no-break space after a name of the list", lay: noList, class: "WiderSpace",
+			line: gamePathsOf(aNameThenWiderSpace, "2.0.0"),
+			apart: map[string][]place{
+				gamePathsPath:  {{"units/b.mdx\n", ""}},
+				standardOutput: {{": 2 paths.", ": 1 paths."}},
+			}},
 		{name: "a capital I with a dot above in a name of the list", lay: noList, class: "DottedI",
 			line:  gamePathsOf("Units/\xC4\xB0.MDX\n", "2.0.0"),
 			apart: inTheListWritten("\nunits/i\xCC\x87.mdx\n", "\nunits/i.mdx\n")},
@@ -1651,9 +1856,13 @@ func gamePathsRuns() []oracleRun {
 	return append(runs, noCheckoutRuns("game-paths alone", words("game-paths"))...)
 }
 
+// aNameThenWiderSpace is a list whose second line ends with a no-break space: to the other tree a path with
+// white space after it, and to this tree a file of a type that is not kept.
+const aNameThenWiderSpace = "Units/A.mdx\nUnits/B.mdx\xC2\xA0\n"
+
 // inTheListWritten is what a run of an accepted difference in a list carries: the one place of
 // data/game-paths.txt that the two trees write apart, as the other tree writes it and as this tree must.
-func inTheListWritten(other, this string) map[string][]place {
+func inTheListWritten(other, this literal) map[string][]place {
 	return map[string][]place{gamePathsPath: {{other, this}}}
 }
 

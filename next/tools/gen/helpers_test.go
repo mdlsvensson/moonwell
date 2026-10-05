@@ -110,11 +110,12 @@ func (c checkout) run(args ...string) (printed string, files map[string][]byte, 
 
 // runBelow runs one command line of the generator in a folder of the checkout, which it makes: below is its path
 // from the checkout with "/", and "" is the checkout itself. It returns what the run printed and the error the run
-// ended with. It calls run for no folder of the real checkout.
+// ended with. It is the one place of the tests that calls run. It asks first whether the folder is of the real
+// checkout, and makes it after: so it calls run for no folder of the real checkout, and makes none there.
 func (c checkout) runBelow(below string, args ...string) (printed string, err error) {
 	c.t.Helper()
+	notInTheRealCheckout(c.t, c.path(below))
 	dir := c.folder(below)
-	notInTheRealCheckout(c.t, dir)
 	var out bytes.Buffer
 	err = run(dir, args, &out)
 	return out.String(), err
