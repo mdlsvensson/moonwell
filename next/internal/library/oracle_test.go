@@ -99,6 +99,11 @@ import (
 //     TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten,
 //     TestDownloadedFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten, and the three
 //     tests of local files).
+//   - A sync of a local library whose own file is there and cannot be read; among the scenarios it is a folder
+//     under the file's name. The other tree takes the library for one without the file, and copies it from its
+//     root without the files it ships for the map; this tree refuses the library by its file. Decided and
+//     compared as the class before it (TestALocalLibrarysFileThatCannotBeReadIsRefused,
+//     TestAFolderInThePlaceOfALocalLibrarysFileIsRefused).
 //   - A sync of a project with a link at a folder that Sync writes or removes: .moonwell, one of the two
 //     folders, a library's folder, and, for a local library, a folder below its folder or its stamp. The other
 //     tree writes and removes through the link; this tree refuses the link first. Decided and compared as the
@@ -1501,7 +1506,7 @@ func syncScenarios(t *testing.T, home string) (carried, seeded []syncScenario) {
 			{name: "a file that is refused", libraries: mine("../lib", ""), before: with("lib/moonwell-library.json", `{"dir":7}`)},
 			{name: "a folder of files for the map that is empty", libraries: mine("../lib", ""),
 				before: all(with("lib/moonwell-library.json", `{"assets":"none"}`), emptyFolders("lib/none"))},
-			{name: "a folder in the file's place", libraries: mine("../lib", ""),
+			{name: "a folder in the file's place", libraries: mine("../lib", ""), refusedAnew: "Reading moonwell-library.json of library mine failed: ",
 				before: all(without("lib/moonwell-library.json"), emptyFolders("lib/moonwell-library.json"))},
 		}},
 		{"a local library's files for the map inside its module folder", []syncStep{
@@ -1677,7 +1682,8 @@ func TestOracleOnSyncingAsTheOtherTreesTestsDo(t *testing.T) {
 	for _, scenario := range carried {
 		compared.syncs(t, home, scenario)
 	}
-	compared.check(t, tally{refused: 43, results: 37})
+	// In part: the local library with a folder in the place of its own file.
+	compared.check(t, tally{refused: 43, results: 36, inPart: 1})
 }
 
 func TestOracleOnSyncingSeededProjects(t *testing.T) {

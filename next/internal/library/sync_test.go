@@ -410,6 +410,55 @@ func TestALocalLibraryThatCannotBeReadNamesItsSource(t *testing.T) {
 	}
 }
 
+// unreadFile fails the test unless the sync of the local library mine, at lib below root, is refused as one
+// whose own file cannot be read, with nothing copied.
+func unreadFile(t *testing.T, root, what string) {
+	t.Helper()
+	file := filepath.Join(root, "lib", File)
+	e := refusal(t, root, block("mine", fromFolder("lib", "")), nil, what)
+	if !strings.HasPrefix(e.Msg, "Reading moonwell-library.json of library mine failed: ") || e.File != file || e.Cause == nil ||
+		!strings.Contains(e.Hint, "a file that can be read") {
+		t.Errorf("%s: %+v", what, e)
+	}
+	if there(root, ".moonwell/libraries/mine") || there(root, ".moonwell/library-assets/mine") {
+		t.Errorf("%s: the library was copied, although its file says where its modules and its files for the map are", what)
+	}
+}
+
+func TestALocalLibrarysFileThatCannotBeReadIsRefused(t *testing.T) {
+	// Taken for a library without the file, this one would be copied from its root, without its files for the
+	// map.
+	root := t.TempDir()
+	put(t, root, "lib/moonwell-library.json", `{"dir":"src","assets":"assets"}`, "lib/src/a.lua", "return 1", "lib/assets/x.blp", "x")
+	testkit.MakeUnreadable(t, filepath.Join(root, "lib", File))
+	unreadFile(t, root, "a file that cannot be read")
+}
+
+func TestAFolderInThePlaceOfALocalLibrarysFileIsRefused(t *testing.T) {
+	root := t.TempDir()
+	put(t, root, "lib/a.lua", "return 1", "lib/moonwell-library.json/inside.txt", "a file of the folder")
+	unreadFile(t, root, "a folder in the file's place")
+	// The folder gone, the library is one without the file.
+	discard(t, root, "lib/moonwell-library.json")
+	sync(t, root, block("mine", fromFolder("lib", "")), nil)
+	if got := filesIn(t, root, ".moonwell/libraries/mine"); !slices.Equal(got, []string{".moonwell-library.json", "a.lua"}) {
+		t.Errorf("without the folder, the modules are %q", got)
+	}
+}
+
+func TestALocalLibraryWhoseFolderIsAFileHasNoFileOfItsOwnAndNoModuleFolder(t *testing.T) {
+	// A file where the library's folder is said to be holds no moonwell-library.json, whatever a system says of
+	// a read below a file: the refusal is that of the module folder.
+	root := t.TempDir()
+	put(t, root, "lib", "a file, not a folder")
+	for _, dir := range []string{"", "src"} {
+		e := refusal(t, root, block("mine", fromFolder("lib", dir)), nil, "a file for the library's folder")
+		if e.Msg != "Library mine: "+filepath.Join(root, "lib", dir)+" is not a folder." || e.File != manifestFile {
+			t.Errorf("dir %q: %+v", dir, e)
+		}
+	}
+}
+
 func TestALocalLibraryThatHoldsTheProjectsLibrariesFolderIsRefused(t *testing.T) {
 	root := t.TempDir()
 	put(t, root, "a.lua", "return 1")

@@ -3,6 +3,7 @@ package library
 import (
 	"bytes"
 	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"slices"
@@ -108,11 +109,19 @@ func sourcesOf(root string, at folders, path, dir, manifestFile string) (sources
 	return from, nil
 }
 
-// describedAt is what a local library says of itself in libraryFile. A file that cannot be read counts as none:
-// a library without the file is the usual one.
+// describedAt is what a local library says of itself in libraryFile. A library without the file is the usual
+// one, and a library whose folder is no folder has none either: sourcesOf refuses that one by its module folder.
+// A file that is there and cannot be read is refused: taken for none, the library would be copied without the
+// dir and the assets its file names, and without a word.
 func describedAt(key, libraryFile string) (Described, error) {
 	content, err := os.ReadFile(libraryFile)
-	return ParseFile(key, content, err == nil, libraryFile)
+	switch {
+	case err == nil:
+		return ParseFile(key, content, true, libraryFile)
+	case errors.Is(err, fs.ErrNotExist), !fsx.IsDir(filepath.Dir(libraryFile)):
+		return ParseFile(key, nil, false, libraryFile)
+	}
+	return Described{}, errUnreadableLibraryFile(key, libraryFile, err)
 }
 
 // readLocal reads the files that are kept of a local library. The folder of the files for the map holds no
@@ -337,6 +346,17 @@ func errNoAssetsFolder(key, folder, libraryFile string) error {
 		Msg:  "Library " + key + ": " + folder + " is not a folder.",
 		File: libraryFile,
 		Hint: "Create the folder, or fix assets in the library's " + File + ".",
+	}
+}
+
+// errUnreadableLibraryFile is the failure to read a local library's own file, which is there: one that another
+// program holds, that may not be read, or that is a folder.
+func errUnreadableLibraryFile(key, libraryFile string, cause error) error {
+	return &diag.Error{
+		Msg:   "Reading " + File + " of library " + key + " failed: " + reasonOf(cause),
+		File:  libraryFile,
+		Hint:  "Close programs that have the file open, and check that it is a file that can be read.",
+		Cause: cause,
 	}
 }
 
