@@ -3,7 +3,6 @@ package editor
 import (
 	"errors"
 	"maps"
-	"os"
 	"path/filepath"
 	"reflect"
 	"slices"
@@ -169,9 +168,7 @@ func TestALinkOnTheWayToTheDeclarationsIsRefused(t *testing.T) {
 func TestALinkAtAFileOfDeclarationsIsRefused(t *testing.T) {
 	root := lay(t, "elsewhere/mine.lua", "mine", ".moonwell/types/natives.d.lua", "")
 	at := filepath.Join(root, ".moonwell", "types", "map.d.lua")
-	if err := os.Symlink(filepath.Join(root, "elsewhere", "mine.lua"), at); err != nil {
-		t.Skipf("cannot create a symlink to a file here: %v", err)
-	}
+	linkToFile(t, filepath.Join(root, "elsewhere", "mine.lua"), at)
 	written, err := RefreshTypes(root, types(nil))
 	failure := asError(t, err, "a link at map.d.lua")
 	if failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") || written != nil {

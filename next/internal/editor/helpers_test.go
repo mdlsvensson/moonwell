@@ -2,8 +2,11 @@ package editor
 
 import (
 	"errors"
+	"maps"
 	"os"
 	"path/filepath"
+	"runtime"
+	"slices"
 	"strings"
 	"testing"
 
@@ -71,6 +74,34 @@ func linkAt(t testing.TB, root, link string) (at, target string) {
 	}
 	testkit.LinkDir(t, target, at)
 	return at, target
+}
+
+// linkToFile makes at a symlink to the file target, with the folders at is in. Windows lets only some accounts
+// make one, and the test is skipped there when this account may not; on any other system a link that cannot be
+// made fails the test.
+func linkToFile(t testing.TB, target, at string) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	err := os.Symlink(target, at)
+	switch {
+	case err == nil:
+	case runtime.GOOS == "windows":
+		t.Skipf("this account may not make a symlink to a file on Windows: %v", err)
+	default:
+		t.Fatalf("a symlink to a file: %v", err)
+	}
+}
+
+// entriesIn is the names of all there is below a folder, folders too, as the system spells them, from the folder
+// with "/" and sorted; none for a folder that is not there.
+func entriesIn(t testing.TB, dir string) []string {
+	t.Helper()
+	if _, err := os.Stat(dir); err != nil {
+		return nil
+	}
+	return slices.Sorted(maps.Keys(testkit.Snapshot(t, dir)))
 }
 
 // filesIn is the files below a folder with their bytes, by their paths from it with "/"; none for a folder that

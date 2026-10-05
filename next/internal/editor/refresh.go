@@ -4,9 +4,10 @@
 //
 // It takes what objects and script found, and a project folder. RefreshTypes takes the resolved objects, what
 // the map's script defines, the name of that script and the game's API (script.LoadNatives), and writes the
-// declarations; RefreshLibraryView takes the modules and a way to each module's Lua, and writes the libraries'
-// modules. Both write under .moonwell/ and return the paths they wrote, from the project folder. The scaffold
-// takes the template's files, and writes the project's own editor files.
+// declarations; RefreshLibraryView takes the modules and a way to each module's Lua, clears .moonwell/lua/ of
+// all that is no module's, and writes the libraries' modules there. Both write under .moonwell/ and return the
+// paths they wrote, from the project folder. The scaffold takes the template's files, and writes the project's
+// own editor files.
 //
 // It knows nothing of maps or of builds: it reads no map, evaluates no manifest and compiles nothing. What a
 // map's script defines and what a module compiles to are handed to it.

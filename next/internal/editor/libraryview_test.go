@@ -154,28 +154,160 @@ func TestRefreshLibraryViewWritesAModulesBytesAsTheyAre(t *testing.T) {
 	}
 }
 
-func TestRefreshLibraryViewRemovesEveryOtherFileOfTheFolderAndNothingOutsideIt(t *testing.T) {
+func TestRefreshLibraryViewRemovesEveryOtherFileAndEveryFolderThatHoldsNothingAndNothingOutsideTheFolder(t *testing.T) {
 	root := lay(t,
 		".moonwell/lua/gone.lua", "return 0", ".moonwell/lua/example/gone/deep.lua", "return 0", ".moonwell/lua/notes.txt", "",
-		".moonwell/lua/example/greet.lua", "return 1", ".moonwell/lua/EXAMPLE.lua", "",
+		".moonwell/lua/example/greet.lua", "return 1", ".moonwell/lua/EXAMPLE.lua", "", ".moonwell/lua/far/down/below/gone.lua", "",
 		".moonwell/libraries/ex/example/greet.lua", "return 1", ".moonwell/types/natives.d.lua", "---@meta\n",
 		".moonwell/lua.txt", "beside", ".moonwell/luau/kept.lua", "beside", "lua/tools.lua", "return {}", "src/main.yue", "",
 	)
+	// Folders that hold nothing before the run: one below another below the view, one beside a view's file, and
+	// two outside the view.
+	for _, hollow := range []string{".moonwell/lua/hollow/er/est", ".moonwell/lua/example/hollow", ".moonwell/luau/hollow", "lua/hollow"} {
+		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(hollow)), 0o777); err != nil {
+			t.Fatal(err)
+		}
+	}
 	before := testkit.Snapshot(t, root)
 	written, err := RefreshLibraryView(root, librarySources()[:3], nil)
 	if err != nil || len(written) != 0 {
 		t.Fatalf("RefreshLibraryView = %q, %v", written, err)
 	}
-	after := testkit.Snapshot(t, root)
-	for _, removed := range []string{".moonwell/lua/gone.lua", ".moonwell/lua/example/gone/deep.lua", ".moonwell/lua/notes.txt", ".moonwell/lua/EXAMPLE.lua"} {
-		if _, there := after[removed]; there {
-			t.Errorf("%s is no view of a module and is still there", removed)
-		}
-		delete(before, removed)
+	// Of the view there is the module's file, in its folder; all else of the project is as it was. A folder
+	// below a folder that holds nothing more goes with it, which removing the deepest first allows.
+	maps.DeleteFunc(before, func(path string, _ []byte) bool { return strings.HasPrefix(path, ".moonwell/lua/") })
+	before[".moonwell/lua/example"], before[".moonwell/lua/example/greet.lua"] = nil, []byte("return 1")
+	if after := testkit.Snapshot(t, root); !reflect.DeepEqual(before, after) {
+		t.Errorf("the project holds %q, want %q", slices.Sorted(maps.Keys(after)), slices.Sorted(maps.Keys(before)))
 	}
-	// Files are removed, and a folder that holds nothing more stays.
-	if !reflect.DeepEqual(before, after) {
-		t.Errorf("more changed than the files that are no views:\nbefore %q\nafter  %q", slices.Sorted(maps.Keys(before)), slices.Sorted(maps.Keys(after)))
+	// Without a module the view holds nothing, and its own folder stays.
+	written, err = RefreshLibraryView(root, nil, nil)
+	if got := entriesIn(t, filepath.Join(root, ".moonwell")); err != nil || len(written) != 0 ||
+		!slices.Equal(got, []string{"libraries", "libraries/ex", "libraries/ex/example", "libraries/ex/example/greet.lua",
+			"lua", "lua.txt", "luau", "luau/hollow", "luau/kept.lua", "types", "types/natives.d.lua"}) {
+		t.Errorf("RefreshLibraryView = %q, %v; .moonwell holds %q", written, err, got)
+	}
+}
+
+// renamed is one Lua module of a library under one name, for a view that is to move with the name.
+func renamed(name string) []script.Source {
+	path := ".moonwell/libraries/ex/" + strings.ReplaceAll(name, ".", "/") + ".lua"
+	return []script.Source{{Name: name, Path: path, Kind: script.Lua, Text: "return 2", Library: "ex"}}
+}
+
+func TestAViewIsUnderTheSpellingOfItsModulesNameAfterOneRun(t *testing.T) {
+	// A file system that ignores letter case finds the view under the name it had. The view is then no view of
+	// the module, whose name is spelt another way: it is removed with its folder, and written under the name.
+	cases := []struct {
+		what, before, after string
+		held                []string // all that the view holds after the run, as the system spells it
+	}{
+		{"a folder in another letter case", "Kit.init", "kit.init", []string{"kit", "kit/init.lua"}},
+		{"a file in another letter case", "kit.Greet", "kit.greet", []string{"kit", "kit/greet.lua"}},
+		{"a folder and a file below it", "kit.Deep.Mod", "kit.deep.mod", []string{"kit", "kit/deep", "kit/deep/mod.lua"}},
+		{"another name", "old.init", "new.init", []string{"new", "new/init.lua"}},
+	}
+	for _, c := range cases {
+		for mode, lua := range map[string]func(script.Source) (string, bool){"without a compile": nil, "after a compile": compiled(nil)} {
+			root, what := t.TempDir(), c.what+", "+mode
+			view := filepath.Join(root, ".moonwell", "lua")
+			if _, err := RefreshLibraryView(root, renamed(c.before), lua); err != nil {
+				t.Fatal(err)
+			}
+			written, err := RefreshLibraryView(root, renamed(c.after), lua)
+			want := []string{".moonwell/lua/" + c.held[len(c.held)-1]}
+			if got := entriesIn(t, view); err != nil || !slices.Equal(written, want) || !slices.Equal(got, c.held) {
+				t.Errorf("%s: RefreshLibraryView = %q, %v; the view holds %q, want %q", what, written, err, got, c.held)
+			}
+			written, err = RefreshLibraryView(root, renamed(c.after), lua)
+			if got := entriesIn(t, view); err != nil || len(written) != 0 || !slices.Equal(got, c.held) {
+				t.Errorf("%s, again: RefreshLibraryView = %q, %v; the view holds %q", what, written, err, got)
+			}
+		}
+	}
+}
+
+func TestAnUnchangedLibraryViewIsLeftAsItIs(t *testing.T) {
+	root := t.TempDir()
+	view := filepath.Join(root, ".moonwell", "lua")
+	loud := compiled(map[string]string{"example.loud": "return 3"})
+	if _, err := RefreshLibraryView(root, librarySources(), loud); err != nil {
+		t.Fatal(err)
+	}
+	before := testkit.Snapshot(t, view)
+	if len(before) != 5 {
+		t.Fatalf("the view holds %q", slices.Sorted(maps.Keys(before)))
+	}
+	for i, lua := range []func(script.Source) (string, bool){loud, nil, loud} {
+		written, err := RefreshLibraryView(root, librarySources(), lua)
+		if err != nil || written == nil || len(written) != 0 || !reflect.DeepEqual(before, testkit.Snapshot(t, view)) {
+			t.Errorf("run %d: RefreshLibraryView = %#v, %v; the view holds %q", i, written, err, viewIn(t, root))
+		}
+	}
+}
+
+func TestWithoutAWayToTheLuaAYueScriptModulesViewIsKeptByItsExactNameAlone(t *testing.T) {
+	root := lay(t, ".moonwell/lua/example/loud.lua", "return 3", ".moonwell/lua/Kit/Shout.lua", "return 4")
+	view := filepath.Join(root, ".moonwell", "lua")
+	sources := []script.Source{
+		{Name: "example.loud", Path: ".moonwell/libraries/ex/example/loud.yue", Kind: script.Yue, Library: "ex"},
+		{Name: "kit.shout", Path: ".moonwell/libraries/ex/kit/shout.yue", Kind: script.Yue, Library: "ex"},
+	}
+	// The file under the module's own name stays. The one under another spelling is no view of the module, and
+	// there is no Lua to write one from.
+	written, err := RefreshLibraryView(root, sources, nil)
+	if got := entriesIn(t, view); err != nil || len(written) != 0 || !slices.Equal(got, []string{"example", "example/loud.lua"}) ||
+		read(t, root, ".moonwell/lua/example/loud.lua") != "return 3" {
+		t.Errorf("RefreshLibraryView = %q, %v; the view holds %q", written, err, got)
+	}
+	// A compile brings the view back, once.
+	lua := compiled(map[string]string{"example.loud": "return 3", "kit.shout": "return 4"})
+	written, err = RefreshLibraryView(root, sources, lua)
+	held := []string{"example", "example/loud.lua", "kit", "kit/shout.lua"}
+	if got := entriesIn(t, view); err != nil || !slices.Equal(written, []string{".moonwell/lua/kit/shout.lua"}) || !slices.Equal(got, held) {
+		t.Errorf("after a compile, RefreshLibraryView = %q, %v; the view holds %q", written, err, got)
+	}
+	for _, lua := range []func(script.Source) (string, bool){lua, nil} {
+		written, err = RefreshLibraryView(root, sources, lua)
+		if got := entriesIn(t, view); err != nil || len(written) != 0 || !slices.Equal(got, held) {
+			t.Errorf("unchanged, but RefreshLibraryView = %q, %v; the view holds %q", written, err, got)
+		}
+	}
+}
+
+func TestAStrayFileOrFolderInTheWayOfAViewIsRemovedInOneRun(t *testing.T) {
+	// A file where a module's folder goes, a folder with a file where a module's file goes, and a folder that
+	// holds nothing there.
+	root := lay(t, ".moonwell/lua/kit", "a file", ".moonwell/lua/tool.lua/inside.txt", "a file of a folder")
+	view := filepath.Join(root, ".moonwell", "lua")
+	if err := os.MkdirAll(filepath.Join(view, "bare.lua", "deeper"), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	sources := slices.Concat(renamed("kit.init"), renamed("tool"), renamed("bare"))
+	written, err := RefreshLibraryView(root, sources, nil)
+	want := []string{".moonwell/lua/kit/init.lua", ".moonwell/lua/tool.lua", ".moonwell/lua/bare.lua"}
+	held := map[string]string{"kit/init.lua": "return 2", "tool.lua": "return 2", "bare.lua": "return 2"}
+	if got := viewIn(t, root); err != nil || !slices.Equal(written, want) || !maps.Equal(got, held) {
+		t.Errorf("RefreshLibraryView = %q, %v; the view holds %q", written, err, got)
+	}
+	if written, err := RefreshLibraryView(root, sources, nil); err != nil || len(written) != 0 || !maps.Equal(viewIn(t, root), held) {
+		t.Errorf("again: RefreshLibraryView = %q, %v; the view holds %q", written, err, viewIn(t, root))
+	}
+}
+
+func TestAModuleThatBecomesAFolderOfModulesAndAModuleAgain(t *testing.T) {
+	root := t.TempDir()
+	view := filepath.Join(root, ".moonwell", "lua")
+	steps := []struct {
+		name string
+		held []string
+	}{{"a", []string{"a.lua"}}, {"a.b", []string{"a", "a/b.lua"}}, {"a", []string{"a.lua"}}, {"a.b.c", []string{"a", "a/b", "a/b/c.lua"}}, {"a.b", []string{"a", "a/b.lua"}}}
+	for i, step := range steps {
+		written, err := RefreshLibraryView(root, renamed(step.name), nil)
+		want := []string{".moonwell/lua/" + step.held[len(step.held)-1]}
+		if got := entriesIn(t, view); err != nil || !slices.Equal(written, want) || !slices.Equal(got, step.held) {
+			t.Errorf("step %d, the module %s: RefreshLibraryView = %q, %v; the view holds %q", i, step.name, written, err, got)
+		}
 	}
 }
 
@@ -239,45 +371,86 @@ func TestALinkOnTheWayToTheLibraryViewIsRefused(t *testing.T) {
 	}
 }
 
-func TestBelowTheLibraryViewALinkIsWrittenThroughAndRemovedAsALink(t *testing.T) {
-	// The folder is Moonwell's own: what is below it is not looked at for links. A link there is a file of the
-	// folder that is no view, and is removed as the link it is: what it leads to is not listed.
+// isPlain reports whether there is a file or a folder of its own at path, and no link.
+func isPlain(t testing.TB, path string) bool {
+	t.Helper()
+	info, err := fsx.Lstat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return info != nil && !fsx.IsLink(info)
+}
+
+func TestALinkToAFolderBelowTheLibraryViewIsRemovedAsTheLinkBeforeAnythingIsWritten(t *testing.T) {
+	// Three links to folders: in the place of a module's folder, under the name of a module's file, and one that
+	// is in no view's way.
 	root := t.TempDir()
-	at, target := linkAt(t, root, ".moonwell/lua/example")
-	stale, kept := linkAt(t, root, ".moonwell/lua/stale")
-	write(t, target, "beside.lua", "return 0")
-	write(t, kept, "kept.lua", "return 0", "deep/kept.lua", "return 0")
-	written, err := RefreshLibraryView(root, librarySources()[:3], nil)
-	if err != nil || !slices.Equal(written, []string{".moonwell/lua/example/greet.lua"}) {
+	atFolder, behindFolder := linkAt(t, root, ".moonwell/lua/example")
+	atFile, behindFile := linkAt(t, root, ".moonwell/lua/kit/init.lua")
+	atOther, behindOther := linkAt(t, root, ".moonwell/lua/stale")
+	write(t, behindFolder, "beside.lua", "return 0", "greet.lua", "behind the link")
+	write(t, behindFile, "inside.lua", "return 0")
+	write(t, behindOther, "kept.lua", "return 0", "deep/kept.lua", "return 0")
+	behind := []map[string][]byte{testkit.Snapshot(t, behindFolder), testkit.Snapshot(t, behindFile), testkit.Snapshot(t, behindOther)}
+	sources := slices.Concat(librarySources()[:3], librarySources()[4:])
+	written, err := RefreshLibraryView(root, sources, nil)
+	if err != nil || !slices.Equal(written, []string{".moonwell/lua/example/greet.lua", ".moonwell/lua/kit/init.lua"}) {
 		t.Fatalf("RefreshLibraryView = %q, %v", written, err)
 	}
-	if got := filesIn(t, target); !maps.Equal(got, map[string]string{"beside.lua": "return 0", "greet.lua": "return 1"}) {
-		t.Errorf("behind the link at the place of a module's folder: %q", got)
-	}
-	if got := filesIn(t, kept); len(got) != 2 {
-		t.Errorf("behind the link that is no view: %q", got)
-	}
-	for _, link := range []string{at, stale} {
-		if info, err := fsx.Lstat(link); err != nil || info != nil {
-			t.Errorf("the link at %s is still there (%v)", link, err)
+	for i, target := range []string{behindFolder, behindFile, behindOther} {
+		if !reflect.DeepEqual(behind[i], testkit.Snapshot(t, target)) {
+			t.Errorf("what is behind link %d changed: %q", i, filesIn(t, target))
 		}
 	}
-	// The next refresh writes the view into a folder of the view's own.
-	written, err = RefreshLibraryView(root, librarySources()[:3], nil)
-	if got := viewIn(t, root); err != nil || len(written) != 1 || !maps.Equal(got, map[string]string{"example/greet.lua": "return 1"}) {
-		t.Errorf("after the link was removed, RefreshLibraryView = %q, %v; the view holds %q", written, err, got)
+	// The views are files of their own in a folder of the view's own, and each path that was written is there.
+	if !isPlain(t, atFolder) || !isPlain(t, atFile) || fsx.Exists(atOther) {
+		t.Errorf("of the links, there is still one: %v, %v, %v", !isPlain(t, atFolder), !isPlain(t, atFile), fsx.Exists(atOther))
+	}
+	held := map[string]string{"example/greet.lua": "return 1", "kit/init.lua": "return 2"}
+	if got := viewIn(t, root); !maps.Equal(got, held) || !isPlain(t, filepath.Join(root, filepath.FromSlash(written[0]))) {
+		t.Errorf("the view holds %q", got)
+	}
+	if written, err := RefreshLibraryView(root, sources, nil); err != nil || len(written) != 0 || !maps.Equal(viewIn(t, root), held) {
+		t.Errorf("again: RefreshLibraryView = %q, %v; the view holds %q", written, err, viewIn(t, root))
 	}
 }
 
-func TestAFileInThePlaceOfTheLibraryViewIsRemovedOrNamedWhereAViewIsWritten(t *testing.T) {
+// TestALinkToAFileAtAViewsPlaceIsRemovedAsTheLink is skipped on Windows where the account may not make a symlink
+// to a file.
+func TestALinkToAFileAtAViewsPlaceIsRemovedAsTheLink(t *testing.T) {
+	// Behind the link of a Lua module's view is a file with other text, behind that of another one the very text
+	// of the view, and the third link is in the place of a YueScript module's view, which nothing is written for.
+	root := lay(t, "elsewhere/mine.lua", "mine", "elsewhere/same.lua", "return 2", "elsewhere/loud.lua", "return 3")
+	view := filepath.Join(root, ".moonwell", "lua")
+	linkToFile(t, filepath.Join(root, "elsewhere", "mine.lua"), filepath.Join(view, "example", "greet.lua"))
+	linkToFile(t, filepath.Join(root, "elsewhere", "same.lua"), filepath.Join(view, "kit", "init.lua"))
+	linkToFile(t, filepath.Join(root, "elsewhere", "loud.lua"), filepath.Join(view, "example", "loud.lua"))
+	elsewhere := testkit.Snapshot(t, filepath.Join(root, "elsewhere"))
+	written, err := RefreshLibraryView(root, librarySources(), nil)
+	if err != nil || !slices.Equal(written, []string{".moonwell/lua/example/greet.lua", ".moonwell/lua/kit/init.lua"}) {
+		t.Fatalf("RefreshLibraryView = %q, %v", written, err)
+	}
+	if !reflect.DeepEqual(elsewhere, testkit.Snapshot(t, filepath.Join(root, "elsewhere"))) {
+		t.Errorf("what is behind the links changed: %q", filesIn(t, filepath.Join(root, "elsewhere")))
+	}
+	held := map[string]string{"example/greet.lua": "return 1", "kit/init.lua": "return 2"}
+	if got := viewIn(t, root); !maps.Equal(got, held) || !isPlain(t, filepath.Join(view, "example", "greet.lua")) || !isPlain(t, filepath.Join(view, "kit", "init.lua")) {
+		t.Errorf("the view holds %q, or a view is a link", got)
+	}
+	if written, err := RefreshLibraryView(root, librarySources(), nil); err != nil || len(written) != 0 || !maps.Equal(viewIn(t, root), held) {
+		t.Errorf("again: RefreshLibraryView = %q, %v; the view holds %q", written, err, viewIn(t, root))
+	}
+}
+
+func TestAFileInThePlaceOfTheLibraryViewIsRemovedAndTheViewsAreWritten(t *testing.T) {
 	root := lay(t, ".moonwell/lua", "a file, not a folder")
 	written, err := RefreshLibraryView(root, librarySources()[:3], nil)
-	failure := asError(t, err, "a file for .moonwell/lua")
-	if !strings.HasPrefix(failure.Msg, "Writing .moonwell/lua/example/greet.lua failed: ") ||
-		failure.File != ".moonwell/lua/example/greet.lua" || failure.Hint != folderHint || failure.Cause == nil || written != nil {
-		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	if got := viewIn(t, root); err != nil || !slices.Equal(written, []string{".moonwell/lua/example/greet.lua"}) ||
+		!maps.Equal(got, map[string]string{"example/greet.lua": "return 1"}) {
+		t.Errorf("RefreshLibraryView = %q, %v; the view holds %q", written, err, got)
 	}
-	// Without a view to write, the file is one that is no view.
+	// Without a view to write, the file is removed and no folder is made in its place.
+	root = lay(t, ".moonwell/lua", "a file, not a folder")
 	if written, err := RefreshLibraryView(root, nil, nil); err != nil || len(written) != 0 || fsx.Exists(filepath.Join(root, ".moonwell", "lua")) {
 		t.Errorf("RefreshLibraryView = %q, %v, and the file is there: %v", written, err, fsx.Exists(filepath.Join(root, ".moonwell", "lua")))
 	}
@@ -327,10 +500,12 @@ func TestAFileOfTheLibraryViewThatCannotBeRemovedIsReported(t *testing.T) {
 	gone := filepath.Join(root, ".moonwell", "lua", "old", "gone.lua")
 	if runtime.GOOS == "windows" {
 		// A file another program holds: the failure is the one every removal of a held file gives.
+		// That failure has no file of its own: it names the file in its message, by its place on disk.
 		testkit.MakeUnwritable(t, gone)
-		_, err := RefreshLibraryView(root, nil, nil)
-		if failure := asError(t, err, "a held file"); failure.Msg != gone+" is in use by another program." || failure.Hint == "" {
-			t.Errorf("RefreshLibraryView = %+v", failure)
+		written, err := RefreshLibraryView(root, nil, nil)
+		failure := asError(t, err, "a held file")
+		if !strings.Contains(failure.Msg, gone) || !strings.Contains(failure.Msg, "in use by another program") || failure.Hint == "" || written != nil {
+			t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
 		}
 		return
 	}
@@ -346,5 +521,35 @@ func TestAFileOfTheLibraryViewThatCannotBeRemovedIsReported(t *testing.T) {
 	if !strings.HasPrefix(failure.Msg, "Removing .moonwell/lua/old/gone.lua failed: ") || failure.File != ".moonwell/lua/old/gone.lua" ||
 		failure.Hint != folderHint || failure.Cause == nil || written != nil {
 		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	}
+}
+
+func TestAFolderOfTheLibraryViewThatCannotBeRemovedIsReported(t *testing.T) {
+	root := t.TempDir()
+	hollow := filepath.Join(root, ".moonwell", "lua", "held", "hollow")
+	if err := os.MkdirAll(hollow, 0o777); err != nil {
+		t.Fatal(err)
+	}
+	// What keeps a folder that holds nothing from being removed is the system's own: on Windows that the folder
+	// is read-only, and elsewhere that the folder it is in may not be written.
+	guarded := filepath.Dir(hollow)
+	if runtime.GOOS == "windows" {
+		guarded = hollow
+	} else if os.Geteuid() == 0 {
+		t.Skip("root may remove a folder from a folder without the permission, so the removal would not fail")
+	}
+	if err := os.Chmod(guarded, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.Chmod(guarded, 0o777) })
+	written, err := RefreshLibraryView(root, renamed("kit.init"), nil)
+	failure := asError(t, err, "a folder that cannot be removed")
+	if !strings.HasPrefix(failure.Msg, "Removing .moonwell/lua/held/hollow failed: ") || failure.File != ".moonwell/lua/held/hollow" ||
+		failure.Hint != folderHint || failure.Cause == nil || written != nil {
+		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	}
+	// The folder is cleared before a view is written: the failure leaves the module without one.
+	if got := viewIn(t, root); len(got) != 0 {
+		t.Errorf("a view was written before the folder was cleared: %q", got)
 	}
 }

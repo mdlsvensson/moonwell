@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 	"unicode/utf8"
 
@@ -61,12 +62,11 @@ import (
 //     loader of its compile, and this tree the sources and the Lua of the Program that script.Compile gives.
 //     Without one, each tree is handed the modules it finds. Of each step: that neither tree refuses, the paths
 //     that were written, and all that .moonwell/lua/ holds, the names of its folders too and each file byte for
-//     byte.
-//   - RefreshLibraryView of both trees on a project with links below .moonwell/lua/
-//     (TestOracleOnALinkBelowTheLibraryView): one in the place of a module's folder, and one that is no view.
-//     Both trees are handed the same module as values, twice. Of each step: the paths that were written, all
-//     that the view holds, and all that lies behind each link. Both write through the first link and remove
-//     both links as links. It is skipped where the machine cannot make a link.
+//     byte, but for the folders named below.
+//   - RefreshLibraryView of both trees on a project with a link below .moonwell/lua/ that is in no view's way
+//     (TestOracleOnALinkBelowTheLibraryView). Both trees are handed the same module as values, twice. Of each
+//     step: the paths that were written, all that the view holds, and all that lies behind the link, which
+//     both trees remove as the link. It is skipped where the machine cannot make a link.
 //
 // Compared in part, and counted:
 //
@@ -76,6 +76,19 @@ import (
 //     names of the files are compared whole. The view must be the bytes of the module, must be the other tree's
 //     once it is decoded the other tree's way, and must differ from it
 //     (TestRefreshLibraryViewWritesAModulesBytesAsTheyAre).
+//   - A folder of the other tree's view with no file below it, at any depth. The other tree removes files alone,
+//     and leaves the folder of a module that is gone; this tree removes every folder that holds no file. The
+//     class is decided on the other tree's result, and each such folder of each step is counted. The names of
+//     all else that the view holds, and every file's bytes, are compared whole, and this tree's view must hold
+//     no such folder
+//     (TestRefreshLibraryViewRemovesEveryOtherFileAndEveryFolderThatHoldsNothingAndNothingOutsideTheFolder).
+//   - A link below .moonwell/lua/ in the place of a module's folder (TestOracleOnALinkBelowTheLibraryView). The
+//     other tree writes the view behind the link, and then removes the link, so that the path it returns names
+//     no file; this tree removes the link first, and writes the view into a folder of the view's own. The class
+//     is decided on the other tree's result: behind its link there is the view, which the project did not lay
+//     there. The paths that were written are compared whole. The other tree's view must hold nothing; behind
+//     this tree's link there must be what the project laid there, and its view must hold the module's file with
+//     the module's text (TestALinkToAFolderBelowTheLibraryViewIsRemovedAsTheLinkBeforeAnythingIsWritten).
 //
 // Not among the inputs:
 //
@@ -94,7 +107,16 @@ import (
 //   - A view that cannot be written or removed: the other tree names the folder for every failure, and this
 //     tree the file (TestRefreshLibraryViewReportsAViewItCannotWrite,
 //     TestAFileOfTheLibraryViewThatCannotBeRemovedIsReported,
-//     TestAFileInThePlaceOfTheLibraryViewIsRemovedOrNamedWhereAViewIsWritten).
+//     TestAFolderOfTheLibraryViewThatCannotBeRemovedIsReported).
+//   - A view under another spelling of its module's name, on a file system that ignores letter case, where the
+//     other tree removes the view and does not write it; and a file or a folder in the way of a view, where the
+//     other tree fails. This tree clears the folder before it writes
+//     (TestAViewIsUnderTheSpellingOfItsModulesNameAfterOneRun,
+//     TestAStrayFileOrFolderInTheWayOfAViewIsRemovedInOneRun,
+//     TestAFileInThePlaceOfTheLibraryViewIsRemovedAndTheViewsAreWritten). What a file system holds for a name
+//     in another letter case is not the same on the systems of the checks, so no exact count could name it.
+//   - A link to a file at a view's own place, which the other tree writes through and keeps, and this tree
+//     removes as the link (TestALinkToAFileAtAViewsPlaceIsRemovedAsTheLink): not every account may make one.
 //   - A loader that fails, which the other tree's can when it reads an output: this tree's Program has read
 //     every output by then, and its Lua has no failure to give.
 //   - A way to the Lua that has none for a Lua module: the other tree writes a Lua module's own text whatever
@@ -438,7 +460,7 @@ func sameFolders(t *testing.T, what, wantDir, gotDir string) (files int) {
 }
 
 // heldIn is every entry below a folder with its bytes, folders as nil; nothing for a folder that is not there. A
-// link is held under its name with " (a link)" after it, and is not read.
+// link is held as a file, under its name with " (a link)" after it, and is not read.
 func heldIn(t *testing.T, dir string) map[string][]byte {
 	t.Helper()
 	held := map[string][]byte{}
@@ -456,7 +478,7 @@ func heldIn(t *testing.T, dir string) map[string][]byte {
 		case err != nil:
 			return err
 		case fsx.IsLink(info):
-			held[name+" (a link)"] = nil
+			held[name+" (a link)"] = []byte("a link")
 		case entry.IsDir():
 			held[name] = nil
 		default:
@@ -662,10 +684,31 @@ type viewTally struct {
 	steps  int // steps, of each the paths that were written
 	files  int // files of the view compared byte for byte
 	inPart int // files of the view compared in part: those of a module with bytes that are not UTF-8
+	hollow int // folders of the other tree's view with no file below them, which this tree's view does not hold
 }
 
-// viewed gives both trees one step and compares it. written is how many files the other tree must write.
-func (v viewTrees) viewed(t *testing.T, compared *viewTally, what string, compile, minify bool, written int) {
+// hollowFolders is the folders among what a folder holds that have no file below them at any depth, sorted.
+func hollowFolders(held map[string][]byte) []string {
+	var hollow []string
+	for name, data := range held {
+		if data != nil {
+			continue // a file
+		}
+		holdsAFile := false
+		for other, bytes := range held {
+			holdsAFile = holdsAFile || (bytes != nil && strings.HasPrefix(other, name+"/"))
+		}
+		if !holdsAFile {
+			hollow = append(hollow, name)
+		}
+	}
+	slices.Sort(hollow)
+	return hollow
+}
+
+// viewed gives both trees one step and compares it. written is how many files the other tree must write, and
+// hollow the folders without a file that it must leave, which are all that this tree's view may lack.
+func (v viewTrees) viewed(t *testing.T, compared *viewTally, what string, compile, minify bool, written int, hollow ...string) {
 	t.Helper()
 	want, wantErr := v.otherView(t, compile, minify)
 	got, gotErr := v.thisView(t, compile, minify)
@@ -675,6 +718,15 @@ func (v viewTrees) viewed(t *testing.T, compared *viewTally, what string, compil
 	oracle.Values(t, what+": the paths that were written", want, got)
 	compared.steps++
 	wantHeld, gotHeld := heldIn(t, filepath.Join(v.other, ".moonwell", "lua")), heldIn(t, filepath.Join(v.this, ".moonwell", "lua"))
+	left := hollowFolders(wantHeld)
+	if !slices.Equal(left, hollow) || len(hollowFolders(gotHeld)) != 0 {
+		t.Errorf("%s: the other tree's view holds the folders %q without a file, and this tree's %q; the step is one of %q",
+			what, left, hollowFolders(gotHeld), hollow)
+	}
+	for _, folder := range left {
+		delete(wantHeld, folder)
+		compared.hollow++
+	}
 	oracle.Values(t, what+": what the view holds", slices.Sorted(maps.Keys(wantHeld)), slices.Sorted(maps.Keys(gotHeld)))
 	for name, data := range wantHeld {
 		module, isFaulty := v.faulty[name]
@@ -739,11 +791,12 @@ func TestOracleOnTheLibraryView(t *testing.T) {
 	}, libraryDir("two")+"/second.yue", libraryDir("ex")+"/deep/er/mod.lua")
 	// The changed Lua module and the new one are written; the YueScript modules keep what the last compile
 	// gave, the new one has no view yet, and the views of the modules that are gone are removed with the 3
-	// files that are nobody's.
-	lib.viewed(t, &compared, "libraries that changed, without a compile", false, false, 2)
-	lib.viewed(t, &compared, "libraries that changed, compiled", true, false, 2)
-	lib.viewed(t, &compared, "compiled minified", true, true, 3)
-	lib.viewed(t, &compared, "without a compile, after a minified one", false, false, 0)
+	// files that are nobody's. From here on the other tree's view holds the 3 folders those files were in.
+	left := []string{"deep", "deep/er", "kit/old"}
+	lib.viewed(t, &compared, "libraries that changed, without a compile", false, false, 2, left...)
+	lib.viewed(t, &compared, "libraries that changed, compiled", true, false, 2, left...)
+	lib.viewed(t, &compared, "compiled minified", true, true, 3, left...)
+	lib.viewed(t, &compared, "without a compile, after a minified one", false, false, 0, left...)
 
 	// A project without libraries has no view, and gets no folder for one.
 	bare := viewTrees{twoFolders: twice(t, "src/main.yue", "print 1\n", "lua/tools.lua", "return {}\n"), yue: yue}
@@ -767,44 +820,76 @@ func TestOracleOnTheLibraryView(t *testing.T) {
 	raw.faulty["raw.lua"] = second
 	raw.viewed(t, &compared, "other bytes that are not UTF-8, compiled", true, false, 1)
 
-	// The 8 steps of the project with libraries leave 3, 6, 6, 6, 5, 6, 6 and 6 views; the project without
-	// libraries has 2 steps and no view; the last project has 2 steps, each with a view compared whole and one
-	// compared in part.
-	if want := (viewTally{steps: 12, files: 44 + 2, inPart: 2}); compared != want {
+	// The 8 steps of the project with libraries leave 3, 6, 6, 6, 5, 6, 6 and 6 views, and the last 4 of them 3
+	// folders without a file in the other tree's view; the project without libraries has 2 steps and no view;
+	// the last project has 2 steps, each with a view compared whole and one compared in part.
+	if want := (viewTally{steps: 12, files: 44 + 2, inPart: 2, hollow: 4 * 3}); compared != want {
 		t.Errorf("the oracle compared %+v, want %+v", compared, want)
 	}
 }
 
+// greetOfBoth is one Lua module of a library, as each tree is handed it.
+func greetOfBoth() ([]oldbundle.SourceModule, []script.Source) {
+	greet := libraryDir("ex") + "/example/greet.lua"
+	return []oldbundle.SourceModule{{Name: "example.greet", Path: greet, Kind: oldbundle.Lua, Source: "return 1", Library: "ex"}},
+		[]script.Source{{Name: "example.greet", Path: greet, Kind: script.Lua, Text: "return 1", Library: "ex"}}
+}
+
+// linkedTwice is a project laid twice with a link at a path below each folder, and the folder behind each
+// tree's link, which holds the files given as pairs of a path and a text.
+func linkedTwice(t *testing.T, link string, pairs ...string) (project twoFolders, behind [2]string) {
+	t.Helper()
+	project = twice(t, "src/main.yue", "print 1\n")
+	for i, root := range []string{project.other, project.this} {
+		_, behind[i] = linkAt(t, root, link)
+		write(t, behind[i], pairs...)
+	}
+	return project, behind
+}
+
 // TestOracleOnALinkBelowTheLibraryView is skipped where the machine cannot make a link.
 func TestOracleOnALinkBelowTheLibraryView(t *testing.T) {
-	project := twice(t, "src/main.yue", "print 1\n")
-	// For each tree, the folders behind its two links: one in the place of the folder of the module's view, and
-	// one that is no view.
-	var behindModule, behindOther [2]string
-	for i, root := range []string{project.other, project.this} {
-		_, behindModule[i] = linkAt(t, root, ".moonwell/lua/example")
-		_, behindOther[i] = linkAt(t, root, ".moonwell/lua/stale")
-		write(t, behindModule[i], "beside.lua", "return 0")
-		write(t, behindOther[i], "kept.lua", "return 0", "deep/kept.lua", "return 0")
-	}
-	greet := libraryDir("ex") + "/example/greet.lua"
-	theirs := []oldbundle.SourceModule{{Name: "example.greet", Path: greet, Kind: oldbundle.Lua, Source: "return 1", Library: "ex"}}
-	ours := []script.Source{{Name: "example.greet", Path: greet, Kind: script.Lua, Text: "return 1", Library: "ex"}}
-	files := 0
-	for _, what := range []string{"with the links", "after the links were removed"} {
+	theirs, ours := greetOfBoth()
+	files, inPart := 0, 0
+
+	// A link that is in no view's way: both trees remove it as the link, and write the view beside it.
+	project, behind := linkedTwice(t, ".moonwell/lua/stale", "kept.lua", "return 0", "deep/kept.lua", "return 0")
+	for step, written := range []int{1, 0} {
+		what := []string{"a link that is no view", "after the link was removed"}[step]
 		want, wantErr := oldeditor.RefreshLibraryView(project.other, theirs, nil)
 		got, gotErr := RefreshLibraryView(project.this, ours, nil)
-		if wantErr != nil || gotErr != nil || len(want) != 1 {
+		if wantErr != nil || gotErr != nil || len(want) != written {
 			t.Errorf("%s: the other tree wrote %q (%v), and this tree gives %v", what, want, wantErr, gotErr)
 		}
 		oracle.Values(t, what+": the paths that were written", want, got)
 		files += sameFolders(t, what+": the view", filepath.Join(project.other, ".moonwell", "lua"), filepath.Join(project.this, ".moonwell", "lua"))
-		files += sameFolders(t, what+": behind the link at a module's folder", behindModule[0], behindModule[1])
-		files += sameFolders(t, what+": behind the link that is no view", behindOther[0], behindOther[1])
+		files += sameFolders(t, what+": behind the link", behind[0], behind[1])
 	}
-	// With the links, the view is written behind the first, and both links are removed: the view holds nothing,
-	// and 2 files lie behind each link. Then the view is written into a folder of its own: 1 file, and the 4.
-	if files != 4+5 {
-		t.Errorf("the oracle compared %d files", files)
+
+	// A link in the place of the module's folder: the other tree writes the view behind it.
+	project, behind = linkedTwice(t, ".moonwell/lua/example", "beside.lua", "return 0")
+	want, wantErr := oldeditor.RefreshLibraryView(project.other, theirs, nil)
+	got, gotErr := RefreshLibraryView(project.this, ours, nil)
+	if wantErr != nil || gotErr != nil {
+		t.Errorf("a link at a module's folder: the other tree gives %v, and this tree %v", wantErr, gotErr)
+	}
+	oracle.Values(t, "a link at a module's folder: the paths that were written", want, got)
+	laid, view := map[string]string{"beside.lua": "return 0"}, map[string]string{"example/greet.lua": "return 1"}
+	if theirBehind := filesIn(t, behind[0]); theirBehind["greet.lua"] == "return 1" && len(theirBehind) == 2 {
+		inPart++
+	} else {
+		t.Errorf("a link at a module's folder: behind the other tree's link there is %q, and no view", theirBehind)
+	}
+	if theirView := heldIn(t, filepath.Join(project.other, ".moonwell", "lua")); len(theirView) != 0 {
+		t.Errorf("a link at a module's folder: the other tree's view holds %q", slices.Sorted(maps.Keys(theirView)))
+	}
+	if ourBehind, ourView := filesIn(t, behind[1]), viewIn(t, project.this); !maps.Equal(ourBehind, laid) || !maps.Equal(ourView, view) {
+		t.Errorf("a link at a module's folder: behind this tree's link there is %q, and its view holds %q", ourBehind, ourView)
+	}
+
+	// The first project has 2 steps, after each of which the view holds 1 file and 2 lie behind the link; the
+	// second is the one that is compared in part.
+	if files != 2*3 || inPart != 1 {
+		t.Errorf("the oracle compared %d files whole and %d projects in part", files, inPart)
 	}
 }
