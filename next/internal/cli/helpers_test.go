@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -15,7 +16,6 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/toolchain"
-	"github.com/mdlsvensson/moonwell/next/internal/tooltest"
 )
 
 var background = context.Background()
@@ -27,9 +27,8 @@ type outcome struct {
 	output, stdout string
 }
 
-// run runs a command line in root, as the program does: in the real world. A test runs so a line that starts
-// no program and downloads nothing, or else it asks for the programs the line runs first: testkit.NeedPkl,
-// tooltest.Yue.
+// run runs a command line in root, as the program does: in the real world, whose cache is the user's. A test
+// runs so only a line that starts no program, downloads nothing and writes nothing into that cache.
 func run(root string, args ...string) outcome {
 	var lines, printed []string
 	code := Run(background, args, root, func(line string) { lines = append(lines, line) },
@@ -78,23 +77,97 @@ func standIn(t *testing.T) world {
 // ok runs a command line that must succeed.
 func ok(t *testing.T, root string, args ...string) outcome {
 	t.Helper()
-	result := run(root, args...)
-	if result.code != 0 {
-		t.Fatalf("moonwell %s exited with %d:\n%s", strings.Join(args, " "), result.code, result.output)
-	}
-	return result
+	return endedWith(t, run(root, args...), 0, args)
 }
 
 // fails runs a command line that must exit with 1, printing every part of wanted.
 func fails(t *testing.T, root string, wanted []string, args ...string) outcome {
 	t.Helper()
-	result := run(root, args...)
-	if result.code != 1 {
-		t.Fatalf("moonwell %s exited with %d:\n%s", strings.Join(args, " "), result.code, result.output)
-	}
+	result := endedWith(t, run(root, args...), 1, args)
 	contains(t, result.output, wanted...)
 	return result
 }
+
+// endedWith is the outcome of a command line that must have ended with this exit code.
+func endedWith(t *testing.T, result outcome, code int, args []string) outcome {
+	t.Helper()
+	if result.code != code {
+		t.Fatalf("moonwell %s exited with %d:\n%s", strings.Join(args, " "), result.code, result.output)
+	}
+	return result
+}
+
+// seededWorld is a world for a command that asks for the project's compiler and never starts it, which is setup.
+// Its pkl is the real one. Its cache is a temporary folder of the test, with a stand-in for the pinned compiler
+// in the compiler's place: a file that is no program. So setup finds its compiler without a download, and keeps
+// its copy for the editor in that cache, not in the user's, whose bin folder is on the PATH.
+//
+// No `yue` is on the PATH of this world, whatever the machine has. The stand-in, and each program a test names
+// as one more, reports the pinned version when it is asked. Any other program, a download, and a start of the
+// game fail the test.
+type seededWorld struct {
+	outside  world
+	cache    string // the cache folder
+	compiler string // the stand-in for the pinned compiler, in the cache
+}
+
+// seeded is a seeded world. standIns are the programs that report the pinned compiler's version beside the one
+// in the cache: what a test writes as a manifest's yue.path. It needs pkl, and a platform that Moonwell pins a
+// compiler for: the cache has a place for no other.
+func seeded(t *testing.T, standIns ...string) seededWorld {
+	t.Helper()
+	testkit.NeedPkl(t)
+	asset, pinned := toolchain.YueScript.Versions[toolchain.YueVersion][env.CurrentPlatform()]
+	if !pinned {
+		t.Skip("Moonwell pins no compiler for this platform")
+	}
+	cache := t.TempDir()
+	place := filepath.Join(cache, toolchain.YueScript.Name, toolchain.YueVersion)
+	compiler := testkit.WriteFile(t, place, asset.Binary, []byte("A stand-in for the compiler.\n"))
+	reporting := append([]string{compiler}, standIns...)
+	runs := func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
+		asked := slices.Equal(args, toolchain.YueScript.VersionArgs)
+		switch {
+		case program == toolchain.Pkl.Name:
+			return env.Run(ctx, program, args, options)
+		case asked && program == toolchain.YueScript.Name:
+			return env.RunResult{}, env.SpawnError(program, exec.ErrNotFound, options.Hint, "")
+		case asked && slices.Contains(reporting, program):
+			return env.RunResult{Stdout: "Yuescript version: " + toolchain.YueVersion + "\n"}, nil
+		}
+		t.Errorf("the seeded world has no stand-in for the program: %s %q", program, args)
+		return env.RunResult{}, errors.New("no stand-in for " + program)
+	}
+	outside := func(root string, log *env.Logger) *env.Env {
+		e, _ := testkit.Env(t, root)
+		e.Log, e.CacheDir, e.Run = log, cache, runs
+		return e
+	}
+	return seededWorld{outside: outside, cache: cache, compiler: compiler}
+}
+
+// ok runs a command line that must succeed, in this world.
+func (w seededWorld) ok(t *testing.T, root string, args ...string) outcome {
+	t.Helper()
+	return endedWith(t, carriedIn(background, w.outside, root, args...), 0, args)
+}
+
+// fails runs a command line that must exit with 1, printing every part of wanted, in this world.
+func (w seededWorld) fails(t *testing.T, root string, wanted []string, args ...string) outcome {
+	t.Helper()
+	result := endedWith(t, carriedIn(background, w.outside, root, args...), 1, args)
+	contains(t, result.output, wanted...)
+	return result
+}
+
+// at is this world for root, with a log that keeps its lines: for a command that a test calls by its function.
+func (w seededWorld) at(root string) (*env.Env, *testkit.Recorder) {
+	log := testkit.NewRecorder()
+	return w.outside(root, log.Logger), log
+}
+
+// binDir is the folder of this world's cache that setup keeps the copies for a shell and an editor in.
+func (w seededWorld) binDir() string { return filepath.Join(w.cache, "bin") }
 
 func contains(t *testing.T, text string, parts ...string) {
 	t.Helper()
@@ -193,13 +266,6 @@ func newProject(t *testing.T, name string) string {
 		t.Fatal(diag.Format(err))
 	}
 	return filepath.Join(parent, name)
-}
-
-// compiling is a project for the commands that need the YueScript compiler: it needs pkl and the compiler.
-func compiling(t *testing.T) string {
-	t.Helper()
-	tooltest.Yue(t)
-	return newProject(t, "my-map")
 }
 
 // pklOnly is a world for root in which pkl is the one program that runs: every other program, every download
