@@ -4,7 +4,8 @@
 // It takes paths, text and bytes, and returns paths, text, bytes and errors. A failure a user can act on (a file
 // another program holds open, a source file that cannot be read, a path that is not safe to join, a link where real
 // files are needed) is a *diag.Error with a hint; every other failure is the operating system's error as it came,
-// for the caller to word with Reason.
+// for the caller to word with Reason. Inside is the one door that words the system's failure itself, by the path
+// it was given.
 //
 // The package must not know what the files are for: it reads no manifest and no map format, decides no layout of a
 // project, prints nothing, and imports no package of Moonwell but diag.

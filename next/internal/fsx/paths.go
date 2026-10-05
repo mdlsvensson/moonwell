@@ -1,6 +1,7 @@
 package fsx
 
 import (
+	"errors"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -57,6 +58,24 @@ func SafeJoin(root, relative string) (string, error) {
 	return current, nil
 }
 
+// Inside returns the place of relative below root, for a file or folder of a project. relative is written with
+// "/". A path that leaves root, and a link on the way to it, is refused with a *diag.Error whose File is relative;
+// so is a way the system cannot look at, with its Cause.
+//
+// It is SafeJoin with every failure worded for a user: a caller passes its error on as it is. Nothing need be at
+// the place, and root itself is trusted, as SafeJoin says.
+func Inside(root, relative string) (string, error) {
+	place, err := SafeJoin(root, relative)
+	var refused *diag.Error
+	switch {
+	case err == nil:
+		return place, nil
+	case errors.As(err, &refused):
+		return "", errRefused(relative, refused)
+	}
+	return "", errUnreachable(relative, err)
+}
+
 // refuseLink fails when path is a link. A path that does not exist is no link.
 func refuseLink(path string) error {
 	info, err := Lstat(path)
@@ -84,5 +103,23 @@ func errInvalidPath(value string) error {
 		Msg: "Invalid path: " + value,
 		Hint: "Use a relative path such as icons/BTNSword.blp, without .., drive letters or characters Windows " +
 			"forbids.",
+	}
+}
+
+// errRefused is a refusal of SafeJoin, in its words, with the path as it was given as its file.
+func errRefused(relative string, refused *diag.Error) error {
+	named := *refused
+	named.File = relative
+	return &named
+}
+
+// errUnreachable is the failure of the system to look at a step of the way to relative: a folder that may not be
+// read, or a name the system cannot hold.
+func errUnreachable(relative string, cause error) error {
+	return &diag.Error{
+		Msg:   relative + " cannot be reached: " + Reason(cause),
+		File:  relative,
+		Hint:  "Make sure that every folder on the way to it can be read, then try again.",
+		Cause: cause,
 	}
 }

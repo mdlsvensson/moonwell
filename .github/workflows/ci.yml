@@ -63,3 +63,33 @@ jobs:
         env:
           MOONWELL_REQUIRE_TOOLS: "1"
           MOONWELL_NETWORK_TESTS: "1"
+
+  # The race detector, on the packages under next/ whose code or tests run on several goroutines. It needs cgo, so
+  # it runs on Ubuntu alone; the tests that use the network are left to the job above.
+  race:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false # no dependencies, so no go.sum to key a cache on
+
+      - name: Install Pkl 0.32.1
+        run: |
+          mkdir -p "$RUNNER_TEMP/pkl"
+          curl -fsSL -o "$RUNNER_TEMP/pkl/pkl" \
+            "https://github.com/apple/pkl/releases/download/0.32.1/pkl-linux-amd64"
+          chmod +x "$RUNNER_TEMP/pkl/pkl"
+          echo "$RUNNER_TEMP/pkl" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/pkl/pkl" --version
+
+      - run: pkl --version
+      # A missing pkl or YueScript compiler fails a test instead of skipping it; the compiler is downloaded once.
+      - run: go test -race ./next/internal/script/ ./next/internal/testkit/ ./next/internal/env/
+        env:
+          MOONWELL_REQUIRE_TOOLS: "1"

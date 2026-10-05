@@ -78,10 +78,11 @@ type sources struct {
 	assets  string // its files for the map; "" when it names no such folder
 }
 
-// sourcesOf finds the folders of the local library at path, which is relative to the project folder or absolute.
-// The module folder is the manifest's dir, else the one the library's own file names, else the library's folder.
+// sourcesOf finds the folders of the local library at path, and refuses a library that cannot be copied from
+// them. Where the folders are is said by three steps that Locals takes too, so that a library is watched where
+// it is read: baseOf, describedAt and namedBy.
 func sourcesOf(root string, at folders, path, dir, manifestFile string) (sources, error) {
-	base, err := filepath.Abs(fsx.Resolve(root, path))
+	base, err := baseOf(root, path)
 	if err != nil {
 		return sources{}, errUnreadableLibrary(at.key, path, manifestFile, err)
 	}
@@ -90,23 +91,50 @@ func sourcesOf(root string, at folders, path, dir, manifestFile string) (sources
 	if err != nil {
 		return sources{}, err
 	}
-	if dir == "" && described.Dir != nil {
-		dir = *described.Dir
-	}
-	from := sources{modules: fsx.Resolve(base, dir)}
+	from := namedBy(dir, described).below(base)
 	switch {
 	case !fsx.IsDir(from.modules):
 		return sources{}, errNoModuleFolder(at.key, from.modules, manifestFile)
 	case fsx.IsWithin(filepath.Dir(at.modules), from.modules):
 		return sources{}, errHoldsTheLibraries(at.key, from.modules, manifestFile)
-	}
-	if described.Assets != nil {
-		from.assets = fsx.Resolve(base, *described.Assets)
-		if !fsx.IsDir(from.assets) {
-			return sources{}, errNoAssetsFolder(at.key, from.assets, libraryFile)
-		}
+	case from.assets != "" && !fsx.IsDir(from.assets):
+		return sources{}, errNoAssetsFolder(at.key, from.assets, libraryFile)
 	}
 	return from, nil
+}
+
+// baseOf is the folder of the local library at path, which is relative to the project folder or absolute.
+func baseOf(root, path string) (string, error) {
+	return filepath.Abs(fsx.Resolve(root, path))
+}
+
+// named is the two folders of a local library as they are written: each from the library's folder.
+type named struct {
+	modules string // "" for the library's folder itself
+	assets  string // "" when the library names no folder of files for the map
+}
+
+// namedBy is the folders that the manifest's dir and the library's own file name. The module folder is the
+// manifest's dir, else the one the library's own file names, else the library's folder. The folder of the files
+// for the map is the library's file's alone.
+func namedBy(dir string, described Described) named {
+	folders := named{modules: dir}
+	if dir == "" && described.Dir != nil {
+		folders.modules = *described.Dir
+	}
+	if described.Assets != nil {
+		folders.assets = *described.Assets
+	}
+	return folders
+}
+
+// below is the named folders on disk, for a library whose folder is base.
+func (n named) below(base string) sources {
+	from := sources{modules: fsx.Resolve(base, n.modules)}
+	if n.assets != "" {
+		from.assets = fsx.Resolve(base, n.assets)
+	}
+	return from
 }
 
 // describedAt is what a local library says of itself in libraryFile. A library without the file is the usual

@@ -26,8 +26,8 @@ const (
 	byteOrderMark = "\xEF\xBB\xBF"
 )
 
-// compiled is what a compile left in dist/stage/lua.
-type compiled struct {
+// staged is what a compile left in dist/stage/lua.
+type staged struct {
 	texts  map[string]string // each YueScript source's text, by its path from the project folder
 	hashes map[string]string // the SHA-256 of each source's bytes, by the same path
 	lua    map[string]string // where each compiled file is, by the same path
@@ -47,7 +47,7 @@ type compiled struct {
 // What a compile leaves depends on nothing an earlier run left. The output of a source is removed before the
 // compiler runs on it, and before the first compiler runs, the hashes file stops vouching for every source that
 // is to be compiled: a run that is stopped leaves nothing up to date that it may have touched.
-func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macros, sources []Source) (*compiled, error) {
+func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macros, sources []Source) (*staged, error) {
 	stage, err := stageOf(e.Root)
 	if err != nil {
 		return nil, err
@@ -79,14 +79,14 @@ func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macr
 	if len(failures) > 0 {
 		return nil, errNotCompiled(failures)
 	}
-	return compiledOf(units, now.MacroSources), nil
+	return stagedOf(units, now.MacroSources), nil
 }
 
 // luaOf reads a compiled module; ok is false when it has no output. The Lua is the bytes the compiler wrote:
 // nothing is decoded. A module that is no YueScript, or that the compile was not given, has no output, and
 // neither has a source without code, for which the compiler writes no file.
-func (c *compiled) luaOf(source Source) (lua string, ok bool, err error) {
-	file, isCompiled := c.lua[source.Path]
+func (s *staged) luaOf(source Source) (lua string, ok bool, err error) {
+	file, isCompiled := s.lua[source.Path]
 	if source.Kind != Yue || !isCompiled {
 		return "", false, nil
 	}
@@ -212,10 +212,10 @@ func withoutFailed(units []unit, failures []*diag.Error) []unit {
 	return slices.DeleteFunc(slices.Clone(units), func(u unit) bool { return failed[u.path] })
 }
 
-// compiledOf is what a compile without failures left, with the sources that may define macros as it hashed
+// stagedOf is what a compile without failures left, with the sources that may define macros as it hashed
 // them.
-func compiledOf(units []unit, macroSources string) *compiled {
-	result := &compiled{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}, macroSources: macroSources}
+func stagedOf(units []unit, macroSources string) *staged {
+	result := &staged{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}, macroSources: macroSources}
 	for _, u := range units {
 		result.texts[u.path], result.hashes[u.path], result.lua[u.path] = u.text, u.hash, u.output
 	}

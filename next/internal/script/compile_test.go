@@ -619,11 +619,12 @@ func TestTheTwoStepsInARowGiveTheProgramCompileGives(t *testing.T) {
 			t.Fatalf("minified %v: CompileSources = %v", minify, err)
 		}
 		compiles, before := b.ran(), luaOfEach(compiled.Sources, compiled.Lua)
+		loggedByTheFirstStep := len(b.log.Lines())
 		got, err := Link(background, b.world, compiled)
 		if err != nil {
 			t.Fatalf("minified %v: Link = %v", minify, err)
 		}
-		lists := b.ran()
+		lists, warnings := b.ran(), b.log.Lines()[loggedByTheFirstStep:]
 		if !reflect.DeepEqual(got, want) || !slices.Equal(b.log.Lines(), whole.log.Lines()) {
 			t.Errorf("minified %v: the two steps give %+v and log %q, want what Compile gives: %+v and %q",
 				minify, got, b.log.Lines(), want, whole.log.Lines())
@@ -631,6 +632,16 @@ func TestTheTwoStepsInARowGiveTheProgramCompileGives(t *testing.T) {
 		wantLua := luaOfEach(want.Sources, want.Lua)
 		if gotLua := luaOfEach(got.Sources, got.Lua); !maps.Equal(gotLua, wantLua) || len(wantLua) != 5 {
 			t.Errorf("minified %v: the Lua after the two steps is %q, want that of Compile, of five modules: %q", minify, gotLua, wantLua)
+		}
+		// For a module of a library, what the first step returned answers as the program does: with the Lua the
+		// compiler wrote, with the module's own text, and with none for the source without code.
+		early, late := ofLibraries(compiled.Sources), ofLibraries(got.Sources)
+		fromCompiled, fromProgram := luaOfEach(early, compiled.Lua), luaOfEach(late, got.Lua)
+		if !slices.Equal(pathsOf(early), []string{empty, loud, plain}) || !slices.Equal(early, late) ||
+			!maps.Equal(fromCompiled, fromProgram) || len(fromProgram) != 2 || fromProgram[loud] == "" ||
+			fromProgram[plain] != "return 1\n" {
+			t.Errorf("minified %v: of the libraries' modules %q, the first step has the Lua %q and the program %q",
+				minify, pathsOf(early), fromCompiled, fromProgram)
 		}
 		// Each step runs the compiler for its own work, and the two for no more than Compile does: the first
 		// compiles, and the second lists the globals.
@@ -644,6 +655,11 @@ func TestTheTwoStepsInARowGiveTheProgramCompileGives(t *testing.T) {
 		again, err := Link(background, b.world, compiled)
 		if ran := b.ran(); err != nil || !reflect.DeepEqual(again, want) || len(ran) != 0 {
 			t.Errorf("minified %v: a second link gives %+v, %v, and ran the compiler as %q", minify, again, err, ran)
+		}
+		// Each link logs the unknown globals it lets pass: the second logs those of the first again.
+		repeated := b.log.Lines()[loggedByTheFirstStep+len(warnings):]
+		if len(warnings) == 0 || !slices.Equal(repeated, warnings) {
+			t.Errorf("minified %v: the first link logged %q and the second %q", minify, warnings, repeated)
 		}
 		if after := luaOfEach(compiled.Sources, compiled.Lua); !maps.Equal(after, before) || len(before) != 3 {
 			t.Errorf("minified %v: the Lua of what the first step returned is %q before the links and %q after", minify, before, after)

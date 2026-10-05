@@ -53,7 +53,32 @@ type Source struct {
 // the listing gives it: a link to a file that is named as a module is that module, and a Lua one is read through
 // the link; a link to a folder is not entered, so the modules behind it are not found.
 func Collect(root string, libraries []Library) ([]Source, error) {
-	folders, err := moduleFolders(root, libraries)
+	ofLibraries, err := libraryFolders("Collect", libraries)
+	if err != nil {
+		return nil, err
+	}
+	return collectFrom(root, append(ownFolders(), ofLibraries...))
+}
+
+// CollectLibraries lists the libraries' modules alone, as Collect lists them, with Collect's refusals among them.
+// It does not look at src/ or lua/: a module of a library that has the name of one of the project is listed.
+//
+// So it lists the modules of the libraries of a project that Collect refuses for its own modules: one without
+// src/, one with a fault in src/ or lua/, and one in which a module of the project and a module of a library
+// answer to one name. What Collect refuses of a library is refused here in the same words: a dotted name, a
+// name that is not valid UTF-8, a built-in module's name, a name that two modules of the libraries answer to,
+// and a link at a library's folder or on the way to it.
+func CollectLibraries(root string, libraries []Library) ([]Source, error) {
+	searched, err := libraryFolders("CollectLibraries", libraries)
+	if err != nil {
+		return nil, err
+	}
+	return collectFrom(root, searched)
+}
+
+// collectFrom lists the modules of the folders searched that are there, in the order of the folders.
+func collectFrom(root string, searched []folder) ([]Source, error) {
+	folders, err := moduleFolders(root, searched)
 	if err != nil {
 		return nil, err
 	}
@@ -87,13 +112,8 @@ type folder struct {
 	required bool   // a project without this folder is refused
 }
 
-// moduleFolders is the folders that are there, in the order they are searched: src/ for YueScript, lua/ for Lua,
-// then each library's folder for YueScript and for Lua.
-func moduleFolders(root string, libraries []Library) ([]folder, error) {
-	searched, err := searchedFolders(libraries)
-	if err != nil {
-		return nil, err
-	}
+// moduleFolders is the folders among searched that are there, in the order they are searched.
+func moduleFolders(root string, searched []folder) ([]folder, error) {
 	var present []folder
 	for _, f := range searched {
 		path, found, err := folderAt(root, f.dir)
@@ -110,18 +130,28 @@ func moduleFolders(root string, libraries []Library) ([]folder, error) {
 	return present, nil
 }
 
-// searchedFolders is every folder a project may hold modules in, in the order they are searched.
-func searchedFolders(libraries []Library) ([]folder, error) {
-	searched := []folder{{dir: "src", kind: Yue, required: true}, {dir: "lua", kind: Lua}}
+// ownFolders is the folders a project may hold modules of its own in, in the order they are searched: src/ for
+// YueScript, then lua/ for Lua.
+func ownFolders() []folder {
+	return []folder{{dir: "src", kind: Yue, required: true}, {dir: "lua", kind: Lua}}
+}
+
+// libraryFolders is the folders the libraries may hold modules in, in the order they are searched: each
+// library's folder for YueScript and then for Lua. door names the function that was handed the libraries, for
+// the error.
+func libraryFolders(door string, libraries []Library) ([]folder, error) {
+	var searched []folder
 	for _, library := range libraries {
 		dir, ok := fsx.RelPath(library.Dir)
 		if library.Key == "" || !ok {
 			// A plain error: the caller makes the libraries from what a sync of them returned, so a library
 			// without a key, or with a folder that is no path below the project folder, is a mistake in Moonwell
 			// and nothing the user can put right.
-			return nil, fmt.Errorf("script.Collect: library %q has the folder %q, which no library can have", library.Key, library.Dir)
+			return nil, fmt.Errorf("script.%s: library %q has the folder %q, which no library can have",
+				door, library.Key, library.Dir)
 		}
-		searched = append(searched, folder{dir: dir, kind: Yue, library: library.Key}, folder{dir: dir, kind: Lua, library: library.Key})
+		searched = append(searched,
+			folder{dir: dir, kind: Yue, library: library.Key}, folder{dir: dir, kind: Lua, library: library.Key})
 	}
 	return searched, nil
 }

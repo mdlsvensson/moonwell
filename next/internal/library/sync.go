@@ -4,7 +4,8 @@
 //
 // It takes the manifest's libraries and the outside world (the project folder, the network and the log), and
 // returns where each library lies in the project, or the first failure. Beside Sync it reads a library's own file
-// (ParseFile) and reads and writes the lock (ReadLock, WriteLock).
+// (ParseFile), reads and writes the lock (ReadLock, WriteLock), and lists the folders that a sync reads the local
+// libraries from (Locals), for what watches them.
 //
 // It knows nothing of modules, of maps or of what is done with the files. In a project it writes and removes
 // below its two folders and the lock file only; a local library's own folder is read and never written.

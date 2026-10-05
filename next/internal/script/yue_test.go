@@ -136,7 +136,7 @@ func (b *bench) ran() []string {
 }
 
 // compile finds the project's modules as they are now and compiles them.
-func (b *bench) compile(yue string, minify bool) (*compiled, error) {
+func (b *bench) compile(yue string, minify bool) (*staged, error) {
 	b.t.Helper()
 	var err error
 	if b.sources, err = Collect(b.root, b.libraries); err != nil {
@@ -146,7 +146,7 @@ func (b *bench) compile(yue string, minify bool) (*compiled, error) {
 }
 
 // compiles is the result of a compile that must not fail.
-func (b *bench) compiles(yue string, minify bool) *compiled {
+func (b *bench) compiles(yue string, minify bool) *staged {
 	b.t.Helper()
 	result, err := b.compile(yue, minify)
 	if err != nil {
@@ -173,7 +173,7 @@ func (b *bench) source(path string) Source {
 }
 
 // luaAt is the Lua of the module at a path, which must have some.
-func (b *bench) luaAt(result *compiled, path string) string {
+func (b *bench) luaAt(result *staged, path string) string {
 	b.t.Helper()
 	lua, ok, err := result.luaOf(b.source(path))
 	if err != nil || !ok {
@@ -204,7 +204,7 @@ func TestCompileAllCompilesEveryYueScriptModuleAndReadsItsLua(t *testing.T) {
 	mainText, mathText := "import \"util.math\" as M\nexport answer = M.double 21\n", "export double = (x) -> x * 2\n"
 	b := benchOf(t, files("src/main.yue", mainText, "src/util/math.yue", mathText, "lua/tools.lua", "return {}\n"))
 	result := b.compiles(b.real(), false)
-	want := &compiled{
+	want := &staged{
 		texts:  map[string]string{"src/main.yue": mainText, "src/util/math.yue": mathText},
 		hashes: map[string]string{"src/main.yue": fsx.SHA256Hex([]byte(mainText)), "src/util/math.yue": fsx.SHA256Hex([]byte(mathText))},
 		lua:    map[string]string{"src/main.yue": b.staged("main.lua"), "src/util/math.yue": b.staged("util/math.lua")},

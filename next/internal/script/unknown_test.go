@@ -225,7 +225,7 @@ type checkBench struct {
 	yue     *listing
 	in      Input
 	search  macros
-	output  *compiled
+	output  *staged
 	modules []Module
 }
 
@@ -243,7 +243,7 @@ func checkOf(t *testing.T, sources []string, printed map[string]string, lint man
 		b.in.Map = mapGlobalsOf(mapScript)
 	}
 	b.search = macros{path: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
-	b.output = &compiled{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}}
+	b.output = &staged{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}}
 	for i := 0; i+1 < len(sources); i += 2 {
 		path := "src/" + sources[i]
 		b.output.texts[path], b.output.hashes[path] = sources[i+1], "h"+strconv.Itoa(i)

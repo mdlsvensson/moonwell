@@ -22,7 +22,7 @@ import (
 // is looked through, and only a module the entry reaches declares a global. With lint.unknownGlobals = "error"
 // any unknown use fails, with a diag.Problems that holds all of them; else they are logged as warnings and
 // returned.
-func unknownGlobals(ctx context.Context, e *env.Env, in Input, m macros, output *compiled, modules []Module) ([]diag.Problem, error) {
+func unknownGlobals(ctx context.Context, e *env.Env, in Input, m macros, output *staged, modules []Module) ([]diag.Problem, error) {
 	uses, err := listUses(ctx, e, in.Compiler, m, output.macroSources, checkedAmong(modules, output))
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func warnOf(log *env.Logger, problems []diag.Problem) {
 // declaredBy is the names the modules declare as globals: what the `global` lines of a YueScript module name,
 // and what a Lua module defines at its top level. The YueScript texts are the ones the compile read and hashed:
 // reading a file again could fail, or give other bytes.
-func declaredBy(modules []Module, output *compiled) []string {
+func declaredBy(modules []Module, output *staged) []string {
 	var declared []string
 	for _, module := range modules {
 		if module.Kind == Lua {
@@ -201,7 +201,7 @@ type checked struct {
 // checkedAmong is the sources to list among the modules the entry reaches: the project's own YueScript, each
 // once, in the order of their paths. A library's modules are the library's to check, and a Lua module is not
 // looked through.
-func checkedAmong(modules []Module, output *compiled) []checked {
+func checkedAmong(modules []Module, output *staged) []checked {
 	byPath := map[string]checked{}
 	for _, module := range modules {
 		if hash, hashed := output.hashes[module.Path]; hashed && module.Kind == Yue && module.Library == "" {

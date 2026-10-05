@@ -2,14 +2,15 @@
 // the sources import, finds the modules, compiles the YueScript ones, follows the requires from the entry, checks
 // for globals nobody defines, renders the bundle, and plans the bundle's place at the end of the map's script.
 //
-// A compile is made from an Input: a project folder, a compiler, the entry, the libraries' folders, the lint
-// block, the game's API (LoadNatives) and what the map's own script defines. It is two steps. CompileSources
-// takes the Input and returns a Compiled: the modules, and the Lua of the libraries' ones. Link takes the
-// Compiled and returns a Program: what the entry reaches, checked for unknown globals. Compile takes the Input
-// and returns the Program, as the two steps in a row. Bundle takes a Program, the runtime and the line the bundle
-// starts on, and returns the block of Lua. Inject takes a map folder and a Program, and returns one change: the
-// map's script with the bundle after it. Collect, EntryName and RefreshMacros are steps of a compile that other
-// packages take alone.
+// A compile is made from the outside world, an env.Env whose Root is the project folder, and from an Input: a
+// compiler, the entry, the libraries' folders, the lint block, the game's API (LoadNatives) and what the map's
+// own script defines. It is two steps. CompileSources takes the Input and returns a Compiled: the modules, and
+// the Lua of the libraries' ones. Link takes the Compiled and returns a Program: what the entry reaches, checked
+// for unknown globals. Compile takes the Input and returns the Program, as the two steps in a row. Bundle takes
+// a Program, the runtime and the line the bundle starts on, and returns the block of Lua. Inject takes a map
+// folder and a Program, and returns one change: the map's script with the bundle after it. Collect, EntryName
+// and RefreshMacros are steps of a compile that other packages take alone, and CollectLibraries is Collect for
+// the libraries' modules alone.
 //
 // It knows nothing of where a library comes from, of manifests beyond the lint block, or of how a map is built.
 // Of a map it knows one file, war3map.lua: what it defines, which a compile is handed, and its bytes, which
@@ -86,7 +87,7 @@ type Compiled struct {
 
 	in     Input             // what it was compiled from: Link goes on from the same Input
 	search macros            // how the compiler finds the macro module
-	output *compiled         // what the compile left in dist/stage/lua
+	output *staged           // what the compile left in dist/stage/lua
 	lua    map[string]string // the Lua of each YueScript module of a library that has some, by its path
 	none   map[string]bool   // the YueScript modules of a library that have none, by the same path
 }
@@ -166,6 +167,9 @@ func CompileSources(ctx context.Context, e *env.Env, in Input) (*Compiled, error
 // "warning" they are logged and returned in the Program. The Lua of the libraries' modules is what
 // CompileSources read, and that of the project's modules is read as the requires are followed, so that
 // Program.Lua has both without a read that could fail. compiled stays as it is, whether Link fails or not.
+//
+// Every Link reports what it finds: a second Link of one Compiled gives the same Program, and logs the warnings
+// again. A caller that wants them logged once links once.
 func Link(ctx context.Context, e *env.Env, compiled *Compiled) (*Program, error) {
 	if compiled == nil || compiled.output == nil {
 		// A plain error: the caller passes what CompileSources returned without a failure, which is never nil and
@@ -214,7 +218,7 @@ func macroModule(root string) (macros, error) {
 // reader reads the Lua of compiled modules, each once, and keeps what it read: a module that is asked for again,
 // under another name or by the Program, is the Lua that was read first.
 type reader struct {
-	output *compiled
+	output *staged
 	lua    map[string]string // the Lua of each module read that has some, by the source's path
 	none   map[string]bool   // the modules read that have none, by the same path
 }
