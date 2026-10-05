@@ -60,10 +60,18 @@ func TestParseReadsAWellFormedLine(t *testing.T) {
 		{[]string{"assets:paths", "units/Hero.mdx"}, line{words: []string{"assets:paths", "units/Hero.mdx"}}},
 		// A dash alone is no flag.
 		{[]string{"assets:paths", "-"}, line{words: []string{"assets:paths", "-"}}},
-		// What follows "--" is arguments, whatever it starts with; with nothing after it, "--" says nothing.
+		// What follows "--" is words, whatever it starts with; with nothing after it, "--" says nothing.
 		{[]string{"assets:paths", "--", "--odd.mdx"}, line{words: []string{"assets:paths", "--odd.mdx"}}},
 		{[]string{"init", "--link", "--", "-v"}, line{words: []string{"init", "-v"}, link: true}},
 		{[]string{"build", "--minify", "--"}, line{words: []string{"build"}, minify: true}},
+		{[]string{"--"}, line{}},
+		// "--" may stand before the command: the first word after it is the command then.
+		{[]string{"--", "build"}, line{words: []string{"build"}}},
+		{[]string{"--minify", "--", "build"}, line{words: []string{"build"}, minify: true}},
+		{[]string{"--help", "--", "build"}, line{words: []string{"build"}, help: true}},
+		{[]string{"--", "init", "--link"}, line{words: []string{"init", "--link"}}},
+		// A command the table does not have, though a flag is written so: its name is the caller's to refuse.
+		{[]string{"--", "--minify"}, line{words: []string{"--minify"}}},
 
 		// Help and version, in both forms, alone and beside a command.
 		{[]string{"--help"}, line{help: true}},
@@ -106,8 +114,14 @@ func TestParseRefusesALineThatIsNotWellFormed(t *testing.T) {
 		{[]string{"--color=always", "build"}, []string{"no flag", "'--color'"}, "--help"},
 		{[]string{"-x", "build"}, []string{"no flag", "'-x'"}, "--help"},
 		{[]string{"build", "---minify"}, []string{"no flag", "'---minify'"}, "Did you mean --minify?"},
-		{[]string{"build", "--=x"}, []string{"no flag", "'--'"}, "--help"},
+		// A flag without a name is named as it is typed: "--" alone is the end of the flags.
+		{[]string{"build", "--=x"}, []string{"no flag", "'--=x'"}, "--help"},
+		{[]string{"build", "--="}, []string{"no flag", "'--='"}, "--help"},
 		{[]string{"frobnicate", "--minfy"}, []string{"no flag", "'--minfy'"}, "Did you mean --minify?"},
+		// One dash and one character is a short flag, whatever the character's length in bytes: "\xc3\xa9" is
+		// an e with an acute accent.
+		{[]string{"-\xc3\xa9"}, []string{"no flag", "'-\xc3\xa9'"}, "--help"},
+		{[]string{"build", "-5"}, []string{"no flag", "'-5'"}, "--help"},
 
 		// A flag the command does not have.
 		{[]string{"check", "--minify"}, []string{"check has no flag", "'--minify'"}, "build and test"},
@@ -155,6 +169,8 @@ func TestParseRefusesALineThatIsNotWellFormed(t *testing.T) {
 		{[]string{"check", "a", "b"}, []string{"check takes no arguments", "'a'"}, "moonwell check"},
 		{[]string{"build", "extra", "--help"}, []string{"build takes no arguments", "'extra'"}, "moonwell build"},
 		{[]string{"build", "--", "--minify"}, []string{"build takes no arguments", "'--minify'"}, "moonwell build"},
+		{[]string{"--", "build", "--minify"}, []string{"build takes no arguments", "'--minify'"}, "moonwell build"},
+		{[]string{"--", "init"}, []string{"init needs a directory"}, "moonwell init my-map"},
 		{[]string{"build", "-"}, []string{"build takes no arguments", "'-'"}, "moonwell build"},
 		{[]string{"init", "a", "b"}, []string{"init takes one argument", "'b'"}, "moonwell init"},
 		{[]string{"init", "a", "--help", "b"}, []string{"init takes one argument", "'b'"}, "moonwell init"},
@@ -169,11 +185,11 @@ func TestParseRefusesALineThatIsNotWellFormed(t *testing.T) {
 		{[]string{"-abc=5", "build"}, []string{"'-abc=5'", "one dash and one letter"}, "on its own"},
 		{[]string{"build", "-h=1"}, []string{"'-h=1'", "one dash and one letter"}, "on its own"},
 		{[]string{"build", "-minify"}, []string{"'-minify'", "one dash and one letter"}, "two dashes"},
+		{[]string{"build", "-\xc3\xa9\xc3\xa9"}, []string{"'-\xc3\xa9\xc3\xa9'", "one dash and one letter"}, "on its own"},
 
-		// "--" before the command.
-		{[]string{"--", "build"}, []string{"'--'", "before the command"}, "command first"},
-		{[]string{"--"}, []string{"'--'", "before the command"}, "command first"},
-		{[]string{"--help", "--", "build"}, []string{"'--'", "before the command"}, "command first"},
+		// A command's flag before "--" is held against the command after it, and against a line without one.
+		{[]string{"--minify", "--", "check"}, []string{"check has no flag", "'--minify'"}, "build and test"},
+		{[]string{"--minify", "--"}, []string{"'--minify'", "without a command"}, "build and test"},
 	} {
 		got, err := parse(c.args, grammar)
 		var refusal *diag.Error
@@ -192,6 +208,44 @@ func TestParseRefusesALineThatIsNotWellFormed(t *testing.T) {
 		if refusal.File != "" || !reflect.DeepEqual(got, line{}) {
 			t.Errorf("parse(%q): file %q and line %+v; a refused line has no file and says nothing", c.args,
 				refusal.File, got)
+		}
+	}
+}
+
+// The hint for a flag Moonwell does not have names the closest flag the line's command has, or that every line
+// has. Only when none of those is close does it name the closest flag of another command, and then says whose
+// that is: the flag it names is not one to add to the line as it stands. A command that is named after the flag
+// is not known when the flag is read.
+func TestTheHintForAFlagMoonwellDoesNotHaveNamesAFlagOfTheCommandFirst(t *testing.T) {
+	const listed = "moonwell --help lists the flags of each command."
+	for _, c := range []struct {
+		args []string
+		hint string
+	}{
+		{[]string{"build", "--minfy"}, "Did you mean --minify?"},
+		{[]string{"test", "--entri=src/a.yue"}, "Did you mean --entry?"},
+		{[]string{"init", "my-map", "--lnk"}, "Did you mean --link?"},
+		{[]string{"check", "--hlp"}, "Did you mean --help?"},
+		{[]string{"--versio"}, "Did you mean --version?"},
+		// The closest flag is another command's.
+		{[]string{"build", "--linkk"}, "Did you mean --link? --link is a flag of init."},
+		{[]string{"init", "my-map", "--minfy"}, "Did you mean --minify? --minify is a flag of build and test."},
+		{[]string{"check", "--entri"}, "Did you mean --entry? --entry is a flag of build and test."},
+		{[]string{"--minfy"}, "Did you mean --minify? --minify is a flag of build and test."},
+		{[]string{"--minfy", "build"}, "Did you mean --minify? --minify is a flag of build and test."},
+		{[]string{"frobnicate", "--lnk"}, "Did you mean --link? --link is a flag of init."},
+		// No flag is close.
+		{[]string{"build", "--verbose"}, listed},
+		{[]string{"build", "-x"}, listed},
+	} {
+		_, err := parse(c.args, grammar)
+		var refusal *diag.Error
+		if !errors.As(err, &refusal) {
+			t.Errorf("parse(%q) = %v; want a refusal that is a *diag.Error", c.args, err)
+			continue
+		}
+		if !strings.Contains(refusal.Msg, "Moonwell has no flag") || refusal.Hint != c.hint {
+			t.Errorf("parse(%q): %q with the hint %q, want the hint %q", c.args, refusal.Msg, refusal.Hint, c.hint)
 		}
 	}
 }

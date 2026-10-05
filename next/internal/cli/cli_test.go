@@ -34,7 +34,9 @@ Options:
 
 func TestHelpAndNoCommandPrintUsage(t *testing.T) {
 	want := strings.Replace(usage, "VERSION", moonwell.Version, 1)
-	for _, args := range [][]string{{"--help"}, {"-h"}, {}, {"build", "--help"}, {"frobnicate", "--help"}} {
+	for _, args := range [][]string{
+		{"--help"}, {"-h"}, {}, {"build", "--help"}, {"frobnicate", "--help"}, {"--"}, {"--help", "--", "build"},
+	} {
 		if result := run(t.TempDir(), args...); result.code != 0 || result.output != want || result.stdout != "" {
 			t.Errorf("%q: exit %d\n%s", args, result.code, result.output)
 		}
@@ -50,20 +52,26 @@ func TestVersionPrintsTheVersion(t *testing.T) {
 }
 
 func TestUnknownCommandsFailWithUsage(t *testing.T) {
-	for _, c := range []struct{ name, first string }{
-		{"frobnicate", "Unknown command 'frobnicate'."},
-		{"", "Unknown command ''."},
+	for _, c := range []struct {
+		args  []string
+		first string
+	}{
+		{[]string{"frobnicate"}, "Unknown command 'frobnicate'."},
+		{[]string{""}, "Unknown command ''."},
 		// The closest command is named when one is close.
-		{"buld", "Unknown command 'buld'. Did you mean build?"},
-		{"chek", "Unknown command 'chek'. Did you mean check?"},
-		{"Dev", "Unknown command 'Dev'. Did you mean dev?"},
+		{[]string{"buld"}, "Unknown command 'buld'. Did you mean build?"},
+		{[]string{"chek"}, "Unknown command 'chek'. Did you mean check?"},
+		{[]string{"Dev"}, "Unknown command 'Dev'. Did you mean dev?"},
+		// After "--" the first word is the command, though a flag is written so.
+		{[]string{"--", "--minify"}, "Unknown command '--minify'."},
+		{[]string{"--", "frobnicate", "--minify"}, "Unknown command 'frobnicate'."},
 	} {
-		result := run(t.TempDir(), c.name)
+		result := run(t.TempDir(), c.args...)
 		if result.code != 1 || !strings.HasPrefix(result.output, c.first+"\n\nMoonwell ") || result.stdout != "" {
-			t.Errorf("%q: %+v", c.name, result)
+			t.Errorf("%q: %+v", c.args, result)
 		}
 		if !strings.HasSuffix(result.output, "\n\n"+Usage()) {
-			t.Errorf("%q: the usage does not end the output:\n%s", c.name, result.output)
+			t.Errorf("%q: the usage does not end the output:\n%s", c.args, result.output)
 		}
 	}
 }
@@ -81,6 +89,9 @@ func TestARefusedLineIsPrintedAsAFailureWithItsHintAndWithoutTheUsage(t *testing
 		{[]string{"build", "extra"}, []string{"error: build takes no arguments", "\nhint: "}},
 		{[]string{"test", "--minify=true"}, []string{"error: ", "takes no value", "\nhint: "}},
 		{[]string{"-hv"}, []string{"error: ", "'-hv'", "\nhint: "}},
+		{[]string{"--", "build", "--minify"}, []string{"error: build takes no arguments", "'--minify'", "\nhint: "}},
+		{[]string{"build", "--linkk"},
+			[]string{"error: Moonwell has no flag '--linkk'.", "\nhint: Did you mean --link? --link is a flag of init."}},
 	} {
 		result := fails(t, t.TempDir(), c.wanted, c.args...)
 		if strings.Contains(result.output, "Usage:") || strings.Count(result.output, "error: ") != 1 {
@@ -139,7 +150,7 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	root := t.TempDir()
 	fails(t, root, []string{"error: ", "The src/ folder is missing."}, "dev")
 	for _, name := range []string{"check", "build", "test"} {
-		result := carried(t, background, root, rowNamed(t, name), line{words: []string{name}})
+		result := carried(t, background, root, name)
 		if result.code != 1 || !strings.Contains(result.output, "No moonwell.pkl found") {
 			t.Errorf("%s: %+v", name, result)
 		}
@@ -178,20 +189,24 @@ func TestALinkAtDistGetsNoLog(t *testing.T) {
 // ---- how a command's outcome becomes printed lines and an exit code ----
 
 func TestCommandFailuresAreFormattedAndReturn1(t *testing.T) {
-	result := carried(t, background, t.TempDir(), rowNamed(t, "check"), line{words: []string{"check"}})
-	if result.code != 1 || !strings.HasPrefix(result.output, "error: ") {
+	result := carried(t, background, t.TempDir(), "check")
+	if result.code != 1 || !strings.HasPrefix(result.output, "error: ") || result.stdout != "" {
 		t.Errorf("%+v", result)
 	}
 	contains(t, result.output, "No moonwell.pkl found in this directory.", "\nhint: ")
+	if strings.Count(result.output, "error: ") != 1 {
+		t.Errorf("the failure is printed more than once:\n%s", result.output)
+	}
 }
 
 func TestACommandThatWasInterruptedExitsWith130(t *testing.T) {
 	cancelled, cancel := context.WithCancel(background)
 	cancel()
-	// Nothing ran, so there is nothing to report: not even the internal error a bare cancellation would be. A
-	// program is not started with a context that is cancelled, so this runs in the real world.
+	// Nothing ran, so there is nothing to report: not even the internal error a bare cancellation would be. The
+	// stand-in world answers a cancelled context as the real one does, with the context's error; the command
+	// stops at the first program it would run, which is pkl asked for its version.
 	for _, command := range []string{"check", "build", "test"} {
-		if result := runWith(cancelled, t.TempDir(), command); result.code != 130 || result.output != "" {
+		if result := carried(t, cancelled, t.TempDir(), command); result.code != 130 || result.output != "" {
 			t.Errorf("%s: exit %d, printed %q", command, result.code, result.output)
 		}
 	}
@@ -204,7 +219,7 @@ func TestADevThatWasToldToStopExitsWith130(t *testing.T) {
 	testkit.WriteFile(t, root, "src/main.yue", []byte("x = 1\n"))
 	stopped, stop := context.WithCancel(background)
 	stop()
-	result := carried(t, stopped, root, rowNamed(t, "dev"), line{words: []string{"dev"}})
+	result := carried(t, stopped, root, "dev")
 	if result.code != 130 {
 		t.Errorf("%+v", result)
 	}
@@ -234,30 +249,72 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 		{"a cancellation nobody asked for", "check", false, context.Canceled, 1, diag.Internal("context canceled")},
 	} {
 		ctx, stop := context.WithCancel(background)
-		ends := command{name: c.command, run: func(context.Context, *env.Env, call) error {
-			if c.stopped {
-				stop()
-			}
-			return c.err
-		}}
-		result := carried(t, ctx, t.TempDir(), ends, line{})
+		if c.stopped {
+			stop()
+		}
+		log := testkit.NewRecorder()
+		code := ended(ctx, log.Logger, command{name: c.command}, c.err)
 		stop()
-		if result.code != c.code || result.output != c.output || result.stdout != "" {
-			t.Errorf("%s: exit %d, want %d; printed\n%s\nwant\n%s", c.what, result.code, c.code, result.output, c.output)
+		if output := strings.Join(log.Lines(), "\n"); code != c.code || output != c.output || len(log.Lines()) > 1 {
+			t.Errorf("%s: exit %d, want %d; printed\n%s\nwant\n%s", c.what, code, c.code, output, c.output)
 		}
 	}
 }
 
-func TestAPanicInACommandIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
-	panics := func(context.Context, *env.Env, call) error { panic("the index is out of range") }
-	result := carried(t, background, t.TempDir(), command{name: "check", run: panics}, line{})
-	if result.code != 1 || !strings.HasPrefix(result.output, "internal error: the index is out of range\n") {
-		t.Errorf("%+v", result)
+// A panic is a fault in Moonwell wherever it happens on the way of a line: in a command, here in the first
+// program check runs, and before a command runs, here while its outside world is made. Both are in a project, so
+// the line has a log by then, and the fault is kept in it.
+//
+// The parser is on the same way, before the two: no test makes it panic, since it calls nothing a test can
+// hand it.
+func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
+	inACommand := func(root string, log *env.Logger) *env.Env {
+		e := standIn(t)(root, log)
+		e.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
+			panic("the index is out of range")
+		}
+		return e
 	}
-	// The stack names the function that panicked, in this file.
-	contains(t, result.output, "goroutine ", "cli_test.go", "This is a bug in Moonwell; please report it.")
-	if strings.Count(result.output, "internal error: ") != 1 {
-		t.Errorf("the panic is printed more than once:\n%s", result.output)
+	beforeTheCommand := func(string, *env.Logger) *env.Env { panic("the index is out of range") }
+	places := map[string]world{"in a command": inACommand, "before the command": beforeTheCommand}
+	for what, outside := range places {
+		root := project(t)
+		result := carriedIn(background, outside, root, "check")
+		if result.code != 1 || !strings.HasPrefix(result.output, "internal error: the index is out of range\n") {
+			t.Errorf("%s: %+v", what, result)
+		}
+		// The stack names the function that panicked, in this file.
+		contains(t, result.output, "goroutine ", "cli_test.go", "This is a bug in Moonwell; please report it.")
+		if strings.Count(result.output, "internal error: ") != 1 || result.stdout != "" {
+			t.Errorf("%s: the panic is printed more than once, or for other programs:\n%s", what, result.output)
+		}
+		if logged := read(t, root, "dist/moonwell.log"); !strings.HasSuffix(logged, "] error: "+result.output+"\n") {
+			t.Errorf("%s: dist/moonwell.log holds:\n%s\nwant the time, the level and what was printed", what, logged)
+		}
+	}
+}
+
+// Before a line has a command it has no log, and a fault there is printed to the terminal alone. Nothing that
+// runs so early can be made to panic but the stream the lines go to: it fails here once, as the version is
+// written, in the real world.
+func TestAPanicBeforeALineHasACommandIsPrintedToTheTerminal(t *testing.T) {
+	root := project(t)
+	var lines []string
+	broke := false
+	write := func(line string) {
+		if !broke {
+			broke = true
+			panic("the stream broke")
+		}
+		lines = append(lines, line)
+	}
+	code := Run(background, []string{"--version"}, root, write, func(string) {})
+	if code != 1 || len(lines) != 1 || !strings.HasPrefix(lines[0], "internal error: the stream broke\n") {
+		t.Fatalf("exit %d, printed %q", code, lines)
+	}
+	contains(t, lines[0], "goroutine ", "cli_test.go", "This is a bug in Moonwell; please report it.")
+	if exists(root, "dist") {
+		t.Error("a line without a command made dist/")
 	}
 }
 
@@ -271,9 +328,10 @@ func TestAFileNameThatIsNotUTF8IsPrintedAsItIs(t *testing.T) {
 	if got := diag.Format(refusal); got != want {
 		t.Errorf("diag.Format = %q, want %q", got, want)
 	}
-	refused := command{name: "check", run: func(context.Context, *env.Env, call) error { return refusal }}
-	if result := carried(t, background, t.TempDir(), refused, line{}); result.code != 1 || result.output != want {
-		t.Errorf("the command printed %q, want %q", result.output, want)
+	log := testkit.NewRecorder()
+	code := ended(background, log.Logger, command{name: "check"}, refusal)
+	if printed := log.Lines(); code != 1 || len(printed) != 1 || printed[0] != want {
+		t.Errorf("a command that ends with the failure prints %q and exits with %d, want %q and 1", printed, code, want)
 	}
 }
 

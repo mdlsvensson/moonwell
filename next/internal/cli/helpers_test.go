@@ -27,15 +27,48 @@ type outcome struct {
 // run runs a command line in root, as the program does: in the real world. A test runs so only a line that
 // starts no program and downloads nothing.
 func run(root string, args ...string) outcome {
-	return runWith(background, root, args...)
-}
-
-// runWith is run with the context given.
-func runWith(ctx context.Context, root string, args ...string) outcome {
 	var lines, printed []string
-	code := Run(ctx, args, root, func(line string) { lines = append(lines, line) },
+	code := Run(background, args, root, func(line string) { lines = append(lines, line) },
 		func(text string) { printed = append(printed, text) })
 	return outcome{code, strings.Join(lines, "\n"), strings.Join(printed, "\n")}
+}
+
+// carried runs a command line in root as the program does, but for the outside world, which is a stand-in.
+func carried(t *testing.T, ctx context.Context, root string, args ...string) outcome {
+	t.Helper()
+	return carriedIn(ctx, standIn(t), root, args...)
+}
+
+// carriedIn runs a command line in root as the program does, in the outside world that is given.
+func carriedIn(ctx context.Context, outside world, root string, args ...string) outcome {
+	var lines, printed []string
+	code := runIn(ctx, outside, args, root, func(line string) { lines = append(lines, line) },
+		func(text string) { printed = append(printed, text) })
+	return outcome{code, strings.Join(lines, "\n"), strings.Join(printed, "\n")}
+}
+
+// standIn is a stand-in for the outside world. The log is the line's own, so what a command says is printed and
+// kept as in the real world. Of all programs it answers one, pkl asked for its version, as a Pkl that is new
+// enough: so a command gets as far as the manifest without a program started, and any other program fails the
+// test. A program is not started with a context that is cancelled, and the context's error is returned, as
+// env.Run does.
+func standIn(t *testing.T) world {
+	return func(root string, log *env.Logger) *env.Env {
+		e, _ := testkit.Env(t, root)
+		e.Log = log
+		e.Run = func(ctx context.Context, program string, args []string, _ env.RunOptions) (env.RunResult, error) {
+			switch {
+			case ctx.Err() != nil:
+				return env.RunResult{}, ctx.Err()
+			case program == toolchain.Pkl.Name && slices.Equal(args, toolchain.Pkl.VersionArgs):
+				return env.RunResult{Stdout: "Pkl 0.32.1 (a stand-in)\n"}, nil
+			}
+			// Without stopping the test: a command may run a program from a goroutine of its own.
+			t.Errorf("the test has no stand-in for the program: %s %q", program, args)
+			return env.RunResult{}, errors.New("no stand-in for " + program)
+		}
+		return e
+	}
 }
 
 // ok runs a command line that must succeed.
@@ -70,33 +103,6 @@ func contains(t *testing.T, text string, parts ...string) {
 
 // exists reports whether a file or folder of root is there; path uses "/".
 func exists(root, path string) bool { return fsx.Exists(filepath.Join(root, filepath.FromSlash(path))) }
-
-// world is a stand-in world for the folder root. Its log is recorded, and of all programs it answers one: pkl
-// asked for its version, as a Pkl that is new enough. So a command gets as far as the manifest without a
-// program started, and any other program fails the test.
-func world(t *testing.T, root string) (*env.Env, *testkit.Recorder) {
-	t.Helper()
-	e, log := testkit.Env(t, root)
-	e.Run = func(_ context.Context, program string, args []string, _ env.RunOptions) (env.RunResult, error) {
-		if program == toolchain.Pkl.Name && slices.Equal(args, toolchain.Pkl.VersionArgs) {
-			return env.RunResult{Stdout: "Pkl 0.32.1 (a stand-in)\n"}, nil
-		}
-		// Without stopping the test: a command may run a program from a goroutine of its own.
-		t.Errorf("the test has no stand-in for the program: %s %q", program, args)
-		return env.RunResult{}, errors.New("no stand-in for " + program)
-	}
-	return e, log
-}
-
-// carried carries out a command in a stand-in world for root, as Run does in the real one once it has read the
-// line, and returns what the command logged and how it ended.
-func carried(t *testing.T, ctx context.Context, root string, chosen command, said line) outcome {
-	t.Helper()
-	e, log := world(t, root)
-	var printed []string
-	code := carryOut(ctx, chosen, e, call{said: said, print: func(text string) { printed = append(printed, text) }})
-	return outcome{code, strings.Join(log.Lines(), "\n"), strings.Join(printed, "\n")}
-}
 
 // rowNamed is the row of the command table for a command that must be there.
 func rowNamed(t *testing.T, name string) command {

@@ -3,6 +3,7 @@ package cli
 import (
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/script"
@@ -13,8 +14,8 @@ import (
 // A line is words and flags. The first word names the command, and the words after it are the command's own
 // arguments. A flag is written --name, or by its short form, one dash and one letter; it may stand anywhere, a
 // command's flag before the command too. A flag with a value takes it after "=", or from the argument after the
-// flag. "--" ends the flags: what follows it is arguments of the command, whatever it starts with, so the
-// command stands before it. A dash alone is a word.
+// flag. "--" ends the flags, wherever it stands: what follows it is words, whatever it starts with, so the
+// command when none is named before it, and the command's arguments. A dash alone is a word.
 //
 // Whatever else a line holds is refused with a hint, and nothing of the line is carried out: no flag is passed
 // over, and no argument.
@@ -113,25 +114,16 @@ func (r *reading) read(arg string, rest []string) (taken int, err error) {
 		r.said.words = append(r.said.words, arg)
 		return 0, nil
 	case arg == "--":
-		return 0, r.endFlags()
+		r.ended = true
+		return 0, nil
 	}
 	return r.flag(arg, rest)
-}
-
-// endFlags reads "--". The command stands before it: after it a word is an argument, so a command there would
-// be taken for one, or an argument for the command.
-func (r *reading) endFlags() error {
-	if len(r.said.words) == 0 {
-		return errFlagsEndBeforeCommand()
-	}
-	r.ended = true
-	return nil
 }
 
 // flag reads one flag, arg, with its value, and keeps what it says. A flag may be given more than once as long
 // as it says one thing: its values are compared as they are written.
 func (r *reading) flag(arg string, rest []string) (taken int, err error) {
-	f, inline, hasInline, err := spelled(arg)
+	f, inline, hasInline, err := r.spelled(arg)
 	if err != nil {
 		return 0, err
 	}
@@ -148,28 +140,34 @@ func (r *reading) flag(arg string, rest []string) (taken int, err error) {
 }
 
 // spelled is the flag that arg spells, an argument that starts with a dash, and the value it writes after "=":
-// hasInline says that it writes one, which only a long form can. One dash is followed by one letter: a group of
-// short flags is refused, and so is a long form with one dash.
-func spelled(arg string) (f flag, inline string, hasInline bool, err error) {
+// hasInline says that it writes one, which only a long form can. One dash is followed by one character: a group
+// of short flags is refused, and so is a long form with one dash.
+func (r *reading) spelled(arg string) (f flag, inline string, hasInline bool, err error) {
 	if !strings.HasPrefix(arg, "--") {
 		short := arg[1:]
-		if len(short) != 1 {
+		if utf8.RuneCountInString(short) != 1 {
 			return flag{}, "", false, errNotOneLetter(arg)
 		}
-		f, err = flagBy(arg, func(row flag) bool { return row.short == short })
+		f, err = r.flagBy(arg, func(row flag) bool { return row.short == short })
 		return f, "", false, err
 	}
 	name, inline, hasInline := strings.Cut(arg[2:], "=")
-	f, err = flagBy("--"+name, func(row flag) bool { return row.name == name })
+	written := "--" + name
+	if name == "" {
+		// A flag without a name is named as it is typed: "--" alone would read as the end of the flags.
+		written = arg
+	}
+	f, err = r.flagBy(written, func(row flag) bool { return row.name == name })
 	return f, inline, hasInline, err
 }
 
 // flagBy is the row of the table that is the one asked for; written is how the line wrote the flag, for the
-// refusal of one the table does not have.
-func flagBy(written string, is func(row flag) bool) (flag, error) {
+// refusal of one the table does not have. The refusal's hint is for the command the line has named so far.
+func (r *reading) flagBy(written string, is func(row flag) bool) (flag, error) {
 	at := slices.IndexFunc(flags, is)
 	if at < 0 {
-		return flag{}, errUnknownFlag(written)
+		command, _ := r.said.command()
+		return flag{}, errUnknownFlag(written, command)
 	}
 	return flags[at], nil
 }
@@ -231,21 +229,46 @@ func (r *reading) flagNotOf(command string) (flag, bool) {
 
 // ---- errors ----
 
-func errUnknownFlag(written string) error {
-	hint := "moonwell --help lists the flags of each command."
-	var have []string
+// errUnknownFlag refuses a flag Moonwell does not have, as the line wrote it. command is the command the line
+// has named where the flag stands, "" for none.
+//
+// The hint names the closest flag the command can be given: one of its own, or one of every line. Only when
+// none of those is close does it name the closest flag of the other commands, and says whose that is, since the
+// line as it stands cannot take it.
+func errUnknownFlag(written, command string) error {
+	var own, others []flag
 	for _, f := range flags {
-		have = append(have, f.written())
+		if len(f.commands) == 0 || slices.Contains(f.commands, command) {
+			own = append(own, f)
+		} else {
+			others = append(others, f)
+		}
 	}
-	if closest := diag.Closest(have, written, 1); len(closest) > 0 {
-		hint = "Did you mean " + diag.JoinWords(closest, "or", -1) + "?"
+	hint := "moonwell --help lists the flags of each command."
+	if f, found := closestFlag(own, written); found {
+		hint = "Did you mean " + f.written() + "?"
+	} else if f, found := closestFlag(others, written); found {
+		hint = "Did you mean " + f.written() + "? " + whoseFlag(f)
 	}
 	return &diag.Error{Msg: "Moonwell has no flag '" + written + "'.", Hint: hint}
 }
 
+// closestFlag is the flag among candidates whose long form is closest to what a line wrote, when one is close.
+func closestFlag(candidates []flag, written string) (flag, bool) {
+	var forms []string
+	for _, f := range candidates {
+		forms = append(forms, f.written())
+	}
+	closest := diag.Closest(forms, written, 1)
+	if len(closest) == 0 {
+		return flag{}, false
+	}
+	return candidates[slices.Index(forms, closest[0])], true
+}
+
 func errNotOneLetter(written string) error {
 	return &diag.Error{
-		Msg: "'" + written + "' is no flag: a short flag is one dash and one letter.",
+		Msg: "'" + written + "' is no flag: a short flag is one dash and one letter, and this has more.",
 		Hint: "Write each short flag on its own, such as -h -v, and a long flag with two dashes, such as " +
 			"--minify.",
 	}
@@ -262,13 +285,6 @@ func errGivenTwice(f flag, first, second string) error {
 	return &diag.Error{
 		Msg:  "'" + f.written() + "' is given twice, as '" + first + "' and as '" + second + "'.",
 		Hint: "Give " + f.written() + " once.",
-	}
-}
-
-func errFlagsEndBeforeCommand() error {
-	return &diag.Error{
-		Msg:  "'--' stands before the command.",
-		Hint: "Name the command first: what follows '--' is the command's arguments.",
 	}
 }
 

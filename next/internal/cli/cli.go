@@ -86,13 +86,36 @@ func Usage() string {
 // was cancelled before the command ended. write takes the lines for the terminal; print takes output meant for
 // other programs.
 //
-// root is a full path: a command names its files from it. Only a line that names a command Moonwell has gets
-// as far as a log file and the outside world: a line that is refused, one that asks for the help or the
-// version, and one whose command is not known, write nothing to disk.
+// root is a full path: a command names its files from it.
 func Run(ctx context.Context, args []string, root string, write, print func(string)) int {
+	return runIn(ctx, env.New, args, root, write, print)
+}
+
+// world makes the outside world of a command that runs in the folder root and logs to log: env.New, or the
+// stand-in of a test.
+type world func(root string, log *env.Logger) *env.Env
+
+// runIn is Run with the maker of the outside world given: the line is read, the help or the version is printed
+// when it asks for one, its command is looked up, the command runs in its world with its log, and the outcome
+// becomes the exit code.
+//
+// Only a line that names a command Moonwell has gets as far as a log file and the outside world: a line that
+// is refused, one that asks for the help or the version, and one whose command is not known, write nothing to
+// disk.
+//
+// A panic anywhere on the way is a fault in Moonwell: it is printed as an internal error with its stack, to the
+// terminal, and to the log as well once the line has one, and the line ends with 1.
+func runIn(ctx context.Context, outside world, args []string, root string, write, print func(string)) (code int) {
+	say := write // takes the lines of a fault
+	defer func() {
+		if fault := recover(); fault != nil {
+			say(diag.Internal(fmt.Sprintf("%v\n%s", fault, debug.Stack())))
+			code = 1
+		}
+	}()
 	said, err := parse(args, commands)
 	if err != nil {
-		env.NewLogger(write, "").Error(diag.Format(err))
+		write(diag.Format(err))
 		return 1
 	}
 	name, named := said.command()
@@ -110,7 +133,9 @@ func Run(ctx context.Context, args []string, root string, write, print func(stri
 		return 1
 	}
 	log := env.NewLogger(write, logFile(root, chosen))
-	return carryOut(ctx, chosen, env.New(root, log), call{said: said, print: print})
+	say = log.Error
+	err = chosen.run(ctx, outside(root, log), call{said: said, print: print})
+	return ended(ctx, log, chosen, err)
 }
 
 // logFile is the file a command's lines are also written to: dist/moonwell.log for a project, and "" for a
@@ -131,21 +156,8 @@ func logFile(root string, chosen command) string {
 	return file
 }
 
-// carryOut runs a command in the outside world e and returns the exit code. A panic in the command is printed
-// as an internal error with its stack, and ends with 1: a fault in Moonwell asks for a report as any other does.
-//
-// It is the part of Run that is given its world: Run makes the real one, and a test hands in one of its own.
-func carryOut(ctx context.Context, chosen command, e *env.Env, c call) (code int) {
-	defer func() {
-		if fault := recover(); fault != nil {
-			e.Log.Error(diag.Internal(fmt.Sprintf("%v\n%s", fault, debug.Stack())))
-			code = 1
-		}
-	}()
-	return ended(ctx, e.Log, chosen, chosen.run(ctx, e, c))
-}
-
-// ended prints the failure a command ended with, and returns the exit code of the outcome.
+// ended prints the failure a command ended with, and returns the exit code of the outcome. A failure is printed
+// in one way, as diag.Format renders it, whether a command ended with it or the line was refused.
 //
 // A command that was told to stop ends with 130, unless it ended well all the same; when it only stopped
 // because it was told to, it has nothing to report. dev runs until it is told to stop, and ends with 130 then,
