@@ -51,6 +51,18 @@ func TestGamePathKeyTakesOnlyTheLastExtensionAndOnlyATexturesOff(t *testing.T) {
 			t.Errorf("a .%s texture has the key %q", extension, got)
 		}
 	}
+	// The types written out: a model that names a texture of any of them is given the game's file of another.
+	for _, extension := range []string{"blp", "dds", "tga", "tif", "tiff", "png", "jpg"} {
+		if got := GamePathKey("Textures/A." + extension); got != "textures/a.<texture>" {
+			t.Errorf("a .%s texture has the key %q", extension, got)
+		}
+	}
+	// What looks like one of them and is none keeps its extension.
+	for _, extension := range []string{"jpeg", "bmp", "tg", "ddsx", "wav", "pkb", "pkfx"} {
+		if got := GamePathKey("Textures/A." + extension); got != "textures/a."+extension {
+			t.Errorf("a .%s file has the key %q", extension, got)
+		}
+	}
 }
 
 // Letter case folds one character to one character: a capital I with a dot is a plain i.

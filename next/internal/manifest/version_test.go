@@ -23,6 +23,9 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 		{"a local package", resolvedDeps("0.1.3"), "0.1.3"},
 		{"a remote package beside another", remote, "0.9.1-rc.1"},
 		{"behind a byte order mark", "\xEF\xBB\xBF" + resolvedDeps("0.9.0"), "0.9.0"},
+		// The package is the first dependency named moonwell that is resolved to a version.
+		{"after a dependency of its name that is no mapping", `{"resolvedDependencies":{
+			"package://x/moonwell@0":"1.0.0","package://y/moonwell@1":{"uri":"p://y/moonwell@1.2.3"}}}`, "1.2.3"},
 	}
 	for _, tt := range found {
 		if got, err := ReadPackageVersion([]byte(tt.deps)); err != nil || got != tt.want {
@@ -39,6 +42,7 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 		{"an address without a version", `{"resolvedDependencies":{"package://x/moonwell@0":{"uri":3}}}`, "not a resolved"},
 		{"another package", `{"resolvedDependencies":{"package://x/other@0":{"uri":"p://x/other@0.9.1"}}}`, "not a resolved"},
 		{"not JSON", `{ not json`, "not valid JSON"},
+		{"an empty file", ``, "not valid JSON"},
 	}
 	for _, tt := range refused {
 		version, err := ReadPackageVersion([]byte(tt.deps))
@@ -51,7 +55,7 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 }
 
 func TestCheckPackageVersionComparesTheMajorAndMinorNumbers(t *testing.T) {
-	for _, same := range [][2]string{{"0.1.9", "0.1.0"}, {"0.9.1", "0.9.1"}, {"1.2.0-rc.1", "1.2.7"}} {
+	for _, same := range [][2]string{{"0.1.9", "0.1.0"}, {"0.9.1", "0.9.1"}, {"1.2.0-rc.1", "1.2.7"}, {"0.9", "0.9.1"}} {
 		if err := CheckPackageVersion(same[0], same[1]); err != nil {
 			t.Errorf("CheckPackageVersion(%q, %q) = %v", same[0], same[1], err)
 		}
@@ -72,6 +76,11 @@ func TestCheckPackageVersionComparesTheMajorAndMinorNumbers(t *testing.T) {
 		{"a package with an install script", "0.8.2", "0.9.0", true, "moonwell@0.9.x"},
 		{"a later major version", "1.0.0", "0.9.1", true, "moonwell@0.9.x"},
 		{"a version that is no version", "latest", "0.9.1", false, "moonwell@0.9.x"},
+		// The numbers are compared whole: 9 is not 10, though one starts as the other does.
+		{"a minor version that starts as the program's does", "0.1.0", "0.10.0", false, "moonwell@0.10.x"},
+		{"the minor version before the program's", "0.9.1", "0.10.0", true, "moonwell@0.10.x"},
+		{"no version", "", "0.9.1", false, "moonwell@0.9.x"},
+		{"a version with a part that is no number", "0.x.1", "1.0.0", false, "moonwell@1.0.x"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

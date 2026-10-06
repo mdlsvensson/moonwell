@@ -55,9 +55,19 @@ func TestPklProjectDependsOnThePublishedPackageOrOnALocalOne(t *testing.T) {
 		PackageBaseURI != "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell" {
 		t.Errorf("remote = %q", remote)
 	}
+	// The file whole, as a new project gets it: pkl reads it, and a project keeps it under version control.
+	const wantRemote = "amends \"pkl:Project\"\n\ndependencies {\n" +
+		"  [\"moonwell\"] { uri = \"package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.1.0\" }\n}\n"
+	if remote != wantRemote {
+		t.Errorf("remote = %q, want %q", remote, wantRemote)
+	}
 	local := PklProject("", "../schema")
 	if !strings.Contains(local, `["moonwell"] = import("../schema/PklProject")`) {
 		t.Errorf("local = %q", local)
+	}
+	const wantLocal = "amends \"pkl:Project\"\n\ndependencies {\n  [\"moonwell\"] = import(\"../schema/PklProject\")\n}\n"
+	if local != wantLocal {
+		t.Errorf("local = %q, want %q", local, wantLocal)
 	}
 	// The template in the checkout is a project linked to the schema beside it.
 	template, err := os.ReadFile(filepath.Join(testkit.RepoRoot(t), "template", "PklProject"))
@@ -79,5 +89,19 @@ func TestLocalPklAmendsMoonwellPklAndSetsTheDefaultGamePathEscaped(t *testing.T)
 	}
 	if DefaultGameExecutable != `C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe` {
 		t.Errorf("DefaultGameExecutable = %q", DefaultGameExecutable)
+	}
+	// The file whole, as init and setup write it.
+	const want = "// Settings for this machine only. Git-ignored, so each checkout has its own; " +
+		"`moonwell setup` recreates it.\n" +
+		"// It amends moonwell.pkl, so anything set here overrides the shared manifest.\n" +
+		"\n" +
+		"amends \"moonwell.pkl\"\n" +
+		"\n" +
+		"launch {\n" +
+		"  gameExecutable = \"C:\\\\Program Files (x86)\\\\Warcraft III\\\\_retail_\\\\x86_64\\\\Warcraft III.exe\"" +
+		"  // your Warcraft III.exe\n" +
+		"}\n"
+	if local != want {
+		t.Errorf("LocalPkl = %q, want %q", local, want)
 	}
 }

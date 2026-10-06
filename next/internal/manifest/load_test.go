@@ -66,7 +66,8 @@ func TestLoadEvaluatesTheLocalManifestWhenThereIsOneWithTheProgramItIsGiven(t *t
 			e := world(t, tt.files)
 			var calls []ran
 			line := "/cache/pkl/0.32.1/pkl eval --format json --project-dir . " + tt.want
-			e.Run = answering(&calls, map[string]env.RunResult{line: {Stdout: printed()}})
+			// What pkl says beside a project that it prints is a warning, and does not stop the load.
+			e.Run = answering(&calls, map[string]env.RunResult{line: {Stdout: printed(), Stderr: "a warning"}})
 			p, err := Load(background, e, "/cache/pkl/0.32.1/pkl")
 			if err != nil {
 				t.Fatal(diag.Format(err))
@@ -113,6 +114,8 @@ func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
 		{"an evaluation that fails and says so on the other stream", project,
 			evaluation(env.RunResult{Code: 2, Stdout: "No such module\n"}),
 			"moonwell.pkl", []string{"Evaluating moonwell.pkl failed:\nNo such module"}, ""},
+		{"an evaluation that fails without a word", project, evaluation(env.RunResult{Code: 3}),
+			"moonwell.pkl", []string{"Evaluating moonwell.pkl failed:"}, ""},
 		{"output that is not JSON", project, evaluation(env.RunResult{Stdout: "map { }\n"}),
 			"moonwell.pkl", []string{"not valid JSON:\nmap { }"}, "Pkl 0.32"},
 		{"no output", project, evaluation(env.RunResult{}),
