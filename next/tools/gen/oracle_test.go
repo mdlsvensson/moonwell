@@ -45,7 +45,8 @@ import (
 // checkout; Lua extras that the other tree's program panics on; and, started in a folder below the checkout, a
 // list and an export beside it, and a list and an export that are not there, each named by a path from that
 // folder. They are compared as every other run is, each by its class. The test builds two programs and starts
-// them some hundred and sixty times, takes some ten seconds, and is skipped with -short. A change to this tree's
+// them some hundred and ninety times, once for every run and once more for each run of the programs, takes some
+// ten seconds, and is skipped with -short. A change to this tree's
 // generator that is given to go test with its flag -overlay reaches run and not the program that the test
 // builds: through GOFLAGS it reaches both.
 //
@@ -204,8 +205,9 @@ import (
 //     list of differences does not name this one. The predicate is on the extras, which are no JSON, and on
 //     what the other tree said: that sentence, and no other. A place of the class holds the other tree's words
 //     for the end, and is of standard error (TestDecodeExtrasSaysTheSameOfATextThatEndsTooSoonWhereverItEnds).
-//     Where the two readers say the same, the runs are compared whole: a text that is cut short inside a text
-//     or before a value, one that holds nothing, and one that is no JSON from its first character.
+//     The two readers say the same of a text that is cut short inside a text, after a key and before its colon,
+//     or after a colon and before its value, of one that holds nothing, and of one that is no JSON from its first
+//     character. The runs of these are compared whole; the cut after a key has no run.
 //   - KeyOrder, 2 runs (keysInAnotherOrder, keyOrders): a function of the extras, or a parameter of one, whose
 //     keys, all of them and each once, stand in another order than data/natives.json writes them (name, params,
 //     returns; name, type). The other tree writes the keys of a function of Lua and of its parameters in the
@@ -229,11 +231,21 @@ import (
 //     words; the other tree passes over a value that is no list and an entry that is no text, writes a params or
 //     a returns of any shape into the natives, and panics on a name that is no text
 //     (TestDecodeExtrasRefusesWhatTheFileMustNotHold holds that this tree refuses each, with the file).
-//   - Two faults in one line, where each tree tells of the one it comes to first: Lua extras of UnknownKey or of
-//     LacksAKey, or a script with white space outside ASCII, beside a name that is declared twice. The other tree
-//     says "declared twice", and this tree refuses the extras or the script. Which fault of several is told is
-//     free. Where the two trees come to the same fault first, the runs are compared whole: a script that does
-//     not parse beside extras that are no JSON; an export that is not there, and no extras.
+//   - Two faults in one line, where each tree tells of the one it comes to first: Lua extras of UnknownKey, of
+//     LacksAKey or of NullEntry, or a script with white space outside ASCII, beside a name that is declared
+//     twice. The other tree says "declared twice", and this tree refuses the extras or the script. And a fault of
+//     one function of the extras, of LacksAKey or of NullEntry or a key of a parameter, beside a later entry of
+//     the functions that is no object: the other tree says that a function is not an object, and this tree tells
+//     of the function before it. Which fault of several is told is free. Where the two trees come to the same
+//     fault first, the runs are compared whole: a script that does not parse beside extras that are no JSON; an
+//     export that is not there, and no extras.
+//   - A key of a function of the extras, or of a parameter of one, that stands twice, with its first place out
+//     of the order of the file: returns before name and again after params, or type before name and again after
+//     it. The other tree keeps such a key at its first place, with its last value, and writes the keys of a
+//     function of Lua in that order; this tree writes the one order of the file, as in KeyOrder, whose predicate
+//     asks for every key once and so does not hold. The values are the same in both trees: the last one, and
+//     nothing of an earlier one. A key twice whose first place is its place in the order of the file is among the
+//     runs, and is compared whole.
 //   - A name of the extras with a character above U+FFFF, beside one with a character from U+E000 on: the other
 //     tree orders by UTF-16 units and this tree by bytes (TestBuildNativesOrdersTheNamesByTheirBytes). A name of
 //     a script is of ASCII letters, digits and the underscore, and the two orders are one for those. The order
