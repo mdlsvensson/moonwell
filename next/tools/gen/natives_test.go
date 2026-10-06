@@ -47,21 +47,6 @@ constant function ConstantBJ takes nothing returns integer
 endfunction
 `
 
-// miniExtrasText is Lua extras in the shape of tools/natives/lua-extras.json, and miniExtras what they hold.
-const miniExtrasText = `{
-	"functions": [{ "name": "FourCC", "params": [{ "name": "id", "type": "string" }], "returns": "integer" }],
-	"globals": ["print", "math"],
-	"removed": ["io"]
-}`
-
-func miniExtras() extras {
-	return extras{
-		Functions: []extraFunction{{Name: "FourCC", Params: params("string", "id"), Returns: "integer"}},
-		Globals:   []string{"print", "math"},
-		Removed:   []string{"io"},
-	}
-}
-
 // parsed parses a miniature script as the script of a name.
 func parsed(t *testing.T, text, source string) jass.File {
 	t.Helper()
@@ -230,6 +215,39 @@ func TestBuildNativesNamesBothPlacesOfANameDeclaredTwice(t *testing.T) {
 	}
 }
 
+// The names of every list are ordered by their bytes. A name with a character from U+E000 on stands before one
+// with a character above U+FFFF, which an order by UTF-16 units puts the other way round.
+func TestBuildNativesOrdersTheNamesByTheirBytes(t *testing.T) {
+	const above, from = "\xF0\x90\x80\x80", "\xEE\x80\x80" // U+10000, and U+E000
+	lua := func(names ...string) (functions []extraFunction) {
+		for _, name := range names {
+			functions = append(functions, extraFunction{Name: name})
+		}
+		return functions
+	}
+	natives, err := buildNatives("1", jass.File{}, jass.File{}, extras{
+		Functions: lua("f"+above, "f"+from, "a", "_a", "Z", "f"),
+		Globals:   []string{above, from, "b", "B"},
+		Removed:   []string{above + "x", from + "x", from + "w"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var functions []string
+	for _, function := range natives.Functions {
+		functions = append(functions, function.Name)
+	}
+	if want := []string{"Z", "_a", "a", "f", "f" + from, "f" + above}; !slices.Equal(functions, want) {
+		t.Errorf("the functions are ordered %q, want %q", functions, want)
+	}
+	if want := []string{"B", "b", from, above}; !slices.Equal(natives.Lua.Globals, want) {
+		t.Errorf("the globals that Lua provides are ordered %q, want %q", natives.Lua.Globals, want)
+	}
+	if want := []string{from + "w", from + "x", above + "x"}; !slices.Equal(natives.Lua.Removed, want) {
+		t.Errorf("the globals that Lua removes are ordered %q, want %q", natives.Lua.Removed, want)
+	}
+}
+
 // A list that holds nothing is empty and not nil, whatever the scripts and the extras have, and is written [].
 func TestBuildNativesMakesEveryListThatHoldsNothingAnEmptyOne(t *testing.T) {
 	natives, err := buildNatives("1", jass.File{}, jass.File{}, extras{Functions: []extraFunction{{Name: "f"}}})
@@ -382,111 +400,6 @@ func TestRenderNativesWritesTheTextOfTheFile(t *testing.T) {
 	}
 }
 
-func TestDecodeExtrasReadsTheFunctionsAndTheTwoListsOfGlobals(t *testing.T) {
-	got, err := decodeExtras([]byte(miniExtrasText))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if want := miniExtras(); !reflect.DeepEqual(got, want) {
-		t.Errorf("the extras are %+v, want %+v", got, want)
-	}
-	// A key of the file may be left out, and a list may be empty or null. A function may have no parameter, and
-	// a name that is empty; its keys may stand in any order. A key that stands twice has its last value.
-	for text, want := range map[string]extras{
-		`{}`:                                 {},
-		`{"functions": [], "globals": null}`: {Functions: []extraFunction{}},
-		`{"functions": [{"returns": "", "params": [], "name": ""}]}`: {
-			Functions: []extraFunction{{Params: params()}}},
-		`{"functions": [{"returns": "a", "params": [{"type": "b", "name": "c"}], "name": "d"}]}`: {
-			Functions: []extraFunction{{Name: "d", Params: params("b", "c"), Returns: "a"}}},
-		`{"globals": ["a"], "removed": ["b"], "globals": ["c"]}`: {Globals: []string{"c"}, Removed: []string{"b"}},
-	} {
-		if got, err := decodeExtras([]byte(text)); err != nil || !reflect.DeepEqual(got, want) {
-			t.Errorf("%s: got %+v, %v, want %+v", text, got, err, want)
-		}
-	}
-}
-
-// The keys that the reading of the file knows are the keys of the structs that the file is decoded into.
-func TestTheKeysOfTheExtrasAreTheKeysOfTheirStructs(t *testing.T) {
-	for name, c := range map[string]struct {
-		keys []string
-		of   reflect.Type
-	}{
-		"the file":    {extrasKeys, reflect.TypeFor[extras]()},
-		"a function":  {functionKeys, reflect.TypeFor[extraFunction]()},
-		"a parameter": {parameterKeys, reflect.TypeFor[script.NativeParam]()},
-	} {
-		var tagged []string
-		for i := range c.of.NumField() {
-			tagged = append(tagged, c.of.Field(i).Tag.Get("json"))
-		}
-		if !slices.Equal(c.keys, tagged) {
-			t.Errorf("the keys of %s are %q, and its struct has %q", name, c.keys, tagged)
-		}
-	}
-}
-
-func TestDecodeExtrasRefusesWhatTheFileMustNotHold(t *testing.T) {
-	functions := func(list string) string { return `{"functions": [` + list + `]}` }
-	const (
-		whole = `"name": "A", "params": [], "returns": "nothing"`
-		// The start of the sentence that Go's decoder says of a value of another type than the struct has.
-		anotherType = "cannot unmarshal"
-	)
-	for name, c := range map[string]struct {
-		text  string
-		words []string // what the refusal says, beside the file
-	}{
-		"a key the file has not": {`{"functions": [], "more": 1}`,
-			[]string{`the file has the key "more"`, "functions, globals and removed"}},
-		"a key in other letters": {`{"Globals": ["print"]}`, []string{`the file has the key "Globals"`}},
-		"a key a function has not": {functions(`{` + whole + `, "more": true}`),
-			[]string{`the function A has the key "more"`, "name, params and returns"}},
-		"a key a parameter has not": {
-			functions(`{"name": "A", "params": [{"name": "a", "type": "b", "more": null}], "returns": "b"}`),
-			[]string{`a parameter of the function A has the key "more"`, "name and type"}},
-		"a function without a name": {functions(`{` + whole + `}, {"params": [], "returns": "nothing"}`),
-			[]string{`function 2 of the list has no "name"`, "name, params and returns"}},
-		"a function with null for its name": {functions(`{"name": null, "params": [], "returns": "nothing"}`),
-			[]string{`function 1 of the list has no "name"`}},
-		"a function without params": {functions(`{"name": "A", "returns": "nothing"}`),
-			[]string{`the function A has no "params"`, "name, params and returns"}},
-		"a function with null for its params": {functions(`{"name": "A", "params": null, "returns": "nothing"}`),
-			[]string{`the function A has no "params"`}},
-		"a function without returns": {functions(`{"name": "A", "params": []}`),
-			[]string{`the function A has no "returns"`}},
-		"a parameter without its type": {functions(`{"name": "A", "params": [{"name": "a"}], "returns": "b"}`),
-			[]string{`a parameter of the function A has no "type"`, "name and type"}},
-		"a function that is no object": {functions(`1`), []string{"a function is not an object"}},
-		"a list for the file":          {`[]`, []string{"is not a JSON object"}},
-		"a text for the file":          {`"functions"`, []string{"is not a JSON object"}},
-		"null for the file":            {`null`, []string{"is not a JSON object"}},
-		"a file cut short":             {`{"functions": [{"name": "Fo`, []string{"unexpected EOF"}},
-		"a file that holds nothing":    {``, []string{"unexpected EOF"}},
-		"no JSON":                      {"not JSON\n", []string{"invalid character 'o'"}},
-		"a byte order mark":            {"\xEF\xBB\xBF{}", []string{"invalid character"}},
-		"something after the object":   {`{} {}`, []string{"unexpected data after the JSON value"}},
-		"a text where a list belongs":  {`{"globals": "print"}`, []string{anotherType}},
-		"a number among the globals":   {`{"removed": ["io", 1]}`, []string{anotherType}},
-		"an object for the functions":  {`{"functions": {"name": "A"}}`, []string{anotherType}},
-		"a number for a name":          {functions(`{"name": 1, "params": [], "returns": "b"}`), []string{anotherType}},
-		"a parameter that is no object": {
-			functions(`{"name": "A", "params": ["a"], "returns": "b"}`), []string{anotherType}},
-		"a number for what is returned": {
-			functions(`{"name": "A", "params": [], "returns": 0}`), []string{anotherType}},
-		"a number for the type of a parameter": {
-			functions(`{"name": "A", "params": [{"name": "a", "type": 1}], "returns": "b"}`), []string{anotherType}},
-	} {
-		got, err := decodeExtras([]byte(c.text))
-		if err == nil {
-			t.Errorf("%s: the extras were read: %+v", name, got)
-			continue
-		}
-		contains(t, err.Error(), append(c.words, extrasPath)...)
-	}
-}
-
 // exportedScripts writes the two scripts as an export of the game's files has them, and returns the folder of
 // the export.
 func exportedScripts(t testing.TB, common, blizzard string) string {
@@ -514,15 +427,23 @@ func without(c checkout, name string) {
 	}
 }
 
+// The file is written in its one form whatever form the scripts and the extras have: for either kind of line
+// break and a byte order mark in a script, and for extras whose keys stand in another order than the file's.
 func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
+	const otherOrder = `{"removed": ["io"], "globals": ["print", "math"], "functions": [
+		{"returns": "integer", "params": [{"type": "string", "name": "id"}], "name": "FourCC"}]}`
 	want := renderNatives(miniNatives())
 	withBoth := func(text string) string { return "\xEF\xBB\xBF" + strings.ReplaceAll(text, "\n", "\r\n") }
-	for name, folder := range map[string]string{
-		"line feeds": exportedScripts(t, miniCommon, miniBlizzard),
-		"carriage returns, and a byte order mark at the start of each script": exportedScripts(t,
-			withBoth(miniCommon), withBoth(miniBlizzard)),
+	whole := exportedScripts(t, miniCommon, miniBlizzard)
+	for name, c := range map[string]struct{ folder, extras string }{
+		"line feeds": {whole, miniExtrasText},
+		"carriage returns, and a byte order mark at the start of each script": {
+			exportedScripts(t, withBoth(miniCommon), withBoth(miniBlizzard)), miniExtrasText},
+		"extras with their keys in another order": {whole, otherOrder},
 	} {
-		printed, files, err := withExtras(t).run("natives", folder, "9.9.9")
+		scratch := withExtras(t)
+		scratch.write(extrasPath, c.extras)
+		printed, files, err := scratch.run("natives", c.folder, "9.9.9")
 		if err != nil {
 			t.Errorf("%s: %v", name, err)
 			continue

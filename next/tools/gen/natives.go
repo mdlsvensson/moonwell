@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -19,10 +16,8 @@ import (
 )
 
 const (
-	// nativesPath is the game's script API, which the program carries, and extrasPath what the game's Lua adds
-	// to the two scripts, written by hand: each by its path from the checkout.
+	// nativesPath is the game's script API, which the program carries, by its path from the checkout.
 	nativesPath = "data/natives.json"
-	extrasPath  = "tools/natives/lua-extras.json"
 
 	// scriptsFolder is where an export of the game's files has the two scripts, by its path from the folder of
 	// the export. An entry of the natives records the script it is from by the script's name.
@@ -74,157 +69,6 @@ func readScript(folder, name string) (jass.File, error) {
 		return jass.File{}, errFile(folder+"/"+below, err)
 	}
 	return jass.Parse(fsx.DecodeText(data), name)
-}
-
-// ---- the Lua extras ----
-
-// extras is tools/natives/lua-extras.json: what the game's Lua adds to the two scripts, and the globals of
-// Lua's standard library it provides and removes.
-type extras struct {
-	Functions []extraFunction `json:"functions"`
-	Globals   []string        `json:"globals"`
-	Removed   []string        `json:"removed"`
-}
-
-// extraFunction is a function that only the game's Lua has. The type of a parameter, and what the function
-// returns, may be a type of Lua.
-type extraFunction struct {
-	Name    string               `json:"name"`
-	Params  []script.NativeParam `json:"params"`
-	Returns string               `json:"returns"`
-}
-
-// The keys of the file, of a function in it, and of a parameter of a function: those of the three structs.
-var (
-	extrasKeys    = []string{"functions", "globals", "removed"}
-	functionKeys  = []string{"name", "params", "returns"}
-	parameterKeys = []string{"name", "type"}
-)
-
-// readExtras reads the Lua extras of a checkout.
-func readExtras(checkout string) (extras, error) {
-	data, err := os.ReadFile(fileIn(checkout, extrasPath))
-	if err != nil {
-		return extras{}, errInCheckout(checkout, extrasPath, err)
-	}
-	return decodeExtras(data)
-}
-
-// decodeExtras reads the text of a lua-extras.json: a JSON object with the keys of the file and no other, in
-// which every function has its three keys and every parameter its two. A key of the file itself may be left out:
-// its list is then empty. The bytes go to the decoder as they are, so a byte order mark is no JSON.
-//
-// The text is decoded twice. First as a tree, which shows what a decoding into a struct does not: which keys an
-// object has, in the letters it has them in, and whether a key is left out or holds an empty value. Then into
-// the struct, which holds every value to its type.
-func decodeExtras(data []byte) (extras, error) {
-	written, err := extrasTree(data)
-	if err != nil {
-		return extras{}, err
-	}
-	file, isObject := written.(map[string]any)
-	if !isObject {
-		return extras{}, errExtrasNoObject()
-	}
-	if err := checkExtras(file); err != nil {
-		return extras{}, err
-	}
-	var read extras
-	if err := json.Unmarshal(data, &read); err != nil {
-		return extras{}, errExtras(err)
-	}
-	return read, nil
-}
-
-// extrasTree decodes the text as one JSON value of any shape: an object as a map, a list as a slice.
-func extrasTree(data []byte) (any, error) {
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	var tree any
-	if err := decoder.Decode(&tree); err != nil {
-		if errors.Is(err, io.EOF) {
-			// A text that holds no value at all ends before its value, as one that is cut short does.
-			err = io.ErrUnexpectedEOF
-		}
-		return nil, errExtras(err)
-	}
-	if _, err := decoder.Token(); !errors.Is(err, io.EOF) {
-		return nil, errExtrasGoOn()
-	}
-	return tree, nil
-}
-
-// checkExtras holds the tree of the file to its keys, and every function in it to its own. A value of another
-// shape than the file gives it is passed over: the decoding into the struct refuses it.
-func checkExtras(file map[string]any) error {
-	if key, unknown := keyOutside(file, extrasKeys); unknown {
-		return errUnknownKey("the file", key, extrasKeys)
-	}
-	functions, _ := file["functions"].([]any)
-	for index, entry := range functions {
-		function, isObject := entry.(map[string]any)
-		if !isObject {
-			return errNoFunction()
-		}
-		if err := checkFunction(functionCalled(index, function), function); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// checkFunction holds one function of the file to its keys: it has all three and no other, and each of its
-// parameters has its two and no other. called is how a message names the function.
-func checkFunction(called string, function map[string]any) error {
-	if key, unknown := keyOutside(function, functionKeys); unknown {
-		return errUnknownKey(called, key, functionKeys)
-	}
-	if key, lacking := keyLacking(function, functionKeys); lacking {
-		return errLacksKey(called, key, functionKeys)
-	}
-	params, _ := function["params"].([]any)
-	for _, entry := range params {
-		param, isObject := entry.(map[string]any)
-		if !isObject {
-			continue
-		}
-		if key, unknown := keyOutside(param, parameterKeys); unknown {
-			return errUnknownKey("a parameter of "+called, key, parameterKeys)
-		}
-		if key, lacking := keyLacking(param, parameterKeys); lacking {
-			return errLacksKey("a parameter of "+called, key, parameterKeys)
-		}
-	}
-	return nil
-}
-
-// functionCalled is how a message names a function of the file: by its name, and one without a name by its
-// place in the list, counted from 1.
-func functionCalled(index int, function map[string]any) string {
-	if name, _ := function["name"].(string); name != "" {
-		return "the function " + name
-	}
-	return "function " + strconv.Itoa(index+1) + " of the list"
-}
-
-// keyOutside is a key of the object that is not among the keys it may have: of several, the first by its bytes.
-func keyOutside(object map[string]any, known []string) (string, bool) {
-	for _, key := range slices.Sorted(maps.Keys(object)) {
-		if !slices.Contains(known, key) {
-			return key, true
-		}
-	}
-	return "", false
-}
-
-// keyLacking is the first of the keys that the object does not have. A key whose value is null is one it does
-// not have: a decoding into a struct cannot tell the two apart.
-func keyLacking(object map[string]any, keys []string) (string, bool) {
-	for _, key := range keys {
-		if object[key] == nil {
-			return key, true
-		}
-	}
-	return "", false
 }
 
 // ---- the natives ----
@@ -441,30 +285,6 @@ func jsonBlock(opening string, entries []string, closing string) string {
 }
 
 // ---- errors ----
-
-// errExtras is a fault of the Lua extras that Go's decoder tells of: a text that is no JSON, or a value of
-// another type than the file gives it.
-func errExtras(cause error) error { return errors.New(extrasPath + ": " + cause.Error()) }
-
-// errExtrasGoOn refuses Lua extras that hold more than one JSON value.
-func errExtrasGoOn() error { return errors.New(extrasPath + ": unexpected data after the JSON value") }
-
-func errExtrasNoObject() error { return errors.New(extrasPath + " is not a JSON object") }
-
-func errNoFunction() error { return errors.New(extrasPath + ": a function is not an object") }
-
-// errUnknownKey refuses a key that the generator does not read: it would not reach data/natives.json. holder is
-// what has the key: the file, a function, or a parameter of one.
-func errUnknownKey(holder, key string, known []string) error {
-	return errors.New(extrasPath + ": " + holder + " has the key " + fsx.Quoted(key) +
-		", which the generator does not read. Its keys are " + listed(known) + ": take the key out, or rename it.")
-}
-
-// errLacksKey refuses a function, or a parameter of one, that has not every key it must have.
-func errLacksKey(holder, key string, keys []string) error {
-	return errors.New(extrasPath + ": " + holder + " has no " + fsx.Quoted(key) + ". Its keys are " + listed(keys) +
-		": write all of them.")
-}
 
 func errDeclaredTwice(name, first, second string) error {
 	return errors.New(name + " is declared twice (" + first + " and " + second + ").")
