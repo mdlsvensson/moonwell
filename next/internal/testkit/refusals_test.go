@@ -15,7 +15,8 @@ func TestRefusalOfTakesTheWordsOfADiagErrorAndTheTextOfAnyOther(t *testing.T) {
 		want Refusal
 	}{
 		{failure, Refusal{"an input", "map/a.w3i", "Cannot read it.", "Save it again.", 3, 7}},
-		{fmt.Errorf("while reading: %w", failure), Refusal{"an input", "map/a.w3i", "Cannot read it.", "Save it again.", 3, 7}},
+		{fmt.Errorf("while reading: %w", failure),
+			Refusal{"an input", "map/a.w3i", "Cannot read it.", "Save it again.", 3, 7}},
 		{errors.New("a.slk:2: bad"), Refusal{Input: "an input", Message: "a.slk:2: bad"}},
 		{nil, Refusal{Input: "an input", Message: "(not refused)"}},
 	} {

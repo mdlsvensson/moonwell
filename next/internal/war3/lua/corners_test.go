@@ -50,22 +50,29 @@ var cornerSources = []namedSource{
 	{"a require at the end", "require"},
 	{"a require before an open bracket", "require ("},
 	{"globals after semicolons and breaks", "A = 1; B, C = 2, 3\rD = 4 E = 5\nF, G\n= 6\nH == 7\nfunction I() end"},
-	{"globals inside brackets and blocks", "t = { A = 1 }\nf(\nB = 2)\nwhile x do\nC = 3\nend\nrepeat\nD = 4\nuntil E\nF = 5"},
+	{"globals inside brackets and blocks",
+		"t = { A = 1 }\nf(\nB = 2)\nwhile x do\nC = 3\nend\nrepeat\nD = 4\nuntil E\nF = 5"},
 	{"locals of every form", "local A, B\nlocal function C() end\nlocal function\nlocal\nA = 1\nB = 2\nC = 3\nD = 4"},
 	// A string that holds `local` or `function` passes for the keyword.
-	{"a string that holds a keyword", "print 'local' function F() end\nlocal 'function' G\nG = 1\nf [[local]] function H() end"},
+	{"a string that holds a keyword",
+		"print 'local' function F() end\nlocal 'function' G\nG = 1\nf [[local]] function H() end"},
 	{"ends without a block", "end end\nA = 1\n) ]\nB = 2"},
-	{"declaration lines", "udg_A   =   5  \r\nudg_B=-3\nudg_C = -.5\nudg_D = 1.\nudg_E = \"x\" -- y\nudg_F = true\nudg_G==1"},
-	{"array declarations", "udg_A = __jarray( \"\" )\nudg_B = __jarray(__jarray(0))\nudg_C = __jarray({}) \nudg_D = __jarray()"},
-	{"handle declarations", "gg_snd_A = nil\ngg_dest_B = nil\ngg_item_C = 5\ngg_xyz_D = 5\ngg_Trg_E = 5\ngg_cam_ = 1\ngg__F = 2"},
+	{"declaration lines",
+		"udg_A   =   5  \r\nudg_B=-3\nudg_C = -.5\nudg_D = 1.\nudg_E = \"x\" -- y\nudg_F = true\nudg_G==1"},
+	{"array declarations",
+		"udg_A = __jarray( \"\" )\nudg_B = __jarray(__jarray(0))\nudg_C = __jarray({}) \nudg_D = __jarray()"},
+	{"handle declarations",
+		"gg_snd_A = nil\ngg_dest_B = nil\ngg_item_C = 5\ngg_xyz_D = 5\ngg_Trg_E = 5\ngg_cam_ = 1\ngg__F = 2"},
 	{"lines that are not declarations", " udg_A = 1\nlocal udg_B = 1\nudg_C.x = 1\n\tudg_D = 1\nudg_E\n= 1\n1udg = 2"},
-	{"function lines", "function  Spaced  ()\nend\n function Indented()\nfunction a.b()\nfunction\tTabbed\t(\nudg_Late = 1"},
+	{"function lines",
+		"function  Spaced  ()\nend\n function Indented()\nfunction a.b()\nfunction\tTabbed\t(\nudg_Late = 1"},
 	{"two functions on a line", "function A()function B()\nend"},
 	{"declarations with tabs and returns", "udg_A\t=\t5\t\r\nudg_B =\v1\f\nudg_C = 1\r"},
 	{"a declaration with a lone return", "udg_A = 1\rudg_B = 2\nudg_C = 3"},
 	{"a function line with a lone return", "udg_A = 1\rfunction main()\nudg_B = 2"},
 	{"a call and its semicolon", "function config() A() ; B() --[[ c ]] ; C()\n; D() -- c\n; E();; end"},
-	{"functions of every form", "function a() end local function b() end function c.d() end function e:f() end g = function() end"},
+	{"functions of every form",
+		"function a() end local function b() end function c.d() end function e:f() end g = function() end"},
 	{"a function in a function", "function a() function b() X() end Y() end function a() end"},
 	{"a method call of a string", "function a() X():y 'z' X{}.a() X 'a' 'b' X.y() end"},
 	{"a return of every form", "function a() return end function b() return; end function c() return 1, 2; end return a"},
@@ -81,10 +88,12 @@ var cornerSources = []namedSource{
 	{"tables at the limit", "x = " + strings.Repeat("{", 198) + strings.Repeat("}", 198)},
 	{"tables one past the limit", "x = " + strings.Repeat("{", 199) + strings.Repeat("}", 199)},
 	{"a negative number with a space", "function a() X(- 1, -1, - -1, -0x10, 0X10, 1E5, -0) end"},
-	{"a hexadecimal number too long", "function a() X(0x" + strings.Repeat("F", 300) + ", -0x" + strings.Repeat("f", 300) + ") end"},
+	{"a hexadecimal number too long",
+		"function a() X(0x" + strings.Repeat("F", 300) + ", -0x" + strings.Repeat("f", 300) + ") end"},
 	{"a hexadecimal number that rounds", "function a() X(0x20000000000001, 0x20000000000003, 0x1FFFFFFFFFFFFF, 0x0) end"},
 	{"a decimal number at the edges", "function a() X(1e308, 1e309, 1e-400, 4.9e-324, 00012, 1.e5, .0) end"},
-	{"a player of every form", "function a() X(Player(1e2), Player(-0), Player(0x7fffffff), Player(1e30), Player (3)) end"},
+	{"a player of every form",
+		"function a() X(Player(1e2), Player(-0), Player(0x7fffffff), Player(1e30), Player (3)) end"},
 }
 
 // luaFilesOfTheCheckout are the Lua files the checkout holds for good: the two scripts World Editor saved, the
@@ -193,7 +202,8 @@ func (s scanned) text(name, source string) string {
 		fmt.Fprintf(&out, "map functions: %s\n", strings.Join(s.Map.Functions, " "))
 	}
 	for _, function := range s.Functions {
-		fmt.Fprintf(&out, "function %s: %d-%d, its end at %d\n", function.Name, function.Start, function.End, function.EndStart)
+		fmt.Fprintf(&out, "function %s: %d-%d, its end at %d\n", function.Name, function.Start, function.End,
+			function.EndStart)
 		for _, call := range function.Calls {
 			var arguments []string
 			for _, argument := range call.Args {

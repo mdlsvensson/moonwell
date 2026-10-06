@@ -51,10 +51,12 @@ var counted = []struct {
 			"    local integer i = 0\n    call Make(null)\n    endfunctions\nendfunction // done\n" +
 			"constant function One takes nothing returns integer\n    return 1\nendfunction\n",
 		cut: outcomes{15, 236}, changed: outcomes{20, 40}, swept: outcomes{631, 66}},
-	{name: "a line that is no declaration", text: "type unit extends widget\nlibrary Foo\nnative F takes nothing returns nothing\n",
-		cut: outcomes{8, 68}, changed: outcomes{7, 53}, swept: outcomes{0, 183}},
-	{name: "a body that never ends", text: "native A takes nothing returns nothing\n\nfunction F takes integer a returns nothing\n",
-		cut: outcomes{10, 73}, changed: outcomes{4, 56}, swept: outcomes{0, 209}},
+	{name: "a line that is no declaration",
+		text: "type unit extends widget\nlibrary Foo\nnative F takes nothing returns nothing\n",
+		cut:  outcomes{8, 68}, changed: outcomes{7, 53}, swept: outcomes{0, 183}},
+	{name: "a body that never ends",
+		text: "native A takes nothing returns nothing\n\nfunction F takes integer a returns nothing\n",
+		cut:  outcomes{10, 73}, changed: outcomes{4, 56}, swept: outcomes{0, 209}},
 }
 
 // damageSeed is the seed of the changes that TestADamagedScriptIsReadOrRefusedByFileAndLineAndNeverPanics makes.
@@ -132,8 +134,8 @@ func TestADamagedScriptIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) 
 	for _, c := range counted {
 		cut, changed, swept := damaged(t, c.name, c.text)
 		if cut != c.cut || changed != c.changed || swept != c.swept {
-			t.Errorf("%s:\n got cut: %+v, changed: %+v, with white space: %+v\nwant cut: %+v, changed: %+v, with white space: %+v",
-				c.name, cut, changed, swept, c.cut, c.changed, c.swept)
+			t.Errorf("%s:\n got cut: %+v, changed: %+v, with white space: %+v\n"+
+				"want cut: %+v, changed: %+v, with white space: %+v", c.name, cut, changed, swept, c.cut, c.changed, c.swept)
 		}
 	}
 }

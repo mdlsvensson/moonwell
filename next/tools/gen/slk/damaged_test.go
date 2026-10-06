@@ -131,8 +131,8 @@ func TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 	for _, c := range counted {
 		cut, changed, swept := damaged(t, c.name, c.text)
 		if cut != c.cut || changed != c.changed || swept != c.swept {
-			t.Errorf("%s:\n got cut: %+v, changed: %+v, with white space: %+v\nwant cut: %+v, changed: %+v, with white space: %+v",
-				c.name, cut, changed, swept, c.cut, c.changed, c.swept)
+			t.Errorf("%s:\n got cut: %+v, changed: %+v, with white space: %+v\n"+
+				"want cut: %+v, changed: %+v, with white space: %+v", c.name, cut, changed, swept, c.cut, c.changed, c.swept)
 		}
 	}
 }
