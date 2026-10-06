@@ -41,6 +41,8 @@ Not a readable model: the ATCH chunk has a record with an invalid size.
     hint: Re-export it from your modelling tool, or open it in a model viewer to check it.
     - a record larger than its chunk, through ReadMDX
     - a record larger than its chunk, through Paths
+    - a record one byte larger than its chunk, through ReadMDX
+    - a record one byte larger than its chunk, through Paths
     - a size after the last record, through ReadMDX
     - a size after the last record, through Paths
     - the size at 2073 set to 4, through ReadMDX
@@ -65,6 +67,8 @@ Not a readable model: the ATCH chunk has a record with an invalid size.
 Not a readable model: the ATCH chunk has a node with an invalid size.
     file: assets/Knight.mdx
     hint: Re-export it from your modelling tool, or open it in a model viewer to check it.
+    - a node one byte smaller than a node, through ReadMDX
+    - a node one byte smaller than a node, through Paths
     - a node smaller than a node, through ReadMDX
     - a node smaller than a node, through Paths
     - the size at 2081 set to 0, through ReadMDX

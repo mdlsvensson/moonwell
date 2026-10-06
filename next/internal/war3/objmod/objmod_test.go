@@ -316,6 +316,9 @@ func malformedFiles(t *testing.T) []malformed {
 		{"version 4", with(0, 4), "unsupported version 4"},
 		{"cut inside the version", valid[:2], "truncated"},
 		{"cut inside the count of original objects", valid[:6], "truncated"},
+		// A wrong value is what the file is refused for, also where the bytes run out after it.
+		{"version 0 cut inside the count of original objects", with(0, 0)[:6], "unsupported version 0"},
+		{"a string that is not UTF-8 before an end token cut short", invalidUTF8[:len(invalidUTF8)-2], "invalid UTF-8"},
 		{"a count of 1000 custom objects", with(8, 1000), "object count 1000"},
 		{"a count of -1 custom objects", with(8, -1), "object count -1"},
 		{"a count of modifications past the end", with(28, math.MaxInt32), "modification count"},
@@ -402,6 +405,28 @@ func TestACountFitsWhenItsItemsOfTheSmallestSizeFillTheRestOfTheFile(t *testing.
 			}
 			_, err = objmod.Read(mods[:len(mods)-1], kind, modFile)
 			refusal(t, what+", modifications without the last byte", err, modFile, "modification count 3 past end of file")
+		}
+	}
+}
+
+// A table without objects and a set without modifications are lists that are empty and not nil: what is written
+// from a file that was read says [] of them, not null.
+func TestATableWithoutObjectsAndASetWithoutModificationsAreEmptyLists(t *testing.T) {
+	bare := []testkit.SyntheticObject{{Base: "hfoo", ID: "h000"}}
+	for _, version := range []int32{1, 2, 3} {
+		parsed := mustRead(t, testkit.BuildModFile(version, nil, bare, objmod.Simple), objmod.Simple, modFile)
+		want := &objmod.File{
+			Version:  version,
+			Original: objmod.Table{CountOffset: 4, Start: 8, Stop: 8, Objects: []objmod.Object{}},
+			Custom:   parsed.Custom,
+		}
+		if !reflect.DeepEqual(parsed, want) || parsed.Original.Objects == nil {
+			t.Errorf("version %d: the original table is %#v, want no objects in a list that is not nil", version,
+				parsed.Original)
+		}
+		sets := parsed.Custom.Objects[0].Sets
+		if len(sets) != 1 || sets[0].Mods == nil || len(sets[0].Mods) != 0 {
+			t.Errorf("version %d: the sets of an object without modifications are %#v", version, sets)
 		}
 	}
 }

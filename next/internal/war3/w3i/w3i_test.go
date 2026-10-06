@@ -65,6 +65,7 @@ func TestReadHeaderReadsVersionAndGameVersion(t *testing.T) {
 	}{
 		{"version 39 saved by 3.0", header(39, 3, 0), w3i.Header{Version: 39, HasGameVersion: true, Major: 3}},
 		{"version 25 records no game version", header(25, 1, 31), w3i.Header{Version: 25}},
+		{"version 27 is the last that records none", header(27, 1, 31), w3i.Header{Version: 27}},
 		{"version 28 with its game version", header(28, 1, 31)[:20],
 			w3i.Header{Version: 28, HasGameVersion: true, Major: 1, Minor: 31}},
 		{"version 28 cut inside its game version", header(28, 1, 31)[:19], w3i.Header{Version: 28}},

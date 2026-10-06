@@ -166,7 +166,11 @@ func TestTheEdgesOfNamesNumeralsAndDots(t *testing.T) {
 	if tokens, fault := Tokenize("a."); fault != nil || !slices.Equal(raws(tokens), []string{"a", "."}) {
 		t.Errorf("Tokenize(a.) = %q, fault %+v", raws(tokens), fault)
 	}
-	for _, source := range []string{"0xg", "0xG", "0x1g"} {
+	// Nor the characters just before a and A.
+	if tokens, _ := Tokenize("0x1@ 0x1`"); !slices.Equal(raws(tokens), []string{"0x1", "@", "0x1", "`"}) {
+		t.Errorf("Tokenize(0x1@ 0x1`) = %q", raws(tokens))
+	}
+	for _, source := range []string{"0xg", "0xG", "0x1g", "0x@", "0x`"} {
 		if _, fault := Tokenize(source); fault == nil || fault.Msg != "invalid numeral" {
 			t.Errorf("Tokenize(%s): fault %+v, want an invalid numeral", source, fault)
 		}
@@ -182,6 +186,7 @@ func TestAShortCommentEndsBeforeItsLineBreakOrWithTheSource(t *testing.T) {
 		{"a -- the source ends in the comment", []string{"a"}, 1},
 		{"--", nil, 0},
 		{"a -- a line feed\nb", []string{"a", "b"}, 2},
+		{"a -- nothing but a line break ~ ends ; it\nb", []string{"a", "b"}, 2},
 		{"a -- a return and a line feed\r\nb", []string{"a", "b"}, 2},
 		{"a -- [[ no long comment\nb ]]", []string{"a", "b", "]", "]"}, 2},
 	} {
@@ -240,6 +245,13 @@ func TestASourceThatEndsWhereALongBracketOpensIsScanned(t *testing.T) {
 	// One bracket and equals signs are symbols, and no string.
 	if tokens, _ := Tokenize("a = [="); !slices.Equal(raws(tokens), []string{"a", "=", "[", "="}) {
 		t.Errorf("Tokenize(a = [=) = %q", raws(tokens))
+	}
+	// The text of a long string that never closes is what follows its opening bracket.
+	for source, text := range map[string]string{"a = [=[ open ]] b": " open ]] b", "a = [[\nopen": "open", "a = [[": ""} {
+		tokens, fault := Tokenize(source)
+		if fault == nil || len(tokens) != 3 || tokens[2].Kind != StringToken || tokens[2].Text != text {
+			t.Errorf("Tokenize(%q) = %+v, fault %+v, want a string with the text %q", source, tokens, fault, text)
+		}
 	}
 }
 

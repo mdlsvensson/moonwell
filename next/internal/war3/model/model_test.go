@@ -4,6 +4,7 @@ import (
 	"errors"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -144,6 +145,20 @@ func binaryModels() []binaryModel {
 			{Kind: model.Popcorn, Path: `Effects\Smoke.pkb`},
 			{Kind: model.FaceEffect, Path: "a.facefx"},
 		}},
+		// Only the two bits say what an emitter emits: every other bit of its flags says nothing of it.
+		{"emitters with other flags than the two", testkit.MDX(testkit.Chunk("PREM", testkit.Concat(
+			testkit.Emitter("a.mdx", 1),
+			testkit.Emitter("b.blp", testkit.EmitterUsesTGA|1),
+			testkit.Emitter("c.mdx", 0xFFFFFFFF&^(testkit.EmitterUsesMDL|testkit.EmitterUsesTGA)),
+			testkit.Emitter("d.mdx", 0xFFFFFFFF&^testkit.EmitterUsesTGA),
+			testkit.Emitter("e.blp", 0xFFFFFFFF&^testkit.EmitterUsesMDL),
+		))), []model.Path{
+			{Kind: model.ParticleModel, Path: "a.mdx"},
+			{Kind: model.ParticleTexture, Path: "b.blp"},
+			{Kind: model.ParticleModel, Path: "c.mdx"},
+			{Kind: model.ParticleModel, Path: "d.mdx"},
+			{Kind: model.ParticleTexture, Path: "e.blp"},
+		}},
 		// The reader leaves the magic to IsMDX and reads what follows the first four bytes.
 		{"bytes shorter than the magic", []byte("MD"), nil},
 	}
@@ -173,6 +188,10 @@ func damagedModels() []damagedModel {
 			"the FAFX chunk is not a whole number of face effects"},
 		{"a record larger than its chunk", chunk("ATCH", testkit.SetU32(attachment, 0, 9999)),
 			"the ATCH chunk has a record with an invalid size"},
+		{"a record one byte larger than its chunk", chunk("ATCH", testkit.SetU32(attachment, 0, uint32(len(attachment)+1))),
+			"the ATCH chunk has a record with an invalid size"},
+		{"a node one byte smaller than a node", chunk("ATCH", testkit.SetU32(attachment, 4, 95)),
+			"the ATCH chunk has a node with an invalid size"},
 		{"a node smaller than a node", chunk("ATCH", testkit.SetU32(attachment, 4, 10)),
 			"the ATCH chunk has a node with an invalid size"},
 		{"a record that ends at its node", chunk("ATCH", testkit.SetU32(attachment, 0, 4+96)),
@@ -284,6 +303,23 @@ func TestPathsPicksTheReaderFromTheContent(t *testing.T) {
 	blp := []byte{0x42, 0x4c, 0x50, 0x31, 0, 0, 0, 0} // a BLP texture, not a model
 	_, err = model.Paths(blp, "icon.blp")
 	refused(t, "a texture", err, "icon.blp", "it is neither a binary MDX nor a text MDL file")
+	// A NUL is no character of a text model, wherever it stands: at the start, in a string, at the end.
+	for _, text := range []string{"\x00" + header, header + "Bitmap { Image \"a\x00.blp\", }", header + "\x00"} {
+		_, err := model.Paths([]byte(text), modelFile)
+		refused(t, strconv.Quote(text), err, modelFile, "neither a binary MDX nor a text MDL")
+	}
+}
+
+// The words of the six kinds are what a report of a project's assets prints for a referenced file.
+func TestEachKindHasItsWords(t *testing.T) {
+	for kind, words := range map[model.Kind]string{
+		model.Texture: "texture", model.ParticleModel: "particle model", model.ParticleTexture: "particle texture",
+		model.Attachment: "attachment", model.Popcorn: "popcorn", model.FaceEffect: "face effect",
+	} {
+		if string(kind) != words {
+			t.Errorf("the kind %q, want %q", kind, words)
+		}
+	}
 }
 
 func TestPathsRefusesTextThatIsNotAModel(t *testing.T) {
@@ -390,6 +426,15 @@ func emitterTexts() []textModel {
 			[]model.Path{{Kind: model.ParticleTexture, Path: "spark.blp"}}},
 		{"a Particle block deeper than the emitter's own", `ParticleEmitter "A" { Other { Particle { Path "b.mdx", } } }`, nil},
 		{"a Particle block of another block", `Attachment "A" { Particle { Path "b.mdx", } }`, nil},
+		{"a path in a block of the emitter that is no Particle block", `ParticleEmitter "A" { Other { Path "b.mdx", } }`, nil},
+		{"a Particle block without a path before one with a path",
+			`ParticleEmitter "A" { Particle { } Particle { Path "heal.mdx", } }`, heal},
+		{"both flags", `ParticleEmitter "A" { EmitterUsesMDL, EmitterUsesTGA, Path "heal.mdx", }`, heal},
+		{"both flags, the texture's first", `ParticleEmitter "A" { EmitterUsesTGA, EmitterUsesMDL, Path "heal.mdx", }`, heal},
+		{"the flag of a model and then another flag", `ParticleEmitter "A" { EmitterUsesMDL, Other, EmitterUsesTGA, Path "heal.mdx", }`,
+			heal},
+		{"the flag of a texture and then another flag", `ParticleEmitter "A" { EmitterUsesTGA, Other, Path "spark.blp", }`,
+			[]model.Path{{Kind: model.ParticleTexture, Path: "spark.blp"}}},
 		{"a Particle block of no block", `Particle { Path "b.mdx", }`, nil},
 	}
 }
@@ -409,6 +454,11 @@ func statementTexts() []textModel {
 		{"a slot that is not a whole number", "Bitmap { ReplaceableId 1.5, ReplaceableId +2, ReplaceableId 0x3, ReplaceableId -, }",
 			texture("", 0)},
 		{"a slot written as a string", `Bitmap { ReplaceableId "1", }`, texture("", 0)},
+		{"a slot that is kept when a later one is no whole number",
+			"Bitmap { ReplaceableId 2, ReplaceableId 1.5, ReplaceableId -, ReplaceableId x1, ReplaceableId 1x, }", texture("", 2)},
+		{"a number after a word that is not ReplaceableId", "Bitmap { Other 7, Image 8, }", texture("", 0)},
+		{"a character that is no white space of ASCII is part of its word", "Bitmap { Image~ \"a.blp\", ~Image \"b.blp\", }",
+			texture("", 0)},
 		{"an image written as a word", "Bitmap { Image a.blp, }", texture("", 0)},
 		{"a statement of three words", `Bitmap { static Image "a.blp", Image "b.blp" 1, }`, texture("", 0)},
 		{"a statement that starts with a string", `Bitmap { "Image" "a.blp", }`, texture("", 0)},

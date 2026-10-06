@@ -3,6 +3,8 @@ Cannot read object data: unsupported version 0.
     hint: Open and re-save this map in World Editor 3.00.
     - version 0
     - version 0, as a leveled table
+    - version 0 cut inside the count of original objects
+    - version 0 cut inside the count of original objects, as a leveled table
 
 Cannot read object data: unsupported version 4.
     file: map/war3map.w3u
@@ -17,6 +19,7 @@ Cannot read object data: truncated file.
     - cut inside the version, as a leveled table
     - cut inside the count of original objects
     - cut inside the count of original objects, as a leveled table
+    - a string that is not UTF-8 before an end token cut short, as a leveled table
     - cut at 9 bytes
     - cut at 9 bytes, as a leveled table
     - cut at 10 bytes
@@ -43,6 +46,16 @@ Cannot read object data: truncated file.
     - synthetic version 3, kind 0 with the number at 168 set to 4
     - synthetic version 3, kind 0 with the number at 168 set to 5
     - synthetic version 3, kind 0 with the number at 168 set to 64
+
+Cannot read object data: invalid UTF-8 in a string.
+    file: map/war3map.w3u
+    hint: Open and re-save this map in World Editor 3.00.
+    - a string that is not UTF-8 before an end token cut short
+    - a string that is not UTF-8
+    - synthetic version 1, kind 1 with the number at 50 set to 3
+    - synthetic version 1, kind 1 with the number at 116 set to 3
+    - synthetic version 3, kind 0 with the number at 50 set to 3
+    - synthetic version 3, kind 0 with the number at 108 set to 3
 
 Cannot read object data: object count 1000 past end of file.
     file: map/war3map.w3u
@@ -107,15 +120,6 @@ Cannot read object data: unterminated string.
     - cut at 49 bytes
     - cut at 50 bytes
     - cut at 51 bytes
-
-Cannot read object data: invalid UTF-8 in a string.
-    file: map/war3map.w3u
-    hint: Open and re-save this map in World Editor 3.00.
-    - a string that is not UTF-8
-    - synthetic version 1, kind 1 with the number at 50 set to 3
-    - synthetic version 1, kind 1 with the number at 116 set to 3
-    - synthetic version 3, kind 0 with the number at 50 set to 3
-    - synthetic version 3, kind 0 with the number at 108 set to 3
 
 Cannot read object data: trailing bytes after the custom objects.
     file: map/war3map.w3u

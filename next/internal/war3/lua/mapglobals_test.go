@@ -80,6 +80,9 @@ func TestADeclarationIsTypedByItsValueUnlessItsNameSaysWhatItHolds(t *testing.T)
 		{"udg_A=-.5", "udg_A", "number"},
 		{"udg_A = 1.", "udg_A", "any"},
 		{"udg_A = true", "udg_A", "boolean"},
+		// A character that is no white space of Lua is part of the value it stands in.
+		{"udg_A = ~5~", "udg_A", "any"},
+		{"udg_A = ~true", "udg_A", "any"},
 		{`udg_A = "text" -- a comment`, "udg_A", "string"},
 		{`udg_A = __jarray( "" )`, "udg_A", "string[]"},
 		{"udg_A = __jarray(__jarray(0))", "udg_A", "integer[][]"},

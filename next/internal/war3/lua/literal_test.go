@@ -56,6 +56,12 @@ func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 			t.Errorf("LiteralNumber(%s) = %v, %v, want %v, %v", c.source, value, ok, c.value, c.ok)
 		}
 	}
+	// A numeral that is no number gives a plain zero beside its false, also behind a minus sign.
+	for _, source := range []string{"-1e999", "-0x1.fp2"} {
+		if value, ok := LiteralNumber(argument(t, source)); ok || value != 0 || math.Signbit(value) {
+			t.Errorf("LiteralNumber(%s) = %v, %v, want 0 and false", source, value, ok)
+		}
+	}
 	// Unary plus is not Lua syntax, so the helper gets the tokens as they would be.
 	plusOne := []Token{
 		{Kind: SymbolToken, Raw: "+", Start: 0, End: 1},

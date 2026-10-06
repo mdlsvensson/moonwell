@@ -1,6 +1,7 @@
 package picture_test
 
 import (
+	"errors"
 	"slices"
 	"strings"
 	"testing"
@@ -15,7 +16,8 @@ const unreadablePNG = "The preview picture is a PNG that could not be read: "
 // refusals is what read says of every file the lists of this package hold as refused: the TGA files the reader
 // does not know, the sizes the game does not show, the BLP and the PNG files the game could not read, and the
 // names that are of no picture. A file that is read is left out. The decoder's own words in the refusal of a
-// damaged PNG are another version of Go's to change, so the recording has <reason> in their place.
+// damaged PNG, which the error carries as its cause, are another version of Go's to change, so the recording
+// has <reason> in their place.
 func refusals(read func(data []byte, file string) error,
 	refusal func(input string, err error) testkit.Refusal) []testkit.Refusal {
 	var said []testkit.Refusal
@@ -26,8 +28,9 @@ func refusals(read func(data []byte, file string) error,
 			continue
 		}
 		words := refusal(c.name+", as "+c.file, err)
-		if reason, decoded := strings.CutPrefix(words.Message, unreadablePNG); decoded {
-			words.Message = string(testkit.Placed([]byte(words.Message), "", strings.TrimSuffix(reason, ".")))
+		if cause := errors.Unwrap(err); cause != nil && strings.HasPrefix(words.Message, unreadablePNG) {
+			reason := strings.TrimPrefix(cause.Error(), "png: ")
+			words.Message = string(testkit.Placed([]byte(words.Message), "", reason))
 		}
 		said = append(said, words)
 	}

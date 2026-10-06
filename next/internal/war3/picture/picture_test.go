@@ -109,6 +109,26 @@ func TestAWrittenTGAStartsWithThePicturesBottomRowAndHasNothingAfterItsPixels(t 
 	}
 }
 
+// The low four bits of a TGA's descriptor count the bits of its alpha and say nothing of how its rows are
+// stored: a picture with any of them set is read as the same picture without.
+func TestTheAlphaBitsOfATGAsDescriptorDoNotMoveItsRows(t *testing.T) {
+	const descriptor = 17
+	for _, options := range []testkit.TGAOptions{{}, {FromTop: true}, {RLE: true}} {
+		source := testkit.TGA(testkit.NewPixels(256), options)
+		want, err := picture.Read(source, "preview.tga")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, bits := range []byte{0x01, 0x02, 0x04, 0x08, 0x0F} {
+			with := edited(slices.Clone(source), func(b []byte) { b[descriptor] = b[descriptor]&0xF0 | bits })
+			got, err := picture.Read(with, "preview.tga")
+			if err != nil || !bytes.Equal(got.Bytes, want.Bytes) {
+				t.Errorf("%+v with the alpha bits %#x: %v, or another picture", options, bits, err)
+			}
+		}
+	}
+}
+
 // run is a run-length packet of count pixels of one colour.
 func run(count int) []byte { return []byte{byte(0x80 | (count - 1)), 1, 2, 3, 255} }
 

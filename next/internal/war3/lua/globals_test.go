@@ -125,7 +125,8 @@ func TestTopLevelGlobals(t *testing.T) {
 		},
 		{
 			"a function of a table, and one without a name, define no global",
-			[]string{"function Lib.run() end", "function Lib:stop() end", "function () end"},
+			[]string{"function Lib.run() end", "function Lib:stop() end", "function () end", "function 'Quoted'() end",
+				"function nil() end"},
 			nil,
 		},
 		{

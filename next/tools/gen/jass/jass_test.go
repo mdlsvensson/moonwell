@@ -154,12 +154,13 @@ func TestParseReadsTheCornersOfALine(t *testing.T) {
 }
 
 // comments has a comment of two slashes that end their line, and comments with a carriage return in them, which
-// no line that is read holds after an equals sign: after a string of one character, and after a string that ends
-// with a backslash that a backslash escapes.
+// no line that is read holds after an equals sign: after a string of one character, after a string that ends
+// with a backslash that a backslash escapes, and after a backslash outside a string, which escapes nothing.
 const comments = "type agent extends handle//\n" +
 	"globals\n" +
 	"string ONE = \"a\" // one\rtwo\n" +
 	"string BACK = \"a\\\\\" // one\rtwo\n" +
+	"integer SLASHED = 1 \\// one\rtwo\n" +
 	"endglobals//\n"
 
 func TestACommentIsCutFromItsLineWhereTwoSlashesStandOutsideAString(t *testing.T) {
@@ -169,10 +170,17 @@ func TestACommentIsCutFromItsLineWhereTwoSlashesStandOutsideAString(t *testing.T
 		Globals: []jass.Global{
 			{Name: "ONE", Source: "comments.j", Type: "string"},
 			{Name: "BACK", Source: "comments.j", Type: "string"},
+			{Name: "SLASHED", Source: "comments.j", Type: "integer"},
 		},
 	}
 	if got := parse(t, comments, "comments.j"); !reflect.DeepEqual(got, want) {
 		t.Errorf("got  %+v\nwant %+v", got, want)
+	}
+	// Two slashes inside a string, after other characters of it, start no comment: the carriage return after
+	// them is still in the line, which is refused for it.
+	_, err := jass.Parse("globals\nstring S = \"a//b\rc\"\nendglobals\n", "comments.j")
+	if err == nil || !strings.HasPrefix(err.Error(), "comments.j:2: cannot read ") {
+		t.Errorf("two slashes inside a string: got %v, want line 2 refused", err)
 	}
 }
 
