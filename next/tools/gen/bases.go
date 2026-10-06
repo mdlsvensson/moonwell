@@ -25,36 +25,50 @@ func standardObjects(game gameData) (map[manifest.Category]map[string]objects.Ba
 	if err := unitsByCategory(game, bases); err != nil {
 		return nil, err
 	}
-	for _, row := range game.items {
-		id := row.Value("itemID")
-		bases["items"][id] = objects.BaseMeta{Name: itemName.of(game.strings, id, row)}
-	}
-	strs := game.strings
-	if err := withLevels(bases["abilities"], strs, game.abilities, "alias", "levels", abilityName); err != nil {
-		return nil, err
-	}
-	for _, row := range game.buffs {
-		id := row.Value("alias")
-		bases["buffs"][id] = objects.BaseMeta{Name: buffName.of(game.strings, id, row)}
-	}
-	if err := withLevels(bases["upgrades"], strs, game.upgrades, "upgradeid", "maxlevel", upgradeName); err != nil {
+	objectsByName(game, bases)
+	if err := objectsWithLevels(game, bases); err != nil {
 		return nil, err
 	}
 	return bases, nil
 }
 
-// withLevels puts the objects of a table that has a count of levels, the abilities or the upgrades, into their
-// category: each by the id in its key column, with its name and the count in its levels column.
-func withLevels(
-	into map[string]objects.BaseMeta, strs ini.File, rows []slk.Row, key, levels string, name nameSource,
-) error {
-	for _, row := range rows {
-		id := row.Value(key)
-		count, err := levelCount(row, levels)
-		if err != nil {
-			return err
+// objectTable is a table whose every row is a standard object of one category.
+type objectTable struct {
+	category manifest.Category
+	rows     []slk.Row
+	key      string     // the column that has the id of a row
+	name     nameSource // where an object of the table has its name
+	levels   string     // the column that has the count of levels of a row; "" for a table without one
+}
+
+// objectsByName puts the items and the buffs into their categories: each by its id, with its name.
+func objectsByName(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) {
+	for _, table := range []objectTable{
+		{category: "items", rows: game.items, key: "itemID", name: itemName},
+		{category: "buffs", rows: game.buffs, key: "alias", name: buffName},
+	} {
+		for _, row := range table.rows {
+			id := row.Value(table.key)
+			bases[table.category][id] = objects.BaseMeta{Name: table.name.of(game.strings, id, row)}
 		}
-		into[id] = objects.BaseMeta{Name: name.of(strs, id, row), Levels: &count}
+	}
+}
+
+// objectsWithLevels puts the abilities and then the upgrades into their categories: each by its id, with its
+// name and its count of levels. The first count that is none ends it.
+func objectsWithLevels(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
+	for _, table := range []objectTable{
+		{category: "abilities", rows: game.abilities, key: "alias", name: abilityName, levels: "levels"},
+		{category: "upgrades", rows: game.upgrades, key: "upgradeid", name: upgradeName, levels: "maxlevel"},
+	} {
+		for _, row := range table.rows {
+			id := row.Value(table.key)
+			count, err := levelCount(row, table.levels)
+			if err != nil {
+				return err
+			}
+			bases[table.category][id] = objects.BaseMeta{Name: table.name.of(game.strings, id, row), Levels: &count}
+		}
 	}
 	return nil
 }
@@ -114,14 +128,10 @@ func categoryOfUnit(id string, stats slk.Row) (category manifest.Category, broke
 	hero := id[0] >= 'A' && id[0] <= 'Z'
 	building := stats.Value("isbldg") == "1"
 	if primary := stats.Value("Primary"); hero != slices.Contains(primaryAttributes, primary) {
-		letters := "lowercase"
-		if hero {
-			letters = "uppercase"
-		}
-		broken = append(broken, id+" ("+letters+", primary attribute '"+primary+"')")
+		broken = append(broken, primaryDisagrees(id, hero, primary))
 	}
 	if hero && building {
-		broken = append(broken, id+" (uppercase, a building)")
+		broken = append(broken, heroIsABuilding(id))
 	}
 	switch {
 	case hero:
@@ -164,9 +174,9 @@ func (s nameSource) of(strs ini.File, id string, row slk.Row) string {
 	return cleanName(row.Value(s.comment))
 }
 
-// firstListItem is the first entry of a list with commas between its entries, where an entry may stand in
-// quotes. A list that opens a quote and never closes it loses its last character with the quote: the game's
-// strings may have such a list, and its name is kept as it is read.
+// firstListItem is the first entry of a list with commas between its entries: what stands before the first
+// comma, or, for a list that opens with a quote, what stands between that quote and the next one. A list that
+// opens with a quote and has no other gives what follows the quote without its last byte.
 func firstListItem(list string) string {
 	quoted, opens := strings.CutPrefix(list, `"`)
 	if !opens {
@@ -206,6 +216,19 @@ func errHeroRule(exceptions []string) error {
 		"unitbalance.slk (spec \xC2\xA73.1, V12): " + strings.Join(exceptions, ", ") +
 		". Decide how to classify them before regenerating.")
 }
+
+// primaryDisagrees is what errHeroRule says of a unit whose id and whose primary attribute disagree: a capital
+// first without the attribute of a hero, or the attribute without the capital.
+func primaryDisagrees(id string, capital bool, primary string) string {
+	letters := "lowercase"
+	if capital {
+		letters = "uppercase"
+	}
+	return id + " (" + letters + ", primary attribute '" + primary + "')"
+}
+
+// heroIsABuilding is what errHeroRule says of a unit whose id starts with a capital and that is a building.
+func heroIsABuilding(id string) string { return id + " (uppercase, a building)" }
 
 // errNoLevels refuses a row of abilities or of upgrades that has no cell for its count of levels. The row is
 // named by its first cell.

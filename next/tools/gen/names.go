@@ -12,73 +12,65 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/objects"
 )
 
-// ---- the names that no field can have ----
+// ---- the pins ----
 
-// The names that no field can have as its property. Every part of the generator that gives a field its name, or
-// checks one, reads these two lists, so that a name is refused where it is made and not only where the schema is
-// rendered.
-var (
-	// reservedNames is the names that an object module has of itself: the properties of Object.pkl (base, source,
-	// properties), the id that the module of each category declares, and output, which every Pkl module has.
-	reservedNames = []string{"id", "base", "source", "properties", "output"}
+// overridesPath is the names that are pinned, written by hand, by its path from the checkout.
+const overridesPath = "tools/metadata/overrides.json"
 
-	// pklKeywords is the keywords of Pkl 0.32 and the words it reserves for a later version.
-	pklKeywords = strings.Fields("abstract amends as case class const delete else extends external false fixed for " +
-		"function hidden if import in is let local module new nothing null open out outer override private protected " +
-		"public read record super switch this throw trace true typealias unknown vararg when")
-)
-
-// nameIsTaken reports whether Pkl or an object module has the name already, so that no field's property can.
-func nameIsTaken(name string) bool {
-	return slices.Contains(reservedNames, name) || slices.Contains(pklKeywords, name)
+// overrides is tools/metadata/overrides.json: the friendly names that are pinned, by the list of the field and
+// its id, and the fields whose leaving the game is acknowledged, by their list.
+type overrides struct {
+	Names   map[string]map[string]string `json:"names"`
+	Removed map[string][]string          `json:"removed"`
 }
 
-// pklIdentifier is a name that Pkl reads as an identifier without quoting it.
-var pklIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+// overridesKeys is the keys of the file: those of the struct.
+var overridesKeys = []string{"names", "removed"}
 
-// friendlyName is the form of a name that the generator gives a field: letters of ASCII and digits, the first
-// a small letter.
-var friendlyName = regexp.MustCompile(`^[a-z][A-Za-z0-9]*$`)
+// readOverrides reads the overrides of a checkout.
+func readOverrides(checkout string) (overrides, error) {
+	data, err := os.ReadFile(fileIn(checkout, overridesPath))
+	if err != nil {
+		return overrides{}, errInCheckout(checkout, overridesPath, err)
+	}
+	return decodeOverrides(data)
+}
 
-// ---- the name of a label ----
+// decodeOverrides reads the text of an overrides.json: a JSON object with the keys of the file and no other. A
+// key may be left out, and the file may be null: it then pins nothing. The bytes go to the decoder as they are,
+// so a byte order mark is no JSON.
+//
+// The text is decoded into the struct, which holds every value to its type, and once more for the keys of the
+// file in the letters they have: a decoding into a struct reads a key in any letters, and passes over one that
+// the struct does not have. Below the two keys every key is a list or an id, and none is unknown.
+func decodeOverrides(data []byte) (overrides, error) {
+	var pins overrides
+	if err := json.Unmarshal(data, &pins); err != nil {
+		return overrides{}, errNoJSON(overridesPath, err)
+	}
+	// What the struct took is an object or null, and either decodes as the keys of an object too: this decoding
+	// has no failure left.
+	var file map[string]any
+	_ = json.Unmarshal(data, &file)
+	if key, unknown := keyOutside(file, overridesKeys); unknown {
+		return overrides{}, errUnknownKey(overridesPath, "the file", key, overridesKeys)
+	}
+	return pins, nil
+}
 
-// What a label's punctuation becomes in its name: a mark that is dropped joins the letters around it, and a sign
-// that is spelled is a word of its own.
-var (
-	// The apostrophes, the straight one and the curled one, U+2019, the exclamation mark and the full stop.
-	droppedMarks = strings.NewReplacer("'", "", "\xE2\x80\x99", "", "!", "", ".", "")
-	spelledSigns = strings.NewReplacer("/", " Or ", "&", " And ", "+", " Plus ", "%", " Percent ")
-	// notWord is what stands between two words: everything that is no letter of ASCII and no digit.
-	notWord = regexp.MustCompile(`[^A-Za-z0-9]+`)
-)
-
-// camelCase is the friendly name of a label: its words joined, each but the first with a capital, so that
-// "Hit Points Maximum (Base)" is hitPointsMaximumBase. The first word starts with a small letter, and is all
-// small where the label has it all in capitals. An apostrophe, "!" and "." are dropped, "/" reads Or, "&" And,
-// "+" Plus and "%" Percent, and every other character that is no letter and no digit ends a word.
-func camelCase(label string) string {
-	var name strings.Builder
-	for _, word := range notWord.Split(spelledSigns.Replace(droppedMarks.Replace(label)), -1) {
-		switch {
-		case word == "":
-		case name.Len() > 0:
-			name.WriteString(capitalize(word))
-		case word == strings.ToUpper(word):
-			name.WriteString(strings.ToLower(word))
-		default:
-			name.WriteString(strings.ToLower(word[:1]) + word[1:])
+// pinned is the name that the overrides pin for a field of a list, and whether they pin one. The fields of units
+// and of items are one table, so a pin under either list is of both.
+func (o overrides) pinned(list, id string) (string, bool) {
+	lists := []string{list}
+	if list == "units" || list == "items" {
+		lists = []string{"units", "items"}
+	}
+	for _, under := range lists {
+		if name, has := o.Names[under][id]; has {
+			return name, true
 		}
 	}
-	return name.String()
-}
-
-// capitalize is a word with a capital for its first letter. The words are of ASCII: a word of a label, a name,
-// a category, and a rawcode.
-func capitalize(word string) string {
-	if word == "" {
-		return word
-	}
-	return strings.ToUpper(word[:1]) + word[1:]
+	return "", false
 }
 
 // ---- the names of the fields of a table ----
@@ -86,22 +78,6 @@ func capitalize(word string) string {
 // rename is a field whose friendly name is not the name of its label: the first list it is in, its id, and what
 // is reported of it, which is the two names and why they differ.
 type rename struct{ list, id, change string }
-
-// pinReason is the reason that is reported for a name that the overrides pin.
-const pinReason = "override"
-
-// renaming is a way to rename a field whose name clashes with another's, and the reason that is reported for it.
-type renaming struct {
-	reason string
-	rename func(field objects.FieldMeta) string
-}
-
-// The two renamings of a clash, in the order they are tried: the category of the field before its name, and
-// then the rawcode after it.
-var renamings = []renaming{
-	{"category prefix", func(field objects.FieldMeta) string { return field.Category + capitalize(field.Name) }},
-	{"rawcode", func(field objects.FieldMeta) string { return field.Name + capitalize(field.ID) }},
-}
 
 // assignNames gives the fields of one table their friendly names. It returns, for each field, what is reported
 // of a name that is not the name of its label ("" for a field that is named after its label), and a line for
@@ -115,23 +91,10 @@ var renamings = []renaming{
 func assignNames(
 	records []objects.FieldMeta, list string, pins overrides, abilities []string,
 ) (changes, problems []string) {
-	fromLabel := make([]string, len(records))
-	reasons := make([][]string, len(records))
-	for i := range records {
-		fromLabel[i] = camelCase(records[i].Label)
-		records[i].Name = fromLabel[i]
-		if name, pinned := pins.pinned(list, records[i].ID); pinned {
-			records[i].Name, reasons[i] = name, []string{pinReason}
-		}
-	}
+	fromLabel := nameAfterLabels(records)
+	pinned := applyPins(records, list, pins)
 	groups := groupsOf(records, list, abilities)
-	for _, way := range renamings {
-		for _, i := range clashing(records, groups) {
-			if !slices.Contains(reasons[i], pinReason) {
-				records[i].Name, reasons[i] = way.rename(records[i]), append(reasons[i], way.reason)
-			}
-		}
-	}
+	renamedBy := renameClashes(records, groups, pinned)
 	for _, i := range clashing(records, groups) {
 		problems = append(problems, stillClashes(list, records[i]))
 	}
@@ -140,11 +103,78 @@ func assignNames(
 		if !friendlyName.MatchString(field.Name) || nameIsTaken(field.Name) {
 			problems = append(problems, noFriendlyName(list, field))
 		}
-		if len(reasons[i]) > 0 {
-			changes[i] = `"` + fromLabel[i] + `" -> "` + field.Name + `" (` + strings.Join(reasons[i], " and ") + ")"
-		}
+		changes[i] = changeOf(fromLabel[i], field.Name, pinned[i], renamedBy[i])
 	}
 	return changes, problems
+}
+
+// nameAfterLabels gives every field the name of its label, and returns those names.
+func nameAfterLabels(records []objects.FieldMeta) []string {
+	fromLabel := make([]string, len(records))
+	for i := range records {
+		fromLabel[i] = camelCase(records[i].Label)
+		records[i].Name = fromLabel[i]
+	}
+	return fromLabel
+}
+
+// applyPins gives every field that the overrides pin its pinned name, and returns which fields those are.
+func applyPins(records []objects.FieldMeta, list string, pins overrides) []bool {
+	pinned := make([]bool, len(records))
+	for i := range records {
+		if name, has := pins.pinned(list, records[i].ID); has {
+			records[i].Name, pinned[i] = name, true
+		}
+	}
+	return pinned
+}
+
+// renaming is a way to rename a field whose name clashes with another's: the name it gives the field, made of
+// the name the field has, and the reason that is reported for it.
+type renaming struct {
+	reason string
+	rename func(field objects.FieldMeta) string
+}
+
+// The two renamings of a clash, in the order they are tried: the category of the field before its name, and
+// then the rawcode after it.
+var renamings = []renaming{
+	{"category prefix", func(field objects.FieldMeta) string { return field.Category + capitalize(field.Name) }},
+	{"rawcode", func(field objects.FieldMeta) string { return field.Name + capitalize(field.ID) }},
+}
+
+// renameClashes renames the fields whose names clash, by each renaming in turn: every field that clashes when a
+// renaming's turn comes is renamed by it, but for a pinned field, which keeps its pin. It returns, for each
+// field, the reasons of the renamings that renamed it, in their order.
+func renameClashes(records []objects.FieldMeta, groups [][]string, pinned []bool) [][]string {
+	renamedBy := make([][]string, len(records))
+	for _, way := range renamings {
+		for _, i := range clashing(records, groups) {
+			if pinned[i] {
+				continue
+			}
+			records[i].Name = way.rename(records[i])
+			renamedBy[i] = append(renamedBy[i], way.reason)
+		}
+	}
+	return renamedBy
+}
+
+// pinReason is the reason that is reported for a name that the overrides pin.
+const pinReason = "override"
+
+// changeOf is what is reported of a field whose name the overrides pin or a renaming made: the name of its label,
+// the name it has, and why. It is "" for a field that is neither pinned nor renamed. A pin is reported also
+// where it pins the name of the label.
+func changeOf(fromLabel, name string, pinned bool, renamedBy []string) string {
+	reasons := renamedBy
+	if pinned {
+		reasons = append([]string{pinReason}, renamedBy...)
+	}
+	if len(reasons) == 0 {
+		return ""
+	}
+	return `"` + fromLabel + `" -> "` + name + `" (` + strings.Join(reasons, " and ") + ")"
 }
 
 // groupsOf is, for each field of a table, the groups that its name must be the only one of its kind in: a group
@@ -216,65 +246,45 @@ func clashing(records []objects.FieldMeta, groups [][]string) []int {
 	return slices.Compact(clash)
 }
 
-// ---- the pins ----
+// ---- the name of a label ----
 
-// overridesPath is the names that are pinned, written by hand, by its path from the checkout.
-const overridesPath = "tools/metadata/overrides.json"
+// What a label's punctuation becomes in its name: a mark that is dropped joins the letters around it, and a sign
+// that is spelled is a word of its own.
+var (
+	// The apostrophes, the straight one and the curled one, U+2019, the exclamation mark and the full stop.
+	droppedMarks = strings.NewReplacer("'", "", "\xE2\x80\x99", "", "!", "", ".", "")
+	spelledSigns = strings.NewReplacer("/", " Or ", "&", " And ", "+", " Plus ", "%", " Percent ")
+	// notWord is what stands between two words: everything that is no letter of ASCII and no digit.
+	notWord = regexp.MustCompile(`[^A-Za-z0-9]+`)
+)
 
-// overrides is tools/metadata/overrides.json: the friendly names that are pinned, by the list of the field and
-// its id, and the fields whose leaving the game is acknowledged, by their list.
-type overrides struct {
-	Names   map[string]map[string]string `json:"names"`
-	Removed map[string][]string          `json:"removed"`
-}
-
-// overridesKeys is the keys of the file: those of the struct.
-var overridesKeys = []string{"names", "removed"}
-
-// readOverrides reads the overrides of a checkout.
-func readOverrides(checkout string) (overrides, error) {
-	data, err := os.ReadFile(fileIn(checkout, overridesPath))
-	if err != nil {
-		return overrides{}, errInCheckout(checkout, overridesPath, err)
-	}
-	return decodeOverrides(data)
-}
-
-// decodeOverrides reads the text of an overrides.json: a JSON object with the keys of the file and no other. A
-// key may be left out, and the file may be null: it then pins nothing. The bytes go to the decoder as they are,
-// so a byte order mark is no JSON.
-//
-// The text is decoded into the struct, which holds every value to its type, and once more for the keys of the
-// file in the letters they have: a decoding into a struct reads a key in any letters, and passes over one that
-// the struct does not have. Below the two keys every key is a list or an id, and none is unknown.
-func decodeOverrides(data []byte) (overrides, error) {
-	var pins overrides
-	if err := json.Unmarshal(data, &pins); err != nil {
-		return overrides{}, errNoJSON(overridesPath, err)
-	}
-	var file map[string]any
-	if err := json.Unmarshal(data, &file); err != nil {
-		return overrides{}, errNoJSON(overridesPath, err)
-	}
-	if key, unknown := keyOutside(file, overridesKeys); unknown {
-		return overrides{}, errUnknownKey(overridesPath, "the file", key, overridesKeys)
-	}
-	return pins, nil
-}
-
-// pinned is the name that the overrides pin for a field of a list, and whether they pin one. The fields of units
-// and of items are one table, so a pin under either list is of both.
-func (o overrides) pinned(list, id string) (string, bool) {
-	lists := []string{list}
-	if list == "units" || list == "items" {
-		lists = []string{"units", "items"}
-	}
-	for _, under := range lists {
-		if name, has := o.Names[under][id]; has {
-			return name, true
+// camelCase is the friendly name of a label: its words joined, each but the first with a capital, so that
+// "Hit Points Maximum (Base)" is hitPointsMaximumBase. The first word starts with a small letter, and is all
+// small where the label has it all in capitals. An apostrophe, "!" and "." are dropped, "/" reads Or, "&" And,
+// "+" Plus and "%" Percent, and every other character that is no letter and no digit ends a word.
+func camelCase(label string) string {
+	var name strings.Builder
+	for _, word := range notWord.Split(spelledSigns.Replace(droppedMarks.Replace(label)), -1) {
+		switch {
+		case word == "":
+		case name.Len() > 0:
+			name.WriteString(capitalize(word))
+		case word == strings.ToUpper(word):
+			name.WriteString(strings.ToLower(word))
+		default:
+			name.WriteString(strings.ToLower(word[:1]) + word[1:])
 		}
 	}
-	return "", false
+	return name.String()
+}
+
+// capitalize is a word with a capital for its first letter. The words are of ASCII: a word of a label, a name,
+// a category, and a rawcode.
+func capitalize(word string) string {
+	if word == "" {
+		return word
+	}
+	return strings.ToUpper(word[:1]) + word[1:]
 }
 
 // ---- the names that are released ----
@@ -317,13 +327,41 @@ func changedNames(list string, released, current []objects.FieldMeta, pins overr
 		pinned, _ := pins.pinned(list, field.ID)
 		switch {
 		case !still && !slices.Contains(pins.Removed[list], field.ID):
-			problems = append(problems, list+" "+field.ID+` "`+field.Name+`" would disappear`)
+			problems = append(problems, wouldDisappear(list, field))
 		case still && name != field.Name && pinned != name:
-			problems = append(problems, list+" "+field.ID+` "`+field.Name+`" would become "`+name+`"`)
+			problems = append(problems, wouldBecome(list, field, name))
 		}
 	}
 	return problems
 }
+
+// ---- the names that no field can have ----
+
+// The names that no field can have as its property. Every part of the generator that gives a field its name, or
+// checks one, reads these two lists, so that a name is refused where it is made and not only where the schema is
+// rendered.
+var (
+	// reservedNames is the names that an object module has of itself: the properties of Object.pkl (base, source,
+	// properties), the id that the module of each category declares, and output, which every Pkl module has.
+	reservedNames = []string{"id", "base", "source", "properties", "output"}
+
+	// pklKeywords is the keywords of Pkl 0.32 and the words it reserves for a later version.
+	pklKeywords = strings.Fields("abstract amends as case class const delete else extends external false fixed for " +
+		"function hidden if import in is let local module new nothing null open out outer override private protected " +
+		"public read record super switch this throw trace true typealias unknown vararg when")
+)
+
+// nameIsTaken reports whether Pkl or an object module has the name already, so that no field's property can.
+func nameIsTaken(name string) bool {
+	return slices.Contains(reservedNames, name) || slices.Contains(pklKeywords, name)
+}
+
+// pklIdentifier is a name that Pkl reads as an identifier without quoting it.
+var pklIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+
+// friendlyName is the form of a name that the generator gives a field: letters of ASCII and digits, the first
+// a small letter.
+var friendlyName = regexp.MustCompile(`^[a-z][A-Za-z0-9]*$`)
 
 // ---- errors ----
 
@@ -336,6 +374,18 @@ func stillClashes(list string, field objects.FieldMeta) string {
 func noFriendlyName(list string, field objects.FieldMeta) string {
 	return list + " " + field.ID + ` "` + field.Name + `" (` + field.Label + "): not a valid property name, a Pkl " +
 		"keyword or a reserved name; add a name for it to " + overridesPath
+}
+
+// wouldDisappear is the line for a released field of a list that the game's data have not, and that the
+// overrides do not list as removed.
+func wouldDisappear(list string, released objects.FieldMeta) string {
+	return list + " " + released.ID + ` "` + released.Name + `" would disappear`
+}
+
+// wouldBecome is the line for a released field of a list whose name would be another now, and that no pin holds
+// to it.
+func wouldBecome(list string, released objects.FieldMeta, name string) string {
+	return list + " " + released.ID + ` "` + released.Name + `" would become "` + name + `"`
 }
 
 // errReleasedNames refuses fields that would change what authors write, with a line for each name.
