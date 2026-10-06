@@ -188,6 +188,69 @@ func TestAGitHubLibraryIsDownloadedOnceKeepingDirAndLockedByCommit(t *testing.T)
 	}
 }
 
+// A manifest may write the dir of a tag's library with "./" before it, with a separator after it, and with the
+// separators of Windows: each spelling names the same folder.
+func TestATagLibrarysDirNamesTheSameFolderInEverySpelling(t *testing.T) {
+	archive := tagArchive(t, commitA, "README.md", "# lib", "src/example/greet.lua", "return {}")
+	server := serving(map[string][]byte{urlV1: archive})
+	for dir, kept := range map[string]string{
+		"./src": "example/greet.lua", "src/": "example/greet.lua",
+		`src\example`: "greet.lua", "src/./example/": "greet.lua",
+	} {
+		root := t.TempDir()
+		sync(t, root, block("ex", fromGitHub("v0.1.0", dir)), server)
+		if got := filesIn(t, root, ".moonwell/libraries/ex"); !slices.Equal(got, []string{stampFile, kept}) {
+			t.Errorf("with the dir %q the folder holds %q, want %s", dir, got, kept)
+		}
+	}
+}
+
+// A project that an earlier Moonwell synced: the lock and the two stamps are laid as the text they have in such
+// a project. Nothing is downloaded, nothing is logged and no file is written.
+func TestASyncedProjectNeedsNoDownloadAndIsLeftAsItIs(t *testing.T) {
+	const (
+		modules = "sha256:b2a02000abc725476fcc6a72806632851fff48bc26179d2169b27c1ecc3b88c3"
+		shipped = "sha256:d40d3370a1e0e14f411273c8a5051158371a1e798f58b23e6b424fbb1f27eadb"
+	)
+	root := t.TempDir()
+	put(t, root,
+		LockFile, "{\n  \"libraries\": {\n"+
+			"    \"art\": {\n      \"github\": \"owner/lib\",\n      \"tag\": \"v0.1.0\",\n      \"dir\": \"\",\n"+
+			"      \"commit\": \""+commitA+"\",\n      \"files\": \""+modules+"\",\n"+
+			"      \"assets\": \""+shipped+"\"\n    },\n"+
+			"    \"ex\": {\n      \"github\": \"owner/lib\",\n      \"tag\": \"v0.1.0\",\n      \"dir\": \"src\",\n"+
+			"      \"commit\": \""+commitA+"\",\n      \"files\": \""+modules+"\"\n    }\n  }\n}\n",
+		".moonwell/libraries/art/.moonwell-library.json",
+		"{\n  \"github\": \"owner/lib\",\n  \"tag\": \"v0.1.0\",\n  \"dir\": \"\",\n"+
+			"  \"commit\": \""+commitA+"\",\n  \"files\": \""+modules+"\",\n"+
+			"  \"assets\": \""+shipped+"\",\n  \"layout\": 2\n}\n",
+		".moonwell/libraries/art/example/greet.lua", "return {}",
+		".moonwell/library-assets/art/Models/Golem.mdx", "model",
+		".moonwell/libraries/ex/.moonwell-library.json",
+		"{\n  \"github\": \"owner/lib\",\n  \"tag\": \"v0.1.0\",\n  \"dir\": \"src\",\n"+
+			"  \"commit\": \""+commitA+"\",\n  \"files\": \""+modules+"\",\n  \"layout\": 2\n}\n",
+		".moonwell/libraries/ex/example/greet.lua", "return {}",
+	)
+	makeOld(t, root)
+	server := serving(nil)
+	e, log := worldOf(t, root, server)
+	libraries := block("art", fromGitHub("v0.1.0", ""), "ex", fromGitHub("v0.1.0", "src"))
+	synced, err := Sync(background, e, libraries, manifestFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []Synced{
+		{Key: "art", Modules: ".moonwell/libraries/art", Assets: ".moonwell/library-assets/art"},
+		{Key: "ex", Modules: ".moonwell/libraries/ex"},
+	}
+	if !slices.Equal(synced, want) {
+		t.Errorf("Sync returned %+v", synced)
+	}
+	if _, written := filesBelow(t, root); len(server.asked) != 0 || len(log.Lines()) != 0 || written != nil {
+		t.Errorf("it asked %q, logged %q and wrote %q", server.asked, log.Lines(), written)
+	}
+}
+
 func TestAMovedTagFailsAChangedTagUpdatesTheLock(t *testing.T) {
 	root := t.TempDir()
 	libraries := block("ex", fromGitHub("v0.1.0", "src"))
@@ -507,9 +570,13 @@ func TestALocalLibraryCopiesOnlyItsYueAndLuaFilesOutsideDotFolders(t *testing.T)
 
 func TestAGitHubLibraryKeepsNoFileUnderADotFolder(t *testing.T) {
 	root := t.TempDir()
-	server := serving(map[string][]byte{urlV1: tagArchive(t, commitA, "a.lua", "return 1", ".github/workflows/x.lua", "return 0", "LICENSE", "MIT")})
+	// A dot name is left out at any depth: a folder below a folder, and a file in one.
+	server := serving(map[string][]byte{urlV1: tagArchive(t, commitA,
+		"a.lua", "return 1", ".github/workflows/x.lua", "return 0", "LICENSE", "MIT",
+		"b/.c/d.lua", "0", "b/.e.lua", "0")})
 	sync(t, root, block("ex", fromGitHub("v0.1.0", "")), server)
-	if there(root, ".moonwell/libraries/ex/.github") || textOf(t, root, ".moonwell/libraries/ex/LICENSE") != "MIT" {
+	if there(root, ".moonwell/libraries/ex/.github") || there(root, ".moonwell/libraries/ex/b") ||
+		textOf(t, root, ".moonwell/libraries/ex/LICENSE") != "MIT" {
 		t.Error("GitHub files keep every extension, but nothing under a dot-folder")
 	}
 }
