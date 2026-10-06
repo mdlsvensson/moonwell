@@ -1,0 +1,84 @@
+{
+  "settings": "<reason>|83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713",
+  "files": {
+    "generated/objects.yue": {
+      "hash": "daf96c691d8f717e34a499a0b13ad59a8e8b8765eefd9387a9659e6cd17019ed",
+      "uses": []
+    },
+    "main.yue": {
+      "hash": "3a04103ace4d5249b6247be96e64e0a6952f25efe17c2d4c7e4eab15a9779a2e",
+      "uses": [
+        [
+          "require",
+          1,
+          22
+        ],
+        [
+          "require",
+          3,
+          31
+        ],
+        [
+          "print",
+          6,
+          3
+        ],
+        [
+          "CreateUnit",
+          9,
+          10
+        ],
+        [
+          "Player",
+          9,
+          21
+        ],
+        [
+          "TimerStart",
+          10,
+          3
+        ],
+        [
+          "CreateTimer",
+          10,
+          14
+        ],
+        [
+          "SetUnitColor",
+          11,
+          5
+        ],
+        [
+          "GetPlayerColor",
+          11,
+          24
+        ],
+        [
+          "Player",
+          11,
+          39
+        ],
+        [
+          "GetRandomInt",
+          11,
+          46
+        ],
+        [
+          "bj_MAX_PLAYERS",
+          11,
+          62
+        ],
+        [
+          "CreateUnit",
+          13,
+          3
+        ],
+        [
+          "Player",
+          13,
+          14
+        ]
+      ]
+    }
+  }
+}

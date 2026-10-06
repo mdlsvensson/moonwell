@@ -1,0 +1,3 @@
+import "golems.names"
+
+export first = -> names.first\upper!

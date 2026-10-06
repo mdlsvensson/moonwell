@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/env"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/objects"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
@@ -560,6 +561,22 @@ func TestCheckLeavesTheIDsModuleAloneAndFailsWhereABuildWould(t *testing.T) {
 	}
 	if lines := s.log.Lines(); len(lines) != 0 {
 		t.Errorf("the failed check logged %q", lines)
+	}
+}
+
+func TestCheckReturnsTheFailureToFindPklAndEvaluatesNothing(t *testing.T) {
+	s := newStandIn(t)
+	// A platform Moonwell has no Pkl to download for, so that an old Pkl is refused and nothing is fetched.
+	s.env.Platform = "plan9-x86_64"
+	s.answer("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
+		return env.RunResult{Stdout: "Pkl 0.31.0 (a stand-in)\n"}, nil
+	})
+	result, err := Check(background, s.env)
+	if e := asError(t, err, "an old Pkl"); result != nil || !strings.Contains(e.Msg, "Pkl 0.32 or newer") {
+		t.Errorf("Check = %+v, %+v", result, e)
+	}
+	if runs := s.ranSoFar(); len(runs) != 1 {
+		t.Errorf("ran %+v, want the question for the version alone", runs)
 	}
 }
 

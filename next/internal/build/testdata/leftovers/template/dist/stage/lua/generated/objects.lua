@@ -1,0 +1,1 @@
+local i={}local a={}i["heroes"]=a;local b={captain=1747988528}i["units"]=b;local c={}i["buildings"]=c;local d={}i["items"]=d;local e={}i["abilities"]=e;local f={}i["buffs"]=f;local g={}i["upgrades"]=g;return i

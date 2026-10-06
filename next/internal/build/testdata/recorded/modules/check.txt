@@ -1,0 +1,22 @@
+logged:
+  "warning: src/main.yue:25:18 › Unknown global Unheard.\nhint: Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl."
+  Check passed: 9 module(s) reachable from main, 0 asset(s).
+staged in dist/stage/map.w3x:
+  nothing
+no archive
+generated:
+  .moonwell/libraries/ex/.moonwell-library.json: present
+  .moonwell/libraries/ex/example/globals.lua: sha256 af05967d3e16fd382197971e2cfe00d54462675f506a92e79cee91deef76bb62, 44 bytes
+  .moonwell/libraries/ex/example/greet.lua: sha256 5afb93f22b0590461b65861162abd2a1d9af816382e205bc27f984e549d8bfb3, 75 bytes
+  .moonwell/libraries/ex/example/loud.lua: sha256 942972dba3665284226ec0a90741e8bae56f3be9b8c1d7070c72ab517fc26c98, 49 bytes
+  .moonwell/libraries/ex/example/loud.yue: sha256 8fc7f375847f9f76cec089277082f5be2a8bd4fbfe78015eb118b4e3a5331763, 74 bytes
+  .moonwell/lua/example/globals.lua: sha256 af05967d3e16fd382197971e2cfe00d54462675f506a92e79cee91deef76bb62, 44 bytes
+  .moonwell/lua/example/greet.lua: sha256 5afb93f22b0590461b65861162abd2a1d9af816382e205bc27f984e549d8bfb3, 75 bytes
+  .moonwell/lua/example/loud.lua: present
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 66c0492cebd8687e1ec970ffe4498278c1ee6b48cf30b041159608a6de2bd648, 844 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes
+  moonwell.lock: sha256 87d042f9bb8ee890413b9b3c9e2ad4939174c0c64715305e8615d77a6eac566b, 256 bytes
+  src/generated/objects.yue: sha256 daf96c691d8f717e34a499a0b13ad59a8e8b8765eefd9387a9659e6cd17019ed, 228 bytes

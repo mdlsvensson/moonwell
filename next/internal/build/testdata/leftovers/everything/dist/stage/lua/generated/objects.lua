@@ -1,0 +1,1 @@
+local i={}local a={paladin=1211117617}i["heroes"]=a;local b={captain=1747988529}i["units"]=b;local c={hall=1747988530}i["buildings"]=c;local d={claws=1227894833}i["items"]=d;local e={light=1093677105}i["abilities"]=e;local f={blessed=1110454321}i["buffs"]=f;local g={masonry=1378889777}i["upgrades"]=g;return i

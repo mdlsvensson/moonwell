@@ -1,0 +1,268 @@
+logged:
+  Added 1 custom object(s) to 2 file(s).
+  Applied map settings to 4 internal file(s).
+  Packing archive...
+  Built dist/bin/map.w3x (2 module(s)).
+staged in dist/stage/map.w3x:
+  conversation.json:
+    "{\n"
+    "    \"stringTablePath\": \"war3map.wts\",\n"
+    "    \"conversation\": {}\n"
+    "}"
+  war3map.doo: sha256 390abf3266720381e4d472a83ff09b0c394be471b990917b560f70b651b114a0, 24 bytes
+  war3map.lua: sha256 89a5c98ea2c5b08918e84ff1758b80f9c70b3fe7413dad30456192ec2a47a48d, 11043 bytes
+  war3map.mmp: sha256 6232e06d584c3ebe71199814ed9aee41b057eed7924733d7e527e4d598195083, 88 bytes
+  war3map.shd: sha256 de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31, 65536 bytes
+  war3map.w3c: sha256 35be322d094f9d154a8aba4733b8497f180353bd7ae7b0a15f90b586b549f28b, 8 bytes
+  war3map.w3e: sha256 0fc6ed4b5bb2d3d2109a7a279c7c330de7254b209fcd85c00a9523f24d75f557, 33869 bytes
+  war3map.w3grp: sha256 15ec7bf0b50732b49f8228e07d24365338f9e3ab994b00af08e5a3bffe55fd8b, 12 bytes
+  war3map.w3i: sha256 c537a7b976f8a3ec6958e1f18ff4d91a7dab2b776688b1ec43b35a4799e77869, 622 bytes
+  war3map.w3l: sha256 e605b3c27b181866c487bdd0af804c4c08c593a5af30ec676d806cf22f64ebe5, 22 bytes
+  war3map.w3r: sha256 aae89fc0f03e2959ae4d701a80cc3915918c950b159f6abb6c92c1433b1a8534, 8 bytes
+  war3map.w3u: sha256 b90dec7c2fec6a5e500088b6bd298bf238c61909841edf241e0a4fdf10f0c674, 32 bytes
+  war3map.wct: sha256 f64ae3ad02604bc24d835dea5161f83e9fff2a9a9a75458fa16d79451292c0a5, 313 bytes
+  war3map.wpm: sha256 6d0b368c1b8a30b001f98a1b6b6ad1b35f1c65673815e4092574e51d7d404730, 65552 bytes
+  war3map.wtg: sha256 16f619c9a09d04a8bdd9d99ad716f96397f2c45fd71c417bed54f0d66f890dd8, 442 bytes
+  war3map.wts:
+    "\ufeffSTRING 1\r\n"
+    "{\r\n"
+    "TypeScript Template\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 2\r\n"
+    "{\r\n"
+    "Any\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 3\r\n"
+    "{\r\n"
+    "Nondescript\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 4\r\n"
+    "{\r\n"
+    "TriggerHappy\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 5\r\n"
+    "{\r\n"
+    "Player 1\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 6\r\n"
+    "{\r\n"
+    "Player 2\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 7\r\n"
+    "{\r\n"
+    "Player 3\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 8\r\n"
+    "{\r\n"
+    "Force 1\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 9\r\n"
+    "{\r\n"
+    "Force 2\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 10\r\n"
+    "{\r\n"
+    "Player 4\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 11\r\n"
+    "{\r\n"
+    "Player 12\r\n"
+    "}\r\n"
+    "\r\n"
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+  war3mapMinimap.blp: sha256 2cd809d877523db6b3de75f91b20abf8a921885a44be3b686bac9c1dd4a88eed, 9222 bytes
+  war3mapSkin.w3u: sha256 b661ba4d8a3b663bc6a88f1d7277f1dd43b9f6a3d954d42b93fbd3bc50f99827, 163 bytes
+  war3mapUnits.doo: sha256 8ea9de4b46137aee6c683d20b34418fbbb9513067a09541591639862eea84754, 933 bytes
+packed in dist/bin/map.w3x, behind no header:
+  conversation.json: sha256 0b3d1bdf2b0e90a774b1e1278e038a670c5b3066019dd8e8849655a4cdea08cf, 64 bytes
+  war3map.doo: sha256 390abf3266720381e4d472a83ff09b0c394be471b990917b560f70b651b114a0, 24 bytes
+  war3map.lua: sha256 89a5c98ea2c5b08918e84ff1758b80f9c70b3fe7413dad30456192ec2a47a48d, 11043 bytes
+  war3map.mmp: sha256 6232e06d584c3ebe71199814ed9aee41b057eed7924733d7e527e4d598195083, 88 bytes
+  war3map.shd: sha256 de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31, 65536 bytes
+  war3map.w3c: sha256 35be322d094f9d154a8aba4733b8497f180353bd7ae7b0a15f90b586b549f28b, 8 bytes
+  war3map.w3e: sha256 0fc6ed4b5bb2d3d2109a7a279c7c330de7254b209fcd85c00a9523f24d75f557, 33869 bytes
+  war3map.w3grp: sha256 15ec7bf0b50732b49f8228e07d24365338f9e3ab994b00af08e5a3bffe55fd8b, 12 bytes
+  war3map.w3i: sha256 c537a7b976f8a3ec6958e1f18ff4d91a7dab2b776688b1ec43b35a4799e77869, 622 bytes
+  war3map.w3l: sha256 e605b3c27b181866c487bdd0af804c4c08c593a5af30ec676d806cf22f64ebe5, 22 bytes
+  war3map.w3r: sha256 aae89fc0f03e2959ae4d701a80cc3915918c950b159f6abb6c92c1433b1a8534, 8 bytes
+  war3map.w3u: sha256 b90dec7c2fec6a5e500088b6bd298bf238c61909841edf241e0a4fdf10f0c674, 32 bytes
+  war3map.wct: sha256 f64ae3ad02604bc24d835dea5161f83e9fff2a9a9a75458fa16d79451292c0a5, 313 bytes
+  war3map.wpm: sha256 6d0b368c1b8a30b001f98a1b6b6ad1b35f1c65673815e4092574e51d7d404730, 65552 bytes
+  war3map.wtg: sha256 16f619c9a09d04a8bdd9d99ad716f96397f2c45fd71c417bed54f0d66f890dd8, 442 bytes
+  war3map.wts: sha256 c351c03ade4147a31da632e8870fe4d27631943f80b21eaf42159a9e1c89431b, 325 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+  war3mapMinimap.blp: sha256 2cd809d877523db6b3de75f91b20abf8a921885a44be3b686bac9c1dd4a88eed, 9222 bytes
+  war3mapSkin.w3u: sha256 b661ba4d8a3b663bc6a88f1d7277f1dd43b9f6a3d954d42b93fbd3bc50f99827, 163 bytes
+  war3mapUnits.doo: sha256 8ea9de4b46137aee6c683d20b34418fbbb9513067a09541591639862eea84754, 933 bytes
+generated:
+  .moonwell/types/map.d.lua:
+    "---@meta\n"
+    "-- GENERATED by Moonwell from maps/map.w3x/war3map.lua; do not edit.\n"
+    "\n"
+    "---@type trigger\n"
+    "gg_trg_Initialization = nil\n"
+    "\n"
+    "---@type unit\n"
+    "gg_unit_Hblm_0003 = nil\n"
+    "\n"
+    "---@type unit\n"
+    "gg_unit_Hpal_0002 = nil\n"
+    "\n"
+    "function InitGlobals() end\n"
+    "\n"
+    "function CreateUnitsForPlayer0() end\n"
+    "\n"
+    "function CreateUnitsForPlayer1() end\n"
+    "\n"
+    "function CreatePlayerBuildings() end\n"
+    "\n"
+    "function CreatePlayerUnits() end\n"
+    "\n"
+    "function CreateAllUnits() end\n"
+    "\n"
+    "function Trig_Initialization_Actions() end\n"
+    "\n"
+    "function InitTrig_Initialization() end\n"
+    "\n"
+    "function InitCustomTriggers() end\n"
+    "\n"
+    "function RunInitializationTriggers() end\n"
+    "\n"
+    "function InitCustomPlayerSlots() end\n"
+    "\n"
+    "function InitCustomTeams() end\n"
+    "\n"
+    "function InitAllyPriorities() end\n"
+    "\n"
+    "function main() end\n"
+    "\n"
+    "function config() end\n"
+  .moonwell/types/moonwell.d.lua:
+    "---@meta moonwell\n"
+    "-- GENERATED by Moonwell; do not edit.\n"
+    "\n"
+    "---The Moonwell runtime. Hooks of one kind run in the order they were added. A failing hook prints its error\n"
+    "---with the .yue file and line, and the other hooks still run.\n"
+    "local moonwell = {}\n"
+    "\n"
+    "---Adds `fn` to run when the game calls config(), before World Editor's config() sets up players, forces and\n"
+    "---start locations.\n"
+    "---@param fn fun(): ...\n"
+    "function moonwell.before_config(fn) end\n"
+    "\n"
+    "---Adds `fn` to run when the game calls config(), after World Editor's config() has set up players and forces.\n"
+    "---@param fn fun(): ...\n"
+    "function moonwell.on_config(fn) end\n"
+    "\n"
+    "---Adds `fn` to run when the game calls main(), before World Editor's main() creates preplaced units and runs\n"
+    "---the initialization triggers.\n"
+    "---@param fn fun(): ...\n"
+    "function moonwell.before_main(fn) end\n"
+    "\n"
+    "---Adds `fn` to run when the game calls main(), after World Editor's main(): preplaced units exist and the\n"
+    "---initialization triggers have run.\n"
+    "---@param fn fun(): ...\n"
+    "function moonwell.on_main(fn) end\n"
+    "\n"
+    "---Rewrites war3map.lua line numbers in an error message to the source file and line (src/*.yue or\n"
+    "---lua/*.lua); for a minified YueScript module, to the file only.\n"
+    "---@param message string\n"
+    "---@return string\n"
+    "function moonwell.format_error(message) end\n"
+    "\n"
+    "---Loads a bundled module by its dotted name, such as \"heroes.captain\" or \"moonwell\". The Moonwell runtime\n"
+    "---defines it: the game's Lua has no package library, which .luarc.json turns off along with LuaLS's own require.\n"
+    "---@param name string\n"
+    "---@return any\n"
+    "function require(name) end\n"
+    "\n"
+    "return moonwell\n"
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua:
+    "---@meta generated.objects\n"
+    "---@diagnostic disable: missing-fields\n"
+    "-- GENERATED by Moonwell from objects/**.pkl; do not edit.\n"
+    "\n"
+    "---@class generated.objects.heroes\n"
+    "\n"
+    "---@class generated.objects.units\n"
+    "---@field captain integer h000\n"
+    "\n"
+    "---@class generated.objects.buildings\n"
+    "\n"
+    "---@class generated.objects.items\n"
+    "\n"
+    "---@class generated.objects.abilities\n"
+    "\n"
+    "---@class generated.objects.buffs\n"
+    "\n"
+    "---@class generated.objects.upgrades\n"
+    "\n"
+    "local objects = {}\n"
+    "\n"
+    "---@type generated.objects.heroes\n"
+    "objects.heroes = {}\n"
+    "\n"
+    "---@type generated.objects.units\n"
+    "objects.units = {}\n"
+    "\n"
+    "---@type generated.objects.buildings\n"
+    "objects.buildings = {}\n"
+    "\n"
+    "---@type generated.objects.items\n"
+    "objects.items = {}\n"
+    "\n"
+    "---@type generated.objects.abilities\n"
+    "objects.abilities = {}\n"
+    "\n"
+    "---@type generated.objects.buffs\n"
+    "objects.buffs = {}\n"
+    "\n"
+    "---@type generated.objects.upgrades\n"
+    "objects.upgrades = {}\n"
+    "\n"
+    "return objects\n"
+  .moonwell/yue/moonwell/macros.yue:
+    "-- Moonwell's compile-time macros, imported with `import \"moonwell.macros\" as {:$FourCC}`. Moonwell writes this file to\n"
+    "-- .moonwell/yue/moonwell/macros.yue, where the compiler and the editor's YueScript extension find it. It adds nothing\n"
+    "-- to the map.\n"
+    "\n"
+    "-- $FourCC \"hfoo\" is a rawcode as the integer the game uses, 1751543663: its four characters' bytes, big-endian.\n"
+    "export macro FourCC = (code = \"\", ...) ->\n"
+    "  quote = code\\sub 1, 1\n"
+    "  text = code\\sub 2, -2\n"
+    "  valid = select(\"#\", ...) == 0 and (quote == '\"' or quote == \"'\") and code\\sub(-1) == quote and #text == 4\n"
+    "  -- A double-quoted string interpolates #{...}, so its text is not its value.\n"
+    "  valid = false if quote == '\"' and text\\find '#{', 1, true\n"
+    "  if valid\n"
+    "    for i = 1, 4\n"
+    "      byte = text\\byte i\n"
+    "      -- Printable ASCII only: a backslash starts an escape sequence, and the quote ends the string.\n"
+    "      valid = false if byte < 32 or byte > 126 or byte == 92 or byte == quote\\byte!\n"
+    "  unless valid\n"
+    "    error '$FourCC needs a string literal of exactly 4 characters, such as \"hfoo\".'\n"
+    "  value = 0\n"
+    "  for i = 1, 4\n"
+    "    value = value * 256 + text\\byte i\n"
+    "  tostring value\n"
+  src/generated/objects.yue:
+    "-- GENERATED by Moonwell from objects/**.pkl; do not edit.\n"
+    "export heroes = {}\n"
+    "export units = {\n"
+    "  captain: 1747988528 -- h000\n"
+    "}\n"
+    "export buildings = {}\n"
+    "export items = {}\n"
+    "export abilities = {}\n"
+    "export buffs = {}\n"
+    "export upgrades = {}\n"

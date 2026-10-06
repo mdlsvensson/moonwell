@@ -1,0 +1,8 @@
+{
+  "settings": "paths|<reason>|minify|83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713",
+  "files": {
+    "src/generated/objects.yue": "b0283f4b36fa9a9c4124c123a3c260627efd1adb8ecde3395235444ee9b80284",
+    "src/main.yue": "3597dbcad07ae68212f3bfb751f7e1ce089e6677479d95d78c27b1b23ee3cb40",
+    ".moonwell/libraries/golems/golems/loud.yue": "342b2eb142fd8baff710138ab5fae4f03718ef88a8dff81c58b6aeb91e13def2"
+  }
+}

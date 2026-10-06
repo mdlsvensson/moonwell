@@ -1,0 +1,2 @@
+refused: src/generated/objects.yue
+left: no stage, no archive

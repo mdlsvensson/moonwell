@@ -1,0 +1,1 @@
+local d={}local a=require("golems.names")local b;b=function()return a.first:upper()end;d["first"]=b;return d

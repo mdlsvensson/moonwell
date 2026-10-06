@@ -1,0 +1,388 @@
+logged:
+  Added 7 custom object(s) to 10 file(s).
+  Applied map settings to 7 internal file(s).
+  assets/textures/golem.blp replaces library golems's Textures/Golem.blp
+  Imported 4 asset(s).
+  Packing archive...
+  Built dist/bin/map.w3x (6 module(s)).
+staged in dist/stage/map.w3x:
+  Models/unit.mdx: sha256 ad6170c304e1b0a6cfe3b1ba6b40c065f646428f623f664ad31d54b98735195c, 5 bytes
+  ReplaceableTextures/CommandButtons/BTNSword.blp: "an icon"
+  conversation.json:
+    "{\n"
+    "    \"stringTablePath\": \"war3map.wts\",\n"
+    "    \"conversation\": {}\n"
+    "}"
+  textures/golem.blp: "texture from the map"
+  war3map.doo: sha256 390abf3266720381e4d472a83ff09b0c394be471b990917b560f70b651b114a0, 24 bytes
+  war3map.imp: sha256 883bddbba8355918fe272a4e66f49c21dff961f9d18f0d4d4a5b02ffa1bf7e5d, 129 bytes
+  war3map.lua: sha256 2abb8bbd753a43ce0a0dea56a8a735daf9b28aa2e1c4392544e2d037775c49ce, 15405 bytes
+  war3map.mmp: sha256 6232e06d584c3ebe71199814ed9aee41b057eed7924733d7e527e4d598195083, 88 bytes
+  war3map.shd: sha256 de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31, 65536 bytes
+  war3map.w3a: sha256 19e3048f915204170ba1e0a4d56e7ad29045a287891642fdec9ecea10b761e0d, 172 bytes
+  war3map.w3b: sha256 40ea49f669f78dc1ecd0c7f96a63870f69fbe5d1e4c9958a90b1d412491977c6, 32 bytes
+  war3map.w3c: sha256 35be322d094f9d154a8aba4733b8497f180353bd7ae7b0a15f90b586b549f28b, 8 bytes
+  war3map.w3d: sha256 844d1993a7866afda7294c841001a763c58a8352bd2dcda0c06130e9d63a76d1, 64 bytes
+  war3map.w3e: sha256 0fc6ed4b5bb2d3d2109a7a279c7c330de7254b209fcd85c00a9523f24d75f557, 33869 bytes
+  war3map.w3grp: sha256 15ec7bf0b50732b49f8228e07d24365338f9e3ab994b00af08e5a3bffe55fd8b, 12 bytes
+  war3map.w3h: sha256 e52b026427a794eef8f84e0bc22ebf778a223de58eed422bc0908f36281b64c6, 52 bytes
+  war3map.w3i: sha256 b2f12df41b56ad033bfd9388cb35161812380f2581f7503447c6f7bdbd1c62f4, 689 bytes
+  war3map.w3l: sha256 e605b3c27b181866c487bdd0af804c4c08c593a5af30ec676d806cf22f64ebe5, 22 bytes
+  war3map.w3q: sha256 39f17a94c4a5115210e09571139d77426b51e058b794b9053487bef2530cf5f4, 52 bytes
+  war3map.w3r: sha256 aae89fc0f03e2959ae4d701a80cc3915918c950b159f6abb6c92c1433b1a8534, 8 bytes
+  war3map.w3t: sha256 3a314fb023e4c60b0ac47fb27cf72937a6a5b4c6ad88f08c2e13772470b718f0, 68 bytes
+  war3map.w3u: sha256 d96bffb5d24ed647cfacffeaecfd9b94f4d0d0b41f4666b5141acc75b2db2fb8, 108 bytes
+  war3map.wct: sha256 f64ae3ad02604bc24d835dea5161f83e9fff2a9a9a75458fa16d79451292c0a5, 313 bytes
+  war3map.wpm: sha256 6d0b368c1b8a30b001f98a1b6b6ad1b35f1c65673815e4092574e51d7d404730, 65552 bytes
+  war3map.wtg: sha256 16f619c9a09d04a8bdd9d99ad716f96397f2c45fd71c417bed54f0d66f890dd8, 442 bytes
+  war3map.wts:
+    "\ufeffSTRING 1\r\n"
+    "{\r\n"
+    "TypeScript Template\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 2\r\n"
+    "{\r\n"
+    "Any\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 3\r\n"
+    "{\r\n"
+    "Nondescript\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 4\r\n"
+    "{\r\n"
+    "TriggerHappy\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 5\r\n"
+    "{\r\n"
+    "Player 1\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 6\r\n"
+    "{\r\n"
+    "Player 2\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 7\r\n"
+    "{\r\n"
+    "Player 3\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 8\r\n"
+    "{\r\n"
+    "Force 1\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 9\r\n"
+    "{\r\n"
+    "Force 2\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 10\r\n"
+    "{\r\n"
+    "Player 4\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 11\r\n"
+    "{\r\n"
+    "Player 12\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 12\r\n"
+    "// Units: h000 (Unit), Name (Name)\r\n"
+    "{\r\n"
+    "Unit\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 13\r\n"
+    "// Items: I000 (Item), Name (Name)\r\n"
+    "{\r\n"
+    "Item\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 14\r\n"
+    "// Destructibles: B000 (Destructable), Name (Name)\r\n"
+    "{\r\n"
+    "Destructable\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 15\r\n"
+    "// Doodads: D000 (Doodad), Name (Name)\r\n"
+    "{\r\n"
+    "Doodad\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 16\r\n"
+    "// Abilities: A000 (Ability), Name (Name)\r\n"
+    "{\r\n"
+    "Ability\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 17\r\n"
+    "// Buffs/Effects: B000 (Buffs/Effects), EditorName (Name (Editor Only))\r\n"
+    "{\r\n"
+    "Buffs/Effects\r\n"
+    "}\r\n"
+    "\r\n"
+    "STRING 18\r\n"
+    "// Upgrades: R000 (Iron Forged Swords,Steel Forged Swords,Mithril Forged Swords), Name (Name)\r\n"
+    "{\r\n"
+    "Upgrade\r\n"
+    "}\r\n"
+    "\r\n"
+  war3mapImported/golems/frames.toc: "toc from the library"
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+  war3mapMinimap.blp: sha256 2cd809d877523db6b3de75f91b20abf8a921885a44be3b686bac9c1dd4a88eed, 9222 bytes
+  war3mapMisc.txt:
+    "[Misc]\n"
+    "DefenseArmor=0.05\n"
+    "MaxHeroLevel=25\n"
+    "FoodCeiling=200"
+  war3mapSkin.txt:
+    "[CustomSkin]\r\n"
+    "Old=1\r\n"
+    "Test=value\r\n"
+    "\r\n"
+    "[FrameDef]\r\n"
+    "GOLD=Coins\r\n"
+  war3mapSkin.w3a: sha256 167ba98ff5ffb0e168676cd2a9c7b8af7d00ed453aba458412cd267749f7b677, 115 bytes
+  war3mapSkin.w3b: sha256 c1da9904a1c31d43e929604a37b655d34e956269101ae2312d5f1523a26f82ac, 56 bytes
+  war3mapSkin.w3d: sha256 e89036856e6510d9a7aa67905ff89f6850ba1b9d3513a13b89481d615f756632, 32 bytes
+  war3mapSkin.w3h: sha256 c909f7b957839979d1cfba520e85f54317f164a63e6c7b7daede8b5477d046eb, 108 bytes
+  war3mapSkin.w3q: sha256 a5d0c4ba81f8012c8236c41d29ad4a80be06f77ca1a9fb2a4bf91695da04b9ea, 153 bytes
+  war3mapSkin.w3t: sha256 abdff036cc4a8496078954ea86f64eaf510ab160a7d5cc7e7c0d76b7ed834704, 99 bytes
+  war3mapSkin.w3u: sha256 0f1d0998835bdaef8e82efe1ed2bd1cf79e2d7f0e85c78ba6afdb1fff077ad86, 299 bytes
+  war3mapUnits.doo: sha256 8ea9de4b46137aee6c683d20b34418fbbb9513067a09541591639862eea84754, 933 bytes
+packed in dist/bin/map.w3x, behind no header:
+  Models\unit.mdx: sha256 ad6170c304e1b0a6cfe3b1ba6b40c065f646428f623f664ad31d54b98735195c, 5 bytes
+  ReplaceableTextures\CommandButtons\BTNSword.blp: sha256 5c7eb42696ec26e5f6bf7d7d935f9454ad27400b25ea3239976503b38b77d0fa, 7 bytes
+  conversation.json: sha256 0b3d1bdf2b0e90a774b1e1278e038a670c5b3066019dd8e8849655a4cdea08cf, 64 bytes
+  textures\golem.blp: sha256 b0aab45f6a45026616f6bbba5254f1a77fae13346e100523e1e3af12b5a0d5a1, 20 bytes
+  war3map.doo: sha256 390abf3266720381e4d472a83ff09b0c394be471b990917b560f70b651b114a0, 24 bytes
+  war3map.imp: sha256 883bddbba8355918fe272a4e66f49c21dff961f9d18f0d4d4a5b02ffa1bf7e5d, 129 bytes
+  war3map.lua: sha256 2abb8bbd753a43ce0a0dea56a8a735daf9b28aa2e1c4392544e2d037775c49ce, 15405 bytes
+  war3map.mmp: sha256 6232e06d584c3ebe71199814ed9aee41b057eed7924733d7e527e4d598195083, 88 bytes
+  war3map.shd: sha256 de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31, 65536 bytes
+  war3map.w3a: sha256 19e3048f915204170ba1e0a4d56e7ad29045a287891642fdec9ecea10b761e0d, 172 bytes
+  war3map.w3b: sha256 40ea49f669f78dc1ecd0c7f96a63870f69fbe5d1e4c9958a90b1d412491977c6, 32 bytes
+  war3map.w3c: sha256 35be322d094f9d154a8aba4733b8497f180353bd7ae7b0a15f90b586b549f28b, 8 bytes
+  war3map.w3d: sha256 844d1993a7866afda7294c841001a763c58a8352bd2dcda0c06130e9d63a76d1, 64 bytes
+  war3map.w3e: sha256 0fc6ed4b5bb2d3d2109a7a279c7c330de7254b209fcd85c00a9523f24d75f557, 33869 bytes
+  war3map.w3grp: sha256 15ec7bf0b50732b49f8228e07d24365338f9e3ab994b00af08e5a3bffe55fd8b, 12 bytes
+  war3map.w3h: sha256 e52b026427a794eef8f84e0bc22ebf778a223de58eed422bc0908f36281b64c6, 52 bytes
+  war3map.w3i: sha256 b2f12df41b56ad033bfd9388cb35161812380f2581f7503447c6f7bdbd1c62f4, 689 bytes
+  war3map.w3l: sha256 e605b3c27b181866c487bdd0af804c4c08c593a5af30ec676d806cf22f64ebe5, 22 bytes
+  war3map.w3q: sha256 39f17a94c4a5115210e09571139d77426b51e058b794b9053487bef2530cf5f4, 52 bytes
+  war3map.w3r: sha256 aae89fc0f03e2959ae4d701a80cc3915918c950b159f6abb6c92c1433b1a8534, 8 bytes
+  war3map.w3t: sha256 3a314fb023e4c60b0ac47fb27cf72937a6a5b4c6ad88f08c2e13772470b718f0, 68 bytes
+  war3map.w3u: sha256 d96bffb5d24ed647cfacffeaecfd9b94f4d0d0b41f4666b5141acc75b2db2fb8, 108 bytes
+  war3map.wct: sha256 f64ae3ad02604bc24d835dea5161f83e9fff2a9a9a75458fa16d79451292c0a5, 313 bytes
+  war3map.wpm: sha256 6d0b368c1b8a30b001f98a1b6b6ad1b35f1c65673815e4092574e51d7d404730, 65552 bytes
+  war3map.wtg: sha256 16f619c9a09d04a8bdd9d99ad716f96397f2c45fd71c417bed54f0d66f890dd8, 442 bytes
+  war3map.wts: sha256 fa44bd352212a9bcb4ba9da80a4c27fcdb275b132cde3354680390e761c1e6be, 900 bytes
+  war3mapImported\golems\frames.toc: sha256 e9f35bc5d035b6525a16f11f50921b5495f3440707695be7dfd0c9cf3a7f5ce1, 20 bytes
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+  war3mapMinimap.blp: sha256 2cd809d877523db6b3de75f91b20abf8a921885a44be3b686bac9c1dd4a88eed, 9222 bytes
+  war3mapMisc.txt: sha256 33bca4154df732c71d5f5f3281f86aeb2dce5914cf97ac4191f22def1a87783c, 56 bytes
+  war3mapSkin.txt: sha256 197bebdd1600fa7f3d4b110f40a78aede19bba0374904418d383599bd863cbb7, 59 bytes
+  war3mapSkin.w3a: sha256 167ba98ff5ffb0e168676cd2a9c7b8af7d00ed453aba458412cd267749f7b677, 115 bytes
+  war3mapSkin.w3b: sha256 c1da9904a1c31d43e929604a37b655d34e956269101ae2312d5f1523a26f82ac, 56 bytes
+  war3mapSkin.w3d: sha256 e89036856e6510d9a7aa67905ff89f6850ba1b9d3513a13b89481d615f756632, 32 bytes
+  war3mapSkin.w3h: sha256 c909f7b957839979d1cfba520e85f54317f164a63e6c7b7daede8b5477d046eb, 108 bytes
+  war3mapSkin.w3q: sha256 a5d0c4ba81f8012c8236c41d29ad4a80be06f77ca1a9fb2a4bf91695da04b9ea, 153 bytes
+  war3mapSkin.w3t: sha256 abdff036cc4a8496078954ea86f64eaf510ab160a7d5cc7e7c0d76b7ed834704, 99 bytes
+  war3mapSkin.w3u: sha256 0f1d0998835bdaef8e82efe1ed2bd1cf79e2d7f0e85c78ba6afdb1fff077ad86, 299 bytes
+  war3mapUnits.doo: sha256 8ea9de4b46137aee6c683d20b34418fbbb9513067a09541591639862eea84754, 933 bytes
+generated:
+  .moonwell/libraries/golems/.moonwell-library.json: present
+  .moonwell/libraries/golems/golems/loud.yue:
+    "import \"golems.names\"\n"
+    "\n"
+    "export first = -> names.first\\upper!\n"
+  .moonwell/libraries/golems/golems/names.lua: "return { first = \"Granite\" }\n"
+  .moonwell/library-assets/golems/Textures/Golem.blp: "texture from the library"
+  .moonwell/library-assets/golems/war3mapImported/golems/frames.toc: "toc from the library"
+  .moonwell/lua/golems/loud.lua: present
+  .moonwell/lua/golems/names.lua: "return { first = \"Granite\" }\n"
+  .moonwell/types/map.d.lua:
+    "---@meta\n"
+    "-- GENERATED by Moonwell from maps/map.w3x/war3map.lua; do not edit.\n"
+    "\n"
+    "---@type trigger\n"
+    "gg_trg_Initialization = nil\n"
+    "\n"
+    "---@type unit\n"
+    "gg_unit_Hblm_0003 = nil\n"
+    "\n"
+    "---@type unit\n"
+    "gg_unit_Hpal_0002 = nil\n"
+    "\n"
+    "function InitGlobals() end\n"
+    "\n"
+    "function CreateUnitsForPlayer0() end\n"
+    "\n"
+    "function CreateUnitsForPlayer1() end\n"
+    "\n"
+    "function CreatePlayerBuildings() end\n"
+    "\n"
+    "function CreatePlayerUnits() end\n"
+    "\n"
+    "function CreateAllUnits() end\n"
+    "\n"
+    "function Trig_Initialization_Actions() end\n"
+    "\n"
+    "function InitTrig_Initialization() end\n"
+    "\n"
+    "function InitCustomTriggers() end\n"
+    "\n"
+    "function RunInitializationTriggers() end\n"
+    "\n"
+    "function InitCustomPlayerSlots() end\n"
+    "\n"
+    "function InitCustomTeams() end\n"
+    "\n"
+    "function InitAllyPriorities() end\n"
+    "\n"
+    "function main() end\n"
+    "\n"
+    "function config() end\n"
+  .moonwell/types/moonwell.d.lua:
+    "---@meta moonwell\n"
+    "-- GENERATED by Moonwell; do not edit.\n"
+    "\n"
+    "---The Moonwell runtime. Hooks of one kind run in the order they were added. A failing hook prints its error\n"
+    "---with the .yue file and line, and the other hooks still run.\n"
+    "local moonwell = {}\n"
+    "\n"
+    "---Adds `fn` to run when the game calls config(), before World Editor's config() sets up players, forces and\n"
+    "---start locations.\n"
+    "---@param fn fun(): ...\n"
+    "function moonwell.before_config(fn) end\n"
+    "\n"
+    "---Adds `fn` to run when the game calls config(), after World Editor's config() has set up players and forces.\n"
+    "---@param fn fun(): ...\n"
+    "function moonwell.on_config(fn) end\n"
+    "\n"
+    "---Adds `fn` to run when the game calls main(), before World Editor's main() creates preplaced units and runs\n"
+    "---the initialization triggers.\n"
+    "---@param fn fun(): ...\n"
+    "function moonwell.before_main(fn) end\n"
+    "\n"
+    "---Adds `fn` to run when the game calls main(), after World Editor's main(): preplaced units exist and the\n"
+    "---initialization triggers have run.\n"
+    "---@param fn fun(): ...\n"
+    "function moonwell.on_main(fn) end\n"
+    "\n"
+    "---Rewrites war3map.lua line numbers in an error message to the source file and line (src/*.yue or\n"
+    "---lua/*.lua); for a minified YueScript module, to the file only.\n"
+    "---@param message string\n"
+    "---@return string\n"
+    "function moonwell.format_error(message) end\n"
+    "\n"
+    "---Loads a bundled module by its dotted name, such as \"heroes.captain\" or \"moonwell\". The Moonwell runtime\n"
+    "---defines it: the game's Lua has no package library, which .luarc.json turns off along with LuaLS's own require.\n"
+    "---@param name string\n"
+    "---@return any\n"
+    "function require(name) end\n"
+    "\n"
+    "return moonwell\n"
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua:
+    "---@meta generated.objects\n"
+    "---@diagnostic disable: missing-fields\n"
+    "-- GENERATED by Moonwell from objects/**.pkl; do not edit.\n"
+    "\n"
+    "---@class generated.objects.heroes\n"
+    "---@field paladin integer H001\n"
+    "\n"
+    "---@class generated.objects.units\n"
+    "---@field captain integer h001\n"
+    "\n"
+    "---@class generated.objects.buildings\n"
+    "---@field hall integer h002\n"
+    "\n"
+    "---@class generated.objects.items\n"
+    "---@field claws integer I001\n"
+    "\n"
+    "---@class generated.objects.abilities\n"
+    "---@field light integer A001\n"
+    "\n"
+    "---@class generated.objects.buffs\n"
+    "---@field blessed integer B001\n"
+    "\n"
+    "---@class generated.objects.upgrades\n"
+    "---@field masonry integer R001\n"
+    "\n"
+    "local objects = {}\n"
+    "\n"
+    "---@type generated.objects.heroes\n"
+    "objects.heroes = {}\n"
+    "\n"
+    "---@type generated.objects.units\n"
+    "objects.units = {}\n"
+    "\n"
+    "---@type generated.objects.buildings\n"
+    "objects.buildings = {}\n"
+    "\n"
+    "---@type generated.objects.items\n"
+    "objects.items = {}\n"
+    "\n"
+    "---@type generated.objects.abilities\n"
+    "objects.abilities = {}\n"
+    "\n"
+    "---@type generated.objects.buffs\n"
+    "objects.buffs = {}\n"
+    "\n"
+    "---@type generated.objects.upgrades\n"
+    "objects.upgrades = {}\n"
+    "\n"
+    "return objects\n"
+  .moonwell/yue/moonwell/macros.yue:
+    "-- Moonwell's compile-time macros, imported with `import \"moonwell.macros\" as {:$FourCC}`. Moonwell writes this file to\n"
+    "-- .moonwell/yue/moonwell/macros.yue, where the compiler and the editor's YueScript extension find it. It adds nothing\n"
+    "-- to the map.\n"
+    "\n"
+    "-- $FourCC \"hfoo\" is a rawcode as the integer the game uses, 1751543663: its four characters' bytes, big-endian.\n"
+    "export macro FourCC = (code = \"\", ...) ->\n"
+    "  quote = code\\sub 1, 1\n"
+    "  text = code\\sub 2, -2\n"
+    "  valid = select(\"#\", ...) == 0 and (quote == '\"' or quote == \"'\") and code\\sub(-1) == quote and #text == 4\n"
+    "  -- A double-quoted string interpolates #{...}, so its text is not its value.\n"
+    "  valid = false if quote == '\"' and text\\find '#{', 1, true\n"
+    "  if valid\n"
+    "    for i = 1, 4\n"
+    "      byte = text\\byte i\n"
+    "      -- Printable ASCII only: a backslash starts an escape sequence, and the quote ends the string.\n"
+    "      valid = false if byte < 32 or byte > 126 or byte == 92 or byte == quote\\byte!\n"
+    "  unless valid\n"
+    "    error '$FourCC needs a string literal of exactly 4 characters, such as \"hfoo\".'\n"
+    "  value = 0\n"
+    "  for i = 1, 4\n"
+    "    value = value * 256 + text\\byte i\n"
+    "  tostring value\n"
+  src/generated/objects.yue:
+    "-- GENERATED by Moonwell from objects/**.pkl; do not edit.\n"
+    "export heroes = {\n"
+    "  paladin: 1211117617 -- H001\n"
+    "}\n"
+    "export units = {\n"
+    "  captain: 1747988529 -- h001\n"
+    "}\n"
+    "export buildings = {\n"
+    "  hall: 1747988530 -- h002\n"
+    "}\n"
+    "export items = {\n"
+    "  claws: 1227894833 -- I001\n"
+    "}\n"
+    "export abilities = {\n"
+    "  light: 1093677105 -- A001\n"
+    "}\n"
+    "export buffs = {\n"
+    "  blessed: 1110454321 -- B001\n"
+    "}\n"
+    "export upgrades = {\n"
+    "  masonry: 1378889777 -- R001\n"
+    "}\n"

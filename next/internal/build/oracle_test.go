@@ -2,8 +2,6 @@ package build
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/hex"
 	"maps"
 	"os"
 	"path/filepath"
@@ -40,7 +38,8 @@ import (
 // of that, each tree builds a copy of the template once, and nothing of those two builds is compared: a tree
 // that has to download the compiler logs that it does, and does so in that build.
 //
-// The seeds are the rows of the table in the spec's §10.3 and three more (oracleSeeds), each on the template:
+// The seeds are the rows of the table in the spec's §10.3 and three more (seeds, in seeds_test.go), each on the
+// template:
 //
 //   - the template as init leaves it;
 //   - every setting set, but the preview, on the map info and the script of the fixture map-settings-v39, with a
@@ -104,7 +103,17 @@ import (
 // log what this tree's check of a fresh copy did. The six runs are counted as Upgraded; their files and their
 // lines are not in the other counts, which are of the runs of both trees on a fresh copy.
 //
-// The refusals are 33 projects (oracleFaults), each built once: 32 with one fault and one with two. Eleven are
+// The recordings. The recorded test (recorded_test.go) builds the same projects with this tree alone, and holds
+// each run to a recording under testdata/recorded. This test is what writes the recordings, with
+// MOONWELL_RECORD=1 and -run of this test alone: a recording is what the other tree left, as outcome.recording
+// writes it, and for a run in one of the classes below what this tree left, since a class is where the two
+// differ (toRecord). Without the variable each run is held to its recording as well as compared, so that no
+// recording parts from the other tree while that tree is there. A recording holds less than is compared here: of
+// a refusal the file it names and whether a stage or an archive was left, and of no run the cache of the compile
+// or the files that no command changes. With the variable this test also writes testdata/leftovers, what the
+// other tree's minified build left of two of the seeds, which the recorded test builds over (recordLeftovers).
+//
+// The refusals are 33 projects (faults), each built once: 32 with one fault and one with two. Eleven are
 // the faults a build meets step by step, and those of the classes below: an object with a base the game has not;
 // a setting for a player the map has not; an unknown global; a required module that is not there; an asset at
 // the path of a file the map holds; an asset at a path that a map keeps for a file of its format, war3map.w3e; a
@@ -230,28 +239,33 @@ func TestOracleOnWhatTheBuildsOfBothTreesLeave(t *testing.T) {
 	o := newBuildOracle(t)
 	o.warm(t)
 	ran := 0
-	for _, seed := range oracleSeeds {
+	for _, seed := range seeds {
 		t.Run(seed.name, func(t *testing.T) {
 			ran++
 			o.lay(t, seed)
-			plain, built := o.compare(t, seed.name, plainBuild)
-			minified, _ := o.compare(t, seed.name, minifiedBuild)
-			_, checked := o.compare(t, seed.name, plainCheck)
-			coversItsRow(t, seed, plain, minified)
+			plain, built := o.recorded(t, seed.name, plainBuild, 0)
+			minified, _ := o.recorded(t, seed.name, minifiedBuild, 1)
+			_, checked := o.recorded(t, seed.name, plainCheck, 2)
+			coversItsRow(t, seed.name, plain, minified)
 			if slices.Contains(upgradedSeeds, seed.name) {
 				o.upgrade(t, seed.name, built, checked)
 			}
 		})
 	}
-	for _, fault := range oracleFaults {
+	var refused []byte
+	for _, fault := range faults {
 		t.Run(fault.name, func(t *testing.T) {
 			ran++
 			o.lay(t, fault)
-			o.compare(t, fault.name, plainBuild)
+			_, _, held := o.compare(t, fault.name, plainBuild)
+			root := filepath.Join(o.runs, fault.name)
+			refused = append(refused, titled(fault.name, held.recording(t, root, false))...)
 		})
 	}
-	// A run of some of the projects, which -run asks for, has no tally to keep.
-	if ran == len(oracleSeeds)+len(oracleFaults) {
+	// A run of some of the projects, which -run asks for, has no recording of the refusals to hold, and no tally
+	// to keep.
+	if ran == len(seeds)+len(faults) {
+		testkit.Recorded(t, "refused.txt", refused)
 		o.tally.check(t, buildTally{
 			Builds: 22, Checks: 10, Refusals: 34,
 			Staged: 541, Packed: 504, Generated: 368, Libraries: 48, Kept: 2291, Lines: 103,
@@ -295,12 +309,12 @@ func (c buildTally) check(t *testing.T, want buildTally) {
 
 // ---- the projects ----
 
-// oracleProject is a project of the oracle: its name, what is written into a new project to make it, and, for
-// a seed, the two things that show the seed covers its row of the spec's table: the lines that a build of it
+// The projects are those of the recorded builds, seeds and faults (seeds_test.go): the recorded test builds the
+// same ones with this tree alone.
+
+// coveredBy is the two things that show a seed covers its row of the spec's table: the lines that a build of it
 // logs, and the number of bytes that stand before the archive of a build of it.
-type oracleProject struct {
-	name   string
-	lay    func(t *testing.T, root string)
+type coveredBy struct {
 	says   []string
 	before int
 }
@@ -312,502 +326,58 @@ const (
 	theHeader = 512
 )
 
-// oracleSeeds are the projects that both trees build, build minified and check.
-var oracleSeeds = []oracleProject{
-	{"template", func(*testing.T, string) {}, []string{
+// seedCovers is what each seed must show, by the seed's name.
+var seedCovers = map[string]coveredBy{
+	"template": {[]string{
 		"Added 1 custom object(s) to 2 file(s).", "Built dist/bin/map.w3x (2 module(s)).",
 	}, noHeader},
-	{"settings", laySettings, []string{"Applied map settings to 4 internal file(s)."}, noHeader},
-	{"objects", layObjects, []string{"Added 7 custom object(s) to 10 file(s)."}, noHeader},
-	{"assets", layAssets, []string{
+	"settings": {[]string{"Applied map settings to 4 internal file(s)."}, noHeader},
+	"objects":  {[]string{"Added 7 custom object(s) to 10 file(s)."}, noHeader},
+	"assets": {[]string{
 		"assets/textures/golem.blp replaces library golems's Textures/Golem.blp", "Imported 5 asset(s).",
 		"Built dist/bin/map.w3x (3 module(s)).",
 	}, noHeader},
-	{"preview-tga", layPreview("preview.tga", packedTGA),
-		[]string{"Applied map settings to 5 internal file(s)."}, noHeader},
-	{"preview-blp", layPreview("art/preview.blp", testkit.BLP(256, 1)),
-		[]string{"Applied map settings to 4 internal file(s)."}, noHeader},
-	{"preview-png", layPreview("preview.png", testkit.PNG(testkit.NewPixels(256), "rgba")),
-		[]string{"Applied map settings to 5 internal file(s)."}, noHeader},
-	{"modules", layModules, []string{"Built dist/bin/map.w3x (9 module(s))."}, noHeader},
+	"preview-tga": {[]string{"Applied map settings to 5 internal file(s)."}, noHeader},
+	"preview-blp": {[]string{"Applied map settings to 4 internal file(s)."}, noHeader},
+	"preview-png": {[]string{"Applied map settings to 5 internal file(s)."}, noHeader},
+	"modules":     {[]string{"Built dist/bin/map.w3x (9 module(s))."}, noHeader},
 	// An ids module that is not the objects': a build writes it anew, and a check refuses it.
-	{"stale-ids", func(t *testing.T, root string) { put(t, root, "src/generated/objects.yue", "-- stale\n") },
-		[]string{"Built dist/bin/map.w3x (2 module(s))."}, noHeader},
+	"stale-ids": {[]string{"Built dist/bin/map.w3x (2 module(s))."}, noHeader},
 	// A map info of format 28, which is packed behind a header.
-	{"older-format", func(t *testing.T, root string) {
-		testkit.WriteFile(t, root, "maps/map.w3x/war3map.w3i", testkit.SyntheticMapInfo(28))
-	}, []string{"Built dist/bin/map.w3x (2 module(s))."}, theHeader},
-	{"everything", layEverything, []string{
+	"older-format": {[]string{"Built dist/bin/map.w3x (2 module(s))."}, theHeader},
+	"everything": {[]string{
 		"Added 7 custom object(s) to 10 file(s).", "Applied map settings to 7 internal file(s).",
 		"assets/textures/golem.blp replaces library golems's Textures/Golem.blp", "Imported 4 asset(s).",
 		"Built dist/bin/map.w3x (6 module(s)).",
 	}, noHeader},
 }
 
-// oracleFaults are the projects that both trees refuse to build, each with one fault but for the one that has
-// two. The first eleven are the faults a build meets step by step, and those of the header's classes; the next
-// eighteen are the other refusals a user can get, one of each kind; the last four are the two faults at once,
-// two map files that are too short to read, and a state that is none.
-var oracleFaults = []oracleProject{
-	{name: "invalid-object", lay: func(t *testing.T, root string) {
-		put(t, root, "objects/units.pkl",
-			"amends \"@moonwell/ObjectFile.pkl\"\n\nunits { [\"captain\"] { id = \"h000\"; base = \"zzzz\" } }\n")
-	}},
-	{name: "refused-setting", lay: func(t *testing.T, root string) {
-		amendLocal(t, root, `settings { players { ["5"] { name = "Absent" } } }`)
-	}},
-	{name: "unknown-global", lay: func(t *testing.T, root string) {
-		appendTo(t, root, "src/main.yue", "\nCreatUnit Player(0), objects.units.captain, 0, 0, 0\n")
-	}},
-	{name: "missing-module", lay: func(t *testing.T, root string) {
-		appendTo(t, root, "src/main.yue", "\nimport \"missing.module\"\n")
-	}},
-	{name: "asset-at-a-file-of-the-map", lay: func(t *testing.T, root string) {
-		put(t, root, "maps/map.w3x/Textures/Mine.blp", "a file World Editor imported")
-		put(t, root, "assets/Textures/Mine.blp", "an asset at the same path")
-	}},
-	{name: "asset-at-a-file-of-the-format", lay: func(t *testing.T, root string) {
-		put(t, root, "assets/war3map.w3e", "no terrain")
-	}},
-	{name: "output-is-a-folder", lay: func(t *testing.T, root string) {
-		put(t, root, "dist/bin/map.w3x/kept.txt", "a folder where the archive goes")
-	}},
-	{name: "no-source-map", lay: func(t *testing.T, root string) {
-		removeFrom(t, root, "maps/map.w3x")
-	}},
-	{name: "no-source-map-and-no-objects", lay: func(t *testing.T, root string) {
-		removeFrom(t, root, "maps/map.w3x")
-		removeFrom(t, root, "objects")
-		removeFrom(t, root, "src/generated")
-		put(t, root, "src/main.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"There is no map.\"\n")
-	}},
-	{name: "no-map-info", lay: func(t *testing.T, root string) {
-		removeFrom(t, root, "maps/map.w3x/war3map.w3i")
-	}},
-	{name: "lock-left-behind", lay: func(t *testing.T, root string) {
-		put(t, root, "dist/.lock", "4242")
-	}},
-
-	{name: "mapped-asset-missing", lay: func(t *testing.T, root string) {
-		amendLocal(t, root, `assets { paths { ["missing.blp"] = "x.blp" } }`)
-	}},
-	{name: "mapped-asset-excluded", lay: func(t *testing.T, root string) {
-		put(t, root, "assets/a.blp", "an asset")
-		amendLocal(t, root, `assets { paths { ["a.blp"] = "x.blp" } exclude = List("a.blp") }`)
-	}},
-	{name: "two-libraries-one-path", lay: func(t *testing.T, root string) {
-		for _, key := range []string{"one", "two"} {
-			put(t, root, "libs/"+key+"/moonwell-library.json", `{"dir":"src","assets":"assets"}`)
-			put(t, root, "libs/"+key+"/src/"+key+"/m.lua", "return 1\n")
-			put(t, root, "libs/"+key+"/assets/Textures/Same.blp", key)
-		}
-		amendLocal(t, root, `libraries { ["one"] { path = "libs/one" } ["two"] { path = "libs/two" } }`)
-	}},
-	{name: "typed-against-raw-constant", lay: func(t *testing.T, root string) {
-		amendLocal(t, root,
-			`settings { gameplay { foodLimit = 200 } gameplayConstants { ["Misc"] { ["FoodCeiling"] = "1" } } }`)
-	}},
-	{name: "syntax-error", lay: func(t *testing.T, root string) {
-		put(t, root, "src/main.yue", "import \"moonwell\" as mw\nx = \n  if then\n")
-	}},
-	{name: "entry-not-there", lay: func(t *testing.T, root string) {
-		amendLocal(t, root, `map { entry = "src/nope.yue" }`)
-	}},
-	{name: "module-twice", lay: func(t *testing.T, root string) {
-		put(t, root, "lua/main.lua", "return {}\n")
-	}},
-	{name: "missing-library", lay: func(t *testing.T, root string) {
-		amendLocal(t, root, `libraries { ["kit"] { path = "libs/kit" } }`)
-	}},
-	{name: "library-keys-in-two-cases", lay: func(t *testing.T, root string) {
-		put(t, root, "libs/one/one/m.lua", "return 1\n")
-		amendLocal(t, root, `libraries { ["Kit"] { path = "libs/one" } ["kit"] { path = "libs/one" } }`)
-	}},
-	{name: "yue-path-to-nothing", lay: func(t *testing.T, root string) {
-		amendLocal(t, root, `yue { path = "tools/no-such-yue" }`)
-	}},
-	{name: "object-id-taken", lay: func(t *testing.T, root string) {
-		for _, file := range []string{"war3map.w3u", "war3mapSkin.w3u"} {
-			testkit.WriteFile(t, root, "maps/map.w3x/"+file, testkit.Fixture(t, "objects-v3-names/"+file))
-		}
-	}},
-	{name: "no-script", lay: func(t *testing.T, root string) {
-		removeFrom(t, root, "maps/map.w3x/war3map.lua")
-	}},
-	{name: "script-without-main", lay: func(t *testing.T, root string) {
-		const script = "maps/map.w3x/war3map.lua"
-		text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(script)))
-		if err != nil || !bytes.Contains(text, []byte("function main()")) {
-			t.Fatalf("the map's script has no main to take away: %v", err)
-		}
-		put(t, root, script, strings.ReplaceAll(string(text), "function main()", "function start()"))
-	}},
-	{name: "settings-without-map-info", lay: func(t *testing.T, root string) {
-		removeFrom(t, root, "maps/map.w3x/war3map.w3i")
-		amendLocal(t, root, `settings { info { name = "Needs the info" } }`)
-	}},
-	{name: "refused-picture", lay: func(t *testing.T, root string) {
-		testkit.WriteFile(t, root, "preview.tga", make([]byte, 40))
-		amendLocal(t, root, `settings { info { preview = "preview.tga" } }`)
-	}},
-	{name: "preview-under-assets", lay: func(t *testing.T, root string) {
-		testkit.WriteFile(t, root, "assets/preview.tga", packedTGA)
-		amendLocal(t, root, `settings { info { preview = "assets/preview.tga" } }`)
-	}},
-	{name: "manifest-pkl-refuses", lay: func(t *testing.T, root string) {
-		amendLocal(t, root, `build { folder = "maps" }`)
-	}},
-	{name: "not-a-project", lay: func(t *testing.T, root string) {
-		removeFrom(t, root, "moonwell.pkl")
-		removeFrom(t, root, "moonwell.local.pkl")
-	}},
-
-	// Two faults, of two steps: the one that is refused is the one whose step comes first.
-	{name: "refused-setting-and-mapped-asset-missing", lay: func(t *testing.T, root string) {
-		amendLocal(t, root, `settings { players { ["5"] { name = "Absent" } } }
-assets { paths { ["missing.blp"] = "x.blp" } }`)
-	}},
-	{name: "map-info-too-short", lay: func(t *testing.T, root string) {
-		put(t, root, "maps/map.w3x/war3map.w3i", "ab")
-	}},
-	{name: "index-too-short", lay: func(t *testing.T, root string) {
-		put(t, root, "maps/map.w3x/war3map.imp", "ab")
-		put(t, root, "assets/a.blp", "an asset")
-	}},
-	{name: "state-that-is-no-state", lay: func(t *testing.T, root string) {
-		put(t, root, ".asset-state/map.w3x.json", "not json")
-	}},
-}
-
-// everySetting is a settings block that sets every setting but the preview picture.
-const everySetting = `settings {
-  info {
-    name = "Oracle settings"
-    author = "The oracle"
-    description = "Every setting is set"
-    recommendedPlayers = "2-4"
-  }
-  loadingScreen {
-    background = -1
-    model = #"war3mapImported\Loading.mdx"#
-    text = "Loading text"
-    title = "Loading title"
-    subtitle = "Loading subtitle"
-  }
-  gameplay { heroMaxLevel = 25; foodLimit = 200 }
-  gameplayConstants { ["Misc"] { ["DefenseArmor"] = "0.05" } }
-  gameInterface { ["CustomSkin"] { ["Test"] = "value" } ["FrameDef"] { ["GOLD"] = "Coins" } }
-  players {
-    ["0"] { name = "Oracle"; controller = "computer"; race = "orc"; fixedStart = false; x = 256; y = -512.5 }
-  }
-  forces {
-    ["0"] {
-      name = "First force"
-      allied = false
-      alliedVictory = true
-      sharedVision = false
-      sharedControl = true
-      sharedAdvancedControl = true
-    }
-  }
-  environment {
-    soundEnvironment = "Mountains"
-    waterColor = List(10, 20, 30, 255)
-    fog { enabled = true; style = 1; start = 100; end = 1000.5; density = 0.25; color = List(1, 2, 3, 4) }
-  }
-}`
-
-// laySettings writes the map info and the script World Editor saved, a text file of the game's interface for the
-// settings to merge into, and every setting.
-func laySettings(t *testing.T, root string) {
-	settingsMap(t, root)
-	put(t, root, "maps/map.w3x/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
-	amendLocal(t, root, everySetting)
-}
-
-// settingsMap puts the map info and the script of the settings fixture into the project's map.
-func settingsMap(t *testing.T, root string) {
-	t.Helper()
-	for _, name := range []string{"war3map.w3i", "war3map.lua"} {
-		testkit.WriteFile(t, root, "maps/map.w3x/"+name, testkit.Fixture(t, "map-settings-v39/"+name))
-	}
-}
-
-// everyCategory is an object file with an object of every category, none with an id the objects fixture has.
-const everyCategory = `amends "@moonwell/ObjectFile.pkl"
-
-heroes {
-  ["paladin"] { id = "H001"; base = "Hpal"; name = "Oracle Paladin"; properties { ["uhpm"] = 900 } }
-}
-units {
-  ["captain"] {
-    id = "h001"
-    base = "hfoo"
-    name = "Oracle Captain"
-    modelFile = #"units\human\TheCaptain\TheCaptain"#
-    iconGameInterface = #"ReplaceableTextures\CommandButtons\BTNTheCaptain.blp"#
-  }
-}
-buildings {
-  ["hall"] { id = "h002"; base = "hbla"; name = "Oracle Hall" }
-}
-items {
-  ["claws"] { id = "I001"; base = "ratf"; name = "Oracle Claws"; goldCost = 0 }
-}
-abilities {
-  ["light"] {
-    id = "A001"
-    base = "AHhb"
-    name = "Oracle Light"
-    levels = 2
-    cooldown = List(5, 4.5)
-    manaCost = List(75, 80)
-  }
-}
-buffs {
-  ["blessed"] { id = "B001"; base = "BHbd"; tooltip = "Blessed by the oracle" }
-}
-upgrades {
-  ["masonry"] { id = "R001"; base = "Rhme"; name = List("First masonry", "Second masonry") }
-}
-`
-
-// everyCategoryIDs is the ids module of everyCategory: a check wants the module current, and writes none.
-const everyCategoryIDs = `-- GENERATED by Moonwell from objects/**.pkl; do not edit.
-export heroes = {
-  paladin: 1211117617 -- H001
-}
-export units = {
-  captain: 1747988529 -- h001
-}
-export buildings = {
-  hall: 1747988530 -- h002
-}
-export items = {
-  claws: 1227894833 -- I001
-}
-export abilities = {
-  light: 1093677105 -- A001
-}
-export buffs = {
-  blessed: 1110454321 -- B001
-}
-export upgrades = {
-  masonry: 1378889777 -- R001
-}
-`
-
-// layObjects writes the object files World Editor saved with one object on each of its tabs, and their strings,
-// and an object of every category of the manifest with its ids module.
-func layObjects(t *testing.T, root string) {
-	for _, kind := range []string{"w3a", "w3b", "w3d", "w3h", "w3q", "w3t", "w3u"} {
-		for _, file := range []string{"war3map." + kind, "war3mapSkin." + kind} {
-			testkit.WriteFile(t, root, "maps/map.w3x/"+file, testkit.Fixture(t, "objects-v3-names/"+file))
-		}
-	}
-	testkit.WriteFile(t, root, "maps/map.w3x/war3map.wts", testkit.Fixture(t, "objects-v3-names/war3map.wts"))
-	put(t, root, "objects/units.pkl", everyCategory)
-	put(t, root, "src/generated/objects.yue", everyCategoryIDs)
-}
-
-// layAssets writes a map as World Editor 3 saved it after assets:sync had imported two files, and the project's
-// assets as they are now.
-//
-// The map holds the index World Editor wrote, with its flag 29, the picture the index names and a file it does
-// not name; the ownership state says that both are Moonwell's. Of the assets, one is that picture with other
-// bytes, one keeps its path, one has a path from the manifest, one is left out by the manifest, and one has the
-// path of a file that the library ships. The other owned file has no asset. The library is a local one in the
-// project's folder, with a module the entry requires and two files for the map.
-func layAssets(t *testing.T, root string) {
-	const inMap = "maps/map.w3x/"
-	const synced, gone = "the picture as it was synced", "a file whose asset is gone"
-	testkit.WriteFile(t, root, inMap+"war3map.imp", testkit.Fixture(t, "imports-we3/war3map-flag29.imp"))
-	put(t, root, inMap+"wa3mapPreview.tga", synced)
-	put(t, root, inMap+"war3mapImported/gone.txt", gone)
-	put(t, root, ".asset-state/map.w3x.json", "{\n  \"version\": 1,\n  \"files\": {\n"+
-		"    \"wa3mapPreview.tga\": \""+hashOf(synced)+"\",\n"+
-		"    \"war3mapImported/gone.txt\": \""+hashOf(gone)+"\"\n  }\n}\n")
-
-	put(t, root, "assets/wa3mapPreview.tga", "the picture as it is now")
-	put(t, root, "assets/Models/unit.mdx", "\x00\x01\x02\xfa\xff")
-	put(t, root, "assets/icons/BTNSword.blp", "an icon")
-	put(t, root, "assets/notes/readme.txt", "left out")
-	put(t, root, "assets/textures/golem.blp", "texture from the map")
-
-	put(t, root, "libs/golems/moonwell-library.json", `{"dir":"src","assets":"assets"}`)
-	put(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
-	put(t, root, "libs/golems/assets/war3mapImported/golems/frames.toc", "toc from the library")
-	put(t, root, "libs/golems/assets/Textures/Golem.blp", "texture from the library")
-	amendLocal(t, root, `assets {
-  paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# }
-  exclude = List("notes/")
-}
-libraries { ["golems"] { path = "libs/golems" } }`)
-	appendTo(t, root, "src/main.yue", "\nimport \"golems.names\"\nprint names.first\n")
-}
-
-// packedTGA is a preview picture of 512 pixels a side, as a TGA with its rows from the top and its runs packed:
-// a build writes it again, plain and from the bottom.
-var packedTGA = testkit.TGA(testkit.NewPixels(512), testkit.TGAOptions{RLE: true, FromTop: true})
-
-// layPreview is a seed with a preview picture: a file of the project that the settings name, on the map World
-// Editor saved for the settings fixture.
-func layPreview(name string, picture []byte) func(t *testing.T, root string) {
-	return func(t *testing.T, root string) {
-		settingsMap(t, root)
-		testkit.WriteFile(t, root, name, picture)
-		amendLocal(t, root, `settings { info { name = "With a preview"; preview = "`+name+`" } }`)
-	}
-}
-
-// layModules writes Lua modules of the project, one in a folder of its name, one that defines globals and one
-// that nothing requires, two more sources, and a local library in the project's folder with modules of both
-// languages, one of which has stale Lua beside it. The entry requires all of them but the one, and uses a
-// global the manifest allows and one that nothing defines, which the manifest makes a warning. The lock holds,
-// out of order and on one line, an entry of the library, which a local library keeps, and one of a library the
-// manifest has not.
-func layModules(t *testing.T, root string) {
-	put(t, root, "lua/tools/init.lua", greeterWith("greet"))
-	put(t, root, "lua/counter.lua", "Count = 0\nfunction CountUp()\n Count = Count + 1\nend\n")
-	put(t, root, "lua/unused.lua", "Unused = true\n")
-	put(t, root, "src/state.yue", "global Round = 1\n")
-	put(t, root, "src/game/rules.yue", "export limit = 12\n")
-	const library = "libs/example/src/example/"
-	put(t, root, library+"greet.lua", greeterWith("hello"))
-	put(t, root, library+"loud.yue", "import \"example.greet\"\n\nexport shout = (name) -> greet.hello(name)\\upper!\n")
-	put(t, root, library+"loud.lua", "return { shout = function() return \"stale\" end }\n")
-	put(t, root, library+"globals.lua", "function ExampleAdd(a, b)\n return a + b\nend\n")
-	amendLocal(t, root, `libraries { ["ex"] { path = "libs/example"; dir = "src" } }
-lint { unknownGlobals = "warning"; globals = List("MyLibrary") }`)
-	appendTo(t, root, "src/main.yue", "\nimport \"tools\"\nimport \"state\"\nimport \"game.rules\" as rules\n"+
-		"require \"counter\"\nimport \"example.loud\"\nrequire \"example.globals\"\nCountUp!\n"+
-		"print tools.greet(\"Moonwell\"), Round, rules.limit, Count\nprint loud.shout \"Moonwell\"\n"+
-		"print ExampleAdd 1, 2\nprint MyLibrary, Unheard\n"+usesTheMapsScript)
-	put(t, root, "moonwell.lock", `{"libraries": {`+lockEntry("gone", "b")+`, `+lockEntry("ex", "a")+"}}\n")
-}
-
-// usesTheMapsScript is gameplay that names a global and calls a function of the script World Editor saved for
-// the template's map and for the settings fixture: both are known to a build by what the script defines alone.
-const usesTheMapsScript = "print gg_trg_Initialization\nInitCustomTriggers!\n"
-
-// layEverything writes one project with all that the other seeds have a project each for, so that each step of
-// a build plans on what the steps before it changed: the object files World Editor saved and an object of every
-// category; every setting and a preview picture, on the map info and the script of the settings fixture, with a
-// text file to merge into; assets, one at a path from the manifest; a local library that ships a module of each
-// language and files for the map, one of which an asset of the map replaces; and Lua modules of the project.
-// The entry requires the modules and names what the map's script defines.
-func layEverything(t *testing.T, root string) {
-	layObjects(t, root)
-	settingsMap(t, root)
-	put(t, root, "maps/map.w3x/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
-	testkit.WriteFile(t, root, "preview.png", testkit.PNG(testkit.NewPixels(256), "rgba"))
-	const lastOfInfo = `recommendedPlayers = "2-4"`
-	if !strings.Contains(everySetting, lastOfInfo) {
-		t.Fatalf("the settings have no line %s to put the preview after", lastOfInfo)
-	}
-	withPreview := strings.Replace(everySetting, lastOfInfo, lastOfInfo+"\n    preview = \"preview.png\"", 1)
-
-	put(t, root, "assets/Models/unit.mdx", "\x00\x01\x02\xfa\xff")
-	put(t, root, "assets/icons/BTNSword.blp", "an icon")
-	put(t, root, "assets/textures/golem.blp", "texture from the map")
-	put(t, root, "libs/golems/moonwell-library.json", `{"dir":"src","assets":"assets"}`)
-	put(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
-	put(t, root, "libs/golems/src/golems/loud.yue", "import \"golems.names\"\n\nexport first = -> names.first\\upper!\n")
-	put(t, root, "libs/golems/assets/war3mapImported/golems/frames.toc", "toc from the library")
-	put(t, root, "libs/golems/assets/Textures/Golem.blp", "texture from the library")
-	put(t, root, "lua/tools/init.lua", greeterWith("greet"))
-	put(t, root, "lua/counter.lua", "Count = 0\nfunction CountUp()\n Count = Count + 1\nend\n")
-	amendLocal(t, root, withPreview+`
-assets { paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# } }
-libraries { ["golems"] { path = "libs/golems" } }`)
-	appendTo(t, root, "src/main.yue", "\nimport \"tools\"\nrequire \"counter\"\nimport \"golems.loud\"\nCountUp!\n"+
-		"print tools.greet(loud.first!), Count, objects.heroes.paladin\n"+usesTheMapsScript)
-}
-
-// greeterWith is a Lua module that returns a table with one function of this name, which greets.
-func greeterWith(function string) string {
-	return "local M = {}\nfunction M." + function + "(name)\n return \"Hello, \" .. name\nend\nreturn M\n"
-}
-
-// lockEntry is the entry of a library in a lock, on one line: the library is owner/<key>, and its commit is one
-// letter forty times.
-func lockEntry(key, letter string) string {
-	return `"` + key + `": {"github": "owner/` + key + `", "tag": "v1.0.0", "dir": "src", "commit": "` +
-		strings.Repeat(letter, 40) + `", "files": "` + hashOf(key) + `"}`
-}
-
-// hashOf is the SHA-256 of a text in hexadecimal, as an ownership state and a lock write one.
-func hashOf(text string) string {
-	sum := sha256.Sum256([]byte(text))
-	return hex.EncodeToString(sum[:])
-}
-
-// put writes a file of a project as text, with its folders.
-func put(t *testing.T, root, name, text string) {
-	t.Helper()
-	testkit.WriteFile(t, root, name, []byte(text))
-}
-
-// amendLocal makes the project's local manifest one that amends the shared one by body.
-func amendLocal(t *testing.T, root, body string) {
-	t.Helper()
-	put(t, root, "moonwell.local.pkl", "amends \"moonwell.pkl\"\n\n"+body+"\n")
-}
-
-// appendTo adds text to the end of a file of a project, which must be there.
-func appendTo(t *testing.T, root, name, more string) {
-	t.Helper()
-	file := filepath.Join(root, filepath.FromSlash(name))
-	text, err := os.ReadFile(file)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(file, append(text, more...), 0o666); err != nil {
-		t.Fatal(err)
-	}
-}
-
-// removeFrom removes a file or a folder of a project, which must be there.
-func removeFrom(t *testing.T, root, name string) {
-	t.Helper()
-	at := filepath.Join(root, filepath.FromSlash(name))
-	if !fsx.Exists(at) {
-		t.Fatalf("the project has no %s to remove", name)
-	}
-	if err := os.RemoveAll(at); err != nil {
-		t.Fatal(err)
-	}
-}
-
 // coversItsRow fails the test for a seed that does not show what its row of the table is for: the plain build
 // of the other tree must log the lines the seed names, its minified build must stage another script, and as
 // many bytes must stand before its archive as the seed says.
-func coversItsRow(t *testing.T, seed oracleProject, plain, minified leftBy) {
+func coversItsRow(t *testing.T, seed string, plain, minified leftBy) {
 	t.Helper()
-	for _, line := range seed.says {
+	covers, named := seedCovers[seed]
+	if !named {
+		t.Errorf("%s: the oracle does not say what the seed must show", seed)
+	}
+	for _, line := range covers.says {
 		if !slices.Contains(plain.lines, line) {
-			t.Errorf("%s: the other tree's build does not log %q: it logged %q", seed.name, line, plain.lines)
+			t.Errorf("%s: the other tree's build does not log %q: it logged %q", seed, line, plain.lines)
 		}
 	}
-	const script = oracleStage + "/war3map.lua"
+	const script = seedStage + "/war3map.lua"
 	if plain.files[script] == nil || bytes.Equal(plain.files[script], minified.files[script]) {
-		t.Errorf("%s: the other tree's minified build stages the script of its plain build, or none", seed.name)
+		t.Errorf("%s: the other tree's minified build stages the script of its plain build, or none", seed)
 	}
-	if packed := plain.files[oracleArchive]; packed == nil {
-		t.Errorf("%s: the other tree's build left no archive", seed.name)
-	} else if before := opened(t, packed).HeaderOffset; before != seed.before {
-		t.Errorf("%s: %d bytes stand before the other tree's archive, want %d", seed.name, before, seed.before)
+	if packed := plain.files[seedArchive]; packed == nil {
+		t.Errorf("%s: the other tree's build left no archive", seed)
+	} else if before := opened(t, packed).HeaderOffset; before != covers.before {
+		t.Errorf("%s: %d bytes stand before the other tree's archive, want %d", seed, before, covers.before)
 	}
 }
 
 // ---- the two trees ----
-
-// The map folder and the build folder of every project are the template's.
-const (
-	oracleMap     = "maps/map.w3x"
-	oracleStage   = "dist/stage/map.w3x"
-	oracleArchive = "dist/bin/map.w3x"
-)
 
 // buildOracle is one run of the oracle: where its projects lie, and what it has compared.
 type buildOracle struct {
@@ -830,7 +400,7 @@ func newBuildOracle(t *testing.T) *buildOracle {
 
 // lay makes the seed of a project: a project that the other tree's init creates, linked to this checkout, and
 // then what the project writes into it.
-func (o *buildOracle) lay(t *testing.T, project oracleProject) {
+func (o *buildOracle) lay(t *testing.T, project seedProject) {
 	t.Helper()
 	world := oldpipeline.NewEnv(o.seeds, oldtestkit.NewRecorder().Logger)
 	linked := oldcli.InitOptions{Link: true, Checkout: o.checkout}
@@ -858,7 +428,7 @@ func (o *buildOracle) fresh(t *testing.T, seed string) string {
 // is compared. Nothing of the two builds is compared.
 func (o *buildOracle) warm(t *testing.T) {
 	t.Helper()
-	o.lay(t, oracleProject{name: "warm", lay: func(*testing.T, string) {}})
+	o.lay(t, seedProject{name: "warm", lay: func(*testing.T, string) {}})
 	if left := o.oldTree(t, "warm", plainBuild); left.err != nil {
 		t.Fatalf("the other tree does not build the template: %v", left.err)
 	}
@@ -884,6 +454,8 @@ type oracleCommand struct {
 	new   func(world *env.Env) (answer, error)
 }
 
+// The commands, in the order of recordedCommands, which has for each the name of its recording and whether the
+// recording holds short texts whole.
 var (
 	plainBuild    = oracleCommand{"build", true, oldBuild(false), newBuild(false)}
 	minifiedBuild = oracleCommand{"build --minify", true, oldBuild(true), newBuild(true)}
@@ -964,13 +536,15 @@ func newTreeIn(t *testing.T, root string, command oracleCommand) leftBy {
 // compare runs a command of both trees on a seed, one after the other at one place, and compares what they
 // left: whole, but for the classes of the header. It returns what the other tree left, and what this tree left
 // as it was compared.
-func (o *buildOracle) compare(t *testing.T, seed string, command oracleCommand) (left, got leftBy) {
+func (o *buildOracle) compare(t *testing.T, seed string, command oracleCommand) (left, got leftBy, held outcome) {
 	t.Helper()
 	what := seed + ", " + command.name
 	left = o.oldTree(t, seed, command)
 	got = o.newTree(t, seed, command)
+	asItCame, whole := o.tally, got
 	want := o.butForTheClasses(t, what, seed, left)
 	o.refusedLater(t, what, seed, left, &got)
+	held = toRecord(t, seed, left, whole, o.tally != asItCame)
 	before := o.tally
 	failed := oracle.Refusals(t, what, want.err, got.err)
 	oracle.Values(t, what+": what the command gave back", want.answer, got.answer)
@@ -992,7 +566,48 @@ func (o *buildOracle) compare(t *testing.T, seed string, command oracleCommand) 
 		}
 		o.tally.Checks++
 	}
+	return left, got, held
+}
+
+// recorded is compare for a run of a seed, which has a recording of its own: the run is held to it, or, with
+// MOONWELL_RECORD=1, written as it. nth is the command's place among recordedCommands.
+func (o *buildOracle) recorded(t *testing.T, seed string, command oracleCommand, nth int) (left, got leftBy) {
+	t.Helper()
+	left, got, held := o.compare(t, seed, command)
+	as := recordedCommands[nth]
+	testkit.Recorded(t, seed+"/"+as.name+".txt", held.recording(t, filepath.Join(o.runs, seed), as.texts))
 	return left, got
+}
+
+// toRecord is the outcome of a run that the recorded test's recording holds (recorded_test.go): what the other
+// tree left, and, for a run in a class of the header, what this tree left, whole. So a recording is the other
+// tree's behaviour wherever the two trees are compared whole.
+func toRecord(t *testing.T, seed string, left, got leftBy, inAClass bool) outcome {
+	t.Helper()
+	if inAClass {
+		t.Logf("%s is in a class of the header: its recording holds what this tree left", seed)
+		return got.outcome(func(err error) (string, bool) {
+			failure, expected := diag.First(err)
+			return failure.File, expected
+		})
+	}
+	return left.outcome(func(err error) (string, bool) {
+		failure, expected := olddiag.First(err)
+		return failure.File, expected
+	})
+}
+
+// outcome is what a tree left as the recorded test holds an outcome; fileOf gives the file of a refusal, by the
+// tree's own kind of error, and whether the error is a refusal at all.
+func (l leftBy) outcome(fileOf func(err error) (file string, expected bool)) outcome {
+	made := outcome{lines: l.lines, files: l.files}
+	if l.err != nil {
+		made.refused, made.refusedAt = true, internalError
+		if file, expected := fileOf(l.err); expected {
+			made.refusedAt = file
+		}
+	}
+	return made
 }
 
 // listed is a list of lines that is never nil: no lines are no lines, whichever way a tree's logger keeps them.
@@ -1027,7 +642,7 @@ func sameProject(t *testing.T, what, wanted string, want, got map[string][]byte)
 		libraries: alike(t, what+": the libraries", wanted, theirs[libraries], mine[libraries]),
 		kept:      alike(t, what+": the rest of the project", wanted, theirs[kept], mine[kept]),
 		packed: sameArchive(t, what+": the archive", wanted,
-			theirs[packed][oracleArchive], mine[packed][oracleArchive]),
+			theirs[packed][seedArchive], mine[packed][seedArchive]),
 	}
 }
 
@@ -1049,9 +664,9 @@ func partOf(name string) part {
 	switch {
 	case name == "dist/stage", below("dist/stage/lua"):
 		return cache
-	case below(oracleStage):
+	case below(seedStage):
 		return staged
-	case name == oracleArchive:
+	case name == seedArchive:
 		return packed
 	case name == "src/generated/objects.yue", name == "moonwell.lock", name == ".moonwell",
 		below(".moonwell/types"), below(".moonwell/yue"), below(".moonwell/lua"):
@@ -1114,27 +729,6 @@ func sameArchive(t *testing.T, what, wanted string, want, got []byte) (files int
 	theirs, mine := unpacked(t, what+" of "+wanted, want), unpacked(t, what, got)
 	oracle.Bytes(t, what+": what stands before the archive", theirs.before, mine.before)
 	return alike(t, what, wanted, theirs.files, mine.files)
-}
-
-// anArchive is an archive as the trees are compared by: what stands before it, and the files it lists.
-type anArchive struct {
-	before []byte
-	files  map[string][]byte
-}
-
-// unpacked reads every file an archive lists. An archive that holds a file it does not list fails the test.
-func unpacked(t *testing.T, what string, data []byte) anArchive {
-	t.Helper()
-	archive := opened(t, data)
-	names := namesIn(t, archive)
-	if archive.Blocks != len(names)+1 {
-		t.Errorf("%s: the archive holds %d files and lists %d", what, archive.Blocks-1, len(names))
-	}
-	files := map[string][]byte{}
-	for _, name := range names {
-		files[name] = []byte(fileOf(t, archive, name))
-	}
-	return anArchive{before: data[:archive.HeaderOffset], files: files}
 }
 
 // ---- the upgrade ----
@@ -1201,7 +795,40 @@ func (o *buildOracle) leftToBuildOver(t *testing.T, what, seed string, first ora
 	if left.err != nil || !wroteAMap(left.files) || left.files[cachedHashes] == nil || left.files[cachedUses] == nil {
 		t.Errorf("%s: the other tree left no build to build over: %v", what, left.err)
 	}
-	return filepath.Join(o.runs, seed)
+	root = filepath.Join(o.runs, seed)
+	if first.name == minifiedBuild.name && slices.Contains(builtOverLeftovers, seed) {
+		recordLeftovers(t, seed, root, left.files)
+	}
+	return root
+}
+
+// recordLeftovers writes, with MOONWELL_RECORD=1 and not without, the folder of leftovers that the recorded
+// test lays over a fresh copy of a seed (overLeftovers): of what the other tree's minified build left in the
+// project folder at root, the cache of its compile, .moonwell, the lock and the ids module. Left out are the
+// stage and the archive, which a build writes whole, and the declarations of the game's natives, which are
+// nearly half a megabyte and which every build of either tree writes with the same bytes (the recordings hold
+// their digest). The project folder is written <root>, which the stamp of a library's copy names, and the
+// compiler's place <reason>, which the two files of the cache name as JSON writes it.
+func recordLeftovers(t *testing.T, seed, root string, left map[string][]byte) {
+	t.Helper()
+	if os.Getenv("MOONWELL_RECORD") != "1" {
+		return
+	}
+	folder := filepath.Join("testdata", "leftovers", seed)
+	if err := os.RemoveAll(folder); err != nil {
+		t.Fatal(err)
+	}
+	compiler := strings.ReplaceAll(tooltest.Yue(t), `\`, `\\`)
+	files := 0
+	for name, data := range left {
+		kept := strings.HasPrefix(name, "dist/stage/lua/") || strings.HasPrefix(name, ".moonwell/") ||
+			strings.HasPrefix(name, "src/generated/") || name == "moonwell.lock"
+		if kept && data != nil && name != ".moonwell/types/natives.d.lua" {
+			testkit.WriteFile(t, folder, name, testkit.Placed(data, root, compiler))
+			files++
+		}
+	}
+	t.Errorf("recorded %s, %d files. Run the test again without MOONWELL_RECORD.", folder, files)
 }
 
 // sameRun compares what two runs of this tree gave back and logged: got must be as want.
@@ -1243,7 +870,7 @@ func (o *buildOracle) generatedByTheRun(seed, name string) bool {
 // missed the map.
 func (o *buildOracle) mapOpenedFirst(t *testing.T, what, seed string, want *leftBy) {
 	t.Helper()
-	if o.laid(seed, oracleMap) || o.laid(seed, "objects") {
+	if o.laid(seed, seedMap) || o.laid(seed, "objects") {
 		return
 	}
 	before := len(want.files)
@@ -1278,9 +905,9 @@ func (o *buildOracle) stagedWhole(t *testing.T, what string, want *leftBy) {
 // namedByItsPlace is the files of a refusal that the other tree names by their place on disk, each by its path
 // from the project folder, with the name this tree gives the file.
 var namedByItsPlace = map[string]string{
-	oracleStage:                  oracleMap,                  // a map without its info, missed when it is packed
-	oracleStage + "/war3map.imp": oracleMap + "/war3map.imp", // an index of imports that is too short to read
-	"dist/.lock":                 "dist/.lock",               // the build lock, which is held
+	seedStage:                  seedMap,                  // a map without its info, missed when it is packed
+	seedStage + "/war3map.imp": seedMap + "/war3map.imp", // an index of imports that is too short to read
+	"dist/.lock":               "dist/.lock",             // the build lock, which is held
 }
 
 // namedFromTheProject is the class of a refusal whose file the other tree names by its place on disk: this
@@ -1311,9 +938,9 @@ var withoutAFile = []struct {
 	hint string
 }{
 	// An asset at the path of a file that the map holds and no state owns. The other tree has a hint.
-	{regexp.MustCompile(`^Asset (.+) conflicts with a file or import already in the map\.$`), oracleMap + "/$1", ""},
+	{regexp.MustCompile(`^Asset (.+) conflicts with a file or import already in the map\.$`), seedMap + "/$1", ""},
 	// A map info that is too short to read, which is found when the map is packed.
-	{regexp.MustCompile(`^war3map\.w3i is truncated\.$`), oracleMap + "/war3map.w3i",
+	{regexp.MustCompile(`^war3map\.w3i is truncated\.$`), seedMap + "/war3map.w3i",
 		"Save the map again in World Editor."},
 }
 

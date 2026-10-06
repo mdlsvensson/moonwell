@@ -1,0 +1,1 @@
+local c=require("moonwell")local a=require("generated.objects")return c.on_main(function()print("Moonwell is running.")local b=CreateUnit(Player(0),a.units.captain,45,-650,270)TimerStart(CreateTimer(),1.0,true,function()return SetUnitColor(b,GetPlayerColor(Player(GetRandomInt(0,bj_MAX_PLAYERS-1))))end)return CreateUnit(Player(0),1751543663,-45,-650,270)end)

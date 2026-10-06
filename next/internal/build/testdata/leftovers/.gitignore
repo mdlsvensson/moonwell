@@ -1,0 +1,2 @@
+# The leftovers hold the cache of a compile, dist/stage/lua, and the checkout ignores every dist folder.
+!dist/

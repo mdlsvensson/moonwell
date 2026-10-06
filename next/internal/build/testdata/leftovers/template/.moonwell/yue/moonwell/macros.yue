@@ -1,0 +1,22 @@
+-- Moonwell's compile-time macros, imported with `import "moonwell.macros" as {:$FourCC}`. Moonwell writes this file to
+-- .moonwell/yue/moonwell/macros.yue, where the compiler and the editor's YueScript extension find it. It adds nothing
+-- to the map.
+
+-- $FourCC "hfoo" is a rawcode as the integer the game uses, 1751543663: its four characters' bytes, big-endian.
+export macro FourCC = (code = "", ...) ->
+  quote = code\sub 1, 1
+  text = code\sub 2, -2
+  valid = select("#", ...) == 0 and (quote == '"' or quote == "'") and code\sub(-1) == quote and #text == 4
+  -- A double-quoted string interpolates #{...}, so its text is not its value.
+  valid = false if quote == '"' and text\find '#{', 1, true
+  if valid
+    for i = 1, 4
+      byte = text\byte i
+      -- Printable ASCII only: a backslash starts an escape sequence, and the quote ends the string.
+      valid = false if byte < 32 or byte > 126 or byte == 92 or byte == quote\byte!
+  unless valid
+    error '$FourCC needs a string literal of exactly 4 characters, such as "hfoo".'
+  value = 0
+  for i = 1, 4
+    value = value * 256 + text\byte i
+  tostring value

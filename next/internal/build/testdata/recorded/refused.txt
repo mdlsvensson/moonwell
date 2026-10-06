@@ -1,0 +1,99 @@
+== invalid-object
+refused: objects/units.pkl
+left: no stage, no archive
+== refused-setting
+refused: maps/map.w3x/war3map.w3i
+left: no stage, no archive
+== unknown-global
+refused: src/main.yue
+left: no stage, no archive
+== missing-module
+refused: src/main.yue
+left: no stage, no archive
+== asset-at-a-file-of-the-map
+refused: maps/map.w3x/Textures/Mine.blp
+left: no stage, no archive
+== asset-at-a-file-of-the-format
+refused: ""
+left: no stage, no archive
+== output-is-a-folder
+refused: moonwell.local.pkl
+left: no stage, no archive
+== no-source-map
+refused: moonwell.local.pkl
+left: no stage, no archive
+== no-source-map-and-no-objects
+refused: moonwell.local.pkl
+left: no stage, no archive
+== no-map-info
+refused: maps/map.w3x
+left: a stage of 18 file(s), no archive
+== lock-left-behind
+refused: dist/.lock
+left: no stage, no archive
+== mapped-asset-missing
+refused: moonwell.pkl
+left: no stage, no archive
+== mapped-asset-excluded
+refused: moonwell.pkl
+left: no stage, no archive
+== two-libraries-one-path
+refused: moonwell.pkl
+left: no stage, no archive
+== typed-against-raw-constant
+refused: moonwell.local.pkl
+left: no stage, no archive
+== syntax-error
+refused: src/main.yue
+left: no stage, no archive
+== entry-not-there
+refused: ""
+left: no stage, no archive
+== module-twice
+refused: lua/main.lua
+left: no stage, no archive
+== missing-library
+refused: moonwell.local.pkl
+left: no stage, no archive
+== library-keys-in-two-cases
+refused: moonwell.local.pkl
+left: no stage, no archive
+== yue-path-to-nothing
+refused: moonwell.local.pkl
+left: no stage, no archive
+== object-id-taken
+refused: objects/units.pkl
+left: no stage, no archive
+== no-script
+refused: maps/map.w3x/war3map.lua
+left: no stage, no archive
+== script-without-main
+refused: maps/map.w3x/war3map.lua
+left: no stage, no archive
+== settings-without-map-info
+refused: maps/map.w3x/war3map.w3i
+left: no stage, no archive
+== refused-picture
+refused: preview.tga
+left: no stage, no archive
+== preview-under-assets
+refused: moonwell.local.pkl
+left: no stage, no archive
+== manifest-pkl-refuses
+refused: moonwell.local.pkl
+left: no stage, no archive
+== not-a-project
+refused: <root>
+left: no stage, no archive
+== refused-setting-and-mapped-asset-missing
+refused: maps/map.w3x/war3map.w3i
+left: no stage, no archive
+== map-info-too-short
+refused: maps/map.w3x/war3map.w3i
+left: a stage of 19 file(s), no archive
+== index-too-short
+refused: maps/map.w3x/war3map.imp
+left: no stage, no archive
+== state-that-is-no-state
+refused: <root>/.asset-state/map.w3x.json
+left: no stage, no archive

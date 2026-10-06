@@ -1,0 +1,20 @@
+logged:
+  assets/textures/golem.blp replaces library golems's Textures/Golem.blp
+  Check passed: 6 module(s) reachable from main, 4 asset(s).
+staged in dist/stage/map.w3x:
+  nothing
+no archive
+generated:
+  .moonwell/libraries/golems/.moonwell-library.json: present
+  .moonwell/libraries/golems/golems/loud.yue: sha256 342b2eb142fd8baff710138ab5fae4f03718ef88a8dff81c58b6aeb91e13def2, 60 bytes
+  .moonwell/libraries/golems/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes
+  .moonwell/library-assets/golems/Textures/Golem.blp: sha256 883a080351ee4bf07016589f5d18b35f7d8d56a7b024c919b22c1488eb274150, 24 bytes
+  .moonwell/library-assets/golems/war3mapImported/golems/frames.toc: sha256 e9f35bc5d035b6525a16f11f50921b5495f3440707695be7dfd0c9cf3a7f5ce1, 20 bytes
+  .moonwell/lua/golems/loud.lua: present
+  .moonwell/lua/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 fe6c7bde12f93cf25ae9c685adbce10f7590a61d98862d4edab61bcdc5bfb203, 1023 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes
+  src/generated/objects.yue: sha256 b0283f4b36fa9a9c4124c123a3c260627efd1adb8ecde3395235444ee9b80284, 407 bytes
