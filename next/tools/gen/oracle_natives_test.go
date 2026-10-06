@@ -74,6 +74,13 @@ func keyOfAParameterLeftOut(function, key string) string {
 		"\". Its keys are name and type: write all of them.\n"
 }
 
+// entryIsNull is what this tree says as it refuses Lua extras for a list with null for an entry: the place of
+// the entry, counted from 1, and how the list is named.
+func entryIsNull(place, list string) string {
+	return "error: tools/natives/lua-extras.json: entry " + place + " of " + list +
+		" is null. Write the entry, or take the null out.\n"
+}
+
 // endsTooSoon is what a run of EndOfJSON carries: the one place of standard error that the two trees write
 // apart, each in the words of the reader it gives the Lua extras to.
 var endsTooSoon = map[string][]place{standardError: {{"unexpected end of JSON input", "unexpected EOF"}}}
@@ -300,6 +307,15 @@ func nativesRuns() []oracleRun {
 		{name: "a function of the extras with null for its name", class: "NoName", line: ofTheMiniatures,
 			lay:     luaExtras(functionsOfTheExtras(whole, `{"name": null, "params": [], "returns": "nothing"}`)),
 			refusal: keyLeftOut("function 2 of the list", "name")},
+
+		{name: "null among the globals of the extras", class: "NullEntry", line: ofTheMiniatures,
+			lay: luaExtras(`{"globals": ["print", null]}`), refusal: entryIsNull("2", "globals")},
+		{name: "null among the removed globals of the extras", class: "NullEntry", line: ofTheMiniatures,
+			lay: luaExtras(`{"removed": [null, "io"]}`), refusal: entryIsNull("1", "removed")},
+		{name: "null among the params of a function of the extras", class: "NullEntry", line: ofTheMiniatures,
+			lay: luaExtras(functionsOfTheExtras(whole,
+				`{"name": "Bare", "params": [{"name": "id", "type": "any"}, null], "returns": "nothing"}`)),
+			refusal: entryIsNull("2", "the params of the function Bare")},
 
 		{name: "extras that are cut short after a bracket", class: "EndOfJSON", line: ofTheMiniatures,
 			lay: luaExtras(`{"functions": [`), apart: endsTooSoon},

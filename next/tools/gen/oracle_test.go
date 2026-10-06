@@ -134,7 +134,7 @@ import (
 //     other tree made of the line. This tree must end with 1, print nothing, say the words that the run holds
 //     (refusal), which are a text and decide nothing, and leave the checkout as it was laid
 //     (TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments).
-//   - The three classes after this one are of Lua extras that this tree refuses and the other tree does not
+//   - The four classes after this one are of Lua extras that this tree refuses and the other tree does not
 //     (inTheExtras, refusedByThisTree). The predicate of each is on the extras that the checkout holds before a
 //     line of natives, read as a tree of JSON by this file's own reading, and on how the other tree ended. This
 //     tree must end, print and leave the checkout as in CountRefused, with the words that the run holds
@@ -149,6 +149,10 @@ import (
 //     and the parameter with the keys they have, and null where the extras have it.
 //   - NoName, 4 runs (aFunctionHasNoName, panicked): a function of the extras without a name, or with null for
 //     it. The other tree ends in a panic, with the exit code 2 and the stacks on standard error.
+//   - NullEntry, 3 runs (aListHoldsNull, carriedOut): extras with null for an entry of a list: among the
+//     globals, among the removed globals, or among the params of a function. This tree refuses them, with the
+//     list and the place of the entry. The other tree carries the line out: it passes over null among the
+//     globals, and writes null among the parameters.
 //   - CountOfPaths, 1 run (versionWithALineFeed, countsThePaths): a version with a line feed in it, for a list
 //     that names a path. The other tree counts the line breaks of what it writes, after the first, and this
 //     tree the paths. The predicate is on the command line. Not compared: the number in the printed line. The
@@ -220,10 +224,6 @@ import (
 //   - Lua extras with a comma before a closing bracket: each of Go's two ways of reading names another
 //     character as the one that is in the way, and the sentence is Go's
 //     (TestDecodeExtrasSaysTheSameOfATextThatEndsTooSoonWhereverItEnds holds which one this tree names).
-//   - Lua extras with null for an entry of a list: among the globals, among the removed globals, or among the
-//     parameters of a function. This tree refuses them, with the list and the place of the entry; the other
-//     tree passes over null among the globals, and writes null among the parameters
-//     (TestDecodeExtrasRefusesWhatTheFileMustNotHold).
 //   - Lua extras that are JSON of another shape: a text where a list belongs, a number among the globals, a name
 //     that is a number. This tree's sentence is Go's, and names a Go type of this tree, so a run would hold Go's
 //     words; the other tree passes over a value that is no list and an entry that is no text, writes a params or
@@ -300,12 +300,13 @@ func TestOracleOnWhatBothGeneratorsWriteSayAndHowTheyEnd(t *testing.T) {
 	}
 	fixtures.check(t, genTally{
 		counts: counts{
-			Runs: 172, Whole: 117, Passed: 73, Failed: 99, AsPrograms: 18, Files: 390, Committed: 21,
+			Runs: 175, Whole: 117, Passed: 76, Failed: 99, AsPrograms: 18, Files: 390, Committed: 21,
 		},
-		Modes: map[string]int{"": 29, "natives": 101, "game-paths": 42},
+		Modes: map[string]int{"": 29, "natives": 104, "game-paths": 42},
 		Classes: map[string]int{
 			"FromCheckout": 13, "AsGiven": 11, "CountRefused": 2, "UnknownKey": 4, "LacksAKey": 8, "NoName": 4,
-			"CountOfPaths": 1, "WiderSpace": 4, "DottedI": 1, "NoUTF8": 1, "ByBytes": 1, "EndOfJSON": 3, "KeyOrder": 2,
+			"NullEntry": 3, "CountOfPaths": 1, "WiderSpace": 4, "DottedI": 1, "NoUTF8": 1, "ByBytes": 1,
+			"EndOfJSON": 3, "KeyOrder": 2,
 		},
 	})
 }
@@ -786,6 +787,7 @@ var classes = []class{
 	{name: "UnknownKey", is: inTheExtras(hasAKeyThatIsNotRead, carriedOut), compare: comparison.refusedByThisTree},
 	{name: "LacksAKey", is: inTheExtras(aNamedFunctionLacksAKey, carriedOut), compare: comparison.refusedByThisTree},
 	{name: "NoName", is: inTheExtras(aFunctionHasNoName, panicked), compare: comparison.refusedByThisTree},
+	{name: "NullEntry", is: inTheExtras(aListHoldsNull, carriedOut), compare: comparison.refusedByThisTree},
 	{name: "CountOfPaths", is: versionWithALineFeed, compare: comparison.countsThePaths},
 	{name: "WiderSpace", is: either(inTheList(hasWiderSpaceAtAnEdge), inTheLabels(isWiderSpace)),
 		compare: comparison.acceptedDifference, shows: widerSpaceShows},
@@ -1007,6 +1009,24 @@ func aNamedFunctionLacksAKey(file map[string]any) bool {
 func aFunctionHasNoName(file map[string]any) bool {
 	for _, function := range functionsIn(file) {
 		if lacks(function, "name") {
+			return true
+		}
+	}
+	return false
+}
+
+// aListHoldsNull reports whether a list of the Lua extras has null for an entry: the globals, the removed
+// globals, or the params of a function.
+func aListHoldsNull(file map[string]any) bool {
+	holdsNull := func(value any) bool {
+		list, _ := value.([]any)
+		return slices.Contains(list, nil)
+	}
+	if holdsNull(file["globals"]) || holdsNull(file["removed"]) {
+		return true
+	}
+	for _, function := range functionsIn(file) {
+		if holdsNull(function["params"]) {
 			return true
 		}
 	}
