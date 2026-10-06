@@ -36,7 +36,7 @@ func standardObjects(game gameData) (map[manifest.Category]map[string]objects.Ba
 type objectTable struct {
 	category manifest.Category
 	rows     []slk.Row
-	key      string     // the column that has the id of a row
+	key      string     // the table's key: the column that has the id of a row
 	name     nameSource // where an object of the table has its name
 	levels   string     // the column that has the count of levels of a row; "" for a table without one
 }
@@ -44,8 +44,8 @@ type objectTable struct {
 // objectsByName puts the items and the buffs into their categories: each by its id, with its name.
 func objectsByName(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) {
 	for _, table := range []objectTable{
-		{category: "items", rows: game.items, key: "itemID", name: itemName},
-		{category: "buffs", rows: game.buffs, key: "alias", name: buffName},
+		{category: "items", rows: game.items, key: itemKey, name: itemName},
+		{category: "buffs", rows: game.buffs, key: buffKey, name: buffName},
 	} {
 		for _, row := range table.rows {
 			id := row.Value(table.key)
@@ -58,8 +58,8 @@ func objectsByName(game gameData, bases map[manifest.Category]map[string]objects
 // name and its count of levels. The first count that is none ends it.
 func objectsWithLevels(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
 	for _, table := range []objectTable{
-		{category: "abilities", rows: game.abilities, key: "alias", name: abilityName, levels: "levels"},
-		{category: "upgrades", rows: game.upgrades, key: "upgradeid", name: upgradeName, levels: "maxlevel"},
+		{category: "abilities", rows: game.abilities, key: abilityKey, name: abilityName, levels: "levels"},
+		{category: "upgrades", rows: game.upgrades, key: upgradeKey, name: upgradeName, levels: "maxlevel"},
 	} {
 		for _, row := range table.rows {
 			id := row.Value(table.key)
@@ -102,11 +102,11 @@ var primaryAttributes = []string{"STR", "INT", "AGI"}
 func unitsByCategory(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
 	balance := map[string]slk.Row{}
 	for _, row := range game.balance {
-		balance[row.Value("unitBalanceID")] = row
+		balance[row.Value(balanceKey)] = row
 	}
 	var exceptions []string
 	for _, row := range game.units {
-		id := row.Value("unitID")
+		id := row.Value(unitKey)
 		stats, has := balance[id]
 		if !has {
 			return errNoBalance(id)

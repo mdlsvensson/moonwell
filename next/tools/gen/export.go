@@ -43,22 +43,34 @@ const (
 	upgradesTable  = unitsFolder + "/upgradedata.slk"
 )
 
+// The key of each table: the column that names a row. Its cell is the id of the row's field, or of its standard
+// object.
+const (
+	fieldKey   = "ID" // of each of the four tables of fields
+	abilityKey = "alias"
+	balanceKey = "unitBalanceID"
+	unitKey    = "unitID"
+	itemKey    = "itemID"
+	buffKey    = "alias"
+	upgradeKey = "upgradeid"
+)
+
 // gameData is what an export says of the game's object data: every table and text that the metadata is made
-// from, held as values. A table is held as its rows that describe something: those with a cell in the column
-// that names the row.
+// from, held as values. A table is held as its rows that describe something: those with a cell in the table's
+// key.
 type gameData struct {
 	labels  ini.Section // the editor's strings
 	strings ini.File    // the strings of the standard objects: a section for each id
 
-	// The fields of units and items, of abilities, of buffs and of upgrades, each row named by its ID.
+	// The fields of units and items, of abilities, of buffs and of upgrades.
 	unitFields, abilityFields, buffFields, upgradeFields []slk.Row
 
-	abilities []slk.Row // named by alias
-	balance   []slk.Row // of the units, named by unitBalanceID
-	units     []slk.Row // named by unitID
-	items     []slk.Row // named by itemID
-	buffs     []slk.Row // named by alias
-	upgrades  []slk.Row // named by upgradeid
+	abilities []slk.Row
+	balance   []slk.Row // of the units
+	units     []slk.Row
+	items     []slk.Row
+	buffs     []slk.Row
+	upgrades  []slk.Row
 }
 
 // readExport reads everything that the metadata is made from out of the export in folder: the labels, the
@@ -78,16 +90,16 @@ func readExport(folder string) (gameData, error) {
 		rows      *[]slk.Row
 		path, key string
 	}{
-		{&game.unitFields, unitFieldsTable, "ID"},
-		{&game.abilityFields, abilityFieldsTable, "ID"},
-		{&game.buffFields, buffFieldsTable, "ID"},
-		{&game.upgradeFields, upgradeFieldsTable, "ID"},
-		{&game.abilities, abilitiesTable, "alias"},
-		{&game.balance, balanceTable, "unitBalanceID"},
-		{&game.units, unitsTable, "unitID"},
-		{&game.items, itemsTable, "itemID"},
-		{&game.buffs, buffsTable, "alias"},
-		{&game.upgrades, upgradesTable, "upgradeid"},
+		{&game.unitFields, unitFieldsTable, fieldKey},
+		{&game.abilityFields, abilityFieldsTable, fieldKey},
+		{&game.buffFields, buffFieldsTable, fieldKey},
+		{&game.upgradeFields, upgradeFieldsTable, fieldKey},
+		{&game.abilities, abilitiesTable, abilityKey},
+		{&game.balance, balanceTable, balanceKey},
+		{&game.units, unitsTable, unitKey},
+		{&game.items, itemsTable, itemKey},
+		{&game.buffs, buffsTable, buffKey},
+		{&game.upgrades, upgradesTable, upgradeKey},
 	} {
 		if *table.rows, err = from.rows(table.path, table.key); err != nil {
 			return gameData{}, err

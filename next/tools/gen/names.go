@@ -48,9 +48,10 @@ func decodeOverrides(data []byte) (overrides, error) {
 	if err := json.Unmarshal(data, &pins); err != nil {
 		return overrides{}, errNoJSON(overridesPath, err)
 	}
-	// What the struct took is an object or null, and either decodes as the keys of an object too: this decoding
-	// has no failure left.
-	var file map[string]any
+	// What the struct took is an object or null, and either decodes as the keys of an object too. The values are
+	// kept as the text they are, and nothing reads them: so this decoding has no failure left, also where a key
+	// that the struct does not have holds a number out of range, which the decoding into the struct passes over.
+	var file map[string]json.RawMessage
 	_ = json.Unmarshal(data, &file)
 	if key, unknown := keyOutside(file, overridesKeys); unknown {
 		return overrides{}, errUnknownKey(overridesPath, "the file", key, overridesKeys)

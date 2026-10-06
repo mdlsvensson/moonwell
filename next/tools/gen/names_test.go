@@ -324,6 +324,8 @@ func TestDecodeOverridesRefusesWhatTheFileMustNotHold(t *testing.T) {
 		"a name that is a number":    {`{"names": {"units": {"ucls": 1}}}`, []string{anotherType}},
 		"a list of pins":             {`{"names": {"units": ["ucls"]}}`, []string{anotherType}},
 		"a text for a removed field": {`{"removed": {"units": "uold"}}`, []string{anotherType}},
+		// The value of a key the file has not is not read: the key is refused, and not its number out of range.
+		"a key with a number too big": {`{"zzz":1e999}`, []string{`the file has the key "zzz"`}},
 	} {
 		got, err := decodeOverrides([]byte(c.text))
 		if err == nil {

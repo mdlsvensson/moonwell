@@ -164,7 +164,8 @@ func functionCalled(index int, function map[string]any) string {
 }
 
 // keyOutside is a key of the object that is not among the keys it may have: of several, the first by its bytes.
-func keyOutside(object map[string]any, known []string) (string, bool) {
+// It asks nothing of the values, so it reads an object whose values are decoded and one whose values are text.
+func keyOutside[V any](object map[string]V, known []string) (string, bool) {
 	for _, key := range slices.Sorted(maps.Keys(object)) {
 		if !slices.Contains(known, key) {
 			return key, true

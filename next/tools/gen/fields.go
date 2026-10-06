@@ -79,7 +79,7 @@ func nameFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, 
 func baseAbilities(game gameData) []string {
 	ids := make([]string, len(game.abilities))
 	for i, row := range game.abilities {
-		ids[i] = row.Value("alias")
+		ids[i] = row.Value(abilityKey)
 	}
 	return ids
 }
@@ -137,7 +137,7 @@ func fieldRecord(row slk.Row, label, list string) (objects.FieldMeta, error) {
 	}
 	fieldType := row.Value("type")
 	return objects.FieldMeta{
-		ID:       paddedID(row.Value("ID")),
+		ID:       paddedID(row.Value(fieldKey)),
 		Label:    label,
 		Category: row.Value("category"),
 		Type:     fieldType,
@@ -316,18 +316,18 @@ func errNoFriendlyNames(problems []string) error {
 func noLabel(row slk.Row) string {
 	key, named := row.Get("displayName")
 	if !named {
-		return row.Value("ID") + ": no displayName cell, so no World Editor label"
+		return row.Value(fieldKey) + ": no displayName cell, so no World Editor label"
 	}
-	return row.Value("ID") + ": no World Editor label for " + key
+	return row.Value(fieldKey) + ": no World Editor label for " + key
 }
 
 // usedByNothing is the line for a field of the units' table that no kind of object uses.
 func usedByNothing(field objects.FieldMeta) string { return field.ID + ": applies to no object type" }
 
 func errNoNumber(row slk.Row, column string) error {
-	return errors.New(row.Value("ID") + ": the " + column + " cell '" + row.Value(column) + "' is not a number")
+	return errors.New(row.Value(fieldKey) + ": the " + column + " cell '" + row.Value(column) + "' is not a number")
 }
 
 func errNotWhole(row slk.Row) error {
-	return errors.New(row.Value("ID") + ": the data column '" + row.Value("data") + "' is not a whole number")
+	return errors.New(row.Value(fieldKey) + ": the data column '" + row.Value("data") + "' is not a whole number")
 }
