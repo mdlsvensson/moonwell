@@ -3,8 +3,10 @@ package testkit
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 // recording writes a recording into a folder of the test's own and returns the folder.
@@ -88,14 +90,69 @@ func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T
 	}
 }
 
-func TestRecordedReadsBelowTestdataRecordedOfTheWorkingFolder(t *testing.T) {
-	t.Setenv(recordVariable, "")
+func TestRecordedReadsBelowThePackagesFolderWhereverTheTestHasGone(t *testing.T) {
+	// The folder was taken before any test ran: it is this package's.
+	if filepath.Base(packageFolder) != "testkit" {
+		t.Fatalf("the package's folder is %s", packageFolder)
+	}
+	if _, err := os.Stat(filepath.Join(packageFolder, "recorded.go")); err != nil {
+		t.Fatalf("the package's folder does not hold the package: %v", err)
+	}
+	// A package of the test's own, so that this one needs no testdata; the test then goes somewhere else.
+	started := packageFolder
+	t.Cleanup(func() { packageFolder = started })
+	packageFolder = t.TempDir()
+	WriteFile(t, filepath.Join(packageFolder, "testdata", "recorded"), "here.txt", []byte("here\n"))
 	t.Chdir(t.TempDir())
-	WriteFile(t, filepath.Join("testdata", "recorded"), "here.txt", []byte("here\n"))
+	t.Setenv(recordVariable, "")
 	found := newStandIn(t)
 	Recorded(found, "here.txt", []byte("here\n"))
 	if len(found.errors) != 0 {
-		t.Errorf("the recording of the working folder was not found: %q", found.errors)
+		t.Errorf("the recording of the package was not found from another working folder: %q", found.errors)
+	}
+	t.Setenv(recordVariable, "1")
+	Recorded(newStandIn(t), "sub/written.txt", []byte("made\n"))
+	if _, err := os.Stat(filepath.Join(packageFolder, "testdata", "recorded", "sub", "written.txt")); err != nil {
+		t.Errorf("a recording was not written below the package's folder: %v", err)
+	}
+	if entries, _ := os.ReadDir("."); len(entries) != 0 {
+		t.Errorf("a recording was written below the working folder: %d entries", len(entries))
+	}
+}
+
+func TestShownWritesPlainTextAsItIsAndQuotesEveryOtherValue(t *testing.T) {
+	// The escape that Go's quoting writes for a no-break space: a backslash, the letter u and four digits.
+	noBreakSpace := `\` + "u00a0"
+	for _, c := range [][2]string{
+		{"plain text, with: marks", "plain text, with: marks"},
+		{"M\xC3\xA5ne \xE6\x9C\x88", "M\xC3\xA5ne \xE6\x9C\x88"},
+		{"inside \"quotes\" it", "inside \"quotes\" it"},
+		{"", `""`},
+		{" starts with a space", `" starts with a space"`},
+		{"ends with a space ", `"ends with a space "`},
+		{"ends with a no-break space\xC2\xA0", `"ends with a no-break space` + noBreakSpace + `"`},
+		{"a\tb", `"a\tb"`},
+		{"line\nbreak", `"line\nbreak"`},
+		{"\x7f", `"\x7f"`},
+		{"not UTF-8: \xff", `"not UTF-8: \xff"`},
+		{"cut letter \xc3", `"cut letter \xc3"`},
+		{"\xEF\xBF\xBD", `"` + "\xEF\xBF\xBD" + `"`},
+		{`"starts with a quote`, `"\"starts with a quote"`},
+	} {
+		value, want := c[0], c[1]
+		got := Shown(value)
+		if got != want {
+			t.Errorf("Shown(%q) = %s, want %s", value, got, want)
+		}
+		if !utf8.ValidString(got) || strings.HasSuffix(got, " ") || strings.ContainsAny(got, "\r\n\t") {
+			t.Errorf("Shown(%q) = %q is not a value of one line of text", value, got)
+		}
+		// What is quoted reads back as the value.
+		if got != value {
+			if back, err := strconv.Unquote(got); err != nil || back != value {
+				t.Errorf("Shown(%q) = %s reads back as %q, %v", value, got, back, err)
+			}
+		}
 	}
 }
 
@@ -150,11 +207,65 @@ func TestPlacedWritesTheRootAsRoot(t *testing.T) {
 	}
 }
 
+func TestPlacedWritesTheRootAsJSONWritesItAndLeavesAFolderBesideItAlone(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "project")
+	doubled := strings.ReplaceAll(root, `\`, `\\`)
+	text := `{"file": "` + doubled + `\\src\\a.yue"}` + "\n" + root + "-other\n" + root + "_2\n" + root + "s\n" +
+		root + ".\n" + root + ": gone\n"
+	want := `{"file": "<root>\\src\\a.yue"}` + "\n" + root + "-other\n" + root + "_2\n" + root + "s\n" +
+		"<root>.\n<root>: gone\n"
+	if got := string(Placed([]byte(text), root)); got != want {
+		t.Errorf("Placed = %q, want %q", got, want)
+	}
+}
+
+func TestPlacedWritesTheRootWithEitherDriveLetter(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "project")
+	if filepath.VolumeName(root) == "" || root[1] != ':' {
+		t.Skip("this system writes no drive letter before a path")
+	}
+	small, capital := strings.ToLower(root[:1])+root[1:], strings.ToUpper(root[:1])+root[1:]
+	for _, given := range []string{small, capital} {
+		text := "a " + small + `\x` + "\nb " + capital + "/y\nc " + filepath.ToSlash(small) + "/z\n"
+		if got := string(Placed([]byte(text), given)); got != "a <root>\\x\nb <root>/y\nc <root>/z\n" {
+			t.Errorf("Placed with the root %s = %q", given, got)
+		}
+	}
+}
+
+func TestPlacedWritesTheRootInItsLongAndItsShortSpelling(t *testing.T) {
+	long := filepath.Join(t.TempDir(), "a folder with a long name")
+	if err := os.Mkdir(long, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	resolved, err := filepath.EvalSymlinks(long)
+	if err != nil {
+		t.Fatal(err)
+	}
+	short := shortSpelling(resolved)
+	if short == "" || strings.EqualFold(short, resolved) {
+		t.Skip("this system, or the volume of the temporary folder, writes no short names")
+	}
+	// A test is given one spelling, and what it made may hold the other: both are the root.
+	text := "long " + filepath.Join(resolved, "a.txt") + "\nshort " + filepath.Join(short, "b.txt") + "\n"
+	want := "long <root>" + string(filepath.Separator) + "a.txt\nshort <root>" + string(filepath.Separator) + "b.txt\n"
+	for _, given := range []string{resolved, short} {
+		if got := string(Placed([]byte(text), given)); got != want {
+			t.Errorf("Placed with the root %s = %q, want %q", given, got, want)
+		}
+	}
+}
+
+// A reason is words that are not Moonwell's own: the operating system's for a failure, or the standard
+// library's where a decoder words an error.
 func TestPlacedWritesEachReasonAsReason(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "project")
-	text := "cannot read " + filepath.Join(root, "a") + ": Access is denied.\ncannot write b: permission denied\n"
-	want := "cannot read <root>" + string(filepath.Separator) + "a: <reason>\ncannot write b: <reason>\n"
-	if got := string(Placed([]byte(text), root, "Access is denied.", "", "permission denied")); got != want {
+	text := "cannot read " + filepath.Join(root, "a") + ": Access is denied.\ncannot write b: permission denied\n" +
+		"not a picture: invalid format: not enough pixel data.\n"
+	want := "cannot read <root>" + string(filepath.Separator) + "a: <reason>\ncannot write b: <reason>\n" +
+		"not a picture: <reason>.\n"
+	reasons := []string{"Access is denied.", "", "permission denied", "invalid format: not enough pixel data"}
+	if got := string(Placed([]byte(text), root, reasons...)); got != want {
 		t.Errorf("Placed = %q, want %q", got, want)
 	}
 	// A reason that names a file of the project is found before the root is written over.

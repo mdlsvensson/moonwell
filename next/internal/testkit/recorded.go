@@ -6,7 +6,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strconv"
+	"strings"
 	"testing"
+	"unicode"
+	"unicode/utf8"
 )
 
 // recordVariable is the environment variable that makes Recorded write recordings; its value is then "1".
@@ -18,16 +23,21 @@ const (
 	reasonPlaceholder = "<reason>"
 )
 
-// Recorded compares got with the recording name under the calling package's testdata/recorded folder and fails
-// the test where the two part: it gives the offset, the line, and that line of each. A test starts in the folder
-// of its package, so the folder is found from the working folder. name is written with "/".
+// packageFolder is the folder the test binary starts in, which is the folder of the package under test: go test
+// starts it there. It is taken when the package is first loaded, before a test can change the working folder,
+// so Recorded finds the recordings of the package wherever the test that calls it has gone since.
+var packageFolder, _ = os.Getwd()
+
+// Recorded compares got with the recording name under the testdata/recorded folder of the package under test
+// and fails the test where the two part: it gives the offset, the line, and that line of each. The package's
+// folder is the one the test binary started in, not the working folder of the moment. name is written with "/".
 //
 // With MOONWELL_RECORD=1 it writes got as the recording instead, and fails the test, so that no run passes by
-// recording. Nothing else writes a recording. A recording is the bytes it was given: the checkout marks every
-// file below a testdata folder as one whose line ends git leaves alone.
+// recording. Nothing else writes a recording. A recording is the bytes it was given: the checkout marks the
+// recordings as files whose line ends git leaves alone.
 func Recorded(t testing.TB, name string, got []byte) {
 	t.Helper()
-	recordedIn(t, filepath.Join("testdata", "recorded"), name, got)
+	recordedIn(t, filepath.Join(packageFolder, "testdata", "recorded"), name, got)
 }
 
 // recordedIn is Recorded for the recordings of the folder given.
@@ -112,10 +122,34 @@ func Digest(data []byte) string {
 	return fmt.Sprintf("sha256 %x, %d bytes", sha256.Sum256(data), len(data))
 }
 
-// Placed is text as a recording holds it, without what belongs to one machine or one system: the path of the
-// folder root is written <root>, in the system's own spelling and with "/", and each of the reasons, the
-// operating system's own words for a failure, is written <reason>. Nothing else is changed: a path below the
-// root keeps its separators. An empty root or reason stands for nothing.
+// Shown is a value as a line of a recording holds it, so that the recording is text that an editor may open
+// and save: a recording is UTF-8, and no line of it ends in a space. A value is written as it is when it is not
+// empty, is UTF-8, has only characters that are printed, neither starts nor ends with white space, and does not
+// start with a quote; any other is quoted as Go quotes a string, which shows a byte that is no UTF-8, a control
+// character and a space at an end. Every writer of a recording writes its values through Shown, or quotes them
+// all.
+func Shown(value string) string {
+	bare := value != "" && utf8.ValidString(value) && !strings.HasPrefix(value, `"`) &&
+		!strings.ContainsFunc(value, func(r rune) bool { return !strconv.IsPrint(r) || r == utf8.RuneError })
+	if bare {
+		first, _ := utf8.DecodeRuneInString(value)
+		last, _ := utf8.DecodeLastRuneInString(value)
+		bare = !unicode.IsSpace(first) && !unicode.IsSpace(last)
+	}
+	if bare {
+		return value
+	}
+	return strconv.Quote(value)
+}
+
+// Placed is text as a recording holds it, without what belongs to one machine or one system. The path of the
+// folder root is written <root>: as it is given, as the system resolves it and, on Windows, in its short
+// spelling; each of those with the system's separator, with "/" and with every backslash doubled, as JSON and
+// Go write a path; and with its drive letter small or capital. A path is the root only where no letter, digit,
+// "-" or "_" follows it: a folder beside the root whose name starts with the root's is left as it is. Each of
+// the reasons is written <reason>: a reason is words that are not Moonwell's own, as the operating system's for
+// a failure. Nothing else is changed: a path below the root keeps its separators. An empty root or reason stands
+// for nothing.
 func Placed(text []byte, root string, reasons ...string) []byte {
 	for _, reason := range reasons {
 		if reason != "" {
@@ -125,7 +159,69 @@ func Placed(text []byte, root string, reasons ...string) []byte {
 	if root == "" {
 		return text
 	}
-	root = filepath.Clean(root)
-	text = bytes.ReplaceAll(text, []byte(root), []byte(rootPlaceholder))
-	return bytes.ReplaceAll(text, []byte(filepath.ToSlash(root)), []byte(rootPlaceholder))
+	// The longest spelling first: one spelling may be the start of another.
+	spellings := spellingsOf(root)
+	slices.SortFunc(spellings, func(a, b string) int { return len(b) - len(a) })
+	for _, spelling := range spellings {
+		text = replacedAsAPath(text, spelling)
+	}
+	return text
+}
+
+// spellingsOf is every way a text may write the folder: see Placed.
+func spellingsOf(root string) []string {
+	folders := []string{filepath.Clean(root)}
+	if resolved, err := filepath.EvalSymlinks(root); err == nil {
+		folders = append(folders, resolved)
+	}
+	if short := shortSpelling(root); short != "" {
+		folders = append(folders, short)
+	}
+	var spellings []string
+	add := func(spelling string) {
+		if !slices.Contains(spellings, spelling) {
+			spellings = append(spellings, spelling)
+		}
+	}
+	for _, folder := range folders {
+		for _, lettered := range withEitherDriveLetter(folder) {
+			add(lettered)
+			add(filepath.ToSlash(lettered))
+			add(strings.ReplaceAll(lettered, `\`, `\\`))
+		}
+	}
+	return spellings
+}
+
+// withEitherDriveLetter is the path, and for a path that starts with a drive letter also the path with that
+// letter in the other case.
+func withEitherDriveLetter(path string) []string {
+	if len(path) < 2 || path[1] != ':' || !unicode.IsLetter(rune(path[0])) {
+		return []string{path}
+	}
+	return []string{path, strings.ToLower(path[:1]) + path[1:], strings.ToUpper(path[:1]) + path[1:]}
+}
+
+// replacedAsAPath is text with the spelling of the root written <root> wherever it stands as a whole path or as
+// the start of a path below it.
+func replacedAsAPath(text []byte, spelling string) []byte {
+	var out []byte
+	for {
+		at := bytes.Index(text, []byte(spelling))
+		if at < 0 {
+			return append(out, text...)
+		}
+		end := at + len(spelling)
+		if end < len(text) && continuesAName(text[end]) {
+			out = append(out, text[:end]...)
+		} else {
+			out = append(append(out, text[:at]...), rootPlaceholder...)
+		}
+		text = text[end:]
+	}
+}
+
+// continuesAName reports whether the byte after a path makes it the start of another folder's name.
+func continuesAName(next byte) bool {
+	return next == '-' || next == '_' || next >= 0x80 || unicode.IsLetter(rune(next)) || unicode.IsDigit(rune(next))
 }
