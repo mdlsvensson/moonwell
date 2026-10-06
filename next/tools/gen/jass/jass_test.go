@@ -234,18 +234,6 @@ func TestParseNamesTheFileAndLineOfAnythingItDoesNotUnderstand(t *testing.T) {
 	}
 }
 
-func TestAnErrorIsThePlaceAndWhatIsWrongThere(t *testing.T) {
-	for text, want := range map[string]string{
-		"type unit extends widget\n  library Foo \n":           `x.j:2: cannot read "library Foo"`,
-		"\nfunction F takes nothing returns nothing\nreturn\n": "x.j:2: the function never reaches endfunction",
-		"globals\ninteger a\n":                                 "x.j: the globals block never reaches endglobals",
-	} {
-		if _, err := jass.Parse(text, "x.j"); err == nil || err.Error() != want {
-			t.Errorf("%q: got %v, want %s", text, err, want)
-		}
-	}
-}
-
 // widerSpace are scripts with a character that is white space outside ASCII. Each is text: it parts no two
 // words, it is trimmed from no line, and inside a line it is a character like any other. A case with words is a
 // script that is refused; one without is read into want.

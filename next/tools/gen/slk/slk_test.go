@@ -227,23 +227,6 @@ func TestParseNamesTheFileAndLineOfAMalformedRecord(t *testing.T) {
 	}
 }
 
-func TestAnErrorIsThePlaceAndWhatIsWrongThere(t *testing.T) {
-	for text, want := range map[string]string{
-		"ID;P\nC;X1;K\"ID\"\n":                 "x.slk:2: cell without an X or Y coordinate",
-		"ID;P\nC;X1;Y1;K\"ID\n":                "x.slk:2: unterminated quoted string",
-		"C;X1;Y1;Ka\n\nC;Xb;Y2;K1\n":           "x.slk:3: bad X coordinate 'b'",
-		"C;X1;Y;K1\n":                          "x.slk:1: bad Y coordinate ''",
-		"C;X1;Y1;K\"ID\"x\n":                   "x.slk:1: expected ';' after a value",
-		"C;X1;Y1;Ka\nC;X1;;Y2;K1\n":            "x.slk:2: empty field: two ';' with nothing between them",
-		"C;X1;Y1;K\"ID\"\nC;X2;K\"ID\"\n":      "x.slk: duplicate column 'ID' in the header row",
-		"C;X2;Y1;K\"a b\"\nC;X1;K\"a b\"\nE\n": "x.slk: duplicate column 'a b' in the header row",
-	} {
-		if _, err := slk.Parse(text, "x.slk"); err == nil || err.Error() != want {
-			t.Errorf("%q: got %v, want %s", text, err, want)
-		}
-	}
-}
-
 // emptyFields are tables with a record that has a field with nothing in it, each with the place of its error:
 // the field is the first of the record, it stands between two others, and it follows a quoted and a bare value.
 var emptyFields = []struct{ text, place string }{

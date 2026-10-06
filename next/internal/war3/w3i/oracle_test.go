@@ -134,6 +134,32 @@ func extendedFiles(t *testing.T) []input {
 	return files
 }
 
+// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every input
+// the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test alone.
+// Which altered files are refused is asked of the other tree here, and of this tree by the test that stays.
+func TestOracleOnTheRecordedRefusals(t *testing.T) {
+	said := refusals(t, readers{
+		read: func(data []byte, depth w3i.Depth) error {
+			_, err := oldw3i.Read(data, depth == w3i.Extended, mapInfoFile)
+			return err
+		},
+		header: func(data []byte) error {
+			_, err := oldw3i.ReadHeader(data)
+			return err
+		},
+		edits: func(source []byte, edits []w3i.Edit) error {
+			var old []oldw3i.Edit
+			for _, e := range edits {
+				old = append(old, oldw3i.Edit{Start: e.Start, End: e.End, Bytes: e.Bytes})
+			}
+			_, err := oldw3i.ApplyEdits(source, old)
+			return err
+		},
+		refusal: oracle.RefusalOf,
+	})
+	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
+}
+
 func TestOracleOnWholeFiles(t *testing.T) {
 	c := &comparison{t: t}
 	files := wholeFiles(t)

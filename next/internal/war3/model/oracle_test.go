@@ -256,6 +256,24 @@ func TestOracleLeavesOutOnlyWhatTheTreesReadDifferently(t *testing.T) {
 	t.Logf("%d inputs left out", leftOut)
 }
 
+// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every model
+// the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test alone.
+func TestOracleOnTheRecordedRefusals(t *testing.T) {
+	said := refusals(t, func(reader string, data []byte) error {
+		var err error
+		switch reader {
+		case "ReadMDX":
+			_, err = oldmodels.ReadMDX(data, modelFile)
+		case "ReadMDL":
+			_, err = oldmodels.ReadMDL(string(data), modelFile)
+		default:
+			_, err = oldmodels.Paths(data, modelFile)
+		}
+		return err
+	}, oracle.RefusalOf)
+	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
+}
+
 func TestOracleOnTheCarriedBuilders(t *testing.T) {
 	c := newComparison(t)
 	body := []byte{1, 2, 3}

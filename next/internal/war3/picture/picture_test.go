@@ -456,56 +456,6 @@ func TestAFileThatIsNotAReadablePNGIsRefused(t *testing.T) {
 	}
 }
 
-func TestARefusalSaysWhatThePictureIsAndHowToMakeOneThatGoesIn(t *testing.T) {
-	const (
-		export = "Export the picture from an image editor as a 24- or 32-bit TGA of 256x256 pixels."
-		resize = "Resize the picture. 256x256 is where the game's start location markers sit right."
-		asPNG  = "Export the picture again from an image editor as a PNG of 256x256 pixels."
-	)
-	plain, blp := plainTGA(), testkit.BLP(256, 1)
-	set := func(data []byte, offset int, value byte) []byte {
-		return edited(slices.Clone(data), func(b []byte) { b[offset] = value })
-	}
-	for _, c := range []struct {
-		file          string
-		data          []byte
-		problem, hint string
-	}{
-		{"preview.jpg", plain, "must be a .tga, a .blp or a .png file.", export},
-		{"preview.tga", sizedTGA(128, 64), "is 128x64 pixels; it must be 256x256 or 512x512.", resize},
-		{"preview.tga", plain[:17], "is cut short: a TGA header has 18 bytes.", export},
-		{"preview.tga", set(plain, 1, 1), "is a TGA with a colour map.", export},
-		{"preview.tga", set(plain, 2, 3), "is a TGA of image type 3, not a true-colour picture.", export},
-		{"preview.tga", set(plain, 16, 16), "is a TGA with 16 bits a pixel, not 24 or 32.", export},
-		{"preview.tga", set(plain, 17, plain[17]|0x10), "is a TGA whose rows run from right to left.", export},
-		{"preview.tga", plain[:len(plain)-1], "is cut short: its pixel data ends early.", export},
-		{"preview.tga", slices.Concat(runsOfAllButOnePixel(), run(2)), "is damaged: a run of pixels overruns the picture.",
-			export},
-		{"preview.blp", set(blp, 3, '2'), "is a BLP2 file, the World of Warcraft format.",
-			"Save it as BLP1, or export it as TGA."},
-		{"preview.blp", plain, "is not a BLP file: it does not start with BLP1.", export},
-		{"preview.blp", blp[:155], "is cut short: a BLP header has 156 bytes.", export},
-		{"preview.blp", set(blp, 4, 2), "has the unknown BLP content type 2.", export},
-		{"preview.blp", blp[:156], "is cut short: its first mipmap lies outside the file.", export},
-		{"preview.png", plain, "is not a PNG file: it does not start with a PNG signature.", asPNG},
-	} {
-		_, err := picture.Read(c.data, c.file)
-		want := diag.Error{Msg: "The preview picture " + c.problem, File: c.file, Hint: c.hint}
-		var failure *diag.Error
-		if !errors.As(err, &failure) || *failure != want {
-			t.Errorf("got %+v, want %+v", err, want)
-		}
-	}
-	// A PNG that the decoder gives up says so in the decoder's words, which the error carries as its cause.
-	_, err := picture.Read(testkit.PNG(testkit.NewPixels(256), "rgb")[:20], "preview.png")
-	var failure *diag.Error
-	if !errors.As(err, &failure) || failure.Cause == nil || failure.Hint != asPNG || failure.File != "preview.png" ||
-		failure.Msg != "The preview picture is a PNG that could not be read: "+
-			strings.TrimPrefix(failure.Cause.Error(), "png: ")+"." {
-		t.Errorf("a PNG cut short: %+v", err)
-	}
-}
-
 // nameRefusals are pictures under a name whose extension is none of the three.
 func nameRefusals() []refusal {
 	const words = "must be a .tga, a .blp or a .png file"

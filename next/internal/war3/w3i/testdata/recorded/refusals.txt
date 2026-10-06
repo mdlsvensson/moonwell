@@ -1,0 +1,914 @@
+Cannot read map settings: truncated war3map.w3i.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - the fixture cut at 2 bytes, depth 1
+    - the fixture cut at 157 bytes, depth 1
+    - the fixture cut at 250 bytes, depth 1
+    - the fixture cut at 280 bytes, depth 1
+    - the fixture cut at 570 bytes, depth 1
+    - synthetic version 28 with the player count set to 2, depth 1
+    - synthetic version 28 with the player count set to 24, depth 1
+    - synthetic version 28 with the force count set to 2, depth 1
+    - synthetic version 28 with the force count set to 24, depth 1
+    - synthetic version 31 with the player count set to 2, depth 1
+    - synthetic version 31 with the player count set to 24, depth 1
+    - synthetic version 31 with the force count set to 2, depth 1
+    - synthetic version 31 with the force count set to 24, depth 1
+    - synthetic version 32 with the player count set to 2, depth 1
+    - synthetic version 32 with the player count set to 24, depth 1
+    - synthetic version 32 with the force count set to 2, depth 1
+    - synthetic version 32 with the force count set to 24, depth 1
+    - synthetic version 33 with the player count set to 2, depth 1
+    - synthetic version 33 with the player count set to 24, depth 1
+    - synthetic version 33 with the force count set to 2, depth 1
+    - synthetic version 33 with the force count set to 24, depth 1
+    - synthetic version 39 with the force count set to 2, depth 1
+    - synthetic version 39 with the force count set to 24, depth 1
+
+Cannot read map settings: unterminated string in war3map.w3i.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - the fixture cut at 30 bytes, depth 1
+    - the fixture cut at 145 bytes, depth 1
+    - synthetic version 18 as version 25, depth 0
+    - synthetic version 18 as version 28, depth 0
+    - synthetic version 18 as version 31, depth 0
+    - synthetic version 18 as version 32, depth 0
+    - synthetic version 18 as version 33, depth 0
+    - synthetic version 18 as version 39, depth 0
+    - synthetic version 25 as version 28, depth 0
+    - synthetic version 25 as version 31, depth 0
+    - synthetic version 25 as version 32, depth 0
+    - synthetic version 25 as version 33, depth 0
+    - synthetic version 25 as version 39, depth 0
+    - synthetic version 39 with the player count set to 2, depth 1
+    - synthetic version 39 with the player count set to 24, depth 1
+
+Cannot read map settings: player, force and environment overrides require w3i version 28 or later.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18, depth 1
+    - synthetic version 25, depth 1
+    - synthetic version 28 as version 18, depth 1
+    - synthetic version 28 as version 25, depth 1
+    - synthetic version 31 as version 18, depth 1
+    - synthetic version 31 as version 25, depth 1
+    - synthetic version 32 as version 18, depth 1
+    - synthetic version 32 as version 25, depth 1
+    - synthetic version 33 as version 18, depth 1
+    - synthetic version 33 as version 25, depth 1
+    - synthetic version 39 as version 18, depth 1
+    - synthetic version 39 as version 25, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version -1.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version -1, depth 0
+    - synthetic version 25 as version -1, depth 0
+    - synthetic version 28 as version -1, depth 1
+    - synthetic version 31 as version -1, depth 1
+    - synthetic version 32 as version -1, depth 1
+    - synthetic version 33 as version -1, depth 1
+    - synthetic version 39 as version -1, depth 0
+    - synthetic version 39 as version -1, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 0.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 0, depth 0
+    - synthetic version 25 as version 0, depth 0
+    - synthetic version 28 as version 0, depth 1
+    - synthetic version 31 as version 0, depth 1
+    - synthetic version 32 as version 0, depth 1
+    - synthetic version 33 as version 0, depth 1
+    - synthetic version 39 as version 0, depth 0
+    - synthetic version 39 as version 0, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 17.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 17, depth 0
+    - synthetic version 25 as version 17, depth 0
+    - synthetic version 28 as version 17, depth 1
+    - synthetic version 31 as version 17, depth 1
+    - synthetic version 32 as version 17, depth 1
+    - synthetic version 33 as version 17, depth 1
+    - synthetic version 39 as version 17, depth 0
+    - synthetic version 39 as version 17, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 19.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 19, depth 0
+    - synthetic version 25 as version 19, depth 0
+    - synthetic version 28 as version 19, depth 1
+    - synthetic version 31 as version 19, depth 1
+    - synthetic version 32 as version 19, depth 1
+    - synthetic version 33 as version 19, depth 1
+    - synthetic version 39 as version 19, depth 0
+    - synthetic version 39 as version 19, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 24.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 24, depth 0
+    - synthetic version 25 as version 24, depth 0
+    - synthetic version 28 as version 24, depth 1
+    - synthetic version 31 as version 24, depth 1
+    - synthetic version 32 as version 24, depth 1
+    - synthetic version 33 as version 24, depth 1
+    - synthetic version 39 as version 24, depth 0
+    - synthetic version 39 as version 24, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 26.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 26, depth 0
+    - synthetic version 25 as version 26, depth 0
+    - synthetic version 28 as version 26, depth 1
+    - synthetic version 31 as version 26, depth 1
+    - synthetic version 32 as version 26, depth 1
+    - synthetic version 33 as version 26, depth 1
+    - synthetic version 39 as version 26, depth 0
+    - synthetic version 39 as version 26, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 27.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 27, depth 0
+    - synthetic version 25 as version 27, depth 0
+    - synthetic version 28 as version 27, depth 1
+    - synthetic version 31 as version 27, depth 1
+    - synthetic version 32 as version 27, depth 1
+    - synthetic version 33 as version 27, depth 1
+    - synthetic version 39 as version 27, depth 0
+    - synthetic version 39 as version 27, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 29.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 29, depth 0
+    - synthetic version 25 as version 29, depth 0
+    - synthetic version 28 as version 29, depth 1
+    - synthetic version 31 as version 29, depth 1
+    - synthetic version 32 as version 29, depth 1
+    - synthetic version 33 as version 29, depth 1
+    - synthetic version 39 as version 29, depth 0
+    - synthetic version 39 as version 29, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 30.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 30, depth 0
+    - synthetic version 25 as version 30, depth 0
+    - synthetic version 28 as version 30, depth 1
+    - synthetic version 31 as version 30, depth 1
+    - synthetic version 32 as version 30, depth 1
+    - synthetic version 33 as version 30, depth 1
+    - synthetic version 39 as version 30, depth 0
+    - synthetic version 39 as version 30, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 34.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 34, depth 0
+    - synthetic version 25 as version 34, depth 0
+    - synthetic version 28 as version 34, depth 1
+    - synthetic version 31 as version 34, depth 1
+    - synthetic version 32 as version 34, depth 1
+    - synthetic version 33 as version 34, depth 1
+    - synthetic version 39 as version 34, depth 0
+    - synthetic version 39 as version 34, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 38.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 38, depth 0
+    - synthetic version 25 as version 38, depth 0
+    - synthetic version 28 as version 38, depth 1
+    - synthetic version 31 as version 38, depth 1
+    - synthetic version 32 as version 38, depth 1
+    - synthetic version 33 as version 38, depth 1
+    - synthetic version 39 as version 38, depth 0
+    - synthetic version 39 as version 38, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 40.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 40, depth 0
+    - synthetic version 25 as version 40, depth 0
+    - synthetic version 28 as version 40, depth 1
+    - synthetic version 31 as version 40, depth 1
+    - synthetic version 32 as version 40, depth 1
+    - synthetic version 33 as version 40, depth 1
+    - synthetic version 39 as version 40, depth 0
+    - synthetic version 39 as version 40, depth 1
+
+Cannot read map settings: unsupported war3map.w3i version 2147483647.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 18 as version 2147483647, depth 0
+    - synthetic version 25 as version 2147483647, depth 0
+    - synthetic version 28 as version 2147483647, depth 1
+    - synthetic version 31 as version 2147483647, depth 1
+    - synthetic version 32 as version 2147483647, depth 1
+    - synthetic version 33 as version 2147483647, depth 1
+    - synthetic version 39 as version 2147483647, depth 0
+    - synthetic version 39 as version 2147483647, depth 1
+
+Cannot read map settings: invalid UTF-8 in war3map.w3i.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor.
+    - synthetic version 18 with "\xff" before the name, depth 0
+    - synthetic version 18 with "\xc3" before the name, depth 0
+    - synthetic version 18 with "\xc0\x80" before the name, depth 0
+    - synthetic version 18 with "\xed\xa0\x80" before the name, depth 0
+    - synthetic version 18 with "\xef\xbb" before the name, depth 0
+    - synthetic version 18 with "\xff" before the author, depth 0
+    - synthetic version 18 with "\xc3" before the author, depth 0
+    - synthetic version 18 with "\xc0\x80" before the author, depth 0
+    - synthetic version 18 with "\xed\xa0\x80" before the author, depth 0
+    - synthetic version 18 with "\xef\xbb" before the author, depth 0
+    - synthetic version 18 with "\xff" before the description, depth 0
+    - synthetic version 18 with "\xc3" before the description, depth 0
+    - synthetic version 18 with "\xc0\x80" before the description, depth 0
+    - synthetic version 18 with "\xed\xa0\x80" before the description, depth 0
+    - synthetic version 18 with "\xef\xbb" before the description, depth 0
+    - synthetic version 18 with "\xff" before the recommended players, depth 0
+    - synthetic version 18 with "\xc3" before the recommended players, depth 0
+    - synthetic version 18 with "\xc0\x80" before the recommended players, depth 0
+    - synthetic version 18 with "\xed\xa0\x80" before the recommended players, depth 0
+    - synthetic version 18 with "\xef\xbb" before the recommended players, depth 0
+    - synthetic version 18 with "\xff" before the loading text, depth 0
+    - synthetic version 18 with "\xc3" before the loading text, depth 0
+    - synthetic version 18 with "\xc0\x80" before the loading text, depth 0
+    - synthetic version 18 with "\xed\xa0\x80" before the loading text, depth 0
+    - synthetic version 18 with "\xef\xbb" before the loading text, depth 0
+    - synthetic version 18 with "\xff" before the loading title, depth 0
+    - synthetic version 18 with "\xc3" before the loading title, depth 0
+    - synthetic version 18 with "\xc0\x80" before the loading title, depth 0
+    - synthetic version 18 with "\xed\xa0\x80" before the loading title, depth 0
+    - synthetic version 18 with "\xef\xbb" before the loading title, depth 0
+    - synthetic version 18 with "\xff" before the loading subtitle, depth 0
+    - synthetic version 18 with "\xc3" before the loading subtitle, depth 0
+    - synthetic version 18 with "\xc0\x80" before the loading subtitle, depth 0
+    - synthetic version 18 with "\xed\xa0\x80" before the loading subtitle, depth 0
+    - synthetic version 18 with "\xef\xbb" before the loading subtitle, depth 0
+    - synthetic version 25 with "\xff" before the name, depth 0
+    - synthetic version 25 with "\xc3" before the name, depth 0
+    - synthetic version 25 with "\xc0\x80" before the name, depth 0
+    - synthetic version 25 with "\xed\xa0\x80" before the name, depth 0
+    - synthetic version 25 with "\xef\xbb" before the name, depth 0
+    - synthetic version 25 with "\xff" before the author, depth 0
+    - synthetic version 25 with "\xc3" before the author, depth 0
+    - synthetic version 25 with "\xc0\x80" before the author, depth 0
+    - synthetic version 25 with "\xed\xa0\x80" before the author, depth 0
+    - synthetic version 25 with "\xef\xbb" before the author, depth 0
+    - synthetic version 25 with "\xff" before the description, depth 0
+    - synthetic version 25 with "\xc3" before the description, depth 0
+    - synthetic version 25 with "\xc0\x80" before the description, depth 0
+    - synthetic version 25 with "\xed\xa0\x80" before the description, depth 0
+    - synthetic version 25 with "\xef\xbb" before the description, depth 0
+    - synthetic version 25 with "\xff" before the recommended players, depth 0
+    - synthetic version 25 with "\xc3" before the recommended players, depth 0
+    - synthetic version 25 with "\xc0\x80" before the recommended players, depth 0
+    - synthetic version 25 with "\xed\xa0\x80" before the recommended players, depth 0
+    - synthetic version 25 with "\xef\xbb" before the recommended players, depth 0
+    - synthetic version 25 with "\xff" before the loading text, depth 0
+    - synthetic version 25 with "\xc3" before the loading text, depth 0
+    - synthetic version 25 with "\xc0\x80" before the loading text, depth 0
+    - synthetic version 25 with "\xed\xa0\x80" before the loading text, depth 0
+    - synthetic version 25 with "\xef\xbb" before the loading text, depth 0
+    - synthetic version 25 with "\xff" before the loading title, depth 0
+    - synthetic version 25 with "\xc3" before the loading title, depth 0
+    - synthetic version 25 with "\xc0\x80" before the loading title, depth 0
+    - synthetic version 25 with "\xed\xa0\x80" before the loading title, depth 0
+    - synthetic version 25 with "\xef\xbb" before the loading title, depth 0
+    - synthetic version 25 with "\xff" before the loading subtitle, depth 0
+    - synthetic version 25 with "\xc3" before the loading subtitle, depth 0
+    - synthetic version 25 with "\xc0\x80" before the loading subtitle, depth 0
+    - synthetic version 25 with "\xed\xa0\x80" before the loading subtitle, depth 0
+    - synthetic version 25 with "\xef\xbb" before the loading subtitle, depth 0
+    - synthetic version 25 with "\xff" before the loading model, depth 0
+    - synthetic version 25 with "\xc3" before the loading model, depth 0
+    - synthetic version 25 with "\xc0\x80" before the loading model, depth 0
+    - synthetic version 25 with "\xed\xa0\x80" before the loading model, depth 0
+    - synthetic version 25 with "\xef\xbb" before the loading model, depth 0
+    - synthetic version 28 as version 32, depth 1
+    - synthetic version 28 with "\xff" before the name, depth 1
+    - synthetic version 28 with "\xc3" before the name, depth 1
+    - synthetic version 28 with "\xc0\x80" before the name, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the name, depth 1
+    - synthetic version 28 with "\xef\xbb" before the name, depth 1
+    - synthetic version 28 with "\xff" before the author, depth 1
+    - synthetic version 28 with "\xc3" before the author, depth 1
+    - synthetic version 28 with "\xc0\x80" before the author, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the author, depth 1
+    - synthetic version 28 with "\xef\xbb" before the author, depth 1
+    - synthetic version 28 with "\xff" before the description, depth 1
+    - synthetic version 28 with "\xc3" before the description, depth 1
+    - synthetic version 28 with "\xc0\x80" before the description, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the description, depth 1
+    - synthetic version 28 with "\xef\xbb" before the description, depth 1
+    - synthetic version 28 with "\xff" before the recommended players, depth 1
+    - synthetic version 28 with "\xc3" before the recommended players, depth 1
+    - synthetic version 28 with "\xc0\x80" before the recommended players, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the recommended players, depth 1
+    - synthetic version 28 with "\xef\xbb" before the recommended players, depth 1
+    - synthetic version 28 with "\xff" before the loading text, depth 1
+    - synthetic version 28 with "\xc3" before the loading text, depth 1
+    - synthetic version 28 with "\xc0\x80" before the loading text, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the loading text, depth 1
+    - synthetic version 28 with "\xef\xbb" before the loading text, depth 1
+    - synthetic version 28 with "\xff" before the loading title, depth 1
+    - synthetic version 28 with "\xc3" before the loading title, depth 1
+    - synthetic version 28 with "\xc0\x80" before the loading title, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the loading title, depth 1
+    - synthetic version 28 with "\xef\xbb" before the loading title, depth 1
+    - synthetic version 28 with "\xff" before the loading subtitle, depth 1
+    - synthetic version 28 with "\xc3" before the loading subtitle, depth 1
+    - synthetic version 28 with "\xc0\x80" before the loading subtitle, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the loading subtitle, depth 1
+    - synthetic version 28 with "\xef\xbb" before the loading subtitle, depth 1
+    - synthetic version 28 with "\xff" before the loading model, depth 1
+    - synthetic version 28 with "\xc3" before the loading model, depth 1
+    - synthetic version 28 with "\xc0\x80" before the loading model, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the loading model, depth 1
+    - synthetic version 28 with "\xef\xbb" before the loading model, depth 1
+    - synthetic version 28 with "\xff" before the sound environment, depth 1
+    - synthetic version 28 with "\xc3" before the sound environment, depth 1
+    - synthetic version 28 with "\xc0\x80" before the sound environment, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before the sound environment, depth 1
+    - synthetic version 28 with "\xef\xbb" before the sound environment, depth 1
+    - synthetic version 28 with "\xff" before a player's name, depth 1
+    - synthetic version 28 with "\xc3" before a player's name, depth 1
+    - synthetic version 28 with "\xc0\x80" before a player's name, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before a player's name, depth 1
+    - synthetic version 28 with "\xef\xbb" before a player's name, depth 1
+    - synthetic version 28 with "\xff" before a force's name, depth 1
+    - synthetic version 28 with "\xc3" before a force's name, depth 1
+    - synthetic version 28 with "\xc0\x80" before a force's name, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before a force's name, depth 1
+    - synthetic version 28 with "\xef\xbb" before a force's name, depth 1
+    - synthetic version 28 with "\xff" before text 1 after the loading screen, depth 1
+    - synthetic version 28 with "\xc3" before text 1 after the loading screen, depth 1
+    - synthetic version 28 with "\xc0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 28 with "\xef\xbb" before text 1 after the loading screen, depth 1
+    - synthetic version 28 with "\xff" before text 2 after the loading screen, depth 1
+    - synthetic version 28 with "\xc3" before text 2 after the loading screen, depth 1
+    - synthetic version 28 with "\xc0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 28 with "\xef\xbb" before text 2 after the loading screen, depth 1
+    - synthetic version 28 with "\xff" before text 3 after the loading screen, depth 1
+    - synthetic version 28 with "\xc3" before text 3 after the loading screen, depth 1
+    - synthetic version 28 with "\xc0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 28 with "\xef\xbb" before text 3 after the loading screen, depth 1
+    - synthetic version 28 with "\xff" before text 4 after the loading screen, depth 1
+    - synthetic version 28 with "\xc3" before text 4 after the loading screen, depth 1
+    - synthetic version 28 with "\xc0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 28 with "\xed\xa0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 28 with "\xef\xbb" before text 4 after the loading screen, depth 1
+    - synthetic version 31 with "\xff" before the name, depth 1
+    - synthetic version 31 with "\xc3" before the name, depth 1
+    - synthetic version 31 with "\xc0\x80" before the name, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the name, depth 1
+    - synthetic version 31 with "\xef\xbb" before the name, depth 1
+    - synthetic version 31 with "\xff" before the author, depth 1
+    - synthetic version 31 with "\xc3" before the author, depth 1
+    - synthetic version 31 with "\xc0\x80" before the author, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the author, depth 1
+    - synthetic version 31 with "\xef\xbb" before the author, depth 1
+    - synthetic version 31 with "\xff" before the description, depth 1
+    - synthetic version 31 with "\xc3" before the description, depth 1
+    - synthetic version 31 with "\xc0\x80" before the description, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the description, depth 1
+    - synthetic version 31 with "\xef\xbb" before the description, depth 1
+    - synthetic version 31 with "\xff" before the recommended players, depth 1
+    - synthetic version 31 with "\xc3" before the recommended players, depth 1
+    - synthetic version 31 with "\xc0\x80" before the recommended players, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the recommended players, depth 1
+    - synthetic version 31 with "\xef\xbb" before the recommended players, depth 1
+    - synthetic version 31 with "\xff" before the loading text, depth 1
+    - synthetic version 31 with "\xc3" before the loading text, depth 1
+    - synthetic version 31 with "\xc0\x80" before the loading text, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the loading text, depth 1
+    - synthetic version 31 with "\xef\xbb" before the loading text, depth 1
+    - synthetic version 31 with "\xff" before the loading title, depth 1
+    - synthetic version 31 with "\xc3" before the loading title, depth 1
+    - synthetic version 31 with "\xc0\x80" before the loading title, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the loading title, depth 1
+    - synthetic version 31 with "\xef\xbb" before the loading title, depth 1
+    - synthetic version 31 with "\xff" before the loading subtitle, depth 1
+    - synthetic version 31 with "\xc3" before the loading subtitle, depth 1
+    - synthetic version 31 with "\xc0\x80" before the loading subtitle, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the loading subtitle, depth 1
+    - synthetic version 31 with "\xef\xbb" before the loading subtitle, depth 1
+    - synthetic version 31 with "\xff" before the loading model, depth 1
+    - synthetic version 31 with "\xc3" before the loading model, depth 1
+    - synthetic version 31 with "\xc0\x80" before the loading model, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the loading model, depth 1
+    - synthetic version 31 with "\xef\xbb" before the loading model, depth 1
+    - synthetic version 31 with "\xff" before the sound environment, depth 1
+    - synthetic version 31 with "\xc3" before the sound environment, depth 1
+    - synthetic version 31 with "\xc0\x80" before the sound environment, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before the sound environment, depth 1
+    - synthetic version 31 with "\xef\xbb" before the sound environment, depth 1
+    - synthetic version 31 with "\xff" before a player's name, depth 1
+    - synthetic version 31 with "\xc3" before a player's name, depth 1
+    - synthetic version 31 with "\xc0\x80" before a player's name, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before a player's name, depth 1
+    - synthetic version 31 with "\xef\xbb" before a player's name, depth 1
+    - synthetic version 31 with "\xff" before a force's name, depth 1
+    - synthetic version 31 with "\xc3" before a force's name, depth 1
+    - synthetic version 31 with "\xc0\x80" before a force's name, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before a force's name, depth 1
+    - synthetic version 31 with "\xef\xbb" before a force's name, depth 1
+    - synthetic version 31 with "\xff" before text 1 after the loading screen, depth 1
+    - synthetic version 31 with "\xc3" before text 1 after the loading screen, depth 1
+    - synthetic version 31 with "\xc0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 31 with "\xef\xbb" before text 1 after the loading screen, depth 1
+    - synthetic version 31 with "\xff" before text 2 after the loading screen, depth 1
+    - synthetic version 31 with "\xc3" before text 2 after the loading screen, depth 1
+    - synthetic version 31 with "\xc0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 31 with "\xef\xbb" before text 2 after the loading screen, depth 1
+    - synthetic version 31 with "\xff" before text 3 after the loading screen, depth 1
+    - synthetic version 31 with "\xc3" before text 3 after the loading screen, depth 1
+    - synthetic version 31 with "\xc0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 31 with "\xef\xbb" before text 3 after the loading screen, depth 1
+    - synthetic version 31 with "\xff" before text 4 after the loading screen, depth 1
+    - synthetic version 31 with "\xc3" before text 4 after the loading screen, depth 1
+    - synthetic version 31 with "\xc0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 31 with "\xed\xa0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 31 with "\xef\xbb" before text 4 after the loading screen, depth 1
+    - synthetic version 32 with "\xff" before the name, depth 1
+    - synthetic version 32 with "\xc3" before the name, depth 1
+    - synthetic version 32 with "\xc0\x80" before the name, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the name, depth 1
+    - synthetic version 32 with "\xef\xbb" before the name, depth 1
+    - synthetic version 32 with "\xff" before the author, depth 1
+    - synthetic version 32 with "\xc3" before the author, depth 1
+    - synthetic version 32 with "\xc0\x80" before the author, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the author, depth 1
+    - synthetic version 32 with "\xef\xbb" before the author, depth 1
+    - synthetic version 32 with "\xff" before the description, depth 1
+    - synthetic version 32 with "\xc3" before the description, depth 1
+    - synthetic version 32 with "\xc0\x80" before the description, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the description, depth 1
+    - synthetic version 32 with "\xef\xbb" before the description, depth 1
+    - synthetic version 32 with "\xff" before the recommended players, depth 1
+    - synthetic version 32 with "\xc3" before the recommended players, depth 1
+    - synthetic version 32 with "\xc0\x80" before the recommended players, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the recommended players, depth 1
+    - synthetic version 32 with "\xef\xbb" before the recommended players, depth 1
+    - synthetic version 32 with "\xff" before the loading text, depth 1
+    - synthetic version 32 with "\xc3" before the loading text, depth 1
+    - synthetic version 32 with "\xc0\x80" before the loading text, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the loading text, depth 1
+    - synthetic version 32 with "\xef\xbb" before the loading text, depth 1
+    - synthetic version 32 with "\xff" before the loading title, depth 1
+    - synthetic version 32 with "\xc3" before the loading title, depth 1
+    - synthetic version 32 with "\xc0\x80" before the loading title, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the loading title, depth 1
+    - synthetic version 32 with "\xef\xbb" before the loading title, depth 1
+    - synthetic version 32 with "\xff" before the loading subtitle, depth 1
+    - synthetic version 32 with "\xc3" before the loading subtitle, depth 1
+    - synthetic version 32 with "\xc0\x80" before the loading subtitle, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the loading subtitle, depth 1
+    - synthetic version 32 with "\xef\xbb" before the loading subtitle, depth 1
+    - synthetic version 32 with "\xff" before the loading model, depth 1
+    - synthetic version 32 with "\xc3" before the loading model, depth 1
+    - synthetic version 32 with "\xc0\x80" before the loading model, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the loading model, depth 1
+    - synthetic version 32 with "\xef\xbb" before the loading model, depth 1
+    - synthetic version 32 with "\xff" before the sound environment, depth 1
+    - synthetic version 32 with "\xc3" before the sound environment, depth 1
+    - synthetic version 32 with "\xc0\x80" before the sound environment, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before the sound environment, depth 1
+    - synthetic version 32 with "\xef\xbb" before the sound environment, depth 1
+    - synthetic version 32 with "\xff" before a player's name, depth 1
+    - synthetic version 32 with "\xc3" before a player's name, depth 1
+    - synthetic version 32 with "\xc0\x80" before a player's name, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before a player's name, depth 1
+    - synthetic version 32 with "\xef\xbb" before a player's name, depth 1
+    - synthetic version 32 with "\xff" before a force's name, depth 1
+    - synthetic version 32 with "\xc3" before a force's name, depth 1
+    - synthetic version 32 with "\xc0\x80" before a force's name, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before a force's name, depth 1
+    - synthetic version 32 with "\xef\xbb" before a force's name, depth 1
+    - synthetic version 32 with "\xff" before text 1 after the loading screen, depth 1
+    - synthetic version 32 with "\xc3" before text 1 after the loading screen, depth 1
+    - synthetic version 32 with "\xc0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 32 with "\xef\xbb" before text 1 after the loading screen, depth 1
+    - synthetic version 32 with "\xff" before text 2 after the loading screen, depth 1
+    - synthetic version 32 with "\xc3" before text 2 after the loading screen, depth 1
+    - synthetic version 32 with "\xc0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 32 with "\xef\xbb" before text 2 after the loading screen, depth 1
+    - synthetic version 32 with "\xff" before text 3 after the loading screen, depth 1
+    - synthetic version 32 with "\xc3" before text 3 after the loading screen, depth 1
+    - synthetic version 32 with "\xc0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 32 with "\xef\xbb" before text 3 after the loading screen, depth 1
+    - synthetic version 32 with "\xff" before text 4 after the loading screen, depth 1
+    - synthetic version 32 with "\xc3" before text 4 after the loading screen, depth 1
+    - synthetic version 32 with "\xc0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 32 with "\xed\xa0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 32 with "\xef\xbb" before text 4 after the loading screen, depth 1
+    - synthetic version 33 with "\xff" before the name, depth 1
+    - synthetic version 33 with "\xc3" before the name, depth 1
+    - synthetic version 33 with "\xc0\x80" before the name, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the name, depth 1
+    - synthetic version 33 with "\xef\xbb" before the name, depth 1
+    - synthetic version 33 with "\xff" before the author, depth 1
+    - synthetic version 33 with "\xc3" before the author, depth 1
+    - synthetic version 33 with "\xc0\x80" before the author, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the author, depth 1
+    - synthetic version 33 with "\xef\xbb" before the author, depth 1
+    - synthetic version 33 with "\xff" before the description, depth 1
+    - synthetic version 33 with "\xc3" before the description, depth 1
+    - synthetic version 33 with "\xc0\x80" before the description, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the description, depth 1
+    - synthetic version 33 with "\xef\xbb" before the description, depth 1
+    - synthetic version 33 with "\xff" before the recommended players, depth 1
+    - synthetic version 33 with "\xc3" before the recommended players, depth 1
+    - synthetic version 33 with "\xc0\x80" before the recommended players, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the recommended players, depth 1
+    - synthetic version 33 with "\xef\xbb" before the recommended players, depth 1
+    - synthetic version 33 with "\xff" before the loading text, depth 1
+    - synthetic version 33 with "\xc3" before the loading text, depth 1
+    - synthetic version 33 with "\xc0\x80" before the loading text, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the loading text, depth 1
+    - synthetic version 33 with "\xef\xbb" before the loading text, depth 1
+    - synthetic version 33 with "\xff" before the loading title, depth 1
+    - synthetic version 33 with "\xc3" before the loading title, depth 1
+    - synthetic version 33 with "\xc0\x80" before the loading title, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the loading title, depth 1
+    - synthetic version 33 with "\xef\xbb" before the loading title, depth 1
+    - synthetic version 33 with "\xff" before the loading subtitle, depth 1
+    - synthetic version 33 with "\xc3" before the loading subtitle, depth 1
+    - synthetic version 33 with "\xc0\x80" before the loading subtitle, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the loading subtitle, depth 1
+    - synthetic version 33 with "\xef\xbb" before the loading subtitle, depth 1
+    - synthetic version 33 with "\xff" before the loading model, depth 1
+    - synthetic version 33 with "\xc3" before the loading model, depth 1
+    - synthetic version 33 with "\xc0\x80" before the loading model, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the loading model, depth 1
+    - synthetic version 33 with "\xef\xbb" before the loading model, depth 1
+    - synthetic version 33 with "\xff" before the sound environment, depth 1
+    - synthetic version 33 with "\xc3" before the sound environment, depth 1
+    - synthetic version 33 with "\xc0\x80" before the sound environment, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before the sound environment, depth 1
+    - synthetic version 33 with "\xef\xbb" before the sound environment, depth 1
+    - synthetic version 33 with "\xff" before a player's name, depth 1
+    - synthetic version 33 with "\xc3" before a player's name, depth 1
+    - synthetic version 33 with "\xc0\x80" before a player's name, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before a player's name, depth 1
+    - synthetic version 33 with "\xef\xbb" before a player's name, depth 1
+    - synthetic version 33 with "\xff" before a force's name, depth 1
+    - synthetic version 33 with "\xc3" before a force's name, depth 1
+    - synthetic version 33 with "\xc0\x80" before a force's name, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before a force's name, depth 1
+    - synthetic version 33 with "\xef\xbb" before a force's name, depth 1
+    - synthetic version 33 with "\xff" before text 1 after the loading screen, depth 1
+    - synthetic version 33 with "\xc3" before text 1 after the loading screen, depth 1
+    - synthetic version 33 with "\xc0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 33 with "\xef\xbb" before text 1 after the loading screen, depth 1
+    - synthetic version 33 with "\xff" before text 2 after the loading screen, depth 1
+    - synthetic version 33 with "\xc3" before text 2 after the loading screen, depth 1
+    - synthetic version 33 with "\xc0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 33 with "\xef\xbb" before text 2 after the loading screen, depth 1
+    - synthetic version 33 with "\xff" before text 3 after the loading screen, depth 1
+    - synthetic version 33 with "\xc3" before text 3 after the loading screen, depth 1
+    - synthetic version 33 with "\xc0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 33 with "\xef\xbb" before text 3 after the loading screen, depth 1
+    - synthetic version 33 with "\xff" before text 4 after the loading screen, depth 1
+    - synthetic version 33 with "\xc3" before text 4 after the loading screen, depth 1
+    - synthetic version 33 with "\xc0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 33 with "\xed\xa0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 33 with "\xef\xbb" before text 4 after the loading screen, depth 1
+    - synthetic version 39 as version 28, depth 1
+    - synthetic version 39 as version 31, depth 1
+    - synthetic version 39 as version 32, depth 1
+    - synthetic version 39 as version 33, depth 1
+    - synthetic version 39 with "\xff" before the name, depth 0
+    - synthetic version 39 with "\xff" before the name, depth 1
+    - synthetic version 39 with "\xc3" before the name, depth 0
+    - synthetic version 39 with "\xc3" before the name, depth 1
+    - synthetic version 39 with "\xc0\x80" before the name, depth 0
+    - synthetic version 39 with "\xc0\x80" before the name, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the name, depth 0
+    - synthetic version 39 with "\xed\xa0\x80" before the name, depth 1
+    - synthetic version 39 with "\xef\xbb" before the name, depth 0
+    - synthetic version 39 with "\xef\xbb" before the name, depth 1
+    - synthetic version 39 with "\xff" before the author, depth 0
+    - synthetic version 39 with "\xff" before the author, depth 1
+    - synthetic version 39 with "\xc3" before the author, depth 0
+    - synthetic version 39 with "\xc3" before the author, depth 1
+    - synthetic version 39 with "\xc0\x80" before the author, depth 0
+    - synthetic version 39 with "\xc0\x80" before the author, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the author, depth 0
+    - synthetic version 39 with "\xed\xa0\x80" before the author, depth 1
+    - synthetic version 39 with "\xef\xbb" before the author, depth 0
+    - synthetic version 39 with "\xef\xbb" before the author, depth 1
+    - synthetic version 39 with "\xff" before the description, depth 0
+    - synthetic version 39 with "\xff" before the description, depth 1
+    - synthetic version 39 with "\xc3" before the description, depth 0
+    - synthetic version 39 with "\xc3" before the description, depth 1
+    - synthetic version 39 with "\xc0\x80" before the description, depth 0
+    - synthetic version 39 with "\xc0\x80" before the description, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the description, depth 0
+    - synthetic version 39 with "\xed\xa0\x80" before the description, depth 1
+    - synthetic version 39 with "\xef\xbb" before the description, depth 0
+    - synthetic version 39 with "\xef\xbb" before the description, depth 1
+    - synthetic version 39 with "\xff" before the recommended players, depth 0
+    - synthetic version 39 with "\xff" before the recommended players, depth 1
+    - synthetic version 39 with "\xc3" before the recommended players, depth 0
+    - synthetic version 39 with "\xc3" before the recommended players, depth 1
+    - synthetic version 39 with "\xc0\x80" before the recommended players, depth 0
+    - synthetic version 39 with "\xc0\x80" before the recommended players, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the recommended players, depth 0
+    - synthetic version 39 with "\xed\xa0\x80" before the recommended players, depth 1
+    - synthetic version 39 with "\xef\xbb" before the recommended players, depth 0
+    - synthetic version 39 with "\xef\xbb" before the recommended players, depth 1
+    - synthetic version 39 with "\xff" before the loading text, depth 0
+    - synthetic version 39 with "\xff" before the loading text, depth 1
+    - synthetic version 39 with "\xc3" before the loading text, depth 0
+    - synthetic version 39 with "\xc3" before the loading text, depth 1
+    - synthetic version 39 with "\xc0\x80" before the loading text, depth 0
+    - synthetic version 39 with "\xc0\x80" before the loading text, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the loading text, depth 0
+    - synthetic version 39 with "\xed\xa0\x80" before the loading text, depth 1
+    - synthetic version 39 with "\xef\xbb" before the loading text, depth 0
+    - synthetic version 39 with "\xef\xbb" before the loading text, depth 1
+    - synthetic version 39 with "\xff" before the loading title, depth 0
+    - synthetic version 39 with "\xff" before the loading title, depth 1
+    - synthetic version 39 with "\xc3" before the loading title, depth 0
+    - synthetic version 39 with "\xc3" before the loading title, depth 1
+    - synthetic version 39 with "\xc0\x80" before the loading title, depth 0
+    - synthetic version 39 with "\xc0\x80" before the loading title, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the loading title, depth 0
+    - synthetic version 39 with "\xed\xa0\x80" before the loading title, depth 1
+    - synthetic version 39 with "\xef\xbb" before the loading title, depth 0
+    - synthetic version 39 with "\xef\xbb" before the loading title, depth 1
+    - synthetic version 39 with "\xff" before the loading subtitle, depth 0
+    - synthetic version 39 with "\xff" before the loading subtitle, depth 1
+    - synthetic version 39 with "\xc3" before the loading subtitle, depth 0
+    - synthetic version 39 with "\xc3" before the loading subtitle, depth 1
+    - synthetic version 39 with "\xc0\x80" before the loading subtitle, depth 0
+    - synthetic version 39 with "\xc0\x80" before the loading subtitle, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the loading subtitle, depth 0
+    - synthetic version 39 with "\xed\xa0\x80" before the loading subtitle, depth 1
+    - synthetic version 39 with "\xef\xbb" before the loading subtitle, depth 0
+    - synthetic version 39 with "\xef\xbb" before the loading subtitle, depth 1
+    - synthetic version 39 with "\xff" before the loading model, depth 0
+    - synthetic version 39 with "\xff" before the loading model, depth 1
+    - synthetic version 39 with "\xc3" before the loading model, depth 0
+    - synthetic version 39 with "\xc3" before the loading model, depth 1
+    - synthetic version 39 with "\xc0\x80" before the loading model, depth 0
+    - synthetic version 39 with "\xc0\x80" before the loading model, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the loading model, depth 0
+    - synthetic version 39 with "\xed\xa0\x80" before the loading model, depth 1
+    - synthetic version 39 with "\xef\xbb" before the loading model, depth 0
+    - synthetic version 39 with "\xef\xbb" before the loading model, depth 1
+    - synthetic version 39 with "\xff" before the sound environment, depth 1
+    - synthetic version 39 with "\xc3" before the sound environment, depth 1
+    - synthetic version 39 with "\xc0\x80" before the sound environment, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before the sound environment, depth 1
+    - synthetic version 39 with "\xef\xbb" before the sound environment, depth 1
+    - synthetic version 39 with "\xff" before a player's name, depth 1
+    - synthetic version 39 with "\xc3" before a player's name, depth 1
+    - synthetic version 39 with "\xc0\x80" before a player's name, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before a player's name, depth 1
+    - synthetic version 39 with "\xef\xbb" before a player's name, depth 1
+    - synthetic version 39 with "\xff" before a force's name, depth 1
+    - synthetic version 39 with "\xc3" before a force's name, depth 1
+    - synthetic version 39 with "\xc0\x80" before a force's name, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before a force's name, depth 1
+    - synthetic version 39 with "\xef\xbb" before a force's name, depth 1
+    - synthetic version 39 with "\xff" before text 1 after the loading screen, depth 1
+    - synthetic version 39 with "\xc3" before text 1 after the loading screen, depth 1
+    - synthetic version 39 with "\xc0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before text 1 after the loading screen, depth 1
+    - synthetic version 39 with "\xef\xbb" before text 1 after the loading screen, depth 1
+    - synthetic version 39 with "\xff" before text 2 after the loading screen, depth 1
+    - synthetic version 39 with "\xc3" before text 2 after the loading screen, depth 1
+    - synthetic version 39 with "\xc0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before text 2 after the loading screen, depth 1
+    - synthetic version 39 with "\xef\xbb" before text 2 after the loading screen, depth 1
+    - synthetic version 39 with "\xff" before text 3 after the loading screen, depth 1
+    - synthetic version 39 with "\xc3" before text 3 after the loading screen, depth 1
+    - synthetic version 39 with "\xc0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before text 3 after the loading screen, depth 1
+    - synthetic version 39 with "\xef\xbb" before text 3 after the loading screen, depth 1
+    - synthetic version 39 with "\xff" before text 4 after the loading screen, depth 1
+    - synthetic version 39 with "\xc3" before text 4 after the loading screen, depth 1
+    - synthetic version 39 with "\xc0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 39 with "\xed\xa0\x80" before text 4 after the loading screen, depth 1
+    - synthetic version 39 with "\xef\xbb" before text 4 after the loading screen, depth 1
+
+Cannot read map settings: invalid player records in war3map.w3i.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 28 as version 31, depth 1
+    - synthetic version 28 with the player's id set to -1, depth 1
+    - synthetic version 28 with the player's id set to 24, depth 1
+    - synthetic version 28 with the player's controller set to 0, depth 1
+    - synthetic version 28 with the player's controller set to 5, depth 1
+    - synthetic version 28 with the player's controller set to -1, depth 1
+    - synthetic version 28 with the player's race set to -1, depth 1
+    - synthetic version 28 with the player's race set to 5, depth 1
+    - synthetic version 28 with the player's fixed start set to -1, depth 1
+    - synthetic version 28 with the player's fixed start set to 2, depth 1
+    - synthetic version 28 with the player's x set to 2143289344, depth 1
+    - synthetic version 28 with the player's x set to 2139095040, depth 1
+    - synthetic version 28 with the player's x set to -8388608, depth 1
+    - synthetic version 28 with the player's y set to 2143289344, depth 1
+    - synthetic version 28 with the player's y set to 2139095040, depth 1
+    - synthetic version 28 with the player's y set to -8388608, depth 1
+    - synthetic version 28 with its player twice, depth 1
+    - synthetic version 28 with a wrong player and then a player twice, depth 1
+    - synthetic version 28 with a second player that is wrong, depth 1
+    - synthetic version 31 as version 32, depth 1
+    - synthetic version 31 as version 33, depth 1
+    - synthetic version 31 with the player's id set to -1, depth 1
+    - synthetic version 31 with the player's id set to 24, depth 1
+    - synthetic version 31 with the player's controller set to 0, depth 1
+    - synthetic version 31 with the player's controller set to 5, depth 1
+    - synthetic version 31 with the player's controller set to -1, depth 1
+    - synthetic version 31 with the player's race set to -1, depth 1
+    - synthetic version 31 with the player's race set to 5, depth 1
+    - synthetic version 31 with the player's fixed start set to -1, depth 1
+    - synthetic version 31 with the player's fixed start set to 2, depth 1
+    - synthetic version 31 with the player's x set to 2143289344, depth 1
+    - synthetic version 31 with the player's x set to 2139095040, depth 1
+    - synthetic version 31 with the player's x set to -8388608, depth 1
+    - synthetic version 31 with the player's y set to 2143289344, depth 1
+    - synthetic version 31 with the player's y set to 2139095040, depth 1
+    - synthetic version 31 with the player's y set to -8388608, depth 1
+    - synthetic version 31 with its player twice, depth 1
+    - synthetic version 31 with a wrong player and then a player twice, depth 1
+    - synthetic version 31 with a second player that is wrong, depth 1
+    - synthetic version 32 with the player's id set to -1, depth 1
+    - synthetic version 32 with the player's id set to 24, depth 1
+    - synthetic version 32 with the player's controller set to 0, depth 1
+    - synthetic version 32 with the player's controller set to 5, depth 1
+    - synthetic version 32 with the player's controller set to -1, depth 1
+    - synthetic version 32 with the player's race set to -1, depth 1
+    - synthetic version 32 with the player's race set to 5, depth 1
+    - synthetic version 32 with the player's fixed start set to -1, depth 1
+    - synthetic version 32 with the player's fixed start set to 2, depth 1
+    - synthetic version 32 with the player's x set to 2143289344, depth 1
+    - synthetic version 32 with the player's x set to 2139095040, depth 1
+    - synthetic version 32 with the player's x set to -8388608, depth 1
+    - synthetic version 32 with the player's y set to 2143289344, depth 1
+    - synthetic version 32 with the player's y set to 2139095040, depth 1
+    - synthetic version 32 with the player's y set to -8388608, depth 1
+    - synthetic version 32 with its player twice, depth 1
+    - synthetic version 32 with a wrong player and then a player twice, depth 1
+    - synthetic version 32 with a second player that is wrong, depth 1
+    - synthetic version 33 with the player's id set to -1, depth 1
+    - synthetic version 33 with the player's id set to 24, depth 1
+    - synthetic version 33 with the player's controller set to 0, depth 1
+    - synthetic version 33 with the player's controller set to 5, depth 1
+    - synthetic version 33 with the player's controller set to -1, depth 1
+    - synthetic version 33 with the player's race set to -1, depth 1
+    - synthetic version 33 with the player's race set to 5, depth 1
+    - synthetic version 33 with the player's fixed start set to -1, depth 1
+    - synthetic version 33 with the player's fixed start set to 2, depth 1
+    - synthetic version 33 with the player's x set to 2143289344, depth 1
+    - synthetic version 33 with the player's x set to 2139095040, depth 1
+    - synthetic version 33 with the player's x set to -8388608, depth 1
+    - synthetic version 33 with the player's y set to 2143289344, depth 1
+    - synthetic version 33 with the player's y set to 2139095040, depth 1
+    - synthetic version 33 with the player's y set to -8388608, depth 1
+    - synthetic version 33 with its player twice, depth 1
+    - synthetic version 33 with a wrong player and then a player twice, depth 1
+    - synthetic version 33 with a second player that is wrong, depth 1
+    - synthetic version 39 with the player's id set to -1, depth 1
+    - synthetic version 39 with the player's id set to 24, depth 1
+    - synthetic version 39 with the player's controller set to 0, depth 1
+    - synthetic version 39 with the player's controller set to 5, depth 1
+    - synthetic version 39 with the player's controller set to -1, depth 1
+    - synthetic version 39 with the player's race set to -1, depth 1
+    - synthetic version 39 with the player's race set to 5, depth 1
+    - synthetic version 39 with the player's fixed start set to -1, depth 1
+    - synthetic version 39 with the player's fixed start set to 2, depth 1
+    - synthetic version 39 with the player's x set to 2143289344, depth 1
+    - synthetic version 39 with the player's x set to 2139095040, depth 1
+    - synthetic version 39 with the player's x set to -8388608, depth 1
+    - synthetic version 39 with the player's y set to 2143289344, depth 1
+    - synthetic version 39 with the player's y set to 2139095040, depth 1
+    - synthetic version 39 with the player's y set to -8388608, depth 1
+    - synthetic version 39 with its player twice, depth 1
+    - synthetic version 39 with a wrong player and then a player twice, depth 1
+    - synthetic version 39 with a second player that is wrong, depth 1
+
+Cannot read map settings: invalid player count in war3map.w3i.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 28 as version 33, depth 1
+    - synthetic version 28 with the player count set to -1, depth 1
+    - synthetic version 28 with the player count set to 0, depth 1
+    - synthetic version 28 with the player count set to 25, depth 1
+    - synthetic version 28 with the player count set to 2147483647, depth 1
+    - synthetic version 28 with the player count set to -2147483648, depth 1
+    - synthetic version 31 as version 28, depth 1
+    - synthetic version 31 with the player count set to -1, depth 1
+    - synthetic version 31 with the player count set to 0, depth 1
+    - synthetic version 31 with the player count set to 25, depth 1
+    - synthetic version 31 with the player count set to 2147483647, depth 1
+    - synthetic version 31 with the player count set to -2147483648, depth 1
+    - synthetic version 32 as version 28, depth 1
+    - synthetic version 32 as version 31, depth 1
+    - synthetic version 32 as version 33, depth 1
+    - synthetic version 32 with the player count set to -1, depth 1
+    - synthetic version 32 with the player count set to 0, depth 1
+    - synthetic version 32 with the player count set to 25, depth 1
+    - synthetic version 32 with the player count set to 2147483647, depth 1
+    - synthetic version 32 with the player count set to -2147483648, depth 1
+    - synthetic version 33 as version 28, depth 1
+    - synthetic version 33 as version 31, depth 1
+    - synthetic version 33 as version 32, depth 1
+    - synthetic version 33 with the player count set to -1, depth 1
+    - synthetic version 33 with the player count set to 0, depth 1
+    - synthetic version 33 with the player count set to 25, depth 1
+    - synthetic version 33 with the player count set to 2147483647, depth 1
+    - synthetic version 33 with the player count set to -2147483648, depth 1
+    - synthetic version 39 with the player count set to -1, depth 1
+    - synthetic version 39 with the player count set to 0, depth 1
+    - synthetic version 39 with the player count set to 25, depth 1
+    - synthetic version 39 with the player count set to 2147483647, depth 1
+    - synthetic version 39 with the player count set to -2147483648, depth 1
+
+Cannot read map settings: map settings require Lua script mode.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 28 as version 39, depth 1
+    - synthetic version 28 with the script language set to -1, depth 1
+    - synthetic version 28 with the script language set to 0, depth 1
+    - synthetic version 28 with the script language set to 2, depth 1
+    - synthetic version 28 that is not Lua and has no players, depth 1
+    - synthetic version 31 as version 39, depth 1
+    - synthetic version 31 with the script language set to -1, depth 1
+    - synthetic version 31 with the script language set to 0, depth 1
+    - synthetic version 31 with the script language set to 2, depth 1
+    - synthetic version 31 that is not Lua and has no players, depth 1
+    - synthetic version 32 as version 39, depth 1
+    - synthetic version 32 with the script language set to -1, depth 1
+    - synthetic version 32 with the script language set to 0, depth 1
+    - synthetic version 32 with the script language set to 2, depth 1
+    - synthetic version 32 that is not Lua and has no players, depth 1
+    - synthetic version 33 as version 39, depth 1
+    - synthetic version 33 with the script language set to -1, depth 1
+    - synthetic version 33 with the script language set to 0, depth 1
+    - synthetic version 33 with the script language set to 2, depth 1
+    - synthetic version 33 that is not Lua and has no players, depth 1
+    - synthetic version 39 with the script language set to -1, depth 1
+    - synthetic version 39 with the script language set to 0, depth 1
+    - synthetic version 39 with the script language set to 2, depth 1
+    - synthetic version 39 that is not Lua and has no players, depth 1
+
+Cannot read map settings: invalid force count in war3map.w3i.
+    file: map/war3map.w3i
+    hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
+    - synthetic version 28 with the force count set to -1, depth 1
+    - synthetic version 28 with the force count set to 0, depth 1
+    - synthetic version 28 with the force count set to 25, depth 1
+    - synthetic version 28 with the force count set to 2147483647, depth 1
+    - synthetic version 28 with the force count set to -2147483648, depth 1
+    - synthetic version 31 with the force count set to -1, depth 1
+    - synthetic version 31 with the force count set to 0, depth 1
+    - synthetic version 31 with the force count set to 25, depth 1
+    - synthetic version 31 with the force count set to 2147483647, depth 1
+    - synthetic version 31 with the force count set to -2147483648, depth 1
+    - synthetic version 32 with the force count set to -1, depth 1
+    - synthetic version 32 with the force count set to 0, depth 1
+    - synthetic version 32 with the force count set to 25, depth 1
+    - synthetic version 32 with the force count set to 2147483647, depth 1
+    - synthetic version 32 with the force count set to -2147483648, depth 1
+    - synthetic version 33 with the force count set to -1, depth 1
+    - synthetic version 33 with the force count set to 0, depth 1
+    - synthetic version 33 with the force count set to 25, depth 1
+    - synthetic version 33 with the force count set to 2147483647, depth 1
+    - synthetic version 33 with the force count set to -2147483648, depth 1
+    - synthetic version 39 with the force count set to -1, depth 1
+    - synthetic version 39 with the force count set to 0, depth 1
+    - synthetic version 39 with the force count set to 25, depth 1
+    - synthetic version 39 with the force count set to 2147483647, depth 1
+    - synthetic version 39 with the force count set to -2147483648, depth 1
+
+war3map.w3i is truncated.
+    - a header of two bytes
+
+Invalid or overlapping map-info edits.
+    - edits that overlap
+

@@ -131,6 +131,17 @@ func TestOracleLeavesOutOnlyWhatTheTreesReadDifferently(t *testing.T) {
 	}
 }
 
+// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every file
+// the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test alone.
+func TestOracleOnTheRecordedRefusals(t *testing.T) {
+	var said []testkit.Refusal
+	for _, file := range refusingFiles() {
+		_, err := oldassets.ReadImports(file.data, indexFile)
+		said = append(said, oracle.RefusalOf(file.name, err))
+	}
+	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
+}
+
 func TestOracleOnTheFixture(t *testing.T) {
 	c := &comparison{t: t}
 	saved := testkit.Fixture(t, "imports-we3/war3map-flag29.imp")

@@ -228,46 +228,6 @@ func TestInvalidStringsCountsPlayerFieldsAndScriptModeAreFileErrors(t *testing.T
 	}
 }
 
-func TestARefusalSaysWhatIsWrongWithTheFileAndHowToPutItRight(t *testing.T) {
-	source := testkit.SyntheticMapInfo(39)
-	info := mustRead(t, source, w3i.Extended)
-	player, force := info.Details.Players[0], info.Details.Forces[0]
-	const luaHint = "Open and re-save this map in World Editor; extended settings require Lua script mode."
-	const plainHint = "Open and re-save this map in World Editor."
-	for _, c := range []struct {
-		data          []byte
-		problem, hint string
-	}{
-		{testkit.SetU32(source, 0, 40), "unsupported war3map.w3i version 40", luaHint},
-		{source[:2], "truncated war3map.w3i", luaHint},
-		{source[:info.Name.Start+3], "unterminated string in war3map.w3i", luaHint},
-		{testkit.SyntheticMapInfo(18), "player, force and environment overrides require w3i version 28 or later", luaHint},
-		{testkit.SetU32(source, info.Details.SoundEnvironment.End+5, 0), "map settings require Lua script mode", luaHint},
-		{testkit.SetU32(source, player.ID.Start-4, 0), "invalid player count in war3map.w3i", luaHint},
-		{testkit.SetU32(source, player.Controller.Start, 0), "invalid player records in war3map.w3i", luaHint},
-		{testkit.SetU32(source, force.Flags.Start-4, 0), "invalid force count in war3map.w3i", luaHint},
-		// Lua script mode has no part in a text that is not UTF-8.
-		{inserted(source, info.Name.Start, 0xff), "invalid UTF-8 in war3map.w3i", plainHint},
-	} {
-		_, err := w3i.Read(c.data, mapInfoFile, w3i.Extended)
-		want := diag.Error{Msg: "Cannot read map settings: " + c.problem + ".", File: mapInfoFile, Hint: c.hint}
-		var failure *diag.Error
-		if !errors.As(err, &failure) || *failure != want {
-			t.Errorf("got %+v, want %+v", err, want)
-		}
-	}
-	// ReadHeader is given no name, so its error has none, and no hint.
-	_, err := w3i.ReadHeader([]byte{1, 2})
-	var failure *diag.Error
-	if !errors.As(err, &failure) || *failure != (diag.Error{Msg: "war3map.w3i is truncated."}) {
-		t.Errorf("ReadHeader of two bytes: %+v", err)
-	}
-	if _, err := w3i.ApplyEdits(source, []w3i.Edit{edit(4, 8, ""), edit(6, 9, "")}); err == nil ||
-		err.Error() != "Invalid or overlapping map-info edits." {
-		t.Errorf("ApplyEdits of overlapping edits: %v", err)
-	}
-}
-
 func TestAPlayerRecordTakesEveryValueOfItsRangesAndNoOther(t *testing.T) {
 	source := testkit.SyntheticMapInfo(39)
 	for _, c := range []struct {

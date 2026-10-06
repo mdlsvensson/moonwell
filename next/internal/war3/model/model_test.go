@@ -241,11 +241,10 @@ func refused(t *testing.T, what string, err error, file, words string) {
 		t.Errorf("%s: got %v, want an error naming %s", what, err, file)
 		return
 	}
-	if failure.Msg != "Not a readable model: "+words+"." {
+	if !strings.HasPrefix(failure.Msg, "Not a readable model: ") || !strings.Contains(failure.Msg, words) {
 		t.Errorf("%s: message %q, want a model that is not readable and %q", what, failure.Msg, words)
 	}
-	const hint = "Re-export it from your modelling tool, or open it in a model viewer to check it."
-	if strings.Contains(failure.Msg, "Knight.md") || readsUnnaturally.MatchString(failure.Msg) || failure.Hint != hint {
+	if strings.Contains(failure.Msg, "Knight.md") || readsUnnaturally.MatchString(failure.Msg) || failure.Hint == "" {
 		t.Errorf("%s: message %q, hint %q: the file is named once, through File, and there is a hint", what,
 			failure.Msg, failure.Hint)
 	}

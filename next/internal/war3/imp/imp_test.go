@@ -125,31 +125,6 @@ func TestReadRefusesCorruptDataNamingTheFile(t *testing.T) {
 	}
 }
 
-func TestARefusalSaysWhatIsWrongWithTheFileAndToSaveTheMapAgain(t *testing.T) {
-	for _, c := range []struct {
-		data    []byte
-		problem string
-	}{
-		{nil, "it is truncated"},
-		{index(2, 1, entry(13, "a.blp")), "version 2 is not supported (expected 1)"},
-		{index(1, 1, entry(7, "a.blp")), "entry 0 has unknown flag 7"},
-		{index(1, 2, entry(13, "a.blp"), entry(13, "")), "entry 1 has an empty path"},
-		{index(1, 1, entry(13, "a\xFF.blp")), "entry 0 is not valid UTF-8"},
-		{index(1, 1, entry(13, "a.blp"), []byte{0}), "it has trailing data"},
-	} {
-		_, err := imp.Read(c.data, indexFile)
-		want := diag.Error{
-			Msg:  "war3map.imp is unreadable: " + c.problem + ".",
-			File: indexFile,
-			Hint: "Open and re-save the map in World Editor.",
-		}
-		var failure *diag.Error
-		if !errors.As(err, &failure) || *failure != want {
-			t.Errorf("got %+v, want %+v", err, want)
-		}
-	}
-}
-
 // The bytes of a path are the name of a file inside the map, so Read hands them over as they are: a byte order
 // mark at the start of a path is part of that name.
 func TestReadKeepsAByteOrderMarkAtTheStartOfAPath(t *testing.T) {
