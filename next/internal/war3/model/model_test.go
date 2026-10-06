@@ -145,6 +145,12 @@ func binaryModels() []binaryModel {
 			{Kind: model.Popcorn, Path: `Effects\Smoke.pkb`},
 			{Kind: model.FaceEffect, Path: "a.facefx"},
 		}},
+		// A slot is a number without a sign: the highest is 4294967295, and no negative one.
+		{"a texture of the highest slot", testkit.MDX(testkit.Chunk("TEXS", testkit.Concat(
+			testkit.Texture("", 0xFFFFFFFF), testkit.Texture("", 0x80000000),
+		))), []model.Path{
+			{Kind: model.Texture, ReplaceableID: 0xFFFFFFFF}, {Kind: model.Texture, ReplaceableID: 0x80000000},
+		}},
 		// Only the two bits say what an emitter emits: every other bit of its flags says nothing of it.
 		{"emitters with other flags than the two", testkit.MDX(testkit.Chunk("PREM", testkit.Concat(
 			testkit.Emitter("a.mdx", 1),
@@ -455,12 +461,14 @@ func statementTexts() []textModel {
 		{"a slot that is not a whole number", "Bitmap { ReplaceableId 1.5, ReplaceableId +2, ReplaceableId 0x3, ReplaceableId -, }",
 			texture("", 0)},
 		{"a slot written as a string", `Bitmap { ReplaceableId "1", }`, texture("", 0)},
+		{"a slot with two minus signs is no whole number", "Bitmap { ReplaceableId 2, ReplaceableId --5, }", texture("", 2)},
 		{"a slot that is kept when a later one is no whole number",
 			"Bitmap { ReplaceableId 2, ReplaceableId 1.5, ReplaceableId -, ReplaceableId x1, ReplaceableId 1x, }",
 			texture("", 2)},
 		{"a number after a word that is not ReplaceableId", "Bitmap { Other 7, Image 8, }", texture("", 0)},
-		{"a character that is no white space of ASCII is part of its word", "Bitmap { Image~ \"a.blp\", ~Image \"b.blp\", }",
-			texture("", 0)},
+		// A word ends at white space, a brace, a comma or a quote. A tilde is none of them, so Image~ and ~Image
+		// are words of their own, and no Image statement.
+		{"a tilde is part of the word it stands in", "Bitmap { Image~ \"a.blp\", ~Image \"b.blp\", }", texture("", 0)},
 		{"an image written as a word", "Bitmap { Image a.blp, }", texture("", 0)},
 		{"a statement of three words", `Bitmap { static Image "a.blp", Image "b.blp" 1, }`, texture("", 0)},
 		{"a statement that starts with a string", `Bitmap { "Image" "a.blp", }`, texture("", 0)},
