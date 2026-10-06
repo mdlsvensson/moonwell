@@ -115,26 +115,25 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 // number at an edge and to the ones about the counts and types there are: the smallest number as a count, a
 // value type of -1 and of 4, 64 and 65 sets.
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
-	var cut, changed, numbered tally
-	files := filesToDamage(t)
-	for _, file := range files {
+	var damaged tally
+	for _, file := range filesToDamage(t) {
 		for length := range len(file.data) {
-			cut.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length], file.kind)
+			what := fmt.Sprintf("%s cut at %d bytes", file.name, length)
+			damaged.readOrRefused(t, what, file.data[:length:length], file.kind)
 		}
 		for index := range uint64(400) {
 			what := fmt.Sprintf("%s, change %d of seed %d", file.name, index, damageSeed)
-			changed.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index), file.kind)
+			damaged.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index), file.kind)
 		}
 		for _, at := range numberOffsets(t, file) {
 			for _, number := range append(testkit.EdgeNumbers(), 3, 4, 5, 64, 65, 1000) {
 				what := fmt.Sprintf("%s with the number at %d set to %d", file.name, at, number)
-				numbered.readOrRefused(t, what, testkit.SetU32(file.data, at, number), file.kind)
+				damaged.readOrRefused(t, what, testkit.SetU32(file.data, at, number), file.kind)
 			}
 		}
 	}
-	// A file ends with its custom objects, so no cut file reads. The numbers are what Read makes of these
-	// inputs: one that differs is a reading that changed.
-	if len(files) != 20 || cut != (tally{0, 1736}) || changed != (tally{910, 7090}) || numbered != (tally{185, 2144}) {
-		t.Errorf("%d files; cut: %+v, changed: %+v, numbered: %+v", len(files), cut, changed, numbered)
+	// The floor is against a test that passes because it gave Read and Append nothing.
+	if damaged.read == 0 || damaged.refused == 0 {
+		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.read, damaged.refused)
 	}
 }

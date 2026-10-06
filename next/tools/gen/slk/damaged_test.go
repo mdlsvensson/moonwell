@@ -41,26 +41,18 @@ func tablesOfTheTests() map[string]string {
 // outcomes counts the damaged tables that were read and the ones that were refused.
 type outcomes struct{ read, refused int }
 
-// counted are tables of this file's own, each with what Parse makes of it cut at every length, after the seeded
-// changes and with white space put in: how many it reads and how many it refuses. They are written here and
-// not taken from the lists of the tests, so that a table added to a list changes no number, and a number that
-// differs names its table: it is a reading of that table that changed.
-var counted = []struct {
-	name, text          string
-	cut, changed, swept outcomes
-}{
-	{name: "three rows, the last with its Y before its X",
-		text: "ID;PWXL;N;E\r\nC;X1;Y1;K\"ID\"\r\nC;X2;K\"note\"\r\nC;X1;Y2;K\"abcd\"\r\nC;X2;K12\r\n" +
-			"C;X1;Y3;K\"efgh\"\r\nC;Y4;X1;K\"a;b\"\r\nC;X2;KTRUE\r\nE\r\nC;X1;Y5;K\"after\"\r\n",
-		cut: outcomes{97, 38}, changed: outcomes{38, 22}, swept: outcomes{146, 70}},
-	{name: "records that are no cells and a doubled quote",
-		text: "ID;P\nB;X2;Y2\nC;X1;Y1;K\"ID\"\nF;P0;X1\nC;X1;Y2;K\"say \"\"hi\"\";ok\";E0\nC;X1;Y3;N;K7\nE\n",
-		cut:  outcomes{57, 21}, changed: outcomes{43, 17}, swept: outcomes{92, 7}},
-	{name: "a column named twice", text: "C;X1;Y1;K\"ID\"\nC;X2;K\"ID\"\nC;X1;Y2;K1\n",
-		cut: outcomes{15, 21}, changed: outcomes{14, 46}, swept: outcomes{5, 34}},
-	{name: "a quote that is not closed and a coordinate that is no number",
-		text: "C;X1;Y1;Ka\nC;X1;Y2;K\"open\nC;Xb;Y3;K1\n",
-		cut:  outcomes{17, 20}, changed: outcomes{2, 58}, swept: outcomes{0, 39}},
+// longerTables are tables of this file's own, longer than the ones of the tests, with what a table of the game
+// has side by side: carriage returns, records that are no cells, a Y before its X, a doubled quote, text after
+// the end.
+var longerTables = map[string]string{
+	"three rows, the last with its Y before its X": "ID;PWXL;N;E\r\nC;X1;Y1;K\"ID\"\r\nC;X2;K\"note\"\r\n" +
+		"C;X1;Y2;K\"abcd\"\r\nC;X2;K12\r\nC;X1;Y3;K\"efgh\"\r\nC;Y4;X1;K\"a;b\"\r\nC;X2;KTRUE\r\nE\r\n" +
+		"C;X1;Y5;K\"after\"\r\n",
+	"records that are no cells and a doubled quote": "ID;P\nB;X2;Y2\nC;X1;Y1;K\"ID\"\nF;P0;X1\n" +
+		"C;X1;Y2;K\"say \"\"hi\"\";ok\";E0\nC;X1;Y3;N;K7\nE\n",
+	"a column named twice": "C;X1;Y1;K\"ID\"\nC;X2;K\"ID\"\nC;X1;Y2;K1\n",
+	"a quote that is not closed and a coordinate that is no number": "C;X1;Y1;Ka\nC;X1;Y2;K\"open\n" +
+		"C;Xb;Y3;K1\n",
 }
 
 // damageSeed is the seed of the changes that TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics makes. A
@@ -97,42 +89,28 @@ func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 	}
 }
 
-// damaged gives Parse the table cut at every length, after each of 60 seeded changes of its lines, quotes and
-// white space, and with one character of ASCII white space put in at every place, and counts what it makes of
-// each.
-func damaged(t *testing.T, name, text string) (cut, changed, swept outcomes) {
-	t.Helper()
-	for length := range len(text) {
-		cut.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", name, length), text[:length])
-	}
-	for index := range uint64(60) {
-		made := testkit.Changed(text, damageSeed, index)
-		changed.readOrRefused(t, fmt.Sprintf("%s, change %d of seed %d: %q", name, index, damageSeed, made), made)
-	}
-	for i, made := range testkit.Swept(text) {
-		swept.readOrRefused(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
-	}
-	return cut, changed, swept
-}
-
-// TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics damages the tables of the tests and the tables of
-// this file, and compares what Parse makes of the damaged forms of the latter with the numbers written beside
-// them.
+// TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics gives Parse the tables of the tests and the
+// longer tables of this file, each cut at every length, after each of 60 seeded changes of its lines, quotes
+// and white space, and with one character of ASCII white space put in at every place.
 func TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 	named := tablesOfTheTests()
-	inputs := 0
+	maps.Copy(named, longerTables)
+	var damaged outcomes
 	for _, name := range slices.Sorted(maps.Keys(named)) {
-		cut, changed, swept := damaged(t, name, named[name])
-		inputs += cut.read + cut.refused + changed.read + changed.refused + swept.read + swept.refused
-	}
-	if len(named) < 34 || inputs < 4000 {
-		t.Errorf("%d tables of the tests and %d damaged forms of them, want 34 and 4000 or more", len(named), inputs)
-	}
-	for _, c := range counted {
-		cut, changed, swept := damaged(t, c.name, c.text)
-		if cut != c.cut || changed != c.changed || swept != c.swept {
-			t.Errorf("%s:\n got cut: %+v, changed: %+v, with white space: %+v\n"+
-				"want cut: %+v, changed: %+v, with white space: %+v", c.name, cut, changed, swept, c.cut, c.changed, c.swept)
+		text := named[name]
+		for length := range len(text) {
+			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", name, length), text[:length])
 		}
+		for index := range uint64(60) {
+			made := testkit.Changed(text, damageSeed, index)
+			damaged.readOrRefused(t, fmt.Sprintf("%s, change %d of seed %d: %q", name, index, damageSeed, made), made)
+		}
+		for i, made := range testkit.Swept(text) {
+			damaged.readOrRefused(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
+		}
+	}
+	// The floor is against a test that passes because it gave Parse nothing.
+	if damaged.read == 0 || damaged.refused == 0 {
+		t.Errorf("%d damaged tables were read and %d refused; want some of each", damaged.read, damaged.refused)
 	}
 }

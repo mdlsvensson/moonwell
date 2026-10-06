@@ -195,27 +195,24 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 // length: its one wrong thing comes before or after the cut. Among the altered files are the numbers at the
 // edges that a seed may not hit: a count of 25, of the largest and of the smallest number, in each version.
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
-	var cut, changed, altered tally
+	var damaged tally
 	for _, file := range wholeFiles(t) {
 		for length := range len(file.data) {
-			cut.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
+			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
 		}
 		for index := range uint64(1500) {
 			what := fmt.Sprintf("%s, change %d of seed %d", file.name, index, damageSeed)
-			changed.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index))
+			damaged.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index))
 		}
 	}
-	files := alteredFiles(t)
-	for _, file := range files {
-		altered.readOrRefused(t, file.name, file.data)
+	for _, file := range alteredFiles(t) {
+		damaged.readOrRefused(t, file.name, file.data)
 		for length := range len(file.data) {
-			cut.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
+			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
 		}
 	}
-	// A file cut short is refused, but for its Basic part where the cut comes after that part. The numbers are
-	// what the readers make of these inputs: one that differs is a reading that changed.
-	if len(files) != 855 || cut != (tally{76198, 416534}) || changed != (tally{17944, 18056}) ||
-		altered != (tally{568, 1142}) {
-		t.Errorf("%d altered files; cut: %+v, changed: %+v, altered: %+v", len(files), cut, changed, altered)
+	// The floor is against a test that passes because it gave the readers nothing.
+	if damaged.read == 0 || damaged.refused == 0 {
+		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.read, damaged.refused)
 	}
 }

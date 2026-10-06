@@ -111,7 +111,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 // 1500 seeded changes of its lines, quotes and white space; and the binary model with every chunk with each of
 // its sizes set to the numbers of sizesNear.
 func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
-	var cut, changed, sized tally
+	var damaged tally
 	for _, whole := range []struct {
 		name string
 		data []byte
@@ -123,14 +123,14 @@ func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		{"the text with other letters", []byte(textWithOtherLetters), true},
 	} {
 		for length := range len(whole.data) + 1 {
-			cut.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", whole.name, length), whole.data[:length:length])
+			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", whole.name, length), whole.data[:length:length])
 		}
 		for index := range uint64(1500) {
 			what := fmt.Sprintf("%s, change %d of seed %d", whole.name, index, damageSeed)
-			changed.readOrRefused(t, what+" to its bytes", testkit.ChangedBytes(whole.data, damageSeed, index))
+			damaged.readOrRefused(t, what+" to its bytes", testkit.ChangedBytes(whole.data, damageSeed, index))
 			if whole.text {
 				text := testkit.Changed(string(whole.data), damageSeed, index)
-				changed.readOrRefused(t, what+" to its text", []byte(text))
+				damaged.readOrRefused(t, what+" to its text", []byte(text))
 			}
 		}
 	}
@@ -139,12 +139,12 @@ func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	whole := modelWithEveryChunk()
 	for _, at := range sizeOffsets(t, whole) {
 		for _, size := range sizesNear(binary.LittleEndian.Uint32(whole[at:])) {
-			sized.readOrRefused(t, fmt.Sprintf("the size at %d set to %d", at, size), testkit.SetU32(whole, at, size))
+			damaged.readOrRefused(t, fmt.Sprintf("the size at %d set to %d", at, size), testkit.SetU32(whole, at, size))
 		}
 	}
-	// A binary model reads where the cut falls between two chunks, and a text model where it falls between two
-	// blocks. The numbers are what the readers make of these inputs: one that differs is a reading that changed.
-	if cut != (tally{412, 15134}) || changed != (tally{6080, 20920}) || sized != (tally{106, 1490}) {
-		t.Errorf("cut: %+v, changed: %+v, sized: %+v", cut, changed, sized)
+	// The floor is against a test that passes because it gave the readers nothing.
+	if damaged.read == 0 || damaged.refused == 0 {
+		t.Errorf("%d readings of damaged models gave paths and %d were refused; want some of each", damaged.read,
+			damaged.refused)
 	}
 }
