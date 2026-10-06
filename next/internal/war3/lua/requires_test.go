@@ -49,6 +49,16 @@ func TestRequires(t *testing.T) {
 			nil,
 		},
 		{
+			"a require after a word that declares nothing is the global",
+			"return require(\"m\")\nx = y and require \"n\"",
+			[]Require{lit(1, "m"), lit(2, "n")},
+		},
+		{"a function named require that starts the source", "function require(name) end", nil},
+		{"a local named require, whatever follows it", "local require(\"m\")", nil},
+		{"a require that ends the source is not called", "x = require", nil},
+		{"a require whose bracket ends the source is called without a string", "require(", []Require{{Line: 1}}},
+		{"a require whose string ends the source is called without a string", `require("m"`, []Require{{Line: 1}}},
+		{
 			"a concatenation before it is not a field access",
 			`local s = "a" .. require("b")`,
 			[]Require{lit(1, "b")},

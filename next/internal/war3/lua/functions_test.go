@@ -45,8 +45,8 @@ func refused(t *testing.T, c refusal) {
 		t.Errorf("Functions accepted, or failed with %v:\n%s", err, c.source)
 		return
 	}
-	if e.File != "map.lua" || !strings.Contains(e.Hint, "World Editor") ||
-		!strings.Contains(e.Msg, "Cannot safely read map Lua") || !strings.Contains(e.Msg, c.words) {
+	if e.File != "map.lua" || e.Hint != "Re-save the map in World Editor to restore its generated Lua structure." ||
+		e.Msg != "Cannot safely read map Lua: "+c.words {
 		t.Errorf("error = %+v, want the words %q, for:\n%s", e, c.words, c.source)
 	}
 	if e.Line != c.line || e.Column != c.column {
@@ -89,11 +89,76 @@ func TestOnlyDirectStandaloneCallsBelongToAnEditorFunction(t *testing.T) {
 	}
 }
 
+// visibleAlone reports whether the source is the function config with the one call of Visible, and then main.
+func visibleAlone(source string) bool {
+	functions, err := Functions(source+"\nfunction main() end", "")
+	return err == nil && len(functions) == 2 && functions[0].Name == "config" &&
+		slices.Equal(callNames(functions[0]), []string{"Visible"})
+}
+
+func TestAParameterListIsNamesWithCommasBetweenThemAndMayEndWithThreeDots(t *testing.T) {
+	for _, parameters := range []string{"", "only", "first, second", "first, second, third", "...", "first, ..."} {
+		if source := "function config(" + parameters + ") Visible() end"; !visibleAlone(source) {
+			t.Errorf("the parameters %q are not read:\n%s", parameters, source)
+		}
+	}
+	for _, c := range []refusal{
+		{"function config(first,) end", "expected a name", 1, 23},
+		{"function config(first second) end", "expected ')'", 1, 23},
+		{"function config(..., last) end", "expected ')'", 1, 20},
+		{"function config(first, 2) end", "expected a name", 1, 24},
+	} {
+		refused(t, c)
+	}
+}
+
+func TestAReturnHasValuesOrNoneAndASemicolonOrNoneAndEndsItsBlock(t *testing.T) {
+	for _, returned := range []string{"return", "return;", "return 1", "return 1;", "return Hidden(), 2;",
+		"if a then return end", "if a then return; else return 1, 2 end", "repeat return until a"} {
+		if source := "function config() Visible() " + returned + " end"; !visibleAlone(source) {
+			t.Errorf("%q is not read:\n%s", returned, source)
+		}
+	}
+	for _, c := range []refusal{
+		{"function config() return; Visible() end", "return must end its block", 1, 27},
+		{"function config() return 1; Visible() end", "return must end its block", 1, 29},
+		{"function config() return;; end", "return must end its block", 1, 26},
+	} {
+		refused(t, c)
+	}
+}
+
+// lowestOperator has `or`, the operator that binds least, in every place where an expression stands.
+const lowestOperator = `function config()
+if a or b then Hidden() elseif c or d then Hidden() end
+while a or b do break end
+for i = a or 1, b or 2, c or 3 do end
+for k in a or b, c or d do end
+repeat until a or b
+local t = {a or b, [a or b] = c or d; name = a or b}
+x, y = t[a or b], c or d
+x = - - not # ~ 1 ^ - 2 or ~ b
+Visible(a or b, c or d);
+(a or b)(c or d)
+return a or b, c or d
+end`
+
+func TestAnExpressionIsReadWholeWhereverItStands(t *testing.T) {
+	if !visibleAlone(lowestOperator) {
+		t.Fatalf("the source is not read as config with one call of Visible:\n%s", lowestOperator)
+	}
+	call := mustFunctions(t, lowestOperator)[0].Calls[0]
+	if len(call.Args) != 2 || !slices.Equal(raws(call.Args[0]), []string{"a", "or", "b"}) ||
+		!slices.Equal(raws(call.Args[1]), []string{"c", "or", "d"}) {
+		t.Errorf("the arguments of Visible are %+v", call.Args)
+	}
+}
+
 // ambiguousStructures are sources whose blocks, strings or statements do not close as Lua's do.
 var ambiguousStructures = []refusal{
 	{"function config()", "unterminated block", 1, 18},
 	{`function config() X("unterminated) end`, "unterminated quoted string", 1, 21},
-	{"function config() X([=[unterminated) end", "unterminated long string", 1, 21},
+	{"function config() X([=[unterminated) end", "unterminated long string or comment", 1, 21},
 	{"--[=[ no close", "unterminated long string or comment", 1, 1},
 	{"function config() X({) end", "expected a name", 1, 22},
 	{"function config() if true then X() end", "unterminated block", 1, 39},
@@ -105,7 +170,7 @@ var ambiguousStructures = []refusal{
 	{"function config() X() + Y() end", "expected a name", 1, 23},
 	{"function config() X(0x) end", "invalid numeral", 1, 21},
 	{"function config() X(1e+) end", "invalid numeral", 1, 21},
-	{"function config() X('line\nbreak') end", "unescaped newline", 1, 21},
+	{"function config() X('line\nbreak') end", "unescaped newline in quoted string", 1, 21},
 	{"function config() return X() Y() end", "return must end its block", 1, 30},
 	{"end", "expected a name", 1, 1},
 	{"until X()", "expected a name", 1, 1},
@@ -292,9 +357,10 @@ func TestRealWorldEditorLuaExposesTheExpectedSettingsFunctionsAndCalls(t *testin
 var deepNesting = []refusal{
 	{
 		"function config() Capture(" + strings.Repeat("(", 20000) + "1" + strings.Repeat(")", 20000) + ") end",
-		"nesting is too deep", 1, 225,
+		"nesting is too deep to establish safe edit boundaries", 1, 225,
 	},
-	{strings.Repeat("do ", 20000) + strings.Repeat("end ", 20000), "nesting is too deep", 1, 601},
+	{strings.Repeat("do ", 20000) + strings.Repeat("end ", 20000),
+		"nesting is too deep to establish safe edit boundaries", 1, 601},
 }
 
 func TestDeeplyNestedInputFailsSafely(t *testing.T) {

@@ -372,6 +372,9 @@ func TestHashStringTakesOnlyASCIILettersForTheSameInEitherCase(t *testing.T) {
 		{"stra\xC3\x9Fe", "STRASSE", false},          // a sharp s, whose capital is SS
 		{"(l\xC4\xB1stfile)", "(LISTFILE)", false},   // a dotless i, whose capital is I
 		{"`{.txt", "@[.txt", false},                  // the bytes just outside a to z
+		{"{.txt", "[.txt", false},                    // the byte after z alone
+		{"`.txt", "@.txt", false},                    // the byte before a alone
+		{"z.txt", "Z.txt", true},                     // and the last letter itself
 		{"a/b.txt", `a\b.txt`, false},                // a slash is not a backslash
 		{"\xE1\xFA", "\xC1\xDA", false},              // Latin-1 letters as single bytes
 		{"war3map.lua", "war3map.lua\x00", false},    // every byte counts
@@ -409,6 +412,54 @@ func TestEncryptBlockAndDecryptBlockRoundTrip(t *testing.T) {
 	}
 	mpq.EncryptBlock(nil, 1)
 	mpq.DecryptBlock(nil, 1)
+}
+
+// The cipher is the format's: a reader that is not this package decrypts what this package encrypts. A round
+// trip holds only that the two halves agree, so the words themselves are written down here, for five keys and
+// a block whose plain words have every bit set and none.
+func TestEncryptBlockGivesTheWordsOfTheFormat(t *testing.T) {
+	plain := []uint32{0, 0, 1, 0xFFFFFFFF, 0x12345678, 0x80000000, 0x7FFFFFFF, 0xDEADBEEF}
+	for _, c := range []struct {
+		key   uint32
+		words []uint32
+	}{
+		{0, []uint32{0x08299586, 0x299f8910, 0xc51029e4, 0x4454b063, 0x7732f56a, 0x4c1a3a79, 0xd395b7b7, 0x95f1542a}},
+		{1, []uint32{0x4385e6c4, 0xd06601ed, 0x48c5ba63, 0xc9ec8c46, 0xbe471cb7, 0x811bd9d6, 0xfe602cba, 0x19ee6b8d}},
+		{0xFFFFFFFF,
+			[]uint32{0x61f21759, 0x24582b08, 0xfe53e896, 0x158573cd, 0xfe41e2cb, 0x8f0c63cd, 0x425c3b1f, 0xe80a8161}},
+		{mpq.HashTableKey,
+			[]uint32{0x863ccfcc, 0x67cd26d8, 0x60908c64, 0xe94e844e, 0x69cfb8b4, 0xc787c318, 0x3d543fe5, 0x9f5036de}},
+		{mpq.BlockTableKey,
+			[]uint32{0x3d48678b, 0xca08d381, 0xf835b6b2, 0x97cd1655, 0x20a55098, 0xfd895654, 0xec43183c, 0xcba8c74f}},
+	} {
+		words := slices.Clone(plain)
+		mpq.EncryptBlock(words, c.key)
+		if !slices.Equal(words, c.words) {
+			t.Errorf("key %#x encrypts to %#x, want %#x", c.key, words, c.words)
+		}
+		mpq.DecryptBlock(words, c.key)
+		if !slices.Equal(words, plain) {
+			t.Errorf("key %#x decrypts to %#x, want %#x", c.key, words, plain)
+		}
+	}
+}
+
+// The hashes of names that every reader of the format knows: the list of files, and a script and a model.
+func TestHashStringGivesTheHashesOfTheFormat(t *testing.T) {
+	for _, c := range []struct {
+		name                          string
+		offset, nameA, nameB, fileKey uint32
+	}{
+		{"(listfile)", 0x5f3de859, 0xfd657910, 0x4e9b98a7, 0x2d2f0a94},
+		{"war3map.j", 0x0cca3be6, 0xc99707e7, 0x95b8144e, 0x54556402},
+		{`Units\Human\Footman.mdx`, 0xf934cca5, 0x5f1e03ba, 0xe17e4df7, 0x01ed4733},
+	} {
+		got := [4]uint32{mpq.HashString(c.name, mpq.TableOffset), mpq.HashString(c.name, mpq.NameA),
+			mpq.HashString(c.name, mpq.NameB), mpq.HashString(c.name, mpq.FileKey)}
+		if got != [4]uint32{c.offset, c.nameA, c.nameB, c.fileKey} {
+			t.Errorf("the hashes of %s are %#x", c.name, got)
+		}
+	}
 }
 
 // ---- Write ----
@@ -494,10 +545,10 @@ func TestWriteRejectsCaseInsensitiveDuplicates(t *testing.T) {
 			t.Errorf("%s: %d bytes, %v; want a refusal", c.name, len(written), err)
 			continue
 		}
-		if !strings.Contains(e.Msg, "Duplicate archive path '"+c.second+"'") || !strings.Contains(e.Msg, "'"+c.first+"'") {
+		if e.Msg != "Duplicate archive path '"+c.second+"' (also '"+c.first+"')." {
 			t.Errorf("%s: the message is %q, want the duplicate %q and then %q", c.name, e.Msg, c.second, c.first)
 		}
-		if !strings.Contains(e.Hint, "case-insensitive") || e.File != "" {
+		if e.Hint != "Archive paths are case-insensitive; rename one of the files." || e.File != "" {
 			t.Errorf("%s: the hint is %q and the file %q", c.name, e.Hint, e.File)
 		}
 	}
@@ -508,7 +559,8 @@ func TestWriteRejectsAPrefixThatIsNotAMultipleOf512Bytes(t *testing.T) {
 	for _, length := range []int{1, 100, 511, 513, 1000} {
 		written, err := mpq.Write(files, mpq.Options{Prefix: make([]byte, length)})
 		var e *diag.Error
-		if !errors.As(err, &e) || !strings.Contains(e.Msg, "512") || written != nil {
+		if !errors.As(err, &e) || *e != (diag.Error{Msg: "The archive prefix must be a multiple of 512 bytes."}) ||
+			written != nil {
 			t.Errorf("a prefix of %d bytes: %d bytes, %v", length, len(written), err)
 		}
 	}

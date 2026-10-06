@@ -344,6 +344,159 @@ func TestMalformedFilesAreFileErrorsThatPointToWorldEditor300(t *testing.T) {
 	}
 }
 
+func TestARefusalSaysWhatIsWrongWithTheFileAndToSaveTheMapAgain(t *testing.T) {
+	// The malformed files by their names, each with the whole of what its error says is wrong.
+	problems := map[string]string{}
+	for _, pair := range [][2]string{
+		{"version 0", "unsupported version 0"},
+		{"cut inside the version", "truncated file"},
+		{"cut inside the count of original objects", "truncated file"},
+		{"a count of 1000 custom objects", "object count 1000 past end of file"},
+		{"a count of -1 custom objects", "object count -1 past end of file"},
+		{"a count of modifications past the end", "modification count 2147483647 past end of file"},
+		{"value type 4", "unknown value type 4"},
+		{"a string without its NUL", "unterminated string"},
+		{"a string that is not UTF-8", "invalid UTF-8 in a string"},
+		{"a byte after the custom objects", "trailing bytes after the custom objects"},
+		{"a set count of 0", "unsupported set count 0"},
+		{"a set count of -1", "unsupported set count -1"},
+	} {
+		problems[pair[0]] = pair[1]
+	}
+	found := 0
+	for _, c := range malformedFiles(t) {
+		problem, listed := problems[c.name]
+		if !listed {
+			continue
+		}
+		found++
+		_, err := objmod.Read(c.data, objmod.Simple, modFile)
+		want := diag.Error{
+			Msg:  "Cannot read object data: " + problem + ".",
+			File: modFile,
+			Hint: "Open and re-save this map in World Editor 3.00.",
+		}
+		var failure *diag.Error
+		if !errors.As(err, &failure) || *failure != want {
+			t.Errorf("%s: got %+v, want %+v", c.name, err, want)
+		}
+	}
+	if found != len(problems) {
+		t.Errorf("%d of the %d files were found among the malformed ones", found, len(problems))
+	}
+}
+
+func TestAppendSaysWhatItCannotWrite(t *testing.T) {
+	mod := func(field string, value objmod.Value) objmod.NewMod {
+		return objmod.NewMod{Field: id(field), Value: value}
+	}
+	for _, c := range []struct {
+		kind    objmod.TableKind
+		objects []objmod.NewObject
+		words   string
+	}{
+		{objmod.Simple, []objmod.NewObject{{ID: id("X001")}},
+			`Cannot write the object "X001": its base is four NUL bytes.`},
+		{objmod.Simple, []objmod.NewObject{{Base: id("hfoo")}},
+			`Cannot write an object based on "hfoo": its id is four NUL bytes.`},
+		{objmod.Simple, oneMod(objmod.NewMod{Value: intValue(1)}),
+			`Cannot write a modification of "X001": its field is four NUL bytes.`},
+		{objmod.Simple, oneMod(mod("unam", objmod.Value{Type: 7})),
+			"Cannot write unam: its value type 7 is none of the four."},
+		{objmod.Simple, oneMod(objmod.NewMod{Field: id("unam"), Level: 2, Column: 3, Value: intValue(1)}),
+			"Cannot write unam at level 2, column 3: a simple table has neither."},
+		{objmod.Leveled, oneMod(mod("unam", textValue("a\x00b"))),
+			`Cannot write "a\x00b": it contains NUL or invalid UTF-8.`},
+		{objmod.Leveled, oneMod(mod("uhpm", realValue(float32(math.Inf(-1))))), "Cannot write -Inf as a float32."},
+		{objmod.Leveled, oneMod(mod("uhpm", unrealValue(float32(math.NaN())))), "Cannot write NaN as a float32."},
+	} {
+		_, err := objmod.Append(nil, c.kind, c.objects, "war3map.w3a")
+		if err == nil || err.Error() != c.words {
+			t.Errorf("got %v, want %s", err, c.words)
+		}
+	}
+}
+
+// What follows the first thing wrong is not what the file meant, so it is not read: the error is of the first
+// object or modification that is wrong, whatever is wrong with the ones after it.
+func TestTheFirstProblemIsReportedWhenMoreObjectsOrModificationsFollowIt(t *testing.T) {
+	typed := func(number int32) testkit.SyntheticMod {
+		return testkit.SyntheticMod{Field: "unam", Value: objmod.Value{Type: objmod.ValueType(number)}}
+	}
+	object := func(mods ...testkit.SyntheticMod) testkit.SyntheticObject {
+		return testkit.SyntheticObject{Base: "hfoo", ID: "h000", Mods: mods}
+	}
+	whole := textValue("whole")
+	for _, c := range []struct {
+		name   string
+		custom []testkit.SyntheticObject
+	}{
+		{"two wrong objects", []testkit.SyntheticObject{object(typed(9)), object(typed(8))}},
+		{"a wrong object and then a whole one",
+			[]testkit.SyntheticObject{object(typed(9)), object(testkit.SyntheticMod{Field: "unam", Value: whole})}},
+		{"two wrong modifications of one object", []testkit.SyntheticObject{object(typed(9), typed(8))}},
+		{"a wrong modification and then two whole ones", []testkit.SyntheticObject{object(typed(9),
+			testkit.SyntheticMod{Field: "unam", Value: whole}, testkit.SyntheticMod{Field: "uhpm", Value: intValue(7)})}},
+	} {
+		for _, version := range []int32{1, 2, 3} {
+			for _, kind := range []objmod.TableKind{objmod.Simple, objmod.Leveled} {
+				what := fmt.Sprintf("%s, version %d, kind %d", c.name, version, kind)
+				parsed, err := objmod.Read(testkit.BuildModFile(version, nil, c.custom, kind), kind, modFile)
+				refusal(t, what, err, modFile, "unknown value type 9")
+				if parsed != nil {
+					t.Errorf("%s: a refused file returned %+v", what, parsed)
+				}
+			}
+		}
+	}
+}
+
+// A count is refused when its items would not fit in the bytes that are left if each had its smallest size: an
+// object without modifications, which has a count of sets and a flag from version 3 on, and a modification whose
+// value is an empty string, which has a level and a column in a leveled table. So a file of such items reads, and
+// the same file without its last byte has a count that is wrong.
+func TestACountFitsWhenItsItemsOfTheSmallestSizeFillTheRestOfTheFile(t *testing.T) {
+	bare := testkit.SyntheticObject{Base: "hfoo", ID: "h000"}
+	empty := testkit.SyntheticMod{Field: "unam", Value: textValue("")}
+	modified := testkit.SyntheticObject{Base: "hfoo", ID: "h000", Mods: []testkit.SyntheticMod{empty, empty, empty}}
+	for _, version := range []int32{1, 2, 3} {
+		for _, kind := range []objmod.TableKind{objmod.Simple, objmod.Leveled} {
+			what := fmt.Sprintf("version %d, kind %d", version, kind)
+			objects := testkit.BuildModFile(version, nil, []testkit.SyntheticObject{bare, bare, bare}, kind)
+			if got := mustRead(t, objects, kind, modFile); len(got.Custom.Objects) != 3 {
+				t.Errorf("%s: three objects without modifications read as %+v", what, got.Custom)
+			}
+			_, err := objmod.Read(objects[:len(objects)-1], kind, modFile)
+			refusal(t, what+", objects without the last byte", err, modFile, "object count 3 past end of file")
+
+			mods := testkit.BuildModFile(version, nil, []testkit.SyntheticObject{modified}, kind)
+			if got := mustRead(t, mods, kind, modFile); len(got.Custom.Objects[0].Sets[0].Mods) != 3 {
+				t.Errorf("%s: three modifications of empty strings read as %+v", what, got.Custom)
+			}
+			_, err = objmod.Read(mods[:len(mods)-1], kind, modFile)
+			refusal(t, what+", modifications without the last byte", err, modFile, "modification count 3 past end of file")
+		}
+	}
+}
+
+func TestAnObjectHasOneToSixtyFourSets(t *testing.T) {
+	object := func(sets int) []testkit.SyntheticObject {
+		return []testkit.SyntheticObject{{Base: "hfoo", ID: "h000", Sets: make([]testkit.SyntheticSet, sets)}}
+	}
+	for _, sets := range []int{1, 2, 63, 64} {
+		parsed := mustRead(t, testkit.BuildModFile(3, nil, object(sets), objmod.Simple), objmod.Simple, modFile)
+		if len(parsed.Custom.Objects[0].Sets) != sets {
+			t.Errorf("an object of %d sets reads with %d", sets, len(parsed.Custom.Objects[0].Sets))
+		}
+	}
+	_, err := objmod.Read(testkit.BuildModFile(3, nil, object(65), objmod.Simple), objmod.Simple, modFile)
+	refusal(t, "an object of 65 sets", err, modFile, "unsupported set count 65")
+	// A count of 64 is no wrong count, so an object with fewer sets than it says ends too soon.
+	counted := testkit.SetU32(testkit.BuildModFile(3, nil, object(1), objmod.Simple), 20, 64)
+	_, err = objmod.Read(counted, objmod.Simple, modFile)
+	refusal(t, "a set count of 64 before one set", err, modFile, "truncated")
+}
+
 func TestASliceOfALargerBufferParsesTheSameAsACopy(t *testing.T) {
 	for _, file := range []string{"war3mapSkin.w3q", "war3map.w3d", "war3mapSkin.w3u"} {
 		data := fixture(t, file)

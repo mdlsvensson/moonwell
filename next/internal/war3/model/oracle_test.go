@@ -341,33 +341,6 @@ func TestOracleOnTheModelsOfTheTests(t *testing.T) {
 	c.summary(len(inputs))
 }
 
-// modelWithEveryChunk is a binary model with every chunk that holds paths, chunks that hold none, and a path that
-// is not ASCII.
-func modelWithEveryChunk() []byte {
-	return testkit.MDX(
-		testkit.Chunk("VERS", testkit.U32(800)),
-		testkit.Chunk("TEXS", testkit.Concat(
-			testkit.Texture(`Textures\Knight.blp`, 0), testkit.Texture("", 1), testkit.Texture("Textures/M\xC3\xA5ne.blp", 0),
-		)),
-		testkit.Chunk("ZZZZ", make([]byte, 13)),
-		testkit.Chunk("PREM", testkit.Concat(
-			testkit.Emitter(`Abilities\Spells\Human\Heal.mdx`, testkit.EmitterUsesMDL),
-			testkit.Emitter(`Textures\Spark.blp`, testkit.EmitterUsesTGA),
-			testkit.Emitter("", 0),
-		)),
-		testkit.Chunk("ATCH", testkit.Concat(testkit.Attachment(`Models\Sword.mdx`), testkit.Attachment(""))),
-		testkit.Chunk("CORN", testkit.Popcorn(`Effects\Fire.pkfx`)),
-		testkit.Chunk("FAFX", testkit.FaceEffect("Head", `FaceFX\Knight.facefx`)),
-	)
-}
-
-// textWithOtherLetters is a text model with CRLF line ends, comments, and letters outside ASCII in a comment, a
-// block name, a string and a path.
-const textWithOtherLetters = "// M\xC3\xA5ne \xE6\x9C\x88\r\nVersion {\r\n\tFormatVersion 800,\r\n}\r\n" +
-	"Model \"M\xC3\xA5ne\" {\r\n}\r\nTextures 2 {\r\n\tBitmap { // \xF0\x9F\x8C\x99\r\n" +
-	"\t\tImage \"Textures\\M\xC3\xA5ne\xE6\x9C\x88.blp\",\r\n\t}\r\n\tBitm\xC3\xA5p {\r\n\t\tImage \"b.blp\",\r\n\t}\r\n}\r\n" +
-	"ParticleEmitter \"\xE6\x9C\x88\" {\r\n\tEmitterUsesTGA,\r\n\tParticle {\r\n\t\tPath \"\xF0\x9F\x8C\x99.blp\",\r\n\t}\r\n}\r\n"
-
 // TestOracleOnModelsCutAtEveryLength proves that both trees read the same paths or report the same problem
 // wherever a model ends.
 func TestOracleOnModelsCutAtEveryLength(t *testing.T) {

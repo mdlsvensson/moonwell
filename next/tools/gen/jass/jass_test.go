@@ -153,6 +153,29 @@ func TestParseReadsTheCornersOfALine(t *testing.T) {
 	}
 }
 
+// comments has a comment of two slashes that end their line, and comments with a carriage return in them, which
+// no line that is read holds after an equals sign: after a string of one character, and after a string that ends
+// with a backslash that a backslash escapes.
+const comments = "type agent extends handle//\n" +
+	"globals\n" +
+	"string ONE = \"a\" // one\rtwo\n" +
+	"string BACK = \"a\\\\\" // one\rtwo\n" +
+	"endglobals//\n"
+
+func TestACommentIsCutFromItsLineWhereTwoSlashesStandOutsideAString(t *testing.T) {
+	want := jass.File{
+		Types:     []jass.Type{{Name: "agent", Extends: "handle"}},
+		Functions: []jass.Function{},
+		Globals: []jass.Global{
+			{Name: "ONE", Source: "comments.j", Type: "string"},
+			{Name: "BACK", Source: "comments.j", Type: "string"},
+		},
+	}
+	if got := parse(t, comments, "comments.j"); !reflect.DeepEqual(got, want) {
+		t.Errorf("got  %+v\nwant %+v", got, want)
+	}
+}
+
 func TestABlockEndsWhateverStandsAroundTheWordThatEndsIt(t *testing.T) {
 	want := jass.File{
 		Types:   []jass.Type{},
@@ -207,6 +230,18 @@ func TestParseNamesTheFileAndLineOfAnythingItDoesNotUnderstand(t *testing.T) {
 		}
 		if file.Types != nil || file.Functions != nil || file.Globals != nil {
 			t.Errorf("%s: a refused script is %+v, want none", c.source, file)
+		}
+	}
+}
+
+func TestAnErrorIsThePlaceAndWhatIsWrongThere(t *testing.T) {
+	for text, want := range map[string]string{
+		"type unit extends widget\n  library Foo \n":           `x.j:2: cannot read "library Foo"`,
+		"\nfunction F takes nothing returns nothing\nreturn\n": "x.j:2: the function never reaches endfunction",
+		"globals\ninteger a\n":                                 "x.j: the globals block never reaches endglobals",
+	} {
+		if _, err := jass.Parse(text, "x.j"); err == nil || err.Error() != want {
+			t.Errorf("%q: got %v, want %s", text, err, want)
 		}
 	}
 }

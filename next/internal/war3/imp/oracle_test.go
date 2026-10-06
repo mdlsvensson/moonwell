@@ -145,34 +145,6 @@ func TestOracleOnTheFixture(t *testing.T) {
 	c.summary()
 }
 
-var (
-	everyFlag = []uint8{0, 5, 8, 10, 13, 29}
-	// paths are ASCII paths and paths with letters of two, three and four bytes, one with a byte order mark that
-	// is not at its start.
-	paths = []string{
-		"a.blp",
-		`Textures\custom.blp`,
-		`war3mapImported\default.blp`,
-		"war3mapPreview.tga",
-		"name with spaces.mdx",
-		"M\xC3\xB8\xC3\xB8nwell\\\xC3\x85.mdx",
-		"\xE6\x9C\x88.blp",
-		"moon\xF0\x9F\x8C\x99.tga",
-		"a\xEF\xBB\xBF.blp",
-	}
-)
-
-// everyEntry is one entry of every flag with every path.
-func everyEntry() []imp.Entry {
-	var entries []imp.Entry
-	for _, flag := range everyFlag {
-		for _, path := range paths {
-			entries = append(entries, imp.Entry{Flag: flag, Path: path})
-		}
-	}
-	return entries
-}
-
 // reversed is the entries in the opposite order.
 func reversed(entries []imp.Entry) []imp.Entry {
 	backwards := slices.Clone(entries)

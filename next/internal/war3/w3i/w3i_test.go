@@ -228,6 +228,131 @@ func TestInvalidStringsCountsPlayerFieldsAndScriptModeAreFileErrors(t *testing.T
 	}
 }
 
+func TestARefusalSaysWhatIsWrongWithTheFileAndHowToPutItRight(t *testing.T) {
+	source := testkit.SyntheticMapInfo(39)
+	info := mustRead(t, source, w3i.Extended)
+	player, force := info.Details.Players[0], info.Details.Forces[0]
+	const luaHint = "Open and re-save this map in World Editor; extended settings require Lua script mode."
+	const plainHint = "Open and re-save this map in World Editor."
+	for _, c := range []struct {
+		data          []byte
+		problem, hint string
+	}{
+		{testkit.SetU32(source, 0, 40), "unsupported war3map.w3i version 40", luaHint},
+		{source[:2], "truncated war3map.w3i", luaHint},
+		{source[:info.Name.Start+3], "unterminated string in war3map.w3i", luaHint},
+		{testkit.SyntheticMapInfo(18), "player, force and environment overrides require w3i version 28 or later", luaHint},
+		{testkit.SetU32(source, info.Details.SoundEnvironment.End+5, 0), "map settings require Lua script mode", luaHint},
+		{testkit.SetU32(source, player.ID.Start-4, 0), "invalid player count in war3map.w3i", luaHint},
+		{testkit.SetU32(source, player.Controller.Start, 0), "invalid player records in war3map.w3i", luaHint},
+		{testkit.SetU32(source, force.Flags.Start-4, 0), "invalid force count in war3map.w3i", luaHint},
+		// Lua script mode has no part in a text that is not UTF-8.
+		{inserted(source, info.Name.Start, 0xff), "invalid UTF-8 in war3map.w3i", plainHint},
+	} {
+		_, err := w3i.Read(c.data, mapInfoFile, w3i.Extended)
+		want := diag.Error{Msg: "Cannot read map settings: " + c.problem + ".", File: mapInfoFile, Hint: c.hint}
+		var failure *diag.Error
+		if !errors.As(err, &failure) || *failure != want {
+			t.Errorf("got %+v, want %+v", err, want)
+		}
+	}
+	// ReadHeader is given no name, so its error has none, and no hint.
+	_, err := w3i.ReadHeader([]byte{1, 2})
+	var failure *diag.Error
+	if !errors.As(err, &failure) || *failure != (diag.Error{Msg: "war3map.w3i is truncated."}) {
+		t.Errorf("ReadHeader of two bytes: %+v", err)
+	}
+	if _, err := w3i.ApplyEdits(source, []w3i.Edit{edit(4, 8, ""), edit(6, 9, "")}); err == nil ||
+		err.Error() != "Invalid or overlapping map-info edits." {
+		t.Errorf("ApplyEdits of overlapping edits: %v", err)
+	}
+}
+
+func TestAPlayerRecordTakesEveryValueOfItsRangesAndNoOther(t *testing.T) {
+	source := testkit.SyntheticMapInfo(39)
+	for _, c := range []struct {
+		what      string
+		field     func(w3i.Player) w3i.Field[int32]
+		low, high int32
+	}{
+		{"id", func(p w3i.Player) w3i.Field[int32] { return p.ID }, 0, 23},
+		{"controller", func(p w3i.Player) w3i.Field[int32] { return p.Controller }, 1, 4},
+		{"race", func(p w3i.Player) w3i.Field[int32] { return p.Race }, 0, 4},
+		{"fixed start", func(p w3i.Player) w3i.Field[int32] { return p.FixedStart }, 0, 1},
+	} {
+		offset := c.field(mustRead(t, source, w3i.Extended).Details.Players[0]).Start
+		for value := c.low; value <= c.high; value++ {
+			info, err := w3i.Read(testkit.SetU32(source, offset, uint32(value)), mapInfoFile, w3i.Extended)
+			if err != nil || c.field(info.Details.Players[0]).Value != value {
+				t.Errorf("a player's %s of %d: %v", c.what, value, err)
+			}
+		}
+		for _, value := range []int32{c.low - 1, c.high + 1, math.MinInt32, math.MaxInt32} {
+			refusal(t, fmt.Sprintf("a player's %s of %d", c.what, value), testkit.SetU32(source, offset, uint32(value)),
+				w3i.Extended, "player records")
+		}
+	}
+}
+
+func TestAStartPositionIsAnyNumberAndNothingElse(t *testing.T) {
+	source := testkit.SyntheticMapInfo(39)
+	player := mustRead(t, source, w3i.Extended).Details.Players[0]
+	for _, offset := range []int{player.X.Start, player.Y.Start} {
+		for _, value := range []float32{0, -1, math.MaxFloat32, -math.MaxFloat32, math.SmallestNonzeroFloat32} {
+			info, err := w3i.Read(testkit.SetU32(source, offset, math.Float32bits(value)), mapInfoFile, w3i.Extended)
+			if got := info.Details.Players[0]; err != nil || got.X.Value != value && got.Y.Value != value {
+				t.Errorf("a start position of %v at %d: %v", value, offset, err)
+			}
+		}
+		for _, value := range []float64{math.Inf(1), math.Inf(-1), math.NaN()} {
+			refusal(t, fmt.Sprintf("a start position of %v at %d", value, offset),
+				testkit.SetU32(source, offset, math.Float32bits(float32(value))), w3i.Extended, "player records")
+		}
+	}
+}
+
+// repeated is source with the bytes from start to end put in count times in all, and the number of them written
+// at countOffset, which is before start. change is given each copy to tell it from the others.
+func repeated(source []byte, countOffset, start, end, count int, change func(record []byte, index int)) []byte {
+	out := testkit.SetU32(source[:start:start], countOffset, uint32(count))
+	for index := range count {
+		record := bytes.Clone(source[start:end])
+		change(record, index)
+		out = append(out, record...)
+	}
+	return append(out, source[end:]...)
+}
+
+func TestAMapHasOneToTwentyFourPlayersAndForces(t *testing.T) {
+	source := testkit.SyntheticMapInfo(39)
+	details := mustRead(t, source, w3i.Extended).Details
+	player, force := details.Players[0], details.Forces[0]
+	playerCount, forceCount := player.ID.Start-4, force.Flags.Start-4
+	numbered := func(record []byte, index int) { copy(record, testkit.U32(uint32(index))) }
+	for _, count := range []int{1, 2, 23, 24} {
+		players := repeated(source, playerCount, player.ID.Start, forceCount, count, numbered)
+		info, err := w3i.Read(players, mapInfoFile, w3i.Extended)
+		if err != nil || len(info.Details.Players) != count || info.Details.Players[count-1].ID.Value != int32(count-1) ||
+			len(info.Details.Forces) != 1 {
+			t.Errorf("%d players: %v", count, err)
+		}
+		forces := repeated(source, forceCount, force.Flags.Start, force.Name.End, count, numbered)
+		info, err = w3i.Read(forces, mapInfoFile, w3i.Extended)
+		if err != nil || len(info.Details.Forces) != count || info.Details.Forces[count-1].Flags.Value != int32(count-1) {
+			t.Errorf("%d forces: %v", count, err)
+		}
+	}
+	refusal(t, "25 players", repeated(source, playerCount, player.ID.Start, forceCount, 25, numbered), w3i.Extended,
+		"player count")
+	refusal(t, "25 forces", repeated(source, forceCount, force.Flags.Start, force.Name.End, 25, numbered), w3i.Extended,
+		"force count")
+	// A count of 24 is no wrong count, so a file with fewer records than it says ends too soon: in the name of
+	// a player, or in the numbers of a force.
+	refusal(t, "a player count of 24 before one player", testkit.SetU32(source, playerCount, 24), w3i.Extended,
+		"unterminated string")
+	refusal(t, "a force count of 24 before one force", testkit.SetU32(source, forceCount, 24), w3i.Extended, "truncated")
+}
+
 func TestTheFirstProblemInTheFileIsTheOneReported(t *testing.T) {
 	source := testkit.SyntheticMapInfo(39)
 	info := mustRead(t, source, w3i.Extended)

@@ -97,6 +97,15 @@ func TestParseReadsLines(t *testing.T) {
 	}
 }
 
+// One quoted string has a quote at each end. A value with a quote at one end only is none, and keeps it.
+func TestAValueWithAQuoteAtOneEndOnlyIsKeptAsItIsWritten(t *testing.T) {
+	got := ini.Parse("[a]\nA=\"open\nB=shut\"\nC=\"x\nD=x\"\nE=\"x\"\n")
+	want := ini.File{"a": {"A": `"open`, "B": `shut"`, "C": `"x`, "D": `x"`, "E": "x"}}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("%q, want %q", got, want)
+	}
+}
+
 // widerSpace are texts with a character that is white space outside ASCII. Each is text: it is trimmed from
 // nothing, so it is part of the key or of the value it stands in, and a line that starts with one is no header.
 var widerSpace = []struct {

@@ -165,6 +165,8 @@ func damagedModels() []damagedModel {
 	chunk := func(tag string, body []byte) []byte { return testkit.MDX(testkit.Chunk(tag, body)) }
 	return []damagedModel{
 		{"bytes after the last chunk", testkit.Concat(testkit.MDX(), []byte{1, 2, 3}), "a chunk header is cut off"},
+		{"one byte after the last chunk", testkit.Concat(whole, []byte{1}), "a chunk header is cut off"},
+		{"one byte after the magic", testkit.Concat(testkit.MDX(), []byte{1}), "a chunk header is cut off"},
 		{"a chunk cut short", whole[:100], "the TEXS chunk runs past the end of the file"},
 		{"textures of a wrong size", chunk("TEXS", make([]byte, 100)), "the TEXS chunk is not a whole number of textures"},
 		{"face effects of a wrong size", chunk("FAFX", make([]byte, 100)),
@@ -177,6 +179,9 @@ func damagedModels() []damagedModel {
 			"the ATCH chunk has a record too small for its path"},
 		{"bytes after the last record", chunk("ATCH", testkit.Concat(attachment, []byte{1, 2, 3})),
 			"the ATCH chunk has a record that is cut off"},
+		// Four bytes are a size, so the record is not cut off: it is smaller than a node.
+		{"a size after the last record", chunk("ATCH", testkit.Concat(attachment, testkit.U32(4))),
+			"the ATCH chunk has a record with an invalid size"},
 		{"a record smaller than a node", chunk("PREM", testkit.SetU32(emitter, 0, 99)),
 			"the PREM chunk has a record with an invalid size"},
 		{"a node larger than its record", chunk("PREM", testkit.SetU32(emitter, 4, uint32(len(emitter)-3))),
@@ -236,10 +241,11 @@ func refused(t *testing.T, what string, err error, file, words string) {
 		t.Errorf("%s: got %v, want an error naming %s", what, err, file)
 		return
 	}
-	if !strings.HasPrefix(failure.Msg, "Not a readable model: ") || !strings.Contains(failure.Msg, words) {
+	if failure.Msg != "Not a readable model: "+words+"." {
 		t.Errorf("%s: message %q, want a model that is not readable and %q", what, failure.Msg, words)
 	}
-	if strings.Contains(failure.Msg, "Knight.md") || readsUnnaturally.MatchString(failure.Msg) || failure.Hint == "" {
+	const hint = "Re-export it from your modelling tool, or open it in a model viewer to check it."
+	if strings.Contains(failure.Msg, "Knight.md") || readsUnnaturally.MatchString(failure.Msg) || failure.Hint != hint {
 		t.Errorf("%s: message %q, hint %q: the file is named once, through File, and there is a hint", what,
 			failure.Msg, failure.Hint)
 	}
@@ -278,7 +284,7 @@ func TestPathsPicksTheReaderFromTheContent(t *testing.T) {
 	}
 	blp := []byte{0x42, 0x4c, 0x50, 0x31, 0, 0, 0, 0} // a BLP texture, not a model
 	_, err = model.Paths(blp, "icon.blp")
-	refused(t, "a texture", err, "icon.blp", "neither a binary MDX nor a text MDL")
+	refused(t, "a texture", err, "icon.blp", "it is neither a binary MDX nor a text MDL file")
 }
 
 func TestPathsRefusesTextThatIsNotAModel(t *testing.T) {
@@ -408,6 +414,11 @@ func statementTexts() []textModel {
 		{"a statement of three words", `Bitmap { static Image "a.blp", Image "b.blp" 1, }`, texture("", 0)},
 		{"a statement that starts with a string", `Bitmap { "Image" "a.blp", }`, texture("", 0)},
 		{"a path written as a flag", "Attachment { Path, }", nil},
+		{"a path written as a word", "Attachment { Path a.mdx, }", nil},
+		{"an empty path in each block that takes its file from one",
+			`Attachment { Path "", } ParticleEmitter { Path "", } ParticleEmitterPopcorn { Path "", } FaceFX { Path "", }`, nil},
+		{"a string after a word that is not Path", `Attachment { Image "a.mdx", Name "b.mdx", }`, nil},
+		{"a string after a word that is not Image", `Bitmap { Path "a.blp", Name "b.blp", }`, texture("", 0)},
 		{"a flag written with a value", `ParticleEmitter { EmitterUsesTGA 1, Path "a.blp", }`,
 			[]model.Path{{Kind: model.ParticleModel, Path: "a.blp"}}},
 		{"comments", "Bitmap { // Image \"no.blp\",\n\tImage \"a//b.blp\", // the slot\r\n\tReplaceableId 1, }// end", texture("a//b.blp", 1)},

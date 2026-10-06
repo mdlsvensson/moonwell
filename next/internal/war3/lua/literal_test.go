@@ -71,9 +71,26 @@ func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 	}
 }
 
+func TestPlayerIDTakesOnlyTheWholeCallOfPlayer(t *testing.T) {
+	for _, source := range []string{"", "Player", "Player(", "Player()", "Player(0", "Player[0)", "Player(0]",
+		"Player 0 )", "'Player'(0)", "Other(0)", "player(0)", "(0)"} {
+		tokens, _ := Tokenize(source)
+		if id, ok := PlayerID(tokens); ok || id != 0 {
+			t.Errorf("PlayerID of the tokens of %s = %d, %v", source, id, ok)
+		}
+	}
+	tokens, _ := Tokenize("Player ( - 7 )")
+	if id, ok := PlayerID(tokens); !ok || id != -7 {
+		t.Errorf("PlayerID of Player ( - 7 ) = %d, %v", id, ok)
+	}
+}
+
 func TestQuoteEscapesQuotesBackslashesAndControlCharacters(t *testing.T) {
 	for _, c := range []struct{ value, want string }{
 		{`a"b\c`, `"a\"b\\c"`},
+		// A space is the first character that is written as it is, and the tilde the last of ASCII.
+		{" ", `" "`},
+		{"\x1F !~\x7F", `"\031 !~\127"`},
 		{"\n1\t2\x7F3", `"\0101\0092\1273"`},
 		{"\n", `"\010"`},
 		{"\t", `"\009"`},
