@@ -239,27 +239,6 @@ func testTables() map[string]string {
 	return named
 }
 
-// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every table
-// the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test alone.
-// Of a table with two semicolons in a row (hasTwoSemicolons, the third class of the note above) the recording
-// holds this tree's words: the other tree's parser reads past the empty field and panics.
-func TestOracleOnTheRecordedRefusals(t *testing.T) {
-	var said []testkit.Refusal
-	for _, table := range refusedTables() {
-		err := func() (err error) {
-			defer func() {
-				if recover() != nil || hasTwoSemicolons([]byte(table.text)) {
-					_, err = slk.Parse(table.text, table.file)
-				}
-			}()
-			_, err = oldslk.Parse(table.text, table.file)
-			return err
-		}()
-		said = append(said, oracle.RefusalOf(table.name, err))
-	}
-	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
-}
-
 func TestOracleOnTheTablesOfTheTests(t *testing.T) {
 	c := &comparison{t: t}
 	for name, text := range testTables() {

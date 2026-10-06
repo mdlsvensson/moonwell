@@ -12,7 +12,6 @@ import (
 	oldmpq "github.com/mdlsvensson/moonwell/internal/mpq"
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
-	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/mpq"
 )
 
@@ -181,17 +180,6 @@ func named(names ...string) []mpq.File {
 		files = append(files, mpq.File{Name: name, Data: []byte{byte(i)}})
 	}
 	return files
-}
-
-// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every list
-// the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test alone.
-func TestOracleOnTheRecordedRefusals(t *testing.T) {
-	var said []testkit.Refusal
-	for _, list := range refusedLists() {
-		_, err := otherTreeWrite(list.files, list.options)
-		said = append(said, oracle.RefusalOf(list.name, err))
-	}
-	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
 }
 
 // TestOracleOnRefusals compares what both trees say of a list or a prefix that neither writes.

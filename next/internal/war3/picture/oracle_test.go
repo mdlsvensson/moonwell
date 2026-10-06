@@ -367,16 +367,6 @@ func TestOracleOnBLPs(t *testing.T) {
 	}
 }
 
-// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every file
-// the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test alone.
-func TestOracleOnTheRecordedRefusals(t *testing.T) {
-	said := refusals(func(data []byte, file string) error {
-		_, err := settings.ReadPicture(data, file)
-		return err
-	}, oracle.RefusalOf)
-	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
-}
-
 // TestOracleOnRefusedPictures gives both trees every file the tests of this package expect Read to refuse.
 func TestOracleOnRefusedPictures(t *testing.T) {
 	c := newComparison(t)

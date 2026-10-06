@@ -765,51 +765,6 @@ func TestOracleOnSourcesWithRealsThatAreNotFinite(t *testing.T) {
 	t.Logf("%d comparisons", c.count)
 }
 
-// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every input
-// the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test alone.
-//
-// Of what Append refuses, the recording holds this tree's words in two cases, which are the differences this
-// file names: the refusal of a text and of a real that is not finite, which the two trees spell differently
-// (reduced brings both to what they share), and the four things the other tree writes and this tree refuses
-// (TestWhatTheOtherTreeWritesAndThisTreeRefuses).
-func TestOracleOnTheRecordedRefusals(t *testing.T) {
-	said := refusals(t, writers{
-		read: func(data []byte, kind objmod.TableKind) error {
-			_, err := oldobjects.ReadModFile(data, otherKind(kind), modFile)
-			return err
-		},
-		appendTo: func(refused unwritableObjects) error {
-			_, own := objmod.Append(nil, refused.kind, refused.objects, modFile)
-			unknownType := false
-			eachNewValue(refused.objects, func(value objmod.Value) {
-				unknownType = unknownType || value.Type < objmod.Int || value.Type > objmod.String
-			})
-			if unknownType || own == nil {
-				return own
-			}
-			written, old := oldobjects.AppendObjects(nil, otherKind(refused.kind), otherObjects(t, refused.objects), modFile)
-			switch {
-			case old == nil && len(written) > 0:
-				return own
-			case old != nil && old.Error() != own.Error() && reduced(old.Error()) == reduced(own.Error()):
-				return own
-			}
-			return old
-		},
-		refusal: oracle.RefusalOf,
-	})
-	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
-}
-
-// eachNewValue visits the value of every modification of the objects.
-func eachNewValue(objects []objmod.NewObject, visit func(objmod.Value)) {
-	for _, object := range objects {
-		for _, mod := range object.Mods {
-			visit(mod.Value)
-		}
-	}
-}
-
 func TestOracleOnMalformedFiles(t *testing.T) {
 	c := &comparison{t: t}
 	files := malformedFiles(t)

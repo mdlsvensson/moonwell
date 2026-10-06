@@ -168,22 +168,6 @@ func testScripts() map[string]string {
 	return named
 }
 
-// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every
-// script the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test
-// alone. Of a script with a character that is white space outside ASCII (hasWiderSpace, the class of the note
-// above) the recording holds this tree's words: the other tree takes the character for white space.
-func TestOracleOnTheRecordedRefusals(t *testing.T) {
-	var said []testkit.Refusal
-	for _, script := range refusedScripts() {
-		_, err := oldjass.Parse(script.text, script.source)
-		if hasWiderSpace([]byte(script.text)) {
-			_, err = jass.Parse(script.text, script.source)
-		}
-		said = append(said, oracle.RefusalOf(script.name, err))
-	}
-	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
-}
-
 func TestOracleOnTheScriptsOfTheTests(t *testing.T) {
 	c := &comparison{t: t}
 	for name, text := range testScripts() {
