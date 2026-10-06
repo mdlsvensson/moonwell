@@ -851,39 +851,6 @@ func (c comparison) made(name string) (theirs, ours string) {
 	return string(c.want.left[name]), string(c.got.left[name])
 }
 
-// parting says, for a report, where two texts part: the offset, and the line of each there. No report shows
-// more of what a tree printed or wrote than such a line.
-func parting(want, got string) string {
-	at := partingOffset(want, got)
-	return fmt.Sprintf("the two part at offset %d, where the line wanted is %q and the line got is %q",
-		at, lineAt(want, at), lineAt(got, at))
-}
-
-// firstLine is the first line of a text, for a report, cut as lineAt cuts a line.
-func firstLine(text string) string { return lineAt(text, 0) }
-
-// partingOffset is the offset of the first byte in which two texts differ: the length of the shorter when it is
-// the start of the other.
-func partingOffset(a, b string) int {
-	at := 0
-	for at < len(a) && at < len(b) && a[at] == b[at] {
-		at++
-	}
-	return at
-}
-
-// lineAt is the line of a text that holds the byte at an offset, for a report: without its line break, and of a
-// long line the sixty bytes before the offset and the sixty from it.
-func lineAt(text string, offset int) string {
-	offset = min(offset, len(text))
-	start := strings.LastIndexByte(text[:offset], '\n') + 1
-	end := len(text)
-	if length := strings.IndexByte(text[offset:], '\n'); length >= 0 {
-		end = offset + length
-	}
-	return text[max(start, offset-60):min(end, offset+60)]
-}
-
 // withTheRealCheckout compares what each tree left with the files of the real checkout, for a run that names
 // some.
 func (c comparison) withTheRealCheckout() {
