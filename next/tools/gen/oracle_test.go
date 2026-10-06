@@ -27,8 +27,8 @@ import (
 // A run is one command line on one scratch checkout: a folder of the test with a go.mod that names this module
 // and what the run lays there. Each tree gets a checkout of its own, laid by the same function, since a run
 // writes; the two are compared by the paths from their checkouts. What the line names by its full path, a list
-// of file names or an export with the two scripts, lies in a third folder that both trees read, and that must
-// hold afterwards what it held.
+// of file names, an export with the two scripts or an export with the game's object data, lies in a third folder
+// that both trees read, and that must hold afterwards what it held.
 // No run is given the real checkout, or a folder below it, as the folder to run in: the real checkout is only
 // read.
 //
@@ -41,14 +41,14 @@ import (
 // working folder, which a program reads from its own folder and run from the folder of the test. So the test
 // builds this tree's generator too, next/tools/gen, and the runs of programRuns are given to both generators as
 // programs, each started in its own checkout (AsPrograms in the tally): for each mode a line that is carried out,
-// a line that the mode refuses, and a wrong count; a file of the checkout that is not there; a folder that is no
-// checkout; Lua extras that the other tree's program panics on; and, started in a folder below the checkout, a
-// list and an export beside it, and a list and an export that are not there, each named by a path from that
-// folder. They are compared as every other run is, each by its class. The test builds two programs and starts
-// them some hundred and ninety times, once for every run and once more for each run of the programs, takes some
-// ten seconds, and is skipped with -short. A change to this tree's
-// generator that is given to go test with its flag -overlay reaches run and not the program that the test
-// builds: through GOFLAGS it reaches both.
+// a line that the mode refuses, and a wrong count; a first argument that names no mode; a file of the checkout
+// that is not there; a folder that is no checkout; Lua extras that the other tree's program panics on; and,
+// started in a folder below the checkout, a list and an export of each kind beside it, and a list and an export
+// of each kind that are not there, each named by a path from that folder. They are compared as every other run
+// is, each by its class. The test builds two programs and starts them some three hundred and thirty times, once
+// for every run and once more for each run of the programs, takes some twenty seconds, and is skipped with
+// -short. A change to this tree's generator that is given to go test with its flag -overlay reaches run and not
+// the program that the test builds: through GOFLAGS it reaches both.
 //
 // Where a run is started. Each tree carries a run out in one place (madeBy), and nothing is started there, by
 // either tree, as a program or in process, unless the folder of the run can lead a generator that walks up from
@@ -71,8 +71,8 @@ import (
 //     data/ and schema/generated/, and whatever else lies there, so that a file written elsewhere shows.
 //
 // For the runs that say so (asCommitted), what each tree writes is also compared with the file of the real
-// checkout: the schema of the committed metadata, the list of the game's own list of file names, and the natives
-// of the game's own two scripts.
+// checkout: the schema of the committed metadata, the list of the game's own list of file names, the natives of
+// the game's own two scripts, and the metadata of the game's own object data.
 //
 // Neither tree may put the full path of its checkout into what it prints or writes: the two checkouts are two
 // folders, and such a path would part the trees for no reason of theirs. The other tree's standard error is the
@@ -81,10 +81,11 @@ import (
 // The files of the oracle, which leave the tree together when the other tree does: this file, with this
 // header, the oracle, its comparison, the classes and the tally; oracle_rules_test.go, the tests of the oracle
 // itself; and the runs of each mode, with what they lay and what they are of in the comment of the mode's
-// function: oracle_schema_test.go (schemaRuns), oracle_natives_test.go (nativesRuns, theGamesScripts) and
-// oracle_gamepaths_test.go (gamePathsRuns, theGamesList). The runs that both generators make as programs are in
-// this file (programRuns). None of the files imports a package of the other tree: the oracle builds that tree's
-// generator by its path and starts it.
+// function: oracle_schema_test.go (schemaRuns), oracle_natives_test.go (nativesRuns, theGamesScripts),
+// oracle_metadata_test.go (metadataRuns, theGamesData) and oracle_gamepaths_test.go (gamePathsRuns,
+// theGamesList). The lines that name no mode (unknownModeRuns) and the runs that both generators make as
+// programs (programRuns) are in this file. None of the files imports a package of the other tree: the oracle
+// builds that tree's generator by its path and starts it.
 //
 // Compared in part, and counted. A run of a class names it (class). The class is decided by its predicate, which
 // is the class's own and stands in the table classes, never in a run: it reads the input, that is the command
@@ -92,7 +93,11 @@ import (
 // and never what this tree made of it. A run that names a class whose predicate does not hold of it fails, and
 // is compared whole. A run that names no class is compared whole, whatever a predicate would say of it. What a
 // run carries for its class is data and no predicate: which argument names a file (cannotGive), the words of a
-// refusal (refusal), the places in which the two trees write a file or a stream apart (apart). What this tree
+// refusal (refusal), the places in which the two trees write a file or a stream apart (apart), and the value of
+// an export of object data that the class is about, as the bytes that the run lays in a file (holds). A
+// predicate reads the bytes of what is laid: the Lua extras, the overrides and a metadata as trees of JSON, by
+// Go's own decoder, and a file of an export by a search for the bytes that the run holds. It uses no parser and
+// no function of this tree's generator. What this tree
 // must make in a class is a value of this file, or is made from what the other tree made, and must never be made
 // by this tree's generator. So a place is to be a text that stands written in a run, and that is a rule for the
 // reader of a run: a reviewer reads every place. One slip is held by a test: the two texts of a place have a type
@@ -102,32 +107,38 @@ import (
 // every constant does. What a class does not name is compared whole.
 // TestOracleReportsARunThatIsNotOfTheClassItNames holds the rules of the classes on runs that break each of them.
 //
-//   - FromCheckout, 13 runs (otherTreeNamesItsCheckout, fileOfTheCheckout): a failure of the system on a file or
-//     a folder of the checkout: the metadata, the folder of the schema, the list of paths, the Lua extras, the
-//     natives. The other tree says Go's own line, with the operation and the full path, and this tree names the
-//     path from the checkout. The predicate is on what the other tree made: its standard error holds the path of
-//     its checkout. That line must be "error: ", one word, the full path of one file or folder of the checkout,
-//     ": " and the system's reason; this tree must say "error: ", that path from the checkout with "/", ": " and
-//     the same reason. The path is the one the system names: for a file at the place of a folder it is, on
-//     Windows, the step in the way, and on the other systems the file that was being read. The exit code,
-//     standard output and the checkout are compared whole
+//   - FromCheckout, 20 runs (otherTreeNamesItsCheckout, fileOfTheCheckout): a file or a folder of the checkout
+//     that cannot be read or written: the metadata, the folder of the schema, the list of paths, the Lua extras,
+//     the natives, the overrides. The other tree names it by its full path, and this tree by its path from the
+//     checkout. The predicate is on what the other tree made: its standard error holds the path of its checkout.
+//     That line has one of two forms. For a failure of the system it is Go's own line: "error: ", the operation
+//     as one word, the full path of one file or folder of the checkout, ": " and the system's reason. For a
+//     released metadata that the mode metadata finds and that is no JSON, 1 run with a file that is cut short,
+//     it is "error: ", the full path, ": " and the decoder's reason, without an operation. This tree must say
+//     "error: ", that path from the checkout with "/", ": " and the same reason. The path is the one the system
+//     names: for a file at the place of a folder it is, on Windows, the step in the way, and on the other
+//     systems the file that was being read. The exit code, standard output and the checkout are compared whole
 //     (TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON,
 //     TestTheModeGamePathsNamesTheFileItCannotWriteByItsPathFromTheCheckout,
 //     TestTheModeWithoutANameNamesWhatTheSystemNamesWhenAFileIsInTheWayOfTheSchema,
-//     TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives).
-//   - AsGiven, 11 runs (cannotGiveWhatTheLineNames, fileAsGiven): a failure of the system on a file that the
+//     TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives,
+//     TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn, TestKeepsReleasedNamesNamesAMetadataItCannotRead).
+//   - AsGiven, 12 runs (cannotGiveWhatTheLineNames, fileAsGiven): a failure of the system on a file that the
 //     line leads to. The other tree says Go's own line, "error: open <path>: <reason>" or "error: read <path>:
 //     <reason>", and this tree "error: <path>: <reason>". The run says which argument of the line names the
 //     path (cannotGive): the one that names the list, or the one that names the folder of an export, with the
-//     path of a script from that folder. The path of a list is the argument as it stands; the path of a script
-//     is the folder and the script's path joined as the system joins two paths, which on Windows is with "\"
-//     and on every system without what a path need not have, such as a "/" at the end of the folder: an empty
-//     folder argument gives the script's own path (named.in). Both trees write that path. The predicate is the
-//     row's: the input has no file at the path, since nothing is there or a folder is, and the other tree said
-//     one of the two lines about the path. This tree must say that line without its operation. The exit code,
-//     standard output and the checkout are compared whole
+//     path of a script or of a table from that folder. The path of a list is the argument as it stands; the path
+//     of a script or of a table is the folder and the file's path joined as the system joins two paths, which on
+//     Windows is with "\" and on every system without what a path need not have, such as a "/" at the end of
+//     the folder: an empty folder argument gives the script's own path (named.in). Both trees write that path.
+//     The predicate is the row's: the input has no file at the path, since nothing is there or a folder is, and
+//     the other tree said one of the two lines about the path. This tree must say that line without its
+//     operation. The exit code, standard output and the checkout are compared whole. An export of object data
+//     has 1 such run, a folder at the place of a table: a file that such an export lacks is no failure of the
+//     system, both trees say of it that it is missing from the export, and those runs are compared whole
 //     (TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid,
-//     TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives).
+//     TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives,
+//     TestReadExportNamesWhatTheSystemCannotGiveByThePathItOpened).
 //   - CountRefused, 2 runs (moreAfterAnEmptyFirstArgument, refusedByThisTree): something after an empty first
 //     argument. The other tree passes over what follows an empty first argument and writes the schema; this tree
 //     refuses the line with the usage line of the mode without a name. The predicate is on the command line,
@@ -154,6 +165,48 @@ import (
 //     globals, among the removed globals, or among the params of a function. This tree refuses them, with the
 //     list and the place of the entry. The other tree carries the line out: it passes over null among the
 //     globals, and writes null among the parameters.
+//   - The five classes after this one are of the mode metadata. The first is of the overrides of the checkout,
+//     read as a tree of JSON by this file's own reading. Each of the other four is of a value of the export that
+//     the run holds (holds): the bytes of a label, of a cell, of a row or of a fault, as the run lays them. The
+//     predicate looks for the bytes in the file of the export that the run names, asks of the bytes themselves
+//     whether they are of the class, and asks how the other tree ended (heldInTheExport). In the first three
+//     this tree refuses a line that the other tree carries out, and must end, print and leave the checkout as in
+//     CountRefused, with the words that the run holds (refusedByThisTree).
+//   - OverridesKey, 2 runs (overridesWithAKeyThatIsNotRead): overrides with a key that this tree does not read,
+//     one of them a key of the file in other letters. The other tree carries the line out: it passes over a key
+//     it does not know, and reads a key in any letters (TestDecodeOverridesRefusesWhatTheFileMustNotHold).
+//   - NameTaken, 3 runs (aLabelGivesANameThisTreeAloneRefuses): a label that gives a field the name private,
+//     public or output. This tree has one list of the names that no property can have, the schema's, and asks
+//     for a pin; the other tree's list for the metadata has not these three, so it writes the metadata, and
+//     would refuse the name when the schema is rendered. The run holds the line of the editor's strings with the
+//     label (TestNameFieldsRefusesANameThatNoPropertyCanHaveWithoutAPin).
+//   - NumberRefused, 12 runs (aNumberCellThisTreeAloneRefuses, numberForms): a cell that must be a number, a
+//     repeat or a data cell of a field or a count of levels, that the other tree reads and this tree refuses: an
+//     infinity, NaN, a hexadecimal number, a number with white space outside ASCII at an edge, and such white
+//     space alone, which the other tree takes for an empty cell. The run holds the record of the cell. Where
+//     the other tree refuses such a cell too, the run is of OtherWords, or is compared whole: a count of levels
+//     that is infinite or NaN is refused by both in the same words
+//     (TestFieldRecordReadsANumberCellAsADecimalNumber, TestLevelCountIsAWholeNumberThatIsNotNegative).
+//   - OtherWords, 5 runs (bothRefuseInOtherWords, acceptedDifference): both trees refuse the line, and one
+//     place of the complaint differs. A row of a field without its displayName, and a row of an ability or of
+//     an upgrade without its count of levels: the other tree writes the word undefined where the value of the
+//     cell would stand, and this tree says which cell the row has not. The run holds the row as it is laid,
+//     without the cell. And a data cell that is NaN, or hexadecimal and not whole: the other tree says that the
+//     data column is not a whole number, and this tree that the cell is no number. The run holds the record of
+//     the cell. The predicate asks that the other tree refused in those words. The run names the one place of
+//     standard error, as the runs of the six classes below do; a place of the class holds the other tree's
+//     words (TestLabelOfFollowsTheStringsOfTheEditor, TestLevelCountIsAWholeNumberThatIsNotNegative,
+//     TestFieldRecordReadsANumberCellAsADecimalNumber).
+//   - TwoFaults, 3 runs (eachTreeTellsOfItsFirstFault, bothRefuse): an export with two faults, of which each
+//     tree tells the one it comes to first. This tree reads every file of the export before it makes anything of
+//     it, which is the plan's decision; the other tree reads the tables of the units, of their balance, of the
+//     items, of the buffs and of the upgrades only after it has named the fields, and the last three after the
+//     units. So a table of those that does not parse is this tree's first fault, where the other tree tells of
+//     a name, of a cell or of a unit. The run holds the two faults, the second in such a table. The predicate
+//     asks that the other tree refused, and did not name that table. Both trees must end with 1, print nothing
+//     and leave the checkout as it was laid, and this tree must say the words that the run holds; what the
+//     other tree says is not compared. A table of those that the export lacks is such a fault too, and has no
+//     run: this tree's sentence names the folder of the export (TestTheModeMetadataWritesNothingWhenItRefuses).
 //   - CountOfPaths, 1 run (versionWithALineFeed, countsThePaths): a version with a line feed in it, for a list
 //     that names a path. The other tree counts the line breaks of what it writes, after the first, and this
 //     tree the paths. The predicate is on the command line. Not compared: the number in the printed line. The
@@ -162,10 +215,12 @@ import (
 //     (TestTheModeGamePathsFailsAndKeepsTheExistingListWhenNoPathIsRecognized).
 //   - The six classes after this one hold a difference at places (acceptedDifference). The first four are the
 //     plan's accepted differences: the predicate of each is on bytes of the input alone, and says where it reads
-//     them: the list that a line of game-paths names (inTheList), or the labels and the categories of the
-//     metadata of a checkout that the mode without a name is run in (inTheLabels). The last two are of the Lua
-//     extras of a line of natives, and say their predicates below. The run names what the two trees make apart,
-//     a file by its path from the checkout and a stream by its name (standard output, standard error), and in
+//     them: the list that a line of game-paths names (inTheList), the labels and the categories of the metadata
+//     of a checkout that the mode without a name is run in (inTheLabels), or the values that a run of the mode
+//     metadata holds, each of which must stand in its file of the export (inTheExport, heldOrderedApart). The
+//     last two are of the Lua extras of a line of natives, and say their predicates below. The run names what
+//     the two trees make apart, a file by its path from the checkout and a stream by its name (standard output,
+//     standard error), and in
 //     each the places: what the other tree wrote there, and what this tree must write in its stead (apart). That
 //     is the one form there is: a file or a stream of such a run is held to the other tree's text with those
 //     places changed, so everything outside them is compared with the other tree's, and no text of a whole file
@@ -175,17 +230,22 @@ import (
 //     row of the class says what one looks like (shows). A report of a text that is written otherwise shows
 //     where the two part, and one line of each. The exit code, a stream that the run does not name, the names of
 //     all that the checkout holds and every other file are compared whole.
-//   - WiderSpace, 4 runs (hasWiderSpaceAtAnEdge, isWiderSpace): white space outside ASCII, which the other tree
+//   - WiderSpace, 6 runs (hasWiderSpaceAtAnEdge, isWiderSpace): white space outside ASCII, which the other tree
 //     takes off a line of the list, and writes as one space in a label and a category, and this tree takes for
 //     text. In a list: a line that starts or ends with such a character once its ASCII white space is off, a
 //     byte order mark at the very start of the list aside. A line that ends with one is, to this tree, of a
 //     type of file that is not kept: it leaves the path out and counts one path less, so such a run names the
-//     list and standard output. In a metadata: a label or a category that holds one. A place of the class holds
-//     such a character on one side (widerSpaceShows). In a run whose list has a line that ends with one, every
-//     place passes: what the trees write apart there is a path that this tree leaves out and a count, and neither
-//     holds a byte of the class, so the two places of the one such run are a reader's to judge
+//     list and standard output. In a metadata: a label or a category that holds one. In an export of object
+//     data, 2 runs, where the place shows the character: at the edges of the value of a label, after the dash
+//     that ends a label, before an id of a useSpecific cell, and at the start of a comment that names a standard
+//     object; the other tree takes it off, and this tree writes it. The places are of data/metadata.json: a
+//     line of a rename shows the name of a field, which has no white space, and never its label. A place of the
+//     class holds such a character on one side (widerSpaceShows). In a run whose list has a line that ends with
+//     one, every place passes: what the trees write apart there is a path that this tree leaves out and a count,
+//     and neither holds a byte of the class, so the two places of the one such run are a reader's to judge
 //     (TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes,
-//     TestRenderSchemaWritesALabelAndACategoryOnOneLine).
+//     TestRenderSchemaWritesALabelAndACategoryOnOneLine, TestLabelOfPutsTheTypeOfAnEffectWhereTheLabelHasItsPlace,
+//     TestSplitIDsReadsTheIDsBetweenCommasAndDots, TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow).
 //   - DottedI, 1 run (holdsADottedI): a list that holds U+0130, the capital I with a dot above, which the other
 //     tree lowers to an i and a combining dot and this tree to an i. A place of the class holds the i and the
 //     dot in what the other tree writes (TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes).
@@ -193,11 +253,14 @@ import (
 //     UTF-8. The other tree writes a replacement character for each part that could have started a character,
 //     and this tree one for the run of them. A place of the class holds two replacement characters side by side
 //     in what the other tree writes (TestTheModeGamePathsDecodesTheListAndCountsEachPathOnce).
-//   - ByBytes, 1 run (hasCharactersOrderedApart): a list that holds a character above U+FFFF and one from
+//   - ByBytes, 2 runs (hasCharactersOrderedApart): a list that holds a character above U+FFFF and one from
 //     U+E000 to U+FFFF, the replacement character of a byte that is no UTF-8 among them. The other tree orders
-//     the paths by UTF-16 units, which puts the first before the second, and this tree by bytes. A place of the
+//     the paths by UTF-16 units, which puts the first before the second, and this tree by bytes. And, 1 run, an
+//     export of object data with two ids of fields and two ids of standard objects of those two kinds: the
+//     fields of a list and the objects of a category are written in the order of their ids. A place of the
 //     class holds both kinds of character in what the other tree writes
-//     (TestRenderGamePathsSortsThePathsByBytes).
+//     (TestRenderGamePathsSortsThePathsByBytes, TestNameFieldsOrdersTheFieldsOfAListByTheBytesOfTheirIDs,
+//     TestRenderMetadataWritesTheTextOfTheFile).
 //   - EndOfJSON, 3 runs (theReadersEndApart): Lua extras that end before their value does, in a place where
 //     Go's two ways of reading a text word the end apart. The other tree reads the extras token by token, and
 //     says "unexpected end of JSON input" of a text that ends after a bracket, after a comma or after a whole
@@ -219,10 +282,41 @@ import (
 //
 // Not among the inputs:
 //
-//   - The mode metadata, and a first argument that names no mode. This tree's table of modes has the rows of the
-//     modes it has, and its sentence for an unknown mode names the modes of the table, so until the table has
-//     all four that sentence is not the other tree's. The runs of a mode are added with the mode, and the
-//     unknown mode with the last of them (Task 5 of the plan): see fixtureRuns, onTheGamesFiles and classes.
+//   - White space outside ASCII at the edge of a line, of a key or of the name of a section of the editor's
+//     strings or of the strings of the standard objects. The other tree takes it off and finds the key; this
+//     tree takes it for text, and what follows is no place that shows the character: a field without a label,
+//     which this tree refuses and the other tree names, or a standard object that is named by the comment of
+//     its row. The parser's own oracle (ini/oracle_test.go) is given such texts, and counts them. Such white
+//     space is among the inputs where a place shows it, the class WiderSpace.
+//   - A table that starts with a byte order mark and then at once with a record of a cell. This tree drops the
+//     mark as it decodes the file, and reads the record; to the other tree the mark is part of the line, which
+//     is then no record. The parser's own oracle (slk/oracle_test.go) is given such a table. A mark before the
+//     first line of a table as the game writes one, of the labels and of a file of strings is among the runs,
+//     and is compared whole.
+//   - A file at the place of the folder of the strings. Both trees say the system's line of the folder, the
+//     other tree with its operation, which is another word on each system; and AsGiven is of a path that names
+//     no file (TestReadExportNamesWhatTheSystemCannotGiveByThePathItOpened holds this tree's line).
+//   - A released metadata, and overrides, that are JSON of another shape, as the metadata of the mode without a
+//     name below: the decoder's sentence names a Go type, the other tree's Overrides and this tree's overrides
+//     (TestDecodeOverridesRefusesWhatTheFileMustNotHold, TestKeepsReleasedNamesNamesAMetadataItCannotRead).
+//   - An id of a field with a character outside ASCII that is shorter than four bytes or than four UTF-16
+//     units: the other tree pads it to four units and this tree to four bytes, which is the plan's accepted
+//     difference (TestPaddedIDIsFourBytesLong). The ids of the game are of ASCII.
+//   - Two bytes side by side that are no UTF-8, in a file of an export of object data: the other tree writes a
+//     replacement character for each part and this tree one for the run, into a label or a name
+//     (TestReadExportDecodesItsFilesAsText). The difference is among the inputs for the list of paths, the
+//     class NoUTF8; one such byte alone is among the runs here, and is compared whole.
+//   - U+0130 in the name of a folder or of a file of an export of object data. This tree lowers it to an i,
+//     and so finds a folder that is named units with that letter for its i, and reads a file of strings whose
+//     name ends in STRINGS.TXT with it; the other tree lowers it to an i and a combining dot, and finds neither
+//     (TestReadExportReadsTheFilesOfStringsInTheOrderOfTheirNames). The difference is among the inputs for the
+//     list of paths, the class DottedI.
+//   - Two files of strings that give one key, with names that an order by UTF-16 units and an order by bytes
+//     put the other way round: the later file has the key, and the two trees read them in their own order
+//     (TestReadExportReadsTheFilesOfStringsInTheOrderOfTheirNames holds the order by bytes).
+//   - Seeded changes of a table of an export. A line that is cut can take the displayName or the count of
+//     levels from a row, which is the class OtherWords, and can leave two faults; the seeded changes are of the
+//     editor's strings, where a change is of no class. The parsers' own oracles are given changed tables.
 //   - Lua extras with a comma before a closing bracket: each of Go's two ways of reading names another
 //     character as the one that is in the way, and the sentence is Go's
 //     (TestDecodeExtrasSaysTheSameOfATextThatEndsTooSoonWhereverItEnds holds which one this tree names).
@@ -278,7 +372,11 @@ import (
 // data/game-paths.txt states, and what each writes must be that file. MOONWELL_GAME_SCRIPTS names the folder of
 // an export that has the game's two scripts: both trees are given it with the version that the committed
 // data/natives.json states and with the committed Lua extras, once with this tree's generator in the process of
-// the test and once with both as programs, and what each writes must be that file. Without its variable a group
+// the test and once with both as programs, and what each writes must be that file. MOONWELL_GAME_DATA names the
+// folder of an export that has the game's object data: both trees are given it with the version that the
+// committed data/metadata.json states and with the committed overrides, once over the committed metadata and
+// once, with both as programs, into an empty data folder; what each writes must be that file, and what the two
+// print must be the same. Without its variable a group
 // of runs is skipped, and with MOONWELL_REQUIRE_EXPORTS=1 it fails instead; asked for alone with -run, and
 // skipped, the runs leave the test failing with "the oracle compared no run", which is so: an oracle that
 // compared nothing has not passed. The game's files are read and never written, and a report shows no more of
@@ -312,13 +410,14 @@ func TestOracleOnWhatBothGeneratorsWriteSayAndHowTheyEnd(t *testing.T) {
 	}
 	fixtures.check(t, genTally{
 		counts: counts{
-			Runs: 175, Whole: 117, Passed: 76, Failed: 99, AsPrograms: 18, Files: 390, Committed: 21,
+			Runs: 302, Whole: 208, Passed: 126, Failed: 176, AsPrograms: 25, Files: 640, Committed: 21,
 		},
-		Modes: map[string]int{"": 29, "natives": 104, "game-paths": 42},
+		// "nativs" is the first argument of the lines that name no mode.
+		Modes: map[string]int{"": 29, "natives": 104, "metadata": 122, "game-paths": 42, "nativs": 5},
 		Classes: map[string]int{
-			"FromCheckout": 13, "AsGiven": 11, "CountRefused": 2, "UnknownKey": 4, "LacksAKey": 8, "NoName": 4,
-			"NullEntry": 3, "CountOfPaths": 1, "WiderSpace": 4, "DottedI": 1, "NoUTF8": 1, "ByBytes": 1,
-			"EndOfJSON": 3, "KeyOrder": 2,
+			"FromCheckout": 20, "AsGiven": 12, "CountRefused": 2, "UnknownKey": 4, "LacksAKey": 8, "NoName": 4,
+			"NullEntry": 3, "OverridesKey": 2, "NameTaken": 3, "NumberRefused": 12, "OtherWords": 5, "TwoFaults": 3,
+			"CountOfPaths": 1, "WiderSpace": 6, "DottedI": 1, "NoUTF8": 1, "ByBytes": 2, "EndOfJSON": 3, "KeyOrder": 2,
 		},
 	})
 }
@@ -409,7 +508,15 @@ type oracleRun struct {
 	// places in which they do: a file by its path from the checkout, and a stream by its name, standardOutput or
 	// standardError.
 	apart map[string][]place
+	// holds is, for a run of a class that is about a value of an export of object data, that value: the cell, the
+	// label or the fault that the run lays, as the bytes that stand in a file of the export. The predicate of the
+	// class looks for the bytes in the file.
+	holds []laid
 }
+
+// laid is bytes that a run lays in a file of an export: the file by its path from the folder of the export,
+// with "/".
+type laid struct{ file, bytes string }
 
 // named is a path that a command line gives: the argument that names it, counted from 0, and, for a file below
 // a folder that the argument names, the file's path from that folder with "/".
@@ -800,15 +907,26 @@ var classes = []class{
 	{name: "LacksAKey", is: inTheExtras(aNamedFunctionLacksAKey, carriedOut), compare: comparison.refusedByThisTree},
 	{name: "NoName", is: inTheExtras(aFunctionHasNoName, panicked), compare: comparison.refusedByThisTree},
 	{name: "NullEntry", is: inTheExtras(aListHoldsNull, carriedOut), compare: comparison.refusedByThisTree},
+	{name: "OverridesKey", is: overridesWithAKeyThatIsNotRead, compare: comparison.refusedByThisTree},
+	{name: "NameTaken", is: aLabelGivesANameThisTreeAloneRefuses, compare: comparison.refusedByThisTree},
+	{name: "NumberRefused", is: aNumberCellThisTreeAloneRefuses, compare: comparison.refusedByThisTree},
+	{name: "OtherWords", is: bothRefuseInOtherWords, compare: comparison.acceptedDifference,
+		shows: theOtherTreeWrites(func(text string) bool {
+			return strings.Contains(text, "undefined") || strings.Contains(text, "is not a whole number")
+		})},
+	{name: "TwoFaults", is: eachTreeTellsOfItsFirstFault, compare: comparison.bothRefuse},
 	{name: "CountOfPaths", is: versionWithALineFeed, compare: comparison.countsThePaths},
-	{name: "WiderSpace", is: either(inTheList(hasWiderSpaceAtAnEdge), inTheLabels(isWiderSpace)),
+	{name: "WiderSpace",
+		is: either(either(inTheList(hasWiderSpaceAtAnEdge), inTheLabels(isWiderSpace)),
+			inTheExport(func(text string) bool { return strings.ContainsFunc(text, isWiderSpace) })),
 		compare: comparison.acceptedDifference, shows: widerSpaceShows},
 	{name: "DottedI", is: inTheList(holdsADottedI), compare: comparison.acceptedDifference,
 		shows: theOtherTreeWrites(func(text string) bool { return strings.Contains(text, "i\xCC\x87") })},
 	{name: "NoUTF8", is: inTheList(hasNeighboursThatAreNoUTF8), compare: comparison.acceptedDifference,
 		shows: theOtherTreeWrites(func(text string) bool { return strings.Contains(text, replaced+replaced) })},
-	{name: "ByBytes", is: inTheList(hasCharactersOrderedApart), compare: comparison.acceptedDifference,
-		shows: theOtherTreeWrites(func(text string) bool { return hasCharactersOrderedApart([]byte(text)) })},
+	{name: "ByBytes", is: either(inTheList(hasCharactersOrderedApart), heldOrderedApart),
+		compare: comparison.acceptedDifference,
+		shows:   theOtherTreeWrites(func(text string) bool { return hasCharactersOrderedApart([]byte(text)) })},
 	{name: "EndOfJSON", is: theReadersEndApart, compare: comparison.acceptedDifference,
 		shows: theOtherTreeWrites(func(text string) bool { return strings.Contains(text, "end of JSON input") })},
 	{name: "KeyOrder", is: keysInAnotherOrder, compare: comparison.acceptedDifference,
@@ -856,15 +974,19 @@ func (c comparison) fileOfTheCheckout() {
 	c.mustSay(must)
 }
 
-// lineFromTheCheckout is the line this tree must say of a file or a folder of the checkout that the system
-// failed on, made of the line that the other tree said of it in its checkout at root. The other tree's line is
-// "error: ", the operation that failed as one word, the full path, ": " and the system's reason; this tree's is
-// "error: ", the path from the checkout with "/", ": " and that reason. It is false for a line of another shape.
+// lineFromTheCheckout is the line this tree must say of a file or a folder of the checkout that could not be
+// read or written, made of the line that the other tree said of it in its checkout at root. The other tree's
+// line has two forms: "error: ", the operation that failed as one word, the full path, ": " and the system's
+// reason; and, for a file that the decoder refused, "error: ", the full path, ": " and the decoder's reason.
+// This tree's is "error: ", the path from the checkout with "/", ": " and that reason. It is false for a line
+// of another shape.
 func lineFromTheCheckout(line, root string) (string, bool) {
 	failure, isError := strings.CutPrefix(line, "error: ")
-	operation, rest, inCheckout := strings.Cut(failure, " "+root+string(filepath.Separator))
+	before, rest, inCheckout := strings.Cut(failure, root+string(filepath.Separator))
 	file, reason, hasReason := strings.Cut(rest, ": ")
-	if !isError || !inCheckout || !hasReason || operation == "" || strings.ContainsAny(operation, " \n") {
+	operation, spaced := strings.CutSuffix(before, " ")
+	oneWord := spaced && operation != "" && !strings.ContainsAny(operation, " \n")
+	if !isError || !inCheckout || !hasReason || (before != "" && !oneWord) {
 		return "", false
 	}
 	return "error: " + filepath.ToSlash(file) + ": " + reason, true
@@ -1130,6 +1252,154 @@ func sameLinesInAnotherOrder(_ comparison, p place) bool {
 		return sorted
 	}
 	return p.other != p.this && slices.Equal(lines(p.other), lines(p.this))
+}
+
+// The classes of the mode metadata. A predicate of them reads the overrides that the checkout holds, as a tree of
+// JSON, or the value that the run holds for its class: it looks for the bytes in the file of the export, and
+// asks of the bytes themselves whether they are of the class. It uses no parser of this tree, and nothing of
+// the generator but the names of the files.
+
+// keysOfTheOverrides is the keys that this tree reads in the overrides. They stand written here, and are not
+// the generator's.
+var keysOfTheOverrides = []string{"names", "removed"}
+
+// overridesWithAKeyThatIsNotRead is the predicate of OverridesKey: the overrides of a checkout that a line of
+// metadata is run in are a JSON object with a key that this tree does not read, and the other tree carried the
+// line out.
+func overridesWithAKeyThatIsNotRead(c comparison) bool {
+	var file map[string]any
+	if c.in.mode() != "metadata" || len(c.in.args) != 3 || json.Unmarshal(c.in.laid[overridesPath], &file) != nil {
+		return false
+	}
+	return file != nil && hasOtherKeys(file, keysOfTheOverrides) && carriedOut(c.want)
+}
+
+// heldInTheExport is the values that a run holds for its class, and whether they are there: the line is of
+// metadata with its two arguments, the run holds a value, and the bytes of each stand in the file that it names
+// of the export that the line names.
+func (c comparison) heldInTheExport() ([]laid, bool) {
+	if c.in.mode() != "metadata" || len(c.in.args) != 3 || len(c.r.holds) == 0 {
+		return nil, false
+	}
+	for _, value := range c.r.holds {
+		data, isFile := c.in.given(filepath.Join(c.in.args[1], filepath.FromSlash(value.file)))
+		if !isFile || !bytes.Contains(data, []byte(value.bytes)) {
+			return nil, false
+		}
+	}
+	return c.r.holds, true
+}
+
+// inTheExport is a predicate on the values that a run of metadata holds: each stands in its file of the
+// export, and holds is true of the bytes of each.
+func inTheExport(holds func(text string) bool) func(c comparison) bool {
+	return func(c comparison) bool {
+		held, there := c.heldInTheExport()
+		for _, value := range held {
+			there = there && holds(value.bytes)
+		}
+		return there
+	}
+}
+
+// heldOrderedApart is the predicate of ByBytes for a line of metadata: the values that the run holds stand in
+// the export, and have between them a character above U+FFFF and one from U+E000 to U+FFFF.
+func heldOrderedApart(c comparison) bool {
+	held, there := c.heldInTheExport()
+	var all []byte
+	for _, value := range held {
+		all = append(all, value.bytes...)
+	}
+	return there && hasCharactersOrderedApart(all)
+}
+
+// aLabelGivesANameThisTreeAloneRefuses is the predicate of NameTaken: the run holds one line of the strings of
+// the editor whose label is, in letters of either case, private, public or output, and the other tree carried
+// the line out.
+func aLabelGivesANameThisTreeAloneRefuses(c comparison) bool {
+	held, there := c.heldInTheExport()
+	if !there || len(held) != 1 || held[0].file != labelsFile {
+		return false
+	}
+	_, label, isLine := strings.Cut(held[0].bytes, "=")
+	return isLine && slices.Contains([]string{"private", "public", "output"}, strings.ToLower(label)) && carriedOut(c.want)
+}
+
+// cellOfARecord is the value of one record of a table that is written C;X<column>;K"<value>". It is false for
+// other bytes, more than one record among them.
+func cellOfARecord(record string) (string, bool) {
+	position, quoted, hasValue := strings.Cut(record, `;K"`)
+	value, closes := strings.CutSuffix(quoted, `"`)
+	isCell := strings.HasPrefix(position, "C;X") && hasValue && closes && !strings.ContainsAny(value, "\"\n")
+	return value, isCell
+}
+
+// numberForms is which of the forms the text of a cell has that the other tree reads as a number and this tree
+// does not: an infinity, NaN and a hexadecimal number, each with or without a sign and ASCII white space around
+// it, and white space outside ASCII at an edge.
+func numberForms(cell string) (infinite, nan, hexadecimal, widerSpace bool) {
+	first, _ := utf8.DecodeRuneInString(cell)
+	last, _ := utf8.DecodeLastRuneInString(cell)
+	number := strings.ToLower(strings.TrimLeft(strings.Trim(cell, asciiSpace), "+-"))
+	return number == "inf" || number == "infinity", number == "nan", strings.HasPrefix(number, "0x"),
+		isWiderSpace(first) || isWiderSpace(last)
+}
+
+// aNumberCellThisTreeAloneRefuses is the predicate of NumberRefused: the run holds one cell of a table that has
+// one of the forms of numberForms, and the other tree carried the line out.
+func aNumberCellThisTreeAloneRefuses(c comparison) bool {
+	held, there := c.heldInTheExport()
+	if !there || len(held) != 1 {
+		return false
+	}
+	cell, isCell := cellOfARecord(held[0].bytes)
+	infinite, nan, hexadecimal, widerSpace := numberForms(cell)
+	return isCell && (infinite || nan || hexadecimal || widerSpace) && carriedOut(c.want)
+}
+
+// bothRefuseInOtherWords is the predicate of OtherWords: the run holds one value, the other tree refused the
+// line, and its complaint has the words that this tree has others for. For a cell that is NaN or hexadecimal
+// those are that the data column is not a whole number; for any other value, a row as the run lays it without
+// one of its cells, the word undefined where the cell's value would stand.
+func bothRefuseInOtherWords(c comparison) bool {
+	held, there := c.heldInTheExport()
+	if !there || len(held) != 1 || c.want.code != 1 || c.want.stdout != "" {
+		return false
+	}
+	if cell, isCell := cellOfARecord(held[0].bytes); isCell {
+		_, nan, hexadecimal, _ := numberForms(cell)
+		return (nan || hexadecimal) && strings.Contains(c.want.stderr, "the data column '"+cell+"' is not a whole number")
+	}
+	return strings.Contains(c.want.stderr, " for undefined\n") || strings.Contains(c.want.stderr, " 'undefined'\n")
+}
+
+// lateTables is the tables of an export that this tree reads before it makes anything of the export, and the
+// other tree only after it has named the fields, or after the units: each by its path from the export's folder.
+var lateTables = []string{balanceTable, unitsTable, itemsTable, buffsTable, upgradesTable}
+
+// eachTreeTellsOfItsFirstFault is the predicate of TwoFaults: the run holds two faults, the second in one of
+// the tables that this tree reads earlier than the other tree does, and the other tree refused the line with a
+// complaint that does not name that table.
+func eachTreeTellsOfItsFirstFault(c comparison) bool {
+	held, there := c.heldInTheExport()
+	return there && len(held) == 2 && slices.Contains(lateTables, held[1].file) && c.want.code == 1 &&
+		!strings.Contains(c.want.stderr, held[1].file)
+}
+
+// bothRefuse checks a run of TwoFaults: both trees must end with 1, print nothing and leave the checkout as it
+// was laid, and this tree must say what the run holds. What the other tree says is its own first fault, and is
+// the predicate's to judge.
+func (c comparison) bothRefuse() {
+	if c.r.refusal == "" {
+		c.t.Error("the run holds nothing that this tree must say as it refuses the line")
+	}
+	for tree, made := range map[string]outcome{"the other tree": c.want, "this tree": c.got} {
+		if made.code != 1 || made.stdout != "" || !reflect.DeepEqual(made.left, made.laid) {
+			c.t.Errorf("%s ended with %d, printed %d bytes and left %q; want 1, nothing, and the checkout as it was "+
+				"laid: %q", tree, made.code, len(made.stdout), entries(made.left), entries(made.laid))
+		}
+	}
+	c.mustSay(c.r.refusal)
 }
 
 // versionWithALineFeed is the predicate of CountOfPaths: the line is of game-paths with its two arguments, and
@@ -1403,7 +1673,7 @@ func hasCharactersOrderedApart(list []byte) bool {
 // then the runs that both generators make as programs. The runs of a mode are a function of its own, and a new
 // mode's are added here.
 func fixtureRuns() []oracleRun {
-	return slices.Concat(schemaRuns(), nativesRuns(), gamePathsRuns(), programRuns())
+	return slices.Concat(schemaRuns(), nativesRuns(), metadataRuns(), gamePathsRuns(), unknownModeRuns(), programRuns())
 }
 
 // exportRuns is the runs on the game's files that one variable names, and the tally they must make.
@@ -1428,6 +1698,13 @@ var onTheGamesFiles = []exportRuns{
 		counts: counts{Runs: 2, Whole: 2, Passed: 2, AsPrograms: 1, Files: 6, Committed: 2},
 		Modes:  map[string]int{"natives": 2},
 	}},
+	// The object data of that version, which the committed metadata are made from: two runs of no class, one of
+	// them with both generators as programs, each with the go.mod, the overrides and the metadata as the files of
+	// its checkout.
+	{"MOONWELL_GAME_DATA", theGamesData, genTally{
+		counts: counts{Runs: 2, Whole: 2, Passed: 2, AsPrograms: 1, Files: 6, Committed: 2},
+		Modes:  map[string]int{"metadata": 2},
+	}},
 }
 
 // anotherModule is the go.mod of a module that is not this one.
@@ -1441,6 +1718,17 @@ func noCheckoutRuns(of string, line lineOfARun) []oracleRun {
 		{name: of + ", in a folder of another module", noCheckout: true, line: line,
 			lay: func(c checkout) { c.write("go.mod", anotherModule) }},
 	}
+}
+
+// unknownModeRuns is lines whose first argument names no mode, with and without more arguments, in a checkout
+// and in a folder that is none: the refusal names the modes that there are.
+func unknownModeRuns() []oracleRun {
+	runs := []oracleRun{
+		{name: "a first argument that names no mode", lay: oneBuff("fnam", "name"),
+			line: words("nativs", "export", "9.9.9")},
+		{name: "a first argument that names no mode, alone", lay: oneBuff("fnam", "name"), line: words("nativs")},
+	}
+	return append(runs, noCheckoutRuns("a first argument that names no mode", words("nativs"))...)
 }
 
 // ---- the runs that both generators make as programs ----
@@ -1490,6 +1778,19 @@ func programRuns() []oracleRun {
 		{name: "a function of the extras without a name", class: "NoName", line: ofTheMiniatures,
 			lay:     luaExtras(functionsOfTheExtras(`{"params": [], "returns": "nothing"}`)),
 			refusal: keyLeftOut("function 1 of the list", "name")},
+		{name: "the metadata of the miniature export", lay: miniPins, line: ofTheMiniExport},
+		{name: "a name that needs a pin", lay: pinned("{}"), line: ofTheMiniExport},
+		{name: "metadata alone", lay: miniPins, line: words("metadata")},
+		{name: "no overrides", class: "FromCheckout", lay: noList, line: ofTheMiniExport},
+		{name: "an export of object data beside the folder of the run, by its name", below: "work",
+			line: words("metadata", "export", "3.0.0.1"),
+			lay: func(c checkout) {
+				miniPins(c)
+				writeExport(c.t, c.path("work/export"), nil)
+			}},
+		{name: "an export of object data that is not there, by its name", below: "work", lay: miniPins,
+			line: words("metadata", "no-export", "3.0.0.1")},
+		{name: "a first argument that names no mode", lay: miniPins, line: words("nativs", "export", "9.9.9")},
 	}
 	for i := range runs {
 		runs[i].name, runs[i].asPrograms = "as programs: "+runs[i].name, true

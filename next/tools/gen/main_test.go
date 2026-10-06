@@ -22,7 +22,8 @@ func TestRunRefusesAFirstArgumentThatNamesNoMode(t *testing.T) {
 		t.Fatal("a mode the generator does not have was run")
 	}
 	contains(t, err.Error(),
-		"Unknown mode 'nativs'", "natives", "game-paths", "without one, gen writes schema/generated")
+		"Unknown mode 'nativs'", "The modes are natives, metadata and game-paths",
+		"without one, gen writes schema/generated")
 	if printed != "" || len(files) != 0 {
 		t.Errorf("the refused line printed %q and left %v", printed, slices.Sorted(maps.Keys(files)))
 	}
@@ -52,6 +53,7 @@ func TestTheRefusalOfAnUnknownModeNamesTheModesOfTheTable(t *testing.T) {
 func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
 	const (
 		natives   = "Usage: go run ./tools/gen natives <exported folder> <game version>"
+		metadata  = "Usage: go run ./tools/gen metadata <game data folder> <game version, e.g. 3.0.0.24268>"
 		gamePaths = "Usage: go run ./tools/gen game-paths <listfile> <game version, e.g. 3.0.0.24268>"
 	)
 	for _, c := range []struct {
@@ -61,6 +63,9 @@ func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
 		{[]string{"natives"}, natives},
 		{[]string{"natives", "folder"}, natives},
 		{[]string{"natives", "folder", "1.2.3.4", "more"}, natives},
+		{[]string{"metadata"}, metadata},
+		{[]string{"metadata", "folder"}, metadata},
+		{[]string{"metadata", "folder", "1.2.3.4", "more"}, metadata},
 		{[]string{"game-paths"}, gamePaths},
 		{[]string{"game-paths", "listfile.txt"}, gamePaths},
 		{[]string{"game-paths", "listfile.txt", "1.2.3.4", "more"}, gamePaths},
@@ -102,6 +107,10 @@ func TestTheTableStartsWithTheModeWithoutANameAndNamesEachModeOnce(t *testing.T)
 	}
 	if len(names) == 0 || names[0] != "" {
 		t.Errorf("the table's modes are %q, want the one without a name first", names)
+	}
+	// The order is that of the command lines in the package comment, and of the sentence for an unknown mode.
+	if want := []string{"", "natives", "metadata", "game-paths"}; !slices.Equal(names, want) {
+		t.Errorf("the table's modes are %q, want %q", names, want)
 	}
 }
 

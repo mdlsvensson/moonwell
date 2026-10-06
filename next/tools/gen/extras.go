@@ -105,7 +105,7 @@ func extrasTree(data []byte) (any, error) {
 // of a list.
 func checkExtras(file map[string]any) error {
 	if key, unknown := keyOutside(file, extrasKeys); unknown {
-		return errUnknownKey("the file", key, extrasKeys)
+		return errUnknownKey(extrasPath, "the file", key, extrasKeys)
 	}
 	functions, _ := file["functions"].([]any)
 	for index, entry := range functions {
@@ -130,7 +130,7 @@ func checkExtras(file map[string]any) error {
 // parameters is there, and has its two and no other. called is how a message names the function.
 func checkFunction(called string, function map[string]any) error {
 	if key, unknown := keyOutside(function, functionKeys); unknown {
-		return errUnknownKey(called, key, functionKeys)
+		return errUnknownKey(extrasPath, called, key, functionKeys)
 	}
 	if key, lacking := keyLacking(function, functionKeys); lacking {
 		return errLacksKey(called, key, functionKeys)
@@ -145,7 +145,7 @@ func checkFunction(called string, function map[string]any) error {
 			continue
 		}
 		if key, unknown := keyOutside(param, parameterKeys); unknown {
-			return errUnknownKey("a parameter of "+called, key, parameterKeys)
+			return errUnknownKey(extrasPath, "a parameter of "+called, key, parameterKeys)
 		}
 		if key, lacking := keyLacking(param, parameterKeys); lacking {
 			return errLacksKey("a parameter of "+called, key, parameterKeys)
@@ -207,10 +207,12 @@ func errExtrasNoObject() error { return errors.New(extrasPath + " is not a JSON 
 
 func errNoFunction() error { return errors.New(extrasPath + ": a function is not an object") }
 
-// errUnknownKey refuses a key that the generator does not read: it would not reach data/natives.json. holder is
-// what has the key: the file, a function, or a parameter of one.
-func errUnknownKey(holder, key string, known []string) error {
-	return errors.New(extrasPath + ": " + holder + " has the key " + fsx.Quoted(key) +
+// errUnknownKey refuses a key of a file that is written by hand, the Lua extras or the overrides of the object
+// metadata, that the generator does not read: what stands under it would reach no file that the generator
+// writes. file is the file by its path from the checkout, and holder what has the key: the file, a function, or
+// a parameter of one.
+func errUnknownKey(file, holder, key string, known []string) error {
+	return errors.New(file + ": " + holder + " has the key " + fsx.Quoted(key) +
 		", which the generator does not read. Its keys are " + listed(known) + ": take the key out, or rename it.")
 }
 

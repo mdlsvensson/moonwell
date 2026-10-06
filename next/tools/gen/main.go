@@ -18,9 +18,10 @@
 // the same, as any program reads one. It knows nothing of a project or of a map either: the program is not built
 // from it.
 //
-// Of Moonwell's packages it imports objects and manifest, for the fields and the categories the schema is made
-// of, script, for the natives as the program reads them, assets, for the types of file that are a texture, fsx,
-// and jass, its own parser of the game's two scripts.
+// Of Moonwell's packages it imports objects and manifest, for the fields, the standard objects and the
+// categories as the program reads them, script, for the natives as the program reads them, assets, for the types
+// of file that are a texture, fsx, and its own parsers: jass, of the game's two scripts, slk, of the game's
+// tables, and ini, of the game's texts of sections.
 package main
 
 import (
@@ -62,6 +63,8 @@ var modes = []mode{
 	{name: "", usage: "Usage: " + commandLine, run: writeSchema},
 	{name: "natives", usage: "Usage: " + commandLine + " natives <exported folder> <game version>",
 		takes: 2, run: writeNatives},
+	{name: "metadata", usage: "Usage: " + commandLine + " metadata <game data folder> <game version, e.g. 3.0.0.24268>",
+		takes: 2, run: writeMetadata},
 	{name: "game-paths", usage: "Usage: " + commandLine + " game-paths <listfile> <game version, e.g. 3.0.0.24268>",
 		takes: 2, run: writeGamePaths},
 }
