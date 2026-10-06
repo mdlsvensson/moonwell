@@ -1,0 +1,138 @@
+Cannot safely read map Lua: unterminated block
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() (at 1:18)
+    - function config() if true then X() end (at 1:39)
+    - "function config()\n" (at 2:1)
+
+Cannot safely read map Lua: unterminated quoted string
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() X("unterminated) end (at 1:21)
+
+Cannot safely read map Lua: unterminated long string or comment
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() X([=[unterminated) end (at 1:21)
+    - --[=[ no close (at 1:1)
+
+Cannot safely read map Lua: expected a name
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() X({) end (at 1:22)
+    - function config() repeat X() end (at 1:30)
+    - function config() X(1, ) end (at 1:24)
+    - function config() local x = end (at 1:29)
+    - function config() object.() end (at 1:26)
+    - function config() 1 end (at 1:19)
+    - function config() X() + Y() end (at 1:23)
+    - end (at 1:1)
+    - until X() (at 1:1)
+    - function config() local x = {end=1} end (at 1:30)
+    - function config() local end = 1 end (at 1:25)
+    - function config() for x in do end end (at 1:28)
+    - function config() goto end end (at 1:24)
+    - function config() if x then else elseif y then end end (at 1:34)
+    - function config() repeat until end (at 1:32)
+    - "-- 🌙\nend" (at 2:1)
+    - --[[🌙]] end (at 1:9)
+    - "function config()\n  local s = '🌙' .. \nend" (at 3:1)
+    - function config(first,) end (at 1:23)
+    - function config(first, 2) end (at 1:24)
+
+Cannot safely read map Lua: invalid numeral
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() X(0x) end (at 1:21)
+    - function config() X(1e+) end (at 1:21)
+    - function config() A(1.2.3) end (at 1:21)
+    - "function config()\r\n  X(0x)\r\nend" (at 2:5)
+
+Cannot safely read map Lua: unescaped newline in quoted string
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - "function config() X('line\nbreak') end" (at 1:21)
+
+Cannot safely read map Lua: return must end its block
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() return X() Y() end (at 1:30)
+    - function config() return; Visible() end (at 1:27)
+    - function config() return 1; Visible() end (at 1:29)
+    - function config() return;; end (at 1:26)
+
+Cannot safely read map Lua: nesting is too deep to establish safe edit boundaries
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() Capture(((((((((((((((((((((((((((((((((((((((((((((((((((((((... (40032 bytes) (at 1:225)
+    - do do do do do do do do do do do do do do do do do do do do do do do do do do do... (140000 bytes) (at 1:601)
+
+Cannot safely read map Lua: expected ')'
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() local x = (1] end (at 1:31)
+    - function config(first second) end (at 1:23)
+    - function config(..., last) end (at 1:20)
+
+Cannot safely read map Lua: expected '='
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() local x = {[1] 2} end (at 1:34)
+
+Cannot safely read map Lua: expected '}'
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() local x = {1 2} end (at 1:32)
+
+Cannot safely read map Lua: expected ']'
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() A()[1 end (at 1:25)
+
+Cannot safely read map Lua: expected call arguments
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() A():method end (at 1:30)
+
+Cannot safely read map Lua: invalid assignment target
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() A() = 1 end (at 1:23)
+    - function config() a, A() = 1, 2 end (at 1:26)
+    - function config() (a) = 1 end (at 1:23)
+
+Cannot safely read map Lua: expected '('
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() function t:config.extra() end end (at 1:36)
+    - function config() local function t.x() end end (at 1:35)
+
+Cannot safely read map Lua: expected ','
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() for x = 1 do end end (at 1:29)
+
+Cannot safely read map Lua: expected 'do'
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() for x = 1, 2, 3, 4 do end end (at 1:34)
+
+Cannot safely read map Lua: expected '::'
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() ::name: end (at 1:25)
+
+Cannot safely read map Lua: unsupported symbol
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() local x = @ end (at 1:29)
+    - --[[🌙]] x = @ (at 1:13)
+
+Cannot safely read map Lua: expected an assignment or call statement
+    file: map.lua
+    hint: Re-save the map in World Editor to restore its generated Lua structure.
+    - function config() X end (at 1:21)
+
+Overlapping or invalid Lua edits.
+    - edits that overlap
+

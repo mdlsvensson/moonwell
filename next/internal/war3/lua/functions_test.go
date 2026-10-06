@@ -45,8 +45,8 @@ func refused(t *testing.T, c refusal) {
 		t.Errorf("Functions accepted, or failed with %v:\n%s", err, c.source)
 		return
 	}
-	if e.File != "map.lua" || e.Hint != "Re-save the map in World Editor to restore its generated Lua structure." ||
-		e.Msg != "Cannot safely read map Lua: "+c.words {
+	if e.File != "map.lua" || !strings.Contains(e.Hint, "World Editor") ||
+		!strings.Contains(e.Msg, "Cannot safely read map Lua") || !strings.Contains(e.Msg, c.words) {
 		t.Errorf("error = %+v, want the words %q, for:\n%s", e, c.words, c.source)
 	}
 	if e.Line != c.line || e.Column != c.column {
@@ -102,14 +102,75 @@ func TestAParameterListIsNamesWithCommasBetweenThemAndMayEndWithThreeDots(t *tes
 			t.Errorf("the parameters %q are not read:\n%s", parameters, source)
 		}
 	}
-	for _, c := range []refusal{
-		{"function config(first,) end", "expected a name", 1, 23},
-		{"function config(first second) end", "expected ')'", 1, 23},
-		{"function config(..., last) end", "expected ')'", 1, 20},
-		{"function config(first, 2) end", "expected a name", 1, 24},
-	} {
+	for _, c := range parameterRefusals {
 		refused(t, c)
 	}
+}
+
+// Lua that is valid and that no other source of the tests has: the one binary operator that everyExpression
+// lacks, blocks one after the other, which nest no deeper than one, and an assignment to an index and to a field
+// of one.
+func TestGreaterThanBlocksInARowAndAnAssignmentToAnIndexAreRead(t *testing.T) {
+	for _, source := range []string{
+		"function config() local x = a > b Visible() end",
+		"function config() if a > b and c >= d then Hidden() end Visible() end",
+		"function config() " + strings.Repeat("do end ", 300) + "Visible() end",
+		"function config() " + strings.Repeat("if a then Hidden() end ", 300) + "Visible() end",
+		"function config() t[1] = 2 t.a[b].c, d = 1, 2 Visible() end",
+		"function config() t[k], u[1][2] = v, w Visible() end",
+	} {
+		if !visibleAlone(source) {
+			t.Errorf("the source is not read as config with one call of Visible:\n%s", sourceName(source))
+		}
+	}
+}
+
+func TestEveryKeywordOfLuaIsNoNameAndAWordThatOnlyStartsLikeOneIs(t *testing.T) {
+	words := strings.Fields("and break do else elseif end false for function goto if in local nil not or repeat " +
+		"return then true until while")
+	if len(keywords) != len(words) {
+		t.Errorf("there are %d keywords, want %d", len(keywords), len(words))
+	}
+	named := func(word string) bool { return isName(Token{Kind: NameToken, Raw: word, Text: word}) }
+	for _, word := range words {
+		if !keywords[word] || named(word) {
+			t.Errorf("%s is not held as a keyword", word)
+		}
+		// Where a name must stand, a keyword is refused.
+		if _, err := Functions("function config() local "+word+" = 1 end", ""); err == nil {
+			t.Errorf("a local named %s is read", word)
+		}
+		if _, err := Functions("function "+word+"() end", ""); err == nil {
+			t.Errorf("a function named %s is read", word)
+		}
+		for _, name := range []string{word + "s", word + "_", "_" + word, word + "1", strings.ToUpper(word)} {
+			if keywords[name] || !named(name) || !visibleAlone("function config() local "+name+" = 1 Visible() end") {
+				t.Errorf("%s is not taken for a name", name)
+			}
+		}
+	}
+	// A keyword is no global either.
+	for _, word := range words {
+		source := "Fine = 2\n" + word + " = 1\nFine, " + word + " = 3, 4"
+		if got := TopLevelGlobals(source); !slices.Equal(got, []string{"Fine"}) {
+			t.Errorf("TopLevelGlobals(%q) = %q", source, got)
+		}
+	}
+}
+
+// parameterRefusals are parameter lists that are none.
+var parameterRefusals = []refusal{
+	{"function config(first,) end", "expected a name", 1, 23},
+	{"function config(first second) end", "expected ')'", 1, 23},
+	{"function config(..., last) end", "expected ')'", 1, 20},
+	{"function config(first, 2) end", "expected a name", 1, 24},
+}
+
+// returnRefusals are returns with a statement after them.
+var returnRefusals = []refusal{
+	{"function config() return; Visible() end", "return must end its block", 1, 27},
+	{"function config() return 1; Visible() end", "return must end its block", 1, 29},
+	{"function config() return;; end", "return must end its block", 1, 26},
 }
 
 func TestAReturnHasValuesOrNoneAndASemicolonOrNoneAndEndsItsBlock(t *testing.T) {
@@ -119,11 +180,7 @@ func TestAReturnHasValuesOrNoneAndASemicolonOrNoneAndEndsItsBlock(t *testing.T) 
 			t.Errorf("%q is not read:\n%s", returned, source)
 		}
 	}
-	for _, c := range []refusal{
-		{"function config() return; Visible() end", "return must end its block", 1, 27},
-		{"function config() return 1; Visible() end", "return must end its block", 1, 29},
-		{"function config() return;; end", "return must end its block", 1, 26},
-	} {
+	for _, c := range returnRefusals {
 		refused(t, c)
 	}
 }

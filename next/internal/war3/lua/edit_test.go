@@ -73,7 +73,7 @@ func TestApplyEditsRefusesEditsThatOverlapOrLieOutsideTheSource(t *testing.T) {
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			got, err := ApplyEdits(digits, c.edits)
-			if err == nil || got != "" || err.Error() != "Overlapping or invalid Lua edits." {
+			if err == nil || got != "" {
 				t.Fatalf("ApplyEdits = %q, %v, want it refused", got, err)
 			}
 			// A caller's bug is not a failure a user can act on.

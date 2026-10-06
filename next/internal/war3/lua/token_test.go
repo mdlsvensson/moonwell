@@ -3,6 +3,8 @@ package lua
 import (
 	"slices"
 	"testing"
+
+	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
 // raws returns the source text of each token.
@@ -201,11 +203,43 @@ func TestALongStringLeavesOutTheLineBreakThatFollowsItsOpeningBracket(t *testing
 		{"[[\n\ntext\n]]", "\ntext\n"},
 		{"[[text\r\n]]", "text\r\n"},
 		{"[[\r\n]]", ""},
+		{"[=[a]]b]=]", "a]]b"},
 	} {
 		tokens, fault := Tokenize(c.source)
 		if fault != nil || len(tokens) != 1 || tokens[0].Kind != StringToken || tokens[0].Text != c.text {
 			t.Errorf("Tokenize(%q) = %+v, fault %+v, want one string with the text %q", c.source, tokens, fault, c.text)
 		}
+	}
+}
+
+// A long bracket ends at its first closing bracket of its level: two long strings are two tokens, and a long
+// comment does not swallow what follows it.
+func TestALongBracketEndsAtItsFirstClosingBracket(t *testing.T) {
+	for _, c := range []struct {
+		source string
+		raws   []string
+	}{
+		{"a = [[x]] b = [[y]]", []string{"a", "=", "[[x]]", "b", "=", "[[y]]"}},
+		{"a = [=[x]=] b = [=[y]=]", []string{"a", "=", "[=[x]=]", "b", "=", "[=[y]=]"}},
+		{"--[[x]] a --[[y]] b", []string{"a", "b"}},
+	} {
+		tokens, fault := Tokenize(c.source)
+		if got := raws(tokens); fault != nil || !slices.Equal(got, c.raws) {
+			t.Errorf("Tokenize(%q) = %q, fault %+v, want %q", c.source, got, fault, c.raws)
+		}
+	}
+}
+
+// What opens a long bracket, or only starts to, is the last thing in the source: each scanner takes it.
+func TestASourceThatEndsWhereALongBracketOpensIsScanned(t *testing.T) {
+	for _, source := range []string{"a = [", "a = [=", "a = [==", "a = [=[", "--[", "--[=", "--[==[", "["} {
+		if value := testkit.Panic(func() { scan(source) }); value != nil {
+			t.Errorf("a scanner panics on %q: %v", source, value)
+		}
+	}
+	// One bracket and equals signs are symbols, and no string.
+	if tokens, _ := Tokenize("a = [="); !slices.Equal(raws(tokens), []string{"a", "=", "[", "="}) {
+		t.Errorf("Tokenize(a = [=) = %q", raws(tokens))
 	}
 }
 
