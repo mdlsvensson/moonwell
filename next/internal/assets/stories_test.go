@@ -92,10 +92,10 @@ func (p project) shippedIn(root string) []Library {
 }
 
 // The kinds of refusal a run can have. A refusal of the first kind names no file of the project, or the manifest.
-// Each of the others is about one file, which it names from the project folder, and has a note in the recording.
+// Each of the others is about one file.
 const (
 	asWhole = "whole"
-	// byName is a refusal about a file of the map, named by the map's label, or about the state file.
+	// byName is a refusal about a file of the map, or about the state file.
 	byName = "by name"
 	// reworded is the refusal of a write to a place that changed after the assets were checked.
 	reworded = "reworded"
@@ -103,14 +103,36 @@ const (
 	bySystem = "by system"
 )
 
-// notes is the note the recording has beside a run with a refusal of each kind: the row of the table of what a
-// user can notice, in the design of this program (its §8), that the refusal is an instance of.
-var notes = map[string]string{
-	byName: `§8, the rule of its rows on a file that cannot be used: it "is named from the project folder"`,
-	reworded: `§8, "assets:sync: a file or folder that appears where a new asset goes, between the check and ` +
-		`the write, stops the sync with "changed after the assets were checked""`,
-	bySystem: `§8, "A folder where a map file belongs, and a file that cannot be read [...], is a named error ` +
-		`with the file, not an internal error"`,
+// The notes of the recording. A note stands beside a run whose refusal has another file than the program before
+// this one gave it, and says what the recording holds there. Two kinds of refusal have a row in the table of what
+// a user can notice, in the design of this program (its §8), and their notes quote it. A refusal by name has no
+// row: its note says what its file is, by what the run records.
+const (
+	noteFromTheProject = "the file of this refusal is named from the project folder, where the program before " +
+		"this one gave no file or a path on disk"
+	noteStateOnDisk = "the file of this refusal is the state file, by its path on disk, where the program before " +
+		"this one gave no file"
+	noteReworded = `§8, "assets:sync: a file or folder that appears where a new asset goes, between the check and ` +
+		`the write, stops the sync with "changed after the assets were checked""`
+	noteBySystem = `§8, "A folder where a map file belongs, and a file that cannot be read [...], is a named error ` +
+		`with the file, not an internal error"`
+)
+
+// noteOf is the note beside a run of a kind that came to the outcome, or "" for a run without one. A refusal by
+// name that has no file, because its message lists the files it is about, has none: no file is what the program
+// before this one gave it too.
+func noteOf(kind string, o outcome) string {
+	switch {
+	case kind == reworded:
+		return noteReworded
+	case kind == bySystem:
+		return noteBySystem
+	case kind != byName || !o.refused || o.refusedAt == noFile:
+		return ""
+	case strings.HasPrefix(o.refusedAt, underRoot):
+		return noteStateOnDisk
+	}
+	return noteFromTheProject
 }
 
 // run is one run of assets:sync, or of a build, in a project as the runs before it left it.
@@ -522,18 +544,32 @@ func held(data []byte) string {
 	return strconv.Quote(string(data))
 }
 
+// How a recording names the file of a refusal: a path on disk below the project folder starts with underRoot,
+// and a refusal without a file has noFile.
+const (
+	underRoot = "<root>/"
+	noFile    = `""`
+)
+
 // below is a file of a refusal as a recording names it: a path on disk below the project folder is written from
-// "<root>", with "/".
+// underRoot, with "/".
 func below(root, file string) string {
 	if rel, err := filepath.Rel(root, file); err == nil && filepath.IsAbs(file) && filepath.IsLocal(rel) {
-		return "<root>/" + filepath.ToSlash(rel)
+		return underRoot + filepath.ToSlash(rel)
 	}
 	return testkit.Shown(file)
 }
 
-// fileOf is the file that a refusal names.
+// internalError is what stands in a recording for the file of an error that is no refusal: one a command would
+// show as an internal error.
+const internalError = "(an internal error)"
+
+// fileOf is the file that a refusal names: "" for a refusal without one.
 func fileOf(err error) string {
-	failure, _ := diag.First(err)
+	failure, expected := diag.First(err)
+	if !expected {
+		return internalError
+	}
 	return failure.File
 }
 
@@ -601,10 +637,11 @@ func recordedStories(t testing.TB, do func(r run, root string) outcome) []byte {
 				r.edit(t, root)
 			}
 			fmt.Fprintf(&out, "== %s (run %d)\n", s.name, i+1)
-			if note := notes[r.refused]; note != "" {
+			made := do(r, root)
+			if note := noteOf(r.refused, made); note != "" {
 				fmt.Fprintf(&out, "note: %s\n", note)
 			}
-			out.WriteString(do(r, root).lines())
+			out.WriteString(made.lines())
 		}
 	}
 	return []byte(out.String())

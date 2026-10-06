@@ -1120,7 +1120,8 @@ func copyOf(t *testing.T, root string) string {
 // the shape outcomeOf gives for this tree. The file of a refusal about one file is this tree's: the other tree
 // names such a file by its path on disk, or in its message alone, which leaves open whether this tree's refusal
 // has a file. So that run is made in this tree too, on a copy of the project; the two refusals must be those the
-// kind of the run allows, and the note beside the run in the recording says what the kind is.
+// kind of the run allows, and the note beside the run in the recording says what file it holds (noteOf). A run
+// in which neither tree's refusal has a file has no note.
 func outcomeOfOtherTree(t *testing.T, r run, root string) outcome {
 	t.Helper()
 	aboutOneFile := r.refused != "" && r.refused != asWhole
@@ -1135,8 +1136,11 @@ func outcomeOfOtherTree(t *testing.T, r run, root string) outcome {
 		t.Errorf("the other tree takes a run that is refused %s", r.refused)
 	case did.err == nil:
 	case !aboutOneFile:
-		failure, _ := olddiag.First(did.err)
-		made.refused, made.refusedAt = true, below(root, failure.File)
+		file := internalError
+		if failure, expected := olddiag.First(did.err); expected {
+			file = failure.File
+		}
+		made.refused, made.refusedAt = true, below(root, file)
 	default:
 		ours := r.in(t, twin)
 		r.refusals(t, "a recorded run about "+r.about, did.err, ours.err, root, twin)

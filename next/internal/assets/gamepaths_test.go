@@ -97,6 +97,12 @@ func TestTheEmbeddedPathListIsTheGames(t *testing.T) {
 	if len(keys) < 30000 || !keys[GamePathKey(`Units\Human\Footman\Footman.mdx`)] || !keys[GamePathKey(`Textures\Black32.blp`)] {
 		t.Errorf("the embedded list has %d keys", len(keys))
 	}
+	// Every path of the list has its key, and two paths that are one file to the game share one. The number is
+	// that of the list of Warcraft III 3.0.0.24268: it changes when the list is generated again for a new version
+	// of the game, and then this row changes with it.
+	if len(keys) != 42114 {
+		t.Errorf("the embedded list has %d keys, want 42114", len(keys))
+	}
 	if again := LoadGamePaths(); reflect.ValueOf(again).Pointer() != reflect.ValueOf(keys).Pointer() {
 		t.Error("the embedded list is parsed again on a second call")
 	}
