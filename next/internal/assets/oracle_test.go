@@ -26,7 +26,6 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/manifest"
-	"github.com/mdlsvensson/moonwell/next/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 	"github.com/mdlsvensson/moonwell/next/internal/war3/imp"
@@ -155,67 +154,19 @@ import (
 // oldManifest is the manifest the other tree names in every error about the assets block.
 const oldManifest = "moonwell.pkl"
 
-// mapFolder is the source map of every project here that has one.
-const mapFolder = "map.w3x"
-
-// shippedUnder is where the other tree looks for the files a library ships, from the project folder.
-const shippedUnder = layout.LibraryAssetsDir + "/"
-
-// project is a temporary project for both trees.
-type project struct {
-	name      string
-	files     map[string]string // by path from the project folder, with "/": what each file holds
-	folders   []string          // folders to make besides those the files are in
-	block     string            // the manifest's assets block as pkl prints it; "" for a block that sets nothing
-	libraries []string          // the keys of the libraries, whose files are under shippedUnder
-	refused   bool              // whether both trees refuse the project
-}
-
-// holding is files that each hold their own name, so that no two hold the same bytes.
-func holding(names ...string) map[string]string {
-	files := map[string]string{}
-	for _, name := range names {
-		files[name] = bytesOf(name)
-	}
-	return files
-}
-
-// bytesOf is what holding puts into the file of a name.
-func bytesOf(name string) string { return "the bytes of " + name }
-
-// onDisk writes the project into a folder of its own.
-func (p project) onDisk(t testing.TB) string {
-	t.Helper()
-	root := t.TempDir()
-	for _, folder := range p.folders {
-		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(folder)), 0o777); err != nil {
-			t.Fatal(err)
-		}
-	}
-	for name, content := range p.files {
-		testkit.WriteFile(t, root, name, []byte(content))
-	}
-	return root
-}
+// The projects of both trees (project, holding, onDisk), the stories of the plan and the sync, and the run of
+// this tree are in stories_test.go. shippedUnder there is where the other tree looks for the files a library
+// ships (layout.LibraryAssetsDir), and the folder this tree is given for each library.
 
 // blocks is the project's assets block as each tree holds it.
 func (p project) blocks(t testing.TB) (oldassets.Config, manifest.Assets) {
 	t.Helper()
-	block := blockOf(t, cmp.Or(p.block, noBlock))
+	block := p.assets(t)
 	paths := &ordered.Map[string]{}
 	for source, target := range block.Paths.All() {
 		paths.Set(source, target)
 	}
 	return oldassets.Config{Paths: paths, Exclude: block.Exclude}, block
-}
-
-// shippedIn is the project's libraries as this tree is given them: each with the folder the other tree reads.
-func (p project) shippedIn(root string) []Library {
-	var libraries []Library
-	for _, key := range p.libraries {
-		libraries = append(libraries, Library{Key: key, Dir: filepath.Join(root, filepath.FromSlash(shippedUnder), key)})
-	}
-	return libraries
 }
 
 // converted is the assets the other tree collected, in the type of this tree.
@@ -958,53 +909,8 @@ func TestOracleOnTheBytesOfAState(t *testing.T) {
 
 // ---- the plan and the sync ----
 
-// sourceLabel is how this tree names the source map in errors: its path from the project folder.
-const sourceLabel = "maps/" + mapFolder
-
-// stageFolder is where a build of the stories stages the map, from the project folder.
-const stageFolder = "dist/stage/" + mapFolder
-
-// How the two refusals of a run are compared; the header of this file says what each is.
-const (
-	asWhole  = "whole"
-	byName   = "by name"
-	reworded = "reworded"
-	bySystem = "by system"
-)
-
-// run is one run of assets:sync, or of a build, in a project as the runs before it left it.
-type run struct {
-	edit      func(t testing.TB, root string) // what changes in the project before the run
-	block     string
-	libraries []string
-	build     bool                            // the changes go into a staged copy, and no state is written
-	meddle    func(t testing.TB, root string) // what another program does between the plan and its writes
-	// The context of the plan and of the writes, for a run that makes its own: else one that is never cancelled.
-	planCtx, syncCtx func(t testing.TB, root string) *countdown
-	refused          string // how the two refusals are compared; "" for a run both trees take
-	about            string // the file a refusal names, from the project folder with "/"
-}
-
-// story is a project and the runs in it, one after the other.
-type story struct {
-	name    string
-	project project
-	runs    []run
-}
-
-// planned is a plan of either tree in one shape.
-type planned struct {
-	Assets  []Asset
-	Changes []plannedChange
-	Owned   []Owned
-}
-
-// plannedChange is one change of a plan, its file by the path from the folder the plan is for, with "/".
-type plannedChange struct {
-	Name   string
-	Bytes  []byte
-	Remove bool
-}
+// The kind of a run's refusal (asWhole, byName, reworded, bySystem, in stories_test.go) is how the two refusals
+// of the run are compared; the header of this file says what each is.
 
 // plannedByOtherTree is a plan of the other tree for the folder at dir.
 func plannedByOtherTree(t testing.TB, plan *oldassets.Plan, dir string) *planned {
@@ -1023,32 +929,8 @@ func plannedByOtherTree(t testing.TB, plan *oldassets.Plan, dir string) *planned
 	return p
 }
 
-// plannedByThisTree is a plan of this tree.
-func plannedByThisTree(result *Result) *planned {
-	p := &planned{Assets: result.Assets, Changes: []plannedChange{}, Owned: append([]Owned{}, result.State.Files...)}
-	for _, change := range result.Changes {
-		p.Changes = append(p.Changes, plannedChange{change.Name, change.Bytes, change.Remove})
-	}
-	return p
-}
-
-// ran is what a run did in one tree.
-type ran struct {
-	plan *planned // nil for a plan that was refused
-	err  error
-	asks [2]int // how often the plan and the writes asked their contexts
-}
-
-// contextOf is the context of one step of a run in the project at root.
-func contextOf(t testing.TB, root string, own func(testing.TB, string) *countdown) *countdown {
-	if own != nil {
-		return own(t, root)
-	}
-	return &countdown{Context: context.Background(), limit: never}
-}
-
 // inOtherTree is the run in the other tree, on its copy of the project.
-func (r run) inOtherTree(t *testing.T, root string) (did ran) {
+func (r run) inOtherTree(t testing.TB, root string) (did ran) {
 	t.Helper()
 	mapDir, stateFile, err := oldassets.Locations(root, mapFolder)
 	if err != nil {
@@ -1079,47 +961,6 @@ func (r run) inOtherTree(t *testing.T, root string) (did ran) {
 		r.meddle(t, root)
 	}
 	did.err = oldassets.ApplyPlan(syncCtx, plan, written)
-	did.asks[1] = syncCtx.asks
-	return did
-}
-
-// inThisTree is the run in this tree, on its copy of the project: as a command does it.
-func (r run) inThisTree(t *testing.T, root string) (did ran) {
-	t.Helper()
-	p := project{block: r.block, libraries: r.libraries}
-	_, block := p.blocks(t)
-	stateFile, err := StateFile(root, mapFolder)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assets, _, err := Collect(root, block, oldManifest, p.shippedIn(root))
-	if err != nil {
-		return ran{err: err}
-	}
-	owned, err := ReadState(stateFile)
-	if err != nil {
-		return ran{err: err}
-	}
-	folder, err := mapdir.Open(filepath.Join(root, filepath.FromSlash(sourceLabel)), sourceLabel)
-	if err != nil {
-		return ran{err: err}
-	}
-	planCtx, syncCtx := contextOf(t, root, r.planCtx), contextOf(t, root, r.syncCtx)
-	result, err := Plan(planCtx, folder, assets, owned)
-	did.asks[0] = planCtx.asks
-	if err != nil {
-		did.err = err
-		return did
-	}
-	did.plan = plannedByThisTree(result)
-	if r.meddle != nil {
-		r.meddle(t, root)
-	}
-	if r.build {
-		did.err = folder.With(result.Changes).StageTo(filepath.Join(root, filepath.FromSlash(stageFolder)))
-		return did
-	}
-	did.err = Sync(syncCtx, folder, result, stateFile)
 	did.asks[1] = syncCtx.asks
 	return did
 }
@@ -1220,7 +1061,7 @@ func (r run) compare(t *testing.T, what, oldRoot, newRoot string) (refused strin
 		r.edit(t, oldRoot)
 		r.edit(t, newRoot)
 	}
-	want, got := r.inOtherTree(t, oldRoot), r.inThisTree(t, newRoot)
+	want, got := r.inOtherTree(t, oldRoot), r.in(t, newRoot)
 	refused = r.refusals(t, what, want.err, got.err, oldRoot, newRoot)
 	switch {
 	case want.plan != nil && got.plan != nil:
@@ -1236,237 +1077,8 @@ func (r run) compare(t *testing.T, what, oldRoot, newRoot string) (refused strin
 
 // ---- the stories ----
 
-// with adds files that hold a text of their own to files: a name, then the text, and so on.
-func with(files map[string]string, pairs ...string) map[string]string {
-	for i := 0; i < len(pairs); i += 2 {
-		files[pairs[i]] = pairs[i+1]
-	}
-	return files
-}
-
-// putting is an edit that writes files of the project: a name from the project folder with "/", then the text
-// the file holds, and so on.
-func putting(pairs ...string) func(testing.TB, string) {
-	return func(t testing.TB, root string) {
-		t.Helper()
-		for i := 0; i < len(pairs); i += 2 {
-			testkit.WriteFile(t, root, pairs[i], []byte(pairs[i+1]))
-		}
-	}
-}
-
-// removing is an edit that removes files of the project, and folders with all that is in them.
-func removing(names ...string) func(testing.TB, string) {
-	return func(t testing.TB, root string) {
-		t.Helper()
-		for _, name := range names {
-			if err := os.RemoveAll(filepath.Join(root, filepath.FromSlash(name))); err != nil {
-				t.Fatal(err)
-			}
-		}
-	}
-}
-
-// renaming is an edit that renames a file or a folder of the project, by way of a third name: a system that
-// ignores letter case takes two spellings of a name for one.
-func renaming(from, to string) func(testing.TB, string) {
-	return func(t testing.TB, root string) {
-		t.Helper()
-		at := func(name string) string { return filepath.Join(root, filepath.FromSlash(name)) }
-		if err := errors.Join(os.Rename(at(from), at(from+".aside")), os.Rename(at(from+".aside"), at(to))); err != nil {
-			t.Fatal(err)
-		}
-	}
-}
-
-// several is edits made one after the other.
-func several(edits ...func(testing.TB, string)) func(testing.TB, string) {
-	return func(t testing.TB, root string) {
-		t.Helper()
-		for _, edit := range edits {
-			edit(t, root)
-		}
-	}
-}
-
-// indexOf is what a war3map.imp with the entries holds.
-func indexOf(entries ...imp.Entry) string { return string(imp.Write(entries)) }
-
-// stopped is a context that is cancelled from the ask after limit on, and before that ask has another program
-// do something in the project.
-func stopped(limit int, meddle func(testing.TB, string)) func(testing.TB, string) *countdown {
-	return func(t testing.TB, root string) *countdown {
-		return &countdown{Context: context.Background(), limit: limit, before: map[int]func(){limit + 1: func() { meddle(t, root) }}}
-	}
-}
-
-// scenarioStories is the scenarios of the other tree's tests of the plan.
-func scenarioStories() []story {
-	const m, s = sourceLabel + "/", shippedUnder
-	const sword = "ReplaceableTextures/CommandButtons/BTNSword.blp"
-	const mapped = `{"paths":{"icons/disabled.blp":"ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp"}}`
-	const spellings = `{"paths":{"a.blp":"Sound/Music/a.blp","b.blp":"sound/music/b.blp","c.blp":"SOUND/Effects/c.blp"}}`
-	return []story{
-		{"mapped assets beside the editor's own import, and nothing to do the second time",
-			project{files: with(holding("assets/"+sword, "assets/icons/disabled.blp", m+"war3mapImported/existing.wav"),
-				m+"war3map.imp", indexOf(imp.Entry{Flag: 5, Path: "existing.wav"}))},
-			[]run{{block: mapped}, {block: mapped}}},
-		{"an asset is changed, staged by a build, synced, renamed by a mapping and removed",
-			project{files: holding("assets/Models/unit.mdx", m+"unmanaged.txt")},
-			[]run{{}, {edit: putting("assets/Models/unit.mdx", "second"), build: true}, {},
-				{block: `{"paths":{"Models/unit.mdx":"Models/renamed.mdx"}}`}, {edit: removing("assets/Models/unit.mdx")}}},
-		{"World Editor saves the owned imports with its own flag, and a third asset is added",
-			project{files: holding("assets/Textures/a.blp", "assets/Textures/b.blp")},
-			[]run{{}, {edit: putting(m+"war3map.imp",
-				indexOf(imp.Entry{Flag: 29, Path: `Textures\a.blp`}, imp.Entry{Flag: 29, Path: `Textures\b.blp`}))},
-				{edit: putting("assets/Textures/c.blp", "a third")}}},
-		{"a file of the map where an asset goes, then an owned file edited by hand, with and without its asset",
-			project{files: with(holding("assets/a.blp"), m+"a.blp", "editor owned")},
-			[]run{{refused: byName, about: m + "a.blp"}, {edit: removing(m + "a.blp")},
-				{edit: putting(m+"a.blp", "manual edit"), refused: byName, about: m + "a.blp"},
-				{edit: removing("assets/a.blp"), refused: byName, about: m + "a.blp"},
-				{build: true, refused: byName, about: m + "a.blp"}}},
-		{"an asset below a file of the map",
-			project{files: holding("assets/a.blp", m+"Textures")},
-			[]run{{block: `{"paths":{"a.blp":"textures/a.blp"}}`, refused: byName, about: m + "Textures"}}},
-		{"a folder the map spells in its own way, and new folders in three spellings",
-			project{files: holding(m+"Textures/existing.blp", "assets/textures/new.blp", "assets/a.blp", "assets/b.blp", "assets/c.blp")},
-			[]run{{block: spellings}, {block: spellings}}},
-		{"nothing to own, then one file, then nothing again",
-			project{}, []run{{}, {edit: putting("assets/a.blp", "one")}, {edit: removing("assets/a.blp")}}},
-		{"a folder appears where a new file goes, after the plan",
-			project{files: holding("assets/a.blp", "assets/b.blp")},
-			[]run{{meddle: putting(m+"b.blp/inner.txt", "another program's"), refused: reworded, about: m + "b.blp"}}},
-		{"a write fails after a file was replaced: a file is where the folder of a new file goes",
-			project{files: with(holding("assets/a.blp"), m+"war3mapImported/existing.wav", "editor",
-				m+"war3map.imp", indexOf(imp.Entry{Flag: 5, Path: "existing.wav"}))},
-			[]run{{}, {edit: putting("assets/a.blp", "second", "assets/Sound/b.blp", "new"),
-				meddle: putting(m+"Sound", "another program's"), refused: byName, about: m + "Sound/b.blp"}}},
-		{"a file that cannot be taken out again when the sync is interrupted",
-			project{files: holding("assets/a.blp", "assets/b.blp")},
-			[]run{{syncCtx: stopped(1, several(removing(m+"a.blp"), putting(m+"a.blp/inner.txt", "another program's"))),
-				refused: byName, about: m + "a.blp"}}},
-		{"nothing to import and nothing owned, in a map whose index does not read",
-			project{files: map[string]string{m + "war3map.imp": "\x09\x09"}}, []run{{}, {build: true}}},
-		{"a library's files beside the map's own, and the library dropped",
-			project{files: holding("assets/Models/Own.mdx", "assets/icons/shared.blp", s+"ui/war3mapImported/ui/frames.toc",
-				s+"ui/icons/shared.blp", s+"unlisted/never.txt")},
-			[]run{{libraries: []string{"ui"}}, {libraries: []string{"ui"}}, {}}},
-		{"a library's file where the map has a file of its own",
-			project{files: holding(s+"ui/Models/Golem.mdx", m+"Models/Golem.mdx")},
-			[]run{{libraries: []string{"ui"}, refused: byName, about: m + "Models/Golem.mdx"}}},
-	}
-}
-
-// seededStories is stories for what the scenarios do not reach.
-func seededStories(t testing.TB) []story {
-	const m, s = sourceLabel + "/", shippedUnder
-	const state = ".asset-state/" + mapFolder + ".json"
-	e := func(flag uint8, path string) imp.Entry { return imp.Entry{Flag: flag, Path: path} }
-	one := func(name string, files map[string]string, r run) story {
-		return story{name, project{files: files}, []run{r}}
-	}
-	return []story{
-		one("an import World Editor made where an asset goes, without a file",
-			with(holding("assets/Textures/a.blp"), m+"war3map.imp", indexOf(e(29, `textures\A.blp`))),
-			run{refused: byName, about: m + "Textures/a.blp"}),
-		one("an import in the folder World Editor imports into, where an asset goes",
-			with(holding("assets/war3mapImported/a.wav"), m+"war3map.imp", indexOf(e(8, "A.wav"))),
-			run{refused: byName, about: m + "war3mapImported/a.wav"}),
-		one("an index that lists a path twice",
-			with(holding("assets/a.blp"), m+"war3map.imp", indexOf(e(13, `Textures\x.blp`), e(5, "y.wav"), e(29, "textures/X.BLP"))),
-			run{refused: byName, about: m + "war3map.imp"}),
-		one("an index that is cut short", with(holding("assets/a.blp"), m+"war3map.imp", indexOf(e(13, "x.blp"))[:10]),
-			run{refused: byName, about: m + "war3map.imp"}),
-		one("an index with a flag World Editor does not write", with(holding("assets/a.blp"), m+"war3map.imp", indexOf(e(7, "x.blp"))),
-			run{refused: byName, about: m + "war3map.imp"}),
-		one("an index with a path that leaves the map", with(holding("assets/a.blp"), m+"War3Map.imp", indexOf(e(13, `..\x.blp`))),
-			run{refused: byName, about: m + "War3Map.imp"}),
-		one("an index named in capitals, with the editor's own import",
-			with(holding("assets/a.blp", m+"war3mapImported/own.wav"), m+"WAR3MAP.IMP", indexOf(e(8, "own.wav"))), run{}),
-		one("the index World Editor 3.00 saved",
-			with(holding("assets/a.blp", m+"wa3mapPreview.tga"), m+"war3map.imp", string(testkit.Fixture(t, "imports-we3/war3map-flag29.imp"))),
-			run{}),
-		{"an owned file gone from the map, an asset changed, one added and one left out",
-			project{files: holding("assets/a.blp", "assets/b.blp", "assets/c.blp", "assets/d.blp")},
-			[]run{{}, {edit: several(removing(m+"a.blp"), putting("assets/b.blp", "second", "assets/Sound/e.blp", "new")),
-				block: `{"exclude":["c.blp"]}`}}},
-		one("an asset named as a folder of the map", holding("assets/textures", m+"Textures/x.blp"),
-			run{refused: byName, about: m + "Textures"}),
-		{"an asset named as an empty folder of the map",
-			project{files: holding("assets/empty"), folders: []string{m + "Empty"}}, []run{{refused: byName, about: m + "Empty"}}},
-		{"an asset below an owned file that no asset wants",
-			project{files: holding("assets/data")},
-			[]run{{}, {edit: several(removing("assets/data"), putting("assets/data/inner.txt", "inner")), refused: byName, about: m + "data"}}},
-		one("two assets without room, the first below a file", holding("assets/a/inner.blp", "assets/b.blp", m+"a", m+"b.blp"),
-			run{refused: byName, about: m + "a"}),
-		one("two assets without room, the first at a file", holding("assets/a/inner.blp", "assets/b.blp", m+"a", m+"0.blp"),
-			run{block: `{"paths":{"b.blp":"0.blp"}}`, refused: byName, about: m + "0.blp"}),
-		{"an owned import that World Editor saved without a custom path",
-			project{files: holding("assets/war3mapImported/a.wav")},
-			[]run{{}, {edit: putting(m+"war3map.imp", indexOf(e(5, "a.wav")))}, {}, {}}},
-		{"the last owned file is removed from a map without an index",
-			project{files: holding("assets/a.blp")}, []run{{}, {edit: removing("assets/a.blp", m+"war3map.imp")}}},
-		{"an owned file whose import is gone from the index",
-			project{files: holding("assets/a.blp")}, []run{{}, {edit: putting(m+"war3map.imp", indexOf())}}},
-		{"an owned file under another spelling in the map",
-			project{files: holding("assets/Models/Unit.mdx")},
-			[]run{{}, {edit: several(renaming(m+"Models/Unit.mdx", m+"Models/UNIT.mdx"), renaming(m+"Models", m+"models"),
-				putting("assets/Models/Unit.mdx", "second"))}}},
-		one("names outside ASCII and with a space, and a file without bytes",
-			with(holding("assets/caf\xc3\xa9/\xc3\x89cole.blp", "assets/My Icons/a b.blp"), "assets/empty.blp", ""), run{}),
-		one("a path that looks like a number, alone", holding("assets/7"), run{}),
-		{"a build with an asset changed, one removed and one in a new folder",
-			project{files: holding("assets/Models/unit.mdx", "assets/old.blp", m+"war3map.w3i")},
-			[]run{{}, {edit: several(putting("assets/Models/unit.mdx", "second", "assets/sound/theme.mp3", "theme"), removing("assets/old.blp")),
-				build: true}}},
-		one("a library's file below a file of the map", holding(s+"ui/ui/frame.fdf", m+"UI"),
-			run{libraries: []string{"ui"}, refused: byName, about: m + "UI"}),
-		one("a folder named as the index", holding("assets/a.blp", m+"war3map.imp/stray.txt"),
-			run{refused: bySystem, about: m + "war3map.imp"}),
-		{"an owned file is edited by hand after the plan",
-			project{files: holding("assets/0.blp", "assets/a.blp")},
-			[]run{{}, {edit: putting("assets/0.blp", "second", "assets/a.blp", "second"),
-				meddle: putting(m+"a.blp", "edited by hand"), refused: byName, about: m + "a.blp"}}},
-		one("a file appears where a new asset goes, after the plan", holding("assets/0.blp", "assets/a.blp"),
-			run{meddle: putting(m+"a.blp", "the editor's"), refused: byName, about: m + "a.blp"}),
-		one("the state file cannot be written", holding("assets/a.blp"),
-			run{syncCtx: beforeAsk(3, putting(state+"/in the way.txt", "another program's")), refused: byName, about: state}),
-		// Another program gets at the state file after the sync began. The ask before the state file is the last:
-		// the second where a.blp alone is written, the third where the index is written too.
-		{"the state file is changed before it is written",
-			project{files: holding("assets/a.blp")},
-			[]run{{}, {edit: putting("assets/a.blp", "second"), syncCtx: beforeAsk(2, putting(state, "another program's")),
-				refused: byName, about: state}}},
-		{"the state file is removed before it is written",
-			project{files: holding("assets/a.blp")},
-			[]run{{}, {edit: putting("assets/a.blp", "second"), syncCtx: beforeAsk(2, removing(state)), refused: byName, about: state}}},
-		one("a state file is made before the first is written", holding("assets/a.blp"),
-			run{syncCtx: beforeAsk(3, putting(state, "another program's")), refused: byName, about: state}),
-		{"the state file is changed before it is removed",
-			project{files: holding("assets/a.blp")},
-			[]run{{}, {edit: removing("assets/a.blp"), syncCtx: beforeAsk(3, putting(state, "another program's")),
-				refused: byName, about: state}}},
-		// Neither tree looks again at a state file that needs no write.
-		{"the state file is changed while a sync that does not write it writes the index",
-			project{files: holding("assets/a.blp")},
-			[]run{{}, {edit: putting(m+"war3map.imp", indexOf()), syncCtx: beforeAsk(1, putting(state, "another program's"))}}},
-		// Nor does either tree look for a state file that a sync has neither to write nor to remove: the sync
-		// leaves nothing owned, and the state file is gone when it begins.
-		{"a state file is made while a sync that owns nothing, and found none, writes the map",
-			project{files: holding("assets/a.blp")},
-			[]run{{}, {edit: removing("assets/a.blp"), meddle: removing(state),
-				syncCtx: beforeAsk(2, putting(state, "another program's"))}}},
-	}
-}
-
-// beforeAsk is a context that is never cancelled, and before an ask, counted from 1, has another program do
-// something in the project.
-func beforeAsk(ask int, meddle func(testing.TB, string)) func(testing.TB, string) *countdown {
-	return func(t testing.TB, root string) *countdown {
-		return &countdown{Context: context.Background(), limit: never, before: map[int]func(){ask: func() { meddle(t, root) }}}
-	}
-}
+// The stories are in stories_test.go: scenarioStories is the scenarios of the other tree's tests of the plan, and
+// seededStories is those for what the scenarios do not reach.
 
 func TestOracleOnThePlanAndTheSync(t *testing.T) {
 	compared := map[string]int{}
@@ -1488,21 +1100,61 @@ func TestOracleOnThePlanAndTheSync(t *testing.T) {
 	}
 }
 
-// interruptedProject is a project after a sync, with an asset changed, one added and one removed since: its plan
-// asks its context before anything, before each of the two owned files and before each of the two assets, and its
-// sync before each of four changes and before the state file.
-func interruptedProject() project {
-	const m = sourceLabel + "/"
-	owned := State{Files: []Owned{{"a.blp", fsx.SHA256Hex([]byte("first"))}, {"dropped.blp", fsx.SHA256Hex([]byte("dropped"))}}}
-	index := indexOf(imp.Entry{Flag: 29, Path: "a.blp"}, imp.Entry{Flag: 29, Path: "dropped.blp"})
-	return project{files: map[string]string{
-		"assets/a.blp": "second", "assets/b.blp": "new", m + "a.blp": "first", m + "dropped.blp": "dropped",
-		m + "war3map.imp": index, ".asset-state/" + mapFolder + ".json": string(owned.Bytes()),
-	}}
+// ---- the recording ----
+
+// copyOf is a copy of the project at root, in a folder of its own.
+func copyOf(t *testing.T, root string) string {
+	t.Helper()
+	twin := t.TempDir()
+	for name, data := range testkit.Snapshot(t, root) {
+		if data != nil {
+			testkit.WriteFile(t, twin, name, data)
+		} else if err := os.MkdirAll(filepath.Join(twin, filepath.FromSlash(name)), 0o777); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return twin
+}
+
+// outcomeOfOtherTree makes the run in the other tree's way in the project at root, and gives what it came to in
+// the shape outcomeOf gives for this tree. The file of a refusal about one file is this tree's: the other tree
+// names such a file by its path on disk, or in its message alone, which leaves open whether this tree's refusal
+// has a file. So that run is made in this tree too, on a copy of the project; the two refusals must be those the
+// kind of the run allows, and the note beside the run in the recording says what the kind is.
+func outcomeOfOtherTree(t *testing.T, r run, root string) outcome {
+	t.Helper()
+	aboutOneFile := r.refused != "" && r.refused != asWhole
+	twin := ""
+	if aboutOneFile {
+		twin = copyOf(t, root)
+	}
+	did := r.inOtherTree(t, root)
+	made := outcome{plan: did.plan, left: testkit.Snapshot(t, root)}
+	switch {
+	case did.err == nil && r.refused != "":
+		t.Errorf("the other tree takes a run that is refused %s", r.refused)
+	case did.err == nil:
+	case !aboutOneFile:
+		failure, _ := olddiag.First(did.err)
+		made.refused, made.refusedAt = true, below(root, failure.File)
+	default:
+		ours := r.in(t, twin)
+		r.refusals(t, "a recorded run about "+r.about, did.err, ours.err, root, twin)
+		made.refused, made.refusedAt = true, below(twin, fileOf(ours.err))
+	}
+	return made
+}
+
+// TestOracleOnTheRecordedStories holds testdata/recorded/stories.txt to what the other tree does in every run
+// the recording names. It is the test that writes it: MOONWELL_RECORD=1 with -run of this test alone.
+func TestOracleOnTheRecordedStories(t *testing.T) {
+	testkit.Recorded(t, "stories.txt", recordedStories(t, func(r run, root string) outcome {
+		return outcomeOfOtherTree(t, r, root)
+	}))
 }
 
 func TestOracleOnAnInterruptedPlanAndAnInterruptedSync(t *testing.T) {
-	const asks = 5 // of the plan, and of the sync
+	const asks = interruptedAsks // of the plan, and of the sync
 	limited := func(limit int) func(testing.TB, string) *countdown {
 		return func(testing.TB, string) *countdown { return &countdown{Context: context.Background(), limit: limit} }
 	}
@@ -1544,7 +1196,7 @@ func TestOracleOnAMapFileThatCannotBeRead(t *testing.T) {
 		for _, root := range []string{oldRoot, newRoot} {
 			testkit.MakeUnreadable(t, filepath.Join(root, filepath.FromSlash(r.about)))
 		}
-		want, got := r.inOtherTree(t, oldRoot), r.inThisTree(t, newRoot)
+		want, got := r.inOtherTree(t, oldRoot), r.in(t, newRoot)
 		if r.refusals(t, "a plan that needs "+held, want.err, got.err, oldRoot, newRoot) == bySystem && want.plan == nil && got.plan == nil {
 			compared++
 		}

@@ -1,0 +1,2239 @@
+== {"loadingScreen":{"model":"Loading.mdx","text":"Text","title":"Title","subtitle":"Subtitle"}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3map.w3i: sha256 813528f27ea7cb6667da9095b8dcacf4184927ec200679963c4c74115ace6153, 647 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 813528f27ea7cb6667da9095b8dcacf4184927ec200679963c4c74115ace6153, 647 bytes
+== {"environment":{"soundEnvironment":"Dungeon","waterColor":[255,0,0,255],"fog":{"enabled":true,"color":[255,0,0,255]}}}
+the 53 scripts:
+  sha256 b49a8d9b21af6e2d292ffe889e4341a70be5e9d1b267147a6e26eb817e02db12, 254422 bytes
+the fixture:
+  war3map.w3i: sha256 96001f8167f90028febd797847bfe7bad6f61783965ccc01ef20ccd736d9e32b, 626 bytes
+  war3map.lua: sha256 fb193850d6416bfc0b16ac870f5ed142a1df8f78fd7f8ec5fa68d459ef6837f2, 6747 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 96001f8167f90028febd797847bfe7bad6f61783965ccc01ef20ccd736d9e32b, 626 bytes
+  war3map.lua: sha256 b92ee07304f7fbd88adcaf0420b7e88c83da26cf05eec29d915b0f37e2b13990, 6750 bytes
+== {"info":{"name":"Møønwell","author":"","description":"TRIGSTR_001"},"loadingScreen":{"title":"Changed","background":7}}
+the 53 scripts:
+  sha256 208a5dc721accaee62ef2083e2726b10e6e0b2581188d896fad9683e299cff60, 257309 bytes
+the fixture:
+  war3map.w3i: sha256 264e6ae2faedff3ebed944c1181400b005d0c0e0b1e6eb80bd06f5b2870806ae, 614 bytes
+  war3map.lua: sha256 005ddaf37141eff84f81ea632d22badb598788c39a4d2c1737aa547801a81a1b, 6665 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 264e6ae2faedff3ebed944c1181400b005d0c0e0b1e6eb80bd06f5b2870806ae, 614 bytes
+  war3map.lua: sha256 2bf7cd1b26557bb8456a00774a2d42869da5d82c8f0c5d1c346abaeda43da9b1, 6668 bytes
+== {"info":{"name":"TRIGSTR_001","author":"Author","description":"Description"},"loadingScreen":{"title":"Title","background":0}}
+the 53 scripts:
+  sha256 a8d0092df7b0171215e824872ec635711f1c2d8a28818a34df04e4ceffa019f4, 257347 bytes
+the fixture:
+  war3map.w3i: sha256 85d22984e2d21d555b6743b1c1cea70524a52e1a050d9cca577d2ba5dbf89f39, 619 bytes
+  war3map.lua: sha256 97c550da8704766ff5ca9af38e0ce4dde6e4497d58ff854604bd602ca15ed91d, 6666 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 85d22984e2d21d555b6743b1c1cea70524a52e1a050d9cca577d2ba5dbf89f39, 619 bytes
+  war3map.lua: sha256 ca6b635eea0ac60b1a232359cb88b5f66a9a347e58d0e431652b57bd2369780a, 6669 bytes
+== {"players":{"0":{"x":256,"controller":"computer"}},"forces":{"0":{"name":"Blue","sharedVision":true}},"environment":{"soundEnvironment":"Dungeon","waterColor":[2,3,4,255],"fog":{"start":2000}}}
+the 53 scripts:
+  sha256 950c1874e8f6fdc7b063b7b0b15a985a5b990c2abc991e5b4f9a8530ba45041f, 242236 bytes
+the fixture:
+  war3map.w3i: sha256 150f7ba38fd2cfe8aef6e246b2fb0f7af440370709f490de25c1591a0d8af6dd, 619 bytes
+  war3map.lua: sha256 1f956031ec49bba69e5c86017641ded808fe1d58d572c236d93fedde3233fff6, 9906 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 150f7ba38fd2cfe8aef6e246b2fb0f7af440370709f490de25c1591a0d8af6dd, 619 bytes
+  war3map.lua: sha256 de90dc8d24d68bd1ff9cc2a5bb672782e78817181289716f5ea84a2b0c474ed5, 9909 bytes
+== {"players":{"0":{"x":128,"controller":"user"}},"forces":{"0":{"name":"Force 1","sharedVision":false}},"environment":{"soundEnvironment":"Default","waterColor":[255,255,255,255],"fog":{"start":1000}}}
+the 53 scripts:
+  sha256 79d16a4b3e0a2cf2f6a8a6c934e73a446aaf4ac096b58b3ec319f033372e46a0, 242572 bytes
+the fixture:
+  war3map.w3i: sha256 44839244c8bd010de739ab9612f0a58cb1d552c17a8711d23bd85c91f02264a2, 622 bytes
+  war3map.lua: sha256 0f6849d2df514970c51d63815b29b524ff11fb6dc4655ea994aea38d8149d97c, 9920 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 44839244c8bd010de739ab9612f0a58cb1d552c17a8711d23bd85c91f02264a2, 622 bytes
+  war3map.lua: sha256 883ea88bf381925000c1f3082e011fc80b21116164c91f8d474ee25552c1a5eb, 9923 bytes
+== {"players":{"0":{"name":"P"}}}
+the 53 scripts:
+  sha256 c9a6b4aa7a1bcbad5b8682c96bf5a67fa56ec0486c95ae5f23c482e4414a180c, 4073 bytes
+the fixture:
+  war3map.w3i: sha256 10cb19def0bb4690d6b6490aca4f27ac167c5cb95bc1f42ff989f92acbc4a379, 609 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 10cb19def0bb4690d6b6490aca4f27ac167c5cb95bc1f42ff989f92acbc4a379, 609 bytes
+== {"loadingScreen":{"model":""}}
+the 53 scripts:
+  as they are
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"players":{"2":{"name":"P"}}}
+the 53 scripts:
+  sha256 c9a6b4aa7a1bcbad5b8682c96bf5a67fa56ec0486c95ae5f23c482e4414a180c, 4073 bytes
+the fixture:
+  war3map.w3i: sha256 2f22b8fff9d607182c65004f2f7f42cfdc030b887c139af5d92596bf56450cf2, 609 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 2f22b8fff9d607182c65004f2f7f42cfdc030b887c139af5d92596bf56450cf2, 609 bytes
+== {"forces":{"1":{"name":"F"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3map.w3i: sha256 5453736ed79aca1735b4951f0c11632f013e9464f74be40e2f1c2cd9a4bb3c70, 609 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 5453736ed79aca1735b4951f0c11632f013e9464f74be40e2f1c2cd9a4bb3c70, 609 bytes
+== {"environment":{"fog":{"start":6000}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"info":{"name":"Safe"}}
+the 53 scripts:
+  sha256 da616a7d796c0cc01a72fed976f3712531826e29718e867dd5135c4518ba4ca3, 257081 bytes
+the fixture:
+  war3map.w3i: sha256 417db3f9ff82ef42753a57c0d7d2ab61d11bf54bff1f90546972a0b7ebc2746d, 612 bytes
+  war3map.lua: sha256 86641949e2e2a5f95c29ab3b4121753776810ae9f101851a52cea8468f01acbb, 6659 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 417db3f9ff82ef42753a57c0d7d2ab61d11bf54bff1f90546972a0b7ebc2746d, 612 bytes
+  war3map.lua: sha256 bc63f6dd01e0f629d09704055de818e441a981bde510b018baf9ddf02a014831, 6662 bytes
+== {"environment":{"soundEnvironment":"Safe"}}
+the 53 scripts:
+  sha256 0a7af24d7ba2ca097b2b1382dfec8cfd461f287c9c9f5d1c2324c1331e2252ea, 264259 bytes
+the fixture:
+  war3map.w3i: sha256 5007327773f04c8975ed85932e84cd1125d532ed30a01eb9e2b3e30408d25cf2, 623 bytes
+  war3map.lua: sha256 f16dc3bee2b09cdd3688fffee3810750b3cdaf5ed457fe6993a06ffa4b160df4, 6663 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 5007327773f04c8975ed85932e84cd1125d532ed30a01eb9e2b3e30408d25cf2, 623 bytes
+  war3map.lua: sha256 a9da2e4bfc9154c469977418bf2155784847371781280f3764c6013f85534701, 6666 bytes
+== {"environment":{"fog":{"enabled":true}}}
+the 53 scripts:
+  sha256 978df0cccabeab88090199c04ecf403bbc5958e7281fd5bd92f49d390306c7ed, 266167 bytes
+the fixture:
+  war3map.w3i: sha256 da9ab91e4b2357747e614f969c7770578f977ff7a12b1186eac27945178a8658, 619 bytes
+  war3map.lua: sha256 7ecec49c3987fc8a2093c12da4151e1e4620c59b897e4910710daaa4b4fe7445, 6712 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 da9ab91e4b2357747e614f969c7770578f977ff7a12b1186eac27945178a8658, 619 bytes
+  war3map.lua: sha256 338607b23c03ad9760f37a067daccbb8e61a91e37a5f7c8d3c769f4a3f62e3b3, 6715 bytes
+== {}
+the 53 scripts:
+  as they are
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+every file:
+  no change
+with war3mapMisc.txt alone:
+  no change
+with war3mapSkin.txt alone:
+  no change
+with the minimap alone:
+  no change
+with text files that hold nothing:
+  no change
+every file under another spelling:
+  no change
+an empty folder:
+  no change
+without the script:
+  no change
+without the map info:
+  no change
+a script that is not UTF-8:
+  no change
+text files that are not UTF-8:
+  no change
+a script without SetMapName:
+  no change
+a script whose main() returns a value:
+  no change
+bytes that are no map info:
+  no change
+with the name the minimap is kept under:
+  no change
+with the name a TGA preview takes:
+  no change
+== {"forces":{"0":{"name":"X"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3map.w3i: sha256 cf4933da058353eee5b5a142074d2089d24b6dcba0f4a225fecbebbdd8550ace, 609 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 cf4933da058353eee5b5a142074d2089d24b6dcba0f4a225fecbebbdd8550ace, 609 bytes
+== {"players":{"7":{"name":"P"}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"forces":{"0":{"name":"F"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3map.w3i: sha256 770e48f5f9b827c0bf644515ab9dce6362f8e15a1fc612bca9c5f16f61a2bd09, 609 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 770e48f5f9b827c0bf644515ab9dce6362f8e15a1fc612bca9c5f16f61a2bd09, 609 bytes
+== {"gameInterface":{"Misc":{"MaxHeroLevel":"25","Added":"0"},"CustomSkin":{"Text":""}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[Misc]\nMaxHeroLevel=25\nAdded=0\n\n[CustomSkin]\nText="
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\nText=\n\n[A]\nOld=1\n\n[Misc]\nMaxHeroLevel=25\nAdded=0"
+== {"gameInterface":{"Misc":{"FoodCeiling":"0"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[Misc]\nFoodCeiling=0"
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\n\n[Misc]\nFoodCeiling=0"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"misc":{"foodceiling":"200"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapMisc.txt: "[misc]\nfoodceiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"misc":{"foodceiling":"0200"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"misc":{"foodceiling":"100"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":150},"gameplayConstants":{"Other":{"A":"1"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapMisc.txt: "[Other]\nA=1\n\n[Misc]\nMaxHeroLevel=25\nFoodCeiling=150"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=150\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=1\r\n"
+== {"gameInterface":{"Misc":{"FoodCeiling":"200"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[Misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\n\n[Misc]\nFoodCeiling=200"
+== {"gameInterface":{"Misc":{"FoodCeiling":"0"},"Skin":{"Text":""},"New":{"Value":"1"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[Misc]\nFoodCeiling=0\n\n[Skin]\nText=\n\n[New]\nValue=1"
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\n\n[Misc]\nFoodCeiling=0\n\n[Skin]\nText=\n\n[New]\nValue=1"
+== {"gameInterface":{"Misc":{"B":"2"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[Misc]\nB=2"
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\n\n[Misc]\nB=2"
+== {"gameInterface":{"A":{"K":"v"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[A]\nK=v"
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\nK=v"
+== {"gameInterface":{"New":{"K":"v"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[New]\nK=v"
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\n\n[New]\nK=v"
+== {"info":{"name":"Planned"},"gameplay":{"foodLimit":200}}
+the 53 scripts:
+  sha256 88e381a0bd6c38b0d353ed865397950191c48b060da8fb9476f1b2d95bab3ba6, 257195 bytes
+the fixture:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 af9acfec0c7fb1406a7994bf6980a8795556fdff71889f9f6fef4dbf99976957, 6665 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+every file:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+with war3mapMisc.txt alone:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+with war3mapSkin.txt alone:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+with the minimap alone:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+with text files that hold nothing:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+every file under another spelling:
+  WAR3MAP.W3I: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  War3Map.Lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  WAR3MAPMISC.TXT: "[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+an empty folder:
+  refused: maps/map.w3x/war3map.w3i
+without the script:
+  refused: maps/map.w3x/war3map.lua
+without the map info:
+  refused: maps/map.w3x/war3map.w3i
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.lua
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3mapMisc.txt
+a script without SetMapName:
+  refused: maps/map.w3x/war3map.lua
+a script whose main() returns a value:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 37d409485c5d3ecfeb0911e7cca2293cd3b2d93b4e6a49680eb0b2a75571eacb, 6672 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+bytes that are no map info:
+  refused: maps/map.w3x/war3map.w3i
+with the name the minimap is kept under:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+with the name a TGA preview takes:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+== {"info":{"name":"Not written"},"players":{"5":{"name":"Absent"}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"info":{"name":"Planned"},"gameplay":{"heroMaxLevel":25}}
+the 53 scripts:
+  sha256 88e381a0bd6c38b0d353ed865397950191c48b060da8fb9476f1b2d95bab3ba6, 257195 bytes
+the fixture:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 fb60f9cfd91420bc4aa624e220abd95f1204889b3ef0cdda33b9168df89f4585, 6662 bytes
+  war3mapMisc.txt: "[Misc]\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 a2abe24da72c7f365eb3420a064b06a0acbe9c8fa8fcce975e9977c95fbbe09b, 615 bytes
+  war3map.lua: sha256 af9acfec0c7fb1406a7994bf6980a8795556fdff71889f9f6fef4dbf99976957, 6665 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n"
+== {"gameInterface":{"CustomSkin":{"Test":"value"}},"gameplayConstants":{"Misc":{"GoldCost":"1"}},"info":{"description":"Described"}}
+the 53 scripts:
+  sha256 9fa39fff35d1e795d418f718a5c8281eeeec49fde34d261eb07f12954fc8da08, 277169 bytes
+the fixture:
+  war3map.w3i: sha256 6b64b9c7c8beb1d5431f7b10f6c969b1fcab35376a6ae7ef6379fb7fbef01559, 617 bytes
+  war3map.lua: sha256 7669c3528855fe8559af4b2849a62b0bee1e581ec3260d5796149b60fada112b, 6664 bytes
+  war3mapMisc.txt: "[Misc]\nGoldCost=1"
+  war3mapSkin.txt: "[CustomSkin]\nTest=value"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 6b64b9c7c8beb1d5431f7b10f6c969b1fcab35376a6ae7ef6379fb7fbef01559, 617 bytes
+  war3map.lua: sha256 26eb1d28756c34c196c46d8f11ee28ea306c43f6fcb3a1b2aa5fb730776bcf2d, 6667 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nGoldCost=1\r\n\r\n[Other]\r\nA=0\r\n"
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=value\n\n[A]\nOld=1"
+== {"gameInterface":{"CustomSkin":{"Test":""}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[CustomSkin]\nTest="
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=\n\n[A]\nOld=1"
+== {"info":{"name":null},"players":{"5":{"name":null}},"environment":{"fog":{}},"gameplayConstants":{"Misc":{}},"gameInterface":{"CustomSkin":{}}}
+the 53 scripts:
+  as they are
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"gameplay":{"foodLimit":100}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+every file, each text file behind a byte order mark:
+  no change
+every file:
+  no change
+with war3mapMisc.txt alone:
+  no change
+with war3mapSkin.txt alone:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+with the minimap alone:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+with text files that hold nothing:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+every file under another spelling:
+  no change
+an empty folder:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+without the script:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+without the map info:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+a script that is not UTF-8:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3mapMisc.txt
+a script without SetMapName:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+a script whose main() returns a value:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+bytes that are no map info:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+with the name the minimap is kept under:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+with the name a TGA preview takes:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=100"
+== {"info":{"author":"Someone"},"loadingScreen":{"title":"T"}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+every file:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+with war3mapMisc.txt alone:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+with war3mapSkin.txt alone:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+with the minimap alone:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+with text files that hold nothing:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+every file under another spelling:
+  WAR3MAP.W3I: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+an empty folder:
+  refused: maps/map.w3x/war3map.w3i
+without the script:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+without the map info:
+  refused: maps/map.w3x/war3map.w3i
+a script that is not UTF-8:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+text files that are not UTF-8:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+a script without SetMapName:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+a script whose main() returns a value:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+bytes that are no map info:
+  refused: maps/map.w3x/war3map.w3i
+with the name the minimap is kept under:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+with the name a TGA preview takes:
+  war3map.w3i: sha256 e2cc00c86972d31c6007a6e210d57570fe9e782ec06594f95484474288017f69, 616 bytes
+== {"loadingScreen":{"title":"T"}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3map.w3i: sha256 eadbd281ddd4e44ed91d527fc7d187e5ca3f357df7c3929f54493a9c5d220beb, 620 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 eadbd281ddd4e44ed91d527fc7d187e5ca3f357df7c3929f54493a9c5d220beb, 620 bytes
+== {"info":{"name":"Needs Lua"}}
+the 53 scripts:
+  sha256 282e4b37a6c58441e1d010156051ff7be243002c591d4e81a7178fd96e809827, 257271 bytes
+the fixture:
+  war3map.w3i: sha256 2825437dd3ff79497728fb7f7c62ce44ab694ef3fe62b0665c5af2c47993a592, 617 bytes
+  war3map.lua: sha256 20f18a537e5aae8ab56524e69e9aa21963969c51909b06b323e4b8b1993179dc, 6664 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 2825437dd3ff79497728fb7f7c62ce44ab694ef3fe62b0665c5af2c47993a592, 617 bytes
+  war3map.lua: sha256 d6601cb53b2ee6d1c54b58787bfd9515e6c730bbf07239535da4da7319890cda, 6667 bytes
+== {"environment":{"soundEnvironment":"Mountains"}}
+the 53 scripts:
+  sha256 c6d0de47645a23f265aac20d8aa0e0a011bfd006e296300c0a55be386f9170b6, 264484 bytes
+the fixture:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 b27f3b7117bb8d94c8790b56fc13f1ab85f870a0674cd3b08a9ae613617af082, 6671 bytes
+every file:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+with war3mapMisc.txt alone:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+with war3mapSkin.txt alone:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+with the minimap alone:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+with text files that hold nothing:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+every file under another spelling:
+  WAR3MAP.W3I: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  War3Map.Lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+an empty folder:
+  refused: maps/map.w3x/war3map.w3i
+without the script:
+  refused: maps/map.w3x/war3map.lua
+without the map info:
+  refused: maps/map.w3x/war3map.w3i
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.lua
+text files that are not UTF-8:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+a script without SetMapName:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d91929306c53297b13232a0c1c813d1d208220005575df6d00336afa6242614a, 6663 bytes
+a script whose main() returns a value:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 dbb53b70dbd1ee286c1342832009f9a35aa922b449064590a5ddcaccb28a42aa, 6678 bytes
+bytes that are no map info:
+  refused: maps/map.w3x/war3map.w3i
+with the name the minimap is kept under:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+with the name a TGA preview takes:
+  war3map.w3i: sha256 7652d898afaff9898abf6f4250edbed47942a5eb2cca2f2e299a550cf8065fe0, 628 bytes
+  war3map.lua: sha256 d84d78a460b6eceb64b178bed649b0ca687aae2f781e048f242980fdfbe45780, 6668 bytes
+== {"gameplay":{"heroMaxLevel":5}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapMisc.txt: "[Misc]\nMaxHeroLevel=5"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nMaxHeroLevel=5\r\n\r\n[Other]\r\nA=0\r\n"
+== {"gameInterface":{"A":{"B":"c"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[A]\nB=c"
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\nB=c"
+every file:
+  war3mapSkin.txt: "[CustomSkin]\nTest=old\n\n[A]\nOld=1\nB=c"
+with war3mapMisc.txt alone:
+  war3mapSkin.txt: "[A]\nB=c"
+with war3mapSkin.txt alone:
+  war3mapSkin.txt: "[CustomSkin]\nTest=old\n\n[A]\nOld=1\nB=c"
+with the minimap alone:
+  war3mapSkin.txt: "[A]\nB=c"
+with text files that hold nothing:
+  war3mapSkin.txt: "[A]\nB=c"
+every file under another spelling:
+  war3mapskin.txt: "[CustomSkin]\nTest=old\n\n[A]\nOld=1\nB=c"
+an empty folder:
+  war3mapSkin.txt: "[A]\nB=c"
+without the script:
+  war3mapSkin.txt: "[A]\nB=c"
+without the map info:
+  war3mapSkin.txt: "[A]\nB=c"
+a script that is not UTF-8:
+  war3mapSkin.txt: "[A]\nB=c"
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3mapSkin.txt
+a script without SetMapName:
+  war3mapSkin.txt: "[A]\nB=c"
+a script whose main() returns a value:
+  war3mapSkin.txt: "[A]\nB=c"
+bytes that are no map info:
+  war3mapSkin.txt: "[A]\nB=c"
+with the name the minimap is kept under:
+  war3mapSkin.txt: "[A]\nB=c"
+with the name a TGA preview takes:
+  war3mapSkin.txt: "[A]\nB=c"
+== {"info":{"name":"X"}}
+the 53 scripts:
+  sha256 96799412d5c79a3d891c95004f722c704579d8b6c9a63421743e0d230d69c373, 256967 bytes
+the fixture:
+  war3map.w3i: sha256 1077fec7135b36092a13f06ac617c1968ddb7aa2d06d953c57e620b8af45d90c, 609 bytes
+  war3map.lua: sha256 7cf5ae61837c76751f91ac200126b7748b1bdfbbe3f6c57b0b05480275e3954a, 6656 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 1077fec7135b36092a13f06ac617c1968ddb7aa2d06d953c57e620b8af45d90c, 609 bytes
+  war3map.lua: sha256 66fdb40ed9452835d94c7528128f0b212fae66c73a908720b7d0e8bbc8e8376d, 6659 bytes
+== {"info":{"name":"Refused"},"gameplay":{"foodLimit":1},"gameInterface":{"A":{"B":"c"}}}
+the 53 scripts:
+  sha256 1ca1a2d4dedc7e47e2a9e8ba93b96ef78bc16806fc716354cb363742ee84882b, 257195 bytes
+the fixture:
+  war3map.w3i: sha256 83d6d11d95153980e00d6438df99f2c8f055d8e54a969b726941b6c1958d0c17, 615 bytes
+  war3map.lua: sha256 7c55db7855e4a3cf414ca984585de22744ba9571872e6af07b76915ccc8bf92b, 6662 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=1"
+  war3mapSkin.txt: "[A]\nB=c"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 83d6d11d95153980e00d6438df99f2c8f055d8e54a969b726941b6c1958d0c17, 615 bytes
+  war3map.lua: sha256 86d945d9cb6b0d7a36ef34cd14336ba073511945e01f78eeb023299ab2fad266, 6665 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=1\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\nB=c"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"MISC":{"foodCeiling":"1"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"info":{"name":"BOM"},"gameInterface":{"A":{"B":"c"}}}
+the 53 scripts:
+  sha256 568bbbe2224b8e5916bd2ec95bbfc28e5cbbc9aff0a36037439765b141a2e371, 257043 bytes
+the fixture:
+  war3map.w3i: sha256 83eb3aa9602ed70e650f4f716df6b13b226d72ffaeda684642ccac70f72430bb, 611 bytes
+  war3map.lua: sha256 838b2083d2e79f14b1c4fd2dc8ef26577496fdc5fac4c6944e047096cec43e6e, 6658 bytes
+  war3mapSkin.txt: "[A]\nB=c"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 83eb3aa9602ed70e650f4f716df6b13b226d72ffaeda684642ccac70f72430bb, 611 bytes
+  war3map.lua: sha256 2ab15a11741b9d25e3b0f910ac5f74c9e63d49d161175b6736beae49a0f730c5, 6661 bytes
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\nB=c"
+== {"info":{"name":"Name","description":""},"players":{"0":{"name":"Hero","controller":"computer","fixedStart":false,"x":256}},"forces":{"0":{"allied":false,"alliedVictory":true}},"environment":{"soundEnvironment":"","waterColor":[1,2,3,4],"fog":{"enabled":true,"start":1,"end":2}},"gameplay":{"heroMaxLevel":20,"foodLimit":150},"gameplayConstants":{"misc":{"Other":"1"}},"gameInterface":{"CustomSkin":{"A":"b"}}}
+the 53 scripts:
+  sha256 31f376a50321a08893d102d48383aef587aade7ba6c7d6fd1ea3d72e22590a98, 192323 bytes
+the fixture:
+  war3map.w3i: sha256 deebedb8fb71fb10704bfd0a9dabea2458b053feb29a101eb43ef6162fe34bc5, 594 bytes
+  war3map.lua: sha256 9fbc1cdd93806edeb128840553e59376b01223111a877f78f06eb6f0a972b6bc, 9879 bytes
+  war3mapMisc.txt: "[misc]\nOther=1\nMaxHeroLevel=20\nFoodCeiling=150"
+  war3mapSkin.txt: "[CustomSkin]\nA=b"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 deebedb8fb71fb10704bfd0a9dabea2458b053feb29a101eb43ef6162fe34bc5, 594 bytes
+  war3map.lua: sha256 8dd72d47459eeeaa70afdb8654e06cbe094a375a57f8ef6af03cbcdf3adf44b5, 9882 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=150\r\nKeep=1\r\nOther=1\r\nMaxHeroLevel=20\r\n\r\n[Other]\r\nA=0\r\n"
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\nA=b\n\n[A]\nOld=1"
+== {"players":{"5":{"name":"Absent"}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+every file:
+  refused: maps/map.w3x/war3map.w3i
+with war3mapMisc.txt alone:
+  refused: maps/map.w3x/war3map.w3i
+with war3mapSkin.txt alone:
+  refused: maps/map.w3x/war3map.w3i
+with the minimap alone:
+  refused: maps/map.w3x/war3map.w3i
+with text files that hold nothing:
+  refused: maps/map.w3x/war3map.w3i
+every file under another spelling:
+  refused: maps/map.w3x/WAR3MAP.W3I
+an empty folder:
+  refused: maps/map.w3x/war3map.w3i
+without the script:
+  refused: maps/map.w3x/war3map.w3i
+without the map info:
+  refused: maps/map.w3x/war3map.w3i
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.w3i
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3map.w3i
+a script without SetMapName:
+  refused: maps/map.w3x/war3map.w3i
+a script whose main() returns a value:
+  refused: maps/map.w3x/war3map.w3i
+bytes that are no map info:
+  refused: maps/map.w3x/war3map.w3i
+with the name the minimap is kept under:
+  refused: maps/map.w3x/war3map.w3i
+with the name a TGA preview takes:
+  refused: maps/map.w3x/war3map.w3i
+== {"info":{"name":"Refused"}}
+the 53 scripts:
+  sha256 1ca1a2d4dedc7e47e2a9e8ba93b96ef78bc16806fc716354cb363742ee84882b, 257195 bytes
+the fixture:
+  war3map.w3i: sha256 83d6d11d95153980e00d6438df99f2c8f055d8e54a969b726941b6c1958d0c17, 615 bytes
+  war3map.lua: sha256 7c55db7855e4a3cf414ca984585de22744ba9571872e6af07b76915ccc8bf92b, 6662 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 83d6d11d95153980e00d6438df99f2c8f055d8e54a969b726941b6c1958d0c17, 615 bytes
+  war3map.lua: sha256 86d945d9cb6b0d7a36ef34cd14336ba073511945e01f78eeb023299ab2fad266, 6665 bytes
+== {"gameplay":{"foodLimit":1}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=1"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=1\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+== {"info":{"name":"Labelled"}}
+the 53 scripts:
+  sha256 7d5a83d7682b6a819e7990edba41b05764b6e071575ecf2f32b87165c15c387c, 257233 bytes
+the fixture:
+  war3map.w3i: sha256 1897c81b968ce09a262eff28977c69d410399c4ccb4e62d3c2fb015b9c199046, 616 bytes
+  war3map.lua: sha256 5153487a2b94bbf173c6b11aaad0505f3cfba97e179e5fb28217eb57ebacfef7, 6663 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 1897c81b968ce09a262eff28977c69d410399c4ccb4e62d3c2fb015b9c199046, 616 bytes
+  war3map.lua: sha256 f7ac76d5796d6c0a19bb2cfac32890b4e0fd7993d2fce9c86236c868e7e0b201, 6666 bytes
+== {"info":{"name":"Cased"},"gameplay":{"foodLimit":7},"gameInterface":{"A":{"B":"c"}}}
+the 53 scripts:
+  sha256 7b07578f669862a22d8e56847df6f5bce42ecc6cbbd903f7ab5f056d83f10884, 257119 bytes
+the fixture:
+  war3map.w3i: sha256 d4d7f3bc270d8ca38e6d6893dea2a48ca1fa66b425ba2861866fecc0b0d2db5f, 613 bytes
+  war3map.lua: sha256 f7dba3e799cd44a6f6dafad905b09d54b21d9b1770ed15119c03472e6b51a6b2, 6660 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=7"
+  war3mapSkin.txt: "[A]\nB=c"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 d4d7f3bc270d8ca38e6d6893dea2a48ca1fa66b425ba2861866fecc0b0d2db5f, 613 bytes
+  war3map.lua: sha256 5428debac5aebe459be4a482493e9583ba804715839521900561137245b44f17, 6663 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=7\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\nB=c"
+== {"info":{"preview":"preview.blp"}}
+the 53 scripts:
+  as they are
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 769dd7251e5613451c313cc8bae0fdb7647c9154e3c6c4be85cb6d8aa339d901, 6719 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+every file:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+with war3mapMisc.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with war3mapSkin.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with the minimap alone:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+with text files that hold nothing:
+  refused: maps/map.w3x/war3mapMap.blp
+every file under another spelling:
+  War3Map.Lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  WAR3MAPMAP.BLP: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+an empty folder:
+  refused: maps/map.w3x/war3mapMap.blp
+without the script:
+  refused: maps/map.w3x/war3map.lua
+without the map info:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.lua
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3mapMap.blp
+a script without SetMapName:
+  war3map.lua: sha256 65324471416e67674530ad04e991cb6472331db28e137745594f80133e1a217a, 6711 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+a script whose main() returns a value:
+  note: §8, "A preview on a map whose main() ends in return <value> is refused"
+  refused: maps/map.w3x/war3map.lua
+bytes that are no map info:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+with the name the minimap is kept under:
+  refused: maps/map.w3x/war3mapminimap.blp
+with the name a TGA preview takes:
+  refused: maps/map.w3x/War3mapMap.TGA
+== {"info":{"preview":"art/Preview.TGA"}}
+the 53 scripts:
+  as they are
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 769dd7251e5613451c313cc8bae0fdb7647c9154e3c6c4be85cb6d8aa339d901, 6719 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+== {"info":{"preview":"art/Preview.PNG"}}
+the 53 scripts:
+  as they are
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 769dd7251e5613451c313cc8bae0fdb7647c9154e3c6c4be85cb6d8aa339d901, 6719 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+every file:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+with war3mapMisc.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with war3mapSkin.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with the minimap alone:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+with text files that hold nothing:
+  refused: maps/map.w3x/war3mapMap.blp
+every file under another spelling:
+  War3Map.Lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  WAR3MAPMAP.BLP: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+an empty folder:
+  refused: maps/map.w3x/war3mapMap.blp
+without the script:
+  refused: maps/map.w3x/war3map.lua
+without the map info:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.lua
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3mapMap.blp
+a script without SetMapName:
+  war3map.lua: sha256 65324471416e67674530ad04e991cb6472331db28e137745594f80133e1a217a, 6711 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+a script whose main() returns a value:
+  note: §8, "A preview on a map whose main() ends in return <value> is refused"
+  refused: maps/map.w3x/war3map.lua
+bytes that are no map info:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+with the name the minimap is kept under:
+  refused: maps/map.w3x/war3mapminimap.blp
+with the name a TGA preview takes:
+  refused: maps/map.w3x/War3mapMap.TGA
+== {"info":{"preview":"preview.tga"}}
+the 53 scripts:
+  as they are
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 769dd7251e5613451c313cc8bae0fdb7647c9154e3c6c4be85cb6d8aa339d901, 6719 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+every file:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+with war3mapMisc.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with war3mapSkin.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with the minimap alone:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+with text files that hold nothing:
+  refused: maps/map.w3x/war3mapMap.blp
+every file under another spelling:
+  War3Map.Lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  WAR3MAPMAP.BLP: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+an empty folder:
+  refused: maps/map.w3x/war3mapMap.blp
+without the script:
+  refused: maps/map.w3x/war3map.lua
+without the map info:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.lua
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3mapMap.blp
+a script without SetMapName:
+  war3map.lua: sha256 65324471416e67674530ad04e991cb6472331db28e137745594f80133e1a217a, 6711 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+a script whose main() returns a value:
+  note: §8, "A preview on a map whose main() ends in return <value> is refused"
+  refused: maps/map.w3x/war3map.lua
+bytes that are no map info:
+  war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+with the name the minimap is kept under:
+  refused: maps/map.w3x/war3mapminimap.blp
+with the name a TGA preview takes:
+  refused: maps/map.w3x/War3mapMap.TGA
+== {"info":{"name":"Both","preview":"preview.blp"},"gameplay":{"foodLimit":200},"gameInterface":{"CustomSkin":{"Test":"value"}}}
+the 53 scripts:
+  sha256 9bacb4216fbc67aa43cbfb31a0c8eee6fe2bcd0c2324a0a1c3864e00381a3907, 257081 bytes
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 80a5118e43fd3770c5d45a30545cae13a9c1d809ceb6efa22f42b107a1e006d0, 612 bytes
+  war3map.lua: sha256 96fff9367f08daffddceb508eb8ea5e10b62af68308c13a41af81f634707ee3a, 6712 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=value\n\n[A]\nOld=1"
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+every file:
+  war3map.w3i: sha256 80a5118e43fd3770c5d45a30545cae13a9c1d809ceb6efa22f42b107a1e006d0, 612 bytes
+  war3map.lua: sha256 60f003fc9ea9650ad9caca830d0f0bcda901c69e03ddf15e82e78efdce4038b7, 6709 bytes
+  war3mapMisc.txt: "[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+  war3mapSkin.txt: "[CustomSkin]\nTest=value\n\n[A]\nOld=1"
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+with war3mapMisc.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with war3mapSkin.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with the minimap alone:
+  war3map.w3i: sha256 80a5118e43fd3770c5d45a30545cae13a9c1d809ceb6efa22f42b107a1e006d0, 612 bytes
+  war3map.lua: sha256 60f003fc9ea9650ad9caca830d0f0bcda901c69e03ddf15e82e78efdce4038b7, 6709 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+  war3mapSkin.txt: "[CustomSkin]\nTest=value"
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+with text files that hold nothing:
+  refused: maps/map.w3x/war3mapMap.blp
+every file under another spelling:
+  WAR3MAP.W3I: sha256 80a5118e43fd3770c5d45a30545cae13a9c1d809ceb6efa22f42b107a1e006d0, 612 bytes
+  War3Map.Lua: sha256 60f003fc9ea9650ad9caca830d0f0bcda901c69e03ddf15e82e78efdce4038b7, 6709 bytes
+  WAR3MAPMISC.TXT: "[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+  war3mapskin.txt: "[CustomSkin]\nTest=value\n\n[A]\nOld=1"
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  WAR3MAPMAP.BLP: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
+an empty folder:
+  refused: maps/map.w3x/war3mapMap.blp
+without the script:
+  refused: maps/map.w3x/war3map.lua
+without the map info:
+  refused: maps/map.w3x/war3map.w3i
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.lua
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3mapMap.blp
+a script without SetMapName:
+  refused: maps/map.w3x/war3map.lua
+a script whose main() returns a value:
+  note: §8, "A preview on a map whose main() ends in return <value> is refused"
+  refused: maps/map.w3x/war3map.lua
+bytes that are no map info:
+  refused: maps/map.w3x/war3map.w3i
+with the name the minimap is kept under:
+  refused: maps/map.w3x/war3mapminimap.blp
+with the name a TGA preview takes:
+  refused: maps/map.w3x/War3mapMap.TGA
+== {"info":{"name":"A \"quoted\" map\n雪"},"players":{"0":{"name":"Hero","controller":"computer","race":"orc","fixedStart":false,"x":256}},"environment":{"waterColor":[10,20,30,255],"fog":{"enabled":true,"start":100,"end":1000}}}
+the 53 scripts:
+  sha256 719f752dfc41842eb7b8c3718c478f5814d5b46c24786f072ae2ea404624bcd5, 179065 bytes
+the fixture:
+  war3map.w3i: sha256 a3cc956a3a0c19ab54379ed13a03b62904b224f54e7775d3c939410cd47ceee2, 619 bytes
+  war3map.lua: sha256 c951d1de4ae09c6b81073e31d848115f10af4aa8d47c1973e14e03ff41539b2f, 6717 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 a3cc956a3a0c19ab54379ed13a03b62904b224f54e7775d3c939410cd47ceee2, 619 bytes
+  war3map.lua: sha256 39f237219018387b148e463c72ef72e5844eb784f059b1ccb120346f68d596ac, 6720 bytes
+== {"info":{"name":"Name"}}
+the 53 scripts:
+  sha256 735e1bfb00780d4f93d958b9a9aecb00252bfcd94983e8b90174e53dcdec782b, 257081 bytes
+the fixture:
+  war3map.w3i: sha256 46b20085490f4d44a12bfda39da5acfd3693613c5184075308ba1240b662fb08, 612 bytes
+  war3map.lua: sha256 9884ddc6b8fa504ff4dd5820ac085a40c63ece9b2ff1780f7d473ef84c9df0a3, 6659 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 46b20085490f4d44a12bfda39da5acfd3693613c5184075308ba1240b662fb08, 612 bytes
+  war3map.lua: sha256 5740bc27b98a97ffe81fedcad7f05e9c72081a5c54def4a3fe175989dce0e2cf, 6662 bytes
+== {"info":{"author":"Author","recommendedPlayers":""},"loadingScreen":{"title":"Title"},"forces":{"0":{"name":"Allies"}},"gameplay":{"heroMaxLevel":20}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3map.w3i: sha256 36e073c36d33a35d97e84e1cd354e29fea8866c305889729e0f2a8c0219702b8, 603 bytes
+  war3mapMisc.txt: "[Misc]\nMaxHeroLevel=20"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 36e073c36d33a35d97e84e1cd354e29fea8866c305889729e0f2a8c0219702b8, 603 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nMaxHeroLevel=20\r\n\r\n[Other]\r\nA=0\r\n"
+== {"info":{"name":"Name","description":""}}
+the 53 scripts:
+  sha256 3e38146bb316ee5cef9ad1361f8791d5d11956a48d23e6a839ac50ada890f10d, 256663 bytes
+the fixture:
+  war3map.w3i: sha256 c24b42551d5974b7c9901716bd64fac6052186ad2c1aebdc62c60f0ce4acf7fd, 601 bytes
+  war3map.lua: sha256 fc9e3c7890197bb7fde7a0c24abca0daaca7100fefd5cda3ac5a4fdf88e3f14a, 6648 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 c24b42551d5974b7c9901716bd64fac6052186ad2c1aebdc62c60f0ce4acf7fd, 601 bytes
+  war3map.lua: sha256 1a5192cb175fc637d03c994c791f728b6e1b9a092b862a7574c3caa89b841ed3, 6651 bytes
+== {"players":{"0":{"name":"Hero","race":"selectable","fixedStart":false}}}
+the 53 scripts:
+  sha256 7379c7fe9edc3e8ef7bdbd82ecc91c0e1f482ade2348a215bbfde56de195bfb8, 249610 bytes
+the fixture:
+  war3map.w3i: sha256 3852a32d2e34fd6db89cdc23e5114511baf137fa6093f55641a7a14fb9bcff13, 612 bytes
+  war3map.lua: sha256 e0b3817357797e965919b94e36fb6719200c24b287645a0b7c31fc94b85758e6, 6635 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 3852a32d2e34fd6db89cdc23e5114511baf137fa6093f55641a7a14fb9bcff13, 612 bytes
+  war3map.lua: sha256 45807127fbe216f1c93ad9fb7e2fc01a31e5d8140854046310f03cc926780f1d, 6638 bytes
+== {"players":{"1":{"fixedStart":true}}}
+the 53 scripts:
+  sha256 07be3661f84e45efce7d12c51ddf5e766cc2ccccb8fe978b5e9fbef0da4c8f60, 50997 bytes
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"players":{"11":{"fixedStart":true,"controller":"computer"}}}
+the 53 scripts:
+  sha256 00dfe70de71626eb0ab2d067cc21359a910c5194728c3c825e6ef674b713c8cd, 4121 bytes
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"players":{"1":{"name":"Tab\there ✓","controller":"rescuable"}}}
+the 53 scripts:
+  sha256 6e034c794dbe1f2bc937db65169677eaaaa22a14b240505c37bd7026b1db7aa2, 244333 bytes
+the fixture:
+  war3map.w3i: sha256 454d1cadfcd6feb8c1c61726412922594dac5262839a0b0794c5b45c570f02b1, 620 bytes
+  war3map.lua: sha256 a19fb4ea53621998adc7e4080b1effc593bb32ab1a30f73af75b46c6d77359a5, 6671 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 454d1cadfcd6feb8c1c61726412922594dac5262839a0b0794c5b45c570f02b1, 620 bytes
+  war3map.lua: sha256 d605caa0f220d0b7e077f7c1bc2146e03514f69f4cff5f18774b651a3d2248d4, 6674 bytes
+== {"players":{"0":{"name":"Hero"}}}
+the 53 scripts:
+  sha256 c9a6b4aa7a1bcbad5b8682c96bf5a67fa56ec0486c95ae5f23c482e4414a180c, 4073 bytes
+the fixture:
+  war3map.w3i: sha256 d63c457737eef7a7f3716216aa6a044e422aa61b68a1ebc94e129450ea5e5512, 612 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 d63c457737eef7a7f3716216aa6a044e422aa61b68a1ebc94e129450ea5e5512, 612 bytes
+== {"players":{"11":{"x":0.1}}}
+the 53 scripts:
+  sha256 ef6535604661404c67611ce37047b2420c11a6097102626fb30602de88c682a7, 264475 bytes
+the fixture:
+  war3map.w3i: sha256 16e50282a26f94279092797d01dd8e3df611e7e26cba1502538ccf10ebd8ec2d, 619 bytes
+  war3map.lua: sha256 144b48f3550247e07994ecf59f4e7f83df00f56b87781f3185d6dcb0eb05136b, 6678 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 16e50282a26f94279092797d01dd8e3df611e7e26cba1502538ccf10ebd8ec2d, 619 bytes
+  war3map.lua: sha256 5e70a6bafdcabf06866711ad6eca45f25a169c751c44c6a571edadb22120f4d2, 6681 bytes
+== {"environment":{"fog":{"enabled":true,"start":0,"density":0.3,"color":[255,0,51,128]}}}
+the 53 scripts:
+  sha256 8ac34139148a9e6fabd88501013844cff282ca3b877210737700aaf5f99ffca5, 266842 bytes
+the fixture:
+  war3map.w3i: sha256 cb42ad1305346fe573b5b7bb82b0614b397b78910d7e8ad27c7d49cdf80b67d1, 619 bytes
+  war3map.lua: sha256 35e7ab64b149e251f02321a529b539693c66cb7055a2ab64daab4f61541ddaf2, 6727 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 cb42ad1305346fe573b5b7bb82b0614b397b78910d7e8ad27c7d49cdf80b67d1, 619 bytes
+  war3map.lua: sha256 08b57a4de4dd85cd058982db71610c2c074bdc651929bea413f572c03e54a893, 6730 bytes
+== {"players":{"0":{"controller":"computer"}}}
+the 53 scripts:
+  sha256 f12189348721fb87e946a7b2bffc25215eed07bff9057b9cf042815edb9dc822, 257533 bytes
+the fixture:
+  war3map.w3i: sha256 00c3ca8dac92108c1a4abae98999c4b2d9a9ca03d4fc2177e9238f56d563c7cd, 619 bytes
+  war3map.lua: sha256 41a91e716274e1fe8d5130ba28cfae10dc622a3be147622008959adc948f7004, 6670 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 00c3ca8dac92108c1a4abae98999c4b2d9a9ca03d4fc2177e9238f56d563c7cd, 619 bytes
+  war3map.lua: sha256 bebc1d92ea67aa7d7118441bcae9076cd04e71e7057cb510adb8061de340f87f, 6673 bytes
+== {"players":{"1":{"controller":"computer"}}}
+the 53 scripts:
+  sha256 1d947b36ff4f7e16a6be64f652270df83a124bef79b50ca11401b91bda9acf83, 244297 bytes
+the fixture:
+  war3map.w3i: sha256 f67482eda5ecdb6a99e7973bae4f957cb8423e097553f86b5b16887f463336a5, 619 bytes
+  war3map.lua: sha256 2f6c992de0c9215e5515633fedb1fad80153073668635bcb29854bc3a1070434, 6670 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 f67482eda5ecdb6a99e7973bae4f957cb8423e097553f86b5b16887f463336a5, 619 bytes
+  war3map.lua: sha256 d2ae5542a77e664484ea86d75f43bc17c0cddd1ba01af530e327fe087515a2dd, 6673 bytes
+== {"forces":{"0":{"allied":true}}}
+the 53 scripts:
+  sha256 f2c8e16f948a9909854c53057e70f9cdd24aed26b5b104c364ff806b9f42bfe3, 339246 bytes
+the fixture:
+  war3map.lua: sha256 57190fb7ae90137f62f0f5af0c4897679483292a03ac4a065d948022842f4313, 9854 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 f5dccb69ad40a706c2400334c250e3e0ef56f9e941fdcb8af1906f4405f36068, 9857 bytes
+== {"environment":{"waterColor":[1,2,3,4]}}
+the 53 scripts:
+  sha256 653e3e3e5de6eb9291a05c61b4f8911ac0ff7b4949ac38f0c29a0c7b099d2df1, 265619 bytes
+the fixture:
+  war3map.w3i: sha256 0a9422904bcbe2591e4fb80a966e80caf5a26ef8d8a9b5d45746d890f5bf083e, 619 bytes
+  war3map.lua: sha256 e6be94db8ff0e787dd72620b1738fd583657dec29f812b1232828314a36473b7, 6697 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 0a9422904bcbe2591e4fb80a966e80caf5a26ef8d8a9b5d45746d890f5bf083e, 619 bytes
+  war3map.lua: sha256 8ab646dacdf6c64345433df3d54a5de78f4b4ce3628b987eb018367eaee5d09b, 6700 bytes
+== {"info":{"name":"x"}}
+the 53 scripts:
+  sha256 162015897ef65ea25c95bb43e7d7c2e8d9e42ccc2bb83aacdae17086c21cb9e4, 256967 bytes
+the fixture:
+  war3map.w3i: sha256 d46a5a63b6c79ea0c964fea2157a6ab3f45c4b4f4b1dd72fbd5c50207445b00e, 609 bytes
+  war3map.lua: sha256 a483b5e305a5cb58d2ca5e6fb0417fd668cca2e75af3792d6438e2d0729de9d0, 6656 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 d46a5a63b6c79ea0c964fea2157a6ab3f45c4b4f4b1dd72fbd5c50207445b00e, 609 bytes
+  war3map.lua: sha256 ea299b8ed2d8d02d865fbaf5bc37ab45cf6cf9762dc40230368dc22343df1a0c, 6659 bytes
+== {"players":{"0":{"x":1}}}
+the 53 scripts:
+  sha256 8bfd916e9d3c62b6548b01a69bf90bd6bae84e24e070c84411ad65c235eb0074, 257146 bytes
+the fixture:
+  war3map.w3i: sha256 186d65cbc89f13f04c4cfd76f75674ee3e50ed19d2ce29c8529936ac7a2cc10e, 619 bytes
+  war3map.lua: sha256 225b54620bea565f32c01131ef6eb263202617c365adeda461b2d23a8851d052, 6660 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 186d65cbc89f13f04c4cfd76f75674ee3e50ed19d2ce29c8529936ac7a2cc10e, 619 bytes
+  war3map.lua: sha256 a8c89462883e6f3f9c50d8df40f3322cc4531fe598d3ff55641dd1e9b9025078, 6663 bytes
+== {"players":{"0":{"fixedStart":false}}}
+the 53 scripts:
+  sha256 8d4c37a1006be532aaae8fc2aff376e3a87f0992f8130dc825b209b8565f972f, 255827 bytes
+the fixture:
+  war3map.w3i: sha256 0d34e3badee9cd2540f197e5004467044e0e95f6fbe6822c13be36723f268340, 619 bytes
+  war3map.lua: sha256 19a3cee311a15fcbde94a9fc6d22d5755b9062c4959f7cb7654769852da64b4e, 6626 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 0d34e3badee9cd2540f197e5004467044e0e95f6fbe6822c13be36723f268340, 619 bytes
+  war3map.lua: sha256 ccfeb9ed4a083b01788a86e04a9306cf9000d0ad55678c8f0c996b25c8b815f9, 6629 bytes
+== {"players":{"0":{"fixedStart":true}}}
+the 53 scripts:
+  sha256 66a49ad13aba6d6b12e7894dd2206a0b481b2ef0f2df3f85553b32abfb9b2e5a, 4121 bytes
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"players":{"0":{"race":"orc"}}}
+the 53 scripts:
+  sha256 d0c820ce8008dc44e64256fae0a3b83a07c033247f6f46077b90248b69ae8034, 263975 bytes
+the fixture:
+  war3map.w3i: sha256 080a7173ea6fab4187ec3a7f2027faa597367c5103adb22982c17ea55e394e4b, 619 bytes
+  war3map.lua: sha256 2411ea045a213099c516ab199490f48a4667cb4894d09800c4f223832a5dc50d, 6664 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 080a7173ea6fab4187ec3a7f2027faa597367c5103adb22982c17ea55e394e4b, 619 bytes
+  war3map.lua: sha256 41b743d449c6b07e1a86e19e7459b824e77507b72205507ce36a1c4631b83f4a, 6667 bytes
+== {"players":{"0":{"name":"x"}}}
+the 53 scripts:
+  sha256 c9a6b4aa7a1bcbad5b8682c96bf5a67fa56ec0486c95ae5f23c482e4414a180c, 4073 bytes
+the fixture:
+  war3map.w3i: sha256 e1de99d041f1e60934da6b86e53fc5cefd567f8a4e6b2f8202d3683a3d9585d7, 609 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 e1de99d041f1e60934da6b86e53fc5cefd567f8a4e6b2f8202d3683a3d9585d7, 609 bytes
+== {"forces":{"1":{"allied":true}}}
+the 53 scripts:
+  sha256 04b7ed660a8d2275be5c93143e98ebc645df9d8edc5e2cbaeeb27f6ed7f19625, 239564 bytes
+the fixture:
+  war3map.lua: sha256 d9881b11dd49c18145121060ed56b658ce9809e36eb650802a99a811ff40cd79, 6726 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 33bb832060cc718cb96a76f3ce2cc186ae8ebc338aa4fc25244ee2fb0a4c060c, 6729 bytes
+== {"environment":{"soundEnvironment":"Cave"}}
+the 53 scripts:
+  sha256 cbdee5dc87220579835039365852ff8059d7b619c310b8d80a5ca6aa50269f13, 264259 bytes
+the fixture:
+  war3map.w3i: sha256 a68d19859ffe01fd364e139a8ba2c3b2e572fef09dadbeb1492ff6fb180753a8, 623 bytes
+  war3map.lua: sha256 0b845601043164c74555d377a0883c3a23622911396aaf8d7422eef2139e7615, 6663 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 a68d19859ffe01fd364e139a8ba2c3b2e572fef09dadbeb1492ff6fb180753a8, 623 bytes
+  war3map.lua: sha256 4a55e9e3e556f49160958efcfeadd8965df5bd5ff9ffa237584c79806dd346b7, 6666 bytes
+== {"environment":{"fog":{"enabled":false}}}
+the 53 scripts:
+  sha256 c46f764e78a93170bf257874991df536c68fbfd8f99e1f63d041a16866fe0eae, 264952 bytes
+the fixture:
+  war3map.lua: sha256 e0d3ea43521861f5d233095ad397eb5576c05fc29da1248045bc92529355737c, 6685 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 eda3fcd29e7b2c463dfb4dc24d464967c08340f490d6262048135c2ff0ea4c2e, 6688 bytes
+== {"forces":{"0":{"allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true},"1":{}}}
+the 53 scripts:
+  sha256 2dc9360152beb23b7e60a3cd46138969d61f7b682d08a8f62041e62beed86670, 339654 bytes
+the fixture:
+  war3map.w3i: sha256 a26fc9be9e29e3db9d684ac7088845db9af09f93812d869e797c55b3585e9608, 619 bytes
+  war3map.lua: sha256 79931f8b10df9bfbd1f3b6f24c8db588db9e842a30bd5b53cda55de08c94dfc8, 9866 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 a26fc9be9e29e3db9d684ac7088845db9af09f93812d869e797c55b3585e9608, 619 bytes
+  war3map.lua: sha256 5d2682e708e072a3ca57eea5b07825d9b5fe1ce41910911c625a49065d870db5, 9869 bytes
+== {"forces":{"1":{"sharedVision":true}}}
+the 53 scripts:
+  sha256 04b7ed660a8d2275be5c93143e98ebc645df9d8edc5e2cbaeeb27f6ed7f19625, 239564 bytes
+the fixture:
+  war3map.lua: sha256 d9881b11dd49c18145121060ed56b658ce9809e36eb650802a99a811ff40cd79, 6726 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 33bb832060cc718cb96a76f3ce2cc186ae8ebc338aa4fc25244ee2fb0a4c060c, 6729 bytes
+== {"environment":{"soundEnvironment":"","fog":{"enabled":false}}}
+the 53 scripts:
+  sha256 c3c88224e5ae796a380c2d771d84ed542b4ef368b24063b714a1500eeb75ec93, 258439 bytes
+the fixture:
+  war3map.lua: sha256 a1c6c7782bceb6f95b9243da673a6d8039bc5371edae627eb6faa69ab011b511, 6685 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 a50fe6a59c9c5cccf58ea3c83442f726461f530b98e5ee13560fac837d4dafe3, 6688 bytes
+== {"environment":{"soundEnvironment":"Cave","fog":{"enabled":true}}}
+the 53 scripts:
+  sha256 5ae77fff6a4f2cc174af1e89c04f499045eb3591b101d7ab3219c3c8d4b54b75, 259495 bytes
+the fixture:
+  war3map.w3i: sha256 aedb1ca6d51237fc7d3fbddec5b40ce883b9a56680648397ca1bb8824b78c0bb, 623 bytes
+  war3map.lua: sha256 281d666842f9a2b050987cd5ac4ac787b9000dce9a738ba466a7952c6667ffb8, 6709 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 aedb1ca6d51237fc7d3fbddec5b40ce883b9a56680648397ca1bb8824b78c0bb, 623 bytes
+  war3map.lua: sha256 0b2541e5b89dc7ea81580eb8081934388e22f796b8f7fdb3a6b5e378ced59338, 6712 bytes
+== {"info":{"name":"Both"},"environment":{"soundEnvironment":"Dungeon"}}
+the 53 scripts:
+  sha256 5452f073eec6842ea653a22c0af971111a07fbb105683e88bff90813ed91070c, 237213 bytes
+the fixture:
+  war3map.w3i: sha256 841e8641a1d675b9172808a823f54ec17cb5df2c27a159ce84771289b2c12dca, 619 bytes
+  war3map.lua: sha256 85e3c3ba290c469194ff08fd8c28774fea0a6771b72b2e61ffdda893fcef226d, 6659 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 841e8641a1d675b9172808a823f54ec17cb5df2c27a159ce84771289b2c12dca, 619 bytes
+  war3map.lua: sha256 747a9fb5e01c19bc4f2e66fb4549d91085d577371e8c07fd016c845531a40a83, 6662 bytes
+== {"info":{"name":"\n123"},"environment":{"fog":{"enabled":true,"start":100,"end":1000}}}
+the 53 scripts:
+  sha256 7657dc52d6bad6fa17a3e1f5b26ea911df282b28ea67921702213d81c5fe6fa3, 238862 bytes
+the fixture:
+  war3map.w3i: sha256 49d585dda73f97271450d7776649d4b968d1bbc62d9d59700c1cd595abd79ccd, 612 bytes
+  war3map.lua: sha256 deebc53f655073cb6f7f27e91bd6bbd6558aec00ae5127014b8f0a165430b4c9, 6707 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 49d585dda73f97271450d7776649d4b968d1bbc62d9d59700c1cd595abd79ccd, 612 bytes
+  war3map.lua: sha256 341ea37602d24aedf2e848438423cdd3921af43c42b2bdf2506f604f0aeedd20, 6710 bytes
+== {"info":{"name":"Moonwell","description":""},"players":{"0":{"name":"","controller":"computer","race":"selectable","fixedStart":false,"x":0,"y":0.1},"11":{"controller":"rescuable","race":"undead"}},"forces":{"0":{"allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true}},"environment":{"soundEnvironment":"","waterColor":[0,0,0,0],"fog":{"enabled":true,"start":0,"color":[255,0,0,0]}}}
+the 53 scripts:
+  sha256 2b51fd958eb2b8ef7e6cde6edbbd13186726cd11512598a10a9bf78689adf057, 183024 bytes
+the fixture:
+  war3map.w3i: sha256 8c6a10981991649466ec226fcff65a4d2806d911467a3ab799c414e1ef2b24c7, 594 bytes
+  war3map.lua: sha256 77b1a7e2bb8869a850661dbe6e5a07fa81dc0b7eedc3527f92e5bad1e2d5c0d1, 9907 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 8c6a10981991649466ec226fcff65a4d2806d911467a3ab799c414e1ef2b24c7, 594 bytes
+  war3map.lua: sha256 2826b2189af82c14924c11db12551c13e816c990a37313ea64f913c3651e6b89, 9910 bytes
+== {"environment":{"fog":{"enabled":false,"density":0}}}
+the 53 scripts:
+  sha256 c46f764e78a93170bf257874991df536c68fbfd8f99e1f63d041a16866fe0eae, 264952 bytes
+the fixture:
+  war3map.w3i: sha256 996c78b32b47bace744b43e82f3afa9b8218fc0e3890263540d87c74c1fc5308, 619 bytes
+  war3map.lua: sha256 e0d3ea43521861f5d233095ad397eb5576c05fc29da1248045bc92529355737c, 6685 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 996c78b32b47bace744b43e82f3afa9b8218fc0e3890263540d87c74c1fc5308, 619 bytes
+  war3map.lua: sha256 eda3fcd29e7b2c463dfb4dc24d464967c08340f490d6262048135c2ff0ea4c2e, 6688 bytes
+== {"info":{"name":null},"players":{"23":{"name":null}},"environment":{"fog":{}}}
+the 53 scripts:
+  as they are
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"info":{"name":""},"players":{"0":{"fixedStart":false,"x":0}},"gameplay":{"foodLimit":0}}
+the 53 scripts:
+  sha256 b185de1f8ae564c00d8b5f6d5c1c01c2ee83f78a4ac08207778a2b66c4eafb33, 222293 bytes
+the fixture:
+  war3map.w3i: sha256 6da84bdb54a4817289bccc48c5de560e7db33c883758189b4c9118f0fa44ac7c, 608 bytes
+  war3map.lua: sha256 6e378c17b57ab26e7d1e235a2f6f3c5a6cd1ab4387ecf93706834afca396c003, 6609 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=0"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 6da84bdb54a4817289bccc48c5de560e7db33c883758189b4c9118f0fa44ac7c, 608 bytes
+  war3map.lua: sha256 2ed19a40a65b46bf6c3765cda232a8bf72e23965b74e12f2d79f7560effd2951, 6612 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+== {"gameInterface":{"constructor":{"constructor":"ok"}}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapSkin.txt: "[constructor]\nconstructor=ok"
+every file, each text file behind a byte order mark:
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\n\n[A]\nOld=1\n\n[constructor]\nconstructor=ok"
+== {"loadingScreen":{"background":-1}}
+the 53 scripts:
+  as they are
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"loadingScreen":{"background":2147483647}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3map.w3i: sha256 63d76767e8e0b0bd6fb9ba7de17fa679d70663c9fd2db7cda5d41df1b6ab5476, 619 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 63d76767e8e0b0bd6fb9ba7de17fa679d70663c9fd2db7cda5d41df1b6ab5476, 619 bytes
+== {"gameplay":{"heroMaxLevel":1,"foodLimit":0}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapMisc.txt: "[Misc]\nMaxHeroLevel=1\nFoodCeiling=0"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0\r\nKeep=1\r\nMaxHeroLevel=1\r\n\r\n[Other]\r\nA=0\r\n"
+== {"gameplay":{"heroMaxLevel":10000,"foodLimit":300}}
+the 53 scripts:
+  as they are
+the fixture:
+  war3mapMisc.txt: "[Misc]\nMaxHeroLevel=10000\nFoodCeiling=300"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=300\r\nKeep=1\r\nMaxHeroLevel=10000\r\n\r\n[Other]\r\nA=0\r\n"
+== {"players":{"23":{"x":-10000000,"y":10000000}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"environment":{"fog":{"style":0,"density":0,"start":-10000000,"end":10000000}}}
+the 53 scripts:
+  sha256 c46f764e78a93170bf257874991df536c68fbfd8f99e1f63d041a16866fe0eae, 264952 bytes
+the fixture:
+  war3map.w3i: sha256 83f92e8ab5f0ed6013fd02f3bde14fbd5bf53bd6f2d3db8c1e2c4d2732c4e2e3, 619 bytes
+  war3map.lua: sha256 e0d3ea43521861f5d233095ad397eb5576c05fc29da1248045bc92529355737c, 6685 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 83f92e8ab5f0ed6013fd02f3bde14fbd5bf53bd6f2d3db8c1e2c4d2732c4e2e3, 619 bytes
+  war3map.lua: sha256 eda3fcd29e7b2c463dfb4dc24d464967c08340f490d6262048135c2ff0ea4c2e, 6688 bytes
+== {"environment":{"fog":{"style":2,"density":1},"waterColor":[0,255,0,255]}}
+the 53 scripts:
+  sha256 bff41f2f1141e916616caa76004e93e9ab1f329c91ce86722756641e9e0fff16, 259809 bytes
+the fixture:
+  war3map.w3i: sha256 a5db39fb2596dfe327a6447b890ab4634381bf2f0865bce4d48b232c174496b3, 619 bytes
+  war3map.lua: sha256 bc889e02e35a72b68b1a2a1d505418d08c861bc0ffa2c63354eee88346358025, 6720 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 a5db39fb2596dfe327a6447b890ab4634381bf2f0865bce4d48b232c174496b3, 619 bytes
+  war3map.lua: sha256 47e8a10c7f20bb4a843aa410994c9c4eb0f1ef225cf889c5b13511896e028a99, 6723 bytes
+== {"environment":{"waterColor":[1,2,3,4]},"gameplayConstants":{"Misc":{"FoodCeiling":"0"}}}
+the 53 scripts:
+  sha256 653e3e3e5de6eb9291a05c61b4f8911ac0ff7b4949ac38f0c29a0c7b099d2df1, 265619 bytes
+the fixture:
+  war3map.w3i: sha256 0a9422904bcbe2591e4fb80a966e80caf5a26ef8d8a9b5d45746d890f5bf083e, 619 bytes
+  war3map.lua: sha256 e6be94db8ff0e787dd72620b1738fd583657dec29f812b1232828314a36473b7, 6697 bytes
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=0"
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 0a9422904bcbe2591e4fb80a966e80caf5a26ef8d8a9b5d45746d890f5bf083e, 619 bytes
+  war3map.lua: sha256 8ab646dacdf6c64345433df3d54a5de78f4b4ce3628b987eb018367eaee5d09b, 6700 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+== {"players":{"0":{"x":256,"y":-896}},"environment":{"fog":{"start":100,"end":1000,"density":1}}}
+the 53 scripts:
+  sha256 444a6c0d2904ed0879d947675a3db0f96120796a749b47a743451bd8329f99ce, 237979 bytes
+the fixture:
+  war3map.w3i: sha256 f3d3742a5ec3af0d21ca987ecf7cb3311239621951abb005ceb3ed6b33531b7e, 619 bytes
+  war3map.lua: sha256 bb235ef3453c4d0b4e5410763806f7b18ed40434fc6765f59ccad87619b2ba09, 6681 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 f3d3742a5ec3af0d21ca987ecf7cb3311239621951abb005ceb3ed6b33531b7e, 619 bytes
+  war3map.lua: sha256 e55c3aa0c2c99792edce689f69e1ebbcc13f223e5420c2c6147dce85fe01bec9, 6684 bytes
+== {"info":{"name":"N","preview":"art/preview.tga"}}
+the 53 scripts:
+  sha256 025fd3ef148b42faee8cd614ea375a303d62fea958d3107699fff33b0eade5dd, 256967 bytes
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 a8bb7dc2633fc4c9d8a0c012cf5aee874214e6feae818e041231aab62f148fea, 609 bytes
+  war3map.lua: sha256 52faf8ebca4da5ed1ce6b27a59c2711da9dc4dd2b1780454b4f5e369e0eefba2, 6709 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+== {"info":{"preview":"p.blp"}}
+the 53 scripts:
+  as they are
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 769dd7251e5613451c313cc8bae0fdb7647c9154e3c6c4be85cb6d8aa339d901, 6719 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: sha256 2ee5a85716ad45c8c8b4d8876a2b1a4386a39355ea780e7fdf90455d59a42c9f, 263324 bytes
+== {"info":{"preview":null}}
+the 53 scripts:
+  as they are
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"players":{"10":{"name":"k"},"2":{"name":"c"},"0":{"name":"a"}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"players":{"0":{"controller":"user"}}}
+the 53 scripts:
+  sha256 00dfe70de71626eb0ab2d067cc21359a910c5194728c3c825e6ef674b713c8cd, 4121 bytes
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"players":{"0":{"controller":"neutral"}}}
+the 53 scripts:
+  sha256 b12118d63f366b6f40cd344abc4be3109a3d64c597bef4e6b68cb2211665f0ee, 257495 bytes
+the fixture:
+  war3map.w3i: sha256 5e78088a5daef502cbbc25435e50fff13bf67b9682b71c5f7e606fbd0044f29d, 619 bytes
+  war3map.lua: sha256 2f5a534079fef4f934af020849b43d8462a5909882d36e7232934a9f22437b6c, 6669 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 5e78088a5daef502cbbc25435e50fff13bf67b9682b71c5f7e606fbd0044f29d, 619 bytes
+  war3map.lua: sha256 e7e94e38cb0550dfca415b67d11e8c227d6398a06b98b7119dc6dfa03495e131, 6672 bytes
+== {"players":{"0":{"controller":"rescuable"}}}
+the 53 scripts:
+  sha256 f676ba9c0de3a17a50246225ef55338d566da98333e311bae5276c7cf050a887, 257571 bytes
+the fixture:
+  war3map.w3i: sha256 c7599affb481335c69ecfc8a5ccb569e9295c76e4aa75889362871080e55b4ea, 619 bytes
+  war3map.lua: sha256 c877dcce72171add15d8aa6100f111fc84a2be0aa54c56d45f7aaa4aa4ec298b, 6671 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 c7599affb481335c69ecfc8a5ccb569e9295c76e4aa75889362871080e55b4ea, 619 bytes
+  war3map.lua: sha256 372bf7efbd68396fdb9fe95642c738d056e7622315fc2124867fec05ae4bcafd, 6674 bytes
+== {"players":{"0":{"race":"selectable"}}}
+the 53 scripts:
+  sha256 04fa0d7d2abd24e1d39a123a79a445e1eb626a814e4596f7dafdfe10103cba5a, 264404 bytes
+the fixture:
+  war3map.w3i: sha256 6c43ac5e55c1487fa573588732aad1a2bb1c3c578a0ee5fca2314193467106c4, 619 bytes
+  war3map.lua: sha256 63cc2417a97b0cf6ef9703f6546a52424d365653d9462f39cf5055a5a35a22f0, 6675 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 6c43ac5e55c1487fa573588732aad1a2bb1c3c578a0ee5fca2314193467106c4, 619 bytes
+  war3map.lua: sha256 863f3f3e6d4cef35419417c41669db0d05b9dab7d865c550eb9089b2f2a94b82, 6678 bytes
+== {"players":{"0":{"race":"human"}}}
+the 53 scripts:
+  sha256 8c012b91ddbfef322d812885201aed52ecf09fc72b44fadb561faaae66e362a3, 4097 bytes
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"players":{"0":{"race":"undead"}}}
+the 53 scripts:
+  sha256 07092c93a9d8197d4dc75feb1a99b8639d01706c5705efee832341169c5f7242, 264092 bytes
+the fixture:
+  war3map.w3i: sha256 ea5f68e0243f981e6daf69ec684e0c7f14e044ca2978672a46123c312568fa27, 619 bytes
+  war3map.lua: sha256 72f61353a00663b9a3b19dc54290bf9bc349ff09361409c0035f0f9c7529a3a2, 6667 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 ea5f68e0243f981e6daf69ec684e0c7f14e044ca2978672a46123c312568fa27, 619 bytes
+  war3map.lua: sha256 c245468bf11d368350dfb276b12de13c3ed843d76d01c2ab82cdf98df5a9634f, 6670 bytes
+== {"players":{"0":{"race":"nightelf"}}}
+the 53 scripts:
+  sha256 8610e3ee565acb82936aea4b2e6ecbcf636d6c3f92e46535253218dac08f1b3b, 264170 bytes
+the fixture:
+  war3map.w3i: sha256 b3da69da296766355ed00206e04eccff2ac3bc42668184ff1207f25cb4dffd4d, 619 bytes
+  war3map.lua: sha256 87af6f3a4dbc4de6239f11b515cbdd91eb5912f829e8ba2dadc551f6499e59a9, 6669 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 b3da69da296766355ed00206e04eccff2ac3bc42668184ff1207f25cb4dffd4d, 619 bytes
+  war3map.lua: sha256 c27df851b7d983fc925e4483835f3dcfde19da62d6b689f59c6a0c3dd5aa01c7, 6672 bytes
+== {"forces":{"0":{"allied":false}}}
+the 53 scripts:
+  sha256 c2858cc74c527bf38b39a69946d414e12777bc4376bcd7642db3604ae1fa3b23, 339654 bytes
+the fixture:
+  war3map.w3i: sha256 79036f926cbbcab2e401b58aff9f5404839377811317d739aaa8a5c6a2cefccd, 619 bytes
+  war3map.lua: sha256 96132f9f7c8520eaac0aa902bc5871d987eed659d9fe22263f4cff65d9790537, 9866 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 79036f926cbbcab2e401b58aff9f5404839377811317d739aaa8a5c6a2cefccd, 619 bytes
+  war3map.lua: sha256 9d9b3f19ba70d0c0197025040bc206bdbf9ee8ea27fe71ffb2ac05475434e6c3, 9869 bytes
+== {"forces":{"0":{"alliedVictory":false}}}
+the 53 scripts:
+  sha256 f2c8e16f948a9909854c53057e70f9cdd24aed26b5b104c364ff806b9f42bfe3, 339246 bytes
+the fixture:
+  war3map.lua: sha256 57190fb7ae90137f62f0f5af0c4897679483292a03ac4a065d948022842f4313, 9854 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 f5dccb69ad40a706c2400334c250e3e0ef56f9e941fdcb8af1906f4405f36068, 9857 bytes
+== {"forces":{"0":{"sharedVision":false}}}
+the 53 scripts:
+  sha256 cc8c57fcff510b8aee16a93e66764179d27d61b9580b1d2136ec536a3b2b2ce2, 339654 bytes
+the fixture:
+  war3map.w3i: sha256 ef81846c37b31f1d61c38bc2c96429b4f74836232871b26de6e69b5238330312, 619 bytes
+  war3map.lua: sha256 23d9843df55ad666c3e04fa8f1dd256c52fcea5dd1229d7a6a214077699409da, 9866 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 ef81846c37b31f1d61c38bc2c96429b4f74836232871b26de6e69b5238330312, 619 bytes
+  war3map.lua: sha256 452d07fcb1f204f185b9d37c9e3d0fa4fc3827fd5eaf419e19768d5046995258, 9869 bytes
+== {"forces":{"0":{"sharedControl":false}}}
+the 53 scripts:
+  sha256 f2c8e16f948a9909854c53057e70f9cdd24aed26b5b104c364ff806b9f42bfe3, 339246 bytes
+the fixture:
+  war3map.lua: sha256 57190fb7ae90137f62f0f5af0c4897679483292a03ac4a065d948022842f4313, 9854 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 f5dccb69ad40a706c2400334c250e3e0ef56f9e941fdcb8af1906f4405f36068, 9857 bytes
+== {"forces":{"0":{"sharedAdvancedControl":false}}}
+the 53 scripts:
+  sha256 f2c8e16f948a9909854c53057e70f9cdd24aed26b5b104c364ff806b9f42bfe3, 339246 bytes
+the fixture:
+  war3map.lua: sha256 57190fb7ae90137f62f0f5af0c4897679483292a03ac4a065d948022842f4313, 9854 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 f5dccb69ad40a706c2400334c250e3e0ef56f9e941fdcb8af1906f4405f36068, 9857 bytes
+== {"info":{"name":"Every \"setting\"","author":"An author","description":"One|nTwo","recommendedPlayers":"2-4","preview":"preview.tga"},"loadingScreen":{"background":3,"model":"Loading\\Screen.mdx","text":"Text","title":"Title","subtitle":"Subtitle"},"players":{"0":{"name":"Hero","controller":"computer","race":"nightelf","fixedStart":false,"x":-512.25,"y":1024.5}},"forces":{"0":{"name":"The Alliance","allied":true,"alliedVictory":false,"sharedVision":true,"sharedControl":false,"sharedAdvancedControl":true}},"environment":{"soundEnvironment":"Mountains","waterColor":[10,20,30,40],"fog":{"enabled":true,"style":1,"start":500.5,"end":4000,"density":0.75,"color":[50,60,70,80]}},"gameplay":{"heroMaxLevel":20,"foodLimit":150},"gameplayConstants":{"Misc":{"DefenseArmor":"0.05"},"Other":{"Key":""}},"gameInterface":{"FrameDef":{"UPKEEP_NONE":"No upkeep"},"CustomSkin":{"A":"b"}}}
+the 53 scripts:
+  sha256 e30611db7e2b56255c48c15a6b7291ffae05f6ff8d73631c868d3789d9bd1e5f, 183852 bytes
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 c804661ecd816ceea97ea046f0ad91b2306ab2bb94abb4aa7e40c227afe078a3, 648 bytes
+  war3map.lua: sha256 83fe22397f4d62588c2b9fdb6e3e69fb6a613a217e150bfbf16d852c5f777982, 10006 bytes
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=150\r\nKeep=1\r\nDefenseArmor=0.05\r\nMaxHeroLevel=20\r\n\r\n[Other]\r\nA=0\r\nKey=\r\n"
+  war3mapSkin.txt: "\ufeff[CustomSkin]\nTest=old\nA=b\n\n[A]\nOld=1\n\n[FrameDef]\nUPKEEP_NONE=No upkeep"
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+every file:
+  war3map.w3i: sha256 c804661ecd816ceea97ea046f0ad91b2306ab2bb94abb4aa7e40c227afe078a3, 648 bytes
+  war3map.lua: sha256 aa65d7a725414ce4faf64b68b79250f861ff3f83062dccbe00671ab3a70f3176, 10003 bytes
+  war3mapMisc.txt: "[Misc]\r\nFoodCeiling=150\r\nKeep=1\r\nDefenseArmor=0.05\r\nMaxHeroLevel=20\r\n\r\n[Other]\r\nA=0\r\nKey=\r\n"
+  war3mapSkin.txt: "[CustomSkin]\nTest=old\nA=b\n\n[A]\nOld=1\n\n[FrameDef]\nUPKEEP_NONE=No upkeep"
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+with war3mapMisc.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with war3mapSkin.txt alone:
+  refused: maps/map.w3x/war3mapMap.blp
+with the minimap alone:
+  war3map.w3i: sha256 c804661ecd816ceea97ea046f0ad91b2306ab2bb94abb4aa7e40c227afe078a3, 648 bytes
+  war3map.lua: sha256 aa65d7a725414ce4faf64b68b79250f861ff3f83062dccbe00671ab3a70f3176, 10003 bytes
+  war3mapMisc.txt: "[Misc]\nDefenseArmor=0.05\nMaxHeroLevel=20\nFoodCeiling=150\n\n[Other]\nKey="
+  war3mapSkin.txt: "[FrameDef]\nUPKEEP_NONE=No upkeep\n\n[CustomSkin]\nA=b"
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+with text files that hold nothing:
+  refused: maps/map.w3x/war3mapMap.blp
+every file under another spelling:
+  WAR3MAP.W3I: sha256 c804661ecd816ceea97ea046f0ad91b2306ab2bb94abb4aa7e40c227afe078a3, 648 bytes
+  War3Map.Lua: sha256 aa65d7a725414ce4faf64b68b79250f861ff3f83062dccbe00671ab3a70f3176, 10003 bytes
+  WAR3MAPMISC.TXT: "[Misc]\r\nFoodCeiling=150\r\nKeep=1\r\nDefenseArmor=0.05\r\nMaxHeroLevel=20\r\n\r\n[Other]\r\nA=0\r\nKey=\r\n"
+  war3mapskin.txt: "[CustomSkin]\nTest=old\nA=b\n\n[A]\nOld=1\n\n[FrameDef]\nUPKEEP_NONE=No upkeep"
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  WAR3MAPMAP.BLP: removed
+  war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
+an empty folder:
+  refused: maps/map.w3x/war3mapMap.blp
+without the script:
+  refused: maps/map.w3x/war3map.lua
+without the map info:
+  refused: maps/map.w3x/war3map.w3i
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.lua
+text files that are not UTF-8:
+  refused: maps/map.w3x/war3mapMap.blp
+a script without SetMapName:
+  refused: maps/map.w3x/war3map.lua
+a script whose main() returns a value:
+  note: §8, "A preview on a map whose main() ends in return <value> is refused"
+  refused: maps/map.w3x/war3map.lua
+bytes that are no map info:
+  refused: maps/map.w3x/war3map.w3i
+with the name the minimap is kept under:
+  refused: maps/map.w3x/war3mapminimap.blp
+with the name a TGA preview takes:
+  refused: maps/map.w3x/War3mapMap.TGA
+== {"info":{"name":"","author":"A","description":"D","recommendedPlayers":"Any","preview":"art/p.png"},"loadingScreen":{"background":-1,"model":"","text":"","title":"T","subtitle":"S"}}
+the 53 scripts:
+  sha256 47f59c9303343e7afb54bc0786abd2ad2c4f73ed2641aa00211124352dbc5315, 256549 bytes
+the fixture:
+  refused: maps/map.w3x/war3mapMap.blp
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 7c284047488559e5a791e5e8f2326667e5d1d38e3e47cb29d1b89648eacae170, 582 bytes
+  war3map.lua: sha256 9ff9e02d580f68a071c50869a72e4eda597667dce13754a1b04efd52a00582f6, 6698 bytes
+  war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
+  war3mapMap.blp: removed
+  war3mapMap.tga: sha256 b29cb5266406b8274258847aef0b90b8c218c36a04b8c1b9c95f5737d877f643, 262162 bytes
+== {"info":{"name":"N","author":"A","description":"","recommendedPlayers":""},"loadingScreen":{"background":0,"text":"Text","title":"","subtitle":""}}
+the 53 scripts:
+  sha256 ed59e38ec589a324528c6e3462f3d1280858dae8be08b14e78cf2bba97a6774a, 256549 bytes
+the fixture:
+  war3map.w3i: sha256 dc3154733029bc22a2e756e2ed4ba4517a4d55749940411e281826c869fa4711, 581 bytes
+  war3map.lua: sha256 973af13a64ac97095db37b1b17b068f67a372ffedf86661c469d71ce4dd3d83b, 6645 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 dc3154733029bc22a2e756e2ed4ba4517a4d55749940411e281826c869fa4711, 581 bytes
+  war3map.lua: sha256 683672c62552a45e56551612a32d60639d5527c29ad98e8564dad6ab8b8037b3, 6648 bytes
+== {"players":{"11":{"name":"Last","controller":"rescuable","race":"undead","fixedStart":true,"x":1.5,"y":-2.5},"1":{"name":"Second","controller":"neutral","race":"human","fixedStart":false,"x":0,"y":0},"0":{"name":"","controller":"user","race":"selectable","fixedStart":true,"x":-0.0,"y":3e-7}},"forces":{"1":{"name":"","allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true,"sharedAdvancedControl":false},"0":{"name":"First","allied":true,"alliedVictory":true,"sharedVision":true,"sharedControl":true,"sharedAdvancedControl":true}},"environment":{"soundEnvironment":"","waterColor":[0,0,0,0],"fog":{"enabled":false,"style":0,"start":-10,"end":-10,"density":0,"color":[0,0,0,0]}}}
+the 53 scripts:
+  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
+  sha256 3fb96663d45a255a8f87d774b5d8866138f2935b44455831d23fe70fa230325d, 183463 bytes
+the fixture:
+  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
+  war3map.w3i: sha256 89070504ca0caf66e4daf4636662df4a116023ec6ec2c07cab14441117ad66fb, 579 bytes
+  war3map.lua: sha256 198efd10d8932bfa26eac3c8227db4b7121b309e278cc5399ca898a7436e8229, 9914 bytes
+every file, each text file behind a byte order mark:
+  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
+  war3map.w3i: sha256 89070504ca0caf66e4daf4636662df4a116023ec6ec2c07cab14441117ad66fb, 579 bytes
+  war3map.lua: sha256 f67847419b0c717181bfe24eadc267c9db18f0dbfaf4eef6bcd66424b814bde0, 9917 bytes
+== {"players":{"23":{},"0":{"name":"Hero"},"9":{"name":null}},"forces":{"7":{},"0":{"sharedControl":true}}}
+the 53 scripts:
+  sha256 ced0d68da08dd40c7c5b7cccb2fa030d79cc55a87774c8da7789e467aaca0633, 329054 bytes
+the fixture:
+  war3map.w3i: sha256 cb35811d69a7a38eb7dfc5d420897b1aba42f171230cae24241c667163f17cb0, 612 bytes
+  war3map.lua: sha256 8563ff7e7b04771cc42fd10687e64b751312b0f763cd331546a78aac0bd86a6d, 9842 bytes
+every file, each text file behind a byte order mark:
+  war3map.w3i: sha256 cb35811d69a7a38eb7dfc5d420897b1aba42f171230cae24241c667163f17cb0, 612 bytes
+  war3map.lua: sha256 4fc276914ccc2b8d72be7239897e9a1ac46c4069068ed8f9d908c6db1b2428fe, 9845 bytes
+== {"environment":{"fog":{"start":2,"end":1}},"forces":{"9":{"name":"F"},"3":{"name":"F"}},"players":{"10":{"name":"P"},"2":{"name":"P"}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"environment":{"fog":{"start":2,"end":1}},"forces":{"9":{"name":"F"},"3":{"name":"F"}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"environment":{"fog":{"start":2,"end":1},"waterColor":[1,1,1,1]}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"environment":{"fog":{"density":0.5}}}
+the 53 scripts:
+  sha256 c46f764e78a93170bf257874991df536c68fbfd8f99e1f63d041a16866fe0eae, 264952 bytes
+the fixture:
+  war3map.lua: sha256 e0d3ea43521861f5d233095ad397eb5576c05fc29da1248045bc92529355737c, 6685 bytes
+every file, each text file behind a byte order mark:
+  war3map.lua: sha256 eda3fcd29e7b2c463dfb4dc24d464967c08340f490d6262048135c2ff0ea4c2e, 6688 bytes
+== {"environment":{"fog":{"end":999.5}}}
+the 53 scripts:
+  refused: maps/map.w3x/war3map.w3i
+the fixture:
+  refused: maps/map.w3x/war3map.w3i
+every file, each text file behind a byte order mark:
+  refused: maps/map.w3x/war3map.w3i
+== {"gameplay":{}}
+the fixture:
+  no change
+every file, each text file behind a byte order mark:
+  no change
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nfoodceiling=0200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nMAXHEROLEVEL=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nmaxherolevel=7\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nmaxherolevel=7\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nfoodceiling=0200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nMAXHEROLEVEL=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nmaxherolevel=7\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nmaxherolevel=7\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nfoodceiling=0200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nMAXHEROLEVEL=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nmaxherolevel=7\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nmaxherolevel=7\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200}}
+the fixture:
+  war3mapMisc.txt: "[Misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nmaxherolevel=7\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nmaxherolevel=7\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nmaxherolevel=7\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nmaxherolevel=7\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nmaxherolevel=7\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nmaxherolevel=7\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25}}
+the fixture:
+  war3mapMisc.txt: "[Misc]\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFoodCeiling=200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nfoodceiling=0200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nMAXHEROLEVEL=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFoodCeiling=200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nfoodceiling=0200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nMAXHEROLEVEL=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFoodCeiling=200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nfoodceiling=0200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=0200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nMAXHEROLEVEL=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200}}
+the fixture:
+  war3mapMisc.txt: "[Misc]\nMaxHeroLevel=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nMaxHeroLevel=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nMaxHeroLevel=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFoodCeiling=200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nMaxHeroLevel=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nMaxHeroLevel=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFoodCeiling=200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nMaxHeroLevel=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nMaxHeroLevel=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFoodCeiling=200\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"foodceiling":"0200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
+the fixture:
+  war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
+every file, each text file behind a byte order mark:
+  war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
+== {"gameplayConstants":{"Misc":{},"misc":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+every file:
+  refused: moonwell.local.pkl
+with war3mapMisc.txt alone:
+  refused: moonwell.local.pkl
+with war3mapSkin.txt alone:
+  refused: moonwell.local.pkl
+with the minimap alone:
+  refused: moonwell.local.pkl
+with text files that hold nothing:
+  refused: moonwell.local.pkl
+every file under another spelling:
+  refused: moonwell.local.pkl
+an empty folder:
+  refused: moonwell.local.pkl
+without the script:
+  refused: moonwell.local.pkl
+without the map info:
+  refused: moonwell.local.pkl
+a script that is not UTF-8:
+  refused: moonwell.local.pkl
+text files that are not UTF-8:
+  refused: moonwell.local.pkl
+a script without SetMapName:
+  refused: moonwell.local.pkl
+a script whose main() returns a value:
+  refused: moonwell.local.pkl
+bytes that are no map info:
+  refused: moonwell.local.pkl
+with the name the minimap is kept under:
+  refused: moonwell.local.pkl
+with the name a TGA preview takes:
+  refused: moonwell.local.pkl
+== {"gameInterface":{"Frame":{"X":"a","x":"b"}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameInterface":{"A":{"k":"v"},"B":{},"a":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplayConstants":{"Misc":{"Key":"1","Other":"2","KEY":"3"}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameInterface":{"A":{"k":"1","K":"2"},"a":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"},"MISC":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplayConstants":{"A":{"B":"1"},"a":{"B":"1","b":"2"}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"}},"gameInterface":{"A":{},"a":{}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"gameInterface":{"A":{},"a":{}},"gameplayConstants":{"Misc":{"Key":"1","KEY":"2"}}}
+the fixture:
+  refused: moonwell.local.pkl
+every file, each text file behind a byte order mark:
+  refused: moonwell.local.pkl
+== {"players":{"0":{"x":-0.0,"y":0}}}
+the 53 scripts:
+  sha256 4d67cd070c206860e7a2132491f92ad6c91e53c4b1e3deb2b67026f290eb0428, 257032 bytes
+== {"players":{"0":{"x":1e-46,"y":-1e-46}}}
+the 53 scripts:
+  sha256 4d67cd070c206860e7a2132491f92ad6c91e53c4b1e3deb2b67026f290eb0428, 257032 bytes
+== {"environment":{"fog":{"enabled":true,"start":-0.0,"end":-0.0,"density":-0.0,"color":[1,2,3,4]}}}
+the 53 scripts:
+  sha256 e62415c0e41588d7396173d76ba79ef6a0f67369ecad24b29218be83388fef89, 268282 bytes
+== {"players":{"0":{"x":0.000001}}}
+the 53 scripts:
+  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
+  sha256 7a149595812a118162617ff3dd3052abc8183f8491117745ef7a287e4b6b5d43, 258020 bytes
+== {"players":{"1":{"x":7},"11":{"y":-0.0000001}}}
+the 53 scripts:
+  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
+  sha256 34649a0c8efddbe0c4be96cf0377c42d76b7a76a5003be65a1f0f0f3c0bbab8c, 244578 bytes
+== {"environment":{"fog":{"enabled":true,"start":-0.0000001,"density":1e-7}}}
+the 53 scripts:
+  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
+  sha256 e9aa1129f9a20367df19a74d0d20120a320377c8c1ee1fef47f7dd6b89a89bce, 268147 bytes
+== {"environment":{"fog":{"enabled":false,"density":1e-7}}}
+the 53 scripts:
+  sha256 c46f764e78a93170bf257874991df536c68fbfd8f99e1f63d041a16866fe0eae, 264952 bytes
+== {"environment":{"fog":{"density":1e-7}}}
+the 53 scripts:
+  sha256 c46f764e78a93170bf257874991df536c68fbfd8f99e1f63d041a16866fe0eae, 264952 bytes
+== {"forces":{"0":{"name":"Blue"}}}
+every file:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+with war3mapMisc.txt alone:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+with war3mapSkin.txt alone:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+with the minimap alone:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+with text files that hold nothing:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+every file under another spelling:
+  WAR3MAP.W3I: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+an empty folder:
+  refused: maps/map.w3x/war3map.w3i
+without the script:
+  refused: maps/map.w3x/war3map.lua
+without the map info:
+  refused: maps/map.w3x/war3map.w3i
+a script that is not UTF-8:
+  refused: maps/map.w3x/war3map.lua
+text files that are not UTF-8:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+a script without SetMapName:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+a script whose main() returns a value:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+bytes that are no map info:
+  refused: maps/map.w3x/war3map.w3i
+with the name the minimap is kept under:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+with the name a TGA preview takes:
+  war3map.w3i: sha256 8a820193914650bc69534685f1a05aa7a442395aa9f69e2001494fa817bb0041, 612 bytes
+== {"gameplayConstants":{"Empty":{}},"gameInterface":{"Empty":{}}}
+every file:
+  no change
+with war3mapMisc.txt alone:
+  no change
+with war3mapSkin.txt alone:
+  no change
+with the minimap alone:
+  no change
+with text files that hold nothing:
+  no change
+every file under another spelling:
+  no change
+an empty folder:
+  no change
+without the script:
+  no change
+without the map info:
+  no change
+a script that is not UTF-8:
+  no change
+text files that are not UTF-8:
+  no change
+a script without SetMapName:
+  no change
+a script whose main() returns a value:
+  no change
+bytes that are no map info:
+  no change
+with the name the minimap is kept under:
+  no change
+with the name a TGA preview takes:
+  no change
+== {"info":{"name":"N","preview":"missing.tga"}}
+every file:
+  refused: moonwell.local.pkl
+with war3mapMisc.txt alone:
+  refused: moonwell.local.pkl
+with war3mapSkin.txt alone:
+  refused: moonwell.local.pkl
+with the minimap alone:
+  refused: moonwell.local.pkl
+with text files that hold nothing:
+  refused: moonwell.local.pkl
+every file under another spelling:
+  refused: moonwell.local.pkl
+an empty folder:
+  refused: moonwell.local.pkl
+without the script:
+  refused: moonwell.local.pkl
+without the map info:
+  refused: moonwell.local.pkl
+a script that is not UTF-8:
+  refused: moonwell.local.pkl
+text files that are not UTF-8:
+  refused: moonwell.local.pkl
+a script without SetMapName:
+  refused: moonwell.local.pkl
+a script whose main() returns a value:
+  refused: moonwell.local.pkl
+bytes that are no map info:
+  refused: moonwell.local.pkl
+with the name the minimap is kept under:
+  refused: moonwell.local.pkl
+with the name a TGA preview takes:
+  refused: moonwell.local.pkl
+== {"info":{"name":"N","preview":"preview.blp"},"gameplay":{"foodLimit":200},"gameplayConstants":{"MISC":{"foodCeiling":"1"}}}
+every file:
+  refused: moonwell.local.pkl
+with war3mapMisc.txt alone:
+  refused: moonwell.local.pkl
+with war3mapSkin.txt alone:
+  refused: moonwell.local.pkl
+with the minimap alone:
+  refused: moonwell.local.pkl
+with text files that hold nothing:
+  refused: moonwell.local.pkl
+every file under another spelling:
+  refused: moonwell.local.pkl
+an empty folder:
+  refused: moonwell.local.pkl
+without the script:
+  refused: moonwell.local.pkl
+without the map info:
+  refused: moonwell.local.pkl
+a script that is not UTF-8:
+  refused: moonwell.local.pkl
+text files that are not UTF-8:
+  refused: moonwell.local.pkl
+a script without SetMapName:
+  refused: moonwell.local.pkl
+a script whose main() returns a value:
+  refused: moonwell.local.pkl
+bytes that are no map info:
+  refused: moonwell.local.pkl
+with the name the minimap is kept under:
+  refused: moonwell.local.pkl
+with the name a TGA preview takes:
+  refused: moonwell.local.pkl

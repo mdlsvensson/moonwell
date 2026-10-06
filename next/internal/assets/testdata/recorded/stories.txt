@@ -1,0 +1,1302 @@
+== mapped assets beside the editor's own import, and nothing to do the second time (run 1)
+planned:
+  ReplaceableTextures/CommandButtons/BTNSword.blp: sha256 8c050f2fed1526ff19d51b0b7c63197101022dfa74e2a938da6ee6f34ae27648, 67 bytes
+  ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp: "the bytes of assets/icons/disabled.blp"
+  war3map.imp: sha256 2e783b717baa49ddccf8427b3807e4a554661f653ba8e6e0fa0191ff6a4809a3, 131 bytes
+  owned: ReplaceableTextures/CommandButtons/BTNSword.blp 8c050f2fed1526ff19d51b0b7c63197101022dfa74e2a938da6ee6f34ae27648
+  owned: ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp 9a2180a79f1ed21d5ddacd1239f10a61ae62a4913fe71b0d318744649bbdf4dc
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 8d84d602875e7ed42d5d492d25bd8c7e637bbaa144f8e8a1480c6baae6c95e38, 293 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/ReplaceableTextures/
+  maps/map.w3x/ReplaceableTextures/CommandButtons/
+  maps/map.w3x/ReplaceableTextures/CommandButtons/BTNSword.blp: sha256 8c050f2fed1526ff19d51b0b7c63197101022dfa74e2a938da6ee6f34ae27648, 67 bytes
+  maps/map.w3x/ReplaceableTextures/CommandButtonsDisabled/
+  maps/map.w3x/ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp: "the bytes of assets/icons/disabled.blp"
+  maps/map.w3x/war3map.imp: sha256 2e783b717baa49ddccf8427b3807e4a554661f653ba8e6e0fa0191ff6a4809a3, 131 bytes
+    import 5 existing.wav
+    import 13 ReplaceableTextures\CommandButtons\BTNSword.blp
+    import 13 ReplaceableTextures\CommandButtonsDisabled\DISBTNSword.blp
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/existing.wav: "the bytes of maps/map.w3x/war3mapImported/existing.wav"
+== mapped assets beside the editor's own import, and nothing to do the second time (run 2)
+planned:
+  owned: ReplaceableTextures/CommandButtons/BTNSword.blp 8c050f2fed1526ff19d51b0b7c63197101022dfa74e2a938da6ee6f34ae27648
+  owned: ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp 9a2180a79f1ed21d5ddacd1239f10a61ae62a4913fe71b0d318744649bbdf4dc
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 8d84d602875e7ed42d5d492d25bd8c7e637bbaa144f8e8a1480c6baae6c95e38, 293 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/ReplaceableTextures/
+  maps/map.w3x/ReplaceableTextures/CommandButtons/
+  maps/map.w3x/ReplaceableTextures/CommandButtons/BTNSword.blp: sha256 8c050f2fed1526ff19d51b0b7c63197101022dfa74e2a938da6ee6f34ae27648, 67 bytes
+  maps/map.w3x/ReplaceableTextures/CommandButtonsDisabled/
+  maps/map.w3x/ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp: "the bytes of assets/icons/disabled.blp"
+  maps/map.w3x/war3map.imp: sha256 2e783b717baa49ddccf8427b3807e4a554661f653ba8e6e0fa0191ff6a4809a3, 131 bytes
+    import 5 existing.wav
+    import 13 ReplaceableTextures\CommandButtons\BTNSword.blp
+    import 13 ReplaceableTextures\CommandButtonsDisabled\DISBTNSword.blp
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/existing.wav: "the bytes of maps/map.w3x/war3mapImported/existing.wav"
+== an asset is changed, staged by a build, synced, renamed by a mapping and removed (run 1)
+planned:
+  Models/unit.mdx: "the bytes of assets/Models/unit.mdx"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\unit.mdx\x00"
+  owned: Models/unit.mdx 4f721035acf2ebb70c919a4297bac7b27926a2d80717422fdab1378df2b8aef1
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 0fa9516f789bcd979234d534f6f824d8e1ec80489fe1d0d35f14c0a60b2322ce, 127 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/unit.mdx: "the bytes of assets/Models/unit.mdx"
+  maps/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\unit.mdx\x00"
+    import 13 Models\unit.mdx
+== an asset is changed, staged by a build, synced, renamed by a mapping and removed (run 2)
+planned:
+  Models/unit.mdx: "second"
+  owned: Models/unit.mdx 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 0fa9516f789bcd979234d534f6f824d8e1ec80489fe1d0d35f14c0a60b2322ce, 127 bytes
+  dist/
+  dist/stage/
+  dist/stage/map.w3x/
+  dist/stage/map.w3x/Models/
+  dist/stage/map.w3x/Models/unit.mdx: "second"
+  dist/stage/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  dist/stage/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\unit.mdx\x00"
+    import 13 Models\unit.mdx
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/unit.mdx: "the bytes of assets/Models/unit.mdx"
+  maps/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\unit.mdx\x00"
+    import 13 Models\unit.mdx
+== an asset is changed, staged by a build, synced, renamed by a mapping and removed (run 3)
+planned:
+  Models/unit.mdx: "second"
+  owned: Models/unit.mdx 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 84cc0c73aa90c755672b39a042cee3356b61fe27f4dd60c81a12a9345ba7b55e, 127 bytes
+  dist/
+  dist/stage/
+  dist/stage/map.w3x/
+  dist/stage/map.w3x/Models/
+  dist/stage/map.w3x/Models/unit.mdx: "second"
+  dist/stage/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  dist/stage/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\unit.mdx\x00"
+    import 13 Models\unit.mdx
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/unit.mdx: "second"
+  maps/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\unit.mdx\x00"
+    import 13 Models\unit.mdx
+== an asset is changed, staged by a build, synced, renamed by a mapping and removed (run 4)
+planned:
+  Models/renamed.mdx: "second"
+  Models/unit.mdx: removed
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\renamed.mdx\x00"
+  owned: Models/renamed.mdx 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 e0e6d6d2c9d3e9b9763ce5bec479311862a370e5c1c19ed26f6593be0c2046d2, 130 bytes
+  dist/
+  dist/stage/
+  dist/stage/map.w3x/
+  dist/stage/map.w3x/Models/
+  dist/stage/map.w3x/Models/unit.mdx: "second"
+  dist/stage/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  dist/stage/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\unit.mdx\x00"
+    import 13 Models\unit.mdx
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/renamed.mdx: "second"
+  maps/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\renamed.mdx\x00"
+    import 13 Models\renamed.mdx
+== an asset is changed, staged by a build, synced, renamed by a mapping and removed (run 5)
+planned:
+  Models/renamed.mdx: removed
+  war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+left:
+  .asset-state/
+  dist/
+  dist/stage/
+  dist/stage/map.w3x/
+  dist/stage/map.w3x/Models/
+  dist/stage/map.w3x/Models/unit.mdx: "second"
+  dist/stage/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  dist/stage/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\unit.mdx\x00"
+    import 13 Models\unit.mdx
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/unmanaged.txt: "the bytes of maps/map.w3x/unmanaged.txt"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+== World Editor saves the owned imports with its own flag, and a third asset is added (run 1)
+planned:
+  Textures/a.blp: "the bytes of assets/Textures/a.blp"
+  Textures/b.blp: "the bytes of assets/Textures/b.blp"
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\rTextures\\a.blp\x00\rTextures\\b.blp\x00"
+  owned: Textures/a.blp 868adf10df3549022064a16c41e16a3089e92ea4b787d300afb4c8676ff3a5bf
+  owned: Textures/b.blp 537a49fb619936da49fce3cd43f285ba62d59e5689e6391ba6662928fe4abd1a
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 c18c00d655e10271e6548255e4890bb2053a3a5d9c1cd20b1748860437aba1db, 216 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Textures/
+  maps/map.w3x/Textures/a.blp: "the bytes of assets/Textures/a.blp"
+  maps/map.w3x/Textures/b.blp: "the bytes of assets/Textures/b.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\rTextures\\a.blp\x00\rTextures\\b.blp\x00"
+    import 13 Textures\a.blp
+    import 13 Textures\b.blp
+== World Editor saves the owned imports with its own flag, and a third asset is added (run 2)
+planned:
+  owned: Textures/a.blp 868adf10df3549022064a16c41e16a3089e92ea4b787d300afb4c8676ff3a5bf
+  owned: Textures/b.blp 537a49fb619936da49fce3cd43f285ba62d59e5689e6391ba6662928fe4abd1a
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 c18c00d655e10271e6548255e4890bb2053a3a5d9c1cd20b1748860437aba1db, 216 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Textures/
+  maps/map.w3x/Textures/a.blp: "the bytes of assets/Textures/a.blp"
+  maps/map.w3x/Textures/b.blp: "the bytes of assets/Textures/b.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1dTextures\\a.blp\x00\x1dTextures\\b.blp\x00"
+    import 29 Textures\a.blp
+    import 29 Textures\b.blp
+== World Editor saves the owned imports with its own flag, and a third asset is added (run 3)
+planned:
+  Textures/c.blp: "a third"
+  war3map.imp: "\x01\x00\x00\x00\x03\x00\x00\x00\x1dTextures\\a.blp\x00\x1dTextures\\b.blp\x00\rTextures\\c.blp\x00"
+  owned: Textures/a.blp 868adf10df3549022064a16c41e16a3089e92ea4b787d300afb4c8676ff3a5bf
+  owned: Textures/b.blp 537a49fb619936da49fce3cd43f285ba62d59e5689e6391ba6662928fe4abd1a
+  owned: Textures/c.blp d44e2d132ef9a2b833da6811d72a8e65ddebf34fa83234bba9b4c9a6d2e00a12
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 72530d294e2e19af06691161ee6579dc9264d73c45228016d5508182749811cb, 306 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Textures/
+  maps/map.w3x/Textures/a.blp: "the bytes of assets/Textures/a.blp"
+  maps/map.w3x/Textures/b.blp: "the bytes of assets/Textures/b.blp"
+  maps/map.w3x/Textures/c.blp: "a third"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x03\x00\x00\x00\x1dTextures\\a.blp\x00\x1dTextures\\b.blp\x00\rTextures\\c.blp\x00"
+    import 29 Textures\a.blp
+    import 29 Textures\b.blp
+    import 13 Textures\c.blp
+== a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/a.blp
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "editor owned"
+== a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 2)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 3)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/a.blp
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "manual edit"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 4)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/a.blp
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "manual edit"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 5)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/a.blp
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "manual edit"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== an asset below a file of the map (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/Textures
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Textures: "the bytes of maps/map.w3x/Textures"
+== a folder the map spells in its own way, and new folders in three spellings (run 1)
+planned:
+  SOUND/Effects/c.blp: "the bytes of assets/c.blp"
+  SOUND/Music/a.blp: "the bytes of assets/a.blp"
+  SOUND/Music/b.blp: "the bytes of assets/b.blp"
+  Textures/new.blp: "the bytes of assets/textures/new.blp"
+  war3map.imp: sha256 e299bc7ee7144836e56e2ad932383d016be54a2b61cd0ef53ae72cc019663289, 85 bytes
+  owned: SOUND/Effects/c.blp 4e20e0ca0f6922f92bf0dbcabf7f971a58c9bedc36ce30b45e0d30a599b2b710
+  owned: SOUND/Music/a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+  owned: SOUND/Music/b.blp 32eef70f7570067369f3aa68754360c90c9a392caa70df0fde43ee23cc213994
+  owned: Textures/new.blp a860f98e500c7b5e7f9fc819a55129d2913fc28ef6df7d4d0311d4d7f831b6a2
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 6da7717498f744f897e52c6449dbaf2665d920cb3ea7b1f9fe441240b2f59bce, 409 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/SOUND/
+  maps/map.w3x/SOUND/Effects/
+  maps/map.w3x/SOUND/Effects/c.blp: "the bytes of assets/c.blp"
+  maps/map.w3x/SOUND/Music/
+  maps/map.w3x/SOUND/Music/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/SOUND/Music/b.blp: "the bytes of assets/b.blp"
+  maps/map.w3x/Textures/
+  maps/map.w3x/Textures/existing.blp: "the bytes of maps/map.w3x/Textures/existing.blp"
+  maps/map.w3x/Textures/new.blp: "the bytes of assets/textures/new.blp"
+  maps/map.w3x/war3map.imp: sha256 e299bc7ee7144836e56e2ad932383d016be54a2b61cd0ef53ae72cc019663289, 85 bytes
+    import 13 SOUND\Effects\c.blp
+    import 13 SOUND\Music\a.blp
+    import 13 SOUND\Music\b.blp
+    import 13 Textures\new.blp
+== a folder the map spells in its own way, and new folders in three spellings (run 2)
+planned:
+  owned: SOUND/Effects/c.blp 4e20e0ca0f6922f92bf0dbcabf7f971a58c9bedc36ce30b45e0d30a599b2b710
+  owned: SOUND/Music/a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+  owned: SOUND/Music/b.blp 32eef70f7570067369f3aa68754360c90c9a392caa70df0fde43ee23cc213994
+  owned: Textures/new.blp a860f98e500c7b5e7f9fc819a55129d2913fc28ef6df7d4d0311d4d7f831b6a2
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 6da7717498f744f897e52c6449dbaf2665d920cb3ea7b1f9fe441240b2f59bce, 409 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/SOUND/
+  maps/map.w3x/SOUND/Effects/
+  maps/map.w3x/SOUND/Effects/c.blp: "the bytes of assets/c.blp"
+  maps/map.w3x/SOUND/Music/
+  maps/map.w3x/SOUND/Music/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/SOUND/Music/b.blp: "the bytes of assets/b.blp"
+  maps/map.w3x/Textures/
+  maps/map.w3x/Textures/existing.blp: "the bytes of maps/map.w3x/Textures/existing.blp"
+  maps/map.w3x/Textures/new.blp: "the bytes of assets/textures/new.blp"
+  maps/map.w3x/war3map.imp: sha256 e299bc7ee7144836e56e2ad932383d016be54a2b61cd0ef53ae72cc019663289, 85 bytes
+    import 13 SOUND\Effects\c.blp
+    import 13 SOUND\Music\a.blp
+    import 13 SOUND\Music\b.blp
+    import 13 Textures\new.blp
+== nothing to own, then one file, then nothing again (run 1)
+planned:
+left:
+  maps/
+  maps/map.w3x/
+== nothing to own, then one file, then nothing again (run 2)
+planned:
+  a.blp: "one"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 7692c3ad3540bb803c020b3aee66cd8887123234ea0c6e7143c0add73ff431ed
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 06a5b70ff1e1c41e0ded7acd2177f087c9ca86e9d0528798c5f492023339c5a9, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "one"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== nothing to own, then one file, then nothing again (run 3)
+planned:
+  a.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+left:
+  .asset-state/
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+== a folder appears where a new file goes, after the plan (run 1)
+note: §8, "assets:sync: a file or folder that appears where a new asset goes, between the check and the write, stops the sync with "changed after the assets were checked""
+refused: maps/map.w3x/b.blp
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  b.blp: "the bytes of assets/b.blp"
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\ra.blp\x00\rb.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+  owned: b.blp 32eef70f7570067369f3aa68754360c90c9a392caa70df0fde43ee23cc213994
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/b.blp/
+  maps/map.w3x/b.blp/inner.txt: "another program's"
+== a write fails after a file was replaced: a file is where the folder of a new file goes (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x05existing.wav\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x05existing.wav\x00\ra.blp\x00"
+    import 5 existing.wav
+    import 13 a.blp
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/existing.wav: "editor"
+== a write fails after a file was replaced: a file is where the folder of a new file goes (run 2)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/Sound/b.blp
+planned:
+  a.blp: "second"
+  Sound/b.blp: "new"
+  war3map.imp: "\x01\x00\x00\x00\x03\x00\x00\x00\x05existing.wav\x00\ra.blp\x00\rSound\\b.blp\x00"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: Sound/b.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Sound: "another program's"
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x05existing.wav\x00\ra.blp\x00"
+    import 5 existing.wav
+    import 13 a.blp
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/existing.wav: "editor"
+== a file that cannot be taken out again when the sync is interrupted (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: ""
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  b.blp: "the bytes of assets/b.blp"
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\ra.blp\x00\rb.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+  owned: b.blp 32eef70f7570067369f3aa68754360c90c9a392caa70df0fde43ee23cc213994
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp/
+  maps/map.w3x/a.blp/inner.txt: "another program's"
+== nothing to import and nothing owned, in a map whose index does not read (run 1)
+planned:
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\t\t"
+== nothing to import and nothing owned, in a map whose index does not read (run 2)
+planned:
+left:
+  dist/
+  dist/stage/
+  dist/stage/map.w3x/
+  dist/stage/map.w3x/war3map.imp: "\t\t"
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\t\t"
+== a library's files beside the map's own, and the library dropped (run 1)
+planned:
+  icons/shared.blp: "the bytes of assets/icons/shared.blp"
+  Models/Own.mdx: "the bytes of assets/Models/Own.mdx"
+  war3mapImported/ui/frames.toc: sha256 0fd422bd887c91d83b373934f9d549ea530d889288fe695ff383c0b90707c441, 70 bytes
+  war3map.imp: sha256 450271b064885e4d8d66a4130878d8060cf8af07333c52d2961edd03ccba7e1a, 73 bytes
+  owned: icons/shared.blp c7061c775e11bcae63bf4f24aa46e2f1b06e265903f1ff55419813d1a5795889
+  owned: Models/Own.mdx 0fa7badeb2a8a8d1daff5e7bb55851e5bf670a76005d5971e7527e54def9b15e
+  owned: war3mapImported/ui/frames.toc 0fd422bd887c91d83b373934f9d549ea530d889288fe695ff383c0b90707c441
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 9a5301ca2fb893e1c3b4f8fcb71d3038eef1304348802a0f8e65d2bdecb3486e, 323 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/Own.mdx: "the bytes of assets/Models/Own.mdx"
+  maps/map.w3x/icons/
+  maps/map.w3x/icons/shared.blp: "the bytes of assets/icons/shared.blp"
+  maps/map.w3x/war3map.imp: sha256 450271b064885e4d8d66a4130878d8060cf8af07333c52d2961edd03ccba7e1a, 73 bytes
+    import 13 icons\shared.blp
+    import 13 Models\Own.mdx
+    import 13 war3mapImported\ui\frames.toc
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/ui/
+  maps/map.w3x/war3mapImported/ui/frames.toc: sha256 0fd422bd887c91d83b373934f9d549ea530d889288fe695ff383c0b90707c441, 70 bytes
+== a library's files beside the map's own, and the library dropped (run 2)
+planned:
+  owned: icons/shared.blp c7061c775e11bcae63bf4f24aa46e2f1b06e265903f1ff55419813d1a5795889
+  owned: Models/Own.mdx 0fa7badeb2a8a8d1daff5e7bb55851e5bf670a76005d5971e7527e54def9b15e
+  owned: war3mapImported/ui/frames.toc 0fd422bd887c91d83b373934f9d549ea530d889288fe695ff383c0b90707c441
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 9a5301ca2fb893e1c3b4f8fcb71d3038eef1304348802a0f8e65d2bdecb3486e, 323 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/Own.mdx: "the bytes of assets/Models/Own.mdx"
+  maps/map.w3x/icons/
+  maps/map.w3x/icons/shared.blp: "the bytes of assets/icons/shared.blp"
+  maps/map.w3x/war3map.imp: sha256 450271b064885e4d8d66a4130878d8060cf8af07333c52d2961edd03ccba7e1a, 73 bytes
+    import 13 icons\shared.blp
+    import 13 Models\Own.mdx
+    import 13 war3mapImported\ui\frames.toc
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/ui/
+  maps/map.w3x/war3mapImported/ui/frames.toc: sha256 0fd422bd887c91d83b373934f9d549ea530d889288fe695ff383c0b90707c441, 70 bytes
+== a library's files beside the map's own, and the library dropped (run 3)
+planned:
+  war3mapImported/ui/frames.toc: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\ricons\\shared.blp\x00\rModels\\Own.mdx\x00"
+  owned: icons/shared.blp c7061c775e11bcae63bf4f24aa46e2f1b06e265903f1ff55419813d1a5795889
+  owned: Models/Own.mdx 0fa7badeb2a8a8d1daff5e7bb55851e5bf670a76005d5971e7527e54def9b15e
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 c30e2a8c3abdf708730dff0fac12cb37d1b901158112c40c667c1a91ef56073c, 218 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/Own.mdx: "the bytes of assets/Models/Own.mdx"
+  maps/map.w3x/icons/
+  maps/map.w3x/icons/shared.blp: "the bytes of assets/icons/shared.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\ricons\\shared.blp\x00\rModels\\Own.mdx\x00"
+    import 13 icons\shared.blp
+    import 13 Models\Own.mdx
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/ui/
+== a library's file where the map has a file of its own (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/Models/Golem.mdx
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/Golem.mdx: "the bytes of maps/map.w3x/Models/Golem.mdx"
+== an import World Editor made where an asset goes, without a file (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/Textures/a.blp
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\x1dtextures\\A.blp\x00"
+    import 29 textures\A.blp
+== an import in the folder World Editor imports into, where an asset goes (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/war3mapImported/a.wav
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\bA.wav\x00"
+    import 8 A.wav
+== an index that lists a path twice (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/war3map.imp
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x03\x00\x00\x00\rTextures\\x.blp\x00\x05y.wav\x00\x1dtextures/X.BLP\x00"
+    import 13 Textures\x.blp
+    import 5 y.wav
+    import 29 textures/X.BLP
+== an index that is cut short (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/war3map.imp
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rx"
+== an index with a flag World Editor does not write (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/war3map.imp
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ax.blp\x00"
+== an index with a path that leaves the map (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/War3Map.imp
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/War3Map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\r..\\x.blp\x00"
+    import 13 ..\x.blp
+== an index named in capitals, with the editor's own import (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  WAR3MAP.IMP: "\x01\x00\x00\x00\x02\x00\x00\x00\bown.wav\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/WAR3MAP.IMP: "\x01\x00\x00\x00\x02\x00\x00\x00\bown.wav\x00\ra.blp\x00"
+    import 8 own.wav
+    import 13 a.blp
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/own.wav: "the bytes of maps/map.w3x/war3mapImported/own.wav"
+== the index World Editor 3.00 saved (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1dwa3mapPreview.tga\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/wa3mapPreview.tga: "the bytes of maps/map.w3x/wa3mapPreview.tga"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1dwa3mapPreview.tga\x00\ra.blp\x00"
+    import 29 wa3mapPreview.tga
+    import 13 a.blp
+== an owned file gone from the map, an asset changed, one added and one left out (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  b.blp: "the bytes of assets/b.blp"
+  c.blp: "the bytes of assets/c.blp"
+  d.blp: "the bytes of assets/d.blp"
+  war3map.imp: "\x01\x00\x00\x00\x04\x00\x00\x00\ra.blp\x00\rb.blp\x00\rc.blp\x00\rd.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+  owned: b.blp 32eef70f7570067369f3aa68754360c90c9a392caa70df0fde43ee23cc213994
+  owned: c.blp 4e20e0ca0f6922f92bf0dbcabf7f971a58c9bedc36ce30b45e0d30a599b2b710
+  owned: d.blp 0324777f342a5b6a3bb5c95f30f6d152c0241091f99970e38e48adf193316dc1
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 0be94d1cdf0155f7fa1161471159d6c3eb3e75eab9f5e1e12129d4563d473270, 360 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/b.blp: "the bytes of assets/b.blp"
+  maps/map.w3x/c.blp: "the bytes of assets/c.blp"
+  maps/map.w3x/d.blp: "the bytes of assets/d.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x04\x00\x00\x00\ra.blp\x00\rb.blp\x00\rc.blp\x00\rd.blp\x00"
+    import 13 a.blp
+    import 13 b.blp
+    import 13 c.blp
+    import 13 d.blp
+== an owned file gone from the map, an asset changed, one added and one left out (run 2)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  b.blp: "second"
+  Sound/e.blp: "new"
+  c.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x04\x00\x00\x00\ra.blp\x00\rb.blp\x00\rd.blp\x00\rSound\\e.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+  owned: b.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: d.blp 0324777f342a5b6a3bb5c95f30f6d152c0241091f99970e38e48adf193316dc1
+  owned: Sound/e.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 a5d70b58e603ab9eb06aab10ad6496abfdcf3b0dd579febc379bb39636337be4, 366 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Sound/
+  maps/map.w3x/Sound/e.blp: "new"
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/b.blp: "second"
+  maps/map.w3x/d.blp: "the bytes of assets/d.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x04\x00\x00\x00\ra.blp\x00\rb.blp\x00\rd.blp\x00\rSound\\e.blp\x00"
+    import 13 a.blp
+    import 13 b.blp
+    import 13 d.blp
+    import 13 Sound\e.blp
+== an asset named as a folder of the map (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/Textures
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Textures/
+  maps/map.w3x/Textures/x.blp: "the bytes of maps/map.w3x/Textures/x.blp"
+== an asset named as an empty folder of the map (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/Empty
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Empty/
+== an asset below an owned file that no asset wants (run 1)
+planned:
+  data: "the bytes of assets/data"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rdata\x00"
+  owned: data 95b5442bd6d5260f5cb488d7d5c8b37b0cda265c347924ad9b1c3b722c30a032
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 155b0dee157f2bd74acc08157f7fdc0047fd8746f4cbf27d2c32c39f54ba54ab, 116 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/data: "the bytes of assets/data"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rdata\x00"
+    import 13 data
+== an asset below an owned file that no asset wants (run 2)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/data
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 155b0dee157f2bd74acc08157f7fdc0047fd8746f4cbf27d2c32c39f54ba54ab, 116 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/data: "the bytes of assets/data"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rdata\x00"
+    import 13 data
+== two assets without room, the first below a file (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/a
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a: "the bytes of maps/map.w3x/a"
+  maps/map.w3x/b.blp: "the bytes of maps/map.w3x/b.blp"
+== two assets without room, the first at a file (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/0.blp
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/0.blp: "the bytes of maps/map.w3x/0.blp"
+  maps/map.w3x/a: "the bytes of maps/map.w3x/a"
+== an owned import that World Editor saved without a custom path (run 1)
+planned:
+  war3mapImported/a.wav: "the bytes of assets/war3mapImported/a.wav"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rwar3mapImported\\a.wav\x00"
+  owned: war3mapImported/a.wav aa5618e2ce7aeb60ecbb287123edba22133c4169ef68c837c43178456c1478e8
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 ec40fcc60c5fb430e529ce55fc1edb7acb440dc3bcdc8936987cea02d966acfb, 133 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rwar3mapImported\\a.wav\x00"
+    import 13 war3mapImported\a.wav
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/a.wav: "the bytes of assets/war3mapImported/a.wav"
+== an owned import that World Editor saved without a custom path (run 2)
+planned:
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\x05war3mapImported\\a.wav\x00"
+  owned: war3mapImported/a.wav aa5618e2ce7aeb60ecbb287123edba22133c4169ef68c837c43178456c1478e8
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 ec40fcc60c5fb430e529ce55fc1edb7acb440dc3bcdc8936987cea02d966acfb, 133 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\x05war3mapImported\\a.wav\x00"
+    import 5 war3mapImported\a.wav
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/a.wav: "the bytes of assets/war3mapImported/a.wav"
+== an owned import that World Editor saved without a custom path (run 3)
+planned:
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x05war3mapImported\\a.wav\x00\rwar3mapImported\\a.wav\x00"
+  owned: war3mapImported/a.wav aa5618e2ce7aeb60ecbb287123edba22133c4169ef68c837c43178456c1478e8
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 ec40fcc60c5fb430e529ce55fc1edb7acb440dc3bcdc8936987cea02d966acfb, 133 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x05war3mapImported\\a.wav\x00\rwar3mapImported\\a.wav\x00"
+    import 5 war3mapImported\a.wav
+    import 13 war3mapImported\a.wav
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/a.wav: "the bytes of assets/war3mapImported/a.wav"
+== an owned import that World Editor saved without a custom path (run 4)
+planned:
+  owned: war3mapImported/a.wav aa5618e2ce7aeb60ecbb287123edba22133c4169ef68c837c43178456c1478e8
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 ec40fcc60c5fb430e529ce55fc1edb7acb440dc3bcdc8936987cea02d966acfb, 133 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x05war3mapImported\\a.wav\x00\rwar3mapImported\\a.wav\x00"
+    import 5 war3mapImported\a.wav
+    import 13 war3mapImported\a.wav
+  maps/map.w3x/war3mapImported/
+  maps/map.w3x/war3mapImported/a.wav: "the bytes of assets/war3mapImported/a.wav"
+== the last owned file is removed from a map without an index (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== the last owned file is removed from a map without an index (run 2)
+planned:
+  a.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+left:
+  .asset-state/
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+== an owned file whose import is gone from the index (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== an owned file whose import is gone from the index (run 2)
+planned:
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== an owned file under another spelling in the map (run 1)
+planned:
+  Models/Unit.mdx: "the bytes of assets/Models/Unit.mdx"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\Unit.mdx\x00"
+  owned: Models/Unit.mdx e163ec8541573d16b00003398d527d15d090e3b6ec48892eb9c16a26cf23f8ec
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 52fcc6b9ababd5b285f6085b870d08d208b06fc9110d18537cf5beee4f624023, 127 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/Unit.mdx: "the bytes of assets/Models/Unit.mdx"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rModels\\Unit.mdx\x00"
+    import 13 Models\Unit.mdx
+== an owned file under another spelling in the map (run 2)
+planned:
+  models/UNIT.mdx: "second"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rmodels\\UNIT.mdx\x00"
+  owned: models/UNIT.mdx 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 af9954e1a9d68ae12a7e9075048cbb0cc110d8c0da774ebbd4e7305e6b67e74f, 127 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/models/
+  maps/map.w3x/models/UNIT.mdx: "second"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rmodels\\UNIT.mdx\x00"
+    import 13 models\UNIT.mdx
+== names outside ASCII and with a space, and a file without bytes (run 1)
+planned:
+  café/École.blp: "the bytes of assets/café/École.blp"
+  empty.blp: ""
+  My Icons/a b.blp: "the bytes of assets/My Icons/a b.blp"
+  war3map.imp: "\x01\x00\x00\x00\x03\x00\x00\x00\rcafé\\École.blp\x00\rempty.blp\x00\rMy Icons\\a b.blp\x00"
+  owned: café/École.blp 349574d88ab1b3dc519c57c5c5f23534a7d3fcb2d2568ba47f48d4904a4b1875
+  owned: empty.blp e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  owned: My Icons/a b.blp d19fc4132be9eca0c3e0563cb6d8902fb59fc4787eff161845b6fbfacb7cf4b9
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 6dc7f89902991fc7627f4c5bd85843679cecd214da5e85531c373dff2ea528b6, 305 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/My Icons/
+  maps/map.w3x/My Icons/a b.blp: "the bytes of assets/My Icons/a b.blp"
+  maps/map.w3x/café/
+  maps/map.w3x/café/École.blp: "the bytes of assets/café/École.blp"
+  maps/map.w3x/empty.blp: ""
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x03\x00\x00\x00\rcafé\\École.blp\x00\rempty.blp\x00\rMy Icons\\a b.blp\x00"
+    import 13 café\École.blp
+    import 13 empty.blp
+    import 13 My Icons\a b.blp
+== a path that looks like a number, alone (run 1)
+planned:
+  7: "the bytes of assets/7"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\r7\x00"
+  owned: 7 2a5fef01ac7a918f4b9b9378c5d1bf1d050559b52a70189b619a8bcc144acbb2
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 8d042c5566a29fe41e1695070d206384d10df2809f854841a65fb97b25de1dde, 113 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/7: "the bytes of assets/7"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\r7\x00"
+    import 13 7
+== a build with an asset changed, one removed and one in a new folder (run 1)
+planned:
+  Models/unit.mdx: "the bytes of assets/Models/unit.mdx"
+  old.blp: "the bytes of assets/old.blp"
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\rModels\\unit.mdx\x00\rold.blp\x00"
+  owned: Models/unit.mdx 4f721035acf2ebb70c919a4297bac7b27926a2d80717422fdab1378df2b8aef1
+  owned: old.blp fd7358d16342393fc0f56a41e2a42e4ed86d1ef4556d022ef55800f08ce3f919
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 4d1d9502ef3b4b6e07ebbc7e400d41022e21a343863335f1be8a23cbfc24f6ab, 210 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/unit.mdx: "the bytes of assets/Models/unit.mdx"
+  maps/map.w3x/old.blp: "the bytes of assets/old.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\rModels\\unit.mdx\x00\rold.blp\x00"
+    import 13 Models\unit.mdx
+    import 13 old.blp
+  maps/map.w3x/war3map.w3i: "the bytes of maps/map.w3x/war3map.w3i"
+== a build with an asset changed, one removed and one in a new folder (run 2)
+planned:
+  Models/unit.mdx: "second"
+  sound/theme.mp3: "theme"
+  old.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\rModels\\unit.mdx\x00\rsound\\theme.mp3\x00"
+  owned: Models/unit.mdx 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: sound/theme.mp3 3cb8201e7ff1e7777446032ef1bf4338535aadbabe464c15411cdce8c2317590
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 4d1d9502ef3b4b6e07ebbc7e400d41022e21a343863335f1be8a23cbfc24f6ab, 210 bytes
+  dist/
+  dist/stage/
+  dist/stage/map.w3x/
+  dist/stage/map.w3x/Models/
+  dist/stage/map.w3x/Models/unit.mdx: "second"
+  dist/stage/map.w3x/sound/
+  dist/stage/map.w3x/sound/theme.mp3: "theme"
+  dist/stage/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\rModels\\unit.mdx\x00\rsound\\theme.mp3\x00"
+    import 13 Models\unit.mdx
+    import 13 sound\theme.mp3
+  dist/stage/map.w3x/war3map.w3i: "the bytes of maps/map.w3x/war3map.w3i"
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/Models/
+  maps/map.w3x/Models/unit.mdx: "the bytes of assets/Models/unit.mdx"
+  maps/map.w3x/old.blp: "the bytes of assets/old.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\rModels\\unit.mdx\x00\rold.blp\x00"
+    import 13 Models\unit.mdx
+    import 13 old.blp
+  maps/map.w3x/war3map.w3i: "the bytes of maps/map.w3x/war3map.w3i"
+== a library's file below a file of the map (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/UI
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/UI: "the bytes of maps/map.w3x/UI"
+== a folder named as the index (run 1)
+note: §8, "A folder where a map file belongs, and a file that cannot be read [...], is a named error with the file, not an internal error"
+refused: maps/map.w3x/war3map.imp
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp/
+  maps/map.w3x/war3map.imp/stray.txt: "the bytes of maps/map.w3x/war3map.imp/stray.txt"
+== an owned file is edited by hand after the plan (run 1)
+planned:
+  0.blp: "the bytes of assets/0.blp"
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\r0.blp\x00\ra.blp\x00"
+  owned: 0.blp 31c91f31983fa8768eceb876e3d8a18a671c33c04a4ef059228fed29c420585b
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5acbe2750f87e6959a10b99a495031062571355ff05e1707c7367c4fb5f1fcea, 198 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/0.blp: "the bytes of assets/0.blp"
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\r0.blp\x00\ra.blp\x00"
+    import 13 0.blp
+    import 13 a.blp
+== an owned file is edited by hand after the plan (run 2)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/a.blp
+planned:
+  0.blp: "second"
+  a.blp: "second"
+  owned: 0.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5acbe2750f87e6959a10b99a495031062571355ff05e1707c7367c4fb5f1fcea, 198 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/0.blp: "the bytes of assets/0.blp"
+  maps/map.w3x/a.blp: "edited by hand"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\r0.blp\x00\ra.blp\x00"
+    import 13 0.blp
+    import 13 a.blp
+== a file appears where a new asset goes, after the plan (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: maps/map.w3x/a.blp
+planned:
+  0.blp: "the bytes of assets/0.blp"
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\r0.blp\x00\ra.blp\x00"
+  owned: 0.blp 31c91f31983fa8768eceb876e3d8a18a671c33c04a4ef059228fed29c420585b
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the editor's"
+== the state file cannot be written (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: <root>/.asset-state/map.w3x.json
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json/
+  .asset-state/map.w3x.json/in the way.txt: "another program's"
+  maps/
+  maps/map.w3x/
+== the state file is changed before it is written (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== the state file is changed before it is written (run 2)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: <root>/.asset-state/map.w3x.json
+planned:
+  a.blp: "second"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: "another program's"
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== the state file is removed before it is written (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== the state file is removed before it is written (run 2)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: <root>/.asset-state/map.w3x.json
+planned:
+  a.blp: "second"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+left:
+  .asset-state/
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== a state file is made before the first is written (run 1)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: <root>/.asset-state/map.w3x.json
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: "another program's"
+  maps/
+  maps/map.w3x/
+== the state file is changed before it is removed (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== the state file is changed before it is removed (run 2)
+note: §8, the rule of its rows on a file that cannot be used: it "is named from the project folder"
+refused: <root>/.asset-state/map.w3x.json
+planned:
+  a.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: "another program's"
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== the state file is changed while a sync that does not write it writes the index (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== the state file is changed while a sync that does not write it writes the index (run 2)
+planned:
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: "another program's"
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== a state file is made while a sync that owns nothing, and found none, writes the map (run 1)
+planned:
+  a.blp: "the bytes of assets/a.blp"
+  war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+  owned: a.blp 090211a4fec43beb3b0afca6c3523fecf76c10b41cdeba49b569fb1d710e2fad
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 5d7159e3f40bce3ffe995c4775208968dbee60959d990cd8b94d52c7cddd3997, 117 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "the bytes of assets/a.blp"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
+    import 13 a.blp
+== a state file is made while a sync that owns nothing, and found none, writes the map (run 2)
+planned:
+  a.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: "another program's"
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
+== the plan, cancelled at ask 1 (run 1)
+refused: ""
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the plan, cancelled at ask 2 (run 1)
+refused: ""
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the plan, cancelled at ask 3 (run 1)
+refused: ""
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the plan, cancelled at ask 4 (run 1)
+refused: ""
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the plan, cancelled at ask 5 (run 1)
+refused: ""
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the plan, cancelled at ask 6 (run 1)
+planned:
+  a.blp: "second"
+  b.blp: "new"
+  dropped.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: b.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 df0929d38648a8861d0f2c4fd174ddb2268e9203f60e152a82a39a36b4308013, 198 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "second"
+  maps/map.w3x/b.blp: "new"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+    import 29 a.blp
+    import 13 b.blp
+== the sync, cancelled at ask 1 (run 1)
+refused: ""
+planned:
+  a.blp: "second"
+  b.blp: "new"
+  dropped.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: b.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the sync, cancelled at ask 2 (run 1)
+refused: ""
+planned:
+  a.blp: "second"
+  b.blp: "new"
+  dropped.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: b.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the sync, cancelled at ask 3 (run 1)
+refused: ""
+planned:
+  a.blp: "second"
+  b.blp: "new"
+  dropped.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: b.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the sync, cancelled at ask 4 (run 1)
+refused: ""
+planned:
+  a.blp: "second"
+  b.blp: "new"
+  dropped.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: b.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the sync, cancelled at ask 5 (run 1)
+refused: ""
+planned:
+  a.blp: "second"
+  b.blp: "new"
+  dropped.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: b.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 abf16963ee7a951859f69a332548ee9f8b2f67cb797d364cc3517234da23db69, 204 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "first"
+  maps/map.w3x/dropped.blp: "dropped"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\x1ddropped.blp\x00"
+    import 29 a.blp
+    import 29 dropped.blp
+== the sync, cancelled at ask 6 (run 1)
+planned:
+  a.blp: "second"
+  b.blp: "new"
+  dropped.blp: removed
+  war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+  owned: a.blp 16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4
+  owned: b.blp 11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437
+left:
+  .asset-state/
+  .asset-state/map.w3x.json: sha256 df0929d38648a8861d0f2c4fd174ddb2268e9203f60e152a82a39a36b4308013, 198 bytes
+  maps/
+  maps/map.w3x/
+  maps/map.w3x/a.blp: "second"
+  maps/map.w3x/b.blp: "new"
+  maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x02\x00\x00\x00\x1da.blp\x00\rb.blp\x00"
+    import 29 a.blp
+    import 13 b.blp

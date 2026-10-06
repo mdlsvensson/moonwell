@@ -13,7 +13,6 @@ import (
 	"runtime"
 	"slices"
 	"strings"
-	"sync"
 	"syscall"
 	"testing"
 
@@ -181,248 +180,8 @@ func accepted(t testing.TB, root, document string) (*oldsettings.Settings, *mani
 	return read.old, read.project
 }
 
-// ---- the documents ----
-
-// The documents of the other tree's tests of the map info.
-var mapInfoDocuments = []string{
-	`{"loadingScreen":{"model":"Loading.mdx","text":"Text","title":"Title","subtitle":"Subtitle"}}`,
-	`{"environment":{"soundEnvironment":"Dungeon","waterColor":[255,0,0,255],"fog":{"enabled":true,"color":[255,0,0,255]}}}`,
-	`{"info":{"name":"M` + "\xc3\xb8\xc3\xb8" + `nwell","author":"","description":"TRIGSTR_001"},"loadingScreen":{"title":"Changed","background":7}}`,
-	`{"info":{"name":"TRIGSTR_001","author":"Author","description":"Description"},"loadingScreen":{"title":"Title","background":0}}`,
-	`{"players":{"0":{"x":256,"controller":"computer"}},"forces":{"0":{"name":"Blue","sharedVision":true}},
-		"environment":{"soundEnvironment":"Dungeon","waterColor":[2,3,4,255],"fog":{"start":2000}}}`,
-	`{"players":{"0":{"x":128,"controller":"user"}},"forces":{"0":{"name":"Force 1","sharedVision":false}},
-		"environment":{"soundEnvironment":"Default","waterColor":[255,255,255,255],"fog":{"start":1000}}}`,
-	`{"players":{"0":{"name":"P"}}}`,
-	`{"loadingScreen":{"model":""}}`,
-	`{"players":{"2":{"name":"P"}}}`,
-	`{"forces":{"1":{"name":"F"}}}`,
-	`{"environment":{"fog":{"start":6000}}}`,
-	`{"info":{"name":"Safe"}}`,
-	`{"environment":{"soundEnvironment":"Safe"}}`,
-	`{"environment":{"fog":{"enabled":true}}}`,
-	`{}`,
-	`{"forces":{"0":{"name":"X"}}}`,
-	`{"players":{"7":{"name":"P"}}}`,
-	`{"forces":{"0":{"name":"F"}}}`,
-}
-
-// The documents of the other tree's tests of the two text files.
-var textDocuments = []string{
-	`{"gameInterface":{"Misc":{"MaxHeroLevel":"25","Added":"0"},"CustomSkin":{"Text":""}}}`,
-	`{"gameInterface":{"Misc":{"FoodCeiling":"0"}}}`,
-	`{"gameplay":{"foodLimit":200},"gameplayConstants":{"misc":{"foodceiling":"200"}}}`,
-	`{"gameplay":{"foodLimit":200},"gameplayConstants":{"misc":{"foodceiling":"0200"}}}`,
-	`{"gameplay":{"foodLimit":200},"gameplayConstants":{"misc":{"foodceiling":"100"}}}`,
-	`{"gameplay":{"heroMaxLevel":25,"foodLimit":150},"gameplayConstants":{"Other":{"A":"1"}}}`,
-	`{"gameInterface":{"Misc":{"FoodCeiling":"200"}}}`,
-	`{"gameInterface":{"Misc":{"FoodCeiling":"0"},"Skin":{"Text":""},"New":{"Value":"1"}}}`,
-	`{"gameInterface":{"Misc":{"B":"2"}}}`,
-	`{"gameInterface":{"A":{"K":"v"}}}`,
-	`{"gameInterface":{"New":{"K":"v"}}}`,
-}
-
-// The documents of the other tree's tests of the plan.
-var planDocuments = []string{
-	`{"info":{"name":"Planned"},"gameplay":{"foodLimit":200}}`,
-	`{"info":{"name":"Not written"},"players":{"5":{"name":"Absent"}}}`,
-	`{"info":{"name":"Planned"},"gameplay":{"heroMaxLevel":25}}`,
-	`{"gameInterface":{"CustomSkin":{"Test":"value"}},
-		"gameplayConstants":{"Misc":{"GoldCost":"1"}},"info":{"description":"Described"}}`,
-	`{"gameInterface":{"CustomSkin":{"Test":""}}}`,
-	`{"info":{"name":null},"players":{"5":{"name":null}},"environment":{"fog":{}},
-		"gameplayConstants":{"Misc":{}},"gameInterface":{"CustomSkin":{}}}`,
-	`{"gameplay":{"foodLimit":100}}`,
-	`{"info":{"author":"Someone"},"loadingScreen":{"title":"T"}}`,
-	`{"loadingScreen":{"title":"T"}}`,
-	`{"info":{"name":"Needs Lua"}}`,
-	`{"environment":{"soundEnvironment":"Mountains"}}`,
-	`{"gameplay":{"heroMaxLevel":5}}`,
-	`{"gameInterface":{"A":{"B":"c"}}}`,
-	`{"info":{"name":"X"}}`,
-	`{"info":{"name":"Refused"},"gameplay":{"foodLimit":1},"gameInterface":{"A":{"B":"c"}}}`,
-	`{"gameplay":{"foodLimit":200},"gameplayConstants":{"MISC":{"foodCeiling":"1"}}}`,
-	`{"info":{"name":"BOM"},"gameInterface":{"A":{"B":"c"}}}`,
-	`{
-		"info":{"name":"Name","description":""},
-		"players":{"0":{"name":"Hero","controller":"computer","fixedStart":false,"x":256}},
-		"forces":{"0":{"allied":false,"alliedVictory":true}},
-		"environment":{"soundEnvironment":"","waterColor":[1,2,3,4],"fog":{"enabled":true,"start":1,"end":2}},
-		"gameplay":{"heroMaxLevel":20,"foodLimit":150},
-		"gameplayConstants":{"misc":{"Other":"1"}},
-		"gameInterface":{"CustomSkin":{"A":"b"}}}`,
-	`{"players":{"5":{"name":"Absent"}}}`,
-	`{"info":{"name":"Refused"}}`,
-	`{"gameplay":{"foodLimit":1}}`,
-	`{"info":{"name":"Labelled"}}`,
-	`{"info":{"name":"Cased"},"gameplay":{"foodLimit":7},"gameInterface":{"A":{"B":"c"}}}`,
-	`{"info":{"preview":"preview.blp"}}`,
-	`{"info":{"preview":"art/Preview.TGA"}}`,
-	`{"info":{"preview":"art/Preview.PNG"}}`,
-	`{"info":{"preview":"preview.tga"}}`,
-	`{"info":{"name":"Both","preview":"preview.blp"},"gameplay":{"foodLimit":200},
-		"gameInterface":{"CustomSkin":{"Test":"value"}}}`,
-}
-
-// The documents of the other tree's tests of the Lua, those that run it among them.
-var luaDocuments = []string{
-	`{
-		"info":{"name":"A \"quoted\" map\n` + "\xe9\x9b\xaa" + `"},
-		"players":{"0":{"name":"Hero","controller":"computer","race":"orc","fixedStart":false,"x":256}},
-		"environment":{"waterColor":[10,20,30,255],"fog":{"enabled":true,"start":100,"end":1000}}}`,
-	`{"info":{"name":"Name"}}`,
-	`{"info":{"author":"Author","recommendedPlayers":""},"loadingScreen":{"title":"Title"},
-		"forces":{"0":{"name":"Allies"}},"gameplay":{"heroMaxLevel":20}}`,
-	`{"info":{"name":"Name","description":""}}`,
-	`{"players":{"0":{"name":"Hero","race":"selectable","fixedStart":false}}}`,
-	`{"players":{"1":{"fixedStart":true}}}`,
-	`{"players":{"11":{"fixedStart":true,"controller":"computer"}}}`,
-	`{"players":{"1":{"name":"Tab\there ` + "\xe2\x9c\x93" + `","controller":"rescuable"}}}`,
-	`{"players":{"0":{"name":"Hero"}}}`,
-	`{"players":{"11":{"x":0.1}}}`,
-	`{"environment":{"fog":{"enabled":true,"start":0,"density":0.3,"color":[255,0,51,128]}}}`,
-	`{"players":{"0":{"controller":"computer"}}}`,
-	`{"players":{"1":{"controller":"computer"}}}`,
-	`{"forces":{"0":{"allied":true}}}`,
-	`{"environment":{"waterColor":[1,2,3,4]}}`,
-	`{"info":{"name":"x"}}`,
-	`{"players":{"0":{"x":1}}}`,
-	`{"players":{"0":{"fixedStart":false}}}`,
-	`{"players":{"0":{"fixedStart":true}}}`,
-	`{"players":{"0":{"race":"orc"}}}`,
-	`{"players":{"0":{"name":"x"}}}`,
-	`{"forces":{"1":{"allied":true}}}`,
-	`{"environment":{"soundEnvironment":"Cave"}}`,
-	`{"environment":{"fog":{"enabled":false}}}`,
-	`{"forces":{"0":{"allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true},"1":{}}}`,
-	`{"forces":{"1":{"sharedVision":true}}}`,
-	`{"environment":{"soundEnvironment":"","fog":{"enabled":false}}}`,
-	`{"environment":{"soundEnvironment":"Cave","fog":{"enabled":true}}}`,
-	`{"info":{"name":"Both"},"environment":{"soundEnvironment":"Dungeon"}}`,
-	`{"info":{"name":"\n123"},"environment":{"fog":{"enabled":true,"start":100,"end":1000}}}`,
-	`{"info":{"name":"Moonwell","description":""},
-		"players":{"0":{"name":"","controller":"computer","race":"selectable","fixedStart":false,"x":0,"y":0.1},
-			"11":{"controller":"rescuable","race":"undead"}},
-		"forces":{"0":{"allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true}},
-		"environment":{"soundEnvironment":"","waterColor":[0,0,0,0],"fog":{"enabled":true,"start":0,"color":[255,0,0,0]}}}`,
-	`{"environment":{"fog":{"enabled":false,"density":0}}}`,
-}
-
-// The documents of the other tree's tests of its Validate that it accepts.
-func optionDocuments() []string {
-	documents := []string{
-		`{"info":{"name":null},"players":{"23":{"name":null}},"environment":{"fog":{}}}`,
-		`{"info":{"name":""},"players":{"0":{"fixedStart":false,"x":0}},"gameplay":{"foodLimit":0}}`,
-		`{"gameInterface":{"constructor":{"constructor":"ok"}}}`,
-		`{"loadingScreen":{"background":-1}}`,
-		`{"loadingScreen":{"background":2147483647}}`,
-		`{"gameplay":{"heroMaxLevel":1,"foodLimit":0}}`,
-		`{"gameplay":{"heroMaxLevel":10000,"foodLimit":300}}`,
-		`{"players":{"23":{"x":-10000000,"y":10000000}}}`,
-		`{"environment":{"fog":{"style":0,"density":0,"start":-10000000,"end":10000000}}}`,
-		`{"environment":{"fog":{"style":2,"density":1},"waterColor":[0,255,0,255]}}`,
-		`{"environment":{"waterColor":[1,2,3,4]},"gameplayConstants":{"Misc":{"FoodCeiling":"0"}}}`,
-		`{"players":{"0":{"x":256,"y":-896}},"environment":{"fog":{"start":100,"end":1000,"density":1}}}`,
-		`{"info":{"name":"N","preview":"art/preview.tga"}}`,
-		`{"info":{"preview":"p.blp"}}`,
-		`{"info":{"preview":null}}`,
-		`{"players":{"10":{"name":"k"},"2":{"name":"c"},"0":{"name":"a"}}}`,
-	}
-	for _, controller := range controllers[1:] {
-		documents = append(documents, `{"players":{"0":{"controller":"`+controller+`"}}}`)
-	}
-	for _, race := range races {
-		documents = append(documents, `{"players":{"0":{"race":"`+race+`"}}}`)
-	}
-	for _, flag := range []string{"allied", "alliedVictory", "sharedVision", "sharedControl", "sharedAdvancedControl"} {
-		documents = append(documents, `{"forces":{"0":{"`+flag+`":false}}}`)
-	}
-	return documents
-}
-
-// The documents of this file: each sets every setting that some map info can take.
-var everyDocuments = []string{
-	// Every setting there is, for the player and the force that every map with players and forces has.
-	`{"info":{"name":"Every \"setting\"","author":"An author","description":"One|nTwo","recommendedPlayers":"2-4",
-			"preview":"preview.tga"},
-		"loadingScreen":{"background":3,"model":"Loading\\Screen.mdx","text":"Text","title":"Title","subtitle":"Subtitle"},
-		"players":{"0":{"name":"Hero","controller":"computer","race":"nightelf","fixedStart":false,"x":-512.25,"y":1024.5}},
-		"forces":{"0":{"name":"The Alliance","allied":true,"alliedVictory":false,"sharedVision":true,"sharedControl":false,
-			"sharedAdvancedControl":true}},
-		"environment":{"soundEnvironment":"Mountains","waterColor":[10,20,30,40],
-			"fog":{"enabled":true,"style":1,"start":500.5,"end":4000,"density":0.75,"color":[50,60,70,80]}},
-		"gameplay":{"heroMaxLevel":20,"foodLimit":150},
-		"gameplayConstants":{"Misc":{"DefenseArmor":"0.05"},"Other":{"Key":""}},
-		"gameInterface":{"FrameDef":{"UPKEEP_NONE":"No upkeep"},"CustomSkin":{"A":"b"}}}`,
-	// Every setting that a map info of any version from 25 holds.
-	`{"info":{"name":"","author":"A","description":"D","recommendedPlayers":"Any","preview":"art/p.png"},
-		"loadingScreen":{"background":-1,"model":"","text":"","title":"T","subtitle":"S"}}`,
-	// Every setting that a map info of any version holds.
-	`{"info":{"name":"N","author":"A","description":"","recommendedPlayers":""},
-		"loadingScreen":{"background":0,"text":"Text","title":"","subtitle":""}}`,
-	// Every setting of the players and the forces of the fixture, written out of slot order, with the alliance
-	// flags turned the other way.
-	`{"players":{"11":{"name":"Last","controller":"rescuable","race":"undead","fixedStart":true,"x":1.5,"y":-2.5},
-			"1":{"name":"Second","controller":"neutral","race":"human","fixedStart":false,"x":0,"y":0},
-			"0":{"name":"","controller":"user","race":"selectable","fixedStart":true,"x":-0.0,"y":3e-7}},
-		"forces":{"1":{"name":"","allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true,
-				"sharedAdvancedControl":false},
-			"0":{"name":"First","allied":true,"alliedVictory":true,"sharedVision":true,"sharedControl":true,
-				"sharedAdvancedControl":true}},
-		"environment":{"soundEnvironment":"","waterColor":[0,0,0,0],
-			"fog":{"enabled":false,"style":0,"start":-10,"end":-10,"density":0,"color":[0,0,0,0]}}}`,
-	// Overrides with nothing set beside ones that set something, for slots the maps lack.
-	`{"players":{"23":{},"0":{"name":"Hero"},"9":{"name":null}},"forces":{"7":{},"0":{"sharedControl":true}}}`,
-	// The first of several refusals: a player, then a force, then the fog.
-	`{"environment":{"fog":{"start":2,"end":1}},"forces":{"9":{"name":"F"},"3":{"name":"F"}},
-		"players":{"10":{"name":"P"},"2":{"name":"P"}}}`,
-	`{"environment":{"fog":{"start":2,"end":1}},"forces":{"9":{"name":"F"},"3":{"name":"F"}}}`,
-	`{"environment":{"fog":{"start":2,"end":1},"waterColor":[1,1,1,1]}}`,
-	`{"environment":{"fog":{"density":0.5}}}`,
-	`{"environment":{"fog":{"end":999.5}}}`,
-}
-
-// documents is every document that both trees accept.
-func documents() []string {
-	return slices.Concat(mapInfoDocuments, textDocuments, planDocuments, luaDocuments, optionDocuments(), everyDocuments)
-}
-
-// constantDocuments pairs each typed gameplay constant, and both, and none, with raw constants: none at all, or a
-// Misc section in each of three spellings that holds no key of a typed constant, or such a key in one of three
-// spellings with a value that is the typed one or another. The section before Misc holds a key of a typed
-// constant too, and is left alone.
-func constantDocuments() []string {
-	var documents []string
-	for _, typed := range []string{``, `"foodLimit":200`, `"heroMaxLevel":25`, `"heroMaxLevel":25,"foodLimit":200`} {
-		documents = append(documents, `{"gameplay":{`+typed+`}}`)
-		for _, section := range []string{"Misc", "misc", "MISC"} {
-			for _, keys := range []string{
-				``, `"Other":"1"`, `"FoodCeiling":"200"`, `"foodceiling":"0200"`, `"Other":"1","MAXHEROLEVEL":"25"`,
-				`"maxherolevel":"7","FoodCeiling":"200"`, `"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"`,
-			} {
-				documents = append(documents, `{"gameplay":{`+typed+`},"gameplayConstants":{"First":{"FoodCeiling":"1"},"`+
-					section+`":{`+keys+`},"Last":{}}}`)
-			}
-		}
-	}
-	return documents
-}
-
-// The documents the other tree's Validate refuses for names that differ only in letter case: the two of its
-// tests, and more of each kind.
-var duplicateDocuments = []string{
-	`{"gameplayConstants":{"Misc":{},"misc":{}}}`,
-	`{"gameInterface":{"Frame":{"X":"a","x":"b"}}}`,
-	`{"gameInterface":{"A":{"k":"v"},"B":{},"a":{}}}`,
-	`{"gameplayConstants":{"Misc":{"Key":"1","Other":"2","KEY":"3"}}}`,
-	`{"gameInterface":{"A":{"k":"1","K":"2"},"a":{}}}`,
-	`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"},"MISC":{}}}`,
-	`{"gameplayConstants":{"A":{"B":"1"},"a":{"B":"1","b":"2"}}}`,
-	// Two spellings in the interface beside a typed constant that disagrees with a raw one, and two spellings in
-	// both blocks: which refusal is the one told.
-	`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"}},"gameInterface":{"A":{},"a":{}}}`,
-	`{"gameInterface":{"A":{},"a":{}},"gameplayConstants":{"Misc":{"Key":"1","KEY":"2"}}}`,
-}
+// The documents are in documents_test.go: those of the other tree's tests of the map info, of the two text
+// files, of the plan, of the Lua and of its Validate, and those made for this comparison.
 
 // ---- the map info ----
 
@@ -766,108 +525,14 @@ func subsetDocuments() []string {
 	return documents
 }
 
-// The documents with a zero below 0: set as one, or what the map info keeps of a number too small for it.
-var zeroDocuments = []string{
-	`{"players":{"0":{"x":-0.0,"y":0}}}`,
-	`{"players":{"0":{"x":1e-46,"y":-1e-46}}}`,
-	`{"environment":{"fog":{"enabled":true,"start":-0.0,"end":-0.0,"density":-0.0,"color":[1,2,3,4]}}}`,
-}
-
-// The documents with a number that the two trees write apart, beside the one among everyDocuments, and after
-// them documents with such a number that no script takes: of a fog that is not shown, and of a player whose
-// position is not set.
-var apartDocuments = []string{
-	`{"players":{"0":{"x":0.000001}}}`,
-	`{"players":{"1":{"x":7},"11":{"y":-0.0000001}}}`,
-	`{"environment":{"fog":{"enabled":true,"start":-0.0000001,"density":1e-7}}}`,
-	`{"environment":{"fog":{"enabled":false,"density":1e-7}}}`,
-	`{"environment":{"fog":{"density":1e-7}}}`,
-}
-
-// scriptDocuments is the documents that every script is patched for.
-func scriptDocuments() []string {
-	return slices.Concat(documents(), zeroDocuments, apartDocuments)
-}
-
-// script is a war3map.lua, or a text given as one.
-type script struct{ name, text string }
-
-// scripts is the fixture's script, every script the other tree's tests of the Lua patch or see refused, and the
-// fixture's in other layouts.
-func scripts(t *testing.T) []script {
-	t.Helper()
-	fixture := fixtureLua(t)
-	notHeld := swapped(t, fixture, "ForcePlayerStartLocation(Player(1), 1)\r\n", "")
-	all := []script{
-		{"the fixture", fixture},
-		{"without SetMapName", swapped(t, fixture, "SetMapName(", "Other(")},
-		{"with a second config()", fixture + "\nfunction config() SetMapName(\"x\") end"},
-		{"with SetMapName of an object", swapped(t, fixture, "SetMapName(", "object.SetMapName(")},
-		{"a script that does not read", "function (((unreadable"},
-		{"with player 1 not held to its start", notHeld},
-		{"with a SetPlayerName", swapped(t, fixture, "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
-			"SetPlayerColor(Player(1), ConvertPlayerColor(1))\r\nSetPlayerName(Player(1), \"TRIGSTR_006\")")},
-		{"a main() alone, indented", indentedMain},
-	}
-	for _, shape := range unsafeShapes {
-		all = append(all, script{fmt.Sprintf("with %q for %q", shape.new, shape.old), swapped(t, fixture, shape.old, shape.new)})
-	}
-	for _, c := range joinable {
-		all = append(all, script{fmt.Sprintf("the script %q", c.source), c.source})
-	}
-	for _, source := range slices.Concat(slices.Sorted(maps.Keys(minimapSources)), slices.Sorted(maps.Keys(withoutOneMain))) {
-		all = append(all, script{fmt.Sprintf("the script %q", source), source})
-	}
-	// A call that is added takes its line ending, its indentation and its semicolon from the layout, and the one
-	// call a setting adds to a player is the one that holds the player to its start: each layout comes once more
-	// without that call for player 1.
-	all = append(all, layouts(t, "", fixture)...)
-	return append(all, layouts(t, "with player 1 not held to its start, ", notHeld)...)
-}
-
-// layouts is a script of the fixture's shape written in other ways that say the same. Each is named by what
-// stands before its name.
-func layouts(t *testing.T, before, fixture string) []script {
-	t.Helper()
-	oneLine := strings.ReplaceAll(swapped(t, fixture, "--\r\n", ""), "\r\n", " ")
-	together := swapped(t, fixture, "SetPlayerStartLocation(Player(0), 0)\r\nForcePlayerStartLocation(Player(0), 0)\r\nSetPlayerColor",
-		"SetPlayerStartLocation(Player(0), 0)ForcePlayerStartLocation(Player(0), 0)SetPlayerColor")
-	together = swapped(t, together, "NewSoundEnvironment(\"Default\")\r\n", "")
-	together = swapped(t, together, "SetMapMusic(\"Music\", true, 0)\r\nCreateAllUnits()\r\n",
-		"SetMapMusic(\"Music\", true, 0)\r\nNewSoundEnvironment(\"Default\")ResetTerrainFog()CreateAllUnits()")
-	return []script{
-		{before + "with the line endings of Unix", strings.ReplaceAll(fixture, "\r\n", "\n")},
-		{before + "with a semicolon after every call", strings.ReplaceAll(fixture, ")\r\n", ");\r\n")},
-		{before + "with every line indented", strings.ReplaceAll(fixture, "\r\n", "\r\n\t  ")},
-		{before + "on one line", oneLine},
-		{before + "on one line with semicolons", strings.ReplaceAll(oneLine, ") ", "); ")},
-		{before + "with calls that touch", together},
-	}
-}
+// The documents with a zero below 0 and those with a number that the two trees write apart (zeroDocuments,
+// apartDocuments), the scripts and their layouts, and the map folders of the plans are in documents_test.go and
+// recorded_test.go.
 
 // writtenApart reports whether the settings make a script take, from the map info given as bytes, a number that
-// the two trees write apart: a position of a player whose position is set, or a start, an end or a density of a
-// fog that is set and shown, that is not 0 and is below 0.000001 in size or from 1e21.
+// the two trees write apart: the other tree with an exponent, this tree in plain decimal.
 func writtenApart(s manifest.Settings, patchedInfo []byte) bool {
-	info, err := w3i.Read(patchedInfo, infoFile, w3i.Extended)
-	if err != nil {
-		return false
-	}
-	apart := func(values ...float32) bool {
-		return slices.ContainsFunc(values, func(value float32) bool {
-			size := math.Abs(float64(value))
-			return size != 0 && (size < 0.000001 || size >= 1e21)
-		})
-	}
-	for _, player := range info.Details.Players {
-		override := s.Players[int(player.ID.Value)]
-		if (override.X != nil || override.Y != nil) && apart(player.X.Value, player.Y.Value) {
-			return true
-		}
-	}
-	fog := info.Details.Fog
-	return s.Environment.Fog != (manifest.Fog{}) && info.Flags.Value&fogOn != 0 &&
-		apart(fog.Start.Value, fog.End.Value, fog.Density.Value)
+	return inPlainDecimal(s, patchedInfo)
 }
 
 // unreadIn is the refusal of the other tree when it is that of its Lua reader for a script that does not read,
@@ -942,25 +607,6 @@ func together(work []func(*scriptCounts)) scriptCounts {
 		sum.add(count)
 	}
 	return sum
-}
-
-// onEveryCore runs each piece of work on one of as many goroutines as the machine runs at once, and returns when
-// all are done.
-func onEveryCore(pieces int, work func(piece int)) {
-	queue := make(chan int)
-	var workers sync.WaitGroup
-	for range runtime.GOMAXPROCS(0) {
-		workers.Go(func() {
-			for piece := range queue {
-				work(piece)
-			}
-		})
-	}
-	for piece := range pieces {
-		queue <- piece
-	}
-	close(queue)
-	workers.Wait()
 }
 
 // onTheFixturesInfo puts the settings of each document into the fixture's map info and gives both trees each
@@ -1108,168 +754,42 @@ func TestOracleOnTheMinimapCall(t *testing.T) {
 
 // ---- the plan ----
 
-// planProject is a project folder that holds, at each path a document names as its preview, a picture of the
-// kind the path says. The picture that documents name in two spellings is written under both: a file system
-// that keeps the spellings apart then has two files and another has one, and both give the same bytes for either.
-func planProject(t *testing.T) string {
-	t.Helper()
-	root := t.TempDir()
-	picture := testkit.NewPixels(256)
-	packed := testkit.TGA(picture, testkit.TGAOptions{RLE: true, Depth: 24, FromTop: true})
-	for _, file := range []struct {
-		name string
-		data []byte
-	}{
-		{"preview.blp", testkit.BLP(256, 1)},
-		{"p.blp", testkit.BLP(512, 0)},
-		{"preview.tga", plainTGA()},
-		{"art/Preview.TGA", packed},
-		{"art/preview.tga", packed},
-		{"art/Preview.PNG", testkit.PNG(picture, "rgba")},
-		{"art/p.png", testkit.PNG(testkit.GreyPixels(256), "grey")},
-	} {
-		testkit.WriteFile(t, root, file.name, file.data)
-	}
-	return root
-}
-
-// routeDocuments is one document for each way through a plan: the settings of each file alone and together, a
-// preview of each kind alone and beside other settings, and what is refused before the map is read, by the map
-// info, and by neither.
-var routeDocuments = []string{
-	`{}`,
-	`{"info":{"author":"Someone"},"loadingScreen":{"title":"T"}}`,
-	`{"info":{"name":"Planned"},"gameplay":{"foodLimit":200}}`,
-	`{"environment":{"soundEnvironment":"Mountains"}}`,
-	// A force's name is stored in the map info alone, and the script is read all the same.
-	`{"forces":{"0":{"name":"Blue"}}}`,
-	`{"players":{"5":{"name":"Absent"}}}`,
-	// The text files of sourceMaps hold this constant, and lack the interface's key.
-	`{"gameplay":{"foodLimit":100}}`,
-	`{"gameInterface":{"A":{"B":"c"}}}`,
-	`{"gameplayConstants":{"Empty":{}},"gameInterface":{"Empty":{}}}`,
-	everyDocuments[0],
-	`{"info":{"preview":"preview.blp"}}`,
-	`{"info":{"preview":"preview.tga"}}`,
-	`{"info":{"preview":"art/Preview.PNG"}}`,
-	`{"info":{"name":"Both","preview":"preview.blp"},"gameplay":{"foodLimit":200},
-		"gameInterface":{"CustomSkin":{"Test":"value"}}}`,
-	`{"info":{"name":"N","preview":"missing.tga"}}`,
-	`{"info":{"name":"N","preview":"preview.blp"},"gameplay":{"foodLimit":200},"gameplayConstants":{"MISC":{"foodCeiling":"1"}}}`,
-	duplicateDocuments[0],
-}
-
 // planCounts is what came of the plans for one map folder.
 type planCounts struct{ refused, changed, unchanged, apart, broken int }
 
-// sourceMap is a map folder that both trees plan for.
-type sourceMap struct {
-	name  string
-	files map[string][]byte
-	// every says that every document is planned for the folder. For the others it is those of routeDocuments.
-	every bool
-	want  planCounts
-}
-
-// sourceMaps is the map folders the plans are compared for. The first two get every document: the fixture as
-// it is, which has neither of the optional text files and no minimap, and the fixture with every file a plan
-// reads, each text file behind a byte order mark. The others get the documents of routeDocuments: the fixture
-// with each optional file alone and with all, with files that hold nothing, under other spellings, and each
-// folder that a plan refuses for a file it lacks, cannot read as text or cannot patch, or for a name it has.
-func sourceMaps(t *testing.T) []sourceMap {
-	t.Helper()
-	info, script := fixtureInfo(t), fixtureLua(t)
-	misc := "[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n"
-	skin := "[CustomSkin]\nTest=old\n\n[A]\nOld=1"
-	type files = map[string][]byte
-	fixture := func(more files) files {
-		all := files{"war3map.w3i": info, "war3map.lua": []byte(script)}
-		maps.Copy(all, more)
-		return all
-	}
-	returnsValue := swapped(t, script, "RunInitializationTriggers()\r\nend", "RunInitializationTriggers()\r\nreturn 1\r\nend")
-	// Of the 17 documents of routeDocuments, four are refused for every folder: the player the fixture lacks, the
-	// preview that is not there, the constant set twice, and the two spellings of a section. Two change nothing
-	// in any folder: the one that sets nothing, and the sections without keys.
-	return []sourceMap{
-		// One document puts a number into the script that the trees write apart (the fourth of everyDocuments).
-		// Without a minimap, the nine documents with a preview are refused; with every file, they are planned.
-		{name: "the fixture", every: true, files: fixture(nil), want: planCounts{refused: 43, changed: 170, unchanged: 12, apart: 1}},
-		{name: "every file, each text file behind a byte order mark", every: true,
-			want: planCounts{refused: 34, changed: 178, unchanged: 13, apart: 1}, files: fixture(files{
-				"war3map.lua": []byte(byteOrderMark + script), "war3mapMisc.txt": []byte(byteOrderMark + misc),
-				"war3mapSkin.txt": []byte(byteOrderMark + skin), "war3mapMap.blp": minimapBytes})},
-		// The constant the file holds already is no change.
-		{name: "every file", want: planCounts{refused: 4, changed: 10, unchanged: 3}, files: fixture(files{
-			"war3mapMisc.txt": []byte(misc), "war3mapSkin.txt": []byte(skin), "war3mapMap.blp": minimapBytes})},
-		// Without a minimap, the five documents with a preview are refused as well.
-		{name: "with war3mapMisc.txt alone", want: planCounts{refused: 9, changed: 5, unchanged: 3},
-			files: fixture(files{"war3mapMisc.txt": []byte(misc)})},
-		{name: "with war3mapSkin.txt alone", want: planCounts{refused: 9, changed: 6, unchanged: 2},
-			files: fixture(files{"war3mapSkin.txt": []byte(skin)})},
-		{name: "with the minimap alone", want: planCounts{refused: 4, changed: 11, unchanged: 2},
-			files: fixture(files{"war3mapMap.blp": minimapBytes})},
-		{name: "with text files that hold nothing", want: planCounts{refused: 9, changed: 6, unchanged: 2},
-			files: fixture(files{"war3mapMisc.txt": {}, "war3mapSkin.txt": {}})},
-		{name: "every file under another spelling", want: planCounts{refused: 4, changed: 10, unchanged: 3}, files: files{
-			"WAR3MAP.W3I": info, "War3Map.Lua": []byte(script), "WAR3MAPMISC.TXT": []byte(misc),
-			"war3mapskin.txt": []byte(skin), "WAR3MAPMAP.BLP": minimapBytes}},
-		// Only the two text files can be planned for a folder without a file.
-		{name: "an empty folder", want: planCounts{refused: 13, changed: 2, unchanged: 2}},
-		// The author and the loading screen need the map info alone; the force's name needs the script too.
-		{name: "without the script", want: planCounts{refused: 12, changed: 3, unchanged: 2},
-			files: files{"war3map.w3i": info, "war3mapMap.blp": minimapBytes}},
-		// A preview alone needs the script and the minimap, and no map info.
-		{name: "without the map info", want: planCounts{refused: 10, changed: 5, unchanged: 2},
-			files: files{"war3map.lua": []byte(script), "war3mapMap.blp": minimapBytes}},
-		{name: "a script that is not UTF-8", want: planCounts{refused: 12, changed: 3, unchanged: 2}, files: fixture(files{
-			"war3map.lua": {0x66, 0xff, 0x66}, "war3mapMap.blp": minimapBytes})},
-		{name: "text files that are not UTF-8", want: planCounts{refused: 12, changed: 3, unchanged: 2}, files: fixture(files{
-			"war3mapMisc.txt": {0xc3}, "war3mapSkin.txt": []byte(byteOrderMark + "[A]\n\xff")})},
-		// The three documents that set the map's name are refused by the script, after the map info was patched.
-		{name: "a script without SetMapName", want: planCounts{refused: 7, changed: 8, unchanged: 2}, files: fixture(files{
-			"war3map.lua": []byte(swapped(t, script, "SetMapName(", "Other(")), "war3mapMap.blp": minimapBytes})},
-		// The five documents with a preview are left out: the other tree writes the minimap call after the return.
-		{name: "a script whose main() returns a value", want: planCounts{refused: 4, changed: 6, unchanged: 2, broken: 5},
-			files: fixture(files{"war3map.lua": []byte(returnsValue), "war3mapMap.blp": minimapBytes})},
-		{name: "bytes that are no map info", want: planCounts{refused: 10, changed: 5, unchanged: 2}, files: fixture(files{
-			"war3map.w3i": []byte("not a map info"), "war3mapMap.blp": minimapBytes})},
-		// The five documents with a preview are refused for the name the map has already, of either kind of picture.
-		{name: "with the name the minimap is kept under", want: planCounts{refused: 9, changed: 6, unchanged: 2},
-			files: fixture(files{"war3mapMap.blp": minimapBytes, "war3mapminimap.blp": {1}})},
-		{name: "with the name a TGA preview takes", want: planCounts{refused: 9, changed: 6, unchanged: 2},
-			files: fixture(files{"war3mapMap.blp": minimapBytes, "War3mapMap.TGA": {1}})},
-	}
-}
-
-// onDisk writes the map folder into a temporary folder and returns its path.
-func (m sourceMap) onDisk(t *testing.T) string {
-	t.Helper()
-	dir := t.TempDir()
-	for name, data := range m.files {
-		testkit.WriteFile(t, dir, name, data)
-	}
-	return dir
-}
-
-// held is the bytes of the file the map folder has under name, in any letter case.
-func (m sourceMap) held(name string) []byte {
-	for spelled, data := range m.files {
-		if mapdir.Key(spelled) == mapdir.Key(name) {
-			return data
-		}
-	}
-	return nil
-}
-
-// changeTo is the change a plan makes to the file under name, in any letter case.
-func changeTo(changes []mapdir.Change, name string) (mapdir.Change, bool) {
-	for _, change := range changes {
-		if mapdir.Key(change.Name) == mapdir.Key(name) {
-			return change, true
-		}
-	}
-	return mapdir.Change{}, false
+// wantPlans is what the plans for each map folder of sourceMaps (in recorded_test.go) must come to, by the
+// folder's name. Of the 17 documents of routeDocuments, four are refused for every folder: the player the fixture
+// lacks, the preview that is not there, the constant set twice, and the two spellings of a section. Two change
+// nothing in any folder: the one that sets nothing, and the sections without keys.
+var wantPlans = map[string]planCounts{
+	// One document puts a number into the script that the trees write apart (the fourth of everyDocuments).
+	// Without a minimap, the nine documents with a preview are refused; with every file, they are planned.
+	"the fixture": {refused: 43, changed: 170, unchanged: 12, apart: 1},
+	"every file, each text file behind a byte order mark": {refused: 34, changed: 178, unchanged: 13, apart: 1},
+	// The constant the file holds already is no change.
+	"every file": {refused: 4, changed: 10, unchanged: 3},
+	// Without a minimap, the five documents with a preview are refused as well.
+	"with war3mapMisc.txt alone":        {refused: 9, changed: 5, unchanged: 3},
+	"with war3mapSkin.txt alone":        {refused: 9, changed: 6, unchanged: 2},
+	"with the minimap alone":            {refused: 4, changed: 11, unchanged: 2},
+	"with text files that hold nothing": {refused: 9, changed: 6, unchanged: 2},
+	"every file under another spelling": {refused: 4, changed: 10, unchanged: 3},
+	// Only the two text files can be planned for a folder without a file.
+	"an empty folder": {refused: 13, changed: 2, unchanged: 2},
+	// The author and the loading screen need the map info alone; the force's name needs the script too.
+	"without the script": {refused: 12, changed: 3, unchanged: 2},
+	// A preview alone needs the script and the minimap, and no map info.
+	"without the map info":          {refused: 10, changed: 5, unchanged: 2},
+	"a script that is not UTF-8":    {refused: 12, changed: 3, unchanged: 2},
+	"text files that are not UTF-8": {refused: 12, changed: 3, unchanged: 2},
+	// The three documents that set the map's name are refused by the script, after the map info was patched.
+	"a script without SetMapName": {refused: 7, changed: 8, unchanged: 2},
+	// The five documents with a preview are left out: the other tree writes the minimap call after the return.
+	"a script whose main() returns a value": {refused: 4, changed: 6, unchanged: 2, broken: 5},
+	"bytes that are no map info":            {refused: 10, changed: 5, unchanged: 2},
+	// The five documents with a preview are refused for the name the map has already, of either kind of picture.
+	"with the name the minimap is kept under": {refused: 9, changed: 6, unchanged: 2},
+	"with the name a TGA preview takes":       {refused: 9, changed: 6, unchanged: 2},
 }
 
 // planOfOld is the other tree's plan for the map folder at dir: the refusal of its Validate, which is where it
@@ -1429,8 +949,8 @@ func TestOracleOnThePlan(t *testing.T) {
 			documents = every
 		}
 		counted, reached := plansFor(t, source, documents, root)
-		if counted != source.want {
-			t.Errorf("%s: the plans came to %+v, want %+v", source.name, counted, source.want)
+		if want, known := wantPlans[source.name]; !known || counted != want {
+			t.Errorf("%s: the plans came to %+v, want %+v", source.name, counted, want)
 		}
 		seen.add(reached)
 	}
@@ -1446,6 +966,100 @@ func TestOracleOnThePlan(t *testing.T) {
 	if !maps.Equal(seen.files, wantFiles) || seen.removals != 21 {
 		t.Errorf("the plans compared the bytes of %v and %d removals, want %v and 21", seen.files, seen.removals, wantFiles)
 	}
+}
+
+// ---- the recording ----
+
+// fileOfOld is the file that a refusal of the other tree names.
+func fileOfOld(err error) string {
+	failure, expected := olddiag.First(err)
+	if !expected {
+		return "(an error without a file)"
+	}
+	return failure.File
+}
+
+// scriptsOfOld is what the other tree makes of every script for the settings of a document, in the shape
+// scriptsWith gives for this tree. The map info is the fixture's as the other tree patches it. A script into
+// which a number goes that the trees write apart is this tree's, which the note beside the document says.
+func scriptsOfOld(t testing.TB, document string, sources []script) recordedScripts {
+	t.Helper()
+	old, project := accepted(t, "", document)
+	info, err := oldsettings.PatchMapInfo(fixtureInfo(t), old, infoFile)
+	if err != nil {
+		return recordedScripts{refused: true, refusedAt: fileOfOld(err)}
+	}
+	made, apart := recordedScripts{}, writtenApart(project.Settings, info)
+	if apart {
+		made.note = notePlainDecimal
+	}
+	for _, source := range sources {
+		text, err := oldsettings.PatchLua(source.text, old, info, luaFile, infoFile)
+		switch {
+		case err != nil:
+			text = refusedAt(fileOfOld(err))
+		case apart:
+			if text, err = afterInfo(source.text, project.Settings, info); err != nil {
+				t.Errorf("%s, settings %s: this tree refuses what the other tree takes: %v", source.name, document, err)
+			}
+		}
+		made.scripts = append(made.scripts, madeOf(source, text))
+	}
+	return made
+}
+
+// planByOld is the other tree's plan of a document for a map folder, in the shape planFor gives for this tree.
+// The two results that are this tree's each have their note: the refusal of a preview for a script whose main()
+// returns a value, where the other tree writes a script that does not load; and the bytes of a script into which
+// a number goes that the trees write apart.
+func planByOld(t testing.TB, source sourceMap, dir, root, document string) recordedPlan {
+	t.Helper()
+	read := inBothTrees(t, root, document)
+	want, wantErr := planOfOld(dir, root, read)
+	switch {
+	case breaksTheScript(want, wantErr):
+		return recordedPlan{refused: true, refusedAt: mapLabel + "/" + luaName, note: noteAfterAReturn}
+	case wantErr != nil:
+		return recordedPlan{refused: true, refusedAt: fileOfOld(wantErr)}
+	}
+	planned := recordedPlan{changes: want}
+	info := source.held(infoName)
+	if change, patched := changeTo(want, infoName); patched {
+		info = change.Bytes
+	}
+	if !writtenApart(read.project.Settings, info) {
+		return planned
+	}
+	planned.note = notePlainDecimal
+	folder, err := mapdir.Open(dir, mapLabel)
+	if err != nil {
+		t.Errorf("%s: %v", source.name, err)
+		return planned
+	}
+	got, err := Plan(folder, read.project)
+	ours, written := changeTo(got, luaName)
+	at := slices.IndexFunc(planned.changes, func(change mapdir.Change) bool {
+		return mapdir.Key(change.Name) == mapdir.Key(luaName)
+	})
+	if err != nil || !written || at < 0 {
+		t.Errorf("%s, settings %s: no script of both trees to take this tree's of: %v", source.name, document, err)
+		return planned
+	}
+	planned.changes[at].Bytes = ours.Bytes
+	return planned
+}
+
+// TestOracleOnTheRecordedSettings holds testdata/recorded/settings.txt to what the other tree makes of every
+// document the recording names. It is the test that writes it: MOONWELL_RECORD=1 with -run of this test alone.
+func TestOracleOnTheRecordedSettings(t *testing.T) {
+	testkit.Recorded(t, "settings.txt", recordedSettings(t, recorder{
+		scripts: func(document string, sources []script) recordedScripts {
+			return scriptsOfOld(t, document, sources)
+		},
+		plan: func(source sourceMap, dir, root, document string) recordedPlan {
+			return planByOld(t, source, dir, root, document)
+		},
+	}))
 }
 
 func TestOracleOnAFolderUnderANameAPreviewAdds(t *testing.T) {
