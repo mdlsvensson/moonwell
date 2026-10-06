@@ -3,7 +3,11 @@
 // MakeUnwritable), a test world for the commands and the logger that keeps its lines (Recorder), byte helpers,
 // builders for map info, object files, MDX models, pictures and zip archives (Zip), a reader of the archives
 // Moonwell writes, and the way to what a test needs from the machine: a program (NeedPkl), the network
-// (NeedNetwork) and the game's files (NeedExport).
+// (NeedNetwork) and the game's files (NeedExport). It also holds what a test gives a reader that must stand
+// damaged input: the seeded changes of a text (Changed, Swept) and of bytes (ChangedBytes), and Panic, which
+// says of which input a reader panics. And it holds how a test keeps a whole text: Recorded compares what a test
+// made with a recording under the package's testdata/recorded, Digest stands in for a large file, and Placed
+// writes what belongs to one machine or system by a name.
 //
 // It is imported by tests only. Of Moonwell's packages it knows env, binio and the formats it builds or reads
 // (war3/objmod and war3/mpq), so the tests of those two packages are external test packages. Most helpers take a
