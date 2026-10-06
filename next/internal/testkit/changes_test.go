@@ -2,6 +2,7 @@ package testkit
 
 import (
 	"bytes"
+	"encoding/binary"
 	"math/rand/v2"
 	"slices"
 	"strings"
@@ -161,17 +162,21 @@ func kindOfByteChange(data, changed []byte) string {
 			return "a run dropped"
 		case grown > 0 && grown == run && bytes.Equal(changed, slices.Concat(data[:at], rest[:run], rest)):
 			return "a run doubled"
+		case grown == 0 && len(rest) >= 4 && bytes.Equal(changed[:at], data[:at]) &&
+			bytes.Equal(changed[at+4:], rest[4:]) && slices.Contains(EdgeNumbers(), binary.LittleEndian.Uint32(changed[at:])):
+			return "a number set"
 		}
 	}
 	return ""
 }
 
-func TestOneChangeOfBytesIsAByteSetARunDroppedOrARunDoubled(t *testing.T) {
+func TestOneChangeOfBytesIsAByteSetARunDroppedARunDoubledOrANumberSet(t *testing.T) {
 	data := []byte("0123456789abcdefghijklmnopqrstuvwxyz")
 	seen := map[string]int{}
 	lengths := map[int]bool{}
+	numbers := map[uint32]bool{}
 	random := rand.New(rand.NewPCG(1, 2))
-	for range 600 {
+	for range 800 {
 		changed := changeBytes(random, slices.Clone(data))
 		kind := kindOfByteChange(data, changed)
 		if kind == "" {
@@ -179,10 +184,27 @@ func TestOneChangeOfBytesIsAByteSetARunDroppedOrARunDoubled(t *testing.T) {
 		}
 		seen[kind]++
 		lengths[len(changed)-len(data)] = true
+		if kind == "a number set" {
+			for at := 0; at+4 <= len(changed); at++ {
+				numbers[binary.LittleEndian.Uint32(changed[at:])] = true
+			}
+		}
 	}
-	for _, kind := range []string{"a byte set", "a run dropped", "a run doubled"} {
+	for _, kind := range []string{"a byte set", "a run dropped", "a run doubled", "a number set"} {
 		if seen[kind] < 100 {
-			t.Errorf("%s came %d times of 600, want 100 or more", kind, seen[kind])
+			t.Errorf("%s came %d times of 800, want 100 or more", kind, seen[kind])
+		}
+	}
+	for _, edge := range EdgeNumbers() {
+		if !numbers[edge] {
+			t.Errorf("no change wrote the number %#x", edge)
+		}
+	}
+	// Bytes too few for a number have a byte set in its place: nothing is written past their end.
+	for range 200 {
+		short := []byte("xyz")
+		if changed := changeBytes(random, slices.Clone(short)); kindOfByteChange(short, changed) == "" {
+			t.Fatalf("%q became %q, which no one change makes", short, changed)
 		}
 	}
 	// A run is of 1 to 16 bytes: every length is dropped and doubled, and none is longer.

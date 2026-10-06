@@ -477,30 +477,6 @@ func altered(random *rand.Rand, data []byte) []byte {
 	return testkit.SetU32(data, at, edges[random.IntN(len(edges))])
 }
 
-// sizeOffsets are the offsets in the model with every chunk of the numbers that say how large something is: the
-// size of each chunk, of each record and of each node, found by walking the model as the builders wrote it.
-func sizeOffsets(t *testing.T, data []byte) []int {
-	t.Helper()
-	u32 := func(at int) int {
-		return int(data[at]) | int(data[at+1])<<8 | int(data[at+2])<<16 | int(data[at+3])<<24
-	}
-	var offsets []int
-	for at := 4; at < len(data); {
-		tag, size := string(data[at:at+4]), u32(at+4)
-		offsets = append(offsets, at+4)
-		if tag == "PREM" || tag == "ATCH" || tag == "CORN" {
-			for record := at + 8; record < at+8+size; record += u32(record) {
-				offsets = append(offsets, record, record+4)
-			}
-		}
-		at += 8 + size
-	}
-	if len(offsets) < 15 {
-		t.Fatalf("found only %d sizes in the model", len(offsets))
-	}
-	return offsets
-}
-
 // TestOracleOnAlteredBinaryModels compares models with one thing wrong: every size of the model with every chunk
 // set to every value near it and to the edges, and seeded changes anywhere in the model.
 func TestOracleOnAlteredBinaryModels(t *testing.T) {

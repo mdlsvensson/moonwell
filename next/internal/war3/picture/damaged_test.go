@@ -62,22 +62,30 @@ func lengthsToCut(whole int) []int {
 // TestADamagedPictureIsReadOrRefusedByNameAndNeverPanics gives Read a picture of each format and way of storing
 // it, cut at the lengths of lengthsToCut and after seeded changes of its bytes: 150 anywhere in the file, and
 // 150 in its start, 1500 in all. A change of a PNG fails a check value, so the PNG reader meets its damage in
-// the cuts.
+// the cuts. No cut picture reads: the pixels of each, and the first mipmap of the BLP, end where the file ends.
 func TestADamagedPictureIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	t.Parallel()
 	source := testkit.NewPixels(256)
-	var cut, changed tally
 	for _, whole := range []struct {
 		name, file string
 		data       []byte
+		// What Read makes of the cuts and of the changes. The bytes of a TGA and of a BLP are the test kit's
+		// own, so their numbers are exact: one that differs is a reading that changed. The bytes of a PNG are a
+		// compressor's, which another version of Go may write otherwise: of a PNG no input reads, a change
+		// fails a check value, and how many there are is not written down.
+		cut, changed tally
+		compressed   bool
 	}{
-		{"a plain TGA", "preview.tga", testkit.TGA(source, testkit.TGAOptions{ID: 7})},
-		{"a run-length TGA", "preview.tga",
-			testkit.TGA(source, testkit.TGAOptions{RLE: true, Depth: 24, FromTop: true, ID: 7})},
-		{"a PNG", "preview.png", testkit.PNG(source, "rgba")},
-		{"an interlaced PNG", "preview.png", testkit.PNG(source, "interlaced")},
-		{"a BLP", "preview.blp", testkit.BLP(256, 1)},
+		{name: "a plain TGA", file: "preview.tga", data: testkit.TGA(source, testkit.TGAOptions{ID: 7}),
+			cut: tally{0, 4731}, changed: tally{196, 104}},
+		{name: "a run-length TGA", file: "preview.tga",
+			data: testkit.TGA(source, testkit.TGAOptions{RLE: true, Depth: 24, FromTop: true, ID: 7}),
+			cut:  tally{0, 3055}, changed: tally{98, 202}},
+		{name: "a PNG", file: "preview.png", data: testkit.PNG(source, "rgba"), compressed: true},
+		{name: "an interlaced PNG", file: "preview.png", data: testkit.PNG(source, "interlaced"), compressed: true},
+		{name: "a BLP", file: "preview.blp", data: testkit.BLP(256, 1), cut: tally{0, 2716}, changed: tally{194, 106}},
 	} {
+		var cut, changed tally
 		for _, length := range lengthsToCut(len(whole.data)) {
 			cut.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", whole.name, length), whole.data[:length:length], whole.file)
 		}
@@ -89,12 +97,11 @@ func TestADamagedPictureIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 			inStart := slices.Concat(testkit.ChangedBytes(start, damageSeed, index), rest)
 			changed.readOrRefused(t, what+" to its first 2048 bytes", inStart, whole.file)
 		}
-	}
-	// No cut picture reads: the pixels of each, and the first mipmap of the BLP, end where the file ends. A
-	// change reads when it sets a pixel of a TGA, or a byte of a BLP that Read does not look at. The numbers of
-	// the changes are floors: the bytes of a PNG are a compressor's, which another version of Go may write
-	// otherwise.
-	if cut.read != 0 || cut.refused < 5000 || changed.read < 100 || changed.refused < 500 {
-		t.Errorf("cut: %+v, changed: %+v; want no cut picture read, and changed pictures of both kinds", cut, changed)
+		switch {
+		case whole.compressed && (cut.read != 0 || changed.read != 0 || cut.refused < 2000 || changed.refused != 300):
+			t.Errorf("%s: cut: %+v, changed: %+v; want none read", whole.name, cut, changed)
+		case !whole.compressed && (cut != whole.cut || changed != whole.changed):
+			t.Errorf("%s: cut: %+v, changed: %+v; want %+v and %+v", whole.name, cut, changed, whole.cut, whole.changed)
+		}
 	}
 }

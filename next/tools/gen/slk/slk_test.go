@@ -130,6 +130,19 @@ func TestParseReadsTables(t *testing.T) {
 	}
 }
 
+// Zero is a coordinate like any other: a cell at X0 or at Y0 is a cell, and the column and the row of the number
+// 0 come first.
+func TestACellAtTheCoordinateZeroIsACell(t *testing.T) {
+	const text = "C;X1;Y0;Kb\nC;X0;Ka\nC;X0;Y1;K1\nC;X1;K2\n"
+	table, err := slk.Parse(text, "zero.slk")
+	if err != nil || !reflect.DeepEqual(table.Columns, []string{"a", "b"}) {
+		t.Fatalf("columns %q, error %v", table.Columns, err)
+	}
+	if got := rows(t, text); !reflect.DeepEqual(got, []map[string]string{{"a": "1", "b": "2"}}) {
+		t.Errorf("rows %v", got)
+	}
+}
+
 // numbered has a column and a row with the number 10 beside ones with the numbers 1 and 2, and gives the cells of
 // its second row with the last column first.
 const numbered = "C;X1;Y1;Ka\nC;X2;Kb\nC;X10;Kc\nC;X10;Y2;K1\nC;X2;K2\nC;X1;Y10;K3\n"

@@ -1,6 +1,7 @@
 package model_test
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"testing"
@@ -39,6 +40,37 @@ const textWithOtherLetters = "// M\xC3\xA5ne \xE6\x9C\x88\r\nVersion {\r\n\tForm
 	"ParticleEmitter \"\xE6\x9C\x88\" {\r\n\tEmitterUsesTGA,\r\n" +
 	"\tParticle {\r\n\t\tPath \"\xF0\x9F\x8C\x99.blp\",\r\n\t}\r\n}\r\n"
 
+// sizeOffsets are the offsets in the model with every chunk of the numbers that say how large something is: the
+// size of each chunk, of each record and of each node, found by walking the model as the builders wrote it.
+func sizeOffsets(t *testing.T, data []byte) []int {
+	t.Helper()
+	u32 := func(at int) int {
+		return int(data[at]) | int(data[at+1])<<8 | int(data[at+2])<<16 | int(data[at+3])<<24
+	}
+	var offsets []int
+	for at := 4; at < len(data); {
+		tag, size := string(data[at:at+4]), u32(at+4)
+		offsets = append(offsets, at+4)
+		if tag == "PREM" || tag == "ATCH" || tag == "CORN" {
+			for record := at + 8; record < at+8+size; record += u32(record) {
+				offsets = append(offsets, record, record+4)
+			}
+		}
+		at += 8 + size
+	}
+	if len(offsets) < 15 {
+		t.Fatalf("found only %d sizes in the model", len(offsets))
+	}
+	return offsets
+}
+
+// sizesNear are the numbers a size is set to: the edges of what a size may be, the sizes of the fixed parts of
+// a record and the ones beside them, and the size itself moved by a little and by a path's length.
+func sizesNear(size uint32) []uint32 {
+	return append(testkit.EdgeNumbers(), 3, 4, 95, 96, 99, 100, 103, 104, size-261, size-260, size-5, size-4, size-1,
+		size+1, size+4, size+260, size+268)
+}
+
 // damageSeed is the seed of the changes that TestADamagedModelIsReadOrRefusedByNameAndNeverPanics makes. A failure
 // names the model and the index of the change: testkit.ChangedBytes, and testkit.Changed for a change of the
 // text, make the same model of the three again.
@@ -76,9 +108,10 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 
 // TestADamagedModelIsReadOrRefusedByNameAndNeverPanics gives the three readers two binary and two text models,
 // each cut at every length and after each of 1500 seeded changes of its bytes; a text model also after each of
-// 1500 seeded changes of its lines, quotes and white space.
+// 1500 seeded changes of its lines, quotes and white space; and the binary model with every chunk with each of
+// its sizes set to the numbers of sizesNear.
 func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
-	var cut, changed tally
+	var cut, changed, sized tally
 	for _, whole := range []struct {
 		name string
 		data []byte
@@ -101,9 +134,17 @@ func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 			}
 		}
 	}
+	// A size is no number to trust: every size of the model with every chunk, set to each number at an edge and
+	// near itself.
+	whole := modelWithEveryChunk()
+	for _, at := range sizeOffsets(t, whole) {
+		for _, size := range sizesNear(binary.LittleEndian.Uint32(whole[at:])) {
+			sized.readOrRefused(t, fmt.Sprintf("the size at %d set to %d", at, size), testkit.SetU32(whole, at, size))
+		}
+	}
 	// A binary model reads where the cut falls between two chunks, and a text model where it falls between two
 	// blocks. The numbers are what the readers make of these inputs: one that differs is a reading that changed.
-	if cut != (tally{read: 412, refused: 15134}) || changed != (tally{read: 5676, refused: 21324}) {
-		t.Errorf("cut: %+v, changed: %+v", cut, changed)
+	if cut != (tally{412, 15134}) || changed != (tally{6080, 20920}) || sized != (tally{106, 1490}) {
+		t.Errorf("cut: %+v, changed: %+v, sized: %+v", cut, changed, sized)
 	}
 }

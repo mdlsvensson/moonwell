@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"strings"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -192,10 +191,11 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 }
 
 // TestADamagedFileIsReadOrRefusedByNameAndNeverPanics gives the readers every whole file cut at every length and
-// after each of 1500 seeded changes of its bytes, and every altered file of the newest layout, whose one wrong
-// thing comes before or after the cut, cut at every length.
+// after each of 1500 seeded changes of its bytes, and every altered file of every layout, whole and cut at every
+// length: its one wrong thing comes before or after the cut. Among the altered files are the numbers at the
+// edges that a seed may not hit: a count of 25, of the largest and of the smallest number, in each version.
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
-	var cut, changed tally
+	var cut, changed, altered tally
 	for _, file := range wholeFiles(t) {
 		for length := range len(file.data) {
 			cut.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
@@ -205,23 +205,17 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 			changed.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index))
 		}
 	}
-	altered := 0
-	for _, file := range alteredFiles(t) {
-		if !strings.HasPrefix(file.name, "synthetic version 39 ") {
-			continue
-		}
-		altered++
+	files := alteredFiles(t)
+	for _, file := range files {
+		altered.readOrRefused(t, file.name, file.data)
 		for length := range len(file.data) {
 			cut.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
 		}
 	}
-	if altered < 140 {
-		t.Errorf("only %d altered files were cut", altered)
-	}
-	// A file cut short is refused, but for its Basic part where the cut comes after that part. About half of the
-	// changed files read. The numbers are what the readers make of these inputs: one that differs is a reading
-	// that changed.
-	if cut != (tally{read: 23049, refused: 94931}) || changed != (tally{read: 17994, refused: 18006}) {
-		t.Errorf("cut: %+v, changed: %+v", cut, changed)
+	// A file cut short is refused, but for its Basic part where the cut comes after that part. The numbers are
+	// what the readers make of these inputs: one that differs is a reading that changed.
+	if len(files) != 855 || cut != (tally{76198, 416534}) || changed != (tally{17944, 18056}) ||
+		altered != (tally{568, 1142}) {
+		t.Errorf("%d altered files; cut: %+v, changed: %+v, altered: %+v", len(files), cut, changed, altered)
 	}
 }

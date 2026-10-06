@@ -66,11 +66,12 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 }
 
 // TestADamagedFileIsReadOrRefusedByNameAndNeverPanics gives Read the file World Editor saved and files of this
-// package's making, each cut at every length and after each of 1500 seeded changes of its bytes.
+// package's making, each cut at every length and after each of 1500 seeded changes of its bytes, and files whose
+// count is a number at an edge.
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	short := []imp.Entry{{Flag: 0, Path: "a"}, {Flag: 5, Path: "b\xC3\xA5"}, {Flag: 8, Path: `c\d`},
 		{Flag: 10, Path: "e.blp"}, {Flag: 13, Path: "\xE6\x9C\x88"}, {Flag: 29, Path: "f"}}
-	var cut, changed tally
+	var cut, changed, counted tally
 	for _, file := range []struct {
 		name string
 		data []byte
@@ -90,10 +91,16 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 			changed.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index))
 		}
 	}
+	// A count is no number to trust: three entries and none, counted as every number at an edge.
+	three := testkit.Concat(entry(5, "a.blp"), entry(13, `b\c.mdx`), entry(29, "d.tga"))
+	for _, count := range append(testkit.EdgeNumbers(), 3, 4, 5, 0x100) {
+		counted.readOrRefused(t, fmt.Sprintf("three entries counted as %d", count), index(1, count, three))
+		counted.readOrRefused(t, fmt.Sprintf("no entries counted as %d", count), index(1, count))
+	}
 	// A file ends with its last entry, so no cut file reads. A changed file reads when the change is in a path
-	// and leaves it UTF-8. The numbers are what Read makes of these inputs: one that differs is a reading that
-	// changed.
-	if cut != (tally{read: 0, refused: 1912}) || changed != (tally{read: 892, refused: 8108}) {
-		t.Errorf("cut: %+v, changed: %+v", cut, changed)
+	// and leaves it UTF-8. Of the counts, three of three entries and none of none read. The numbers are what
+	// Read makes of these inputs: one that differs is a reading that changed.
+	if cut != (tally{0, 1912}) || changed != (tally{602, 8398}) || counted != (tally{2, 28}) {
+		t.Errorf("cut: %+v, changed: %+v, counted: %+v", cut, changed, counted)
 	}
 }

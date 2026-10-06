@@ -1,6 +1,7 @@
 package testkit
 
 import (
+	"encoding/binary"
 	"math/rand/v2"
 	"slices"
 	"strings"
@@ -105,10 +106,20 @@ func Swept(text string) []string {
 	return swept
 }
 
+// EdgeNumbers are the numbers of 32 bits at which a reader of a binary file goes wrong when it trusts a size or
+// a count: none, one and two, the largest and the smallest number with a sign and the ones beside them, the
+// largest without a sign and the one before it, and the bits of an infinite float and of one that is no number.
+func EdgeNumbers() []uint32 {
+	return []uint32{0, 1, 2, 0x7FFFFFFE, 0x7FFFFFFF, 0x80000000, 0x80000001, 0xFFFFFFFE, 0xFFFFFFFF, 0x7F800000,
+		0x7FC00000}
+}
+
 // ChangedBytes is a copy of data after the changes that a seed and an index make, the same on every call: one
-// to three, each a byte set to another value, a run of bytes dropped, or a run of bytes doubled. A run is of 1
-// to 16 bytes and ends where data ends. It is the changer for a binary file, as Changed is for a text; data
-// without a byte comes back empty.
+// to three, each a byte set to another value, a run of bytes dropped, a run of bytes doubled, or four bytes set
+// to one of EdgeNumbers, little-endian. A run is of 1 to 16 bytes and ends where data ends; a number is written
+// into the last four bytes when fewer follow its place, and into data of fewer than four bytes not at all: a
+// byte of it is set. It is the changer for a binary file, as Changed is for a text; data without a byte comes
+// back empty.
 func ChangedBytes(data []byte, seed, index uint64) []byte {
 	random := rand.New(rand.NewPCG(seed, index))
 	data = slices.Clone(data)
@@ -125,12 +136,17 @@ func ChangedBytes(data []byte, seed, index uint64) []byte {
 func changeBytes(random *rand.Rand, data []byte) []byte {
 	at := random.IntN(len(data))
 	run := data[at:min(at+1+random.IntN(longestRun), len(data))]
-	switch random.IntN(3) {
-	case 0:
-		data[at] ^= byte(1 + random.IntN(255))
-		return data
-	case 1:
+	edges := EdgeNumbers()
+	edge := edges[random.IntN(len(edges))]
+	switch kind := random.IntN(4); {
+	case kind == 1:
 		return slices.Delete(data, at, at+len(run))
+	case kind == 2:
+		return slices.Insert(data, at, slices.Clone(run)...)
+	case kind == 3 && len(data) >= 4:
+		binary.LittleEndian.PutUint32(data[min(at, len(data)-4):], edge)
+		return data
 	}
-	return slices.Insert(data, at, slices.Clone(run)...)
+	data[at] ^= byte(1 + random.IntN(255))
+	return data
 }
