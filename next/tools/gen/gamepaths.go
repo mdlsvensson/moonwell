@@ -29,16 +29,30 @@ func writeGamePaths(checkout string, args []string, out io.Writer) error {
 	if err != nil {
 		return errFile(listFile, err)
 	}
-	text := renderGamePaths(fsx.DecodeText(data), version)
-	count := pathCount(text, version)
-	if count == 0 {
+	paths := gamePaths(fsx.DecodeText(data))
+	if len(paths) == 0 {
 		return errNoGamePaths()
 	}
+	text := renderGamePaths(paths, version)
 	if err := os.WriteFile(fileIn(checkout, gamePathsPath), []byte(text), 0o666); err != nil {
 		return errInCheckout(checkout, gamePathsPath, err)
 	}
-	fmt.Fprintln(out, "wrote "+gamePathsPath+": "+strconv.Itoa(count)+" paths.")
+	fmt.Fprintln(out, "wrote "+gamePathsPath+": "+strconv.Itoa(len(paths))+" paths.")
 	return nil
+}
+
+// gamePaths is the in-game paths that a list of the game's file names names, one name on a line: each path once,
+// sorted by bytes.
+func gamePaths(list string) []string {
+	named := map[string]bool{}
+	// A carriage return before a line feed is white space at the end of its line, which normalizeGamePath takes
+	// off.
+	for line := range strings.SplitSeq(list, "\n") {
+		if path, kept := normalizeGamePath(line); kept {
+			named[path] = true
+		}
+	}
+	return slices.Sorted(maps.Keys(named))
 }
 
 // normalizeGamePath turns one line of a list of the game's file names into an in-game path: lower case, "/".
@@ -77,28 +91,15 @@ func canBeReferenced(path string) bool {
 	return slices.Contains(modelExtensions, extension) || slices.Contains(assets.TextureExtensions, extension)
 }
 
-// renderGamePaths is the text of data/game-paths.txt for such a list: a line with the game's version, then the
-// paths, each once, sorted by bytes.
-func renderGamePaths(list, version string) string {
-	named := map[string]bool{}
-	// A carriage return before a line feed is white space at the end of its line, which normalizeGamePath takes
-	// off.
-	for line := range strings.SplitSeq(list, "\n") {
-		if path, kept := normalizeGamePath(line); kept {
-			named[path] = true
-		}
+// renderGamePaths is the text of data/game-paths.txt: a line with the version of the game that the paths are
+// from, then the paths in the order given, each on a line.
+func renderGamePaths(paths []string, version string) string {
+	var text strings.Builder
+	text.WriteString("# Warcraft III " + version + "\n")
+	for _, path := range paths {
+		text.WriteString(path + "\n")
 	}
-	paths := slices.Sorted(maps.Keys(named))
-	return versionLine(version) + strings.Join(append(paths, ""), "\n")
-}
-
-// versionLine is the first line of the list: the version of the game that its paths are from.
-func versionLine(version string) string { return "# Warcraft III " + version + "\n" }
-
-// pathCount is how many paths the text of a list has that renderGamePaths made for the version: each is a line
-// after the first.
-func pathCount(text, version string) int {
-	return strings.Count(strings.TrimPrefix(text, versionLine(version)), "\n")
+	return text.String()
 }
 
 // ---- errors ----

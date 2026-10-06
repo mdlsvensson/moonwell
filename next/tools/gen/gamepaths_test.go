@@ -86,7 +86,7 @@ func TestRenderGamePathsWritesAHeaderAndSortedUniquePaths(t *testing.T) {
 		"units/human/footman/footman.mdx",
 		"",
 	}, "\n")
-	if got := renderGamePaths(list, "3.0.0.24268"); got != want {
+	if got := renderGamePaths(gamePaths(list), "3.0.0.24268"); got != want {
 		t.Errorf("renderGamePaths = %q", got)
 	}
 }
@@ -95,7 +95,7 @@ func TestRenderGamePathsWritesAHeaderAndSortedUniquePaths(t *testing.T) {
 func TestRenderGamePathsSortsThePathsByBytes(t *testing.T) {
 	list := "b.mdx\n\xF0\x90\x80\x80.mdx\nB.blp\n\xEE\x80\x80.mdx\na/z.mdx\na.mdx"
 	want := "# Warcraft III 1\na.mdx\na/z.mdx\nb.blp\nb.mdx\n\xEE\x80\x80.mdx\n\xF0\x90\x80\x80.mdx\n"
-	if got := renderGamePaths(list, "1"); got != want {
+	if got := renderGamePaths(gamePaths(list), "1"); got != want {
 		t.Errorf("renderGamePaths = %q, want %q", got, want)
 	}
 }
@@ -109,14 +109,14 @@ func TestTheCommittedListOfTheGamesPathsRendersToItself(t *testing.T) {
 	if !found {
 		t.Fatalf("the first line of data/game-paths.txt is %q", first)
 	}
-	if got := renderGamePaths(committed, version); got != committed {
+	if got := renderGamePaths(gamePaths(committed), version); got != committed {
 		t.Errorf("data/game-paths.txt renders to %d bytes that are not its %d", len(got), len(committed))
 	}
 }
 
 func TestRenderGamePathsOfAListThatNamesNothingIsTheLineWithTheVersion(t *testing.T) {
 	for _, list := range []string{"", "\r\n\r\n", "war3.w3mod:Sound/Hit.wav\n"} {
-		if got := renderGamePaths(list, "2.0.0"); got != "# Warcraft III 2.0.0\n" {
+		if got := renderGamePaths(gamePaths(list), "2.0.0"); got != "# Warcraft III 2.0.0\n" {
 			t.Errorf("renderGamePaths(%q) = %q", list, got)
 		}
 	}
