@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"unicode/utf16"
 	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/next/internal/oracle"
@@ -175,11 +176,12 @@ import (
 //   - OverridesKey, 2 runs (overridesWithAKeyThatIsNotRead): overrides with a key that this tree does not read,
 //     one of them a key of the file in other letters. The other tree carries the line out: it passes over a key
 //     it does not know, and reads a key in any letters (TestDecodeOverridesRefusesWhatTheFileMustNotHold).
-//   - NameTaken, 3 runs (aLabelGivesANameThisTreeAloneRefuses): a label that gives a field the name private,
-//     public or output. This tree has one list of the names that no property can have, the schema's, and asks
-//     for a pin; the other tree's list for the metadata has not these three, so it writes the metadata, and
-//     would refuse the name when the schema is rendered. The run holds the line of the editor's strings with the
-//     label (TestNameFieldsRefusesANameThatNoPropertyCanHaveWithoutAPin).
+//   - NameTaken, 4 runs (aNameThisTreeAloneRefuses): a field that is given the name private, public or output,
+//     by its label, 3 runs, or by a pin of the overrides, 1 run. This tree has one list of the names that no
+//     property can have, the schema's, and asks for another name; the other tree's list for the metadata has not
+//     these three, so it writes the metadata, and would refuse the name when the schema is rendered. A run of a
+//     label holds the line of the editor's strings with the label; for a pin the predicate reads the overrides
+//     of the checkout, as a tree of JSON (TestNameFieldsRefusesANameThatNoPropertyCanHaveWithoutAPin).
 //   - NumberRefused, 12 runs (aNumberCellThisTreeAloneRefuses, numberForms): a cell that must be a number, a
 //     repeat or a data cell of a field or a count of levels, that the other tree reads and this tree refuses: an
 //     infinity, NaN, a hexadecimal number, a number with white space outside ASCII at an edge, and such white
@@ -194,7 +196,7 @@ import (
 //     without the cell. And a data cell that is NaN, or hexadecimal and not whole: the other tree says that the
 //     data column is not a whole number, and this tree that the cell is no number. The run holds the record of
 //     the cell. The predicate asks that the other tree refused in those words. The run names the one place of
-//     standard error, as the runs of the six classes below do; a place of the class holds the other tree's
+//     standard error, as the runs of the seven classes below do; a place of the class holds the other tree's
 //     words (TestLabelOfFollowsTheStringsOfTheEditor, TestLevelCountIsAWholeNumberThatIsNotNegative,
 //     TestFieldRecordReadsANumberCellAsADecimalNumber).
 //   - TwoFaults, 3 runs (eachTreeTellsOfItsFirstFault, bothRefuse): an export with two faults, of which each
@@ -213,12 +215,13 @@ import (
 //     other tree must print the count of the line breaks after the first, and this tree the count of the lines
 //     after the version's own. The exit code, standard error and the checkout are compared whole
 //     (TestTheModeGamePathsFailsAndKeepsTheExistingListWhenNoPathIsRecognized).
-//   - The six classes after this one hold a difference at places (acceptedDifference). The first four are the
+//   - The seven classes after this one hold a difference at places (acceptedDifference). The first five are the
 //     plan's accepted differences: the predicate of each is on bytes of the input alone, and says where it reads
 //     them: the list that a line of game-paths names (inTheList), the labels and the categories of the metadata
 //     of a checkout that the mode without a name is run in (inTheLabels), or the values that a run of the mode
-//     metadata holds, each of which must stand in its file of the export (inTheExport, heldOrderedApart). The
-//     last two are of the Lua extras of a line of natives, and say their predicates below. The run names what
+//     metadata holds, each of which must stand in its file of the export (inTheExport, heldOrderedApart,
+//     aFieldIDPaddedApart). The last two are of the Lua extras of a line of natives, and say their predicates
+//     below. The run names what
 //     the two trees make apart, a file by its path from the checkout and a stream by its name (standard output,
 //     standard error), and in
 //     each the places: what the other tree wrote there, and what this tree must write in its stead (apart). That
@@ -238,9 +241,12 @@ import (
 //     list and standard output. In a metadata: a label or a category that holds one. In an export of object
 //     data, 2 runs, where the place shows the character: at the edges of the value of a label, after the dash
 //     that ends a label, before an id of a useSpecific cell, and at the start of a comment that names a standard
-//     object; the other tree takes it off, and this tree writes it. The places are of data/metadata.json: a
-//     line of a rename shows the name of a field, which has no white space, and never its label. A place of the
-//     class holds such a character on one side (widerSpaceShows). In a run whose list has a line that ends with
+//     object; the other tree takes it off, and this tree writes it. The places of these runs are of
+//     data/metadata.json: both trees carry the lines out, and a line of a rename shows the name of a field,
+//     which has no white space, and never its label. A label shows in a line of a refusal too, and such white
+//     space before an id of a useSpecific or a notSpecific cell makes another base ability of the id, and so
+//     another group of names: neither is in a run, and both are named under "Not among the inputs". A place of
+//     the class holds such a character on one side (widerSpaceShows). In a run whose list has a line that ends with
 //     one, every place passes: what the trees write apart there is a path that this tree leaves out and a count,
 //     and neither holds a byte of the class, so the two places of the one such run are a reader's to judge
 //     (TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes,
@@ -261,6 +267,13 @@ import (
 //     class holds both kinds of character in what the other tree writes
 //     (TestRenderGamePathsSortsThePathsByBytes, TestNameFieldsOrdersTheFieldsOfAListByTheBytesOfTheirIDs,
 //     TestRenderMetadataWritesTheTextOfTheFile).
+//   - PaddedID, 2 runs (aFieldIDPaddedApart): an id of a field with a character outside ASCII that is shorter
+//     than four bytes or than four UTF-16 units. A modification file stores an id in four bytes, and a shorter
+//     one is padded with NUL: the other tree counts the id in UTF-16 units, and this tree in bytes. The run
+//     holds the record of the id, the first cell of a row of a table of fields; the predicate asks that the two
+//     counts pad it apart. A place of the class is of data/metadata.json, and holds a character outside ASCII
+//     and a NUL as the file writes one in what the other tree writes. The ids of the game are of ASCII, which
+//     both trees pad alike (TestPaddedIDIsFourBytesLong).
 //   - EndOfJSON, 3 runs (theReadersEndApart): Lua extras that end before their value does, in a place where
 //     Go's two ways of reading a text word the end apart. The other tree reads the extras token by token, and
 //     says "unexpected end of JSON input" of a text that ends after a bracket, after a comma or after a whole
@@ -299,9 +312,13 @@ import (
 //   - A released metadata, and overrides, that are JSON of another shape, as the metadata of the mode without a
 //     name below: the decoder's sentence names a Go type, the other tree's Overrides and this tree's overrides
 //     (TestDecodeOverridesRefusesWhatTheFileMustNotHold, TestKeepsReleasedNamesNamesAMetadataItCannotRead).
-//   - An id of a field with a character outside ASCII that is shorter than four bytes or than four UTF-16
-//     units: the other tree pads it to four units and this tree to four bytes, which is the plan's accepted
-//     difference (TestPaddedIDIsFourBytesLong). The ids of the game are of ASCII.
+//   - White space outside ASCII before an id of a useSpecific or a notSpecific cell, in an export where the id
+//     without it is the base ability of another field of the same label. To the other tree the two fields meet
+//     in the group of that base ability, and it renames them or refuses them; to this tree the id with the white
+//     space is another base ability, and the two do not meet. And such white space in a label that a refusal
+//     names: the label stands in the line of the refusal, with the white space in this tree's and without it in
+//     the other tree's. The runs of WiderSpace are carried out by both trees, and have no clash that the white
+//     space makes or unmakes.
 //   - Two bytes side by side that are no UTF-8, in a file of an export of object data: the other tree writes a
 //     replacement character for each part and this tree one for the run, into a label or a name
 //     (TestReadExportDecodesItsFilesAsText). The difference is among the inputs for the list of paths, the
@@ -410,14 +427,15 @@ func TestOracleOnWhatBothGeneratorsWriteSayAndHowTheyEnd(t *testing.T) {
 	}
 	fixtures.check(t, genTally{
 		counts: counts{
-			Runs: 302, Whole: 208, Passed: 126, Failed: 176, AsPrograms: 25, Files: 640, Committed: 21,
+			Runs: 308, Whole: 211, Passed: 132, Failed: 176, AsPrograms: 25, Files: 653, Committed: 21,
 		},
 		// "nativs" is the first argument of the lines that name no mode.
-		Modes: map[string]int{"": 29, "natives": 104, "metadata": 122, "game-paths": 42, "nativs": 5},
+		Modes: map[string]int{"": 29, "natives": 104, "metadata": 128, "game-paths": 42, "nativs": 5},
 		Classes: map[string]int{
 			"FromCheckout": 20, "AsGiven": 12, "CountRefused": 2, "UnknownKey": 4, "LacksAKey": 8, "NoName": 4,
-			"NullEntry": 3, "OverridesKey": 2, "NameTaken": 3, "NumberRefused": 12, "OtherWords": 5, "TwoFaults": 3,
-			"CountOfPaths": 1, "WiderSpace": 6, "DottedI": 1, "NoUTF8": 1, "ByBytes": 2, "EndOfJSON": 3, "KeyOrder": 2,
+			"NullEntry": 3, "OverridesKey": 2, "NameTaken": 4, "NumberRefused": 12, "OtherWords": 5, "TwoFaults": 3,
+			"CountOfPaths": 1, "WiderSpace": 6, "DottedI": 1, "NoUTF8": 1, "ByBytes": 2, "PaddedID": 2, "EndOfJSON": 3,
+			"KeyOrder": 2,
 		},
 	})
 }
@@ -908,7 +926,7 @@ var classes = []class{
 	{name: "NoName", is: inTheExtras(aFunctionHasNoName, panicked), compare: comparison.refusedByThisTree},
 	{name: "NullEntry", is: inTheExtras(aListHoldsNull, carriedOut), compare: comparison.refusedByThisTree},
 	{name: "OverridesKey", is: overridesWithAKeyThatIsNotRead, compare: comparison.refusedByThisTree},
-	{name: "NameTaken", is: aLabelGivesANameThisTreeAloneRefuses, compare: comparison.refusedByThisTree},
+	{name: "NameTaken", is: aNameThisTreeAloneRefuses, compare: comparison.refusedByThisTree},
 	{name: "NumberRefused", is: aNumberCellThisTreeAloneRefuses, compare: comparison.refusedByThisTree},
 	{name: "OtherWords", is: bothRefuseInOtherWords, compare: comparison.acceptedDifference,
 		shows: theOtherTreeWrites(func(text string) bool {
@@ -927,6 +945,10 @@ var classes = []class{
 	{name: "ByBytes", is: either(inTheList(hasCharactersOrderedApart), heldOrderedApart),
 		compare: comparison.acceptedDifference,
 		shows:   theOtherTreeWrites(func(text string) bool { return hasCharactersOrderedApart([]byte(text)) })},
+	{name: "PaddedID", is: aFieldIDPaddedApart, compare: comparison.acceptedDifference,
+		shows: theOtherTreeWrites(func(text string) bool {
+			return strings.Contains(text, `\u0000`) && strings.ContainsFunc(text, func(r rune) bool { return r > 0x7F })
+		})},
 	{name: "EndOfJSON", is: theReadersEndApart, compare: comparison.acceptedDifference,
 		shows: theOtherTreeWrites(func(text string) bool { return strings.Contains(text, "end of JSON input") })},
 	{name: "KeyOrder", is: keysInAnotherOrder, compare: comparison.acceptedDifference,
@@ -1313,16 +1335,60 @@ func heldOrderedApart(c comparison) bool {
 	return there && hasCharactersOrderedApart(all)
 }
 
-// aLabelGivesANameThisTreeAloneRefuses is the predicate of NameTaken: the run holds one line of the strings of
-// the editor whose label is, in letters of either case, private, public or output, and the other tree carried
-// the line out.
-func aLabelGivesANameThisTreeAloneRefuses(c comparison) bool {
+// namesThisTreeAloneRefuses is the three names that this tree's one list of names no property can have has, and
+// the other tree's list for the metadata has not.
+var namesThisTreeAloneRefuses = []string{"private", "public", "output"}
+
+// aNameThisTreeAloneRefuses is the predicate of NameTaken: a label or a pin gives a field one of the three
+// names, and the other tree carried the line out.
+func aNameThisTreeAloneRefuses(c comparison) bool {
+	return (aLabelGivesSuchAName(c) || aPinGivesSuchAName(c)) && carriedOut(c.want)
+}
+
+// aLabelGivesSuchAName reports whether the run holds one line of the strings of the editor whose label is, in
+// letters of either case, one of the three names.
+func aLabelGivesSuchAName(c comparison) bool {
 	held, there := c.heldInTheExport()
 	if !there || len(held) != 1 || held[0].file != labelsFile {
 		return false
 	}
 	_, label, isLine := strings.Cut(held[0].bytes, "=")
-	return isLine && slices.Contains([]string{"private", "public", "output"}, strings.ToLower(label)) && carriedOut(c.want)
+	return isLine && slices.Contains(namesThisTreeAloneRefuses, strings.ToLower(label))
+}
+
+// aPinGivesSuchAName reports whether the overrides of a checkout that a line of metadata is run in, read as a
+// tree of JSON, pin one of the three names for a field.
+func aPinGivesSuchAName(c comparison) bool {
+	var file map[string]any
+	if c.in.mode() != "metadata" || len(c.in.args) != 3 || json.Unmarshal(c.in.laid[overridesPath], &file) != nil {
+		return false
+	}
+	lists, _ := file["names"].(map[string]any)
+	for _, list := range lists {
+		pins, _ := list.(map[string]any)
+		for _, pin := range pins {
+			if name, isText := pin.(string); isText && slices.Contains(namesThisTreeAloneRefuses, name) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// fieldTablesOfAnExport is the four tables of fields of an export, each by its path from the export's folder.
+var fieldTablesOfAnExport = []string{unitFieldsTable, abilityFieldsTable, buffFieldsTable, upgradeFieldsTable}
+
+// aFieldIDPaddedApart is the predicate of PaddedID: the run holds one record of a table of fields, the first
+// cell of a row, whose value is an id that is padded to four UTF-16 units by another count of NUL bytes than to
+// four bytes.
+func aFieldIDPaddedApart(c comparison) bool {
+	held, there := c.heldInTheExport()
+	if !there || len(held) != 1 || !slices.Contains(fieldTablesOfAnExport, held[0].file) {
+		return false
+	}
+	id, isCell := cellOfARecord(held[0].bytes)
+	units := len(utf16.Encode([]rune(id)))
+	return isCell && strings.HasPrefix(held[0].bytes, "C;X1;") && max(0, 4-units) != max(0, 4-len(id))
 }
 
 // cellOfARecord is the value of one record of a table that is written C;X<column>;K"<value>". It is false for

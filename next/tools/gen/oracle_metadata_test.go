@@ -215,14 +215,16 @@ func orderedApart(_ testing.TB, files map[string]string) {
 // over a metadata that releases the same names, over one whose names differ where a pin allows it, and over one
 // with a field that is acknowledged as removed; an export with its paths in capitals, with a byte order mark at
 // the start of its files, with one byte that is no UTF-8, with more files of strings, and with fields that
-// clash down to their rawcodes; a version that is empty, and one that a JSON text escapes; a run in a folder
-// below the checkout; each refusal with one fault: a name that needs a pin, a field without a label and one
-// that nothing uses, a released name that would change and one that would disappear, each breach of the rule
-// for heroes, a unit without a row of balance, each file of the export missing, the folder of the strings and
-// the export itself missing, a table that does not parse, a cell that is no number or not whole, a count of
-// levels that is none; overrides that are cut short, hold nothing, are no JSON, start with a byte order mark,
-// have something after their object, are null, and have a key twice; a wrong count of arguments; the runs of
-// the classes, which the header of oracle_test.go names; seeded changes of the editor's strings; and a folder
+// clash down to their rawcodes; fields of the units' table that meet in a later use, a pinned field beside a
+// clash, and a clash in the group of a base ability that a useSpecific cell alone names; a version that is
+// empty, and one that a JSON text escapes; a run in a folder below the checkout; each refusal with one fault: a
+// name that needs a pin, a field without a label and one that nothing uses, a released name that would change
+// and one that would disappear, each breach of the rule for heroes, a unit without a row of balance, each file
+// of the export missing, the folder of the strings and the export itself missing, a table that does not parse,
+// a cell that is no number or not whole, a count of levels that is none; overrides that are cut short, hold
+// nothing, are no JSON, start with a byte order mark, have something after their object, are null, and have a
+// key twice; a wrong count of arguments; the runs of the classes, which the header of oracle_test.go names;
+// seeded changes of the editor's strings; and a folder
 // that is no checkout.
 func metadataRuns() []oracleRun {
 	const (
@@ -265,6 +267,22 @@ func metadataRuns() []oracleRun {
 				set(stringsFolder+"/morestrings.txt/held.txt", "[hfoo]\nName=In a folder\n"))},
 		{name: "fields that clash down to their rawcodes", lay: miniPins,
 			line: metadataOf("3.0.0.1", more(labelsFile, "WESTRING_HHB1=Damage", "WESTRING_HDC1=Damage"))},
+		// The three runs after this one hold the rules of the groups and of a pin beside a clash. Two fields of the
+		// units' table with one label, used by a unit and a hero and by a hero and a building: they meet in the
+		// hero alone, which is not the first use of the first field. A pinned field that clashes: the other field
+		// alone is renamed. And a field of a base ability that a useSpecific cell alone names, with the label of a field
+		// that every ability has: the two meet in the group of that base ability.
+		{name: "two fields of the units' table with one label that meet in a later use", lay: miniPins,
+			line: metadataOf("3.0.0.1", more(labelsFile, "WESTRING_SHARED=Shared"),
+				oneMoreRow(unitFieldsTable, `C;X1;Y13;K"uone"`, `C;X5;K"stats"`, `C;X6;K"WESTRING_SHARED"`,
+					`C;X7;K"int"`, `C;X8;K1`, `C;X9;K1`),
+				oneMoreRow(unitFieldsTable, `C;X1;Y14;K"utwo"`, `C;X5;K"art"`, `C;X6;K"WESTRING_SHARED"`,
+					`C;X7;K"int"`, `C;X8;K1`, `C;X10;K1`))},
+		{name: "a pinned field that clashes, of which the other field alone is renamed", line: ofTheMiniExport,
+			lay: pinned(classPinned + `}, "abilities": {"acdn": "cooldown"}}}`)},
+		{name: "a clash in the group of a base ability that a useSpecific cell alone names", lay: miniPins,
+			line: metadataOf("3.0.0.1", oneMoreRow(abilityFieldsTable, `C;X1;Y11;K"Anw1"`, `C;X7;K"data"`,
+				`C;X8;K"WESTRING_ALEV"`, `C;X9;K"int"`, `C;X13;K"ANew"`))},
 		{name: "two fields with one id", lay: miniPins,
 			line: metadataOf("3.0.0.1", oneMoreRow(buffFieldsTable,
 				`C;X1;Y4;K"fnam"`, `C;X3;K"text"`, `C;X4;K"WESTRING_FART"`, `C;X5;K"string"`))},
@@ -395,6 +413,9 @@ func metadataRuns() []oracleRun {
 			holds:   []laid{{labelsFile, "WESTRING_ATP1=Output"}},
 			line:    metadataOf("3.0.0.1", more(labelsFile, "WESTRING_ATP1=Output")),
 			refusal: nameNotAllowed("abilities", "atp1", "output", "Output")},
+		{name: "a pin that gives the name output", class: "NameTaken", line: ofTheMiniExport,
+			lay:     pinned(classPinned + `}, "buffs": {"fart": "output"}}}`),
+			refusal: nameNotAllowed("buffs", "fart", "output", "Icon")},
 
 		{name: "a repeat cell that is NaN", class: "NumberRefused", lay: miniPins,
 			holds:   []laid{{abilityFieldsTable, `C;X5;K"NaN"`}},
@@ -509,6 +530,16 @@ func metadataRuns() []oracleRun {
 			apart: inTheMetadataWritten(
 				place{fieldAbove + ",\n      " + fieldBelow, fieldBelow + ",\n      " + fieldAbove},
 				place{buffAbove + ",\n      " + buffBelow, buffBelow + ",\n      " + buffAbove})},
+
+		{name: "a field id of three bytes that are two characters", class: "PaddedID", lay: miniPins,
+			holds: []laid{{buffFieldsTable, "C;X1;Y3;K\"\xC3\xA9a\""}},
+			line:  metadataOf("3.0.0.1", swapped(buffFieldsTable, `K"fart"`, "K\"\xC3\xA9a\"")),
+			apart: inTheMetadataWritten(place{"\"id\":\"\xC3\xA9a\\u0000\\u0000\"", "\"id\":\"\xC3\xA9a\\u0000\""})},
+		{name: "a field id of six bytes that are two characters", class: "PaddedID", lay: miniPins,
+			holds: []laid{{buffFieldsTable, "C;X1;Y3;K\"\xE6\x97\xA5\xE6\x9C\xAC\""}},
+			line:  metadataOf("3.0.0.1", swapped(buffFieldsTable, `K"fart"`, "K\"\xE6\x97\xA5\xE6\x9C\xAC\"")),
+			apart: inTheMetadataWritten(
+				place{"\"id\":\"\xE6\x97\xA5\xE6\x9C\xAC\\u0000\\u0000\"", "\"id\":\"\xE6\x97\xA5\xE6\x9C\xAC\""})},
 	}
 	for _, name := range slices.Sorted(maps.Keys(miniExport())) {
 		runs = append(runs, oracleRun{name: "an export without " + name, lay: miniPins,
