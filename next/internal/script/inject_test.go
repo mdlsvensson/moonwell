@@ -93,6 +93,24 @@ func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T
 	}
 }
 
+// The scripts of two maps that World Editor saved: main and config are found in them as it writes them, and the
+// bundle follows the script, which is kept byte for byte.
+func TestInjectPlacesTheBundleInAScriptThatWorldEditorSaved(t *testing.T) {
+	for _, fixture := range []string{"map-settings-v39/war3map.lua", "map-globals-we3/war3map.lua"} {
+		script := string(testkit.Fixture(t, fixture))
+		added := ""
+		if !strings.HasSuffix(script, "\n") {
+			added = "\n"
+		}
+		first := strings.Count(script+added, "\n") + 1
+		change := placed(t, mapOf(t, "war3map.lua", script), small)
+		want := script + added + Bundle(small, moonwell.RuntimeLua, first)
+		if differs := firstDifference(string(change.Bytes), want); change.Name != "war3map.lua" || differs != "" {
+			t.Errorf("%s: against the script and the bundle from line %d, %s", fixture, first, differs)
+		}
+	}
+}
+
 func TestInjectRequiresMainAndConfig(t *testing.T) {
 	for _, c := range []struct{ name, script, lacks string }{
 		{"no config", "function main()\nend\n", "config"},

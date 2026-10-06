@@ -13,7 +13,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-	"time"
 	"unicode/utf8"
 
 	olddiag "github.com/mdlsvensson/moonwell/internal/diag"
@@ -533,9 +532,6 @@ type lockAfter struct {
 	Text    string
 	Written bool // the file was written, whatever it held
 }
-
-// longAgo is when a lock file that is there beforehand was last written.
-var longAgo = time.Date(2001, 2, 3, 4, 5, 6, 0, time.UTC)
 
 // lockIn is the lock file of a folder as a write left it.
 func lockIn(t *testing.T, root string) lockAfter {
@@ -1160,66 +1156,6 @@ func all(changes ...func(*testing.T, string)) func(*testing.T, string) {
 	}
 }
 
-// filesBelow is every file and folder below dir: a file by what it holds, a folder as nil, and a link, which is
-// not followed, by a word. written is the files that were written since makeOld.
-func filesBelow(t *testing.T, dir string) (files map[string]*string, written []string) {
-	t.Helper()
-	files = map[string]*string{}
-	eachBelow(t, dir, func(path, name string, info fs.FileInfo) {
-		switch {
-		case info.IsDir():
-			files[name] = nil
-		case fsx.IsLink(info):
-			word := "a link"
-			files[name] = &word
-		default:
-			data, err := os.ReadFile(path)
-			if err != nil {
-				t.Fatal(err)
-			}
-			held := string(data)
-			files[name] = &held
-			if !info.ModTime().Equal(longAgo) {
-				written = append(written, name)
-			}
-		}
-	})
-	return files, written
-}
-
-// eachBelow calls visit for every file, folder and link below dir, with its path on disk and its path from dir.
-func eachBelow(t *testing.T, dir string, visit func(path, name string, info fs.FileInfo)) {
-	t.Helper()
-	err := filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
-		if err != nil || path == dir {
-			return err
-		}
-		info, err := entry.Info()
-		if err != nil {
-			return err
-		}
-		below, err := filepath.Rel(dir, path)
-		visit(path, filepath.ToSlash(below), info)
-		return err
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-// makeOld sets the time every file below dir was last written to longAgo.
-func makeOld(t *testing.T, dir string) {
-	t.Helper()
-	eachBelow(t, dir, func(path, _ string, info fs.FileInfo) {
-		if !info.Mode().IsRegular() || info.ModTime().Equal(longAgo) {
-			return
-		}
-		if err := os.Chtimes(path, longAgo, longAgo); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
-
 // played is the scenario as a tree plays it in the folder home, from nothing. The project is home/project.
 func (s syncScenario) played(t *testing.T, home string, sync syncing) []syncOf {
 	t.Helper()
@@ -1628,13 +1564,6 @@ func syncScenarios(t *testing.T, home string) (carried, seeded []syncScenario) {
 // githubLibrary is a library of a repository at a tag.
 func githubLibrary(repository, tag, dir string) manifest.Library {
 	return manifest.Library{GitHub: &repository, Tag: &tag, Dir: dir}
-}
-
-// changed is the files with another content for one of them.
-func changed(files []string, name, content string) []string {
-	other := slices.Clone(files)
-	other[slices.Index(other, name)+1] = content
-	return other
 }
 
 // stampScenario is a library whose folder holds one stamp after another, and each time the lock entry the first

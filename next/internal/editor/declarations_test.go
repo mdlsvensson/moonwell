@@ -140,6 +140,16 @@ func TestTheRuntimeDeclarationsDeclareTheModulesHooksAndRequire(t *testing.T) {
 	contains(t, declarations, "function moonwell.format_error(message) end\n",
 		// .luarc.json turns off the package library, which would otherwise remove require.
 		"---@param name string\n---@return any\nfunction require(name) end\n")
+	// Every line is a comment, a statement of the module or blank. A line of any other kind is no Lua, and the
+	// editor then takes nothing from the file.
+	for number, line := range strings.Split(strings.TrimSuffix(declarations, "\n"), "\n") {
+		isComment := strings.HasPrefix(line, "---") || strings.HasPrefix(line, "-- ")
+		isStatement := line == "local moonwell = {}" || line == "return moonwell" ||
+			strings.HasPrefix(line, "function ") && strings.HasSuffix(line, ") end")
+		if line != "" && !isComment && !isStatement {
+			t.Errorf("line %d of the runtime declarations is neither a comment nor a statement: %q", number+1, line)
+		}
+	}
 }
 
 func resolved() []objects.Resolved {

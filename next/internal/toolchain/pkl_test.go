@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/next/internal/env"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
@@ -15,11 +16,26 @@ const installPage = "https://pkl-lang.org/main/current/pkl-cli/index.html#instal
 
 func TestPklProgramUsesPklOnPathWhenItIs032OrNewer(t *testing.T) {
 	for _, found := range []string{"Pkl 0.32.1 (Windows 10.0, native)", "Pkl 0.33.0 (Linux)", "Pkl 1.0.0 (Linux)"} {
-		e, log, fetches := pklInstaller(t, "")
-		e.Run = pathAndPinned(found, "")
-		program, err := PklProgram(background, e)
-		if err != nil || program != "pkl" || *fetches != 0 || len(log.Lines()) != 0 {
-			t.Errorf("%s: PklProgram = %q, %v, %d downloads, log %q", found, program, err, *fetches, log.Lines())
+		// A machine that Moonwell has no download for takes the pkl on PATH as every other machine does.
+		for _, platform := range []string{"linux-x86_64", ""} {
+			e, log, fetches := pklInstaller(t, "")
+			e.Platform = platform
+			var asked []string
+			e.Run = func(
+				ctx context.Context, program string, args []string, options env.RunOptions,
+			) (env.RunResult, error) {
+				asked = append([]string{program}, args...)
+				return pathAndPinned(found, "")(ctx, program, args, options)
+			}
+			program, err := PklProgram(background, e)
+			if err != nil || program != "pkl" || *fetches != 0 || len(log.Lines()) != 0 {
+				t.Errorf("%s on %q: PklProgram = %q, %v, %d downloads, log %q",
+					found, platform, program, err, *fetches, log.Lines())
+			}
+			// The words that make a Pkl print its version: with others it prints an error, and is taken for none.
+			if !slices.Equal(asked, []string{"pkl", "--version"}) {
+				t.Errorf("%s on %q: it ran %q, want pkl --version", found, platform, asked)
+			}
 		}
 	}
 }
@@ -59,6 +75,23 @@ func TestPklProgramWarnsAboutAnOlderPklOnPathAndUsesThePinnedOne(t *testing.T) {
 	}
 	if lines := log.Lines(); !slices.Equal(lines, want) {
 		t.Errorf("log = %q", lines)
+	}
+}
+
+// A pkl on PATH that names no version is no Pkl that Moonwell can use: the pinned one is downloaded, as for an
+// older one, and the warning shows what the program printed.
+func TestPklProgramTakesAPklOnPathThatNamesNoVersionForAnOlderOne(t *testing.T) {
+	for printed, shown := range map[string]string{"pkl: no such flag\n": "(pkl: no such flag)", " \r\n": "(unknown)"} {
+		e, log, fetches := pklInstaller(t, "")
+		e.Run = pathAndPinned(printed, "Pkl "+PklVersion+" (Linux)")
+		program, err := PklProgram(background, e)
+		if err != nil || program != filepath.Join(e.CacheDir, "pkl", PklVersion, "pkl") || *fetches != 1 {
+			t.Errorf("%q: PklProgram = %q, %v, %d downloads", printed, program, err, *fetches)
+		}
+		lines := log.Lines()
+		if len(lines) != 2 || !strings.HasPrefix(lines[0], "warning: pkl on PATH is older than 0.32 "+shown+", ") {
+			t.Errorf("%q: log = %q", printed, lines)
+		}
 	}
 }
 

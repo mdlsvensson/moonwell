@@ -3,11 +3,16 @@ package library
 import (
 	"context"
 	"errors"
+	"io/fs"
+	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
+	"github.com/mdlsvensson/moonwell/next/internal/fsx"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
@@ -103,4 +108,74 @@ func listing(files []file) []string {
 		listed = append(listed, f.name+"="+string(f.data))
 	}
 	return listed
+}
+
+// changed is the files with another content for one of them.
+func changed(files []string, name, content string) []string {
+	other := slices.Clone(files)
+	other[slices.Index(other, name)+1] = content
+	return other
+}
+
+// longAgo is when a file that a test must find untouched was last written.
+var longAgo = time.Date(2001, 2, 3, 4, 5, 6, 0, time.UTC)
+
+// filesBelow is every file and folder below dir: a file by what it holds, a folder as nil, and a link, which is
+// not followed, by a word. written is the files that were written since makeOld.
+func filesBelow(t *testing.T, dir string) (files map[string]*string, written []string) {
+	t.Helper()
+	files = map[string]*string{}
+	eachBelow(t, dir, func(path, name string, info fs.FileInfo) {
+		switch {
+		case info.IsDir():
+			files[name] = nil
+		case fsx.IsLink(info):
+			word := "a link"
+			files[name] = &word
+		default:
+			data, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			held := string(data)
+			files[name] = &held
+			if !info.ModTime().Equal(longAgo) {
+				written = append(written, name)
+			}
+		}
+	})
+	return files, written
+}
+
+// eachBelow calls visit for every file, folder and link below dir, with its path on disk and its path from dir.
+func eachBelow(t *testing.T, dir string, visit func(path, name string, info fs.FileInfo)) {
+	t.Helper()
+	err := filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil || path == dir {
+			return err
+		}
+		info, err := entry.Info()
+		if err != nil {
+			return err
+		}
+		below, err := filepath.Rel(dir, path)
+		visit(path, filepath.ToSlash(below), info)
+		return err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// makeOld sets the time every file below dir was last written to longAgo.
+func makeOld(t *testing.T, dir string) {
+	t.Helper()
+	eachBelow(t, dir, func(path, _ string, info fs.FileInfo) {
+		if !info.Mode().IsRegular() || info.ModTime().Equal(longAgo) {
+			return
+		}
+		if err := os.Chtimes(path, longAgo, longAgo); err != nil {
+			t.Fatal(err)
+		}
+	})
 }

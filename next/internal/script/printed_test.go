@@ -224,6 +224,10 @@ func TestRewriteErrorReadsTheStepTheReasonAndTheLineMarkOfTheLuaLeft(t *testing.
 		{"a reason with white space around it", "Failed to rewrite: x\n>> :1:1:  \t spaced \t\n", "local x -- 7\n",
 			"YueScript compiled this file but could not rewrite its Lua: spaced", 7},
 		{"the step on the error stream", "\nFailed to rewrite: x\n>> :2:1: late\n", "a -- 1\nb -- 12\n", "YueScript compiled this file but could not rewrite its Lua: late", 12},
+		// A file of more than nine lines: the position in the Lua left has two digits.
+		{"a position of two digits", "Failed to rewrite: x\n>> :12:34: deep\n",
+			strings.Repeat("a -- 1\n", 11) + "b -- 40\n",
+			"YueScript compiled this file but could not rewrite its Lua: deep", 40},
 	} {
 		failure := rewriteError("src/x.yue", c.printed, leaving(c.left))
 		if failure == nil || failure.Msg != c.wantMsg || failure.Line != c.wantLine || failure.File != "src/x.yue" ||
