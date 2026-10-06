@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"maps"
 	"os"
+	"path/filepath"
 	"reflect"
 	"slices"
 	"strings"
@@ -488,23 +489,29 @@ func TestTheModeNativesRecordsTheNameOfAScriptInLowerCase(t *testing.T) {
 	}
 }
 
-// A run that fails says which file it failed on, as the reader can find it: a script by the folder that the
-// line names and its path from there, a file of the checkout by its path from the checkout, and a line of a
-// script by the script's name and the line's number. It leaves the natives of the checkout as they were.
+// A run that fails says which file it failed on, as the reader can find it: a script by the path that was
+// opened, which is the folder that the line names and the script's path from there, joined as the system joins
+// two paths; a file of the checkout by its path from the checkout; and a line of a script by the script's name
+// and the line's number. It leaves the natives of the checkout as they were.
 func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testing.T) {
 	const kept = "the natives of another version\n"
 	whole := exportedScripts(t, miniCommon, miniBlizzard)
 	noBlizzard := t.TempDir()
 	testkit.WriteFile(t, noBlizzard, scriptsFolder+"/"+commonScript, []byte(miniCommon))
-	notThere := noBlizzard + "/no-such-folder"
+	blizzardThere := filepath.Join(noBlizzard, "war3.w3mod", "scripts", "blizzard.j") + ": "
+	commonNotThere := filepath.Join(noBlizzard, "no-such-folder", "war3.w3mod", "scripts", "common.j") + ": "
 	for name, c := range map[string]struct {
 		folder string
 		lay    func(c checkout)
 		starts string   // what the error starts with
 		words  []string // what it says besides
 	}{
-		"a script that is not there": {folder: noBlizzard, starts: noBlizzard + "/war3.w3mod/scripts/blizzard.j: "},
-		"a folder that is not there": {folder: notThere, starts: notThere + "/war3.w3mod/scripts/common.j: "},
+		"a script that is not there": {folder: noBlizzard, starts: blizzardThere},
+		"a folder that is not there": {folder: filepath.Join(noBlizzard, "no-such-folder"), starts: commonNotThere},
+		// The folder as the line gives it has what a path need not have: the joined path has it not.
+		"a folder with a slash at its end": {folder: noBlizzard + "/", starts: blizzardThere},
+		"a folder with two points in it":   {folder: noBlizzard + "/war3.w3mod/..", starts: blizzardThere},
+		"a folder with slashes, not there": {folder: noBlizzard + "/no-such-folder//", starts: commonNotThere},
 		"a line that is no declaration": {folder: exportedScripts(t, miniCommon, "globals\n    real = 1\nendglobals\n"),
 			starts: "blizzard.j:2: cannot read ", words: []string{`"real = 1"`}},
 		"a function without its end": {folder: exportedScripts(t, "\n\nfunction F takes nothing returns nothing\n", ""),

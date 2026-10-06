@@ -174,8 +174,10 @@ func errUnknownMode(table []mode, name string) error {
 // errUsage refuses a line that gives a mode more arguments than it takes, or fewer, with the mode's usage line.
 func errUsage(chosen mode) error { return errors.New(chosen.usage) }
 
-// errFile is a failure of the system on a file or a folder that the command line names: the path as the line
-// gave it, and the system's reason without the operation and the full path that Go puts before it.
+// errFile is a failure of the system on a file or a folder that the command line leads to: its path, and the
+// system's reason without the operation and the path that Go puts before it. path is what the generator opened:
+// a file that the line names, as the line gives it, or a file below a folder that the line names, the two joined
+// as the system joins them.
 func errFile(path string, cause error) error {
 	return fmt.Errorf("%s: %s", path, fsx.Reason(cause))
 }

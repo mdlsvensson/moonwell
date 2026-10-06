@@ -137,18 +137,18 @@ import (
 //     TestTheModeGamePathsNamesTheFileItCannotWriteByItsPathFromTheCheckout,
 //     TestTheModeWithoutANameNamesWhatTheSystemNamesWhenAFileIsInTheWayOfTheSchema,
 //     TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives).
-//   - AsGiven, 9 runs (cannotGiveWhatTheLineNames, fileAsGiven): a failure of the system on a file that the
-//     line names. The other tree says Go's own line, "error: open <path>: <reason>" or "error: read <path>:
+//   - AsGiven, 11 runs (cannotGiveWhatTheLineNames, fileAsGiven): a failure of the system on a file that the
+//     line leads to. The other tree says Go's own line, "error: open <path>: <reason>" or "error: read <path>:
 //     <reason>", and this tree "error: <path>: <reason>". The run says which argument of the line names the
 //     path (cannotGive): the one that names the list, or the one that names the folder of an export, with the
-//     path of a script from that folder. The two trees write the path of a script apart: the other tree joins
-//     the folder and the script's path as the system joins two paths, which on Windows is with "\" and on every
-//     system without what a path need not have, such as a "/" at the end of the folder; this tree writes the
-//     folder as the line gives it, "/", and the script's path with "/" (named.in, named.asGiven). The predicate
-//     is the row's: the input has no file at the path, since nothing is there or a folder is, and the other
-//     tree said one of the two lines about the path as it makes it. This tree must say that line without its
-//     operation, about the path as this tree names it. The exit code, standard output and the checkout are
-//     compared whole (TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid,
+//     path of a script from that folder. The path of a list is the argument as it stands; the path of a script
+//     is the folder and the script's path joined as the system joins two paths, which on Windows is with "\"
+//     and on every system without what a path need not have, such as a "/" at the end of the folder: an empty
+//     folder argument gives the script's own path (named.in). Both trees write that path. The predicate is the
+//     row's: the input has no file at the path, since nothing is there or a folder is, and the other tree said
+//     one of the two lines about the path. This tree must say that line without its operation. The exit code,
+//     standard output and the checkout are compared whole
+//     (TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid,
 //     TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives).
 //   - CountRefused, 2 runs (moreAfterAnEmptyFirstArgument, refusedByThisTree): something after an empty first
 //     argument. The other tree passes over what follows an empty first argument and writes the schema; this tree
@@ -305,11 +305,11 @@ func TestOracleOnWhatBothGeneratorsWriteSayAndHowTheyEnd(t *testing.T) {
 	}
 	fixtures.check(t, genTally{
 		counts: counts{
-			Runs: 157, Whole: 115, Passed: 64, Failed: 93, AsPrograms: 16, Files: 370, Committed: 21,
+			Runs: 159, Whole: 115, Passed: 64, Failed: 95, AsPrograms: 18, Files: 374, Committed: 21,
 		},
-		Modes: map[string]int{"": 29, "natives": 86, "game-paths": 42},
+		Modes: map[string]int{"": 29, "natives": 88, "game-paths": 42},
 		Classes: map[string]int{
-			"FromCheckout": 13, "AsGiven": 9, "CountRefused": 2, "UnknownKey": 4, "LacksAKey": 3, "NoName": 3,
+			"FromCheckout": 13, "AsGiven": 11, "CountRefused": 2, "UnknownKey": 4, "LacksAKey": 3, "NoName": 3,
 			"CountOfPaths": 1, "WiderSpace": 4, "DottedI": 1, "NoUTF8": 1, "ByBytes": 1,
 		},
 	})
@@ -420,18 +420,6 @@ func (n named) in(args []string) (string, bool) {
 		return args[n.argument], true
 	}
 	return filepath.Join(args[n.argument], filepath.FromSlash(n.below)), true
-}
-
-// asGiven is the path as this tree names it in a message: the argument as the line gives it, and, for a file
-// below a folder, "/" and the file's path from the folder with "/". It is "" for a line without the argument.
-func (n named) asGiven(args []string) string {
-	switch {
-	case n.argument >= len(args):
-		return ""
-	case n.below == "":
-		return args[n.argument]
-	}
-	return args[n.argument] + "/" + n.below
 }
 
 // place is a place of a file or of a stream that the two trees write apart: what the other tree writes there,
@@ -884,30 +872,29 @@ func cannotGiveWhatTheLineNames(c comparison) bool {
 	}
 	path, given := c.r.cannotGive.in(c.in.args)
 	_, isFile := c.in.given(path)
-	_, said := lineWithoutTheOperation(c.want.stderr, path, path)
+	_, said := lineWithoutTheOperation(c.want.stderr, path)
 	return given && !isFile && said
 }
 
 // fileAsGiven compares a run of the class AsGiven: the line this tree says is the other tree's without the
-// operation, with the path as this tree names it, and everything else is compared whole.
+// operation, and everything else is compared whole.
 func (c comparison) fileAsGiven() {
 	c.codes()
 	c.streams(standardOutput, c.want.stdout, c.got.stdout)
 	c.files()
 	path, _ := c.r.cannotGive.in(c.in.args)
-	must, _ := lineWithoutTheOperation(c.want.stderr, path, c.r.cannotGive.asGiven(c.in.args))
+	must, _ := lineWithoutTheOperation(c.want.stderr, path)
 	c.mustSay(must)
 }
 
-// lineWithoutTheOperation is the line this tree must say of a file that the command line names and that the
-// system failed on, made of the line that the other tree said of it. The other tree's line is "error: ", the
-// operation, which is open or read, the path as a program makes it of the line, ": " and the system's reason;
-// this tree's is "error: ", the path as this tree names it (as), ": " and that reason. It is false for a line of
-// another shape.
-func lineWithoutTheOperation(line, path, as string) (string, bool) {
+// lineWithoutTheOperation is the line this tree must say of a file that the command line leads to by path and
+// that the system failed on, made of the line that the other tree said of it. The other tree's line is
+// "error: ", the operation, which is open or read, the path, ": " and the system's reason; this tree's is that
+// line without the operation. It is false for a line of another shape.
+func lineWithoutTheOperation(line, path string) (string, bool) {
 	for _, operation := range []string{"open", "read"} {
 		if reason, said := strings.CutPrefix(line, "error: "+operation+" "+path+": "); said {
-			return "error: " + as + ": " + reason, true
+			return "error: " + path + ": " + reason, true
 		}
 	}
 	return "", false
@@ -1319,36 +1306,32 @@ func TestOracleReadsTheLinesAndTheEndingsThatDecideItsClasses(t *testing.T) {
 		{"error: open other.txt: the reason\n", "", false},
 		{"error: list.txt: the reason\n", "", false},
 	} {
-		got, shaped := lineWithoutTheOperation(c.line, "list.txt", "list.txt")
-		if got != c.want || shaped != c.shaped {
+		if got, shaped := lineWithoutTheOperation(c.line, "list.txt"); got != c.want || shaped != c.shaped {
 			t.Errorf("lineWithoutTheOperation(%q) = %q, %v, want %q, %v", c.line, got, shaped, c.want, c.shaped)
 		}
 	}
-	// A file below a folder that the line names: the other tree joins the two as the system does, and this tree
-	// names the folder as the line gives it, and the file from there with "/".
-	export, script := filepath.Join("an", "export"), filepath.Join("an", "export", "scripts", "common.j")
+	// The path that a run names: a file that the line names is the argument as it stands, and a file below a
+	// folder that the line names is the two joined as the system joins them, without what a path need not have.
+	script := func(steps ...string) string { return filepath.Join(append(steps, "scripts", "common.j")...) }
+	natives := func(folder string) []string { return []string{"natives", folder, "1"} }
 	for _, c := range []struct {
-		n       named
-		args    []string
-		in      string // the path as a program makes it
-		has     bool
-		asGiven string // the path as this tree names it
+		n    named
+		args []string
+		in   string
+		has  bool
 	}{
-		{named{1, ""}, []string{"game-paths", "lists/list.txt", "1"}, "lists/list.txt", true, "lists/list.txt"},
-		{named{1, "scripts/common.j"}, []string{"natives", "an/export/", "1"}, script, true,
-			"an/export//scripts/common.j"},
-		{named{1, "scripts/common.j"}, []string{"natives", export, "1"}, script, true, export + "/scripts/common.j"},
-		{named{3, "scripts/common.j"}, []string{"natives", "export", "1"}, "", false, ""},
+		{named{1, ""}, []string{"game-paths", "lists//list.txt", "1"}, "lists//list.txt", true},
+		{named{1, "scripts/common.j"}, natives(filepath.Join("an", "export")), script("an", "export"), true},
+		{named{1, "scripts/common.j"}, natives("an/export/"), script("an", "export"), true},
+		{named{1, "scripts/common.j"}, natives("an//export//"), script("an", "export"), true},
+		{named{1, "scripts/common.j"}, natives(""), script(), true},
+		{named{1, "scripts/common.j"}, natives("."), script(), true},
+		{named{1, "scripts/common.j"}, natives(".."), script(".."), true},
+		{named{1, "scripts/common.j"}, natives("an/../export"), script("export"), true},
+		{named{3, "scripts/common.j"}, natives("export"), "", false},
 	} {
-		in, has := c.n.in(c.args)
-		asGiven := c.n.asGiven(c.args)
-		if in != c.in || has != c.has || asGiven != c.asGiven {
-			t.Errorf("%+v of %q: a program makes %q, %v of it and this tree names %q; want %q, %v and %q",
-				c.n, c.args, in, has, asGiven, c.in, c.has, c.asGiven)
-		}
-		got, _ := lineWithoutTheOperation("error: open "+in+": the reason\n", in, asGiven)
-		if want := "error: " + c.asGiven + ": the reason\n"; has && got != want {
-			t.Errorf("%+v of %q: this tree must say %q, want %q", c.n, c.args, got, want)
+		if in, has := c.n.in(c.args); in != c.in || has != c.has {
+			t.Errorf("%+v of %q: a program makes %q, %v of it; want %q, %v", c.n, c.args, in, has, c.in, c.has)
 		}
 	}
 	const stack = "panic: a function without a name\n\ngoroutine 1 [running]:\nmain.main()\n"
@@ -2458,6 +2441,10 @@ func programRuns() []oracleRun {
 			}},
 		{name: "an export that is not there, by its name", below: "work", lay: luaExtras(miniExtrasText),
 			class: "AsGiven", cannotGive: &named{1, commonOfAnExport}, line: words("natives", "no-export", "9.9.9")},
+		{name: "an export that is not there, by its name and a slash", below: "work", lay: luaExtras(miniExtrasText),
+			class: "AsGiven", cannotGive: &named{1, commonOfAnExport}, line: words("natives", "no-export/", "9.9.9")},
+		{name: "an empty argument for the export", below: "work", lay: luaExtras(miniExtrasText),
+			class: "AsGiven", cannotGive: &named{1, commonOfAnExport}, line: words("natives", "", "9.9.9")},
 		{name: "a function of the extras without a name", class: "NoName", line: ofTheMiniatures,
 			lay:     luaExtras(functionsOfTheExtras(`{"params": [], "returns": "nothing"}`)),
 			refusal: keyLeftOut("function 1 of the list", "name")},

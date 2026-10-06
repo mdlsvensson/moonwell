@@ -60,13 +60,14 @@ func writeNatives(checkout string, args []string, out io.Writer) error {
 }
 
 // readScript reads one of the game's two scripts from the export in folder, and parses it. The script is looked
-// for at its path as it is written here. Every entry records name as the script it is from: the script's name in
-// lower case, whatever the letter case of the file.
+// for at its path as it is written here, joined to the folder as the system joins two paths; a failure of the
+// system names it by that joined path, which is what was opened. Every entry records name as the script it is
+// from: the script's name in lower case, whatever the letter case of the file.
 func readScript(folder, name string) (jass.File, error) {
-	below := scriptsFolder + "/" + name
-	data, err := os.ReadFile(filepath.Join(folder, filepath.FromSlash(below)))
+	path := filepath.Join(folder, filepath.FromSlash(scriptsFolder+"/"+name))
+	data, err := os.ReadFile(path)
 	if err != nil {
-		return jass.File{}, errFile(folder+"/"+below, err)
+		return jass.File{}, errFile(path, err)
 	}
 	return jass.Parse(fsx.DecodeText(data), name)
 }
