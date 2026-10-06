@@ -830,11 +830,11 @@ tokens: 26
 top-level globals: config
 map functions: config
 function config: 0-66, its end at 63
-  call A: 18-23, 0 arguments: 
-  call B: 24-27, 0 arguments: 
-  call C: 40-45, 0 arguments: 
-  call D: 46-49, 0 arguments: 
-  call E: 57-61, 0 arguments: 
+  call A: 18-23, 0 arguments
+  call B: 24-27, 0 arguments
+  call C: 40-45, 0 arguments
+  call D: 46-49, 0 arguments
+  call E: 57-61, 0 arguments
 
 == functions of every form
 source: sha256 9bbb993de187afc813c49281c1b75d2edba0a5df3aececa1ab0fdfb27b526b9f, 96 bytes
@@ -901,7 +901,7 @@ tokens: 21
 top-level globals: a
 map functions: a
 function a: 0-41, its end at 38
-  call Y: 34-37, 0 arguments: 
+  call Y: 34-37, 0 arguments
 function a: 42-58, its end at 55
 
 == a method call of a string
@@ -1074,7 +1074,8 @@ tokens: 22
 top-level globals: a
 map functions: a
 function a: 0-52, its end at 49
-  call X: 43-48, 1 arguments: - x
+  call X: 43-48, 1 arguments
+    argument 1: "- x"
 
 == an operator without an operand
 source: "function a() local x = 1 + end"
@@ -1099,7 +1100,8 @@ tokens: 403, sha256 2e2647b01aeab4ff763a6dc73ff80a902d06d5bd87b3177089a9a9944ae8
 top-level globals: config
 map functions: config
 function config: 0-426, its end at 423
-  call Capture: 18-422, 1 arguments: sha256 0ed6a0c0696264fd29419b80968c990975fe0bc627521caa0433fb30a7431e25, 789 bytes
+  call Capture: 18-422, 1 arguments
+    argument 1: "sha256 0ed6a0c0696264fd29419b80968c990975fe0bc627521caa0433fb30a7431e25, 789 bytes"
 
 == brackets one past the limit
 source: sha256 000b9be710dea7a77b8d8b39c350f3d80f440d88d8e028d49f6ce24ccf630f27, 428 bytes
@@ -1162,7 +1164,14 @@ tokens: 27
 top-level globals: a
 map functions: a
 function a: 0-55, its end at 52
-  call X: 13-51, 7 arguments: - 1 , - 1 , - - 1 , - 0x10 , 0X10 , 1E5 , - 0
+  call X: 13-51, 7 arguments
+    argument 1: "- 1", the number -1
+    argument 2: "- 1", the number -1
+    argument 3: "- - 1"
+    argument 4: "- 0x10", the number -16
+    argument 5: "0X10", the number 16
+    argument 6: "1E5", the number 100000
+    argument 7: "- 0", the number -0
 
 == a hexadecimal number too long
 source: sha256 6f2f089de6d0255c54238413ee7d8f2c750fad75f91721bfb13ae3b44ccfc87b, 627 bytes
@@ -1182,7 +1191,9 @@ tokens: 12
 top-level globals: a
 map functions: a
 function a: 0-627, its end at 624
-  call X: 13-623, 2 arguments: sha256 d430600be890e7927d425c544e46149520acf5ef4dd14fae48ea79d7dedd1e20, 609 bytes
+  call X: 13-623, 2 arguments
+    argument 1: "sha256 b16037f3451402dd49c65a8dd4226cd1530087fc9593779c6ac50397dd177e13, 302 bytes"
+    argument 2: "sha256 3075f2c08efe763ab39f6eb6ec7cd77855538e3ca7a6deb0d7d46010a3766249, 304 bytes"
 
 == a hexadecimal number that rounds
 source: "function a() X(0x20000000000001, 0x20000000000003, 0x1FFFFFFFFFFFFF, 0x0) end"
@@ -1205,7 +1216,11 @@ tokens: 15
 top-level globals: a
 map functions: a
 function a: 0-77, its end at 74
-  call X: 13-73, 4 arguments: 0x20000000000001 , 0x20000000000003 , 0x1FFFFFFFFFFFFF , 0x0
+  call X: 13-73, 4 arguments
+    argument 1: "0x20000000000001", the number 9.007199254740992e+15
+    argument 2: "0x20000000000003", the number 9.007199254740996e+15
+    argument 3: "0x1FFFFFFFFFFFFF", the number 9.007199254740991e+15
+    argument 4: "0x0", the number 0
 
 == a decimal number at the edges
 source: "function a() X(1e308, 1e309, 1e-400, 4.9e-324, 00012, 1.e5, .0) end"
@@ -1234,7 +1249,14 @@ tokens: 21
 top-level globals: a
 map functions: a
 function a: 0-67, its end at 64
-  call X: 13-63, 7 arguments: 1e308 , 1e309 , 1e-400 , 4.9e-324 , 00012 , 1.e5 , .0
+  call X: 13-63, 7 arguments
+    argument 1: "1e308", the number 1e+308
+    argument 2: "1e309"
+    argument 3: "1e-400", the number 0
+    argument 4: "4.9e-324", the number 5e-324
+    argument 5: "00012", the number 12
+    argument 6: "1.e5", the number 100000
+    argument 7: ".0", the number 0
 
 == a player of every form
 source: sha256 59980a8113c72de58202409985ca9099a0f8674f10213517e93033f1eeedd392, 89 bytes
@@ -1275,5 +1297,10 @@ tokens: 33
 top-level globals: a
 map functions: a
 function a: 0-89, its end at 86
-  call X: 13-85, 5 arguments: sha256 7f1c692291eed0308e42ea97a9b2aaf16e151259c17bdc8538393dcd7a531718, 88 bytes
+  call X: 13-85, 5 arguments
+    argument 1: "Player ( 1e2 )", the player 100
+    argument 2: "Player ( - 0 )", the player 0
+    argument 3: "Player ( 0x7fffffff )", the player 2147483647
+    argument 4: "Player ( 1e30 )", a player whose number is past an int
+    argument 5: "Player ( 3 )", the player 3
 

@@ -256,9 +256,19 @@ func otherScan(t *testing.T, source string) scanned {
 		}
 		return out
 	}
+	// What the other tree's two literal helpers make of the other tree's tokens.
+	literalOf := func(tokens []luasrc.Token) literal {
+		var made literal
+		made.Number, made.IsNumber = luasrc.LiteralNumber(tokens)
+		if made.Player, made.IsPlayer = luasrc.PlayerID(tokens); made.IsPlayer {
+			made.Inside, _ = luasrc.LiteralNumber(tokens[2 : len(tokens)-1])
+		}
+		return made
+	}
 	var made scanned
 	tokens, fault := luasrc.Tokenize(source)
 	made.Tokens = carried(tokens)
+	made.Whole = literalOf(tokens)
 	carry(fault, &made.Fault)
 	for _, require := range luasrc.Requires(source) {
 		made.Requires = append(made.Requires, Require{require.Line, require.Name, require.Literal})
@@ -272,22 +282,27 @@ func otherScan(t *testing.T, source string) scanned {
 			var arguments [][]Token
 			for _, argument := range call.Args {
 				arguments = append(arguments, carried(argument))
+				made.Arguments = append(made.Arguments, literalOf(argument))
 			}
 			own.Calls = append(own.Calls, Call{call.Name, arguments, call.Start, call.End})
 		}
 		made.Functions = append(made.Functions, own)
 	}
 	if err != nil {
-		made.Refusal = otherRefusal(t, "", source, err)
+		made.Refusal = otherRefusal(t, source, err)
 	}
 	return made
 }
 
 // otherRefusal is what an error of the other tree's Functions says, with its place as this tree gives one: the
 // other tree ends its message with ` at character N`, or has the place of its tokenizer's fault.
-func otherRefusal(t *testing.T, input, source string, err error) testkit.Refusal {
+func otherRefusal(t *testing.T, source string, err error) refusedAt {
 	t.Helper()
-	said := oracle.RefusalOf(input, err)
+	said := refusedAt{Message: err.Error()}
+	var failure *olddiag.Error
+	if errors.As(err, &failure) {
+		said = refusedAt{File: failure.File, Message: failure.Msg, Hint: failure.Hint}
+	}
 	offset := -1
 	if place := atCharacter.FindStringSubmatch(said.Message); place != nil {
 		units, _ := strconv.Atoi(place[1])
@@ -301,28 +316,12 @@ func otherRefusal(t *testing.T, input, source string, err error) testkit.Refusal
 	return said
 }
 
-// TestOracleOnTheRecordedRefusals holds testdata/recorded/refusals.txt to what the other tree says of every
-// source the recording names. It is the test that writes the recording: MOONWELL_RECORD=1 with -run of this test
-// alone. The place of an error is this tree's, a line and a column (otherRefusal). The words for edits that
-// overlap are this tree's: the other tree's applier of edits is no door of a package of its own.
-func TestOracleOnTheRecordedRefusals(t *testing.T) {
-	var said []testkit.Refusal
-	for _, c := range refusedSources() {
-		_, err := luasrc.Functions(c.source, "map.lua")
-		said = append(said, otherRefusal(t, sourceName(c.source), c.source, err))
-	}
-	_, err := ApplyEdits("0123456789", overlappingEdits)
-	said = append(said, testkit.RefusalOf("edits that overlap", err))
-	testkit.Recorded(t, "refusals.txt", testkit.Refusals(said))
-}
-
-// TestOracleOnTheRecordedScans holds testdata/recorded/corners.txt and files.txt to what the other tree's scanners
-// make of every source the recordings name. It is the test that writes them: MOONWELL_RECORD=1 with -run of this
-// test alone.
+// TestOracleOnTheRecordedScans holds testdata/recorded/corners.txt to what the other tree's scanners make of
+// every source the recording names. It is the test that writes it: MOONWELL_RECORD=1 with -run of this test
+// alone. The place of an error is this tree's, a line and a column (otherRefusal).
 func TestOracleOnTheRecordedScans(t *testing.T) {
 	other := func(source string) scanned { return otherScan(t, source) }
 	testkit.Recorded(t, "corners.txt", scans(cornerSources, other))
-	testkit.Recorded(t, "files.txt", scans(luaFilesOfTheCheckout(t), other))
 }
 
 func TestOracleOnTheSourcesOfTheTests(t *testing.T) {

@@ -80,9 +80,22 @@ func TestADeclarationIsTypedByItsValueUnlessItsNameSaysWhatItHolds(t *testing.T)
 		{"udg_A=-.5", "udg_A", "number"},
 		{"udg_A = 1.", "udg_A", "any"},
 		{"udg_A = true", "udg_A", "boolean"},
-		// A character that is no white space of Lua is part of the value it stands in.
+		// Only Lua's white space is taken off the ends of a value. Any other character there is part of it: a
+		// number with a tilde before or after it is no number, and true with one is no boolean.
 		{"udg_A = ~5~", "udg_A", "any"},
 		{"udg_A = ~true", "udg_A", "any"},
+		// A value is typed as a whole: a number or an array that is one side of an expression says nothing of
+		// what the expression gives. A declaration without a value is one all the same.
+		{"udg_A = 0.5 + 1", "udg_A", "any"},
+		{"udg_A = x or __jarray(0)", "udg_A", "any"},
+		{"udg_A = __jarray(0) or x", "udg_A", "any"},
+		{"udg_A =", "udg_A", "any"},
+		// A name may start with an underscore, and be one. A handle's name has an underscore after its kind:
+		// without it the name says nothing of what the variable holds.
+		{"_under = 1", "_under", "integer"},
+		{"_ = 0.5", "_", "number"},
+		{"gg_dest = nil", "gg_dest", "any"},
+		{"gg_dest_Gate = nil", "gg_dest_Gate", "destructable"},
 		{`udg_A = "text" -- a comment`, "udg_A", "string"},
 		{`udg_A = __jarray( "" )`, "udg_A", "string[]"},
 		{"udg_A = __jarray(__jarray(0))", "udg_A", "integer[][]"},
@@ -124,10 +137,19 @@ func TestOnlyALineThatStartsWithANameOrAFunctionIsRead(t *testing.T) {
 		"udg_Field.x = 1",
 		" function Indented()",
 		"function Table.method()",
+		"functionGlued()",
 		"function  Spaced  ()",
 		"udg_After = 1",
 	}, "\n"))
 	if len(globals.Globals) != 0 || !slices.Equal(globals.Functions, []string{"Spaced"}) {
 		t.Errorf("read %+v", globals)
+	}
+}
+
+// A name of Lua may start with an underscore, and be nothing but one: such a function is a function of the map.
+func TestAFunctionWhoseNameStartsWithAnUnderscoreIsRead(t *testing.T) {
+	globals := ReadMapGlobals("function _hidden()\nend\nfunction _()\nend\nfunction __two_2()\nend\nfunction 2nd()\nend\n")
+	if !slices.Equal(globals.Functions, []string{"_hidden", "_", "__two_2"}) {
+		t.Errorf("the functions are %q", globals.Functions)
 	}
 }

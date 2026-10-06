@@ -77,9 +77,11 @@ var malformedSources = []struct {
 	{"a = \"x\\z  ", "unterminated quoted string", 4, []string{"a", "=", "\"x\\z  "}},
 	{"a = 1e", "invalid numeral", 4, []string{"a", "=", "1e"}},
 	{"a = 0x", "invalid numeral", 4, []string{"a", "=", "0x"}},
-	// A malformed numeral takes a sign only after the letter of an exponent, and no bracket.
+	// A malformed numeral takes a sign only after the letter of an exponent, in either case, and no bracket.
 	{"a = 1e+ b", "invalid numeral", 4, []string{"a", "=", "1e+", "b"}},
 	{"a = 0x1P- b", "invalid numeral", 4, []string{"a", "=", "0x1P-", "b"}},
+	{"a = 1E- b", "invalid numeral", 4, []string{"a", "=", "1E-", "b"}},
+	{"a = 0x1p+ b", "invalid numeral", 4, []string{"a", "=", "0x1p+", "b"}},
 	{"a = 1.2.3+4", "invalid numeral", 4, []string{"a", "=", "1.2.3", "+", "4"}},
 	{"a = (0x1p)", "invalid numeral", 5, []string{"a", "=", "(", "0x1p", ")"}},
 }
@@ -146,6 +148,9 @@ func TestTheEdgesOfNamesNumeralsAndDots(t *testing.T) {
 	}{
 		{"A Z a z _ _9 Zz9_", NameToken, []string{"A", "Z", "a", "z", "_", "_9", "Zz9_"}},
 		{"0xa 0xA 0xf 0xF 0x09afAF 0Xa.Fp1", NumberToken, []string{"0xa", "0xA", "0xf", "0xF", "0x09afAF", "0Xa.Fp1"}},
+		// The letter of an exponent is taken in either case: e and E after decimal digits, p and P after
+		// hexadecimal ones.
+		{"0x1P4 0x1p-4 0XA.8P+1 1E5 1e5 .5E+2", NumberToken, []string{"0x1P4", "0x1p-4", "0XA.8P+1", "1E5", "1e5", ".5E+2"}},
 		{".5", NumberToken, []string{".5"}},
 		{"1 .5", NumberToken, []string{"1", ".5"}},
 		{".", SymbolToken, []string{"."}},
@@ -186,6 +191,7 @@ func TestAShortCommentEndsBeforeItsLineBreakOrWithTheSource(t *testing.T) {
 		{"a -- the source ends in the comment", []string{"a"}, 1},
 		{"--", nil, 0},
 		{"a -- a line feed\nb", []string{"a", "b"}, 2},
+		// A short comment runs to its line break: no character of its text ends it sooner.
 		{"a -- nothing but a line break ~ ends ; it\nb", []string{"a", "b"}, 2},
 		{"a -- a return and a line feed\r\nb", []string{"a", "b"}, 2},
 		{"a -- [[ no long comment\nb ]]", []string{"a", "b", "]", "]"}, 2},

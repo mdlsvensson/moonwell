@@ -1,12 +1,15 @@
 package lua
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/next/internal/diag"
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
@@ -96,15 +99,14 @@ var cornerSources = []namedSource{
 		"function a() X(Player(1e2), Player(-0), Player(0x7fffffff), Player(1e30), Player (3)) end"},
 }
 
-// luaFilesOfTheCheckout are the Lua files the checkout holds for good: the two scripts World Editor saved, the
-// template's map script and the runtime. Each has its path below the root, with "/", for a name.
+// luaFilesOfTheCheckout are the two scripts World Editor saved, which are fixtures, and the runtime, which is the
+// Lua file that every build bundles. Each has its path below the root, with "/", for a name.
 func luaFilesOfTheCheckout(t *testing.T) []namedSource {
 	t.Helper()
 	var sources []namedSource
 	for _, name := range []string{
 		"internal/testkit/testdata/map-globals-we3/war3map.lua",
 		"internal/testkit/testdata/map-settings-v39/war3map.lua",
-		"template/maps/map.w3x/war3map.lua",
 		"runtime/moonwell.lua",
 	} {
 		data, err := os.ReadFile(filepath.Join(testkit.RepoRoot(t), filepath.FromSlash(name)))
@@ -116,7 +118,51 @@ func luaFilesOfTheCheckout(t *testing.T) []namedSource {
 	return sources
 }
 
-// scanned is what every scanner of the package makes of one source.
+// literal is what the two literal helpers make of some tokens: of all the tokens of a source, or of one argument
+// of a call. Inside is the number between the brackets of `Player(...)`, for a player.
+type literal struct {
+	Number   float64
+	IsNumber bool
+	Player   int
+	IsPlayer bool
+	Inside   float64
+}
+
+// literalOf asks the two helpers.
+func literalOf(tokens []Token) literal {
+	var made literal
+	made.Number, made.IsNumber = LiteralNumber(tokens)
+	if made.Player, made.IsPlayer = PlayerID(tokens); made.IsPlayer {
+		made.Inside, _ = LiteralNumber(tokens[2 : len(tokens)-1])
+	}
+	return made
+}
+
+// String is the literal as a recording holds it; "" for tokens that are neither a number nor a player. A player
+// whose number is past what an int holds is written as that and not as the int: Go leaves what such a number
+// becomes to the processor.
+func (l literal) String() string {
+	var parts []string
+	if l.IsNumber {
+		parts = append(parts, "the number "+strconv.FormatFloat(l.Number, 'g', -1, 64))
+	}
+	switch {
+	case l.IsPlayer && (l.Inside >= 1<<63 || l.Inside < -(1<<63)):
+		parts = append(parts, "a player whose number is past an int")
+	case l.IsPlayer:
+		parts = append(parts, "the player "+strconv.Itoa(l.Player))
+	}
+	return strings.Join(parts, ", ")
+}
+
+// refusedAt is what an error of Functions says: its file, its words, its hint and its place. An error that is
+// no *diag.Error has its text for a message and nothing else.
+type refusedAt struct {
+	File, Message, Hint string
+	Line, Column        int
+}
+
+// scanned is what the tokenizer, every scanner and the two literal helpers make of one source.
 type scanned struct {
 	Tokens    []Token
 	Fault     *Fault
@@ -125,18 +171,34 @@ type scanned struct {
 	Map       MapGlobals
 	Functions []Function
 	// Refusal is what Functions says of a source it refuses; its message is empty for a source that is read.
-	Refusal testkit.Refusal
+	Refusal refusedAt
+	// Whole is the literal of all the tokens, and Arguments the literal of each argument of each call of each
+	// function, in their order.
+	Whole     literal
+	Arguments []literal
 }
 
-// scan gives the source to every scanner.
+// scan gives the source to the tokenizer and to every scanner, and what they read to the literal helpers.
 func scan(source string) scanned {
 	made := scanned{Requires: Requires(source), Globals: TopLevelGlobals(source), Map: ReadMapGlobals(source)}
 	made.Tokens, made.Fault = Tokenize(source)
+	made.Whole = literalOf(made.Tokens)
 	functions, err := Functions(source, "war3map.lua")
-	if err != nil {
-		made.Refusal = testkit.RefusalOf("", err)
+	var failure *diag.Error
+	switch {
+	case errors.As(err, &failure):
+		made.Refusal = refusedAt{failure.File, failure.Msg, failure.Hint, failure.Line, failure.Column}
+	case err != nil:
+		made.Refusal = refusedAt{Message: err.Error()}
 	}
 	made.Functions = functions
+	for _, function := range functions {
+		for _, call := range function.Calls {
+			for _, argument := range call.Args {
+				made.Arguments = append(made.Arguments, literalOf(argument))
+			}
+		}
+	}
 	return made
 }
 
@@ -171,11 +233,22 @@ func tokenLines(tokens []Token) string {
 	return lines.String()
 }
 
+// shownEach is each value as testkit.Shown writes it, with a space between two.
+func shownEach(values []string) string {
+	var shown []string
+	for _, value := range values {
+		shown = append(shown, testkit.Shown(value))
+	}
+	return strings.Join(shown, " ")
+}
+
 // text is the scan of a source as a recording holds it: a line or a few for what each scanner made. A source
-// or a list of tokens that is long stands as its digest.
+// or a list of tokens that is long stands as its digest. Every value that comes from the source is quoted or
+// written through testkit.Shown, so that the recording is text whatever bytes the source holds, and no line
+// ends in a space.
 func (s scanned) text(name, source string) string {
 	var out strings.Builder
-	fmt.Fprintf(&out, "== %s\n", name)
+	fmt.Fprintf(&out, "== %s\n", testkit.Shown(name))
 	if len(source) > longest {
 		fmt.Fprintf(&out, "source: %s\n", testkit.Digest([]byte(source)))
 	} else {
@@ -186,38 +259,48 @@ func (s scanned) text(name, source string) string {
 	} else {
 		fmt.Fprintf(&out, "tokens: %d\n%s", len(s.Tokens), lines)
 	}
+	if whole := s.Whole.String(); whole != "" {
+		fmt.Fprintf(&out, "the tokens as a literal: %s\n", whole)
+	}
 	if s.Fault != nil {
-		fmt.Fprintf(&out, "fault: %s at %d\n", s.Fault.Msg, s.Fault.Offset)
+		fmt.Fprintf(&out, "fault: %s at %d\n", testkit.Shown(s.Fault.Msg), s.Fault.Offset)
 	}
 	for _, require := range s.Requires {
 		fmt.Fprintf(&out, "require: line %d, %q, literal %v\n", require.Line, require.Name, require.Literal)
 	}
 	if len(s.Globals) > 0 {
-		fmt.Fprintf(&out, "top-level globals: %s\n", strings.Join(s.Globals, " "))
+		fmt.Fprintf(&out, "top-level globals: %s\n", shownEach(s.Globals))
 	}
 	for _, global := range s.Map.Globals {
-		fmt.Fprintf(&out, "map global: %s %s\n", global.Name, global.Type)
+		fmt.Fprintf(&out, "map global: %s %s\n", testkit.Shown(global.Name), testkit.Shown(global.Type))
 	}
 	if len(s.Map.Functions) > 0 {
-		fmt.Fprintf(&out, "map functions: %s\n", strings.Join(s.Map.Functions, " "))
+		fmt.Fprintf(&out, "map functions: %s\n", shownEach(s.Map.Functions))
 	}
+	argument := 0
 	for _, function := range s.Functions {
-		fmt.Fprintf(&out, "function %s: %d-%d, its end at %d\n", function.Name, function.Start, function.End,
-			function.EndStart)
+		fmt.Fprintf(&out, "function %s: %d-%d, its end at %d\n", testkit.Shown(function.Name), function.Start,
+			function.End, function.EndStart)
 		for _, call := range function.Calls {
-			var arguments []string
-			for _, argument := range call.Args {
-				arguments = append(arguments, rawsOf(argument))
+			fmt.Fprintf(&out, "  call %s: %d-%d, %d arguments\n", testkit.Shown(call.Name), call.Start, call.End,
+				len(call.Args))
+			for i, tokens := range call.Args {
+				text := rawsOf(tokens)
+				if len(text) > longest {
+					text = testkit.Digest([]byte(text))
+				}
+				fmt.Fprintf(&out, "    argument %d: %q", i+1, text)
+				if literal := s.Arguments[argument].String(); literal != "" {
+					fmt.Fprintf(&out, ", %s", literal)
+				}
+				out.WriteString("\n")
+				argument++
 			}
-			text := strings.Join(arguments, " , ")
-			if len(text) > longest {
-				text = testkit.Digest([]byte(text))
-			}
-			fmt.Fprintf(&out, "  call %s: %d-%d, %d arguments: %s\n", call.Name, call.Start, call.End, len(call.Args), text)
 		}
 	}
 	if s.Refusal.Message != "" {
-		fmt.Fprintf(&out, "functions refused at %d:%d: %s\n", s.Refusal.Line, s.Refusal.Column, s.Refusal.Message)
+		fmt.Fprintf(&out, "functions refused at %d:%d: %s\n", s.Refusal.Line, s.Refusal.Column,
+			testkit.Shown(s.Refusal.Message))
 	}
 	return out.String() + "\n"
 }
@@ -231,10 +314,9 @@ func scans(sources []namedSource, scan func(source string) scanned) []byte {
 	return []byte(text.String())
 }
 
-// TestTheScannersAreAsRecorded holds what the tokenizer and the four scanners make of every corner source, and
-// of the Lua files of the checkout, to two recordings. A change of what any of them reads is a line of a diff
-// that names the source.
+// TestTheScannersAreAsRecorded holds what the tokenizer, the four scanners and the two literal helpers make of
+// every corner source to a recording: one file for a table that would be several hundred rows. A change of
+// what any of them reads is a line of a diff that names the source.
 func TestTheScannersAreAsRecorded(t *testing.T) {
 	testkit.Recorded(t, "corners.txt", scans(cornerSources, scan))
-	testkit.Recorded(t, "files.txt", scans(luaFilesOfTheCheckout(t), scan))
 }

@@ -19,6 +19,15 @@ var literalNumbers = []struct {
 }{
 	{"0", 0, true},
 	{"0xF", 15, true},
+	// Every letter of a hexadecimal digit is taken, in either case.
+	{"0xABCDEF", 0xABCDEF, true},
+	{"0xabcdef", 0xABCDEF, true},
+	// The x of a hexadecimal integer and the e of an exponent are taken in either case.
+	{"0X10", 16, true},
+	{"-0X10", -16, true},
+	{"1E5", 100000, true},
+	{".5E+2", 50, true},
+	{"1e5", 100000, true},
 	{"-0xF", -15, true},
 	{"-.5", -.5, true},
 	{"1.", 1, true},
@@ -41,6 +50,10 @@ var playerIDs = []struct {
 	{"Player(0)", 0, true},
 	{"Player(-1)", -1, true},
 	{"Player(0x17)", 23, true},
+	// A whole number past 32 bits is the number it is.
+	{"Player(4294967296)", 4294967296, true},
+	{"Player(-2147483649)", -2147483649, true},
+	{"Player(0x7fffffffffff)", 0x7fffffffffff, true},
 	{"Player(1.5)", 0, false},
 	{"Player(1+2)", 0, false},
 	{"Player(0,1)", 0, false},
@@ -73,6 +86,21 @@ func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 	for _, c := range playerIDs {
 		if value, ok := PlayerID(argument(t, c.source)); ok != c.ok || value != c.value {
 			t.Errorf("PlayerID(%s) = %v, %v, want %v, %v", c.source, value, ok, c.value, c.ok)
+		}
+	}
+}
+
+// The tokenizer gives a malformed numeral as a number token beside its fault. Such a token is no number: a
+// setting whose value is one is not read as zero.
+func TestAMalformedNumeralIsNoLiteralNumber(t *testing.T) {
+	for _, source := range []string{"0x", "0X", "3a", "1x5", "1e", "1E", "1e+", "1e-", "1.2.3", ".5e"} {
+		tokens, fault := Tokenize(source)
+		if fault == nil || len(tokens) != 1 || tokens[0].Kind != NumberToken || tokens[0].Raw != source {
+			t.Errorf("Tokenize(%s) = %+v, fault %+v; want one number token and a fault", source, tokens, fault)
+			continue
+		}
+		if value, ok := LiteralNumber(tokens); ok || value != 0 {
+			t.Errorf("LiteralNumber of the malformed numeral %s = %v, %v, want 0 and false", source, value, ok)
 		}
 	}
 }
