@@ -223,9 +223,12 @@ func splitIDs(cell string) []string {
 const labelDepth = 8
 
 // labelOf is the label of a field as World Editor shows it. The row names a key of the editor's strings in its
-// displayName, and the string of a key may be a key again: the keys are followed for labelDepth strings. found
-// is false for a row that names no key, whose label is empty, and for a key that the strings do not have or
-// that leads back to itself, whose label is the key.
+// displayName, and the string of a key may be a key again: the keys are followed for labelDepth strings.
+//
+// found is false for a row that names no key, whose label is empty; for a key that the strings do not have; and
+// for keys that lead in a circle and stand at the first again after labelDepth strings. In the last two the
+// label is the key. Keys that lead in a circle and stand at another of them after labelDepth strings have that
+// key for a label, and found is true.
 func labelOf(row slk.Row, labels ini.Section) (label string, found bool) {
 	key, named := row.Get("displayName")
 	if !named {
@@ -239,8 +242,8 @@ func labelOf(row slk.Row, labels ini.Section) (label string, found bool) {
 		}
 		label = next
 	}
-	// A key without a string was not followed, and one that leads back to itself ends where it started: in both
-	// the label is still the key, and none was found.
+	// A key without a string was not followed, and keys in a circle that the last string closes end where they
+	// started: in both the label is still the key, and none was found.
 	return effectLabel(label, row), label != key
 }
 

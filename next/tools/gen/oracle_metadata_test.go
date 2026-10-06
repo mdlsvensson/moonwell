@@ -223,9 +223,8 @@ func orderedApart(_ testing.TB, files map[string]string) {
 // of the export missing, the folder of the strings and the export itself missing, a table that does not parse,
 // a cell that is no number or not whole, a count of levels that is none; overrides that are cut short, hold
 // nothing, are no JSON, start with a byte order mark, have something after their object, are null, and have a
-// key twice; a wrong count of arguments; the runs of the classes, which the header of oracle_test.go names;
-// seeded changes of the editor's strings; and a folder
-// that is no checkout.
+// key twice; a wrong count of arguments; the runs of the classes, which the header of oracle_test.go names; seeded
+// changes of the editor's strings; and a folder that is no checkout.
 func metadataRuns() []oracleRun {
 	const (
 		nbsp = "\xC2\xA0"

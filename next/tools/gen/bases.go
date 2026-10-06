@@ -176,7 +176,7 @@ func (s nameSource) of(strs ini.File, id string, row slk.Row) string {
 
 // firstListItem is the first entry of a list with commas between its entries: what stands before the first
 // comma, or, for a list that opens with a quote, what stands between that quote and the next one. A list that
-// opens with a quote and has no other gives what follows the quote without its last byte.
+// opens with a quote and has no other quote gives what follows the quote without its last byte.
 func firstListItem(list string) string {
 	quoted, opens := strings.CutPrefix(list, `"`)
 	if !opens {

@@ -221,18 +221,16 @@ import (
 //     of a checkout that the mode without a name is run in (inTheLabels), or the values that a run of the mode
 //     metadata holds, each of which must stand in its file of the export (inTheExport, heldOrderedApart,
 //     aFieldIDPaddedApart). The last two are of the Lua extras of a line of natives, and say their predicates
-//     below. The run names what
-//     the two trees make apart, a file by its path from the checkout and a stream by its name (standard output,
-//     standard error), and in
-//     each the places: what the other tree wrote there, and what this tree must write in its stead (apart). That
-//     is the one form there is: a file or a stream of such a run is held to the other tree's text with those
-//     places changed, so everything outside them is compared with the other tree's, and no text of a whole file
-//     stands in a run, where this tree's generator could have made it. A place must be in the other tree's text
-//     exactly once, and the two trees must write it apart; a run in which they make the file or the stream alike
-//     fails, since the class is about a difference. A place must also be of the difference of its class, as the
-//     row of the class says what one looks like (shows). A report of a text that is written otherwise shows
-//     where the two part, and one line of each. The exit code, a stream that the run does not name, the names of
-//     all that the checkout holds and every other file are compared whole.
+//     below. The run names what the two trees make apart, a file by its path from the checkout and a stream by its name
+//     (standard output, standard error), and in each the places: what the other tree wrote there, and what this tree
+//     must write in its stead (apart). That is the one form there is: a file or a stream of such a run is held to the
+//     other tree's text with those places changed, so everything outside them is compared with the other tree's, and no
+//     text of a whole file stands in a run, where this tree's generator could have made it. A place must be in the
+//     other tree's text exactly once, and the two trees must write it apart; a run in which they make the file or the
+//     stream alike fails, since the class is about a difference. A place must also be of the difference of its class,
+//     as the row of the class says what one looks like (shows). A report of a text that is written otherwise shows
+//     where the two part, and one line of each. The exit code, a stream that the run does not name, the names of all
+//     that the checkout holds and every other file are compared whole.
 //   - WiderSpace, 6 runs (hasWiderSpaceAtAnEdge, isWiderSpace): white space outside ASCII, which the other tree
 //     takes off a line of the list, and writes as one space in a label and a category, and this tree takes for
 //     text. In a list: a line that starts or ends with such a character once its ASCII white space is off, a

@@ -252,12 +252,13 @@ func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 		"WESTRING_1": "WESTRING_2", "WESTRING_2": "WESTRING_3", "WESTRING_3": "WESTRING_4", "WESTRING_4": "WESTRING_5",
 		"WESTRING_5": "WESTRING_6", "WESTRING_6": "WESTRING_7", "WESTRING_7": "WESTRING_8", "WESTRING_8": "Eight Deep",
 		"WESTRING_0": "WESTRING_1", "WESTRING_PING": "WESTRING_PONG", "WESTRING_PONG": "WESTRING_PING",
+		"WESTRING_X": "WESTRING_Y", "WESTRING_Y": "WESTRING_Z", "WESTRING_Z": "WESTRING_X",
 		"": "The Label of No Key",
 	}
 	rows := rowsOf(t, []string{"ID", "displayName"},
 		[]any{"aaaa", "WESTRING_A"}, []any{"bbbb", "WESTRING_B"}, []any{"cccc", "WESTRING_1"},
 		[]any{"dddd", "WESTRING_0"}, []any{"eeee", "WESTRING_NONE"}, []any{"ffff", "WESTRING_SELF"},
-		[]any{"gggg", "WESTRING_PING"}, []any{"hhhh", nil}, []any{"iiii", ""},
+		[]any{"gggg", "WESTRING_PING"}, []any{"hhhh", nil}, []any{"iiii", ""}, []any{"jjjj", "WESTRING_X"},
 	)
 	for i, c := range []struct {
 		label string
@@ -276,6 +277,8 @@ func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 		{"", false, "hhhh: no displayName cell, so no World Editor label"},
 		// An empty key is a key: the strings may have a label for it.
 		{"The Label of No Key", true, ""},
+		// Three keys that lead in a circle end, after eight strings, at the third: a label that is a key.
+		{"WESTRING_Z", true, ""},
 	} {
 		label, found := labelOf(rows[i], labels)
 		if label != c.label || found != c.found {
