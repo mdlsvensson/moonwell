@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"maps"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
 func TestNormalizeGamePathStripsStoragePrefixesAndKeepsOnlyModelReferencedFileTypes(t *testing.T) {
@@ -20,6 +23,7 @@ func TestNormalizeGamePathStripsStoragePrefixesAndKeepsOnlyModelReferencedFileTy
 		{`war3.w3mod:_de.w3mod:abilities\ribbon\chainlightning.pkb`, "abilities/ribbon/chainlightning.pkb"},
 		// A folder is a container, and a file is none: the last step of a path is kept whatever its name.
 		{"Textures//Deep.w3mod//Black32.tga", "black32.tga"},
+		{"Textures/Deep.mpq/Black32.tga", "black32.tga"},
 		{"textures/odd.mpq.png", "textures/odd.mpq.png"},
 	} {
 		if got, ok := normalizeGamePath(c.line); !ok || got != c.want {
@@ -207,5 +211,30 @@ func TestTheModeGamePathsNamesTheFileItCannotWriteByItsPathFromTheCheckout(t *te
 	}
 	if printed != "" || len(files) != 0 {
 		t.Errorf("the failed run printed %q and left %q", printed, texts(files))
+	}
+}
+
+// The game's list of file names, with the version that the committed list states, gives the committed list byte
+// for byte, and the run prints how many paths that list has: its lines after the first. The test reads the list
+// that MOONWELL_GAME_LISTFILE names, and takes a second.
+func TestTheModeGamePathsWritesTheCommittedListFromTheGamesList(t *testing.T) {
+	list := testkit.NeedExport(t, "MOONWELL_GAME_LISTFILE").Path()
+	want := string(realFile(t, gamePathsPath))
+	first, paths, _ := strings.Cut(want, "\n")
+	version, found := strings.CutPrefix(first, "# Warcraft III ")
+	if !found {
+		t.Fatalf("the first line of %s is %q", gamePathsPath, first)
+	}
+	c := newCheckout(t)
+	c.folder("data")
+	printed, files, err := c.run("game-paths", list, version)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := string(files[gamePathsPath]); got != want {
+		t.Errorf("the game's list does not give the committed %s: %s", gamePathsPath, parting(want, got))
+	}
+	if count := fmt.Sprintf("wrote data/game-paths.txt: %d paths.\n", strings.Count(paths, "\n")); printed != count {
+		t.Errorf("the run printed %q, want %q", printed, count)
 	}
 }

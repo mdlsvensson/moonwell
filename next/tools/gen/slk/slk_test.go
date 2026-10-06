@@ -149,6 +149,31 @@ func TestColumnsAndRowsAreInTheOrderOfTheirNumbers(t *testing.T) {
 	}
 }
 
+// besideTheHeader has a header row that names its second column alone, and a row with a cell in each of the two.
+const besideTheHeader = "C;X2;Y1;K\"ID\"\nC;X1;Y2;K\"no header\"\nC;X2;K\"abcd\"\n"
+
+// A cell in a column that the header row does not name is left out of its row: the row has no cell without a
+// name, and its first cell is the first that has one.
+func TestACellInAColumnTheHeaderRowDoesNotNameIsLeftOut(t *testing.T) {
+	for name, text := range map[string]string{
+		"a cell after the columns of the header row": otherRecords,
+		"a cell before them":                         besideTheHeader,
+	} {
+		table, err := slk.Parse(text, "beside.slk")
+		if err != nil || len(table.Rows) == 0 {
+			t.Errorf("%s: table %v, error %v", name, table, err)
+			continue
+		}
+		row := table.Rows[0]
+		if cell, has := row.Get(""); has || row.Value("") != "" {
+			t.Errorf("%s: the row has the cell %q under no name", name, cell)
+		}
+		if row.First() != "abcd" {
+			t.Errorf("%s: the first cell of the row is %q, want the cell of the column ID", name, row.First())
+		}
+	}
+}
+
 // emptyTables are texts without a cell: no text, no record, a cell after each form of the end, and a record
 // without a value.
 var emptyTables = []string{"", "ID;P\nE\n", "E\nC;X1;Y1;Ka\n", "E;x\nC;X1;Y1;Ka\n", "C;X1;Y1\n"}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"maps"
 	"os"
@@ -398,6 +399,19 @@ func TestRenderNativesWritesTheTextOfTheFile(t *testing.T) {
 `
 	if got := renderNatives(natives); got != want {
 		t.Errorf("the natives are not written as the file has them: %s", parting(want, got))
+	}
+}
+
+// The file that the mode writes is read back as the program reads it: a function of each of the two orders of
+// keys, a function without a parameter, and the lists of Lua among it.
+func TestRenderNativesWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
+	made := miniNatives()
+	var read script.Natives
+	if err := json.Unmarshal([]byte(renderNatives(made)), &read); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(&read, made) {
+		t.Errorf("the natives read back as %+v, want %+v", read, made)
 	}
 }
 

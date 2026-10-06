@@ -338,13 +338,7 @@ func TestDecodeOverridesRefusesWhatTheFileMustNotHold(t *testing.T) {
 // write. A pin of the name a field has now, and a field that is listed as removed, are let through.
 func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) {
 	game := readMini(t, nil)
-	metadataOf := func(pins overrides) *objects.Metadata {
-		fields, _, err := nameFields(game, pins)
-		if err != nil {
-			t.Fatal(err)
-		}
-		return &objects.Metadata{Format: 1, Game: "3.0.0.2", Fields: fields}
-	}
+	metadataOf := func(pins overrides) *objects.Metadata { return metadataPinned(t, game, pins) }
 	current := metadataOf(unitClass)
 	released := renderMetadata(current)
 	renamed := strings.Replace(released, `"name":"hitPointsMaximumBase"`, `"name":"hitPoints"`, 1)
@@ -388,6 +382,39 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 	if err := keepsReleasedNames(pinned, c.root, pins); err == nil || !strings.Contains(err.Error(), "upgrades gold") {
 		t.Errorf("a field removed under another list: got %v", err)
 	}
+}
+
+// A pin lets a released field take another name: a name is held to the one that is released unless the overrides
+// pin the name the field has now, which is how a name is changed on purpose. The fields of units and of items
+// are one table, so a pin is of both lists, under whichever of the two it is written.
+func TestKeepsReleasedNamesLetsAPinGiveAReleasedFieldAnotherName(t *testing.T) {
+	game := readMini(t, nil)
+	c := newCheckout(t)
+	c.write(metadataPath, renderMetadata(metadataPinned(t, game, unitClass)))
+	for under, names := range map[string]map[string]map[string]string{
+		"units": {"units": {"ucls": "unitClass", "uhpm": "health", "unam": "title"}},
+		"items": {"units": {"ucls": "unitClass", "uhpm": "health"}, "items": {"unam": "title"}},
+	} {
+		pins := overrides{Names: names}
+		pinned := metadataPinned(t, game, pins)
+		units, items := namesOf(pinned.Fields["units"]), namesOf(pinned.Fields["items"])
+		equal(t, "the names of uhpm, and of unam in both lists, with unam pinned under "+under,
+			[]string{units["uhpm"], units["unam"], items["unam"]}, []string{"health", "title", "title"})
+		if err := keepsReleasedNames(pinned, c.root, pins); err != nil {
+			t.Errorf("unam pinned under %s: the pins of other names than the released ones are refused: %v", under, err)
+		}
+	}
+}
+
+// metadataPinned is the metadata of an export's fields, named with these pins, as the mode makes it but for the
+// standard objects.
+func metadataPinned(t testing.TB, game gameData, pins overrides) *objects.Metadata {
+	t.Helper()
+	fields, _, err := nameFields(game, pins)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return &objects.Metadata{Format: 1, Game: "3.0.0.2", Fields: fields}
 }
 
 // A released metadata that cannot be read is refused by its path from the checkout: one that is a folder, with

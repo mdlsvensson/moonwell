@@ -156,6 +156,20 @@ func TestStorageOfIsAnIntForNumbersFlagsAndEnumerationsAndAStringForTheRest(t *t
 	}
 }
 
+// A field is a list when the name of its type has List in it, with the capital: at the end of the name, or
+// before it.
+func TestFieldRecordMarksAFieldAsAListByTheNameOfItsType(t *testing.T) {
+	for fieldType, want := range map[string]bool{
+		"abilityList": true, "stringList": true, "pathingListPrevent": true, "List": true,
+		"string": false, "listing": false, "LIST": false, "": false,
+	} {
+		rows := rowsOf(t, []string{"ID", "type"}, []any{"upat", fieldType})
+		if got, err := fieldRecord(rows[0], "Label", "units"); err != nil || got.List != want {
+			t.Errorf("a field of the type %q: a list %v, %v; want %v", fieldType, got.List, err, want)
+		}
+	}
+}
+
 // The uses of a field stand in the one order of a record, whatever the order of the table's columns, and 1
 // alone marks a use. A field of another table than the units' has no use.
 func TestUsesOfListsTheKindsOfObjectWhoseColumnHasOne(t *testing.T) {

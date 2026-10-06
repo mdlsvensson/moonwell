@@ -82,19 +82,21 @@ func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(
 }
 
 // The renames are reported in the order of the lists, and in a list in the order of the ids' bytes: capitals
-// first. A field of units and of items is reported once, under the units.
+// first. A field of units and of items is reported once, under the units, and a field that items alone use under
+// the items.
 func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testing.T) {
 	folder := exportedGame(t, func(files map[string]string) {
 		files[labelsFile] += "WESTRING_GPCT=Name\r\nWESTRING_FART=Name\r\n"
 	})
-	c := withPins(t, `{"names": {"items": {"unam": "unitName"}, "units": {"ucls": "unitClass"}}}`)
+	c := withPins(t, `{"names": {"items": {"unam": "unitName", "ifil": "itemModel"}, "units": {"ucls": "unitClass"}}}`)
 	printed, _, err := c.run("metadata", folder, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	contains(t, printed, `renamed (8):
+	contains(t, printed, `renamed (9):
   units ucls "class" -> "unitClass" (override)
   units unam "name" -> "unitName" (override)
+  items ifil "modelFile" -> "itemModel" (override)
   abilities Htb1 "cooldown" -> "dataCooldown" (category prefix)
   abilities acdn "cooldown" -> "statsCooldown" (category prefix)
   buffs fart "name" -> "artName" (category prefix)
