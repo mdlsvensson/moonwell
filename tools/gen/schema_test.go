@@ -530,7 +530,7 @@ func TestTheModeWithoutANameWritesNothingWhenANameCannotBeAProperty(t *testing.T
 	if err == nil {
 		t.Fatal("a field named output was written into the schema")
 	}
-	contains(t, err.Error(), "Cannot render the Pkl schema", `BuffProps: field "fout" (output) has the name "output"`)
+	contains(t, err.Error(), "cannot render the Pkl schema", `BuffProps: field "fout" (output) has the name "output"`)
 	if printed != "" || !reflect.DeepEqual(files, before) {
 		t.Errorf("the refused run printed %q and left %q", printed, slices.Sorted(maps.Keys(files)))
 	}

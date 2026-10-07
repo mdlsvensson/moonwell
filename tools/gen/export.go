@@ -264,6 +264,15 @@ func errMissingFromExport(path, folder string) error {
 	return errors.New(path + " is missing from " + folder)
 }
 
+// rowNamed is how a refusal names a row of a table: the table by its path as the generator asks for it, and
+// the row by its id.
+func rowNamed(table, id string) string { return table + ": " + id }
+
+// errInRow is a fault of a row of a table, with the table and the row.
+func errInRow(table, id string, fault error) error {
+	return errors.New(rowNamed(table, id) + ": " + fault.Error())
+}
+
 // errNoColumn refuses a table, by its path as the generator asks for it, that lacks a column the generator
 // reads, and says where the column's name stands.
 func errNoColumn(path, column string) error {

@@ -107,7 +107,7 @@ func TestNameFieldsAddsTheRawcodeWhereTheCategoryLeavesAClash(t *testing.T) {
 // A name that no property can have is refused, with the field, its label and where to pin a name for it.
 func TestNameFieldsRefusesANameThatNoPropertyCanHaveWithoutAPin(t *testing.T) {
 	contains(t, refusal(t, overrides{}, nil), "cannot derive friendly names:\n  ", `units ucls "class" (Class)`,
-		"add a name for it to tools/metadata/overrides.json")
+		`pin another under "names", "units", "ucls" in tools/metadata/overrides.json`)
 	contains(t, refusal(t, unitClass, withLabels("WESTRING_FART=Base")), `buffs fart "base" (Base)`)
 
 	// Every keyword of Pkl and every reserved name is refused: the lists are the schema's.
@@ -203,32 +203,42 @@ func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 	})
 }
 
-// What cannot stand after the two renamings is refused: two pins of one name in a group, a pin that no property
-// can have, two fields that share their id and their label, and a field that lists a base ability twice, which
-// clashes with itself.
+// What cannot stand after the two renamings is refused: two pins of one name in a group, each with the other
+// field and what to do; a pin that no property can have, as a pin that is refused; and two fields that share
+// their id and their label.
 func TestNameFieldsRefusesTheNamesThatStillClashOrCannotStand(t *testing.T) {
 	pinned := func(names map[string]string) overrides {
 		return overrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}, "abilities": names}}
 	}
 	got := refusal(t, pinned(map[string]string{"acdn": "cool", "Htb1": "cool", "alev": "Levels", "anam": "class"}), nil)
-	const want = "cannot derive friendly names:\n" +
-		"  abilities acdn \"cool\" (Cooldown): clashes with another field\n" +
-		"  abilities Htb1 \"cool\" (Cooldown): clashes with another field\n" +
-		"  abilities anam \"class\" (Name): not a valid property name, a Pkl keyword or a reserved name; add a name for " +
-		"it to tools/metadata/overrides.json\n" +
-		"  abilities alev \"Levels\" (Levels): not a valid property name, a Pkl keyword or a reserved name; add a name " +
-		"for it to tools/metadata/overrides.json"
-	if got != want {
-		t.Errorf("got %q, want %q", got, want)
+	contains(t, got, "cannot derive friendly names:\n",
+		"\n  abilities acdn \"cool\" (Cooldown): Htb1 (Cooldown) has this name too, and one object can have both: "+
+			"pin another name for one of the two in tools/metadata/overrides.json",
+		"\n  abilities Htb1 \"cool\" (Cooldown): acdn (Cooldown) has this name too",
+		"\n  abilities anam \"class\" (Name): the pin is refused: no property can have this name",
+		"\n  abilities alev \"Levels\" (Levels): the pin is refused: ")
+	if strings.Contains(got, `pin another under "names"`) {
+		t.Errorf("a pin that is refused is told to be pinned: %s", got)
 	}
 	contains(t, refusal(t, unitClass, func(files map[string]string) {
 		files[buffFieldsTable] = withRow(files[buffFieldsTable],
 			`C;X1;Y4;K"fnam"`, `C;X3;K"text"`, `C;X4;K"WESTRING_FNAM"`, `C;X5;K"string"`)
-	}), "  buffs fnam \"textNameFnam\" (Name): clashes with another field\n"+
-		"  buffs fnam \"textNameFnam\" (Name): clashes with another field")
-	contains(t, refusal(t, unitClass, func(files map[string]string) {
+	}), `buffs fnam "textNameFnam" (Name): fnam (Name) has this name too`)
+}
+
+// A field that lists a base ability twice is of that ability once: it shares its name with no other field
+// there, and keeps the name of its label.
+func TestNameFieldsFindsNoClashOfAFieldWithItself(t *testing.T) {
+	fields, renames := namedFields(t, func(files map[string]string) {
 		files[abilityFieldsTable] = strings.Replace(files[abilityFieldsTable], `K"AHtb,AHhb"`, `K"AHtb,AHtb"`, 1)
-	}), `abilities Hdc1 "dataDamageDealtPercentHdc1" (Damage Dealt (%)): clashes with another field`)
+	})
+	equal(t, "the name of Hdc1", namesOf(fields["abilities"])["Hdc1"], "damageDealtPercent")
+	equal(t, "the bases of Hdc1", byID(fields["abilities"])["Hdc1"].Specific, []string{"AHtb", "AHtb"})
+	for _, line := range reported(renames) {
+		if strings.Contains(line, "Hdc1") {
+			t.Errorf("the field is reported as renamed: %s", line)
+		}
+	}
 }
 
 // The groups that a name must be the only one in: the kinds of object that use a field of the units' table;
@@ -249,18 +259,20 @@ func TestGroupsOfIsTheFieldsThatCanMeetInOneObject(t *testing.T) {
 		{"common", "AHhb", "ANew"},
 		{"common", "AHhb", "AHtb", "ANew", "AOld"},
 	})
-	// Two fields of the units' table with one label clash where one kind of object uses both.
-	named := func(use ...string) objects.FieldMeta { return objects.FieldMeta{Name: "shared", Use: use} }
+	// Two fields of the units' table with one label clash where one kind of object uses both: each is found
+	// with the other. A field that is twice in a group does not clash with itself.
+	shared := func(use ...string) objects.FieldMeta { return objects.FieldMeta{Name: "shared", Use: use} }
+	other := objects.FieldMeta{Name: "other", Use: []string{"item"}}
 	for _, c := range []struct {
 		fields []objects.FieldMeta
-		want   []int
+		want   map[int]int
 	}{
-		{[]objects.FieldMeta{named("hero"), named("building"), named("item")}, nil},
-		{[]objects.FieldMeta{named("hero"), named("building", "hero"), named("item")}, []int{0, 1}},
-		{[]objects.FieldMeta{named("unit", "item"), named("building"), named("item"), {Name: "other", Use: []string{"item"}}},
-			[]int{0, 2}},
+		{[]objects.FieldMeta{shared("hero"), shared("building"), shared("item")}, map[int]int{}},
+		{[]objects.FieldMeta{shared("hero"), shared("building", "hero"), shared("item")}, map[int]int{0: 1, 1: 0}},
+		{[]objects.FieldMeta{shared("unit", "item"), shared("building"), shared("item"), other}, map[int]int{0: 2, 2: 0}},
+		{[]objects.FieldMeta{shared("hero", "hero"), other}, map[int]int{}},
 	} {
-		equal(t, "the fields that clash", clashing(c.fields, groupsOf(c.fields, "units", nil)), c.want)
+		equal(t, "the fields that clash", clashes(c.fields, groupsOf(c.fields, "units", nil)), c.want)
 	}
 }
 
@@ -325,14 +337,20 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 		t.Errorf("the names that are released: %v", err)
 	}
 	c.write(metadataPath, renamed)
-	const want = "released friendly names would change. Pin each in tools/metadata/overrides.json \"names\", or list a " +
-		"field the game no longer has under \"removed\":\n" +
+	// The refusal says what to do for each of the two kinds of line, and where, and then has the lines.
+	const lines = ":\n" +
 		"  units uhpm \"hitPoints\" would become \"hitPointsMaximumBase\"\n" +
 		"  units unam \"unitName\" would become \"name\"\n" +
 		"  items unam \"unitName\" would become \"name\"\n" +
 		"  upgrades gold \"percentBonusAndMore\" would disappear"
-	if err := keepsReleasedNames(current, c.root, unitClass); err == nil || err.Error() != want {
-		t.Errorf("got %v, want %q", err, want)
+	err := keepsReleasedNames(current, c.root, unitClass)
+	if err == nil || !strings.HasSuffix(err.Error(), lines) {
+		t.Fatalf("got %v, want the lines %q", err, lines)
+	}
+	contains(t, err.Error(), "released friendly names would change. In tools/metadata/overrides.json, ",
+		`under "names"`, `under "removed"`)
+	if strings.Contains(err.Error(), "no longer") {
+		t.Errorf("the refusal tells of what was: %v", err)
 	}
 	if kept := string(c.all()[metadataPath]); kept != renamed {
 		t.Error("the check wrote the metadata")

@@ -166,7 +166,7 @@ func errUnknownMode(table []mode, name string) error {
 			named = append(named, row.name)
 		}
 	}
-	return errors.New("Unknown mode '" + name + "'. The modes are " + listed(named) + "; without one, gen writes " +
+	return errors.New("unknown mode '" + name + "'. The modes are " + listed(named) + "; without one, gen writes " +
 		schemaFolder + ".")
 }
 

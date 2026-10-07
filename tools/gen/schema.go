@@ -231,7 +231,7 @@ func oneLine(text string) string {
 
 // errUnusableNames refuses to render the schema, with a line for each name that stands in its way.
 func errUnusableNames(problems []string) error {
-	return errors.New("Cannot render the Pkl schema; fix the names in tools/metadata/overrides.json:\n" +
+	return errors.New("cannot render the Pkl schema; fix the names in tools/metadata/overrides.json:\n" +
 		strings.Join(problems, "\n"))
 }
 

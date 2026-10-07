@@ -39,8 +39,8 @@ func readExtras(checkout string) (extras, error) {
 // checkExtras holds the extras to what an entry of the natives needs: every function has its name, its list of
 // parameters, which may be empty, and what it returns; every parameter has its name and its type; and no global
 // is an empty name. A key that the file leaves out, null and an empty text are one here: the reading leaves all
-// three empty, and so null for an entry of a list is refused too. A function is named by its place in the list,
-// counted from 1.
+// three empty, and so null for an entry of a list is refused as well. A function is named by its place in the
+// list, counted from 1.
 func checkExtras(lua extras) error {
 	for i, function := range lua.Functions {
 		called := "function " + strconv.Itoa(i+1)

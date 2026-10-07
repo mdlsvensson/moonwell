@@ -14,9 +14,11 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-// fieldTable is one of the game's tables of fields: its rows, and the lists of data/metadata.json that its
-// fields go to. The first list is the table's name in a pin and in a message.
+// fieldTable is one of the game's tables of fields: its path from the folder of the export, which names it in
+// a message, its rows, and the lists of data/metadata.json that its fields go to. The first list is the one
+// that a pin of a field of the table stands under.
 type fieldTable struct {
+	path  string
 	rows  []slk.Row
 	lists []string
 }
@@ -25,10 +27,10 @@ type fieldTable struct {
 // the units' fields is the items' too.
 func fieldTables(game gameData) []fieldTable {
 	return []fieldTable{
-		{game.unitFields, []string{"units", "items"}},
-		{game.abilityFields, []string{"abilities"}},
-		{game.buffFields, []string{"buffs"}},
-		{game.upgradeFields, []string{"upgrades"}},
+		{unitFieldsTable, game.unitFields, []string{"units", "items"}},
+		{abilityFieldsTable, game.abilityFields, []string{"abilities"}},
+		{buffFieldsTable, game.buffFields, []string{"buffs"}},
+		{upgradeFieldsTable, game.upgradeFields, []string{"upgrades"}},
 	}
 }
 
@@ -56,7 +58,7 @@ func nameFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, 
 		for i, field := range records {
 			lists := listsOf(field, table.lists)
 			if len(lists) == 0 {
-				problems = append(problems, usedByNothing(field))
+				problems = append(problems, usedByNothing(table.path, field))
 				continue
 			}
 			for _, list := range lists {
@@ -109,16 +111,16 @@ func listsOf(field objects.FieldMeta, lists []string) []string {
 // ---- a record of a row ----
 
 // fieldRecords is a record of each row of a table, in the order of the rows and without a name yet, and a line
-// for each row that has no label. A cell that is no number ends it.
+// for each row that has no label. A cell that is no number ends it, with the table and the row.
 func fieldRecords(table fieldTable, labels ini.Section) (records []objects.FieldMeta, unlabelled []string, err error) {
 	for _, row := range table.rows {
 		label, found := labelOf(row, labels)
 		if !found {
-			unlabelled = append(unlabelled, noLabel(row))
+			unlabelled = append(unlabelled, noLabel(table.path, row))
 		}
 		record, err := fieldRecord(row, label, table.lists[0])
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errInRow(table.path, row.Value(fieldKey), err)
 		}
 		records = append(records, record)
 	}
@@ -320,25 +322,28 @@ func errNoFriendlyNames(problems []string) error {
 	return errors.New("cannot derive friendly names:\n  " + strings.Join(problems, "\n  "))
 }
 
-// noLabel is the line for a row whose field has no label: the key that the editor's strings do not lead on
-// from, or that the row names no key.
-func noLabel(row slk.Row) string {
-	key, named := row.Get("displayName")
-	if !named {
-		return row.Value(fieldKey) + ": no displayName cell, so no World Editor label"
+// noLabel is the line for a row of a table whose field has no label: the key that the editor's strings do not
+// lead on from, or that the row names no key.
+func noLabel(table string, row slk.Row) string {
+	key, has := row.Get("displayName")
+	if !has {
+		return rowNamed(table, row.Value(fieldKey)) + ": the row has no displayName cell, which names the label"
 	}
-	return row.Value(fieldKey) + ": no World Editor label for " + key
+	return rowNamed(table, row.Value(fieldKey)) + ": no label for " + key + " in " + labelsFile
 }
 
 // usedByNothing is the line for a field of the units' table that no kind of object uses.
-func usedByNothing(field objects.FieldMeta) string {
-	return displayRawcode(field.ID) + ": applies to no object type"
+func usedByNothing(table string, field objects.FieldMeta) string {
+	return rowNamed(table, displayRawcode(field.ID)) + ": no kind of object uses it: none of useUnit, useHero, " +
+		"useBuilding and useItem is 1"
 }
 
+// errNoNumber and errNotWhole are the faults of a cell that must be a number; fieldRecords names the table and
+// the row.
 func errNoNumber(row slk.Row, column string) error {
-	return errors.New(row.Value(fieldKey) + ": the " + column + " cell '" + row.Value(column) + "' is not a number")
+	return errors.New("the " + column + " cell '" + row.Value(column) + "' is not a number")
 }
 
 func errNotWhole(row slk.Row) error {
-	return errors.New(row.Value(fieldKey) + ": the data column '" + row.Value("data") + "' is not a whole number")
+	return errors.New("the data cell '" + row.Value("data") + "' is not a whole number")
 }

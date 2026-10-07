@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"maps"
 	"regexp"
 	"slices"
 	"strings"
@@ -70,13 +71,14 @@ func assignNames(
 	pinned := applyPins(records, list, pins)
 	groups := groupsOf(records, list, abilities)
 	renamedBy := renameClashes(records, groups, pinned)
-	for _, i := range clashing(records, groups) {
-		problems = append(problems, stillClashes(list, records[i]))
+	with := clashes(records, groups)
+	for _, i := range slices.Sorted(maps.Keys(with)) {
+		problems = append(problems, stillClashes(list, records[i], records[with[i]]))
 	}
 	changes = make([]string, len(records))
 	for i, field := range records {
 		if !friendlyName.MatchString(field.Name) || nameIsTaken(field.Name) {
-			problems = append(problems, noFriendlyName(list, field))
+			problems = append(problems, noFriendlyName(list, field, pinned[i]))
 		}
 		changes[i] = changeOf(fromLabel[i], field.Name, pinned[i], renamedBy[i])
 	}
@@ -124,7 +126,7 @@ var renamings = []renaming{
 func renameClashes(records []objects.FieldMeta, groups [][]string, pinned []bool) [][]string {
 	renamedBy := make([][]string, len(records))
 	for _, way := range renamings {
-		for _, i := range clashing(records, groups) {
+		for i := range clashes(records, groups) {
 			if pinned[i] {
 				continue
 			}
@@ -201,24 +203,28 @@ func mentionedAbilities(records []objects.FieldMeta, abilities []string) []strin
 	return mentioned
 }
 
-// clashing is the fields, each by its index and in their order, whose name is twice in one of their groups. A
-// field that lists a base ability twice is twice in that group, and clashes there with itself.
-func clashing(records []objects.FieldMeta, groups [][]string) []int {
-	sharing := map[string][]int{} // the fields that have a name in a group, by the group, a NUL and the name
+// clashes is the fields whose name another field has too in one of their groups: each by its index, with the
+// index of one such other field, which a refusal names. A field that lists a base ability twice is in that
+// group once, and shares its name with no other field there.
+func clashes(records []objects.FieldMeta, groups [][]string) map[int]int {
+	first := map[string]int{} // the first field that has a name in a group, by the group, a NUL and the name
+	with := map[int]int{}
 	for i, field := range records {
 		for _, group := range groups[i] {
-			named := group + "\x00" + field.Name
-			sharing[named] = append(sharing[named], i)
+			inGroup := group + "\x00" + field.Name
+			earlier, taken := first[inGroup]
+			switch {
+			case !taken:
+				first[inGroup] = i
+			case earlier != i:
+				with[i] = earlier
+				if _, has := with[earlier]; !has {
+					with[earlier] = i
+				}
+			}
 		}
 	}
-	var clash []int
-	for _, fields := range sharing {
-		if len(fields) > 1 {
-			clash = append(clash, fields...)
-		}
-	}
-	slices.Sort(clash)
-	return slices.Compact(clash)
+	return with
 }
 
 // ---- the name of a label ----
@@ -340,36 +346,47 @@ var friendlyName = regexp.MustCompile(`^[a-z][A-Za-z0-9]*$`)
 
 // ---- errors ----
 
-// named is how a line of a refusal names a field: its list, its id as an author writes it, and its name.
-func named(list string, field objects.FieldMeta) string {
+// fieldNamed is how a line of a refusal names a field: its list, its id as an author writes it, and its name.
+func fieldNamed(list string, field objects.FieldMeta) string {
 	return list + " " + displayRawcode(field.ID) + ` "` + field.Name + `"`
 }
 
-// stillClashes is the line for a field whose name another field has after both renamings.
-func stillClashes(list string, field objects.FieldMeta) string {
-	return named(list, field) + " (" + field.Label + "): clashes with another field"
+// stillClashes is the line for a field whose name another field has after both renamings, with that other
+// field: two fields that are pinned to one name, or two rows of a table that have one id.
+func stillClashes(list string, field, other objects.FieldMeta) string {
+	return fieldNamed(list, field) + " (" + field.Label + "): " + displayRawcode(other.ID) + " (" + other.Label +
+		") has this name too, and one object can have both: pin another name for one of the two in " + overridesPath
 }
 
-// noFriendlyName is the line for a field whose name no property can have.
-func noFriendlyName(list string, field objects.FieldMeta) string {
-	return named(list, field) + " (" + field.Label + "): not a valid property name, a Pkl " +
-		"keyword or a reserved name; add a name for it to " + overridesPath
+// noFriendlyName is the line for a field whose name no property can have: the name of its label, which a pin
+// replaces, or the name that a pin gives it, which is a pin that is refused. list is the list that a pin of the
+// field stands under.
+func noFriendlyName(list string, field objects.FieldMeta, pinned bool) string {
+	line := fieldNamed(list, field) + " (" + field.Label + "): "
+	const why = "no property can have this name (a keyword of Pkl, a name that every object has, or not a small " +
+		"letter with letters and digits after it); pin another "
+	if pinned {
+		return line + "the pin is refused: " + why + "in " + overridesPath
+	}
+	return line + why + `under "names", ` + fsx.Quoted(list) + ", " + fsx.Quoted(displayRawcode(field.ID)) +
+		" in " + overridesPath
 }
 
 // wouldDisappear is the line for a released field of a list that the game's data have not, and that the
 // overrides do not list as removed.
 func wouldDisappear(list string, released objects.FieldMeta) string {
-	return named(list, released) + " would disappear"
+	return fieldNamed(list, released) + " would disappear"
 }
 
 // wouldBecome is the line for a released field of a list whose name would be another now, and that no pin holds
 // to it.
 func wouldBecome(list string, released objects.FieldMeta, name string) string {
-	return named(list, released) + ` would become "` + name + `"`
+	return fieldNamed(list, released) + ` would become "` + name + `"`
 }
 
 // errReleasedNames refuses fields that would change what authors write, with a line for each name.
 func errReleasedNames(problems []string) error {
-	return errors.New("released friendly names would change. Pin each in " + overridesPath + ` "names", or list ` +
-		`a field the game no longer has under "removed":` + "\n  " + strings.Join(problems, "\n  "))
+	return errors.New("released friendly names would change. In " + overridesPath + ", pin a name that would " +
+		`become another under "names" (the released name to keep it, the new one to change it on purpose), and ` +
+		`list a field that would disappear under "removed":` + "\n  " + strings.Join(problems, "\n  "))
 }

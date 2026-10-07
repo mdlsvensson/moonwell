@@ -22,7 +22,7 @@ func TestRunRefusesAFirstArgumentThatNamesNoMode(t *testing.T) {
 		t.Fatal("a mode the generator does not have was run")
 	}
 	contains(t, err.Error(),
-		"Unknown mode 'nativs'", "The modes are natives, metadata and game-paths",
+		"unknown mode 'nativs'", "The modes are natives, metadata and game-paths",
 		"without one, gen writes schema/generated")
 	if printed != "" || !asNew(files) {
 		t.Errorf("the refused line printed %q and left %v", printed, slices.Sorted(maps.Keys(files)))
@@ -43,7 +43,7 @@ func TestTheRefusalOfAnUnknownModeNamesTheModesOfTheTable(t *testing.T) {
 		for _, name := range c.names {
 			table = append(table, mode{name: name})
 		}
-		want := "Unknown mode 'x'. The modes are " + c.want + "; without one, gen writes schema/generated."
+		want := "unknown mode 'x'. The modes are " + c.want + "; without one, gen writes schema/generated."
 		if got := errUnknownMode(table, "x").Error(); got != want {
 			t.Errorf("the modes %q: %q, want %q", c.names, got, want)
 		}
@@ -384,8 +384,8 @@ func TestARunEndsWithNothingAndZeroOrWithItsErrorAndOne(t *testing.T) {
 		code      int
 	}{
 		{nil, "", 0},
-		{errors.New("Unknown mode 'x'."), "error: Unknown mode 'x'.\n", 1},
-		{errors.New("Cannot render the Pkl schema:\none\ntwo"), "error: Cannot render the Pkl schema:\none\ntwo\n", 1},
+		{errors.New("unknown mode 'x'."), "error: unknown mode 'x'.\n", 1},
+		{errors.New("cannot render the Pkl schema:\none\ntwo"), "error: cannot render the Pkl schema:\none\ntwo\n", 1},
 	} {
 		if complaint, code := ending(c.err); complaint != c.complaint || code != c.code {
 			t.Errorf("ending(%v) = %q, %d, want %q, %d", c.err, complaint, code, c.complaint, c.code)

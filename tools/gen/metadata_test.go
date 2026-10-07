@@ -154,7 +154,7 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 				files[unitsTable] = withRow(files[unitsTable], `C;X1;Y6;K"Nhro"`)
 				files[balanceTable] = withRow(files[balanceTable], `C;X1;Y6;K"Nhro"`, `C;X2;K0`, `C;X3;K"_"`)
 			}),
-			starts: "standard unit ids where the uppercase hero rule disagrees", words: []string{"Nhro (uppercase, "}},
+			starts: "standard units break the rule for heroes: Nhro (uppercase, "},
 		"a released name that would change": {folder: whole, kept: released,
 			starts: "released friendly names would change.",
 			words:  []string{`units uhpm "hitPoints" would become "hitPointsMaximumBase"`}},

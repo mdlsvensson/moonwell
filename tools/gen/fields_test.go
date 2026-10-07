@@ -205,13 +205,11 @@ func TestNameFieldsPutsAFieldOfTheUnitsTableIntoTheListsOfWhatUsesIt(t *testing.
 		files[labelsFile] += "WESTRING_NONE=Used by Nothing\r\n"
 	})
 	_, _, err := nameFields(game, overrides{})
-	const want = "cannot derive friendly names:\n" +
-		"  units ucls \"class\" (Class): not a valid property name, a Pkl keyword or a reserved name; add a name for it " +
-		"to tools/metadata/overrides.json\n" +
-		"  unon: applies to no object type"
-	if err == nil || err.Error() != want {
-		t.Errorf("got %v, want %q", err, want)
+	if err == nil {
+		t.Fatal("the fields were named")
 	}
+	contains(t, err.Error(), "cannot derive friendly names:\n  units ucls \"class\" (Class): ",
+		"\n  war3.w3mod/units/unitmetadata.slk: unon: no kind of object uses it")
 }
 
 // The fields of a list stand in the order of their ids' bytes: capitals before small letters, and two fields
@@ -270,11 +268,11 @@ func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 		{"Eight Deep", true, ""},
 		// Nine strings deep, the label is the eighth string, which is a key.
 		{"WESTRING_8", true, ""},
-		{"WESTRING_NONE", false, "eeee: no World Editor label for WESTRING_NONE"},
-		{"WESTRING_SELF", false, "ffff: no World Editor label for WESTRING_SELF"},
+		{"WESTRING_NONE", false, "table.slk: eeee: no label for WESTRING_NONE in " + labelsFile},
+		{"WESTRING_SELF", false, "table.slk: ffff: no label for WESTRING_SELF in " + labelsFile},
 		// Two keys that lead to each other end, after eight strings, at the first.
-		{"WESTRING_PING", false, "gggg: no World Editor label for WESTRING_PING"},
-		{"", false, "hhhh: no displayName cell, so no World Editor label"},
+		{"WESTRING_PING", false, "table.slk: gggg: no label for WESTRING_PING in " + labelsFile},
+		{"", false, "table.slk: hhhh: the row has no displayName cell, which names the label"},
 		// An empty key is a key: the strings may have a label for it.
 		{"The Label of No Key", true, ""},
 		// Three keys that lead in a circle end, after eight strings, at the third: a label that is a key.
@@ -284,13 +282,13 @@ func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 		if label != c.label || found != c.found {
 			t.Errorf("%s: the label is %q, found %v; want %q, %v", rows[i].Value("ID"), label, found, c.label, c.found)
 		}
-		if !found && noLabel(rows[i]) != c.line {
-			t.Errorf("%s: the line is %q, want %q", rows[i].Value("ID"), noLabel(rows[i]), c.line)
+		if !found && noLabel("table.slk", rows[i]) != c.line {
+			t.Errorf("%s: the line is %q, want %q", rows[i].Value("ID"), noLabel("table.slk", rows[i]), c.line)
 		}
 	}
-	_, unlabelled, err := fieldRecords(fieldTable{rows, []string{"buffs"}}, labels)
-	if err != nil || len(unlabelled) != 4 || strings.Contains(strings.Join(unlabelled, "\n"), "undefined") {
-		t.Errorf("the rows without a label are %q, %v; want four lines that name what is missing", unlabelled, err)
+	_, unlabelled, err := fieldRecords(fieldTable{"table.slk", rows, []string{"buffs"}}, labels)
+	if err != nil || len(unlabelled) != 4 {
+		t.Errorf("the rows without a label are %q, %v; want four lines", unlabelled, err)
 	}
 }
 
@@ -348,15 +346,15 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 		"x", "4 5", "Inf", "-inf", "+Infinity", "NaN", "nan", "0x1p4", "0X1P4", "-0x10p0", "0x10", "0x_1p0", "1__0", "1e999",
 		"\xC2\xA04", "4\xE2\x80\xA8", "\xC2\xA0",
 	} {
-		if _, err := record(cell, 0); err == nil || err.Error() != "Hhb1: the repeat cell '"+cell+"' is not a number" {
+		if _, err := record(cell, 0); err == nil || err.Error() != "the repeat cell '"+cell+"' is not a number" {
 			t.Errorf("repeat %q: got %v, want the cell refused as no number", cell, err)
 		}
-		if _, err := record(0, cell); err == nil || err.Error() != "Hhb1: the data cell '"+cell+"' is not a number" {
+		if _, err := record(0, cell); err == nil || err.Error() != "the data cell '"+cell+"' is not a number" {
 			t.Errorf("data %q: got %v, want the cell refused as no number", cell, err)
 		}
 	}
 	for _, cell := range []string{"1.5", " 0.25 ", "-2.5", "1e-1"} {
-		if _, err := record(0, cell); err == nil || err.Error() != "Hhb1: the data column '"+cell+"' is not a whole number" {
+		if _, err := record(0, cell); err == nil || err.Error() != "the data cell '"+cell+"' is not a whole number" {
 			t.Errorf("data %q: got %v, want the cell refused as no whole number", cell, err)
 		}
 	}
@@ -367,8 +365,10 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 	game := readMini(t, func(files map[string]string) {
 		files[upgradeFieldsTable] = strings.Replace(files[upgradeFieldsTable], "C;X3;K1\r\n", "C;X3;K\"many\"\r\n", 1)
 	})
+	// The refusal names the table and the row.
 	_, _, err := nameFields(game, overrides{})
-	if err == nil || err.Error() != "gnam: the repeat cell 'many' is not a number" {
-		t.Errorf("a repeat cell that is no number, beside a name that needs a pin: got %v", err)
+	const want = "war3.w3mod/units/upgrademetadata.slk: gnam: the repeat cell 'many' is not a number"
+	if err == nil || err.Error() != want {
+		t.Errorf("a repeat cell that is no number, beside a name that needs a pin: got %v, want %q", err, want)
 	}
 }

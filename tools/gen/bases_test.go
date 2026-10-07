@@ -56,12 +56,16 @@ func TestStandardObjectsRefusesTheUnitsThatBreakTheRuleForHeroes(t *testing.T) {
 			[]any{"hfoo"}, []any{"Hpal"}, []any{"hbar"}, []any{"nzzz"}, []any{"nhro"}, []any{"Hbld"}, []any{"Hodd"},
 		)
 	})
-	const want = "standard unit ids where the uppercase hero rule disagrees with the hero marker in unitbalance.slk " +
-		"(spec \xC2\xA73.1, V12): Hpal (uppercase, primary attribute '_'), nhro (lowercase, primary attribute 'AGI'), " +
-		"Hbld (uppercase, a building), Hodd (uppercase, primary attribute 'str'), Hodd (uppercase, a building). " +
-		"Decide how to classify them before regenerating."
-	if got != want {
-		t.Errorf("got %q, want %q", got, want)
+	// The refusal names the units, the rule with the table and the column it is read from, and where the
+	// generator sorts a unit: nothing in the overrides lets such a unit through.
+	contains(t, got, "standard units break the rule for heroes: Hpal (uppercase, primary attribute '_'), "+
+		"nhro (lowercase, primary attribute 'AGI'), Hbld (uppercase, a building), "+
+		"Hodd (uppercase, primary attribute 'str'), Hodd (uppercase, a building).",
+		"war3.w3mod/units/unitbalance.slk", "Primary", "STR, INT or AGI", "categoryOfUnit in tools/gen/bases.go")
+	for _, unfindable := range []string{"spec", "V12", "marker"} {
+		if strings.Contains(got, unfindable) {
+			t.Errorf("the refusal points at %q, which a contributor cannot find: %s", unfindable, got)
+		}
 	}
 }
 
@@ -72,7 +76,7 @@ func TestStandardObjectsRefusesAUnitWithoutARowOfBalance(t *testing.T) {
 			[]any{"Hbad"}, []any{"hnew"}, []any{"hfoo"}, []any{"hmor"})
 		files[balanceTable] = sylk(balanceMeta, []any{"Hbad", 0, "_"}, []any{"hfoo", 0, "_"})
 	})
-	if got != "unit hnew has no row in unitbalance.slk" {
+	if got != "war3.w3mod/units/unitdata.slk: hnew: war3.w3mod/units/unitbalance.slk has no row for it" {
 		t.Errorf("got %q", got)
 	}
 }
@@ -180,19 +184,20 @@ func TestLevelCountIsAWholeNumberThatIsNotNegative(t *testing.T) {
 	for _, cell := range []string{
 		"-1", "2.5", "many", "Inf", "-Inf", "NaN", "0x1p1", "0x3", "1e999", "3 levels", "\xC2\xA03", "\xC2\xA0",
 	} {
-		// The row is named by its first cell.
-		if _, err := count(cell); err == nil || err.Error() != "a comment: bad levels '"+cell+"'" {
+		if _, err := count(cell); err == nil || err.Error() != "the levels cell '"+cell+"' is no count of levels" {
 			t.Errorf("the levels %q: got %v, want the cell refused", cell, err)
 		}
 	}
 	_, err := count(nil)
-	if err == nil || err.Error() != "a comment: bad levels: the row has no levels cell" {
+	if err == nil || err.Error() != "the row has no levels cell" {
 		t.Errorf("a row without the cell: got %v", err)
 	}
 }
 
-// The first count of levels that is none ends the standard objects: of an ability, and then of an upgrade.
+// The first count of levels that is none ends the standard objects: of an ability, and then of an upgrade. The
+// refusal names the table and the row.
 func TestStandardObjectsRefusesALevelCountThatIsNone(t *testing.T) {
+	const abilities, upgrades = "war3.w3mod/units/abilitydata.slk: AHtb: ", "war3.w3mod/units/upgradedata.slk: Rhme: "
 	levels := func(ability, upgrade any) func(files map[string]string) {
 		return func(files map[string]string) {
 			files[abilitiesTable] = sylk([]string{"alias", "comments", "levels"},
@@ -201,11 +206,11 @@ func TestStandardObjectsRefusesALevelCountThatIsNone(t *testing.T) {
 		}
 	}
 	for want, change := range map[string]func(files map[string]string){
-		"AHtb: bad levels '-1'":                            levels(-1, 3),
-		"AHtb: bad levels '2.5'":                           levels("2.5", "x"),
-		"AHtb: bad levels: the row has no levels cell":     levels(nil, 3),
-		"Rhme: bad maxlevel 'x'":                           levels(3, "x"),
-		"Rhme: bad maxlevel: the row has no maxlevel cell": levels(3, nil),
+		abilities + "the levels cell '-1' is no count of levels":  levels(-1, 3),
+		abilities + "the levels cell '2.5' is no count of levels": levels("2.5", "x"),
+		abilities + "the row has no levels cell":                  levels(nil, 3),
+		upgrades + "the maxlevel cell 'x' is no count of levels":  levels(3, "x"),
+		upgrades + "the row has no maxlevel cell":                 levels(3, nil),
 	} {
 		if got := basesRefused(t, change); got != want {
 			t.Errorf("got %q, want %q", got, want)
@@ -216,7 +221,4 @@ func TestStandardObjectsRefusesALevelCountThatIsNone(t *testing.T) {
 	equal(t, "an ability without a count", bases["abilities"]["AHtb"], objects.BaseMeta{Name: "Storm Bolt", Levels: &none})
 	equal(t, "an upgrade with none", bases["upgrades"]["Rhme"],
 		objects.BaseMeta{Name: "Iron Forged Swords", Levels: &none})
-	if strings.Contains(basesRefused(t, levels(nil, 3)), "undefined") {
-		t.Error("the refusal of a row without the cell names a value that no cell has")
-	}
 }

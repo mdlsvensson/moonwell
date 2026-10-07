@@ -36,6 +36,7 @@ func standardObjects(game gameData) (map[manifest.Category]map[string]objects.Ba
 // objectTable is a table whose every row is a standard object of one category.
 type objectTable struct {
 	category manifest.Category
+	path     string // the table's path from the folder of the export, which names it in a message
 	rows     []slk.Row
 	key      string     // the table's key: the column that has the id of a row
 	name     nameSource // where an object of the table has its name
@@ -45,8 +46,8 @@ type objectTable struct {
 // objectsByName puts the items and the buffs into their categories: each by its id, with its name.
 func objectsByName(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) {
 	for _, table := range []objectTable{
-		{category: "items", rows: game.items, key: itemKey, name: itemName},
-		{category: "buffs", rows: game.buffs, key: buffKey, name: buffName},
+		{category: "items", path: itemsTable, rows: game.items, key: itemKey, name: itemName},
+		{category: "buffs", path: buffsTable, rows: game.buffs, key: buffKey, name: buffName},
 	} {
 		for _, row := range table.rows {
 			id := row.Value(table.key)
@@ -56,17 +57,19 @@ func objectsByName(game gameData, bases map[manifest.Category]map[string]objects
 }
 
 // objectsWithLevels puts the abilities and then the upgrades into their categories: each by its id, with its
-// name and its count of levels. The first count that is none ends it.
+// name and its count of levels. The first count that is none ends it, with the table and the row.
 func objectsWithLevels(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
 	for _, table := range []objectTable{
-		{category: "abilities", rows: game.abilities, key: abilityKey, name: abilityName, levels: "levels"},
-		{category: "upgrades", rows: game.upgrades, key: upgradeKey, name: upgradeName, levels: "maxlevel"},
+		{category: "abilities", path: abilitiesTable, rows: game.abilities, key: abilityKey, name: abilityName,
+			levels: "levels"},
+		{category: "upgrades", path: upgradesTable, rows: game.upgrades, key: upgradeKey, name: upgradeName,
+			levels: "maxlevel"},
 	} {
 		for _, row := range table.rows {
 			id := row.Value(table.key)
 			count, err := levelCount(row, table.levels)
 			if err != nil {
-				return err
+				return errInRow(table.path, id, err)
 			}
 			bases[table.category][id] = objects.BaseMeta{Name: table.name.of(game.strings, id, row), Levels: &count}
 		}
@@ -79,14 +82,14 @@ func objectsWithLevels(game gameData, bases map[manifest.Category]map[string]obj
 func levelCount(row slk.Row, column string) (int, error) {
 	cell, has := row.Get(column)
 	if !has {
-		return 0, errNoLevels(row, column)
+		return 0, errNoLevels(column)
 	}
 	if fsx.TrimASCIISpace(cell) == "" {
 		return 0, nil
 	}
 	count, isNumber := decimal(fsx.TrimASCIISpace(cell))
 	if !isNumber || count != math.Trunc(count) || count < 0 {
-		return 0, errBadLevels(row, column, cell)
+		return 0, errBadLevels(column, cell)
 	}
 	return int(count), nil
 }
@@ -204,15 +207,19 @@ func cleanName(name string) string {
 
 // ---- errors ----
 
+// errNoBalance refuses a unit, a row of the units' table, that the balance table has no row for.
 func errNoBalance(id string) error {
-	return errors.New("unit " + id + " has no row in unitbalance.slk")
+	return errInRow(unitsTable, id, errors.New(balanceTable+" has no row for it"))
 }
 
-// errHeroRule refuses the units of an export, with every unit that breaks the rule for heroes and how.
+// errHeroRule refuses the units of an export, with every unit that breaks the rule for heroes and how, the rule
+// with the table and the column it is read from, and where the generator sorts a unit: no pin lets such a unit
+// through.
 func errHeroRule(exceptions []string) error {
-	return errors.New("standard unit ids where the uppercase hero rule disagrees with the hero marker in " +
-		"unitbalance.slk (spec \xC2\xA73.1, V12): " + strings.Join(exceptions, ", ") +
-		". Decide how to classify them before regenerating.")
+	return errors.New("standard units break the rule for heroes: " + strings.Join(exceptions, ", ") +
+		". The rule: a unit whose id starts with a capital is a hero; a hero has STR, INT or AGI in the column " +
+		"Primary of " + balanceTable + " and is no building; no other unit has one of the three there. " +
+		"categoryOfUnit in tools/gen/bases.go sorts the units by it: change it to say what these units are.")
 }
 
 // primaryDisagrees is what errHeroRule says of a unit whose id and whose primary attribute disagree: a capital
@@ -228,12 +235,12 @@ func primaryDisagrees(id string, capital bool, primary string) string {
 // heroIsABuilding is what errHeroRule says of a unit whose id starts with a capital and that is a building.
 func heroIsABuilding(id string) string { return id + " (uppercase, a building)" }
 
-// errNoLevels refuses a row of abilities or of upgrades that has no cell for its count of levels. The row is
-// named by its first cell.
-func errNoLevels(row slk.Row, column string) error {
-	return errors.New(row.First() + ": bad " + column + ": the row has no " + column + " cell")
+// errNoLevels and errBadLevels are the faults of the cell of a row of abilities or of upgrades that has its
+// count of levels: no cell, and a cell that is no count. objectsWithLevels names the table and the row.
+func errNoLevels(column string) error {
+	return errors.New("the row has no " + column + " cell")
 }
 
-func errBadLevels(row slk.Row, column, cell string) error {
-	return errors.New(row.First() + ": bad " + column + " '" + cell + "'")
+func errBadLevels(column, cell string) error {
+	return errors.New("the " + column + " cell '" + cell + "' is no count of levels")
 }
