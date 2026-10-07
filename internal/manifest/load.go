@@ -6,11 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"io/fs"
-	"maps"
 	"os"
 	"path/filepath"
-	"slices"
-	"strconv"
 	"strings"
 
 	moonwell "github.com/mdlsvensson/moonwell"
@@ -55,32 +52,8 @@ func Decode(root, file string, data []byte) (*Project, error) {
 	if missing := project.missingTexts(); len(missing) > 0 {
 		return nil, errNotAProject(file, "it has no "+diag.JoinWords(missing, "and", -1), nil)
 	}
-	if slot := misspelledSlot(data); slot != "" {
-		return nil, errNotAProject(file, slot+" is no slot: a slot is a whole number as pkl prints it", nil)
-	}
 	project.Objects.nameSources(file)
 	return project, nil
-}
-
-// misspelledSlot is the first slot of a player or a force, as settings.players.01, that is written in another
-// way than pkl prints a whole number: with a sign, or with a zero before it. The decoder reads such a key as the
-// number it means, and one slot would have two spellings. It is "" where every slot is written the one way.
-func misspelledSlot(data []byte) string {
-	var written struct {
-		Settings struct{ Players, Forces map[string]json.RawMessage }
-	}
-	_ = json.Unmarshal(data, &written) // the JSON is a project's: it has been decoded as one
-	for _, block := range []struct {
-		name  string
-		slots map[string]json.RawMessage
-	}{{"players", written.Settings.Players}, {"forces", written.Settings.Forces}} {
-		for _, key := range slices.Sorted(maps.Keys(block.slots)) {
-			if slot, err := strconv.Atoi(key); err != nil || strconv.Itoa(slot) != key {
-				return "settings." + block.name + "." + key
-			}
-		}
-	}
-	return ""
 }
 
 // reasonOf says why JSON does not fit a project. A value of another kind than a project has in its place is named

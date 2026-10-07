@@ -168,13 +168,6 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 			[]string{"first", "settings.players"}, []string{"map.folder"}},
 		{"a force slot that is no whole number", printed(`"settings":{"forces":{"1.5":{}}}`),
 			[]string{"1.5", "settings.forces"}, []string{"map.folder"}},
-		// A slot has one spelling: the number as pkl prints it.
-		{"a player slot with a zero before it", printed(`"settings":{"players":{"01":{}}}`),
-			[]string{"01", "settings.players"}, []string{"map.folder"}},
-		{"a force slot with a sign", printed(`"settings":{"forces":{"+1":{}}}`),
-			[]string{"+1", "settings.forces"}, []string{"map.folder"}},
-		{"a player slot that is the zero below 0", printed(`"settings":{"players":{"-0":{}}}`),
-			[]string{"-0", "settings.players"}, []string{"map.folder"}},
 		{"asset paths as a list", `{"assets":{"paths":[]}}`, []string{"array", "a mapping"}, nil},
 		{"an asset path of another type", `{"assets":{"paths":{"a.blp":3}}}`, []string{"number", "a.blp: "}, nil},
 		{"an object without a text for its id", `{"objects":{"units":{"a":{"id":3}}}}`, []string{"number", "a: id: "}, nil},
