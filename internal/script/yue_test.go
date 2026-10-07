@@ -621,6 +621,21 @@ func TestAfterAnErrorThatIsNoCompileFailureNoFurtherCompilerIsStarted(t *testing
 	}
 }
 
+// The work on a file runs in a goroutine of its own, where the recover of the command line does not reach: a
+// panic there comes back as a plain error, which is printed as the internal error it is, with its stack.
+func TestAPanicWhileAFileIsCompiledIsAPlainErrorWithItsStack(t *testing.T) {
+	b := benchOf(t, mainOnly)
+	b.use(func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
+		panic("the stand-in compiler panics")
+	})
+	result, err := b.compile(fakeYue, false)
+	var expected *diag.Error
+	if result != nil || err == nil || errors.As(err, &expected) ||
+		!strings.Contains(err.Error(), "the stand-in compiler panics") || !strings.Contains(err.Error(), "goroutine ") {
+		t.Errorf("compileAll = %+v, %v, want a plain error with the panic and its stack", result, err)
+	}
+}
+
 func TestACompileFailureLetsTheOtherFilesCompile(t *testing.T) {
 	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/bad.yue", "x = 1\n", "src/c.yue", "x = 1\n"))
 	b.fake(map[string]answer{"src/bad.yue": {code: 1, stdout: "Failed to compile: bad.yue\n1: boom\n"}})

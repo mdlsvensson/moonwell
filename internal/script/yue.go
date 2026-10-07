@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime/debug"
 	"slices"
 	"strconv"
 	"strings"
@@ -239,7 +240,7 @@ func eachOf[T, G any](items []T, work func(T) (G, error)) (gave []G, err error) 
 	for {
 		if err == nil && next < len(items) && running < atOnce {
 			go func(at int) {
-				result, failed := work(items[at])
+				result, failed := guarded(work, items[at])
 				over <- ended{at, result, failed}
 			}(next)
 			next, running = next+1, running+1
@@ -255,6 +256,18 @@ func eachOf[T, G any](items []T, work func(T) (G, error)) (gave []G, err error) 
 			err = done.err
 		}
 	}
+}
+
+// guarded does the work on an item and gives a panic in it as an error. The work runs in a goroutine of its own,
+// where a panic would end the program before the command line's recover saw it. The error is a plain one, with
+// the panic and its stack, so it is printed as the internal error a panic anywhere else is.
+func guarded[T, G any](work func(T) (G, error), item T) (gave G, err error) {
+	defer func() {
+		if fault := recover(); fault != nil {
+			err = fmt.Errorf("%v\n%s", fault, debug.Stack())
+		}
+	}()
+	return work(item)
 }
 
 // compileEach compiles the units, at most atOnce at a time, and returns the failures of the files the compiler
