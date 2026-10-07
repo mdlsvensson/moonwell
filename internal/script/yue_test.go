@@ -182,7 +182,7 @@ func (b *bench) luaAt(result *staged, path string) string {
 	return lua
 }
 
-// staged is a file of the staging folder on disk; below uses "/".
+// staged is a file of the compile's output folder on disk; below uses "/".
 func (b *bench) staged(below string) string {
 	return filepath.Join(b.root, "dist", "stage", "lua", filepath.FromSlash(below))
 }
@@ -804,7 +804,7 @@ func TestAModuleWithoutAnOutputHasNoLua(t *testing.T) {
 	}
 }
 
-func TestTheNamesCollectGivesPlaceEveryOutputBelowTheStagingFolder(t *testing.T) {
+func TestTheNamesCollectGivesPlaceEveryOutputBelowTheOutputFolder(t *testing.T) {
 	// A name is a path with a dot for each "/", and no file or folder on that path has a dot in its own name: so
 	// no step of an output's path is "." or "..", whatever the files are called.
 	p := files(
@@ -833,7 +833,7 @@ func TestTheNamesCollectGivesPlaceEveryOutputBelowTheStagingFolder(t *testing.T)
 	}
 }
 
-func TestALinkOnTheWayToTheStagingFolderIsRefused(t *testing.T) {
+func TestALinkOnTheWayToTheOutputFolderIsRefused(t *testing.T) {
 	for _, link := range []string{"dist", "dist/stage", "dist/stage/lua"} {
 		b := benchOf(t, files("src/game/units.yue", "x = 1\n"))
 		b.fake(nil)
@@ -847,8 +847,8 @@ func TestALinkOnTheWayToTheStagingFolderIsRefused(t *testing.T) {
 	}
 }
 
-func TestBelowTheStagingFolderALinkIsWrittenThrough(t *testing.T) {
-	// The staging folder is Moonwell's own: what is below it is not looked at for links.
+func TestBelowTheOutputFolderALinkIsWrittenThrough(t *testing.T) {
+	// The output folder is Moonwell's own: what is below it is not looked at for links.
 	b := benchOf(t, files("src/game/units.yue", "x = 1\n"))
 	b.fake(nil)
 	at := linkTo(t, files(), b.root, "dist/stage/lua/game")
@@ -984,7 +984,7 @@ func TestAnOutputThatAnotherProgramHoldsIsRefusedByItsPathFromTheProjectFolder(t
 	// own, as any other failure to remove it, and not that of a map that the game holds.
 	failure := b.refuses(fakeYue, false, "an output that is held")
 	if !strings.HasPrefix(failure.Msg, "Removing dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" ||
-		failure.Hint != stageHint || strings.Contains(failure.Msg, b.root) || failure.Cause == nil || len(b.ran()) != 0 {
+		failure.Hint != distHint || strings.Contains(failure.Msg, b.root) || failure.Cause == nil || len(b.ran()) != 0 {
 		t.Errorf("error = %+v", failure)
 	}
 }

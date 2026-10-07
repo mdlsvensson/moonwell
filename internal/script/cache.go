@@ -14,7 +14,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// hashesFile is the file of the staging folder in which a compile keeps what it left there, for the next one.
+// hashesFile is the file of the output folder in which a compile keeps what it left there, for the next one.
 const hashesFile = ".hashes.json"
 
 // dependsOn is what every output of a compile depends on beside its own source. A compile with another value
@@ -90,7 +90,7 @@ type hashes struct {
 // keptSource is a source as the hashes file keeps it.
 type keptSource struct {
 	Hash   string `json:"hash"`   // the SHA-256 of the source's bytes; "" while nothing vouches for its output
-	Output string `json:"output"` // where its Lua is, from the staging folder, with "/"
+	Output string `json:"output"` // where its Lua is, from the output folder, with "/"
 }
 
 // readHashes is what the last compile kept. Without a file, or with one in another shape, nothing is kept: every
@@ -103,7 +103,7 @@ func readHashes(root string) (hashes, error) {
 	return kept, nil
 }
 
-// namesOutputs reports whether every output the file names is a Lua file below the staging folder, by the
+// namesOutputs reports whether every output the file names is a Lua file below the output folder, by the
 // system's own rule for a path that stays below its folder. A compile joins the outputs it finds there with the
 // folder and removes them, so a file that names anything else is none of its own.
 func (h hashes) namesOutputs() bool {
@@ -130,8 +130,8 @@ func (h hashes) stale(units []unit, now dependsOn) (stale, upToDate []unit) {
 }
 
 // removeGone removes each output of the last compile that no source compiles to now: that of a source that is
-// gone, and that of a library's module whose library has another key. stage is the staging folder on disk.
-func removeGone(stage string, last hashes, units []unit) error {
+// gone, and that of a library's module whose library has another key. outputs is the output folder on disk.
+func removeGone(outputs string, last hashes, units []unit) error {
 	current := map[string]bool{}
 	for _, u := range units {
 		current[u.under] = true
@@ -141,7 +141,7 @@ func removeGone(stage string, last hashes, units []unit) error {
 		if current[under] {
 			continue
 		}
-		if err := removeOutput(under, filepath.Join(stage, filepath.FromSlash(under))); err != nil {
+		if err := removeOutput(under, filepath.Join(outputs, filepath.FromSlash(under))); err != nil {
 			return err
 		}
 	}
@@ -163,7 +163,7 @@ func writeHashes(root string, now dependsOn, good, pending []unit) error {
 	return writeCache(root, hashesFile, kept)
 }
 
-// usesFile is the file of the staging folder in which a check keeps the globals each source uses, for the next
+// usesFile is the file of the output folder in which a check keeps the globals each source uses, for the next
 // one.
 const usesFile = ".globals.json"
 
@@ -222,13 +222,13 @@ func writeUses(root string, now listedWith, lists map[string]sourceUses) error {
 	return writeCache(root, usesFile, keptUses{listedWith: now, Sources: lists})
 }
 
-// readCache reads a file that a compile keeps in the staging folder, as the T it was written from. found is
+// readCache reads a file that a compile keeps in the output folder, as the T it was written from. found is
 // false without such a file: where there is none, where it cannot be read, and where it is no JSON in the shape
 // of T, which is so for text that is no JSON value, for a member T has not, for a value of another kind than
 // T's, and for anything after the value. A link on the way to the file is refused.
 func readCache[T any](root, name string) (kept T, found bool, err error) {
 	var none T
-	file, err := fsx.Inside(root, stageDir+"/"+name)
+	file, err := fsx.Inside(root, outputDir+"/"+name)
 	if err != nil {
 		return none, false, err
 	}
@@ -247,10 +247,10 @@ func readCache[T any](root, name string) (kept T, found bool, err error) {
 	return kept, true, nil
 }
 
-// writeCache writes a file that a compile keeps in the staging folder: kept as JSON, with two spaces for each
+// writeCache writes a file that a compile keeps in the output folder: kept as JSON, with two spaces for each
 // level and a line break at the end. A link on the way to the file is refused.
 func writeCache(root, name string, kept any) error {
-	path := stageDir + "/" + name
+	path := outputDir + "/" + name
 	text, err := json.MarshalIndent(kept, "", "  ")
 	if err != nil {
 		// A plain error: what is kept is a struct of strings, numbers and maps of them, which is always JSON, so
@@ -269,6 +269,6 @@ func writeCache(root, name string, kept any) error {
 
 // ---- errors ----
 
-// The failures of this file are those of a file below the staging folder that cannot be read, written or
+// The failures of this file are those of a file below the output folder that cannot be read, written or
 // removed. They are worded where the compile words them for its outputs: errUnreadableOutput,
 // errUnwritableOutput and errUnremovableOutput, below the same line of yue.go.

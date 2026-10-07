@@ -19,8 +19,9 @@ import (
 )
 
 const (
-	// stageDir is where a compile leaves its Lua, and the files it keeps beside it, from the project folder.
-	stageDir = "dist/stage/lua"
+	// outputDir is the output folder: where a compile leaves its Lua, and the files it keeps beside it, from the
+	// project folder. It lies below the folder the maps are staged in, and is no stage of a map.
+	outputDir = "dist/stage/lua"
 	// atOnce is how many compilers run at a time.
 	atOnce = 8
 )
@@ -47,11 +48,11 @@ type staged struct {
 // compiler runs on it, and before the first compiler runs, the hashes file stops vouching for every source that
 // is to be compiled: a run that is stopped leaves nothing up to date that it may have touched.
 func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macros, sources []Source) (*staged, error) {
-	stage, err := stageOf(e.Root)
+	outputs, err := outputFolder(e.Root)
 	if err != nil {
 		return nil, err
 	}
-	units, err := unitsOf(e.Root, stage, sources)
+	units, err := unitsOf(e.Root, outputs, sources)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +61,7 @@ func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macr
 	if err != nil {
 		return nil, err
 	}
-	if err := removeGone(stage, last, units); err != nil {
+	if err := removeGone(outputs, last, units); err != nil {
 		return nil, err
 	}
 	stale, upToDate := last.stale(units, now)
@@ -95,7 +96,7 @@ func (s *staged) luaOf(source Source) (lua string, ok bool, err error) {
 	}
 	data, found, err := fsx.ReadIfThere(file)
 	if err != nil {
-		return "", false, errUnreadableOutput(stageDir+"/"+under, err)
+		return "", false, errUnreadableOutput(outputDir+"/"+under, err)
 	}
 	return string(data), found, nil
 }
@@ -117,25 +118,25 @@ type unit struct {
 	file   string // the source on disk
 	text   string // the source's bytes, without a byte order mark at the start
 	hash   string // the SHA-256 of the source's bytes
-	under  string // where its Lua goes, from stageDir, with "/"
+	under  string // where its Lua goes, from outputDir, with "/"
 	output string // the same place on disk
 }
 
-// stageOf is the staging folder of the project at root, on disk. A link at the folder, or on the way to it, is
+// outputFolder is the output folder of the project at root, on disk. A link at the folder, or on the way to it, is
 // refused. Below the folder nothing is looked at for links: it is Moonwell's own, which Moonwell makes and
 // fills, so a link that is planted in it is written through.
-func stageOf(root string) (string, error) {
-	return fsx.Inside(root, stageDir)
+func outputFolder(root string) (string, error) {
+	return fsx.Inside(root, outputDir)
 }
 
-// unitsOf reads every YueScript source among the modules, in their order; stage is the staging folder on disk.
-func unitsOf(root, stage string, sources []Source) ([]unit, error) {
+// unitsOf reads every YueScript source among the modules, in their order; outputs is the output folder on disk.
+func unitsOf(root, outputs string, sources []Source) ([]unit, error) {
 	var units []unit
 	for _, source := range sources {
 		if source.Kind != Yue {
 			continue
 		}
-		u, err := unitOf(root, stage, source)
+		u, err := unitOf(root, outputs, source)
 		if err != nil {
 			return nil, err
 		}
@@ -147,7 +148,7 @@ func unitsOf(root, stage string, sources []Source) ([]unit, error) {
 // unitOf reads a YueScript source and finds where its Lua goes. The source is read where the listing of the
 // modules found it: at its path below the project folder, whatever the file is called, and through a link in
 // its place. Nothing of the text is decoded, so it may hold bytes that are not UTF-8.
-func unitOf(root, stage string, source Source) (unit, error) {
+func unitOf(root, outputs string, source Source) (unit, error) {
 	under, err := outputOf(source)
 	if err != nil {
 		return unit{}, err
@@ -163,14 +164,14 @@ func unitOf(root, stage string, source Source) (unit, error) {
 		text:   fsx.WithoutMark(string(data)),
 		hash:   fsx.SHA256Hex(data),
 		under:  under,
-		output: filepath.Join(stage, filepath.FromSlash(under)),
+		output: filepath.Join(outputs, filepath.FromSlash(under)),
 	}, nil
 }
 
 // plainKey matches a library's key as a manifest spells one: one name of letters, digits, "_" and "-".
 var plainKey = regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
 
-// outputOf is where a YueScript source compiles to, from stageDir: src/x.yue to x.lua, and a library's x.yue to
+// outputOf is where a YueScript source compiles to, from outputDir: src/x.yue to x.lua, and a library's x.yue to
 // .libraries/<key>/x.lua. A module's name is its path below its folder, with a dot for each "/", so the name
 // and the library's key place the output, whatever folder the library is in. No step of that path is "." or
 // "..": a name's dots are all separators, and a key is one plain name.
@@ -290,7 +291,7 @@ func (c compiler) compileEach(units []unit) ([]*diag.Error, error) {
 // could not rewrite.
 func (c compiler) compile(u unit) (refused *diag.Error, err error) {
 	if err := os.MkdirAll(filepath.Dir(u.output), 0o777); err != nil {
-		return nil, errUnwritableOutput(stageDir+"/"+u.under, err)
+		return nil, errUnwritableOutput(outputDir+"/"+u.under, err)
 	}
 	if err := removeOutput(u.under, u.output); err != nil {
 		return nil, err
@@ -310,7 +311,7 @@ func (c compiler) compile(u unit) (refused *diag.Error, err error) {
 	return failure, nil
 }
 
-// removeOutput removes a file of the staging folder: under is its path from there, with "/", and file its place
+// removeOutput removes a file of the output folder: under is its path from there, with "/", and file its place
 // on disk. A file that is not there is no failure. Every other failure is the output's own, whatever the
 // system's reason: a file that another program holds is named from the project folder as any other is.
 func removeOutput(under, file string) error {
@@ -318,7 +319,7 @@ func removeOutput(under, file string) error {
 	if err == nil || errors.Is(err, fs.ErrNotExist) {
 		return nil
 	}
-	return errUnremovableOutput(stageDir+"/"+under, err)
+	return errUnremovableOutput(outputDir+"/"+under, err)
 }
 
 // failureOf is the failure of a run of the compiler on the unit; nil for a run that went well. What the run
@@ -363,19 +364,19 @@ func errUnreadableSource(path string, cause error) error {
 	}
 }
 
-// stageHint ends a failure to read, write or remove a file below dist/.
-const stageHint = "Moonwell writes dist/ itself: close any program that has the file open, or delete dist/, then try again."
+// distHint ends a failure to read, write or remove a file below dist/.
+const distHint = "Moonwell writes dist/ itself: close any program that has the file open, or delete dist/, then try again."
 
 func errUnreadableOutput(path string, cause error) error {
-	return &diag.Error{Msg: "Reading " + path + " failed: " + fsx.Reason(cause), File: path, Hint: stageHint, Cause: cause}
+	return &diag.Error{Msg: "Reading " + path + " failed: " + fsx.Reason(cause), File: path, Hint: distHint, Cause: cause}
 }
 
 func errUnwritableOutput(path string, cause error) error {
-	return &diag.Error{Msg: "Writing " + path + " failed: " + fsx.Reason(cause), File: path, Hint: stageHint, Cause: cause}
+	return &diag.Error{Msg: "Writing " + path + " failed: " + fsx.Reason(cause), File: path, Hint: distHint, Cause: cause}
 }
 
 func errUnremovableOutput(path string, cause error) error {
-	return &diag.Error{Msg: "Removing " + path + " failed: " + fsx.Reason(cause), File: path, Hint: stageHint, Cause: cause}
+	return &diag.Error{Msg: "Removing " + path + " failed: " + fsx.Reason(cause), File: path, Hint: distHint, Cause: cause}
 }
 
 // errEmptyOutput is the failure of a compile that reported success and wrote an empty file for a source that
