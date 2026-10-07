@@ -388,8 +388,8 @@ var recordedRuns = []recordedRun{
 	on("other-entry-and-no-game", "test", "--entry", "src/other.yue"),
 	on("no-src", "dev"),
 	// Another entry than the manifest's, and an entry that is none: a file that is not there is missed by the
-	// build, and a file that can be no entry is refused before anything is loaded or made (the design's §8:
-	// "--entry needs a file, and it is checked when the line is read").
+	// build, and a file that can be no entry is refused before anything is loaded or made: --entry needs a file,
+	// and it is checked when the line is read.
 	on("other-entry", "build", "--entry", "src/other.yue"),
 	on("other-entry", "build", "--entry=src/other.yue", "--minify"),
 	on("other-entry", "build", "--entry", "src/missing.yue"),
@@ -476,8 +476,7 @@ var recordedRuns = []recordedRun{
 	// A line that the grammar refuses ends with 1, prints nothing and leaves the project as it is: an unknown
 	// flag, without and with a flag close to it; a flag the command does not have; a switch that is given a
 	// value, after "=" and as a word of its own; an argument the command does not take; a flag without a
-	// command; the help asked for on a line that is refused; and short flags in a group (the design's §8, its
-	// first row, and the row on --minify false, --minify=false and grouped short flags).
+	// command; the help asked for on a line that is refused; and short flags in a group.
 	on(templateSeed, "build", "--frobnicate"),
 	on(templateSeed, "build", "--minfy"),
 	on(templateSeed, "check", "--minify"),
@@ -493,9 +492,8 @@ var recordedRuns = []recordedRun{
 	on(templateSeed, "biuld"),
 	on(templateSeed, "objects:evla"),
 	// A project without its source map: every command that reads the map refuses the folder that is not there,
-	// and names the manifest (the design's §8: "setup, objects:check and objects:eval need the source map
-	// folder, also for a project without objects", and "check fails wherever build would"). Setup has made what
-	// it makes before it opens the map.
+	// and names the manifest. Setup, objects:check and objects:eval need the folder also for a project without
+	// objects, and check fails wherever build would. Setup has made what it makes before it opens the map.
 	on("no-source-map", "build"),
 	on("no-source-map", "check"),
 	on("no-source-map", "setup"),
@@ -514,8 +512,7 @@ var recordedRuns = []recordedRun{
 	on("no-source-map-and-no-objects", "assets:check"),
 	on("no-source-map-and-no-objects", "assets:sync"),
 	// A build lock that is held: the commands that take the lock are refused and name dist/.lock, setup and
-	// assets:paths among them (the design's §8: "the lock's error names dist/.lock", and the row on the two
-	// commands); the commands that take none go on.
+	// assets:paths among them, which sync the libraries; the commands that take none go on.
 	on("lock-left-behind", "build"),
 	on("lock-left-behind", "check"),
 	on("lock-left-behind", "assets:check"),
@@ -526,11 +523,10 @@ var recordedRuns = []recordedRun{
 	on("lock-left-behind", "objects:check"),
 	on("lock-left-behind", "settings:check"),
 	// A file of the map that a command cannot use is named from the project folder, as a file of the source map:
-	// a map without its info; an info and an index of imports that are too short to read (the design's §8, the
-	// row on a file of the map that is too short to read); an asset at the path of a file that the map holds and
-	// no state owns; and, in the run after these, a file that assets:sync owns and that was edited in the map.
-	// A build that is refused has staged nothing (the design's §8: "build and test plan everything before they
-	// touch dist/stage").
+	// a map without its info; an info and an index of imports that are too short to read; an asset at the path of
+	// a file that the map holds and no state owns; and, in the run after these, a file that assets:sync owns and
+	// that was edited in the map. A build that is refused has staged nothing: build and test plan everything
+	// before they touch dist/stage.
 	on("no-map-info", "build"),
 	on("no-map-info", "assets:check"),
 	on("map-info-too-short", "build"),
@@ -547,15 +543,15 @@ var recordedRuns = []recordedRun{
 		cmdline("assets:check"), cmdline("assets:sync"), cmdline("build"),
 	}},
 	// A map.folder with a part that is a dot is the folder it names: every command does on this project what
-	// it does on the template (the design's §8, the row on map.folder and build.folder).
+	// it does on the template.
 	on("dot-map-folder", "build"),
 	on("dot-map-folder", "check"),
 	on("dot-map-folder", "assets:check"),
 	on("dot-map-folder", "settings:check"),
 	on("dot-map-folder", "objects:check"),
-	// A typed gameplay constant that is not the raw one of the same name is refused "by the commands that plan
-	// the settings (build, test, check, dev), not by every command that loads the manifest" (the design's §8):
-	// the last four lines do what they do on the template.
+	// A typed gameplay constant that is not the raw one of the same name is refused by the commands that plan
+	// the settings (build, test, check, dev), not by every command that loads the manifest: the last four lines
+	// do what they do on the template.
 	on("typed-against-raw", "build"),
 	on("typed-against-raw", "check"),
 	on("typed-against-raw", "settings:check"),

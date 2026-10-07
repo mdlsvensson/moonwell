@@ -68,8 +68,8 @@ var seeds = []seedProject{
 // of each kind; the last four are the two faults at once, two map files that are too short to read, and a state
 // that is none.
 //
-// A build plans everything before it touches dist/stage (the design's §8, "build and test plan everything before
-// they touch dist/stage"): a build that is refused before it packs leaves no stage, whichever step refuses it.
+// A build plans everything before it touches dist/stage: a build that is refused before it packs leaves no
+// stage, whichever step refuses it.
 var faults = []seedProject{
 	{name: "invalid-object", lay: func(t *testing.T, root string) {
 		put(t, root, "objects/units.pkl",
@@ -98,20 +98,19 @@ var faults = []seedProject{
 	{name: "no-source-map", lay: func(t *testing.T, root string) {
 		removeFrom(t, root, "maps/map.w3x")
 	}},
-	// §8, "A source map that is missing or refused is reported before a compile error": the map is opened first,
-	// also in a project without objects.
+	// A source map that is missing or refused is reported before a compile error: the map is opened first, also
+	// in a project without objects.
 	{name: "no-source-map-and-no-objects", lay: func(t *testing.T, root string) {
 		removeFrom(t, root, "maps/map.w3x")
 		removeFrom(t, root, "objects")
 		removeFrom(t, root, "src/generated")
 		put(t, root, "src/main.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"There is no map.\"\n")
 	}},
-	// The planned map is packed, not the stage (the design's §6): the refusal names the source map, from the
-	// project folder.
+	// The planned map is packed, not the stage: the refusal names the source map, from the project folder.
 	{name: "no-map-info", lay: func(t *testing.T, root string) {
 		removeFrom(t, root, "maps/map.w3x/war3map.w3i")
 	}},
-	// §8, "the lock's error names dist/.lock".
+	// The lock's error names dist/.lock.
 	{name: "lock-left-behind", lay: func(t *testing.T, root string) {
 		put(t, root, "dist/.lock", "4242")
 	}},
@@ -131,8 +130,8 @@ var faults = []seedProject{
 		}
 		amendLocal(t, root, `libraries { ["one"] { path = "libs/one" } ["two"] { path = "libs/two" } }`)
 	}},
-	// §8, "a typed gameplay value that disagrees with a raw one, [is] refused by the commands that plan the
-	// settings (build, test, check, dev), not by every command that loads the manifest".
+	// A typed gameplay value that disagrees with a raw one is refused by the commands that plan the settings
+	// (build, test, check, dev), not by every command that loads the manifest.
 	{name: "typed-against-raw-constant", lay: func(t *testing.T, root string) {
 		amendLocal(t, root,
 			`settings { gameplay { foodLimit = 200 } gameplayConstants { ["Misc"] { ["FoodCeiling"] = "1" } } }`)
@@ -197,8 +196,8 @@ var faults = []seedProject{
 		amendLocal(t, root, `settings { players { ["5"] { name = "Absent" } } }
 assets { paths { ["missing.blp"] = "x.blp" } }`)
 	}},
-	// §8, "A file of the map that is too short to read (war3map.w3i when the map is packed, war3map.imp when
-	// assets are imported) is named from the project folder, with a hint": this fault and the next.
+	// A file of the map that is too short to read (war3map.w3i when the map is packed, war3map.imp when assets are
+	// imported) is named from the project folder, with a hint: this fault and the next.
 	{name: "map-info-too-short", lay: func(t *testing.T, root string) {
 		put(t, root, "maps/map.w3x/war3map.w3i", "ab")
 	}},

@@ -168,9 +168,9 @@ func TestE2ESettingsBuildMissingMapNamesLocalManifest(t *testing.T) {
 	}, "build")
 }
 
-// A build plans every step before it touches dist/stage (the spec's §8: "build and test plan everything before
-// they touch dist/stage"). So after a build that a setting refuses, the stage is the one the build before it
-// left, whole, with that build's map info, and not a copy of the source map that the refused build made.
+// A build plans every step before it touches dist/stage. So after a build that a setting refuses, the stage is
+// the one the build before it left, whole, with that build's map info, and not a copy of the source map that the
+// refused build made.
 func TestE2ESettingsFailureRemovesArchiveAndPlansAtomically(t *testing.T) {
 	root := settingsProject(t)
 	ok(t, root, "build")
@@ -200,9 +200,8 @@ func TestE2ESettingsFailureRemovesArchiveAndPlansAtomically(t *testing.T) {
 	sameFiles(t, staged, stageOf(t, root), "the stage after a refused build")
 }
 
-// A check fails wherever a build would (the spec's §8: "check fails wherever build would: no source map, no
-// war3map.lua, a bundle that cannot be placed"). So a project without its source map is refused by check also
-// when it has neither objects nor a setting.
+// A check fails wherever a build would: for no source map, no war3map.lua, and a bundle that cannot be placed.
+// So a project without its source map is refused by check also when it has neither objects nor a setting.
 func TestE2ESettingsCheckWithoutStagingAndOptionalMap(t *testing.T) {
 	root := settingsProject(t)
 	edit(t, root, "maps/map.w3x/war3map.lua", "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), 0)")
