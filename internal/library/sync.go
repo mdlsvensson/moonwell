@@ -62,7 +62,7 @@ func Sync(ctx context.Context, e *env.Env, libraries map[string]manifest.Library
 		return nil, err
 	}
 	// Before anything is removed: the lock is read after the folders of libraries that left are gone.
-	if err := refuseLinkedLock(e.Root); err != nil {
+	if _, err := lockAt(e.Root); err != nil {
 		return nil, err
 	}
 	// Before any library is synced: where letter case is ignored, a folder lib that is left of another library
@@ -119,11 +119,11 @@ func isKey(key string) bool {
 func removeStale(root string, keys []string) error {
 	// Both folders are reached before anything is removed from either: a link at the second is refused with the
 	// first as it was.
-	modules, err := inProject(root, ModulesDir, ModulesDir)
+	modules, err := fsx.Inside(root, ModulesDir)
 	if err != nil {
 		return err
 	}
-	assets, err := inProject(root, AssetsDir, AssetsDir)
+	assets, err := fsx.Inside(root, AssetsDir)
 	if err != nil {
 		return err
 	}
@@ -222,11 +222,11 @@ func assetsOf(key string) string  { return AssetsDir + "/" + key }
 // foldersOf is the two folders of the library key in the project at root. A link at either, or on the way to
 // one, is refused.
 func foldersOf(root, key string) (folders, error) {
-	modules, err := inProject(root, modulesOf(key), modulesOf(key))
+	modules, err := fsx.Inside(root, modulesOf(key))
 	if err != nil {
 		return folders{}, err
 	}
-	assets, err := inProject(root, assetsOf(key), assetsOf(key))
+	assets, err := fsx.Inside(root, assetsOf(key))
 	if err != nil {
 		return folders{}, err
 	}
@@ -240,21 +240,6 @@ func (f folders) synced(shipsAssets bool) Synced {
 		lies.Assets = assetsOf(f.key)
 	}
 	return lies
-}
-
-// inProject is the path on disk of a file or folder that Sync writes or removes: path, written from the project
-// folder with "/". A link at it or on the way to it is refused, since what is written or removed through a link
-// lies somewhere else. A failure of the system is one of writing the folder label.
-func inProject(root, path, label string) (string, error) {
-	onDisk, err := fsx.SafeJoin(root, path)
-	var refused *diag.Error
-	switch {
-	case err == nil:
-		return onDisk, nil
-	case errors.As(err, &refused):
-		return "", errRefusedPath(path, refused)
-	}
-	return "", errUnwritable(label, err)
 }
 
 // removeAssets removes the folder of the files a library ships for the map: the library ships none.
@@ -398,13 +383,6 @@ func errKeysDifferByCase(first, second, manifestFile string) error {
 		File: manifestFile,
 		Hint: "Rename one of them: each library gets a folder in " + ModulesDir + "/.",
 	}
-}
-
-// errRefusedPath is the refusal of a path as fsx words it, with the path from the project folder as its file.
-func errRefusedPath(path string, refused *diag.Error) error {
-	named := *refused
-	named.File = path
-	return &named
 }
 
 // errUnwritable is a failure to write or remove at path, a folder below .moonwell/ written from the project

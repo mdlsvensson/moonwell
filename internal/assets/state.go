@@ -19,16 +19,27 @@ type State struct{ Files []Owned }
 // written there, in lower-case hexadecimal.
 type Owned struct{ Path, Hash string }
 
-// StateFile is the ownership file of the project at root for a map folder: .asset-state/<map folder>.json.
+// StateFile is the ownership file of the project at root for a map folder, by its path from the project folder,
+// which is how errors name it: .asset-state/<map folder>.json. A map folder that leads out of .asset-state, and
+// a link on the way to the file, is refused.
 func StateFile(root, mapFolder string) (string, error) {
-	return fsx.SafeJoin(root, ".asset-state/"+mapFolder+".json")
+	file := ".asset-state/" + mapFolder + ".json"
+	if _, err := fsx.Inside(root, file); err != nil {
+		return "", err
+	}
+	return file, nil
 }
 
-// ReadState reads the ownership file. A project without the file owns nothing: its state is empty. A file that
-// is not a state is refused whole, and so is one that lists a path no asset may have: assets:sync removes the
-// files a state lists, and a state that named war3map.lua would have it remove the map's script.
-func ReadState(file string) (State, error) {
-	data, found, err := readIfThere(file)
+// ReadState reads the ownership file of the project at root; file is what StateFile returned. A project without
+// the file owns nothing: its state is empty. A file that is not a state is refused whole, and so is one that
+// lists a path no asset may have: assets:sync removes the files a state lists, and a state that named
+// war3map.lua would have it remove the map's script.
+func ReadState(root, file string) (State, error) {
+	place, err := fsx.Inside(root, file)
+	if err != nil {
+		return State{}, err
+	}
+	data, found, err := readIfThere(place, file)
 	if err != nil || !found {
 		return State{}, err
 	}
@@ -52,9 +63,10 @@ func ReadState(file string) (State, error) {
 	return state, nil
 }
 
-// readIfThere reads the state file. found is false, without an error, when there is none.
-func readIfThere(file string) (data []byte, found bool, err error) {
-	if data, found, err = fsx.ReadIfThere(file); err != nil {
+// readIfThere reads the state file at place, which errors name file. found is false, without an error, when
+// there is none.
+func readIfThere(place, file string) (data []byte, found bool, err error) {
+	if data, found, err = fsx.ReadIfThere(place); err != nil {
 		return nil, false, errUnreadableState(file, err)
 	}
 	return data, found, nil

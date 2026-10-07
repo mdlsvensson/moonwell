@@ -81,7 +81,7 @@ func writeImport(
 	if err != nil {
 		return err
 	}
-	if err := assets.Sync(ctx, source, plan, stateFile); err != nil {
+	if err := assets.Sync(ctx, source, plan, p.Root, stateFile); err != nil {
 		return err
 	}
 	e.Log.Info("Synced " + strconv.Itoa(len(plan.Assets)) + " asset(s) into " + source.Label("") + " (" +

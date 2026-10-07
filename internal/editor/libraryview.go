@@ -37,7 +37,7 @@ func RefreshLibraryView(root string, sources []script.Source,
 	if err != nil {
 		return nil, err
 	}
-	dir, err := viewDir(root)
+	dir, err := fsx.Inside(root, LibraryViewDir)
 	if err != nil {
 		return nil, err
 	}
@@ -104,15 +104,6 @@ func viewAt(file string, source script.Source, lua func(script.Source) (string, 
 	}
 	// Nothing is compiled, and the module is YueScript: the file of an earlier compile stays as it is.
 	return view{file: file, kept: true}, true
-}
-
-// viewDir is where the folder of the view is on disk. A link at it, or on the way to it, is refused.
-func viewDir(root string) (string, error) {
-	dir, err := fsx.SafeJoin(root, LibraryViewDir)
-	if err != nil && !isExpected(err) {
-		return "", errViewNotWritten(LibraryViewDir, err)
-	}
-	return dir, err
 }
 
 // removeOthers removes every file below the folder that is no view: one that is not at the exact name of a

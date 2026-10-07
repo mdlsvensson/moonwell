@@ -825,7 +825,8 @@ func TestALinkOnTheWayToTheStagingFolderIsRefused(t *testing.T) {
 		elsewhere := files()
 		at := linkTo(t, elsewhere, b.root, link)
 		failure := b.refuses(fakeYue, false, "a link at "+link)
-		if failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") || len(b.ran()) != 0 {
+		if failure.Msg != "Symlinks are not supported: "+at || failure.File != "dist/stage/lua" ||
+			!strings.Contains(failure.Hint, "real files") || len(b.ran()) != 0 {
 			t.Errorf("a link at %s: %+v", link, failure)
 		}
 	}
@@ -980,6 +981,16 @@ func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T
 	failure := b.refuses(fakeYue, false, "a file for the output's folder")
 	if !strings.HasPrefix(failure.Msg, "Writing dist/stage/lua/game/units.lua failed: ") || failure.File != "dist/stage/lua/game/units.lua" ||
 		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil || len(b.ran()) != 0 {
+		t.Errorf("error = %+v", failure)
+	}
+	// A file at dist/stage, above the staging folder: nothing is below a file, which one system says in other
+	// words than another, and the refusal is that of the first file a compile writes, on each of them.
+	b = benchOf(t, mainOnly.and("dist/stage", "a file, not a folder"))
+	b.fake(nil)
+	failure = b.refuses(fakeYue, false, "a file at dist/stage")
+	if !strings.HasPrefix(failure.Msg, "Writing dist/stage/lua/.hashes.json failed: ") ||
+		failure.File != "dist/stage/lua/.hashes.json" || !strings.Contains(failure.Hint, "dist/") ||
+		failure.Cause == nil || len(b.ran()) != 0 {
 		t.Errorf("error = %+v", failure)
 	}
 	// A folder with a file in it where the output is: it cannot be removed before the compiler runs.

@@ -2,7 +2,6 @@ package library
 
 import (
 	"bytes"
-	"errors"
 	"os"
 	"path/filepath"
 	"slices"
@@ -232,20 +231,14 @@ type mirror struct {
 func mirrorOf(root, label string, files []file) (mirror, error) {
 	planned := mirror{label: label, files: files, targets: make([]string, len(files))}
 	var err error
-	if planned.folder, err = inProject(root, label, label); err != nil {
+	if planned.folder, err = fsx.Inside(root, label); err != nil {
 		return mirror{}, err
 	}
 	planned.anew = liesInTheWay(planned.folder, files)
 	for i, f := range files {
-		path := label + "/" + f.name
-		var refused *diag.Error
-		// A folder that is made anew is reached again when it is written: what lies in the way of a file keeps
-		// some systems from looking at the file's place at all.
-		switch planned.targets[i], err = fsx.SafeJoin(root, path); {
-		case errors.As(err, &refused):
-			return mirror{}, errRefusedPath(path, refused)
-		case err != nil && !planned.anew:
-			return mirror{}, errUnwritable(label, err)
+		// What lies in the way of a file is no failure here: the folder is then made anew.
+		if planned.targets[i], err = fsx.Inside(root, label+"/"+f.name); err != nil {
+			return mirror{}, err
 		}
 	}
 	return planned, nil

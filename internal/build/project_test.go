@@ -488,8 +488,8 @@ func TestStateFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 		s.project.Map.Folder = tt.folder
 		before := testkit.Snapshot(t, s.root)
 		file, err := StateFile(s.project)
-		if err != nil || file != s.at(tt.want) {
-			t.Errorf("map.folder %q: StateFile = %q, %v, want %q", tt.folder, file, err, s.at(tt.want))
+		if err != nil || file != tt.want {
+			t.Errorf("map.folder %q: StateFile = %q, %v, want %q", tt.folder, file, err, tt.want)
 		}
 		if !reflect.DeepEqual(testkit.Snapshot(t, s.root), before) {
 			t.Errorf("map.folder %q: naming the state file changed the project", tt.folder)

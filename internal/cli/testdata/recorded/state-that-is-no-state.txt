@@ -1,17 +1,17 @@
 == moonwell assets:check
 exit code: 1
 printed: nothing
-terminal: a complaint about <root>/.asset-state/map.w3x.json
+terminal: a complaint about .asset-state/map.w3x.json
 left: nothing
 == moonwell assets:sync
 exit code: 1
 printed: nothing
-terminal: a complaint about <root>/.asset-state/map.w3x.json
+terminal: a complaint about .asset-state/map.w3x.json
 left: nothing
 == moonwell build
 exit code: 1
 printed: nothing
-terminal: a complaint about <root>/.asset-state/map.w3x.json
+terminal: a complaint about .asset-state/map.w3x.json
 left:
   .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
   .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes

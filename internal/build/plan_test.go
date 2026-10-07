@@ -705,11 +705,10 @@ func TestPlanReadsTheOwnershipStateAndNeverWritesIt(t *testing.T) {
 			if held, _ := os.ReadFile(s.at(tt.stateFile)); string(held) != state {
 				t.Errorf("after the plan the ownership state holds %q", held)
 			}
-			// A state that is none is refused by its name.
+			// A state that is none is refused by its name from the project folder.
 			s.put(tt.stateFile, "not a state")
 			problem := firstProblem(t, s, Options{}, "a state file that is no state")
-			if !strings.Contains(problem.Msg, "ownership state is invalid") ||
-				!strings.HasSuffix(filepath.ToSlash(problem.File), tt.stateFile) {
+			if !strings.Contains(problem.Msg, "ownership state is invalid") || problem.File != tt.stateFile {
 				t.Errorf("problem = %+v", problem)
 			}
 		})

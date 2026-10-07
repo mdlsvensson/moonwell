@@ -336,7 +336,8 @@ func TestALinkOnTheWayToTheHashesFileIsRefused(t *testing.T) {
 		b := benchOf(t, files("src/notes.txt", ""))
 		at := linkTo(t, files(".hashes.json", "{}"), b.root, link)
 		_, err := b.compile(fakeYue, false)
-		if failure := asError(t, err, "a link at "+link); failure.Msg != "Symlinks are not supported: "+at {
+		if failure := asError(t, err, "a link at "+link); failure.Msg != "Symlinks are not supported: "+at ||
+			failure.File != "dist/stage/lua" {
 			t.Errorf("a link at %s: %+v", link, failure)
 		}
 	}
@@ -792,7 +793,8 @@ func TestAUsesFileThatCannotBeReadOrWrittenIsRefusedByItsPath(t *testing.T) {
 	b = usesBenchOf(t, nil)
 	at := linkTo(t, files(".globals.json", "{}"), b.root, "dist/stage")
 	_, err = b.list("yue", "src/main.yue", "h1")
-	if failure := asError(t, err, "a link at dist/stage"); failure.Msg != "Symlinks are not supported: "+at || len(b.yue.ran()) != 0 {
+	if failure := asError(t, err, "a link at dist/stage"); failure.Msg != "Symlinks are not supported: "+at ||
+		failure.File != "dist/stage/lua/.globals.json" || len(b.yue.ran()) != 0 {
 		t.Errorf("a link at dist/stage: %+v", failure)
 	}
 }

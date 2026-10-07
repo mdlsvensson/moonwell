@@ -100,7 +100,8 @@ func TestRefreshMacrosRefusesALinkOnTheWayToTheFile(t *testing.T) {
 		testkit.LinkDir(t, elsewhere, at)
 		wrote, err := RefreshMacros(root)
 		failure := asError(t, err, link)
-		if wrote || failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") {
+		if wrote || failure.Msg != "Symlinks are not supported: "+at || failure.File != MacrosFile ||
+			!strings.Contains(failure.Hint, "real files") {
 			t.Errorf("a link at %s: wrote %v, %+v", link, wrote, failure)
 		}
 		if through := testkit.Snapshot(t, elsewhere); len(through) != 0 {

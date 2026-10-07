@@ -327,14 +327,14 @@ func TestBuildRefusesAFileNamedDistByItsName(t *testing.T) {
 }
 
 // A file at dist/stage is met first by the compile, which keeps its cache below it, and whose refusal names the
-// place it could not write: so the test asks what every system gives.
+// first file it could not write there: the same file on every system.
 func TestBuildNamesAFileAtDistStageAndLeavesNoArchiveAndNoLock(t *testing.T) {
 	s := newStandIn(t)
 	s.withInfo(modernInfo)
 	s.put("dist/stage", "a file")
 	file, err := Build(background, s.env, Options{})
 	e := asError(t, err, "a file at dist/stage")
-	if file != "" || !strings.HasPrefix(e.File, "dist/stage") || e.Hint == "" {
+	if file != "" || e.File != "dist/stage/lua/.hashes.json" || e.Hint == "" {
 		t.Errorf("Build = %q, %+v", file, e)
 	}
 	if fsx.Exists(s.at("dist/bin")) || fsx.Exists(lockOf(s.root)) {

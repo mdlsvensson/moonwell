@@ -81,14 +81,14 @@ func declarationsOf(in Types) []declarations {
 
 // refresh writes the file below root unless it holds the text already, and reports whether it wrote.
 func (d declarations) refresh(root string) (wrote bool, err error) {
-	file, err := fsx.SafeJoin(root, d.path)
-	if err == nil {
-		wrote, err = fsx.WriteIfChanged(file, d.text)
+	file, err := fsx.Inside(root, d.path)
+	if err != nil {
+		return false, err
 	}
-	if err != nil && !isExpected(err) {
+	if wrote, err = fsx.WriteIfChanged(file, d.text); err != nil {
 		return false, errDeclarationsNotWritten(d.path, err)
 	}
-	return wrote, err
+	return wrote, nil
 }
 
 // isExpected reports whether a failure is worded for a user already: a link where real files are needed, or a

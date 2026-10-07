@@ -157,7 +157,7 @@ func (r run) in(t testing.TB, root string) (did ran) {
 	if err != nil {
 		return ran{err: err}
 	}
-	owned, err := ReadState(stateFile)
+	owned, err := ReadState(root, stateFile)
 	if err != nil {
 		return ran{err: err}
 	}
@@ -180,7 +180,7 @@ func (r run) in(t testing.TB, root string) (did ran) {
 		did.err = folder.With(result.Changes).StageTo(filepath.Join(root, filepath.FromSlash(stageFolder)))
 		return did
 	}
-	did.err = Sync(syncCtx, folder, result, stateFile)
+	did.err = Sync(syncCtx, folder, result, root, stateFile)
 	did.asks[1] = syncCtx.asks
 	return did
 }

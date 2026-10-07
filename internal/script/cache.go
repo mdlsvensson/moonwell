@@ -228,7 +228,7 @@ func writeUses(root string, now listedWith, lists map[string]sourceUses) error {
 // T's, and for anything after the value. A link on the way to the file is refused.
 func readCache[T any](root, name string) (kept T, found bool, err error) {
 	var none T
-	file, err := placeOf(root, stageDir+"/"+name, errUnreadableOutput)
+	file, err := fsx.Inside(root, stageDir+"/"+name)
 	if err != nil {
 		return none, false, err
 	}
@@ -257,7 +257,7 @@ func writeCache(root, name string, kept any) error {
 		// a value that is not is a mistake in Moonwell.
 		return fmt.Errorf("script: %s cannot be written as JSON: %w", path, err)
 	}
-	file, err := placeOf(root, path, errUnwritableOutput)
+	file, err := fsx.Inside(root, path)
 	if err != nil {
 		return err
 	}

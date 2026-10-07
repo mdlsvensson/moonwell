@@ -173,7 +173,7 @@ func TestAFailedSyncUndoesTheWritesItMade(t *testing.T) {
 	inTheWayOf(t, s, "Sound")
 	before := testkit.Snapshot(t, s.root)
 
-	e := asError(t, Sync(background, folder, result, s.state), "a failed sync")
+	e := asError(t, Sync(background, folder, result, s.root, stateName), "a failed sync")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
 		e.File != mapLabel+"/Sound/b.blp" || e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
@@ -192,7 +192,7 @@ func TestASyncThatCannotWriteOverAnOwnedFileUndoesItsWritesAndLeavesTheFileAsItW
 	before := testkit.Snapshot(t, s.root)
 	testkit.MakeUnwritable(t, filepath.Join(s.mapDir, "a.blp"))
 
-	e := asError(t, Sync(background, folder, result, s.state), "a sync that cannot write over a file")
+	e := asError(t, Sync(background, folder, result, s.root, stateName), "a sync that cannot write over a file")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
 		e.File != mapLabel+"/a.blp" || e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
@@ -240,9 +240,9 @@ func TestASyncThatCannotWriteItsStateRestoresTheMapByteForByte(t *testing.T) {
 	testkit.MakeUnwritable(t, s.state)
 	ctx := &countdown{Context: background, limit: never, before: map[int]func(){5: s.mapIsChanged}}
 
-	e := asError(t, Sync(ctx, folder, result, s.state), "a sync that cannot write its state")
+	e := asError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot write its state")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
-		e.File != s.state || !strings.Contains(e.Hint, "can be written") || e.Cause == nil {
+		e.File != stateName || !strings.Contains(e.Hint, "can be written") || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
 	if ctx.asks != 5 {
@@ -264,9 +264,10 @@ func TestASyncThatCannotReadItsStateJustBeforeWritingItRestoresTheMapByteForByte
 		}
 	}}}
 
-	e := asError(t, Sync(ctx, folder, result, s.state), "a sync that cannot read its state before it writes it")
+	e := asError(t, Sync(ctx, folder, result, s.root, stateName),
+		"a sync that cannot read its state before it writes it")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
-		e.File != s.state || !strings.Contains(e.Hint, "a readable file, not a folder") || e.Cause == nil {
+		e.File != stateName || !strings.Contains(e.Hint, "a readable file, not a folder") || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
 	if after := testkit.Snapshot(t, s.mapDir); !maps.EqualFunc(before, after, slices.Equal) {
@@ -284,7 +285,7 @@ func TestAnInterruptedSyncWritesNothingAndOneInterruptedMidwayUndoesItsWrites(t 
 	for limit := range asks {
 		folder, result := s.planned(noBlock)
 		ctx := &countdown{Context: background, limit: limit}
-		e := asError(t, Sync(ctx, folder, result, s.state), "an interrupted sync")
+		e := asError(t, Sync(ctx, folder, result, s.root, stateName), "an interrupted sync")
 		want := "Interrupted; every change was undone."
 		if limit == 0 {
 			want = "Interrupted; nothing was written."
@@ -296,7 +297,7 @@ func TestAnInterruptedSyncWritesNothingAndOneInterruptedMidwayUndoesItsWrites(t 
 	}
 	folder, result := s.planned(noBlock)
 	ctx := &countdown{Context: background, limit: asks}
-	if err := Sync(ctx, folder, result, s.state); err != nil || ctx.asks != asks {
+	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.asks != asks {
 		t.Errorf("Sync = %v after %d asks, want it to finish after %d", err, ctx.asks, asks)
 	}
 }
@@ -305,7 +306,7 @@ func TestASyncWithNothingToWriteIsNotInterrupted(t *testing.T) {
 	s := newSite(t)
 	folder, result := s.planned(noBlock)
 	ctx := &countdown{Context: background}
-	if err := Sync(ctx, folder, result, s.state); err != nil || ctx.asks != 0 {
+	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.asks != 0 {
 		t.Errorf("Sync = %v after %d asks, want no ask where nothing is written", err, ctx.asks)
 	}
 }
@@ -325,7 +326,7 @@ func TestAnUndoThatCannotRestoreAFileNamesTheFailureAndEveryFileItCouldNotRestor
 		put(t, s.mapDir, "b.blp", "another program's")
 	}}}
 
-	e := asError(t, Sync(ctx, folder, result, s.state), "a sync that cannot undo")
+	e := asError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot undo")
 	failure := mapLabel + "/b.blp changed after the assets were checked."
 	if !strings.HasPrefix(e.Msg, "Writing assets failed ("+failure+"), and these files could not be restored: "+mapLabel+"/a.blp (") ||
 		!strings.Contains(e.Hint, "version control") {
@@ -350,7 +351,7 @@ func TestAnInterruptedSyncThatCannotUndoSaysSo(t *testing.T) {
 		}
 		put(t, s.mapDir, "a.blp/inner.txt")
 	}}}
-	e := asError(t, Sync(ctx, folder, result, s.state), "a sync that cannot undo")
+	e := asError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot undo")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed (interrupted), and these files could not be restored: "+mapLabel+"/a.blp (") {
 		t.Errorf("error = %+v", e)
 	}
@@ -396,7 +397,7 @@ func TestSyncRefusesAFileThatChangedAfterThePlanAndWritesOverNothing(t *testing.
 			tt.meddle(s)
 			before := testkit.Snapshot(t, s.root)
 
-			e := asError(t, Sync(background, folder, result, s.state), "a sync of a map that changed")
+			e := asError(t, Sync(background, folder, result, s.root, stateName), "a sync of a map that changed")
 			file := mapLabel + "/" + tt.changed
 			if e.Msg != file+" changed after the assets were checked." || e.File != file || !strings.Contains(e.Hint, "Close World Editor") {
 				t.Errorf("error = %+v", e)
@@ -446,8 +447,8 @@ func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.
 			before := testkit.Snapshot(t, s.mapDir)
 			ctx := &countdown{Context: background, limit: never, before: map[int]func(){tt.lastAsk: func() { tt.meddle(s) }}}
 
-			e := asError(t, Sync(ctx, folder, result, s.state), "a sync whose state file changed")
-			if e.Msg != s.state+" changed after the assets were checked." || e.File != s.state ||
+			e := asError(t, Sync(ctx, folder, result, s.root, stateName), "a sync whose state file changed")
+			if e.Msg != stateName+" changed after the assets were checked." || e.File != stateName ||
 				!strings.Contains(e.Hint, "Close World Editor") {
 				t.Errorf("error = %+v", e)
 			}
@@ -477,7 +478,7 @@ func TestAStateFileThatNeedsNoWriteIsNotLookedAtAgain(t *testing.T) {
 	ctx := &countdown{Context: background, limit: never, before: map[int]func(){1: func() {
 		put(t, s.root, ".asset-state/map.w3x.json", "another program's")
 	}}}
-	if err := Sync(ctx, folder, result, s.state); err != nil || ctx.asks != 1 {
+	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.asks != 1 {
 		t.Errorf("Sync = %v after %d asks, want it to finish after the one ask of the index", err, ctx.asks)
 	}
 	if len(s.imports()) != 1 || s.stateText() != "another program's" {
@@ -508,7 +509,7 @@ func TestAStateFileMadeDuringASyncThatOwnsNothingAndFoundNoneIsLeftAsItIs(t *tes
 	ctx := &countdown{Context: background, limit: never, before: map[int]func(){2: func() {
 		put(t, s.root, ".asset-state/map.w3x.json", "another program's")
 	}}}
-	if err := Sync(ctx, folder, result, s.state); err != nil || ctx.asks != 2 {
+	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.asks != 2 {
 		t.Errorf("Sync = %v after %d asks, want it to finish after the two asks of the map's changes", err, ctx.asks)
 	}
 	if s.inMap("a.blp") != missing || len(s.imports()) != 0 {
@@ -519,6 +520,22 @@ func TestAStateFileMadeDuringASyncThatOwnsNothingAndFoundNoneIsLeftAsItIs(t *tes
 	}
 }
 
+// A file named .asset-state stands on the way to the state file: no state file is there, on every system, so the
+// project owns nothing and plans, and the sync that cannot write its state names the state file from the
+// project folder.
+func TestAFileNamedAssetStateOwnsNothingAndStopsASyncByTheStateFilesName(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/a.blp")
+	testkit.WriteFile(t, s.root, ".asset-state", []byte("a file, not a folder"))
+	folder, result := s.planned(noBlock)
+	before := testkit.Snapshot(t, s.root)
+	e := asError(t, Sync(background, folder, result, s.root, stateName), "a sync with a file named .asset-state")
+	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || e.File != stateName || e.Hint == "" {
+		t.Errorf("error = %+v", e)
+	}
+	s.unchanged(before, "a refused sync")
+}
+
 func TestSyncRefusesAStateFileItCannotReadBeforeItWritesAnything(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
@@ -527,8 +544,9 @@ func TestSyncRefusesAStateFileItCannotReadBeforeItWritesAnything(t *testing.T) {
 		t.Fatal(err)
 	}
 	before := testkit.Snapshot(t, s.root)
-	e := asError(t, Sync(background, folder, result, s.state), "a sync with a folder in place of its state file")
-	if !strings.Contains(e.Msg, "Reading the asset ownership state failed") || e.File != s.state {
+	e := asError(t, Sync(background, folder, result, s.root, stateName),
+		"a sync with a folder in place of its state file")
+	if !strings.Contains(e.Msg, "Reading the asset ownership state failed") || e.File != stateName {
 		t.Errorf("error = %+v", e)
 	}
 	s.unchanged(before, "a refused sync")
@@ -547,7 +565,7 @@ func TestSyncWritesNothingOfAPlanWithAnAssetInsideAnother(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Plan: %v", diag.Format(err))
 	}
-	err = Sync(background, folder, result, s.state)
+	err = Sync(background, folder, result, s.root, stateName)
 	var expected *diag.Error
 	if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "Cannot write data") {
 		t.Errorf("Sync = %v, want a plain error about data, a file and a folder at once", err)
@@ -566,7 +584,7 @@ func TestSyncRefusesAnotherFolderThanTheOneThePlanWasMadeFrom(t *testing.T) {
 	put(t, s.mapDir, "a.blp", "edited by hand")
 	before := testkit.Snapshot(t, s.root)
 
-	err := Sync(background, s.open(), result, s.state)
+	err := Sync(background, s.open(), result, s.root, stateName)
 	var expected *diag.Error
 	if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "the folder the plan was made from") {
 		t.Errorf("Sync = %v, want a plain error about the folder", err)
@@ -591,7 +609,7 @@ func TestSyncRefusesAFolderThatCarriesPlannedChanges(t *testing.T) {
 	}
 	before := testkit.Snapshot(t, s.root)
 
-	err = Sync(background, view, result, s.state)
+	err = Sync(background, view, result, s.root, stateName)
 	var expected *diag.Error
 	if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "carries planned changes") {
 		t.Errorf("Sync = %v, want a plain error about the folder's planned changes", err)

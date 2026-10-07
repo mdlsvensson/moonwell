@@ -95,5 +95,5 @@ left: a stage of 19 file(s), no archive
 refused: maps/map.w3x/war3map.imp
 left: no stage, no archive
 == state-that-is-no-state
-refused: <root>/.asset-state/map.w3x.json
+refused: .asset-state/map.w3x.json
 left: no stage, no archive

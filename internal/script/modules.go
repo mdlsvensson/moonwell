@@ -159,17 +159,13 @@ func libraryFolders(door string, libraries []Library) ([]folder, error) {
 // folderAt finds a folder of modules on disk. found is false where there is no folder: nothing at all, a file, or
 // a link that leads to no folder. A link at a folder that is there, or on the way to it, is refused.
 //
-// Whether a folder is there is asked first, and the way to it is walked only when one is: a file on the way, such
-// as a file named .moonwell, then means "no folder" on every system, where walking into it fails on some.
+// Whether a folder is there is asked first, and the way to it is walked only when one is: a link that leads to
+// no folder is then no folder, and is not refused.
 func folderAt(root, dir string) (path string, found bool, err error) {
 	if !fsx.IsDir(filepath.Join(root, filepath.FromSlash(dir))) {
 		return "", false, nil
 	}
-	path, err = fsx.SafeJoin(root, dir)
-	var expected *diag.Error
-	if err != nil && !errors.As(err, &expected) {
-		return "", false, errUnreadableFolder(dir, err)
-	}
+	path, err = fsx.Inside(root, dir)
 	return path, err == nil, err
 }
 

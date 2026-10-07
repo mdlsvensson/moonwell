@@ -148,5 +148,5 @@ func ownedFiles(p *manifest.Project) (assets.State, error) {
 	if err != nil {
 		return assets.State{}, err
 	}
-	return assets.ReadState(file)
+	return assets.ReadState(p.Root, file)
 }

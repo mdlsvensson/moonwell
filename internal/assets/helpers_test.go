@@ -89,25 +89,26 @@ func refused(t testing.TB, root, block string, libraries ...string) *diag.Error 
 
 var background = context.Background()
 
-// mapLabel is how the source map of a site is named in errors.
-const mapLabel = "maps/map.w3x"
+// mapLabel is how the source map of a site is named in errors, and stateName the ownership file of that map:
+// both from the project folder.
+const (
+	mapLabel  = "maps/map.w3x"
+	stateName = ".asset-state/map.w3x.json"
+)
 
 // site is a project with a source map and an assets folder, both empty.
 type site struct {
 	t      testing.TB
 	root   string // the project folder
 	mapDir string // maps/map.w3x in it
-	state  string // the ownership file of that map
+	state  string // where the ownership file of that map is on disk
 }
 
 func newSite(t testing.TB) *site {
 	t.Helper()
 	root := t.TempDir()
-	state, err := StateFile(root, "map.w3x")
-	if err != nil {
-		t.Fatal(err)
-	}
-	s := &site{t: t, root: root, mapDir: filepath.Join(root, "maps", "map.w3x"), state: state}
+	s := &site{t: t, root: root, mapDir: filepath.Join(root, "maps", "map.w3x"),
+		state: filepath.Join(root, filepath.FromSlash(stateName))}
 	for _, dir := range []string{s.mapDir, filepath.Join(root, "assets")} {
 		if err := os.MkdirAll(dir, 0o777); err != nil {
 			t.Fatal(err)
@@ -130,7 +131,7 @@ func (s *site) open() *mapdir.Folder {
 func (s *site) plan(ctx context.Context, block string, libraries ...string) (*mapdir.Folder, *Result, error) {
 	s.t.Helper()
 	assets, _ := collect(s.t, s.root, block, libraries...)
-	owned, err := ReadState(s.state)
+	owned, err := ReadState(s.root, stateName)
 	if err != nil {
 		s.t.Fatalf("reading the state: %v", diag.Format(err))
 	}
@@ -163,7 +164,7 @@ func (s *site) refusedPlan(block string, libraries ...string) *diag.Error {
 func (s *site) synced(block string, libraries ...string) *Result {
 	s.t.Helper()
 	folder, result := s.planned(block, libraries...)
-	if err := Sync(background, folder, result, s.state); err != nil {
+	if err := Sync(background, folder, result, s.root, stateName); err != nil {
 		s.t.Fatalf("Sync: %v", diag.Format(err))
 	}
 	return result
@@ -176,7 +177,7 @@ func (s *site) owns(names ...string) {
 	for _, name := range names {
 		state.Files = append(state.Files, Owned{Path: name, Hash: fsx.SHA256Hex([]byte(s.inMap(name)))})
 	}
-	testkit.WriteFile(s.t, s.root, ".asset-state/map.w3x.json", state.Bytes())
+	testkit.WriteFile(s.t, s.root, stateName, state.Bytes())
 }
 
 // missing is what inMap and stateText give for a file that is not there.

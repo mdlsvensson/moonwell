@@ -12,8 +12,9 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 )
 
-// Sync writes a plan's changes into the map folder itself and the ownership state into stateFile. When a write
-// fails or ctx is cancelled it puts back every file it changed.
+// Sync writes a plan's changes into the map folder itself and the ownership state into stateFile, which is what
+// StateFile returned for the project at root. When a write fails or ctx is cancelled it puts back every file it
+// changed.
 //
 // folder is the folder the plan was made from. What Plan read through it is what each file is checked against
 // before it is replaced or removed, so a file that changed after the plan stops the sync and is not written
@@ -28,14 +29,14 @@ import (
 // is: one that another program wrote, made or removed after the sync began stops the sync, and is kept. A state
 // file that holds the state already is not written, and not looked at again. The folder of the state file is
 // made when it is needed. Folders made for new files stay when the files are taken out again.
-func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, stateFile string) error {
+func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, root, stateFile string) error {
 	if result.planned != folder {
 		return errOtherFolder()
 	}
 	if len(folder.Changes()) > 0 {
 		return errFolderWithChanges()
 	}
-	state, err := stateChange(stateFile, result.State)
+	state, err := stateChange(root, stateFile, result.State)
 	if err != nil {
 		return err
 	}
@@ -51,21 +52,27 @@ func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, stateFile 
 // stateWrite is what a sync does to the state file: it writes bytes, or removes the file. It keeps what the file
 // was when the sync began, to compare with what the file is just before the write or the removal.
 type stateWrite struct {
-	file   string
+	file   string // from the project folder: how errors name it
+	place  string // where it is on disk
 	held   []byte // what the file held when the sync began
 	found  bool   // whether it was there
 	bytes  []byte
 	remove bool
 }
 
-// stateChange is what the state file needs to hold the state, or nil when it is as it must be: the file of a
-// state that owns nothing is removed, and any other is written unless it holds the same bytes.
-func stateChange(file string, state State) (*stateWrite, error) {
-	held, found, err := readIfThere(file)
+// stateChange is what the state file of the project at root needs to hold the state, or nil when it is as it
+// must be: the file of a state that owns nothing is removed, and any other is written unless it holds the same
+// bytes.
+func stateChange(root, file string, state State) (*stateWrite, error) {
+	place, err := fsx.Inside(root, file)
 	if err != nil {
 		return nil, err
 	}
-	change := &stateWrite{file: file, held: held, found: found}
+	held, found, err := readIfThere(place, file)
+	if err != nil {
+		return nil, err
+	}
+	change := &stateWrite{file: file, place: place, held: held, found: found}
 	if len(state.Files) == 0 {
 		if !found {
 			return nil, nil
@@ -99,9 +106,9 @@ func (s *stateWrite) apply(journal *fsx.Journal) error {
 		return err
 	}
 	if s.remove {
-		err = journal.Remove(s.file)
+		err = journal.Remove(s.place)
 	} else {
-		err = journal.Write(s.file, s.bytes)
+		err = journal.Write(s.place, s.bytes)
 	}
 	if err != nil {
 		return errStateNotWritten(s.file, err)
@@ -112,7 +119,7 @@ func (s *stateWrite) apply(journal *fsx.Journal) error {
 // asItWas fails unless the state file is what it was when the sync began: there with the same bytes, or not
 // there. Another program that wrote, made or removed it in between has its file kept.
 func (s *stateWrite) asItWas() error {
-	held, found, err := readIfThere(s.file)
+	held, found, err := readIfThere(s.place, s.file)
 	switch {
 	case err != nil:
 		return err
@@ -123,7 +130,7 @@ func (s *stateWrite) asItWas() error {
 }
 
 // unrestored lists the files an undo could not put back, each with the system's reason: a file of the map by
-// the folder's label, the state file by its path.
+// the folder's label, the state file by its path on disk, which is what the journal knows it by.
 func unrestored(folder *mapdir.Folder, files []fsx.Unrestored) []string {
 	var listed []string
 	for _, file := range files {
@@ -205,7 +212,7 @@ func errInterruptedAndUndone() error {
 }
 
 // errStateChanged is mapdir's refusal of a map file that changed after the plan, for the state file, which is
-// named by its path.
+// named by its path from the project folder.
 func errStateChanged(file string) error {
 	return &diag.Error{
 		Msg:  file + " changed after the assets were checked.",

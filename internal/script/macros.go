@@ -1,7 +1,6 @@
 package script
 
 import (
-	"errors"
 	"path/filepath"
 	"strings"
 
@@ -16,22 +15,14 @@ const MacrosFile = ".moonwell/yue/moonwell/macros.yue"
 // RefreshMacros writes the macro module when its content differs, so that `import "moonwell.macros"` is found by
 // the compiler and by an editor. A link on the way to the file is refused, and nothing is written through it.
 func RefreshMacros(root string) (wrote bool, err error) {
-	wrote, err = writeMacros(root)
-	var expected *diag.Error
-	if err != nil && !errors.As(err, &expected) {
-		return false, errMacrosNotWritten(err)
-	}
-	return wrote, err
-}
-
-// writeMacros writes the macro module below root unless the file holds it already. Its failures are the system's,
-// but for a link on the way.
-func writeMacros(root string) (wrote bool, err error) {
-	file, err := fsx.SafeJoin(root, MacrosFile)
+	file, err := fsx.Inside(root, MacrosFile)
 	if err != nil {
 		return false, err
 	}
-	return fsx.WriteIfChanged(file, moonwell.MacrosYue)
+	if wrote, err = fsx.WriteIfChanged(file, moonwell.MacrosYue); err != nil {
+		return false, errMacrosNotWritten(err)
+	}
+	return wrote, nil
 }
 
 // macros is how a run of the compiler finds `import "moonwell.macros"`.

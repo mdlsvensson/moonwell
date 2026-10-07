@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
 // Two hashes a state file can hold.
@@ -16,30 +17,50 @@ var (
 	sevens = strings.Repeat("7", 64)
 )
 
-// stateOf is the path of a state file that holds content, in a project of its own.
+// stateOf is a project of its own whose state file holds content: its folder.
 func stateOf(t *testing.T, content string) string {
 	t.Helper()
-	return put(t, t.TempDir(), ".asset-state/map.w3x.json", content)
+	root := t.TempDir()
+	put(t, root, stateName, content)
+	return root
 }
 
-func TestStateFileIsUnderAssetStateByTheMapFoldersName(t *testing.T) {
+func TestStateFileIsUnderAssetStateByTheMapFoldersNameFromTheProjectFolder(t *testing.T) {
 	root := t.TempDir()
 	file, err := StateFile(root, "map.w3x")
-	if err != nil || file != filepath.Join(root, ".asset-state", "map.w3x.json") {
+	if err != nil || file != ".asset-state/map.w3x.json" {
 		t.Errorf("StateFile = %q, %v", file, err)
 	}
 	file, err = StateFile(root, "../map.w3x")
-	if e := asError(t, err, "a map folder outside maps/"); file != "" || !strings.Contains(e.Msg, "../map.w3x") || e.Hint == "" {
+	if e := asError(t, err, "a map folder outside maps/"); file != "" || !strings.Contains(e.Msg, "../map.w3x") ||
+		e.File != ".asset-state/../map.w3x.json" || e.Hint == "" {
 		t.Errorf("StateFile = %q, %+v", file, e)
 	}
 }
 
-func TestReadStateOfAProjectWithoutAStateFileIsEmpty(t *testing.T) {
-	file, err := StateFile(t.TempDir(), "map.w3x")
-	if err != nil {
-		t.Fatal(err)
+// A link on the way to the state file is refused where the file is named, where it is read and where it is
+// written, each time by the state file's name from the project folder.
+func TestALinkOnTheWayToTheStateFileIsRefusedByTheStateFilesName(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/a.blp")
+	folder, result := s.planned(noBlock)
+	testkit.LinkDir(t, t.TempDir(), filepath.Join(s.root, ".asset-state"))
+	_, named := StateFile(s.root, "map.w3x")
+	_, read := ReadState(s.root, stateName)
+	for what, err := range map[string]error{
+		"StateFile": named, "ReadState": read, "Sync": Sync(background, folder, result, s.root, stateName),
+	} {
+		if e := asError(t, err, what); !strings.Contains(e.Msg, "Symlinks are not supported") || e.File != stateName {
+			t.Errorf("%s: error = %+v", what, e)
+		}
 	}
-	if state, err := ReadState(file); err != nil || len(state.Files) != 0 {
+	if s.inMap("a.blp") != missing {
+		t.Error("the refused sync wrote into the map")
+	}
+}
+
+func TestReadStateOfAProjectWithoutAStateFileIsEmpty(t *testing.T) {
+	if state, err := ReadState(t.TempDir(), stateName); err != nil || len(state.Files) != 0 {
 		t.Errorf("ReadState = %+v, %v", state, err)
 	}
 }
@@ -65,7 +86,7 @@ func TestReadStateKeepsThePathsAsWrittenInTheOrderWritten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			state, err := ReadState(stateOf(t, tt.content))
+			state, err := ReadState(stateOf(t, tt.content), stateName)
 			if err != nil || !slices.Equal(state.Files, tt.want) {
 				t.Errorf("ReadState = %+v, %v, want %+v", state.Files, err, tt.want)
 			}
@@ -106,19 +127,18 @@ func TestReadStateRefusesAFileThatIsNotAStateAndNamesIt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			file := stateOf(t, tt.content)
-			state, err := ReadState(file)
+			state, err := ReadState(stateOf(t, tt.content), stateName)
 			e := asError(t, err, tt.content)
-			if e.Msg != "The asset ownership state is invalid: "+tt.problem || e.File != file ||
+			if e.Msg != "The asset ownership state is invalid: "+tt.problem || e.File != stateName ||
 				!strings.HasPrefix(e.Hint, "Restore it from version control.") || len(state.Files) != 0 {
-				t.Errorf("ReadState = %+v, %+v, want the problem %q at %s", state, e, tt.problem, file)
+				t.Errorf("ReadState = %+v, %+v, want the problem %q at %s", state, e, tt.problem, stateName)
 			}
 		})
 	}
 }
 
 func TestTheFirstBadEntryOfAStateIsTheFirstWrittenAlsoWhereAPathLooksLikeANumber(t *testing.T) {
-	_, err := ReadState(stateOf(t, `{"version":1,"files":{"b.blp":"bad","7":"worse"}}`))
+	_, err := ReadState(stateOf(t, `{"version":1,"files":{"b.blp":"bad","7":"worse"}}`), stateName)
 	if e := asError(t, err, "two bad hashes"); !strings.Contains(e.Msg, "b.blp has no valid hash") {
 		t.Errorf("error = %+v, want it about b.blp, which is written before 7", e)
 	}
@@ -126,13 +146,14 @@ func TestTheFirstBadEntryOfAStateIsTheFirstWrittenAlsoWhereAPathLooksLikeANumber
 
 func TestReadStateNamesAStateFileItCannotRead(t *testing.T) {
 	// A folder where the file should be: reading it fails on every system.
-	file := filepath.Join(t.TempDir(), ".asset-state", "map.w3x.json")
-	if err := os.MkdirAll(file, 0o777); err != nil {
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, ".asset-state", "map.w3x.json"), 0o777); err != nil {
 		t.Fatal(err)
 	}
-	_, err := ReadState(file)
+	_, err := ReadState(root, stateName)
 	e := asError(t, err, "a folder in place of the state file")
-	if !strings.Contains(e.Msg, "Reading the asset ownership state failed") || e.File != file || e.Hint == "" || e.Cause == nil {
+	if !strings.Contains(e.Msg, "Reading the asset ownership state failed") || e.File != stateName || e.Hint == "" ||
+		e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
 }
@@ -169,7 +190,7 @@ func TestAStateIsReadBackAsItWasWritten(t *testing.T) {
 		{"Models/H\xc3\xa9ro.mdx", fsx.SHA256Hex([]byte("model"))},
 		{"12", zeros},
 	}}
-	read, err := ReadState(stateOf(t, string(state.Bytes())))
+	read, err := ReadState(stateOf(t, string(state.Bytes())), stateName)
 	if err != nil || !slices.Equal(read.Files, state.Files) {
 		t.Errorf("ReadState = %+v, %v, want %+v", read.Files, err, state.Files)
 	}

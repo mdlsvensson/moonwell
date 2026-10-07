@@ -124,7 +124,7 @@ type unit struct {
 // refused. Below the folder nothing is looked at for links: it is Moonwell's own, which Moonwell makes and
 // fills, so a link that is planted in it is written through.
 func stageOf(root string) (string, error) {
-	return placeOf(root, stageDir, errUnwritableOutput)
+	return fsx.Inside(root, stageDir)
 }
 
 // unitsOf reads every YueScript source among the modules, in their order; stage is the staging folder on disk.
@@ -185,17 +185,6 @@ func outputOf(source Source) (string, error) {
 	// manifest's, which are plain names. So a YueScript module that is not at the path of its name, or a key that
 	// is no plain name, is a mistake in Moonwell and nothing the user can put right.
 	return "", fmt.Errorf("script.compileAll: the module %q of the library %q is at %q, which places no output", source.Name, source.Library, source.Path)
-}
-
-// placeOf is where a file or a folder of the project is on disk; path is from the project folder, with "/". A
-// link at it, or on the way to it, is refused. Any other failure to look at the place is worded by failed.
-func placeOf(root, path string, failed func(path string, cause error) error) (string, error) {
-	onDisk, err := fsx.SafeJoin(root, path)
-	var refused *diag.Error
-	if err != nil && !errors.As(err, &refused) {
-		return "", failed(path, err)
-	}
-	return onDisk, err
 }
 
 // withoutFailed is the units whose compile left their Lua: all but those a failure names.

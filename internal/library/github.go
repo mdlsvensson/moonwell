@@ -227,11 +227,11 @@ func dropStamp(at folders) error {
 // the place of the folder <key>. dir is one of the two folders, from the project folder at root.
 func replace(root, dir, key string, files []file, stamp string) error {
 	label := dir + "/" + key
-	temp, err := inProject(root, dir+"/."+key+".tmp", label)
+	temp, err := fsx.Inside(root, dir+"/."+key+".tmp")
 	if err != nil {
 		return err
 	}
-	target, err := inProject(root, label, label)
+	target, err := fsx.Inside(root, label)
 	if err != nil {
 		return err
 	}

@@ -366,7 +366,8 @@ func TestALinkOnTheWayToTheLibraryViewIsRefused(t *testing.T) {
 		for _, lua := range []func(script.Source) (string, bool){nil, compiled(nil)} {
 			written, err := RefreshLibraryView(root, librarySources(), lua)
 			failure := asError(t, err, "a link at "+link)
-			if failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") || written != nil {
+			if failure.Msg != "Symlinks are not supported: "+at || failure.File != LibraryViewDir ||
+				!strings.Contains(failure.Hint, "real files") || written != nil {
 				t.Errorf("a link at %s: RefreshLibraryView = %q, %+v", link, written, failure)
 			}
 		}

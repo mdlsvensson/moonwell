@@ -156,7 +156,8 @@ func TestALinkOnTheWayToTheDeclarationsIsRefused(t *testing.T) {
 		at, target := linkAt(t, root, link)
 		written, err := RefreshTypes(root, types(nil))
 		failure := asError(t, err, "a link at "+link)
-		if failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") || written != nil {
+		if failure.Msg != "Symlinks are not supported: "+at || failure.File != ".moonwell/types/natives.d.lua" ||
+			!strings.Contains(failure.Hint, "real files") || written != nil {
 			t.Errorf("a link at %s: RefreshTypes = %q, %+v", link, written, failure)
 		}
 		if behind := testkit.Snapshot(t, target); len(behind) != 0 {
@@ -171,7 +172,8 @@ func TestALinkAtAFileOfDeclarationsIsRefused(t *testing.T) {
 	linkToFile(t, filepath.Join(root, "elsewhere", "mine.lua"), at)
 	written, err := RefreshTypes(root, types(nil))
 	failure := asError(t, err, "a link at map.d.lua")
-	if failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") || written != nil {
+	if failure.Msg != "Symlinks are not supported: "+at || failure.File != ".moonwell/types/map.d.lua" ||
+		!strings.Contains(failure.Hint, "real files") || written != nil {
 		t.Errorf("RefreshTypes = %q, %+v", written, failure)
 	}
 	if got := read(t, root, "elsewhere/mine.lua"); got != "mine" {

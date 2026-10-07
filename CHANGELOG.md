@@ -12,6 +12,10 @@
 - A "did you mean" hint counts two neighbouring letters that changed places as one mistake: `biuld` names `build`,
   `--hepl` names `--help` and `tset` names `test`. This holds for every such hint: a command, a flag, a global,
   and a field or a base object of an object.
+- An error about the asset ownership state names `.asset-state/<map>.json` from the project folder, as every other
+  file is named, and not by its full path. A link on the way to a file Moonwell keeps below `.moonwell/` or
+  `dist/stage/lua/` is refused with that file named. A file in the place of the folder `.asset-state` or
+  `dist/stage` gives the same error on Windows and on Linux.
 
 ## 0.9.1 (2026-10-03)
 

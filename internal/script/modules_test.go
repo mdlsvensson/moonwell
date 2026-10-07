@@ -399,6 +399,11 @@ func TestALinkAtAFolderOfModulesIsRefused(t *testing.T) {
 		if failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") {
 			t.Errorf("a link at %s: %+v", link, failure)
 		}
+		// The refusal names the folder of modules that was looked for, from the project folder.
+		if !slices.Contains([]string{"src", "lua", librariesDir + "/ex"}, failure.File) ||
+			!strings.HasPrefix(failure.File, link) {
+			t.Errorf("a link at %s: the refusal names the file %q", link, failure.File)
+		}
 	}
 }
 
