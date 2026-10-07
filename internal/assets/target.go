@@ -62,6 +62,6 @@ func errReserved(value string) error {
 func errMapListPicture(value string) error {
 	return &diag.Error{
 		Msg:  "Reserved map path: " + value,
-		Hint: "For a picture of your own in the game's map list, set settings.info.preview in moonwell.pkl.",
+		Hint: "For a picture of your own in the game's map list, set settings.info.preview.",
 	}
 }

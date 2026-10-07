@@ -59,13 +59,17 @@ func Decode(root, file string, data []byte) (*Project, error) {
 // reasonOf says why JSON does not fit a project. A value of another kind than a project has in its place is named
 // by where it stands, as a manifest writes it (map.folder), and by what it is, in place of the decoder's words,
 // which name types of this program. The keys of the mappings on the way to it stand before it, as under puts them.
+// A number that its place cannot hold, the key of a slot that is none among them, is named as that number.
 func reasonOf(err error) string {
 	var mismatch *json.UnmarshalTypeError
 	if !errors.As(err, &mismatch) {
 		return strings.ReplaceAll(err.Error(), "json: ", "")
 	}
-	keys := strings.TrimSuffix(err.Error(), mismatch.Error())
-	return keys + cmp.Or(mismatch.Field, "the value") + " is of the wrong kind (" + mismatch.Value + ")"
+	where := strings.TrimSuffix(err.Error(), mismatch.Error()) + cmp.Or(mismatch.Field, "the value")
+	if number, written := strings.CutPrefix(mismatch.Value, "number "); written {
+		return where + ": " + number + " is no number that fits there"
+	}
+	return where + " is of the wrong kind (" + mismatch.Value + ")"
 }
 
 // missingTexts names the texts p lacks of the four the schema gives every project. JSON that fits the structs and

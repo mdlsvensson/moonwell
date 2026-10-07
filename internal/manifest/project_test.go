@@ -165,9 +165,9 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 		{"a player of another type", `{"settings":{"players":{"7":{"x":"1"}}}}`, []string{"string", "settings.players.7.x"}, nil},
 		// The only fault of these two is the slot: a slot is a whole number.
 		{"a player slot that is no number", printed(`"settings":{"players":{"first":{}}}`),
-			[]string{"first", "settings.players"}, []string{"map.folder"}},
+			[]string{"first is no number", "settings.players"}, []string{"map.folder", "number first"}},
 		{"a force slot that is no whole number", printed(`"settings":{"forces":{"1.5":{}}}`),
-			[]string{"1.5", "settings.forces"}, []string{"map.folder"}},
+			[]string{"1.5 is no number", "settings.forces"}, []string{"map.folder", "number 1.5"}},
 		{"asset paths as a list", `{"assets":{"paths":[]}}`, []string{"array", "a mapping"}, nil},
 		{"an asset path of another type", `{"assets":{"paths":{"a.blp":3}}}`, []string{"number", "a.blp: "}, nil},
 		{"an object without a text for its id", `{"objects":{"units":{"a":{"id":3}}}}`, []string{"number", "a: id: "}, nil},

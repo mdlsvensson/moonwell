@@ -30,7 +30,7 @@ func PackID(id string) (uint32, error) {
 // RenderIDs renders the generated module for the objects: a table for every category in order, with the objects
 // sorted by key, each as its number and, in a comment, its rawcode. It reads only the category, the key and the
 // id of an object. An id that does not pack is PackID's error: Resolve lets through only ids of four letters or
-// digits, so such an id is a bug in the caller, and no objects render without an error.
+// digits, so such an id is a bug in the caller. A call without objects has no id, and returns no error.
 func RenderIDs(resolved []Resolved) (string, error) {
 	lines := []string{idsHeader}
 	for _, category := range manifest.Categories {
