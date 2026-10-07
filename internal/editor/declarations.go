@@ -28,8 +28,8 @@ var luaKeywords = []string{
 // luaType is the lua-language-server type for a JASS type. Handle types, and the Lua types of the functions only
 // Lua has, pass through.
 func luaType(jassType string) string {
-	if luaType, ok := luaTypes[jassType]; ok {
-		return luaType
+	if named, ok := luaTypes[jassType]; ok {
+		return named
 	}
 	return jassType
 }

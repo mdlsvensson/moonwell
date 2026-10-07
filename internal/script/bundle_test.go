@@ -168,18 +168,18 @@ func TestANameAndAPathAreWrittenAsLuaStringsThatLuaReadsBackAsTheirBytes(t *test
 		want = append(want, inHex(name[1])+" "+inHex(name[1])+" "+inHex("lua/"+name[1]+".lua"))
 	}
 	const entry = "a\tb\x7f\"\\" + eAcute
-	bundle := bundle(&Program{Entry: entry, Modules: modules}, recordingRuntime, 1)
+	block := bundle(&Program{Entry: entry, Modules: modules}, recordingRuntime, 1)
 	// A control character and U+007F are three digits after a backslash, so that a digit after one stays apart.
 	for _, written := range []string{
 		`__mw.define("a\009b", function(...)`, `__mw.define("a\010b", function(...)`, `__mw.define("a\0011", function(...)`,
 		`__mw.define("a\000b", function(...)`, `__mw.define("a\1277", function(...)`, `, "a\"b", "src/a\"b.yue"},`, `, "a\\b", "src/a\\b.yue"},`,
 		`, "a\0319", "src/a\0319.yue"},`, `__mw.boot("a\009b\127\"\\` + eAcute + `")`, `__mw.define("` + beyond + `", function(...)`,
 	} {
-		if !strings.Contains(bundle, written+"\n") {
+		if !strings.Contains(block, written+"\n") {
 			t.Errorf("the bundle lacks %s", written)
 		}
 	}
-	file := testkit.WriteFile(t, t.TempDir(), "names.lua", []byte(bundle))
+	file := testkit.WriteFile(t, t.TempDir(), "names.lua", []byte(block))
 	got := strings.Split(strings.TrimSuffix(tooltest.RunLua(t, file), "\n"), "\n")
 	want = append(want, inHex(entry))
 	if !slices.Equal(got, want) {

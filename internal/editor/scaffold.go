@@ -16,11 +16,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-// files are the committed files VS Code's YueScript extension and lua-language-server read: the editor files.
-var files = []string{"yueconfig.yue", ".luarc.json", ".vscode/extensions.json"}
+// editorFiles are the committed files VS Code's YueScript extension and lua-language-server read.
+var editorFiles = []string{"yueconfig.yue", ".luarc.json", ".vscode/extensions.json"}
 
-// ignores are the .gitignore lines for what Moonwell and the extension write.
-var ignores = []string{".moonwell/", "src/**/*.lua"}
+// gitignoreLines are the .gitignore lines for what Moonwell and the extension write.
+var gitignoreLines = []string{".moonwell/", "src/**/*.lua"}
 
 // The two files of a project that are changed where they are, from the project folder.
 const (
@@ -36,13 +36,13 @@ const (
 // AddFiles gives a project the editor files it lacks: each missing file from the template, and each missing
 // .gitignore line appended. It never overwrites a file. It returns what it added.
 //
-// What is added is named as setup reports it: each file by its path, in the order of files, and then .gitignore
-// with the lines it was given.
+// What is added is named as setup reports it: each file by its path, in the order of editorFiles, and then
+// .gitignore with the lines it was given.
 //
 // The files are the project's own, which its user commits, and so is a link at one of them. A file behind a link
-// is there: one of files is left as it is, and .gitignore is read and written through the link. A link that leads
-// to nothing, at one of files or at .gitignore, is refused before anything is written, since a file written under
-// its name would be made where the link leads. A link to a folder at .vscode is followed.
+// is there: an editor file is left as it is, and .gitignore is read and written through the link. A link that
+// leads to nothing, at an editor file or at .gitignore, is refused before anything is written, since a file
+// written under its name would be made where the link leads. A link to a folder at .vscode is followed.
 func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	there, err := lookAtFiles(root)
 	if err != nil {
@@ -62,11 +62,11 @@ func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	return added, nil
 }
 
-// lookAtFiles reports, for each of files and for .gitignore, whether there is something under its name. All four
-// are looked at before any is written, so that a link to nothing at one of them leaves the project as it is.
+// lookAtFiles reports, for each editor file and for .gitignore, whether there is something under its name. All
+// four are looked at before any is written, so that a link to nothing at one of them leaves the project as it is.
 func lookAtFiles(root string) (there map[string]bool, err error) {
 	there = map[string]bool{}
-	for _, file := range append(slices.Clone(files), gitignoreFile) {
+	for _, file := range append(slices.Clone(editorFiles), gitignoreFile) {
 		if there[file], err = isThere(root, file); err != nil {
 			return nil, err
 		}
@@ -96,11 +96,11 @@ func leadsNowhere(link string) bool {
 	return errors.Is(err, fs.ErrNotExist)
 }
 
-// addMissingFiles writes each of files that is not there, from the template, and returns those it wrote. What is
-// there under the name of a file stays as it is, whatever it holds, and a folder too.
+// addMissingFiles writes each editor file that is not there, from the template, and returns those it wrote. What
+// is there under the name of a file stays as it is, whatever it holds, and a folder too.
 func addMissingFiles(root string, template []moonwell.TemplateFile, there map[string]bool) ([]string, error) {
 	added := []string{}
-	for _, file := range files {
+	for _, file := range editorFiles {
 		if there[file] {
 			continue
 		}
@@ -123,13 +123,13 @@ func templateFile(template []moonwell.TemplateFile, path string) ([]byte, error)
 			return file.Data, nil
 		}
 	}
-	// A plain error: the template is Moonwell's own and holds each of files, so one without the file is a mistake
-	// in Moonwell and nothing the user can put right.
+	// A plain error: the template is Moonwell's own and holds each editor file, so one without the file is a
+	// mistake in Moonwell and nothing the user can put right.
 	return nil, errors.New("editor: the template has no " + path + "; pass moonwell.TemplateFiles()")
 }
 
-// addIgnores appends each of ignores that .gitignore lacks, and returns those it appended. A project without the
-// file is given one.
+// addIgnores appends each of gitignoreLines that .gitignore lacks, and returns those it appended. A project
+// without the file is given one.
 func addIgnores(root string) ([]string, error) {
 	held, _, err := readIfThere(root, gitignoreFile)
 	if err != nil {
@@ -145,15 +145,16 @@ func addIgnores(root string) ([]string, error) {
 	return lacking, nil
 }
 
-// ignoresLacking is each of ignores that no line of a .gitignore is. A line ends at a line feed, and is compared
-// without the white space of ASCII around it; a byte order mark at the start of the file is no part of the first.
+// ignoresLacking is each of gitignoreLines that no line of a .gitignore is. A line ends at a line feed, and is
+// compared without the white space of ASCII around it; a byte order mark at the start of the file is no part of
+// the first.
 func ignoresLacking(held []byte) []string {
 	var lines []string
 	for line := range strings.SplitSeq(fsx.WithoutMark(string(held)), "\n") {
 		lines = append(lines, strings.Trim(line, lineSpace))
 	}
 	var lacking []string
-	for _, ignore := range ignores {
+	for _, ignore := range gitignoreLines {
 		if !slices.Contains(lines, ignore) {
 			lacking = append(lacking, ignore)
 		}
