@@ -218,7 +218,7 @@ func dropStamp(at folders) error {
 		return nil
 	}
 	if err := fsx.RemoveFile(stamp); err != nil {
-		return errUnwritable(modulesOf(at.key), err)
+		return errUnremovable(modulesOf(at.key)+"/"+stampFile, err)
 	}
 	return nil
 }
@@ -242,7 +242,7 @@ func replace(root, dir, key string, files []file, stamp string) error {
 		return errUnwritable(label, err)
 	}
 	if err := fsx.RemoveAll(target); err != nil {
-		return errUnwritable(label, err)
+		return errUnremovable(label, err)
 	}
 	if err := os.Rename(temp, target); err != nil {
 		return errUnwritable(label, err)

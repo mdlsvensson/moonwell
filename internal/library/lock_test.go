@@ -264,11 +264,12 @@ func TestTheLockIsWrittenOnlyWhenItsTextChanges(t *testing.T) {
 
 func TestALockThatCannotBeWrittenOrRemovedIsRefusedByItsName(t *testing.T) {
 	// A folder that holds a file can neither be written as a file nor removed as one, on every system.
-	for name, entries := range map[string]map[string]LockEntry{"written": {"a": entryOfTest(nil)}, "removed": nil} {
+	// Each failure is worded as what was tried: no entries means that the file is removed.
+	for name, entries := range map[string]map[string]LockEntry{"Writing": {"a": entryOfTest(nil)}, "Removing": nil} {
 		root := t.TempDir()
 		testkit.WriteFile(t, root, LockFile+"/in the way", nil)
 		failure := asError(t, WriteLock(root, entries), name)
-		if !strings.HasPrefix(failure.Msg, "Writing moonwell.lock failed: ") || failure.File != LockFile ||
+		if !strings.HasPrefix(failure.Msg, name+" moonwell.lock failed: ") || failure.File != LockFile ||
 			!strings.Contains(failure.Hint, "Close programs that have moonwell.lock open") || failure.Cause == nil {
 			t.Errorf("%s: %+v", name, failure)
 		}

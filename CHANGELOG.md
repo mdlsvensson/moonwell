@@ -23,6 +23,8 @@
 - `assets:paths` with a file that does not exist, that is a folder, or that cannot be read reports it as every
   other file is reported: the file before the message, from the folder the command runs in, and a hint. A model
   whose name starts with two dots (`..knight.mdx`) is named from that folder too, and not by its whole path.
+- A folder of a library below `.moonwell/`, or `moonwell.lock`, that cannot be removed is reported as "Removing …
+  failed", where it said "Writing … failed".
 
 ## 0.9.1 (2026-10-03)
 

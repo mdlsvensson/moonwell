@@ -144,7 +144,7 @@ func removeOthers(folder, dir string, keys []string) error {
 			continue
 		}
 		if err := fsx.RemoveAll(filepath.Join(folder, entry.Name())); err != nil {
-			return errUnwritable(dir+"/"+entry.Name(), err)
+			return errUnremovable(dir+"/"+entry.Name(), err)
 		}
 	}
 	return nil
@@ -245,7 +245,7 @@ func (f folders) synced(shipsAssets bool) Synced {
 // removeAssets removes the folder of the files a library ships for the map: the library ships none.
 func removeAssets(at folders) error {
 	if err := fsx.RemoveAll(at.assets); err != nil {
-		return errUnwritable(assetsOf(at.key), err)
+		return errUnremovable(assetsOf(at.key), err)
 	}
 	return nil
 }
@@ -385,15 +385,19 @@ func errKeysDifferByCase(first, second, manifestFile string) error {
 	}
 }
 
-// errUnwritable is a failure to write or remove at path, a folder below .moonwell/ written from the project
-// folder.
+// folderHint is the hint of a failure to write or to remove below .moonwell/.
+const folderHint = "Close programs that have files in .moonwell/ open, then retry."
+
+// errUnwritable is a failure to write at path, a folder below .moonwell/ written from the project folder: to
+// write a file of it, or to bring it up to date, which writes and removes.
 func errUnwritable(path string, cause error) error {
-	return &diag.Error{
-		Msg:   "Writing " + path + " failed: " + reasonOf(cause),
-		File:  path,
-		Hint:  "Close programs that have files in .moonwell/ open, then retry.",
-		Cause: cause,
-	}
+	return &diag.Error{Msg: "Writing " + path + " failed: " + reasonOf(cause), File: path, Hint: folderHint, Cause: cause}
+}
+
+// errUnremovable is a failure to remove what is at path, a file or a folder below .moonwell/ written from the
+// project folder.
+func errUnremovable(path string, cause error) error {
+	return &diag.Error{Msg: "Removing " + path + " failed: " + reasonOf(cause), File: path, Hint: folderHint, Cause: cause}
 }
 
 // unusableHint is the hint of a refusal of files that cannot be used, for the one who can act on it: the author

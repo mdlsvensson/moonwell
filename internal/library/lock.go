@@ -100,12 +100,13 @@ func WriteLock(root string, entries map[string]LockEntry) error {
 		return err
 	}
 	if len(entries) == 0 {
-		err = fsx.RemoveFile(path)
-	} else {
-		_, err = fsx.WriteIfChanged(path, lockText(entries))
+		if err := fsx.RemoveFile(path); err != nil {
+			return errUnwritableLock("Removing", err)
+		}
+		return nil
 	}
-	if err != nil {
-		return errUnwritableLock(err)
+	if _, err := fsx.WriteIfChanged(path, lockText(entries)); err != nil {
+		return errUnwritableLock("Writing", err)
 	}
 	return nil
 }
@@ -174,9 +175,10 @@ func errNotALock() error {
 	return &diag.Error{Msg: LockFile + " is not a Moonwell lock file.", File: LockFile, Hint: lockHint}
 }
 
-func errUnwritableLock(cause error) error {
+// errUnwritableLock is a failure to write the lock or to remove it; doing says which, as "Writing".
+func errUnwritableLock(doing string, cause error) error {
 	return &diag.Error{
-		Msg:   "Writing " + LockFile + " failed: " + reasonOf(cause),
+		Msg:   doing + " " + LockFile + " failed: " + reasonOf(cause),
 		File:  LockFile,
 		Hint:  "Close programs that have " + LockFile + " open, and check it is not read-only.",
 		Cause: cause,

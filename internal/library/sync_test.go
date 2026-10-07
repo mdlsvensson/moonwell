@@ -1562,6 +1562,30 @@ func TestAFolderThatCannotBeWrittenNamesTheFolder(t *testing.T) {
 	}
 }
 
+func TestAFolderOfALibraryThatLeftAndCannotBeRemovedIsWordedAsARemoval(t *testing.T) {
+	root := t.TempDir()
+	put(t, root, ".moonwell/libraries/gone/a.lua", "1")
+	held := filepath.Join(root, ".moonwell", "libraries", "gone", "a.lua")
+	// What keeps a file from being removed is the system's own: on Windows that a program holds it, and
+	// elsewhere that the folder it is in may not be written.
+	switch {
+	case runtime.GOOS == "windows":
+		testkit.MakeUnwritable(t, held)
+	case os.Geteuid() == 0:
+		t.Skip("root may remove a file from a folder without the permission, so the removal would not fail")
+	default:
+		if err := os.Chmod(filepath.Dir(held), 0o555); err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { os.Chmod(filepath.Dir(held), 0o777) })
+	}
+	e := refusal(t, root, nil, nil, "a folder that cannot be removed")
+	if !strings.HasPrefix(e.Msg, "Removing .moonwell/libraries/gone failed: ") || e.File != ".moonwell/libraries/gone" ||
+		e.Hint == "" || e.Cause == nil {
+		t.Errorf("error = %+v", e)
+	}
+}
+
 func TestAFileOfADownloadThatLiesWhereAFolderOfItDoesFailsAndTheLibraryIsFetchedAgain(t *testing.T) {
 	root := t.TempDir()
 	libraries := block("ex", fromGitHub("v0.1.0", ""))
