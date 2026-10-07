@@ -122,6 +122,37 @@ func Digest(data []byte) string {
 	return fmt.Sprintf("sha256 %x, %d bytes", sha256.Sum256(data), len(data))
 }
 
+// ByDigest is a file as the line of a recording holds it after the file's name, by its digest.
+func ByDigest(data []byte) string { return " " + Digest(data) + "\n" }
+
+// longestWhole is the most bytes of a text that a recording writes out.
+const longestWhole = 2048
+
+// WholeIfShort is a file as the line of a recording holds it after the file's name where texts stand whole: a
+// text of up to longestWhole bytes with each line quoted as Go quotes a string, and any other file as its
+// digest. A text of one line stands beside the name, and a longer one line by line below it.
+func WholeIfShort(data []byte) string {
+	isText := utf8.Valid(data) && !bytes.ContainsFunc(data, func(r rune) bool {
+		return r < ' ' && r != '\t' && r != '\n' && r != '\r'
+	})
+	if len(data) > longestWhole || !isText {
+		return ByDigest(data)
+	}
+	lines := strings.SplitAfter(string(data), "\n")
+	if last := len(lines) - 1; last > 0 && lines[last] == "" {
+		lines = lines[:last]
+	}
+	if len(lines) == 1 {
+		return " " + strconv.Quote(lines[0]) + "\n"
+	}
+	var out strings.Builder
+	out.WriteString("\n")
+	for _, line := range lines {
+		out.WriteString("    " + strconv.Quote(line) + "\n")
+	}
+	return out.String()
+}
+
 // Shown is a value as a line of a recording holds it, so that the recording is text that an editor may open
 // and save: a recording is UTF-8, and no line of it ends in a space. A value is written as it is when it is not
 // empty, is UTF-8, has only characters that are printed, neither starts nor ends with white space, and does not
@@ -148,8 +179,9 @@ func Shown(value string) string {
 // Go write a path; and with its drive letter small or capital. A path is the root only where no letter, digit,
 // "-" or "_" follows it: a folder beside the root whose name starts with the root's is left as it is. Each of
 // the reasons is written <reason>: a reason is words that are not Moonwell's own, as the operating system's for
-// a failure. Nothing else is changed: a path below the root keeps its separators. An empty root or reason stands
-// for nothing.
+// a failure, or a whole path outside the project whose spelling the system decides, as the place of the pinned
+// compiler in a cache, whose file name differs from one system to the next. Nothing else is changed: a path
+// below the root keeps its separators. An empty root or reason stands for nothing.
 func Placed(text []byte, root string, reasons ...string) []byte {
 	for _, reason := range reasons {
 		if reason != "" {

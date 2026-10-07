@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"unicode/utf8"
 
 	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/next/internal/diag"
@@ -34,7 +33,7 @@ import (
 //   - every file a build generates beside the map: the ids module, the lock, and all of .moonwell, which is the
 //     editor's declarations, the macro module, the copies of the libraries and the editor's view of them.
 //
-// A file stands as its digest. In the recording of the plain build, a text of up to longestWhole bytes stands
+// A file stands as its digest. In the recording of the plain build, a short text (testkit.WholeIfShort) stands
 // whole instead, in the stage and among the generated files, so that a change of it reads as its lines; the
 // archive holds the staged files, and the two other recordings of a seed hold the same texts, by their digests.
 //
@@ -276,9 +275,9 @@ func (o outcome) recording(t *testing.T, root string, texts bool) []byte {
 	if o.refused {
 		return o.refusal(root, len(staged), archive != nil)
 	}
-	shown := byDigest
+	shown := testkit.ByDigest
 	if texts {
-		shown = wholeIfShort
+		shown = testkit.WholeIfShort
 	}
 	var out strings.Builder
 	out.WriteString("logged:\n")
@@ -291,7 +290,7 @@ func (o outcome) recording(t *testing.T, root string, texts bool) []byte {
 	} else {
 		inside := unpacked(t, seedArchive, archive)
 		out.WriteString("packed in " + seedArchive + ", behind " + headerOrNone(inside.before) + ":\n")
-		out.WriteString(fileLines(inside.files, byDigest))
+		out.WriteString(fileLines(inside.files, testkit.ByDigest))
 	}
 	out.WriteString("generated:\n" + o.generatedLines(shown))
 	return testkit.Placed([]byte(out.String()), root)
@@ -386,37 +385,6 @@ func fileLines(files map[string][]byte, shown func(data []byte) string) string {
 	var out strings.Builder
 	for _, name := range slices.Sorted(maps.Keys(files)) {
 		out.WriteString("  " + testkit.Shown(name) + ":" + shown(files[name]))
-	}
-	return out.String()
-}
-
-// byDigest is a file as a recording holds it by its digest.
-func byDigest(data []byte) string { return " " + testkit.Digest(data) + "\n" }
-
-// longestWhole is the most bytes of a text that a recording writes out.
-const longestWhole = 2048
-
-// wholeIfShort is a file as the recording of a plain build holds it: a text of up to longestWhole bytes whole,
-// each line quoted as Go quotes a string, and any other file as its digest. A text of one line stands beside
-// its name, and a longer one line by line below it.
-func wholeIfShort(data []byte) string {
-	isText := utf8.Valid(data) && !bytes.ContainsFunc(data, func(r rune) bool {
-		return r < ' ' && r != '\t' && r != '\n' && r != '\r'
-	})
-	if len(data) > longestWhole || !isText {
-		return byDigest(data)
-	}
-	lines := strings.SplitAfter(string(data), "\n")
-	if last := len(lines) - 1; last > 0 && lines[last] == "" {
-		lines = lines[:last]
-	}
-	if len(lines) == 1 {
-		return " " + strconv.Quote(lines[0]) + "\n"
-	}
-	var out strings.Builder
-	out.WriteString("\n")
-	for _, line := range lines {
-		out.WriteString("    " + strconv.Quote(line) + "\n")
 	}
 	return out.String()
 }

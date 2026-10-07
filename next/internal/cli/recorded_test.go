@@ -13,7 +13,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/next/internal/env"
 	"github.com/mdlsvensson/moonwell/next/internal/fsx"
@@ -40,7 +39,7 @@ import (
 // The words of a complaint are in no recording: the tests of the command that complains hold what they must
 // say.
 //
-// A file that a line left stands as its digest, and a text of up to longestWhole bytes whole, so that a change
+// A file that a line left stands as its digest, and a short text whole (testkit.WholeIfShort), so that a change
 // of it reads as its lines. What Moonwell builds and generates, which is all of dist and of .moonwell, stands
 // as its digest whatever it is: the recorded builds of package build hold those texts. Two files stand by their
 // names alone: the archive, which those recordings hold unpacked, and the stamp of a library's copy, which
@@ -59,6 +58,12 @@ import (
 
 func TestTheCommandLinesAreAsRecorded(t *testing.T) {
 	p := newRecordedProjects(t)
+	// A run is in the recording of its seed: one that names no seed would be in none, and never be made.
+	for _, run := range recordedRuns {
+		if !slices.Contains(p.names(), run.seed) {
+			t.Errorf("a run is on the seed %q, and no seed has that name: %s", run.seed, said(run.steps[0].args))
+		}
+	}
 	for _, seed := range p.names() {
 		t.Run(seed, func(t *testing.T) {
 			var all []byte
@@ -326,38 +331,7 @@ func leftAs(name string, data []byte) string {
 	case strings.HasPrefix(name, "dist/bin/"), path.Base(name) == ".moonwell-library.json":
 		return " present\n"
 	case strings.HasPrefix(name, "dist/"), strings.HasPrefix(name, ".moonwell/"):
-		return byDigest(data)
+		return testkit.ByDigest(data)
 	}
-	return wholeIfShort(data)
-}
-
-// byDigest is a file as a recording holds it by its digest.
-func byDigest(data []byte) string { return " " + testkit.Digest(data) + "\n" }
-
-// longestWhole is the most bytes of a text that a recording writes out.
-const longestWhole = 2048
-
-// wholeIfShort is a file as a recording holds it where texts stand whole: a text of up to longestWhole bytes
-// with each line quoted as Go quotes a string, and any other file as its digest. A text of one line stands
-// beside its name, and a longer one line by line below it.
-func wholeIfShort(data []byte) string {
-	isText := utf8.Valid(data) && !bytes.ContainsFunc(data, func(r rune) bool {
-		return r < ' ' && r != '\t' && r != '\n' && r != '\r'
-	})
-	if len(data) > longestWhole || !isText {
-		return byDigest(data)
-	}
-	lines := strings.SplitAfter(string(data), "\n")
-	if last := len(lines) - 1; last > 0 && lines[last] == "" {
-		lines = lines[:last]
-	}
-	if len(lines) == 1 {
-		return " " + strconv.Quote(lines[0]) + "\n"
-	}
-	var out strings.Builder
-	out.WriteString("\n")
-	for _, line := range lines {
-		out.WriteString("    " + strconv.Quote(line) + "\n")
-	}
-	return out.String()
+	return testkit.WholeIfShort(data)
 }

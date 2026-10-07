@@ -189,6 +189,27 @@ func TestDigestIsTheSHA256AndTheLength(t *testing.T) {
 	}
 }
 
+func TestWholeIfShortWritesAShortTextLineByLineAndAnyOtherFileByItsDigest(t *testing.T) {
+	longest := strings.Repeat("a", longestWhole)
+	for _, c := range []struct{ name, data, want string }{
+		{"one line", "an asset", ` "an asset"` + "\n"},
+		{"one line with its line feed", "return 1\n", ` "return 1\n"` + "\n"},
+		{"several lines", "a\r\nb\n\tc", "\n" + `    "a\r\n"` + "\n" + `    "b\n"` + "\n" + `    "\tc"` + "\n"},
+		{"nothing", "", ` ""` + "\n"},
+		{"the longest text", longest, ` "` + longest + `"` + "\n"},
+		{"a text that is longer", longest + "a", ByDigest([]byte(longest + "a"))},
+		{"a control character", "a\x00b", ByDigest([]byte("a\x00b"))},
+		{"bytes that are no UTF-8", "a\xffb", ByDigest([]byte("a\xffb"))},
+	} {
+		if got := WholeIfShort([]byte(c.data)); got != c.want {
+			t.Errorf("%s: WholeIfShort = %q, want %q", c.name, got, c.want)
+		}
+	}
+	if got, want := ByDigest([]byte("abc")), " "+Digest([]byte("abc"))+"\n"; got != want {
+		t.Errorf("ByDigest = %q, want %q", got, want)
+	}
+}
+
 func TestPlacedWritesTheRootAsRoot(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "project")
 	slashed := filepath.ToSlash(root)
