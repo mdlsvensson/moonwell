@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
-	"runtime"
 	"slices"
 	"strings"
 	"testing"
@@ -497,27 +496,22 @@ func TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON(t *testing.T) 
 	}
 }
 
-// A file at the place of the folder of the schema, or of the folder above it, is named as the system names it,
-// by its path from the checkout. On Windows that is the step in the way: a read below a file answers there that
-// nothing is there, and then the folder cannot be made. On the other systems the read of the first module fails
-// itself, and names the module.
-func TestTheModeWithoutANameNamesWhatTheSystemNamesWhenAFileIsInTheWayOfTheSchema(t *testing.T) {
+// A file at the place of the folder of the schema, or of the folder above it, is named by its path from the
+// checkout, on every system: a read below a file finds no module there, and then the folder cannot be made, which
+// names the step in the way.
+func TestTheModeWithoutANameNamesAFileInTheWayOfTheSchema(t *testing.T) {
 	for _, inTheWay := range []string{"schema/generated", "schema"} {
 		c := newCheckout(t)
 		c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
 		c.write(inTheWay, "a file\n")
 		before := c.all()
-		named := "schema/generated/HeroProps.pkl"
-		if runtime.GOOS == "windows" {
-			named = inTheWay
-		}
 		printed, _, err := c.run()
 		if err == nil {
 			t.Errorf("a file at %s: the schema was written", inTheWay)
 			continue
 		}
-		if !strings.HasPrefix(err.Error(), named+": ") || strings.Contains(err.Error(), c.root) {
-			t.Errorf("a file at %s: got %q, want %q and the system's reason", inTheWay, err, named)
+		if !strings.HasPrefix(err.Error(), inTheWay+": ") || strings.Contains(err.Error(), c.root) {
+			t.Errorf("a file at %s: got %q, want %q and the system's reason", inTheWay, err, inTheWay)
 		}
 		if printed != "" || !reflect.DeepEqual(c.all(), before) {
 			t.Errorf("a file at %s: the failed run printed %q and left %q",

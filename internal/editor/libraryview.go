@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"syscall"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
@@ -113,7 +114,7 @@ func viewAt(file string, source script.Source, lua func(script.Source) (string, 
 func removeOthers(dir string, views []view) error {
 	listed, err := fsx.ListFiles(dir)
 	switch {
-	case errors.Is(err, fs.ErrNotExist):
+	case noFolder(err):
 		return nil // no folder: a project without library modules never had a view
 	case err != nil:
 		return errViewNotRead(LibraryViewDir, err)
@@ -137,6 +138,14 @@ func removeOthers(dir string, views []view) error {
 		}
 	}
 	return nil
+}
+
+// noFolder reports whether err, the failure of listing the folder, says that no folder is there: nothing at its
+// place, or a file on the way to it, of which one system says that the path does not exist and another that what
+// is above it is no folder. Nothing is listed then, and below a file it is the write of a view that fails, on
+// every system.
+func noFolder(err error) bool {
+	return errors.Is(err, fs.ErrNotExist) || errors.Is(err, syscall.ENOTDIR)
 }
 
 // isPlainFile reports whether a listed file, which is named as a view, is a file of its own, and no link.
@@ -189,7 +198,7 @@ func emptyFolders(dir string) ([]string, error) {
 		return nil
 	})
 	switch {
-	case errors.Is(err, fs.ErrNotExist):
+	case noFolder(err):
 		return nil, nil
 	case err != nil:
 		return nil, errViewNotRead(LibraryViewDir, err)
