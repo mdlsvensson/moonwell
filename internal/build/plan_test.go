@@ -46,7 +46,7 @@ func settingsNamed(name string) string {
 const localKit = `"libraries":{"kit":{"path":"libs/kit"}}`
 
 // captainIDs is the ids module of a project whose one object is the captain.
-var captainIDs = objects.RenderIDs([]objects.Resolved{{Category: "units", Key: "captain", ID: "h000"}})
+var captainIDs, _ = objects.RenderIDs([]objects.Resolved{{Category: "units", Key: "captain", ID: "h000"}})
 
 // ---- what the tests ask of a plan ----
 

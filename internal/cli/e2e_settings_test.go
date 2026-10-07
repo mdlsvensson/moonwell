@@ -228,7 +228,7 @@ func TestE2ESettingsCheckWithoutStagingAndOptionalMap(t *testing.T) {
 	const noMap = "error: moonwell.local.pkl " + mark + " Source map folder maps/map.w3x not found."
 	writeLocal(t, root, "")
 	remove(t, root, "objects")
-	write(t, root, objects.IDsFile, objects.RenderIDs(nil))
+	write(t, root, objects.IDsFile, noObjects)
 	remove(t, root, "maps/map.w3x")
 	fails(t, root, []string{noMap}, "check")
 	writeLocal(t, root, `settings { info { name = "Needs a map" } }`)

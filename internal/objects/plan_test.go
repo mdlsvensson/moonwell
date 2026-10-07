@@ -227,7 +227,7 @@ func TestTheNamesFixturesObjectsPlannedAgainstAnEmptyMapAreWorldEditorsFiles(t *
 	for _, object := range result.Objects {
 		planned = append(planned, object.ID)
 	}
-	if !slices.Equal(planned, []string{"h000", "I000", "A000", "B000", "R000"}) || result.IDs != objects.RenderIDs(result.Objects) {
+	if !slices.Equal(planned, []string{"h000", "I000", "A000", "B000", "R000"}) || result.IDs != rendered(t, result.Objects) {
 		t.Errorf("objects = %q", planned)
 	}
 	if left := testkit.Snapshot(t, dir); len(left) != 0 {
@@ -368,7 +368,7 @@ func TestPlanAppendsToTheMapsFilesSplitsBySkinSortsByIDAndWritesNothing(t *testi
 	for _, object := range result.Objects {
 		keys = append(keys, object.Key)
 	}
-	if !slices.Equal(keys, []string{"knight", "captain", "plating"}) || result.IDs != objects.RenderIDs(result.Objects) {
+	if !slices.Equal(keys, []string{"knight", "captain", "plating"}) || result.IDs != rendered(t, result.Objects) {
 		t.Errorf("objects = %q", keys)
 	}
 }

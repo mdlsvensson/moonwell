@@ -68,7 +68,7 @@ func TestTheGeneratedIDsModuleCompilesAndEachIDEqualsFourCC(t *testing.T) {
 	for _, mode := range []string{"-r", "-m"} {
 		t.Run(mode, func(t *testing.T) {
 			dir := t.TempDir()
-			testkit.WriteFile(t, dir, "objects.yue", []byte(objects.RenderIDs(generated)))
+			testkit.WriteFile(t, dir, "objects.yue", []byte(rendered(t, generated)))
 			arguments := []string{"--target=5.3", mode, "-o", "objects.lua", "objects.yue"}
 			compiled, err := env.Run(context.Background(), compiler, arguments, env.RunOptions{Dir: dir})
 			if err != nil || compiled.Code != 0 {

@@ -247,7 +247,7 @@ upgrades {
 }`
 
 // everyCategoryIDs is the ids module of everyCategory: a check wants the module current, and writes none.
-var everyCategoryIDs = objects.RenderIDs([]objects.Resolved{
+var everyCategoryIDs, _ = objects.RenderIDs([]objects.Resolved{
 	{Category: "heroes", Key: "paladin", ID: "H001"}, {Category: "units", Key: "captain", ID: "h001"},
 	{Category: "buildings", Key: "hall", ID: "h002"}, {Category: "items", Key: "claws", ID: "I001"},
 	{Category: "abilities", Key: "light", ID: "A001"}, {Category: "buffs", Key: "blessed", ID: "B001"},

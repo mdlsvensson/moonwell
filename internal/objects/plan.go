@@ -39,7 +39,7 @@ type Result struct {
 // appends each, sorted by id, to its main file and, for a map with skin files, to its skin file.
 func Plan(folder *mapdir.Folder, objects manifest.Objects, metadata *Metadata) (*Result, error) {
 	if objects.Empty() {
-		return &Result{Objects: []Resolved{}, IDs: RenderIDs(nil)}, nil
+		return &Result{Objects: []Resolved{}, IDs: noIDs}, nil
 	}
 	files, err := readObjectFiles(folder)
 	if err != nil {
@@ -53,7 +53,11 @@ func Plan(folder *mapdir.Folder, objects manifest.Objects, metadata *Metadata) (
 	if err != nil {
 		return nil, err
 	}
-	return &Result{Changes: changes, Objects: resolved, IDs: RenderIDs(resolved)}, nil
+	ids, err := RenderIDs(resolved)
+	if err != nil {
+		return nil, err
+	}
+	return &Result{Changes: changes, Objects: resolved, IDs: ids}, nil
 }
 
 // extensions is the extensions of the object files Moonwell appends to, in the order of their changes.
@@ -216,7 +220,8 @@ func (f *objectFiles) appended(name string, family []Resolved, takes func(Field)
 	if err != nil {
 		return mapdir.Change{}, err
 	}
-	written, err := objmod.Append(f.held[name].data, objmod.KindOf(name), added, f.folder.Label(name))
+	held := f.held[name] // the file as it was read, once; nothing for a file the map lacks
+	written, err := objmod.AppendTo(held.parsed, held.data, objmod.KindOf(name), added)
 	if err != nil {
 		return mapdir.Change{}, err
 	}

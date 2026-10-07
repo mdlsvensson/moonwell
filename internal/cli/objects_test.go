@@ -49,11 +49,13 @@ func objectFile(body string) string { return "amends \"@moonwell/ObjectFile.pkl\
 var (
 	captain = objectFile(`units { ["captain"] { id = "h000"; base = "hfoo"; name = "Captain" } }`)
 	paladin = objectFile(`heroes { ["paladin"] { id = "H000"; base = "Hpal"; properties { ["uhpm"] = 900 } } }`)
-	// onlyCaptain and bothObjects are the ids module of a project with the captain, and with the paladin too.
-	onlyCaptain = objects.RenderIDs([]objects.Resolved{{Category: "units", Key: "captain", ID: "h000"}})
-	bothObjects = objects.RenderIDs([]objects.Resolved{
+	// onlyCaptain and bothObjects are the ids module of a project with the captain, and with the paladin too;
+	// noObjects is that of a project without objects.
+	onlyCaptain, _ = objects.RenderIDs([]objects.Resolved{{Category: "units", Key: "captain", ID: "h000"}})
+	bothObjects, _ = objects.RenderIDs([]objects.Resolved{
 		{Category: "heroes", Key: "paladin", ID: "H000"}, {Category: "units", Key: "captain", ID: "h000"},
 	})
+	noObjects, _ = objects.RenderIDs(nil)
 )
 
 // idsLine is the line objects:check says of the ids module.
@@ -263,7 +265,7 @@ func TestPklObjectsCheckMissingStaleCurrent(t *testing.T) {
 	if r.stdout != "" || exists(root, objects.IDsFile) || strings.Contains(r.output, "Object data valid") {
 		t.Fatalf("objects:check wrote the ids module, printed for other programs, or summed up a failure: %+v", r)
 	}
-	write(t, root, objects.IDsFile, objects.RenderIDs(nil))
+	write(t, root, objects.IDsFile, noObjects)
 	r = failsWithPklAlone(t, root,
 		[]string{idsLine("stale"), "does not match the objects in the manifest."}, "objects:check")
 	if strings.Contains(r.output, "Object data valid") {

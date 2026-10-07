@@ -1,6 +1,7 @@
 package objmod
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -42,7 +43,20 @@ type NewObject struct {
 // It does not judge what a value means: any int, any finite real and any other text is written. Only the objects
 // it adds are checked. What the source holds is copied as it is.
 func Append(source []byte, kind TableKind, objects []NewObject, file string) ([]byte, error) {
-	w, err := begin(source, kind, len(objects), file)
+	var parsed *File
+	if source != nil {
+		var err error
+		if parsed, err = Read(source, kind, file); err != nil {
+			return nil, err
+		}
+	}
+	return AppendTo(parsed, source, kind, objects)
+}
+
+// AppendTo is Append for a source that is read already: parsed is what Read gave for source, and nil for a nil
+// source. A caller that has read a file to look into it appends through this, so that the file is read once.
+func AppendTo(parsed *File, source []byte, kind TableKind, objects []NewObject) ([]byte, error) {
+	w, err := begin(parsed, source, kind, len(objects))
 	if err != nil {
 		return nil, err
 	}
@@ -62,19 +76,20 @@ type writer struct {
 	kind    TableKind
 }
 
-// begin returns a writer that holds everything that comes before the new objects: the source with the count of its
-// custom table raised by added, or for a nil source the start of a new file.
-func begin(source []byte, kind TableKind, added int, file string) (*writer, error) {
-	if source == nil {
+// begin returns a writer that holds everything that comes before the new objects: the source, which was read as
+// parsed, with the count of its custom table raised by added, or for a nil source the start of a new file.
+func begin(parsed *File, source []byte, kind TableKind, added int) (*writer, error) {
+	switch {
+	case parsed == nil && source == nil:
 		w := &writer{version: NewFileVersion, kind: kind}
 		w.out.I32(NewFileVersion)
 		w.out.I32(0) // no original objects
 		w.out.I32(int32(added))
 		return w, nil
-	}
-	parsed, err := Read(source, kind, file)
-	if err != nil {
-		return nil, err
+	case parsed == nil || parsed.Custom.Stop != len(source):
+		// A plain error: the caller passes what Read gave for the source, whose custom table ends where the
+		// source does, so anything else is a mistake in Moonwell.
+		return nil, errors.New("Cannot append to an object file: it was not read from the bytes that are given.")
 	}
 	w := &writer{version: parsed.Version, kind: kind}
 	custom := parsed.Custom

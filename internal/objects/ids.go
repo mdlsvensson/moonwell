@@ -29,17 +29,22 @@ func PackID(id string) (uint32, error) {
 
 // RenderIDs renders the generated module for the objects: a table for every category in order, with the objects
 // sorted by key, each as its number and, in a comment, its rawcode. It reads only the category, the key and the
-// id of an object.
-func RenderIDs(resolved []Resolved) string {
+// id of an object. An id that does not pack is PackID's error: Resolve lets through only ids of four letters or
+// digits, so such an id is a bug in the caller, and no objects render without an error.
+func RenderIDs(resolved []Resolved) (string, error) {
 	lines := []string{idsHeader}
 	for _, category := range manifest.Categories {
-		lines = append(lines, idsTable(category, resolved)...)
+		table, err := idsTable(category, resolved)
+		if err != nil {
+			return "", err
+		}
+		lines = append(lines, table...)
 	}
-	return strings.Join(lines, "\n") + "\n"
+	return strings.Join(lines, "\n") + "\n", nil
 }
 
 // idsTable is the lines of one category's table.
-func idsTable(category manifest.Category, resolved []Resolved) []string {
+func idsTable(category manifest.Category, resolved []Resolved) ([]string, error) {
 	var entries []Resolved
 	for _, object := range resolved {
 		if object.Category == category {
@@ -47,19 +52,22 @@ func idsTable(category manifest.Category, resolved []Resolved) []string {
 		}
 	}
 	if len(entries) == 0 {
-		return []string{"export " + string(category) + " = {}"}
+		return []string{"export " + string(category) + " = {}"}, nil
 	}
 	slices.SortStableFunc(entries, func(a, b Resolved) int { return strings.Compare(a.Key, b.Key) })
 	lines := []string{"export " + string(category) + " = {"}
 	for _, entry := range entries {
 		packed, err := PackID(entry.ID)
 		if err != nil {
-			panic(err) // Resolve lets through only ids of four letters or digits
+			return nil, err
 		}
 		lines = append(lines, fmt.Sprintf("  %s: %d -- %s", entry.Key, packed, entry.ID))
 	}
-	return append(lines, "}")
+	return append(lines, "}"), nil
 }
+
+// noIDs is the module of a manifest without objects, which has no id that could fail to pack.
+var noIDs, _ = RenderIDs(nil)
 
 // IDsStatus says how the generated module of a project compares with what its manifest renders.
 type IDsStatus string
@@ -77,7 +85,7 @@ func StatusOfIDs(root, expected string) (IDsStatus, error) {
 	switch {
 	case err != nil:
 		return "", errIDsUnreadable(err)
-	case !found && expected == RenderIDs(nil):
+	case !found && expected == noIDs:
 		return IDsCurrent, nil
 	case !found:
 		return IDsMissing, nil

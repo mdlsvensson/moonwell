@@ -29,7 +29,17 @@ func object(category manifest.Category, key, id string) objects.Resolved {
 	return objects.Resolved{Category: category, Key: key, ID: id}
 }
 
-var captainIDs = objects.RenderIDs([]objects.Resolved{object("units", "captain", "h000")})
+var captainIDs, _ = objects.RenderIDs([]objects.Resolved{object("units", "captain", "h000")})
+
+// rendered is the ids module of objects whose ids pack.
+func rendered(t *testing.T, resolved []objects.Resolved) string {
+	t.Helper()
+	ids, err := objects.RenderIDs(resolved)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return ids
+}
 
 func idsFile(root string) string { return filepath.Join(root, "src", "generated", "objects.yue") }
 
@@ -80,16 +90,25 @@ func TestPackIDPacksARawcodeBigEndian(t *testing.T) {
 }
 
 func TestRenderIDsWritesEveryCategoryInOrderEvenWhenEmpty(t *testing.T) {
-	if got := objects.RenderIDs(nil); got != emptyIDs {
-		t.Errorf("RenderIDs = %q", got)
+	if got, err := objects.RenderIDs(nil); err != nil || got != emptyIDs {
+		t.Errorf("RenderIDs = %q, %v", got, err)
 	}
 	if objects.IDsFile != "src/generated/objects.yue" {
 		t.Errorf("IDsFile = %q", objects.IDsFile)
 	}
 }
 
+func TestRenderIDsGivesAPlainErrorForAnIDThatDoesNotPack(t *testing.T) {
+	short := []objects.Resolved{object("units", "captain", "h000"), object("units", "archer", "h00")}
+	got, err := objects.RenderIDs(short)
+	var expected *diag.Error
+	if got != "" || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), `"h00"`) {
+		t.Errorf("RenderIDs = %q, %v, want a plain error that names the id", got, err)
+	}
+}
+
 func TestRenderIDsSortsKeysWithinEachCategoryAndCommentsEachRawcode(t *testing.T) {
-	got := objects.RenderIDs([]objects.Resolved{
+	got, err := objects.RenderIDs([]objects.Resolved{
 		object("units", "captain", "h000"),
 		object("abilities", "holy", "A001"),
 		object("units", "Archer", "h002"),
@@ -118,8 +137,8 @@ func TestRenderIDsSortsKeysWithinEachCategoryAndCommentsEachRawcode(t *testing.T
 		"}",
 		"",
 	}, "\n")
-	if got != want {
-		t.Errorf("RenderIDs =\n%s", got)
+	if err != nil || got != want {
+		t.Errorf("RenderIDs = %v\n%s", err, got)
 	}
 }
 
