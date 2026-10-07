@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // File is the file a library describes its own layout with, at its root.
@@ -50,7 +51,7 @@ func ParseFile(key string, data []byte, present bool, where string) (Described, 
 // membersOf is the members of the JSON object that a library's file holds, each value as the file writes it. A
 // byte order mark at the start is read past.
 func membersOf(key string, data []byte, where string) (map[string]json.RawMessage, error) {
-	text := bytes.TrimPrefix(data, []byte("\xEF\xBB\xBF"))
+	text := fsx.WithoutMark(data)
 	if !utf8.Valid(text) || !json.Valid(text) {
 		return nil, errNotJSON(key, where)
 	}

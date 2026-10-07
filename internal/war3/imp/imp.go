@@ -15,6 +15,7 @@ import (
 
 	"github.com/mdlsvensson/moonwell/internal/binio"
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // CustomPath is the flag Moonwell writes: the entry's path is the full in-map path.
@@ -51,8 +52,8 @@ func (e Entry) MapPath() string {
 }
 
 // Read reads a war3map.imp. file is the name its errors give. Every entry must have one of the six flags and a
-// path that is not empty and is UTF-8, and the file must end with its last entry. The bytes of a path are kept as
-// they are.
+// path that is not empty and is UTF-8, and the file must end with its last entry. A path is read as any text
+// is: without a byte order mark at its start, and with every other byte as it is.
 func Read(data []byte, file string) ([]Entry, error) {
 	r := binio.NewReader(data)
 	found, count := r.U32(), r.U32()
@@ -77,7 +78,8 @@ func Read(data []byte, file string) ([]Entry, error) {
 	return entries, nil
 }
 
-// readEntry reads the entry at index: one byte of flag, then the path up to its NUL.
+// readEntry reads the entry at index: one byte of flag, then the path up to its NUL. A byte order mark at the
+// start of the path is not part of it.
 func readEntry(r *binio.Reader, file string, index uint32) (Entry, error) {
 	flag := r.U8()
 	if r.Err() != nil {
@@ -86,7 +88,7 @@ func readEntry(r *binio.Reader, file string, index uint32) (Entry, error) {
 	if !slices.Contains(defaultPathFlags, flag) && !slices.Contains(customPathFlags, flag) {
 		return Entry{}, errFlag(file, index, flag)
 	}
-	path := r.CString()
+	path := fsx.WithoutMark(r.CString())
 	switch {
 	case r.Err() != nil:
 		return Entry{}, errTruncated(file)

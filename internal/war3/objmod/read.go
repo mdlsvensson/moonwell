@@ -8,6 +8,7 @@ import (
 
 	"github.com/mdlsvensson/moonwell/internal/binio"
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // TableKind says whether a file stores a level and a data pointer with each modification.
@@ -287,13 +288,14 @@ func (r *reader) id() ID {
 	return id
 }
 
-// text reads a NUL-terminated string, which must be UTF-8.
+// text reads a NUL-terminated string, which must be UTF-8. A byte order mark at its start is not part of the
+// value.
 func (r *reader) text() string {
 	raw := r.data.CString()
 	if !utf8.Valid(raw) {
 		r.refuse(errNotUTF8(r.file))
 	}
-	return string(raw)
+	return fsx.WithoutMark(string(raw))
 }
 
 // ---- errors ----

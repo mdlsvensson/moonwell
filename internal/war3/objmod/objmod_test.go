@@ -600,6 +600,22 @@ func TestAppendingToAMalformedSourceIsTheReadersFileError(t *testing.T) {
 	}
 }
 
+// A string is a text, and a text is read by the one rule for a byte order mark: one at its very start is no
+// part of it, and one anywhere else is.
+func TestAByteOrderMarkAtTheStartOfAStringIsNotPartOfIt(t *testing.T) {
+	const mark = "\xEF\xBB\xBF"
+	for written, want := range map[string]string{
+		mark + "Name": "Name", mark: "", mark + mark + "Name": mark + "Name", "Na" + mark + "me": "Na" + mark + "me",
+	} {
+		file := mustAppend(t, nil, objmod.Simple, oneMod(objmod.NewMod{Field: id("unam"), Value: textValue(written)}),
+			"war3map.w3u")
+		read := mustRead(t, file, objmod.Simple, "war3map.w3u").Custom.Objects[0].Sets[0].Mods[0].Value
+		if read.Type != objmod.String || read.Text != want {
+			t.Errorf("the string %q reads as %+v, want the text %q", written, read, want)
+		}
+	}
+}
+
 // oneMod is one object to append with one modification.
 func oneMod(mod objmod.NewMod) []objmod.NewObject {
 	return []objmod.NewObject{{Base: id("hfoo"), ID: id("X001"), Mods: []objmod.NewMod{mod}}}

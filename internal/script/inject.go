@@ -7,6 +7,7 @@ import (
 
 	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 )
 
@@ -80,7 +81,7 @@ func definesHooked(script []byte, file string) error {
 // string counts as any other line, and a function that is defined in another way, as `main = function()`, is
 // not found.
 func defines(script []byte, name string) bool {
-	rest := bytes.TrimPrefix(script, []byte(byteOrderMark))
+	rest := fsx.WithoutMark(script)
 	for {
 		if startsDefinition(rest, name) {
 			return true

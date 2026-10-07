@@ -29,9 +29,8 @@ const (
 )
 
 const (
-	byteOrderMark = "\xEF\xBB\xBF" // U+FEFF in UTF-8
-	jsonSpace     = " \t\r\n"      // the white space of JSON
-	lineSpace     = " \t\r\v\f"    // the white space of ASCII that a line may hold
+	jsonSpace = " \t\r\n"   // the white space of JSON
+	lineSpace = " \t\r\v\f" // the white space of ASCII that a line may hold
 )
 
 // AddFiles gives a project the editor files it lacks: each missing file from the template, and each missing
@@ -150,7 +149,7 @@ func addIgnores(root string) ([]string, error) {
 // without the white space of ASCII around it; a byte order mark at the start of the file is no part of the first.
 func ignoresLacking(held []byte) []string {
 	var lines []string
-	for line := range strings.SplitSeq(strings.TrimPrefix(string(held), byteOrderMark), "\n") {
+	for line := range strings.SplitSeq(fsx.WithoutMark(string(held)), "\n") {
 		lines = append(lines, strings.Trim(line, lineSpace))
 	}
 	var lacking []string
@@ -258,7 +257,7 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 // order mark before the text is read past. It reports false for text that is not JSON, which has neither the
 // comments nor the comma after a last member that lua-language-server reads, and for JSON that is no object.
 func objectOf(text []byte) (config manifest.Ordered[json.RawMessage], isObject bool) {
-	text = bytes.TrimPrefix(text, []byte(byteOrderMark))
+	text = fsx.WithoutMark(text)
 	// A null reads as a mapping without keys, so what the text starts with is asked first.
 	if !startsWith(text, '{') || json.Unmarshal(text, &config) != nil {
 		return manifest.Ordered[json.RawMessage]{}, false

@@ -7,14 +7,24 @@ import (
 )
 
 const (
-	byteOrderMark = "\xEF\xBB\xBF"
+	byteOrderMark = "\xEF\xBB\xBF"         // U+FEFF in UTF-8
 	replacement   = string(utf8.RuneError) // U+FFFD
 )
+
+// WithoutMark is a text without the byte order mark at its start. It is the one rule for the mark, for every
+// text Moonwell reads, a whole file or a string inside one: a mark at the very start is no part of the text and
+// is dropped, once; a mark anywhere else, a second one behind the first among them, is content like any other.
+func WithoutMark[T string | []byte](text T) T {
+	if len(text) >= len(byteOrderMark) && string(text[:len(byteOrderMark)]) == byteOrderMark {
+		return text[len(byteOrderMark):]
+	}
+	return text
+}
 
 // DecodeText reads bytes as UTF-8 text: invalid bytes become U+FFFD and a leading byte order mark is dropped.
 // Neighbouring invalid bytes become one U+FFFD together.
 func DecodeText(b []byte) string {
-	return strings.TrimPrefix(strings.ToValidUTF8(string(b), replacement), byteOrderMark)
+	return WithoutMark(strings.ToValidUTF8(string(b), replacement))
 }
 
 // TextWithMark splits a file's bytes into a leading byte order mark ("" when there is none) and the text after
@@ -23,10 +33,8 @@ func TextWithMark(data []byte) (mark, text string, ok bool) {
 	if !utf8.Valid(data) {
 		return "", "", false
 	}
-	if text, marked := strings.CutPrefix(string(data), byteOrderMark); marked {
-		return byteOrderMark, text, true
-	}
-	return "", string(data), true
+	text = WithoutMark(string(data))
+	return string(data[:len(data)-len(text)]), text, true
 }
 
 // shortEscapes is the bytes that Quoted writes as a backslash and one character.

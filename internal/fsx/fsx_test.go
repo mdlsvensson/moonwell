@@ -138,6 +138,26 @@ func TestReadSourceReportsAFileItCannotReadNamingTheLabel(t *testing.T) {
 	}
 }
 
+func TestWithoutMarkDropsOneMarkAtTheVeryStartAndNoOther(t *testing.T) {
+	for _, c := range []struct{ name, text, want string }{
+		{"no mark", "a", "a"},
+		{"a mark at the start", bom + "a", "a"},
+		{"a mark only", bom, ""},
+		{"two marks: the second is content", bom + bom + "a", bom + "a"},
+		{"a mark further in", "a" + bom, "a" + bom},
+		{"a mark after a space", " " + bom + "a", " " + bom + "a"},
+		{"a mark cut short", "\xEF\xBB", "\xEF\xBB"},
+		{"nothing", "", ""},
+	} {
+		if got := WithoutMark(c.text); got != c.want {
+			t.Errorf("%s: WithoutMark(%q) = %q, want %q", c.name, c.text, got, c.want)
+		}
+		if got := WithoutMark([]byte(c.text)); string(got) != c.want {
+			t.Errorf("%s, as bytes: WithoutMark(%q) = %q, want %q", c.name, c.text, got, c.want)
+		}
+	}
+}
+
 func TestDecodeText(t *testing.T) {
 	for _, c := range []struct{ name, bytes, want string }{
 		{"valid text is unchanged", "héro 1 \u2603\n", "héro 1 \u2603\n"},

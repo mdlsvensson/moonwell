@@ -22,8 +22,6 @@ const (
 	stageDir = "dist/stage/lua"
 	// atOnce is how many compilers run at a time.
 	atOnce = 8
-	// byteOrderMark is U+FEFF in UTF-8.
-	byteOrderMark = "\xEF\xBB\xBF"
 )
 
 // staged is what a compile left in dist/stage/lua.
@@ -164,7 +162,7 @@ func unitOf(root, stage string, source Source) (unit, error) {
 	return unit{
 		path:   source.Path,
 		file:   file,
-		text:   strings.TrimPrefix(string(data), byteOrderMark),
+		text:   fsx.WithoutMark(string(data)),
 		hash:   fsx.SHA256Hex(data),
 		under:  under,
 		output: filepath.Join(stage, filepath.FromSlash(under)),

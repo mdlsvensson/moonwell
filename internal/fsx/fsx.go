@@ -264,7 +264,7 @@ func ReadSource(path, label string) (string, error) {
 	if err != nil {
 		return "", errUnreadable(label, err)
 	}
-	return blankShebang(strings.TrimPrefix(string(data), byteOrderMark)), nil
+	return blankShebang(WithoutMark(string(data))), nil
 }
 
 // blankShebang empties a first line that starts with `#` and keeps its line break, so line numbers stay.

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"math"
 	"slices"
-	"strings"
 	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/internal/binio"
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // Depth is how much of the file Read reads.
@@ -85,9 +85,6 @@ var versions = []int32{18, 25, 28, 31, 32, 33, 39}
 
 // maxSlots is the most players a map has, and so the most forces.
 const maxSlots = 24
-
-// byteOrderMark is U+FEFF in UTF-8.
-const byteOrderMark = "\xEF\xBB\xBF"
 
 // Read reads a war3map.w3i. file is the name its errors give. What follows the last part read is not looked at.
 func Read(data []byte, file string, depth Depth) (*Info, error) {
@@ -340,7 +337,7 @@ func (r *reader) decoded() string {
 	if !utf8.Valid(raw) {
 		r.refuse(errNotUTF8(r.file))
 	}
-	return strings.TrimPrefix(string(raw), byteOrderMark)
+	return fsx.WithoutMark(string(raw))
 }
 
 // ---- errors ----
