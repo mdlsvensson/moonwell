@@ -230,7 +230,7 @@ func toolMay(f goFile, target string) bool {
 // in the order of the rules.
 func (f goFile) broken(imports []string) []string {
 	var reports []string
-	const onNoShelf = "%s: package %s is on no shelf; add it to this test and to the spec's layout"
+	const onNoShelf = "%s: package %s is on no shelf; add it to this test and to ARCHITECTURE.md"
 	if f.shelved && !onAShelf(f.pkg) {
 		reports = append(reports, fmt.Sprintf(onNoShelf, f.path, f.pkg))
 	}
@@ -489,7 +489,7 @@ func TestTheWalkHoldsTheGeneratorAndItsParsersToTheirShelf(t *testing.T) {
 		return targets
 	}
 	deeper, command := toolsTree+"gen/slk/deeper", module+"/cmd/moonwell"
-	const addIt = "; add it to this test and to the spec's layout"
+	const addIt = "; add it to this test and to ARCHITECTURE.md"
 	generator := append(in("objects", "script", "assets", "manifest", "fsx"), "os", module, slk, ini, jass)
 	generatorTest := append(in("testkit", "tooltest", "objects"), slk, "os/exec")
 	notForIt := append(in("settings", "env", "diag", "war3/lua", "build", "testkit"), command, "os/exec")

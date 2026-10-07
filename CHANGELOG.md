@@ -2,39 +2,175 @@
 
 ## Unreleased
 
-- **A library with only `github`, or only `tag`, is now refused by Pkl.** `libraries` in `moonwell.pkl` takes a
-  `github` and a `tag`, or a `path`. Moonwell refused anything else before, in its own words; the schema now says
-  so itself, so the editor marks the line and Pkl's message names it. A manifest that built before still builds.
-- A global function of a Lua module is found also when a string that says `local` stands before it
-  (`kind = "local"`, then `function Init() end`). A use of such a function was reported as an unknown global.
+- **The program was written anew.** The twelve commands and their flags, the manifest, `moonwell.lock`,
+  `.asset-state/` and the libraries are those of 0.9.1. What a user can notice of the new program is listed here,
+  the most noticeable first; the last section has the small differences.
+- **To move a project to this version,** install it (run the install line again), set `moonwell@0.10.0` in
+  `PklProject` and run `pkl project resolve`. The program refuses a project that is still on a 0.9 package, and
+  says so. Nothing else in the project has to change. The caches under `dist/` and `.moonwell/` are built anew by
+  the first command.
+- **A command line is read strictly.** A line is carried out whole or not at all. Each of these is now an error with
+  a hint, where 0.9.1 passed over it or guessed: a flag Moonwell does not have (`build --minfy` gets
+  "Did you mean --minify?"), a flag the command does not have (`check --minify`), a flag without a command
+  (`moonwell --minify`), a flag given twice with two values (0.9.1 took the last), a value for a flag that takes
+  none, and an argument the command does not take. `--entry` needs a `.yue` file under `src/`, and that is checked
+  as the line is read. `--help` and `--version` do not rescue a line that is refused. `--minify false`,
+  `--minify=false` and several short flags in one (`-hv`) are gone; they were never documented. A command Moonwell
+  does not have names the closest one before the usage text.
+- **`dist` is a real folder.** So are the stage, the build lock and the folder the archive goes into. A link or a
+  Windows junction on the way to any of them is refused, and the error names the step that is the link. 0.9.1 built
+  through a junction at `dist`.
+- **`build` and `test` plan everything before they touch `dist/stage`.** A refused setting or an invalid object no
+  longer leaves a half-staged folder. "Added … custom object(s)", "Applied map settings" and "Imported … asset(s)"
+  are logged after the stage is written, so a build that fails before that logs none of them.
+- **`check` fails wherever the plan of a build fails:** also for a project without its source map, or without the
+  map's `war3map.lua`. In 0.9.1 such a project could pass `check` and then fail `build`. What only packing finds is
+  still `build`'s alone: a map without `war3map.w3i`, a map too large for an archive, a `build.folder` that cannot
+  be used.
+- **Every command that reads the source map opens it in the same way.** A link, two paths that differ only in
+  letter case, or a name Windows cannot hold, anywhere in the map, fails each of them; in 0.9.1 only the commands
+  that import assets noticed. `assets:check`, `assets:sync`, `setup`, `objects:check` and `objects:eval` need the
+  map's folder also when the project has no assets or no objects, and say "Source map folder … not found" without
+  it. A map that is missing or refused is reported before a compile error.
+- **A build that is ended midway leaves no cut archive under the map's name.** `build` writes the archive beside its
+  place, as `<map.folder>.tmp` in `build.folder`, and moves it to its place when it is written whole. A build that
+  is ended can leave the `.tmp` file; the next build that packs replaces it.
+- **A build after a change equals a clean build.** A source that lost its code leaves no earlier module behind.
+  Nothing a stopped build touched counts as up to date. An edit of a file that defines a macro compiles every file
+  again (every YueScript file with the word `macro` counts as one). 0.9.1 kept stale Lua in each of the three
+  cases.
+- **A library with only `github`, or only `tag`, is refused by Pkl.** `libraries` in `moonwell.pkl` takes a `github`
+  and a `tag`, or a `path`. Moonwell refused anything else before, in its own words; the schema now says so itself,
+  so the editor marks the line and Pkl's message names it. A manifest that built before still builds.
+- `setup`, and `assets:paths` in a project, take the build lock while they sync the libraries: beside a running
+  build they fail with "Another Moonwell build is running". A sync writes `.moonwell/` and `moonwell.lock` in
+  several steps, and a build beside it would read them half written.
+- `dev` checks a save made during its first check once that check is over. After a long check, the next one waits
+  until the files have lain still for a moment, as after a short one.
 - A "did you mean" hint counts two neighbouring letters that changed places as one mistake: `biuld` names `build`,
   `--hepl` names `--help` and `tset` names `test`. This holds for every such hint: a command, a flag, a global,
   and a field or a base object of an object.
-- An error about the asset ownership state names `.asset-state/<map>.json` from the project folder, as every other
-  file is named, and not by its full path. A link on the way to a file Moonwell keeps below `.moonwell/` or
-  `dist/stage/lua/` is refused with that file named. A file in the place of the folder `.asset-state` or
-  `dist/stage` gives the same error on Windows and on Linux.
-- A manifest that does not evaluate to a Moonwell project (one that does not amend `@moonwell/Project.pkl`) is
-  refused with the place of the value that does not fit, as the manifest writes it (`map.folder`), and what the
-  value is.
+- `init ""` is refused; 0.9.1 made the project in the working folder. `setup` no longer mentions `deno.json`.
+- For contributors: the source tree is new, and `ARCHITECTURE.md` is the way into it. It has the layout (the
+  packages stand on four shelves, and a test holds every import to them), what a build does step by step, and a
+  table of which file to open for what. Beside the unit tests there are recorded tests: whole builds and whole
+  command lines, compared with recordings in the repository. `CONTRIBUTING.md` has the checks with their variables,
+  how a recording is made anew, and the generator.
+
+### The small differences from 0.9.1
+
+The manifest and its folders:
+
+- An error in the shape of a manifest is Pkl's own, with the line. A manifest that does not evaluate to a Moonwell
+  project (one that does not amend `@moonwell/Project.pkl`) is refused with one error: the place of the value that
+  does not fit, as the manifest writes it (`map.folder`), and what the value is.
+- Section or key names of the raw constants that differ only in letter case, and a typed gameplay value that
+  disagrees with a raw one, are refused by the commands that plan the settings, not by every command that loads the
+  manifest.
+- `map.folder` and `build.folder` are read once, as the schema reads them: split at `/` and `\`, with empty and `.`
+  parts dropped. `map.folder = "./map.w3x"` opens the map. A part Windows cannot hold is refused with the manifest
+  as the file. On a system that allows it, a map folder with a backslash in its name is not found.
+- `moonwell.lock` has its entries sorted by key, by bytes, also where a key is a whole number: an existing lock
+  loads, and may be written once in another order. A library whose files hold a path with a character beyond U+FFFF
+  beside one with a character from U+E000 to U+FFFF gets another hash: the command says once that the tag moved,
+  and its hint says to delete the entry.
+- Keys that look like whole numbers keep the order they were written in: a source in `assets.paths`, a path in
+  `.asset-state` (such a state file is written once more), the problems of an object's properties.
+
+Errors that now name their file:
+
+- A failure of the system while the lock is taken, the map is staged or the archive is written is an error with the
+  file, from the project folder; the lock's names `dist/.lock`.
+- A file of the map that is too short to read (`war3map.w3i` when the map is packed, `war3map.imp` when assets are
+  imported) is named from the project folder, with a hint.
+- A folder where a map file belongs, and a file that cannot be read (a map file, an asset, a library's file, the
+  preview picture, `PklProject.deps.json`, the ids module), is an error with the file, not an internal error. A
+  preview path that goes through a file "does not exist" on every system.
+- An error about the structure of `war3map.lua` names a line and a column, not "at character N".
+- An error about the asset ownership state names `.asset-state/<map>.json` from the project folder, and not by its
+  full path. A link on the way to a file Moonwell keeps below `.moonwell/` or `dist/stage/lua/` is refused with
+  that file named. A file in the place of the folder `.asset-state` or `dist/stage` gives the same error on Windows
+  and on Linux.
 - A path in `assets.paths` or `assets.exclude` that no asset may have ("Invalid asset path", "Reserved map path")
   is reported with `moonwell.pkl` as its file, and its hint ends with "Fix the assets block in moonwell.pkl.", as
   the other mistakes in that block are. It named no file.
 - `assets:paths` with a file that does not exist, that is a folder, or that cannot be read reports it as every
   other file is reported: the file before the message, from the folder the command runs in, and a hint. A model
   whose name starts with two dots (`..knight.mdx`) is named from that folder too, and not by its whole path.
-- A folder of a library below `.moonwell/`, or `moonwell.lock`, that cannot be removed is reported as "Removing …
-  failed", where it said "Writing … failed".
 - A `yue.path` that is there and cannot be started (a folder, a file that is no program) is reported with
   `moonwell.local.pkl` as its file and a hint that says what to do there. A `yue.path` that does not exist has the
   same hint.
 - On Windows, `init` names a file it could not write, and the `PklProject` whose dependencies did not resolve, with
   `/`, as every other error names a file: `my-map/src/main.yue`, where it said `my-map\src\main.yue`. A failed
   `pkl project resolve` has a hint.
-- `build` writes the archive beside its place, as `<map.folder>.tmp` in `build.folder`, and moves it to its place
-  when it is written whole. A write that fails midway, such as on a full disk, and a build that is ended midway
-  leave no cut archive under the map's name. A build that is ended can leave the `.tmp` file; the next build
-  replaces it.
+- A folder of a library below `.moonwell/`, or `moonwell.lock`, that cannot be removed is reported as "Removing …
+  failed", where it said "Writing … failed". A file of the editor's view that cannot be removed is named as that
+  file, with a hint about the editor; 0.9.1's hint spoke of Warcraft III having the map open.
+
+The map and the gameplay:
+
+- A preview picture on a map whose `main()` ends in `return <value>` is refused. 0.9.1 wrote a script Lua cannot
+  load.
+- A map info whose player controller, race, start coordinate or fog the script cannot take is refused, with the
+  hint to save the map again. A map that World Editor saved cannot get there.
+- A required module whose file holds no code is refused as "has no code", with its file; 0.9.1 said "not found".
+- A global function of a Lua module is found also when a string that says `local` stands before it
+  (`kind = "local"`, then `function Init() end`). A use of such a function was reported as an unknown global.
+- A module file whose name is not valid UTF-8 is refused: nothing could require it. A control character in a module
+  file's name is written into the bundle as Lua reads it.
+- A link in the place of `src`, `lua` or a library's module folder is refused; 0.9.1 silently found no modules
+  there.
+- A name Windows cannot hold (a control character, one of `< > : " | ? *`, a dot or a space at the end, a device
+  name such as `aux.blp`) under `assets/` or among a library's files fails every command that reads it, as in the
+  source map. Such a project cannot be checked out on Windows.
+- A folder named as an object file (`war3map.w3u/`) is refused only by a build that writes that file.
+
+Text and bytes:
+
+- A byte of `war3map.lua`, of a Lua module or of a compiled module that is not UTF-8 is kept as it is by a build.
+  0.9.1 wrote U+FFFD in its place.
+- White space outside ASCII (a no-break space, a byte order mark, U+2028) is not white space in `war3map.lua`, in
+  `war3mapMisc.txt` and `war3mapSkin.txt`, or between the tokens of an MDL model. Those are Lua's and the game's own
+  rules, and World Editor writes none of these characters.
+- A path in `war3map.imp` keeps a byte order mark at its start. A run of bytes that are not UTF-8 in a model's path
+  reads as one U+FFFD.
+- A number is written in plain decimal, in `war3map.lua` and in an error message: also one below 0.000001 or from
+  1e21. A zero is `0` whatever its sign.
+- Names sort by their bytes, letter case folds as Go folds it, "did you mean" compares names by characters, and
+  `assets:paths` pads its columns by characters. This differs from 0.9.1 only for characters above U+FFFF and for
+  `ß`, `İ` and ligatures in names.
+
+Libraries:
+
+- Two files or folders of one library that differ only in letter case are refused when the library is synced. So
+  are a library key that is a Windows device name, a link below a local library's copy and, where the system is
+  not Windows, a backslash in a local library's file name. Such a library cannot be used on Windows.
+- A link at `moonwell.lock` is refused, before anything is removed or downloaded.
+- A local library whose file or folder changed only in letter case, or whose file became a folder of the same
+  name, is copied anew. A library update or a switch to a local path that was interrupted is done again on the
+  next run. 0.9.1 could drop the module until `.moonwell/` was deleted by hand.
+- A local library's `moonwell-library.json` that is there and cannot be read is refused with the file; 0.9.1 took
+  it for no file. A library's file that cannot be read, and a link in place of a library's folder, name the file
+  and are not worded as the library's fault.
+- A tag whose files are not those the lock recorded, for the same commit, is worded as that; 0.9.1 said
+  "moved from X to X".
+- The editor's view of the libraries' modules (`.moonwell/lua/`) is cleared of what is not current, of links and
+  of empty folders before it is written.
+
+`setup` and `assets:sync`:
+
+- `setup` leaves the values of a `.luarc.json` as they were written: a number's form, a string's escapes, the order
+  of the file's own keys. It keeps the bytes of a `.gitignore`, and takes only ASCII white space off its lines.
+- `setup` creates nothing through a link: a link to a file that does not exist, at `yueconfig.yue`, `.luarc.json`,
+  `.vscode/extensions.json` or `.gitignore`, is an error that names it. A file that exists behind a link is updated
+  through it, as it was. A `.gitignore` that is a folder, or a `.vscode` that is a file, is an error with the file,
+  not an internal error.
+- `assets:sync`: a file or folder that appears where a new asset goes, between the check and the write, stops the
+  sync with "changed after the assets were checked". A link made in that time is refused, not written through. A
+  file that the undo finds as it was is not listed as "could not be restored".
+- The messages about downloading YueScript and Pkl name the tool in the same way. When several files fail to
+  compile, the first by the bytes of its path is named.
+- An empty `HOME` counts as not set when the cache folder is chosen.
 
 ## 0.9.1 (2026-10-03)
 

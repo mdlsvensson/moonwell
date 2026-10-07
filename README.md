@@ -14,7 +14,8 @@
   </a>
 </p>
 
-- Gameplay with [YueScript](https://yuescript.org/), [Teal](https://teal-language.org/), [Fennel](https://fennel-lang.org/).
+- Gameplay with [YueScript](https://yuescript.org/), [Teal](https://teal-language.org/),
+  [Fennel](https://fennel-lang.org/).
 - [Pkl](https://pkl-lang.org) for object data, assets and configuration.
 - Annotated lua wrappers for Warcraft III natives.
 - Full systems suite including damage engine, physics, missiles, save/load, and more.
@@ -80,6 +81,19 @@ irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.9.1/ins
 To move a project to a newer Moonwell, install that version, change the package's version in the project's
 `PklProject` (for example `moonwell@0.8.1` to `moonwell@0.9.0`) and run `pkl project resolve`.
 
+### Upgrading a project to 0.10
+
+A project that builds with Moonwell 0.9 builds with 0.10 after three steps:
+
+1. Install Moonwell 0.10: run the install line again.
+2. In the project's `PklProject`, set the package's version to `moonwell@0.10.0`.
+3. Run `pkl project resolve` in the project folder. If you have no `pkl` command, run `moonwell setup` there first:
+   it copies Moonwell's own Pkl into the `bin` folder above before it reads the project.
+
+Nothing in `moonwell.pkl`, the map, `moonwell.lock` or `.asset-state/` has to change. The first command afterwards
+builds the caches under `dist/` and `.moonwell/` anew. The [changelog](CHANGELOG.md) lists what 0.10 does differently;
+the two changes most projects meet are that a mistyped flag is now an error, and that `dist` must be a real folder.
+
 ### Upgrading a project from 0.7
 
 Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four steps:
@@ -90,8 +104,8 @@ Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four
 4. Delete `deno.json` and `deno.lock`. Where you ran `deno task build`, run `moonwell build`; the same goes for every
    other command.
 
-Nothing else changes: the manifest, the map, the libraries, the caches under `dist/` and `.moonwell/`, and the files a
-build writes are the same.
+Nothing else changes in the project: the manifest, the map and the libraries stay as they are. The caches under
+`dist/` and `.moonwell/` are built anew by the first command.
 
 ## A project
 
@@ -116,6 +130,14 @@ build writes are the same.
 `moonwell.local.pkl` amends `moonwell.pkl`, so any setting can be overridden there for your machine only. Lists such as
 `launch.args` are replaced, not extended: `args = List("-launch", "-windowmode", "fullscreen")`.
 
+`dist/` and the folder the map is built into (`build.folder`, by default `dist/bin`) are real folders. Moonwell
+removes and replaces what it wrote there, so it refuses a link or a Windows junction on the way to anything it writes
+below them, and names the link. A link at `.moonwell/`, `.asset-state/`, `maps/`, `src/` or `lua/` is refused too.
+
+Build only a project you trust. `build`, `test`, `check`, `dev` and `setup` run code the project brings: the program
+its `yue.path` names, and its macros, which the compiler runs while it compiles. Refusing links keeps Moonwell's own
+writes inside the project folder; it is no barrier against a project that means harm.
+
 Gameplay registers hooks with the `moonwell` module:
 
 ```yue
@@ -133,9 +155,8 @@ Bitwise operators (`&`, `|`, `~`, `<<`, `>>`) do not build from YueScript: the c
 prepares the Lua for the map does not read them, and Moonwell stops the build with an error at the line. Put that code
 in a Lua file under `lua/` (see "Lua modules"), where the operators work as the game's Lua 5.3 has them.
 
-A project made with Moonwell 0.8.0 or earlier uses YueScript 0.34.2, which compiles a file that uses floor division
-(`//`) to no Lua at all; Moonwell stops that build too. Set `moonwell@0.8.1` or later in `PklProject` and run
-`pkl project resolve` to get YueScript 0.34.3, where `//` works.
+Floor division (`//`) works with YueScript 0.34.3, the default. YueScript 0.34.2, which `yue.version` can still name,
+compiles a file that uses it to no Lua at all; Moonwell stops that build too.
 
 ## Editor setup
 
@@ -435,11 +456,10 @@ Map settings valid: 3 internal file(s) would change during build.
 
 A file a build removes is listed as `war3mapMap.blp (removed)`; that happens for a TGA picture.
 
-`moonwell check` (and so `dev`) checks settings the same way; with no settings set it does not need the source map.
-Mistakes in the manifest name the manifest that was evaluated (`moonwell.local.pkl` when it exists, else
-`moonwell.pkl`). Problems with the map name the file under `maps/<folder>/`, such as `maps/map.w3x/war3map.w3i`. Map
-files are matched ignoring letter case, as Warcraft III does: a map saved with `war3mapskin.txt` is patched under that
-name.
+`moonwell check` (and so `dev`) checks settings the same way. Mistakes in the manifest name the manifest that was
+evaluated (`moonwell.local.pkl` when it exists, else `moonwell.pkl`). Problems with the map name the file under
+`maps/<folder>/`, such as `maps/map.w3x/war3map.w3i`. Map files are matched ignoring letter case, as Warcraft III
+does: a map saved with `war3mapskin.txt` is patched under that name.
 
 ## Objects
 
@@ -564,6 +584,20 @@ Not supported yet:
 | `moonwell objects:check`                        | Validate the objects and show which internal map files they would change         |
 | `moonwell objects:eval`                         | Print the resolved objects as JSON                                               |
 | `moonwell setup`                                | Create a missing `moonwell.local.pkl`, download YueScript and prepare the editor |
+
+A command line is read strictly: Moonwell runs a line it understands whole, or nothing. Each of these is an error
+with a hint, such as `Did you mean --minify?`:
+
+- a flag Moonwell does not have (`moonwell build --minfy`), and a command it does not have;
+- a flag the command does not have (`moonwell check --minify`), and a flag without a command (`moonwell --minify`);
+- an argument the command does not take (`moonwell build extra`);
+- a value for a flag that takes none (`--minify=false`), and `--entry` without a `.yue` file under `src/`;
+- a flag given twice with two values (`--entry src/a.yue --entry src/b.yue`);
+- several short flags in one (`-hv`): write `-h -v`.
+
+A flag may stand before or after the command. `--entry` takes its file after a space or after `=`. `--` ends the
+flags. `moonwell --help` (`-h`) prints the commands and `moonwell --version` (`-v`) the version. A command ends with
+the exit code 0, with 1 when it fails, and with 130 after Ctrl+C.
 
 The compiler, and Pkl when Moonwell needs its own, are downloaded once per version and verified by checksum. They are
 cached in `MOONWELL_CACHE` when that is set, else in `%LOCALAPPDATA%\moonwell` on Windows, else in
