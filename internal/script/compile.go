@@ -174,13 +174,6 @@ func Link(ctx context.Context, e *env.Env, compiled *Compiled) (*Program, error)
 	}, nil
 }
 
-// errNoNatives is the failure of a compile that is handed an Input without the game's API. It is a plain error:
-// the caller passes LoadNatives(), which is never nil, so a compile without the game's API is a mistake in
-// Moonwell and nothing the user can put right.
-func errNoNatives() error {
-	return errors.New("script.CompileSources: Input.Natives is nil; pass script.LoadNatives()")
-}
-
 // macroModule writes the macro module of the project at root, and returns how the compiler finds it. A project
 // folder whose path the search cannot hold is refused before anything is written.
 func macroModule(root string) (macros, error) {
@@ -236,4 +229,13 @@ func (r *reader) libraries(sources []Source) error {
 		}
 	}
 	return nil
+}
+
+// ---- errors ----
+
+// errNoNatives is the failure of a compile that is handed an Input without the game's API. It is a plain error:
+// the caller passes LoadNatives(), which is never nil, so a compile without the game's API is a mistake in
+// Moonwell and nothing the user can put right.
+func errNoNatives() error {
+	return errors.New("script.CompileSources: Input.Natives is nil; pass script.LoadNatives()")
 }

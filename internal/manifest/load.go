@@ -1,3 +1,15 @@
+// Package manifest is a Moonwell project as Go values: the mirror of schema/, file for file. It evaluates the
+// manifest with pkl and decodes what pkl prints. It also holds what ties a project to its Pkl package: the
+// version check, and the PklProject and moonwell.local.pkl a new project gets.
+//
+// Load takes the project folder of an env.Env and the pkl program, and returns the Project; Decode takes what pkl
+// printed. A project that cannot be read is a *diag.Error that names the file to look at. IsProject says of a
+// folder whether it is a project at all.
+//
+// Pkl has checked every type, range and pattern, and supplied every default; this package checks nothing of that
+// again. It must not know anything of maps, or what a setting does.
+//
+// Of Moonwell it imports env, diag and fsx, and the root package for the program's version.
 package manifest
 
 import (

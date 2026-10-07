@@ -1,6 +1,3 @@
-// Package objmod reads the object modification files of a map (w3u, w3t, w3b, w3d, w3a, w3h, w3q and their skin
-// files) and appends custom objects to them, copying every existing byte. It takes and returns bytes. It knows
-// nothing of what a field means.
 package objmod
 
 // ID is a four-character id as the files store it: an object, a base object or a field.

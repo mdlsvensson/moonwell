@@ -1,6 +1,3 @@
-// Package w3i reads a map's war3map.w3i and edits it in place: every byte Moonwell does not change is kept. It
-// takes the file's bytes and returns values with their offsets, or new bytes. It knows nothing of the map folder
-// the bytes come from, of the project, or of which values Moonwell sets.
 package w3i
 
 import (

@@ -14,11 +14,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-// These tests read recorded text and run no compiler, but for the one that runs the compiler on the sources
-// behind the recordings and compares what it prints with them.
+// These tests read what the compiler printed, kept in this file, and run no compiler, but for the one that runs
+// the compiler on the sources behind the kept texts and compares what it prints with them.
 
-// What the pinned compiler, 0.34.3, printed on Windows for the sources named beside each, recorded from runs of
-// it with the arguments a compile gives it. The project folder is written as C:\project and the compiler's as
+// What the pinned compiler, 0.34.3, printed on Windows for the sources named beside each, kept from runs of it
+// with the arguments a compile gives it. The project folder is written as C:\project and the compiler's as
 // C:\yue; nothing else is changed. On Windows the compiler ends its lines with "\r\n".
 const (
 	// src/bad.yue: "x = 1\ny = \n  if then\n", with -r and with -m.
@@ -61,9 +61,9 @@ const (
 // between them.
 func asPrinted(stdout string) string { return stdout + "\n" }
 
-// withLineFeeds is a recorded text with the line ends of a system that ends its lines with "\n". It is made of
-// the recording; TestTheCompilerPrintsWhatWasRecorded holds the compiler of such a system to it.
-func withLineFeeds(recorded string) string { return strings.ReplaceAll(recorded, "\r\n", "\n") }
+// withLineFeeds is a kept text with the line ends of a system that ends its lines with "\n". It is made of the
+// kept text; TestTheCompilerPrintsWhatIsKeptHere holds the compiler of such a system to it.
+func withLineFeeds(kept string) string { return strings.ReplaceAll(kept, "\r\n", "\n") }
 
 // withoutSearchedFiles is a text without the lines that name a file the compiler looked for a module in: which
 // files those are is the system's and the compiler's folder's own.
@@ -77,8 +77,8 @@ func withoutSearchedFiles(printed string) string {
 	return strings.Join(kept, "\n")
 }
 
-// recordedVersion is the version of the compiler that the recordings are of.
-const recordedVersion = "0.34.3"
+// keptVersion is the version of the compiler that the kept texts are of.
+const keptVersion = "0.34.3"
 
 // versionLine finds the version in what a compiler prints when it is asked for it: the version ends at the first
 // white space.
@@ -98,29 +98,31 @@ func reportedVersion(t *testing.T, yue string) string {
 	return ""
 }
 
-// TestTheCompilerPrintsWhatWasRecorded runs the real compiler on the source behind each recording, with the
-// arguments a compile gives it, and compares what it prints and leaves with the recording. On Windows the two
-// are the same once the folders are written as the recordings write them. On another system the recording is
+// TestTheCompilerPrintsWhatIsKeptHere runs the real compiler on the source behind each kept text, with the
+// arguments a compile gives it, and compares what it prints and leaves with the kept text. On Windows the two
+// are the same once the folders are written as the kept texts write them. On another system the kept text is
 // taken with "\n" for each line end, and without the lines that name the files a module was looked for in.
 //
-// The recordings are of one version of the compiler, which is the one Moonwell downloads. A compiler of the
+// The kept texts are of one version of the compiler, which is the one Moonwell downloads. A compiler of the
 // user's own that reports another version, named by MOONWELL_TEST_YUE, words its failures its own way: the test
 // is skipped for it, and says so. Without that variable the compiler is the one Moonwell downloads, and another
-// version fails the test: the recordings are then to be made again. A change of the version Moonwell downloads
-// records them again in the same commit.
-func TestTheCompilerPrintsWhatWasRecorded(t *testing.T) {
+// version fails the test: the texts are then to be taken again, by hand, from what that compiler prints. A
+// change of the version Moonwell downloads takes them again in the same commit.
+func TestTheCompilerPrintsWhatIsKeptHere(t *testing.T) {
 	yue := tooltest.Yue(t)
-	if reported := reportedVersion(t, yue); reported != recordedVersion {
+	if reported := reportedVersion(t, yue); reported != keptVersion {
 		if os.Getenv("MOONWELL_TEST_YUE") == "" {
-			t.Fatalf("the recordings are of YueScript %s, and the compiler Moonwell downloads reports %q: record them again", recordedVersion, reported)
+			t.Fatalf("the texts kept in printed_test.go are of YueScript %s, and the compiler Moonwell downloads "+
+				"reports %q: take them again", keptVersion, reported)
 		}
-		t.Skipf("the recordings are of YueScript %s, and the compiler MOONWELL_TEST_YUE names reports %q", recordedVersion, reported)
+		t.Skipf("the texts kept in printed_test.go are of YueScript %s, and the compiler MOONWELL_TEST_YUE names "+
+			"reports %q", keptVersion, reported)
 	}
 	const bit = "x = 1\n\n\nflags = x & 3\nprint flags\n"
 	for _, c := range []struct {
 		name, text, mode string // the source is src/<name>.yue
 		code             int
-		printed, left    string // the recording, and the Lua left at the output, "" for none
+		printed, left    string // the kept text, and the Lua left at the output, "" for none
 	}{
 		{"bad", "x = 1\ny = \n  if then\n", "-r", 1, printedSyntax, ""},
 		{"bad", "x = 1\ny = \n  if then\n", "-m", 1, printedSyntax, ""},
@@ -142,12 +144,12 @@ func TestTheCompilerPrintsWhatWasRecorded(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		// The folders as the recordings write them; the longest first, where one begins with another.
-		asRecorded := strings.NewReplacer(
+		// The folders as the kept texts write them; the longest first, where one begins with another.
+		asKept := strings.NewReplacer(
 			source, `C:\project\src\`+c.name+`.yue`, output, `C:\project\dist\stage\lua\`+c.name+`.lua`,
 			b.root, `C:\project`, filepath.Dir(yue), `C:\yue`,
 		)
-		printed, left := asRecorded.Replace(result.Stdout), asRecorded.Replace(leftAt(output))
+		printed, left := asKept.Replace(result.Stdout), asKept.Replace(leftAt(output))
 		wantPrinted, wantLeft := c.printed, c.left
 		if runtime.GOOS != "windows" {
 			wantPrinted, wantLeft = withoutSearchedFiles(withLineFeeds(wantPrinted)), withLineFeeds(wantLeft)
