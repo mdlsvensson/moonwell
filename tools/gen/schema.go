@@ -233,9 +233,6 @@ func oneLine(text string) string {
 
 // ---- errors ----
 
-// errNoJSON names a file of the checkout, by its path from there, that the JSON decoder refused.
-func errNoJSON(path string, cause error) error { return errors.New(path + ": " + cause.Error()) }
-
 // errUnusableNames refuses to render the schema, with a line for each name that stands in its way.
 func errUnusableNames(problems []string) error {
 	return errors.New("Cannot render the Pkl schema; fix the names in tools/metadata/overrides.json:\n" +

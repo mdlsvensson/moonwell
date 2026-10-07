@@ -143,7 +143,7 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 		"a released file that is no JSON": {folder: whole, kept: `{"format":`, starts: "data/metadata.json: "},
 		"overrides that are no JSON":      {folder: whole, pins: `{"names":`, starts: "tools/metadata/overrides.json: "},
 		"overrides with a key too many": {folder: whole, pins: `{"names": {}, "renamed": {}}`,
-			starts: `tools/metadata/overrides.json: the file has the key "renamed"`},
+			starts: `tools/metadata/overrides.json: unknown field "renamed"`},
 	} {
 		scratch := withPins(t, cmp.Or(c.pins, unitClassPins))
 		if c.kept != "" {

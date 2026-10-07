@@ -25,6 +25,8 @@
 package main
 
 import (
+	"cmp"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -192,4 +194,20 @@ func errInCheckout(checkout, path string, cause error) error {
 		}
 	}
 	return errFile(path, cause)
+}
+
+// errNoJSON refuses a file of the checkout, by its path from there, whose text a JSON decoder did not take. It
+// says why in the decoder's words, but for a value of another kind than its place takes: the decoder names a
+// type of this program there, and the refusal names the place, key by key as the file writes it and an entry of
+// a list by its number, counted from 0, and the kind of value that stands there.
+func errNoJSON(path string, cause error) error {
+	var mismatch *json.UnmarshalTypeError
+	switch {
+	case errors.As(cause, &mismatch):
+		return errors.New(path + ": " + cmp.Or(mismatch.Field, "the file") + " is of the wrong kind (" +
+			mismatch.Value + ")")
+	case errors.Is(cause, io.EOF):
+		return errors.New(path + ": the file is empty")
+	}
+	return errors.New(path + ": " + strings.TrimPrefix(cause.Error(), "json: "))
 }

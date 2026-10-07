@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
 	"regexp"
 	"slices"
 	"strings"
@@ -24,37 +22,12 @@ type overrides struct {
 	Removed map[string][]string          `json:"removed"`
 }
 
-// overridesKeys is the keys of the file: those of the struct.
-var overridesKeys = []string{"names", "removed"}
-
-// readOverrides reads the overrides of a checkout.
+// readOverrides reads the overrides of a checkout. A file that leaves a key out pins nothing, or lists no field
+// as removed.
 func readOverrides(checkout string) (overrides, error) {
-	data, err := os.ReadFile(fileIn(checkout, overridesPath))
-	if err != nil {
-		return overrides{}, errInCheckout(checkout, overridesPath, err)
-	}
-	return decodeOverrides(data)
-}
-
-// decodeOverrides reads the text of an overrides.json: a JSON object with the keys of the file and no other. A
-// key may be left out, and the file may be null: it then pins nothing. The bytes go to the decoder as they are,
-// so a byte order mark is no JSON.
-//
-// The text is decoded into the struct, which holds every value to its type, and once more for the keys of the
-// file in the letters they have: a decoding into a struct reads a key in any letters, and passes over one that
-// the struct does not have. Below the two keys every key is a list or an id, and none is unknown.
-func decodeOverrides(data []byte) (overrides, error) {
 	var pins overrides
-	if err := json.Unmarshal(data, &pins); err != nil {
-		return overrides{}, errNoJSON(overridesPath, err)
-	}
-	// What the struct took is an object or null, and either decodes as the keys of an object too. The values are
-	// kept as the text they are, and nothing reads them: so this decoding has no failure left, also where a key
-	// that the struct does not have holds a number out of range, which the decoding into the struct passes over.
-	var file map[string]json.RawMessage
-	_ = json.Unmarshal(data, &file)
-	if key, unknown := keyOutside(file, overridesKeys); unknown {
-		return overrides{}, errUnknownKey(overridesPath, "the file", key, overridesKeys)
+	if err := readHandWritten(checkout, overridesPath, &pins); err != nil {
+		return overrides{}, err
 	}
 	return pins, nil
 }

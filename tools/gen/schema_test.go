@@ -474,7 +474,7 @@ func TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON(t *testing.T) 
 	}{
 		"missing":       {"", "data/metadata.json"},
 		"no JSON":       {`{"format": 1,`, "data/metadata.json: unexpected end of JSON input"},
-		"another shape": {`{"format": "one"}`, "data/metadata.json: json: cannot unmarshal string"},
+		"another shape": {`{"format": "one"}`, "data/metadata.json: format is of the wrong kind (string)"},
 	} {
 		scratch := newCheckout(t)
 		if c.metadata != "" {

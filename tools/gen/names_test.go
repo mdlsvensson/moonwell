@@ -257,7 +257,17 @@ func TestGroupsOfIsTheFieldsThatCanMeetInOneObject(t *testing.T) {
 	}
 }
 
-func TestDecodeOverridesReadsThePinsAndTheFieldsThatAreRemoved(t *testing.T) {
+// decodeOverrides reads the text of an overrides.json as readOverrides reads the file: by the reader of the
+// hand-written files.
+func decodeOverrides(data []byte) (overrides, error) {
+	var pins overrides
+	if err := decodeHandWritten(overridesPath, data, &pins); err != nil {
+		return overrides{}, err
+	}
+	return pins, nil
+}
+
+func TestTheOverridesAreThePinsAndTheFieldsThatAreRemoved(t *testing.T) {
 	const text = `{
 		"names": {"abilities": {"Tau1": "preferHostiles", "Crs\u0000": "missChance"}, "upgrades": {"gcls": "upgradeClass"}},
 		"removed": {"units": ["uold", "uolder"]}
@@ -277,9 +287,6 @@ func TestDecodeOverridesReadsThePinsAndTheFieldsThatAreRemoved(t *testing.T) {
 		`{"names": null, "removed": null}`: {},
 		`{"removed": {}}`:                  {Removed: map[string][]string{}},
 		`{"names": {"units": {}}}`:         {Names: map[string]map[string]string{"units": {}}},
-		// A key that stands twice gives its lists to one map, and a list that stands twice is the later one.
-		`{"names": {"units": {"a": "b"}, "items": {"c": "d"}}, "names": {"units": {"e": "f"}}}`: {
-			Names: map[string]map[string]string{"units": {"e": "f"}, "items": {"c": "d"}}},
 	} {
 		if got, err := decodeOverrides([]byte(text)); err != nil || !reflect.DeepEqual(got, want) {
 			t.Errorf("%s: got %+v, %v; want %+v", text, got, err, want)
@@ -288,51 +295,6 @@ func TestDecodeOverridesReadsThePinsAndTheFieldsThatAreRemoved(t *testing.T) {
 	committed, err := decodeOverrides(realFile(t, overridesPath))
 	if err != nil || len(committed.Names) == 0 {
 		t.Errorf("the committed overrides are read as %d lists of pins, %v", len(committed.Names), err)
-	}
-}
-
-// The keys that the reading of the file knows are the keys of the struct that the file is decoded into.
-func TestTheKeysOfTheOverridesAreTheKeysOfTheirStruct(t *testing.T) {
-	of := reflect.TypeFor[overrides]()
-	var tagged []string
-	for i := range of.NumField() {
-		tagged = append(tagged, of.Field(i).Tag.Get("json"))
-	}
-	if !slices.Equal(overridesKeys, tagged) {
-		t.Errorf("the keys of the overrides are %q, and their struct has %q", overridesKeys, tagged)
-	}
-}
-
-func TestDecodeOverridesRefusesWhatTheFileMustNotHold(t *testing.T) {
-	// The start of the sentence that Go's decoder says of a value of another type than the struct has.
-	const anotherType = "cannot unmarshal"
-	for name, c := range map[string]struct {
-		text  string
-		words []string // what the refusal says, beside the file
-	}{
-		"a key the file has not": {`{"names": {}, "renamed": {}}`,
-			[]string{`the file has the key "renamed"`, "Its keys are names and removed", "take the key out"}},
-		"a key in other letters":     {`{"Names": {"units": {"ucls": "u"}}}`, []string{`the file has the key "Names"`}},
-		"a file cut short":           {`{"names": {"units": {"ucls": "unitCl`, []string{"unexpected end of JSON input"}},
-		"a file cut after a value":   {`{"names": {}`, []string{"unexpected end of JSON input"}},
-		"a file that holds nothing":  {``, []string{"unexpected end of JSON input"}},
-		"no JSON":                    {"not JSON\n", []string{"invalid character 'o'"}},
-		"a byte order mark":          {"\xEF\xBB\xBF{}", []string{"invalid character"}},
-		"something after the object": {`{} {}`, []string{"invalid character '{' after top-level value"}},
-		"a list for the file":        {`[]`, []string{anotherType}},
-		"a text for the names":       {`{"names": "ucls"}`, []string{anotherType}},
-		"a name that is a number":    {`{"names": {"units": {"ucls": 1}}}`, []string{anotherType}},
-		"a list of pins":             {`{"names": {"units": ["ucls"]}}`, []string{anotherType}},
-		"a text for a removed field": {`{"removed": {"units": "uold"}}`, []string{anotherType}},
-		// The value of a key the file has not is not read: the key is refused, and not its number out of range.
-		"a key with a number too big": {`{"zzz":1e999}`, []string{`the file has the key "zzz"`}},
-	} {
-		got, err := decodeOverrides([]byte(c.text))
-		if err == nil {
-			t.Errorf("%s: the overrides were read: %+v", name, got)
-			continue
-		}
-		contains(t, err.Error(), append(c.words, overridesPath+": ")...)
 	}
 }
 
@@ -434,7 +396,7 @@ func TestKeepsReleasedNamesNamesAMetadataItCannotRead(t *testing.T) {
 		`{"format": 1,`: "data/metadata.json: unexpected end of JSON input",
 		"":              "data/metadata.json: unexpected end of JSON input",
 		"not JSON\n":    "data/metadata.json: invalid character 'o'",
-		`{"fields": 1}`: "data/metadata.json: json: cannot unmarshal number",
+		`{"fields": 1}`: "data/metadata.json: fields is of the wrong kind (number)",
 	} {
 		c := newCheckout(t)
 		c.write(metadataPath, text)
