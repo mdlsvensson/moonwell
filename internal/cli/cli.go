@@ -60,7 +60,8 @@ type command struct {
 var commands = []command{
 	{name: "init", usage: "init <dir> [--link]", help: "Create a project (--link: use this local Moonwell checkout)",
 		takes: arity{most: 1, missing: errInitNeedsAFolder}, run: runInit},
-	{name: "setup", usage: "setup", help: "Install the pinned YueScript compiler", run: runSetup},
+	{name: "setup", usage: "setup",
+		help: "Prepare a checkout: moonwell.local.pkl, Pkl, YueScript, libraries, the editor", run: runSetup},
 	{name: "build", usage: "build [--entry f] [--minify]", help: "Build <build.folder>/<map.folder>", run: runBuild},
 	{name: "test", usage: "test [--entry f] [--minify]", help: "Stage the map and launch Warcraft III", run: runTest},
 	{name: "dev", usage: "dev", help: "Watch sources and report errors on save", run: runDev},

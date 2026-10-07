@@ -50,7 +50,9 @@
 - A "did you mean" hint counts two neighbouring letters that changed places as one mistake: `biuld` names `build`,
   `--hepl` names `--help` and `tset` names `test`. This holds for every such hint: a command, a flag, a global,
   and a field or a base object of an object.
-- `init ""` is refused; 0.9.1 made the project in the working folder. `setup` no longer mentions `deno.json`.
+- `init ""` is refused; 0.9.1 made the project in the working folder. `setup` no longer mentions `deno.json`, and
+  `moonwell --help` says what `setup` does: it said "Install the pinned YueScript compiler" of a command that also
+  makes `moonwell.local.pkl`, keeps Pkl for the shell, fetches the libraries and prepares the editor.
 - For contributors: the source tree is new, and `ARCHITECTURE.md` is the way into it. It has the layout (the
   packages stand on four shelves, and a test holds every import to them), what a build does step by step, and a
   table of which file to open for what. Beside the unit tests there are recorded tests: whole builds and whole

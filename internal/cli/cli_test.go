@@ -23,7 +23,7 @@ Usage: moonwell <command> [options]
 
 Commands:
   init <dir> [--link]            Create a project (--link: use this local Moonwell checkout)
-  setup                          Install the pinned YueScript compiler
+  setup                          Prepare a checkout: moonwell.local.pkl, Pkl, YueScript, libraries, the editor
   build [--entry f] [--minify]   Build <build.folder>/<map.folder>
   test [--entry f] [--minify]    Stage the map and launch Warcraft III
   dev                            Watch sources and report errors on save
