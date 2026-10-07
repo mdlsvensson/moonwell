@@ -21,7 +21,8 @@ func TestNormalizeGamePathStripsStoragePrefixesAndKeepsOnlyModelReferencedFileTy
 		{"  Effects/Fire.pkfx  ", "effects/fire.pkfx"},
 		// Reforged stores its particle effects baked, as .pkb.
 		{`war3.w3mod:_de.w3mod:abilities\ribbon\chainlightning.pkb`, "abilities/ribbon/chainlightning.pkb"},
-		// A folder is a container, and a file is none: the last step of a path is kept whatever its name.
+		// A step named as an archive is a container wherever it stands among the folders; a file whose name
+		// only has such a name inside it is none.
 		{"Textures//Deep.w3mod//Black32.tga", "black32.tga"},
 		{"Textures/Deep.mpq/Black32.tga", "black32.tga"},
 		{"textures/odd.mpq.png", "textures/odd.mpq.png"},

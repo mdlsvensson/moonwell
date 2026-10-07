@@ -88,13 +88,10 @@ func TestParseReadsCellsByHeaderWithTheLastYCarriedForward(t *testing.T) {
 	if got := rows(t, mini); !reflect.DeepEqual(got, want) {
 		t.Fatalf("rows: %v", got)
 	}
-	// A row is named by its first cell, and tells an absent cell from an empty one.
+	// A row tells an absent cell from an empty one.
 	row := table.Rows[1]
 	if _, has := row.Get("field"); has || row.Value("field") != "" || row.Value("count") != "-1.5" {
 		t.Errorf("row: %v", cellsOf(table, row))
-	}
-	if row.First() != "efgh" || (slk.Row{}).First() != "" {
-		t.Errorf("the first cell of the row is %q, of a row without cells %q", row.First(), slk.Row{}.First())
 	}
 }
 
@@ -147,8 +144,7 @@ func TestACellAtTheCoordinateZeroIsACell(t *testing.T) {
 // its second row with the last column first.
 const numbered = "C;X1;Y1;Ka\nC;X2;Kb\nC;X10;Kc\nC;X10;Y2;K1\nC;X2;K2\nC;X1;Y10;K3\n"
 
-// A coordinate is a number: the tenth column comes after the second, and so does the tenth row. The first cell
-// of a row is the one in its lowest column.
+// A coordinate is a number: the tenth column comes after the second, and so does the tenth row.
 func TestColumnsAndRowsAreInTheOrderOfTheirNumbers(t *testing.T) {
 	table, err := slk.Parse(numbered, "numbered.slk")
 	if err != nil {
@@ -157,8 +153,8 @@ func TestColumnsAndRowsAreInTheOrderOfTheirNumbers(t *testing.T) {
 	if !reflect.DeepEqual(table.Columns, []string{"a", "b", "c"}) {
 		t.Errorf("columns: %q", table.Columns)
 	}
-	if len(table.Rows) != 2 || table.Rows[0].First() != "2" || table.Rows[1].First() != "3" {
-		t.Errorf("rows: %v, want the row of Y2 with the first cell 2, then the row of Y10", rows(t, numbered))
+	if len(table.Rows) != 2 || table.Rows[0].Value("b") != "2" || table.Rows[1].Value("a") != "3" {
+		t.Errorf("rows: %v, want the row of Y2, then the row of Y10", rows(t, numbered))
 	}
 }
 
@@ -166,7 +162,7 @@ func TestColumnsAndRowsAreInTheOrderOfTheirNumbers(t *testing.T) {
 const besideTheHeader = "C;X2;Y1;K\"ID\"\nC;X1;Y2;K\"no header\"\nC;X2;K\"abcd\"\n"
 
 // A cell in a column that the header row does not name is left out of its row: the row has no cell without a
-// name, and its first cell is the first that has one.
+// name, and has the cell of the column that is named.
 func TestACellInAColumnTheHeaderRowDoesNotNameIsLeftOut(t *testing.T) {
 	for name, text := range map[string]string{
 		"a cell after the columns of the header row": otherRecords,
@@ -181,8 +177,8 @@ func TestACellInAColumnTheHeaderRowDoesNotNameIsLeftOut(t *testing.T) {
 		if cell, has := row.Get(""); has || row.Value("") != "" {
 			t.Errorf("%s: the row has the cell %q under no name", name, cell)
 		}
-		if row.First() != "abcd" {
-			t.Errorf("%s: the first cell of the row is %q, want the cell of the column ID", name, row.First())
+		if row.Value("ID") != "abcd" {
+			t.Errorf("%s: the cell of the column ID is %q", name, row.Value("ID"))
 		}
 	}
 }

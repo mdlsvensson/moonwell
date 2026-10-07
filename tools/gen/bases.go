@@ -26,8 +26,7 @@ func standardObjects(game gameData) (map[manifest.Category]map[string]objects.Ba
 	if err := unitsByCategory(game, bases); err != nil {
 		return nil, err
 	}
-	objectsByName(game, bases)
-	if err := objectsWithLevels(game, bases); err != nil {
+	if err := objectsByTable(game, bases); err != nil {
 		return nil, err
 	}
 	return bases, nil
@@ -36,42 +35,34 @@ func standardObjects(game gameData) (map[manifest.Category]map[string]objects.Ba
 // objectTable is a table whose every row is a standard object of one category.
 type objectTable struct {
 	category manifest.Category
-	path     string // the table's path from the folder of the export, which names it in a message
-	rows     []slk.Row
+	path     string     // the table's path from the folder of the export, which names it in a message
+	rows     []slk.Row  // its rows that have a cell in the key
 	key      string     // the table's key: the column that has the id of a row
 	name     nameSource // where an object of the table has its name
-	levels   string     // the column that has the count of levels of a row; "" for a table without one
+	levels   string     // the column that has an object's count of levels; "" where the objects have none
 }
 
-// objectsByName puts the items and the buffs into their categories: each by its id, with its name.
-func objectsByName(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) {
+// objectsByTable puts the items, the buffs, the abilities and the upgrades into their categories, in that order
+// of the tables: each object by its id, with its name, and an ability and an upgrade with its count of levels.
+// The first count that is none ends it, with the table and the row.
+func objectsByTable(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
 	for _, table := range []objectTable{
-		{category: "items", path: itemsTable, rows: game.items, key: itemKey, name: itemName},
-		{category: "buffs", path: buffsTable, rows: game.buffs, key: buffKey, name: buffName},
+		{"items", itemsTable, game.items, itemKey, itemName, ""},
+		{"buffs", buffsTable, game.buffs, buffKey, buffName, ""},
+		{"abilities", abilitiesTable, game.abilities, abilityKey, abilityName, "levels"},
+		{"upgrades", upgradesTable, game.upgrades, upgradeKey, upgradeName, "maxlevel"},
 	} {
 		for _, row := range table.rows {
 			id := row.Value(table.key)
-			bases[table.category][id] = objects.BaseMeta{Name: table.name.of(game.strings, id, row)}
-		}
-	}
-}
-
-// objectsWithLevels puts the abilities and then the upgrades into their categories: each by its id, with its
-// name and its count of levels. The first count that is none ends it, with the table and the row.
-func objectsWithLevels(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
-	for _, table := range []objectTable{
-		{category: "abilities", path: abilitiesTable, rows: game.abilities, key: abilityKey, name: abilityName,
-			levels: "levels"},
-		{category: "upgrades", path: upgradesTable, rows: game.upgrades, key: upgradeKey, name: upgradeName,
-			levels: "maxlevel"},
-	} {
-		for _, row := range table.rows {
-			id := row.Value(table.key)
-			count, err := levelCount(row, table.levels)
-			if err != nil {
-				return errInRow(table.path, id, err)
+			object := objects.BaseMeta{Name: table.name.of(game.strings, id, row)}
+			if table.levels != "" {
+				count, err := levelCount(row, table.levels)
+				if err != nil {
+					return errInRow(table.path, id, err)
+				}
+				object.Levels = &count
 			}
-			bases[table.category][id] = objects.BaseMeta{Name: table.name.of(game.strings, id, row), Levels: &count}
+			bases[table.category][id] = object
 		}
 	}
 	return nil
@@ -236,7 +227,7 @@ func primaryDisagrees(id string, capital bool, primary string) string {
 func heroIsABuilding(id string) string { return id + " (uppercase, a building)" }
 
 // errNoLevels and errBadLevels are the faults of the cell of a row of abilities or of upgrades that has its
-// count of levels: no cell, and a cell that is no count. objectsWithLevels names the table and the row.
+// count of levels: no cell, and a cell that is no count. objectsByTable names the table and the row.
 func errNoLevels(column string) error {
 	return errors.New("the row has no " + column + " cell")
 }

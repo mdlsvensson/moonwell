@@ -333,8 +333,6 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 		{nil, nil, false, 0}, {"", "", false, 0}, {" \t", "\r", false, 0}, {0, 0, false, 0}, {4, 12, true, 12},
 		{" 4\t", "\v3 ", true, 3}, {"0.5", "3.0", true, 3}, {"-1", "-2", false, -2}, {"1e2", "1e1", true, 10},
 		{"+1", "0.0", true, 0}, {".5", "2.", true, 2},
-		// strconv reads an underscore between two digits, and so does a cell.
-		{"1_000", "1_0", true, 10},
 	} {
 		got, err := record(c.repeat, c.data)
 		if err != nil || got.PerLevel != c.perLevel || got.Column != c.column {
@@ -344,6 +342,8 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 	}
 	for _, cell := range []string{
 		"x", "4 5", "Inf", "-inf", "+Infinity", "NaN", "nan", "0x1p4", "0X1P4", "-0x10p0", "0x10", "0x_1p0", "1__0", "1e999",
+		// An underscore between two digits is how Go writes a number, and no table of the game does.
+		"1_0", "1_000",
 		"\xC2\xA04", "4\xE2\x80\xA8", "\xC2\xA0",
 	} {
 		if _, err := record(cell, 0); err == nil || err.Error() != "the repeat cell '"+cell+"' is not a number" {

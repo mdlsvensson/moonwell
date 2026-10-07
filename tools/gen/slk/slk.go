@@ -20,8 +20,7 @@ import (
 
 // Row is one record after the header row: its cells by column name. A cell the row does not have is absent.
 type Row struct {
-	columns []string          // the columns the row has a cell in, in column order
-	values  map[string]string // the cells by column name
+	values map[string]string // the cells by column name
 }
 
 // Get returns the cell of a column, and whether the row has it.
@@ -32,14 +31,6 @@ func (r Row) Get(column string) (string, bool) {
 
 // Value returns the cell of a column, "" when the row has none.
 func (r Row) Value(column string) string { return r.values[column] }
-
-// First returns the row's first cell, which names the row in a message.
-func (r Row) First() string {
-	if len(r.columns) == 0 {
-		return ""
-	}
-	return r.values[r.columns[0]]
-}
 
 // Table is the header row's names, in column order, and the rows after it.
 type Table struct {
@@ -205,10 +196,9 @@ func columnsOf(header map[int]string, file string) ([]string, error) {
 // left out.
 func rowOf(cells, header map[int]string) Row {
 	row := Row{values: map[string]string{}}
-	for _, x := range sortedKeys(cells) {
+	for x, cell := range cells {
 		if name, named := header[x]; named {
-			row.columns = append(row.columns, name)
-			row.values[name] = cells[x]
+			row.values[name] = cell
 		}
 	}
 	return row

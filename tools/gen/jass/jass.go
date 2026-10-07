@@ -62,10 +62,11 @@ var (
 )
 
 // Parse reads the declarations of a script. source is the file name recorded on every entry; an error names
-// source and the line.
+// source and the line. A line ends at a line feed: a carriage return before one is white space at the end of
+// the line, and goes with it.
 func Parse(script, source string) (File, error) {
 	r := reader{source: source, file: File{Types: []Type{}, Functions: []Function{}, Globals: []Global{}}}
-	for index, raw := range strings.Split(strings.ReplaceAll(script, "\r\n", "\n"), "\n") {
+	for index, raw := range strings.Split(script, "\n") {
 		if err := r.read(index+1, raw); err != nil {
 			return File{}, err
 		}

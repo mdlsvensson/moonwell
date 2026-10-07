@@ -16,8 +16,8 @@ import (
 
 // writeMetadata is the mode metadata: it writes data/metadata.json from an export of the game's object data,
 // and prints how many fields and standard objects each category has and which friendly names are not the names
-// of their labels. It writes nothing when the export lacks a file, a name needs a pin, a unit breaks the rule
-// for heroes, or a released name would change.
+// of their labels. It writes nothing when the export lacks a file or a table lacks a column, a name needs a
+// pin, a unit breaks the rule for heroes, or a released name would change.
 func writeMetadata(checkout string, args []string, out io.Writer) error {
 	folder, version := args[0], args[1]
 	pins, err := readOverrides(checkout)

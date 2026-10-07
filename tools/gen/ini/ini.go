@@ -27,10 +27,11 @@ func Parse(source string) File {
 
 // Add adds the sections of source to the file, which Parse made or which is File{}: a section the file has gains
 // the text's keys, and a key given again, in this text or in one added before, takes the later value. A text
-// starts outside every section, so its lines before the first [section] line are passed over.
+// starts outside every section, so its lines before the first [section] line are passed over. A line ends at a
+// line feed: a carriage return before one is white space at the end of the line, and goes with it.
 func (f File) Add(source string) {
 	var section Section
-	for _, raw := range strings.Split(strings.ReplaceAll(source, "\r\n", "\n"), "\n") {
+	for _, raw := range strings.Split(source, "\n") {
 		line := trim(raw)
 		switch {
 		case line == "" || strings.HasPrefix(line, "//"):

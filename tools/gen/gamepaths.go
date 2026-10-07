@@ -68,11 +68,12 @@ func normalizeGamePath(line string) (string, bool) {
 	return kept, canBeReferenced(kept)
 }
 
-// pastContainers is where the in-game path starts among the steps of a stored path: after the last folder named
-// as an archive of the game (.w3mod, .mpq). The last step is the file, and no container whatever its name.
+// pastContainers is where the in-game path starts among the steps of a stored path: after the last step named
+// as an archive of the game (.w3mod, .mpq). A path whose last step is named so has no in-game path: it is no
+// file that a model can reference.
 func pastContainers(steps []string) int {
 	start := 0
-	for i, step := range steps[:max(0, len(steps)-1)] {
+	for i, step := range steps {
 		if strings.HasSuffix(step, ".w3mod") || strings.HasSuffix(step, ".mpq") {
 			start = i + 1
 		}

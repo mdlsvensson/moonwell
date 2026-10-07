@@ -206,8 +206,8 @@ func (e export) text(path string) (string, error) {
 	return fsx.DecodeText(data), nil
 }
 
-// files is the names of the files that the folder at path holds, sorted by their bytes. What is no file, a
-// folder among it, is left out.
+// files is the names of the files that the folder at path holds, in the order of their bytes, which is the
+// order that os.ReadDir gives the entries in. What is no file, a folder among it, is left out.
 func (e export) files(path string) ([]string, error) {
 	folder, err := e.find(path)
 	if err != nil {
@@ -223,7 +223,6 @@ func (e export) files(path string) ([]string, error) {
 			names = append(names, entry.Name())
 		}
 	}
-	slices.Sort(names)
 	return names, nil
 }
 

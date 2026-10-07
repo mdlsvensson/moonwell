@@ -14,26 +14,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-// fieldTable is one of the game's tables of fields: its path from the folder of the export, which names it in
-// a message, its rows, and the lists of data/metadata.json that its fields go to. The first list is the one
-// that a pin of a field of the table stands under.
-type fieldTable struct {
-	path  string
-	rows  []slk.Row
-	lists []string
-}
-
-// fieldTables is the four tables of fields, in the order their fields are named and reported in. The table of
-// the units' fields is the items' too.
-func fieldTables(game gameData) []fieldTable {
-	return []fieldTable{
-		{unitFieldsTable, game.unitFields, []string{"units", "items"}},
-		{abilityFieldsTable, game.abilityFields, []string{"abilities"}},
-		{buffFieldsTable, game.buffFields, []string{"buffs"}},
-		{upgradeFieldsTable, game.upgradeFields, []string{"upgrades"}},
-	}
-}
-
 // nameFields is the fields of the game by the list they are in, each with its friendly name and every list in
 // the order of the ids' bytes, and the fields whose names are not the names of their labels. Table by table it
 // makes a record of each row, names the records, and puts each into its lists.
@@ -78,6 +58,26 @@ func nameFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, 
 	return fields, renames, nil
 }
 
+// fieldTable is one of the game's tables of fields: its path from the folder of the export, which names it in
+// a message, its rows, and the lists of data/metadata.json that its fields go to. The first list is the one
+// that a pin of a field of the table stands under.
+type fieldTable struct {
+	path  string
+	rows  []slk.Row
+	lists []string
+}
+
+// fieldTables is the four tables of fields, in the order their fields are named and reported in. The table of
+// the units' fields is the items' too.
+func fieldTables(game gameData) []fieldTable {
+	return []fieldTable{
+		{unitFieldsTable, game.unitFields, []string{"units", "items"}},
+		{abilityFieldsTable, game.abilityFields, []string{"abilities"}},
+		{buffFieldsTable, game.buffFields, []string{"buffs"}},
+		{upgradeFieldsTable, game.upgradeFields, []string{"upgrades"}},
+	}
+}
+
 // baseAbilities is the ids of the game's abilities, in the order of their table.
 func baseAbilities(game gameData) []string {
 	ids := make([]string, len(game.abilities))
@@ -94,16 +94,12 @@ func listsOf(field objects.FieldMeta, lists []string) []string {
 	if len(lists) == 1 {
 		return lists
 	}
-	usedByAnItem := slices.Contains(field.Use, "item")
-	usedByAUnit := slices.ContainsFunc(field.Use, func(use string) bool { return use != "item" })
 	var in []string
-	for _, list := range lists {
-		switch {
-		case list == "items" && usedByAnItem:
-			in = append(in, list)
-		case list != "items" && usedByAUnit:
-			in = append(in, list)
-		}
+	if slices.ContainsFunc(field.Use, func(use string) bool { return use != "item" }) {
+		in = append(in, "units")
+	}
+	if slices.Contains(field.Use, "item") {
+		in = append(in, "items")
 	}
 	return in
 }
@@ -277,12 +273,12 @@ func withoutLastDash(label string) string {
 
 // ---- a cell that is a number ----
 
-// decimal reads the text of a cell as a decimal number, as strconv reads one: digits with or without a sign, a
-// fraction and an exponent, and with an underscore between two digits, so that 1_0 is ten. It is false for
-// every other text, and for the other forms that strconv reads: an infinity, NaN, and a hexadecimal number.
+// decimal reads the text of a cell as a decimal number: digits with or without a sign, a fraction and an
+// exponent. It is false for every other text, and for the other forms that strconv reads: an infinity, NaN, a
+// hexadecimal number, and an underscore between two digits.
 func decimal(text string) (float64, bool) {
 	value, err := strconv.ParseFloat(text, 64)
-	if err != nil || math.IsInf(value, 0) || math.IsNaN(value) || strings.ContainsAny(text, "xX") {
+	if err != nil || math.IsInf(value, 0) || math.IsNaN(value) || strings.ContainsAny(text, "xX_") {
 		return 0, false
 	}
 	return value, true

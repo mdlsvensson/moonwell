@@ -142,11 +142,11 @@ const pinReason = "override"
 
 // changeOf is what is reported of a field whose name the overrides pin or a renaming made: the name of its label,
 // the name it has, and why. It is "" for a field that is neither pinned nor renamed. A pin is reported also
-// where it pins the name of the label.
+// where it pins the name of the label; no renaming renames a pinned field.
 func changeOf(fromLabel, name string, pinned bool, renamedBy []string) string {
 	reasons := renamedBy
 	if pinned {
-		reasons = append([]string{pinReason}, renamedBy...)
+		reasons = []string{pinReason}
 	}
 	if len(reasons) == 0 {
 		return ""
