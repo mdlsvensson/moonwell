@@ -30,7 +30,9 @@ const (
 	// scriptName is a map's script, by the name World Editor gives it. A map may spell it in another letter case.
 	scriptName = "war3map.lua"
 	// sharedManifest is the manifest every project has, which a manifest of one machine amends. The assets block
-	// is written in it, so an error about that block names it, whichever manifest was evaluated.
+	// is written in it, so an error about that block names it, whichever manifest was evaluated. The manifest
+	// that is evaluated is the machine's own wherever a project has one, which does not hold the block, and
+	// nothing pkl prints says which of the two files wrote a value.
 	sharedManifest = "moonwell.pkl"
 )
 

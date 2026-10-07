@@ -107,14 +107,17 @@ func TestCollectRefusesBadMappingsCollisionsAndReservedTargets(t *testing.T) {
 		words       string
 		file, hint  string
 	}{
-		{"a target that leaves the map", `{"paths":{"a.blp":"../escape"}}`, "Invalid asset path: ../escape", "", "relative path"},
-		{"an absolute target", `{"paths":{"a.blp":"/absolute"}}`, "Invalid asset path: /absolute", "", "relative path"},
-		{"a target on a drive", `{"paths":{"a.blp":"C:\\escape"}}`, `Invalid asset path: C:\escape`, "", "relative path"},
-		{"the script as a target", `{"paths":{"a.blp":"war3map.lua"}}`, "Reserved map path: war3map.lua", "", "map internals"},
-		{"the import index as a target", `{"paths":{"a.blp":"war3map.imp"}}`, "Reserved map path: war3map.imp", "", "map internals"},
-		{"the JASS script as a target", `{"paths":{"a.blp":"scripts/war3map.j"}}`, "Reserved map path: scripts/war3map.j", "", "map internals"},
-		{"a source that leaves assets", `{"paths":{"../a.blp":"x.blp"}}`, "Invalid asset path: ../a.blp", "", "relative path"},
-		{"an exclusion that leaves assets", `{"exclude":["../x/"]}`, "Invalid asset path: ../x", "", "relative path"},
+		// A path written in the block that no asset may have: the path's own hint, and the block's after it.
+		{"a target that leaves the map", `{"paths":{"a.blp":"../escape"}}`, "Invalid asset path: ../escape", manifestName, "relative path"},
+		{"an absolute target", `{"paths":{"a.blp":"/absolute"}}`, "Invalid asset path: /absolute", manifestName, "relative path"},
+		{"a target on a drive", `{"paths":{"a.blp":"C:\\escape"}}`, `Invalid asset path: C:\escape`, manifestName, "relative path"},
+		{"the script as a target", `{"paths":{"a.blp":"war3map.lua"}}`, "Reserved map path: war3map.lua", manifestName, "map internals"},
+		{"the import index as a target", `{"paths":{"a.blp":"war3map.imp"}}`, "Reserved map path: war3map.imp", manifestName, "map internals"},
+		{"the JASS script as a target", `{"paths":{"a.blp":"scripts/war3map.j"}}`, "Reserved map path: scripts/war3map.j", manifestName, "map internals"},
+		{"the map list's picture as a target", `{"paths":{"a.blp":"war3mapPreview.tga"}}`,
+			"Reserved map path: war3mapPreview.tga", manifestName, "settings.info.preview"},
+		{"a source that leaves assets", `{"paths":{"../a.blp":"x.blp"}}`, "Invalid asset path: ../a.blp", manifestName, "relative path"},
+		{"an exclusion that leaves assets", `{"exclude":["../x/"]}`, "Invalid asset path: ../x", manifestName, "relative path"},
 		{"a source that does not exist", `{"paths":{"missing":"x.blp"}}`,
 			"assets.paths names a file that does not exist: assets/missing", manifestName, inBlock},
 		{"an excluded source", `{"paths":{"a.blp":"x"},"exclude":["a.blp"]}`,
@@ -131,8 +134,9 @@ func TestCollectRefusesBadMappingsCollisionsAndReservedTargets(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := refused(t, root, tt.block)
-			if !strings.Contains(e.Msg, tt.words) || e.File != tt.file || !strings.Contains(e.Hint, tt.hint) {
-				t.Errorf("error = %+v, want %q at %q with a hint about %q", e, tt.words, tt.file, tt.hint)
+			if !strings.Contains(e.Msg, tt.words) || e.File != tt.file || !strings.Contains(e.Hint, tt.hint) ||
+				!strings.Contains(e.Hint, inBlock) {
+				t.Errorf("error = %+v, want %q at %q with a hint about %q and the block", e, tt.words, tt.file, tt.hint)
 			}
 		})
 	}
@@ -150,7 +154,9 @@ func TestTheFirstBadMappingIsTheFirstWrittenAlsoWhereASourceLooksLikeANumber(t *
 func TestAFileUnderAssetsNamedAsOneOfTheMapsOwnIsRefusedUnlessItIsMappedOrExcluded(t *testing.T) {
 	root := t.TempDir()
 	put(t, root, "assets/war3mapMap.blp")
-	if e := refused(t, root, noBlock); e.Msg != "Reserved map path: war3mapMap.blp" || !strings.Contains(e.Hint, "settings.info.preview") {
+	// The path is the file's own name and is written in no manifest: the refusal names no file.
+	if e := refused(t, root, noBlock); e.Msg != "Reserved map path: war3mapMap.blp" || e.File != "" ||
+		!strings.Contains(e.Hint, "settings.info.preview") || strings.Contains(e.Hint, "assets block") {
 		t.Errorf("error = %+v", e)
 	}
 	if collected, _ := collect(t, root, `{"exclude":["war3mapMap.blp"]}`); len(collected) != 0 {

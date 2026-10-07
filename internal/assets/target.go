@@ -43,7 +43,7 @@ func reserved(path string) bool {
 // ---- errors ----
 
 // The errors of a path have no file: a path is written in a manifest, in a state file, or is a file's own name,
-// and the caller knows which.
+// and the caller knows which. Collect names the manifest for a path that is written in the assets block.
 
 func errInvalidPath(value string) error {
 	return &diag.Error{

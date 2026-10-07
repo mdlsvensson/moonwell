@@ -17,6 +17,9 @@
 - A manifest that does not evaluate to a Moonwell project (one that does not amend `@moonwell/Project.pkl`) is
   refused with the place of the value that does not fit, as the manifest writes it (`map.folder`), and what the
   value is.
+- A path in `assets.paths` or `assets.exclude` that no asset may have ("Invalid asset path", "Reserved map path")
+  is reported with `moonwell.pkl` as its file, and its hint ends with "Fix the assets block in moonwell.pkl.", as
+  the other mistakes in that block are. It named no file.
 
 ## 0.9.1 (2026-10-03)
 

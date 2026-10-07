@@ -78,7 +78,7 @@ func (c *collection) addOwn(root string, config manifest.Assets) error {
 	}
 	rules, err := rulesOf(config.Exclude)
 	if err != nil {
-		return err
+		return c.inBlock(err)
 	}
 	files := filesOf(folder)
 	mapped, err := c.mappings(config.Paths, files, rules)
@@ -148,7 +148,7 @@ func (c *collection) mappings(paths manifest.Ordered[string], files []string, ru
 	for source, target := range paths.All() {
 		path, ok := fsx.RelPath(source)
 		if !ok {
-			return nil, errInvalidPath(source)
+			return nil, c.inBlock(errInvalidPath(source))
 		}
 		key := mapdir.Key(path)
 		_, twice := mapped[key]
@@ -162,10 +162,22 @@ func (c *collection) mappings(paths manifest.Ordered[string], files []string, ru
 		}
 		var err error
 		if mapped[key], err = TargetPath(target); err != nil {
-			return nil, err
+			return nil, c.inBlock(err)
 		}
 	}
 	return mapped, nil
+}
+
+// inBlock makes the refusal of a path that is written in the assets block the block's own: the manifest is its
+// file, and the block's hint follows what the path's hint says. A path that is a file's own name is not written
+// there, and its refusal stays as it is.
+func (c *collection) inBlock(err error) error {
+	var failure *diag.Error
+	if errors.As(err, &failure) {
+		failure.File = c.manifestFile
+		failure.Hint += " " + blockHint
+	}
+	return err
 }
 
 // addOwnFile adds one of the map's own files, under the path its mapping gives, else under its own.
