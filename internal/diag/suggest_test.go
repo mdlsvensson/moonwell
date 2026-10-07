@@ -5,12 +5,18 @@ import (
 	"testing"
 )
 
-func TestEditDistanceCountsInsertionsDeletionsAndSubstitutions(t *testing.T) {
+func TestEditDistanceCountsInsertionsDeletionsSubstitutionsAndSwaps(t *testing.T) {
 	for _, c := range []struct {
 		a, b string
 		want int
 	}{
 		{"kitten", "sitting", 3},
+		// Two neighbours that changed places are one edit, and each pair counts by itself.
+		{"biuld", "build", 1},
+		{"ab", "ba", 1},
+		{"abcd", "badc", 2},
+		// A character put between the two that changed places: no swap of neighbours, so three edits.
+		{"ca", "abc", 3},
 		{"", "abc", 3},
 		{"abc", "", 3},
 		{"same", "same", 0},
@@ -71,6 +77,12 @@ func TestClosestFindsNamesAFewEditsAwayIgnoringCaseNearestFirst(t *testing.T) {
 		{names, "io", -1, nil},
 		// A nearer name comes before one that sorts first.
 		{[]string{"abcdefaa", "abcdefgx", "abcdefgh"}, "abcdefgi", 3, []string{"abcdefgh", "abcdefgx", "abcdefaa"}},
+		// Two neighbours that changed places are one edit, which a short name allows.
+		{[]string{"build", "check", "test"}, "biuld", 1, []string{"build"}},
+		{[]string{"build", "check", "test"}, "tset", 1, []string{"test"}},
+		{[]string{"--entry", "--help", "--minify"}, "--hepl", 1, []string{"--help"}},
+		// Two that are apart did not: that is two edits.
+		{[]string{"build"}, "dliub", 3, nil},
 		// A character outside the basic plane is one edit, which a five-character name allows.
 		{[]string{"moon"}, "moon🌙", 3, []string{"moon"}},
 		// Ties are in byte order: the ligature ﬁ (U+FB01) sorts before 🌙 (U+1F319).

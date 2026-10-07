@@ -9,6 +9,9 @@
   (`kind = "local"`, then `function Init() end`). A use of such a function was reported as an unknown global.
 - An entry of `war3map.imp` whose path is a byte order mark and nothing else is refused as an entry with an empty
   path. It was read as an entry without a path.
+- A "did you mean" hint counts two neighbouring letters that changed places as one mistake: `biuld` names `build`,
+  `--hepl` names `--help` and `tset` names `test`. This holds for every such hint: a command, a flag, a global,
+  and a field or a base object of an object.
 
 ## 0.9.1 (2026-10-03)
 

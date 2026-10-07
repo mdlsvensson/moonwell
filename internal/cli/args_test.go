@@ -226,6 +226,7 @@ func TestTheHintForAFlagMoonwellDoesNotHaveNamesAFlagOfTheCommandFirst(t *testin
 		{[]string{"test", "--entri=src/a.yue"}, "Did you mean --entry?"},
 		{[]string{"init", "my-map", "--lnk"}, "Did you mean --link?"},
 		{[]string{"check", "--hlp"}, "Did you mean --help?"},
+		{[]string{"check", "--hepl"}, "Did you mean --help?"},
 		{[]string{"--versio"}, "Did you mean --version?"},
 		// The closest flag is another command's.
 		{[]string{"build", "--linkk"}, "Did you mean --link? --link is a flag of init."},

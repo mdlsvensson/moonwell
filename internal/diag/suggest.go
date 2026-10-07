@@ -7,9 +7,9 @@ import (
 )
 
 // Closest returns up to max of names that are close to key, for a "did you mean" hint; with max < 0, every close
-// name. A name is close when it is within a quarter of key's length in edits, and at least one edit is always
-// allowed; letter case is ignored. The nearest name comes first, and names equally near are in byte order. key
-// itself is never returned.
+// name. A name is close when it is within a quarter of key's length in edits, as EditDistance counts them, and
+// at least one edit is always allowed; letter case is ignored. The nearest name comes first, and names equally
+// near are in byte order. key itself is never returned.
 func Closest(names []string, key string, max int) []string {
 	matches := near(names, key)
 	slices.SortStableFunc(matches, func(a, b match) int {
@@ -72,21 +72,24 @@ func JoinWords(words []string, conjunction string, max int) string {
 	return strings.Join(shown[:last], ", ") + " " + conjunction + " " + shown[last]
 }
 
-// EditDistance is the Levenshtein distance between a and b: how many characters must be inserted, removed or
-// replaced to turn one into the other. A character is a Unicode code point, whatever its length in bytes.
+// EditDistance is how many edits turn a into b: a character inserted, removed or replaced, or two neighbours
+// that change places, which is the slip of a typing hand and counts as one. A character is a Unicode code point,
+// whatever its length in bytes.
 func EditDistance(a, b string) int {
 	return distance([]rune(a), []rune(b))
 }
 
-// distance fills the Levenshtein table a row at a time: a row holds the distance from the characters of a read so
-// far to each prefix of b, and only the row above is needed to fill the next.
+// distance fills the table of edits a row at a time: a row holds the distance from the characters of a read so
+// far to each prefix of b. The row above is needed to fill the next, and the one above that for two neighbours
+// that changed places.
 func distance(a, b []rune) int {
+	var twoAbove []int
 	above := make([]int, len(b)+1)
-	row := make([]int, len(b)+1)
 	for j := range above {
 		above[j] = j
 	}
 	for i, inA := range a {
+		row := make([]int, len(b)+1)
 		row[0] = i + 1
 		for j, inB := range b {
 			replaced := above[j]
@@ -94,8 +97,11 @@ func distance(a, b []rune) int {
 				replaced++
 			}
 			row[j+1] = min(above[j+1]+1, row[j]+1, replaced)
+			if i > 0 && j > 0 && inA == b[j-1] && a[i-1] == inB {
+				row[j+1] = min(row[j+1], twoAbove[j-1]+1)
+			}
 		}
-		above, row = row, above
+		twoAbove, above = above, row
 	}
 	return above[len(b)]
 }

@@ -71,6 +71,9 @@ func TestUnknownCommandsFailWithUsage(t *testing.T) {
 		{[]string{"buld"}, "Unknown command 'buld'. Did you mean build?"},
 		{[]string{"chek"}, "Unknown command 'chek'. Did you mean check?"},
 		{[]string{"Dev"}, "Unknown command 'Dev'. Did you mean dev?"},
+		// Two letters that changed places are one slip.
+		{[]string{"biuld"}, "Unknown command 'biuld'. Did you mean build?"},
+		{[]string{"tset"}, "Unknown command 'tset'. Did you mean test?"},
 		// After "--" the first word is the command, though a flag is written so.
 		{[]string{"--", "--minify"}, "Unknown command '--minify'."},
 		{[]string{"--", "frobnicate", "--minify"}, "Unknown command 'frobnicate'."},
