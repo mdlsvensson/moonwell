@@ -119,37 +119,29 @@ func luaFilesOfTheCheckout(t *testing.T) []namedSource {
 }
 
 // literal is what the two literal helpers make of some tokens: of all the tokens of a source, or of one argument
-// of a call. Inside is the number between the brackets of `Player(...)`, for a player.
+// of a call.
 type literal struct {
 	Number   float64
 	IsNumber bool
 	Player   int
 	IsPlayer bool
-	Inside   float64
 }
 
 // literalOf asks the two helpers.
 func literalOf(tokens []Token) literal {
 	var made literal
 	made.Number, made.IsNumber = LiteralNumber(tokens)
-	if made.Player, made.IsPlayer = PlayerID(tokens); made.IsPlayer {
-		made.Inside, _ = LiteralNumber(tokens[2 : len(tokens)-1])
-	}
+	made.Player, made.IsPlayer = PlayerID(tokens)
 	return made
 }
 
-// String is the literal as a recording holds it; "" for tokens that are neither a number nor a player. A player
-// whose number is past what an int holds is written as that and not as the int: Go leaves what such a number
-// becomes to the processor.
+// String is the literal as a recording holds it; "" for tokens that are neither a number nor a player.
 func (l literal) String() string {
 	var parts []string
 	if l.IsNumber {
 		parts = append(parts, "the number "+strconv.FormatFloat(l.Number, 'g', -1, 64))
 	}
-	switch {
-	case l.IsPlayer && (l.Inside >= 1<<63 || l.Inside < -(1<<63)):
-		parts = append(parts, "a player whose number is past an int")
-	case l.IsPlayer:
+	if l.IsPlayer {
 		parts = append(parts, "the player "+strconv.Itoa(l.Player))
 	}
 	return strings.Join(parts, ", ")

@@ -1302,6 +1302,6 @@ function a: 0-89, its end at 86
     argument 1: "Player ( 1e2 )", the player 100
     argument 2: "Player ( - 0 )", the player 0
     argument 3: "Player ( 0x7fffffff )", the player 2147483647
-    argument 4: "Player ( 1e30 )", a player whose number is past an int
+    argument 4: "Player ( 1e30 )"
     argument 5: "Player ( 3 )", the player 3
 

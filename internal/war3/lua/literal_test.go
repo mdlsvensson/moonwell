@@ -54,6 +54,10 @@ var playerIDs = []struct {
 	{"Player(4294967296)", 4294967296, true},
 	{"Player(-2147483649)", -2147483649, true},
 	{"Player(0x7fffffffffff)", 0x7fffffffffff, true},
+	// A whole number that no int holds names no player: what it would become differs between processors.
+	{"Player(1e30)", 0, false},
+	{"Player(-1e30)", 0, false},
+	{"Player(9223372036854775808)", 0, false},
 	{"Player(1.5)", 0, false},
 	{"Player(1+2)", 0, false},
 	{"Player(0,1)", 0, false},

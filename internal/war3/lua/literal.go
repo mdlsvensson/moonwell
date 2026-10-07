@@ -47,7 +47,8 @@ func numeralValue(raw string) (float64, bool) {
 	return value, true
 }
 
-// PlayerID returns n when tokens are `Player(n)` with a literal whole number.
+// PlayerID returns n when tokens are `Player(n)` with a literal whole number that an int of 64 bits holds. A
+// larger one names no player: what Go makes of such a number differs from processor to processor.
 func PlayerID(tokens []Token) (int, bool) {
 	last := len(tokens) - 1
 	if len(tokens) < 3 || tokens[0].Kind != NameToken || tokens[0].Raw != "Player" ||
@@ -55,7 +56,7 @@ func PlayerID(tokens []Token) (int, bool) {
 		return 0, false
 	}
 	value, ok := LiteralNumber(tokens[2:last])
-	if !ok || value != math.Trunc(value) {
+	if !ok || value != math.Trunc(value) || math.Abs(value) >= 1<<63 {
 		return 0, false
 	}
 	return int(value), true
