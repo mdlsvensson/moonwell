@@ -160,8 +160,8 @@ const damageSeed = 39
 type tally struct{ read, refused int }
 
 // readOrRefused gives Read the bytes at both depths, and ReadHeader. It stops the test when one of them panics,
-// when Read returns neither an Info nor an error or both, and when an error is not a *diag.Error, which for Read
-// has the name the test gave.
+// when Read returns neither an Info nor an error or both, and when an error is not a *diag.Error with the name
+// the test gave.
 func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	t.Helper()
 	for _, depth := range []w3i.Depth{w3i.Basic, w3i.Extended} {
@@ -181,12 +181,12 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 		}
 	}
 	var err error
-	if value := testkit.Panic(func() { _, err = w3i.ReadHeader(data) }); value != nil {
+	if value := testkit.Panic(func() { _, err = w3i.ReadHeader(data, mapInfoFile) }); value != nil {
 		t.Fatalf("%s: ReadHeader panics: %v", what, value)
 	}
 	var failure *diag.Error
-	if err != nil && !errors.As(err, &failure) {
-		t.Fatalf("%s: ReadHeader: %v, which is not a *diag.Error", what, err)
+	if err != nil && (!errors.As(err, &failure) || failure.File != mapInfoFile) {
+		t.Fatalf("%s: ReadHeader: %v, which is not an error of %s", what, err, mapInfoFile)
 	}
 }
 

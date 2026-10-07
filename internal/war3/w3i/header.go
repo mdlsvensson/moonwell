@@ -17,12 +17,13 @@ type Header struct {
 }
 
 // ReadHeader reads the format version and, for version 28 and later, the major and minor version of the game that
-// saved the map. A file of that version that ends before them has no game version.
-func ReadHeader(data []byte) (Header, error) {
+// saved the map. A file of that version that ends before them has no game version. file is the name its error
+// gives.
+func ReadHeader(data []byte, file string) (Header, error) {
 	r := binio.NewReader(data)
 	header := Header{Version: r.I32()}
 	if r.Err() != nil {
-		return Header{}, errNoVersion()
+		return Header{}, errNoVersion(file)
 	}
 	if header.Version < 28 {
 		return header, nil
@@ -47,8 +48,7 @@ func (h Header) Headerless() bool {
 
 // ---- errors ----
 
-// errNoVersion says that the file ends before its format version. ReadHeader is given no file name, so the error
-// has none.
-func errNoVersion() error {
-	return &diag.Error{Msg: "war3map.w3i is truncated."}
+// errNoVersion says that the file ends before its format version.
+func errNoVersion(file string) error {
+	return &diag.Error{Msg: "war3map.w3i is truncated.", File: file, Hint: "Save the map again in World Editor."}
 }

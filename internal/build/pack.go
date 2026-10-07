@@ -51,7 +51,7 @@ func pack(view *mapdir.Folder, name string) ([]byte, error) {
 	}
 	archive, err := mpq.Write(files, options)
 	if err != nil {
-		return nil, named(err, view.Label(""), "Check the files of the source map, then try again.")
+		return nil, named(err, view.Label(""))
 	}
 	return archive, nil
 }
@@ -65,11 +65,7 @@ func formatOf(view *mapdir.Folder) (w3i.Header, error) {
 	case !found:
 		return w3i.Header{}, errNoMapInfo(view.Label(""))
 	}
-	format, err := w3i.ReadHeader(info)
-	if err != nil {
-		return w3i.Header{}, named(err, view.Label(infoName), "Save the map again in World Editor.")
-	}
-	return format, nil
+	return w3i.ReadHeader(info, view.Label(infoName))
 }
 
 // archiveFiles is the files of the view as an archive names them, with "\" for "/", in the view's order and
@@ -94,18 +90,15 @@ func archiveFiles(view *mapdir.Folder) ([]mpq.File, error) {
 	return files, nil
 }
 
-// named is a failure of a package that knows no file, with the file it is about and how to put it right: an
-// expected failure gets the file, and the hint where it has none. Any other error stays as it is.
-func named(err error, file, hint string) error {
+// named is a refusal of the archive's writer, which knows no file, with the file it is about. Any other error
+// stays as it is.
+func named(err error, file string) error {
 	var failure *diag.Error
 	if !errors.As(err, &failure) {
 		return err
 	}
 	withFile := *failure
 	withFile.File = file
-	if withFile.Hint == "" {
-		withFile.Hint = hint
-	}
 	return &withFile
 }
 

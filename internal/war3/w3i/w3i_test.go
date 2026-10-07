@@ -71,15 +71,16 @@ func TestReadHeaderReadsVersionAndGameVersion(t *testing.T) {
 		{"version 28 cut inside its game version", header(28, 1, 31)[:19], w3i.Header{Version: 28}},
 		{"only the version", header(39, 1, 31)[:4], w3i.Header{Version: 39}},
 	} {
-		got, err := w3i.ReadHeader(c.data)
+		got, err := w3i.ReadHeader(c.data, mapInfoFile)
 		if err != nil || got != c.want {
 			t.Errorf("%s: ReadHeader = %+v, %v, want %+v", c.name, got, err, c.want)
 		}
 	}
-	_, err := w3i.ReadHeader([]byte{1, 2})
+	_, err := w3i.ReadHeader([]byte{1, 2}, mapInfoFile)
 	var failure *diag.Error
-	if !errors.As(err, &failure) || !strings.Contains(failure.Msg, "truncated") {
-		t.Errorf("a file of two bytes: %v", err)
+	if !errors.As(err, &failure) || !strings.Contains(failure.Msg, "truncated") || failure.File != mapInfoFile ||
+		failure.Hint == "" {
+		t.Errorf("a file of two bytes: %+v", err)
 	}
 }
 

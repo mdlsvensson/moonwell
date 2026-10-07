@@ -558,8 +558,9 @@ func TestWriteRejectsAPrefixThatIsNotAMultipleOf512Bytes(t *testing.T) {
 	files := []mpq.File{{Name: "a.txt", Data: []byte("a")}}
 	for _, length := range []int{1, 100, 511, 513, 1000} {
 		written, err := mpq.Write(files, mpq.Options{Prefix: make([]byte, length)})
+		// A plain error: the caller makes the prefix, so its length is no mistake of a user's.
 		var e *diag.Error
-		if !errors.As(err, &e) || !strings.Contains(e.Msg, "512") || written != nil {
+		if err == nil || errors.As(err, &e) || !strings.Contains(err.Error(), "512") || written != nil {
 			t.Errorf("a prefix of %d bytes: %d bytes, %v", length, len(written), err)
 		}
 	}
@@ -570,8 +571,7 @@ func TestWriteRejectsAPrefixThatIsNotAMultipleOf512Bytes(t *testing.T) {
 	}
 	// The prefix is looked at first: a list that is refused too does not hide it.
 	_, err := mpq.Write([]mpq.File{{Name: "a"}, {Name: "A"}}, mpq.Options{Prefix: make([]byte, 100)})
-	var e *diag.Error
-	if !errors.As(err, &e) || !strings.Contains(e.Msg, "512") {
+	if err == nil || !strings.Contains(err.Error(), "512") {
 		t.Errorf("an unaligned prefix and a duplicate: %v", err)
 	}
 }

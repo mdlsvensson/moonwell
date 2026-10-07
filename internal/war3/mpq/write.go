@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"cmp"
 	"compress/zlib"
+	"fmt"
 	"slices"
 	"strings"
 
@@ -65,7 +66,11 @@ const (
 // names are one archive path are refused.
 func Write(files []File, options Options) ([]byte, error) {
 	if len(options.Prefix)%alignment != 0 {
-		return nil, errPrefixLength()
+		// A plain error: the caller makes the prefix, which is the header HM3WHeader returns or nothing, and no
+		// file of a user's has a part in its length. So another length is a mistake in Moonwell, with no file to
+		// name and nothing the user can put right.
+		return nil, fmt.Errorf("mpq.Write: the prefix is %d bytes, which is no multiple of %d: a reader would "+
+			"not find the archive", len(options.Prefix), alignment)
 	}
 	if err := checkPaths(files); err != nil {
 		return nil, err
@@ -279,11 +284,6 @@ func writeTable(w *binio.Writer, table []uint32, key uint32) {
 }
 
 // ---- errors ----
-
-// errPrefixLength says that the archive would not start where a reader looks for it.
-func errPrefixLength() error {
-	return &diag.Error{Msg: "The archive prefix must be a multiple of 512 bytes."}
-}
 
 // errDuplicatePath says that two of the files would be one file of the archive.
 func errDuplicatePath(name, earlier string) error {
