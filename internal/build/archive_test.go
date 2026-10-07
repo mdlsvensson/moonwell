@@ -215,20 +215,80 @@ func TestRemoveArchiveRemovesAFileAndNamesAFailureFromTheProjectFolder(t *testin
 	}
 }
 
-func TestWriteArchiveMakesTheFoldersAndNamesAFailureFromTheProjectFolder(t *testing.T) {
+// The archive is written beside its place, as <archive>.tmp, and moved to the place when it is whole: the place
+// holds a whole archive or what it held, and nothing is left beside it.
+func TestWriteArchiveWritesBesideThePlaceAndMovesTheWholeArchiveThere(t *testing.T) {
 	root := t.TempDir()
 	at := place{file: filepath.Join(root, "dist", "bin", "campaign", "one.w3x"), label: "dist/bin/campaign/one.w3x"}
+	holds := func(archive string) map[string][]byte {
+		return map[string][]byte{
+			"dist": nil, "dist/bin": nil, "dist/bin/campaign": nil, "dist/bin/campaign/one.w3x": []byte(archive),
+		}
+	}
+	// The folders on the way are made.
 	if err := writeArchive(at, []byte("an archive")); err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	if held, _ := os.ReadFile(at.file); string(held) != "an archive" {
-		t.Errorf("the archive holds %q", held)
+	if held := testkit.Snapshot(t, root); !reflect.DeepEqual(held, holds("an archive")) {
+		t.Errorf("after the first write the project holds %q", held)
 	}
-	// A folder in the archive's place, made after the look at the place: no system writes a file over it.
-	blocked := place{file: filepath.Join(root, "dist", "bin", "campaign"), label: "dist/bin/campaign"}
-	e := asError(t, writeArchive(blocked, []byte("an archive")), "a folder in the archive's place")
-	if !strings.HasPrefix(e.Msg, "Writing dist/bin/campaign failed: ") || strings.Contains(e.Msg, root) ||
-		e.File != "dist/bin/campaign" || e.Cause == nil || e.Hint == "" {
+	// What a build that was ended left beside the place is replaced, and so is an archive at the place.
+	testkit.WriteFile(t, root, "dist/bin/campaign/one.w3x.tmp", []byte("a cut arch"))
+	if err := writeArchive(at, []byte("a second archive")); err != nil {
+		t.Fatal(diag.Format(err))
+	}
+	if held := testkit.Snapshot(t, root); !reflect.DeepEqual(held, holds("a second archive")) {
+		t.Errorf("after the second write the project holds %q", held)
+	}
+}
+
+// A link under the name the archive is written under is removed and not written through: the file it leads to,
+// here a file of the source map, stays as it is, and the archive is a file of its own.
+func TestWriteArchiveWritesThroughNoLinkBesideThePlace(t *testing.T) {
+	root := t.TempDir()
+	at := place{file: filepath.Join(root, "dist", "bin", "one.w3x"), label: "dist/bin/one.w3x"}
+	target := testkit.WriteFile(t, root, "maps/map.w3x/war3map.w3i", []byte("a file of the map"))
+	if err := os.MkdirAll(filepath.Dir(at.file), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	testkit.LinkFile(t, target, at.file+".tmp")
+	if err := writeArchive(at, []byte("an archive")); err != nil {
+		t.Fatal(diag.Format(err))
+	}
+	if held, _ := os.ReadFile(target); string(held) != "a file of the map" {
+		t.Errorf("the file the link leads to holds %q", held)
+	}
+	if info, err := os.Lstat(at.file); err != nil || !info.Mode().IsRegular() || fsx.Exists(at.file+".tmp") {
+		t.Errorf("the archive is no file of its own (%v), or the link is still there", err)
+	}
+}
+
+// A write that fails leaves the place as it was. A build removes the archive of the build before as it starts;
+// here one is at the place, to show that the failed write did not touch it.
+func TestWriteArchiveThatFailsLeavesThePlaceAsItWasAndNothingBesideIt(t *testing.T) {
+	root := t.TempDir()
+	const label = "dist/bin/one.w3x"
+	at := place{file: testkit.WriteFile(t, root, label, []byte("the archive before")), label: label}
+	// The write beside the place fails: a folder that holds a file stands under the name it writes under.
+	testkit.WriteFile(t, root, "dist/bin/one.w3x.tmp/kept.txt", []byte("kept"))
+	before := testkit.Snapshot(t, root)
+	e := asError(t, writeArchive(at, []byte("a newer archive")), "a write beside the place that fails")
+	if !strings.HasPrefix(e.Msg, "Writing dist/bin/one.w3x failed: ") || strings.Contains(e.Msg, root) ||
+		e.File != "dist/bin/one.w3x" || e.Cause == nil || e.Hint == "" {
 		t.Errorf("error = %+v", e)
+	}
+	if !reflect.DeepEqual(testkit.Snapshot(t, root), before) {
+		t.Error("a write that failed changed the archive that was there, or what stood beside it")
+	}
+	// The move to the place fails, after the archive was written whole beside it: a folder that holds a file is at
+	// the place, made after the look at the place, and no system moves a file over it. What was written is removed.
+	blocked := place{file: filepath.Join(root, "dist", "bin"), label: "dist/bin"}
+	e = asError(t, writeArchive(blocked, []byte("a newer archive")), "a folder in the archive's place")
+	if !strings.HasPrefix(e.Msg, "Writing dist/bin failed: ") || strings.Contains(e.Msg, root) ||
+		e.File != "dist/bin" || e.Cause == nil || e.Hint == "" {
+		t.Errorf("error = %+v", e)
+	}
+	if !reflect.DeepEqual(testkit.Snapshot(t, root), before) {
+		t.Error("a move that failed left what it wrote beside the place, or changed the place")
 	}
 }

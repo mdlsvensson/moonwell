@@ -102,7 +102,8 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 // makes no dist folder there.
 //
 // The archive of the build before is removed under the lock, before anything is planned; no step before the
-// last writes at its place, and the last removes what it wrote of an archive that it could not write whole.
+// last writes at its place, and the last writes the archive beside the place and moves it there when it is
+// whole, so the place never holds a cut archive.
 func Build(ctx context.Context, e *env.Env, opts Options) (archive string, err error) {
 	p, err := Load(ctx, e)
 	if err != nil {

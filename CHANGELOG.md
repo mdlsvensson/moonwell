@@ -31,6 +31,10 @@
 - On Windows, `init` names a file it could not write, and the `PklProject` whose dependencies did not resolve, with
   `/`, as every other error names a file: `my-map/src/main.yue`, where it said `my-map\src\main.yue`. A failed
   `pkl project resolve` has a hint.
+- `build` writes the archive beside its place, as `<map.folder>.tmp` in `build.folder`, and moves it to its place
+  when it is written whole. A write that fails midway, such as on a full disk, and a build that is ended midway
+  leave no cut archive under the map's name. A build that is ended can leave the `.tmp` file; the next build
+  replaces it.
 
 ## 0.9.1 (2026-10-03)
 

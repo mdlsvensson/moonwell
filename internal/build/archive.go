@@ -2,6 +2,7 @@ package build
 
 import (
 	"errors"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -144,18 +145,48 @@ func removeArchive(at place) error {
 	return errNotRemoved(at.label, err)
 }
 
-// writeArchive writes the archive to its place, with the folders on the way. An archive that could not be
-// written whole is removed: a failed build leaves no archive. A failure of that removal is passed over, since
-// the failure to write is the one to report.
+// unfinished ends the name an archive is written under: that of its place, and this.
+const unfinished = ".tmp"
+
+// writeArchive writes the archive to its place, with the folders on the way. It writes the archive beside the
+// place, under a name of its own, and moves it to the place when it is written whole. So the place holds a whole
+// archive or what it held: a write that fails midway leaves no cut archive there, and neither does a build that
+// is ended midway, whose file beside the place the next write replaces.
+//
+// What was written beside the place is removed when the write or the move fails. A failure of that removal is
+// passed over, since the failure to write is the one to report.
 func writeArchive(at place, archive []byte) error {
 	if err := os.MkdirAll(filepath.Dir(at.file), 0o777); err != nil {
 		return errArchiveNotWritten(at.label, err)
 	}
-	if err := os.WriteFile(at.file, archive, 0o666); err != nil {
-		_ = fsx.RemoveFile(at.file)
+	beside := at.file + unfinished
+	err := writeAnew(beside, archive)
+	if err == nil {
+		err = os.Rename(beside, at.file)
+	}
+	if err != nil {
+		_ = os.Remove(beside)
 		return errArchiveNotWritten(at.label, err)
 	}
 	return nil
+}
+
+// writeAnew writes a file under a name that is Moonwell's own to write under. What stands under the name is
+// removed, and the file is made: a file that an ended build left is replaced, and a link under the name is
+// removed and not written through. A folder that holds something is not removed, and is the failure.
+func writeAnew(file string, data []byte) error {
+	if err := os.Remove(file); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return err
+	}
+	made, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
+	if err != nil {
+		return err
+	}
+	_, err = made.Write(data)
+	if closed := made.Close(); err == nil {
+		err = closed
+	}
+	return err
 }
 
 // ---- errors ----
