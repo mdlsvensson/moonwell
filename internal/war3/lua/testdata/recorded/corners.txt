@@ -551,6 +551,7 @@ tokens: 20
   4:78-79 symbol "("
   4:79-80 symbol ")"
   4:81-84 name "end"
+top-level globals: F G H
 map global: G integer
 functions refused at 2:7: Cannot safely read map Lua: expected a name
 

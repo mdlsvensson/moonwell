@@ -56,7 +56,7 @@ var cornerSources = []namedSource{
 	{"globals inside brackets and blocks",
 		"t = { A = 1 }\nf(\nB = 2)\nwhile x do\nC = 3\nend\nrepeat\nD = 4\nuntil E\nF = 5"},
 	{"locals of every form", "local A, B\nlocal function C() end\nlocal function\nlocal\nA = 1\nB = 2\nC = 3\nD = 4"},
-	// A string that holds `local` or `function` passes for the keyword.
+	// A string that says `local` or `function` is no keyword.
 	{"a string that holds a keyword",
 		"print 'local' function F() end\nlocal 'function' G\nG = 1\nf [[local]] function H() end"},
 	{"ends without a block", "end end\nA = 1\n) ]\nB = 2"},

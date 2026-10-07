@@ -5,6 +5,8 @@
 - **A library with only `github`, or only `tag`, is now refused by Pkl.** `libraries` in `moonwell.pkl` takes a
   `github` and a `tag`, or a `path`. Moonwell refused anything else before, in its own words; the schema now says
   so itself, so the editor marks the line and Pkl's message names it. A manifest that built before still builds.
+- A global function of a Lua module is found also when a string that says `local` stands before it
+  (`kind = "local"`, then `function Init() end`). A use of such a function was reported as an unknown global.
 
 ## 0.9.1 (2026-10-03)
 

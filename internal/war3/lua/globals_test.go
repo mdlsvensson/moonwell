@@ -135,11 +135,17 @@ func TestTopLevelGlobals(t *testing.T) {
 			[]string{"B", "E"},
 		},
 		{
-			// A string that holds `local` or `function` passes for the keyword: F and H are taken for local
-			// functions, and G for the name of one.
-			"a string that holds a keyword",
+			// Only the word is the keyword: a string that says `local` or `function`, a comment and a longer
+			// name are not.
+			"a string that says a keyword is none",
 			[]string{"print 'local' function F() end", "local 'function' G", "G = 1", "f [[local]] function H() end"},
-			nil,
+			[]string{"F", "G", "H"},
+		},
+		{
+			"a setting that says local, a comment and a longer name hide no function",
+			[]string{`kind = "local"`, "function Init() end", "-- local", "function Start() end", "locals = 1",
+				"function Stop() end"},
+			[]string{"kind", "Init", "Start", "locals", "Stop"},
 		},
 		{
 			"a module that returns a table has none",

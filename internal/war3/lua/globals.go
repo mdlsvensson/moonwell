@@ -18,7 +18,7 @@ func TopLevelGlobals(source string) []string {
 				for _, name := range localNames(tokens, i) {
 					locals[name] = true
 				}
-			case token.Raw == "function" && !holdsWord(tokenAt(tokens, i-1), "local"):
+			case token.Raw == "function" && !isWord(tokenAt(tokens, i-1), "local"):
 				defined = append(defined, functionName(tokens, i)...)
 			case startsStatement(tokens, i):
 				defined = append(defined, assignedNames(tokens, i)...)
@@ -59,8 +59,8 @@ func (n *nesting) step(token Token) {
 
 func isName(token Token) bool { return token.Kind == NameToken && !keywords[token.Raw] }
 
-// holdsWord reports whether the token reads as the word: the name itself, or a string that holds nothing else.
-func holdsWord(token Token, word string) bool { return token.Kind != SymbolToken && token.Text == word }
+// isWord reports whether the token is the keyword. A string that says the word is a string.
+func isWord(token Token, word string) bool { return token.Kind == NameToken && token.Raw == word }
 
 // startsStatement reports whether tokens[i] begins a statement, as far as a scanner can tell: it starts a line or
 // follows `;`.
@@ -97,7 +97,7 @@ func assignedNames(tokens []Token, i int) []string {
 // localNames returns the names that the `local` at tokens[i] declares: `local Name {, Name}` or
 // `local function Name`.
 func localNames(tokens []Token, i int) []string {
-	if holdsWord(tokenAt(tokens, i+1), "function") {
+	if isWord(tokenAt(tokens, i+1), "function") {
 		if name := tokenAt(tokens, i+2); isName(name) {
 			return []string{name.Raw}
 		}
