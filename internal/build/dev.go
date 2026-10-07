@@ -149,7 +149,7 @@ var checkedFolders = []struct{ dir, ending string }{
 }
 
 // manifests is the files in the project folder that say what the manifest evaluates to.
-var manifests = []string{sharedManifest, "moonwell.local.pkl", "PklProject", "PklProject.deps.json"}
+var manifests = []string{manifest.SharedFile, manifest.LocalFile, "PklProject", "PklProject.deps.json"}
 
 // watched is what dev watches: the roots of its watcher, and the folders and files among them that it names in
 // the line that says so.

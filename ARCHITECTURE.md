@@ -652,7 +652,7 @@ fault or the machine's, so every error added to `internal/mapdir` keeps the rule
 
 **An error about the `assets` block names `moonwell.pkl`.** The block is written there. The manifest that is
 evaluated is `moonwell.local.pkl` in nearly every project, which does not hold it, and nothing Pkl prints says which
-of the two files wrote a value. (`sharedManifest` in `internal/build/project.go`.)
+of the two files wrote a value. (`Assets` in `internal/build/project.go`.)
 
 **A preview picture is only what the game was seen to read.** A picture the game cannot read closes the game when
 the map is selected in the list. So a TGA or a PNG is decoded and written again in one layout, and only two sizes

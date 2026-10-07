@@ -16,10 +16,17 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// The files of a project that this package reads or names, from the project folder.
+// The two manifests of a project, from the project folder.
 const (
-	sharedManifest = "moonwell.pkl"
-	localManifest  = "moonwell.local.pkl"
+	// SharedFile is the manifest every project has, which the team shares.
+	SharedFile = "moonwell.pkl"
+	// LocalFile is the manifest of one machine, which amends the shared one and holds what is that machine's,
+	// such as where the game is. Where a project has it, it is the manifest that is evaluated.
+	LocalFile = "moonwell.local.pkl"
+)
+
+// The other files of a project that this package reads or names, from the project folder.
+const (
 	pklProjectFile = "PklProject"
 	depsFile       = "PklProject.deps.json"
 )
@@ -91,12 +98,12 @@ func (p *Project) missingTexts() []string {
 // IsProject reports whether the folder at root is a project: a folder with a moonwell.pkl. It is what a command
 // asks before it does in a project what it does not do elsewhere, such as keep a log.
 func IsProject(root string) bool {
-	return fsx.Exists(filepath.Join(root, sharedManifest))
+	return fsx.Exists(filepath.Join(root, SharedFile))
 }
 
 // manifestFile is the manifest to evaluate: the local one, which amends the shared one, when it exists.
 func manifestFile(root string) (string, error) {
-	for _, file := range []string{localManifest, sharedManifest} {
+	for _, file := range []string{LocalFile, SharedFile} {
 		if fsx.Exists(filepath.Join(root, file)) {
 			return file, nil
 		}

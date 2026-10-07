@@ -29,11 +29,6 @@ const (
 	sourcesDir = "src"
 	// scriptName is a map's script, by the name World Editor gives it. A map may spell it in another letter case.
 	scriptName = "war3map.lua"
-	// sharedManifest is the manifest every project has, which a manifest of one machine amends. The assets block
-	// is written in it, so an error about that block names it, whichever manifest was evaluated. The manifest
-	// that is evaluated is the machine's own wherever a project has one, which does not hold the block, and
-	// nothing pkl prints says which of the two files wrote a value.
-	sharedManifest = "moonwell.pkl"
 )
 
 // Load finds Pkl and evaluates the manifest of the project in e.Root.
@@ -187,14 +182,18 @@ func MapGlobals(source *mapdir.Folder) (*lua.MapGlobals, error) {
 }
 
 // Assets collects the map's own assets and the files the synced libraries ship, and the lines that say which of
-// a library's files the map's own replace. A mistake in the assets block names the shared manifest, as the hint
-// of such a mistake does.
+// a library's files the map's own replace.
+//
+// A mistake in the assets block names the shared manifest, manifest.SharedFile, as the hint of such a mistake
+// does, whichever manifest was evaluated. The block is written in the shared one. The manifest that is evaluated
+// is the machine's own wherever a project has one, which does not hold the block, and nothing pkl prints says
+// which of the two files wrote a value.
 func Assets(p *manifest.Project, synced []library.Synced) (found []assets.Asset, replaced []string, err error) {
 	shipping, err := shippingLibraries(p.Root, synced)
 	if err != nil {
 		return nil, nil, err
 	}
-	return assets.Collect(p.Root, p.Assets, sharedManifest, shipping)
+	return assets.Collect(p.Root, p.Assets, manifest.SharedFile, shipping)
 }
 
 // shippingLibraries is the libraries that ship files for the map, each with the folder of those files. The way

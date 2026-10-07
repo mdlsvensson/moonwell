@@ -35,7 +35,7 @@ func LocalPkl() string {
 		"// Settings for this machine only. Git-ignored, so each checkout has its own; `moonwell setup` recreates it.",
 		"// It amends moonwell.pkl, so anything set here overrides the shared manifest.",
 		"",
-		`amends "moonwell.pkl"`,
+		`amends "` + SharedFile + `"`,
 		"",
 		"launch {",
 		`  gameExecutable = "` + executable + `"  // your Warcraft III.exe`,
@@ -50,7 +50,7 @@ func LocalPkl() string {
 // A file that could not be written whole is removed, so that the next call does not take half a file for the
 // user's.
 func EnsureLocalManifest(root string) (created bool, err error) {
-	path := filepath.Join(root, localManifest)
+	path := filepath.Join(root, LocalFile)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
 	switch {
 	// The look at the name is there for a folder under it: one system says of it that it exists, as of a file,
@@ -83,8 +83,8 @@ func isTaken(path string) bool {
 
 func errLocalManifestNotWritten(cause error) error {
 	return &diag.Error{
-		Msg:  "Creating " + localManifest + " failed: " + fsx.Reason(cause),
-		File: localManifest,
+		Msg:  "Creating " + LocalFile + " failed: " + fsx.Reason(cause),
+		File: LocalFile,
 		Hint: "Make sure that the project folder is one you may write to and that its disk has room, then run " +
 			"moonwell setup again.",
 		Cause: cause,
