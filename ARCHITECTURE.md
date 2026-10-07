@@ -526,7 +526,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | change where the archive goes, or how `build.folder` is read | `internal/build/archive.go`: `archiveOf`, `buildFolder`, `writeArchive` |
 | know which files go into the archive, and in which order | `internal/build/pack.go`: `pack`, `archiveFiles` |
 | know how large a map may be, or change the archive's format | `internal/war3/mpq/room.go`: `RoomFor`; `internal/war3/mpq/write.go`: `Write` |
-| change what `dev` watches, or when it checks again | `internal/build/dev.go`: `Dev`, `ownFolders`, `countsInProject`, `due`; the watcher in `internal/build/watch.go` |
+| change what `dev` watches, or when it checks again | `internal/build/dev_watched.go`: `ownFolders`, `countsInProject`, for what is watched; `internal/build/dev.go`: `Dev`, `due`, for when; the watcher in `internal/build/watch.go` |
 | change how the game is started | `internal/build/launch.go`: `launch`; `internal/env/spawn_windows.go` and `internal/env/spawn_unix.go` |
 
 ### The manifest and the tools
