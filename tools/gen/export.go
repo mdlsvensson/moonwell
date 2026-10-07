@@ -12,11 +12,13 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-// The two folders of an export that hold the game's object data, each by its path from the folder of the
-// export.
+// The folders of an export that the generator reads, each by its path from the folder of the export: the one
+// that holds the game's two scripts, which the natives are made from, and the two that hold the game's object
+// data.
 const (
-	unitsFolder  = "war3.w3mod/units"
-	localeFolder = "war3.w3mod/_locales/enus.w3mod"
+	scriptsFolder = "war3.w3mod/scripts"
+	unitsFolder   = "war3.w3mod/units"
+	localeFolder  = "war3.w3mod/_locales/enus.w3mod"
 )
 
 // The files of an export that the metadata is made from, each by its path from the folder of the export, in the

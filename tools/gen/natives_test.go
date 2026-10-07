@@ -484,14 +484,10 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 	}
 }
 
-// The scripts are looked for at their paths as the generator writes them. Where the file system does not tell
-// letter case apart, an export that names them in other letters is read all the same, and every entry records
-// the script's name in lower case.
-func TestTheModeNativesRecordsTheNameOfAScriptInLowerCase(t *testing.T) {
+// The scripts are found as every file of an export is: without regard to the letter case of a step of their
+// paths, on a file system of either kind. Every entry records the script's name in lower case all the same.
+func TestTheModeNativesFindsAScriptWhateverTheLetterCaseOfItsPath(t *testing.T) {
 	folder := t.TempDir()
-	if testkit.CaseSensitive(t, folder) {
-		t.Skip("the file system tells letter case apart: the scripts are found at their paths in lower case alone")
-	}
 	testkit.WriteFile(t, folder, "War3.w3mod/Scripts/COMMON.J", []byte(miniCommon))
 	testkit.WriteFile(t, folder, "War3.w3mod/Scripts/Blizzard.j", []byte(miniBlizzard))
 	_, files, err := withExtras(t).run("natives", folder, "9.9.9")
@@ -503,29 +499,34 @@ func TestTheModeNativesRecordsTheNameOfAScriptInLowerCase(t *testing.T) {
 	}
 }
 
-// A run that fails says which file it failed on, as the reader can find it: a script by the path that was
-// opened, which is the folder that the line names and the script's path from there, joined as the system joins
-// two paths; a file of the checkout by its path from the checkout; and a line of a script by the script's name
-// and the line's number. It leaves the natives of the checkout as they were.
+// A run that fails says which file it failed on, as the reader can find it: a script that the export lacks by
+// its path as the generator asks for it, with the folder as the line gives it, which is how the mode metadata
+// names a file that is missing; a script that the system cannot give by the path that was opened; a file of the
+// checkout by its path from the checkout; and a line of a script by the script's name and the line's number. It
+// leaves the natives of the checkout as they were.
 func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testing.T) {
 	const kept = "the natives of another version\n"
 	whole := exportedScripts(t, miniCommon, miniBlizzard)
 	noBlizzard := t.TempDir()
 	testkit.WriteFile(t, noBlizzard, scriptsFolder+"/"+commonScript, []byte(miniCommon))
-	blizzardThere := filepath.Join(noBlizzard, "war3.w3mod", "scripts", "blizzard.j") + ": "
-	commonNotThere := filepath.Join(noBlizzard, "no-such-folder", "war3.w3mod", "scripts", "common.j") + ": "
+	noFolder := filepath.Join(noBlizzard, "no-such-folder")
+	blizzardAsFolder := t.TempDir()
+	testkit.WriteFile(t, blizzardAsFolder, scriptsFolder+"/"+commonScript, []byte(miniCommon))
+	testkit.WriteFile(t, blizzardAsFolder, scriptsFolder+"/"+blizzardScript+"/held.txt", []byte("held\n"))
 	for name, c := range map[string]struct {
 		folder string
 		lay    func(c checkout)
 		starts string   // what the error starts with
 		words  []string // what it says besides
 	}{
-		"a script that is not there": {folder: noBlizzard, starts: blizzardThere},
-		"a folder that is not there": {folder: filepath.Join(noBlizzard, "no-such-folder"), starts: commonNotThere},
-		// The folder as the line gives it has what a path need not have: the joined path has it not.
-		"a folder with a slash at its end": {folder: noBlizzard + "/", starts: blizzardThere},
-		"a folder with two points in it":   {folder: noBlizzard + "/war3.w3mod/..", starts: blizzardThere},
-		"a folder with slashes, not there": {folder: noBlizzard + "/no-such-folder//", starts: commonNotThere},
+		"a script that is not there": {folder: noBlizzard,
+			starts: "war3.w3mod/scripts/blizzard.j is missing from " + noBlizzard},
+		"a folder that is not there": {folder: noFolder,
+			starts: "war3.w3mod/scripts/common.j is missing from " + noFolder},
+		"a folder with a slash at its end": {folder: noBlizzard + "/",
+			starts: "war3.w3mod/scripts/blizzard.j is missing from " + noBlizzard + "/"},
+		"a folder at the place of a script": {folder: blizzardAsFolder,
+			starts: filepath.Join(blizzardAsFolder, "war3.w3mod", "scripts", "blizzard.j") + ": "},
 		"a line that is no declaration": {folder: exportedScripts(t, miniCommon, "globals\n    real = 1\nendglobals\n"),
 			starts: "blizzard.j:2: cannot read ", words: []string{`"real = 1"`}},
 		"a function without its end": {folder: exportedScripts(t, "\n\nfunction F takes nothing returns nothing\n", ""),

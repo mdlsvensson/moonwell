@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -19,9 +18,8 @@ const (
 	// nativesPath is the game's script API, which the program carries, by its path from the checkout.
 	nativesPath = "data/natives.json"
 
-	// scriptsFolder is where an export of the game's files has the two scripts, by its path from the folder of
-	// the export. An entry of the natives records the script it is from by the script's name.
-	scriptsFolder  = "war3.w3mod/scripts"
+	// The game's two scripts, by their names in the scripts' folder of an export. An entry of the natives records
+	// the script it is from by this name.
 	commonScript   = "common.j"
 	blizzardScript = "blizzard.j"
 
@@ -59,17 +57,15 @@ func writeNatives(checkout string, args []string, out io.Writer) error {
 	return nil
 }
 
-// readScript reads one of the game's two scripts from the export in folder, and parses it. The script is looked
-// for at its path as it is written here, joined to the folder as the system joins two paths; a failure of the
-// system names it by that joined path, which is what was opened. Every entry records name as the script it is
-// from: the script's name in lower case, whatever the letter case of the file.
+// readScript reads one of the game's two scripts from the export in folder, and parses it. The script is found
+// as every file of an export is (export.find): without regard to letter case. Every entry records name as the
+// script it is from: the script's name in lower case, whatever the letter case of the file.
 func readScript(folder, name string) (jass.File, error) {
-	path := filepath.Join(folder, filepath.FromSlash(scriptsFolder+"/"+name))
-	data, err := os.ReadFile(path)
+	text, err := export{folder}.text(scriptsFolder + "/" + name)
 	if err != nil {
-		return jass.File{}, errFile(path, err)
+		return jass.File{}, err
 	}
-	return jass.Parse(fsx.DecodeText(data), name)
+	return jass.Parse(text, name)
 }
 
 // ---- the natives ----
