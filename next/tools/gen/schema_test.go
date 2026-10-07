@@ -397,7 +397,7 @@ func TestTheModeWithoutANameWritesTheCommittedSchemaFromTheCommittedMetadata(t *
 	if printed != wrote {
 		t.Errorf("printed %q, want %q", printed, wrote)
 	}
-	want := map[string]string{"data/metadata.json": string(realFile(t, "data/metadata.json"))}
+	want := withGoMod(map[string]string{"data/metadata.json": string(realFile(t, "data/metadata.json"))})
 	for _, name := range generatedNames() {
 		want[name] = string(realFile(t, name))
 	}
@@ -420,8 +420,8 @@ func TestTheModeWithoutANameWritesTheCommittedSchemaFromTheCommittedMetadata(t *
 func TestTheModeWithoutANameWritesNothingOverTheCommittedSchema(t *testing.T) {
 	c := newCheckout(t)
 	c.carry("data/metadata.json", "schema/generated")
-	before := c.outputs()
-	if len(texts(before)) != 8 {
+	before := c.all()
+	if len(texts(c.outputs())) != 8 {
 		t.Fatalf("the checkout was given %q", slices.Sorted(maps.Keys(before)))
 	}
 	printed, files, err := c.run()
@@ -441,13 +441,13 @@ func TestTheModeWithoutANameRemovesWhatElseLiesInTheFolderOfTheSchema(t *testing
 	if _, _, err := c.run(); err != nil {
 		t.Fatal(err)
 	}
-	want := c.outputs()
+	c.write("schema/Kept.pkl", "beside the folder\n")
+	want := c.all()
 	c.write("schema/generated/HeroProps.pkl", "stale\n")
 	c.write("schema/generated/Stray.pkl", "stray\n")
 	c.write("schema/generated/UnitProps.pkl.orig", "stray\n")
 	c.write("schema/generated/old/deeper/Left.pkl", "stray\n")
 	c.folder("schema/generated/empty")
-	c.write("schema/Kept.pkl", "beside the folder\n")
 	printed, files, err := c.run()
 	if err != nil {
 		t.Fatal(err)
@@ -460,11 +460,9 @@ func TestTheModeWithoutANameRemovesWhatElseLiesInTheFolderOfTheSchema(t *testing
 	if printed != lines {
 		t.Errorf("printed %q, want %q", printed, lines)
 	}
+	// The file beside the folder of the schema is among what the checkout held, and holds.
 	if !reflect.DeepEqual(files, want) {
 		t.Errorf("the checkout holds %q, want %q", slices.Sorted(maps.Keys(files)), slices.Sorted(maps.Keys(want)))
-	}
-	if kept := testkit.Snapshot(t, c.path("schema")); string(kept["Kept.pkl"]) != "beside the folder\n" {
-		t.Error("a file beside the folder of the schema was removed")
 	}
 }
 
@@ -483,6 +481,7 @@ func TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON(t *testing.T) 
 		if c.metadata != "" {
 			scratch.write("data/metadata.json", c.metadata)
 		}
+		before := scratch.all()
 		printed, files, err := scratch.run()
 		if err == nil {
 			t.Errorf("%s: the schema was written", name)
@@ -492,7 +491,7 @@ func TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON(t *testing.T) 
 		if strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: the message holds the path of the checkout: %v", name, err)
 		}
-		if _, written := files["schema/generated"]; written || printed != "" {
+		if printed != "" || !reflect.DeepEqual(files, before) {
 			t.Errorf("%s: the refused run printed %q and left %q", name, printed, slices.Sorted(maps.Keys(files)))
 		}
 	}
@@ -532,7 +531,7 @@ func TestTheModeWithoutANameWritesNothingWhenANameCannotBeAProperty(t *testing.T
 	c := newCheckout(t)
 	c.write("data/metadata.json", metadataOfOneBuff(t, "fout", "output"))
 	c.write("schema/generated/Stray.pkl", "stray\n")
-	before := c.outputs()
+	before := c.all()
 	printed, files, err := c.run()
 	if err == nil {
 		t.Fatal("a field named output was written into the schema")

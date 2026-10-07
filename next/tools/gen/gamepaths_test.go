@@ -133,7 +133,9 @@ func TestTheModeGamePathsWritesTheListAndPrintsHowManyPathsItHas(t *testing.T) {
 	if printed != "wrote data/game-paths.txt: 1 paths.\n" {
 		t.Errorf("printed %q", printed)
 	}
-	want := map[string]string{"data/game-paths.txt": "# Warcraft III 2.0.0\nunits/human/footman/footman.mdx\n"}
+	want := withGoMod(map[string]string{
+		"data/game-paths.txt": "# Warcraft III 2.0.0\nunits/human/footman/footman.mdx\n",
+	})
 	if got := texts(files); !maps.Equal(got, want) {
 		t.Errorf("wrote %q", got)
 	}
@@ -173,7 +175,7 @@ func TestTheModeGamePathsFailsAndKeepsTheExistingListWhenNoPathIsRecognized(t *t
 		if printed != "" {
 			t.Errorf("version %q: printed %q", version, printed)
 		}
-		if got := texts(files); !maps.Equal(got, map[string]string{"data/game-paths.txt": existing}) {
+		if got := texts(files); !maps.Equal(got, withGoMod(map[string]string{"data/game-paths.txt": existing})) {
 			t.Errorf("version %q: the list changed to %q", version, got)
 		}
 	}
@@ -209,7 +211,7 @@ func TestTheModeGamePathsNamesTheFileItCannotWriteByItsPathFromTheCheckout(t *te
 	if strings.Contains(err.Error(), c.root) {
 		t.Errorf("the message holds the path of the checkout: %v", err)
 	}
-	if printed != "" || len(files) != 0 {
+	if printed != "" || !asNew(files) {
 		t.Errorf("the failed run printed %q and left %q", printed, texts(files))
 	}
 }

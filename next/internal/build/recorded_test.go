@@ -56,13 +56,14 @@ func TestTheBuildsOfTheSeedsAreAsRecorded(t *testing.T) {
 	for _, seed := range seeds {
 		t.Run(seed.name, func(t *testing.T) {
 			p.lay(t, seed)
+			made := map[string][]byte{} // the recording each command made
 			for _, command := range recordedCommands {
 				root := p.fresh(t, seed.name)
-				made := ranIn(t, root, command.run)
-				testkit.Recorded(t, seed.name+"/"+command.name+".txt", made.recording(t, root, command.texts))
+				made[command.name] = ranIn(t, root, command.run).recording(t, root, command.texts)
+				testkit.Recorded(t, seed.name+"/"+command.name+".txt", made[command.name])
 			}
 			if slices.Contains(builtOverLeftovers, seed.name) {
-				p.overLeftovers(t, seed.name)
+				p.overLeftovers(t, seed.name, made["build"])
 			}
 		})
 	}
@@ -100,12 +101,12 @@ func titled(name string, recording []byte) []byte {
 var builtOverLeftovers = []string{"template", "everything"}
 
 // overLeftovers builds a seed in a project folder that holds such leftovers, and in its stage a file that no
-// build stages. The build must leave what the build of a fresh copy leaves, by that build's recording: nothing
-// of the cache is taken for this program's own, and the stage is written anew. A check after it must pass and
-// leave the folder as the build left it. The stamp among the leftovers names <root>, which is no folder, so the
-// library is copied anew; that a library whose stamp is current needs no new copy is held by the tests of
-// library.
-func (p *recordedProjects) overLeftovers(t *testing.T, seed string) {
+// build stages. The build must leave what the build of a fresh copy left, which is fresh, the recording that
+// build made: nothing of the cache is taken for this program's own, and the stage is written anew. The run is
+// compared and writes no recording. A check after it must pass and leave the folder as the build left it. The
+// stamp among the leftovers names <root>, which is no folder, so the library is copied anew; that a library
+// whose stamp is current needs no new copy is held by the tests of library.
+func (p *recordedProjects) overLeftovers(t *testing.T, seed string, fresh []byte) {
 	t.Helper()
 	root := p.fresh(t, seed)
 	if err := fsx.CopyTree(filepath.Join("testdata", "leftovers", seed), root); err != nil {
@@ -113,7 +114,11 @@ func (p *recordedProjects) overLeftovers(t *testing.T, seed string) {
 	}
 	put(t, root, seedStage+"/stale.txt", "a file of an earlier stage")
 	built := ranIn(t, root, building(Options{}))
-	testkit.Recorded(t, seed+"/build.txt", built.recording(t, root, true))
+	if over := built.recording(t, root, true); !bytes.Equal(over, fresh) {
+		line, _ := testkit.PartingLine(fresh, func(upTo []byte) bool { return bytes.HasPrefix(over, upTo) })
+		t.Errorf("%s: the build over the leftovers leaves another project than the build of a fresh copy: "+
+			"what the two make parts at line %d of %s/build.txt", seed, line, seed)
+	}
 	checked := ranIn(t, root, checking)
 	if checked.refused || !maps.EqualFunc(built.files, checked.files, bytes.Equal) {
 		t.Errorf("%s: the check after the build over the leftovers is refused, or changes the project folder", seed)

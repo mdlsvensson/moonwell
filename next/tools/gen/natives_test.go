@@ -467,7 +467,7 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 			t.Errorf("%s: printed %q", name, printed)
 		}
 		got := texts(files)
-		if !maps.Equal(got, map[string]string{nativesPath: want}) {
+		if !maps.Equal(got, withGoMod(map[string]string{extrasPath: c.extras, nativesPath: want})) {
 			t.Errorf("%s: the checkout holds %q, want the natives of the two scripts: %s",
 				name, slices.Sorted(maps.Keys(got)), parting(want, got[nativesPath]))
 		}
@@ -549,7 +549,7 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 		if c.lay != nil {
 			c.lay(scratch)
 		}
-		before := scratch.outputs()
+		before := scratch.all()
 		printed, files, err := scratch.run("natives", c.folder, "9.9.9")
 		if err == nil {
 			t.Errorf("%s: the run wrote the natives", name)

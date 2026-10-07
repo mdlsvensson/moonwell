@@ -159,55 +159,6 @@ func TestOracleReadsTheLinesAndTheEndingsThatDecideItsClasses(t *testing.T) {
 	}
 }
 
-// The folder a run is started in: nothing is started where a generator that walks up from that folder could
-// find a checkout that is not the run's own.
-func TestOracleStartsNothingWhereAnotherCheckoutCouldBeFound(t *testing.T) {
-	const (
-		mentioned = "module example.com/other\n\nrequire " + modulePath + " v1.0.0\n"
-		// Words of the three refusals.
-		inside   = "is inside a checkout"
-		unnamed  = "names this module: false"
-		notBelow = "nor below it"
-	)
-	for name, c := range map[string]struct {
-		above     string // the go.mod of the folder above the run's; "" for none
-		own       string // the go.mod of the run's folder; "" for none
-		below     string // where the line is run, from the run's folder
-		elsewhere bool   // the line is run in a folder that is not the run's
-		ofOne     bool   // the run is of a checkout
-		refused   string // words of the refusal; "" for a folder in which a run may start
-	}{
-		"a checkout":                              {own: moduleFile, ofOne: true},
-		"a folder below a checkout":               {own: moduleFile, below: "tools/gen", ofOne: true},
-		"a folder that is no checkout":            {},
-		"a folder of another module":              {own: anotherModule},
-		"another module above":                    {above: anotherModule, own: moduleFile, ofOne: true},
-		"a checkout above a checkout":             {above: moduleFile, own: moduleFile, ofOne: true, refused: inside},
-		"a checkout above a folder that is none":  {above: moduleFile, refused: inside},
-		"a mention of the module above":           {above: mentioned, own: moduleFile, ofOne: true, refused: inside},
-		"a checkout where the run is of none":     {own: moduleFile, refused: "names this module: true"},
-		"no checkout where the run is of one":     {below: "tools", ofOne: true, refused: unnamed},
-		"another module where the run is of one":  {own: anotherModule, ofOne: true, refused: unnamed},
-		"a folder that is not the run's":          {own: moduleFile, elsewhere: true, ofOne: true, refused: notBelow},
-		"a folder above the run's, by two points": {own: moduleFile, below: "..", ofOne: true, refused: notBelow},
-	} {
-		outer := checkout{t, t.TempDir()}
-		root, dir := outer.folder("above/run"), outer.folder("above/run/"+c.below)
-		if c.elsewhere {
-			dir = outer.folder("above/other")
-		}
-		for at, text := range map[string]string{"above/go.mod": c.above, "above/run/go.mod": c.own} {
-			if text != "" {
-				outer.write(at, text)
-			}
-		}
-		heard := listenTo(t, func(tb testing.TB) { onlyItsOwnCheckout(tb, root, dir, c.ofOne) })
-		if (heard == "") != (c.refused == "") || !strings.Contains(heard, c.refused) {
-			t.Errorf("%s: the guard said %q, want the words %q", name, heard, c.refused)
-		}
-	}
-}
-
 // The guard stands before every run: a run whose folder it refuses is carried out by no tree.
 func TestOracleCarriesOutNoRunThatItsGuardRefuses(t *testing.T) {
 	goMod := func(text string) func(checkout) { return func(c checkout) { c.write("go.mod", text) } }

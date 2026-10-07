@@ -1,0 +1,92 @@
+== moonwell build
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left:
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 66c0492cebd8687e1ec970ffe4498278c1ee6b48cf30b041159608a6de2bd648, 844 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes
+== moonwell check
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left:
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 66c0492cebd8687e1ec970ffe4498278c1ee6b48cf30b041159608a6de2bd648, 844 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes
+== moonwell settings:check
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing
+== moonwell objects:eval
+exit code: 0
+printed:
+  {
+  "  \"heroes\": {},"
+  "  \"units\": {"
+  "    \"captain\": {"
+  "      \"id\": \"h000\","
+  "      \"base\": \"hfoo\","
+  "      \"source\": \"objects/units.pkl\","
+  "      \"fields\": ["
+  "        {"
+  "          \"rawcode\": \"uico\","
+  "          \"name\": \"iconGameInterface\","
+  "          \"level\": 0,"
+  "          \"column\": 0,"
+  "          \"skin\": true,"
+  "          \"type\": \"string\","
+  "          \"value\": \"ReplaceableTextures\\\\CommandButtons\\\\BTNTheCaptain.blp\""
+  "        },"
+  "        {"
+  "          \"rawcode\": \"umdl\","
+  "          \"name\": \"modelFile\","
+  "          \"level\": 0,"
+  "          \"column\": 0,"
+  "          \"skin\": true,"
+  "          \"type\": \"string\","
+  "          \"value\": \"units\\\\human\\\\TheCaptain\\\\TheCaptain\""
+  "        },"
+  "        {"
+  "          \"rawcode\": \"unam\","
+  "          \"name\": \"name\","
+  "          \"level\": 0,"
+  "          \"column\": 0,"
+  "          \"skin\": true,"
+  "          \"type\": \"string\","
+  "          \"value\": \"Captain\""
+  "        }"
+  "      ]"
+  "    }"
+  "  },"
+  "  \"buildings\": {},"
+  "  \"items\": {},"
+  "  \"abilities\": {},"
+  "  \"buffs\": {},"
+  "  \"upgrades\": {}"
+  }
+terminal: nothing
+left: nothing
+== moonwell assets:check
+exit code: 0
+printed: nothing
+terminal:
+  Checked 0 asset(s); assets:sync would make 0 file change(s). Nothing was written.
+left: nothing
+== moonwell assets:sync
+exit code: 0
+printed: nothing
+terminal:
+  Synced 0 asset(s) into maps/map.w3x (0 file change(s)). Reopen the map in World Editor.
+left: nothing
+== moonwell assets:paths
+exit code: 0
+printed: nothing
+terminal:
+  No models under assets/.
+left: nothing

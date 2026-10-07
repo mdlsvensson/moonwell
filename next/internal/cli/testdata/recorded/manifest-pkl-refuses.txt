@@ -1,0 +1,5 @@
+== moonwell build
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing

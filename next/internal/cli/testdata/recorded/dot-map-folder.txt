@@ -1,0 +1,65 @@
+== moonwell build
+exit code: 0
+printed: nothing
+terminal:
+  Added 1 custom object(s) to 2 file(s).
+  Packing archive...
+  Built dist/bin/map.w3x (2 module(s)).
+left:
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 66c0492cebd8687e1ec970ffe4498278c1ee6b48cf30b041159608a6de2bd648, 844 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes
+  dist/bin/map.w3x: present
+  dist/stage/map.w3x/conversation.json: sha256 0b3d1bdf2b0e90a774b1e1278e038a670c5b3066019dd8e8849655a4cdea08cf, 64 bytes
+  dist/stage/map.w3x/war3map.doo: sha256 390abf3266720381e4d472a83ff09b0c394be471b990917b560f70b651b114a0, 24 bytes
+  dist/stage/map.w3x/war3map.lua: sha256 d1c8a529812ea959bf258737499316bdb49fddba124909b48a74a172f137b5e6, 10990 bytes
+  dist/stage/map.w3x/war3map.mmp: sha256 6232e06d584c3ebe71199814ed9aee41b057eed7924733d7e527e4d598195083, 88 bytes
+  dist/stage/map.w3x/war3map.shd: sha256 de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31, 65536 bytes
+  dist/stage/map.w3x/war3map.w3c: sha256 35be322d094f9d154a8aba4733b8497f180353bd7ae7b0a15f90b586b549f28b, 8 bytes
+  dist/stage/map.w3x/war3map.w3e: sha256 0fc6ed4b5bb2d3d2109a7a279c7c330de7254b209fcd85c00a9523f24d75f557, 33869 bytes
+  dist/stage/map.w3x/war3map.w3grp: sha256 15ec7bf0b50732b49f8228e07d24365338f9e3ab994b00af08e5a3bffe55fd8b, 12 bytes
+  dist/stage/map.w3x/war3map.w3i: sha256 969a64caa8c04393fd79dc0418378e410fa1cb33f0fe2a39f6cc3761646438ce, 619 bytes
+  dist/stage/map.w3x/war3map.w3l: sha256 e605b3c27b181866c487bdd0af804c4c08c593a5af30ec676d806cf22f64ebe5, 22 bytes
+  dist/stage/map.w3x/war3map.w3r: sha256 aae89fc0f03e2959ae4d701a80cc3915918c950b159f6abb6c92c1433b1a8534, 8 bytes
+  dist/stage/map.w3x/war3map.w3u: sha256 b90dec7c2fec6a5e500088b6bd298bf238c61909841edf241e0a4fdf10f0c674, 32 bytes
+  dist/stage/map.w3x/war3map.wct: sha256 f64ae3ad02604bc24d835dea5161f83e9fff2a9a9a75458fa16d79451292c0a5, 313 bytes
+  dist/stage/map.w3x/war3map.wpm: sha256 6d0b368c1b8a30b001f98a1b6b6ad1b35f1c65673815e4092574e51d7d404730, 65552 bytes
+  dist/stage/map.w3x/war3map.wtg: sha256 16f619c9a09d04a8bdd9d99ad716f96397f2c45fd71c417bed54f0d66f890dd8, 442 bytes
+  dist/stage/map.w3x/war3map.wts: sha256 c351c03ade4147a31da632e8870fe4d27631943f80b21eaf42159a9e1c89431b, 325 bytes
+  dist/stage/map.w3x/war3mapMap.blp: sha256 2cd809d877523db6b3de75f91b20abf8a921885a44be3b686bac9c1dd4a88eed, 9222 bytes
+  dist/stage/map.w3x/war3mapSkin.w3u: sha256 b661ba4d8a3b663bc6a88f1d7277f1dd43b9f6a3d954d42b93fbd3bc50f99827, 163 bytes
+  dist/stage/map.w3x/war3mapUnits.doo: sha256 8ea9de4b46137aee6c683d20b34418fbbb9513067a09541591639862eea84754, 933 bytes
+== moonwell check
+exit code: 0
+printed: nothing
+terminal:
+  Check passed: 2 module(s) reachable from main, 0 asset(s).
+left:
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 66c0492cebd8687e1ec970ffe4498278c1ee6b48cf30b041159608a6de2bd648, 844 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes
+== moonwell assets:check
+exit code: 0
+printed: nothing
+terminal:
+  Checked 0 asset(s); assets:sync would make 0 file change(s). Nothing was written.
+left: nothing
+== moonwell settings:check
+exit code: 0
+printed: nothing
+terminal:
+  Map settings valid: 0 internal file(s) would change during build.
+left: nothing
+== moonwell objects:check
+exit code: 0
+printed: nothing
+terminal:
+  "  war3map.w3u"
+  "  war3mapSkin.w3u"
+  "  src/generated/objects.yue: current"
+  Object data valid: 1 object(s), 2 internal file(s) would change during build.
+left: nothing

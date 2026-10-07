@@ -1,0 +1,25 @@
+== moonwell settings:check
+exit code: 1
+printed: nothing
+terminal: a complaint about maps/map.w3x/war3map.w3i
+left: nothing
+== moonwell build
+exit code: 1
+printed: nothing
+terminal: a complaint about maps/map.w3x/war3map.w3i
+left:
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 66c0492cebd8687e1ec970ffe4498278c1ee6b48cf30b041159608a6de2bd648, 844 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes
+== moonwell check
+exit code: 1
+printed: nothing
+terminal: a complaint about maps/map.w3x/war3map.w3i
+left:
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 66c0492cebd8687e1ec970ffe4498278c1ee6b48cf30b041159608a6de2bd648, 844 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes

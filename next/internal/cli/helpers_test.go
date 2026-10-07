@@ -268,8 +268,13 @@ func realWorld(root string) (*env.Env, *testkit.Recorder) {
 // it downloads nothing.
 func newProject(t *testing.T, name string) string {
 	t.Helper()
+	return projectIn(t, t.TempDir(), name)
+}
+
+// projectIn is newProject in the folder parent, which it makes.
+func projectIn(t *testing.T, parent, name string) string {
+	t.Helper()
 	testkit.NeedPkl(t)
-	parent := t.TempDir()
 	e, _, _ := pklOnly(t, parent)
 	if err := createProject(background, e, name, filepath.Join(testkit.RepoRoot(t), "schema")); err != nil {
 		t.Fatal(diag.Format(err))
@@ -296,8 +301,7 @@ func compiling(t *testing.T) string {
 func ownCache(t *testing.T) string {
 	t.Helper()
 	compiler := tooltest.Yue(t)
-	asset, pinned := toolchain.YueScript.Versions[toolchain.YueVersion][env.CurrentPlatform()]
-	if !pinned {
+	if _, pinned := toolchain.YueScript.Versions[toolchain.YueVersion][env.CurrentPlatform()]; !pinned {
 		t.Skip("Moonwell pins no compiler for this platform")
 	}
 	program, err := os.ReadFile(compiler)
@@ -305,7 +309,7 @@ func ownCache(t *testing.T) string {
 		t.Fatal(err)
 	}
 	cache := t.TempDir()
-	place := filepath.Join(cache, toolchain.YueScript.Name, toolchain.YueVersion, filepath.FromSlash(asset.Binary))
+	place := pinnedCompilerIn(cache)
 	if err := os.MkdirAll(filepath.Dir(place), 0o777); err != nil {
 		t.Fatal(err)
 	}
@@ -313,6 +317,13 @@ func ownCache(t *testing.T) string {
 		t.Fatal(err)
 	}
 	return cache
+}
+
+// pinnedCompilerIn is the place of the pinned compiler in a cache folder, on a platform that Moonwell pins one
+// for.
+func pinnedCompilerIn(cache string) string {
+	asset := toolchain.YueScript.Versions[toolchain.YueVersion][env.CurrentPlatform()]
+	return filepath.Join(cache, toolchain.YueScript.Name, toolchain.YueVersion, filepath.FromSlash(asset.Binary))
 }
 
 // pklAlone is the world of pklOnly for a whole command line: the log is the line's own, so what a command says

@@ -19,8 +19,14 @@ import (
 	"github.com/mdlsvensson/moonwell/next/internal/testkit"
 )
 
+// modulePath is the path of this module, as a go.mod of any kind mentions it.
+const modulePath = "github.com/mdlsvensson/moonwell"
+
 // moduleFile is the go.mod of a scratch checkout: the line the generator knows a checkout of Moonwell by.
-const moduleFile = "module github.com/mdlsvensson/moonwell\n"
+const moduleFile = "module " + modulePath + "\n"
+
+// anotherModule is the go.mod of a module that is not this one.
+const anotherModule = "module example.com/other\n"
 
 // outputFolders is the folders of a checkout that the generator writes into, each by its path from the checkout.
 var outputFolders = []string{"data", "schema/generated"}
@@ -31,13 +37,26 @@ var outputFolders = []string{"data", "schema/generated"}
 type checkout struct {
 	t    testing.TB
 	root string // the folder, as a full path
+	// none says that the folder is a scratch folder that is no checkout: no go.mod in it names this module.
+	none bool
 }
 
 // newCheckout makes a scratch checkout that holds its go.mod and nothing else.
 func newCheckout(t testing.TB) checkout {
 	t.Helper()
-	c := checkout{t, t.TempDir()}
+	c := checkout{t: t, root: t.TempDir()}
 	c.write("go.mod", moduleFile)
+	return c
+}
+
+// noCheckout makes a scratch folder that is no checkout: it holds goMod as its go.mod, which does not name this
+// module, or nothing for "".
+func noCheckout(t testing.TB, goMod string) checkout {
+	t.Helper()
+	c := checkout{t: t, root: t.TempDir(), none: true}
+	if goMod != "" {
+		c.write("go.mod", goMod)
+	}
 	return c
 }
 
@@ -101,25 +120,41 @@ func realFiles(t testing.TB, name string) []string {
 	return files
 }
 
-// run runs one command line of the generator in the checkout. It returns what the run printed, what lies below
-// the folders the generator writes afterwards (outputs), and the error the run ended with.
+// run runs one command line of the generator in the checkout. It returns what the run printed, everything the
+// checkout holds afterwards (all), and the error the run ended with: so a test that says what a run left says it
+// of the whole checkout, and a file that a run writes outside data/ and schema/generated/ fails it.
 func (c checkout) run(args ...string) (printed string, files map[string][]byte, err error) {
 	c.t.Helper()
 	printed, err = c.runBelow("", args...)
-	return printed, c.outputs(), err
+	return printed, c.all(), err
 }
 
 // runBelow runs one command line of the generator in a folder of the checkout, which it makes: below is its path
 // from the checkout with "/", and "" is the checkout itself. It returns what the run printed and the error the run
-// ended with. It is the one place of the tests that calls run. It asks first whether the folder is of the real
-// checkout, and makes it after: so it calls run for no folder of the real checkout, and makes none there.
+// ended with. It is the one place of the tests that calls run, and it calls run only where a generator may be
+// started (startsIn).
 func (c checkout) runBelow(below string, args ...string) (printed string, err error) {
 	c.t.Helper()
-	notInTheRealCheckout(c.t, c.path(below))
-	dir := c.folder(below)
+	dir := c.startsIn(below)
 	var out bytes.Buffer
 	err = run(dir, args, &out)
 	return out.String(), err
+}
+
+// startsIn is the folder of the checkout in which a generator is about to be started, as a program or through
+// run: below is its path from the checkout with "/", and "" is the checkout itself. A generator writes into the
+// checkout it finds on its way up from that folder. So the test is stopped for a folder of the real checkout
+// (notInTheRealCheckout), and for one that could lead a generator to another checkout than this one
+// (onlyItsOwnCheckout). The folder is made after both have been asked: none is made in the real checkout.
+//
+// What the two do not hold: run is given the folder, and the process of the test stands in the folder of this
+// package, in the real checkout. A generator that asked the process for its folder would find the real checkout
+// there: run must not ask, as the package comment of main.go says, and main alone does.
+func (c checkout) startsIn(below string) (dir string) {
+	c.t.Helper()
+	notInTheRealCheckout(c.t, c.path(below))
+	onlyItsOwnCheckout(c.t, c.root, c.path(below), !c.none)
+	return c.folder(below)
 }
 
 // all is everything the checkout holds, by its path from the checkout with "/": a file with its bytes, and a
@@ -127,6 +162,17 @@ func (c checkout) runBelow(below string, args ...string) (printed string, err er
 func (c checkout) all() map[string][]byte {
 	c.t.Helper()
 	return testkit.Snapshot(c.t, c.root)
+}
+
+// asNew reports whether files is all that a new checkout holds: its go.mod, and nothing else.
+func asNew(files map[string][]byte) bool {
+	return len(files) == 1 && string(files["go.mod"]) == moduleFile
+}
+
+// withGoMod is the texts of a checkout that holds these files beside the go.mod of a new one.
+func withGoMod(files map[string]string) map[string]string {
+	files["go.mod"] = moduleFile
+	return files
 }
 
 // outputs is what the checkout has at and below data/ and schema/generated/, by its path from the checkout with
@@ -166,12 +212,13 @@ func builtProgram(t testing.TB, pkg string) string {
 	return program
 }
 
-// startIn starts a built program with dir as its working folder, waits for its end, and returns its exit code
-// and what it wrote to each stream. dir is a folder of a scratch checkout, and never one of the real checkout: a
-// generator writes into the checkout it finds.
-func startIn(t testing.TB, program, dir string, args ...string) (code int, stdout, stderr string) {
-	t.Helper()
-	notInTheRealCheckout(t, dir)
+// start starts a built program with a folder of the checkout as its working folder, which it makes, waits for
+// its end, and returns its exit code and what it wrote to each stream: below is the folder's path from the
+// checkout with "/", and "" is the checkout itself. It is the one place of the tests that starts a generator as
+// a program, and it starts one only where a generator may be started (startsIn).
+func (c checkout) start(program, below string, args ...string) (code int, stdout, stderr string) {
+	c.t.Helper()
+	dir := c.startsIn(below)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 	started := exec.CommandContext(ctx, program, args...)
@@ -181,7 +228,7 @@ func startIn(t testing.TB, program, dir string, args ...string) (code int, stdou
 	if err := started.Run(); err != nil {
 		var exited *exec.ExitError
 		if !errors.As(err, &exited) {
-			t.Fatal(err)
+			c.t.Fatal(err)
 		}
 		code = exited.ExitCode()
 	}
@@ -211,6 +258,46 @@ func notInTheRealCheckout(t testing.TB, dir string) {
 		}
 		if at == filepath.Dir(at) {
 			return
+		}
+	}
+}
+
+// onlyItsOwnCheckout stops the test unless a generator that walks up from dir, the folder it is started in, can
+// find no checkout but the one of the run, whose folder is root, whichever go.mod it takes on its way. dir must
+// be root or lie below it. No go.mod above root may so much as mention this module: the test's temporary folder
+// may have been put inside a checkout, and a generator may walk past the go.mod it should stop at. And at or
+// above dir, up to root, a go.mod names this module exactly when the run is of a checkout. It holds nothing of a
+// generator that asks the process for its folder.
+func onlyItsOwnCheckout(t testing.TB, root, dir string, ofACheckout bool) {
+	t.Helper()
+	if below, err := filepath.Rel(root, dir); err != nil || !filepath.IsLocal(below) {
+		t.Fatalf("%s is not the folder of the run, %s, nor below it: nothing is started there", dir, root)
+		return
+	}
+	for above := filepath.Dir(root); ; above = filepath.Dir(above) {
+		data, err := os.ReadFile(filepath.Join(above, "go.mod"))
+		if err == nil && bytes.Contains(data, []byte(modulePath)) {
+			t.Fatalf("%s is inside a checkout, %s: a generator that is started there could write into it", root, above)
+			return
+		}
+		if above == filepath.Dir(above) {
+			break
+		}
+	}
+	if isCheckout := namesTheModuleUpTo(root, dir); isCheckout != ofACheckout {
+		t.Fatalf("at or above %s a go.mod names this module: %v; the run is of a checkout: %v",
+			dir, isCheckout, ofACheckout)
+	}
+}
+
+// namesTheModuleUpTo reports whether dir, or a folder above it up to root, has a go.mod that names this module.
+func namesTheModuleUpTo(root, dir string) bool {
+	for at := dir; ; at = filepath.Dir(at) {
+		if data, err := os.ReadFile(filepath.Join(at, "go.mod")); err == nil && moduleLine.Match(data) {
+			return true
+		}
+		if at == root || at == filepath.Dir(at) {
+			return false
 		}
 	}
 }

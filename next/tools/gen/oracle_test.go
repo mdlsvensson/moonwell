@@ -58,7 +58,8 @@ import (
 // module exactly when the run is of a checkout. So a generator that takes the wrong go.mod on its way up, or a
 // temporary folder that was put inside a checkout, cannot make a run write into the real data/
 // (TestOracleCarriesOutNoRunThatItsGuardRefuses). The helper that starts a program, and the one that calls run,
-// refuse a folder of the real checkout besides, and the tests call run nowhere else. What the guards do not hold:
+// ask the same guard, which is theirs (startsIn of helpers_test.go), and refuse a folder of the real checkout
+// besides; the tests start a program and call run nowhere else. What the guards do not hold:
 // a run in the process of the test is given its scratch folder, and the folder of that process is this
 // package's, in the real checkout. A generator that asked the process for its folder, where run is given one,
 // would find the real checkout there, and no guard looks at that: run must not ask, as the package comment of
@@ -583,7 +584,7 @@ func (r oracleRun) args(t testing.TB, outside string) []string {
 // run is of a folder that is none, with what the run lays and the folder the line is run in.
 func (r oracleRun) checkout(t testing.TB) checkout {
 	t.Helper()
-	c := checkout{t, t.TempDir()}
+	c := checkout{t: t, root: t.TempDir(), none: r.noCheckout}
 	if !r.noCheckout {
 		c.write("go.mod", moduleFile)
 	}
@@ -592,49 +593,6 @@ func (r oracleRun) checkout(t testing.TB) checkout {
 	}
 	c.folder(r.below)
 	return c
-}
-
-// modulePath is the path of this module, as a go.mod of any kind mentions it.
-const modulePath = "github.com/mdlsvensson/moonwell"
-
-// onlyItsOwnCheckout stops the test unless a generator that walks up from dir, the folder it is started in, can
-// find no checkout but the one of the run, whose folder is root, whichever go.mod it takes on its way. dir must
-// be root or lie below it. No go.mod above root may so much as mention this module: the test's temporary folder
-// may have been put inside a checkout, and a generator may walk past the go.mod it should stop at. And at or
-// above dir, up to root, a go.mod names this module exactly when the run is of a checkout. It holds nothing of a
-// generator that asks the process for its folder.
-func onlyItsOwnCheckout(t testing.TB, root, dir string, ofACheckout bool) {
-	t.Helper()
-	if below, err := filepath.Rel(root, dir); err != nil || !filepath.IsLocal(below) {
-		t.Fatalf("%s is not the folder of the run, %s, nor below it: nothing is started there", dir, root)
-		return
-	}
-	for above := filepath.Dir(root); ; above = filepath.Dir(above) {
-		data, err := os.ReadFile(filepath.Join(above, "go.mod"))
-		if err == nil && bytes.Contains(data, []byte(modulePath)) {
-			t.Fatalf("%s is inside a checkout, %s: a generator that is started there could write into it", root, above)
-			return
-		}
-		if above == filepath.Dir(above) {
-			break
-		}
-	}
-	if isCheckout := namesTheModuleUpTo(root, dir); isCheckout != ofACheckout {
-		t.Fatalf("at or above %s a go.mod names this module: %v; the run is of a checkout: %v",
-			dir, isCheckout, ofACheckout)
-	}
-}
-
-// namesTheModuleUpTo reports whether dir, or a folder above it up to root, has a go.mod that names this module.
-func namesTheModuleUpTo(root, dir string) bool {
-	for at := dir; ; at = filepath.Dir(at) {
-		if data, err := os.ReadFile(filepath.Join(at, "go.mod")); err == nil && moduleLine.Match(data) {
-			return true
-		}
-		if at == root || at == filepath.Dir(at) {
-			return false
-		}
-	}
 }
 
 // outcome is what one tree made of a run.
@@ -661,7 +619,7 @@ func (r oracleRun) madeBy(t testing.TB, carryOut func(c checkout) (code int, std
 
 // otherTree is the other tree's way to carry a run out: its generator is started with the line.
 func (o genOracle) otherTree(t testing.TB, r oracleRun, args []string) func(checkout) (int, string, string) {
-	return func(c checkout) (int, string, string) { return startIn(t, o.other, c.path(r.below), args...) }
+	return func(c checkout) (int, string, string) { return c.start(o.other, r.below, args...) }
 }
 
 // thisTree is this tree's way to carry a run out: through run, ended as main ends it, or, for a run of the
@@ -669,7 +627,7 @@ func (o genOracle) otherTree(t testing.TB, r oracleRun, args []string) func(chec
 func (o genOracle) thisTree(t testing.TB, r oracleRun, args []string) func(checkout) (int, string, string) {
 	return func(c checkout) (code int, stdout, stderr string) {
 		if r.asPrograms {
-			return startIn(t, o.this, c.path(r.below), args...)
+			return c.start(o.this, r.below, args...)
 		}
 		stdout, err := c.runBelow(r.below, args...)
 		stderr, code = ending(err)
@@ -1737,9 +1695,6 @@ var onTheGamesFiles = []exportRuns{
 		Modes:  map[string]int{"metadata": 2},
 	}},
 }
-
-// anotherModule is the go.mod of a module that is not this one.
-const anotherModule = "module example.com/other\n"
 
 // noCheckoutRuns is a line in two folders that are in no checkout: one without a go.mod, and one with the
 // go.mod of another module. What the folder holds afterwards is compared as a checkout's is.

@@ -1,0 +1,62 @@
+== moonwell assets:paths
+exit code: 0
+printed: nothing
+terminal:
+  library golems: Models/Golem.mdx
+  "  texture  Textures\\Golem.blp  custom path, imported"
+  assets/Models/Knight.mdx
+  "  texture         Textures\\Knight.blp   in-game path, replaced"
+  "  texture         team colour (slot 1)"
+  "  particle model  Abilities\\Heal.mdx    custom path, not imported"
+  2 models, 4 paths: 1 in-game, 1 custom imported, 1 custom not imported.
+left:
+  .moonwell/libraries/golems/.moonwell-library.json: present
+  .moonwell/libraries/golems/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes
+  .moonwell/library-assets/golems/Models/Golem.mdx: sha256 5c279d24b27bfbb5ac0c2d09c400f236951f192b66319434c370773b6205b735, 280 bytes
+  .moonwell/library-assets/golems/Textures/Golem.blp: sha256 dbc1b4c900ffe48d575b5da5c638040125f65db0fe3e24494b76ea986457d986, 1 bytes
+== moonwell assets:paths assets/Models/Knight.mdx
+exit code: 0
+printed: nothing
+terminal:
+  assets/Models/Knight.mdx
+  "  texture         Textures\\Knight.blp   in-game path, replaced"
+  "  texture         team colour (slot 1)"
+  "  particle model  Abilities\\Heal.mdx    custom path, not imported"
+  1 model, 3 paths: 1 in-game, 0 custom imported, 1 custom not imported.
+left:
+  .moonwell/libraries/golems/.moonwell-library.json: present
+  .moonwell/libraries/golems/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes
+  .moonwell/library-assets/golems/Models/Golem.mdx: sha256 5c279d24b27bfbb5ac0c2d09c400f236951f192b66319434c370773b6205b735, 280 bytes
+  .moonwell/library-assets/golems/Textures/Golem.blp: sha256 dbc1b4c900ffe48d575b5da5c638040125f65db0fe3e24494b76ea986457d986, 1 bytes
+== moonwell assets:paths drafts/knight.mdx
+exit code: 0
+printed: nothing
+terminal:
+  drafts/knight.mdx
+  "  texture         Textures\\Knight.blp   in-game path, replaced"
+  "  texture         team colour (slot 1)"
+  "  particle model  Abilities\\Heal.mdx    custom path, not imported"
+  1 model, 3 paths: 1 in-game, 0 custom imported, 1 custom not imported.
+left:
+  .moonwell/libraries/golems/.moonwell-library.json: present
+  .moonwell/libraries/golems/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes
+  .moonwell/library-assets/golems/Models/Golem.mdx: sha256 5c279d24b27bfbb5ac0c2d09c400f236951f192b66319434c370773b6205b735, 280 bytes
+  .moonwell/library-assets/golems/Textures/Golem.blp: sha256 dbc1b4c900ffe48d575b5da5c638040125f65db0fe3e24494b76ea986457d986, 1 bytes
+== moonwell assets:paths drafts/notes.mdl
+exit code: 1
+printed: nothing
+terminal: a complaint about drafts/notes.mdl
+left:
+  .moonwell/libraries/golems/.moonwell-library.json: present
+  .moonwell/libraries/golems/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes
+  .moonwell/library-assets/golems/Models/Golem.mdx: sha256 5c279d24b27bfbb5ac0c2d09c400f236951f192b66319434c370773b6205b735, 280 bytes
+  .moonwell/library-assets/golems/Textures/Golem.blp: sha256 dbc1b4c900ffe48d575b5da5c638040125f65db0fe3e24494b76ea986457d986, 1 bytes
+== moonwell assets:paths drafts/missing.mdx
+exit code: 1
+printed: nothing
+terminal: a complaint that names no file
+left:
+  .moonwell/libraries/golems/.moonwell-library.json: present
+  .moonwell/libraries/golems/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes
+  .moonwell/library-assets/golems/Models/Golem.mdx: sha256 5c279d24b27bfbb5ac0c2d09c400f236951f192b66319434c370773b6205b735, 280 bytes
+  .moonwell/library-assets/golems/Textures/Golem.blp: sha256 dbc1b4c900ffe48d575b5da5c638040125f65db0fe3e24494b76ea986457d986, 1 bytes

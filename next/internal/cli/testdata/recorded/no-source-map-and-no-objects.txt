@@ -1,0 +1,41 @@
+== moonwell build
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing
+== moonwell check
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing
+== moonwell setup
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+the cache has a bin folder: true
+left: nothing
+== moonwell objects:check
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing
+== moonwell objects:eval
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing
+== moonwell settings:check
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing
+== moonwell assets:check
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing
+== moonwell assets:sync
+exit code: 1
+printed: nothing
+terminal: a complaint about moonwell.local.pkl
+left: nothing

@@ -56,8 +56,9 @@ func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(
 		t.Errorf("the run printed\n%s\nwant\n%s", printed, miniReport)
 	}
 	first := texts(files)
-	if len(first) != 1 || first[metadataPath] == "" {
-		t.Fatalf("the run left %q, want the metadata alone", slices.Sorted(maps.Keys(first)))
+	beside := withGoMod(map[string]string{overridesPath: unitClassPins, metadataPath: first[metadataPath]})
+	if first[metadataPath] == "" || !maps.Equal(first, beside) {
+		t.Fatalf("the run left %q, want the metadata beside what the checkout held", slices.Sorted(maps.Keys(first)))
 	}
 	// One field and one standard object on a line keep the file small and its changes readable. "&" stands as it
 	// is: the file escapes no more than a JSON text must.
@@ -148,7 +149,7 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 		if c.kept != "" {
 			scratch.write(metadataPath, c.kept)
 		}
-		before := scratch.outputs()
+		before := scratch.all()
 		printed, files, err := scratch.run("metadata", c.folder, "3.0.0.2")
 		if err == nil {
 			t.Errorf("%s: the run wrote the metadata", name)
@@ -186,7 +187,7 @@ func TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn(t *testing.T) {
 	} {
 		scratch := newCheckout(t)
 		c.lay(scratch)
-		before := scratch.outputs()
+		before := scratch.all()
 		printed, files, err := scratch.run("metadata", folder, "3.0.0.1")
 		if err == nil || !strings.HasPrefix(err.Error(), c.starts) || strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: got %v, want a failure that starts with %q and holds no path of the checkout",

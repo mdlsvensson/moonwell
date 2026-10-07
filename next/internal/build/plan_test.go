@@ -424,7 +424,8 @@ func TestPlanWithKeepGeneratedLeavesTheIDsModuleAloneAndFailsForOneThatIsNotCurr
 			}
 			if tt.says == "" {
 				if err != nil || result == nil || !fsx.Exists(s.at(editor.TypesDir+"/objects.d.lua")) {
-					t.Errorf("Plan = %+v, %v, want a plan and the declarations", result, diag.Format(err))
+					// The error may be nil here, which diag.Format does not take.
+					t.Errorf("Plan = %+v, %v, want a plan and the declarations", result, err)
 				}
 				return
 			}

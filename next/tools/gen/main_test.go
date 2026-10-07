@@ -24,7 +24,7 @@ func TestRunRefusesAFirstArgumentThatNamesNoMode(t *testing.T) {
 	contains(t, err.Error(),
 		"Unknown mode 'nativs'", "The modes are natives, metadata and game-paths",
 		"without one, gen writes schema/generated")
-	if printed != "" || len(files) != 0 {
+	if printed != "" || !asNew(files) {
 		t.Errorf("the refused line printed %q and left %v", printed, slices.Sorted(maps.Keys(files)))
 	}
 }
@@ -76,7 +76,7 @@ func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
 		if err == nil || err.Error() != c.want {
 			t.Errorf("%q: got %v, want %q", c.args, err, c.want)
 		}
-		if printed != "" || len(files) != 0 {
+		if printed != "" || !asNew(files) {
 			t.Errorf("%q: the refused line printed %q and left %v", c.args, printed, slices.Sorted(maps.Keys(files)))
 		}
 	}
@@ -118,16 +118,12 @@ func TestTheTableStartsWithTheModeWithoutANameAndNamesEachModeOnce(t *testing.T)
 func TestRunRefusesAFolderThatIsInNoCheckout(t *testing.T) {
 	for name, module := range map[string]string{
 		"no go.mod":                "",
-		"another module":           "module example.com/other\n",
+		"another module":           anotherModule,
 		"a module below this one":  "module github.com/mdlsvensson/moonwell/next\n",
 		"the module in a comment":  "// module github.com/mdlsvensson/moonwell\nmodule example.com/other\n",
 		"the module as a requires": "module example.com/other\n\nrequire github.com/mdlsvensson/moonwell v1.0.0\n",
 	} {
-		dir := t.TempDir()
-		if module != "" {
-			testkit.WriteFile(t, dir, "go.mod", []byte(module))
-		}
-		printed, err := checkout{t, dir}.runBelow("", "no-such-mode")
+		printed, err := noCheckout(t, module).runBelow("", "no-such-mode")
 		if err == nil || !strings.Contains(err.Error(), "in a Moonwell checkout") {
 			t.Errorf("%s: got %v, want the refusal of a folder that is in no checkout", name, err)
 		}
@@ -187,16 +183,18 @@ func TestRunPassesOverTheGoModOfAnotherModuleOnItsWayUp(t *testing.T) {
 	}
 }
 
-// Of two checkouts, one inside the other, the run is in the nearer one, and the one above is left as it is.
+// Of two checkouts, one inside the other, the run is in the nearer one, and the one above is left as it is. The
+// two are one scratch folder to the helper that runs the line: it starts nothing in a scratch checkout that lies
+// inside another.
 func TestRunTakesTheNearerOfTwoCheckouts(t *testing.T) {
 	outer := newCheckout(t)
 	outer.write("data/metadata.json", metadataOfOneBuff(t, "fabo", "above"))
 	outer.write("schema/generated/Stray.pkl", "stray\n")
 	above := outer.outputs()
-	inner := checkout{t, outer.folder("inner")}
+	inner := checkout{t: t, root: outer.folder("inner")}
 	inner.write("go.mod", moduleFile)
 	inner.write("data/metadata.json", metadataOfOneBuff(t, "fnea", "nearer"))
-	if _, err := inner.runBelow("deeper"); err != nil {
+	if _, err := outer.runBelow("inner/deeper"); err != nil {
 		t.Fatal(err)
 	}
 	got := texts(inner.outputs())
@@ -255,16 +253,16 @@ func TestTheHelpersRunNoGeneratorInTheRealCheckout(t *testing.T) {
 	}
 	// The program is none that could be started, and the mode none that writes: a helper that went on would do
 	// nothing to the checkout either.
-	started := listenTo(t, func(tb testing.TB) { startIn(tb, "no-such-program", root) })
-	called := listenTo(t, func(tb testing.TB) { checkout{tb, root}.runBelow("", "no-such-mode") })
+	started := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.start("no-such-program", "") })
+	called := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.runBelow("", "no-such-mode") })
 	if !strings.Contains(started, refusal) || !strings.Contains(called, refusal) {
-		t.Errorf("startIn said %q and runBelow %q, want the refusal from both", started, called)
+		t.Errorf("start said %q and runBelow %q, want the refusal from both", started, called)
 	}
 	// runBelow makes the folder it runs in, and asks before it makes one: a folder that the real checkout has
 	// not is refused, and is not there afterwards.
 	const below = "next/tools/gen/no-such-folder"
 	made := filepath.Join(root, filepath.FromSlash(below))
-	refused := listenTo(t, func(tb testing.TB) { checkout{tb, root}.runBelow(below, "no-such-mode") })
+	refused := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.runBelow(below, "no-such-mode") })
 	if !strings.Contains(refused, refusal) {
 		t.Errorf("runBelow said %q of a new folder of the real checkout, want the refusal", refused)
 	}
@@ -272,6 +270,78 @@ func TestTheHelpersRunNoGeneratorInTheRealCheckout(t *testing.T) {
 		t.Errorf("runBelow made %s in the real checkout before it refused the folder", below)
 		if err := os.Remove(made); err != nil {
 			t.Error(err)
+		}
+	}
+}
+
+// The folder a generator is started in: nothing is started where a generator that walks up from that folder
+// could find a checkout that is not the run's own.
+func TestNothingIsStartedWhereAnotherCheckoutCouldBeFound(t *testing.T) {
+	const (
+		mentioned = "module example.com/other\n\nrequire " + modulePath + " v1.0.0\n"
+		// Words of the three refusals.
+		inside   = "is inside a checkout"
+		unnamed  = "names this module: false"
+		notBelow = "nor below it"
+	)
+	for name, c := range map[string]struct {
+		above     string // the go.mod of the folder above the run's; "" for none
+		own       string // the go.mod of the run's folder; "" for none
+		below     string // where the line is run, from the run's folder
+		elsewhere bool   // the line is run in a folder that is not the run's
+		ofOne     bool   // the run is of a checkout
+		refused   string // words of the refusal; "" for a folder in which a run may start
+	}{
+		"a checkout":                              {own: moduleFile, ofOne: true},
+		"a folder below a checkout":               {own: moduleFile, below: "tools/gen", ofOne: true},
+		"a folder that is no checkout":            {},
+		"a folder of another module":              {own: anotherModule},
+		"another module above":                    {above: anotherModule, own: moduleFile, ofOne: true},
+		"a checkout above a checkout":             {above: moduleFile, own: moduleFile, ofOne: true, refused: inside},
+		"a checkout above a folder that is none":  {above: moduleFile, refused: inside},
+		"a mention of the module above":           {above: mentioned, own: moduleFile, ofOne: true, refused: inside},
+		"a checkout where the run is of none":     {own: moduleFile, refused: "names this module: true"},
+		"no checkout where the run is of one":     {below: "tools", ofOne: true, refused: unnamed},
+		"another module where the run is of one":  {own: anotherModule, ofOne: true, refused: unnamed},
+		"a folder that is not the run's":          {own: moduleFile, elsewhere: true, ofOne: true, refused: notBelow},
+		"a folder above the run's, by two points": {own: moduleFile, below: "..", ofOne: true, refused: notBelow},
+	} {
+		outer := checkout{t: t, root: t.TempDir()}
+		root, dir := outer.folder("above/run"), outer.folder("above/run/"+c.below)
+		if c.elsewhere {
+			dir = outer.folder("above/other")
+		}
+		for at, text := range map[string]string{"above/go.mod": c.above, "above/run/go.mod": c.own} {
+			if text != "" {
+				outer.write(at, text)
+			}
+		}
+		heard := listenTo(t, func(tb testing.TB) { onlyItsOwnCheckout(tb, root, dir, c.ofOne) })
+		if (heard == "") != (c.refused == "") || !strings.Contains(heard, c.refused) {
+			t.Errorf("%s: the guard said %q, want the words %q", name, heard, c.refused)
+		}
+	}
+}
+
+// Both helpers that start a generator stand behind that guard: neither starts one in a scratch checkout that
+// lies inside another, nor in a scratch folder whose kind is not the one the test made it as.
+func TestTheHelpersStartNoGeneratorWhereAnotherCheckoutCouldBeFound(t *testing.T) {
+	outer := newCheckout(t)
+	inner := checkout{t: t, root: outer.folder("inner")}
+	inner.write("go.mod", moduleFile)
+	lost := noCheckout(t, moduleFile)
+	for name, c := range map[string]struct {
+		in      checkout
+		refused string // words of the refusal
+	}{
+		"a checkout inside a checkout":        {inner, "is inside a checkout"},
+		"a checkout where the run is of none": {lost, "names this module: true"},
+	} {
+		heardBy := func(tb testing.TB) checkout { return checkout{t: tb, root: c.in.root, none: c.in.none} }
+		started := listenTo(t, func(tb testing.TB) { heardBy(tb).start("no-such-program", "") })
+		called := listenTo(t, func(tb testing.TB) { heardBy(tb).runBelow("", "no-such-mode") })
+		if !strings.Contains(started, c.refused) || !strings.Contains(called, c.refused) {
+			t.Errorf("%s: start said %q and runBelow %q, want the words %q from both", name, started, called, c.refused)
 		}
 	}
 }
@@ -289,7 +359,7 @@ func TestTheProgramPrintsToStandardOutputAndComplainsOnStandardError(t *testing.
 	c.folder("data")
 	list := exported(t, "listfile.txt", "war3.w3mod:Units/Human/Footman/Footman.mdx\n")
 
-	code, stdout, stderr := startIn(t, program, c.root, "game-paths", list, "2.0.0")
+	code, stdout, stderr := c.start(program, "", "game-paths", list, "2.0.0")
 	if code != 0 || stdout != "wrote data/game-paths.txt: 1 paths.\n" || stderr != "" {
 		t.Errorf("a line that is carried out: exit %d; stdout %q; stderr %q", code, stdout, stderr)
 	}
@@ -298,7 +368,7 @@ func TestTheProgramPrintsToStandardOutputAndComplainsOnStandardError(t *testing.
 		t.Errorf("a line that is carried out left %q in the checkout it was started in", got)
 	}
 
-	code, stdout, stderr = startIn(t, program, c.root, "game-paths", list)
+	code, stdout, stderr = c.start(program, "", "game-paths", list)
 	if code != 1 || stdout != "" {
 		t.Errorf("a line that is refused: exit %d; stdout %q; stderr %q", code, stdout, stderr)
 	}

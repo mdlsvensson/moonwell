@@ -1,0 +1,80 @@
+== moonwell setup
+exit code: 0
+printed: nothing
+terminal:
+  Created moonwell.local.pkl. Check that launch.gameExecutable points at your Warcraft III.exe.
+  YueScript 0.34.3: <reason>
+  Copied YueScript for the editor to <reason>.
+  Added yueconfig.yue for the editor.
+  Added .vscode/extensions.json for the editor.
+  Added .gitignore (.moonwell/, src/**/*.lua) for the editor.
+  Added src/?.lua, src/?/init.lua, lua/?.lua, lua/?/init.lua, .moonwell/types, .moonwell/lua, dist, maps, .moonwell/libraries to .luarc.json.
+the cache has a bin folder: true
+left:
+  .gitignore:
+    "dist/\n"
+    "moonwell.local.pkl\n"
+    ".pkl-lsp/\n"
+    ".moonwell/\n"
+    "src/**/*.lua\n"
+  .luarc.json:
+    "{\n"
+    "  \"runtime.version\": \"Lua 5.3\",\n"
+    "  \"workspace.library\": [\n"
+    "    \"mine\",\n"
+    "    \".moonwell/types\",\n"
+    "    \".moonwell/lua\"\n"
+    "  ],\n"
+    "  \"runtime.path\": [\n"
+    "    \"src/?.lua\",\n"
+    "    \"src/?/init.lua\",\n"
+    "    \"lua/?.lua\",\n"
+    "    \"lua/?/init.lua\"\n"
+    "  ],\n"
+    "  \"workspace.ignoreDir\": [\n"
+    "    \"dist\",\n"
+    "    \"maps\",\n"
+    "    \".moonwell/libraries\"\n"
+    "  ]\n"
+    "}\n"
+  .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
+  .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
+  .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
+  .moonwell/types/objects.d.lua: sha256 66c0492cebd8687e1ec970ffe4498278c1ee6b48cf30b041159608a6de2bd648, 844 bytes
+  .moonwell/yue/moonwell/macros.yue: sha256 83cd73684e80ab9abef8d64453ac975399c6a2df25e5118d2580e2ec79317713, 1124 bytes
+  .vscode/extensions.json:
+    "{\n"
+    "  \"recommendations\": [\"LiJin.yuescript\", \"sumneko.lua\"]\n"
+    "}\n"
+  moonwell.local.pkl:
+    "// Settings for this machine only. Git-ignored, so each checkout has its own; `moonwell setup` recreates it.\n"
+    "// It amends moonwell.pkl, so anything set here overrides the shared manifest.\n"
+    "\n"
+    "amends \"moonwell.pkl\"\n"
+    "\n"
+    "launch {\n"
+    "  gameExecutable = \"C:\\\\Program Files (x86)\\\\Warcraft III\\\\_retail_\\\\x86_64\\\\Warcraft III.exe\"  // your Warcraft III.exe\n"
+    "}\n"
+  yueconfig.yue:
+    "-- Read by VS Code's YueScript extension (LiJin.yuescript). Moonwell builds from src/ on its own; these settings only\n"
+    "-- drive the editor. See \"Editor setup\" in Moonwell's README.\n"
+    "return\n"
+    "  -- Write src/**/*.lua when a .yue file is saved, keeping its line numbers and comments: the extension needs all\n"
+    "  -- three for lua-language-server. The .lua files are git-ignored and never used by builds.\n"
+    "  build: true\n"
+    "  reserve_line_number: true\n"
+    "  reserve_comment: true\n"
+    "  -- Unknown globals are reported by lua-language-server, from .moonwell/types, and by `moonwell check`.\n"
+    "  lint_global: false\n"
+    "  -- Where `import \"moonwell.macros\"` is found; Moonwell writes that folder.\n"
+    "  include:\n"
+    "    - \".moonwell/yue\"\n"
+    "  options:\n"
+    "    target: \"5.3\"\n"
+== and then moonwell setup
+exit code: 0
+printed: nothing
+terminal:
+  YueScript 0.34.3: <reason>
+the cache has a bin folder: true
+left: nothing

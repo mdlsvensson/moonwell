@@ -1,0 +1,71 @@
+== moonwell assets:paths knight.mdx
+exit code: 0
+printed: nothing
+terminal:
+  knight.mdx
+  "  texture         Textures\\Knight.blp   in-game path"
+  "  texture         team colour (slot 1)"
+  "  particle model  Abilities\\Heal.mdx    custom path"
+  1 model, 3 paths: 1 in-game, 1 custom.
+left: nothing
+== moonwell assets:paths
+exit code: 1
+printed: nothing
+terminal: a complaint that names no file
+left: nothing
+== moonwell assets:paths missing.mdx
+exit code: 1
+printed: nothing
+terminal: a complaint that names no file
+left: nothing
+== moonwell assets:paths notes.mdx
+exit code: 1
+printed: nothing
+terminal: a complaint about notes.mdx
+left: nothing
+== moonwell build
+exit code: 1
+printed: nothing
+terminal: a complaint about <root>
+left: nothing
+== moonwell setup
+exit code: 1
+printed: nothing
+terminal: a complaint about <root>
+the cache has a bin folder: false
+left: nothing
+== moonwell dev
+exit code: 1
+printed: nothing
+terminal: a complaint about <root>
+left: nothing
+== moonwell assets:sync
+exit code: 1
+printed: nothing
+terminal: a complaint about <root>
+left: nothing
+== moonwell objects:eval
+exit code: 1
+printed: nothing
+terminal: a complaint about <root>
+left: nothing
+== moonwell init
+exit code: 1
+printed: nothing
+terminal: a complaint that names no file
+left: nothing
+== moonwell init full
+exit code: 1
+printed: nothing
+terminal: a complaint that names no file
+left: nothing
+== moonwell init afile
+exit code: 1
+printed: nothing
+terminal: a complaint that names no file
+left: nothing
+== moonwell init new --link
+exit code: 1
+printed: nothing
+terminal: a complaint that names no file
+left: nothing

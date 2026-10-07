@@ -1,0 +1,10 @@
+== moonwell check
+exit code: 1
+printed: nothing
+terminal: a complaint about src/generated/objects.yue
+left: nothing
+== moonwell objects:check
+exit code: 1
+printed: nothing
+terminal: a complaint about src/generated/objects.yue
+left: nothing

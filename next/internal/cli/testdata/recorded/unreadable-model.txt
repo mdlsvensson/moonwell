@@ -1,0 +1,5 @@
+== moonwell assets:paths
+exit code: 1
+printed: nothing
+terminal: a complaint that names no file
+left: nothing
