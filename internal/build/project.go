@@ -196,11 +196,12 @@ func Assets(p *manifest.Project, synced []library.Synced) (found []assets.Asset,
 	return assets.Collect(p.Root, p.Assets, manifest.SharedFile, shipping)
 }
 
-// shippingLibraries is the libraries that ship files for the map, each with the folder of those files. The way
-// to the folder is checked from the project folder, so a link on it is refused: .moonwell as a link, or the
-// folder itself. The folder is then named as the project folder is, with the library's path joined to it, and not
-// by the place fsx.Inside gives: assets.Collect names a library's folder from the project folder in its errors,
-// which it can for a project folder of any form only when both are of that form.
+// shippingLibraries is the libraries that ship files for the map, each with the folder of those files. A link
+// on the way to it from the project folder is refused, by fsx.Inside: .moonwell as a link, or the folder itself.
+//
+// The folder is root with the library's path joined to it, and not the place fsx.Inside returns, which is a
+// full path also when root is not one. assets.Collect names a library's folder in its errors by its path from
+// root, and finds that path only when both are full paths or neither is.
 func shippingLibraries(root string, synced []library.Synced) ([]assets.Library, error) {
 	var shipping []assets.Library
 	for _, lib := range synced {

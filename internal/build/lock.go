@@ -14,9 +14,10 @@ import (
 // lockName is the build lock, from the project folder.
 const lockName = distDir + "/.lock"
 
-// holding is one taking of a lock: what the list keeps for the lock's file. A release gives back the lock only
-// while the list keeps the holding of its own call, so it never removes a lock that a later call took at the
-// same place. A holding has a size, so that two of them are never one pointer.
+// holding is one taking of a lock: each call of TakeLock makes its own, and the list keeps it for the lock's
+// file. A release gives the lock back only while the list keeps the holding of its own call, so it never removes
+// a lock that a later call took at the same place. Holdings are told apart as pointers, and Go lets two pointers
+// to values without a size be equal: so a holding has a size, which its field gives it.
 type holding struct {
 	file string // the lock file's place on disk
 }

@@ -15,7 +15,9 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// This file holds the steps of Plan that are more than one call, in the order Plan takes them.
+// This file holds the steps of Plan that are more than one call, in the order Plan takes them. Three of its
+// functions are also doors for package cli, whose commands take a step alone: RefreshDeclarations, ModuleFolders
+// and PlanAssets.
 
 // writeGenerated writes what the gameplay and the editor read beside the sources: the ids module,
 // src/generated/objects.yue, then the editor's declarations in .moonwell/types, and then the macro module in

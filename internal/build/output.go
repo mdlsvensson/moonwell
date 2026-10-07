@@ -9,6 +9,16 @@ import (
 )
 
 // This file holds the places Moonwell writes what it builds: real folders of the project.
+//
+// From a value of the manifest to a place on disk there are five steps, each with its function:
+//
+//  1. the value, map.folder or build.folder: mapFolder (project.go), buildFolder (archive.go);
+//  2. its parts, split at "/" and "\", or the fault that makes it no folder: readFolder (project.go);
+//  3. the place, a path on disk and a label for messages: placeOf, called by stagePlace and archiveOf;
+//  4. a link on the way to the place, or at it, which is refused: outputAt, with linkOnTheWay to name it;
+//  5. a file where a folder on the way belongs, which is refused: fileOnTheWay.
+//
+// placeOf takes steps 4 and 5. A place that no value names, such as dist/.lock, starts at step 4.
 
 const (
 	// distDir is the folder of a project that Moonwell writes what it builds into, from the project folder.
@@ -17,14 +27,14 @@ const (
 	stageDir = distDir + "/stage"
 )
 
-// outputAt is the way to every place Moonwell writes what it builds: relative is the place from the project
-// folder, with "/", such as dist/.lock. Nothing need be at the place.
+// outputAt gives the path on disk of any place Moonwell writes what it builds to, and refuses a link on the way
+// to it or at it: what a build writes, and what it removes to write it, stays in the project. relative is the
+// place from the project folder, with "/", such as dist/.lock. Nothing need be at it.
 //
-// The place is reached with fsx.Inside, so every folder on the way to it is a real folder of the project, the
-// first too: what a build writes, and what it removes to write it, stays in the project. A link on the way, or
-// at the place, is refused in words of this package's own, since what fsx.Inside says of a link is said of files
-// the user keeps, and these are Moonwell's to make. fsx.Inside's other refusals are passed on: a path that leaves
-// the project, a name Windows cannot hold, and a way the system cannot look at.
+// The way is looked at with fsx.Inside, every folder on it, the first too. A link is refused in words of this
+// package's own, since what fsx.Inside says of a link is said of files the user keeps, and these are Moonwell's
+// to make. fsx.Inside's other refusals are passed on: a path that leaves the project, a name Windows cannot
+// hold, and a way the system cannot look at.
 func outputAt(root, relative string) (string, error) {
 	place, err := fsx.Inside(root, relative)
 	if err == nil {

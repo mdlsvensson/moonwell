@@ -29,12 +29,12 @@ func stage(e *env.Env, p *manifest.Project, plan *Result) (place, error) {
 // stagePlace is where the project's map is staged: dist/stage/<map.folder>, a folder named as the source map
 // is, since the game loads a map that is a folder by its .w3x name.
 //
-// A map folder below lua/ has its stage in the folder of the compile's cache, dist/stage/lua, and neither
-// touches what the other wrote. A map's folder ends in .w3x, as the schema has it, and nothing of the cache is
-// named so: the cache holds .hashes.json, .globals.json and one .lua for each module, below the folders of the
-// module's name and, for a library's module, below .libraries and the library's key; a folder of a module's name
-// holds no dot, and a key is letters, digits, "_" and "-". The compile removes the files it wrote, each by its
-// name, and staging replaces the stage's own folder.
+// One corner: a map folder below lua/, such as lua/one.w3x, has its stage inside the folder of the compile's
+// cache, dist/stage/lua. Neither touches what the other wrote, because a map's folder ends in .w3x, as the
+// schema has it, and nothing of the cache is named so. The cache holds .hashes.json, .globals.json and one .lua
+// for each module, below the folders of the module's name, which hold no dot, and for a library's module below
+// .libraries and the library's key, which is letters, digits, "_" and "-". And each clears only its own: the
+// compile removes the files it wrote, each by its name, and staging replaces the stage's own folder.
 func stagePlace(p *manifest.Project) (place, error) {
 	folder, err := mapFolder(p)
 	if err != nil {

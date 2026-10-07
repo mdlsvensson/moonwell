@@ -222,9 +222,9 @@ type compiler struct {
 	search  string // the --path that finds the macro module
 }
 
-// eachOf does the work on every item, at most atOnce at a time, and returns what each gave, in the order of the
-// items. After an error no further work is started, the work that runs is waited for, and the first error is
-// returned.
+// eachOf is a pool of at most eight workers (atOnce): it does the work on every item, that many at a time, and
+// returns what each gave, in the order of the items. After an error no further work is started, the work that
+// runs is waited for, and the first error is returned.
 //
 // Only this function's own goroutine reads and writes what it counts and gathers; the work on an item hands
 // over what it gave on the channel and touches nothing else that is shared. The function returns when all the

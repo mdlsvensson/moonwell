@@ -233,8 +233,8 @@ func heed(interrupts <-chan os.Signal, cancel, leave func()) {
 // 130, without waiting for the command. The locks come first: nothing of the program runs after the exit, the
 // command's own deferred release neither, and a lock that stays is taken for a build that runs.
 //
-// exit is how the program leaves, os.Exit, or a test's stand-in for it. The release is not handed in: it is what
-// a test of this function holds, and so is not to be left out by its caller.
+// exit is how the program leaves: os.Exit, or a test's stand-in for it. The release is no parameter: it is
+// called here, so that the test of this function holds it and a caller cannot leave it out.
 func leaveAtOnce(exit func(int)) func() {
 	return func() {
 		build.ReleaseHeld()

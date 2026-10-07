@@ -31,6 +31,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
+// Three values in this file hold the Lua of YueScript modules, each for a reason. A reader reads a module's Lua
+// from dist/stage/lua once, and keeps it. A Compiled holds what CompileSources read, the Lua of the libraries'
+// modules, and never changes after: an editor's view of the libraries is made from it, also when Link fails. So
+// a Link reads into a reader of its own, which starts as a copy of the Compiled's Lua, and adds the project's
+// modules that the entry reaches. A Program holds what that reader ended with.
+
 // Input is what a compile is made from.
 type Input struct {
 	Compiler  string // the compiler to run, as its path
@@ -64,12 +70,12 @@ type Program struct {
 	lua map[string]string // the Lua of each YueScript module that the compile read and that has some, by its path
 }
 
-// Lua returns a module as Lua; ok is false for a module that has none.
+// Lua returns a module as Lua. A Lua module is its own text, whichever module it is. A YueScript module is what
+// the compiler wrote for it, when the entry reaches it or it is a library's, reached or not: those are the
+// modules whose Lua the compile read.
 //
-// A Lua module is its own text, whichever module it is. A YueScript module is what the compiler wrote for it,
-// for the modules whose Lua the compile read: those the entry reaches, and every module of a library, reached or
-// not. For any other YueScript module ok is false: for a module of the project that the entry does not reach,
-// for a module that is not among Sources, and for a source without code, which the compiler writes no Lua for.
+// ok is false for any other YueScript module: one of the project that the entry does not reach, one that is not
+// among Sources, and a source without code, which the compiler writes no Lua for.
 func (p *Program) Lua(source Source) (text string, ok bool) {
 	if source.Kind == Lua {
 		return source.Text, true
@@ -91,13 +97,13 @@ type Compiled struct {
 	none   map[string]bool   // the YueScript modules of a library that have none, by the same path
 }
 
-// Lua returns a module as Lua; ok is false for a module that has none.
+// Lua returns a module as Lua, as Program.Lua does, without what a Link reads: a YueScript module of the
+// project's own has none here, since its Lua is read when Link follows the requires to it. A Lua module is its
+// own text, whichever module it is; a library's YueScript module is what the compiler wrote for it, reached or not.
 //
-// A Lua module is its own text, whichever module it is. A YueScript module of a library is what the compiler
-// wrote for it, whether the entry reaches it or not. For any other YueScript module ok is false: for a module of
-// the project's own, whose Lua is read when Link follows the requires to it, for a module that is not among
-// Sources, and for a source without code, which the compiler writes no Lua for. Nothing is read, and a Link
-// changes no answer: for a module of a library, the Program of that Link answers the same.
+// ok is false for any other YueScript module: one of the project's own, one that is not among Sources, and a
+// source without code, which the compiler writes no Lua for. Nothing is read, and a Link changes no answer: for
+// a module of a library, the Program of that Link answers the same.
 func (c *Compiled) Lua(source Source) (text string, ok bool) {
 	if source.Kind == Lua {
 		return source.Text, true
