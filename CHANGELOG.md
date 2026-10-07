@@ -8,6 +8,11 @@
 - **To move a project to this version,** install it (run the install line again), set `moonwell@0.10.0` in
   `PklProject` and run `pkl project resolve`. The program refuses a project that is still on a 0.9 package, and
   says so. The caches under `dist/` and `.moonwell/` are built anew by the first command.
+- **Known issue with Warcraft III 3.0.1 (build 24342, 2026-10-07): `moonwell test` starts the game, and the game
+  shows its main menu.** That version of the game no longer loads a map that is a folder when it is started with
+  `-loadfile`, which is what `test` does; a packed map still loads. 0.9.1 behaves the same. Until 0.10.1 changes
+  `test`, run `moonwell build` and start the game on the packed map:
+  `& "<your Warcraft III.exe>" -launch -windowmode windowed -loadfile "<project>\dist\bin\map.w3x"`.
 - **In nearly every project nothing else has to change.** A project that built with 0.9.1 is refused now, with an
   error that names what to put right, where it has a link or a Windows junction at `dist`, `src` or `lua`; a link,
   two names that differ only in letter case, or a name Windows cannot hold in its map, its assets or a library; or
@@ -181,6 +186,22 @@ Libraries:
 - The messages about downloading YueScript and Pkl name the tool in the same way. When several files fail to
   compile, the first by the bytes of its path is named.
 - An empty `HOME` counts as not set when the cache folder is chosen.
+
+### Release gate
+
+Run 2026-10-07 on Windows. Steps 1, 2 and 15 (CONTRIBUTING) passed, and CI passed on Ubuntu and Windows with the
+race job. Steps 3 to 13 were not played through in the game. In their place the project of each step was made and
+built with the 0.9.1 program and with this one: 12 projects, 70 commands with each. No printed line and no exit code
+differs, and every staged file, source map, `moonwell.lock`, `.asset-state/` and file for the editor is the same
+byte for byte. The packed map differs in the order of its files alone. Step 14 (Ctrl+C twice during a build) was
+run 34 times by a harness: the lock was gone every time, the next build ran, and no cut archive was left. While an
+archive of 150 MB is being written, the command ends up to a second and a half after the second Ctrl+C.
+
+In the game, Warcraft III 3.0.1 (build 24342), which arrived during the gate: a map with the objects of step 9, the
+Lua modules of step 12, the settings of step 8, the asset of step 7 and the preview of step 13, packed by this
+version, loads from its archive and runs, and its lines show. `moonwell test` starts the game with the right
+command line and the game's window stays open, but the game shows its menu: the known issue above. The packed map
+was not opened in World Editor. The online and desync checks are deferred, not passed.
 
 ## 0.9.1 (2026-10-03)
 
