@@ -11,12 +11,24 @@ back to.
 
 Moonwell is one program, `moonwell`, that builds a Warcraft III map from a project folder. A project holds a map
 that World Editor saved as a folder (the source map), gameplay code in YueScript and Lua, custom objects and map
-settings written in Pkl, and files to import. `moonwell build` evaluates the project's manifest (`moonwell.pkl`) with
-Pkl, compiles the gameplay to Lua with the YueScript compiler, and works out every file of the map that has to
-change: the object data, the map settings, the imported files, and the map's script with the gameplay added at its
-end. It writes the changed map as a folder below `dist/stage/` and packs that into one `.w3x` archive. The source map
-is only read. The other commands are parts of this: `check` works everything out and writes no map, `test` writes
-the folder and starts the game on it, `dev` checks again on every save.
+settings written in Pkl, and files to import. `moonwell build` evaluates the project's manifest with Pkl (the
+manifest is `moonwell.pkl`, or `moonwell.local.pkl`, which amends it, where a project has one), compiles the gameplay
+to Lua with the YueScript compiler, and works out every file of the map that has to change: the object data, the map
+settings, the imported files, and the map's script with the gameplay added at its end. It writes the changed map as a
+folder, `dist/stage/<map.folder>`, and packs that into one `.w3x` archive. The source map is only read. The other
+commands are parts of this: `check` works everything out and writes no map, `test` writes the folder and starts the
+game on it, `dev` checks again on every save.
+
+Four words of a project come back all through this document:
+
+- The **source map** is `maps/<map.folder>`, the map as World Editor saved it. No build writes into it.
+- The **stage** is `dist/stage/<map.folder>`, the built map as a folder. This document says "stage" of that folder
+  only. (`dist/stage/lua`, beside it, is where the compiler's output is kept; it is called the compile's cache
+  here.)
+- The **entry** is the module that `map.entry` names, `src/main.yue` in a new project: where the gameplay starts.
+  What goes into the map is the entry and every module it reaches through `import` and `require`.
+- The **bundle** is the one block of Lua that a build adds to the end of the map's script: Moonwell's runtime and
+  those modules.
 
 ## The repository
 
@@ -39,7 +51,8 @@ the folder and starts the game on it, `dev` checks again on every save.
 - `install.ps1` and `install.sh`: the install scripts a release serves.
 - The test files at the root (`layout_test.go`, `module_test.go`, `schema_test.go`, `install_test.go`,
   `documents_test.go`) are tests of the repository as a whole: what may import what, that no dependency crept in,
-  that the version is the same everywhere, that the install scripts work, that this document names real files.
+  that the version is the same everywhere, that the install scripts work, that this document names real files and
+  quotes `Plan` as the source has it.
 
 The module is `github.com/mdlsvensson/moonwell` and uses the Go standard library only: `go.mod` has no `require`
 line.
@@ -52,7 +65,7 @@ the shelves below its own and never from a shelf above. To find where something 
 ```
                 cmd/moonwell
                      |
-  commands          cli             reads the command line, calls one door, prints, sets the exit code
+  commands          cli             reads the command line, calls build or an area, prints, sets the exit code
                      |
   the build        build            the one package that knows the order of a build
                      |
@@ -63,15 +76,16 @@ the shelves below its own and never from a shelf above. To find where something 
   and formats      war3/w3i  war3/objmod  war3/imp  war3/mpq  war3/model  war3/picture  war3/lua  war3/txt
 ```
 
-Three words are used throughout the code and this document:
+Three words for the packages:
 
 - An **area** is a package with one job in a build, such as the custom objects or the imported files.
 - A **foundation** is a package that knows nothing of a build: files, errors, a map folder, the manifest.
 - A **door** is an exported function that other packages call. A package has few of them, and the file that holds
   the main one also holds the package comment.
 
-Every package opens with a comment of four parts: what the package does, what it takes and returns, what it must
-not know, and what it imports. `go doc ./internal/build` prints it. Read that comment before the code of a package.
+Every package opens with a comment of three or four parts: what the package does, what it takes and returns, what
+it must not know, and, where it imports a package of Moonwell, which. `go doc ./internal/build` prints it. Read that
+comment before the code of a package.
 
 ### Commands
 
@@ -102,7 +116,7 @@ not know, and what it imports. `go doc ./internal/build` prints it. Read that co
 | Package | What it does |
 | --- | --- |
 | `internal/manifest` | A project as Go values, the mirror of `schema/`. It runs `pkl eval` on the manifest and decodes the JSON, checks that the project's Pkl package is of the program's version, and holds the `PklProject` and `moonwell.local.pkl` a new project gets. |
-| `internal/mapdir` | A map saved as a folder. It scans the folder once, finds a file in any letter case, holds planned changes as a view, and writes a view to the stage or into the folder. |
+| `internal/mapdir` | A map saved as a folder. It scans the folder once, finds a file in any letter case, holds planned changes as a view (the folder with the changes laid over it, and nothing written yet), and writes a view to the stage or into the folder. |
 | `internal/env` | The outside world as one struct, `Env`: running a program, downloading an address, starting the game, the logger, the cache folder, the platform. |
 | `internal/diag` | The expected failure (`Error`, `Problems`), the one function that turns any error into what a user reads (`Format`), and "did you mean". |
 | `internal/fsx` | File helpers: listing, copying and removing, a path that must stay inside its folder, a journal of writes that can be undone, and the rules for text (the byte order mark, ASCII white space). |
@@ -143,9 +157,12 @@ A format package takes bytes and returns bytes or values. It knows nothing of pr
 - A format may import other formats, and `diag`, `fsx` and `binio`.
 - Only `internal/env` imports `os/exec` and `net/http`, the two packages of the standard library that start a
   program and reach the network. (`internal/fsx` is let off for `os/exec`: it names one error type of it and starts
-  nothing.)
+  nothing.) Test files and the two test-only packages may import both: `internal/testkit/tools.go` looks for `pkl`
+  with `os/exec`.
 - The two test-only packages are imported by test files alone. A test file follows the rule of its package, and may
   also import its own package and the two test-only packages.
+- The root package is under no rule. A package below `internal/` may import it for the embedded files and the
+  version: `cli`, `manifest`, `objects`, `script`, `assets` and `editor` do.
 - Nothing outside `tools/` imports a package below `tools/`. The generator may import `internal/objects`,
   `internal/script`, `internal/assets`, `internal/manifest`, `internal/fsx`, the root package and its own parsers.
   A parser imports nothing of the module.
@@ -153,8 +170,8 @@ A format package takes bytes and returns bytes or values. It knows nothing of pr
 `layout_test.go` is the proof. It reads the imports of every Go file below `internal/`, `cmd/` and `tools/` and
 fails for each import that breaks a rule, and for a package that is on no shelf. The rules are data at the top of
 that file (`foundations`, `areas`, `belowFormats`, `testOnly`, `outsideWorld`, `generatorMay`) and one function,
-`allowed`. The root package's own files, `embed.go` and `version.go`, are outside its rules: the test does not read
-them, and they import nothing of the module.
+`allowed`. The root package's own files, `embed.go` and `version.go`, are outside its rules too: the test does not
+read them, and they import nothing of the module.
 
 A new package is added to that file, on its shelf, and to the tables above.
 
@@ -190,13 +207,15 @@ The command table and where each command goes:
 | `dev` | `runDev` in `internal/cli/dev.go` | `build.Dev` |
 | `init` | `runInit` in `internal/cli/initcmd.go` | writes the template's files and runs `pkl project resolve` |
 | `setup` | `runSetup` in `internal/cli/setup.go` | Pkl, the manifest, the compiler, the editor's files, the libraries |
-| `assets:check`, `assets:sync` | `importAssets` in `internal/cli/assets.go` | `build.Load`, `build.Source`, `library.Sync`, `build.PlanAssets`, and for a sync `assets.Sync` |
-| `assets:paths` | `assetsPaths` in `internal/cli/assetspaths.go` | `assets.ReportModels` |
+| `assets:check`, `assets:sync` | `runAssetsCheck` and `runAssetsSync`, each one call of `importAssets` in `internal/cli/assets.go` | `build.Load`, `build.Source`, `library.Sync`, `build.PlanAssets`, and for a sync `assets.Sync` |
+| `assets:paths` | `runAssetsPaths`, which calls `assetsPaths` in `internal/cli/assetspaths.go` | in a project `build.Load`, `library.Sync` and `build.Assets`; then `assets.ReportModels` |
 | `settings:check` | `runSettingsCheck` in `internal/cli/settings.go` | `build.Load`, `build.Source`, `settings.Plan` |
-| `objects:check`, `objects:eval` | `planObjects` in `internal/cli/objects.go` | `build.Load`, `build.Source`, `objects.Plan` |
+| `objects:check`, `objects:eval` | `runObjectsCheck` and `runObjectsEval`, which both start with `planObjects` in `internal/cli/objects.go` | `build.Load`, `build.Source`, `objects.Plan` |
 
-The four commands that plan a whole build are one call of a door of `internal/build`. Every other command opens the
-project the way a build does, with `build.Load` and `build.Source`, and then calls the one area it is about.
+The four commands that plan a whole build are one call of a door of `internal/build`. The commands about one area
+(`assets:check`, `assets:sync`, `settings:check`, `objects:check`, `objects:eval`) open the project the way a build
+does, with `build.Load` and `build.Source`, and then call that area. `init`, `setup` and `assets:paths` have steps
+of their own, as the table says.
 
 ## The build, step by step
 
@@ -212,8 +231,9 @@ project the way a build does, with `build.Load` and `build.Source`, and then cal
 5. `stage` writes the planned map to `dist/stage/<map.folder>`.
 6. `packInto` packs the planned map into an archive and writes it.
 
-`Test` is steps 1, 2, 4 and 5, and then starts the game on the staged folder. `Check` is steps 1, 2 and 4, and then
-says what the plan holds. `Dev` is `Check` again and again. So the order of a build is written once, in `Plan`.
+`Test` is steps 1, 2, 4 and 5, and then starts the game on the stage. `Check` is steps 1, 2 and 4, and then says
+what the plan holds. `Dev` is that check again and again, with the ids module written as a build writes it. So the
+order of a build is written once, in `Plan`.
 
 ### `Plan`
 
@@ -264,16 +284,16 @@ The steps, one by one:
    the compile, which compiles the libraries' modules, and before the assets, which import the libraries' files.
 6. **`compile`** (in `internal/build/steps.go`) finds the compiler (`toolchain.Compiler`) and makes the program in
    two steps of `internal/script`. `script.CompileSources` finds every module and compiles the YueScript ones into
-   `dist/stage/lua`, which is also its cache. `script.Link` follows the requires from the entry and checks the
-   modules it reaches for unknown globals. Between the two, `editor.RefreshLibraryView` writes the libraries'
-   modules as Lua into `.moonwell/lua`: the editor then has them also when the link fails, which is when a user
-   looks.
+   the compile's cache, `dist/stage/lua`. `script.Link` follows the requires from the entry and checks the modules
+   it reaches for unknown globals. Between the two, `editor.RefreshLibraryView` writes the libraries' modules as
+   Lua into `.moonwell/lua`: the editor then has them also when `script.Link` fails, which is when a user looks.
 7. **`source.With(objs.Changes)`** makes the first view. A view is the source map with planned changes laid over it:
    a read through the view gives the changed file, and nothing is on disk yet.
 8. **`settings.Plan(view, p)`** plans the map settings on the map as the objects leave it. It patches
    `war3map.w3i`, edits the calls World Editor wrote into `war3map.lua`, and merges the two text files.
 9. **`PlanAssets`** (in `internal/build/steps.go`) collects the project's assets and the files the libraries ship,
-   reads which files of the map `assets:sync` owns, and has `assets.Plan` plan the imports and `war3map.imp`.
+   reads which files of the map `assets:sync` owns (the ownership state, `.asset-state/<map>.json`), and has
+   `assets.Plan` plan the imports and `war3map.imp`.
 10. **`script.Inject(view, program)`** appends the bundle, which is the runtime and every module the entry reaches,
     to `war3map.lua`. It is the last step because the settings edit the same file, and the bundle carries a table
     of the line each module starts on in the finished script. Nothing may change the script after it.
@@ -283,10 +303,12 @@ The steps, one by one:
 The upper half (steps 1 to 6) makes what the gameplay is compiled against, and compiles it. The lower half (steps 7
 to 10) plans the map, each step on the map as the steps above it leave it. A function that takes a map folder and
 returns changes is called a **planner**: `objects.Plan`, `settings.Plan`, `assets.Plan` and `script.Inject` are the
-four. A planner writes nothing.
+four. A planner writes nothing. `build.Plan` is not one of the four: it calls them, and its upper half writes beside
+the map.
 
 `Plan` writes nothing into the map, but it does write beside it: the ids module, everything below `.moonwell/`,
-`moonwell.lock` and the compile's cache `dist/stage/lua`. So `check` writes those too.
+`moonwell.lock` and the compile's cache `dist/stage/lua`. So `check` writes those too, all but the ids module,
+which it only compares with what the objects render. `dev` writes the ids module as well.
 
 ### After the plan
 
@@ -296,8 +318,8 @@ four. A planner writes nothing.
 - `packInto` in `internal/build/archive.go` calls `pack` in `internal/build/pack.go`, which reads every file from
   the view, in the order of `Folder.Files`, and hands them to `mpq.Write`. The archive is written beside its place
   as `<map.folder>.tmp` and renamed when it is whole.
-- `launch` in `internal/build/launch.go` starts the game with `-loadfile` and the staged folder, through
-  `Env.Spawn`, and does not wait for it.
+- `launch` in `internal/build/launch.go` starts the game with `-loadfile` and the stage, through `Env.Spawn`, and
+  does not wait for it.
 
 ## The outside world
 
@@ -351,11 +373,14 @@ Three habits follow, and the code keeps them everywhere:
   bottom of the file that raises them, below a line `// ---- errors ----`. To change the words of an error, search
   for a few of its words; to see every way a file can fail, scroll to its end.
 - A plain error (`errors.New`, `fmt.Errorf`) appears only where the caller, not the user, made the mistake. A
-  comment beside it says why it is plain; search the code for "A plain error" to see them.
-- A test of an error checks its file and the words that tell it apart, not the whole sentence.
+  comment beside it says why it is plain; search the code for "plain error" to see them.
+- A test of an error checks its file, its hint and the words that tell it apart, not the whole sentence. The tests
+  of the packages that raise such errors each have a helper, `asError`, that fails the test for an error that is no
+  `*diag.Error`.
 
-`exitCode` in `internal/cli/cli.go` is the one place a command's error is printed. A panic is caught in `runIn`,
-and printed as an internal error with its stack.
+`exitCode` in `internal/cli/cli.go` prints the error a command ends with, once. `runIn` prints a line that is
+refused, and catches a panic, which it prints as an internal error with its stack. `dev` goes on after a check that
+fails, so `cycle` in `internal/build/dev.go` prints that failure itself.
 
 The generator (`tools/gen/`) is a tool for contributors and does not use `internal/diag`: its failures are plain
 errors, printed after `error: `.
@@ -374,11 +399,12 @@ part of the Pkl schema that follows the game's data. It has four modes; `modes` 
 
 Each door reads top to bottom, like `Plan`. The rest of the generator:
 
-- `tools/gen/export.go` finds and reads the files of an export of the game's data.
+- `tools/gen/export.go` finds and reads the files of an export: a folder of the game's own files, taken out of the
+  game's storage with a tool for that. `CONTRIBUTING.md` says which files, and with which tool.
 - `tools/gen/fields.go`, `tools/gen/names.go` and `tools/gen/bases.go` make the object metadata: a record for each
   field, its friendly name, and the standard objects.
-- `tools/gen/handwritten.go` reads the two hand-written JSON files; `tools/gen/extras.go` holds the shape of the
-  first.
+- `tools/gen/handwritten.go` reads the two hand-written JSON files. The keys of `tools/natives/lua-extras.json` are
+  in `tools/gen/extras.go`, those of `tools/metadata/overrides.json` at the top of `tools/gen/names.go`.
 - `tools/gen/jass/`, `tools/gen/slk/` and `tools/gen/ini/` are three small parsers for the game's file formats.
   They import nothing of the module.
 
@@ -478,7 +504,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | --- | --- |
 | see what `moonwell build` does, in order | `internal/build/build.go`: `Build`, then `Plan`; the longer steps in `internal/build/steps.go` |
 | add a command | `internal/cli/cli.go`: the table `commands`, whose comment says what a new command needs |
-| add a flag, or give a command a flag | `internal/cli/args.go`: the table `flags` |
+| add a flag, or give a command a flag | `internal/cli/args.go`: the table `flags`, and a field of `line` for what the flag says. A flag of `build` and `test` then goes on through `options` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
 | know why a command line is refused | `internal/cli/args.go`: `parse`, `fits`, and the errors at the bottom |
 | change the help text | `internal/cli/cli.go`: `Usage`, and the `usage` and `help` of each row of `commands` |
 | know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `runIn`, `exitCode` |
@@ -512,14 +538,14 @@ Each row names the file to open and, in most rows, the function to read first.
 | know which `pkl` and which `yue` is run | `internal/toolchain/tools.go`: `PklProgram`, `Compiler` |
 | pin a new version of YueScript or Pkl | `internal/toolchain/tools.go`: `YueScript`, `Pkl`; the default `yue.version` in `schema/Project.pkl` |
 | change how a pinned program is downloaded and checked | `internal/toolchain/ensure.go`: `Ensure`; its steps in `internal/toolchain/install.go` |
-| change the version number | `version.go`, `schema/PklProject`, `install.ps1`, `install.sh`; `module_test.go` and `install_test.go` name one that was missed |
+| change the version number | `version.go`, `schema/PklProject`, `install.ps1`, `install.sh`, and the two examples in `README.md`; `module_test.go` and `install_test.go` name one that was missed |
 
 ### The gameplay code
 
 | I want to | Open |
 | --- | --- |
 | know how a file becomes a module, and what its name is | `internal/script/modules.go`: `Collect` |
-| change how the compiler is run, or what is compiled again | `internal/script/yue.go`: `compileAll`; the cache in `internal/script/cache.go` |
+| change how the compiler is run, or what is compiled again | `internal/script/yue.go`: `compileAll`, and `compile` for the one call of the compiler; the cache in `internal/script/cache.go`. The check for unknown globals runs the compiler too: `list` in `internal/script/unknown.go` |
 | change the words of a compile error | `internal/script/printed.go`: `compileError`, `rewriteError` |
 | know which modules go into the map, and where "module not found" comes from | `internal/script/graph.go`: `reached`, `errNoModule` |
 | change the check for unknown globals | `internal/script/unknown.go`: `unknownGlobals`, `knownGlobals` |
@@ -533,6 +559,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | I want to | Open |
 | --- | --- |
 | follow an object from Pkl to the bytes of `war3map.w3u` | `internal/objects/plan.go`: `Plan`; `internal/objects/resolve.go`: `Resolve`; `internal/war3/objmod/append.go`: `AppendTo` |
+| make a field of an object settable from Pkl | Nothing in Go: the fields are data. `go run ./tools/gen metadata <folder> <version>` writes `data/metadata.json` from the game's tables, and `go run ./tools/gen` then writes `schema/generated/`; `CONTRIBUTING.md` has the steps. The program reads the file in `internal/objects/metadata.go`: `LoadMetadata` |
 | change the words of an error about an object | the errors at the bottom of `internal/objects/resolve.go`, `internal/objects/fields.go` and `internal/objects/values.go` |
 | change `src/generated/objects.yue` | `internal/objects/ids.go`: `RenderIDs`, `RefreshIDs`, `AssertIDsCurrent` |
 | change the JSON of `objects:eval` | `internal/objects/eval.go`: `EvalJSON` |
@@ -543,7 +570,8 @@ Each row names the file to open and, in most rows, the function to read first.
 | know which files are assets, and what path each gets in the map | `internal/assets/collect.go`: `Collect`; `internal/assets/target.go`: `targetPath` |
 | know how an import is planned | `internal/build/steps.go`: `PlanAssets`, which calls `Plan` in `internal/assets/plan.go`; `internal/war3/imp/imp.go` |
 | change what `assets:sync` writes, and how it undoes a failed write | `internal/assets/sync.go`: `Sync`; `internal/mapdir/apply.go`: `ApplyInPlace`; `internal/fsx/journal.go` |
-| read or change `.asset-state/<map>.json` | `internal/assets/state.go`: `ReadState`, `StateFile` |
+| know which files of the source map `assets:sync` may replace or remove | `internal/assets/plan.go`: `Plan`, `ownedUnchanged`, `removals`; the state it is given is read in `internal/assets/state.go`: `ReadState` |
+| read or change `.asset-state/<map>.json`, the ownership state | `internal/assets/state.go`: `ReadState`, and `StateFile`, which names the file for a map folder and refuses a link on the way to it; `OwnershipFile` in `internal/build/project.go` is `StateFile` for a project, with `map.folder` read as a build reads it |
 | change the report of `assets:paths` | `internal/cli/assetspaths.go`: `assetsPaths`; `internal/assets/report.go`: `ReportModels`, `RenderReports` |
 | read a new kind of reference out of a model | `internal/war3/model/mdx.go`: `ReadMDX`; `internal/war3/model/mdl.go`: `ReadMDL` |
 | know how a library is downloaded and locked | `internal/library/sync.go`: `Sync`; `internal/library/github.go`: `syncGitHub`; `internal/library/lock.go` |
@@ -590,16 +618,22 @@ build commands are `Plan` and one more step. So `check` cannot pass a project th
 step, and one function answers what a build does.
 
 **A planner writes nothing.** It reads a map folder and returns changes; `internal/build` lays them over the map as
-a view and writes the view at the end. So a build touches `dist/stage` only after every step has succeeded: a refused
-setting leaves no half-written map. It is also why `check` is cheap to keep true: it is the same plan, not written.
+a view and writes the view at the end. So a build writes `dist/stage/<map.folder>` only after every step has
+succeeded: a refused setting leaves no half-written map. (The compile's cache, `dist/stage/lua`, is written during
+the plan.) It is also why `check` is cheap to keep true: it is the same plan, not written.
+
+**A library has a type in each area that takes it.** `manifest.Library` is the library as the manifest writes it,
+`library.Synced` where it lies after a sync, `script.Library` its module folder, `assets.Library` the files it ships.
+No area imports another, so `internal/build` turns one into the next: `ModuleFolders` in `internal/build/steps.go`,
+`shippingLibraries` in `internal/build/project.go`.
 
 **The archive is packed from the view, not read back from the stage.** Both then hold the same bytes without a
 second read from disk that could fail. The stage is still written by `build`, though the archive does not need it: a
 user reads error positions in `dist/stage/<map.folder>/war3map.lua`. (`pack` in `internal/build/pack.go`.)
 
 **The archive is written beside its place and then renamed.** The place holds a whole archive or what it held
-before; a build that is ended midway leaves no cut archive under the map's name. (`writeArchive` in
-`internal/build/archive.go`.)
+before; a build that is ended midway leaves no cut archive under the map's name. It can leave the file beside the
+place, `<map.folder>.tmp`, which the next build that packs replaces. (`writeArchive` in `internal/build/archive.go`.)
 
 **What Moonwell writes, it writes into real folders.** A link, or a Windows junction, on the way to `dist`, the
 stage, the lock, the archive, `.moonwell` or `moonwell.lock` is refused. A build removes and replaces what is at
@@ -617,8 +651,9 @@ see: what a setting needs of the map, and two blocks that disagree. A field the 
 so that a later patch release of the package may add one. (`Decode` in `internal/manifest/load.go`.)
 
 **`internal/build` keeps one piece of state between calls.** `internal/build/lock.go` keeps the list of build locks
-this process holds. A second Ctrl+C ends the program from outside the command that is running; what handles it has
-no project at hand and must still leave no lock behind, which the next build would take for a running build. The
+this process holds. A second Ctrl+C ends the program from outside the command that is running. The function that
+handles it, `leaveAtOnce` in `internal/cli/cli.go`, knows no project and has no release function to call, and it
+must still leave no lock behind: the next build would take a lock that stays for a build that runs. The
 only other values a package keeps are the three files of `data/`, each parsed once when it is first asked for
 (`objects.LoadMetadata`, `script.LoadNatives`, `assets.LoadGamePaths`).
 
@@ -629,8 +664,8 @@ that is under way, since the check holds the lock. The second gives back the loc
 **A pinned program is checked before it is kept or run.** `Ensure` checks the SHA-256 of a download, unpacks it in a
 folder beside its place, asks it for its version, and only then moves it into the cache. The `yue` on the PATH is
 never the compiler: a project names its version, or its own program with `yue.path`. The `pkl` on the PATH is used
-when it is 0.32 or newer; an older one gets a warning, since a `pkl` command the user types still runs it.
-(`internal/toolchain/ensure.go`, `internal/toolchain/tools.go`.)
+when it is 0.32 or newer. An older one is passed over for the pinned Pkl, with a warning, since a `pkl` command the
+user types still runs the old one. (`internal/toolchain/ensure.go`, `internal/toolchain/tools.go`.)
 
 **The compile is two steps, and the editor's files are written early.** The declarations and the macro module are
 written before a library is fetched or a compiler downloaded, and the libraries' Lua between compiling and linking.

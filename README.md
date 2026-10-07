@@ -68,7 +68,8 @@ Moonwell is built for Windows and Linux on x86-64. Run the line again to upgrade
 Moonwell evaluates projects with [Pkl](https://pkl-lang.org). It uses the `pkl` on your PATH when that is Pkl 0.32 or
 newer. Otherwise it downloads Pkl 0.32.1 (about 100 MB, once, checked against a pinned checksum) into its cache and runs
 that, with a warning when the `pkl` on your PATH is older. `moonwell setup` then copies it next to `yue` in the `bin`
-folder above, so a `pkl` command you type, such as `pkl project resolve`, finds it too.
+folder of its cache, so a `pkl` command you type, such as `pkl project resolve`, finds it too. On Windows that is the
+folder above. On Linux it is `~/.cache/moonwell/bin`, and `setup` prints the command that puts it on your PATH.
 
 A project names the Moonwell it is written for in its `PklProject`, as the version of the `moonwell` Pkl package. The
 program and the package must have the same major and minor version; `moonwell` refuses another project and says which
@@ -83,16 +84,18 @@ To move a project to a newer Moonwell, install that version, change the package'
 
 ### Upgrading a project to 0.10
 
-A project that builds with Moonwell 0.9 builds with 0.10 after three steps:
+A project that builds with Moonwell 0.9 needs three steps to build with 0.10:
 
 1. Install Moonwell 0.10: run the install line again.
 2. In the project's `PklProject`, set the package's version to `moonwell@0.10.0`.
 3. Run `pkl project resolve` in the project folder. If you have no `pkl` command, run `moonwell setup` there first:
-   it copies Moonwell's own Pkl into the `bin` folder above before it reads the project.
+   it copies Moonwell's own Pkl into its cache's `bin` folder and prints the command that puts that folder on your
+   PATH. It then stops at the project's package version, which this step puts right.
 
-Nothing in `moonwell.pkl`, the map, `moonwell.lock` or `.asset-state/` has to change. The first command afterwards
-builds the caches under `dist/` and `.moonwell/` anew. The [changelog](CHANGELOG.md) lists what 0.10 does differently;
-the two changes most projects meet are that a mistyped flag is now an error, and that `dist` must be a real folder.
+In nearly every project nothing in `moonwell.pkl`, the map, `moonwell.lock` or `.asset-state/` has to change. The
+first command afterwards builds the caches under `dist/` and `.moonwell/` anew. The [changelog](CHANGELOG.md) lists
+what 0.10 does differently, and what it refuses that 0.9 let through; the two changes a project is most likely to
+meet are that a mistyped flag is now an error, and that `dist` must be a real folder.
 
 ### Upgrading a project from 0.7
 
@@ -391,7 +394,7 @@ settings {
   After inheriting any value you leave out, fog `start` must not exceed `end`.
 - **Staged copy only.** Builds and `moonwell test` write settings into the staged copy in `dist/stage/`, never into
   `maps/<folder>`, so World Editor keeps showing the map's own values. Open the built map to see them. Settings are
-  applied after staging and before assets and the gameplay bundle, and never appear in `war3map.imp`.
+  applied after the objects and before the assets and the gameplay bundle, and never appear in `war3map.imp`.
 - **Map versions.** The map info file (`war3map.w3i`) must be version 18, 25, 28, 31, 32, 33 or 39; World Editor 3.00
   saves version 39. A loading-screen `model` needs version 25 or later. `players`, `forces` and `environment` need
   version 28 or later and Lua as the script language. If a map is refused, open it in World Editor and save it again in

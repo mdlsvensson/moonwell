@@ -7,8 +7,12 @@
   the most noticeable first; the last section has the small differences.
 - **To move a project to this version,** install it (run the install line again), set `moonwell@0.10.0` in
   `PklProject` and run `pkl project resolve`. The program refuses a project that is still on a 0.9 package, and
-  says so. Nothing else in the project has to change. The caches under `dist/` and `.moonwell/` are built anew by
-  the first command.
+  says so. The caches under `dist/` and `.moonwell/` are built anew by the first command.
+- **In nearly every project nothing else has to change.** A project that built with 0.9.1 is refused now, with an
+  error that names what to put right, where it has a link or a Windows junction at `dist`, `src` or `lua`; a link,
+  two names that differ only in letter case, or a name Windows cannot hold in its map, its assets or a library; or
+  a script that calls `moonwell` with a flag it does not have, or with `--minify=false`. The entries below say
+  more.
 - **A command line is read strictly.** A line is carried out whole or not at all. Each of these is now an error with
   a hint, where 0.9.1 passed over it or guessed: a flag Moonwell does not have (`build --minfy` gets
   "Did you mean --minify?"), a flag the command does not have (`check --minify`), a flag without a command
@@ -20,9 +24,10 @@
 - **`dist` is a real folder.** So are the stage, the build lock and the folder the archive goes into. A link or a
   Windows junction on the way to any of them is refused, and the error names the step that is the link. 0.9.1 built
   through a junction at `dist`.
-- **`build` and `test` plan everything before they touch `dist/stage`.** A refused setting or an invalid object no
-  longer leaves a half-staged folder. "Added … custom object(s)", "Applied map settings" and "Imported … asset(s)"
-  are logged after the stage is written, so a build that fails before that logs none of them.
+- **`build` and `test` plan everything before they write the staged map.** A refused setting or an invalid object
+  no longer leaves a half-staged folder. "Added … custom object(s)", "Applied map settings" and "Imported …
+  asset(s)" are logged after the stage is written, so a build that fails before that logs none of them. A build
+  that fails when it packs the archive has logged them and has left its stage.
 - **`check` fails wherever the plan of a build fails:** also for a project without its source map, or without the
   map's `war3map.lua`. In 0.9.1 such a project could pass `check` and then fail `build`. What only packing finds is
   still `build`'s alone: a map without `war3map.w3i`, a map too large for an archive, a `build.folder` that cannot

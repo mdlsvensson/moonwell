@@ -92,7 +92,8 @@ commit that changes the behaviour, and the commit message says which recordings 
   any panic, is reported as an internal "please report" error, so a user's mistake must never reach it. The text of
   an error is made by a named function below a `// ---- errors ----` line, at the bottom of the file that raises it.
 - **Layout.** A new package goes on a shelf: add it to `layout_test.go` and to `ARCHITECTURE.md`. A test fails when
-  either document names a file that is not there.
+  either document names a file that is not there, and another when a step of a build changes and the quote of `Plan`
+  in `ARCHITECTURE.md` does not: change the quote and the numbered steps below it in the same commit.
 - **Style.** `gofmt` and `go vet` are clean. Markdown is wrapped at 120 by hand.
 - **Versions must agree.** `version.go`, `schema/PklProject`, both install scripts and the README's examples carry the
   same number, and tests check it.
@@ -176,7 +177,8 @@ and in a function or a parameter.
 | `names` | Pins. Below it one of the five lists (`units`, `items`, `abilities`, `buffs`, `upgrades`), below that a field's id, and its value is the friendly name. |
 | `removed` | The fields whose leaving the game is acknowledged. Below it one of the five lists, whose value is a list of ids. |
 
-- A pin must name a field of its list.
+- A pin must name a field of its list, by the id in its exact letters. A pin that names none is refused, and so is
+  a list that is none of the five.
 - The fields of units and of items are one table of the game. A pin under `units` is of the items too, and one under
   `items` of the units. `removed` is not shared so: a field that was of both is listed under both.
 - A pinned name is a small letter and then letters and digits of ASCII. It is no keyword of Pkl, and none of `id`,
