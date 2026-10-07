@@ -132,9 +132,15 @@ func writeProjectFile(target, dir string, file moonwell.TemplateFile) error {
 		err = os.WriteFile(path, file.Data, 0o666)
 	}
 	if err != nil {
-		return errNotWritten(filepath.Join(dir, filepath.FromSlash(file.Path)), err)
+		return errNotWritten(fileOf(dir, file.Path), err)
 	}
 	return nil
+}
+
+// fileOf is a file of the new project as a message names it: the folder init was given and then the file's path
+// in the project, name, with "/" on every system.
+func fileOf(dir, name string) string {
+	return fsx.ToPosix(filepath.Join(dir, filepath.FromSlash(name)))
 }
 
 // resolve has pkl resolve the dependencies of the new project in target, which writes its PklProject.deps.json:
@@ -242,11 +248,14 @@ func errNotWritten(file string, cause error) error {
 	}
 }
 
-// errNotResolved shows what pkl printed when it failed to resolve the project's dependencies.
+// errNotResolved shows what pkl printed when it failed to resolve the project's dependencies. The hint names the
+// one cause that is not the project's: a project that is not linked to a checkout has its package fetched.
 func errNotResolved(dir, output string) error {
 	return &diag.Error{
 		Msg:  "pkl project resolve failed:\n" + fsx.TrimASCIISpace(output),
-		File: filepath.Join(dir, "PklProject"),
+		File: fileOf(dir, "PklProject"),
+		Hint: "Pkl says why above. Without --link it fetches the moonwell package from GitHub: check the network " +
+			"connection, then run init again.",
 	}
 }
 

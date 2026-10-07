@@ -236,7 +236,9 @@ func TestInitRemovesTheDirectoryItCreatedWhenResolvingFails(t *testing.T) {
 	target := filepath.Join(parent, "my-map")
 	lines, err := created(resolving(t, "Pkl 0.32.1", 1), parent, target, "")
 	e := asError(t, err, "a failed resolve")
-	if e.Msg != "pkl project resolve failed:\n"+unreachable || e.File != filepath.Join(target, "PklProject") {
+	// The file is named with "/" on every system, as the folder was given and then the file.
+	if e.Msg != "pkl project resolve failed:\n"+unreachable || e.File != filepath.ToSlash(target)+"/PklProject" ||
+		e.Hint == "" {
 		t.Errorf("error = %+v", e)
 	}
 	if fsx.Exists(target) || len(lines) != 0 {
@@ -253,15 +255,15 @@ func TestInitEmptiesAPreExistingDirectoryAgainWhenItFails(t *testing.T) {
 	}
 }
 
-// A file that cannot be written is named from the folder the command was given, and what stood in the way stays:
-// a failed init removes what it wrote and nothing else.
+// A file that cannot be written is named from the folder the command was given, with "/" on every system, and
+// what stood in the way stays: a failed init removes what it wrote and nothing else.
 func TestInitNamesTheFileItCannotWriteAndRemovesNothingElse(t *testing.T) {
 	parent := t.TempDir()
 	testkit.WriteFile(t, parent, "taken", []byte("mine"))
-	dir := filepath.Join("taken", "my-map")
-	_, err := created(resolving(t, "Pkl 0.32.1", 0), parent, dir, "")
+	_, err := created(resolving(t, "Pkl 0.32.1", 0), parent, filepath.Join("taken", "my-map"), "")
 	e := asError(t, err, "a file where a folder is needed")
-	if !strings.HasPrefix(e.Msg, "Writing "+dir) || !strings.HasPrefix(e.File, dir) || e.Hint == "" || e.Cause == nil {
+	if !strings.HasPrefix(e.Msg, "Writing taken/my-map/") || !strings.HasPrefix(e.File, "taken/my-map/") ||
+		e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
 	if read(t, parent, "taken") != "mine" {

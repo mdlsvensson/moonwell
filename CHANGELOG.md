@@ -28,6 +28,9 @@
 - A `yue.path` that is there and cannot be started (a folder, a file that is no program) is reported with
   `moonwell.local.pkl` as its file and a hint that says what to do there. A `yue.path` that does not exist has the
   same hint.
+- On Windows, `init` names a file it could not write, and the `PklProject` whose dependencies did not resolve, with
+  `/`, as every other error names a file: `my-map/src/main.yue`, where it said `my-map\src\main.yue`. A failed
+  `pkl project resolve` has a hint.
 
 ## 0.9.1 (2026-10-03)
 
