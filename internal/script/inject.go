@@ -28,9 +28,9 @@ var hooked = []string{"main", "config"}
 // bundle follows from the next line, which is the line the bundle is told it starts on.
 func Inject(folder *mapdir.Folder, program *Program) ([]mapdir.Change, error) {
 	if program == nil {
-		// A plain error: the caller places what Compile returned, and Compile returns a program whenever it
-		// returns no error, so a call without one is a mistake in Moonwell and nothing the user can put right.
-		return nil, errors.New("script.Inject: the program is nil; pass what script.Compile returned")
+		// A plain error: the caller places what Link returned, and Link returns a program whenever it returns
+		// no error, so a call without one is a mistake in Moonwell and nothing the user can put right.
+		return nil, errors.New("script.Inject: the program is nil; pass what script.Link returned")
 	}
 	script, err := scriptOf(folder)
 	if err != nil {

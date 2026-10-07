@@ -6,10 +6,10 @@
 // compiler, the entry, the libraries' folders, the lint block, the game's API (LoadNatives) and what the map's
 // own script defines. It is two steps. CompileSources takes the Input and returns a Compiled: the modules, and
 // the Lua of the libraries' ones. Link takes the Compiled and returns a Program: what the entry reaches, checked
-// for unknown globals. Compile takes the Input and returns the Program, as the two steps in a row. Inject takes a
-// map folder and a Program, and returns one change: the map's script with the bundle after it. Collect, EntryName
-// and RefreshMacros are steps of a compile that other packages take alone, and CollectLibraries is Collect for
-// the libraries' modules alone.
+// for unknown globals. Inject takes a map folder and a Program, and returns one change: the map's script with the
+// bundle after it. EntryName and RefreshMacros are steps of a compile that other packages take alone. Collect is
+// the step that lists the modules, which no other package takes, and CollectLibraries is Collect for the
+// libraries' modules alone, which setup takes.
 //
 // It knows nothing of where a library comes from, of manifests beyond the lint block, or of how a map is built.
 // Of a map it knows one file, war3map.lua: what it defines, which a compile is handed, and its bytes, which
@@ -106,26 +106,6 @@ func (c *Compiled) Lua(source Source) (text string, ok bool) {
 	return text, ok
 }
 
-// Compile is CompileSources and then Link: it writes the macro module, finds the modules, compiles them, follows
-// the requires from the entry and checks the modules it reaches for unknown globals. With
-// lint.unknownGlobals = "error" an unknown global fails with every one listed; with "warning" they are logged
-// and returned in the Program.
-//
-// The steps are taken in that order, and the first fault ends the compile: a file the compiler refuses is
-// reported before an entry that is no file of src/, that before a module that is not found, and an unknown
-// global last. A caller that makes something of the modules whatever the entry reaches takes the two steps
-// itself.
-func Compile(ctx context.Context, e *env.Env, in Input) (*Program, error) {
-	if in.Natives == nil {
-		return nil, errNoNatives("Compile")
-	}
-	compiled, err := CompileSources(ctx, e, in)
-	if err != nil {
-		return nil, err
-	}
-	return Link(ctx, e, compiled)
-}
-
 // CompileSources is the first step of a compile: it writes the macro module, finds the modules, compiles every
 // YueScript source that changed since the last compile, and reads the Lua of every YueScript module of a
 // library.
@@ -135,7 +115,7 @@ func Compile(ctx context.Context, e *env.Env, in Input) (*Program, error) {
 // that Compiled.Lua has it without a read that could fail.
 func CompileSources(ctx context.Context, e *env.Env, in Input) (*Compiled, error) {
 	if in.Natives == nil {
-		return nil, errNoNatives("CompileSources")
+		return nil, errNoNatives()
 	}
 	search, err := macroModule(e.Root)
 	if err != nil {
@@ -194,11 +174,11 @@ func Link(ctx context.Context, e *env.Env, compiled *Compiled) (*Program, error)
 	}, nil
 }
 
-// errNoNatives is the failure of a door, by its name, that is handed an Input without the game's API. It is a
-// plain error: the caller passes LoadNatives(), which is never nil, so a compile without the game's API is a
-// mistake in Moonwell and nothing the user can put right.
-func errNoNatives(door string) error {
-	return errors.New("script." + door + ": Input.Natives is nil; pass script.LoadNatives()")
+// errNoNatives is the failure of a compile that is handed an Input without the game's API. It is a plain error:
+// the caller passes LoadNatives(), which is never nil, so a compile without the game's API is a mistake in
+// Moonwell and nothing the user can put right.
+func errNoNatives() error {
+	return errors.New("script.CompileSources: Input.Natives is nil; pass script.LoadNatives()")
 }
 
 // macroModule writes the macro module of the project at root, and returns how the compiler finds it. A project

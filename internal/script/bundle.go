@@ -19,8 +19,8 @@ import (
 // Lua, and its entry says so, with a `true` at its end; a Lua module is its own source, whatever the program is,
 // and is never marked.
 //
-// The program is one that Compile returned, and is there: bundle has no error to return, and does not look for
-// what no such program has. In a program of Compile the entry's name, and every module's name and path, are
+// The program is one that Link returned, and is there: bundle has no error to return, and does not look for
+// what no such program has. In a program of Link the entry's name, and every module's name and path, are
 // valid UTF-8, since Collect refuses a module file whose name is not, and every module has Lua.
 //
 // A name and a path are written as strings of Lua, by lua.Quote: a control character is three digits after a
