@@ -19,8 +19,8 @@ import (
 // makes a record of each row, names the records, and puts each into its lists.
 //
 // A cell that is no number ends it at once. Every other fault is gathered, and all of them are refused
-// together: a field without a label, a name that clashes or that no property can have, and a field that no
-// kind of object uses.
+// together: a field without a label, a name that clashes or that no property can have, a field that no kind of
+// object uses, and a pin that names no field.
 func nameFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, []rename, error) {
 	fields := map[string][]objects.FieldMeta{}
 	for _, list := range objects.FieldLists {
@@ -49,6 +49,7 @@ func nameFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, 
 			}
 		}
 	}
+	problems = append(problems, pins.namingNothing(fields)...)
 	if len(problems) > 0 {
 		return nil, nil, errNoFriendlyNames(problems)
 	}

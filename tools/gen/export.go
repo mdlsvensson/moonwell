@@ -264,7 +264,8 @@ func errMissingFromExport(path, folder string) error {
 }
 
 // rowNamed is how a refusal names a row of a table: the table by its path as the generator asks for it, and
-// the row by its id.
+// the row by its id. It and errInRow stand here, with the tables' paths, since two files raise them: fields.go
+// for a row of a table of fields, and bases.go for a row of a table of objects.
 func rowNamed(table, id string) string { return table + ": " + id }
 
 // errInRow is a fault of a row of a table, with the table and the row.

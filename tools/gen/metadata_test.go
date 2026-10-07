@@ -162,6 +162,12 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 		"overrides that are no JSON":      {folder: whole, pins: `{"names":`, starts: "tools/metadata/overrides.json: "},
 		"overrides with a key too many": {folder: whole, pins: `{"names": {}, "renamed": {}}`,
 			starts: `tools/metadata/overrides.json: unknown field "renamed"`},
+		"a pin under a list that is none": {folder: whole,
+			pins:   `{"names": {"units": {"ucls": "unitClass"}, "ability": {"anam": "title"}}}`,
+			starts: "cannot derive friendly names:\n  names.ability is none of the lists of fields"},
+		"a pin of an id that no field has": {folder: whole,
+			pins:   `{"names": {"units": {"ucls": "unitClass", "uhpn": "health"}}}`,
+			starts: "cannot derive friendly names:\n  the pin of \"uhpn\" under names.units names no field"},
 	} {
 		scratch := withPins(t, cmp.Or(c.pins, unitClassPins))
 		if c.kept != "" {

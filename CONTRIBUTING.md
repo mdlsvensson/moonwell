@@ -205,9 +205,9 @@ Either hand-written file (`<file>` is its path from the checkout):
 | `<file>: the key "<key>" stands twice in one object: write it once` | Keep one of the two. |
 | `<file>: <place> is of the wrong kind (<kind>)` | The value at that place is a text where a list belongs, or the like. The place is the keys on the way to it joined by dots, with an entry of a list as its number, counted from 0: `functions.0.params.1.type`, `names.units.ucls`. |
 | `<file>: the file is empty`, `unexpected EOF`, `invalid character …`, `something follows the JSON value` | Sound JSON, and one object. |
-| `…: function <n> has no "name"` (or `"params"`, or `"returns"`) | Give the function the key, with a value. |
-| `…: a parameter of function <n> lacks its "name" or its "type".` | Give the parameter both keys. |
-| `…: "globals" has an entry that is empty or null.` (or `"removed"`) | Write the name, or take the entry out. |
+| `…: functions.<n> has no "name"` (or `"params"`, or `"returns"`) | Give the function the key, with a value. The place is written as in the row above: `functions.1` is the second function. |
+| `…: functions.<n>.params.<m> lacks its "name" or its "type".` | Give the parameter both keys. |
+| `…: globals.<n> is empty or null.` (or `removed.<n>`) | Write the name, or take the entry out. |
 
 The mode `natives`:
 
@@ -229,6 +229,8 @@ The mode `metadata`:
 | `cannot derive friendly names:` and a line that ends `no property can have this name (…); pin another under "names", "<list>", "<id>" in tools/metadata/overrides.json` | A pin, at the place the line gives. |
 | the same, with `the pin is refused: no property can have this name (…)` | Another name in the pin that is there. |
 | the same, with `<other id> (<label>) has this name too, and one object can have both: pin another name for one of the two …` | A pin for one of the two fields. |
+| the same, with `the pin of "<id>" under names.<list> names no field: …` | The pin pins nothing: no field of the list has that id. Correct the id, in its exact letters, or take the pin out. An id under `removed` is not held so: its field is gone. |
+| the same, with `names.<list> is none of the lists of fields (…)` (or `removed.<list>`) | Correct the list's name: one of the five, in small letters. |
 | the same, with `no label for <key> in …` or `the row has no … cell, which names the label` | The export lacks the label: a whole export, or a change to the generator. |
 | the same, with `no kind of object uses it: …` | A change to the generator. No pin helps. |
 | `<table>: <id>: <other table> has no row for it` | A whole export, or a change to the generator. |

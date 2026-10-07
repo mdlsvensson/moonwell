@@ -541,7 +541,7 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 			starts: "tools/natives/lua-extras.json: unknown field \"more\""},
 		"extras with a function that returns nothing": {folder: whole,
 			lay:    func(c checkout) { c.write(extrasPath, `{"functions": [{"name": "A", "params": []}]}`) },
-			starts: "tools/natives/lua-extras.json: function 1 has no \"returns\""},
+			starts: "tools/natives/lua-extras.json: functions.0 has no \"returns\""},
 		"a folder at the place of the natives": {folder: whole, starts: "data/natives.json: ",
 			lay: func(c checkout) {
 				without(c, nativesPath)

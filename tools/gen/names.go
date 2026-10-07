@@ -37,16 +37,58 @@ func readOverrides(checkout string) (overrides, error) {
 // pinned is the name that the overrides pin for a field of a list, and whether they pin one. The fields of units
 // and of items are one table, so a pin under either list is of both.
 func (o overrides) pinned(list, id string) (string, bool) {
-	lists := []string{list}
-	if list == "units" || list == "items" {
-		lists = []string{"units", "items"}
-	}
-	for _, under := range lists {
+	for _, under := range oneTable(list) {
 		if name, has := o.Names[under][displayRawcode(id)]; has {
 			return name, true
 		}
 	}
 	return "", false
+}
+
+// oneTable is the lists whose fields are one table of the game with those of list: units and items are, and
+// every other list stands alone.
+func oneTable(list string) []string {
+	if list == "units" || list == "items" {
+		return []string{"units", "items"}
+	}
+	return []string{list}
+}
+
+// namingNothing is a line for each pin that names no field: a list under names or under removed that is none of
+// the lists of fields, and an id under names that no field of its list has, nor of the list that is one table
+// with it. Such a pin would say nothing, and its field would take the name of its label. fields is the fields of
+// the game by their list. An id under removed is not asked for: it is of a field that the game's data have not.
+func (o overrides) namingNothing(fields map[string][]objects.FieldMeta) []string {
+	var problems []string
+	for _, list := range slices.Sorted(maps.Keys(o.Names)) {
+		if !slices.Contains(objects.FieldLists, list) {
+			problems = append(problems, noSuchList("names", list))
+			continue
+		}
+		for _, id := range slices.Sorted(maps.Keys(o.Names[list])) {
+			if !hasField(fields, oneTable(list), id) {
+				problems = append(problems, pinOfNoField(list, id))
+			}
+		}
+	}
+	for _, list := range slices.Sorted(maps.Keys(o.Removed)) {
+		if !slices.Contains(objects.FieldLists, list) {
+			problems = append(problems, noSuchList("removed", list))
+		}
+	}
+	return problems
+}
+
+// hasField reports whether a field of one of the lists has the id, as an author writes one.
+func hasField(fields map[string][]objects.FieldMeta, lists []string, id string) bool {
+	for _, list := range lists {
+		for _, field := range fields[list] {
+			if displayRawcode(field.ID) == id {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // ---- the names of the fields of a table ----
@@ -345,6 +387,20 @@ var pklIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 var friendlyName = regexp.MustCompile(`^[a-z][A-Za-z0-9]*$`)
 
 // ---- errors ----
+
+// noSuchList is the line for a list under a key of the overrides, names or removed, that is none of the lists
+// of fields.
+func noSuchList(key, list string) string {
+	return key + "." + list + " is none of the lists of fields (" + listed(objects.FieldLists) +
+		"): correct its name in " + overridesPath
+}
+
+// pinOfNoField is the line for a pin whose id no field of its list has, nor of the list that is one table with
+// it. The id is shown as the file writes it.
+func pinOfNoField(list, id string) string {
+	return "the pin of " + fsx.Quoted(id) + " under names." + list + " names no field: no field of " +
+		strings.Join(oneTable(list), " or ") + " has that id; correct the id or take the pin out of " + overridesPath
+}
 
 // fieldNamed is how a line of a refusal names a field: its list, its id as an author writes it, and its name.
 func fieldNamed(list string, field objects.FieldMeta) string {

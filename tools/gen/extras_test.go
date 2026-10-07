@@ -54,8 +54,9 @@ func TestTheExtrasAreTheFunctionsAndTheTwoListsOfGlobals(t *testing.T) {
 }
 
 // Every function has its three keys and every parameter its two, each with something under it, and no global
-// is an empty name: a key that is left out, null and an empty text are refused alike, with the function by its
-// place in the list.
+// is an empty name: a key that is left out, null and an empty text are refused alike. What lacks something is
+// named by its place in the file, as a value of the wrong kind is: the keys on the way to it and the number of
+// an entry of a list, counted from 0.
 func TestTheExtrasAreRefusedForAFunctionOrAGlobalThatLacksSomething(t *testing.T) {
 	functions := func(list string) string { return `{"functions": [` + list + `]}` }
 	with := func(params string) string {
@@ -63,26 +64,25 @@ func TestTheExtrasAreRefusedForAFunctionOrAGlobalThatLacksSomething(t *testing.T
 	}
 	const (
 		whole     = `{"name": "A", "params": [], "returns": "b"}`
-		parameter = `a parameter of function 1 lacks its "name" or its "type"`
-		noGlobal  = ` has an entry that is empty or null`
+		lacksBoth = ` lacks its "name" or its "type"`
 	)
 	for text, words := range map[string]string{
-		functions(whole + `, {"params": [], "returns": "b"}`):             `function 2 has no "name"`,
-		functions(`{"name": null, "params": [], "returns": "b"}`):         `function 1 has no "name"`,
-		functions(`{"name": "", "params": [], "returns": "b"}`):           `function 1 has no "name"`,
-		functions(`{"name": "A", "returns": "b"}`):                        `function 1 has no "params"`,
-		functions(`{"name": "A", "params": null, "returns": "b"}`):        `function 1 has no "params"`,
-		functions(whole + `, ` + whole + `, {"name": "A", "params": []}`): `function 3 has no "returns"`,
-		functions(`{"name": "A", "params": [], "returns": null}`):         `function 1 has no "returns"`,
-		functions(`{"name": "A", "params": [], "returns": ""}`):           `function 1 has no "returns"`,
-		functions(whole + `, null`):                                       `function 2 has no "name"`,
-		with(`{"name": "a"}`):                                             parameter,
-		with(`{"name": "a", "type": "b"}, {"type": "b"}`):                 parameter,
-		with(`{"name": "a", "type": null}`):                               parameter,
-		with(`{"name": "a", "type": "b"}, null`):                          parameter,
-		`{"globals": ["print", null]}`:                                    `"globals"` + noGlobal,
-		`{"globals": [""]}`:                                               `"globals"` + noGlobal,
-		`{"removed": [null, "io"]}`:                                       `"removed"` + noGlobal,
+		functions(whole + `, {"params": [], "returns": "b"}`):             `: functions.1 has no "name"`,
+		functions(`{"name": null, "params": [], "returns": "b"}`):         `: functions.0 has no "name"`,
+		functions(`{"name": "", "params": [], "returns": "b"}`):           `: functions.0 has no "name"`,
+		functions(`{"name": "A", "returns": "b"}`):                        `: functions.0 has no "params"`,
+		functions(`{"name": "A", "params": null, "returns": "b"}`):        `: functions.0 has no "params"`,
+		functions(whole + `, ` + whole + `, {"name": "A", "params": []}`): `: functions.2 has no "returns"`,
+		functions(`{"name": "A", "params": [], "returns": null}`):         `: functions.0 has no "returns"`,
+		functions(`{"name": "A", "params": [], "returns": ""}`):           `: functions.0 has no "returns"`,
+		functions(whole + `, null`):                                       `: functions.1 has no "name"`,
+		with(`{"name": "a"}`):                                             `: functions.0.params.0` + lacksBoth,
+		with(`{"name": "a", "type": "b"}, {"type": "b"}`):                 `: functions.0.params.1` + lacksBoth,
+		with(`{"name": "a", "type": null}`):                               `: functions.0.params.0` + lacksBoth,
+		with(`{"name": "a", "type": "b"}, null`):                          `: functions.0.params.1` + lacksBoth,
+		`{"globals": ["print", null]}`:                                    `: globals.1 is empty or null`,
+		`{"globals": [""]}`:                                               `: globals.0 is empty or null`,
+		`{"removed": [null, "io"]}`:                                       `: removed.0 is empty or null`,
 	} {
 		got, err := decodeExtras([]byte(text))
 		if err == nil {

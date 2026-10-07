@@ -39,48 +39,52 @@ func readExtras(checkout string) (extras, error) {
 // checkExtras holds the extras to what an entry of the natives needs: every function has its name, its list of
 // parameters, which may be empty, and what it returns; every parameter has its name and its type; and no global
 // is an empty name. A key that the file leaves out, null and an empty text are one here: the reading leaves all
-// three empty, and so null for an entry of a list is refused as well. A function is named by its place in the
-// list, counted from 1.
+// three empty, and so null for an entry of a list is refused as well.
+//
+// What lacks something is named by its place in the file, as the refusal of a value of the wrong kind names a
+// place (errNoJSON): the keys on the way to it with dots between them, and an entry of a list by its number,
+// counted from 0. So functions.1 is the second function, in both.
 func checkExtras(lua extras) error {
 	for i, function := range lua.Functions {
-		called := "function " + strconv.Itoa(i+1)
+		place := "functions." + strconv.Itoa(i)
 		switch {
 		case function.Name == "":
-			return errExtraLacks(called, "name")
+			return errExtraLacks(place, "name")
 		case function.Params == nil:
-			return errExtraLacks(called, "params")
+			return errExtraLacks(place, "params")
 		case function.Returns == "":
-			return errExtraLacks(called, "returns")
+			return errExtraLacks(place, "returns")
 		}
-		for _, param := range function.Params {
+		for j, param := range function.Params {
 			if param.Name == "" || param.Type == "" {
-				return errParamLacks(called)
+				return errParamLacks(place + ".params." + strconv.Itoa(j))
 			}
 		}
 	}
-	if slices.Contains(lua.Globals, "") {
-		return errEmptyGlobal("globals")
+	if at := slices.Index(lua.Globals, ""); at >= 0 {
+		return errEmptyGlobal("globals." + strconv.Itoa(at))
 	}
-	if slices.Contains(lua.Removed, "") {
-		return errEmptyGlobal("removed")
+	if at := slices.Index(lua.Removed, ""); at >= 0 {
+		return errEmptyGlobal("removed." + strconv.Itoa(at))
 	}
 	return nil
 }
 
 // ---- errors ----
 
-// errExtraLacks refuses a function of the extras that lacks one of its three keys, or has nothing under it.
-func errExtraLacks(called, key string) error {
-	return errors.New(extrasPath + ": " + called + ` has no "` + key + `". Every function has a "name", its ` +
+// errExtraLacks refuses a function of the extras, by its place, that lacks one of its three keys, or has nothing
+// under it.
+func errExtraLacks(place, key string) error {
+	return errors.New(extrasPath + ": " + place + ` has no "` + key + `". Every function has a "name", its ` +
 		`"params" (a list, [] for a function that takes nothing) and what it "returns".`)
 }
 
-// errParamLacks refuses a parameter of a function of the extras that lacks one of its two keys.
-func errParamLacks(called string) error {
-	return errors.New(extrasPath + ": a parameter of " + called + ` lacks its "name" or its "type".`)
+// errParamLacks refuses a parameter of a function of the extras, by its place, that lacks one of its two keys.
+func errParamLacks(place string) error {
+	return errors.New(extrasPath + ": " + place + ` lacks its "name" or its "type".`)
 }
 
-// errEmptyGlobal refuses a list of globals that has an entry without a name.
-func errEmptyGlobal(list string) error {
-	return errors.New(extrasPath + `: "` + list + `" has an entry that is empty or null.`)
+// errEmptyGlobal refuses an entry of a list of globals, by its place, that has no name.
+func errEmptyGlobal(place string) error {
+	return errors.New(extrasPath + ": " + place + " is empty or null.")
 }

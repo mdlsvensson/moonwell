@@ -179,7 +179,6 @@ func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 	pins := overrides{Names: map[string]map[string]string{
 		"items":     {"unam": "displayName", "ucls": "unitClass"},
 		"abilities": {"acdn": "cooldown", "Crs": "missChance"},
-		"buffs":     {"unam": "notOfThisList"},
 	}}
 	fields, renames, err := nameFields(readMini(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
@@ -201,6 +200,53 @@ func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 		`abilities Htb1 "cooldown" -> "dataCooldown" (category prefix)`,
 		`abilities Crs "class" -> "missChance" (override)`,
 	})
+}
+
+// A pin that names no field is refused, with where it stands and what to do: a list under names or under
+// removed that is none of the five, in its exact letters, and an id under names that no field of its list has.
+// A pin that says nothing would let a field take its derived name in silence.
+func TestNameFieldsRefusesAPinThatNamesNoField(t *testing.T) {
+	const (
+		noList  = " is none of the lists of fields (units, items, abilities, buffs and upgrades)"
+		noField = "correct the id or take the pin out of tools/metadata/overrides.json"
+	)
+	for _, c := range []struct {
+		names   map[string]map[string]string
+		removed map[string][]string
+		words   []string
+	}{
+		{names: map[string]map[string]string{"ability": {"anam": "title"}}, words: []string{"names.ability" + noList}},
+		{names: map[string]map[string]string{"Units": {"uhpm": "health"}}, words: []string{"names.Units" + noList}},
+		{removed: map[string][]string{"upgrade": {"gold"}}, words: []string{"removed.upgrade" + noList}},
+		{names: map[string]map[string]string{"abilities": {"Tau9": "maxUnits"}}, words: []string{
+			`the pin of "Tau9" under names.abilities names no field: no field of abilities has that id`, noField}},
+		// A field of another list, and an id in other letters, is no field of the list.
+		{names: map[string]map[string]string{"buffs": {"unam": "title"}, "upgrades": {"GNAM": "title"}},
+			words: []string{`the pin of "unam" under names.buffs names no field`,
+				`the pin of "GNAM" under names.upgrades names no field`}},
+		{names: map[string]map[string]string{"units": {"uzzz": "none"}}, words: []string{
+			`the pin of "uzzz" under names.units names no field: no field of units or items has that id`}},
+		// The id of three letters is written as its letters: with the NUL of the metadata it names no field.
+		{names: map[string]map[string]string{"abilities": {"Crs\x00": "missChance"}}, words: []string{
+			`the pin of "Crs\u0000" under names.abilities names no field`}},
+	} {
+		pins := overrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}}, Removed: c.removed}
+		for list, names := range c.names {
+			pins.Names[list] = names
+		}
+		contains(t, refusal(t, pins, nil), append(c.words, "cannot derive friendly names:\n  ")...)
+	}
+	// A pin under units of a field that items alone use, and one under items of a field of units, names its
+	// field: the two lists are one table. A field that is listed as removed is one that the game's data have
+	// not: its id names no field, and is none that is asked for.
+	pins := overrides{
+		Names: map[string]map[string]string{
+			"units": {"ucls": "unitClass", "ifil": "itemModel"}, "items": {"uhpm": "health"}},
+		Removed: map[string][]string{"units": {"uold"}, "buffs": {}},
+	}
+	if _, _, err := nameFields(readMini(t, nil), pins); err != nil {
+		t.Errorf("pins that name their fields, and a field that is removed: %v", err)
+	}
 }
 
 // What cannot stand after the two renamings is refused: two pins of one name in a group, each with the other
