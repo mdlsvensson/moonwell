@@ -236,6 +236,37 @@ func TestReadExportNamesWhatTheSystemCannotGiveByThePathItOpened(t *testing.T) {
 	}
 }
 
+// A table that lacks a column the generator reads is refused, with the table and the column: its key, and each
+// column that columnsRead lists for it. The miniature has every one of them, as the game's tables have.
+func TestReadExportRefusesATableThatLacksAColumnTheGeneratorReads(t *testing.T) {
+	keys := map[string]string{
+		unitFieldsTable: fieldKey, abilityFieldsTable: fieldKey, buffFieldsTable: fieldKey, upgradeFieldsTable: fieldKey,
+		abilitiesTable: abilityKey, balanceTable: balanceKey, unitsTable: unitKey, itemsTable: itemKey,
+		buffsTable: buffKey, upgradesTable: upgradeKey,
+	}
+	if len(columnsRead) != len(keys) {
+		t.Errorf("columnsRead lists the columns of %d tables, and the export has %d", len(columnsRead), len(keys))
+	}
+	for table, key := range keys {
+		for _, column := range append([]string{key}, columnsRead[table]...) {
+			// The first cell with the column's name is the one of the header row.
+			folder := exportedGame(t, func(files map[string]string) {
+				files[table] = strings.Replace(files[table], `K"`+column+`"`, `K"`+column+`2"`, 1)
+			})
+			want := table + ` has no column "` + column + `"`
+			if _, err := readExport(folder); err == nil || !strings.HasPrefix(err.Error(), want) {
+				t.Errorf("%s with its column %s under another name: got %v, want %q", table, column, err, want)
+			}
+		}
+	}
+	// A table that holds nothing has no column.
+	folder := exportedGame(t, func(files map[string]string) { files[itemsTable] = "ID;PWXL;N;E\r\nE\r\n" })
+	const want = `war3.w3mod/units/itemdata.slk has no column "itemID"`
+	if _, err := readExport(folder); err == nil || !strings.HasPrefix(err.Error(), want) {
+		t.Errorf("a table that holds nothing: got %v, want %q", err, want)
+	}
+}
+
 // A table that does not parse is refused with its path as the generator asks for it, and the line.
 func TestReadExportRefusesATableThatDoesNotParse(t *testing.T) {
 	folder := exportedGame(t, func(files map[string]string) {

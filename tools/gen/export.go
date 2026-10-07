@@ -57,6 +57,26 @@ const (
 	upgradeKey = "upgradeid"
 )
 
+// columnsRead is the columns of each table, beside its key, whose cells the generator reads. A table that lacks
+// one of them, or its key, is refused: a cell of a column that is not there reads as an empty cell, so a column
+// that the game gives another name would empty what is made of it, and nothing would say so.
+//
+// A table of fields is listed with the columns that the game's table has: a field of a buff has no levels, so
+// the buffs' table has no repeat, and its cells are empty there by right. A column that the generator comes to
+// read is added here.
+var columnsRead = map[string][]string{
+	unitFieldsTable:    {"displayName", "category", "type", "netsafe", "useUnit", "useHero", "useBuilding", "useItem"},
+	abilityFieldsTable: {"displayName", "category", "type", "netsafe", "repeat", "data", "useSpecific", "notSpecific"},
+	buffFieldsTable:    {"displayName", "category", "type", "netsafe"},
+	upgradeFieldsTable: {"displayName", "category", "type", "netsafe", "repeat", "effectType"},
+	abilitiesTable:     {"levels", "comments"},
+	balanceTable:       {"isbldg", "Primary"},
+	unitsTable:         {"comment(s)"},
+	itemsTable:         {"comment"},
+	buffsTable:         {"comments"},
+	upgradesTable:      {"maxlevel", "comments"},
+}
+
 // gameData is what an export says of the game's object data: every table and text that the metadata is made
 // from, held as values. A table is held as its rows that describe something: those with a cell in the table's
 // key.
@@ -77,7 +97,8 @@ type gameData struct {
 
 // readExport reads everything that the metadata is made from out of the export in folder: the labels, the
 // strings, then the tables in the order of gameData. It fails at the first file that the export lacks, that the
-// system cannot give, or that does not parse. Nothing else of the mode reads the folder.
+// system cannot give, or that does not parse, and at the first table that lacks a column the generator reads.
+// Nothing else of the mode reads the folder.
 func readExport(folder string) (gameData, error) {
 	from := export{folder}
 	var game gameData
@@ -146,7 +167,8 @@ func (e export) strings() (ini.File, error) {
 }
 
 // rows is the rows of the table at path that have a cell in the key column. The game's tables have a few rows
-// without one, which describe nothing.
+// without one, which describe nothing. A table that lacks its key, or a column that columnsRead lists for it,
+// is refused.
 func (e export) rows(path, key string) ([]slk.Row, error) {
 	text, err := e.text(path)
 	if err != nil {
@@ -155,6 +177,11 @@ func (e export) rows(path, key string) ([]slk.Row, error) {
 	table, err := slk.Parse(text, path)
 	if err != nil {
 		return nil, err
+	}
+	for _, column := range append([]string{key}, columnsRead[path]...) {
+		if !slices.Contains(table.Columns, column) {
+			return nil, errNoColumn(path, column)
+		}
 	}
 	var rows []slk.Row
 	for _, row := range table.Rows {
@@ -235,4 +262,12 @@ func entryNamed(folder, name string) (spelled string, has bool) {
 // with the folder of the export as the command line gives it.
 func errMissingFromExport(path, folder string) error {
 	return errors.New(path + " is missing from " + folder)
+}
+
+// errNoColumn refuses a table, by its path as the generator asks for it, that lacks a column the generator
+// reads, and says where the column's name stands.
+func errNoColumn(path, column string) error {
+	return errors.New(path + " has no column " + fsx.Quoted(column) + ", which the generator reads. If the game " +
+		"gives the column another name now, give it that name in tools/gen/export.go (columnsRead, or the table's " +
+		"key) and where the generator reads the column.")
 }

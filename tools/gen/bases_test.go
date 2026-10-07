@@ -52,7 +52,7 @@ func TestStandardObjectsRefusesTheUnitsThatBreakTheRuleForHeroes(t *testing.T) {
 			[]any{"hfoo", 0, "_"}, []any{"Hpal", 0, "_"}, []any{"hbar", 1, "_"}, []any{"nzzz", 0, "_"},
 			[]any{"nhro", 0, "AGI"}, []any{"Hbld", 1, "INT"}, []any{"Hodd", 1, "str"},
 		)
-		files[unitsTable] = sylk([]string{"unitID"},
+		files[unitsTable] = sylk([]string{"unitID", "comment(s)"},
 			[]any{"hfoo"}, []any{"Hpal"}, []any{"hbar"}, []any{"nzzz"}, []any{"nhro"}, []any{"Hbld"}, []any{"Hodd"},
 		)
 	})
@@ -68,7 +68,8 @@ func TestStandardObjectsRefusesTheUnitsThatBreakTheRuleForHeroes(t *testing.T) {
 // A unit without a row of balance is refused at once, before the units that break the rule for heroes.
 func TestStandardObjectsRefusesAUnitWithoutARowOfBalance(t *testing.T) {
 	got := basesRefused(t, func(files map[string]string) {
-		files[unitsTable] = sylk([]string{"unitID"}, []any{"Hbad"}, []any{"hnew"}, []any{"hfoo"}, []any{"hmor"})
+		files[unitsTable] = sylk([]string{"unitID", "comment(s)"},
+			[]any{"Hbad"}, []any{"hnew"}, []any{"hfoo"}, []any{"hmor"})
 		files[balanceTable] = sylk(balanceMeta, []any{"Hbad", 0, "_"}, []any{"hfoo", 0, "_"})
 	})
 	if got != "unit hnew has no row in unitbalance.slk" {

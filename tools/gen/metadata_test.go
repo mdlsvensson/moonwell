@@ -124,8 +124,20 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 		"a file that the export lacks": {
 			folder: exportedGame(t, func(files map[string]string) { delete(files, upgradesTable) }),
 			starts: "war3.w3mod/units/upgradedata.slk is missing from "},
-		// Every file of the export is read before anything is made of it: a table that does not parse is told
-		// of before a name that needs a pin.
+		// A column that the game has renamed would read as empty, and every mark of a skin would be false.
+		"a table whose column netsafe has another name": {
+			folder: exportedGame(t, func(files map[string]string) {
+				files[unitFieldsTable] = strings.Replace(files[unitFieldsTable], `K"netsafe"`, `K"netSafe"`, 1)
+			}),
+			starts: `war3.w3mod/units/unitmetadata.slk has no column "netsafe"`,
+			words:  []string{"tools/gen/export.go"}},
+		// Every file of the export is read before anything is made of it: a table that lacks a column, and one
+		// that does not parse, is told of before a name that needs a pin.
+		"a name that needs a pin, in an export with a table that lacks a column": {pins: "{}",
+			folder: exportedGame(t, func(files map[string]string) {
+				files[upgradesTable] = strings.Replace(files[upgradesTable], `K"maxlevel"`, `K"levels"`, 1)
+			}),
+			starts: `war3.w3mod/units/upgradedata.slk has no column "maxlevel"`},
 		"a name that needs a pin, in an export with a table that does not parse": {pins: "{}",
 			folder: exportedGame(t, func(files map[string]string) {
 				files[upgradesTable] = "ID;PWXL;N;E\r\nC;X1;Y1;K\"upgradeid\"\r\nC;X1;Y2;K\"Rhme\r\nE\r\n"
