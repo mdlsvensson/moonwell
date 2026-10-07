@@ -49,3 +49,25 @@ func TestTheDocumentsNameFilesAndFoldersThatAreThere(t *testing.T) {
 		}
 	}
 }
+
+// ARCHITECTURE.md quotes build.Plan and numbers its steps, so the quote must be the function as the source has
+// it: a step that is added, moved, renamed or taken out fails this test. Left out of both, before they are held
+// against each other, are the empty lines and the three lines of each error check.
+func TestArchitectureQuotesPlanAsTheSourceHasIt(t *testing.T) {
+	document, _ := os.ReadFile("ARCHITECTURE.md")
+	source, _ := os.ReadFile("internal/build/build.go")
+	_, quote, _ := strings.Cut(string(document), "```go\nfunc Plan(")
+	quote, _, _ = strings.Cut(quote, "\n```")
+	_, body, _ := strings.Cut(string(source), "\nfunc Plan(")
+	body, _, _ = strings.Cut(body, "\n}\n")
+	leftOut := func(line string) bool {
+		return slices.Contains([]string{"", "if err != nil {", "return nil, err", "}"}, strings.TrimSpace(line))
+	}
+	quoted := slices.DeleteFunc(strings.Split(quote, "\n"), leftOut)
+	written := slices.DeleteFunc(strings.Split(body, "\n"), leftOut)
+	if len(written) == 0 || !slices.Equal(quoted, written) {
+		t.Errorf("Plan changed, or its quote did: update the quote of Plan in ARCHITECTURE.md, and the numbered "+
+			"steps below it, to say what internal/build/build.go has.\nThe document quotes:\n%s\nThe source has:\n%s",
+			strings.Join(quoted, "\n"), strings.Join(written, "\n"))
+	}
+}

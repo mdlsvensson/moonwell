@@ -65,7 +65,8 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 	if err != nil {
 		return nil, err
 	}
-	if err := writeGenerated(e, source, objs, globals, opts); err != nil { // the ids module, .moonwell/types and yue
+	err = writeGenerated(e, source, objs, globals, opts) // the ids module, .moonwell/types and yue
+	if err != nil {
 		return nil, err
 	}
 	synced, err := library.Sync(ctx, e, p.Libraries, p.File) // .moonwell/libraries and library-assets, moonwell.lock

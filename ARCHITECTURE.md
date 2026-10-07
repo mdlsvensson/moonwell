@@ -218,7 +218,8 @@ says what the plan holds. `Dev` is `Check` again and again. So the order of a bu
 ### `Plan`
 
 This is the function as the source has it, with the error check after each step left out (each is
-`if err != nil { return nil, err }`: the first step that fails ends the plan):
+`if err != nil { return nil, err }`: the first step that fails ends the plan). A test in `documents_test.go` holds
+the quote to the source, so a step added to `Plan` is a step added here:
 
 ```go
 func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*Result, error) {
