@@ -13,7 +13,8 @@ import (
 )
 
 // This file holds the packing of a planned map: which of its files an archive holds, under which names and in
-// which order, with which header, and how large an archive can be.
+// which order, with which header, and the refusal of a map that is larger than an archive can be. How large that
+// is, war3/mpq knows.
 
 // infoName is the file of a map that says which format the map has.
 const infoName = "war3map.w3i"
@@ -46,7 +47,7 @@ func pack(view *mapdir.Folder, name string) ([]byte, error) {
 	if !format.Headerless() {
 		options.Prefix = mpq.HM3WHeader(name, 0, 0)
 	}
-	if tooLarge, fits := roomFor(int64(len(options.Prefix)), sizesOf(files)); !fits {
+	if tooLarge, fits := mpq.RoomFor(len(options.Prefix), files); !fits {
 		return nil, errTooLarge(view, tooLarge)
 	}
 	archive, err := mpq.Write(files, options)
@@ -102,87 +103,6 @@ func named(err error, file string) error {
 	return &withFile
 }
 
-// ---- the size an archive can have ----
-
-// An archive as war3/mpq lays one out: a header, the data of each file and of the list of the files, the hash
-// table and the block table. A file's data is its bytes in sectors, behind a word for where each sector starts
-// and one for where the last ends.
-const (
-	archiveHeader = 32   // the header, in bytes
-	sectorBytes   = 4096 // a sector of a file, before it is compressed
-	wordBytes     = 4    // a position or a size
-	entryBytes    = 16   // a slot of the hash table, and a block of the block table
-	fewestSlots   = 16   // the smallest hash table
-	// largestWord is the largest number a word holds: the format writes every position and size as one.
-	largestWord = 1<<32 - 1
-)
-
-// sized is a file of an archive by its name there and the number of its bytes.
-type sized struct {
-	name string
-	size int64
-}
-
-// sizesOf is the files by their sizes, in their order.
-func sizesOf(files []mpq.File) []sized {
-	sizes := make([]sized, len(files))
-	for at, file := range files {
-		sizes[at] = sized{name: file.Name, size: int64(len(file.Data))}
-	}
-	return sizes
-}
-
-// roomFor reports whether the format can hold an archive of the files behind a prefix of so many bytes. Where it
-// cannot, tooLarge is the first file that is too large by itself, and "" where the files are too large together.
-//
-// The format writes as a word: the size of each file; where each file's data starts and how long it is, counted
-// from the archive's header; where the two tables start; and the archive's size, from its header to the end of
-// the block table, which is the largest of them. So a file must not be larger than a word holds, and the archive
-// must not be: it is counted with its prefix, the header of 512 bytes that a map of an older format has, since
-// a reader finds a position by adding where the archive starts, and holds the sum in a word too. The archive
-// is counted at its largest, with no sector compressed, so the answer depends on the sizes alone.
-func roomFor(prefix int64, files []sized) (tooLarge string, fits bool) {
-	for _, file := range files {
-		if file.size > largestWord {
-			return file.name, false
-		}
-	}
-	return "", largestArchive(prefix, files) <= largestWord
-}
-
-// largestArchive is the most bytes an archive of the files takes, with its prefix: the bytes it takes when no
-// sector of it is stored shorter than it is.
-func largestArchive(prefix int64, files []sized) int64 {
-	total := prefix + archiveHeader
-	var list int64
-	for _, file := range files {
-		total += largestStored(file.size)
-		list += int64(len(file.name)) + 2 // the file's line of the list: its name and "\r\n"
-	}
-	entries := int64(len(files)) + 1 // the files, and the list of them
-	return total + largestStored(list) + (hashSlots(entries)+entries)*entryBytes
-}
-
-// largestStored is the most bytes the data of a file of size bytes takes in an archive: its bytes, and a word
-// for each sector and one more. A file without a byte takes none.
-func largestStored(size int64) int64 {
-	if size == 0 {
-		return 0
-	}
-	sectors := (size + sectorBytes - 1) / sectorBytes
-	return size + (sectors+1)*wordBytes
-}
-
-// hashSlots is the size of the hash table of an archive with so many entries: the smallest power of two, from
-// sixteen, that leaves a third of its slots free.
-func hashSlots(entries int64) int64 {
-	slots := int64(fewestSlots)
-	for slots*2 < entries*3 {
-		slots *= 2
-	}
-	return slots
-}
-
 // ---- errors ----
 
 func errNoMapInfo(mapLabel string) error {
@@ -196,7 +116,7 @@ func errNoMapInfo(mapLabel string) error {
 // errTooLarge is the refusal of a map the format cannot hold: file is the file of the archive that is too large
 // by itself, by its name there, and "" where the map is too large as a whole.
 func errTooLarge(view *mapdir.Folder, file string) error {
-	limit := strconv.FormatInt(largestWord, 10) + " bytes"
+	limit := strconv.FormatInt(mpq.MaxSize, 10) + " bytes"
 	if file == "" {
 		return &diag.Error{
 			Msg:  "The map is too large to pack: an archive holds at most " + limit + ".",

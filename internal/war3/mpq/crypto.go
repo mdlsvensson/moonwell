@@ -1,9 +1,9 @@
 // Package mpq writes MPQ format-1 archives, the format of a packed map. It takes named byte slices and returns
 // the archive's bytes. It does not read folders.
 //
-// Write takes the files and returns the archive; HM3WHeader returns the header that older maps carry before it.
-// HashString, EncryptBlock, DecryptBlock and the two table keys are the format's hash and cipher, which a reader
-// of an archive needs too.
+// Write takes the files and returns the archive; RoomFor says whether the format can hold an archive of them;
+// HM3WHeader returns the header that older maps carry before it. HashString, EncryptBlock, DecryptBlock and the
+// two table keys are the format's hash and cipher, which a reader of an archive needs too.
 //
 // The package must not know where the files come from, what a map is made of, or which maps carry the header.
 package mpq
