@@ -78,20 +78,51 @@ func Source(p *manifest.Project) (*mapdir.Folder, error) {
 // mapFolder is the project's map.folder as everything in this package reads it: the folder below maps/, and
 // below the stage, with "/" between its parts, such as "campaign/one.w3x". Its last part is the map's name.
 //
-// The value is read by the rule of schema/Project.pkl (segments, isRelativeFolder), as text, so that the answer
-// is the same on every system: it is split at "/" and "\", and its empty and "." parts are dropped. A value that
-// starts with a separator or a drive, one with a ".." part, and one with no part left names no folder inside
-// maps/, and is refused with the manifest as its file. No ".." is resolved against the part before it. So is a
-// value with a name Windows cannot hold: the map, its stage and its archive are named by it on every system.
+// The value is read as readFolder reads a folder of the manifest. One that leaves its folder and one with no part
+// left name no folder inside maps/, and are refused with the manifest as their file. So is a value with a name
+// Windows cannot hold: the map, its stage and its archive are named by it on every system.
 func mapFolder(p *manifest.Project) (string, error) {
-	parts := partsOf(p.Map.Folder)
-	switch {
-	case leavesItsFolder(p.Map.Folder, parts), len(parts) == 0:
+	parts, fault := readFolder(p.Map.Folder)
+	switch fault {
+	case leavesItsFolder, namesNoFolder:
 		return "", errNotInsideMaps(p.File, p.Map.Folder)
-	case !everySystemHolds(parts):
+	case unusableName:
 		return "", errUnusableMapFolder(p.File, p.Map.Folder)
 	}
 	return strings.Join(parts, "/"), nil
+}
+
+// folderFault is what keeps a folder, as a manifest writes one, from naming a folder below the one it is written
+// for: map.folder below maps/, and build.folder below the project folder.
+type folderFault int
+
+const (
+	noFault         folderFault = iota
+	leavesItsFolder             // it starts at a root, or one of its parts is ".."
+	namesNoFolder               // no part of it is left
+	unusableName                // one of its parts is a name Windows cannot hold
+)
+
+// readFolder reads a folder as a manifest writes one: its parts, which joined with "/" are its path from the
+// folder it is written for, or the first fault it has, in the order of the faults. map.folder and build.folder
+// are read by it, and each has its own words for a fault.
+//
+// The value is read by the rule of schema/Project.pkl (segments, isRelativeFolder), as text, so that the answer
+// is the same on every system: it is split at "/" and "\", and its empty and "." parts are dropped. A value that
+// starts with a separator or a drive, and one with a ".." part, leaves its folder: no ".." is resolved against
+// the part before it. What the schema refuses is refused here too, for a manifest that was not checked against
+// it. The schema lets through a name that Windows cannot hold, such as "out:bin", and that is a fault as well.
+func readFolder(written string) (parts []string, fault folderFault) {
+	parts = partsOf(written)
+	switch {
+	case startsAtARoot(written) || slices.Contains(parts, ".."):
+		return nil, leavesItsFolder
+	case len(parts) == 0:
+		return nil, namesNoFolder
+	case !everySystemHolds(parts):
+		return nil, unusableName
+	}
+	return parts, noFault
 }
 
 // everySystemHolds reports whether a folder of these parts is one every system can make: whether each part is a
@@ -101,12 +132,6 @@ func mapFolder(p *manifest.Project) (string, error) {
 func everySystemHolds(parts []string) bool {
 	_, portable := fsx.RelPath(strings.Join(parts, "/"))
 	return portable
-}
-
-// leavesItsFolder reports whether a path, as a manifest writes one, is no path from the folder it is written
-// for: one that starts at a root, and one of whose parts, which are partsOf it, is "..".
-func leavesItsFolder(written string, parts []string) bool {
-	return startsAtARoot(written) || slices.Contains(parts, "..")
 }
 
 // partsOf is the parts of a path as a manifest writes one: what stands between its separators, "/" and "\",

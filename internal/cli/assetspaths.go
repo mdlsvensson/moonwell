@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -10,7 +9,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/build"
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
-	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
 
@@ -26,13 +25,13 @@ func runAssetsPaths(ctx context.Context, e *env.Env, c call) error {
 
 // assetsPaths is assets:paths for a file, "" for none, with gamePaths as the keys of the paths the game ships.
 //
-// A folder with a moonwell.pkl is a project. There the command first works out what a build imports, which
-// syncs the libraries. It then reports on the model at file, read from the folder the command runs in, or
-// without a file on every model among the imported files; outside a project it needs a file. The report is
-// logged, and after it, and only then, a model among the imported files that could not be read fails the
-// command.
+// In a project, which is what manifest.IsProject takes for one, the command first works out what a build
+// imports, which syncs the libraries. It then reports on the model at file, read from the folder the command
+// runs in, or without a file on every model among the imported files; outside a project it needs a file. The
+// report is logged, and after it, and only then, a model among the imported files that could not be read fails
+// the command.
 func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[string]bool) error {
-	inProject := fsx.Exists(filepath.Join(e.Root, "moonwell.pkl"))
+	inProject := manifest.IsProject(e.Root)
 	var imported []assets.Asset
 	var targets map[string]bool // the in-map paths a build imports; nil outside a project, which has no build
 	if inProject {

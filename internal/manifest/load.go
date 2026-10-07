@@ -111,6 +111,12 @@ func (p *Project) missingTexts() []string {
 	return missing
 }
 
+// IsProject reports whether the folder at root is a project: a folder with a moonwell.pkl. It is what a command
+// asks before it does in a project what it does not do elsewhere, such as keep a log.
+func IsProject(root string) bool {
+	return fsx.Exists(filepath.Join(root, sharedManifest))
+}
+
 // manifestFile is the manifest to evaluate: the local one, which amends the shared one, when it exists.
 func manifestFile(root string) (string, error) {
 	for _, file := range []string{localManifest, sharedManifest} {

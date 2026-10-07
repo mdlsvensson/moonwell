@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"runtime/debug"
 	"slices"
 	"strings"
@@ -21,6 +20,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
 // call is what a command gets beside the context and the outside world.
@@ -163,14 +163,14 @@ func runIn(ctx context.Context, outside world, args []string, root string, write
 }
 
 // logFile is the file a command's lines are also written to: dist/moonwell.log for a project, and "" for a
-// command that keeps no log. A project is a folder with a moonwell.pkl: a command that is run elsewhere makes
-// no dist/ there. init makes a project in another folder, and the folder it is run in is not its project.
+// command that keeps no log. A project is what manifest.IsProject takes for one: a command that is run elsewhere
+// makes no dist/ there. init makes a project in another folder, and the folder it is run in is not its project.
 //
 // The file is reached with fsx.Inside: a project with a link at dist/ keeps no log, since a line written
 // through the link would land outside the project. Such a link is the command's to refuse, when it writes
 // there itself.
 func logFile(root string, chosen command) string {
-	if chosen.name == "init" || !fsx.Exists(filepath.Join(root, "moonwell.pkl")) {
+	if chosen.name == "init" || !manifest.IsProject(root) {
 		return ""
 	}
 	file, err := fsx.Inside(root, "dist/moonwell.log")

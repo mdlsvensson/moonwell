@@ -100,20 +100,28 @@ func compileInput(
 	compiler string, p *manifest.Project, synced []library.Synced, globals *lua.MapGlobals, opts Options,
 ) script.Input {
 	in := script.Input{
-		Compiler: compiler,
-		Entry:    p.Map.Entry,
-		Minify:   opts.Minify || p.Build.Minify,
-		Lint:     p.Lint,
-		Map:      globals,
-		Natives:  script.LoadNatives(),
+		Compiler:  compiler,
+		Entry:     p.Map.Entry,
+		Minify:    opts.Minify || p.Build.Minify,
+		Libraries: ModuleFolders(synced),
+		Lint:      p.Lint,
+		Map:       globals,
+		Natives:   script.LoadNatives(),
 	}
 	if opts.Entry != "" {
 		in.Entry = opts.Entry
 	}
-	for _, lib := range synced {
-		in.Libraries = append(in.Libraries, script.Library{Key: lib.Key, Dir: lib.Modules})
-	}
 	return in
+}
+
+// ModuleFolders is the synced libraries as script takes them: each by its key and the folder of its modules, in
+// the order of the sync. It is the one place a synced library becomes one of script's.
+func ModuleFolders(synced []library.Synced) []script.Library {
+	var folders []script.Library
+	for _, lib := range synced {
+		folders = append(folders, script.Library{Key: lib.Key, Dir: lib.Modules})
+	}
+	return folders
 }
 
 // PlanAssets plans the import of the project's assets and of the files its synced libraries ship into folder,

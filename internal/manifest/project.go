@@ -3,7 +3,8 @@
 // version check, and the PklProject and moonwell.local.pkl a new project gets.
 //
 // Load takes the project folder of an env.Env and the pkl program, and returns the Project; Decode takes what pkl
-// printed. A project that cannot be read is a *diag.Error that names the file to look at.
+// printed. A project that cannot be read is a *diag.Error that names the file to look at. IsProject says of a
+// folder whether it is a project at all.
 //
 // Pkl has checked every type, range and pattern, and supplied every default; this package checks nothing of that
 // again. It must not know anything of maps, or what a setting does.

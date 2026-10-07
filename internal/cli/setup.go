@@ -195,11 +195,7 @@ func librariesAndTheirView(ctx context.Context, e *env.Env, p *manifest.Project)
 // modules of the libraries are listed alone, so the view is written also where one of them has the name of a
 // module of the project, which check and build report.
 func libraryView(e *env.Env, synced []library.Synced) error {
-	var libraries []script.Library
-	for _, lib := range synced {
-		libraries = append(libraries, script.Library{Key: lib.Key, Dir: lib.Modules})
-	}
-	sources, err := script.CollectLibraries(e.Root, libraries)
+	sources, err := script.CollectLibraries(e.Root, build.ModuleFolders(synced))
 	if err != nil {
 		return err
 	}

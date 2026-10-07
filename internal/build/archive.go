@@ -76,23 +76,21 @@ func archiveOf(p *manifest.Project) (place, error) {
 // buildFolder is the project's build.folder as a path from the project folder, with "/"; folder is the map's,
 // which names the archive in a refusal.
 //
-// The value is read as mapFolder reads map.folder, by the rule of schema/Project.pkl: every way the schema lets
-// a folder be written names the folder, such as "dist/bin/" and "./out". The refusals have the manifest as their
-// file. What the schema refuses is refused here too, for a manifest that was not checked against it: a value
-// that starts at a root or has a ".." part, one that names no folder, and a folder Moonwell keeps for itself.
-// The schema lets through a name that Windows cannot hold, such as "out:bin", and that is refused as well: the
-// archive goes where every system can make it.
+// The value is read as readFolder reads a folder of the manifest, which is how mapFolder reads map.folder: every
+// way the schema lets a folder be written names the folder, such as "dist/bin/" and "./out". The refusals have
+// the manifest as their file: a value that leaves the project, one that names no folder, one with a name that
+// Windows cannot hold, since the archive goes where every system can make it, and, as the schema has it, a folder
+// Moonwell keeps for itself.
 func buildFolder(p *manifest.Project, folder string) (string, error) {
 	written := p.Build.Folder
-	parts := partsOf(written)
-	switch {
-	case leavesItsFolder(written, parts):
+	parts, fault := readFolder(written)
+	switch fault {
+	case leavesItsFolder:
 		asWritten := strings.TrimRight(strings.ReplaceAll(written, `\`, "/"), "/")
 		return "", errOutputOutside(p.File, asWritten+"/"+folder)
-	case len(parts) == 0:
+	case namesNoFolder:
 		return "", errNoBuildFolder(p.File, written)
-	}
-	if !everySystemHolds(parts) {
+	case unusableName:
 		return "", errUnusableBuildFolder(p.File, written)
 	}
 	into := strings.Join(parts, "/")
