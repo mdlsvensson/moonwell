@@ -84,20 +84,26 @@ func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(
 
 // The renames are reported in the order of the lists, and in a list in the order of the ids' bytes: capitals
 // first. A field of units and of items is reported once, under the units, and a field that items alone use under
-// the items.
+// the items. The id of three letters is pinned and reported as an author writes it, and the file has it in four
+// bytes.
 func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testing.T) {
 	folder := exportedGame(t, func(files map[string]string) {
-		files[labelsFile] += "WESTRING_GPCT=Name\r\nWESTRING_FART=Name\r\n"
+		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
+			`C;X1;Y11;K"Crs"`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`, `C;X9;K"unreal"`)
+		files[labelsFile] += "WESTRING_GPCT=Name\r\nWESTRING_FART=Name\r\nWESTRING_CRS=Chance to Miss\r\n"
 	})
-	c := withPins(t, `{"names": {"items": {"unam": "unitName", "ifil": "itemModel"}, "units": {"ucls": "unitClass"}}}`)
-	printed, _, err := c.run("metadata", folder, "3.0.0.1")
+	c := withPins(t, `{"names": {"items": {"unam": "unitName", "ifil": "itemModel"}, "units": {"ucls": "unitClass"},
+		"abilities": {"Crs": "missChance"}}}`)
+	printed, files, err := c.run("metadata", folder, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	contains(t, printed, `renamed (9):
+	contains(t, string(files[metadataPath]), `{"id":"Crs\u0000","name":"missChance",`)
+	contains(t, printed, `renamed (10):
   units ucls "class" -> "unitClass" (override)
   units unam "name" -> "unitName" (override)
   items ifil "modelFile" -> "itemModel" (override)
+  abilities Crs "chanceToMiss" -> "missChance" (override)
   abilities Htb1 "cooldown" -> "dataCooldown" (category prefix)
   abilities acdn "cooldown" -> "statsCooldown" (category prefix)
   buffs fart "name" -> "artName" (category prefix)

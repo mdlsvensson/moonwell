@@ -63,7 +63,7 @@ func nameFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, 
 				fields[list] = append(fields[list], field)
 			}
 			if changes[i] != "" {
-				renames = append(renames, rename{list: lists[0], id: field.ID, change: changes[i]})
+				renames = append(renames, rename{list: lists[0], id: displayRawcode(field.ID), change: changes[i]})
 			}
 		}
 	}
@@ -163,6 +163,11 @@ func fieldRecord(row slk.Row, label, list string) (objects.FieldMeta, error) {
 func paddedID(id string) string {
 	return id + strings.Repeat("\x00", max(0, 4-len(id)))
 }
+
+// displayRawcode is the id of a record as an author writes it and reads it: without the NUL that pads it. It is
+// how a message and a line of the report show an id, how the overrides name a field, and what the property of a
+// field says its rawcode is.
+func displayRawcode(id string) string { return strings.TrimRight(id, "\x00") }
 
 // intTypes is the types of field that a modification file stores as an int, beside the types whose names end in
 // Flags: the whole numbers, the booleans, and the enumerations and sets of flags that the game numbers. The list
@@ -326,7 +331,9 @@ func noLabel(row slk.Row) string {
 }
 
 // usedByNothing is the line for a field of the units' table that no kind of object uses.
-func usedByNothing(field objects.FieldMeta) string { return field.ID + ": applies to no object type" }
+func usedByNothing(field objects.FieldMeta) string {
+	return displayRawcode(field.ID) + ": applies to no object type"
+}
 
 func errNoNumber(row slk.Row, column string) error {
 	return errors.New(row.Value(fieldKey) + ": the " + column + " cell '" + row.Value(column) + "' is not a number")

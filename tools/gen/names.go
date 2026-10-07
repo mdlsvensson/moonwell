@@ -16,7 +16,8 @@ import (
 const overridesPath = "tools/metadata/overrides.json"
 
 // overrides is tools/metadata/overrides.json: the friendly names that are pinned, by the list of the field and
-// its id, and the fields whose leaving the game is acknowledged, by their list.
+// its id, and the fields whose leaving the game is acknowledged, by their list. An id stands there as an author
+// writes it: the id of three letters as its three letters, Crs.
 type overrides struct {
 	Names   map[string]map[string]string `json:"names"`
 	Removed map[string][]string          `json:"removed"`
@@ -40,7 +41,7 @@ func (o overrides) pinned(list, id string) (string, bool) {
 		lists = []string{"units", "items"}
 	}
 	for _, under := range lists {
-		if name, has := o.Names[under][id]; has {
+		if name, has := o.Names[under][displayRawcode(id)]; has {
 			return name, true
 		}
 	}
@@ -49,8 +50,8 @@ func (o overrides) pinned(list, id string) (string, bool) {
 
 // ---- the names of the fields of a table ----
 
-// rename is a field whose friendly name is not the name of its label: the first list it is in, its id, and what
-// is reported of it, which is the two names and why they differ.
+// rename is a field whose friendly name is not the name of its label: the first list it is in, its id as an
+// author writes it, and what is reported of it, which is the two names and why they differ.
 type rename struct{ list, id, change string }
 
 // assignNames gives the fields of one table their friendly names. It returns, for each field, what is reported
@@ -114,7 +115,7 @@ type renaming struct {
 // then the rawcode after it.
 var renamings = []renaming{
 	{"category prefix", func(field objects.FieldMeta) string { return field.Category + capitalize(field.Name) }},
-	{"rawcode", func(field objects.FieldMeta) string { return field.Name + capitalize(field.ID) }},
+	{"rawcode", func(field objects.FieldMeta) string { return field.Name + capitalize(displayRawcode(field.ID)) }},
 }
 
 // renameClashes renames the fields whose names clash, by each renaming in turn: every field that clashes when a
@@ -300,7 +301,7 @@ func changedNames(list string, released, current []objects.FieldMeta, pins overr
 		name, still := names[field.ID]
 		pinned, _ := pins.pinned(list, field.ID)
 		switch {
-		case !still && !slices.Contains(pins.Removed[list], field.ID):
+		case !still && !slices.Contains(pins.Removed[list], displayRawcode(field.ID)):
 			problems = append(problems, wouldDisappear(list, field))
 		case still && name != field.Name && pinned != name:
 			problems = append(problems, wouldBecome(list, field, name))
@@ -339,27 +340,32 @@ var friendlyName = regexp.MustCompile(`^[a-z][A-Za-z0-9]*$`)
 
 // ---- errors ----
 
+// named is how a line of a refusal names a field: its list, its id as an author writes it, and its name.
+func named(list string, field objects.FieldMeta) string {
+	return list + " " + displayRawcode(field.ID) + ` "` + field.Name + `"`
+}
+
 // stillClashes is the line for a field whose name another field has after both renamings.
 func stillClashes(list string, field objects.FieldMeta) string {
-	return list + " " + field.ID + ` "` + field.Name + `" (` + field.Label + "): clashes with another field"
+	return named(list, field) + " (" + field.Label + "): clashes with another field"
 }
 
 // noFriendlyName is the line for a field whose name no property can have.
 func noFriendlyName(list string, field objects.FieldMeta) string {
-	return list + " " + field.ID + ` "` + field.Name + `" (` + field.Label + "): not a valid property name, a Pkl " +
+	return named(list, field) + " (" + field.Label + "): not a valid property name, a Pkl " +
 		"keyword or a reserved name; add a name for it to " + overridesPath
 }
 
 // wouldDisappear is the line for a released field of a list that the game's data have not, and that the
 // overrides do not list as removed.
 func wouldDisappear(list string, released objects.FieldMeta) string {
-	return list + " " + released.ID + ` "` + released.Name + `" would disappear`
+	return named(list, released) + " would disappear"
 }
 
 // wouldBecome is the line for a released field of a list whose name would be another now, and that no pin holds
 // to it.
 func wouldBecome(list string, released objects.FieldMeta, name string) string {
-	return list + " " + released.ID + ` "` + released.Name + `" would become "` + name + `"`
+	return named(list, released) + ` would become "` + name + `"`
 }
 
 // errReleasedNames refuses fields that would change what authors write, with a line for each name.

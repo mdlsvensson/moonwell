@@ -157,10 +157,6 @@ func unusableNames(module string, fields []objects.FieldMeta) []string {
 	return problems
 }
 
-// displayRawcode is a rawcode as an author sees it: the one id of three letters is padded with a NUL to four
-// bytes in the metadata.
-func displayRawcode(id string) string { return strings.TrimRight(id, "\x00") }
-
 // renderModule is the text of the module of a category for a version of the game: its head, and a property with
 // its doc comment for each field.
 func renderModule(game string, module schemaModule, fields []objects.FieldMeta) string {

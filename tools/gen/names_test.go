@@ -95,6 +95,13 @@ func TestNameFieldsAddsTheRawcodeWhereTheCategoryLeavesAClash(t *testing.T) {
 	if !slices.Contains(reported(renames), `abilities Hhb1 "damage" -> "dataDamageHhb1" (category prefix and rawcode)`) {
 		t.Errorf("the renames are %q", reported(renames))
 	}
+	// The rawcode is added as an author writes it: the id of three letters without the NUL that pads it.
+	fields, _ = namedFields(t, func(files map[string]string) {
+		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
+			`C;X1;Y11;K"Crs"`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`, `C;X9;K"unreal"`, `C;X13;K"AHhb"`)
+		files[labelsFile] += "WESTRING_CRS=Damage\r\nWESTRING_HHB1=Damage\r\nWESTRING_HDC1=Damage\r\n"
+	})
+	equal(t, "the name of the field of three letters", namesOf(fields["abilities"])["Crs\x00"], "dataDamageCrs")
 }
 
 // A name that no property can have is refused, with the field, its label and where to pin a name for it.
@@ -171,7 +178,7 @@ func TestCamelCaseIsTheFriendlyNameOfALabel(t *testing.T) {
 func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 	pins := overrides{Names: map[string]map[string]string{
 		"items":     {"unam": "displayName", "ucls": "unitClass"},
-		"abilities": {"acdn": "cooldown", "Crs\x00": "missChance"},
+		"abilities": {"acdn": "cooldown", "Crs": "missChance"},
 		"buffs":     {"unam": "notOfThisList"},
 	}}
 	fields, renames, err := nameFields(readMini(t, func(files map[string]string) {
@@ -192,7 +199,7 @@ func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 		`units ucls "class" -> "unitClass" (override)`,
 		`abilities acdn "cooldown" -> "cooldown" (override)`,
 		`abilities Htb1 "cooldown" -> "dataCooldown" (category prefix)`,
-		"abilities Crs\x00 \"class\" -> \"missChance\" (override)",
+		`abilities Crs "class" -> "missChance" (override)`,
 	})
 }
 
@@ -269,12 +276,12 @@ func decodeOverrides(data []byte) (overrides, error) {
 
 func TestTheOverridesAreThePinsAndTheFieldsThatAreRemoved(t *testing.T) {
 	const text = `{
-		"names": {"abilities": {"Tau1": "preferHostiles", "Crs\u0000": "missChance"}, "upgrades": {"gcls": "upgradeClass"}},
+		"names": {"abilities": {"Tau1": "preferHostiles", "Crs": "missChance"}, "upgrades": {"gcls": "upgradeClass"}},
 		"removed": {"units": ["uold", "uolder"]}
 	}`
 	want := overrides{
 		Names: map[string]map[string]string{
-			"abilities": {"Tau1": "preferHostiles", "Crs\x00": "missChance"}, "upgrades": {"gcls": "upgradeClass"}},
+			"abilities": {"Tau1": "preferHostiles", "Crs": "missChance"}, "upgrades": {"gcls": "upgradeClass"}},
 		Removed: map[string][]string{"units": {"uold", "uolder"}},
 	}
 	if got, err := decodeOverrides([]byte(text)); err != nil || !reflect.DeepEqual(got, want) {
@@ -366,6 +373,35 @@ func TestKeepsReleasedNamesLetsAPinGiveAReleasedFieldAnotherName(t *testing.T) {
 			[]string{units["uhpm"], units["unam"], items["unam"]}, []string{"health", "title", "title"})
 		if err := keepsReleasedNames(pinned, c.root, pins); err != nil {
 			t.Errorf("unam pinned under %s: the pins of other names than the released ones are refused: %v", under, err)
+		}
+	}
+}
+
+// The id of three letters is written in the overrides as an author writes it, Crs, under names and under
+// removed alike, and a line of the refusal shows it so: without the NUL that the metadata pads it with.
+func TestKeepsReleasedNamesTakesAndShowsTheIDOfThreeLettersAsItIsWritten(t *testing.T) {
+	scratch := newCheckout(t)
+	scratch.write(metadataPath, `{"fields": {"abilities": [{"id": "Crs\u0000", "name": "missChance"}]}}`)
+	gone := &objects.Metadata{}
+	renamed := &objects.Metadata{Fields: map[string][]objects.FieldMeta{
+		"abilities": {{ID: "Crs\x00", Name: "chanceToMiss"}},
+	}}
+	for _, c := range []struct {
+		current *objects.Metadata
+		pins    overrides
+		want    string // the line of the refusal; "" for none
+	}{
+		{gone, overrides{}, `abilities Crs "missChance" would disappear`},
+		{gone, overrides{Removed: map[string][]string{"abilities": {"Crs"}}}, ""},
+		{renamed, overrides{}, `abilities Crs "missChance" would become "chanceToMiss"`},
+		{renamed, overrides{Names: map[string]map[string]string{"abilities": {"Crs": "chanceToMiss"}}}, ""},
+	} {
+		err := keepsReleasedNames(c.current, scratch.root, c.pins)
+		switch {
+		case c.want == "" && err != nil:
+			t.Errorf("with the overrides %+v: %v", c.pins, err)
+		case c.want != "" && (err == nil || !strings.Contains(err.Error(), "\n  "+c.want)):
+			t.Errorf("with the overrides %+v: got %v, want the line %q", c.pins, err, c.want)
 		}
 	}
 }
