@@ -115,6 +115,7 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 		"single":  {"Name": "Only Level"},
 		"noBreak": {"Name": "\xC2\xA0Kept\xC2\xA0"},
 		"notHex":  {"Name": "|cffffccGGNo Colour|r"},
+		"accent":  {"Name": "\"Caf\xC3\xA9"},
 	}
 	rows := rowsOf(t, []string{"alias", "comments", "comment", "comment(s)"},
 		[]any{"named", "a comment", "another", "a third"}, []any{"tipped", "a comment", nil, nil},
@@ -122,7 +123,7 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 		[]any{"absent", "from the row|nalone", nil, nil}, []any{"marked", nil, nil, nil},
 		[]any{"levels", "a comment", nil, nil}, []any{"quoted", nil, nil, nil}, []any{"open", nil, nil, nil},
 		[]any{"lone", nil, nil, nil}, []any{"single", nil, nil, nil}, []any{"noBreak", nil, nil, nil},
-		[]any{"notHex", nil, nil, nil},
+		[]any{"notHex", nil, nil, nil}, []any{"accent", nil, nil, nil},
 	)
 	for _, c := range []struct {
 		row    int
@@ -143,8 +144,10 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 		{6, abilityName, "First Level,Second Level,Third"},
 		{6, upgradeName, "First Level"},
 		{7, upgradeName, "First, with a comma"},
-		// A list that opens a quote and never closes it loses its last character.
-		{8, upgradeName, "Never close"},
+		// A list that opens a quote and never closes it is one name: all that follows the quote, to its last
+		// byte, so a name that ends in a character of several bytes stays UTF-8.
+		{8, upgradeName, "Never closed"},
+		{13, upgradeName, "Caf\xC3\xA9"},
 		{9, upgradeName, ""},
 		{10, upgradeName, "Only Level"},
 		// The comment of a row is no list: it names an upgrade whole.

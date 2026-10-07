@@ -177,17 +177,14 @@ func (s nameSource) of(strs ini.File, id string, row slk.Row) string {
 
 // firstListItem is the first entry of a list with commas between its entries: what stands before the first
 // comma, or, for a list that opens with a quote, what stands between that quote and the next one. A list that
-// opens with a quote and has no other quote gives what follows the quote without its last byte.
+// opens with a quote and has no other quote is one entry: all that follows the quote.
 func firstListItem(list string) string {
-	quoted, opens := strings.CutPrefix(list, `"`)
-	if !opens {
-		first, _, _ := strings.Cut(list, ",")
-		return first
+	separator := ","
+	if quoted, opens := strings.CutPrefix(list, `"`); opens {
+		list, separator = quoted, `"`
 	}
-	if first, _, closes := strings.Cut(quoted, `"`); closes {
-		return first
-	}
-	return quoted[:max(0, len(quoted)-1)]
+	first, _, _ := strings.Cut(list, separator)
+	return first
 }
 
 // The game's markup in a name: the start of a colour (|c and eight hexadecimal digits), its end (|r), and a
