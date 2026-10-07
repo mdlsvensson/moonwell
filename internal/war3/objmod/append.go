@@ -1,7 +1,6 @@
 package objmod
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -28,11 +27,13 @@ type NewObject struct {
 	Mods     []NewMod
 }
 
-// Append adds objects, in order, to the custom table of source and copies everything else. A nil source gives a
-// new file with an empty original table. The source is not changed and the result shares no bytes with it.
+// AppendTo adds objects, in order, to the custom table of source and copies everything else. parsed is what Read
+// gave for source: a file is read once, by the caller, who may look into it before it appends. A nil parsed, for
+// a map without the file, gives a new file with an empty original table. The source is not changed and the
+// result shares no bytes with it.
 //
-// A source that does not read is Read's error. Any other error is a bug in the caller, not a problem with the
-// map, and so is not a diag error. Append refuses, and then returns no bytes:
+// An error is a bug in the caller, not a problem with the map, and so is not a diag error. AppendTo refuses, and
+// then returns no bytes:
 //
 //   - an object whose Base or ID, or a modification whose Field, is four NUL bytes: an id that was never set;
 //   - a value whose Type is none of the four;
@@ -42,27 +43,11 @@ type NewObject struct {
 //
 // It does not judge what a value means: any int, any finite real and any other text is written. Only the objects
 // it adds are checked. What the source holds is copied as it is.
-func Append(source []byte, kind TableKind, objects []NewObject, file string) ([]byte, error) {
-	var parsed *File
-	if source != nil {
-		var err error
-		if parsed, err = Read(source, kind, file); err != nil {
-			return nil, err
-		}
-	}
-	return AppendTo(parsed, source, kind, objects)
-}
-
-// AppendTo is Append for a source that is read already: parsed is what Read gave for source, and nil for a nil
-// source. A caller that has read a file to look into it appends through this, so that the file is read once.
 func AppendTo(parsed *File, source []byte, kind TableKind, objects []NewObject) ([]byte, error) {
-	w, err := begin(parsed, source, kind, len(objects))
-	if err != nil {
-		return nil, err
-	}
 	if err := unwritable(objects, kind); err != nil {
 		return nil, err
 	}
+	w := begin(parsed, source, kind, len(objects))
 	for _, object := range objects {
 		w.object(object)
 	}
@@ -77,19 +62,14 @@ type writer struct {
 }
 
 // begin returns a writer that holds everything that comes before the new objects: the source, which was read as
-// parsed, with the count of its custom table raised by added, or for a nil source the start of a new file.
-func begin(parsed *File, source []byte, kind TableKind, added int) (*writer, error) {
-	switch {
-	case parsed == nil && source == nil:
+// parsed, with the count of its custom table raised by added, or without a parsed file the start of a new one.
+func begin(parsed *File, source []byte, kind TableKind, added int) *writer {
+	if parsed == nil {
 		w := &writer{version: NewFileVersion, kind: kind}
 		w.out.I32(NewFileVersion)
 		w.out.I32(0) // no original objects
 		w.out.I32(int32(added))
-		return w, nil
-	case parsed == nil || parsed.Custom.Stop != len(source):
-		// A plain error: the caller passes what Read gave for the source, whose custom table ends where the
-		// source does, so anything else is a mistake in Moonwell.
-		return nil, errors.New("Cannot append to an object file: it was not read from the bytes that are given.")
+		return w
 	}
 	w := &writer{version: parsed.Version, kind: kind}
 	custom := parsed.Custom
@@ -97,7 +77,7 @@ func begin(parsed *File, source []byte, kind TableKind, added int) (*writer, err
 	w.out.I32(int32(len(custom.Objects) + added))
 	// The custom table runs to the end of the file: Read refuses bytes after it.
 	w.out.Write(source[custom.Start:custom.Stop])
-	return w, nil
+	return w
 }
 
 // object writes one object as World Editor 3.00 writes a custom one. Version 3 stores a count of sets and a flag

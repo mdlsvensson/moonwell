@@ -82,9 +82,9 @@ const damageSeed = 3
 // tally counts the damaged files that read and the ones that were refused.
 type tally struct{ read, refused int }
 
-// readOrRefused gives Read the bytes, and Append the bytes as its source. It stops the test when one of them
-// panics, when it returns neither a value nor an error or both, and when the error is not a *diag.Error with the
-// name the test gave. Append takes a source exactly when Read reads it.
+// readOrRefused gives Read the bytes, and AppendTo what Read made of them when it reads them. It stops the test
+// when one of them panics, when Read returns neither a value nor an error or both, when its error is not a
+// *diag.Error with the name the test gave, and when a file that reads does not come out longer by an object.
 func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmod.TableKind) {
 	t.Helper()
 	var parsed *objmod.File
@@ -93,27 +93,28 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 	if value := testkit.Panic(func() { parsed, err = objmod.Read(data, kind, modFile) }); value != nil {
 		t.Fatalf("%s: Read panics: %v", what, value)
 	}
-	added := []objmod.NewObject{{Base: id("hfoo"), ID: id("X001")}}
-	if value := testkit.Panic(func() { appended, appendErr = objmod.Append(data, kind, added, modFile) }); value != nil {
-		t.Fatalf("%s: Append panics: %v", what, value)
+	if parsed != nil {
+		added := []objmod.NewObject{{Base: id("hfoo"), ID: id("X001")}}
+		if value := testkit.Panic(func() { appended, appendErr = objmod.AppendTo(parsed, data, kind, added) }); value != nil {
+			t.Fatalf("%s: AppendTo panics: %v", what, value)
+		}
 	}
 	var failure *diag.Error
 	switch {
 	case err == nil && parsed != nil && appendErr == nil && len(appended) > len(data):
 		c.read++
-	case err != nil && parsed == nil && errors.As(err, &failure) && failure.File == modFile && appended == nil &&
-		appendErr != nil && appendErr.Error() == err.Error():
+	case err != nil && parsed == nil && errors.As(err, &failure) && failure.File == modFile:
 		c.refused++
 	default:
-		t.Fatalf("%s: Read = %+v, %v and Append = %d bytes, %v; want a file and a longer one, or one error of %s",
+		t.Fatalf("%s: Read = %+v, %v and AppendTo = %d bytes, %v; want a file and a longer one, or an error of %s",
 			what, parsed, err, len(appended), appendErr, modFile)
 	}
 }
 
-// TestADamagedFileIsReadOrRefusedByNameAndNeverPanics gives Read and Append every file cut at every length, after
-// each of 400 seeded changes of its bytes, and with each number that decides how the rest is read set to each
-// number at an edge and to the ones about the counts and types there are: the smallest number as a count, a
-// value type of -1 and of 4, 64 and 65 sets.
+// TestADamagedFileIsReadOrRefusedByNameAndNeverPanics gives Read, and AppendTo after it, every file cut at every
+// length, after each of 400 seeded changes of its bytes, and with each number that decides how the rest is read
+// set to each number at an edge and to the ones about the counts and types there are: the smallest number as a
+// count, a value type of -1 and of 4, 64 and 65 sets.
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	var damaged tally
 	for _, file := range filesToDamage(t) {
@@ -132,7 +133,7 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 			}
 		}
 	}
-	// The floor is against a test that passes because it gave Read and Append nothing.
+	// The floor is against a test that passes because it gave Read and AppendTo nothing.
 	if damaged.read == 0 || damaged.refused == 0 {
 		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.read, damaged.refused)
 	}

@@ -294,7 +294,7 @@ func TestWhatResolveAcceptsCanBeAppendedToAnObjectFile(t *testing.T) {
 		for _, category := range manifest.Categories {
 			file := objectFiles[category]
 			of := slices.DeleteFunc(slices.Clone(resolved), func(object objects.Resolved) bool { return object.Category != category })
-			if _, err := objmod.Append(nil, objmod.KindOf(file), appendable(t, of), file); err != nil {
+			if _, err := objmod.AppendTo(nil, nil, objmod.KindOf(file), appendable(t, of)); err != nil {
 				t.Errorf("%s: %s: %v", name, category, err)
 			}
 			appended[file] += len(of)

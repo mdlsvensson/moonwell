@@ -15,7 +15,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// modFile is the name the tests give Read and Append for their errors.
+// modFile is the name the tests give Read for its errors.
 const modFile = "map/war3map.w3u"
 
 // moonwell is a text with characters that are not ASCII: an o with a stroke, twice.
@@ -82,12 +82,22 @@ func mustRead(t *testing.T, data []byte, kind objmod.TableKind, file string) *ob
 	return parsed
 }
 
-// mustAppend appends objects the test knows can be written.
+// readOf is what Read gives for a source the test knows to be whole, and nil for no source: what AppendTo is
+// handed beside the source.
+func readOf(t *testing.T, source []byte, kind objmod.TableKind, file string) *objmod.File {
+	t.Helper()
+	if source == nil {
+		return nil
+	}
+	return mustRead(t, source, kind, file)
+}
+
+// mustAppend appends objects the test knows can be written, to a source it knows to be whole or to none.
 func mustAppend(t *testing.T, source []byte, kind objmod.TableKind, added []objmod.NewObject, file string) []byte {
 	t.Helper()
-	data, err := objmod.Append(source, kind, added, file)
+	data, err := objmod.AppendTo(readOf(t, source, kind, file), source, kind, added)
 	if err != nil {
-		t.Fatalf("Append(%s): %v", file, err)
+		t.Fatalf("AppendTo(%s): %v", file, err)
 	}
 	return data
 }
@@ -559,7 +569,7 @@ func TestSyntheticV1V2AndV3SourcesGetObjectsInTheirOwnVersionsShape(t *testing.T
 		{Base: "hfoo", ID: "h001", Mods: []testkit.SyntheticMod{{Field: "unam", Level: 2, Value: textValue("A")}}},
 		{Base: "hfoo", ID: "h002", Mods: []testkit.SyntheticMod{{Field: "utip", Value: textValue("B"), End: "h002"}}},
 	}
-	// A version 3 object with two sets and a flag that is not 0, which Append never writes, is still copied as it is.
+	// A version 3 object with two sets and a flag that is not 0, which AppendTo never writes, is still copied as it is.
 	multiSet := testkit.SyntheticObject{Base: "hfoo", ID: "h003", Sets: []testkit.SyntheticSet{
 		{Flag: 7},
 		{Mods: []testkit.SyntheticMod{{Field: "uhpm", Value: intValue(5)}}},
@@ -576,26 +586,6 @@ func TestSyntheticV1V2AndV3SourcesGetObjectsInTheirOwnVersionsShape(t *testing.T
 			if got := mustAppend(t, source, kind, added, "war3map.w3u"); !bytes.Equal(got, want) {
 				t.Errorf("v%d, kind %v: the appended file differs", version, kind)
 			}
-		}
-	}
-}
-
-func TestAppendingToAMalformedSourceIsTheReadersFileError(t *testing.T) {
-	valid := fixture(t, "war3mapSkin.w3u")
-	for _, c := range []struct {
-		name   string
-		source []byte
-		words  string
-	}{
-		{"a source cut after the id of its object", valid[:20], "object count 1 past end of file"},
-		{"a source cut inside its string", valid[:45], "unterminated string"},
-		{"a source that is empty and not nil", []byte{}, "truncated"},
-		{"a source of another version", testkit.SetU32(valid, 0, 4), "unsupported version 4"},
-	} {
-		data, err := objmod.Append(c.source, objmod.Simple, appended(objmod.Simple), "map/war3mapSkin.w3u")
-		refusal(t, c.name, err, "map/war3mapSkin.w3u", c.words)
-		if data != nil {
-			t.Errorf("%s: a refused source returned % X", c.name, data)
 		}
 	}
 }
@@ -621,7 +611,7 @@ func oneMod(mod objmod.NewMod) []objmod.NewObject {
 	return []objmod.NewObject{{Base: id("hfoo"), ID: id("X001"), Mods: []objmod.NewMod{mod}}}
 }
 
-// unwritable is objects that Append must refuse, and the words its error has.
+// unwritable is objects that AppendTo must refuse, and the words its error has.
 type unwritable struct {
 	name    string
 	kind    objmod.TableKind
@@ -629,13 +619,13 @@ type unwritable struct {
 	words   string
 }
 
-// refusedByAppend checks that Append refuses the objects, added to no source and to a source, with an error that
-// is not a file error and has the words, and that it returns no bytes.
+// refusedByAppend checks that AppendTo refuses the objects, added to no source and to a source, with an error
+// that is not a file error and has the words, and that it returns no bytes.
 func refusedByAppend(t *testing.T, cases []unwritable) {
 	t.Helper()
 	for _, c := range cases {
 		for _, source := range [][]byte{nil, testkit.BuildModFile(2, nil, nil, c.kind)} {
-			data, err := objmod.Append(source, c.kind, c.objects, "war3map.w3a")
+			data, err := objmod.AppendTo(readOf(t, source, c.kind, "war3map.w3a"), source, c.kind, c.objects)
 			var fileError *diag.Error
 			if err == nil || errors.As(err, &fileError) || !strings.Contains(err.Error(), c.words) {
 				t.Errorf("%s: error = %v, want one with %q that is not a *diag.Error", c.name, err, c.words)
@@ -726,7 +716,7 @@ func TestAppendRefusesAnIDOfFourNULs(t *testing.T) {
 	mustAppend(t, nil, objmod.Simple, []objmod.NewObject{object}, "war3map.w3u")
 }
 
-// TestAppendLeavesItsSourceAsItIs gives Append a source with spare capacity, where an append in place would go.
+// TestAppendLeavesItsSourceAsItIs gives AppendTo a source with spare capacity, where an append in place would go.
 func TestAppendLeavesItsSourceAsItIs(t *testing.T) {
 	for _, file := range []string{"war3mapSkin.w3u", "war3mapSkin.w3q"} {
 		kind := objmod.KindOf(file)
@@ -737,7 +727,7 @@ func TestAppendLeavesItsSourceAsItIs(t *testing.T) {
 			before := bytes.Clone(buffer)
 			data := mustAppend(t, source, kind, added, file)
 			if !bytes.Equal(buffer, before) {
-				t.Errorf("%s with %d objects: Append changed its source or the bytes after it", file, len(added))
+				t.Errorf("%s with %d objects: AppendTo changed its source or the bytes after it", file, len(added))
 			}
 			// Nothing written into the result may show in the source, or in the capacity it has to spare.
 			data = append(data, 0x55)
