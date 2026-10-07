@@ -1,7 +1,7 @@
 package settings
 
 import (
-	"encoding/json"
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -10,14 +10,16 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/txt"
 )
 
-// written is raw sections as JSON, in their order.
-func written(t *testing.T, raw manifest.Ordered[manifest.Ordered[string]]) string {
-	t.Helper()
-	text, err := json.Marshal(raw)
-	if err != nil {
-		t.Fatal(err)
+// written is raw sections as one text, in their order: each section's name, then its keys with their values.
+func written(raw manifest.Ordered[manifest.Ordered[string]]) string {
+	var text strings.Builder
+	for name, entries := range raw.All() {
+		fmt.Fprintf(&text, "[%q]", name)
+		for key, value := range entries.All() {
+			fmt.Fprintf(&text, " %q=%q", key, value)
+		}
 	}
-	return string(text)
+	return text.String()
 }
 
 func section(name string, fields ...txt.Field) txt.Section {
@@ -56,7 +58,7 @@ func TestTypedGameplayConstantsMergeIntoTheRawOnesWithoutRegardToLetterCase(t *t
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := settingsOf(t, tt.document)
-			before := written(t, s.GameplayConstants)
+			before := written(s.GameplayConstants)
 			merged, _, err := textSections(s, manifestName)
 			if err != nil {
 				t.Fatal(err)
@@ -71,7 +73,7 @@ func TestTypedGameplayConstantsMergeIntoTheRawOnesWithoutRegardToLetterCase(t *t
 				}
 				merged[i].Fields = append(merged[i].Fields, txt.Field{Key: "Added", Value: "x"})
 			}
-			if after := written(t, s.GameplayConstants); after != before {
+			if after := written(s.GameplayConstants); after != before {
 				t.Errorf("the settings were changed: %s, were %s", after, before)
 			}
 		})
@@ -89,14 +91,14 @@ func TestATypedGameplayConstantThatDisagreesWithARawOneIsRefusedByTheManifest(t 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := settingsOf(t, tt.document)
-			before := written(t, s.GameplayConstants)
+			before := written(s.GameplayConstants)
 			_, _, err := textSections(s, manifestName)
 			failure := asError(t, err, tt.document)
 			if failure.File != manifestName || !strings.Contains(failure.Msg, "Conflicting typed and raw gameplay constant: "+tt.constant) ||
 				!strings.Contains(failure.Hint, tt.setting) {
 				t.Errorf("error = %+v", failure)
 			}
-			if after := written(t, s.GameplayConstants); after != before {
+			if after := written(s.GameplayConstants); after != before {
 				t.Errorf("the settings were changed: %s, were %s", after, before)
 			}
 		})
