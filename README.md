@@ -127,7 +127,7 @@ Nothing else changes in the project: the manifest, the map and the libraries sta
 | `.luarc.json`        | Settings for lua-language-server in the editor                                                         |
 | `.vscode/`           | `extensions.json`, which recommends the YueScript and Lua extensions                                   |
 | `moonwell.lock`      | The commit of each library's GitHub tag (see "Libraries"); commit it                                   |
-| `.moonwell/`         | Libraries and editor declarations, written by `check`, `build`, `test`, `dev` and `setup`; git-ignored |
+| `.moonwell/`         | Libraries and editor declarations, written by `check`, `build`, `test`, `dev`, `setup` and the three `assets:` commands; git-ignored |
 | `dist/`              | Build output                                                                                           |
 
 `moonwell.local.pkl` amends `moonwell.pkl`, so any setting can be overridden there for your machine only. Lists such as

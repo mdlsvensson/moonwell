@@ -373,7 +373,8 @@ Three habits follow, and the code keeps them everywhere:
   bottom of the file that raises them, below a line `// ---- errors ----`. To change the words of an error, search
   for a few of its words; to see every way a file can fail, scroll to its end.
 - A plain error (`errors.New`, `fmt.Errorf`) appears only where the caller, not the user, made the mistake. A
-  comment beside it says why it is plain; search the code for "plain error" to see them.
+  comment beside it says why it is plain, in the words "a plain error" or "not a diag error"; search the code for
+  "plain error" and "diag error" to see them.
 - A test of an error checks its file, its hint and the words that tell it apart, not the whole sentence. The tests
   of the packages that raise such errors each have a helper, `asError`, that fails the test for an error that is no
   `*diag.Error`.
@@ -504,7 +505,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | --- | --- |
 | see what `moonwell build` does, in order | `internal/build/build.go`: `Build`, then `Plan`; the longer steps in `internal/build/steps.go` |
 | add a command | `internal/cli/cli.go`: the table `commands`, whose comment says what a new command needs |
-| add a flag, or give a command a flag | `internal/cli/args.go`: the table `flags`, and a field of `line` for what the flag says. A flag of `build` and `test` then goes on through `options` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
+| add a flag, or give a command a flag | `internal/cli/args.go`: the table `flags`, and a field of `line` for what the flag says. The flag is also written by hand in the `usage` text of each command that has it, in the table `commands` of `internal/cli/cli.go`: that text is what `--help` shows. A flag of `build` and `test` then goes on through `options` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
 | know why a command line is refused | `internal/cli/args.go`: `parse`, `fits`, and the errors at the bottom |
 | change the help text | `internal/cli/cli.go`: `Usage`, and the `usage` and `help` of each row of `commands` |
 | know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `runIn`, `exitCode` |
@@ -680,6 +681,12 @@ on every system. (`internal/build/watch.go`.)
 UTF-8 is kept as it is. White space is the six characters of ASCII, as Lua and the game's text files have it, and
 names sort by their bytes. A byte order mark at the start of a text that is read is dropped; a path in
 `war3map.imp` keeps one, because it is written back as it was read. (`internal/fsx/text.go`.)
+
+**One reader leaves its functions by a panic.** `reader` in `internal/war3/lua/functions.go` reads Lua's statements
+by recursive descent, where every step would otherwise return an error and every call check one. So `fail` panics
+with the error at a token the grammar does not allow, and `Functions`, which alone makes a `reader`, recovers that
+panic and returns the error. It is the only place where a panic is a way out of a function: any other panic is a
+bug in Moonwell, and is printed as an internal error.
 
 **An error of `mapdir` has a cause exactly when the system failed.** A folder that cannot be listed has one; a map
 whose content is refused has none. `internal/assets` reads the difference to say whether a failure is a library's

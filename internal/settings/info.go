@@ -52,6 +52,8 @@ func patchInfo(data []byte, s manifest.Settings, file string) ([]byte, error) {
 	}
 	patched, err := w3i.ApplyEdits(data, p.edits)
 	if err != nil {
+		// A plain error: every edit is of a field that w3i.Read placed in these bytes, so edits that overlap or
+		// leave them are a mistake in Moonwell and nothing the user can put right.
 		return nil, fmt.Errorf("patching %s: %w", file, err)
 	}
 	return patched, nil

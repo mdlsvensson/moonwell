@@ -146,6 +146,9 @@ Text and bytes:
 - Names sort by their bytes, letter case folds as Go folds it, "did you mean" compares names by characters, and
   `assets:paths` pads its columns by characters. This differs from 0.9.1 only for characters above U+FFFF and for
   `ß`, `İ` and ligatures in names.
+- The files inside the archive, and its `(listfile)`, stand in the map's own order and then the order they were
+  planned in: the source map's files first, then the files the build adds. 0.9.1 sorted all of them by name. The
+  game finds a file by the hash of its name, so nothing reads the order.
 
 Libraries:
 

@@ -239,6 +239,7 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 	}
 	config, isObject := objectOf(data)
 	if !isObject {
+		// A plain error: the template is Moonwell's own, so this is a mistake in Moonwell and not the user's.
 		return nil, errors.New("editor: the template's .luarc.json is not a JSON object")
 	}
 	entries := map[string][]string{}
@@ -246,6 +247,7 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 		written, _ := config.Get(key)
 		list, isList := stringsOf(written)
 		if !isList {
+			// A plain error, as the one above: the template is Moonwell's own.
 			return nil, errors.New("editor: the template's .luarc.json has no " + key + " array of strings")
 		}
 		entries[key] = list

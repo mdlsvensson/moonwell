@@ -76,6 +76,8 @@ func (p *patcher) text(native, value string) {
 func (p *patcher) edited() (string, error) {
 	result, err := lua.ApplyEdits(p.source, p.edits)
 	if err != nil {
+		// A plain error: every edit is at a place that lua.Functions found in this source, so edits that overlap
+		// or leave it are a mistake in Moonwell and nothing the user can put right.
 		return "", fmt.Errorf("patching %s: %w", p.file, err)
 	}
 	if _, err := lua.Functions(result, p.file); err != nil {
