@@ -115,8 +115,8 @@ var valueRules = []refused{
 }
 
 // plainDecimalRules are problems whose message holds a number below 0.000001 or from 1e21, which is written in
-// plain decimal, with every digit and no exponent. They are a table of their own: the design's §8 has their row,
-// "A number in an error message is written in plain decimal".
+// plain decimal, with every digit and no exponent. They are a table of their own, for the test of that one rule
+// (TestAProblemWritesItsNumberInPlainDecimal).
 var plainDecimalRules = []refused{
 	{name: "a real that a float32 cannot hold", document: captain(`{"uacq":1e39}`),
 		at: `units["captain"].properties["uacq"]`, says: "1000000000000000000000000000000000000000 is out of range for a real number.",

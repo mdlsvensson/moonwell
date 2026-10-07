@@ -721,7 +721,6 @@ a script without SetMapName:
   war3mapMinimap.blp: sha256 0c39073f9ed497b2d2a28671d3229de2e155ef1cdb78b84bc2b8432fbaf1a6ab, 6 bytes
   war3mapMap.blp: sha256 6a7b6cb4f7dbf360733df96acf9ccbc304dbd2154f937e9b17d13086ff55d4e4, 66716 bytes
 a script whose main() returns a value:
-  note: §8, "A preview on a map whose main() ends in return <value> is refused"
   refused: maps/map.w3x/war3map.lua
 bytes that are no map info:
   war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
@@ -791,7 +790,6 @@ a script without SetMapName:
   war3mapMap.blp: removed
   war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
 a script whose main() returns a value:
-  note: §8, "A preview on a map whose main() ends in return <value> is refused"
   refused: maps/map.w3x/war3map.lua
 bytes that are no map info:
   war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
@@ -852,7 +850,6 @@ a script without SetMapName:
   war3mapMap.blp: removed
   war3mapMap.tga: sha256 b3569081df09cd6a7e374c772a9b3b9c26b8c19f9308f927f958bb160e0b5b48, 262162 bytes
 a script whose main() returns a value:
-  note: §8, "A preview on a map whose main() ends in return <value> is refused"
   refused: maps/map.w3x/war3map.lua
 bytes that are no map info:
   war3map.lua: sha256 4629fb904fe58bebbe38a637b52583c79e362208634a46ff5aa2d7f241b1e4c2, 6716 bytes
@@ -915,7 +912,6 @@ text files that are not UTF-8:
 a script without SetMapName:
   refused: maps/map.w3x/war3map.lua
 a script whose main() returns a value:
-  note: §8, "A preview on a map whose main() ends in return <value> is refused"
   refused: maps/map.w3x/war3map.lua
 bytes that are no map info:
   refused: maps/map.w3x/war3map.w3i
@@ -1477,7 +1473,6 @@ text files that are not UTF-8:
 a script without SetMapName:
   refused: maps/map.w3x/war3map.lua
 a script whose main() returns a value:
-  note: §8, "A preview on a map whose main() ends in return <value> is refused"
   refused: maps/map.w3x/war3map.lua
 bytes that are no map info:
   refused: maps/map.w3x/war3map.w3i
@@ -1507,14 +1502,11 @@ every file, each text file behind a byte order mark:
   war3map.lua: sha256 683672c62552a45e56551612a32d60639d5527c29ad98e8564dad6ab8b8037b3, 6648 bytes
 == {"players":{"11":{"name":"Last","controller":"rescuable","race":"undead","fixedStart":true,"x":1.5,"y":-2.5},"1":{"name":"Second","controller":"neutral","race":"human","fixedStart":false,"x":0,"y":0},"0":{"name":"","controller":"user","race":"selectable","fixedStart":true,"x":-0.0,"y":3e-7}},"forces":{"1":{"name":"","allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true,"sharedAdvancedControl":false},"0":{"name":"First","allied":true,"alliedVictory":true,"sharedVision":true,"sharedControl":true,"sharedAdvancedControl":true}},"environment":{"soundEnvironment":"","waterColor":[0,0,0,0],"fog":{"enabled":false,"style":0,"start":-10,"end":-10,"density":0,"color":[0,0,0,0]}}}
 the 53 scripts:
-  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
   sha256 3fb96663d45a255a8f87d774b5d8866138f2935b44455831d23fe70fa230325d, 183463 bytes
 the fixture:
-  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
   war3map.w3i: sha256 89070504ca0caf66e4daf4636662df4a116023ec6ec2c07cab14441117ad66fb, 579 bytes
   war3map.lua: sha256 198efd10d8932bfa26eac3c8227db4b7121b309e278cc5399ca898a7436e8229, 9914 bytes
 every file, each text file behind a byte order mark:
-  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
   war3map.w3i: sha256 89070504ca0caf66e4daf4636662df4a116023ec6ec2c07cab14441117ad66fb, 579 bytes
   war3map.lua: sha256 f67847419b0c717181bfe24eadc267c9db18f0dbfaf4eef6bcd66424b814bde0, 9917 bytes
 == {"players":{"23":{},"0":{"name":"Hero"},"9":{"name":null}},"forces":{"7":{},"0":{"sharedControl":true}}}
@@ -2089,15 +2081,12 @@ the 53 scripts:
   sha256 e62415c0e41588d7396173d76ba79ef6a0f67369ecad24b29218be83388fef89, 268282 bytes
 == {"players":{"0":{"x":0.000001}}}
 the 53 scripts:
-  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
   sha256 7a149595812a118162617ff3dd3052abc8183f8491117745ef7a287e4b6b5d43, 258020 bytes
 == {"players":{"1":{"x":7},"11":{"y":-0.0000001}}}
 the 53 scripts:
-  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
   sha256 34649a0c8efddbe0c4be96cf0377c42d76b7a76a5003be65a1f0f0f3c0bbab8c, 244578 bytes
 == {"environment":{"fog":{"enabled":true,"start":-0.0000001,"density":1e-7}}}
 the 53 scripts:
-  note: §8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"
   sha256 e9aa1129f9a20367df19a74d0d20120a320377c8c1ee1fef47f7dd6b89a89bce, 268147 bytes
 == {"environment":{"fog":{"enabled":false,"density":1e-7}}}
 the 53 scripts:

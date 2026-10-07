@@ -197,7 +197,6 @@ left:
     import 29 Textures\b.blp
     import 13 Textures\c.blp
 == a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/a.blp
 left:
   maps/
@@ -217,7 +216,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
     import 13 a.blp
 == a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 3)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/a.blp
 left:
   .asset-state/
@@ -228,7 +226,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
     import 13 a.blp
 == a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 4)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/a.blp
 left:
   .asset-state/
@@ -239,7 +236,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
     import 13 a.blp
 == a file of the map where an asset goes, then an owned file edited by hand, with and without its asset (run 5)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/a.blp
 left:
   .asset-state/
@@ -250,7 +246,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
     import 13 a.blp
 == an asset below a file of the map (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/Textures
 left:
   maps/
@@ -339,7 +334,6 @@ left:
   maps/map.w3x/
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x00\x00\x00\x00"
 == a folder appears where a new file goes, after the plan (run 1)
-note: §8, "assets:sync: a file or folder that appears where a new asset goes, between the check and the write, stops the sync with "changed after the assets were checked""
 refused: maps/map.w3x/b.blp
 planned:
   a.blp: "the bytes of assets/a.blp"
@@ -369,7 +363,6 @@ left:
   maps/map.w3x/war3mapImported/
   maps/map.w3x/war3mapImported/existing.wav: "editor"
 == a write fails after a file was replaced: a file is where the folder of a new file goes (run 2)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/Sound/b.blp
 planned:
   a.blp: "second"
@@ -485,7 +478,6 @@ left:
   maps/map.w3x/war3mapImported/
   maps/map.w3x/war3mapImported/ui/
 == a library's file where the map has a file of its own (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/Models/Golem.mdx
 left:
   maps/
@@ -493,7 +485,6 @@ left:
   maps/map.w3x/Models/
   maps/map.w3x/Models/Golem.mdx: "the bytes of maps/map.w3x/Models/Golem.mdx"
 == an import World Editor made where an asset goes, without a file (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/Textures/a.blp
 left:
   maps/
@@ -501,7 +492,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\x1dtextures\\A.blp\x00"
     import 29 textures\A.blp
 == an import in the folder World Editor imports into, where an asset goes (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/war3mapImported/a.wav
 left:
   maps/
@@ -509,7 +499,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\bA.wav\x00"
     import 8 A.wav
 == an index that lists a path twice (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/war3map.imp
 left:
   maps/
@@ -519,21 +508,18 @@ left:
     import 5 y.wav
     import 29 textures/X.BLP
 == an index that is cut short (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/war3map.imp
 left:
   maps/
   maps/map.w3x/
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rx"
 == an index with a flag World Editor does not write (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/war3map.imp
 left:
   maps/
   maps/map.w3x/
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ax.blp\x00"
 == an index with a path that leaves the map (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/War3Map.imp
 left:
   maps/
@@ -623,7 +609,6 @@ left:
     import 13 d.blp
     import 13 Sound\e.blp
 == an asset named as a folder of the map (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/Textures
 left:
   maps/
@@ -631,7 +616,6 @@ left:
   maps/map.w3x/Textures/
   maps/map.w3x/Textures/x.blp: "the bytes of maps/map.w3x/Textures/x.blp"
 == an asset named as an empty folder of the map (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/Empty
 left:
   maps/
@@ -651,7 +635,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rdata\x00"
     import 13 data
 == an asset below an owned file that no asset wants (run 2)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/data
 left:
   .asset-state/
@@ -662,7 +645,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\rdata\x00"
     import 13 data
 == two assets without room, the first below a file (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/a
 left:
   maps/
@@ -670,7 +652,6 @@ left:
   maps/map.w3x/a: "the bytes of maps/map.w3x/a"
   maps/map.w3x/b.blp: "the bytes of maps/map.w3x/b.blp"
 == two assets without room, the first at a file (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/0.blp
 left:
   maps/
@@ -893,14 +874,12 @@ left:
     import 13 old.blp
   maps/map.w3x/war3map.w3i: "the bytes of maps/map.w3x/war3map.w3i"
 == a library's file below a file of the map (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/UI
 left:
   maps/
   maps/map.w3x/
   maps/map.w3x/UI: "the bytes of maps/map.w3x/UI"
 == a folder named as the index (run 1)
-note: §8, "A folder where a map file belongs, and a file that cannot be read [...], is a named error with the file, not an internal error"
 refused: maps/map.w3x/war3map.imp
 left:
   maps/
@@ -925,7 +904,6 @@ left:
     import 13 0.blp
     import 13 a.blp
 == an owned file is edited by hand after the plan (run 2)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/a.blp
 planned:
   0.blp: "second"
@@ -943,7 +921,6 @@ left:
     import 13 0.blp
     import 13 a.blp
 == a file appears where a new asset goes, after the plan (run 1)
-note: the file of this refusal is named from the project folder, where the program before this one gave no file or a path on disk
 refused: maps/map.w3x/a.blp
 planned:
   0.blp: "the bytes of assets/0.blp"
@@ -956,7 +933,6 @@ left:
   maps/map.w3x/
   maps/map.w3x/a.blp: "the editor's"
 == the state file cannot be written (run 1)
-note: the file of this refusal is the state file, by its path on disk, where the program before this one gave no file
 refused: <root>/.asset-state/map.w3x.json
 planned:
   a.blp: "the bytes of assets/a.blp"
@@ -982,7 +958,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
     import 13 a.blp
 == the state file is changed before it is written (run 2)
-note: the file of this refusal is the state file, by its path on disk, where the program before this one gave no file
 refused: <root>/.asset-state/map.w3x.json
 planned:
   a.blp: "second"
@@ -1009,7 +984,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
     import 13 a.blp
 == the state file is removed before it is written (run 2)
-note: the file of this refusal is the state file, by its path on disk, where the program before this one gave no file
 refused: <root>/.asset-state/map.w3x.json
 planned:
   a.blp: "second"
@@ -1022,7 +996,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
     import 13 a.blp
 == a state file is made before the first is written (run 1)
-note: the file of this refusal is the state file, by its path on disk, where the program before this one gave no file
 refused: <root>/.asset-state/map.w3x.json
 planned:
   a.blp: "the bytes of assets/a.blp"
@@ -1047,7 +1020,6 @@ left:
   maps/map.w3x/war3map.imp: "\x01\x00\x00\x00\x01\x00\x00\x00\ra.blp\x00"
     import 13 a.blp
 == the state file is changed before it is removed (run 2)
-note: the file of this refusal is the state file, by its path on disk, where the program before this one gave no file
 refused: <root>/.asset-state/map.w3x.json
 planned:
   a.blp: removed

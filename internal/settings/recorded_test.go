@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"maps"
-	"math"
 	"runtime"
 	"slices"
 	"strconv"
@@ -14,10 +13,8 @@ import (
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
-	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
-	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
 // ---- the scripts ----
@@ -81,31 +78,6 @@ func layouts(t testing.TB, before, fixture string) []script {
 	}
 }
 
-// inPlainDecimal reports whether the settings make a script take, from the map info given as bytes, a number
-// that is not 0 and is below 0.000001 in size or from 1e21: a position of a player whose position is set, or a
-// start, an end or a density of a fog that is set and shown. A script takes such a number in plain decimal.
-func inPlainDecimal(s manifest.Settings, patchedInfo []byte) bool {
-	info, err := w3i.Read(patchedInfo, infoFile, w3i.Extended)
-	if err != nil {
-		return false
-	}
-	small := func(values ...float32) bool {
-		return slices.ContainsFunc(values, func(value float32) bool {
-			size := math.Abs(float64(value))
-			return size != 0 && (size < 0.000001 || size >= 1e21)
-		})
-	}
-	for _, player := range info.Details.Players {
-		override := s.Players[int(player.ID.Value)]
-		if (override.X != nil || override.Y != nil) && small(player.X.Value, player.Y.Value) {
-			return true
-		}
-	}
-	fog := info.Details.Fog
-	return s.Environment.Fog != (manifest.Fog{}) && info.Flags.Value&fogOn != 0 &&
-		small(fog.Start.Value, fog.End.Value, fog.Density.Value)
-}
-
 // onEveryCore runs each piece of work on one of as many goroutines as the machine runs at once, and returns when
 // all are done.
 func onEveryCore(pieces int, work func(piece int)) {
@@ -158,8 +130,6 @@ type sourceMap struct {
 	files map[string][]byte
 	// every says that every document is planned for the folder. For the others it is those of routeDocuments.
 	every bool
-	// returns says that the main() of its script ends in a return of a value, after which no call can stand.
-	returns bool
 }
 
 // sourceMaps is the map folders the settings are planned for. The first two get every document: the fixture as
@@ -204,7 +174,7 @@ func sourceMaps(t testing.TB) []sourceMap {
 			"war3mapMisc.txt": {0xc3}, "war3mapSkin.txt": []byte(byteOrderMark + "[A]\n\xff")})},
 		{name: "a script without SetMapName", files: fixture(files{
 			"war3map.lua": []byte(swapped(t, script, "SetMapName(", "Other(")), "war3mapMap.blp": minimapBytes})},
-		{name: "a script whose main() returns a value", returns: true,
+		{name: "a script whose main() returns a value",
 			files: fixture(files{"war3map.lua": []byte(returnsValue), "war3mapMap.blp": minimapBytes})},
 		{name: "bytes that are no map info", files: fixture(files{
 			"war3map.w3i": []byte("not a map info"), "war3mapMap.blp": minimapBytes})},
@@ -225,34 +195,7 @@ func (m sourceMap) onDisk(t testing.TB) string {
 	return dir
 }
 
-// held is the bytes of the file the map folder has under name, in any letter case.
-func (m sourceMap) held(name string) []byte {
-	for spelled, data := range m.files {
-		if mapdir.Key(spelled) == mapdir.Key(name) {
-			return data
-		}
-	}
-	return nil
-}
-
-// changeTo is the change a plan makes to the file under name, in any letter case.
-func changeTo(changes []mapdir.Change, name string) (mapdir.Change, bool) {
-	for _, change := range changes {
-		if mapdir.Key(change.Name) == mapdir.Key(name) {
-			return change, true
-		}
-	}
-	return mapdir.Change{}, false
-}
-
 // ---- the recording ----
-
-// The two notes of the recording. Each stands beside a result that the table of what a user can notice, in the
-// design of this program (its §8), has a row for, and quotes that row.
-const (
-	notePlainDecimal = `§8, "A number below 0.000001 or from 1e21 in war3map.lua is written in plain decimal"`
-	noteAfterAReturn = `§8, "A preview on a map whose main() ends in return <value> is refused"`
-)
 
 // fileOf is the file that a refusal names.
 func fileOf(err error) string {
@@ -268,16 +211,12 @@ type recordedPlan struct {
 	changes   []mapdir.Change
 	refused   bool
 	refusedAt string
-	note      string
 }
 
 // lines is the plan as a recording holds it, each line indented: the file a refusal names; or a line for each
 // change, which holds a text file whole, as Go quotes a string, and any other file as its digest.
 func (p recordedPlan) lines() string {
 	var out strings.Builder
-	if p.note != "" {
-		fmt.Fprintf(&out, "  note: %s\n", p.note)
-	}
 	switch {
 	case p.refused:
 		fmt.Fprintf(&out, "  refused: %s\n", p.refusedAt)
@@ -304,16 +243,12 @@ type recordedScripts struct {
 	refused   bool
 	refusedAt string
 	scripts   []string
-	note      string
 }
 
 // lines is the scripts as a recording holds them: one digest for all of them, each after its name; "as they are"
 // where no script changes; or the file that the map info's refusal names.
 func (r recordedScripts) lines(sources []script) string {
 	var out strings.Builder
-	if r.note != "" {
-		fmt.Fprintf(&out, "  note: %s\n", r.note)
-	}
 	if r.refused {
 		fmt.Fprintf(&out, "  refused: %s\n", r.refusedAt)
 		return out.String()
@@ -396,9 +331,6 @@ func scriptsWith(t testing.TB, document string, sources []script) recordedScript
 		return recordedScripts{refused: true, refusedAt: fileOf(err)}
 	}
 	made := recordedScripts{}
-	if inPlainDecimal(s, info) {
-		made.note = notePlainDecimal
-	}
 	for _, source := range sources {
 		text, err := afterInfo(source.text, s, info)
 		if err != nil {
@@ -431,22 +363,9 @@ func planFor(t testing.TB, source sourceMap, dir, root, document string) recorde
 	}
 	changes, err := Plan(folder, project)
 	if err != nil {
-		refused := recordedPlan{refused: true, refusedAt: fileOf(err)}
-		// The one refusal for the script of a map whose main() returns a value is that of the call a preview adds.
-		if source.returns && project.Settings.Info.Preview != nil && refused.refusedAt == folder.Label(luaName) {
-			refused.note = noteAfterAReturn
-		}
-		return refused
+		return recordedPlan{refused: true, refusedAt: fileOf(err)}
 	}
-	planned := recordedPlan{changes: changes}
-	info := source.held(infoName)
-	if change, patched := changeTo(changes, infoName); patched {
-		info = change.Bytes
-	}
-	if inPlainDecimal(project.Settings, info) {
-		planned.note = notePlainDecimal
-	}
-	return planned
+	return recordedPlan{changes: changes}
 }
 
 // TestTheSettingsOfEveryDocumentAreAsRecorded holds what every settings document makes of every script, and

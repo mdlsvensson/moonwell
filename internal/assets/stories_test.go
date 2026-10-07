@@ -89,50 +89,6 @@ func (p project) shippedIn(root string) []Library {
 	return libraries
 }
 
-// The kinds of refusal a run can have. A refusal of the first kind names no file of the project, or the manifest.
-// Each of the others is about one file.
-const (
-	asWhole = "whole"
-	// byName is a refusal about a file of the map, or about the state file.
-	byName = "by name"
-	// reworded is the refusal of a write to a place that changed after the assets were checked.
-	reworded = "reworded"
-	// bySystem is the refusal for a file of the map that cannot be read, or that is a folder.
-	bySystem = "by system"
-)
-
-// The notes of the recording. A note stands beside a run whose refusal has another file than the program before
-// this one gave it, and says what the recording holds there. Two kinds of refusal have a row in the table of what
-// a user can notice, in the design of this program (its §8), and their notes quote it. A refusal by name has no
-// row: its note says what its file is, by what the run records.
-const (
-	noteFromTheProject = "the file of this refusal is named from the project folder, where the program before " +
-		"this one gave no file or a path on disk"
-	noteStateOnDisk = "the file of this refusal is the state file, by its path on disk, where the program before " +
-		"this one gave no file"
-	noteReworded = `§8, "assets:sync: a file or folder that appears where a new asset goes, between the check and ` +
-		`the write, stops the sync with "changed after the assets were checked""`
-	noteBySystem = `§8, "A folder where a map file belongs, and a file that cannot be read [...], is a named error ` +
-		`with the file, not an internal error"`
-)
-
-// noteOf is the note beside a run of a kind that came to the outcome, or "" for a run without one. A refusal by
-// name that has no file, because its message lists the files it is about, has none: no file is what the program
-// before this one gave it too.
-func noteOf(kind string, o outcome) string {
-	switch {
-	case kind == reworded:
-		return noteReworded
-	case kind == bySystem:
-		return noteBySystem
-	case kind != byName || !o.refused || o.refusedAt == noFile:
-		return ""
-	case strings.HasPrefix(o.refusedAt, underRoot):
-		return noteStateOnDisk
-	}
-	return noteFromTheProject
-}
-
 // run is one run of assets:sync, or of a build, in a project as the runs before it left it.
 type run struct {
 	edit      func(t testing.TB, root string) // what changes in the project before the run
@@ -142,7 +98,6 @@ type run struct {
 	meddle    func(t testing.TB, root string) // what another program does between the plan and its writes
 	// The context of the plan and of the writes, for a run that makes its own: else one that is never cancelled.
 	planCtx, syncCtx func(t testing.TB, root string) *countdown
-	refused          string // the kind of its refusal; "" for a run that is taken
 }
 
 // story is a project and the runs in it, one after the other.
@@ -334,13 +289,13 @@ func scenarioStories() []story {
 				{edit: putting("assets/Textures/c.blp", "a third")}}},
 		{"a file of the map where an asset goes, then an owned file edited by hand, with and without its asset",
 			project{files: with(holding("assets/a.blp"), m+"a.blp", "editor owned")},
-			[]run{{refused: byName}, {edit: removing(m + "a.blp")},
-				{edit: putting(m+"a.blp", "manual edit"), refused: byName},
-				{edit: removing("assets/a.blp"), refused: byName},
-				{build: true, refused: byName}}},
+			[]run{{}, {edit: removing(m + "a.blp")},
+				{edit: putting(m+"a.blp", "manual edit")},
+				{edit: removing("assets/a.blp")},
+				{build: true}}},
 		{"an asset below a file of the map",
 			project{files: holding("assets/a.blp", m+"Textures")},
-			[]run{{block: `{"paths":{"a.blp":"textures/a.blp"}}`, refused: byName}}},
+			[]run{{block: `{"paths":{"a.blp":"textures/a.blp"}}`}}},
 		{"a folder the map spells in its own way, and new folders in three spellings",
 			project{files: holding(m+"Textures/existing.blp", "assets/textures/new.blp", "assets/a.blp",
 				"assets/b.blp", "assets/c.blp")},
@@ -349,16 +304,16 @@ func scenarioStories() []story {
 			project{}, []run{{}, {edit: putting("assets/a.blp", "one")}, {edit: removing("assets/a.blp")}}},
 		{"a folder appears where a new file goes, after the plan",
 			project{files: holding("assets/a.blp", "assets/b.blp")},
-			[]run{{meddle: putting(m+"b.blp/inner.txt", "another program's"), refused: reworded}}},
+			[]run{{meddle: putting(m+"b.blp/inner.txt", "another program's")}}},
 		{"a write fails after a file was replaced: a file is where the folder of a new file goes",
 			project{files: with(holding("assets/a.blp"), m+"war3mapImported/existing.wav", "editor",
 				m+"war3map.imp", indexOf(imp.Entry{Flag: 5, Path: "existing.wav"}))},
 			[]run{{}, {edit: putting("assets/a.blp", "second", "assets/Sound/b.blp", "new"),
-				meddle: putting(m+"Sound", "another program's"), refused: byName}}},
+				meddle: putting(m+"Sound", "another program's")}}},
 		{"a file that cannot be taken out again when the sync is interrupted",
 			project{files: holding("assets/a.blp", "assets/b.blp")},
-			[]run{{syncCtx: stopped(1, several(removing(m+"a.blp"), putting(m+"a.blp/inner.txt", "another program's"))),
-				refused: byName}}},
+			[]run{{syncCtx: stopped(1,
+				several(removing(m+"a.blp"), putting(m+"a.blp/inner.txt", "another program's")))}}},
 		{"nothing to import and nothing owned, in a map whose index does not read",
 			project{files: map[string]string{m + "war3map.imp": "\x09\x09"}}, []run{{}, {build: true}}},
 		{"a library's files beside the map's own, and the library dropped",
@@ -367,7 +322,7 @@ func scenarioStories() []story {
 			[]run{{libraries: []string{"ui"}}, {libraries: []string{"ui"}}, {}}},
 		{"a library's file where the map has a file of its own",
 			project{files: holding(s+"ui/Models/Golem.mdx", m+"Models/Golem.mdx")},
-			[]run{{libraries: []string{"ui"}, refused: byName}}},
+			[]run{{libraries: []string{"ui"}}}},
 	}
 }
 
@@ -383,23 +338,23 @@ func seededStories(t testing.TB) []story {
 	return []story{
 		one("an import World Editor made where an asset goes, without a file",
 			with(holding("assets/Textures/a.blp"), m+"war3map.imp", indexOf(e(29, `textures\A.blp`))),
-			run{refused: byName}),
+			run{}),
 		one("an import in the folder World Editor imports into, where an asset goes",
 			with(holding("assets/war3mapImported/a.wav"), m+"war3map.imp", indexOf(e(8, "A.wav"))),
-			run{refused: byName}),
+			run{}),
 		one("an index that lists a path twice",
 			with(holding("assets/a.blp"), m+"war3map.imp",
 				indexOf(e(13, `Textures\x.blp`), e(5, "y.wav"), e(29, "textures/X.BLP"))),
-			run{refused: byName}),
+			run{}),
 		one("an index that is cut short",
 			with(holding("assets/a.blp"), m+"war3map.imp", indexOf(e(13, "x.blp"))[:10]),
-			run{refused: byName}),
+			run{}),
 		one("an index with a flag World Editor does not write",
 			with(holding("assets/a.blp"), m+"war3map.imp", indexOf(e(7, "x.blp"))),
-			run{refused: byName}),
+			run{}),
 		one("an index with a path that leaves the map",
 			with(holding("assets/a.blp"), m+"War3Map.imp", indexOf(e(13, `..\x.blp`))),
-			run{refused: byName}),
+			run{}),
 		one("an index named in capitals, with the editor's own import",
 			with(holding("assets/a.blp", m+"war3mapImported/own.wav"), m+"WAR3MAP.IMP", indexOf(e(8, "own.wav"))),
 			run{}),
@@ -410,19 +365,18 @@ func seededStories(t testing.TB) []story {
 			[]run{{}, {edit: several(removing(m+"a.blp"),
 				putting("assets/b.blp", "second", "assets/Sound/e.blp", "new")), block: `{"exclude":["c.blp"]}`}}},
 		one("an asset named as a folder of the map", holding("assets/textures", m+"Textures/x.blp"),
-			run{refused: byName}),
+			run{}),
 		{"an asset named as an empty folder of the map",
 			project{files: holding("assets/empty"), folders: []string{m + "Empty"}},
-			[]run{{refused: byName}}},
+			[]run{{}}},
 		{"an asset below an owned file that no asset wants",
 			project{files: holding("assets/data")},
-			[]run{{}, {edit: several(removing("assets/data"), putting("assets/data/inner.txt", "inner")),
-				refused: byName}}},
+			[]run{{}, {edit: several(removing("assets/data"), putting("assets/data/inner.txt", "inner"))}}},
 		one("two assets without room, the first below a file",
-			holding("assets/a/inner.blp", "assets/b.blp", m+"a", m+"b.blp"), run{refused: byName}),
+			holding("assets/a/inner.blp", "assets/b.blp", m+"a", m+"b.blp"), run{}),
 		one("two assets without room, the first at a file",
 			holding("assets/a/inner.blp", "assets/b.blp", m+"a", m+"0.blp"),
-			run{block: `{"paths":{"b.blp":"0.blp"}}`, refused: byName}),
+			run{block: `{"paths":{"b.blp":"0.blp"}}`}),
 		{"an owned import that World Editor saved without a custom path",
 			project{files: holding("assets/war3mapImported/a.wav")},
 			[]run{{}, {edit: putting(m+"war3map.imp", indexOf(e(5, "a.wav")))}, {}, {}}},
@@ -443,34 +397,32 @@ func seededStories(t testing.TB) []story {
 			[]run{{}, {edit: several(putting("assets/Models/unit.mdx", "second", "assets/sound/theme.mp3", "theme"),
 				removing("assets/old.blp")), build: true}}},
 		one("a library's file below a file of the map", holding(s+"ui/ui/frame.fdf", m+"UI"),
-			run{libraries: []string{"ui"}, refused: byName}),
+			run{libraries: []string{"ui"}}),
 		one("a folder named as the index", holding("assets/a.blp", m+"war3map.imp/stray.txt"),
-			run{refused: bySystem}),
+			run{}),
 		{"an owned file is edited by hand after the plan",
 			project{files: holding("assets/0.blp", "assets/a.blp")},
 			[]run{{}, {edit: putting("assets/0.blp", "second", "assets/a.blp", "second"),
-				meddle: putting(m+"a.blp", "edited by hand"), refused: byName}}},
+				meddle: putting(m+"a.blp", "edited by hand")}}},
 		one("a file appears where a new asset goes, after the plan", holding("assets/0.blp", "assets/a.blp"),
-			run{meddle: putting(m+"a.blp", "the editor's"), refused: byName}),
+			run{meddle: putting(m+"a.blp", "the editor's")}),
 		one("the state file cannot be written", holding("assets/a.blp"),
-			run{syncCtx: beforeAsk(3, putting(state+"/in the way.txt", "another program's")),
-				refused: byName}),
+			run{syncCtx: beforeAsk(3, putting(state+"/in the way.txt", "another program's"))}),
 		// Another program gets at the state file after the sync began. The ask before the state file is the last:
 		// the second where a.blp alone is written, the third where the index is written too.
 		{"the state file is changed before it is written",
 			project{files: holding("assets/a.blp")},
 			[]run{{}, {edit: putting("assets/a.blp", "second"),
-				syncCtx: beforeAsk(2, putting(state, "another program's")), refused: byName}}},
+				syncCtx: beforeAsk(2, putting(state, "another program's"))}}},
 		{"the state file is removed before it is written",
 			project{files: holding("assets/a.blp")},
-			[]run{{}, {edit: putting("assets/a.blp", "second"), syncCtx: beforeAsk(2, removing(state)),
-				refused: byName}}},
+			[]run{{}, {edit: putting("assets/a.blp", "second"), syncCtx: beforeAsk(2, removing(state))}}},
 		one("a state file is made before the first is written", holding("assets/a.blp"),
-			run{syncCtx: beforeAsk(3, putting(state, "another program's")), refused: byName}),
+			run{syncCtx: beforeAsk(3, putting(state, "another program's"))}),
 		{"the state file is changed before it is removed",
 			project{files: holding("assets/a.blp")},
-			[]run{{}, {edit: removing("assets/a.blp"), syncCtx: beforeAsk(3, putting(state, "another program's")),
-				refused: byName}}},
+			[]run{{}, {edit: removing("assets/a.blp"),
+				syncCtx: beforeAsk(3, putting(state, "another program's"))}}},
 		// A state file that needs no write is not looked at again.
 		{"the state file is changed while a sync that does not write it writes the index",
 			project{files: holding("assets/a.blp")},
@@ -513,12 +465,9 @@ func interruptedStories() []story {
 	var stories []story
 	for _, step := range []string{"the plan", "the sync"} {
 		for limit := range interruptedAsks + 1 {
-			r := run{planCtx: limited(limit), refused: asWhole}
+			r := run{planCtx: limited(limit)}
 			if step == "the sync" {
-				r = run{syncCtx: limited(limit), refused: asWhole}
-			}
-			if limit == interruptedAsks {
-				r.refused = ""
+				r = run{syncCtx: limited(limit)}
 			}
 			name := fmt.Sprintf("%s, cancelled at ask %d", step, limit+1)
 			stories = append(stories, story{name, interruptedProject(), []run{r}})
@@ -540,12 +489,8 @@ func held(data []byte) string {
 	return strconv.Quote(string(data))
 }
 
-// How a recording names the file of a refusal: a path on disk below the project folder starts with underRoot,
-// and a refusal without a file has noFile.
-const (
-	underRoot = "<root>/"
-	noFile    = `""`
-)
+// underRoot starts, in a recording, the file of a refusal that is a path on disk below the project folder.
+const underRoot = "<root>/"
 
 // below is a file of a refusal as a recording names it: a path on disk below the project folder is written from
 // underRoot, with "/".
@@ -633,11 +578,7 @@ func recordedStories(t testing.TB) []byte {
 				r.edit(t, root)
 			}
 			fmt.Fprintf(&out, "== %s (run %d)\n", s.name, i+1)
-			made := outcomeOf(t, r, root)
-			if note := noteOf(r.refused, made); note != "" {
-				fmt.Fprintf(&out, "note: %s\n", note)
-			}
-			out.WriteString(made.lines())
+			out.WriteString(outcomeOf(t, r, root).lines())
 		}
 	}
 	return []byte(out.String())
