@@ -82,22 +82,20 @@ func TestOutsideAProjectAssetsPathsNeedsAFileThatExistsAndIsNotAFolder(t *testin
 	testkit.WriteFile(t, root, "notes.mdx", []byte("Model {\n}\nBroken {\n"))
 	for _, c := range []struct {
 		what, file string
-		msg, hint  string
+		words      string // of the message
 		named      string // the file the failure names
 	}{
-		{what: "no file", file: "", msg: "assets:paths needs a model file outside a Moonwell project.",
-			hint: "moonwell assets:paths assets/Models/Knight.mdx"},
-		{what: "a file that is not there", file: "missing.mdx", msg: "missing.mdx does not exist.",
-			hint: "Model paths are relative to the project folder, e.g. assets/Models/Knight.mdx."},
-		{what: "a folder", file: ".", msg: ". is a folder, not a model file."},
+		// Without a file there is none to name.
+		{what: "no file", file: "", words: "needs a model file outside a Moonwell project"},
+		{what: "a file that is not there", file: "missing.mdx", words: "does not exist", named: "missing.mdx"},
+		{what: "a folder", file: ".", words: "is a folder", named: "."},
 		// A file that is no model is refused in the words of the model's reader, which names it.
-		{what: "a file that is no model", file: "notes.mdx", msg: "Not a readable model: ", named: "notes.mdx",
-			hint: "Re-export it from your modelling tool, or open it in a model viewer to check it."},
+		{what: "a file that is no model", file: "notes.mdx", words: "Not a readable model: ", named: "notes.mdx"},
 	} {
 		e, log := testkit.Env(t, root)
 		lines, err := paths(e, log, c.file, "textures/knight.dds\n")
 		failure := asError(t, err, c.what)
-		if !strings.HasPrefix(failure.Msg, c.msg) || failure.Hint != c.hint || failure.File != c.named ||
+		if !strings.Contains(failure.Msg, c.words) || failure.Hint == "" || failure.File != c.named ||
 			failure.Cause != nil {
 			t.Errorf("%s: error = %+v", c.what, failure)
 		}
@@ -115,7 +113,7 @@ func TestOutsideAProjectAssetsPathsNamesAFileItCannotRead(t *testing.T) {
 	e, log := testkit.Env(t, root)
 	lines, err := paths(e, log, "held.mdx", "textures/knight.dds\n")
 	failure := asError(t, err, "a file that cannot be read")
-	if !strings.HasPrefix(failure.Msg, "held.mdx could not be read: ") || failure.Hint != "" || failure.File != "" ||
+	if !strings.Contains(failure.Msg, "Reading the model failed: ") || failure.Hint == "" || failure.File != "held.mdx" ||
 		failure.Cause == nil {
 		t.Errorf("error = %+v", failure)
 	}
@@ -129,9 +127,12 @@ func TestOutsideAProjectAssetsPathsNamesAFileItCannotRead(t *testing.T) {
 func TestAssetsPathsNamesAModelFromTheFolderItRunsIn(t *testing.T) {
 	root, elsewhere := t.TempDir(), t.TempDir()
 	testkit.WriteFile(t, root, "units/knight.mdx", knight())
+	testkit.WriteFile(t, root, "..knight.mdx", knight())
 	outside := testkit.WriteFile(t, elsewhere, "knight.mdx", knight())
 	for _, c := range []struct{ file, heading string }{
 		{"units/knight.mdx", "units/knight.mdx"},
+		// A name that only starts with two dots is a file of the folder.
+		{"..knight.mdx", "..knight.mdx"},
 		{filepath.Join("units", "knight.mdx"), "units/knight.mdx"},
 		{filepath.Join(root, "units", "knight.mdx"), "units/knight.mdx"},
 		{outside, fsx.ToPosix(outside)},

@@ -54,7 +54,7 @@ left:
 == moonwell assets:paths drafts/missing.mdx
 exit code: 1
 printed: nothing
-terminal: a complaint that names no file
+terminal: a complaint about drafts/missing.mdx
 left:
   .moonwell/libraries/golems/.moonwell-library.json: present
   .moonwell/libraries/golems/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes

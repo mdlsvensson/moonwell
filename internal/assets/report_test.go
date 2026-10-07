@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mdlsvensson/moonwell/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
@@ -17,15 +16,6 @@ func textured(paths ...string) []byte {
 		entries = append(entries, testkit.Texture(path, 0)...)
 	}
 	return testkit.MDX(testkit.Chunk("TEXS", entries))
-}
-
-// importedBy is the in-map paths a build of these assets imports, as ReportModels takes them.
-func importedBy(assets []Asset) map[string]bool {
-	targets := map[string]bool{}
-	for _, asset := range assets {
-		targets[mapdir.Key(asset.Target)] = true
-	}
-	return targets
 }
 
 // statuses is the status of each reference of a report, in the order of the references.
@@ -149,7 +139,7 @@ func TestTheModelsALibraryShipsAreReportedAndItsFilesCountAsImported(t *testing.
 	testkit.WriteFile(t, root, "assets/Models/Own.mdx", textured(`textures\golem.BLP`))
 	assets, _ := collect(t, root, noBlock, "golems")
 
-	reports := ReportModels(Models(assets), ParseGamePaths("# test\n"), importedBy(assets))
+	reports := ReportModels(Models(assets), ParseGamePaths("# test\n"), Targets(assets))
 	if got, want := headings(reports), []string{"library golems: Models/Golem.mdx", "assets/Models/Own.mdx"}; !slices.Equal(got, want) {
 		t.Fatalf("the reports are of %q, want %q", got, want)
 	}
@@ -185,7 +175,7 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 	}
 
 	// One model, as a command reports the file it is given.
-	reports := ReportModels(models[1:2], gamePaths, importedBy(assets))
+	reports := ReportModels(models[1:2], gamePaths, Targets(assets))
 	wanted := []PathStatus{InGameReplaced, CustomImported, InGame, "", CustomImported, CustomNotImported}
 	if len(reports) != 1 || !slices.Equal(statuses(reports[0]), wanted) {
 		t.Fatalf("ReportModels = %+v", reports)
@@ -196,7 +186,7 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 	}
 
 	// Every model of the project.
-	reports = ReportModels(models, gamePaths, importedBy(assets))
+	reports = ReportModels(models, gamePaths, Targets(assets))
 	if got, want := headings(reports), []string{"assets/Models/Glow.mdx", "assets/Models/Knight.mdx", "assets/Models/Only.mdl"}; !slices.Equal(got, want) {
 		t.Fatalf("the reports are of %q, want %q", got, want)
 	}
@@ -225,7 +215,7 @@ func TestAModelThatCannotBeReadIsReportedInItsPlaceBesideTheOthers(t *testing.T)
 	testkit.WriteFile(t, root, "assets/Models/B.mdx", textured(`Textures\B.blp`))
 	assets, _ := collect(t, root, noBlock)
 
-	reports := ReportModels(Models(assets), ParseGamePaths("textures/b.blp\n"), importedBy(assets))
+	reports := ReportModels(Models(assets), ParseGamePaths("textures/b.blp\n"), Targets(assets))
 	if got, want := headings(reports), []string{"assets/Models/A.mdl", "assets/Models/B.mdx"}; !slices.Equal(got, want) {
 		t.Fatalf("the reports are of %q, want %q", got, want)
 	}

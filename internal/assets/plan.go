@@ -8,9 +8,9 @@
 // Collect takes the project folder, the manifest's assets block and the libraries' folders, and returns the
 // assets. Plan takes a map folder, the assets and the ownership state as ReadState read it, and returns the
 // changes and the state after them. Sync takes a plan, the map folder it was made from and the path of the state
-// file, and writes both: nothing else in the package writes. For the report the package takes the bytes of
-// models, the game's paths and the paths a build imports, and returns the references with their statuses, and
-// the report as lines.
+// file, and writes both: nothing else in the package writes. For the report the package takes the models, which
+// are those among the assets or the one a command line names and ReadModel reads, the game's paths and the paths
+// a build imports, and returns the references with their statuses, and the report as lines.
 //
 // It must not know where a library's files come from, how a map is built, nor the settings and the object data
 // of a map. It prints nothing: the command prints a report, and decides what a model that cannot be read means

@@ -219,8 +219,8 @@ func (c *collection) addLibrary(root string, library Library) error {
 	return nil
 }
 
-// labelOf is how errors name a library's folder: by its path from the project folder with "/" where it is inside
-// the project, else by its path.
+// labelOf is how errors name a library's folder, and how a report names a model a command line names: by its
+// path from the project folder with "/" where it is inside the project, else by its path.
 func labelOf(root, dir string) string {
 	if below, err := filepath.Rel(root, dir); err == nil && filepath.IsLocal(below) {
 		return filepath.ToSlash(below)

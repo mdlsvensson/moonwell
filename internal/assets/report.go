@@ -1,11 +1,16 @@
 package assets
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
+	"os"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 
+	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
@@ -39,6 +44,36 @@ func Models(assets []Asset) []Model {
 		}
 	}
 	return models
+}
+
+// ReadModel reads the model a command line names: file is a path from root, the folder the command runs in, or
+// a whole path. The report and a refusal name the model as labelOf names a folder: by its path from root with
+// "/" where it is below root, and else by its whole path. Whether the bytes are a model is not looked at here.
+func ReadModel(root, file string) (Model, error) {
+	path := fsx.Resolve(root, file)
+	heading := labelOf(root, path)
+	data, err := os.ReadFile(path)
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+		return Model{}, errNoSuchModel(heading)
+	// What a system says of reading a folder differs from system to system, so the folder is found by a look.
+	case err != nil && fsx.IsDir(path):
+		return Model{}, errModelIsAFolder(heading)
+	case err != nil:
+		return Model{}, errModelNotRead(heading, err)
+	}
+	return Model{Heading: heading, Data: data}, nil
+}
+
+// Targets is the in-map paths the assets are imported as, by mapdir.Key: what ReportModels takes for a project.
+// For a project that imports nothing it is empty and not nil: the report tells a project from a folder that is
+// none by that.
+func Targets(imported []Asset) map[string]bool {
+	targets := map[string]bool{}
+	for _, asset := range imported {
+		targets[mapdir.Key(asset.Target)] = true
+	}
+	return targets
 }
 
 // isModel reports whether an in-map path is a model's, by its extension in any letter case.
@@ -224,4 +259,34 @@ func counted(count int, noun string) string {
 		return "1 " + noun
 	}
 	return strconv.Itoa(count) + " " + noun + "s"
+}
+
+// ---- errors ----
+
+// The three refusals of ReadModel name the file as the report would name the model.
+
+func errNoSuchModel(file string) error {
+	return &diag.Error{
+		Msg:  "This model file does not exist.",
+		File: file,
+		Hint: "A model's path starts at the folder the command runs in, e.g. assets/Models/Knight.mdx.",
+	}
+}
+
+func errModelIsAFolder(file string) error {
+	return &diag.Error{
+		Msg:  "This is a folder, not a model file.",
+		File: file,
+		Hint: "Name one model, e.g. assets/Models/Knight.mdx. In a project, assets:paths without a file reports " +
+			"on every model among the assets.",
+	}
+}
+
+func errModelNotRead(file string, cause error) error {
+	return &diag.Error{
+		Msg:   "Reading the model failed: " + fsx.Reason(cause),
+		File:  file,
+		Hint:  "Close any program that has the file open and check that it is a file you may read, then try again.",
+		Cause: cause,
+	}
 }

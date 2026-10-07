@@ -16,7 +16,7 @@ left: nothing
 == moonwell assets:paths missing.mdx
 exit code: 1
 printed: nothing
-terminal: a complaint that names no file
+terminal: a complaint about missing.mdx
 left: nothing
 == moonwell assets:paths notes.mdx
 exit code: 1

@@ -2,9 +2,6 @@ package cli
 
 import (
 	"context"
-	"errors"
-	"io/fs"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -14,7 +11,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
-	"github.com/mdlsvensson/moonwell/internal/mapdir"
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
 
@@ -44,7 +40,7 @@ func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[str
 		if err != nil {
 			return err
 		}
-		imported, targets = found, targetsOf(found)
+		imported, targets = found, assets.Targets(found)
 	}
 	models, err := modelsToReport(e.Root, file, inProject, imported)
 	if err != nil {
@@ -88,23 +84,13 @@ func importedByABuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
 	return found, err
 }
 
-// targetsOf is the in-map paths the assets are imported as, by mapdir.Key. For a project that imports nothing
-// it is empty and not nil: the report tells a project from a folder that is none by that.
-func targetsOf(imported []assets.Asset) map[string]bool {
-	targets := map[string]bool{}
-	for _, asset := range imported {
-		targets[mapdir.Key(asset.Target)] = true
-	}
-	return targets
-}
-
-// modelsToReport is the models the command reports on: the one at file, or without a file every model among the
-// files a build imports, which may be none. Outside a project there are no such files, and the command needs a
-// file.
+// modelsToReport is the models the command reports on: the one at file, read from root, or without a file every
+// model among the files a build imports, which may be none. Outside a project there are no such files, and the
+// command needs a file.
 func modelsToReport(root, file string, inProject bool, imported []assets.Asset) ([]assets.Model, error) {
 	switch {
 	case file != "":
-		named, err := namedModel(root, file)
+		named, err := assets.ReadModel(root, file)
 		if err != nil {
 			return nil, err
 		}
@@ -113,33 +99,6 @@ func modelsToReport(root, file string, inProject bool, imported []assets.Asset) 
 		return nil, errNeedsAModel()
 	}
 	return assets.Models(imported), nil
-}
-
-// namedModel reads the model the command line names, a path from root or a whole path. Whether its bytes are a
-// model is not looked at here.
-func namedModel(root, file string) (assets.Model, error) {
-	path := fsx.Resolve(root, file)
-	data, err := os.ReadFile(path)
-	switch {
-	case errors.Is(err, fs.ErrNotExist):
-		return assets.Model{}, errNoSuchModel(file)
-	// What a system says of reading a folder differs from system to system, so the folder is found by a look.
-	case err != nil && fsx.IsDir(path):
-		return assets.Model{}, errModelIsAFolder(file)
-	case err != nil:
-		return assets.Model{}, errModelNotRead(file, err)
-	}
-	return assets.Model{Heading: headingOf(root, path), Data: data}, nil
-}
-
-// headingOf is how the report names the model at path: by its path from root, with "/", when that does not
-// start with "..", and else by its whole path.
-func headingOf(root, path string) string {
-	below, err := filepath.Rel(root, path)
-	if err != nil || strings.HasPrefix(below, "..") || filepath.IsAbs(below) {
-		return fsx.ToPosix(path)
-	}
-	return fsx.ToPosix(below)
 }
 
 // refuseUnreadable fails when the report has a model that could not be read, and names each. The report says why
@@ -159,6 +118,7 @@ func refuseUnreadable(reports []assets.ModelReport) error {
 
 // ---- errors ----
 
+// errNeedsAModel has no file: the line names none.
 func errNeedsAModel() error {
 	return &diag.Error{
 		Msg:  "assets:paths needs a model file outside a Moonwell project.",
@@ -166,23 +126,8 @@ func errNeedsAModel() error {
 	}
 }
 
-// errNoSuchModel, errModelIsAFolder and errModelNotRead name the file as the command line wrote it.
-func errNoSuchModel(file string) error {
-	return &diag.Error{
-		Msg:  file + " does not exist.",
-		Hint: "Model paths are relative to the project folder, e.g. assets/Models/Knight.mdx.",
-	}
-}
-
-func errModelIsAFolder(file string) error {
-	return &diag.Error{Msg: file + " is a folder, not a model file."}
-}
-
-func errModelNotRead(file string, cause error) error {
-	return &diag.Error{Msg: file + " could not be read: " + fsx.Reason(cause), Cause: cause}
-}
-
-// errUnreadableModels names the models by the headings the report gives them.
+// errUnreadableModels names the models by the headings the report gives them, in its hint. It has no file: the
+// models may be several, and a heading names a library's model by its library, which is no path.
 func errUnreadableModels(headings []string) error {
 	count := strconv.Itoa(len(headings)) + " models"
 	if len(headings) == 1 {

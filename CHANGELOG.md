@@ -20,6 +20,9 @@
 - A path in `assets.paths` or `assets.exclude` that no asset may have ("Invalid asset path", "Reserved map path")
   is reported with `moonwell.pkl` as its file, and its hint ends with "Fix the assets block in moonwell.pkl.", as
   the other mistakes in that block are. It named no file.
+- `assets:paths` with a file that does not exist, that is a folder, or that cannot be read reports it as every
+  other file is reported: the file before the message, from the folder the command runs in, and a hint. A model
+  whose name starts with two dots (`..knight.mdx`) is named from that folder too, and not by its whole path.
 
 ## 0.9.1 (2026-10-03)
 
