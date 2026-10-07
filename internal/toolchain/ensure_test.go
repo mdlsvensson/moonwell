@@ -105,7 +105,7 @@ func TestCompilerUsesYuePathAndWarnsOnAVersionMismatch(t *testing.T) {
 	gone := filepath.Join(t.TempDir(), "yue")
 	_, err = Compiler(background, e, "9.9.9", &gone)
 	if failure := asError(t, err, "a missing yue.path"); failure.Msg != "yue.path does not exist: "+gone ||
-		failure.File != "moonwell.local.pkl" {
+		failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Hint, "yue.path") {
 		t.Errorf("error = %+v", failure)
 	}
 }
@@ -146,7 +146,9 @@ func TestCompilerPassesOnAYuePathThatCannotBeStartedOrIsInterrupted(t *testing.T
 	e, _ := testkit.Env(t, t.TempDir())
 	e.Run = missing
 	_, err := Compiler(background, e, "9.9.9", &local)
-	if failure := asError(t, err, "a yue.path that is no program"); failure.Msg != "Cannot run '"+local+"': command not found." {
+	// The program is the manifest's: the failure names the manifest that sets it, and says what to do there.
+	if failure := asError(t, err, "a yue.path that is no program"); !strings.Contains(failure.Msg, "Cannot run '"+local+"'") ||
+		failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Hint, "yue.path") || failure.Cause == nil {
 		t.Errorf("error = %+v", failure)
 	}
 	e.Run = interrupted

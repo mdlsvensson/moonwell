@@ -25,6 +25,9 @@
   whose name starts with two dots (`..knight.mdx`) is named from that folder too, and not by its whole path.
 - A folder of a library below `.moonwell/`, or `moonwell.lock`, that cannot be removed is reported as "Removing …
   failed", where it said "Writing … failed".
+- A `yue.path` that is there and cannot be started (a folder, a file that is no program) is reported with
+  `moonwell.local.pkl` as its file and a hint that says what to do there. A `yue.path` that does not exist has the
+  same hint.
 
 ## 0.9.1 (2026-10-03)
 

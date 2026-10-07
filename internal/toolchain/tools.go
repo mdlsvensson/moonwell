@@ -102,12 +102,22 @@ func Compiler(ctx context.Context, e *env.Env, version string, path *string) (st
 	}
 	found, err := ReportedVersion(ctx, e, YueScript, *path)
 	if err != nil {
-		return "", err
+		return "", ofYuePath(err)
 	}
 	if found != version {
 		e.Log.Warn("yue.path reports version " + orUnknown(found) + ", expected " + version + ".")
 	}
 	return *path, nil
+}
+
+// ofYuePath makes the failure to start the program a yue.path names the manifest's: it gets the manifest as its
+// file and the hint that says what to do there. Any other failure, a cancelled run among them, stays as it is.
+func ofYuePath(err error) error {
+	var failure *diag.Error
+	if errors.As(err, &failure) {
+		failure.File, failure.Hint = yuePathFile, yuePathHint
+	}
+	return err
 }
 
 // PklProgram returns the pkl to run: "pkl" when the one on PATH is 0.32 or newer; else Ensure, with a warning
@@ -171,8 +181,16 @@ func notStarted(err error) bool {
 // pklInstallHint says how to get Pkl where Moonwell cannot download it.
 const pklInstallHint = "Install Pkl 0.32 or newer: " + pklPage
 
+// yuePathFile is the manifest a yue.path is set in: the one of this machine, as the hint of a compiler that
+// cannot be downloaded says.
+const yuePathFile = "moonwell.local.pkl"
+
+// yuePathHint says what to do about a yue.path that names no program the system can run.
+const yuePathHint = "Point yue.path in " + yuePathFile + " at a yue program this system can run, or remove it to " +
+	"use the compiler Moonwell downloads."
+
 func errNoYuePath(path string) error {
-	return &diag.Error{Msg: "yue.path does not exist: " + path, File: "moonwell.local.pkl"}
+	return &diag.Error{Msg: "yue.path does not exist: " + path, File: yuePathFile, Hint: yuePathHint}
 }
 
 func errOlderPkl(printed string) error {
