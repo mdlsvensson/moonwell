@@ -174,7 +174,7 @@ func (p *planner) readIndex() error {
 // folder under that name. The name has no folder on its way, so nothing else can be in its place.
 func (p *planner) placeForIndex() error {
 	if p.folder.IsFolder(indexName) {
-		return errIndexIsAFolder(p.folder.Label(indexName))
+		return errIndexIsAFolder(p.folder.Name(indexName), p.folder.Label(indexName))
 	}
 	return nil
 }
@@ -347,9 +347,11 @@ func errSamePath(path string) error {
 	return fmt.Errorf("Cannot plan the assets: two assets have the in-map path %q.", path)
 }
 
-func errIndexIsAFolder(file string) error {
+// errIndexIsAFolder names the folder as the map spells it, as every refusal of a folder where a file of the map
+// belongs does.
+func errIndexIsAFolder(folder, file string) error {
 	return &diag.Error{
-		Msg:  "war3map.imp in the map is a folder, not a file.",
+		Msg:  folder + " in the map is a folder, not a file.",
 		File: file,
 		Hint: "The map has a folder where its index of imports belongs. Remove that folder from the source map, " +
 			"or open and re-save the map in World Editor.",

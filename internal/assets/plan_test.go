@@ -424,7 +424,7 @@ func TestAFolderNamedAsTheIndexOfImportsIsRefusedBeforeAnythingIsPlanned(t *test
 	put(t, s.mapDir, "War3Map.imp/stray.txt")
 	before := testkit.Snapshot(t, s.root)
 	e := s.refusedPlan(noBlock)
-	if !strings.Contains(e.Msg, "is a folder") || e.File != mapLabel+"/War3Map.imp" ||
+	if !strings.Contains(e.Msg, "War3Map.imp in the map is a folder") || e.File != mapLabel+"/War3Map.imp" ||
 		!strings.Contains(e.Hint, "Remove that folder") || strings.Contains(e.Hint, "another path") {
 		t.Errorf("error = %+v, want the folder named as the map spells it, and a hint that fits the index", e)
 	}
