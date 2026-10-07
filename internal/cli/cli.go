@@ -216,7 +216,7 @@ func Main() int {
 	defer cancel()
 	interrupts := make(chan os.Signal, 2)
 	signal.Notify(interrupts, os.Interrupt)
-	go heed(interrupts, cancel, leaveAtOnce(build.ReleaseHeld, os.Exit))
+	go heed(interrupts, cancel, leaveAtOnce(os.Exit))
 	return Run(ctx, os.Args[1:], root, write, print)
 }
 
@@ -231,9 +231,12 @@ func heed(interrupts <-chan os.Signal, cancel, leave func()) {
 // leaveAtOnce is what the second Ctrl+C does: it gives back the build locks this process holds and leaves with
 // 130, without waiting for the command. The locks come first: nothing of the program runs after the exit, the
 // command's own deferred release neither, and a lock that stays is taken for a build that runs.
-func leaveAtOnce(release func(), exit func(int)) func() {
+//
+// exit is how the program leaves, os.Exit, or a test's stand-in for it. The release is not handed in: it is what
+// a test of this function holds, and so is not to be left out by its caller.
+func leaveAtOnce(exit func(int)) func() {
 	return func() {
-		release()
+		build.ReleaseHeld()
 		exit(130)
 	}
 }

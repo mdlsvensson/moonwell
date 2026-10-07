@@ -480,24 +480,9 @@ func TestTheFirstInterruptCancelsTheCommandAndTheSecondLeaves(t *testing.T) {
 	<-left
 }
 
-// Nothing of the program runs after the exit, so the locks are given back first.
-func TestLeavingAtOnceGivesBackTheLocksAndThenExitsWith130(t *testing.T) {
-	var did []string
-	leave := leaveAtOnce(
-		func() { did = append(did, "release") },
-		func(code int) { did = append(did, fmt.Sprint("exit ", code)) },
-	)
-	if len(did) != 0 {
-		t.Fatalf("before the second interrupt: %q", did)
-	}
-	leave()
-	if want := []string{"release", "exit 130"}; !slices.Equal(did, want) {
-		t.Errorf("leaving did %q, want %q", did, want)
-	}
-}
-
-// With the release that Main hands it, the lock a command holds is gone by the time the program exits.
-func TestLeavingAtOnceLeavesNoBuildLockBehind(t *testing.T) {
+// What Main hands the second Ctrl+C is leaveAtOnce with the program's exit; here the exit is the test's. Nothing
+// of the program runs after the exit, so the lock a command holds is gone by then, and stays until then.
+func TestLeavingAtOnceGivesBackTheBuildLockAndThenExitsWith130(t *testing.T) {
 	root := t.TempDir()
 	release, err := build.TakeLock(root)
 	if err != nil {
@@ -505,17 +490,18 @@ func TestLeavingAtOnceLeavesNoBuildLockBehind(t *testing.T) {
 	}
 	defer release()
 	lock := filepath.Join(root, "dist", ".lock")
-	if _, err := os.Stat(lock); err != nil {
-		t.Fatalf("the command holds no lock: %v", err)
-	}
-	exited := false
-	leaveAtOnce(build.ReleaseHeld, func(int) {
-		exited = true
+	var codes []int
+	leave := leaveAtOnce(func(code int) {
+		codes = append(codes, code)
 		if _, err := os.Stat(lock); !errors.Is(err, os.ErrNotExist) {
 			t.Errorf("the program exits with the build lock in place: %v", err)
 		}
-	})()
-	if !exited {
-		t.Error("the program did not exit")
+	})
+	if _, err := os.Stat(lock); err != nil || len(codes) != 0 {
+		t.Fatalf("before the second interrupt: the lock: %v; exits: %v", err, codes)
+	}
+	leave()
+	if !slices.Equal(codes, []int{130}) {
+		t.Errorf("leaving exits with %v, want 130 once", codes)
 	}
 }
