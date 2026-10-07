@@ -236,7 +236,8 @@ func mirrorOf(root, label string, files []file) (mirror, error) {
 	}
 	planned.anew = liesInTheWay(planned.folder, files)
 	for i, f := range files {
-		// What lies in the way of a file is no failure here: the folder is then made anew.
+		// A file on the way to a file's place is no failure here: fsx.Inside takes it for a place that nothing
+		// is at, and the folder is then made anew. Any other failure to look at the place is refused.
 		if planned.targets[i], err = fsx.Inside(root, label+"/"+f.name); err != nil {
 			return mirror{}, err
 		}

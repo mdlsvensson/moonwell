@@ -106,8 +106,6 @@ func TestReadRefusesCorruptDataNamingTheFile(t *testing.T) {
 		{"an unknown flag", index(1, 1, entry(7, "a.blp")), "entry 0 has unknown flag 7"},
 		{"an unknown flag in the second entry", index(1, 2, entry(13, "a.blp"), entry(12, "b.blp")), "entry 1 has unknown flag 12"},
 		{"an empty path", index(1, 1, entry(13, "")), "entry 0 has an empty path"},
-		{"a path that is a byte order mark and nothing else", index(1, 1, entry(13, "\xEF\xBB\xBF")),
-			"entry 0 has an empty path"},
 		{"a path that is not UTF-8", index(1, 1, entry(13, "a\xFF.blp")), "entry 0 is not valid UTF-8"},
 		{"a byte after the last entry", index(1, 1, entry(13, "a.blp"), []byte{0}), "trailing"},
 		{"more entries than the count", index(1, 1, entry(13, "a.blp"), entry(13, "b.blp")), "trailing"},
@@ -127,16 +125,17 @@ func TestReadRefusesCorruptDataNamingTheFile(t *testing.T) {
 	}
 }
 
-// A path is a text, and a text is read by the one rule for a byte order mark: one at its very start is no part
-// of it, and one anywhere else is part of the file's name.
-func TestAByteOrderMarkAtTheStartOfAPathIsNotPartOfIt(t *testing.T) {
-	const mark = "\xEF\xBB\xBF"
-	for written, want := range map[string]string{
-		mark + "a.blp": "a.blp", mark + mark + "a.blp": mark + "a.blp", "a" + mark + ".blp": "a" + mark + ".blp",
-	} {
-		read, err := imp.Read(index(1, 1, entry(imp.CustomPath, written)), indexFile)
-		if err != nil || !slices.Equal(read, []imp.Entry{{Flag: imp.CustomPath, Path: want}}) {
-			t.Errorf("Read of the path %q = %+v, %v, want the path %q", written, read, err, want)
+// The bytes of a path are the name of a file inside the map, and are written back as they were read: so Read
+// hands them over as they are, and a byte order mark at the start of a path is part of that name.
+func TestReadKeepsAByteOrderMarkAtTheStartOfAPath(t *testing.T) {
+	for _, path := range []string{"\xEF\xBB\xBFa.blp", "\xEF\xBB\xBF", "a\xEF\xBB\xBF.blp"} {
+		read, err := imp.Read(index(1, 1, entry(imp.CustomPath, path)), indexFile)
+		if err != nil || !slices.Equal(read, []imp.Entry{{Flag: imp.CustomPath, Path: path}}) {
+			t.Errorf("Read of the path %q = %+v, %v", path, read, err)
+			continue
+		}
+		if got := read[0].MapPath(); got != path {
+			t.Errorf("MapPath of %q = %q", path, got)
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package assets
 
 import (
+	"bytes"
 	"errors"
 	"os"
 	"path/filepath"
@@ -103,6 +104,25 @@ func TestPlanChangesOnlyWhatDiffersAndRemovesOnlyOwnedFilesNoAssetWants(t *testi
 		{"same.blp", hashed("same")}}
 	if !slices.Equal(result.State.Files, owned) {
 		t.Errorf("the state is %+v, want %+v", result.State.Files, owned)
+	}
+}
+
+// The index is read and written back. An import of the map's own whose name starts with a byte order mark names
+// a file by those bytes, and is listed by them still when another asset is added.
+func TestPlanKeepsAnImportOfTheMapsOwnByteForByteWithAMarkAtItsStart(t *testing.T) {
+	const marked = "\xEF\xBB\xBFa.blp"
+	s := newSite(t)
+	put(t, s.mapDir, marked, "the map's own")
+	s.setImports(imp.Entry{Flag: 13, Path: marked})
+	put(t, s.root, "assets/b.blp")
+
+	_, result := s.planned(noBlock)
+	if got, want := names(result.Changes), []string{"b.blp", "war3map.imp"}; !slices.Equal(got, want) {
+		t.Fatalf("the changes are %q, want %q", got, want)
+	}
+	want := imp.Write([]imp.Entry{{Flag: 13, Path: marked}, {Flag: imp.CustomPath, Path: "b.blp"}})
+	if got := result.Changes[1].Bytes; !bytes.Equal(got, want) {
+		t.Errorf("the index is %q, want %q", got, want)
 	}
 }
 

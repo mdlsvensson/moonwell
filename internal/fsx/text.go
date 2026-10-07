@@ -19,9 +19,15 @@ const ASCIISpace = " \t\n\v\f\r"
 // TrimASCIISpace is a text without the white space of ASCII at its start and at its end.
 func TrimASCIISpace(text string) string { return strings.Trim(text, ASCIISpace) }
 
-// WithoutMark is a text without the byte order mark at its start. It is the one rule for the mark, for every
-// text Moonwell reads, a whole file or a string inside one: a mark at the very start is no part of the text and
-// is dropped, once; a mark anywhere else, a second one behind the first among them, is content like any other.
+// WithoutMark is a text without the byte order mark at its start. It is the one rule for the mark: a mark at the
+// very start of a text is no part of the text and is dropped, once; a mark anywhere else, a second one behind
+// the first among them, is content like any other.
+//
+// The rule is for a text that is read and looked into: a source, the map's script and its text files,
+// .gitignore, .luarc.json, a library's own file, what a program printed, and a string of war3map.w3i, of an
+// object file or of a model. It is not for a value that is written back as it was read. A path of war3map.imp
+// is one: its bytes are the name of a file in the map, the index is written anew from the paths that were read,
+// and so a path keeps a mark at its start.
 func WithoutMark[T string | []byte](text T) T {
 	if len(text) >= len(byteOrderMark) && string(text[:len(byteOrderMark)]) == byteOrderMark {
 		return text[len(byteOrderMark):]

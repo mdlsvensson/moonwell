@@ -47,8 +47,9 @@ func numeralValue(raw string) (float64, bool) {
 	return value, true
 }
 
-// PlayerID returns n when tokens are `Player(n)` with a literal whole number that an int of 64 bits holds. A
-// larger one names no player: what Go makes of such a number differs from processor to processor.
+// PlayerID returns n when tokens are `Player(n)` with a literal whole number below 2^63 in size, which an int of
+// 64 bits holds. One of that size or more, -2^63 among them, names no player: what Go makes of a number past an
+// int differs from processor to processor.
 func PlayerID(tokens []Token) (int, bool) {
 	last := len(tokens) - 1
 	if len(tokens) < 3 || tokens[0].Kind != NameToken || tokens[0].Raw != "Player" ||
