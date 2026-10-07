@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 	"github.com/mdlsvensson/moonwell/internal/objects"
 	"github.com/mdlsvensson/moonwell/tools/gen/ini"
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
@@ -210,7 +211,7 @@ var idSeparator = regexp.MustCompile(`[,.]`)
 func splitIDs(cell string) []string {
 	ids := []string{}
 	for _, id := range idSeparator.Split(cell, -1) {
-		if id = trim(id); id != "" {
+		if id = fsx.TrimASCIISpace(id); id != "" {
 			ids = append(ids, id)
 		}
 	}
@@ -260,11 +261,11 @@ func effectLabel(label string, row slk.Row) string {
 // withoutLastDash is a label without the dash that ends it and the white space around that dash. A label that
 // ends otherwise is kept as it is, with the white space at its end.
 func withoutLastDash(label string) string {
-	dashed, ends := strings.CutSuffix(strings.TrimRight(label, whiteSpace), "-")
+	dashed, ends := strings.CutSuffix(strings.TrimRight(label, fsx.ASCIISpace), "-")
 	if !ends {
 		return label
 	}
-	return strings.TrimRight(dashed, whiteSpace)
+	return strings.TrimRight(dashed, fsx.ASCIISpace)
 }
 
 // ---- a cell that is a number ----
@@ -283,7 +284,7 @@ func decimal(text string) (float64, bool) {
 // numberCell is the number in a cell of a field's row, without the white space around it. A cell that is empty,
 // and one that the row does not have, is 0.
 func numberCell(row slk.Row, column string) (float64, error) {
-	cell := trim(row.Value(column))
+	cell := fsx.TrimASCIISpace(row.Value(column))
 	if cell == "" {
 		return 0, nil
 	}

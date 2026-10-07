@@ -3,15 +3,14 @@ package model
 import (
 	"strconv"
 	"strings"
+
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // A text model is blocks: a name, at times more words or a string, and braces around statements and more blocks.
 // A statement is words and strings up to a comma or to the brace that closes its block. White space is ASCII
 // white space, and a comment runs from two slashes, where a token could start, to the end of the line.
-const (
-	mdlSpaces   = " \t\n\v\f\r"
-	mdlWordEnds = mdlSpaces + `{},"`
-)
+const mdlWordEnds = fsx.ASCIISpace + `{},"`
 
 type mdlTokenKind uint8
 
@@ -64,7 +63,7 @@ func (t *mdlTokens) skipSpaceAndComments() {
 	for t.at < len(t.source) {
 		rest := t.source[t.at:]
 		switch {
-		case strings.IndexByte(mdlSpaces, rest[0]) >= 0:
+		case strings.IndexByte(fsx.ASCIISpace, rest[0]) >= 0:
 			t.at++
 		case strings.HasPrefix(rest, "//"):
 			t.at += lineLength(rest)

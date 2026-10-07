@@ -92,7 +92,7 @@ func readArchive(data []byte) (commit string, files []file, err error) {
 // commitOf is the commit an archive's comment holds: forty hexadecimal digits in lower case, with nothing but
 // ASCII white space around them.
 func commitOf(comment string) (string, error) {
-	commit := strings.Trim(comment, " \t\n\v\f\r")
+	commit := fsx.TrimASCIISpace(comment)
 	if len(commit) != 40 || strings.ContainsFunc(commit, notALowerHexDigit) {
 		return "", errNoCommit()
 	}

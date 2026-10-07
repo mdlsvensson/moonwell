@@ -11,6 +11,14 @@ const (
 	replacement   = string(utf8.RuneError) // U+FFFD
 )
 
+// ASCIISpace is the white space of ASCII: the six characters that C's isspace takes, and with it Lua, YueScript
+// and the game's text files. Where Moonwell reads what they read, and where it tidies what a program printed,
+// these are white space and nothing outside ASCII is: no no-break space, no line separator, no byte order mark.
+const ASCIISpace = " \t\n\v\f\r"
+
+// TrimASCIISpace is a text without the white space of ASCII at its start and at its end.
+func TrimASCIISpace(text string) string { return strings.Trim(text, ASCIISpace) }
+
 // WithoutMark is a text without the byte order mark at its start. It is the one rule for the mark, for every
 // text Moonwell reads, a whole file or a string inside one: a mark at the very start is no part of the text and
 // is dropped, once; a mark anywhere else, a second one behind the first among them, is content like any other.

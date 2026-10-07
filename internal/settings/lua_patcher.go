@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
@@ -240,7 +241,7 @@ func restOfLine(text string) string {
 // startsWithName reports whether the first thing in text after white space is a letter or an underscore: a name
 // or a keyword, and not a comment, a number, a string or a symbol.
 func startsWithName(text string) bool {
-	text = strings.TrimLeft(text, " \t\n\v\f\r")
+	text = strings.TrimLeft(text, fsx.ASCIISpace)
 	if text == "" {
 		return false
 	}

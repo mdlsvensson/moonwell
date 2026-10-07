@@ -15,6 +15,8 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // Field is one key and the value to give it.
@@ -77,7 +79,7 @@ func (d document) joined() string {
 
 // whiteSpace is the six white space characters of ASCII, as the inside of a character class. The `\s` of regexp
 // has five of them: it leaves the vertical tab out.
-const whiteSpace = `\t\n\v\f\r `
+const whiteSpace = fsx.ASCIISpace
 
 var (
 	// header matches a line that opens a section and captures the section's name. Only white space and a comment

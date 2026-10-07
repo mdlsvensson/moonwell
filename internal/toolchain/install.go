@@ -254,7 +254,7 @@ func errNoProgram(tool Tool, binary string) error {
 }
 
 func errNotExtracted(tool Tool, stderr string) error {
-	return &diag.Error{Msg: "Extracting " + tool.Title + " failed:\n" + trimmed(stderr)}
+	return &diag.Error{Msg: "Extracting " + tool.Title + " failed:\n" + fsx.TrimASCIISpace(stderr)}
 }
 
 func errOtherVersion(tool Tool, found, version string) error {

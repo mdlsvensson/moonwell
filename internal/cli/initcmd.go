@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"syscall"
 
 	moonwell "github.com/mdlsvensson/moonwell"
@@ -246,7 +245,7 @@ func errNotWritten(file string, cause error) error {
 // errNotResolved shows what pkl printed when it failed to resolve the project's dependencies.
 func errNotResolved(dir, output string) error {
 	return &diag.Error{
-		Msg:  "pkl project resolve failed:\n" + strings.Trim(output, " \t\n\v\f\r"),
+		Msg:  "pkl project resolve failed:\n" + fsx.TrimASCIISpace(output),
 		File: filepath.Join(dir, "PklProject"),
 	}
 }

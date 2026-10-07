@@ -143,12 +143,6 @@ func findCheckout(dir string) (string, error) {
 // fileIn is the full path of what a checkout has at path, a path from the checkout with "/".
 func fileIn(checkout, path string) string { return filepath.Join(checkout, filepath.FromSlash(path)) }
 
-// whiteSpace is what the generator takes for white space in a text it reads: ASCII's six characters.
-const whiteSpace = " \t\n\v\f\r"
-
-// trim takes the white space off both ends of text.
-func trim(text string) string { return strings.Trim(text, whiteSpace) }
-
 // listed writes names as a sentence lists them: commas between them, and the word and before the last.
 func listed(names []string) string {
 	if len(names) < 2 {

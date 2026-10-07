@@ -61,7 +61,7 @@ func gamePaths(list string) []string {
 // What says where the game stores the file goes: everything up to the last ":", then every folder up to the last
 // one that is a container.
 func normalizeGamePath(line string) (string, bool) {
-	path := strings.ReplaceAll(strings.ToLower(trim(line)), `\`, "/")
+	path := strings.ReplaceAll(strings.ToLower(fsx.TrimASCIISpace(line)), `\`, "/")
 	path = path[strings.LastIndex(path, ":")+1:]
 	steps := strings.FieldsFunc(path, func(r rune) bool { return r == '/' })
 	kept := strings.Join(steps[pastContainers(steps):], "/")

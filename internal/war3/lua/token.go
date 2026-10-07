@@ -6,6 +6,8 @@ package lua
 import (
 	"strings"
 	"unicode/utf8"
+
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // Kind is the kind of a token. Comments and white space are not tokens.
@@ -41,9 +43,6 @@ type Fault struct {
 	Offset int // byte offset
 }
 
-// whiteSpace is what Lua skips between tokens.
-const whiteSpace = " \t\n\v\f\r"
-
 // longSymbols are the symbols of several characters, a longer one before the one it starts with.
 var longSymbols = []string{"...", "..", "//", "<<", ">>", "==", "~=", "<=", ">=", "::"}
 
@@ -55,7 +54,8 @@ var keywords = map[string]bool{
 	"repeat": true, "return": true, "then": true, "true": true, "until": true, "while": true,
 }
 
-func isSpace(c byte) bool { return strings.IndexByte(whiteSpace, c) >= 0 }
+// isSpace reports whether Lua skips the byte between tokens: its white space is that of ASCII.
+func isSpace(c byte) bool { return strings.IndexByte(fsx.ASCIISpace, c) >= 0 }
 
 func isNameStart(c byte) bool {
 	return c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')

@@ -6,6 +6,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // Call is a call statement of a bare global function: `Name(args)`, with the tokens of each argument.
@@ -351,7 +352,7 @@ func (r *reader) withSemicolon(call Call) Call {
 		return call
 	}
 	semicolon := r.tokens[r.at]
-	if strings.Trim(r.source[call.End:semicolon.Start], whiteSpace) != "" {
+	if fsx.TrimASCIISpace(r.source[call.End:semicolon.Start]) != "" {
 		return call
 	}
 	r.at++

@@ -6,16 +6,18 @@ import (
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // This file reads what the compiler prints, for a file it failed to compile and for the globals a source uses,
 // and tells a source with code from one without. Its functions take text and return what the text says: they
 // run no program and read no file.
 
-// luaSpace is the white space of Lua, which is that of YueScript and of what the compiler prints.
-const luaSpace = " \t\n\v\f\r"
+// space is one character of white space, for a regular expression. The white space of Lua, which is that of
+// YueScript and of what the compiler prints, is ASCII's.
+const space = "[" + fsx.ASCIISpace + "]"
 
-var blankOrComment = regexp.MustCompile(`^[ \t\n\v\f\r]*(--[^\n\r]*)?$`)
+var blankOrComment = regexp.MustCompile(`^` + space + `*(--[^\n\r]*)?$`)
 
 // hasCode reports whether a source has a line that is neither blank nor a comment. The compiler rightly writes
 // no Lua for a source without one. A line ends at "\n" or "\r\n".
@@ -53,7 +55,7 @@ func rewriteError(file, printed string, left func() string) *diag.Error {
 	}
 	// A position beyond what a number holds is beyond the Lua too.
 	at, _ := strconv.Atoi(reason[1])
-	return errNotRewritten(file, step[1], ": "+strings.Trim(reason[2], luaSpace), markedLine(left(), at))
+	return errNotRewritten(file, step[1], ": "+fsx.TrimASCIISpace(reason[2]), markedLine(left(), at))
 }
 
 // markedLine is the source line that line at of rewritten Lua is marked with, counted from 1; 0 for a line that
@@ -90,7 +92,7 @@ func compileError(file, printed string) *diag.Error {
 			kept = append(kept, line)
 		}
 	}
-	detail := strings.Trim(strings.Join(kept, "\n"), luaSpace)
+	detail := fsx.TrimASCIISpace(strings.Join(kept, "\n"))
 	numbered := numberedLine.FindStringSubmatch(printed)
 	switch {
 	case numbered != nil:
@@ -110,7 +112,7 @@ type globalUse struct {
 	Column int    `json:"column"`
 }
 
-var useLine = regexp.MustCompile(`^([^ \t\n\v\f\r]+) ([0-9]+) ([0-9]+)$`)
+var useLine = regexp.MustCompile(`^([^` + fsx.ASCIISpace + `]+) ([0-9]+) ([0-9]+)$`)
 
 // usesPrinted reads what `yue -g` prints for a source: a `NAME LINE COLUMN` on each line. A line ends at "\n" or
 // "\r\n", the white space around it is dropped, and a blank one is skipped. The first line that is anything else
@@ -119,7 +121,7 @@ var useLine = regexp.MustCompile(`^([^ \t\n\v\f\r]+) ([0-9]+) ([0-9]+)$`)
 func usesPrinted(printed, file string) ([]globalUse, *diag.Error) {
 	uses := []globalUse{}
 	for _, raw := range lineEnd.Split(printed, -1) {
-		line := strings.Trim(raw, luaSpace)
+		line := fsx.TrimASCIISpace(raw)
 		if line == "" {
 			continue
 		}

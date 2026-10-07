@@ -227,7 +227,7 @@ func pklType(field objects.FieldMeta) string {
 
 // oneLine writes a text on one line: each run of ASCII white space is one space, and none stands at an end.
 func oneLine(text string) string {
-	return strings.Join(strings.FieldsFunc(text, func(r rune) bool { return strings.ContainsRune(whiteSpace, r) }), " ")
+	return strings.Join(strings.FieldsFunc(text, func(r rune) bool { return strings.ContainsRune(fsx.ASCIISpace, r) }), " ")
 }
 
 // ---- errors ----

@@ -1,5 +1,7 @@
 // Package fsx holds the file helpers the rest of Moonwell shares: listing, copying, removing, reading and writing
-// files, checking that a path stays inside its folder, and a journal of writes that can be undone.
+// files, checking that a path stays inside its folder, and a journal of writes that can be undone. It also holds
+// what every reader of a text agrees on (text.go): the byte order mark at a text's start, the white space of
+// ASCII, and bytes that are no UTF-8.
 //
 // It takes paths, text and bytes, and returns paths, text, bytes and errors. A failure a user can act on (a file
 // another program holds open, a source file that cannot be read, a path that is not safe to join, a link where real

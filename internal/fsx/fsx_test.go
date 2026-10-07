@@ -185,6 +185,24 @@ func TestWithoutMarkDropsOneMarkAtTheVeryStartAndNoOther(t *testing.T) {
 	}
 }
 
+func TestTrimASCIISpaceTakesTheSixCharactersOfASCIIAndNoOther(t *testing.T) {
+	for text, want := range map[string]string{
+		" \t\n\v\f\ra b \r\f\v\n\t ": "a b",
+		" \t\n\v\f\r":                "",
+		"":                           "",
+		// White space outside ASCII is text: a no-break space, a next line, a line separator, a wide space, and
+		// a byte order mark, which is no white space at all.
+		"\xC2\xA0a\xC2\x85": "\xC2\xA0a\xC2\x85",
+		"\xE2\x80\xA8a ":    "\xE2\x80\xA8a",
+		" \xE3\x80\x80":     "\xE3\x80\x80",
+		bom + " a":          bom + " a",
+	} {
+		if got := TrimASCIISpace(text); got != want {
+			t.Errorf("TrimASCIISpace(%q) = %q, want %q", text, got, want)
+		}
+	}
+}
+
 func TestDecodeText(t *testing.T) {
 	for _, c := range []struct{ name, bytes, want string }{
 		{"valid text is unchanged", "héro 1 \u2603\n", "héro 1 \u2603\n"},

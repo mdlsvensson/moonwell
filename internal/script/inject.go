@@ -102,12 +102,12 @@ func startsDefinition(script []byte, name string) bool {
 	if !isFunction {
 		return false
 	}
-	named := bytes.TrimLeft(after, luaSpace)
+	named := bytes.TrimLeft(after, fsx.ASCIISpace)
 	if len(named) == len(after) {
 		return false
 	}
 	after, isNamed := bytes.CutPrefix(named, []byte(name))
-	return isNamed && bytes.HasPrefix(bytes.TrimLeft(after, luaSpace), []byte("("))
+	return isNamed && bytes.HasPrefix(bytes.TrimLeft(after, fsx.ASCIISpace), []byte("("))
 }
 
 // withBundle is the script with the program's bundle after it, in a slice of its own: the script's bytes belong

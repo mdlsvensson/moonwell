@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"os"
 	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
@@ -114,7 +113,7 @@ func writeLock(file string) error {
 // "unknown" for a lock that holds none or cannot be read.
 func holderOf(file string) string {
 	data, err := os.ReadFile(file)
-	if holder := strings.Trim(string(data), " \t\n\v\f\r"); err == nil && holder != "" {
+	if holder := fsx.TrimASCIISpace(string(data)); err == nil && holder != "" {
 		return holder
 	}
 	return "unknown"

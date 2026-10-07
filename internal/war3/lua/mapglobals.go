@@ -4,6 +4,8 @@ import (
 	"cmp"
 	"regexp"
 	"strings"
+
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 // Global is a variable World Editor declares at the top of war3map.lua. Type is a lua-language-server type, or
@@ -28,7 +30,7 @@ var handleTypes = map[string]string{
 }
 
 // space is one character of Lua's white space, for a regular expression.
-var space = "[" + regexp.QuoteMeta(whiteSpace) + "]"
+var space = "[" + regexp.QuoteMeta(fsx.ASCIISpace) + "]"
 
 var (
 	functionLine = regexp.MustCompile(`^function` + space + `+([A-Za-z_]\w*)` + space + `*\(`)
@@ -91,7 +93,7 @@ func valueType(value string) string {
 		return "any[]"
 	}
 	if array := arrayConstructor.FindStringSubmatch(value); array != nil {
-		return valueType(strings.Trim(array[1], whiteSpace)) + "[]"
+		return valueType(fsx.TrimASCIISpace(array[1])) + "[]"
 	}
 	return "any"
 }

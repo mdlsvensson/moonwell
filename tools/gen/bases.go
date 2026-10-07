@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/objects"
 	"github.com/mdlsvensson/moonwell/tools/gen/ini"
@@ -80,10 +81,10 @@ func levelCount(row slk.Row, column string) (int, error) {
 	if !has {
 		return 0, errNoLevels(row, column)
 	}
-	if trim(cell) == "" {
+	if fsx.TrimASCIISpace(cell) == "" {
 		return 0, nil
 	}
-	count, isNumber := decimal(trim(cell))
+	count, isNumber := decimal(fsx.TrimASCIISpace(cell))
 	if !isNumber || count != math.Trunc(count) || count < 0 {
 		return 0, errBadLevels(row, column, cell)
 	}
@@ -201,7 +202,7 @@ var (
 // space at its ends.
 func cleanName(name string) string {
 	name = colourEnd.ReplaceAllString(colourStart.ReplaceAllString(name, ""), "")
-	return trim(nameLineBreak.ReplaceAllString(name, " "))
+	return fsx.TrimASCIISpace(nameLineBreak.ReplaceAllString(name, " "))
 }
 
 // ---- errors ----

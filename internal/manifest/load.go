@@ -156,12 +156,12 @@ func errDepsUnreadable(cause error) error {
 
 // errEvaluation shows what pkl printed when it failed: pkl's own words name the line of the manifest.
 func errEvaluation(file, output string) error {
-	return &diag.Error{Msg: "Evaluating " + file + " failed:\n" + strings.TrimSpace(output), File: file}
+	return &diag.Error{Msg: "Evaluating " + file + " failed:\n" + fsx.TrimASCIISpace(output), File: file}
 }
 
 func errNotJSON(file, output string, cause error) error {
 	return &diag.Error{
-		Msg:   "pkl eval printed output that is not valid JSON:\n" + firstCharacters(strings.TrimSpace(output), 500),
+		Msg:   "pkl eval printed output that is not valid JSON:\n" + firstCharacters(fsx.TrimASCIISpace(output), 500),
 		File:  file,
 		Hint:  "Check that pkl on PATH is Pkl 0.32 or newer and that no other program is named pkl.",
 		Cause: cause,

@@ -60,7 +60,7 @@ var YueScript = Tool{
 	},
 	VersionArgs: []string{"-v"},
 	// The version ends at the first white space, which is ASCII's.
-	Reported:  regexp.MustCompile(`Yuescript version: ([^ \t\n\v\f\r]+)`),
+	Reported:  regexp.MustCompile(`Yuescript version: ([^` + fsx.ASCIISpace + `]+)`),
 	Otherwise: "build or install yue yourself and set yue.path in moonwell.local.pkl.",
 }
 
@@ -144,7 +144,7 @@ func pklOnPath(ctx context.Context, e *env.Env) (printed string, recent bool, er
 	if err != nil {
 		return "", false, err
 	}
-	return orUnknown(trimmed(result.Stdout)), recentPkl(Pkl.versionIn(result)), nil
+	return orUnknown(fsx.TrimASCIISpace(result.Stdout)), recentPkl(Pkl.versionIn(result)), nil
 }
 
 // recentPkl reports whether a version, as Pkl reports it, is 0.32 or newer; "" is none.

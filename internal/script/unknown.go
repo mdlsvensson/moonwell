@@ -12,6 +12,7 @@ import (
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
@@ -69,8 +70,8 @@ func declaredBy(modules []Module, output *staged) []string {
 }
 
 var (
-	globalLine   = regexp.MustCompile(`^[ \t\n\v\f\r]*global[ \t\n\v\f\r]+([^\n\r]*)$`)
-	constOrClass = regexp.MustCompile(`^(const|class)[ \t\n\v\f\r]+(.*)$`)
+	globalLine   = regexp.MustCompile(`^` + space + `*global` + space + `+([^\n\r]*)$`)
+	constOrClass = regexp.MustCompile(`^(const|class)` + space + `+(.*)$`)
 	leadingName  = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*`)
 	wholeName    = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 )
@@ -86,7 +87,7 @@ func declaredGlobals(source string) []string {
 			continue
 		}
 		rest, _, _ := strings.Cut(global[1], "--")
-		rest = strings.Trim(rest, luaSpace)
+		rest = fsx.TrimASCIISpace(rest)
 		if keyword := constOrClass.FindStringSubmatch(rest); keyword != nil {
 			if keyword[1] == "class" {
 				if name := leadingName.FindString(keyword[2]); name != "" {
@@ -98,7 +99,7 @@ func declaredGlobals(source string) []string {
 		}
 		targets, _, _ := strings.Cut(rest, "=")
 		for part := range strings.SplitSeq(targets, ",") {
-			if name := strings.Trim(part, luaSpace); wholeName.MatchString(name) {
+			if name := fsx.TrimASCIISpace(part); wholeName.MatchString(name) {
 				declared = append(declared, name)
 			}
 		}

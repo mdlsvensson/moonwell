@@ -130,9 +130,6 @@ func orUnknown(version string) string {
 	return version
 }
 
-// trimmed is what a program printed without the white space around it. White space is ASCII's.
-func trimmed(printed string) string { return strings.Trim(printed, " \t\n\v\f\r") }
-
 // sentence is text that ends a sentence, as a sentence of its own.
 func sentence(text string) string {
 	if text == "" {
