@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.0 (2026-10-07)
 
 - **The program was written anew.** The twelve commands and their flags, the manifest, `moonwell.lock`,
   `.asset-state/` and the libraries are those of 0.9.1. What a user can notice of the new program is listed here,
