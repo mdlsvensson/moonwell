@@ -3,7 +3,6 @@ package library
 import (
 	"bytes"
 	"errors"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"slices"
@@ -142,14 +141,11 @@ func (n named) below(base string) sources {
 // A file that is there and cannot be read is refused: taken for none, the library would be copied without the
 // dir and the assets its file names, and without a word.
 func describedAt(key, libraryFile string) (Described, error) {
-	content, err := os.ReadFile(libraryFile)
-	switch {
-	case err == nil:
-		return ParseFile(key, content, true, libraryFile)
-	case errors.Is(err, fs.ErrNotExist), !fsx.IsDir(filepath.Dir(libraryFile)):
-		return ParseFile(key, nil, false, libraryFile)
+	content, found, err := fsx.ReadIfThere(libraryFile)
+	if err != nil && fsx.IsDir(filepath.Dir(libraryFile)) {
+		return Described{}, errUnreadableLibraryFile(key, libraryFile, err)
 	}
-	return Described{}, errUnreadableLibraryFile(key, libraryFile, err)
+	return ParseFile(key, content, found, libraryFile)
 }
 
 // readLocal reads the files that are kept of a local library. The folder of the files for the map holds no

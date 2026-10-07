@@ -92,14 +92,11 @@ func (s *staged) luaOf(source Source) (lua string, ok bool, err error) {
 	if err != nil {
 		return "", false, err
 	}
-	data, err := os.ReadFile(file)
-	switch {
-	case errors.Is(err, fs.ErrNotExist):
-		return "", false, nil
-	case err != nil:
+	data, found, err := fsx.ReadIfThere(file)
+	if err != nil {
 		return "", false, errUnreadableOutput(stageDir+"/"+under, err)
 	}
-	return string(data), true, nil
+	return string(data), found, nil
 }
 
 // modeOf is the compiler's flag for the Lua it writes: -r keeps each statement on the line of its source, and

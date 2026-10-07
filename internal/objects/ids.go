@@ -1,10 +1,7 @@
 package objects
 
 import (
-	"errors"
 	"fmt"
-	"io/fs"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -76,14 +73,14 @@ const (
 // StatusOfIDs reports whether the generated module under root is what the manifest renders (expected). A module
 // that is not there is current when the manifest has no objects, so a project that never had any needs no file.
 func StatusOfIDs(root, expected string) (IDsStatus, error) {
-	data, err := os.ReadFile(idsPath(root))
+	data, found, err := fsx.ReadIfThere(idsPath(root))
 	switch {
-	case errors.Is(err, fs.ErrNotExist) && expected == RenderIDs(nil):
-		return IDsCurrent, nil
-	case errors.Is(err, fs.ErrNotExist):
-		return IDsMissing, nil
 	case err != nil:
 		return "", errIDsUnreadable(err)
+	case !found && expected == RenderIDs(nil):
+		return IDsCurrent, nil
+	case !found:
+		return IDsMissing, nil
 	}
 	// A checkout on Windows may have CRLF line endings; the module is the same.
 	if strings.ReplaceAll(string(data), "\r\n", "\n") == expected {

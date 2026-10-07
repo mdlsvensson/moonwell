@@ -385,14 +385,10 @@ func onDisk(root, file string) string {
 
 // readIfThere reads a file of the project. found is false, without an error, when there is none.
 func readIfThere(root, file string) (data []byte, found bool, err error) {
-	data, err = os.ReadFile(onDisk(root, file))
-	switch {
-	case errors.Is(err, fs.ErrNotExist):
-		return nil, false, nil
-	case err != nil:
+	if data, found, err = fsx.ReadIfThere(onDisk(root, file)); err != nil {
 		return nil, false, errNotRead(file, err)
 	}
-	return data, true, nil
+	return data, found, nil
 }
 
 // writeFile writes a file of the project, and makes the folder it is in.

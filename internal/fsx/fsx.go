@@ -98,6 +98,20 @@ func Lstat(path string) (fs.FileInfo, error) {
 	return info, err
 }
 
+// ReadIfThere reads the file at path, which need not be there. found is false, without an error, where no file
+// is: nothing at the path, or a file on the way to it, of which one system says that the path does not exist and
+// another that what is above it is no folder. Any other failure is the system's error as it came.
+func ReadIfThere(path string) (data []byte, found bool, err error) {
+	data, err = os.ReadFile(path)
+	switch {
+	case err == nil:
+		return data, true, nil
+	case errors.Is(err, fs.ErrNotExist), errors.Is(err, syscall.ENOTDIR):
+		return nil, false, nil
+	}
+	return nil, false, err
+}
+
 // IsLink reports whether info is a symlink or, on Windows, a junction, which Go reports as an irregular file.
 func IsLink(info fs.FileInfo) bool {
 	return info.Mode()&fs.ModeSymlink != 0 || (onWindows && info.Mode()&fs.ModeIrregular != 0)
@@ -239,11 +253,8 @@ func WriteIfChanged(path, content string) (wrote bool, err error) {
 
 // writeIfChanged writes content to path with mode, creating its folder, unless the file already holds content.
 func writeIfChanged(path string, content []byte, mode fs.FileMode) (wrote bool, err error) {
-	existing, err := os.ReadFile(path)
-	if err == nil && bytes.Equal(existing, content) {
-		return false, nil
-	}
-	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+	existing, found, err := ReadIfThere(path)
+	if err != nil || (found && bytes.Equal(existing, content)) {
 		return false, err
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {

@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/fs"
-	"os"
 	"regexp"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
@@ -54,16 +52,12 @@ func ReadState(file string) (State, error) {
 	return state, nil
 }
 
-// readIfThere reads a file. found is false, without an error, when there is none.
+// readIfThere reads the state file. found is false, without an error, when there is none.
 func readIfThere(file string) (data []byte, found bool, err error) {
-	data, err = os.ReadFile(file)
-	switch {
-	case errors.Is(err, fs.ErrNotExist):
-		return nil, false, nil
-	case err != nil:
+	if data, found, err = fsx.ReadIfThere(file); err != nil {
 		return nil, false, errUnreadableState(file, err)
 	}
-	return data, true, nil
+	return data, found, nil
 }
 
 // listedIn is the files a state document lists, each path with its hash as written, in the order of the text; or

@@ -2,8 +2,6 @@ package fsx
 
 import (
 	"bytes"
-	"errors"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"slices"
@@ -70,11 +68,11 @@ func (j *Journal) Undo() (unrestored []Unrestored) {
 // remember notes what the file at path holds now, or that there is none. A path that cannot be read (a folder, a
 // file held open) fails, and nothing is noted for it.
 func (j *Journal) remember(path string) error {
-	before, err := os.ReadFile(path)
-	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+	before, existed, err := ReadIfThere(path)
+	if err != nil {
 		return err
 	}
-	j.touched = append(j.touched, touch{path: path, before: before, existed: err == nil})
+	j.touched = append(j.touched, touch{path: path, before: before, existed: existed})
 	return nil
 }
 
@@ -93,9 +91,6 @@ func (t touch) restore() error {
 // asItWas reports whether the file holds what it held before the touch: the same bytes, or still no file. A file
 // that cannot be read now is not known to, so restore tries it.
 func (t touch) asItWas() bool {
-	now, err := os.ReadFile(t.path)
-	if !t.existed {
-		return errors.Is(err, fs.ErrNotExist)
-	}
-	return err == nil && bytes.Equal(now, t.before)
+	now, found, err := ReadIfThere(t.path)
+	return err == nil && found == t.existed && bytes.Equal(now, t.before)
 }

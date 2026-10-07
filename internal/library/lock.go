@@ -3,9 +3,7 @@ package library
 import (
 	"encoding/json"
 	"errors"
-	"io/fs"
 	"maps"
-	"os"
 	"slices"
 	"strings"
 
@@ -53,12 +51,12 @@ func ReadLock(root string) (map[string]LockEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := os.ReadFile(path)
+	data, found, err := fsx.ReadIfThere(path)
 	switch {
-	case errors.Is(err, fs.ErrNotExist):
-		return map[string]LockEntry{}, nil
 	case err != nil:
 		return nil, errUnreadableLock(err)
+	case !found:
+		return map[string]LockEntry{}, nil
 	case !json.Valid(data):
 		return nil, errLockNotJSON()
 	}

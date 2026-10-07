@@ -101,6 +101,33 @@ func TestWriteIfChangedOnlyWritesDifferingContent(t *testing.T) {
 	}
 }
 
+func TestReadIfThereFindsNoFileWhereNoneCanBeAndFailsForAnythingElse(t *testing.T) {
+	dir := t.TempDir()
+	write(t, filepath.Join(dir, "held.txt"), "held")
+	if err := os.Mkdir(filepath.Join(dir, "folder"), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		name, path, data string
+		found            bool
+	}{
+		{"a file", "held.txt", "held", true},
+		{"nothing at the path", "gone.txt", "", false},
+		{"nothing on the way to the path", "gone/below.txt", "", false},
+		// What a system says of a path below a file differs from system to system; no file is there on any.
+		{"a file on the way to the path", "held.txt/below.txt", "", false},
+	} {
+		data, found, err := ReadIfThere(filepath.Join(dir, filepath.FromSlash(c.path)))
+		if string(data) != c.data || found != c.found || err != nil {
+			t.Errorf("%s: ReadIfThere = %q, %v, %v", c.name, data, found, err)
+		}
+	}
+	// A folder is there, and is no file to read: the system's error, for the caller to word.
+	if data, found, err := ReadIfThere(filepath.Join(dir, "folder")); err == nil || found || data != nil {
+		t.Errorf("a folder: ReadIfThere = %q, %v, %v", data, found, err)
+	}
+}
+
 func TestReadSourceDropsALeadingByteOrderMarkAndBlanksAFirstLineStartingWithHash(t *testing.T) {
 	file := filepath.Join(t.TempDir(), "x.lua")
 	for _, c := range []struct{ content, want string }{

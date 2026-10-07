@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"io/fs"
 	"os"
 	"regexp"
 	"slices"
 	"strings"
 
+	"github.com/mdlsvensson/moonwell/internal/fsx"
 	"github.com/mdlsvensson/moonwell/internal/objects"
 )
 
@@ -294,12 +294,12 @@ func capitalize(word string) string {
 // what authors write: a field of that file must still be there and have its name, unless the overrides pin the
 // name it has now or list the field as removed. A checkout without the file has released no name.
 func keepsReleasedNames(metadata *objects.Metadata, checkout string, pins overrides) error {
-	data, err := os.ReadFile(fileIn(checkout, metadataPath))
+	data, found, err := fsx.ReadIfThere(fileIn(checkout, metadataPath))
 	switch {
-	case errors.Is(err, fs.ErrNotExist):
-		return nil
 	case err != nil:
 		return errInCheckout(checkout, metadataPath, err)
+	case !found:
+		return nil
 	}
 	released, err := decodeMetadata(data)
 	if err != nil {
