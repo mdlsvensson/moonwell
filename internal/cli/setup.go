@@ -178,7 +178,7 @@ func declarations(e *env.Env, p *manifest.Project) error {
 // several steps, and a build beside it would read the libraries half written; a setup beside a running build
 // has still done every step before this one.
 func librariesAndTheirView(ctx context.Context, e *env.Env, p *manifest.Project) error {
-	release, err := build.Acquire(e.Root)
+	release, err := build.TakeLock(e.Root)
 	if err != nil {
 		return err
 	}

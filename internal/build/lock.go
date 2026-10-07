@@ -33,9 +33,9 @@ var held = struct {
 	locks map[string]*holding
 }{locks: map[string]*holding{}}
 
-// Acquire takes the build lock of the project at root, dist/.lock, which holds this process's id, so that a
+// TakeLock takes the build lock of the project at root, dist/.lock, which holds this process's id, so that a
 // second build in the project fails at once. release gives it back and may be called more than once.
-func Acquire(root string) (release func(), err error) {
+func TakeLock(root string) (release func(), err error) {
 	file, err := lockPlace(root)
 	if err != nil {
 		return nil, err

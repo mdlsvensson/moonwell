@@ -40,7 +40,7 @@ func importAssets(ctx context.Context, e *env.Env, write bool) error {
 	if err != nil {
 		return err
 	}
-	release, err := build.Acquire(e.Root)
+	release, err := build.TakeLock(e.Root)
 	if err != nil {
 		return err
 	}
@@ -73,11 +73,11 @@ func importAssets(ctx context.Context, e *env.Env, write bool) error {
 }
 
 // writeImport is the last step of assets:sync: it writes the planned import into the source map, keeps the
-// record of the files assets:sync owns there in the file build.StateFile names, and says what it wrote.
+// record of the files assets:sync owns there in the file build.OwnershipFile names, and says what it wrote.
 func writeImport(
 	ctx context.Context, e *env.Env, p *manifest.Project, source *mapdir.Folder, plan *assets.Result,
 ) error {
-	stateFile, err := build.StateFile(p)
+	stateFile, err := build.OwnershipFile(p)
 	if err != nil {
 		return err
 	}

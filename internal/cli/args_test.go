@@ -17,7 +17,7 @@ var grammar = []command{
 	{name: "build", usage: "build [--entry f] [--minify]"},
 	{name: "test", usage: "test [--entry f] [--minify]"},
 	{name: "check", usage: "check"},
-	{name: "init", usage: "init <dir> [--link]", takes: arity{most: 1, without: errNoFolderToMake}},
+	{name: "init", usage: "init <dir> [--link]", takes: arity{most: 1, missing: errNoFolderToMake}},
 	{name: "assets:paths", usage: "assets:paths [file]", takes: arity{most: 1}},
 }
 

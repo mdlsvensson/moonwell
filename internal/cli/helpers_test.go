@@ -441,7 +441,7 @@ func sameFiles(t *testing.T, before, after map[string][]byte, what string) {
 // holdBuildLock takes the build lock of root for the rest of the test, as a build that runs beside it does.
 func holdBuildLock(t *testing.T, root string) {
 	t.Helper()
-	release, err := build.Acquire(root)
+	release, err := build.TakeLock(root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}

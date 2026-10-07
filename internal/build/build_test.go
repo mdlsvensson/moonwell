@@ -253,7 +253,7 @@ func TestABuildBesideAnotherLeavesTheArchiveOfTheBuildBefore(t *testing.T) {
 	s := newStandIn(t)
 	s.withInfo(modernInfo)
 	file, _ := built(t, s, Options{})
-	release, err := Acquire(s.root)
+	release, err := TakeLock(s.root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -651,7 +651,7 @@ func TestEveryDoorIsRefusedBesideABuildThatRuns(t *testing.T) {
 	for _, d := range doors {
 		t.Run(d.name, func(t *testing.T) {
 			s := newStandIn(t)
-			release, err := Acquire(s.root)
+			release, err := TakeLock(s.root)
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}

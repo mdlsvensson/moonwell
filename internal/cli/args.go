@@ -210,8 +210,8 @@ func (r *reading) fits(commands []command) error {
 	switch {
 	case len(arguments) > chosen.takes.most:
 		return errArgumentNotTaken(chosen, arguments[chosen.takes.most])
-	case len(arguments) == 0 && chosen.takes.without != nil && !r.said.help && !r.said.version:
-		return chosen.takes.without()
+	case len(arguments) == 0 && chosen.takes.missing != nil && !r.said.help && !r.said.version:
+		return chosen.takes.missing()
 	}
 	return nil
 }

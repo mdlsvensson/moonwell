@@ -193,11 +193,11 @@ func shippingLibraries(root string, synced []library.Synced) ([]assets.Library, 
 	return shipping, nil
 }
 
-// StateFile is the file that records which files of the project's source map assets:sync owns, by its path from
-// the project folder. It is named by the map's folder as mapFolder reads it, so every way to write one folder
-// names one file; a map.folder that names no folder inside maps/ is refused as Source refuses it. Nothing need
-// be at the place.
-func StateFile(p *manifest.Project) (string, error) {
+// OwnershipFile is the file that records which files of the project's source map assets:sync owns, by its path
+// from the project folder. It is named by the map's folder as mapFolder reads it, so every way to write one
+// folder names one file; a map.folder that names no folder inside maps/ is refused as Source refuses it. Nothing
+// need be at the place.
+func OwnershipFile(p *manifest.Project) (string, error) {
 	folder, err := mapFolder(p)
 	if err != nil {
 		return "", err

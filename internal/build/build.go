@@ -108,7 +108,7 @@ func Build(ctx context.Context, e *env.Env, opts Options) (archive string, err e
 	if err != nil {
 		return "", err
 	}
-	release, err := Acquire(e.Root)
+	release, err := TakeLock(e.Root)
 	if err != nil {
 		return "", err
 	}
@@ -137,7 +137,7 @@ func Test(ctx context.Context, e *env.Env, opts Options) error {
 	if err != nil {
 		return err
 	}
-	release, err := Acquire(e.Root)
+	release, err := TakeLock(e.Root)
 	if err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ func check(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, 
 	if err != nil {
 		return nil, err
 	}
-	release, err := Acquire(e.Root)
+	release, err := TakeLock(e.Root)
 	if err != nil {
 		return nil, err
 	}

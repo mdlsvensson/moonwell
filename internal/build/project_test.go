@@ -474,9 +474,9 @@ func TestAssetsNamesALibrarysFolderFromAProjectFolderThatIsGivenFromTheWorkingFo
 	}
 }
 
-// ---- StateFile ----
+// ---- OwnershipFile ----
 
-func TestStateFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
+func TestOwnershipFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 	tests := []struct{ folder, want string }{
 		{"map.w3x", ".asset-state/map.w3x.json"},
 		{"campaign/one.w3x", ".asset-state/campaign/one.w3x.json"},
@@ -487,9 +487,9 @@ func TestStateFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 		s := newStandIn(t)
 		s.project.Map.Folder = tt.folder
 		before := testkit.Snapshot(t, s.root)
-		file, err := StateFile(s.project)
+		file, err := OwnershipFile(s.project)
 		if err != nil || file != tt.want {
-			t.Errorf("map.folder %q: StateFile = %q, %v, want %q", tt.folder, file, err, tt.want)
+			t.Errorf("map.folder %q: OwnershipFile = %q, %v, want %q", tt.folder, file, err, tt.want)
 		}
 		if !reflect.DeepEqual(testkit.Snapshot(t, s.root), before) {
 			t.Errorf("map.folder %q: naming the state file changed the project", tt.folder)
@@ -497,7 +497,7 @@ func TestStateFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 	}
 }
 
-func TestStateFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
+func TestOwnershipFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 	const notInside = "must name a folder inside maps/"
 	tests := []struct{ folder, words string }{
 		{"", notInside}, {"../outside", notInside}, {`C:\x`, notInside}, {"a/../b.w3x", notInside},
@@ -506,10 +506,10 @@ func TestStateFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 	for _, tt := range tests {
 		s := newStandIn(t)
 		s.project.File, s.project.Map.Folder = localManifest, tt.folder
-		file, err := StateFile(s.project)
+		file, err := OwnershipFile(s.project)
 		e := asError(t, err, "map.folder "+tt.folder)
 		if file != "" || e.File != localManifest || !strings.Contains(e.Msg, tt.words) {
-			t.Errorf("map.folder %q: StateFile = %q, %+v", tt.folder, file, e)
+			t.Errorf("map.folder %q: OwnershipFile = %q, %+v", tt.folder, file, e)
 		}
 	}
 }

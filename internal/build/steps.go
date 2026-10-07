@@ -141,10 +141,10 @@ func PlanAssets(
 	return imported, replaced, nil
 }
 
-// ownedFiles is the ownership state of the project's map, read from StateFile: the files of the source map that
+// ownedFiles is the ownership state of the project's map, read from OwnershipFile: the files of the source map that
 // assets:sync wrote, which a plan may replace and remove. A build reads the state and never writes it.
 func ownedFiles(p *manifest.Project) (assets.State, error) {
-	file, err := StateFile(p)
+	file, err := OwnershipFile(p)
 	if err != nil {
 		return assets.State{}, err
 	}

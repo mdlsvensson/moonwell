@@ -75,7 +75,7 @@ func importedByABuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
 	if err != nil {
 		return nil, err
 	}
-	release, err := build.Acquire(e.Root)
+	release, err := build.TakeLock(e.Root)
 	if err != nil {
 		return nil, err
 	}

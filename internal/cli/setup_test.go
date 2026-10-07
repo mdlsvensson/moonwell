@@ -149,7 +149,7 @@ func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing
 		file    string
 	}{
 		{"a running build", func(t *testing.T, root string) {
-			release, err := build.Acquire(root)
+			release, err := build.TakeLock(root)
 			if err != nil {
 				t.Fatal(err)
 			}

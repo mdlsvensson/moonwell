@@ -34,9 +34,9 @@ type call struct {
 // that it cannot do without.
 type arity struct {
 	most int // 0 or 1
-	// without is the refusal of a line that lacks the argument, for a command that cannot do without it: the
+	// missing is the refusal of a line that lacks the argument, for a command that cannot do without it: the
 	// command knows what its argument is, and words the refusal. It is nil for a command that can.
-	without func() error
+	missing func() error
 }
 
 // command is one row of the command table. The flags a command has are not in its row: the grammar's table of
@@ -57,7 +57,7 @@ type command struct {
 // settings.Plan.
 var commands = []command{
 	{name: "init", usage: "init <dir> [--link]", help: "Create a project (--link: use this local Moonwell checkout)",
-		takes: arity{most: 1, without: errInitNeedsAFolder}, run: runInit},
+		takes: arity{most: 1, missing: errInitNeedsAFolder}, run: runInit},
 	{name: "setup", usage: "setup", help: "Install the pinned YueScript compiler", run: runSetup},
 	{name: "build", usage: "build [--entry f] [--minify]", help: "Build <build.folder>/<map.folder>", run: runBuild},
 	{name: "test", usage: "test [--entry f] [--minify]", help: "Stage the map and launch Warcraft III", run: runTest},
@@ -157,7 +157,7 @@ func runIn(ctx context.Context, outside world, args []string, root string, write
 	log := env.NewLogger(write, logFile(root, chosen))
 	say = log.Error
 	err = chosen.run(ctx, outside(root, log), call{said: said, print: print})
-	return ended(ctx, log, chosen, err)
+	return exitCode(ctx, log, chosen, err)
 }
 
 // logFile is the file a command's lines are also written to: dist/moonwell.log for a project, and "" for a
@@ -178,13 +178,13 @@ func logFile(root string, chosen command) string {
 	return file
 }
 
-// ended prints the failure a command ended with, and returns the exit code of the outcome. A failure is printed
-// in one way, as diag.Format renders it, whether a command ended with it or the line was refused.
+// exitCode prints the failure a command ended with, and returns the exit code of the outcome. A failure is
+// printed in one way, as diag.Format renders it, whether a command ended with it or the line was refused.
 //
 // A command that was told to stop ends with 130, unless it ended well all the same; when it only stopped
 // because it was told to, it has nothing to report. dev runs until it is told to stop, and ends with 130 then,
 // though it has not failed.
-func ended(ctx context.Context, log *env.Logger, chosen command, err error) int {
+func exitCode(ctx context.Context, log *env.Logger, chosen command, err error) int {
 	toldToStop := ctx.Err() != nil
 	if err != nil && !(toldToStop && errors.Is(err, context.Canceled)) {
 		log.Error(diag.Format(err))

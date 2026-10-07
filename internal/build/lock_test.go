@@ -27,7 +27,7 @@ func refusesABuildBesideAnother(e *diag.Error) bool {
 // lockIsHeld reports whether the lock of the project at root is there and a build is refused for it.
 func lockIsHeld(t *testing.T, root string) bool {
 	t.Helper()
-	release, err := Acquire(root)
+	release, err := TakeLock(root)
 	if err == nil {
 		release()
 		return false
@@ -47,7 +47,7 @@ func TestAReleaseLeavesTheLockOfALaterAcquisitionAlone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
-			first, err := Acquire(root)
+			first, err := TakeLock(root)
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}
@@ -56,7 +56,7 @@ func TestAReleaseLeavesTheLockOfALaterAcquisitionAlone(t *testing.T) {
 			} else {
 				tt.given()
 			}
-			second, err := Acquire(root)
+			second, err := TakeLock(root)
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}
@@ -77,12 +77,12 @@ func TestAReleaseLeavesTheLockOfALaterAcquisitionAlone(t *testing.T) {
 	}
 }
 
-func TestAcquireRefusesADistFolderThatIsALink(t *testing.T) {
+func TestTakeLockRefusesADistFolderThatIsALink(t *testing.T) {
 	root, elsewhere := t.TempDir(), t.TempDir()
 	testkit.WriteFile(t, elsewhere, "kept.txt", []byte("kept"))
 	before := testkit.Snapshot(t, elsewhere)
 	testkit.LinkDir(t, elsewhere, filepath.Join(root, "dist"))
-	release, err := Acquire(root)
+	release, err := TakeLock(root)
 	e := asError(t, err, "dist as a link")
 	if release != nil || e.File != "dist" || !strings.HasPrefix(e.Msg, "dist is a link: ") ||
 		!strings.Contains(e.Hint, "Remove the link (or Windows junction) at dist") || e.Cause != nil {
@@ -98,7 +98,7 @@ func TestAcquireRefusesADistFolderThatIsALink(t *testing.T) {
 	}
 }
 
-func TestAcquireRefusesAFileLinkInTheLocksPlace(t *testing.T) {
+func TestTakeLockRefusesAFileLinkInTheLocksPlace(t *testing.T) {
 	tests := []struct {
 		name  string
 		holds *string // what the file the link leads to holds; nil for a link to nothing
@@ -117,7 +117,7 @@ func TestAcquireRefusesAFileLinkInTheLocksPlace(t *testing.T) {
 				testkit.WriteFile(t, filepath.Dir(target), "other", []byte(*tt.holds))
 			}
 			testkit.LinkFile(t, target, lockOf(root))
-			release, err := Acquire(root)
+			release, err := TakeLock(root)
 			e := asError(t, err, tt.name)
 			if release != nil || e.File != "dist/.lock" || !strings.HasPrefix(e.Msg, "dist/.lock is a link: ") {
 				t.Errorf("error = %+v", e)
@@ -134,9 +134,9 @@ func TestAcquireRefusesAFileLinkInTheLocksPlace(t *testing.T) {
 	}
 }
 
-func TestAcquireRejectsAConcurrentBuildAndReleasesAfterwards(t *testing.T) {
+func TestTakeLockRejectsAConcurrentBuildAndReleasesAfterwards(t *testing.T) {
 	root := t.TempDir()
-	release, err := Acquire(root)
+	release, err := TakeLock(root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -145,7 +145,7 @@ func TestAcquireRejectsAConcurrentBuildAndReleasesAfterwards(t *testing.T) {
 	if data, _ := os.ReadFile(lockOf(root)); string(data) != pid {
 		t.Errorf("the lock holds %q", data)
 	}
-	second, err := Acquire(root)
+	second, err := TakeLock(root)
 	e := asError(t, err, "a second build")
 	if second != nil || e.Cause != nil || !refusesABuildBesideAnother(e) ||
 		!strings.Contains(e.Hint, "If process "+pid+" is not running") ||
@@ -160,7 +160,7 @@ func TestAcquireRejectsAConcurrentBuildAndReleasesAfterwards(t *testing.T) {
 	if fsx.Exists(lockOf(root)) {
 		t.Error("the lock is still there")
 	}
-	again, err := Acquire(root)
+	again, err := TakeLock(root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -180,7 +180,7 @@ func TestOfSeveralBuildsThatStartAtOnceOneTakesTheLock(t *testing.T) {
 	results := make(chan taken, builds)
 	for range builds {
 		go func() {
-			release, err := Acquire(root)
+			release, err := TakeLock(root)
 			results <- taken{release, err}
 		}()
 	}
@@ -221,7 +221,7 @@ func TestALockFileWithoutAProcessIdNamesAnUnknownHolder(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			testkit.WriteFile(t, root, "dist/.lock", []byte(tt.holds))
-			release, err := Acquire(root)
+			release, err := TakeLock(root)
 			e := asError(t, err, "a lock that is there")
 			if release != nil || e.File != "dist/.lock" ||
 				!strings.Contains(e.Hint, "If process "+tt.holder+" is not running") {
@@ -240,7 +240,7 @@ func TestALockThatCannotBeReadNamesAnUnknownHolder(t *testing.T) {
 	if err := os.MkdirAll(lockOf(root), 0o777); err != nil {
 		t.Fatal(err)
 	}
-	release, err := Acquire(root)
+	release, err := TakeLock(root)
 	e := asError(t, err, "a folder in the lock's place")
 	if release != nil || !refusesABuildBesideAnother(e) ||
 		!strings.Contains(e.Hint, "If process unknown is not running") {
@@ -250,11 +250,11 @@ func TestALockThatCannotBeReadNamesAnUnknownHolder(t *testing.T) {
 
 func TestReleaseHeldRemovesTheLocksThisProcessHolds(t *testing.T) {
 	first, second := t.TempDir(), t.TempDir()
-	release, err := Acquire(first)
+	release, err := TakeLock(first)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	if _, err := Acquire(second); err != nil {
+	if _, err := TakeLock(second); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	ReleaseHeld()
@@ -270,9 +270,9 @@ func TestReleaseHeldRemovesTheLocksThisProcessHolds(t *testing.T) {
 	}
 }
 
-func TestAcquireMakesTheDistFolderAndNothingElse(t *testing.T) {
+func TestTakeLockMakesTheDistFolderAndNothingElse(t *testing.T) {
 	root := t.TempDir()
-	release, err := Acquire(root)
+	release, err := TakeLock(root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -285,10 +285,10 @@ func TestAcquireMakesTheDistFolderAndNothingElse(t *testing.T) {
 	}
 }
 
-func TestAcquireNamesADistFolderThatCannotBeMade(t *testing.T) {
+func TestTakeLockNamesADistFolderThatCannotBeMade(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "dist", []byte("a file, not a folder"))
-	release, err := Acquire(root)
+	release, err := TakeLock(root)
 	e := asError(t, err, "a file named dist")
 	if release != nil || e.File != "dist" || e.Cause == nil || !strings.HasPrefix(e.Msg, "Creating dist/ failed: ") ||
 		strings.Contains(e.Msg, root) || !strings.Contains(e.Hint, "dist") {
@@ -300,7 +300,7 @@ func TestAcquireNamesADistFolderThatCannotBeMade(t *testing.T) {
 	}
 }
 
-func TestAcquireNamesALockThatCannotBeWritten(t *testing.T) {
+func TestTakeLockNamesALockThatCannotBeWritten(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("Windows lets a file be made in a folder that is marked as read-only")
 	}
@@ -313,7 +313,7 @@ func TestAcquireNamesALockThatCannotBeWritten(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { os.Chmod(dist, 0o777) })
-	release, err := Acquire(root)
+	release, err := TakeLock(root)
 	e := asError(t, err, "a dist folder that cannot be written")
 	if release != nil || e.File != "dist/.lock" || e.Cause == nil || strings.Contains(e.Msg, root) ||
 		!strings.HasPrefix(e.Msg, "Writing dist/.lock failed: ") || !strings.Contains(e.Hint, "dist") {
@@ -323,20 +323,20 @@ func TestAcquireNamesALockThatCannotBeWritten(t *testing.T) {
 	if err := os.Chmod(dist, 0o777); err != nil {
 		t.Fatal(err)
 	}
-	again, err := Acquire(root)
+	again, err := TakeLock(root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	again()
 }
 
-func TestAcquireRefusesAFolderLinkInTheLocksPlace(t *testing.T) {
+func TestTakeLockRefusesAFolderLinkInTheLocksPlace(t *testing.T) {
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, "dist"), 0o777); err != nil {
 		t.Fatal(err)
 	}
 	testkit.LinkDir(t, t.TempDir(), lockOf(root))
-	release, err := Acquire(root)
+	release, err := TakeLock(root)
 	e := asError(t, err, "the lock as a link")
 	if release != nil || e.File != "dist/.lock" || !strings.HasPrefix(e.Msg, "dist/.lock is a link: ") {
 		t.Errorf("error = %+v", e)

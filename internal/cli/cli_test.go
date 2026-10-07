@@ -316,7 +316,7 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 			stop()
 		}
 		log := testkit.NewRecorder()
-		code := ended(ctx, log.Logger, command{name: c.command}, c.err)
+		code := exitCode(ctx, log.Logger, command{name: c.command}, c.err)
 		stop()
 		if output := strings.Join(log.Lines(), "\n"); code != c.code || output != c.output || len(log.Lines()) > 1 {
 			t.Errorf("%s: exit %d, want %d; printed\n%s\nwant\n%s", c.what, code, c.code, output, c.output)
@@ -392,7 +392,7 @@ func TestAFileNameThatIsNotUTF8IsPrintedAsItIs(t *testing.T) {
 		t.Errorf("diag.Format = %q, want %q", got, want)
 	}
 	log := testkit.NewRecorder()
-	code := ended(background, log.Logger, command{name: "check"}, refusal)
+	code := exitCode(background, log.Logger, command{name: "check"}, refusal)
 	if printed := log.Lines(); code != 1 || len(printed) != 1 || printed[0] != want {
 		t.Errorf("a command that ends with the failure prints %q and exits with %d, want %q and 1", printed, code, want)
 	}
@@ -443,7 +443,7 @@ func TestTheTableHasTheTwelveCommandsInTheOrderOfTheUsage(t *testing.T) {
 	for _, c := range commands {
 		have = append(have, c.name)
 		takesOne := c.name == "init" || c.name == "assets:paths"
-		if (c.takes.most == 1) != takesOne || (c.takes.without != nil) != (c.name == "init") {
+		if (c.takes.most == 1) != takesOne || (c.takes.missing != nil) != (c.name == "init") {
 			t.Errorf("%s takes %+v", c.name, c.takes)
 		}
 	}
@@ -499,7 +499,7 @@ func TestLeavingAtOnceGivesBackTheLocksAndThenExitsWith130(t *testing.T) {
 // With the release that Main hands it, the lock a command holds is gone by the time the program exits.
 func TestLeavingAtOnceLeavesNoBuildLockBehind(t *testing.T) {
 	root := t.TempDir()
-	release, err := build.Acquire(root)
+	release, err := build.TakeLock(root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
