@@ -21,7 +21,7 @@ var allianceNatives = []struct {
 	{"SetPlayerAllianceStateFullControlBJ", sharedAdvancedControl},
 }
 
-// teamCall is a SetPlayerTeam call of the script: the player it puts into a team, and the team.
+// teamCall is a SetPlayerTeam call of the Lua: the player it puts into a team, and the team.
 type teamCall struct {
 	player int
 	team   float64
@@ -75,7 +75,7 @@ func (p *patcher) teamCalls(teams lua.Function) []teamCall {
 }
 
 // force is the states of the force in a slot, which is its place among the map info's forces, after it is seen
-// that the script puts into the force's team the players the map info has in the force, and no other.
+// that the Lua puts into the force's team the players the map info has in the force, and no other.
 func (p *patcher) force(index int, details *w3i.Details, calls []teamCall) []string {
 	if index >= len(details.Forces) {
 		p.refuse(errForceNotInInfo(p.file, index))
@@ -101,7 +101,7 @@ func membersOf(force w3i.Force, players []w3i.Player) []int {
 	return members
 }
 
-// teamed reports whether the script's SetPlayerTeam calls agree with the force: a call puts a player into the
+// teamed reports whether the Lua's SetPlayerTeam calls agree with the force: a call puts a player into the
 // team of the force's number exactly when the player is a member, and each member has exactly one call.
 func (p *patcher) teamed(index int, members []int, calls []teamCall) bool {
 	for _, call := range calls {

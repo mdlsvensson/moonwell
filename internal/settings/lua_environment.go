@@ -11,8 +11,8 @@ import (
 
 // environment sets in main() the sound environment, the water colour and the fog, each when it is set, as the
 // map info has them. The calls World Editor wrote for the same are taken out, and the new ones stand together
-// immediately before the first call of CreateAllUnits() or InitBlizzard() directly in main(). A script without
-// such a call is refused.
+// immediately before the first call of CreateAllUnits() or InitBlizzard() directly in main(). Lua without such a
+// call is refused.
 func (p *patcher) environment(set manifest.Environment, info *w3i.Info) {
 	if set == (manifest.Environment{}) {
 		return
@@ -75,7 +75,7 @@ func (p *patcher) water(main lua.Function, details *w3i.Details) string {
 
 // fog is the call for the map's fog: the one that sets it when the map shows fog, and the one that resets it
 // when it does not. Both kinds are taken out first, since either, left where it is, undoes the other. The numbers
-// of a fog that is shown go into the script as the map info has them, so they must be numbers.
+// of a fog that is shown go into the Lua as the map info has them, so they must be numbers.
 func (p *patcher) fog(main lua.Function, info *w3i.Info) string {
 	p.withdraw(main, "SetTerrainFogEx", 7)
 	p.withdraw(main, "ResetTerrainFog", 0)

@@ -28,7 +28,7 @@ func patchLuaAfter(source string, s manifest.Settings, patchedInfo []byte, file,
 // patchLua is patchLuaAfter for a map info already read. It is asked only for settings with a Lua counterpart:
 // patchLuaAfter, its one caller, returns the source as it is for the others.
 //
-// The script says what the map info says, also for a value the settings leave alone, so info is the map info as
+// The Lua says what the map info says, also for a value the settings leave alone, so info is the map info as
 // w3i.Read returns it after patchInfo: read Extended when a player, a force or the environment is set.
 func patchLua(source string, s manifest.Settings, info *w3i.Info, file string) (string, error) {
 	if info == nil || info.Details == nil && needsDetails(s) {
@@ -71,7 +71,7 @@ func (p *patcher) text(native, value string) {
 	p.replace(p.unique(p.function("config"), native, 1), native+"("+lua.Quote(value)+")")
 }
 
-// edited is the source with the edits made. It is read once more: a script that does not read after the edits is
+// edited is the source with the edits made. It is read once more: Lua that does not read after the edits is
 // refused.
 func (p *patcher) edited() (string, error) {
 	result, err := lua.ApplyEdits(p.source, p.edits)
@@ -90,7 +90,7 @@ func (p *patcher) edited() (string, error) {
 //
 // The call stands on a line of its own when the `end` of main() starts its line; otherwise a space keeps it apart
 // from the statement before. Where main() ends in a return that gives a value, no statement can follow: the
-// result is read once more, and a script that does not read after the edits is refused.
+// result is read once more, and Lua that does not read after the edits is refused.
 func patchMinimap(source, file string) (string, error) {
 	p, err := newPatcher(source, file)
 	if err != nil {
@@ -115,7 +115,7 @@ func errUnsafeEdit(file string, cause error) error {
 }
 
 // errNoMapInfo is not a diag error: the caller reads the map info as deep as the settings need before it asks
-// for the script.
+// for the Lua.
 func errNoMapInfo(file string) error {
 	return errors.New("patching " + file + ": the map info was not read as far as the settings need")
 }

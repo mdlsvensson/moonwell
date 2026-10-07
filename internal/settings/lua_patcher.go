@@ -10,11 +10,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// patcher gathers the edits of one script: it finds the functions and the calls World Editor wrote, and replaces,
+// patcher gathers the edits of a map's Lua: it finds the functions and the calls World Editor wrote, and replaces,
 // adds and removes call statements. It holds the source, its top-level functions, the edits so far and the first
 // failure.
 //
-// A script is edited only where its shape is the one World Editor writes; anything else is a failure. Once the
+// The Lua is edited only where its shape is the one World Editor writes; anything else is a failure. Once the
 // patcher has failed, its methods find nothing and edit nothing: they return zero values, so a step reads straight
 // through and patchLua asks once, at the end, what went wrong.
 type patcher struct {
@@ -26,7 +26,7 @@ type patcher struct {
 	failure   error
 }
 
-// newPatcher reads the functions of a script. A script that does not read is refused.
+// newPatcher reads the functions of a map's Lua. Lua that does not read is refused.
 func newPatcher(source, file string) (*patcher, error) {
 	functions, err := lua.Functions(source, file)
 	if err != nil {
@@ -39,7 +39,7 @@ func newPatcher(source, file string) (*patcher, error) {
 	return &patcher{source: source, file: file, eol: eol, functions: functions}, nil
 }
 
-// refuse records why the settings do not go into this script, unless an earlier reason is recorded.
+// refuse records why the settings do not go into this Lua, unless an earlier reason is recorded.
 func (p *patcher) refuse(reason error) {
 	if p.failure == nil {
 		p.failure = reason
@@ -251,7 +251,7 @@ func startsWithName(text string) bool {
 
 // ---- the map info ----
 
-// finite reports whether every value is a number. The script takes a value of the map info as it is, and a file
+// finite reports whether every value is a number. The Lua takes a value of the map info as it is, and a file
 // that a tool or a hand changed can hold one that is none.
 func finite(values ...float32) bool {
 	for _, value := range values {
@@ -264,13 +264,13 @@ func finite(values ...float32) bool {
 
 // ---- errors ----
 
-// resaveLua is the hint of a script whose shape is not the one World Editor writes.
+// resaveLua is the hint of Lua whose shape is not the one World Editor writes.
 const resaveLua = "Re-save the map in World Editor to restore its generated Lua initialization."
 
 // resaveInfo is the hint of a map info with a value World Editor does not write.
 const resaveInfo = "Re-save the map in World Editor to restore its map info."
 
-// errLua says that the settings do not go into the script as it is, and why.
+// errLua says that the settings do not go into the Lua as it is, and why.
 func errLua(file, problem string) error {
 	return errLuaHint(file, problem, resaveLua)
 }

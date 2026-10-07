@@ -10,10 +10,10 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// slot is one player of the map as the script must show it.
+// slot is one player of the map as the Lua must show it.
 type slot struct {
 	id       int
-	player   string // the player as the script writes it: `Player(3)`
+	player   string // the player as the Lua writes it: `Player(3)`
 	location int    // its start location, which is the place of its record among the map info's players
 	record   w3i.Player
 }
@@ -23,7 +23,7 @@ type slot struct {
 //
 // A player's name is stored in the map info alone: World Editor writes no SetPlayerName, and a call of it from
 // config() crashes Warcraft III 3.0.0.24268 when the lobby is created. An override that sets only a name still
-// asks that the script has the player as the map info has it.
+// asks that the Lua has the player as the map info has it.
 func (p *patcher) players(overrides map[int]manifest.Player, details *w3i.Details) {
 	if !anySet(overrides) {
 		return
