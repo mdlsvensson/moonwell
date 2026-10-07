@@ -72,10 +72,10 @@ type declarations struct {
 // declarationsOf is the four files of declarations, in the order they are written.
 func declarationsOf(in Types) []declarations {
 	return []declarations{
-		{TypesDir + "/natives.d.lua", RenderNatives(in.Natives)},
-		{TypesDir + "/moonwell.d.lua", RuntimeDeclarations},
-		{TypesDir + "/objects.d.lua", RenderObjects(in.Objects)},
-		{TypesDir + "/map.d.lua", RenderMap(in.Map, in.MapLua)},
+		{TypesDir + "/natives.d.lua", renderNatives(in.Natives)},
+		{TypesDir + "/moonwell.d.lua", runtimeDeclarations},
+		{TypesDir + "/objects.d.lua", renderObjects(in.Objects)},
+		{TypesDir + "/map.d.lua", renderMap(in.Map, in.MapLua)},
 	}
 }
 

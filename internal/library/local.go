@@ -144,7 +144,7 @@ func describedAt(key, libraryFile string) (Described, error) {
 	if err != nil && fsx.IsDir(filepath.Dir(libraryFile)) {
 		return Described{}, errUnreadableLibraryFile(key, libraryFile, err)
 	}
-	return ParseFile(key, content, found, libraryFile)
+	return parseFile(key, content, found, libraryFile)
 }
 
 // readLocal reads the files that are kept of a local library. The folder of the files for the map holds no

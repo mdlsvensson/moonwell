@@ -55,7 +55,7 @@ type Result struct {
 // the plan.
 //
 // assets is what Collect returned and owned what ReadState read. Plan checks their in-map paths again with
-// TargetPath: a path that is one of the map's own files would have a change write or remove that file. Such a
+// targetPath: a path that is one of the map's own files would have a change write or remove that file. Such a
 // path is the caller's bug and fails with a plain error, and so do two assets with one path. An asset inside
 // another is not looked for: the folder refuses to write such a plan, before its first write.
 //
@@ -119,13 +119,13 @@ func stopIfInterrupted(ctx context.Context) error {
 
 // ---- the checks ----
 
-// checkPaths fails when an asset or an owned file has an in-map path that TargetPath refuses, and when two
+// checkPaths fails when an asset or an owned file has an in-map path that targetPath refuses, and when two
 // assets have one path: what Collect and ReadState never return. Two owned entries with one path pass: the
 // later one counts (ownedByKey), and the file is checked and removed once.
 func (p *planner) checkPaths() error {
 	taken := map[string]bool{}
 	for _, asset := range p.assets {
-		if _, err := TargetPath(asset.Target); err != nil {
+		if _, err := targetPath(asset.Target); err != nil {
 			return errNotAnAssetPath("an asset", asset.Target, err)
 		}
 		if taken[mapdir.Key(asset.Target)] {
@@ -134,7 +134,7 @@ func (p *planner) checkPaths() error {
 		taken[mapdir.Key(asset.Target)] = true
 	}
 	for _, file := range p.order {
-		if _, err := TargetPath(file.Path); err != nil {
+		if _, err := targetPath(file.Path); err != nil {
 			return errNotAnAssetPath("an owned file", file.Path, err)
 		}
 	}

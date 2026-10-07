@@ -137,7 +137,7 @@ func notADiagError(t testing.TB, err error, what string, words ...string) {
 
 func TestTheTemplateShipsEveryEditorFile(t *testing.T) {
 	template := carried(t)
-	for _, path := range Files {
+	for _, path := range files {
 		if !slices.ContainsFunc(template, func(file moonwell.TemplateFile) bool { return file.Path == path }) {
 			t.Errorf("the template has no %s", path)
 		}
@@ -193,7 +193,7 @@ func TestAddFilesCreatesGitignoreWhenThereIsNoneAndWritesTheCarriedTemplatesFile
 	if got := read(t, root, ".gitignore"); got != ".moonwell/\nsrc/**/*.lua\n" {
 		t.Errorf(".gitignore = %q", got)
 	}
-	for _, path := range Files {
+	for _, path := range files {
 		if read(t, root, path) != string(fileOf(t, template, path)) {
 			t.Errorf("%s differs from the template's", path)
 		}
@@ -450,7 +450,7 @@ func projectWithALinkToNothing(t *testing.T, file string, link func(*testing.T, 
 func TestAddFilesRefusesALinkToNothingAndWritesNothing(t *testing.T) {
 	for _, kind := range linksToNothing {
 		t.Run(kind.name, func(t *testing.T) {
-			for _, file := range append(slices.Clone(Files), ".gitignore") {
+			for _, file := range append(slices.Clone(files), ".gitignore") {
 				above, root, leadsTo := projectWithALinkToNothing(t, file, kind.make)
 				before := everythingBelow(t, above)
 				added, err := AddFiles(root, smallTemplate)
@@ -578,7 +578,7 @@ func TestMergeLuarcAddsTheTemplatesMissingEntries(t *testing.T) {
 	}
 }
 
-// The entries of the carried template's three arrays, in the order of LuarcArrays, are what an object without
+// The entries of the carried template's three arrays, in the order of luarcArrays, are what an object without
 // them is given.
 func TestMergeLuarcGivesAnObjectWithoutTheArraysEveryEntryOfTheCarriedTemplate(t *testing.T) {
 	for _, held := range []string{"{}", "{} \r\n\t", " \n{\n}\n"} {

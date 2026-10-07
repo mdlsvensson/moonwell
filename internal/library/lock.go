@@ -10,12 +10,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// LockFile is the committed lock file, at the project root.
-const LockFile = "moonwell.lock"
+// lockFile is the committed lock file, at the project root.
+const lockFile = "moonwell.lock"
 
-// LockEntry is what a GitHub library resolved to: the manifest's github, tag and dir, the tag's commit, and the
+// lockEntry is what a GitHub library resolved to: the manifest's github, tag and dir, the tag's commit, and the
 // hash of the module files kept from it.
-type LockEntry struct {
+type lockEntry struct {
 	GitHub, Tag, Dir, Commit, Files string
 	Assets                          *string // the hash of the files it ships for the map; nil when it ships none
 }
@@ -23,11 +23,11 @@ type LockEntry struct {
 // lockAt is the path on disk of the lock of the project at root. A link in its place is refused, and nothing is
 // read or written: the lock is committed, so a project can come with a link there, and what is read through it
 // is another file, and what is written through it lies outside the project.
-func lockAt(root string) (string, error) { return fsx.Inside(root, LockFile) }
+func lockAt(root string) (string, error) { return fsx.Inside(root, lockFile) }
 
-// ReadLock returns the lock's entries by library key; none when there is no lock file. A link in the lock's place
+// readLock returns the lock's entries by library key; none when there is no lock file. A link in the lock's place
 // is refused.
-func ReadLock(root string) (map[string]LockEntry, error) {
+func readLock(root string) (map[string]lockEntry, error) {
 	path, err := lockAt(root)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func ReadLock(root string) (map[string]LockEntry, error) {
 	case err != nil:
 		return nil, errUnreadableLock(err)
 	case !found:
-		return map[string]LockEntry{}, nil
+		return map[string]lockEntry{}, nil
 	case !json.Valid(data):
 		return nil, errLockNotJSON()
 	}
@@ -46,13 +46,13 @@ func ReadLock(root string) (map[string]LockEntry, error) {
 
 // entriesOf is the entries of a lock document, which is valid JSON: an object whose member libraries is an object
 // of entries. Members that a lock does not have by its layout are passed over.
-func entriesOf(document []byte) (map[string]LockEntry, error) {
+func entriesOf(document []byte) (map[string]lockEntry, error) {
 	members, _ := objectOf(document)
 	libraries, isObject := objectOf(members["libraries"])
 	if !isObject {
 		return nil, errNotALock()
 	}
-	entries := map[string]LockEntry{}
+	entries := map[string]lockEntry{}
 	for key, written := range libraries {
 		entry, isEntry := entryOf(written)
 		if !isEntry {
@@ -66,35 +66,35 @@ func entriesOf(document []byte) (map[string]LockEntry, error) {
 // entryOf reads a lock entry from the JSON object it is written as. It is false for a value that is no object,
 // for an entry without one of github, tag, dir, commit and files as a string, and for one whose assets is there
 // and is no string.
-func entryOf(written json.RawMessage) (LockEntry, bool) {
+func entryOf(written json.RawMessage) (lockEntry, bool) {
 	members, isObject := objectOf(written)
 	if !isObject {
-		return LockEntry{}, false
+		return lockEntry{}, false
 	}
-	var entry LockEntry
+	var entry lockEntry
 	fields := map[string]*string{
 		"github": &entry.GitHub, "tag": &entry.Tag, "dir": &entry.Dir, "commit": &entry.Commit, "files": &entry.Files,
 	}
 	for name, field := range fields {
 		text, isString := stringOf(members[name])
 		if !isString {
-			return LockEntry{}, false
+			return lockEntry{}, false
 		}
 		*field = text
 	}
 	if hash, given := members["assets"]; given {
 		text, isString := stringOf(hash)
 		if !isString {
-			return LockEntry{}, false
+			return lockEntry{}, false
 		}
 		entry.Assets = &text
 	}
 	return entry, true
 }
 
-// WriteLock writes the entries sorted by key, and only when the file's text changes. No entries removes the file.
+// writeLock writes the entries sorted by key, and only when the file's text changes. No entries removes the file.
 // A link in the lock's place is refused, and stays.
-func WriteLock(root string, entries map[string]LockEntry) error {
+func writeLock(root string, entries map[string]lockEntry) error {
 	path, err := lockAt(root)
 	if err != nil {
 		return err
@@ -117,7 +117,7 @@ func WriteLock(root string, entries map[string]LockEntry) error {
 // The file is committed, so its text for the same libraries must stay the same byte for byte. Every string is
 // therefore written by fsx.Quoted, which escapes only what JSON cannot hold as it is; encoding/json also writes
 // the line and paragraph separators (U+2028, U+2029) as escapes, and a tag or a folder may hold one.
-func lockText(entries map[string]LockEntry) string {
+func lockText(entries map[string]lockEntry) string {
 	var out strings.Builder
 	out.WriteString("{\n  \"libraries\": {")
 	for i, key := range slices.Sorted(maps.Keys(entries)) {
@@ -135,7 +135,7 @@ type member struct{ name, value string }
 
 // entryMembers is an entry as the members of the object it is written as: github, tag, dir, commit, files and,
 // for a library that ships files for the map, assets.
-func entryMembers(entry LockEntry) []member {
+func entryMembers(entry lockEntry) []member {
 	members := []member{
 		{"github", fsx.Quoted(entry.GitHub)},
 		{"tag", fsx.Quoted(entry.Tag)},
@@ -164,23 +164,23 @@ func objectText(members []member, indent string) string {
 const lockHint = "Fix it, or delete it: the next check downloads every library again and writes a new one."
 
 func errUnreadableLock(cause error) error {
-	return &diag.Error{Msg: "Reading " + LockFile + " failed: " + fsx.Reason(cause), File: LockFile, Hint: lockHint, Cause: cause}
+	return &diag.Error{Msg: "Reading " + lockFile + " failed: " + fsx.Reason(cause), File: lockFile, Hint: lockHint, Cause: cause}
 }
 
 func errLockNotJSON() error {
-	return &diag.Error{Msg: LockFile + " is not valid JSON.", File: LockFile, Hint: lockHint}
+	return &diag.Error{Msg: lockFile + " is not valid JSON.", File: lockFile, Hint: lockHint}
 }
 
 func errNotALock() error {
-	return &diag.Error{Msg: LockFile + " is not a Moonwell lock file.", File: LockFile, Hint: lockHint}
+	return &diag.Error{Msg: lockFile + " is not a Moonwell lock file.", File: lockFile, Hint: lockHint}
 }
 
 // errUnwritableLock is a failure to write the lock or to remove it; doing says which, as "Writing".
 func errUnwritableLock(doing string, cause error) error {
 	return &diag.Error{
-		Msg:   doing + " " + LockFile + " failed: " + reasonOf(cause),
-		File:  LockFile,
-		Hint:  "Close programs that have " + LockFile + " open, and check it is not read-only.",
+		Msg:   doing + " " + lockFile + " failed: " + reasonOf(cause),
+		File:  lockFile,
+		Hint:  "Close programs that have " + lockFile + " open, and check it is not read-only.",
 		Cause: cause,
 	}
 }

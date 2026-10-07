@@ -11,11 +11,6 @@
 // Of Moonwell it imports env, diag and fsx, and the root package for the program's version.
 package manifest
 
-import (
-	"maps"
-	"slices"
-)
-
 // Project is an evaluated manifest: Project.pkl.
 type Project struct {
 	Root string `json:"-"` // the project folder
@@ -31,11 +26,6 @@ type Project struct {
 	Libraries map[string]Library `json:"libraries"` // by the key that names the library's folder
 	Settings  Settings           `json:"settings"`
 	Objects   Objects            `json:"objects"`
-}
-
-// LibraryKeys returns the keys of the project's libraries, sorted.
-func (p *Project) LibraryKeys() []string {
-	return slices.Sorted(maps.Keys(p.Libraries))
 }
 
 // Map names the source map and the gameplay entry.

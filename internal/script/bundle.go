@@ -7,7 +7,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// Bundle renders a program as the one block of Lua that is appended to a map's script: the runtime, each module
+// bundle renders a program as the one block of Lua that is appended to a map's script: the runtime, each module
 // as a definition, the table of the lines each module has in the script, and the call that starts the entry.
 // firstLine is the line of the script the block's first line will be on.
 //
@@ -19,15 +19,15 @@ import (
 // Lua, and its entry says so, with a `true` at its end; a Lua module is its own source, whatever the program is,
 // and is never marked.
 //
-// The program is one that Compile returned, and is there: Bundle has no error to return, and does not look for
+// The program is one that Compile returned, and is there: bundle has no error to return, and does not look for
 // what no such program has. In a program of Compile the entry's name, and every module's name and path, are
 // valid UTF-8, since Collect refuses a module file whose name is not, and every module has Lua.
 //
 // A name and a path are written as strings of Lua, by lua.Quote: a control character is three digits after a
 // backslash, and Lua reads the string back as the bytes of the name. Handed a name with a byte that is not
-// UTF-8 all the same, Bundle writes U+FFFD in the byte's place, which is another name than a require asks for.
+// UTF-8 all the same, bundle writes U+FFFD in the byte's place, which is another name than a require asks for.
 // Handed a module without Lua, it defines the module with a body of one empty line.
-func Bundle(program *Program, runtime string, firstLine int) string {
+func bundle(program *Program, runtime string, firstLine int) string {
 	block := append([]string{"do"}, linesOf(runtime)...)
 	var table []string
 	for _, module := range program.Modules {

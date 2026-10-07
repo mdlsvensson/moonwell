@@ -17,11 +17,11 @@ import (
 // syncGitHub downloads a tag of a GitHub library into its two folders, unless they hold the entry the lock has
 // for it, and returns the library's lock entry. locked is that entry, nil when the lock has none.
 func syncGitHub(
-	ctx context.Context, e *env.Env, at folders, library manifest.Library, locked *LockEntry, manifestFile string,
-) (LockEntry, error) {
+	ctx context.Context, e *env.Env, at folders, library manifest.Library, locked *lockEntry, manifestFile string,
+) (lockEntry, error) {
 	github, tag, dir := *library.GitHub, *library.Tag, library.Dir
 	if err := refuseNames(at.key, github, tag, manifestFile); err != nil {
-		return LockEntry{}, err
+		return lockEntry{}, err
 	}
 	sameTag := locked != nil && locked.GitHub == github && locked.Tag == tag && locked.Dir == dir
 	if sameTag && holds(at, *locked) {
@@ -29,18 +29,18 @@ func syncGitHub(
 	}
 	commit, files, err := downloadTag(ctx, e.Fetch, at.key, github, tag, manifestFile)
 	if err != nil {
-		return LockEntry{}, err
+		return lockEntry{}, err
 	}
 	kept, err := keep(at.key, github, tag, dir, files, manifestFile)
 	if err != nil {
-		return LockEntry{}, err
+		return lockEntry{}, err
 	}
 	entry := entryFor(github, tag, dir, commit, kept)
 	if sameTag && moved(*locked, entry) {
-		return LockEntry{}, errMoved(at.key, github, tag, locked.Commit, entry.Commit)
+		return lockEntry{}, errMoved(at.key, github, tag, locked.Commit, entry.Commit)
 	}
 	if err := writeDownloaded(e.Root, at, kept, entry); err != nil {
-		return LockEntry{}, err
+		return lockEntry{}, err
 	}
 	e.Log.Info("Fetched library " + at.key + ": " + github + " " + tag + " (" + short(entry.Commit, 7) + ").")
 	return entry, nil
@@ -62,7 +62,7 @@ func refuseNames(key, github, tag, manifestFile string) error {
 
 // holds reports whether the library's folders hold entry: the stamp in its module folder is the entry with the
 // layout of the folders, and the folder of its files for the map is there when it ships any.
-func holds(at folders, entry LockEntry) bool {
+func holds(at folders, entry lockEntry) bool {
 	stamp, err := os.ReadFile(filepath.Join(at.modules, stampFile))
 	if err != nil {
 		return false
@@ -82,7 +82,7 @@ func hasStampLayout(stamp []byte) bool {
 }
 
 // sameLocked reports whether two lock entries are the same in every member.
-func sameLocked(a, b LockEntry) bool {
+func sameLocked(a, b lockEntry) bool {
 	if (a.Assets == nil) != (b.Assets == nil) || (a.Assets != nil && *a.Assets != *b.Assets) {
 		return false
 	}
@@ -98,7 +98,7 @@ func sameLocked(a, b LockEntry) bool {
 func keep(key, github, tag, dir string, files []file, manifestFile string) (shipped, error) {
 	libraryFile := "https://github.com/" + github + "/blob/" + tag + "/" + File
 	content, present := contentIn(files, File)
-	described, err := ParseFile(key, content, present, libraryFile)
+	described, err := parseFile(key, content, present, libraryFile)
 	if err != nil {
 		return shipped{}, err
 	}
@@ -159,8 +159,8 @@ func hasDotName(path string) bool {
 
 // entryFor is the lock entry of a tag: what the manifest says of the library, the tag's commit, and the hashes of
 // what is kept of it.
-func entryFor(github, tag, dir, commit string, kept shipped) LockEntry {
-	entry := LockEntry{GitHub: github, Tag: tag, Dir: dir, Commit: commit, Files: filesHash(kept.modules)}
+func entryFor(github, tag, dir, commit string, kept shipped) lockEntry {
+	entry := lockEntry{GitHub: github, Tag: tag, Dir: dir, Commit: commit, Files: filesHash(kept.modules)}
 	if kept.shipsAssets {
 		hash := filesHash(kept.assets)
 		entry.Assets = &hash
@@ -175,7 +175,7 @@ func entryFor(github, tag, dir, commit string, kept shipped) LockEntry {
 // without one, for a library that ships such files, comes from a Moonwell that knows no files for the map: its
 // hash of the modules may count files that are shipped for the map, so only the commit says whether the tag
 // moved.
-func moved(locked, entry LockEntry) bool {
+func moved(locked, entry lockEntry) bool {
 	switch {
 	case entry.Commit != locked.Commit:
 		return true
@@ -194,7 +194,7 @@ func short(commit string, length int) string { return commit[:min(length, len(co
 // the folders hold no entry, so a sync that is interrupted anywhere between them is downloaded again: the stamp
 // the module folder has is removed first, then the files for the map are replaced, and the module folder, which
 // comes with the stamp of the tag, is replaced last.
-func writeDownloaded(root string, at folders, kept shipped, entry LockEntry) error {
+func writeDownloaded(root string, at folders, kept shipped, entry lockEntry) error {
 	err := dropStamp(at)
 	switch {
 	case err != nil:
@@ -318,14 +318,14 @@ func errNoAssetsOfTheLibrary(key, assets, tag, libraryFile string) error {
 // and the refusal names the commit once and says so.
 func errMoved(key, github, tag, from, to string) error {
 	what := "tag " + tag + " of " + github + " moved from " + short(from, 12) + " to " + short(to, 12) +
-		" since " + LockFile + " recorded it."
+		" since " + lockFile + " recorded it."
 	if from == to {
-		what = "the files of tag " + tag + " of " + github + " are not those " + LockFile + " recorded for commit " +
+		what = "the files of tag " + tag + " of " + github + " are not those " + lockFile + " recorded for commit " +
 			short(to, 12) + "."
 	}
 	return &diag.Error{
 		Msg:  "Library " + key + ": " + what,
-		File: LockFile,
-		Hint: "If the move was intended, delete the library's entry from " + LockFile + " and run the command again.",
+		File: lockFile,
+		Hint: "If the move was intended, delete the library's entry from " + lockFile + " and run the command again.",
 	}
 }

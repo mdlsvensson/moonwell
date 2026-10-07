@@ -28,8 +28,8 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 			"package://x/moonwell@0":"1.0.0","package://y/moonwell@1":{"uri":"p://y/moonwell@1.2.3"}}}`, "1.2.3"},
 	}
 	for _, tt := range found {
-		if got, err := ReadPackageVersion([]byte(tt.deps)); err != nil || got != tt.want {
-			t.Errorf("%s: ReadPackageVersion = %q, %v, want %q", tt.name, got, err, tt.want)
+		if got, err := readPackageVersion([]byte(tt.deps)); err != nil || got != tt.want {
+			t.Errorf("%s: readPackageVersion = %q, %v, want %q", tt.name, got, err, tt.want)
 		}
 	}
 	refused := []struct{ name, deps, word string }{
@@ -45,7 +45,7 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 		{"an empty file", ``, "not valid JSON"},
 	}
 	for _, tt := range refused {
-		version, err := ReadPackageVersion([]byte(tt.deps))
+		version, err := readPackageVersion([]byte(tt.deps))
 		failure := asError(t, err, tt.name)
 		if version != "" || failure.File != "PklProject.deps.json" || !strings.Contains(failure.Msg, tt.word) ||
 			!strings.Contains(failure.Hint, "pkl project resolve") {
@@ -56,16 +56,16 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 
 func TestCheckPackageVersionComparesTheMajorAndMinorNumbers(t *testing.T) {
 	for _, same := range [][2]string{{"0.1.9", "0.1.0"}, {"0.9.1", "0.9.1"}, {"1.2.0-rc.1", "1.2.7"}, {"0.9", "0.9.1"}} {
-		if err := CheckPackageVersion(same[0], same[1]); err != nil {
-			t.Errorf("CheckPackageVersion(%q, %q) = %v", same[0], same[1], err)
+		if err := checkPackageVersion(same[0], same[1]); err != nil {
+			t.Errorf("checkPackageVersion(%q, %q) = %v", same[0], same[1], err)
 		}
 	}
 	install := "curl -fsSL https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.8.2/install.sh | sh"
 	if runtime.GOOS == "windows" {
 		install = "irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.8.2/install.ps1 | iex"
 	}
-	if got := InstallLine("0.8.2"); got != install {
-		t.Errorf("InstallLine = %q, want %q", got, install)
+	if got := installLine("0.8.2"); got != install {
+		t.Errorf("installLine = %q, want %q", got, install)
 	}
 	tests := []struct {
 		name, pkg, program string
@@ -84,14 +84,14 @@ func TestCheckPackageVersionComparesTheMajorAndMinorNumbers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			failure := asError(t, CheckPackageVersion(tt.pkg, tt.program), tt.name)
+			failure := asError(t, checkPackageVersion(tt.pkg, tt.program), tt.name)
 			if failure.File != "PklProject" || !strings.Contains(failure.Msg, "moonwell@"+tt.pkg) || !strings.Contains(failure.Msg, tt.program) {
 				t.Errorf("error = %+v", failure)
 			}
 			if !strings.Contains(failure.Hint, tt.move) || !strings.Contains(failure.Hint, "pkl project resolve") {
 				t.Errorf("the hint %q does not say how to move to %s", failure.Hint, tt.move)
 			}
-			if got := strings.Contains(failure.Hint, InstallLine(tt.pkg)); got != tt.installs {
+			if got := strings.Contains(failure.Hint, installLine(tt.pkg)); got != tt.installs {
 				t.Errorf("the hint %q names the install line: %v, want %v", failure.Hint, got, tt.installs)
 			}
 		})

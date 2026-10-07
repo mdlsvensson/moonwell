@@ -6,9 +6,8 @@
 // compiler, the entry, the libraries' folders, the lint block, the game's API (LoadNatives) and what the map's
 // own script defines. It is two steps. CompileSources takes the Input and returns a Compiled: the modules, and
 // the Lua of the libraries' ones. Link takes the Compiled and returns a Program: what the entry reaches, checked
-// for unknown globals. Compile takes the Input and returns the Program, as the two steps in a row. Bundle takes
-// a Program, the runtime and the line the bundle starts on, and returns the block of Lua. Inject takes a map
-// folder and a Program, and returns one change: the map's script with the bundle after it. Collect, EntryName
+// for unknown globals. Compile takes the Input and returns the Program, as the two steps in a row. Inject takes a
+// map folder and a Program, and returns one change: the map's script with the bundle after it. Collect, EntryName
 // and RefreshMacros are steps of a compile that other packages take alone, and CollectLibraries is Collect for
 // the libraries' modules alone.
 //

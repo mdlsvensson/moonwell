@@ -20,8 +20,8 @@ var (
 	mapListPicture = regexp.MustCompile(`(?i)^war3map(?:Preview|Map)\.`)
 )
 
-// TargetPath returns value as an in-map path an asset may be imported as. Map internals are never replaced.
-func TargetPath(value string) (string, error) {
+// targetPath returns value as an in-map path an asset may be imported as. Map internals are never replaced.
+func targetPath(value string) (string, error) {
 	path, ok := fsx.RelPath(value)
 	switch {
 	case !ok:

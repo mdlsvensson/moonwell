@@ -16,11 +16,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-// Files are the committed files VS Code's YueScript extension and lua-language-server read.
-var Files = []string{"yueconfig.yue", ".luarc.json", ".vscode/extensions.json"}
+// files are the committed files VS Code's YueScript extension and lua-language-server read: the editor files.
+var files = []string{"yueconfig.yue", ".luarc.json", ".vscode/extensions.json"}
 
-// Ignores are the .gitignore lines for what Moonwell and the extension write.
-var Ignores = []string{".moonwell/", "src/**/*.lua"}
+// ignores are the .gitignore lines for what Moonwell and the extension write.
+var ignores = []string{".moonwell/", "src/**/*.lua"}
 
 // The two files of a project that are changed where they are, from the project folder.
 const (
@@ -36,12 +36,12 @@ const (
 // AddFiles gives a project the editor files it lacks: each missing file from the template, and each missing
 // .gitignore line appended. It never overwrites a file. It returns what it added.
 //
-// What is added is named as setup reports it: each file by its path, in the order of Files, and then .gitignore
+// What is added is named as setup reports it: each file by its path, in the order of files, and then .gitignore
 // with the lines it was given.
 //
 // The files are the project's own, which its user commits, and so is a link at one of them. A file behind a link
-// is there: one of Files is left as it is, and .gitignore is read and written through the link. A link that leads
-// to nothing, at one of Files or at .gitignore, is refused before anything is written, since a file written under
+// is there: one of files is left as it is, and .gitignore is read and written through the link. A link that leads
+// to nothing, at one of files or at .gitignore, is refused before anything is written, since a file written under
 // its name would be made where the link leads. A link to a folder at .vscode is followed.
 func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	there, err := lookAtFiles(root)
@@ -62,11 +62,11 @@ func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	return added, nil
 }
 
-// lookAtFiles reports, for each of Files and for .gitignore, whether there is something under its name. All four
+// lookAtFiles reports, for each of files and for .gitignore, whether there is something under its name. All four
 // are looked at before any is written, so that a link to nothing at one of them leaves the project as it is.
 func lookAtFiles(root string) (there map[string]bool, err error) {
 	there = map[string]bool{}
-	for _, file := range append(slices.Clone(Files), gitignoreFile) {
+	for _, file := range append(slices.Clone(files), gitignoreFile) {
 		if there[file], err = isThere(root, file); err != nil {
 			return nil, err
 		}
@@ -96,11 +96,11 @@ func leadsNowhere(link string) bool {
 	return errors.Is(err, fs.ErrNotExist)
 }
 
-// addMissingFiles writes each of Files that is not there, from the template, and returns those it wrote. What is
+// addMissingFiles writes each of files that is not there, from the template, and returns those it wrote. What is
 // there under the name of a file stays as it is, whatever it holds, and a folder too.
 func addMissingFiles(root string, template []moonwell.TemplateFile, there map[string]bool) ([]string, error) {
 	added := []string{}
-	for _, file := range Files {
+	for _, file := range files {
 		if there[file] {
 			continue
 		}
@@ -123,12 +123,12 @@ func templateFile(template []moonwell.TemplateFile, path string) ([]byte, error)
 			return file.Data, nil
 		}
 	}
-	// A plain error: the template is Moonwell's own and holds each of Files, so one without the file is a mistake
+	// A plain error: the template is Moonwell's own and holds each of files, so one without the file is a mistake
 	// in Moonwell and nothing the user can put right.
 	return nil, errors.New("editor: the template has no " + path + "; pass moonwell.TemplateFiles()")
 }
 
-// addIgnores appends each of Ignores that .gitignore lacks, and returns those it appended. A project without the
+// addIgnores appends each of ignores that .gitignore lacks, and returns those it appended. A project without the
 // file is given one.
 func addIgnores(root string) ([]string, error) {
 	held, _, err := readIfThere(root, gitignoreFile)
@@ -145,7 +145,7 @@ func addIgnores(root string) ([]string, error) {
 	return lacking, nil
 }
 
-// ignoresLacking is each of Ignores that no line of a .gitignore is. A line ends at a line feed, and is compared
+// ignoresLacking is each of ignores that no line of a .gitignore is. A line ends at a line feed, and is compared
 // without the white space of ASCII around it; a byte order mark at the start of the file is no part of the first.
 func ignoresLacking(held []byte) []string {
 	var lines []string
@@ -153,7 +153,7 @@ func ignoresLacking(held []byte) []string {
 		lines = append(lines, strings.Trim(line, lineSpace))
 	}
 	var lacking []string
-	for _, ignore := range Ignores {
+	for _, ignore := range ignores {
 		if !slices.Contains(lines, ignore) {
 			lacking = append(lacking, ignore)
 		}
@@ -174,8 +174,8 @@ func withLines(held []byte, lines []string) []byte {
 	return out
 }
 
-// LuarcArrays are the .luarc.json arrays setup keeps up to date.
-var LuarcArrays = []string{"runtime.path", "workspace.library", "workspace.ignoreDir"}
+// luarcArrays are the .luarc.json arrays setup keeps up to date.
+var luarcArrays = []string{"runtime.path", "workspace.library", "workspace.ignoreDir"}
 
 // MergeLuarc adds the template's entries of those arrays that the project's .luarc.json lacks, keeps every other
 // key and value as written, and rewrites the file when it adds any. merged is false when the file is not a JSON
@@ -216,16 +216,16 @@ func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, 
 	return added, true, nil
 }
 
-// addLacking gives each of LuarcArrays the entries it lacks, and returns all that it added, array after array.
+// addLacking gives each of luarcArrays the entries it lacks, and returns all that it added, array after array.
 func addLacking(config *manifest.Ordered[json.RawMessage], entries map[string][]string) []string {
 	added := []string{}
-	for _, key := range LuarcArrays {
+	for _, key := range luarcArrays {
 		added = append(added, addEntries(config, key, entries[key])...)
 	}
 	return added
 }
 
-// LuarcTemplateEntries is the entries of each of LuarcArrays in the template's .luarc.json, under the key of the
+// LuarcTemplateEntries is the entries of each of luarcArrays in the template's .luarc.json, under the key of the
 // array and in the order the template lists them: what MergeLuarc adds where a project lacks it, and what setup
 // names to the user of a .luarc.json that MergeLuarc left alone. An array without entries has a nil list.
 //
@@ -241,7 +241,7 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 		return nil, errors.New("editor: the template's .luarc.json is not a JSON object")
 	}
 	entries := map[string][]string{}
-	for _, key := range LuarcArrays {
+	for _, key := range luarcArrays {
 		written, _ := config.Get(key)
 		list, isList := stringsOf(written)
 		if !isList {

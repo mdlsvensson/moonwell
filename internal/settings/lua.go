@@ -96,7 +96,7 @@ func patchMinimap(source, file string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	p.insertBefore(p.function("main").EndStart, []string{"BlzChangeMinimapTerrainTex(" + lua.Quote(KeptMinimap) + ")"})
+	p.insertBefore(p.function("main").EndStart, []string{"BlzChangeMinimapTerrainTex(" + lua.Quote(keptMinimap) + ")"})
 	if p.failure != nil {
 		return "", p.failure
 	}

@@ -119,7 +119,7 @@ func withBundle(script []byte, program *Program) []byte {
 		ending = []byte("\n")
 	}
 	firstLine := bytes.Count(script, []byte("\n")) + len(ending) + 1
-	return slices.Concat(script, ending, []byte(Bundle(program, moonwell.RuntimeLua, firstLine)))
+	return slices.Concat(script, ending, []byte(bundle(program, moonwell.RuntimeLua, firstLine)))
 }
 
 // ---- errors ----

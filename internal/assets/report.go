@@ -140,7 +140,7 @@ func reportOn(found Model, gamePaths, targets map[string]bool) ModelReport {
 // statusOf is a reference's status: whether the game ships its path and, in a project (targets is not nil),
 // whether a build imports it.
 func statusOf(path string, gamePaths, targets map[string]bool) PathStatus {
-	inGame := gamePaths[GamePathKey(path)]
+	inGame := gamePaths[gamePathKey(path)]
 	imported := targets[referenceKey(path)]
 	switch {
 	case targets == nil && inGame:

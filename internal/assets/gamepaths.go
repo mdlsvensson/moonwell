@@ -15,9 +15,9 @@ var TextureExtensions = []string{"blp", "dds", "tga", "tif", "tiff", "png", "jpg
 // anyTexture stands in a key for the extension of a texture, whichever of them the path has.
 const anyTexture = ".<texture>"
 
-// GamePathKey is how a path is compared with the game's own files: any letter case, either separator, a
+// gamePathKey is how a path is compared with the game's own files: any letter case, either separator, a
 // requested .mdl as the .mdx the game loads, and a texture without its extension.
-func GamePathKey(path string) string {
+func gamePathKey(path string) string {
 	key := loadedModel(mapdir.Key(path))
 	for _, extension := range TextureExtensions {
 		if name, isTexture := strings.CutSuffix(key, "."+extension); isTexture {
@@ -44,7 +44,7 @@ func ParseGamePaths(list string) map[string]bool {
 	keys := map[string]bool{}
 	for line := range strings.Lines(list) {
 		if path := strings.TrimSpace(line); path != "" && !strings.HasPrefix(path, "#") {
-			keys[GamePathKey(path)] = true
+			keys[gamePathKey(path)] = true
 		}
 	}
 	return keys

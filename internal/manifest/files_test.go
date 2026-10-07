@@ -51,8 +51,8 @@ func TestEnsureLocalManifestNamesTheFileItCannotMake(t *testing.T) {
 
 func TestPklProjectDependsOnThePublishedPackageOrOnALocalOne(t *testing.T) {
 	remote := PklProject("0.1.0", "")
-	if !strings.Contains(remote, `["moonwell"] { uri = "`+PackageBaseURI+`@0.1.0" }`) ||
-		PackageBaseURI != "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell" {
+	if !strings.Contains(remote, `["moonwell"] { uri = "`+packageBaseURI+`@0.1.0" }`) ||
+		packageBaseURI != "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell" {
 		t.Errorf("remote = %q", remote)
 	}
 	// The file whole, as a new project gets it: pkl reads it, and a project keeps it under version control.

@@ -107,7 +107,7 @@ var sha256Hex = regexp.MustCompile(`^[a-f0-9]{64}$`)
 
 // ownedFile is one entry of a state file as an owned file: a path an asset may have, with a SHA-256.
 func ownedFile(file, path string, written json.RawMessage) (Owned, error) {
-	if _, err := TargetPath(path); err != nil {
+	if _, err := targetPath(path); err != nil {
 		return Owned{}, inState(err, file)
 	}
 	var hash string

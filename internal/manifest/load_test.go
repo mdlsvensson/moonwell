@@ -314,7 +314,7 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 	if *player.Y != -896.5 || *player.X != 0 || *player.FixedStart || *force.Allied || *fog.Enabled || *fog.Density != 0 {
 		t.Errorf("player = %+v, force = %+v, fog = %+v", player, force, fog)
 	}
-	if !slices.Equal(p.LibraryKeys(), []string{"example", "mine"}) || text(p.Libraries["mine"].Path) != "../mine" ||
+	if len(p.Libraries) != 2 || text(p.Libraries["mine"].Path) != "../mine" ||
 		text(p.Libraries["example"].Tag) != "v0.2.0" {
 		t.Errorf("libraries = %+v", p.Libraries)
 	}

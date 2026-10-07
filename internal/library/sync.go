@@ -3,9 +3,8 @@
 // to.
 //
 // It takes the manifest's libraries and the outside world (the project folder, the network and the log), and
-// returns where each library lies in the project, or the first failure. Beside Sync it reads a library's own file
-// (ParseFile), reads and writes the lock (ReadLock, WriteLock), and lists the folders that a sync reads the local
-// libraries from (Locals), for what watches them.
+// returns where each library lies in the project, or the first failure. Beside Sync it lists the folders that a
+// sync reads the local libraries from (Locals), for what watches them.
 //
 // It knows nothing of modules, of maps or of what is done with the files. In a project it writes and removes
 // below its two folders and the lock file only; a local library's own folder is read and never written.
@@ -70,7 +69,7 @@ func Sync(ctx context.Context, e *env.Env, libraries map[string]manifest.Library
 	if err := removeStale(e.Root, keys); err != nil {
 		return nil, err
 	}
-	lock, err := ReadLock(e.Root)
+	lock, err := readLock(e.Root)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +77,7 @@ func Sync(ctx context.Context, e *env.Env, libraries map[string]manifest.Library
 	if err != nil {
 		return nil, err
 	}
-	if err := WriteLock(e.Root, entries); err != nil {
+	if err := writeLock(e.Root, entries); err != nil {
 		return nil, err
 	}
 	return synced, nil
@@ -152,17 +151,17 @@ func removeOthers(folder, dir string, keys []string) error {
 
 // syncEach syncs the libraries in the order of the keys, and returns where each lies and the entries of the lock.
 func syncEach(
-	ctx context.Context, e *env.Env, keys []string, libraries map[string]manifest.Library, lock map[string]LockEntry,
+	ctx context.Context, e *env.Env, keys []string, libraries map[string]manifest.Library, lock map[string]lockEntry,
 	manifestFile string,
-) ([]Synced, map[string]LockEntry, error) {
-	synced, entries := make([]Synced, 0, len(keys)), map[string]LockEntry{}
+) ([]Synced, map[string]lockEntry, error) {
+	synced, entries := make([]Synced, 0, len(keys)), map[string]lockEntry{}
 	for _, key := range keys {
 		// A sync that is stopped ends between two libraries, with the context's own error: a local library is
 		// synced without a download that would see it.
 		if err := ctx.Err(); err != nil {
 			return nil, nil, err
 		}
-		var locked *LockEntry
+		var locked *lockEntry
 		if entry, isLocked := lock[key]; isLocked {
 			locked = &entry
 		}
@@ -181,8 +180,8 @@ func syncEach(
 // syncOne syncs one library, local or of GitHub. locked is the entry the lock has for it, nil when it has none.
 // It returns where the library lies and the entry the lock gets for it, nil for none.
 func syncOne(
-	ctx context.Context, e *env.Env, key string, library manifest.Library, locked *LockEntry, manifestFile string,
-) (Synced, *LockEntry, error) {
+	ctx context.Context, e *env.Env, key string, library manifest.Library, locked *lockEntry, manifestFile string,
+) (Synced, *lockEntry, error) {
 	at, err := foldersOf(e.Root, key)
 	if err != nil {
 		return Synced{}, nil, err
@@ -344,7 +343,7 @@ func inFoldersOfTwoSpellings(paths []string) (first, second string, found bool) 
 // ---- the stamp ----
 
 // stampOf is the stamp of a downloaded library: its lock entry, and the layout of its folders.
-func stampOf(entry LockEntry) string {
+func stampOf(entry lockEntry) string {
 	return objectText(append(entryMembers(entry), member{"layout", strconv.Itoa(stampLayout)}), "") + "\n"
 }
 

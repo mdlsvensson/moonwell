@@ -130,11 +130,11 @@ func checkPackage(root string) error {
 	if err != nil {
 		return errDepsUnreadable(err)
 	}
-	version, err := ReadPackageVersion(deps)
+	version, err := readPackageVersion(deps)
 	if err != nil {
 		return err
 	}
-	return CheckPackageVersion(version, moonwell.Version)
+	return checkPackageVersion(version, moonwell.Version)
 }
 
 // evaluate runs pkl on the manifest in the project folder and returns the JSON it printed.

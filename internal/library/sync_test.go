@@ -214,7 +214,7 @@ func TestASyncedProjectNeedsNoDownloadAndIsLeftAsItIs(t *testing.T) {
 	)
 	root := t.TempDir()
 	put(t, root,
-		LockFile, "{\n  \"libraries\": {\n"+
+		lockFile, "{\n  \"libraries\": {\n"+
 			"    \"art\": {\n      \"github\": \"owner/lib\",\n      \"tag\": \"v0.1.0\",\n      \"dir\": \"\",\n"+
 			"      \"commit\": \""+commitA+"\",\n      \"files\": \""+modules+"\",\n"+
 			"      \"assets\": \""+shipped+"\"\n    },\n"+
@@ -304,7 +304,7 @@ func TestDownloadFailuresAreErrorsNamingTheLibrary(t *testing.T) {
 	if e.Msg != "Library ex has no folder src at v0.1.0." || e.File != manifestFile || e.Hint != "Fix the library's dir." {
 		t.Errorf("error = %+v", e)
 	}
-	if there(root, ".moonwell") || there(root, LockFile) {
+	if there(root, ".moonwell") || there(root, lockFile) {
 		t.Error("a download that failed wrote something")
 	}
 }
@@ -339,7 +339,7 @@ func TestALocalLibraryIsCopiedChangedFilesOnlyAndNeverLocked(t *testing.T) {
 	if before == nil || written == nil || again == nil || !again.ModTime().Equal(written.ModTime()) {
 		t.Error("an unchanged file was written again")
 	}
-	if textOf(t, root, ".moonwell/libraries/mine/example/greet.lua") != "return 2" || fsx.Exists(kept) || there(root, LockFile) {
+	if textOf(t, root, ".moonwell/libraries/mine/example/greet.lua") != "return 2" || fsx.Exists(kept) || there(root, lockFile) {
 		t.Error("the copy does not follow the source")
 	}
 	missing := filepath.Join(source, "missing")
@@ -354,13 +354,13 @@ func TestALocalOverrideKeepsTheLibrarysLockEntryAndSwitchingBackChecksIt(t *test
 	root := t.TempDir()
 	first := serving(map[string][]byte{urlV1: tagArchive(t, commitA, "src/a.lua", "1")})
 	sync(t, root, block("ex", fromGitHub("v0.1.0", "src")), first)
-	locked := textOf(t, root, LockFile)
+	locked := textOf(t, root, lockFile)
 	source := filepath.Join(root, "lib")
 	put(t, source, "a.lua", "local")
 	override := fromGitHub("v0.1.0", "")
 	override.Path = &source
 	sync(t, root, block("ex", override), first)
-	if textOf(t, root, ".moonwell/libraries/ex/a.lua") != "local" || textOf(t, root, LockFile) != locked || len(first.asked) != 1 {
+	if textOf(t, root, ".moonwell/libraries/ex/a.lua") != "local" || textOf(t, root, lockFile) != locked || len(first.asked) != 1 {
 		t.Error("moonwell.local.pkl changed the lock")
 	}
 	moved := serving(map[string][]byte{urlV1: tagArchive(t, commitB, "src/a.lua", "2")})
@@ -376,7 +376,7 @@ func TestALibraryRemovedFromTheManifestLeavesTheLibrariesFolderAndTheLock(t *tes
 	sync(t, root, block("ex", fromGitHub("v0.1.0", "src")), server)
 	put(t, root, ".moonwell/libraries/.ex.tmp/a.lua", "left by an interrupted sync")
 	synced := sync(t, root, block(), server)
-	if there(root, ".moonwell/libraries/ex") || there(root, ".moonwell/libraries/.ex.tmp") || there(root, LockFile) {
+	if there(root, ".moonwell/libraries/ex") || there(root, ".moonwell/libraries/.ex.tmp") || there(root, lockFile) {
 		t.Error("the library's folder or the lock is still there")
 	}
 	if synced == nil || len(synced) != 0 {
@@ -445,7 +445,7 @@ func TestALockThatCannotBeWrittenIsAnError(t *testing.T) {
 	// The lock is read before the download and written after it: a folder in its place makes the write fail.
 	e, _ := testkit.Env(t, root)
 	e.Fetch = func(ctx context.Context, url string) (int, []byte, error) {
-		if err := os.MkdirAll(filepath.Join(root, LockFile, "in-the-way"), 0o777); err != nil {
+		if err := os.MkdirAll(filepath.Join(root, lockFile, "in-the-way"), 0o777); err != nil {
 			t.Error(err)
 		}
 		return server.fetch(ctx, url)
@@ -672,7 +672,7 @@ func TestAFolderTheLibrarysFileNamesWithoutFilesAndABadFileAreRefusedNamingTheFi
 		if e.Msg != c[1] || e.File != file || e.Hint != c[2] {
 			t.Errorf("%s: %+v", c[0], e)
 		}
-		if there(root, ".moonwell/libraries/ex") || there(root, LockFile) {
+		if there(root, ".moonwell/libraries/ex") || there(root, lockFile) {
 			t.Errorf("%s: something was written", c[0])
 		}
 	}
@@ -684,7 +684,7 @@ func TestAFolderFromBeforeAssetsIsFetchedOnceMoreAndItsLockIsUpgradedByItsCommit
 	// A lock entry with dir "src" and no assets hash, and a stamp without a layout: what a Moonwell that knows no
 	// files for the map leaves.
 	old := `{"github":"owner/lib","tag":"v0.1.0","dir":"src","commit":"` + commitA + `","files":"sha256:from-0.5"}`
-	put(t, root, LockFile, `{"libraries":{"ex":`+old+`}}`,
+	put(t, root, lockFile, `{"libraries":{"ex":`+old+`}}`,
 		".moonwell/libraries/ex/.moonwell-library.json", old, ".moonwell/libraries/ex/example/greet.lua", "return {}")
 	libraries := block("ex", fromGitHub("v0.1.0", "src"))
 	sync(t, root, libraries, first)
@@ -701,7 +701,7 @@ func TestAFolderFromBeforeAssetsIsFetchedOnceMoreAndItsLockIsUpgradedByItsCommit
 	}
 
 	// The same lock against another commit is a moved tag.
-	put(t, root, LockFile, `{"libraries":{"ex":`+old+`}}`)
+	put(t, root, lockFile, `{"libraries":{"ex":`+old+`}}`)
 	discard(t, root, ".moonwell")
 	moved := serving(map[string][]byte{urlV1: tagArchive(t, commitB, shipping...)})
 	if e := refusal(t, root, libraries, moved, "another commit"); !strings.Contains(e.Msg, "moved") {
@@ -721,7 +721,7 @@ func TestWithAnAssetsHashInTheLockChangedAssetsOrModulesUnderTheSameCommitAreAMo
 		e := refusal(t, root, libraries, other, changed[0])
 		// The commit is the one the lock has, so the refusal names it once, and says that the files are others.
 		want := "Library ex: the files of tag v0.1.0 of owner/lib are not those moonwell.lock recorded for commit aaaaaaaaaaaa."
-		if e.Msg != want || e.File != LockFile || there(root, ".moonwell/library-assets/ex") ||
+		if e.Msg != want || e.File != lockFile || there(root, ".moonwell/library-assets/ex") ||
 			e.Hint != "If the move was intended, delete the library's entry from moonwell.lock and run the command again." {
 			t.Errorf("%s: %+v", changed[0], e)
 		}
@@ -768,7 +768,7 @@ func TestALocalLibrarysFileIsReadFromItsPathAndItsAssetsAreMirrored(t *testing.T
 	if got := filesIn(t, root, ".moonwell/libraries/mine"); !slices.Equal(got, []string{".moonwell-library.json", "a.lua"}) {
 		t.Errorf("the modules are %q", got)
 	}
-	if got := filesIn(t, root, ".moonwell/library-assets/mine"); !slices.Equal(got, []string{"icons/BTNGolem.blp", "old.txt"}) || there(root, LockFile) {
+	if got := filesIn(t, root, ".moonwell/library-assets/mine"); !slices.Equal(got, []string{"icons/BTNGolem.blp", "old.txt"}) || there(root, lockFile) {
 		t.Errorf("the assets are %q", got)
 	}
 
@@ -849,7 +849,7 @@ func TestNetworkTheExampleLibrarysFirstTagDownloadsAndLocksItsCommit(t *testing.
 	if _, err := Sync(background, e, libraries, manifestFile); err != nil {
 		t.Fatal(err)
 	}
-	want := LockEntry{
+	want := lockEntry{
 		GitHub: "mdlsvensson/moonwell-example-lib", Tag: "v0.1.0", Dir: "src",
 		Commit: "c07126f080c3887ba667596d08aa21df3b3a20f7", Files: exampleModules,
 	}
@@ -879,7 +879,7 @@ func TestNetworkTheExampleLibrarysSecondTagNamesItsModuleFolderAndShipsAFileLock
 		t.Fatal(err)
 	}
 	assets := "sha256:d40d3370a1e0e14f411273c8a5051158371a1e798f58b23e6b424fbb1f27eadb"
-	want := LockEntry{
+	want := lockEntry{
 		GitHub: "mdlsvensson/moonwell-example-lib", Tag: "v0.2.0",
 		Commit: "58ab3cbbba900f66e5ec235f805f4b117640b406", Files: exampleModules, Assets: &assets,
 	}
@@ -943,7 +943,7 @@ func TestAProjectWithoutLibrariesKeepsNoneOfTheirFoldersAndNoLock(t *testing.T) 
 	for _, libraries := range []map[string]manifest.Library{nil, {}} {
 		root := t.TempDir()
 		put(t, root,
-			LockFile, `{"libraries":{}}`,
+			lockFile, `{"libraries":{}}`,
 			".moonwell/libraries/gone/a.lua", "1",
 			".moonwell/libraries/.gone.tmp/a.lua", "1",
 			".moonwell/libraries/a file", "1",
@@ -972,9 +972,9 @@ func TestAProjectWithoutLibrariesKeepsNoneOfTheirFoldersAndNoLock(t *testing.T) 
 
 func TestALockThatIsNoLockIsRefusedBeforeAnyDownload(t *testing.T) {
 	root, server := t.TempDir(), serving(nil)
-	put(t, root, LockFile, "not json")
+	put(t, root, lockFile, "not json")
 	e := refusal(t, root, block("ex", fromGitHub("v0.1.0", "")), server, "a lock that is no JSON")
-	if e.Msg != "moonwell.lock is not valid JSON." || e.File != LockFile || len(server.asked) != 0 {
+	if e.Msg != "moonwell.lock is not valid JSON." || e.File != lockFile || len(server.asked) != 0 {
 		t.Errorf("error = %+v after %d downloads", e, len(server.asked))
 	}
 }
@@ -983,7 +983,7 @@ func TestALockThatIsNoLockIsRefusedBeforeAnyDownload(t *testing.T) {
 
 func TestAFolderWhoseStampDoesNotHoldTheLockEntryIsFetchedAgain(t *testing.T) {
 	archive := tagArchive(t, commitA, "a.lua", "1")
-	entry := LockEntry{GitHub: "owner/lib", Tag: "v0.1.0", Commit: commitA, Files: filesHash(filesOfTest("a.lua", "1"))}
+	entry := lockEntry{GitHub: "owner/lib", Tag: "v0.1.0", Commit: commitA, Files: filesHash(filesOfTest("a.lua", "1"))}
 	held := stampOf(entry)
 	cases := []struct {
 		name      string
@@ -1010,7 +1010,7 @@ func TestAFolderWhoseStampDoesNotHoldTheLockEntryIsFetchedAgain(t *testing.T) {
 	}
 	for _, c := range cases {
 		root, server := t.TempDir(), serving(map[string][]byte{urlV1: archive})
-		if err := WriteLock(root, map[string]LockEntry{"ex": entry}); err != nil {
+		if err := writeLock(root, map[string]lockEntry{"ex": entry}); err != nil {
 			t.Fatal(err)
 		}
 		put(t, root, ".moonwell/libraries/ex/a.lua", "1")
@@ -1096,7 +1096,7 @@ func TestASyncIsStoppedBetweenTwoLibraries(t *testing.T) {
 	if err != context.Canceled || synced != nil {
 		t.Errorf("Sync returned %+v, %v; want the context's own error", synced, err)
 	}
-	if got := filesIn(t, root, ".moonwell"); !slices.Equal(got, []string{"libraries/a/" + stampFile, "libraries/a/a.lua"}) || there(root, LockFile) {
+	if got := filesIn(t, root, ".moonwell"); !slices.Equal(got, []string{"libraries/a/" + stampFile, "libraries/a/a.lua"}) || there(root, lockFile) {
 		t.Errorf("a sync that was stopped after its first library left %q", got)
 	}
 	// A sync that is stopped before its first library syncs none.
@@ -1556,7 +1556,7 @@ func TestAFolderThatCannotBeWrittenNamesTheFolder(t *testing.T) {
 		if (e.File != c.file && e.File != c.file+"/ex" && e.File != c.file+"/mine") || !strings.HasPrefix(e.Msg, "Writing "+e.File+" failed: ") || e.Hint != hint {
 			t.Errorf("%s: %+v", c.name, e)
 		}
-		if textOf(t, root, c.inTheWay) != "in the way" || there(root, LockFile) {
+		if textOf(t, root, c.inTheWay) != "in the way" || there(root, lockFile) {
 			t.Errorf("%s: the file in the way is gone, or the lock was written", c.name)
 		}
 	}
@@ -1715,7 +1715,7 @@ func TestALinkInTheLocksPlaceIsRefusedBeforeAnythingIsRemovedOrDownloaded(t *tes
 				target, _ := filesBelow(t, beside)
 				e, _ := worldOf(t, root, server)
 				synced, err := Sync(background, e, libraries, manifestFile)
-				refusedLink(t, err, name, filepath.Join(root, LockFile), LockFile)
+				refusedLink(t, err, name, filepath.Join(root, lockFile), lockFile)
 				if synced != nil || len(server.asked) != 0 {
 					t.Errorf("%s: Sync returned %+v after %d downloads", name, synced, len(server.asked))
 				}

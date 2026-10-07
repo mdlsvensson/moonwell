@@ -54,10 +54,10 @@ func TestRefreshTypesWritesTheFourDeclarationsThenOnlyWhatChanged(t *testing.T) 
 		t.Fatalf("RefreshTypes = %q, %v", written, err)
 	}
 	want := map[string]string{
-		"types/natives.d.lua":  RenderNatives(in.Natives),
-		"types/moonwell.d.lua": RuntimeDeclarations,
-		"types/objects.d.lua":  RenderObjects(in.Objects),
-		"types/map.d.lua":      RenderMap(in.Map, mapLua),
+		"types/natives.d.lua":  renderNatives(in.Natives),
+		"types/moonwell.d.lua": runtimeDeclarations,
+		"types/objects.d.lua":  renderObjects(in.Objects),
+		"types/map.d.lua":      renderMap(in.Map, mapLua),
 	}
 	// The macro module is the compiler's to write: the declarations are all there is.
 	if got := filesIn(t, filepath.Join(root, ".moonwell")); !maps.Equal(got, want) {
@@ -84,7 +84,7 @@ func TestRefreshTypesWorksWithoutAMapsScriptAndWithTheEmbeddedNatives(t *testing
 	}
 	contains(t, read(t, root, ".moonwell/types/map.d.lua"), "no maps/map.w3x/war3map.lua")
 	contains(t, read(t, root, ".moonwell/types/natives.d.lua"), "function CreateUnit(", "---@class unit: widget\n")
-	if got := read(t, root, ".moonwell/types/objects.d.lua"); got != RenderObjects(nil) {
+	if got := read(t, root, ".moonwell/types/objects.d.lua"); got != renderObjects(nil) {
 		t.Errorf("without objects, objects.d.lua =\n%s", got)
 	}
 }
@@ -104,7 +104,7 @@ func TestRefreshTypesReadsNoMap(t *testing.T) {
 			if _, err := RefreshTypes(root, types(globals)); err != nil {
 				t.Fatalf("%s: %v", name, err)
 			}
-			if got := read(t, root, ".moonwell/types/map.d.lua"); got != RenderMap(globals, mapLua) {
+			if got := read(t, root, ".moonwell/types/map.d.lua"); got != renderMap(globals, mapLua) {
 				t.Errorf("%s: map.d.lua =\n%s", name, got)
 			}
 		}
@@ -145,7 +145,7 @@ func TestADeclarationFileThatCannotBeWrittenIsNamed(t *testing.T) {
 		t.Errorf("RefreshTypes = %q, %+v", written, failure)
 	}
 	// The files are written in their order, and the first failure ends the refresh.
-	if got := read(t, root, ".moonwell/types/map.d.lua"); got != RenderMap(nil, mapLua) {
+	if got := read(t, root, ".moonwell/types/map.d.lua"); got != renderMap(nil, mapLua) {
 		t.Errorf("map.d.lua was written after the failure:\n%s", got)
 	}
 }

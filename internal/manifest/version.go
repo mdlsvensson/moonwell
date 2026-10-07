@@ -16,9 +16,9 @@ var (
 	resolvedVersion = regexp.MustCompile(`@(\d+\.\d+\.\d+[^/]*)$`) // the version at the end of a resolved address
 )
 
-// ReadPackageVersion returns the version the moonwell Pkl package is resolved to in a PklProject.deps.json
+// readPackageVersion returns the version the moonwell Pkl package is resolved to in a PklProject.deps.json
 // document.
-func ReadPackageVersion(deps []byte) (string, error) {
+func readPackageVersion(deps []byte) (string, error) {
 	text := []byte(fsx.DecodeText(deps))
 	var whole json.RawMessage
 	if err := json.Unmarshal(text, &whole); err != nil {
@@ -43,9 +43,9 @@ func ReadPackageVersion(deps []byte) (string, error) {
 	return "", errNotResolved()
 }
 
-// CheckPackageVersion fails unless the project's Pkl package and this program have the same major and minor
+// checkPackageVersion fails unless the project's Pkl package and this program have the same major and minor
 // version.
-func CheckPackageVersion(packageVersion, programVersion string) error {
+func checkPackageVersion(packageVersion, programVersion string) error {
 	pkg, program := strings.Split(packageVersion, "."), strings.Split(programVersion, ".")
 	if len(pkg) >= 2 && len(program) >= 2 && pkg[0] == program[0] && pkg[1] == program[1] {
 		return nil
@@ -55,15 +55,15 @@ func CheckPackageVersion(packageVersion, programVersion string) error {
 
 const releases = "https://github.com/mdlsvensson/moonwell/releases/download/moonwell@"
 
-// InstallLine is the command that installs a Moonwell version on this machine.
-func InstallLine(version string) string {
+// installLine is the command that installs a Moonwell version on this machine.
+func installLine(version string) string {
 	if runtime.GOOS == "windows" {
 		return "irm " + releases + version + "/install.ps1 | iex"
 	}
 	return "curl -fsSL " + releases + version + "/install.sh | sh"
 }
 
-// hasInstallScript reports whether a Moonwell version can be installed with InstallLine: 0.8.0 is the first that
+// hasInstallScript reports whether a Moonwell version can be installed with installLine: 0.8.0 is the first that
 // has an install script.
 func hasInstallScript(version string) bool {
 	parts := strings.Split(version, ".")
@@ -102,7 +102,7 @@ func errVersionMismatch(packageVersion, programVersion string) error {
 	move := "se moonwell@" + major + "." + minor + ".x in PklProject and run `pkl project resolve`."
 	hint := "U" + move
 	if hasInstallScript(packageVersion) {
-		hint = "Install Moonwell " + packageVersion + " (" + InstallLine(packageVersion) + "), or u" + move
+		hint = "Install Moonwell " + packageVersion + " (" + installLine(packageVersion) + "), or u" + move
 	}
 	return &diag.Error{
 		Msg:  "Pkl package moonwell@" + packageVersion + " does not match Moonwell CLI " + programVersion + ".",

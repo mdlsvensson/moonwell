@@ -85,7 +85,7 @@ type required struct {
 
 // visit loads the module of a name and follows its requires, unless the walk has been there.
 func (w *walk) visit(name string, at required) error {
-	if slices.Contains(Builtins, name) || w.state[name] == visited {
+	if slices.Contains(builtins, name) || w.state[name] == visited {
 		return nil
 	}
 	if w.state[name] == visiting {
@@ -146,7 +146,7 @@ func errNoModule(name string, at required) error {
 		File: at.file,
 		Line: at.line,
 		Hint: "Expected src/" + path + ".yue, lua/" + path + ".lua, lua/" + path + "/init.lua or a module of a library in " +
-			"moonwell.pkl. Built-in modules: " + strings.Join(Builtins, ", ") + ".",
+			"moonwell.pkl. Built-in modules: " + strings.Join(builtins, ", ") + ".",
 	}
 }
 

@@ -11,9 +11,9 @@ import (
 
 // The files of a preview picture.
 const (
-	// KeptMinimap is the file a build with a preview picture keeps World Editor's minimap in: a copy of what the
+	// keptMinimap is the file a build with a preview picture keeps World Editor's minimap in: a copy of what the
 	// map has as savedMinimap, which the picture replaces. The call patchMinimap adds to war3map.lua names it.
-	KeptMinimap = "war3mapMinimap.blp"
+	keptMinimap = "war3mapMinimap.blp"
 	// savedMinimap is the file World Editor saves the minimap as, which the game's map list shows: the place a
 	// preview picture takes.
 	savedMinimap = "war3mapMap.blp"
@@ -44,7 +44,7 @@ func (p *planner) roomFor(preview *picture.Picture) error {
 	if err := p.hasMinimap(); err != nil {
 		return err
 	}
-	for _, added := range []string{KeptMinimap, tgaName} {
+	for _, added := range []string{keptMinimap, tgaName} {
 		if p.folder.Has(added) {
 			return errNameTaken(p.folder.Name(added), p.folder.Label(added))
 		}
@@ -67,7 +67,7 @@ func (p *planner) hasMinimap() error {
 	return errNoMinimap(p.folder.Label(savedMinimap))
 }
 
-// preview puts the picture in the minimap's place and keeps the minimap under KeptMinimap. A BLP takes the
+// preview puts the picture in the minimap's place and keeps the minimap under keptMinimap. A BLP takes the
 // minimap's file; any other picture is a TGA, which goes in beside the minimap's file, and that file is removed.
 func (p *planner) preview(preview *picture.Picture) error {
 	if preview == nil {
@@ -77,7 +77,7 @@ func (p *planner) preview(preview *picture.Picture) error {
 	if err != nil {
 		return err
 	}
-	if err := p.write(KeptMinimap, kept); err != nil {
+	if err := p.write(keptMinimap, kept); err != nil {
 		return err
 	}
 	if preview.Extension == "blp" {

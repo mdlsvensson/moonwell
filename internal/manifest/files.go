@@ -11,13 +11,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// PackageBaseURI is where the moonwell Pkl package is published, without its version.
-const PackageBaseURI = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell"
+// packageBaseURI is where the moonwell Pkl package is published, without its version.
+const packageBaseURI = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell"
 
 // PklProject renders the PklProject of a map project. It depends on the published moonwell package of version, or,
 // when local is not empty, on the package in the folder local: a checkout's schema/.
 func PklProject(version, local string) string {
-	line := `  ["moonwell"] { uri = "` + PackageBaseURI + "@" + version + `" }`
+	line := `  ["moonwell"] { uri = "` + packageBaseURI + "@" + version + `" }`
 	if local != "" {
 		line = `  ["moonwell"] = import("` + local + `/PklProject")`
 	}

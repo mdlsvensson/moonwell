@@ -58,14 +58,14 @@ var linkedLocks = []string{"a link to a lock", "a link to nothing", "a link to a
 // cannot be made fails the test.
 func linkTheLock(t *testing.T, kind, root, beside string) {
 	t.Helper()
-	link, target := filepath.Join(root, LockFile), filepath.Join(beside, "nothing.lock")
+	link, target := filepath.Join(root, lockFile), filepath.Join(beside, "nothing.lock")
 	switch kind {
 	case "a link to a folder":
 		testkit.WriteFile(t, beside, "folder/kept.txt", []byte("kept"))
 		testkit.LinkDir(t, filepath.Join(beside, "folder"), link)
 		return
 	case "a link to a lock":
-		target = testkit.WriteFile(t, beside, "their.lock", []byte(lockText(map[string]LockEntry{"ex": entryOfTest(nil)})))
+		target = testkit.WriteFile(t, beside, "their.lock", []byte(lockText(map[string]lockEntry{"ex": entryOfTest(nil)})))
 	}
 	testkit.LinkFile(t, target, link)
 }

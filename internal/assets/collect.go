@@ -161,7 +161,7 @@ func (c *collection) mappings(paths manifest.Ordered[string], files []string, ru
 			return nil, errNamedTwice(c.manifestFile, source)
 		}
 		var err error
-		if mapped[key], err = TargetPath(target); err != nil {
+		if mapped[key], err = targetPath(target); err != nil {
 			return nil, c.inBlock(err)
 		}
 	}
@@ -185,7 +185,7 @@ func (c *collection) addOwnFile(folder *mapdir.Folder, source string, mapped map
 	target, isMapped := mapped[mapdir.Key(source)]
 	if !isMapped {
 		var err error
-		if target, err = TargetPath(source); err != nil {
+		if target, err = targetPath(source); err != nil {
 			return err
 		}
 	}
@@ -240,7 +240,7 @@ func refuseLinked(dir, label string) error {
 // addShipped adds one file of a library, unless one of the map's own is imported at its path. A path the file may
 // not have is the library's failure; two libraries at one path are the project's.
 func (c *collection) addShipped(folder *mapdir.Folder, library, label, source string) error {
-	target, err := TargetPath(source)
+	target, err := targetPath(source)
 	if err != nil {
 		return inLibrary(err, library, label)
 	}
@@ -334,7 +334,7 @@ func (c *collection) sortByTarget() {
 
 // ---- errors ----
 
-// errInvalidPath, for a source or an exclusion that is no path, is with TargetPath in target.go.
+// errInvalidPath, for a source or an exclusion that is no path, is with targetPath in target.go.
 
 const blockHint = "Fix the assets block in moonwell.pkl."
 

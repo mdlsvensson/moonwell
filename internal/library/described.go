@@ -25,9 +25,9 @@ type Described struct {
 // knownKeys is the keys a library's file may have.
 var knownKeys = []string{"dir", "assets"}
 
-// ParseFile reads a library's moonwell-library.json. present is false for a library without one, which ships
+// parseFile reads a library's moonwell-library.json. present is false for a library without one, which ships
 // nothing but modules from its root. where names the file in errors: a path, or an address for a download.
-func ParseFile(key string, data []byte, present bool, where string) (Described, error) {
+func parseFile(key string, data []byte, present bool, where string) (Described, error) {
 	if !present {
 		return Described{}, nil
 	}

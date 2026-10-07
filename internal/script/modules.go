@@ -21,8 +21,8 @@ const (
 	Lua Kind = "lua"
 )
 
-// Builtins are the modules the runtime provides; no file may take their names.
-var Builtins = []string{"moonwell"}
+// builtins are the modules the runtime provides; no file may take their names.
+var builtins = []string{"moonwell"}
 
 // Library is a library's module folder: a path from the project folder, with "/".
 type Library struct{ Key, Dir string }
@@ -268,7 +268,7 @@ func (f folder) source(file string) (Source, error) {
 // earlier answers to, is refused.
 func (c *collected) claim(source Source) error {
 	for _, name := range claimedNames(source.Name) {
-		if slices.Contains(Builtins, name) {
+		if slices.Contains(builtins, name) {
 			return errBuiltinName(name, source)
 		}
 		if other, taken := c.byName[name]; taken {

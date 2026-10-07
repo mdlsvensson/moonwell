@@ -108,7 +108,7 @@ func TestDecodeReadsEveryPlainBlock(t *testing.T) {
 	}
 }
 
-func TestDecodeReadsLibrariesOfBothKindsAndListsTheirKeysSorted(t *testing.T) {
+func TestDecodeReadsLibrariesOfBothKinds(t *testing.T) {
 	p := decoded(t, printed(`"libraries":{
 		"mine":{"path":"../mine","dir":""},
 		"example":{"github":"mdlsvensson/moonwell-example-lib","tag":"v0.1.0","dir":"src"},
@@ -121,11 +121,8 @@ func TestDecodeReadsLibrariesOfBothKindsAndListsTheirKeysSorted(t *testing.T) {
 	if mine.GitHub != nil || mine.Tag != nil || text(mine.Path) != "../mine" || mine.Dir != "" {
 		t.Errorf("mine = %q, %q, %q, %q", text(mine.GitHub), text(mine.Tag), text(mine.Path), mine.Dir)
 	}
-	if got := p.LibraryKeys(); !slices.Equal(got, []string{"Zeta", "example", "mine"}) {
-		t.Errorf("LibraryKeys = %q, want them sorted", got)
-	}
-	if got := decoded(t, printed(), "moonwell.pkl").LibraryKeys(); len(got) != 0 {
-		t.Errorf("LibraryKeys of no libraries = %q", got)
+	if len(p.Libraries) != 3 || len(decoded(t, printed(), "moonwell.pkl").Libraries) != 0 {
+		t.Errorf("libraries = %+v, and of a manifest without any %+v", p.Libraries, decoded(t, printed(), "moonwell.pkl").Libraries)
 	}
 }
 
