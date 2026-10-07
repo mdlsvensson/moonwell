@@ -56,17 +56,17 @@ type Natives struct {
 // returns the same value, which nobody may change.
 //
 // The file is part of the program, and a test proves that it parses and what it holds. So the function has no
-// error to return: for a file that does not parse it returns a Natives that holds nothing.
+// error to return: a file that does not parse is a bug in Moonwell, and a panic.
 func LoadNatives() *Natives { return embeddedNatives() }
 
 var embeddedNatives = sync.OnceValue(func() *Natives { return parseNatives(moonwell.Natives) })
 
-// parseNatives reads a natives.json. A document that does not parse gives a Natives that holds nothing, and never
-// the part of it that was read before the fault.
+// parseNatives reads a natives.json. A document that does not parse is a panic, which is printed as an internal
+// error: the one document it is given is the program's own, so the fault is no failure to report to a user.
 func parseNatives(document []byte) *Natives {
 	var parsed Natives
 	if err := json.Unmarshal(document, &parsed); err != nil {
-		return &Natives{}
+		panic("the embedded natives.json does not parse: " + err.Error())
 	}
 	return &parsed
 }

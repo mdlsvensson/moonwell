@@ -3,7 +3,10 @@ package script
 import (
 	"reflect"
 	"slices"
+	"strings"
 	"testing"
+
+	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
 func TestLoadNativesReadsTheEmbeddedNativesOnce(t *testing.T) {
@@ -61,10 +64,14 @@ func TestParseNativesReadsEveryMemberOfTheFile(t *testing.T) {
 	}
 }
 
-func TestAFileOfNativesThatDoesNotParseGivesNoNatives(t *testing.T) {
+// The one document the program reads is the one it carries, so a document that does not parse is a fault in
+// Moonwell: a panic, which the command line prints as an internal error, and never a value to go on with.
+func TestAFileOfNativesThatDoesNotParseIsAPanic(t *testing.T) {
 	for _, document := range []string{"", "{", `{"types": 7}`, `{"gameVersion": "1.2.3", "functions": [{"name": 1}]}`} {
-		if got := parseNatives([]byte(document)); !reflect.DeepEqual(got, &Natives{}) {
-			t.Errorf("parseNatives(%q) = %+v, want no natives", document, got)
+		var got *Natives
+		fault := testkit.Panic(func() { got = parseNatives([]byte(document)) })
+		if said, _ := fault.(string); got != nil || !strings.Contains(said, "the embedded natives.json does not parse") {
+			t.Errorf("parseNatives(%q) = %+v, panic %v, want a panic that names the embedded natives.json", document, got, fault)
 		}
 	}
 }
