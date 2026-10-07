@@ -1,22 +1,21 @@
-// Package testkit holds what Moonwell's tests share: the files World Editor saved, and builders and readers for the
-// binary formats. It is imported by tests only.
 package testkit
 
 import (
-	"embed"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
-//go:embed testdata
-var fixtures embed.FS
-
-// Fixture returns a file saved by World Editor, by its path under testdata, such as
-// "map-settings-v39/war3map.w3i".
+// Fixture returns a file saved by World Editor, by its path under this package's testdata folder, such as
+// "map-settings-v39/war3map.w3i". It is read from disk, from the one folder of fixtures that every test uses: a
+// test of any package finds it through the root of the checkout.
 func Fixture(t testing.TB, name string) []byte {
 	t.Helper()
-	data, err := fixtures.ReadFile("testdata/" + name)
+	path := filepath.Join(RepoRoot(t), "internal", "testkit", "testdata", filepath.FromSlash(name))
+	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("fixture %s: %v", name, err)
+		return nil
 	}
 	return data
 }

@@ -1,4 +1,4 @@
-package cli_test
+package cli
 
 import (
 	"fmt"
@@ -14,30 +14,30 @@ const (
 	ctrlBreakEvent        = 1
 )
 
-// configureDevProcess gives the program a hidden console and a process group of its own, so that an interrupt can be
-// sent to it alone: not to the test runner, and not to the process that sends it.
-func configureDevProcess(cmd *exec.Cmd) {
+// apartFromTheTest gives the program a hidden console and a process group of its own, so that an interrupt can
+// be sent to it alone: not to the test runner, and not to the process that sends it.
+func apartFromTheTest(cmd *exec.Cmd) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: createNewConsole | createNewProcessGroup}
 }
 
-// interruptDevProcess sends the program an interrupt from a second copy of the test program, which joins the
-// program's console to do so: a process can only signal the console it is attached to.
-func interruptDevProcess(cmd *exec.Cmd) error {
+// interruptDev sends the program an interrupt from a second copy of the test program, which joins the program's
+// console to do so: a process can only signal the console it is attached to.
+func interruptDev(cmd *exec.Cmd) error {
 	sender := exec.Command(os.Args[0])
-	sender.Env = append(os.Environ(), "MOONWELL_TEST_ROLE=interrupt", "MOONWELL_TEST_INTERRUPT_PID="+strconv.Itoa(cmd.Process.Pid))
+	sender.Env = append(os.Environ(), testRole+"="+interruptingRole, interruptedPid+"="+strconv.Itoa(cmd.Process.Pid))
 	if output, err := sender.CombinedOutput(); err != nil {
 		return fmt.Errorf("sending the interrupt: %w: %s", err, output)
 	}
 	return nil
 }
 
-// processInterruptHelper is the sender. It sends Ctrl+Break, which Go reports as os.Interrupt just like Ctrl+C, to
-// the program's process group. Ctrl+C would not do: it is switched off for a process started in a new process
-// group and for everything below it, and it cannot be sent to one group. The sender must stay out of the event's
-// way: joining a console removes the handlers Go installed, so the event would end it.
-func processInterruptHelper() {
+// sendInterrupt is the sender. It sends Ctrl+Break, which Go reports as os.Interrupt just as Ctrl+C, to the
+// program's process group. Ctrl+C would not do: it is switched off for a process started in a new process
+// group and for everything below it, and it cannot be sent to one group. The sender must stay out of the
+// event's way: joining a console removes the handlers Go installed, so the event would end it.
+func sendInterrupt() {
 	kernel := syscall.NewLazyDLL("kernel32.dll")
-	pid, err := strconv.Atoi(os.Getenv("MOONWELL_TEST_INTERRUPT_PID"))
+	pid, err := strconv.Atoi(os.Getenv(interruptedPid))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

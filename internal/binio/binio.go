@@ -1,7 +1,11 @@
-// Package binio reads and writes the little-endian binary formats of Warcraft III maps.
+// Package binio reads and writes little-endian binary data held in memory.
 //
-// A Reader keeps its first failure: after a read past the end, every later read returns zero and Err reports where
-// it went wrong. A parser reads straight through and checks once.
+// A Reader takes a byte slice and hands out integers, floats, byte runs and NUL-terminated strings in order. It keeps
+// its first failure: after a read past the end, every later read returns zero and Err reports where it went wrong, so
+// a parser reads straight through and checks once. A Writer collects the same kinds of values into a byte slice that
+// Bytes returns.
+//
+// binio knows nothing of any file format, of files, or of what the bytes mean.
 package binio
 
 import (
@@ -13,7 +17,7 @@ import (
 
 // Error is a Reader's first failure.
 type Error struct {
-	Offset       int
+	Offset       int  // where the failed read began
 	Unterminated bool // a string without its NUL; otherwise a read past the end
 }
 
@@ -26,34 +30,35 @@ func (e *Error) Error() string {
 
 // Reader reads from a byte slice.
 type Reader struct {
-	data   []byte
-	offset int
-	err    *Error
+	data []byte
+	pos  int
+	err  *Error
 }
 
 // NewReader returns a Reader at the start of data.
 func NewReader(data []byte) *Reader { return &Reader{data: data} }
 
-// Offset is the position of the next read.
-func (r *Reader) Offset() int { return r.offset }
+// Offset is the position of the next read. A failed read leaves it where it was.
+func (r *Reader) Offset() int { return r.pos }
 
 // Len is the number of bytes not read yet.
-func (r *Reader) Len() int { return len(r.data) - r.offset }
+func (r *Reader) Len() int { return len(r.data) - r.pos }
 
 // Err is the first failure, or nil.
 func (r *Reader) Err() *Error { return r.err }
 
-// take returns the next n bytes, or nil after a failure.
+// take returns the next n bytes and moves past them. It returns nil after a failure, and fails itself when n is
+// negative or more than is left.
 func (r *Reader) take(n int) []byte {
 	if r.err != nil {
 		return nil
 	}
 	if n < 0 || n > r.Len() {
-		r.err = &Error{Offset: r.offset}
+		r.err = &Error{Offset: r.pos}
 		return nil
 	}
-	b := r.data[r.offset : r.offset+n]
-	r.offset += n
+	b := r.data[r.pos : r.pos+n]
+	r.pos += n
 	return b
 }
 
@@ -93,22 +98,23 @@ func (r *Reader) I32() int32 { return int32(r.U32()) }
 // F32 reads a 32-bit float.
 func (r *Reader) F32() float32 { return math.Float32frombits(r.U32()) }
 
-// CString reads a NUL-terminated string and returns its bytes without the NUL.
+// CString reads a NUL-terminated string and returns its bytes without the NUL. Without a NUL before the end of the
+// data it fails at the string's first byte.
 func (r *Reader) CString() []byte {
 	if r.err != nil {
 		return nil
 	}
-	end := bytes.IndexByte(r.data[r.offset:], 0)
-	if end < 0 {
-		r.err = &Error{Offset: r.offset, Unterminated: true}
+	n := bytes.IndexByte(r.data[r.pos:], 0)
+	if n < 0 {
+		r.err = &Error{Offset: r.pos, Unterminated: true}
 		return nil
 	}
-	b := r.data[r.offset : r.offset+end]
-	r.offset += end + 1
-	return b
+	s := r.take(n)
+	r.pos++ // the NUL
+	return s
 }
 
-// Writer builds a byte slice.
+// Writer builds a byte slice. The zero value is ready to use.
 type Writer struct {
 	data []byte
 }
@@ -116,7 +122,7 @@ type Writer struct {
 // Len is the number of bytes written.
 func (w *Writer) Len() int { return len(w.data) }
 
-// Bytes is what was written.
+// Bytes is what was written. The slice aliases the Writer's buffer.
 func (w *Writer) Bytes() []byte { return w.data }
 
 // Write appends b.

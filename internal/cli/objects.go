@@ -4,93 +4,61 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/mdlsvensson/moonwell/internal/layout"
+	"github.com/mdlsvensson/moonwell/internal/build"
+	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/objects"
-	"github.com/mdlsvensson/moonwell/internal/ordered"
-	"github.com/mdlsvensson/moonwell/internal/pipeline"
 )
 
-// Evaluated renders resolved objects as objects:eval prints them: every category in the fixed order, each with its
-// objects by key in manifest order, each object with its id, base, source and fields.
-func Evaluated(resolved []objects.Resolved) *ordered.Map[any] {
-	result := &ordered.Map[any]{}
-	byCategory := map[objects.Category]*ordered.Map[any]{}
-	for _, category := range objects.Categories {
-		byCategory[category] = &ordered.Map[any]{}
-		result.Set(string(category), byCategory[category])
+// runObjectsEval is `moonwell objects:eval`: it prints the project's custom objects, resolved and checked, as
+// JSON for other programs. That is all it prints there: what it logs, and its failure, go to the terminal. It
+// reads the manifest and the source map, runs no compiler, takes no build lock and writes nothing.
+func runObjectsEval(ctx context.Context, e *env.Env, c call) error {
+	objs, err := planObjects(ctx, e) // the manifest, the source map, and the objects checked against it
+	if err != nil {
+		return err
 	}
-	for _, object := range resolved {
-		fields := make([]any, len(object.Fields))
-		for i, field := range object.Fields {
-			entry := &ordered.Map[any]{}
-			entry.Set("rawcode", field.ID)
-			entry.Set("name", field.Name)
-			entry.Set("level", field.Level)
-			entry.Set("column", field.Column)
-			entry.Set("skin", field.Skin)
-			// How the value is stored in the modification file: int, real, unreal or string.
-			entry.Set("type", field.Value.Type)
-			if field.Value.Type == "string" {
-				entry.Set("value", field.Value.Text)
-			} else {
-				entry.Set("value", field.Value.Number)
-			}
-			fields[i] = entry
-		}
-		entry := &ordered.Map[any]{}
-		entry.Set("id", object.ID)
-		entry.Set("base", object.Base)
-		entry.Set("source", object.Source)
-		entry.Set("fields", fields)
-		byCategory[object.Category].Set(object.Key, entry)
-	}
-	return result
+	// The JSON ends without a line break, and print writes a line.
+	c.print(string(objects.EvalJSON(objs.Objects)))
+	return nil
 }
 
-// ObjectsEval prints the validated, resolved objects as JSON through print (stdout); logs and errors stay on stderr.
-// It reads the source map only to validate against the objects already in it: no compiler, no staging, no build
-// lock.
-func ObjectsEval(ctx context.Context, env *pipeline.Env, print func(string)) (*ordered.Map[any], error) {
-	p, err := pipeline.LoadProject(ctx, env)
+// runObjectsCheck is `moonwell objects:check`: it lists the files of the map that the project's objects change in
+// a build, and says whether the ids module, src/generated/objects.yue, is what the manifest renders. A module
+// that is stale, or missing though the manifest has objects, is a failure, which stands in place of the last
+// line. It reads the manifest, the source map and the module, runs no compiler, takes no build lock and writes
+// nothing.
+func runObjectsCheck(ctx context.Context, e *env.Env, _ call) error {
+	objs, err := planObjects(ctx, e) // the manifest, the source map, and the objects checked against it
 	if err != nil {
-		return nil, err
+		return err
 	}
-	plan, err := pipeline.PlanObjects(env, p)
+	for _, change := range objs.Changes {
+		e.Log.Info("  " + change.Name)
+	}
+	status, err := objects.StatusOfIDs(e.Root, objs.IDs)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	result := Evaluated(plan.Objects)
-	print(ordered.Stringify(result, 2))
-	return result, nil
+	e.Log.Info("  " + objects.IDsFile + ": " + string(status))
+	if err := objects.AssertIDsCurrent(e.Root, objs.IDs); err != nil {
+		return err
+	}
+	e.Log.Info("Object data valid: " + strconv.Itoa(len(objs.Objects)) + " object(s), " +
+		strconv.Itoa(len(objs.Changes)) + " internal file(s) would change during build.")
+	return nil
 }
 
-// ObjectsCheck lists the internal map files the manifest's objects would change during a build and says whether
-// src/generated/objects.yue is current. It reads the source map and the generated module only: no compiler, no
-// staging, no build lock. Invalid objects or a stale module fail.
-func ObjectsCheck(ctx context.Context, env *pipeline.Env) (*objects.Plan, error) {
-	p, err := pipeline.LoadProject(ctx, env)
+// planObjects evaluates the manifest of the project in e.Root, opens its source map as a build does, and plans
+// the manifest's objects against the objects the map has: the two commands' first three steps. The map's folder
+// is needed also by a project whose manifest has no objects.
+func planObjects(ctx context.Context, e *env.Env) (*objects.Result, error) {
+	p, err := build.Load(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	plan, err := pipeline.PlanObjects(env, p)
+	source, err := build.Source(p)
 	if err != nil {
 		return nil, err
 	}
-	for _, change := range plan.Changes {
-		env.Log.Info("  " + change.Name)
-	}
-	status, err := objects.StatusOfIDs(env.Root, plan.Generated)
-	if err != nil {
-		return nil, err
-	}
-	env.Log.Info("  " + layout.ObjectIDsFile + ": " + string(status))
-	// A stale or missing module fails with the hint to regenerate it instead of the summary.
-	if status != objects.IDsCurrent {
-		if err := objects.AssertIDsCurrent(env.Root, plan.Generated); err != nil {
-			return nil, err
-		}
-	}
-	env.Log.Info("Object data valid: " + strconv.Itoa(len(plan.Objects)) + " object(s), " + strconv.Itoa(len(plan.Changes)) +
-		" internal file(s) would change during build.")
-	return plan, nil
+	return objects.Plan(source, p.Objects, objects.LoadMetadata())
 }

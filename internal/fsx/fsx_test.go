@@ -2,17 +2,22 @@ package fsx
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
+	"syscall"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
 )
+
+const bom = "\xEF\xBB\xBF"
 
 func write(t *testing.T, path, content string) {
 	t.Helper()
@@ -24,6 +29,19 @@ func write(t *testing.T, path, content string) {
 	}
 }
 
+// read is the content of the file at path, or "<missing>" when there is none.
+func read(t *testing.T, path string) string {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return "<missing>"
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(data)
+}
+
 func asError(t *testing.T, err error) *diag.Error {
 	t.Helper()
 	var e *diag.Error
@@ -33,12 +51,15 @@ func asError(t *testing.T, err error) *diag.Error {
 	return e
 }
 
-func TestListFilesReturnsSortedPosixRelativePaths(t *testing.T) {
+func TestListFilesReturnsPosixRelativePathsSortedByBytes(t *testing.T) {
 	dir := t.TempDir()
 	write(t, filepath.Join(dir, "z.txt"), "")
 	write(t, filepath.Join(dir, "a", "b", "c.txt"), "")
+	write(t, filepath.Join(dir, "Y.txt"), "")
+	// A walk meets a.txt after the folder a; by bytes "." comes before "/", so only a sort puts it first.
+	write(t, filepath.Join(dir, "a.txt"), "")
 	got, err := ListFiles(dir)
-	if err != nil || !slices.Equal(got, []string{"a/b/c.txt", "z.txt"}) {
+	if err != nil || !slices.Equal(got, []string{"Y.txt", "a.txt", "a/b/c.txt", "z.txt"}) {
 		t.Errorf("ListFiles = %q, %v", got, err)
 	}
 }
@@ -59,8 +80,8 @@ func TestReplaceDirReplacesDestinationContents(t *testing.T) {
 	if err := ReplaceDir(filepath.Join(dir, "src"), filepath.Join(dir, "a", "b", "dest")); err != nil {
 		t.Fatal(err)
 	}
-	if data, _ := os.ReadFile(filepath.Join(dir, "a", "b", "dest", "new.txt")); string(data) != "new" {
-		t.Errorf("copied file holds %q", data)
+	if got := read(t, filepath.Join(dir, "a", "b", "dest", "new.txt")); got != "new" {
+		t.Errorf("copied file holds %q", got)
 	}
 }
 
@@ -75,20 +96,22 @@ func TestWriteIfChangedOnlyWritesDifferingContent(t *testing.T) {
 			t.Errorf("WriteIfChanged(%q) = %v, %v, want %v", c.content, got, err, c.want)
 		}
 	}
-	if data, _ := os.ReadFile(file); string(data) != "b" {
-		t.Errorf("file holds %q", data)
+	if got := read(t, file); got != "b" {
+		t.Errorf("file holds %q", got)
 	}
 }
 
-func TestReadSourceStripsALeadingBOMAndBlanksAFirstLineStartingWithHash(t *testing.T) {
-	const bom = "\xEF\xBB\xBF"
+func TestReadSourceDropsALeadingByteOrderMarkAndBlanksAFirstLineStartingWithHash(t *testing.T) {
 	file := filepath.Join(t.TempDir(), "x.lua")
 	for _, c := range []struct{ content, want string }{
 		{bom + "Count = 0\n", "Count = 0\n"},
 		{bom + "#!/usr/bin/lua\r\nCount = 0\n# not the first line\n", "\r\nCount = 0\n# not the first line\n"},
 		{"#only line", ""},
 		{"Count = 0 -- " + bom + " kept\n", "Count = 0 -- " + bom + " kept\n"},
-		{"bad \xFF byte\n", "bad \uFFFD byte\n"},
+		// Bytes that are not UTF-8 stay as they are: one, a run, and a character that is cut short.
+		{"bad \xFF byte\n", "bad \xFF byte\n"},
+		{"s = '\xE9\xE9\xFF' -- \xE2\x80\n", "s = '\xE9\xE9\xFF' -- \xE2\x80\n"},
+		{bom + "#!lua \xFF\n-- \xC0\xC1", "\n-- \xC0\xC1"},
 	} {
 		write(t, file, c.content)
 		got, err := ReadSource(file, "lua/x.lua")
@@ -115,6 +138,96 @@ func TestReadSourceReportsAFileItCannotReadNamingTheLabel(t *testing.T) {
 	}
 }
 
+func TestDecodeText(t *testing.T) {
+	for _, c := range []struct{ name, bytes, want string }{
+		{"valid text is unchanged", "héro 1 \u2603\n", "héro 1 \u2603\n"},
+		{"a leading byte order mark is dropped", bom + "a", "a"},
+		{"a byte order mark further in stays", "a" + bom, "a" + bom},
+		{"an invalid byte becomes U+FFFD", "a\xFFb", "a\uFFFDb"},
+		{"a run of invalid bytes becomes one U+FFFD", "a\xFF\xFE\xC0b", "a\uFFFDb"},
+		{"no bytes are no text", "", ""},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			if got := DecodeText([]byte(c.bytes)); got != c.want {
+				t.Errorf("DecodeText(%q) = %q, want %q", c.bytes, got, c.want)
+			}
+		})
+	}
+}
+
+func TestTextWithMarkKeepsTheMarkAsideAndRefusesInvalidBytes(t *testing.T) {
+	for _, c := range []struct {
+		name, bytes, mark, text string
+		ok                      bool
+	}{
+		{"no mark", "Count = 0\n", "", "Count = 0\n", true},
+		{"a mark", bom + "Count = 0\n", bom, "Count = 0\n", true},
+		{"a mark only", bom, bom, "", true},
+		{"an empty file", "", "", "", true},
+		{"only the first mark is kept aside", bom + bom + "a", bom, bom + "a", true},
+		{"a mark further in is text", "a" + bom, "", "a" + bom, true},
+		{"text outside ASCII", bom + "h\xC3\xA9ro\n", bom, "h\xC3\xA9ro\n", true},
+		{"an invalid byte", "a\xFFb", "", "", false},
+		{"an invalid byte after a mark", bom + "a\xFFb", "", "", false},
+		{"a mark cut short", "\xEF\xBB", "", "", false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			mark, text, ok := TextWithMark([]byte(c.bytes))
+			if mark != c.mark || text != c.text || ok != c.ok {
+				t.Errorf("TextWithMark(%q) = %q, %q, %v, want %q, %q, %v", c.bytes, mark, text, ok, c.mark, c.text, c.ok)
+			}
+			if ok && mark+text != c.bytes {
+				t.Errorf("the mark and the text make %q, want the bytes given", mark+text)
+			}
+		})
+	}
+}
+
+func TestQuotedEscapesTheQuoteTheBackslashAndTheControlCharacters(t *testing.T) {
+	// How the escape of a control character without a short one starts: a backslash, the letter u and two zeros.
+	const long = `\` + "u00"
+	for _, c := range []struct{ name, text, want string }{
+		{"no text", "", `""`},
+		{"plain text", "Models/unit.mdx", `"Models/unit.mdx"`},
+		{"the quote and the backslash", `a"b\c`, `"a\"b\\c"`},
+		{"each short escape", "\b\f\n\r\t", `"\b\f\n\r\t"`},
+		{"the first and the last control character", "\x00\x1F", `"` + long + "00" + long + `1f"`},
+		{"hexadecimal digits in lower case", "\x0B\x1A\x1E", `"` + long + "0b" + long + "1a" + long + `1e"`},
+		{"markup and the slash", "<a href='x/y'>&</a>", `"<a href='x/y'>&</a>"`},
+		{"DEL", "a\x7Fb", "\"a\x7Fb\""},
+		{"a character outside ASCII", "h\xC3\xA9ro", "\"h\xC3\xA9ro\""},
+		{"the line and the paragraph separator", "\xE2\x80\xA8\xE2\x80\xA9", "\"\xE2\x80\xA8\xE2\x80\xA9\""},
+		{"a character beyond the basic plane", "\xF0\x9F\x8C\x99", "\"\xF0\x9F\x8C\x99\""},
+		{"a byte that is not UTF-8", "a\xFFb", "\"a\xFFb\""},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			if got := Quoted(c.text); got != c.want {
+				t.Errorf("Quoted(%q) = %s, want %s", c.text, got, c.want)
+			}
+		})
+	}
+}
+
+// Of the 256 bytes, the quote, the backslash and those below a space are escaped, and no other. What is written
+// for a byte of ASCII is JSON, which reads back as the byte.
+func TestQuotedEscapesExactlyTheBytesItMustAndWritesJSON(t *testing.T) {
+	for b := range 256 {
+		text := string([]byte{byte(b)})
+		got := Quoted(text)
+		escaped := b < 0x20 || b == '"' || b == '\\'
+		if kept := got == `"`+text+`"`; kept == escaped {
+			t.Errorf("Quoted of the byte %#02x = %s, want it escaped: %v", b, got, escaped)
+		}
+		if escaped && b < 0x20 && shortEscapes[byte(b)] == "" && got != fmt.Sprintf(`"\u00%02x"`, b) {
+			t.Errorf("Quoted of the byte %#02x = %s, want the escape with four hexadecimal digits in lower case", b, got)
+		}
+		var back string
+		if err := json.Unmarshal([]byte(got), &back); b < 0x80 && (err != nil || back != text) {
+			t.Errorf("Quoted of the byte %#02x = %s, which reads back as %q, %v", b, got, back, err)
+		}
+	}
+}
+
 func TestIsWithin(t *testing.T) {
 	folder := filepath.Join("projects", "map")
 	for _, c := range []struct {
@@ -136,7 +249,7 @@ func TestIsWithin(t *testing.T) {
 	}
 }
 
-func TestRemoveAllIgnoresMissingPaths(t *testing.T) {
+func TestRemoveAllAndRemoveFileIgnoreMissingPaths(t *testing.T) {
 	dir := t.TempDir()
 	if err := RemoveAll(filepath.Join(dir, "missing")); err != nil {
 		t.Error(err)
@@ -204,7 +317,7 @@ func TestRemovingAFileAnotherProgramHoldsOpenNamesTheFileAndSaysToCloseTheGame(t
 	for _, remove := range []func(string) error{RemoveFile, RemoveAll} {
 		e := asError(t, remove(file))
 		if !strings.Contains(e.Msg, "in use by another program") || !strings.Contains(e.Msg, file) ||
-			!strings.Contains(e.Hint, "Warcraft III") {
+			!strings.Contains(e.Hint, "Warcraft III") || e.Cause == nil {
 			t.Errorf("error = %+v", e)
 		}
 	}
@@ -214,28 +327,39 @@ func TestRemovingAFileAnotherProgramHoldsOpenNamesTheFileAndSaysToCloseTheGame(t
 	}
 }
 
-func TestRelPathRejectsWhatCouldEscapeOrFailOnWindows(t *testing.T) {
-	for input, want := range map[string]string{
-		"icons/BTNSword.blp":  "icons/BTNSword.blp",
-		`icons\BTNSword.blp`:  "icons/BTNSword.blp",
-		"a/..b/c":             "a/..b/c",
-		"Textures/héro 1.blp": "Textures/héro 1.blp",
+// refused are the paths RelPath turns down: each could leave its folder or fail on Windows.
+var refused = []string{
+	"", "/a", "a//b", "a/", "../a", "a/./b", "C:/a", "a/b?.blp", "a\tb", "a/b.", "a/b ", "con", "a/NUL.txt",
+	"com1.blp", `a\..\b`,
+}
+
+func TestRelPathRefusesWhatCouldLeaveItsFolderOrFailOnWindows(t *testing.T) {
+	for _, c := range []struct{ value, want string }{
+		{"icons/BTNSword.blp", "icons/BTNSword.blp"},
+		{`icons\BTNSword.blp`, "icons/BTNSword.blp"},
+		{"a/..b/c", "a/..b/c"},
+		{"Textures/héro 1.blp", "Textures/héro 1.blp"},
+		{"console.txt", "console.txt"}, // a name that only starts like a device is fine
 	} {
-		if got, err := RelPath(input); err != nil || got != want {
-			t.Errorf("RelPath(%q) = %q, %v", input, got, err)
+		if got, ok := RelPath(c.value); !ok || got != c.want {
+			t.Errorf("RelPath(%q) = %q, %v, want %q", c.value, got, ok, c.want)
 		}
 	}
-	for _, input := range []string{
-		"", "/a", "a//b", "a/", "../a", "a/./b", "C:/a", "a/b?.blp", "a\tb", "a/b.", "a/b ", "con", "a/NUL.txt",
-		"com1.blp", `a\..\b`,
-	} {
-		_, err := RelPath(input)
-		if e := asError(t, err); e.Msg != "Invalid asset path: "+input {
-			t.Errorf("RelPath(%q) error = %q", input, e.Msg)
+	for _, value := range refused {
+		if got, ok := RelPath(value); ok || got != "" {
+			t.Errorf("RelPath(%q) = %q, %v, want it refused", value, got, ok)
 		}
 	}
-	if _, err := RelPath("console.txt"); err != nil {
-		t.Errorf("a name that only starts like a device is fine: %v", err)
+}
+
+func TestSafeJoinNamesAPathRelPathRefuses(t *testing.T) {
+	root := t.TempDir()
+	for _, value := range refused {
+		got, err := SafeJoin(root, value)
+		e := asError(t, err)
+		if got != "" || !strings.Contains(e.Msg, "Invalid path: "+value) || !strings.Contains(e.Hint, "relative path") {
+			t.Errorf("SafeJoin(%q) = %q, %+v", value, got, e)
+		}
 	}
 }
 
@@ -249,11 +373,42 @@ func TestSafeJoinRefusesASymlinkBelowTheRoot(t *testing.T) {
 	if got, err := SafeJoin(root, "missing/b.txt"); err != nil || got != filepath.Join(root, "missing", "b.txt") {
 		t.Errorf("SafeJoin of a missing path = %q, %v", got, err)
 	}
-	if err := os.Symlink(filepath.Join(root, "real"), filepath.Join(root, "link")); err != nil {
-		t.Skipf("cannot create a symlink here: %v", err)
+	// Windows keeps the right to make a symlink from some accounts, and says so with its error 1314. The test is
+	// skipped for that failure alone: the junction of the next test needs no right. Any other symlink that
+	// cannot be made fails the test, on every system. testkit.LinkFile has the same rule; testkit imports this
+	// package, so the rule is written out here.
+	err = os.Symlink(filepath.Join(root, "real"), filepath.Join(root, "link"))
+	switch {
+	case err == nil:
+	case runtime.GOOS == "windows" && errors.Is(err, syscall.Errno(1314)):
+		t.Skipf("this account has not the right to make a symlink on Windows; the case is covered where it has: %v", err)
+	default:
+		t.Fatalf("no symlink was made: %v", err)
 	}
-	_, err = SafeJoin(root, "link/a.txt")
-	if e := asError(t, err); !strings.HasPrefix(e.Msg, "Symlinks are not supported: ") {
+	refusesTheLink(t, root)
+}
+
+func TestSafeJoinRefusesAJunctionBelowTheRoot(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		t.Skip("only Windows has junctions")
+	}
+	root := t.TempDir()
+	write(t, filepath.Join(root, "real", "a.txt"), "a")
+	mklink := exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(root, "link"), filepath.Join(root, "real"))
+	if out, err := mklink.CombinedOutput(); err != nil {
+		t.Fatalf("mklink /J: %v\n%s", err, out)
+	}
+	refusesTheLink(t, root)
+}
+
+// refusesTheLink checks that SafeJoin does not go through root's "link" folder.
+func refusesTheLink(t *testing.T, root string) {
+	t.Helper()
+	link := filepath.Join(root, "link")
+	_, err := SafeJoin(root, "link/a.txt")
+	e := asError(t, err)
+	if !strings.Contains(e.Msg, "Symlinks are not supported") || !strings.Contains(e.Msg, link) ||
+		!strings.Contains(e.Hint, "real files") {
 		t.Errorf("error = %+v", e)
 	}
 }

@@ -1,16 +1,16 @@
 package objects_test
 
 import (
+	"maps"
 	"regexp"
 	"slices"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/objects"
-	"github.com/mdlsvensson/moonwell/internal/ordered"
-	"github.com/mdlsvensson/moonwell/internal/text"
 )
 
-// Invariants of the committed metadata.json (generated from the game's files).
+// The embedded metadata, generated from the game's files: what must hold of it whenever it is generated again.
 var metadata = objects.LoadMetadata()
 
 // duplicates returns the values that occur more than once.
@@ -24,68 +24,104 @@ func duplicates(values []string) []string {
 	return found
 }
 
-func TestLoadMetadataReturnsTheCommittedMetadataParsedOnce(t *testing.T) {
+func TestLoadMetadataReturnsTheEmbeddedMetadataParsedOnce(t *testing.T) {
 	if objects.LoadMetadata() != metadata || metadata.Format != 1 || metadata.Game != "3.0.0.24268" {
 		t.Errorf("metadata = format %d, game %q", metadata.Format, metadata.Game)
 	}
+	for _, list := range objects.FieldLists {
+		if len(metadata.Fields[list]) == 0 {
+			t.Errorf("no %s fields", list)
+		}
+	}
+	if len(metadata.Fields) != len(objects.FieldLists) || len(metadata.Bases) != len(manifest.Categories) {
+		t.Errorf("%d field lists and %d categories of bases", len(metadata.Fields), len(metadata.Bases))
+	}
 }
 
-func TestMetadataHasUniqueSortedRawcodesPerCategory(t *testing.T) {
+func TestFieldSourceNamesTheListAndTheUseOfEveryCategory(t *testing.T) {
+	if want := []string{"units", "items", "abilities", "buffs", "upgrades"}; !slices.Equal(objects.FieldLists, want) {
+		t.Errorf("the lists of fields are %q, want %q", objects.FieldLists, want)
+	}
+	sources := map[manifest.Category][2]string{
+		"heroes": {"units", "hero"}, "units": {"units", "unit"}, "buildings": {"units", "building"},
+		"items": {"items", "item"}, "abilities": {"abilities", ""}, "buffs": {"buffs", ""},
+		"upgrades": {"upgrades", ""},
+		// A category there is none of has no list and no use.
+		"spells": {"", ""}, "": {"", ""},
+	}
+	for category, want := range sources {
+		if list, use := objects.FieldSource(category); list != want[0] || use != want[1] {
+			t.Errorf("the fields of %q are in the list %q with the use %q, want %q", category, list, use, want)
+		}
+	}
+	var lists []string
+	for _, category := range manifest.Categories {
+		list, _ := objects.FieldSource(category)
+		if _, tested := sources[category]; !tested || !slices.Contains(objects.FieldLists, list) {
+			t.Errorf("the fields of %s are in the list %q; tested here: %v", category, list, tested)
+		}
+		lists = append(lists, list)
+	}
+	// Every list is the list of some category, and the lists come in the order of their first category.
+	if lists = slices.Compact(lists); !slices.Equal(lists, objects.FieldLists) {
+		t.Errorf("the categories have the lists %q, want %q", lists, objects.FieldLists)
+	}
+}
+
+func TestMetadataHasUniqueSortedRawcodesInEveryFieldList(t *testing.T) {
 	rawcode := regexp.MustCompile(`^[A-Za-z0-9]{3}[A-Za-z0-9\x00]$`)
-	for _, category := range objects.FieldCategories {
+	for _, list := range objects.FieldLists {
 		var ids, padded []string
-		for _, field := range metadata.Fields[category] {
+		for _, field := range metadata.Fields[list] {
 			ids = append(ids, field.ID)
 			if !rawcode.MatchString(field.ID) {
-				t.Errorf("%s %q is not a rawcode", category, field.ID)
+				t.Errorf("%s %q is not a rawcode", list, field.ID)
 			}
-			// Curse's "Chance to Miss" is the game's one three-letter field id; the files store it padded with a NUL
-			// byte, and so does the metadata, so every id is the 4 characters the writer requires.
-			if len(field.ID) == 4 && field.ID[3] == 0 {
+			// Curse's "Chance to Miss" is the game's one field id of three letters. The files store it padded with a
+			// NUL byte, and so does the metadata, so that every id is four bytes.
+			if field.ID[len(field.ID)-1] == 0 {
 				padded = append(padded, field.ID)
 			}
 		}
 		if found := duplicates(ids); len(found) > 0 {
-			t.Errorf("%s has duplicate rawcodes %q", category, found)
+			t.Errorf("%s has duplicate rawcodes %q", list, found)
 		}
-		sorted := slices.Clone(ids)
-		text.Sort(sorted)
-		if !slices.Equal(ids, sorted) {
-			t.Errorf("%s is not sorted by rawcode", category)
+		if !slices.IsSorted(ids) {
+			t.Errorf("%s is not sorted by rawcode", list)
 		}
 		want := []string(nil)
-		if category == "abilities" {
+		if list == "abilities" {
 			want = []string{"Crs\x00"}
 		}
 		if !slices.Equal(padded, want) {
-			t.Errorf("%s has padded ids %q", category, padded)
+			t.Errorf("%s has the padded ids %q", list, padded)
 		}
 	}
 }
 
 func TestMetadataFriendlyNamesAreValidAndUniqueAmongTheFieldsAnObjectCanHave(t *testing.T) {
 	name := regexp.MustCompile(`^[a-z][A-Za-z0-9]*$`)
-	for _, category := range objects.FieldCategories {
-		for _, field := range metadata.Fields[category] {
+	for _, list := range objects.FieldLists {
+		for _, field := range metadata.Fields[list] {
 			if !name.MatchString(field.Name) || slices.Contains([]string{"id", "base", "source", "properties"}, field.Name) {
-				t.Errorf("%s %s has the name %q", category, field.ID, field.Name)
+				t.Errorf("%s %s has the name %q", list, field.ID, field.Name)
 			}
 		}
 	}
-	// Every class (Unit, Hero, Building, Item, Buff, Upgrade) and every standard ability's fields, which include the
-	// Ability class's common fields.
-	for _, category := range objects.Categories {
-		var bases []string
-		for id := range metadata.Bases[category] {
-			bases = append(bases, id)
-			if category != "abilities" {
-				break
-			}
+	// One base of every category, the first by id; and of the abilities, whose fields depend on the base, every base
+	// too, with every base that some field is specific to.
+	for _, category := range manifest.Categories {
+		bases := slices.Sorted(maps.Keys(metadata.Bases[category]))
+		if len(bases) == 0 {
+			t.Errorf("no standard %s", category)
+			continue
 		}
 		if category == "abilities" {
 			for _, field := range metadata.Fields["abilities"] {
 				bases = append(bases, field.Specific...)
 			}
+		} else {
+			bases = bases[:1]
 		}
 		slices.Sort(bases)
 		for _, base := range slices.Compact(bases) {
@@ -101,10 +137,9 @@ func TestMetadataFriendlyNamesAreValidAndUniqueAmongTheFieldsAnObjectCanHave(t *
 }
 
 func TestMetadataStorageTypesDataColumnsAndApplicabilityAreConsistent(t *testing.T) {
-	for _, category := range objects.FieldCategories {
-		for _, field := range metadata.Fields[category] {
-			where := category + " " + field.ID
-			problem := func(what string) { t.Errorf("%s: %s", where, what) }
+	for _, list := range objects.FieldLists {
+		for _, field := range metadata.Fields[list] {
+			problem := func(what string) { t.Errorf("%s %s: %s", list, field.ID, what) }
 			if !slices.Contains([]string{"int", "real", "unreal", "string"}, field.Storage) {
 				problem("storage " + field.Storage)
 			}
@@ -117,10 +152,10 @@ func TestMetadataStorageTypesDataColumnsAndApplicabilityAreConsistent(t *testing
 			if field.List && field.Storage != "string" {
 				problem("a list that is not stored as a string")
 			}
-			if field.Column < 0 || field.Column > 26 || (category != "abilities" && field.Column != 0) {
+			if field.Column < 0 || field.Column > 26 || (list != "abilities" && field.Column != 0) {
 				problem("its data column")
 			}
-			switch category {
+			switch list {
 			case "units":
 				if !slices.ContainsFunc(field.Use, func(use string) bool { return use != "item" }) {
 					problem("a unit field no unit uses")
@@ -138,10 +173,10 @@ func TestMetadataStorageTypesDataColumnsAndApplicabilityAreConsistent(t *testing
 	}
 }
 
-func TestMetadataSkinFlagsMatchTheNamesFixture(t *testing.T) {
-	// The names fixture wrote these fields to war3mapSkin.* files.
+func TestMetadataSkinFlagsMatchTheFilesWorldEditorSaved(t *testing.T) {
+	// World Editor wrote these fields of the names fixture to the war3mapSkin files, and uhpm to the main file.
 	for _, c := range []struct {
-		category objects.Category
+		category manifest.Category
 		id       string
 		skin     bool
 	}{
@@ -154,10 +189,10 @@ func TestMetadataSkinFlagsMatchTheNamesFixture(t *testing.T) {
 	}
 }
 
-func TestMetadataBaseIDsAreClassifiedAndAbilitiesAndUpgradesCarryLevelCounts(t *testing.T) {
+func TestMetadataBasesAreInTheirCategoryAndAbilitiesAndUpgradesHaveLevelCounts(t *testing.T) {
 	id := regexp.MustCompile(`^[A-Za-z0-9]{4}$`)
 	uppercase := regexp.MustCompile(`^[A-Z]`)
-	for _, category := range objects.Categories {
+	for _, category := range manifest.Categories {
 		for baseID, base := range metadata.Bases[category] {
 			leveled := category == "abilities" || category == "upgrades"
 			if !id.MatchString(baseID) || base.Name == "" || (base.Levels != nil) != leveled ||
@@ -168,9 +203,9 @@ func TestMetadataBaseIDsAreClassifiedAndAbilitiesAndUpgradesCarryLevelCounts(t *
 		}
 	}
 	for _, c := range []struct {
-		category objects.Category
+		category manifest.Category
 		id, name string
-		levels   int
+		levels   int // -1 for a category without levels
 	}{
 		{"units", "hfoo", "Footman", -1}, {"heroes", "Hpal", "Paladin", -1}, {"buildings", "hbla", "Blacksmith", -1},
 		{"abilities", "AHhb", "Holy Light", 3}, {"upgrades", "Rhme", "Iron Forged Swords", 3},
@@ -182,12 +217,12 @@ func TestMetadataBaseIDsAreClassifiedAndAbilitiesAndUpgradesCarryLevelCounts(t *
 	}
 }
 
-func TestFieldsForAndFieldByNameApplyUseSpecificAndNotSpecific(t *testing.T) {
-	has := func(category objects.Category, base, id string) bool {
+func TestFieldsForAndFieldByNameGoByUseSpecificAndNotSpecific(t *testing.T) {
+	has := func(category manifest.Category, base, id string) bool {
 		return slices.ContainsFunc(metadata.FieldsFor(category, base), func(f *objects.FieldMeta) bool { return f.ID == id })
 	}
 	for _, c := range []struct {
-		category objects.Category
+		category manifest.Category
 		base, id string
 		want     bool
 	}{
@@ -196,17 +231,17 @@ func TestFieldsForAndFieldByNameApplyUseSpecificAndNotSpecific(t *testing.T) {
 		{"abilities", "AHtb", "Hhb1", false},
 	} {
 		if has(c.category, c.base, c.id) != c.want {
-			t.Errorf("%s %s has field %s: %v", c.category, c.base, c.id, !c.want)
+			t.Errorf("%s %s has the field %s: %v", c.category, c.base, c.id, !c.want)
 		}
 	}
-	// A common field does not apply to the bases its notSpecific column lists.
-	for _, field := range metadata.Fields["abilities"] {
-		if len(field.NotSpecific) > 0 {
-			if has("abilities", field.NotSpecific[0], field.ID) {
-				t.Errorf("%s applies to %s, which its metadata excludes", field.ID, field.NotSpecific[0])
-			}
-			break
-		}
+	// A common field does not apply to the bases its notSpecific lists.
+	excluding := slices.IndexFunc(metadata.Fields["abilities"], func(f objects.FieldMeta) bool { return len(f.NotSpecific) > 0 })
+	if excluding < 0 {
+		t.Fatal("no ability field excludes a base")
+	}
+	if field := &metadata.Fields["abilities"][excluding]; has("abilities", field.NotSpecific[0], field.ID) ||
+		objects.AppliesTo(field, "abilities", field.NotSpecific[0]) || !objects.AppliesTo(field, "abilities", "AHhb") {
+		t.Errorf("%s and the base %s that its metadata excludes", field.ID, field.NotSpecific[0])
 	}
 	if field := metadata.FieldByName("abilities", "AHhb", "amountHealedOrDamaged"); field == nil || field.ID != "Hhb1" {
 		t.Errorf("amountHealedOrDamaged of AHhb = %+v", field)
@@ -221,110 +256,44 @@ func TestFieldsForAndFieldByNameApplyUseSpecificAndNotSpecific(t *testing.T) {
 		t.Errorf("uhpm = %+v", field)
 	}
 	if field := metadata.FieldByRawcode("heroes", "anam"); field != nil {
-		t.Errorf("anam among unit fields = %+v", field)
+		t.Errorf("anam among the unit fields = %+v", field)
+	}
+	if field := metadata.FieldByRawcode("spells", "anam"); field != nil || metadata.FieldsFor("spells", "AHhb") != nil {
+		t.Errorf("a field of a category that is none = %+v", field)
 	}
 }
 
-func TestBaseOfFindsAStandardIDInAnyCategoryAndNearestBasesSuggestsCloseIDs(t *testing.T) {
-	for id, want := range map[string]objects.Category{"hfoo": "units", "Hpal": "heroes", "AHhb": "abilities"} {
-		if category, _, ok := metadata.BaseOf(id); !ok || category != want {
-			t.Errorf("BaseOf(%s) = %s, %v", id, category, ok)
+func TestBaseOfFindsAStandardIDInAnyCategoryAndNearestBasesNamesTheClosestIDs(t *testing.T) {
+	for id, want := range map[string]manifest.Category{"hfoo": "units", "Hpal": "heroes", "AHhb": "abilities"} {
+		if category, base, ok := metadata.BaseOf(id); !ok || category != want || base.Name == "" {
+			t.Errorf("BaseOf(%s) = %s, %+v, %v", id, category, base, ok)
 		}
 	}
 	if _, _, ok := metadata.BaseOf("h000"); ok {
 		t.Error("h000 is a standard object")
 	}
-	if got := metadata.NearestBases("heroes", "Hpla", 1); !slices.Equal(got, []objects.NamedBase{{ID: "Hpal", Name: "Paladin"}}) {
-		t.Errorf("nearest to Hpla = %+v", got)
-	}
-	if got := metadata.NearestBases("units", "HFOO", 1); !slices.Equal(got, []objects.NamedBase{{ID: "hfoo", Name: "Footman"}}) {
-		t.Errorf("nearest to HFOO = %+v", got)
-	}
-	if got := metadata.NearestBases("units", "hfoo", 3); len(got) != 3 {
-		t.Errorf("nearest to hfoo = %+v", got)
-	}
-}
-
-func TestParseManifestAnAbsentObjectsKeyIsAnEmptyManifest(t *testing.T) {
-	parsed, err := objects.ParseManifest(nil, false, "moonwell.pkl")
-	if err != nil || !parsed.Empty() || len(parsed) != 7 {
-		t.Errorf("ParseManifest = %v, %v", parsed, err)
-	}
-	for _, category := range objects.Categories {
-		if parsed[category] == nil || parsed[category].Len() != 0 {
-			t.Errorf("category %s = %v", category, parsed[category])
-		}
-	}
-}
-
-func TestParseManifestSplitsReservedKeysFromTypedFields(t *testing.T) {
-	parsed := manifest(t, `{
-		"abilities":{"holy":{"base":"AHhb","source":"objects/a.pkl","properties":{"Crs":[0.5],"amountHealedOrDamaged":3},
-			"castRange":[1,2.5],"heroAbility":false,"buffs":[["BHbd","Bcrs"],[]],"levels":4,"id":"A000"}},
-		"units":{"captain":{"id":"h000","base":"hfoo","name":"","properties":{}}}}`)
-	holy, _ := parsed["abilities"].Get("holy")
-	if holy.ID != "A000" || holy.Base != "AHhb" || holy.Source != "objects/a.pkl" {
-		t.Errorf("holy = %+v", holy)
-	}
-	if got := ordered.Stringify(&holy.Typed, 0); got != `{"castRange":[1,2.5],"heroAbility":false,"buffs":[["BHbd","Bcrs"],[]],"levels":4}` {
-		t.Errorf("typed = %s", got)
-	}
-	if got := ordered.Stringify(&holy.Properties, 0); got != `{"Crs":[0.5],"amountHealedOrDamaged":3}` {
-		t.Errorf("properties = %s", got)
-	}
-	captain, _ := parsed["units"].Get("captain")
-	if got := ordered.Stringify(&captain.Typed, 0); got != `{"name":""}` {
-		t.Errorf("captain's typed = %s", got)
-	}
-}
-
-func TestParseManifestAMissingSourceIsTheEvaluatedManifest(t *testing.T) {
-	tree, _ := ordered.Decode([]byte(`{"units":{"captain":{"id":"h000","base":"hfoo","properties":{}}}}`))
-	parsed, err := objects.ParseManifest(tree, true, "moonwell.local.pkl")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if captain, _ := parsed["units"].Get("captain"); captain.Source != "moonwell.local.pkl" {
-		t.Errorf("source = %q", captain.Source)
-	}
-}
-
-func TestParseManifestSkipsNullValuesAndAMissingPropertiesBlock(t *testing.T) {
-	captain, _ := manifest(t, `{"units":{"captain":{"id":"h000","base":"hfoo","name":null}}}`)["units"].Get("captain")
-	if captain.Typed.Len() != 0 || captain.Properties.Len() != 0 {
-		t.Errorf("captain = %+v", captain)
-	}
-	captain, _ = manifest(t, `{"units":{"captain":{"id":"h000","base":"hfoo","properties":{"uhpm":null}}}}`)["units"].Get("captain")
-	if captain.Properties.Len() != 0 {
-		t.Errorf("a null property is kept: %+v", captain)
-	}
-}
-
-func TestParseManifestRejectsAWrongShapeWithTheVersionHintAndTheManifestAsFile(t *testing.T) {
-	for document, message := range map[string]string{
-		`[]`:                              "objects must be an object.",
-		`{"spells":{}}`:                   "objects.spells is not an object category.",
-		`{"units":[]}`:                    "objects.units must be an object.",
-		`{"units":{"a":"x"}}`:             `objects.units["a"] must be an object.`,
-		`{"units":{"a":{"base":"hfoo"}}}`: `objects.units["a"].id must be a string.`,
-		`{"units":{"a":{"id":"h000"}}}`:   `objects.units["a"].base must be a string.`,
-		`{"units":{"a":{"id":"h000","base":"hfoo","source":1}}}`:               `objects.units["a"].source must be a string.`,
-		`{"units":{"a":{"id":"h000","base":"hfoo","properties":[]}}}`:          `objects.units["a"].properties must be an object.`,
-		`{"units":{"a":{"id":"h000","base":"hfoo","name":{"x":1}}}}`:           `objects.units["a"].name must be a Boolean, number, string or List.`,
-		`{"units":{"a":{"id":"h000","base":"hfoo","properties":{"x":[[1]]}}}}`: `objects.units["a"].properties["x"] must be a Boolean, number, string or List.`,
-		`{"units":{"a":{"id":"h000","base":"hfoo","name":[null]}}}`:            `objects.units["a"].name must be a Boolean, number, string or List.`,
+	for _, c := range []struct {
+		category manifest.Category
+		id       string
+		n        int
+		want     []objects.NamedBase
+	}{
+		{"heroes", "Hpla", 1, []objects.NamedBase{{ID: "Hpal", Name: "Paladin"}}},
+		// Letter case is ignored.
+		{"units", "HFOO", 1, []objects.NamedBase{{ID: "hfoo", Name: "Footman"}}},
+		{"units", "hfoo", 0, []objects.NamedBase{}},
 	} {
-		tree, err := ordered.Decode([]byte(document))
-		if err != nil {
-			t.Fatal(err)
-		}
-		_, err = objects.ParseManifest(tree, true, "moonwell.local.pkl")
-		e := asError(t, err, document)
-		if e.Msg != message || e.File != "moonwell.local.pkl" || e.Hint != objects.SchemaHint {
-			t.Errorf("%s: %+v, want %q", document, e, message)
+		if got := metadata.NearestBases(c.category, c.id, c.n); !slices.Equal(got, c.want) {
+			t.Errorf("the %d nearest %s to %s = %+v, want %+v", c.n, c.category, c.id, got, c.want)
 		}
 	}
-	if objects.SchemaHint != "Is the moonwell Pkl package the version this CLI expects?" {
-		t.Errorf("SchemaHint = %q", objects.SchemaHint)
+	if got := metadata.NearestBases("units", "hfoo", 3); len(got) != 3 || got[0].ID != "hfoo" {
+		t.Errorf("the nearest to hfoo = %+v", got)
+	}
+	// Among ids equally many edits away, the one that shares the longer start comes first, then the lower id; a
+	// category with fewer bases than asked for gives them all.
+	want := []objects.NamedBase{{ID: "Hpal", Name: "Paladin"}, {ID: "Hamg", Name: "Archmage"}, {ID: "Hmkg", Name: "Mountain King"}}
+	if got := mini.NearestBases("heroes", "Hpla", 5); !slices.Equal(got, want) {
+		t.Errorf("the nearest heroes to Hpla = %+v, want %+v", got, want)
 	}
 }

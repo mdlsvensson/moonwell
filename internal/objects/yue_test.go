@@ -2,41 +2,32 @@ package objects_test
 
 import (
 	"context"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/internal/env"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/objects"
-	"github.com/mdlsvensson/moonwell/internal/proc"
-	"github.com/mdlsvensson/moonwell/internal/yuetest"
+	"github.com/mdlsvensson/moonwell/internal/testkit"
+	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-// The generated module, compiled by the real compiler and run in its Lua.
+// The generated module, compiled by the real compiler and run in its Lua. The test starts the compiler four
+// times, and is skipped on a machine without one (tooltest.Yue).
 
-func TestTheGeneratedObjectsModuleCompilesAndEachIDEqualsFourCC(t *testing.T) {
-	compiler := yuetest.Need(t)
-	// One object per category and several units, with keys that sort and ids that span the rawcode alphabet.
-	generated := []objects.Resolved{
-		{Category: "heroes", Key: "paladin", ID: "H000"},
-		{Category: "units", Key: "captain", ID: "h000"},
-		{Category: "units", Key: "archer_2", ID: "hz9Z"},
-		{Category: "units", Key: "Zealot", ID: "e001"},
-		{Category: "buildings", Key: "keep", ID: "h00A"},
-		{Category: "items", Key: "claws", ID: "I0zz"},
-		{Category: "abilities", Key: "holy_light", ID: "A000"},
-		{Category: "buffs", Key: "blessed", ID: "B000"},
-		{Category: "upgrades", Key: "plating", ID: "R000"},
-	}
+// idsCheck is a Lua script that loads the compiled module from objects.lua beside it and holds it against the
+// objects it was generated from: a table for every category, no entry but theirs, and each id the integer that
+// FourCC gives for its rawcode. It prints "objects-ok" when all of it holds.
+func idsCheck(generated []objects.Resolved) string {
 	var expected, categories []string
-	for _, object := range generated {
-		expected = append(expected, `  { "`+string(object.Category)+`", "`+object.Key+`", "`+object.ID+`" },`)
+	for _, entry := range generated {
+		expected = append(expected, `  { "`+string(entry.Category)+`", "`+entry.Key+`", "`+entry.ID+`" },`)
 	}
-	for _, category := range objects.Categories {
+	for _, category := range manifest.Categories {
 		categories = append(categories, `"`+string(category)+`"`)
 	}
 	// FourCC as the game defines it in Lua: the four bytes big-endian.
-	check := `
+	return `
 local function FourCC(id) return string.unpack(">I4", id) end
 local objects = dofile("objects.lua")
 local expected = {
@@ -56,22 +47,36 @@ for _, entry in ipairs(expected) do
 end
 io.write("objects-ok")
 `
+}
+
+func TestTheGeneratedIDsModuleCompilesAndEachIDEqualsFourCC(t *testing.T) {
+	compiler := tooltest.Yue(t)
+	// One object per category and several units, with keys that sort and ids that span the rawcode alphabet.
+	generated := []objects.Resolved{
+		object("heroes", "paladin", "H000"),
+		object("units", "captain", "h000"),
+		object("units", "archer_2", "hz9Z"),
+		object("units", "Zealot", "e001"),
+		object("buildings", "keep", "h00A"),
+		object("items", "claws", "I0zz"),
+		object("abilities", "holy_light", "A000"),
+		object("buffs", "blessed", "B000"),
+		object("upgrades", "plating", "R000"),
+	}
+	check := idsCheck(generated)
+	// The two ways a build compiles a module: rewritten to keep its lines, and minified.
 	for _, mode := range []string{"-r", "-m"} {
-		dir := t.TempDir()
-		if err := os.WriteFile(filepath.Join(dir, "objects.yue"), []byte(objects.RenderIDs(generated)), 0o666); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(filepath.Join(dir, "check.lua"), []byte(check), 0o666); err != nil {
-			t.Fatal(err)
-		}
-		options := proc.Options{Dir: dir}
-		compiled, err := proc.Run(context.Background(), compiler, []string{"--target=5.3", mode, "-o", "objects.lua", "objects.yue"}, options)
-		if err != nil || compiled.Code != 0 {
-			t.Fatalf("%s: compiling failed: %v\n%s\n%s", mode, err, compiled.Stdout, compiled.Stderr)
-		}
-		result, err := proc.Run(context.Background(), compiler, []string{"-e", "check.lua"}, options)
-		if err != nil || result.Code != 0 || result.Stdout != "objects-ok" {
-			t.Errorf("%s: %v\n%s\n%s", mode, err, result.Stdout, result.Stderr)
-		}
+		t.Run(mode, func(t *testing.T) {
+			dir := t.TempDir()
+			testkit.WriteFile(t, dir, "objects.yue", []byte(objects.RenderIDs(generated)))
+			arguments := []string{"--target=5.3", mode, "-o", "objects.lua", "objects.yue"}
+			compiled, err := env.Run(context.Background(), compiler, arguments, env.RunOptions{Dir: dir})
+			if err != nil || compiled.Code != 0 {
+				t.Fatalf("compiling failed with exit code %d (%v):\n%s\n%s", compiled.Code, err, compiled.Stdout, compiled.Stderr)
+			}
+			if printed := tooltest.RunLua(t, testkit.WriteFile(t, dir, "check.lua", []byte(check))); printed != "objects-ok" {
+				t.Errorf("the check printed %q", printed)
+			}
+		})
 	}
 }

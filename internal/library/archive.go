@@ -7,212 +7,223 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/http"
-	"regexp"
+	"net/url"
 	"slices"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
-	"github.com/mdlsvensson/moonwell/internal/text"
 )
 
-// Files is a set of files by POSIX path that keeps the order they were added in.
-type Files struct {
-	names []string
-	data  map[string][]byte
+// file is one file of a library: its path inside the library, with "/", and its bytes.
+type file struct {
+	name string
+	data []byte
 }
 
-// NewFiles returns an empty set.
-func NewFiles() *Files { return &Files{data: map[string][]byte{}} }
-
-// Set adds or replaces a file; a replaced file keeps its place.
-func (f *Files) Set(name string, data []byte) {
-	if _, ok := f.data[name]; !ok {
-		f.names = append(f.names, name)
+// downloadTag downloads a tag of the library key from GitHub: the tag's commit and its files, without the
+// archive's top folder, every path checked to stay inside the library's folder. Failures name manifestFile.
+func downloadTag(
+	ctx context.Context, fetch env.FetchFunc, key, github, tag, manifestFile string,
+) (commit string, files []file, err error) {
+	address := archiveURL(github, tag)
+	body, err := fetchTag(ctx, fetch, address, key, github, tag, manifestFile)
+	if err != nil {
+		return "", nil, err
 	}
-	f.data[name] = data
-}
-
-// Get returns a file's bytes.
-func (f *Files) Get(name string) ([]byte, bool) {
-	data, ok := f.data[name]
-	return data, ok
-}
-
-// Has reports whether the set has a file of this name.
-func (f *Files) Has(name string) bool {
-	_, ok := f.data[name]
-	return ok
-}
-
-// Names returns the paths in the order they were added.
-func (f *Files) Names() []string { return f.names }
-
-// Len is the number of files.
-func (f *Files) Len() int { return len(f.names) }
-
-var commitSHA = regexp.MustCompile(`^[0-9a-f]{40}$`)
-
-// ReadGitHubArchive reads a GitHub tag archive: its files, without their single top folder (whose name GitHub
-// derives from the repository and tag), and the commit SHA from the zip comment. Folder entries are skipped, so
-// every name is a file.
-func ReadGitHubArchive(data []byte) (commit string, files *Files, err error) {
-	archive, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
-	// An entry name that leaves the archive's folder is not the reader's failure: DownloadTag refuses it by name.
-	if err != nil && !errors.Is(err, zip.ErrInsecurePath) {
-		return "", nil, &diag.Error{Msg: "Invalid zip archive: " + strings.TrimPrefix(err.Error(), "zip: ") + "."}
+	commit, files, err = readArchive(body)
+	if err != nil {
+		return "", nil, errNotATagArchive(key, manifestFile, address, err)
 	}
-	commit = text.Trim(archive.Comment)
-	if !commitSHA.MatchString(commit) {
-		return "", nil, &diag.Error{Msg: "The archive's comment is not a commit SHA."}
-	}
-	files = NewFiles()
-	top, hasTop := "", false
-	for _, entry := range archive.File {
-		name := entry.Name
-		if strings.HasSuffix(name, "/") {
-			continue
+	for _, f := range files {
+		if !insideLibrary(f.name) {
+			return "", nil, errUnsafePath(key, manifestFile, address, f.name)
 		}
-		first, rest, found := strings.Cut(name, "/")
-		if !found || (hasTop && first != top) {
-			return "", nil, &diag.Error{Msg: "The archive does not have a single top folder."}
-		}
-		top, hasTop = first, true
-		reader, err := entry.Open()
-		if err != nil {
-			return "", nil, &diag.Error{Msg: fmt.Sprintf("Invalid zip archive: %s cannot be read: %v.", name, err)}
-		}
-		content, err := io.ReadAll(reader)
-		reader.Close()
-		if err != nil {
-			return "", nil, &diag.Error{Msg: fmt.Sprintf("Invalid zip archive: %s cannot be read: %v.", name, err)}
-		}
-		files.Set(rest, content)
 	}
 	return commit, files, nil
 }
 
-// FilesHash is "sha256:" and the SHA-256 of `<path>\n<sha256 of its bytes>\n` for each file, sorted by path.
-func FilesHash(files *Files) string {
-	names := slices.Clone(files.Names())
-	text.Sort(names)
-	var listing strings.Builder
-	for _, name := range names {
-		data, _ := files.Get(name)
-		listing.WriteString(name + "\n" + fsx.SHA256Hex(data) + "\n")
+// fetchTag asks address for the archive of a tag, and returns what a status from 200 to 299 came with.
+func fetchTag(ctx context.Context, fetch env.FetchFunc, address, key, github, tag, manifestFile string) ([]byte, error) {
+	status, body, err := fetch(ctx, address)
+	switch {
+	case err != nil:
+		return nil, errDownloadFailed(key, github, manifestFile, err)
+	case status == 404:
+		return nil, errNoSuchTag(key, github, tag, manifestFile)
+	case status < 200 || status > 299:
+		return nil, errStatus(key, status, manifestFile)
 	}
-	return "sha256:" + fsx.SHA256Hex([]byte(listing.String()))
+	return body, nil
 }
 
-// Fetch downloads a URL: the response's status and body. Tests substitute it.
-type Fetch func(ctx context.Context, url string) (status int, body []byte, err error)
-
-// HTTPFetch returns the Fetch that downloads with client.
-func HTTPFetch(client *http.Client) Fetch {
-	return func(ctx context.Context, url string) (int, []byte, error) {
-		request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-		if err != nil {
-			return 0, nil, err
-		}
-		response, err := client.Do(request)
-		if err != nil {
-			return 0, nil, err
-		}
-		defer response.Body.Close()
-		body, err := io.ReadAll(response.Body)
-		if err != nil {
-			return 0, nil, err
-		}
-		return response.StatusCode, body, nil
+// archiveURL is the address of the zip archive of a GitHub tag. Each part of the tag between two "/" is written as
+// a segment of a path is, and the "/" stays between them.
+func archiveURL(github, tag string) string {
+	segments := strings.Split(tag, "/")
+	for i, segment := range segments {
+		segments[i] = url.PathEscape(segment)
 	}
+	return "https://codeload.github.com/" + github + "/zip/refs/tags/" + strings.Join(segments, "/")
 }
 
-// encodeURIComponent is JavaScript's function of that name.
-func encodeURIComponent(s string) string {
-	const unreserved = "-_.!~*'()"
-	var b strings.Builder
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || strings.IndexByte(unreserved, c) >= 0 {
-			b.WriteByte(c)
-		} else {
-			fmt.Fprintf(&b, "%%%02X", c)
-		}
+// readArchive reads a GitHub tag archive: the commit, which the archive's comment holds, and the files without
+// their single top folder, whose name GitHub makes from the repository and the tag. Folder entries are skipped,
+// so every name is a file's.
+//
+// Its failures say what is wrong with the bytes and nothing else: downloadTag says whose bytes they are.
+func readArchive(data []byte) (commit string, files []file, err error) {
+	archive, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	// A name that leaves the archive's folder is no failure of reading: the reader that comes with it holds
+	// every entry, and downloadTag refuses the name.
+	if err != nil && !errors.Is(err, zip.ErrInsecurePath) {
+		return "", nil, errInvalidZip(err)
 	}
-	return b.String()
+	if commit, err = commitOf(archive.Comment); err != nil {
+		return "", nil, err
+	}
+	if files, err = filesBelowTheTop(archive.File); err != nil {
+		return "", nil, err
+	}
+	return commit, files, nil
 }
 
-// ArchiveURL is the address of the zip archive of a GitHub tag; a tag's "/" stays a path separator.
-func ArchiveURL(github, tag string) string {
-	return "https://codeload.github.com/" + github + "/zip/refs/tags/" +
-		strings.ReplaceAll(encodeURIComponent(tag), "%2F", "/")
+// commitOf is the commit an archive's comment holds: forty hexadecimal digits in lower case, with nothing but
+// ASCII white space around them.
+func commitOf(comment string) (string, error) {
+	commit := strings.Trim(comment, " \t\n\v\f\r")
+	if len(commit) != 40 || strings.ContainsFunc(commit, notALowerHexDigit) {
+		return "", errNoCommit()
+	}
+	return commit, nil
 }
 
-// reasonOf is the text of a failure inside another message.
+func notALowerHexDigit(r rune) bool { return !strings.ContainsRune("0123456789abcdef", r) }
+
+// filesBelowTheTop reads the file entries of an archive in their order, each under its path below the one top
+// folder that all of them are in. A path that comes twice keeps its first place and its last bytes.
+func filesBelowTheTop(entries []*zip.File) ([]file, error) {
+	var files []file
+	place := map[string]int{} // where in files each path is
+	top, hasTop := "", false
+	for _, entry := range entries {
+		if strings.HasSuffix(entry.Name, "/") {
+			continue
+		}
+		first, path, found := strings.Cut(entry.Name, "/")
+		if !found || (hasTop && first != top) {
+			return nil, errNoSingleTop()
+		}
+		top, hasTop = first, true
+		data, err := contentOf(entry)
+		if err != nil {
+			return nil, err
+		}
+		if at, held := place[path]; held {
+			files[at].data = data
+			continue
+		}
+		place[path] = len(files)
+		files = append(files, file{path, data})
+	}
+	return files, nil
+}
+
+// contentOf is the bytes of an entry, unpacked and checked against the entry's checksum.
+func contentOf(entry *zip.File) ([]byte, error) {
+	reader, err := entry.Open()
+	if err != nil {
+		return nil, errEntryUnreadable(entry.Name, err)
+	}
+	defer reader.Close()
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, errEntryUnreadable(entry.Name, err)
+	}
+	return data, nil
+}
+
+// filesHash is "sha256:" and the SHA-256 of `<path>\n<sha256 of its bytes>\n` for each file, in the byte order of
+// the paths.
+func filesHash(files []file) string {
+	sorted := slices.SortedFunc(slices.Values(files), func(a, b file) int { return strings.Compare(a.name, b.name) })
+	var lines strings.Builder
+	for _, f := range sorted {
+		lines.WriteString(f.name + "\n" + fsx.SHA256Hex(f.data) + "\n")
+	}
+	return "sha256:" + fsx.SHA256Hex([]byte(lines.String()))
+}
+
+// reasonOf is the text of a failure inside another message: what an expected failure says, or the system's
+// reason without the operation and the path.
 func reasonOf(err error) string {
-	var userError *diag.Error
-	if errors.As(err, &userError) {
-		return userError.Msg
+	var failure *diag.Error
+	if errors.As(err, &failure) {
+		return failure.Msg
 	}
 	return fsx.Reason(err)
 }
 
-// isSafePath reports whether path is a relative POSIX path of plain names: no leading "/", no empty, "." or ".."
-// segment, no "\" or ":".
-func isSafePath(path string) bool {
-	if strings.HasPrefix(path, "/") || strings.ContainsAny(path, `\:`) {
-		return false
+// ---- errors ----
+
+func errDownloadFailed(key, github, manifestFile string, cause error) error {
+	return &diag.Error{
+		Msg:   "Downloading library " + key + " failed: " + reasonOf(cause),
+		File:  manifestFile,
+		Hint:  "Check your connection and that https://github.com/" + github + " exists.",
+		Cause: cause,
 	}
-	for _, segment := range strings.Split(path, "/") {
-		if segment == "" || segment == "." || segment == ".." {
-			return false
-		}
-	}
-	return true
 }
 
-// DownloadTag downloads a tag of library key from GitHub: its commit and files, without the archive's top folder,
-// every path checked to stay inside the library's folder. Failures name manifest.
-func DownloadTag(ctx context.Context, key, github, tag, manifest string, fetch Fetch) (commit string, files *Files, err error) {
-	url := ArchiveURL(github, tag)
-	status, body, err := fetch(ctx, url)
-	if err != nil {
-		return "", nil, &diag.Error{
-			Msg:   "Downloading library " + key + " failed: " + reasonOf(err),
-			File:  manifest,
-			Cause: err,
-			Hint:  "Check your connection and that https://github.com/" + github + " exists.",
-		}
+func errNoSuchTag(key, github, tag, manifestFile string) error {
+	return &diag.Error{
+		Msg:  "Library " + key + ": " + github + " has no tag " + tag + ".",
+		File: manifestFile,
+		Hint: "See the tags at https://github.com/" + github + "/tags.",
 	}
-	if status == 404 {
-		return "", nil, &diag.Error{
-			Msg:  "Library " + key + ": " + github + " has no tag " + tag + ".",
-			File: manifest,
-			Hint: "See the tags at https://github.com/" + github + "/tags.",
-		}
+}
+
+func errStatus(key string, status int, manifestFile string) error {
+	return &diag.Error{
+		Msg:  fmt.Sprintf("Downloading library %s failed: HTTP %d.", key, status),
+		File: manifestFile,
+		Hint: "Try again later.",
 	}
-	if status < 200 || status > 299 {
-		return "", nil, &diag.Error{
-			Msg: fmt.Sprintf("Downloading library %s failed: HTTP %d.", key, status), File: manifest, Hint: "Try again later.",
-		}
+}
+
+func errNotATagArchive(key, manifestFile, address string, cause error) error {
+	return &diag.Error{
+		Msg:   "The download of library " + key + " is not a GitHub tag archive: " + reasonOf(cause),
+		File:  manifestFile,
+		Hint:  "Check " + address + " in a browser.",
+		Cause: cause,
 	}
-	hint := "Check " + url + " in a browser."
-	commit, files, err = ReadGitHubArchive(body)
-	if err != nil {
-		return "", nil, &diag.Error{
-			Msg:   "The download of library " + key + " is not a GitHub tag archive: " + reasonOf(err),
-			File:  manifest,
-			Cause: err,
-			Hint:  hint,
-		}
+}
+
+func errUnsafePath(key, manifestFile, address, path string) error {
+	return &diag.Error{
+		Msg:  "The download of library " + key + " has an unsafe path: " + path,
+		File: manifestFile,
+		Hint: "Check " + address + " in a browser.",
 	}
-	for _, path := range files.Names() {
-		if !isSafePath(path) {
-			return "", nil, &diag.Error{
-				Msg: "The download of library " + key + " has an unsafe path: " + path, File: manifest, Hint: hint,
-			}
-		}
-	}
-	return commit, files, nil
+}
+
+// The four failures of readArchive have no file and no hint: errNotATagArchive puts the library, the manifest and
+// the address around what they say.
+
+func errInvalidZip(cause error) error {
+	return &diag.Error{Msg: "Invalid zip archive: " + strings.TrimPrefix(cause.Error(), "zip: ") + ".", Cause: cause}
+}
+
+func errNoCommit() error {
+	return &diag.Error{Msg: "The archive's comment is not a commit SHA."}
+}
+
+func errNoSingleTop() error {
+	return &diag.Error{Msg: "The archive does not have a single top folder."}
+}
+
+func errEntryUnreadable(name string, cause error) error {
+	return &diag.Error{Msg: fmt.Sprintf("Invalid zip archive: %s cannot be read: %v.", name, cause), Cause: cause}
 }

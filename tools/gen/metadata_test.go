@@ -1,490 +1,340 @@
 package main
 
 import (
+	"cmp"
 	"encoding/json"
-	"errors"
-	"io/fs"
+	"fmt"
 	"maps"
-	"os"
-	"path/filepath"
 	"reflect"
 	"slices"
-	"strconv"
 	"strings"
 	"testing"
 
+	moonwell "github.com/mdlsvensson/moonwell"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/objects"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// A hand-written miniature of the game's files, in the export's folder layout. Ids and labels are real where the
-// test is about them (Holy Light, Footman); the values are made up.
-
-// sylk is SYLK text with a header row and one row per record. A cell is a string, an int, or nil to leave it out.
-func sylk(columns []string, rows ...[]any) string {
-	lines := []string{"ID;PWXL;N;E"}
-	header := make([]any, len(columns))
-	for i, column := range columns {
-		header[i] = column
-	}
-	for y, row := range append([][]any{header}, rows...) {
-		first := true
-		for x, cell := range row {
-			if cell == nil {
-				continue
-			}
-			value := ""
-			switch cell := cell.(type) {
-			case int:
-				value = strconv.Itoa(cell)
-			case string:
-				value = `"` + cell + `"`
-			}
-			line := "C;X" + strconv.Itoa(x+1) + ";"
-			if first {
-				line += "Y" + strconv.Itoa(y+1) + ";"
-			}
-			lines = append(lines, line+"K"+value)
-			first = false
-		}
-	}
-	return strings.Join(append(lines, "E", ""), "\r\n")
-}
-
-var (
-	unitMeta = []string{
-		"ID", "field", "slk", "index", "category", "displayName", "type", "useHero", "useUnit", "useBuilding", "useItem",
-		"useSpecific", "netsafe",
-	}
-	abilityMeta = []string{
-		"ID", "field", "slk", "index", "repeat", "data", "category", "displayName", "type", "useUnit", "useHero", "useItem",
-		"useSpecific", "notSpecific", "netsafe",
-	}
-	buffMeta    = []string{"ID", "field", "category", "displayName", "type", "netsafe"}
-	upgradeMeta = []string{"ID", "field", "repeat", "effectType", "category", "displayName", "type", "netsafe"}
-	balanceMeta = []string{"unitBalanceID", "isbldg", "Primary"}
-)
-
-const labelsFile = "_locales/enus.w3mod/ui/worldeditstrings.txt"
-
-func gameFilesFixture() map[string]string {
-	return map[string]string{
-		"units/unitmetadata.slk": sylk(unitMeta,
-			[]any{"uhpm", "HP", "UnitBalance", -1, "stats", "WESTRING_UHPM", "int", 1, 1, 1, 0, nil, 0},
-			[]any{"unam", "Name", "Profile", 0, "text", "WESTRING_UNAM", "string", 1, 1, 1, 1, nil, 1},
-			[]any{"umdl", "file", "Profile", 0, "art", "WESTRING_UMDL", "model", 1, 1, 0, 0, nil, 1},
-			[]any{"ifil", "file", "ItemData", 0, "art", "WESTRING_IFIL", "model", 0, 0, 0, 1, nil, 1},
-			[]any{"ushr", "shadowOnWater", "Profile", -1, "art", "WESTRING_USHR", "bool", 0, 0, 1, 0, nil, 11},
-			[]any{"uabi", "abilList", "UnitAbilities", -1, "abil", "WESTRING_UABI", "abilityList", 1, 1, 1, 0, nil, 0},
-			[]any{"udea", "deathType", "UnitData", -1, "stats", "WESTRING_UDEA", "deathType", 1, 1, 1, 0, nil, 0},
-			[]any{"upro", "Propernames", "Profile", -1, "text", "WESTRING_UPRO", "stringList", 1, 0, 0, 0, nil, 1},
-			[]any{"ucls", "class", "Profile", -1, "stats", "WESTRING_UCLS", "string", 1, 1, 1, 0, nil, 0},
-			[]any{"uver", "fileVerFlags", "Profile", -1, "art", "WESTRING_UVER", "versionFlags", 1, 1, 1, 0, nil, 1},
-			[]any{nil, "orphan", "Profile", -1, "stats", "WESTRING_UHPM", "int", 1, 1, 1, 0, nil, 0},
-		),
-		"units/abilitymetadata.slk": sylk(abilityMeta,
-			[]any{"anam", "Name", "Profile", 0, 0, 0, "text", "WESTRING_ANAM", "string", 1, 1, 1, nil, nil, 1},
-			[]any{"alev", "levels", "AbilityData", -1, 0, 0, "stats", "WESTRING_ALEV", "int", 1, 1, 1, nil, nil, 0},
-			[]any{"acdn", "Cool", "AbilityData", -1, 4, 0, "stats", "WESTRING_ACDN", "unreal", 1, 1, 1, nil, nil, 0},
-			[]any{"aare", "Area", "AbilityData", -1, 4, 0, "stats", "WESTRING_AARE", "unreal", 1, 1, 1, nil, "AHhb", 0},
-			[]any{"Hhb2", "Data", "AbilityData", -1, 4, 2, "data", "WESTRING_HHB2", "unreal", 1, 1, 1, "AHhb", nil, 0},
-			[]any{"Hhb1", "Data", "AbilityData", -1, 4, 1, "data", "WESTRING_HHB1", "unreal", 1, 1, 1, "AHhb", nil, ""},
-			[]any{"Htb1", "Data", "AbilityData", -1, 4, 1, "data", "WESTRING_HTB1", "unreal", 1, 1, 1, "AHtb", nil, 0},
-			[]any{"Hdc1", "Data", "AbilityData", -1, 4, 12, "data", "WESTRING_HDC1", "int", 1, 1, 1, "AHtb,AHhb", nil, 0},
-			[]any{"atp1", "Tip", "Profile", 0, 3, 0, "text", "WESTRING_ATP1", "string", 1, 1, 0, nil, nil, 1},
-		),
-		"units/abilitybuffmetadata.slk": sylk(buffMeta,
-			[]any{"fnam", "EditorName", "text", "WESTRING_FNAM", "string", 1},
-			[]any{"fart", "Buffart", "art", "WESTRING_FART", "icon", 1},
-		),
-		"units/upgrademetadata.slk": sylk(upgradeMeta,
-			[]any{"gnam", "Name", 1, nil, "text", "WESTRING_GNAM", "string", 1},
-			[]any{"gef1", "effect1", 0, "EffectID", "data", "WESTRING_GEF1", "upgradeEffect", 0},
-			[]any{"gba1", "base1", 0, "Base", "data", "WESTRING_GBA1", "unreal", 0},
-			[]any{"gmo1", "mod1", 0, "Mod", "data", "WESTRING_GMO1", "unreal", 0},
-			[]any{"gpct", "pct", 0, nil, "data", "WESTRING_GPCT", "unreal", 0},
-		),
-		"units/unitdata.slk": sylk([]string{"unitID", "comment(s)"},
-			[]any{"hfoo", "footman"}, []any{"Hpal", "paladin"}, []any{"hbar", "barracks"}, []any{"nzzz", "unnamed critter"},
-		),
-		"units/unitbalance.slk": sylk(balanceMeta,
-			[]any{"hfoo", 0, "_"}, []any{"Hpal", 0, "STR"}, []any{"hbar", 1, "_"}, []any{"nzzz", 0, "_"},
-		),
-		"units/itemdata.slk": sylk([]string{"itemID", "comment"}, []any{"ratf", "claws"}),
-		"units/abilitydata.slk": sylk([]string{"alias", "comments", "levels"},
-			[]any{"AHhb", "holy light", 3}, []any{"AHtb", "storm bolt", 3}, []any{nil, "row without an id", 1},
-		),
-		"units/abilitybuffdata.slk": sylk([]string{"alias", "comments"}, []any{"Binf", "inner fire"}, []any{"BHbd", "blizzard"}),
-		"units/upgradedata.slk":     sylk([]string{"upgradeid", "comments", "maxlevel"}, []any{"Rhme", "swords", 3}),
-		labelsFile: strings.Join([]string{
-			"[WorldEditStrings]",
-			"WESTRING_UHPM=Hit Points Maximum (Base)",
-			"WESTRING_UNAM=Name",
-			"WESTRING_UMDL=WESTRING_MODELFILE",
-			"WESTRING_MODELFILE=Model File",
-			"WESTRING_IFIL=Model File",
-			"WESTRING_USHR=Shadow on Water",
-			"WESTRING_UABI=Abilities - Normal",
-			"WESTRING_UDEA=Death Type",
-			"WESTRING_UPRO=Proper Names (Hero's +1.)",
-			"WESTRING_UCLS=Class",
-			"WESTRING_UVER=Model File - Extra Versions",
-			"WESTRING_ANAM=Name",
-			"WESTRING_ALEV=Levels",
-			"WESTRING_ACDN=Cooldown",
-			"WESTRING_AARE=Area of Effect",
-			"WESTRING_HHB2=Area of Effect",
-			"WESTRING_HHB1=Amount Healed/Damaged",
-			"WESTRING_HTB1=Cooldown",
-			"WESTRING_HDC1=Damage Dealt (%)",
-			"WESTRING_ATP1=Tooltip - Normal",
-			"WESTRING_FNAM=Name",
-			"WESTRING_FART=Icon",
-			"WESTRING_GNAM=Name",
-			"WESTRING_GEF1=Effect 1",
-			"WESTRING_GBA1=Effect 1 - %s",
-			"WESTRING_GMO1=Effect 1 - %s",
-			"WESTRING_GPCT=% Bonus & More",
-			"",
-		}, "\r\n"),
-		"_locales/enus.w3mod/units/humanunitstrings.txt": strings.Join([]string{
-			"[hfoo]\t",
-			"Name=Footman",
-			"[Hpal]",
-			`Name="|cffffcc00Paladin|r"`,
-			"[hbar]",
-			"Name=Barracks",
-		}, "\r\n"),
-		"_locales/enus.w3mod/units/humanabilitystrings.txt": strings.Join([]string{
-			"[AHhb]",
-			"Name=Holy Light",
-			"[AHtb]",
-			"Name=Storm Bolt",
-			"[Binf]",
-			"Bufftip=Inner Fire",
-			"[BHbd]",
-			"EditorName=Blizzard (Caster)",
-			"Bufftip=Blizzard",
-		}, "\n"),
-		"_locales/enus.w3mod/units/humanupgradestrings.txt": "[Rhme]\nName=Iron Forged Swords,Steel Forged Swords\n",
-		"_locales/enus.w3mod/units/itemstrings.txt":         "[ratf]\nName=Claws of Attack +15\n",
-	}
-}
-
-// game writes the miniature export, after change has adjusted its files, and returns its folder and the path the
-// metadata goes to.
-func game(t *testing.T, change func(files map[string]string)) (folder, target string) {
+// withPins makes a scratch checkout with an overrides file of this text and a data folder.
+func withPins(t testing.TB, pins string) checkout {
 	t.Helper()
-	dir := t.TempDir()
-	files := gameFilesFixture()
-	if change != nil {
-		change(files)
-	}
-	for path, content := range files {
-		testkit.WriteFile(t, dir, "game/war3.w3mod/"+path, []byte(content))
-	}
-	return filepath.Join(dir, "game"), filepath.Join(dir, "metadata.json")
+	c := newCheckout(t)
+	c.write(overridesPath, pins)
+	c.folder("data")
+	return c
 }
 
-var unitClass = Overrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}}}
-
-func generate(t *testing.T, folder, version, target string, overrides Overrides) MetadataResult {
+// written reads the data/metadata.json among the outputs of a checkout.
+func written(t testing.TB, files map[string][]byte) *objects.Metadata {
 	t.Helper()
-	result, err := GenerateMetadata(folder, version, target, overrides)
+	metadata, err := decodeMetadata(files[metadataPath])
 	if err != nil {
 		t.Fatal(err)
 	}
-	return result
+	return metadata
 }
 
-func generated(t *testing.T, target string) *objects.Metadata {
-	t.Helper()
-	data, err := os.ReadFile(target)
+// The report of the miniature export: the counts of the lists and of the categories in their order, the renames
+// in the order of the lists and then of the ids, and the command that is to be run next.
+const miniReport = `fields: {"units":9,"items":2,"abilities":9,"buffs":2,"upgrades":5}
+bases: {"heroes":1,"units":2,"buildings":1,"items":1,"abilities":2,"buffs":2,"upgrades":1}
+renamed (3):
+  units ucls "class" -> "unitClass" (override)
+  abilities Htb1 "cooldown" -> "dataCooldown" (category prefix)
+  abilities acdn "cooldown" -> "statsCooldown" (category prefix)
+` + "wrote data/metadata.json. Now run `go run ./tools/gen`.\n"
+
+func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(t *testing.T) {
+	folder := exportedGame(t, nil)
+	c := withPins(t, unitClassPins)
+	printed, files, err := c.run("metadata", folder, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	var metadata objects.Metadata
-	if err := json.Unmarshal(data, &metadata); err != nil {
-		t.Fatal(err)
+	if printed != miniReport {
+		t.Errorf("the run printed\n%s\nwant\n%s", printed, miniReport)
 	}
-	return &metadata
-}
-
-func byID(fields []objects.FieldMeta) map[string]objects.FieldMeta {
-	out := map[string]objects.FieldMeta{}
-	for _, field := range fields {
-		out[field.ID] = field
+	first := texts(files)
+	beside := withGoMod(map[string]string{overridesPath: unitClassPins, metadataPath: first[metadataPath]})
+	if first[metadataPath] == "" || !maps.Equal(first, beside) {
+		t.Fatalf("the run left %q, want the metadata beside what the checkout held", slices.Sorted(maps.Keys(first)))
 	}
-	return out
-}
-
-func ids(fields []objects.FieldMeta) []string {
-	var out []string
-	for _, field := range fields {
-		out = append(out, field.ID)
-	}
-	return out
-}
-
-func names(fields []objects.FieldMeta) map[string]string {
-	out := map[string]string{}
-	for _, field := range fields {
-		out[field.ID] = field.Name
-	}
-	return out
-}
-
-func equal[T any](t *testing.T, what string, got, want T) {
-	t.Helper()
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("%s: got %v, want %v", what, got, want)
-	}
-}
-
-func TestGenerateMetadataWritesFieldRecordsFromTheMetadataSLKs(t *testing.T) {
-	folder, target := game(t, nil)
-	generate(t, folder, "3.0.0.1", target, unitClass)
-	metadata := generated(t, target)
-	equal(t, "format", metadata.Format, 1)
-	equal(t, "game", metadata.Game, "3.0.0.1")
-	units := byID(metadata.Fields["units"])
-	equal(t, "uhpm", units["uhpm"], objects.FieldMeta{
-		ID: "uhpm", Name: "hitPointsMaximumBase", Label: "Hit Points Maximum (Base)", Category: "stats", Type: "int",
-		Storage: "int", Use: []string{"unit", "hero", "building"}, Specific: []string{}, NotSpecific: []string{},
-	})
-	// Rows without an id are skipped; fields only items use are not unit fields.
-	equal(t, "the unit fields", ids(metadata.Fields["units"]),
-		[]string{"uabi", "ucls", "udea", "uhpm", "umdl", "unam", "upro", "ushr", "uver"})
-	// Labels resolve through nested WESTRING references; only netsafe 1 marks a skin field (11 does not).
-	equal(t, "umdl's label", units["umdl"].Label, "Model File")
-	equal(t, "the skin marks", []bool{units["umdl"].Skin, units["ushr"].Skin, units["unam"].Skin}, []bool{true, false, true})
-	// bool, flag and enumeration types are stored as int; lists and other types as strings.
-	equal(t, "the storage",
-		[]string{units["ushr"].Storage, units["udea"].Storage, units["uver"].Storage, units["uabi"].Storage, units["umdl"].Storage},
-		[]string{"int", "int", "int", "string", "string"})
-	equal(t, "the lists", []bool{units["uabi"].List, units["upro"].List, units["unam"].List}, []bool{true, true, false})
-
-	items := byID(metadata.Fields["items"])
-	equal(t, "the item fields", ids(metadata.Fields["items"]), []string{"ifil", "unam"})
-	equal(t, "unam of items", items["unam"], units["unam"])
-	equal(t, "unam's use", items["unam"].Use, []string{"unit", "hero", "building", "item"})
-
-	abilities := byID(metadata.Fields["abilities"])
-	equal(t, "per level", []bool{abilities["anam"].PerLevel, abilities["atp1"].PerLevel, abilities["acdn"].PerLevel},
-		[]bool{false, true, true})
-	equal(t, "the columns", []int{abilities["Hhb1"].Column, abilities["Hdc1"].Column, abilities["acdn"].Column}, []int{1, 12, 0})
-	equal(t, "Hdc1's bases", abilities["Hdc1"].Specific, []string{"AHtb", "AHhb"})
-	equal(t, "aare's exceptions", abilities["aare"].NotSpecific, []string{"AHhb"})
-	equal(t, "Hhb1's skin mark", abilities["Hhb1"].Skin, false)
-	equal(t, "Hhb1's use", abilities["Hhb1"].Use, []string{})
-
-	upgrades := byID(metadata.Fields["upgrades"])
-	equal(t, "gnam per level", upgrades["gnam"].PerLevel, true)
-	// "%s" stands for the effect's own label in World Editor; the effect type names the field instead.
-	equal(t, "the effect labels", []string{upgrades["gba1"].Label, upgrades["gmo1"].Label}, []string{"Effect 1 - Base", "Effect 1 - Mod"})
-	equal(t, "gef1's storage", upgrades["gef1"].Storage, "string")
-}
-
-func TestGenerateMetadataDerivesFriendlyNamesFromLabelsAndRenamesClashes(t *testing.T) {
-	folder, target := game(t, nil)
-	result := generate(t, folder, "3.0.0.1", target, unitClass)
-	metadata := generated(t, target)
-	equal(t, "units", names(metadata.Fields["units"]), map[string]string{
-		"uabi": "abilitiesNormal",
-		"ucls": "unitClass",
-		"udea": "deathType",
-		"uhpm": "hitPointsMaximumBase",
-		"umdl": "modelFile",
-		"unam": "name",
-		"upro": "properNamesHerosPlus1",
-		"ushr": "shadowOnWater",
-		"uver": "modelFileExtraVersions",
-	})
-	// "Model File" appears once per class: umdl is not an item field, ifil is not a unit field.
-	equal(t, "items", names(metadata.Fields["items"]), map[string]string{"ifil": "modelFile", "unam": "name"})
-	// Storm Bolt's own "Cooldown" clashes with the common one, so both take their category. Holy Light's own "Area
-	// of Effect" does not clash with the common one, which does not apply to Holy Light (notSpecific).
-	equal(t, "abilities", names(metadata.Fields["abilities"]), map[string]string{
-		"Hdc1": "damageDealtPercent",
-		"Hhb1": "amountHealedOrDamaged",
-		"Hhb2": "areaOfEffect",
-		"aare": "areaOfEffect",
-		"Htb1": "dataCooldown",
-		"acdn": "statsCooldown",
-		"alev": "levels",
-		"anam": "name",
-		"atp1": "tooltipNormal",
-	})
-	equal(t, "upgrades", names(metadata.Fields["upgrades"]), map[string]string{
-		"gba1": "effect1Base",
-		"gef1": "effect1",
-		"gmo1": "effect1Mod",
-		"gnam": "name",
-		"gpct": "percentBonusAndMore",
-	})
-	equal(t, "renames", result.Renames, []string{
-		`units ucls "class" -> "unitClass" (override)`,
-		`abilities Htb1 "cooldown" -> "dataCooldown" (category prefix)`,
-		`abilities acdn "cooldown" -> "statsCooldown" (category prefix)`,
-	})
-}
-
-func TestGenerateMetadataAppendsTheRawcodeWhenTheCategoryPrefixLeavesAClash(t *testing.T) {
-	folder, target := game(t, func(files map[string]string) {
-		files[labelsFile] += "WESTRING_HHB1=Damage\r\nWESTRING_HDC1=Damage\r\n"
-	})
-	result := generate(t, folder, "3.0.0.1", target, unitClass)
-	abilities := names(generated(t, target).Fields["abilities"])
-	equal(t, "names", []string{abilities["Hhb1"], abilities["Hdc1"]}, []string{"dataDamageHhb1", "dataDamageHdc1"})
-	if !slices.Contains(result.Renames, `abilities Hhb1 "damage" -> "dataDamageHhb1" (category prefix and rawcode)`) {
-		t.Errorf("renames: %q", result.Renames)
-	}
-}
-
-func TestGenerateMetadataClassifiesBasesAndReadsNamesAndLevelCounts(t *testing.T) {
-	folder, target := game(t, nil)
-	generate(t, folder, "3.0.0.1", target, unitClass)
-	three := 3
-	equal(t, "bases", generated(t, target).Bases, map[objects.Category]map[string]objects.BaseMeta{
-		"heroes":    {"Hpal": {Name: "Paladin"}},
-		"units":     {"hfoo": {Name: "Footman"}, "nzzz": {Name: "unnamed critter"}},
-		"buildings": {"hbar": {Name: "Barracks"}},
-		"items":     {"ratf": {Name: "Claws of Attack +15"}},
-		"abilities": {"AHhb": {Name: "Holy Light", Levels: &three}, "AHtb": {Name: "Storm Bolt", Levels: &three}},
-		"buffs":     {"BHbd": {Name: "Blizzard (Caster)"}, "Binf": {Name: "Inner Fire"}},
-		"upgrades":  {"Rhme": {Name: "Iron Forged Swords", Levels: &three}},
-	})
-}
-
-func TestGenerateMetadataIsDeterministicAndReportsCountsPerCategory(t *testing.T) {
-	folder, target := game(t, nil)
-	first := generate(t, folder, "3.0.0.1", target, unitClass)
-	written, _ := os.ReadFile(target)
-	second := generate(t, folder, "3.0.0.1", target, unitClass)
-	again, _ := os.ReadFile(target)
-	equal(t, "the second file", string(again), string(written))
-	equal(t, "the second result", second, first)
-	equal(t, "field counts", first.Fields, []Count{{"units", 9}, {"items", 2}, {"abilities", 9}, {"buffs", 2}, {"upgrades", 5}})
-	equal(t, "base counts", first.Bases, []Count{
-		{"heroes", 1}, {"units", 2}, {"buildings", 1}, {"items", 1}, {"abilities", 2}, {"buffs", 2}, {"upgrades", 1},
-	})
-	// One record per line keeps the file small and its diffs readable.
-	contains(t, string(written),
+	// One field and one standard object on a line keep the file small and its changes readable. "&" stands as it
+	// is: the file escapes no more than a JSON text must.
+	contains(t, first[metadataPath],
+		"{\n  \"format\": 1,\n  \"game\": \"3.0.0.1\",\n  \"fields\": {\n    \"units\": [\n      {\"id\":\"uabi\",",
 		"\n      {\"id\":\"uhpm\",\"name\":\"hitPointsMaximumBase\",",
 		"\n      \"AHhb\": {\"name\":\"Holy Light\",\"levels\":3},",
-		// JSON.stringify leaves "&" as it is, which Go's encoder would escape.
 		`"label":"% Bonus & More"`,
 	)
-}
-
-func TestGenerateMetadataFailsWithoutWritingOnAPklKeywordOrReservedNameWithoutAnOverride(t *testing.T) {
-	folder, target := game(t, nil)
-	_, err := GenerateMetadata(folder, "3.0.0.1", target, Overrides{})
-	if err == nil {
-		t.Fatal("the name class was accepted")
-	}
-	contains(t, err.Error(), `units ucls "class" (Class)`, "overrides.json")
-	if _, err := os.Stat(target); !errors.Is(err, fs.ErrNotExist) {
-		t.Error("the metadata was written")
-	}
-
-	folder, target = game(t, func(files map[string]string) { files[labelsFile] += "WESTRING_FART=Base\r\n" })
-	if _, err = GenerateMetadata(folder, "3.0.0.1", target, unitClass); err == nil {
-		t.Fatal("the name base was accepted")
-	}
-	contains(t, err.Error(), `buffs fart "base" (Base)`)
-}
-
-func TestGenerateMetadataFailsWhenAReleasedFriendlyNameWouldChangeOrDisappear(t *testing.T) {
-	folder, target := game(t, nil)
-	generate(t, folder, "3.0.0.1", target, unitClass)
-	released, _ := os.ReadFile(target)
-	renamed := strings.Replace(string(released), `"name":"hitPointsMaximumBase"`, `"name":"hitPoints"`, 1)
-	renamed = strings.Replace(renamed, `{"id":"gpct"`, `{"id":"gold"`, 1)
-	if err := os.WriteFile(target, []byte(renamed), 0o666); err != nil {
+	// The second run finds the file of the first as the names that are released, and writes it again.
+	again, files, err := c.run("metadata", folder, "3.0.0.1")
+	if err != nil {
 		t.Fatal(err)
 	}
-
-	_, err := GenerateMetadata(folder, "3.0.0.2", target, unitClass)
-	if err == nil {
-		t.Fatal("released names changed without an override")
+	if again != printed || !maps.Equal(texts(files), first) {
+		t.Errorf("the second run printed %q and wrote another file than the first: %s",
+			again, parting(first[metadataPath], texts(files)[metadataPath]))
 	}
-	contains(t, err.Error(),
-		`units uhpm "hitPoints" would become "hitPointsMaximumBase"`,
-		`upgrades gold "percentBonusAndMore" would disappear`,
-	)
-	if kept, _ := os.ReadFile(target); string(kept) != renamed {
-		t.Error("the metadata was written")
+	if metadata := written(t, files); metadata.Format != 1 || metadata.Game != "3.0.0.1" {
+		t.Errorf("the file states the format %d and the game %q", metadata.Format, metadata.Game)
 	}
-
-	// An override pins the released name; removed acknowledges a field the game no longer has.
-	generate(t, folder, "3.0.0.2", target, Overrides{
-		Names:   map[string]map[string]string{"units": {"ucls": "unitClass", "uhpm": "hitPoints"}},
-		Removed: map[string][]string{"upgrades": {"gold"}},
-	})
-	equal(t, "uhpm's name", byID(generated(t, target).Fields["units"])["uhpm"].Name, "hitPoints")
 }
 
-func TestGenerateMetadataFailsWhenAnUppercaseUnitIDIsNotAHeroInTheBalanceData(t *testing.T) {
-	folder, target := game(t, func(files map[string]string) {
-		files["units/unitbalance.slk"] = sylk(balanceMeta,
-			[]any{"hfoo", 0, "_"}, []any{"Hpal", 0, "_"}, []any{"hbar", 1, "_"}, []any{"nzzz", 0, "_"}, []any{"nhro", 0, "AGI"},
-		)
-		files["units/unitdata.slk"] = sylk([]string{"unitID"},
-			[]any{"hfoo"}, []any{"Hpal"}, []any{"hbar"}, []any{"nzzz"}, []any{"nhro"},
-		)
+// The renames are reported in the order of the lists, and in a list in the order of the ids' bytes: capitals
+// first. A field of units and of items is reported once, under the units, and a field that items alone use under
+// the items.
+func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testing.T) {
+	folder := exportedGame(t, func(files map[string]string) {
+		files[labelsFile] += "WESTRING_GPCT=Name\r\nWESTRING_FART=Name\r\n"
 	})
-	_, err := GenerateMetadata(folder, "3.0.0.1", target, unitClass)
-	if err == nil {
-		t.Fatal("the exceptions to the hero rule were accepted")
+	c := withPins(t, `{"names": {"items": {"unam": "unitName", "ifil": "itemModel"}, "units": {"ucls": "unitClass"}}}`)
+	printed, _, err := c.run("metadata", folder, "3.0.0.1")
+	if err != nil {
+		t.Fatal(err)
 	}
-	contains(t, err.Error(), "Hpal", "nhro")
+	contains(t, printed, `renamed (9):
+  units ucls "class" -> "unitClass" (override)
+  units unam "name" -> "unitName" (override)
+  items ifil "modelFile" -> "itemModel" (override)
+  abilities Htb1 "cooldown" -> "dataCooldown" (category prefix)
+  abilities acdn "cooldown" -> "statsCooldown" (category prefix)
+  buffs fart "name" -> "artName" (category prefix)
+  buffs fnam "name" -> "textName" (category prefix)
+  upgrades gnam "name" -> "textName" (category prefix)
+  upgrades gpct "name" -> "dataName" (category prefix)
+`)
 }
 
-func TestGenerateMetadataNamesAMissingGameFile(t *testing.T) {
-	folder, target := game(t, func(files map[string]string) { delete(files, "units/upgradedata.slk") })
-	_, err := GenerateMetadata(folder, "3.0.0.1", target, unitClass)
-	if err == nil {
-		t.Fatal("a missing file was accepted")
-	}
-	contains(t, err.Error(), "war3.w3mod/units/upgradedata.slk")
-}
-
-func TestGenerateMetadataPadsAThreeLetterFieldIDWithNULAndReadsADotAsAListSeparator(t *testing.T) {
-	folder, target := game(t, func(files map[string]string) {
-		files["units/abilitymetadata.slk"] = strings.Replace(files["units/abilitymetadata.slk"], "\r\nE\r\n",
-			"\r\nC;X1;Y11;K\"Crs\"\r\nC;X2;K\"Data\"\r\nC;X5;K4\r\nC;X6;K1\r\nC;X7;K\"data\"\r\nC;X8;K\"WESTRING_CRS\"\r\n"+
-				"C;X9;K\"unreal\"\r\nC;X13;K\"AHtb.AHhb\"\r\nE\r\n", 1)
-		files[labelsFile] += "WESTRING_CRS=Chance to Miss\r\n"
-	})
-	generate(t, folder, "3.0.0.1", target, unitClass)
-	for _, field := range generated(t, target).Fields["abilities"] {
-		if field.Label == "Chance to Miss" {
-			equal(t, "the id", field.ID, "Crs\x00")
-			equal(t, "the bases", field.Specific, []string{"AHtb", "AHhb"})
-			return
+// A run that is refused prints nothing and leaves the data folder as it was: the file of another version is
+// kept, and no file is made where there was none.
+func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
+	const released = `{"format":1,"game":"1.0","fields":{"units":[{"id":"uhpm","name":"hitPoints"}]}}`
+	whole := exportedGame(t, nil)
+	for name, c := range map[string]struct {
+		folder string
+		pins   string // the overrides; "" for those of the miniature
+		kept   string // the data/metadata.json that the checkout holds; "" for none
+		starts string // what the error starts with
+		words  []string
+	}{
+		"a name that needs a pin": {folder: whole, pins: "{}", starts: "cannot derive friendly names:\n  ",
+			words: []string{`units ucls "class" (Class)`, "tools/metadata/overrides.json"}},
+		"a file that the export lacks": {
+			folder: exportedGame(t, func(files map[string]string) { delete(files, upgradesTable) }),
+			starts: "war3.w3mod/units/upgradedata.slk is missing from "},
+		// Every file of the export is read before anything is made of it: a table that does not parse is told
+		// of before a name that needs a pin.
+		"a name that needs a pin, in an export with a table that does not parse": {pins: "{}",
+			folder: exportedGame(t, func(files map[string]string) {
+				files[upgradesTable] = "ID;PWXL;N;E\r\nC;X1;Y1;K\"upgradeid\"\r\nC;X1;Y2;K\"Rhme\r\nE\r\n"
+			}),
+			starts: "war3.w3mod/units/upgradedata.slk:3: unterminated quoted string"},
+		"a unit that breaks the rule for heroes": {
+			folder: exportedGame(t, func(files map[string]string) {
+				files[unitsTable] = withRow(files[unitsTable], `C;X1;Y6;K"Nhro"`)
+				files[balanceTable] = withRow(files[balanceTable], `C;X1;Y6;K"Nhro"`, `C;X2;K0`, `C;X3;K"_"`)
+			}),
+			starts: "standard unit ids where the uppercase hero rule disagrees", words: []string{"Nhro (uppercase, "}},
+		"a released name that would change": {folder: whole, kept: released,
+			starts: "released friendly names would change.",
+			words:  []string{`units uhpm "hitPoints" would become "hitPointsMaximumBase"`}},
+		"a released file that is no JSON": {folder: whole, kept: `{"format":`, starts: "data/metadata.json: "},
+		"overrides that are no JSON":      {folder: whole, pins: `{"names":`, starts: "tools/metadata/overrides.json: "},
+		"overrides with a key too many": {folder: whole, pins: `{"names": {}, "renamed": {}}`,
+			starts: `tools/metadata/overrides.json: the file has the key "renamed"`},
+	} {
+		scratch := withPins(t, cmp.Or(c.pins, unitClassPins))
+		if c.kept != "" {
+			scratch.write(metadataPath, c.kept)
+		}
+		before := scratch.all()
+		printed, files, err := scratch.run("metadata", c.folder, "3.0.0.2")
+		if err == nil {
+			t.Errorf("%s: the run wrote the metadata", name)
+			continue
+		}
+		if !strings.HasPrefix(err.Error(), c.starts) {
+			t.Errorf("%s: the error is %q, want it to start with %q", name, err, c.starts)
+		}
+		contains(t, err.Error(), c.words...)
+		if strings.Contains(err.Error(), scratch.root) {
+			t.Errorf("%s: the error holds the full path of the checkout: %q", name, err)
+		}
+		if printed != "" || !reflect.DeepEqual(files, before) {
+			t.Errorf("%s: the refused run printed %q and left %q, want what the checkout held",
+				name, printed, slices.Sorted(maps.Keys(files)))
 		}
 	}
-	t.Error("the field is missing")
 }
 
-// The renderer writes the file as the TypeScript generator did: the committed file, read and rendered again, is
-// itself.
+// A failure of the system on a file of the checkout names the file by its path from the checkout: the overrides
+// that are not there, the released metadata that is a folder, and the data folder that is not there to write
+// into.
+func TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn(t *testing.T) {
+	folder := exportedGame(t, nil)
+	for name, c := range map[string]struct {
+		lay    func(c checkout)
+		starts string
+	}{
+		"no overrides": {func(c checkout) { c.folder("data") }, "tools/metadata/overrides.json: "},
+		"a folder at the place of the released metadata": {func(c checkout) {
+			c.write(overridesPath, unitClassPins)
+			c.folder(metadataPath)
+		}, "data/metadata.json: "},
+		"no data folder": {func(c checkout) { c.write(overridesPath, unitClassPins) }, "data/metadata.json: "},
+	} {
+		scratch := newCheckout(t)
+		c.lay(scratch)
+		before := scratch.all()
+		printed, files, err := scratch.run("metadata", folder, "3.0.0.1")
+		if err == nil || !strings.HasPrefix(err.Error(), c.starts) || strings.Contains(err.Error(), scratch.root) {
+			t.Errorf("%s: got %v, want a failure that starts with %q and holds no path of the checkout",
+				name, err, c.starts)
+		}
+		if printed != "" || !reflect.DeepEqual(files, before) {
+			t.Errorf("%s: the run printed %q and left %q", name, printed, slices.Sorted(maps.Keys(files)))
+		}
+	}
+}
+
+// Every kind of entry, against the text as it stands in the file: a field with every key, the id of three
+// letters, a list that holds nothing and a category without an object, an object with levels and one without,
+// texts that a JSON string must escape, and the objects of a category in the order of their ids' bytes.
+func TestRenderMetadataWritesTheTextOfTheFile(t *testing.T) {
+	none, three := 0, 3
+	metadata := &objects.Metadata{
+		Format: 1,
+		Game:   "1.0 \"beta\"",
+		Fields: map[string][]objects.FieldMeta{
+			"units": {
+				{ID: "uabi", Name: "abilities", Label: "Abilities <&>", Category: "abil", Type: "abilityList",
+					Storage: "string", List: true, PerLevel: true, Column: 12, Skin: true,
+					Use: []string{"unit", "hero"}, Specific: []string{"AHhb", "AHtb"}, NotSpecific: []string{"Aloc"}},
+				{ID: "Crs\x00", Name: "tab\tAndQuote\"", Use: []string{}},
+			},
+			"upgrades":  {},
+			"elsewhere": {{ID: "none", Name: "notWritten"}},
+		},
+		Bases: map[manifest.Category]map[string]objects.BaseMeta{
+			"heroes":    {"Hpal": {Name: "Paladin"}, "Hamg": {Name: "Archmage"}, "\xEE\x80\x80": {}, "\xF0\x90\x80\x80": {}},
+			"abilities": {"AHhb": {Name: "Holy\nLight", Levels: &three}, "Aloc": {Name: "Locust", Levels: &none}},
+		},
+	}
+	const want = `{
+  "format": 1,
+  "game": "1.0 \"beta\"",
+  "fields": {
+    "units": [
+      {"id":"uabi","name":"abilities","label":"Abilities <&>","category":"abil","type":"abilityList",` +
+		`"storage":"string","list":true,"perLevel":true,"column":12,"skin":true,"use":["unit","hero"],` +
+		`"specific":["AHhb","AHtb"],"notSpecific":["Aloc"]},
+      {"id":"Crs\u0000","name":"tab\tAndQuote\"","label":"","category":"","type":"","storage":"","list":false,` +
+		`"perLevel":false,"column":0,"skin":false,"use":[],"specific":[],"notSpecific":[]}
+    ],
+    "items": [],
+    "abilities": [],
+    "buffs": [],
+    "upgrades": []
+  },
+  "bases": {
+    "heroes": {
+      "Hamg": {"name":"Archmage"},
+      "Hpal": {"name":"Paladin"},
+      "` + "\xEE\x80\x80" + `": {"name":""},
+      "` + "\xF0\x90\x80\x80" + `": {"name":""}
+    },
+    "units": {},
+    "buildings": {},
+    "items": {},
+    "abilities": {
+      "AHhb": {"name":"Holy\nLight","levels":3},
+      "Aloc": {"name":"Locust","levels":0}
+    },
+    "buffs": {},
+    "upgrades": {}
+  }
+}
+`
+	if got := renderMetadata(metadata); got != want {
+		t.Errorf("the metadata is not written as the file has it: %s", parting(want, got))
+	}
+}
+
+// The committed file, read and rendered again, is itself: byte for byte. Its lists of fields are the five that
+// the renderer writes.
 func TestTheCommittedMetadataRendersToItself(t *testing.T) {
-	root := testkit.RepoRoot(t)
-	committed, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(metadataPath)))
+	committed := string(moonwell.Metadata)
+	metadata := objects.LoadMetadata()
+	if rendered := renderMetadata(metadata); rendered != committed {
+		t.Errorf("%s does not render to itself: %s", metadataPath, parting(committed, rendered))
+	}
+	if string(realFile(t, metadataPath)) != committed {
+		t.Errorf("the program does not carry %s as the checkout has it", metadataPath)
+	}
+	lists, five := slices.Sorted(maps.Keys(metadata.Fields)), slices.Sorted(slices.Values(objects.FieldLists))
+	if !slices.Equal(lists, five) {
+		t.Errorf("the lists of fields of %s are %q, want the five that are written", metadataPath, lists)
+	}
+}
+
+// The game's object data, with the version that the committed metadata state and the committed overrides, give
+// the committed metadata byte for byte, over the committed file and into an empty data folder. The test reads
+// the export that MOONWELL_GAME_DATA names, and takes a second or two.
+func TestTheModeMetadataWritesTheCommittedMetadataFromTheGamesFiles(t *testing.T) {
+	export := testkit.NeedExport(t, "MOONWELL_GAME_DATA").Path()
+	committed := objects.LoadMetadata()
+	want := string(realFile(t, metadataPath))
+	var lists, categories []string
+	for _, list := range objects.FieldLists {
+		lists = append(lists, fmt.Sprintf("%q:%d", list, len(committed.Fields[list])))
+	}
+	for _, category := range manifest.Categories {
+		categories = append(categories, fmt.Sprintf("%q:%d", category, len(committed.Bases[category])))
+	}
+	counts := "fields: {" + strings.Join(lists, ",") + "}\nbases: {" + strings.Join(categories, ",") + "}\nrenamed ("
+	for name, carried := range map[string][]string{
+		"over the committed metadata": {overridesPath, metadataPath},
+		"into an empty data folder":   {overridesPath},
+	} {
+		c := newCheckout(t)
+		c.folder("data")
+		c.carry(carried...)
+		printed, files, err := c.run("metadata", export, committed.Game)
+		if err != nil {
+			t.Errorf("%s: the run failed, and the first line of its error is %q", name, firstLine(err.Error()))
+			continue
+		}
+		if got := string(files[metadataPath]); got != want {
+			t.Errorf("%s: the game's files do not give the committed %s: the two part at offset %d",
+				name, metadataPath, partingOffset(want, got))
+		}
+		const last = "\nwrote data/metadata.json. Now run `go run ./tools/gen`.\n"
+		if !strings.HasPrefix(printed, counts) || !strings.HasSuffix(printed, last) {
+			t.Errorf("%s: the run printed %d bytes, and not the counts of the committed file first and the "+
+				"command to run next last", name, len(printed))
+		}
+	}
+}
+
+// The file that the mode writes is read back as the program reads it.
+func TestTheModeMetadataWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
+	game := readMini(t, nil)
+	fields, _, err := nameFields(game, unitClass)
 	if err != nil {
 		t.Fatal(err)
 	}
-	metadata, err := readMetadata(root)
+	bases, err := standardObjects(game)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if RenderMetadata(metadata) != string(committed) {
-		t.Errorf("%s does not render to itself", metadataPath)
+	made := &objects.Metadata{Format: 1, Game: "3.0.0.1", Fields: fields, Bases: bases}
+	var read objects.Metadata
+	if err := json.Unmarshal([]byte(renderMetadata(made)), &read); err != nil {
+		t.Fatal(err)
 	}
-	// Every category the file has is one the renderer writes.
-	if categories := slices.Sorted(maps.Keys(metadata.Fields)); !slices.Equal(categories, slices.Sorted(slices.Values(objects.FieldCategories))) {
-		t.Errorf("field categories: %q", categories)
+	if !reflect.DeepEqual(&read, made) {
+		t.Errorf("the metadata reads back as %+v, want %+v", read, made)
 	}
 }

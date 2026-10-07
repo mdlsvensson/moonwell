@@ -1,17 +1,19 @@
-package cli_test
+package cli
 
 import (
 	"bufio"
 	"io"
 )
 
-// readProcessLines sends each line a program writes, and closes the channel when the program closes the stream.
-func readProcessLines(reader io.Reader, lines chan<- string) {
+// sendLines sends each line a program writes to a stream, and closes the channel when the program closes the
+// stream.
+func sendLines(stream io.Reader, lines chan<- string) {
 	defer close(lines)
-	scanner := bufio.NewScanner(reader)
+	scanner := bufio.NewScanner(stream)
 	for scanner.Scan() {
 		lines <- scanner.Text()
 	}
 }
 
-func readAllProcess(reader io.Reader) ([]byte, error) { return io.ReadAll(reader) }
+// readAll is all that a program writes to a stream until it closes it.
+func readAll(stream io.Reader) ([]byte, error) { return io.ReadAll(stream) }

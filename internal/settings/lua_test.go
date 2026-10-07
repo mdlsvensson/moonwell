@@ -1,52 +1,76 @@
-package settings_test
+package settings
 
 import (
+	"encoding/binary"
+	"errors"
 	"fmt"
+	"math"
 	"strings"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
-	"github.com/mdlsvensson/moonwell/internal/luasrc"
-	"github.com/mdlsvensson/moonwell/internal/settings"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
+	"github.com/mdlsvensson/moonwell/internal/war3/lua"
+	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-func fixtureLua(t *testing.T) string {
+// luaFile is the name the script has in errors.
+const luaFile = "maps/map.w3x/war3map.lua"
+
+const minimapCall = `BlzChangeMinimapTerrainTex("war3mapMinimap.blp")`
+
+func fixtureLua(t testing.TB) string {
+	t.Helper()
 	return string(testkit.Fixture(t, "map-settings-v39/war3map.lua"))
 }
 
-// patchLua applies the settings of a JSON document to source, with the fixture's map info patched the same way.
-func patchLua(t *testing.T, document, source string) string {
+func fixtureInfo(t testing.TB) []byte {
 	t.Helper()
-	s := validated(t, document)
-	info, err := settings.PatchMapInfo(testkit.Fixture(t, "map-settings-v39/war3map.w3i"), s, "war3map.w3i")
-	if err != nil {
-		t.Fatalf("PatchMapInfo(%s): %v", document, err)
-	}
-	patched, err := settings.PatchLua(source, s, info, "war3map.lua", "war3map.w3i")
-	if err != nil {
-		t.Fatalf("PatchLua(%s): %v", document, err)
-	}
-	return patched
+	return testkit.Fixture(t, "map-settings-v39/war3map.w3i")
 }
 
-// refusesLua checks that the settings cannot be applied to source, with an error naming the Lua file.
-func refusesLua(t *testing.T, document, source string) *diag.Error {
-	t.Helper()
-	s := validated(t, document)
-	info, err := settings.PatchMapInfo(testkit.Fixture(t, "map-settings-v39/war3map.w3i"), s, "war3map.w3i")
-	if err != nil {
-		t.Fatalf("PatchMapInfo(%s): %v", document, err)
-	}
-	_, err = settings.PatchLua(source, s, info, "map/war3map.lua", "map/war3map.w3i")
-	e := asError(t, err, document)
-	if e.File != "map/war3map.lua" {
-		t.Errorf("%s: the error names %q: %s", document, e.File, e.Msg)
-	}
-	return e
+// afterInfo brings a script into line with a map info given as the bytes patchInfo returned, as a plan does it,
+// under the names these tests give the two files.
+func afterInfo(source string, s manifest.Settings, patchedInfo []byte) (string, error) {
+	return patchLuaAfter(source, s, patchedInfo, luaFile, infoFile)
 }
 
-func replaced(t *testing.T, source, old, new string) string {
+// withSettings puts the settings into the fixture's map info, and brings the script into line with the result.
+func withSettings(t testing.TB, document, source string) (string, error) {
+	t.Helper()
+	s := settingsOf(t, document)
+	info, err := patchInfo(fixtureInfo(t), s, infoFile)
+	if err != nil {
+		t.Fatalf("patchInfo(%s): %v", document, err)
+	}
+	return afterInfo(source, s, info)
+}
+
+// inLine is the script with the settings of the document, which must go in.
+func inLine(t testing.TB, document, source string) string {
+	t.Helper()
+	result, err := withSettings(t, document, source)
+	if err != nil {
+		t.Fatalf("patchLua(%s): %v", document, err)
+	}
+	return result
+}
+
+// refusedLua is the failure of settings that must not go into the script: an expected one that names the script
+// and says what to do.
+func refusedLua(t testing.TB, document, source string) *diag.Error {
+	t.Helper()
+	_, err := withSettings(t, document, source)
+	failure := asError(t, err, document)
+	if failure.File != luaFile || failure.Hint == "" || !strings.HasPrefix(failure.Msg, "Cannot apply map settings to Lua: ") {
+		t.Errorf("%s: the error names %q, hints %q and says %q", document, failure.File, failure.Hint, failure.Msg)
+	}
+	return failure
+}
+
+// swapped is the source with the first old replaced by new. The source must have old.
+func swapped(t testing.TB, source, old, new string) string {
 	t.Helper()
 	if !strings.Contains(source, old) {
 		t.Fatalf("the source has no %q", old)
@@ -54,16 +78,17 @@ func replaced(t *testing.T, source, old, new string) string {
 	return strings.Replace(source, old, new, 1)
 }
 
-// teamsTail is the whole InitCustomTeams body after the editor's last call.
-func teamsTail(lua string) string {
+// teamsTail is the whole InitCustomTeams body after World Editor's last call.
+func teamsTail(script string) string {
 	const last = "SetPlayerTeam(Player(11), 1)\r\n"
-	start := strings.Index(lua, last) + len(last)
-	return lua[start : start+strings.Index(lua[start:], "end")]
+	start := strings.Index(script, last) + len(last)
+	return script[start : start+strings.Index(script[start:], "end")]
 }
 
-func mainCalls(t *testing.T, lua string) []string {
+// mainCalls is the names of the calls directly in main(), of a script that must read.
+func mainCalls(t testing.TB, script string) []string {
 	t.Helper()
-	functions, err := luasrc.Functions(lua, "war3map.lua")
+	functions, err := lua.Functions(script, luaFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,12 +106,12 @@ func mainCalls(t *testing.T, lua string) []string {
 }
 
 func TestPlayerAndEnvironmentEditsAgreeWithPatchedMapInfo(t *testing.T) {
-	lua := patchLua(t, `{
-		"info":{"name":"A \"quoted\" map\n雪"},
+	script := inLine(t, `{
+		"info":{"name":"A \"quoted\" map\n`+"\xe9\x9b\xaa"+`"},
 		"players":{"0":{"name":"Hero","controller":"computer","race":"orc","fixedStart":false,"x":256}},
 		"environment":{"waterColor":[10,20,30,255],"fog":{"enabled":true,"start":100,"end":1000}}}`, fixtureLua(t))
 	for _, line := range []string{
-		`SetMapName("A \"quoted\" map\010雪")`,
+		`SetMapName("A \"quoted\" map\010` + "\xe9\x9b\xaa" + `")`,
 		"SetPlayerController(Player(0), MAP_CONTROL_COMPUTER)",
 		"SetPlayerRacePreference(Player(0), RACE_PREF_ORC)",
 		"DefineStartLocation(0, 256, -896)",
@@ -94,138 +119,337 @@ func TestPlayerAndEnvironmentEditsAgreeWithPatchedMapInfo(t *testing.T) {
 		"ForcePlayerStartLocation(Player(1), 1)",
 		`BlzCreateUnitWithSkin(p, FourCC("Hblm")`,
 	} {
-		if !strings.Contains(lua, line) {
+		if !strings.Contains(script, line) {
 			t.Errorf("the patched Lua lacks %s", line)
 		}
 	}
-	if strings.Contains(lua, "ForcePlayerStartLocation(Player(0)") {
+	if strings.Contains(script, "ForcePlayerStartLocation(Player(0)") {
 		t.Error("player 0 is still forced to its start location")
-	}
-	if got := settings.LuaString("\n123"); got != `"\010123"` {
-		t.Errorf("LuaString = %s", got)
 	}
 }
 
 func TestMissingOrDuplicateEditorCallsRefuseAnEdit(t *testing.T) {
 	source := fixtureLua(t)
 	name := `{"info":{"name":"Name"}}`
-	refusesLua(t, name, replaced(t, source, "SetMapName(", "Other("))
-	refusesLua(t, name, source+"\nfunction config() SetMapName(\"x\") end")
-	refusesLua(t, name, replaced(t, source, "SetMapName(", "object.SetMapName("))
+	for _, c := range []struct{ source, words string }{
+		{swapped(t, source, "SetMapName(", "Other("), "exactly one direct SetMapName in config() call, found 0"},
+		{source + "\nfunction config() SetMapName(\"x\") end", "exactly one global function config(), found 2"},
+		{swapped(t, source, "SetMapName(", "object.SetMapName("), "exactly one direct SetMapName in config() call, found 0"},
+	} {
+		if failure := refusedLua(t, name, c.source); !strings.Contains(failure.Msg, c.words) {
+			t.Errorf("the error says %q, want %q in it", failure.Msg, c.words)
+		}
+	}
 }
 
 func TestSettingsWithoutLuaCounterpartsReturnTheSourceUnchangedWithoutReadingIt(t *testing.T) {
 	source := fixtureLua(t)
-	if patchLua(t, `{}`, source) != source {
+	if inLine(t, `{}`, source) != source {
 		t.Error("no settings changed the Lua")
 	}
 	metadataOnly := `{"info":{"author":"Author","recommendedPlayers":""},"loadingScreen":{"title":"Title"},
 		"forces":{"0":{"name":"Allies"}},"gameplay":{"heroMaxLevel":20}}`
-	if patchLua(t, metadataOnly, source) != source {
+	if inLine(t, metadataOnly, source) != source {
 		t.Error("settings stored only in the map info changed the Lua")
 	}
-	if got := patchLua(t, `{}`, "function (((unreadable"); got != "function (((unreadable" {
+	if got := inLine(t, `{}`, "function (((unreadable"); got != "function (((unreadable" {
 		t.Errorf("unreadable Lua was touched: %q", got)
+	}
+	// Neither is the map info looked at: there is none here.
+	if got, err := afterInfo("function (((unreadable", settingsOf(t, metadataOnly), nil); err != nil || got != "function (((unreadable" {
+		t.Errorf("patchLuaAfter without a map info = %q, %v", got, err)
+	}
+}
+
+func TestSetsLuaIsTrueForTheSettingsWithACounterpartInTheScript(t *testing.T) {
+	for document, want := range map[string]bool{
+		`{}`: false,
+		`{"info":{"author":"A","recommendedPlayers":"2","preview":"p.tga"}}`:                                  false,
+		`{"loadingScreen":{"background":1,"model":"m","text":"t","title":"t","subtitle":"s"}}`:                false,
+		`{"forces":{"0":{"name":"Allies"},"1":{}}}`:                                                           false,
+		`{"players":{"0":{},"5":{"name":null}}}`:                                                              false,
+		`{"environment":{"fog":{}}}`:                                                                          false,
+		`{"gameplay":{"heroMaxLevel":20},"gameplayConstants":{"A":{"B":"c"}},"gameInterface":{"A":{}}}`:       false,
+		`{"info":{"name":""}}`:                                                                                true,
+		`{"info":{"description":"D"}}`:                                                                        true,
+		`{"players":{"0":{"name":"Hero"}}}`:                                                                   true,
+		`{"players":{"3":{},"0":{"fixedStart":false}}}`:                                                       true,
+		`{"forces":{"0":{"name":"Allies"},"1":{"allied":false}}}`:                                             true,
+		`{"forces":{"0":{"sharedAdvancedControl":true}}}`:                                                     true,
+		`{"environment":{"soundEnvironment":""}}`:                                                             true,
+		`{"environment":{"waterColor":[0,0,0,0]}}`:                                                            true,
+		`{"environment":{"fog":{"density":0}}}`:                                                               true,
+		`{"info":{"author":"A"},"loadingScreen":{"title":"T"},"environment":{"fog":{"enabled":false}}}`:       true,
+		`{"info":{"name":null,"description":null},"players":{"0":{"x":null}},"forces":{"0":{"allied":null}}}`: false,
+	} {
+		if got := setsLua(settingsOf(t, document)); got != want {
+			t.Errorf("setsLua(%s) = %v, want %v", document, got, want)
+		}
 	}
 }
 
 func TestAMapNameEditChangesOnlyThatCall(t *testing.T) {
 	source := fixtureLua(t)
-	want := replaced(t, source, `SetMapName("TRIGSTR_001")`, `SetMapName("Name")`)
-	want = replaced(t, want, `SetMapDescription("TRIGSTR_003")`, `SetMapDescription("")`)
-	if got := patchLua(t, `{"info":{"name":"Name","description":""}}`, source); got != want {
+	want := swapped(t, source, `SetMapName("TRIGSTR_001")`, `SetMapName("Name")`)
+	want = swapped(t, want, `SetMapDescription("TRIGSTR_003")`, `SetMapDescription("")`)
+	if got := inLine(t, `{"info":{"name":"Name","description":""}}`, source); got != want {
 		t.Error("a name and description edit changed something else")
 	}
 }
 
 func TestPlayerEditsReplaceInsertAndRemoveOnlyThatPlayersCalls(t *testing.T) {
 	source := fixtureLua(t)
-	want := replaced(t, source,
+	want := swapped(t, source,
 		"SetPlayerStartLocation(Player(0), 0)\r\nForcePlayerStartLocation(Player(0), 0)\r\n",
 		"SetPlayerStartLocation(Player(0), 0)\r\n")
-	want = replaced(t, want, "SetPlayerRacePreference(Player(0), RACE_PREF_HUMAN)",
+	want = swapped(t, want, "SetPlayerRacePreference(Player(0), RACE_PREF_HUMAN)",
 		"SetPlayerRacePreference(Player(0), RACE_PREF_USER_SELECTABLE)")
-	want = replaced(t, want, "SetPlayerRaceSelectable(Player(0), false)", "SetPlayerRaceSelectable(Player(0), true)")
-	if got := patchLua(t, `{"players":{"0":{"name":"Hero","race":"selectable","fixedStart":false}}}`, source); got != want {
+	want = swapped(t, want, "SetPlayerRaceSelectable(Player(0), false)", "SetPlayerRaceSelectable(Player(0), true)")
+	if got := inLine(t, `{"players":{"0":{"name":"Hero","race":"selectable","fixedStart":false}}}`, source); got != want {
 		t.Error("player 0's edits differ")
 	}
-	unforced := replaced(t, source, "ForcePlayerStartLocation(Player(1), 1)\r\n", "")
-	if got := patchLua(t, `{"players":{"1":{"fixedStart":true}}}`, unforced); got != source {
+	unforced := swapped(t, source, "ForcePlayerStartLocation(Player(1), 1)\r\n", "")
+	if got := inLine(t, `{"players":{"1":{"fixedStart":true}}}`, unforced); got != source {
 		t.Error("forcing player 1's start location did not restore the editor's call")
 	}
 	// Player 11 is the fifth record, so its start location is 4; an existing matching call is kept.
-	if got := patchLua(t, `{"players":{"11":{"fixedStart":true,"controller":"computer"}}}`, source); got != source {
+	if got := inLine(t, `{"players":{"11":{"fixedStart":true,"controller":"computer"}}}`, source); got != source {
 		t.Error("settings equal to the map's changed the Lua")
 	}
 	// A name changes only war3map.w3i; an existing SetPlayerName call is left alone.
-	named := replaced(t, source, "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
+	named := swapped(t, source, "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
 		"SetPlayerColor(Player(1), ConvertPlayerColor(1))\r\nSetPlayerName(Player(1), \"TRIGSTR_006\")")
-	want = replaced(t, named, "SetPlayerController(Player(1), MAP_CONTROL_USER)",
+	want = swapped(t, named, "SetPlayerController(Player(1), MAP_CONTROL_USER)",
 		"SetPlayerController(Player(1), MAP_CONTROL_RESCUABLE)")
-	if got := patchLua(t, `{"players":{"1":{"name":"Tab\there ✓","controller":"rescuable"}}}`, named); got != want {
+	document := `{"players":{"1":{"name":"Tab\there ` + "\xe2\x9c\x93" + `","controller":"rescuable"}}}`
+	if got := inLine(t, document, named); got != want {
 		t.Error("a name and controller edit differ")
 	}
-	if got := patchLua(t, `{"players":{"0":{"name":"Hero"}}}`, source); got != source {
+	if got := inLine(t, `{"players":{"0":{"name":"Hero"}}}`, source); got != source {
 		t.Error("a player name changed the Lua")
 	}
 }
 
+func TestAnAddedCallStandsAndEndsAsTheCallItFollows(t *testing.T) {
+	notHeld := swapped(t, fixtureLua(t), "ForcePlayerStartLocation(Player(1), 1)\r\n", "")
+	oneLine := strings.ReplaceAll(swapped(t, notHeld, "--\r\n", ""), "\r\n", " ")
+	for _, c := range []struct{ source, want string }{
+		{strings.ReplaceAll(notHeld, "\r\n", "\n"),
+			"\nSetPlayerStartLocation(Player(1), 1)\nForcePlayerStartLocation(Player(1), 1)\nSetPlayerColor"},
+		{strings.ReplaceAll(notHeld, ")\r\n", ");\r\n"),
+			"\r\nSetPlayerStartLocation(Player(1), 1);\r\nForcePlayerStartLocation(Player(1), 1);\r\nSetPlayerColor"},
+		{strings.ReplaceAll(notHeld, "\r\n", "\r\n\t  "),
+			"\r\n\t  SetPlayerStartLocation(Player(1), 1)\r\n\t  ForcePlayerStartLocation(Player(1), 1)\r\n\t  SetPlayerColor"},
+		{oneLine, " SetPlayerStartLocation(Player(1), 1) ForcePlayerStartLocation(Player(1), 1) SetPlayerColor"},
+		{strings.ReplaceAll(oneLine, ") ", "); "),
+			" SetPlayerStartLocation(Player(1), 1); ForcePlayerStartLocation(Player(1), 1); SetPlayerColor"},
+	} {
+		if script := inLine(t, `{"players":{"1":{"fixedStart":true}}}`, c.source); !strings.Contains(script, c.want) {
+			t.Errorf("the patched Lua lacks %q", c.want)
+		}
+	}
+}
+
 func TestStartCoordinatesUseEffectiveFloat32MapInfoValues(t *testing.T) {
-	lua := patchLua(t, `{"players":{"11":{"x":0.1}}}`, fixtureLua(t))
+	script := inLine(t, `{"players":{"11":{"x":0.1}}}`, fixtureLua(t))
 	for _, line := range []string{
 		"DefineStartLocation(4, 0.10000000149011612, -896)\r\n",
 		"DefineStartLocation(0, 128.0, -896.0)\r\n",
 	} {
-		if !strings.Contains(lua, line) {
+		if !strings.Contains(script, line) {
 			t.Errorf("the patched Lua lacks %q", line)
 		}
 	}
-	fog := patchLua(t, `{"environment":{"fog":{"enabled":true,"start":0,"density":0.3,"color":[255,0,51,128]}}}`, fixtureLua(t))
+	fog := inLine(t, `{"environment":{"fog":{"enabled":true,"start":0,"density":0.3,"color":[255,0,51,128]}}}`, fixtureLua(t))
 	if want := "SetTerrainFogEx(0, 0, 5000, 0.30000001192092896, 1, 0, 0.2)\r\nCreateAllUnits()"; !strings.Contains(fog, want) {
 		t.Errorf("the patched Lua lacks %q", want)
 	}
 }
 
+// withFogEnd is the fixture's map info with the fog ending at the value, and the fog shown.
+func withFogEnd(t *testing.T, end float32) []byte {
+	t.Helper()
+	data := fixtureInfo(t)
+	info := readInfo(t, data, w3i.Extended)
+	binary.LittleEndian.PutUint32(data[info.Details.Fog.End.Start:], math.Float32bits(end))
+	binary.LittleEndian.PutUint32(data[info.Flags.Start:], uint32(info.Flags.Value|fogOn))
+	return data
+}
+
+func TestANumberIsWrittenInPlainDecimalHoweverSmallOrLargeAndAZeroAsZero(t *testing.T) {
+	for _, c := range []struct{ document, want string }{
+		{`{"players":{"0":{"x":-0.0000001,"y":3e-7}}}`,
+			"DefineStartLocation(0, -0.00000010000000116860974, 0.0000003000000106112566)\r\n"},
+		// The map info holds 0.000001 as the nearest float32, which is below it.
+		{`{"players":{"0":{"x":0.000001,"y":0.0000011}}}`,
+			"DefineStartLocation(0, 0.0000009999999974752427, 0.0000010999999631167157)\r\n"},
+		{`{"environment":{"fog":{"enabled":true,"start":-0.000001,"density":1e-7}}}`,
+			"SetTerrainFogEx(0, -0.0000009999999974752427, 5000, 0.00000010000000116860974, 0, 0, 0)\r\n"},
+		// A zero below 0, set as one or left of a value too small for the map info, is the one zero.
+		{`{"players":{"0":{"x":-0.0,"y":0}}}`, "DefineStartLocation(0, 0, 0)\r\n"},
+		{`{"players":{"0":{"x":1e-46,"y":-1e-46}}}`, "DefineStartLocation(0, 0, 0)\r\n"},
+		{`{"environment":{"fog":{"enabled":true,"start":-0.0,"end":-0.0,"density":-0.0,"color":[1,2,3,4]}}}`,
+			"SetTerrainFogEx(0, 0, 0, 0, 0.00392156862745098, 0.00784313725490196, 0.011764705882352941)\r\n"},
+	} {
+		if script := inLine(t, c.document, fixtureLua(t)); !strings.Contains(script, c.want) {
+			t.Errorf("%s: the patched Lua lacks %q", c.document, c.want)
+		}
+	}
+	// No setting is that large: only a map's own fog can be.
+	s := settingsOf(t, `{"environment":{"fog":{"start":0}}}`)
+	info, err := patchInfo(withFogEnd(t, 1e30), s, infoFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	script, err := afterInfo(fixtureLua(t), s, info)
+	if want := "SetTerrainFogEx(0, 0, 1000000015047466200000000000000, 0.5, 0, 0, 0)\r\n"; err != nil || !strings.Contains(script, want) {
+		t.Errorf("the patched Lua lacks %q: %v", want, err)
+	}
+}
+
+// unsafeShapes are changes to the fixture's script after which a setting does not go in, with the words that
+// tell each refusal from the others.
+var unsafeShapes = []struct{ document, old, new, words string }{
+	{`{"info":{"name":"x"}}`, `SetMapName("TRIGSTR_001")`, `SetMapName("TRIGSTR_001", 1)`,
+		"SetMapName in config() must have 1 argument(s)"},
+	{`{"players":{"1":{"controller":"computer"}}}`, "SetPlayerStartLocation(Player(1), 1)", "SetPlayerStartLocation(Player(1), 2)",
+		"must call SetPlayerStartLocation(Player(1), 1) to match"},
+	{`{"players":{"1":{"controller":"computer"}}}`, "SetPlayerStartLocation(Player(1), 1)\r\n", "",
+		"must call SetPlayerStartLocation(Player(1), 1) to match"},
+	{`{"players":{"0":{"controller":"computer"}}}`, "SetPlayerController(Player(0), MAP_CONTROL_USER)",
+		"SetPlayerController(Player(0 + 0), MAP_CONTROL_USER)",
+		"cannot identify the player in a SetPlayerController call in InitCustomPlayerSlots()"},
+	{`{"players":{"0":{"controller":"computer"}}}`, "SetPlayerController(Player(1), MAP_CONTROL_USER)",
+		"SetPlayerController(p, MAP_CONTROL_USER)",
+		"cannot identify the player in a SetPlayerController call in InitCustomPlayerSlots()"},
+	{`{"players":{"0":{"x":1}}}`, "DefineStartLocation(0,", "DefineStartLocation(zero,",
+		"cannot identify a DefineStartLocation index in config()"},
+	{`{"players":{"0":{"x":1}}}`, "DefineStartLocation(1,", "DefineStartLocation(0,",
+		"exactly one direct DefineStartLocation(0) in config() call, found 2"},
+	{`{"players":{"0":{"fixedStart":false}}}`, "ForcePlayerStartLocation(Player(0), 0)",
+		"ForcePlayerStartLocation(Player(0), 0)\r\nForcePlayerStartLocation(Player(0), 0)",
+		"at most one ForcePlayerStartLocation(Player(0)) call, found 2"},
+	{`{"players":{"0":{"fixedStart":true}}}`, "ForcePlayerStartLocation(Player(0), 0)", "ForcePlayerStartLocation(Player(0), 1)",
+		"ForcePlayerStartLocation(Player(0)) must use start location 0"},
+	{`{"players":{"0":{"race":"orc"}}}`, "SetPlayerRaceSelectable(Player(0), false)\r\n", "",
+		"exactly one direct SetPlayerRaceSelectable(Player(0)) call, found 0"},
+	{`{"players":{"0":{"name":"x"}}}`, "InitCustomPlayerSlots()\r\nInitCustomTeams()", "InitCustomTeams()",
+		"exactly one direct InitCustomPlayerSlots in config() call, found 0"},
+	{`{"forces":{"0":{"allied":true}}}`, "SetPlayerTeam(Player(3), 0)", "SetPlayerTeam(Player(3), 1)",
+		"SetPlayerTeam(Player(3), 1) disagrees with force 0"},
+	{`{"forces":{"1":{"allied":true}}}`, "SetPlayerTeam(Player(3), 0)", "SetPlayerTeam(Player(3), 1)",
+		"SetPlayerTeam(Player(3), 1) disagrees with force 1"},
+	{`{"forces":{"0":{"allied":true}}}`, "SetPlayerTeam(Player(3), 0)\r\n", "",
+		"must call SetPlayerTeam(Player(3), 0) exactly once"},
+	{`{"forces":{"0":{"allied":true}}}`, "SetPlayerTeam(Player(3), 0)", "SetPlayerTeam(Player(3), team)",
+		"cannot identify the player and team of a SetPlayerTeam call"},
+	{`{"forces":{"0":{"allied":true}}}`, "InitCustomTeams()\r\nInitAllyPriorities()", "InitAllyPriorities()",
+		"exactly one direct InitCustomTeams in config() call, found 0"},
+	{`{"environment":{"waterColor":[1,2,3,4]}}`, "CreateAllUnits()\r\nInitBlizzard()\r\n", "",
+		"main() must call CreateAllUnits() or InitBlizzard() directly"},
+	{`{"environment":{"waterColor":[1,2,3,4]}}`, "CreateAllUnits()\r\nInitBlizzard()", "CreateAllUnits(1)\r\nInitBlizzard()",
+		"CreateAllUnits in main() must have 0 argument(s)"},
+	{`{"environment":{"waterColor":[1,2,3,4]}}`, "CreateAllUnits()\r\nInitBlizzard()",
+		"SetWaterBaseColor(1, 2, 3)\r\nCreateAllUnits()\r\nInitBlizzard()",
+		"SetWaterBaseColor in main() must have 4 argument(s)"},
+	{`{"environment":{"soundEnvironment":"Cave"}}`, "CreateAllUnits()\r\nInitBlizzard()",
+		"NewSoundEnvironment(\"Second\")\r\nCreateAllUnits()\r\nInitBlizzard()",
+		"at most one NewSoundEnvironment in main() call, found 2"},
+	{`{"environment":{"fog":{"enabled":false}}}`, "CreateAllUnits()\r\nInitBlizzard()",
+		"ResetTerrainFog(1)\r\nCreateAllUnits()\r\nInitBlizzard()",
+		"ResetTerrainFog in main() must have 0 argument(s)"},
+	// More than the shapes above: a team that is no whole number or the zero below 0, a statement after which
+	// nothing may follow, and a script that does not read.
+	{`{"forces":{"1":{"allied":true}}}`, "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), 0.5)",
+		"SetPlayerTeam(Player(11), 0.5) disagrees with force 1"},
+	{`{"forces":{"1":{"allied":true}}}`, "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), -0.0)",
+		"SetPlayerTeam(Player(11), 0) disagrees with force 1"},
+	{`{"forces":{"0":{"allied":true}}}`, "SetPlayerTeam(Player(11), 1)\r\nend", "SetPlayerTeam(Player(11), 1)\r\nreturn\r\nend",
+		"the edited script could not be read back safely"},
+	{`{"info":{"name":"x"}}`, "function InitGlobals()", "function InitGlobals(((",
+		"Cannot safely read map Lua"},
+}
+
 func TestUnsafePlayerTeamAndEnvironmentShapesAreRefused(t *testing.T) {
 	source := fixtureLua(t)
-	computer0 := `{"players":{"0":{"controller":"computer"}}}`
-	computer1 := `{"players":{"1":{"controller":"computer"}}}`
-	allied0 := `{"forces":{"0":{"allied":true}}}`
-	water := `{"environment":{"waterColor":[1,2,3,4]}}`
-	units := "CreateAllUnits()\r\nInitBlizzard()"
-	for _, c := range []struct{ document, old, new string }{
-		{`{"info":{"name":"x"}}`, `SetMapName("TRIGSTR_001")`, `SetMapName("TRIGSTR_001", 1)`},
-		{computer1, "SetPlayerStartLocation(Player(1), 1)", "SetPlayerStartLocation(Player(1), 2)"},
-		{computer1, "SetPlayerStartLocation(Player(1), 1)\r\n", ""},
-		{computer0, "SetPlayerController(Player(0), MAP_CONTROL_USER)", "SetPlayerController(Player(0 + 0), MAP_CONTROL_USER)"},
-		{computer0, "SetPlayerController(Player(1), MAP_CONTROL_USER)", "SetPlayerController(p, MAP_CONTROL_USER)"},
-		{`{"players":{"0":{"x":1}}}`, "DefineStartLocation(0,", "DefineStartLocation(zero,"},
-		{`{"players":{"0":{"x":1}}}`, "DefineStartLocation(1,", "DefineStartLocation(0,"},
-		{`{"players":{"0":{"fixedStart":false}}}`, "ForcePlayerStartLocation(Player(0), 0)",
-			"ForcePlayerStartLocation(Player(0), 0)\r\nForcePlayerStartLocation(Player(0), 0)"},
-		{`{"players":{"0":{"fixedStart":true}}}`, "ForcePlayerStartLocation(Player(0), 0)", "ForcePlayerStartLocation(Player(0), 1)"},
-		{`{"players":{"0":{"race":"orc"}}}`, "SetPlayerRaceSelectable(Player(0), false)\r\n", ""},
-		{`{"players":{"0":{"name":"x"}}}`, "InitCustomPlayerSlots()\r\nInitCustomTeams()", "InitCustomTeams()"},
-		{allied0, "SetPlayerTeam(Player(3), 0)", "SetPlayerTeam(Player(3), 1)"},
-		{`{"forces":{"1":{"allied":true}}}`, "SetPlayerTeam(Player(3), 0)", "SetPlayerTeam(Player(3), 1)"},
-		{allied0, "SetPlayerTeam(Player(3), 0)\r\n", ""},
-		{allied0, "SetPlayerTeam(Player(3), 0)", "SetPlayerTeam(Player(3), team)"},
-		{allied0, "InitCustomTeams()\r\nInitAllyPriorities()", "InitAllyPriorities()"},
-		{water, "CreateAllUnits()\r\nInitBlizzard()\r\n", ""},
-		{water, units, "CreateAllUnits(1)\r\nInitBlizzard()"},
-		{water, units, "SetWaterBaseColor(1, 2, 3)\r\n" + units},
-		{`{"environment":{"soundEnvironment":"Cave"}}`, units, "NewSoundEnvironment(\"Second\")\r\n" + units},
-		{`{"environment":{"fog":{"enabled":false}}}`, units, "ResetTerrainFog(1)\r\n" + units},
+	for _, c := range unsafeShapes {
+		_, err := withSettings(t, c.document, swapped(t, source, c.old, c.new))
+		failure := asError(t, err, c.document)
+		if failure.File != luaFile || failure.Hint == "" || !strings.Contains(failure.Msg, c.words) {
+			t.Errorf("%s with %q: the error names %q, hints %q and says %q, want %q in it",
+				c.document, c.new, failure.File, failure.Hint, failure.Msg, c.words)
+		}
+	}
+}
+
+func TestAScriptThatDoesNotReadIsRefusedWithItsLineAndColumn(t *testing.T) {
+	source := swapped(t, fixtureLua(t), "function InitGlobals()", "function InitGlobals(((")
+	_, err := withSettings(t, `{"info":{"name":"x"}}`, source)
+	failure := asError(t, err, "a script that does not read")
+	if failure.File != luaFile || failure.Line != 4 || failure.Column != 22 || failure.Msg != "Cannot safely read map Lua: expected a name" {
+		t.Errorf("the error is %+v", failure)
+	}
+	_, err = patchMinimap(source, luaFile)
+	if again := asError(t, err, "a script that does not read"); *again != *failure {
+		t.Errorf("the minimap call is refused with %+v, the settings with %+v", again, failure)
+	}
+}
+
+func TestATeamInARefusalIsWrittenInPlainDecimal(t *testing.T) {
+	for team, want := range map[string]string{
+		"0.0000005": "SetPlayerTeam(Player(11), 0.0000005) disagrees with force 1",
+		"1e21":      "SetPlayerTeam(Player(11), 1000000000000000000000) disagrees with force 1",
 	} {
-		e := refusesLua(t, c.document, replaced(t, source, c.old, c.new))
-		if !strings.HasPrefix(e.Msg, "Cannot apply map settings to Lua: ") || e.Hint == "" {
-			t.Errorf("%s with %q: %+v", c.document, c.new, e)
+		source := swapped(t, fixtureLua(t), "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), "+team+")")
+		if failure := refusedLua(t, `{"forces":{"1":{"allied":true}}}`, source); !strings.Contains(failure.Msg, want) {
+			t.Errorf("the error says %q, want %q in it", failure.Msg, want)
+		}
+	}
+}
+
+func TestAScriptThatNoLongerReadsAfterTheEditsIsRefusedWithWhatIsWrongWithIt(t *testing.T) {
+	source := swapped(t, fixtureLua(t), "SetPlayerTeam(Player(11), 1)\r\nend", "SetPlayerTeam(Player(11), 1)\r\nreturn\r\nend")
+	failure := refusedLua(t, `{"forces":{"0":{"allied":true}}}`, source)
+	var cause *diag.Error
+	if !errors.As(failure.Cause, &cause) || cause.File != luaFile || !strings.Contains(cause.Msg, "return must end its block") {
+		t.Errorf("the cause is %v", failure.Cause)
+	}
+}
+
+func TestTheFirstOfSeveralRefusalsIsTheOneReported(t *testing.T) {
+	source := swapped(t, fixtureLua(t), `SetMapName("TRIGSTR_001")`, `SetMapName("TRIGSTR_001", 1)`)
+	source = swapped(t, source, "SetPlayerStartLocation(Player(1), 1)\r\n", "")
+	source = swapped(t, source, "CreateAllUnits()\r\nInitBlizzard()\r\n", "")
+	everything := `{"info":{"name":"x","description":"y"},"players":{"1":{"controller":"computer"}},
+		"forces":{"7":{"allied":true}},"environment":{"waterColor":[1,2,3,4]}}`
+	s := settingsOf(t, everything)
+	_, err := patchLua(source, s, readInfo(t, fixtureInfo(t), w3i.Extended), luaFile)
+	if failure := asError(t, err, everything); !strings.Contains(failure.Msg, "SetMapName in config() must have 1 argument(s)") {
+		t.Errorf("the error says %q", failure.Msg)
+	}
+	s.Info = manifest.Info{}
+	_, err = patchLua(source, s, readInfo(t, fixtureInfo(t), w3i.Extended), luaFile)
+	if failure := asError(t, err, everything); !strings.Contains(failure.Msg, "must call SetPlayerStartLocation(Player(1), 1)") {
+		t.Errorf("without the name, the error says %q", failure.Msg)
+	}
+}
+
+func TestAPlayerOrAForceTheMapInfoLacksIsRefusedWithWhatToCreate(t *testing.T) {
+	info := readInfo(t, fixtureInfo(t), w3i.Extended)
+	for _, c := range []struct{ document, words, hint string }{
+		{`{"players":{"7":{"controller":"computer"}}}`, "player 7 does not exist in war3map.w3i", "Create this player slot"},
+		{`{"forces":{"2":{"allied":true}}}`, "force 2 does not exist in war3map.w3i", "Create this force"},
+	} {
+		_, err := patchLua(fixtureLua(t), settingsOf(t, c.document), info, luaFile)
+		failure := asError(t, err, c.document)
+		if failure.File != luaFile || !strings.Contains(failure.Msg, c.words) || !strings.Contains(failure.Hint, c.hint) {
+			t.Errorf("%s: the error names %q, says %q and hints %q", c.document, failure.File, failure.Msg, failure.Hint)
 		}
 	}
 }
 
 func TestForceFlagEditsAppendEffectiveStatesAfterTheEditorsCalls(t *testing.T) {
-	lua := patchLua(t,
+	script := inLine(t,
 		`{"forces":{"0":{"allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true},"1":{}}}`,
 		fixtureLua(t))
 	var want strings.Builder
@@ -249,129 +473,266 @@ func TestForceFlagEditsAppendEffectiveStatesAfterTheEditorsCalls(t *testing.T) {
 			}
 		}
 	}
-	if got := teamsTail(lua); got != want.String() {
+	if got := teamsTail(script); got != want.String() {
 		t.Errorf("the appended team states are\n%q\nwant\n%q", got, want.String())
 	}
-	if !strings.Contains(lua, "SetPlayerAllianceStateAllyBJ(Player(0), Player(1), true)\r\n") {
+	if !strings.Contains(script, "SetPlayerAllianceStateAllyBJ(Player(0), Player(1), true)\r\n") {
 		t.Error("the editor's own alliance calls are gone")
 	}
 	// Force 1 has one member: only its allied-victory state (inherited false) is written.
-	one := teamsTail(patchLua(t, `{"forces":{"1":{"sharedVision":true}}}`, fixtureLua(t)))
+	one := teamsTail(inLine(t, `{"forces":{"1":{"sharedVision":true}}}`, fixtureLua(t)))
 	if one != "SetPlayerState(Player(11), PLAYER_STATE_ALLIED_VICTORY, 0)\r\n" {
 		t.Errorf("force 1's states are %q", one)
 	}
 }
 
+// indentedMain is a script that is one main(), indented, with two fog calls on one line.
+const indentedMain = "function main()\n  SetTerrainFogEx(0, 1, 2, 0.5, 1, 1, 1) ResetTerrainFog()\n  NewSoundEnvironment(\"Old\")\n  InitBlizzard()\nend\n"
+
 func TestEnvironmentEditsReplaceOldInitializationImmediatelyBeforeTheAnchor(t *testing.T) {
 	source := fixtureLua(t)
-	want := replaced(t, source, "NewSoundEnvironment(\"Default\")\r\n", "")
-	want = replaced(t, want, "CreateAllUnits()\r\nInitBlizzard()",
+	want := swapped(t, source, "NewSoundEnvironment(\"Default\")\r\n", "")
+	want = swapped(t, want, "CreateAllUnits()\r\nInitBlizzard()",
 		"NewSoundEnvironment(\"Default\")\r\nResetTerrainFog()\r\nCreateAllUnits()\r\nInitBlizzard()")
-	if got := patchLua(t, `{"environment":{"soundEnvironment":"","fog":{"enabled":false}}}`, source); got != want {
+	if got := inLine(t, `{"environment":{"soundEnvironment":"","fog":{"enabled":false}}}`, source); got != want {
 		t.Error("the environment edit differs")
 	}
-	custom := "function main()\n  SetTerrainFogEx(0, 1, 2, 0.5, 1, 1, 1) ResetTerrainFog()\n  NewSoundEnvironment(\"Old\")\n  InitBlizzard()\nend\n"
-	got := patchLua(t, `{"environment":{"soundEnvironment":"Cave","fog":{"enabled":true}}}`, custom)
+	got := inLine(t, `{"environment":{"soundEnvironment":"Cave","fog":{"enabled":true}}}`, indentedMain)
 	wantCustom := "function main()\n  ; ;\n  NewSoundEnvironment(\"Cave\")\n  SetTerrainFogEx(0, 3000, 5000, 0.5, 0, 0, 0)\n  InitBlizzard()\nend\n"
 	if got != wantCustom {
 		t.Errorf("patched = %q, want %q", got, wantCustom)
 	}
 }
 
+// joinable are scripts in which taking a call out could join the statements around it, with what the script
+// must be up to the place where the fog is set.
+var joinable = []struct{ source, want string }{
+	{"function main()\nx = b\nResetTerrainFog();(f)()\nInitBlizzard()\nend", "function main()\nx = b\n;(f)()\n"},
+	{"function main()\nx = b\nResetTerrainFog();\n(f)()\nInitBlizzard()\nend", "function main()\nx = b\n;\n(f)()\n"},
+	{"function main()\nx = b\nResetTerrainFog() -- c\ny()\nInitBlizzard()\nend", "function main()\nx = b\n; -- c\ny()\n"},
+}
+
 func TestRemovingACallNeverJoinsTheStatementsAroundIt(t *testing.T) {
-	for _, c := range []struct{ source, want string }{
-		{"function main()\nx = b\nResetTerrainFog();(f)()\nInitBlizzard()\nend", "function main()\nx = b\n;(f)()\n"},
-		{"function main()\nx = b\nResetTerrainFog();\n(f)()\nInitBlizzard()\nend", "function main()\nx = b\n;\n(f)()\n"},
-		{"function main()\nx = b\nResetTerrainFog() -- c\ny()\nInitBlizzard()\nend", "function main()\nx = b\n; -- c\ny()\n"},
-	} {
-		lua := patchLua(t, `{"environment":{"fog":{"enabled":false}}}`, c.source)
-		if want := c.want + "ResetTerrainFog()\nInitBlizzard()\nend"; lua != want {
-			t.Errorf("patched = %q, want %q", lua, want)
+	for _, c := range joinable {
+		script := inLine(t, `{"environment":{"fog":{"enabled":false}}}`, c.source)
+		if want := c.want + "ResetTerrainFog()\nInitBlizzard()\nend"; script != want {
+			t.Errorf("patched = %q, want %q", script, want)
 		}
-		mainCalls(t, lua)
+		mainCalls(t, script)
 	}
 }
 
-func TestLuaStringsEscapeQuotesBackslashesAndControlCharactersAsDecimalEscapes(t *testing.T) {
+func TestTextsAreWrittenWithQuotesBackslashesAndControlCharactersEscaped(t *testing.T) {
 	for input, want := range map[string]string{
-		"Back\\slash \"q\" \t\x7f ✓ 雪 😀": `"Back\\slash \"q\" \009\127 ✓ 雪 😀"`,
-		"\r\n1\x001":                     `"\013\0101\0001"`,
-		"":                               `""`,
+		"Back\\slash \"q\" \t\x7f \xe2\x9c\x93 \xe9\x9b\xaa \xf0\x9f\x98\x80": `"Back\\slash \"q\" \009\127 ` + "\xe2\x9c\x93 \xe9\x9b\xaa \xf0\x9f\x98\x80" + `"`,
+		"\r\n1\x001": `"\013\0101\0001"`,
+		"\n123":      `"\010123"`,
+		"":           `""`,
 	} {
-		if got := settings.LuaString(input); got != want {
-			t.Errorf("LuaString(%q) = %s, want %s", input, got, want)
+		// The map info is given as read, with the text put in by hand: one with a NUL cannot be stored in the file.
+		info := readInfo(t, fixtureInfo(t), w3i.Extended)
+		info.Name.Value, info.Description.Value, info.Details.SoundEnvironment.Value = input, input, input
+		s := settingsOf(t, `{"info":{"name":"x","description":"x"},"environment":{"soundEnvironment":"x"}}`)
+		script, err := patchLua(fixtureLua(t), s, info, luaFile)
+		if err != nil {
+			t.Fatalf("%q: %v", input, err)
+		}
+		for _, call := range []string{"SetMapName(" + want + ")\r\n", "SetMapDescription(" + want + ")\r\n"} {
+			if !strings.Contains(script, call) {
+				t.Errorf("the patched Lua lacks %s", call)
+			}
+		}
+		// An empty sound environment is the game's default one.
+		if input == "" {
+			want = `"Default"`
+		}
+		if call := "NewSoundEnvironment(" + want + ")\r\nCreateAllUnits()"; !strings.Contains(script, call) {
+			t.Errorf("the patched Lua lacks %s", call)
 		}
 	}
 }
 
 func TestUnreadablePatchedMapInfoIsReportedAgainstTheMapInfoFile(t *testing.T) {
-	s := validated(t, `{"info":{"name":"X"}}`)
-	_, err := settings.PatchLua(fixtureLua(t), s, []byte{1, 2}, "maps/m/war3map.lua", "maps/m/war3map.w3i")
-	if e := asError(t, err, "a cut-off map info"); e.File != "maps/m/war3map.w3i" {
-		t.Errorf("the error names %q", e.File)
+	_, err := afterInfo(fixtureLua(t), settingsOf(t, `{"info":{"name":"X"}}`), []byte{1, 2})
+	if failure := asError(t, err, "a cut-off map info"); failure.File != infoFile {
+		t.Errorf("the error names %q", failure.File)
 	}
 }
 
-const minimapCall = `BlzChangeMinimapTerrainTex("war3mapMinimap.blp")`
+func TestAMapInfoWithoutWhatTheSettingsNeedIsTheCallersMistake(t *testing.T) {
+	basic := readInfo(t, fixtureInfo(t), w3i.Basic)
+	for document, info := range map[string]*w3i.Info{
+		`{"info":{"name":"X"}}`:                       nil,
+		`{"players":{"0":{"name":"Hero"}}}`:           basic,
+		`{"forces":{"0":{"allied":true}}}`:            basic,
+		`{"environment":{"soundEnvironment":"Cave"}}`: basic,
+	} {
+		_, err := patchLua(fixtureLua(t), settingsOf(t, document), info, luaFile)
+		var expected *diag.Error
+		if err == nil || errors.As(err, &expected) {
+			t.Errorf("%s: got %v, want an error that is not a diag error", document, err)
+		}
+	}
+	// The name and the description need no more than every map info has.
+	if _, err := patchLua(fixtureLua(t), settingsOf(t, `{"info":{"name":"X"}}`), basic, luaFile); err != nil {
+		t.Error(err)
+	}
+}
 
 func TestTheMinimapCallBecomesTheLastStatementOfMainOnALineOfItsOwn(t *testing.T) {
-	lua := fixtureLua(t)
-	patched, err := settings.PatchMinimapLua(lua, "war3map.lua")
+	script := fixtureLua(t)
+	result, err := patchMinimap(script, luaFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(patched) != len(lua)+len(minimapCall)+2 {
-		t.Errorf("the patch added %d bytes", len(patched)-len(lua))
+	if len(result) != len(script)+len(minimapCall)+2 {
+		t.Errorf("the patch added %d bytes", len(result)-len(script))
 	}
-	if !strings.Contains(patched, "RunInitializationTriggers()\r\n"+minimapCall+"\r\nend\r\n") {
+	if !strings.Contains(result, "RunInitializationTriggers()\r\n"+minimapCall+"\r\nend\r\n") {
 		t.Error("the call is not the last line of main")
 	}
-	calls := mainCalls(t, patched)
+	calls := mainCalls(t, result)
 	if n := len(calls); calls[n-1] != "BlzChangeMinimapTerrainTex" || calls[n-2] != "RunInitializationTriggers" {
 		t.Errorf("main calls %q", calls)
 	}
 	// The other functions are untouched: the call is in main alone.
-	if strings.Count(patched, minimapCall) != 1 {
+	if strings.Count(result, minimapCall) != 1 {
 		t.Error("the call was added more than once")
 	}
 }
 
+// minimapSources are scripts whose main() takes the minimap call, with what each becomes.
+var minimapSources = map[string]string{
+	"function main()\r\n  InitBlizzard()\r\n  end\r\n": "function main()\r\n  InitBlizzard()\r\n  " + minimapCall + "\r\n  end\r\n",
+	"function main()\nend\n":                           "function main()\n" + minimapCall + "\nend\n",
+	"function main() InitBlizzard() end":               "function main() InitBlizzard() " + minimapCall + " end",
+}
+
 func TestTheMinimapCallKeepsTheScriptsLineEndingAndTheIndentationOfMainsEnd(t *testing.T) {
-	for source, want := range map[string]string{
-		"function main()\r\n  InitBlizzard()\r\n  end\r\n": "function main()\r\n  InitBlizzard()\r\n  " + minimapCall + "\r\n  end\r\n",
-		"function main()\nend\n":                           "function main()\n" + minimapCall + "\nend\n",
-		"function main() InitBlizzard() end":               "function main() InitBlizzard() " + minimapCall + " end",
-	} {
-		if got, err := settings.PatchMinimapLua(source, "war3map.lua"); err != nil || got != want {
-			t.Errorf("PatchMinimapLua(%q) = %q, %v", source, got, err)
+	for source, want := range minimapSources {
+		if got, err := patchMinimap(source, luaFile); err != nil || got != want {
+			t.Errorf("patchMinimap(%q) = %q, %v", source, got, err)
 		}
 	}
 }
 
+// withoutOneMain are scripts that do not take the minimap call, with how many main() each has.
+var withoutOneMain = map[string]int{
+	"function config()\nend\n":                     0,
+	"function main()\nend\nfunction main()\nend\n": 2,
+}
+
 func TestTheMinimapCallNeedsExactlyOneGlobalMain(t *testing.T) {
-	for source, count := range map[string]int{
-		"function config()\nend\n":                     0,
-		"function main()\nend\nfunction main()\nend\n": 2,
-	} {
-		_, err := settings.PatchMinimapLua(source, "map/war3map.lua")
-		e := asError(t, err, source)
+	for source, count := range withoutOneMain {
+		_, err := patchMinimap(source, luaFile)
+		failure := asError(t, err, source)
 		want := fmt.Sprintf("expected exactly one global function main(), found %d.", count)
-		if !strings.Contains(e.Msg, want) || e.File != "map/war3map.lua" || e.Hint == "" {
-			t.Errorf("error = %+v", e)
+		if !strings.Contains(failure.Msg, want) || failure.File != luaFile || failure.Hint == "" {
+			t.Errorf("error = %+v", failure)
 		}
+	}
+	_, err := patchMinimap("function main(", luaFile)
+	if failure := asError(t, err, "a script that does not read"); failure.File != luaFile {
+		t.Errorf("the error names %q", failure.File)
+	}
+}
+
+// The scripts whose main() ends in a return. After a return that gives a value no statement can stand; a return
+// that gives none takes the call as its value, which Lua then makes.
+const (
+	mainReturnsValue = "function main()\n  InitBlizzard()\n  return 1\nend\n"
+	mainReturns      = "function main()\n  InitBlizzard()\n  return\nend\n"
+)
+
+func TestTheMinimapCallIsRefusedWhereItWouldStandAfterAReturnedValue(t *testing.T) {
+	_, err := patchMinimap(mainReturnsValue, luaFile)
+	failure := asError(t, err, mainReturnsValue)
+	if failure.File != luaFile || failure.Hint == "" || !strings.Contains(failure.Msg, "the edited script could not be read back safely") {
+		t.Errorf("the error names %q, hints %q and says %q", failure.File, failure.Hint, failure.Msg)
+	}
+	var cause *diag.Error
+	if !errors.As(failure.Cause, &cause) || !strings.Contains(cause.Msg, "return must end its block") {
+		t.Errorf("the cause is %v", failure.Cause)
+	}
+	want := "function main()\n  InitBlizzard()\n  return\n" + minimapCall + "\nend\n"
+	if got, err := patchMinimap(mainReturns, luaFile); err != nil || got != want {
+		t.Errorf("patchMinimap(%q) = %q, %v", mainReturns, got, err)
+	}
+}
+
+// damaged is the fixture's map info as read, with what the change does to its first player or its fog.
+func damaged(t *testing.T, change func(player *w3i.Player, fog *w3i.Fog)) *w3i.Info {
+	t.Helper()
+	info := readInfo(t, fixtureInfo(t), w3i.Extended)
+	info.Flags.Value |= fogOn
+	change(&info.Details.Players[0], &info.Details.Fog)
+	return info
+}
+
+func TestAMapInfoWithAValueTheScriptCannotTakeIsRefused(t *testing.T) {
+	nan, endless := float32(math.NaN()), float32(math.Inf(-1))
+	for _, c := range []struct {
+		document, words string
+		change          func(player *w3i.Player, fog *w3i.Fog)
+	}{
+		{`{"players":{"0":{"controller":"computer"}}}`, "player 0 has controller 9 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Controller.Value = 9 }},
+		{`{"players":{"0":{"controller":"computer"}}}`, "player 0 has controller 0 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Controller.Value = 0 }},
+		{`{"players":{"0":{"controller":"computer"}}}`, "player 0 has controller -1 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Controller.Value = -1 }},
+		{`{"players":{"0":{"race":"orc"}}}`, "player 0 has race 5 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Race.Value = 5 }},
+		{`{"players":{"0":{"race":"orc"}}}`, "player 0 has race -2 in the map info",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Race.Value = -2 }},
+		{`{"players":{"0":{"x":1}}}`, "player 0 has a start position in the map info that is not a number",
+			func(player *w3i.Player, _ *w3i.Fog) { player.Y.Value = nan }},
+		{`{"players":{"0":{"y":1}}}`, "player 0 has a start position in the map info that is not a number",
+			func(player *w3i.Player, _ *w3i.Fog) { player.X.Value = endless }},
+		{`{"environment":{"fog":{"style":1}}}`, "the fog of the map info has a start, an end or a density that is not a number",
+			func(_ *w3i.Player, fog *w3i.Fog) { fog.Density.Value = nan }},
+		{`{"environment":{"fog":{"style":1}}}`, "the fog of the map info has a start, an end or a density that is not a number",
+			func(_ *w3i.Player, fog *w3i.Fog) { fog.Start.Value = endless }},
+	} {
+		_, err := patchLua(fixtureLua(t), settingsOf(t, c.document), damaged(t, c.change), luaFile)
+		failure := asError(t, err, c.document)
+		if failure.File != luaFile || !strings.Contains(failure.Msg, c.words) || !strings.Contains(failure.Hint, "Re-save the map in World Editor") {
+			t.Errorf("%s: the error names %q, says %q and hints %q; want %q in it", c.document, failure.File, failure.Msg, failure.Hint, c.words)
+		}
+	}
+}
+
+func TestAValueOfTheMapInfoThatNoSettingMakesTheScriptTakeIsNotLookedAt(t *testing.T) {
+	broken := damaged(t, func(player *w3i.Player, fog *w3i.Fog) {
+		player.Controller.Value, player.Race.Value, player.X.Value = 9, 9, float32(math.NaN())
+		fog.End.Value = float32(math.Inf(1))
+	})
+	for _, document := range []string{
+		`{"players":{"0":{"name":"Hero","fixedStart":true},"1":{"controller":"computer","race":"orc","x":1}}}`,
+		`{"environment":{"soundEnvironment":"Cave","waterColor":[1,2,3,4]}}`,
+	} {
+		if _, err := patchLua(fixtureLua(t), settingsOf(t, document), broken, luaFile); err != nil {
+			t.Errorf("%s: %v", document, err)
+		}
+	}
+	// A fog that is not shown is reset, and none of its numbers is written.
+	broken.Flags.Value &^= fogOn
+	script, err := patchLua(fixtureLua(t), settingsOf(t, `{"environment":{"fog":{"style":1}}}`), broken, luaFile)
+	if err != nil || !strings.Contains(script, "ResetTerrainFog()\r\nCreateAllUnits()") {
+		t.Errorf("a fog that is not shown: %v", err)
 	}
 }
 
 func TestTheMinimapCallGoesInBesideTheOtherLuaSettings(t *testing.T) {
-	lua := patchLua(t, `{"info":{"name":"Both"},"environment":{"soundEnvironment":"Dungeon"}}`, fixtureLua(t))
-	patched, err := settings.PatchMinimapLua(lua, "war3map.lua")
+	script := inLine(t, `{"info":{"name":"Both"},"environment":{"soundEnvironment":"Dungeon"}}`, fixtureLua(t))
+	result, err := patchMinimap(script, luaFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(patched, `SetMapName("Both")`) || !strings.Contains(patched, `NewSoundEnvironment("Dungeon")`) {
+	if !strings.Contains(result, `SetMapName("Both")`) || !strings.Contains(result, `NewSoundEnvironment("Dungeon")`) {
 		t.Error("the other settings are gone")
 	}
-	if calls := mainCalls(t, patched); calls[len(calls)-1] != "BlzChangeMinimapTerrainTex" {
+	if calls := mainCalls(t, result); calls[len(calls)-1] != "BlzChangeMinimapTerrainTex" {
 		t.Errorf("main calls %q", calls)
 	}
 }

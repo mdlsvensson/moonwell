@@ -9,7 +9,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/mdlsvensson/moonwell/internal/mpq"
+	"github.com/mdlsvensson/moonwell/internal/war3/mpq"
 )
 
 // MPQ is an opened MPQ format-1 archive: enough of a reader to verify what Moonwell writes.

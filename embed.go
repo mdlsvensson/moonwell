@@ -7,8 +7,6 @@ import (
 	"io/fs"
 	"slices"
 	"strings"
-
-	"github.com/mdlsvensson/moonwell/internal/text"
 )
 
 //go:embed all:template
@@ -48,7 +46,7 @@ type TemplateFile struct {
 // TemplateExclude names the template files init writes itself, or never writes.
 var TemplateExclude = []string{"PklProject", "PklProject.deps.json", "moonwell.local.pkl"}
 
-// TemplateFiles returns every file init copies from the template, sorted by path.
+// TemplateFiles returns every file init copies from the template, sorted by the bytes of its path.
 func TemplateFiles() ([]TemplateFile, error) {
 	var files []TemplateFile
 	err := fs.WalkDir(templateFS, "template", func(path string, entry fs.DirEntry, err error) error {
@@ -66,7 +64,7 @@ func TemplateFiles() ([]TemplateFile, error) {
 		files = append(files, TemplateFile{Path: rel, Data: data})
 		return nil
 	})
-	slices.SortFunc(files, func(a, b TemplateFile) int { return text.Compare(a.Path, b.Path) })
+	slices.SortFunc(files, func(a, b TemplateFile) int { return strings.Compare(a.Path, b.Path) })
 	return files, err
 }
 

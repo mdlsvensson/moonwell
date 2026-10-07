@@ -1,44 +1,131 @@
 package main
 
 import (
+	"cmp"
+	"encoding/json"
 	"errors"
-	"regexp"
+	"fmt"
+	"io"
+	"os"
 	"slices"
 	"strings"
 
+	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/objects"
-	"github.com/mdlsvensson/moonwell/internal/text"
 )
 
-// GeneratedFile is one file a generator renders: its path from the checkout, with "/", and its text.
-type GeneratedFile struct{ Path, Text string }
+// generatedFile is one file a mode renders: its path from the checkout, with "/", and its text.
+type generatedFile struct{ path, text string }
 
-// schemaModules is each object category's Pkl module name, as in schema/objects/<Name>.pkl.
-var schemaModules = []struct {
-	category objects.Category
-	name     string
-}{
+// schemaModule is the Pkl module of a category of objects.
+type schemaModule struct {
+	category manifest.Category
+	name     string // as in schema/objects/<name>.pkl
+}
+
+// schemaModules is the module of each category, in the order of the categories.
+var schemaModules = []schemaModule{
 	{"heroes", "Hero"}, {"units", "Unit"}, {"buildings", "Building"}, {"items", "Item"},
 	{"abilities", "Ability"}, {"buffs", "Buff"}, {"upgrades", "Upgrade"},
 }
 
-// schemaReserved are the names an object module already has: Object.pkl's properties, the category's id, and Pkl's
-// module property output.
-var schemaReserved = []string{"id", "base", "source", "properties", "output"}
+// writeSchema is the mode without a name: it writes schema/generated/ from the object metadata of the checkout,
+// and removes whatever else lies there, since the folder holds nothing but the schema. It prints a line for each
+// file it wrote, which is none for a file that was as rendered, and for each entry it removed. It writes and
+// removes nothing when a field's name cannot be a property.
+func writeSchema(checkout string, _ []string, out io.Writer) error {
+	metadata, err := readMetadata(checkout)
+	if err != nil {
+		return err
+	}
+	files, err := renderSchema(metadata)
+	if err != nil {
+		return err
+	}
+	if err := writeGenerated(checkout, files, out); err != nil {
+		return err
+	}
+	return removeOthers(checkout, files, out)
+}
 
-// pklKeywords are Pkl 0.32's keywords and the words it reserves for future use.
-var pklKeywords = strings.Fields("abstract amends as case class const delete else extends external false fixed for " +
-	"function hidden if import in is let local module new nothing null open out outer override private protected " +
-	"public read record super switch this throw trace true typealias unknown vararg when")
+// readMetadata reads the object metadata of a checkout: its data/metadata.json, and not the one this program
+// was built with.
+func readMetadata(checkout string) (*objects.Metadata, error) {
+	data, err := os.ReadFile(fileIn(checkout, metadataPath))
+	if err != nil {
+		return nil, errInCheckout(checkout, metadataPath, err)
+	}
+	return decodeMetadata(data)
+}
 
-var (
-	pklIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
-	spaces        = regexp.MustCompile(text.SpaceClass + `+`)
-)
+// decodeMetadata reads the text of a data/metadata.json. The bytes go to the decoder as they are.
+func decodeMetadata(data []byte) (*objects.Metadata, error) {
+	var metadata objects.Metadata
+	if err := json.Unmarshal(data, &metadata); err != nil {
+		return nil, errNoJSON(metadataPath, err)
+	}
+	return &metadata, nil
+}
 
-// typedFields are the fields that get a typed property in a category's module: ability-specific fields go through
-// properties.
-func typedFields(metadata *objects.Metadata, category objects.Category) []objects.FieldMeta {
+// writeGenerated writes each file that the checkout does not hold as it is rendered, and prints a line for each
+// it wrote.
+func writeGenerated(checkout string, files []generatedFile, out io.Writer) error {
+	for _, file := range files {
+		wrote, err := fsx.WriteIfChanged(fileIn(checkout, file.path), file.text)
+		if err != nil {
+			return errInCheckout(checkout, file.path, err)
+		}
+		if wrote {
+			fmt.Fprintln(out, "wrote "+file.path)
+		}
+	}
+	return nil
+}
+
+// removeOthers removes what the folder of the schema holds beside the files, a folder with all that is below
+// it, and prints a line for each entry it removed.
+func removeOthers(checkout string, files []generatedFile, out io.Writer) error {
+	entries, err := os.ReadDir(fileIn(checkout, schemaFolder))
+	if err != nil {
+		return errInCheckout(checkout, schemaFolder, err)
+	}
+	for _, entry := range entries {
+		path := schemaFolder + "/" + entry.Name()
+		if slices.ContainsFunc(files, func(file generatedFile) bool { return file.path == path }) {
+			continue
+		}
+		if err := os.RemoveAll(fileIn(checkout, path)); err != nil {
+			return errInCheckout(checkout, path, err)
+		}
+		fmt.Fprintln(out, "removed "+path)
+	}
+	return nil
+}
+
+// renderSchema renders schema/generated/<Name>Props.pkl for each category of objects. It fails for a name no
+// Pkl property can have, and for one that two fields of a module share.
+func renderSchema(metadata *objects.Metadata) ([]generatedFile, error) {
+	var files []generatedFile
+	var problems []string
+	for _, module := range schemaModules {
+		fields := typedFields(metadata, module.category)
+		problems = append(problems, unusableNames(module.name+"Props", fields)...)
+		files = append(files, generatedFile{
+			path: schemaFolder + "/" + module.name + "Props.pkl",
+			text: renderModule(metadata.Game, module, fields),
+		})
+	}
+	if len(problems) > 0 {
+		return nil, errUnusableNames(problems)
+	}
+	return files, nil
+}
+
+// typedFields is the fields that have a typed property in the module of a category, in the order the module has
+// them: by name, and by id where two share a name. A field that only the copies of some base abilities have is
+// none of them: it is set through properties.
+func typedFields(metadata *objects.Metadata, category manifest.Category) []objects.FieldMeta {
 	list, use := objects.FieldSource(category)
 	var fields []objects.FieldMeta
 	for _, field := range metadata.Fields[list] {
@@ -46,73 +133,62 @@ func typedFields(metadata *objects.Metadata, category objects.Category) []object
 			fields = append(fields, field)
 		}
 	}
+	slices.SortStableFunc(fields, func(a, b objects.FieldMeta) int {
+		return cmp.Or(strings.Compare(a.Name, b.Name), strings.Compare(a.ID, b.ID))
+	})
 	return fields
 }
 
-// displayRawcode is a rawcode as authors see it: Crs is padded with NUL to four bytes in the metadata.
-func displayRawcode(id string) string { return strings.TrimRight(id, "\x00") }
-
-// RenderSchema renders schema/generated/<Name>Props.pkl for each object category. It fails for a name no Pkl
-// property can have, or one that two fields of a module share.
-func RenderSchema(metadata *objects.Metadata) ([]GeneratedFile, error) {
-	var files []GeneratedFile
+// unusableNames is a line for each field of a module whose name no property can have, and for each that has the
+// name of the field before it. The fields are in the order of the module.
+func unusableNames(module string, fields []objects.FieldMeta) []string {
 	var problems []string
-	for _, module := range schemaModules {
-		name := module.name + "Props"
-		fields := typedFields(metadata, module.category)
-		slices.SortStableFunc(fields, func(a, b objects.FieldMeta) int {
-			if order := text.Compare(a.Name, b.Name); order != 0 {
-				return order
-			}
-			return text.Compare(a.ID, b.ID)
-		})
-		seen := map[string]objects.FieldMeta{}
-		for _, field := range fields {
-			where := name + ": field " + text.Quote(displayRawcode(field.ID)) + " (" + field.Label + ")"
-			if !pklIdentifier.MatchString(field.Name) || slices.Contains(schemaReserved, field.Name) ||
-				slices.Contains(pklKeywords, field.Name) {
-				problems = append(problems, where+" has the name "+text.Quote(field.Name)+
-					", which is reserved or not a Pkl identifier.")
-			}
-			if other, taken := seen[field.Name]; taken {
-				problems = append(problems, where+" has the name "+text.Quote(field.Name)+", as does field "+
-					text.Quote(displayRawcode(other.ID))+".")
-			}
-			seen[field.Name] = field
+	latest := map[string]objects.FieldMeta{} // the last field of each name so far
+	for _, field := range fields {
+		where := module + ": field " + fsx.Quoted(displayRawcode(field.ID)) + " (" + field.Label + ")"
+		if !pklIdentifier.MatchString(field.Name) || nameIsTaken(field.Name) {
+			problems = append(problems, noPropertyName(where, field.Name))
 		}
-		files = append(files, GeneratedFile{
-			Path: "schema/generated/" + name + ".pkl",
-			Text: renderModule(metadata, module.category, module.name, fields),
-		})
+		if other, shared := latest[field.Name]; shared {
+			problems = append(problems, sharedName(where, field.Name, other))
+		}
+		latest[field.Name] = field
 	}
-	if len(problems) > 0 {
-		return nil, errors.New("Cannot render the Pkl schema; fix the names in tools/metadata/overrides.json:\n" +
-			strings.Join(problems, "\n"))
-	}
-	return files, nil
+	return problems
 }
 
-func renderModule(metadata *objects.Metadata, category objects.Category, module string, fields []objects.FieldMeta) string {
-	what := "the fields of " + string(category)
-	if category == "abilities" {
+// displayRawcode is a rawcode as an author sees it: the one id of three letters is padded with a NUL to four
+// bytes in the metadata.
+func displayRawcode(id string) string { return strings.TrimRight(id, "\x00") }
+
+// renderModule is the text of the module of a category for a version of the game: its head, and a property with
+// its doc comment for each field.
+func renderModule(game string, module schemaModule, fields []objects.FieldMeta) string {
+	what := "the fields of " + string(module.category)
+	if module.category == "abilities" {
 		what = "the ability fields not specific to one base ability"
 	}
 	lines := []string{
-		"// GENERATED by `" + generatedBy + "` from " + metadataPath + " (game " + metadata.Game + ") — do not edit.",
+		// The dash is an em dash.
+		"// GENERATED by `" + commandLine + "` from " + metadataPath + " (game " + game + ") \xE2\x80\x94 do not edit.",
 		"",
-		"/// The typed properties of `" + module + ".pkl`: " + what + ", named after their World Editor labels.",
-		"abstract module moonwell.generated." + module + "Props",
+		"/// The typed properties of `" + module.name + ".pkl`: " + what + ", named after their World Editor labels.",
+		"abstract module moonwell.generated." + module.name + "Props",
 		"",
 		`extends "../objects/Object.pkl"`,
 	}
 	for _, field := range fields {
-		lines = append(lines, "", "/// "+oneLine(field.Label), "///", "/// "+facts(field), field.Name+": "+pklType(field))
+		property := field.Name + ": " + pklType(field)
+		lines = append(lines, "", "/// "+oneLine(field.Label), "///", "/// "+facts(field), property)
 	}
 	return strings.Join(lines, "\n") + "\n"
 }
 
+// facts is the line of a field's doc comment that says what the game knows of it: its rawcode, its category and
+// its type, and how its value is given.
 func facts(field objects.FieldMeta) string {
-	parts := []string{"Field `" + displayRawcode(field.ID) + "` (" + oneLine(field.Category) + ", `" + field.Type + "`)."}
+	rawcode, category := displayRawcode(field.ID), oneLine(field.Category)
+	parts := []string{"Field `" + rawcode + "` (" + category + ", `" + field.Type + "`)."}
 	if field.PerLevel {
 		parts = append(parts, "Per level: a `List` sets levels 1, 2, ...")
 	}
@@ -125,6 +201,8 @@ func facts(field objects.FieldMeta) string {
 	return strings.Join(parts, " ")
 }
 
+// pklType is the type of a field's property. Every property may be left out; a field with levels takes one value
+// or a list of them; and a field that is a list takes its text or the list.
 func pklType(field objects.FieldMeta) string {
 	if field.List {
 		if field.PerLevel {
@@ -147,4 +225,28 @@ func pklType(field objects.FieldMeta) string {
 	return scalar + "?"
 }
 
-func oneLine(s string) string { return text.Trim(spaces.ReplaceAllString(s, " ")) }
+// oneLine writes a text on one line: each run of ASCII white space is one space, and none stands at an end.
+func oneLine(text string) string {
+	return strings.Join(strings.FieldsFunc(text, func(r rune) bool { return strings.ContainsRune(whiteSpace, r) }), " ")
+}
+
+// ---- errors ----
+
+// errNoJSON names a file of the checkout, by its path from there, that the JSON decoder refused.
+func errNoJSON(path string, cause error) error { return errors.New(path + ": " + cause.Error()) }
+
+// errUnusableNames refuses to render the schema, with a line for each name that stands in its way.
+func errUnusableNames(problems []string) error {
+	return errors.New("Cannot render the Pkl schema; fix the names in tools/metadata/overrides.json:\n" +
+		strings.Join(problems, "\n"))
+}
+
+// noPropertyName is the line for a field, which where names, whose name no Pkl property can have.
+func noPropertyName(where, name string) string {
+	return where + " has the name " + fsx.Quoted(name) + ", which is reserved or not a Pkl identifier."
+}
+
+// sharedName is the line for a field, which where names, that has the name of another field of its module.
+func sharedName(where, name string, other objects.FieldMeta) string {
+	return where + " has the name " + fsx.Quoted(name) + ", as does field " + fsx.Quoted(displayRawcode(other.ID)) + "."
+}

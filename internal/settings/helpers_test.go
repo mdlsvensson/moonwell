@@ -1,46 +1,44 @@
-package settings_test
+package settings
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
-	"github.com/mdlsvensson/moonwell/internal/ordered"
-	"github.com/mdlsvensson/moonwell/internal/settings"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-// tree parses a JSON document into the tree the manifest is read into.
-func tree(t *testing.T, document string) any {
+// manifestName is the manifest the projects of these tests were evaluated from.
+const manifestName = "moonwell.local.pkl"
+
+// plainBlocks is what pkl prints for the blocks of a new project other than its settings. A project is decoded
+// whole, so a test that needs only settings has these around them.
+const plainBlocks = `"map":{"folder":"map.w3x","entry":"src/main.yue"},"build":{"folder":"dist/bin","minify":false},` +
+	`"launch":{"args":[]},"yue":{"version":"0.34.3"},"assets":{"paths":{},"exclude":[]},` +
+	`"lint":{"unknownGlobals":"error","globals":[]},"libraries":{},"objects":{}`
+
+// projectOf is the project in the folder root whose manifest has the document as its settings block.
+func projectOf(t testing.TB, root, document string) *manifest.Project {
 	t.Helper()
-	value, err := ordered.Decode([]byte(document))
+	project, err := manifest.Decode(root, manifestName, []byte("{"+plainBlocks+`,"settings":`+document+"}"))
 	if err != nil {
-		t.Fatalf("test JSON %s: %v", document, err)
+		t.Fatalf("settings %s: %v", document, diag.Format(err))
 	}
-	return value
+	return project
 }
 
-// validated returns the settings of a JSON document, which must be valid.
-func validated(t *testing.T, document string) *settings.Settings {
+// settingsOf is the settings a manifest has whose settings block is the document.
+func settingsOf(t testing.TB, document string) manifest.Settings {
 	t.Helper()
-	s, err := settings.Validate(tree(t, document), "")
-	if err != nil {
-		t.Fatalf("Validate(%s): %v", document, err)
-	}
-	return s
+	return projectOf(t, "", document).Settings
 }
 
-// asError returns err as a *diag.Error, failing the test when it is another kind of error or nil.
-func asError(t *testing.T, err error, what string) *diag.Error {
+// asError is err as the expected failure it must be.
+func asError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
-	var e *diag.Error
-	if !errors.As(err, &e) {
+	var failure *diag.Error
+	if !errors.As(err, &failure) {
 		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
 	}
-	return e
-}
-
-// sections builds Sections from alternating section names and key, value pairs.
-func sections(t *testing.T, document string) settings.Sections {
-	t.Helper()
-	return validated(t, `{"gameInterface":`+document+`}`).GameInterface
+	return failure
 }

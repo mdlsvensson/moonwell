@@ -1,12 +1,17 @@
 //go:build !windows
 
-package cli_test
+package cli
 
 import (
 	"os"
 	"os/exec"
 )
 
-func configureDevProcess(cmd *exec.Cmd)       {}
-func interruptDevProcess(cmd *exec.Cmd) error { return cmd.Process.Signal(os.Interrupt) }
-func processInterruptHelper()                 {}
+// apartFromTheTest has nothing to do where a signal is sent to one process.
+func apartFromTheTest(cmd *exec.Cmd) {}
+
+// interruptDev sends the program the signal that Ctrl+C sends.
+func interruptDev(cmd *exec.Cmd) error { return cmd.Process.Signal(os.Interrupt) }
+
+// sendInterrupt has nothing to do: the test sends the signal itself.
+func sendInterrupt() {}

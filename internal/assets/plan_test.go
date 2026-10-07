@@ -1,482 +1,528 @@
-package assets_test
+package assets
 
 import (
-	"bytes"
-	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/mdlsvensson/moonwell/internal/assets"
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/mapdir"
+	"github.com/mdlsvensson/moonwell/internal/testkit"
+	"github.com/mdlsvensson/moonwell/internal/war3/imp"
 )
 
-var background = context.Background()
+// hashed is the hash of a file that holds text.
+func hashed(text string) string { return fsx.SHA256Hex([]byte(text)) }
 
-// project makes a project with an empty source map and an assets folder.
-func project(t *testing.T) (root, mapDir, state string) {
-	t.Helper()
-	root = t.TempDir()
-	mapDir, state, err := assets.Locations(root, "map.w3x")
-	if err != nil {
-		t.Fatal(err)
-	}
-	os.MkdirAll(mapDir, 0o777)
-	os.Mkdir(filepath.Join(root, "assets"), 0o777)
-	return root, mapDir, state
-}
-
-func planFor(t *testing.T, root, mapDir, state string, c assets.Config, libraries ...string) *assets.Plan {
-	t.Helper()
-	plan, err := assets.PlanAssets(background, root, mapDir, state, c, libraries)
-	if err != nil {
-		t.Fatalf("PlanAssets: %v", diag.Format(err))
-	}
-	return plan
-}
-
-// sync plans and applies, as assets:sync does.
-func sync(t *testing.T, root, mapDir, state string, c assets.Config, libraries ...string) *assets.Plan {
-	t.Helper()
-	plan := planFor(t, root, mapDir, state, c, libraries...)
-	if err := assets.ApplyPlan(background, plan, state); err != nil {
-		t.Fatalf("ApplyPlan: %v", diag.Format(err))
-	}
-	return plan
-}
-
-func refusedPlan(t *testing.T, root, mapDir, state string, c assets.Config, libraries ...string) *diag.Error {
-	t.Helper()
-	_, err := assets.PlanAssets(background, root, mapDir, state, c, libraries)
-	return asError(t, err, "a refused plan")
-}
-
-func importsOf(t *testing.T, mapDir string) []assets.Import {
-	t.Helper()
-	data, err := os.ReadFile(filepath.Join(mapDir, "war3map.imp"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	entries, err := assets.ReadImports(data, "war3map.imp")
-	if err != nil {
-		t.Fatal(err)
-	}
-	return entries
-}
-
-func importPaths(t *testing.T, mapDir string) []string {
-	var paths []string
-	for _, entry := range importsOf(t, mapDir) {
-		paths = append(paths, entry.Path)
-	}
-	slices.Sort(paths)
-	return paths
-}
-
-func textOf(t *testing.T, dir, file string) string {
-	t.Helper()
-	data, err := os.ReadFile(filepath.Join(dir, filepath.FromSlash(file)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	return string(data)
-}
-
-// countdown is a context that reads as cancelled from its nth check on.
-type countdown struct {
-	context.Context
-	checks, limit int
-}
-
-func (c *countdown) Err() error {
-	c.checks++
-	if c.checks > c.limit {
-		return context.Canceled
-	}
-	return nil
-}
-
-func (c *countdown) Deadline() (time.Time, bool) { return time.Time{}, false }
-
-func cancelled() context.Context {
-	ctx, cancel := context.WithCancel(background)
-	cancel()
-	return ctx
-}
-
-func TestLocationsPlacesTheStateFileUnderAssetState(t *testing.T) {
-	root := t.TempDir()
-	mapDir, state, err := assets.Locations(root, "map.w3x")
-	if err != nil || mapDir != filepath.Join(root, "maps", "map.w3x") || state != filepath.Join(root, ".asset-state", "map.w3x.json") {
-		t.Errorf("Locations = %q, %q, %v", mapDir, state, err)
-	}
-}
-
-func TestSyncImportsMappedAssetsAndKeepsTheEditorsOwnImports(t *testing.T) {
-	root, mapDir, state := project(t)
-	const icon = "ReplaceableTextures/CommandButtons/BTNSword.blp"
-	const disabled = "ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp"
-	put(t, root, "assets/"+icon)
-	put(t, root, "assets/icons/disabled.blp", "disabled")
-	put(t, mapDir, "war3mapImported/existing.wav", "editor")
-	os.WriteFile(filepath.Join(mapDir, "war3map.imp"), assets.WriteImports([]assets.Import{{Flag: 5, Path: "existing.wav"}}), 0o666)
-	c := config(nil, "icons/disabled.blp", disabled)
-
-	plan := planFor(t, root, mapDir, state, c)
-	if len(plan.Assets) != 2 || fsx.Exists(state) {
-		t.Fatalf("%d assets; planning wrote the state: %v", len(plan.Assets), fsx.Exists(state))
-	}
-	if err := assets.ApplyPlan(background, plan, state); err != nil {
-		t.Fatal(err)
-	}
-	want := []assets.Import{{Flag: 5, Path: "existing.wav"}}
-	for _, asset := range plan.Assets {
-		want = append(want, assets.Import{Flag: 13, Path: strings.ReplaceAll(asset.Target, "/", `\`)})
-	}
-	if got := importsOf(t, mapDir); !slices.Equal(got, want) {
-		t.Errorf("imports = %+v", got)
-	}
-	if textOf(t, mapDir, disabled) != "disabled" {
-		t.Error("the mapped asset is not in the map")
-	}
-	if again := planFor(t, root, mapDir, state, c); len(again.Changes) != 0 {
-		t.Errorf("a second sync changes %d files", len(again.Changes))
-	}
-	wantState := "{\n  \"version\": 1,\n  \"files\": {\n    \"" + icon + "\": \"" + plan.Assets[0].Hash + "\",\n    \"" +
-		disabled + "\": \"" + plan.Assets[1].Hash + "\"\n  }\n}\n"
-	if got := textOf(t, filepath.Dir(state), filepath.Base(state)); got != wantState {
-		t.Errorf("the state file is\n%s\nwant\n%s", got, wantState)
-	}
-}
-
-func TestSyncUpdatesRenamesAndDeletesOnlyOwnedFilesAndAStagedCopyLeavesSourceStateAlone(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/Models/unit.mdx", "first")
-	put(t, mapDir, "unmanaged.txt", "keep")
-	sync(t, root, mapDir, state, defaults)
-	previousState := textOf(t, filepath.Dir(state), filepath.Base(state))
-
-	put(t, root, "assets/Models/unit.mdx", "second")
-	staged := filepath.Join(root, "stage")
-	if err := fsx.CopyTree(mapDir, staged); err != nil {
-		t.Fatal(err)
-	}
-	if err := assets.ApplyPlan(background, planFor(t, root, staged, state, defaults), ""); err != nil {
-		t.Fatal(err)
-	}
-	if textOf(t, staged, "Models/unit.mdx") != "second" || textOf(t, mapDir, "Models/unit.mdx") != "first" ||
-		textOf(t, filepath.Dir(state), filepath.Base(state)) != previousState {
-		t.Error("a build changed the source map or its state")
-	}
-
-	sync(t, root, mapDir, state, defaults)
-	sync(t, root, mapDir, state, config(nil, "Models/unit.mdx", "Models/renamed.mdx"))
-	if fsx.Exists(filepath.Join(mapDir, "Models", "unit.mdx")) || textOf(t, mapDir, "Models/renamed.mdx") != "second" {
-		t.Error("the asset was not renamed")
-	}
-
-	os.Remove(filepath.Join(root, "assets", "Models", "unit.mdx"))
-	sync(t, root, mapDir, state, defaults)
-	if len(importsOf(t, mapDir)) != 0 || textOf(t, mapDir, "unmanaged.txt") != "keep" {
-		t.Error("removing the asset left an import, or touched another file")
-	}
-}
-
-func TestSyncKeepsTheFlagWorldEditorSavedOnAnOwnedImport(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/Textures/a.blp")
-	put(t, root, "assets/Textures/b.blp")
-	sync(t, root, mapDir, state, defaults)
-	// World Editor 3.00 rewrites flag 13 as 29 when it saves the map.
-	saved := []assets.Import{{Flag: 29, Path: `Textures\a.blp`}, {Flag: 29, Path: `Textures\b.blp`}}
-	os.WriteFile(filepath.Join(mapDir, "war3map.imp"), assets.WriteImports(saved), 0o666)
-	if plan := planFor(t, root, mapDir, state, defaults); len(plan.Changes) != 0 {
-		t.Errorf("a save by World Editor is a change: %+v", plan.Changes)
-	}
-	put(t, root, "assets/Textures/c.blp")
-	sync(t, root, mapDir, state, defaults)
-	if got := importsOf(t, mapDir); !slices.Equal(got, append(saved, assets.Import{Flag: 13, Path: `Textures\c.blp`})) {
-		t.Errorf("imports = %+v", got)
-	}
-}
-
-func TestConflictsAndEditedOwnedFilesFailBeforeAnythingChanges(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/a.blp")
-	put(t, mapDir, "a.blp", "editor owned")
-	e := refusedPlan(t, root, mapDir, state, defaults)
-	if e.Msg != "Asset a.blp conflicts with a file or import already in the map." ||
-		e.Hint != "Import it under another path with assets.paths, or remove the map's own copy." ||
-		textOf(t, mapDir, "a.blp") != "editor owned" {
-		t.Errorf("error = %+v", e)
-	}
-
-	os.Remove(filepath.Join(mapDir, "a.blp"))
-	sync(t, root, mapDir, state, defaults)
-	put(t, mapDir, "a.blp", "manual edit")
-	modified := refusedPlan(t, root, mapDir, state, defaults)
-	if modified.Msg != "a.blp was modified in the map after assets:sync wrote it." ||
-		modified.File != filepath.Join(mapDir, "a.blp") || !strings.Contains(modified.Hint, "source map") {
-		t.Errorf("error = %+v", modified)
-	}
-	os.Remove(filepath.Join(root, "assets", "a.blp"))
-	if e := refusedPlan(t, root, mapDir, state, defaults); !strings.Contains(e.Msg, "modified") {
-		t.Errorf("error = %+v", e)
-	}
-	if textOf(t, mapDir, "a.blp") != "manual edit" {
-		t.Error("a refused plan changed the file")
-	}
-}
-
-func TestAnAssetWhoseFolderIsAFileInTheMapIsRejected(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/a.blp")
-	put(t, mapDir, "Textures", "file")
-	e := refusedPlan(t, root, mapDir, state, config(nil, "a.blp", "textures/a.blp"))
-	if e.Msg != "Textures in the map is a file, not a directory, so textures/a.blp cannot go there." {
-		t.Errorf("error = %+v", e)
-	}
-}
-
-func TestExistingFolderSpellingIsReusedAndForgedStateCannotTargetMapInternals(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, mapDir, "Textures/existing.blp")
-	put(t, root, "assets/textures/new.blp")
-	if plan := planFor(t, root, mapDir, state, defaults); plan.Assets[0].Target != "Textures/new.blp" {
-		t.Errorf("the target is %q", plan.Assets[0].Target)
-	}
-	os.MkdirAll(filepath.Dir(state), 0o777)
-	os.WriteFile(state, []byte(`{"version":1,"files":{"war3map.lua":"`+strings.Repeat("0", 64)+`"}}`), 0o666)
-	reserved := refusedPlan(t, root, mapDir, state, defaults)
-	if reserved.Msg != "The asset ownership state is invalid: Reserved map path: war3map.lua" || reserved.File != state ||
-		!strings.HasPrefix(reserved.Hint, "Restore it from version control.") {
-		t.Errorf("error = %+v", reserved)
-	}
-	for content, problem := range map[string]string{
-		`not json`:                              "it is not JSON",
-		`{"version":2,"files":{}}`:              "version must be 1",
-		`null`:                                  "version must be 1",
-		`{"version":1,"files":[]}`:              "files must be an object",
-		`{"version":1,"files":{"a.blp":"abc"}}`: "a.blp has no valid hash",
-		`{"version":1,"files":{"a.blp":"` + strings.Repeat("0", 64) + `","A.BLP":"` + strings.Repeat("0", 64) + `"}}`: "A.BLP is listed twice",
-	} {
-		os.WriteFile(state, []byte(content), 0o666)
-		if e := refusedPlan(t, root, mapDir, state, defaults); e.Msg != "The asset ownership state is invalid: "+problem+"." {
-			t.Errorf("state %s: %q", content, e.Msg)
+func TestWithNothingToImportAndNothingOwnedPlanChangesNothingAndReadsNothing(t *testing.T) {
+	s := newSite(t)
+	put(t, s.mapDir, "war3map.imp", "\x09\x09")
+	put(t, s.mapDir, "Textures/kept.blp")
+	folder := s.open()
+	// A folder where the scan found a file: a read of either file fails.
+	for _, name := range []string{"war3map.imp", "Textures/kept.blp"} {
+		file := filepath.Join(s.mapDir, filepath.FromSlash(name))
+		if err := errors.Join(os.Remove(file), os.Mkdir(file, 0o777)); err != nil {
+			t.Fatal(err)
 		}
 	}
-}
-
-func TestSyncWritesNoStateFileWhenItOwnsNothingAndRemovesOneItNoLongerNeeds(t *testing.T) {
-	root, mapDir, state := project(t)
-	sync(t, root, mapDir, state, defaults)
-	if fsx.Exists(state) {
-		t.Error("owning nothing wrote a state file")
+	result, err := Plan(background, folder, nil, State{})
+	if err != nil {
+		t.Fatalf("Plan: %v", diag.Format(err))
 	}
-	put(t, root, "assets/a.blp")
-	sync(t, root, mapDir, state, defaults)
-	if !fsx.Exists(state) {
-		t.Error("owning a file wrote no state file")
-	}
-	os.Remove(filepath.Join(root, "assets", "a.blp"))
-	sync(t, root, mapDir, state, defaults)
-	if fsx.Exists(filepath.Join(mapDir, "a.blp")) || fsx.Exists(state) {
-		t.Error("the owned file or the state file is still there")
+	if len(result.Assets) != 0 || len(result.Changes) != 0 || len(result.State.Files) != 0 {
+		t.Errorf("Plan = %+v, want no asset, no change and nothing owned", result)
 	}
 }
 
-func TestNewFoldersPlannedInOneRunShareOneSpelling(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/a.blp")
-	put(t, root, "assets/b.blp")
-	plan := planFor(t, root, mapDir, state, config(nil, "a.blp", "Textures/a.blp", "b.blp", "textures/b.blp"))
-	if got := rows(plan.Assets); got[0].target != "Textures/a.blp" || got[1].target != "Textures/b.blp" {
-		t.Errorf("targets = %+v", got)
+func TestPlanWritesEachAssetAndTheIndexAndKeepsTheEditorsOwnImports(t *testing.T) {
+	s := newSite(t)
+	const icon = "ReplaceableTextures/CommandButtons/BTNSword.blp"
+	const disabled = "ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp"
+	put(t, s.root, "assets/"+icon)
+	put(t, s.root, "assets/icons/disabled.blp", "disabled")
+	put(t, s.mapDir, "war3mapImported/existing.wav", "editor")
+	s.setImports(imp.Entry{Flag: 5, Path: "existing.wav"})
+	before := testkit.Snapshot(t, s.root)
+
+	_, result := s.planned(`{"paths":{"icons/disabled.blp":"` + disabled + `"},"exclude":[]}`)
+	if got, want := names(result.Changes), []string{icon, disabled, "war3map.imp"}; !slices.Equal(got, want) {
+		t.Fatalf("the changes are %q, want %q", got, want)
+	}
+	if got := string(result.Changes[1].Bytes); got != "disabled" {
+		t.Errorf("the mapped asset is written as %q", got)
+	}
+	entries, err := imp.Read(result.Changes[2].Bytes, "war3map.imp")
+	want := []imp.Entry{
+		{Flag: 5, Path: "existing.wav"},
+		{Flag: imp.CustomPath, Path: strings.ReplaceAll(icon, "/", `\`)},
+		{Flag: imp.CustomPath, Path: strings.ReplaceAll(disabled, "/", `\`)},
+	}
+	if err != nil || !slices.Equal(entries, want) {
+		t.Errorf("the index lists %+v, %v, want %+v", entries, err, want)
+	}
+	owned := []Owned{{icon, hashed("asset")}, {disabled, hashed("disabled")}}
+	if !slices.Equal(result.State.Files, owned) {
+		t.Errorf("the state is %+v, want %+v", result.State.Files, owned)
+	}
+	if got := rows(result.Assets); !slices.Equal(got, []row{{"", icon, icon}, {"", "icons/disabled.blp", disabled}}) {
+		t.Errorf("the assets are %+v", got)
+	}
+	s.unchanged(before, "planning")
+}
+
+func TestPlanChangesOnlyWhatDiffersAndRemovesOnlyOwnedFilesNoAssetWants(t *testing.T) {
+	s := newSite(t)
+	for name, content := range map[string]string{
+		"same.blp": "same", "edited.blp": "first", "dropped.blp": "dropped", "Sounds/dropped.wav": "dropped too",
+		"unmanaged.txt": "keep",
+	} {
+		put(t, s.mapDir, name, content)
+	}
+	// The state lists a file the map does not have: its asset is written again.
+	s.owns("same.blp", "edited.blp", "Sounds/dropped.wav", "dropped.blp", "gone.blp")
+	s.setImports(
+		imp.Entry{Flag: 13, Path: "same.blp"}, imp.Entry{Flag: 13, Path: "edited.blp"},
+		imp.Entry{Flag: 13, Path: `Sounds\dropped.wav`}, imp.Entry{Flag: 13, Path: "dropped.blp"},
+		imp.Entry{Flag: 13, Path: "gone.blp"})
+	for name, content := range map[string]string{"same.blp": "same", "edited.blp": "second", "gone.blp": "back", "new.blp": "new"} {
+		put(t, s.root, "assets/"+name, content)
+	}
+
+	_, result := s.planned(noBlock)
+	// The writes in the order of the assets, the removals in the order of the state, then the index.
+	want := []string{"edited.blp", "gone.blp", "new.blp", "-Sounds/dropped.wav", "-dropped.blp", "war3map.imp"}
+	if got := names(result.Changes); !slices.Equal(got, want) {
+		t.Errorf("the changes are %q, want %q", got, want)
+	}
+	owned := []Owned{{"edited.blp", hashed("second")}, {"gone.blp", hashed("back")}, {"new.blp", hashed("new")},
+		{"same.blp", hashed("same")}}
+	if !slices.Equal(result.State.Files, owned) {
+		t.Errorf("the state is %+v, want %+v", result.State.Files, owned)
 	}
 }
 
-func TestAFailedSyncUndoesTheWritesItAlreadyMade(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/a.blp")
-	put(t, root, "assets/b.blp")
-	plan := planFor(t, root, mapDir, state, defaults)
-	// b.blp turning into a folder after planning makes the second write fail.
-	os.Mkdir(filepath.Join(mapDir, "b.blp"), 0o777)
-	asError(t, assets.ApplyPlan(background, plan, state), "a failed sync")
-	if fsx.Exists(filepath.Join(mapDir, "a.blp")) || fsx.Exists(filepath.Join(mapDir, "war3map.imp")) || fsx.Exists(state) ||
-		!fsx.IsDir(filepath.Join(mapDir, "b.blp")) {
-		t.Error("the failed sync left its writes behind")
+func TestPlanChangesNothingInAMapThatHoldsEveryAssetAndListsIt(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/Textures/a.blp")
+	put(t, s.mapDir, "Textures/a.blp")
+	s.owns("Textures/a.blp")
+	s.setImports(imp.Entry{Flag: 13, Path: `Textures\a.blp`})
+	if _, result := s.planned(noBlock); len(result.Changes) != 0 || len(result.State.Files) != 1 {
+		t.Errorf("the changes are %q and the state %+v, want no change and one owned file",
+			names(result.Changes), result.State.Files)
 	}
 }
 
-func TestAnInterruptedSyncChangesNothingAndOneInterruptedMidwayUndoesItsWrites(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/a.blp")
-	put(t, root, "assets/b.blp")
-	plan := planFor(t, root, mapDir, state, defaults)
-
-	before := asError(t, assets.ApplyPlan(cancelled(), plan, state), "an interrupted sync")
-	if before.Msg != "Interrupted; nothing was written." || fsx.Exists(filepath.Join(mapDir, "a.blp")) {
-		t.Errorf("error = %+v", before)
+func TestAnOwnedImportKeepsTheFlagWorldEditorSavedItWith(t *testing.T) {
+	s := newSite(t)
+	for _, name := range []string{"Textures/a.blp", "Textures/b.blp"} {
+		put(t, s.root, "assets/"+name)
+		put(t, s.mapDir, name)
 	}
-	// The context reads as cancelled from the second change on, after a.blp was written.
-	midway := &countdown{Context: background, limit: 1}
-	e := asError(t, assets.ApplyPlan(midway, plan, state), "a sync interrupted midway")
-	if e.Msg != "Interrupted; every change was undone." || midway.checks < 2 {
-		t.Errorf("error = %+v after %d checks", e, midway.checks)
+	s.owns("Textures/a.blp", "Textures/b.blp")
+	// World Editor 3.00 saves the flag 13 as 29.
+	saved := []imp.Entry{{Flag: 29, Path: `Textures\a.blp`}, {Flag: 29, Path: `Textures\b.blp`}}
+	s.setImports(saved...)
+	if _, result := s.planned(noBlock); len(result.Changes) != 0 {
+		t.Errorf("a map World Editor saved is changed: %q", names(result.Changes))
 	}
-	if fsx.Exists(filepath.Join(mapDir, "a.blp")) || fsx.Exists(filepath.Join(mapDir, "war3map.imp")) || fsx.Exists(state) {
-		t.Error("the interrupted sync left its writes behind")
+	put(t, s.root, "assets/Textures/c.blp")
+	_, result := s.planned(noBlock)
+	if got := names(result.Changes); !slices.Equal(got, []string{"Textures/c.blp", "war3map.imp"}) {
+		t.Fatalf("the changes are %q", got)
 	}
-}
-
-func TestPlanningStopsAtAnInterruptBeforeAnythingIsWritten(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/a.blp")
-	put(t, root, "assets/b.blp")
-	_, err := assets.PlanAssets(cancelled(), root, mapDir, state, defaults, nil)
-	if e := asError(t, err, "an interrupted plan"); e.Msg != "Interrupted; nothing was written." {
-		t.Errorf("error = %+v", e)
-	}
-	// The context reads as cancelled from the second asset on, so planning stops midway.
-	midway := &countdown{Context: background, limit: 1}
-	_, err = assets.PlanAssets(midway, root, mapDir, state, defaults, nil)
-	asError(t, err, "a plan interrupted midway")
-	if midway.checks < 2 || fsx.Exists(filepath.Join(mapDir, "a.blp")) || fsx.Exists(state) {
-		t.Errorf("%d checks; planning wrote something", midway.checks)
+	entries, err := imp.Read(result.Changes[1].Bytes, "war3map.imp")
+	if want := append(saved, imp.Entry{Flag: imp.CustomPath, Path: `Textures\c.blp`}); err != nil || !slices.Equal(entries, want) {
+		t.Errorf("the index lists %+v, %v, want %+v", entries, err, want)
 	}
 }
 
-func TestAnIncompleteRollbackNamesTheFailureAndEveryFileItCouldNotRestore(t *testing.T) {
-	_, mapDir, _ := project(t)
-	old := filepath.Join(mapDir, "old.blp")
-	put(t, mapDir, "old.blp", "old")
-	// Deleting old.blp and then writing old.blp/inner.blp makes old.blp a folder, so it cannot be restored as a
-	// file.
-	plan := &assets.Plan{
-		Changes: []assets.FileChange{
-			{File: old, Before: []byte("old"), Existed: true, Remove: true},
-			{File: filepath.Join(old, "inner.blp"), After: []byte("new")},
-			{File: filepath.Join(mapDir, "gone.blp"), Before: []byte("missing"), Existed: true, After: []byte("new")},
-		},
-		State: assets.State{Version: 1},
+// An entry without a custom path keeps its flag too, and is then written with the whole in-map path: the index
+// names another file than the asset's.
+func TestAnOwnedImportThatWorldEditorSavedWithoutACustomPathKeepsThatFlag(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/war3mapImported/a.wav")
+	put(t, s.mapDir, "war3mapImported/a.wav")
+	s.owns("war3mapImported/a.wav")
+	s.setImports(imp.Entry{Flag: 5, Path: "a.wav"})
+	_, result := s.planned(noBlock)
+	if got := names(result.Changes); !slices.Equal(got, []string{"war3map.imp"}) {
+		t.Fatalf("the changes are %q", got)
 	}
-	e := asError(t, assets.ApplyPlan(background, plan, ""), "an incomplete rollback")
-	if !strings.Contains(e.Msg, "changed after the assets were checked") ||
-		!strings.Contains(e.Msg, "could not be restored: "+old+" (") || !strings.Contains(e.Hint, "version control") {
-		t.Errorf("error = %+v", e)
-	}
-	if _, ok := diag.First(e.Cause); !ok {
-		t.Errorf("the cause is %v", e.Cause)
+	entries, err := imp.Read(result.Changes[0].Bytes, "war3map.imp")
+	if want := []imp.Entry{{Flag: 5, Path: `war3mapImported\a.wav`}}; err != nil || !slices.Equal(entries, want) {
+		t.Errorf("the index lists %+v, %v, want %+v", entries, err, want)
 	}
 }
 
-func TestWithNoAssetsAndNothingOwnedWar3mapImpIsLeftUntouched(t *testing.T) {
-	root, mapDir, state := project(t)
-	if plan := planFor(t, root, mapDir, state, defaults); len(plan.Changes) != 0 || fsx.Exists(filepath.Join(mapDir, "war3map.imp")) {
-		t.Errorf("changes = %+v", plan.Changes)
+func TestPlanSpellsFoldersAsTheMapDoesAndNewOnesAsTheFirstAssetToNameThem(t *testing.T) {
+	s := newSite(t)
+	put(t, s.mapDir, "Textures/existing.blp")
+	for _, name := range []string{"textures/new.blp", "a.blp", "b.blp", "c.blp"} {
+		put(t, s.root, "assets/"+name)
 	}
-	// A build never even reads war3map.imp then.
-	os.WriteFile(filepath.Join(mapDir, "war3map.imp"), []byte{9, 9}, 0o666)
-	plan := planFor(t, root, mapDir, state, defaults)
-	if len(plan.Assets) != 0 || len(plan.Replaced) != 0 || len(plan.Changes) != 0 || plan.State.Version != 1 || plan.State.Files.Len() != 0 {
-		t.Errorf("plan = %+v", plan)
+	block := `{"paths":{"a.blp":"Sound/Music/a.blp","b.blp":"sound/music/b.blp","c.blp":"SOUND/Effects/c.blp"},"exclude":[]}`
+	_, result := s.planned(block)
+	// The assets come in the order of their paths, so c.blp is the first to name the folder Sound.
+	spelled := []string{"SOUND/Effects/c.blp", "SOUND/Music/a.blp", "SOUND/Music/b.blp", "Textures/new.blp"}
+	var targets, owned []string
+	for _, asset := range result.Assets {
+		targets = append(targets, asset.Target)
 	}
-}
-
-func TestAFailedSyncRestoresTheFilesItOverwroteByteForByte(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/a.blp", "first")
-	put(t, mapDir, "war3mapImported/existing.wav", "editor")
-	os.WriteFile(filepath.Join(mapDir, "war3map.imp"), assets.WriteImports([]assets.Import{{Flag: 5, Path: "existing.wav"}}), 0o666)
-	sync(t, root, mapDir, state, defaults)
-	read := func(path string) []byte {
-		data, _ := os.ReadFile(path)
-		return data
+	for _, file := range result.State.Files {
+		owned = append(owned, file.Path)
 	}
-	assetBefore, impBefore, stateBefore := read(filepath.Join(mapDir, "a.blp")), read(filepath.Join(mapDir, "war3map.imp")), read(state)
-
-	put(t, root, "assets/a.blp", "second")
-	put(t, root, "assets/b.blp")
-	plan := planFor(t, root, mapDir, state, defaults)
-	var existed []bool
-	for _, change := range plan.Changes {
-		existed = append(existed, change.Existed)
+	if !slices.Equal(targets, spelled) || !slices.Equal(owned, spelled) {
+		t.Errorf("the assets are written as %q and owned as %q, want %q", targets, owned, spelled)
 	}
-	if !slices.Equal(existed, []bool{true, false, true}) {
-		t.Fatalf("changes existed before: %v", existed)
+	if got := names(result.Changes); !slices.Equal(got, append(spelled, "war3map.imp")) {
+		t.Fatalf("the changes are %q", got)
 	}
-	// b.blp turning into a folder after planning makes the second write fail, after a.blp was overwritten.
-	os.Mkdir(filepath.Join(mapDir, "b.blp"), 0o777)
-	asError(t, assets.ApplyPlan(background, plan, state), "a failed sync")
-	if !bytes.Equal(read(filepath.Join(mapDir, "a.blp")), assetBefore) ||
-		!bytes.Equal(read(filepath.Join(mapDir, "war3map.imp")), impBefore) || !bytes.Equal(read(state), stateBefore) {
-		t.Error("the failed sync did not restore what it overwrote")
+	entries, err := imp.Read(result.Changes[4].Bytes, "war3map.imp")
+	if err != nil || len(entries) != 4 || entries[0].Path != `SOUND\Effects\c.blp` || entries[3].Path != `Textures\new.blp` {
+		t.Errorf("the index lists %+v, %v", entries, err)
 	}
 }
 
-func TestTheFilesLibrariesShipArePlannedLikeTheMapsOwnAndOwnedByASync(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, "assets/Models/Own.mdx", "own")
-	put(t, root, "assets/icons/shared.blp", "the map's")
-	put(t, root, ".moonwell/library-assets/ui/war3mapImported/ui/frames.toc", "toc")
-	put(t, root, ".moonwell/library-assets/ui/icons/shared.blp", "the library's")
-	put(t, root, ".moonwell/library-assets/unlisted/never.txt", "not in the manifest")
-
-	plan := planFor(t, root, mapDir, state, defaults, "ui")
-	want := []row{
-		{"", "icons/shared.blp", "icons/shared.blp"},
-		{"", "Models/Own.mdx", "Models/Own.mdx"},
-		{"ui", "war3mapImported/ui/frames.toc", "war3mapImported/ui/frames.toc"},
+func TestAnOwnedFileIsFoundAndWrittenUnderTheSpellingTheMapHas(t *testing.T) {
+	s := newSite(t)
+	put(t, s.mapDir, "models/UNIT.mdx", "first")
+	put(t, s.mapDir, "WAR3MAP.IMP", string(imp.Write([]imp.Entry{{Flag: 13, Path: `Models\Unit.mdx`}})))
+	put(t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{`Models\Unit.mdx`, hashed("first")}}}.Bytes()))
+	put(t, s.root, "assets/Models/Unit.mdx", "second")
+	_, result := s.planned(noBlock)
+	if got := names(result.Changes); !slices.Equal(got, []string{"models/UNIT.mdx", "WAR3MAP.IMP"}) {
+		t.Errorf("the changes are %q", got)
 	}
-	if got := rows(plan.Assets); !slices.Equal(got, want) ||
-		!slices.Equal(plan.Replaced, []string{"assets/icons/shared.blp replaces library ui's icons/shared.blp"}) {
-		t.Fatalf("assets = %+v, replaced %q", got, plan.Replaced)
-	}
-	if err := assets.ApplyPlan(background, plan, state); err != nil {
-		t.Fatal(err)
-	}
-	if textOf(t, mapDir, "war3mapImported/ui/frames.toc") != "toc" || textOf(t, mapDir, "icons/shared.blp") != "the map's" {
-		t.Error("the map does not hold the library's file and the map's own")
-	}
-	if got := importPaths(t, mapDir); !slices.Equal(got, []string{`Models\Own.mdx`, `icons\shared.blp`, `war3mapImported\ui\frames.toc`}) {
-		t.Errorf("imports = %q", got)
-	}
-	if again := planFor(t, root, mapDir, state, defaults, "ui"); len(again.Changes) != 0 {
-		t.Errorf("a second sync changes %d files", len(again.Changes))
-	}
-
-	// Without the library, the next sync deletes the file it owned.
-	without := sync(t, root, mapDir, state, defaults)
-	if len(without.Replaced) != 0 || fsx.Exists(filepath.Join(mapDir, "war3mapImported", "ui", "frames.toc")) {
-		t.Error("the library's file is still in the map")
-	}
-	if got := importPaths(t, mapDir); !slices.Equal(got, []string{`Models\Own.mdx`, `icons\shared.blp`}) {
-		t.Errorf("imports = %q", got)
+	if want := []Owned{{"models/UNIT.mdx", hashed("second")}}; !slices.Equal(result.State.Files, want) {
+		t.Errorf("the state is %+v, want %+v", result.State.Files, want)
 	}
 }
 
-func TestALibraryFileThatClashesWithTheMapsOwnCopyNamesTheLibrary(t *testing.T) {
-	root, mapDir, state := project(t)
-	put(t, root, ".moonwell/library-assets/ui/Models/Golem.mdx", "library")
-	put(t, mapDir, "Models/Golem.mdx", "editor")
-	e := refusedPlan(t, root, mapDir, state, defaults, "ui")
-	if e.Msg != "Asset Models/Golem.mdx of library ui conflicts with a file or import already in the map." ||
-		e.Hint != "Remove the map's own copy in World Editor's Import Manager." {
-		t.Errorf("error = %+v", e)
+func TestAnAssetAtAFileOrAnImportTheMapHasAndDoesNotOwnIsRefused(t *testing.T) {
+	const own = "Import it under another path with assets.paths, or remove the map's own copy."
+	tests := []struct {
+		name       string
+		asset      string // under assets/, or under the library's folder
+		library    string
+		file       string // a file the map has
+		entry      *imp.Entry
+		msg, where string
+		hint       string
+	}{
+		{"a file of the map", "a.blp", "", "a.blp", nil,
+			"Asset a.blp conflicts with a file or import already in the map.", "a.blp", own},
+		{"a file in another letter case", "textures/A.blp", "", "Textures/a.BLP", nil,
+			"Asset textures/A.blp conflicts with a file or import already in the map.", "Textures/a.BLP", own},
+		{"an import with a custom path and no file", "Textures/a.blp", "", "", &imp.Entry{Flag: 29, Path: `textures\A.blp`},
+			"Asset Textures/a.blp conflicts with a file or import already in the map.", "Textures/a.blp", own},
+		{"an import in the folder World Editor imports into", "war3mapImported/a.wav", "", "", &imp.Entry{Flag: 8, Path: "A.wav"},
+			"Asset war3mapImported/a.wav conflicts with a file or import already in the map.", "war3mapImported/a.wav", own},
+		{"a library's file", "Models/Golem.mdx", "ui", "Models/Golem.mdx", nil,
+			"Asset Models/Golem.mdx of library ui conflicts with a file or import already in the map.", "Models/Golem.mdx",
+			"Remove the map's own copy in World Editor's Import Manager."},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newSite(t)
+			var libraries []string
+			if tt.library == "" {
+				put(t, s.root, "assets/"+tt.asset)
+			} else {
+				put(t, s.root, "libraries/"+tt.library+"/"+tt.asset)
+				libraries = []string{tt.library}
+			}
+			if tt.file != "" {
+				put(t, s.mapDir, tt.file, "the editor's")
+			}
+			if tt.entry != nil {
+				s.setImports(*tt.entry)
+			}
+			before := testkit.Snapshot(t, s.root)
+			e := s.refusedPlan(noBlock, libraries...)
+			if e.Msg != tt.msg || e.File != mapLabel+"/"+tt.where || e.Hint != tt.hint {
+				t.Errorf("error = %+v, want %q at %s", e, tt.msg, tt.where)
+			}
+			s.unchanged(before, "a refused plan")
+		})
 	}
 }
 
-func TestAMissingMapFolderNamesTheManifest(t *testing.T) {
-	root := t.TempDir()
-	put(t, root, "assets/a.blp")
-	mapDir, state, _ := assets.Locations(root, "map.w3x")
-	e := refusedPlan(t, root, mapDir, state, defaults)
-	if e.Msg != "The map folder "+mapDir+" does not exist." || e.File != "moonwell.pkl" || e.Hint == "" {
-		t.Errorf("error = %+v", e)
+func TestAnOwnedFileEditedInTheMapIsRefusedAlsoWhenNoAssetWantsIt(t *testing.T) {
+	s := newSite(t)
+	// The state spells the path in its own way: a file of the map is found in any letter case.
+	put(t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures/A.BLP", hashed("asset")}}}.Bytes()))
+	put(t, s.mapDir, "Textures/a.blp", "manual edit")
+	for _, asset := range []string{"assets/Textures/a.blp", ""} {
+		if asset != "" {
+			put(t, s.root, asset, "a newer asset")
+		}
+		e := s.refusedPlan(noBlock)
+		if e.Msg != "Textures/a.blp was modified in the map after assets:sync wrote it." ||
+			e.File != mapLabel+"/Textures/a.blp" || !strings.Contains(e.Hint, "source map") {
+			t.Errorf("with the asset %q: error = %+v", asset, e)
+		}
+		if err := os.RemoveAll(filepath.Join(s.root, "assets", "Textures")); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if got := s.inMap("Textures/a.blp"); got != "manual edit" {
+		t.Errorf("a refused plan left %q in the edited file", got)
+	}
+}
+
+func TestAnAssetBelowAFileOfTheMapIsRefusedAlsoWhenTheFileIsOwned(t *testing.T) {
+	const own = "Import it under another path with assets.paths, or remove "
+	tests := []struct {
+		name                 string
+		files                []string // of the map
+		owned                []string
+		asset, target        string // under assets/, and the path it is mapped to
+		library              bool
+		inTheWay, wantsToBe  string
+		hintStart, hintWords string
+	}{
+		{"a file of the map", []string{"Textures"}, nil, "a.blp", "textures/a.blp", false, "Textures", "textures/a.blp", own, "Textures"},
+		{"a file in a folder", []string{"Units/Hero"}, nil, "a.blp", "units/hero/skins/a.blp", false,
+			"Units/Hero", "units/hero/skins/a.blp", own, "Units/Hero"},
+		// The plan would remove the owned file. No file of the map becomes a folder, an owned one neither.
+		{"an owned file that no asset wants", []string{"data"}, []string{"data"}, "data/inner.txt", "", false,
+			"data", "data/inner.txt", own, "data"},
+		{"a library's file", []string{"UI"}, nil, "ui/frame.fdf", "", true, "UI", "ui/frame.fdf", "Remove UI", "source map"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newSite(t)
+			for _, file := range tt.files {
+				put(t, s.mapDir, file)
+			}
+			s.owns(tt.owned...)
+			block, libraries := noBlock, []string(nil)
+			switch {
+			case tt.library:
+				put(t, s.root, "libraries/lib/"+tt.asset)
+				libraries = []string{"lib"}
+			case tt.target != "":
+				put(t, s.root, "assets/"+tt.asset)
+				block = `{"paths":{"` + tt.asset + `":"` + tt.target + `"},"exclude":[]}`
+			default:
+				put(t, s.root, "assets/"+tt.asset)
+			}
+			e := s.refusedPlan(block, libraries...)
+			msg := tt.inTheWay + " in the map is a file, not a directory, so " + tt.wantsToBe + " cannot go there."
+			if e.Msg != msg || e.File != mapLabel+"/"+tt.inTheWay || !strings.HasPrefix(e.Hint, tt.hintStart) ||
+				!strings.Contains(e.Hint, tt.hintWords) {
+				t.Errorf("error = %+v, want %q at %s", e, msg, tt.inTheWay)
+			}
+		})
+	}
+}
+
+func TestAnAssetNamedAsAFolderOfTheMapIsRefused(t *testing.T) {
+	empty := func(s *site) {
+		if err := os.Mkdir(filepath.Join(s.mapDir, "Textures"), 0o777); err != nil {
+			s.t.Fatal(err)
+		}
+	}
+	tests := []struct {
+		name  string
+		setup func(s *site)
+	}{
+		{"a folder with a file in it", func(s *site) { put(s.t, s.mapDir, "Textures/a.blp") }},
+		{"an empty folder", empty},
+		// The file the state lists is a folder in the map: it is not checked as an owned file, and not replaced.
+		{"a folder where the state lists a file", func(s *site) {
+			empty(s)
+			put(s.t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures", zeros}}}.Bytes()))
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newSite(t)
+			tt.setup(s)
+			put(t, s.root, "assets/textures")
+			e := s.refusedPlan(noBlock)
+			if e.Msg != "Asset textures would replace a folder in the map." || e.File != mapLabel+"/Textures" ||
+				!strings.Contains(e.Hint, "remove that folder") {
+				t.Errorf("error = %+v", e)
+			}
+		})
+	}
+}
+
+func TestTheFirstAssetWithoutRoomIsTheOneRefused(t *testing.T) {
+	s := newSite(t)
+	put(t, s.mapDir, "a")
+	put(t, s.mapDir, "b.blp")
+	put(t, s.root, "assets/a/inner.blp")
+	put(t, s.root, "assets/b.blp")
+	if e := s.refusedPlan(noBlock); !strings.Contains(e.Msg, "a in the map is a file") {
+		t.Errorf("error = %+v, want it about a/inner.blp, the first asset", e)
+	}
+	// The same two assets, the other one first.
+	block := `{"paths":{"b.blp":"0.blp"},"exclude":[]}`
+	put(t, s.mapDir, "0.blp")
+	if e := s.refusedPlan(block); !strings.Contains(e.Msg, "Asset 0.blp conflicts") {
+		t.Errorf("error = %+v, want it about 0.blp, the first asset", e)
+	}
+}
+
+func TestPlanRefusesAnIndexOfImportsItCannotUse(t *testing.T) {
+	two := imp.Write([]imp.Entry{{Flag: 13, Path: `Textures\x.blp`}, {Flag: 5, Path: "y.wav"}, {Flag: 29, Path: `textures/X.BLP`}})
+	tests := []struct {
+		name  string
+		index []byte
+		words string
+	}{
+		{"a file that is no index", []byte{9, 9}, "war3map.imp is unreadable: it is truncated."},
+		{"a path listed twice", two, `war3map.imp lists textures/X.BLP twice.`},
+		{"a path that leaves the map", imp.Write([]imp.Entry{{Flag: 13, Path: `..\x.blp`}}), `Invalid asset path: ..\x.blp`},
+		{"a path no file can have, in the folder World Editor imports into", imp.Write([]imp.Entry{{Flag: 8, Path: `a?.wav`}}),
+			`Invalid asset path: war3mapImported\a?.wav`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newSite(t)
+			put(t, s.root, "assets/a.blp")
+			testkit.WriteFile(t, s.mapDir, "War3map.imp", tt.index)
+			e := s.refusedPlan(noBlock)
+			if e.Msg != tt.words || e.File != mapLabel+"/War3map.imp" || e.Hint == "" {
+				t.Errorf("error = %+v, want %q at the map's War3map.imp", e, tt.words)
+			}
+		})
+	}
+}
+
+func TestAFolderNamedAsTheIndexOfImportsIsRefusedBeforeAnythingIsPlanned(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/a.blp")
+	put(t, s.mapDir, "War3Map.imp/stray.txt")
+	before := testkit.Snapshot(t, s.root)
+	e := s.refusedPlan(noBlock)
+	if !strings.Contains(e.Msg, "is a folder") || e.File != mapLabel+"/War3Map.imp" ||
+		!strings.Contains(e.Hint, "Remove that folder") || strings.Contains(e.Hint, "another path") {
+		t.Errorf("error = %+v, want the folder named as the map spells it, and a hint that fits the index", e)
+	}
+	s.unchanged(before, "a refused plan")
+}
+
+func TestPlanStopsAtAnInterruptBetweenFilesAndWritesNothing(t *testing.T) {
+	s := newSite(t)
+	put(t, s.root, "assets/a.blp")
+	put(t, s.root, "assets/b.blp")
+	put(t, s.mapDir, "owned.blp")
+	s.owns("owned.blp")
+	before := testkit.Snapshot(t, s.root)
+	// One ask before anything is read, one before each owned file and one before each asset.
+	const asks = 4
+	for limit := range asks {
+		ctx := &countdown{Context: background, limit: limit}
+		_, result, err := s.plan(ctx, noBlock)
+		if e := asError(t, err, "an interrupted plan"); e.Msg != "Interrupted; nothing was written." || result != nil {
+			t.Errorf("cancelled at ask %d: Plan = %+v, %+v", limit+1, result, e)
+		}
+		if ctx.asks != limit+1 {
+			t.Errorf("cancelled at ask %d: Plan asked %d times, want it to stop at the ask that was refused", limit+1, ctx.asks)
+		}
+	}
+	ctx := &countdown{Context: background, limit: asks}
+	if _, _, err := s.plan(ctx, noBlock); err != nil || ctx.asks != asks {
+		t.Errorf("Plan = %v after %d asks, want a plan after %d", err, ctx.asks, asks)
+	}
+	s.unchanged(before, "planning")
+}
+
+// A path that Collect and ReadState refuse cannot reach a plan through them. Given by another caller, it is that
+// caller's bug: the plan would write, or remove, one of the map's own files.
+func TestPlanRefusesAPathNoAssetMayHaveAsACallersBug(t *testing.T) {
+	script := Asset{Source: "x.lua", Target: "war3map.lua", Bytes: []byte("x"), Hash: hashed("x")}
+	tests := []struct {
+		name   string
+		assets []Asset
+		owned  State
+		words  string
+	}{
+		{"an asset as the map's script", []Asset{script}, State{}, `an asset has the in-map path "war3map.lua"`},
+		{"an asset outside the map", []Asset{{Target: "../x.blp"}}, State{}, `an asset has the in-map path "../x.blp"`},
+		{"two assets at one path", []Asset{{Target: "Textures/a.blp"}, {Target: `textures\A.blp`}}, State{},
+			`two assets have the in-map path "textures\\A.blp"`},
+		{"the map's script as an owned file", nil, State{Files: []Owned{{"war3map.lua", hashed("the script")}}},
+			`an owned file has the in-map path "war3map.lua"`},
+		{"the map's script in its folder, as an owned file", nil, State{Files: []Owned{{`Scripts\war3map.j`, zeros}}},
+			`an owned file has the in-map path "Scripts\\war3map.j"`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newSite(t)
+			put(t, s.mapDir, "war3map.lua", "the script")
+			result, err := Plan(background, s.open(), tt.assets, tt.owned)
+			var expected *diag.Error
+			if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), tt.words) || result != nil {
+				t.Errorf("Plan = %+v, %v, want a plain error that says %q", result, err, tt.words)
+			}
+		})
+	}
+}
+
+func TestAMapFileThePlanNeedsAndCannotReadIsRefusedByItsName(t *testing.T) {
+	for _, held := range []string{"Textures/owned.blp", "war3map.imp"} {
+		t.Run(held, func(t *testing.T) {
+			s := newSite(t)
+			put(t, s.mapDir, "Textures/owned.blp")
+			s.owns("Textures/owned.blp")
+			s.setImports(imp.Entry{Flag: 13, Path: `Textures\owned.blp`})
+			testkit.MakeUnreadable(t, filepath.Join(s.mapDir, filepath.FromSlash(held)))
+			e := s.refusedPlan(noBlock)
+			if !strings.HasPrefix(e.Msg, "Reading a map file failed") || e.File != mapLabel+"/"+held || e.Cause == nil {
+				t.Errorf("error = %+v", e)
+			}
+		})
+	}
+}
+
+// A build lays the changes over its view of the map and stages the view: nothing is written into the source map,
+// and the state file is neither read nor written.
+func TestThePlanLaidOverAViewIsStagedAndTheSourceMapIsLeftAlone(t *testing.T) {
+	s := newSite(t)
+	put(t, s.mapDir, "Models/unit.mdx", "first")
+	put(t, s.mapDir, "Models/dropped.mdx", "dropped")
+	put(t, s.mapDir, "unmanaged.txt", "keep")
+	put(t, s.mapDir, "war3map.w3i", "info")
+	s.owns("Models/unit.mdx", "Models/dropped.mdx")
+	s.setImports(imp.Entry{Flag: 13, Path: `Models\unit.mdx`}, imp.Entry{Flag: 13, Path: `Models\dropped.mdx`})
+	put(t, s.root, "assets/models/unit.mdx", "second")
+	put(t, s.root, "assets/Sound/theme.mp3", "theme")
+	before := testkit.Snapshot(t, s.root)
+
+	folder, result := s.planned(noBlock)
+	// The view a build has by then holds the changes of the other areas.
+	view := folder.With([]mapdir.Change{{Name: "war3map.w3i", Bytes: []byte("patched")}}).With(result.Changes)
+	stage := filepath.Join(t.TempDir(), "stage", "map.w3x")
+	if err := view.StageTo(stage); err != nil {
+		t.Fatalf("StageTo: %v", diag.Format(err))
+	}
+	s.unchanged(before, "a build")
+
+	staged := map[string]string{}
+	for name, data := range testkit.Snapshot(t, stage) {
+		if data != nil {
+			staged[name] = string(data)
+		}
+	}
+	index := string(imp.Write([]imp.Entry{{Flag: 13, Path: `Models\unit.mdx`}, {Flag: 13, Path: `Sound\theme.mp3`}}))
+	want := map[string]string{"Models/unit.mdx": "second", "Sound/theme.mp3": "theme", "unmanaged.txt": "keep",
+		"war3map.w3i": "patched", "war3map.imp": index}
+	for name, content := range want {
+		if staged[name] != content {
+			t.Errorf("the stage holds %q under %s, want %q", staged[name], name, content)
+		}
+	}
+	if len(staged) != len(want) {
+		t.Errorf("the stage holds %d files, want %d: %v", len(staged), len(want), staged)
 	}
 }

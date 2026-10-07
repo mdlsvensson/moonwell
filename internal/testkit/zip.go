@@ -6,15 +6,18 @@ import (
 	"testing"
 )
 
-// ZipEntry is one entry of a test archive. A name that ends with "/" is a folder entry.
+// ZipEntry is one entry of a test archive. Its name is written as given, whatever it is: a name that ends with
+// "/" is a folder entry, and one that points outside the archive ("../x", "/x") is how a test builds an archive
+// that must not be trusted.
 type ZipEntry struct {
 	Name    string
 	Data    []byte
-	Deflate bool
+	Deflate bool // compressed; stored as it is otherwise
 }
 
-// MakeZip writes a zip archive. comment is the archive comment, where GitHub's tag archives hold the commit SHA.
-func MakeZip(t testing.TB, entries []ZipEntry, comment string) []byte {
+// Zip is a zip archive of the entries in the order given. comment is the archive's comment, where an archive of
+// a tag that GitHub serves holds the commit.
+func Zip(t testing.TB, comment string, entries ...ZipEntry) []byte {
 	t.Helper()
 	var out bytes.Buffer
 	writer := zip.NewWriter(&out)
@@ -25,17 +28,21 @@ func MakeZip(t testing.TB, entries []ZipEntry, comment string) []byte {
 		}
 		file, err := writer.CreateHeader(&zip.FileHeader{Name: entry.Name, Method: method})
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("the zip entry %s: %v", entry.Name, err)
+			return nil
 		}
 		if _, err := file.Write(entry.Data); err != nil {
-			t.Fatal(err)
+			t.Fatalf("the zip entry %s: %v", entry.Name, err)
+			return nil
 		}
 	}
 	if err := writer.SetComment(comment); err != nil {
-		t.Fatal(err)
+		t.Fatalf("the zip comment: %v", err)
+		return nil
 	}
 	if err := writer.Close(); err != nil {
-		t.Fatal(err)
+		t.Fatalf("the zip archive: %v", err)
+		return nil
 	}
 	return out.Bytes()
 }

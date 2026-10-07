@@ -3,43 +3,30 @@ package testkit
 import (
 	"os"
 	"os/exec"
-	"path/filepath"
-	"runtime"
 	"testing"
 )
 
-// need finds a program a test cannot run without. The test is skipped when the program is missing; with
-// MOONWELL_REQUIRE_TOOLS=1, which CI sets, it fails instead, so that CI never quietly skips.
-func need(t testing.TB, program string) string {
+// NeedPkl returns the pkl program on PATH. Without one it skips the test, or fails it when
+// MOONWELL_REQUIRE_TOOLS=1, which CI sets so that it never quietly skips.
+func NeedPkl(t testing.TB) string {
 	t.Helper()
-	path, err := exec.LookPath(program)
+	program, err := exec.LookPath("pkl")
 	if err == nil {
-		return path
+		return program
 	}
 	if os.Getenv("MOONWELL_REQUIRE_TOOLS") == "1" {
-		t.Fatalf("%s is not on the PATH, and MOONWELL_REQUIRE_TOOLS=1 requires it", program)
+		t.Fatalf("pkl is not on the PATH, and MOONWELL_REQUIRE_TOOLS=1 requires it")
+		return ""
 	}
-	t.Skipf("%s is not on the PATH", program)
+	t.Skip("pkl is not on the PATH")
 	return ""
 }
 
-// NeedPkl returns the path of pkl, or skips the test.
-func NeedPkl(t testing.TB) string { return need(t, "pkl") }
-
-// NeedNetwork skips the test unless MOONWELL_NETWORK_TESTS=1.
+// NeedNetwork skips the test unless MOONWELL_NETWORK_TESTS=1, which CI sets: a test that downloads runs only
+// where it is asked for.
 func NeedNetwork(t testing.TB) {
 	t.Helper()
 	if os.Getenv("MOONWELL_NETWORK_TESTS") != "1" {
-		t.Skip("set MOONWELL_NETWORK_TESTS=1 to run tests that use the network")
+		t.Skip("set MOONWELL_NETWORK_TESTS=1 to run the tests that use the network")
 	}
-}
-
-// RepoRoot returns the root of the Moonwell checkout: the folder with go.mod.
-func RepoRoot(t testing.TB) string {
-	t.Helper()
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		t.Fatal("cannot locate the test kit's source file")
-	}
-	return filepath.Dir(filepath.Dir(filepath.Dir(file)))
 }

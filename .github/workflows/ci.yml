@@ -64,8 +64,8 @@ jobs:
           MOONWELL_REQUIRE_TOOLS: "1"
           MOONWELL_NETWORK_TESTS: "1"
 
-  # The race detector, on the packages under next/ whose code or tests run on several goroutines. It needs cgo, so
-  # it runs on Ubuntu alone; the tests that use the network are left to the job above.
+  # The race detector, on the packages whose code or tests run on several goroutines. It needs cgo, so it runs on
+  # Ubuntu alone; the tests that use the network are left to the job above.
   race:
     runs-on: ubuntu-latest
     defaults:
@@ -91,6 +91,6 @@ jobs:
       - run: pkl --version
       # A missing pkl or YueScript compiler fails a test instead of skipping it; the compiler is downloaded once.
       # The detector is slow, and the tests of script run the real compiler: a package gets twenty minutes.
-      - run: go test -race -timeout 20m ./next/internal/script/ ./next/internal/testkit/ ./next/internal/env/ ./next/internal/build/ ./next/internal/cli/
+      - run: go test -race -timeout 20m ./internal/script/ ./internal/testkit/ ./internal/env/ ./internal/build/ ./internal/cli/
         env:
           MOONWELL_REQUIRE_TOOLS: "1"

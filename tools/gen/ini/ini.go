@@ -1,56 +1,73 @@
-// Package ini reads the game's INI-style .txt files (WorldEditStrings.txt, the per-race strings files): [section]
-// headers, Key=value lines and // comment lines.
+// Package ini reads the game's text files of sections, the editor's strings and the strings of each race:
+// [section] lines, key=value lines and // comment lines.
+//
+// It takes the text of a file, decoded, and returns its sections, or adds them to the sections read from the
+// files before it. It has no failure: a line that is none of the three is passed over.
+//
+// It must not know which sections and keys the generator reads, nor how a file is found and decoded: a byte order
+// mark is text to it, and its white space is ASCII.
+//
+// It imports no package of the module.
 package ini
 
-import (
-	"strings"
+import "strings"
 
-	"github.com/mdlsvensson/moonwell/internal/ordered"
-	"github.com/mdlsvensson/moonwell/internal/text"
-)
+// Section is a section's keys and their values.
+type Section map[string]string
 
-// bom is the byte order mark some of the game's text files start with.
-const bom = "\xEF\xBB\xBF"
+// File is the sections by name.
+type File map[string]Section
 
-// Section maps a section's keys to their values.
-type Section = ordered.Map[string]
-
-// File maps section names to their sections.
-type File = ordered.Map[*Section]
-
-// Parse adds the sections of source to into; nil starts a new file. A repeated key, in the same or a later text,
-// replaces the earlier value. A value that is one quoted string is unquoted; a quoted list such as "a","b" is kept
-// as written. Lines before the first section are ignored.
-func Parse(source string, into *File) *File {
-	if into == nil {
-		into = &File{}
-	}
-	var section *Section
-	source = strings.TrimPrefix(source, bom)
-	for _, raw := range strings.Split(strings.ReplaceAll(source, "\r\n", "\n"), "\n") {
-		line := text.Trim(raw)
-		if line == "" || strings.HasPrefix(line, "//") {
-			continue
-		}
-		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
-			name := text.Trim(line[1 : len(line)-1])
-			found, ok := into.Get(name)
-			if !ok {
-				found = &Section{}
-				into.Set(name, found)
-			}
-			section = found
-			continue
-		}
-		equals := strings.IndexByte(line, '=')
-		if section == nil || equals < 0 {
-			continue
-		}
-		value := text.Trim(line[equals+1:])
-		if len(value) >= 2 && value[0] == '"' && value[len(value)-1] == '"' && !strings.Contains(value[1:len(value)-1], `"`) {
-			value = value[1 : len(value)-1]
-		}
-		section.Set(text.Trim(line[:equals]), value)
-	}
-	return into
+// Parse reads the sections of a text.
+func Parse(source string) File {
+	file := File{}
+	file.Add(source)
+	return file
 }
+
+// Add adds the sections of source to the file, which Parse made or which is File{}: a section the file has gains
+// the text's keys, and a key given again, in this text or in one added before, takes the later value. A text
+// starts outside every section, so its lines before the first [section] line are passed over.
+func (f File) Add(source string) {
+	var section Section
+	for _, raw := range strings.Split(strings.ReplaceAll(source, "\r\n", "\n"), "\n") {
+		line := trim(raw)
+		switch {
+		case line == "" || strings.HasPrefix(line, "//"):
+		case strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]"):
+			section = f.section(trim(line[1 : len(line)-1]))
+		case section != nil:
+			section.set(line)
+		}
+	}
+}
+
+// section is the section of the name, which is added to the file when it has none.
+func (f File) section(name string) Section {
+	if f[name] == nil {
+		f[name] = Section{}
+	}
+	return f[name]
+}
+
+// set reads a key=value line into the section; a line without an equals sign is passed over.
+func (s Section) set(line string) {
+	if key, value, found := strings.Cut(line, "="); found {
+		s[trim(key)] = unquoted(trim(value))
+	}
+}
+
+// unquoted is the value without its quotes when it is one quoted string: a quote at each end and none between
+// them. A quoted list such as "a","b" is kept as it is written.
+func unquoted(value string) string {
+	if len(value) < 2 || value[0] != '"' || value[len(value)-1] != '"' {
+		return value
+	}
+	if inner := value[1 : len(value)-1]; !strings.Contains(inner, `"`) {
+		return inner
+	}
+	return value
+}
+
+// trim takes the ASCII white space off both ends of text.
+func trim(text string) string { return strings.Trim(text, " \t\n\v\f\r") }

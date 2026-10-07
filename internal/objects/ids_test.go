@@ -1,12 +1,16 @@
 package objects_test
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/mdlsvensson/moonwell/internal/diag"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/objects"
+	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
 var emptyIDs = strings.Join([]string{
@@ -21,7 +25,7 @@ var emptyIDs = strings.Join([]string{
 	"",
 }, "\n")
 
-func object(category objects.Category, key, id string) objects.Resolved {
+func object(category manifest.Category, key, id string) objects.Resolved {
 	return objects.Resolved{Category: category, Key: key, ID: id}
 }
 
@@ -38,33 +42,49 @@ func status(t *testing.T, root, expected string) objects.IDsStatus {
 	return got
 }
 
-func write(t *testing.T, root, content string) bool {
+func refresh(t *testing.T, root, expected string) bool {
 	t.Helper()
-	wrote, err := objects.WriteIDs(root, content)
+	wrote, err := objects.RefreshIDs(root, expected)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return wrote
 }
 
+func asError(t *testing.T, err error, what string) *diag.Error {
+	t.Helper()
+	var failure *diag.Error
+	if !errors.As(err, &failure) {
+		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
+	}
+	return failure
+}
+
 func TestPackIDPacksARawcodeBigEndian(t *testing.T) {
 	for id, want := range map[string]uint32{
 		"h000": 1747988528, "A000": 0x41303030,
-		// Unsigned: ids starting with a byte of 0x80 or more stay positive.
-		"ÿ\x00\x00\x00": 0xff000000,
+		// The number has no sign: an id whose first byte is 0x80 or more stays above 0. U+00FF is the byte 0xFF.
+		"\xc3\xbf\x00\x00\x00": 0xff000000,
 	} {
 		if got, err := objects.PackID(id); err != nil || got != want {
 			t.Errorf("PackID(%q) = %d, %v", id, got, err)
 		}
 	}
-	if _, err := objects.PackID("h00"); err == nil {
-		t.Error("PackID accepted three characters")
+	for _, id := range []string{"h00", "h0000", "", "h00\xe2\x82\xac"} {
+		_, err := objects.PackID(id)
+		var expected *diag.Error
+		if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "4 Latin-1 characters") {
+			t.Errorf("PackID(%q) = %v, want a plain error", id, err)
+		}
 	}
 }
 
 func TestRenderIDsWritesEveryCategoryInOrderEvenWhenEmpty(t *testing.T) {
 	if got := objects.RenderIDs(nil); got != emptyIDs {
 		t.Errorf("RenderIDs = %q", got)
+	}
+	if objects.IDsFile != "src/generated/objects.yue" {
+		t.Errorf("IDsFile = %q", objects.IDsFile)
 	}
 }
 
@@ -103,110 +123,125 @@ func TestRenderIDsSortsKeysWithinEachCategoryAndCommentsEachRawcode(t *testing.T
 	}
 }
 
-func TestStatusOfIDsIsCurrentStaleOrMissingWhileTheManifestHasObjects(t *testing.T) {
+func TestStatusOfIDsIsCurrentStaleOrMissing(t *testing.T) {
 	root := t.TempDir()
-	// No objects and no file passes, so projects from before objects keep passing check.
+	// No objects and no file is current, so a project that has never had objects passes check.
 	if got := status(t, root, emptyIDs); got != objects.IDsCurrent {
 		t.Errorf("no file, no objects: %s", got)
 	}
 	if got := status(t, root, captainIDs); got != objects.IDsMissing {
 		t.Errorf("no file, with objects: %s", got)
 	}
-	if !write(t, root, captainIDs) {
-		t.Error("the first write wrote nothing")
-	}
-	if data, _ := os.ReadFile(idsFile(root)); string(data) != captainIDs {
-		t.Errorf("the file holds %q", data)
-	}
-	if write(t, root, captainIDs) {
-		t.Error("an unchanged module was written again")
-	}
+	testkit.WriteFile(t, root, objects.IDsFile, []byte(captainIDs))
 	if got := status(t, root, captainIDs); got != objects.IDsCurrent {
-		t.Errorf("a written module: %s", got)
+		t.Errorf("the module of these objects: %s", got)
 	}
 	if got := status(t, root, emptyIDs); got != objects.IDsStale {
-		t.Errorf("a module for other objects: %s", got)
+		t.Errorf("the module of other objects: %s", got)
 	}
-	write(t, root, emptyIDs)
+	testkit.WriteFile(t, root, objects.IDsFile, []byte(emptyIDs))
 	if got := status(t, root, emptyIDs); got != objects.IDsCurrent {
 		t.Errorf("an empty module: %s", got)
 	}
 }
 
-func TestAssertIDsCurrentFailsOnAStaleOrMissingFileWithTheRegenerateHint(t *testing.T) {
+func TestAssertIDsCurrentFailsOnAStaleOrMissingFileWithTheHintToRegenerate(t *testing.T) {
 	root := t.TempDir()
 	if err := objects.AssertIDsCurrent(root, emptyIDs); err != nil {
 		t.Error(err)
 	}
 	const hint = "Run moonwell build, test or dev to regenerate it."
 	missing := asError(t, objects.AssertIDsCurrent(root, captainIDs), "a missing module")
-	if missing.Msg != "The file is missing, but the manifest has objects." || missing.File != "src/generated/objects.yue" || missing.Hint != hint {
+	if !strings.Contains(missing.Msg, "is missing, but the manifest has objects") || missing.File != objects.IDsFile || missing.Hint != hint {
 		t.Errorf("error = %+v", missing)
 	}
-	write(t, root, emptyIDs)
+	testkit.WriteFile(t, root, objects.IDsFile, []byte(emptyIDs))
 	stale := asError(t, objects.AssertIDsCurrent(root, captainIDs), "a stale module")
-	if stale.Msg != "The file does not match the objects in the manifest." || stale.File != "src/generated/objects.yue" || stale.Hint != hint {
+	if !strings.Contains(stale.Msg, "does not match the objects in the manifest") || stale.File != objects.IDsFile || stale.Hint != hint {
 		t.Errorf("error = %+v", stale)
 	}
-	write(t, root, captainIDs)
+	testkit.WriteFile(t, root, objects.IDsFile, []byte(captainIDs))
 	if err := objects.AssertIDsCurrent(root, captainIDs); err != nil {
 		t.Error(err)
 	}
 }
 
-func TestStatusOfIDsReadsACRLFCheckoutAsTheSameModule(t *testing.T) {
+func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.T) {
 	root := t.TempDir()
-	write(t, root, strings.ReplaceAll(captainIDs, "\n", "\r\n"))
+	testkit.WriteFile(t, root, objects.IDsFile, []byte(strings.ReplaceAll(captainIDs, "\n", "\r\n")))
 	if got := status(t, root, captainIDs); got != objects.IDsCurrent {
-		t.Errorf("a CRLF checkout: %s", got)
+		t.Errorf("CRLF line endings: %s", got)
 	}
 	if err := objects.AssertIDsCurrent(root, captainIDs); err != nil {
 		t.Error(err)
 	}
-	// A lone CR is a real difference.
-	os.WriteFile(idsFile(root), []byte(strings.ReplaceAll(captainIDs, "\n", "\r")), 0o666)
-	if got := status(t, root, captainIDs); got != objects.IDsStale {
-		t.Errorf("lone CRs: %s", got)
+	// A CR alone is a difference, and so is a byte order mark.
+	for name, content := range map[string]string{
+		"CR alone":          strings.ReplaceAll(captainIDs, "\n", "\r"),
+		"a byte order mark": "\xEF\xBB\xBF" + captainIDs,
+	} {
+		testkit.WriteFile(t, root, objects.IDsFile, []byte(content))
+		if got := status(t, root, captainIDs); got != objects.IDsStale {
+			t.Errorf("%s: %s", name, got)
+		}
 	}
-	// A folder in the module's place is a file error.
+	// A folder in the module's place cannot be read.
 	other := t.TempDir()
-	os.MkdirAll(idsFile(other), 0o777)
-	_, err := objects.StatusOfIDs(other, captainIDs)
-	if e := asError(t, err, "a folder"); e.File != "src/generated/objects.yue" || !strings.HasPrefix(e.Msg, "Reading the generated object ids failed: ") {
-		t.Errorf("error = %+v", e)
+	if err := os.MkdirAll(idsFile(other), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	for name, err := range map[string]error{
+		"StatusOfIDs":      second(objects.StatusOfIDs(other, captainIDs)),
+		"RefreshIDs":       second(objects.RefreshIDs(other, captainIDs)),
+		"AssertIDsCurrent": objects.AssertIDsCurrent(other, captainIDs),
+	} {
+		failure := asError(t, err, name)
+		if failure.File != objects.IDsFile || !strings.HasPrefix(failure.Msg, "Reading the generated object ids failed: ") ||
+			failure.Hint == "" || failure.Cause == nil {
+			t.Errorf("%s: error = %+v", name, failure)
+		}
 	}
 }
 
-func TestRefreshIDsWritesOnlyAStaleOrMissingModuleNeverAnUnneededEmptyOne(t *testing.T) {
+func second[T any](_ T, err error) error { return err }
+
+func TestRefreshIDsWritesOnlyAStaleOrMissingModuleAndNeverAnEmptyOneThatIsNotNeeded(t *testing.T) {
 	root := t.TempDir()
-	refresh := func(expected string) bool {
-		t.Helper()
-		wrote, err := objects.RefreshIDs(root, expected)
-		if err != nil {
-			t.Fatal(err)
-		}
-		return wrote
-	}
-	if refresh(emptyIDs) {
+	if refresh(t, root, emptyIDs) {
 		t.Error("no objects wrote a module")
 	}
 	if _, err := os.Stat(idsFile(root)); err == nil {
 		t.Error("no objects created a file")
 	}
-	if !refresh(captainIDs) {
+	if !refresh(t, root, captainIDs) {
 		t.Error("a missing module was not written")
 	}
 	if data, _ := os.ReadFile(idsFile(root)); string(data) != captainIDs {
 		t.Errorf("the file holds %q", data)
 	}
-	os.WriteFile(idsFile(root), []byte(strings.ReplaceAll(captainIDs, "\n", "\r\n")), 0o666)
-	if refresh(captainIDs) {
-		t.Error("a CRLF checkout was rewritten")
+	if refresh(t, root, captainIDs) {
+		t.Error("a current module was written again")
 	}
-	if !refresh(emptyIDs) {
+	testkit.WriteFile(t, root, objects.IDsFile, []byte(strings.ReplaceAll(captainIDs, "\n", "\r\n")))
+	if refresh(t, root, captainIDs) {
+		t.Error("a checkout with CRLF line endings was rewritten")
+	}
+	if !refresh(t, root, emptyIDs) {
 		t.Error("removing every object did not empty the module")
 	}
 	if data, _ := os.ReadFile(idsFile(root)); string(data) != emptyIDs {
 		t.Errorf("the file holds %q", data)
+	}
+}
+
+func TestRefreshIDsNamesTheModuleWhenItCannotBeWritten(t *testing.T) {
+	// A file where the module's folder belongs: the module cannot be read or written, whichever the system refuses.
+	root := t.TempDir()
+	testkit.WriteFile(t, root, "src/generated", []byte("a file"))
+	wrote, err := objects.RefreshIDs(root, captainIDs)
+	failure := asError(t, err, "a file in place of the folder")
+	if wrote || failure.File != objects.IDsFile || !strings.Contains(failure.Msg, "the generated object ids failed: ") ||
+		failure.Hint == "" || failure.Cause == nil {
+		t.Errorf("RefreshIDs = %v, %+v", wrote, failure)
 	}
 }

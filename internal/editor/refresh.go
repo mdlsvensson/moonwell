@@ -1,95 +1,110 @@
+// Package editor writes the files a code editor reads: the declarations lua-language-server learns the game's
+// API, the project's objects and the map's globals from; the libraries' modules as Lua; and the project's own
+// editor files, where one is missing or lacks an entry.
+//
+// It takes what objects and script found, and a project folder. RefreshTypes takes the resolved objects, what
+// the map's script defines, the name of that script and the game's API (script.LoadNatives), and writes the
+// declarations; RefreshLibraryView takes the modules and a way to each module's Lua, clears .moonwell/lua/ of
+// all that is no module's, and writes the libraries' modules there. Both write under .moonwell/ and return the
+// paths they wrote, from the project folder. AddFiles and MergeLuarc, the scaffold, take the template's files
+// (moonwell.TemplateFiles) and bring the project's own editor files up to date: yueconfig.yue, .luarc.json,
+// .vscode/extensions.json and the lines of .gitignore. They return what they added.
+//
+// It knows nothing of maps or of builds: it reads no map, evaluates no manifest and compiles nothing. What a
+// map's script defines and what a module compiles to are handed to it.
+//
+// Of Moonwell it imports objects and script, whose findings it renders, manifest, war3/lua, diag, fsx and the
+// root package, for the template's files.
 package editor
 
 import (
 	"errors"
-	"io/fs"
-	"os"
-	"path/filepath"
 
-	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
-	"github.com/mdlsvensson/moonwell/internal/luasrc"
-	"github.com/mdlsvensson/moonwell/internal/natives"
 	"github.com/mdlsvensson/moonwell/internal/objects"
-	"github.com/mdlsvensson/moonwell/internal/text"
-	"github.com/mdlsvensson/moonwell/internal/yue"
+	"github.com/mdlsvensson/moonwell/internal/script"
+	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// TypesDir is the folder of the editor's declarations, from the project root.
-const TypesDir = ".moonwell/types"
+// The folders the package writes, from the project folder.
+const (
+	TypesDir       = ".moonwell/types" // the declarations
+	LibraryViewDir = ".moonwell/lua"   // the libraries' modules as Lua, by module path
+)
 
-// Inputs are what the editor's files are made from.
-type Inputs struct {
-	// Objects are the project's custom objects; only their category, key and id are used.
-	Objects []objects.Resolved
-	// MapFolder is the source map's folder as the project names it, such as "maps/map.w3x".
-	MapFolder string
-	// Natives is the game's API; nil is the embedded copy. Tests pass a miniature one.
-	Natives *natives.Natives
+// Types is what the declarations are made from.
+type Types struct {
+	Objects []objects.Resolved // only their category, key and id are used
+	Map     *lua.MapGlobals    // nil for a map without a script
+	MapLua  string             // the script as the project names it, such as "maps/map.w3x/war3map.lua"
+	Natives *script.Natives    // the game's API: script.LoadNatives()
 }
 
-// ReadSourceScript reads the source map's script; exists is false when there is none. label is its POSIX path, for
-// error messages.
-func ReadSourceScript(path, label string) (script string, exists bool, err error) {
-	data, err := os.ReadFile(path)
-	if errors.Is(err, fs.ErrNotExist) {
-		return "", false, nil
+// RefreshTypes brings .moonwell/types/ up to date: natives.d.lua, moonwell.d.lua, objects.d.lua and map.d.lua.
+// Each file is written only when its content differs. It returns the paths it wrote, from the project folder, in
+// that order. A link on the way to a file is refused, and nothing is written through it.
+func RefreshTypes(root string, in Types) (written []string, err error) {
+	if in.Natives == nil {
+		// A plain error: the caller passes script.LoadNatives(), which is never nil, so declarations without the
+		// game's API are a mistake in Moonwell and nothing the user can put right.
+		return nil, errors.New("editor.RefreshTypes: Types.Natives is nil; pass script.LoadNatives()")
 	}
-	if err != nil {
-		return "", false, &diag.Error{
-			Msg:   "Reading " + label + " failed: " + fsx.Reason(err),
-			File:  label,
-			Cause: err,
-			Hint:  "map.folder must be a map World Editor saved in folder format; re-save it that way.",
-		}
-	}
-	return text.Lossy(data), true, nil
-}
-
-// Refresh brings .moonwell/ under root up to date: the editor's declarations in .moonwell/types/ and the macro
-// module. Each file is written only when its content differs. It returns the POSIX paths it wrote.
-func Refresh(root string, inputs Inputs) ([]string, error) {
-	source := inputs.MapFolder + "/war3map.lua"
-	script, exists, err := ReadSourceScript(filepath.Join(root, filepath.FromSlash(source)), source)
-	if err != nil {
-		return nil, err
-	}
-	var mapGlobals *luasrc.MapGlobals
-	if exists {
-		globals := luasrc.ReadMapGlobals(script)
-		mapGlobals = &globals
-	}
-	api := inputs.Natives
-	if api == nil {
-		api = natives.Load()
-	}
-	files := [][2]string{
-		{TypesDir + "/natives.d.lua", RenderNatives(api)},
-		{TypesDir + "/moonwell.d.lua", RuntimeDeclarations},
-		{TypesDir + "/objects.d.lua", RenderObjects(inputs.Objects)},
-		{TypesDir + "/map.d.lua", RenderMap(mapGlobals, source)},
-		{yue.MacrosFile, moonwell.MacrosYue},
-	}
-	written := []string{}
-	for _, file := range files {
-		path, content := file[0], file[1]
-		wrote, err := fsx.WriteIfChanged(filepath.Join(root, filepath.FromSlash(path)), content)
-		var expected *diag.Error
-		if errors.As(err, &expected) {
+	written = []string{}
+	for _, file := range declarationsOf(in) {
+		wrote, err := file.refresh(root)
+		if err != nil {
 			return nil, err
 		}
-		if err != nil {
-			return nil, &diag.Error{
-				Msg:   "Writing " + path + " failed: " + fsx.Reason(err),
-				File:  path,
-				Cause: err,
-				Hint:  "Moonwell's compiler and the editor read .moonwell/; make sure it is a folder you can write, then retry.",
-			}
-		}
 		if wrote {
-			written = append(written, path)
+			written = append(written, file.path)
 		}
 	}
 	return written, nil
+}
+
+// declarations is one file of declarations.
+type declarations struct {
+	path string // from the project folder, with "/"
+	text string
+}
+
+// declarationsOf is the four files of declarations, in the order they are written.
+func declarationsOf(in Types) []declarations {
+	return []declarations{
+		{TypesDir + "/natives.d.lua", RenderNatives(in.Natives)},
+		{TypesDir + "/moonwell.d.lua", RuntimeDeclarations},
+		{TypesDir + "/objects.d.lua", RenderObjects(in.Objects)},
+		{TypesDir + "/map.d.lua", RenderMap(in.Map, in.MapLua)},
+	}
+}
+
+// refresh writes the file below root unless it holds the text already, and reports whether it wrote.
+func (d declarations) refresh(root string) (wrote bool, err error) {
+	file, err := fsx.SafeJoin(root, d.path)
+	if err == nil {
+		wrote, err = fsx.WriteIfChanged(file, d.text)
+	}
+	if err != nil && !isExpected(err) {
+		return false, errDeclarationsNotWritten(d.path, err)
+	}
+	return wrote, err
+}
+
+// isExpected reports whether a failure is worded for a user already: a link where real files are needed, or a
+// file another program holds. Any other failure is the system's, and is worded where it happens.
+func isExpected(err error) bool {
+	var expected *diag.Error
+	return errors.As(err, &expected)
+}
+
+// ---- errors ----
+
+func errDeclarationsNotWritten(path string, cause error) error {
+	return &diag.Error{
+		Msg:   "Writing " + path + " failed: " + fsx.Reason(cause),
+		File:  path,
+		Hint:  "Moonwell's compiler and the editor read .moonwell/; make sure it is a folder you can write, then retry.",
+		Cause: cause,
+	}
 }

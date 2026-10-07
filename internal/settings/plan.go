@@ -1,303 +1,249 @@
+// Package settings applies the manifest's map settings to a map folder: it patches war3map.w3i, brings
+// war3map.lua into line with it, merges the two settings text files, and puts a preview picture in the
+// minimap's place.
+//
+// It takes a project and a map folder, and returns the changes to the map's files. Beside the map's files it
+// reads one file: the preview picture the settings name, from the project folder. It writes nothing.
+//
+// The shape of the settings is Pkl's to check. What is checked here is what Pkl cannot see: what a setting needs
+// of the map it is for, a typed gameplay constant against a raw one, and names that differ only in letter case.
+// The package must not know how a map is built or launched, nor the object data and the imported files of a map.
+//
+// Of Moonwell it imports manifest, mapdir, diag, fsx, and war3/w3i, war3/lua, war3/txt and war3/picture.
 package settings
 
 import (
 	"bytes"
-	"errors"
-	"io/fs"
-	"os"
-	"path/filepath"
-	"strings"
-	"unicode/utf8"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
+	"github.com/mdlsvensson/moonwell/internal/war3/txt"
 )
 
+// The files of a map that settings change, by the names World Editor gives them. A map may spell them in another
+// letter case, and is changed under the spelling it has. The files of a preview picture are named beside its
+// steps.
 const (
-	resaveMap = "Open and re-save the map in World Editor in folder format with Lua as the script language."
-	bom       = "\xEF\xBB\xBF"
-	// The minimap World Editor writes, which the game's map list shows, and the name a TGA picture takes its place
-	// under.
-	minimap    = "war3mapMap.blp"
-	minimapTGA = "war3mapMap.tga"
+	infoName = "war3map.w3i"
+	luaName  = "war3map.lua"
+	miscName = "war3mapMisc.txt"
+	skinName = "war3mapSkin.txt"
 )
 
-var settingsFiles = []string{"war3map.w3i", "war3map.lua", "war3mapMisc.txt", "war3mapSkin.txt"}
-
-// PlanOptions say how a settings plan names things in its errors.
-type PlanOptions struct {
-	// ManifestFile is the evaluated manifest, which errors that do not depend on the map name.
-	ManifestFile string
-	// SourceLabel is the folder that map-file errors name, such as maps/map.w3x when the plan is for a staged copy:
-	// the user fixes the source, not the copy. Empty: errors name the path in the planned folder.
-	SourceLabel string
-	// Root is the project folder that settings.info.preview starts at.
-	Root string
+// Plan computes every file the project's settings change in the map folder, and writes nothing. It returns the
+// changed files only, in the order war3map.w3i, war3map.lua, war3mapMisc.txt, war3mapSkin.txt, and then the
+// files of a preview picture: war3mapMinimap.blp (World Editor's minimap, kept), war3mapMap.blp (replaced by a
+// BLP picture, removed for a TGA one) and war3mapMap.tga.
+//
+// What does not depend on the map is refused before a map file is read: constants that cannot be written, and a
+// preview that is no usable picture. A file is read only when a setting needs it, so settings that set nothing
+// read nothing.
+func Plan(folder *mapdir.Folder, p *manifest.Project) ([]mapdir.Change, error) {
+	s := p.Settings
+	misc, skin, err := textSections(s, p.File)
+	if err != nil {
+		return nil, err
+	}
+	preview, err := previewOf(p)
+	if err != nil {
+		return nil, err
+	}
+	plan := &planner{folder: folder}
+	if err := plan.roomFor(preview); err != nil {
+		return nil, err
+	}
+	info, err := plan.mapInfo(s)
+	if err != nil {
+		return nil, err
+	}
+	if err := plan.lua(s, info, preview != nil); err != nil {
+		return nil, err
+	}
+	if err := plan.text(miscName, misc); err != nil {
+		return nil, err
+	}
+	if err := plan.text(skinName, skin); err != nil {
+		return nil, err
+	}
+	if err := plan.preview(preview); err != nil {
+		return nil, err
+	}
+	return plan.changes, nil
 }
 
-// readMapFile reads a map file; nil without an error only when an optional file does not exist. Errors name file,
-// the label, not the path.
-func readMapFile(path, file string, optional bool) ([]byte, error) {
-	data, err := os.ReadFile(path)
+// planner gathers the changes of one plan. Each step returns its failure, and Plan stops at the first.
+type planner struct {
+	folder  *mapdir.Folder
+	changes []mapdir.Change
+}
+
+// ---- the steps, in the order of their changes; those of a preview are in plan_preview.go ----
+
+// mapInfo patches war3map.w3i and returns the file as the settings leave it, which the Lua is brought into line
+// with. Without a setting that is stored in the file, it is not read and nothing is returned.
+func (p *planner) mapInfo(s manifest.Settings) ([]byte, error) {
+	if !setsInfo(s) {
+		return nil, nil
+	}
+	data, err := p.required(infoName)
+	if err != nil {
+		return nil, err
+	}
+	patched, err := patchInfo(data, s, p.folder.Label(infoName))
+	if err != nil {
+		return nil, err
+	}
+	if !bytes.Equal(patched, data) {
+		if err := p.write(infoName, patched); err != nil {
+			return nil, err
+		}
+	}
+	return patched, nil
+}
+
+// lua brings war3map.lua into line with the patched map info and, for a map that gets a preview picture, adds
+// the call that gives the game World Editor's minimap back. Both edits go into one change. A byte order mark is
+// kept aside and put back in front of what is written.
+func (p *planner) lua(s manifest.Settings, patchedInfo []byte, withPreview bool) error {
+	if !needsLua(s) && !withPreview {
+		return nil
+	}
+	mark, source, err := p.requiredText(luaName)
+	if err != nil {
+		return err
+	}
+	patched, err := p.patchedLua(source, s, patchedInfo, withPreview)
+	if err != nil || patched == source {
+		return err
+	}
+	return p.write(luaName, []byte(mark+patched))
+}
+
+// needsLua reports whether the settings are of a kind war3map.lua takes part in: the map's name and description,
+// and the players, the forces and the environment, which only a map with Lua as its script language has. The Lua
+// of such a map must be there and be text, also for a setting that setsLua does not count, as a force's name.
+func needsLua(s manifest.Settings) bool {
+	return needsDetails(s) || s.Info.Name != nil || s.Info.Description != nil
+}
+
+// patchedLua is the text of war3map.lua with the settings in it, and with the minimap call for a preview.
+func (p *planner) patchedLua(source string, s manifest.Settings, patchedInfo []byte, withPreview bool) (string, error) {
+	file := p.folder.Label(luaName)
+	patched, err := patchLuaAfter(source, s, patchedInfo, file, p.folder.Label(infoName))
+	if err != nil || !withPreview {
+		return patched, err
+	}
+	return patchMinimap(patched, file)
+}
+
+// text merges the sections into the text file under name. A map without the file is merged into as one whose
+// file holds nothing, and so gets a file with the sections alone; a file that holds every value already is not
+// changed. Without a key to set, the file is not read. A byte order mark is kept aside and put back in front of
+// what is written.
+func (p *planner) text(name string, sections []txt.Section) error {
+	if !setsKeys(sections) {
+		return nil
+	}
+	data, _, err := p.folder.Read(name)
+	if err != nil {
+		return err
+	}
+	mark, source, err := p.textOf(name, data)
+	if err != nil {
+		return err
+	}
+	merged := txt.Merge(source, sections)
+	if merged == source {
+		return nil
+	}
+	return p.write(name, []byte(mark+merged))
+}
+
+// setsKeys reports whether a section has a key to set. Sections without keys write nothing.
+func setsKeys(sections []txt.Section) bool {
+	for _, section := range sections {
+		if len(section.Fields) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// ---- reading and changing the map's files ----
+
+// required is the bytes of a file the settings need the map to have, in any letter case. A folder under the name
+// is not the file, and is refused as a folder where the file belongs, not as a file the map lacks.
+func (p *planner) required(name string) ([]byte, error) {
+	data, found, err := p.folder.Read(name)
 	switch {
-	case err == nil:
+	case err != nil:
+		return nil, err
+	case found:
 		return data, nil
-	case errors.Is(err, fs.ErrNotExist) && optional:
-		return nil, nil
-	case errors.Is(err, fs.ErrNotExist):
-		return nil, &diag.Error{
-			Msg: "A map file needed by the configured settings is missing.", File: file, Cause: err, Hint: resaveMap,
-		}
+	case p.folder.IsFolder(name):
+		return nil, errFolderForFile(p.folder.Name(name), p.folder.Label(name))
 	}
-	return nil, &diag.Error{
-		Msg:   "Reading a map file for map settings failed: " + fsx.Reason(err),
-		File:  file,
-		Cause: err,
-		Hint:  "Make sure this is a readable file, not a folder, and that no other program has it locked.",
+	return nil, errMissing(p.folder.Label(name))
+}
+
+// requiredText is required for a file that is text: its byte order mark, and the text after it.
+func (p *planner) requiredText(name string) (mark, text string, err error) {
+	data, err := p.required(name)
+	if err != nil {
+		return "", "", err
+	}
+	return p.textOf(name, data)
+}
+
+// textOf is the bytes of the file under name as text, which is UTF-8: the byte order mark the file starts with,
+// or "", and the text after it.
+func (p *planner) textOf(name string, data []byte) (mark, text string, err error) {
+	mark, text, ok := fsx.TextWithMark(data)
+	if !ok {
+		return "", "", errNotText(p.folder.Label(name))
+	}
+	return mark, text, nil
+}
+
+// write plans the file under name to hold data.
+func (p *planner) write(name string, data []byte) error {
+	return p.change(mapdir.Change{Name: name, Bytes: data})
+}
+
+// change adds a change, under the spelling the map has for the file. A file the map does not have keeps the name
+// given; where the map has a folder under that name, the plan is refused.
+func (p *planner) change(change mapdir.Change) error {
+	placed, err := p.folder.Place(change.Name)
+	if err != nil {
+		return err
+	}
+	change.Name = placed
+	p.changes = append(p.changes, change)
+	return nil
+}
+
+// ---- errors ----
+
+// resaveMap is the hint of a map that lacks a file World Editor writes, or has one World Editor did not write.
+const resaveMap = "Open and re-save the map in World Editor in folder format with Lua as the script language."
+
+func errMissing(file string) error {
+	return &diag.Error{Msg: "A map file needed by the configured settings is missing.", File: file, Hint: resaveMap}
+}
+
+// errFolderForFile names the folder as the map spells it. It is raised for the minimap a preview needs too, in
+// plan_preview.go.
+func errFolderForFile(folder, file string) error {
+	return &diag.Error{
+		Msg:  folder + " in the map is a folder, not a file.",
+		File: file,
+		Hint: "The map has a folder where a file the configured settings need belongs. Remove that folder from the " +
+			"source map, or open and re-save the map in World Editor.",
 	}
 }
 
-// decodeText decodes strict UTF-8, keeping a byte order mark aside so that it survives re-encoding.
-func decodeText(data []byte, file string) (mark, text string, err error) {
-	if !utf8.Valid(data) {
-		return "", "", &diag.Error{Msg: "This map file is not valid UTF-8 text.", File: file, Hint: resaveMap}
-	}
-	if rest, found := strings.CutPrefix(string(data), bom); found {
-		return bom, rest, nil
-	}
-	return "", string(data), nil
-}
-
-// Plan computes every file the settings change in the map folder mapDir, without writing anything. It returns
-// changed files only, named relative to mapDir, in the order war3map.w3i, war3map.lua, war3mapMisc.txt,
-// war3mapSkin.txt, and then the files of a preview picture: war3mapMinimap.blp (World Editor's minimap, kept),
-// war3mapMap.blp (replaced by a BLP picture, removed for a TGA one) and war3mapMap.tga.
-func Plan(mapDir string, s *Settings, options PlanOptions) ([]mapdir.Change, error) {
-	if !s.Has() {
-		return nil, nil
-	}
-	// Conflicts that do not depend on the map fail before any map file is read.
-	manifestFile := options.ManifestFile
-	if manifestFile == "" {
-		manifestFile = "moonwell.pkl"
-	}
-	misc, err := GameplaySections(s, manifestFile)
-	if err != nil {
-		return nil, err
-	}
-	var picture *Picture
-	if s.Preview != nil {
-		if options.Root == "" {
-			return nil, errors.New("settings.Plan needs the project folder to read settings.info.preview.")
-		}
-		if picture, err = LoadPreview(options.Root, *s.Preview, options.ManifestFile); err != nil {
-			return nil, err
-		}
-	}
-	dir, err := filepath.Abs(mapDir)
-	if err != nil {
-		return nil, err
-	}
-	label := func(name string) string {
-		switch {
-		case options.SourceLabel == "":
-			return filepath.Join(dir, name)
-		case name == "":
-			return options.SourceLabel
-		}
-		return options.SourceLabel + "/" + name
-	}
-
-	wanted := settingsFiles
-	if picture != nil {
-		wanted = append(append([]string{}, settingsFiles...), minimap, minimapTGA, KeptMinimap)
-	}
-	var entries []string
-	listed, err := os.ReadDir(dir)
-	if err != nil && !errors.Is(err, fs.ErrNotExist) {
-		return nil, &diag.Error{
-			Msg:   "Reading the map folder for map settings failed: " + fsx.Reason(err),
-			File:  label(""),
-			Cause: err,
-			Hint:  "Check that the map folder is readable.",
-		}
-	}
-	for _, entry := range listed {
-		entries = append(entries, entry.Name())
-	}
-	names, err := mapdir.Names(entries, wanted, label)
-	if err != nil {
-		return nil, err
-	}
-	// existing is the name a file has in the folder, or its usual name when the folder has none.
-	existing := func(name string) string {
-		if found, ok := names[mapdir.Key(name)]; ok {
-			return found
-		}
-		return name
-	}
-
-	var changes []mapdir.Change
-	extended := s.HasExtended()
-	needsW3i := extended || !s.Info.empty() || !s.Loading.empty()
-	needsLua := extended || s.Info.Name != nil || s.Info.Description != nil
-	// A preview picture takes the minimap's place, so the map must have one, and the two names it adds must be free.
-	minimapName, hasMinimap := names[mapdir.Key(minimap)]
-	if picture != nil {
-		if !hasMinimap {
-			return nil, &diag.Error{
-				Msg:  "The map has no " + minimap + ", the minimap whose place the preview picture takes.",
-				File: label(minimap),
-				Hint: "Open and save the map in World Editor, which writes the minimap.",
-			}
-		}
-		for _, needed := range []string{KeptMinimap, minimapTGA} {
-			if taken, ok := names[mapdir.Key(needed)]; ok {
-				return nil, &diag.Error{
-					Msg:  "The map already has " + taken + ", a name the preview picture needs.",
-					File: label(taken),
-					Hint: "Remove that file from the map: a build with settings.info.preview writes it.",
-				}
-			}
-		}
-	}
-
-	w3iName := existing("war3map.w3i")
-	w3iFile := label(w3iName)
-	var patchedInfo []byte
-	if needsW3i {
-		info, err := readMapFile(filepath.Join(dir, w3iName), w3iFile, false)
-		if err != nil {
-			return nil, err
-		}
-		if patchedInfo, err = PatchMapInfo(info, s, w3iFile); err != nil {
-			return nil, err
-		}
-		if !bytes.Equal(patchedInfo, info) {
-			changes = append(changes, mapdir.Change{Name: w3iName, Bytes: patchedInfo})
-		}
-	}
-	if needsLua || picture != nil {
-		luaName := existing("war3map.lua")
-		luaFile := label(luaName)
-		data, err := readMapFile(filepath.Join(dir, luaName), luaFile, false)
-		if err != nil {
-			return nil, err
-		}
-		mark, source, err := decodeText(data, luaFile)
-		if err != nil {
-			return nil, err
-		}
-		lua := source
-		if needsLua {
-			if lua, err = PatchLua(lua, s, patchedInfo, luaFile, w3iFile); err != nil {
-				return nil, err
-			}
-		}
-		if picture != nil {
-			if lua, err = PatchMinimapLua(lua, luaFile); err != nil {
-				return nil, err
-			}
-		}
-		if lua != source {
-			changes = append(changes, mapdir.Change{Name: luaName, Bytes: []byte(mark + lua)})
-		}
-	}
-
-	for _, file := range []struct {
-		name     string
-		sections *Sections
-	}{{"war3mapMisc.txt", &misc}, {"war3mapSkin.txt", &s.GameInterface}} {
-		if !hasEntries(file.sections) {
-			continue
-		}
-		name := existing(file.name)
-		data, err := readMapFile(filepath.Join(dir, name), label(name), true)
-		if err != nil {
-			return nil, err
-		}
-		mark, source := "", ""
-		if data != nil {
-			if mark, source, err = decodeText(data, label(name)); err != nil {
-				return nil, err
-			}
-		}
-		if merged := PatchText(source, *file.sections); data == nil || merged != source {
-			changes = append(changes, mapdir.Change{Name: name, Bytes: []byte(mark + merged)})
-		}
-	}
-
-	if picture != nil {
-		kept, err := readMapFile(filepath.Join(dir, minimapName), label(minimapName), false)
-		if err != nil {
-			return nil, err
-		}
-		changes = append(changes, mapdir.Change{Name: KeptMinimap, Bytes: kept})
-		if picture.Extension == "blp" {
-			changes = append(changes, mapdir.Change{Name: minimapName, Bytes: picture.Bytes})
-		} else {
-			changes = append(changes,
-				mapdir.Change{Name: minimapName, Remove: true},
-				mapdir.Change{Name: minimapTGA, Bytes: picture.Bytes})
-		}
-	}
-	return changes, nil
-}
-
-// Apply writes planned settings into the staged map folder. Only build and test call this, on dist/stage.
-func Apply(mapDir string, changes []mapdir.Change) error {
-	return mapdir.Apply(mapDir, changes, "Writing staged map settings failed.")
-}
-
-// MapDir returns the source map folder maps/<mapFolder> that settings are checked against: an existing real folder.
-// It is the folder build and test stage, but checked more strictly than their staging, which only tests that the
-// path exists: here map.folder must stay inside maps/ and no path segment below the project may be a symlink or
-// junction. A missing folder names the manifest, as build does, since map.folder is what to fix.
-func MapDir(root, mapFolder, manifestFile string) (string, error) {
-	if manifestFile == "" {
-		manifestFile = "moonwell.pkl"
-	}
-	maps, err := filepath.Abs(filepath.Join(root, "maps"))
-	if err != nil {
-		return "", err
-	}
-	inside, err := filepath.Rel(maps, fsx.Resolve(maps, mapFolder))
-	label := "maps/" + mapFolder
-	if err != nil || inside == "." || strings.Split(inside, string(filepath.Separator))[0] == ".." || filepath.IsAbs(inside) {
-		return "", &diag.Error{
-			Msg:  `map.folder must name a folder inside maps/, not "` + mapFolder + `".`,
-			File: manifestFile,
-			Hint: "Set map.folder to the name of the map folder under maps/, such as map.w3x.",
-		}
-	}
-	dir, err := fsx.SafeJoin(root, label)
-	if err != nil {
-		return "", err
-	}
-	info, err := os.Stat(dir)
-	if errors.Is(err, fs.ErrNotExist) {
-		return "", &diag.Error{
-			Msg:   "Source map folder " + label + " not found.",
-			File:  manifestFile,
-			Cause: err,
-			Hint:  "Set map.folder to a folder under maps/ saved by World Editor in folder format.",
-		}
-	}
-	if err != nil {
-		return "", &diag.Error{
-			Msg:   "Reading the source map folder failed: " + fsx.Reason(err),
-			File:  label,
-			Cause: err,
-			Hint:  "Check that the folder is readable.",
-		}
-	}
-	if !info.IsDir() {
-		return "", &diag.Error{
-			Msg:  "Source map " + label + " is not a folder.",
-			File: label,
-			Hint: "Save the map in World Editor in folder format (File > Save Map As, Folder), or set map.folder to it.",
-		}
-	}
-	return dir, nil
+func errNotText(file string) error {
+	return &diag.Error{Msg: "This map file is not valid UTF-8 text.", File: file, Hint: resaveMap}
 }
