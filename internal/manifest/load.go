@@ -47,13 +47,25 @@ func Load(ctx context.Context, e *env.Env, pkl string) (*Project, error) {
 func Decode(root, file string, data []byte) (*Project, error) {
 	project := &Project{Root: root, File: file}
 	if err := json.Unmarshal(data, project); err != nil {
-		return nil, errNotAProject(file, strings.ReplaceAll(err.Error(), "json: ", ""), err)
+		return nil, errNotAProject(file, reasonOf(err), err)
 	}
 	if missing := project.missingTexts(); len(missing) > 0 {
 		return nil, errNotAProject(file, "it has no "+diag.JoinWords(missing, "and", -1), nil)
 	}
 	project.Objects.nameSources(file)
 	return project, nil
+}
+
+// reasonOf says why JSON does not fit a project. A value of another kind than a project has in its place is named
+// by where it stands, as a manifest writes it (map.folder), and by what it is, in place of the decoder's words,
+// which name types of this program. The keys of the mappings on the way to it stand before it, as under puts them.
+func reasonOf(err error) string {
+	var mismatch *json.UnmarshalTypeError
+	if !errors.As(err, &mismatch) {
+		return strings.ReplaceAll(err.Error(), "json: ", "")
+	}
+	keys := strings.TrimSuffix(err.Error(), mismatch.Error())
+	return keys + cmp.Or(mismatch.Field, "the value") + " is of the wrong kind (" + mismatch.Value + ")"
 }
 
 // missingTexts names the texts p lacks of the four the schema gives every project. JSON that fits the structs and

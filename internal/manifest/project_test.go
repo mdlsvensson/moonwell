@@ -200,8 +200,8 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 					t.Errorf("the message %q lacks %q", failure.Msg, word)
 				}
 			}
-			// The reason is the decoder's, without the name of its package and without a type of this one.
-			for _, word := range append([]string{"json:", "Ordered", "Object"}, tt.without...) {
+			// The reason is in Moonwell's words: no word of the decoder's, and no type of Go or of this package.
+			for _, word := range append([]string{"json:", "unmarshal", "Go ", "of type", "manifest.", "Ordered", "Object"}, tt.without...) {
 				if strings.Contains(failure.Msg, word) {
 					t.Errorf("the message %q has %q", failure.Msg, word)
 				}

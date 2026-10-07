@@ -14,6 +14,9 @@
   file is named, and not by its full path. A link on the way to a file Moonwell keeps below `.moonwell/` or
   `dist/stage/lua/` is refused with that file named. A file in the place of the folder `.asset-state` or
   `dist/stage` gives the same error on Windows and on Linux.
+- A manifest that does not evaluate to a Moonwell project (one that does not amend `@moonwell/Project.pkl`) is
+  refused with the place of the value that does not fit, as the manifest writes it (`map.folder`), and what the
+  value is.
 
 ## 0.9.1 (2026-10-03)
 

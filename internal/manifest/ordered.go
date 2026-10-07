@@ -62,8 +62,7 @@ func (o *Ordered[V]) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if opening != json.Delim('{') {
-		// In the decoder's words, with what the value should be in place of the name of a Go type.
-		return fmt.Errorf("cannot unmarshal %s into a mapping", kindOf(opening))
+		return fmt.Errorf("the value is of the wrong kind (%s, not a mapping)", kindOf(opening))
 	}
 	for decoder.More() {
 		if err := o.readEntry(decoder); err != nil {
@@ -72,39 +71,6 @@ func (o *Ordered[V]) UnmarshalJSON(data []byte) error {
 	}
 	_, err = decoder.Token() // the closing brace
 	return err
-}
-
-// MarshalJSON prints the mapping as a JSON object with its keys in their order; a mapping without keys is {}. It
-// leaves markup characters as they are: an encoder that writes them as escapes does so to what a type prints too.
-func (o Ordered[V]) MarshalJSON() ([]byte, error) {
-	var out bytes.Buffer
-	encoder := json.NewEncoder(&out)
-	encoder.SetEscapeHTML(false)
-	out.WriteByte('{')
-	for i, key := range o.keys {
-		if i > 0 {
-			out.WriteByte(',')
-		}
-		if err := printJSON(&out, encoder, key); err != nil {
-			return nil, err
-		}
-		out.WriteByte(':')
-		if err := printJSON(&out, encoder, o.values[key]); err != nil {
-			return nil, err
-		}
-	}
-	out.WriteByte('}')
-	return out.Bytes(), nil
-}
-
-// printJSON adds the JSON of a value to out, through the encoder that writes to it, without the line break an
-// encoder ends a value with.
-func printJSON(out *bytes.Buffer, encoder *json.Encoder, value any) error {
-	if err := encoder.Encode(value); err != nil {
-		return err
-	}
-	out.Truncate(out.Len() - 1)
-	return nil
 }
 
 // readEntry reads the next key and its value.
