@@ -42,24 +42,24 @@ func sameLines(t *testing.T, got, want []string) {
 
 func TestModelsAreTheAssetsImportedAsAModelNamedByWhereTheyComeFrom(t *testing.T) {
 	assets := []Asset{
-		{Source: "Models/Knight.mdx", Target: "Models/Knight.mdx", Bytes: []byte("knight")},
-		{Source: "art/tree.bin", Target: "Doodads/Tree.MDL", Bytes: []byte("tree")},
-		{Source: "Models/Golem.mdx", Library: "golems", Target: "Models/Golem.MdX", Bytes: []byte("golem")},
-		{Source: "Models/Spare.mdx", Target: "spare/model.bin", Bytes: []byte("spare")},
-		{Source: "Textures/a.blp", Target: "Textures/a.blp", Bytes: []byte("texture")},
-		{Source: "notes.mdx.txt", Target: "notes.mdx.txt", Bytes: []byte("notes")},
-		{Source: "mdx", Target: "mdx", Bytes: []byte("no extension")},
+		{Source: "Models/Knight.mdx", Target: "Models/Knight.mdx", Data: []byte("knight")},
+		{Source: "art/tree.bin", Target: "Doodads/Tree.MDL", Data: []byte("tree")},
+		{Source: "Models/Golem.mdx", Library: "golems", Target: "Models/Golem.MdX", Data: []byte("golem")},
+		{Source: "Models/Spare.mdx", Target: "spare/model.bin", Data: []byte("spare")},
+		{Source: "Textures/a.blp", Target: "Textures/a.blp", Data: []byte("texture")},
+		{Source: "notes.mdx.txt", Target: "notes.mdx.txt", Data: []byte("notes")},
+		{Source: "mdx", Target: "mdx", Data: []byte("no extension")},
 	}
 	want := []Model{
 		{"assets/Models/Knight.mdx", []byte("knight")},
 		{"assets/art/tree.bin", []byte("tree")},
 		{"library golems: Models/Golem.mdx", []byte("golem")},
 	}
-	got := Models(assets)
+	got := ModelsAmong(assets)
 	if !slices.EqualFunc(got, want, func(a, b Model) bool { return a.Heading == b.Heading && string(a.Data) == string(b.Data) }) {
 		t.Errorf("Models = %q", got)
 	}
-	if found := Models(assets[3:]); len(found) != 0 {
+	if found := ModelsAmong(assets[3:]); len(found) != 0 {
 		t.Errorf("assets without a model have the models %q", found)
 	}
 }
@@ -135,7 +135,7 @@ func TestTheModelsALibraryShipsAreReportedAndItsFilesCountAsImported(t *testing.
 	testkit.WriteFile(t, root, "assets/Models/Own.mdx", textured(`textures\golem.BLP`))
 	assets, _ := collect(t, root, noBlock, "golems")
 
-	reports := ReportModels(Models(assets), ParseGamePaths("# test\n"), Targets(assets))
+	reports := ReportModels(ModelsAmong(assets), ParseGamePaths("# test\n"), TargetSet(assets))
 	if got, want := headings(reports), []string{"library golems: Models/Golem.mdx", "assets/Models/Own.mdx"}; !slices.Equal(got, want) {
 		t.Fatalf("the reports are of %q, want %q", got, want)
 	}
@@ -165,12 +165,12 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 	put(t, root, "assets/Models/Only.mdl", "Version {\n FormatVersion 800,\n}\n")
 	assets, _ := collect(t, root, `{"paths":{"art/cape.blp":"Textures\\Cape.blp"},"exclude":[]}`)
 	gamePaths := ParseGamePaths("# test\ntextures/knight.dds\ntextures/missing.blp\n")
-	models := Models(assets)
+	models := ModelsAmong(assets)
 	if len(models) != 3 || models[1].Heading != "assets/Models/Knight.mdx" {
 		t.Fatalf("Models = %+v", models)
 	}
 
-	reports := ReportModels(models[1:2], gamePaths, Targets(assets))
+	reports := ReportModels(models[1:2], gamePaths, TargetSet(assets))
 	wanted := []PathStatus{InGameReplaced, CustomImported, InGame, "", CustomImported, CustomNotImported}
 	if len(reports) != 1 || !slices.Equal(statuses(reports[0]), wanted) {
 		t.Fatalf("ReportModels = %+v", reports)
@@ -180,7 +180,7 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 		t.Errorf("the summary is %q", last)
 	}
 
-	reports = ReportModels(models, gamePaths, Targets(assets))
+	reports = ReportModels(models, gamePaths, TargetSet(assets))
 	if got, want := headings(reports), []string{"assets/Models/Glow.mdx", "assets/Models/Knight.mdx", "assets/Models/Only.mdl"}; !slices.Equal(got, want) {
 		t.Fatalf("the reports are of %q, want %q", got, want)
 	}
@@ -209,7 +209,7 @@ func TestAModelThatCannotBeReadIsReportedInItsPlaceBesideTheOthers(t *testing.T)
 	testkit.WriteFile(t, root, "assets/Models/B.mdx", textured(`Textures\B.blp`))
 	assets, _ := collect(t, root, noBlock)
 
-	reports := ReportModels(Models(assets), ParseGamePaths("textures/b.blp\n"), Targets(assets))
+	reports := ReportModels(ModelsAmong(assets), ParseGamePaths("textures/b.blp\n"), TargetSet(assets))
 	if got, want := headings(reports), []string{"assets/Models/A.mdl", "assets/Models/B.mdx"}; !slices.Equal(got, want) {
 		t.Fatalf("the reports are of %q, want %q", got, want)
 	}

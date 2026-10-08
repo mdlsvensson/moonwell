@@ -17,7 +17,7 @@ type Asset struct {
 	Source  string
 	Library string
 	Target  string
-	Bytes   []byte
+	Data    []byte
 	Hash    string
 }
 
@@ -28,73 +28,73 @@ type Library struct {
 
 const ownFolder = "assets"
 
-func Collect(root string, config manifest.Assets, manifestFile string, libraries []Library) (assets []Asset,
+func Collect(root string, config manifest.Assets, manifestName string, libraries []Library) (assets []Asset,
 	replaced []string, err error) {
-	c := &collection{manifestFile: manifestFile, assets: []Asset{}, taken: map[string]Asset{}, replaced: []string{}}
-	if err = c.addOwn(root, config); err != nil {
+	c := &collector{manifestName: manifestName, assets: []Asset{}, byTarget: map[string]Asset{}, replaced: []string{}}
+	if err = c.addProjectAssets(root, config); err != nil {
 		return nil, nil, err
 	}
-	for _, library := range byKey(libraries) {
-		if err = c.addLibrary(root, library); err != nil {
+	for _, library := range sortedByKey(libraries) {
+		if err = c.addLibraryAssets(root, library); err != nil {
 			return nil, nil, err
 		}
 	}
-	if err = c.refuseNesting(); err != nil {
+	if err = c.checkNoNesting(); err != nil {
 		return nil, nil, err
 	}
 	c.sortByTarget()
 	return c.assets, c.replaced, nil
 }
 
-type collection struct {
-	manifestFile string
+type collector struct {
+	manifestName string
 	assets       []Asset
-	taken        map[string]Asset
+	byTarget     map[string]Asset
 	replaced     []string
 }
 
-func byKey(libraries []Library) []Library {
+func sortedByKey(libraries []Library) []Library {
 	sorted := slices.Clone(libraries)
 	slices.SortStableFunc(sorted, func(a, b Library) int { return strings.Compare(a.Key, b.Key) })
 	return sorted
 }
 
-func (c *collection) addOwn(root string, config manifest.Assets) error {
-	folder, err := open(filepath.Join(root, ownFolder), ownFolder)
+func (c *collector) addProjectAssets(root string, config manifest.Assets) error {
+	folder, err := openDir(filepath.Join(root, ownFolder), ownFolder)
 	if err != nil {
 		return err
 	}
-	rules, err := rulesOf(config.Exclude)
+	rules, err := parseExcludeRules(config.Exclude)
 	if err != nil {
-		return c.inBlock(err)
+		return c.blameAssetsBlock(err)
 	}
-	files := filesOf(folder)
-	mapped, err := c.mappings(config.Paths, files, rules)
+	files := sortedFiles(folder)
+	mapped, err := c.resolveMappings(config.Paths, files, rules)
 	if err != nil {
 		return err
 	}
 	for _, source := range files {
-		if leftOut(source, rules) {
+		if isExcluded(source, rules) {
 			continue
 		}
-		if err := c.addOwnFile(folder, source, mapped); err != nil {
+		if err := c.addProjectFile(folder, source, mapped); err != nil {
 			return err
 		}
 	}
-	if err := c.refuseNesting(); err != nil {
+	if err := c.checkNoNesting(); err != nil {
 		return err
 	}
 	c.sortByTarget()
 	return nil
 }
 
-type rule struct {
-	key    string
-	folder bool
+type excludeRule struct {
+	key   string
+	isDir bool
 }
 
-func rulesOf(exclude []string) ([]rule, error) {
-	var rules []rule
+func parseExcludeRules(exclude []string) ([]excludeRule, error) {
+	var rules []excludeRule
 	for _, value := range exclude {
 		name, folder := value, false
 		if strings.HasSuffix(value, "/") || strings.HasSuffix(value, `\`) {
@@ -104,23 +104,23 @@ func rulesOf(exclude []string) ([]rule, error) {
 		if !ok {
 			return nil, errInvalidPath(name)
 		}
-		rules = append(rules, rule{mapdir.Key(path), folder})
+		rules = append(rules, excludeRule{mapdir.Key(path), folder})
 	}
 	return rules, nil
 }
 
-func leftOut(path string, rules []rule) bool {
+func isExcluded(path string, rules []excludeRule) bool {
 	key := mapdir.Key(path)
-	return hasDotPart(path) || slices.ContainsFunc(rules, func(r rule) bool {
-		return key == r.key || (r.folder && strings.HasPrefix(key, r.key+"/"))
+	return hasHiddenSegment(path) || slices.ContainsFunc(rules, func(r excludeRule) bool {
+		return key == r.key || (r.isDir && strings.HasPrefix(key, r.key+"/"))
 	})
 }
 
-func hasDotPart(path string) bool {
+func hasHiddenSegment(path string) bool {
 	return strings.HasPrefix(path, ".") || strings.Contains(path, "/.")
 }
 
-func (c *collection) mappings(paths manifest.OrderedMap[string], files []string, rules []rule) (map[string]string, error) {
+func (c *collector) resolveMappings(paths manifest.OrderedMap[string], files []string, rules []excludeRule) (map[string]string, error) {
 	present := map[string]bool{}
 	for _, file := range files {
 		present[mapdir.Key(file)] = true
@@ -129,152 +129,152 @@ func (c *collection) mappings(paths manifest.OrderedMap[string], files []string,
 	for source, target := range paths.All() {
 		path, ok := fsx.CleanRelPath(source)
 		if !ok {
-			return nil, c.inBlock(errInvalidPath(source))
+			return nil, c.blameAssetsBlock(errInvalidPath(source))
 		}
 		key := mapdir.Key(path)
 		_, twice := mapped[key]
 		switch {
 		case !present[key]:
-			return nil, errNoSuchFile(c.manifestFile, source)
-		case leftOut(path, rules):
-			return nil, errExcluded(c.manifestFile, source)
+			return nil, errNoSuchFile(c.manifestName, source)
+		case isExcluded(path, rules):
+			return nil, errExcluded(c.manifestName, source)
 		case twice:
-			return nil, errNamedTwice(c.manifestFile, source)
+			return nil, errNamedTwice(c.manifestName, source)
 		}
 		var err error
-		if mapped[key], err = targetPath(target); err != nil {
-			return nil, c.inBlock(err)
+		if mapped[key], err = parseTargetPath(target); err != nil {
+			return nil, c.blameAssetsBlock(err)
 		}
 	}
 	return mapped, nil
 }
 
-func (c *collection) inBlock(err error) error {
+func (c *collector) blameAssetsBlock(err error) error {
 	var failure *diag.Error
 	if errors.As(err, &failure) {
-		failure.File = c.manifestFile
+		failure.File = c.manifestName
 		failure.Hint += " " + blockHint
 	}
 	return err
 }
 
-func (c *collection) addOwnFile(folder *mapdir.Folder, source string, mapped map[string]string) error {
+func (c *collector) addProjectFile(folder *mapdir.Folder, source string, mapped map[string]string) error {
 	target, isMapped := mapped[mapdir.Key(source)]
 	if !isMapped {
 		var err error
-		if target, err = targetPath(source); err != nil {
+		if target, err = parseTargetPath(source); err != nil {
 			return err
 		}
 	}
-	if _, taken := c.taken[mapdir.Key(target)]; taken {
-		return errSameTarget(c.manifestFile, target)
+	if _, taken := c.byTarget[mapdir.Key(target)]; taken {
+		return errSameTarget(c.manifestName, target)
 	}
 	return c.add(folder, Asset{Source: source, Target: target})
 }
 
-func (c *collection) addLibrary(root string, library Library) error {
-	label := labelOf(root, library.Dir)
-	if err := refuseLinked(library.Dir, label); err != nil {
+func (c *collector) addLibraryAssets(root string, library Library) error {
+	displayPath := displayPathOf(root, library.Dir)
+	if err := checkNotSymlink(library.Dir, displayPath); err != nil {
 		return err
 	}
-	folder, err := open(library.Dir, label)
+	folder, err := openDir(library.Dir, displayPath)
 	if err != nil {
-		return inLibrary(err, library.Key, label)
+		return blameLibrary(err, library.Key, displayPath)
 	}
-	for _, source := range filesOf(folder) {
-		if hasDotPart(source) {
+	for _, source := range sortedFiles(folder) {
+		if hasHiddenSegment(source) {
 			continue
 		}
-		if err := c.addShipped(folder, library.Key, label, source); err != nil {
+		if err := c.addLibraryFile(folder, library.Key, displayPath, source); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func labelOf(root, dir string) string {
+func displayPathOf(root, dir string) string {
 	if below, err := filepath.Rel(root, dir); err == nil && filepath.IsLocal(below) {
 		return filepath.ToSlash(below)
 	}
 	return filepath.ToSlash(dir)
 }
 
-func refuseLinked(dir, label string) error {
+func checkNotSymlink(dir, displayPath string) error {
 	if info, err := fsx.Lstat(dir); err == nil && info != nil && fsx.IsSymlink(info) {
-		return errLinkedFolder(dir, label)
+		return errLinkedFolder(dir, displayPath)
 	}
 	return nil
 }
 
-func (c *collection) addShipped(folder *mapdir.Folder, library, label, source string) error {
-	target, err := targetPath(source)
+func (c *collector) addLibraryFile(folder *mapdir.Folder, library, displayPath, source string) error {
+	target, err := parseTargetPath(source)
 	if err != nil {
-		return inLibrary(err, library, label)
+		return blameLibrary(err, library, displayPath)
 	}
-	if other, taken := c.taken[mapdir.Key(target)]; taken {
-		return c.replace(other, library, source, target)
+	if other, taken := c.byTarget[mapdir.Key(target)]; taken {
+		return c.replaceAsset(other, library, source, target)
 	}
-	return inLibrary(c.add(folder, Asset{Source: source, Library: library, Target: target}), library, label)
+	return blameLibrary(c.add(folder, Asset{Source: source, Library: library, Target: target}), library, displayPath)
 }
 
-func (c *collection) replace(other Asset, library, source, target string) error {
+func (c *collector) replaceAsset(other Asset, library, source, target string) error {
 	if other.Library != "" {
-		return errTwoLibraries(c.manifestFile, other.Library, library, target)
+		return errTwoLibraries(c.manifestName, other.Library, library, target)
 	}
 	c.replaced = append(c.replaced, "assets/"+other.Source+" replaces library "+library+"'s "+source)
 	return nil
 }
 
-func inLibrary(err error, library, label string) error {
+func blameLibrary(err error, library, displayPath string) error {
 	var failure *diag.Error
 	if !errors.As(err, &failure) || failure.Cause != nil {
 		return err
 	}
-	return errInLibrary(library, label, failure)
+	return errInLibrary(library, displayPath, failure)
 }
 
-func open(dir, label string) (*mapdir.Folder, error) {
+func openDir(dir, displayPath string) (*mapdir.Folder, error) {
 	if info, err := fsx.Lstat(dir); err == nil && info != nil && !info.IsDir() && !fsx.IsSymlink(info) {
-		return nil, errNotAFolder(label)
+		return nil, errNotAFolder(displayPath)
 	}
-	folder, err := mapdir.Open(dir, label)
+	folder, err := mapdir.Open(dir, displayPath)
 	if _, expected := diag.FirstProblem(err); !expected && errors.Is(err, fs.ErrNotExist) {
 		return nil, nil
 	}
 	return folder, err
 }
 
-func filesOf(folder *mapdir.Folder) []string {
+func sortedFiles(folder *mapdir.Folder) []string {
 	if folder == nil {
 		return nil
 	}
 	return folder.Files()
 }
 
-func (c *collection) add(folder *mapdir.Folder, asset Asset) error {
+func (c *collector) add(folder *mapdir.Folder, asset Asset) error {
 	data, _, err := folder.Read(asset.Source)
 	if err != nil {
 		return err
 	}
-	asset.Bytes, asset.Hash = data, fsx.SHA256Hex(data)
+	asset.Data, asset.Hash = data, fsx.SHA256Hex(data)
 	c.assets = append(c.assets, asset)
-	c.taken[mapdir.Key(asset.Target)] = asset
+	c.byTarget[mapdir.Key(asset.Target)] = asset
 	return nil
 }
 
-func (c *collection) refuseNesting() error {
+func (c *collector) checkNoNesting() error {
 	for _, asset := range c.assets {
 		key := mapdir.Key(asset.Target)
 		for end := strings.LastIndexByte(key, '/'); end >= 0; end = strings.LastIndexByte(key[:end], '/') {
-			if _, taken := c.taken[key[:end]]; taken {
-				return errNested(c.manifestFile, key, key[:end])
+			if _, taken := c.byTarget[key[:end]]; taken {
+				return errNested(c.manifestName, key, key[:end])
 			}
 		}
 	}
 	return nil
 }
 
-func (c *collection) sortByTarget() {
+func (c *collector) sortByTarget() {
 	slices.SortStableFunc(c.assets, func(a, b Asset) int {
 		return strings.Compare(mapdir.Key(a.Target), mapdir.Key(b.Target))
 	})
@@ -282,68 +282,68 @@ func (c *collection) sortByTarget() {
 
 const blockHint = "Fix the assets block in moonwell.pkl."
 
-func errNoSuchFile(manifestFile, source string) error {
+func errNoSuchFile(manifestName, source string) error {
 	return &diag.Error{
 		Msg:  "assets.paths names a file that does not exist: assets/" + source,
-		File: manifestFile,
+		File: manifestName,
 		Hint: blockHint,
 	}
 }
 
-func errExcluded(manifestFile, source string) error {
-	return &diag.Error{Msg: "assets.paths names an excluded file: " + source, File: manifestFile, Hint: blockHint}
+func errExcluded(manifestName, source string) error {
+	return &diag.Error{Msg: "assets.paths names an excluded file: " + source, File: manifestName, Hint: blockHint}
 }
 
-func errNamedTwice(manifestFile, source string) error {
-	return &diag.Error{Msg: "assets.paths names " + source + " twice.", File: manifestFile, Hint: blockHint}
+func errNamedTwice(manifestName, source string) error {
+	return &diag.Error{Msg: "assets.paths names " + source + " twice.", File: manifestName, Hint: blockHint}
 }
 
-func errSameTarget(manifestFile, target string) error {
+func errSameTarget(manifestName, target string) error {
 	return &diag.Error{
 		Msg:  "Two assets would be imported as " + target + " (target collision).",
-		File: manifestFile,
+		File: manifestName,
 		Hint: blockHint,
 	}
 }
 
-func errNested(manifestFile, inner, outer string) error {
+func errNested(manifestName, inner, outer string) error {
 	return &diag.Error{
 		Msg:  "Asset " + inner + " would sit inside the asset file " + outer + " (file/folder collision).",
-		File: manifestFile,
+		File: manifestName,
 		Hint: blockHint,
 	}
 }
 
-func errTwoLibraries(manifestFile, first, second, target string) error {
+func errTwoLibraries(manifestName, first, second, target string) error {
 	return &diag.Error{
 		Msg:  "Libraries " + first + " and " + second + " both import " + strings.ReplaceAll(target, "/", `\`) + ".",
-		File: manifestFile,
+		File: manifestName,
 		Hint: "Drop one of the libraries, or put your own file at that path under assets/ to replace both.",
 	}
 }
 
-func errLinkedFolder(dir, label string) error {
+func errLinkedFolder(dir, displayPath string) error {
 	err := fsx.NewSymlinkError(dir)
 	var failure *diag.Error
 	if errors.As(err, &failure) {
-		failure.File = label
+		failure.File = displayPath
 	}
 	return err
 }
 
-func errInLibrary(library, label string, failure *diag.Error) error {
+func errInLibrary(library, displayPath string, failure *diag.Error) error {
 	return &diag.Error{
 		Msg:   "Library " + library + ": " + failure.Msg,
-		File:  label,
+		File:  displayPath,
 		Hint:  "Report it to the library's author, or use another version of the library.",
 		Cause: failure,
 	}
 }
 
-func errNotAFolder(label string) error {
+func errNotAFolder(displayPath string) error {
 	return &diag.Error{
-		Msg:  "Expected a folder: " + label,
-		File: label,
-		Hint: "Make " + label + " a folder that holds the files to import, or remove the file.",
+		Msg:  "Expected a folder: " + displayPath,
+		File: displayPath,
+		Hint: "Make " + displayPath + " a folder that holds the files to import, or remove the file.",
 	}
 }

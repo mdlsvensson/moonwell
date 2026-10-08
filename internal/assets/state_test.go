@@ -25,11 +25,11 @@ func stateOf(t *testing.T, content string) string {
 
 func TestStateFileIsUnderAssetStateByTheMapFoldersNameFromTheProjectFolder(t *testing.T) {
 	root := t.TempDir()
-	file, err := StateFile(root, "map.w3x")
+	file, err := StateFilePath(root, "map.w3x")
 	if err != nil || file != ".asset-state/map.w3x.json" {
 		t.Errorf("StateFile = %q, %v", file, err)
 	}
-	file, err = StateFile(root, "../map.w3x")
+	file, err = StateFilePath(root, "../map.w3x")
 	if e := asError(t, err, "a map folder outside maps/"); file != "" || !strings.Contains(e.Msg, "../map.w3x") ||
 		e.File != ".asset-state/../map.w3x.json" || e.Hint == "" {
 		t.Errorf("StateFile = %q, %+v", file, e)
@@ -41,7 +41,7 @@ func TestALinkOnTheWayToTheStateFileIsRefusedByTheStateFilesName(t *testing.T) {
 	put(t, s.root, "assets/a.blp")
 	folder, result := s.planned(noBlock)
 	testkit.LinkDir(t, t.TempDir(), filepath.Join(s.root, ".asset-state"))
-	_, named := StateFile(s.root, "map.w3x")
+	_, named := StateFilePath(s.root, "map.w3x")
 	_, read := ReadState(s.root, stateName)
 	for what, err := range map[string]error{
 		"StateFile": named, "ReadState": read, "Sync": Sync(background, folder, result, s.root, stateName),
@@ -170,7 +170,7 @@ func TestStateBytesAreTheFilesInTheOrderGivenWithTwoSpacesAndAFinalLineBreak(t *
 			"{\n  \"version\": 1,\n  \"files\": {\n    \"a\\\"b\\\\c\\n\\u0001<&>\xe2\x80\xa8\xc3\xa9.blp\": \"" + zeros + "\"\n  }\n}\n"},
 	}
 	for _, tt := range tests {
-		if got := string(tt.state.Bytes()); got != tt.want {
+		if got := string(tt.state.Encode()); got != tt.want {
 			t.Errorf("%s: the state file is\n%s\nwant\n%s", tt.name, got, tt.want)
 		}
 	}
@@ -182,7 +182,7 @@ func TestAStateIsReadBackAsItWasWritten(t *testing.T) {
 		{"Models/H\xc3\xa9ro.mdx", fsx.SHA256Hex([]byte("model"))},
 		{"12", zeros},
 	}}
-	read, err := ReadState(stateOf(t, string(state.Bytes())), stateName)
+	read, err := ReadState(stateOf(t, string(state.Encode())), stateName)
 	if err != nil || !slices.Equal(read.Files, state.Files) {
 		t.Errorf("ReadState = %+v, %v, want %+v", read.Files, err, state.Files)
 	}

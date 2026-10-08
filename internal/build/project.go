@@ -159,7 +159,7 @@ func OwnershipFile(p *manifest.Project) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return assets.StateFile(p.Root, folder)
+	return assets.StateFilePath(p.Root, folder)
 }
 
 func errNotInsideMaps(manifestFile, folder string) error {

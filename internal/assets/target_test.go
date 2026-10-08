@@ -16,7 +16,7 @@ func TestTargetPathTakesAPathAnAssetMayHaveWithSlashes(t *testing.T) {
 		{"war3.blp", "war3.blp"},
 	}
 	for _, tt := range tests {
-		if got, err := targetPath(tt.value); err != nil || got != tt.want {
+		if got, err := parseTargetPath(tt.value); err != nil || got != tt.want {
 			t.Errorf("targetPath(%q) = %q, %v, want %q", tt.value, got, err, tt.want)
 		}
 	}
@@ -42,7 +42,7 @@ func TestTargetPathRefusesTheMapsOwnFiles(t *testing.T) {
 		{"war3mapMap.tga", picture},
 	}
 	for _, tt := range tests {
-		_, err := targetPath(tt.value)
+		_, err := parseTargetPath(tt.value)
 		e := asError(t, err, tt.value)
 		if e.Msg != "Reserved map path: "+tt.value || !strings.Contains(e.Hint, tt.hint) || e.File != "" {
 			t.Errorf("targetPath(%q): %+v, want a reserved path with a hint about %q", tt.value, e, tt.hint)
@@ -52,7 +52,7 @@ func TestTargetPathRefusesTheMapsOwnFiles(t *testing.T) {
 
 func TestTargetPathRefusesAPathThatLeavesTheMapOrThatWindowsCannotHold(t *testing.T) {
 	for _, value := range []string{"../escape", "/absolute", `C:\escape`, "", "a//b.blp", "a/./b.blp", "con.blp", "icon.", "what?.blp", "a\tb.blp"} {
-		got, err := targetPath(value)
+		got, err := parseTargetPath(value)
 		e := asError(t, err, value)
 		if got != "" || e.Msg != "Invalid asset path: "+value || !strings.Contains(e.Hint, "relative path") || e.File != "" {
 			t.Errorf("targetPath(%q) = %q, %+v", value, got, e)

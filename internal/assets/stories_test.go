@@ -125,7 +125,7 @@ func contextOf(t testing.TB, root string, own func(testing.TB, string) *countdow
 func (r run) in(t testing.TB, root string) (did ran) {
 	t.Helper()
 	p := project{block: r.block, libraries: r.libraries}
-	stateFile, err := StateFile(root, mapFolder)
+	stateFile, err := StateFilePath(root, mapFolder)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -396,7 +396,7 @@ func interruptedProject() project {
 	index := indexOf(imp.Entry{Flag: 29, Path: "a.blp"}, imp.Entry{Flag: 29, Path: "dropped.blp"})
 	return project{files: map[string]string{
 		"assets/a.blp": "second", "assets/b.blp": "new", m + "a.blp": "first", m + "dropped.blp": "dropped",
-		m + "war3map.imp": index, ".asset-state/" + mapFolder + ".json": string(owned.Bytes()),
+		m + "war3map.imp": index, ".asset-state/" + mapFolder + ".json": string(owned.Encode()),
 	}}
 }
 

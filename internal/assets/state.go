@@ -16,7 +16,7 @@ type State struct{ Files []Owned }
 
 type Owned struct{ Path, Hash string }
 
-func StateFile(root, mapFolder string) (string, error) {
+func StateFilePath(root, mapFolder string) (string, error) {
 	file := ".asset-state/" + mapFolder + ".json"
 	if _, err := fsx.SafeJoinNoSymlinks(root, file); err != nil {
 		return "", err
@@ -29,18 +29,18 @@ func ReadState(root, file string) (State, error) {
 	if err != nil {
 		return State{}, err
 	}
-	data, found, err := readIfThere(place, file)
+	data, found, err := readStateFile(place, file)
 	if err != nil || !found {
 		return State{}, err
 	}
-	listed, problem := listedIn(data)
+	listed, problem := parseFileList(data)
 	if problem != "" {
 		return State{}, errInvalidState(file, problem)
 	}
 	var state State
 	seen := map[string]bool{}
 	for path, written := range listed.All() {
-		owned, err := ownedFile(file, path, written)
+		owned, err := parseOwned(file, path, written)
 		if err != nil {
 			return State{}, err
 		}
@@ -53,14 +53,14 @@ func ReadState(root, file string) (State, error) {
 	return state, nil
 }
 
-func readIfThere(place, file string) (data []byte, found bool, err error) {
+func readStateFile(place, file string) (data []byte, found bool, err error) {
 	if data, found, err = fsx.ReadFileIfExists(place); err != nil {
 		return nil, false, errUnreadableState(file, err)
 	}
 	return data, found, nil
 }
 
-func listedIn(data []byte) (files manifest.OrderedMap[json.RawMessage], problem string) {
+func parseFileList(data []byte) (files manifest.OrderedMap[json.RawMessage], problem string) {
 	var document manifest.OrderedMap[json.RawMessage]
 	switch {
 	case !json.Valid(data):
@@ -69,7 +69,7 @@ func listedIn(data []byte) (files manifest.OrderedMap[json.RawMessage], problem 
 		return files, "version must be 1"
 	}
 	listed, _ := document.Get("files")
-	if !isObject(listed) || json.Unmarshal(listed, &files) != nil {
+	if !isJSONObject(listed) || json.Unmarshal(listed, &files) != nil {
 		return files, "files must be an object"
 	}
 	return files, ""
@@ -81,15 +81,15 @@ func isOne(document manifest.OrderedMap[json.RawMessage], name string) bool {
 	return json.Unmarshal(written, &number) == nil && number == 1
 }
 
-func isObject(written json.RawMessage) bool {
+func isJSONObject(written json.RawMessage) bool {
 	return bytes.HasPrefix(bytes.TrimSpace(written), []byte("{"))
 }
 
 var sha256Hex = regexp.MustCompile(`^[a-f0-9]{64}$`)
 
-func ownedFile(file, path string, written json.RawMessage) (Owned, error) {
-	if _, err := targetPath(path); err != nil {
-		return Owned{}, inState(err, file)
+func parseOwned(file, path string, written json.RawMessage) (Owned, error) {
+	if _, err := parseTargetPath(path); err != nil {
+		return Owned{}, blameStateFile(err, file)
 	}
 	var hash string
 	if json.Unmarshal(written, &hash) != nil || !sha256Hex.MatchString(hash) {
@@ -98,7 +98,7 @@ func ownedFile(file, path string, written json.RawMessage) (Owned, error) {
 	return Owned{path, hash}, nil
 }
 
-func inState(err error, file string) error {
+func blameStateFile(err error, file string) error {
 	var failure *diag.Error
 	if !errors.As(err, &failure) {
 		return err
@@ -106,7 +106,7 @@ func inState(err error, file string) error {
 	return errStatePath(file, failure)
 }
 
-func (s State) Bytes() []byte {
+func (s State) Encode() []byte {
 	var out bytes.Buffer
 	out.WriteString("{\n  \"version\": 1,\n  \"files\": {")
 	for i, file := range s.Files {

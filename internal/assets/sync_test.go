@@ -527,8 +527,8 @@ func TestSyncWritesNothingOfAPlanWithAnAssetInsideAnother(t *testing.T) {
 	put(t, s.root, "assets/a.blp")
 	before := testkit.Snapshot(t, s.root)
 	folder := s.open()
-	assets := []Asset{{Target: "a.blp", Bytes: []byte("a")}, {Target: "data", Bytes: []byte("outer")},
-		{Target: "data/inner.txt", Bytes: []byte("inner")}}
+	assets := []Asset{{Target: "a.blp", Data: []byte("a")}, {Target: "data", Data: []byte("outer")},
+		{Target: "data/inner.txt", Data: []byte("inner")}}
 	result, err := Plan(background, folder, assets, State{})
 	if err != nil {
 		t.Fatalf("Plan: %v", diag.Format(err))

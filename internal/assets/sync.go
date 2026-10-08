@@ -13,44 +13,44 @@ import (
 )
 
 func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, root, stateFile string) error {
-	if result.planned != folder {
+	if result.view != folder {
 		return errOtherFolder()
 	}
 	if len(folder.Changes()) > 0 {
 		return errFolderWithChanges()
 	}
-	state, err := stateChange(root, stateFile, result.State)
+	state, err := planStateWrite(root, stateFile, result.State)
 	if err != nil {
 		return err
 	}
 	var journal fsx.Journal
-	failure := write(ctx, folder.WithChanges(result.Changes), state, &journal)
+	failure := applyAll(ctx, folder.WithChanges(result.Changes), state, &journal)
 	if failure == nil {
 		return nil
 	}
 	touched := journal.Len()
-	return undone(failure, touched, unrestored(folder, journal.Undo()))
+	return wrapUndone(failure, touched, describeUndoFailures(folder, journal.Undo()))
 }
 
 type stateWrite struct {
-	file   string
-	place  string
-	held   []byte
-	found  bool
-	bytes  []byte
-	remove bool
+	file     string
+	fullPath string
+	previous []byte
+	found    bool
+	data     []byte
+	remove   bool
 }
 
-func stateChange(root, file string, state State) (*stateWrite, error) {
+func planStateWrite(root, file string, state State) (*stateWrite, error) {
 	place, err := fsx.SafeJoinNoSymlinks(root, file)
 	if err != nil {
 		return nil, err
 	}
-	held, found, err := readIfThere(place, file)
+	held, found, err := readStateFile(place, file)
 	if err != nil {
 		return nil, err
 	}
-	change := &stateWrite{file: file, place: place, held: held, found: found}
+	change := &stateWrite{file: file, fullPath: place, previous: held, found: found}
 	if len(state.Files) == 0 {
 		if !found {
 			return nil, nil
@@ -58,14 +58,14 @@ func stateChange(root, file string, state State) (*stateWrite, error) {
 		change.remove = true
 		return change, nil
 	}
-	change.bytes = state.Bytes()
-	if found && bytes.Equal(held, change.bytes) {
+	change.data = state.Encode()
+	if found && bytes.Equal(held, change.data) {
 		return nil, nil
 	}
 	return change, nil
 }
 
-func write(ctx context.Context, view *mapdir.Folder, state *stateWrite, journal *fsx.Journal) error {
+func applyAll(ctx context.Context, view *mapdir.Folder, state *stateWrite, journal *fsx.Journal) error {
 	if err := view.ApplyInPlace(ctx, journal); err != nil || state == nil {
 		return err
 	}
@@ -76,14 +76,14 @@ func write(ctx context.Context, view *mapdir.Folder, state *stateWrite, journal 
 }
 
 func (s *stateWrite) apply(journal *fsx.Journal) error {
-	err := s.asItWas()
+	err := s.checkUnchanged()
 	if err != nil {
 		return err
 	}
 	if s.remove {
-		err = journal.Remove(s.place)
+		err = journal.Remove(s.fullPath)
 	} else {
-		err = journal.Write(s.place, s.bytes)
+		err = journal.Write(s.fullPath, s.data)
 	}
 	if err != nil {
 		return errStateNotWritten(s.file, err)
@@ -91,26 +91,26 @@ func (s *stateWrite) apply(journal *fsx.Journal) error {
 	return nil
 }
 
-func (s *stateWrite) asItWas() error {
-	held, found, err := readIfThere(s.place, s.file)
+func (s *stateWrite) checkUnchanged() error {
+	held, found, err := readStateFile(s.fullPath, s.file)
 	switch {
 	case err != nil:
 		return err
-	case found != s.found || !bytes.Equal(held, s.held):
+	case found != s.found || !bytes.Equal(held, s.previous):
 		return errStateChanged(s.file)
 	}
 	return nil
 }
 
-func unrestored(folder *mapdir.Folder, files []fsx.UndoFailure) []string {
+func describeUndoFailures(folder *mapdir.Folder, files []fsx.UndoFailure) []string {
 	var listed []string
 	for _, file := range files {
-		listed = append(listed, named(folder, file.Path)+" ("+fsx.Reason(file.Err)+")")
+		listed = append(listed, displayName(folder, file.Path)+" ("+fsx.Reason(file.Err)+")")
 	}
 	return listed
 }
 
-func named(folder *mapdir.Folder, path string) string {
+func displayName(folder *mapdir.Folder, path string) string {
 	dir, err := filepath.Abs(folder.Dir())
 	if err != nil {
 		return path
@@ -122,15 +122,15 @@ func named(folder *mapdir.Folder, path string) string {
 	return folder.DisplayPath(filepath.ToSlash(below))
 }
 
-func undone(failure error, touched int, unrestored []string) error {
+func wrapUndone(failure error, touched int, unrestored []string) error {
 	var expected *diag.Error
 	isExpected := errors.As(failure, &expected)
 	switch {
 	case len(unrestored) > 0:
 		return errNotRestored(failure, unrestored)
-	case interrupted(failure) && touched == 0:
+	case isCancelled(failure) && touched == 0:
 		return errInterruptedBeforeWriting()
-	case interrupted(failure):
+	case isCancelled(failure):
 		return errInterruptedAndUndone()
 	case isExpected && expected.Cause != nil:
 		return errNotWritten(expected)
@@ -138,14 +138,14 @@ func undone(failure error, touched int, unrestored []string) error {
 	return failure
 }
 
-func interrupted(failure error) bool {
+func isCancelled(failure error) bool {
 	return errors.Is(failure, context.Canceled) || errors.Is(failure, context.DeadlineExceeded)
 }
 
-func reasonOf(failure error) string {
+func describeFailure(failure error) string {
 	var expected *diag.Error
 	switch {
-	case interrupted(failure):
+	case isCancelled(failure):
 		return "interrupted"
 	case !errors.As(failure, &expected):
 		return fsx.Reason(failure)
@@ -186,7 +186,7 @@ func errStateNotWritten(file string, cause error) error {
 
 func errNotWritten(failed *diag.Error) error {
 	return &diag.Error{
-		Msg:   "Writing assets failed: " + reasonOf(failed) + ". Every change was undone.",
+		Msg:   "Writing assets failed: " + describeFailure(failed) + ". Every change was undone.",
 		File:  failed.File,
 		Cause: failed.Cause,
 		Hint:  failed.Hint,
@@ -195,7 +195,7 @@ func errNotWritten(failed *diag.Error) error {
 
 func errNotRestored(failure error, unrestored []string) error {
 	return &diag.Error{
-		Msg: "Writing assets failed (" + reasonOf(failure) + "), and these files could not be restored: " +
+		Msg: "Writing assets failed (" + describeFailure(failure) + "), and these files could not be restored: " +
 			strings.Join(unrestored, ", "),
 		Cause: failure,
 		Hint:  "Restore the map folder from version control before retrying.",

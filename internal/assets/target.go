@@ -14,20 +14,20 @@ var (
 	mapListPicture = regexp.MustCompile(`(?i)^war3map(?:Preview|Map)\.`)
 )
 
-func targetPath(value string) (string, error) {
+func parseTargetPath(value string) (string, error) {
 	path, ok := fsx.CleanRelPath(value)
 	switch {
 	case !ok:
 		return "", errInvalidPath(value)
 	case mapListPicture.MatchString(path):
 		return "", errMapListPicture(value)
-	case reserved(path):
+	case isReservedPath(path):
 		return "", errReserved(value)
 	}
 	return path, nil
 }
 
-func reserved(path string) bool {
+func isReservedPath(path string) bool {
 	internal := mapInternal.MatchString(path) && !importedFolder.MatchString(path)
 	return internal || mapScript.MatchString(path)
 }

@@ -203,7 +203,7 @@ func TestAnOwnedFileIsFoundAndWrittenUnderTheSpellingTheMapHas(t *testing.T) {
 	s := newSite(t)
 	put(t, s.mapDir, "models/UNIT.mdx", "first")
 	put(t, s.mapDir, "WAR3MAP.IMP", string(imp.Write([]imp.Entry{{Flag: 13, Path: `Models\Unit.mdx`}})))
-	put(t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{`Models\Unit.mdx`, hashed("first")}}}.Bytes()))
+	put(t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{`Models\Unit.mdx`, hashed("first")}}}.Encode()))
 	put(t, s.root, "assets/Models/Unit.mdx", "second")
 	_, result := s.planned(noBlock)
 	if got := names(result.Changes); !slices.Equal(got, []string{"models/UNIT.mdx", "WAR3MAP.IMP"}) {
@@ -265,7 +265,7 @@ func TestAnAssetAtAFileOrAnImportTheMapHasAndDoesNotOwnIsRefused(t *testing.T) {
 
 func TestAnOwnedFileEditedInTheMapIsRefusedAlsoWhenNoAssetWantsIt(t *testing.T) {
 	s := newSite(t)
-	put(t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures/A.BLP", hashed("asset")}}}.Bytes()))
+	put(t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures/A.BLP", hashed("asset")}}}.Encode()))
 	put(t, s.mapDir, "Textures/a.blp", "manual edit")
 	for _, asset := range []string{"assets/Textures/a.blp", ""} {
 		if asset != "" {
@@ -345,7 +345,7 @@ func TestAnAssetNamedAsAFolderOfTheMapIsRefused(t *testing.T) {
 		{"an empty folder", empty},
 		{"a folder where the state lists a file", func(s *site) {
 			empty(s)
-			put(s.t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures", zeros}}}.Bytes()))
+			put(s.t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures", zeros}}}.Encode()))
 		}},
 	}
 	for _, tt := range tests {
@@ -443,7 +443,7 @@ func TestPlanStopsAtAnInterruptBetweenFilesAndWritesNothing(t *testing.T) {
 }
 
 func TestPlanRefusesAPathNoAssetMayHaveAsACallersBug(t *testing.T) {
-	script := Asset{Source: "x.lua", Target: "war3map.lua", Bytes: []byte("x"), Hash: hashed("x")}
+	script := Asset{Source: "x.lua", Target: "war3map.lua", Data: []byte("x"), Hash: hashed("x")}
 	tests := []struct {
 		name   string
 		assets []Asset

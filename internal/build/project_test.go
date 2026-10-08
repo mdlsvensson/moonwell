@@ -334,7 +334,7 @@ func syncedLibrary(key string, ships bool) library.Synced {
 func describedAssets(found []assets.Asset) []string {
 	var lines []string
 	for _, asset := range found {
-		lines = append(lines, asset.Target+" from "+asset.Source+" of "+asset.Library+": "+string(asset.Bytes))
+		lines = append(lines, asset.Target+" from "+asset.Source+" of "+asset.Library+": "+string(asset.Data))
 	}
 	return lines
 }

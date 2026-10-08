@@ -35,8 +35,8 @@ func TestCollectMapsExcludesSkipsDotFilesAndWritesNothing(t *testing.T) {
 	if got := rows(collected); !slices.Equal(got, []row{{"", sword, sword}, {"", "icons/disabled.blp", disabled}}) {
 		t.Errorf("assets = %+v", got)
 	}
-	if mapped := collected[1]; string(mapped.Bytes) != "disabled" || mapped.Hash != fsx.SHA256Hex([]byte("disabled")) {
-		t.Errorf("the mapped asset holds %q with the hash %s", mapped.Bytes, mapped.Hash)
+	if mapped := collected[1]; string(mapped.Data) != "disabled" || mapped.Hash != fsx.SHA256Hex([]byte("disabled")) {
+		t.Errorf("the mapped asset holds %q with the hash %s", mapped.Data, mapped.Hash)
 	}
 	if len(replaced) != 0 {
 		t.Errorf("replaced = %q in a project without libraries", replaced)
@@ -338,8 +338,8 @@ func TestLibraryAssetsFollowTheMapsOwnByKeyAndImportAtTheirPathInTheLibrary(t *t
 	if got := rows(collected); !slices.Equal(got, want) || len(replaced) != 0 {
 		t.Fatalf("assets = %+v, replaced %q", got, replaced)
 	}
-	if horn := collected[1]; string(horn.Bytes) != "horn" || horn.Hash != fsx.SHA256Hex([]byte("horn")) {
-		t.Errorf("the library's asset holds %q with the hash %s", horn.Bytes, horn.Hash)
+	if horn := collected[1]; string(horn.Data) != "horn" || horn.Hash != fsx.SHA256Hex([]byte("horn")) {
+		t.Errorf("the library's asset holds %q with the hash %s", horn.Data, horn.Hash)
 	}
 	own, replaced := collect(t, root, noBlock)
 	if !slices.Equal(rows(own), want[:1]) || len(replaced) != 0 {

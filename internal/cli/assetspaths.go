@@ -30,7 +30,7 @@ func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[str
 		if err != nil {
 			return err
 		}
-		imported, targets = found, assets.Targets(found)
+		imported, targets = found, assets.TargetSet(found)
 	}
 	models, err := modelsToReport(e.Root, file, inProject, imported)
 	if err != nil {
@@ -80,7 +80,7 @@ func modelsToReport(root, file string, inProject bool, imported []assets.Asset) 
 	case !inProject:
 		return nil, errNeedsAModel()
 	}
-	return assets.Models(imported), nil
+	return assets.ModelsAmong(imported), nil
 }
 
 func refuseUnreadable(reports []assets.ModelReport) error {

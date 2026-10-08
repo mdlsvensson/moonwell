@@ -30,11 +30,11 @@ type Model struct {
 	Data    []byte
 }
 
-func Models(assets []Asset) []Model {
+func ModelsAmong(assets []Asset) []Model {
 	var models []Model
 	for _, asset := range assets {
 		if isModel(asset.Target) {
-			models = append(models, Model{Heading: headingOf(asset), Data: asset.Bytes})
+			models = append(models, Model{Heading: headingOf(asset), Data: asset.Data})
 		}
 	}
 	return models
@@ -42,7 +42,7 @@ func Models(assets []Asset) []Model {
 
 func ReadModel(root, file string) (Model, error) {
 	path := fsx.ResolvePath(root, file)
-	heading := labelOf(root, path)
+	heading := displayPathOf(root, path)
 	data, err := os.ReadFile(path)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
@@ -55,7 +55,7 @@ func ReadModel(root, file string) (Model, error) {
 	return Model{Heading: heading, Data: data}, nil
 }
 
-func Targets(imported []Asset) map[string]bool {
+func TargetSet(imported []Asset) map[string]bool {
 	targets := map[string]bool{}
 	for _, asset := range imported {
 		targets[mapdir.Key(asset.Target)] = true
@@ -89,12 +89,12 @@ type ModelReport struct {
 func ReportModels(models []Model, gamePaths, targets map[string]bool) []ModelReport {
 	reports := make([]ModelReport, len(models))
 	for i, found := range models {
-		reports[i] = reportOn(found, gamePaths, targets)
+		reports[i] = reportModel(found, gamePaths, targets)
 	}
 	return reports
 }
 
-func reportOn(found Model, gamePaths, targets map[string]bool) ModelReport {
+func reportModel(found Model, gamePaths, targets map[string]bool) ModelReport {
 	report := ModelReport{Heading: found.Heading}
 	paths, err := model.ReadPaths(found.Data, found.Heading)
 	if err != nil {
@@ -105,13 +105,13 @@ func reportOn(found Model, gamePaths, targets map[string]bool) ModelReport {
 	for i, path := range paths {
 		report.Refs[i] = ModelRef{Path: path}
 		if path.Path != "" {
-			report.Refs[i].Status = statusOf(path.Path, gamePaths, targets)
+			report.Refs[i].Status = pathStatus(path.Path, gamePaths, targets)
 		}
 	}
 	return report
 }
 
-func statusOf(path string, gamePaths, targets map[string]bool) PathStatus {
+func pathStatus(path string, gamePaths, targets map[string]bool) PathStatus {
 	inGame := gamePaths[gamePathKey(path)]
 	imported := targets[referenceKey(path)]
 	switch {
@@ -137,40 +137,40 @@ func RenderReports(reports []ModelReport, inProject bool) []string {
 	var lines []string
 	for _, report := range reports {
 		lines = append(lines, report.Heading)
-		lines = append(lines, report.body()...)
+		lines = append(lines, report.lines()...)
 	}
-	return append(lines, summaryOf(reports, inProject))
+	return append(lines, formatSummary(reports, inProject))
 }
 
-func (r ModelReport) body() []string {
+func (r ModelReport) lines() []string {
 	switch {
 	case r.Unreadable != "":
 		return []string{"  (unreadable: " + r.Unreadable + ")"}
 	case len(r.Refs) == 0:
 		return []string{"  (no referenced files)"}
 	}
-	return table(r.Refs)
+	return formatTable(r.Refs)
 }
 
-func table(refs []ModelRef) []string {
+func formatTable(refs []ModelRef) []string {
 	kindWidth, pathWidth := 0, 0
 	for _, ref := range refs {
 		kindWidth = max(kindWidth, utf8.RuneCountInString(string(ref.Kind)))
-		pathWidth = max(pathWidth, utf8.RuneCountInString(shown(ref)))
+		pathWidth = max(pathWidth, utf8.RuneCountInString(formatRef(ref)))
 	}
 	lines := make([]string, len(refs))
 	for i, ref := range refs {
-		line := "  " + padded(string(ref.Kind), kindWidth) + "  " + padded(shown(ref), pathWidth) + "  " + string(ref.Status)
+		line := "  " + padRight(string(ref.Kind), kindWidth) + "  " + padRight(formatRef(ref), pathWidth) + "  " + string(ref.Status)
 		lines[i] = strings.TrimRight(line, " ")
 	}
 	return lines
 }
 
-func shown(ref ModelRef) string {
+func formatRef(ref ModelRef) string {
 	return strings.ReplaceAll(model.DescribePath(ref.Path), "/", `\`)
 }
 
-func padded(text string, width int) string {
+func padRight(text string, width int) string {
 	return text + strings.Repeat(" ", max(0, width-utf8.RuneCountInString(text)))
 }
 
@@ -180,7 +180,7 @@ type tally struct {
 	unreadable int
 }
 
-func tallyOf(reports []ModelReport) tally {
+func countReports(reports []ModelReport) tally {
 	count := tally{byStatus: map[PathStatus]int{}}
 	for _, report := range reports {
 		count.paths += len(report.Refs)
@@ -194,9 +194,9 @@ func tallyOf(reports []ModelReport) tally {
 	return count
 }
 
-func summaryOf(reports []ModelReport, inProject bool) string {
-	count := tallyOf(reports)
-	summary := fmt.Sprintf("%s, %s: %d in-game", counted(len(reports), "model"), counted(count.paths, "path"),
+func formatSummary(reports []ModelReport, inProject bool) string {
+	count := countReports(reports)
+	summary := fmt.Sprintf("%s, %s: %d in-game", pluralize(len(reports), "model"), pluralize(count.paths, "path"),
 		count.byStatus[InGame]+count.byStatus[InGameReplaced])
 	if inProject {
 		summary += fmt.Sprintf(", %d custom imported, %d custom not imported",
@@ -205,12 +205,12 @@ func summaryOf(reports []ModelReport, inProject bool) string {
 		summary += fmt.Sprintf(", %d custom", count.byStatus[Custom])
 	}
 	if count.unreadable > 0 {
-		summary += ", " + counted(count.unreadable, "model") + " unreadable"
+		summary += ", " + pluralize(count.unreadable, "model") + " unreadable"
 	}
 	return summary + "."
 }
 
-func counted(count int, noun string) string {
+func pluralize(count int, noun string) string {
 	if count == 1 {
 		return "1 " + noun
 	}

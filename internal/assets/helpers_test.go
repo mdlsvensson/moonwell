@@ -158,7 +158,7 @@ func (s *site) owns(names ...string) {
 	for _, name := range names {
 		state.Files = append(state.Files, Owned{Path: name, Hash: fsx.SHA256Hex([]byte(s.inMap(name)))})
 	}
-	testkit.WriteFile(s.t, s.root, stateName, state.Bytes())
+	testkit.WriteFile(s.t, s.root, stateName, state.Encode())
 }
 
 const missing = "<missing>"
