@@ -129,7 +129,7 @@ func Test(ctx context.Context, e *env.Env, opts Options) error {
 }
 
 func Check(ctx context.Context, e *env.Env) (*Result, error) {
-	pkl, err := toolchain.PklProgram(ctx, e)
+	pkl, err := toolchain.FindPkl(ctx, e)
 	if err != nil {
 		return nil, err
 	}

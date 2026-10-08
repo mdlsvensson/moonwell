@@ -17,7 +17,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-type install struct {
+type installer struct {
 	ctx     context.Context
 	e       *env.Env
 	tool    Tool
@@ -26,11 +26,11 @@ type install struct {
 	target  string
 }
 
-func (in install) programIn(folder string) string {
-	return filepath.Join(folder, filepath.FromSlash(in.asset.Binary))
+func (in installer) programPath(dir string) string {
+	return filepath.Join(dir, filepath.FromSlash(in.asset.Binary))
 }
 
-func (in install) download() ([]byte, error) {
+func (in installer) download() ([]byte, error) {
 	in.e.Log.Info("Downloading " + in.tool.Title + " " + in.version + "...")
 	status, body, err := in.e.Fetch(in.ctx, in.asset.URL)
 	switch {
@@ -44,14 +44,14 @@ func (in install) download() ([]byte, error) {
 	return body, nil
 }
 
-func (in install) verify(download []byte) error {
+func (in installer) verify(download []byte) error {
 	if actual := fsx.SHA256Hex(download); actual != in.asset.SHA256 {
 		return errChecksum(in.tool, in.asset.SHA256, actual)
 	}
 	return nil
 }
 
-func (in install) stage() (string, error) {
+func (in installer) makeStagingDir() (string, error) {
 	beside := filepath.Dir(in.target)
 	if err := os.MkdirAll(beside, 0o777); err != nil {
 		return "", errNotInstalled(in.tool, beside, err)
@@ -63,7 +63,7 @@ func (in install) stage() (string, error) {
 	return staging, nil
 }
 
-func (in install) discard(staging string) {
+func (in installer) removeStagingDir(staging string) {
 	if err := fsx.RemoveAll(staging); err != nil {
 		reason := strings.TrimSuffix(fsx.Reason(err), ".")
 		in.e.Log.Warn("Moonwell could not remove its staging folder " + staging + " (" + reason +
@@ -71,8 +71,8 @@ func (in install) discard(staging string) {
 	}
 }
 
-func (in install) unpack(download []byte, staging string) error {
-	staged := in.programIn(staging)
+func (in installer) unpack(download []byte, staging string) error {
+	staged := in.programPath(staging)
 	if err := os.MkdirAll(filepath.Dir(staged), 0o777); err != nil {
 		return errNotInstalled(in.tool, filepath.Dir(staged), err)
 	}
@@ -80,7 +80,7 @@ func (in install) unpack(download []byte, staging string) error {
 		return err
 	}
 	if !fsx.Exists(staged) {
-		return errNoProgram(in.tool, in.asset.Binary)
+		return errProgramMissing(in.tool, in.asset.Binary)
 	}
 	if runtime.GOOS == "windows" {
 		return nil
@@ -91,43 +91,43 @@ func (in install) unpack(download []byte, staging string) error {
 	return nil
 }
 
-func (in install) unpackAs(download []byte, staging, staged string) error {
+func (in installer) unpackAs(download []byte, staging, staged string) error {
 	switch in.asset.Archive {
 	case "":
-		return in.write(staged, download)
+		return in.writeFile(staged, download)
 	case "zip":
-		program, err := zipEntry(in.tool, download, in.asset.Binary)
+		program, err := readZipEntry(in.tool, download, in.asset.Binary)
 		if err != nil {
 			return err
 		}
-		return in.write(staged, program)
+		return in.writeFile(staged, program)
 	case "7z":
 		return in.untar(download, staging)
 	}
-	return errArchiveKind(in.asset.Archive)
+	return errUnknownArchiveKind(in.asset.Archive)
 }
 
-func (in install) write(file string, data []byte) error {
+func (in installer) writeFile(file string, data []byte) error {
 	if err := os.WriteFile(file, data, 0o777); err != nil {
 		return errNotInstalled(in.tool, file, err)
 	}
 	return nil
 }
 
-func zipEntry(tool Tool, archive []byte, name string) ([]byte, error) {
+func readZipEntry(tool Tool, archive []byte, name string) ([]byte, error) {
 	reader, err := zip.NewReader(bytes.NewReader(archive), int64(len(archive)))
 	if err != nil && reader == nil {
 		return nil, errInvalidZip(strings.TrimPrefix(err.Error(), "zip: "))
 	}
 	for _, entry := range reader.File {
 		if entry.Name == name {
-			return readEntry(entry)
+			return readZipFile(entry)
 		}
 	}
-	return nil, errNoProgram(tool, name)
+	return nil, errProgramMissing(tool, name)
 }
 
-func readEntry(entry *zip.File) ([]byte, error) {
+func readZipFile(entry *zip.File) ([]byte, error) {
 	file, err := entry.Open()
 	if err != nil {
 		return nil, errInvalidZip(entry.Name + " cannot be read: " + err.Error())
@@ -140,13 +140,13 @@ func readEntry(entry *zip.File) ([]byte, error) {
 	return data, nil
 }
 
-func (in install) untar(download []byte, staging string) error {
+func (in installer) untar(download []byte, staging string) error {
 	archive := filepath.Join(staging, "archive.7z")
-	if err := in.write(archive, download); err != nil {
+	if err := in.writeFile(archive, download); err != nil {
 		return err
 	}
-	options := env.RunOptions{Hint: sentence(in.tool.Otherwise)}
-	result, err := in.e.Run(in.ctx, windowsTar(), []string{"-xf", archive, "-C", staging}, options)
+	options := env.RunOptions{Hint: capitalize(in.tool.ManualInstallHint)}
+	result, err := in.e.Run(in.ctx, windowsTarPath(), []string{"-xf", archive, "-C", staging}, options)
 	if err != nil {
 		return err
 	}
@@ -159,7 +159,7 @@ func (in install) untar(download []byte, staging string) error {
 	return nil
 }
 
-func windowsTar() string {
+func windowsTarPath() string {
 	systemRoot := os.Getenv("SystemRoot")
 	if systemRoot == "" {
 		systemRoot = `C:\Windows`
@@ -167,19 +167,19 @@ func windowsTar() string {
 	return filepath.Join(systemRoot, "System32", "tar.exe")
 }
 
-func (in install) askVersion(staging string) error {
-	printed, err := in.tool.ask(in.ctx, in.e, in.programIn(staging), sentence(in.tool.Otherwise))
+func (in installer) verifyVersion(staging string) error {
+	output, err := in.tool.runVersionCommand(in.ctx, in.e, in.programPath(staging), capitalize(in.tool.ManualInstallHint))
 	if err != nil {
 		return err
 	}
-	if found := in.tool.versionIn(printed); found != in.version {
-		return errOtherVersion(in.tool, found, in.version)
+	if found := in.tool.parseVersion(output); found != in.version {
+		return errVersionMismatch(in.tool, found, in.version)
 	}
 	return nil
 }
 
-func (in install) moveIntoPlace(staging string) (string, error) {
-	program := in.programIn(in.target)
+func (in installer) moveIntoPlace(staging string) (string, error) {
+	program := in.programPath(in.target)
 	err := os.Rename(staging, in.target)
 	switch {
 	case err == nil:
@@ -187,7 +187,7 @@ func (in install) moveIntoPlace(staging string) (string, error) {
 	case fsx.Exists(program):
 		return program, nil
 	case fsx.Exists(in.target):
-		return "", errInTheWay(in.tool, in.target, err)
+		return "", errTargetBlocked(in.tool, in.target, err)
 	}
 	return "", errNotInstalled(in.tool, in.target, err)
 }
@@ -195,7 +195,7 @@ func (in install) moveIntoPlace(staging string) (string, error) {
 func errDownloadFailed(tool Tool, url string, cause error) error {
 	return &diag.Error{
 		Msg:   "Downloading " + url + " failed.",
-		Hint:  "Check your connection and retry, or " + tool.Otherwise,
+		Hint:  "Check your connection and retry, or " + tool.ManualInstallHint,
 		Cause: cause,
 	}
 }
@@ -203,7 +203,7 @@ func errDownloadFailed(tool Tool, url string, cause error) error {
 func errDownloadStatus(tool Tool, url string, status int) error {
 	return &diag.Error{
 		Msg:  "Downloading " + url + " failed with HTTP " + strconv.Itoa(status) + ".",
-		Hint: "Retry later, or " + tool.Otherwise,
+		Hint: "Retry later, or " + tool.ManualInstallHint,
 	}
 }
 
@@ -211,7 +211,7 @@ func errChecksum(tool Tool, expected, actual string) error {
 	return &diag.Error{
 		Msg: tool.Title + " download checksum mismatch (expected " + expected + ", got " + actual + ").",
 		Hint: "Retry the download, and do not bypass the check. If it keeps failing, report it, or " +
-			tool.Otherwise,
+			tool.ManualInstallHint,
 	}
 }
 
@@ -219,7 +219,7 @@ func errInvalidZip(reason string) error {
 	return &diag.Error{Msg: "Invalid zip archive: " + reason + "."}
 }
 
-func errNoProgram(tool Tool, binary string) error {
+func errProgramMissing(tool Tool, binary string) error {
 	return &diag.Error{Msg: "The " + tool.Title + " archive has no " + binary + "."}
 }
 
@@ -227,9 +227,9 @@ func errNotExtracted(tool Tool, stderr string) error {
 	return &diag.Error{Msg: "Extracting " + tool.Title + " failed:\n" + fsx.TrimASCIISpace(stderr)}
 }
 
-func errOtherVersion(tool Tool, found, version string) error {
+func errVersionMismatch(tool Tool, found, version string) error {
 	return &diag.Error{
-		Msg: "Downloaded " + tool.Title + " reports version " + orUnknown(found) + ", expected " + version + ".",
+		Msg: "Downloaded " + tool.Title + " reports version " + versionOrUnknown(found) + ", expected " + version + ".",
 	}
 }
 
@@ -242,7 +242,7 @@ func errNotInstalled(tool Tool, path string, cause error) error {
 	}
 }
 
-func errInTheWay(tool Tool, target string, cause error) error {
+func errTargetBlocked(tool Tool, target string, cause error) error {
 	return &diag.Error{
 		Msg:   "Installing " + tool.Title + " failed: " + fsx.Reason(cause),
 		File:  target,
@@ -251,6 +251,6 @@ func errInTheWay(tool Tool, target string, cause error) error {
 	}
 }
 
-func errArchiveKind(kind string) error {
+func errUnknownArchiveKind(kind string) error {
 	return errors.New("Cannot unpack a download of the kind " + strconv.Quote(kind) + ".")
 }

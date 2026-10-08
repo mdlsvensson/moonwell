@@ -21,22 +21,22 @@ type Asset struct {
 }
 
 type Tool struct {
-	Name        string
-	Title       string
-	Versions    map[string]map[string]Asset
-	VersionArgs []string
-	Reported    *regexp.Regexp
-	Otherwise   string
+	Name              string
+	Title             string
+	Versions          map[string]map[string]Asset
+	VersionArgs       []string
+	VersionPattern    *regexp.Regexp
+	ManualInstallHint string
 }
 
 func Ensure(ctx context.Context, e *env.Env, tool Tool, version string) (path string, err error) {
-	asset, err := tool.asset(version, e.Platform)
+	asset, err := tool.assetFor(version, e.Platform)
 	if err != nil {
 		return "", err
 	}
-	in := install{ctx: ctx, e: e, tool: tool, version: version, asset: asset}
+	in := installer{ctx: ctx, e: e, tool: tool, version: version, asset: asset}
 	in.target = filepath.Join(e.CacheDir, tool.Name, version)
-	if cached := in.programIn(in.target); fsx.Exists(cached) {
+	if cached := in.programPath(in.target); fsx.Exists(cached) {
 		return cached, nil
 	}
 	download, err := in.download()
@@ -46,21 +46,21 @@ func Ensure(ctx context.Context, e *env.Env, tool Tool, version string) (path st
 	if err := in.verify(download); err != nil {
 		return "", err
 	}
-	staging, err := in.stage()
+	staging, err := in.makeStagingDir()
 	if err != nil {
 		return "", err
 	}
-	defer in.discard(staging)
+	defer in.removeStagingDir(staging)
 	if err := in.unpack(download, staging); err != nil {
 		return "", err
 	}
-	if err := in.askVersion(staging); err != nil {
+	if err := in.verifyVersion(staging); err != nil {
 		return "", err
 	}
 	return in.moveIntoPlace(staging)
 }
 
-func (tool Tool) asset(version, platform string) (Asset, error) {
+func (tool Tool) assetFor(version, platform string) (Asset, error) {
 	platforms, known := tool.Versions[version]
 	if !known {
 		return Asset{}, errUnknownVersion(tool, version)
@@ -72,40 +72,40 @@ func (tool Tool) asset(version, platform string) (Asset, error) {
 	return asset, nil
 }
 
-func ReportedVersion(ctx context.Context, e *env.Env, tool Tool, program string) (string, error) {
-	printed, err := tool.ask(ctx, e, program, "")
+func QueryVersion(ctx context.Context, e *env.Env, tool Tool, program string) (string, error) {
+	output, err := tool.runVersionCommand(ctx, e, program, "")
 	if err != nil {
 		return "", err
 	}
-	return tool.versionIn(printed), nil
+	return tool.parseVersion(output), nil
 }
 
-func (tool Tool) ask(ctx context.Context, e *env.Env, program, hint string) (env.RunResult, error) {
+func (tool Tool) runVersionCommand(ctx context.Context, e *env.Env, program, hint string) (env.RunResult, error) {
 	return e.Run(ctx, program, tool.VersionArgs, env.RunOptions{Hint: hint})
 }
 
-func (tool Tool) versionIn(printed env.RunResult) string {
-	if match := tool.Reported.FindStringSubmatch(printed.Stdout + printed.Stderr); match != nil {
+func (tool Tool) parseVersion(output env.RunResult) string {
+	if match := tool.VersionPattern.FindStringSubmatch(output.Stdout + output.Stderr); match != nil {
 		return match[1]
 	}
 	return ""
 }
 
-func orUnknown(version string) string {
+func versionOrUnknown(version string) string {
 	if version == "" {
 		return "unknown"
 	}
 	return version
 }
 
-func sentence(text string) string {
+func capitalize(text string) string {
 	if text == "" {
 		return ""
 	}
 	return strings.ToUpper(text[:1]) + text[1:]
 }
 
-func machine() string {
+func platformName() string {
 	arch := runtime.GOARCH
 	switch arch {
 	case "amd64":
@@ -121,13 +121,13 @@ func errUnknownVersion(tool Tool, version string) error {
 	return &diag.Error{
 		Msg:  "Unknown " + tool.Title + " version " + version + ". Known versions: " + strings.Join(known, ", ") + ".",
 		File: "moonwell.pkl",
-		Hint: "Use a known version, or " + tool.Otherwise,
+		Hint: "Use a known version, or " + tool.ManualInstallHint,
 	}
 }
 
 func errNoDownload(tool Tool) error {
 	return &diag.Error{
-		Msg:  "Moonwell cannot download " + tool.Title + " for this platform (" + machine() + ").",
-		Hint: sentence(tool.Otherwise),
+		Msg:  "Moonwell cannot download " + tool.Title + " for this platform (" + platformName() + ").",
+		Hint: capitalize(tool.ManualInstallHint),
 	}
 }

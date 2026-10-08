@@ -94,7 +94,7 @@ func TestCompilerUsesYuePathAndWarnsOnAVersionMismatch(t *testing.T) {
 	e, log, fetches, _ := yueInstaller(t, "")
 	local := testkit.WriteFile(t, t.TempDir(), "yue", nil)
 	e.Run = yueOf("0.1.0")
-	program, err := Compiler(background, e, "9.9.9", &local)
+	program, err := FindCompiler(background, e, "9.9.9", &local)
 	if err != nil || program != local || *fetches != 0 {
 		t.Fatalf("Compiler = %q, %v, %d downloads", program, err, *fetches)
 	}
@@ -103,7 +103,7 @@ func TestCompilerUsesYuePathAndWarnsOnAVersionMismatch(t *testing.T) {
 		t.Errorf("log = %q", lines)
 	}
 	gone := filepath.Join(t.TempDir(), "yue")
-	_, err = Compiler(background, e, "9.9.9", &gone)
+	_, err = FindCompiler(background, e, "9.9.9", &gone)
 	if failure := asError(t, err, "a missing yue.path"); failure.Msg != "yue.path does not exist: "+gone ||
 		failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Hint, "yue.path") {
 		t.Errorf("error = %+v", failure)
@@ -128,7 +128,7 @@ func TestCompilerTakesYuePathAsItIs(t *testing.T) {
 			e, log := testkit.Env(t, t.TempDir())
 			e.Platform = ""
 			e.Run = tc.run
-			program, err := Compiler(background, e, tc.version, &local)
+			program, err := FindCompiler(background, e, tc.version, &local)
 			if err != nil || program != local || !slices.Equal(log.Lines(), tc.logs) {
 				t.Errorf("Compiler = %q, %v, log %q", program, err, log.Lines())
 			}
@@ -143,13 +143,13 @@ func TestCompilerPassesOnAYuePathThatCannotBeStartedOrIsInterrupted(t *testing.T
 	local := testkit.WriteFile(t, t.TempDir(), "yue", nil)
 	e, _ := testkit.Env(t, t.TempDir())
 	e.Run = missing
-	_, err := Compiler(background, e, "9.9.9", &local)
+	_, err := FindCompiler(background, e, "9.9.9", &local)
 	if failure := asError(t, err, "a yue.path that is no program"); !strings.Contains(failure.Msg, "Cannot run '"+local+"'") ||
 		failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Hint, "yue.path") || failure.Cause == nil {
 		t.Errorf("error = %+v", failure)
 	}
 	e.Run = interrupted
-	if _, err := Compiler(background, e, "9.9.9", &local); err != context.Canceled {
+	if _, err := FindCompiler(background, e, "9.9.9", &local); err != context.Canceled {
 		t.Errorf("Compiler = %v, want the cancellation as it is", err)
 	}
 }
@@ -163,7 +163,7 @@ func TestCompilerWithoutYuePathEnsuresThePinnedCompiler(t *testing.T) {
 		}
 		return yueOf("9.9.9")(ctx, program, args, options)
 	}
-	program, err := Compiler(background, e, "9.9.9", nil)
+	program, err := FindCompiler(background, e, "9.9.9", nil)
 	if err != nil || program != filepath.Join(e.CacheDir, "yue", "9.9.9", "yue") || *fetches != 1 {
 		t.Errorf("Compiler = %q, %v, %d downloads", program, err, *fetches)
 	}
@@ -266,7 +266,7 @@ func TestReportedVersionFindsTheVersionInWhatAProgramPrints(t *testing.T) {
 				asked = append([]string{program}, args...)
 				return env.RunResult{Stdout: tc.stdout, Stderr: tc.stderr}, nil
 			}
-			got, err := ReportedVersion(background, e, tc.tool, "some/program")
+			got, err := QueryVersion(background, e, tc.tool, "some/program")
 			if err != nil || got != tc.want {
 				t.Errorf("ReportedVersion = %q, %v, want %q", got, err, tc.want)
 			}
@@ -280,12 +280,12 @@ func TestReportedVersionFindsTheVersionInWhatAProgramPrints(t *testing.T) {
 func TestReportedVersionPassesOnAProgramThatCannotBeStartedOrIsInterrupted(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
 	e.Run = missing
-	_, err := ReportedVersion(background, e, YueScript, "yue")
+	_, err := QueryVersion(background, e, YueScript, "yue")
 	if failure := asError(t, err, "no yue"); failure.Msg != "Cannot run 'yue': command not found." {
 		t.Errorf("error = %+v", failure)
 	}
 	e.Run = interrupted
-	if _, err := ReportedVersion(background, e, YueScript, "yue"); err != context.Canceled {
+	if _, err := QueryVersion(background, e, YueScript, "yue"); err != context.Canceled {
 		t.Errorf("ReportedVersion = %v, want the cancellation as it is", err)
 	}
 }
@@ -341,10 +341,10 @@ func TestTheRefusalsOfBothToolsAreWordedAlike(t *testing.T) {
 		{"an unknown Pkl", errUnknownVersion(Pkl, "1.0.0"),
 			"Unknown Pkl version 1.0.0. Known versions: 0.32.1.", "Use a known version, or " + pklElse},
 		{"no compiler for the platform", errNoDownload(YueScript),
-			"Moonwell cannot download YueScript for this platform (" + machine() + ").",
+			"Moonwell cannot download YueScript for this platform (" + platformName() + ").",
 			"Build or install yue yourself and set yue.path in moonwell.local.pkl."},
 		{"no Pkl for the platform", errNoDownload(Pkl),
-			"Moonwell cannot download Pkl for this platform (" + machine() + ").",
+			"Moonwell cannot download Pkl for this platform (" + platformName() + ").",
 			"Install Pkl 0.32 or newer yourself: " + page},
 		{"the compiler, offline", errDownloadFailed(YueScript, "https://a.test/yue", os.ErrDeadlineExceeded),
 			"Downloading https://a.test/yue failed.", "Check your connection and retry, or " + yueElse},
@@ -360,13 +360,13 @@ func TestTheRefusalsOfBothToolsAreWordedAlike(t *testing.T) {
 		{"Pkl, another checksum", errChecksum(Pkl, "aa", "bb"),
 			"Pkl download checksum mismatch (expected aa, got bb).",
 			"Retry the download, and do not bypass the check. If it keeps failing, report it, or " + pklElse},
-		{"the compiler, another version", errOtherVersion(YueScript, "0.34.2", "0.34.3"),
+		{"the compiler, another version", errVersionMismatch(YueScript, "0.34.2", "0.34.3"),
 			"Downloaded YueScript reports version 0.34.2, expected 0.34.3.", ""},
-		{"Pkl, another version", errOtherVersion(Pkl, "0.32.0", "0.32.1"),
+		{"Pkl, another version", errVersionMismatch(Pkl, "0.32.0", "0.32.1"),
 			"Downloaded Pkl reports version 0.32.0, expected 0.32.1.", ""},
-		{"Pkl, no version", errOtherVersion(Pkl, "", "0.32.1"),
+		{"Pkl, no version", errVersionMismatch(Pkl, "", "0.32.1"),
 			"Downloaded Pkl reports version unknown, expected 0.32.1.", ""},
-		{"an archive without the compiler", errNoProgram(YueScript, "yue.exe"),
+		{"an archive without the compiler", errProgramMissing(YueScript, "yue.exe"),
 			"The YueScript archive has no yue.exe.", ""},
 		{"an archive that cannot be unpacked", errNotExtracted(YueScript, "\r\n tar: no such file \v\n"),
 			"Extracting YueScript failed:\ntar: no such file", ""},

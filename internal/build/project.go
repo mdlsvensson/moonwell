@@ -26,7 +26,7 @@ const (
 )
 
 func Load(ctx context.Context, e *env.Env) (*manifest.Project, error) {
-	pkl, err := toolchain.PklProgram(ctx, e)
+	pkl, err := toolchain.FindPkl(ctx, e)
 	if err != nil {
 		return nil, err
 	}

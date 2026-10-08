@@ -23,7 +23,7 @@ func saysWhichCompiler(compiler string) string {
 func warnsOfPath(line, binDir string) bool {
 	return strings.HasPrefix(line, "warning: yue is not on PATH; VS Code's YueScript extension needs YueScript "+
 		toolchain.YueVersion+" there. Run this once in ") &&
-		strings.HasSuffix(line, ":\n  "+toolchain.PathCommand(binDir, runtime.GOOS))
+		strings.HasSuffix(line, ":\n  "+toolchain.AddToPathCommand(binDir, runtime.GOOS))
 }
 
 func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *testing.T) {

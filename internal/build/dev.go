@@ -50,7 +50,7 @@ func Dev(ctx context.Context, e *env.Env, pace Pace) error {
 
 func cycle(ctx context.Context, e *env.Env, pkl string) (found string) {
 	if pkl == "" {
-		program, err := toolchain.PklProgram(ctx, e)
+		program, err := toolchain.FindPkl(ctx, e)
 		if err != nil {
 			e.Log.Error(diag.Format(err))
 			return ""

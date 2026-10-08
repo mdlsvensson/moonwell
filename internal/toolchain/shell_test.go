@@ -17,14 +17,14 @@ func TestInstallBinCopiesTheCompilerOnceAndAgainWhenItChanges(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
 	source := testkit.WriteFile(t, t.TempDir(), "yue.exe", []byte("v1"))
 	want := filepath.Join(e.CacheDir, "bin", "yue.exe")
-	if path, copied, err := InstallBin(e, YueScript, source); err != nil || path != want || !copied {
+	if path, copied, err := CopyToBinDir(e, YueScript, source); err != nil || path != want || !copied {
 		t.Fatalf("InstallBin = %q, %v, %v", path, copied, err)
 	}
-	if path, copied, err := InstallBin(e, YueScript, source); err != nil || path != want || copied {
+	if path, copied, err := CopyToBinDir(e, YueScript, source); err != nil || path != want || copied {
 		t.Errorf("InstallBin again = %q, %v, %v", path, copied, err)
 	}
 	testkit.WriteFile(t, filepath.Dir(source), "yue.exe", []byte("v2"))
-	if _, copied, err := InstallBin(e, YueScript, source); err != nil || !copied {
+	if _, copied, err := CopyToBinDir(e, YueScript, source); err != nil || !copied {
 		t.Errorf("InstallBin of a changed compiler = %v, %v", copied, err)
 	}
 	if data, _ := os.ReadFile(want); string(data) != "v2" {
@@ -50,7 +50,7 @@ func TestInstallBinReportsACopyItCannotReplace(t *testing.T) {
 		if err := os.MkdirAll(blocked, 0o777); err != nil {
 			t.Fatal(err)
 		}
-		path, copied, err := InstallBin(e, tc.tool, source)
+		path, copied, err := CopyToBinDir(e, tc.tool, source)
 		failure := asError(t, err, "a folder in the way")
 		if !strings.HasPrefix(failure.Msg, "Copying "+tc.title+" to "+blocked+" failed: ") || failure.Hint != tc.hint ||
 			failure.Cause == nil || path != blocked || copied {
@@ -66,34 +66,34 @@ func TestYueOnPathTellsThePinnedVersionAnotherVersionAndAMissingYueApart(t *test
 		asked = append([]string{program}, args...)
 		return yueOf("0.30.0")(ctx, program, args, options)
 	}
-	if version, found, err := yueOnPath(background, e); version != "0.30.0" || !found || err != nil {
+	if version, found, err := findYueOnPath(background, e); version != "0.30.0" || !found || err != nil {
 		t.Errorf("yueOnPath = %q, %v, %v", version, found, err)
 	}
 	if !slices.Equal(asked, []string{"yue", "-v"}) {
 		t.Errorf("it ran %q", asked)
 	}
 	e.Run = missing
-	if version, found, err := yueOnPath(background, e); version != "" || found || err != nil {
+	if version, found, err := findYueOnPath(background, e); version != "" || found || err != nil {
 		t.Errorf("yueOnPath without yue = %q, %v, %v", version, found, err)
 	}
 	e.Run = prints("not a compiler")
-	if _, found, err := yueOnPath(background, e); found || err != nil {
+	if _, found, err := findYueOnPath(background, e); found || err != nil {
 		t.Errorf("yueOnPath of another program = %v, %v", found, err)
 	}
 	e.Run = interrupted
-	if _, _, err := yueOnPath(background, e); err != context.Canceled {
+	if _, _, err := findYueOnPath(background, e); err != context.Canceled {
 		t.Errorf("yueOnPath of a cancelled run = %v", err)
 	}
 }
 
 func TestPathCommandGivesAPowerShellCommandOnWindowsAndAProfileLineElsewhere(t *testing.T) {
-	windows := PathCommand(`C:\Users\me\AppData\Local\moonwell\bin`, "windows")
+	windows := AddToPathCommand(`C:\Users\me\AppData\Local\moonwell\bin`, "windows")
 	want := `[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ` +
 		`';C:\Users\me\AppData\Local\moonwell\bin', 'User')`
 	if windows != want {
 		t.Errorf("PathCommand = %s", windows)
 	}
-	linux := PathCommand("/home/me/.cache/moonwell/bin", "linux")
+	linux := AddToPathCommand("/home/me/.cache/moonwell/bin", "linux")
 	if linux != `echo 'export PATH="/home/me/.cache/moonwell/bin:$PATH"' >> ~/.profile` {
 		t.Errorf("PathCommand = %s", linux)
 	}
@@ -104,7 +104,7 @@ func TestPathCommandKeepsSpacesAndDoublesSingleQuotesInTheWindowsFolder(t *testi
 		`C:\Users\Jane Doe\AppData\Local\moonwell\bin`: `+ ';C:\Users\Jane Doe\AppData\Local\moonwell\bin', 'User')`,
 		`C:\Users\O'Brien\AppData\Local\moonwell\bin`:  `+ ';C:\Users\O''Brien\AppData\Local\moonwell\bin', 'User')`,
 	} {
-		if got := PathCommand(folder, "windows"); !strings.Contains(got, want) {
+		if got := AddToPathCommand(folder, "windows"); !strings.Contains(got, want) {
 			t.Errorf("PathCommand(%s) = %s", folder, got)
 		}
 	}
@@ -114,17 +114,17 @@ func TestReportYueOnPathWarnsOnceAboutYueOnPathAndSaysNothingWhenItIsRight(t *te
 	const binDir = "/home/me/.cache/moonwell/bin"
 	e, log := testkit.Env(t, t.TempDir())
 	e.Run = yueOf("0.30.0")
-	if err := ReportYueOnPath(background, e, "0.34.2", binDir, "linux"); err != nil {
+	if err := WarnIfYueNotOnPath(background, e, "0.34.2", binDir, "linux"); err != nil {
 		t.Fatal(err)
 	}
 	want := "warning: yue on PATH is version 0.30.0; VS Code's YueScript extension needs YueScript 0.34.2 there. " +
-		"Run this once in your shell, then open a new terminal and restart VS Code:\n  " + PathCommand(binDir, "linux")
+		"Run this once in your shell, then open a new terminal and restart VS Code:\n  " + AddToPathCommand(binDir, "linux")
 	if lines := log.Lines(); !slices.Equal(lines, []string{want}) {
 		t.Errorf("log = %q", lines)
 	}
 	quiet, silence := testkit.Env(t, t.TempDir())
 	quiet.Run = yueOf("0.34.2")
-	if err := ReportYueOnPath(background, quiet, "0.34.2", binDir, "linux"); err != nil || len(silence.Lines()) != 0 {
+	if err := WarnIfYueNotOnPath(background, quiet, "0.34.2", binDir, "linux"); err != nil || len(silence.Lines()) != 0 {
 		t.Errorf("log = %q, %v", silence.Lines(), err)
 	}
 }
@@ -133,13 +133,13 @@ func TestReportYueOnPathTellsWindowsUsersToRunTheCommandInPowerShell(t *testing.
 	const binDir = `C:\Users\me\AppData\Local\moonwell\bin`
 	e, log := testkit.Env(t, t.TempDir())
 	e.Run = missing
-	if err := ReportYueOnPath(background, e, "0.34.2", binDir, "windows"); err != nil {
+	if err := WarnIfYueNotOnPath(background, e, "0.34.2", binDir, "windows"); err != nil {
 		t.Fatal(err)
 	}
 	lines := log.Lines()
 	if len(lines) != 1 || !strings.HasPrefix(lines[0], "warning: yue is not on PATH; ") ||
 		!strings.Contains(lines[0], "Run this once in PowerShell, then open a new terminal and restart VS Code") ||
-		!strings.HasSuffix(lines[0], PathCommand(binDir, "windows")) {
+		!strings.HasSuffix(lines[0], AddToPathCommand(binDir, "windows")) {
 		t.Errorf("log = %q", lines)
 	}
 }
@@ -147,7 +147,7 @@ func TestReportYueOnPathTellsWindowsUsersToRunTheCommandInPowerShell(t *testing.
 func TestReportYueOnPathPassesOnACancellationAndLogsNothing(t *testing.T) {
 	e, log := testkit.Env(t, t.TempDir())
 	e.Run = interrupted
-	if err := ReportYueOnPath(background, e, "0.34.2", "/bin", "linux"); err != context.Canceled || len(log.Lines()) != 0 {
+	if err := WarnIfYueNotOnPath(background, e, "0.34.2", "/bin", "linux"); err != context.Canceled || len(log.Lines()) != 0 {
 		t.Errorf("ReportYueOnPath = %v, log %q", err, log.Lines())
 	}
 }
@@ -169,7 +169,7 @@ func TestDirAsWrittenKeepsTheSeparatorsOfThePath(t *testing.T) {
 		cases[`C:\yue.exe`] = `C:\`
 	}
 	for path, want := range cases {
-		if got := DirAsWritten(path); got != want {
+		if got := ParentDir(path); got != want {
 			t.Errorf("DirAsWritten(%q) = %q, want %q", path, got, want)
 		}
 	}

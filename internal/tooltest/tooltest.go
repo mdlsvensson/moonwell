@@ -18,7 +18,7 @@ func Yue(t testing.TB) string {
 		provided = &path
 	}
 	world := env.New("", env.NewLogger(func(string) {}, ""))
-	program, err := toolchain.Compiler(context.Background(), world, toolchain.YueVersion, provided)
+	program, err := toolchain.FindCompiler(context.Background(), world, toolchain.YueVersion, provided)
 	if err == nil {
 		return program
 	}

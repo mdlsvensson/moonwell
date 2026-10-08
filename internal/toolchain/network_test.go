@@ -19,7 +19,7 @@ func TestThePinnedProgramsAreDownloadedForRealAndReportTheirVersions(t *testing.
 	t.Run("the compiler, as tests get it", func(t *testing.T) {
 		t.Setenv("MOONWELL_TEST_YUE", "")
 		program := tooltest.Yue(t)
-		found, err := toolchain.ReportedVersion(ctx, world, toolchain.YueScript, program)
+		found, err := toolchain.QueryVersion(ctx, world, toolchain.YueScript, program)
 		if err != nil || found != toolchain.YueVersion {
 			t.Errorf("%s reports the version %q, %v, want %s", program, found, err, toolchain.YueVersion)
 		}
@@ -33,7 +33,7 @@ func TestThePinnedProgramsAreDownloadedForRealAndReportTheirVersions(t *testing.
 		if err != nil {
 			t.Fatal(diag.Format(err))
 		}
-		found, err := toolchain.ReportedVersion(ctx, world, toolchain.Pkl, program)
+		found, err := toolchain.QueryVersion(ctx, world, toolchain.Pkl, program)
 		if err != nil || found != toolchain.PklVersion {
 			t.Errorf("%s reports the version %q, %v, want %s", program, found, err, toolchain.PklVersion)
 		}

@@ -42,11 +42,11 @@ func runSetup(ctx context.Context, e *env.Env, _ call) error {
 }
 
 func pklForShell(ctx context.Context, e *env.Env) (pkl string, err error) {
-	pkl, err = toolchain.PklProgram(ctx, e)
+	pkl, err = toolchain.FindPkl(ctx, e)
 	if err != nil {
 		return "", err
 	}
-	return pkl, toolchain.KeepPklForShell(ctx, e, pkl, runtime.GOOS)
+	return pkl, toolchain.CopyPklToBinDir(ctx, e, pkl, runtime.GOOS)
 }
 
 func localManifest(e *env.Env) error {
@@ -61,7 +61,7 @@ func localManifest(e *env.Env) error {
 }
 
 func compilerForEditor(ctx context.Context, e *env.Env, yue manifest.Yue) error {
-	compiler, err := toolchain.Compiler(ctx, e, yue.Version, yue.Path)
+	compiler, err := toolchain.FindCompiler(ctx, e, yue.Version, yue.Path)
 	if err != nil {
 		return err
 	}
@@ -70,14 +70,14 @@ func compilerForEditor(ctx context.Context, e *env.Env, yue manifest.Yue) error 
 	if err != nil {
 		return err
 	}
-	return toolchain.ReportYueOnPath(ctx, e, yue.Version, binDir, runtime.GOOS)
+	return toolchain.WarnIfYueNotOnPath(ctx, e, yue.Version, binDir, runtime.GOOS)
 }
 
 func folderForPath(e *env.Env, yue manifest.Yue, compiler string) (string, error) {
 	if yue.Path != nil {
-		return toolchain.DirAsWritten(*yue.Path), nil
+		return toolchain.ParentDir(*yue.Path), nil
 	}
-	path, copied, err := toolchain.InstallBin(e, toolchain.YueScript, compiler)
+	path, copied, err := toolchain.CopyToBinDir(e, toolchain.YueScript, compiler)
 	if err != nil {
 		return "", err
 	}

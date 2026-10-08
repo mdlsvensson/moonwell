@@ -52,7 +52,7 @@ func compile(
 	if _, err := outputAt(p.Root, stageDir); err != nil {
 		return nil, err
 	}
-	compiler, err := toolchain.Compiler(ctx, e, p.Yue.Version, p.Yue.Path)
+	compiler, err := toolchain.FindCompiler(ctx, e, p.Yue.Version, p.Yue.Path)
 	if err != nil {
 		return nil, err
 	}

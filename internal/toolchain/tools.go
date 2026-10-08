@@ -56,9 +56,9 @@ var YueScript = Tool{
 			},
 		},
 	},
-	VersionArgs: []string{"-v"},
-	Reported:    regexp.MustCompile(`Yuescript version: ([^` + fsx.ASCIISpace + `]+)`),
-	Otherwise:   "build or install yue yourself and set yue.path in moonwell.local.pkl.",
+	VersionArgs:       []string{"-v"},
+	VersionPattern:    regexp.MustCompile(`Yuescript version: ([^` + fsx.ASCIISpace + `]+)`),
+	ManualInstallHint: "build or install yue yourself and set yue.path in moonwell.local.pkl.",
 }
 
 var Pkl = Tool{
@@ -78,39 +78,39 @@ var Pkl = Tool{
 			},
 		},
 	},
-	VersionArgs: []string{"--version"},
-	Reported:    regexp.MustCompile(`Pkl (\d+\.\d+\.\d+)`),
-	Otherwise:   "install Pkl 0.32 or newer yourself: " + pklPage,
+	VersionArgs:       []string{"--version"},
+	VersionPattern:    regexp.MustCompile(`Pkl (\d+\.\d+\.\d+)`),
+	ManualInstallHint: "install Pkl 0.32 or newer yourself: " + pklPage,
 }
 
-func Compiler(ctx context.Context, e *env.Env, version string, path *string) (string, error) {
+func FindCompiler(ctx context.Context, e *env.Env, version string, path *string) (string, error) {
 	if path == nil {
 		return Ensure(ctx, e, YueScript, version)
 	}
 	if !fsx.Exists(*path) {
 		return "", errNoYuePath(*path)
 	}
-	found, err := ReportedVersion(ctx, e, YueScript, *path)
+	found, err := QueryVersion(ctx, e, YueScript, *path)
 	if err != nil {
-		return "", ofYuePath(err)
+		return "", blameYuePath(err)
 	}
 	if found != version {
-		e.Log.Warn("yue.path reports version " + orUnknown(found) + ", expected " + version + ".")
+		e.Log.Warn("yue.path reports version " + versionOrUnknown(found) + ", expected " + version + ".")
 	}
 	return *path, nil
 }
 
-func ofYuePath(err error) error {
-	var failure *diag.Error
-	if errors.As(err, &failure) {
-		failure.File, failure.Hint = yuePathFile, yuePathHint
+func blameYuePath(err error) error {
+	var diagErr *diag.Error
+	if errors.As(err, &diagErr) {
+		diagErr.File, diagErr.Hint = yuePathFile, yuePathHint
 	}
 	return err
 }
 
-func PklProgram(ctx context.Context, e *env.Env) (string, error) {
-	printed, recent, err := pklOnPath(ctx, e)
-	onPath := !notStarted(err)
+func FindPkl(ctx context.Context, e *env.Env) (string, error) {
+	output, recent, err := findPklOnPath(ctx, e)
+	onPath := !isStartFailure(err)
 	switch {
 	case err != nil && onPath:
 		return "", err
@@ -121,24 +121,24 @@ func PklProgram(ctx context.Context, e *env.Env) (string, error) {
 		if !onPath {
 			return "", err
 		}
-		return "", errOlderPkl(printed)
+		return "", errPklTooOld(output)
 	}
 	if onPath {
-		e.Log.Warn("pkl on PATH is older than 0.32 (" + printed + "), so Moonwell runs its own Pkl " + PklVersion +
+		e.Log.Warn("pkl on PATH is older than 0.32 (" + output + "), so Moonwell runs its own Pkl " + PklVersion +
 			". A pkl command you type yourself, such as `pkl project resolve`, still runs the old one.")
 	}
 	return Ensure(ctx, e, Pkl, PklVersion)
 }
 
-func pklOnPath(ctx context.Context, e *env.Env) (printed string, recent bool, err error) {
-	result, err := Pkl.ask(ctx, e, Pkl.Name, pklInstallHint)
+func findPklOnPath(ctx context.Context, e *env.Env) (output string, recent bool, err error) {
+	result, err := Pkl.runVersionCommand(ctx, e, Pkl.Name, pklInstallHint)
 	if err != nil {
 		return "", false, err
 	}
-	return orUnknown(fsx.TrimASCIISpace(result.Stdout)), recentPkl(Pkl.versionIn(result)), nil
+	return versionOrUnknown(fsx.TrimASCIISpace(result.Stdout)), isSupportedPkl(Pkl.parseVersion(result)), nil
 }
 
-func recentPkl(version string) bool {
+func isSupportedPkl(version string) bool {
 	numbers := strings.Split(version, ".")
 	if len(numbers) < 2 {
 		return false
@@ -148,9 +148,9 @@ func recentPkl(version string) bool {
 	return major > 0 || minor >= 32
 }
 
-func notStarted(err error) bool {
-	var expected *diag.Error
-	return errors.As(err, &expected)
+func isStartFailure(err error) bool {
+	var diagErr *diag.Error
+	return errors.As(err, &diagErr)
 }
 
 const pklInstallHint = "Install Pkl 0.32 or newer: " + pklPage
@@ -164,6 +164,6 @@ func errNoYuePath(path string) error {
 	return &diag.Error{Msg: "yue.path does not exist: " + path, File: yuePathFile, Hint: yuePathHint}
 }
 
-func errOlderPkl(printed string) error {
-	return &diag.Error{Msg: "Moonwell needs Pkl 0.32 or newer (found: " + printed + ").", Hint: pklInstallHint}
+func errPklTooOld(output string) error {
+	return &diag.Error{Msg: "Moonwell needs Pkl 0.32 or newer (found: " + output + ").", Hint: pklInstallHint}
 }

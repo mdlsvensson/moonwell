@@ -11,7 +11,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-func InstallBin(e *env.Env, tool Tool, program string) (path string, copied bool, err error) {
+func CopyToBinDir(e *env.Env, tool Tool, program string) (path string, copied bool, err error) {
 	path = filepath.Join(e.CacheDir, "bin", filepath.Base(program))
 	copied, err = fsx.CopyProgram(program, path)
 	if err != nil {
@@ -20,7 +20,7 @@ func InstallBin(e *env.Env, tool Tool, program string) (path string, copied bool
 	return path, copied, nil
 }
 
-func PathCommand(binDir, goos string) string {
+func AddToPathCommand(binDir, goos string) string {
 	if goos == "windows" {
 		entry := strings.ReplaceAll(";"+binDir, "'", "''")
 		return "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + '" +
@@ -29,9 +29,9 @@ func PathCommand(binDir, goos string) string {
 	return `echo 'export PATH="` + binDir + `:$PATH"' >> ~/.profile`
 }
 
-func DirAsWritten(path string) string {
+func ParentDir(path string) string {
 	root := len(filepath.VolumeName(path))
-	end := lastName(path, root)
+	end := lastNameStart(path, root)
 	if end == root {
 		if root > 0 {
 			return path[:root]
@@ -44,7 +44,7 @@ func DirAsWritten(path string) string {
 	return path[:end]
 }
 
-func lastName(path string, root int) int {
+func lastNameStart(path string, root int) int {
 	end := len(path)
 	for end > root && os.IsPathSeparator(path[end-1]) {
 		end--
@@ -55,15 +55,15 @@ func lastName(path string, root int) int {
 	return end
 }
 
-func shellOf(goos string) string {
+func shellName(goos string) string {
 	if goos == "windows" {
 		return "PowerShell"
 	}
 	return "your shell"
 }
 
-func ReportYueOnPath(ctx context.Context, e *env.Env, version, binDir, goos string) error {
-	onPath, found, err := yueOnPath(ctx, e)
+func WarnIfYueNotOnPath(ctx context.Context, e *env.Env, version, binDir, goos string) error {
+	onPath, found, err := findYueOnPath(ctx, e)
 	if err != nil || (found && onPath == version) {
 		return err
 	}
@@ -72,15 +72,15 @@ func ReportYueOnPath(ctx context.Context, e *env.Env, version, binDir, goos stri
 		problem = "on PATH is version " + onPath
 	}
 	e.Log.Warn("yue " + problem + "; VS Code's YueScript extension needs YueScript " + version + " there. " +
-		"Run this once in " + shellOf(goos) + ", then open a new terminal and restart VS Code:\n" +
-		"  " + PathCommand(binDir, goos))
+		"Run this once in " + shellName(goos) + ", then open a new terminal and restart VS Code:\n" +
+		"  " + AddToPathCommand(binDir, goos))
 	return nil
 }
 
-func yueOnPath(ctx context.Context, e *env.Env) (version string, found bool, err error) {
-	version, err = ReportedVersion(ctx, e, YueScript, YueScript.Name)
+func findYueOnPath(ctx context.Context, e *env.Env) (version string, found bool, err error) {
+	version, err = QueryVersion(ctx, e, YueScript, YueScript.Name)
 	switch {
-	case notStarted(err):
+	case isStartFailure(err):
 		return "", false, nil
 	case err != nil:
 		return "", false, err
@@ -88,22 +88,22 @@ func yueOnPath(ctx context.Context, e *env.Env) (version string, found bool, err
 	return version, version != "", nil
 }
 
-func KeepPklForShell(ctx context.Context, e *env.Env, program, goos string) error {
+func CopyPklToBinDir(ctx context.Context, e *env.Env, program, goos string) error {
 	if program == Pkl.Name {
 		return nil
 	}
-	path, copied, err := InstallBin(e, Pkl, program)
+	path, copied, err := CopyToBinDir(e, Pkl, program)
 	if err != nil {
 		return err
 	}
 	if copied {
 		e.Log.Info("Copied Pkl " + PklVersion + " to " + path + ".")
 	}
-	if _, err := Pkl.ask(ctx, e, Pkl.Name, ""); !notStarted(err) {
+	if _, err := Pkl.runVersionCommand(ctx, e, Pkl.Name, ""); !isStartFailure(err) {
 		return err
 	}
 	e.Log.Warn("pkl is not on PATH, so a pkl command you type, such as `pkl project resolve`, finds no Pkl. " +
-		"Run this once in " + shellOf(goos) + ", then open a new terminal:\n  " + PathCommand(filepath.Dir(path), goos))
+		"Run this once in " + shellName(goos) + ", then open a new terminal:\n  " + AddToPathCommand(filepath.Dir(path), goos))
 	return nil
 }
 

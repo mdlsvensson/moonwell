@@ -44,7 +44,7 @@ func createProject(ctx context.Context, e *env.Env, dir, schema string) error {
 	if err != nil {
 		return err
 	}
-	pkl, err := toolchain.PklProgram(ctx, e)
+	pkl, err := toolchain.FindPkl(ctx, e)
 	if err != nil {
 		return err
 	}

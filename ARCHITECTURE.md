@@ -225,7 +225,7 @@ of their own, as the table says.
 
 `Build` in `internal/build/build.go` reads top to bottom:
 
-1. `Load` finds Pkl (`toolchain.PklProgram`) and evaluates the manifest (`manifest.Load`). The result is a
+1. `Load` finds Pkl (`toolchain.FindPkl`) and evaluates the manifest (`manifest.Load`). The result is a
    `*manifest.Project`: every setting of the project as a Go value.
 2. `TakeLock` writes `dist/.lock`, so that a second build in the same project fails at once. The manifest is
    evaluated first, so that a command run outside a project makes no `dist` folder there.
@@ -286,7 +286,7 @@ The steps, one by one:
 5. **`library.Sync`** brings the copies of the libraries below `.moonwell/` up to date and writes `moonwell.lock`.
    It returns, for each library, the folder of its modules and the folder of the files it ships. It stands before
    the compile, which compiles the libraries' modules, and before the assets, which import the libraries' files.
-6. **`compile`** (in `internal/build/steps.go`) finds the compiler (`toolchain.Compiler`) and makes the program in
+6. **`compile`** (in `internal/build/steps.go`) finds the compiler (`toolchain.FindCompiler`) and makes the program in
    two steps of `internal/script`. `script.CompileSources` finds every module and compiles the YueScript ones into
    the compile's cache, `dist/stage/lua`. `script.Link` follows the requires from the entry and checks the modules
    it reaches for unknown globals. Between the two, `editor.RefreshLibraryView` writes the libraries' modules as
@@ -538,7 +538,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | add a setting to the manifest | `schema/Project.pkl` or `schema/MapSettings.pkl`, then the struct in `internal/manifest/project.go` or `internal/manifest/settings.go`; `internal/manifest/load_test.go` fails for a field no manifest sets |
 | know how the manifest is evaluated, and which of the two files | `internal/manifest/load.go`: `Load`, `manifestFile`, `Decode` |
 | change the check of the program's version against the project's | `internal/manifest/version.go`: `checkPackageVersion` |
-| know which `pkl` and which `yue` is run | `internal/toolchain/tools.go`: `PklProgram`, `Compiler` |
+| know which `pkl` and which `yue` is run | `internal/toolchain/tools.go`: `FindPkl`, `FindCompiler` |
 | pin a new version of YueScript or Pkl | `internal/toolchain/tools.go`: `YueScript`, `Pkl`; the default `yue.version` in `schema/Project.pkl` |
 | change how a pinned program is downloaded and checked | `internal/toolchain/ensure.go`: `Ensure`; its steps in `internal/toolchain/install.go` |
 | change the version number | `version.go`, `schema/PklProject`, `install.ps1`, `install.sh`, and the two examples in `README.md`; `module_test.go` and `install_test.go` name one that was missed |
