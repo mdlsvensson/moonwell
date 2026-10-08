@@ -2,7 +2,7 @@
 
 ## Layout
 
-One Go module at the root, with no dependencies beyond the standard library.
+One Go module at the root, with one dependency beyond the standard library: `cobra`, which reads the command line.
 
 [`ARCHITECTURE.md`](ARCHITECTURE.md) is the way into the code. It says what every package does, how a command runs,
 what a build does step by step, and which file to open for what. Read it before you change the code. In short:
@@ -87,7 +87,11 @@ commit that changes the behaviour, and the commit message says which recordings 
 
 ## Rules
 
-- **Standard library only.** No third-party module and no cgo: `go.mod` has no `require`, and a test keeps it so.
+- **One dependency, `cobra`.** The only third-party modules are `github.com/spf13/cobra` and the two it needs
+  (`pflag`, and `mousetrap` on Windows). Only `internal/cli` imports them, and there is no cgo. `module_test.go`
+  holds `go.mod` to that list and `layout_test.go` holds the import. A further module needs a design the
+  maintainer approves; it is then added to the list in `module_test.go`, and `layout_test.go` says which package
+  may import it.
 - **Errors.** An expected failure is a `*diag.Error` (or `diag.Problems`) with the file and a hint. Any other error, and
   any panic, is reported as an internal "please report" error, so a user's mistake must never reach it. The text of
   an error is made by a named function below a `// ---- errors ----` line, at the bottom of the file that raises it.

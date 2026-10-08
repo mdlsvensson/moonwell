@@ -588,19 +588,20 @@ Not supported yet:
 | `moonwell objects:eval`                         | Print the resolved objects as JSON                                               |
 | `moonwell setup`                                | Create a missing `moonwell.local.pkl`, download YueScript and prepare the editor |
 
-A command line is read strictly: Moonwell runs a line it understands whole, or nothing. Each of these is an error
-with a hint, such as `Did you mean --minify?`:
+A flag is written after its command: `moonwell build --minify`. `--entry` takes its file after a space or after
+`=`, and `--` ends the flags. A line Moonwell cannot read, such as one with a flag or a command it does not have
+or with an argument too many, is refused with an error, and nothing of it runs.
 
-- a flag Moonwell does not have (`moonwell build --minfy`), and a command it does not have;
-- a flag the command does not have (`moonwell check --minify`), and a flag without a command (`moonwell --minify`);
-- an argument the command does not take (`moonwell build extra`);
-- a value for a flag that takes none (`--minify=false`), and `--entry` without a `.yue` file under `src/`;
-- a flag given twice with two values (`--entry src/a.yue --entry src/b.yue`);
-- several short flags in one (`-hv`): write `-h -v`.
+`moonwell --help` (`-h`) lists the commands, and every command has its own help: `moonwell build --help`, or
+`moonwell help build`. `moonwell --version` (`-v`) prints the version. A command ends with the exit code 0, with 1
+when it fails, and with 130 after Ctrl+C.
 
-A flag may stand before or after the command. `--entry` takes its file after a space or after `=`. `--` ends the
-flags. `moonwell --help` (`-h`) prints the commands and `moonwell --version` (`-v`) the version. A command ends with
-the exit code 0, with 1 when it fails, and with 130 after Ctrl+C.
+`moonwell completion <shell>` prints a completion script for `bash`, `zsh`, `fish` or `powershell`. For PowerShell,
+add this line to your profile (`notepad $PROFILE`):
+
+```powershell
+moonwell completion powershell | Out-String | Invoke-Expression
+```
 
 The compiler, and Pkl when Moonwell needs its own, are downloaded once per version and verified by checksum. They are
 cached in `MOONWELL_CACHE` when that is set, else in `%LOCALAPPDATA%\moonwell` on Windows, else in

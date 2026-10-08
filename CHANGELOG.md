@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased
+
+- **The command line is read by `cobra`** (`github.com/spf13/cobra`), the library most Go programs use for it, in
+  place of a reader of Moonwell's own. The commands, their arguments and their flags are the same. Moonwell now
+  depends on that module and the two it needs; until now it used the Go standard library alone.
+- **New: every command has its help.** `moonwell build --help` and `moonwell help build` print what the command
+  does and the flags it has.
+- **New: `moonwell completion <shell>`** prints a completion script for `bash`, `zsh`, `fish` or `powershell`.
+- **A flag is written after its command.** `moonwell --minify build` is refused now: write
+  `moonwell build --minify`. The version is asked of `moonwell` alone: `moonwell build --version` is refused.
+- **A line that starts with `--` prints the help** and runs no command: `moonwell -- check` ran `check`, and
+  prints the help now. Write `moonwell check`.
+- **The help and the version are printed to standard output**, where they were printed to standard error. A
+  script that reads `moonwell --version` reads standard output.
+- **A line that cannot be read is refused in `cobra`'s words**, such as `unknown flag: --minfy` and
+  `accepts 0 arg(s), received 1`, with one hint that points to the help. Moonwell no longer suggests the closest
+  flag ("Did you mean --minify?"); for a command the closest is still named. The usage is no longer printed below
+  the refusal of an unknown command, and `moonwell frobnicate --help` is refused where it printed the help.
+- Read now, where they were refused: a flag given twice with two values (the last one counts), a switch with a
+  value (`--minify=false`), and short flags behind one dash (`-hv`).
+- The help text has a new layout, and lists `help` and `completion` after Moonwell's commands. On a line with
+  `--help` and `--version` the help is printed. Started by a double click in Windows Explorer, the program says
+  that it is a command line tool.
+- The program is about 2.7 MB larger.
+
 ## 0.10.0 (2026-10-07)
 
 - **The program was written anew.** The twelve commands and their flags, the manifest, `moonwell.lock`,
