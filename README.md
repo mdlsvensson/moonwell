@@ -76,33 +76,37 @@ program and the package must have the same major and minor version; `moonwell` r
 of the two to change. To install one version, use its own script:
 
 ```powershell
-irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.10.0/install.ps1 | iex
+irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.11.0/install.ps1 | iex
 ```
 
 To move a project to a newer Moonwell, install that version, change the package's version in the project's
 `PklProject` (for example `moonwell@0.8.1` to `moonwell@0.9.0`) and run `pkl project resolve`.
 
-### Upgrading a project to 0.10
+### Upgrading a project to 0.11
 
-A project that builds with Moonwell 0.9 needs three steps to build with 0.10:
+A project that builds with Moonwell 0.10 or 0.9 needs three steps to build with 0.11:
 
-1. Install Moonwell 0.10: run the install line again.
-2. In the project's `PklProject`, set the package's version to `moonwell@0.10.0`.
+1. Install Moonwell 0.11: run the install line again.
+2. In the project's `PklProject`, set the package's version to `moonwell@0.11.0`.
 3. Run `pkl project resolve` in the project folder. If you have no `pkl` command, run `moonwell setup` there first:
    it copies Moonwell's own Pkl into its cache's `bin` folder and prints the command that puts that folder on your
    PATH. It then stops at the project's package version, which this step puts right.
 
-In nearly every project nothing in `moonwell.pkl`, the map, `moonwell.lock` or `.asset-state/` has to change. The
-first command afterwards builds the caches under `dist/` and `.moonwell/` anew. The [changelog](CHANGELOG.md) lists
-what 0.10 does differently, and what it refuses that 0.9 let through; the two changes a project is most likely to
-meet are that a mistyped flag is now an error, and that `dist` must be a real folder.
+From 0.10, nothing else in the project has to change, and it builds the same map. What 0.11 changes is the command
+line: a flag must stand after its command (`moonwell build --minify`), and the [changelog](CHANGELOG.md) lists the
+rest.
+
+From 0.9, in nearly every project nothing in `moonwell.pkl`, the map, `moonwell.lock` or `.asset-state/` has to
+change either. The first command afterwards builds the caches under `dist/` and `.moonwell/` anew. The changelog's
+section on 0.10 lists what that version does differently, and what it refuses that 0.9 let through; the change a
+project is most likely to meet is that `dist` must be a real folder.
 
 ### Upgrading a project from 0.7
 
 Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four steps:
 
 1. Install `moonwell`, as above.
-2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.10.0`.
+2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.11.0`.
 3. Run `pkl project resolve`.
 4. Delete `deno.json` and `deno.lock`. Where you ran `deno task build`, run `moonwell build`; the same goes for every
    other command.

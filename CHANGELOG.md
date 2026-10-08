@@ -1,11 +1,19 @@
 # Changelog
 
-## Unreleased
+## 0.11.0 (2026-10-08)
 
 - **The command line is read by `cobra`** (`github.com/spf13/cobra`), the library most Go programs use for it, in
-  place of a reader of Moonwell's own. The commands, their arguments and their flags are the same. Moonwell now
-  depends on that module and the two it needs; until now it used the Go standard library alone. A release hands
-  out their licences beside the programs, in `THIRD_PARTY_LICENSES`.
+  place of a reader of Moonwell's own. The commands, their arguments and their flags are the same, and a project
+  builds the same map. Moonwell now depends on that module and the two it needs; until now it used the Go standard
+  library alone. A release hands out their licences beside the programs, in `THIRD_PARTY_LICENSES`.
+- **To move a project to this version,** install it (run the install line again), set `moonwell@0.11.0` in
+  `PklProject` and run `pkl project resolve`. The program refuses a project that is still on a 0.10 package, and
+  says so. Nothing else in the project has to change.
+- **Known issue with Warcraft III 3.0.1, as in 0.10.0: `moonwell test` starts the game, and the game shows its
+  main menu.** That version of the game no longer loads a map that is a folder when it is started with
+  `-loadfile`, which is what `test` does; a packed map still loads. Until `test` is changed, run `moonwell build`
+  and start the game on the packed map:
+  `& "<your Warcraft III.exe>" -launch -windowmode windowed -loadfile "<project>\dist\bin\map.w3x"`.
 - **New: every command has its help.** `moonwell build --help` and `moonwell help build` print what the command
   does and the flags it has.
 - **New: `moonwell completion <shell>`** prints a completion script for `bash`, `zsh`, `fish` or `powershell`.
