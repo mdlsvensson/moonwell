@@ -6,14 +6,14 @@ import (
 )
 
 type Settings struct {
-	Info              Info                     `json:"info"`
-	LoadingScreen     LoadingScreen            `json:"loadingScreen"`
-	Players           map[int]Player           `json:"players"`
-	Forces            map[int]Force            `json:"forces"`
-	Environment       Environment              `json:"environment"`
-	Gameplay          Gameplay                 `json:"gameplay"`
-	GameplayConstants Ordered[Ordered[string]] `json:"gameplayConstants"`
-	GameInterface     Ordered[Ordered[string]] `json:"gameInterface"`
+	Info              Info                           `json:"info"`
+	LoadingScreen     LoadingScreen                  `json:"loadingScreen"`
+	Players           map[int]Player                 `json:"players"`
+	Forces            map[int]Force                  `json:"forces"`
+	Environment       Environment                    `json:"environment"`
+	Gameplay          Gameplay                       `json:"gameplay"`
+	GameplayConstants OrderedMap[OrderedMap[string]] `json:"gameplayConstants"`
+	GameInterface     OrderedMap[OrderedMap[string]] `json:"gameInterface"`
 }
 
 type Info struct {
@@ -70,6 +70,6 @@ type Gameplay struct {
 	FoodLimit    *int `json:"foodLimit"`
 }
 
-func Slots[V any](overrides map[int]V) []int {
+func SortedSlots[V any](overrides map[int]V) []int {
 	return slices.Sorted(maps.Keys(overrides))
 }

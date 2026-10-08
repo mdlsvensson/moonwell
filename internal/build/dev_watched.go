@@ -19,7 +19,7 @@ var checkedFolders = []struct{ dir, ending string }{
 	{sourcesDir, ".yue"}, {"assets", ""}, {"objects", ".pkl"}, {"lua", ".lua"},
 }
 
-var manifests = []string{manifest.SharedFile, manifest.LocalFile, "PklProject", "PklProject.deps.json"}
+var manifests = []string{manifest.SharedManifest, manifest.LocalManifest, "PklProject", "PklProject.deps.json"}
 
 type watched struct {
 	roots  []watchRoot

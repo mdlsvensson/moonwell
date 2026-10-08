@@ -18,12 +18,12 @@ var (
 
 func readPackageVersion(deps []byte) (string, error) {
 	text := []byte(fsx.DecodeText(deps))
-	var whole json.RawMessage
-	if err := json.Unmarshal(text, &whole); err != nil {
+	var raw json.RawMessage
+	if err := json.Unmarshal(text, &raw); err != nil {
 		return "", errDepsNotJSON(err)
 	}
 	var document struct {
-		Resolved Ordered[json.RawMessage] `json:"resolvedDependencies"`
+		Resolved OrderedMap[json.RawMessage] `json:"resolvedDependencies"`
 	}
 	_ = json.Unmarshal(text, &document)
 	for key, entry := range document.Resolved.All() {
@@ -48,13 +48,13 @@ func checkPackageVersion(packageVersion, programVersion string) error {
 	return errVersionMismatch(packageVersion, programVersion)
 }
 
-const releases = "https://github.com/mdlsvensson/moonwell/releases/download/moonwell@"
+const releasesURL = "https://github.com/mdlsvensson/moonwell/releases/download/moonwell@"
 
-func installLine(version string) string {
+func installCommand(version string) string {
 	if runtime.GOOS == "windows" {
-		return "irm " + releases + version + "/install.ps1 | iex"
+		return "irm " + releasesURL + version + "/install.ps1 | iex"
 	}
-	return "curl -fsSL " + releases + version + "/install.sh | sh"
+	return "curl -fsSL " + releasesURL + version + "/install.sh | sh"
 }
 
 func hasInstallScript(version string) bool {
@@ -90,7 +90,7 @@ func errVersionMismatch(packageVersion, programVersion string) error {
 	move := "se moonwell@" + major + "." + minor + ".x in PklProject and run `pkl project resolve`."
 	hint := "U" + move
 	if hasInstallScript(packageVersion) {
-		hint = "Install Moonwell " + packageVersion + " (" + installLine(packageVersion) + "), or u" + move
+		hint = "Install Moonwell " + packageVersion + " (" + installCommand(packageVersion) + "), or u" + move
 	}
 	return &diag.Error{
 		Msg:  "Pkl package moonwell@" + packageVersion + " does not match Moonwell CLI " + programVersion + ".",

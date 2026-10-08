@@ -7,16 +7,16 @@ type Category string
 var Categories = []Category{"heroes", "units", "buildings", "items", "abilities", "buffs", "upgrades"}
 
 type Objects struct {
-	Heroes    Ordered[Object] `json:"heroes"`
-	Units     Ordered[Object] `json:"units"`
-	Buildings Ordered[Object] `json:"buildings"`
-	Items     Ordered[Object] `json:"items"`
-	Abilities Ordered[Object] `json:"abilities"`
-	Buffs     Ordered[Object] `json:"buffs"`
-	Upgrades  Ordered[Object] `json:"upgrades"`
+	Heroes    OrderedMap[Object] `json:"heroes"`
+	Units     OrderedMap[Object] `json:"units"`
+	Buildings OrderedMap[Object] `json:"buildings"`
+	Items     OrderedMap[Object] `json:"items"`
+	Abilities OrderedMap[Object] `json:"abilities"`
+	Buffs     OrderedMap[Object] `json:"buffs"`
+	Upgrades  OrderedMap[Object] `json:"upgrades"`
 }
 
-func (o *Objects) of(category Category) *Ordered[Object] {
+func (o *Objects) pointerTo(category Category) *OrderedMap[Object] {
 	switch category {
 	case "heroes":
 		return &o.Heroes
@@ -36,25 +36,25 @@ func (o *Objects) of(category Category) *Ordered[Object] {
 	return nil
 }
 
-func (o Objects) Of(category Category) Ordered[Object] {
-	if held := o.of(category); held != nil {
-		return *held
+func (o Objects) ByCategory(category Category) OrderedMap[Object] {
+	if found := o.pointerTo(category); found != nil {
+		return *found
 	}
-	return Ordered[Object]{}
+	return OrderedMap[Object]{}
 }
 
-func (o Objects) Empty() bool {
+func (o Objects) IsEmpty() bool {
 	for _, category := range Categories {
-		if o.Of(category).Len() > 0 {
+		if o.ByCategory(category).Len() > 0 {
 			return false
 		}
 	}
 	return true
 }
 
-func (o *Objects) nameSources(file string) {
+func (o *Objects) setSources(file string) {
 	for _, category := range Categories {
-		objects := o.of(category)
+		objects := o.pointerTo(category)
 		for key, object := range objects.All() {
 			if object.Source == "" {
 				object.Source = file
@@ -67,25 +67,25 @@ func (o *Objects) nameSources(file string) {
 type Object struct {
 	ID, Base   string
 	Source     string
-	Typed      Ordered[any]
-	Properties Ordered[any]
+	Typed      OrderedMap[any]
+	Properties OrderedMap[any]
 }
 
 func (o *Object) UnmarshalJSON(data []byte) error {
-	var keys Ordered[json.RawMessage]
+	var keys OrderedMap[json.RawMessage]
 	if err := keys.UnmarshalJSON(data); err != nil {
 		return err
 	}
 	*o = Object{}
 	for key, value := range keys.All() {
-		if err := o.readKey(key, value); err != nil {
-			return under(key, err)
+		if err := o.decodeField(key, value); err != nil {
+			return wrapWithKey(key, err)
 		}
 	}
 	return nil
 }
 
-func (o *Object) readKey(key string, value json.RawMessage) error {
+func (o *Object) decodeField(key string, value json.RawMessage) error {
 	switch key {
 	case "id":
 		return json.Unmarshal(value, &o.ID)
@@ -94,7 +94,7 @@ func (o *Object) readKey(key string, value json.RawMessage) error {
 	case "source":
 		return json.Unmarshal(value, &o.Source)
 	case "properties":
-		var properties Ordered[any]
+		var properties OrderedMap[any]
 		err := json.Unmarshal(value, &properties)
 		for name, property := range properties.All() {
 			setUnlessNull(&o.Properties, name, property)
@@ -107,7 +107,7 @@ func (o *Object) readKey(key string, value json.RawMessage) error {
 	return err
 }
 
-func setUnlessNull(properties *Ordered[any], name string, value any) {
+func setUnlessNull(properties *OrderedMap[any], name string, value any) {
 	if value != nil {
 		properties.Set(name, value)
 	}

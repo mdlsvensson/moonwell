@@ -16,7 +16,7 @@ const plainBlocks = `"map":{"folder":"map.w3x","entry":"src/main.yue"},"build":{
 
 func projectOf(t testing.TB, root, document string) *manifest.Project {
 	t.Helper()
-	project, err := manifest.Decode(root, manifestName, []byte("{"+plainBlocks+`,"settings":`+document+"}"))
+	project, err := manifest.DecodeProject(root, manifestName, []byte("{"+plainBlocks+`,"settings":`+document+"}"))
 	if err != nil {
 		t.Fatalf("settings %s: %v", document, diag.Format(err))
 	}

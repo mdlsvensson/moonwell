@@ -149,7 +149,7 @@ func librariesAndTheirView(ctx context.Context, e *env.Env, p *manifest.Project)
 		return err
 	}
 	defer release()
-	synced, err := library.Sync(ctx, e, p.Libraries, p.File)
+	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
 	if err != nil {
 		return err
 	}

@@ -115,7 +115,7 @@ func TestDecodeReadsEverySetting(t *testing.T) {
 		},
 		Gameplay: Gameplay{HeroMaxLevel: ptr(20), FoodLimit: ptr(300)},
 	}
-	var misc, frame Ordered[string]
+	var misc, frame OrderedMap[string]
 	misc.Set("DefenseArmor", "0.05")
 	frame.Set("UPKEEP_NONE", "x")
 	want.GameplayConstants.Set("Misc", misc)
@@ -137,7 +137,7 @@ func TestSlotsComeInTheOrderOfTheirNumbers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Slots(tt.overrides); !slices.Equal(got, tt.want) {
+			if got := SortedSlots(tt.overrides); !slices.Equal(got, tt.want) {
 				t.Errorf("Slots = %v, want %v", got, tt.want)
 			}
 		})
@@ -146,10 +146,10 @@ func TestSlotsComeInTheOrderOfTheirNumbers(t *testing.T) {
 
 func TestTheSlotsOfPlayersAndForcesAreReadAsNumbers(t *testing.T) {
 	s := settingsOf(t, `{"players":{"10":{"name":"k"},"2":{"name":"c"},"0":{"name":"a"}},"forces":{"11":{},"3":{}}}`)
-	if got := Slots(s.Players); !slices.Equal(got, []int{0, 2, 10}) {
+	if got := SortedSlots(s.Players); !slices.Equal(got, []int{0, 2, 10}) {
 		t.Errorf("players = %v", got)
 	}
-	if got := Slots(s.Forces); !slices.Equal(got, []int{3, 11}) {
+	if got := SortedSlots(s.Forces); !slices.Equal(got, []int{3, 11}) {
 		t.Errorf("forces = %v", got)
 	}
 	if text(s.Players[10].Name) != "k" || text(s.Players[2].Name) != "c" || text(s.Players[0].Name) != "a" {

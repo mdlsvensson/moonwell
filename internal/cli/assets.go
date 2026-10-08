@@ -39,7 +39,7 @@ func importAssets(ctx context.Context, e *env.Env, write bool) error {
 	if err := savedWithLuaScript(source); err != nil {
 		return err
 	}
-	synced, err := library.Sync(ctx, e, p.Libraries, p.File)
+	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func savedWithLuaScript(source *mapdir.Folder) error {
 func syncedAssets(
 	ctx context.Context, e *env.Env, p *manifest.Project,
 ) (found []assets.Asset, replaced []string, err error) {
-	synced, err := library.Sync(ctx, e, p.Libraries, p.File)
+	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
 	if err != nil {
 		return nil, nil, err
 	}

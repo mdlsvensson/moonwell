@@ -84,16 +84,16 @@ func fileOf(t testing.TB, template []moonwell.TemplateFile, path string) []byte 
 	return nil
 }
 
-func membersOf(t testing.TB, text string) manifest.Ordered[json.RawMessage] {
+func membersOf(t testing.TB, text string) manifest.OrderedMap[json.RawMessage] {
 	t.Helper()
-	var members manifest.Ordered[json.RawMessage]
+	var members manifest.OrderedMap[json.RawMessage]
 	if err := json.Unmarshal([]byte(strings.TrimPrefix(text, mark)), &members); err != nil {
 		t.Fatalf("%v in\n%s", err, text)
 	}
 	return members
 }
 
-func listUnder(t testing.TB, members manifest.Ordered[json.RawMessage], key string) []string {
+func listUnder(t testing.TB, members manifest.OrderedMap[json.RawMessage], key string) []string {
 	t.Helper()
 	written, _ := members.Get(key)
 	var list []string

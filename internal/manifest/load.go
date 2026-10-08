@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	SharedFile = "moonwell.pkl"
-	LocalFile  = "moonwell.local.pkl"
+	SharedManifest = "moonwell.pkl"
+	LocalManifest  = "moonwell.local.pkl"
 )
 
 const (
@@ -27,45 +27,45 @@ const (
 )
 
 func Load(ctx context.Context, e *env.Env, pkl string) (*Project, error) {
-	file, err := manifestFile(e.Root)
+	file, err := findManifest(e.Root)
 	if err != nil {
 		return nil, err
 	}
-	if err := checkPackage(e.Root); err != nil {
+	if err := checkResolvedPackage(e.Root); err != nil {
 		return nil, err
 	}
-	printed, err := evaluate(ctx, e, pkl, file)
+	output, err := evaluateManifest(ctx, e, pkl, file)
 	if err != nil {
 		return nil, err
 	}
-	return Decode(e.Root, file, []byte(printed))
+	return DecodeProject(e.Root, file, []byte(output))
 }
 
-func Decode(root, file string, data []byte) (*Project, error) {
-	project := &Project{Root: root, File: file}
+func DecodeProject(root, file string, data []byte) (*Project, error) {
+	project := &Project{Root: root, ManifestName: file}
 	if err := json.Unmarshal(data, project); err != nil {
-		return nil, errNotAProject(file, reasonOf(err), err)
+		return nil, errNotAProject(file, describeDecodeError(err), err)
 	}
-	if missing := project.missingTexts(); len(missing) > 0 {
+	if missing := project.missingRequiredFields(); len(missing) > 0 {
 		return nil, errNotAProject(file, "it has no "+diag.JoinWords(missing, "and", -1), nil)
 	}
-	project.Objects.nameSources(file)
+	project.Objects.setSources(file)
 	return project, nil
 }
 
-func reasonOf(err error) string {
-	var mismatch *json.UnmarshalTypeError
-	if !errors.As(err, &mismatch) {
+func describeDecodeError(err error) string {
+	var typeErr *json.UnmarshalTypeError
+	if !errors.As(err, &typeErr) {
 		return strings.ReplaceAll(err.Error(), "json: ", "")
 	}
-	where := strings.TrimSuffix(err.Error(), mismatch.Error()) + cmp.Or(mismatch.Field, "the value")
-	if number, written := strings.CutPrefix(mismatch.Value, "number "); written {
-		return where + ": " + number + " is no number that fits there"
+	location := strings.TrimSuffix(err.Error(), typeErr.Error()) + cmp.Or(typeErr.Field, "the value")
+	if number, isNumber := strings.CutPrefix(typeErr.Value, "number "); isNumber {
+		return location + ": " + number + " is no number that fits there"
 	}
-	return where + " is of the wrong kind (" + mismatch.Value + ")"
+	return location + " is of the wrong kind (" + typeErr.Value + ")"
 }
 
-func (p *Project) missingTexts() []string {
+func (p *Project) missingRequiredFields() []string {
 	var missing []string
 	for _, text := range []struct{ name, value string }{
 		{"map.folder", p.Map.Folder}, {"map.entry", p.Map.Entry}, {"build.folder", p.Build.Folder},
@@ -79,11 +79,11 @@ func (p *Project) missingTexts() []string {
 }
 
 func IsProject(root string) bool {
-	return fsx.Exists(filepath.Join(root, SharedFile))
+	return fsx.Exists(filepath.Join(root, SharedManifest))
 }
 
-func manifestFile(root string) (string, error) {
-	for _, file := range []string{LocalFile, SharedFile} {
+func findManifest(root string) (string, error) {
+	for _, file := range []string{LocalManifest, SharedManifest} {
 		if fsx.Exists(filepath.Join(root, file)) {
 			return file, nil
 		}
@@ -91,10 +91,10 @@ func manifestFile(root string) (string, error) {
 	return "", errNoManifest(root)
 }
 
-func checkPackage(root string) error {
+func checkResolvedPackage(root string) error {
 	deps, err := os.ReadFile(filepath.Join(root, depsFile))
 	if errors.Is(err, fs.ErrNotExist) {
-		return errNoDeps()
+		return errDepsMissing()
 	}
 	if err != nil {
 		return errDepsUnreadable(err)
@@ -106,14 +106,14 @@ func checkPackage(root string) error {
 	return checkPackageVersion(version, moonwell.Version)
 }
 
-func evaluate(ctx context.Context, e *env.Env, pkl, file string) (string, error) {
+func evaluateManifest(ctx context.Context, e *env.Env, pkl, file string) (string, error) {
 	args := []string{"eval", "--format", "json", "--project-dir", ".", file}
 	result, err := e.Run(ctx, pkl, args, env.RunOptions{Dir: e.Root})
 	if err != nil {
 		return "", err
 	}
 	if result.ExitCode != 0 {
-		return "", errEvaluation(file, cmp.Or(result.Stderr, result.Stdout))
+		return "", errEvaluationFailed(file, cmp.Or(result.Stderr, result.Stdout))
 	}
 	var value json.RawMessage
 	if err := json.Unmarshal([]byte(result.Stdout), &value); err != nil {
@@ -122,7 +122,7 @@ func evaluate(ctx context.Context, e *env.Env, pkl, file string) (string, error)
 	return result.Stdout, nil
 }
 
-func firstCharacters(text string, limit int) string {
+func truncateRunes(text string, limit int) string {
 	count := 0
 	for i := range text {
 		if count == limit {
@@ -141,7 +141,7 @@ func errNoManifest(root string) error {
 	}
 }
 
-func errNoDeps() error {
+func errDepsMissing() error {
 	return &diag.Error{
 		Msg:  "PklProject.deps.json is missing.",
 		File: pklProjectFile,
@@ -158,13 +158,13 @@ func errDepsUnreadable(cause error) error {
 	}
 }
 
-func errEvaluation(file, output string) error {
+func errEvaluationFailed(file, output string) error {
 	return &diag.Error{Msg: "Evaluating " + file + " failed:\n" + fsx.TrimASCIISpace(output), File: file}
 }
 
 func errNotJSON(file, output string, cause error) error {
 	return &diag.Error{
-		Msg:   "pkl eval printed output that is not valid JSON:\n" + firstCharacters(fsx.TrimASCIISpace(output), 500),
+		Msg:   "pkl eval printed output that is not valid JSON:\n" + truncateRunes(fsx.TrimASCIISpace(output), 500),
 		File:  file,
 		Hint:  "Check that pkl on PATH is Pkl 0.32 or newer and that no other program is named pkl.",
 		Cause: cause,

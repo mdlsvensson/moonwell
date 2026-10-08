@@ -19,7 +19,7 @@ type Result struct {
 }
 
 func Plan(folder *mapdir.Folder, objects manifest.Objects, metadata *Metadata) (*Result, error) {
-	if objects.Empty() {
+	if objects.IsEmpty() {
 		return &Result{Objects: []Resolved{}, IDs: noIDs}, nil
 	}
 	files, err := readObjectFiles(folder)

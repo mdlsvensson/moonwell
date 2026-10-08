@@ -67,7 +67,7 @@ func TestLoadEvaluatesTheLocalManifestWhenThereIsOneWithTheProgramItIsGiven(t *t
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}
-			if p.Map.Folder != "map.w3x" || p.File != tt.want || p.Root != e.Root {
+			if p.Map.Folder != "map.w3x" || p.ManifestName != tt.want || p.Root != e.Root {
 				t.Errorf("project = %+v", p)
 			}
 			if !slices.Equal(calls, []ran{{line, e.Root}}) {
@@ -178,7 +178,7 @@ func linked(t *testing.T, files map[string]string) (*env.Env, string) {
 	if err != nil {
 		t.Fatalf("the temporary folder %s must be on the drive of the checkout: %v", e.Root, err)
 	}
-	testkit.WriteFile(t, e.Root, "PklProject", []byte(PklProject(moonwell.Version, filepath.ToSlash(schema))))
+	testkit.WriteFile(t, e.Root, "PklProject", []byte(PklProjectText(moonwell.Version, filepath.ToSlash(schema))))
 	resolved, err := e.Run(background, pkl, []string{"project", "resolve"}, env.RunOptions{Dir: e.Root})
 	if err != nil || resolved.ExitCode != 0 {
 		t.Fatalf("pkl project resolve: %v\n%s", err, resolved.Stderr)
@@ -202,8 +202,8 @@ func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	if shared.File != "moonwell.pkl" || shared.Launch.GameExecutable != nil {
-		t.Errorf("File = %q, game = %q", shared.File, text(shared.Launch.GameExecutable))
+	if shared.ManifestName != "moonwell.pkl" || shared.Launch.GameExecutable != nil {
+		t.Errorf("File = %q, game = %q", shared.ManifestName, text(shared.Launch.GameExecutable))
 	}
 	if created, err := EnsureLocalManifest(e.Root); err != nil || !created {
 		t.Fatalf("EnsureLocalManifest = %v, %v", created, err)
@@ -212,8 +212,8 @@ func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	if p.Root != e.Root || p.File != "moonwell.local.pkl" || text(p.Launch.GameExecutable) != DefaultGameExecutable {
-		t.Errorf("Root = %q, File = %q, game = %q", p.Root, p.File, text(p.Launch.GameExecutable))
+	if p.Root != e.Root || p.ManifestName != "moonwell.local.pkl" || text(p.Launch.GameExecutable) != DefaultGameExecutable {
+		t.Errorf("Root = %q, File = %q, game = %q", p.Root, p.ManifestName, text(p.Launch.GameExecutable))
 	}
 	if p.Map != (Map{Folder: "map.w3x", Entry: "src/main.yue"}) || p.Build != (Build{Folder: "dist/bin"}) ||
 		!slices.Equal(p.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) || p.Yue.Version == "" || p.Yue.Path != nil {
@@ -318,7 +318,7 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 		"upgrades":  {"armor", []any{"One", "Two"}, "y"},
 	}
 	for _, category := range Categories {
-		objects, want := p.Objects.Of(category), properties[category]
+		objects, want := p.Objects.ByCategory(category), properties[category]
 		object, found := objects.Get(want.key)
 		if objects.Len() != 1 || !found || object.Source != "moonwell.pkl" || object.Typed.Len() != 1 || object.Properties.Len() != 1 {
 			t.Errorf("%s: %d objects; %s = %+v, found %v", category, objects.Len(), want.key, object, found)

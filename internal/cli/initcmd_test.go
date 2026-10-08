@@ -184,10 +184,10 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 	if exists(target, "PklProject.deps.json") {
 		t.Error("init wrote the template's resolved dependencies")
 	}
-	if got := read(t, target, "PklProject"); got != manifest.PklProject(moonwell.Version, "") {
+	if got := read(t, target, "PklProject"); got != manifest.PklProjectText(moonwell.Version, "") {
 		t.Errorf("PklProject =\n%s", got)
 	}
-	if got := read(t, target, "moonwell.local.pkl"); got != manifest.LocalPkl() {
+	if got := read(t, target, "moonwell.local.pkl"); got != manifest.LocalManifestText() {
 		t.Errorf("moonwell.local.pkl =\n%s", got)
 	}
 	want := "Created my-map. Check launch.gameExecutable in moonwell.local.pkl, then: cd my-map && moonwell build"
@@ -202,7 +202,7 @@ func TestInitLinksTheProjectToTheSchemaItIsHanded(t *testing.T) {
 	if _, err := created(resolving(t, "Pkl 0.32.1", 0), parent, "maps/my-map", schema); err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	want := manifest.PklProject(moonwell.Version, "../../moonwell/schema")
+	want := manifest.PklProjectText(moonwell.Version, "../../moonwell/schema")
 	if got := read(t, parent, "maps/my-map/PklProject"); got != want {
 		t.Errorf("PklProject =\n%s\nwant\n%s", got, want)
 	}
@@ -263,7 +263,7 @@ func TestInitWithLinkNeedsACheckout(t *testing.T) {
 	if result.code != 0 {
 		t.Fatalf("%+v", result)
 	}
-	want = manifest.PklProject(moonwell.Version, "../../schema")
+	want = manifest.PklProjectText(moonwell.Version, "../../schema")
 	if got := read(t, checkout, "maps/my-map/PklProject"); got != want {
 		t.Errorf("PklProject =\n%s\nwant\n%s", got, want)
 	}

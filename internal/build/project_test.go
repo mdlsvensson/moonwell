@@ -25,7 +25,7 @@ func TestLoadFindsPklAndEvaluatesTheManifestInTheProjectFolder(t *testing.T) {
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	if p.Root != s.root || p.File != manifestName || !reflect.DeepEqual(p, s.project) {
+	if p.Root != s.root || p.ManifestName != manifestName || !reflect.DeepEqual(p, s.project) {
 		t.Errorf("Load = %+v, want %+v", p, s.project)
 	}
 	want := []ran{
@@ -134,7 +134,7 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 			s := newStandIn(t)
 			s.folder("outside")
 			s.folder("maps/a")
-			s.project.File, s.project.Map.Folder = localManifest, tt.folder
+			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
 			source, err := Source(s.project)
 			e := asError(t, err, "map.folder "+tt.folder)
 			if source != nil || e.File != localManifest || e.Cause != nil || !strings.Contains(e.Msg, tt.words) ||
@@ -161,7 +161,7 @@ func TestSourceNamesTheManifestForAMapFolderThatIsNotThere(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t)
 			tt.arrange(s)
-			s.project.File, s.project.Map.Folder = localManifest, tt.folder
+			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
 			source, err := Source(s.project)
 			e := asError(t, err, tt.name)
 			if source != nil || e.File != localManifest || e.Cause != nil ||
@@ -176,7 +176,7 @@ func TestAPackedMapFileWhereTheMapFolderShouldBeIsRefusedAsAFile(t *testing.T) {
 	s := newStandIn(t)
 	s.remove("maps/map.w3x")
 	s.put("maps/map.w3x", "a packed map, not a folder")
-	s.project.File = localManifest
+	s.project.ManifestName = localManifest
 	source, err := Source(s.project)
 	e := asError(t, err, "a file for the map folder")
 	if source != nil || e.File != "maps/map.w3x" || !strings.Contains(e.Msg, "is not a folder") ||
@@ -201,7 +201,7 @@ func TestSourceRefusesALinkOnTheWayToTheMapAndALinkInTheMapsPlace(t *testing.T) 
 				t.Fatal(err)
 			}
 			testkit.LinkDir(t, elsewhere, s.at(tt.link))
-			s.project.File = localManifest
+			s.project.ManifestName = localManifest
 			source, err := Source(s.project)
 			e := asError(t, err, tt.name)
 			if source != nil || e.File != "maps/map.w3x" || !strings.Contains(e.Msg, "Symlinks are not supported") ||
@@ -383,7 +383,7 @@ func TestAssetsNamesTheSharedManifestForAMistakeInItsBlock(t *testing.T) {
 	for _, evaluated := range []string{manifestName, localManifest} {
 		t.Run("evaluated from "+evaluated, func(t *testing.T) {
 			s := newStandIn(t, `"assets":{"paths":{"absent.blp":"icons\\Absent.blp"},"exclude":[]}`)
-			s.project.File = evaluated
+			s.project.ManifestName = evaluated
 			found, replaced, err := Assets(s.project, nil)
 			e := asError(t, err, "a mapping of a file that is not there")
 			if found != nil || replaced != nil || e.File != "moonwell.pkl" || !strings.Contains(e.Msg, "assets/absent.blp") ||
@@ -478,7 +478,7 @@ func TestOwnershipFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) 
 	}
 	for _, tt := range tests {
 		s := newStandIn(t)
-		s.project.File, s.project.Map.Folder = localManifest, tt.folder
+		s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
 		file, err := OwnershipFile(s.project)
 		e := asError(t, err, "map.folder "+tt.folder)
 		if file != "" || e.File != localManifest || !strings.Contains(e.Msg, tt.words) {

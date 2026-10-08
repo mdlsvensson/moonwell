@@ -23,26 +23,26 @@ func launch(e *env.Env, how manifest.Launch, mapPath string) error {
 	}
 	args := append(slices.Clone(how.Args), "-loadfile", mapPath)
 	if err := e.Spawn(game, args); err != nil {
-		return env.NewSpawnError(game, err, fixGame, manifest.LocalFile)
+		return env.NewSpawnError(game, err, fixGame, manifest.LocalManifest)
 	}
 	return nil
 }
 
-const fixGame = "Fix launch.gameExecutable in " + manifest.LocalFile + " to point at Warcraft III.exe."
+const fixGame = "Fix launch.gameExecutable in " + manifest.LocalManifest + " to point at Warcraft III.exe."
 
 func errNoGame() error {
 	return &diag.Error{
 		Msg:  "launch.gameExecutable is not set.",
-		File: manifest.LocalFile,
-		Hint: "Run `moonwell setup` to create " + manifest.LocalFile + ", then set launch.gameExecutable there to " +
+		File: manifest.LocalManifest,
+		Hint: "Run `moonwell setup` to create " + manifest.LocalManifest + ", then set launch.gameExecutable there to " +
 			"your Warcraft III.exe.",
 	}
 }
 
 func errGameNotFound(game string) error {
-	return &diag.Error{Msg: "Game executable not found: " + game, File: manifest.LocalFile, Hint: fixGame}
+	return &diag.Error{Msg: "Game executable not found: " + game, File: manifest.LocalManifest, Hint: fixGame}
 }
 
 func errGameNotAFile(game string) error {
-	return &diag.Error{Msg: "Game executable " + game + " is not a file.", File: manifest.LocalFile, Hint: fixGame}
+	return &diag.Error{Msg: "Game executable " + game + " is not a file.", File: manifest.LocalManifest, Hint: fixGame}
 }

@@ -60,8 +60,8 @@ func readIfThere(place, file string) (data []byte, found bool, err error) {
 	return data, found, nil
 }
 
-func listedIn(data []byte) (files manifest.Ordered[json.RawMessage], problem string) {
-	var document manifest.Ordered[json.RawMessage]
+func listedIn(data []byte) (files manifest.OrderedMap[json.RawMessage], problem string) {
+	var document manifest.OrderedMap[json.RawMessage]
 	switch {
 	case !json.Valid(data):
 		return files, "it is not JSON"
@@ -75,7 +75,7 @@ func listedIn(data []byte) (files manifest.Ordered[json.RawMessage], problem str
 	return files, ""
 }
 
-func isOne(document manifest.Ordered[json.RawMessage], name string) bool {
+func isOne(document manifest.OrderedMap[json.RawMessage], name string) bool {
 	var number float64
 	written, _ := document.Get(name)
 	return json.Unmarshal(written, &number) == nil && number == 1

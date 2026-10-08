@@ -48,7 +48,7 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 	if err != nil {
 		return nil, err
 	}
-	synced, err := library.Sync(ctx, e, p.Libraries, p.File)
+	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
 	if err != nil {
 		return nil, err
 	}

@@ -61,7 +61,7 @@ func TestCheckPackageVersionComparesTheMajorAndMinorNumbers(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		install = "irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.8.2/install.ps1 | iex"
 	}
-	if got := installLine("0.8.2"); got != install {
+	if got := installCommand("0.8.2"); got != install {
 		t.Errorf("installLine = %q, want %q", got, install)
 	}
 	tests := []struct {
@@ -87,7 +87,7 @@ func TestCheckPackageVersionComparesTheMajorAndMinorNumbers(t *testing.T) {
 			if !strings.Contains(failure.Hint, tt.move) || !strings.Contains(failure.Hint, "pkl project resolve") {
 				t.Errorf("the hint %q does not say how to move to %s", failure.Hint, tt.move)
 			}
-			if got := strings.Contains(failure.Hint, installLine(tt.pkg)); got != tt.installs {
+			if got := strings.Contains(failure.Hint, installCommand(tt.pkg)); got != tt.installs {
 				t.Errorf("the hint %q names the install line: %v, want %v", failure.Hint, got, tt.installs)
 			}
 		})

@@ -37,7 +37,7 @@ func project(document string) string {
 
 func decoded(t *testing.T, document string) manifest.Objects {
 	t.Helper()
-	p, err := manifest.Decode("/p", "objects/a.pkl", []byte(project(document)))
+	p, err := manifest.DecodeProject("/p", "objects/a.pkl", []byte(project(document)))
 	if err != nil {
 		t.Fatalf("the test's objects %s: %v", document, err)
 	}

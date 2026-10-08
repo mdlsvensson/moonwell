@@ -44,11 +44,11 @@ func Source(p *manifest.Project) (*mapdir.Folder, error) {
 		return nil, err
 	}
 	if !fsx.Exists(dir) {
-		return nil, errNoMap(p.File, label)
+		return nil, errNoMap(p.ManifestName, label)
 	}
 	source, err := mapdir.Open(dir, label)
 	if isMissing(err) {
-		return nil, errNoMap(p.File, label)
+		return nil, errNoMap(p.ManifestName, label)
 	}
 	return source, err
 }
@@ -57,9 +57,9 @@ func mapFolder(p *manifest.Project) (string, error) {
 	parts, fault := readFolder(p.Map.Folder)
 	switch fault {
 	case leavesItsFolder, namesNoFolder:
-		return "", errNotInsideMaps(p.File, p.Map.Folder)
+		return "", errNotInsideMaps(p.ManifestName, p.Map.Folder)
 	case unusableName:
-		return "", errUnusableMapFolder(p.File, p.Map.Folder)
+		return "", errUnusableMapFolder(p.ManifestName, p.Map.Folder)
 	}
 	return strings.Join(parts, "/"), nil
 }
@@ -136,7 +136,7 @@ func Assets(p *manifest.Project, synced []library.Synced) (found []assets.Asset,
 	if err != nil {
 		return nil, nil, err
 	}
-	return assets.Collect(p.Root, p.Assets, manifest.SharedFile, shipping)
+	return assets.Collect(p.Root, p.Assets, manifest.SharedManifest, shipping)
 }
 
 func shippingLibraries(root string, synced []library.Synced) ([]assets.Library, error) {

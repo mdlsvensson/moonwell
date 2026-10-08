@@ -26,7 +26,7 @@ type teamCall struct {
 
 func flagged(overrides map[int]manifest.Force) []int {
 	var slots []int
-	for _, slot := range manifest.Slots(overrides) {
+	for _, slot := range manifest.SortedSlots(overrides) {
 		override := overrides[slot]
 		override.Name = nil
 		if override != (manifest.Force{}) {

@@ -69,7 +69,7 @@ func withConstant(merged []txt.Section, constant typedConstant, manifestFile str
 	return merged, nil
 }
 
-func sections(raw manifest.Ordered[manifest.Ordered[string]], path, manifestFile string) ([]txt.Section, error) {
+func sections(raw manifest.OrderedMap[manifest.OrderedMap[string]], path, manifestFile string) ([]txt.Section, error) {
 	var result []txt.Section
 	for name, entries := range raw.All() {
 		if slices.ContainsFunc(result, func(section txt.Section) bool { return sameName(section.Name, name) }) {
@@ -84,7 +84,7 @@ func sections(raw manifest.Ordered[manifest.Ordered[string]], path, manifestFile
 	return result, nil
 }
 
-func fieldsOf(entries manifest.Ordered[string], path, manifestFile string) ([]txt.Field, error) {
+func fieldsOf(entries manifest.OrderedMap[string], path, manifestFile string) ([]txt.Field, error) {
 	var fields []txt.Field
 	for key, value := range entries.All() {
 		if slices.ContainsFunc(fields, func(field txt.Field) bool { return sameName(field.Key, key) }) {

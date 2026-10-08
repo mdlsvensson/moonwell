@@ -30,7 +30,7 @@ func printed(blocks ...string) string {
 
 func decoded(t *testing.T, document, file string) *Project {
 	t.Helper()
-	project, err := Decode("/p", file, []byte(document))
+	project, err := DecodeProject("/p", file, []byte(document))
 	if err != nil {
 		t.Fatalf("Decode(%s): %v", document, diag.Format(err))
 	}
@@ -55,8 +55,8 @@ func text(value *string) string {
 
 func TestDecodeLeavesANullableFieldThatPklOmittedNil(t *testing.T) {
 	p := decoded(t, printed(), "moonwell.pkl")
-	if p.Root != "/p" || p.File != "moonwell.pkl" {
-		t.Errorf("Root = %q, File = %q", p.Root, p.File)
+	if p.Root != "/p" || p.ManifestName != "moonwell.pkl" {
+		t.Errorf("Root = %q, File = %q", p.Root, p.ManifestName)
 	}
 	if p.Map != (Map{Folder: "map.w3x", Entry: "src/main.yue"}) || p.Build != (Build{Folder: "dist/bin"}) {
 		t.Errorf("map = %+v, build = %+v", p.Map, p.Build)
@@ -67,7 +67,7 @@ func TestDecodeLeavesANullableFieldThatPklOmittedNil(t *testing.T) {
 	if p.Yue.Version != "0.34.3" || p.Yue.Path != nil {
 		t.Errorf("yue = %+v", p.Yue)
 	}
-	if p.Assets.Paths.Len() != 0 || len(p.Assets.Exclude) != 0 || len(p.Libraries) != 0 || !p.Objects.Empty() {
+	if p.Assets.Paths.Len() != 0 || len(p.Assets.Exclude) != 0 || len(p.Libraries) != 0 || !p.Objects.IsEmpty() {
 		t.Errorf("assets = %+v, libraries = %+v, objects = %+v", p.Assets, p.Libraries, p.Objects)
 	}
 	if p.Lint.UnknownGlobals != "error" || len(p.Lint.Globals) != 0 {
@@ -84,8 +84,8 @@ func TestDecodeReadsEveryPlainBlock(t *testing.T) {
 		"launch":{"gameExecutable":"C:/wc3.exe","args":["-launch","-windowmode","windowed"]},
 		"yue":{"version":"0.34.2","path":"tools/yue"},
 		"lint":{"unknownGlobals":"warning","globals":["MyLibrary"]}}`, "moonwell.local.pkl")
-	if p.File != "moonwell.local.pkl" || p.Map != (Map{Folder: "hero.w3x", Entry: "src/game/init.yue"}) {
-		t.Errorf("File = %q, map = %+v", p.File, p.Map)
+	if p.ManifestName != "moonwell.local.pkl" || p.Map != (Map{Folder: "hero.w3x", Entry: "src/game/init.yue"}) {
+		t.Errorf("File = %q, map = %+v", p.ManifestName, p.Map)
 	}
 	if p.Build != (Build{Folder: "out", Minify: true}) {
 		t.Errorf("build = %+v", p.Build)
@@ -177,7 +177,7 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			project, err := Decode("/p", "moonwell.local.pkl", []byte(tt.document))
+			project, err := DecodeProject("/p", "moonwell.local.pkl", []byte(tt.document))
 			failure := asError(t, err, tt.document)
 			if project != nil || failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Msg, "moonwell.local.pkl") {
 				t.Errorf("project = %v, error = %+v", project, failure)

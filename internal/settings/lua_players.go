@@ -24,7 +24,7 @@ func (p *patcher) players(overrides map[int]manifest.Player, details *w3i.Detail
 	config := p.function("config")
 	p.unique(config, "InitCustomPlayerSlots", 0)
 	slots := p.function("InitCustomPlayerSlots")
-	for _, id := range manifest.Slots(overrides) {
+	for _, id := range manifest.SortedSlots(overrides) {
 		if override := overrides[id]; override != (manifest.Player{}) {
 			p.player(config, slots, override, id, details)
 		}

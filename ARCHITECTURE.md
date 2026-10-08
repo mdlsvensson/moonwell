@@ -252,7 +252,7 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 
 	objs, err := objects.Plan(source, p.Objects, objects.LoadMetadata())
 	err = writeGenerated(e, source, objs, globals, opts)
-	synced, err := library.Sync(ctx, e, p.Libraries, p.File)
+	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
 	program, err := compile(ctx, e, p, synced, globals, opts)
 
 	view := source.WithChanges(objs.Changes)
@@ -513,7 +513,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `carryOut`, `exitCode` |
 | change what Ctrl+C does | `internal/cli/cli.go`: `Main`, `heed`, `leaveAtOnce`; `internal/build/lock.go`: `ReleaseHeld` |
 | know where the log file is written | `internal/cli/cli.go`: `logFile`; `internal/env/log.go` |
-| change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/files.go`: `PklProject`, `LocalPkl` |
+| change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/files.go`: `PklProjectText`, `LocalManifestText` |
 | change what `setup` does | `internal/cli/setup.go`: `runSetup` |
 
 ### The build

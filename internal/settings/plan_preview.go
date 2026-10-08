@@ -23,7 +23,7 @@ func previewOf(p *manifest.Project) (*picture.Picture, error) {
 	case p.Root == "":
 		return nil, errNoProjectFolder()
 	}
-	return loadPreview(p.Root, *preview, p.File)
+	return loadPreview(p.Root, *preview, p.ManifestName)
 }
 
 func (p *planner) roomFor(preview *picture.Picture) error {

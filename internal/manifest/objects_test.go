@@ -38,7 +38,7 @@ func TestAnObjectsOwnKeysAreApartFromItsTypedProperties(t *testing.T) {
 	if !ok || bolt.ID != "A000" || bolt.Base != "AHtb" || bolt.Source != "objects/a.pkl" {
 		t.Fatalf("bolt = %+v, found %v", bolt, ok)
 	}
-	var typed, properties Ordered[any]
+	var typed, properties OrderedMap[any]
 	typed.Set("tooltipNormal", []any{"a", "b"})
 	typed.Set("name", "Bolt")
 	typed.Set("levels", 3.0)
@@ -57,7 +57,7 @@ func TestAnObjectsOwnKeysAreApartFromItsTypedProperties(t *testing.T) {
 
 func TestObjectsAreReadByCategoryInTheOrderWritten(t *testing.T) {
 	var none Objects
-	if !none.Empty() || !objectsOf(t, `{"heroes":{},"units":{},"upgrades":{}}`, "moonwell.pkl").Empty() {
+	if !none.IsEmpty() || !objectsOf(t, `{"heroes":{},"units":{},"upgrades":{}}`, "moonwell.pkl").IsEmpty() {
 		t.Error("objects without an object are not empty")
 	}
 	objects := objectsOf(t, `{
@@ -76,17 +76,17 @@ func TestObjectsAreReadByCategoryInTheOrderWritten(t *testing.T) {
 		t.Errorf("Categories = %q", Categories)
 	}
 	for _, category := range Categories {
-		if got := objects.Of(category).Keys(); !slices.Equal(got, want[category]) {
+		if got := objects.ByCategory(category).Keys(); !slices.Equal(got, want[category]) {
 			t.Errorf("%s = %q, want %q", category, got, want[category])
 		}
 	}
-	if objects.Empty() || objects.Of("doodads").Len() != 0 {
-		t.Errorf("Empty = %v, and a category that is none has %d objects", objects.Empty(), objects.Of("doodads").Len())
+	if objects.IsEmpty() || objects.ByCategory("doodads").Len() != 0 {
+		t.Errorf("Empty = %v, and a category that is none has %d objects", objects.IsEmpty(), objects.ByCategory("doodads").Len())
 	}
 	for _, category := range Categories {
 		one := objectsOf(t, `{"`+string(category)+`":{"x":{"id":"x000","base":"hfoo"}}}`, "moonwell.pkl")
-		if one.Empty() || one.Of(category).Len() != 1 {
-			t.Errorf("an object of %s alone: Empty = %v, Of has %d", category, one.Empty(), one.Of(category).Len())
+		if one.IsEmpty() || one.ByCategory(category).Len() != 1 {
+			t.Errorf("an object of %s alone: Empty = %v, Of has %d", category, one.IsEmpty(), one.ByCategory(category).Len())
 		}
 	}
 }

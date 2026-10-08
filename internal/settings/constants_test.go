@@ -10,7 +10,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/txt"
 )
 
-func written(raw manifest.Ordered[manifest.Ordered[string]]) string {
+func written(raw manifest.OrderedMap[manifest.OrderedMap[string]]) string {
 	var text strings.Builder
 	for name, entries := range raw.All() {
 		fmt.Fprintf(&text, "[%q]", name)

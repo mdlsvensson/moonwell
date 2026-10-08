@@ -15,10 +15,10 @@ import (
 
 func projectWith(root, buildFolder, manifestFile string) *manifest.Project {
 	return &manifest.Project{
-		Root:  root,
-		File:  manifestFile,
-		Map:   manifest.Map{Folder: "map.w3x", Entry: "src/main.yue"},
-		Build: manifest.Build{Folder: buildFolder},
+		Root:         root,
+		ManifestName: manifestFile,
+		Map:          manifest.Map{Folder: "map.w3x", Entry: "src/main.yue"},
+		Build:        manifest.Build{Folder: buildFolder},
 	}
 }
 

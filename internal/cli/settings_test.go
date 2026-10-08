@@ -148,7 +148,7 @@ func TestPklSettingsLoadsEveryGroupAndReplacesColor(t *testing.T) {
 		t.Fatal(err)
 	}
 	p := loaded(t, root)
-	if p.File != "moonwell.local.pkl" || !reflect.DeepEqual(p.Settings, wanted) {
+	if p.ManifestName != "moonwell.local.pkl" || !reflect.DeepEqual(p.Settings, wanted) {
 		t.Fatalf("got %+v want %+v", p.Settings, wanted)
 	}
 	writeLocal(t, root, "")

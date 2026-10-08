@@ -35,7 +35,7 @@ func Resolve(metadata *Metadata, objects manifest.Objects, existing map[string]b
 	r := &resolver{metadata: metadata, existing: existing, owners: map[string]owner{}}
 	resolved := []Resolved{}
 	for _, category := range manifest.Categories {
-		for key, object := range objects.Of(category).All() {
+		for key, object := range objects.ByCategory(category).All() {
 			if one, ok := r.resolve(category, key, object); ok {
 				resolved = append(resolved, one)
 			}

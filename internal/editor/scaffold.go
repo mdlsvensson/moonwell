@@ -171,7 +171,7 @@ func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, 
 	return added, true, nil
 }
 
-func addLacking(config *manifest.Ordered[json.RawMessage], entries map[string][]string) []string {
+func addLacking(config *manifest.OrderedMap[json.RawMessage], entries map[string][]string) []string {
 	added := []string{}
 	for _, key := range luarcArrays {
 		added = append(added, addEntries(config, key, entries[key])...)
@@ -200,15 +200,15 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 	return entries, nil
 }
 
-func objectOf(text []byte) (config manifest.Ordered[json.RawMessage], isObject bool) {
+func objectOf(text []byte) (config manifest.OrderedMap[json.RawMessage], isObject bool) {
 	text = fsx.TrimBOM(text)
 	if !startsWith(text, '{') || json.Unmarshal(text, &config) != nil {
-		return manifest.Ordered[json.RawMessage]{}, false
+		return manifest.OrderedMap[json.RawMessage]{}, false
 	}
 	return config, true
 }
 
-func addEntries(config *manifest.Ordered[json.RawMessage], key string, entries []string) (added []string) {
+func addEntries(config *manifest.OrderedMap[json.RawMessage], key string, entries []string) (added []string) {
 	written, given := config.Get(key)
 	elements, isArray := elementsOf(written)
 	if given && !isArray {
@@ -277,7 +277,7 @@ func arrayOf(elements []json.RawMessage) json.RawMessage {
 	return append(array, ']')
 }
 
-func writeLuarc(root string, config manifest.Ordered[json.RawMessage]) error {
+func writeLuarc(root string, config manifest.OrderedMap[json.RawMessage]) error {
 	text, err := laidOut(config)
 	if err != nil {
 		return err
@@ -285,7 +285,7 @@ func writeLuarc(root string, config manifest.Ordered[json.RawMessage]) error {
 	return writeFile(root, luarcFile, text)
 }
 
-func laidOut(config manifest.Ordered[json.RawMessage]) ([]byte, error) {
+func laidOut(config manifest.OrderedMap[json.RawMessage]) ([]byte, error) {
 	var onOneLine bytes.Buffer
 	onOneLine.WriteByte('{')
 	for key, value := range config.All() {

@@ -243,7 +243,7 @@ func TestPlanWritesTheMacroModuleBeforeAnyCompilerRunsAndGivesEveryRunItsPath(t 
 
 func TestPlanNeedsTheSourceMapAndItsScript(t *testing.T) {
 	s := newStandIn(t)
-	s.project.File = localManifest
+	s.project.ManifestName = localManifest
 	s.remove("maps/map.w3x/war3map.lua")
 	problem := firstProblem(t, s, Options{}, "a map without a script")
 	if !strings.Contains(problem.Msg, "The map has no war3map.lua") || problem.File != "maps/map.w3x/war3map.lua" ||

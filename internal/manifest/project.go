@@ -1,8 +1,8 @@
 package manifest
 
 type Project struct {
-	Root string `json:"-"`
-	File string `json:"-"`
+	Root         string `json:"-"`
+	ManifestName string `json:"-"`
 
 	Map       Map                `json:"map"`
 	Build     Build              `json:"build"`
@@ -36,8 +36,8 @@ type Yue struct {
 }
 
 type Assets struct {
-	Paths   Ordered[string] `json:"paths"`
-	Exclude []string        `json:"exclude"`
+	Paths   OrderedMap[string] `json:"paths"`
+	Exclude []string           `json:"exclude"`
 }
 
 type Lint struct {

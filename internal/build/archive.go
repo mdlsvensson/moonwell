@@ -55,7 +55,7 @@ func archiveOf(p *manifest.Project) (place, error) {
 		return place{}, err
 	}
 	if fsx.IsDir(out.file) {
-		return place{}, errOutputIsAFolder(p.File, out.label)
+		return place{}, errOutputIsAFolder(p.ManifestName, out.label)
 	}
 	return out, nil
 }
@@ -66,15 +66,15 @@ func buildFolder(p *manifest.Project, folder string) (string, error) {
 	switch fault {
 	case leavesItsFolder:
 		asWritten := strings.TrimRight(strings.ReplaceAll(written, `\`, "/"), "/")
-		return "", errOutputOutside(p.File, asWritten+"/"+folder)
+		return "", errOutputOutside(p.ManifestName, asWritten+"/"+folder)
 	case namesNoFolder:
-		return "", errNoBuildFolder(p.File, written)
+		return "", errNoBuildFolder(p.ManifestName, written)
 	case unusableName:
-		return "", errUnusableBuildFolder(p.File, written)
+		return "", errUnusableBuildFolder(p.ManifestName, written)
 	}
 	into := strings.Join(parts, "/")
 	if kept, isKept := keptFolder(parts); isKept {
-		return "", errOutputInKeptFolder(p.File, into+"/"+folder, kept)
+		return "", errOutputInKeptFolder(p.ManifestName, into+"/"+folder, kept)
 	}
 	return into, nil
 }

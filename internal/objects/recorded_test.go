@@ -217,7 +217,7 @@ func recordedPlans(t *testing.T) []byte {
 
 func planOf(t *testing.T, metadata int, dir string, in input) recordedPlan {
 	t.Helper()
-	p, err := manifest.Decode("/p", in.file, []byte(in.document))
+	p, err := manifest.DecodeProject("/p", in.file, []byte(in.document))
 	if err != nil {
 		t.Fatalf("%s: %v", in.name, diag.Format(err))
 	}

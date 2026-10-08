@@ -94,8 +94,8 @@ func writeProject(target, dir, local string) error {
 		return err
 	}
 	files = append(files,
-		moonwell.TemplateFile{Path: "PklProject", Data: []byte(manifest.PklProject(moonwell.Version, local))},
-		moonwell.TemplateFile{Path: manifest.LocalFile, Data: []byte(manifest.LocalPkl())},
+		moonwell.TemplateFile{Path: "PklProject", Data: []byte(manifest.PklProjectText(moonwell.Version, local))},
+		moonwell.TemplateFile{Path: manifest.LocalManifest, Data: []byte(manifest.LocalManifestText())},
 	)
 	for _, file := range files {
 		if err := writeProjectFile(target, dir, file); err != nil {

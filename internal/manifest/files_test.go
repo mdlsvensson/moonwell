@@ -15,7 +15,7 @@ func TestEnsureLocalManifestCreatesMoonwellLocalPklOnceAndNeverOverwritesIt(t *t
 	if created, err := EnsureLocalManifest(root); err != nil || !created {
 		t.Fatalf("the first call: %v, %v", created, err)
 	}
-	if content, _ := os.ReadFile(local); string(content) != LocalPkl() {
+	if content, _ := os.ReadFile(local); string(content) != LocalManifestText() {
 		t.Errorf("the file holds %q", content)
 	}
 	testkit.WriteFile(t, root, "moonwell.local.pkl", []byte("mine"))
@@ -49,7 +49,7 @@ func TestEnsureLocalManifestNamesTheFileItCannotMake(t *testing.T) {
 }
 
 func TestPklProjectDependsOnThePublishedPackageOrOnALocalOne(t *testing.T) {
-	remote := PklProject("0.1.0", "")
+	remote := PklProjectText("0.1.0", "")
 	if !strings.Contains(remote, `["moonwell"] { uri = "`+packageBaseURI+`@0.1.0" }`) ||
 		packageBaseURI != "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell" {
 		t.Errorf("remote = %q", remote)
@@ -59,7 +59,7 @@ func TestPklProjectDependsOnThePublishedPackageOrOnALocalOne(t *testing.T) {
 	if remote != wantRemote {
 		t.Errorf("remote = %q, want %q", remote, wantRemote)
 	}
-	local := PklProject("", "../schema")
+	local := PklProjectText("", "../schema")
 	if !strings.Contains(local, `["moonwell"] = import("../schema/PklProject")`) {
 		t.Errorf("local = %q", local)
 	}
@@ -74,7 +74,7 @@ func TestPklProjectDependsOnThePublishedPackageOrOnALocalOne(t *testing.T) {
 }
 
 func TestLocalPklAmendsMoonwellPklAndSetsTheDefaultGamePathEscaped(t *testing.T) {
-	local := LocalPkl()
+	local := LocalManifestText()
 	for _, want := range []string{
 		`amends "moonwell.pkl"`,
 		`gameExecutable = "C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe"`,

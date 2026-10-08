@@ -120,7 +120,7 @@ func hasDotPart(path string) bool {
 	return strings.HasPrefix(path, ".") || strings.Contains(path, "/.")
 }
 
-func (c *collection) mappings(paths manifest.Ordered[string], files []string, rules []rule) (map[string]string, error) {
+func (c *collection) mappings(paths manifest.OrderedMap[string], files []string, rules []rule) (map[string]string, error) {
 	present := map[string]bool{}
 	for _, file := range files {
 		present[mapdir.Key(file)] = true

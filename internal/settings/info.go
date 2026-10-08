@@ -119,7 +119,7 @@ func (p *infoPatch) loadingScreen(screen manifest.LoadingScreen) {
 }
 
 func (p *infoPatch) players(overrides map[int]manifest.Player) {
-	for _, slot := range manifest.Slots(overrides) {
+	for _, slot := range manifest.SortedSlots(overrides) {
 		override := overrides[slot]
 		if override == (manifest.Player{}) {
 			continue
@@ -148,7 +148,7 @@ func (p *infoPatch) player(slot int) (w3i.Player, bool) {
 }
 
 func (p *infoPatch) forces(overrides map[int]manifest.Force) {
-	for _, slot := range manifest.Slots(overrides) {
+	for _, slot := range manifest.SortedSlots(overrides) {
 		override := overrides[slot]
 		if override == (manifest.Force{}) {
 			continue

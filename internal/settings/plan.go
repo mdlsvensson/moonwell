@@ -19,7 +19,7 @@ const (
 
 func Plan(folder *mapdir.Folder, p *manifest.Project) ([]mapdir.Change, error) {
 	s := p.Settings
-	misc, skin, err := textSections(s, p.File)
+	misc, skin, err := textSections(s, p.ManifestName)
 	if err != nil {
 		return nil, err
 	}

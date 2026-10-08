@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func entries[V comparable](t *testing.T, o Ordered[V]) string {
+func entries[V comparable](t *testing.T, o OrderedMap[V]) string {
 	t.Helper()
 	var words []string
 	for key, value := range o.All() {
@@ -37,7 +37,7 @@ func TestOrderedDecodesAMappingInTheOrderItWasWritten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var o Ordered[string]
+			var o OrderedMap[string]
 			if err := json.Unmarshal([]byte(tt.document), &o); err != nil {
 				t.Fatal(err)
 			}
@@ -50,9 +50,9 @@ func TestOrderedDecodesAMappingInTheOrderItWasWritten(t *testing.T) {
 
 func TestOrderedDecodesInsideAStructAndInsideItself(t *testing.T) {
 	var held struct {
-		Sections Ordered[Ordered[string]] `json:"sections"`
-		Missing  Ordered[string]          `json:"missing"`
-		Null     Ordered[string]          `json:"null"`
+		Sections OrderedMap[OrderedMap[string]] `json:"sections"`
+		Missing  OrderedMap[string]             `json:"missing"`
+		Null     OrderedMap[string]             `json:"null"`
 	}
 	held.Null.Set("stale", "x")
 	document := `{"sections":{"Misc":{"B":"1","A":"2"},"Frame":{}},"null":null}`
@@ -69,7 +69,7 @@ func TestOrderedDecodesInsideAStructAndInsideItself(t *testing.T) {
 }
 
 func TestOrderedSetKeepsTheOrderKeysWereAddedIn(t *testing.T) {
-	var o Ordered[int]
+	var o OrderedMap[int]
 	if _, ok := o.Get("a"); ok || o.Len() != 0 || len(o.Keys()) != 0 {
 		t.Errorf("the zero value is not empty: %d keys", o.Len())
 	}
@@ -106,7 +106,7 @@ func TestOrderedRefusesWhatIsNotAMapping(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var held struct {
-				Paths Ordered[string] `json:"paths"`
+				Paths OrderedMap[string] `json:"paths"`
 			}
 			err := json.Unmarshal([]byte(tt.document), &held)
 			if err == nil {

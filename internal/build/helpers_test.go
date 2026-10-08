@@ -142,7 +142,7 @@ func (s *standIn) templateMap() {
 func (s *standIn) evaluatesTo(blocks ...string) {
 	s.t.Helper()
 	printed := printedWith(s.defaults, blocks...)
-	project, err := manifest.Decode(s.root, manifestName, []byte(printed))
+	project, err := manifest.DecodeProject(s.root, manifestName, []byte(printed))
 	if err != nil {
 		s.t.Fatalf("the manifest %s: %v", printed, diag.Format(err))
 	}

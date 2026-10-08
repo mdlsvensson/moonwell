@@ -188,7 +188,7 @@ func TestE2ESetupLocalManifestCreatesAndKeeps(t *testing.T) {
 	world, root := seeded(t), newProject(t, "my-map")
 	remove(t, root, "moonwell.local.pkl")
 	world.ok(t, root, "setup")
-	if read(t, root, "moonwell.local.pkl") != manifest.LocalPkl() {
+	if read(t, root, "moonwell.local.pkl") != manifest.LocalManifestText() {
 		t.Fatal("wrong local manifest")
 	}
 	mine := "amends \"moonwell.pkl\"\nlaunch { gameExecutable = \"/games/wc3.exe\" }\n"

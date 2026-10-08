@@ -114,8 +114,8 @@ func linkedProject(t *testing.T, pkl, root string) {
 	if err != nil {
 		t.Fatalf("no way from the project to the checkout's Pkl package: %v", err)
 	}
-	put(t, root, "PklProject", manifest.PklProject(moonwell.Version, filepath.ToSlash(schema)))
-	put(t, root, "moonwell.local.pkl", manifest.LocalPkl())
+	put(t, root, "PklProject", manifest.PklProjectText(moonwell.Version, filepath.ToSlash(schema)))
+	put(t, root, "moonwell.local.pkl", manifest.LocalManifestText())
 	resolved, err := env.Run(background, pkl, []string{"project", "resolve"}, env.RunOptions{Dir: root})
 	if err != nil || resolved.ExitCode != 0 {
 		t.Fatalf("pkl project resolve: exit code %d, %v\n%s", resolved.ExitCode, err, resolved.Stderr)
