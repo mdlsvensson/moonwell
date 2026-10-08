@@ -13,7 +13,7 @@ import (
 )
 
 func paths(e *env.Env, log *testkit.Recorder, file, gameList string) ([]string, error) {
-	err := assetsPaths(background, e, file, assets.ParseGamePaths(gameList))
+	err := reportAssetPaths(background, e, file, assets.ParseGamePaths(gameList))
 	return log.Lines(), err
 }
 
@@ -244,12 +244,12 @@ func TestAReportWithModelsThatCouldNotBeReadFailsAndNamesEach(t *testing.T) {
 		{Heading: "assets/Models/B.mdx"},
 		{Heading: "library golems: Models/C.mdx", Unreadable: "it is cut short"},
 	}
-	failure := asError(t, refuseUnreadable(reports), "two models that cannot be read")
+	failure := asError(t, checkModelsReadable(reports), "two models that cannot be read")
 	if !strings.Contains(failure.Msg, "2 models could not be read") ||
 		!strings.Contains(failure.Hint, "assets/Models/A.mdl, library golems: Models/C.mdx;") {
 		t.Errorf("error = %+v", failure)
 	}
-	if err := refuseUnreadable(reports[1:2]); err != nil {
+	if err := checkModelsReadable(reports[1:2]); err != nil {
 		t.Errorf("a report whose models were all read fails: %v", err)
 	}
 }

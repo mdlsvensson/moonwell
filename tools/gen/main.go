@@ -23,14 +23,14 @@ const (
 	schemaFolder = "schema/generated"
 )
 
-type mode struct {
+type subcommand struct {
 	name  string
 	usage string
 	takes int
 	run   func(checkout string, args []string, out io.Writer) error
 }
 
-var modes = []mode{
+var modes = []subcommand{
 	{name: "", usage: "Usage: " + commandLine, run: writeSchema},
 	{name: "natives", usage: "Usage: " + commandLine + " natives <exported folder> <game version>",
 		takes: 2, run: writeNatives},
@@ -45,12 +45,12 @@ func main() {
 	if err == nil {
 		err = run(dir, os.Args[1:], os.Stdout)
 	}
-	complaint, code := ending(err)
+	complaint, code := exitStatus(err)
 	fmt.Fprint(os.Stderr, complaint)
 	os.Exit(code)
 }
 
-func ending(err error) (complaint string, code int) {
+func exitStatus(err error) (complaint string, code int) {
 	if err == nil {
 		return "", 0
 	}
@@ -66,7 +66,7 @@ func run(dir string, args []string, out io.Writer) error {
 	if len(args) > 0 {
 		name, rest = args[0], args[1:]
 	}
-	chosen, known := modeNamed(modes, name)
+	chosen, known := findSubcommand(modes, name)
 	switch {
 	case !known:
 		return errUnknownMode(modes, name)
@@ -76,10 +76,10 @@ func run(dir string, args []string, out io.Writer) error {
 	return chosen.run(checkout, rest, out)
 }
 
-func modeNamed(table []mode, name string) (mode, bool) {
-	at := slices.IndexFunc(table, func(row mode) bool { return row.name == name })
+func findSubcommand(table []subcommand, name string) (subcommand, bool) {
+	at := slices.IndexFunc(table, func(row subcommand) bool { return row.name == name })
 	if at < 0 {
-		return mode{}, false
+		return subcommand{}, false
 	}
 	return table[at], true
 }
@@ -99,9 +99,9 @@ func findCheckout(dir string) (string, error) {
 	}
 }
 
-func fileIn(checkout, path string) string { return filepath.Join(checkout, filepath.FromSlash(path)) }
+func pathIn(checkout, path string) string { return filepath.Join(checkout, filepath.FromSlash(path)) }
 
-func listed(names []string) string {
+func joinNames(names []string) string {
 	if len(names) < 2 {
 		return strings.Join(names, "")
 	}
@@ -111,18 +111,18 @@ func listed(names []string) string {
 
 func errNoCheckout() error { return errors.New("run gen in a Moonwell checkout") }
 
-func errUnknownMode(table []mode, name string) error {
+func errUnknownMode(table []subcommand, name string) error {
 	var named []string
 	for _, row := range table {
 		if row.name != "" {
 			named = append(named, row.name)
 		}
 	}
-	return errors.New("unknown mode '" + name + "'. The modes are " + listed(named) + "; without one, gen writes " +
+	return errors.New("unknown mode '" + name + "'. The modes are " + joinNames(named) + "; without one, gen writes " +
 		schemaFolder + ".")
 }
 
-func errUsage(chosen mode) error { return errors.New(chosen.usage) }
+func errUsage(chosen subcommand) error { return errors.New(chosen.usage) }
 
 func errFile(path string, cause error) error {
 	return fmt.Errorf("%s: %s", path, fsx.Reason(cause))

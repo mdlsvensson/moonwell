@@ -19,7 +19,7 @@ func TestOutputAtIsThePlaceBelowTheProjectFolderWhateverIsThere(t *testing.T) {
 		{"out/map.w3x", "out/map.w3x"},
 	}
 	for _, tt := range tests {
-		place, err := outputAt(root, tt.relative)
+		place, err := outputPath(root, tt.relative)
 		if want := filepath.Join(root, filepath.FromSlash(tt.want)); err != nil || place != want {
 			t.Errorf("outputAt(%q) = %q, %v, want %q", tt.relative, place, err, want)
 		}
@@ -50,7 +50,7 @@ func TestOutputAtRefusesALinkOnTheWayOrAtThePlaceByItsStep(t *testing.T) {
 				t.Fatal(err)
 			}
 			testkit.LinkDir(t, elsewhere, at)
-			place, err := outputAt(root, tt.place)
+			place, err := outputPath(root, tt.place)
 			e := asError(t, err, tt.name)
 			if place != "" || e.File != tt.place || !strings.HasPrefix(e.Msg, tt.link+" is a link: ") ||
 				!strings.Contains(e.Hint, "junction) at "+tt.link+",") || e.Cause != nil ||
@@ -70,7 +70,7 @@ func TestOutputAtPassesOnTheRefusalOfAPathThatLeavesTheProjectOrThatWindowsCanno
 		"", ".", "..", "../dist", "dist/..", "dist/../maps", "dist/stage/../../maps", "dist//stage", "dist/", "/dist",
 		`C:\dist`, "dist/con", "dist/stage/map?.w3x", "nul/x", `dist\..\maps`,
 	} {
-		place, err := outputAt(root, relative)
+		place, err := outputPath(root, relative)
 		e := asError(t, err, "the place "+relative)
 		if place != "" || e.File != relative || !strings.Contains(e.Msg, "Invalid path: "+relative) || e.Cause != nil {
 			t.Errorf("outputAt(%q): error = %+v", relative, e)
@@ -84,7 +84,7 @@ func TestOutputAtNamesAPlaceTheSystemCannotLookAtByTheWholePath(t *testing.T) {
 		t.Fatal(err)
 	}
 	relative := "dist/" + strings.Repeat("a", 300) + "/x"
-	place, err := outputAt(root, relative)
+	place, err := outputPath(root, relative)
 	e := asError(t, err, "a name the system cannot hold")
 	if place != "" || e.File != relative || e.Cause == nil || strings.Contains(e.Msg, root) ||
 		!strings.HasPrefix(e.Msg, relative+" cannot be reached") {

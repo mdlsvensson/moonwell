@@ -65,8 +65,8 @@ func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 		t.Fatalf("%s: a refused script is %+v, want none", what, file)
 	}
 	rest, named := strings.CutPrefix(err.Error(), damagedFile+":")
-	number, _, _ := strings.Cut(rest, ": ")
-	line, notANumber := strconv.Atoi(number)
+	lineNumber, _, _ := strings.Cut(rest, ": ")
+	line, notANumber := strconv.Atoi(lineNumber)
 	onALine := notANumber == nil && line >= 1 && line <= strings.Count(text, "\n")+1
 	if !named || !onALine && rest != " the globals block never reaches endglobals" {
 		t.Fatalf("%s: got %v, want an error that starts with %s and a line of the text", what, err, damagedFile)

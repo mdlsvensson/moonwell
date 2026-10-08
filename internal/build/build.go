@@ -31,11 +31,11 @@ type Result struct {
 }
 
 func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*Result, error) {
-	source, err := Source(p)
+	source, err := OpenSource(p)
 	if err != nil {
 		return nil, err
 	}
-	globals, err := MapGlobals(source)
+	globals, err := ReadMapGlobals(source)
 	if err != nil {
 		return nil, err
 	}
@@ -81,12 +81,12 @@ func Build(ctx context.Context, e *env.Env, opts Options) (archive string, err e
 	if err != nil {
 		return "", err
 	}
-	release, err := TakeLock(e.Root)
+	release, err := AcquireLock(e.Root)
 	if err != nil {
 		return "", err
 	}
 	defer release()
-	out, err := clearedArchive(p)
+	out, err := prepareArchivePath(p)
 	if err != nil {
 		return "", err
 	}
@@ -97,10 +97,10 @@ func Build(ctx context.Context, e *env.Env, opts Options) (archive string, err e
 	if _, err := stage(e, p, plan); err != nil {
 		return "", err
 	}
-	if err := packInto(e, plan, out); err != nil {
+	if err := packArchive(e, plan, out); err != nil {
 		return "", err
 	}
-	return out.file, nil
+	return out.fullPath, nil
 }
 
 func Test(ctx context.Context, e *env.Env, opts Options) error {
@@ -108,7 +108,7 @@ func Test(ctx context.Context, e *env.Env, opts Options) error {
 	if err != nil {
 		return err
 	}
-	release, err := TakeLock(e.Root)
+	release, err := AcquireLock(e.Root)
 	if err != nil {
 		return err
 	}
@@ -121,10 +121,10 @@ func Test(ctx context.Context, e *env.Env, opts Options) error {
 	if err != nil {
 		return err
 	}
-	if err := launch(e, p.Launch, staged.file); err != nil {
+	if err := launch(e, p.Launch, staged.fullPath); err != nil {
 		return err
 	}
-	e.Log.Info("Launched Warcraft III with " + staged.label + ".")
+	e.Log.Info("Launched Warcraft III with " + staged.displayPath + ".")
 	return nil
 }
 
@@ -133,15 +133,15 @@ func Check(ctx context.Context, e *env.Env) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return check(ctx, e, pkl, false)
+	return runCheck(ctx, e, pkl, false)
 }
 
-func check(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, error) {
+func runCheck(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, error) {
 	p, err := manifest.Load(ctx, e, pkl)
 	if err != nil {
 		return nil, err
 	}
-	release, err := TakeLock(e.Root)
+	release, err := AcquireLock(e.Root)
 	if err != nil {
 		return nil, err
 	}
@@ -150,11 +150,11 @@ func check(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, 
 	if err != nil {
 		return nil, err
 	}
-	sayChecked(e.Log, plan)
+	logCheckPassed(e.Log, plan)
 	return plan, nil
 }
 
-func sayChecked(log *env.Logger, plan *Result) {
+func logCheckPassed(log *env.Logger, plan *Result) {
 	for _, line := range plan.Replaced {
 		log.Info(line)
 	}

@@ -20,11 +20,11 @@ import (
 func TestRefreshDeclarationsWritesTheDeclarationsAndTheMacroModuleAndNoIDsModule(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")))
 	s.templateMap()
-	source, err := Source(s.project)
+	source, err := OpenSource(s.project)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	globals, err := MapGlobals(source)
+	globals, err := ReadMapGlobals(source)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}

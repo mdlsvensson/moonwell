@@ -31,7 +31,7 @@ const (
 )
 
 func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
-	there, err := lookAtFiles(root)
+	there, err := findExistingFiles(root)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	ignores, err := addIgnores(root)
+	ignores, err := addGitignoreLines(root)
 	if err != nil {
 		return nil, err
 	}
@@ -49,29 +49,29 @@ func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	return added, nil
 }
 
-func lookAtFiles(root string) (there map[string]bool, err error) {
+func findExistingFiles(root string) (there map[string]bool, err error) {
 	there = map[string]bool{}
 	for _, file := range append(slices.Clone(editorFiles), gitignoreFile) {
-		if there[file], err = isThere(root, file); err != nil {
+		if there[file], err = fileExists(root, file); err != nil {
 			return nil, err
 		}
 	}
 	return there, nil
 }
 
-func isThere(root, file string) (bool, error) {
-	at := onDisk(root, file)
+func fileExists(root, file string) (bool, error) {
+	at := fullPathOf(root, file)
 	info, err := fsx.Lstat(at)
 	switch {
 	case err != nil || info == nil:
 		return false, nil
-	case fsx.IsSymlink(info) && leadsNowhere(at):
+	case fsx.IsSymlink(info) && isBrokenSymlink(at):
 		return false, errLinkToNothing(file)
 	}
 	return true, nil
 }
 
-func leadsNowhere(link string) bool {
+func isBrokenSymlink(link string) bool {
 	_, err := os.Stat(link)
 	return errors.Is(err, fs.ErrNotExist)
 }
@@ -103,22 +103,22 @@ func templateFile(template []moonwell.TemplateFile, path string) ([]byte, error)
 	return nil, errors.New("editor: the template has no " + path + "; pass moonwell.TemplateFiles()")
 }
 
-func addIgnores(root string) ([]string, error) {
-	held, _, err := readIfThere(root, gitignoreFile)
+func addGitignoreLines(root string) ([]string, error) {
+	held, _, err := readFileIfExists(root, gitignoreFile)
 	if err != nil {
 		return nil, err
 	}
-	lacking := ignoresLacking(held)
+	lacking := missingGitignoreLines(held)
 	if len(lacking) == 0 {
 		return nil, nil
 	}
-	if err := writeFile(root, gitignoreFile, withLines(held, lacking)); err != nil {
+	if err := writeFile(root, gitignoreFile, appendLines(held, lacking)); err != nil {
 		return nil, err
 	}
 	return lacking, nil
 }
 
-func ignoresLacking(held []byte) []string {
+func missingGitignoreLines(held []byte) []string {
 	var lines []string
 	for line := range strings.SplitSeq(fsx.TrimBOM(string(held)), "\n") {
 		lines = append(lines, strings.Trim(line, lineSpace))
@@ -132,7 +132,7 @@ func ignoresLacking(held []byte) []string {
 	return lacking
 }
 
-func withLines(held []byte, lines []string) []byte {
+func appendLines(held []byte, lines []string) []byte {
 	out := bytes.Clone(held)
 	if len(out) > 0 && !bytes.HasSuffix(out, []byte("\n")) {
 		out = append(out, '\n')
@@ -146,7 +146,7 @@ func withLines(held []byte, lines []string) []byte {
 var luarcArrays = []string{"runtime.path", "workspace.library", "workspace.ignoreDir"}
 
 func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, merged bool, err error) {
-	written, found, err := readIfThere(root, luarcFile)
+	written, found, err := readFileIfExists(root, luarcFile)
 	switch {
 	case err != nil:
 		return nil, false, err
@@ -157,11 +157,11 @@ func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, 
 	if err != nil {
 		return nil, false, err
 	}
-	config, isObject := objectOf(written)
+	config, isObject := asObject(written)
 	if !isObject {
 		return nil, false, nil
 	}
-	added = addLacking(&config, entries)
+	added = addMissingEntries(&config, entries)
 	if len(added) == 0 {
 		return added, true, nil
 	}
@@ -171,7 +171,7 @@ func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, 
 	return added, true, nil
 }
 
-func addLacking(config *manifest.OrderedMap[json.RawMessage], entries map[string][]string) []string {
+func addMissingEntries(config *manifest.OrderedMap[json.RawMessage], entries map[string][]string) []string {
 	added := []string{}
 	for _, key := range luarcArrays {
 		added = append(added, addEntries(config, key, entries[key])...)
@@ -184,14 +184,14 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 	if err != nil {
 		return nil, err
 	}
-	config, isObject := objectOf(data)
+	config, isObject := asObject(data)
 	if !isObject {
 		return nil, errors.New("editor: the template's .luarc.json is not a JSON object")
 	}
 	entries := map[string][]string{}
 	for _, key := range luarcArrays {
 		written, _ := config.Get(key)
-		list, isList := stringsOf(written)
+		list, isList := asStringList(written)
 		if !isList {
 			return nil, errors.New("editor: the template's .luarc.json has no " + key + " array of strings")
 		}
@@ -200,7 +200,7 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 	return entries, nil
 }
 
-func objectOf(text []byte) (config manifest.OrderedMap[json.RawMessage], isObject bool) {
+func asObject(text []byte) (config manifest.OrderedMap[json.RawMessage], isObject bool) {
 	text = fsx.TrimBOM(text)
 	if !startsWith(text, '{') || json.Unmarshal(text, &config) != nil {
 		return manifest.OrderedMap[json.RawMessage]{}, false
@@ -210,13 +210,13 @@ func objectOf(text []byte) (config manifest.OrderedMap[json.RawMessage], isObjec
 
 func addEntries(config *manifest.OrderedMap[json.RawMessage], key string, entries []string) (added []string) {
 	written, given := config.Get(key)
-	elements, isArray := elementsOf(written)
+	elements, isArray := asArray(written)
 	if given && !isArray {
 		return nil
 	}
 	held := map[string]bool{}
 	for _, element := range elements {
-		if text, isString := stringOf(element); isString {
+		if text, isString := asString(element); isString {
 			held[text] = true
 		}
 	}
@@ -228,18 +228,18 @@ func addEntries(config *manifest.OrderedMap[json.RawMessage], key string, entrie
 		elements = append(elements, json.RawMessage(fsx.QuoteJSON(entry)))
 		added = append(added, entry)
 	}
-	config.Set(key, arrayOf(elements))
+	config.Set(key, toJSONArray(elements))
 	return added
 }
 
-func elementsOf(written json.RawMessage) (elements []json.RawMessage, isArray bool) {
+func asArray(written json.RawMessage) (elements []json.RawMessage, isArray bool) {
 	if !startsWith(written, '[') || json.Unmarshal(written, &elements) != nil {
 		return nil, false
 	}
 	return elements, true
 }
 
-func stringOf(written json.RawMessage) (text string, isString bool) {
+func asString(written json.RawMessage) (text string, isString bool) {
 	if !startsWith(written, '"') || json.Unmarshal(written, &text) != nil {
 		return "", false
 	}
@@ -251,13 +251,13 @@ func startsWith(text []byte, first byte) bool {
 	return len(text) > 0 && text[0] == first
 }
 
-func stringsOf(written json.RawMessage) (list []string, isList bool) {
-	elements, isArray := elementsOf(written)
+func asStringList(written json.RawMessage) (list []string, isList bool) {
+	elements, isArray := asArray(written)
 	if !isArray {
 		return nil, false
 	}
 	for _, element := range elements {
-		text, isString := stringOf(element)
+		text, isString := asString(element)
 		if !isString {
 			return nil, false
 		}
@@ -266,7 +266,7 @@ func stringsOf(written json.RawMessage) (list []string, isList bool) {
 	return list, true
 }
 
-func arrayOf(elements []json.RawMessage) json.RawMessage {
+func toJSONArray(elements []json.RawMessage) json.RawMessage {
 	array := json.RawMessage("[")
 	for i, element := range elements {
 		if i > 0 {
@@ -278,14 +278,14 @@ func arrayOf(elements []json.RawMessage) json.RawMessage {
 }
 
 func writeLuarc(root string, config manifest.OrderedMap[json.RawMessage]) error {
-	text, err := laidOut(config)
+	text, err := formatLuarc(config)
 	if err != nil {
 		return err
 	}
 	return writeFile(root, luarcFile, text)
 }
 
-func laidOut(config manifest.OrderedMap[json.RawMessage]) ([]byte, error) {
+func formatLuarc(config manifest.OrderedMap[json.RawMessage]) ([]byte, error) {
 	var onOneLine bytes.Buffer
 	onOneLine.WriteByte('{')
 	for key, value := range config.All() {
@@ -305,19 +305,19 @@ func laidOut(config manifest.OrderedMap[json.RawMessage]) ([]byte, error) {
 	return text.Bytes(), nil
 }
 
-func onDisk(root, file string) string {
+func fullPathOf(root, file string) string {
 	return filepath.Join(root, filepath.FromSlash(file))
 }
 
-func readIfThere(root, file string) (data []byte, found bool, err error) {
-	if data, found, err = fsx.ReadFileIfExists(onDisk(root, file)); err != nil {
+func readFileIfExists(root, file string) (data []byte, found bool, err error) {
+	if data, found, err = fsx.ReadFileIfExists(fullPathOf(root, file)); err != nil {
 		return nil, false, errNotRead(file, err)
 	}
 	return data, found, nil
 }
 
 func writeFile(root, file string, data []byte) error {
-	target := onDisk(root, file)
+	target := fullPathOf(root, file)
 	err := os.MkdirAll(filepath.Dir(target), 0o777)
 	if err == nil {
 		err = os.WriteFile(target, data, 0o666)

@@ -11,7 +11,7 @@ import (
 )
 
 func readHandWritten(checkout, path string, into any) error {
-	data, err := os.ReadFile(fileIn(checkout, path))
+	data, err := os.ReadFile(pathIn(checkout, path))
 	if err != nil {
 		return errInCheckout(checkout, path, err)
 	}

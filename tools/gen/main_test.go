@@ -38,9 +38,9 @@ func TestTheRefusalOfAnUnknownModeNamesTheModesOfTheTable(t *testing.T) {
 		{[]string{"", "natives", "game-paths"}, "natives and game-paths"},
 		{[]string{"", "game-paths"}, "game-paths"},
 	} {
-		var table []mode
+		var table []subcommand
 		for _, name := range c.names {
-			table = append(table, mode{name: name})
+			table = append(table, subcommand{name: name})
 		}
 		want := "unknown mode 'x'. The modes are " + c.want + "; without one, gen writes schema/generated."
 		if got := errUnknownMode(table, "x").Error(); got != want {
@@ -354,7 +354,7 @@ func TestARunEndsWithNothingAndZeroOrWithItsErrorAndOne(t *testing.T) {
 		{errors.New("unknown mode 'x'."), "error: unknown mode 'x'.\n", 1},
 		{errors.New("cannot render the Pkl schema:\none\ntwo"), "error: cannot render the Pkl schema:\none\ntwo\n", 1},
 	} {
-		if complaint, code := ending(c.err); complaint != c.complaint || code != c.code {
+		if complaint, code := exitStatus(c.err); complaint != c.complaint || code != c.code {
 			t.Errorf("ending(%v) = %q, %d, want %q, %d", c.err, complaint, code, c.complaint, c.code)
 		}
 	}

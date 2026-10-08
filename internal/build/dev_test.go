@@ -113,7 +113,7 @@ func TestCountsInProjectTakesSourcesModulesAssetsObjectFilesAndManifestsOnly(t *
 		"README.md":                        false,
 	}
 	for file, want := range tests {
-		if got := countsInProject(dir, filepath.Join(dir, filepath.FromSlash(file))); got != want {
+		if got := isProjectSource(dir, filepath.Join(dir, filepath.FromSlash(file))); got != want {
 			t.Errorf("countsInProject(%s) = %v", file, got)
 		}
 	}
@@ -128,7 +128,7 @@ func TestCountsInLibraryPassesOverWhatIsUnderADotFolder(t *testing.T) {
 		"example/.cache/x.lua": false,
 	}
 	for file, want := range tests {
-		if got := countsInLibrary(folder, filepath.Join(folder, filepath.FromSlash(file))); got != want {
+		if got := isLibrarySource(folder, filepath.Join(folder, filepath.FromSlash(file))); got != want {
 			t.Errorf("countsInLibrary(%s) = %v", file, got)
 		}
 	}
@@ -165,9 +165,9 @@ func TestACheckIsDueOnceTheFilesHaveStayedUnchangedForTheDebounce(t *testing.T) 
 	start := time.Date(2026, time.October, 5, 12, 0, 0, 0, time.UTC)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var waiting unchecked
+			var waiting pendingChange
 			for _, l := range tt.looks {
-				if due := waiting.due(l.changed, start.Add(l.at), tt.debounce); due != l.due {
+				if due := waiting.isDue(l.changed, start.Add(l.at), tt.debounce); due != l.due {
 					t.Errorf("at %v: due = %v, want %v", l.at, due, l.due)
 				}
 			}
@@ -190,8 +190,8 @@ func (s *standIn) everyFolder() {
 	s.put("libs/kit/files/icons/Sword.blp", "kit sword")
 }
 
-func watchedOf(dir string, p *manifest.Project) watched {
-	return ownFolders(dir).and(namedFolders(dir, p))
+func watchedOf(dir string, p *manifest.Project) watchSet {
+	return projectWatchSet(dir).merge(manifestWatchSet(dir, p))
 }
 
 func TestAProjectIsWatchedForItsSourcesItsManifestsItsLocalLibrariesAndItsPreviewPicture(t *testing.T) {
@@ -280,7 +280,7 @@ func TestWhatACheckWritesIsNoChange(t *testing.T) {
 	s.everyFolder()
 	w := newWatcher(watchedOf(s.root, s.project).roots)
 	for range 2 {
-		if pkl := cycle(background, s.env, ""); pkl != "pkl" {
+		if pkl := runCheckCycle(background, s.env, ""); pkl != "pkl" {
 			t.Fatalf("the cycle found the Pkl program %q; it logged %q", pkl, s.log.Lines())
 		}
 		if w.poll() {

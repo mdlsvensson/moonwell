@@ -97,7 +97,7 @@ table below and in the rest of this document; the code as it was commented is th
 
 | Package | What it does |
 | --- | --- |
-| `internal/build` | Holds the order of a build in one function, `Plan`, and the four doors that use it: `Build`, `Test`, `Check` and `Dev`. It also opens a project (`Load`, `Source`), writes the stage and the archive, keeps the build lock, watches files for `dev` and starts the game. |
+| `internal/build` | Holds the order of a build in one function, `Plan`, and the four doors that use it: `Build`, `Test`, `Check` and `Dev`. It also opens a project (`Load`, `OpenSource`), writes the stage and the archive, keeps the build lock, watches files for `dev` and starts the game. |
 
 ### Areas
 
@@ -185,15 +185,15 @@ Follow `moonwell build --minify`:
 2. `Main` in `internal/cli/cli.go` finds the working folder, makes two writers (lines for the terminal go to
    standard error, output meant for other programs goes to standard output), turns Ctrl+C into the cancelling of a
    `context.Context`, and calls `Run`.
-3. `Run` calls `runIn`, and that `carryOut`, which does these things in order:
-   - `tree` makes the command line as `cobra` reads it: a `cobra` command for each row of the table `commands`. A
-     row has the name, the help text, how many arguments the command takes, the flags it has, and the function
-     that runs it.
+3. `Run` calls `runIn`, and that `execute`, which does these things in order:
+   - `buildCommandTree` makes the command line as `cobra` reads it: a `cobra` command for each row of the table
+     `commands`. A row has the name, the help text, how many arguments the command takes, the flags it has, and
+     the function that runs it.
    - `cobra` reads the line. It answers `--help` itself, and so the commands `help` and `completion`, which are
-     its own; `moonwell --version` is answered by the function of `moonwell` in `tree`. A line `cobra` cannot
-     read is refused in its words, printed as every failure of Moonwell is, and nothing runs.
-   - For a line that names a row, `run` refuses an `--entry` that is no `.yue` file under `src/`, and then makes a
-     logger and the outside world: `env.NewLogger` and `env.New`. In a project the logger also writes
+     its own; `moonwell --version` is answered by the function of `moonwell` in `buildCommandTree`. A line
+     `cobra` cannot read is refused in its words, printed as every failure of Moonwell is, and nothing runs.
+   - For a line that names a row, `runCommand` refuses an `--entry` that is no `.yue` file under `src/`, and then
+     makes a logger and the outside world: `env.NewLogger` and `env.New`. In a project the logger also writes
      `dist/moonwell.log`.
    - The row's function runs, and `exitCode` turns what it returned into 0, 1, or 130 after Ctrl+C. An error is
      printed here, once, by `diag.Format`.
@@ -211,14 +211,14 @@ The command table and where each command goes:
 | `dev` | `runDev` in `internal/cli/dev.go` | `build.Dev` |
 | `init` | `runInit` in `internal/cli/initcmd.go` | writes the template's files and runs `pkl project resolve` |
 | `setup` | `runSetup` in `internal/cli/setup.go` | Pkl, the manifest, the compiler, the editor's files, the libraries |
-| `assets:check`, `assets:sync` | `runAssetsCheck` and `runAssetsSync`, each one call of `importAssets` in `internal/cli/assets.go` | `build.Load`, `build.Source`, `library.Sync`, `build.PlanAssets`, and for a sync `assets.Sync` |
-| `assets:paths` | `runAssetsPaths`, which calls `assetsPaths` in `internal/cli/assetspaths.go` | in a project `build.Load`, `library.Sync` and `build.Assets`; then `assets.ReportModels` |
-| `settings:check` | `runSettingsCheck` in `internal/cli/settings.go` | `build.Load`, `build.Source`, `settings.Plan` |
-| `objects:check`, `objects:eval` | `runObjectsCheck` and `runObjectsEval`, which both start with `planObjects` in `internal/cli/objects.go` | `build.Load`, `build.Source`, `objects.Plan` |
+| `assets:check`, `assets:sync` | `runAssetsCheck` and `runAssetsSync`, each one call of `syncOrCheckAssets` in `internal/cli/assets.go` | `build.Load`, `build.OpenSource`, `library.Sync`, `build.PlanAssets`, and for a sync `assets.Sync` |
+| `assets:paths` | `runAssetsPaths`, which calls `reportAssetPaths` in `internal/cli/assetspaths.go` | in a project `build.Load`, `library.Sync` and `build.CollectAssets`; then `assets.ReportModels` |
+| `settings:check` | `runSettingsCheck` in `internal/cli/settings.go` | `build.Load`, `build.OpenSource`, `settings.Plan` |
+| `objects:check`, `objects:eval` | `runObjectsCheck` and `runObjectsEval`, which both start with `planObjects` in `internal/cli/objects.go` | `build.Load`, `build.OpenSource`, `objects.Plan` |
 
 The four commands that plan a whole build are one call of a door of `internal/build`. The commands about one area
 (`assets:check`, `assets:sync`, `settings:check`, `objects:check`, `objects:eval`) open the project the way a build
-does, with `build.Load` and `build.Source`, and then call that area. `init`, `setup` and `assets:paths` have steps
+does, with `build.Load` and `build.OpenSource`, and then call that area. `init`, `setup` and `assets:paths` have steps
 of their own, as the table says.
 
 ## The build, step by step
@@ -227,13 +227,13 @@ of their own, as the table says.
 
 1. `Load` finds Pkl (`toolchain.FindPkl`) and evaluates the manifest (`manifest.Load`). The result is a
    `*manifest.Project`: every setting of the project as a Go value.
-2. `TakeLock` writes `dist/.lock`, so that a second build in the same project fails at once. The manifest is
+2. `AcquireLock` writes `dist/.lock`, so that a second build in the same project fails at once. The manifest is
    evaluated first, so that a command run outside a project makes no `dist` folder there.
-3. `clearedArchive` works out where the archive goes, `<build.folder>/<map.folder>`, and removes the archive of the
+3. `prepareArchivePath` works out where the archive goes, `<build.folder>/<map.folder>`, and removes the archive of the
    build before.
 4. `Plan` works out the whole map. Nothing of the map is written yet.
 5. `stage` writes the planned map to `dist/stage/<map.folder>`.
-6. `packInto` packs the planned map into an archive and writes it.
+6. `packArchive` packs the planned map into an archive and writes it.
 
 `Test` is steps 1, 2, 4 and 5, and then starts the game on the stage. `Check` is steps 1, 2 and 4, and then says
 what the plan holds. `Dev` is that check again and again, with the ids module written as a build writes it. So the
@@ -247,8 +247,8 @@ the quote to the source, so a step added to `Plan` is a step added here:
 
 ```go
 func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*Result, error) {
-	source, err := Source(p)
-	globals, err := MapGlobals(source)
+	source, err := OpenSource(p)
+	globals, err := ReadMapGlobals(source)
 
 	objs, err := objects.Plan(source, p.Objects, objects.LoadMetadata())
 	err = writeGenerated(e, source, objs, globals, opts)
@@ -268,11 +268,11 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 
 The steps, one by one:
 
-1. **`Source(p)`** opens the source map, `maps/<map.folder>`, as a `*mapdir.Folder`. The folder is scanned whole,
+1. **`OpenSource(p)`** opens the source map, `maps/<map.folder>`, as a `*mapdir.Folder`. The folder is scanned whole,
    once: a link, a name Windows cannot hold, or two paths that differ only in letter case is refused here, wherever
    in the map it is. It comes first because every later step reads the map, and a map that is missing should be
    reported before a compile error.
-2. **`MapGlobals(source)`** reads the map's `war3map.lua` and lists what it defines: the `gg_` and `udg_` globals
+2. **`ReadMapGlobals(source)`** reads the map's `war3map.lua` and lists what it defines: the `gg_` and `udg_` globals
    and the functions World Editor wrote. Two later steps need the list: the check for unknown globals, and the
    editor's declarations.
 3. **`objects.Plan`** checks the manifest's custom objects against the game's metadata and against the objects the
@@ -319,7 +319,7 @@ which it only compares with what the objects render. `dev` writes the ids module
 - `stage` in `internal/build/stage.go` has `mapdir` replace `dist/stage/<map.folder>` with a copy of the source map
   and write the view's changes into the copy (`Folder.StageTo` in `internal/mapdir/apply.go`). Then it logs what
   went in ("Added … custom object(s)", "Applied map settings", "Imported … asset(s)").
-- `packInto` in `internal/build/archive.go` calls `pack` in `internal/build/pack.go`, which reads every file from
+- `packArchive` in `internal/build/archive.go` calls `packMap` in `internal/build/pack.go`, which reads every file from
   the view, in the order of `Folder.Files`, and hands them to `mpq.Write`. The archive is written beside its place
   as `<map.folder>.tmp` and renamed when it is whole.
 - `launch` in `internal/build/launch.go` starts the game with `-loadfile` and the stage, through `Env.Spawn`, and
@@ -344,7 +344,7 @@ type Env struct {
 
 `Run` runs a program and waits for it: `pkl`, `yue`, `tar`. `Fetch` downloads an address: a library's archive, a
 pinned program. `Spawn` starts a program that outlives Moonwell: the game. `env.New(root, log)` is the real world.
-`run` in `internal/cli/cli.go` makes one for each command and hands it down as the parameter `e`.
+`runCommand` in `internal/cli/cli.go` makes one for each command and hands it down as the parameter `e`.
 
 Only `internal/env` starts programs and reaches the network, and the layout test holds every other package to it.
 The reason is the tests. A test hands the code an `Env` of its own (`testkit.Env` in `internal/testkit/env.go`),
@@ -381,9 +381,9 @@ Three habits follow, and the code keeps them everywhere:
   of the packages that raise such errors each have a helper, `asError`, that fails the test for an error that is no
   `*diag.Error`.
 
-`exitCode` in `internal/cli/cli.go` prints the error a command ends with, once. `carryOut` prints a line that is
+`exitCode` in `internal/cli/cli.go` prints the error a command ends with, once. `execute` prints a line that is
 refused, and catches a panic, which it prints as an internal error with its stack. `dev` goes on after a check that
-fails, so `cycle` in `internal/build/dev.go` prints that failure itself.
+fails, so `runCheckCycle` in `internal/build/dev.go` prints that failure itself.
 
 The generator (`tools/gen/`) is a tool for contributors and does not use `internal/diag`: its failures are plain
 errors, printed after `error: `.
@@ -507,12 +507,12 @@ Each row names the file to open and, in most rows, the function to read first.
 | --- | --- |
 | see what `moonwell build` does, in order | `internal/build/build.go`: `Build`, then `Plan`; the longer steps in `internal/build/steps.go` |
 | add a command | `internal/cli/cli.go`: a row in the table `commands`, and a function in a file of the package that the row names |
-| add a flag, or give a command a flag | `internal/cli/cli.go`: an `option` beside `entryOption`, in the `flags` of each row of `commands` that has it, a field of `call` for what the flag says, and a line in `run` that reads it. The flag is also written by hand in the `usage` text of those rows. A flag of `build` and `test` then goes on through `options` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
-| know why a command line is refused | `cobra` refuses it, in its own words: an unknown flag or command, a flag without its value, a wrong number of arguments (the `args` of the row in `commands`). `refusal` in `internal/cli/cli.go` prints it. Only an `--entry` that is no entry is refused by Moonwell, in `run` |
-| change the help text | `internal/cli/cli.go`: the `usage` and `help` of each row of `commands`, the `help` of an `option`, and the `Long` text in `tree`. The layout is `cobra`'s |
-| know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `carryOut`, `exitCode` |
-| change what Ctrl+C does | `internal/cli/cli.go`: `Main`, `heed`, `leaveAtOnce`; `internal/build/lock.go`: `ReleaseHeld` |
-| know where the log file is written | `internal/cli/cli.go`: `logFile`; `internal/env/log.go` |
+| add a flag, or give a command a flag | `internal/cli/cli.go`: an `flagSpec` beside `entryFlag`, in the `flags` of each row of `commands` that has it, a field of `commandArgs` for what the flag says, and a line in `runCommand` that reads it. The flag is also written by hand in the `usage` text of those rows. A flag of `build` and `test` then goes on through `buildOptions` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
+| know why a command line is refused | `cobra` refuses it, in its own words: an unknown flag or command, a flag without its value, a wrong number of arguments (the `args` of the row in `commands`). `usageError` in `internal/cli/cli.go` prints it. Only an `--entry` that is no entry is refused by Moonwell, in `runCommand` |
+| change the help text | `internal/cli/cli.go`: the `usage` and `help` of each row of `commands`, the `help` of an `flagSpec`, and the `Long` text in `buildCommandTree`. The layout is `cobra`'s |
+| know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `execute`, `exitCode` |
+| change what Ctrl+C does | `internal/cli/cli.go`: `Main`, `handleInterrupts`, `newForceExit`; `internal/build/lock.go`: `ReleaseHeldLocks` |
+| know where the log file is written | `internal/cli/cli.go`: `logFilePath`; `internal/env/log.go` |
 | change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/files.go`: `PklProjectText`, `LocalManifestText` |
 | change what `setup` does | `internal/cli/setup.go`: `runSetup` |
 
@@ -521,14 +521,14 @@ Each row names the file to open and, in most rows, the function to read first.
 | I want to | Open |
 | --- | --- |
 | add a step to a build, or move one | `internal/build/build.go`: `Plan` |
-| know how `map.folder` is read and the source map opened | `internal/build/project.go`: `Source`, `mapFolder`, `readFolder` |
-| know where "Another Moonwell build is running" comes from | `internal/build/lock.go`: `TakeLock`, `errHeld` |
-| know why a link at `dist` is refused | `internal/build/output.go`: `outputAt` |
-| change where the map is staged, or what is logged after | `internal/build/stage.go`: `stagePlace`, `sayStaged` |
-| change where the archive goes, or how `build.folder` is read | `internal/build/archive.go`: `archiveOf`, `buildFolder`, `writeArchive` |
-| know which files go into the archive, and in which order | `internal/build/pack.go`: `pack`, `archiveFiles` |
+| know how `map.folder` is read and the source map opened | `internal/build/project.go`: `OpenSource`, `sourceMapDir`, `parseDir` |
+| know where "Another Moonwell build is running" comes from | `internal/build/lock.go`: `AcquireLock`, `errHeld` |
+| know why a link at `dist` is refused | `internal/build/output.go`: `outputPath` |
+| change where the map is staged, or what is logged after | `internal/build/stage.go`: `stageOutputFile`, `logStaged` |
+| change where the archive goes, or how `build.folder` is read | `internal/build/archive.go`: `archivePath`, `resolveBuildDir`, `writeArchive` |
+| know which files go into the archive, and in which order | `internal/build/pack.go`: `packMap`, `archiveFiles` |
 | know how large a map may be, or change the archive's format | `internal/war3/mpq/room.go`: `CheckFits`; `internal/war3/mpq/write.go`: `Write` |
-| change what `dev` watches, or when it checks again | `internal/build/dev_watched.go`: `ownFolders`, `countsInProject`, for what is watched; `internal/build/dev.go`: `Dev`, `due`, for when; the watcher in `internal/build/watch.go` |
+| change what `dev` watches, or when it checks again | `internal/build/dev_watched.go`: `projectWatchSet`, `isProjectSource`, for what is watched; `internal/build/dev.go`: `Dev`, `isDue`, for when; the watcher in `internal/build/watch.go` |
 | change how the game is started | `internal/build/launch.go`: `launch`; `internal/env/spawn_windows.go` and `internal/env/spawn_unix.go` |
 
 ### The manifest and the tools
@@ -536,7 +536,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | I want to | Open |
 | --- | --- |
 | add a setting to the manifest | `schema/Project.pkl` or `schema/MapSettings.pkl`, then the struct in `internal/manifest/project.go` or `internal/manifest/settings.go`; `internal/manifest/load_test.go` fails for a field no manifest sets |
-| know how the manifest is evaluated, and which of the two files | `internal/manifest/load.go`: `Load`, `manifestFile`, `Decode` |
+| know how the manifest is evaluated, and which of the two files | `internal/manifest/load.go`: `Load`, `findManifest`, `DecodeProject` |
 | change the check of the program's version against the project's | `internal/manifest/version.go`: `checkPackageVersion` |
 | know which `pkl` and which `yue` is run | `internal/toolchain/tools.go`: `FindPkl`, `FindCompiler` |
 | pin a new version of YueScript or Pkl | `internal/toolchain/tools.go`: `YueScript`, `Pkl`; the default `yue.version` in `schema/Project.pkl` |
@@ -547,11 +547,11 @@ Each row names the file to open and, in most rows, the function to read first.
 
 | I want to | Open |
 | --- | --- |
-| know how a file becomes a module, and what its name is | `internal/script/modules.go`: `Collect` |
-| change how the compiler is run, or what is compiled again | `internal/script/yue.go`: `compileAll`, and `compile` for the one call of the compiler; the cache in `internal/script/cache.go`. The check for unknown globals runs the compiler too: `list` in `internal/script/unknown.go` |
-| change the words of a compile error | `internal/script/printed.go`: `compileError`, `rewriteError` |
-| know which modules go into the map, and where "module not found" comes from | `internal/script/graph.go`: `reached`, `errNoModule` |
-| change the check for unknown globals | `internal/script/unknown.go`: `unknownGlobals`, `knownGlobals` |
+| know how a file becomes a module, and what its name is | `internal/script/modules.go`: `CollectSources` |
+| change how the compiler is run, or what is compiled again | `internal/script/yue.go`: `compileAll`, and `compile` for the one call of the compiler; the cache in `internal/script/cache.go`. The check for unknown globals runs the compiler too: `listUses` in `internal/script/unknown.go` |
+| change the words of a compile error | `internal/script/printed.go`: `newCompileError`, `newRewriteError` |
+| know which modules go into the map, and where "module not found" comes from | `internal/script/graph.go`: `reachableModules`, `errNoModule` |
+| change the check for unknown globals | `internal/script/unknown.go`: `findUnknownGlobals`, `knownGlobals` |
 | know what the bundle looks like, and how an error in the game finds its source line | `internal/script/bundle.go`: `bundle`; `runtime/moonwell.lua` |
 | know how the bundle gets into `war3map.lua` | `internal/script/inject.go`: `Inject` |
 | add a macro | `runtime/macros.yue`; it is written into a project by `RefreshMacros` in `internal/script/macros.go` |
@@ -564,22 +564,22 @@ Each row names the file to open and, in most rows, the function to read first.
 | follow an object from Pkl to the bytes of `war3map.w3u` | `internal/objects/plan.go`: `Plan`; `internal/objects/resolve.go`: `Resolve`; `internal/war3/objmod/append.go`: `AppendObjects` |
 | make a field of an object settable from Pkl | Nothing in Go: the fields are data. `go run ./tools/gen metadata <folder> <version>` writes `data/metadata.json` from the game's tables, and `go run ./tools/gen` then writes `schema/generated/`; `CONTRIBUTING.md` has the steps. The program reads the file in `internal/objects/metadata.go`: `LoadMetadata` |
 | change the words of an error about an object | the errors at the bottom of `internal/objects/resolve.go`, `internal/objects/fields.go` and `internal/objects/values.go` |
-| change `src/generated/objects.yue` | `internal/objects/ids.go`: `RenderIDs`, `RefreshIDs`, `AssertIDsCurrent` |
+| change `src/generated/objects.yue` | `internal/objects/ids.go`: `RenderIDs`, `RefreshIDs`, `RequireIDsCurrent` |
 | change the JSON of `objects:eval` | `internal/objects/eval.go`: `EvalJSON` |
 | follow a setting into `war3map.w3i` | `internal/settings/plan.go`: `Plan`; `internal/settings/info.go`: `patchInfo`; `internal/war3/w3i/edit.go` |
 | change how World Editor's calls in `war3map.lua` are edited | `internal/settings/lua.go`: `patchLua`; `internal/settings/lua_patcher.go`; one file for each group of calls beside it |
 | change how gameplay constants are written | `internal/settings/constants.go`: `textSections`; `internal/war3/txt/txt.go`: `Merge` |
 | change which preview pictures are taken | `internal/settings/preview.go`, `internal/settings/plan_preview.go`; `internal/war3/picture/picture.go`: `Read` |
-| know which files are assets, and what path each gets in the map | `internal/assets/collect.go`: `Collect`; `internal/assets/target.go`: `targetPath` |
+| know which files are assets, and what path each gets in the map | `internal/assets/collect.go`: `Collect`; `internal/assets/target.go`: `parseTargetPath` |
 | know how an import is planned | `internal/build/steps.go`: `PlanAssets`, which calls `Plan` in `internal/assets/plan.go`; `internal/war3/imp/imp.go` |
 | change what `assets:sync` writes, and how it undoes a failed write | `internal/assets/sync.go`: `Sync`; `internal/mapdir/apply.go`: `ApplyInPlace`; `internal/fsx/journal.go` |
-| know which files of the source map `assets:sync` may replace or remove | `internal/assets/plan.go`: `Plan`, `ownedUnchanged`, `removals`; the state it is given is read in `internal/assets/state.go`: `ReadState` |
-| read or change `.asset-state/<map>.json`, the ownership state | `internal/assets/state.go`: `ReadState`, and `StateFile`, which names the file for a map folder and refuses a link on the way to it; `OwnershipFile` in `internal/build/project.go` is `StateFile` for a project, with `map.folder` read as a build reads it |
-| change the report of `assets:paths` | `internal/cli/assetspaths.go`: `assetsPaths`; `internal/assets/report.go`: `ReportModels`, `RenderReports` |
+| know which files of the source map `assets:sync` may replace or remove | `internal/assets/plan.go`: `Plan`, `checkOwnedUnchanged`, `planRemovals`; the state it is given is read in `internal/assets/state.go`: `ReadState` |
+| read or change `.asset-state/<map>.json`, the ownership state | `internal/assets/state.go`: `ReadState`, and `StateFilePath`, which names the file for a map folder and refuses a link on the way to it; `AssetStatePath` in `internal/build/project.go` is `StateFilePath` for a project, with `map.folder` read as a build reads it |
+| change the report of `assets:paths` | `internal/cli/assetspaths.go`: `reportAssetPaths`; `internal/assets/report.go`: `ReportModels`, `RenderReports` |
 | read a new kind of reference out of a model | `internal/war3/model/mdx.go`: `ReadMDX`; `internal/war3/model/mdl.go`: `ReadMDL` |
 | know how a library is downloaded and locked | `internal/library/sync.go`: `Sync`; `internal/library/github.go`: `syncGitHub`; `internal/library/lock.go` |
 | know how a local library is copied | `internal/library/local.go`: `syncLocal` |
-| add a key to `moonwell-library.json` | `internal/library/described.go`: `parseFile` |
+| add a key to `moonwell-library.json` | `internal/library/described.go`: `parseLibraryFile` |
 | change the editor's declarations | `internal/editor/refresh.go`: `RefreshTypes`; the text of each file in `internal/editor/declarations.go` |
 | change what `setup` adds to `.luarc.json` and `.gitignore` | `internal/editor/scaffold.go`: `AddFiles`, `MergeLuarc` |
 
@@ -627,8 +627,8 @@ the plan.) It is also why `check` is cheap to keep true: it is the same plan, no
 
 **A library has a type in each area that takes it.** `manifest.Library` is the library as the manifest writes it,
 `library.Synced` where it lies after a sync, `script.Library` its module folder, `assets.Library` the files it ships.
-No area imports another, so `internal/build` turns one into the next: `ModuleFolders` in `internal/build/steps.go`,
-`shippingLibraries` in `internal/build/project.go`.
+No area imports another, so `internal/build` turns one into the next: `LibraryModuleDirs` in `internal/build/steps.go`,
+`librariesWithAssets` in `internal/build/project.go`.
 
 **The archive is packed from the view, not read back from the stage.** Both then hold the same bytes without a
 second read from disk that could fail. The stage is still written by `build`, though the archive does not need it: a
@@ -640,10 +640,10 @@ place, `<map.folder>.tmp`, which the next build that packs replaces. (`writeArch
 
 **What Moonwell writes, it writes into real folders.** A link, or a Windows junction, on the way to `dist`, the
 stage, the lock, the archive, `.moonwell` or `moonwell.lock` is refused. A build removes and replaces what is at
-those places, and through a link that would happen outside the project. (`outputAt` in `internal/build/output.go`,
-`Inside` in `internal/fsx/paths.go`.)
+those places, and through a link that would happen outside the project. (`outputPath` in `internal/build/output.go`,
+`SafeJoinNoSymlinks` in `internal/fsx/paths.go`.)
 
-**The source map is opened in one way, and scanned whole.** Every command that reads the map calls `build.Source`,
+**The source map is opened in one way, and scanned whole.** Every command that reads the map calls `build.OpenSource`,
 and `mapdir.Open` refuses a link, a name Windows cannot hold and two paths that differ only in letter case anywhere
 in it. One rule in one place means a command cannot be more lenient than a build. The game matches a map's file
 names without regard to letter case, so a `Folder` does too. (`internal/mapdir/folder.go`.)
@@ -651,18 +651,18 @@ names without regard to letter case, so a `Folder` does too. (`internal/mapdir/f
 **Pkl is the one judge of a manifest's shape.** The schema holds every type, range, pattern and default, and Pkl's
 error points at the line of the user's file. The Go code decodes what Pkl printed and checks only what Pkl cannot
 see: what a setting needs of the map, and two blocks that disagree. A field the structs do not have is passed over,
-so that a later patch release of the package may add one. (`Decode` in `internal/manifest/load.go`.)
+so that a later patch release of the package may add one. (`DecodeProject` in `internal/manifest/load.go`.)
 
 **`internal/build` keeps one piece of state between calls.** `internal/build/lock.go` keeps the list of build locks
 this process holds. A second Ctrl+C ends the program from outside the command that is running. The function that
-handles it, `leaveAtOnce` in `internal/cli/cli.go`, knows no project and has no release function to call, and it
+handles it, `newForceExit` in `internal/cli/cli.go`, knows no project and has no release function to call, and it
 must still leave no lock behind: the next build would take a lock that stays for a build that runs. The
 only other values a package keeps are the three files of `data/`, each parsed once when it is first asked for
 (`objects.LoadMetadata`, `script.LoadNatives`, `assets.LoadGamePaths`).
 
 **Ctrl+C asks first, and leaves at the second.** The first cancels the command's context: `dev` finishes the check
 that is under way, since the check holds the lock. The second gives back the locks and exits with 130 at once.
-(`Main` and `leaveAtOnce` in `internal/cli/cli.go`.)
+(`Main` and `newForceExit` in `internal/cli/cli.go`.)
 
 **A pinned program is checked before it is kept or run.** `Ensure` checks the SHA-256 of a download, unpacks it in a
 folder beside its place, asks it for its version, and only then moves it into the cache. The `yue` on the PATH is
@@ -696,7 +696,7 @@ fault or the machine's, so every error added to `internal/mapdir` keeps the rule
 
 **An error about the `assets` block names `moonwell.pkl`.** The block is written there. The manifest that is
 evaluated is `moonwell.local.pkl` in nearly every project, which does not hold it, and nothing Pkl prints says which
-of the two files wrote a value. (`Assets` in `internal/build/project.go`.)
+of the two files wrote a value. (`CollectAssets` in `internal/build/project.go`.)
 
 **A preview picture is only what the game was seen to read.** A picture the game cannot read closes the game when
 the map is selected in the list. So a TGA or a PNG is decoded and written again in one layout, and only two sizes

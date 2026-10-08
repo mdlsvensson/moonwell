@@ -13,26 +13,26 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
 
-func runAssetsPaths(ctx context.Context, e *env.Env, c call) error {
+func runAssetsPaths(ctx context.Context, e *env.Env, c commandArgs) error {
 	file := ""
 	if len(c.arguments) > 0 {
 		file = c.arguments[0]
 	}
-	return assetsPaths(ctx, e, file, assets.LoadGamePaths())
+	return reportAssetPaths(ctx, e, file, assets.LoadGamePaths())
 }
 
-func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[string]bool) error {
+func reportAssetPaths(ctx context.Context, e *env.Env, file string, gamePaths map[string]bool) error {
 	inProject := manifest.IsProject(e.Root)
 	var imported []assets.Asset
 	var targets map[string]bool
 	if inProject {
-		found, err := importedByABuild(ctx, e)
+		found, err := assetsOfBuild(ctx, e)
 		if err != nil {
 			return err
 		}
 		imported, targets = found, assets.TargetSet(found)
 	}
-	models, err := modelsToReport(e.Root, file, inProject, imported)
+	models, err := selectModels(e.Root, file, inProject, imported)
 	if err != nil {
 		return err
 	}
@@ -52,24 +52,24 @@ func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[str
 	for _, line := range assets.RenderReports(reports, inProject) {
 		e.Log.Info(line)
 	}
-	return refuseUnreadable(reports)
+	return checkModelsReadable(reports)
 }
 
-func importedByABuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
+func assetsOfBuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
 	p, err := build.Load(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	release, err := build.TakeLock(e.Root)
+	release, err := build.AcquireLock(e.Root)
 	if err != nil {
 		return nil, err
 	}
 	defer release()
-	found, _, err := syncedAssets(ctx, e, p)
+	found, _, err := collectSyncedAssets(ctx, e, p)
 	return found, err
 }
 
-func modelsToReport(root, file string, inProject bool, imported []assets.Asset) ([]assets.Model, error) {
+func selectModels(root, file string, inProject bool, imported []assets.Asset) ([]assets.Model, error) {
 	switch {
 	case file != "":
 		named, err := assets.ReadModel(root, file)
@@ -83,7 +83,7 @@ func modelsToReport(root, file string, inProject bool, imported []assets.Asset) 
 	return assets.ModelsAmong(imported), nil
 }
 
-func refuseUnreadable(reports []assets.ModelReport) error {
+func checkModelsReadable(reports []assets.ModelReport) error {
 	var unreadable []string
 	for _, report := range reports {
 		if report.Unreadable != "" {

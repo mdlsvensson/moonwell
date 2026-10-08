@@ -19,27 +19,27 @@ func (f File) Add(source string) {
 		switch {
 		case line == "" || strings.HasPrefix(line, "//"):
 		case strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]"):
-			section = f.section(trim(line[1 : len(line)-1]))
+			section = f.sectionNamed(trim(line[1 : len(line)-1]))
 		case section != nil:
-			section.set(line)
+			section.setFromLine(line)
 		}
 	}
 }
 
-func (f File) section(name string) Section {
+func (f File) sectionNamed(name string) Section {
 	if f[name] == nil {
 		f[name] = Section{}
 	}
 	return f[name]
 }
 
-func (s Section) set(line string) {
+func (s Section) setFromLine(line string) {
 	if key, value, found := strings.Cut(line, "="); found {
-		s[trim(key)] = unquoted(trim(value))
+		s[trim(key)] = unquote(trim(value))
 	}
 }
 
-func unquoted(value string) string {
+func unquote(value string) string {
 	if len(value) < 2 || value[0] != '"' || value[len(value)-1] != '"' {
 		return value
 	}

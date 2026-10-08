@@ -11,12 +11,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/settings"
 )
 
-func runSettingsCheck(ctx context.Context, e *env.Env, _ call) error {
+func runSettingsCheck(ctx context.Context, e *env.Env, _ commandArgs) error {
 	p, err := build.Load(ctx, e)
 	if err != nil {
 		return err
 	}
-	source, err := build.Source(p)
+	source, err := build.OpenSource(p)
 	if err != nil {
 		return err
 	}
@@ -24,11 +24,11 @@ func runSettingsCheck(ctx context.Context, e *env.Env, _ call) error {
 	if err != nil {
 		return err
 	}
-	sayChangedBySettings(e.Log, changes)
+	logSettingsChanges(e.Log, changes)
 	return nil
 }
 
-func sayChangedBySettings(log *env.Logger, changes []mapdir.Change) {
+func logSettingsChanges(log *env.Logger, changes []mapdir.Change) {
 	for _, change := range changes {
 		removed := ""
 		if change.Remove {

@@ -13,18 +13,18 @@ const (
 	stageDir = distDir + "/stage"
 )
 
-func outputAt(root, relative string) (string, error) {
+func outputPath(root, relative string) (string, error) {
 	place, err := fsx.SafeJoinNoSymlinks(root, relative)
 	if err == nil {
 		return place, nil
 	}
-	if link, found := linkOnTheWay(root, relative); found {
+	if link, found := findSymlinkOnPath(root, relative); found {
 		return "", errLinkedOutput(link, relative)
 	}
 	return "", err
 }
 
-func linkOnTheWay(root, relative string) (link string, found bool) {
+func findSymlinkOnPath(root, relative string) (link string, found bool) {
 	slashed, portable := fsx.CleanRelPath(relative)
 	if !portable {
 		return "", false
@@ -44,23 +44,23 @@ func linkOnTheWay(root, relative string) (link string, found bool) {
 	return "", false
 }
 
-type place struct {
-	file  string
-	label string
+type outputFile struct {
+	fullPath    string
+	displayPath string
 }
 
-func placeOf(root, label string) (place, error) {
-	file, err := outputAt(root, label)
+func newOutputFile(root, label string) (outputFile, error) {
+	file, err := outputPath(root, label)
 	if err != nil {
-		return place{}, err
+		return outputFile{}, err
 	}
-	if blocking, found := fileOnTheWay(root, label); found {
-		return place{}, errFileForFolder(blocking, label)
+	if blocking, found := findBlockingFile(root, label); found {
+		return outputFile{}, errFileForFolder(blocking, label)
 	}
-	return place{file: file, label: label}, nil
+	return outputFile{fullPath: file, displayPath: label}, nil
 }
 
-func fileOnTheWay(root, label string) (file string, found bool) {
+func findBlockingFile(root, label string) (file string, found bool) {
 	for at, char := range label {
 		if char != '/' {
 			continue
@@ -73,12 +73,12 @@ func fileOnTheWay(root, label string) (file string, found bool) {
 	return "", false
 }
 
-func (at place) labelOf(file string) string {
-	below, err := filepath.Rel(at.file, file)
+func (at outputFile) displayPathOf(file string) string {
+	below, err := filepath.Rel(at.fullPath, file)
 	if err != nil || below == "." || !filepath.IsLocal(below) {
-		return at.label
+		return at.displayPath
 	}
-	return at.label + "/" + filepath.ToSlash(below)
+	return at.displayPath + "/" + filepath.ToSlash(below)
 }
 
 func errFileForFolder(file, wanted string) error {

@@ -317,7 +317,7 @@ func TestTheModeMetadataWritesTheCommittedMetadataFromTheGamesFiles(t *testing.T
 
 func TestTheModeMetadataWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
 	game := readMini(t, nil)
-	fields, _, err := nameFields(game, unitClass)
+	fields, _, err := buildNamedFields(game, unitClass)
 	if err != nil {
 		t.Fatal(err)
 	}

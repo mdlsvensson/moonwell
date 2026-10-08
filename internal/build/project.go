@@ -33,8 +33,8 @@ func Load(ctx context.Context, e *env.Env) (*manifest.Project, error) {
 	return manifest.Load(ctx, e, pkl)
 }
 
-func Source(p *manifest.Project) (*mapdir.Folder, error) {
-	folder, err := mapFolder(p)
+func OpenSource(p *manifest.Project) (*mapdir.Folder, error) {
+	folder, err := sourceMapDir(p)
 	if err != nil {
 		return nil, err
 	}
@@ -53,8 +53,8 @@ func Source(p *manifest.Project) (*mapdir.Folder, error) {
 	return source, err
 }
 
-func mapFolder(p *manifest.Project) (string, error) {
-	parts, fault := readFolder(p.Map.Folder)
+func sourceMapDir(p *manifest.Project) (string, error) {
+	parts, fault := parseDir(p.Map.Folder)
 	switch fault {
 	case leavesItsFolder, namesNoFolder:
 		return "", errNotInsideMaps(p.ManifestName, p.Map.Folder)
@@ -64,34 +64,34 @@ func mapFolder(p *manifest.Project) (string, error) {
 	return strings.Join(parts, "/"), nil
 }
 
-type folderFault int
+type dirProblem int
 
 const (
-	noFault folderFault = iota
+	noFault dirProblem = iota
 	leavesItsFolder
 	namesNoFolder
 	unusableName
 )
 
-func readFolder(written string) (parts []string, fault folderFault) {
-	parts = partsOf(written)
+func parseDir(written string) (parts []string, fault dirProblem) {
+	parts = splitPath(written)
 	switch {
-	case startsAtARoot(written) || slices.Contains(parts, ".."):
+	case isRooted(written) || slices.Contains(parts, ".."):
 		return nil, leavesItsFolder
 	case len(parts) == 0:
 		return nil, namesNoFolder
-	case !everySystemHolds(parts):
+	case !isPortablePath(parts):
 		return nil, unusableName
 	}
 	return parts, noFault
 }
 
-func everySystemHolds(parts []string) bool {
+func isPortablePath(parts []string) bool {
 	_, portable := fsx.CleanRelPath(strings.Join(parts, "/"))
 	return portable
 }
 
-func partsOf(written string) []string {
+func splitPath(written string) []string {
 	var parts []string
 	for part := range strings.SplitSeq(strings.ReplaceAll(written, `\`, "/"), "/") {
 		if part != "" && part != "." {
@@ -101,7 +101,7 @@ func partsOf(written string) []string {
 	return parts
 }
 
-func startsAtARoot(written string) bool {
+func isRooted(written string) bool {
 	if strings.HasPrefix(written, "/") || strings.HasPrefix(written, `\`) {
 		return true
 	}
@@ -117,7 +117,7 @@ func isMissing(err error) bool {
 	return errors.Is(err, fs.ErrNotExist) && !errors.As(err, &expected)
 }
 
-func MapGlobals(source *mapdir.Folder) (*lua.MapGlobals, error) {
+func ReadMapGlobals(source *mapdir.Folder) (*lua.MapGlobals, error) {
 	script, found, err := source.Read(scriptName)
 	switch {
 	case err != nil:
@@ -131,15 +131,15 @@ func MapGlobals(source *mapdir.Folder) (*lua.MapGlobals, error) {
 	return nil, nil
 }
 
-func Assets(p *manifest.Project, synced []library.Synced) (found []assets.Asset, replaced []string, err error) {
-	shipping, err := shippingLibraries(p.Root, synced)
+func CollectAssets(p *manifest.Project, synced []library.Synced) (found []assets.Asset, replaced []string, err error) {
+	shipping, err := librariesWithAssets(p.Root, synced)
 	if err != nil {
 		return nil, nil, err
 	}
 	return assets.Collect(p.Root, p.Assets, manifest.SharedManifest, shipping)
 }
 
-func shippingLibraries(root string, synced []library.Synced) ([]assets.Library, error) {
+func librariesWithAssets(root string, synced []library.Synced) ([]assets.Library, error) {
 	var shipping []assets.Library
 	for _, lib := range synced {
 		if lib.Assets == "" {
@@ -154,8 +154,8 @@ func shippingLibraries(root string, synced []library.Synced) ([]assets.Library, 
 	return shipping, nil
 }
 
-func OwnershipFile(p *manifest.Project) (string, error) {
-	folder, err := mapFolder(p)
+func AssetStatePath(p *manifest.Project) (string, error) {
+	folder, err := sourceMapDir(p)
 	if err != nil {
 		return "", err
 	}

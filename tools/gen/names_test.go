@@ -27,7 +27,7 @@ func reported(renames []rename) []string {
 
 func refusal(t *testing.T, pins overrides, change func(files map[string]string)) string {
 	t.Helper()
-	_, _, err := nameFields(readMini(t, change), pins)
+	_, _, err := buildNamedFields(readMini(t, change), pins)
 	if err == nil {
 		t.Fatal("the fields were named")
 	}
@@ -162,7 +162,7 @@ func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 		"items":     {"unam": "displayName", "ucls": "unitClass"},
 		"abilities": {"acdn": "cooldown", "Crs": "missChance"},
 	}}
-	fields, renames, err := nameFields(readMini(t, func(files map[string]string) {
+	fields, renames, err := buildNamedFields(readMini(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
 			`C;X1;Y11;K"Crs"`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`, `C;X9;K"unreal"`)
 		files[labelsFile] += "WESTRING_CRS=Class\r\n"
@@ -218,7 +218,7 @@ func TestNameFieldsRefusesAPinThatNamesNoField(t *testing.T) {
 			"units": {"ucls": "unitClass", "ifil": "itemModel"}, "items": {"uhpm": "health"}},
 		Removed: map[string][]string{"units": {"uold"}, "buffs": {}},
 	}
-	if _, _, err := nameFields(readMini(t, nil), pins); err != nil {
+	if _, _, err := buildNamedFields(readMini(t, nil), pins); err != nil {
 		t.Errorf("pins that name their fields, and a field that is removed: %v", err)
 	}
 }
@@ -334,11 +334,11 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 	renamed = strings.Replace(renamed, `"name":"name"`, `"name":"unitName"`, 2)
 	c := newCheckout(t)
 
-	if err := keepsReleasedNames(current, c.root, unitClass); err != nil {
+	if err := checkReleasedNamesKept(current, c.root, unitClass); err != nil {
 		t.Errorf("a checkout without a metadata: %v", err)
 	}
 	c.write(metadataPath, released)
-	if err := keepsReleasedNames(current, c.root, unitClass); err != nil {
+	if err := checkReleasedNamesKept(current, c.root, unitClass); err != nil {
 		t.Errorf("the names that are released: %v", err)
 	}
 	c.write(metadataPath, renamed)
@@ -347,7 +347,7 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 		"  units unam \"unitName\" would become \"name\"\n" +
 		"  items unam \"unitName\" would become \"name\"\n" +
 		"  upgrades gold \"percentBonusAndMore\" would disappear"
-	err := keepsReleasedNames(current, c.root, unitClass)
+	err := checkReleasedNamesKept(current, c.root, unitClass)
 	if err == nil || !strings.HasSuffix(err.Error(), lines) {
 		t.Fatalf("got %v, want the lines %q", err, lines)
 	}
@@ -365,12 +365,12 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 		Removed: map[string][]string{"upgrades": {"gold"}, "units": {"gold"}},
 	}
 	pinned := metadataOf(pins)
-	if err := keepsReleasedNames(pinned, c.root, pins); err != nil {
+	if err := checkReleasedNamesKept(pinned, c.root, pins); err != nil {
 		t.Errorf("with the names pinned and the field removed: %v", err)
 	}
 	equal(t, "the name of uhpm", namesOf(pinned.Fields["units"])["uhpm"], "hitPoints")
 	pins.Removed = map[string][]string{"units": {"gold"}}
-	if err := keepsReleasedNames(pinned, c.root, pins); err == nil || !strings.Contains(err.Error(), "upgrades gold") {
+	if err := checkReleasedNamesKept(pinned, c.root, pins); err == nil || !strings.Contains(err.Error(), "upgrades gold") {
 		t.Errorf("a field removed under another list: got %v", err)
 	}
 }
@@ -388,7 +388,7 @@ func TestKeepsReleasedNamesLetsAPinGiveAReleasedFieldAnotherName(t *testing.T) {
 		units, items := namesOf(pinned.Fields["units"]), namesOf(pinned.Fields["items"])
 		equal(t, "the names of uhpm, and of unam in both lists, with unam pinned under "+under,
 			[]string{units["uhpm"], units["unam"], items["unam"]}, []string{"health", "title", "title"})
-		if err := keepsReleasedNames(pinned, c.root, pins); err != nil {
+		if err := checkReleasedNamesKept(pinned, c.root, pins); err != nil {
 			t.Errorf("unam pinned under %s: the pins of other names than the released ones are refused: %v", under, err)
 		}
 	}
@@ -411,7 +411,7 @@ func TestKeepsReleasedNamesTakesAndShowsTheIDOfThreeLettersAsItIsWritten(t *test
 		{renamed, overrides{}, `abilities Crs "missChance" would become "chanceToMiss"`},
 		{renamed, overrides{Names: map[string]map[string]string{"abilities": {"Crs": "chanceToMiss"}}}, ""},
 	} {
-		err := keepsReleasedNames(c.current, scratch.root, c.pins)
+		err := checkReleasedNamesKept(c.current, scratch.root, c.pins)
 		switch {
 		case c.want == "" && err != nil:
 			t.Errorf("with the overrides %+v: %v", c.pins, err)
@@ -423,7 +423,7 @@ func TestKeepsReleasedNamesTakesAndShowsTheIDOfThreeLettersAsItIsWritten(t *test
 
 func metadataPinned(t testing.TB, game gameData, pins overrides) *objects.Metadata {
 	t.Helper()
-	fields, _, err := nameFields(game, pins)
+	fields, _, err := buildNamedFields(game, pins)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -434,7 +434,7 @@ func TestKeepsReleasedNamesNamesAMetadataItCannotRead(t *testing.T) {
 	current := &objects.Metadata{Format: 1}
 	asFolder := newCheckout(t)
 	asFolder.folder(metadataPath)
-	err := keepsReleasedNames(current, asFolder.root, overrides{})
+	err := checkReleasedNamesKept(current, asFolder.root, overrides{})
 	const starts = "data/metadata.json: "
 	if err == nil || !strings.HasPrefix(err.Error(), starts) || strings.Contains(err.Error(), asFolder.root) {
 		t.Errorf("a folder at the place of the metadata: got %v", err)
@@ -447,14 +447,14 @@ func TestKeepsReleasedNamesNamesAMetadataItCannotRead(t *testing.T) {
 	} {
 		c := newCheckout(t)
 		c.write(metadataPath, text)
-		if err := keepsReleasedNames(current, c.root, overrides{}); err == nil || !strings.HasPrefix(err.Error(), words) {
+		if err := checkReleasedNamesKept(current, c.root, overrides{}); err == nil || !strings.HasPrefix(err.Error(), words) {
 			t.Errorf("the metadata %q: got %v, want it to start with %q", text, err, words)
 		}
 	}
 	for _, text := range []string{`{}`, `null`, `{"fields": {"elsewhere": [{"id": "gone", "name": "gone"}]}}`} {
 		c := newCheckout(t)
 		c.write(metadataPath, text)
-		if err := keepsReleasedNames(current, c.root, overrides{}); err != nil {
+		if err := checkReleasedNamesKept(current, c.root, overrides{}); err != nil {
 			t.Errorf("the metadata %q: %v", text, err)
 		}
 	}

@@ -131,7 +131,7 @@ func (p *recordedProjects) through(t *testing.T, run recordedRun) []answer {
 	return answers
 }
 
-func startingNothing(t *testing.T) world {
+func startingNothing(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e := env.New(root, log)
 		e.Spawn = func(program string, args []string) error {

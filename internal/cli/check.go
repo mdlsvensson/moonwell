@@ -7,7 +7,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/env"
 )
 
-func runCheck(ctx context.Context, e *env.Env, _ call) error {
+func runCheck(ctx context.Context, e *env.Env, _ commandArgs) error {
 	_, err := build.Check(ctx, e)
 	return err
 }

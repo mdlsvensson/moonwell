@@ -16,7 +16,7 @@ var unitClass = overrides{Names: map[string]map[string]string{"units": {"ucls": 
 
 func namedFields(t testing.TB, change func(files map[string]string)) (map[string][]objects.FieldMeta, []rename) {
 	t.Helper()
-	fields, renames, err := nameFields(readMini(t, change), unitClass)
+	fields, renames, err := buildNamedFields(readMini(t, change), unitClass)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -184,7 +184,7 @@ func TestNameFieldsPutsAFieldOfTheUnitsTableIntoTheListsOfWhatUsesIt(t *testing.
 			`C;X1;Y13;K"unon"`, `C;X5;K"stats"`, `C;X6;K"WESTRING_NONE"`, `C;X7;K"int"`)
 		files[labelsFile] += "WESTRING_NONE=Used by Nothing\r\n"
 	})
-	_, _, err := nameFields(game, overrides{})
+	_, _, err := buildNamedFields(game, overrides{})
 	if err == nil {
 		t.Fatal("the fields were named")
 	}
@@ -327,7 +327,7 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 	game := readMini(t, func(files map[string]string) {
 		files[upgradeFieldsTable] = strings.Replace(files[upgradeFieldsTable], "C;X3;K1\r\n", "C;X3;K\"many\"\r\n", 1)
 	})
-	_, _, err := nameFields(game, overrides{})
+	_, _, err := buildNamedFields(game, overrides{})
 	const want = "war3.w3mod/units/upgrademetadata.slk: gnam: the repeat cell 'many' is not a number"
 	if err == nil || err.Error() != want {
 		t.Errorf("a repeat cell that is no number, beside a name that needs a pin: got %v, want %q", err, want)

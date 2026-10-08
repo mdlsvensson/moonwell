@@ -46,7 +46,7 @@ func objectsByTable(game gameData, bases map[manifest.Category]map[string]object
 	} {
 		for _, row := range table.rows {
 			id := row.Value(table.key)
-			object := objects.BaseMeta{Name: table.name.of(game.strings, id, row)}
+			object := objects.BaseMeta{Name: table.name.nameFor(game.strings, id, row)}
 			if table.levels != "" {
 				count, err := levelCount(row, table.levels)
 				if err != nil {
@@ -91,7 +91,7 @@ func unitsByCategory(game gameData, bases map[manifest.Category]map[string]objec
 		}
 		category, broken := categoryOfUnit(id, stats)
 		exceptions = append(exceptions, broken...)
-		bases[category][id] = objects.BaseMeta{Name: unitName.of(game.strings, id, row)}
+		bases[category][id] = objects.BaseMeta{Name: unitName.nameFor(game.strings, id, row)}
 	}
 	if len(exceptions) > 0 {
 		return errHeroRule(exceptions)
@@ -131,7 +131,7 @@ var (
 	upgradeName = nameSource{keys: []string{"Name"}, comment: "comments", first: true}
 )
 
-func (s nameSource) of(strs ini.File, id string, row slk.Row) string {
+func (s nameSource) nameFor(strs ini.File, id string, row slk.Row) string {
 	for _, key := range s.keys {
 		if name := strs[id][key]; name != "" {
 			if s.first {

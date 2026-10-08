@@ -24,31 +24,31 @@ func Dev(ctx context.Context, e *env.Env, pace Pace) error {
 	if !fsx.IsDir(filepath.Join(e.Root, sourcesDir)) {
 		return errNoSources(e.Root)
 	}
-	watch := ownFolders(e.Root)
+	watch := projectWatchSet(e.Root)
 	files := newWatcher(watch.roots)
 	working := context.WithoutCancel(ctx)
-	pkl := cycle(working, e, "")
-	named := namedFolders(e.Root, startingManifest(working, e, pkl))
+	pkl := runCheckCycle(working, e, "")
+	named := manifestWatchSet(e.Root, loadInitialManifest(working, e, pkl))
 	files.add(named.roots...)
-	e.Log.Info(watch.and(named).line())
+	e.Log.Info(watch.merge(named).describe())
 
 	ticker := time.NewTicker(pace.Interval)
 	defer ticker.Stop()
-	var waiting unchecked
+	var waiting pendingChange
 	for ctx.Err() == nil {
 		select {
 		case <-ctx.Done():
 		case <-ticker.C:
 			changed := files.poll()
-			if ctx.Err() == nil && waiting.due(changed, time.Now(), pace.Debounce) {
-				pkl = cycle(working, e, pkl)
+			if ctx.Err() == nil && waiting.isDue(changed, time.Now(), pace.Debounce) {
+				pkl = runCheckCycle(working, e, pkl)
 			}
 		}
 	}
 	return nil
 }
 
-func cycle(ctx context.Context, e *env.Env, pkl string) (found string) {
+func runCheckCycle(ctx context.Context, e *env.Env, pkl string) (found string) {
 	if pkl == "" {
 		program, err := toolchain.FindPkl(ctx, e)
 		if err != nil {
@@ -57,13 +57,13 @@ func cycle(ctx context.Context, e *env.Env, pkl string) (found string) {
 		}
 		pkl = program
 	}
-	if _, err := check(ctx, e, pkl, true); err != nil {
+	if _, err := runCheck(ctx, e, pkl, true); err != nil {
 		e.Log.Error(diag.Format(err))
 	}
 	return pkl
 }
 
-func startingManifest(ctx context.Context, e *env.Env, pkl string) *manifest.Project {
+func loadInitialManifest(ctx context.Context, e *env.Env, pkl string) *manifest.Project {
 	if pkl == "" {
 		return nil
 	}
@@ -74,19 +74,19 @@ func startingManifest(ctx context.Context, e *env.Env, pkl string) *manifest.Pro
 	return p
 }
 
-type unchecked struct {
-	waits bool
-	since time.Time
+type pendingChange struct {
+	isWaiting bool
+	since     time.Time
 }
 
-func (u *unchecked) due(changed bool, now time.Time, debounce time.Duration) bool {
+func (u *pendingChange) isDue(changed bool, now time.Time, debounce time.Duration) bool {
 	if changed {
-		u.waits, u.since = true, now
+		u.isWaiting, u.since = true, now
 	}
-	if !u.waits || now.Sub(u.since) < debounce {
+	if !u.isWaiting || now.Sub(u.since) < debounce {
 		return false
 	}
-	u.waits = false
+	u.isWaiting = false
 	return true
 }
 

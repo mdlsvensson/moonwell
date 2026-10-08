@@ -26,7 +26,7 @@ func readOverrides(checkout string) (overrides, error) {
 	return pins, nil
 }
 
-func (o overrides) pinned(list, id string) (string, bool) {
+func (o overrides) pinnedName(list, id string) (string, bool) {
 	for _, under := range oneTable(list) {
 		if name, has := o.Names[under][displayRawcode(id)]; has {
 			return name, true
@@ -42,7 +42,7 @@ func oneTable(list string) []string {
 	return []string{list}
 }
 
-func (o overrides) namingNothing(fields map[string][]objects.FieldMeta) []string {
+func (o overrides) unusedPins(fields map[string][]objects.FieldMeta) []string {
 	var problems []string
 	for _, list := range slices.Sorted(maps.Keys(o.Names)) {
 		if !slices.Contains(objects.FieldLists, list) {
@@ -89,7 +89,7 @@ func assignNames(
 	}
 	changes = make([]string, len(records))
 	for i, field := range records {
-		if !friendlyName.MatchString(field.Name) || nameIsTaken(field.Name) {
+		if !friendlyName.MatchString(field.Name) || isReservedName(field.Name) {
 			problems = append(problems, noFriendlyName(list, field, pinned[i]))
 		}
 		changes[i] = changeOf(fromLabel[i], field.Name, pinned[i], renamedBy[i])
@@ -109,7 +109,7 @@ func nameAfterLabels(records []objects.FieldMeta) []string {
 func applyPins(records []objects.FieldMeta, list string, pins overrides) []bool {
 	pinned := make([]bool, len(records))
 	for i := range records {
-		if name, has := pins.pinned(list, records[i].ID); has {
+		if name, has := pins.pinnedName(list, records[i].ID); has {
 			records[i].Name, pinned[i] = name, true
 		}
 	}
@@ -245,8 +245,8 @@ func capitalize(word string) string {
 	return strings.ToUpper(word[:1]) + word[1:]
 }
 
-func keepsReleasedNames(metadata *objects.Metadata, checkout string, pins overrides) error {
-	data, found, err := fsx.ReadFileIfExists(fileIn(checkout, metadataPath))
+func checkReleasedNamesKept(metadata *objects.Metadata, checkout string, pins overrides) error {
+	data, found, err := fsx.ReadFileIfExists(pathIn(checkout, metadataPath))
 	switch {
 	case err != nil:
 		return errInCheckout(checkout, metadataPath, err)
@@ -275,7 +275,7 @@ func changedNames(list string, released, current []objects.FieldMeta, pins overr
 	var problems []string
 	for _, field := range released {
 		name, still := names[field.ID]
-		pinned, _ := pins.pinned(list, field.ID)
+		pinned, _ := pins.pinnedName(list, field.ID)
 		switch {
 		case !still && !slices.Contains(pins.Removed[list], displayRawcode(field.ID)):
 			problems = append(problems, wouldDisappear(list, field))
@@ -294,7 +294,7 @@ var (
 		"public read record super switch this throw trace true typealias unknown vararg when")
 )
 
-func nameIsTaken(name string) bool {
+func isReservedName(name string) bool {
 	return slices.Contains(reservedNames, name) || slices.Contains(pklKeywords, name)
 }
 
@@ -303,7 +303,7 @@ var pklIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 var friendlyName = regexp.MustCompile(`^[a-z][A-Za-z0-9]*$`)
 
 func noSuchList(key, list string) string {
-	return key + "." + list + " is none of the lists of fields (" + listed(objects.FieldLists) +
+	return key + "." + list + " is none of the lists of fields (" + joinNames(objects.FieldLists) +
 		"): correct its name in " + overridesPath
 }
 

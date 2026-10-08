@@ -27,8 +27,8 @@ func RefreshTypes(root string, in Types) (written []string, err error) {
 		return nil, errors.New("editor.RefreshTypes: Types.Natives is nil; pass script.LoadNatives()")
 	}
 	written = []string{}
-	for _, file := range declarationsOf(in) {
-		wrote, err := file.refresh(root)
+	for _, file := range buildDeclarationFiles(in) {
+		wrote, err := file.write(root)
 		if err != nil {
 			return nil, err
 		}
@@ -39,13 +39,13 @@ func RefreshTypes(root string, in Types) (written []string, err error) {
 	return written, nil
 }
 
-type declarations struct {
+type declarationFile struct {
 	path string
 	text string
 }
 
-func declarationsOf(in Types) []declarations {
-	return []declarations{
+func buildDeclarationFiles(in Types) []declarationFile {
+	return []declarationFile{
 		{TypesDir + "/natives.d.lua", renderNatives(in.Natives)},
 		{TypesDir + "/moonwell.d.lua", runtimeDeclarations},
 		{TypesDir + "/objects.d.lua", renderObjects(in.Objects)},
@@ -53,7 +53,7 @@ func declarationsOf(in Types) []declarations {
 	}
 }
 
-func (d declarations) refresh(root string) (wrote bool, err error) {
+func (d declarationFile) write(root string) (wrote bool, err error) {
 	file, err := fsx.SafeJoinNoSymlinks(root, d.path)
 	if err != nil {
 		return false, err
@@ -64,7 +64,7 @@ func (d declarations) refresh(root string) (wrote bool, err error) {
 	return wrote, nil
 }
 
-func isExpected(err error) bool {
+func isDiagError(err error) bool {
 	var expected *diag.Error
 	return errors.As(err, &expected)
 }

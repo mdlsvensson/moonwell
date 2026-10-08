@@ -24,7 +24,7 @@ func writeMetadata(checkout string, args []string, out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	fields, renames, err := nameFields(game, pins)
+	fields, renames, err := buildNamedFields(game, pins)
 	if err != nil {
 		return err
 	}
@@ -33,14 +33,14 @@ func writeMetadata(checkout string, args []string, out io.Writer) error {
 		return err
 	}
 	metadata := &objects.Metadata{Format: 1, Game: version, Fields: fields, Bases: bases}
-	if err := keepsReleasedNames(metadata, checkout, pins); err != nil {
+	if err := checkReleasedNamesKept(metadata, checkout, pins); err != nil {
 		return err
 	}
 	return writeAndReport(checkout, metadata, renames, out)
 }
 
 func writeAndReport(checkout string, metadata *objects.Metadata, renames []rename, out io.Writer) error {
-	if err := os.WriteFile(fileIn(checkout, metadataPath), []byte(renderMetadata(metadata)), 0o666); err != nil {
+	if err := os.WriteFile(pathIn(checkout, metadataPath), []byte(renderMetadata(metadata)), 0o666); err != nil {
 		return errInCheckout(checkout, metadataPath, err)
 	}
 	var fields, bases []string

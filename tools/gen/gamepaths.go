@@ -29,7 +29,7 @@ func writeGamePaths(checkout string, args []string, out io.Writer) error {
 		return errNoGamePaths()
 	}
 	text := renderGamePaths(paths, version)
-	if err := os.WriteFile(fileIn(checkout, gamePathsPath), []byte(text), 0o666); err != nil {
+	if err := os.WriteFile(pathIn(checkout, gamePathsPath), []byte(text), 0o666); err != nil {
 		return errInCheckout(checkout, gamePathsPath, err)
 	}
 	fmt.Fprintln(out, "wrote "+gamePathsPath+": "+strconv.Itoa(len(paths))+" paths.")

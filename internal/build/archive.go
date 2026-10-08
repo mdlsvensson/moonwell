@@ -17,52 +17,52 @@ import (
 
 const mapSuffix = ".w3x"
 
-func clearedArchive(p *manifest.Project) (place, error) {
-	out, err := archiveOf(p)
+func prepareArchivePath(p *manifest.Project) (outputFile, error) {
+	out, err := archivePath(p)
 	if err != nil {
-		return place{}, err
+		return outputFile{}, err
 	}
 	if err := removeArchive(out); err != nil {
-		return place{}, err
+		return outputFile{}, err
 	}
 	return out, nil
 }
 
-func packInto(e *env.Env, plan *Result, out place) error {
+func packArchive(e *env.Env, plan *Result, out outputFile) error {
 	e.Log.Info("Packing archive...")
-	archive, err := pack(plan.Map, strings.TrimSuffix(path.Base(out.label), mapSuffix))
+	archive, err := packMap(plan.Map, strings.TrimSuffix(path.Base(out.displayPath), mapSuffix))
 	if err != nil {
 		return err
 	}
 	if err := writeArchive(out, archive); err != nil {
 		return err
 	}
-	e.Log.Info("Built " + out.label + " (" + strconv.Itoa(len(plan.Program.Modules)) + " module(s)).")
+	e.Log.Info("Built " + out.displayPath + " (" + strconv.Itoa(len(plan.Program.Modules)) + " module(s)).")
 	return nil
 }
 
-func archiveOf(p *manifest.Project) (place, error) {
-	folder, err := mapFolder(p)
+func archivePath(p *manifest.Project) (outputFile, error) {
+	folder, err := sourceMapDir(p)
 	if err != nil {
-		return place{}, err
+		return outputFile{}, err
 	}
-	into, err := buildFolder(p, folder)
+	into, err := resolveBuildDir(p, folder)
 	if err != nil {
-		return place{}, err
+		return outputFile{}, err
 	}
-	out, err := placeOf(p.Root, into+"/"+folder)
+	out, err := newOutputFile(p.Root, into+"/"+folder)
 	if err != nil {
-		return place{}, err
+		return outputFile{}, err
 	}
-	if fsx.IsDir(out.file) {
-		return place{}, errOutputIsAFolder(p.ManifestName, out.label)
+	if fsx.IsDir(out.fullPath) {
+		return outputFile{}, errOutputIsAFolder(p.ManifestName, out.displayPath)
 	}
 	return out, nil
 }
 
-func buildFolder(p *manifest.Project, folder string) (string, error) {
+func resolveBuildDir(p *manifest.Project, folder string) (string, error) {
 	written := p.Build.Folder
-	parts, fault := readFolder(written)
+	parts, fault := parseDir(written)
 	switch fault {
 	case leavesItsFolder:
 		asWritten := strings.TrimRight(strings.ReplaceAll(written, `\`, "/"), "/")
@@ -80,17 +80,17 @@ func buildFolder(p *manifest.Project, folder string) (string, error) {
 }
 
 func keptFolder(parts []string) (kept string, found bool) {
-	first := lowerASCII(parts[0])
+	first := toLowerASCII(parts[0])
 	switch {
 	case first == mapsDir, first == sourcesDir:
 		return first, true
-	case len(parts) > 1 && first+"/"+lowerASCII(parts[1]) == stageDir:
+	case len(parts) > 1 && first+"/"+toLowerASCII(parts[1]) == stageDir:
 		return stageDir, true
 	}
 	return "", false
 }
 
-func lowerASCII(text string) string {
+func toLowerASCII(text string) string {
 	lowered := []byte(text)
 	for at, char := range lowered {
 		if char >= 'A' && char <= 'Z' {
@@ -100,8 +100,8 @@ func lowerASCII(text string) string {
 	return string(lowered)
 }
 
-func removeArchive(at place) error {
-	err := fsx.RemoveFile(at.file)
+func removeArchive(at outputFile) error {
+	err := fsx.RemoveFile(at.fullPath)
 	if err == nil {
 		return nil
 	}
@@ -109,28 +109,28 @@ func removeArchive(at place) error {
 	if errors.As(err, &held) && held.Cause != nil {
 		err = held.Cause
 	}
-	return errNotRemoved(at.label, err)
+	return errNotRemoved(at.displayPath, err)
 }
 
 const unfinished = ".tmp"
 
-func writeArchive(at place, archive []byte) error {
-	if err := os.MkdirAll(filepath.Dir(at.file), 0o777); err != nil {
-		return errArchiveNotWritten(at.label, err)
+func writeArchive(at outputFile, archive []byte) error {
+	if err := os.MkdirAll(filepath.Dir(at.fullPath), 0o777); err != nil {
+		return errArchiveNotWritten(at.displayPath, err)
 	}
-	beside := at.file + unfinished
-	err := writeAnew(beside, archive)
+	beside := at.fullPath + unfinished
+	err := writeFileAtomic(beside, archive)
 	if err == nil {
-		err = os.Rename(beside, at.file)
+		err = os.Rename(beside, at.fullPath)
 	}
 	if err != nil {
 		_ = os.Remove(beside)
-		return errArchiveNotWritten(at.label, err)
+		return errArchiveNotWritten(at.displayPath, err)
 	}
 	return nil
 }
 
-func writeAnew(file string, data []byte) error {
+func writeFileAtomic(file string, data []byte) error {
 	if err := os.Remove(file); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}

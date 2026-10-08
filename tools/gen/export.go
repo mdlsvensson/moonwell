@@ -73,14 +73,14 @@ type gameData struct {
 	upgrades  []slk.Row
 }
 
-func readExport(folder string) (gameData, error) {
-	from := export{folder}
+func readExport(dir string) (gameData, error) {
+	from := export{dir}
 	var game gameData
 	var err error
-	if game.labels, err = from.labels(); err != nil {
+	if game.labels, err = from.readLabels(); err != nil {
 		return gameData{}, err
 	}
-	if game.strings, err = from.strings(); err != nil {
+	if game.strings, err = from.readStrings(); err != nil {
 		return gameData{}, err
 	}
 	for _, table := range []struct {
@@ -98,25 +98,25 @@ func readExport(folder string) (gameData, error) {
 		{&game.buffs, buffsTable, buffKey},
 		{&game.upgrades, upgradesTable, upgradeKey},
 	} {
-		if *table.rows, err = from.rows(table.path, table.key); err != nil {
+		if *table.rows, err = from.readRows(table.path, table.key); err != nil {
 			return gameData{}, err
 		}
 	}
 	return game, nil
 }
 
-type export struct{ folder string }
+type export struct{ dir string }
 
-func (e export) labels() (ini.Section, error) {
-	text, err := e.text(labelsFile)
+func (e export) readLabels() (ini.Section, error) {
+	text, err := e.readText(labelsFile)
 	if err != nil {
 		return nil, err
 	}
 	return ini.Parse(text)["WorldEditStrings"], nil
 }
 
-func (e export) strings() (ini.File, error) {
-	names, err := e.files(stringsFolder)
+func (e export) readStrings() (ini.File, error) {
+	names, err := e.listFiles(stringsFolder)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (e export) strings() (ini.File, error) {
 		if !strings.HasSuffix(strings.ToLower(name), stringsSuffix) {
 			continue
 		}
-		text, err := e.text(stringsFolder + "/" + name)
+		text, err := e.readText(stringsFolder + "/" + name)
 		if err != nil {
 			return nil, err
 		}
@@ -134,8 +134,8 @@ func (e export) strings() (ini.File, error) {
 	return all, nil
 }
 
-func (e export) rows(path, key string) ([]slk.Row, error) {
-	text, err := e.text(path)
+func (e export) readRows(path, key string) ([]slk.Row, error) {
+	text, err := e.readText(path)
 	if err != nil {
 		return nil, err
 	}
@@ -157,8 +157,8 @@ func (e export) rows(path, key string) ([]slk.Row, error) {
 	return rows, nil
 }
 
-func (e export) text(path string) (string, error) {
-	file, err := e.find(path)
+func (e export) readText(path string) (string, error) {
+	file, err := e.findFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -169,8 +169,8 @@ func (e export) text(path string) (string, error) {
 	return fsx.DecodeText(data), nil
 }
 
-func (e export) files(path string) ([]string, error) {
-	folder, err := e.find(path)
+func (e export) listFiles(path string) ([]string, error) {
+	folder, err := e.findFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -187,19 +187,19 @@ func (e export) files(path string) ([]string, error) {
 	return names, nil
 }
 
-func (e export) find(path string) (string, error) {
-	found := e.folder
+func (e export) findFile(path string) (string, error) {
+	found := e.dir
 	for step := range strings.SplitSeq(path, "/") {
-		name, has := entryNamed(found, step)
+		name, has := findEntry(found, step)
 		if !has {
-			return "", errMissingFromExport(path, e.folder)
+			return "", errMissingFromExport(path, e.dir)
 		}
 		found = filepath.Join(found, name)
 	}
 	return found, nil
 }
 
-func entryNamed(folder, name string) (spelled string, has bool) {
+func findEntry(folder, name string) (spelled string, has bool) {
 	entries, _ := os.ReadDir(folder)
 	for _, entry := range entries {
 		if strings.ToLower(entry.Name()) == strings.ToLower(name) {

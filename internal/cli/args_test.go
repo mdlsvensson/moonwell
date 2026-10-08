@@ -13,7 +13,7 @@ import (
 type reading struct {
 	code   int
 	ran    string
-	got    call
+	got    commandArgs
 	output string
 	stdout string
 }
@@ -24,22 +24,22 @@ func readLine(t *testing.T, args ...string) reading {
 	table := slices.Clone(commands)
 	for i := range table {
 		name := table[i].name
-		table[i].run = func(_ context.Context, _ *env.Env, c call) error {
+		table[i].run = func(_ context.Context, _ *env.Env, c commandArgs) error {
 			c.print = nil
 			result.ran, result.got = name, c
 			return nil
 		}
 	}
 	var lines, printed []string
-	r := &running{
-		ctx:     background,
-		outside: func(string, *env.Logger) *env.Env { return nil },
-		table:   table,
-		root:    t.TempDir(),
-		write:   func(line string) { lines = append(lines, line) },
-		print:   func(text string) { printed = append(printed, text) },
+	r := &invocation{
+		ctx:      background,
+		newEnv:   func(string, *env.Logger) *env.Env { return nil },
+		commands: table,
+		workDir:  t.TempDir(),
+		write:    func(line string) { lines = append(lines, line) },
+		print:    func(text string) { printed = append(printed, text) },
 	}
-	result.code = r.carryOut(args)
+	result.code = r.execute(args)
 	result.output, result.stdout = strings.Join(lines, "\n"), strings.Join(printed, "\n")
 	return result
 }
@@ -48,32 +48,32 @@ func TestAWellFormedLineRunsItsCommandWithWhatItSaid(t *testing.T) {
 	for _, c := range []struct {
 		args []string
 		ran  string
-		want call
+		want commandArgs
 	}{
-		{[]string{"build"}, "build", call{}},
-		{[]string{"check"}, "check", call{}},
-		{[]string{"assets:check"}, "assets:check", call{}},
+		{[]string{"build"}, "build", commandArgs{}},
+		{[]string{"check"}, "check", commandArgs{}},
+		{[]string{"assets:check"}, "assets:check", commandArgs{}},
 
-		{[]string{"build", "--minify"}, "build", call{minify: true}},
-		{[]string{"init", "my-map", "--link"}, "init", call{arguments: []string{"my-map"}, link: true}},
-		{[]string{"init", "--link", "my-map"}, "init", call{arguments: []string{"my-map"}, link: true}},
+		{[]string{"build", "--minify"}, "build", commandArgs{minify: true}},
+		{[]string{"init", "my-map", "--link"}, "init", commandArgs{arguments: []string{"my-map"}, link: true}},
+		{[]string{"init", "--link", "my-map"}, "init", commandArgs{arguments: []string{"my-map"}, link: true}},
 
-		{[]string{"build", "--entry", "src/a.yue", "--minify"}, "build", call{entry: "src/a.yue", minify: true}},
-		{[]string{"test", "--entry=src/a.yue"}, "test", call{entry: "src/a.yue"}},
-		{[]string{"test", "--entry", `src\game\init.yue`}, "test", call{entry: `src\game\init.yue`}},
+		{[]string{"build", "--entry", "src/a.yue", "--minify"}, "build", commandArgs{entry: "src/a.yue", minify: true}},
+		{[]string{"test", "--entry=src/a.yue"}, "test", commandArgs{entry: "src/a.yue"}},
+		{[]string{"test", "--entry", `src\game\init.yue`}, "test", commandArgs{entry: `src\game\init.yue`}},
 
-		{[]string{"build", "--minify", "--minify"}, "build", call{minify: true}},
-		{[]string{"build", "--entry", "src/a.yue", "--entry", "src/b.yue"}, "build", call{entry: "src/b.yue"}},
-		{[]string{"build", "--minify=true"}, "build", call{minify: true}},
-		{[]string{"build", "--minify=false"}, "build", call{}},
-		{[]string{"build", "--minify", "--minify=false"}, "build", call{}},
+		{[]string{"build", "--minify", "--minify"}, "build", commandArgs{minify: true}},
+		{[]string{"build", "--entry", "src/a.yue", "--entry", "src/b.yue"}, "build", commandArgs{entry: "src/b.yue"}},
+		{[]string{"build", "--minify=true"}, "build", commandArgs{minify: true}},
+		{[]string{"build", "--minify=false"}, "build", commandArgs{}},
+		{[]string{"build", "--minify", "--minify=false"}, "build", commandArgs{}},
 
-		{[]string{"assets:paths"}, "assets:paths", call{}},
-		{[]string{"assets:paths", "units/Hero.mdx"}, "assets:paths", call{arguments: []string{"units/Hero.mdx"}}},
-		{[]string{"assets:paths", "-"}, "assets:paths", call{arguments: []string{"-"}}},
-		{[]string{"assets:paths", "--", "--odd.mdx"}, "assets:paths", call{arguments: []string{"--odd.mdx"}}},
-		{[]string{"init", "--link", "--", "-v"}, "init", call{arguments: []string{"-v"}, link: true}},
-		{[]string{"build", "--minify", "--"}, "build", call{minify: true}},
+		{[]string{"assets:paths"}, "assets:paths", commandArgs{}},
+		{[]string{"assets:paths", "units/Hero.mdx"}, "assets:paths", commandArgs{arguments: []string{"units/Hero.mdx"}}},
+		{[]string{"assets:paths", "-"}, "assets:paths", commandArgs{arguments: []string{"-"}}},
+		{[]string{"assets:paths", "--", "--odd.mdx"}, "assets:paths", commandArgs{arguments: []string{"--odd.mdx"}}},
+		{[]string{"init", "--link", "--", "-v"}, "init", commandArgs{arguments: []string{"-v"}, link: true}},
+		{[]string{"build", "--minify", "--"}, "build", commandArgs{minify: true}},
 	} {
 		got := readLine(t, c.args...)
 		same := got.got.entry == c.want.entry && got.got.minify == c.want.minify && got.got.link == c.want.link &&

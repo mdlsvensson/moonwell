@@ -45,11 +45,11 @@ var (
 func Parse(script, source string) (File, error) {
 	r := reader{source: source, file: File{Types: []Type{}, Functions: []Function{}, Globals: []Global{}}}
 	for index, raw := range strings.Split(script, "\n") {
-		if err := r.read(index+1, raw); err != nil {
+		if err := r.readLine(index+1, raw); err != nil {
 			return File{}, err
 		}
 	}
-	if err := r.ended(); err != nil {
+	if err := r.finish(); err != nil {
 		return File{}, err
 	}
 	return r.file, nil
@@ -68,7 +68,7 @@ type reader struct {
 	bodyStart int
 }
 
-func (r *reader) read(number int, raw string) error {
+func (r *reader) readLine(lineNumber int, raw string) error {
 	line := trim(stripComment(raw))
 	switch {
 	case line == "":
@@ -77,21 +77,21 @@ func (r *reader) read(number int, raw string) error {
 			r.place = atTheTop
 		}
 	case r.place == inGlobals:
-		return r.global(number, raw, line)
+		return r.readGlobal(lineNumber, raw, line)
 	default:
-		return r.declaration(number, raw, line)
+		return r.readDeclaration(lineNumber, raw, line)
 	}
 	return nil
 }
 
-func (r *reader) global(number int, raw, line string) error {
+func (r *reader) readGlobal(lineNumber int, raw, line string) error {
 	if line == "endglobals" {
 		r.place = atTheTop
 		return nil
 	}
 	match := globalLine.FindStringSubmatch(line)
 	if match == nil {
-		return errCannotRead(r.source, number, raw)
+		return errCannotRead(r.source, lineNumber, raw)
 	}
 	r.file.Globals = append(r.file.Globals, Global{
 		Name: match[4], Source: r.source, Type: match[2], Constant: match[1] != "", Array: match[3] != "",
@@ -99,7 +99,7 @@ func (r *reader) global(number int, raw, line string) error {
 	return nil
 }
 
-func (r *reader) declaration(number int, raw, line string) error {
+func (r *reader) readDeclaration(lineNumber int, raw, line string) error {
 	if line == "globals" {
 		r.place = inGlobals
 		return nil
@@ -110,22 +110,22 @@ func (r *reader) declaration(number int, raw, line string) error {
 	}
 	header := headerLine.FindStringSubmatch(line)
 	if header == nil {
-		return errCannotRead(r.source, number, raw)
+		return errCannotRead(r.source, lineNumber, raw)
 	}
 	params, ok := parseParams(header[4])
 	if !ok {
-		return errCannotRead(r.source, number, raw)
+		return errCannotRead(r.source, lineNumber, raw)
 	}
 	r.file.Functions = append(r.file.Functions, Function{
 		Name: header[3], Source: r.source, Constant: header[1] != "", Params: params, Returns: header[5],
 	})
 	if header[2] == "function" {
-		r.place, r.bodyStart = inABody, number
+		r.place, r.bodyStart = inABody, lineNumber
 	}
 	return nil
 }
 
-func (r *reader) ended() error {
+func (r *reader) finish() error {
 	switch r.place {
 	case inABody:
 		return errNoEndFunction(r.source, r.bodyStart)

@@ -14,7 +14,7 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-func nameFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, []rename, error) {
+func buildNamedFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, []rename, error) {
 	fields := map[string][]objects.FieldMeta{}
 	for _, list := range objects.FieldLists {
 		fields[list] = []objects.FieldMeta{}
@@ -42,7 +42,7 @@ func nameFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, 
 			}
 		}
 	}
-	problems = append(problems, pins.namingNothing(fields)...)
+	problems = append(problems, pins.unusedPins(fields)...)
 	if len(problems) > 0 {
 		return nil, nil, errNoFriendlyNames(problems)
 	}

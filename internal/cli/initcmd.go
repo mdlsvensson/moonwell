@@ -18,14 +18,14 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
-func runInit(ctx context.Context, e *env.Env, c call) error {
+func runInit(ctx context.Context, e *env.Env, c commandArgs) error {
 	arguments := c.arguments
 	if len(arguments) == 0 || arguments[0] == "" {
 		return errInitNeedsAFolder()
 	}
 	schema := ""
 	if c.link {
-		checkout, err := checkoutAbove(e.Root)
+		checkout, err := findCheckout(e.Root)
 		if err != nil {
 			return err
 		}
@@ -36,11 +36,11 @@ func runInit(ctx context.Context, e *env.Env, c call) error {
 
 func createProject(ctx context.Context, e *env.Env, dir, schema string) error {
 	target := fsx.ResolvePath(e.Root, dir)
-	existed, err := newOrEmpty(target, dir)
+	existed, err := checkNewOrEmpty(target, dir)
 	if err != nil {
 		return err
 	}
-	local, err := linkTo(target, schema)
+	local, err := schemaLink(target, schema)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func createProject(ctx context.Context, e *env.Env, dir, schema string) error {
 	}
 	err = writeProject(target, dir, local)
 	if err == nil {
-		err = resolve(ctx, e, pkl, target, dir)
+		err = resolvePklProject(ctx, e, pkl, target, dir)
 	}
 	if err != nil {
 		undoInit(target, existed)
@@ -61,11 +61,11 @@ func createProject(ctx context.Context, e *env.Env, dir, schema string) error {
 	return nil
 }
 
-func newOrEmpty(target, dir string) (existed bool, err error) {
+func checkNewOrEmpty(target, dir string) (existed bool, err error) {
 	info, err := os.Stat(target)
 	switch {
 	case errors.Is(err, fs.ErrNotExist), errors.Is(err, syscall.ENOTDIR):
-		return false, refuseLinkToNothing(target, dir)
+		return false, checkNotBrokenSymlink(target, dir)
 	case err != nil:
 		return false, errFolderNotRead(dir, err)
 	case !info.IsDir():
@@ -81,7 +81,7 @@ func newOrEmpty(target, dir string) (existed bool, err error) {
 	return true, nil
 }
 
-func refuseLinkToNothing(target, dir string) error {
+func checkNotBrokenSymlink(target, dir string) error {
 	if info, err := fsx.Lstat(target); err == nil && info != nil {
 		return errNotAFolder(dir)
 	}
@@ -112,16 +112,16 @@ func writeProjectFile(target, dir string, file moonwell.TemplateFile) error {
 		err = os.WriteFile(path, file.Data, 0o666)
 	}
 	if err != nil {
-		return errNotWritten(fileOf(dir, file.Path), err)
+		return errNotWritten(fullPathOf(dir, file.Path), err)
 	}
 	return nil
 }
 
-func fileOf(dir, name string) string {
+func fullPathOf(dir, name string) string {
 	return fsx.ToSlash(filepath.Join(dir, filepath.FromSlash(name)))
 }
 
-func resolve(ctx context.Context, e *env.Env, pkl, target, dir string) error {
+func resolvePklProject(ctx context.Context, e *env.Env, pkl, target, dir string) error {
 	result, err := e.Run(ctx, pkl, []string{"project", "resolve"}, env.RunOptions{Dir: target})
 	if err != nil {
 		return err
@@ -148,7 +148,7 @@ func undoInit(target string, existed bool) {
 
 var moduleLine = regexp.MustCompile(`(?m)^module\s+github\.com/mdlsvensson/moonwell\s*$`)
 
-func checkoutAbove(start string) (string, error) {
+func findCheckout(start string) (string, error) {
 	for dir := start; ; dir = filepath.Dir(dir) {
 		if data, err := os.ReadFile(filepath.Join(dir, "go.mod")); err == nil && moduleLine.Match(data) {
 			return dir, nil
@@ -159,14 +159,14 @@ func checkoutAbove(start string) (string, error) {
 	}
 }
 
-func linkTo(target, schema string) (string, error) {
+func schemaLink(target, schema string) (string, error) {
 	if schema == "" {
 		return "", nil
 	}
-	return linkPath(target, schema)
+	return schemaLinkPath(target, schema)
 }
 
-func linkPath(target, schema string) (string, error) {
+func schemaLinkPath(target, schema string) (string, error) {
 	inside, err := filepath.Rel(target, schema)
 	if err != nil || filepath.IsAbs(inside) {
 		return "", errAnotherDrive(schema)
@@ -209,7 +209,7 @@ func errNotWritten(file string, cause error) error {
 func errNotResolved(dir, output string) error {
 	return &diag.Error{
 		Msg:  "pkl project resolve failed:\n" + fsx.TrimASCIISpace(output),
-		File: fileOf(dir, "PklProject"),
+		File: fullPathOf(dir, "PklProject"),
 		Hint: "Pkl says why above. Without --link it fetches the moonwell package from GitHub: check the network " +
 			"connection, then run init again.",
 	}

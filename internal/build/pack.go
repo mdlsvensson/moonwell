@@ -16,8 +16,8 @@ const infoName = "war3map.w3i"
 
 var archiveMetadata = map[string]bool{"(attributes)": true, "(listfile)": true, "(signature)": true}
 
-func pack(view *mapdir.Folder, name string) ([]byte, error) {
-	format, err := formatOf(view)
+func packMap(view *mapdir.Folder, name string) ([]byte, error) {
+	format, err := readInfoHeader(view)
 	if err != nil {
 		return nil, err
 	}
@@ -34,12 +34,12 @@ func pack(view *mapdir.Folder, name string) ([]byte, error) {
 	}
 	archive, err := mpq.Write(files, options)
 	if err != nil {
-		return nil, named(err, view.DisplayPath(""))
+		return nil, withFile(err, view.DisplayPath(""))
 	}
 	return archive, nil
 }
 
-func formatOf(view *mapdir.Folder) (w3i.Header, error) {
+func readInfoHeader(view *mapdir.Folder) (w3i.Header, error) {
 	info, found, err := view.Read(infoName)
 	switch {
 	case err != nil:
@@ -53,7 +53,7 @@ func formatOf(view *mapdir.Folder) (w3i.Header, error) {
 func archiveFiles(view *mapdir.Folder) ([]mpq.File, error) {
 	var files []mpq.File
 	for _, name := range view.Files() {
-		if archiveMetadata[lowerASCII(name)] {
+		if archiveMetadata[toLowerASCII(name)] {
 			continue
 		}
 		data, found, err := view.Read(name)
@@ -68,7 +68,7 @@ func archiveFiles(view *mapdir.Folder) ([]mpq.File, error) {
 	return files, nil
 }
 
-func named(err error, file string) error {
+func withFile(err error, file string) error {
 	var failure *diag.Error
 	if !errors.As(err, &failure) {
 		return err

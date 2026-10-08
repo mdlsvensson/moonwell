@@ -13,28 +13,28 @@ import (
 
 const lockName = distDir + "/.lock"
 
-type holding struct {
+type heldLock struct {
 	file string
 }
 
 var held = struct {
 	sync.Mutex
-	locks map[string]*holding
-}{locks: map[string]*holding{}}
+	locks map[string]*heldLock
+}{locks: map[string]*heldLock{}}
 
-func TakeLock(root string) (release func(), err error) {
-	file, err := lockPlace(root)
+func AcquireLock(root string) (release func(), err error) {
+	file, err := lockPath(root)
 	if err != nil {
 		return nil, err
 	}
-	mine, err := take(file)
+	mine, err := acquireLock(file)
 	if err != nil {
 		return nil, err
 	}
-	return func() { giveBack(mine) }, nil
+	return func() { releaseLock(mine) }, nil
 }
 
-func ReleaseHeld() {
+func ReleaseHeldLocks() {
 	held.Lock()
 	defer held.Unlock()
 	for file := range held.locks {
@@ -43,24 +43,24 @@ func ReleaseHeld() {
 	clear(held.locks)
 }
 
-func lockPlace(root string) (string, error) {
-	dir, err := outputAt(root, distDir)
+func lockPath(root string) (string, error) {
+	dir, err := outputPath(root, distDir)
 	if err != nil {
 		return "", err
 	}
 	if err := os.MkdirAll(dir, 0o777); err != nil {
 		return "", errNoDist(err)
 	}
-	return outputAt(root, lockName)
+	return outputPath(root, lockName)
 }
 
-func take(file string) (*holding, error) {
+func acquireLock(file string) (*heldLock, error) {
 	held.Lock()
 	defer held.Unlock()
 	if err := writeLock(file); err != nil {
 		return nil, err
 	}
-	mine := &holding{file: file}
+	mine := &heldLock{file: file}
 	held.locks[file] = mine
 	return mine, nil
 }
@@ -69,7 +69,7 @@ func writeLock(file string) error {
 	lock, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
 	switch {
 	case errors.Is(err, fs.ErrExist), err != nil && fsx.IsDir(file):
-		return errHeld(holderOf(file))
+		return errHeld(readLockHolder(file))
 	case err != nil:
 		return errLockNotWritten(err)
 	}
@@ -84,7 +84,7 @@ func writeLock(file string) error {
 	return nil
 }
 
-func holderOf(file string) string {
+func readLockHolder(file string) string {
 	data, err := os.ReadFile(file)
 	if holder := fsx.TrimASCIISpace(string(data)); err == nil && holder != "" {
 		return holder
@@ -92,7 +92,7 @@ func holderOf(file string) string {
 	return "unknown"
 }
 
-func giveBack(mine *holding) {
+func releaseLock(mine *heldLock) {
 	held.Lock()
 	defer held.Unlock()
 	if held.locks[mine.file] == mine {

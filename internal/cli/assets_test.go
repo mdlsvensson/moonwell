@@ -87,7 +87,7 @@ func TestPklAssetsAreListedByThePathsTheyAreWrittenUnder(t *testing.T) {
 	}
 }
 
-func stoppingAfterTheManifest(t *testing.T, stop context.CancelFunc) world {
+func stoppingAfterTheManifest(t *testing.T, stop context.CancelFunc) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _, _ := pklOnly(t, root)
 		e.Log = log

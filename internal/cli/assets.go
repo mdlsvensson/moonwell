@@ -14,29 +14,29 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 )
 
-func runAssetsCheck(ctx context.Context, e *env.Env, _ call) error {
-	return importAssets(ctx, e, false)
+func runAssetsCheck(ctx context.Context, e *env.Env, _ commandArgs) error {
+	return syncOrCheckAssets(ctx, e, false)
 }
 
-func runAssetsSync(ctx context.Context, e *env.Env, _ call) error {
-	return importAssets(ctx, e, true)
+func runAssetsSync(ctx context.Context, e *env.Env, _ commandArgs) error {
+	return syncOrCheckAssets(ctx, e, true)
 }
 
-func importAssets(ctx context.Context, e *env.Env, write bool) error {
+func syncOrCheckAssets(ctx context.Context, e *env.Env, write bool) error {
 	p, err := build.Load(ctx, e)
 	if err != nil {
 		return err
 	}
-	release, err := build.TakeLock(e.Root)
+	release, err := build.AcquireLock(e.Root)
 	if err != nil {
 		return err
 	}
 	defer release()
-	source, err := build.Source(p)
+	source, err := build.OpenSource(p)
 	if err != nil {
 		return err
 	}
-	if err := savedWithLuaScript(source); err != nil {
+	if err := checkLuaScriptMap(source); err != nil {
 		return err
 	}
 	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
@@ -47,18 +47,18 @@ func importAssets(ctx context.Context, e *env.Env, write bool) error {
 	if err != nil {
 		return err
 	}
-	sayImport(e.Log, source, plan, replaced)
+	logAssetPlan(e.Log, source, plan, replaced)
 	if !write {
-		sayNothingWritten(e.Log, plan)
+		logNothingWritten(e.Log, plan)
 		return nil
 	}
-	return writeImport(ctx, e, p, source, plan)
+	return writeAssets(ctx, e, p, source, plan)
 }
 
-func writeImport(
+func writeAssets(
 	ctx context.Context, e *env.Env, p *manifest.Project, source *mapdir.Folder, plan *assets.Result,
 ) error {
-	stateFile, err := build.OwnershipFile(p)
+	stateFile, err := build.AssetStatePath(p)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func writeImport(
 	return nil
 }
 
-func savedWithLuaScript(source *mapdir.Folder) error {
+func checkLuaScriptMap(source *mapdir.Folder) error {
 	for _, name := range []string{"war3map.lua", "war3map.w3i"} {
 		if !source.HasFile(name) {
 			return errMapLacks(name, source.DisplayPath(""))
@@ -79,17 +79,17 @@ func savedWithLuaScript(source *mapdir.Folder) error {
 	return nil
 }
 
-func syncedAssets(
+func collectSyncedAssets(
 	ctx context.Context, e *env.Env, p *manifest.Project,
 ) (found []assets.Asset, replaced []string, err error) {
 	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
 	if err != nil {
 		return nil, nil, err
 	}
-	return build.Assets(p, synced)
+	return build.CollectAssets(p, synced)
 }
 
-func sayImport(log *env.Logger, source *mapdir.Folder, plan *assets.Result, replaced []string) {
+func logAssetPlan(log *env.Logger, source *mapdir.Folder, plan *assets.Result, replaced []string) {
 	for _, asset := range plan.Assets {
 		from := asset.Source
 		if asset.Library != "" {
@@ -109,7 +109,7 @@ func sayImport(log *env.Logger, source *mapdir.Folder, plan *assets.Result, repl
 	}
 }
 
-func sayNothingWritten(log *env.Logger, plan *assets.Result) {
+func logNothingWritten(log *env.Logger, plan *assets.Result) {
 	log.Info("Checked " + strconv.Itoa(len(plan.Assets)) + " asset(s); assets:sync would make " +
 		strconv.Itoa(len(plan.Changes)) + " file change(s). Nothing was written.")
 }

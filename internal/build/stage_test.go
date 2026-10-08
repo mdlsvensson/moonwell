@@ -24,7 +24,7 @@ func (s *standIn) mapAt(folder string, blocks ...string) {
 	s.evaluatesTo(append(blocks, `"map":{"folder":"`+folder+`","entry":"src/main.yue"}`)...)
 }
 
-func stagedOf(t testing.TB, s *standIn, plan *Result) place {
+func stagedOf(t testing.TB, s *standIn, plan *Result) outputFile {
 	t.Helper()
 	at, err := stage(s.env, s.project, plan)
 	if err != nil {
@@ -41,10 +41,10 @@ func TestStageWritesThePlannedMapInPlaceOfAnEarlierStageAndSaysWhatItHolds(t *te
 	source := testkit.Snapshot(t, s.at("maps"))
 	plan := planOf(t, s, Options{})
 	at := stagedOf(t, s, plan)
-	if at.label != "dist/stage/map.w3x" || at.file != s.at("dist/stage/map.w3x") {
+	if at.displayPath != "dist/stage/map.w3x" || at.fullPath != s.at("dist/stage/map.w3x") {
 		t.Errorf("staged at %+v", at)
 	}
-	staged := filesBelow(t, at.file)
+	staged := filesBelow(t, at.fullPath)
 	for _, name := range plan.Map.Files() {
 		if staged[name] != heldBy(t, plan.Map, name) {
 			t.Errorf("the stage's %s is not the planned one", name)

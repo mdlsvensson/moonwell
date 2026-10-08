@@ -9,7 +9,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/objects"
 )
 
-func runObjectsEval(ctx context.Context, e *env.Env, c call) error {
+func runObjectsEval(ctx context.Context, e *env.Env, c commandArgs) error {
 	objs, err := planObjects(ctx, e)
 	if err != nil {
 		return err
@@ -18,7 +18,7 @@ func runObjectsEval(ctx context.Context, e *env.Env, c call) error {
 	return nil
 }
 
-func runObjectsCheck(ctx context.Context, e *env.Env, _ call) error {
+func runObjectsCheck(ctx context.Context, e *env.Env, _ commandArgs) error {
 	objs, err := planObjects(ctx, e)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func planObjects(ctx context.Context, e *env.Env) (*objects.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	source, err := build.Source(p)
+	source, err := build.OpenSource(p)
 	if err != nil {
 		return nil, err
 	}

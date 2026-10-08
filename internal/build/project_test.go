@@ -88,7 +88,7 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 			}
 			s.project.Map.Folder = tt.folder
 			before := testkit.Snapshot(t, s.root)
-			source, err := Source(s.project)
+			source, err := OpenSource(s.project)
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}
@@ -135,7 +135,7 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 			s.folder("outside")
 			s.folder("maps/a")
 			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
-			source, err := Source(s.project)
+			source, err := OpenSource(s.project)
 			e := asError(t, err, "map.folder "+tt.folder)
 			if source != nil || e.File != localManifest || e.Cause != nil || !strings.Contains(e.Msg, tt.words) ||
 				!strings.Contains(e.Msg, `"`+tt.folder+`"`) || !strings.Contains(e.Hint, "such as map.w3x") {
@@ -162,7 +162,7 @@ func TestSourceNamesTheManifestForAMapFolderThatIsNotThere(t *testing.T) {
 			s := newStandIn(t)
 			tt.arrange(s)
 			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
-			source, err := Source(s.project)
+			source, err := OpenSource(s.project)
 			e := asError(t, err, tt.name)
 			if source != nil || e.File != localManifest || e.Cause != nil ||
 				!strings.Contains(e.Msg, "maps/"+tt.folder+" not found") || !strings.Contains(e.Hint, "folder format") {
@@ -177,7 +177,7 @@ func TestAPackedMapFileWhereTheMapFolderShouldBeIsRefusedAsAFile(t *testing.T) {
 	s.remove("maps/map.w3x")
 	s.put("maps/map.w3x", "a packed map, not a folder")
 	s.project.ManifestName = localManifest
-	source, err := Source(s.project)
+	source, err := OpenSource(s.project)
 	e := asError(t, err, "a file for the map folder")
 	if source != nil || e.File != "maps/map.w3x" || !strings.Contains(e.Msg, "is not a folder") ||
 		!strings.Contains(e.Hint, "folder format") || e.Cause != nil {
@@ -202,7 +202,7 @@ func TestSourceRefusesALinkOnTheWayToTheMapAndALinkInTheMapsPlace(t *testing.T) 
 			}
 			testkit.LinkDir(t, elsewhere, s.at(tt.link))
 			s.project.ManifestName = localManifest
-			source, err := Source(s.project)
+			source, err := OpenSource(s.project)
 			e := asError(t, err, tt.name)
 			if source != nil || e.File != "maps/map.w3x" || !strings.Contains(e.Msg, "Symlinks are not supported") ||
 				!strings.Contains(e.Msg, s.at(tt.link)) || !strings.Contains(e.Hint, "real files") {
@@ -233,7 +233,7 @@ func TestIsMissingTellsAFolderThatIsNotThereFromAnExpectedFailure(t *testing.T) 
 func TestSourcePassesOnWhatAMapFolderCannotHold(t *testing.T) {
 	s := newStandIn(t)
 	testkit.LinkDir(t, s.folder("elsewhere"), s.at("maps/map.w3x/linked"))
-	source, err := Source(s.project)
+	source, err := OpenSource(s.project)
 	e := asError(t, err, "a link in the map")
 	if source != nil || e.File != "maps/map.w3x/linked" || !strings.Contains(e.Msg, "Symlinks are not supported") {
 		t.Errorf("error = %+v", e)
@@ -242,7 +242,7 @@ func TestSourcePassesOnWhatAMapFolderCannotHold(t *testing.T) {
 
 func openedSource(t testing.TB, s *standIn) *mapdir.Folder {
 	t.Helper()
-	source, err := Source(s.project)
+	source, err := OpenSource(s.project)
 	if err != nil {
 		t.Fatalf("opening the source map: %v", diag.Format(err))
 	}
@@ -252,7 +252,7 @@ func openedSource(t testing.TB, s *standIn) *mapdir.Folder {
 func TestMapGlobalsIsWhatTheMapsScriptDefines(t *testing.T) {
 	s := newStandIn(t)
 	s.templateMap()
-	globals, err := MapGlobals(openedSource(t, s))
+	globals, err := ReadMapGlobals(openedSource(t, s))
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -269,7 +269,7 @@ func TestMapGlobalsReadsTheScriptUnderTheSpellingTheMapHas(t *testing.T) {
 	s := newStandIn(t)
 	s.remove("maps/map.w3x/war3map.lua")
 	s.put("maps/map.w3x/WAR3MAP.LUA", "udg_count = 0\nfunction main()\nend\n")
-	globals, err := MapGlobals(openedSource(t, s))
+	globals, err := ReadMapGlobals(openedSource(t, s))
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -282,7 +282,7 @@ func TestMapGlobalsReadsTheScriptUnderTheSpellingTheMapHas(t *testing.T) {
 func TestMapGlobalsIsNilForAMapWithoutAScript(t *testing.T) {
 	s := newStandIn(t)
 	s.remove("maps/map.w3x/war3map.lua")
-	if globals, err := MapGlobals(openedSource(t, s)); globals != nil || err != nil {
+	if globals, err := ReadMapGlobals(openedSource(t, s)); globals != nil || err != nil {
 		t.Errorf("MapGlobals = %+v, %v", globals, err)
 	}
 }
@@ -290,7 +290,7 @@ func TestMapGlobalsIsNilForAMapWithoutAScript(t *testing.T) {
 func TestMapGlobalsReadsAnEmptyScriptAsOneThatDefinesNothing(t *testing.T) {
 	s := newStandIn(t)
 	s.put("maps/map.w3x/war3map.lua", "")
-	globals, err := MapGlobals(openedSource(t, s))
+	globals, err := ReadMapGlobals(openedSource(t, s))
 	if err != nil || globals == nil || len(globals.Globals) != 0 || len(globals.Functions) != 0 {
 		t.Errorf("MapGlobals = %+v, %v", globals, err)
 	}
@@ -301,7 +301,7 @@ func TestAScriptThatIsAFolderFails(t *testing.T) {
 		s := newStandIn(t)
 		s.remove("maps/map.w3x/war3map.lua")
 		s.folder("maps/map.w3x/" + name)
-		globals, err := MapGlobals(openedSource(t, s))
+		globals, err := ReadMapGlobals(openedSource(t, s))
 		e := asError(t, err, "a folder for a script")
 		if globals != nil || !strings.HasPrefix(e.Msg, name+" in the map is a folder") || e.Cause != nil ||
 			e.File != "maps/map.w3x/"+name || !strings.Contains(e.Hint, "a folder where its script belongs") ||
@@ -315,7 +315,7 @@ func TestAScriptThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 	s := newStandIn(t)
 	source := openedSource(t, s)
 	testkit.MakeUnreadable(t, s.at("maps/map.w3x/war3map.lua"))
-	globals, err := MapGlobals(source)
+	globals, err := ReadMapGlobals(source)
 	e := asError(t, err, "a script that cannot be read")
 	if globals != nil || e.File != "maps/map.w3x/war3map.lua" || e.Cause == nil ||
 		!strings.Contains(e.Msg, "Reading a map file failed") {
@@ -350,7 +350,7 @@ func TestAssetsCollectsTheMapsOwnAndWhatTheSyncedLibrariesShip(t *testing.T) {
 	s.put(".moonwell/library-assets/plain/stray.blp", "not shipped")
 	before := testkit.Snapshot(t, s.root)
 	libraries := []library.Synced{syncedLibrary("kit", true), syncedLibrary("plain", false), syncedLibrary("art", true)}
-	found, replaced, err := Assets(s.project, libraries)
+	found, replaced, err := CollectAssets(s.project, libraries)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -373,7 +373,7 @@ func TestAssetsCollectsTheMapsOwnAndWhatTheSyncedLibrariesShip(t *testing.T) {
 
 func TestAssetsOfAProjectWithoutAnyAreNone(t *testing.T) {
 	s := newStandIn(t)
-	found, replaced, err := Assets(s.project, nil)
+	found, replaced, err := CollectAssets(s.project, nil)
 	if err != nil || len(found) != 0 || len(replaced) != 0 {
 		t.Errorf("Assets = %q, %q, %v", describedAssets(found), replaced, err)
 	}
@@ -384,7 +384,7 @@ func TestAssetsNamesTheSharedManifestForAMistakeInItsBlock(t *testing.T) {
 		t.Run("evaluated from "+evaluated, func(t *testing.T) {
 			s := newStandIn(t, `"assets":{"paths":{"absent.blp":"icons\\Absent.blp"},"exclude":[]}`)
 			s.project.ManifestName = evaluated
-			found, replaced, err := Assets(s.project, nil)
+			found, replaced, err := CollectAssets(s.project, nil)
 			e := asError(t, err, "a mapping of a file that is not there")
 			if found != nil || replaced != nil || e.File != "moonwell.pkl" || !strings.Contains(e.Msg, "assets/absent.blp") ||
 				!strings.Contains(e.Hint, "moonwell.pkl") {
@@ -411,7 +411,7 @@ func TestAssetsRefusesALinkOnTheWayToALibrarysFiles(t *testing.T) {
 			testkit.WriteFile(t, elsewhere, tt.to, []byte("kit axe"))
 			s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash(tt.link))))
 			testkit.LinkDir(t, elsewhere, s.at(tt.link))
-			found, replaced, err := Assets(s.project, []library.Synced{syncedLibrary("kit", true)})
+			found, replaced, err := CollectAssets(s.project, []library.Synced{syncedLibrary("kit", true)})
 			e := asError(t, err, tt.name)
 			if found != nil || replaced != nil || e.File != ".moonwell/library-assets/kit" ||
 				!strings.Contains(e.Msg, "Symlinks are not supported") || !strings.Contains(e.Msg, s.at(tt.link)) {
@@ -423,7 +423,7 @@ func TestAssetsRefusesALinkOnTheWayToALibrarysFiles(t *testing.T) {
 
 func TestAssetsRefusesALibraryFolderThatLeavesTheProject(t *testing.T) {
 	s := newStandIn(t)
-	found, replaced, err := Assets(s.project, []library.Synced{{Key: "kit", Modules: "x", Assets: "../kit"}})
+	found, replaced, err := CollectAssets(s.project, []library.Synced{{Key: "kit", Modules: "x", Assets: "../kit"}})
 	e := asError(t, err, "a folder outside the project")
 	if found != nil || replaced != nil || e.File != "../kit" || !strings.Contains(e.Msg, "Invalid path") {
 		t.Errorf("error = %+v", e)
@@ -436,12 +436,12 @@ func TestAssetsNamesALibrarysFolderFromAProjectFolderThatIsGivenFromTheWorkingFo
 	s.put(".moonwell/library-assets/art", "a file where the library's folder belongs")
 	t.Chdir(s.root)
 	s.project.Root = "."
-	found, _, err := Assets(s.project, []library.Synced{syncedLibrary("kit", true)})
+	found, _, err := CollectAssets(s.project, []library.Synced{syncedLibrary("kit", true)})
 	want := []string{"kit/axe.blp from kit/axe.blp of kit: kit axe"}
 	if got := describedAssets(found); err != nil || !slices.Equal(got, want) {
 		t.Errorf("Assets = %q, %v", got, err)
 	}
-	_, _, err = Assets(s.project, []library.Synced{syncedLibrary("art", true), syncedLibrary("kit", true)})
+	_, _, err = CollectAssets(s.project, []library.Synced{syncedLibrary("art", true), syncedLibrary("kit", true)})
 	e := asError(t, err, "a file for a library's folder")
 	if e.File != ".moonwell/library-assets/art" ||
 		!strings.Contains(e.Msg, "Expected a folder: .moonwell/library-assets/art") {
@@ -460,7 +460,7 @@ func TestOwnershipFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 		s := newStandIn(t)
 		s.project.Map.Folder = tt.folder
 		before := testkit.Snapshot(t, s.root)
-		file, err := OwnershipFile(s.project)
+		file, err := AssetStatePath(s.project)
 		if err != nil || file != tt.want {
 			t.Errorf("map.folder %q: OwnershipFile = %q, %v, want %q", tt.folder, file, err, tt.want)
 		}
@@ -479,7 +479,7 @@ func TestOwnershipFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) 
 	for _, tt := range tests {
 		s := newStandIn(t)
 		s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
-		file, err := OwnershipFile(s.project)
+		file, err := AssetStatePath(s.project)
 		e := asError(t, err, "map.folder "+tt.folder)
 		if file != "" || e.File != localManifest || !strings.Contains(e.Msg, tt.words) {
 			t.Errorf("map.folder %q: OwnershipFile = %q, %+v", tt.folder, file, e)

@@ -143,7 +143,7 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 		{12, unitName, "|cffffccGGNo Colour"},
 	} {
 		id := rows[c.row].Value("alias")
-		if got := c.source.of(strs, id, rows[c.row]); got != c.want {
+		if got := c.source.nameFor(strs, id, rows[c.row]); got != c.want {
 			t.Errorf("the name of %s, with the keys %q: %q, want %q", id, c.source.keys, got, c.want)
 		}
 	}

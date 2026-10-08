@@ -41,7 +41,7 @@ func writeNatives(checkout string, args []string, out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(fileIn(checkout, nativesPath), []byte(renderNatives(natives)), 0o666); err != nil {
+	if err := os.WriteFile(pathIn(checkout, nativesPath), []byte(renderNatives(natives)), 0o666); err != nil {
 		return errInCheckout(checkout, nativesPath, err)
 	}
 	fmt.Fprintf(out, "wrote %s: %d types, %d functions, %d globals\n",
@@ -50,7 +50,7 @@ func writeNatives(checkout string, args []string, out io.Writer) error {
 }
 
 func readScript(folder, name string) (jass.File, error) {
-	text, err := export{folder}.text(scriptsFolder + "/" + name)
+	text, err := export{folder}.readText(scriptsFolder + "/" + name)
 	if err != nil {
 		return jass.File{}, err
 	}
@@ -65,21 +65,21 @@ func buildNatives(version string, common, blizzard jass.File, extras extras) (*s
 		Globals:     []script.NativeGlobal{},
 	}
 	for _, file := range []jass.File{common, blizzard} {
-		natives.Types = append(natives.Types, typesOf(file)...)
-		natives.Functions = append(natives.Functions, functionsOf(file)...)
-		natives.Globals = append(natives.Globals, globalsOf(file)...)
+		natives.Types = append(natives.Types, convertTypes(file)...)
+		natives.Functions = append(natives.Functions, convertFunctions(file)...)
+		natives.Globals = append(natives.Globals, convertGlobals(file)...)
 	}
 	natives.Functions = append(natives.Functions, luaFunctions(extras)...)
 	natives.Lua.Globals = append([]string{}, extras.Globals...)
 	natives.Lua.Removed = append([]string{}, extras.Removed...)
-	if err := declaredOnce(declarations(natives)); err != nil {
+	if err := checkDeclaredOnce(declarations(natives)); err != nil {
 		return nil, err
 	}
 	sortByName(natives)
 	return natives, nil
 }
 
-func typesOf(file jass.File) []script.NativeType {
+func convertTypes(file jass.File) []script.NativeType {
 	types := make([]script.NativeType, len(file.Types))
 	for i, declared := range file.Types {
 		types[i] = script.NativeType{Name: declared.Name, Extends: declared.Extends}
@@ -87,7 +87,7 @@ func typesOf(file jass.File) []script.NativeType {
 	return types
 }
 
-func functionsOf(file jass.File) []script.NativeFunction {
+func convertFunctions(file jass.File) []script.NativeFunction {
 	functions := make([]script.NativeFunction, len(file.Functions))
 	for i, declared := range file.Functions {
 		params := make([]script.NativeParam, len(declared.Params))
@@ -102,7 +102,7 @@ func functionsOf(file jass.File) []script.NativeFunction {
 	return functions
 }
 
-func globalsOf(file jass.File) []script.NativeGlobal {
+func convertGlobals(file jass.File) []script.NativeGlobal {
 	globals := make([]script.NativeGlobal, len(file.Globals))
 	for i, declared := range file.Globals {
 		globals[i] = script.NativeGlobal{
@@ -146,7 +146,7 @@ func declarations(natives *script.Natives) []declaration {
 	return declared
 }
 
-func declaredOnce(declared []declaration) error {
+func checkDeclaredOnce(declared []declaration) error {
 	places := map[string]string{}
 	for _, d := range declared {
 		if first, twice := places[d.name]; twice {

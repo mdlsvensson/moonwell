@@ -34,7 +34,7 @@ func loaded(t *testing.T, root string) *manifest.Project {
 func plannedSettings(t *testing.T, root string) []mapdir.Change {
 	t.Helper()
 	p := loaded(t, root)
-	source, err := build.Source(p)
+	source, err := build.OpenSource(p)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}

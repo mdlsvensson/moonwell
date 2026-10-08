@@ -41,14 +41,14 @@ func carried(t *testing.T, ctx context.Context, root string, args ...string) out
 	return carriedIn(ctx, standIn(t), root, args...)
 }
 
-func carriedIn(ctx context.Context, outside world, root string, args ...string) outcome {
+func carriedIn(ctx context.Context, outside envFactory, root string, args ...string) outcome {
 	var lines, printed []string
 	code := runIn(ctx, outside, args, root, func(line string) { lines = append(lines, line) },
 		func(text string) { printed = append(printed, text) })
 	return outcome{code, strings.Join(lines, "\n"), strings.Join(printed, "\n")}
 }
 
-func standIn(t *testing.T) world {
+func standIn(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
 		e.Log = log
@@ -87,7 +87,7 @@ func endedWith(t *testing.T, result outcome, code int, args []string) outcome {
 }
 
 type seededWorld struct {
-	outside  world
+	outside  envFactory
 	cache    string
 	compiler string
 }
@@ -277,7 +277,7 @@ func pinnedCompilerIn(cache string) string {
 	return filepath.Join(cache, toolchain.YueScript.Name, toolchain.YueVersion, filepath.FromSlash(asset.Binary))
 }
 
-func pklAlone(t *testing.T) world {
+func pklAlone(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _, _ := pklOnly(t, root)
 		e.Log = log
@@ -327,7 +327,7 @@ func pklOnly(t *testing.T, root string) (e *env.Env, log *testkit.Recorder, ran 
 func commandIn(t *testing.T, ctx context.Context, e *env.Env, name string, arguments ...string) ([]string, error) {
 	t.Helper()
 	var printed []string
-	said := call{arguments: arguments, print: func(text string) { printed = append(printed, text) }}
+	said := commandArgs{arguments: arguments, print: func(text string) { printed = append(printed, text) }}
 	err := rowNamed(t, name).run(ctx, e, said)
 	return printed, err
 }
@@ -372,7 +372,7 @@ func sameFiles(t *testing.T, before, after map[string][]byte, what string) {
 
 func holdBuildLock(t *testing.T, root string) {
 	t.Helper()
-	release, err := build.TakeLock(root)
+	release, err := build.AcquireLock(root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}

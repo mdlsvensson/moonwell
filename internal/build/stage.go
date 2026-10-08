@@ -10,35 +10,35 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-func stage(e *env.Env, p *manifest.Project, plan *Result) (place, error) {
-	at, err := stagePlace(p)
+func stage(e *env.Env, p *manifest.Project, plan *Result) (outputFile, error) {
+	at, err := stageOutputFile(p)
 	if err != nil {
-		return place{}, err
+		return outputFile{}, err
 	}
-	if err := plan.Map.StageTo(at.file); err != nil {
-		return place{}, stagingFailure(err, at)
+	if err := plan.Map.StageTo(at.fullPath); err != nil {
+		return outputFile{}, wrapStageError(err, at)
 	}
-	sayStaged(e.Log, plan)
+	logStaged(e.Log, plan)
 	return at, nil
 }
 
-func stagePlace(p *manifest.Project) (place, error) {
-	folder, err := mapFolder(p)
+func stageOutputFile(p *manifest.Project) (outputFile, error) {
+	folder, err := sourceMapDir(p)
 	if err != nil {
-		return place{}, err
+		return outputFile{}, err
 	}
-	return placeOf(p.Root, stageDir+"/"+folder)
+	return newOutputFile(p.Root, stageDir+"/"+folder)
 }
 
-func stagingFailure(err error, at place) error {
+func wrapStageError(err error, at outputFile) error {
 	var failure *diag.Error
 	if !errors.As(err, &failure) || failure.Cause == nil {
 		return err
 	}
-	return errNotStaged(at.label, at.labelOf(failure.File), failure.Cause)
+	return errNotStaged(at.displayPath, at.displayPathOf(failure.File), failure.Cause)
 }
 
-func sayStaged(log *env.Logger, plan *Result) {
+func logStaged(log *env.Logger, plan *Result) {
 	if count := len(plan.Objects.Objects); count > 0 {
 		log.Info("Added " + strconv.Itoa(count) + " custom object(s) to " + strconv.Itoa(len(plan.Objects.Changes)) +
 			" file(s).")

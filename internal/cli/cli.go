@@ -21,7 +21,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/script"
 )
 
-type call struct {
+type commandArgs struct {
 	arguments []string
 	entry     string
 	minify    bool
@@ -29,38 +29,38 @@ type call struct {
 	print     func(text string)
 }
 
-type option struct {
-	name string
-	help string
-	file bool
+type flagSpec struct {
+	name      string
+	help      string
+	takesFile bool
 }
 
 var (
-	entryOption  = option{name: "entry", help: "Compile from this .yue file under src/ in place of map.entry", file: true}
-	minifyOption = option{name: "minify", help: "Shrink the script; runtime errors lose their line numbers"}
-	linkOption   = option{name: "link", help: "Use the Pkl package of the Moonwell checkout the command runs in"}
+	entryFlag  = flagSpec{name: "entry", help: "Compile from this .yue file under src/ in place of map.entry", takesFile: true}
+	minifyFlag = flagSpec{name: "minify", help: "Shrink the script; runtime errors lose their line numbers"}
+	linkFlag   = flagSpec{name: "link", help: "Use the Pkl package of the Moonwell checkout the command runs in"}
 )
 
-var stages = []option{entryOption, minifyOption}
+var buildFlags = []flagSpec{entryFlag, minifyFlag}
 
 type command struct {
 	name  string
 	usage string
 	help  string
 	args  cobra.PositionalArgs
-	flags []option
-	run   func(ctx context.Context, e *env.Env, c call) error
+	flags []flagSpec
+	run   func(ctx context.Context, e *env.Env, c commandArgs) error
 }
 
 var commands = []command{
 	{name: "init", usage: "init <dir> [--link]", help: "Create a project (--link: use this local Moonwell checkout)",
-		args: cobra.ExactArgs(1), flags: []option{linkOption}, run: runInit},
+		args: cobra.ExactArgs(1), flags: []flagSpec{linkFlag}, run: runInit},
 	{name: "setup", usage: "setup",
 		help: "Prepare a checkout: moonwell.local.pkl, Pkl, YueScript, libraries, the editor", run: runSetup},
 	{name: "build", usage: "build [--entry f] [--minify]", help: "Build <build.folder>/<map.folder>",
-		flags: stages, run: runBuild},
+		flags: buildFlags, run: runBuild},
 	{name: "test", usage: "test [--entry f] [--minify]", help: "Stage the map and launch Warcraft III",
-		flags: stages, run: runTest},
+		flags: buildFlags, run: runTest},
 	{name: "dev", usage: "dev", help: "Watch sources and report errors on save", run: runDev},
 	{name: "check", usage: "check", help: "Compile and validate without building a map", run: runCheck},
 	{name: "assets:check", usage: "assets:check", help: "Show what assets:sync would change in the source map",
@@ -83,123 +83,123 @@ func init() {
 	cobra.MousetrapHelpText = ""
 }
 
-func Run(ctx context.Context, args []string, root string, write, print func(string)) int {
-	return runIn(ctx, env.New, args, root, write, print)
+func Run(ctx context.Context, args []string, workDir string, write, print func(string)) int {
+	return runIn(ctx, env.New, args, workDir, write, print)
 }
 
-type world func(root string, log *env.Logger) *env.Env
+type envFactory func(root string, log *env.Logger) *env.Env
 
-func runIn(ctx context.Context, outside world, args []string, root string, write, print func(string)) int {
-	r := &running{ctx: ctx, outside: outside, table: commands, root: root, write: write, print: print}
-	return r.carryOut(args)
+func runIn(ctx context.Context, newEnv envFactory, args []string, workDir string, write, print func(string)) int {
+	r := &invocation{ctx: ctx, newEnv: newEnv, commands: commands, workDir: workDir, write: write, print: print}
+	return r.execute(args)
 }
 
-type running struct {
-	ctx     context.Context
-	outside world
-	table   []command
-	root    string
-	write   func(string)
-	print   func(string)
-	chosen  *command
-	log     *env.Logger
+type invocation struct {
+	ctx        context.Context
+	newEnv     envFactory
+	commands   []command
+	workDir    string
+	write      func(string)
+	print      func(string)
+	ranCommand *command
+	log        *env.Logger
 }
 
-func (r *running) carryOut(args []string) (code int) {
+func (r *invocation) execute(args []string) (code int) {
 	defer func() {
-		if fault := recover(); fault != nil {
+		if panicValue := recover(); panicValue != nil {
 			say := r.write
 			if r.log != nil {
 				say = r.log.Error
 			}
-			say(diag.FormatInternalError(fmt.Sprintf("%v\n%s", fault, debug.Stack())))
+			say(diag.FormatInternalError(fmt.Sprintf("%v\n%s", panicValue, debug.Stack())))
 			code = 1
 		}
 	}()
-	top := r.tree()
-	var printed, complaints strings.Builder
-	top.SetOut(&printed)
-	top.SetErr(&complaints)
-	top.SetArgs(append([]string{}, args...))
-	err := top.ExecuteContext(r.ctx)
-	if printed.Len() > 0 {
-		r.print(strings.TrimSuffix(printed.String(), "\n"))
+	root := r.buildCommandTree()
+	var stdout, stderr strings.Builder
+	root.SetOut(&stdout)
+	root.SetErr(&stderr)
+	root.SetArgs(append([]string{}, args...))
+	err := root.ExecuteContext(r.ctx)
+	if stdout.Len() > 0 {
+		r.print(strings.TrimSuffix(stdout.String(), "\n"))
 	}
-	if complaints.Len() > 0 {
-		r.write(strings.TrimSuffix(complaints.String(), "\n"))
+	if stderr.Len() > 0 {
+		r.write(strings.TrimSuffix(stderr.String(), "\n"))
 	}
 	switch {
-	case r.chosen != nil:
-		return exitCode(r.ctx, r.log, *r.chosen, err)
+	case r.ranCommand != nil:
+		return exitCode(r.ctx, r.log, *r.ranCommand, err)
 	case err == nil:
 		return 0
 	}
-	r.write(diag.Format(refusal(err)))
+	r.write(diag.Format(usageError(err)))
 	return 1
 }
 
-func (r *running) tree() *cobra.Command {
-	top := &cobra.Command{
+func (r *invocation) buildCommandTree() *cobra.Command {
+	root := &cobra.Command{
 		Use:           "moonwell",
 		Long:          "Moonwell " + moonwell.Version + ": Warcraft III maps with YueScript gameplay and Pkl data",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(c *cobra.Command, _ []string) error {
-			if asked, _ := c.Flags().GetBool("version"); asked {
+			if wantsVersion, _ := c.Flags().GetBool("version"); wantsVersion {
 				r.print(moonwell.Version)
 				return nil
 			}
 			return c.Help()
 		},
 	}
-	top.Flags().BoolP("version", "v", false, "Print the version")
-	for _, row := range r.table {
-		top.AddCommand(r.commandOf(row))
+	root.Flags().BoolP("version", "v", false, "Print the version")
+	for _, cmd := range r.commands {
+		root.AddCommand(r.newCobraCommand(cmd))
 	}
-	return top
+	return root
 }
 
-func (r *running) commandOf(row command) *cobra.Command {
+func (r *invocation) newCobraCommand(cmd command) *cobra.Command {
 	c := &cobra.Command{
-		Use:                   row.usage,
-		Short:                 row.help,
-		Args:                  row.args,
+		Use:                   cmd.usage,
+		Short:                 cmd.help,
+		Args:                  cmd.args,
 		DisableFlagsInUseLine: true,
 		RunE: func(c *cobra.Command, arguments []string) error {
-			return r.run(row, c.Flags(), arguments)
+			return r.runCommand(cmd, c.Flags(), arguments)
 		},
 	}
-	if row.args == nil {
+	if cmd.args == nil {
 		c.Args = cobra.ExactArgs(0)
 	}
-	for _, o := range row.flags {
-		if o.file {
-			c.Flags().String(o.name, "", o.help)
+	for _, flag := range cmd.flags {
+		if flag.takesFile {
+			c.Flags().String(flag.name, "", flag.help)
 		} else {
-			c.Flags().Bool(o.name, false, o.help)
+			c.Flags().Bool(flag.name, false, flag.help)
 		}
 	}
 	return c
 }
 
-func (r *running) run(row command, flags *pflag.FlagSet, arguments []string) error {
-	said := call{arguments: arguments, print: r.print}
-	said.entry, _ = flags.GetString(entryOption.name)
-	said.minify, _ = flags.GetBool(minifyOption.name)
-	said.link, _ = flags.GetBool(linkOption.name)
-	if flags.Changed(entryOption.name) {
-		if _, err := script.EntryName(said.entry); err != nil {
+func (r *invocation) runCommand(cmd command, flags *pflag.FlagSet, arguments []string) error {
+	args := commandArgs{arguments: arguments, print: r.print}
+	args.entry, _ = flags.GetString(entryFlag.name)
+	args.minify, _ = flags.GetBool(minifyFlag.name)
+	args.link, _ = flags.GetBool(linkFlag.name)
+	if flags.Changed(entryFlag.name) {
+		if _, err := script.EntryName(args.entry); err != nil {
 			return err
 		}
 	}
-	r.chosen = &row
-	r.log = env.NewLogger(r.write, logFile(r.root, row))
-	return row.run(r.ctx, r.outside(r.root, r.log), said)
+	r.ranCommand = &cmd
+	r.log = env.NewLogger(r.write, logFilePath(r.workDir, cmd))
+	return cmd.run(r.ctx, r.newEnv(r.workDir, r.log), args)
 }
 
-func refusal(err error) error {
-	var worded *diag.Error
-	if errors.As(err, &worded) {
+func usageError(err error) error {
+	var diagErr *diag.Error
+	if errors.As(err, &diagErr) {
 		return err
 	}
 	return &diag.Error{
@@ -208,24 +208,24 @@ func refusal(err error) error {
 	}
 }
 
-func logFile(root string, chosen command) string {
-	if chosen.name == "init" || !manifest.IsProject(root) {
+func logFilePath(workDir string, cmd command) string {
+	if cmd.name == "init" || !manifest.IsProject(workDir) {
 		return ""
 	}
-	file, err := fsx.SafeJoinNoSymlinks(root, "dist/moonwell.log")
+	file, err := fsx.SafeJoinNoSymlinks(workDir, "dist/moonwell.log")
 	if err != nil {
 		return ""
 	}
 	return file
 }
 
-func exitCode(ctx context.Context, log *env.Logger, chosen command, err error) int {
+func exitCode(ctx context.Context, log *env.Logger, cmd command, err error) int {
 	toldToStop := ctx.Err() != nil
 	if err != nil && !(toldToStop && errors.Is(err, context.Canceled)) {
 		log.Error(diag.Format(err))
 	}
 	switch {
-	case toldToStop && (err != nil || chosen.name == "dev"):
+	case toldToStop && (err != nil || cmd.name == "dev"):
 		return 130
 	case err != nil:
 		return 1
@@ -236,7 +236,7 @@ func exitCode(ctx context.Context, log *env.Logger, chosen command, err error) i
 func Main() int {
 	write := func(line string) { fmt.Fprintln(os.Stderr, line) }
 	print := func(text string) { fmt.Fprintln(os.Stdout, text) }
-	root, err := os.Getwd()
+	workDir, err := os.Getwd()
 	if err != nil {
 		write(diag.Format(errNoWorkingFolder(err)))
 		return 1
@@ -245,20 +245,20 @@ func Main() int {
 	defer cancel()
 	interrupts := make(chan os.Signal, 2)
 	signal.Notify(interrupts, os.Interrupt)
-	go heed(interrupts, cancel, leaveAtOnce(os.Exit))
-	return Run(ctx, os.Args[1:], root, write, print)
+	go handleInterrupts(interrupts, cancel, newForceExit(os.Exit))
+	return Run(ctx, os.Args[1:], workDir, write, print)
 }
 
-func heed(interrupts <-chan os.Signal, cancel, leave func()) {
+func handleInterrupts(interrupts <-chan os.Signal, cancel, forceExit func()) {
 	<-interrupts
 	cancel()
 	<-interrupts
-	leave()
+	forceExit()
 }
 
-func leaveAtOnce(exit func(int)) func() {
+func newForceExit(exit func(int)) func() {
 	return func() {
-		build.ReleaseHeld()
+		build.ReleaseHeldLocks()
 		exit(130)
 	}
 }

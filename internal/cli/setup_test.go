@@ -31,7 +31,7 @@ func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *te
 	remove(t, root, "moonwell.local.pkl")
 	remove(t, root, "yueconfig.yue")
 	e, log := world.at(root)
-	if err := runSetup(background, e, call{}); err != nil {
+	if err := runSetup(background, e, commandArgs{}); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	copied := filepath.Join(world.binDir(), filepath.Base(world.compiler))
@@ -46,7 +46,7 @@ func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *te
 	}
 
 	e, log = world.at(root)
-	if err := runSetup(background, e, call{}); err != nil {
+	if err := runSetup(background, e, commandArgs{}); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	lines = log.Lines()
@@ -62,7 +62,7 @@ func TestSetupWithAYuePathCopiesNothingAndNamesItsFolderAsTheManifestWritesIt(t 
 	world, root := seeded(t, written), newProject(t, "my-map")
 	appendTo(t, root, "moonwell.local.pkl", "\nyue { path = \""+written+"\" }\n")
 	e, log := world.at(root)
-	if err := runSetup(background, e, call{}); err != nil {
+	if err := runSetup(background, e, commandArgs{}); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	lines := log.Lines()
@@ -81,7 +81,7 @@ func TestSetupMakesTheLocalManifestBeforeItLooksForTheCompilerAndTheEditorsFiles
 	remove(t, root, "moonwell.local.pkl")
 	remove(t, root, "yueconfig.yue")
 	e, log, ran := pklOnly(t, root)
-	failure := asError(t, runSetup(background, e, call{}), "a compiler that is not there")
+	failure := asError(t, runSetup(background, e, commandArgs{}), "a compiler that is not there")
 	if !strings.Contains(failure.Msg, "yue.path does not exist") {
 		t.Errorf("error = %+v", failure)
 	}
@@ -103,7 +103,7 @@ func TestSetupWithoutItsSourceMapFailsAtTheDeclarations(t *testing.T) {
 	remove(t, root, "yueconfig.yue")
 	useLibrary(t, root, exampleLibrary(t))
 	e, log := world.at(root)
-	failure := asError(t, runSetup(background, e, call{}), "a project without its source map")
+	failure := asError(t, runSetup(background, e, commandArgs{}), "a project without its source map")
 	if failure.File != "moonwell.local.pkl" || failure.Hint == "" ||
 		!strings.Contains(failure.Msg, "Source map folder maps/map.w3x not found") {
 		t.Errorf("error = %+v", failure)
@@ -128,7 +128,7 @@ func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing
 		file    string
 	}{
 		{"a running build", func(t *testing.T, root string) {
-			release, err := build.TakeLock(root)
+			release, err := build.AcquireLock(root)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -145,7 +145,7 @@ func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing
 			c.arrange(t, root)
 			held := exists(root, "dist/.lock")
 			e, log := world.at(root)
-			failure := asError(t, runSetup(background, e, call{}), c.what)
+			failure := asError(t, runSetup(background, e, commandArgs{}), c.what)
 			if failure.File != c.file || failure.Hint == "" || !strings.Contains(failure.Msg, c.msg) {
 				t.Errorf("error = %+v", failure)
 			}

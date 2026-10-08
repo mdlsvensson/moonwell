@@ -17,8 +17,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
-func runSetup(ctx context.Context, e *env.Env, _ call) error {
-	pkl, err := pklForShell(ctx, e)
+func runSetup(ctx context.Context, e *env.Env, _ commandArgs) error {
+	pkl, err := setupPkl(ctx, e)
 	if err != nil {
 		return err
 	}
@@ -26,22 +26,22 @@ func runSetup(ctx context.Context, e *env.Env, _ call) error {
 	if err != nil {
 		return err
 	}
-	if err := localManifest(e); err != nil {
+	if err := setupLocalManifest(e); err != nil {
 		return err
 	}
-	if err := compilerForEditor(ctx, e, p.Yue); err != nil {
+	if err := setupCompiler(ctx, e, p.Yue); err != nil {
 		return err
 	}
-	if err := editorFiles(e); err != nil {
+	if err := setupEditorFiles(e); err != nil {
 		return err
 	}
-	if err := declarations(e, p); err != nil {
+	if err := refreshDeclarations(e, p); err != nil {
 		return err
 	}
-	return librariesAndTheirView(ctx, e, p)
+	return syncLibrariesAndView(ctx, e, p)
 }
 
-func pklForShell(ctx context.Context, e *env.Env) (pkl string, err error) {
+func setupPkl(ctx context.Context, e *env.Env) (pkl string, err error) {
 	pkl, err = toolchain.FindPkl(ctx, e)
 	if err != nil {
 		return "", err
@@ -49,7 +49,7 @@ func pklForShell(ctx context.Context, e *env.Env) (pkl string, err error) {
 	return pkl, toolchain.CopyPklToBinDir(ctx, e, pkl, runtime.GOOS)
 }
 
-func localManifest(e *env.Env) error {
+func setupLocalManifest(e *env.Env) error {
 	created, err := manifest.EnsureLocalManifest(e.Root)
 	if err != nil {
 		return err
@@ -60,20 +60,20 @@ func localManifest(e *env.Env) error {
 	return nil
 }
 
-func compilerForEditor(ctx context.Context, e *env.Env, yue manifest.Yue) error {
+func setupCompiler(ctx context.Context, e *env.Env, yue manifest.Yue) error {
 	compiler, err := toolchain.FindCompiler(ctx, e, yue.Version, yue.Path)
 	if err != nil {
 		return err
 	}
 	e.Log.Info("YueScript " + yue.Version + ": " + compiler)
-	binDir, err := folderForPath(e, yue, compiler)
+	binDir, err := binDirFor(e, yue, compiler)
 	if err != nil {
 		return err
 	}
 	return toolchain.WarnIfYueNotOnPath(ctx, e, yue.Version, binDir, runtime.GOOS)
 }
 
-func folderForPath(e *env.Env, yue manifest.Yue, compiler string) (string, error) {
+func binDirFor(e *env.Env, yue manifest.Yue, compiler string) (string, error) {
 	if yue.Path != nil {
 		return toolchain.ParentDir(*yue.Path), nil
 	}
@@ -87,7 +87,7 @@ func folderForPath(e *env.Env, yue manifest.Yue, compiler string) (string, error
 	return filepath.Dir(path), nil
 }
 
-func editorFiles(e *env.Env) error {
+func setupEditorFiles(e *env.Env) error {
 	template, err := moonwell.TemplateFiles()
 	if err != nil {
 		return err
@@ -108,14 +108,14 @@ func mergeLuarc(e *env.Env, template []moonwell.TemplateFile) error {
 	case err != nil:
 		return err
 	case !isJSON:
-		return warnOfLuarc(e, template)
+		return warnAboutLuarc(e, template)
 	case len(added) > 0:
 		e.Log.Info("Added " + strings.Join(added, ", ") + " to .luarc.json.")
 	}
 	return nil
 }
 
-func warnOfLuarc(e *env.Env, template []moonwell.TemplateFile) error {
+func warnAboutLuarc(e *env.Env, template []moonwell.TemplateFile) error {
 	entries, err := editor.LuarcTemplateEntries(template)
 	if err != nil {
 		return err
@@ -127,12 +127,12 @@ func warnOfLuarc(e *env.Env, template []moonwell.TemplateFile) error {
 	return nil
 }
 
-func declarations(e *env.Env, p *manifest.Project) error {
-	source, err := build.Source(p)
+func refreshDeclarations(e *env.Env, p *manifest.Project) error {
+	source, err := build.OpenSource(p)
 	if err != nil {
 		return err
 	}
-	globals, err := build.MapGlobals(source)
+	globals, err := build.ReadMapGlobals(source)
 	if err != nil {
 		return err
 	}
@@ -143,8 +143,8 @@ func declarations(e *env.Env, p *manifest.Project) error {
 	return build.RefreshDeclarations(e.Root, source, objs.Objects, globals)
 }
 
-func librariesAndTheirView(ctx context.Context, e *env.Env, p *manifest.Project) error {
-	release, err := build.TakeLock(e.Root)
+func syncLibrariesAndView(ctx context.Context, e *env.Env, p *manifest.Project) error {
+	release, err := build.AcquireLock(e.Root)
 	if err != nil {
 		return err
 	}
@@ -153,11 +153,11 @@ func librariesAndTheirView(ctx context.Context, e *env.Env, p *manifest.Project)
 	if err != nil {
 		return err
 	}
-	return libraryView(e, synced)
+	return refreshLibraryView(e, synced)
 }
 
-func libraryView(e *env.Env, synced []library.Synced) error {
-	sources, err := script.CollectLibrarySources(e.Root, build.ModuleFolders(synced))
+func refreshLibraryView(e *env.Env, synced []library.Synced) error {
+	sources, err := script.CollectLibrarySources(e.Root, build.LibraryModuleDirs(synced))
 	if err != nil {
 		return err
 	}

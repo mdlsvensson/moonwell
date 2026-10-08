@@ -105,7 +105,7 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 		t.Errorf("a command outside a project left %v there (%v)", entries, err)
 	}
 	for _, name := range append([]string{"dev", "assets:paths"}, needManifest...) {
-		if file := logFile(root, rowNamed(t, name)); file != "" {
+		if file := logFilePath(root, rowNamed(t, name)); file != "" {
 			t.Errorf("%s outside a project keeps a log in %s", name, file)
 		}
 	}
@@ -120,13 +120,13 @@ func TestAFailingObjectsEvalPrintsItsErrorToTheLogWriterAndNothingToStdout(t *te
 
 func TestOnlyAProjectGetsALogAndInitNeverDoes(t *testing.T) {
 	root := project(t)
-	if file, want := logFile(root, rowNamed(t, "check")), filepath.Join(root, "dist", "moonwell.log"); file != want {
+	if file, want := logFilePath(root, rowNamed(t, "check")), filepath.Join(root, "dist", "moonwell.log"); file != want {
 		t.Errorf("the log of a project is %q, want %q", file, want)
 	}
-	if file, want := logFile(root, rowNamed(t, "setup")), filepath.Join(root, "dist", "moonwell.log"); file != want {
+	if file, want := logFilePath(root, rowNamed(t, "setup")), filepath.Join(root, "dist", "moonwell.log"); file != want {
 		t.Errorf("the log of a setup in a project is %q, want %q", file, want)
 	}
-	if file := logFile(root, rowNamed(t, "init")); file != "" {
+	if file := logFilePath(root, rowNamed(t, "init")); file != "" {
 		t.Errorf("init keeps a log in %s", file)
 	}
 }
@@ -224,7 +224,7 @@ func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 		return e
 	}
 	beforeTheCommand := func(string, *env.Logger) *env.Env { panic("the index is out of range") }
-	places := map[string]world{"in a command": inACommand, "before the command": beforeTheCommand}
+	places := map[string]envFactory{"in a command": inACommand, "before the command": beforeTheCommand}
 	for what, outside := range places {
 		root := project(t)
 		result := carriedIn(background, outside, root, "check")
@@ -278,15 +278,15 @@ func TestAFileNameThatIsNotUTF8IsPrintedAsItIs(t *testing.T) {
 
 func TestBuildAndTestPlanWithWhatTheLineSaid(t *testing.T) {
 	for _, c := range []struct {
-		said call
+		said commandArgs
 		want build.Options
 	}{
-		{call{}, build.Options{}},
-		{call{minify: true}, build.Options{Minify: true}},
-		{call{entry: "src/other.yue"}, build.Options{Entry: "src/other.yue"}},
-		{call{entry: "src/other.yue", minify: true}, build.Options{Entry: "src/other.yue", Minify: true}},
+		{commandArgs{}, build.Options{}},
+		{commandArgs{minify: true}, build.Options{Minify: true}},
+		{commandArgs{entry: "src/other.yue"}, build.Options{Entry: "src/other.yue"}},
+		{commandArgs{entry: "src/other.yue", minify: true}, build.Options{Entry: "src/other.yue", Minify: true}},
 	} {
-		if got := c.said.options(); got != c.want {
+		if got := c.said.buildOptions(); got != c.want {
 			t.Errorf("the options of %+v are %+v, want %+v", c.said, got, c.want)
 		}
 	}
@@ -331,7 +331,7 @@ func TestTheTableHasTheTwelveCommandsInTheOrderOfTheUsage(t *testing.T) {
 func TestTheFirstInterruptCancelsTheCommandAndTheSecondLeaves(t *testing.T) {
 	interrupts := make(chan os.Signal)
 	cancelled, left := make(chan struct{}), make(chan struct{})
-	go heed(interrupts, func() { close(cancelled) }, func() { close(left) })
+	go handleInterrupts(interrupts, func() { close(cancelled) }, func() { close(left) })
 	interrupts <- os.Interrupt
 	<-cancelled
 	select {
@@ -345,14 +345,14 @@ func TestTheFirstInterruptCancelsTheCommandAndTheSecondLeaves(t *testing.T) {
 
 func TestLeavingAtOnceGivesBackTheBuildLockAndThenExitsWith130(t *testing.T) {
 	root := t.TempDir()
-	release, err := build.TakeLock(root)
+	release, err := build.AcquireLock(root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	defer release()
 	lock := filepath.Join(root, "dist", ".lock")
 	var codes []int
-	leave := leaveAtOnce(func(code int) {
+	leave := newForceExit(func(code int) {
 		codes = append(codes, code)
 		if _, err := os.Stat(lock); !errors.Is(err, os.ErrNotExist) {
 			t.Errorf("the program exits with the build lock in place: %v", err)

@@ -22,7 +22,7 @@ import (
 
 const unreachable = "cannot reach the package server"
 
-func resolving(t *testing.T, pklVersion string, resolveCode int) world {
+func resolving(t *testing.T, pklVersion string, resolveCode int) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
 		e.Log = log
@@ -44,7 +44,7 @@ func resolving(t *testing.T, pklVersion string, resolveCode int) world {
 	}
 }
 
-func nothingRuns(t *testing.T) world {
+func nothingRuns(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
 		e.Log = log
@@ -52,7 +52,7 @@ func nothingRuns(t *testing.T) world {
 	}
 }
 
-func created(outside world, root, dir, schema string) ([]string, error) {
+func created(outside envFactory, root, dir, schema string) ([]string, error) {
 	log := testkit.NewRecorder()
 	err := createProject(background, outside(root, log.Logger), dir, schema)
 	return log.Lines(), err
@@ -277,17 +277,17 @@ func TestACheckoutIsAFolderWhoseGoModNamesThisModule(t *testing.T) {
 	testkit.WriteFile(t, base, "go.mod", []byte("// A comment.\nmodule  github.com/mdlsvensson/moonwell \n"))
 	testkit.WriteFile(t, base, "other/go.mod", []byte("module github.com/mdlsvensson/moonwell/v2\n"))
 	testkit.WriteFile(t, base, "other/deep/file.txt", nil)
-	if got, err := checkoutAbove(filepath.Join(base, "other", "deep")); err != nil || got != base {
+	if got, err := findCheckout(filepath.Join(base, "other", "deep")); err != nil || got != base {
 		t.Errorf("checkoutAbove = %q, %v; want %q", got, err, base)
 	}
-	if got, err := checkoutAbove(base); err != nil || got != base {
+	if got, err := findCheckout(base); err != nil || got != base {
 		t.Errorf("checkoutAbove of the checkout itself = %q, %v", got, err)
 	}
 }
 
 func TestLinkPathIsRelativeWhenTheTargetSharesARootWithTheCheckout(t *testing.T) {
 	base := t.TempDir()
-	path, err := linkPath(filepath.Join(base, "maps", "my-map"), filepath.Join(base, "moonwell", "schema"))
+	path, err := schemaLinkPath(filepath.Join(base, "maps", "my-map"), filepath.Join(base, "moonwell", "schema"))
 	if err != nil || path != "../../moonwell/schema" {
 		t.Errorf("linkPath = %q, %v", path, err)
 	}
@@ -297,7 +297,7 @@ func TestLinkPathRefusesATargetOnAnotherDrive(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		t.Skip("only Windows has drives")
 	}
-	_, err := linkPath(`C:\Temp\my-map`, `D:\a\moonwell\schema`)
+	_, err := schemaLinkPath(`C:\Temp\my-map`, `D:\a\moonwell\schema`)
 	e := asError(t, err, "another drive")
 	if e.Msg != "--link needs the project on the same drive as this Moonwell checkout." ||
 		!strings.HasPrefix(e.Hint, `Create the project on D:\ (`) {

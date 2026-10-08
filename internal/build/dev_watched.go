@@ -21,86 +21,86 @@ var checkedFolders = []struct{ dir, ending string }{
 
 var manifests = []string{manifest.SharedManifest, manifest.LocalManifest, "PklProject", "PklProject.deps.json"}
 
-type watched struct {
+type watchSet struct {
 	roots  []watchRoot
 	labels []string
 }
 
-func namedFolders(dir string, p *manifest.Project) watched {
+func manifestWatchSet(dir string, p *manifest.Project) watchSet {
 	if p == nil {
-		return watched{}
+		return watchSet{}
 	}
-	return libraryFolders(dir, p.Libraries).and(previewPicture(dir, p.Settings.Info.Preview))
+	return libraryWatchSet(dir, p.Libraries).merge(previewWatchSet(dir, p.Settings.Info.Preview))
 }
 
-func (w watched) and(more watched) watched {
-	return watched{roots: slices.Concat(w.roots, more.roots), labels: slices.Concat(w.labels, more.labels)}
+func (w watchSet) merge(more watchSet) watchSet {
+	return watchSet{roots: slices.Concat(w.roots, more.roots), labels: slices.Concat(w.labels, more.labels)}
 }
 
-func (w watched) line() string {
+func (w watchSet) describe() string {
 	return "Watching " + strings.Join(w.labels, ", ") + " and the project manifests. Press Ctrl+C to stop."
 }
 
-func ownFolders(dir string) watched {
-	counts := func(path string) bool { return countsInProject(dir, path) }
-	own := watched{roots: []watchRoot{{dir: dir, counts: counts}}}
+func projectWatchSet(dir string) watchSet {
+	counts := func(path string) bool { return isProjectSource(dir, path) }
+	own := watchSet{roots: []watchRoot{{dir: dir, include: counts}}}
 	for _, folder := range checkedFolders {
 		at := filepath.Join(dir, folder.dir)
 		if folder.dir != sourcesDir && !fsx.IsDir(at) {
 			continue
 		}
-		own.roots = append(own.roots, watchRoot{dir: at, deep: true, counts: counts})
+		own.roots = append(own.roots, watchRoot{dir: at, deep: true, include: counts})
 		own.labels = append(own.labels, folder.dir+"/")
 	}
 	return own
 }
 
-func libraryFolders(dir string, libraries map[string]manifest.Library) watched {
-	var all watched
+func libraryWatchSet(dir string, libraries map[string]manifest.Library) watchSet {
+	var all watchSet
 	for _, local := range library.Locals(dir, libraries) {
-		all = all.and(localFolders(dir, local))
+		all = all.merge(localLibraryWatchSet(dir, local))
 	}
 	return all
 }
 
-func localFolders(dir string, local library.Local) watched {
-	var found watched
+func localLibraryWatchSet(dir string, local library.Local) watchSet {
+	var found watchSet
 	for _, folder := range local.Folders {
-		if !watchable(dir, folder.Dir) {
+		if !isWatchable(dir, folder.Dir) {
 			continue
 		}
-		copied := func(path string) bool { return countsInLibrary(folder.Dir, path) }
-		found.roots = append(found.roots, watchRoot{dir: folder.Dir, deep: true, counts: copied})
+		copied := func(path string) bool { return isLibrarySource(folder.Dir, path) }
+		found.roots = append(found.roots, watchRoot{dir: folder.Dir, deep: true, include: copied})
 		found.labels = append(found.labels, folder.Label)
 	}
-	if watchable(dir, local.Dir) {
+	if isWatchable(dir, local.Dir) {
 		describes := func(path string) bool { return filepath.Base(path) == library.File }
-		found.roots = append(found.roots, watchRoot{dir: local.Dir, counts: describes})
+		found.roots = append(found.roots, watchRoot{dir: local.Dir, include: describes})
 	}
 	return found
 }
 
-func watchable(dir, folder string) bool {
+func isWatchable(dir, folder string) bool {
 	return fsx.IsDir(folder) && !fsx.IsWithin(filepath.Join(dir, keptDir), folder)
 }
 
-func previewPicture(dir string, preview *string) watched {
+func previewWatchSet(dir string, preview *string) watchSet {
 	if preview == nil {
-		return watched{}
+		return watchSet{}
 	}
 	file := fsx.ResolvePath(dir, *preview)
 	if !fsx.IsDir(filepath.Dir(file)) {
-		return watched{}
+		return watchSet{}
 	}
 	isPicture := func(path string) bool { return path == file }
-	return watched{
-		roots:  []watchRoot{{dir: filepath.Dir(file), counts: isPicture}},
+	return watchSet{
+		roots:  []watchRoot{{dir: filepath.Dir(file), include: isPicture}},
 		labels: []string{fsx.ToSlash(*preview)},
 	}
 }
 
-func countsInProject(dir, path string) bool {
-	file := pathFrom(dir, path)
+func isProjectSource(dir, path string) bool {
+	file := relativeTo(dir, path)
 	if strings.HasPrefix(file, generatedDir+"/") {
 		return false
 	}
@@ -112,8 +112,8 @@ func countsInProject(dir, path string) bool {
 	return slices.Contains(manifests, file)
 }
 
-func countsInLibrary(folder, path string) bool {
-	for part := range strings.SplitSeq(pathFrom(folder, path), "/") {
+func isLibrarySource(folder, path string) bool {
+	for part := range strings.SplitSeq(relativeTo(folder, path), "/") {
 		if strings.HasPrefix(part, ".") {
 			return false
 		}
@@ -121,7 +121,7 @@ func countsInLibrary(folder, path string) bool {
 	return true
 }
 
-func pathFrom(folder, path string) string {
+func relativeTo(folder, path string) string {
 	below, err := filepath.Rel(folder, path)
 	if err != nil {
 		return filepath.ToSlash(path)

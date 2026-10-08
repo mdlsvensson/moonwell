@@ -17,7 +17,7 @@ import (
 
 func RefreshLibraryView(root string, sources []script.Source,
 	lua func(script.Source) (string, bool)) (written []string, err error) {
-	views, err := viewsOf(sources, lua)
+	views, err := buildViews(sources, lua)
 	if err != nil {
 		return nil, err
 	}
@@ -25,39 +25,39 @@ func RefreshLibraryView(root string, sources []script.Source,
 	if err != nil {
 		return nil, err
 	}
-	if err := removeOthers(dir, views); err != nil {
+	if err := removeStaleViews(dir, views); err != nil {
 		return nil, err
 	}
-	if err := removeEmptyFolders(dir); err != nil {
+	if err := removeEmptyDirs(dir); err != nil {
 		return nil, err
 	}
 	return writeViews(dir, views)
 }
 
-type view struct {
+type libraryView struct {
 	file string
 	text string
 	kept bool
 }
 
-func viewsOf(sources []script.Source, lua func(script.Source) (string, bool)) ([]view, error) {
-	var views []view
+func buildViews(sources []script.Source, lua func(script.Source) (string, bool)) ([]libraryView, error) {
+	var views []libraryView
 	for _, source := range sources {
 		if source.Library == "" {
 			continue
 		}
-		file, err := viewFile(source)
+		file, err := viewPath(source)
 		if err != nil {
 			return nil, err
 		}
-		if v, has := viewAt(file, source, lua); has {
+		if v, has := buildView(file, source, lua); has {
 			views = append(views, v)
 		}
 	}
 	return views, nil
 }
 
-func viewFile(source script.Source) (string, error) {
+func viewPath(source script.Source) (string, error) {
 	below := strings.ReplaceAll(source.Name, ".", "/")
 	if slices.Contains(strings.Split(below, "/"), "") {
 		return "", fmt.Errorf("editor.RefreshLibraryView: the module %q of the library %q names no file below %s",
@@ -66,21 +66,21 @@ func viewFile(source script.Source) (string, error) {
 	return below + ".lua", nil
 }
 
-func viewAt(file string, source script.Source, lua func(script.Source) (string, bool)) (view, bool) {
+func buildView(file string, source script.Source, lua func(script.Source) (string, bool)) (libraryView, bool) {
 	if lua != nil {
 		text, has := lua(source)
-		return view{file: file, text: text}, has
+		return libraryView{file: file, text: text}, has
 	}
 	if source.Kind == script.Lua {
-		return view{file: file, text: source.Text}, true
+		return libraryView{file: file, text: source.Text}, true
 	}
-	return view{file: file, kept: true}, true
+	return libraryView{file: file, kept: true}, true
 }
 
-func removeOthers(dir string, views []view) error {
+func removeStaleViews(dir string, views []libraryView) error {
 	listed, err := fsx.ListFiles(dir)
 	switch {
-	case noFolder(err):
+	case isMissingDir(err):
 		return nil
 	case err != nil:
 		return errViewNotRead(LibraryViewDir, err)
@@ -106,7 +106,7 @@ func removeOthers(dir string, views []view) error {
 	return nil
 }
 
-func noFolder(err error) bool {
+func isMissingDir(err error) bool {
 	return errors.Is(err, fs.ErrNotExist) || errors.Is(err, syscall.ENOTDIR)
 }
 
@@ -118,8 +118,8 @@ func isPlainFile(dir, file string) (bool, error) {
 	return info != nil && !fsx.IsSymlink(info), nil
 }
 
-func removeEmptyFolders(dir string) error {
-	empty, err := emptyFolders(dir)
+func removeEmptyDirs(dir string) error {
+	empty, err := findEmptyDirs(dir)
 	if err != nil {
 		return err
 	}
@@ -131,7 +131,7 @@ func removeEmptyFolders(dir string) error {
 	return nil
 }
 
-func emptyFolders(dir string) ([]string, error) {
+func findEmptyDirs(dir string) ([]string, error) {
 	var folders []string
 	holds := map[string]bool{}
 	err := filepath.WalkDir(dir, func(at string, entry fs.DirEntry, err error) error {
@@ -153,7 +153,7 @@ func emptyFolders(dir string) ([]string, error) {
 		return nil
 	})
 	switch {
-	case noFolder(err):
+	case isMissingDir(err):
 		return nil, nil
 	case err != nil:
 		return nil, errViewNotRead(LibraryViewDir, err)
@@ -169,7 +169,7 @@ func removeBelow(dir, below string) error {
 	return nil
 }
 
-func writeViews(dir string, views []view) (written []string, err error) {
+func writeViews(dir string, views []libraryView) (written []string, err error) {
 	written = []string{}
 	for _, v := range views {
 		if v.kept {
@@ -177,7 +177,7 @@ func writeViews(dir string, views []view) (written []string, err error) {
 		}
 		wrote, err := fsx.WriteIfChanged(filepath.Join(dir, filepath.FromSlash(v.file)), v.text)
 		switch {
-		case err != nil && isExpected(err):
+		case err != nil && isDiagError(err):
 			return nil, err
 		case err != nil:
 			return nil, errViewNotWritten(path.Join(LibraryViewDir, v.file), err)
@@ -207,11 +207,11 @@ func errViewNotRead(file string, cause error) error {
 
 func errViewNotRemoved(file string, cause error) error {
 	return &diag.Error{
-		Msg: "Removing " + file + " failed: " + removalReason(cause), File: file, Hint: viewRemovalHint, Cause: cause,
+		Msg: "Removing " + file + " failed: " + describeRemoveError(cause), File: file, Hint: viewRemovalHint, Cause: cause,
 	}
 }
 
-func removalReason(failure error) string {
+func describeRemoveError(failure error) string {
 	var worded *diag.Error
 	switch {
 	case !errors.As(failure, &worded):

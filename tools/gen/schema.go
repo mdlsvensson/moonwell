@@ -39,11 +39,11 @@ func writeSchema(checkout string, _ []string, out io.Writer) error {
 	if err := writeGenerated(checkout, files, out); err != nil {
 		return err
 	}
-	return removeOthers(checkout, files, out)
+	return removeStaleFiles(checkout, files, out)
 }
 
 func readMetadata(checkout string) (*objects.Metadata, error) {
-	data, err := os.ReadFile(fileIn(checkout, metadataPath))
+	data, err := os.ReadFile(pathIn(checkout, metadataPath))
 	if err != nil {
 		return nil, errInCheckout(checkout, metadataPath, err)
 	}
@@ -60,7 +60,7 @@ func decodeMetadata(data []byte) (*objects.Metadata, error) {
 
 func writeGenerated(checkout string, files []generatedFile, out io.Writer) error {
 	for _, file := range files {
-		wrote, err := fsx.WriteIfChanged(fileIn(checkout, file.path), file.text)
+		wrote, err := fsx.WriteIfChanged(pathIn(checkout, file.path), file.text)
 		if err != nil {
 			return errInCheckout(checkout, file.path, err)
 		}
@@ -71,8 +71,8 @@ func writeGenerated(checkout string, files []generatedFile, out io.Writer) error
 	return nil
 }
 
-func removeOthers(checkout string, files []generatedFile, out io.Writer) error {
-	entries, err := os.ReadDir(fileIn(checkout, schemaFolder))
+func removeStaleFiles(checkout string, files []generatedFile, out io.Writer) error {
+	entries, err := os.ReadDir(pathIn(checkout, schemaFolder))
 	if err != nil {
 		return errInCheckout(checkout, schemaFolder, err)
 	}
@@ -81,7 +81,7 @@ func removeOthers(checkout string, files []generatedFile, out io.Writer) error {
 		if slices.ContainsFunc(files, func(file generatedFile) bool { return file.path == path }) {
 			continue
 		}
-		if err := os.RemoveAll(fileIn(checkout, path)); err != nil {
+		if err := os.RemoveAll(pathIn(checkout, path)); err != nil {
 			return errInCheckout(checkout, path, err)
 		}
 		fmt.Fprintln(out, "removed "+path)
@@ -125,7 +125,7 @@ func unusableNames(module string, fields []objects.FieldMeta) []string {
 	latest := map[string]objects.FieldMeta{}
 	for _, field := range fields {
 		where := module + ": field " + fsx.QuoteJSON(displayRawcode(field.ID)) + " (" + field.Label + ")"
-		if !pklIdentifier.MatchString(field.Name) || nameIsTaken(field.Name) {
+		if !pklIdentifier.MatchString(field.Name) || isReservedName(field.Name) {
 			problems = append(problems, noPropertyName(where, field.Name))
 		}
 		if other, shared := latest[field.Name]; shared {
@@ -151,13 +151,13 @@ func renderModule(game string, module schemaModule, fields []objects.FieldMeta) 
 	}
 	for _, field := range fields {
 		property := field.Name + ": " + pklType(field)
-		lines = append(lines, "", "/// "+oneLine(field.Label), "///", "/// "+facts(field), property)
+		lines = append(lines, "", "/// "+collapseToOneLine(field.Label), "///", "/// "+describeField(field), property)
 	}
 	return strings.Join(lines, "\n") + "\n"
 }
 
-func facts(field objects.FieldMeta) string {
-	rawcode, category := displayRawcode(field.ID), oneLine(field.Category)
+func describeField(field objects.FieldMeta) string {
+	rawcode, category := displayRawcode(field.ID), collapseToOneLine(field.Category)
 	parts := []string{"Field `" + rawcode + "` (" + category + ", `" + field.Type + "`)."}
 	if field.PerLevel {
 		parts = append(parts, "Per level: a `List` sets levels 1, 2, ...")
@@ -193,7 +193,7 @@ func pklType(field objects.FieldMeta) string {
 	return scalar + "?"
 }
 
-func oneLine(text string) string {
+func collapseToOneLine(text string) string {
 	isSpace := func(r rune) bool { return strings.ContainsRune(fsx.ASCIISpace, r) }
 	return strings.Join(strings.FieldsFunc(text, isSpace), " ")
 }

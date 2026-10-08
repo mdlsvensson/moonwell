@@ -77,7 +77,7 @@ func TestBuildStagesTheMapPacksItAndSaysWhatItDid(t *testing.T) {
 	s.put("libs/kit/files/icons/Sword.blp", "kit sword")
 	s.put("assets/icons/sword.blp", "own sword")
 	source := filesBelow(t, s.at("maps"))
-	scanned, err := Source(s.project)
+	scanned, err := OpenSource(s.project)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -227,7 +227,7 @@ func TestABuildBesideAnotherLeavesTheArchiveOfTheBuildBefore(t *testing.T) {
 	s := newStandIn(t)
 	s.withInfo(modernInfo)
 	file, _ := built(t, s, Options{})
-	release, err := TakeLock(s.root)
+	release, err := AcquireLock(s.root)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -373,7 +373,7 @@ func TestEveryDoorRefusesALinkAtDistBeforeItWritesAnything(t *testing.T) {
 				if !untouched(t, s, leadsTo, before) || len(s.compilerRan()) != 0 {
 					t.Error("the refused command wrote where the link leads or into the maps, or compiled")
 				}
-				ReleaseHeld()
+				ReleaseHeldLocks()
 				if !untouched(t, s, leadsTo, before) {
 					t.Error("a release of every lock removed a file where the link leads")
 				}
@@ -533,10 +533,10 @@ func TestTheCheckOfACycleEvaluatesWithItsProgramAndWritesTheIDsModule(t *testing
 	s.templateMap()
 	own := filepath.Join(t.TempDir(), "pkl")
 	s.answer(own, s.pkl)
-	if _, err := check(background, s.env, own, false); err == nil {
+	if _, err := runCheck(background, s.env, own, false); err == nil {
 		t.Error("a check that writes nothing passed without an ids module")
 	}
-	result, err := check(background, s.env, own, true)
+	result, err := runCheck(background, s.env, own, true)
 	if err != nil {
 		t.Fatalf("check: %v", diag.Format(err))
 	}
@@ -594,7 +594,7 @@ func TestEveryDoorIsRefusedBesideABuildThatRuns(t *testing.T) {
 	for _, d := range doors {
 		t.Run(d.name, func(t *testing.T) {
 			s := newStandIn(t)
-			release, err := TakeLock(s.root)
+			release, err := AcquireLock(s.root)
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}

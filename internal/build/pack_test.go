@@ -78,7 +78,7 @@ func namesIn(t testing.TB, archive *testkit.MPQ) []string {
 
 func packedOf(t testing.TB, view *mapdir.Folder, name string) []byte {
 	t.Helper()
-	archive, err := pack(view, name)
+	archive, err := packMap(view, name)
 	if err != nil {
 		t.Fatalf("pack: %v", diag.Format(err))
 	}
@@ -118,7 +118,7 @@ func TestPackPrefixesHM3WForOlderMaps(t *testing.T) {
 }
 
 func TestPackRequiresTheMapInfo(t *testing.T) {
-	_, err := pack(viewOf(t, map[string]string{"war3map.lua": "function main() end"}), "map")
+	_, err := packMap(viewOf(t, map[string]string{"war3map.lua": "function main() end"}), "map")
 	e := asError(t, err, "a map without war3map.w3i")
 	if e.Msg != "war3map.w3i is missing from the map folder." || e.File != mapLabel ||
 		e.Hint != "Save the source map from World Editor in folder format." {
@@ -128,7 +128,7 @@ func TestPackRequiresTheMapInfo(t *testing.T) {
 
 func TestPackNamesTheMapInfoItCannotRead(t *testing.T) {
 	files := smallMap("\x27\x00")
-	_, err := pack(viewOf(t, files), "map")
+	_, err := packMap(viewOf(t, files), "map")
 	e := asError(t, err, "a war3map.w3i of two bytes")
 	if !strings.Contains(e.Msg, "war3map.w3i is truncated") || e.File != mapLabel+"/war3map.w3i" || e.Hint == "" {
 		t.Errorf("error = %+v", e)
