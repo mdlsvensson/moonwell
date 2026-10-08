@@ -193,14 +193,14 @@ func (p recordedPlan) lines() string {
 		out.WriteString("  no change\n")
 	}
 	for _, change := range p.changes {
-		what := testkit.Digest(change.Bytes)
+		what := testkit.Digest(change.Data)
 		switch {
 		case change.Remove:
 			what = "removed"
-		case strings.HasSuffix(mapdir.Key(change.Name), ".txt"):
-			what = strconv.Quote(string(change.Bytes))
+		case strings.HasSuffix(mapdir.Key(change.Path), ".txt"):
+			what = strconv.Quote(string(change.Data))
 		}
-		fmt.Fprintf(&out, "  %s: %s\n", change.Name, what)
+		fmt.Fprintf(&out, "  %s: %s\n", change.Path, what)
 	}
 	return out.String()
 }

@@ -22,7 +22,7 @@ func runOn(t *testing.T, script string, program *Program) (log, printed string) 
 	t.Helper()
 	change := placed(t, mapOf(t, "war3map.lua", script), program)
 	dir := t.TempDir()
-	file := testkit.WriteFile(t, dir, "war3map.lua", append(change.Bytes, asTheGame...))
+	file := testkit.WriteFile(t, dir, "war3map.lua", append(change.Data, asTheGame...))
 	if strings.HasPrefix(script, mark) {
 		file = testkit.WriteFile(t, dir, "run.lua", []byte(`dofile("war3map.lua")`))
 	}

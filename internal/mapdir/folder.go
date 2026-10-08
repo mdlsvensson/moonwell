@@ -9,113 +9,113 @@ import (
 )
 
 func Key(path string) string {
-	return strings.ToLower(slashed(path))
+	return strings.ToLower(toSlash(path))
 }
 
-func slashed(path string) string { return strings.ReplaceAll(path, `\`, "/") }
+func toSlash(path string) string { return strings.ReplaceAll(path, `\`, "/") }
 
-func join(folder, name string) string {
-	if folder == "" {
+func joinPath(dir, name string) string {
+	if dir == "" {
 		return name
 	}
-	return folder + "/" + name
+	return dir + "/" + name
 }
 
 type Folder struct {
-	dir, label string
-	found      *listing
-	hashes     map[string]string
-	changes    []Change
-	planned    map[string]int
-	made       map[string]string
+	dir, displayPath string
+	onDisk           *diskIndex
+	readHashes       map[string]string
+	changes          []Change
+	changeIndex      map[string]int
+	newDirs          map[string]string
 }
 
-func Open(dir, label string) (*Folder, error) {
-	found, err := scan(dir, label)
+func Open(dir, displayPath string) (*Folder, error) {
+	index, err := scanDir(dir, displayPath)
 	if err != nil {
 		return nil, err
 	}
 	return &Folder{
-		dir: dir, label: label, found: found,
-		hashes: map[string]string{}, planned: map[string]int{}, made: map[string]string{},
+		dir: dir, displayPath: displayPath, onDisk: index,
+		readHashes: map[string]string{}, changeIndex: map[string]int{}, newDirs: map[string]string{},
 	}, nil
 }
 
 func (f *Folder) Dir() string { return f.dir }
 
-func (f *Folder) Label(name string) string {
-	if name == "" {
-		return f.label
+func (f *Folder) DisplayPath(path string) string {
+	if path == "" {
+		return f.displayPath
 	}
-	return f.label + "/" + f.Name(name)
+	return f.displayPath + "/" + f.CanonicalPath(path)
 }
 
 func (f *Folder) Files() []string {
 	var files []string
-	for _, name := range f.found.files {
-		if f.Has(name) {
-			files = append(files, name)
+	for _, path := range f.onDisk.files {
+		if f.HasFile(path) {
+			files = append(files, path)
 		}
 	}
 	for _, change := range f.changes {
-		if !f.found.has(change.Name) {
-			files = append(files, change.Name)
+		if !f.onDisk.hasFile(change.Path) {
+			files = append(files, change.Path)
 		}
 	}
 	return files
 }
 
-func (f *Folder) Has(name string) bool {
-	if at, ok := f.planned[Key(name)]; ok {
-		return !f.changes[at].Remove
+func (f *Folder) HasFile(path string) bool {
+	if index, ok := f.changeIndex[Key(path)]; ok {
+		return !f.changes[index].Remove
 	}
-	return f.found.has(name)
+	return f.onDisk.hasFile(path)
 }
 
-func (f *Folder) IsFolder(name string) bool {
-	_, is := f.folder(Key(name))
-	return is
+func (f *Folder) IsDir(path string) bool {
+	_, ok := f.dirPath(Key(path))
+	return ok
 }
 
-func (f *Folder) Name(name string) string {
-	key := Key(name)
-	if spelled, ok := f.spelling(key); ok {
-		return spelled
+func (f *Folder) CanonicalPath(path string) string {
+	key := Key(path)
+	if canonical, ok := f.filePath(key); ok {
+		return canonical
 	}
-	if spelled, ok := f.folder(key); ok {
-		return spelled
+	if canonical, ok := f.dirPath(key); ok {
+		return canonical
 	}
-	return name
+	return path
 }
 
-func (f *Folder) spelling(key string) (string, bool) {
-	if at, ok := f.planned[key]; ok {
-		return f.changes[at].Name, true
+func (f *Folder) filePath(key string) (string, bool) {
+	if index, ok := f.changeIndex[key]; ok {
+		return f.changes[index].Path, true
 	}
-	spelled, ok := f.found.names[key]
-	return spelled, ok
+	canonical, ok := f.onDisk.filePaths[key]
+	return canonical, ok
 }
 
-func (f *Folder) Read(name string) (data []byte, found bool, err error) {
-	key := Key(name)
-	if at, ok := f.planned[key]; ok {
-		if f.changes[at].Remove {
+func (f *Folder) Read(path string) (data []byte, found bool, err error) {
+	key := Key(path)
+	if index, ok := f.changeIndex[key]; ok {
+		if f.changes[index].Remove {
 			return nil, false, nil
 		}
-		return f.changes[at].Bytes, true, nil
+		return f.changes[index].Data, true, nil
 	}
-	spelled, ok := f.found.names[key]
+	canonical, ok := f.onDisk.filePaths[key]
 	if !ok {
 		return nil, false, nil
 	}
-	if data, err = readBelow(f.dir, spelled); err != nil {
-		return nil, false, errUnreadable(f.Label(spelled), err)
+	if data, err = readFileIn(f.dir, canonical); err != nil {
+		return nil, false, errUnreadable(f.DisplayPath(canonical), err)
 	}
-	f.remember(key, data)
+	f.recordReadHash(key, data)
 	return data, true, nil
 }
 
-func readBelow(dir, path string) ([]byte, error) {
+func readFileIn(dir, path string) ([]byte, error) {
 	file, err := fsx.SafeJoin(dir, path)
 	if err != nil {
 		return nil, err
@@ -123,9 +123,9 @@ func readBelow(dir, path string) ([]byte, error) {
 	return os.ReadFile(file)
 }
 
-func (f *Folder) remember(key string, data []byte) {
-	if _, noted := f.hashes[key]; !noted {
-		f.hashes[key] = fsx.SHA256Hex(data)
+func (f *Folder) recordReadHash(key string, data []byte) {
+	if _, exists := f.readHashes[key]; !exists {
+		f.readHashes[key] = fsx.SHA256Hex(data)
 	}
 }
 

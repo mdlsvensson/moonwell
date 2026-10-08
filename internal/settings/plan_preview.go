@@ -34,10 +34,10 @@ func (p *planner) roomFor(preview *picture.Picture) error {
 		return err
 	}
 	for _, added := range []string{keptMinimap, tgaName} {
-		if p.folder.Has(added) {
-			return errNameTaken(p.folder.Name(added), p.folder.Label(added))
+		if p.folder.HasFile(added) {
+			return errNameTaken(p.folder.CanonicalPath(added), p.folder.DisplayPath(added))
 		}
-		if _, err := p.folder.Place(added); err != nil {
+		if _, err := p.folder.ResolveNewPath(added); err != nil {
 			return err
 		}
 	}
@@ -46,12 +46,12 @@ func (p *planner) roomFor(preview *picture.Picture) error {
 
 func (p *planner) hasMinimap() error {
 	switch {
-	case p.folder.Has(savedMinimap):
+	case p.folder.HasFile(savedMinimap):
 		return nil
-	case p.folder.IsFolder(savedMinimap):
-		return errFolderForFile(p.folder.Name(savedMinimap), p.folder.Label(savedMinimap))
+	case p.folder.IsDir(savedMinimap):
+		return errFolderForFile(p.folder.CanonicalPath(savedMinimap), p.folder.DisplayPath(savedMinimap))
 	}
-	return errNoMinimap(p.folder.Label(savedMinimap))
+	return errNoMinimap(p.folder.DisplayPath(savedMinimap))
 }
 
 func (p *planner) preview(preview *picture.Picture) error {
@@ -68,7 +68,7 @@ func (p *planner) preview(preview *picture.Picture) error {
 	if preview.Extension == "blp" {
 		return p.write(savedMinimap, preview.Bytes)
 	}
-	if err := p.change(mapdir.Change{Name: savedMinimap, Remove: true}); err != nil {
+	if err := p.change(mapdir.Change{Path: savedMinimap, Remove: true}); err != nil {
 		return err
 	}
 	return p.write(tgaName, preview.Bytes)

@@ -34,7 +34,7 @@ func pack(view *mapdir.Folder, name string) ([]byte, error) {
 	}
 	archive, err := mpq.Write(files, options)
 	if err != nil {
-		return nil, named(err, view.Label(""))
+		return nil, named(err, view.DisplayPath(""))
 	}
 	return archive, nil
 }
@@ -45,9 +45,9 @@ func formatOf(view *mapdir.Folder) (w3i.Header, error) {
 	case err != nil:
 		return w3i.Header{}, err
 	case !found:
-		return w3i.Header{}, errNoMapInfo(view.Label(""))
+		return w3i.Header{}, errNoMapInfo(view.DisplayPath(""))
 	}
-	return w3i.ReadHeader(info, view.Label(infoName))
+	return w3i.ReadHeader(info, view.DisplayPath(infoName))
 }
 
 func archiveFiles(view *mapdir.Folder) ([]mpq.File, error) {
@@ -91,14 +91,14 @@ func errTooLarge(view *mapdir.Folder, file string) error {
 	if file == "" {
 		return &diag.Error{
 			Msg:  "The map is too large to pack: an archive holds at most " + limit + ".",
-			File: view.Label(""),
+			File: view.DisplayPath(""),
 			Hint: "Take files out of the map or out of assets/.",
 		}
 	}
-	inMap := view.Name(strings.ReplaceAll(file, `\`, "/"))
+	inMap := view.CanonicalPath(strings.ReplaceAll(file, `\`, "/"))
 	return &diag.Error{
 		Msg:  inMap + " is too large to pack: a file of an archive holds at most " + limit + ".",
-		File: view.Label(inMap),
+		File: view.DisplayPath(inMap),
 		Hint: "Take the file out of the map or out of assets/, or make it smaller.",
 	}
 }

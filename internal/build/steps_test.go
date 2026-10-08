@@ -83,7 +83,7 @@ func TestPlanAssetsPlansTheImportIntoTheFolderItIsGivenAgainstWhatTheStateOwns(t
 	}
 	var changes []string
 	for _, change := range plan.Changes {
-		changes = append(changes, fmt.Sprint(change.Name, " removed: ", change.Remove))
+		changes = append(changes, fmt.Sprint(change.Path, " removed: ", change.Remove))
 	}
 	slices.Sort(changes)
 	changed := []string{

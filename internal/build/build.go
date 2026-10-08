@@ -57,22 +57,22 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 		return nil, err
 	}
 
-	view := source.With(objs.Changes)
+	view := source.WithChanges(objs.Changes)
 	set, err := settings.Plan(view, p)
 	if err != nil {
 		return nil, err
 	}
-	view = view.With(set)
+	view = view.WithChanges(set)
 	imported, replaced, err := PlanAssets(ctx, view, p, synced)
 	if err != nil {
 		return nil, err
 	}
-	view = view.With(imported.Changes)
+	view = view.WithChanges(imported.Changes)
 	bundle, err := script.Inject(view, program)
 	if err != nil {
 		return nil, err
 	}
-	view = view.With(bundle)
+	view = view.WithChanges(bundle)
 	return &Result{Map: view, Objects: objs, Settings: set, Assets: imported, Replaced: replaced, Program: program}, nil
 }
 

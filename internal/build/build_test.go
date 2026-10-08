@@ -486,7 +486,7 @@ func TestCheckSaysWhatABuildWouldHoldAndStagesNothing(t *testing.T) {
 		t.Errorf("logged %q, want %q", lines, want)
 	}
 	if result == nil || result.Program.Entry != "main" || len(result.Assets.Assets) != 2 ||
-		!result.Map.Has("icons/axe.blp") {
+		!result.Map.HasFile("icons/axe.blp") {
 		t.Errorf("Check = %+v", result)
 	}
 	if fsx.Exists(s.at("dist/stage/map.w3x")) || fsx.Exists(s.at("dist/bin")) || fsx.Exists(lockOf(s.root)) {

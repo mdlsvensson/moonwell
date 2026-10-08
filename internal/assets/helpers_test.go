@@ -210,9 +210,9 @@ func names(changes []mapdir.Change) []string {
 	list := []string{}
 	for _, change := range changes {
 		if change.Remove {
-			list = append(list, "-"+change.Name)
+			list = append(list, "-"+change.Path)
 		} else {
-			list = append(list, change.Name)
+			list = append(list, change.Path)
 		}
 	}
 	return list

@@ -63,7 +63,7 @@ func (p *planner) mapInfo(s manifest.Settings) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	patched, err := patchInfo(data, s, p.folder.Label(infoName))
+	patched, err := patchInfo(data, s, p.folder.DisplayPath(infoName))
 	if err != nil {
 		return nil, err
 	}
@@ -95,8 +95,8 @@ func needsLua(s manifest.Settings) bool {
 }
 
 func (p *planner) patchedLua(source string, s manifest.Settings, patchedInfo []byte, withPreview bool) (string, error) {
-	file := p.folder.Label(luaName)
-	patched, err := patchLuaAfter(source, s, patchedInfo, file, p.folder.Label(infoName))
+	file := p.folder.DisplayPath(luaName)
+	patched, err := patchLuaAfter(source, s, patchedInfo, file, p.folder.DisplayPath(infoName))
 	if err != nil || !withPreview {
 		return patched, err
 	}
@@ -138,10 +138,10 @@ func (p *planner) required(name string) ([]byte, error) {
 		return nil, err
 	case found:
 		return data, nil
-	case p.folder.IsFolder(name):
-		return nil, errFolderForFile(p.folder.Name(name), p.folder.Label(name))
+	case p.folder.IsDir(name):
+		return nil, errFolderForFile(p.folder.CanonicalPath(name), p.folder.DisplayPath(name))
 	}
-	return nil, errMissing(p.folder.Label(name))
+	return nil, errMissing(p.folder.DisplayPath(name))
 }
 
 func (p *planner) requiredText(name string) (mark, text string, err error) {
@@ -155,21 +155,21 @@ func (p *planner) requiredText(name string) (mark, text string, err error) {
 func (p *planner) textOf(name string, data []byte) (mark, text string, err error) {
 	mark, text, ok := fsx.TextWithMark(data)
 	if !ok {
-		return "", "", errNotText(p.folder.Label(name))
+		return "", "", errNotText(p.folder.DisplayPath(name))
 	}
 	return mark, text, nil
 }
 
 func (p *planner) write(name string, data []byte) error {
-	return p.change(mapdir.Change{Name: name, Bytes: data})
+	return p.change(mapdir.Change{Path: name, Data: data})
 }
 
 func (p *planner) change(change mapdir.Change) error {
-	placed, err := p.folder.Place(change.Name)
+	placed, err := p.folder.ResolveNewPath(change.Path)
 	if err != nil {
 		return err
 	}
-	change.Name = placed
+	change.Path = placed
 	p.changes = append(p.changes, change)
 	return nil
 }

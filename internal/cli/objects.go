@@ -24,7 +24,7 @@ func runObjectsCheck(ctx context.Context, e *env.Env, _ call) error {
 		return err
 	}
 	for _, change := range objs.Changes {
-		e.Log.Info("  " + change.Name)
+		e.Log.Info("  " + change.Path)
 	}
 	status, err := objects.StatusOfIDs(e.Root, objs.IDs)
 	if err != nil {

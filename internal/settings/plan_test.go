@@ -68,7 +68,7 @@ func refusedPlan(t testing.TB, dir, root, document, file string) *diag.Error {
 func namesOf(changes []mapdir.Change) []string {
 	names := []string{}
 	for _, change := range changes {
-		names = append(names, change.Name)
+		names = append(names, change.Path)
 	}
 	return names
 }
@@ -83,7 +83,7 @@ func wantNames(t testing.TB, changes []mapdir.Change, names ...string) {
 func staged(t testing.TB, dir string, changes []mapdir.Change) string {
 	t.Helper()
 	stage := filepath.Join(t.TempDir(), "stage")
-	if err := openMap(t, dir).With(changes).StageTo(stage); err != nil {
+	if err := openMap(t, dir).WithChanges(changes).StageTo(stage); err != nil {
 		t.Fatalf("staging the plan: %v", err)
 	}
 	return stage
@@ -142,10 +142,10 @@ func TestAllFourFilesComeInOneOrderWhateverOrderTheSettingsAreWrittenIn(t *testi
 	changes := planned(t, dir, "", `{"gameInterface":{"CustomSkin":{"Test":"value"}},
 		"gameplayConstants":{"Misc":{"GoldCost":"1"}},"info":{"description":"Described"}}`)
 	wantNames(t, changes, "war3map.w3i", "war3map.lua", "war3mapMisc.txt", "war3mapSkin.txt")
-	if got := string(changes[2].Bytes); got != "[Misc]\nGoldCost=1" {
+	if got := string(changes[2].Data); got != "[Misc]\nGoldCost=1" {
 		t.Errorf("war3mapMisc.txt = %q", got)
 	}
-	if got := string(changes[3].Bytes); got != "[Existing]\nX=1\n\n[CustomSkin]\nTest=value\n" {
+	if got := string(changes[3].Data); got != "[Existing]\nX=1\n\n[CustomSkin]\nTest=value\n" {
 		t.Errorf("war3mapSkin.txt = %q", got)
 	}
 }
@@ -154,7 +154,7 @@ func TestTextSettingsNeedNeitherTheMapInfoNorTheScript(t *testing.T) {
 	dir := t.TempDir()
 	changes := planned(t, dir, "", `{"gameInterface":{"CustomSkin":{"Test":""}}}`)
 	wantNames(t, changes, "war3mapSkin.txt")
-	if got := string(changes[0].Bytes); got != "[CustomSkin]\nTest=" {
+	if got := string(changes[0].Data); got != "[CustomSkin]\nTest=" {
 		t.Errorf("war3mapSkin.txt = %q", got)
 	}
 	testkit.WriteFile(t, dir, "war3mapMisc.txt", []byte("[Misc]\nFoodCeiling=100\n"))
@@ -204,16 +204,16 @@ func TestAnExplicitFalseAZeroAndAnEmptyTextAreSetAndNotInherited(t *testing.T) {
 	}
 	changes := planned(t, dir, "", `{"info":{"name":""},"players":{"0":{"fixedStart":false,"x":0}},"gameplay":{"foodLimit":0}}`)
 	wantNames(t, changes, "war3map.w3i", "war3map.lua", "war3mapMisc.txt")
-	info := readInfo(t, changes[0].Bytes, w3i.Extended)
+	info := readInfo(t, changes[0].Data, w3i.Extended)
 	if player := info.Details.Players[0]; info.Name.Value != "" || player.X.Value != 0 || player.FixedStart.Value != 0 ||
 		player.Y.Value != own.Details.Players[0].Y.Value || info.Author.Value != own.Author.Value {
 		t.Errorf("the map info has the name %q and the player %+v", info.Name.Value, player)
 	}
-	script := string(changes[1].Bytes)
+	script := string(changes[1].Data)
 	if !strings.Contains(script, `SetMapName("")`) || strings.Contains(script, "ForcePlayerStartLocation(Player(0), 0)") {
 		t.Error("the script does not have the empty name, or it holds player 0 to its start")
 	}
-	if got := string(changes[2].Bytes); got != "[Misc]\nFoodCeiling=0" {
+	if got := string(changes[2].Data); got != "[Misc]\nFoodCeiling=0" {
 		t.Errorf("war3mapMisc.txt = %q", got)
 	}
 }
@@ -401,13 +401,13 @@ func TestAByteOrderMarkStaysInFrontOfAScriptAndATextFileThatChange(t *testing.T)
 	changes := planned(t, dir, "", `{"info":{"name":"BOM"},"gameInterface":{"A":{"B":"c"}},"gameplay":{"foodLimit":9}}`)
 	wantNames(t, changes, "war3map.w3i", "war3map.lua", "war3mapMisc.txt", "war3mapSkin.txt")
 	want := byteOrderMark + swapped(t, fixtureLua(t), `SetMapName("TRIGSTR_001")`, `SetMapName("BOM")`)
-	if string(changes[1].Bytes) != want {
+	if string(changes[1].Data) != want {
 		t.Error("the script is not the fixture's with its mark and the name")
 	}
-	if got := string(changes[2].Bytes); got != "[Misc]\nFoodCeiling=9" {
+	if got := string(changes[2].Data); got != "[Misc]\nFoodCeiling=9" {
 		t.Errorf("war3mapMisc.txt = %q", got)
 	}
-	if got := string(changes[3].Bytes); got != byteOrderMark+"[A]\nB=c\n" {
+	if got := string(changes[3].Data); got != byteOrderMark+"[A]\nB=c\n" {
 		t.Errorf("war3mapSkin.txt = %q", got)
 	}
 	stage := staged(t, dir, changes)
@@ -434,7 +434,7 @@ func TestPlanningLeavesTheProjectAsItWas(t *testing.T) {
 	if !reflect.DeepEqual(project, before) {
 		t.Error("planning changed the project")
 	}
-	if got := string(changes[2].Bytes); got != "[misc]\nOther=1\nMaxHeroLevel=20\nFoodCeiling=150" {
+	if got := string(changes[2].Data); got != "[misc]\nOther=1\nMaxHeroLevel=20\nFoodCeiling=150" {
 		t.Errorf("war3mapMisc.txt = %q", got)
 	}
 }
@@ -467,7 +467,7 @@ func TestTheFilesAreFoundInAnyLetterCaseAndChangedUnderTheNamesTheMapHas(t *test
 	changes := planned(t, dir, "", document)
 	names := []string{"WAR3MAP.W3I", "War3Map.Lua", "WAR3MAPMISC.TXT", "war3mapskin.txt"}
 	wantNames(t, changes, names...)
-	if got := string(changes[3].Bytes); got != "[A]\nOld=1\nB=c\n" {
+	if got := string(changes[3].Data); got != "[A]\nOld=1\nB=c\n" {
 		t.Errorf("the skin file = %q", got)
 	}
 	slices.Sort(names)
@@ -504,11 +504,11 @@ func TestABLPPreviewTakesTheMinimapsPlaceWhichIsKeptUnderAnotherNameAndCalledFor
 	before := testkit.Snapshot(t, dir)
 	changes := planned(t, dir, root, previewAt("preview.blp"))
 	wantNames(t, changes, "war3map.lua", "war3mapMinimap.blp", "war3mapMap.blp")
-	if !bytes.Equal(changes[1].Bytes, minimapBytes) || !bytes.Equal(changes[2].Bytes, picture) || changes[2].Remove {
+	if !bytes.Equal(changes[1].Data, minimapBytes) || !bytes.Equal(changes[2].Data, picture) || changes[2].Remove {
 		t.Error("the minimap or the picture has the wrong bytes")
 	}
 	script := fixtureLua(t)
-	if len(changes[0].Bytes) != len(script)+len(minimapCall)+2 || !bytes.Contains(changes[0].Bytes, []byte(minimapCall)) {
+	if len(changes[0].Data) != len(script)+len(minimapCall)+2 || !bytes.Contains(changes[0].Data, []byte(minimapCall)) {
 		t.Error("the change to the script is not the minimap call alone")
 	}
 	if !reflect.DeepEqual(testkit.Snapshot(t, dir), before) {
@@ -527,8 +527,8 @@ func TestATGAPreviewRemovesTheMinimapsBLPAndGoesInAsATGAWrittenAgain(t *testing.
 	dir, root := withPreview(t, "art/Preview.TGA", source)
 	changes := planned(t, dir, root, previewAt("art/Preview.TGA"))
 	wantNames(t, changes, "war3map.lua", "war3mapMinimap.blp", "war3mapMap.blp", "war3mapMap.tga")
-	if !bytes.Equal(changes[1].Bytes, minimapBytes) || !changes[2].Remove || changes[2].Bytes != nil ||
-		!bytes.Equal(changes[3].Bytes, testkit.TGA(picture, testkit.TGAOptions{Alpha: opaque()})) {
+	if !bytes.Equal(changes[1].Data, minimapBytes) || !changes[2].Remove || changes[2].Data != nil ||
+		!bytes.Equal(changes[3].Data, testkit.TGA(picture, testkit.TGAOptions{Alpha: opaque()})) {
 		t.Error("the plan's files have the wrong content")
 	}
 	stage := staged(t, dir, changes)
@@ -536,7 +536,7 @@ func TestATGAPreviewRemovesTheMinimapsBLPAndGoesInAsATGAWrittenAgain(t *testing.
 	if got := fileNames(t, stage); !slices.Equal(got, want) {
 		t.Errorf("the staged map holds %q, want %q", got, want)
 	}
-	if !bytes.Equal(testkit.Snapshot(t, stage)["war3mapMap.tga"], changes[3].Bytes) {
+	if !bytes.Equal(testkit.Snapshot(t, stage)["war3mapMap.tga"], changes[3].Data) {
 		t.Error("the staged picture differs from the plan's")
 	}
 }
@@ -551,7 +551,7 @@ func TestAPNGPreviewGoesIntoTheMapAsTheSameFilesAsATGAOfThePicture(t *testing.T)
 	if !reflect.DeepEqual(changes, expected) {
 		t.Error("the plan differs from the plan for a TGA of the picture")
 	}
-	if !changes[2].Remove || !bytes.Equal(changes[3].Bytes, testkit.TGA(picture, testkit.TGAOptions{Alpha: opaque()})) {
+	if !changes[2].Remove || !bytes.Equal(changes[3].Data, testkit.TGA(picture, testkit.TGAOptions{Alpha: opaque()})) {
 		t.Error("the picture in the plan is not the opaque TGA of the PNG")
 	}
 }
@@ -563,7 +563,7 @@ func TestThePreviewsFilesFollowTheOtherSettingsAndBothEditsOfTheScriptGoIntoOneC
 		"gameInterface":{"CustomSkin":{"Test":"value"}}}`
 	changes := planned(t, dir, root, document)
 	wantNames(t, changes, "war3map.w3i", "war3map.lua", "war3mapMisc.txt", "war3mapSkin.txt", "war3mapMinimap.blp", "war3mapMap.blp")
-	script := changes[1].Bytes
+	script := changes[1].Data
 	if !bytes.Contains(script, []byte(`SetMapName("Both")`)) || !bytes.Contains(script, []byte(minimapCall)) ||
 		!bytes.HasPrefix(script, []byte(byteOrderMark+fixtureLua(t)[:8])) {
 		t.Error("the change to the script lacks one of its two edits, or its mark")

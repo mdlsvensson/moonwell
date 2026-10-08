@@ -104,7 +104,7 @@ type plannedChange struct {
 func plannedBy(result *Result) *planned {
 	p := &planned{Changes: []plannedChange{}, Owned: append([]Owned{}, result.State.Files...)}
 	for _, change := range result.Changes {
-		p.Changes = append(p.Changes, plannedChange{change.Name, change.Bytes, change.Remove})
+		p.Changes = append(p.Changes, plannedChange{change.Path, change.Data, change.Remove})
 	}
 	return p
 }
@@ -153,7 +153,7 @@ func (r run) in(t testing.TB, root string) (did ran) {
 		r.meddle(t, root)
 	}
 	if r.build {
-		did.err = folder.With(result.Changes).StageTo(filepath.Join(root, filepath.FromSlash(stageFolder)))
+		did.err = folder.WithChanges(result.Changes).StageTo(filepath.Join(root, filepath.FromSlash(stageFolder)))
 		return did
 	}
 	did.err = Sync(syncCtx, folder, result, root, stateFile)

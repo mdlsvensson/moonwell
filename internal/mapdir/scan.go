@@ -11,52 +11,52 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-type listing struct {
-	files   []string
-	names   map[string]string
-	folders map[string]string
+type diskIndex struct {
+	files     []string
+	filePaths map[string]string
+	dirPaths  map[string]string
 }
 
-func (l *listing) has(name string) bool {
-	_, ok := l.names[Key(name)]
+func (l *diskIndex) hasFile(path string) bool {
+	_, ok := l.filePaths[Key(path)]
 	return ok
 }
 
-func (l *listing) spelling(key string) (string, bool) {
-	if path, ok := l.names[key]; ok {
+func (l *diskIndex) pathOf(key string) (string, bool) {
+	if path, ok := l.filePaths[key]; ok {
 		return path, true
 	}
-	path, ok := l.folders[key]
+	path, ok := l.dirPaths[key]
 	return path, ok
 }
 
 type walker struct {
-	dir, label string
-	found      *listing
+	dir, displayPath string
+	index            *diskIndex
 }
 
-func scan(dir, label string) (*listing, error) {
-	if err := realFolder(dir, label); err != nil {
+func scanDir(dir, displayPath string) (*diskIndex, error) {
+	if err := checkRealDir(dir, displayPath); err != nil {
 		return nil, err
 	}
-	w := walker{dir: dir, label: label, found: &listing{names: map[string]string{}, folders: map[string]string{}}}
+	w := walker{dir: dir, displayPath: displayPath, index: &diskIndex{filePaths: map[string]string{}, dirPaths: map[string]string{}}}
 	if err := w.walk(""); err != nil {
 		return nil, err
 	}
-	return w.found, nil
+	return w.index, nil
 }
 
-func realFolder(dir, label string) error {
+func checkRealDir(dir, displayPath string) error {
 	info, err := os.Lstat(dir)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		return err
 	case err != nil:
-		return errUnlistable(label, err)
+		return errUnreadableDir(displayPath, err)
 	case fsx.IsLink(info):
-		return errLink(label)
+		return errSymlink(displayPath)
 	case !info.IsDir():
-		return errNotAFolder(label)
+		return errNotADir(displayPath)
 	}
 	return nil
 }
@@ -64,55 +64,55 @@ func realFolder(dir, label string) error {
 func (w walker) walk(path string) error {
 	entries, err := os.ReadDir(filepath.Join(w.dir, filepath.FromSlash(path)))
 	if err != nil {
-		return errUnlistable(join(w.label, path), err)
+		return errUnreadableDir(joinPath(w.displayPath, path), err)
 	}
 	for _, entry := range entries {
-		if err := w.add(join(path, entry.Name()), entry); err != nil {
+		if err := w.addEntry(joinPath(path, entry.Name()), entry); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func usable(name string) bool {
+func isValidName(name string) bool {
 	_, ok := fsx.RelPath(name)
 	return ok && !strings.Contains(name, `\`)
 }
 
-func (w walker) add(path string, entry fs.DirEntry) error {
-	if !usable(entry.Name()) {
-		return errUnusableName(join(w.label, path))
+func (w walker) addEntry(path string, entry fs.DirEntry) error {
+	if !isValidName(entry.Name()) {
+		return errInvalidName(joinPath(w.displayPath, path))
 	}
 	key := Key(path)
-	if other, ok := w.found.spelling(key); ok {
-		return errTwoSpellings(other, path, join(w.label, path))
+	if existing, ok := w.index.pathOf(key); ok {
+		return errCaseConflict(existing, path, joinPath(w.displayPath, path))
 	}
 	info, err := entry.Info()
 	switch {
 	case err != nil:
-		return errUnlistable(join(w.label, path), err)
+		return errUnreadableDir(joinPath(w.displayPath, path), err)
 	case fsx.IsLink(info):
-		return errLink(join(w.label, path))
+		return errSymlink(joinPath(w.displayPath, path))
 	case info.IsDir():
-		w.found.folders[key] = path
+		w.index.dirPaths[key] = path
 		return w.walk(path)
 	case info.Mode().IsRegular():
-		w.found.files = append(w.found.files, path)
-		w.found.names[key] = path
+		w.index.files = append(w.index.files, path)
+		w.index.filePaths[key] = path
 		return nil
 	}
-	return errNotRegular(join(w.label, path))
+	return errNotRegularFile(joinPath(w.displayPath, path))
 }
 
-func errNotAFolder(label string) error {
+func errNotADir(displayPath string) error {
 	return &diag.Error{
-		Msg:  "Source map " + label + " is not a folder.",
-		File: label,
+		Msg:  "Source map " + displayPath + " is not a folder.",
+		File: displayPath,
 		Hint: "Save the map in World Editor in folder format (File > Save Map As, Folder).",
 	}
 }
 
-func errUnlistable(file string, cause error) error {
+func errUnreadableDir(file string, cause error) error {
 	return &diag.Error{
 		Msg:   "Reading the map folder failed: " + fsx.Reason(cause),
 		File:  file,
@@ -121,7 +121,7 @@ func errUnlistable(file string, cause error) error {
 	}
 }
 
-func errLink(file string) error {
+func errSymlink(file string) error {
 	err := fsx.LinkError(file)
 	var failure *diag.Error
 	if errors.As(err, &failure) {
@@ -130,7 +130,7 @@ func errLink(file string) error {
 	return err
 }
 
-func errUnusableName(file string) error {
+func errInvalidName(file string) error {
 	return &diag.Error{
 		Msg:  file + " has a name that cannot be used in a map that Windows tools read.",
 		File: file,
@@ -139,7 +139,7 @@ func errUnusableName(file string) error {
 	}
 }
 
-func errTwoSpellings(first, second, file string) error {
+func errCaseConflict(first, second, file string) error {
 	return &diag.Error{
 		Msg:  "Map paths " + first + " and " + second + " differ only in letter case.",
 		File: file,
@@ -147,7 +147,7 @@ func errTwoSpellings(first, second, file string) error {
 	}
 }
 
-func errNotRegular(file string) error {
+func errNotRegularFile(file string) error {
 	return &diag.Error{
 		Msg:  file + " is not a regular file.",
 		File: file,

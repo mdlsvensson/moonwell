@@ -24,7 +24,7 @@ func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, root, stat
 		return err
 	}
 	var journal fsx.Journal
-	failure := write(ctx, folder.With(result.Changes), state, &journal)
+	failure := write(ctx, folder.WithChanges(result.Changes), state, &journal)
 	if failure == nil {
 		return nil
 	}
@@ -119,7 +119,7 @@ func named(folder *mapdir.Folder, path string) string {
 	if err != nil || !filepath.IsLocal(below) {
 		return path
 	}
-	return folder.Label(filepath.ToSlash(below))
+	return folder.DisplayPath(filepath.ToSlash(below))
 }
 
 func undone(failure error, touched int, unrestored []string) error {

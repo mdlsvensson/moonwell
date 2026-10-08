@@ -81,7 +81,7 @@ func sourcesOf(runs []compilerRun, lists bool) []string {
 func changedNames(view *mapdir.Folder) []string {
 	var names []string
 	for _, change := range view.Changes() {
-		names = append(names, change.Name)
+		names = append(names, change.Path)
 	}
 	return names
 }
@@ -124,7 +124,7 @@ func TestPlanPlansTheObjectsBeforeAnythingIsCompiledAndLaysThemOverTheMapNotInto
 		t.Errorf("the plan has %d object(s) in %d file(s)", len(result.Objects.Objects), len(result.Objects.Changes))
 	}
 	for _, name := range []string{"war3map.w3u", "war3mapSkin.w3u"} {
-		if !result.Map.Has(name) || fsx.Exists(s.at("maps/map.w3x/"+name)) {
+		if !result.Map.HasFile(name) || fsx.Exists(s.at("maps/map.w3x/"+name)) {
 			t.Errorf("%s is not in the planned map, or is in the source map", name)
 		}
 	}
@@ -146,7 +146,7 @@ func TestPlanPlansTheObjectsBeforeAnythingIsCompiledAndLaysThemOverTheMapNotInto
 func TestPlanOfAProjectWithoutObjectsMakesNoIDsModule(t *testing.T) {
 	s := newStandIn(t)
 	result := planOf(t, s, Options{})
-	if fsx.Exists(s.at(objects.IDsFile)) || result.Map.Has("war3map.w3u") ||
+	if fsx.Exists(s.at(objects.IDsFile)) || result.Map.HasFile("war3map.w3u") ||
 		len(result.Objects.Objects) != 0 || len(result.Objects.Changes) != 0 {
 		t.Errorf("a project without objects got an ids module or object files: %+v", result.Objects)
 	}
@@ -206,7 +206,7 @@ func TestPlanLaysTheObjectFilesUnderTheSettingsChangesAndTheBundleOverBoth(t *te
 	}
 	ofSettings := []string{}
 	for _, change := range result.Settings {
-		ofSettings = append(ofSettings, change.Name)
+		ofSettings = append(ofSettings, change.Path)
 	}
 	if !slices.Equal(ofSettings, want[2:]) {
 		t.Errorf("the settings change %q, want %q", ofSettings, want[2:])
@@ -312,7 +312,7 @@ func TestPlanReportsTheFaultsOfAProjectInTheOrderOfTheBuild(t *testing.T) {
 		step.repair()
 	}
 	result := planOf(t, s, Options{})
-	if !result.Map.Has("icons/Absent.blp") || !result.Map.Has("war3map.w3u") {
+	if !result.Map.HasFile("icons/Absent.blp") || !result.Map.HasFile("war3map.w3u") {
 		t.Errorf("the plan of the project put right changes %q", changedNames(result.Map))
 	}
 }
@@ -633,7 +633,7 @@ func TestPlanReadsTheOwnershipStateAndNeverWritesIt(t *testing.T) {
 				fsx.SHA256Hex([]byte("an asset of an earlier sync")) + "\"\n  }\n}\n"
 			s.put(tt.stateFile, state)
 			result := planOf(t, s, Options{})
-			if result.Map.Has("icons/old.blp") || !fsx.Exists(s.at(tt.at+"/icons/old.blp")) {
+			if result.Map.HasFile("icons/old.blp") || !fsx.Exists(s.at(tt.at+"/icons/old.blp")) {
 				t.Error("the owned file is in the planned map still, or left the source map")
 			}
 			if held, _ := os.ReadFile(s.at(tt.stateFile)); string(held) != state {

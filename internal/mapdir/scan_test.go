@@ -114,9 +114,9 @@ func TestTheScanRefusesAnEntryWithANameWindowsCannotHold(t *testing.T) {
 	for _, c := range unusable {
 		for _, below := range []string{"", "Units/Hero"} {
 			t.Run(c.why+" in "+cmp.Or(below, "the top folder"), func(t *testing.T) {
-				w := walker{label: label, found: &listing{}}
-				path := join(below, c.name)
-				e := asError(t, w.add(path, named{name: c.name}))
+				w := walker{displayPath: label, index: &diskIndex{}}
+				path := joinPath(below, c.name)
+				e := asError(t, w.addEntry(path, named{name: c.name}))
 				if !contains(e.Msg, "cannot be used in a map") || !contains(e.Msg, "Windows") || !contains(e.Msg, path) ||
 					e.File != label+"/"+path || !contains(e.Hint, "source map") {
 					t.Errorf("error = %+v, want it at %s", e, label+"/"+path)
@@ -128,7 +128,7 @@ func TestTheScanRefusesAnEntryWithANameWindowsCannotHold(t *testing.T) {
 
 func TestANameWindowsCanHoldIsUsable(t *testing.T) {
 	for _, name := range []string{"war3map.w3i", "Icon 1.blp", ".hidden", "..b", "console.txt", "h\xC3\xA9ro.mdx", "a.b.c"} {
-		if !usable(name) {
+		if !isValidName(name) {
 			t.Errorf("usable(%q) is false", name)
 		}
 	}

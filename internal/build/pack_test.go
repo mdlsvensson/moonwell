@@ -154,10 +154,10 @@ func TestPackSkipsStaleArchiveMetadataFromTheMapFolder(t *testing.T) {
 }
 
 func TestPackPacksThePlannedViewAndNotWhatIsOnDisk(t *testing.T) {
-	view := viewOf(t, smallMap(modernInfo)).With([]mapdir.Change{
-		{Name: "war3map.lua", Bytes: []byte("function main() end -- bundled")},
-		{Name: "war3mapImported/a.txt", Remove: true},
-		{Name: "icons/new.blp", Bytes: []byte("new")},
+	view := viewOf(t, smallMap(modernInfo)).WithChanges([]mapdir.Change{
+		{Path: "war3map.lua", Data: []byte("function main() end -- bundled")},
+		{Path: "war3mapImported/a.txt", Remove: true},
+		{Path: "icons/new.blp", Data: []byte("new")},
 	})
 	archive := opened(t, packedOf(t, view, "map"))
 	if got := fileOf(t, archive, "war3map.lua"); got != "function main() end -- bundled" {
@@ -178,10 +178,10 @@ func TestPackKeepsTheOrderOfTheViewsFiles(t *testing.T) {
 	files["alpha/b.txt"] = "b"
 	files["alpha/B/c.txt"] = "c"
 	files["war3map.doo"] = "doodads"
-	view := viewOf(t, files).With([]mapdir.Change{
-		{Name: "zz/late.txt", Bytes: []byte("late")},
-		{Name: "alpha/a.txt", Bytes: []byte("a")},
-		{Name: "war3map.doo", Bytes: []byte("patched")},
+	view := viewOf(t, files).WithChanges([]mapdir.Change{
+		{Path: "zz/late.txt", Data: []byte("late")},
+		{Path: "alpha/a.txt", Data: []byte("a")},
+		{Path: "war3map.doo", Data: []byte("patched")},
 	})
 	want := []string{
 		"Zeta.txt", `alpha\B\c.txt`, `alpha\b.txt`, "war3map.doo", "war3map.lua", "war3map.w3i",

@@ -220,7 +220,7 @@ func TestPklSettingsPreviewChangesAndNamedErrors(t *testing.T) {
 	opaque := byte(255)
 	changes := plannedSettings(t, root)
 	if len(changes) != 4 ||
-		!bytes.Equal(changes[3].Bytes, testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{Alpha: &opaque})) {
+		!bytes.Equal(changes[3].Data, testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{Alpha: &opaque})) {
 		t.Fatalf("the settings plan %d changes, or the last is not the picture", len(changes))
 	}
 	e, log, _ := pklOnly(t, root)

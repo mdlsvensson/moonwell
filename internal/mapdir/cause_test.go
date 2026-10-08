@@ -39,12 +39,12 @@ var causes = []struct {
 		return err
 	}},
 	{"a name that cannot be used", "cannot be used in a map", refused, func(t *testing.T) error {
-		w := walker{label: label, found: &listing{}}
-		return w.add("what?.blp", named{name: "what?.blp"})
+		w := walker{displayPath: label, index: &diskIndex{}}
+		return w.addEntry("what?.blp", named{name: "what?.blp"})
 	}},
 	{"two spellings of one path", "differ only in letter case", refused, func(t *testing.T) error {
-		w := walker{label: label, found: &listing{names: map[string]string{"a.txt": "A.txt"}}}
-		return w.add("a.txt", named{name: "a.txt"})
+		w := walker{displayPath: label, index: &diskIndex{filePaths: map[string]string{"a.txt": "A.txt"}}}
+		return w.addEntry("a.txt", named{name: "a.txt"})
 	}},
 	{"an entry that is no regular file", "is not a regular file", refused, func(t *testing.T) error {
 		if runtime.GOOS == "windows" {
@@ -67,12 +67,12 @@ var causes = []struct {
 
 	{"a new file below a file of the map", "is a file, not a folder", refused, func(t *testing.T) error {
 		folder, _ := open(t, sourceMap)
-		_, err := folder.Place("war3map.w3i/x.txt")
+		_, err := folder.ResolveNewPath("war3map.w3i/x.txt")
 		return err
 	}},
 	{"a new file named as a folder of the map", "would replace a folder", refused, func(t *testing.T) error {
 		folder, _ := open(t, sourceMap)
-		_, err := folder.Place("textures")
+		_, err := folder.ResolveNewPath("textures")
 		return err
 	}},
 	{"a stage that is the source map", "would replace the source map", refused, func(t *testing.T) error {
@@ -83,11 +83,11 @@ var causes = []struct {
 		folder, dir := open(t, sourceMap)
 		read(t, folder, "war3map.w3i")
 		testkit.WriteFile(t, dir, "war3map.w3i", []byte("edited elsewhere"))
-		return folder.With([]Change{put("war3map.w3i", "patched")}).ApplyInPlace(context.Background(), &fsx.Journal{})
+		return folder.WithChanges([]Change{put("war3map.w3i", "patched")}).ApplyInPlace(context.Background(), &fsx.Journal{})
 	}},
 
 	{"a folder that cannot be listed", "Reading the map folder failed", failed, func(t *testing.T) error {
-		w := walker{dir: write(t, sourceMap), label: label, found: &listing{}}
+		w := walker{dir: write(t, sourceMap), displayPath: label, index: &diskIndex{}}
 		return w.walk("Gone")
 	}},
 	{"a file that cannot be read", "Reading a map file failed", failed, func(t *testing.T) error {
@@ -115,13 +115,13 @@ var causes = []struct {
 	}},
 	{"a file that cannot be written", "Writing a map file failed", failed, func(t *testing.T) error {
 		folder, dir := open(t, sourceMap)
-		view := folder.With([]Change{put("Sound/theme.mp3", "theme")})
+		view := folder.WithChanges([]Change{put("Sound/theme.mp3", "theme")})
 		testkit.WriteFile(t, dir, "Sound", []byte("in the way"))
 		return view.ApplyInPlace(context.Background(), &fsx.Journal{})
 	}},
 	{"a write through a link made after the scan", "Writing a map file failed: Symlinks", failed, func(t *testing.T) error {
 		folder, dir := open(t, sourceMap)
-		view := folder.With([]Change{put("Textures/New.blp", "new")})
+		view := folder.WithChanges([]Change{put("Textures/New.blp", "new")})
 		linkAway(t, dir)
 		return view.ApplyInPlace(context.Background(), &fsx.Journal{})
 	}},

@@ -65,15 +65,15 @@ func writeImport(
 	if err := assets.Sync(ctx, source, plan, p.Root, stateFile); err != nil {
 		return err
 	}
-	e.Log.Info("Synced " + strconv.Itoa(len(plan.Assets)) + " asset(s) into " + source.Label("") + " (" +
+	e.Log.Info("Synced " + strconv.Itoa(len(plan.Assets)) + " asset(s) into " + source.DisplayPath("") + " (" +
 		strconv.Itoa(len(plan.Changes)) + " file change(s)). Reopen the map in World Editor.")
 	return nil
 }
 
 func savedWithLuaScript(source *mapdir.Folder) error {
 	for _, name := range []string{"war3map.lua", "war3map.w3i"} {
-		if !source.Has(name) {
-			return errMapLacks(name, source.Label(""))
+		if !source.HasFile(name) {
+			return errMapLacks(name, source.DisplayPath(""))
 		}
 	}
 	return nil
@@ -105,7 +105,7 @@ func sayImport(log *env.Logger, source *mapdir.Folder, plan *assets.Result, repl
 		if change.Remove {
 			action = "delete"
 		}
-		log.Info(action + " " + source.Label(change.Name))
+		log.Info(action + " " + source.DisplayPath(change.Path))
 	}
 }
 

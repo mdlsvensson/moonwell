@@ -255,13 +255,13 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 	synced, err := library.Sync(ctx, e, p.Libraries, p.File)
 	program, err := compile(ctx, e, p, synced, globals, opts)
 
-	view := source.With(objs.Changes)
+	view := source.WithChanges(objs.Changes)
 	set, err := settings.Plan(view, p)
-	view = view.With(set)
+	view = view.WithChanges(set)
 	imported, replaced, err := PlanAssets(ctx, view, p, synced)
-	view = view.With(imported.Changes)
+	view = view.WithChanges(imported.Changes)
 	bundle, err := script.Inject(view, program)
-	view = view.With(bundle)
+	view = view.WithChanges(bundle)
 	return &Result{Map: view, Objects: objs, Settings: set, Assets: imported, Replaced: replaced, Program: program}, nil
 }
 ```
@@ -291,8 +291,8 @@ The steps, one by one:
    the compile's cache, `dist/stage/lua`. `script.Link` follows the requires from the entry and checks the modules
    it reaches for unknown globals. Between the two, `editor.RefreshLibraryView` writes the libraries' modules as
    Lua into `.moonwell/lua`: the editor then has them also when `script.Link` fails, which is when a user looks.
-7. **`source.With(objs.Changes)`** makes the first view. A view is the source map with planned changes laid over it:
-   a read through the view gives the changed file, and nothing is on disk yet.
+7. **`source.WithChanges(objs.Changes)`** makes the first view. A view is the source map with planned changes laid
+   over it: a read through the view gives the changed file, and nothing is on disk yet.
 8. **`settings.Plan(view, p)`** plans the map settings on the map as the objects leave it. It patches
    `war3map.w3i`, edits the calls World Editor wrote into `war3map.lua`, and merges the two text files.
 9. **`PlanAssets`** (in `internal/build/steps.go`) collects the project's assets and the files the libraries ship,
@@ -591,7 +591,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | change a "did you mean" hint | `internal/diag/suggest.go`: `Closest`, `EditDistance` |
 | know why a link or a file name is refused | `internal/fsx/paths.go`: `Inside`, `RelPath` |
 | know how a map folder is scanned, and how a file is found in any letter case | `internal/mapdir/folder.go`: `Open`, `Key`, `Read`; `internal/mapdir/scan.go` |
-| know how planned changes are laid over a map | `internal/mapdir/view.go`: `With`, `Place` |
+| know how planned changes are laid over a map | `internal/mapdir/view.go`: `WithChanges`, `ResolveNewPath` |
 | change where downloads are cached | `internal/env/cache.go`: `DefaultCacheDir` |
 | know what may import what, or add a package | `layout_test.go`: the lists at the top, and `allowed` |
 

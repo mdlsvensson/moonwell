@@ -23,14 +23,14 @@ func Inject(folder *mapdir.Folder, program *Program) ([]mapdir.Change, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := definesHooked(script, folder.Label(scriptName)); err != nil {
+	if err := definesHooked(script, folder.DisplayPath(scriptName)); err != nil {
 		return nil, err
 	}
-	name, err := folder.Place(scriptName)
+	name, err := folder.ResolveNewPath(scriptName)
 	if err != nil {
 		return nil, err
 	}
-	return []mapdir.Change{{Name: name, Bytes: withBundle(script, program)}}, nil
+	return []mapdir.Change{{Path: name, Data: withBundle(script, program)}}, nil
 }
 
 func scriptOf(folder *mapdir.Folder) ([]byte, error) {
@@ -40,10 +40,10 @@ func scriptOf(folder *mapdir.Folder) ([]byte, error) {
 		return nil, err
 	case found:
 		return script, nil
-	case folder.IsFolder(scriptName):
-		return nil, errFolderForScript(folder.Name(scriptName), folder.Label(scriptName))
+	case folder.IsDir(scriptName):
+		return nil, errFolderForScript(folder.CanonicalPath(scriptName), folder.DisplayPath(scriptName))
 	}
-	return nil, errNoScript(folder.Label(scriptName))
+	return nil, errNoScript(folder.DisplayPath(scriptName))
 }
 
 func definesHooked(script []byte, file string) error {

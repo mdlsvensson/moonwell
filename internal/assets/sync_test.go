@@ -562,7 +562,7 @@ func TestSyncRefusesAFolderThatCarriesPlannedChanges(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
 	put(t, s.mapDir, "war3map.w3i", "the map's own")
-	view := s.open().With([]mapdir.Change{{Name: "war3map.w3i", Bytes: []byte("patched")}})
+	view := s.open().WithChanges([]mapdir.Change{{Path: "war3map.w3i", Data: []byte("patched")}})
 	assets, _ := collect(t, s.root, noBlock)
 	result, err := Plan(background, view, assets, State{})
 	if err != nil {

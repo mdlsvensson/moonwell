@@ -12,42 +12,42 @@ import (
 
 func (f *Folder) StageTo(dir string) error {
 	if fsx.IsWithin(dir, f.dir) || fsx.IsWithin(f.dir, dir) {
-		return errStageOverSource(dir, f.label)
+		return errStageOverSource(dir, f.displayPath)
 	}
-	if err := f.fits(); err != nil {
+	if err := f.validateChanges(); err != nil {
 		return err
 	}
 	if err := fsx.ReplaceDir(f.dir, dir); err != nil {
-		return errStaging(dir, err)
+		return errStageFailed(dir, err)
 	}
 	for _, change := range f.changes {
-		if err := stage(dir, change); err != nil {
-			return errStaging(filepath.Join(dir, filepath.FromSlash(change.Name)), err)
+		if err := writeChange(dir, change); err != nil {
+			return errStageFailed(filepath.Join(dir, filepath.FromSlash(change.Path)), err)
 		}
 	}
 	return nil
 }
 
-func (f *Folder) fits() error {
+func (f *Folder) validateChanges() error {
 	for _, change := range f.changes {
-		if _, ok := fsx.RelPath(change.Name); !ok {
-			return errNoSuchPath(change.Name)
+		if _, ok := fsx.RelPath(change.Path); !ok {
+			return errInvalidChangePath(change.Path)
 		}
 		if change.Remove {
 			continue
 		}
-		if folder, ok := f.folder(Key(change.Name)); ok {
-			return errNamedAsAFolder(change.Name, folder)
+		if dir, ok := f.dirPath(Key(change.Path)); ok {
+			return errChangeIsDir(change.Path, dir)
 		}
-		if file, ok := f.fileOnTheWay(change.Name); ok {
-			return errThroughAFile(change.Name, f.Name(file))
+		if file, ok := f.blockingFile(change.Path); ok {
+			return errChangeBlockedByFile(change.Path, f.CanonicalPath(file))
 		}
 	}
 	return nil
 }
 
-func stage(dir string, change Change) error {
-	file, err := fsx.SafeJoin(dir, change.Name)
+func writeChange(dir string, change Change) error {
+	file, err := fsx.SafeJoin(dir, change.Path)
 	if err != nil {
 		return err
 	}
@@ -57,93 +57,93 @@ func stage(dir string, change Change) error {
 	if err := os.MkdirAll(filepath.Dir(file), 0o777); err != nil {
 		return err
 	}
-	return os.WriteFile(file, change.Bytes, 0o666)
+	return os.WriteFile(file, change.Data, 0o666)
 }
 
 func (f *Folder) ApplyInPlace(ctx context.Context, journal *fsx.Journal) error {
-	if err := f.fits(); err != nil {
+	if err := f.validateChanges(); err != nil {
 		return err
 	}
 	for _, change := range f.changes {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if err := f.apply(change, journal); err != nil {
+		if err := f.applyChange(change, journal); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (f *Folder) apply(change Change, journal *fsx.Journal) error {
-	file, err := fsx.SafeJoin(f.dir, change.Name)
+func (f *Folder) applyChange(change Change, journal *fsx.Journal) error {
+	file, err := fsx.SafeJoin(f.dir, change.Path)
 	if err != nil {
-		return errWriting(f.Label(change.Name), err)
+		return errWriteFailed(f.DisplayPath(change.Path), err)
 	}
-	if err := f.asSeen(change.Name, file); err != nil {
+	if err := f.checkUnchangedSinceScan(change.Path, file); err != nil {
 		return err
 	}
 	if change.Remove {
 		err = journal.Remove(file)
 	} else {
-		err = journal.Write(file, change.Bytes)
+		err = journal.Write(file, change.Data)
 	}
 	if err != nil {
-		return errWriting(f.Label(change.Name), err)
+		return errWriteFailed(f.DisplayPath(change.Path), err)
 	}
 	return nil
 }
 
-func (f *Folder) asSeen(name, path string) error {
-	info, err := fsx.Lstat(path)
-	scanned := f.found.has(name)
+func (f *Folder) checkUnchangedSinceScan(path, fullPath string) error {
+	info, err := fsx.Lstat(fullPath)
+	wasScanned := f.onDisk.hasFile(path)
 	switch {
 	case err != nil:
-		return errWriting(f.Label(name), err)
-	case !scanned && info == nil:
+		return errWriteFailed(f.DisplayPath(path), err)
+	case !wasScanned && info == nil:
 		return nil
-	case !scanned || info == nil || !info.Mode().IsRegular():
-		return errChanged(f.Label(name))
+	case !wasScanned || info == nil || !info.Mode().IsRegular():
+		return errChangedOnDisk(f.DisplayPath(path))
 	}
-	return f.asRead(name, path)
+	return f.checkUnchangedSinceRead(path, fullPath)
 }
 
-func (f *Folder) asRead(name, path string) error {
-	hash, wasRead := f.hashes[Key(name)]
+func (f *Folder) checkUnchangedSinceRead(path, fullPath string) error {
+	hash, wasRead := f.readHashes[Key(path)]
 	if !wasRead {
 		return nil
 	}
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(fullPath)
 	if err != nil {
-		return errWriting(f.Label(name), err)
+		return errWriteFailed(f.DisplayPath(path), err)
 	}
 	if fsx.SHA256Hex(data) != hash {
-		return errChanged(f.Label(name))
+		return errChangedOnDisk(f.DisplayPath(path))
 	}
 	return nil
 }
 
-func errNoSuchPath(name string) error {
-	return fmt.Errorf("Cannot write %q: it is not a relative path that a file of a map can have.", name)
+func errInvalidChangePath(path string) error {
+	return fmt.Errorf("Cannot write %q: it is not a relative path that a file of a map can have.", path)
 }
 
-func errNamedAsAFolder(name, folder string) error {
-	return fmt.Errorf("Cannot write %s: it is named as the folder %s of the map.", name, folder)
+func errChangeIsDir(path, dir string) error {
+	return fmt.Errorf("Cannot write %s: it is named as the folder %s of the map.", path, dir)
 }
 
-func errThroughAFile(name, file string) error {
-	return fmt.Errorf("Cannot write %s: its path goes through %s, a file of the map.", name, file)
+func errChangeBlockedByFile(path, file string) error {
+	return fmt.Errorf("Cannot write %s: its path goes through %s, a file of the map.", path, file)
 }
 
-func errStageOverSource(dir, label string) error {
+func errStageOverSource(dir, displayPath string) error {
 	return &diag.Error{
-		Msg:  "Staging the map into " + fsx.ToPosix(dir) + " would replace the source map " + label + ".",
-		File: label,
+		Msg:  "Staging the map into " + fsx.ToPosix(dir) + " would replace the source map " + displayPath + ".",
+		File: displayPath,
 		Hint: "Stage into a folder that is not the source map, a folder it is in or a folder inside it.",
 	}
 }
 
-func errStaging(file string, cause error) error {
+func errStageFailed(file string, cause error) error {
 	return &diag.Error{
 		Msg:   "Staging the map failed: " + fsx.Reason(cause),
 		File:  file,
@@ -152,7 +152,7 @@ func errStaging(file string, cause error) error {
 	}
 }
 
-func errChanged(file string) error {
+func errChangedOnDisk(file string) error {
 	return &diag.Error{
 		Msg:  file + " changed after the assets were checked.",
 		File: file,
@@ -160,7 +160,7 @@ func errChanged(file string) error {
 	}
 }
 
-func errWriting(file string, cause error) error {
+func errWriteFailed(file string, cause error) error {
 	return &diag.Error{
 		Msg:   "Writing a map file failed: " + fsx.Reason(cause),
 		File:  file,

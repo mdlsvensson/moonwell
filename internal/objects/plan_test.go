@@ -100,7 +100,7 @@ func saysEach(found diag.Problems, words ...string) bool {
 func changeNames(result *objects.Result) []string {
 	names := []string{}
 	for _, change := range result.Changes {
-		names = append(names, change.Name)
+		names = append(names, change.Path)
 	}
 	return names
 }
@@ -108,8 +108,8 @@ func changeNames(result *objects.Result) []string {
 func changeBytes(t *testing.T, result *objects.Result, name string) []byte {
 	t.Helper()
 	for _, change := range result.Changes {
-		if change.Name == name {
-			return change.Bytes
+		if change.Path == name {
+			return change.Data
 		}
 	}
 	t.Fatalf("the plan does not change %s", name)
@@ -202,8 +202,8 @@ func TestTheNamesFixturesObjectsPlannedAgainstAnEmptyMapAreWorldEditorsFiles(t *
 		t.Fatalf("the plan changes %q", got)
 	}
 	for _, change := range result.Changes {
-		if !bytes.Equal(change.Bytes, fixture(t, change.Name)) {
-			t.Errorf("%s is not World Editor's file", change.Name)
+		if !bytes.Equal(change.Data, fixture(t, change.Path)) {
+			t.Errorf("%s is not World Editor's file", change.Path)
 		}
 	}
 	var planned []string
@@ -298,8 +298,8 @@ func TestAVersion2MapGetsTheReferenceLibrarysVersion2LayoutWithEveryFieldInTheMa
 	want = le.AppendUint32(want, 2)
 	want = append(want, referenceMod{"anam", 3, 0, 0, "Holier"}.bytes(true)...)
 	want = append(want, referenceMod{"aran", 2, 1, 0, 500.0}.bytes(true)...)
-	if !bytes.Equal(result.Changes[0].Bytes, want) {
-		t.Errorf("the version 2 file is\n% X\nwant\n% X", result.Changes[0].Bytes, want)
+	if !bytes.Equal(result.Changes[0].Data, want) {
+		t.Errorf("the version 2 file is\n% X\nwant\n% X", result.Changes[0].Data, want)
 	}
 }
 
@@ -318,9 +318,9 @@ func TestPlanAppendsToTheMapsFilesSplitsBySkinSortsByIDAndWritesNothing(t *testi
 		t.Fatalf("the plan changes %q", got)
 	}
 	for _, change := range result.Changes {
-		source := before[change.Name]
-		if !bytes.Equal(change.Bytes[:8], source[:8]) || !bytes.Equal(change.Bytes[12:len(source)], source[12:]) {
-			t.Errorf("%s: the bytes the map has changed", change.Name)
+		source := before[change.Path]
+		if !bytes.Equal(change.Data[:8], source[:8]) || !bytes.Equal(change.Data[12:len(source)], source[12:]) {
+			t.Errorf("%s: the bytes the map has changed", change.Path)
 		}
 	}
 	wantCustom(t, "war3map.w3u", changeBytes(t, result, "war3map.w3u"),
@@ -358,7 +358,7 @@ func TestHeroesUnitsAndBuildingsShareTheW3uFilesSortedByIDAcrossTheThree(t *test
 		t.Fatalf("the plan changes %q", got)
 	}
 	for _, change := range result.Changes {
-		wantCustom(t, change.Name, change.Bytes,
+		wantCustom(t, change.Path, change.Data,
 			customObject{"Hpal", "H000", nil}, customObject{"hbar", "h001", nil}, customObject{"hfoo", "h002", nil})
 	}
 }
@@ -374,12 +374,12 @@ func TestStagingTheMapWithThePlanWritesThePlannedBytesUnderTheirNames(t *testing
 	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3t", "war3mapSkin.w3t"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
-	if err := folder.With(result.Changes).StageTo(staged); err != nil {
+	if err := folder.WithChanges(result.Changes).StageTo(staged); err != nil {
 		t.Fatal(err)
 	}
 	for _, change := range result.Changes {
-		if written, _ := os.ReadFile(filepath.Join(staged, change.Name)); !bytes.Equal(written, change.Bytes) {
-			t.Errorf("%s was not written as planned", change.Name)
+		if written, _ := os.ReadFile(filepath.Join(staged, change.Path)); !bytes.Equal(written, change.Data) {
+			t.Errorf("%s was not written as planned", change.Path)
 		}
 	}
 	if untouched, _ := os.ReadFile(filepath.Join(staged, "war3map.w3u")); !bytes.Equal(untouched, fixture(t, "war3map.w3u")) {
@@ -395,7 +395,7 @@ func TestAV3MainFileWithoutItsSkinFileGetsANewSkinFileAndV1AndV2MapsGetNone(t *t
 	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3u", "war3mapSkin.w3u"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
-	if version := readObjects(t, "war3mapSkin.w3u", result.Changes[1].Bytes).Version; version != 3 {
+	if version := readObjects(t, "war3mapSkin.w3u", result.Changes[1].Data).Version; version != 3 {
 		t.Errorf("the new skin file has version %d", version)
 	}
 	for _, version := range []int32{1, 2} {
@@ -405,8 +405,8 @@ func TestAV3MainFileWithoutItsSkinFileGetsANewSkinFileAndV1AndV2MapsGetNone(t *t
 		if got := changeNames(older); !slices.Equal(got, []string{"war3map.w3u"}) {
 			t.Fatalf("v%d: the plan changes %q", version, got)
 		}
-		wantCustom(t, "war3map.w3u", older.Changes[0].Bytes, customObject{"hfoo", "h001", []customMod{{"unam", 0, 0, "Captain"}}})
-		if got := readObjects(t, "war3map.w3u", older.Changes[0].Bytes).Version; got != version {
+		wantCustom(t, "war3map.w3u", older.Changes[0].Data, customObject{"hfoo", "h001", []customMod{{"unam", 0, 0, "Captain"}}})
+		if got := readObjects(t, "war3map.w3u", older.Changes[0].Data).Version; got != version {
 			t.Errorf("the file became version %d", got)
 		}
 	}
@@ -501,7 +501,7 @@ func TestObjectFilesAreFoundInAnyLetterCaseAndChangedUnderTheNameTheMapHas(t *te
 	if got := changeNames(result); !slices.Equal(got, []string{"WAR3MAP.W3U", "war3mapskin.w3u"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
-	skin := customObjects(t, "war3mapskin.w3u", result.Changes[1].Bytes)
+	skin := customObjects(t, "war3mapskin.w3u", result.Changes[1].Data)
 	if len(skin) != 2 || skin[0].id != "h000" || skin[1].id != "h001" {
 		t.Errorf("the skin file holds %+v", skin)
 	}
@@ -539,7 +539,7 @@ func TestThePlansChangesAreWhatAFolderLaysOverItself(t *testing.T) {
 		t.Fatal(diag.Format(err))
 	}
 	var changes []mapdir.Change = result.Changes
-	view := folder.With(changes)
+	view := folder.WithChanges(changes)
 	if !reflect.DeepEqual(view.Changes(), changes) || len(changes) != 2 {
 		t.Fatalf("the view changes %+v, the plan %+v", view.Changes(), changes)
 	}

@@ -74,9 +74,9 @@ func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T
 		before := testkit.Snapshot(t, folder.Dir())
 		change := placed(t, folder, small)
 		want := c.script + c.added + bundle(small, moonwell.RuntimeLua, c.first)
-		if differs := firstDifference(string(change.Bytes), want); change.Name != "war3map.lua" || differs != "" {
+		if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
 			t.Errorf("%s: the change is of %s; against the script, %q and the bundle from line %d, %s",
-				c.name, change.Name, c.added, c.first, differs)
+				c.name, change.Path, c.added, c.first, differs)
 		}
 		if after := testkit.Snapshot(t, folder.Dir()); !maps.EqualFunc(before, after, bytes.Equal) {
 			t.Errorf("%s: Inject wrote into the map folder", c.name)
@@ -94,7 +94,7 @@ func TestInjectPlacesTheBundleInAScriptThatWorldEditorSaved(t *testing.T) {
 		first := strings.Count(script+added, "\n") + 1
 		change := placed(t, mapOf(t, "war3map.lua", script), small)
 		want := script + added + bundle(small, moonwell.RuntimeLua, first)
-		if differs := firstDifference(string(change.Bytes), want); change.Name != "war3map.lua" || differs != "" {
+		if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
 			t.Errorf("%s: against the script and the bundle from line %d, %s", fixture, first, differs)
 		}
 	}
@@ -180,7 +180,7 @@ func TestInjectKeepsAByteOrderMarkAndBytesThatAreNotUTF8(t *testing.T) {
 		{"a mark, a byte alone and carriage returns", mark + "s = '\xff'\r\nfunction main()\r\nend\r\nfunction config()\r\nend\r\n", ""},
 	} {
 		folder := mapOf(t, "war3map.lua", c.script)
-		got := string(placed(t, folder, small).Bytes)
+		got := string(placed(t, folder, small).Data)
 		lines := strings.Count(c.script+c.added, "\n")
 		if differs := firstDifference(got, c.script+c.added+bundle(small, moonwell.RuntimeLua, lines+1)); differs != "" {
 			t.Errorf("%s: the script is not kept byte for byte before the bundle: %s", c.name, differs)
@@ -199,7 +199,7 @@ func TestInjectRefusesAMapWithoutAScript(t *testing.T) {
 		t.Errorf("no script: Inject = %+v, %+v", changes, failure)
 	}
 	folder := mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n")
-	_, err = Inject(folder.With([]mapdir.Change{{Name: "war3map.lua", Remove: true}}), small)
+	_, err = Inject(folder.WithChanges([]mapdir.Change{{Path: "war3map.lua", Remove: true}}), small)
 	if failure := asError(t, err, "a script that is removed"); failure.Msg != "The map has no war3map.lua." {
 		t.Errorf("a script that is removed: %+v", failure)
 	}
@@ -217,8 +217,8 @@ func TestInjectRefusesAFolderInThePlaceOfTheScriptAsAFolder(t *testing.T) {
 func TestInjectReadsTheScriptInAnyLetterCaseAndNamesTheChangeAsTheMapSpellsIt(t *testing.T) {
 	const script = "function main()\nend\nfunction config()\nend\n"
 	folder := mapOf(t, "War3Map.LUA", script)
-	if change := placed(t, folder, small); change.Name != "War3Map.LUA" || !strings.HasPrefix(string(change.Bytes), script+"do\n") {
-		t.Errorf("the change is of %s: %q", change.Name, change.Bytes[:min(len(change.Bytes), 60)])
+	if change := placed(t, folder, small); change.Path != "War3Map.LUA" || !strings.HasPrefix(string(change.Data), script+"do\n") {
+		t.Errorf("the change is of %s: %q", change.Path, change.Data[:min(len(change.Data), 60)])
 	}
 	_, err := Inject(mapOf(t, "War3Map.LUA", "function main()\nend\n"), small)
 	if failure := asError(t, err, "no config"); failure.File != mapLabel+"/War3Map.LUA" {
@@ -229,17 +229,17 @@ func TestInjectReadsTheScriptInAnyLetterCaseAndNamesTheChangeAsTheMapSpellsIt(t 
 func TestInjectTakesTheScriptAsThePlannedChangesLeaveIt(t *testing.T) {
 	const onDisk, planned = "function main()\nend\n", "function main()\nend\nfunction config()\nend\n-- planned"
 	folder := mapOf(t, "war3map.lua", onDisk)
-	view := folder.With([]mapdir.Change{{Name: "war3map.lua", Bytes: []byte(planned)}})
+	view := folder.WithChanges([]mapdir.Change{{Path: "war3map.lua", Data: []byte(planned)}})
 	want := planned + "\n" + bundle(small, moonwell.RuntimeLua, 6)
 	change := placed(t, view, small)
-	if differs := firstDifference(string(change.Bytes), want); change.Name != "war3map.lua" || differs != "" {
-		t.Errorf("the change is of %s; against the planned script and the bundle from line 6, %s", change.Name, differs)
+	if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
+		t.Errorf("the change is of %s; against the planned script and the bundle from line 6, %s", change.Path, differs)
 	}
 	if kept, _, _ := view.Read("war3map.lua"); string(kept) != planned {
 		t.Errorf("after Inject the view reads the script as %q", kept)
 	}
-	after := view.With([]mapdir.Change{change}).Changes()
-	if len(after) != 1 || after[0].Name != "war3map.lua" || after[0].Remove || string(after[0].Bytes) != want {
+	after := view.WithChanges([]mapdir.Change{change}).Changes()
+	if len(after) != 1 || after[0].Path != "war3map.lua" || after[0].Remove || string(after[0].Data) != want {
 		t.Errorf("with the change laid over it the view changes %d files, want war3map.lua alone, with the bundle", len(after))
 	}
 	if _, err := Inject(folder, small); err == nil {
@@ -267,7 +267,7 @@ func TestInjectWithoutAProgramIsAMistakeOfTheCaller(t *testing.T) {
 
 func TestTheProgramOfABuildIsBundledWithTheRuntimeTheProgramCarries(t *testing.T) {
 	change := placed(t, mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n"), small)
-	if !strings.Contains(string(change.Bytes), "\ndo\n"+strings.ReplaceAll(moonwell.RuntimeLua, "\r\n", "\n")+"__mw.define(\"main\", function(...)\n") {
-		t.Errorf("the bundle does not start with the runtime:\n%s", change.Bytes[:min(len(change.Bytes), 300)])
+	if !strings.Contains(string(change.Data), "\ndo\n"+strings.ReplaceAll(moonwell.RuntimeLua, "\r\n", "\n")+"__mw.define(\"main\", function(...)\n") {
+		t.Errorf("the bundle does not start with the runtime:\n%s", change.Data[:min(len(change.Data), 300)])
 	}
 }

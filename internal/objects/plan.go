@@ -89,7 +89,7 @@ func (f *objectFiles) read(name string) error {
 	if err != nil || !found {
 		return err
 	}
-	label := f.folder.Label(name)
+	label := f.folder.DisplayPath(name)
 	parsed, err := objmod.Read(data, objmod.KindOf(name), label)
 	if err != nil {
 		return err
@@ -165,7 +165,7 @@ func (f *objectFiles) appendFamily(extension string, family []Resolved) (main ma
 }
 
 func (f *objectFiles) appended(name string, family []Resolved, takes func(Field) bool) (mapdir.Change, error) {
-	placed, err := f.folder.Place(name)
+	placed, err := f.folder.ResolveNewPath(name)
 	if err != nil {
 		return mapdir.Change{}, err
 	}
@@ -178,7 +178,7 @@ func (f *objectFiles) appended(name string, family []Resolved, takes func(Field)
 	if err != nil {
 		return mapdir.Change{}, err
 	}
-	return mapdir.Change{Name: placed, Bytes: written}, nil
+	return mapdir.Change{Path: placed, Data: written}, nil
 }
 
 func newObjects(family []Resolved, takes func(Field) bool) ([]objmod.NewObject, error) {

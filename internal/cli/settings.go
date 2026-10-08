@@ -34,7 +34,7 @@ func sayChangedBySettings(log *env.Logger, changes []mapdir.Change) {
 		if change.Remove {
 			removed = " (removed)"
 		}
-		log.Info("  " + path.Base(change.Name) + removed)
+		log.Info("  " + path.Base(change.Path) + removed)
 	}
 	log.Info("Map settings valid: " + strconv.Itoa(len(changes)) + " internal file(s) would change during build.")
 }

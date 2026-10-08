@@ -92,8 +92,8 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}
-			if source.Dir() != s.at(tt.at) || source.Label("") != tt.label || !source.Has("war3map.lua") {
-				t.Errorf("Source = the folder %s named %s", source.Dir(), source.Label(""))
+			if source.Dir() != s.at(tt.at) || source.DisplayPath("") != tt.label || !source.HasFile("war3map.lua") {
+				t.Errorf("Source = the folder %s named %s", source.Dir(), source.DisplayPath(""))
 			}
 			if !reflect.DeepEqual(testkit.Snapshot(t, s.root), before) {
 				t.Error("opening the map changed the project")

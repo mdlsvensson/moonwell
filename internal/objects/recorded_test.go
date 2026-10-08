@@ -173,11 +173,11 @@ func (p recordedPlan) lines() string {
 	}
 	var out strings.Builder
 	for _, change := range p.changes {
-		what := testkit.Digest(change.Bytes)
+		what := testkit.Digest(change.Data)
 		if change.Remove {
 			what = "removed"
 		}
-		fmt.Fprintf(&out, "%s: %s\n", testkit.Shown(change.Name), what)
+		fmt.Fprintf(&out, "%s: %s\n", testkit.Shown(change.Path), what)
 	}
 	fmt.Fprintf(&out, "objects:eval prints: %s\n", testkit.Digest(p.eval))
 	out.WriteString("the ids module:\n")

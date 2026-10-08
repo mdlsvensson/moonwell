@@ -52,10 +52,10 @@ func TestPlanWritesEachAssetAndTheIndexAndKeepsTheEditorsOwnImports(t *testing.T
 	if got, want := names(result.Changes), []string{icon, disabled, "war3map.imp"}; !slices.Equal(got, want) {
 		t.Fatalf("the changes are %q, want %q", got, want)
 	}
-	if got := string(result.Changes[1].Bytes); got != "disabled" {
+	if got := string(result.Changes[1].Data); got != "disabled" {
 		t.Errorf("the mapped asset is written as %q", got)
 	}
-	entries, err := imp.Read(result.Changes[2].Bytes, "war3map.imp")
+	entries, err := imp.Read(result.Changes[2].Data, "war3map.imp")
 	want := []imp.Entry{
 		{Flag: 5, Path: "existing.wav"},
 		{Flag: imp.CustomPath, Path: strings.ReplaceAll(icon, "/", `\`)},
@@ -115,7 +115,7 @@ func TestPlanKeepsAnImportOfTheMapsOwnByteForByteWithAMarkAtItsStart(t *testing.
 		t.Fatalf("the changes are %q, want %q", got, want)
 	}
 	want := imp.Write([]imp.Entry{{Flag: 13, Path: marked}, {Flag: imp.CustomPath, Path: "b.blp"}})
-	if got := result.Changes[1].Bytes; !bytes.Equal(got, want) {
+	if got := result.Changes[1].Data; !bytes.Equal(got, want) {
 		t.Errorf("the index is %q, want %q", got, want)
 	}
 }
@@ -149,7 +149,7 @@ func TestAnOwnedImportKeepsTheFlagWorldEditorSavedItWith(t *testing.T) {
 	if got := names(result.Changes); !slices.Equal(got, []string{"Textures/c.blp", "war3map.imp"}) {
 		t.Fatalf("the changes are %q", got)
 	}
-	entries, err := imp.Read(result.Changes[1].Bytes, "war3map.imp")
+	entries, err := imp.Read(result.Changes[1].Data, "war3map.imp")
 	if want := append(saved, imp.Entry{Flag: imp.CustomPath, Path: `Textures\c.blp`}); err != nil || !slices.Equal(entries, want) {
 		t.Errorf("the index lists %+v, %v, want %+v", entries, err, want)
 	}
@@ -165,7 +165,7 @@ func TestAnOwnedImportThatWorldEditorSavedWithoutACustomPathKeepsThatFlag(t *tes
 	if got := names(result.Changes); !slices.Equal(got, []string{"war3map.imp"}) {
 		t.Fatalf("the changes are %q", got)
 	}
-	entries, err := imp.Read(result.Changes[0].Bytes, "war3map.imp")
+	entries, err := imp.Read(result.Changes[0].Data, "war3map.imp")
 	if want := []imp.Entry{{Flag: 5, Path: `war3mapImported\a.wav`}}; err != nil || !slices.Equal(entries, want) {
 		t.Errorf("the index lists %+v, %v, want %+v", entries, err, want)
 	}
@@ -193,7 +193,7 @@ func TestPlanSpellsFoldersAsTheMapDoesAndNewOnesAsTheFirstAssetToNameThem(t *tes
 	if got := names(result.Changes); !slices.Equal(got, append(spelled, "war3map.imp")) {
 		t.Fatalf("the changes are %q", got)
 	}
-	entries, err := imp.Read(result.Changes[4].Bytes, "war3map.imp")
+	entries, err := imp.Read(result.Changes[4].Data, "war3map.imp")
 	if err != nil || len(entries) != 4 || entries[0].Path != `SOUND\Effects\c.blp` || entries[3].Path != `Textures\new.blp` {
 		t.Errorf("the index lists %+v, %v", entries, err)
 	}
@@ -501,7 +501,7 @@ func TestThePlanLaidOverAViewIsStagedAndTheSourceMapIsLeftAlone(t *testing.T) {
 	before := testkit.Snapshot(t, s.root)
 
 	folder, result := s.planned(noBlock)
-	view := folder.With([]mapdir.Change{{Name: "war3map.w3i", Bytes: []byte("patched")}}).With(result.Changes)
+	view := folder.WithChanges([]mapdir.Change{{Path: "war3map.w3i", Data: []byte("patched")}}).WithChanges(result.Changes)
 	stage := filepath.Join(t.TempDir(), "stage", "map.w3x")
 	if err := view.StageTo(stage); err != nil {
 		t.Fatalf("StageTo: %v", diag.Format(err))

@@ -103,20 +103,20 @@ func TestAFileIsFoundUnderTheSpellingItHas(t *testing.T) {
 		{`textures\Other.blp`, `textures\Other.blp`, "<missing>", false},
 	}
 	for _, c := range cases {
-		if got := folder.Has(c.asked); got != c.has {
+		if got := folder.HasFile(c.asked); got != c.has {
 			t.Errorf("Has(%q) = %v", c.asked, got)
 		}
-		if got := folder.Name(c.asked); got != c.name {
+		if got := folder.CanonicalPath(c.asked); got != c.name {
 			t.Errorf("Name(%q) = %q, want %q", c.asked, got, c.name)
 		}
-		if got := folder.Label(c.asked); got != label+"/"+c.name {
+		if got := folder.DisplayPath(c.asked); got != label+"/"+c.name {
 			t.Errorf("Label(%q) = %q, want %q", c.asked, got, label+"/"+c.name)
 		}
 		if got := read(t, folder, c.asked); got != c.content {
 			t.Errorf("Read(%q) = %q, want %q", c.asked, got, c.content)
 		}
 	}
-	if got := folder.Label(""); got != label {
+	if got := folder.DisplayPath(""); got != label {
 		t.Errorf(`Label("") = %q, want the label alone`, got)
 	}
 	if folder.Dir() != dir {
@@ -126,7 +126,7 @@ func TestAFileIsFoundUnderTheSpellingItHas(t *testing.T) {
 
 func TestAFolderOfTheMapIsNotAFile(t *testing.T) {
 	folder, _ := open(t, map[string]string{"Textures/Icon.blp": "icon"})
-	if folder.Has("Textures") {
+	if folder.HasFile("Textures") {
 		t.Error("Has finds the folder Textures as a file")
 	}
 	if got := read(t, folder, "textures"); got != "<missing>" {
@@ -136,8 +136,8 @@ func TestAFolderOfTheMapIsNotAFile(t *testing.T) {
 
 func TestAFolderIsNamedAsItIsSpelled(t *testing.T) {
 	folder, _ := open(t, map[string]string{"Textures/Old.blp": "old", "Units/Hero/a.txt": "", "WAR3MAP.LUA": "script"})
-	planned := folder.With([]Change{put("Sound/Music/theme.mp3", "theme"), drop("units/hero/A.TXT")})
-	takenBack := planned.With([]Change{drop("sound/music/theme.mp3")})
+	planned := folder.WithChanges([]Change{put("Sound/Music/theme.mp3", "theme"), drop("units/hero/A.TXT")})
+	takenBack := planned.WithChanges([]Change{drop("sound/music/theme.mp3")})
 	cases := []struct {
 		what        string
 		view        *Folder
@@ -155,10 +155,10 @@ func TestAFolderIsNamedAsItIsSpelled(t *testing.T) {
 		{"a planned folder whose one write is taken back", takenBack, "sound/MUSIC", "sound/MUSIC"},
 	}
 	for _, c := range cases {
-		if got := c.view.Name(c.asked); got != c.name {
+		if got := c.view.CanonicalPath(c.asked); got != c.name {
 			t.Errorf("%s: Name(%q) = %q, want %q", c.what, c.asked, got, c.name)
 		}
-		if got := c.view.Label(c.asked); got != label+"/"+c.name {
+		if got := c.view.DisplayPath(c.asked); got != label+"/"+c.name {
 			t.Errorf("%s: Label(%q) = %q, want %q", c.what, c.asked, got, label+"/"+c.name)
 		}
 	}

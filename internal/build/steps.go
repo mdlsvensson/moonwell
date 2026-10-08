@@ -36,7 +36,7 @@ func RefreshDeclarations(
 	root string, source *mapdir.Folder, objs []objects.Resolved, globals *lua.MapGlobals,
 ) error {
 	_, err := editor.RefreshTypes(root, editor.Types{
-		Objects: objs, Map: globals, MapLua: source.Label(scriptName), Natives: script.LoadNatives(),
+		Objects: objs, Map: globals, MapLua: source.DisplayPath(scriptName), Natives: script.LoadNatives(),
 	})
 	if err != nil {
 		return err

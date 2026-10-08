@@ -105,7 +105,7 @@ func (p *planner) readIndex() error {
 	if !found {
 		return p.placeForIndex()
 	}
-	file := p.folder.Label(indexName)
+	file := p.folder.DisplayPath(indexName)
 	if p.imports, err = imp.Read(data, file); err != nil {
 		return err
 	}
@@ -124,8 +124,8 @@ func (p *planner) readIndex() error {
 }
 
 func (p *planner) placeForIndex() error {
-	if p.folder.IsFolder(indexName) {
-		return errIndexIsAFolder(p.folder.Name(indexName), p.folder.Label(indexName))
+	if p.folder.IsDir(indexName) {
+		return errIndexIsAFolder(p.folder.CanonicalPath(indexName), p.folder.DisplayPath(indexName))
 	}
 	return nil
 }
@@ -140,7 +140,7 @@ func (p *planner) ownedUnchanged() error {
 			return err
 		}
 		if found && fsx.SHA256Hex(data) != p.owned[mapdir.Key(file.Path)].Hash {
-			return errModified(p.folder.Name(file.Path), p.folder.Label(file.Path))
+			return errModified(p.folder.CanonicalPath(file.Path), p.folder.DisplayPath(file.Path))
 		}
 	}
 	return nil
@@ -160,10 +160,10 @@ func (p *planner) roomForAssets() error {
 
 func (p *planner) roomFor(asset Asset) error {
 	key := mapdir.Key(asset.Target)
-	if _, owned := p.owned[key]; !owned && (p.folder.Has(asset.Target) || p.imported[key]) {
-		return errConflict(asset, p.folder.Label(asset.Target))
+	if _, owned := p.owned[key]; !owned && (p.folder.HasFile(asset.Target) || p.imported[key]) {
+		return errConflict(asset, p.folder.DisplayPath(asset.Target))
 	}
-	_, err := p.folder.Place(asset.Target)
+	_, err := p.folder.ResolveNewPath(asset.Target)
 	return p.noPlace(asset, err)
 }
 
@@ -172,29 +172,29 @@ func (p *planner) noPlace(asset Asset, refusal error) error {
 	switch {
 	case !errors.As(refusal, &failure):
 		return refusal
-	case p.folder.IsFolder(asset.Target):
-		return errOntoAFolder(asset, p.folder.Label(asset.Target))
+	case p.folder.IsDir(asset.Target):
+		return errOntoAFolder(asset, p.folder.DisplayPath(asset.Target))
 	}
-	inTheWay := strings.TrimPrefix(failure.File, p.folder.Label("")+"/")
+	inTheWay := strings.TrimPrefix(failure.File, p.folder.DisplayPath("")+"/")
 	return errThroughAFile(inTheWay, asset, failure.File)
 }
 
 func (p *planner) writes() (writes []mapdir.Change, spelled []Asset) {
 	writes = []mapdir.Change{}
 	for _, asset := range p.assets {
-		held := p.folder.Has(asset.Target) && p.owned[mapdir.Key(asset.Target)].Hash == asset.Hash
+		held := p.folder.HasFile(asset.Target) && p.owned[mapdir.Key(asset.Target)].Hash == asset.Hash
 		if !held {
-			writes = append(writes, mapdir.Change{Name: asset.Target, Bytes: asset.Bytes})
+			writes = append(writes, mapdir.Change{Path: asset.Target, Data: asset.Bytes})
 		}
 	}
-	view := p.folder.With(writes)
+	view := p.folder.WithChanges(writes)
 	for i := range writes {
-		writes[i].Name = view.Name(writes[i].Name)
+		writes[i].Path = view.CanonicalPath(writes[i].Path)
 	}
 	spelled = make([]Asset, len(p.assets))
 	for i, asset := range p.assets {
 		spelled[i] = asset
-		spelled[i].Target = view.Name(asset.Target)
+		spelled[i].Target = view.CanonicalPath(asset.Target)
 	}
 	return writes, spelled
 }
@@ -208,11 +208,11 @@ func (p *planner) removals(assets []Asset) []mapdir.Change {
 	seen := map[string]bool{}
 	for _, file := range p.order {
 		key := mapdir.Key(file.Path)
-		if seen[key] || wanted[key] || !p.folder.Has(file.Path) {
+		if seen[key] || wanted[key] || !p.folder.HasFile(file.Path) {
 			continue
 		}
 		seen[key] = true
-		removals = append(removals, mapdir.Change{Name: p.folder.Name(file.Path), Remove: true})
+		removals = append(removals, mapdir.Change{Path: p.folder.CanonicalPath(file.Path), Remove: true})
 	}
 	return removals
 }
@@ -239,7 +239,7 @@ func (p *planner) indexChange(assets []Asset) []mapdir.Change {
 	if p.hasIndex && bytes.Equal(written, p.index) {
 		return nil
 	}
-	return []mapdir.Change{{Name: p.folder.Name(indexName), Bytes: written}}
+	return []mapdir.Change{{Path: p.folder.CanonicalPath(indexName), Data: written}}
 }
 
 func ownershipOf(assets []Asset) State {

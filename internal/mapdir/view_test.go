@@ -13,13 +13,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func put(name, content string) Change { return Change{Name: name, Bytes: []byte(content)} }
-func drop(name string) Change         { return Change{Name: name, Remove: true} }
+func put(name, content string) Change { return Change{Path: name, Data: []byte(content)} }
+func drop(name string) Change         { return Change{Path: name, Remove: true} }
 
 func TestAViewSeesWhatWasPlannedAndItsFolderDoesNot(t *testing.T) {
 	folder, dir := open(t, map[string]string{"a.txt": "old", "gone.txt": "leaving", "kept.txt": "kept"})
 	before := testkit.Snapshot(t, dir)
-	view := folder.With([]Change{put("a.txt", "new"), drop("gone.txt"), put("made.txt", "made")})
+	view := folder.WithChanges([]Change{put("a.txt", "new"), drop("gone.txt"), put("made.txt", "made")})
 
 	cases := []struct {
 		name            string
@@ -34,13 +34,13 @@ func TestAViewSeesWhatWasPlannedAndItsFolderDoesNot(t *testing.T) {
 		if got := read(t, view, c.name); got != c.inView {
 			t.Errorf("the view reads %s as %q, want %q", c.name, got, c.inView)
 		}
-		if got := view.Has(c.name); got != (c.inView != "<missing>") {
+		if got := view.HasFile(c.name); got != (c.inView != "<missing>") {
 			t.Errorf("the view's Has(%q) = %v", c.name, got)
 		}
 		if got := read(t, folder, c.name); got != c.inFirst {
 			t.Errorf("the folder it came from reads %s as %q, want %q", c.name, got, c.inFirst)
 		}
-		if got := folder.Has(c.name); got != (c.inFirst != "<missing>") {
+		if got := folder.HasFile(c.name); got != (c.inFirst != "<missing>") {
 			t.Errorf("the folder's Has(%q) = %v", c.name, got)
 		}
 	}
@@ -104,18 +104,18 @@ func TestChangesHoldsEachFileOnceInTheOrderFirstPlanned(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			view, _ := open(t, disk)
 			for _, step := range c.steps {
-				view = view.With(step)
+				view = view.WithChanges(step)
 			}
 			if got := view.Changes(); !slices.EqualFunc(got, c.want, sameChange) {
 				t.Errorf("Changes = %s, want %s", show(got), show(c.want))
 			}
 			for _, change := range c.want {
-				content := string(change.Bytes)
+				content := string(change.Data)
 				if change.Remove {
 					content = "<missing>"
 				}
-				if got := read(t, view, change.Name); got != content {
-					t.Errorf("the view reads %s as %q, want %q", change.Name, got, content)
+				if got := read(t, view, change.Path); got != content {
+					t.Errorf("the view reads %s as %q, want %q", change.Path, got, content)
 				}
 			}
 		})
@@ -151,7 +151,7 @@ func TestWithSpellsTheFoldersOfANewFileAsTheMapAndEarlierChangesDo(t *testing.T)
 				for _, name := range step {
 					changes = append(changes, put(name, name))
 				}
-				view = view.With(changes)
+				view = view.WithChanges(changes)
 				given = append(given, step...)
 			}
 			if got := names(view.Changes()); !slices.Equal(got, c.want) {
@@ -163,18 +163,18 @@ func TestWithSpellsTheFoldersOfANewFileAsTheMapAndEarlierChangesDo(t *testing.T)
 			}
 			one := folder
 			for i, name := range given {
-				if got := view.Name(strings.ToUpper(name)); got != c.want[i] {
+				if got := view.CanonicalPath(strings.ToUpper(name)); got != c.want[i] {
 					t.Errorf("Name of %s in capitals = %q, want %q", name, got, c.want[i])
 				}
 				if got := read(t, view, name); got != name {
 					t.Errorf("the view reads %s as %q", name, got)
 				}
-				placed, err := one.Place(name)
+				placed, err := one.ResolveNewPath(name)
 				if err != nil || placed != c.want[i] {
 					t.Errorf("Place(%q) = %q, %v, want %q", name, placed, err, c.want[i])
 				}
-				one = one.With([]Change{put(name, name)})
-				if got := one.Name(name); got != placed {
+				one = one.WithChanges([]Change{put(name, name)})
+				if got := one.CanonicalPath(name); got != placed {
 					t.Errorf("With stores %s as %q, Place said %q", name, got, placed)
 				}
 			}
@@ -202,7 +202,7 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			folder, _ := open(t, disk)
-			view := folder.With([]Change{put(c.given, "new")})
+			view := folder.WithChanges([]Change{put(c.given, "new")})
 			if got, want := names(view.Changes()), []string{c.stored}; !slices.Equal(got, want) {
 				t.Errorf("Changes names the files %q, want %q", got, want)
 			}
@@ -215,7 +215,7 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 
 func TestWithGivesTwoSpellingsOfAFolderOne(t *testing.T) {
 	folder, _ := open(t, map[string]string{"textures/Old.blp": "old"})
-	view := folder.With([]Change{put("Textures/new.blp", "new"), put("Sound/a.mp3", "a"), put("sound/b.mp3", "b")})
+	view := folder.WithChanges([]Change{put("Textures/new.blp", "new"), put("Sound/a.mp3", "a"), put("sound/b.mp3", "b")})
 	want := []string{"textures/new.blp", "Sound/a.mp3", "Sound/b.mp3"}
 	if got := names(view.Changes()); !slices.Equal(got, want) {
 		t.Errorf("Changes names the files %q, want %q", got, want)
@@ -225,7 +225,7 @@ func TestWithGivesTwoSpellingsOfAFolderOne(t *testing.T) {
 func names(changes []Change) []string {
 	listed := []string{}
 	for _, change := range changes {
-		listed = append(listed, change.Name)
+		listed = append(listed, change.Path)
 	}
 	return listed
 }
@@ -239,10 +239,10 @@ func TestWithLaysManyNewFilesInOneCallQuickly(t *testing.T) {
 		if i < 50 {
 			name = fmt.Sprintf("Units/Folder%d/Model%d.mdx", i, i)
 		}
-		changes[i] = Change{Name: name}
+		changes[i] = Change{Path: name}
 	}
 	start := time.Now()
-	view := folder.With(changes)
+	view := folder.WithChanges(changes)
 	planned := view.Changes()
 	files := view.Files()
 	took := time.Since(start)
@@ -251,8 +251,8 @@ func TestWithLaysManyNewFilesInOneCallQuickly(t *testing.T) {
 		t.Fatalf("the view plans %d changes and has %d files, want %d and %d", len(planned), len(files), count, count+1)
 	}
 	for i, change := range planned {
-		if want := fmt.Sprintf("Units/Folder%d/Model%d.mdx", i%50, i); change.Name != want {
-			t.Fatalf("change %d is named %q, want %q", i, change.Name, want)
+		if want := fmt.Sprintf("Units/Folder%d/Model%d.mdx", i%50, i); change.Path != want {
+			t.Fatalf("change %d is named %q, want %q", i, change.Path, want)
 		}
 	}
 	if took > 2*time.Second {
@@ -261,16 +261,16 @@ func TestWithLaysManyNewFilesInOneCallQuickly(t *testing.T) {
 }
 
 func sameChange(a, b Change) bool {
-	return a.Name == b.Name && a.Remove == b.Remove && string(a.Bytes) == string(b.Bytes)
+	return a.Path == b.Path && a.Remove == b.Remove && string(a.Data) == string(b.Data)
 }
 
 func show(changes []Change) []string {
 	shown := []string{}
 	for _, change := range changes {
 		if change.Remove {
-			shown = append(shown, "-"+change.Name)
+			shown = append(shown, "-"+change.Path)
 		} else {
-			shown = append(shown, change.Name+"="+string(change.Bytes))
+			shown = append(shown, change.Path+"="+string(change.Data))
 		}
 	}
 	return shown
@@ -278,8 +278,8 @@ func show(changes []Change) []string {
 
 func TestAViewOverAViewLeavesTheFirstAsItWas(t *testing.T) {
 	folder, _ := open(t, map[string]string{"a.txt": "a"})
-	first := folder.With([]Change{put("a.txt", "1"), put("new.txt", "1")})
-	second := first.With([]Change{put("A.txt", "2"), drop("new.txt"), put("more.txt", "2")})
+	first := folder.WithChanges([]Change{put("a.txt", "1"), put("new.txt", "1")})
+	second := first.WithChanges([]Change{put("A.txt", "2"), drop("new.txt"), put("more.txt", "2")})
 	if got, want := show(first.Changes()), []string{"a.txt=1", "new.txt=1"}; !slices.Equal(got, want) {
 		t.Errorf("the first view's Changes = %s, want %s", got, want)
 	}
@@ -298,11 +298,11 @@ func TestAViewOverAViewLeavesTheFirstAsItWas(t *testing.T) {
 
 func TestAViewKeepsTheSpellingOfAFileItRemoves(t *testing.T) {
 	folder, _ := open(t, map[string]string{"war3mapMap.blp": "minimap"})
-	view := folder.With([]Change{drop("war3mapmap.BLP")})
-	if view.Has("war3mapMap.blp") {
+	view := folder.WithChanges([]Change{drop("war3mapmap.BLP")})
+	if view.HasFile("war3mapMap.blp") {
 		t.Error("the view still has the file it removes")
 	}
-	if got := view.Label("WAR3MAPMAP.BLP"); got != label+"/war3mapMap.blp" {
+	if got := view.DisplayPath("WAR3MAPMAP.BLP"); got != label+"/war3mapMap.blp" {
 		t.Errorf("Label = %q", got)
 	}
 	if got, want := view.Files(), []string{}; !slices.Equal(got, want) {
@@ -312,7 +312,7 @@ func TestAViewKeepsTheSpellingOfAFileItRemoves(t *testing.T) {
 
 func TestPlaceKeepsTheSpellingOfFoldersAndFilesTheMapHas(t *testing.T) {
 	folder, _ := open(t, map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script", "Units/Hero/a.txt": ""})
-	planned := folder.With([]Change{put("Sound/Music/theme.mp3", "theme"), drop("Units/Hero/a.txt")})
+	planned := folder.WithChanges([]Change{put("Sound/Music/theme.mp3", "theme"), drop("Units/Hero/a.txt")})
 	cases := []struct {
 		view        *Folder
 		name, place string
@@ -330,7 +330,7 @@ func TestPlaceKeepsTheSpellingOfFoldersAndFilesTheMapHas(t *testing.T) {
 		{planned, "units/hero/b.txt", "Units/Hero/b.txt"},
 	}
 	for _, c := range cases {
-		got, err := c.view.Place(c.name)
+		got, err := c.view.ResolveNewPath(c.name)
 		if err != nil || got != c.place {
 			t.Errorf("Place(%q) = %q, %v, want %q", c.name, got, err, c.place)
 		}
@@ -339,8 +339,8 @@ func TestPlaceKeepsTheSpellingOfFoldersAndFilesTheMapHas(t *testing.T) {
 
 func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 	folder, _ := open(t, map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script"})
-	planned := folder.With([]Change{put("Sound/Music/theme.mp3", "theme")})
-	removing := folder.With([]Change{drop("WAR3MAP.LUA"), drop("textures/old.blp")})
+	planned := folder.WithChanges([]Change{put("Sound/Music/theme.mp3", "theme")})
+	removing := folder.WithChanges([]Change{drop("WAR3MAP.LUA"), drop("textures/old.blp")})
 	cases := []struct {
 		view              *Folder
 		name, words, file string
@@ -358,7 +358,7 @@ func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 		{removing, "TEXTURES", "TEXTURES would replace a folder in the map", label + "/Textures"},
 	}
 	for _, c := range cases {
-		got, err := c.view.Place(c.name)
+		got, err := c.view.ResolveNewPath(c.name)
 		e := asError(t, err)
 		if got != "" || !contains(e.Msg, c.words) || e.File != c.file || e.Hint == "" {
 			t.Errorf("Place(%q) = %q, %+v, want %q at %s", c.name, got, e, c.words, c.file)
@@ -376,7 +376,7 @@ func TestPlaceRefusesANameNoFileCanHaveAsItsCallersBug(t *testing.T) {
 		"../outside.txt", "textures//New.blp", `TEXTURES\..\WAR3MAP.W3I`, "what?.blp", "Sound/nul.mp3", "Sound/a.mp3 ",
 	}
 	for _, name := range unwritable {
-		placed, err := folder.Place(name)
+		placed, err := folder.ResolveNewPath(name)
 		text := asPlannersBug(t, err)
 		if placed != "" || !contains(text, fmt.Sprintf("Cannot place %q", name)) || !contains(text, "relative path") {
 			t.Errorf("Place(%q) = %q, %q, want a refusal that names it", name, placed, text)
@@ -393,9 +393,9 @@ func TestIsFolderIsAFolderTheScanFoundOrOneAPlannedChangeMakes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	planned := folder.With([]Change{put("Sound/Music/theme.mp3", "theme"), drop("Units/Hero/a.txt")})
-	takenBack := planned.With([]Change{drop("sound/music/THEME.mp3")})
-	oneLeft := planned.With([]Change{put("sound/Effects/hit.wav", "hit")}).With([]Change{drop("Sound/Music/theme.mp3")})
+	planned := folder.WithChanges([]Change{put("Sound/Music/theme.mp3", "theme"), drop("Units/Hero/a.txt")})
+	takenBack := planned.WithChanges([]Change{drop("sound/music/THEME.mp3")})
+	oneLeft := planned.WithChanges([]Change{put("sound/Effects/hit.wav", "hit")}).WithChanges([]Change{drop("Sound/Music/theme.mp3")})
 	cases := []struct {
 		what string
 		view *Folder
@@ -423,7 +423,7 @@ func TestIsFolderIsAFolderTheScanFoundOrOneAPlannedChangeMakes(t *testing.T) {
 		{"the folder of the write that is taken back", oneLeft, "sound/music", false},
 	}
 	for _, c := range cases {
-		if got := c.view.IsFolder(c.name); got != c.want {
+		if got := c.view.IsDir(c.name); got != c.want {
 			t.Errorf("%s: IsFolder(%q) = %v, want %v", c.what, c.name, got, c.want)
 		}
 	}

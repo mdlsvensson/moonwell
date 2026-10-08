@@ -125,8 +125,8 @@ func MapGlobals(source *mapdir.Folder) (*lua.MapGlobals, error) {
 	case found:
 		defined := lua.ReadMapGlobals(string(script))
 		return &defined, nil
-	case source.IsFolder(scriptName):
-		return nil, errFolderForScript(source.Name(scriptName), source.Label(scriptName))
+	case source.IsDir(scriptName):
+		return nil, errFolderForScript(source.CanonicalPath(scriptName), source.DisplayPath(scriptName))
 	}
 	return nil, nil
 }

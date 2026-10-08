@@ -11,142 +11,142 @@ import (
 )
 
 type Change struct {
-	Name   string
-	Bytes  []byte
+	Path   string
+	Data   []byte
 	Remove bool
 }
 
-func (f *Folder) With(changes []Change) *Folder {
+func (f *Folder) WithChanges(changes []Change) *Folder {
 	view := *f
 	view.changes = slices.Clone(f.changes)
-	view.planned = maps.Clone(f.planned)
-	view.made = maps.Clone(f.made)
+	view.changeIndex = maps.Clone(f.changeIndex)
+	view.newDirs = maps.Clone(f.newDirs)
 	for _, change := range changes {
-		view.lay(change)
+		view.addChange(change)
 	}
-	view.compact()
+	view.compactChanges()
 	return &view
 }
 
 func (f *Folder) Changes() []Change { return slices.Clone(f.changes) }
 
-func (f *Folder) lay(change Change) {
-	change.Name = f.spelled(change.Name)
-	key := Key(change.Name)
-	at, planned := f.planned[key]
+func (f *Folder) addChange(change Change) {
+	change.Path = f.canonicalize(change.Path)
+	key := Key(change.Path)
+	index, isPlanned := f.changeIndex[key]
 	switch {
-	case change.Remove && !f.Has(change.Name):
-	case change.Remove && !f.found.has(change.Name):
-		delete(f.planned, key)
-	case planned:
-		f.changes[at] = change
+	case change.Remove && !f.HasFile(change.Path):
+	case change.Remove && !f.onDisk.hasFile(change.Path):
+		delete(f.changeIndex, key)
+	case isPlanned:
+		f.changes[index] = change
 	default:
-		f.planned[key] = len(f.changes)
+		f.changeIndex[key] = len(f.changes)
 		f.changes = append(f.changes, change)
-		f.makeFolders(change.Name)
+		f.addParentDirs(change.Path)
 	}
 }
 
-func (f *Folder) compact() {
-	if len(f.changes) == len(f.planned) {
+func (f *Folder) compactChanges() {
+	if len(f.changes) == len(f.changeIndex) {
 		return
 	}
-	stays := func(at int) bool {
-		planned, ok := f.planned[Key(f.changes[at].Name)]
-		return ok && planned == at
+	isCurrent := func(index int) bool {
+		current, ok := f.changeIndex[Key(f.changes[index].Path)]
+		return ok && current == index
 	}
-	kept := make([]Change, 0, len(f.planned))
-	for at, change := range f.changes {
-		if stays(at) {
+	kept := make([]Change, 0, len(f.changeIndex))
+	for index, change := range f.changes {
+		if isCurrent(index) {
 			kept = append(kept, change)
 		}
 	}
 	f.changes = kept
-	clear(f.planned)
-	clear(f.made)
-	for at, change := range f.changes {
-		f.planned[Key(change.Name)] = at
-		f.makeFolders(change.Name)
+	clear(f.changeIndex)
+	clear(f.newDirs)
+	for index, change := range f.changes {
+		f.changeIndex[Key(change.Path)] = index
+		f.addParentDirs(change.Path)
 	}
 }
 
-func foldersOf(name string) []string {
-	var folders []string
-	for i := range len(name) {
-		if name[i] == '/' {
-			folders = append(folders, name[:i])
+func parentDirs(path string) []string {
+	var dirs []string
+	for i := range len(path) {
+		if path[i] == '/' {
+			dirs = append(dirs, path[:i])
 		}
 	}
-	return folders
+	return dirs
 }
 
-func (f *Folder) makeFolders(name string) {
-	for _, folder := range foldersOf(name) {
-		if _, noted := f.made[Key(folder)]; !noted {
-			f.made[Key(folder)] = folder
+func (f *Folder) addParentDirs(path string) {
+	for _, dir := range parentDirs(path) {
+		if _, exists := f.newDirs[Key(dir)]; !exists {
+			f.newDirs[Key(dir)] = dir
 		}
 	}
 }
 
-func (f *Folder) folder(key string) (string, bool) {
-	if path, ok := f.found.folders[key]; ok {
+func (f *Folder) dirPath(key string) (string, bool) {
+	if path, ok := f.onDisk.dirPaths[key]; ok {
 		return path, true
 	}
-	path, ok := f.made[key]
+	path, ok := f.newDirs[key]
 	return path, ok
 }
 
-func (f *Folder) spelled(name string) string {
-	name = slashed(name)
-	if known, ok := f.spelling(Key(name)); ok {
-		return known
+func (f *Folder) canonicalize(path string) string {
+	path = toSlash(path)
+	if canonical, ok := f.filePath(Key(path)); ok {
+		return canonical
 	}
-	for end := strings.LastIndexByte(name, '/'); end >= 0; end = strings.LastIndexByte(name[:end], '/') {
-		if existing, ok := f.folder(Key(name[:end])); ok {
-			return existing + name[end:]
+	for end := strings.LastIndexByte(path, '/'); end >= 0; end = strings.LastIndexByte(path[:end], '/') {
+		if existingDir, ok := f.dirPath(Key(path[:end])); ok {
+			return existingDir + path[end:]
 		}
 	}
-	return name
+	return path
 }
 
-func (f *Folder) Place(name string) (string, error) {
-	if _, ok := fsx.RelPath(name); !ok {
-		return "", errNoPlaceForSuchAName(name)
+func (f *Folder) ResolveNewPath(path string) (string, error) {
+	if _, ok := fsx.RelPath(path); !ok {
+		return "", errInvalidNewPath(path)
 	}
-	placed := f.spelled(name)
-	if file, ok := f.fileOnTheWay(placed); ok {
-		return "", errFileOnTheWay(f.Name(file), name, f.Label(file))
+	canonical := f.canonicalize(path)
+	if file, ok := f.blockingFile(canonical); ok {
+		return "", errBlockedByFile(f.CanonicalPath(file), path, f.DisplayPath(file))
 	}
-	if existing, ok := f.folder(Key(placed)); ok {
-		return "", errOntoAFolder(name, join(f.label, existing))
+	if existingDir, ok := f.dirPath(Key(canonical)); ok {
+		return "", errReplacesDir(path, joinPath(f.displayPath, existingDir))
 	}
-	return placed, nil
+	return canonical, nil
 }
 
-func (f *Folder) fileOnTheWay(name string) (file string, found bool) {
-	for _, folder := range foldersOf(name) {
-		if f.found.has(folder) || f.Has(folder) {
-			return folder, true
+func (f *Folder) blockingFile(path string) (file string, found bool) {
+	for _, dir := range parentDirs(path) {
+		if f.onDisk.hasFile(dir) || f.HasFile(dir) {
+			return dir, true
 		}
 	}
 	return "", false
 }
 
-func errNoPlaceForSuchAName(name string) error {
-	return fmt.Errorf("Cannot place %q: it is not a relative path that a file of a map can have.", name)
+func errInvalidNewPath(path string) error {
+	return fmt.Errorf("Cannot place %q: it is not a relative path that a file of a map can have.", path)
 }
 
-func errFileOnTheWay(blocking, name, file string) error {
+func errBlockedByFile(blocking, path, file string) error {
 	return &diag.Error{
-		Msg:  blocking + " in the map is a file, not a folder, so " + name + " cannot go there.",
+		Msg:  blocking + " in the map is a file, not a folder, so " + path + " cannot go there.",
 		File: file,
 		Hint: "Give the new file another path, or remove " + blocking + " from the source map.",
 	}
 }
 
-func errOntoAFolder(name, file string) error {
+func errReplacesDir(path, file string) error {
 	return &diag.Error{
-		Msg:  name + " would replace a folder in the map.",
+		Msg:  path + " would replace a folder in the map.",
 		File: file,
 		Hint: "Give the new file another path, or remove that folder from the source map.",
 	}
