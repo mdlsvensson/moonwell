@@ -51,8 +51,8 @@ type Compiled struct {
 	Sources []Source
 
 	in     Input
-	search macros
-	output *staged
+	macros macroFile
+	output *compileOutput
 	lua    map[string]string
 	none   map[string]bool
 }
@@ -69,11 +69,11 @@ func CompileSources(ctx context.Context, e *env.Env, in Input) (*Compiled, error
 	if in.Natives == nil {
 		return nil, errNoNatives()
 	}
-	search, err := macroModule(e.Root)
+	search, err := loadMacroModule(e.Root)
 	if err != nil {
 		return nil, err
 	}
-	sources, err := Collect(e.Root, in.Libraries)
+	sources, err := CollectSources(e.Root, in.Libraries)
 	if err != nil {
 		return nil, err
 	}
@@ -81,27 +81,27 @@ func CompileSources(ctx context.Context, e *env.Env, in Input) (*Compiled, error
 	if err != nil {
 		return nil, err
 	}
-	read := &reader{output: output, lua: map[string]string{}, none: map[string]bool{}}
-	if err := read.libraries(sources); err != nil {
+	read := &luaReader{output: output, lua: map[string]string{}, none: map[string]bool{}}
+	if err := read.readLibraries(sources); err != nil {
 		return nil, err
 	}
-	return &Compiled{Sources: sources, in: in, search: search, output: output, lua: read.lua, none: read.none}, nil
+	return &Compiled{Sources: sources, in: in, macros: search, output: output, lua: read.lua, none: read.none}, nil
 }
 
 func Link(ctx context.Context, e *env.Env, compiled *Compiled) (*Program, error) {
 	if compiled == nil || compiled.output == nil {
 		return nil, errors.New("script.Link: compiled is not what script.CompileSources returned")
 	}
-	in, read := compiled.in, compiled.reader()
+	in, read := compiled.in, compiled.newLuaReader()
 	entry, err := EntryName(in.Entry)
 	if err != nil {
 		return nil, err
 	}
-	modules, err := reached(entry, loaderOf(compiled.Sources, read.luaOf))
+	modules, err := reachableModules(entry, newLoader(compiled.Sources, read.readLua))
 	if err != nil {
 		return nil, err
 	}
-	unknown, err := unknownGlobals(ctx, e, in, compiled.search, compiled.output, modules)
+	unknown, err := findUnknownGlobals(ctx, e, in, compiled.macros, compiled.output, modules)
 	if err != nil {
 		return nil, err
 	}
@@ -110,32 +110,32 @@ func Link(ctx context.Context, e *env.Env, compiled *Compiled) (*Program, error)
 	}, nil
 }
 
-func macroModule(root string) (macros, error) {
-	search, err := macrosOf(root)
+func loadMacroModule(root string) (macroFile, error) {
+	search, err := readMacros(root)
 	if err != nil {
-		return macros{}, err
+		return macroFile{}, err
 	}
 	if _, err := RefreshMacros(root); err != nil {
-		return macros{}, err
+		return macroFile{}, err
 	}
 	return search, nil
 }
 
-type reader struct {
-	output *staged
+type luaReader struct {
+	output *compileOutput
 	lua    map[string]string
 	none   map[string]bool
 }
 
-func (c *Compiled) reader() *reader {
-	return &reader{output: c.output, lua: maps.Clone(c.lua), none: maps.Clone(c.none)}
+func (c *Compiled) newLuaReader() *luaReader {
+	return &luaReader{output: c.output, lua: maps.Clone(c.lua), none: maps.Clone(c.none)}
 }
 
-func (r *reader) luaOf(source Source) (text string, ok bool, err error) {
+func (r *luaReader) readLua(source Source) (text string, ok bool, err error) {
 	if text, ok = r.lua[source.Path]; ok || r.none[source.Path] {
 		return text, ok, nil
 	}
-	if text, ok, err = r.output.luaOf(source); err != nil {
+	if text, ok, err = r.output.readLua(source); err != nil {
 		return "", false, err
 	}
 	if ok {
@@ -146,12 +146,12 @@ func (r *reader) luaOf(source Source) (text string, ok bool, err error) {
 	return text, ok, nil
 }
 
-func (r *reader) libraries(sources []Source) error {
+func (r *luaReader) readLibraries(sources []Source) error {
 	for _, source := range sources {
 		if source.Library == "" || source.Kind != Yue {
 			continue
 		}
-		if _, _, err := r.luaOf(source); err != nil {
+		if _, _, err := r.readLua(source); err != nil {
 			return err
 		}
 	}

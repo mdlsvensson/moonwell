@@ -23,32 +23,32 @@ const (
 	atOnce    = 8
 )
 
-type staged struct {
+type compileOutput struct {
 	texts        map[string]string
 	hashes       map[string]string
 	lua          map[string]string
 	macroSources string
 }
 
-func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macros, sources []Source) (*staged, error) {
-	outputs, err := outputFolder(e.Root)
+func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macroFile, sources []Source) (*compileOutput, error) {
+	outputs, err := stageLuaDir(e.Root)
 	if err != nil {
 		return nil, err
 	}
-	units, err := unitsOf(e.Root, outputs, sources)
+	units, err := newCompileUnits(e.Root, outputs, sources)
 	if err != nil {
 		return nil, err
 	}
-	now := dependsOn{Compiler: yue, Mode: modeOf(minify), Macros: m.hash, MacroSources: macroSourcesOf(units)}
-	last, err := readHashes(e.Root)
+	now := dependsOn{Compiler: yue, Mode: modeName(minify), Macros: m.hash, MacroSources: macroSourcesOf(units)}
+	last, err := readCompileCache(e.Root)
 	if err != nil {
 		return nil, err
 	}
-	if err := removeGone(outputs, last, units); err != nil {
+	if err := removeStaleOutputs(outputs, last, units); err != nil {
 		return nil, err
 	}
-	stale, upToDate := last.stale(units, now)
-	if err := writeHashes(e.Root, now, upToDate, stale); err != nil {
+	stale, upToDate := last.splitStale(units, now)
+	if err := writeCompileCache(e.Root, now, upToDate, stale); err != nil {
 		return nil, err
 	}
 	with := compiler{ctx: ctx, run: e.Run, program: yue, mode: now.Mode, search: m.path}
@@ -56,21 +56,21 @@ func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macr
 	if err != nil {
 		return nil, err
 	}
-	if err := writeHashes(e.Root, now, withoutFailed(units, failures), nil); err != nil {
+	if err := writeCompileCache(e.Root, now, withoutFailed(units, failures), nil); err != nil {
 		return nil, err
 	}
 	if len(failures) > 0 {
 		return nil, errNotCompiled(failures)
 	}
-	return stagedOf(units, now.MacroSources), nil
+	return newCompileOutput(units, now.MacroSources), nil
 }
 
-func (s *staged) luaOf(source Source) (lua string, ok bool, err error) {
+func (s *compileOutput) readLua(source Source) (lua string, ok bool, err error) {
 	file, isCompiled := s.lua[source.Path]
 	if source.Kind != Yue || !isCompiled {
 		return "", false, nil
 	}
-	under, err := outputOf(source)
+	under, err := outputPath(source)
 	if err != nil {
 		return "", false, err
 	}
@@ -81,33 +81,33 @@ func (s *staged) luaOf(source Source) (lua string, ok bool, err error) {
 	return string(data), found, nil
 }
 
-func modeOf(minify bool) string {
+func modeName(minify bool) string {
 	if minify {
 		return "-m"
 	}
 	return "-r"
 }
 
-type unit struct {
-	path   string
-	file   string
-	text   string
-	hash   string
-	under  string
-	output string
+type compileUnit struct {
+	path      string
+	file      string
+	text      string
+	hash      string
+	outputDir string
+	output    string
 }
 
-func outputFolder(root string) (string, error) {
+func stageLuaDir(root string) (string, error) {
 	return fsx.SafeJoinNoSymlinks(root, outputDir)
 }
 
-func unitsOf(root, outputs string, sources []Source) ([]unit, error) {
-	var units []unit
+func newCompileUnits(root, outputs string, sources []Source) ([]compileUnit, error) {
+	var units []compileUnit
 	for _, source := range sources {
 		if source.Kind != Yue {
 			continue
 		}
-		u, err := unitOf(root, outputs, source)
+		u, err := newCompileUnit(root, outputs, source)
 		if err != nil {
 			return nil, err
 		}
@@ -116,29 +116,29 @@ func unitsOf(root, outputs string, sources []Source) ([]unit, error) {
 	return units, nil
 }
 
-func unitOf(root, outputs string, source Source) (unit, error) {
-	under, err := outputOf(source)
+func newCompileUnit(root, outputs string, source Source) (compileUnit, error) {
+	under, err := outputPath(source)
 	if err != nil {
-		return unit{}, err
+		return compileUnit{}, err
 	}
 	file := filepath.Join(root, filepath.FromSlash(source.Path))
 	data, err := os.ReadFile(file)
 	if err != nil {
-		return unit{}, errUnreadableSource(source.Path, err)
+		return compileUnit{}, errUnreadableSource(source.Path, err)
 	}
-	return unit{
-		path:   source.Path,
-		file:   file,
-		text:   fsx.TrimBOM(string(data)),
-		hash:   fsx.SHA256Hex(data),
-		under:  under,
-		output: filepath.Join(outputs, filepath.FromSlash(under)),
+	return compileUnit{
+		path:      source.Path,
+		file:      file,
+		text:      fsx.TrimBOM(string(data)),
+		hash:      fsx.SHA256Hex(data),
+		outputDir: under,
+		output:    filepath.Join(outputs, filepath.FromSlash(under)),
 	}, nil
 }
 
 var plainKey = regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
 
-func outputOf(source Source) (string, error) {
+func outputPath(source Source) (string, error) {
 	below := strings.ReplaceAll(source.Name, ".", "/")
 	switch {
 	case source.Library == "" && source.Path == "src/"+below+".yue":
@@ -149,16 +149,16 @@ func outputOf(source Source) (string, error) {
 	return "", fmt.Errorf("script.compileAll: the module %q of the library %q is at %q, which places no output", source.Name, source.Library, source.Path)
 }
 
-func withoutFailed(units []unit, failures []*diag.Error) []unit {
+func withoutFailed(units []compileUnit, failures []*diag.Error) []compileUnit {
 	failed := map[string]bool{}
 	for _, failure := range failures {
 		failed[failure.File] = true
 	}
-	return slices.DeleteFunc(slices.Clone(units), func(u unit) bool { return failed[u.path] })
+	return slices.DeleteFunc(slices.Clone(units), func(u compileUnit) bool { return failed[u.path] })
 }
 
-func stagedOf(units []unit, macroSources string) *staged {
-	result := &staged{
+func newCompileOutput(units []compileUnit, macroSources string) *compileOutput {
+	result := &compileOutput{
 		texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}, macroSources: macroSources,
 	}
 	for _, u := range units {
@@ -214,7 +214,7 @@ func guarded[T, G any](work func(T) (G, error), item T) (gave G, err error) {
 	return work(item)
 }
 
-func (c compiler) compileEach(units []unit) ([]*diag.Error, error) {
+func (c compiler) compileEach(units []compileUnit) ([]*diag.Error, error) {
 	refused, err := eachOf(units, c.compile)
 	if err != nil {
 		return nil, err
@@ -222,11 +222,11 @@ func (c compiler) compileEach(units []unit) ([]*diag.Error, error) {
 	return slices.DeleteFunc(refused, func(failure *diag.Error) bool { return failure == nil }), nil
 }
 
-func (c compiler) compile(u unit) (refused *diag.Error, err error) {
+func (c compiler) compile(u compileUnit) (refused *diag.Error, err error) {
 	if err := os.MkdirAll(filepath.Dir(u.output), 0o777); err != nil {
-		return nil, errUnwritableOutput(outputDir+"/"+u.under, err)
+		return nil, errUnwritableOutput(outputDir+"/"+u.outputDir, err)
 	}
-	if err := removeOutput(u.under, u.output); err != nil {
+	if err := removeOutput(u.outputDir, u.output); err != nil {
 		return nil, err
 	}
 	args := []string{"--target=5.3", c.mode, "-o", u.output, "--path", c.search, u.file}
@@ -234,11 +234,11 @@ func (c compiler) compile(u unit) (refused *diag.Error, err error) {
 	if err != nil {
 		return nil, err
 	}
-	failure := u.failureOf(result)
+	failure := u.diagErrorOf(result)
 	if failure == nil {
 		return nil, nil
 	}
-	if err := removeOutput(u.under, u.output); err != nil {
+	if err := removeOutput(u.outputDir, u.output); err != nil {
 		return nil, err
 	}
 	return failure, nil
@@ -252,7 +252,7 @@ func removeOutput(under, file string) error {
 	return errUnremovableOutput(outputDir+"/"+under, err)
 }
 
-func (u unit) failureOf(result env.RunResult) *diag.Error {
+func (u compileUnit) diagErrorOf(result env.RunResult) *diag.Error {
 	if result.ExitCode == 0 {
 		if isEmptyFile(u.output) && hasCode(u.text) {
 			return errEmptyOutput(u.path)
@@ -260,10 +260,10 @@ func (u unit) failureOf(result env.RunResult) *diag.Error {
 		return nil
 	}
 	printed := result.Stdout + "\n" + result.Stderr
-	if failure := rewriteError(u.path, printed, func() string { return leftAt(u.output) }); failure != nil {
+	if failure := newRewriteError(u.path, printed, func() string { return leftAt(u.output) }); failure != nil {
 		return failure
 	}
-	return compileError(u.path, printed)
+	return newCompileError(u.path, printed)
 }
 
 func isEmptyFile(path string) bool {

@@ -20,19 +20,19 @@ func luaByPath(pairs ...string) func(Source) (string, bool, error) {
 
 const noCode = "\x00a source without code"
 
-func modulesOf(pairs ...string) func(name string) (leadsTo, error) {
-	return func(name string) (leadsTo, error) {
+func modulesOf(pairs ...string) func(name string) (loadResult, error) {
+	return func(name string) (loadResult, error) {
 		for i := 0; i+1 < len(pairs); i += 2 {
 			path := "src/" + strings.ReplaceAll(name, ".", "/") + ".yue"
 			switch {
 			case pairs[i] != name:
 			case pairs[i+1] == noCode:
-				return leadsTo{without: path}, nil
+				return loadResult{without: path}, nil
 			default:
-				return leadsTo{module: &Module{Name: name, Path: path, Kind: Yue, Lua: pairs[i+1]}}, nil
+				return loadResult{module: &Module{Name: name, Path: path, Kind: Yue, Lua: pairs[i+1]}}, nil
 			}
 		}
-		return leadsTo{}, nil
+		return loadResult{}, nil
 	}
 }
 
@@ -44,7 +44,7 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 		{Name: "kit.loud", Path: inLibrary("ex", "kit/loud.yue"), Kind: Yue, Library: "ex"},
 		{Name: "kit.bytes", Path: inLibrary("ex", "kit/bytes.lua"), Kind: Lua, Library: "ex", Text: "return '\xff'"},
 	}
-	load := loaderOf(sources, luaByPath("src/main.yue", "local x = 1", inLibrary("ex", "kit/loud.yue"), "return 2"))
+	load := newLoader(sources, luaByPath("src/main.yue", "local x = 1", inLibrary("ex", "kit/loud.yue"), "return 2"))
 	for name, want := range map[string]Module{
 		"main":       {Name: "main", Path: "src/main.yue", Kind: Yue, Lua: "local x = 1"},
 		"tools":      {Name: "tools", Path: "lua/tools/init.lua", Kind: Lua, Lua: "return {}"},
@@ -57,16 +57,16 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 		}
 	}
 	for _, name := range []string{"missing", "kit", "main.init"} {
-		if got, err := load(name); got != (leadsTo{}) || err != nil {
+		if got, err := load(name); got != (loadResult{}) || err != nil {
 			t.Errorf("load(%s) = %+v, %v, want no module", name, got, err)
 		}
 	}
-	if got, err := load("pending"); got != (leadsTo{without: "src/pending.yue"}) || err != nil {
+	if got, err := load("pending"); got != (loadResult{without: "src/pending.yue"}) || err != nil {
 		t.Errorf("load(pending) = %+v, %v, want the file of a module without Lua", got, err)
 	}
 
 	failure := errors.New("the output is gone")
-	loadGame := loaderOf(
+	loadGame := newLoader(
 		[]Source{{Name: "game.init", Path: "src/game/init.yue", Kind: Yue}, {Name: "broken", Path: "src/broken.yue", Kind: Yue}},
 		func(source Source) (string, bool, error) {
 			if source.Name == "broken" {
@@ -79,7 +79,7 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 	if got, err := loadGame("game"); err != nil || got.module == nil || *got.module != want {
 		t.Errorf("load(game) = %+v, %v, want %+v", got, err, want)
 	}
-	if got, err := loadGame("broken"); got != (leadsTo{}) || err != failure {
+	if got, err := loadGame("broken"); got != (loadResult{}) || err != failure {
 		t.Errorf("load(broken) = %+v, %v, want the failure of the read", got, err)
 	}
 }
@@ -92,7 +92,7 @@ func TestReachedReturnsReachableModulesDependenciesFirst(t *testing.T) {
 		"c", "return {}",
 		"unused", "return {}",
 	)
-	modules, err := reached("main", load)
+	modules, err := reachableModules("main", load)
 	var names []string
 	for _, module := range modules {
 		names = append(names, module.Name)
@@ -104,7 +104,7 @@ func TestReachedReturnsReachableModulesDependenciesFirst(t *testing.T) {
 
 func TestABuiltInModuleIsNeverLoaded(t *testing.T) {
 	asked := []string{}
-	modules, err := reached("main", func(name string) (leadsTo, error) {
+	modules, err := reachableModules("main", func(name string) (loadResult, error) {
 		asked = append(asked, name)
 		return modulesOf("main", `require("moonwell")`, "moonwell", "return 'a file of that name'")(name)
 	})
@@ -118,7 +118,7 @@ func TestAModuleRequiredUnderTwoNamesIsReturnedUnderEach(t *testing.T) {
 		{Name: "main", Path: "lua/main.lua", Kind: Lua, Text: "require('tools')\nrequire('tools.init')\nrequire('tools')"},
 		{Name: "tools.init", Path: "lua/tools/init.lua", Kind: Lua, Text: "return {}"},
 	}
-	modules, err := reached("main", loaderOf(sources, luaByPath()))
+	modules, err := reachableModules("main", newLoader(sources, luaByPath()))
 	want := []Module{
 		{Name: "tools", Path: "lua/tools/init.lua", Kind: Lua, Lua: "return {}"},
 		{Name: "tools.init", Path: "lua/tools/init.lua", Kind: Lua, Lua: "return {}"},
@@ -130,14 +130,14 @@ func TestAModuleRequiredUnderTwoNamesIsReturnedUnderEach(t *testing.T) {
 }
 
 func TestReachedReportsAMissingModuleWhereItIsRequired(t *testing.T) {
-	_, err := reached("main", modulesOf("main", "\n\nrequire(\"nope\")"))
+	_, err := reachableModules("main", modulesOf("main", "\n\nrequire(\"nope\")"))
 	if failure := asError(t, err, "a missing module"); failure.Msg != "Module 'nope' not found." || failure.File != "src/main.yue" || failure.Line != 3 {
 		t.Errorf("error = %+v", failure)
 	}
 }
 
 func TestTheHintOfAMissingModuleNamesEveryFileFormItIsLookedForIn(t *testing.T) {
-	_, err := reached("main", modulesOf("main", `require("game.units")`))
+	_, err := reachableModules("main", modulesOf("main", `require("game.units")`))
 	want := "Expected src/game/units.yue, lua/game/units.lua, lua/game/units/init.lua or a module of a library in " +
 		"moonwell.pkl. Built-in modules: moonwell."
 	if failure := asError(t, err, "a missing module"); failure.Hint != want {
@@ -146,32 +146,32 @@ func TestTheHintOfAMissingModuleNamesEveryFileFormItIsLookedForIn(t *testing.T) 
 }
 
 func TestReachedReportsAMissingEntry(t *testing.T) {
-	_, err := reached("main", modulesOf())
+	_, err := reachableModules("main", modulesOf())
 	if failure := asError(t, err, "no entry"); failure.Msg != "Module 'main' not found." || failure.File != "" || failure.Line != 0 {
 		t.Errorf("error = %+v", failure)
 	}
 }
 
 func TestReachedRefusesAModuleWithoutCodeAsOneAndNotAsOneThatIsNotFound(t *testing.T) {
-	_, err := reached("main", modulesOf("main", "\n\nrequire('game.notes')", "game.notes", noCode))
+	_, err := reachableModules("main", modulesOf("main", "\n\nrequire('game.notes')", "game.notes", noCode))
 	failure := asError(t, err, "a required module without code")
 	if failure.Msg != "Module 'game.notes' has no code." || failure.File != "src/main.yue" || failure.Line != 3 ||
 		!strings.Contains(failure.Hint, "src/game/notes.yue") || !strings.Contains(failure.Hint, "writes no Lua for a file with nothing but comments and macros") {
 		t.Errorf("error = %+v", failure)
 	}
-	_, err = reached("main", modulesOf("main", noCode))
+	_, err = reachableModules("main", modulesOf("main", noCode))
 	failure = asError(t, err, "an entry without code")
 	if failure.Msg != "Module 'main' has no code." || failure.File != "src/main.yue" || failure.Line != 0 || !strings.Contains(failure.Hint, "src/main.yue") {
 		t.Errorf("error = %+v", failure)
 	}
-	_, err = reached("main", modulesOf("main", "require('nope')\nrequire('notes')", "notes", noCode))
+	_, err = reachableModules("main", modulesOf("main", "require('nope')\nrequire('notes')", "notes", noCode))
 	if failure := asError(t, err, "a missing module before one without code"); failure.Msg != "Module 'nope' not found." {
 		t.Errorf("error = %+v", failure)
 	}
 }
 
 func TestReachedRefusesARequireThatIsNoSingleStringLiteral(t *testing.T) {
-	_, err := reached("main", modulesOf("main", "require('a')", "a", "\nrequire(name)"))
+	_, err := reachableModules("main", modulesOf("main", "require('a')", "a", "\nrequire(name)"))
 	failure := asError(t, err, "a computed name")
 	if failure.Msg != "require must be called with a single string literal." || failure.File != "src/a.yue" || failure.Line != 2 ||
 		failure.Hint != "Moonwell bundles modules at build time and cannot follow computed module names." {
@@ -181,13 +181,13 @@ func TestReachedRefusesARequireThatIsNoSingleStringLiteral(t *testing.T) {
 
 func TestReachedReportsACycleWithItsChain(t *testing.T) {
 	load := modulesOf("main", `require("a")`, "a", "\n"+`require("b")`, "b", `require("a")`)
-	_, err := reached("main", load)
+	_, err := reachableModules("main", load)
 	failure := asError(t, err, "a cycle")
 	if failure.Msg != "Circular require: a \xe2\x86\x92 b \xe2\x86\x92 a" || failure.File != "src/b.yue" || failure.Line != 1 ||
 		failure.Hint != "Move the shared code into a module that both can require." {
 		t.Errorf("error = %+v", failure)
 	}
-	_, err = reached("main", modulesOf("main", "\n\nrequire 'main'"))
+	_, err = reachableModules("main", modulesOf("main", "\n\nrequire 'main'"))
 	if failure := asError(t, err, "a module that requires itself"); failure.Msg != "Circular require: main \xe2\x86\x92 main" ||
 		failure.File != "src/main.yue" || failure.Line != 3 {
 		t.Errorf("error = %+v", failure)
@@ -196,7 +196,7 @@ func TestReachedReportsACycleWithItsChain(t *testing.T) {
 
 func TestReachedPassesOnTheFailureOfALoad(t *testing.T) {
 	failure := errors.New("the output is gone")
-	modules, err := reached("main", func(string) (leadsTo, error) { return leadsTo{}, failure })
+	modules, err := reachableModules("main", func(string) (loadResult, error) { return loadResult{}, failure })
 	if modules != nil || err != failure {
 		t.Errorf("reached = %+v, %v", modules, err)
 	}

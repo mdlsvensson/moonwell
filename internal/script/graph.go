@@ -8,42 +8,42 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-type leadsTo struct {
+type loadResult struct {
 	module  *Module
 	without string
 }
 
-func loaderOf(sources []Source, read func(Source) (text string, ok bool, err error)) func(name string) (leadsTo, error) {
+func newLoader(sources []Source, read func(Source) (text string, ok bool, err error)) func(name string) (loadResult, error) {
 	byName := make(map[string]Source, len(sources))
 	for _, source := range sources {
 		byName[source.Name] = source
 	}
-	return func(name string) (leadsTo, error) {
+	return func(name string) (loadResult, error) {
 		source, has := byName[name]
 		if !has {
 			if source, has = byName[name+".init"]; !has {
-				return leadsTo{}, nil
+				return loadResult{}, nil
 			}
 		}
 		module := &Module{Name: name, Path: source.Path, Kind: source.Kind, Library: source.Library, Lua: source.Text}
 		if source.Kind == Lua {
-			return leadsTo{module: module}, nil
+			return loadResult{module: module}, nil
 		}
 		text, ok, err := read(source)
 		switch {
 		case err != nil:
-			return leadsTo{}, err
+			return loadResult{}, err
 		case !ok:
-			return leadsTo{without: source.Path}, nil
+			return loadResult{without: source.Path}, nil
 		}
 		module.Lua = text
-		return leadsTo{module: module}, nil
+		return loadResult{module: module}, nil
 	}
 }
 
-func reached(entry string, load func(name string) (leadsTo, error)) ([]Module, error) {
-	w := walk{load: load, state: map[string]int{}}
-	if err := w.visit(entry, required{}); err != nil {
+func reachableModules(entry string, load func(name string) (loadResult, error)) ([]Module, error) {
+	w := graphWalk{load: load, state: map[string]int{}}
+	if err := w.visit(entry, requireSite{}); err != nil {
 		return nil, err
 	}
 	return w.ordered, nil
@@ -54,24 +54,24 @@ const (
 	visited
 )
 
-type walk struct {
-	load    func(name string) (leadsTo, error)
+type graphWalk struct {
+	load    func(name string) (loadResult, error)
 	state   map[string]int
 	stack   []string
 	ordered []Module
 }
 
-type required struct {
+type requireSite struct {
 	file string
 	line int
 }
 
-func (w *walk) visit(name string, at required) error {
+func (w *graphWalk) visit(name string, site requireSite) error {
 	if slices.Contains(builtins, name) || w.state[name] == visited {
 		return nil
 	}
 	if w.state[name] == visiting {
-		return errCircular(append(slices.Clone(w.stack[slices.Index(w.stack, name):]), name), at)
+		return errCircular(append(slices.Clone(w.stack[slices.Index(w.stack, name):]), name), site)
 	}
 	led, err := w.load(name)
 	if err != nil {
@@ -79,13 +79,13 @@ func (w *walk) visit(name string, at required) error {
 	}
 	switch {
 	case led.without != "":
-		return errNoCode(name, led.without, at)
+		return errNoCode(name, led.without, site)
 	case led.module == nil:
-		return errNoModule(name, at)
+		return errNoModule(name, site)
 	}
 	w.state[name] = visiting
 	w.stack = append(w.stack, name)
-	if err := w.follow(led.module); err != nil {
+	if err := w.visitRequires(led.module); err != nil {
 		return err
 	}
 	w.stack = w.stack[:len(w.stack)-1]
@@ -94,19 +94,19 @@ func (w *walk) visit(name string, at required) error {
 	return nil
 }
 
-func (w *walk) follow(module *Module) error {
+func (w *graphWalk) visitRequires(module *Module) error {
 	for _, call := range lua.FindRequires(module.Lua) {
 		if !call.Literal {
-			return errComputedRequire(required{module.Path, call.Line})
+			return errComputedRequire(requireSite{module.Path, call.Line})
 		}
-		if err := w.visit(call.Name, required{module.Path, call.Line}); err != nil {
+		if err := w.visit(call.Name, requireSite{module.Path, call.Line}); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func errCircular(chain []string, at required) error {
+func errCircular(chain []string, at requireSite) error {
 	return &diag.Error{
 		Msg:  "Circular require: " + strings.Join(chain, " \xe2\x86\x92 "),
 		File: at.file,
@@ -115,7 +115,7 @@ func errCircular(chain []string, at required) error {
 	}
 }
 
-func errNoModule(name string, at required) error {
+func errNoModule(name string, at requireSite) error {
 	path := strings.ReplaceAll(name, ".", "/")
 	return &diag.Error{
 		Msg:  "Module '" + name + "' not found.",
@@ -126,9 +126,9 @@ func errNoModule(name string, at required) error {
 	}
 }
 
-func errNoCode(name, file string, at required) error {
+func errNoCode(name, file string, at requireSite) error {
 	if at.file == "" {
-		at = required{file: file}
+		at = requireSite{file: file}
 	}
 	return &diag.Error{
 		Msg:  "Module '" + name + "' has no code.",
@@ -138,7 +138,7 @@ func errNoCode(name, file string, at required) error {
 	}
 }
 
-func errComputedRequire(at required) error {
+func errComputedRequire(at requireSite) error {
 	return &diag.Error{
 		Msg:  "require must be called with a single string literal.",
 		File: at.file,

@@ -87,7 +87,7 @@ func TestDeclaredGlobalsReadsTheNamesOnGlobalLines(t *testing.T) {
 		"globalScore = 1",
 		"print global",
 	}, "\r\n")
-	if got := declaredGlobals(source); !slices.Equal(got, []string{"Score", "a", "b", "x", "y", "K", "Boss", "f"}) {
+	if got := parseDeclaredGlobals(source); !slices.Equal(got, []string{"Score", "a", "b", "x", "y", "K", "Boss", "f"}) {
 		t.Errorf("declaredGlobals = %q", got)
 	}
 	for source, want := range map[string][]string{
@@ -110,7 +110,7 @@ func TestDeclaredGlobalsReadsTheNamesOnGlobalLines(t *testing.T) {
 		"global a\rglobal b":               nil,
 		"global a\r\n\r\nglobal b = 1\r\n": {"a", "b"},
 	} {
-		if got := declaredGlobals(source); !slices.Equal(got, want) {
+		if got := parseDeclaredGlobals(source); !slices.Equal(got, want) {
 			t.Errorf("declaredGlobals(%q) = %q, want %q", source, got, want)
 		}
 	}
@@ -126,7 +126,7 @@ func TestAGlobalLineIsReadWithWhiteSpaceOfASCIIOnly(t *testing.T) {
 		"global x" + paragraphEnd + ", y":       {"y"},
 		"global \v\fx\v = 1":                    {"x"},
 	} {
-		if got := declaredGlobals(source); !slices.Equal(got, want) {
+		if got := parseDeclaredGlobals(source); !slices.Equal(got, want) {
 			t.Errorf("declaredGlobals(%q) = %q, want %q", source, got, want)
 		}
 	}
@@ -140,7 +140,7 @@ func TestAGlobalLineInABlockCommentOrALongStringDeclaresItsNames(t *testing.T) {
 		"x = [[\nglobal Yyy = 1 ]]\n":           {"Yyy"},
 		"-- global Commented\n":                 nil,
 	} {
-		if got := declaredGlobals(source); !slices.Equal(got, want) {
+		if got := parseDeclaredGlobals(source); !slices.Equal(got, want) {
 			t.Errorf("declaredGlobals(%q) = %q, want %q", source, got, want)
 		}
 	}
@@ -203,8 +203,8 @@ type checkBench struct {
 	log     *testkit.Recorder
 	yue     *listing
 	in      Input
-	search  macros
-	output  *staged
+	search  macroFile
+	output  *compileOutput
 	modules []Module
 }
 
@@ -218,8 +218,8 @@ func checkOf(t *testing.T, sources []string, printed map[string]string, lint man
 	if mapScript != "" {
 		b.in.Map = mapGlobalsOf(mapScript)
 	}
-	b.search = macros{path: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
-	b.output = &staged{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}}
+	b.search = macroFile{path: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
+	b.output = &compileOutput{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}}
 	for i := 0; i+1 < len(sources); i += 2 {
 		path := "src/" + sources[i]
 		b.output.texts[path], b.output.hashes[path] = sources[i+1], "h"+strconv.Itoa(i)
@@ -235,7 +235,7 @@ func checkOf(t *testing.T, sources []string, printed map[string]string, lint man
 }
 
 func (b *checkBench) check() ([]diag.Problem, error) {
-	return unknownGlobals(background, b.world, b.in, b.search, b.output, b.modules)
+	return findUnknownGlobals(background, b.world, b.in, b.search, b.output, b.modules)
 }
 
 var asErrors = manifest.Lint{UnknownGlobals: "error"}
@@ -341,7 +341,7 @@ func TestASourceTheCompilerCannotListFailsTheCheckBeforeAnyProblem(t *testing.T)
 
 func TestListUsesReadsWhatTheRealCompilerPrints(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", "global Score = 0\nprint CreatUnit!\nx = math.floor 1.5\nprint Score, x\n"))
-	uses, err := listUses(background, b.world, b.real(), b.search, "", []checked{{path: "src/main.yue", hash: "h"}})
+	uses, err := listGlobalUses(background, b.world, b.real(), b.search, "", []lintSource{{path: "src/main.yue", hash: "h"}})
 	want := map[string][]globalUse{"src/main.yue": {
 		{Name: "Score", Line: 1, Column: 8},
 		{Name: "print", Line: 2, Column: 1},
@@ -357,7 +357,7 @@ func TestListUsesReadsWhatTheRealCompilerPrints(t *testing.T) {
 
 func TestWithTheMacroPathTheCompilerListsNoGlobalForAFourCCCall(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", macroImport+"print $FourCC \"hfoo\"\n"))
-	uses, err := listUses(background, b.world, b.real(), b.search, "", []checked{{path: "src/main.yue", hash: "h"}})
+	uses, err := listGlobalUses(background, b.world, b.real(), b.search, "", []lintSource{{path: "src/main.yue", hash: "h"}})
 	want := map[string][]globalUse{"src/main.yue": {{Name: "print", Line: 2, Column: 1}}}
 	if err != nil || !maps.EqualFunc(uses, want, slices.Equal) {
 		t.Errorf("listUses = %+v, %v", uses, err)

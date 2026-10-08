@@ -32,7 +32,7 @@ type bench struct {
 	root      string
 	world     *env.Env
 	libraries []Library
-	search    macros
+	search    macroFile
 	sources   []Source
 
 	guard sync.Mutex
@@ -46,7 +46,7 @@ func benchOf(t *testing.T, p project) *bench {
 		t.Fatal(err)
 	}
 	var err error
-	if b.search, err = macrosOf(b.root); err != nil {
+	if b.search, err = readMacros(b.root); err != nil {
 		t.Fatal(err)
 	}
 	b.world, _ = testkit.Env(t, b.root)
@@ -115,16 +115,16 @@ func (b *bench) ran() []string {
 	return sources
 }
 
-func (b *bench) compile(yue string, minify bool) (*staged, error) {
+func (b *bench) compile(yue string, minify bool) (*compileOutput, error) {
 	b.t.Helper()
 	var err error
-	if b.sources, err = Collect(b.root, b.libraries); err != nil {
+	if b.sources, err = CollectSources(b.root, b.libraries); err != nil {
 		b.t.Fatal(err)
 	}
 	return compileAll(background, b.world, yue, minify, b.search, b.sources)
 }
 
-func (b *bench) compiles(yue string, minify bool) *staged {
+func (b *bench) compiles(yue string, minify bool) *compileOutput {
 	b.t.Helper()
 	result, err := b.compile(yue, minify)
 	if err != nil {
@@ -148,9 +148,9 @@ func (b *bench) source(path string) Source {
 	return b.sources[at]
 }
 
-func (b *bench) luaAt(result *staged, path string) string {
+func (b *bench) luaAt(result *compileOutput, path string) string {
 	b.t.Helper()
-	lua, ok, err := result.luaOf(b.source(path))
+	lua, ok, err := result.readLua(b.source(path))
 	if err != nil || !ok {
 		b.t.Fatalf("luaOf(%s): ok %v, %v", path, ok, err)
 	}
@@ -174,7 +174,7 @@ func TestCompileAllCompilesEveryYueScriptModuleAndReadsItsLua(t *testing.T) {
 	mainText, mathText := "import \"util.math\" as M\nexport answer = M.double 21\n", "export double = (x) -> x * 2\n"
 	b := benchOf(t, files("src/main.yue", mainText, "src/util/math.yue", mathText, "lua/tools.lua", "return {}\n"))
 	result := b.compiles(b.real(), false)
-	want := &staged{
+	want := &compileOutput{
 		texts:  map[string]string{"src/main.yue": mainText, "src/util/math.yue": mathText},
 		hashes: map[string]string{"src/main.yue": fsx.SHA256Hex([]byte(mainText)), "src/util/math.yue": fsx.SHA256Hex([]byte(mathText))},
 		lua:    map[string]string{"src/main.yue": b.staged("main.lua"), "src/util/math.yue": b.staged("util/math.lua")},
@@ -189,7 +189,7 @@ func TestCompileAllCompilesEveryYueScriptModuleAndReadsItsLua(t *testing.T) {
 		t.Errorf("the Lua of src/util/math.yue is\n%s", lua)
 	}
 	for _, source := range []Source{b.source("lua/tools.lua"), {Name: "missing", Path: "src/missing.yue", Kind: Yue}} {
-		if lua, ok, err := result.luaOf(source); lua != "" || ok || err != nil {
+		if lua, ok, err := result.readLua(source); lua != "" || ok || err != nil {
 			t.Errorf("luaOf(%s) = %q, %v, %v, want no Lua", source.Path, lua, ok, err)
 		}
 	}
@@ -252,7 +252,7 @@ func TestCompileAllReportsSyntaxErrorsWithFileAndLine(t *testing.T) {
 	if failure.File != "src/bad.yue" || failure.Line != 2 || !strings.HasPrefix(failure.Msg, "expected valid expression\n") {
 		t.Errorf("error = %+v", failure)
 	}
-	kept, err := readHashes(b.root)
+	kept, err := readCompileCache(b.root)
 	if _, ok := kept.Sources["src/ok.yue"]; err != nil || !ok || len(kept.Sources) != 1 {
 		t.Errorf("the hashes file keeps %+v, %v", kept.Sources, err)
 	}
@@ -665,7 +665,7 @@ func TestWhereASourceCompilesTo(t *testing.T) {
 		{Source{Name: "a.", Path: "src/a/.yue", Kind: Yue}, "a/.lua"},
 		{Source{Name: "", Path: "vendor/kit/.yue", Kind: Yue, Library: "kit"}, ".libraries/kit/.lua"},
 	} {
-		if got, err := outputOf(c.source); got != c.want || err != nil {
+		if got, err := outputPath(c.source); got != c.want || err != nil {
 			t.Errorf("outputOf(%+v) = %q, %v, want %q", c.source, got, err, c.want)
 		}
 	}
@@ -688,7 +688,7 @@ func TestWhereASourceCompilesTo(t *testing.T) {
 		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: eAcute},
 		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "kit\n"},
 	} {
-		got, err := outputOf(source)
+		got, err := outputPath(source)
 		var expected *diag.Error
 		if got != "" || err == nil || errors.As(err, &expected) {
 			t.Errorf("outputOf(%+v) = %q, %v, want a plain error", source, got, err)
@@ -714,7 +714,7 @@ func TestAModuleWithoutAnOutputHasNoLua(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", "x = 1\n", "src/notes.yue", "-- only comments\n\n"))
 	b.fake(map[string]answer{"src/notes.yue": {}})
 	result := b.compiles(fakeYue, false)
-	if lua, ok, err := result.luaOf(b.source("src/notes.yue")); lua != "" || ok || err != nil {
+	if lua, ok, err := result.readLua(b.source("src/notes.yue")); lua != "" || ok || err != nil {
 		t.Errorf("luaOf(src/notes.yue) = %q, %v, %v, want no Lua", lua, ok, err)
 	}
 	if result.texts["src/notes.yue"] != "-- only comments\n\n" || result.lua["src/notes.yue"] != b.staged("notes.lua") {
@@ -733,13 +733,13 @@ func TestTheNamesCollectGivesPlaceEveryOutputBelowTheOutputFolder(t *testing.T) 
 		"src/_/_.yue", "", "src/init/init.yue", "",
 	).with("ex").and(inLibrary("ex", "kit/.yue"), "", inLibrary("ex", "deep/er/x.yue"), "")
 	b := benchOf(t, p)
-	sources, err := Collect(b.root, b.libraries)
+	sources, err := CollectSources(b.root, b.libraries)
 	if err != nil {
 		t.Fatal(err)
 	}
 	placed := 0
 	for _, source := range sources {
-		output, err := outputOf(source)
+		output, err := outputPath(source)
 		if err != nil || !filepath.IsLocal(filepath.FromSlash(output)) || !strings.HasSuffix(output, ".lua") {
 			t.Errorf("outputOf(%+v) = %q, %v, want a path that stays below its folder", source, output, err)
 			continue
@@ -833,7 +833,7 @@ func TestASourceThatLosesItsCodeLosesItsLua(t *testing.T) {
 		b.write("src/notes.yue", "-- export y = 2\n")
 		for _, what := range []string{"once the code is a comment", "and on the next run"} {
 			result := b.compiles(yue, minify)
-			lua, ok, err := result.luaOf(b.source("src/notes.yue"))
+			lua, ok, err := result.readLua(b.source("src/notes.yue"))
 			if ran := b.ran(); lua != "" || ok || err != nil || fsx.Exists(b.staged("notes.lua")) || !slices.Equal(ran, []string{"src/notes.yue"}) {
 				t.Errorf("minify %v, %s: luaOf = %q, %v, %v; the output is there: %v; the compiler ran on %q",
 					minify, what, lua, ok, err, fsx.Exists(b.staged("notes.lua")), ran)
@@ -852,7 +852,7 @@ func TestACompilerThatWritesNothingLeavesNoLuaOfAnEarlierRun(t *testing.T) {
 	b.write("src/main.yue", "-- x = 1\n")
 	b.fake(map[string]answer{"src/main.yue": {}})
 	result := b.compiles(fakeYue, false)
-	if lua, ok, err := result.luaOf(b.source("src/main.yue")); lua != "" || ok || err != nil || fsx.Exists(b.staged("main.lua")) {
+	if lua, ok, err := result.readLua(b.source("src/main.yue")); lua != "" || ok || err != nil || fsx.Exists(b.staged("main.lua")) {
 		t.Errorf("luaOf = %q, %v, %v, and the output of the first compile is there: %v", lua, ok, err, fsx.Exists(b.staged("main.lua")))
 	}
 }
@@ -923,7 +923,7 @@ func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T
 	b.fake(map[string]answer{"src/main.yue": {}})
 	result := b.compiles(fakeYue, false)
 	b.write("dist/stage/lua/main.lua/kept.txt", "")
-	_, ok, err := result.luaOf(b.source("src/main.yue"))
+	_, ok, err := result.readLua(b.source("src/main.yue"))
 	failure = asError(t, err, "a folder for the output, read")
 	if ok || !strings.HasPrefix(failure.Msg, "Reading dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" || failure.Cause == nil {
 		t.Errorf("luaOf: ok %v, %+v", ok, failure)

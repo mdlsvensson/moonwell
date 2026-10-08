@@ -30,7 +30,7 @@ var utilAndMain = []Module{
 }
 
 func TestBundleWrapsTheModulesAndRecordsTheLinesEachHasInTheScript(t *testing.T) {
-	got := bundle(byHand(false, utilAndMain...), "local __mw = {}\n-- runtime", 10)
+	got := renderBundle(byHand(false, utilAndMain...), "local __mw = {}\n-- runtime", 10)
 	want := strings.Join([]string{
 		"do",
 		"local __mw = {}",
@@ -60,8 +60,8 @@ func TestBundleWrapsTheModulesAndRecordsTheLinesEachHasInTheScript(t *testing.T)
 
 func TestBundleMarksAMinifiedYueScriptModuleAndALuaModuleKeepsItsLines(t *testing.T) {
 	modules := append(slices.Clone(utilAndMain), ofLua("lib", "return {}"))
-	plain := bundle(byHand(false, modules...), "", 1)
-	minified := bundle(byHand(true, modules...), "", 1)
+	plain := renderBundle(byHand(false, modules...), "", 1)
+	minified := renderBundle(byHand(true, modules...), "", 1)
 	if strings.Contains(plain, ", true},") {
 		t.Errorf("a bundle that is not minified marks a module:\n%s", plain)
 	}
@@ -95,7 +95,7 @@ func TestAModulesLinesAreSplitAtLineFeedsAndAFinalLineBreakStartsNoLine(t *testi
 		{"no Lua at all", "", "", 4},
 		{"bytes that are not UTF-8", "a = '\xff'\nb = '\xe2\x82'\n", "a = '\xff'\nb = '\xe2\x82'", 5},
 	} {
-		got := bundle(byHand(false, ofSrc("main", c.lua)), "-- runtime\n", 1)
+		got := renderBundle(byHand(false, ofSrc("main", c.lua)), "-- runtime\n", 1)
 		want := "do\n-- runtime\n__mw.define(\"main\", function(...)\n" + c.body + "\nend)\n__mw.lines = {\n" +
 			"{4, " + strconv.Itoa(c.last) + ", \"main\", \"src/main.yue\"},\n}\n__mw.install()\n__mw.boot(\"main\")\nend\n"
 		if got != want {
@@ -105,7 +105,7 @@ func TestAModulesLinesAreSplitAtLineFeedsAndAFinalLineBreakStartsNoLine(t *testi
 }
 
 func TestBundleOfAProgramWithoutModulesHasAnEmptyTableOfLines(t *testing.T) {
-	got := bundle(&Program{Entry: "main"}, "-- runtime", 1)
+	got := renderBundle(&Program{Entry: "main"}, "-- runtime", 1)
 	if got != "do\n-- runtime\n__mw.lines = {\n}\n__mw.install()\n__mw.boot(\"main\")\nend\n" {
 		t.Errorf("bundle = %q", got)
 	}
@@ -149,7 +149,7 @@ func TestANameAndAPathAreWrittenAsLuaStringsThatLuaReadsBackAsTheirBytes(t *test
 		want = append(want, inHex(name[1])+" "+inHex(name[1])+" "+inHex("lua/"+name[1]+".lua"))
 	}
 	const entry = "a\tb\x7f\"\\" + eAcute
-	block := bundle(&Program{Entry: entry, Modules: modules}, recordingRuntime, 1)
+	block := renderBundle(&Program{Entry: entry, Modules: modules}, recordingRuntime, 1)
 	for _, written := range []string{
 		`__mw.define("a\009b", function(...)`, `__mw.define("a\010b", function(...)`, `__mw.define("a\0011", function(...)`,
 		`__mw.define("a\000b", function(...)`, `__mw.define("a\1277", function(...)`, `, "a\"b", "src/a\"b.yue"},`, `, "a\\b", "src/a\\b.yue"},`,

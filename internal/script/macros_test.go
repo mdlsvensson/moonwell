@@ -17,7 +17,7 @@ func TestMacrosOfPointsYueAtItsFolderAndHashesTheModule(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		root, wantPath, wantFile = `C:\project`, `C:\project\.moonwell\yue\?.lua`, `C:\project\.moonwell\yue\moonwell\macros.yue`
 	}
-	search, err := macrosOf(root)
+	search, err := readMacros(root)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,10 +35,10 @@ func TestMacrosOfPointsYueAtItsFolderAndHashesTheModule(t *testing.T) {
 
 func TestMacrosOfRefusesAProjectFolderWhosePathHasASemicolonOrAQuestionMark(t *testing.T) {
 	for _, root := range []string{"/pro;ject", "/pro?ject"} {
-		search, err := macrosOf(root)
+		search, err := readMacros(root)
 		failure := asError(t, err, root)
 		if failure.Msg != `The project folder's path contains ";" or "?", which YueScript's module search cannot handle.` ||
-			failure.File != root || failure.Hint != "Move the project to a folder whose path has neither character." || search != (macros{}) {
+			failure.File != root || failure.Hint != "Move the project to a folder whose path has neither character." || search != (macroFile{}) {
 			t.Errorf("%s: %+v, %+v", root, search, failure)
 		}
 	}

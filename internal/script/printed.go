@@ -28,12 +28,12 @@ var (
 	lineMark       = regexp.MustCompile(` -- ([0-9]+)$`)
 )
 
-func rewriteError(file, printed string, left func() string) *diag.Error {
-	step := rewriteFailure.FindStringSubmatch(printed)
+func newRewriteError(file, output string, left func() string) *diag.Error {
+	step := rewriteFailure.FindStringSubmatch(output)
 	if step == nil {
 		return nil
 	}
-	reason := rewriteReason.FindStringSubmatch(printed)
+	reason := rewriteReason.FindStringSubmatch(output)
 	if reason == nil {
 		return errNotRewritten(file, step[1], ".", 0)
 	}
@@ -60,15 +60,15 @@ var (
 	macroPosition = regexp.MustCompile(`^failed to expand macro: \(macro [^)]*\):[0-9]+: `)
 )
 
-func compileError(file, printed string) *diag.Error {
+func newCompileError(file, output string) *diag.Error {
 	var kept []string
-	for _, line := range lineEnd.Split(printed, -1) {
+	for _, line := range lineEnd.Split(output, -1) {
 		if !strings.HasPrefix(line, "Failed to compile") {
 			kept = append(kept, line)
 		}
 	}
 	detail := fsx.TrimASCIISpace(strings.Join(kept, "\n"))
-	numbered := numberedLine.FindStringSubmatch(printed)
+	numbered := numberedLine.FindStringSubmatch(output)
 	switch {
 	case numbered != nil:
 		line, _ := strconv.Atoi(numbered[1])
@@ -87,9 +87,9 @@ type globalUse struct {
 
 var useLine = regexp.MustCompile(`^([^` + fsx.ASCIISpace + `]+) ([0-9]+) ([0-9]+)$`)
 
-func usesPrinted(printed, file string) ([]globalUse, *diag.Error) {
+func parseGlobalUses(output, file string) ([]globalUse, *diag.Error) {
 	uses := []globalUse{}
-	for _, raw := range lineEnd.Split(printed, -1) {
+	for _, raw := range lineEnd.Split(output, -1) {
 		line := fsx.TrimASCIISpace(raw)
 		if line == "" {
 			continue

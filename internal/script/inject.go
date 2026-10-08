@@ -15,47 +15,47 @@ const scriptName = "war3map.lua"
 
 var hooked = []string{"main", "config"}
 
-func Inject(folder *mapdir.Folder, program *Program) ([]mapdir.Change, error) {
+func Inject(source *mapdir.Folder, program *Program) ([]mapdir.Change, error) {
 	if program == nil {
 		return nil, errors.New("script.Inject: the program is nil; pass what script.Link returned")
 	}
-	script, err := scriptOf(folder)
+	script, err := readMapScript(source)
 	if err != nil {
 		return nil, err
 	}
-	if err := definesHooked(script, folder.DisplayPath(scriptName)); err != nil {
+	if err := checkHooksDefined(script, source.DisplayPath(scriptName)); err != nil {
 		return nil, err
 	}
-	name, err := folder.ResolveNewPath(scriptName)
+	name, err := source.ResolveNewPath(scriptName)
 	if err != nil {
 		return nil, err
 	}
-	return []mapdir.Change{{Path: name, Data: withBundle(script, program)}}, nil
+	return []mapdir.Change{{Path: name, Data: appendBundle(script, program)}}, nil
 }
 
-func scriptOf(folder *mapdir.Folder) ([]byte, error) {
-	script, found, err := folder.Read(scriptName)
+func readMapScript(source *mapdir.Folder) ([]byte, error) {
+	script, found, err := source.Read(scriptName)
 	switch {
 	case err != nil:
 		return nil, err
 	case found:
 		return script, nil
-	case folder.IsDir(scriptName):
-		return nil, errFolderForScript(folder.CanonicalPath(scriptName), folder.DisplayPath(scriptName))
+	case source.IsDir(scriptName):
+		return nil, errFolderForScript(source.CanonicalPath(scriptName), source.DisplayPath(scriptName))
 	}
-	return nil, errNoScript(folder.DisplayPath(scriptName))
+	return nil, errNoScript(source.DisplayPath(scriptName))
 }
 
-func definesHooked(script []byte, file string) error {
+func checkHooksDefined(script []byte, file string) error {
 	for _, name := range hooked {
-		if !defines(script, name) {
+		if !definesFunction(script, name) {
 			return errNotDefined(name, file)
 		}
 	}
 	return nil
 }
 
-func defines(script []byte, name string) bool {
+func definesFunction(script []byte, name string) bool {
 	rest := fsx.TrimBOM(script)
 	for {
 		if startsDefinition(rest, name) {
@@ -82,13 +82,13 @@ func startsDefinition(script []byte, name string) bool {
 	return isNamed && bytes.HasPrefix(bytes.TrimLeft(after, fsx.ASCIISpace), []byte("("))
 }
 
-func withBundle(script []byte, program *Program) []byte {
+func appendBundle(script []byte, program *Program) []byte {
 	var ending []byte
 	if !bytes.HasSuffix(script, []byte("\n")) {
 		ending = []byte("\n")
 	}
 	firstLine := bytes.Count(script, []byte("\n")) + len(ending) + 1
-	return slices.Concat(script, ending, []byte(bundle(program, moonwell.RuntimeLua, firstLine)))
+	return slices.Concat(script, ending, []byte(renderBundle(program, moonwell.RuntimeLua, firstLine)))
 }
 
 func errNoScript(file string) error {

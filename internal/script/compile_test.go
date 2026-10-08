@@ -170,14 +170,14 @@ func TestCompileTurnsAProjectIntoAProgramWithTheRealCompiler(t *testing.T) {
 	if counter := program.Modules[2]; counter.Lua != "Count = 0\n" || counter.Kind != Lua {
 		t.Errorf("the Lua module is %+v", counter)
 	}
-	found, err := Collect(b.root, p.libraries())
+	found, err := CollectSources(b.root, p.libraries())
 	if err != nil || !slices.Equal(program.Sources, found) || len(found) != 8 {
 		t.Errorf("the program's sources are %+v, want every module Collect finds: %+v, %v", program.Sources, found, err)
 	}
 	if !fsx.Exists(filepath.Join(b.root, filepath.FromSlash(MacrosFile))) {
 		t.Error("the macro module is not written")
 	}
-	kept, err := readUses(b.root, listedWith{Compiler: yue, Macros: fsx.SHA256Hex([]byte(moonwell.MacrosYue))})
+	kept, err := readUsesCache(b.root, listedWith{Compiler: yue, Macros: fsx.SHA256Hex([]byte(moonwell.MacrosYue))})
 	if err != nil || len(kept) != 2 || kept["src/main.yue"].Uses == nil || kept["src/util/math.yue"].Uses == nil {
 		t.Errorf("the uses file keeps %+v, %v, want the two modules of src/ that the entry reaches", kept, err)
 	}
@@ -519,7 +519,7 @@ func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testi
 			t.Errorf("%s: CompileSources = %v, want the sources compiled", c.name, err)
 			continue
 		}
-		found, err := Collect(b.root, of.libraries())
+		found, err := CollectSources(b.root, of.libraries())
 		if ran := b.ran(); err != nil || !slices.Equal(compiled.Sources, found) || len(found) != 5 || !slices.Equal(ran, wantCompiles) {
 			t.Errorf("%s: the sources are %+v, want what Collect finds: %+v, %v; the compiler ran as %q", c.name, compiled.Sources, found, err, ran)
 		}

@@ -119,7 +119,7 @@ func TestTheHashesFileIsWrittenWhenSomeFilesFailedHoldingThoseThatCompiled(t *te
 	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/bad.yue", "x = \n", "src/c.yue", "z = 3\n"))
 	b.fake(map[string]answer{"src/bad.yue": {code: 1, stdout: "Failed to compile: bad.yue\n1: boom\n"}})
 	b.refuses(fakeYue, false, "a failed file")
-	kept, err := readHashes(b.root)
+	kept, err := readCompileCache(b.root)
 	if paths := slices.Sorted(maps.Keys(kept.Sources)); err != nil || !slices.Equal(paths, []string{"src/a.yue", "src/c.yue"}) {
 		t.Errorf("the hashes file keeps %q, %v", paths, err)
 	}
@@ -214,8 +214,8 @@ func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 		if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue"}) || !fsx.Exists(b.staged("b.lua")) {
 			t.Errorf("%s: the compiler ran on %q, and b.lua is there: %v", what, ran, fsx.Exists(b.staged("b.lua")))
 		}
-		kept, err := readHashes(b.root)
-		want := map[string]keptSource{"src/a.yue": {Hash: hashOfA, Output: "a.lua"}}
+		kept, err := readCompileCache(b.root)
+		want := map[string]cachedSource{"src/a.yue": {Hash: hashOfA, Output: "a.lua"}}
 		if err != nil || !reflect.DeepEqual(kept.Sources, want) || kept.Compiler != fakeYue {
 			t.Errorf("%s: the hashes file written over it keeps %+v, %v", what, kept, err)
 		}
@@ -258,8 +258,8 @@ func TestAStoppedRunLeavesNothingItWasToCompileUpToDate(t *testing.T) {
 	if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue", "src/new.yue", "src/stop.yue"}) || !fsx.Exists(b.staged("new.lua")) {
 		t.Fatalf("the stopped run ran the compiler on %q, and new.lua is there: %v", ran, fsx.Exists(b.staged("new.lua")))
 	}
-	kept, err := readHashes(b.root)
-	want := map[string]keptSource{
+	kept, err := readCompileCache(b.root)
+	want := map[string]cachedSource{
 		"src/a.yue": {Output: "a.lua"}, "src/new.yue": {Output: "new.lua"}, "src/stop.yue": {Output: "stop.lua"},
 		"src/kept.yue": {Hash: fsx.SHA256Hex([]byte("y = 2\n")), Output: "kept.lua"},
 	}
@@ -337,17 +337,17 @@ func TestACacheFileIsReadBackAsItWasWrittenAndNotAsAnotherShape(t *testing.T) {
 		Of    string         `json:"of"`
 	}
 	root := t.TempDir()
-	if kept, found, err := readCache[counted](root, ".counted.json"); found || err != nil || kept.Words != nil {
+	if kept, found, err := readCacheFile[counted](root, ".counted.json"); found || err != nil || kept.Words != nil {
 		t.Errorf("without a file: %+v, %v, %v", kept, found, err)
 	}
 	want := counted{Words: map[string]int{"a<b>&c": 2, eAcute + beyond: 1}, Of: `C:\a "b"`}
-	if err := writeCache(root, ".counted.json", want); err != nil {
+	if err := writeCacheFile(root, ".counted.json", want); err != nil {
 		t.Fatal(err)
 	}
-	if kept, found, err := readCache[counted](root, ".counted.json"); !found || err != nil || !reflect.DeepEqual(kept, want) {
+	if kept, found, err := readCacheFile[counted](root, ".counted.json"); !found || err != nil || !reflect.DeepEqual(kept, want) {
 		t.Errorf("read back: %+v, %v, %v, want %+v", kept, found, err, want)
 	}
-	if kept, found, err := readCache[hashes](root, ".counted.json"); found || err != nil || kept.Sources != nil {
+	if kept, found, err := readCacheFile[compileCache](root, ".counted.json"); found || err != nil || kept.Sources != nil {
 		t.Errorf("read as hashes: %+v, %v, %v", kept, found, err)
 	}
 	if text, err := os.ReadFile(root + "/dist/stage/lua/.counted.json"); err != nil || !strings.HasSuffix(string(text), "}\n") {
@@ -381,7 +381,7 @@ func TestASourceMayDefineMacrosWhenItHoldsTheWordMacro(t *testing.T) {
 		"mac ro":                          false,
 		macroImport + "print $FourCC 'x'": false,
 	} {
-		if got := holdsMacroWord(text); got != want {
+		if got := containsMacroWord(text); got != want {
 			t.Errorf("holdsMacroWord(%q) = %v, want %v", text, got, want)
 		}
 	}
@@ -393,7 +393,7 @@ func TestTheSourcesThatMayDefineMacrosAreAmongWhatEveryOutputDependsOn(t *testin
 		b := benchOf(t, p)
 		b.fake(nil)
 		result := b.compiles(fakeYue, false)
-		kept, err := readHashes(b.root)
+		kept, err := readCompileCache(b.root)
 		if err != nil || kept.MacroSources != result.macroSources {
 			t.Fatalf("the hashes file keeps %q and the compile returns %q, %v", kept.MacroSources, result.macroSources, err)
 		}
@@ -459,7 +459,7 @@ type usesBench struct {
 	root         string
 	world        *env.Env
 	yue          *listing
-	search       macros
+	search       macroFile
 	macroSources string
 }
 
@@ -469,16 +469,16 @@ func usesBenchOf(t *testing.T, printed map[string]env.RunResult) *usesBench {
 	b := &usesBench{t: t, root: root, yue: &listing{t: t, root: root, printed: printed}, macroSources: "s1"}
 	b.world, _ = testkit.Env(t, root)
 	b.world.Run = b.yue.run
-	b.search = macros{path: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
+	b.search = macroFile{path: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
 	return b
 }
 
 func (b *usesBench) list(yue string, pairs ...string) (map[string][]globalUse, error) {
-	var sources []checked
+	var sources []lintSource
 	for i := 0; i+1 < len(pairs); i += 2 {
-		sources = append(sources, checked{path: pairs[i], hash: pairs[i+1]})
+		sources = append(sources, lintSource{path: pairs[i], hash: pairs[i+1]})
 	}
-	return listUses(background, b.world, yue, b.search, b.macroSources, sources)
+	return listGlobalUses(background, b.world, yue, b.search, b.macroSources, sources)
 }
 
 func (b *usesBench) usesText() string {
@@ -566,7 +566,7 @@ func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *test
 	if _, err := b.list("other-yue", main, "h3"); err != nil || len(b.yue.ran()) != 0 {
 		t.Fatalf("one source of the two: %v", err)
 	}
-	kept, err := readUses(b.root, listedWith{Compiler: "other-yue", Macros: "m1", MacroSources: "s1"})
+	kept, err := readUsesCache(b.root, listedWith{Compiler: "other-yue", Macros: "m1", MacroSources: "s1"})
 	if err != nil || len(kept) != 1 || kept[main].Hash != "h3" {
 		t.Errorf("the uses file keeps %+v, %v", kept, err)
 	}

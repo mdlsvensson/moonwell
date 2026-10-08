@@ -23,17 +23,17 @@ type dependsOn struct {
 	MacroSources string `json:"macroSources"`
 }
 
-func macroSourcesOf(units []unit) string {
-	var holding []unit
+func macroSourcesOf(units []compileUnit) string {
+	var holding []compileUnit
 	for _, u := range units {
-		if holdsMacroWord(u.text) {
+		if containsMacroWord(u.text) {
 			holding = append(holding, u)
 		}
 	}
 	if len(holding) == 0 {
 		return ""
 	}
-	slices.SortFunc(holding, func(a, b unit) int { return strings.Compare(a.path, b.path) })
+	slices.SortFunc(holding, func(a, b compileUnit) int { return strings.Compare(a.path, b.path) })
 	var hashed strings.Builder
 	for _, u := range holding {
 		hashed.WriteString(u.path + "\x00" + u.hash + "\n")
@@ -41,7 +41,7 @@ func macroSourcesOf(units []unit) string {
 	return fsx.SHA256Hex([]byte(hashed.String()))
 }
 
-func holdsMacroWord(text string) bool {
+func containsMacroWord(text string) bool {
 	const word = "macro"
 	for from := 0; ; {
 		at := strings.Index(text[from:], word)
@@ -49,36 +49,36 @@ func holdsMacroWord(text string) bool {
 			return false
 		}
 		start, end := from+at, from+at+len(word)
-		if (start == 0 || !joinsAWord(text[start-1])) && (end == len(text) || !joinsAWord(text[end])) {
+		if (start == 0 || !isWordByte(text[start-1])) && (end == len(text) || !isWordByte(text[end])) {
 			return true
 		}
 		from = start + 1
 	}
 }
 
-func joinsAWord(b byte) bool {
+func isWordByte(b byte) bool {
 	return b == '_' || (b >= '0' && b <= '9') || (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')
 }
 
-type hashes struct {
+type compileCache struct {
 	dependsOn
-	Sources map[string]keptSource `json:"sources"`
+	Sources map[string]cachedSource `json:"sources"`
 }
 
-type keptSource struct {
+type cachedSource struct {
 	Hash   string `json:"hash"`
 	Output string `json:"output"`
 }
 
-func readHashes(root string) (hashes, error) {
-	kept, found, err := readCache[hashes](root, hashesFile)
-	if err != nil || !found || !kept.namesOutputs() {
-		return hashes{}, err
+func readCompileCache(root string) (compileCache, error) {
+	kept, found, err := readCacheFile[compileCache](root, hashesFile)
+	if err != nil || !found || !kept.hasOutputs() {
+		return compileCache{}, err
 	}
 	return kept, nil
 }
 
-func (h hashes) namesOutputs() bool {
+func (h compileCache) hasOutputs() bool {
 	for _, source := range h.Sources {
 		if !filepath.IsLocal(filepath.FromSlash(source.Output)) || !strings.HasSuffix(source.Output, ".lua") {
 			return false
@@ -87,9 +87,9 @@ func (h hashes) namesOutputs() bool {
 	return true
 }
 
-func (h hashes) stale(units []unit, now dependsOn) (stale, upToDate []unit) {
+func (h compileCache) splitStale(units []compileUnit, now dependsOn) (stale, upToDate []compileUnit) {
 	for _, u := range units {
-		if h.dependsOn == now && h.Sources[u.path] == (keptSource{Hash: u.hash, Output: u.under}) && fsx.Exists(u.output) {
+		if h.dependsOn == now && h.Sources[u.path] == (cachedSource{Hash: u.hash, Output: u.outputDir}) && fsx.Exists(u.output) {
 			upToDate = append(upToDate, u)
 		} else {
 			stale = append(stale, u)
@@ -98,10 +98,10 @@ func (h hashes) stale(units []unit, now dependsOn) (stale, upToDate []unit) {
 	return stale, upToDate
 }
 
-func removeGone(outputs string, last hashes, units []unit) error {
+func removeStaleOutputs(outputs string, last compileCache, units []compileUnit) error {
 	current := map[string]bool{}
 	for _, u := range units {
-		current[u.under] = true
+		current[u.outputDir] = true
 	}
 	for _, path := range slices.Sorted(maps.Keys(last.Sources)) {
 		under := last.Sources[path].Output
@@ -115,15 +115,15 @@ func removeGone(outputs string, last hashes, units []unit) error {
 	return nil
 }
 
-func writeHashes(root string, now dependsOn, good, pending []unit) error {
-	kept := hashes{dependsOn: now, Sources: map[string]keptSource{}}
+func writeCompileCache(root string, now dependsOn, good, pending []compileUnit) error {
+	kept := compileCache{dependsOn: now, Sources: map[string]cachedSource{}}
 	for _, u := range good {
-		kept.Sources[u.path] = keptSource{Hash: u.hash, Output: u.under}
+		kept.Sources[u.path] = cachedSource{Hash: u.hash, Output: u.outputDir}
 	}
 	for _, u := range pending {
-		kept.Sources[u.path] = keptSource{Output: u.under}
+		kept.Sources[u.path] = cachedSource{Output: u.outputDir}
 	}
-	return writeCache(root, hashesFile, kept)
+	return writeCacheFile(root, hashesFile, kept)
 }
 
 const usesFile = ".globals.json"
@@ -134,25 +134,25 @@ type listedWith struct {
 	MacroSources string `json:"macroSources"`
 }
 
-type keptUses struct {
+type usesCache struct {
 	listedWith
-	Sources map[string]sourceUses `json:"sources"`
+	Sources map[string]cachedUses `json:"sources"`
 }
 
-type sourceUses struct {
+type cachedUses struct {
 	Hash string      `json:"hash"`
 	Uses []globalUse `json:"uses"`
 }
 
-func readUses(root string, now listedWith) (map[string]sourceUses, error) {
-	kept, found, err := readCache[keptUses](root, usesFile)
+func readUsesCache(root string, now listedWith) (map[string]cachedUses, error) {
+	kept, found, err := readCacheFile[usesCache](root, usesFile)
 	if err != nil || !found || kept.listedWith != now || !kept.listsEverySource() {
-		return map[string]sourceUses{}, err
+		return map[string]cachedUses{}, err
 	}
 	return kept.Sources, nil
 }
 
-func (k keptUses) listsEverySource() bool {
+func (k usesCache) listsEverySource() bool {
 	for _, source := range k.Sources {
 		if source.Uses == nil || slices.ContainsFunc(source.Uses, func(use globalUse) bool { return use.Name == "" }) {
 			return false
@@ -161,11 +161,11 @@ func (k keptUses) listsEverySource() bool {
 	return k.Sources != nil
 }
 
-func writeUses(root string, now listedWith, lists map[string]sourceUses) error {
-	return writeCache(root, usesFile, keptUses{listedWith: now, Sources: lists})
+func writeUsesCache(root string, now listedWith, lists map[string]cachedUses) error {
+	return writeCacheFile(root, usesFile, usesCache{listedWith: now, Sources: lists})
 }
 
-func readCache[T any](root, name string) (kept T, found bool, err error) {
+func readCacheFile[T any](root, name string) (kept T, found bool, err error) {
 	var none T
 	file, err := fsx.SafeJoinNoSymlinks(root, outputDir+"/"+name)
 	if err != nil {
@@ -186,7 +186,7 @@ func readCache[T any](root, name string) (kept T, found bool, err error) {
 	return kept, true, nil
 }
 
-func writeCache(root, name string, kept any) error {
+func writeCacheFile(root, name string, kept any) error {
 	path := outputDir + "/" + name
 	text, err := json.MarshalIndent(kept, "", "  ")
 	if err != nil {

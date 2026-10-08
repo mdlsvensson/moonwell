@@ -157,7 +157,7 @@ func librariesAndTheirView(ctx context.Context, e *env.Env, p *manifest.Project)
 }
 
 func libraryView(e *env.Env, synced []library.Synced) error {
-	sources, err := script.CollectLibraries(e.Root, build.ModuleFolders(synced))
+	sources, err := script.CollectLibrarySources(e.Root, build.ModuleFolders(synced))
 	if err != nil {
 		return err
 	}

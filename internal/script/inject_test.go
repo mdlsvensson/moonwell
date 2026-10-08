@@ -73,7 +73,7 @@ func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T
 		folder := mapOf(t, "war3map.lua", c.script, "war3map.w3i", "the map's info")
 		before := testkit.Snapshot(t, folder.Dir())
 		change := placed(t, folder, small)
-		want := c.script + c.added + bundle(small, moonwell.RuntimeLua, c.first)
+		want := c.script + c.added + renderBundle(small, moonwell.RuntimeLua, c.first)
 		if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
 			t.Errorf("%s: the change is of %s; against the script, %q and the bundle from line %d, %s",
 				c.name, change.Path, c.added, c.first, differs)
@@ -93,7 +93,7 @@ func TestInjectPlacesTheBundleInAScriptThatWorldEditorSaved(t *testing.T) {
 		}
 		first := strings.Count(script+added, "\n") + 1
 		change := placed(t, mapOf(t, "war3map.lua", script), small)
-		want := script + added + bundle(small, moonwell.RuntimeLua, first)
+		want := script + added + renderBundle(small, moonwell.RuntimeLua, first)
 		if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
 			t.Errorf("%s: against the script and the bundle from line %d, %s", fixture, first, differs)
 		}
@@ -163,11 +163,11 @@ func TestMainAndConfigAreFoundAtTheStartOfALineWithTheWhiteSpaceOfLua(t *testing
 		"\xfffunction main()":                       false,
 		"-- \xff\nfunction main() -- \xe2\x82":      true,
 	} {
-		if got := defines([]byte(script), "main"); got != want {
+		if got := definesFunction([]byte(script), "main"); got != want {
 			t.Errorf("defines(%q, main) = %v, want %v", script, got, want)
 		}
 	}
-	if !defines([]byte("function main()\n\tfunction  config ( )\n"), "config") || defines([]byte("function main()\n"), "config") {
+	if !definesFunction([]byte("function main()\n\tfunction  config ( )\n"), "config") || definesFunction([]byte("function main()\n"), "config") {
 		t.Error("config is not found as main is")
 	}
 }
@@ -182,7 +182,7 @@ func TestInjectKeepsAByteOrderMarkAndBytesThatAreNotUTF8(t *testing.T) {
 		folder := mapOf(t, "war3map.lua", c.script)
 		got := string(placed(t, folder, small).Data)
 		lines := strings.Count(c.script+c.added, "\n")
-		if differs := firstDifference(got, c.script+c.added+bundle(small, moonwell.RuntimeLua, lines+1)); differs != "" {
+		if differs := firstDifference(got, c.script+c.added+renderBundle(small, moonwell.RuntimeLua, lines+1)); differs != "" {
 			t.Errorf("%s: the script is not kept byte for byte before the bundle: %s", c.name, differs)
 		}
 		if kept, found, err := folder.Read("war3map.lua"); err != nil || !found || string(kept) != c.script {
@@ -230,7 +230,7 @@ func TestInjectTakesTheScriptAsThePlannedChangesLeaveIt(t *testing.T) {
 	const onDisk, planned = "function main()\nend\n", "function main()\nend\nfunction config()\nend\n-- planned"
 	folder := mapOf(t, "war3map.lua", onDisk)
 	view := folder.WithChanges([]mapdir.Change{{Path: "war3map.lua", Data: []byte(planned)}})
-	want := planned + "\n" + bundle(small, moonwell.RuntimeLua, 6)
+	want := planned + "\n" + renderBundle(small, moonwell.RuntimeLua, 6)
 	change := placed(t, view, small)
 	if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
 		t.Errorf("the change is of %s; against the planned script and the bundle from line 6, %s", change.Path, differs)

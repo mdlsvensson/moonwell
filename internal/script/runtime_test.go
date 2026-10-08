@@ -84,7 +84,7 @@ func TestALuaModuleKeepsItsLineNumbersInAMinifiedBundle(t *testing.T) {
 
 func TestALuaFileSavedWithABOMAndAHashFirstLineLoadsInTheBundleAndKeepsItsLineNumbers(t *testing.T) {
 	root := files("src/main.yue", "", "lua/lib.lua", mark+"#!/usr/bin/lua\nGreeting = \"hi\"\n"+failingLua+"\n").lay(t)
-	sources, err := Collect(root, nil)
+	sources, err := CollectSources(root, nil)
 	if err != nil || len(sources) != 2 || sources[1].Name != "lib" {
 		t.Fatalf("Collect = %+v, %v", sources, err)
 	}

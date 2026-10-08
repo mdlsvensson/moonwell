@@ -22,16 +22,16 @@ func RefreshMacros(root string) (wrote bool, err error) {
 	return wrote, nil
 }
 
-type macros struct {
+type macroFile struct {
 	path string
 	hash string
 }
 
-func macrosOf(root string) (macros, error) {
+func readMacros(root string) (macroFile, error) {
 	if strings.ContainsAny(root, ";?") {
-		return macros{}, errUnsearchableFolder(root)
+		return macroFile{}, errUnsearchableFolder(root)
 	}
-	return macros{
+	return macroFile{
 		path: filepath.Join(root, ".moonwell", "yue", "?.lua"),
 		hash: fsx.SHA256Hex([]byte(moonwell.MacrosYue)),
 	}, nil

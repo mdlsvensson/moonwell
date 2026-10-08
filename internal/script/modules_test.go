@@ -19,7 +19,7 @@ import (
 
 func collect(t *testing.T, p project) []Source {
 	t.Helper()
-	sources, err := Collect(p.lay(t), p.libraries())
+	sources, err := CollectSources(p.lay(t), p.libraries())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func collect(t *testing.T, p project) []Source {
 
 func refused(t *testing.T, p project, what string) *diag.Error {
 	t.Helper()
-	_, err := Collect(p.lay(t), p.libraries())
+	_, err := CollectSources(p.lay(t), p.libraries())
 	return asError(t, err, what)
 }
 
@@ -109,7 +109,7 @@ func TestCollectWorksWithoutLuaAndRequiresSrc(t *testing.T) {
 		"no file at all": files(),
 	} {
 		root := p.lay(t)
-		_, err := Collect(root, nil)
+		_, err := CollectSources(root, nil)
 		if failure := asError(t, err, what); failure.Msg != "The src/ folder is missing." || failure.File != root {
 			t.Errorf("%s: %+v", what, failure)
 		}
@@ -172,7 +172,7 @@ func TestCollectTakesTheLibrariesInTheOrderGivenEachYueScriptBeforeItsLua(t *tes
 		{[]Library{b}, []string{"main", "own", "four", "three"}},
 		{nil, []string{"main", "own"}},
 	} {
-		sources, err := Collect(root, c.libraries)
+		sources, err := CollectSources(root, c.libraries)
 		if err != nil || !slices.Equal(namesOf(sources), c.want) {
 			t.Errorf("Collect with %+v = %q, %v, want %q", c.libraries, namesOf(sources), err, c.want)
 		}
@@ -228,9 +228,9 @@ func TestADottedOrBuiltInNameInALibrarySuggestsNarrowingTheLibrarysDir(t *testin
 }
 
 func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
-	src, lua, library := folder{dir: "src", kind: Yue}, folder{dir: "lua", kind: Lua}, folder{dir: librariesDir + "/ex", kind: Lua, library: "ex"}
+	src, lua, library := moduleDir{dir: "src", kind: Yue}, moduleDir{dir: "lua", kind: Lua}, moduleDir{dir: librariesDir + "/ex", kind: Lua, library: "ex"}
 	for _, c := range []struct {
-		of   folder
+		of   moduleDir
 		file string
 	}{
 		{src, "a\xffb.yue"},
@@ -241,20 +241,20 @@ func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 		{lua, eAcute + "\xc3.lua"},
 	} {
 		path := c.of.dir + "/" + c.file
-		_, err := c.of.source(c.file)
+		_, err := c.of.readSource(c.file)
 		failure := asError(t, err, path)
 		if failure.Msg != "Module file and folder names must be valid UTF-8." || failure.File != path ||
 			!strings.Contains(failure.Hint, "rename the file or folder") {
 			t.Errorf("%q: %+v", path, failure)
 		}
 	}
-	_, err := library.source("kit/\xff.lua")
+	_, err := library.readSource("kit/\xff.lua")
 	failure := asError(t, err, "a library's file")
 	if !strings.Contains(failure.Msg, "must be valid UTF-8") || failure.File != librariesDir+"/ex/kit/\xff.lua" ||
 		strings.Contains(failure.Hint, "rename") || !strings.Contains(failure.Hint, "narrow the library's `dir` in moonwell.pkl") {
 		t.Errorf("a library's file: %+v", failure)
 	}
-	_, err = src.source("a.b\xff.yue")
+	_, err = src.readSource("a.b\xff.yue")
 	if failure := asError(t, err, "a dotted name"); !strings.Contains(failure.Msg, "cannot contain dots") {
 		t.Errorf("a dotted name: %+v", failure)
 	}
@@ -262,7 +262,7 @@ func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 		eAcute + ".yue": eAcute, beyond + "/" + fullWidthA + ".yue": beyond + "." + fullWidthA, replacement + ".yue": replacement,
 		"a\x7fb.yue": "a\x7fb", "a b.yue": "a b", "a" + noBreakSpace + "b/c" + lineSeparator + ".yue": "a" + noBreakSpace + "b.c" + lineSeparator,
 	} {
-		if source, err := src.source(file); err != nil || source.Name != name || source.Path != "src/"+file {
+		if source, err := src.readSource(file); err != nil || source.Name != name || source.Path != "src/"+file {
 			t.Errorf("%q: %+v, %v", file, source, err)
 		}
 	}
@@ -271,7 +271,7 @@ func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 func TestCollectRefusesAModuleFileWhoseNameIsNotUTF8(t *testing.T) {
 	for _, path := range []string{"src/a" + halfPair + ".yue", "lua/" + halfPair + "/x.lua", "src/game/" + halfPair + "/units.yue"} {
 		p := mainOnly.and(path, "")
-		_, err := Collect(p.layAsNamed(t), p.libraries())
+		_, err := CollectSources(p.layAsNamed(t), p.libraries())
 		failure := asError(t, err, path)
 		if failure.Msg != "Module file and folder names must be valid UTF-8." || failure.File != path ||
 			!strings.Contains(failure.Hint, "rename the file or folder") {
@@ -279,12 +279,12 @@ func TestCollectRefusesAModuleFileWhoseNameIsNotUTF8(t *testing.T) {
 		}
 	}
 	inALibrary := mainOnly.with("ex").and(inLibrary("ex", "kit/"+halfPair+".yue"), "")
-	_, err := Collect(inALibrary.layAsNamed(t), inALibrary.libraries())
+	_, err := CollectSources(inALibrary.layAsNamed(t), inALibrary.libraries())
 	if failure := asError(t, err, "a library's file"); failure.File != inLibrary("ex", "kit/"+halfPair+".yue") || !strings.Contains(failure.Hint, "narrow the library's `dir`") {
 		t.Errorf("a library's file: %+v", failure)
 	}
 	others := mainOnly.and("src/"+halfPair+".txt", "", "lua/"+halfPair+"/readme.md", "", "src/"+halfPair+".lua", "", "lua/x"+halfPair+".yue", "")
-	sources, err := Collect(others.layAsNamed(t), others.libraries())
+	sources, err := CollectSources(others.layAsNamed(t), others.libraries())
 	if got := pathsOf(sources); err != nil || !slices.Equal(got, []string{"src/main.yue"}) {
 		t.Errorf("files that are no modules: paths = %q, %v", got, err)
 	}
@@ -346,7 +346,7 @@ func TestInsideAFolderOfModulesALinkToAFileIsReadAndALinkToAFolderIsNotEntered(t
 	root := mainOnly.and("lua/own.lua", "return 1\n").lay(t)
 	linkTo(t, files("deep.lua", "return 2\n", "more/deeper.lua", "return 3\n"), root, "lua/linked")
 	linkTo(t, files("other.yue", "x = 2\n"), root, "src/linked")
-	sources, err := Collect(root, nil)
+	sources, err := CollectSources(root, nil)
 	if err != nil || !slices.Equal(pathsOf(sources), []string{"src/main.yue", "lua/own.lua"}) {
 		t.Errorf("with links to folders: Collect = %q, %v, want the modules that are not behind them", pathsOf(sources), err)
 	}
@@ -361,7 +361,7 @@ func TestInsideAFolderOfModulesALinkToAFileIsReadAndALinkToAFolderIsNotEntered(t
 		{Name: "own", Path: "lua/own.lua", Kind: Lua, Text: "return 1\n"},
 		{Name: "through", Path: "lua/through.lua", Kind: Lua, Text: "return 'through the link'\n"},
 	}
-	if sources, err = Collect(root, nil); err != nil || !reflect.DeepEqual(sources, want) {
+	if sources, err = CollectSources(root, nil); err != nil || !reflect.DeepEqual(sources, want) {
 		t.Errorf("with links to files: Collect = %+v, %v, want %+v", sources, err, want)
 	}
 }
@@ -374,7 +374,7 @@ func TestALinkAtAFolderOfModulesIsRefused(t *testing.T) {
 		}
 		root := p.lay(t)
 		at := linkTo(t, files("main.yue", "x = 1\n", "libraries/ex/x.lua", "", "ex/x.lua", ""), root, link)
-		_, err := Collect(root, p.libraries())
+		_, err := CollectSources(root, p.libraries())
 		failure := asError(t, err, link)
 		if failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") {
 			t.Errorf("a link at %s: %+v", link, failure)
@@ -392,14 +392,14 @@ func TestALibraryThatNamesNoFolderOfTheProjectIsAMistakeOfTheCaller(t *testing.T
 		{Key: "", Dir: librariesDir + "/ex"}, {Key: "ex", Dir: ""}, {Key: "ex", Dir: "../ex"}, {Key: "ex", Dir: "/ex"},
 		{Key: "ex", Dir: "a//b"}, {Key: "ex", Dir: "ex/"}, {Key: "ex", Dir: "."},
 	} {
-		_, err := Collect(root, []Library{library})
+		_, err := CollectSources(root, []Library{library})
 		var expected *diag.Error
 		if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "script.Collect") {
 			t.Errorf("Collect with %+v = %v, want an error that is no user's mistake", library, err)
 		}
 	}
 	p := mainOnly.with("ex").and(inLibrary("ex", "x.lua"), "")
-	sources, err := Collect(p.lay(t), []Library{{Key: "ex", Dir: `.moonwell\libraries\ex`}})
+	sources, err := CollectSources(p.lay(t), []Library{{Key: "ex", Dir: `.moonwell\libraries\ex`}})
 	if err != nil || !slices.Equal(pathsOf(sources), []string{"src/main.yue", ".moonwell/libraries/ex/x.lua"}) {
 		t.Errorf("Collect = %q, %v", pathsOf(sources), err)
 	}
@@ -408,7 +408,7 @@ func TestALibraryThatNamesNoFolderOfTheProjectIsAMistakeOfTheCaller(t *testing.T
 func TestALuaModuleThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
 	root := mainOnly.and("lua/held.lua", "return {}\n").lay(t)
 	testkit.MakeUnreadable(t, filepath.Join(root, "lua", "held.lua"))
-	_, err := Collect(root, nil)
+	_, err := CollectSources(root, nil)
 	failure := asError(t, err, "a held file")
 	if !strings.HasPrefix(failure.Msg, "Reading lua/held.lua failed: ") || failure.File != "lua/held.lua" || failure.Hint == "" {
 		t.Errorf("error = %+v", failure)
@@ -428,7 +428,7 @@ func TestAFolderOfModulesThatCannotBeListedIsRefusedByItsName(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { os.Chmod(closed, 0o777) })
-	_, err := Collect(root, nil)
+	_, err := CollectSources(root, nil)
 	failure := asError(t, err, "a closed folder")
 	if !strings.HasPrefix(failure.Msg, "Reading lua/closed/ failed: ") || failure.File != "lua/closed" ||
 		!strings.Contains(failure.Hint, "can be read") {
@@ -437,7 +437,7 @@ func TestAFolderOfModulesThatCannotBeListedIsRefusedByItsName(t *testing.T) {
 }
 
 func TestAListingThatFailsBelowAFolderNamesTheFolderItFailedAt(t *testing.T) {
-	lua := folder{dir: "lua", path: filepath.Join(t.TempDir(), "lua"), kind: Lua}
+	lua := moduleDir{dir: "lua", path: filepath.Join(t.TempDir(), "lua"), kind: Lua}
 	denied := func(path string) error { return &fs.PathError{Op: "open", Path: path, Err: fs.ErrPermission} }
 	for what, c := range map[string]struct {
 		cause error
@@ -488,11 +488,11 @@ func TestCollectLibrariesListsTheLibrariesModulesAsCollectListsThem(t *testing.T
 		{[]Library{missing}, nil},
 		{nil, nil},
 	} {
-		whole, err := Collect(root, c.libraries)
+		whole, err := CollectSources(root, c.libraries)
 		if err != nil {
 			t.Fatal(err)
 		}
-		alone, err := CollectLibraries(root, c.libraries)
+		alone, err := CollectLibrarySources(root, c.libraries)
 		if err != nil || !slices.Equal(namesOf(alone), c.want) || !reflect.DeepEqual(alone, ofLibraries(whole)) {
 			t.Errorf("CollectLibraries with %+v = %+v, %v, want the modules %q, as Collect lists them: %+v",
 				c.libraries, alone, err, c.want, ofLibraries(whole))
@@ -521,11 +521,11 @@ func TestCollectLibrariesDoesNotLookAtTheProjectsOwnModules(t *testing.T) {
 	want := []Source{{Name: "example.greet", Path: greet, Kind: Lua, Library: "ex", Text: "return {}\n"}}
 	for _, c := range cases {
 		root := c.project.lay(t)
-		_, err := Collect(root, c.project.libraries())
+		_, err := CollectSources(root, c.project.libraries())
 		if failure := asError(t, err, c.name); !strings.Contains(failure.Msg, c.refusal) {
 			t.Errorf("%s: Collect refuses with %+v, want %q", c.name, failure, c.refusal)
 		}
-		if got, err := CollectLibraries(root, c.project.libraries()); err != nil || !reflect.DeepEqual(got, want) {
+		if got, err := CollectLibrarySources(root, c.project.libraries()); err != nil || !reflect.DeepEqual(got, want) {
 			t.Errorf("%s: CollectLibraries = %+v, %v, want %+v", c.name, got, err, want)
 		}
 	}
@@ -539,11 +539,11 @@ func TestCollectLibrariesDoesNotGoThroughALinkAtAFolderOfTheProjectsOwn(t *testi
 		}
 		root := p.lay(t)
 		at := linkTo(t, files("main.yue", "", "x.lua", ""), root, link)
-		_, err := Collect(root, p.libraries())
+		_, err := CollectSources(root, p.libraries())
 		if failure := asError(t, err, link); failure.Msg != "Symlinks are not supported: "+at {
 			t.Errorf("a link at %s: Collect refuses with %+v", link, failure)
 		}
-		got, err := CollectLibraries(root, p.libraries())
+		got, err := CollectLibrarySources(root, p.libraries())
 		if err != nil || !slices.Equal(pathsOf(got), []string{inLibrary("ex", "x.lua")}) {
 			t.Errorf("a link at %s: CollectLibraries = %q, %v", link, pathsOf(got), err)
 		}
@@ -560,8 +560,8 @@ func TestCollectLibrariesRefusesWhatCollectRefusesOfALibrary(t *testing.T) {
 		"a name that an init claims": two.and(inLibrary("a", "kit/init.yue"), "", inLibrary("b", "kit.lua"), ""),
 	} {
 		root := p.lay(t)
-		_, whole := Collect(root, p.libraries())
-		got, alone := CollectLibraries(root, p.libraries())
+		_, whole := CollectSources(root, p.libraries())
+		got, alone := CollectLibrarySources(root, p.libraries())
 		want := asError(t, whole, what)
 		if failure := asError(t, alone, what); got != nil || !reflect.DeepEqual(failure, want) || want.File == "" {
 			t.Errorf("%s: CollectLibraries = %+v, %+v, want the refusal of Collect: %+v", what, got, failure, want)
@@ -574,7 +574,7 @@ func TestCollectLibrariesRefusesALinkAtAFolderOfALibrary(t *testing.T) {
 		p := mainOnly.with("ex")
 		root := p.lay(t)
 		at := linkTo(t, files("libraries/ex/x.lua", "", "ex/x.lua", "", "x.lua", ""), root, link)
-		got, err := CollectLibraries(root, p.libraries())
+		got, err := CollectLibrarySources(root, p.libraries())
 		failure := asError(t, err, link)
 		if got != nil || failure.Msg != "Symlinks are not supported: "+at ||
 			!strings.Contains(failure.Hint, "real files") {
@@ -588,7 +588,7 @@ func TestCollectLibrariesTakesALibraryThatNamesNoFolderOfTheProjectForAMistakeOf
 	for _, library := range []Library{
 		{Key: "", Dir: librariesDir + "/ex"}, {Key: "ex", Dir: ""}, {Key: "ex", Dir: "../ex"}, {Key: "ex", Dir: "/ex"},
 	} {
-		_, err := CollectLibraries(root, []Library{library})
+		_, err := CollectLibrarySources(root, []Library{library})
 		var expected *diag.Error
 		if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "script.CollectLibraries: ") {
 			t.Errorf("CollectLibraries with %+v = %v, want an error that is no user's mistake", library, err)

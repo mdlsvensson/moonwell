@@ -7,11 +7,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-func bundle(program *Program, runtime string, firstLine int) string {
-	block := append([]string{"do"}, linesOf(runtime)...)
+func renderBundle(program *Program, runtime string, firstLine int) string {
+	block := append([]string{"do"}, splitLines(runtime)...)
 	var table []string
 	for _, module := range program.Modules {
-		body := linesOf(module.Lua)
+		body := splitLines(module.Lua)
 		block = append(block, "__mw.define("+lua.QuoteString(module.Name)+", function(...)")
 		first := firstLine + len(block)
 		table = append(table, entryOf(module, first, first+len(body)-1, program.Minify))
@@ -24,7 +24,7 @@ func bundle(program *Program, runtime string, firstLine int) string {
 	return strings.Join(block, "\n") + "\n"
 }
 
-func linesOf(text string) []string {
+func splitLines(text string) []string {
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
 	if len(lines) > 1 && lines[len(lines)-1] == "" {
 		lines = lines[:len(lines)-1]

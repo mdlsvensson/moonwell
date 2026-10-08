@@ -32,30 +32,30 @@ type Source struct {
 	Text    string
 }
 
-func Collect(root string, libraries []Library) ([]Source, error) {
-	ofLibraries, err := libraryFolders("Collect", libraries)
+func CollectSources(root string, libraries []Library) ([]Source, error) {
+	ofLibraries, err := libraryModuleDirs("Collect", libraries)
 	if err != nil {
 		return nil, err
 	}
-	return collectFrom(root, append(ownFolders(), ofLibraries...))
+	return collectSources(root, append(projectModuleDirs(), ofLibraries...))
 }
 
-func CollectLibraries(root string, libraries []Library) ([]Source, error) {
-	searched, err := libraryFolders("CollectLibraries", libraries)
+func CollectLibrarySources(root string, libraries []Library) ([]Source, error) {
+	searched, err := libraryModuleDirs("CollectLibraries", libraries)
 	if err != nil {
 		return nil, err
 	}
-	return collectFrom(root, searched)
+	return collectSources(root, searched)
 }
 
-func collectFrom(root string, searched []folder) ([]Source, error) {
-	folders, err := moduleFolders(root, searched)
+func collectSources(root string, searched []moduleDir) ([]Source, error) {
+	folders, err := findModuleDirs(root, searched)
 	if err != nil {
 		return nil, err
 	}
-	found := collected{byName: map[string]Source{}}
+	found := sourceSet{byName: map[string]Source{}}
 	for _, f := range folders {
-		if err := found.addFolder(f); err != nil {
+		if err := found.addDir(f); err != nil {
 			return nil, err
 		}
 	}
@@ -72,7 +72,7 @@ func EntryName(entry string) (string, error) {
 	return strings.ReplaceAll(under, "/", "."), nil
 }
 
-type folder struct {
+type moduleDir struct {
 	dir      string
 	path     string
 	kind     Kind
@@ -80,10 +80,10 @@ type folder struct {
 	required bool
 }
 
-func moduleFolders(root string, searched []folder) ([]folder, error) {
-	var present []folder
+func findModuleDirs(root string, searched []moduleDir) ([]moduleDir, error) {
+	var present []moduleDir
 	for _, f := range searched {
-		path, found, err := folderAt(root, f.dir)
+		path, found, err := findDir(root, f.dir)
 		switch {
 		case err != nil:
 			return nil, err
@@ -97,12 +97,12 @@ func moduleFolders(root string, searched []folder) ([]folder, error) {
 	return present, nil
 }
 
-func ownFolders() []folder {
-	return []folder{{dir: "src", kind: Yue, required: true}, {dir: "lua", kind: Lua}}
+func projectModuleDirs() []moduleDir {
+	return []moduleDir{{dir: "src", kind: Yue, required: true}, {dir: "lua", kind: Lua}}
 }
 
-func libraryFolders(door string, libraries []Library) ([]folder, error) {
-	var searched []folder
+func libraryModuleDirs(door string, libraries []Library) ([]moduleDir, error) {
+	var searched []moduleDir
 	for _, library := range libraries {
 		dir, ok := fsx.CleanRelPath(library.Dir)
 		if library.Key == "" || !ok {
@@ -110,12 +110,12 @@ func libraryFolders(door string, libraries []Library) ([]folder, error) {
 				door, library.Key, library.Dir)
 		}
 		searched = append(searched,
-			folder{dir: dir, kind: Yue, library: library.Key}, folder{dir: dir, kind: Lua, library: library.Key})
+			moduleDir{dir: dir, kind: Yue, library: library.Key}, moduleDir{dir: dir, kind: Lua, library: library.Key})
 	}
 	return searched, nil
 }
 
-func folderAt(root, dir string) (path string, found bool, err error) {
+func findDir(root, dir string) (path string, found bool, err error) {
 	if !fsx.IsDir(filepath.Join(root, filepath.FromSlash(dir))) {
 		return "", false, nil
 	}
@@ -123,22 +123,22 @@ func folderAt(root, dir string) (path string, found bool, err error) {
 	return path, err == nil, err
 }
 
-type collected struct {
+type sourceSet struct {
 	sources []Source
 	byName  map[string]Source
 }
 
-func (c *collected) addFolder(f folder) error {
-	files, err := f.moduleFiles()
+func (c *sourceSet) addDir(f moduleDir) error {
+	files, err := f.listModuleFiles()
 	if err != nil {
 		return err
 	}
 	for _, file := range files {
-		source, err := f.source(file)
+		source, err := f.readSource(file)
 		if err != nil {
 			return err
 		}
-		if err := c.claim(source); err != nil {
+		if err := c.addSource(source); err != nil {
 			return err
 		}
 		if source.Kind == Lua {
@@ -151,7 +151,7 @@ func (c *collected) addFolder(f folder) error {
 	return nil
 }
 
-func (f folder) moduleFiles() ([]string, error) {
+func (f moduleDir) listModuleFiles() ([]string, error) {
 	files, err := fsx.ListFiles(f.path)
 	if err != nil {
 		return nil, errUnreadableFolder(f.failedAt(err), err)
@@ -167,7 +167,7 @@ func (f folder) moduleFiles() ([]string, error) {
 	return modules, nil
 }
 
-func (f folder) failedAt(cause error) string {
+func (f moduleDir) failedAt(cause error) string {
 	var failure *fs.PathError
 	if !errors.As(cause, &failure) {
 		return f.dir
@@ -179,7 +179,7 @@ func (f folder) failedAt(cause error) string {
 	return f.dir + "/" + fsx.ToSlash(below)
 }
 
-func (f folder) compiledOutputs(files []string) map[string]bool {
+func (f moduleDir) compiledOutputs(files []string) map[string]bool {
 	outputs := map[string]bool{}
 	if f.library == "" || f.kind != Lua {
 		return outputs
@@ -192,7 +192,7 @@ func (f folder) compiledOutputs(files []string) map[string]bool {
 	return outputs
 }
 
-func (f folder) source(file string) (Source, error) {
+func (f moduleDir) readSource(file string) (Source, error) {
 	path := f.dir + "/" + file
 	stem := strings.TrimSuffix(file, "."+string(f.kind))
 	switch {
@@ -204,7 +204,7 @@ func (f folder) source(file string) (Source, error) {
 	return Source{Name: strings.ReplaceAll(stem, "/", "."), Path: path, Kind: f.kind, Library: f.library}, nil
 }
 
-func (c *collected) claim(source Source) error {
+func (c *sourceSet) addSource(source Source) error {
 	for _, name := range claimedNames(source.Name) {
 		if slices.Contains(builtins, name) {
 			return errBuiltinName(name, source)
