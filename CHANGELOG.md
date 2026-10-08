@@ -4,7 +4,8 @@
 
 - **The command line is read by `cobra`** (`github.com/spf13/cobra`), the library most Go programs use for it, in
   place of a reader of Moonwell's own. The commands, their arguments and their flags are the same. Moonwell now
-  depends on that module and the two it needs; until now it used the Go standard library alone.
+  depends on that module and the two it needs; until now it used the Go standard library alone. A release hands
+  out their licences beside the programs, in `THIRD_PARTY_LICENSES`.
 - **New: every command has its help.** `moonwell build --help` and `moonwell help build` print what the command
   does and the flags it has.
 - **New: `moonwell completion <shell>`** prints a completion script for `bash`, `zsh`, `fish` or `powershell`.

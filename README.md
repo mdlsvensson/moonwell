@@ -652,4 +652,5 @@ settings {
 ## Credits
 
 The template map derives from TriggerHappy's [wc3-ts-template](https://github.com/cipherxof/wc3-ts-template) via
-wc3-dev-framework. MIT licensed; see [LICENSE](LICENSE).
+wc3-dev-framework. MIT licensed; see [LICENSE](LICENSE). The program is built with three modules of other authors,
+whose licences are in [THIRD_PARTY_LICENSES](THIRD_PARTY_LICENSES).

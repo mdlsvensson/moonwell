@@ -25,6 +25,8 @@ what a build does step by step, and which file to open for what. Read it before 
 - `tools/gen/`: the generator (below). `tools/metadata/` and `tools/natives/` hold the two files it reads that are
   written by hand.
 - `install.ps1`, `install.sh`: the install scripts a release serves.
+- `THIRD_PARTY_LICENSES`: the licences of the three modules the program is built with, each as its authors wrote
+  it. A release hands the file out beside the programs.
 
 ## Working on Moonwell
 
@@ -91,7 +93,9 @@ commit that changes the behaviour, and the commit message says which recordings 
   (`pflag`, and `mousetrap` on Windows). Only `internal/cli` imports them, and there is no cgo. `module_test.go`
   holds `go.mod` to that list and `layout_test.go` holds the import. A further module needs a design the
   maintainer approves; it is then added to the list in `module_test.go`, and `layout_test.go` says which package
-  may import it.
+  may import it. `THIRD_PARTY_LICENSES` names each module at the version `go.mod` requires, with its licence
+  (`module_test.go` holds the names and the versions): when a version changes, copy the licence from the module
+  anew, and when a module is added, add its section.
 - **Errors.** An expected failure is a `*diag.Error` (or `diag.Problems`) with the file and a hint. Any other error, and
   any panic, is reported as an internal "please report" error, so a user's mistake must never reach it. The text of
   an error is made by a named function below a `// ---- errors ----` line, at the bottom of the file that raises it.
@@ -420,7 +424,8 @@ package's download address is built from it.
    workflow fails at once unless the tag, `version.go` and `schema/PklProject` agree. It then runs the checks, builds
    `moonwell-windows-amd64.exe` and `moonwell-linux-amd64` with their `checksums.txt`, packages the schema
    (`moonwell@<version>.zip` and the metadata file `moonwell@<version>`, which `package://pkg.pkl-lang.org/...` URIs
-   redirect to), and creates the GitHub release with those files and the two install scripts.
+   redirect to), and creates the GitHub release with those files, the two install scripts and
+   `THIRD_PARTY_LICENSES`.
 4. Read the workflow's result (`gh run watch`). Its last job is the check from outside the repository: on Ubuntu and
    Windows it runs the install line of the new version, then `moonwell init my-map` and `moonwell build`.
 5. On your own machine, run the install line once, then step 16 of the release gate: a plain `moonwell init` and a

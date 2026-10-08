@@ -56,7 +56,8 @@ jobs:
           GOOS=linux go build -trimpath -ldflags "-s -w" -o out/moonwell-linux-amd64 ./cmd/moonwell
           GOOS=windows go build -trimpath -ldflags "-s -w" -o out/moonwell-windows-amd64.exe ./cmd/moonwell
           (cd out && sha256sum moonwell-linux-amd64 moonwell-windows-amd64.exe > checksums.txt)
-          cp install.ps1 install.sh out/
+          # The licences of the modules the executables are built with go out beside them.
+          cp install.ps1 install.sh THIRD_PARTY_LICENSES out/
           out/moonwell-linux-amd64 --version
 
       - name: Package the Pkl schema

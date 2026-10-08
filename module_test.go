@@ -26,6 +26,12 @@ func TestTheModuleDependsOnCobraAloneAndUsesNoCgo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// A release hands out the modules' licences beside the program, in THIRD_PARTY_LICENSES. The file names each
+	// module at the version go.mod requires, so a change of a version is a look at that module's licence too.
+	licences, err := os.ReadFile("THIRD_PARTY_LICENSES")
+	if err != nil {
+		t.Fatal(err)
+	}
 	var required []string
 	for _, line := range strings.Split(string(mod), "\n") {
 		words := strings.Fields(line)
@@ -36,6 +42,9 @@ func TestTheModuleDependsOnCobraAloneAndUsesNoCgo(t *testing.T) {
 		case len(words) == 0 || words[0] == "(" || words[0] == ")" || words[0] == "module" || words[0] == "go":
 		case len(words) >= 2 && strings.HasPrefix(words[1], "v"):
 			required = append(required, words[0])
+			if named := words[0] + " " + words[1]; !strings.Contains(string(licences), "\n"+named+"\n") {
+				t.Errorf("THIRD_PARTY_LICENSES has no line %q: it names each module at the version go.mod requires", named)
+			}
 		default:
 			t.Errorf("go.mod has %q: Moonwell's go.mod names the module, the Go version and what it requires",
 				strings.TrimSpace(line))
