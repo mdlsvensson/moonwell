@@ -27,45 +27,45 @@ const (
 	sharedAdvancedControl = 32
 )
 
-func patchInfo(data []byte, s manifest.Settings, file string) ([]byte, error) {
-	if !setsInfo(s) {
+func patchInfo(data []byte, s manifest.Settings, displayPath string) ([]byte, error) {
+	if !changesInfo(s) {
 		return data, nil
 	}
-	info, err := w3i.Read(data, file, depthFor(s))
+	info, err := w3i.Read(data, displayPath, readDepthFor(s))
 	if err != nil {
 		return nil, err
 	}
-	p := &infoPatch{info: info, file: file, flags: info.Flags.Value}
-	p.description(s.Info)
-	p.loadingScreen(s.LoadingScreen)
-	p.players(s.Players)
-	p.forces(s.Forces)
-	p.environment(s.Environment)
-	p.mapFlags()
-	if p.failure != nil {
-		return nil, p.failure
+	p := &infoPatch{info: info, displayPath: displayPath, flags: info.Flags.Value}
+	p.patchDescription(s.Info)
+	p.patchLoadingScreen(s.LoadingScreen)
+	p.patchPlayers(s.Players)
+	p.patchForces(s.Forces)
+	p.patchEnvironment(s.Environment)
+	p.patchMapFlags()
+	if p.err != nil {
+		return nil, p.err
 	}
 	patched, err := w3i.ApplyEdits(data, p.edits)
 	if err != nil {
-		return nil, fmt.Errorf("patching %s: %w", file, err)
+		return nil, fmt.Errorf("patching %s: %w", displayPath, err)
 	}
 	return patched, nil
 }
 
-func setsInfo(s manifest.Settings) bool {
-	return needsDetails(s) || described(s.Info) || s.LoadingScreen != (manifest.LoadingScreen{})
+func changesInfo(s manifest.Settings) bool {
+	return needsDetails(s) || hasDescription(s.Info) || s.LoadingScreen != (manifest.LoadingScreen{})
 }
 
-func described(info manifest.Info) bool {
+func hasDescription(info manifest.Info) bool {
 	info.Preview = nil
 	return info != (manifest.Info{})
 }
 
 func needsDetails(s manifest.Settings) bool {
-	return anySet(s.Players) || anySet(s.Forces) || s.Environment != (manifest.Environment{})
+	return hasOverrides(s.Players) || hasOverrides(s.Forces) || s.Environment != (manifest.Environment{})
 }
 
-func anySet[V comparable](overrides map[int]V) bool {
+func hasOverrides[V comparable](overrides map[int]V) bool {
 	var nothing V
 	for _, override := range overrides {
 		if override != nothing {
@@ -75,7 +75,7 @@ func anySet[V comparable](overrides map[int]V) bool {
 	return false
 }
 
-func depthFor(s manifest.Settings) w3i.Depth {
+func readDepthFor(s manifest.Settings) w3i.Depth {
 	if needsDetails(s) {
 		return w3i.Extended
 	}
@@ -83,62 +83,62 @@ func depthFor(s manifest.Settings) w3i.Depth {
 }
 
 type infoPatch struct {
-	info    *w3i.Info
-	file    string
-	flags   int32
-	edits   []w3i.Edit
-	failure error
+	info        *w3i.Info
+	displayPath string
+	flags       int32
+	edits       []w3i.Edit
+	err         error
 }
 
-func (p *infoPatch) refuse(reason error) {
-	if p.failure == nil {
-		p.failure = reason
+func (p *infoPatch) fail(err error) {
+	if p.err == nil {
+		p.err = err
 	}
 }
 
-func (p *infoPatch) description(info manifest.Info) {
-	p.text(p.info.Name, info.Name)
-	p.text(p.info.Author, info.Author)
-	p.text(p.info.Description, info.Description)
-	p.text(p.info.RecommendedPlayers, info.RecommendedPlayers)
+func (p *infoPatch) patchDescription(info manifest.Info) {
+	p.setText(p.info.Name, info.Name)
+	p.setText(p.info.Author, info.Author)
+	p.setText(p.info.Description, info.Description)
+	p.setText(p.info.RecommendedPlayers, info.RecommendedPlayers)
 }
 
-func (p *infoPatch) loadingScreen(screen manifest.LoadingScreen) {
+func (p *infoPatch) patchLoadingScreen(screen manifest.LoadingScreen) {
 	loading := p.info.Loading
-	p.number(loading.Background, screen.Background)
+	p.setInt(loading.Background, screen.Background)
 	switch {
 	case screen.Model == nil:
 	case loading.Model == nil:
-		p.refuse(errNoLoadingModel(p.file))
+		p.fail(errNoLoadingModel(p.displayPath))
 	default:
-		p.text(*loading.Model, screen.Model)
+		p.setText(*loading.Model, screen.Model)
 	}
-	p.text(loading.Text, screen.Text)
-	p.text(loading.Title, screen.Title)
-	p.text(loading.Subtitle, screen.Subtitle)
+	p.setText(loading.Text, screen.Text)
+	p.setText(loading.Title, screen.Title)
+	p.setText(loading.Subtitle, screen.Subtitle)
 }
 
-func (p *infoPatch) players(overrides map[int]manifest.Player) {
+func (p *infoPatch) patchPlayers(overrides map[int]manifest.Player) {
 	for _, slot := range manifest.SortedSlots(overrides) {
 		override := overrides[slot]
 		if override == (manifest.Player{}) {
 			continue
 		}
-		player, found := p.player(slot)
+		player, found := p.findPlayer(slot)
 		if !found {
-			p.refuse(errNoPlayer(p.file, slot))
+			p.fail(errNoPlayer(p.displayPath, slot))
 			continue
 		}
-		p.text(player.Name, override.Name)
-		p.named(player.Controller, override.Controller, controllers)
-		p.named(player.Race, override.Race, races)
-		p.yesNo(player.FixedStart, override.FixedStart)
-		p.real(player.X, override.X)
-		p.real(player.Y, override.Y)
+		p.setText(player.Name, override.Name)
+		p.setEnum(player.Controller, override.Controller, controllers)
+		p.setEnum(player.Race, override.Race, races)
+		p.setBool(player.FixedStart, override.FixedStart)
+		p.setFloat(player.X, override.X)
+		p.setFloat(player.Y, override.Y)
 	}
 }
 
-func (p *infoPatch) player(slot int) (w3i.Player, bool) {
+func (p *infoPatch) findPlayer(slot int) (w3i.Player, bool) {
 	players := p.info.Details.Players
 	at := slices.IndexFunc(players, func(player w3i.Player) bool { return int(player.ID.Value) == slot })
 	if at < 0 {
@@ -147,26 +147,26 @@ func (p *infoPatch) player(slot int) (w3i.Player, bool) {
 	return players[at], true
 }
 
-func (p *infoPatch) forces(overrides map[int]manifest.Force) {
+func (p *infoPatch) patchForces(overrides map[int]manifest.Force) {
 	for _, slot := range manifest.SortedSlots(overrides) {
 		override := overrides[slot]
 		if override == (manifest.Force{}) {
 			continue
 		}
-		force, found := p.force(slot)
+		force, found := p.findForce(slot)
 		switch {
 		case !found:
-			p.refuse(errNoForce(p.file, slot))
+			p.fail(errNoForce(p.displayPath, slot))
 		case p.info.Flags.Value&customForces == 0:
-			p.refuse(errNoCustomForces(p.file, slot))
+			p.fail(errNoCustomForces(p.displayPath, slot))
 		default:
-			p.text(force.Name, override.Name)
-			p.edits = append(p.edits, w3i.IntEdit(force.Flags, alliances(force.Flags.Value, override)))
+			p.setText(force.Name, override.Name)
+			p.edits = append(p.edits, w3i.IntEdit(force.Flags, applyAllianceFlags(force.Flags.Value, override)))
 		}
 	}
 }
 
-func (p *infoPatch) force(slot int) (w3i.Force, bool) {
+func (p *infoPatch) findForce(slot int) (w3i.Force, bool) {
 	forces := p.info.Details.Forces
 	if slot < 0 || slot >= len(forces) {
 		return w3i.Force{}, false
@@ -174,15 +174,15 @@ func (p *infoPatch) force(slot int) (w3i.Force, bool) {
 	return forces[slot], true
 }
 
-func alliances(flags int32, override manifest.Force) int32 {
-	flags = turned(flags, allied, override.Allied)
-	flags = turned(flags, alliedVictory, override.AlliedVictory)
-	flags = turned(flags, sharedVision, override.SharedVision)
-	flags = turned(flags, sharedControl, override.SharedControl)
-	return turned(flags, sharedAdvancedControl, override.SharedAdvancedControl)
+func applyAllianceFlags(flags int32, override manifest.Force) int32 {
+	flags = withBit(flags, allied, override.Allied)
+	flags = withBit(flags, alliedVictory, override.AlliedVictory)
+	flags = withBit(flags, sharedVision, override.SharedVision)
+	flags = withBit(flags, sharedControl, override.SharedControl)
+	return withBit(flags, sharedAdvancedControl, override.SharedAdvancedControl)
 }
 
-func turned(flags, bit int32, setting *bool) int32 {
+func withBit(flags, bit int32, setting *bool) int32 {
 	switch {
 	case setting == nil:
 		return flags
@@ -192,76 +192,76 @@ func turned(flags, bit int32, setting *bool) int32 {
 	return flags &^ bit
 }
 
-func (p *infoPatch) environment(environment manifest.Environment) {
+func (p *infoPatch) patchEnvironment(environment manifest.Environment) {
 	if environment == (manifest.Environment{}) {
 		return
 	}
 	details := p.info.Details
-	p.text(details.SoundEnvironment, environment.SoundEnvironment)
+	p.setText(details.SoundEnvironment, environment.SoundEnvironment)
 	if environment.WaterColor != nil {
 		p.flags |= waterTinted
-		p.color(details.WaterColor, environment.WaterColor)
+		p.setColor(details.WaterColor, environment.WaterColor)
 	}
-	p.fog(environment.Fog)
+	p.patchFog(environment.Fog)
 }
 
-func (p *infoPatch) fog(fog manifest.Fog) {
+func (p *infoPatch) patchFog(fog manifest.Fog) {
 	if fog == (manifest.Fog{}) {
 		return
 	}
 	current := p.info.Details.Fog
-	if !inOrder(fog, current) {
-		p.refuse(errFog(p.file))
+	if !isFogRangeValid(fog, current) {
+		p.fail(errFogRange(p.displayPath))
 		return
 	}
-	p.flags = turned(p.flags, fogOn, fog.Enabled)
-	p.number(current.Style, fog.Style)
-	p.real(current.Start, fog.Start)
-	p.real(current.End, fog.End)
-	p.real(current.Density, fog.Density)
-	p.color(current.Color, fog.Color)
+	p.flags = withBit(p.flags, fogOn, fog.Enabled)
+	p.setInt(current.Style, fog.Style)
+	p.setFloat(current.Start, fog.Start)
+	p.setFloat(current.End, fog.End)
+	p.setFloat(current.Density, fog.Density)
+	p.setColor(current.Color, fog.Color)
 }
 
-func inOrder(fog manifest.Fog, current w3i.Fog) bool {
-	start := orInherited(fog.Start, current.Start.Value)
-	end := orInherited(fog.End, current.End.Value)
-	density := orInherited(fog.Density, current.Density.Value)
+func isFogRangeValid(fog manifest.Fog, current w3i.Fog) bool {
+	start := valueOrInherited(fog.Start, current.Start.Value)
+	end := valueOrInherited(fog.End, current.End.Value)
+	density := valueOrInherited(fog.Density, current.Density.Value)
 	isNumber := func(value float64) bool { return !math.IsInf(value, 0) && !math.IsNaN(value) }
 	return isNumber(start) && isNumber(end) && isNumber(density) && start <= end
 }
 
-func orInherited(setting *float64, inherited float32) float64 {
+func valueOrInherited(setting *float64, inherited float32) float64 {
 	if setting != nil {
 		return *setting
 	}
 	return float64(inherited)
 }
 
-func (p *infoPatch) mapFlags() {
+func (p *infoPatch) patchMapFlags() {
 	if p.flags != p.info.Flags.Value {
 		p.edits = append(p.edits, w3i.IntEdit(p.info.Flags, p.flags))
 	}
 }
 
-func (p *infoPatch) text(field w3i.Field[string], setting *string) {
+func (p *infoPatch) setText(field w3i.Field[string], setting *string) {
 	if setting != nil {
 		p.edits = append(p.edits, w3i.TextEdit(field, *setting))
 	}
 }
 
-func (p *infoPatch) number(field w3i.Field[int32], setting *int32) {
+func (p *infoPatch) setInt(field w3i.Field[int32], setting *int32) {
 	if setting != nil {
 		p.edits = append(p.edits, w3i.IntEdit(field, *setting))
 	}
 }
 
-func (p *infoPatch) real(field w3i.Field[float32], setting *float64) {
+func (p *infoPatch) setFloat(field w3i.Field[float32], setting *float64) {
 	if setting != nil {
 		p.edits = append(p.edits, w3i.FloatEdit(field, float32(*setting)))
 	}
 }
 
-func (p *infoPatch) yesNo(field w3i.Field[int32], setting *bool) {
+func (p *infoPatch) setBool(field w3i.Field[int32], setting *bool) {
 	switch {
 	case setting == nil:
 	case *setting:
@@ -271,19 +271,19 @@ func (p *infoPatch) yesNo(field w3i.Field[int32], setting *bool) {
 	}
 }
 
-func (p *infoPatch) named(field w3i.Field[int32], setting *string, names []string) {
+func (p *infoPatch) setEnum(field w3i.Field[int32], setting *string, names []string) {
 	if setting == nil {
 		return
 	}
 	number := slices.Index(names, *setting)
 	if number < 0 || *setting == "" {
-		p.refuse(errNoNumber(*setting, names))
+		p.fail(errUnknownName(*setting, names))
 		return
 	}
 	p.edits = append(p.edits, w3i.IntEdit(field, int32(number)))
 }
 
-func (p *infoPatch) color(field w3i.Color, setting *[4]uint8) {
+func (p *infoPatch) setColor(field w3i.Color, setting *[4]uint8) {
 	if setting == nil {
 		return
 	}
@@ -292,46 +292,46 @@ func (p *infoPatch) color(field w3i.Color, setting *[4]uint8) {
 	}
 }
 
-func errNoLoadingModel(file string) error {
+func errNoLoadingModel(displayPath string) error {
 	return &diag.Error{
 		Msg:  "settings.loadingScreen.model: custom loading-screen models require w3i version 25 or later.",
-		File: file,
+		File: displayPath,
 		Hint: "Save the map in a newer World Editor.",
 	}
 }
 
-func errNoPlayer(file string, slot int) error {
+func errNoPlayer(displayPath string, slot int) error {
 	return &diag.Error{
 		Msg:  fmt.Sprintf(`settings.players["%d"]: player %d does not exist in the source map.`, slot, slot),
-		File: file,
+		File: displayPath,
 		Hint: "Create this player slot in World Editor first.",
 	}
 }
 
-func errNoForce(file string, slot int) error {
+func errNoForce(displayPath string, slot int) error {
 	return &diag.Error{
 		Msg:  fmt.Sprintf(`settings.forces["%d"]: force %d does not exist in the source map.`, slot, slot),
-		File: file,
+		File: displayPath,
 		Hint: "Create this force in World Editor first.",
 	}
 }
 
-func errNoCustomForces(file string, slot int) error {
+func errNoCustomForces(displayPath string, slot int) error {
 	return &diag.Error{
 		Msg:  fmt.Sprintf(`settings.forces["%d"]: force overrides require custom forces enabled in the source map.`, slot),
-		File: file,
+		File: displayPath,
 		Hint: "Enable custom forces in World Editor first.",
 	}
 }
 
-func errFog(file string) error {
+func errFogRange(displayPath string) error {
 	return &diag.Error{
 		Msg:  "settings.environment.fog: start, end and density must be finite, and start must not exceed end.",
-		File: file,
+		File: displayPath,
 		Hint: "Check fog values in World Editor or set valid fog values in settings.",
 	}
 }
 
-func errNoNumber(name string, names []string) error {
+func errUnknownName(name string, names []string) error {
 	return fmt.Errorf("settings: %q has no number in war3map.w3i; the names with one are %q", name, names)
 }

@@ -10,17 +10,17 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-type patcher struct {
-	source    string
-	file      string
-	eol       string
-	functions []lua.Function
-	edits     []lua.Edit
-	failure   error
+type luaPatcher struct {
+	source      string
+	displayPath string
+	eol         string
+	functions   []lua.Function
+	edits       []lua.Edit
+	err         error
 }
 
-func newPatcher(source, file string) (*patcher, error) {
-	functions, err := lua.ParseFunctions(source, file)
+func newPatcher(source, displayPath string) (*luaPatcher, error) {
+	functions, err := lua.ParseFunctions(source, displayPath)
 	if err != nil {
 		return nil, err
 	}
@@ -28,18 +28,18 @@ func newPatcher(source, file string) (*patcher, error) {
 	if strings.Contains(source, "\r\n") {
 		eol = "\r\n"
 	}
-	return &patcher{source: source, file: file, eol: eol, functions: functions}, nil
+	return &luaPatcher{source: source, displayPath: displayPath, eol: eol, functions: functions}, nil
 }
 
-func (p *patcher) refuse(reason error) {
-	if p.failure == nil {
-		p.failure = reason
+func (p *luaPatcher) fail(err error) {
+	if p.err == nil {
+		p.err = err
 	}
 }
 
-func (p *patcher) failed() bool { return p.failure != nil }
+func (p *luaPatcher) hasFailed() bool { return p.err != nil }
 
-func (p *patcher) function(name string) lua.Function {
+func (p *luaPatcher) findFunction(name string) lua.Function {
 	var found []lua.Function
 	for _, function := range p.functions {
 		if function.Name == name {
@@ -47,17 +47,17 @@ func (p *patcher) function(name string) lua.Function {
 		}
 	}
 	switch {
-	case p.failed():
+	case p.hasFailed():
 		return lua.Function{}
 	case len(found) != 1:
-		p.refuse(errFunctionCount(p.file, name, len(found)))
+		p.fail(errFunctionCount(p.displayPath, name, len(found)))
 		return lua.Function{}
 	}
 	return found[0]
 }
 
-func (p *patcher) callsNamed(fn lua.Function, name string, arity int) []lua.Call {
-	if p.failed() {
+func (p *luaPatcher) findCalls(fn lua.Function, name string, arity int) []lua.Call {
+	if p.hasFailed() {
 		return nil
 	}
 	var calls []lua.Call
@@ -66,7 +66,7 @@ func (p *patcher) callsNamed(fn lua.Function, name string, arity int) []lua.Call
 			continue
 		}
 		if len(call.Args) != arity {
-			p.refuse(errArity(p.file, name, fn.Name, arity))
+			p.fail(errArity(p.displayPath, name, fn.Name, arity))
 			return nil
 		}
 		calls = append(calls, call)
@@ -74,38 +74,38 @@ func (p *patcher) callsNamed(fn lua.Function, name string, arity int) []lua.Call
 	return calls
 }
 
-func (p *patcher) one(calls []lua.Call, label string) lua.Call {
+func (p *luaPatcher) requireOne(calls []lua.Call, label string) lua.Call {
 	switch {
-	case p.failed():
+	case p.hasFailed():
 		return lua.Call{}
 	case len(calls) != 1:
-		p.refuse(errNotOne(p.file, label, len(calls)))
+		p.fail(errNotOne(p.displayPath, label, len(calls)))
 		return lua.Call{}
 	}
 	return calls[0]
 }
 
-func (p *patcher) unique(fn lua.Function, name string, arity int) lua.Call {
-	return p.one(p.callsNamed(fn, name, arity), name+" in "+fn.Name+"()")
+func (p *luaPatcher) findOneCall(fn lua.Function, name string, arity int) lua.Call {
+	return p.requireOne(p.findCalls(fn, name, arity), name+" in "+fn.Name+"()")
 }
 
-func (p *patcher) optional(calls []lua.Call, label string) (lua.Call, bool) {
+func (p *luaPatcher) atMostOne(calls []lua.Call, label string) (lua.Call, bool) {
 	switch {
-	case p.failed() || len(calls) == 0:
+	case p.hasFailed() || len(calls) == 0:
 		return lua.Call{}, false
 	case len(calls) > 1:
-		p.refuse(errMoreThanOne(p.file, label, len(calls)))
+		p.fail(errMoreThanOne(p.displayPath, label, len(calls)))
 		return lua.Call{}, false
 	}
 	return calls[0], true
 }
 
-func (p *patcher) forPlayer(fn lua.Function, name string, arity, id int) []lua.Call {
+func (p *luaPatcher) findPlayerCalls(fn lua.Function, name string, arity, id int) []lua.Call {
 	var calls []lua.Call
-	for _, call := range p.callsNamed(fn, name, arity) {
+	for _, call := range p.findCalls(fn, name, arity) {
 		target, ok := lua.ParsePlayerID(call.Args[0])
 		if !ok {
-			p.refuse(errUnknownPlayer(p.file, name, fn.Name))
+			p.fail(errUnknownPlayer(p.displayPath, name, fn.Name))
 			return nil
 		}
 		if target == id {
@@ -115,46 +115,46 @@ func (p *patcher) forPlayer(fn lua.Function, name string, arity, id int) []lua.C
 	return calls
 }
 
-func literalIs(argument []lua.Token, want int) bool {
+func isIntLiteral(argument []lua.Token, want int) bool {
 	value, ok := lua.ParseNumberLiteral(argument)
 	return ok && value == float64(want)
 }
 
-func (p *patcher) replace(call lua.Call, statement string) {
-	if p.failed() {
+func (p *luaPatcher) replace(call lua.Call, statement string) {
+	if p.hasFailed() {
 		return
 	}
-	p.edits = append(p.edits, lua.Edit{Start: call.Start, End: call.End, Text: statement + p.semicolon(call)})
+	p.edits = append(p.edits, lua.Edit{Start: call.Start, End: call.End, Text: statement + p.semicolonAfter(call)})
 }
 
-func (p *patcher) insertAfter(call lua.Call, statements []string) {
-	if p.failed() || len(statements) == 0 {
+func (p *luaPatcher) insertAfter(call lua.Call, statements []string) {
+	if p.hasFailed() || len(statements) == 0 {
 		return
 	}
 	var added strings.Builder
 	for _, statement := range statements {
-		added.WriteString(p.separator(call.Start) + statement + p.semicolon(call))
+		added.WriteString(p.separatorAt(call.Start) + statement + p.semicolonAfter(call))
 	}
 	p.edits = append(p.edits, lua.Edit{Start: call.End, End: call.End, Text: added.String()})
 }
 
-func (p *patcher) insertBefore(at int, statements []string) {
-	if p.failed() || len(statements) == 0 {
+func (p *luaPatcher) insertBefore(at int, statements []string) {
+	if p.hasFailed() || len(statements) == 0 {
 		return
 	}
 	var added strings.Builder
 	for _, statement := range statements {
-		added.WriteString(statement + p.separator(at))
+		added.WriteString(statement + p.separatorAt(at))
 	}
 	p.edits = append(p.edits, lua.Edit{Start: at, End: at, Text: added.String()})
 }
 
-func (p *patcher) remove(call lua.Call) {
-	if p.failed() {
+func (p *luaPatcher) remove(call lua.Call) {
+	if p.hasFailed() {
 		return
 	}
 	rest := restOfLine(p.source[call.End:])
-	_, alone := p.indentation(call.Start)
+	_, alone := p.indentationAt(call.Start)
 	if alone && rest != "" && startsWithName(p.source[call.End+len(rest):]) {
 		p.edits = append(p.edits, lua.Edit{Start: lineStart(p.source, call.Start), End: call.End + len(rest)})
 		return
@@ -162,21 +162,21 @@ func (p *patcher) remove(call lua.Call) {
 	p.edits = append(p.edits, lua.Edit{Start: call.Start, End: call.End, Text: ";"})
 }
 
-func (p *patcher) semicolon(call lua.Call) string {
+func (p *luaPatcher) semicolonAfter(call lua.Call) string {
 	if p.source[call.End-1] == ';' {
 		return ";"
 	}
 	return ""
 }
 
-func (p *patcher) separator(at int) string {
-	if indentation, alone := p.indentation(at); alone {
+func (p *luaPatcher) separatorAt(at int) string {
+	if indentation, alone := p.indentationAt(at); alone {
 		return p.eol + indentation
 	}
 	return " "
 }
 
-func (p *patcher) indentation(at int) (prefix string, blank bool) {
+func (p *luaPatcher) indentationAt(at int) (prefix string, blank bool) {
 	prefix = p.source[lineStart(p.source, at):at]
 	return prefix, strings.Trim(prefix, " \t") == ""
 }
@@ -205,7 +205,7 @@ func startsWithName(text string) bool {
 	return first == '_' || first >= 'A' && first <= 'Z' || first >= 'a' && first <= 'z'
 }
 
-func finite(values ...float32) bool {
+func areFinite(values ...float32) bool {
 	for _, value := range values {
 		if math.IsInf(float64(value), 0) || math.IsNaN(float64(value)) {
 			return false
@@ -218,30 +218,30 @@ const resaveLua = "Re-save the map in World Editor to restore its generated Lua 
 
 const resaveInfo = "Re-save the map in World Editor to restore its map info."
 
-func errLua(file, problem string) error {
-	return errLuaHint(file, problem, resaveLua)
+func errLua(displayPath, problem string) error {
+	return errLuaHint(displayPath, problem, resaveLua)
 }
 
-func errLuaHint(file, problem, hint string) error {
-	return &diag.Error{Msg: "Cannot apply map settings to Lua: " + problem, File: file, Hint: hint}
+func errLuaHint(displayPath, problem, hint string) error {
+	return &diag.Error{Msg: "Cannot apply map settings to Lua: " + problem, File: displayPath, Hint: hint}
 }
 
-func errFunctionCount(file, name string, count int) error {
-	return errLua(file, fmt.Sprintf("expected exactly one global function %s(), found %d.", name, count))
+func errFunctionCount(displayPath, name string, count int) error {
+	return errLua(displayPath, fmt.Sprintf("expected exactly one global function %s(), found %d.", name, count))
 }
 
-func errArity(file, name, function string, arity int) error {
-	return errLua(file, fmt.Sprintf("%s in %s() must have %d argument(s).", name, function, arity))
+func errArity(displayPath, name, function string, arity int) error {
+	return errLua(displayPath, fmt.Sprintf("%s in %s() must have %d argument(s).", name, function, arity))
 }
 
-func errNotOne(file, label string, count int) error {
-	return errLua(file, fmt.Sprintf("expected exactly one direct %s call, found %d.", label, count))
+func errNotOne(displayPath, label string, count int) error {
+	return errLua(displayPath, fmt.Sprintf("expected exactly one direct %s call, found %d.", label, count))
 }
 
-func errMoreThanOne(file, label string, count int) error {
-	return errLua(file, fmt.Sprintf("expected at most one %s call, found %d.", label, count))
+func errMoreThanOne(displayPath, label string, count int) error {
+	return errLua(displayPath, fmt.Sprintf("expected at most one %s call, found %d.", label, count))
 }
 
-func errUnknownPlayer(file, name, function string) error {
-	return errLua(file, fmt.Sprintf("cannot identify the player in a %s call in %s().", name, function))
+func errUnknownPlayer(displayPath, name, function string) error {
+	return errLua(displayPath, fmt.Sprintf("cannot identify the player in a %s call in %s().", name, function))
 }

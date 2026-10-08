@@ -17,101 +17,101 @@ const (
 	skinName = "war3mapSkin.txt"
 )
 
-func Plan(folder *mapdir.Folder, p *manifest.Project) ([]mapdir.Change, error) {
+func Plan(source *mapdir.Folder, p *manifest.Project) ([]mapdir.Change, error) {
 	s := p.Settings
 	misc, skin, err := textSections(s, p.ManifestName)
 	if err != nil {
 		return nil, err
 	}
-	preview, err := previewOf(p)
+	preview, err := loadProjectPreview(p)
 	if err != nil {
 		return nil, err
 	}
-	plan := &planner{folder: folder}
-	if err := plan.roomFor(preview); err != nil {
+	plan := &planner{source: source}
+	if err := plan.checkPreviewFits(preview); err != nil {
 		return nil, err
 	}
-	info, err := plan.mapInfo(s)
+	info, err := plan.planMapInfo(s)
 	if err != nil {
 		return nil, err
 	}
-	if err := plan.lua(s, info, preview != nil); err != nil {
+	if err := plan.planLua(s, info, preview != nil); err != nil {
 		return nil, err
 	}
-	if err := plan.text(miscName, misc); err != nil {
+	if err := plan.planTextFile(miscName, misc); err != nil {
 		return nil, err
 	}
-	if err := plan.text(skinName, skin); err != nil {
+	if err := plan.planTextFile(skinName, skin); err != nil {
 		return nil, err
 	}
-	if err := plan.preview(preview); err != nil {
+	if err := plan.planPreview(preview); err != nil {
 		return nil, err
 	}
 	return plan.changes, nil
 }
 
 type planner struct {
-	folder  *mapdir.Folder
+	source  *mapdir.Folder
 	changes []mapdir.Change
 }
 
-func (p *planner) mapInfo(s manifest.Settings) ([]byte, error) {
-	if !setsInfo(s) {
+func (p *planner) planMapInfo(s manifest.Settings) ([]byte, error) {
+	if !changesInfo(s) {
 		return nil, nil
 	}
-	data, err := p.required(infoName)
+	data, err := p.readRequired(infoName)
 	if err != nil {
 		return nil, err
 	}
-	patched, err := patchInfo(data, s, p.folder.DisplayPath(infoName))
+	patched, err := patchInfo(data, s, p.source.DisplayPath(infoName))
 	if err != nil {
 		return nil, err
 	}
 	if !bytes.Equal(patched, data) {
-		if err := p.write(infoName, patched); err != nil {
+		if err := p.addWrite(infoName, patched); err != nil {
 			return nil, err
 		}
 	}
 	return patched, nil
 }
 
-func (p *planner) lua(s manifest.Settings, patchedInfo []byte, withPreview bool) error {
+func (p *planner) planLua(s manifest.Settings, patchedInfo []byte, withPreview bool) error {
 	if !needsLua(s) && !withPreview {
 		return nil
 	}
-	mark, source, err := p.requiredText(luaName)
+	mark, source, err := p.readRequiredText(luaName)
 	if err != nil {
 		return err
 	}
-	patched, err := p.patchedLua(source, s, patchedInfo, withPreview)
+	patched, err := p.patchLuaSource(source, s, patchedInfo, withPreview)
 	if err != nil || patched == source {
 		return err
 	}
-	return p.write(luaName, []byte(mark+patched))
+	return p.addWrite(luaName, []byte(mark+patched))
 }
 
 func needsLua(s manifest.Settings) bool {
 	return needsDetails(s) || s.Info.Name != nil || s.Info.Description != nil
 }
 
-func (p *planner) patchedLua(source string, s manifest.Settings, patchedInfo []byte, withPreview bool) (string, error) {
-	file := p.folder.DisplayPath(luaName)
-	patched, err := patchLuaAfter(source, s, patchedInfo, file, p.folder.DisplayPath(infoName))
+func (p *planner) patchLuaSource(source string, s manifest.Settings, patchedInfo []byte, withPreview bool) (string, error) {
+	displayPath := p.source.DisplayPath(luaName)
+	patched, err := patchLuaAfter(source, s, patchedInfo, displayPath, p.source.DisplayPath(infoName))
 	if err != nil || !withPreview {
 		return patched, err
 	}
-	return patchMinimap(patched, file)
+	return patchMinimap(patched, displayPath)
 }
 
-func (p *planner) text(name string, sections []txt.Section) error {
-	if !setsKeys(sections) {
+func (p *planner) planTextFile(name string, sections []txt.Section) error {
+	if !hasFields(sections) {
 		return nil
 	}
-	data, _, err := p.folder.Read(name)
+	data, _, err := p.source.Read(name)
 	if err != nil {
 		return err
 	}
-	mark, source, err := p.textOf(name, data)
+	mark, source, err := p.decodeText(name, data)
 	if err != nil {
 		return err
 	}
@@ -119,10 +119,10 @@ func (p *planner) text(name string, sections []txt.Section) error {
 	if merged == source {
 		return nil
 	}
-	return p.write(name, []byte(mark+merged))
+	return p.addWrite(name, []byte(mark+merged))
 }
 
-func setsKeys(sections []txt.Section) bool {
+func hasFields(sections []txt.Section) bool {
 	for _, section := range sections {
 		if len(section.Fields) > 0 {
 			return true
@@ -131,41 +131,41 @@ func setsKeys(sections []txt.Section) bool {
 	return false
 }
 
-func (p *planner) required(name string) ([]byte, error) {
-	data, found, err := p.folder.Read(name)
+func (p *planner) readRequired(name string) ([]byte, error) {
+	data, found, err := p.source.Read(name)
 	switch {
 	case err != nil:
 		return nil, err
 	case found:
 		return data, nil
-	case p.folder.IsDir(name):
-		return nil, errFolderForFile(p.folder.CanonicalPath(name), p.folder.DisplayPath(name))
+	case p.source.IsDir(name):
+		return nil, errIsDir(p.source.CanonicalPath(name), p.source.DisplayPath(name))
 	}
-	return nil, errMissing(p.folder.DisplayPath(name))
+	return nil, errMissing(p.source.DisplayPath(name))
 }
 
-func (p *planner) requiredText(name string) (mark, text string, err error) {
-	data, err := p.required(name)
+func (p *planner) readRequiredText(name string) (mark, text string, err error) {
+	data, err := p.readRequired(name)
 	if err != nil {
 		return "", "", err
 	}
-	return p.textOf(name, data)
+	return p.decodeText(name, data)
 }
 
-func (p *planner) textOf(name string, data []byte) (mark, text string, err error) {
+func (p *planner) decodeText(name string, data []byte) (mark, text string, err error) {
 	mark, text, ok := fsx.SplitBOM(data)
 	if !ok {
-		return "", "", errNotText(p.folder.DisplayPath(name))
+		return "", "", errNotText(p.source.DisplayPath(name))
 	}
 	return mark, text, nil
 }
 
-func (p *planner) write(name string, data []byte) error {
-	return p.change(mapdir.Change{Path: name, Data: data})
+func (p *planner) addWrite(name string, data []byte) error {
+	return p.addChange(mapdir.Change{Path: name, Data: data})
 }
 
-func (p *planner) change(change mapdir.Change) error {
-	placed, err := p.folder.ResolveNewPath(change.Path)
+func (p *planner) addChange(change mapdir.Change) error {
+	placed, err := p.source.ResolveNewPath(change.Path)
 	if err != nil {
 		return err
 	}
@@ -176,19 +176,19 @@ func (p *planner) change(change mapdir.Change) error {
 
 const resaveMap = "Open and re-save the map in World Editor in folder format with Lua as the script language."
 
-func errMissing(file string) error {
-	return &diag.Error{Msg: "A map file needed by the configured settings is missing.", File: file, Hint: resaveMap}
+func errMissing(displayPath string) error {
+	return &diag.Error{Msg: "A map file needed by the configured settings is missing.", File: displayPath, Hint: resaveMap}
 }
 
-func errFolderForFile(folder, file string) error {
+func errIsDir(folder, displayPath string) error {
 	return &diag.Error{
 		Msg:  folder + " in the map is a folder, not a file.",
-		File: file,
+		File: displayPath,
 		Hint: "The map has a folder where a file the configured settings need belongs. Remove that folder from the " +
 			"source map, or open and re-save the map in World Editor.",
 	}
 }
 
-func errNotText(file string) error {
-	return &diag.Error{Msg: "This map file is not valid UTF-8 text.", File: file, Hint: resaveMap}
+func errNotText(displayPath string) error {
+	return &diag.Error{Msg: "This map file is not valid UTF-8 text.", File: displayPath, Hint: resaveMap}
 }

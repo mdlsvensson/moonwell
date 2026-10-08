@@ -11,73 +11,73 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/picture"
 )
 
-func loadPreview(root, preview, manifestFile string) (*picture.Picture, error) {
-	path, err := previewPath(preview, manifestFile)
+func loadPreview(root, preview, manifestName string) (*picture.Picture, error) {
+	path, err := previewPath(preview, manifestName)
 	if err != nil {
 		return nil, err
 	}
-	data, err := readPreview(root, path, manifestFile)
+	data, err := readPreview(root, path, manifestName)
 	if err != nil {
 		return nil, err
 	}
 	return picture.Read(data, path)
 }
 
-func previewPath(preview, manifestFile string) (string, error) {
+func previewPath(preview, manifestName string) (string, error) {
 	path, inside := fsx.CleanRelPath(preview)
 	switch {
 	case !inside:
-		return "", errOutsideProject(manifestFile, preview)
+		return "", errOutsideProject(manifestName, preview)
 	case strings.HasPrefix(strings.ToLower(path), "assets/"):
-		return "", errUnderAssets(manifestFile, path)
+		return "", errUnderAssets(manifestName, path)
 	}
 	return path, nil
 }
 
-func readPreview(root, path, manifestFile string) ([]byte, error) {
-	file, err := fsx.SafeJoin(root, path)
+func readPreview(root, path, manifestName string) ([]byte, error) {
+	displayPath, err := fsx.SafeJoin(root, path)
 	if err != nil {
-		return nil, unreached(err, path, manifestFile)
+		return nil, wrapPreviewError(err, path, manifestName)
 	}
-	info, err := fsx.Lstat(file)
+	info, err := fsx.Lstat(displayPath)
 	switch {
 	case err != nil:
-		return nil, unreached(err, path, manifestFile)
+		return nil, wrapPreviewError(err, path, manifestName)
 	case info == nil:
-		return nil, errNoSuchFile(manifestFile, path)
+		return nil, errNoSuchFile(manifestName, path)
 	case !info.Mode().IsRegular():
-		return nil, errNotAFile(manifestFile, path)
+		return nil, errNotAFile(manifestName, path)
 	}
-	data, err := os.ReadFile(file)
+	data, err := os.ReadFile(displayPath)
 	if err != nil {
 		return nil, errUnreadable(path, err)
 	}
 	return data, nil
 }
 
-func unreached(err error, path, manifestFile string) error {
+func wrapPreviewError(err error, path, manifestName string) error {
 	var expected *diag.Error
 	switch {
 	case errors.As(err, &expected):
 		return err
 	case errors.Is(err, syscall.ENOTDIR):
-		return errNoSuchFile(manifestFile, path)
+		return errNoSuchFile(manifestName, path)
 	}
 	return errUnreachable(path, err)
 }
 
-func errOutsideProject(manifestFile, preview string) error {
+func errOutsideProject(manifestName, preview string) error {
 	return &diag.Error{
 		Msg:  `settings.info.preview must be a path inside the project, not "` + preview + `".`,
-		File: manifestFile,
+		File: manifestName,
 		Hint: `Name a picture in the project folder, such as "preview.tga" beside moonwell.pkl.`,
 	}
 }
 
-func errUnderAssets(manifestFile, path string) error {
+func errUnderAssets(manifestName, path string) error {
 	return &diag.Error{
 		Msg:  "settings.info.preview names a file under assets/: " + path,
-		File: manifestFile,
+		File: manifestName,
 		Hint: "Keep the picture outside assets/, for example beside moonwell.pkl: every file under assets/ is also " +
 			"imported into the map under its own name.",
 	}
@@ -85,18 +85,18 @@ func errUnderAssets(manifestFile, path string) error {
 
 const fromProjectFolder = "The path starts at the project folder, where moonwell.pkl is."
 
-func errNoSuchFile(manifestFile, path string) error {
+func errNoSuchFile(manifestName, path string) error {
 	return &diag.Error{
 		Msg:  "settings.info.preview names a file that does not exist: " + path,
-		File: manifestFile,
+		File: manifestName,
 		Hint: fromProjectFolder,
 	}
 }
 
-func errNotAFile(manifestFile, path string) error {
+func errNotAFile(manifestName, path string) error {
 	return &diag.Error{
 		Msg:  "settings.info.preview does not name a file: " + path,
-		File: manifestFile,
+		File: manifestName,
 		Hint: fromProjectFolder,
 	}
 }

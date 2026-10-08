@@ -90,7 +90,7 @@ func planProject(t testing.TB) string {
 	root := t.TempDir()
 	picture := testkit.NewPixels(256)
 	packed := testkit.TGA(picture, testkit.TGAOptions{RLE: true, Depth: 24, FromTop: true})
-	for _, file := range []struct {
+	for _, displayPath := range []struct {
 		name string
 		data []byte
 	}{
@@ -102,7 +102,7 @@ func planProject(t testing.TB) string {
 		{"art/Preview.PNG", testkit.PNG(picture, "rgba")},
 		{"art/p.png", testkit.PNG(testkit.GreyPixels(256), "grey")},
 	} {
-		testkit.WriteFile(t, root, file.name, file.data)
+		testkit.WriteFile(t, root, displayPath.name, displayPath.data)
 	}
 	return root
 }
@@ -297,7 +297,7 @@ func scriptsWith(t testing.TB, document string, sources []script) recordedScript
 	return made
 }
 
-func refusedAt(file string) string { return "refused: " + file }
+func refusedAt(displayPath string) string { return "refused: " + displayPath }
 
 func madeOf(source script, text string) string {
 	if text == source.text {

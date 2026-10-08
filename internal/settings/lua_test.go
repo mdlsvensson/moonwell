@@ -171,7 +171,7 @@ func TestSetsLuaIsTrueForTheSettingsWithACounterpartInTheScript(t *testing.T) {
 		`{"info":{"author":"A"},"loadingScreen":{"title":"T"},"environment":{"fog":{"enabled":false}}}`:       true,
 		`{"info":{"name":null,"description":null},"players":{"0":{"x":null}},"forces":{"0":{"allied":null}}}`: false,
 	} {
-		if got := setsLua(settingsOf(t, document)); got != want {
+		if got := changesLua(settingsOf(t, document)); got != want {
 			t.Errorf("setsLua(%s) = %v, want %v", document, got, want)
 		}
 	}

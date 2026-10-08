@@ -119,8 +119,8 @@ func TestNamesThatDifferOnlyInLetterCaseAreRefusedByTheManifest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := settingsOf(t, tt.document)
-			_, constantsErr := sections(s.GameplayConstants, "settings.gameplayConstants", manifestName)
-			_, interfaceErr := sections(s.GameInterface, "settings.gameInterface", manifestName)
+			_, constantsErr := toSections(s.GameplayConstants, "settings.gameplayConstants", manifestName)
+			_, interfaceErr := toSections(s.GameInterface, "settings.gameInterface", manifestName)
 			if (constantsErr == nil) == (interfaceErr == nil) {
 				t.Fatalf("the constants give %v and the interface %v, want one refusal", constantsErr, interfaceErr)
 			}
@@ -174,7 +174,7 @@ func TestTheSectionsOfBothTextFilesComeTogether(t *testing.T) {
 
 func TestSectionsKeepTheOrderWrittenAndASectionWithoutKeys(t *testing.T) {
 	s := settingsOf(t, `{"gameInterface":{"B":{"z":"1","a":"2"},"A":{},"C":{"k":""}}}`)
-	got, err := sections(s.GameInterface, "settings.gameInterface", manifestName)
+	got, err := toSections(s.GameInterface, "settings.gameInterface", manifestName)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -10,85 +10,85 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-func patchLuaAfter(source string, s manifest.Settings, patchedInfo []byte, file, infoLabel string) (string, error) {
-	if !setsLua(s) {
+func patchLuaAfter(source string, s manifest.Settings, patchedInfo []byte, displayPath, infoLabel string) (string, error) {
+	if !changesLua(s) {
 		return source, nil
 	}
-	info, err := w3i.Read(patchedInfo, infoLabel, depthFor(s))
+	info, err := w3i.Read(patchedInfo, infoLabel, readDepthFor(s))
 	if err != nil {
 		return "", err
 	}
-	return patchLua(source, s, info, file)
+	return patchLua(source, s, info, displayPath)
 }
 
-func patchLua(source string, s manifest.Settings, info *w3i.Info, file string) (string, error) {
+func patchLua(source string, s manifest.Settings, info *w3i.Info, displayPath string) (string, error) {
 	if info == nil || info.Details == nil && needsDetails(s) {
-		return "", errNoMapInfo(file)
+		return "", errNoMapInfo(displayPath)
 	}
-	p, err := newPatcher(source, file)
+	p, err := newPatcher(source, displayPath)
 	if err != nil {
 		return "", err
 	}
-	p.nameAndDescription(s.Info, info)
-	p.players(s.Players, info.Details)
-	p.forces(s.Forces, info.Details)
-	p.environment(s.Environment, info)
-	if p.failure != nil {
-		return "", p.failure
+	p.patchNameAndDescription(s.Info, info)
+	p.patchPlayers(s.Players, info.Details)
+	p.patchForces(s.Forces, info.Details)
+	p.patchEnvironment(s.Environment, info)
+	if p.err != nil {
+		return "", p.err
 	}
-	return p.edited()
+	return p.result()
 }
 
-func setsLua(s manifest.Settings) bool {
-	return s.Info.Name != nil || s.Info.Description != nil || anySet(s.Players) || len(flagged(s.Forces)) > 0 ||
+func changesLua(s manifest.Settings) bool {
+	return s.Info.Name != nil || s.Info.Description != nil || hasOverrides(s.Players) || len(forcesWithFlags(s.Forces)) > 0 ||
 		s.Environment != (manifest.Environment{})
 }
 
-func (p *patcher) nameAndDescription(set manifest.Info, info *w3i.Info) {
+func (p *luaPatcher) patchNameAndDescription(set manifest.Info, info *w3i.Info) {
 	if set.Name != nil {
-		p.text("SetMapName", info.Name.Value)
+		p.setTextCall("SetMapName", info.Name.Value)
 	}
 	if set.Description != nil {
-		p.text("SetMapDescription", info.Description.Value)
+		p.setTextCall("SetMapDescription", info.Description.Value)
 	}
 }
 
-func (p *patcher) text(native, value string) {
-	p.replace(p.unique(p.function("config"), native, 1), native+"("+lua.QuoteString(value)+")")
+func (p *luaPatcher) setTextCall(native, value string) {
+	p.replace(p.findOneCall(p.findFunction("config"), native, 1), native+"("+lua.QuoteString(value)+")")
 }
 
-func (p *patcher) edited() (string, error) {
+func (p *luaPatcher) result() (string, error) {
 	result, err := lua.ApplyEdits(p.source, p.edits)
 	if err != nil {
-		return "", fmt.Errorf("patching %s: %w", p.file, err)
+		return "", fmt.Errorf("patching %s: %w", p.displayPath, err)
 	}
-	if _, err := lua.ParseFunctions(result, p.file); err != nil {
-		return "", errUnsafeEdit(p.file, err)
+	if _, err := lua.ParseFunctions(result, p.displayPath); err != nil {
+		return "", errUnsafeEdit(p.displayPath, err)
 	}
 	return result, nil
 }
 
-func patchMinimap(source, file string) (string, error) {
-	p, err := newPatcher(source, file)
+func patchMinimap(source, displayPath string) (string, error) {
+	p, err := newPatcher(source, displayPath)
 	if err != nil {
 		return "", err
 	}
-	p.insertBefore(p.function("main").EndStart, []string{"BlzChangeMinimapTerrainTex(" + lua.QuoteString(keptMinimap) + ")"})
-	if p.failure != nil {
-		return "", p.failure
+	p.insertBefore(p.findFunction("main").EndStart, []string{"BlzChangeMinimapTerrainTex(" + lua.QuoteString(keptMinimap) + ")"})
+	if p.err != nil {
+		return "", p.err
 	}
-	return p.edited()
+	return p.result()
 }
 
-func errUnsafeEdit(file string, cause error) error {
+func errUnsafeEdit(displayPath string, cause error) error {
 	return &diag.Error{
 		Msg:   "Cannot apply map settings to Lua: the edited script could not be read back safely.",
-		File:  file,
+		File:  displayPath,
 		Hint:  resaveLua,
 		Cause: cause,
 	}
 }
 
-func errNoMapInfo(file string) error {
-	return errors.New("patching " + file + ": the map info was not read as far as the settings need")
+func errNoMapInfo(displayPath string) error {
+	return errors.New("patching " + displayPath + ": the map info was not read as far as the settings need")
 }

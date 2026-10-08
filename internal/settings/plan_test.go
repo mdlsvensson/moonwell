@@ -51,13 +51,13 @@ func planned(t testing.TB, dir, root, document string) []mapdir.Change {
 	return changes
 }
 
-func refusedPlan(t testing.TB, dir, root, document, file string) *diag.Error {
+func refusedPlan(t testing.TB, dir, root, document, displayPath string) *diag.Error {
 	t.Helper()
 	before := testkit.Snapshot(t, dir)
 	changes, err := planIn(t, dir, root, document)
 	failure := asError(t, err, document)
-	if failure.File != file || failure.Hint == "" || changes != nil {
-		t.Errorf("%s: the refusal names %q, want %q, with %d changes: %+v", document, failure.File, file, len(changes), failure)
+	if failure.File != displayPath || failure.Hint == "" || changes != nil {
+		t.Errorf("%s: the refusal names %q, want %q, with %d changes: %+v", document, failure.File, displayPath, len(changes), failure)
 	}
 	if !reflect.DeepEqual(testkit.Snapshot(t, dir), before) {
 		t.Errorf("%s: a refused plan changed the map folder", document)
@@ -638,7 +638,7 @@ func TestAPreviewThatIsNoUsablePictureIsRefusedBeforeAMapFileIsRead(t *testing.T
 	_, root := withPreview(t, "preview.tga", plainTGA())
 	testkit.WriteFile(t, root, "small.tga", plainTGA()[:100])
 	folders := refusingMaps(t)
-	tests := []struct{ path, words, file string }{
+	tests := []struct{ path, words, displayPath string }{
 		{"missing.tga", "settings.info.preview names a file that does not exist: missing.tga", manifestName},
 		{"../preview.tga", "settings.info.preview must be a path inside the project", manifestName},
 		{"small.tga", "The preview picture is cut short", "small.tga"},
@@ -647,8 +647,8 @@ func TestAPreviewThatIsNoUsablePictureIsRefusedBeforeAMapFileIsRead(t *testing.T
 		for _, folder := range folders {
 			changes, err := Plan(folder, projectOf(t, root, `{"info":{"name":"N","preview":`+strconv.Quote(tt.path)+`}}`))
 			failure := asError(t, err, tt.path)
-			if !strings.Contains(failure.Msg, tt.words) || failure.File != tt.file || failure.Hint == "" || changes != nil {
-				t.Errorf("preview %q: %+v, want %q naming %s", tt.path, failure, tt.words, tt.file)
+			if !strings.Contains(failure.Msg, tt.words) || failure.File != tt.displayPath || failure.Hint == "" || changes != nil {
+				t.Errorf("preview %q: %+v, want %q naming %s", tt.path, failure, tt.words, tt.displayPath)
 			}
 		}
 	}

@@ -25,10 +25,10 @@ func TestAPreviewOfEachKindIsReadFromItsPathInTheProject(t *testing.T) {
 	asTGA := testkit.TGA(picture, testkit.TGAOptions{Alpha: opaque()})
 	blp := testkit.BLP(256, 1)
 	tests := []struct {
-		name, file, preview string
-		data                []byte
-		extension           string
-		want                []byte
+		name, displayPath, preview string
+		data                       []byte
+		extension                  string
+		want                       []byte
 	}{
 		{"a BLP beside the manifest goes in as it is", "preview.blp", "preview.blp", blp, "blp", blp},
 		{"a TGA in a folder, named in capitals, is written again", "art/Preview.TGA", "art/Preview.TGA",
@@ -40,7 +40,7 @@ func TestAPreviewOfEachKindIsReadFromItsPathInTheProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
-			testkit.WriteFile(t, root, tt.file, tt.data)
+			testkit.WriteFile(t, root, tt.displayPath, tt.data)
 			got, err := loadPreview(root, tt.preview, manifestName)
 			if err != nil {
 				t.Fatal(err)
@@ -65,7 +65,7 @@ func TestAPreviewSettingThatNamesNoUsablePictureIsRefused(t *testing.T) {
 	inside := func(preview string) string {
 		return `settings.info.preview must be a path inside the project, not "` + preview + `".`
 	}
-	tests := []struct{ name, preview, words, file string }{
+	tests := []struct{ name, preview, words, displayPath string }{
 		{"a file that is not there", "missing.tga", "settings.info.preview names a file that does not exist: missing.tga", manifestName},
 		{"a file in a folder that is not there", "art/preview.tga", "names a file that does not exist: art/preview.tga", manifestName},
 		{"a folder", "folder.tga", "settings.info.preview does not name a file: folder.tga", manifestName},
@@ -84,8 +84,8 @@ func TestAPreviewSettingThatNamesNoUsablePictureIsRefused(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := loadPreview(root, tt.preview, manifestName)
 			failure := asError(t, err, tt.preview)
-			if !strings.Contains(failure.Msg, tt.words) || failure.File != tt.file || failure.Hint == "" {
-				t.Errorf("error = %+v, want %q naming %s", failure, tt.words, tt.file)
+			if !strings.Contains(failure.Msg, tt.words) || failure.File != tt.displayPath || failure.Hint == "" {
+				t.Errorf("error = %+v, want %q naming %s", failure, tt.words, tt.displayPath)
 			}
 		})
 	}
@@ -119,7 +119,7 @@ func TestAFailureOnTheWayToThePreviewIsToldAsWhatTheUserCanFix(t *testing.T) {
 		return &fs.PathError{Op: "lstat", Path: filepath.Join("project", "art", "preview.tga"), Err: reason}
 	}
 	t.Run("a file where the path needs a folder", func(t *testing.T) {
-		failure := asError(t, unreached(failed(syscall.ENOTDIR), path, manifestName), "not a directory")
+		failure := asError(t, wrapPreviewError(failed(syscall.ENOTDIR), path, manifestName), "not a directory")
 		if !strings.Contains(failure.Msg, "names a file that does not exist: "+path) || failure.File != manifestName ||
 			failure.Hint == "" {
 			t.Errorf("error = %+v", failure)
@@ -127,7 +127,7 @@ func TestAFailureOnTheWayToThePreviewIsToldAsWhatTheUserCanFix(t *testing.T) {
 	})
 	t.Run("a folder that may not be entered", func(t *testing.T) {
 		cause := failed(syscall.EACCES)
-		failure := asError(t, unreached(cause, path, manifestName), "permission denied")
+		failure := asError(t, wrapPreviewError(cause, path, manifestName), "permission denied")
 		if !strings.Contains(failure.Msg, "Reading the preview picture failed: ") || failure.File != path ||
 			failure.Cause != cause {
 			t.Errorf("error = %+v", failure)
@@ -138,7 +138,7 @@ func TestAFailureOnTheWayToThePreviewIsToldAsWhatTheUserCanFix(t *testing.T) {
 	})
 	t.Run("a link", func(t *testing.T) {
 		link := fsx.NewSymlinkError(filepath.Join("project", "art"))
-		if got := unreached(link, path, manifestName); got != link {
+		if got := wrapPreviewError(link, path, manifestName); got != link {
 			t.Errorf("error = %v, want the link's own", got)
 		}
 	})
