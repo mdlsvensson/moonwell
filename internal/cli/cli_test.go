@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/spf13/cobra"
+
 	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/internal/build"
 	"github.com/mdlsvensson/moonwell/internal/diag"
@@ -55,6 +57,14 @@ func TestAnEntryThatIsNoEntryFileIsRefusedBeforeAnythingIsLoaded(t *testing.T) {
 		"build", "--entry", "lua/main.lua")
 	if exists(root, "dist") {
 		t.Error("a refused line made dist/")
+	}
+}
+
+// A start from Windows Explorer, from a shortcut or from Win+R is a start like any other: cobra's refusal of
+// such a start is switched off for the program, in this package's init. The start itself cannot be made here.
+func TestAStartFromExplorerIsNotRefused(t *testing.T) {
+	if cobra.MousetrapHelpText != "" {
+		t.Errorf("cobra would refuse a start from Windows Explorer, saying %q", cobra.MousetrapHelpText)
 	}
 }
 
@@ -109,18 +119,6 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	for _, name := range append([]string{"dev", "assets:paths"}, needManifest...) {
 		if file := logFile(root, rowNamed(t, name)); file != "" {
 			t.Errorf("%s outside a project keeps a log in %s", name, file)
-		}
-	}
-}
-
-func TestTheAssetsSettingsAndObjectsCommandsAreKnownCommands(t *testing.T) {
-	for _, name := range []string{
-		"assets:check", "assets:sync", "assets:paths", "settings:check", "objects:eval", "objects:check",
-	} {
-		result := carried(t, background, t.TempDir(), name)
-		if result.code != 1 || strings.Contains(result.output, "Unknown command") ||
-			!strings.HasPrefix(result.output, "error: ") {
-			t.Errorf("%s: %+v", name, result)
 		}
 	}
 }

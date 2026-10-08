@@ -160,8 +160,8 @@ A format package takes bytes and returns bytes or values. It knows nothing of pr
   program and reach the network. (`internal/fsx` is let off for `os/exec`: it names one error type of it and starts
   nothing.) Test files and the two test-only packages may import both: `internal/testkit/tools.go` looks for `pkl`
   with `os/exec`.
-- Only `internal/cli` imports `cobra` and `pflag`, the modules that read a command line: no other package knows
-  how a line is read.
+- Only `internal/cli` imports `cobra`, `pflag` and `mousetrap`, the modules that read a command line: no other
+  package knows how a line is read.
 - The two test-only packages are imported by test files alone. A test file follows the rule of its package, and may
   also import its own package and the two test-only packages.
 - The root package is under no rule. A package below `internal/` may import it for the embedded files and the
@@ -190,9 +190,9 @@ Follow `moonwell build --minify`:
    - `tree` makes the command line as `cobra` reads it: a `cobra` command for each row of the table `commands`. A
      row has the name, the help text, how many arguments the command takes, the flags it has, and the function
      that runs it.
-   - `cobra` reads the line. It answers `--help` and `--version` itself, and so the commands `help` and
-     `completion`, which are its own. A line it cannot read is refused in `cobra`'s words, printed as every failure
-     of Moonwell is, and nothing runs.
+   - `cobra` reads the line. It answers `--help` itself, and so the commands `help` and `completion`, which are
+     its own; `moonwell --version` is answered by the function of `moonwell` in `tree`. A line `cobra` cannot
+     read is refused in its words, printed as every failure of Moonwell is, and nothing runs.
    - For a line that names a row, `run` refuses an `--entry` that is no `.yue` file under `src/`, and then makes a
      logger and the outside world: `env.NewLogger` and `env.New`. In a project the logger also writes
      `dist/moonwell.log`.
@@ -356,7 +356,7 @@ or starts anything by accident.
 Files are not behind `Env`. Every package reads and writes them directly, with `os` and `internal/fsx`, and a test
 gives it a temporary folder. The program reads environment variables in two places: `internal/env/cache.go`, for the
 cache folder (`MOONWELL_CACHE`, else the system's own variables), and `internal/toolchain/install.go`, for
-`SystemRoot`, to find `tar.exe` on Windows.
+`SystemRoot`, to find `tar.exe` on Windows. `cobra` reads a few of its own while a shell asks it for completions.
 
 ## Errors
 

@@ -603,6 +603,8 @@ add this line to your profile (`notepad $PROFILE`):
 moonwell completion powershell | Out-String | Invoke-Expression
 ```
 
+If PowerShell has no profile yet, make the file first: `if (!(Test-Path $PROFILE)) { New-Item -Force $PROFILE }`.
+
 The compiler, and Pkl when Moonwell needs its own, are downloaded once per version and verified by checksum. They are
 cached in `MOONWELL_CACHE` when that is set, else in `%LOCALAPPDATA%\moonwell` on Windows, else in
 `$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`. `setup` also copies Moonwell's own Pkl to that folder's `bin`.
