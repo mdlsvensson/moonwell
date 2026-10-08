@@ -660,7 +660,7 @@ func TestAPreviewThatIsNoUsablePictureIsRefusedBeforeAMapFileIsRead(t *testing.T
 
 func TestAPreviewCannotBePlannedForAProjectWithoutItsFolder(t *testing.T) {
 	changes, err := Plan(openMap(t, t.TempDir()), projectOf(t, "", previewAt("preview.tga")))
-	_, expected := diag.First(err)
+	_, expected := diag.FirstProblem(err)
 	if err == nil || expected || !strings.Contains(err.Error(), "needs the project folder") || changes != nil {
 		t.Errorf("error = %v, want one that is not a diag error", err)
 	}

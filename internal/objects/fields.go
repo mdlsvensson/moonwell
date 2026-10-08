@@ -70,7 +70,7 @@ func (s *subject) entries() []entry {
 		}
 	}
 	for key, value := range s.object.Properties.All() {
-		route := "properties[" + fsx.Quoted(key) + "]"
+		route := "properties[" + fsx.QuoteJSON(key) + "]"
 		if field := s.propertyField(key); field != nil {
 			kept.add(field, "."+route, route, value)
 		} else {

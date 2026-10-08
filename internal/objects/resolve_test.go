@@ -212,7 +212,7 @@ func TestResolveReportsEveryProblemInOrderEachWithItsFile(t *testing.T) {
 			t.Errorf("problem %d = %+v, want %+v", i+1, p, w)
 		}
 	}
-	first, _ := diag.First(found)
+	first, _ := diag.FirstProblem(found)
 	if first.File != "objects/heroes.pkl" || found.Error() != found[0].Msg {
 		t.Errorf("the first problem = %+v", first)
 	}

@@ -100,7 +100,7 @@ func rulesOf(exclude []string) ([]rule, error) {
 		if strings.HasSuffix(value, "/") || strings.HasSuffix(value, `\`) {
 			name, folder = value[:len(value)-1], true
 		}
-		path, ok := fsx.RelPath(name)
+		path, ok := fsx.CleanRelPath(name)
 		if !ok {
 			return nil, errInvalidPath(name)
 		}
@@ -127,7 +127,7 @@ func (c *collection) mappings(paths manifest.Ordered[string], files []string, ru
 	}
 	mapped := map[string]string{}
 	for source, target := range paths.All() {
-		path, ok := fsx.RelPath(source)
+		path, ok := fsx.CleanRelPath(source)
 		if !ok {
 			return nil, c.inBlock(errInvalidPath(source))
 		}
@@ -200,7 +200,7 @@ func labelOf(root, dir string) string {
 }
 
 func refuseLinked(dir, label string) error {
-	if info, err := fsx.Lstat(dir); err == nil && info != nil && fsx.IsLink(info) {
+	if info, err := fsx.Lstat(dir); err == nil && info != nil && fsx.IsSymlink(info) {
 		return errLinkedFolder(dir, label)
 	}
 	return nil
@@ -234,11 +234,11 @@ func inLibrary(err error, library, label string) error {
 }
 
 func open(dir, label string) (*mapdir.Folder, error) {
-	if info, err := fsx.Lstat(dir); err == nil && info != nil && !info.IsDir() && !fsx.IsLink(info) {
+	if info, err := fsx.Lstat(dir); err == nil && info != nil && !info.IsDir() && !fsx.IsSymlink(info) {
 		return nil, errNotAFolder(label)
 	}
 	folder, err := mapdir.Open(dir, label)
-	if _, expected := diag.First(err); !expected && errors.Is(err, fs.ErrNotExist) {
+	if _, expected := diag.FirstProblem(err); !expected && errors.Is(err, fs.ErrNotExist) {
 		return nil, nil
 	}
 	return folder, err
@@ -323,7 +323,7 @@ func errTwoLibraries(manifestFile, first, second, target string) error {
 }
 
 func errLinkedFolder(dir, label string) error {
-	err := fsx.LinkError(dir)
+	err := fsx.NewSymlinkError(dir)
 	var failure *diag.Error
 	if errors.As(err, &failure) {
 		failure.File = label

@@ -12,7 +12,7 @@ import (
 const MacrosFile = ".moonwell/yue/moonwell/macros.yue"
 
 func RefreshMacros(root string) (wrote bool, err error) {
-	file, err := fsx.Inside(root, MacrosFile)
+	file, err := fsx.SafeJoinNoSymlinks(root, MacrosFile)
 	if err != nil {
 		return false, err
 	}

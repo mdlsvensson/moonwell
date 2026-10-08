@@ -21,7 +21,7 @@ func RefreshLibraryView(root string, sources []script.Source,
 	if err != nil {
 		return nil, err
 	}
-	dir, err := fsx.Inside(root, LibraryViewDir)
+	dir, err := fsx.SafeJoinNoSymlinks(root, LibraryViewDir)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func isPlainFile(dir, file string) (bool, error) {
 	if err != nil {
 		return false, errViewNotRead(path.Join(LibraryViewDir, file), err)
 	}
-	return info != nil && !fsx.IsLink(info), nil
+	return info != nil && !fsx.IsSymlink(info), nil
 }
 
 func removeEmptyFolders(dir string) error {
@@ -142,7 +142,7 @@ func emptyFolders(dir string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		below = fsx.ToPosix(below)
+		below = fsx.ToSlash(below)
 		if entry.IsDir() {
 			folders = append(folders, below)
 			return nil

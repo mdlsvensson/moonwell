@@ -39,7 +39,7 @@ func Source(p *manifest.Project) (*mapdir.Folder, error) {
 		return nil, err
 	}
 	label := mapsDir + "/" + folder
-	dir, err := fsx.Inside(p.Root, label)
+	dir, err := fsx.SafeJoinNoSymlinks(p.Root, label)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func readFolder(written string) (parts []string, fault folderFault) {
 }
 
 func everySystemHolds(parts []string) bool {
-	_, portable := fsx.RelPath(strings.Join(parts, "/"))
+	_, portable := fsx.CleanRelPath(strings.Join(parts, "/"))
 	return portable
 }
 
@@ -145,10 +145,10 @@ func shippingLibraries(root string, synced []library.Synced) ([]assets.Library, 
 		if lib.Assets == "" {
 			continue
 		}
-		if _, err := fsx.Inside(root, lib.Assets); err != nil {
+		if _, err := fsx.SafeJoinNoSymlinks(root, lib.Assets); err != nil {
 			return nil, err
 		}
-		below, _ := fsx.RelPath(lib.Assets)
+		below, _ := fsx.CleanRelPath(lib.Assets)
 		shipping = append(shipping, assets.Library{Key: lib.Key, Dir: filepath.Join(root, filepath.FromSlash(below))})
 	}
 	return shipping, nil

@@ -54,7 +54,7 @@ func declarationsOf(in Types) []declarations {
 }
 
 func (d declarations) refresh(root string) (wrote bool, err error) {
-	file, err := fsx.Inside(root, d.path)
+	file, err := fsx.SafeJoinNoSymlinks(root, d.path)
 	if err != nil {
 		return false, err
 	}

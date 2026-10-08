@@ -246,7 +246,7 @@ func capitalize(word string) string {
 }
 
 func keepsReleasedNames(metadata *objects.Metadata, checkout string, pins overrides) error {
-	data, found, err := fsx.ReadIfThere(fileIn(checkout, metadataPath))
+	data, found, err := fsx.ReadFileIfExists(fileIn(checkout, metadataPath))
 	switch {
 	case err != nil:
 		return errInCheckout(checkout, metadataPath, err)
@@ -308,7 +308,7 @@ func noSuchList(key, list string) string {
 }
 
 func pinOfNoField(list, id string) string {
-	return "the pin of " + fsx.Quoted(id) + " under names." + list + " names no field: no field of " +
+	return "the pin of " + fsx.QuoteJSON(id) + " under names." + list + " names no field: no field of " +
 		strings.Join(oneTable(list), " or ") + " has that id; correct the id or take the pin out of " + overridesPath
 }
 
@@ -328,7 +328,7 @@ func noFriendlyName(list string, field objects.FieldMeta, pinned bool) string {
 	if pinned {
 		return line + "the pin is refused: " + why + "in " + overridesPath
 	}
-	return line + why + `under "names", ` + fsx.Quoted(list) + ", " + fsx.Quoted(displayRawcode(field.ID)) +
+	return line + why + `under "names", ` + fsx.QuoteJSON(list) + ", " + fsx.QuoteJSON(displayRawcode(field.ID)) +
 		" in " + overridesPath
 }
 

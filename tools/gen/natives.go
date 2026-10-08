@@ -167,26 +167,26 @@ func sortByName(natives *script.Natives) {
 
 func renderNatives(natives *script.Natives) string {
 	return jsonObject(
-		member{"gameVersion", fsx.Quoted(natives.GameVersion)},
+		member{"gameVersion", fsx.QuoteJSON(natives.GameVersion)},
 		member{"types", jsonList(natives.Types, renderType)},
 		member{"functions", jsonList(natives.Functions, renderFunction)},
 		member{"globals", jsonList(natives.Globals, renderGlobal)},
 		member{"lua", jsonObject(
-			member{"globals", jsonList(natives.Lua.Globals, fsx.Quoted)},
-			member{"removed", jsonList(natives.Lua.Removed, fsx.Quoted)},
+			member{"globals", jsonList(natives.Lua.Globals, fsx.QuoteJSON)},
+			member{"removed", jsonList(natives.Lua.Removed, fsx.QuoteJSON)},
 		)},
 	) + "\n"
 }
 
 func renderType(declared script.NativeType) string {
-	return jsonObject(member{"name", fsx.Quoted(declared.Name)}, member{"extends", fsx.Quoted(declared.Extends)})
+	return jsonObject(member{"name", fsx.QuoteJSON(declared.Name)}, member{"extends", fsx.QuoteJSON(declared.Extends)})
 }
 
 func renderFunction(function script.NativeFunction) string {
-	name := member{"name", fsx.Quoted(function.Name)}
-	source := member{"source", fsx.Quoted(function.Source)}
+	name := member{"name", fsx.QuoteJSON(function.Name)}
+	source := member{"source", fsx.QuoteJSON(function.Source)}
 	constant := member{"constant", strconv.FormatBool(function.Constant)}
-	returns := member{"returns", fsx.Quoted(function.Returns)}
+	returns := member{"returns", fsx.QuoteJSON(function.Returns)}
 	if function.Source == luaSource {
 		return jsonObject(name, member{"params", jsonList(function.Params, nameThenType)}, returns, source, constant)
 	}
@@ -194,18 +194,18 @@ func renderFunction(function script.NativeFunction) string {
 }
 
 func nameThenType(param script.NativeParam) string {
-	return jsonObject(member{"name", fsx.Quoted(param.Name)}, member{"type", fsx.Quoted(param.Type)})
+	return jsonObject(member{"name", fsx.QuoteJSON(param.Name)}, member{"type", fsx.QuoteJSON(param.Type)})
 }
 
 func typeThenName(param script.NativeParam) string {
-	return jsonObject(member{"type", fsx.Quoted(param.Type)}, member{"name", fsx.Quoted(param.Name)})
+	return jsonObject(member{"type", fsx.QuoteJSON(param.Type)}, member{"name", fsx.QuoteJSON(param.Name)})
 }
 
 func renderGlobal(global script.NativeGlobal) string {
 	return jsonObject(
-		member{"name", fsx.Quoted(global.Name)},
-		member{"source", fsx.Quoted(global.Source)},
-		member{"type", fsx.Quoted(global.Type)},
+		member{"name", fsx.QuoteJSON(global.Name)},
+		member{"source", fsx.QuoteJSON(global.Source)},
+		member{"type", fsx.QuoteJSON(global.Type)},
 		member{"constant", strconv.FormatBool(global.Constant)},
 		member{"array", strconv.FormatBool(global.Array)},
 	)
@@ -216,7 +216,7 @@ type member struct{ key, value string }
 func jsonObject(members ...member) string {
 	entries := make([]string, len(members))
 	for i, m := range members {
-		entries[i] = fsx.Quoted(m.key) + ": " + m.value
+		entries[i] = fsx.QuoteJSON(m.key) + ": " + m.value
 	}
 	return jsonBlock("{", entries, "}")
 }

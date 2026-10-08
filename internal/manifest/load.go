@@ -112,7 +112,7 @@ func evaluate(ctx context.Context, e *env.Env, pkl, file string) (string, error)
 	if err != nil {
 		return "", err
 	}
-	if result.Code != 0 {
+	if result.ExitCode != 0 {
 		return "", errEvaluation(file, cmp.Or(result.Stderr, result.Stdout))
 	}
 	var value json.RawMessage

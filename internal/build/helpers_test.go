@@ -195,7 +195,7 @@ func (s *standIn) yue(args []string, _ env.RunOptions) (env.RunResult, error) {
 	case lists:
 		return env.RunResult{Stdout: listing}, nil
 	case refusal != "":
-		return env.RunResult{Code: 1, Stdout: refusal}, nil
+		return env.RunResult{ExitCode: 1, Stdout: refusal}, nil
 	}
 	output := args[slices.Index(args, "-o")+1]
 	return env.RunResult{}, os.WriteFile(output, []byte(compiledLua), 0o666)

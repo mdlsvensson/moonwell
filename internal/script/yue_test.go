@@ -89,7 +89,7 @@ func (b *bench) fake(answers map[string]answer) {
 				return env.RunResult{}, err
 			}
 		}
-		return env.RunResult{Code: does.code, Stdout: does.stdout, Stderr: does.stderr}, nil
+		return env.RunResult{ExitCode: does.code, Stdout: does.stdout, Stderr: does.stderr}, nil
 	})
 }
 

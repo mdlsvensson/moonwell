@@ -109,7 +109,7 @@ func seeded(t *testing.T, standIns ...string) seededWorld {
 		case program == toolchain.Pkl.Name:
 			return env.Run(ctx, program, args, options)
 		case asked && program == toolchain.YueScript.Name:
-			return env.RunResult{}, env.SpawnError(program, exec.ErrNotFound, options.Hint, "")
+			return env.RunResult{}, env.NewSpawnError(program, exec.ErrNotFound, options.Hint, "")
 		case asked && slices.Contains(reporting, program):
 			return env.RunResult{Stdout: "Yuescript version: " + toolchain.YueVersion + "\n"}, nil
 		}

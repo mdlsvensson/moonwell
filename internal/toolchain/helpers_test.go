@@ -34,7 +34,7 @@ func prints(stdout string) env.RunFunc {
 func yueOf(version string) env.RunFunc { return prints("Yuescript version: " + version + "\n") }
 
 func missing(_ context.Context, program string, _ []string, options env.RunOptions) (env.RunResult, error) {
-	return env.RunResult{}, env.SpawnError(program, fs.ErrNotExist, options.Hint, "")
+	return env.RunResult{}, env.NewSpawnError(program, fs.ErrNotExist, options.Hint, "")
 }
 
 func interrupted(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
@@ -112,7 +112,7 @@ func pathAndPinned(onPath, downloaded string) env.RunFunc {
 		case program != "pkl":
 			return env.RunResult{Stdout: downloaded}, nil
 		case onPath == "":
-			return env.RunResult{}, env.SpawnError(program, fs.ErrNotExist, options.Hint, "")
+			return env.RunResult{}, env.NewSpawnError(program, fs.ErrNotExist, options.Hint, "")
 		}
 		return env.RunResult{Stdout: onPath}, nil
 	}

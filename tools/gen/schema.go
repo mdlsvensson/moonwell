@@ -124,7 +124,7 @@ func unusableNames(module string, fields []objects.FieldMeta) []string {
 	var problems []string
 	latest := map[string]objects.FieldMeta{}
 	for _, field := range fields {
-		where := module + ": field " + fsx.Quoted(displayRawcode(field.ID)) + " (" + field.Label + ")"
+		where := module + ": field " + fsx.QuoteJSON(displayRawcode(field.ID)) + " (" + field.Label + ")"
 		if !pklIdentifier.MatchString(field.Name) || nameIsTaken(field.Name) {
 			problems = append(problems, noPropertyName(where, field.Name))
 		}
@@ -204,9 +204,9 @@ func errUnusableNames(problems []string) error {
 }
 
 func noPropertyName(where, name string) string {
-	return where + " has the name " + fsx.Quoted(name) + ", which is reserved or not a Pkl identifier."
+	return where + " has the name " + fsx.QuoteJSON(name) + ", which is reserved or not a Pkl identifier."
 }
 
 func sharedName(where, name string, other objects.FieldMeta) string {
-	return where + " has the name " + fsx.Quoted(name) + ", as does field " + fsx.Quoted(displayRawcode(other.ID)) + "."
+	return where + " has the name " + fsx.QuoteJSON(name) + ", as does field " + fsx.QuoteJSON(displayRawcode(other.ID)) + "."
 }

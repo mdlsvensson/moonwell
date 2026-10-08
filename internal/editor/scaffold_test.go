@@ -352,7 +352,7 @@ func everythingBelow(t testing.TB, dir string) map[string]string {
 		switch {
 		case err != nil:
 			return err
-		case fsx.IsLink(info):
+		case fsx.IsSymlink(info):
 			held[filepath.ToSlash(below)] = "(a link)"
 		case entry.IsDir():
 			held[filepath.ToSlash(below)] = "(a folder)"

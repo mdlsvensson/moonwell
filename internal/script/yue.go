@@ -74,7 +74,7 @@ func (s *staged) luaOf(source Source) (lua string, ok bool, err error) {
 	if err != nil {
 		return "", false, err
 	}
-	data, found, err := fsx.ReadIfThere(file)
+	data, found, err := fsx.ReadFileIfExists(file)
 	if err != nil {
 		return "", false, errUnreadableOutput(outputDir+"/"+under, err)
 	}
@@ -98,7 +98,7 @@ type unit struct {
 }
 
 func outputFolder(root string) (string, error) {
-	return fsx.Inside(root, outputDir)
+	return fsx.SafeJoinNoSymlinks(root, outputDir)
 }
 
 func unitsOf(root, outputs string, sources []Source) ([]unit, error) {
@@ -129,7 +129,7 @@ func unitOf(root, outputs string, source Source) (unit, error) {
 	return unit{
 		path:   source.Path,
 		file:   file,
-		text:   fsx.WithoutMark(string(data)),
+		text:   fsx.TrimBOM(string(data)),
 		hash:   fsx.SHA256Hex(data),
 		under:  under,
 		output: filepath.Join(outputs, filepath.FromSlash(under)),
@@ -253,7 +253,7 @@ func removeOutput(under, file string) error {
 }
 
 func (u unit) failureOf(result env.RunResult) *diag.Error {
-	if result.Code == 0 {
+	if result.ExitCode == 0 {
 		if isEmptyFile(u.output) && hasCode(u.text) {
 			return errEmptyOutput(u.path)
 		}

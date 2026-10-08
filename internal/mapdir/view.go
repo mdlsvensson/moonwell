@@ -110,7 +110,7 @@ func (f *Folder) canonicalize(path string) string {
 }
 
 func (f *Folder) ResolveNewPath(path string) (string, error) {
-	if _, ok := fsx.RelPath(path); !ok {
+	if _, ok := fsx.CleanRelPath(path); !ok {
 		return "", errInvalidNewPath(path)
 	}
 	canonical := f.canonicalize(path)

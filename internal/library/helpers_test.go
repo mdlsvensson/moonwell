@@ -108,7 +108,7 @@ func filesBelow(t *testing.T, dir string) (files map[string]*string, written []s
 		switch {
 		case info.IsDir():
 			files[name] = nil
-		case fsx.IsLink(info):
+		case fsx.IsSymlink(info):
 			word := "a link"
 			files[name] = &word
 		default:

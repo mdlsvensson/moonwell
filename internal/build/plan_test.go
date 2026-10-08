@@ -51,7 +51,7 @@ func planOf(t testing.TB, s *standIn, opts Options) *Result {
 func firstProblem(t testing.TB, s *standIn, opts Options, what string) diag.Problem {
 	t.Helper()
 	result, err := Plan(background, s.env, s.project, opts)
-	problem, expected := diag.First(err)
+	problem, expected := diag.FirstProblem(err)
 	if result != nil || !expected {
 		t.Fatalf("%s: Plan = %+v, %v, want an expected failure", what, result, err)
 	}
@@ -497,7 +497,7 @@ func TestPlanHandsTheCompileTheLintBlockAndWhatTheMapsScriptDefines(t *testing.T
 			s.uses("src/main.yue", tt.uses+" 1 1\n")
 			result, err := Plan(background, s.env, s.project, Options{})
 			if tt.unknown {
-				problem, _ := diag.First(err)
+				problem, _ := diag.FirstProblem(err)
 				if result != nil || !strings.Contains(problem.Msg, "Unknown global "+tt.uses) {
 					t.Errorf("Plan = %+v, %v", result, err)
 				}

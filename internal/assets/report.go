@@ -41,7 +41,7 @@ func Models(assets []Asset) []Model {
 }
 
 func ReadModel(root, file string) (Model, error) {
-	path := fsx.Resolve(root, file)
+	path := fsx.ResolvePath(root, file)
 	heading := labelOf(root, path)
 	data, err := os.ReadFile(path)
 	switch {

@@ -614,14 +614,14 @@ func TestAUsesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 }
 
 func TestAFailedListingIsReportedLikeAFileThatFailedToCompile(t *testing.T) {
-	failed := env.RunResult{Code: 1, Stdout: "Failed to compile: main.yue\n2: unexpected expression\n"}
+	failed := env.RunResult{ExitCode: 1, Stdout: "Failed to compile: main.yue\n2: unexpected expression\n"}
 	b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": failed})
 	uses, err := b.list("yue", "src/main.yue", "h1")
 	failure := asError(t, err, "a failed run")
 	if uses != nil || failure.Msg != "unexpected expression\n2: unexpected expression" || failure.File != "src/main.yue" || failure.Line != 2 {
 		t.Errorf("listUses = %+v, %+v", uses, failure)
 	}
-	b = usesBenchOf(t, map[string]env.RunResult{"src/main.yue": {Code: 1, Stderr: "7: on the error stream\n"}})
+	b = usesBenchOf(t, map[string]env.RunResult{"src/main.yue": {ExitCode: 1, Stderr: "7: on the error stream\n"}})
 	_, err = b.list("yue", "src/main.yue", "h1")
 	if failure := asError(t, err, "a failed run"); failure.Line != 7 || failure.File != "src/main.yue" {
 		t.Errorf("error = %+v", failure)

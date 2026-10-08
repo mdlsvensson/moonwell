@@ -14,7 +14,7 @@ const (
 )
 
 func outputAt(root, relative string) (string, error) {
-	place, err := fsx.Inside(root, relative)
+	place, err := fsx.SafeJoinNoSymlinks(root, relative)
 	if err == nil {
 		return place, nil
 	}
@@ -25,7 +25,7 @@ func outputAt(root, relative string) (string, error) {
 }
 
 func linkOnTheWay(root, relative string) (link string, found bool) {
-	slashed, portable := fsx.RelPath(relative)
+	slashed, portable := fsx.CleanRelPath(relative)
 	if !portable {
 		return "", false
 	}
@@ -37,7 +37,7 @@ func linkOnTheWay(root, relative string) (link string, found bool) {
 		if err != nil || info == nil {
 			return "", false
 		}
-		if fsx.IsLink(info) {
+		if fsx.IsSymlink(info) {
 			return slashed[:end], true
 		}
 	}

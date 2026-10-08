@@ -88,14 +88,14 @@ func previewPicture(dir string, preview *string) watched {
 	if preview == nil {
 		return watched{}
 	}
-	file := fsx.Resolve(dir, *preview)
+	file := fsx.ResolvePath(dir, *preview)
 	if !fsx.IsDir(filepath.Dir(file)) {
 		return watched{}
 	}
 	isPicture := func(path string) bool { return path == file }
 	return watched{
 		roots:  []watchRoot{{dir: filepath.Dir(file), counts: isPicture}},
-		labels: []string{fsx.ToPosix(*preview)},
+		labels: []string{fsx.ToSlash(*preview)},
 	}
 }
 

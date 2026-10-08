@@ -111,7 +111,7 @@ func (p *planner) readIndex() error {
 	}
 	p.index, p.hasIndex = data, true
 	for _, entry := range p.imports {
-		path, ok := fsx.RelPath(entry.MapPath())
+		path, ok := fsx.CleanRelPath(entry.MapPath())
 		if !ok {
 			return errImportPath(entry.MapPath(), file)
 		}

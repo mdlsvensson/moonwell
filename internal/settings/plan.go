@@ -153,7 +153,7 @@ func (p *planner) requiredText(name string) (mark, text string, err error) {
 }
 
 func (p *planner) textOf(name string, data []byte) (mark, text string, err error) {
-	mark, text, ok := fsx.TextWithMark(data)
+	mark, text, ok := fsx.SplitBOM(data)
 	if !ok {
 		return "", "", errNotText(p.folder.DisplayPath(name))
 	}

@@ -292,7 +292,7 @@ func (r *reader) decoded() string {
 	if !utf8.Valid(raw) {
 		r.refuse(errNotUTF8(r.file))
 	}
-	return fsx.WithoutMark(string(raw))
+	return fsx.TrimBOM(string(raw))
 }
 
 func errUnreadable(file, problem string) error {

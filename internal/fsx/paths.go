@@ -12,80 +12,80 @@ import (
 
 var deviceName = regexp.MustCompile(`(?i)^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)`)
 
-func RelPath(value string) (path string, ok bool) {
+func CleanRelPath(value string) (path string, ok bool) {
 	normalized := strings.ReplaceAll(value, `\`, "/")
 	for segment := range strings.SplitSeq(normalized, "/") {
-		if unsafeSegment(segment) {
+		if isUnsafeSegment(segment) {
 			return "", false
 		}
 	}
 	return normalized, true
 }
 
-func unsafeSegment(segment string) bool {
+func isUnsafeSegment(segment string) bool {
 	if segment == "" || segment == "." || segment == ".." {
 		return true
 	}
-	return strings.ContainsFunc(segment, isControl) || strings.ContainsAny(segment, `<>:"|?*`) ||
+	return strings.ContainsFunc(segment, isControlRune) || strings.ContainsAny(segment, `<>:"|?*`) ||
 		strings.HasSuffix(segment, ".") || strings.HasSuffix(segment, " ") || deviceName.MatchString(segment)
 }
 
-func isControl(r rune) bool { return r < 32 }
+func isControlRune(r rune) bool { return r < 32 }
 
 func SafeJoin(root, relative string) (string, error) {
-	return joinBelow(root, relative, refuseLink)
+	return joinChecked(root, relative, checkNotSymlink)
 }
 
-func joinBelow(root, relative string, look func(path string) error) (string, error) {
-	current, err := filepath.Abs(root)
+func joinChecked(root, relative string, check func(path string) error) (string, error) {
+	fullPath, err := filepath.Abs(root)
 	if err != nil {
 		return "", err
 	}
-	rel, ok := RelPath(relative)
+	rel, ok := CleanRelPath(relative)
 	if !ok {
 		return "", errInvalidPath(relative)
 	}
 	for segment := range strings.SplitSeq(rel, "/") {
-		current = filepath.Join(current, segment)
-		if err := look(current); err != nil {
+		fullPath = filepath.Join(fullPath, segment)
+		if err := check(fullPath); err != nil {
 			return "", err
 		}
 	}
-	return current, nil
+	return fullPath, nil
 }
 
-func Inside(root, relative string) (string, error) {
-	place, err := joinBelow(root, relative, stepInside)
-	var refused *diag.Error
+func SafeJoinNoSymlinks(root, relative string) (string, error) {
+	fullPath, err := joinChecked(root, relative, checkNotSymlinkPastFile)
+	var diagErr *diag.Error
 	switch {
 	case err == nil:
-		return place, nil
-	case errors.As(err, &refused):
-		return "", errRefused(relative, refused)
+		return fullPath, nil
+	case errors.As(err, &diagErr):
+		return "", errPathRefused(relative, diagErr)
 	}
-	return "", errUnreachable(relative, err)
+	return "", errPathUnreachable(relative, err)
 }
 
-func stepInside(path string) error {
-	err := refuseLink(path)
+func checkNotSymlinkPastFile(path string) error {
+	err := checkNotSymlink(path)
 	if errors.Is(err, syscall.ENOTDIR) {
 		return nil
 	}
 	return err
 }
 
-func refuseLink(path string) error {
+func checkNotSymlink(path string) error {
 	info, err := Lstat(path)
 	if err != nil {
 		return err
 	}
-	if info != nil && IsLink(info) {
-		return LinkError(path)
+	if info != nil && IsSymlink(info) {
+		return NewSymlinkError(path)
 	}
 	return nil
 }
 
-func LinkError(path string) error {
+func NewSymlinkError(path string) error {
 	return &diag.Error{
 		Msg:  "Symlinks are not supported: " + path,
 		Hint: "Replace the link (or Windows junction) with the real files.",
@@ -100,13 +100,13 @@ func errInvalidPath(value string) error {
 	}
 }
 
-func errRefused(relative string, refused *diag.Error) error {
-	named := *refused
-	named.File = relative
-	return &named
+func errPathRefused(relative string, diagErr *diag.Error) error {
+	withFile := *diagErr
+	withFile.File = relative
+	return &withFile
 }
 
-func errUnreachable(relative string, cause error) error {
+func errPathUnreachable(relative string, cause error) error {
 	return &diag.Error{
 		Msg:   relative + " cannot be reached: " + Reason(cause),
 		File:  relative,

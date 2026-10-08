@@ -291,7 +291,7 @@ func TestWriteLockRefusesALinkInTheLocksPlace(t *testing.T) {
 				if after, _ := filesBelow(t, beside); !reflect.DeepEqual(after, before) {
 					t.Errorf("%s: the lock was written or removed through the link: %v", name, slices.Sorted(maps.Keys(after)))
 				}
-				if info, err := fsx.Lstat(filepath.Join(root, lockFile)); err != nil || info == nil || !fsx.IsLink(info) {
+				if info, err := fsx.Lstat(filepath.Join(root, lockFile)); err != nil || info == nil || !fsx.IsSymlink(info) {
 					t.Errorf("%s: the link is gone", name)
 				}
 			}

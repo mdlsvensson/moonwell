@@ -42,7 +42,7 @@ type stateWrite struct {
 }
 
 func stateChange(root, file string, state State) (*stateWrite, error) {
-	place, err := fsx.Inside(root, file)
+	place, err := fsx.SafeJoinNoSymlinks(root, file)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (s *stateWrite) asItWas() error {
 	return nil
 }
 
-func unrestored(folder *mapdir.Folder, files []fsx.Unrestored) []string {
+func unrestored(folder *mapdir.Folder, files []fsx.UndoFailure) []string {
 	var listed []string
 	for _, file := range files {
 		listed = append(listed, named(folder, file.Path)+" ("+fsx.Reason(file.Err)+")")

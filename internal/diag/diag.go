@@ -42,10 +42,10 @@ func Format(err error) string {
 	if errors.As(err, &problems) {
 		return formatProblems(problems)
 	}
-	if problem, ok := First(err); ok {
+	if problem, ok := FirstProblem(err); ok {
 		return "error: " + FormatProblem(problem)
 	}
-	return Internal(err.Error())
+	return FormatInternalError(err.Error())
 }
 
 func formatProblems(problems Problems) string {
@@ -62,8 +62,8 @@ func formatProblems(problems Problems) string {
 
 func FormatProblem(p Problem) string {
 	text := p.Msg
-	if where := location(p); where != "" {
-		text = where + " › " + text
+	if loc := formatLocation(p); loc != "" {
+		text = loc + " › " + text
 	}
 	if p.Hint != "" {
 		text += "\nhint: " + p.Hint
@@ -71,7 +71,7 @@ func FormatProblem(p Problem) string {
 	return text
 }
 
-func location(p Problem) string {
+func formatLocation(p Problem) string {
 	switch {
 	case p.File == "" || p.Line == 0:
 		return p.File
@@ -81,19 +81,19 @@ func location(p Problem) string {
 	return fmt.Sprintf("%s:%d:%d", p.File, p.Line, p.Column)
 }
 
-func Internal(detail string) string {
+func FormatInternalError(detail string) string {
 	return "internal error: " + detail + "\nThis is a bug in Moonwell; please report it."
 }
 
-func First(err error) (Problem, bool) {
+func FirstProblem(err error) (Problem, bool) {
 	var problems Problems
 	if errors.As(err, &problems) && len(problems) > 0 {
 		return problems[0], true
 	}
-	var failure *Error
-	if errors.As(err, &failure) {
+	var diagErr *Error
+	if errors.As(err, &diagErr) {
 		return Problem{
-			File: failure.File, Line: failure.Line, Column: failure.Column, Msg: failure.Msg, Hint: failure.Hint,
+			File: diagErr.File, Line: diagErr.Line, Column: diagErr.Column, Msg: diagErr.Msg, Hint: diagErr.Hint,
 		}, true
 	}
 	return Problem{}, false

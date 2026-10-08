@@ -171,7 +171,7 @@ func (m sourceMap) onDisk(t testing.TB) string {
 }
 
 func fileOf(err error) string {
-	failure, expected := diag.First(err)
+	failure, expected := diag.FirstProblem(err)
 	if !expected {
 		return "(an error without a file)"
 	}

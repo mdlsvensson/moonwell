@@ -354,7 +354,7 @@ func isPlain(t testing.TB, path string) bool {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return info != nil && !fsx.IsLink(info)
+	return info != nil && !fsx.IsSymlink(info)
 }
 
 func TestALinkToAFolderBelowTheLibraryViewIsRemovedAsTheLinkBeforeAnythingIsWritten(t *testing.T) {

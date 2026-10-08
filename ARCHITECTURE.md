@@ -588,8 +588,8 @@ Each row names the file to open and, in most rows, the function to read first.
 | I want to | Open |
 | --- | --- |
 | change how an error is printed | `internal/diag/diag.go`: `Format`, `FormatProblem` |
-| change a "did you mean" hint | `internal/diag/suggest.go`: `Closest`, `EditDistance` |
-| know why a link or a file name is refused | `internal/fsx/paths.go`: `Inside`, `RelPath` |
+| change a "did you mean" hint | `internal/diag/suggest.go`: `ClosestNames`, `EditDistance` |
+| know why a link or a file name is refused | `internal/fsx/paths.go`: `SafeJoinNoSymlinks`, `CleanRelPath` |
 | know how a map folder is scanned, and how a file is found in any letter case | `internal/mapdir/folder.go`: `Open`, `Key`, `Read`; `internal/mapdir/scan.go` |
 | know how planned changes are laid over a map | `internal/mapdir/view.go`: `WithChanges`, `ResolveNewPath` |
 | change where downloads are cached | `internal/env/cache.go`: `DefaultCacheDir` |

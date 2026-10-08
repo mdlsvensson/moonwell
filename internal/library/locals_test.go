@@ -156,8 +156,8 @@ func TestALocalsFolderIsWrittenAsTheManifestAndTheLibrarysFileWriteIt(t *testing
 		{"a path that is not the shortest", "./lib/../lib", "a/../b", filepath.Join(root, "lib"),
 			[]LocalFolder{{filepath.Join(root, "lib", "b"), "lib/b/"}}},
 		{"a folder outside the project, by its whole path", elsewhere, "", elsewhere, []LocalFolder{
-			{filepath.Join(elsewhere, "src", "modules"), fsx.ToPosix(elsewhere) + "/src/modules/"},
-			{filepath.Join(elsewhere, "art"), fsx.ToPosix(elsewhere) + "/art/"},
+			{filepath.Join(elsewhere, "src", "modules"), fsx.ToSlash(elsewhere) + "/src/modules/"},
+			{filepath.Join(elsewhere, "art"), fsx.ToSlash(elsewhere) + "/art/"},
 		}},
 	}
 	for _, c := range cases {

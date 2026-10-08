@@ -51,9 +51,9 @@ func RunLua(t testing.TB, file string) string {
 	case err != nil:
 		t.Fatalf("%s was not run in Lua: %v", file, err)
 		return ""
-	case result.Code != 0:
+	case result.ExitCode != 0:
 		printed := strings.TrimRight(result.Stdout+"\n"+result.Stderr, "\r\n")
-		t.Fatalf("%s ended with exit code %d in Lua:\n%s", file, result.Code, printed)
+		t.Fatalf("%s ended with exit code %d in Lua:\n%s", file, result.ExitCode, printed)
 		return ""
 	}
 	return strings.ReplaceAll(result.Stdout, "\r\n", "\n")

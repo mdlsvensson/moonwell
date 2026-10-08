@@ -92,7 +92,7 @@ func TestPklObjectsNestedMergeSources(t *testing.T) {
 	writeObjects(t, root)
 	write(t, root, "objects/notes.txt", "not Pkl")
 	r := evaluatePkl(t, root, "moonwell.local.pkl")
-	if r.Code != 0 {
+	if r.ExitCode != 0 {
 		t.Fatal(r.Stderr)
 	}
 	value := jsonObject(t, r.Stdout)["objects"].(map[string]any)
@@ -103,7 +103,7 @@ func TestPklObjectsNestedMergeSources(t *testing.T) {
 		t.Fatal(value)
 	}
 	r = evaluatePkl(t, root, "moonwell.pkl")
-	if r.Code != 0 || !reflect.DeepEqual(jsonObject(t, r.Stdout)["objects"], value) {
+	if r.ExitCode != 0 || !reflect.DeepEqual(jsonObject(t, r.Stdout)["objects"], value) {
 		t.Fatal(r.Stderr)
 	}
 }
@@ -112,7 +112,7 @@ func TestPklObjectsMissingAndEmptyFolder(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	for range 2 {
 		r := evaluatePkl(t, root, "moonwell.local.pkl")
-		if r.Code != 0 {
+		if r.ExitCode != 0 {
 			t.Fatal(r.Stderr)
 		}
 		assertEmptyObjects(t, jsonObject(t, r.Stdout)["objects"].(map[string]any))
@@ -124,7 +124,7 @@ func TestPklObjectsWithoutWiring(t *testing.T) {
 	root := emptyObjectProject(t, false)
 	write(t, root, "objects/heroes.pkl", paladin)
 	r := evaluatePkl(t, root, "moonwell.local.pkl")
-	if r.Code != 0 {
+	if r.ExitCode != 0 {
 		t.Fatal(r.Stderr)
 	}
 	assertEmptyObjects(t, jsonObject(t, r.Stdout)["objects"].(map[string]any))
@@ -135,7 +135,7 @@ func TestPklObjectsDuplicateKeyNamesBothFiles(t *testing.T) {
 	write(t, root, "objects/a.pkl", paladin)
 	write(t, root, "objects/b/c.pkl", paladin)
 	r := evaluatePkl(t, root, "moonwell.local.pkl")
-	if r.Code != 1 {
+	if r.ExitCode != 1 {
 		t.Fatal(r)
 	}
 	contains(t, r.Stderr, `heroes["paladin"] is defined in both objects/a.pkl and objects/b/c.pkl`)
@@ -145,7 +145,7 @@ func TestPklObjectsInvalidObjectNamesOwnFile(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	write(t, root, "objects/bad.pkl", objectFile(`units { ["captain"] { id = "H000"; base = "hfoo" } }`))
 	r := evaluatePkl(t, root, "moonwell.local.pkl")
-	if r.Code != 1 {
+	if r.ExitCode != 1 {
 		t.Fatal(r)
 	}
 	contains(t, r.Stderr, "objects/bad.pkl")

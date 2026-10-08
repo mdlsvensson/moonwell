@@ -35,7 +35,7 @@ func resolving(t *testing.T, pklVersion string, resolveCode int) world {
 				if !fsx.Exists(filepath.Join(options.Dir, "PklProject")) {
 					t.Errorf("pkl resolved in %q, which holds no PklProject", options.Dir)
 				}
-				return env.RunResult{Code: resolveCode, Stderr: unreachable}, nil
+				return env.RunResult{ExitCode: resolveCode, Stderr: unreachable}, nil
 			}
 			t.Errorf("the test has no stand-in for the program: %s %q", program, args)
 			return env.RunResult{}, errors.New("no stand-in for " + program)

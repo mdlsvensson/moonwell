@@ -118,9 +118,9 @@ func TestTheCompilerPrintsWhatIsKeptHere(t *testing.T) {
 			wantPrinted, wantLeft = withoutSearchedFiles(withLineFeeds(wantPrinted)), withLineFeeds(wantLeft)
 			printed = withoutSearchedFiles(printed)
 		}
-		if result.Code != c.code || printed != wantPrinted || result.Stderr != "" || left != wantLeft {
+		if result.ExitCode != c.code || printed != wantPrinted || result.Stderr != "" || left != wantLeft {
 			t.Errorf("src/%s.yue with %s: exit code %d, want %d\nprinted %q\nwant    %q\non the error stream %q\nleft %q\nwant %q",
-				c.name, c.mode, result.Code, c.code, printed, wantPrinted, result.Stderr, left, wantLeft)
+				c.name, c.mode, result.ExitCode, c.code, printed, wantPrinted, result.Stderr, left, wantLeft)
 		}
 	}
 }

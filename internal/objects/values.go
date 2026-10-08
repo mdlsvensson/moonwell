@@ -113,7 +113,7 @@ func shown(value any) string {
 	case float64:
 		return number(v)
 	case string:
-		return fsx.Quoted(v)
+		return fsx.QuoteJSON(v)
 	case []any:
 		entries := make([]string, len(v))
 		for i, entry := range v {
@@ -123,7 +123,7 @@ func shown(value any) string {
 	case map[string]any:
 		entries := make([]string, 0, len(v))
 		for _, key := range slices.Sorted(maps.Keys(v)) {
-			entries = append(entries, fsx.Quoted(key)+":"+shown(v[key]))
+			entries = append(entries, fsx.QuoteJSON(key)+":"+shown(v[key]))
 		}
 		return "{" + strings.Join(entries, ",") + "}"
 	}

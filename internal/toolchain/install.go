@@ -150,7 +150,7 @@ func (in install) untar(download []byte, staging string) error {
 	if err != nil {
 		return err
 	}
-	if result.Code != 0 {
+	if result.ExitCode != 0 {
 		return errNotExtracted(in.tool, result.Stderr)
 	}
 	if err := os.Remove(archive); err != nil {

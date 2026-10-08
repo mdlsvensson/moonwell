@@ -71,8 +71,8 @@ func TestFormatTreatsAnyOtherErrorAsInternal(t *testing.T) {
 			t.Errorf("Format = %q, want it to contain %q", got, want)
 		}
 	}
-	if got != Internal("boom") {
-		t.Errorf("Format = %q, want what Internal renders: %q", got, Internal("boom"))
+	if got != FormatInternalError("boom") {
+		t.Errorf("Format = %q, want what Internal renders: %q", got, FormatInternalError("boom"))
 	}
 }
 
@@ -142,7 +142,7 @@ func TestFirstIsAnErrorAsOneProblem(t *testing.T) {
 		{"an error that is not Moonwell's", errors.New("other"), Problem{}, false},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			if got, ok := First(c.err); got != c.want || ok != c.ok {
+			if got, ok := FirstProblem(c.err); got != c.want || ok != c.ok {
 				t.Errorf("First = %+v, %v; want %+v, %v", got, ok, c.want, c.ok)
 			}
 		})

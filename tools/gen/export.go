@@ -220,7 +220,7 @@ func errInRow(table, id string, fault error) error {
 }
 
 func errNoColumn(path, column string) error {
-	return errors.New(path + " has no column " + fsx.Quoted(column) + ", which the generator reads. If the game " +
+	return errors.New(path + " has no column " + fsx.QuoteJSON(column) + ", which the generator reads. If the game " +
 		"gives the column another name now, give it that name in tools/gen/export.go (columnsRead, or the table's " +
 		"key) and where the generator reads the column.")
 }

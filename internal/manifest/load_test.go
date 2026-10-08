@@ -104,12 +104,12 @@ func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
 		{"a package of another version", map[string]string{"moonwell.pkl": "", "PklProject.deps.json": resolvedDeps("0.1.0")}, nil,
 			"PklProject", []string{"moonwell@0.1.0", "does not match", moonwell.Version}, "pkl project resolve"},
 		{"an evaluation that fails", project,
-			evaluation(env.RunResult{Code: 1, Stdout: "ignored", Stderr: "\n-- Pkl Error --\nType constraint violated\n"}),
+			evaluation(env.RunResult{ExitCode: 1, Stdout: "ignored", Stderr: "\n-- Pkl Error --\nType constraint violated\n"}),
 			"moonwell.pkl", []string{"Evaluating moonwell.pkl failed:\n-- Pkl Error --\nType constraint violated"}, ""},
 		{"an evaluation that fails and says so on the other stream", project,
-			evaluation(env.RunResult{Code: 2, Stdout: "No such module\n"}),
+			evaluation(env.RunResult{ExitCode: 2, Stdout: "No such module\n"}),
 			"moonwell.pkl", []string{"Evaluating moonwell.pkl failed:\nNo such module"}, ""},
-		{"an evaluation that fails without a word", project, evaluation(env.RunResult{Code: 3}),
+		{"an evaluation that fails without a word", project, evaluation(env.RunResult{ExitCode: 3}),
 			"moonwell.pkl", []string{"Evaluating moonwell.pkl failed:"}, ""},
 		{"output that is not JSON", project, evaluation(env.RunResult{Stdout: "map { }\n"}),
 			"moonwell.pkl", []string{"not valid JSON:\nmap { }"}, "Pkl 0.32"},
@@ -160,7 +160,7 @@ func TestLoadShowsTheStartOfLongOutputThatIsNotJSON(t *testing.T) {
 
 func TestLoadPassesOnAProgramThatCannotBeStarted(t *testing.T) {
 	e := world(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": resolvedDeps(moonwell.Version)})
-	failed := env.SpawnError("pkl", errors.New("no such program"), "", "")
+	failed := env.NewSpawnError("pkl", errors.New("no such program"), "", "")
 	e.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
 		return env.RunResult{}, failed
 	}
@@ -180,7 +180,7 @@ func linked(t *testing.T, files map[string]string) (*env.Env, string) {
 	}
 	testkit.WriteFile(t, e.Root, "PklProject", []byte(PklProject(moonwell.Version, filepath.ToSlash(schema))))
 	resolved, err := e.Run(background, pkl, []string{"project", "resolve"}, env.RunOptions{Dir: e.Root})
-	if err != nil || resolved.Code != 0 {
+	if err != nil || resolved.ExitCode != 0 {
 		t.Fatalf("pkl project resolve: %v\n%s", err, resolved.Stderr)
 	}
 	return e, pkl

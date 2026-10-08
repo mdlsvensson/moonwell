@@ -95,7 +95,7 @@ func tar(t testing.TB, archive []byte, unpacked ...string) env.RunFunc {
 		}
 		if len(args) != 4 || args[0] != "-xf" || args[2] != "-C" || args[1] != filepath.Join(args[3], "archive.7z") {
 			t.Errorf("tar was asked %q", args)
-			return env.RunResult{Code: 1}, nil
+			return env.RunResult{ExitCode: 1}, nil
 		}
 		if data, _ := os.ReadFile(args[1]); string(data) != string(archive) {
 			t.Errorf("the archive handed to tar holds %q", data)
@@ -144,7 +144,7 @@ func TestA7zThatCannotBeUnpackedIsRefusedAndNothingIsInstalled(t *testing.T) {
 		hinted  bool
 	}{
 		{"tar fails", func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
-			return env.RunResult{Code: 1, Stderr: "tar: Error opening archive\r\n"}, nil
+			return env.RunResult{ExitCode: 1, Stderr: "tar: Error opening archive\r\n"}, nil
 		}, "Extracting YueScript failed:\ntar: Error opening archive", false},
 		{"the archive holds the program under another name", tar(t, archive, "yue-x64.exe", "the compiler"),
 			"The YueScript archive has no yue.exe.", false},

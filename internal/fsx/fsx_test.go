@@ -113,12 +113,12 @@ func TestReadIfThereFindsNoFileWhereNoneCanBeAndFailsForAnythingElse(t *testing.
 		{"nothing on the way to the path", "gone/below.txt", "", false},
 		{"a file on the way to the path", "held.txt/below.txt", "", false},
 	} {
-		data, found, err := ReadIfThere(filepath.Join(dir, filepath.FromSlash(c.path)))
+		data, found, err := ReadFileIfExists(filepath.Join(dir, filepath.FromSlash(c.path)))
 		if string(data) != c.data || found != c.found || err != nil {
 			t.Errorf("%s: ReadIfThere = %q, %v, %v", c.name, data, found, err)
 		}
 	}
-	if data, found, err := ReadIfThere(filepath.Join(dir, "folder")); err == nil || found || data != nil {
+	if data, found, err := ReadFileIfExists(filepath.Join(dir, "folder")); err == nil || found || data != nil {
 		t.Errorf("a folder: ReadIfThere = %q, %v, %v", data, found, err)
 	}
 }
@@ -170,10 +170,10 @@ func TestWithoutMarkDropsOneMarkAtTheVeryStartAndNoOther(t *testing.T) {
 		{"a mark cut short", "\xEF\xBB", "\xEF\xBB"},
 		{"nothing", "", ""},
 	} {
-		if got := WithoutMark(c.text); got != c.want {
+		if got := TrimBOM(c.text); got != c.want {
 			t.Errorf("%s: WithoutMark(%q) = %q, want %q", c.name, c.text, got, c.want)
 		}
-		if got := WithoutMark([]byte(c.text)); string(got) != c.want {
+		if got := TrimBOM([]byte(c.text)); string(got) != c.want {
 			t.Errorf("%s, as bytes: WithoutMark(%q) = %q, want %q", c.name, c.text, got, c.want)
 		}
 	}
@@ -229,7 +229,7 @@ func TestTextWithMarkKeepsTheMarkAsideAndRefusesInvalidBytes(t *testing.T) {
 		{"a mark cut short", "\xEF\xBB", "", "", false},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			mark, text, ok := TextWithMark([]byte(c.bytes))
+			mark, text, ok := SplitBOM([]byte(c.bytes))
 			if mark != c.mark || text != c.text || ok != c.ok {
 				t.Errorf("TextWithMark(%q) = %q, %q, %v, want %q, %q, %v", c.bytes, mark, text, ok, c.mark, c.text, c.ok)
 			}
@@ -257,7 +257,7 @@ func TestQuotedEscapesTheQuoteTheBackslashAndTheControlCharacters(t *testing.T) 
 		{"a byte that is not UTF-8", "a\xFFb", "\"a\xFFb\""},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			if got := Quoted(c.text); got != c.want {
+			if got := QuoteJSON(c.text); got != c.want {
 				t.Errorf("Quoted(%q) = %s, want %s", c.text, got, c.want)
 			}
 		})
@@ -267,7 +267,7 @@ func TestQuotedEscapesTheQuoteTheBackslashAndTheControlCharacters(t *testing.T) 
 func TestQuotedEscapesExactlyTheBytesItMustAndWritesJSON(t *testing.T) {
 	for b := range 256 {
 		text := string([]byte{byte(b)})
-		got := Quoted(text)
+		got := QuoteJSON(text)
 		escaped := b < 0x20 || b == '"' || b == '\\'
 		if kept := got == `"`+text+`"`; kept == escaped {
 			t.Errorf("Quoted of the byte %#02x = %s, want it escaped: %v", b, got, escaped)
@@ -392,12 +392,12 @@ func TestRelPathRefusesWhatCouldLeaveItsFolderOrFailOnWindows(t *testing.T) {
 		{"Textures/héro 1.blp", "Textures/héro 1.blp"},
 		{"console.txt", "console.txt"},
 	} {
-		if got, ok := RelPath(c.value); !ok || got != c.want {
+		if got, ok := CleanRelPath(c.value); !ok || got != c.want {
 			t.Errorf("RelPath(%q) = %q, %v, want %q", c.value, got, ok, c.want)
 		}
 	}
 	for _, value := range refused {
-		if got, ok := RelPath(value); ok || got != "" {
+		if got, ok := CleanRelPath(value); ok || got != "" {
 			t.Errorf("RelPath(%q) = %q, %v, want it refused", value, got, ok)
 		}
 	}

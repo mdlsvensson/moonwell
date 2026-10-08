@@ -72,7 +72,7 @@ func (s *subject) report(path string, wrong fault) {
 }
 
 func (r *resolver) resolve(category manifest.Category, key string, object manifest.Object) (Resolved, bool) {
-	s := &subject{resolver: r, category: category, at: string(category) + "[" + fsx.Quoted(key) + "]", object: object}
+	s := &subject{resolver: r, category: category, at: string(category) + "[" + fsx.QuoteJSON(key) + "]", object: object}
 	s.checkID()
 	s.claimID()
 	base, known := r.metadata.Bases[category][object.Base]

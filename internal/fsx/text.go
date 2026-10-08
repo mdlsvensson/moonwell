@@ -15,7 +15,7 @@ const ASCIISpace = " \t\n\v\f\r"
 
 func TrimASCIISpace(text string) string { return strings.Trim(text, ASCIISpace) }
 
-func WithoutMark[T string | []byte](text T) T {
+func TrimBOM[T string | []byte](text T) T {
 	if len(text) >= len(byteOrderMark) && string(text[:len(byteOrderMark)]) == byteOrderMark {
 		return text[len(byteOrderMark):]
 	}
@@ -23,20 +23,20 @@ func WithoutMark[T string | []byte](text T) T {
 }
 
 func DecodeText(b []byte) string {
-	return WithoutMark(strings.ToValidUTF8(string(b), replacement))
+	return TrimBOM(strings.ToValidUTF8(string(b), replacement))
 }
 
-func TextWithMark(data []byte) (mark, text string, ok bool) {
+func SplitBOM(data []byte) (mark, text string, ok bool) {
 	if !utf8.Valid(data) {
 		return "", "", false
 	}
-	text = WithoutMark(string(data))
+	text = TrimBOM(string(data))
 	return string(data[:len(data)-len(text)]), text, true
 }
 
 var shortEscapes = map[byte]string{'"': `\"`, '\\': `\\`, '\b': `\b`, '\f': `\f`, '\n': `\n`, '\r': `\r`, '\t': `\t`}
 
-func Quoted(text string) string {
+func QuoteJSON(text string) string {
 	var out strings.Builder
 	out.WriteByte('"')
 	for i := range len(text) {

@@ -112,7 +112,7 @@ func (r *running) carryOut(args []string) (code int) {
 			if r.log != nil {
 				say = r.log.Error
 			}
-			say(diag.Internal(fmt.Sprintf("%v\n%s", fault, debug.Stack())))
+			say(diag.FormatInternalError(fmt.Sprintf("%v\n%s", fault, debug.Stack())))
 			code = 1
 		}
 	}()
@@ -212,7 +212,7 @@ func logFile(root string, chosen command) string {
 	if chosen.name == "init" || !manifest.IsProject(root) {
 		return ""
 	}
-	file, err := fsx.Inside(root, "dist/moonwell.log")
+	file, err := fsx.SafeJoinNoSymlinks(root, "dist/moonwell.log")
 	if err != nil {
 		return ""
 	}

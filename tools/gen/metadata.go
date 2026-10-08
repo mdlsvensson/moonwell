@@ -45,10 +45,10 @@ func writeAndReport(checkout string, metadata *objects.Metadata, renames []renam
 	}
 	var fields, bases []string
 	for _, list := range objects.FieldLists {
-		fields = append(fields, fsx.Quoted(list)+":"+strconv.Itoa(len(metadata.Fields[list])))
+		fields = append(fields, fsx.QuoteJSON(list)+":"+strconv.Itoa(len(metadata.Fields[list])))
 	}
 	for _, category := range manifest.Categories {
-		bases = append(bases, fsx.Quoted(string(category))+":"+strconv.Itoa(len(metadata.Bases[category])))
+		bases = append(bases, fsx.QuoteJSON(string(category))+":"+strconv.Itoa(len(metadata.Bases[category])))
 	}
 	fmt.Fprintln(out, "fields: {"+strings.Join(fields, ",")+"}")
 	fmt.Fprintln(out, "bases: {"+strings.Join(bases, ",")+"}")
@@ -74,19 +74,19 @@ func renderMetadata(metadata *objects.Metadata) string {
 		for _, field := range metadata.Fields[list] {
 			entries = append(entries, renderField(field))
 		}
-		fields = append(fields, "    "+fsx.Quoted(list)+": "+entriesBlock("[", entries, "]"))
+		fields = append(fields, "    "+fsx.QuoteJSON(list)+": "+entriesBlock("[", entries, "]"))
 	}
 	for _, category := range manifest.Categories {
 		var entries []string
 		for _, id := range slices.Sorted(maps.Keys(metadata.Bases[category])) {
-			entries = append(entries, fsx.Quoted(id)+": "+renderBase(metadata.Bases[category][id]))
+			entries = append(entries, fsx.QuoteJSON(id)+": "+renderBase(metadata.Bases[category][id]))
 		}
-		bases = append(bases, "    "+fsx.Quoted(string(category))+": "+entriesBlock("{", entries, "}"))
+		bases = append(bases, "    "+fsx.QuoteJSON(string(category))+": "+entriesBlock("{", entries, "}"))
 	}
 	return strings.Join([]string{
 		"{",
 		`  "format": ` + strconv.Itoa(metadata.Format) + ",",
-		`  "game": ` + fsx.Quoted(metadata.Game) + ",",
+		`  "game": ` + fsx.QuoteJSON(metadata.Game) + ",",
 		"  \"fields\": {\n" + strings.Join(fields, ",\n") + "\n  },",
 		"  \"bases\": {\n" + strings.Join(bases, ",\n") + "\n  }",
 		"}",
@@ -102,12 +102,12 @@ func entriesBlock(opening string, entries []string, closing string) string {
 }
 
 func renderField(field objects.FieldMeta) string {
-	return `{"id":` + fsx.Quoted(field.ID) +
-		`,"name":` + fsx.Quoted(field.Name) +
-		`,"label":` + fsx.Quoted(field.Label) +
-		`,"category":` + fsx.Quoted(field.Category) +
-		`,"type":` + fsx.Quoted(field.Type) +
-		`,"storage":` + fsx.Quoted(field.Storage) +
+	return `{"id":` + fsx.QuoteJSON(field.ID) +
+		`,"name":` + fsx.QuoteJSON(field.Name) +
+		`,"label":` + fsx.QuoteJSON(field.Label) +
+		`,"category":` + fsx.QuoteJSON(field.Category) +
+		`,"type":` + fsx.QuoteJSON(field.Type) +
+		`,"storage":` + fsx.QuoteJSON(field.Storage) +
 		`,"list":` + strconv.FormatBool(field.List) +
 		`,"perLevel":` + strconv.FormatBool(field.PerLevel) +
 		`,"column":` + strconv.Itoa(field.Column) +
@@ -119,15 +119,15 @@ func renderField(field objects.FieldMeta) string {
 
 func renderBase(base objects.BaseMeta) string {
 	if base.Levels == nil {
-		return `{"name":` + fsx.Quoted(base.Name) + "}"
+		return `{"name":` + fsx.QuoteJSON(base.Name) + "}"
 	}
-	return `{"name":` + fsx.Quoted(base.Name) + `,"levels":` + strconv.Itoa(*base.Levels) + "}"
+	return `{"name":` + fsx.QuoteJSON(base.Name) + `,"levels":` + strconv.Itoa(*base.Levels) + "}"
 }
 
 func renderTexts(texts []string) string {
 	quoted := make([]string, len(texts))
 	for i, text := range texts {
-		quoted[i] = fsx.Quoted(text)
+		quoted[i] = fsx.QuoteJSON(text)
 	}
 	return "[" + strings.Join(quoted, ",") + "]"
 }

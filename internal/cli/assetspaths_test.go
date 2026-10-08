@@ -118,7 +118,7 @@ func TestAssetsPathsNamesAModelFromTheFolderItRunsIn(t *testing.T) {
 		{"..knight.mdx", "..knight.mdx"},
 		{filepath.Join("units", "knight.mdx"), "units/knight.mdx"},
 		{filepath.Join(root, "units", "knight.mdx"), "units/knight.mdx"},
-		{outside, fsx.ToPosix(outside)},
+		{outside, fsx.ToSlash(outside)},
 	} {
 		e, log := testkit.Env(t, root)
 		lines, err := paths(e, log, c.file, "textures/knight.dds\n")

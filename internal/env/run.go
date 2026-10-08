@@ -20,7 +20,7 @@ type RunOptions struct {
 }
 
 type RunResult struct {
-	Code           int
+	ExitCode       int
 	Stdout, Stderr string
 }
 
@@ -38,13 +38,13 @@ func Run(ctx context.Context, program string, args []string, options RunOptions)
 	case ctx.Err() != nil:
 		return result, ctx.Err()
 	case errors.As(err, &exit):
-		result.Code = exit.ExitCode()
+		result.ExitCode = exit.ExitCode()
 		return result, nil
 	}
-	return result, SpawnError(program, err, options.Hint, "")
+	return result, NewSpawnError(program, err, options.Hint, "")
 }
 
-func SpawnError(program string, err error, hint, file string) *diag.Error {
+func NewSpawnError(program string, err error, hint, file string) *diag.Error {
 	reason := fsx.Reason(err)
 	if errors.Is(err, exec.ErrNotFound) || errors.Is(err, fs.ErrNotExist) {
 		reason = "command not found"

@@ -20,24 +20,24 @@ import (
 
 const onWindows = runtime.GOOS == "windows"
 
-func ToPosix(path string) string { return filepath.ToSlash(path) }
+func ToSlash(path string) string { return filepath.ToSlash(path) }
 
-func IsWithin(path, folder string) bool {
+func IsWithin(path, dir string) bool {
 	path, errPath := filepath.Abs(path)
-	folder, errFolder := filepath.Abs(folder)
-	if errPath != nil || errFolder != nil {
+	dir, errDir := filepath.Abs(dir)
+	if errPath != nil || errDir != nil {
 		return false
 	}
 	if onWindows {
-		path, folder = strings.ToLower(path), strings.ToLower(folder)
+		path, dir = strings.ToLower(path), strings.ToLower(dir)
 	}
-	between, err := filepath.Rel(folder, path)
-	return err == nil && staysInside(between)
+	rel, err := filepath.Rel(dir, path)
+	return err == nil && isInsideRel(rel)
 }
 
-func staysInside(between string) bool {
-	leaves := between == ".." || strings.HasPrefix(between, ".."+string(filepath.Separator))
-	return !filepath.IsAbs(between) && !leaves
+func isInsideRel(rel string) bool {
+	escapes := rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator))
+	return !filepath.IsAbs(rel) && !escapes
 }
 
 func ListFiles(dir string) ([]string, error) {
@@ -50,7 +50,7 @@ func ListFiles(dir string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		files = append(files, ToPosix(rel))
+		files = append(files, ToSlash(rel))
 		return nil
 	})
 	if err != nil {
@@ -78,7 +78,7 @@ func Lstat(path string) (fs.FileInfo, error) {
 	return info, err
 }
 
-func ReadIfThere(path string) (data []byte, found bool, err error) {
+func ReadFileIfExists(path string) (data []byte, found bool, err error) {
 	data, err = os.ReadFile(path)
 	switch {
 	case err == nil:
@@ -89,12 +89,12 @@ func ReadIfThere(path string) (data []byte, found bool, err error) {
 	return nil, false, err
 }
 
-func IsLink(info fs.FileInfo) bool {
+func IsSymlink(info fs.FileInfo) bool {
 	return info.Mode()&fs.ModeSymlink != 0 || (onWindows && info.Mode()&fs.ModeIrregular != 0)
 }
 
 func RemoveAll(path string) error {
-	return inUse(os.RemoveAll(path), path)
+	return wrapIfInUse(os.RemoveAll(path), path)
 }
 
 func RemoveFile(path string) error {
@@ -102,12 +102,12 @@ func RemoveFile(path string) error {
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil
 	}
-	return inUse(err, path)
+	return wrapIfInUse(err, path)
 }
 
 const sharingViolation = syscall.Errno(32)
 
-func inUse(err error, path string) error {
+func wrapIfInUse(err error, path string) error {
 	var errno syscall.Errno
 	if !errors.As(err, &errno) {
 		return err
@@ -212,7 +212,7 @@ func WriteIfChanged(path, content string) (wrote bool, err error) {
 }
 
 func writeIfChanged(path string, content []byte, mode fs.FileMode) (wrote bool, err error) {
-	existing, found, err := ReadIfThere(path)
+	existing, found, err := ReadFileIfExists(path)
 	if err != nil || (found && bytes.Equal(existing, content)) {
 		return false, err
 	}
@@ -225,12 +225,12 @@ func writeIfChanged(path string, content []byte, mode fs.FileMode) (wrote bool, 
 	return true, nil
 }
 
-func ReadSource(path, label string) (string, error) {
+func ReadSource(path, displayPath string) (string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return "", errUnreadable(label, err)
+		return "", errUnreadable(displayPath, err)
 	}
-	return blankShebang(WithoutMark(string(data))), nil
+	return blankShebang(TrimBOM(string(data))), nil
 }
 
 func blankShebang(source string) string {
@@ -249,7 +249,7 @@ func SHA256Hex(b []byte) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func Resolve(base, path string) string {
+func ResolvePath(base, path string) string {
 	if filepath.IsAbs(path) {
 		return filepath.Clean(path)
 	}
@@ -264,10 +264,10 @@ func errInUse(path string, cause error) error {
 	}
 }
 
-func errUnreadable(label string, cause error) error {
+func errUnreadable(displayPath string, cause error) error {
 	return &diag.Error{
-		Msg:   "Reading " + label + " failed: " + Reason(cause),
-		File:  label,
+		Msg:   "Reading " + displayPath + " failed: " + Reason(cause),
+		File:  displayPath,
 		Hint:  "Close any program that has the file open and check that it is a readable file, then try again.",
 		Cause: cause,
 	}

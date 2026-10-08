@@ -331,7 +331,7 @@ func TestOnlyTheProjectsOwnYueScriptIsListedAndEveryReachedModuleDeclares(t *tes
 
 func TestASourceTheCompilerCannotListFailsTheCheckBeforeAnyProblem(t *testing.T) {
 	b := checkOf(t, []string{"main.yue", "x = Zzz\n", "bad.yue", "y = \n"}, map[string]string{"main.yue": "Zzz 1 5\n"}, asErrors, "")
-	b.yue.printed["src/bad.yue"] = env.RunResult{Code: 1, Stdout: "Failed to compile: bad.yue\n1: unexpected expression\n"}
+	b.yue.printed["src/bad.yue"] = env.RunResult{ExitCode: 1, Stdout: "Failed to compile: bad.yue\n1: unexpected expression\n"}
 	problems, err := b.check()
 	failure := asError(t, err, "a source that is not listed")
 	if problems != nil || failure.File != "src/bad.yue" || failure.Line != 1 || failure.Msg != "unexpected expression\n1: unexpected expression" {

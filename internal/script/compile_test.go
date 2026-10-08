@@ -65,7 +65,7 @@ func (b *programBench) fake(compiles map[string]answer, uses map[string]string) 
 				return env.RunResult{}, err
 			}
 		}
-		return env.RunResult{Code: does.code, Stdout: does.stdout, Stderr: does.stderr}, nil
+		return env.RunResult{ExitCode: does.code, Stdout: does.stdout, Stderr: does.stderr}, nil
 	}
 }
 
@@ -241,7 +241,7 @@ func TestCompileRunsItsStepsInOrderAndReportsTheFirstFault(t *testing.T) {
 			wantFile = b.root
 		}
 		program, err := b.compile()
-		failure, isFailure := diag.First(err)
+		failure, isFailure := diag.FirstProblem(err)
 		if program != nil || !isFailure || !strings.HasPrefix(failure.Msg, c.wantMsg) || failure.File != wantFile {
 			t.Errorf("%s: the compile = %+v, %v, want a failure of %q that starts %q", c.name, program, err, wantFile, c.wantMsg)
 		}
@@ -527,7 +527,7 @@ func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testi
 			t.Errorf("%s: before the link, the Lua is %q, want %q", c.name, got, wantLua)
 		}
 		program, linkErr := Link(background, b.world, compiled)
-		failure, isFailure := diag.First(linkErr)
+		failure, isFailure := diag.FirstProblem(linkErr)
 		if program != nil || !isFailure || !strings.HasPrefix(failure.Msg, c.wantMsg) || failure.File != c.wantFile {
 			t.Errorf("%s: Link = %+v, %v, want a failure of %q that starts %q", c.name, program, linkErr, c.wantFile, c.wantMsg)
 		}

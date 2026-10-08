@@ -69,7 +69,7 @@ func TestRunCapturesOutputAndExitCode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if result.Code != 3 || strings.TrimSpace(result.Stderr) != "err" {
+	if result.ExitCode != 3 || strings.TrimSpace(result.Stderr) != "err" {
 		t.Errorf("result = %+v", result)
 	}
 	if lines := strings.Fields(result.Stdout); len(lines) != 2 || lines[0] != "out" || lines[1] != filepath.Base(dir) {
@@ -84,8 +84,8 @@ func TestRunDecodesOutputThatIsNotUTF8(t *testing.T) {
 		t.Fatal(err)
 	}
 	replacement := string(utf8.RuneError)
-	if result.Code != 0 || result.Stdout != "a"+replacement+"b" || result.Stderr != "c"+replacement {
-		t.Errorf("stdout = %q, stderr = %q, code %d", result.Stdout, result.Stderr, result.Code)
+	if result.ExitCode != 0 || result.Stdout != "a"+replacement+"b" || result.Stderr != "c"+replacement {
+		t.Errorf("stdout = %q, stderr = %q, code %d", result.Stdout, result.Stderr, result.ExitCode)
 	}
 }
 
@@ -139,7 +139,7 @@ func TestSpawnErrorNamesTheProgramTheReasonTheHintAndTheFile(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			e := SpawnError("game.exe", c.cause, "check the path", "moonwell.local.pkl")
+			e := NewSpawnError("game.exe", c.cause, "check the path", "moonwell.local.pkl")
 			if e.File != "moonwell.local.pkl" || e.Hint != "check the path" || !errors.Is(e, c.cause) ||
 				!strings.HasPrefix(e.Msg, "Cannot run 'game.exe'") || !strings.HasSuffix(e.Msg, c.reason) ||
 				strings.Contains(e.Msg, "fork/exec") {

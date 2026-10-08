@@ -14,7 +14,7 @@ import (
 
 func refusedInside(t *testing.T, root, relative string) *diag.Error {
 	t.Helper()
-	place, err := fsx.Inside(root, relative)
+	place, err := fsx.SafeJoinNoSymlinks(root, relative)
 	var failure *diag.Error
 	if !errors.As(err, &failure) {
 		t.Fatalf("Inside(%q) = %q, %v, want a *diag.Error", relative, place, err)
@@ -35,7 +35,7 @@ func TestInsideIsThePlaceOfAPathBelowTheFolder(t *testing.T) {
 		`maps\demo.w3x`:              filepath.Join(root, "maps", "demo.w3x"),
 		"maps/demo.w3x/..hidden.txt": filepath.Join(root, "maps", "demo.w3x", "..hidden.txt"),
 	} {
-		if got, err := fsx.Inside(root, relative); err != nil || got != want {
+		if got, err := fsx.SafeJoinNoSymlinks(root, relative); err != nil || got != want {
 			t.Errorf("Inside(%q) = %q, %v, want %q", relative, got, err, want)
 		}
 	}
@@ -82,7 +82,7 @@ func TestInsideRefusesALinkOnTheWayAndALinkAtTheEnd(t *testing.T) {
 		}
 	}
 	beside := filepath.Join(root, "real", "sub", "a.txt")
-	if got, err := fsx.Inside(root, "real/sub/a.txt"); err != nil || got != beside {
+	if got, err := fsx.SafeJoinNoSymlinks(root, "real/sub/a.txt"); err != nil || got != beside {
 		t.Errorf("Inside beside the links = %q, %v", got, err)
 	}
 }
@@ -106,7 +106,7 @@ func TestInsideTrustsTheFolderItIsGiven(t *testing.T) {
 	testkit.WriteFile(t, base, "project/maps/a.txt", nil)
 	root := filepath.Join(base, "opened")
 	testkit.LinkDir(t, filepath.Join(base, "project"), root)
-	if got, err := fsx.Inside(root, "maps/a.txt"); err != nil || got != filepath.Join(root, "maps", "a.txt") {
+	if got, err := fsx.SafeJoinNoSymlinks(root, "maps/a.txt"); err != nil || got != filepath.Join(root, "maps", "a.txt") {
 		t.Errorf("Inside below a folder that is a link = %q, %v", got, err)
 	}
 }
@@ -120,7 +120,7 @@ func TestInsideTakesAFileOnTheWayForNothingThere(t *testing.T) {
 		"real/maps/demo.w3x/war3map.lua",
 	} {
 		want := filepath.Join(root, filepath.FromSlash(relative))
-		place, err := fsx.Inside(root, relative)
+		place, err := fsx.SafeJoinNoSymlinks(root, relative)
 		if err != nil || place != want {
 			t.Errorf("Inside(%q) = %q, %v, want %q", relative, place, err, want)
 			continue

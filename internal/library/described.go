@@ -43,7 +43,7 @@ func parseFile(key string, data []byte, present bool, where string) (Described, 
 }
 
 func membersOf(key string, data []byte, where string) (map[string]json.RawMessage, error) {
-	text := fsx.WithoutMark(data)
+	text := fsx.TrimBOM(data)
 	if !utf8.Valid(text) || !json.Valid(text) {
 		return nil, errNotJSON(key, where)
 	}

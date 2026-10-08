@@ -154,7 +154,7 @@ func (h *hints) worded(name string) string {
 	if h.names == nil {
 		h.names = slices.Sorted(maps.Keys(h.known))
 	}
-	if closest := diag.Closest(h.names, name, 3); len(closest) > 0 {
+	if closest := diag.ClosestNames(h.names, name, 3); len(closest) > 0 {
 		return hintClose(closest)
 	}
 	return unknownGlobalHint
@@ -240,7 +240,7 @@ func (c compiler) list(root string, source checked) (listed, error) {
 	if err != nil {
 		return listed{}, err
 	}
-	if result.Code != 0 {
+	if result.ExitCode != 0 {
 		return listed{source: source, failure: compileError(source.path, result.Stdout+"\n"+result.Stderr)}, nil
 	}
 	uses, failure := usesPrinted(result.Stdout, source.path)

@@ -45,6 +45,6 @@ func appendLine(file, line string) {
 	out.WriteString(line)
 }
 
-func logLine(at time.Time, level, message string) string {
-	return fmt.Sprintf("[%s] %s: %s\n", at.UTC().Format("2006-01-02T15:04:05.000Z"), level, message)
+func logLine(timestamp time.Time, level, message string) string {
+	return fmt.Sprintf("[%s] %s: %s\n", timestamp.UTC().Format("2006-01-02T15:04:05.000Z"), level, message)
 }

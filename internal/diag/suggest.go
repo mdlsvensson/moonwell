@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-func Closest(names []string, key string, max int) []string {
-	matches := near(names, key)
+func ClosestNames(names []string, key string, max int) []string {
+	matches := nearMatches(names, key)
 	slices.SortStableFunc(matches, func(a, b match) int {
 		if a.distance != b.distance {
 			return a.distance - b.distance
@@ -29,20 +29,20 @@ type match struct {
 	distance int
 }
 
-func near(names []string, key string) []match {
-	wanted := []rune(strings.ToLower(key))
-	limit := max(1, len(wanted)/4)
+func nearMatches(names []string, key string) []match {
+	target := []rune(strings.ToLower(key))
+	limit := max(1, len(target)/4)
 	var matches []match
 	for _, name := range names {
 		if name == key {
 			continue
 		}
 		candidate := []rune(strings.ToLower(name))
-		if gap := len(candidate) - len(wanted); gap > limit || -gap > limit {
+		if lengthDiff := len(candidate) - len(target); lengthDiff > limit || -lengthDiff > limit {
 			continue
 		}
-		if d := distance(wanted, candidate); d <= limit {
-			matches = append(matches, match{name, d})
+		if dist := runeEditDistance(target, candidate); dist <= limit {
+			matches = append(matches, match{name, dist})
 		}
 	}
 	return matches
@@ -64,29 +64,29 @@ func JoinWords(words []string, conjunction string, max int) string {
 }
 
 func EditDistance(a, b string) int {
-	return distance([]rune(a), []rune(b))
+	return runeEditDistance([]rune(a), []rune(b))
 }
 
-func distance(a, b []rune) int {
-	var twoAbove []int
-	above := make([]int, len(b)+1)
-	for j := range above {
-		above[j] = j
+func runeEditDistance(a, b []rune) int {
+	var prevPrevRow []int
+	prevRow := make([]int, len(b)+1)
+	for j := range prevRow {
+		prevRow[j] = j
 	}
-	for i, inA := range a {
+	for i, charA := range a {
 		row := make([]int, len(b)+1)
 		row[0] = i + 1
-		for j, inB := range b {
-			replaced := above[j]
-			if inA != inB {
-				replaced++
+		for j, charB := range b {
+			substituted := prevRow[j]
+			if charA != charB {
+				substituted++
 			}
-			row[j+1] = min(above[j+1]+1, row[j]+1, replaced)
-			if i > 0 && j > 0 && inA == b[j-1] && a[i-1] == inB {
-				row[j+1] = min(row[j+1], twoAbove[j-1]+1)
+			row[j+1] = min(prevRow[j+1]+1, row[j]+1, substituted)
+			if i > 0 && j > 0 && charA == b[j-1] && a[i-1] == charB {
+				row[j+1] = min(row[j+1], prevPrevRow[j-1]+1)
 			}
 		}
-		twoAbove, above = above, row
+		prevPrevRow, prevRow = prevRow, row
 	}
-	return above[len(b)]
+	return prevRow[len(b)]
 }

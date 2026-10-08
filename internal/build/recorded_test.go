@@ -117,8 +117,8 @@ func linkedProject(t *testing.T, pkl, root string) {
 	put(t, root, "PklProject", manifest.PklProject(moonwell.Version, filepath.ToSlash(schema)))
 	put(t, root, "moonwell.local.pkl", manifest.LocalPkl())
 	resolved, err := env.Run(background, pkl, []string{"project", "resolve"}, env.RunOptions{Dir: root})
-	if err != nil || resolved.Code != 0 {
-		t.Fatalf("pkl project resolve: exit code %d, %v\n%s", resolved.Code, err, resolved.Stderr)
+	if err != nil || resolved.ExitCode != 0 {
+		t.Fatalf("pkl project resolve: exit code %d, %v\n%s", resolved.ExitCode, err, resolved.Stderr)
 	}
 }
 
@@ -186,7 +186,7 @@ func ranIn(t *testing.T, root string, run func(world *env.Env) error) outcome {
 	if err := run(world); err != nil {
 		t.Logf("%s is refused: %v", filepath.Base(root), diag.Format(err))
 		made.refused, made.refusedAt = true, internalError
-		if failure, expected := diag.First(err); expected {
+		if failure, expected := diag.FirstProblem(err); expected {
 			made.refusedAt = failure.File
 		}
 	}

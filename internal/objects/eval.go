@@ -99,13 +99,13 @@ func (p *printer) member() {
 
 func (p *printer) key(name string) {
 	p.member()
-	p.out.WriteString(fsx.Quoted(name))
+	p.out.WriteString(fsx.QuoteJSON(name))
 	p.out.WriteString(": ")
 }
 
 func (p *printer) text(key, value string) {
 	p.key(key)
-	p.out.WriteString(fsx.Quoted(value))
+	p.out.WriteString(fsx.QuoteJSON(value))
 }
 
 func (p *printer) truth(key string, value bool) {

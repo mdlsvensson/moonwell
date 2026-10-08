@@ -65,7 +65,7 @@ func refuseKeys(keys []string, manifestFile string) error {
 		if !isKey(key) {
 			return errNotAKey(key)
 		}
-		if _, portable := fsx.RelPath(key); !portable {
+		if _, portable := fsx.CleanRelPath(key); !portable {
 			return errUnusableKey(key, manifestFile)
 		}
 		if other, taken := spelled[strings.ToLower(key)]; taken {
@@ -83,11 +83,11 @@ func isKey(key string) bool {
 }
 
 func removeStale(root string, keys []string) error {
-	modules, err := fsx.Inside(root, ModulesDir)
+	modules, err := fsx.SafeJoinNoSymlinks(root, ModulesDir)
 	if err != nil {
 		return err
 	}
-	assets, err := fsx.Inside(root, AssetsDir)
+	assets, err := fsx.SafeJoinNoSymlinks(root, AssetsDir)
 	if err != nil {
 		return err
 	}
@@ -172,11 +172,11 @@ func modulesOf(key string) string { return ModulesDir + "/" + key }
 func assetsOf(key string) string  { return AssetsDir + "/" + key }
 
 func foldersOf(root, key string) (folders, error) {
-	modules, err := fsx.Inside(root, modulesOf(key))
+	modules, err := fsx.SafeJoinNoSymlinks(root, modulesOf(key))
 	if err != nil {
 		return folders{}, err
 	}
-	assets, err := fsx.Inside(root, assetsOf(key))
+	assets, err := fsx.SafeJoinNoSymlinks(root, assetsOf(key))
 	if err != nil {
 		return folders{}, err
 	}
@@ -220,7 +220,7 @@ func (s shipped) refuseUnusableNames(key, kind string, files []file, manifestFil
 	slices.Sort(names)
 	spelled := map[string]string{}
 	for _, name := range names {
-		if _, portable := fsx.RelPath(name); !portable || !insideLibrary(name) {
+		if _, portable := fsx.CleanRelPath(name); !portable || !insideLibrary(name) {
 			return errUnusableName(key, kind, name, manifestFile, s.local)
 		}
 		if other, taken := spelled[strings.ToLower(name)]; taken {
@@ -277,7 +277,7 @@ func stampOf(entry lockEntry) string {
 }
 
 func stampOfFolder(source string) string {
-	return objectText([]member{{"path", fsx.Quoted(source)}}, "") + "\n"
+	return objectText([]member{{"path", fsx.QuoteJSON(source)}}, "") + "\n"
 }
 
 func errNotAKey(key string) error {

@@ -213,7 +213,7 @@ type rawcodes struct{ err error }
 func (r *rawcodes) of(text string) objmod.ID {
 	id, ok := objmod.ParseID(text)
 	if !ok && r.err == nil {
-		r.err = fmt.Errorf("Cannot write %s to an object file: a rawcode is 4 Latin-1 characters.", fsx.Quoted(text))
+		r.err = fmt.Errorf("Cannot write %s to an object file: a rawcode is 4 Latin-1 characters.", fsx.QuoteJSON(text))
 	}
 	return id
 }

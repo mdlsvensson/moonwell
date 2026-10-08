@@ -24,7 +24,7 @@ func loadPreview(root, preview, manifestFile string) (*picture.Picture, error) {
 }
 
 func previewPath(preview, manifestFile string) (string, error) {
-	path, inside := fsx.RelPath(preview)
+	path, inside := fsx.CleanRelPath(preview)
 	switch {
 	case !inside:
 		return "", errOutsideProject(manifestFile, preview)

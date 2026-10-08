@@ -85,7 +85,7 @@ func sourcesOf(root string, at folders, path, dir, manifestFile string) (sources
 }
 
 func baseOf(root, path string) (string, error) {
-	return filepath.Abs(fsx.Resolve(root, path))
+	return filepath.Abs(fsx.ResolvePath(root, path))
 }
 
 type named struct {
@@ -105,15 +105,15 @@ func namedBy(dir string, described Described) named {
 }
 
 func (n named) below(base string) sources {
-	from := sources{modules: fsx.Resolve(base, n.modules)}
+	from := sources{modules: fsx.ResolvePath(base, n.modules)}
 	if n.assets != "" {
-		from.assets = fsx.Resolve(base, n.assets)
+		from.assets = fsx.ResolvePath(base, n.assets)
 	}
 	return from
 }
 
 func describedAt(key, libraryFile string) (Described, error) {
-	content, found, err := fsx.ReadIfThere(libraryFile)
+	content, found, err := fsx.ReadFileIfExists(libraryFile)
 	if err != nil && fsx.IsDir(filepath.Dir(libraryFile)) {
 		return Described{}, errUnreadableLibraryFile(key, libraryFile, err)
 	}
@@ -189,12 +189,12 @@ type mirror struct {
 func mirrorOf(root, label string, files []file) (mirror, error) {
 	planned := mirror{label: label, files: files, targets: make([]string, len(files))}
 	var err error
-	if planned.folder, err = fsx.Inside(root, label); err != nil {
+	if planned.folder, err = fsx.SafeJoinNoSymlinks(root, label); err != nil {
 		return mirror{}, err
 	}
 	planned.anew = liesInTheWay(planned.folder, files)
 	for i, f := range files {
-		if planned.targets[i], err = fsx.Inside(root, label+"/"+f.name); err != nil {
+		if planned.targets[i], err = fsx.SafeJoinNoSymlinks(root, label+"/"+f.name); err != nil {
 			return mirror{}, err
 		}
 	}
@@ -202,7 +202,7 @@ func mirrorOf(root, label string, files []file) (mirror, error) {
 }
 
 func liesInTheWay(folder string, files []file) bool {
-	if info, err := fsx.Lstat(folder); err == nil && info != nil && !info.IsDir() && !fsx.IsLink(info) {
+	if info, err := fsx.Lstat(folder); err == nil && info != nil && !info.IsDir() && !fsx.IsSymlink(info) {
 		return true
 	}
 	for _, f := range files {
@@ -210,7 +210,7 @@ func liesInTheWay(folder string, files []file) bool {
 		for i, segment := range segments {
 			path = filepath.Join(path, segment)
 			info, err := fsx.Lstat(path)
-			if err != nil || info == nil || fsx.IsLink(info) {
+			if err != nil || info == nil || fsx.IsSymlink(info) {
 				break
 			}
 			if isFile := i == len(segments)-1; info.IsDir() == isFile {

@@ -75,7 +75,7 @@ func TestClosestFindsNamesAFewEditsAwayIgnoringCaseNearestFirst(t *testing.T) {
 		{[]string{"moon"}, "moon🌙", 3, []string{"moon"}},
 		{[]string{"a🌙", "aﬁ"}, "aa", 3, []string{"aﬁ", "a🌙"}},
 	} {
-		if got := Closest(c.names, c.key, c.max); !slices.Equal(got, c.want) {
+		if got := ClosestNames(c.names, c.key, c.max); !slices.Equal(got, c.want) {
 			t.Errorf("Closest(%q, %q, %d) = %q, want %q", c.names, c.key, c.max, got, c.want)
 		}
 	}

@@ -15,7 +15,7 @@ var (
 )
 
 func targetPath(value string) (string, error) {
-	path, ok := fsx.RelPath(value)
+	path, ok := fsx.CleanRelPath(value)
 	switch {
 	case !ok:
 		return "", errInvalidPath(value)

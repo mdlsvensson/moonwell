@@ -19,7 +19,7 @@ func readHandWritten(checkout, path string, into any) error {
 }
 
 func decodeHandWritten(path string, data []byte, into any) error {
-	text := fsx.WithoutMark(data)
+	text := fsx.TrimBOM(data)
 	decoder := json.NewDecoder(bytes.NewReader(text))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(into); err != nil {
@@ -62,5 +62,5 @@ func errGoesOn(path string) error {
 }
 
 func errKeyTwice(path, key string) error {
-	return errors.New(path + ": the key " + fsx.Quoted(key) + " stands twice in one object: write it once")
+	return errors.New(path + ": the key " + fsx.QuoteJSON(key) + " stands twice in one object: write it once")
 }

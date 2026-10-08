@@ -17,14 +17,14 @@ type lockEntry struct {
 	Assets                          *string
 }
 
-func lockAt(root string) (string, error) { return fsx.Inside(root, lockFile) }
+func lockAt(root string) (string, error) { return fsx.SafeJoinNoSymlinks(root, lockFile) }
 
 func readLock(root string) (map[string]lockEntry, error) {
 	path, err := lockAt(root)
 	if err != nil {
 		return nil, err
 	}
-	data, found, err := fsx.ReadIfThere(path)
+	data, found, err := fsx.ReadFileIfExists(path)
 	switch {
 	case err != nil:
 		return nil, errUnreadableLock(err)
@@ -103,7 +103,7 @@ func lockText(entries map[string]lockEntry) string {
 		if i > 0 {
 			out.WriteByte(',')
 		}
-		out.WriteString("\n    " + fsx.Quoted(key) + ": " + objectText(entryMembers(entries[key]), "    "))
+		out.WriteString("\n    " + fsx.QuoteJSON(key) + ": " + objectText(entryMembers(entries[key]), "    "))
 	}
 	out.WriteString("\n  }\n}\n")
 	return out.String()
@@ -113,14 +113,14 @@ type member struct{ name, value string }
 
 func entryMembers(entry lockEntry) []member {
 	members := []member{
-		{"github", fsx.Quoted(entry.GitHub)},
-		{"tag", fsx.Quoted(entry.Tag)},
-		{"dir", fsx.Quoted(entry.Dir)},
-		{"commit", fsx.Quoted(entry.Commit)},
-		{"files", fsx.Quoted(entry.Files)},
+		{"github", fsx.QuoteJSON(entry.GitHub)},
+		{"tag", fsx.QuoteJSON(entry.Tag)},
+		{"dir", fsx.QuoteJSON(entry.Dir)},
+		{"commit", fsx.QuoteJSON(entry.Commit)},
+		{"files", fsx.QuoteJSON(entry.Files)},
 	}
 	if entry.Assets != nil {
-		members = append(members, member{"assets", fsx.Quoted(*entry.Assets)})
+		members = append(members, member{"assets", fsx.QuoteJSON(*entry.Assets)})
 	}
 	return members
 }
@@ -128,7 +128,7 @@ func entryMembers(entry lockEntry) []member {
 func objectText(members []member, indent string) string {
 	lines := make([]string, len(members))
 	for i, m := range members {
-		lines[i] = indent + "  " + fsx.Quoted(m.name) + ": " + m.value
+		lines[i] = indent + "  " + fsx.QuoteJSON(m.name) + ": " + m.value
 	}
 	return "{\n" + strings.Join(lines, ",\n") + "\n" + indent + "}"
 }

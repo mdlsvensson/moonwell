@@ -188,11 +188,11 @@ func dropStamp(at folders) error {
 
 func replace(root, dir, key string, files []file, stamp string) error {
 	label := dir + "/" + key
-	temp, err := fsx.Inside(root, dir+"/."+key+".tmp")
+	temp, err := fsx.SafeJoinNoSymlinks(root, dir+"/."+key+".tmp")
 	if err != nil {
 		return err
 	}
-	target, err := fsx.Inside(root, label)
+	target, err := fsx.SafeJoinNoSymlinks(root, label)
 	if err != nil {
 		return err
 	}

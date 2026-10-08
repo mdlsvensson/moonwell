@@ -8,17 +8,17 @@ import (
 )
 
 type Journal struct {
-	touched []touch
+	entries []journalEntry
 }
 
-type touch struct {
-	path    string
-	before  []byte
-	existed bool
+type journalEntry struct {
+	path         string
+	originalData []byte
+	existed      bool
 }
 
 func (j *Journal) Write(path string, data []byte) error {
-	if err := j.remember(path); err != nil {
+	if err := j.record(path); err != nil {
 		return err
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
@@ -28,49 +28,49 @@ func (j *Journal) Write(path string, data []byte) error {
 }
 
 func (j *Journal) Remove(path string) error {
-	if err := j.remember(path); err != nil {
+	if err := j.record(path); err != nil {
 		return err
 	}
 	return RemoveFile(path)
 }
 
-func (j *Journal) Len() int { return len(j.touched) }
+func (j *Journal) Len() int { return len(j.entries) }
 
-type Unrestored struct {
+type UndoFailure struct {
 	Path string
 	Err  error
 }
 
-func (j *Journal) Undo() (unrestored []Unrestored) {
-	for _, t := range slices.Backward(j.touched) {
-		if err := t.restore(); err != nil {
-			unrestored = append(unrestored, Unrestored{Path: t.path, Err: err})
+func (j *Journal) Undo() (failures []UndoFailure) {
+	for _, entry := range slices.Backward(j.entries) {
+		if err := entry.restore(); err != nil {
+			failures = append(failures, UndoFailure{Path: entry.path, Err: err})
 		}
 	}
-	j.touched = nil
-	return unrestored
+	j.entries = nil
+	return failures
 }
 
-func (j *Journal) remember(path string) error {
-	before, existed, err := ReadIfThere(path)
+func (j *Journal) record(path string) error {
+	originalData, existed, err := ReadFileIfExists(path)
 	if err != nil {
 		return err
 	}
-	j.touched = append(j.touched, touch{path: path, before: before, existed: existed})
+	j.entries = append(j.entries, journalEntry{path: path, originalData: originalData, existed: existed})
 	return nil
 }
 
-func (t touch) restore() error {
-	if t.asItWas() {
+func (t journalEntry) restore() error {
+	if t.isUnchanged() {
 		return nil
 	}
 	if !t.existed {
 		return RemoveFile(t.path)
 	}
-	return os.WriteFile(t.path, t.before, 0o666)
+	return os.WriteFile(t.path, t.originalData, 0o666)
 }
 
-func (t touch) asItWas() bool {
-	now, found, err := ReadIfThere(t.path)
-	return err == nil && found == t.existed && bytes.Equal(now, t.before)
+func (t journalEntry) isUnchanged() bool {
+	currentData, found, err := ReadFileIfExists(t.path)
+	return err == nil && found == t.existed && bytes.Equal(currentData, t.originalData)
 }

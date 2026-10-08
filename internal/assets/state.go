@@ -18,14 +18,14 @@ type Owned struct{ Path, Hash string }
 
 func StateFile(root, mapFolder string) (string, error) {
 	file := ".asset-state/" + mapFolder + ".json"
-	if _, err := fsx.Inside(root, file); err != nil {
+	if _, err := fsx.SafeJoinNoSymlinks(root, file); err != nil {
 		return "", err
 	}
 	return file, nil
 }
 
 func ReadState(root, file string) (State, error) {
-	place, err := fsx.Inside(root, file)
+	place, err := fsx.SafeJoinNoSymlinks(root, file)
 	if err != nil {
 		return State{}, err
 	}
@@ -54,7 +54,7 @@ func ReadState(root, file string) (State, error) {
 }
 
 func readIfThere(place, file string) (data []byte, found bool, err error) {
-	if data, found, err = fsx.ReadIfThere(place); err != nil {
+	if data, found, err = fsx.ReadFileIfExists(place); err != nil {
 		return nil, false, errUnreadableState(file, err)
 	}
 	return data, found, nil
@@ -113,7 +113,7 @@ func (s State) Bytes() []byte {
 		if i > 0 {
 			out.WriteByte(',')
 		}
-		out.WriteString("\n    " + fsx.Quoted(file.Path) + ": " + fsx.Quoted(file.Hash))
+		out.WriteString("\n    " + fsx.QuoteJSON(file.Path) + ": " + fsx.QuoteJSON(file.Hash))
 	}
 	if len(s.Files) > 0 {
 		out.WriteString("\n  ")

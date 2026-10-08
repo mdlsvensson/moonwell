@@ -65,7 +65,7 @@ func isThere(root, file string) (bool, error) {
 	switch {
 	case err != nil || info == nil:
 		return false, nil
-	case fsx.IsLink(info) && leadsNowhere(at):
+	case fsx.IsSymlink(info) && leadsNowhere(at):
 		return false, errLinkToNothing(file)
 	}
 	return true, nil
@@ -120,7 +120,7 @@ func addIgnores(root string) ([]string, error) {
 
 func ignoresLacking(held []byte) []string {
 	var lines []string
-	for line := range strings.SplitSeq(fsx.WithoutMark(string(held)), "\n") {
+	for line := range strings.SplitSeq(fsx.TrimBOM(string(held)), "\n") {
 		lines = append(lines, strings.Trim(line, lineSpace))
 	}
 	var lacking []string
@@ -201,7 +201,7 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 }
 
 func objectOf(text []byte) (config manifest.Ordered[json.RawMessage], isObject bool) {
-	text = fsx.WithoutMark(text)
+	text = fsx.TrimBOM(text)
 	if !startsWith(text, '{') || json.Unmarshal(text, &config) != nil {
 		return manifest.Ordered[json.RawMessage]{}, false
 	}
@@ -225,7 +225,7 @@ func addEntries(config *manifest.Ordered[json.RawMessage], key string, entries [
 			continue
 		}
 		held[entry] = true
-		elements = append(elements, json.RawMessage(fsx.Quoted(entry)))
+		elements = append(elements, json.RawMessage(fsx.QuoteJSON(entry)))
 		added = append(added, entry)
 	}
 	config.Set(key, arrayOf(elements))
@@ -292,7 +292,7 @@ func laidOut(config manifest.Ordered[json.RawMessage]) ([]byte, error) {
 		if onOneLine.Len() > 1 {
 			onOneLine.WriteByte(',')
 		}
-		onOneLine.WriteString(fsx.Quoted(key))
+		onOneLine.WriteString(fsx.QuoteJSON(key))
 		onOneLine.WriteByte(':')
 		onOneLine.Write(value)
 	}
@@ -310,7 +310,7 @@ func onDisk(root, file string) string {
 }
 
 func readIfThere(root, file string) (data []byte, found bool, err error) {
-	if data, found, err = fsx.ReadIfThere(onDisk(root, file)); err != nil {
+	if data, found, err = fsx.ReadFileIfExists(onDisk(root, file)); err != nil {
 		return nil, false, errNotRead(file, err)
 	}
 	return data, found, nil

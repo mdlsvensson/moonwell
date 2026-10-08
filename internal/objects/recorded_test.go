@@ -157,7 +157,7 @@ type recordedPlan struct {
 func refusedFor(err error) recordedPlan {
 	var problems diag.Problems
 	if !errors.As(err, &problems) {
-		failure, _ := diag.First(err)
+		failure, _ := diag.FirstProblem(err)
 		return recordedPlan{refused: []string{failure.File}}
 	}
 	var files []string

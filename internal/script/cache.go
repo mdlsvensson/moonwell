@@ -167,7 +167,7 @@ func writeUses(root string, now listedWith, lists map[string]sourceUses) error {
 
 func readCache[T any](root, name string) (kept T, found bool, err error) {
 	var none T
-	file, err := fsx.Inside(root, outputDir+"/"+name)
+	file, err := fsx.SafeJoinNoSymlinks(root, outputDir+"/"+name)
 	if err != nil {
 		return none, false, err
 	}
@@ -192,7 +192,7 @@ func writeCache(root, name string, kept any) error {
 	if err != nil {
 		return fmt.Errorf("script: %s cannot be written as JSON: %w", path, err)
 	}
-	file, err := fsx.Inside(root, path)
+	file, err := fsx.SafeJoinNoSymlinks(root, path)
 	if err != nil {
 		return err
 	}

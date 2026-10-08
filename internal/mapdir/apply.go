@@ -30,7 +30,7 @@ func (f *Folder) StageTo(dir string) error {
 
 func (f *Folder) validateChanges() error {
 	for _, change := range f.changes {
-		if _, ok := fsx.RelPath(change.Path); !ok {
+		if _, ok := fsx.CleanRelPath(change.Path); !ok {
 			return errInvalidChangePath(change.Path)
 		}
 		if change.Remove {
@@ -137,7 +137,7 @@ func errChangeBlockedByFile(path, file string) error {
 
 func errStageOverSource(dir, displayPath string) error {
 	return &diag.Error{
-		Msg:  "Staging the map into " + fsx.ToPosix(dir) + " would replace the source map " + displayPath + ".",
+		Msg:  "Staging the map into " + fsx.ToSlash(dir) + " would replace the source map " + displayPath + ".",
 		File: displayPath,
 		Hint: "Stage into a folder that is not the source map, a folder it is in or a folder inside it.",
 	}

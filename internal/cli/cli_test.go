@@ -195,12 +195,12 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 		{"a command that ends well", "check", false, nil, 0, ""},
 		{"an expected failure", "check", false, refusal, 1, diag.Format(refusal)},
 		{"several failures at once", "check", false, several, 1, diag.Format(several)},
-		{"a failure nobody expected", "check", false, errors.New("boom"), 1, diag.Internal("boom")},
+		{"a failure nobody expected", "check", false, errors.New("boom"), 1, diag.FormatInternalError("boom")},
 		{"a command that stopped because it was told to", "check", true, toldToStop, 130, ""},
 		{"a command that failed by itself while it was told to stop", "check", true, refusal, 130, diag.Format(refusal)},
 		{"a command that ended well though it was told to stop", "check", true, nil, 0, ""},
 		{"dev told to stop", "dev", true, nil, 130, ""},
-		{"a cancellation nobody asked for", "check", false, context.Canceled, 1, diag.Internal("context canceled")},
+		{"a cancellation nobody asked for", "check", false, context.Canceled, 1, diag.FormatInternalError("context canceled")},
 	} {
 		ctx, stop := context.WithCancel(background)
 		if c.stopped {

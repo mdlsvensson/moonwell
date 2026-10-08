@@ -56,7 +56,7 @@ func definesHooked(script []byte, file string) error {
 }
 
 func defines(script []byte, name string) bool {
-	rest := fsx.WithoutMark(script)
+	rest := fsx.TrimBOM(script)
 	for {
 		if startsDefinition(rest, name) {
 			return true

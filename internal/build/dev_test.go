@@ -636,7 +636,7 @@ func TestAManifestThatDoesNotLoadIsReportedAndWatchedOn(t *testing.T) {
 		s := newStandIn(t)
 		broken := func(args []string, options env.RunOptions) (env.RunResult, error) {
 			if len(args) > 0 && args[0] == "eval" {
-				return env.RunResult{Code: 1, Stderr: "Cannot find property `mapp`.\n"}, nil
+				return env.RunResult{ExitCode: 1, Stderr: "Cannot find property `mapp`.\n"}, nil
 			}
 			return s.pkl(args, options)
 		}

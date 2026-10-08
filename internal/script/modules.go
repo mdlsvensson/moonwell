@@ -104,7 +104,7 @@ func ownFolders() []folder {
 func libraryFolders(door string, libraries []Library) ([]folder, error) {
 	var searched []folder
 	for _, library := range libraries {
-		dir, ok := fsx.RelPath(library.Dir)
+		dir, ok := fsx.CleanRelPath(library.Dir)
 		if library.Key == "" || !ok {
 			return nil, fmt.Errorf("script.%s: library %q has the folder %q, which no library can have",
 				door, library.Key, library.Dir)
@@ -119,7 +119,7 @@ func folderAt(root, dir string) (path string, found bool, err error) {
 	if !fsx.IsDir(filepath.Join(root, filepath.FromSlash(dir))) {
 		return "", false, nil
 	}
-	path, err = fsx.Inside(root, dir)
+	path, err = fsx.SafeJoinNoSymlinks(root, dir)
 	return path, err == nil, err
 }
 
@@ -176,7 +176,7 @@ func (f folder) failedAt(cause error) string {
 	if err != nil || below == "." || !filepath.IsLocal(below) {
 		return f.dir
 	}
-	return f.dir + "/" + fsx.ToPosix(below)
+	return f.dir + "/" + fsx.ToSlash(below)
 }
 
 func (f folder) compiledOutputs(files []string) map[string]bool {

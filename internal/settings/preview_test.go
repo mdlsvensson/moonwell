@@ -137,7 +137,7 @@ func TestAFailureOnTheWayToThePreviewIsToldAsWhatTheUserCanFix(t *testing.T) {
 		}
 	})
 	t.Run("a link", func(t *testing.T) {
-		link := fsx.LinkError(filepath.Join("project", "art"))
+		link := fsx.NewSymlinkError(filepath.Join("project", "art"))
 		if got := unreached(link, path, manifestName); got != link {
 			t.Errorf("error = %v, want the link's own", got)
 		}

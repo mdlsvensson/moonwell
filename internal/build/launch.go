@@ -23,7 +23,7 @@ func launch(e *env.Env, how manifest.Launch, mapPath string) error {
 	}
 	args := append(slices.Clone(how.Args), "-loadfile", mapPath)
 	if err := e.Spawn(game, args); err != nil {
-		return env.SpawnError(game, err, fixGame, manifest.LocalFile)
+		return env.NewSpawnError(game, err, fixGame, manifest.LocalFile)
 	}
 	return nil
 }

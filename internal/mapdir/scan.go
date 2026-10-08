@@ -53,7 +53,7 @@ func checkRealDir(dir, displayPath string) error {
 		return err
 	case err != nil:
 		return errUnreadableDir(displayPath, err)
-	case fsx.IsLink(info):
+	case fsx.IsSymlink(info):
 		return errSymlink(displayPath)
 	case !info.IsDir():
 		return errNotADir(displayPath)
@@ -75,7 +75,7 @@ func (w walker) walk(path string) error {
 }
 
 func isValidName(name string) bool {
-	_, ok := fsx.RelPath(name)
+	_, ok := fsx.CleanRelPath(name)
 	return ok && !strings.Contains(name, `\`)
 }
 
@@ -91,7 +91,7 @@ func (w walker) addEntry(path string, entry fs.DirEntry) error {
 	switch {
 	case err != nil:
 		return errUnreadableDir(joinPath(w.displayPath, path), err)
-	case fsx.IsLink(info):
+	case fsx.IsSymlink(info):
 		return errSymlink(joinPath(w.displayPath, path))
 	case info.IsDir():
 		w.index.dirPaths[key] = path
@@ -122,7 +122,7 @@ func errUnreadableDir(file string, cause error) error {
 }
 
 func errSymlink(file string) error {
-	err := fsx.LinkError(file)
+	err := fsx.NewSymlinkError(file)
 	var failure *diag.Error
 	if errors.As(err, &failure) {
 		failure.File = file

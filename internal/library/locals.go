@@ -31,7 +31,7 @@ func Locals(root string, libraries map[string]manifest.Library) []Local {
 func localOf(root, key, path, dir string) Local {
 	base, err := baseOf(root, path)
 	if err != nil {
-		base = fsx.Resolve(root, path)
+		base = fsx.ResolvePath(root, path)
 	}
 	described, err := describedAt(key, filepath.Join(base, File))
 	if err != nil {
@@ -47,5 +47,5 @@ func localOf(root, key, path, dir string) Local {
 }
 
 func labelOf(path, folder string) string {
-	return strings.TrimSuffix(fsx.ToPosix(filepath.Join(path, folder)), "/") + "/"
+	return strings.TrimSuffix(fsx.ToSlash(filepath.Join(path, folder)), "/") + "/"
 }

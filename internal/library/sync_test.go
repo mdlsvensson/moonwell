@@ -308,7 +308,7 @@ func TestALocalLibraryIsCopiedChangedFilesOnlyAndNeverLocked(t *testing.T) {
 		t.Errorf("the module holds %q", got)
 	}
 	stamp := textOf(t, root, ".moonwell/libraries/mine/.moonwell-library.json")
-	if want := "{\n  \"path\": " + fsx.Quoted(filepath.Join(source, "src")) + "\n}\n"; stamp != want {
+	if want := "{\n  \"path\": " + fsx.QuoteJSON(filepath.Join(source, "src")) + "\n}\n"; stamp != want {
 		t.Errorf("stamp = %s", stamp)
 	}
 	kept := filepath.Join(root, ".moonwell", "libraries", "mine", "example", "old.lua")
@@ -1411,7 +1411,7 @@ func TestALinkAtAFolderOfTheLibrariesIsRefusedBeforeAnythingGoesThroughIt(t *tes
 		if !untouched() {
 			t.Errorf("%s: the sync wrote or removed through the link: %v", c.link, filesIn(t, beside, "."))
 		}
-		if info, err := fsx.Lstat(link); err != nil || info == nil || !fsx.IsLink(info) {
+		if info, err := fsx.Lstat(link); err != nil || info == nil || !fsx.IsSymlink(info) {
 			t.Errorf("%s: the link is gone", c.link)
 		}
 		if after := filesIn(t, root, "."); !slices.Equal(after, before) {

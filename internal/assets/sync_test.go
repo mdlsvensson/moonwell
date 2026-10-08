@@ -314,7 +314,7 @@ func TestAnUndoThatCannotRestoreAFileNamesTheFailureAndEveryFileItCouldNotRestor
 		!strings.Contains(e.Hint, "version control") {
 		t.Errorf("error = %+v", e)
 	}
-	if cause, ok := diag.First(e.Cause); !ok || cause.Msg != failure {
+	if cause, ok := diag.FirstProblem(e.Cause); !ok || cause.Msg != failure {
 		t.Errorf("the cause is %v, want the failure that stopped the sync", e.Cause)
 	}
 	if s.inMap("b.blp") != "another program's" || s.inMap("war3map.imp") != missing || s.stateText() != missing {

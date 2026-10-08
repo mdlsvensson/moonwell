@@ -35,7 +35,7 @@ func runInit(ctx context.Context, e *env.Env, c call) error {
 }
 
 func createProject(ctx context.Context, e *env.Env, dir, schema string) error {
-	target := fsx.Resolve(e.Root, dir)
+	target := fsx.ResolvePath(e.Root, dir)
 	existed, err := newOrEmpty(target, dir)
 	if err != nil {
 		return err
@@ -118,7 +118,7 @@ func writeProjectFile(target, dir string, file moonwell.TemplateFile) error {
 }
 
 func fileOf(dir, name string) string {
-	return fsx.ToPosix(filepath.Join(dir, filepath.FromSlash(name)))
+	return fsx.ToSlash(filepath.Join(dir, filepath.FromSlash(name)))
 }
 
 func resolve(ctx context.Context, e *env.Env, pkl, target, dir string) error {
@@ -126,7 +126,7 @@ func resolve(ctx context.Context, e *env.Env, pkl, target, dir string) error {
 	if err != nil {
 		return err
 	}
-	if result.Code != 0 {
+	if result.ExitCode != 0 {
 		return errNotResolved(dir, cmp.Or(result.Stderr, result.Stdout))
 	}
 	return nil
@@ -171,7 +171,7 @@ func linkPath(target, schema string) (string, error) {
 	if err != nil || filepath.IsAbs(inside) {
 		return "", errAnotherDrive(schema)
 	}
-	return fsx.ToPosix(inside), nil
+	return fsx.ToSlash(inside), nil
 }
 
 const chooseEmpty = "Choose a new or empty directory."

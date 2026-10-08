@@ -202,7 +202,7 @@ func TestAFailedBuildLeavesNoArchive(t *testing.T) {
 			logged := len(s.log.Lines())
 			tt.spoil(s)
 			again, err := Build(background, s.env, Options{})
-			problem, expected := diag.First(err)
+			problem, expected := diag.FirstProblem(err)
 			if again != "" || !expected || !strings.Contains(problem.Msg, tt.words) {
 				t.Fatalf("Build = %q, %v, want a failure that says %q", again, err, tt.words)
 			}
@@ -498,7 +498,7 @@ func TestCheckLeavesTheIDsModuleAloneAndFailsWhereABuildWould(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")))
 	s.templateMap()
 	result, err := Check(background, s.env)
-	problem, expected := diag.First(err)
+	problem, expected := diag.FirstProblem(err)
 	if result != nil || !expected || problem.File != objects.IDsFile || fsx.Exists(s.at(objects.IDsFile)) {
 		t.Fatalf("Check = %+v, %v, want a refusal of the ids module, which is not written", result, err)
 	}
