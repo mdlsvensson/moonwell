@@ -32,6 +32,20 @@
 - The help text has a new layout, and lists `help` and `completion` after Moonwell's commands. On a line with
   `--help` and `--version` the help is printed.
 
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-08 on Windows, and CI passed on Ubuntu and Windows with the race job.
+Steps 3 to 13 were not played through in the game: nothing that reaches a map changed. The recorded builds of every
+seed project, and the recorded object data, map settings, assets and map scripts, are those of 0.10.0 byte for byte
+and pass unchanged; of the recorded command lines, only the lines whose reading changed differ. The built program
+was run on a fresh project from `init --link`: `check`, `build`, `build --minify`, `objects:check`,
+`settings:check` and `assets:check` end with 0.
+
+A start through a shortcut that Windows Explorer opens ran its command. `cobra` refuses such a start unless it is
+told not to, and a build in which it was not told ran nothing from the same shortcut. `moonwell test` was not run:
+the known issue above stands. Shell completion was read as a script and not tried in a shell. The online and desync
+checks are deferred, not passed.
+
 ## 0.10.0 (2026-10-07)
 
 - **The program was written anew.** The twelve commands and their flags, the manifest, `moonwell.lock`,
