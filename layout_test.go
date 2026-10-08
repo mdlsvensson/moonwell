@@ -55,9 +55,12 @@ var (
 		// it names the type, and starts nothing.
 		"fsx": {"os/exec"},
 	}
-	// commandLine is the modules that read a command line: cobra, and pflag, which holds cobra's flags. Only cli
-	// imports them, its tests too: no other package knows how a line is read.
-	commandLine = []string{"github.com/spf13/cobra", "github.com/spf13/pflag"}
+	// commandLine is the modules that read a command line: cobra, pflag, which holds cobra's flags, and
+	// mousetrap, which cobra needs on Windows. Only cli imports them, its tests too: no other package knows how
+	// a line is read.
+	commandLine = []string{
+		"github.com/spf13/cobra", "github.com/spf13/pflag", "github.com/inconshreveable/mousetrap",
+	}
 	// generatorMay is the packages below internal that the generator may import: the three areas whose data it
 	// writes, and the two foundations it takes the names of a manifest and the text of a file from.
 	generatorMay = []string{"objects", "script", "assets", "manifest", "fsx"}
@@ -317,7 +320,7 @@ func walkFolder(root, top string, report func(format string, args ...any)) error
 //
 //   - It imports neither os/exec nor net/http, unless it is of env, of a test-only package, or a test. fsx is
 //     excused for os/exec, and excused says why (insideTheProgram).
-//   - It imports neither cobra nor pflag, the modules that read a command line, unless it is of cli
+//   - It imports none of cobra, pflag and mousetrap, the modules that read a command line, unless it is of cli
 //     (lineReadByCli). Which modules the program may depend on at all is module_test.go's to hold.
 //   - A file below cmd/ imports cli and nothing else of the module, and a test there the test-only packages too
 //     (cliAlone).
@@ -398,6 +401,7 @@ func TestTheWalkLetsOnlyCliReadTheCommandLine(t *testing.T) {
 		"internal/script/cobras.go":  importing("script", "github.com/spf13/cobrasnake"),
 		"internal/testkit/lines.go":  importing("testkit", cobra),
 		"internal/war3/mpq/flags.go": importing("mpq", pflag),
+		"internal/fsx/explorer.go":   importing("fsx", "github.com/inconshreveable/mousetrap"),
 	},
 		"internal/build/build.go imports "+pflag+"; only cli reads the command line",
 		"internal/env/env_test.go imports "+cobra+"/doc; only cli reads the command line",
@@ -405,6 +409,7 @@ func TestTheWalkLetsOnlyCliReadTheCommandLine(t *testing.T) {
 		"tools/gen/main.go imports "+pflag+"; only cli reads the command line",
 		"internal/testkit/lines.go imports "+cobra+"; only cli reads the command line",
 		"internal/war3/mpq/flags.go imports "+pflag+"; only cli reads the command line",
+		"internal/fsx/explorer.go imports github.com/inconshreveable/mousetrap; only cli reads the command line",
 	)
 }
 

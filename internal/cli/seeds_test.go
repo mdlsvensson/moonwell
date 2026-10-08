@@ -367,7 +367,7 @@ func commandOf(args []string) string {
 
 // recordedRuns is every run of the recorded test. The help and the version are not among them: both hold the
 // version number, which every release changes, and the help is laid out by cobra:
-// TestTheHelpNamesEveryCommandInTheOrderOfTheTable and TestVersionPrintsTheVersion hold what they must say.
+// TestTheHelpNamesEveryCommandAndEveryFlag and TestTheVersionIsPrintedAsABareNumber hold what they must say.
 var recordedRuns = []recordedRun{
 	// Every command on the template.
 	on(templateSeed, "build"),

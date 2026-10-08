@@ -21,9 +21,7 @@
 - Read now, where they were refused: a flag given twice with two values (the last one counts), a switch with a
   value (`--minify=false`), and short flags behind one dash (`-hv`).
 - The help text has a new layout, and lists `help` and `completion` after Moonwell's commands. On a line with
-  `--help` and `--version` the help is printed. Started by a double click in Windows Explorer, the program says
-  that it is a command line tool.
-- The program is about 2.7 MB larger.
+  `--help` and `--version` the help is printed.
 
 ## 0.10.0 (2026-10-07)
 

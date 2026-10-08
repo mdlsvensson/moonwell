@@ -210,8 +210,7 @@ func names(table []command) []string {
 	return all
 }
 
-// The version is a bare number, printed for other programs: the install scripts and the release workflow
-// compare it with the version they expect.
+// The version is a bare number, printed for other programs: the release workflow compares it with the tag.
 func TestTheVersionIsPrintedAsABareNumber(t *testing.T) {
 	for _, args := range [][]string{{"--version"}, {"-v"}} {
 		if got := readLine(t, args...); got.code != 0 || got.stdout != moonwell.Version || got.output != "" || got.ran != "" {

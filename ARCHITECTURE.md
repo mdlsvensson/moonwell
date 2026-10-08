@@ -345,7 +345,7 @@ type Env struct {
 
 `Run` runs a program and waits for it: `pkl`, `yue`, `tar`. `Fetch` downloads an address: a library's archive, a
 pinned program. `Spawn` starts a program that outlives Moonwell: the game. `env.New(root, log)` is the real world.
-`runIn` makes one for each command and hands it down as the parameter `e`.
+`run` in `internal/cli/cli.go` makes one for each command and hands it down as the parameter `e`.
 
 Only `internal/env` starts programs and reaches the network, and the layout test holds every other package to it.
 The reason is the tests. A test hands the code an `Env` of its own (`testkit.Env` in `internal/testkit/env.go`),
@@ -384,7 +384,7 @@ Three habits follow, and the code keeps them everywhere:
   of the packages that raise such errors each have a helper, `asError`, that fails the test for an error that is no
   `*diag.Error`.
 
-`exitCode` in `internal/cli/cli.go` prints the error a command ends with, once. `runIn` prints a line that is
+`exitCode` in `internal/cli/cli.go` prints the error a command ends with, once. `carryOut` prints a line that is
 refused, and catches a panic, which it prints as an internal error with its stack. `dev` goes on after a check that
 fails, so `cycle` in `internal/build/dev.go` prints that failure itself.
 
@@ -513,7 +513,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | add a flag, or give a command a flag | `internal/cli/cli.go`: an `option` beside `entryOption`, in the `flags` of each row of `commands` that has it, a field of `call` for what the flag says, and a line in `run` that reads it. The flag is also written by hand in the `usage` text of those rows. A flag of `build` and `test` then goes on through `options` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
 | know why a command line is refused | `cobra` refuses it, in its own words: an unknown flag or command, a flag without its value, a wrong number of arguments (the `args` of the row in `commands`). `refusal` in `internal/cli/cli.go` prints it. Only an `--entry` that is no entry is refused by Moonwell, in `run` |
 | change the help text | `internal/cli/cli.go`: the `usage` and `help` of each row of `commands`, the `help` of an `option`, and the `Long` text in `tree`. The layout is `cobra`'s |
-| know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `runIn`, `exitCode` |
+| know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `carryOut`, `exitCode` |
 | change what Ctrl+C does | `internal/cli/cli.go`: `Main`, `heed`, `leaveAtOnce`; `internal/build/lock.go`: `ReleaseHeld` |
 | know where the log file is written | `internal/cli/cli.go`: `logFile`; `internal/env/log.go` |
 | change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/files.go`: `PklProject`, `LocalPkl` |

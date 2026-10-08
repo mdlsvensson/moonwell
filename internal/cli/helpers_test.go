@@ -189,6 +189,15 @@ func contains(t *testing.T, text string, parts ...string) {
 // exists reports whether a file or folder of root is there; path uses "/".
 func exists(root, path string) bool { return fsx.Exists(filepath.Join(root, filepath.FromSlash(path))) }
 
+// rowOf is the row of a command table for the command of this name.
+func rowOf(table []command, name string) (command, bool) {
+	at := slices.IndexFunc(table, func(row command) bool { return row.name == name })
+	if at < 0 {
+		return command{}, false
+	}
+	return table[at], true
+}
+
 // rowNamed is the row of the command table for a command that must be there.
 func rowNamed(t *testing.T, name string) command {
 	t.Helper()

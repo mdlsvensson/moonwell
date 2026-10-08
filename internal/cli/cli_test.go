@@ -24,7 +24,7 @@ import (
 func TestTheHelpAndTheVersionArePrintedForOtherPrograms(t *testing.T) {
 	for _, args := range [][]string{{"--help"}, {}, {"build", "--help"}, {"help", "init"}} {
 		result := ok(t, t.TempDir(), args...)
-		if result.output != "" || !strings.Contains(result.stdout, "Usage:") {
+		if result.output != "" || !strings.Contains(result.stdout, "moonwell") {
 			t.Errorf("%q: %+v", args, result)
 		}
 	}
@@ -245,8 +245,8 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 // program check runs, and before a command runs, here while its outside world is made. Both are in a project, so
 // the line has a log by then, and the fault is kept in it.
 //
-// The parser is on the same way, before the two: no test makes it panic, since it calls nothing a test can
-// hand it.
+// cobra reads the line on the same way, before the two: no test makes it panic, since it calls nothing a test
+// can hand it.
 func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 	inACommand := func(root string, log *env.Logger) *env.Env {
 		e := standIn(t)(root, log)
@@ -354,8 +354,8 @@ func TestEveryCommandOfTheTableCanBeShownAndRun(t *testing.T) {
 	}
 }
 
-// The table lists the commands in the order of the usage text, and each takes the arguments its usage shows: one
-// at most where the usage names one, and none else.
+// The table lists the commands in the order of the help, and each takes the arguments its usage shows: one at
+// most where the usage names one, and none else.
 func TestTheTableHasTheTwelveCommandsInTheOrderOfTheUsage(t *testing.T) {
 	want := []string{
 		"init", "setup", "build", "test", "dev", "check", "assets:check", "assets:sync", "assets:paths",

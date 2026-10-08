@@ -216,7 +216,8 @@ func linkPath(target, schema string) (string, error) {
 // chooseEmpty is the hint of every refusal of the folder init is given.
 const chooseEmpty = "Choose a new or empty directory."
 
-// errInitNeedsAFolder refuses an init without its argument, as the line is read.
+// errInitNeedsAFolder refuses an init whose folder is an empty name. An init without its argument does not get
+// here: cobra refuses that line.
 func errInitNeedsAFolder() error {
 	return &diag.Error{Msg: "init needs a directory.", Hint: "moonwell init my-map"}
 }

@@ -16,7 +16,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime/debug"
-	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -103,17 +102,14 @@ var commands = []command{
 		run: runObjectsCheck},
 }
 
-// rowOf is the row of a command table for the command of this name.
-func rowOf(table []command, name string) (command, bool) {
-	at := slices.IndexFunc(table, func(row command) bool { return row.name == name })
-	if at < 0 {
-		return command{}, false
-	}
-	return table[at], true
+// Two of cobra's settings, which are the same for every tree of a program, are changed for Moonwell. The help
+// lists the commands as the table does, where cobra would list them by their names. And a start from Windows
+// Explorer is a start like any other, as it was before cobra read the line: cobra would say that this is a
+// command line tool and leave with 1, also when a shortcut names a command.
+func init() {
+	cobra.EnableCommandSorting = false
+	cobra.MousetrapHelpText = ""
 }
-
-// cobra lists a tree's commands by their names unless it is told not to: the help lists them as the table does.
-func init() { cobra.EnableCommandSorting = false }
 
 // Run runs one command line in the folder root and returns the exit code: 0, 1 for a failure, and 130 when ctx
 // was cancelled before the command ended. write takes the lines for the terminal; print takes output meant for
@@ -150,8 +146,9 @@ type running struct {
 // carryOut reads the line and carries it out: the tree is made of the table, cobra reads the line by it and
 // runs what the line names, and the outcome becomes the exit code.
 //
-// What cobra prints itself is the help, the version and a completion script. It is printed for other programs,
-// whole, once the line has ended: a shell reads the script, and the help can be piped to a pager.
+// What cobra prints itself is the help and a completion script. It is printed for other programs, whole, once
+// the line has ended: a shell reads the script, and the help can be piped to a pager. The version goes the same
+// way.
 //
 // Only a line that names a command of the table, and that is well formed, gets as far as a log file and the
 // outside world: a line that cobra refuses, and one that asks for the help or the version, write nothing to
@@ -174,7 +171,8 @@ func (r *running) carryOut(args []string) (code int) {
 	var printed, complaints strings.Builder
 	top.SetOut(&printed)
 	top.SetErr(&complaints)
-	top.SetArgs(args)
+	// A line without arguments is given as one: for no arguments at all, cobra would read the program's own.
+	top.SetArgs(append([]string{}, args...))
 	err := top.ExecuteContext(r.ctx)
 	if printed.Len() > 0 {
 		r.print(strings.TrimSuffix(printed.String(), "\n"))
@@ -192,20 +190,28 @@ func (r *running) carryOut(args []string) (code int) {
 	return 1
 }
 
-// tree is the command line as cobra reads it: moonwell itself, which has the help and the version, and below
+// tree is the command line as cobra reads it: moonwell itself, which prints the help or the version, and below
 // it a command for each row of the table; cobra adds its own two, help and completion. It is made anew for
 // every line, since it holds what the line came to.
 func (r *running) tree() *cobra.Command {
 	top := &cobra.Command{
-		Use:     "moonwell",
-		Long:    "Moonwell " + moonwell.Version + ": Warcraft III maps with YueScript gameplay and Pkl data",
-		Version: moonwell.Version,
+		Use:  "moonwell",
+		Long: "Moonwell " + moonwell.Version + ": Warcraft III maps with YueScript gameplay and Pkl data",
 		// A failure is printed once, by this package, as every failure of Moonwell is printed.
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		// moonwell alone prints the help, and with --version the version, as a bare number: the release workflow
+		// compares it with the tag. cobra's own --version prints a sentence, and prints a bare number only by a
+		// template, which makes the program 2.7 MB larger.
+		RunE: func(c *cobra.Command, _ []string) error {
+			if asked, _ := c.Flags().GetBool("version"); asked {
+				r.print(moonwell.Version)
+				return nil
+			}
+			return c.Help()
+		},
 	}
-	// The version is printed as a bare number: the install scripts and the release workflow read it.
-	top.SetVersionTemplate("{{.Version}}\n")
+	top.Flags().BoolP("version", "v", false, "Print the version")
 	for _, row := range r.table {
 		top.AddCommand(r.commandOf(row))
 	}

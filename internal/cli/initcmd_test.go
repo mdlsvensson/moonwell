@@ -93,8 +93,7 @@ func TestInitRefusesATargetThatIsAFileOrIsNotEmpty(t *testing.T) {
 	}
 }
 
-// An empty name is no folder to make: it is refused as an init without its argument is, and is not read as the
-// working folder.
+// An empty name is no folder to make: it is refused, and is not read as the working folder.
 func TestInitRefusesAnEmptyFolderName(t *testing.T) {
 	for _, args := range [][]string{{"init", ""}, {"init", "--", ""}, {"init", "--link", ""}} {
 		root := t.TempDir()

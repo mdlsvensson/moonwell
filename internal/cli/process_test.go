@@ -95,7 +95,7 @@ func TestMoonwellExecutable(t *testing.T) {
 		if code != 0 || log != "" {
 			t.Fatalf("exit %d; stdout %q; stderr %q", code, out, log)
 		}
-		contains(t, out, "Usage:\n  moonwell")
+		contains(t, out, "Moonwell ", "assets:check")
 	})
 	t.Run("an unknown command ends with 1", func(t *testing.T) {
 		code, out, log := s.run(t, "unknown")
