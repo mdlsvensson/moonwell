@@ -175,19 +175,19 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	var damaged tally
-	for _, file := range wholeFiles(t) {
-		for length := range len(file.data) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
+	for _, displayPath := range wholeFiles(t) {
+		for length := range len(displayPath.data) {
+			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
 		}
 		for index := range uint64(1500) {
-			what := fmt.Sprintf("%s, change %d of seed %d", file.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index))
+			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
+			damaged.readOrRefused(t, what, testkit.ChangedBytes(displayPath.data, damageSeed, index))
 		}
 	}
-	for _, file := range alteredFiles(t) {
-		damaged.readOrRefused(t, file.name, file.data)
-		for length := range len(file.data) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
+	for _, displayPath := range alteredFiles(t) {
+		damaged.readOrRefused(t, displayPath.name, displayPath.data)
+		for length := range len(displayPath.data) {
+			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
 		}
 	}
 	if damaged.read == 0 || damaged.refused == 0 {

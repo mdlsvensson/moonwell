@@ -10,7 +10,7 @@ import (
 
 type Edit struct {
 	Start, End int
-	Bytes      []byte
+	Data       []byte
 }
 
 func TextEdit(field Field[string], value string) Edit {
@@ -36,36 +36,36 @@ func ByteEdit(field Field[uint8], value uint8) Edit {
 }
 
 func ApplyEdits(source []byte, edits []Edit) ([]byte, error) {
-	ordered := slices.Clone(edits)
-	slices.SortStableFunc(ordered, func(a, b Edit) int { return cmp.Compare(a.Start, b.Start) })
-	if !apart(ordered, len(source)) {
-		return nil, errEdits()
+	sorted := slices.Clone(edits)
+	slices.SortStableFunc(sorted, func(a, b Edit) int { return cmp.Compare(a.Start, b.Start) })
+	if !areDisjoint(sorted, len(source)) {
+		return nil, errOverlappingEdits()
 	}
-	return spliced(source, ordered), nil
+	return applySorted(source, sorted), nil
 }
 
-func apart(ordered []Edit, size int) bool {
-	kept := 0
-	for _, edit := range ordered {
-		if edit.Start < kept || edit.End < edit.Start || edit.End > size {
+func areDisjoint(sorted []Edit, size int) bool {
+	end := 0
+	for _, edit := range sorted {
+		if edit.Start < end || edit.End < edit.Start || edit.End > size {
 			return false
 		}
-		kept = edit.End
+		end = edit.End
 	}
 	return true
 }
 
-func spliced(source []byte, ordered []Edit) []byte {
+func applySorted(source []byte, sorted []Edit) []byte {
 	result := make([]byte, 0, len(source))
 	kept := 0
-	for _, edit := range ordered {
+	for _, edit := range sorted {
 		result = append(result, source[kept:edit.Start]...)
-		result = append(result, edit.Bytes...)
+		result = append(result, edit.Data...)
 		kept = edit.End
 	}
 	return append(result, source[kept:]...)
 }
 
-func errEdits() error {
+func errOverlappingEdits() error {
 	return errors.New("Invalid or overlapping map-info edits.")
 }

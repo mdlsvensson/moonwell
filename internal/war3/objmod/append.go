@@ -23,13 +23,13 @@ type NewObject struct {
 	Mods     []NewMod
 }
 
-func AppendTo(parsed *File, source []byte, kind TableKind, objects []NewObject) ([]byte, error) {
-	if err := unwritable(objects, kind); err != nil {
+func AppendObjects(parsed *File, source []byte, kind TableKind, objects []NewObject) ([]byte, error) {
+	if err := checkWritable(objects, kind); err != nil {
 		return nil, err
 	}
-	w := begin(parsed, source, kind, len(objects))
+	w := newWriter(parsed, source, kind, len(objects))
 	for _, object := range objects {
-		w.object(object)
+		w.writeObject(object)
 	}
 	return w.out.Bytes(), nil
 }
@@ -40,7 +40,7 @@ type writer struct {
 	kind    TableKind
 }
 
-func begin(parsed *File, source []byte, kind TableKind, added int) *writer {
+func newWriter(parsed *File, source []byte, kind TableKind, added int) *writer {
 	if parsed == nil {
 		w := &writer{version: NewFileVersion, kind: kind}
 		w.out.I32(NewFileVersion)
@@ -56,7 +56,7 @@ func begin(parsed *File, source []byte, kind TableKind, added int) *writer {
 	return w
 }
 
-func (w *writer) object(object NewObject) {
+func (w *writer) writeObject(object NewObject) {
 	w.out.Write(object.Base[:])
 	w.out.Write(object.ID[:])
 	if w.version >= 3 {
@@ -65,11 +65,11 @@ func (w *writer) object(object NewObject) {
 	}
 	w.out.I32(int32(len(object.Mods)))
 	for _, mod := range object.Mods {
-		w.modification(mod)
+		w.writeModification(mod)
 	}
 }
 
-func (w *writer) modification(mod NewMod) {
+func (w *writer) writeModification(mod NewMod) {
 	w.out.Write(mod.Field[:])
 	w.out.I32(int32(mod.Value.Type))
 	if w.kind == Leveled {
@@ -87,16 +87,16 @@ func (w *writer) modification(mod NewMod) {
 	w.out.I32(0)
 }
 
-func unwritable(objects []NewObject, kind TableKind) error {
+func checkWritable(objects []NewObject, kind TableKind) error {
 	for _, object := range objects {
-		if err := refused(object, kind); err != nil {
+		if err := checkObject(object, kind); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func refused(object NewObject, kind TableKind) error {
+func checkObject(object NewObject, kind TableKind) error {
 	if object.Base == (ID{}) {
 		return fmt.Errorf("Cannot write the object %q: its base is four NUL bytes.", object.ID)
 	}
@@ -113,19 +113,19 @@ func refused(object NewObject, kind TableKind) error {
 		case kind == Simple && (mod.Level != 0 || mod.Column != 0):
 			return fmt.Errorf("Cannot write %s at level %d, column %d: a simple table has neither.",
 				mod.Field, mod.Level, mod.Column)
-		case value.Type == String && !storable(value.Text):
+		case value.Type == String && !isStorableText(value.Text):
 			return fmt.Errorf("Cannot write %q: it contains NUL or invalid UTF-8.", value.Text)
-		case (value.Type == Real || value.Type == Unreal) && !finite(value.Real):
+		case (value.Type == Real || value.Type == Unreal) && !isFinite(value.Real):
 			return fmt.Errorf("Cannot write %v as a float32.", value.Real)
 		}
 	}
 	return nil
 }
 
-func storable(text string) bool {
+func isStorableText(text string) bool {
 	return !strings.Contains(text, "\x00") && utf8.ValidString(text)
 }
 
-func finite(number float32) bool {
+func isFinite(number float32) bool {
 	return !math.IsNaN(float64(number)) && !math.IsInf(float64(number), 0)
 }

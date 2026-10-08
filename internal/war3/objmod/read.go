@@ -75,212 +75,212 @@ type File struct {
 
 const maxSets = 64
 
-func Read(data []byte, kind TableKind, file string) (*File, error) {
-	r := &reader{data: binio.NewReader(data), kind: kind, file: file}
-	parsed := r.whole()
-	if err := r.failure(); err != nil {
+func Read(data []byte, kind TableKind, displayPath string) (*File, error) {
+	r := &reader{input: binio.NewReader(data), kind: kind, displayPath: displayPath}
+	parsed := r.readFile()
+	if err := r.readErr(); err != nil {
 		return nil, err
 	}
 	return parsed, nil
 }
 
 type reader struct {
-	data    *binio.Reader
-	kind    TableKind
-	file    string
-	version int32
-	problem error
+	input       *binio.Reader
+	kind        TableKind
+	displayPath string
+	version     int32
+	err         error
 }
 
-func (r *reader) refuse(problem error) {
-	if !r.stopped() {
-		r.problem = problem
+func (r *reader) fail(err error) {
+	if !r.hasFailed() {
+		r.err = err
 	}
 }
 
-func (r *reader) stopped() bool {
-	return r.problem != nil || r.data.Err() != nil
+func (r *reader) hasFailed() bool {
+	return r.err != nil || r.input.Err() != nil
 }
 
-func (r *reader) failure() error {
-	failure := r.data.Err()
+func (r *reader) readErr() error {
+	readErr := r.input.Err()
 	switch {
-	case r.problem != nil:
-		return r.problem
-	case failure == nil:
+	case r.err != nil:
+		return r.err
+	case readErr == nil:
 		return nil
-	case failure.Unterminated:
-		return errUnterminated(r.file)
+	case readErr.Unterminated:
+		return errUnterminated(r.displayPath)
 	}
-	return errTruncated(r.file)
+	return errTruncated(r.displayPath)
 }
 
-func (r *reader) whole() *File {
-	r.version = r.data.I32()
+func (r *reader) readFile() *File {
+	r.version = r.input.I32()
 	if r.version < 1 || r.version > 3 {
-		r.refuse(errVersion(r.file, r.version))
+		r.fail(errUnsupportedVersion(r.displayPath, r.version))
 	}
 	parsed := &File{Version: r.version}
-	parsed.Original = r.table()
-	parsed.Custom = r.table()
-	if r.data.Len() != 0 {
-		r.refuse(errTrailing(r.file))
+	parsed.Original = r.readTable()
+	parsed.Custom = r.readTable()
+	if r.input.Len() != 0 {
+		r.fail(errTrailingData(r.displayPath))
 	}
 	return parsed
 }
 
-func (r *reader) table() Table {
-	table := Table{CountOffset: r.data.Offset(), Objects: []Object{}}
-	r.times(r.count("object", r.smallestObject()), func() {
-		table.Objects = append(table.Objects, r.object())
+func (r *reader) readTable() Table {
+	table := Table{CountOffset: r.input.Offset(), Objects: []Object{}}
+	r.repeat(r.readCount("object", r.minObjectSize()), func() {
+		table.Objects = append(table.Objects, r.readObject())
 	})
-	table.Start, table.Stop = table.CountOffset+4, r.data.Offset()
+	table.Start, table.Stop = table.CountOffset+4, r.input.Offset()
 	return table
 }
 
-func (r *reader) object() Object {
-	object := Object{Start: r.data.Offset()}
-	object.Base, object.ID = r.id(), r.id()
-	r.times(r.setCount(), func() {
-		object.Sets = append(object.Sets, r.set())
+func (r *reader) readObject() Object {
+	object := Object{Start: r.input.Offset()}
+	object.Base, object.ID = r.readID(), r.readID()
+	r.repeat(r.readSetCount(), func() {
+		object.Sets = append(object.Sets, r.readSet())
 	})
-	object.Stop = r.data.Offset()
+	object.Stop = r.input.Offset()
 	return object
 }
 
-func (r *reader) setCount() int {
+func (r *reader) readSetCount() int {
 	if r.version < 3 {
 		return 1
 	}
-	count := r.data.I32()
+	count := r.input.I32()
 	if count < 1 || count > maxSets {
-		r.refuse(errSetCount(r.file, count))
+		r.fail(errSetCount(r.displayPath, count))
 		return 0
 	}
 	return int(count)
 }
 
-func (r *reader) set() Set {
+func (r *reader) readSet() Set {
 	set := Set{Mods: []Modification{}}
 	if r.version >= 3 {
-		set.Flag = r.data.I32()
+		set.Flag = r.input.I32()
 	}
-	r.times(r.count("modification", r.smallestModification()), func() {
-		set.Mods = append(set.Mods, r.modification())
+	r.repeat(r.readCount("modification", r.minModificationSize()), func() {
+		set.Mods = append(set.Mods, r.readModification())
 	})
 	return set
 }
 
-func (r *reader) modification() Modification {
-	mod := Modification{Start: r.data.Offset()}
-	mod.Field = r.id()
-	valueType := r.data.I32()
+func (r *reader) readModification() Modification {
+	mod := Modification{Start: r.input.Offset()}
+	mod.Field = r.readID()
+	valueType := r.input.I32()
 	if r.kind == Leveled {
-		mod.Level, mod.Column = r.data.I32(), r.data.I32()
+		mod.Level, mod.Column = r.input.I32(), r.input.I32()
 	}
-	mod.Value = r.value(valueType)
-	mod.End = r.id()
-	mod.Stop = r.data.Offset()
+	mod.Value = r.readValue(valueType)
+	mod.End = r.readID()
+	mod.Stop = r.input.Offset()
 	return mod
 }
 
-func (r *reader) value(number int32) Value {
+func (r *reader) readValue(number int32) Value {
 	switch valueType := ValueType(number); valueType {
 	case Int:
-		return Value{Type: Int, Int: r.data.I32()}
+		return Value{Type: Int, Int: r.input.I32()}
 	case Real, Unreal:
-		return Value{Type: valueType, Real: r.data.F32()}
+		return Value{Type: valueType, Real: r.input.F32()}
 	case String:
-		return Value{Type: String, Text: r.text()}
+		return Value{Type: String, Text: r.readText()}
 	}
-	r.refuse(errValueType(r.file, number))
+	r.fail(errUnknownValueType(r.displayPath, number))
 	return Value{}
 }
 
-func (r *reader) count(what string, smallest int) int {
-	count := r.data.I32()
-	if count < 0 || int64(count)*int64(smallest) > int64(r.data.Len()) {
-		r.refuse(errCount(r.file, what, count))
+func (r *reader) readCount(what string, smallest int) int {
+	count := r.input.I32()
+	if count < 0 || int64(count)*int64(smallest) > int64(r.input.Len()) {
+		r.fail(errBadCount(r.displayPath, what, count))
 	}
-	if r.stopped() {
+	if r.hasFailed() {
 		return 0
 	}
 	return int(count)
 }
 
-func (r *reader) times(count int, read func()) {
+func (r *reader) repeat(count int, read func()) {
 	for range count {
-		if r.stopped() {
+		if r.hasFailed() {
 			return
 		}
 		read()
 	}
 }
 
-func (r *reader) smallestObject() int {
+func (r *reader) minObjectSize() int {
 	if r.version >= 3 {
 		return 20
 	}
 	return 12
 }
 
-func (r *reader) smallestModification() int {
+func (r *reader) minModificationSize() int {
 	if r.kind == Leveled {
 		return 21
 	}
 	return 13
 }
 
-func (r *reader) id() ID {
+func (r *reader) readID() ID {
 	var id ID
-	copy(id[:], r.data.Bytes(len(id)))
+	copy(id[:], r.input.Bytes(len(id)))
 	return id
 }
 
-func (r *reader) text() string {
-	raw := r.data.CString()
+func (r *reader) readText() string {
+	raw := r.input.CString()
 	if !utf8.Valid(raw) {
-		r.refuse(errNotUTF8(r.file))
+		r.fail(errNotUTF8(r.displayPath))
 	}
 	return fsx.TrimBOM(string(raw))
 }
 
-func errUnreadable(file, problem string) error {
+func errUnreadable(displayPath, problem string) error {
 	return &diag.Error{
 		Msg:  "Cannot read object data: " + problem + ".",
-		File: file,
+		File: displayPath,
 		Hint: "Open and re-save this map in World Editor 3.00.",
 	}
 }
 
-func errVersion(file string, version int32) error {
-	return errUnreadable(file, fmt.Sprintf("unsupported version %d", version))
+func errUnsupportedVersion(displayPath string, version int32) error {
+	return errUnreadable(displayPath, fmt.Sprintf("unsupported version %d", version))
 }
 
-func errTruncated(file string) error {
-	return errUnreadable(file, "truncated file")
+func errTruncated(displayPath string) error {
+	return errUnreadable(displayPath, "truncated file")
 }
 
-func errUnterminated(file string) error {
-	return errUnreadable(file, "unterminated string")
+func errUnterminated(displayPath string) error {
+	return errUnreadable(displayPath, "unterminated string")
 }
 
-func errNotUTF8(file string) error {
-	return errUnreadable(file, "invalid UTF-8 in a string")
+func errNotUTF8(displayPath string) error {
+	return errUnreadable(displayPath, "invalid UTF-8 in a string")
 }
 
-func errCount(file, what string, count int32) error {
-	return errUnreadable(file, fmt.Sprintf("%s count %d past end of file", what, count))
+func errBadCount(displayPath, what string, count int32) error {
+	return errUnreadable(displayPath, fmt.Sprintf("%s count %d past end of file", what, count))
 }
 
-func errSetCount(file string, count int32) error {
-	return errUnreadable(file, fmt.Sprintf("unsupported set count %d", count))
+func errSetCount(displayPath string, count int32) error {
+	return errUnreadable(displayPath, fmt.Sprintf("unsupported set count %d", count))
 }
 
-func errValueType(file string, number int32) error {
-	return errUnreadable(file, fmt.Sprintf("unknown value type %d", number))
+func errUnknownValueType(displayPath string, number int32) error {
+	return errUnreadable(displayPath, fmt.Sprintf("unknown value type %d", number))
 }
 
-func errTrailing(file string) error {
-	return errUnreadable(file, "trailing bytes after the custom objects")
+func errTrailingData(displayPath string) error {
+	return errUnreadable(displayPath, "trailing bytes after the custom objects")
 }

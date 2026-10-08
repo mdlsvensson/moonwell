@@ -66,12 +66,12 @@ func (p *planner) preview(preview *picture.Picture) error {
 		return err
 	}
 	if preview.Extension == "blp" {
-		return p.write(savedMinimap, preview.Bytes)
+		return p.write(savedMinimap, preview.Data)
 	}
 	if err := p.change(mapdir.Change{Path: savedMinimap, Remove: true}); err != nil {
 		return err
 	}
-	return p.write(tgaName, preview.Bytes)
+	return p.write(tgaName, preview.Data)
 }
 
 func errNoMinimap(file string) error {

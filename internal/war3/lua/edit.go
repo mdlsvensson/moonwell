@@ -13,33 +13,33 @@ type Edit struct {
 }
 
 func ApplyEdits(source string, edits []Edit) (string, error) {
-	ordered := slices.Clone(edits)
-	slices.SortStableFunc(ordered, inOrder)
-	if !apart(ordered, len(source)) {
-		return "", errEdits()
+	sorted := slices.Clone(edits)
+	slices.SortStableFunc(sorted, compareEdits)
+	if !areDisjoint(sorted, len(source)) {
+		return "", errOverlappingEdits()
 	}
-	return spliced(source, ordered), nil
+	return applySorted(source, sorted), nil
 }
 
-func inOrder(a, b Edit) int {
+func compareEdits(a, b Edit) int {
 	return cmp.Or(cmp.Compare(a.Start, b.Start), cmp.Compare(a.End, b.End))
 }
 
-func apart(ordered []Edit, size int) bool {
-	kept := 0
-	for _, edit := range ordered {
-		if edit.Start < kept || edit.End < edit.Start || edit.End > size {
+func areDisjoint(sorted []Edit, size int) bool {
+	end := 0
+	for _, edit := range sorted {
+		if edit.Start < end || edit.End < edit.Start || edit.End > size {
 			return false
 		}
-		kept = edit.End
+		end = edit.End
 	}
 	return true
 }
 
-func spliced(source string, ordered []Edit) string {
+func applySorted(source string, sorted []Edit) string {
 	var result strings.Builder
 	kept := 0
-	for _, edit := range ordered {
+	for _, edit := range sorted {
 		result.WriteString(source[kept:edit.Start])
 		result.WriteString(edit.Text)
 		kept = edit.End
@@ -48,6 +48,6 @@ func spliced(source string, ordered []Edit) string {
 	return result.String()
 }
 
-func errEdits() error {
+func errOverlappingEdits() error {
 	return errors.New("Overlapping or invalid Lua edits.")
 }

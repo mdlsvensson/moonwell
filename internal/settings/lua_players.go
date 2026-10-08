@@ -130,7 +130,7 @@ func (p *patcher) position(config lua.Function, s slot) {
 	}
 	var locations []lua.Call
 	for _, call := range p.callsNamed(config, "DefineStartLocation", 3) {
-		number, ok := lua.LiteralNumber(call.Args[0])
+		number, ok := lua.ParseNumberLiteral(call.Args[0])
 		if !ok {
 			p.refuse(errUnknownLocation(p.file))
 			return
@@ -142,7 +142,7 @@ func (p *patcher) position(config lua.Function, s slot) {
 	p.replace(
 		p.one(locations, fmt.Sprintf("DefineStartLocation(%d) in config()", s.location)),
 		fmt.Sprintf("DefineStartLocation(%d, %s, %s)", s.location,
-			lua.Number(float64(s.record.X.Value)), lua.Number(float64(s.record.Y.Value))),
+			lua.FormatNumber(float64(s.record.X.Value)), lua.FormatNumber(float64(s.record.Y.Value))),
 	)
 }
 

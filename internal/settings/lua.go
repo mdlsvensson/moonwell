@@ -54,7 +54,7 @@ func (p *patcher) nameAndDescription(set manifest.Info, info *w3i.Info) {
 }
 
 func (p *patcher) text(native, value string) {
-	p.replace(p.unique(p.function("config"), native, 1), native+"("+lua.Quote(value)+")")
+	p.replace(p.unique(p.function("config"), native, 1), native+"("+lua.QuoteString(value)+")")
 }
 
 func (p *patcher) edited() (string, error) {
@@ -62,7 +62,7 @@ func (p *patcher) edited() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("patching %s: %w", p.file, err)
 	}
-	if _, err := lua.Functions(result, p.file); err != nil {
+	if _, err := lua.ParseFunctions(result, p.file); err != nil {
 		return "", errUnsafeEdit(p.file, err)
 	}
 	return result, nil
@@ -73,7 +73,7 @@ func patchMinimap(source, file string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	p.insertBefore(p.function("main").EndStart, []string{"BlzChangeMinimapTerrainTex(" + lua.Quote(keptMinimap) + ")"})
+	p.insertBefore(p.function("main").EndStart, []string{"BlzChangeMinimapTerrainTex(" + lua.QuoteString(keptMinimap) + ")"})
 	if p.failure != nil {
 		return "", p.failure
 	}

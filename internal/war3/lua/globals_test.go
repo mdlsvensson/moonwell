@@ -151,7 +151,7 @@ func TestTopLevelGlobals(t *testing.T) {
 			nil,
 		},
 	} {
-		if got := TopLevelGlobals(strings.Join(c.source, "\n")); !slices.Equal(got, c.want) {
+		if got := FindTopLevelGlobals(strings.Join(c.source, "\n")); !slices.Equal(got, c.want) {
 			t.Errorf("%s: TopLevelGlobals = %q, want %q", c.name, got, c.want)
 		}
 	}

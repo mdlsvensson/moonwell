@@ -25,33 +25,33 @@ type blpHeader struct {
 	firstOffset, firstSize uint32
 }
 
-func checkBLP(data []byte, file string) error {
-	if err := checkBLPMagic(data, file); err != nil {
+func checkBLP(data []byte, displayPath string) error {
+	if err := checkBLPMagic(data, displayPath); err != nil {
 		return err
 	}
 	if len(data) < blpHeaderSize {
-		return errBLPHeaderCutShort(file)
+		return errBLPHeaderCutShort(displayPath)
 	}
 	header := readBLPHeader(data)
 	if header.content != blpJPEG && header.content != blpPalette {
-		return errBLPContent(file, header.content)
+		return errBLPContentType(displayPath, header.content)
 	}
-	if err := checkSize(file, header.width, header.height); err != nil {
+	if err := checkSize(displayPath, header.width, header.height); err != nil {
 		return err
 	}
 	offset, size := uint64(header.firstOffset), uint64(header.firstSize)
 	if offset < blpHeaderSize || size == 0 || offset+size > uint64(len(data)) {
-		return errBLPMipmapOutside(file)
+		return errBLPMipmapOutside(displayPath)
 	}
 	return nil
 }
 
-func checkBLPMagic(data []byte, file string) error {
+func checkBLPMagic(data []byte, displayPath string) error {
 	switch {
 	case bytes.HasPrefix(data, []byte(blp2Magic)):
-		return errBLP2(file)
+		return errBLP2(displayPath)
 	case !bytes.HasPrefix(data, []byte(blpMagic)):
-		return errNotBLP(file)
+		return errNotBLP(displayPath)
 	}
 	return nil
 }
@@ -69,22 +69,22 @@ func readBLPHeader(data []byte) blpHeader {
 	return blpHeader{content, width, height, firstOffset, firstSize}
 }
 
-func errBLP2(file string) error {
-	return refused(file, "is a BLP2 file, the World of Warcraft format.", "Save it as BLP1, or export it as TGA.")
+func errBLP2(displayPath string) error {
+	return newPictureError(displayPath, "is a BLP2 file, the World of Warcraft format.", "Save it as BLP1, or export it as TGA.")
 }
 
-func errNotBLP(file string) error {
-	return refused(file, "is not a BLP file: it does not start with "+blpMagic+".", exportHint)
+func errNotBLP(displayPath string) error {
+	return newPictureError(displayPath, "is not a BLP file: it does not start with "+blpMagic+".", exportHint)
 }
 
-func errBLPHeaderCutShort(file string) error {
-	return refused(file, fmt.Sprintf("is cut short: a BLP header has %d bytes.", blpHeaderSize), exportHint)
+func errBLPHeaderCutShort(displayPath string) error {
+	return newPictureError(displayPath, fmt.Sprintf("is cut short: a BLP header has %d bytes.", blpHeaderSize), exportHint)
 }
 
-func errBLPContent(file string, content uint32) error {
-	return refused(file, fmt.Sprintf("has the unknown BLP content type %d.", content), exportHint)
+func errBLPContentType(displayPath string, content uint32) error {
+	return newPictureError(displayPath, fmt.Sprintf("has the unknown BLP content type %d.", content), exportHint)
 }
 
-func errBLPMipmapOutside(file string) error {
-	return refused(file, "is cut short: its first mipmap lies outside the file.", exportHint)
+func errBLPMipmapOutside(displayPath string) error {
+	return newPictureError(displayPath, "is cut short: its first mipmap lies outside the file.", exportHint)
 }

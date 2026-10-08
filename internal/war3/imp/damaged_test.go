@@ -61,7 +61,7 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	short := []imp.Entry{{Flag: 0, Path: "a"}, {Flag: 5, Path: "b\xC3\xA5"}, {Flag: 8, Path: `c\d`},
 		{Flag: 10, Path: "e.blp"}, {Flag: 13, Path: "\xE6\x9C\x88"}, {Flag: 29, Path: "f"}}
 	var damaged tally
-	for _, file := range []struct {
+	for _, displayPath := range []struct {
 		name string
 		data []byte
 	}{
@@ -72,12 +72,12 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		{"one entry", imp.Write(short[4:5])},
 		{"no entries", imp.Write(nil)},
 	} {
-		for length := range len(file.data) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
+		for length := range len(displayPath.data) {
+			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
 		}
 		for index := range uint64(1500) {
-			what := fmt.Sprintf("%s, change %d of seed %d", file.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index))
+			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
+			damaged.readOrRefused(t, what, testkit.ChangedBytes(displayPath.data, damageSeed, index))
 		}
 	}
 	three := testkit.Concat(entry(5, "a.blp"), entry(13, `b\c.mdx`), entry(29, "d.tga"))

@@ -45,8 +45,8 @@ func TestAPreviewOfEachKindIsReadFromItsPathInTheProject(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if got.Extension != tt.extension || !bytes.Equal(got.Bytes, tt.want) {
-				t.Errorf("the picture is a %s of %d bytes, want a %s of %d bytes", got.Extension, len(got.Bytes), tt.extension, len(tt.want))
+			if got.Extension != tt.extension || !bytes.Equal(got.Data, tt.want) {
+				t.Errorf("the picture is a %s of %d bytes, want a %s of %d bytes", got.Extension, len(got.Data), tt.extension, len(tt.want))
 			}
 		})
 	}

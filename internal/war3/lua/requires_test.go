@@ -64,7 +64,7 @@ func TestRequires(t *testing.T) {
 			[]Require{lit(1, "b")},
 		},
 	} {
-		if got := Requires(c.source); !slices.Equal(got, c.want) {
+		if got := FindRequires(c.source); !slices.Equal(got, c.want) {
 			t.Errorf("%s: Requires = %+v, want %+v", c.name, got, c.want)
 		}
 	}

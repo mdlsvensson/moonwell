@@ -57,7 +57,7 @@ func (p *patcher) sound(main lua.Function, details *w3i.Details) string {
 	if name == "" {
 		name = "Default"
 	}
-	return "NewSoundEnvironment(" + lua.Quote(name) + ")"
+	return "NewSoundEnvironment(" + lua.QuoteString(name) + ")"
 }
 
 func (p *patcher) water(main lua.Function, details *w3i.Details) string {
@@ -77,8 +77,8 @@ func (p *patcher) fog(main lua.Function, info *w3i.Info) string {
 		p.refuse(errNoFog(p.file))
 		return ""
 	}
-	number := func(value float32) string { return lua.Number(float64(value)) }
-	channel := func(i int) string { return lua.Number(float64(fog.Color[i].Value) / 255) }
+	number := func(value float32) string { return lua.FormatNumber(float64(value)) }
+	channel := func(i int) string { return lua.FormatNumber(float64(fog.Color[i].Value) / 255) }
 	return fmt.Sprintf("SetTerrainFogEx(%d, %s, %s, %s, %s, %s, %s)", fog.Style.Value,
 		number(fog.Start.Value), number(fog.End.Value), number(fog.Density.Value), channel(0), channel(1), channel(2))
 }

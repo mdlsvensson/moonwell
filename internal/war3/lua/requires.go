@@ -6,7 +6,7 @@ type Require struct {
 	Literal bool
 }
 
-func Requires(source string) []Require {
+func FindRequires(source string) []Require {
 	tokens := simpleTokens(source)
 	var calls []Require
 	for i, token := range tokens {
@@ -39,8 +39,8 @@ func stringArgument(after []Token) (literal *Token, called bool) {
 	switch {
 	case len(after) > 0 && after[0].Kind == StringToken:
 		return &after[0], true
-	case len(after) > 0 && after[0].is("("):
-		if len(after) > 2 && after[1].Kind == StringToken && after[2].is(")") {
+	case len(after) > 0 && after[0].isSymbol("("):
+		if len(after) > 2 && after[1].Kind == StringToken && after[2].isSymbol(")") {
 			return &after[1], true
 		}
 		return nil, true

@@ -35,7 +35,7 @@ func (r refusal) check(t *testing.T) *diag.Error {
 		t.Errorf("%s: message %q, hint %q, want a message with %q and a hint", r.name, failure.Msg, failure.Hint, r.words)
 	}
 	if result != nil {
-		t.Errorf("%s: a refused picture returned %d bytes", r.name, len(result.Bytes))
+		t.Errorf("%s: a refused picture returned %d bytes", r.name, len(result.Data))
 	}
 	return failure
 }
@@ -69,7 +69,7 @@ func TestEveryAcceptedTGAIsWrittenAsTheOneLayoutTheGameWasSeenToAccept(t *testin
 					for _, id := range []int{0, 5} {
 						data := testkit.TGA(source, testkit.TGAOptions{RLE: rle, Depth: depth, FromTop: fromTop, ID: id})
 						result, err := picture.Read(data, "art/Preview.TGA")
-						if err != nil || result.Extension != "tga" || !bytes.Equal(result.Bytes, expected) {
+						if err != nil || result.Extension != "tga" || !bytes.Equal(result.Data, expected) {
 							t.Errorf("size %d, rle %v, %d bits, from top %v, id %d: %v", size, rle, depth, fromTop, id, err)
 						}
 					}
@@ -85,15 +85,15 @@ func TestAWrittenTGAStartsWithThePicturesBottomRowAndHasNothingAfterItsPixels(t 
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(result.Bytes) != tgaHeaderSize+256*256*4 {
-		t.Errorf("the written TGA has %d bytes", len(result.Bytes))
+	if len(result.Data) != tgaHeaderSize+256*256*4 {
+		t.Errorf("the written TGA has %d bytes", len(result.Data))
 	}
-	if got := result.Bytes[tgaHeaderSize : tgaHeaderSize+4]; !bytes.Equal(got, []byte{200, 40, 255, 255}) {
+	if got := result.Data[tgaHeaderSize : tgaHeaderSize+4]; !bytes.Equal(got, []byte{200, 40, 255, 255}) {
 		t.Errorf("the first pixel is %v", got)
 	}
 	footer := append(testkit.TGA(source, testkit.TGAOptions{}), "TRUEVISION-XFILE.\x00"...)
 	again, err := picture.Read(footer, "preview.tga")
-	if err != nil || !bytes.Equal(again.Bytes, result.Bytes) {
+	if err != nil || !bytes.Equal(again.Data, result.Data) {
 		t.Errorf("a TGA with a footer: %v", err)
 	}
 }
@@ -109,7 +109,7 @@ func TestTheAlphaBitsOfATGAsDescriptorDoNotMoveItsRows(t *testing.T) {
 		for _, bits := range []byte{0x01, 0x02, 0x04, 0x08, 0x0F} {
 			with := edited(slices.Clone(source), func(b []byte) { b[descriptor] = b[descriptor]&0xF0 | bits })
 			got, err := picture.Read(with, "preview.tga")
-			if err != nil || !bytes.Equal(got.Bytes, want.Bytes) {
+			if err != nil || !bytes.Equal(got.Data, want.Data) {
 				t.Errorf("%+v with the alpha bits %#x: %v, or another picture", options, bits, err)
 			}
 		}
@@ -161,7 +161,7 @@ func TestATGATheReaderDoesNotKnowIsRefusedByWhatItIs(t *testing.T) {
 		c.check(t)
 	}
 	result, err := picture.Read(slices.Concat(runsOfAllButOnePixel(), run(1)), "preview.tga")
-	if err != nil || result.Bytes[tgaHeaderSize+2] != 3 {
+	if err != nil || result.Data[tgaHeaderSize+2] != 3 {
 		t.Errorf("a picture of runs: %v", err)
 	}
 }
@@ -199,7 +199,7 @@ func TestABLP1WithJPEGOrPaletteContentIsUsedAsItIs(t *testing.T) {
 		for _, content := range []uint32{0, 1} {
 			data := testkit.BLP(size, content)
 			result, err := picture.Read(data, "Preview.BLP")
-			if err != nil || result.Extension != "blp" || !bytes.Equal(result.Bytes, data) {
+			if err != nil || result.Extension != "blp" || !bytes.Equal(result.Data, data) {
 				t.Errorf("size %d, content %d: %v", size, content, err)
 			}
 		}
@@ -214,7 +214,7 @@ func TestABLP1WithJPEGOrPaletteContentIsUsedAsItIs(t *testing.T) {
 		{"of the last byte", length - 1, 1},
 	} {
 		data := edited(edited(testkit.BLP(256, 1), putU32(28, c.offset)), putU32(92, c.size))
-		if result, err := picture.Read(data, "preview.blp"); err != nil || !bytes.Equal(result.Bytes, data) {
+		if result, err := picture.Read(data, "preview.blp"); err != nil || !bytes.Equal(result.Data, data) {
 			t.Errorf("a first mipmap %s: %v", c.name, err)
 		}
 	}
@@ -276,7 +276,7 @@ func TestAPNGOfAnyKindGoesInAsTheTGAThatATGAOfTheSamePictureGives(t *testing.T) 
 			}
 			for _, kind := range kinds {
 				result, err := picture.Read(testkit.PNG(source, kind), "art/Preview.PNG")
-				if err != nil || result.Extension != "tga" || !bytes.Equal(result.Bytes, expected.Bytes) {
+				if err != nil || result.Extension != "tga" || !bytes.Equal(result.Data, expected.Data) {
 					t.Errorf("size %d, %s: %v", size, kind, err)
 				}
 			}
@@ -301,10 +301,10 @@ func TestAPNGsTransparencyIsDroppedAndItsStoredColourKept(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if !bytes.Equal(result.Bytes, expected) {
+			if !bytes.Equal(result.Data, expected) {
 				t.Errorf("alpha %d, %s: the picture is not the opaque TGA of its stored colours", alpha, kind)
 			}
-			if got := result.Bytes[tgaHeaderSize : tgaHeaderSize+4]; !bytes.Equal(got, []byte{200, 40, 255, 255}) {
+			if got := result.Data[tgaHeaderSize : tgaHeaderSize+4]; !bytes.Equal(got, []byte{200, 40, 255, 255}) {
 				t.Errorf("alpha %d, %s: the first pixel is %v", alpha, kind, got)
 			}
 		}
@@ -354,9 +354,9 @@ func TestAPNGsTransparentColourIsKeptAsItIsStored(t *testing.T) {
 			t.Errorf("%s: %v", kind, err)
 			continue
 		}
-		if !bytes.Equal(result.Bytes, expected) {
+		if !bytes.Equal(result.Data, expected) {
 			t.Errorf("%s: the picture is not the opaque TGA of its stored colours; its first pixel is %v, want %v",
-				kind, result.Bytes[tgaHeaderSize:tgaHeaderSize+4], expected[tgaHeaderSize:tgaHeaderSize+4])
+				kind, result.Data[tgaHeaderSize:tgaHeaderSize+4], expected[tgaHeaderSize:tgaHeaderSize+4])
 		}
 	}
 }
@@ -479,7 +479,7 @@ func TestTheExtensionIsWhatFollowsTheLastDotOfTheLastPartOfThePathInAnyLetterCas
 	expected := testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{Alpha: opaque()})
 	for _, name := range acceptedNames {
 		result, err := picture.Read(data, name)
-		if err != nil || result.Extension != "tga" || !bytes.Equal(result.Bytes, expected) {
+		if err != nil || result.Extension != "tga" || !bytes.Equal(result.Data, expected) {
 			t.Errorf("%q: %v", name, err)
 		}
 	}

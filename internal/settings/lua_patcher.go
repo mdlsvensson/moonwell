@@ -20,7 +20,7 @@ type patcher struct {
 }
 
 func newPatcher(source, file string) (*patcher, error) {
-	functions, err := lua.Functions(source, file)
+	functions, err := lua.ParseFunctions(source, file)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (p *patcher) optional(calls []lua.Call, label string) (lua.Call, bool) {
 func (p *patcher) forPlayer(fn lua.Function, name string, arity, id int) []lua.Call {
 	var calls []lua.Call
 	for _, call := range p.callsNamed(fn, name, arity) {
-		target, ok := lua.PlayerID(call.Args[0])
+		target, ok := lua.ParsePlayerID(call.Args[0])
 		if !ok {
 			p.refuse(errUnknownPlayer(p.file, name, fn.Name))
 			return nil
@@ -116,7 +116,7 @@ func (p *patcher) forPlayer(fn lua.Function, name string, arity, id int) []lua.C
 }
 
 func literalIs(argument []lua.Token, want int) bool {
-	value, ok := lua.LiteralNumber(argument)
+	value, ok := lua.ParseNumberLiteral(argument)
 	return ok && value == float64(want)
 }
 

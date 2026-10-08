@@ -78,7 +78,7 @@ func teamsTail(script string) string {
 
 func mainCalls(t testing.TB, script string) []string {
 	t.Helper()
-	functions, err := lua.Functions(script, luaFile)
+	functions, err := lua.ParseFunctions(script, luaFile)
 	if err != nil {
 		t.Fatal(err)
 	}

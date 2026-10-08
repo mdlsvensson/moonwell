@@ -17,21 +17,21 @@ const startOfAPicture = 2048
 
 type tally struct{ read, refused int }
 
-func (c *tally) readOrRefused(t *testing.T, what string, data []byte, file string) {
+func (c *tally) readOrRefused(t *testing.T, what string, data []byte, displayPath string) {
 	t.Helper()
 	var read *picture.Picture
 	var err error
-	if value := testkit.Panic(func() { read, err = picture.Read(data, file) }); value != nil {
+	if value := testkit.Panic(func() { read, err = picture.Read(data, displayPath) }); value != nil {
 		t.Fatalf("%s: Read panics: %v", what, value)
 	}
 	var failure *diag.Error
 	switch {
 	case err == nil && read != nil:
 		c.read++
-	case err != nil && read == nil && errors.As(err, &failure) && failure.File == file:
+	case err != nil && read == nil && errors.As(err, &failure) && failure.File == displayPath:
 		c.refused++
 	default:
-		t.Fatalf("%s: Read = %+v, %v; want a picture, or an error of %s", what, read, err, file)
+		t.Fatalf("%s: Read = %+v, %v; want a picture, or an error of %s", what, read, err, displayPath)
 	}
 }
 
@@ -51,8 +51,8 @@ func TestADamagedPictureIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	source := testkit.NewPixels(256)
 	var damaged tally
 	for _, whole := range []struct {
-		name, file string
-		data       []byte
+		name, displayPath string
+		data              []byte
 	}{
 		{"a plain TGA", "preview.tga", testkit.TGA(source, testkit.TGAOptions{ID: 7})},
 		{"a run-length TGA", "preview.tga",
@@ -63,15 +63,15 @@ func TestADamagedPictureIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	} {
 		for _, length := range lengthsToCut(len(whole.data)) {
 			what := fmt.Sprintf("%s cut at %d bytes", whole.name, length)
-			damaged.readOrRefused(t, what, whole.data[:length:length], whole.file)
+			damaged.readOrRefused(t, what, whole.data[:length:length], whole.displayPath)
 		}
 		start, rest := whole.data[:startOfAPicture], whole.data[startOfAPicture:]
 		for index := range uint64(150) {
 			what := fmt.Sprintf("%s, change %d of seed %d", whole.name, index, damageSeed)
 			anywhere := testkit.ChangedBytes(whole.data, damageSeed, index)
-			damaged.readOrRefused(t, what+" to the whole file", anywhere, whole.file)
+			damaged.readOrRefused(t, what+" to the whole file", anywhere, whole.displayPath)
 			inStart := slices.Concat(testkit.ChangedBytes(start, damageSeed, index), rest)
-			damaged.readOrRefused(t, what+" to its first 2048 bytes", inStart, whole.file)
+			damaged.readOrRefused(t, what+" to its first 2048 bytes", inStart, whole.displayPath)
 		}
 	}
 	if damaged.read == 0 || damaged.refused == 0 {

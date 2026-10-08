@@ -91,7 +91,7 @@ func TestHeaderlessOnlyForV39MapsFrom131On(t *testing.T) {
 		{w3i.Header{Version: 31, HasGameVersion: true, Major: 1, Minor: 31}, false},
 		{w3i.Header{Version: 25}, false},
 	} {
-		if got := c.header.Headerless(); got != c.want {
+		if got := c.header.IsHeaderless(); got != c.want {
 			t.Errorf("%+v.Headerless() = %v", c.header, got)
 		}
 	}
@@ -375,7 +375,7 @@ func TestApplyEditsReplacesFieldsAndKeepsEveryOtherByte(t *testing.T) {
 }
 
 func edit(start, end int, text string) w3i.Edit {
-	return w3i.Edit{Start: start, End: end, Bytes: []byte(text)}
+	return w3i.Edit{Start: start, End: end, Data: []byte(text)}
 }
 
 func TestApplyEditsTakesEditsInAnyOrderAndRefusesTheOnesThatCannotBeMade(t *testing.T) {

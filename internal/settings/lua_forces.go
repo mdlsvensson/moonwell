@@ -54,8 +54,8 @@ func (p *patcher) forces(overrides map[int]manifest.Force, details *w3i.Details)
 func (p *patcher) teamCalls(teams lua.Function) []teamCall {
 	var calls []teamCall
 	for _, call := range p.callsNamed(teams, "SetPlayerTeam", 2) {
-		player, isPlayer := lua.PlayerID(call.Args[0])
-		team, isTeam := lua.LiteralNumber(call.Args[1])
+		player, isPlayer := lua.ParsePlayerID(call.Args[0])
+		team, isTeam := lua.ParseNumberLiteral(call.Args[1])
 		if !isPlayer || !isTeam {
 			p.refuse(errUnknownTeam(p.file))
 			return nil
@@ -137,7 +137,7 @@ func errUnknownTeam(file string) error {
 
 func errTeamDisagrees(file string, call teamCall, index int) error {
 	return errLua(file, fmt.Sprintf("SetPlayerTeam(Player(%d), %s) disagrees with force %d in war3map.w3i.",
-		call.player, lua.Number(call.team), index))
+		call.player, lua.FormatNumber(call.team), index))
 }
 
 func errTeamCount(file string, member, index int) error {

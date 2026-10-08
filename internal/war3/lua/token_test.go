@@ -92,7 +92,7 @@ func TestTokenizeRecoversFromMalformedTokensAndReportsTheFirst(t *testing.T) {
 			t.Errorf("Tokenize(%q) = %q, want %q", c.source, got, c.raws)
 		}
 	}
-	if got := Requires(afterAnOpenString); !slices.Equal(got, []Require{{Line: 2, Name: "m", Literal: true}}) {
+	if got := FindRequires(afterAnOpenString); !slices.Equal(got, []Require{{Line: 2, Name: "m", Literal: true}}) {
 		t.Errorf("Requires after an unterminated string = %+v", got)
 	}
 }
@@ -107,7 +107,7 @@ func TestQuotedStringsFollowLuasEscapes(t *testing.T) {
 	if tokens[2].Text != "one\\z\n   two" || !tokens[2].Escaped || tokens[5].Text != "x\\\r\ny" {
 		t.Errorf("strings = %q, %q", tokens[2].Text, tokens[5].Text)
 	}
-	if got := Requires(escapedStrings); !slices.Equal(got, []Require{{Line: 3, Name: "m", Literal: true}}) {
+	if got := FindRequires(escapedStrings); !slices.Equal(got, []Require{{Line: 3, Name: "m", Literal: true}}) {
 		t.Errorf("Requires = %+v", got)
 	}
 }

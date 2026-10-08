@@ -44,7 +44,7 @@ func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[str
 		e.Log.Warn("Moonwell's in-game path list is empty, so every path shows as custom.")
 	}
 	if file != "" {
-		if _, err := model.Paths(models[0].Data, models[0].Heading); err != nil {
+		if _, err := model.ReadPaths(models[0].Data, models[0].Heading); err != nil {
 			return err
 		}
 	}

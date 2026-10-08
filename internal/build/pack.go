@@ -26,10 +26,10 @@ func pack(view *mapdir.Folder, name string) ([]byte, error) {
 		return nil, err
 	}
 	var options mpq.Options
-	if !format.Headerless() {
+	if !format.IsHeaderless() {
 		options.Prefix = mpq.HM3WHeader(name, 0, 0)
 	}
-	if tooLarge, fits := mpq.RoomFor(len(options.Prefix), files); !fits {
+	if tooLarge, fits := mpq.CheckFits(len(options.Prefix), files); !fits {
 		return nil, errTooLarge(view, tooLarge)
 	}
 	archive, err := mpq.Write(files, options)

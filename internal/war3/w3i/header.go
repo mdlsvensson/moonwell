@@ -11,11 +11,11 @@ type Header struct {
 	Major, Minor   uint32
 }
 
-func ReadHeader(data []byte, file string) (Header, error) {
+func ReadHeader(data []byte, displayPath string) (Header, error) {
 	r := binio.NewReader(data)
 	header := Header{Version: r.I32()}
 	if r.Err() != nil {
-		return Header{}, errNoVersion(file)
+		return Header{}, errHeaderTruncated(displayPath)
 	}
 	if header.Version < 28 {
 		return header, nil
@@ -29,13 +29,13 @@ func ReadHeader(data []byte, file string) (Header, error) {
 	return header, nil
 }
 
-func (h Header) Headerless() bool {
+func (h Header) IsHeaderless() bool {
 	if h.Version != 39 || !h.HasGameVersion {
 		return false
 	}
 	return h.Major*100+h.Minor >= 131
 }
 
-func errNoVersion(file string) error {
-	return &diag.Error{Msg: "war3map.w3i is truncated.", File: file, Hint: "Save the map again in World Editor."}
+func errHeaderTruncated(displayPath string) error {
+	return &diag.Error{Msg: "war3map.w3i is truncated.", File: displayPath, Hint: "Save the map again in World Editor."}
 }

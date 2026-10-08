@@ -11,9 +11,9 @@ const (
 
 const cipherKeys HashType = 4
 
-var numbers = fixedNumbers()
+var cryptTable = buildCryptTable()
 
-func fixedNumbers() (table [5 << 8]uint32) {
+func buildCryptTable() (table [5 << 8]uint32) {
 	seed := uint32(0x00100001)
 	step := func() uint32 {
 		seed = (seed*125 + 3) % 0x2AAAAB
@@ -28,7 +28,7 @@ func fixedNumbers() (table [5 << 8]uint32) {
 	return table
 }
 
-func upper(c byte) byte {
+func toUpperASCII(c byte) byte {
 	if 'a' <= c && c <= 'z' {
 		return c - 'a' + 'A'
 	}
@@ -38,8 +38,8 @@ func upper(c byte) byte {
 func HashString(s string, hashType HashType) uint32 {
 	seed1, seed2 := uint32(0x7FED7FED), uint32(0xEEEEEEEE)
 	for i := range len(s) {
-		c := uint32(upper(s[i]))
-		seed1 = numbers[uint32(hashType)<<8+c] ^ (seed1 + seed2)
+		c := uint32(toUpperASCII(s[i]))
+		seed1 = cryptTable[uint32(hashType)<<8+c] ^ (seed1 + seed2)
 		seed2 = c + seed1 + seed2 + seed2<<5 + 3
 	}
 	return seed1
@@ -59,11 +59,11 @@ func newKeystream(key uint32) keystream {
 }
 
 func (k *keystream) next() uint32 {
-	k.seed += numbers[uint32(cipherKeys)<<8+(k.key&0xFF)]
+	k.seed += cryptTable[uint32(cipherKeys)<<8+(k.key&0xFF)]
 	return k.key + k.seed
 }
 
-func (k *keystream) took(plain uint32) {
+func (k *keystream) absorb(plain uint32) {
 	k.key = (^k.key<<21 + 0x11111111) | k.key>>11
 	k.seed = plain + k.seed + k.seed<<5 + 3
 }
@@ -72,7 +72,7 @@ func EncryptBlock(words []uint32, key uint32) {
 	stream := newKeystream(key)
 	for i, plain := range words {
 		words[i] = plain ^ stream.next()
-		stream.took(plain)
+		stream.absorb(plain)
 	}
 }
 
@@ -81,6 +81,6 @@ func DecryptBlock(words []uint32, key uint32) {
 	for i, cipher := range words {
 		plain := cipher ^ stream.next()
 		words[i] = plain
-		stream.took(plain)
+		stream.absorb(plain)
 	}
 }

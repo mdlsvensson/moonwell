@@ -37,18 +37,18 @@ func TestLargestArchiveIsTheSizeOfAnArchiveWhoseFilesDoNotCompress(t *testing.T)
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var sizes []sized
+			var sizes []fileSize
 			for at := range tt.files {
 				if tt.files[at].Name == "" {
 					tt.files[at] = File{Name: "file" + string(rune('a'+at)), Data: noise(uint64(at), 100)}
 				}
-				sizes = append(sizes, sized{tt.files[at].Name, int64(len(tt.files[at].Data))})
+				sizes = append(sizes, fileSize{tt.files[at].Name, int64(len(tt.files[at].Data))})
 			}
 			written, err := Write(tt.files, Options{Prefix: make([]byte, tt.prefix)})
 			if err != nil {
 				t.Fatal(err)
 			}
-			counted := largestArchive(int64(tt.prefix), sizes)
+			counted := maxArchiveSize(int64(tt.prefix), sizes)
 			if counted < int64(len(written)) || (tt.exact && counted != int64(len(written))) {
 				t.Errorf("counted %d bytes; the archive has %d (exact: %v)", counted, len(written), tt.exact)
 			}
@@ -62,26 +62,26 @@ func TestRoomForRefusesWhatTheFormatsFieldsCannotHold(t *testing.T) {
 	tests := []struct {
 		name     string
 		prefix   int64
-		files    []sized
+		files    []fileSize
 		tooLarge string
 		fits     bool
 	}{
-		{"a small map", 512, []sized{{"war3map.lua", 5000}, {"war3map.w3i", 800}}, "", true},
+		{"a small map", 512, []fileSize{{"war3map.lua", 5000}, {"war3map.w3i", 800}}, "", true},
 		{"no file at all", 0, nil, "", true},
-		{"the largest file an archive of one file holds", 0, []sized{{"f", largestAlone}}, "", true},
-		{"one byte more", 0, []sized{{"f", largestAlone + 1}}, "", false},
-		{"the largest file behind a header of 512 bytes", 512, []sized{{"f", largestAlone - 512}}, "", true},
-		{"one byte more behind the header", 512, []sized{{"f", largestAlone - 511}}, "", false},
-		{"a file whose size is the most a field holds", 0, []sized{{"small", 10}, {"f", most}}, "", false},
-		{"a file whose size no field holds", 0, []sized{{"small", 10}, {"big.bin", most + 1}, {"f", most + 2}},
+		{"the largest file an archive of one file holds", 0, []fileSize{{"f", largestAlone}}, "", true},
+		{"one byte more", 0, []fileSize{{"f", largestAlone + 1}}, "", false},
+		{"the largest file behind a header of 512 bytes", 512, []fileSize{{"f", largestAlone - 512}}, "", true},
+		{"one byte more behind the header", 512, []fileSize{{"f", largestAlone - 511}}, "", false},
+		{"a file whose size is the most a field holds", 0, []fileSize{{"small", 10}, {"f", most}}, "", false},
+		{"a file whose size no field holds", 0, []fileSize{{"small", 10}, {"big.bin", most + 1}, {"f", most + 2}},
 			"big.bin", false},
-		{"files that fit each and not together", 0, []sized{{"a", 1 << 31}, {"b", 1 << 31}}, "", false},
+		{"files that fit each and not together", 0, []fileSize{{"a", 1 << 31}, {"b", 1 << 31}}, "", false},
 		{"empty files whose names do not fit the list of the files", 0,
-			slices.Repeat([]sized{{strings.Repeat("n", 1<<16), 0}}, 1<<16), "", false},
+			slices.Repeat([]fileSize{{strings.Repeat("n", 1<<16), 0}}, 1<<16), "", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tooLarge, fits := roomFor(tt.prefix, tt.files)
+			tooLarge, fits := checkFits(tt.prefix, tt.files)
 			if tooLarge != tt.tooLarge || fits != tt.fits {
 				t.Errorf("roomFor = %q, %v, want %q, %v", tooLarge, fits, tt.tooLarge, tt.fits)
 			}

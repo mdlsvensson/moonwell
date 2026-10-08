@@ -527,7 +527,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | change where the map is staged, or what is logged after | `internal/build/stage.go`: `stagePlace`, `sayStaged` |
 | change where the archive goes, or how `build.folder` is read | `internal/build/archive.go`: `archiveOf`, `buildFolder`, `writeArchive` |
 | know which files go into the archive, and in which order | `internal/build/pack.go`: `pack`, `archiveFiles` |
-| know how large a map may be, or change the archive's format | `internal/war3/mpq/room.go`: `RoomFor`; `internal/war3/mpq/write.go`: `Write` |
+| know how large a map may be, or change the archive's format | `internal/war3/mpq/room.go`: `CheckFits`; `internal/war3/mpq/write.go`: `Write` |
 | change what `dev` watches, or when it checks again | `internal/build/dev_watched.go`: `ownFolders`, `countsInProject`, for what is watched; `internal/build/dev.go`: `Dev`, `due`, for when; the watcher in `internal/build/watch.go` |
 | change how the game is started | `internal/build/launch.go`: `launch`; `internal/env/spawn_windows.go` and `internal/env/spawn_unix.go` |
 
@@ -561,7 +561,7 @@ Each row names the file to open and, in most rows, the function to read first.
 
 | I want to | Open |
 | --- | --- |
-| follow an object from Pkl to the bytes of `war3map.w3u` | `internal/objects/plan.go`: `Plan`; `internal/objects/resolve.go`: `Resolve`; `internal/war3/objmod/append.go`: `AppendTo` |
+| follow an object from Pkl to the bytes of `war3map.w3u` | `internal/objects/plan.go`: `Plan`; `internal/objects/resolve.go`: `Resolve`; `internal/war3/objmod/append.go`: `AppendObjects` |
 | make a field of an object settable from Pkl | Nothing in Go: the fields are data. `go run ./tools/gen metadata <folder> <version>` writes `data/metadata.json` from the game's tables, and `go run ./tools/gen` then writes `schema/generated/`; `CONTRIBUTING.md` has the steps. The program reads the file in `internal/objects/metadata.go`: `LoadMetadata` |
 | change the words of an error about an object | the errors at the bottom of `internal/objects/resolve.go`, `internal/objects/fields.go` and `internal/objects/values.go` |
 | change `src/generated/objects.yue` | `internal/objects/ids.go`: `RenderIDs`, `RefreshIDs`, `AssertIDsCurrent` |
@@ -684,10 +684,10 @@ UTF-8 is kept as it is. White space is the six characters of ASCII, as Lua and t
 names sort by their bytes. A byte order mark at the start of a text that is read is dropped; a path in
 `war3map.imp` keeps one, because it is written back as it was read. (`internal/fsx/text.go`.)
 
-**One reader leaves its functions by a panic.** `reader` in `internal/war3/lua/functions.go` reads Lua's statements
+**One parser leaves its functions by a panic.** `parser` in `internal/war3/lua/functions.go` reads Lua's statements
 by recursive descent, where every step would otherwise return an error and every call check one. So `fail` panics
-with the error at a token the grammar does not allow, and `Functions`, which alone makes a `reader`, recovers that
-panic and returns the error. It is the only place where a panic is a way out of a function: any other panic is a
+with the error at a token the grammar does not allow, and `ParseFunctions`, which alone makes a `parser`, recovers
+that panic and returns the error. It is the only place where a panic is a way out of a function: any other panic is a
 bug in Moonwell, and is printed as an internal error.
 
 **An error of `mapdir` has a cause exactly when the system failed.** A folder that cannot be listed has one; a map

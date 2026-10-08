@@ -64,41 +64,41 @@ func realValue(n float32) objmod.Value   { return objmod.Value{Type: objmod.Real
 func unrealValue(n float32) objmod.Value { return objmod.Value{Type: objmod.Unreal, Real: n} }
 func textValue(s string) objmod.Value    { return objmod.Value{Type: objmod.String, Text: s} }
 
-func mustRead(t *testing.T, data []byte, kind objmod.TableKind, file string) *objmod.File {
+func mustRead(t *testing.T, data []byte, kind objmod.TableKind, displayPath string) *objmod.File {
 	t.Helper()
-	parsed, err := objmod.Read(data, kind, file)
+	parsed, err := objmod.Read(data, kind, displayPath)
 	if err != nil {
-		t.Fatalf("Read(%s): %v", file, err)
+		t.Fatalf("Read(%s): %v", displayPath, err)
 	}
 	return parsed
 }
 
-func readOf(t *testing.T, source []byte, kind objmod.TableKind, file string) *objmod.File {
+func readOf(t *testing.T, source []byte, kind objmod.TableKind, displayPath string) *objmod.File {
 	t.Helper()
 	if source == nil {
 		return nil
 	}
-	return mustRead(t, source, kind, file)
+	return mustRead(t, source, kind, displayPath)
 }
 
-func mustAppend(t *testing.T, source []byte, kind objmod.TableKind, added []objmod.NewObject, file string) []byte {
+func mustAppend(t *testing.T, source []byte, kind objmod.TableKind, added []objmod.NewObject, displayPath string) []byte {
 	t.Helper()
-	data, err := objmod.AppendTo(readOf(t, source, kind, file), source, kind, added)
+	data, err := objmod.AppendObjects(readOf(t, source, kind, displayPath), source, kind, added)
 	if err != nil {
-		t.Fatalf("AppendTo(%s): %v", file, err)
+		t.Fatalf("AppendTo(%s): %v", displayPath, err)
 	}
 	return data
 }
 
-func refusal(t *testing.T, what string, err error, file, words string) {
+func refusal(t *testing.T, what string, err error, displayPath, words string) {
 	t.Helper()
 	var failure *diag.Error
 	if !errors.As(err, &failure) {
 		t.Errorf("%s: got %v, want a *diag.Error", what, err)
 		return
 	}
-	if failure.File != file || !strings.Contains(failure.Msg, words) {
-		t.Errorf("%s: error %q of file %s, want file %s and a message with %q", what, failure.Msg, failure.File, file, words)
+	if failure.File != displayPath || !strings.Contains(failure.Msg, words) {
+		t.Errorf("%s: error %q of file %s, want file %s and a message with %q", what, failure.Msg, failure.File, displayPath, words)
 	}
 	if !strings.Contains(failure.Hint, "World Editor 3.00") {
 		t.Errorf("%s: hint %q, want one that points to World Editor 3.00", what, failure.Hint)
@@ -155,29 +155,29 @@ func TestTableKindIsLeveledForW3aW3dAndW3q(t *testing.T) {
 func TestEveryWorldEditorNamesFileParsesAsTheFixtureREADMERecords(t *testing.T) {
 	for _, name := range fixtureNames {
 		for _, skin := range []bool{false, true} {
-			file := "war3map." + name.ext
+			displayPath := "war3map." + name.ext
 			if skin {
-				file = "war3mapSkin." + name.ext
+				displayPath = "war3mapSkin." + name.ext
 			}
-			data := fixture(t, file)
-			parsed := mustRead(t, data, objmod.KindOf(file), file)
+			data := fixture(t, displayPath)
+			parsed := mustRead(t, data, objmod.KindOf(displayPath), displayPath)
 			if parsed.Version != 3 || parsed.Original.CountOffset != 4 || parsed.Original.Start != 8 ||
 				parsed.Original.Stop != 8 || len(parsed.Original.Objects) != 0 {
-				t.Errorf("%s: version %d, original %+v", file, parsed.Version, parsed.Original)
+				t.Errorf("%s: version %d, original %+v", displayPath, parsed.Version, parsed.Original)
 			}
 			custom := parsed.Custom
 			if custom.CountOffset != 8 || custom.Start != 12 || custom.Stop != len(data) || len(custom.Objects) != 1 {
-				t.Fatalf("%s: custom %+v", file, custom)
+				t.Fatalf("%s: custom %+v", displayPath, custom)
 			}
 			object := custom.Objects[0]
 			if object.Base != id(name.base) || object.ID != id(name.id) || object.Start != 12 ||
 				object.Stop != len(data) || len(object.Sets) != 1 || object.Sets[0].Flag != 0 {
-				t.Errorf("%s: object %+v", file, object)
+				t.Errorf("%s: object %+v", displayPath, object)
 			}
 			mods := object.Sets[0].Mods
 			if skin != name.skin {
 				if len(mods) != 0 {
-					t.Errorf("%s has modifications %+v", file, mods)
+					t.Errorf("%s has modifications %+v", displayPath, mods)
 				}
 				continue
 			}
@@ -186,7 +186,7 @@ func TestEveryWorldEditorNamesFileParsesAsTheFixtureREADMERecords(t *testing.T) 
 				Start: 32, Stop: len(data),
 			}}
 			if !reflect.DeepEqual(mods, want) {
-				t.Errorf("%s: mods %+v, want %+v", file, mods, want)
+				t.Errorf("%s: mods %+v, want %+v", displayPath, mods, want)
 			}
 		}
 	}
@@ -432,12 +432,12 @@ func TestAnObjectHasOneToSixtyFourSets(t *testing.T) {
 }
 
 func TestASliceOfALargerBufferParsesTheSameAsACopy(t *testing.T) {
-	for _, file := range []string{"war3mapSkin.w3q", "war3map.w3d", "war3mapSkin.w3u"} {
-		data := fixture(t, file)
+	for _, displayPath := range []string{"war3mapSkin.w3q", "war3map.w3d", "war3mapSkin.w3u"} {
+		data := fixture(t, displayPath)
 		padded := testkit.Concat(make([]byte, 3), data, make([]byte, 4))
-		view := mustRead(t, padded[3:3+len(data)], objmod.KindOf(file), file)
-		if !reflect.DeepEqual(view, mustRead(t, data, objmod.KindOf(file), file)) {
-			t.Errorf("%s parses differently as a slice", file)
+		view := mustRead(t, padded[3:3+len(data)], objmod.KindOf(displayPath), displayPath)
+		if !reflect.DeepEqual(view, mustRead(t, data, objmod.KindOf(displayPath), displayPath)) {
+			t.Errorf("%s parses differently as a slice", displayPath)
 		}
 	}
 }
@@ -480,52 +480,52 @@ func asSynthetic(added []objmod.NewObject) []testkit.SyntheticObject {
 func TestAppendingEachNamesFixtureObjectToNoFileReproducesWorldEditorsFiles(t *testing.T) {
 	for _, name := range fixtureNames {
 		for _, skin := range []bool{false, true} {
-			file := "war3map." + name.ext
+			displayPath := "war3map." + name.ext
 			if skin {
-				file = "war3mapSkin." + name.ext
+				displayPath = "war3mapSkin." + name.ext
 			}
 			mods := []objmod.NewMod{}
 			if skin == name.skin {
 				mods = append(mods, objmod.NewMod{Field: id(name.field), Level: name.level, Value: textValue(name.value)})
 			}
 			added := []objmod.NewObject{{Base: id(name.base), ID: id(name.id), Mods: mods}}
-			if got := mustAppend(t, nil, objmod.KindOf(file), added, file); !bytes.Equal(got, fixture(t, file)) {
-				t.Errorf("%s is not World Editor's file", file)
+			if got := mustAppend(t, nil, objmod.KindOf(displayPath), added, displayPath); !bytes.Equal(got, fixture(t, displayPath)) {
+				t.Errorf("%s is not World Editor's file", displayPath)
 			}
 		}
 	}
 }
 
 func TestAppendingToEveryNamesFixtureFileKeepsItsBytesAndAddsTheObjectsLast(t *testing.T) {
-	for _, file := range fixtureFiles() {
-		kind := objmod.KindOf(file)
-		source := fixture(t, file)
-		before := mustRead(t, source, kind, file)
-		data := mustAppend(t, source, kind, appended(kind), file)
+	for _, displayPath := range fixtureFiles() {
+		kind := objmod.KindOf(displayPath)
+		source := fixture(t, displayPath)
+		before := mustRead(t, source, kind, displayPath)
+		data := mustAppend(t, source, kind, appended(kind), displayPath)
 		custom := before.Custom
 		if !bytes.Equal(data[:custom.CountOffset], source[:custom.CountOffset]) ||
 			!bytes.Equal(data[custom.CountOffset:custom.Start], testkit.U32(uint32(len(custom.Objects)+2))) ||
 			!bytes.Equal(data[custom.Start:custom.Stop], source[custom.Start:custom.Stop]) {
-			t.Errorf("%s: the existing bytes changed", file)
+			t.Errorf("%s: the existing bytes changed", displayPath)
 		}
-		after := mustRead(t, data, kind, file)
+		after := mustRead(t, data, kind, displayPath)
 		count := len(after.Custom.Objects)
 		if after.Version != 3 || !reflect.DeepEqual(after.Original, before.Original) ||
 			!reflect.DeepEqual(after.Custom.Objects[:count-2], before.Custom.Objects) || after.Custom.Stop != len(data) {
-			t.Errorf("%s: the file reads differently after appending", file)
+			t.Errorf("%s: the file reads differently after appending", displayPath)
 		}
 		expected := testkit.BuildModFile(3, nil, asSynthetic(appended(kind)), kind)
 		if !bytes.Equal(data[custom.Stop:], expected[12:]) {
-			t.Errorf("%s: the appended objects are not encoded as expected", file)
+			t.Errorf("%s: the appended objects are not encoded as expected", displayPath)
 		}
 	}
 }
 
 func TestAppendingNoObjectsReturnsTheSourceBytes(t *testing.T) {
-	for _, file := range []string{"war3map.w3u", "war3mapSkin.w3q", "war3map.w3d"} {
-		source := fixture(t, file)
-		if got := mustAppend(t, source, objmod.KindOf(file), nil, file); !bytes.Equal(got, source) {
-			t.Errorf("%s changed", file)
+	for _, displayPath := range []string{"war3map.w3u", "war3mapSkin.w3q", "war3map.w3d"} {
+		source := fixture(t, displayPath)
+		if got := mustAppend(t, source, objmod.KindOf(displayPath), nil, displayPath); !bytes.Equal(got, source) {
+			t.Errorf("%s changed", displayPath)
 		}
 	}
 }
@@ -563,9 +563,9 @@ func TestAByteOrderMarkAtTheStartOfAStringIsNotPartOfIt(t *testing.T) {
 	for written, want := range map[string]string{
 		mark + "Name": "Name", mark: "", mark + mark + "Name": mark + "Name", "Na" + mark + "me": "Na" + mark + "me",
 	} {
-		file := mustAppend(t, nil, objmod.Simple, oneMod(objmod.NewMod{Field: id("unam"), Value: textValue(written)}),
+		displayPath := mustAppend(t, nil, objmod.Simple, oneMod(objmod.NewMod{Field: id("unam"), Value: textValue(written)}),
 			"war3map.w3u")
-		read := mustRead(t, file, objmod.Simple, "war3map.w3u").Custom.Objects[0].Sets[0].Mods[0].Value
+		read := mustRead(t, displayPath, objmod.Simple, "war3map.w3u").Custom.Objects[0].Sets[0].Mods[0].Value
 		if read.Type != objmod.String || read.Text != want {
 			t.Errorf("the string %q reads as %+v, want the text %q", written, read, want)
 		}
@@ -576,18 +576,18 @@ func oneMod(mod objmod.NewMod) []objmod.NewObject {
 	return []objmod.NewObject{{Base: id("hfoo"), ID: id("X001"), Mods: []objmod.NewMod{mod}}}
 }
 
-type unwritable struct {
+type checkWritable struct {
 	name    string
 	kind    objmod.TableKind
 	objects []objmod.NewObject
 	words   string
 }
 
-func refusedByAppend(t *testing.T, cases []unwritable) {
+func refusedByAppend(t *testing.T, cases []checkWritable) {
 	t.Helper()
 	for _, c := range cases {
 		for _, source := range [][]byte{nil, testkit.BuildModFile(2, nil, nil, c.kind)} {
-			data, err := objmod.AppendTo(readOf(t, source, c.kind, "war3map.w3a"), source, c.kind, c.objects)
+			data, err := objmod.AppendObjects(readOf(t, source, c.kind, "war3map.w3a"), source, c.kind, c.objects)
 			var fileError *diag.Error
 			if err == nil || errors.As(err, &fileError) || !strings.Contains(err.Error(), c.words) {
 				t.Errorf("%s: error = %v, want one with %q that is not a *diag.Error", c.name, err, c.words)
@@ -603,7 +603,7 @@ func TestWhatAppendCannotWriteIsAnErrorThatIsNotAFileError(t *testing.T) {
 	text := func(s string) []objmod.NewObject {
 		return oneMod(objmod.NewMod{Field: id("unam"), Value: textValue(s)})
 	}
-	refusedByAppend(t, []unwritable{
+	refusedByAppend(t, []checkWritable{
 		{"a text with a NUL", objmod.Leveled, text("a\x00b"), "NUL"},
 		{"a text that is not UTF-8", objmod.Leveled, text("a\xFFb"), "UTF-8"},
 		{"a text with a NUL in a simple table", objmod.Simple, text("\x00"), "NUL"},
@@ -615,11 +615,11 @@ func TestWhatAppendCannotWriteIsAnErrorThatIsNotAFileError(t *testing.T) {
 }
 
 func TestAppendRefusesAValueTypeThatIsNoneOfTheFour(t *testing.T) {
-	var cases []unwritable
+	var cases []checkWritable
 	for _, valueType := range []objmod.ValueType{-1, 4, 7, 1<<32 | 3} {
 		value := objmod.Value{Type: valueType, Int: 1, Real: 1, Text: "a"}
 		for _, kind := range []objmod.TableKind{objmod.Simple, objmod.Leveled} {
-			cases = append(cases, unwritable{
+			cases = append(cases, checkWritable{
 				fmt.Sprintf("the value type %d in a table of kind %d", valueType, kind), kind,
 				oneMod(objmod.NewMod{Field: id("unam"), Value: value}), fmt.Sprintf("value type %d", valueType),
 			})
@@ -629,7 +629,7 @@ func TestAppendRefusesAValueTypeThatIsNoneOfTheFour(t *testing.T) {
 }
 
 func TestAppendRefusesARealThatIsNotFinite(t *testing.T) {
-	var cases []unwritable
+	var cases []checkWritable
 	for _, c := range []struct {
 		number float32
 		words  string
@@ -640,7 +640,7 @@ func TestAppendRefusesARealThatIsNotFinite(t *testing.T) {
 		{float32(math.Inf(-1)), "-Inf"},
 	} {
 		for _, value := range []objmod.Value{realValue(c.number), unrealValue(c.number)} {
-			cases = append(cases, unwritable{
+			cases = append(cases, checkWritable{
 				fmt.Sprintf("%v as a value of type %d", c.number, value.Type), objmod.Leveled,
 				oneMod(objmod.NewMod{Field: id("umvs"), Value: value}), c.words,
 			})
@@ -657,7 +657,7 @@ func TestAppendRefusesARealThatIsNotFinite(t *testing.T) {
 
 func TestAppendRefusesAnIDOfFourNULs(t *testing.T) {
 	mods := []objmod.NewMod{{Field: id("unam"), Value: intValue(1)}}
-	refusedByAppend(t, []unwritable{
+	refusedByAppend(t, []checkWritable{
 		{"an object without a base", objmod.Simple,
 			[]objmod.NewObject{{ID: id("X001"), Mods: mods}}, "its base is four NUL bytes"},
 		{"an object without an id", objmod.Simple,
@@ -676,23 +676,23 @@ func TestAppendRefusesAnIDOfFourNULs(t *testing.T) {
 }
 
 func TestAppendLeavesItsSourceAsItIs(t *testing.T) {
-	for _, file := range []string{"war3mapSkin.w3u", "war3mapSkin.w3q"} {
-		kind := objmod.KindOf(file)
-		whole := fixture(t, file)
+	for _, displayPath := range []string{"war3mapSkin.w3u", "war3mapSkin.w3q"} {
+		kind := objmod.KindOf(displayPath)
+		whole := fixture(t, displayPath)
 		for _, added := range [][]objmod.NewObject{nil, {}, appended(kind)} {
 			buffer := bytes.Repeat([]byte{0xAA}, len(whole)+4096)
 			source := buffer[:copy(buffer, whole)]
 			before := bytes.Clone(buffer)
-			data := mustAppend(t, source, kind, added, file)
+			data := mustAppend(t, source, kind, added, displayPath)
 			if !bytes.Equal(buffer, before) {
-				t.Errorf("%s with %d objects: AppendTo changed its source or the bytes after it", file, len(added))
+				t.Errorf("%s with %d objects: AppendTo changed its source or the bytes after it", displayPath, len(added))
 			}
 			data = append(data, 0x55)
 			for i := range data {
 				data[i] = 0x55
 			}
 			if !bytes.Equal(buffer, before) {
-				t.Errorf("%s with %d objects: the result shares its bytes with the source", file, len(added))
+				t.Errorf("%s with %d objects: the result shares its bytes with the source", displayPath, len(added))
 			}
 		}
 	}

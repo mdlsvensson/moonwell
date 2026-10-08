@@ -24,360 +24,360 @@ type Function struct {
 	Calls    []Call
 }
 
-func Functions(source, file string) (functions []Function, err error) {
+func ParseFunctions(source, displayPath string) (functions []Function, err error) {
 	tokens, fault := Tokenize(source)
 	if fault != nil {
-		return nil, errUnsafe(file, source, fault.Offset, fault.Msg)
+		return nil, errUnsafe(displayPath, source, fault.Offset, fault.Msg)
 	}
-	r := &reader{source: source, file: file, tokens: tokens}
+	r := &parser{source: source, displayPath: displayPath, tokens: tokens}
 	defer func() {
 		switch stopped := recover().(type) {
 		case nil:
-		case unreadable:
+		case parseAbort:
 			functions, err = nil, stopped.err
 		default:
 			panic(stopped)
 		}
 	}()
-	r.statements(atTop)
+	r.parseStatements(atTop)
 	return r.functions, nil
 }
 
-type reader struct {
-	source, file string
-	tokens       []Token
-	at           int
-	depth        int
-	functions    []Function
-	calls        []Call
+type parser struct {
+	source, displayPath string
+	tokens              []Token
+	pos                 int
+	depth               int
+	functions           []Function
+	calls               []Call
 }
 
-type unreadable struct{ err error }
+type parseAbort struct{ err error }
 
-type place uint8
+type syntaxContext uint8
 
 const (
-	inBlock place = iota
+	inBlock syntaxContext = iota
 	atTop
 	inFunction
 )
 
 const maxDepth = 200
 
-const unaryBinding = 11
+const unaryPrecedence = 11
 
-var binding = map[string]int{
+var binaryPrecedence = map[string]int{
 	"or": 1, "and": 2,
 	"<": 3, ">": 3, "<=": 3, ">=": 3, "~=": 3, "==": 3,
 	"|": 4, "~": 5, "&": 6, "<<": 7, ">>": 7, "..": 8,
 	"+": 9, "-": 9, "*": 10, "/": 10, "//": 10, "%": 10, "^": 12,
 }
 
-func (r *reader) more() bool { return r.at < len(r.tokens) }
+func (r *parser) hasMore() bool { return r.pos < len(r.tokens) }
 
-func (r *reader) raw() string {
-	if r.more() {
-		return r.tokens[r.at].Raw
+func (r *parser) peekRaw() string {
+	if r.hasMore() {
+		return r.tokens[r.pos].Raw
 	}
 	return ""
 }
 
-func (r *reader) is(kind Kind) bool { return r.more() && r.tokens[r.at].Kind == kind }
+func (r *parser) peekIs(kind Kind) bool { return r.hasMore() && r.tokens[r.pos].Kind == kind }
 
-func (r *reader) take(raw string) bool {
-	if r.raw() != raw {
+func (r *parser) accept(raw string) bool {
+	if r.peekRaw() != raw {
 		return false
 	}
-	r.at++
+	r.pos++
 	return true
 }
 
-func (r *reader) expect(raw string) Token {
-	if r.raw() != raw {
+func (r *parser) expect(raw string) Token {
+	if r.peekRaw() != raw {
 		r.fail("expected '" + raw + "'")
 	}
-	r.at++
-	return r.tokens[r.at-1]
+	r.pos++
+	return r.tokens[r.pos-1]
 }
 
-func (r *reader) name() string {
-	if !r.is(NameToken) || keywords[r.raw()] {
+func (r *parser) expectName() string {
+	if !r.peekIs(NameToken) || keywords[r.peekRaw()] {
 		r.fail("expected a name")
 	}
-	r.at++
-	return r.tokens[r.at-1].Raw
+	r.pos++
+	return r.tokens[r.pos-1].Raw
 }
 
-func (r *reader) fail(what string) {
+func (r *parser) fail(what string) {
 	offset := len(r.source)
-	if r.more() {
-		offset = r.tokens[r.at].Start
+	if r.hasMore() {
+		offset = r.tokens[r.pos].Start
 	}
-	panic(unreadable{errUnsafe(r.file, r.source, offset, what)})
+	panic(parseAbort{errUnsafe(r.displayPath, r.source, offset, what)})
 }
 
-func (r *reader) enter() {
+func (r *parser) enterNested() {
 	r.depth++
 	if r.depth > maxDepth {
 		r.fail("nesting is too deep to establish safe edit boundaries")
 	}
 }
 
-func (r *reader) statements(where place, stops ...string) {
-	r.enter()
-	for r.more() && !slices.Contains(stops, r.raw()) {
-		if r.take("return") {
-			r.returned(stops)
+func (r *parser) parseStatements(where syntaxContext, stops ...string) {
+	r.enterNested()
+	for r.hasMore() && !slices.Contains(stops, r.peekRaw()) {
+		if r.accept("return") {
+			r.parseReturn(stops)
 			break
 		}
-		r.statement(where)
+		r.parseStatement(where)
 	}
-	if where != atTop && !r.more() {
+	if where != atTop && !r.hasMore() {
 		r.fail("unterminated block")
 	}
 	r.depth--
 }
 
-func (r *reader) returned(stops []string) {
-	ends := func() bool { return !r.more() || slices.Contains(stops, r.raw()) }
-	if !ends() && r.raw() != ";" {
-		r.expressions()
+func (r *parser) parseReturn(stops []string) {
+	ends := func() bool { return !r.hasMore() || slices.Contains(stops, r.peekRaw()) }
+	if !ends() && r.peekRaw() != ";" {
+		r.parseExpressionList()
 	}
-	r.take(";")
+	r.accept(";")
 	if !ends() {
 		r.fail("return must end its block")
 	}
 }
 
-func (r *reader) block() {
-	r.statements(inBlock, "end")
+func (r *parser) parseBlock() {
+	r.parseStatements(inBlock, "end")
 	r.expect("end")
 }
 
-func (r *reader) statement(where place) {
-	start := r.tokens[r.at].Start
+func (r *parser) parseStatement(where syntaxContext) {
+	start := r.tokens[r.pos].Start
 	switch {
-	case r.take(";"):
-	case r.take("function"):
-		r.function(start, where)
-	case r.take("local"):
-		r.local()
-	case r.take("if"):
-		r.conditional()
-	case r.take("while"):
-		r.expression(1)
+	case r.accept(";"):
+	case r.accept("function"):
+		r.parseFunction(start, where)
+	case r.accept("local"):
+		r.parseLocal()
+	case r.accept("if"):
+		r.parseIf()
+	case r.accept("while"):
+		r.parseExpression(1)
 		r.expect("do")
-		r.block()
-	case r.take("for"):
-		r.loop()
-	case r.take("do"):
-		r.block()
-	case r.take("repeat"):
-		r.statements(inBlock, "until")
+		r.parseBlock()
+	case r.accept("for"):
+		r.parseLoop()
+	case r.accept("do"):
+		r.parseBlock()
+	case r.accept("repeat"):
+		r.parseStatements(inBlock, "until")
 		r.expect("until")
-		r.expression(1)
-	case r.take("break"):
-	case r.take("goto"):
-		r.name()
-	case r.take("::"):
-		r.name()
+		r.parseExpression(1)
+	case r.accept("break"):
+	case r.accept("goto"):
+		r.expectName()
+	case r.accept("::"):
+		r.expectName()
 		r.expect("::")
 	default:
-		r.assignmentOrCall(where)
+		r.parseAssignmentOrCall(where)
 	}
 }
 
-func (r *reader) function(start int, where place) {
-	name, bare := r.functionName()
+func (r *parser) parseFunction(start int, where syntaxContext) {
+	name, bare := r.parseFunctionName()
 	if where != atTop || !bare {
-		r.functionBody(inBlock)
+		r.parseFunctionBody(inBlock)
 		return
 	}
 	r.calls = []Call{}
-	end := r.functionBody(inFunction)
+	end := r.parseFunctionBody(inFunction)
 	r.functions = append(r.functions, Function{
 		Name: name, Start: start, End: end.End, EndStart: end.Start, Calls: r.calls,
 	})
 }
 
-func (r *reader) functionName() (name string, bare bool) {
-	name, bare = r.name(), true
-	for r.take(".") {
+func (r *parser) parseFunctionName() (name string, bare bool) {
+	name, bare = r.expectName(), true
+	for r.accept(".") {
 		bare = false
-		r.name()
+		r.expectName()
 	}
-	if r.take(":") {
+	if r.accept(":") {
 		bare = false
-		r.name()
+		r.expectName()
 	}
 	return name, bare
 }
 
-func (r *reader) functionBody(where place) Token {
+func (r *parser) parseFunctionBody(where syntaxContext) Token {
 	r.expect("(")
-	if !r.take(")") {
-		r.parameters()
+	if !r.accept(")") {
+		r.parseParameters()
 		r.expect(")")
 	}
-	r.statements(where, "end")
+	r.parseStatements(where, "end")
 	return r.expect("end")
 }
 
-func (r *reader) parameters() {
-	for !r.take("...") {
-		r.name()
-		if !r.take(",") {
+func (r *parser) parseParameters() {
+	for !r.accept("...") {
+		r.expectName()
+		if !r.accept(",") {
 			return
 		}
 	}
 }
 
-func (r *reader) local() {
-	if r.take("function") {
-		r.name()
-		r.functionBody(inBlock)
+func (r *parser) parseLocal() {
+	if r.accept("function") {
+		r.expectName()
+		r.parseFunctionBody(inBlock)
 		return
 	}
-	r.name()
-	for r.take(",") {
-		r.name()
+	r.expectName()
+	for r.accept(",") {
+		r.expectName()
 	}
-	if r.take("=") {
-		r.expressions()
+	if r.accept("=") {
+		r.parseExpressionList()
 	}
 }
 
-func (r *reader) conditional() {
+func (r *parser) parseIf() {
 	for {
-		r.expression(1)
+		r.parseExpression(1)
 		r.expect("then")
-		r.statements(inBlock, "elseif", "else", "end")
-		if !r.take("elseif") {
+		r.parseStatements(inBlock, "elseif", "else", "end")
+		if !r.accept("elseif") {
 			break
 		}
 	}
-	if r.take("else") {
-		r.statements(inBlock, "end")
+	if r.accept("else") {
+		r.parseStatements(inBlock, "end")
 	}
 	r.expect("end")
 }
 
-func (r *reader) loop() {
-	r.name()
-	if r.take("=") {
-		r.expression(1)
+func (r *parser) parseLoop() {
+	r.expectName()
+	if r.accept("=") {
+		r.parseExpression(1)
 		r.expect(",")
-		r.expression(1)
-		if r.take(",") {
-			r.expression(1)
+		r.parseExpression(1)
+		if r.accept(",") {
+			r.parseExpression(1)
 		}
 	} else {
-		for r.take(",") {
-			r.name()
+		for r.accept(",") {
+			r.expectName()
 		}
 		r.expect("in")
-		r.expressions()
+		r.parseExpressionList()
 	}
 	r.expect("do")
-	r.block()
+	r.parseBlock()
 }
 
-func (r *reader) assignmentOrCall(where place) {
-	target := r.prefix()
+func (r *parser) parseAssignmentOrCall(where syntaxContext) {
+	target := r.parsePrefix()
 	switch {
-	case r.raw() == "=" || r.raw() == ",":
-		r.assignment(target)
+	case r.peekRaw() == "=" || r.peekRaw() == ",":
+		r.parseAssignment(target)
 	case !target.call:
 		r.fail("expected an assignment or call statement")
 	case target.direct != nil && where == inFunction:
-		r.calls = append(r.calls, r.withSemicolon(*target.direct))
+		r.calls = append(r.calls, r.includeSemicolon(*target.direct))
 	}
 }
 
-func (r *reader) assignment(first prefixed) {
+func (r *parser) parseAssignment(first prefixExpr) {
 	if !first.assignable {
 		r.fail("invalid assignment target")
 	}
-	for r.take(",") {
-		if !r.prefix().assignable {
+	for r.accept(",") {
+		if !r.parsePrefix().assignable {
 			r.fail("invalid assignment target")
 		}
 	}
 	r.expect("=")
-	r.expressions()
+	r.parseExpressionList()
 }
 
-func (r *reader) withSemicolon(call Call) Call {
-	if r.raw() != ";" {
+func (r *parser) includeSemicolon(call Call) Call {
+	if r.peekRaw() != ";" {
 		return call
 	}
-	semicolon := r.tokens[r.at]
+	semicolon := r.tokens[r.pos]
 	if fsx.TrimASCIISpace(r.source[call.End:semicolon.Start]) != "" {
 		return call
 	}
-	r.at++
+	r.pos++
 	call.End = semicolon.End
 	return call
 }
 
-func (r *reader) expressions() {
-	r.expression(1)
-	for r.take(",") {
-		r.expression(1)
+func (r *parser) parseExpressionList() {
+	r.parseExpression(1)
+	for r.accept(",") {
+		r.parseExpression(1)
 	}
 }
 
-func (r *reader) expression(minimum int) {
-	r.enter()
-	r.operand()
+func (r *parser) parseExpression(minPrecedence int) {
+	r.enterNested()
+	r.parseOperand()
 	for {
-		operator := binding[r.raw()]
-		if operator == 0 || operator < minimum {
+		operator := binaryPrecedence[r.peekRaw()]
+		if operator == 0 || operator < minPrecedence {
 			break
 		}
-		r.at++
-		r.expression(operator + 1)
+		r.pos++
+		r.parseExpression(operator + 1)
 	}
 	r.depth--
 }
 
-func (r *reader) operand() {
-	switch raw := r.raw(); {
+func (r *parser) parseOperand() {
+	switch raw := r.peekRaw(); {
 	case raw == "not" || raw == "#" || raw == "-" || raw == "~":
-		r.at++
-		r.expression(unaryBinding)
-	case r.take("function"):
-		r.functionBody(inBlock)
+		r.pos++
+		r.parseExpression(unaryPrecedence)
+	case r.accept("function"):
+		r.parseFunctionBody(inBlock)
 	case raw == "{":
-		r.table()
-	case raw == "nil" || raw == "true" || raw == "false" || raw == "..." || r.is(NumberToken) || r.is(StringToken):
-		r.at++
+		r.parseTable()
+	case raw == "nil" || raw == "true" || raw == "false" || raw == "..." || r.peekIs(NumberToken) || r.peekIs(StringToken):
+		r.pos++
 	default:
-		r.prefix()
+		r.parsePrefix()
 	}
 }
 
-type prefixed struct {
+type prefixExpr struct {
 	bare       string
 	assignable bool
 	call       bool
 	direct     *Call
 }
 
-func (r *reader) prefix() prefixed {
+func (r *parser) parsePrefix() prefixExpr {
 	start := len(r.source)
-	if r.more() {
-		start = r.tokens[r.at].Start
+	if r.hasMore() {
+		start = r.tokens[r.pos].Start
 	}
-	var current prefixed
-	if r.take("(") {
-		r.expression(1)
+	var current prefixExpr
+	if r.accept("(") {
+		r.parseExpression(1)
 		r.expect(")")
 	} else {
-		current = prefixed{bare: r.name(), assignable: true}
+		current = prefixExpr{bare: r.expectName(), assignable: true}
 	}
 	for {
-		next, found := r.suffix(current, start)
+		next, found := r.parseSuffix(current, start)
 		if !found {
 			return current
 		}
@@ -385,56 +385,56 @@ func (r *reader) prefix() prefixed {
 	}
 }
 
-func (r *reader) suffix(before prefixed, start int) (after prefixed, found bool) {
+func (r *parser) parseSuffix(before prefixExpr, start int) (after prefixExpr, found bool) {
 	switch {
-	case r.take("["):
-		r.expression(1)
+	case r.accept("["):
+		r.parseExpression(1)
 		r.expect("]")
-		return prefixed{assignable: true}, true
-	case r.take("."):
-		r.name()
-		return prefixed{assignable: true}, true
-	case r.take(":"):
-		r.name()
-		r.arguments()
-		return prefixed{call: true}, true
-	case r.raw() == "(" || r.raw() == "{" || r.is(StringToken):
-		args := r.arguments()
-		after = prefixed{call: true}
+		return prefixExpr{assignable: true}, true
+	case r.accept("."):
+		r.expectName()
+		return prefixExpr{assignable: true}, true
+	case r.accept(":"):
+		r.expectName()
+		r.parseArguments()
+		return prefixExpr{call: true}, true
+	case r.peekRaw() == "(" || r.peekRaw() == "{" || r.peekIs(StringToken):
+		args := r.parseArguments()
+		after = prefixExpr{call: true}
 		if before.bare != "" {
-			after.direct = &Call{Name: before.bare, Args: args, Start: start, End: r.tokens[r.at-1].End}
+			after.direct = &Call{Name: before.bare, Args: args, Start: start, End: r.tokens[r.pos-1].End}
 		}
 		return after, true
 	}
 	return before, false
 }
 
-func (r *reader) arguments() [][]Token {
-	if r.take("(") {
-		return r.argumentList()
+func (r *parser) parseArguments() [][]Token {
+	if r.accept("(") {
+		return r.parseArgumentList()
 	}
-	start := r.at
+	start := r.pos
 	switch {
-	case r.raw() == "{":
-		r.table()
-	case r.is(StringToken):
-		r.at++
+	case r.peekRaw() == "{":
+		r.parseTable()
+	case r.peekIs(StringToken):
+		r.pos++
 	default:
 		r.fail("expected call arguments")
 	}
-	return [][]Token{r.tokens[start:r.at]}
+	return [][]Token{r.tokens[start:r.pos]}
 }
 
-func (r *reader) argumentList() [][]Token {
+func (r *parser) parseArgumentList() [][]Token {
 	args := [][]Token{}
-	if r.take(")") {
+	if r.accept(")") {
 		return args
 	}
 	for {
-		start := r.at
-		r.expression(1)
-		args = append(args, r.tokens[start:r.at])
-		if !r.take(",") {
+		start := r.pos
+		r.parseExpression(1)
+		args = append(args, r.tokens[start:r.pos])
+		if !r.accept(",") {
 			break
 		}
 	}
@@ -442,41 +442,41 @@ func (r *reader) argumentList() [][]Token {
 	return args
 }
 
-func (r *reader) table() {
+func (r *parser) parseTable() {
 	r.expect("{")
-	for !r.take("}") {
-		r.field()
-		if !r.take(",") && !r.take(";") {
+	for !r.accept("}") {
+		r.parseTableField()
+		if !r.accept(",") && !r.accept(";") {
 			r.expect("}")
 			return
 		}
 	}
 }
 
-func (r *reader) field() {
+func (r *parser) parseTableField() {
 	switch {
-	case r.take("["):
-		r.expression(1)
+	case r.accept("["):
+		r.parseExpression(1)
 		r.expect("]")
 		r.expect("=")
-	case r.is(NameToken) && tokenAt(r.tokens, r.at+1).is("="):
-		r.name()
+	case r.peekIs(NameToken) && tokenAt(r.tokens, r.pos+1).isSymbol("="):
+		r.expectName()
 		r.expect("=")
 	}
-	r.expression(1)
+	r.parseExpression(1)
 }
 
-func position(source string, offset int) (line, column int) {
+func lineAndColumn(source string, offset int) (line, column int) {
 	before := source[:offset]
 	lineStart := strings.LastIndexByte(before, '\n') + 1
 	return strings.Count(before, "\n") + 1, utf8.RuneCountInString(before[lineStart:]) + 1
 }
 
-func errUnsafe(file, source string, offset int, what string) error {
-	line, column := position(source, offset)
+func errUnsafe(displayPath, source string, offset int, what string) error {
+	line, column := lineAndColumn(source, offset)
 	return &diag.Error{
 		Msg:    "Cannot safely read map Lua: " + what,
-		File:   file,
+		File:   displayPath,
 		Line:   line,
 		Column: column,
 		Hint:   "Re-save the map in World Editor to restore its generated Lua structure.",

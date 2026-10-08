@@ -70,7 +70,7 @@ type tally struct{ read, refused int }
 func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	t.Helper()
 	for name, read := range map[string]func() ([]model.Path, error){
-		"Paths":   func() ([]model.Path, error) { return model.Paths(data, modelFile) },
+		"Paths":   func() ([]model.Path, error) { return model.ReadPaths(data, modelFile) },
 		"ReadMDX": func() ([]model.Path, error) { return model.ReadMDX(data, modelFile) },
 		"ReadMDL": func() ([]model.Path, error) { return model.ReadMDL(string(data), modelFile) },
 	} {

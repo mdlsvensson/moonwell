@@ -25,7 +25,7 @@ type Path struct {
 	ReplaceableID int64
 }
 
-func Describe(p Path) string {
+func DescribePath(p Path) string {
 	switch {
 	case p.Path != "":
 		return p.Path
@@ -37,14 +37,14 @@ func Describe(p Path) string {
 	return fmt.Sprintf("replaceable texture (slot %d)", p.ReplaceableID)
 }
 
-func Paths(data []byte, file string) ([]Path, error) {
+func ReadPaths(data []byte, displayPath string) ([]Path, error) {
 	if IsMDX(data) {
-		return ReadMDX(data, file)
+		return ReadMDX(data, displayPath)
 	}
 	if bytes.IndexByte(data, 0) >= 0 {
-		return nil, errNeitherFormat(file)
+		return nil, errUnknownFormat(displayPath)
 	}
-	return ReadMDL(fsx.DecodeText(data), file)
+	return ReadMDL(fsx.DecodeText(data), displayPath)
 }
 
 func emitterKind(usesMDL, usesTGA bool) Kind {
@@ -54,14 +54,14 @@ func emitterKind(usesMDL, usesTGA bool) Kind {
 	return ParticleModel
 }
 
-func errNotReadable(file, problem string) error {
+func errNotReadable(displayPath, problem string) error {
 	return &diag.Error{
 		Msg:  "Not a readable model: " + problem + ".",
-		File: file,
+		File: displayPath,
 		Hint: "Re-export it from your modelling tool, or open it in a model viewer to check it.",
 	}
 }
 
-func errNeitherFormat(file string) error {
-	return errNotReadable(file, "it is neither a binary MDX nor a text MDL file")
+func errUnknownFormat(displayPath string) error {
+	return errNotReadable(displayPath, "it is neither a binary MDX nor a text MDL file")
 }

@@ -12,7 +12,7 @@ import (
 
 func mustFunctions(t *testing.T, source string) []Function {
 	t.Helper()
-	functions, err := Functions(source, "")
+	functions, err := ParseFunctions(source, "")
 	if err != nil {
 		t.Fatalf("Functions failed: %v\n%s", err, source)
 	}
@@ -35,7 +35,7 @@ type refusal struct {
 
 func refused(t *testing.T, c refusal) {
 	t.Helper()
-	_, err := Functions(c.source, "map.lua")
+	_, err := ParseFunctions(c.source, "map.lua")
 	var e *diag.Error
 	if !errors.As(err, &e) {
 		t.Errorf("Functions accepted, or failed with %v:\n%s", err, c.source)
@@ -77,7 +77,7 @@ func TestOnlyDirectStandaloneCallsBelongToAnEditorFunction(t *testing.T) {
 	if fn.Name != "config" || !slices.Equal(callNames(fn), []string{"SetMapName", "SetPlayerController"}) {
 		t.Errorf("function %s has calls %q", fn.Name, callNames(fn))
 	}
-	if id, ok := PlayerID(fn.Calls[1].Args[0]); !ok || id != 0 {
+	if id, ok := ParsePlayerID(fn.Calls[1].Args[0]); !ok || id != 0 {
 		t.Errorf("PlayerID = %d, %v", id, ok)
 	}
 	if source[fn.EndStart:fn.End] != "end" {
@@ -86,7 +86,7 @@ func TestOnlyDirectStandaloneCallsBelongToAnEditorFunction(t *testing.T) {
 }
 
 func visibleAlone(source string) bool {
-	functions, err := Functions(source+"\nfunction main() end", "")
+	functions, err := ParseFunctions(source+"\nfunction main() end", "")
 	return err == nil && len(functions) == 2 && functions[0].Name == "config" &&
 		slices.Equal(callNames(functions[0]), []string{"Visible"})
 }
@@ -128,10 +128,10 @@ func TestEveryKeywordOfLuaIsNoNameAndAWordThatOnlyStartsLikeOneIs(t *testing.T) 
 		if !keywords[word] || named(word) {
 			t.Errorf("%s is not held as a keyword", word)
 		}
-		if _, err := Functions("function config() local "+word+" = 1 end", ""); err == nil {
+		if _, err := ParseFunctions("function config() local "+word+" = 1 end", ""); err == nil {
 			t.Errorf("a local named %s is read", word)
 		}
-		if _, err := Functions("function "+word+"() end", ""); err == nil {
+		if _, err := ParseFunctions("function "+word+"() end", ""); err == nil {
 			t.Errorf("a function named %s is read", word)
 		}
 		for _, name := range []string{word + "s", word + "_", "_" + word, word + "1", strings.ToUpper(word)} {
@@ -142,7 +142,7 @@ func TestEveryKeywordOfLuaIsNoNameAndAWordThatOnlyStartsLikeOneIs(t *testing.T) 
 	}
 	for _, word := range words {
 		source := "Fine = 2\n" + word + " = 1\nFine, " + word + " = 3, 4"
-		if got := TopLevelGlobals(source); !slices.Equal(got, []string{"Fine"}) {
+		if got := FindTopLevelGlobals(source); !slices.Equal(got, []string{"Fine"}) {
 			t.Errorf("TopLevelGlobals(%q) = %q", source, got)
 		}
 	}
@@ -267,7 +267,7 @@ func TestStringsAndCommentsAtTokenBoundariesCannotIntroduceCalls(t *testing.T) {
 	if !slices.Equal(callNames(fn), []string{"SetPlayerController"}) {
 		t.Fatalf("calls = %q", callNames(fn))
 	}
-	if id, ok := PlayerID(fn.Calls[0].Args[0]); !ok || id != 0 {
+	if id, ok := ParsePlayerID(fn.Calls[0].Args[0]); !ok || id != 0 {
 		t.Errorf("PlayerID = %d, %v", id, ok)
 	}
 	for _, argument := range fn.Calls[0].Args {
@@ -360,7 +360,7 @@ func TestRealWorldEditorLuaExposesTheExpectedSettingsFunctionsAndCalls(t *testin
 	var controllers []int
 	for _, call := range find("InitCustomPlayerSlots").Calls {
 		if call.Name == "SetPlayerController" {
-			id, _ := PlayerID(call.Args[0])
+			id, _ := ParsePlayerID(call.Args[0])
 			controllers = append(controllers, id)
 		}
 	}
@@ -416,7 +416,7 @@ func longChain(operator string) string {
 
 func TestLongRightAssociativeChainsAreConsumedWithoutCountingAsNesting(t *testing.T) {
 	for _, operator := range []string{"..", "^"} {
-		functions, err := Functions(longChain(operator), "map.lua")
+		functions, err := ParseFunctions(longChain(operator), "map.lua")
 		if err != nil || !slices.Equal(callNames(functions[0]), []string{"X"}) {
 			t.Errorf("a chain of %s: %v", operator, err)
 		}
@@ -512,7 +512,7 @@ func TestAnErrorNamesItsLineAndItsColumnInCharacters(t *testing.T) {
 
 func TestASourceWithoutFunctionsHasNone(t *testing.T) {
 	for _, source := range []string{"", "-- nothing\n", "local x = 1\nreturn x"} {
-		if functions, err := Functions(source, "map.lua"); err != nil || len(functions) != 0 {
+		if functions, err := ParseFunctions(source, "map.lua"); err != nil || len(functions) != 0 {
 			t.Errorf("Functions(%q) = %+v, %v", source, functions, err)
 		}
 	}

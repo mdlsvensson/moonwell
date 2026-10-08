@@ -82,7 +82,7 @@ func Write(files []File, options Options) ([]byte, error) {
 func pathKey(name string) string {
 	key := []byte(name)
 	for i, c := range key {
-		key[i] = upper(c)
+		key[i] = toUpperASCII(c)
 	}
 	return string(key)
 }
@@ -160,7 +160,7 @@ func storeFile(packer *sectorPacker, data []byte, sectorSize int) ([]byte, error
 	var table binio.Writer
 	var sectors []byte
 	for raw := range slices.Chunk(data, sectorSize) {
-		sector, err := packer.sector(raw)
+		sector, err := packer.pack(raw)
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +183,7 @@ func newSectorPacker() *sectorPacker {
 	return p
 }
 
-func (p *sectorPacker) sector(raw []byte) ([]byte, error) {
+func (p *sectorPacker) pack(raw []byte) ([]byte, error) {
 	p.packed.Reset()
 	p.packed.WriteByte(compressedWithZlib)
 	p.compressor.Reset(&p.packed)

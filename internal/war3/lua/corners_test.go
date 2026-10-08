@@ -120,8 +120,8 @@ type literal struct {
 
 func literalOf(tokens []Token) literal {
 	var made literal
-	made.Number, made.IsNumber = LiteralNumber(tokens)
-	made.Player, made.IsPlayer = PlayerID(tokens)
+	made.Number, made.IsNumber = ParseNumberLiteral(tokens)
+	made.Player, made.IsPlayer = ParsePlayerID(tokens)
 	return made
 }
 
@@ -154,10 +154,10 @@ type scanned struct {
 }
 
 func scan(source string) scanned {
-	made := scanned{Requires: Requires(source), Globals: TopLevelGlobals(source), Map: ReadMapGlobals(source)}
+	made := scanned{Requires: FindRequires(source), Globals: FindTopLevelGlobals(source), Map: ReadMapGlobals(source)}
 	made.Tokens, made.Fault = Tokenize(source)
 	made.Whole = literalOf(made.Tokens)
-	functions, err := Functions(source, "war3map.lua")
+	functions, err := ParseFunctions(source, "war3map.lua")
 	var failure *diag.Error
 	switch {
 	case errors.As(err, &failure):

@@ -81,7 +81,7 @@ func TestCollectListsYueScriptInSrcAndLuaInLuaNamedByPath(t *testing.T) {
 
 func TestCollectReadsALuaFileSavedWithAByteOrderMarkWithoutItSoTheScanSeesItsFirstLine(t *testing.T) {
 	module := luaModule(t, mark+"Counter = 0\n")
-	if module.Text != "Counter = 0\n" || !slices.Equal(lua.TopLevelGlobals(module.Text), []string{"Counter"}) {
+	if module.Text != "Counter = 0\n" || !slices.Equal(lua.FindTopLevelGlobals(module.Text), []string{"Counter"}) {
 		t.Errorf("text = %q", module.Text)
 	}
 }

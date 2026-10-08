@@ -13,22 +13,22 @@ var (
 	decimal    = regexp.MustCompile(`^(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$`)
 )
 
-func LiteralNumber(tokens []Token) (float64, bool) {
-	negative := len(tokens) == 2 && tokens[0].is("-")
+func ParseNumberLiteral(tokens []Token) (float64, bool) {
+	negative := len(tokens) == 2 && tokens[0].isSymbol("-")
 	if negative {
 		tokens = tokens[1:]
 	}
 	if len(tokens) != 1 || tokens[0].Kind != NumberToken {
 		return 0, false
 	}
-	value, ok := numeralValue(tokens[0].Raw)
+	value, ok := parseNumeral(tokens[0].Raw)
 	if ok && negative {
 		value = -value
 	}
 	return value, ok
 }
 
-func numeralValue(raw string) (float64, bool) {
+func parseNumeral(raw string) (float64, bool) {
 	switch {
 	case hexInteger.MatchString(raw):
 		raw += "p0"
@@ -42,20 +42,20 @@ func numeralValue(raw string) (float64, bool) {
 	return value, true
 }
 
-func PlayerID(tokens []Token) (int, bool) {
+func ParsePlayerID(tokens []Token) (int, bool) {
 	last := len(tokens) - 1
 	if len(tokens) < 3 || tokens[0].Kind != NameToken || tokens[0].Raw != "Player" ||
-		!tokens[1].is("(") || !tokens[last].is(")") {
+		!tokens[1].isSymbol("(") || !tokens[last].isSymbol(")") {
 		return 0, false
 	}
-	value, ok := LiteralNumber(tokens[2:last])
+	value, ok := ParseNumberLiteral(tokens[2:last])
 	if !ok || value != math.Trunc(value) || math.Abs(value) >= 1<<63 {
 		return 0, false
 	}
 	return int(value), true
 }
 
-func Quote(s string) string {
+func QuoteString(s string) string {
 	var b strings.Builder
 	b.WriteByte('"')
 	for _, r := range s {
@@ -73,7 +73,7 @@ func Quote(s string) string {
 	return b.String()
 }
 
-func Number(v float64) string {
+func FormatNumber(v float64) string {
 	if v == 0 {
 		return "0"
 	}

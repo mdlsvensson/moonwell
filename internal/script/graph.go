@@ -95,7 +95,7 @@ func (w *walk) visit(name string, at required) error {
 }
 
 func (w *walk) follow(module *Module) error {
-	for _, call := range lua.Requires(module.Lua) {
+	for _, call := range lua.FindRequires(module.Lua) {
 		if !call.Literal {
 			return errComputedRequire(required{module.Path, call.Line})
 		}

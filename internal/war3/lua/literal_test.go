@@ -61,12 +61,12 @@ var playerIDs = []struct {
 
 func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 	for _, c := range literalNumbers {
-		if value, ok := LiteralNumber(argument(t, c.source)); ok != c.ok || value != c.value {
+		if value, ok := ParseNumberLiteral(argument(t, c.source)); ok != c.ok || value != c.value {
 			t.Errorf("LiteralNumber(%s) = %v, %v, want %v, %v", c.source, value, ok, c.value, c.ok)
 		}
 	}
 	for _, source := range []string{"-1e999", "-0x1.fp2"} {
-		if value, ok := LiteralNumber(argument(t, source)); ok || value != 0 || math.Signbit(value) {
+		if value, ok := ParseNumberLiteral(argument(t, source)); ok || value != 0 || math.Signbit(value) {
 			t.Errorf("LiteralNumber(%s) = %v, %v, want 0 and false", source, value, ok)
 		}
 	}
@@ -74,11 +74,11 @@ func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 		{Kind: SymbolToken, Raw: "+", Start: 0, End: 1},
 		{Kind: NumberToken, Raw: "1", Start: 1, End: 2},
 	}
-	if _, ok := LiteralNumber(plusOne); ok {
+	if _, ok := ParseNumberLiteral(plusOne); ok {
 		t.Error("LiteralNumber accepted +1")
 	}
 	for _, c := range playerIDs {
-		if value, ok := PlayerID(argument(t, c.source)); ok != c.ok || value != c.value {
+		if value, ok := ParsePlayerID(argument(t, c.source)); ok != c.ok || value != c.value {
 			t.Errorf("PlayerID(%s) = %v, %v, want %v, %v", c.source, value, ok, c.value, c.ok)
 		}
 	}
@@ -91,7 +91,7 @@ func TestAMalformedNumeralIsNoLiteralNumber(t *testing.T) {
 			t.Errorf("Tokenize(%s) = %+v, fault %+v; want one number token and a fault", source, tokens, fault)
 			continue
 		}
-		if value, ok := LiteralNumber(tokens); ok || value != 0 {
+		if value, ok := ParseNumberLiteral(tokens); ok || value != 0 {
 			t.Errorf("LiteralNumber of the malformed numeral %s = %v, %v, want 0 and false", source, value, ok)
 		}
 	}
@@ -101,12 +101,12 @@ func TestPlayerIDTakesOnlyTheWholeCallOfPlayer(t *testing.T) {
 	for _, source := range []string{"", "Player", "Player(", "Player()", "Player(0", "Player[0)", "Player(0]",
 		"Player 0 )", "'Player'(0)", "Other(0)", "player(0)", "(0)"} {
 		tokens, _ := Tokenize(source)
-		if id, ok := PlayerID(tokens); ok || id != 0 {
+		if id, ok := ParsePlayerID(tokens); ok || id != 0 {
 			t.Errorf("PlayerID of the tokens of %s = %d, %v", source, id, ok)
 		}
 	}
 	tokens, _ := Tokenize("Player ( - 7 )")
-	if id, ok := PlayerID(tokens); !ok || id != -7 {
+	if id, ok := ParsePlayerID(tokens); !ok || id != -7 {
 		t.Errorf("PlayerID of Player ( - 7 ) = %d, %v", id, ok)
 	}
 }
@@ -125,7 +125,7 @@ func TestQuoteEscapesQuotesBackslashesAndControlCharacters(t *testing.T) {
 		{"it's", `"it's"`},
 		{"", `""`},
 	} {
-		if got := Quote(c.value); got != c.want {
+		if got := QuoteString(c.value); got != c.want {
 			t.Errorf("Quote(%q) = %s, want %s", c.value, got, c.want)
 		}
 	}
@@ -133,7 +133,7 @@ func TestQuoteEscapesQuotesBackslashesAndControlCharacters(t *testing.T) {
 
 func TestQuoteWritesWhatTheTokenizerReadsAsOneString(t *testing.T) {
 	for _, value := range []string{`a"b\c`, "line\r\nbreak 123", "tab\there", "é \U0001F319"} {
-		tokens, fault := Tokenize(Quote(value))
+		tokens, fault := Tokenize(QuoteString(value))
 		if fault != nil || len(tokens) != 1 || tokens[0].Kind != StringToken {
 			t.Errorf("Quote(%q) reads as %+v, fault %+v", value, tokens, fault)
 		}
@@ -157,12 +157,12 @@ func TestNumberWritesPlainDecimalWithTheFewestDigits(t *testing.T) {
 		{-1e-7, "-0.0000001"},
 		{-float64(math.SmallestNonzeroFloat32), "-0.000000000000000000000000000000000000000000001401298464324817"},
 	} {
-		got := Number(c.value)
+		got := FormatNumber(c.value)
 		if got != c.want {
 			t.Errorf("Number(%v) = %s, want %s", c.value, got, c.want)
 		}
 		tokens, fault := Tokenize(got)
-		if value, ok := LiteralNumber(tokens); fault != nil || !ok || value != c.value {
+		if value, ok := ParseNumberLiteral(tokens); fault != nil || !ok || value != c.value {
 			t.Errorf("Number(%v) = %s reads back as %v, %v", c.value, got, value, ok)
 		}
 	}

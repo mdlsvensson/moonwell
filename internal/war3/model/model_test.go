@@ -240,11 +240,11 @@ func headerOnlyTexts() []string {
 
 var readsUnnaturally = regexp.MustCompile(`\ba [A-Z]{4}\b`)
 
-func refused(t *testing.T, what string, err error, file, words string) {
+func refused(t *testing.T, what string, err error, displayPath, words string) {
 	t.Helper()
 	var failure *diag.Error
-	if !errors.As(err, &failure) || failure.File != file {
-		t.Errorf("%s: got %v, want an error naming %s", what, err, file)
+	if !errors.As(err, &failure) || failure.File != displayPath {
+		t.Errorf("%s: got %v, want an error naming %s", what, err, displayPath)
 		return
 	}
 	if !strings.HasPrefix(failure.Msg, "Not a readable model: ") || !strings.Contains(failure.Msg, words) {
@@ -274,7 +274,7 @@ func TestReadMDLRefusesBrokenText(t *testing.T) {
 }
 
 func TestPathsPicksTheReaderFromTheContent(t *testing.T) {
-	got, err := model.Paths([]byte(knight), "knight.mdl")
+	got, err := model.ReadPaths([]byte(knight), "knight.mdl")
 	if err != nil || !slices.Equal(got, knightPaths) {
 		t.Errorf("Paths of text = %+v, %v", got, err)
 	}
@@ -282,16 +282,16 @@ func TestPathsPicksTheReaderFromTheContent(t *testing.T) {
 		if !model.IsMDX(binary.data) {
 			continue
 		}
-		got, err := model.Paths(binary.data, "a.mdx")
+		got, err := model.ReadPaths(binary.data, "a.mdx")
 		if err != nil || !slices.Equal(got, binary.want) {
 			t.Errorf("Paths of binary, %s = %+v, %v", binary.name, got, err)
 		}
 	}
 	blp := []byte{0x42, 0x4c, 0x50, 0x31, 0, 0, 0, 0}
-	_, err = model.Paths(blp, "icon.blp")
+	_, err = model.ReadPaths(blp, "icon.blp")
 	refused(t, "a texture", err, "icon.blp", "it is neither a binary MDX nor a text MDL file")
 	for _, text := range []string{"\x00" + header, header + "Bitmap { Image \"a\x00.blp\", }", header + "\x00"} {
-		_, err := model.Paths([]byte(text), modelFile)
+		_, err := model.ReadPaths([]byte(text), modelFile)
 		refused(t, strconv.Quote(text), err, modelFile, "neither a binary MDX nor a text MDL")
 	}
 }
@@ -309,10 +309,10 @@ func TestEachKindHasItsWords(t *testing.T) {
 
 func TestPathsRefusesTextThatIsNotAModel(t *testing.T) {
 	for _, source := range textsThatAreNoModel() {
-		_, err := model.Paths([]byte(source), modelFile)
+		_, err := model.ReadPaths([]byte(source), modelFile)
 		refused(t, source, err, modelFile, "it has no Version or Model block")
 	}
-	_, err := model.Paths([]byte{0x4d, 0x44}, modelFile)
+	_, err := model.ReadPaths([]byte{0x4d, 0x44}, modelFile)
 	refused(t, "MD", err, modelFile, "it has no Version or Model block")
 }
 
@@ -384,7 +384,7 @@ func TestDescribeLabelsReplaceableTextures(t *testing.T) {
 		{model.Path{Kind: model.Texture, ReplaceableID: 11}, "replaceable texture (slot 11)"},
 		{model.Path{Kind: model.Texture}, "replaceable texture (slot 0)"},
 	} {
-		if got := model.Describe(c.path); got != c.want {
+		if got := model.DescribePath(c.path); got != c.want {
 			t.Errorf("Describe(%+v) = %q, want %q", c.path, got, c.want)
 		}
 	}
@@ -507,7 +507,7 @@ func TestOnlyASCIIWhiteSpaceSeparatesTheTokensOfATextModel(t *testing.T) {
 
 func TestPathsDropsALeadingByteOrderMarkAndReadMDLTakesItsTextAsItIs(t *testing.T) {
 	marked := "\xEF\xBB\xBF" + header
-	if got, err := model.Paths([]byte(marked), modelFile); err != nil || len(got) != 0 {
+	if got, err := model.ReadPaths([]byte(marked), modelFile); err != nil || len(got) != 0 {
 		t.Errorf("Paths = %+v, %v", got, err)
 	}
 	_, err := model.ReadMDL(marked, modelFile)
@@ -553,7 +553,7 @@ func singleInvalidSequences() []invalidBytes {
 
 func TestPathsReadsBytesThatAreNotUTF8AsOneReplacementCharacterForEachRun(t *testing.T) {
 	for _, c := range slices.Concat(runsOfInvalidBytes(), singleInvalidSequences()) {
-		got, err := model.Paths(c.data, modelFile)
+		got, err := model.ReadPaths(c.data, modelFile)
 		if err != nil || len(got) != 1 || got[0].Path != c.want {
 			t.Errorf("%s: Paths = %+v, %v, want the path %q", c.name, got, err, c.want)
 		}

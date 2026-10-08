@@ -16,13 +16,13 @@ type Section struct {
 }
 
 func Merge(source string, sections []Section) string {
-	text := takeApart(source)
+	text := splitLines(source)
 	for _, section := range sections {
 		for _, field := range section.Fields {
-			text.lines = set(text.lines, section.Name, field)
+			text.lines = setField(text.lines, section.Name, field)
 		}
 	}
-	return text.joined()
+	return text.join()
 }
 
 type document struct {
@@ -31,7 +31,7 @@ type document struct {
 	finalNewline bool
 }
 
-func takeApart(source string) document {
+func splitLines(source string) document {
 	text := document{newline: "\n", finalNewline: strings.HasSuffix(source, "\n")}
 	if strings.Contains(source, "\r\n") {
 		text.newline = "\r\n"
@@ -45,7 +45,7 @@ func takeApart(source string) document {
 	return text
 }
 
-func (d document) joined() string {
+func (d document) join() string {
 	text := strings.Join(d.lines, d.newline)
 	if d.finalNewline {
 		text += d.newline
@@ -56,40 +56,40 @@ func (d document) joined() string {
 const whiteSpace = fsx.ASCIISpace
 
 var (
-	header  = regexp.MustCompile(`^[` + whiteSpace + `]*\[([^\]]+)\][` + whiteSpace + `]*(?:(?://|;)[^\r\n]*)?$`)
-	setting = regexp.MustCompile(`^([` + whiteSpace + `]*)([^=` + whiteSpace + `]+)[` + whiteSpace + `]*=`)
-	blank   = regexp.MustCompile(`^[` + whiteSpace + `]*$`)
+	headerPattern = regexp.MustCompile(`^[` + whiteSpace + `]*\[([^\]]+)\][` + whiteSpace + `]*(?:(?://|;)[^\r\n]*)?$`)
+	fieldPattern  = regexp.MustCompile(`^([` + whiteSpace + `]*)([^=` + whiteSpace + `]+)[` + whiteSpace + `]*=`)
+	blankPattern  = regexp.MustCompile(`^[` + whiteSpace + `]*$`)
 )
 
-func set(lines []string, section string, field Field) []string {
-	inside := linesOf(lines, section)
-	if replace(lines, inside, field) {
+func setField(lines []string, section string, field Field) []string {
+	indexes := sectionLineIndexes(lines, section)
+	if replaceField(lines, indexes, field) {
 		return lines
 	}
-	if len(inside) == 0 {
+	if len(indexes) == 0 {
 		return appendSection(lines, section, field)
 	}
-	return slices.Insert(lines, end(lines, inside), line(field))
+	return slices.Insert(lines, sectionEnd(lines, indexes), formatField(field))
 }
 
-func linesOf(lines []string, section string) []int {
-	var inside []int
-	open := false
+func sectionLineIndexes(lines []string, section string) []int {
+	var indexes []int
+	inSection := false
 	for i, text := range lines {
-		if name := header.FindStringSubmatch(text); name != nil {
-			open = strings.EqualFold(name[1], section)
+		if name := headerPattern.FindStringSubmatch(text); name != nil {
+			inSection = strings.EqualFold(name[1], section)
 		}
-		if open {
-			inside = append(inside, i)
+		if inSection {
+			indexes = append(indexes, i)
 		}
 	}
-	return inside
+	return indexes
 }
 
-func replace(lines []string, inside []int, field Field) bool {
+func replaceField(lines []string, indexes []int, field Field) bool {
 	found := false
-	for _, i := range inside {
-		if parts := setting.FindStringSubmatch(lines[i]); parts != nil && strings.EqualFold(parts[2], field.Key) {
+	for _, i := range indexes {
+		if parts := fieldPattern.FindStringSubmatch(lines[i]); parts != nil && strings.EqualFold(parts[2], field.Key) {
 			lines[i] = parts[1] + parts[2] + "=" + field.Value
 			found = true
 		}
@@ -97,9 +97,9 @@ func replace(lines []string, inside []int, field Field) bool {
 	return found
 }
 
-func end(lines []string, inside []int) int {
-	for _, i := range slices.Backward(inside) {
-		if !blank.MatchString(lines[i]) {
+func sectionEnd(lines []string, indexes []int) int {
+	for _, i := range slices.Backward(indexes) {
+		if !blankPattern.MatchString(lines[i]) {
 			return i + 1
 		}
 	}
@@ -107,10 +107,10 @@ func end(lines []string, inside []int) int {
 }
 
 func appendSection(lines []string, section string, field Field) []string {
-	if len(lines) > 0 && !blank.MatchString(lines[len(lines)-1]) {
+	if len(lines) > 0 && !blankPattern.MatchString(lines[len(lines)-1]) {
 		lines = append(lines, "")
 	}
-	return append(lines, "["+section+"]", line(field))
+	return append(lines, "["+section+"]", formatField(field))
 }
 
-func line(field Field) string { return field.Key + "=" + field.Value }
+func formatField(field Field) string { return field.Key + "=" + field.Value }

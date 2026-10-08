@@ -25,40 +25,40 @@ type mdlToken struct {
 	text string
 }
 
-type mdlTokens struct {
+type mdlLexer struct {
 	source string
-	at     int
+	pos    int
 }
 
-func (t *mdlTokens) next(file string) (mdlToken, error) {
+func (t *mdlLexer) next(displayPath string) (mdlToken, error) {
 	t.skipSpaceAndComments()
-	if t.at == len(t.source) {
+	if t.pos == len(t.source) {
 		return mdlToken{kind: mdlEnd}, nil
 	}
-	switch t.source[t.at] {
+	switch t.source[t.pos] {
 	case '{':
-		t.at++
+		t.pos++
 		return mdlToken{kind: mdlOpen}, nil
 	case '}':
-		t.at++
+		t.pos++
 		return mdlToken{kind: mdlClose}, nil
 	case ',':
-		t.at++
+		t.pos++
 		return mdlToken{kind: mdlComma}, nil
 	case '"':
-		return t.quoted(file)
+		return t.readString(displayPath)
 	}
-	return t.word(), nil
+	return t.readWord(), nil
 }
 
-func (t *mdlTokens) skipSpaceAndComments() {
-	for t.at < len(t.source) {
-		rest := t.source[t.at:]
+func (t *mdlLexer) skipSpaceAndComments() {
+	for t.pos < len(t.source) {
+		rest := t.source[t.pos:]
 		switch {
 		case strings.IndexByte(fsx.ASCIISpace, rest[0]) >= 0:
-			t.at++
+			t.pos++
 		case strings.HasPrefix(rest, "//"):
-			t.at += lineLength(rest)
+			t.pos += lineLength(rest)
 		default:
 			return
 		}
@@ -72,23 +72,23 @@ func lineLength(text string) int {
 	return len(text)
 }
 
-func (t *mdlTokens) quoted(file string) (mdlToken, error) {
-	body := t.source[t.at+1:]
+func (t *mdlLexer) readString(displayPath string) (mdlToken, error) {
+	body := t.source[t.pos+1:]
 	end := strings.IndexByte(body, '"')
 	if end < 0 {
-		return mdlToken{}, errStringNeverClosed(file)
+		return mdlToken{}, errStringNeverClosed(displayPath)
 	}
-	t.at += end + 2
+	t.pos += end + 2
 	return mdlToken{mdlString, body[:end]}, nil
 }
 
-func (t *mdlTokens) word() mdlToken {
-	rest := t.source[t.at:]
+func (t *mdlLexer) readWord() mdlToken {
+	rest := t.source[t.pos:]
 	end := strings.IndexAny(rest, mdlWordEnds)
 	if end < 0 {
 		end = len(rest)
 	}
-	t.at += end
+	t.pos += end
 	return mdlToken{mdlWord, rest[:end]}
 }
 
@@ -101,7 +101,7 @@ type mdlBlock struct {
 	usesMDL, usesTGA bool
 }
 
-func (b *mdlBlock) set(statement []mdlToken) {
+func (b *mdlBlock) applyStatement(statement []mdlToken) {
 	if len(statement) == 0 || len(statement) > 2 || statement[0].kind != mdlWord {
 		return
 	}
@@ -115,13 +115,13 @@ func (b *mdlBlock) set(statement []mdlToken) {
 	case statement[1].kind == mdlString && key == "Path":
 		b.path, b.hasPath = statement[1].text, true
 	case statement[1].kind == mdlWord && key == "ReplaceableId":
-		if number, ok := wholeNumber(statement[1].text); ok {
+		if number, ok := parseInt(statement[1].text); ok {
 			b.replaceableID = number
 		}
 	}
 }
 
-func wholeNumber(word string) (int64, bool) {
+func parseInt(word string) (int64, bool) {
 	digits := strings.TrimPrefix(word, "-")
 	if digits == "" || strings.Trim(digits, "0123456789") != "" {
 		return 0, false
@@ -130,13 +130,13 @@ func wholeNumber(word string) (int64, bool) {
 	return number, true
 }
 
-func (b *mdlBlock) adopt(child mdlBlock) {
+func (b *mdlBlock) mergeChild(child mdlBlock) {
 	if b.name == "ParticleEmitter" && !b.hasPath && child.name == "Particle" && child.hasPath {
 		b.path, b.hasPath = child.path, true
 	}
 }
 
-func (b mdlBlock) reference() (Path, bool) {
+func (b mdlBlock) toPath() (Path, bool) {
 	switch b.name {
 	case "Bitmap":
 		return Path{Kind: Texture, Path: b.image, ReplaceableID: b.replaceableID}, true
@@ -153,31 +153,31 @@ func (b mdlBlock) reference() (Path, bool) {
 }
 
 type mdlReader struct {
-	file      string
-	open      []mdlBlock
-	statement []mdlToken
-	hasHeader bool
-	paths     []Path
+	displayPath string
+	openBlocks  []mdlBlock
+	statement   []mdlToken
+	hasHeader   bool
+	paths       []Path
 }
 
-func ReadMDL(source, file string) ([]Path, error) {
-	reader := mdlReader{file: file}
-	tokens := mdlTokens{source: source}
+func ReadMDL(source, displayPath string) ([]Path, error) {
+	reader := mdlReader{displayPath: displayPath}
+	tokens := mdlLexer{source: source}
 	for {
-		token, err := tokens.next(file)
+		token, err := tokens.next(displayPath)
 		if err != nil {
 			return nil, err
 		}
 		if token.kind == mdlEnd {
 			return reader.finish()
 		}
-		if err := reader.take(token); err != nil {
+		if err := reader.handleToken(token); err != nil {
 			return nil, err
 		}
 	}
 }
 
-func (r *mdlReader) take(token mdlToken) error {
+func (r *mdlReader) handleToken(token mdlToken) error {
 	switch token.kind {
 	case mdlOpen:
 		r.openBlock()
@@ -197,30 +197,30 @@ func (r *mdlReader) openBlock() {
 		name = r.statement[0].text
 	}
 	r.statement = r.statement[:0]
-	if len(r.open) == 0 && (name == "Version" || name == "Model") {
+	if len(r.openBlocks) == 0 && (name == "Version" || name == "Model") {
 		r.hasHeader = true
 	}
-	r.open = append(r.open, mdlBlock{name: name})
+	r.openBlocks = append(r.openBlocks, mdlBlock{name: name})
 }
 
 func (r *mdlReader) endStatement() {
-	if len(r.open) > 0 {
-		r.open[len(r.open)-1].set(r.statement)
+	if len(r.openBlocks) > 0 {
+		r.openBlocks[len(r.openBlocks)-1].applyStatement(r.statement)
 	}
 	r.statement = r.statement[:0]
 }
 
 func (r *mdlReader) closeBlock() error {
 	r.endStatement()
-	if len(r.open) == 0 {
-		return errUnmatchedClose(r.file)
+	if len(r.openBlocks) == 0 {
+		return errUnmatchedClose(r.displayPath)
 	}
-	closed := r.open[len(r.open)-1]
-	r.open = r.open[:len(r.open)-1]
-	if len(r.open) > 0 {
-		r.open[len(r.open)-1].adopt(closed)
+	closed := r.openBlocks[len(r.openBlocks)-1]
+	r.openBlocks = r.openBlocks[:len(r.openBlocks)-1]
+	if len(r.openBlocks) > 0 {
+		r.openBlocks[len(r.openBlocks)-1].mergeChild(closed)
 	}
-	if path, ok := closed.reference(); ok {
+	if path, ok := closed.toPath(); ok {
 		path.Path = strings.Clone(path.Path)
 		r.paths = append(r.paths, path)
 	}
@@ -228,30 +228,30 @@ func (r *mdlReader) closeBlock() error {
 }
 
 func (r *mdlReader) finish() ([]Path, error) {
-	if len(r.open) > 0 {
-		return nil, errBlockNeverClosed(r.file, r.open[len(r.open)-1].name)
+	if len(r.openBlocks) > 0 {
+		return nil, errBlockNeverClosed(r.displayPath, r.openBlocks[len(r.openBlocks)-1].name)
 	}
 	if !r.hasHeader {
-		return nil, errNoHeader(r.file)
+		return nil, errNoHeader(r.displayPath)
 	}
 	return r.paths, nil
 }
 
-func errStringNeverClosed(file string) error {
-	return errNotReadable(file, "a string is never closed")
+func errStringNeverClosed(displayPath string) error {
+	return errNotReadable(displayPath, "a string is never closed")
 }
 
-func errUnmatchedClose(file string) error {
-	return errNotReadable(file, "a } has no matching {")
+func errUnmatchedClose(displayPath string) error {
+	return errNotReadable(displayPath, "a } has no matching {")
 }
 
-func errBlockNeverClosed(file, name string) error {
+func errBlockNeverClosed(displayPath, name string) error {
 	if name == "" {
 		name = "unnamed"
 	}
-	return errNotReadable(file, "the "+name+" block is never closed")
+	return errNotReadable(displayPath, "the "+name+" block is never closed")
 }
 
-func errNoHeader(file string) error {
-	return errNotReadable(file, "it has no Version or Model block")
+func errNoHeader(displayPath string) error {
+	return errNotReadable(displayPath, "it has no Version or Model block")
 }

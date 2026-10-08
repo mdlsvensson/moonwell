@@ -96,7 +96,7 @@ func ReportModels(models []Model, gamePaths, targets map[string]bool) []ModelRep
 
 func reportOn(found Model, gamePaths, targets map[string]bool) ModelReport {
 	report := ModelReport{Heading: found.Heading}
-	paths, err := model.Paths(found.Data, found.Heading)
+	paths, err := model.ReadPaths(found.Data, found.Heading)
 	if err != nil {
 		report.Unreadable = err.Error()
 		return report
@@ -167,7 +167,7 @@ func table(refs []ModelRef) []string {
 }
 
 func shown(ref ModelRef) string {
-	return strings.ReplaceAll(model.Describe(ref.Path), "/", `\`)
+	return strings.ReplaceAll(model.DescribePath(ref.Path), "/", `\`)
 }
 
 func padded(text string, width int) string {

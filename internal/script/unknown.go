@@ -48,7 +48,7 @@ func declaredBy(modules []Module, output *staged) []string {
 	var declared []string
 	for _, module := range modules {
 		if module.Kind == Lua {
-			declared = append(declared, lua.TopLevelGlobals(module.Lua)...)
+			declared = append(declared, lua.FindTopLevelGlobals(module.Lua)...)
 		} else {
 			declared = append(declared, declaredGlobals(output.texts[module.Path])...)
 		}

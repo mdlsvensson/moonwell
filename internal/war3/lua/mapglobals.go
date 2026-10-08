@@ -48,14 +48,14 @@ func ReadMapGlobals(script string) MapGlobals {
 		if !declarations {
 			continue
 		}
-		if global, ok := declaration(line); ok {
+		if global, ok := parseDeclaration(line); ok {
 			result.Globals = append(result.Globals, global)
 		}
 	}
 	return result
 }
 
-func declaration(line string) (Global, bool) {
+func parseDeclaration(line string) (Global, bool) {
 	match := declarationLine.FindStringSubmatch(line)
 	if match == nil {
 		return Global{}, false
@@ -64,10 +64,10 @@ func declaration(line string) (Global, bool) {
 	if handle := handleName.FindStringSubmatch(name); handle != nil {
 		return Global{Name: name, Type: cmp.Or(handleTypes[handle[1]], "any")}, true
 	}
-	return Global{Name: name, Type: valueType(value)}, true
+	return Global{Name: name, Type: inferValueType(value)}, true
 }
 
-func valueType(value string) string {
+func inferValueType(value string) string {
 	switch {
 	case integerValue.MatchString(value):
 		return "integer"
@@ -81,7 +81,7 @@ func valueType(value string) string {
 		return "any[]"
 	}
 	if array := arrayConstructor.FindStringSubmatch(value); array != nil {
-		return valueType(fsx.TrimASCIISpace(array[1])) + "[]"
+		return inferValueType(fsx.TrimASCIISpace(array[1])) + "[]"
 	}
 	return "any"
 }

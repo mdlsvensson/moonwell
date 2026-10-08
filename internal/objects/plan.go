@@ -174,7 +174,7 @@ func (f *objectFiles) appended(name string, family []Resolved, takes func(Field)
 		return mapdir.Change{}, err
 	}
 	held := f.held[name]
-	written, err := objmod.AppendTo(held.parsed, held.data, objmod.KindOf(name), added)
+	written, err := objmod.AppendObjects(held.parsed, held.data, objmod.KindOf(name), added)
 	if err != nil {
 		return mapdir.Change{}, err
 	}

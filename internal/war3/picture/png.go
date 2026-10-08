@@ -10,37 +10,37 @@ import (
 
 const pngSignature = "\x89PNG\r\n\x1a\n"
 
-func readPNG(data []byte, file string) (pixels, error) {
+func readPNG(data []byte, displayPath string) (pixels, error) {
 	if !bytes.HasPrefix(data, []byte(pngSignature)) {
-		return pixels{}, errNotPNG(file)
+		return pixels{}, errNotPNG(displayPath)
 	}
 	header, err := png.DecodeConfig(bytes.NewReader(data))
 	if err != nil {
-		return pixels{}, errPNGUnreadable(file, err)
+		return pixels{}, errPNGUnreadable(displayPath, err)
 	}
-	if err := checkSize(file, uint32(header.Width), uint32(header.Height)); err != nil {
+	if err := checkSize(displayPath, uint32(header.Width), uint32(header.Height)); err != nil {
 		return pixels{}, err
 	}
 	decoded, err := png.Decode(bytes.NewReader(data))
 	if err != nil {
-		return pixels{}, errPNGUnreadable(file, err)
+		return pixels{}, errPNGUnreadable(displayPath, err)
 	}
-	return storedPixels(decoded, header.Width, header.Height), nil
+	return toPixels(decoded, header.Width, header.Height), nil
 }
 
-func storedPixels(decoded image.Image, width, height int) pixels {
+func toPixels(decoded image.Image, width, height int) pixels {
 	corner := decoded.Bounds().Min
 	stored := make([]byte, 0, width*height*3)
 	for y := range height {
 		for x := range width {
-			red, green, blue := storedColour(decoded.At(corner.X+x, corner.Y+y))
+			red, green, blue := toRGB(decoded.At(corner.X+x, corner.Y+y))
 			stored = append(stored, blue, green, red)
 		}
 	}
-	return pixels{width: width, height: height, step: 3, fromTop: true, stored: stored}
+	return pixels{width: width, height: height, bytesPerPixel: 3, fromTop: true, data: stored}
 }
 
-func storedColour(pixel color.Color) (red, green, blue byte) {
+func toRGB(pixel color.Color) (red, green, blue byte) {
 	switch c := pixel.(type) {
 	case color.NRGBA:
 		return c.R, c.G, c.B
@@ -53,13 +53,13 @@ func storedColour(pixel color.Color) (red, green, blue byte) {
 
 const pngHint = "Export the picture again from an image editor as a PNG of 256x256 pixels."
 
-func errNotPNG(file string) error {
-	return refused(file, "is not a PNG file: it does not start with a PNG signature.", pngHint)
+func errNotPNG(displayPath string) error {
+	return newPictureError(displayPath, "is not a PNG file: it does not start with a PNG signature.", pngHint)
 }
 
-func errPNGUnreadable(file string, cause error) error {
+func errPNGUnreadable(displayPath string, cause error) error {
 	reason := strings.TrimPrefix(cause.Error(), "png: ")
-	failure := refused(file, "is a PNG that could not be read: "+reason+".", pngHint)
+	failure := newPictureError(displayPath, "is a PNG that could not be read: "+reason+".", pngHint)
 	failure.Cause = cause
 	return failure
 }

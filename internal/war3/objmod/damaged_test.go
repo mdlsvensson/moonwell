@@ -40,9 +40,9 @@ func filesToDamage(t *testing.T) []damagedFile {
 	return files
 }
 
-func numberOffsets(t *testing.T, file damagedFile) []int {
+func numberOffsets(t *testing.T, displayPath damagedFile) []int {
 	t.Helper()
-	parsed := mustRead(t, file.data, file.kind, file.name)
+	parsed := mustRead(t, displayPath.data, displayPath.kind, displayPath.name)
 	var offsets []int
 	for _, table := range []objmod.Table{parsed.Original, parsed.Custom} {
 		offsets = append(offsets, table.CountOffset)
@@ -82,7 +82,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 	}
 	if parsed != nil {
 		added := []objmod.NewObject{{Base: id("hfoo"), ID: id("X001")}}
-		if value := testkit.Panic(func() { appended, appendErr = objmod.AppendTo(parsed, data, kind, added) }); value != nil {
+		if value := testkit.Panic(func() { appended, appendErr = objmod.AppendObjects(parsed, data, kind, added) }); value != nil {
 			t.Fatalf("%s: AppendTo panics: %v", what, value)
 		}
 	}
@@ -100,19 +100,19 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	var damaged tally
-	for _, file := range filesToDamage(t) {
-		for length := range len(file.data) {
-			what := fmt.Sprintf("%s cut at %d bytes", file.name, length)
-			damaged.readOrRefused(t, what, file.data[:length:length], file.kind)
+	for _, displayPath := range filesToDamage(t) {
+		for length := range len(displayPath.data) {
+			what := fmt.Sprintf("%s cut at %d bytes", displayPath.name, length)
+			damaged.readOrRefused(t, what, displayPath.data[:length:length], displayPath.kind)
 		}
 		for index := range uint64(400) {
-			what := fmt.Sprintf("%s, change %d of seed %d", file.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.ChangedBytes(file.data, damageSeed, index), file.kind)
+			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
+			damaged.readOrRefused(t, what, testkit.ChangedBytes(displayPath.data, damageSeed, index), displayPath.kind)
 		}
-		for _, at := range numberOffsets(t, file) {
+		for _, at := range numberOffsets(t, displayPath) {
 			for _, number := range append(testkit.EdgeNumbers(), 3, 4, 5, 64, 65, 1000) {
-				what := fmt.Sprintf("%s with the number at %d set to %d", file.name, at, number)
-				damaged.readOrRefused(t, what, testkit.SetU32(file.data, at, number), file.kind)
+				what := fmt.Sprintf("%s with the number at %d set to %d", displayPath.name, at, number)
+				damaged.readOrRefused(t, what, testkit.SetU32(displayPath.data, at, number), displayPath.kind)
 			}
 		}
 	}
