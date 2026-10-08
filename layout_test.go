@@ -55,6 +55,9 @@ var (
 		// it names the type, and starts nothing.
 		"fsx": {"os/exec"},
 	}
+	// commandLine is the modules that read a command line: cobra, and pflag, which holds cobra's flags. Only cli
+	// imports them, its tests too: no other package knows how a line is read.
+	commandLine = []string{"github.com/spf13/cobra", "github.com/spf13/pflag"}
 	// generatorMay is the packages below internal that the generator may import: the three areas whose data it
 	// writes, and the two foundations it takes the names of a manifest and the text of a file from.
 	generatorMay = []string{"objects", "script", "assets", "manifest", "fsx"}
@@ -147,7 +150,16 @@ func isParser(tool string) bool { return path.Dir(tool) == "gen" }
 // rules is the rules on one import of a file, in the order their reports are made. Each returns what the import
 // breaks; "" for an import that keeps the rule.
 var rules = []func(f goFile, target string) string{
-	insideTheProgram, cliAlone, downTheShelves, offTheTools, amongTheTools,
+	insideTheProgram, lineReadByCli, cliAlone, downTheShelves, offTheTools, amongTheTools,
+}
+
+// lineReadByCli holds every file off the modules of commandLine and their packages, unless it is of cli.
+func lineReadByCli(f goFile, target string) string {
+	reads := slices.ContainsFunc(commandLine, func(m string) bool { return target == m || strings.HasPrefix(target, m+"/") })
+	if !reads || f.shelved && f.pkg == "cli" {
+		return ""
+	}
+	return fmt.Sprintf("%s imports %s; only cli reads the command line", f.path, target)
 }
 
 // insideTheProgram holds a file off outsideWorld, unless it is of env, of a test-only package, a test, or
@@ -305,6 +317,8 @@ func walkFolder(root, top string, report func(format string, args ...any)) error
 //
 //   - It imports neither os/exec nor net/http, unless it is of env, of a test-only package, or a test. fsx is
 //     excused for os/exec, and excused says why (insideTheProgram).
+//   - It imports neither cobra nor pflag, the modules that read a command line, unless it is of cli
+//     (lineReadByCli). Which modules the program may depend on at all is module_test.go's to hold.
 //   - A file below cmd/ imports cli and nothing else of the module, and a test there the test-only packages too
 //     (cliAlone).
 //   - A file below internal is in a package that is on a shelf. A shelf that has no package yet is no failure.
@@ -368,6 +382,30 @@ func walked(t *testing.T, files map[string]string, want ...string) {
 	if want = slices.Sorted(slices.Values(want)); !slices.Equal(reported, want) {
 		t.Errorf("the walk reported:\n%s\nwant:\n%s", strings.Join(reported, "\n"), strings.Join(want, "\n"))
 	}
+}
+
+// The walk lets cli alone import cobra and pflag, in a file and in a test, and holds every other file off them
+// and off the packages below them.
+func TestTheWalkLetsOnlyCliReadTheCommandLine(t *testing.T) {
+	const cobra, pflag = "github.com/spf13/cobra", "github.com/spf13/pflag"
+	walked(t, map[string]string{
+		"internal/cli/cli.go":        importing("cli", cobra, pflag),
+		"internal/cli/cli_test.go":   importing("cli", cobra),
+		"internal/build/build.go":    importing("build", pflag),
+		"internal/env/env_test.go":   importing("env", cobra+"/doc"),
+		"cmd/moonwell/main.go":       importing("main", cobra),
+		"tools/gen/main.go":          importing("main", pflag),
+		"internal/script/cobras.go":  importing("script", "github.com/spf13/cobrasnake"),
+		"internal/testkit/lines.go":  importing("testkit", cobra),
+		"internal/war3/mpq/flags.go": importing("mpq", pflag),
+	},
+		"internal/build/build.go imports "+pflag+"; only cli reads the command line",
+		"internal/env/env_test.go imports "+cobra+"/doc; only cli reads the command line",
+		"cmd/moonwell/main.go imports "+cobra+"; only cli reads the command line",
+		"tools/gen/main.go imports "+pflag+"; only cli reads the command line",
+		"internal/testkit/lines.go imports "+cobra+"; only cli reads the command line",
+		"internal/war3/mpq/flags.go imports "+pflag+"; only cli reads the command line",
+	)
 }
 
 // The walk is given a small tree with a file of each kind that breaks a rule, beside files that keep them, and

@@ -12,15 +12,38 @@ import (
 	"testing"
 )
 
-func TestTheModuleUsesTheStandardLibraryOnly(t *testing.T) {
+// dependencies is the modules Moonwell depends on, beside the standard library: cobra, which reads the command
+// line, and the two that cobra needs. A further module needs a design the maintainer approves; it is then added
+// here, and to layout_test.go, which says which package may import it.
+var dependencies = []string{
+	"github.com/inconshreveable/mousetrap",
+	"github.com/spf13/cobra",
+	"github.com/spf13/pflag",
+}
+
+func TestTheModuleDependsOnCobraAloneAndUsesNoCgo(t *testing.T) {
 	mod, err := os.ReadFile("go.mod")
 	if err != nil {
 		t.Fatal(err)
 	}
+	var required []string
 	for _, line := range strings.Split(string(mod), "\n") {
-		if word := strings.Fields(line); len(word) > 0 && (word[0] == "require" || word[0] == "replace") {
-			t.Errorf("go.mod has %q: Moonwell uses the standard library only", strings.TrimSpace(line))
+		words := strings.Fields(line)
+		if len(words) > 0 && words[0] == "require" {
+			words = words[1:] // a require of one line; in a block, each line is a module and its version
 		}
+		switch {
+		case len(words) == 0 || words[0] == "(" || words[0] == ")" || words[0] == "module" || words[0] == "go":
+		case len(words) >= 2 && strings.HasPrefix(words[1], "v"):
+			required = append(required, words[0])
+		default:
+			t.Errorf("go.mod has %q: Moonwell's go.mod names the module, the Go version and what it requires",
+				strings.TrimSpace(line))
+		}
+	}
+	slices.Sort(required)
+	if !slices.Equal(required, dependencies) {
+		t.Errorf("go.mod requires %q, want %q and no other module", required, dependencies)
 	}
 	err = filepath.WalkDir(".", func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
@@ -39,10 +62,14 @@ func TestTheModuleUsesTheStandardLibraryOnly(t *testing.T) {
 		for _, spec := range file.Imports {
 			name := strings.Trim(spec.Path.Value, `"`)
 			first, _, _ := strings.Cut(name, "/")
+			ofADependency := slices.ContainsFunc(dependencies, func(dependency string) bool {
+				return name == dependency || strings.HasPrefix(name, dependency+"/")
+			})
 			if name == "C" {
 				t.Errorf("%s imports \"C\": Moonwell uses no cgo", path)
-			} else if strings.Contains(first, ".") && !strings.HasPrefix(name, "github.com/mdlsvensson/moonwell") {
-				t.Errorf("%s imports %s: Moonwell uses the standard library only", path, name)
+			} else if strings.Contains(first, ".") && !strings.HasPrefix(name, "github.com/mdlsvensson/moonwell") &&
+				!ofADependency {
+				t.Errorf("%s imports %s: Moonwell depends on %q and on no other module", path, name, dependencies)
 			}
 		}
 		return nil
