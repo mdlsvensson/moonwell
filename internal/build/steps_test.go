@@ -17,8 +17,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The door is a command's that compiles nothing, such as setup: it runs no program, and the ids module, which
-// the gameplay imports, is a build's to write.
 func TestRefreshDeclarationsWritesTheDeclarationsAndTheMacroModuleAndNoIDsModule(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")))
 	s.templateMap()
@@ -59,9 +57,6 @@ func TestRefreshDeclarationsWritesTheDeclarationsAndTheMacroModuleAndNoIDsModule
 	}
 }
 
-// The door is a build's step, and the whole plan of a command that imports and builds nothing, such as
-// assets:sync, which gives it the source map itself: the assets of the project and of the synced libraries, into
-// the folder it is given, against what the ownership state says a sync wrote there.
 func TestPlanAssetsPlansTheImportIntoTheFolderItIsGivenAgainstWhatTheStateOwns(t *testing.T) {
 	s := newStandIn(t)
 	s.put("assets/icons/sword.blp", "own sword")

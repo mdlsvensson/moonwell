@@ -34,10 +34,8 @@ func TestALoggerWithoutAFileOrWithABrokenOneStillLogs(t *testing.T) {
 	var lines []string
 	sink := func(line string) { lines = append(lines, line) }
 	NewLogger(sink, "").Info("no file")
-	// A folder in the log file's place: the line still reaches the sink.
 	dir := t.TempDir()
 	NewLogger(sink, dir).Info("a folder")
-	// A file where the log file's folder should be.
 	notAFolder := filepath.Join(dir, "dist")
 	if err := os.WriteFile(notAFolder, nil, 0o666); err != nil {
 		t.Fatal(err)

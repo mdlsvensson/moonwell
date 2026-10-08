@@ -14,17 +14,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The tests of the lock share the list of locks this process holds, so none of them runs beside another.
-
-// lockOf is where the lock of the project at root is on disk.
 func lockOf(root string) string { return filepath.Join(root, "dist", ".lock") }
 
-// refusesABuildBesideAnother reports whether a failure is the refusal of a build while another holds the lock.
 func refusesABuildBesideAnother(e *diag.Error) bool {
 	return e.File == "dist/.lock" && strings.Contains(e.Msg, "Another Moonwell build is running")
 }
 
-// lockIsHeld reports whether the lock of the project at root is there and a build is refused for it.
 func lockIsHeld(t *testing.T, root string) bool {
 	t.Helper()
 	release, err := TakeLock(root)
@@ -35,11 +30,10 @@ func lockIsHeld(t *testing.T, root string) bool {
 	return fsx.Exists(lockOf(root)) && refusesABuildBesideAnother(asError(t, err, "a build beside another"))
 }
 
-// A release gives back the lock its own call took, and no lock a later call took in the same project.
 func TestAReleaseLeavesTheLockOfALaterAcquisitionAlone(t *testing.T) {
 	tests := []struct {
 		name  string
-		given func() // how the first lock is given back before the second is taken
+		given func()
 	}{
 		{"after its own release", nil},
 		{"after a release of every lock", ReleaseHeld},
@@ -88,7 +82,6 @@ func TestTakeLockRefusesADistFolderThatIsALink(t *testing.T) {
 		!strings.Contains(e.Hint, "Remove the link (or Windows junction) at dist") || e.Cause != nil {
 		t.Errorf("error = %+v", e)
 	}
-	// No lock is written through the link, and none is held.
 	if !reflect.DeepEqual(testkit.Snapshot(t, elsewhere), before) {
 		t.Errorf("the folder the link leads to holds %q", testkit.Snapshot(t, elsewhere))
 	}
@@ -101,7 +94,7 @@ func TestTakeLockRefusesADistFolderThatIsALink(t *testing.T) {
 func TestTakeLockRefusesAFileLinkInTheLocksPlace(t *testing.T) {
 	tests := []struct {
 		name  string
-		holds *string // what the file the link leads to holds; nil for a link to nothing
+		holds *string
 	}{
 		{"a link to a file", new("1")},
 		{"a link to nothing", nil},
@@ -122,7 +115,6 @@ func TestTakeLockRefusesAFileLinkInTheLocksPlace(t *testing.T) {
 			if release != nil || e.File != "dist/.lock" || !strings.HasPrefix(e.Msg, "dist/.lock is a link: ") {
 				t.Errorf("error = %+v", e)
 			}
-			// Nothing is written through the link: what it leads to is as it was.
 			held, err := os.ReadFile(target)
 			switch {
 			case tt.holds == nil && fsx.Exists(target):
@@ -140,7 +132,6 @@ func TestTakeLockRejectsAConcurrentBuildAndReleasesAfterwards(t *testing.T) {
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	// The lock records the holder's process id, and the hint names it.
 	pid := strconv.Itoa(os.Getpid())
 	if data, _ := os.ReadFile(lockOf(root)); string(data) != pid {
 		t.Errorf("the lock holds %q", data)
@@ -207,14 +198,13 @@ func TestOfSeveralBuildsThatStartAtOnceOneTakesTheLock(t *testing.T) {
 func TestALockFileWithoutAProcessIdNamesAnUnknownHolder(t *testing.T) {
 	tests := []struct {
 		name   string
-		holds  string // what the lock file holds
+		holds  string
 		holder string
 	}{
 		{"white space alone", " \n", "unknown"},
 		{"nothing", "", "unknown"},
 		{"every kind of ASCII white space", " \t\r\n\v\f", "unknown"},
 		{"a process id among white space", "\t 4321 \r\n", "4321"},
-		// A no-break space is no white space here: it is kept, and what is around it is named.
 		{"white space that is not ASCII", "\xc2\xa0", "\xc2\xa0"},
 	}
 	for _, tt := range tests {
@@ -236,7 +226,6 @@ func TestALockFileWithoutAProcessIdNamesAnUnknownHolder(t *testing.T) {
 
 func TestALockThatCannotBeReadNamesAnUnknownHolder(t *testing.T) {
 	root := t.TempDir()
-	// A folder in the lock's place is there, and has no text to read.
 	if err := os.MkdirAll(lockOf(root), 0o777); err != nil {
 		t.Fatal(err)
 	}
@@ -261,7 +250,6 @@ func TestReleaseHeldRemovesTheLocksThisProcessHolds(t *testing.T) {
 	if fsx.Exists(lockOf(first)) || fsx.Exists(lockOf(second)) {
 		t.Error("a lock is still there")
 	}
-	// Another process may take the lock now; the first holder's release must leave that one alone.
 	testkit.WriteFile(t, first, "dist/.lock", []byte("1"))
 	release()
 	ReleaseHeld()
@@ -319,7 +307,6 @@ func TestTakeLockNamesALockThatCannotBeWritten(t *testing.T) {
 		!strings.HasPrefix(e.Msg, "Writing dist/.lock failed: ") || !strings.Contains(e.Hint, "dist") {
 		t.Errorf("error = %+v", e)
 	}
-	// Nothing is held: a release of all locks has nothing to remove, and a later build takes the lock.
 	if err := os.Chmod(dist, 0o777); err != nil {
 		t.Fatal(err)
 	}

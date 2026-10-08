@@ -15,22 +15,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The test of this file runs the program itself, built from cmd/moonwell: it holds what Run cannot show,
-// which is the working folder, the two streams, the exit code of a process, and Ctrl+C. It builds the program
-// and compiles a project, which takes some seconds, and is skipped with -short. The program runs with a cache of
-// the test's own, so it downloads nothing and writes nothing into the user's.
-
-// The test program stands in for one other program, by the role its environment names.
 const (
-	testRole = "MOONWELL_CLI_TEST_ROLE"
-	// interruptingRole is the sender of an interrupt, where a system needs a process of its own for one.
+	testRole         = "MOONWELL_CLI_TEST_ROLE"
 	interruptingRole = "interrupt"
-	// interruptedPid names the process the sender interrupts.
-	interruptedPid = "MOONWELL_CLI_TEST_PID"
+	interruptedPid   = "MOONWELL_CLI_TEST_PID"
 )
 
-// TestMain lets the test program be the sender of an interrupt, where the system needs a process of its own for
-// that.
 func TestMain(m *testing.M) {
 	if os.Getenv(testRole) == interruptingRole {
 		sendInterrupt()
@@ -39,7 +29,6 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// theProgram builds cmd/moonwell into a folder of the test, and returns the file.
 func theProgram(t *testing.T) string {
 	t.Helper()
 	program := filepath.Join(t.TempDir(), "moonwell")
@@ -54,13 +43,10 @@ func theProgram(t *testing.T) string {
 	return program
 }
 
-// executable is the program as a test runs it: in a project folder, with a cache of the test's own.
 type executable struct {
 	program, root, cache string
 }
 
-// command is the program with these arguments, not yet started: it runs in the project folder, and ends with
-// ctx at the latest.
 func (s executable) command(ctx context.Context, args ...string) *exec.Cmd {
 	cmd := exec.CommandContext(ctx, s.program, args...)
 	cmd.Dir = s.root
@@ -68,7 +54,6 @@ func (s executable) command(ctx context.Context, args ...string) *exec.Cmd {
 	return cmd
 }
 
-// run runs the program to its end, and returns its exit code and what it wrote to each stream.
 func (s executable) run(t *testing.T, args ...string) (code int, stdout, stderr string) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(background, 2*time.Minute)
@@ -136,9 +121,6 @@ func TestMoonwellExecutable(t *testing.T) {
 	t.Run("one Ctrl+C ends dev with 130 and leaves no lock", func(t *testing.T) { interruptedDev(t, s) })
 }
 
-// interruptedDev starts dev, waits until it watches, saves a source that does not compile, waits for the check
-// of it, and then sends the program one interrupt: dev must end with 130, with nothing on the stream for
-// programs and no build lock left.
 func interruptedDev(t *testing.T, s executable) {
 	ctx, cancel := context.WithTimeout(background, 2*time.Minute)
 	defer cancel()

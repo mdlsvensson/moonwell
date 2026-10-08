@@ -9,26 +9,21 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// Call is a call statement of a bare global function: `Name(args)`, with the tokens of each argument.
 type Call struct {
 	Name  string
 	Args  [][]Token
-	Start int // byte offsets of the statement, with a `;` that directly follows it
+	Start int
 	End   int
 }
 
-// Function is a top-level `function Name(...) ... end` and the call statements directly in its body.
 type Function struct {
 	Name     string
-	Start    int // byte offsets of the whole declaration
+	Start    int
 	End      int
-	EndStart int // where its closing `end` begins
+	EndStart int
 	Calls    []Call
 }
 
-// Functions reads the top-level function declarations of Lua source and the call statements directly in each,
-// without running it. Whatever it cannot read with certainty is an error that names the file, the line and the
-// column.
 func Functions(source, file string) (functions []Function, err error) {
 	tokens, fault := Tokenize(source)
 	if fault != nil {
@@ -48,38 +43,29 @@ func Functions(source, file string) (functions []Function, err error) {
 	return r.functions, nil
 }
 
-// reader walks the tokens of a source by Lua's grammar, far enough to know where every statement begins and ends,
-// and keeps the top-level functions it passes. It has no way back: at a token the grammar does not allow, fail
-// panics with an unreadable, which Functions turns into its error.
 type reader struct {
 	source, file string
 	tokens       []Token
-	at           int // the token read next
-	depth        int // how many blocks and expressions are open
+	at           int
+	depth        int
 	functions    []Function
-	calls        []Call // the call statements of the top-level function being read
+	calls        []Call
 }
 
-// unreadable carries the error out of the reader.
 type unreadable struct{ err error }
 
-// place is where a run of statements stands, which decides what the reader keeps of it.
 type place uint8
 
 const (
-	inBlock    place = iota // in a block or a function inside something else: nothing is kept
-	atTop                   // the source itself: its functions with a bare name are kept
-	inFunction              // directly in a top-level function: its call statements are kept
+	inBlock place = iota
+	atTop
+	inFunction
 )
 
-// maxDepth is how deep blocks and expressions may nest. A source that goes deeper is refused, so that no source
-// can exhaust the stack.
 const maxDepth = 200
 
-// unaryBinding is how tightly a unary operator binds: tighter than every binary operator but `^`.
 const unaryBinding = 11
 
-// binding is how tightly each binary operator binds its operands.
 var binding = map[string]int{
 	"or": 1, "and": 2,
 	"<": 3, ">": 3, "<=": 3, ">=": 3, "~=": 3, "==": 3,
@@ -89,7 +75,6 @@ var binding = map[string]int{
 
 func (r *reader) more() bool { return r.at < len(r.tokens) }
 
-// raw is the text of the token read next, or "" at the end.
 func (r *reader) raw() string {
 	if r.more() {
 		return r.tokens[r.at].Raw
@@ -97,10 +82,8 @@ func (r *reader) raw() string {
 	return ""
 }
 
-// is reports whether a token of the kind is read next.
 func (r *reader) is(kind Kind) bool { return r.more() && r.tokens[r.at].Kind == kind }
 
-// take steps over the keyword or symbol when it is read next, and reports whether it was.
 func (r *reader) take(raw string) bool {
 	if r.raw() != raw {
 		return false
@@ -109,7 +92,6 @@ func (r *reader) take(raw string) bool {
 	return true
 }
 
-// expect steps over the keyword or symbol, which must be read next, and returns its token.
 func (r *reader) expect(raw string) Token {
 	if r.raw() != raw {
 		r.fail("expected '" + raw + "'")
@@ -118,7 +100,6 @@ func (r *reader) expect(raw string) Token {
 	return r.tokens[r.at-1]
 }
 
-// name steps over a name, which must be read next, and returns it.
 func (r *reader) name() string {
 	if !r.is(NameToken) || keywords[r.raw()] {
 		r.fail("expected a name")
@@ -127,7 +108,6 @@ func (r *reader) name() string {
 	return r.tokens[r.at-1].Raw
 }
 
-// fail stops the reader with an error at the token read next, or at the end of the source.
 func (r *reader) fail(what string) {
 	offset := len(r.source)
 	if r.more() {
@@ -136,7 +116,6 @@ func (r *reader) fail(what string) {
 	panic(unreadable{errUnsafe(r.file, r.source, offset, what)})
 }
 
-// enter counts one more open block or expression.
 func (r *reader) enter() {
 	r.depth++
 	if r.depth > maxDepth {
@@ -144,8 +123,6 @@ func (r *reader) enter() {
 	}
 }
 
-// statements reads statements up to one of the stop words, which it leaves, or up to the end of the source. Only
-// the top level may end with the source.
 func (r *reader) statements(where place, stops ...string) {
 	r.enter()
 	for r.more() && !slices.Contains(stops, r.raw()) {
@@ -161,7 +138,6 @@ func (r *reader) statements(where place, stops ...string) {
 	r.depth--
 }
 
-// returned reads what follows a `return`: its values and a `;`, if any, and then nothing but the end of its block.
 func (r *reader) returned(stops []string) {
 	ends := func() bool { return !r.more() || slices.Contains(stops, r.raw()) }
 	if !ends() && r.raw() != ";" {
@@ -173,13 +149,11 @@ func (r *reader) returned(stops []string) {
 	}
 }
 
-// block reads the statements of a block and the `end` that closes it.
 func (r *reader) block() {
 	r.statements(inBlock, "end")
 	r.expect("end")
 }
 
-// statement reads one statement.
 func (r *reader) statement(where place) {
 	start := r.tokens[r.at].Start
 	switch {
@@ -203,7 +177,6 @@ func (r *reader) statement(where place) {
 		r.expect("until")
 		r.expression(1)
 	case r.take("break"):
-		// Whether a loop is there to break out of is for Lua to say.
 	case r.take("goto"):
 		r.name()
 	case r.take("::"):
@@ -214,8 +187,6 @@ func (r *reader) statement(where place) {
 	}
 }
 
-// function reads a function statement after its `function`, which is at the offset start. A function with a bare
-// name at the top level is kept, with the call statements directly in its body.
 func (r *reader) function(start int, where place) {
 	name, bare := r.functionName()
 	if where != atTop || !bare {
@@ -229,7 +200,6 @@ func (r *reader) function(start int, where place) {
 	})
 }
 
-// functionName reads the name of a function statement: `a`, `a.b.c` or `a.b:c`. Only the first is bare.
 func (r *reader) functionName() (name string, bare bool) {
 	name, bare = r.name(), true
 	for r.take(".") {
@@ -243,7 +213,6 @@ func (r *reader) functionName() (name string, bare bool) {
 	return name, bare
 }
 
-// functionBody reads the parameters and the body of a function, and returns the `end` that closes it.
 func (r *reader) functionBody(where place) Token {
 	r.expect("(")
 	if !r.take(")") {
@@ -254,7 +223,6 @@ func (r *reader) functionBody(where place) Token {
 	return r.expect("end")
 }
 
-// parameters reads the names of a parameter list, which may end with `...`.
 func (r *reader) parameters() {
 	for !r.take("...") {
 		r.name()
@@ -264,7 +232,6 @@ func (r *reader) parameters() {
 	}
 }
 
-// local reads a local function or the declaration of local names, after its `local`.
 func (r *reader) local() {
 	if r.take("function") {
 		r.name()
@@ -280,7 +247,6 @@ func (r *reader) local() {
 	}
 }
 
-// conditional reads an `if` with its branches, after its `if`.
 func (r *reader) conditional() {
 	for {
 		r.expression(1)
@@ -296,7 +262,6 @@ func (r *reader) conditional() {
 	r.expect("end")
 }
 
-// loop reads a numeric or a generic `for`, after its `for`.
 func (r *reader) loop() {
 	r.name()
 	if r.take("=") {
@@ -317,8 +282,6 @@ func (r *reader) loop() {
 	r.block()
 }
 
-// assignmentOrCall reads a statement that starts with a prefix expression. Directly in a top-level function, a
-// call of a bare name is kept.
 func (r *reader) assignmentOrCall(where place) {
 	target := r.prefix()
 	switch {
@@ -331,7 +294,6 @@ func (r *reader) assignmentOrCall(where place) {
 	}
 }
 
-// assignment reads the rest of an assignment, after its first target.
 func (r *reader) assignment(first prefixed) {
 	if !first.assignable {
 		r.fail("invalid assignment target")
@@ -345,8 +307,6 @@ func (r *reader) assignment(first prefixed) {
 	r.expressions()
 }
 
-// withSemicolon extends a call statement over the `;` after it when only white space stands between the two. A
-// comment there must outlive an edit of the call, so the `;` behind one is a statement of its own.
 func (r *reader) withSemicolon(call Call) Call {
 	if r.raw() != ";" {
 		return call
@@ -360,7 +320,6 @@ func (r *reader) withSemicolon(call Call) Call {
 	return call
 }
 
-// expressions reads a list of expressions.
 func (r *reader) expressions() {
 	r.expression(1)
 	for r.take(",") {
@@ -368,9 +327,6 @@ func (r *reader) expressions() {
 	}
 }
 
-// expression reads an operand and every binary operator after it that binds at least as tightly as minimum, each
-// with its right side. A chain of one right-associative operator (`a .. b .. c`) is read in the loop, not by
-// nesting, so a long one stays within the depth limit.
 func (r *reader) expression(minimum int) {
 	r.enter()
 	r.operand()
@@ -385,8 +341,6 @@ func (r *reader) expression(minimum int) {
 	r.depth--
 }
 
-// operand reads what an operator applies to: a constant, a table, a function, a prefix expression, or a unary
-// operator with its own operand.
 func (r *reader) operand() {
 	switch raw := r.raw(); {
 	case raw == "not" || raw == "#" || raw == "-" || raw == "~":
@@ -403,18 +357,13 @@ func (r *reader) operand() {
 	}
 }
 
-// prefixed is what a statement needs to know of a prefix expression: whether it can be assigned to, and whether
-// it is a call. A call keeps its identity only while it is a bare name called once: any suffix or operator after
-// it makes it something else.
 type prefixed struct {
-	bare       string // the name, while nothing follows it
-	assignable bool   // a name, an index or a field
+	bare       string
+	assignable bool
 	call       bool
-	direct     *Call // the call of a bare name, when that is all the expression is
+	direct     *Call
 }
 
-// prefix reads a prefix expression: a name or an expression in brackets, and every index, field and call after
-// it.
 func (r *reader) prefix() prefixed {
 	start := len(r.source)
 	if r.more() {
@@ -436,8 +385,6 @@ func (r *reader) prefix() prefixed {
 	}
 }
 
-// suffix reads one index, field, method call or call after a prefix expression that began at the offset start,
-// and returns what the expression has become. found is false when none follows.
 func (r *reader) suffix(before prefixed, start int) (after prefixed, found bool) {
 	switch {
 	case r.take("["):
@@ -462,8 +409,6 @@ func (r *reader) suffix(before prefixed, start int) (after prefixed, found bool)
 	return before, false
 }
 
-// arguments reads the arguments of a call and returns the tokens of each: a list in brackets, or one table or
-// one string without them.
 func (r *reader) arguments() [][]Token {
 	if r.take("(") {
 		return r.argumentList()
@@ -480,7 +425,6 @@ func (r *reader) arguments() [][]Token {
 	return [][]Token{r.tokens[start:r.at]}
 }
 
-// argumentList reads the expressions of an argument list and its closing bracket, after the opening one.
 func (r *reader) argumentList() [][]Token {
 	args := [][]Token{}
 	if r.take(")") {
@@ -498,7 +442,6 @@ func (r *reader) argumentList() [][]Token {
 	return args
 }
 
-// table reads a table constructor.
 func (r *reader) table() {
 	r.expect("{")
 	for !r.take("}") {
@@ -510,7 +453,6 @@ func (r *reader) table() {
 	}
 }
 
-// field reads one field of a table constructor: `[key] = value`, `name = value` or a value.
 func (r *reader) field() {
 	switch {
 	case r.take("["):
@@ -524,17 +466,12 @@ func (r *reader) field() {
 	r.expression(1)
 }
 
-// position is the 1-based line and column of a byte offset in a source. A column counts characters.
 func position(source string, offset int) (line, column int) {
 	before := source[:offset]
 	lineStart := strings.LastIndexByte(before, '\n') + 1
 	return strings.Count(before, "\n") + 1, utf8.RuneCountInString(before[lineStart:]) + 1
 }
 
-// ---- errors ----
-
-// errUnsafe says that the Lua of a map has a place the reader cannot follow, so that no edit of it would be safe.
-// what names the trouble, and offset is where in the source it is.
 func errUnsafe(file, source string, offset int, what string) error {
 	line, column := position(source, offset)
 	return &diag.Error{

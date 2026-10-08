@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-// The Pkl schema has tests of its own, written in Pkl: schema/tests. They need pkl.
 func TestThePklSchemasOwnTestsPass(t *testing.T) {
 	pkl, err := exec.LookPath("pkl")
 	if err != nil {

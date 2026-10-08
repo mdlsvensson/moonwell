@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-// objectsOf is the objects of a manifest whose objects block is the document.
 func objectsOf(t *testing.T, document, file string) Objects {
 	t.Helper()
 	return decoded(t, printed(`"objects":`+document), file).Objects

@@ -11,17 +11,11 @@ import (
 	"slices"
 )
 
-// Preview pictures built in code: no binary fixtures.
-
-// Pixels is a square picture, rows from the top, four bytes a pixel (red, green, blue, alpha).
 type Pixels struct {
 	Size int
 	RGBA []byte
 }
 
-// NewPixels returns a picture in which no two rows and no two halves are alike: the left half is one colour a row
-// (long runs), the right half changes with every pixel. Its alpha is 7 everywhere, so a reader that keeps it is
-// found out.
 func NewPixels(size int) Pixels {
 	rgba := make([]byte, size*size*4)
 	for y := range size {
@@ -37,17 +31,14 @@ func NewPixels(size int) Pixels {
 	return Pixels{Size: size, RGBA: rgba}
 }
 
-// TGAOptions choose the layout of a TGA.
 type TGAOptions struct {
-	RLE     bool // run-length encoded (image type 10) instead of plain (type 2)
-	Depth   int  // 24 or 32; zero means 32
-	FromTop bool // rows stored from the top instead of from the bottom
-	ID      int  // bytes of an ID field between the header and the pixels
-	// Alpha is written for every pixel of a 32-bit file; nil keeps the source's own.
-	Alpha *byte
+	RLE     bool
+	Depth   int
+	FromTop bool
+	ID      int
+	Alpha   *byte
 }
 
-// TGA is a true-colour TGA of picture.
 func TGA(picture Pixels, options TGAOptions) []byte {
 	size, depth := picture.Size, options.Depth
 	if depth == 0 {
@@ -89,7 +80,6 @@ func TGA(picture Pixels, options TGAOptions) []byte {
 				x += run
 				continue
 			}
-			// A raw packet: up to 128 pixels, stopping before the next run of two.
 			raw := 1
 			for x+raw < size && raw < 128 && !slices.Equal(pixel(x+raw, row), pixel(x+raw-1, row)) {
 				raw++
@@ -122,7 +112,6 @@ func TGA(picture Pixels, options TGAOptions) []byte {
 	return append(out, data...)
 }
 
-// BLP is a BLP1 with a palette and one mipmap whose pixels are all palette entry 0; content 0 claims JPEG content.
 func BLP(size int, content uint32) []byte {
 	const header, palette = 156, 1024
 	out := make([]byte, header+palette+size*size)
@@ -138,8 +127,6 @@ func BLP(size int, content uint32) []byte {
 	return out
 }
 
-// GreyPixels returns a picture of greys, in which no two neighbouring rows or columns are alike, for the kinds of
-// PNG without colour. Its alpha is 255.
 func GreyPixels(size int) Pixels {
 	rgba := make([]byte, size*size*4)
 	for y := range size {
@@ -152,19 +139,8 @@ func GreyPixels(size int) Pixels {
 	return Pixels{Size: size, RGBA: rgba}
 }
 
-// pngLow is the low byte of every 16-bit sample PNG writes: a reader must take the high byte, not round.
 const pngLow = 0xa5
 
-// PNG is picture as a PNG of one kind:
-//
-//	"rgba"        8 bits a channel, colour with the picture's own alpha
-//	"rgb"         8 bits a channel, colour, no alpha
-//	"rgba16"      16 bits a channel, colour with the picture's own alpha
-//	"rgb16"       16 bits a channel, colour, no alpha
-//	"grey"        8 bits of grey, for a picture of greys
-//	"grey16"      16 bits of grey, for a picture of greys
-//	"palette"     a palette of 256 greys, for a picture of greys
-//	"interlaced"  as "rgba", stored in the seven passes of Adam7
 func PNG(picture Pixels, kind string) []byte {
 	size := picture.Size
 	area := image.Rect(0, 0, size, size)
@@ -211,7 +187,6 @@ func PNG(picture Pixels, kind string) []byte {
 		}
 		source = grey
 	case "palette":
-		// The palette runs from white to black, so an index is never its own grey.
 		palette := make(color.Palette, 256)
 		for index := range palette {
 			grey := byte(255 - index)
@@ -236,7 +211,6 @@ func PNG(picture Pixels, kind string) []byte {
 
 const pngSignature = "\x89PNG\r\n\x1a\n"
 
-// pngChunk is one chunk of a PNG: its length, name, data and check value.
 func pngChunk(name string, data []byte) []byte {
 	out := binary.BigEndian.AppendUint32(nil, uint32(len(data)))
 	out = append(out, name...)
@@ -244,8 +218,6 @@ func pngChunk(name string, data []byte) []byte {
 	return binary.BigEndian.AppendUint32(out, crc32.ChecksumIEEE(out[4:]))
 }
 
-// PNGHeader is the start of a PNG that says it is width by height pixels of 8-bit colour with alpha, and holds no
-// pixel at all: for a reader that must judge the size before it decodes.
 func PNGHeader(width, height uint32, interlaced bool) []byte {
 	header := binary.BigEndian.AppendUint32(nil, width)
 	header = binary.BigEndian.AppendUint32(header, height)
@@ -256,11 +228,8 @@ func PNGHeader(width, height uint32, interlaced bool) []byte {
 	return append([]byte(pngSignature), pngChunk("IHDR", header)...)
 }
 
-// interlacedPNG writes the picture's rows in the seven passes of Adam7, each row unfiltered. Go's encoder does not
-// interlace.
 func interlacedPNG(picture Pixels) []byte {
 	size := picture.Size
-	// Each pass: the first column and row, then the steps between columns and between rows.
 	passes := [7][4]int{{0, 0, 8, 8}, {4, 0, 8, 8}, {0, 4, 4, 8}, {2, 0, 4, 4}, {0, 2, 2, 4}, {1, 0, 2, 2}, {0, 1, 1, 2}}
 	var rows bytes.Buffer
 	for _, pass := range passes {

@@ -11,16 +11,13 @@ func TestEditDistanceCountsInsertionsDeletionsSubstitutionsAndSwaps(t *testing.T
 		want int
 	}{
 		{"kitten", "sitting", 3},
-		// Two neighbours that changed places are one edit, and each pair counts by itself.
 		{"biuld", "build", 1},
 		{"ab", "ba", 1},
 		{"abcd", "badc", 2},
-		// A character put between the two that changed places: no swap of neighbours, so three edits.
 		{"ca", "abc", 3},
 		{"", "abc", 3},
 		{"abc", "", 3},
 		{"same", "same", 0},
-		// One character is one edit, however many bytes or UTF-16 units it takes.
 		{"🌙", "", 1},
 		{"🌙", "é", 1},
 	} {
@@ -42,7 +39,6 @@ func TestJoinWordsJoinsWithCommasAndAConjunctionAndCapsTheList(t *testing.T) {
 		{[]string{"a", "b"}, "or", -1, "a or b"},
 		{[]string{"a", "b", "c"}, "and", -1, "a, b and c"},
 		{[]string{"a", "b", "c", "d"}, "or", 2, "a, b and 2 more"},
-		// A cap the list fits in changes nothing.
 		{[]string{"a", "b", "c"}, "or", 3, "a, b or c"},
 		{[]string{"a", "b"}, "or", 5, "a or b"},
 	} {
@@ -64,28 +60,19 @@ func TestClosestFindsNamesAFewEditsAwayIgnoringCaseNearestFirst(t *testing.T) {
 		{names, "createunit", 3, []string{"CreateUnit"}},
 		{names, "prnt", 3, []string{"print"}},
 		{names, "GetTriggerUnt", 3, []string{"GetTriggerUnit"}},
-		// A short name allows one edit, so "io" matches nothing here.
 		{names, "io", 3, nil},
-		// The name itself is never suggested.
 		{names, "print", 3, nil},
-		// At most max, ties broken by name.
 		{[]string{"ae", "ad", "ac", "ab"}, "aa", 3, []string{"ab", "ac", "ad"}},
 		{[]string{"ae", "ad", "ac", "ab"}, "aa", 1, []string{"ab"}},
 		{[]string{"ae", "ad", "ac", "ab"}, "aa", 0, nil},
-		// A negative max is no cap, as JoinWords reads one.
 		{[]string{"ae", "ad", "ac", "ab"}, "aa", -1, []string{"ab", "ac", "ad", "ae"}},
 		{names, "io", -1, nil},
-		// A nearer name comes before one that sorts first.
 		{[]string{"abcdefaa", "abcdefgx", "abcdefgh"}, "abcdefgi", 3, []string{"abcdefgh", "abcdefgx", "abcdefaa"}},
-		// Two neighbours that changed places are one edit, which a short name allows.
 		{[]string{"build", "check", "test"}, "biuld", 1, []string{"build"}},
 		{[]string{"build", "check", "test"}, "tset", 1, []string{"test"}},
 		{[]string{"--entry", "--help", "--minify"}, "--hepl", 1, []string{"--help"}},
-		// Two that are apart did not: that is two edits.
 		{[]string{"build"}, "dliub", 3, nil},
-		// A character outside the basic plane is one edit, which a five-character name allows.
 		{[]string{"moon"}, "moon🌙", 3, []string{"moon"}},
-		// Ties are in byte order: the ligature ﬁ (U+FB01) sorts before 🌙 (U+1F319).
 		{[]string{"a🌙", "aﬁ"}, "aa", 3, []string{"aﬁ", "a🌙"}},
 	} {
 		if got := Closest(c.names, c.key, c.max); !slices.Equal(got, c.want) {

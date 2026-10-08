@@ -9,10 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// environment sets in main() the sound environment, the water colour and the fog, each when it is set, as the
-// map info has them. The calls World Editor wrote for the same are taken out, and the new ones stand together
-// immediately before the first call of CreateAllUnits() or InitBlizzard() directly in main(). Lua without such a
-// call is refused.
 func (p *patcher) environment(set manifest.Environment, info *w3i.Info) {
 	if set == (manifest.Environment{}) {
 		return
@@ -32,7 +28,6 @@ func (p *patcher) environment(set manifest.Environment, info *w3i.Info) {
 	p.insertBefore(before.Start, calls)
 }
 
-// anchor is the first call of CreateAllUnits() or InitBlizzard() directly in main().
 func (p *patcher) anchor(main lua.Function) lua.Call {
 	at := slices.IndexFunc(main.Calls, func(call lua.Call) bool {
 		return call.Name == "CreateAllUnits" || call.Name == "InitBlizzard"
@@ -50,14 +45,12 @@ func (p *patcher) anchor(main lua.Function) lua.Call {
 	return main.Calls[at]
 }
 
-// withdraw takes the call of the native out of main(), when there is one. There must not be more.
 func (p *patcher) withdraw(main lua.Function, native string, arity int) {
 	if call, found := p.optional(p.callsNamed(main, native, arity), native+" in main()"); found {
 		p.remove(call)
 	}
 }
 
-// sound is the call for the map's sound environment. A map without one has the game's default.
 func (p *patcher) sound(main lua.Function, details *w3i.Details) string {
 	p.withdraw(main, "NewSoundEnvironment", 1)
 	name := details.SoundEnvironment.Value
@@ -73,9 +66,6 @@ func (p *patcher) water(main lua.Function, details *w3i.Details) string {
 	return fmt.Sprintf("SetWaterBaseColor(%d, %d, %d, %d)", color[0].Value, color[1].Value, color[2].Value, color[3].Value)
 }
 
-// fog is the call for the map's fog: the one that sets it when the map shows fog, and the one that resets it
-// when it does not. Both kinds are taken out first, since either, left where it is, undoes the other. The numbers
-// of a fog that is shown go into the Lua as the map info has them, so they must be numbers.
 func (p *patcher) fog(main lua.Function, info *w3i.Info) string {
 	p.withdraw(main, "SetTerrainFogEx", 7)
 	p.withdraw(main, "ResetTerrainFog", 0)
@@ -88,13 +78,10 @@ func (p *patcher) fog(main lua.Function, info *w3i.Info) string {
 		return ""
 	}
 	number := func(value float32) string { return lua.Number(float64(value)) }
-	// The native takes each colour channel as a part of 1, and no alpha.
 	channel := func(i int) string { return lua.Number(float64(fog.Color[i].Value) / 255) }
 	return fmt.Sprintf("SetTerrainFogEx(%d, %s, %s, %s, %s, %s, %s)", fog.Style.Value,
 		number(fog.Start.Value), number(fog.End.Value), number(fog.Density.Value), channel(0), channel(1), channel(2))
 }
-
-// ---- errors ----
 
 func errNoAnchor(file string) error {
 	return errLua(file, "main() must call CreateAllUnits() or InitBlizzard() directly.")

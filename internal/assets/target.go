@@ -7,20 +7,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// What the start of a path says about it, in any letter case.
 var (
-	// mapInternal starts the name of a file the map holds for itself, or that the archive does.
-	mapInternal = regexp.MustCompile(`(?i)^(?:war3map|war3campaign|\(listfile\)|\(attributes\)|\(signature\))`)
-	// importedFolder is the folder World Editor imports into. Its name starts as a map internal's does.
+	mapInternal    = regexp.MustCompile(`(?i)^(?:war3map|war3campaign|\(listfile\)|\(attributes\)|\(signature\))`)
 	importedFolder = regexp.MustCompile(`(?i)^war3mapImported/`)
-	// mapScript is the script where a map keeps it in a folder.
-	mapScript = regexp.MustCompile(`(?i)^scripts/war3map\.`)
-	// mapListPicture is the two names a picture for the game's map list is usually tried under: Reforged ignores
-	// the one, and a build writes the other.
+	mapScript      = regexp.MustCompile(`(?i)^scripts/war3map\.`)
 	mapListPicture = regexp.MustCompile(`(?i)^war3map(?:Preview|Map)\.`)
 )
 
-// targetPath returns value as an in-map path an asset may be imported as. Map internals are never replaced.
 func targetPath(value string) (string, error) {
 	path, ok := fsx.RelPath(value)
 	switch {
@@ -34,16 +27,10 @@ func targetPath(value string) (string, error) {
 	return path, nil
 }
 
-// reserved reports whether path, with "/", is one of the map's own files.
 func reserved(path string) bool {
 	internal := mapInternal.MatchString(path) && !importedFolder.MatchString(path)
 	return internal || mapScript.MatchString(path)
 }
-
-// ---- errors ----
-
-// The errors of a path have no file: a path is written in a manifest, in a state file, or is a file's own name,
-// and the caller knows which. Collect names the manifest for a path that is written in the assets block.
 
 func errInvalidPath(value string) error {
 	return &diag.Error{

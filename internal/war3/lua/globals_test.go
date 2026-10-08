@@ -135,8 +135,6 @@ func TestTopLevelGlobals(t *testing.T) {
 			[]string{"B", "E"},
 		},
 		{
-			// Only the word is the keyword: a string that says `local` or `function`, a comment and a longer
-			// name are not.
 			"a string that says a keyword is none",
 			[]string{"print 'local' function F() end", "local 'function' G", "G = 1", "f [[local]] function H() end"},
 			[]string{"F", "G", "H"},

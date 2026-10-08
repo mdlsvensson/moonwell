@@ -9,8 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// A file another program holds open cannot be removed on Windows. On other systems removing a file asks nothing
-// of the file itself, so the case is this system's.
 func TestASyncThatCannotRemoveAnOwnedFileUndoesItsWritesAndLeavesTheFileAsItWas(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/0.blp", "first")

@@ -16,15 +16,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/mpq"
 )
 
-// ---- what the tests write ----
-
-// script is length bytes of text that compresses well.
 func script(length int) []byte {
 	const line = "print('moonwell')\n"
 	return []byte(strings.Repeat(line, length/len(line)+1))[:length]
 }
 
-// noise is length bytes that do not compress, the same bytes for the same seed.
 func noise(seed uint64, length int) []byte {
 	random := rand.New(rand.NewPCG(seed, 2026))
 	out := make([]byte, length)
@@ -34,7 +30,6 @@ func noise(seed uint64, length int) []byte {
 	return out
 }
 
-// packed is a sector of raw bytes compressed on its own: the byte that names zlib, then the stream.
 func packed(t testing.TB, raw []byte) []byte {
 	t.Helper()
 	var out bytes.Buffer
@@ -49,9 +44,6 @@ func packed(t testing.TB, raw []byte) []byte {
 	return out.Bytes()
 }
 
-// evenSector is a sector that is exactly as long compressed as it is raw, which is the edge of the choice between
-// the two: noise, then a run of one letter that is just long enough to win back what the noise cost. With this
-// noise zlib needs a run of 20.
 func evenSector(t testing.TB) []byte {
 	t.Helper()
 	for run := range 64 {
@@ -64,8 +56,6 @@ func evenSector(t testing.TB) []byte {
 	return nil
 }
 
-// numbered is count files in one folder. Every third one holds a text of its own length and the others are empty,
-// which keeps a test of many files fast: every sector costs a compressor.
 func numbered(count int) []mpq.File {
 	files := []mpq.File{}
 	for i := range count {
@@ -78,7 +68,6 @@ func numbered(count int) []mpq.File {
 	return files
 }
 
-// mixed is a text of three sectors, noise of three sectors, an empty file and a short text.
 func mixed() []mpq.File {
 	return []mpq.File{
 		{Name: "war3map.lua", Data: script(10800)},
@@ -88,7 +77,6 @@ func mixed() []mpq.File {
 	}
 }
 
-// drawn is a list of up to twenty files, each empty, text, noise or text and then noise, of up to 5000 bytes.
 func drawn(random *rand.Rand) []mpq.File {
 	files := []mpq.File{}
 	for i := range random.IntN(21) {
@@ -107,24 +95,16 @@ func drawn(random *rand.Rand) []mpq.File {
 	return files
 }
 
-// fileList is a list of files to write, with a name for a failure.
 type fileList struct {
 	name  string
 	files []mpq.File
 }
 
 var (
-	// sectorEdges are file lengths at the end of a sector and one byte to each side, for sectors of 1024, 4096 and
-	// 16384 bytes.
 	sectorEdges = []int{1, 1023, 1024, 1025, 4095, 4096, 4097, 16383, 16384, 16385}
-	// tableEdges are numbers of files to each side of where the hash table doubles. An archive holds one file more
-	// than it is given, its (listfile), so a table of 16 slots takes 9 files, one of 32 takes 20 and one of 64
-	// takes 41.
-	tableEdges = []int{9, 10, 11, 20, 21, 22, 40, 41, 42, 43}
+	tableEdges  = []int{9, 10, 11, 20, 21, 22, 40, 41, 42, 43}
 )
 
-// fileLists returns the lists every test of a whole archive writes. No list holds two names that are one archive
-// path, and none holds a name that only Unicode case mapping would take for the (listfile).
 func fileLists(t testing.TB) []fileList {
 	t.Helper()
 	stale := []byte("stale.txt\r\n")
@@ -198,14 +178,11 @@ func fileLists(t testing.TB) []fileList {
 	return lists
 }
 
-// optionSet is one way to write an archive, with a name for a failure.
 type optionSet struct {
 	name    string
 	options mpq.Options
 }
 
-// optionSets returns the ways every list is written: as it is, after an HM3W header, and with smaller and with
-// larger sectors.
 func optionSets() []optionSet {
 	return []optionSet{
 		{"no options", mpq.Options{}},
@@ -215,8 +192,6 @@ func optionSets() []optionSet {
 	}
 }
 
-// otherOptionSets returns more ways, in which only otherLists are written: sectors of other sizes, a longer
-// prefix, and a prefix and a sector size at once.
 func otherOptionSets() []optionSet {
 	return []optionSet{
 		{"sectors of 2048 bytes", mpq.Options{SectorSizeShift: 2}},
@@ -230,12 +205,9 @@ func otherOptionSets() []optionSet {
 	}
 }
 
-// otherLists returns the lists that are written in the other ways.
 func otherLists() []fileList {
 	return []fileList{{"no files", nil}, {"text, noise and an empty file", mixed()}, {"22 files", numbered(22)}}
 }
-
-// ---- reading an archive back ----
 
 func open(t *testing.T, archive []byte) *testkit.MPQ {
 	t.Helper()
@@ -255,7 +227,6 @@ func read(t *testing.T, archive *testkit.MPQ, name string) []byte {
 	return data
 }
 
-// capitals is name with its ASCII letters as capitals and every other byte as it is.
 func capitals(name string) string {
 	upper := []byte(name)
 	for i, c := range upper {
@@ -266,7 +237,6 @@ func capitals(name string) string {
 	return string(upper)
 }
 
-// withoutListfile is the files that an archive holds as given: all but a (listfile), in any ASCII letter case.
 func withoutListfile(files []mpq.File) []mpq.File {
 	kept := []mpq.File{}
 	for _, file := range files {
@@ -277,7 +247,6 @@ func withoutListfile(files []mpq.File) []mpq.File {
 	return kept
 }
 
-// header is the eight fields of an archive's header, read without the package.
 type header struct {
 	Magic, HeaderSize, ArchiveSize uint32
 	FormatVersion, SectorShift     uint16
@@ -294,7 +263,6 @@ func readHeader(t *testing.T, archive []byte) header {
 	return h
 }
 
-// table is count entries of four words at position in an archive, decrypted.
 func table(archive []byte, position, count, key uint32) []uint32 {
 	words := make([]uint32, count*4)
 	for i := range words {
@@ -304,9 +272,6 @@ func table(archive []byte, position, count, key uint32) []uint32 {
 	return words
 }
 
-// checkArchive fails the test unless written is the prefix and then an archive that is laid out as header, files,
-// hash table, block table, from which every file reads back under its name in any letter case, and whose
-// (listfile) names the files in their order.
 func checkArchive(t *testing.T, what string, written []byte, files []mpq.File, options mpq.Options) {
 	t.Helper()
 	kept := withoutListfile(files)
@@ -344,8 +309,6 @@ func checkArchive(t *testing.T, what string, written []byte, files []mpq.File, o
 	}
 }
 
-// ---- the hash and the cipher ----
-
 func TestHashStringMatchesTheWellKnownTableKeys(t *testing.T) {
 	if mpq.HashTableKey != 0xc3af3770 || mpq.BlockTableKey != 0xec83b3a3 {
 		t.Errorf("table keys = %#x, %#x", mpq.HashTableKey, mpq.BlockTableKey)
@@ -368,20 +331,20 @@ func TestHashStringTakesOnlyASCIILettersForTheSameInEitherCase(t *testing.T) {
 		{`war3mapImported\icon.blp`, `WAR3MAPIMPORTED\ICON.BLP`, true},
 		{"abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", true},
 		{"\xC3\xA9.txt", "\xC3\xA9.TXT", true},
-		{"\xC3\xA9.txt", "\xC3\x89.txt", false},      // an e with an acute accent, small and capital
-		{"stra\xC3\x9Fe", "STRASSE", false},          // a sharp s, whose capital is SS
-		{"(l\xC4\xB1stfile)", "(LISTFILE)", false},   // a dotless i, whose capital is I
-		{"`{.txt", "@[.txt", false},                  // the bytes just outside a to z
-		{"{.txt", "[.txt", false},                    // the byte after z alone
-		{"`.txt", "@.txt", false},                    // the byte before a alone
-		{"z.txt", "Z.txt", true},                     // and the last letter itself
-		{"a/b.txt", `a\b.txt`, false},                // a slash is not a backslash
-		{"\xE1\xFA", "\xC1\xDA", false},              // Latin-1 letters as single bytes
-		{"war3map.lua", "war3map.lua\x00", false},    // every byte counts
-		{"war3map.lua", "war3map.lu", false},         // and so does the length
-		{"", "", true},                               // no bytes at all
-		{"\x00", "", false},                          // a NUL is a byte like any other
-		{"1234567890-_ ()", "1234567890-_ ()", true}, // no letters
+		{"\xC3\xA9.txt", "\xC3\x89.txt", false},
+		{"stra\xC3\x9Fe", "STRASSE", false},
+		{"(l\xC4\xB1stfile)", "(LISTFILE)", false},
+		{"`{.txt", "@[.txt", false},
+		{"{.txt", "[.txt", false},
+		{"`.txt", "@.txt", false},
+		{"z.txt", "Z.txt", true},
+		{"a/b.txt", `a\b.txt`, false},
+		{"\xE1\xFA", "\xC1\xDA", false},
+		{"war3map.lua", "war3map.lua\x00", false},
+		{"war3map.lua", "war3map.lu", false},
+		{"", "", true},
+		{"\x00", "", false},
+		{"1234567890-_ ()", "1234567890-_ ()", true},
 	} {
 		for _, hashType := range types {
 			if got := mpq.HashString(c.a, hashType) == mpq.HashString(c.b, hashType); got != c.same {
@@ -414,9 +377,6 @@ func TestEncryptBlockAndDecryptBlockRoundTrip(t *testing.T) {
 	mpq.DecryptBlock(nil, 1)
 }
 
-// The cipher is the format's: a reader that is not this package decrypts what this package encrypts. A round
-// trip holds only that the two halves agree, so the words themselves are written down here, for five keys and
-// a block whose plain words have every bit set and none.
 func TestEncryptBlockGivesTheWordsOfTheFormat(t *testing.T) {
 	plain := []uint32{0, 0, 1, 0xFFFFFFFF, 0x12345678, 0x80000000, 0x7FFFFFFF, 0xDEADBEEF}
 	for _, c := range []struct {
@@ -444,7 +404,6 @@ func TestEncryptBlockGivesTheWordsOfTheFormat(t *testing.T) {
 	}
 }
 
-// The hashes of names that every reader of the format knows: the list of files, and a script and a model.
 func TestHashStringGivesTheHashesOfTheFormat(t *testing.T) {
 	for _, c := range []struct {
 		name                          string
@@ -461,8 +420,6 @@ func TestHashStringGivesTheHashesOfTheFormat(t *testing.T) {
 		}
 	}
 }
-
-// ---- Write ----
 
 func TestWriteRoundTripsCompressibleIncompressibleAndEmptyFiles(t *testing.T) {
 	lua := script(10800)
@@ -558,7 +515,6 @@ func TestWriteRejectsAPrefixThatIsNotAMultipleOf512Bytes(t *testing.T) {
 	files := []mpq.File{{Name: "a.txt", Data: []byte("a")}}
 	for _, length := range []int{1, 100, 511, 513, 1000} {
 		written, err := mpq.Write(files, mpq.Options{Prefix: make([]byte, length)})
-		// A plain error: the caller makes the prefix, so its length is no mistake of a user's.
 		var e *diag.Error
 		if err == nil || errors.As(err, &e) || !strings.Contains(err.Error(), "512") || written != nil {
 			t.Errorf("a prefix of %d bytes: %d bytes, %v", length, len(written), err)
@@ -569,7 +525,6 @@ func TestWriteRejectsAPrefixThatIsNotAMultipleOf512Bytes(t *testing.T) {
 			t.Errorf("a prefix of %d bytes: %v", length, err)
 		}
 	}
-	// The prefix is looked at first: a list that is refused too does not hide it.
 	_, err := mpq.Write([]mpq.File{{Name: "a"}, {Name: "A"}}, mpq.Options{Prefix: make([]byte, 100)})
 	if err == nil || !strings.Contains(err.Error(), "512") {
 		t.Errorf("an unaligned prefix and a duplicate: %v", err)
@@ -586,7 +541,6 @@ func TestWriteGrowsTheHashTableWithTheFileCount(t *testing.T) {
 		t.Fatal(err)
 	}
 	archive := open(t, written)
-	// 41 entries with the listfile need more than 61 slots: 64.
 	if hashSize := binary.LittleEndian.Uint32(written[24:]); hashSize != 64 || archive.Blocks != 41 {
 		t.Errorf("hash table of %d slots for %d blocks", hashSize, archive.Blocks)
 	}
@@ -623,7 +577,6 @@ func TestWriteStoresEachFileAsABlockOfSectors(t *testing.T) {
 	h := readHeader(t, written)
 	blocks := table(written, h.BlockTableAt, h.BlockTableSize, mpq.BlockTableKey)
 	const exists, compressed = 0x80000000, 0x00000200
-	// Three sectors of text: four offsets, then each sector as zlib makes it on its own, the last of 808 bytes.
 	one, two, three := packed(t, text[:4096]), packed(t, text[4096:8192]), packed(t, text[8192:])
 	second, third := uint32(16+len(one)), uint32(16+len(one)+len(two))
 	end := third + uint32(len(three))
@@ -635,11 +588,9 @@ func TestWriteStoresEachFileAsABlockOfSectors(t *testing.T) {
 	if got := written[32 : 32+len(want)]; !bytes.Equal(got, want) {
 		t.Errorf("the text is stored as % x..., want % x...", got[:24], want[:24])
 	}
-	// An empty file has no bytes in the archive and is not marked as compressed.
 	if !slices.Equal(blocks[4:8], []uint32{32 + stored, 0, 0, exists}) {
 		t.Errorf("the empty file's block is %#x", blocks[4:8])
 	}
-	// Two sectors of noise are stored as they are, behind their three offsets.
 	if !slices.Equal(blocks[8:12], []uint32{32 + stored, 12 + 5000, 5000, exists | compressed}) {
 		t.Errorf("the noise's block is %#x", blocks[8:12])
 	}
@@ -721,19 +672,17 @@ func TestWriteLeavesOutAListfileItIsGiven(t *testing.T) {
 	}
 }
 
-// Two names are one archive path when the game would find one file under both: when they are equal once their
-// ASCII letters are capitals. Unicode case mapping makes more names equal, and those stay two files.
 func TestWriteKeepsApartNamesThatDifferInLettersThatAreNotASCII(t *testing.T) {
 	for _, pair := range [][2]string{
-		{"\xC3\xA9.txt", "\xC3\x89.txt"},           // an e with an acute accent, small and capital
-		{"stra\xC3\x9Fe.txt", "STRASSE.TXT"},       // a sharp s, whose capital is SS
-		{"\xEF\xAC\x81le.txt", "FILE.TXT"},         // the ligature fi
-		{"\xC5\xBF.txt", "S.txt"},                  // a long s, whose capital is S
-		{"\xC4\xB1.txt", "I.txt"},                  // a dotless i, whose capital is I
-		{"\xCF\x83.txt", "\xCE\xA3.txt"},           // a Greek sigma, small and capital
-		{"\xD0\xB6.txt", "\xD0\x96.txt"},           // a Cyrillic zhe, small and capital
-		{"dir\\\xC3\xA5.txt", "DIR\\\xC3\x85.TXT"}, // an a with a ring, small and capital, in a folder
-		{"\xFF.bin", "\xFE.bin"},                   // two bytes that are not UTF-8
+		{"\xC3\xA9.txt", "\xC3\x89.txt"},
+		{"stra\xC3\x9Fe.txt", "STRASSE.TXT"},
+		{"\xEF\xAC\x81le.txt", "FILE.TXT"},
+		{"\xC5\xBF.txt", "S.txt"},
+		{"\xC4\xB1.txt", "I.txt"},
+		{"\xCF\x83.txt", "\xCE\xA3.txt"},
+		{"\xD0\xB6.txt", "\xD0\x96.txt"},
+		{"dir\\\xC3\xA5.txt", "DIR\\\xC3\x85.TXT"},
+		{"\xFF.bin", "\xFE.bin"},
 	} {
 		files := []mpq.File{{Name: pair[0], Data: []byte("first")}, {Name: pair[1], Data: []byte("second")}}
 		written, err := mpq.Write(files, mpq.Options{})
@@ -745,13 +694,12 @@ func TestWriteKeepsApartNamesThatDifferInLettersThatAreNotASCII(t *testing.T) {
 	}
 }
 
-// A name is the (listfile) under the same rule: Unicode case mapping would take each of these names for it.
 func TestWriteKeepsAFileWhoseNameOnlyLooksLikeTheListfile(t *testing.T) {
 	for _, name := range []string{
-		"(l\xC4\xB1stfile)",    // a dotless i
-		"(li\xC5\xBFtfile)",    // a long s
-		"(li\xEF\xAC\x86file)", // the ligature st
-		"(list\xEF\xAC\x81le)", // the ligature fi
+		"(l\xC4\xB1stfile)",
+		"(li\xC5\xBFtfile)",
+		"(li\xEF\xAC\x86file)",
+		"(list\xEF\xAC\x81le)",
 	} {
 		files := []mpq.File{{Name: "a.txt", Data: []byte("a")}, {Name: name, Data: []byte("kept")}}
 		written, err := mpq.Write(files, mpq.Options{})
@@ -766,7 +714,6 @@ func TestWriteKeepsAFileWhoseNameOnlyLooksLikeTheListfile(t *testing.T) {
 		if got := read(t, archive, "(listfile)"); string(got) != "a.txt\r\n"+name+"\r\n" {
 			t.Errorf("%q: the (listfile) is %q", name, got)
 		}
-		// Beside a (listfile) it is given, such a name is no duplicate.
 		both := append(files, mpq.File{Name: "(listfile)", Data: []byte("stale")})
 		if _, err := mpq.Write(both, mpq.Options{}); err != nil {
 			t.Errorf("%q beside a (listfile): %v", name, err)
@@ -774,8 +721,6 @@ func TestWriteKeepsAFileWhoseNameOnlyLooksLikeTheListfile(t *testing.T) {
 	}
 }
 
-// TestWriteReadsBackEveryListInEveryWay opens every archive with the test kit's reader, which shares only the hash
-// and the cipher with the writer.
 func TestWriteReadsBackEveryListInEveryWay(t *testing.T) {
 	lists, ways := fileLists(t), optionSets()
 	if len(lists) < 60 || len(ways) != 4 {
@@ -785,7 +730,6 @@ func TestWriteReadsBackEveryListInEveryWay(t *testing.T) {
 	writeAndCheck(t, otherLists(), otherOptionSets())
 }
 
-// writeAndCheck writes each list in each way and checks the archive.
 func writeAndCheck(t *testing.T, lists []fileList, ways []optionSet) {
 	t.Helper()
 	for _, list := range lists {
@@ -812,8 +756,6 @@ func TestWriteGivesTheSameArchiveEveryTime(t *testing.T) {
 		t.Errorf("two archives of one list differ: %v", err)
 	}
 }
-
-// ---- HM3WHeader ----
 
 func TestHM3WHeaderWritesMagicNameFlagsAndPlayers(t *testing.T) {
 	header := mpq.HM3WHeader("Hero", 4, 6)

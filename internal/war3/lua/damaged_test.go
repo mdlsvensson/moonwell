@@ -8,8 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// sourcesToDamage are the corner sources, the Lua files of the checkout, and the sources that the tests of this
-// package keep in their constants and lists, the ones that are read and the ones that are refused.
 func sourcesToDamage(t *testing.T) []namedSource {
 	t.Helper()
 	sources := append(append([]namedSource{}, cornerSources...), luaFilesOfTheCheckout(t)...)
@@ -29,13 +27,10 @@ func sourcesToDamage(t *testing.T) []namedSource {
 	return sources
 }
 
-// refusedSources are the sources the lists of this package hold as refused by Functions.
 func refusedSources() []refusal {
 	return slices.Concat(ambiguousStructures, deepNesting, invalidShapes, placedErrors, parameterRefusals, returnRefusals)
 }
 
-// sourceName is a source as a name in a failure: whole when it is short, and its start with its length when it
-// is long.
 func sourceName(source string) string {
 	if len(source) <= longest {
 		return source
@@ -43,16 +38,8 @@ func sourceName(source string) string {
 	return fmt.Sprintf("%s... (%d bytes)", source[:longest], len(source))
 }
 
-// damageSeed is the seed of the changes that TestADamagedSourceIsScannedOrRefusedByNameAndNeverPanics makes. A
-// failure names the source and the index of the change: testkit.Changed, and testkit.ChangedBytes for a change
-// of the bytes, make the same source of the three again.
 const damageSeed = 53
 
-// scannedOrRefused gives the source to the tokenizer and to every scanner. It stops the test when one of them
-// panics; when a token is not the bytes of the source it says it is, or stands before the one before it; when
-// the fault is no place in the source; and when Functions returns functions with an error, an error that is no
-// *diag.Error of the file with a hint, a line and a column, or a function that is no part of the source. It
-// reports whether Functions read the source.
 func scannedOrRefused(t *testing.T, what, source string) (read bool) {
 	t.Helper()
 	var made scanned
@@ -90,12 +77,6 @@ func scannedOrRefused(t *testing.T, what, source string) (read bool) {
 	return false
 }
 
-// TestADamagedSourceIsScannedOrRefusedByNameAndNeverPanics gives the tokenizer and the scanners every source of
-// sourcesToDamage cut short and after seeded changes: of its lines, quotes and white space, and of its bytes. A
-// source of up to 500 bytes is cut at every length and changed 20 times in each way; a longer one is cut at
-// every length below 500 and at every 97th after it and changed 10 times in each way; and one of more than
-// 16000 bytes, which is one of the two that nest too deep, is cut at every 4099th after the 500 and changed
-// three times in each way: a scan of it takes a thousand times as long as one of a corner source.
 func TestADamagedSourceIsScannedOrRefusedByNameAndNeverPanics(t *testing.T) {
 	read, refused, sources := 0, 0, sourcesToDamage(t)
 	count := func(what, source string) {

@@ -14,17 +14,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// infoFile is the name the map info has in errors.
 const infoFile = "maps/map.w3x/war3map.w3i"
 
-// The versions of war3map.w3i whose layout is known, and those of them that have players, forces and an
-// environment to set.
 var (
 	everyVersion    = []int32{18, 25, 28, 31, 32, 33, 39}
 	detailsVersions = []int32{28, 31, 32, 33, 39}
 )
 
-// patched is the map info with the settings of the document, which must go in.
 func patched(t *testing.T, source []byte, document string) []byte {
 	t.Helper()
 	result, err := patchInfo(source, settingsOf(t, document), infoFile)
@@ -34,8 +30,6 @@ func patched(t *testing.T, source []byte, document string) []byte {
 	return result
 }
 
-// refusedInfo is the failure of settings that must not go in: an expected one that names the map info and says
-// what to do.
 func refusedInfo(t *testing.T, source []byte, document string) *diag.Error {
 	t.Helper()
 	_, err := patchInfo(source, settingsOf(t, document), infoFile)
@@ -55,7 +49,6 @@ func readInfo(t *testing.T, data []byte, depth w3i.Depth) *w3i.Info {
 	return info
 }
 
-// withoutFlags is a version 39 map info whose map flags are all off, custom forces among them.
 func withoutFlags(t *testing.T) []byte {
 	t.Helper()
 	source := testkit.SyntheticMapInfo(39)
@@ -88,7 +81,6 @@ func TestColoursWaterTintAndSoundEnvironmentMatchAWorldEditorSave(t *testing.T) 
 	if len(got) != len(editor) {
 		t.Fatalf("the patched file has %d bytes, World Editor's save %d", len(got), len(editor))
 	}
-	// World Editor also wrote its save counter, an unknown field and the three camera zoom values again.
 	editorOnly := []int{4, 141, 230, 231, 234, 235, 238, 239}
 	for i := range editor {
 		if !slices.Contains(editorOnly, i) && got[i] != editor[i] {
@@ -137,7 +129,6 @@ func TestPlayerForceAndEnvironmentEditsKeepEveryOtherByteOfEveryVersion(t *testi
 			t.Errorf("version %d: %+v", version, details)
 		}
 		restored := patched(t, changed, restore)
-		// A water colour turns a map flag on that nothing turns off again: put the flags back before comparing.
 		flags := readInfo(t, source, w3i.Basic).Flags
 		copy(restored[readInfo(t, restored, w3i.Basic).Flags.Start:], source[flags.Start:flags.End])
 		if !bytes.Equal(restored, source) {
@@ -262,7 +253,6 @@ func TestPlayersAndForcesGoInSlotOrder(t *testing.T) {
 
 func TestAnOverrideWithNothingSetIsSkippedSoItsSlotNeedNotExist(t *testing.T) {
 	empty := `{"info":{"name":null},"players":{"7":{"name":null}},"forces":{"5":{}},"environment":{"fog":{}}}`
-	// Version 18 has no players to read, and bytes that are no map info are not read at all.
 	for _, source := range [][]byte{testkit.SyntheticMapInfo(18), []byte("not a map info")} {
 		if got := patched(t, source, empty); !bytes.Equal(got, source) {
 			t.Error("overrides with nothing set changed the file")
@@ -286,8 +276,6 @@ func TestThePreviewIsNotStoredInTheMapInfo(t *testing.T) {
 	}
 }
 
-// Pkl lets through only the names of the schema. A name this package has no number for is this program's fault,
-// and must not be written as a number that is no controller or race.
 func TestAControllerOrARaceWithoutANumberIsNotTheUsersMistake(t *testing.T) {
 	source := testkit.SyntheticMapInfo(39)
 	for _, name := range []string{"elf", ""} {

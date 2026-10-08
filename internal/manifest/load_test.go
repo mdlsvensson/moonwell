@@ -17,7 +17,6 @@ import (
 
 var background = context.Background()
 
-// world is a test world for a new project folder that holds the files.
 func world(t *testing.T, files map[string]string) *env.Env {
 	t.Helper()
 	root := t.TempDir()
@@ -28,11 +27,8 @@ func world(t *testing.T, files map[string]string) *env.Env {
 	return e
 }
 
-// ran is one program a stand-in was asked to run: its command line and the folder it was to run in.
 type ran struct{ line, dir string }
 
-// answering stands in for env.Run. It answers a command line with the result of the longest prefix it knows, keeps
-// what it was asked in calls, and returns an error for a command line it knows no prefix of.
 func answering(calls *[]ran, results map[string]env.RunResult) env.RunFunc {
 	return func(_ context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		line := strings.Join(append([]string{program}, args...), " ")
@@ -66,7 +62,6 @@ func TestLoadEvaluatesTheLocalManifestWhenThereIsOneWithTheProgramItIsGiven(t *t
 			e := world(t, tt.files)
 			var calls []ran
 			line := "/cache/pkl/0.32.1/pkl eval --format json --project-dir . " + tt.want
-			// What pkl says beside a project that it prints is a warning, and does not stop the load.
 			e.Run = answering(&calls, map[string]env.RunResult{line: {Stdout: printed(), Stderr: "a warning"}})
 			p, err := Load(background, e, "/cache/pkl/0.32.1/pkl")
 			if err != nil {
@@ -91,9 +86,9 @@ func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
 	tests := []struct {
 		name  string
 		files map[string]string
-		runs  map[string]env.RunResult // nil when the failure comes before pkl may run
-		file  string                   // "<root>" stands for the project folder
-		words []string                 // of the message
+		runs  map[string]env.RunResult
+		file  string
+		words []string
 		hint  string
 	}{
 		{"no manifest", map[string]string{"PklProject.deps.json": "{ not json"}, nil,
@@ -152,7 +147,6 @@ func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
 func TestLoadShowsTheStartOfLongOutputThatIsNotJSON(t *testing.T) {
 	e := world(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": resolvedDeps(moonwell.Version)})
 	var calls []ran
-	// Each "\xC3\xA9" is one character of two bytes.
 	e.Run = answering(&calls, map[string]env.RunResult{"pkl eval": {Stdout: strings.Repeat("\xC3\xA9", 600)}})
 	_, err := Load(background, e, "pkl")
 	failure := asError(t, err, "long output")
@@ -175,9 +169,6 @@ func TestLoadPassesOnAProgramThatCannotBeStarted(t *testing.T) {
 	}
 }
 
-// linked is a test world for a new project that depends on the schema/ of this checkout, with the dependency
-// resolved by pkl, and the pkl program. Pkl loads a local dependency only from the project's own drive, so the
-// temporary folder must be on the drive of the checkout.
 func linked(t *testing.T, files map[string]string) (*env.Env, string) {
 	t.Helper()
 	pkl := testkit.NeedPkl(t)
@@ -232,7 +223,6 @@ func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
 		p.Lint.UnknownGlobals != "error" || p.Lint.Globals == nil || p.Libraries == nil || len(p.Libraries) != 0 {
 		t.Errorf("assets = %+v, lint = %+v, libraries = %+v", p.Assets, p.Lint, p.Libraries)
 	}
-	// The template writes player 0 with every field null: the override is there, and sets nothing.
 	if player, written := p.Settings.Players[0]; !written || player != (Player{}) || p.Settings.Info != (Info{}) {
 		t.Errorf("player 0 = %+v, written %v; info = %+v", player, written, p.Settings.Info)
 	}
@@ -247,8 +237,6 @@ func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
 	}
 }
 
-// everything is a manifest that sets every setting, a library of each kind, an asset path, lint globals and an
-// object of every category. Where the schema allows it, a value is false, zero or empty, which is set all the same.
 const everything = `amends "@moonwell/Project.pkl"
 
 map { folder = "hero.w3x"; entry = "src/game/init.yue" }
@@ -306,7 +294,6 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 		t.Errorf("%s is not set: the schema and its field in this package have different names, or the manifest of "+
 			"this test does not set it", path)
 	}
-	// A few values, to see that each went where it belongs.
 	if target, _ := p.Assets.Paths.Get("icons/BTNSword.blp"); target != `ReplaceableTextures\CommandButtons\BTNSword.blp` {
 		t.Errorf("the asset path = %q", target)
 	}
@@ -318,8 +305,6 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 		text(p.Libraries["example"].Tag) != "v0.2.0" {
 		t.Errorf("libraries = %+v", p.Libraries)
 	}
-	// What pkl prints for the values of an object's properties, and the Go values they arrive as: a whole number
-	// is a float64 like any other number, and a List is a []any.
 	properties := map[Category]struct {
 		key        string
 		typed, raw any
@@ -346,9 +331,6 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 	}
 }
 
-// unset walks a value and returns the path of every field that is zero wherever it is found. The elements of a
-// map or a list share one path, so a field of theirs is set when one element sets it: a library has a repository
-// or a folder, and never both. A pointer that is not nil is set, whatever it points at.
 func unset(value any) []string {
 	set := map[string]bool{}
 	var paths []string

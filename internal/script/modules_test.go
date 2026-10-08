@@ -17,7 +17,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// collect is the modules of a project that has no fault.
 func collect(t *testing.T, p project) []Source {
 	t.Helper()
 	sources, err := Collect(p.lay(t), p.libraries())
@@ -27,14 +26,12 @@ func collect(t *testing.T, p project) []Source {
 	return sources
 }
 
-// refused is the failure of Collect on a project that has a fault.
 func refused(t *testing.T, p project, what string) *diag.Error {
 	t.Helper()
 	_, err := Collect(p.lay(t), p.libraries())
 	return asError(t, err, what)
 }
 
-// luaModule is the one Lua module, lua/x.lua, of a project that holds text beside its main file.
 func luaModule(t *testing.T, text string) Source {
 	t.Helper()
 	sources := collect(t, mainOnly.and("lua/x.lua", text))
@@ -60,7 +57,6 @@ func pathsOf(sources []Source) []string {
 	return paths
 }
 
-// mainOnly is a project of the one file it needs for src/ to exist.
 var mainOnly = files("src/main.yue", "x = 1\n")
 
 func TestCollectListsYueScriptInSrcAndLuaInLuaNamedByPath(t *testing.T) {
@@ -128,11 +124,9 @@ func TestCollectRefusesDottedNamesInEitherFolder(t *testing.T) {
 			t.Errorf("%s: %+v", path, failure)
 		}
 	}
-	// A project whose only file has a dotted name fails here, before anything is compiled.
 	if failure := refused(t, files("src/a.b.yue", "export x = 1\n"), "a dotted name"); !strings.Contains(failure.Msg, "dots") {
 		t.Errorf("error = %+v", failure)
 	}
-	// A dot in the name of a file that is no module is nobody's business.
 	others := mainOnly.and("src/notes.v2.txt", "", "lua/a.b/readme.md", "", "lua/x.lua.bak", "")
 	if got := pathsOf(collect(t, others)); !slices.Equal(got, []string{"src/main.yue"}) {
 		t.Errorf("paths = %q", got)
@@ -214,8 +208,6 @@ func TestInALibraryALuaFileBesideAYueFileOfTheSameStemIsItsCompiledOutputNotAMod
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("Collect = %+v", got)
 	}
-	// In the project's own folders the two kinds lie apart, and a Lua file of a YueScript module's name is a second
-	// module of that name.
 	failure := refused(t, mainOnly.and("src/loud.yue", "", "lua/loud.lua", ""), "the project's own")
 	if failure.Msg != "Module loud is defined by src/loud.yue and lua/loud.lua." {
 		t.Errorf("error = %+v", failure)
@@ -235,17 +227,15 @@ func TestADottedOrBuiltInNameInALibrarySuggestsNarrowingTheLibrarysDir(t *testin
 	}
 }
 
-// TestAModuleFileWhoseNameIsNotUTF8IsRefused names module files that are given as strings, so it runs on every
-// system, whatever names its files can have.
 func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 	src, lua, library := folder{dir: "src", kind: Yue}, folder{dir: "lua", kind: Lua}, folder{dir: librariesDir + "/ex", kind: Lua, library: "ex"}
 	for _, c := range []struct {
 		of   folder
-		file string // from the folder, with "/"
+		file string
 	}{
 		{src, "a\xffb.yue"},
-		{src, "game\xe9/units.yue"}, // a folder's name, in another encoding
-		{src, "a/b/\xe2\x82.yue"},   // a character that is cut short
+		{src, "game\xe9/units.yue"},
+		{src, "a/b/\xe2\x82.yue"},
 		{lua, "x/" + halfPair + ".lua"},
 		{lua, halfPair + "/init.lua"},
 		{lua, eAcute + "\xc3.lua"},
@@ -258,19 +248,16 @@ func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 			t.Errorf("%q: %+v", path, failure)
 		}
 	}
-	// A library's file is not the project's to rename.
 	_, err := library.source("kit/\xff.lua")
 	failure := asError(t, err, "a library's file")
 	if !strings.Contains(failure.Msg, "must be valid UTF-8") || failure.File != librariesDir+"/ex/kit/\xff.lua" ||
 		strings.Contains(failure.Hint, "rename") || !strings.Contains(failure.Hint, "narrow the library's `dir` in moonwell.pkl") {
 		t.Errorf("a library's file: %+v", failure)
 	}
-	// A name with a dot is refused for the dot, whatever its bytes.
 	_, err = src.source("a.b\xff.yue")
 	if failure := asError(t, err, "a dotted name"); !strings.Contains(failure.Msg, "cannot contain dots") {
 		t.Errorf("a dotted name: %+v", failure)
 	}
-	// Every name of valid UTF-8 is a module's, whatever its characters.
 	for file, name := range map[string]string{
 		eAcute + ".yue": eAcute, beyond + "/" + fullWidthA + ".yue": beyond + "." + fullWidthA, replacement + ".yue": replacement,
 		"a\x7fb.yue": "a\x7fb", "a b.yue": "a b", "a" + noBreakSpace + "b/c" + lineSeparator + ".yue": "a" + noBreakSpace + "b.c" + lineSeparator,
@@ -281,8 +268,6 @@ func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 	}
 }
 
-// TestCollectRefusesAModuleFileWhoseNameIsNotUTF8 lays files whose names are not UTF-8, and is skipped on a
-// system that holds no such name.
 func TestCollectRefusesAModuleFileWhoseNameIsNotUTF8(t *testing.T) {
 	for _, path := range []string{"src/a" + halfPair + ".yue", "lua/" + halfPair + "/x.lua", "src/game/" + halfPair + "/units.yue"} {
 		p := mainOnly.and(path, "")
@@ -298,7 +283,6 @@ func TestCollectRefusesAModuleFileWhoseNameIsNotUTF8(t *testing.T) {
 	if failure := asError(t, err, "a library's file"); failure.File != inLibrary("ex", "kit/"+halfPair+".yue") || !strings.Contains(failure.Hint, "narrow the library's `dir`") {
 		t.Errorf("a library's file: %+v", failure)
 	}
-	// A file that is no module of its folder is not looked at, whatever its name.
 	others := mainOnly.and("src/"+halfPair+".txt", "", "lua/"+halfPair+"/readme.md", "", "src/"+halfPair+".lua", "", "lua/x"+halfPair+".yue", "")
 	sources, err := Collect(others.layAsNamed(t), others.libraries())
 	if got := pathsOf(sources); err != nil || !slices.Equal(got, []string{"src/main.yue"}) {
@@ -320,8 +304,6 @@ func TestALibraryWithoutAFolderHasNoModules(t *testing.T) {
 }
 
 func TestCollectListsTheModulesOfAFolderInByteOrder(t *testing.T) {
-	// By bytes a character from U+E000 to U+FFFF comes before one beyond the basic plane; by UTF-16 units it comes
-	// after.
 	got := pathsOf(collect(t, files(
 		"src/"+beyond+".yue", "", "src/"+fullWidthA+".yue", "", "src/z.yue", "", "src/B.yue", "", "src/a/b.yue", "",
 		"src/a-b.yue", "", "src/a.yue", "", "src/a0.yue", "", "src/"+eAcute+".yue", "",
@@ -354,7 +336,6 @@ func TestALuaModulesTextIsTheBytesOfItsFile(t *testing.T) {
 			t.Errorf("%s: the text of %q is %q", what, written, module.Text)
 		}
 	}
-	// A library's Lua module is read the same way.
 	sources := collect(t, mainOnly.with("ex").and(inLibrary("ex", "x.lua"), "return '\xff\xfe'\n"))
 	if len(sources) != 2 || sources[1].Text != "return '\xff\xfe'\n" {
 		t.Errorf("Collect = %+v", sources)
@@ -372,7 +353,6 @@ func TestInsideAFolderOfModulesALinkToAFileIsReadAndALinkToAFolderIsNotEntered(t
 
 	elsewhere := files("real.lua", "return 'through the link'\n", "real.yue", "x = 3\n").lay(t)
 	for link, target := range map[string]string{"lua/through.lua": "real.lua", "src/also.yue": "real.yue"} {
-		// Skipped where Windows keeps the right to make such a link from this account, and for that alone.
 		testkit.LinkFile(t, filepath.Join(elsewhere, target), filepath.Join(root, filepath.FromSlash(link)))
 	}
 	want := []Source{
@@ -399,7 +379,6 @@ func TestALinkAtAFolderOfModulesIsRefused(t *testing.T) {
 		if failure.Msg != "Symlinks are not supported: "+at || !strings.Contains(failure.Hint, "real files") {
 			t.Errorf("a link at %s: %+v", link, failure)
 		}
-		// The refusal names the folder of modules that was looked for, from the project folder.
 		if !slices.Contains([]string{"src", "lua", librariesDir + "/ex"}, failure.File) ||
 			!strings.HasPrefix(failure.File, link) {
 			t.Errorf("a link at %s: the refusal names the file %q", link, failure.File)
@@ -419,7 +398,6 @@ func TestALibraryThatNamesNoFolderOfTheProjectIsAMistakeOfTheCaller(t *testing.T
 			t.Errorf("Collect with %+v = %v, want an error that is no user's mistake", library, err)
 		}
 	}
-	// A folder written with backslashes is the same folder.
 	p := mainOnly.with("ex").and(inLibrary("ex", "x.lua"), "")
 	sources, err := Collect(p.lay(t), []Library{{Key: "ex", Dir: `.moonwell\libraries\ex`}})
 	if err != nil || !slices.Equal(pathsOf(sources), []string{"src/main.yue", ".moonwell/libraries/ex/x.lua"}) {
@@ -480,7 +458,6 @@ func TestAListingThatFailsBelowAFolderNamesTheFolderItFailedAt(t *testing.T) {
 	}
 }
 
-// ofLibraries is the modules among sources that are a library's.
 func ofLibraries(sources []Source) []Source {
 	var listed []Source
 	for _, source := range sources {
@@ -531,7 +508,7 @@ func TestCollectLibrariesDoesNotLookAtTheProjectsOwnModules(t *testing.T) {
 	cases := []struct {
 		name    string
 		project project
-		refusal string // what Collect says of the project
+		refusal string
 	}{
 		{"a module of src/ with the name", library.and("src/example/greet.yue", "x = 1\n"), clash},
 		{"a module of lua/ with the name", withSrc.and("lua/example/greet.lua", ""), clash},
@@ -554,7 +531,6 @@ func TestCollectLibrariesDoesNotLookAtTheProjectsOwnModules(t *testing.T) {
 	}
 }
 
-// A link at src/ or at lua/ is the project's own: Collect refuses it, and CollectLibraries does not go there.
 func TestCollectLibrariesDoesNotGoThroughALinkAtAFolderOfTheProjectsOwn(t *testing.T) {
 	for _, link := range []string{"src", "lua"} {
 		p := files(inLibrary("ex", "x.lua"), "").with("ex")

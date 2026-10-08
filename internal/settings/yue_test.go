@@ -10,10 +10,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-// The patched script, run in the Lua inside the real compiler on stand-ins for the game's natives. Each test
-// starts the compiler once, and is skipped on a machine without one (tooltest.Yue).
-
-// printedBy is what a Lua script prints when it runs. A script that fails, fails the test.
 func printedBy(t *testing.T, script string) string {
 	t.Helper()
 	return tooltest.RunLua(t, testkit.WriteFile(t, t.TempDir(), "settings.lua", []byte(script)))
@@ -48,8 +44,6 @@ function InitBlizzard() events[#events+1] = "init" end
 	}
 }
 
-// gameNatives are the natives and the functions of Blizzard's own script that the fixture's script, or a setting
-// put into it, calls.
 var gameNatives = strings.Fields(`BlzCreateUnitWithSkin ConditionalTriggerExecute ConvertPlayerColor CreateTrigger
 DefineStartLocation ForcePlayerStartLocation FourCC GetCameraMargin InitBlizzard NewSoundEnvironment
 SelectUnitForPlayerSingle SetAmbientDaySound SetAmbientNightSound SetCameraBounds SetDayNightModels SetGamePlacement
@@ -58,13 +52,8 @@ SetPlayerColor SetPlayerController SetPlayerRacePreference SetPlayerRaceSelectab
 SetPlayerTeam SetPlayers SetStartLocPrio SetStartLocPrioCount SetTeams TriggerAddAction ResetTerrainFog
 SetPlayerAllianceStateControlBJ SetPlayerAllianceStateFullControlBJ SetPlayerName SetPlayerState SetTerrainFogEx SetWaterBaseColor`)
 
-// gameConstant finds the names of the game's constants in a script: capitals and digits in parts joined by "_".
 var gameConstant = regexp.MustCompile(`\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b`)
 
-// callsOf runs config() and main() of a map script outside the game and returns the calls they made of the
-// game's natives, in order, each as its name and its arguments: a number in full, anything else as Lua prints
-// it. A constant of the game stands for its own name, a native returns 0, and Player gives the player's number.
-// A script that reads a global that is none of these fails the test.
 func callsOf(t *testing.T, lua string) []string {
 	t.Helper()
 	constants := gameConstant.FindAllString(fixtureLua(t), -1)
@@ -110,15 +99,12 @@ func TestSettingsLuaUnpatchedFixtureRuns(t *testing.T) {
 	}
 }
 
-// overrides sets something of every kind the script takes: the map's name and description, two players, a
-// force's flags, and the environment.
 const overrides = `{"info":{"name":"Moonwell","description":""},` +
 	`"players":{"0":{"name":"","controller":"computer","race":"selectable","fixedStart":false,"x":0,"y":0.1},` +
 	`"11":{"controller":"rescuable","race":"undead"}},` +
 	`"forces":{"0":{"allied":false,"alliedVictory":true,"sharedVision":false,"sharedControl":true}},` +
 	`"environment":{"soundEnvironment":"","waterColor":[0,0,0,0],"fog":{"enabled":true,"start":0,"color":[255,0,0,0]}}}`
 
-// overrideCalls are calls the script makes once the overrides are in it.
 var overrideCalls = []string{
 	"SetMapName(Moonwell)", "SetMapDescription()", "DefineStartLocation(0,0,0.10000000149011612)",
 	"SetPlayerRacePreference(0,RACE_PREF_USER_SELECTABLE)", "SetPlayerRaceSelectable(0,true)",

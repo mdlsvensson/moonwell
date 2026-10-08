@@ -14,8 +14,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-// syncGitHub downloads a tag of a GitHub library into its two folders, unless they hold the entry the lock has
-// for it, and returns the library's lock entry. locked is that entry, nil when the lock has none.
 func syncGitHub(
 	ctx context.Context, e *env.Env, at folders, library manifest.Library, locked *lockEntry, manifestFile string,
 ) (lockEntry, error) {
@@ -46,8 +44,6 @@ func syncGitHub(
 	return entry, nil
 }
 
-// refuseNames refuses a tag and a repository whose name would lead a download address somewhere else: a part of
-// the tag between two "/", or the repository's name, that is "." or "..".
 func refuseNames(key, github, tag, manifestFile string) error {
 	for segment := range strings.SplitSeq(tag, "/") {
 		if segment == "." || segment == ".." {
@@ -60,8 +56,6 @@ func refuseNames(key, github, tag, manifestFile string) error {
 	return nil
 }
 
-// holds reports whether the library's folders hold entry: the stamp in its module folder is the entry with the
-// layout of the folders, and the folder of its files for the map is there when it ships any.
 func holds(at folders, entry lockEntry) bool {
 	stamp, err := os.ReadFile(filepath.Join(at.modules, stampFile))
 	if err != nil {
@@ -74,14 +68,12 @@ func holds(at folders, entry lockEntry) bool {
 	return entry.Assets == nil || fsx.IsDir(at.assets)
 }
 
-// hasStampLayout reports whether a stamp, which is a JSON object, names the layout of the folders as a number.
 func hasStampLayout(stamp []byte) bool {
 	members, _ := objectOf(stamp)
 	var layout float64
 	return json.Unmarshal(members["layout"], &layout) == nil && layout == stampLayout
 }
 
-// sameLocked reports whether two lock entries are the same in every member.
 func sameLocked(a, b lockEntry) bool {
 	if (a.Assets == nil) != (b.Assets == nil) || (a.Assets != nil && *a.Assets != *b.Assets) {
 		return false
@@ -89,12 +81,6 @@ func sameLocked(a, b lockEntry) bool {
 	return a.GitHub == b.GitHub && a.Tag == b.Tag && a.Dir == b.Dir && a.Commit == b.Commit && a.Files == b.Files
 }
 
-// ---- what is kept of a tag ----
-
-// keep is what is kept of the files of a tag: the modules, which are the files below the module folder, and the
-// files for the map when the library's own file names a folder of them. The module folder is the manifest's dir,
-// else the one the library's file names, else the library's root. A folder that is named and has no files is
-// refused.
 func keep(key, github, tag, dir string, files []file, manifestFile string) (shipped, error) {
 	libraryFile := "https://github.com/" + github + "/blob/" + tag + "/" + File
 	content, present := contentIn(files, File)
@@ -121,7 +107,6 @@ func keep(key, github, tag, dir string, files []file, manifestFile string) (ship
 	return kept, kept.refuseUnusable(key, manifestFile)
 }
 
-// contentIn is the bytes of the file of a name among files; false when there is none.
 func contentIn(files []file, name string) (content []byte, present bool) {
 	for _, f := range files {
 		if f.name == name {
@@ -131,9 +116,6 @@ func contentIn(files []file, name string) (content []byte, present bool) {
 	return nil, false
 }
 
-// keepBelow is the files below the folder dir of a library, all of them when dir names none, each under its
-// path from dir. A file in a folder or with a name that starts with "." is not kept (.github/, .gitignore), nor
-// is a file below the folder except, when one is given.
 func keepBelow(files []file, dir string, except *string) []file {
 	prefix := ""
 	for _, segment := range strings.FieldsFunc(dir, func(r rune) bool { return r == '/' || r == '\\' }) {
@@ -152,13 +134,10 @@ func keepBelow(files []file, dir string, except *string) []file {
 	return kept
 }
 
-// hasDotName reports whether a name on the path starts with ".".
 func hasDotName(path string) bool {
 	return strings.HasPrefix(path, ".") || strings.Contains(path, "/.")
 }
 
-// entryFor is the lock entry of a tag: what the manifest says of the library, the tag's commit, and the hashes of
-// what is kept of it.
 func entryFor(github, tag, dir, commit string, kept shipped) lockEntry {
 	entry := lockEntry{GitHub: github, Tag: tag, Dir: dir, Commit: commit, Files: filesHash(kept.modules)}
 	if kept.shipsAssets {
@@ -168,13 +147,6 @@ func entryFor(github, tag, dir, commit string, kept shipped) lockEntry {
 	return entry
 }
 
-// moved reports whether a tag is something else than the lock recorded of it: another commit, or other files
-// under the same commit.
-//
-// The files are compared only when both entries, or neither, have a hash of files for the map. An entry
-// without one, for a library that ships such files, comes from a Moonwell that knows no files for the map: its
-// hash of the modules may count files that are shipped for the map, so only the commit says whether the tag
-// moved.
 func moved(locked, entry lockEntry) bool {
 	switch {
 	case entry.Commit != locked.Commit:
@@ -185,15 +157,8 @@ func moved(locked, entry lockEntry) bool {
 	return entry.Files != locked.Files || (entry.Assets != nil && *entry.Assets != *locked.Assets)
 }
 
-// short is the first bytes of a commit, at most length of them.
 func short(commit string, length int) string { return commit[:min(length, len(commit))] }
 
-// ---- writing what is kept ----
-
-// writeDownloaded makes the library's two folders hold what is kept of a tag. From its first step to its last
-// the folders hold no entry, so a sync that is interrupted anywhere between them is downloaded again: the stamp
-// the module folder has is removed first, then the files for the map are replaced, and the module folder, which
-// comes with the stamp of the tag, is replaced last.
 func writeDownloaded(root string, at folders, kept shipped, entry lockEntry) error {
 	err := dropStamp(at)
 	switch {
@@ -210,8 +175,6 @@ func writeDownloaded(root string, at folders, kept shipped, entry lockEntry) err
 	return replace(root, ModulesDir, at.key, kept.modules, stampOf(entry))
 }
 
-// dropStamp removes the stamp of the library's module folder. A stamp that is no file is left: no entry is read
-// from it.
 func dropStamp(at folders) error {
 	stamp := filepath.Join(at.modules, stampFile)
 	if info, err := fsx.Lstat(stamp); err != nil || info == nil || info.IsDir() {
@@ -223,8 +186,6 @@ func dropStamp(at folders) error {
 	return nil
 }
 
-// replace writes the files, and the stamp when one is given, into the folder .<key>.tmp of dir, which then takes
-// the place of the folder <key>. dir is one of the two folders, from the project folder at root.
 func replace(root, dir, key string, files []file, stamp string) error {
 	label := dir + "/" + key
 	temp, err := fsx.Inside(root, dir+"/."+key+".tmp")
@@ -250,8 +211,6 @@ func replace(root, dir, key string, files []file, stamp string) error {
 	return nil
 }
 
-// writeAnew makes folder, which holds nothing afterwards but the files, each below it under its name. Its
-// failures are the system's.
 func writeAnew(folder string, files []file) error {
 	if err := fsx.RemoveAll(folder); err != nil {
 		return err
@@ -270,8 +229,6 @@ func writeAnew(folder string, files []file) error {
 	}
 	return nil
 }
-
-// ---- errors ----
 
 func errNotATag(key, github, tag, manifestFile string) error {
 	return &diag.Error{
@@ -313,9 +270,6 @@ func errNoAssetsOfTheLibrary(key, assets, tag, libraryFile string) error {
 	}
 }
 
-// errMoved refuses a tag that is something else than the lock recorded of it: from is the commit the lock has,
-// and to the commit the tag is at. Where the two are one commit, it is the files kept of the tag that are others,
-// and the refusal names the commit once and says so.
 func errMoved(key, github, tag, from, to string) error {
 	what := "tag " + tag + " of " + github + " moved from " + short(from, 12) + " to " + short(to, 12) +
 		" since " + lockFile + " recorded it."

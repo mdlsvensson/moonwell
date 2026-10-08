@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-// plantedExport is a folder in the shape of an export of the game's files, with names in mixed letter case.
 func plantedExport(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
@@ -27,7 +26,6 @@ func TestNeedExportFindsEachNameWithoutRegardToLetterCase(t *testing.T) {
 	if got := export.Path(); got != root {
 		t.Errorf("the export is %q, want the folder the variable names, %q", got, root)
 	}
-	// A path is spelled as the folders spell it, whatever the letter case it is asked for in.
 	want := filepath.Join(root, "War3.W3Mod", "Units", "UnitData.SLK")
 	if got := export.Path("war3.w3mod", "UNITS", "unitdata.slk"); got != want {
 		t.Errorf("the table is %q, want %q", got, want)
@@ -40,7 +38,6 @@ func TestNeedExportFindsEachNameWithoutRegardToLetterCase(t *testing.T) {
 	if got := export.Path("war3.w3mod", "_locales", "enus.w3mod", "ui", "worldeditstrings.txt"); got != want {
 		t.Errorf("the editor's strings are %q, want %q", got, want)
 	}
-	// The entries of a folder are named as the folder names them, in the order of their bytes.
 	wantEntries := []string{"Notes.TXT", "UnitData.SLK", "abilitydata.slk"}
 	if got := export.Entries("war3.w3mod", "units"); !slices.Equal(got, wantEntries) {
 		t.Errorf("the entries are %q, want %q", got, wantEntries)
@@ -50,7 +47,6 @@ func TestNeedExportFindsEachNameWithoutRegardToLetterCase(t *testing.T) {
 	}
 }
 
-// The list of the game's file names is one file, and the variable names it.
 func TestNeedExportTakesAVariableThatNamesAFile(t *testing.T) {
 	list := WriteFile(t, t.TempDir(), "Listfile.txt", []byte("units\\unitdata.slk\n"))
 	t.Setenv("MOONWELL_GAME_LISTFILE", list)
@@ -63,10 +59,10 @@ func TestNeedExportSkipsOrFailsTheTestWithoutTheGamesFiles(t *testing.T) {
 	gone := filepath.Join(t.TempDir(), "gone")
 	tests := []struct {
 		name         string
-		value        string // MOONWELL_GAME_DATA
-		require      string // MOONWELL_REQUIRE_EXPORTS
+		value        string
+		require      string
 		skips, fails int
-		naming       []string // what the one message names
+		naming       []string
 	}{
 		{name: "no variable", skips: 1, naming: []string{"MOONWELL_GAME_DATA is not set"}},
 		{name: "no variable, another value than 1", require: "0", skips: 1},
@@ -89,7 +85,6 @@ func TestNeedExportSkipsOrFailsTheTestWithoutTheGamesFiles(t *testing.T) {
 					t.Errorf("it said %q, want it to name %q", said, words)
 				}
 			}
-			// An export there is none of has no path and no entries, and asking fails nothing more.
 			if path, entries := export.Path("war3.w3mod"), export.Entries(); path != "" || entries != nil {
 				t.Errorf("the path is %q and the entries %q, want none", path, entries)
 			}
@@ -107,14 +102,13 @@ func TestAnExportFailsTheTestForANameItCannotTellApart(t *testing.T) {
 	type lookup struct {
 		name   string
 		below  []string
-		naming []string // what the failure names
+		naming []string
 	}
 	tests := []lookup{
 		{"a name no folder has", []string{"war3.w3mod", "units", "missing.slk"}, []string{units, "missing.slk", "0"}},
 		{"a folder no folder has", []string{"war3.w3mod", "doodads", "doodads.slk"}, []string{"doodads", "0"}},
 		{"a file where a folder should be", []string{"war3.w3mod", "units", "notes.txt", "x"}, []string{"Notes.TXT"}},
 	}
-	// Two names that differ in letter case alone are two entries only where the file system keeps them apart.
 	if CaseSensitive(t, root) {
 		WriteFile(t, root, "War3.W3Mod/Units/UNITDATA.slk", nil)
 		twice := []string{"war3.w3mod", "units", "unitdata.slk"}

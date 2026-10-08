@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-// entries is an Ordered as "key=value" words in its order, to compare in one line.
 func entries[V comparable](t *testing.T, o Ordered[V]) string {
 	t.Helper()
 	var words []string
@@ -87,7 +86,7 @@ func TestOrderedSetKeepsTheOrderKeysWereAddedIn(t *testing.T) {
 	}
 	for key := range o.All() {
 		if key == "b" {
-			break // a loop may stop early
+			break
 		}
 		t.Errorf("All started at %q", key)
 	}
@@ -102,7 +101,6 @@ func TestOrderedRefusesWhatIsNotAMapping(t *testing.T) {
 		{"a text", `{"paths":"x"}`, []string{"string", "not a mapping"}},
 		{"a truth value", `{"paths":true}`, []string{"bool", "not a mapping"}},
 		{"a number", `{"paths":3}`, []string{"number", "not a mapping"}},
-		// The words for a value of the mapping are the decoder's; the key is named before them.
 		{"a value of another type", `{"paths":{"a.blp":"x","b.blp":3}}`, []string{"b.blp: ", "number"}},
 	}
 	for _, tt := range tests {

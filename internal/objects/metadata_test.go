@@ -10,10 +10,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/objects"
 )
 
-// The embedded metadata, generated from the game's files: what must hold of it whenever it is generated again.
 var metadata = objects.LoadMetadata()
 
-// duplicates returns the values that occur more than once.
 func duplicates(values []string) []string {
 	var found []string
 	for i, value := range values {
@@ -46,8 +44,7 @@ func TestFieldSourceNamesTheListAndTheUseOfEveryCategory(t *testing.T) {
 		"heroes": {"units", "hero"}, "units": {"units", "unit"}, "buildings": {"units", "building"},
 		"items": {"items", "item"}, "abilities": {"abilities", ""}, "buffs": {"buffs", ""},
 		"upgrades": {"upgrades", ""},
-		// A category there is none of has no list and no use.
-		"spells": {"", ""}, "": {"", ""},
+		"spells":   {"", ""}, "": {"", ""},
 	}
 	for category, want := range sources {
 		if list, use := objects.FieldSource(category); list != want[0] || use != want[1] {
@@ -62,7 +59,6 @@ func TestFieldSourceNamesTheListAndTheUseOfEveryCategory(t *testing.T) {
 		}
 		lists = append(lists, list)
 	}
-	// Every list is the list of some category, and the lists come in the order of their first category.
 	if lists = slices.Compact(lists); !slices.Equal(lists, objects.FieldLists) {
 		t.Errorf("the categories have the lists %q, want %q", lists, objects.FieldLists)
 	}
@@ -77,8 +73,6 @@ func TestMetadataHasUniqueSortedRawcodesInEveryFieldList(t *testing.T) {
 			if !rawcode.MatchString(field.ID) {
 				t.Errorf("%s %q is not a rawcode", list, field.ID)
 			}
-			// Curse's "Chance to Miss" is the game's one field id of three letters. The files store it padded with a
-			// NUL byte, and so does the metadata, so that every id is four bytes.
 			if field.ID[len(field.ID)-1] == 0 {
 				padded = append(padded, field.ID)
 			}
@@ -108,8 +102,6 @@ func TestMetadataFriendlyNamesAreValidAndUniqueAmongTheFieldsAnObjectCanHave(t *
 			}
 		}
 	}
-	// One base of every category, the first by id; and of the abilities, whose fields depend on the base, every base
-	// too, with every base that some field is specific to.
 	for _, category := range manifest.Categories {
 		bases := slices.Sorted(maps.Keys(metadata.Bases[category]))
 		if len(bases) == 0 {
@@ -174,7 +166,6 @@ func TestMetadataStorageTypesDataColumnsAndApplicabilityAreConsistent(t *testing
 }
 
 func TestMetadataSkinFlagsMatchTheFilesWorldEditorSaved(t *testing.T) {
-	// World Editor wrote these fields of the names fixture to the war3mapSkin files, and uhpm to the main file.
 	for _, c := range []struct {
 		category manifest.Category
 		id       string
@@ -205,7 +196,7 @@ func TestMetadataBasesAreInTheirCategoryAndAbilitiesAndUpgradesHaveLevelCounts(t
 	for _, c := range []struct {
 		category manifest.Category
 		id, name string
-		levels   int // -1 for a category without levels
+		levels   int
 	}{
 		{"units", "hfoo", "Footman", -1}, {"heroes", "Hpal", "Paladin", -1}, {"buildings", "hbla", "Blacksmith", -1},
 		{"abilities", "AHhb", "Holy Light", 3}, {"upgrades", "Rhme", "Iron Forged Swords", 3},
@@ -234,7 +225,6 @@ func TestFieldsForAndFieldByNameGoByUseSpecificAndNotSpecific(t *testing.T) {
 			t.Errorf("%s %s has the field %s: %v", c.category, c.base, c.id, !c.want)
 		}
 	}
-	// A common field does not apply to the bases its notSpecific lists.
 	excluding := slices.IndexFunc(metadata.Fields["abilities"], func(f objects.FieldMeta) bool { return len(f.NotSpecific) > 0 })
 	if excluding < 0 {
 		t.Fatal("no ability field excludes a base")
@@ -279,7 +269,6 @@ func TestBaseOfFindsAStandardIDInAnyCategoryAndNearestBasesNamesTheClosestIDs(t 
 		want     []objects.NamedBase
 	}{
 		{"heroes", "Hpla", 1, []objects.NamedBase{{ID: "Hpal", Name: "Paladin"}}},
-		// Letter case is ignored.
 		{"units", "HFOO", 1, []objects.NamedBase{{ID: "hfoo", Name: "Footman"}}},
 		{"units", "hfoo", 0, []objects.NamedBase{}},
 	} {
@@ -290,8 +279,6 @@ func TestBaseOfFindsAStandardIDInAnyCategoryAndNearestBasesNamesTheClosestIDs(t 
 	if got := metadata.NearestBases("units", "hfoo", 3); len(got) != 3 || got[0].ID != "hfoo" {
 		t.Errorf("the nearest to hfoo = %+v", got)
 	}
-	// Among ids equally many edits away, the one that shares the longer start comes first, then the lower id; a
-	// category with fewer bases than asked for gives them all.
 	want := []objects.NamedBase{{ID: "Hpal", Name: "Paladin"}, {ID: "Hamg", Name: "Archmage"}, {ID: "Hmkg", Name: "Mountain King"}}
 	if got := mini.NearestBases("heroes", "Hpla", 5); !slices.Equal(got, want) {
 		t.Errorf("the nearest heroes to Hpla = %+v, want %+v", got, want)

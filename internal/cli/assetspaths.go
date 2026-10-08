@@ -13,27 +13,18 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
 
-// runAssetsPaths is `moonwell assets:paths [file]`: it lists the files a model references, and says of each
-// whether the game ships its path. In a project it also says whether a build imports a file at the path.
 func runAssetsPaths(ctx context.Context, e *env.Env, c call) error {
-	file := "" // no file: every model among the project's assets
+	file := ""
 	if len(c.arguments) > 0 {
 		file = c.arguments[0]
 	}
 	return assetsPaths(ctx, e, file, assets.LoadGamePaths())
 }
 
-// assetsPaths is assets:paths for a file, "" for none, with gamePaths as the keys of the paths the game ships.
-//
-// In a project, which is what manifest.IsProject takes for one, the command first works out what a build
-// imports, which syncs the libraries. It then reports on the model at file, read from the folder the command
-// runs in, or without a file on every model among the imported files; outside a project it needs a file. The
-// report is logged, and after it, and only then, a model among the imported files that could not be read fails
-// the command.
 func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[string]bool) error {
 	inProject := manifest.IsProject(e.Root)
 	var imported []assets.Asset
-	var targets map[string]bool // the in-map paths a build imports; nil outside a project, which has no build
+	var targets map[string]bool
 	if inProject {
 		found, err := importedByABuild(ctx, e)
 		if err != nil {
@@ -53,8 +44,6 @@ func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[str
 		e.Log.Warn("Moonwell's in-game path list is empty, so every path shows as custom.")
 	}
 	if file != "" {
-		// A file the line names is refused when it is no model, in the words of the model's reader; a model among
-		// the imported files is reported in its place, with the reason.
 		if _, err := model.Paths(models[0].Data, models[0].Heading); err != nil {
 			return err
 		}
@@ -66,10 +55,7 @@ func assetsPaths(ctx context.Context, e *env.Env, file string, gamePaths map[str
 	return refuseUnreadable(reports)
 }
 
-// importedByABuild is what a build of the project in e.Root imports: the map's own assets and the files the
-// libraries ship. It evaluates the manifest and syncs the libraries, and holds the build lock while it does.
 func importedByABuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
-	// Before the lock, as a build has it: a manifest that does not load makes no dist folder.
 	p, err := build.Load(ctx, e)
 	if err != nil {
 		return nil, err
@@ -83,9 +69,6 @@ func importedByABuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
 	return found, err
 }
 
-// modelsToReport is the models the command reports on: the one at file, read from root, or without a file every
-// model among the files a build imports, which may be none. Outside a project there are no such files, and the
-// command needs a file.
 func modelsToReport(root, file string, inProject bool, imported []assets.Asset) ([]assets.Model, error) {
 	switch {
 	case file != "":
@@ -100,8 +83,6 @@ func modelsToReport(root, file string, inProject bool, imported []assets.Asset) 
 	return assets.Models(imported), nil
 }
 
-// refuseUnreadable fails when the report has a model that could not be read, and names each. The report says why
-// each could not: it is logged in full before this failure.
 func refuseUnreadable(reports []assets.ModelReport) error {
 	var unreadable []string
 	for _, report := range reports {
@@ -115,9 +96,6 @@ func refuseUnreadable(reports []assets.ModelReport) error {
 	return errUnreadableModels(unreadable)
 }
 
-// ---- errors ----
-
-// errNeedsAModel has no file: the line names none.
 func errNeedsAModel() error {
 	return &diag.Error{
 		Msg:  "assets:paths needs a model file outside a Moonwell project.",
@@ -125,8 +103,6 @@ func errNeedsAModel() error {
 	}
 }
 
-// errUnreadableModels names the models by the headings the report gives them, in its hint. It has no file: the
-// models may be several, and a heading names a library's model by its library, which is no path.
 func errUnreadableModels(headings []string) error {
 	count := strconv.Itoa(len(headings)) + " models"
 	if len(headings) == 1 {

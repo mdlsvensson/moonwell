@@ -27,12 +27,10 @@ func TestApplyEditsSplicesEditsGivenInAnyOrder(t *testing.T) {
 		{"an insertion at the end", digits, []Edit{{10, 10, "!"}}, "0123456789!"},
 		{"an insertion at the start", digits, []Edit{{0, 0, "^"}}, "^0123456789"},
 		{"an insertion into an empty source", "", []Edit{{0, 0, "a"}, {0, 0, "b"}}, "ab"},
-		// An insertion where a replaced range starts goes before the replacement, whichever was given first.
 		{"an insertion at the start of a replaced range", digits, []Edit{{4, 6, "R"}, {4, 4, "i"}}, "0123iR6789"},
 		{"given before the replacement", digits, []Edit{{4, 4, "i"}, {4, 6, "R"}}, "0123iR6789"},
 		{"several of them around the replacement",
 			digits, []Edit{{4, 4, "a"}, {4, 6, "R"}, {4, 4, "b"}}, "0123abR6789"},
-		// And one where a replaced range ends goes after it.
 		{"an insertion at the end of a replaced range", digits, []Edit{{6, 6, "i"}, {4, 6, "R"}}, "0123Ri6789"},
 		{"given after the replacement", digits, []Edit{{4, 6, "R"}, {6, 6, "i"}}, "0123Ri6789"},
 		{"an insertion between two replacements that touch",
@@ -76,7 +74,6 @@ func TestApplyEditsRefusesEditsThatOverlapOrLieOutsideTheSource(t *testing.T) {
 			if err == nil || got != "" {
 				t.Fatalf("ApplyEdits = %q, %v, want it refused", got, err)
 			}
-			// A caller's bug is not a failure a user can act on.
 			var expected *diag.Error
 			if errors.As(err, &expected) {
 				t.Errorf("the refusal is a *diag.Error: %+v", expected)

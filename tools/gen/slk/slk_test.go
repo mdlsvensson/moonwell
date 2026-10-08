@@ -8,10 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-// The tables below are hand-written miniatures in the shape of the game's files; none is copied from them.
-
-// mini has a header row and three rows after it: a row with a cell in every column, a row that leaves columns
-// out, and a row that names its Y before its X. Its lines end with a carriage return and a line feed.
 var mini = strings.Join([]string{
 	"ID;PWXL;N;E",
 	"B;X4;Y4;D0",
@@ -31,8 +27,6 @@ var mini = strings.Join([]string{
 	`C;X1;Y5;K"after end"`,
 }, "\r\n")
 
-// otherRecords has records that are no cells, fields of a cell that are none of X, Y and K, and a cell in a
-// column the header row does not name.
 var otherRecords = strings.Join([]string{
 	"ID;P",
 	`C;X1;Y1;K"ID"`,
@@ -44,10 +38,8 @@ var otherRecords = strings.Join([]string{
 	"E",
 }, "\n")
 
-// doubledQuotes has a quoted value with two quotes in a row, which are one quote of the value.
 var doubledQuotes = strings.Join([]string{`C;X1;Y1;K"ID"`, `C;X1;Y2;K"say ""hi"";ok"`, "E"}, "\n")
 
-// rows is the rows of the table in text, each as its cells by column name.
 func rows(t *testing.T, text string) []map[string]string {
 	t.Helper()
 	table, err := slk.Parse(text, "mini.slk")
@@ -61,7 +53,6 @@ func rows(t *testing.T, text string) []map[string]string {
 	return cells
 }
 
-// cellsOf is the cells a row has, by column name.
 func cellsOf(table slk.Table, row slk.Row) map[string]string {
 	cells := map[string]string{}
 	for _, column := range table.Columns {
@@ -88,14 +79,12 @@ func TestParseReadsCellsByHeaderWithTheLastYCarriedForward(t *testing.T) {
 	if got := rows(t, mini); !reflect.DeepEqual(got, want) {
 		t.Fatalf("rows: %v", got)
 	}
-	// A row tells an absent cell from an empty one.
 	row := table.Rows[1]
 	if _, has := row.Get("field"); has || row.Value("field") != "" || row.Value("count") != "-1.5" {
 		t.Errorf("row: %v", cellsOf(table, row))
 	}
 }
 
-// tables are tables that are read, each with the rows it has after its header row.
 var tables = []struct {
 	name, text string
 	want       []map[string]string
@@ -127,8 +116,6 @@ func TestParseReadsTables(t *testing.T) {
 	}
 }
 
-// Zero is a coordinate like any other: a cell at X0 or at Y0 is a cell, and the column and the row of the number
-// 0 come first.
 func TestACellAtTheCoordinateZeroIsACell(t *testing.T) {
 	const text = "C;X1;Y0;Kb\nC;X0;Ka\nC;X0;Y1;K1\nC;X1;K2\n"
 	table, err := slk.Parse(text, "zero.slk")
@@ -140,11 +127,8 @@ func TestACellAtTheCoordinateZeroIsACell(t *testing.T) {
 	}
 }
 
-// numbered has a column and a row with the number 10 beside ones with the numbers 1 and 2, and gives the cells of
-// its second row with the last column first.
 const numbered = "C;X1;Y1;Ka\nC;X2;Kb\nC;X10;Kc\nC;X10;Y2;K1\nC;X2;K2\nC;X1;Y10;K3\n"
 
-// A coordinate is a number: the tenth column comes after the second, and so does the tenth row.
 func TestColumnsAndRowsAreInTheOrderOfTheirNumbers(t *testing.T) {
 	table, err := slk.Parse(numbered, "numbered.slk")
 	if err != nil {
@@ -158,11 +142,8 @@ func TestColumnsAndRowsAreInTheOrderOfTheirNumbers(t *testing.T) {
 	}
 }
 
-// besideTheHeader has a header row that names its second column alone, and a row with a cell in each of the two.
 const besideTheHeader = "C;X2;Y1;K\"ID\"\nC;X1;Y2;K\"no header\"\nC;X2;K\"abcd\"\n"
 
-// A cell in a column that the header row does not name is left out of its row: the row has no cell without a
-// name, and has the cell of the column that is named.
 func TestACellInAColumnTheHeaderRowDoesNotNameIsLeftOut(t *testing.T) {
 	for name, text := range map[string]string{
 		"a cell after the columns of the header row": otherRecords,
@@ -183,8 +164,6 @@ func TestACellInAColumnTheHeaderRowDoesNotNameIsLeftOut(t *testing.T) {
 	}
 }
 
-// emptyTables are texts without a cell: no text, no record, a cell after each form of the end, and a record
-// without a value.
 var emptyTables = []string{"", "ID;P\nE\n", "E\nC;X1;Y1;Ka\n", "E;x\nC;X1;Y1;Ka\n", "C;X1;Y1\n"}
 
 func TestATextWithoutACellIsAnEmptyTable(t *testing.T) {
@@ -196,7 +175,6 @@ func TestATextWithoutACellIsAnEmptyTable(t *testing.T) {
 	}
 }
 
-// malformed are the tables that are refused, each with the place and the distinguishing words of its error.
 var malformed = []struct{ text, file, place, words string }{
 	{"ID;P\nC;X1;K\"ID\"\n", "a.slk", "a.slk:2: ", "without an X or Y coordinate"},
 	{"ID;P\nC;X1;Y1;K\"ID\n", "b.slk", "b.slk:2: ", "unterminated quoted string"},
@@ -205,7 +183,6 @@ var malformed = []struct{ text, file, place, words string }{
 	{"C;X1;Y1;K\"ID\"\n\nC;X1;Y;K1\n", "e.slk", "e.slk:3: ", "bad Y coordinate ''"},
 	{"C;X1;Y1;K\"ID\"x\n", "f.slk", "f.slk:1: ", "expected ';' after a value"},
 	{"C;X1;Y99999999999999999999;K1\n", "g.slk", "g.slk:1: ", "bad Y coordinate"},
-	// A coordinate is digits and nothing else, and a cell needs an X as it needs a Y.
 	{"C;X+1;Y1;K1\n", "i.slk", "i.slk:1: ", "bad X coordinate '+1'"},
 	{"C;X1;Y-1;K1\n", "j.slk", "j.slk:1: ", "bad Y coordinate '-1'"},
 	{"C;Y1;K1\n", "k.slk", "k.slk:1: ", "without an X or Y coordinate"},
@@ -223,8 +200,6 @@ func TestParseNamesTheFileAndLineOfAMalformedRecord(t *testing.T) {
 	}
 }
 
-// emptyFields are tables with a record that has a field with nothing in it, each with the place of its error:
-// the field is the first of the record, it stands between two others, and it follows a quoted and a bare value.
 var emptyFields = []struct{ text, place string }{
 	{"C;;X1;Y1;K1\n", "h.slk:1: "},
 	{"C;X1;Y1;Ka\nC;X1;;Y2;K1\n", "h.slk:2: "},
@@ -232,15 +207,11 @@ var emptyFields = []struct{ text, place string }{
 	{"C;X1;Y1;Ka;;b\n", "h.slk:1: "},
 }
 
-// Tables with two semicolons in a row that are no empty field: the two stand inside a quoted value, or after the
-// end of the table.
 const (
 	semicolonsInAValue    = "C;X1;Y1;Ka\nC;X1;Y2;K\"b;;c\"\n"
 	semicolonsAfterTheEnd = "C;X1;Y1;Ka\nE\nC;;X1;Y2;K1\n"
 )
 
-// A field holds at least the letter that says what it is. A record with two semicolons in a row outside a quoted
-// value has a field that holds nothing, and is refused with its line.
 func TestParseRefusesARecordWithAnEmptyField(t *testing.T) {
 	for _, c := range emptyFields {
 		_, err := slk.Parse(c.text, "h.slk")
@@ -254,14 +225,11 @@ func TestParseRefusesARecordWithAnEmptyField(t *testing.T) {
 	if got := rows(t, semicolonsAfterTheEnd); got != nil {
 		t.Errorf("two semicolons after the end of the table: rows %v", got)
 	}
-	// A fault that comes before the empty field in its record is the one that is reported.
 	if _, err := slk.Parse("C;Xa;;Y1;K1\n", "h.slk"); err == nil || !strings.Contains(err.Error(), "bad X coordinate") {
 		t.Errorf("a bad coordinate before an empty field: got %v", err)
 	}
 }
 
-// widerSpace are tables with a character that is white space outside ASCII. A table has no white space of its
-// own: such a character is part of the value it stands in, and a line that starts with one is no cell.
 var widerSpace = []struct {
 	name, text string
 	columns    []string

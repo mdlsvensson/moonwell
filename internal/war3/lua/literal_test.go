@@ -5,13 +5,11 @@ import (
 	"testing"
 )
 
-// argument returns the tokens of the one argument of a call statement.
 func argument(t *testing.T, source string) []Token {
 	t.Helper()
 	return mustFunctions(t, "function test() Capture("+source+") end")[0].Calls[0].Args[0]
 }
 
-// literalNumbers are arguments and the number each is; the ones without a number are not one literal number.
 var literalNumbers = []struct {
 	source string
 	value  float64
@@ -19,10 +17,8 @@ var literalNumbers = []struct {
 }{
 	{"0", 0, true},
 	{"0xF", 15, true},
-	// Every letter of a hexadecimal digit is taken, in either case.
 	{"0xABCDEF", 0xABCDEF, true},
 	{"0xabcdef", 0xABCDEF, true},
-	// The x of a hexadecimal integer and the e of an exponent are taken in either case.
 	{"0X10", 16, true},
 	{"-0X10", -16, true},
 	{"1E5", 100000, true},
@@ -32,7 +28,6 @@ var literalNumbers = []struct {
 	{"-.5", -.5, true},
 	{"1.", 1, true},
 	{"2e-3", .002, true},
-	// A hexadecimal integer of any length is read, rounded as a float.
 	{"0xFFFFFFFFFFFFFFFFFF", 4722366482869645213696, true},
 	{"0x1.fp2", 0, false},
 	{"1e999", 0, false},
@@ -41,7 +36,6 @@ var literalNumbers = []struct {
 	{`"1"`, 0, false},
 }
 
-// playerIDs are arguments and the player each names; the ones without are not `Player(n)` with a whole number.
 var playerIDs = []struct {
 	source string
 	value  int
@@ -50,11 +44,9 @@ var playerIDs = []struct {
 	{"Player(0)", 0, true},
 	{"Player(-1)", -1, true},
 	{"Player(0x17)", 23, true},
-	// A whole number past 32 bits is the number it is.
 	{"Player(4294967296)", 4294967296, true},
 	{"Player(-2147483649)", -2147483649, true},
 	{"Player(0x7fffffffffff)", 0x7fffffffffff, true},
-	// A whole number that no int holds names no player: what it would become differs between processors.
 	{"Player(1e30)", 0, false},
 	{"Player(-1e30)", 0, false},
 	{"Player(9223372036854775808)", 0, false},
@@ -73,13 +65,11 @@ func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 			t.Errorf("LiteralNumber(%s) = %v, %v, want %v, %v", c.source, value, ok, c.value, c.ok)
 		}
 	}
-	// A numeral that is no number gives a plain zero beside its false, also behind a minus sign.
 	for _, source := range []string{"-1e999", "-0x1.fp2"} {
 		if value, ok := LiteralNumber(argument(t, source)); ok || value != 0 || math.Signbit(value) {
 			t.Errorf("LiteralNumber(%s) = %v, %v, want 0 and false", source, value, ok)
 		}
 	}
-	// Unary plus is not Lua syntax, so the helper gets the tokens as they would be.
 	plusOne := []Token{
 		{Kind: SymbolToken, Raw: "+", Start: 0, End: 1},
 		{Kind: NumberToken, Raw: "1", Start: 1, End: 2},
@@ -94,8 +84,6 @@ func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 	}
 }
 
-// The tokenizer gives a malformed numeral as a number token beside its fault. Such a token is no number: a
-// setting whose value is one is not read as zero.
 func TestAMalformedNumeralIsNoLiteralNumber(t *testing.T) {
 	for _, source := range []string{"0x", "0X", "3a", "1x5", "1e", "1E", "1e+", "1e-", "1.2.3", ".5e"} {
 		tokens, fault := Tokenize(source)
@@ -126,7 +114,6 @@ func TestPlayerIDTakesOnlyTheWholeCallOfPlayer(t *testing.T) {
 func TestQuoteEscapesQuotesBackslashesAndControlCharacters(t *testing.T) {
 	for _, c := range []struct{ value, want string }{
 		{`a"b\c`, `"a\"b\\c"`},
-		// A space is the first character that is written as it is, and the tilde the last of ASCII.
 		{" ", `" "`},
 		{"\x1F !~\x7F", `"\031 !~\127"`},
 		{"\n1\t2\x7F3", `"\0101\0092\1273"`},
@@ -166,7 +153,6 @@ func TestNumberWritesPlainDecimalWithTheFewestDigits(t *testing.T) {
 		{float64(float32(0.1)), "0.10000000149011612"},
 		{0, "0"},
 		{255.0 / 255, "1"},
-		// A zero has one spelling; a number below 0 keeps its sign, however small.
 		{math.Copysign(0, -1), "0"},
 		{-1e-7, "-0.0000001"},
 		{-float64(math.SmallestNonzeroFloat32), "-0.000000000000000000000000000000000000000000001401298464324817"},

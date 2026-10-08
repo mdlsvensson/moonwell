@@ -13,40 +13,16 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The projects of the recorded builds (recorded_test.go). Each is the template with files of its own written
-// into it: the seeds, which a build takes, and the faults, which a build refuses.
-
-// seedProject is a project of the recorded builds: its name, and what is written into a new project to make it.
 type seedProject struct {
 	name string
 	lay  func(t *testing.T, root string)
 }
 
-// The stage and the archive of every project here are the template's, from the project folder.
 const (
 	seedStage   = "dist/stage/map.w3x"
 	seedArchive = "dist/bin/map.w3x"
 )
 
-// seeds are the projects that are built, built with minifying on, and checked:
-//
-//   - the template as init leaves it;
-//   - every setting set, but the preview, on the map info and the script of the fixture map-settings-v39, with a
-//     text file of the game's interface in the map to merge into;
-//   - an object of every category of the manifest, on the fourteen object files and the strings of the fixture
-//     objects-v3-names;
-//   - assets and a local library that ships assets, on the index of the fixture imports-we3, with an ownership
-//     state: an asset that keeps its path, one with a path from the manifest, one the manifest leaves out, one
-//     in the place of an owned file of the map, an owned file whose asset is gone, and one in the place of a
-//     file of the library;
-//   - a preview picture as a TGA of 512 pixels, as a BLP and as a PNG, a seed each;
-//   - Lua modules of the project, sources beside the entry, a local library with modules of both languages, an
-//     unknown global that is a warning, a global and a function that the map's script alone defines, and a lock
-//     with an entry of that library and one of a library that the manifest has not;
-//   - an ids module that is not the objects', which a build writes anew and a check refuses;
-//   - a map info of an older format, 28, whose archive stands behind a header of 512 bytes;
-//   - everything in one project, so that each step plans on what the steps before it changed: the objects, the
-//     settings with a preview, assets, a library that ships modules and files, and Lua modules.
 var seeds = []seedProject{
 	{"template", func(*testing.T, string) {}},
 	{"settings", laySettings},
@@ -63,13 +39,6 @@ var seeds = []seedProject{
 	{"everything", layEverything},
 }
 
-// faults are the projects that a build refuses, each with one fault but for the one that has two. The first
-// eleven are the faults a build meets step by step; the next eighteen are the other refusals a user can get, one
-// of each kind; the last four are the two faults at once, two map files that are too short to read, and a state
-// that is none.
-//
-// A build plans everything before it touches dist/stage: a build that is refused before it packs leaves no
-// stage, whichever step refuses it.
 var faults = []seedProject{
 	{name: "invalid-object", lay: func(t *testing.T, root string) {
 		put(t, root, "objects/units.pkl",
@@ -84,7 +53,6 @@ var faults = []seedProject{
 	{name: "missing-module", lay: func(t *testing.T, root string) {
 		appendTo(t, root, "src/main.yue", "\nimport \"missing.module\"\n")
 	}},
-	// The refusal names the file of the map, from the project folder.
 	{name: "asset-at-a-file-of-the-map", lay: func(t *testing.T, root string) {
 		put(t, root, "maps/map.w3x/Textures/Mine.blp", "a file World Editor imported")
 		put(t, root, "assets/Textures/Mine.blp", "an asset at the same path")
@@ -98,19 +66,15 @@ var faults = []seedProject{
 	{name: "no-source-map", lay: func(t *testing.T, root string) {
 		removeFrom(t, root, "maps/map.w3x")
 	}},
-	// A source map that is missing or refused is reported before a compile error: the map is opened first, also
-	// in a project without objects.
 	{name: "no-source-map-and-no-objects", lay: func(t *testing.T, root string) {
 		removeFrom(t, root, "maps/map.w3x")
 		removeFrom(t, root, "objects")
 		removeFrom(t, root, "src/generated")
 		put(t, root, "src/main.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"There is no map.\"\n")
 	}},
-	// The planned map is packed, not the stage: the refusal names the source map, from the project folder.
 	{name: "no-map-info", lay: func(t *testing.T, root string) {
 		removeFrom(t, root, "maps/map.w3x/war3map.w3i")
 	}},
-	// The lock's error names dist/.lock.
 	{name: "lock-left-behind", lay: func(t *testing.T, root string) {
 		put(t, root, "dist/.lock", "4242")
 	}},
@@ -130,8 +94,6 @@ var faults = []seedProject{
 		}
 		amendLocal(t, root, `libraries { ["one"] { path = "libs/one" } ["two"] { path = "libs/two" } }`)
 	}},
-	// A typed gameplay value that disagrees with a raw one is refused by the commands that plan the settings
-	// (build, test, check, dev), not by every command that loads the manifest.
 	{name: "typed-against-raw-constant", lay: func(t *testing.T, root string) {
 		amendLocal(t, root,
 			`settings { gameplay { foodLimit = 200 } gameplayConstants { ["Misc"] { ["FoodCeiling"] = "1" } } }`)
@@ -191,13 +153,10 @@ var faults = []seedProject{
 		removeFrom(t, root, "moonwell.local.pkl")
 	}},
 
-	// Two faults, of two steps: the one that is refused is the one whose step comes first.
 	{name: "refused-setting-and-mapped-asset-missing", lay: func(t *testing.T, root string) {
 		amendLocal(t, root, `settings { players { ["5"] { name = "Absent" } } }
 assets { paths { ["missing.blp"] = "x.blp" } }`)
 	}},
-	// A file of the map that is too short to read (war3map.w3i when the map is packed, war3map.imp when assets are
-	// imported) is named from the project folder, with a hint: this fault and the next.
 	{name: "map-info-too-short", lay: func(t *testing.T, root string) {
 		put(t, root, "maps/map.w3x/war3map.w3i", "ab")
 	}},
@@ -210,7 +169,6 @@ assets { paths { ["missing.blp"] = "x.blp" } }`)
 	}},
 }
 
-// everySetting is a settings block that sets every setting but the preview picture.
 const everySetting = `settings {
   info {
     name = "Seed settings"
@@ -248,15 +206,12 @@ const everySetting = `settings {
   }
 }`
 
-// laySettings writes the map info and the script World Editor saved, a text file of the game's interface for the
-// settings to merge into, and every setting.
 func laySettings(t *testing.T, root string) {
 	settingsMap(t, root)
 	put(t, root, "maps/map.w3x/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
 	amendLocal(t, root, everySetting)
 }
 
-// settingsMap puts the map info and the script of the settings fixture into the project's map.
 func settingsMap(t *testing.T, root string) {
 	t.Helper()
 	for _, name := range []string{"war3map.w3i", "war3map.lua"} {
@@ -264,7 +219,6 @@ func settingsMap(t *testing.T, root string) {
 	}
 }
 
-// everyCategory is an object file with an object of every category, none with an id the objects fixture has.
 const everyCategory = `amends "@moonwell/ObjectFile.pkl"
 
 heroes {
@@ -303,7 +257,6 @@ upgrades {
 }
 `
 
-// everyCategoryIDs is the ids module of everyCategory: a check wants the module current, and writes none.
 const everyCategoryIDs = `-- GENERATED by Moonwell from objects/**.pkl; do not edit.
 export heroes = {
   paladin: 1211117617 -- H001
@@ -328,8 +281,6 @@ export upgrades = {
 }
 `
 
-// layObjects writes the object files World Editor saved with one object on each of its tabs, and their strings,
-// and an object of every category of the manifest with its ids module.
 func layObjects(t *testing.T, root string) {
 	for _, kind := range []string{"w3a", "w3b", "w3d", "w3h", "w3q", "w3t", "w3u"} {
 		for _, file := range []string{"war3map." + kind, "war3mapSkin." + kind} {
@@ -341,14 +292,6 @@ func layObjects(t *testing.T, root string) {
 	put(t, root, "src/generated/objects.yue", everyCategoryIDs)
 }
 
-// layAssets writes a map as World Editor 3 saved it after assets:sync had imported two files, and the project's
-// assets as they are now.
-//
-// The map holds the index World Editor wrote, with its flag 29, the picture the index names and a file it does
-// not name; the ownership state says that both are Moonwell's. Of the assets, one is that picture with other
-// bytes, one keeps its path, one has a path from the manifest, one is left out by the manifest, and one has the
-// path of a file that the library ships. The other owned file has no asset. The library is a local one in the
-// project's folder, with a module the entry requires and two files for the map.
 func layAssets(t *testing.T, root string) {
 	const inMap = "maps/map.w3x/"
 	const synced, gone = "the picture as it was synced", "a file whose asset is gone"
@@ -377,12 +320,8 @@ libraries { ["golems"] { path = "libs/golems" } }`)
 	appendTo(t, root, "src/main.yue", "\nimport \"golems.names\"\nprint names.first\n")
 }
 
-// packedTGA is a preview picture of 512 pixels a side, as a TGA with its rows from the top and its runs packed:
-// a build writes it again, plain and from the bottom.
 var packedTGA = testkit.TGA(testkit.NewPixels(512), testkit.TGAOptions{RLE: true, FromTop: true})
 
-// layPreview is a seed with a preview picture: a file of the project that the settings name, on the map World
-// Editor saved for the settings fixture.
 func layPreview(name string, picture []byte) func(t *testing.T, root string) {
 	return func(t *testing.T, root string) {
 		settingsMap(t, root)
@@ -391,12 +330,6 @@ func layPreview(name string, picture []byte) func(t *testing.T, root string) {
 	}
 }
 
-// layModules writes Lua modules of the project, one in a folder of its name, one that defines globals and one
-// that nothing requires, two more sources, and a local library in the project's folder with modules of both
-// languages, one of which has stale Lua beside it. The entry requires all of them but the one, and uses a
-// global the manifest allows and one that nothing defines, which the manifest makes a warning. The lock holds,
-// out of order and on one line, an entry of the library, which a local library keeps, and one of a library the
-// manifest has not.
 func layModules(t *testing.T, root string) {
 	put(t, root, "lua/tools/init.lua", greeterWith("greet"))
 	put(t, root, "lua/counter.lua", "Count = 0\nfunction CountUp()\n Count = Count + 1\nend\n")
@@ -417,16 +350,8 @@ lint { unknownGlobals = "warning"; globals = List("MyLibrary") }`)
 	put(t, root, "moonwell.lock", `{"libraries": {`+lockEntry("gone", "b")+`, `+lockEntry("ex", "a")+"}}\n")
 }
 
-// usesTheMapsScript is gameplay that names a global and calls a function of the script World Editor saved for
-// the template's map and for the settings fixture: both are known to a build by what the script defines alone.
 const usesTheMapsScript = "print gg_trg_Initialization\nInitCustomTriggers!\n"
 
-// layEverything writes one project with all that the other seeds have a project each for, so that each step of
-// a build plans on what the steps before it changed: the object files World Editor saved and an object of every
-// category; every setting and a preview picture, on the map info and the script of the settings fixture, with a
-// text file to merge into; assets, one at a path from the manifest; a local library that ships a module of each
-// language and files for the map, one of which an asset of the map replaces; and Lua modules of the project.
-// The entry requires the modules and names what the map's script defines.
 func layEverything(t *testing.T, root string) {
 	layObjects(t, root)
 	settingsMap(t, root)
@@ -456,37 +381,30 @@ libraries { ["golems"] { path = "libs/golems" } }`)
 		"print tools.greet(loud.first!), Count, objects.heroes.paladin\n"+usesTheMapsScript)
 }
 
-// greeterWith is a Lua module that returns a table with one function of this name, which greets.
 func greeterWith(function string) string {
 	return "local M = {}\nfunction M." + function + "(name)\n return \"Hello, \" .. name\nend\nreturn M\n"
 }
 
-// lockEntry is the entry of a library in a lock, on one line: the library is owner/<key>, and its commit is one
-// letter forty times.
 func lockEntry(key, letter string) string {
 	return `"` + key + `": {"github": "owner/` + key + `", "tag": "v1.0.0", "dir": "src", "commit": "` +
 		strings.Repeat(letter, 40) + `", "files": "` + hashOf(key) + `"}`
 }
 
-// hashOf is the SHA-256 of a text in hexadecimal, as an ownership state and a lock write one.
 func hashOf(text string) string {
 	sum := sha256.Sum256([]byte(text))
 	return hex.EncodeToString(sum[:])
 }
 
-// put writes a file of a project as text, with its folders.
 func put(t *testing.T, root, name, text string) {
 	t.Helper()
 	testkit.WriteFile(t, root, name, []byte(text))
 }
 
-// amendLocal makes the project's local manifest one that amends the shared one by body.
 func amendLocal(t *testing.T, root, body string) {
 	t.Helper()
 	put(t, root, "moonwell.local.pkl", "amends \"moonwell.pkl\"\n\n"+body+"\n")
 }
 
-// appendTo adds text to the end of a file of a project, which must be there.
 func appendTo(t *testing.T, root, name, more string) {
 	t.Helper()
 	file := filepath.Join(root, filepath.FromSlash(name))
@@ -499,7 +417,6 @@ func appendTo(t *testing.T, root, name, more string) {
 	}
 }
 
-// removeFrom removes a file or a folder of a project, which must be there.
 func removeFrom(t *testing.T, root, name string) {
 	t.Helper()
 	at := filepath.Join(root, filepath.FromSlash(name))

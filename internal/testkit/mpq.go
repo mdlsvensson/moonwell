@@ -12,12 +12,9 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/mpq"
 )
 
-// MPQ is an opened MPQ format-1 archive: enough of a reader to verify what Moonwell writes.
 type MPQ struct {
-	// HeaderOffset is where the archive starts: 512 after an HM3W header, else 0.
 	HeaderOffset int
-	// Blocks is the number of files, the (listfile) included.
-	Blocks int
+	Blocks       int
 
 	data       []byte
 	sectorSize int
@@ -26,7 +23,6 @@ type MPQ struct {
 	blocks     []uint32
 }
 
-// OpenMPQ finds the archive in data and decrypts its tables.
 func OpenMPQ(data []byte) (*MPQ, error) {
 	le := binary.LittleEndian
 	base := -1
@@ -76,7 +72,6 @@ func (m *MPQ) find(name string) (int, bool) {
 	return 0, false
 }
 
-// Read returns the content of the file name; false when the archive has no such file.
 func (m *MPQ) Read(name string) ([]byte, bool, error) {
 	index, ok := m.find(name)
 	if !ok {
@@ -117,7 +112,6 @@ func (m *MPQ) Read(name string) ([]byte, bool, error) {
 	return out, true, nil
 }
 
-// Listfile returns the names in the archive's (listfile), in order.
 func (m *MPQ) Listfile() ([]string, error) {
 	data, ok, err := m.Read("(listfile)")
 	if err != nil || !ok {

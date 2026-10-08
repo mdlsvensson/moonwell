@@ -10,8 +10,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// EvalJSON is what objects:eval prints: every category in order, each object by its key with its id, base,
-// source and fields. The objects of a category come in the order given, and the text ends without a line break.
 func EvalJSON(resolved []Resolved) []byte {
 	var p printer
 	p.open('{')
@@ -30,7 +28,6 @@ func EvalJSON(resolved []Resolved) []byte {
 	return p.out.Bytes()
 }
 
-// object prints an object with its fields in their order.
 func (p *printer) object(object Resolved) {
 	p.open('{')
 	p.text("id", object.ID)
@@ -46,12 +43,10 @@ func (p *printer) object(object Resolved) {
 	p.close('}')
 }
 
-// typeNames is how a value's type is printed: as the metadata names the way a file stores a value.
 var typeNames = map[objmod.ValueType]string{
 	objmod.Int: "int", objmod.Real: "real", objmod.Unreal: "unreal", objmod.String: "string",
 }
 
-// field prints a field: where it is written, how its value is stored, and the value.
 func (p *printer) field(field Field) {
 	p.open('{')
 	p.text("rawcode", field.ID)
@@ -68,25 +63,18 @@ func (p *printer) field(field Field) {
 	p.close('}')
 }
 
-// ---- the JSON text ----
-
-// printer writes JSON text with two spaces of indentation: every member of an object or a list on a line of its
-// own, and an object or a list without members as {} or [].
 type printer struct {
 	out   bytes.Buffer
-	depth int  // how many objects and lists are open
-	bare  bool // the innermost open object or list has no member yet
+	depth int
+	bare  bool
 }
 
-// open starts an object or a list with its bracket.
 func (p *printer) open(bracket byte) {
 	p.out.WriteByte(bracket)
 	p.depth++
 	p.bare = true
 }
 
-// close ends the innermost object or list with its bracket, on a line of its own when it has members. What it
-// ends is a member of the one around it, which so has one.
 func (p *printer) close(bracket byte) {
 	p.depth--
 	if !p.bare {
@@ -96,13 +84,11 @@ func (p *printer) close(bracket byte) {
 	p.bare = false
 }
 
-// line starts a line at the depth of what is open.
 func (p *printer) line() {
 	p.out.WriteByte('\n')
 	p.out.WriteString(strings.Repeat("  ", p.depth))
 }
 
-// member starts the next member of the innermost object or list on a line of its own.
 func (p *printer) member() {
 	if !p.bare {
 		p.out.WriteByte(',')
@@ -111,15 +97,12 @@ func (p *printer) member() {
 	p.line()
 }
 
-// key starts a member of an object: its name, for the value that is written next.
 func (p *printer) key(name string) {
 	p.member()
 	p.out.WriteString(fsx.Quoted(name))
 	p.out.WriteString(": ")
 }
 
-// text writes a member that is a text, as fsx.Quoted writes one. Only the quote, the backslash and the control
-// characters are escaped: markup characters and characters outside ASCII are written as they are.
 func (p *printer) text(key, value string) {
 	p.key(key)
 	p.out.WriteString(fsx.Quoted(value))
@@ -134,16 +117,14 @@ func (p *printer) truth(key string, value bool) {
 	}
 }
 
-// number writes a member that is a number, as encoding/json writes a float64. What is printed has one zero: the
-// zero below 0, which a real can be, is written 0.
 func (p *printer) number(key string, value float64) {
 	p.key(key)
 	if value == 0 {
-		value = 0 // the zero below 0 equals 0, and this makes it the one that is written 0
+		value = 0
 	}
 	written, err := json.Marshal(value)
 	if err != nil {
-		written = []byte("null") // JSON has no number that is not finite
+		written = []byte("null")
 	}
 	p.out.Write(written)
 }

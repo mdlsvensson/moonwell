@@ -15,22 +15,14 @@ import (
 )
 
 const (
-	// nativesPath is the game's script API, which the program carries, by its path from the checkout.
 	nativesPath = "data/natives.json"
 
-	// The game's two scripts, by their names in the scripts' folder of an export. An entry of the natives records
-	// the script it is from by this name.
 	commonScript   = "common.j"
 	blizzardScript = "blizzard.j"
 
-	// luaSource is what an entry records as its script when only the game's Lua has it.
 	luaSource = "lua"
 )
 
-// writeNatives is the mode natives: it writes data/natives.json from the two scripts of an export of the game's
-// files and from the Lua extras of the checkout, and prints how many types, functions and globals it wrote. It
-// reads common.j, then blizzard.j, then the extras, and writes nothing unless all three are sound and no name is
-// declared twice.
 func writeNatives(checkout string, args []string, out io.Writer) error {
 	folder, version := args[0], args[1]
 	common, err := readScript(folder, commonScript)
@@ -57,9 +49,6 @@ func writeNatives(checkout string, args []string, out io.Writer) error {
 	return nil
 }
 
-// readScript reads one of the game's two scripts from the export in folder, and parses it. The script is found
-// as every file of an export is (export.find): without regard to letter case. Every entry records name as the
-// script it is from: the script's name in lower case, whatever the letter case of the file.
 func readScript(folder, name string) (jass.File, error) {
 	text, err := export{folder}.text(scriptsFolder + "/" + name)
 	if err != nil {
@@ -68,10 +57,6 @@ func readScript(folder, name string) (jass.File, error) {
 	return jass.Parse(text, name)
 }
 
-// ---- the natives ----
-
-// buildNatives merges what common.j and blizzard.j declare with the Lua extras, everything sorted by name. A
-// name declared twice is refused, with both places.
 func buildNatives(version string, common, blizzard jass.File, extras extras) (*script.Natives, error) {
 	natives := &script.Natives{
 		GameVersion: version,
@@ -94,7 +79,6 @@ func buildNatives(version string, common, blizzard jass.File, extras extras) (*s
 	return natives, nil
 }
 
-// typesOf is the types that a script declares.
 func typesOf(file jass.File) []script.NativeType {
 	types := make([]script.NativeType, len(file.Types))
 	for i, declared := range file.Types {
@@ -103,7 +87,6 @@ func typesOf(file jass.File) []script.NativeType {
 	return types
 }
 
-// functionsOf is the natives and the functions that a script declares.
 func functionsOf(file jass.File) []script.NativeFunction {
 	functions := make([]script.NativeFunction, len(file.Functions))
 	for i, declared := range file.Functions {
@@ -119,7 +102,6 @@ func functionsOf(file jass.File) []script.NativeFunction {
 	return functions
 }
 
-// globalsOf is the globals that a script declares.
 func globalsOf(file jass.File) []script.NativeGlobal {
 	globals := make([]script.NativeGlobal, len(file.Globals))
 	for i, declared := range file.Globals {
@@ -131,7 +113,6 @@ func globalsOf(file jass.File) []script.NativeGlobal {
 	return globals
 }
 
-// luaFunctions is the functions of the extras: each is of Lua, and no constant.
 func luaFunctions(lua extras) []script.NativeFunction {
 	functions := make([]script.NativeFunction, len(lua.Functions))
 	for i, extra := range lua.Functions {
@@ -143,12 +124,8 @@ func luaFunctions(lua extras) []script.NativeFunction {
 	return functions
 }
 
-// declaration is a name with the place that declares it, as the refusal of a name declared twice says the place.
 type declaration struct{ name, where string }
 
-// declarations is every name of natives that are merged and not yet sorted, each with its place, in the order
-// that a name declared twice is looked for in: the functions of common.j, of blizzard.j and of Lua, the globals
-// of the two scripts, the types, then the globals that Lua provides and those it removes.
 func declarations(natives *script.Natives) []declaration {
 	var declared []declaration
 	for _, function := range natives.Functions {
@@ -169,7 +146,6 @@ func declarations(natives *script.Natives) []declaration {
 	return declared
 }
 
-// declaredOnce refuses the first name that an earlier declaration has too, with the places of the two.
 func declaredOnce(declared []declaration) error {
 	places := map[string]string{}
 	for _, d := range declared {
@@ -181,7 +157,6 @@ func declaredOnce(declared []declaration) error {
 	return nil
 }
 
-// sortByName sorts every list of the natives by name, in the order of the names' bytes.
 func sortByName(natives *script.Natives) {
 	slices.SortFunc(natives.Types, func(a, b script.NativeType) int { return strings.Compare(a.Name, b.Name) })
 	slices.SortFunc(natives.Functions, func(a, b script.NativeFunction) int { return strings.Compare(a.Name, b.Name) })
@@ -190,16 +165,6 @@ func sortByName(natives *script.Natives) {
 	slices.Sort(natives.Lua.Removed)
 }
 
-// ---- the text of the file ----
-
-// renderNatives is the text of data/natives.json: one JSON object, a key or an entry of a list on a line, two
-// spaces deeper for each object and list it is in, and a line break at the end. A list that holds nothing is
-// written []. A text is written as fsx.Quoted writes it.
-//
-// The order of the keys is the file's format. A function of Lua is written name, params, returns, source,
-// constant, and each of its parameters name, type, which is how tools/natives/lua-extras.json lists a function.
-// Every other function is written name, source, constant, params, returns, and each of its parameters type,
-// name, which is how a script declares one.
 func renderNatives(natives *script.Natives) string {
 	return jsonObject(
 		member{"gameVersion", fsx.Quoted(natives.GameVersion)},
@@ -217,7 +182,6 @@ func renderType(declared script.NativeType) string {
 	return jsonObject(member{"name", fsx.Quoted(declared.Name)}, member{"extends", fsx.Quoted(declared.Extends)})
 }
 
-// renderFunction writes a function in the order of keys that its source has in the file.
 func renderFunction(function script.NativeFunction) string {
 	name := member{"name", fsx.Quoted(function.Name)}
 	source := member{"source", fsx.Quoted(function.Source)}
@@ -229,7 +193,6 @@ func renderFunction(function script.NativeFunction) string {
 	return jsonObject(name, source, constant, member{"params", jsonList(function.Params, typeThenName)}, returns)
 }
 
-// nameThenType writes a parameter of a function of Lua, and typeThenName a parameter of every other function.
 func nameThenType(param script.NativeParam) string {
 	return jsonObject(member{"name", fsx.Quoted(param.Name)}, member{"type", fsx.Quoted(param.Type)})
 }
@@ -248,10 +211,8 @@ func renderGlobal(global script.NativeGlobal) string {
 	)
 }
 
-// member is a key of a JSON object with its value, which is JSON text already.
 type member struct{ key, value string }
 
-// jsonObject writes the members as a JSON object, in the order given.
 func jsonObject(members ...member) string {
 	entries := make([]string, len(members))
 	for i, m := range members {
@@ -260,7 +221,6 @@ func jsonObject(members ...member) string {
 	return jsonBlock("{", entries, "}")
 }
 
-// jsonList writes a list as a JSON list, each item as render writes it.
 func jsonList[T any](items []T, render func(T) string) string {
 	entries := make([]string, len(items))
 	for i, item := range items {
@@ -269,19 +229,12 @@ func jsonList[T any](items []T, render func(T) string) string {
 	return jsonBlock("[", entries, "]")
 }
 
-// jsonBlock writes the entries of an object or of a list between its two brackets: each on a line of its own, two
-// spaces in, with a comma after every entry but the last. Without an entry it is the two brackets alone.
-//
-// An entry that is itself a block comes with its own lines, and all of them move two spaces in. No line break of
-// an entry is inside a text: fsx.Quoted writes a line break of a text as an escape.
 func jsonBlock(opening string, entries []string, closing string) string {
 	if len(entries) == 0 {
 		return opening + closing
 	}
 	return opening + "\n  " + strings.ReplaceAll(strings.Join(entries, ",\n"), "\n", "\n  ") + "\n" + closing
 }
-
-// ---- errors ----
 
 func errDeclaredTwice(name, first, second string) error {
 	return errors.New(name + " is declared twice (" + first + " and " + second + ").")

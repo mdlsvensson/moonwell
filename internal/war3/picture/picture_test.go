@@ -14,10 +14,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/picture"
 )
 
-// tgaHeaderSize is the size of a TGA's header, after which a written picture's pixels start.
 const tgaHeaderSize = 18
 
-// refusal is a file Read must refuse, with the words its error must say.
 type refusal struct {
 	name  string
 	data  []byte
@@ -25,8 +23,6 @@ type refusal struct {
 	words string
 }
 
-// check reads the refusal's file and fails the test unless Read refuses it with an error that names the file,
-// says the words and gives a hint. It returns the error, or nil when there was none to return.
 func (r refusal) check(t *testing.T) *diag.Error {
 	t.Helper()
 	result, err := picture.Read(r.data, r.file)
@@ -44,22 +40,18 @@ func (r refusal) check(t *testing.T) *diag.Error {
 	return failure
 }
 
-// opaque is the alpha of a pixel that hides what is behind it.
 func opaque() *byte {
 	alpha := byte(255)
 	return &alpha
 }
 
-// plainTGA is the test picture of 256 pixels a side as a plain 32-bit TGA with rows from the bottom.
 func plainTGA() []byte { return testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{}) }
 
-// edited is data after change has altered it.
 func edited(data []byte, change func([]byte)) []byte {
 	change(data)
 	return data
 }
 
-// putU32 writes value at offset, little-endian.
 func putU32(offset int, value uint32) func([]byte) {
 	return func(b []byte) { binary.LittleEndian.PutUint32(b[offset:], value) }
 }
@@ -67,7 +59,6 @@ func putU32(offset int, value uint32) func([]byte) {
 func TestEveryAcceptedTGAIsWrittenAsTheOneLayoutTheGameWasSeenToAccept(t *testing.T) {
 	for _, size := range []int{256, 512} {
 		source := testkit.NewPixels(size)
-		// Plain, 32 bits, rows from the bottom, opaque: the layout of the one TGA the game was seen to show.
 		expected := testkit.TGA(source, testkit.TGAOptions{Alpha: opaque()})
 		if expected[2] != 2 || expected[16] != 32 || expected[17] != 8 {
 			t.Fatalf("the expected TGA has header % X", expected[:tgaHeaderSize])
@@ -97,11 +88,9 @@ func TestAWrittenTGAStartsWithThePicturesBottomRowAndHasNothingAfterItsPixels(t 
 	if len(result.Bytes) != tgaHeaderSize+256*256*4 {
 		t.Errorf("the written TGA has %d bytes", len(result.Bytes))
 	}
-	// Blue, green, red, alpha of the bottom-left pixel, whose red is its row number.
 	if got := result.Bytes[tgaHeaderSize : tgaHeaderSize+4]; !bytes.Equal(got, []byte{200, 40, 255, 255}) {
 		t.Errorf("the first pixel is %v", got)
 	}
-	// Bytes after the pixels, such as a TGA 2.0 footer, are left out.
 	footer := append(testkit.TGA(source, testkit.TGAOptions{}), "TRUEVISION-XFILE.\x00"...)
 	again, err := picture.Read(footer, "preview.tga")
 	if err != nil || !bytes.Equal(again.Bytes, result.Bytes) {
@@ -109,8 +98,6 @@ func TestAWrittenTGAStartsWithThePicturesBottomRowAndHasNothingAfterItsPixels(t 
 	}
 }
 
-// The low four bits of a TGA's descriptor count the bits of its alpha and say nothing of how its rows are
-// stored: a picture with any of them set is read as the same picture without.
 func TestTheAlphaBitsOfATGAsDescriptorDoNotMoveItsRows(t *testing.T) {
 	const descriptor = 17
 	for _, options := range []testkit.TGAOptions{{}, {FromTop: true}, {RLE: true}} {
@@ -129,17 +116,13 @@ func TestTheAlphaBitsOfATGAsDescriptorDoNotMoveItsRows(t *testing.T) {
 	}
 }
 
-// run is a run-length packet of count pixels of one colour.
 func run(count int) []byte { return []byte{byte(0x80 | (count - 1)), 1, 2, 3, 255} }
 
-// runsOfAllButOnePixel is the header of a run-length encoded TGA of 256 pixels a side and packets for all its
-// pixels but the last: 511 runs of 128 pixels and one of 127.
 func runsOfAllButOnePixel() []byte {
 	header := testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{RLE: true})[:tgaHeaderSize]
 	return slices.Concat(header, bytes.Repeat(run(128), 511), run(127))
 }
 
-// tgaRefusals are the TGA files Read does not know how to read, or that end before their pixels do.
 func tgaRefusals() []refusal {
 	const (
 		early    = "its pixel data ends early"
@@ -165,7 +148,6 @@ func tgaRefusals() []refusal {
 		{"a run-length picture without packets", rle[:tgaHeaderSize], "", early},
 		{"a run of two pixels where one is left", slices.Concat(runs, run(2)), "", overruns},
 		{"a packet of two pixels where one is left", slices.Concat(runs, []byte{1, 1, 2, 3, 255, 1, 2, 3, 255}), "", overruns},
-		// A last run whose pixel is cut off must not be filled in with zeros.
 		{"a last run whose pixel is cut off", slices.Concat(runs, []byte{0x80, 1, 2}), "", early},
 	}
 	for i := range cases {
@@ -184,7 +166,6 @@ func TestATGATheReaderDoesNotKnowIsRefusedByWhatItIs(t *testing.T) {
 	}
 }
 
-// sizedTGA is a plain TGA whose header says it is width by height pixels.
 func sizedTGA(width, height uint16) []byte {
 	return edited(plainTGA(), func(b []byte) {
 		binary.LittleEndian.PutUint16(b[12:], width)
@@ -192,7 +173,6 @@ func sizedTGA(width, height uint16) []byte {
 	})
 }
 
-// sizeRefusals are TGA and BLP files of a size the game was not seen to show.
 func sizeRefusals() []refusal {
 	return []refusal{
 		{"a TGA of 128", sizedTGA(128, 128), "preview.tga", "is 128x128 pixels; it must be 256x256 or 512x512"},
@@ -224,7 +204,6 @@ func TestABLP1WithJPEGOrPaletteContentIsUsedAsItIs(t *testing.T) {
 			}
 		}
 	}
-	// The first mipmap may start where the header ends and end where the file ends, and be of one byte.
 	length := uint32(len(testkit.BLP(256, 1)))
 	for _, c := range []struct {
 		name         string
@@ -241,14 +220,12 @@ func TestABLP1WithJPEGOrPaletteContentIsUsedAsItIs(t *testing.T) {
 	}
 }
 
-// blpRefusals are the files under a .blp name that the game could not read.
 func blpRefusals() []refusal {
 	whole := testkit.BLP(256, 1)
 	const outside = "its first mipmap lies outside the file"
 	with := func(change func([]byte)) []byte { return edited(testkit.BLP(256, 1), change) }
 	cases := []refusal{
 		{"a BLP2", with(func(b []byte) { b[3] = '2' }), "", "is a BLP2 file, the World of Warcraft format"},
-		// TGA bytes under a .blp name closed the game.
 		{"a TGA", plainTGA(), "", "is not a BLP file: it does not start with BLP1"},
 		{"no bytes", nil, "", "is not a BLP file"},
 		{"three bytes of the magic", []byte("BLP"), "", "is not a BLP file"},
@@ -258,7 +235,6 @@ func blpRefusals() []refusal {
 		{"an unknown content type", with(putU32(4, 2)), "", "has the unknown BLP content type 2"},
 		{"a first mipmap inside the header", with(putU32(28, 155)), "", outside},
 		{"a first mipmap without bytes", with(putU32(92, 0)), "", outside},
-		// The sum of where it starts and its size does not fit in 32 bits.
 		{"a first mipmap far past the end", with(putU32(28, 0xFFFFFFFF)), "", outside},
 		{"a first mipmap of a size past every file", with(putU32(92, 0xFFFFFFFF)), "", outside},
 		{"a file one byte short", whole[:len(whole)-1], "", outside},
@@ -278,13 +254,11 @@ func TestABLPTheGameCouldNotReadIsRefused(t *testing.T) {
 	}
 }
 
-// pngKinds are the kinds of PNG the test kit writes, by the picture each is meant for.
 var pngKinds = map[string][]string{
 	"colour": {"rgba", "rgb", "rgba16", "rgb16", "interlaced"},
 	"grey":   {"grey", "grey16", "palette"},
 }
 
-// pngSource is the test picture a kind of PNG is meant for, at size pixels a side.
 func pngSource(name string, size int) testkit.Pixels {
 	if name == "grey" {
 		return testkit.GreyPixels(size)
@@ -310,7 +284,6 @@ func TestAPNGOfAnyKindGoesInAsTheTGAThatATGAOfTheSamePictureGives(t *testing.T) 
 	}
 }
 
-// withAlpha is the test picture of 256 pixels a side with one alpha for every pixel.
 func withAlpha(alpha byte) testkit.Pixels {
 	source := testkit.NewPixels(256)
 	for at := 3; at < len(source.RGBA); at += 4 {
@@ -320,8 +293,6 @@ func withAlpha(alpha byte) testkit.Pixels {
 }
 
 func TestAPNGsTransparencyIsDroppedAndItsStoredColourKept(t *testing.T) {
-	// The picture's alpha is 7 everywhere, and then 0: a reader that blends with a background, or that reads the
-	// colour through the alpha, changes every pixel, and loses a fully transparent one altogether.
 	for _, alpha := range []byte{7, 0} {
 		source := withAlpha(alpha)
 		expected := testkit.TGA(source, testkit.TGAOptions{Alpha: opaque()})
@@ -333,7 +304,6 @@ func TestAPNGsTransparencyIsDroppedAndItsStoredColourKept(t *testing.T) {
 			if !bytes.Equal(result.Bytes, expected) {
 				t.Errorf("alpha %d, %s: the picture is not the opaque TGA of its stored colours", alpha, kind)
 			}
-			// Blue, green, red, alpha of the bottom-left pixel, whose red is its row number.
 			if got := result.Bytes[tgaHeaderSize : tgaHeaderSize+4]; !bytes.Equal(got, []byte{200, 40, 255, 255}) {
 				t.Errorf("alpha %d, %s: the first pixel is %v", alpha, kind, got)
 			}
@@ -341,7 +311,6 @@ func TestAPNGsTransparencyIsDroppedAndItsStoredColourKept(t *testing.T) {
 	}
 }
 
-// pngChunk is one chunk of a PNG: its length, name, data and check value.
 func pngChunk(name string, data []byte) []byte {
 	out := binary.BigEndian.AppendUint32(nil, uint32(len(data)))
 	out = append(out, name...)
@@ -349,11 +318,8 @@ func pngChunk(name string, data []byte) []byte {
 	return binary.BigEndian.AppendUint32(out, crc32.ChecksumIEEE(out[4:]))
 }
 
-// pngHeaderEnd is where the first chunk after the header of a PNG starts: after the signature and the IHDR chunk.
 const pngHeaderEnd = 8 + 12 + 13
 
-// withTransparentColour is a PNG without alpha in which one colour is named transparent: a tRNS chunk put after
-// the header. samples are the colour's samples as the file stores them.
 func withTransparentColour(data []byte, samples ...uint16) []byte {
 	var colour []byte
 	for _, sample := range samples {
@@ -362,17 +328,13 @@ func withTransparentColour(data []byte, samples ...uint16) []byte {
 	return slices.Concat(data[:pngHeaderEnd], pngChunk("tRNS", colour), data[pngHeaderEnd:])
 }
 
-// deep is an 8-bit sample as the 16-bit sample the test kit writes for it.
 func deep(sample byte) uint16 { return uint16(sample)<<8 | 0xa5 }
 
-// transparentColourPNGs are PNGs without alpha that name the colour of their bottom-left pixel transparent, by
-// kind, with the picture each is made of.
 func transparentColourPNGs() map[string]struct {
 	source testkit.Pixels
 	data   []byte
 } {
 	colour, grey := testkit.NewPixels(256), testkit.GreyPixels(256)
-	// The bottom-left pixel of the colour picture is red 255, green 40, blue 200; of the grey one, 251.
 	return map[string]struct {
 		source testkit.Pixels
 		data   []byte
@@ -399,8 +361,6 @@ func TestAPNGsTransparentColourIsKeptAsItIsStored(t *testing.T) {
 	}
 }
 
-// pngSizeRefusals are PNGs of a size the game was not seen to show. All but the last hold a header and no pixel:
-// only a reader that decodes first would call them damaged.
 func pngSizeRefusals() []refusal {
 	cases := []refusal{
 		{"a header of 128", testkit.PNGHeader(128, 128, false), "", "is 128x128 pixels; it must be 256x256 or 512x512"},
@@ -423,11 +383,9 @@ func TestAPNGsSizeIsJudgedBeforeItsPixelsAreRead(t *testing.T) {
 	}
 }
 
-// notPNGRefusals are files under a .png name that do not start as a PNG does.
 func notPNGRefusals() []refusal {
 	const words = "is not a PNG file"
 	return []refusal{
-		// A TGA under a .png name is read as a PNG and refused, never passed through.
 		{"a TGA", plainTGA(), "preview.png", words + ": it does not start with a PNG signature"},
 		{"a BLP", testkit.BLP(256, 1), "preview.png", words},
 		{"no bytes", nil, "preview.png", words},
@@ -435,10 +393,8 @@ func notPNGRefusals() []refusal {
 	}
 }
 
-// damagedPNGRefusals are files that start as a PNG does and cannot be decoded.
 func damagedPNGRefusals() []refusal {
 	whole := testkit.PNG(testkit.NewPixels(256), "rgb")
-	// One changed byte inside the pixel data fails its chunk's check value.
 	changed := edited(slices.Clone(whole), func(b []byte) { b[len(b)/2] ^= 0xff })
 	var cases []refusal
 	for _, c := range []struct {
@@ -468,7 +424,6 @@ func TestAFileThatIsNotAReadablePNGIsRefused(t *testing.T) {
 		if failure == nil {
 			continue
 		}
-		// The decoder's own words follow the colon, and the sentence ends with one full stop.
 		if failure.Cause == nil || !strings.HasSuffix(failure.Msg, ".") || strings.HasSuffix(failure.Msg, "..") ||
 			strings.Contains(failure.Msg, "png: ") || !strings.Contains(failure.Hint, "PNG") {
 			t.Errorf("%s: %+v", c.name, failure)
@@ -476,7 +431,6 @@ func TestAFileThatIsNotAReadablePNGIsRefused(t *testing.T) {
 	}
 }
 
-// nameRefusals are pictures under a name whose extension is none of the three.
 func nameRefusals() []refusal {
 	const words = "must be a .tga, a .blp or a .png file"
 	png := testkit.PNG(testkit.NewPixels(256), "rgb")
@@ -495,8 +449,6 @@ func nameRefusals() []refusal {
 	}
 }
 
-// otherFormatRefusals are pictures of one format under the name of another: each is read as its name says and
-// refused, never passed through.
 func otherFormatRefusals() []refusal {
 	return []refusal{
 		{"a BLP under a .tga name", testkit.BLP(256, 1), "preview.tga", "is a TGA"},
@@ -516,8 +468,6 @@ func TestTheExtensionDecidesHowAPictureIsReadAndAnotherExtensionIsRefused(t *tes
 	}
 }
 
-// acceptedNames are names under which a TGA is read as a TGA: the extension is what follows the last dot of the
-// last part of the path, in any letter case.
 var acceptedNames = []string{
 	"preview.tga", "preview.TGA", "Preview.Tga", "art/preview.tga", `art\preview.tga`, `art\sub/Preview.TGA`,
 	"art.png/preview.tga", `art.blp\preview.tga`, "preview.png.tga", "preview..tga", "..tga", "a.tga", " .tga",

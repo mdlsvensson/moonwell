@@ -11,10 +11,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// label is how the folders of these tests are named in errors.
 const label = "maps/map.w3x"
 
-// write fills a new folder with files, each named with "/" and holding its text.
 func write(t *testing.T, files map[string]string) string {
 	t.Helper()
 	dir := filepath.Join(t.TempDir(), "map.w3x")
@@ -27,7 +25,6 @@ func write(t *testing.T, files map[string]string) string {
 	return dir
 }
 
-// open writes a folder with files and opens it.
 func open(t *testing.T, files map[string]string) (folder *Folder, dir string) {
 	t.Helper()
 	dir = write(t, files)
@@ -38,7 +35,6 @@ func open(t *testing.T, files map[string]string) (folder *Folder, dir string) {
 	return folder, dir
 }
 
-// read is what the folder holds under name, or "<missing>" when it has no such file.
 func read(t *testing.T, folder *Folder, name string) string {
 	t.Helper()
 	data, found, err := folder.Read(name)
@@ -53,8 +49,6 @@ func read(t *testing.T, folder *Folder, name string) string {
 
 func contains(text, words string) bool { return strings.Contains(text, words) }
 
-// linkAway replaces the folder Textures of the map at dir with a link to a folder outside the map, which holds an
-// Old.blp of its own, and returns that folder. It stands for a link made after the map was scanned.
 func linkAway(t *testing.T, dir string) (outside string) {
 	t.Helper()
 	outside = filepath.Join(filepath.Dir(dir), "outside")
@@ -118,7 +112,6 @@ func TestAFileIsFoundUnderTheSpellingItHas(t *testing.T) {
 		if got := folder.Label(c.asked); got != label+"/"+c.name {
 			t.Errorf("Label(%q) = %q, want %q", c.asked, got, label+"/"+c.name)
 		}
-		// On a file system that tells letter cases apart, only the folder's own scan can find these.
 		if got := read(t, folder, c.asked); got != c.content {
 			t.Errorf("Read(%q) = %q, want %q", c.asked, got, c.content)
 		}
@@ -141,7 +134,6 @@ func TestAFolderOfTheMapIsNotAFile(t *testing.T) {
 	}
 }
 
-// An error about a folder of the map names it as the map spells it, as one about a file does.
 func TestAFolderIsNamedAsItIsSpelled(t *testing.T) {
 	folder, _ := open(t, map[string]string{"Textures/Old.blp": "old", "Units/Hero/a.txt": "", "WAR3MAP.LUA": "script"})
 	planned := folder.With([]Change{put("Sound/Music/theme.mp3", "theme"), drop("units/hero/A.TXT")})
@@ -156,10 +148,8 @@ func TestAFolderIsNamedAsItIsSpelled(t *testing.T) {
 		{"a folder a planned file makes", planned, "sound", "Sound"},
 		{"and the folder below it", planned, "SOUND/music", "Sound/Music"},
 		{"a folder of the map whose one file the view removes", planned, "units/HERO", "Units/Hero"},
-		// A file has the name first: a folder and a file never share one in a plan that can be written.
 		{"a file of the map", folder, "war3map.lua", "WAR3MAP.LUA"},
 		{"a file the view removes", planned, "UNITS/HERO/a.txt", "Units/Hero/a.txt"},
-		// A name the view has neither a file nor a folder under stays as given.
 		{"a name the map does not have", folder, "sound", "sound"},
 		{"a new file below a folder of the map", folder, "textures/New.blp", "textures/New.blp"},
 		{"a planned folder whose one write is taken back", takenBack, "sound/MUSIC", "sound/MUSIC"},
@@ -176,7 +166,6 @@ func TestAFolderIsNamedAsItIsSpelled(t *testing.T) {
 
 func TestReadNamesTheFileItCannotRead(t *testing.T) {
 	folder, dir := open(t, map[string]string{"war3map.w3i": "info"})
-	// A folder where the scan saw a file: reading it fails on every system.
 	file := filepath.Join(dir, "war3map.w3i")
 	if err := os.Remove(file); err != nil {
 		t.Fatal(err)

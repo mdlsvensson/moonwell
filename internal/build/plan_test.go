@@ -20,37 +20,25 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
-// Plan takes no lock, and its tests share nothing: each has a project of its own.
-
-// ---- what the tests' manifests hold ----
-
-// captain is a unit among the manifest's objects, as pkl prints it, with base as its base.
 func captain(base string) string {
 	return `"captain":{"id":"h000","base":"` + base + `","source":"objects/units.pkl","name":"Captain",` +
 		`"hitPointsMaximumBase":500}`
 }
 
-// objectsWith is the manifest's objects block with these units.
 func objectsWith(units string) string {
 	return `"objects":{"heroes":{},"units":{` + units + `},"buildings":{},"items":{},"abilities":{},"buffs":{},` +
 		`"upgrades":{}}`
 }
 
-// settingsNamed is the manifest's settings block with a name for the map.
 func settingsNamed(name string) string {
 	return `"settings":{"info":{"name":"` + name + `"},"loadingScreen":{},"gameplayConstants":{},"gameInterface":{},` +
 		`"players":{"0":{}},"forces":{},"environment":{"fog":{}},"gameplay":{}}`
 }
 
-// localKit is the manifest's libraries block with one library, kit, in the project's folder libs/kit.
 const localKit = `"libraries":{"kit":{"path":"libs/kit"}}`
 
-// captainIDs is the ids module of a project whose one object is the captain.
 var captainIDs, _ = objects.RenderIDs([]objects.Resolved{{Category: "units", Key: "captain", ID: "h000"}})
 
-// ---- what the tests ask of a plan ----
-
-// planOf is the plan of a stand-in project, which must be made.
 func planOf(t testing.TB, s *standIn, opts Options) *Result {
 	t.Helper()
 	result, err := Plan(background, s.env, s.project, opts)
@@ -60,7 +48,6 @@ func planOf(t testing.TB, s *standIn, opts Options) *Result {
 	return result
 }
 
-// firstProblem is the first problem of a plan that must fail, and the plan must come without a result.
 func firstProblem(t testing.TB, s *standIn, opts Options, what string) diag.Problem {
 	t.Helper()
 	result, err := Plan(background, s.env, s.project, opts)
@@ -71,7 +58,6 @@ func firstProblem(t testing.TB, s *standIn, opts Options, what string) diag.Prob
 	return problem
 }
 
-// heldBy is a file of a map folder as text. The test fails for a file the folder has not.
 func heldBy(t testing.TB, folder *mapdir.Folder, name string) string {
 	t.Helper()
 	data, found, err := folder.Read(name)
@@ -81,8 +67,6 @@ func heldBy(t testing.TB, folder *mapdir.Folder, name string) string {
 	return string(data)
 }
 
-// sourcesOf is the sources that the runs of one kind were made on, sorted: the runs that list the globals a
-// source uses, or the runs that compile one.
 func sourcesOf(runs []compilerRun, lists bool) []string {
 	sources := []string{}
 	for _, run := range runs {
@@ -94,7 +78,6 @@ func sourcesOf(runs []compilerRun, lists bool) []string {
 	return sources
 }
 
-// changedNames is the names of the files a planned map changes, in the order they were first planned.
 func changedNames(view *mapdir.Folder) []string {
 	var names []string
 	for _, change := range view.Changes() {
@@ -103,8 +86,6 @@ func changedNames(view *mapdir.Folder) []string {
 	return names
 }
 
-// madeSince is the files and folders of the project that are there now and were not before, sorted, and whether
-// anything that was there before is gone or holds something else.
 func madeSince(t testing.TB, s *standIn, before map[string][]byte) (made []string, changed bool) {
 	t.Helper()
 	now := testkit.Snapshot(t, s.root)
@@ -121,14 +102,11 @@ func madeSince(t testing.TB, s *standIn, before map[string][]byte) (made []strin
 	return made, changed
 }
 
-// ---- the order of a build ----
-
 func TestPlanPlansTheObjectsBeforeAnythingIsCompiledAndLaysThemOverTheMapNotIntoIt(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")))
 	s.templateMap()
 	source := testkit.Snapshot(t, s.at("maps"))
 	result := planOf(t, s, Options{})
-	// The ids module is there before the first compiler runs, so the gameplay compiles against current ids.
 	runs := s.compilerRan()
 	if got, want := sourcesOf(runs, false), []string{objects.IDsFile, "src/main.yue"}; !slices.Equal(got, want) {
 		t.Errorf("compiled %q, want %q", got, want)
@@ -153,7 +131,6 @@ func TestPlanPlansTheObjectsBeforeAnythingIsCompiledAndLaysThemOverTheMapNotInto
 	if !reflect.DeepEqual(testkit.Snapshot(t, s.at("maps")), source) {
 		t.Error("the plan changed the source map")
 	}
-	// The program is the entry alone, and its bundle follows the map's own script.
 	own, _ := os.ReadFile(s.at("maps/map.w3x/war3map.lua"))
 	bundled := heldBy(t, result.Map, "war3map.lua")
 	if result.Program.Entry != "main" || len(result.Program.Modules) != 1 || !strings.HasPrefix(bundled, string(own)) ||
@@ -161,7 +138,6 @@ func TestPlanPlansTheObjectsBeforeAnythingIsCompiledAndLaysThemOverTheMapNotInto
 		!strings.HasSuffix(bundled, "__mw.install()\n__mw.boot(\"main\")\nend\n") {
 		t.Errorf("the planned script does not end with the bundle of main:\n%s", bundled[min(len(own), len(bundled)):])
 	}
-	// What a build says of its result is for the command to say, which knows what became of the plan.
 	if lines := s.log.Lines(); len(lines) != 0 {
 		t.Errorf("the plan logged %q", lines)
 	}
@@ -190,7 +166,6 @@ func TestPlanFailsOnInvalidObjectsBeforeTheCompilerRuns(t *testing.T) {
 	if problem.File != "objects/units.pkl" || !strings.Contains(problem.Msg, "zzzz") {
 		t.Errorf("problem = %+v", problem)
 	}
-	// Nothing ran and nothing was written: not the ids module, not the declarations, not the compile's folder.
 	if runs := s.ranSoFar(); len(runs) != 0 {
 		t.Errorf("before the failure ran %+v", runs)
 	}
@@ -215,14 +190,11 @@ func TestPlanFailsOnAnUnknownGlobalAfterTheCompile(t *testing.T) {
 	if len(runs) != 2 || runs[0].lists || !runs[1].lists || runs[0].source != "src/main.yue" {
 		t.Errorf("the compiler ran %+v, want the compile of the entry and then the listing of its globals", runs)
 	}
-	// With the failure returned, nothing logs it as well.
 	if lines := s.log.Lines(); len(lines) != 0 {
 		t.Errorf("the plan logged %q", lines)
 	}
 }
 
-// Each area plans on the map as the earlier areas leave it: the object files lie under the settings' files, and
-// the bundle follows the script as the settings patched it.
 func TestPlanLaysTheObjectFilesUnderTheSettingsChangesAndTheBundleOverBoth(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")), settingsNamed("Ordered"))
 	s.templateMap()
@@ -244,7 +216,6 @@ func TestPlanLaysTheObjectFilesUnderTheSettingsChangesAndTheBundleOverBoth(t *te
 		!strings.HasSuffix(bundled, "__mw.boot(\"main\")\nend\n") {
 		t.Error("the planned script does not hold the settings' name and then the bundle")
 	}
-	// Settings fail on a map without war3map.w3i, after the objects were planned and the gameplay was compiled.
 	s.remove("maps/map.w3x/war3map.w3i")
 	problem := firstProblem(t, s, Options{}, "settings for a map without war3map.w3i")
 	if !strings.Contains(problem.Msg, "needed by the configured settings") {
@@ -264,7 +235,6 @@ func TestPlanWritesTheMacroModuleBeforeAnyCompilerRunsAndGivesEveryRunItsPath(t 
 		if !slices.Contains(run.there, script.MacrosFile) {
 			t.Errorf("the compiler ran on %s before the macro module was there", run.source)
 		}
-		// --path comes right before the source file.
 		if at := slices.Index(run.args, "--path"); at < 0 || run.args[at+1] != search || at+2 != len(run.args)-1 {
 			t.Errorf("run = %+v", run)
 		}
@@ -280,12 +250,10 @@ func TestPlanNeedsTheSourceMapAndItsScript(t *testing.T) {
 		!strings.Contains(problem.Hint, "Lua as the script language") {
 		t.Errorf("problem = %+v", problem)
 	}
-	// The script is missed where the bundle is added to it, which is the last step: the gameplay was compiled.
 	compiled := len(s.compilerRan())
 	if compiled == 0 {
 		t.Error("a map without a script was refused before the gameplay was compiled")
 	}
-	// The map is opened first: without one, nothing is compiled.
 	s.remove("maps")
 	problem = firstProblem(t, s, Options{}, "a project without its map")
 	if !strings.Contains(problem.Msg, "maps/map.w3x not found") || problem.File != localManifest ||
@@ -297,8 +265,6 @@ func TestPlanNeedsTheSourceMapAndItsScript(t *testing.T) {
 	}
 }
 
-// A project with a fault in every step is told of them one by one, in the order of the build's steps: each is
-// put right the way a user would, and the next plan fails at the next.
 func TestPlanReportsTheFaultsOfAProjectInTheOrderOfTheBuild(t *testing.T) {
 	const entry = "src/main.yue"
 	assetsBlock := `"assets":{"paths":{"absent.blp":"icons\\Absent.blp"},"exclude":[]}`
@@ -315,9 +281,9 @@ func TestPlanReportsTheFaultsOfAProjectInTheOrderOfTheBuild(t *testing.T) {
 	s.uses(entry, "CreatUnit 1 1\n")
 	steps := []struct {
 		fault  string
-		file   string // the file the failure names
+		file   string
 		says   string
-		repair func() // what puts the fault right, once it was reported
+		repair func()
 	}{
 		{"no source map", manifestName, "maps/map.w3x not found", func() {
 			if err := os.Rename(s.at("maps/away.w3x"), s.at("maps/map.w3x")); err != nil {
@@ -330,7 +296,6 @@ func TestPlanReportsTheFaultsOfAProjectInTheOrderOfTheBuild(t *testing.T) {
 		{"a library whose folder is not there", manifestName, "Library kit",
 			func() { s.put("libs/kit/kit/greet.lua", "") }},
 		{"a file the compiler refuses", entry, "unexpected indent", func() { s.refuses(entry, "") }},
-		// A source is listed anew once its text changes, so the repair is an edit of the source.
 		{"an unknown global", entry, "Unknown global CreatUnit", func() { s.put(entry, "x = 2\n"); s.uses(entry, "") }},
 		{"a setting the map has no file for", "maps/map.w3x/war3map.w3i", "needed by the configured settings",
 			func() { s.put("maps/map.w3x/war3map.w3i", string(info)) }},
@@ -352,8 +317,6 @@ func TestPlanReportsTheFaultsOfAProjectInTheOrderOfTheBuild(t *testing.T) {
 	}
 }
 
-// ---- what a plan writes, and what it leaves alone ----
-
 func TestPlanWritesWhatABuildGeneratesBesideTheMapAndNothingIntoTheMapOrItsStage(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")), settingsNamed("Ordered"), localKit)
 	s.templateMap()
@@ -364,25 +327,19 @@ func TestPlanWritesWhatABuildGeneratesBesideTheMapAndNothingIntoTheMapOrItsStage
 	made, changed := madeSince(t, s, before)
 	want := []string{
 		".moonwell",
-		// The library, as the sync copies it; it ships no files for the map, and has no entry in a lock.
 		".moonwell/libraries", ".moonwell/libraries/kit", ".moonwell/libraries/kit/.moonwell-library.json",
 		".moonwell/libraries/kit/kit", ".moonwell/libraries/kit/kit/greet.lua",
-		// The editor's view of the libraries, and its declarations.
 		".moonwell/lua", ".moonwell/lua/kit", ".moonwell/lua/kit/greet.lua",
 		".moonwell/types", ".moonwell/types/map.d.lua", ".moonwell/types/moonwell.d.lua",
 		".moonwell/types/natives.d.lua", ".moonwell/types/objects.d.lua",
-		// The macro module, and what the compile keeps.
 		".moonwell/yue", ".moonwell/yue/moonwell", ".moonwell/yue/moonwell/macros.yue",
 		"dist", "dist/stage", "dist/stage/lua", "dist/stage/lua/.globals.json", "dist/stage/lua/.hashes.json",
 		"dist/stage/lua/generated", "dist/stage/lua/generated/objects.lua", "dist/stage/lua/main.lua",
-		// The ids module.
 		"src/generated", "src/generated/objects.yue",
 	}
 	if changed || !slices.Equal(made, want) {
 		t.Errorf("the plan changed a file of the project: %v; it made\n%q, want\n%q", changed, made, want)
 	}
-	// The plan itself holds every change of the map, in the order of the build: the objects, the settings, the
-	// assets, and the program in the script the settings changed. None of them is on disk.
 	inMap := []string{"war3map.w3u", "war3mapSkin.w3u", "war3map.w3i", "war3map.lua", "icons/sword.blp", "war3map.imp"}
 	if got := changedNames(result.Map); !slices.Equal(got, inMap) || fsx.Exists(s.at("dist/stage/map.w3x")) {
 		t.Errorf("the plan changes %q in the map, want %q; or the stage is there", got, inMap)
@@ -394,9 +351,9 @@ func TestPlanWithKeepGeneratedLeavesTheIDsModuleAloneAndFailsForOneThatIsNotCurr
 	windows := strings.ReplaceAll(captainIDs, "\n", "\r\n")
 	tests := []struct {
 		name    string
-		objects bool    // whether the manifest has the captain
-		held    *string // what the ids module holds before the plan; nil for a project without one
-		says    string  // what the failure says; "" for a plan that is made
+		objects bool
+		held    *string
+		says    string
 	}{
 		{"a stale module", true, &stale, "does not match the objects"},
 		{"no module, and objects", true, nil, "missing"},
@@ -424,7 +381,6 @@ func TestPlanWithKeepGeneratedLeavesTheIDsModuleAloneAndFailsForOneThatIsNotCurr
 			}
 			if tt.says == "" {
 				if err != nil || result == nil || !fsx.Exists(s.at(editor.TypesDir+"/objects.d.lua")) {
-					// The error may be nil here, which diag.Format does not take.
 					t.Errorf("Plan = %+v, %v, want a plan and the declarations", result, err)
 				}
 				return
@@ -433,7 +389,6 @@ func TestPlanWithKeepGeneratedLeavesTheIDsModuleAloneAndFailsForOneThatIsNotCurr
 			if result != nil || e.File != objects.IDsFile || !strings.Contains(e.Msg, tt.says) {
 				t.Errorf("error = %+v", e)
 			}
-			// The module is looked at before anything else is generated or compiled.
 			if runs := s.ranSoFar(); len(runs) != 0 || fsx.Exists(s.at(".moonwell")) {
 				t.Errorf("after a module that is not current ran %+v, or .moonwell was made", runs)
 			}
@@ -453,12 +408,9 @@ func TestPlanWritesTheDeclarationsOfTheObjectsAndOfTheMapsScript(t *testing.T) {
 			!strings.Contains(string(ofMap), "maps/map.w3x/war3map.lua") {
 			t.Errorf("with %+v the declarations hold\n%s\n%s", opts, ofObjects, ofMap)
 		}
-		// The second plan, which keeps the ids module, writes the declarations anew as well.
 		s.remove(editor.TypesDir)
 	}
 }
-
-// ---- the compile ----
 
 func TestPlanRunsTheCompilerOfTheManifestsYuePathAndAsksItForTheManifestsVersion(t *testing.T) {
 	s := newStandIn(t)
@@ -489,8 +441,8 @@ func TestPlanCompilesTheEntryAndInTheModeThatItsOptionsAndTheManifestName(t *tes
 		name   string
 		blocks []string
 		opts   Options
-		entry  string // the entry module
-		mode   string // the compiler's flag for the Lua it writes
+		entry  string
+		mode   string
 	}{
 		{"the manifest's entry, as it is written", nil, Options{}, "main", "-r"},
 		{"the entry of the options", nil, Options{Entry: "src/game/other.yue"}, "game.other", "-r"},
@@ -523,10 +475,10 @@ func TestPlanHandsTheCompileTheLintBlockAndWhatTheMapsScriptDefines(t *testing.T
 	tests := []struct {
 		name     string
 		blocks   []string
-		noScript bool   // the map has no script
-		uses     string // the global the entry uses
-		unknown  bool   // the plan fails for it
-		warned   int    // the unknown globals a plan that is made carries, each logged once
+		noScript bool
+		uses     string
+		unknown  bool
+		warned   int
 	}{
 		{"a native of the game", nil, false, "CreateUnit", false, 0},
 		{"a global of the map's script", nil, false, "udg_count", false, 0},
@@ -534,7 +486,6 @@ func TestPlanHandsTheCompileTheLintBlockAndWhatTheMapsScriptDefines(t *testing.T
 		{"a name of lint.globals", []string{withExtra}, false, "Extra", false, 0},
 		{"a name nobody defines", nil, false, "Extra", true, 0},
 		{"a name nobody defines, as a warning", []string{asWarnings}, false, "Extra", false, 1},
-		// A map without a script defines nothing, and the unknown global is reported before the missing script.
 		{"a global of a script the map has not", nil, true, "udg_count", true, 0},
 	}
 	for _, tt := range tests {
@@ -555,7 +506,6 @@ func TestPlanHandsTheCompileTheLintBlockAndWhatTheMapsScriptDefines(t *testing.T
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}
-			// The link logs a warning, and the plan does not log it again.
 			if lines := s.log.Lines(); len(result.Program.Unknown) != tt.warned || len(lines) != tt.warned {
 				t.Errorf("the program carries %+v; log = %q", result.Program.Unknown, lines)
 			}
@@ -563,14 +513,8 @@ func TestPlanHandsTheCompileTheLintBlockAndWhatTheMapsScriptDefines(t *testing.T
 	}
 }
 
-// ---- the libraries ----
-
-// generatedFiles is what a plan writes for the gameplay and the editor to read, whatever becomes of its later
-// steps: the ids module, one of the declarations, and the macro module.
 var generatedFiles = []string{objects.IDsFile, editor.TypesDir + "/objects.d.lua", script.MacrosFile}
 
-// What the gameplay and the editor read is written before the libraries are synced, which is the first step
-// that may need the network: the editor finds `import "moonwell.macros"` also when a library cannot be fetched.
 func TestPlanWritesTheIDsModuleAndTheDeclarationsBeforeItSyncsTheLibraries(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")), localKit)
 	s.templateMap()
@@ -588,7 +532,6 @@ func TestPlanWritesTheIDsModuleAndTheDeclarationsBeforeItSyncsTheLibraries(t *te
 	}
 }
 
-// A plan that finds no compiler has synced the libraries, and leaves what the gameplay and the editor read.
 func TestPlanThatFindsNoCompilerLeavesWhatItGeneratedAndTheLibraries(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")), localKit)
 	s.templateMap()
@@ -609,8 +552,6 @@ func TestPlanThatFindsNoCompilerLeavesWhatItGeneratedAndTheLibraries(t *testing.
 	}
 }
 
-// The editor's view of the libraries is written between the two steps of a compile, so it is current when the
-// second fails: that is when a user looks a library's module up.
 func TestPlanRefreshesTheViewOfTheLibrariesAlsoWhenTheLinkFails(t *testing.T) {
 	s := newStandIn(t, localKit)
 	s.put("libs/kit/kit/greet.lua", "return function() end\n")
@@ -628,14 +569,11 @@ func TestPlanRefreshesTheViewOfTheLibrariesAlsoWhenTheLinkFails(t *testing.T) {
 	if !reflect.DeepEqual(view, want) {
 		t.Errorf("after the failed plan %s holds %q, want %q", editor.LibraryViewDir, view, want)
 	}
-	// The libraries were synced before the compile: the compiler ran on the project's copy of the module.
 	compiled := []string{".moonwell/libraries/kit/kit/loud.yue", "src/main.yue"}
 	if got := sourcesOf(s.compilerRan(), false); !slices.Equal(got, compiled) {
 		t.Errorf("compiled %q, want %q", got, compiled)
 	}
 }
-
-// ---- the assets ----
 
 func TestPlanImportsTheAssetsOfTheProjectAndOfItsLibrariesIntoThePlannedMap(t *testing.T) {
 	s := newStandIn(t, localKit)
@@ -670,14 +608,11 @@ func TestPlanImportsTheAssetsOfTheProjectAndOfItsLibrariesIntoThePlannedMap(t *t
 	}
 }
 
-// A build reads which files of the source map assets:sync owns, and never writes that down.
-//
-// The state file is named by the map's folder as every command reads it, not as the manifest writes it.
 func TestPlanReadsTheOwnershipStateAndNeverWritesIt(t *testing.T) {
 	tests := []struct {
 		name      string
-		folder    string // map.folder
-		at        string // where the map is, from the project folder
+		folder    string
+		at        string
 		stateFile string
 	}{
 		{"the folder below maps", "map.w3x", "maps/map.w3x", ".asset-state/map.w3x.json"},
@@ -698,14 +633,12 @@ func TestPlanReadsTheOwnershipStateAndNeverWritesIt(t *testing.T) {
 				fsx.SHA256Hex([]byte("an asset of an earlier sync")) + "\"\n  }\n}\n"
 			s.put(tt.stateFile, state)
 			result := planOf(t, s, Options{})
-			// The project has no assets, so the file that the state says a sync wrote leaves the planned map.
 			if result.Map.Has("icons/old.blp") || !fsx.Exists(s.at(tt.at+"/icons/old.blp")) {
 				t.Error("the owned file is in the planned map still, or left the source map")
 			}
 			if held, _ := os.ReadFile(s.at(tt.stateFile)); string(held) != state {
 				t.Errorf("after the plan the ownership state holds %q", held)
 			}
-			// A state that is none is refused by its name from the project folder.
 			s.put(tt.stateFile, "not a state")
 			problem := firstProblem(t, s, Options{}, "a state file that is no state")
 			if !strings.Contains(problem.Msg, "ownership state is invalid") || problem.File != tt.stateFile {

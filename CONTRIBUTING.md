@@ -98,7 +98,9 @@ commit that changes the behaviour, and the commit message says which recordings 
   anew, and when a module is added, add its section.
 - **Errors.** An expected failure is a `*diag.Error` (or `diag.Problems`) with the file and a hint. Any other error, and
   any panic, is reported as an internal "please report" error, so a user's mistake must never reach it. The text of
-  an error is made by a named function below a `// ---- errors ----` line, at the bottom of the file that raises it.
+  an error is made by a named function, at the bottom of the file that raises it.
+- **No comments in the Go code.** The maintainer had them all removed on 2026-10-08. The lines the compiler reads
+  (`//go:embed`, `//go:build`) stay. A name says what a thing is; what a package is for is in `ARCHITECTURE.md`.
 - **Layout.** A new package goes on a shelf: add it to `layout_test.go` and to `ARCHITECTURE.md`. A test fails when
   either document names a file that is not there, and another when a step of a build changes and the quote of `Plan`
   in `ARCHITECTURE.md` does not: change the quote and the numbered steps below it in the same commit.

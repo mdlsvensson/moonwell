@@ -17,7 +17,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/jass"
 )
 
-// Hand-written miniature JASS in the shape of common.j and blizzard.j. Nothing of it is from the game's files.
 const miniCommon = `// a leading comment
 type agent extends handle
 type widget   extends agent  // trailing comment
@@ -49,7 +48,6 @@ constant function ConstantBJ takes nothing returns integer
 endfunction
 `
 
-// parsed parses a miniature script as the script of a name.
 func parsed(t *testing.T, text, source string) jass.File {
 	t.Helper()
 	file, err := jass.Parse(text, source)
@@ -64,8 +62,6 @@ func miniScripts(t *testing.T) (common, blizzard jass.File) {
 	return parsed(t, miniCommon, commonScript), parsed(t, miniBlizzard, blizzardScript)
 }
 
-// params is the parameters of a function, each given by its type and then its name, as a script writes the two.
-// Without any it is a list that holds nothing.
 func params(typesAndNames ...string) []script.NativeParam {
 	list := []script.NativeParam{}
 	for i := 0; i+1 < len(typesAndNames); i += 2 {
@@ -74,7 +70,6 @@ func params(typesAndNames ...string) []script.NativeParam {
 	return list
 }
 
-// miniNatives is what the miniature scripts and the miniature extras make for the version 9.9.9.
 func miniNatives() *script.Natives {
 	natives := &script.Natives{
 		GameVersion: "9.9.9",
@@ -115,8 +110,6 @@ func TestBuildNativesMergesBothFilesAndTheLuaExtrasSortedByName(t *testing.T) {
 	if !reflect.DeepEqual(given, miniExtras()) {
 		t.Errorf("buildNatives changed the extras it was given: %+v", given)
 	}
-	// The file's text: the parameters of a function of a script are written type first, and a Lua function has
-	// its parameters name first, and its source and constant after what the extras give it.
 	contains(t, renderNatives(natives),
 		"{\n  \"gameVersion\": \"9.9.9\",\n  \"types\": [\n    {\n      \"name\": \"agent\",\n"+
 			"      \"extends\": \"handle\"\n    },",
@@ -135,7 +128,6 @@ func TestBuildNativesMergesBothFilesAndTheLuaExtrasSortedByName(t *testing.T) {
 	)
 }
 
-// refuses fails the test unless buildNatives refuses the scripts and the extras with an error that has the words.
 func refuses(t *testing.T, common, blizzard jass.File, given extras, words string) {
 	t.Helper()
 	if _, err := buildNatives("9.9.9", common, blizzard, given); err == nil || !strings.Contains(err.Error(), words) {
@@ -158,9 +150,6 @@ func TestBuildNativesRefusesALuaNameBothProvidedAndRemoved(t *testing.T) {
 	refuses(t, common, blizzard, extras{Globals: []string{"print", "io"}, Removed: []string{"io"}}, "io")
 }
 
-// A name is looked for among the functions of both scripts and of Lua, then the globals, the types, the globals
-// that Lua provides and those it removes: the refusal names the two places in that order, and of two names that
-// are declared twice it names the one that is found first.
 func TestBuildNativesNamesBothPlacesOfANameDeclaredTwice(t *testing.T) {
 	common, blizzard := miniScripts(t)
 	as := func(text string) jass.File { return parsed(t, text, blizzardScript) }
@@ -217,10 +206,8 @@ func TestBuildNativesNamesBothPlacesOfANameDeclaredTwice(t *testing.T) {
 	}
 }
 
-// The names of every list are ordered by their bytes. A name with a character from U+E000 on stands before one
-// with a character above U+FFFF, which an order by UTF-16 units puts the other way round.
 func TestBuildNativesOrdersTheNamesByTheirBytes(t *testing.T) {
-	const above, from = "\xF0\x90\x80\x80", "\xEE\x80\x80" // U+10000, and U+E000
+	const above, from = "\xF0\x90\x80\x80", "\xEE\x80\x80"
 	lua := func(names ...string) (functions []extraFunction) {
 		for _, name := range names {
 			functions = append(functions, extraFunction{Name: name})
@@ -250,7 +237,6 @@ func TestBuildNativesOrdersTheNamesByTheirBytes(t *testing.T) {
 	}
 }
 
-// A list that holds nothing is empty and not nil, whatever the scripts and the extras have, and is written [].
 func TestBuildNativesMakesEveryListThatHoldsNothingAnEmptyOne(t *testing.T) {
 	natives, err := buildNatives("1", jass.File{}, jass.File{}, extras{Functions: []extraFunction{{Name: "f"}}})
 	if err != nil {
@@ -285,7 +271,6 @@ func TestBuildNativesMakesEveryListThatHoldsNothingAnEmptyOne(t *testing.T) {
 	}
 }
 
-// The committed file, read and rendered again, is itself: byte for byte.
 func TestTheCommittedNativesRenderToThemselves(t *testing.T) {
 	committed := string(moonwell.Natives)
 	if rendered := renderNatives(script.LoadNatives()); rendered != committed {
@@ -296,9 +281,6 @@ func TestTheCommittedNativesRenderToThemselves(t *testing.T) {
 	}
 }
 
-// Every kind of entry, against the text as it stands in the file: a constant native, a function with no
-// parameter, a Lua function with parameters and one without, an array global, an empty list, and texts that a
-// JSON string must escape. The lists are written in the order they have.
 func TestRenderNativesWritesTheTextOfTheFile(t *testing.T) {
 	natives := &script.Natives{
 		GameVersion: "1.2 \"beta\"\t<&>",
@@ -402,8 +384,6 @@ func TestRenderNativesWritesTheTextOfTheFile(t *testing.T) {
 	}
 }
 
-// The file that the mode writes is read back as the program reads it: a function of each of the two orders of
-// keys, a function without a parameter, and the lists of Lua among it.
 func TestRenderNativesWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
 	made := miniNatives()
 	var read script.Natives
@@ -415,8 +395,6 @@ func TestRenderNativesWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
 	}
 }
 
-// exportedScripts writes the two scripts as an export of the game's files has them, and returns the folder of
-// the export.
 func exportedScripts(t testing.TB, common, blizzard string) string {
 	t.Helper()
 	folder := t.TempDir()
@@ -425,7 +403,6 @@ func exportedScripts(t testing.TB, common, blizzard string) string {
 	return folder
 }
 
-// withExtras makes a scratch checkout with the miniature extras and a data folder.
 func withExtras(t testing.TB) checkout {
 	t.Helper()
 	c := newCheckout(t)
@@ -434,7 +411,6 @@ func withExtras(t testing.TB) checkout {
 	return c
 }
 
-// without takes a file out of a checkout.
 func without(c checkout, name string) {
 	c.t.Helper()
 	if err := os.Remove(c.path(name)); err != nil {
@@ -442,8 +418,6 @@ func without(c checkout, name string) {
 	}
 }
 
-// The file is written in its one form whatever form the scripts and the extras have: for either kind of line
-// break and a byte order mark in a script, and for extras whose keys stand in another order than the file's.
 func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 	const otherOrder = `{"removed": ["io"], "globals": ["print", "math"], "functions": [
 		{"returns": "integer", "params": [{"type": "string", "name": "id"}], "name": "FourCC"}]}`
@@ -471,7 +445,6 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 			t.Errorf("%s: the checkout holds %q, want the natives of the two scripts: %s",
 				name, slices.Sorted(maps.Keys(got)), parting(want, got[nativesPath]))
 		}
-		// What the file holds stands written here too, for a function of each script and for the one of Lua.
 		contains(t, got[nativesPath],
 			"{\n  \"gameVersion\": \"9.9.9\",\n  \"types\": [\n",
 			"      \"name\": \"HelperBJ\",\n      \"source\": \"blizzard.j\",\n      \"constant\": false,\n"+
@@ -484,8 +457,6 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 	}
 }
 
-// The scripts are found as every file of an export is: without regard to the letter case of a step of their
-// paths, on a file system of either kind. Every entry records the script's name in lower case all the same.
 func TestTheModeNativesFindsAScriptWhateverTheLetterCaseOfItsPath(t *testing.T) {
 	folder := t.TempDir()
 	testkit.WriteFile(t, folder, "War3.w3mod/Scripts/COMMON.J", []byte(miniCommon))
@@ -499,11 +470,6 @@ func TestTheModeNativesFindsAScriptWhateverTheLetterCaseOfItsPath(t *testing.T) 
 	}
 }
 
-// A run that fails says which file it failed on, as the reader can find it: a script that the export lacks by
-// its path as the generator asks for it, with the folder as the line gives it, which is how the mode metadata
-// names a file that is missing; a script that the system cannot give by the path that was opened; a file of the
-// checkout by its path from the checkout; and a line of a script by the script's name and the line's number. It
-// leaves the natives of the checkout as they were.
 func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testing.T) {
 	const kept = "the natives of another version\n"
 	whole := exportedScripts(t, miniCommon, miniBlizzard)
@@ -516,8 +482,8 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 	for name, c := range map[string]struct {
 		folder string
 		lay    func(c checkout)
-		starts string   // what the error starts with
-		words  []string // what it says besides
+		starts string
+		words  []string
 	}{
 		"a script that is not there": {folder: noBlizzard,
 			starts: "war3.w3mod/scripts/blizzard.j is missing from " + noBlizzard},
@@ -573,8 +539,6 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 	}
 }
 
-// The game's two scripts, with the version that the committed natives state, give the committed natives byte
-// for byte. The test reads the scripts of the export that MOONWELL_GAME_SCRIPTS names, and takes a second.
 func TestTheModeNativesWritesTheCommittedNativesFromTheGamesScripts(t *testing.T) {
 	export := testkit.NeedExport(t, "MOONWELL_GAME_SCRIPTS").Path()
 	committed := script.LoadNatives()

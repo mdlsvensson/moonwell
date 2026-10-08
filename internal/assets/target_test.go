@@ -11,7 +11,6 @@ func TestTargetPathTakesAPathAnAssetMayHaveWithSlashes(t *testing.T) {
 		{`Textures\Icon.blp`, "Textures/Icon.blp"},
 		{"war3mapImported/sound.wav", "war3mapImported/sound.wav"},
 		{`WAR3MAPIMPORTED\sound.wav`, "WAR3MAPIMPORTED/sound.wav"},
-		// Only the start of a path makes it one of the map's own files.
 		{"Units/war3map.lua", "Units/war3map.lua"},
 		{"scripts/common.j", "scripts/common.j"},
 		{"war3.blp", "war3.blp"},
@@ -37,8 +36,6 @@ func TestTargetPathRefusesTheMapsOwnFiles(t *testing.T) {
 		{"(attributes)", internals},
 		{"(signature)", internals},
 		{"war3mapPreviews/a.tga", internals},
-		// The names tried for a picture in the game's map list point at the setting that makes one. Reforged ignores
-		// war3mapPreview.tga, and a build writes war3mapMap.blp.
 		{"war3mapPreview.tga", picture},
 		{"WAR3MAPPREVIEW.BLP", picture},
 		{"war3mapMap.blp", picture},
@@ -47,7 +44,6 @@ func TestTargetPathRefusesTheMapsOwnFiles(t *testing.T) {
 	for _, tt := range tests {
 		_, err := targetPath(tt.value)
 		e := asError(t, err, tt.value)
-		// The path has no file of its own: whoever asked knows where it was written.
 		if e.Msg != "Reserved map path: "+tt.value || !strings.Contains(e.Hint, tt.hint) || e.File != "" {
 			t.Errorf("targetPath(%q): %+v, want a reserved path with a hint about %q", tt.value, e, tt.hint)
 		}

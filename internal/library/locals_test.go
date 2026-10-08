@@ -9,7 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// foldersOfLocals is the folders of the local libraries, on disk, in the order they are listed.
 func foldersOfLocals(locals []Local) []string {
 	var dirs []string
 	for _, local := range locals {
@@ -20,7 +19,6 @@ func foldersOfLocals(locals []Local) []string {
 	return dirs
 }
 
-// labelsOfLocals is the folders of the local libraries as they are written, in the order they are listed.
 func labelsOfLocals(locals []Local) []string {
 	var labels []string
 	for _, local := range locals {
@@ -105,14 +103,12 @@ func TestLocalsAreInTheOrderOfTheirKeysBytes(t *testing.T) {
 	}
 }
 
-// What the sync refuses of a library's own file is no file to Locals: the library is listed by the manifest
-// alone, so that it is watched, and the sync says what is wrong with the file.
 func TestLocalsTakesALibrarysFileThatTheSyncRefusesForNone(t *testing.T) {
 	cases := []struct {
 		name string
-		file string // the path of what is laid in the file's place, from the library
+		file string
 		text string
-		held bool // the file cannot be read
+		held bool
 	}{
 		{"not JSON", File, "{", false},
 		{"no object", File, `["src"]`, false},
@@ -134,7 +130,6 @@ func TestLocalsTakesALibrarysFileThatTheSyncRefusesForNone(t *testing.T) {
 		if got := Locals(root, libraries); !slices.EqualFunc(got, want, sameLocal) {
 			t.Errorf("%s: Locals = %+v, want %+v", c.name, got, want)
 		}
-		// The manifest's dir is taken all the same.
 		want[0].Folders = []LocalFolder{{filepath.Join(lib, "src"), "lib/src/"}}
 		if got := Locals(root, block("mine", fromFolder("lib", "src"))); !slices.EqualFunc(got, want, sameLocal) {
 			t.Errorf("%s, with a dir in the manifest: Locals = %+v, want %+v", c.name, got, want)
@@ -150,7 +145,7 @@ func TestALocalsFolderIsWrittenAsTheManifestAndTheLibrarysFileWriteIt(t *testing
 	cases := []struct {
 		name      string
 		path, dir string
-		own       string // the library's folder
+		own       string
 		want      []LocalFolder
 	}{
 		{"the project folder", ".", "", root, []LocalFolder{{root, "./"}}},
@@ -173,9 +168,6 @@ func TestALocalsFolderIsWrittenAsTheManifestAndTheLibrarysFileWriteIt(t *testing
 	}
 }
 
-// Locals and the sync have one rule for where a local library is read from: the module folder that Locals lists
-// is the one whose path the sync stamps the library's copy with, and the copies hold the files of the folders
-// that Locals lists.
 func TestLocalsListsTheFoldersTheSyncCopiesFrom(t *testing.T) {
 	root := t.TempDir()
 	put(t, root,

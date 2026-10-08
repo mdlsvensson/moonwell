@@ -12,19 +12,14 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-// These tests bundle programs that are made by hand. One of them runs Lua, and says so.
-
-// ofSrc is a YueScript module of src/ as a compile leaves it: its Lua, under the name it is required by.
 func ofSrc(name, lua string) Module {
 	return Module{Name: name, Path: "src/" + strings.ReplaceAll(name, ".", "/") + ".yue", Kind: Yue, Lua: lua}
 }
 
-// ofLua is a Lua module of lua/: its text, under the name it is required by.
 func ofLua(name, text string) Module {
 	return Module{Name: name, Path: "lua/" + strings.ReplaceAll(name, ".", "/") + ".lua", Kind: Lua, Lua: text}
 }
 
-// byHand is a program of the modules, in their order, whose entry is the module main.
 func byHand(minify bool, modules ...Module) *Program {
 	return &Program{Entry: "main", Modules: modules, Minify: minify}
 }
@@ -36,8 +31,6 @@ var utilAndMain = []Module{
 
 func TestBundleWrapsTheModulesAndRecordsTheLinesEachHasInTheScript(t *testing.T) {
 	got := bundle(byHand(false, utilAndMain...), "local __mw = {}\n-- runtime", 10)
-	// Line 10 is "do", 11 and 12 the runtime, 13 the definition of util, 14 and 15 its Lua, 16 its end, 17 the
-	// definition of main, and 18 to 20 its Lua.
 	want := strings.Join([]string{
 		"do",
 		"local __mw = {}",
@@ -77,7 +70,6 @@ func TestBundleMarksAMinifiedYueScriptModuleAndALuaModuleKeepsItsLines(t *testin
 			t.Errorf("the minified bundle lacks the line %s:\n%s", line, minified)
 		}
 	}
-	// The mark is all that the two differ in: the bundle says nowhere else that it is minified.
 	if strings.ReplaceAll(minified, ", true},", "},") != plain || strings.Contains(minified, "__mw.minified") {
 		t.Errorf("the minified bundle differs from the plain one in more than the marks:\n%s", minified)
 	}
@@ -89,7 +81,7 @@ func TestBundleMarksAMinifiedYueScriptModuleAndALuaModuleKeepsItsLines(t *testin
 func TestAModulesLinesAreSplitAtLineFeedsAndAFinalLineBreakStartsNoLine(t *testing.T) {
 	for _, c := range []struct {
 		name, lua, body string
-		last            int // the last line of the module, whose first is line 4
+		last            int
 	}{
 		{"a final line break", "a = 1\nb = 2\n", "a = 1\nb = 2", 5},
 		{"no final line break", "a = 1\nb = 2", "a = 1\nb = 2", 5},
@@ -100,7 +92,6 @@ func TestAModulesLinesAreSplitAtLineFeedsAndAFinalLineBreakStartsNoLine(t *testi
 		{"one line", "return 1", "return 1", 4},
 		{"blank lines first", "\n\nreturn 1\n", "\n\nreturn 1", 6},
 		{"a line break alone", "\n", "", 4},
-		// No module of a program is without Lua. One that is handed in is one line without text.
 		{"no Lua at all", "", "", 4},
 		{"bytes that are not UTF-8", "a = '\xff'\nb = '\xe2\x82'\n", "a = '\xff'\nb = '\xe2\x82'", 5},
 	} {
@@ -114,16 +105,12 @@ func TestAModulesLinesAreSplitAtLineFeedsAndAFinalLineBreakStartsNoLine(t *testi
 }
 
 func TestBundleOfAProgramWithoutModulesHasAnEmptyTableOfLines(t *testing.T) {
-	// A program has its entry at least. One without a module is still a block that Lua reads.
 	got := bundle(&Program{Entry: "main"}, "-- runtime", 1)
 	if got != "do\n-- runtime\n__mw.lines = {\n}\n__mw.install()\n__mw.boot(\"main\")\nend\n" {
 		t.Errorf("bundle = %q", got)
 	}
 }
 
-// recordingRuntime stands in for the runtime: it keeps the names the bundle defines, and at the start of the
-// entry writes a line for each module, with the bytes, in hexadecimal, of the name it was defined by and of the
-// name and the path its lines are recorded under, and then a line with the bytes of the entry's name.
 const recordingRuntime = `local __mw = { defined = {} }
 function __mw.define(name) __mw.defined[#__mw.defined + 1] = name end
 function __mw.install() end
@@ -136,17 +123,12 @@ function __mw.boot(entry)
 end
 `
 
-// namesLuaReadsBack are names, and parts of paths, that Lua reads back from the bundle as the bytes they are.
 var namesLuaReadsBack = []string{
 	"plain", "a.b", "a b", `a"b`, `a\b`, `a\nb`, `a\\`, "a'b", "a]]b", "--a", "a\tb", "a\nb", "a\rb", "a\r\nb", "a\bb", "a\fb", "a\vb",
 	"a\x00b", "a\x01", "a\x011", "a\x1f9", "a\x7fb", "a\x7f7", eAcute, fullWidthA, beyond, replacement, "a" + noBreakSpace + "b",
 	"a\xc2\x85b", "a" + lineSeparator + "b",
 }
 
-// namesThatAreNotUTF8 are names with bytes that are not UTF-8, and each as Lua reads it back from the bundle:
-// with U+FFFD in the place of each such byte. No program of Link has such a name: Collect refuses the file
-// (TestAModuleFileWhoseNameIsNotUTF8IsRefused). They are here for what bundle does when it is handed one all the
-// same.
 var namesThatAreNotUTF8 = [][2]string{
 	{"a\xffb", "a" + replacement + "b"},
 	{"\xe2\x82", replacement + replacement},
@@ -154,7 +136,6 @@ var namesThatAreNotUTF8 = [][2]string{
 	{eAcute + "\xc3", eAcute + replacement},
 }
 
-// TestANameAndAPathAreWrittenAsLuaStringsThatLuaReadsBackAsTheirBytes runs a bundle in Lua.
 func TestANameAndAPathAreWrittenAsLuaStringsThatLuaReadsBackAsTheirBytes(t *testing.T) {
 	var modules []Module
 	var want []string
@@ -169,7 +150,6 @@ func TestANameAndAPathAreWrittenAsLuaStringsThatLuaReadsBackAsTheirBytes(t *test
 	}
 	const entry = "a\tb\x7f\"\\" + eAcute
 	block := bundle(&Program{Entry: entry, Modules: modules}, recordingRuntime, 1)
-	// A control character and U+007F are three digits after a backslash, so that a digit after one stays apart.
 	for _, written := range []string{
 		`__mw.define("a\009b", function(...)`, `__mw.define("a\010b", function(...)`, `__mw.define("a\0011", function(...)`,
 		`__mw.define("a\000b", function(...)`, `__mw.define("a\1277", function(...)`, `, "a\"b", "src/a\"b.yue"},`, `, "a\\b", "src/a\\b.yue"},`,

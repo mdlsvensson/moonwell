@@ -51,13 +51,11 @@ func TestGamePathKeyTakesOnlyTheLastExtensionAndOnlyATexturesOff(t *testing.T) {
 			t.Errorf("a .%s texture has the key %q", extension, got)
 		}
 	}
-	// The types written out: a model that names a texture of any of them is given the game's file of another.
 	for _, extension := range []string{"blp", "dds", "tga", "tif", "tiff", "png", "jpg"} {
 		if got := gamePathKey("Textures/A." + extension); got != "textures/a.<texture>" {
 			t.Errorf("a .%s texture has the key %q", extension, got)
 		}
 	}
-	// What looks like one of them and is none keeps its extension.
 	for _, extension := range []string{"jpeg", "bmp", "tg", "ddsx", "wav", "pkb", "pkfx"} {
 		if got := gamePathKey("Textures/A." + extension); got != "textures/a."+extension {
 			t.Errorf("a .%s file has the key %q", extension, got)
@@ -65,7 +63,6 @@ func TestGamePathKeyTakesOnlyTheLastExtensionAndOnlyATexturesOff(t *testing.T) {
 	}
 }
 
-// Letter case folds one character to one character: a capital I with a dot is a plain i.
 func TestGamePathKeyFoldsEachLetterToOneLetter(t *testing.T) {
 	if got := gamePathKey("Textures\\\xc4\xb0con.blp"); got != "textures/icon.<texture>" {
 		t.Errorf("the key is %q", got)
@@ -82,8 +79,6 @@ func TestParseGamePathsSkipsCommentsAndBlankLines(t *testing.T) {
 	}
 }
 
-// A list checked out with the line ends of Windows, or indented by hand, holds the same paths. White space is
-// what Unicode calls so: a no-break space and a next-line character go, and a byte order mark is part of a path.
 func TestParseGamePathsTakesTheWhiteSpaceOffEachLine(t *testing.T) {
 	list := "  # a comment\r\n\t textures/a.blp \t\r\n \r\n\xc2\xa0textures/b.blp\xc2\x85\n\xef\xbb\xbftextures/c.blp\ntextures/d e.blp"
 	want := []string{"textures/a.<texture>", "textures/b.<texture>", "textures/d e.<texture>", "\xef\xbb\xbftextures/c.<texture>"}
@@ -97,9 +92,6 @@ func TestTheEmbeddedPathListIsTheGames(t *testing.T) {
 	if len(keys) < 30000 || !keys[gamePathKey(`Units\Human\Footman\Footman.mdx`)] || !keys[gamePathKey(`Textures\Black32.blp`)] {
 		t.Errorf("the embedded list has %d keys", len(keys))
 	}
-	// Every path of the list has its key, and two paths that are one file to the game share one. The number is
-	// that of the list of Warcraft III 3.0.0.24268: it changes when the list is generated again for a new version
-	// of the game, and then this row changes with it.
 	if len(keys) != 42114 {
 		t.Errorf("the embedded list has %d keys, want 42114", len(keys))
 	}

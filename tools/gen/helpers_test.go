@@ -19,29 +19,20 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// modulePath is the path of this module, as a go.mod of any kind mentions it.
 const modulePath = "github.com/mdlsvensson/moonwell"
 
-// moduleFile is the go.mod of a scratch checkout: the line the generator knows a checkout of Moonwell by.
 const moduleFile = "module " + modulePath + "\n"
 
-// anotherModule is the go.mod of a module that is not this one.
 const anotherModule = "module example.com/other\n"
 
-// outputFolders is the folders of a checkout that the generator writes into, each by its path from the checkout.
 var outputFolders = []string{"data", "schema/generated"}
 
-// checkout is a scratch checkout of Moonwell under the test's temporary folder: a folder with a go.mod that
-// names this module, and what the test puts there. The generator writes data/ and schema/generated/ of the
-// checkout it finds, so a test runs it in one of these and never in the real checkout, which is only read.
 type checkout struct {
 	t    testing.TB
-	root string // the folder, as a full path
-	// none says that the folder is a scratch folder that is no checkout: no go.mod in it names this module.
+	root string
 	none bool
 }
 
-// newCheckout makes a scratch checkout that holds its go.mod and nothing else.
 func newCheckout(t testing.TB) checkout {
 	t.Helper()
 	c := checkout{t: t, root: t.TempDir()}
@@ -49,8 +40,6 @@ func newCheckout(t testing.TB) checkout {
 	return c
 }
 
-// noCheckout makes a scratch folder that is no checkout: it holds goMod as its go.mod, which does not name this
-// module, or nothing for "".
 func noCheckout(t testing.TB, goMod string) checkout {
 	t.Helper()
 	c := checkout{t: t, root: t.TempDir(), none: true}
@@ -60,16 +49,13 @@ func noCheckout(t testing.TB, goMod string) checkout {
 	return c
 }
 
-// path is the full path of what the checkout has at name, a path from the checkout with "/".
 func (c checkout) path(name string) string { return filepath.Join(c.root, filepath.FromSlash(name)) }
 
-// write writes a file of the checkout, with the folders it is in. name is its path from the checkout, with "/".
 func (c checkout) write(name, text string) {
 	c.t.Helper()
 	testkit.WriteFile(c.t, c.root, name, []byte(text))
 }
 
-// folder makes a folder of the checkout, with the folders it is in, and returns its full path.
 func (c checkout) folder(name string) string {
 	c.t.Helper()
 	folder := c.path(name)
@@ -79,8 +65,6 @@ func (c checkout) folder(name string) string {
 	return folder
 }
 
-// carry copies into the scratch checkout what the real one has at each name, a path from the checkout with "/":
-// a file, or every file below a folder. Each lands at the path it has in the real checkout.
 func (c checkout) carry(names ...string) {
 	c.t.Helper()
 	for _, name := range names {
@@ -90,7 +74,6 @@ func (c checkout) carry(names ...string) {
 	}
 }
 
-// realFile reads a file of the real checkout, the one these tests are part of, by its path from there with "/".
 func realFile(t testing.TB, name string) []byte {
 	t.Helper()
 	data, err := os.ReadFile(filepath.Join(testkit.RepoRoot(t), filepath.FromSlash(name)))
@@ -100,8 +83,6 @@ func realFile(t testing.TB, name string) []byte {
 	return data
 }
 
-// realFiles is the files the real checkout has at name: name itself for a file, and every file below it for a
-// folder, each as a path from the checkout with "/".
 func realFiles(t testing.TB, name string) []string {
 	t.Helper()
 	root := testkit.RepoRoot(t)
@@ -120,19 +101,12 @@ func realFiles(t testing.TB, name string) []string {
 	return files
 }
 
-// run runs one command line of the generator in the checkout. It returns what the run printed, everything the
-// checkout holds afterwards (all), and the error the run ended with: so a test that says what a run left says it
-// of the whole checkout, and a file that a run writes outside data/ and schema/generated/ fails it.
 func (c checkout) run(args ...string) (printed string, files map[string][]byte, err error) {
 	c.t.Helper()
 	printed, err = c.runBelow("", args...)
 	return printed, c.all(), err
 }
 
-// runBelow runs one command line of the generator in a folder of the checkout, which it makes: below is its path
-// from the checkout with "/", and "" is the checkout itself. It returns what the run printed and the error the run
-// ended with. It is the one place of the tests that calls run, and it calls run only where a generator may be
-// started (startsIn).
 func (c checkout) runBelow(below string, args ...string) (printed string, err error) {
 	c.t.Helper()
 	dir := c.startsIn(below)
@@ -141,15 +115,6 @@ func (c checkout) runBelow(below string, args ...string) (printed string, err er
 	return out.String(), err
 }
 
-// startsIn is the folder of the checkout in which a generator is about to be started, as a program or through
-// run: below is its path from the checkout with "/", and "" is the checkout itself. A generator writes into the
-// checkout it finds on its way up from that folder. So the test is stopped for a folder of the real checkout
-// (notInTheRealCheckout), and for one that could lead a generator to another checkout than this one
-// (onlyItsOwnCheckout). The folder is made after both have been asked: none is made in the real checkout.
-//
-// What the two do not hold: run is given the folder, and the process of the test stands in the folder of this
-// package, in the real checkout. A generator that asked the process for its folder would find the real checkout
-// there: run must not ask, as the package comment of main.go says, and main alone does.
 func (c checkout) startsIn(below string) (dir string) {
 	c.t.Helper()
 	notInTheRealCheckout(c.t, c.path(below))
@@ -157,26 +122,20 @@ func (c checkout) startsIn(below string) (dir string) {
 	return c.folder(below)
 }
 
-// all is everything the checkout holds, by its path from the checkout with "/": a file with its bytes, and a
-// folder as nil. A file that a run writes outside the folders of the generator shows here.
 func (c checkout) all() map[string][]byte {
 	c.t.Helper()
 	return testkit.Snapshot(c.t, c.root)
 }
 
-// asNew reports whether files is all that a new checkout holds: its go.mod, and nothing else.
 func asNew(files map[string][]byte) bool {
 	return len(files) == 1 && string(files["go.mod"]) == moduleFile
 }
 
-// withGoMod is the texts of a checkout that holds these files beside the go.mod of a new one.
 func withGoMod(files map[string]string) map[string]string {
 	files["go.mod"] = moduleFile
 	return files
 }
 
-// outputs is what the checkout has at and below data/ and schema/generated/, by its path from the checkout with
-// "/": a file with its bytes, and a folder as nil. A folder of the two that is not there has no entry.
 func (c checkout) outputs() map[string][]byte {
 	c.t.Helper()
 	found := map[string][]byte{}
@@ -192,12 +151,8 @@ func (c checkout) outputs() map[string][]byte {
 	return found
 }
 
-// generatorPackage is the generator's package, as go build names it from the root of the module.
 const generatorPackage = "./tools/gen"
 
-// builtProgram builds a program of this module with the go that runs the tests, into a folder of the test, and
-// returns the file. pkg names the package from the root of the module, which is the folder the build runs in.
-// The build writes that file and nothing else; it takes a second or two.
 func builtProgram(t testing.TB, pkg string) string {
 	t.Helper()
 	program := filepath.Join(t.TempDir(), "gen")
@@ -212,10 +167,6 @@ func builtProgram(t testing.TB, pkg string) string {
 	return program
 }
 
-// start starts a built program with a folder of the checkout as its working folder, which it makes, waits for
-// its end, and returns its exit code and what it wrote to each stream: below is the folder's path from the
-// checkout with "/", and "" is the checkout itself. It is the one place of the tests that starts a generator as
-// a program, and it starts one only where a generator may be started (startsIn).
 func (c checkout) start(program, below string, args ...string) (code int, stdout, stderr string) {
 	c.t.Helper()
 	dir := c.startsIn(below)
@@ -235,10 +186,6 @@ func (c checkout) start(program, below string, args ...string) (code int, stdout
 	return code, printed.String(), said.String()
 }
 
-// notInTheRealCheckout stops the test when dir is the real checkout, the one these tests are part of, or a
-// folder below it. A generator writes into the checkout it finds, and the real one is only read: so no program
-// is started there, and run is not called for it. A folder that is no full path is one from the folder of the
-// test, which is in the real checkout.
 func notInTheRealCheckout(t testing.TB, dir string) {
 	t.Helper()
 	realCheckout, err := os.Stat(testkit.RepoRoot(t))
@@ -262,12 +209,6 @@ func notInTheRealCheckout(t testing.TB, dir string) {
 	}
 }
 
-// onlyItsOwnCheckout stops the test unless a generator that walks up from dir, the folder it is started in, can
-// find no checkout but the one of the run, whose folder is root, whichever go.mod it takes on its way. dir must
-// be root or lie below it. No go.mod above root may so much as mention this module: the test's temporary folder
-// may have been put inside a checkout, and a generator may walk past the go.mod it should stop at. And at or
-// above dir, up to root, a go.mod names this module exactly when the run is of a checkout. It holds nothing of a
-// generator that asks the process for its folder.
 func onlyItsOwnCheckout(t testing.TB, root, dir string, ofACheckout bool) {
 	t.Helper()
 	if below, err := filepath.Rel(root, dir); err != nil || !filepath.IsLocal(below) {
@@ -290,7 +231,6 @@ func onlyItsOwnCheckout(t testing.TB, root, dir string, ofACheckout bool) {
 	}
 }
 
-// namesTheModuleUpTo reports whether dir, or a folder above it up to root, has a go.mod that names this module.
 func namesTheModuleUpTo(root, dir string) bool {
 	for at := dir; ; at = filepath.Dir(at) {
 		if data, err := os.ReadFile(filepath.Join(at, "go.mod")); err == nil && moduleLine.Match(data) {
@@ -302,14 +242,11 @@ func namesTheModuleUpTo(root, dir string) bool {
 	}
 }
 
-// listener is a test that keeps what is reported to it, where a real test would fail: the reports of what must
-// fail are read through it. Everything else is the real test's.
 type listener struct {
 	testing.TB
 	reports []string
 }
 
-// stopped is what a listener raises where a real test would stop.
 type stopped struct{}
 
 func (l *listener) Helper()                   {}
@@ -319,8 +256,6 @@ func (l *listener) Errorf(f string, a ...any) { l.reports = append(l.reports, fm
 func (l *listener) Fatal(args ...any)         { l.Error(args...); panic(stopped{}) }
 func (l *listener) Fatalf(f string, a ...any) { l.Errorf(f, a...); panic(stopped{}) }
 
-// listenTo runs what would fail a test with a listener for its test, up to where a real test would stop, and
-// returns what was reported, a report on a line.
 func listenTo(t testing.TB, reporting func(tb testing.TB)) string {
 	t.Helper()
 	heard := &listener{TB: t}
@@ -335,7 +270,6 @@ func listenTo(t testing.TB, reporting func(tb testing.TB)) string {
 	return strings.Join(heard.reports, "\n")
 }
 
-// texts is the files among the outputs of a checkout, each with its text. The folders are left out.
 func texts(outputs map[string][]byte) map[string]string {
 	files := map[string]string{}
 	for name, data := range outputs {
@@ -346,17 +280,11 @@ func texts(outputs map[string][]byte) map[string]string {
 	return files
 }
 
-// exported writes a file as an export of the game's files gives one, outside every checkout, and returns its
-// full path.
 func exported(t testing.TB, name, text string) string {
 	t.Helper()
 	return testkit.WriteFile(t, t.TempDir(), name, []byte(text))
 }
 
-// ---- a miniature export of the game's object data ----
-
-// sylk is the text of a table as the game's .slk files have one: a row with the names of the columns, and a row
-// for each record. A cell is a text, a whole number, or nil for a cell that the row does not have.
 func sylk(columns []string, rows ...[]any) string {
 	lines := []string{"ID;PWXL;N;E"}
 	header := make([]any, len(columns))
@@ -385,7 +313,6 @@ func sylk(columns []string, rows ...[]any) string {
 	return strings.Join(append(lines, "E", ""), "\r\n")
 }
 
-// The columns of the miniature's tables of fields and of its balance table.
 var (
 	unitMeta = []string{
 		"ID", "field", "slk", "index", "category", "displayName", "type", "useHero", "useUnit", "useBuilding", "useItem",
@@ -400,7 +327,6 @@ var (
 	balanceMeta = []string{"unitBalanceID", "isbldg", "Primary"}
 )
 
-// The miniature's files of strings, each by its path from the folder of the export.
 const (
 	humanUnitStrings    = stringsFolder + "/humanunitstrings.txt"
 	humanAbilityStrings = stringsFolder + "/humanabilitystrings.txt"
@@ -408,9 +334,6 @@ const (
 	itemStrings         = stringsFolder + "/itemstrings.txt"
 )
 
-// miniExport is a hand-written miniature of an export of the game's object data: every file that the mode
-// metadata reads, by its path from the folder of the export, in the shape the game's files have. The ids and
-// the labels are the game's where a test is about them (Holy Light, Footman); the values are made up.
 func miniExport() map[string]string {
 	return map[string]string{
 		unitFieldsTable: sylk(unitMeta,
@@ -515,8 +438,6 @@ func miniExport() map[string]string {
 	}
 }
 
-// writeExport writes the miniature export into dir, after change has adjusted its files, and returns dir: the
-// folder of the export. change may be nil.
 func writeExport(t testing.TB, dir string, change func(files map[string]string)) string {
 	t.Helper()
 	files := miniExport()
@@ -532,24 +453,17 @@ func writeExport(t testing.TB, dir string, change func(files map[string]string))
 	return dir
 }
 
-// exportedGame writes the miniature export, after change has adjusted its files, into a folder of the test that
-// is outside every checkout, and returns the folder.
 func exportedGame(t testing.TB, change func(files map[string]string)) string {
 	t.Helper()
 	return writeExport(t, t.TempDir(), change)
 }
 
-// withRow gives a table of the miniature one more row: the lines are those of the row's C records, the first
-// with the Y of a row that the table has not.
 func withRow(table string, records ...string) string {
 	return strings.Replace(table, "\r\nE\r\n", "\r\n"+strings.Join(records, "\r\n")+"\r\nE\r\n", 1)
 }
 
-// unitClassPins is the text of an overrides file with the one pin that the miniature needs: its label Class
-// gives a name that is a keyword of Pkl.
 const unitClassPins = `{"names": {"units": {"ucls": "unitClass"}}, "removed": {}}`
 
-// contains fails the test for each part that the text lacks.
 func contains(t testing.TB, text string, parts ...string) {
 	t.Helper()
 	for _, part := range parts {
@@ -559,19 +473,14 @@ func contains(t testing.TB, text string, parts ...string) {
 	}
 }
 
-// parting says, for a report, where two texts part: the offset, and the line of each there. No report shows
-// more of what a run printed or wrote than such a line.
 func parting(want, got string) string {
 	at := partingOffset(want, got)
 	return fmt.Sprintf("the two part at offset %d, where the line wanted is %q and the line got is %q",
 		at, lineAt(want, at), lineAt(got, at))
 }
 
-// firstLine is the first line of a text, for a report, cut as lineAt cuts a line.
 func firstLine(text string) string { return lineAt(text, 0) }
 
-// partingOffset is the offset of the first byte in which two texts differ: the length of the shorter when it is
-// the start of the other.
 func partingOffset(a, b string) int {
 	at := 0
 	for at < len(a) && at < len(b) && a[at] == b[at] {
@@ -580,8 +489,6 @@ func partingOffset(a, b string) int {
 	return at
 }
 
-// lineAt is the line of a text that holds the byte at an offset, for a report: without its line break, and of a
-// long line the sixty bytes before the offset and the sixty from it.
 func lineAt(text string, offset int) string {
 	offset = min(offset, len(text))
 	start := strings.LastIndexByte(text[:offset], '\n') + 1

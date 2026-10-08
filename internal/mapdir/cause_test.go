@@ -12,21 +12,17 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The two kinds of failure a user can act on. A caller tells them apart by the cause.
 const (
-	refused = false // what the map holds, or a plan for it, is refused
-	failed  = true  // the system failed
+	refused = false
+	failed  = true
 )
 
-// causes is each failure of the package that a user can act on, with the words that tell its message from the
-// others' and a way to provoke it. A row that cannot be provoked on this system skips itself.
 var causes = []struct {
 	name    string
 	words   string
 	system  bool
 	provoke func(t *testing.T) error
 }{
-	// ---- the content of the map is refused: Open ----
 	{"a link inside the map", "Symlinks are not supported", refused, func(t *testing.T) error {
 		dir := write(t, map[string]string{"Textures/Icon.blp": "icon"})
 		outside := filepath.Join(filepath.Dir(dir), "outside")
@@ -55,7 +51,6 @@ var causes = []struct {
 			t.Skip("a socket's file made on Windows could not be removed again, so the test would leave it behind")
 		}
 		dir := write(t, sourceMap)
-		// The path of a socket must be short, so it is made from inside the folder.
 		t.Chdir(dir)
 		listener, err := net.Listen("unix", "socket")
 		if err != nil {
@@ -70,7 +65,6 @@ var causes = []struct {
 		return err
 	}},
 
-	// ---- a plan for the map is refused: Place, StageTo, ApplyInPlace ----
 	{"a new file below a file of the map", "is a file, not a folder", refused, func(t *testing.T) error {
 		folder, _ := open(t, sourceMap)
 		_, err := folder.Place("war3map.w3i/x.txt")
@@ -92,15 +86,12 @@ var causes = []struct {
 		return folder.With([]Change{put("war3map.w3i", "patched")}).ApplyInPlace(context.Background(), &fsx.Journal{})
 	}},
 
-	// ---- the system failed ----
 	{"a folder that cannot be listed", "Reading the map folder failed", failed, func(t *testing.T) error {
-		// A folder that is gone by the time the scan enters it.
 		w := walker{dir: write(t, sourceMap), label: label, found: &listing{}}
 		return w.walk("Gone")
 	}},
 	{"a file that cannot be read", "Reading a map file failed", failed, func(t *testing.T) error {
 		folder, dir := open(t, sourceMap)
-		// A folder where the scan saw a file: reading it fails on every system.
 		file := filepath.Join(dir, "war3map.w3i")
 		if err := os.Remove(file); err != nil {
 			t.Fatal(err)
@@ -119,14 +110,12 @@ var causes = []struct {
 	}},
 	{"a stage that cannot be made", "Staging the map failed", failed, func(t *testing.T) error {
 		folder, _ := open(t, sourceMap)
-		// A file where the folder the stage goes into should be.
 		blocked := testkit.WriteFile(t, t.TempDir(), "dist", nil)
 		return folder.StageTo(filepath.Join(blocked, "map.w3x"))
 	}},
 	{"a file that cannot be written", "Writing a map file failed", failed, func(t *testing.T) error {
 		folder, dir := open(t, sourceMap)
 		view := folder.With([]Change{put("Sound/theme.mp3", "theme")})
-		// A file made after the scan, where the new folder goes.
 		testkit.WriteFile(t, dir, "Sound", []byte("in the way"))
 		return view.ApplyInPlace(context.Background(), &fsx.Journal{})
 	}},
@@ -138,8 +127,6 @@ var causes = []struct {
 	}},
 }
 
-// An error of the package carries a cause exactly when the system failed. Callers word the two kinds apart, and
-// decide by the cause whose failure it is.
 func TestAnErrorHasACauseExactlyWhenTheSystemFailed(t *testing.T) {
 	for _, c := range causes {
 		t.Run(c.name, func(t *testing.T) {

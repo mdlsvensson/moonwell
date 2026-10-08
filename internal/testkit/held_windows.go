@@ -7,7 +7,6 @@ import (
 	"unsafe"
 )
 
-// The flags of LockFileEx: the lock is exclusive, and the call fails where it would wait.
 const (
 	lockFailImmediately = 0x1
 	lockExclusive       = 0x2
@@ -19,12 +18,6 @@ var (
 	unlockFileEx = kernel32.NewProc("UnlockFileEx")
 )
 
-// MakeUnreadable holds the file at path the way a program does that lets nobody else read it: it opens the file
-// and shares it with nobody, and locks every byte of it for itself through that handle. Either one refuses a
-// read by another handle. The file is let go when the test ends.
-//
-// The helper then tries the read itself. A system on which the file can still be read cannot run the test, which
-// is skipped there: what the test is about is the same on every system, and is run on the others.
 func MakeUnreadable(t testing.TB, path string) {
 	t.Helper()
 	name, err := syscall.UTF16PtrFromString(path)
@@ -44,11 +37,6 @@ func MakeUnreadable(t testing.TB, path string) {
 	}
 }
 
-// MakeUnwritable holds the file at path the way a program does that lets others read it, and neither write nor
-// remove it. The file is let go when the test ends.
-//
-// The helper then tries to open the file for writing itself. A system on which it can cannot run the test, which
-// is skipped there.
 func MakeUnwritable(t testing.TB, path string) {
 	t.Helper()
 	name, err := syscall.UTF16PtrFromString(path)
@@ -68,11 +56,9 @@ func MakeUnwritable(t testing.TB, path string) {
 	}
 }
 
-// lockWholeFile takes an exclusive lock on every byte the file has or could have, through the handle, until the
-// test ends. The lock starts at the offset an Overlapped names, which is the start of the file for a zero one.
 func lockWholeFile(t testing.TB, handle syscall.Handle) {
 	t.Helper()
-	const everyByte = 0xFFFFFFFF // the low and the high half of the number of bytes
+	const everyByte = 0xFFFFFFFF
 	var fromTheStart syscall.Overlapped
 	locked, _, err := lockFileEx.Call(uintptr(handle), lockExclusive|lockFailImmediately, 0, everyByte, everyByte,
 		uintptr(unsafe.Pointer(&fromTheStart)))

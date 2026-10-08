@@ -13,8 +13,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// mapAt moves the stand-in's map to maps/<folder> and makes that the manifest's map.folder; blocks are the
-// manifest's other blocks, as newStandIn takes them.
 func (s *standIn) mapAt(folder string, blocks ...string) {
 	s.t.Helper()
 	if folder != "map.w3x" {
@@ -26,7 +24,6 @@ func (s *standIn) mapAt(folder string, blocks ...string) {
 	s.evaluatesTo(append(blocks, `"map":{"folder":"`+folder+`","entry":"src/main.yue"}`)...)
 }
 
-// stagedOf stages the plan of a stand-in project, which must go well, and returns where.
 func stagedOf(t testing.TB, s *standIn, plan *Result) place {
 	t.Helper()
 	at, err := stage(s.env, s.project, plan)
@@ -80,8 +77,8 @@ func TestStageOfAMapWithoutObjectsSettingsOrAssetsSaysNothing(t *testing.T) {
 func TestStageRefusesAFileOnTheWayToTheStageByItsName(t *testing.T) {
 	tests := []struct {
 		name   string
-		folder string // map.folder
-		file   string // the file on the way, from the project folder
+		folder string
+		file   string
 	}{
 		{"a file at dist/stage", "map.w3x", "dist/stage"},
 		{"a file where a folder of the map's folder goes", "campaign/one.w3x", "dist/stage/campaign"},
@@ -108,8 +105,6 @@ func TestStageRefusesAFileOnTheWayToTheStageByItsName(t *testing.T) {
 func TestStageNamesTheStageItCouldNotWriteFromTheProjectFolder(t *testing.T) {
 	s := newStandIn(t)
 	plan := planOf(t, s, Options{})
-	// A folder where the map's script was when the plan was made: the copy has it, and no system writes the
-	// planned script over a folder.
 	s.remove("maps/map.w3x/war3map.lua")
 	s.folder("maps/map.w3x/war3map.lua")
 	_, err := stage(s.env, s.project, plan)
@@ -121,13 +116,11 @@ func TestStageNamesTheStageItCouldNotWriteFromTheProjectFolder(t *testing.T) {
 	}
 }
 
-// Every folder on the way to the stage is a real one, dist too: behind a link the stage could be the source map
-// or lie in it, and staging would replace the map by its own copy.
 func TestStageRefusesALinkOnTheWayToTheStageByItsStep(t *testing.T) {
 	tests := []struct {
 		name   string
-		link   string // the step that is a link, from the project folder
-		target string // what it is a link to, from the project folder
+		link   string
+		target string
 	}{
 		{"dist to the source map", "dist", "maps/map.w3x"},
 		{"dist to a folder of the source map", "dist", "maps/map.w3x/war3mapImported"},
@@ -140,8 +133,6 @@ func TestStageRefusesALinkOnTheWayToTheStageByItsStep(t *testing.T) {
 			s := newStandIn(t)
 			s.put("maps/map.w3x/war3mapImported/a.txt", "asset")
 			s.put("maps/other/kept.txt", "kept")
-			// The plan is made, and the compile's cache written, with a dist of the project's own: the link is
-			// there for the stage alone.
 			plan := planOf(t, s, Options{})
 			s.remove(tt.link)
 			testkit.LinkDir(t, s.at(tt.target), s.at(tt.link))

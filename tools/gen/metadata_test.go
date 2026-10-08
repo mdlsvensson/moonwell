@@ -16,7 +16,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// withPins makes a scratch checkout with an overrides file of this text and a data folder.
 func withPins(t testing.TB, pins string) checkout {
 	t.Helper()
 	c := newCheckout(t)
@@ -25,7 +24,6 @@ func withPins(t testing.TB, pins string) checkout {
 	return c
 }
 
-// written reads the data/metadata.json among the outputs of a checkout.
 func written(t testing.TB, files map[string][]byte) *objects.Metadata {
 	t.Helper()
 	metadata, err := decodeMetadata(files[metadataPath])
@@ -35,8 +33,6 @@ func written(t testing.TB, files map[string][]byte) *objects.Metadata {
 	return metadata
 }
 
-// The report of the miniature export: the counts of the lists and of the categories in their order, the renames
-// in the order of the lists and then of the ids, and the command that is to be run next.
 const miniReport = `fields: {"units":9,"items":2,"abilities":9,"buffs":2,"upgrades":5}
 bases: {"heroes":1,"units":2,"buildings":1,"items":1,"abilities":2,"buffs":2,"upgrades":1}
 renamed (3):
@@ -60,15 +56,12 @@ func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(
 	if first[metadataPath] == "" || !maps.Equal(first, beside) {
 		t.Fatalf("the run left %q, want the metadata beside what the checkout held", slices.Sorted(maps.Keys(first)))
 	}
-	// One field and one standard object on a line keep the file small and its changes readable. "&" stands as it
-	// is: the file escapes no more than a JSON text must.
 	contains(t, first[metadataPath],
 		"{\n  \"format\": 1,\n  \"game\": \"3.0.0.1\",\n  \"fields\": {\n    \"units\": [\n      {\"id\":\"uabi\",",
 		"\n      {\"id\":\"uhpm\",\"name\":\"hitPointsMaximumBase\",",
 		"\n      \"AHhb\": {\"name\":\"Holy Light\",\"levels\":3},",
 		`"label":"% Bonus & More"`,
 	)
-	// The second run finds the file of the first as the names that are released, and writes it again.
 	again, files, err := c.run("metadata", folder, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
@@ -82,10 +75,6 @@ func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(
 	}
 }
 
-// The renames are reported in the order of the lists, and in a list in the order of the ids' bytes: capitals
-// first. A field of units and of items is reported once, under the units, and a field that items alone use under
-// the items. The id of three letters is pinned and reported as an author writes it, and the file has it in four
-// bytes.
 func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testing.T) {
 	folder := exportedGame(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
@@ -113,16 +102,14 @@ func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testin
 `)
 }
 
-// A run that is refused prints nothing and leaves the data folder as it was: the file of another version is
-// kept, and no file is made where there was none.
 func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 	const released = `{"format":1,"game":"1.0","fields":{"units":[{"id":"uhpm","name":"hitPoints"}]}}`
 	whole := exportedGame(t, nil)
 	for name, c := range map[string]struct {
 		folder string
-		pins   string // the overrides; "" for those of the miniature
-		kept   string // the data/metadata.json that the checkout holds; "" for none
-		starts string // what the error starts with
+		pins   string
+		kept   string
+		starts string
 		words  []string
 	}{
 		"a name that needs a pin": {folder: whole, pins: "{}", starts: "cannot derive friendly names:\n  ",
@@ -130,15 +117,12 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 		"a file that the export lacks": {
 			folder: exportedGame(t, func(files map[string]string) { delete(files, upgradesTable) }),
 			starts: "war3.w3mod/units/upgradedata.slk is missing from "},
-		// A column that the game has renamed would read as empty, and every mark of a skin would be false.
 		"a table whose column netsafe has another name": {
 			folder: exportedGame(t, func(files map[string]string) {
 				files[unitFieldsTable] = strings.Replace(files[unitFieldsTable], `K"netsafe"`, `K"netSafe"`, 1)
 			}),
 			starts: `war3.w3mod/units/unitmetadata.slk has no column "netsafe"`,
 			words:  []string{"tools/gen/export.go"}},
-		// Every file of the export is read before anything is made of it: a table that lacks a column, and one
-		// that does not parse, is told of before a name that needs a pin.
 		"a name that needs a pin, in an export with a table that lacks a column": {pins: "{}",
 			folder: exportedGame(t, func(files map[string]string) {
 				files[upgradesTable] = strings.Replace(files[upgradesTable], `K"maxlevel"`, `K"levels"`, 1)
@@ -193,9 +177,6 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 	}
 }
 
-// A failure of the system on a file of the checkout names the file by its path from the checkout: the overrides
-// that are not there, the released metadata that is a folder, and the data folder that is not there to write
-// into.
 func TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn(t *testing.T) {
 	folder := exportedGame(t, nil)
 	for name, c := range map[string]struct {
@@ -223,9 +204,6 @@ func TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn(t *testing.T) {
 	}
 }
 
-// Every kind of entry, against the text as it stands in the file: a field with every key, the id of three
-// letters, a list that holds nothing and a category without an object, an object with levels and one without,
-// texts that a JSON string must escape, and the objects of a category in the order of their ids' bytes.
 func TestRenderMetadataWritesTheTextOfTheFile(t *testing.T) {
 	none, three := 0, 3
 	metadata := &objects.Metadata{
@@ -286,8 +264,6 @@ func TestRenderMetadataWritesTheTextOfTheFile(t *testing.T) {
 	}
 }
 
-// The committed file, read and rendered again, is itself: byte for byte. Its lists of fields are the five that
-// the renderer writes.
 func TestTheCommittedMetadataRendersToItself(t *testing.T) {
 	committed := string(moonwell.Metadata)
 	metadata := objects.LoadMetadata()
@@ -303,9 +279,6 @@ func TestTheCommittedMetadataRendersToItself(t *testing.T) {
 	}
 }
 
-// The game's object data, with the version that the committed metadata state and the committed overrides, give
-// the committed metadata byte for byte, over the committed file and into an empty data folder. The test reads
-// the export that MOONWELL_GAME_DATA names, and takes a second or two.
 func TestTheModeMetadataWritesTheCommittedMetadataFromTheGamesFiles(t *testing.T) {
 	export := testkit.NeedExport(t, "MOONWELL_GAME_DATA").Path()
 	committed := objects.LoadMetadata()
@@ -342,7 +315,6 @@ func TestTheModeMetadataWritesTheCommittedMetadataFromTheGamesFiles(t *testing.T
 	}
 }
 
-// The file that the mode writes is read back as the program reads it.
 func TestTheModeMetadataWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
 	game := readMini(t, nil)
 	fields, _, err := nameFields(game, unitClass)

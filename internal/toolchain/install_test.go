@@ -16,8 +16,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// served is a world that serves body as the download of a compiler of version 9.9.9, and that compiler as a tool
-// whose archive is of this kind and holds the program under this name. Every program reports 9.9.9.
 func served(t testing.TB, body []byte, archive, binary string) (*env.Env, Tool) {
 	t.Helper()
 	e, _, _ := world(t, yueAddress, body)
@@ -49,7 +47,6 @@ func TestTheProgramIsAskedForItsVersionInAStagingFolderBesideTheTargetBeforeItIs
 	}
 }
 
-// Only the entry that is the program is written, so no name in an archive reaches outside the staging folder.
 func TestAZipGivesUpOnlyTheProgram(t *testing.T) {
 	archive := zipOf(t, "../escaped", "x", "../../../escaped", "x", "/escaped", "x", "notes/readme", "x", "yue", "the compiler")
 	e, tool := served(t, archive, "zip", "yue")
@@ -91,8 +88,6 @@ func TestADownloadThatIsNoZipIsRefusedAndNothingIsInstalled(t *testing.T) {
 	}
 }
 
-// tar is a machine whose tar.exe unpacks these files, each a name and what it holds, and on which every other
-// program reports the compiler 9.9.9. It checks what tar is asked.
 func tar(t testing.TB, archive []byte, unpacked ...string) env.RunFunc {
 	return func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		if filepath.Base(program) != "tar.exe" {
@@ -112,8 +107,6 @@ func tar(t testing.TB, archive []byte, unpacked ...string) env.RunFunc {
 	}
 }
 
-// Nothing in Go's library reads a 7z. Windows' own tar.exe does, and it is run through the Env, so this test
-// needs neither Windows nor a tar.
 func TestA7zIsUnpackedByTheTarOfWindowsThroughRun(t *testing.T) {
 	for _, systemRoot := range []string{`X:\System`, ""} {
 		t.Setenv("SystemRoot", systemRoot)
@@ -135,7 +128,6 @@ func TestA7zIsUnpackedByTheTarOfWindowsThroughRun(t *testing.T) {
 		if len(ran) != 2 || ran[0] != filepath.Join(systemRoot, "System32", "tar.exe") {
 			t.Errorf("it ran %q", ran)
 		}
-		// The whole archive is unpacked, as its files may need each other; the archive itself is not kept.
 		want := []string{"yue", "yue/9.9.9", "yue/9.9.9/license.txt", "yue/9.9.9/yue.exe"}
 		if got := holds(t, e.CacheDir); !slices.Equal(got, want) {
 			t.Errorf("the cache holds %q, want %q", got, want)
@@ -148,7 +140,7 @@ func TestA7zThatCannotBeUnpackedIsRefusedAndNothingIsInstalled(t *testing.T) {
 	tests := []struct {
 		name    string
 		tar     env.RunFunc
-		message string // "" for a cancellation, which is passed on as it is
+		message string
 		hinted  bool
 	}{
 		{"tar fails", func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
@@ -186,7 +178,6 @@ func TestA7zThatCannotBeUnpackedIsRefusedAndNothingIsInstalled(t *testing.T) {
 	}
 }
 
-// The list of downloads is Moonwell's own, so a kind of archive it cannot unpack is its own bug, not the user's.
 func TestAnArchiveOfAKindMoonwellDoesNotUnpackIsNotAUsersMistake(t *testing.T) {
 	e, tool := served(t, []byte("a tarball"), "tar.gz", "yue")
 	e.Run = noProgram(t)
@@ -228,8 +219,6 @@ func TestADownloadedProgramThatCannotBeStartedIsRefusedWithWhatElseToDo(t *testi
 	}
 }
 
-// Two commands may install one version at a time. The one that finishes last finds the program in place, keeps
-// it, and removes its own staging folder.
 func TestAnInstallAnotherProcessFinishedFirstIsKept(t *testing.T) {
 	e, _, _, tool := yueInstaller(t, "")
 	e.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
@@ -263,12 +252,9 @@ func TestAFolderInThePlaceOfTheInstallThatHoldsNoProgramIsRefusedByItsName(t *te
 	}
 }
 
-// A move that fails while nothing is at the place of the install is the system's failure: there is no folder to
-// remove, so the hint does not ask for it.
 func TestAMoveIntoPlaceThatFailsWithNothingInItsWayIsRefusedWithTheSystemsReason(t *testing.T) {
 	e, _, _, tool := yueInstaller(t, "")
 	e.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
-		// The staging folder goes away under the install, so the rename has nothing to move.
 		if err := os.RemoveAll(filepath.Dir(program)); err != nil {
 			t.Error(err)
 		}
@@ -298,8 +284,6 @@ func TestACacheFolderThatCannotBeMadeIsRefusedByItsName(t *testing.T) {
 	}
 }
 
-// A staging folder that cannot be removed is left with a program that failed a check. No call returns a program
-// from there, and the user is told of the folder.
 func TestAStagingFolderThatCannotBeRemovedIsNamedInAWarning(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		t.Skip("only Windows refuses to remove a file that a program has open")

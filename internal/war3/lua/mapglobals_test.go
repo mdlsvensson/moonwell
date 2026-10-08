@@ -80,18 +80,12 @@ func TestADeclarationIsTypedByItsValueUnlessItsNameSaysWhatItHolds(t *testing.T)
 		{"udg_A=-.5", "udg_A", "number"},
 		{"udg_A = 1.", "udg_A", "any"},
 		{"udg_A = true", "udg_A", "boolean"},
-		// Only Lua's white space is taken off the ends of a value. Any other character there is part of it: a
-		// number with a tilde before or after it is no number, and true with one is no boolean.
 		{"udg_A = ~5~", "udg_A", "any"},
 		{"udg_A = ~true", "udg_A", "any"},
-		// A value is typed as a whole: a number or an array that is one side of an expression says nothing of
-		// what the expression gives. A declaration without a value is one all the same.
 		{"udg_A = 0.5 + 1", "udg_A", "any"},
 		{"udg_A = x or __jarray(0)", "udg_A", "any"},
 		{"udg_A = __jarray(0) or x", "udg_A", "any"},
 		{"udg_A =", "udg_A", "any"},
-		// A name may start with an underscore, and be one. A handle's name has an underscore after its kind:
-		// without it the name says nothing of what the variable holds.
 		{"_under = 1", "_under", "integer"},
 		{"_ = 0.5", "_", "number"},
 		{"gg_dest = nil", "gg_dest", "any"},
@@ -116,11 +110,8 @@ func TestADeclarationIsTypedByItsValueUnlessItsNameSaysWhatItHolds(t *testing.T)
 
 func TestOnlyLuasOwnWhiteSpaceIsLeftOutOfAValue(t *testing.T) {
 	for _, c := range []struct{ name, line, want string }{
-		// A line separator (U+2028) is an ordinary character to Lua, so a value may hold one.
 		{"a line separator in a string", "udg_A = \"x\xE2\x80\xA8y\"", "string"},
-		// A no-break space is not white space to Lua: it stays in the value, which is then no integer.
 		{"a no-break space after a number", "udg_A = 5\xC2\xA0", "any"},
-		// A space, a tab and a carriage return are white space to Lua, and are left out.
 		{"white space after a number", "udg_A = 5 \t\r", "integer"},
 	} {
 		globals := ReadMapGlobals(c.line + "\n").Globals
@@ -146,7 +137,6 @@ func TestOnlyALineThatStartsWithANameOrAFunctionIsRead(t *testing.T) {
 	}
 }
 
-// A name of Lua may start with an underscore, and be nothing but one: such a function is a function of the map.
 func TestAFunctionWhoseNameStartsWithAnUnderscoreIsRead(t *testing.T) {
 	globals := ReadMapGlobals("function _hidden()\nend\nfunction _()\nend\nfunction __two_2()\nend\nfunction 2nd()\nend\n")
 	if !slices.Equal(globals.Functions, []string{"_hidden", "_", "__two_2"}) {

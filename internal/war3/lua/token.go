@@ -1,6 +1,3 @@
-// Package lua reads Lua 5.3 source without running it, writes Lua literals, and splices edits into a source. It
-// takes source text and returns tokens, what scanners find in them, and the source with edits made. It knows
-// nothing of modules, bundles or maps beyond war3map.lua's shape.
 package lua
 
 import (
@@ -10,7 +7,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// Kind is the kind of a token. Comments and white space are not tokens.
 type Kind uint8
 
 const (
@@ -20,30 +16,23 @@ const (
 	SymbolToken
 )
 
-// Token is one token of Lua source.
 type Token struct {
-	Kind Kind
-	// Raw is the token's source text.
-	Raw string
-	// Text is a string's content: what stands between the quotes, with its escapes as written, or a long string's
-	// content without its first line break. For other kinds it is Raw.
+	Kind    Kind
+	Raw     string
 	Text    string
-	Start   int // byte offsets in the source
+	Start   int
 	End     int
-	Line    int  // 1-based line of the token's start
-	Escaped bool // a quoted string that has a backslash
+	Line    int
+	Escaped bool
 }
 
-// is reports whether the token is the symbol.
 func (t Token) is(symbol string) bool { return t.Kind == SymbolToken && t.Raw == symbol }
 
-// Fault is the first malformed token of a source.
 type Fault struct {
 	Msg    string
-	Offset int // byte offset
+	Offset int
 }
 
-// longSymbols are the symbols of several characters, a longer one before the one it starts with.
 var longSymbols = []string{"...", "..", "//", "<<", ">>", "==", "~=", "<=", ">=", "::"}
 
 const singleSymbols = "+-*/%^#&~|<>=(){}[];:,."
@@ -54,7 +43,6 @@ var keywords = map[string]bool{
 	"repeat": true, "return": true, "then": true, "true": true, "until": true, "while": true,
 }
 
-// isSpace reports whether Lua skips the byte between tokens: its white space is that of ASCII.
 func isSpace(c byte) bool { return strings.IndexByte(fsx.ASCIISpace, c) >= 0 }
 
 func isNameStart(c byte) bool {
@@ -69,7 +57,6 @@ func isHexDigit(c byte) bool {
 
 func isNamePart(c byte) bool { return isNameStart(c) || isDigit(c) }
 
-// run returns how many bytes at the start of s satisfy is.
 func run(s string, is func(byte) bool) int {
 	n := 0
 	for n < len(s) && is(s[n]) {
@@ -78,10 +65,6 @@ func run(s string, is func(byte) bool) int {
 	return n
 }
 
-// Tokenize splits Lua source into tokens. It never fails: the first malformed token is returned as the fault, and
-// reading goes on in the way that loses least. An unterminated quoted string ends at its line break, an unterminated
-// long bracket runs to the end, a bad numeral takes the letters, digits and dots that follow it, and a character
-// that Lua has no symbol for is a symbol of its own.
 func Tokenize(source string) ([]Token, *Fault) {
 	l := &lexer{source: source, line: 1}
 	for l.at < len(source) {
@@ -92,23 +75,20 @@ func Tokenize(source string) ([]Token, *Fault) {
 	return l.tokens, l.fault
 }
 
-// lexer is a place in a source, with the tokens read up to it.
 type lexer struct {
 	source string
-	at     int // byte offset of what is read next
-	line   int // 1-based line of at
+	at     int
+	line   int
 	tokens []Token
 	fault  *Fault
 }
 
-// fail notes a malformed token at the offset. Only the first is kept.
 func (l *lexer) fail(msg string, offset int) {
 	if l.fault == nil {
 		l.fault = &Fault{Msg: msg, Offset: offset}
 	}
 }
 
-// skipSpace steps over one white space character and reports whether there was one.
 func (l *lexer) skipSpace() bool {
 	c := l.source[l.at]
 	if !isSpace(c) {
@@ -121,7 +101,6 @@ func (l *lexer) skipSpace() bool {
 	return true
 }
 
-// skipComment steps over a comment and reports whether there was one. A short comment ends before its line break.
 func (l *lexer) skipComment() bool {
 	if !strings.HasPrefix(l.source[l.at:], "--") {
 		return false
@@ -138,15 +117,12 @@ func (l *lexer) skipComment() bool {
 	return true
 }
 
-// bracket is a long bracket: `[[ ... ]]` or, with a level, `[==[ ... ]==]`.
 type bracket struct {
-	content, contentEnd int // the text between the opening and the closing bracket
-	end                 int // where the closing bracket ends
+	content, contentEnd int
+	end                 int
 	closed              bool
 }
 
-// longBracket finds the long bracket that opens at start, when one does. One that never closes runs to the end of
-// the source.
 func longBracket(source string, start int) (bracket, bool) {
 	if start >= len(source) || source[start] != '[' {
 		return bracket{}, false
@@ -165,8 +141,6 @@ func longBracket(source string, start int) (bracket, bool) {
 	return bracket{content: content, contentEnd: contentEnd, end: contentEnd + len(closing), closed: true}, true
 }
 
-// skipLong steps over the long bracket that opens here, as a comment or as a string, and counts its lines. One that
-// never closes is a fault at the offset where it opens.
 func (l *lexer) skipLong(long bracket) {
 	if !long.closed {
 		l.fail("unterminated long string or comment", l.at)
@@ -175,7 +149,6 @@ func (l *lexer) skipLong(long bracket) {
 	l.at = long.end
 }
 
-// token reads the token that starts here.
 func (l *lexer) token() {
 	token := Token{Start: l.at, Line: l.line}
 	c, rest := l.source[l.at], l.source[l.at:]
@@ -206,8 +179,6 @@ func (l *lexer) token() {
 	l.tokens = append(l.tokens, token)
 }
 
-// quoted reads a quoted string into the token: its text and whether it has an escape. A string that its line ends
-// before the closing quote stops at the line break, and one that the source ends in runs to the end.
 func (l *lexer) quoted(token *Token) {
 	quote, content := l.source[l.at], l.at+1
 	for l.at = content; l.at < len(l.source); {
@@ -231,10 +202,6 @@ func (l *lexer) quoted(token *Token) {
 	token.Text = l.source[content:]
 }
 
-// escape steps over a backslash and the byte it escapes, so that an escaped quote or line break does not end the
-// string. `\z` also takes the white space that follows it, and a backslash before a return and a line feed takes
-// both. No byte of a character of several bytes is a quote, a backslash or a line break, so the rest of an escaped
-// one needs no care.
 func (l *lexer) escape() {
 	l.at++
 	rest := l.source[l.at:]
@@ -255,8 +222,6 @@ func (l *lexer) escape() {
 	}
 }
 
-// longText is the text of a long string with the content given: Lua leaves out a line break that directly follows
-// the opening bracket.
 func longText(content string) string {
 	if rest, ok := strings.CutPrefix(content, "\r\n"); ok {
 		return rest
@@ -264,7 +229,6 @@ func longText(content string) string {
 	return strings.TrimPrefix(content, "\n")
 }
 
-// numeral reads a numeral. A malformed one is a fault, and takes the letters, digits and dots that follow it.
 func (l *lexer) numeral() {
 	rest := l.source[l.at:]
 	length := numeralLength(rest)
@@ -275,8 +239,6 @@ func (l *lexer) numeral() {
 	l.at += length
 }
 
-// numeralLength is the length of the Lua numeral at the start of s, or 0 when there is none: digits with a dot
-// among them, then an exponent. After `0x` the digits are hexadecimal and the exponent letter is `p`.
 func numeralLength(s string) int {
 	isDigits, exponent, prefix := isDigit, "eE", 0
 	if len(s) >= 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X') {
@@ -290,9 +252,6 @@ func numeralLength(s string) int {
 	return n + exponentLength(s[n:], exponent)
 }
 
-// mantissaLength is the length of the digits at the start of s, with one dot before, among or after them; 0 when
-// there is no digit. A dot after digits belongs to the numeral unless another dot follows it: `1..2` is `1`, `..`,
-// `2`.
 func mantissaLength(s string, isDigits func(byte) bool) int {
 	whole := run(s, isDigits)
 	after := s[whole:]
@@ -309,8 +268,6 @@ func mantissaLength(s string, isDigits func(byte) bool) int {
 	return whole + 1 + fraction
 }
 
-// exponentLength is the length of the exponent at the start of s: one of the letters, a sign if there is one, and
-// decimal digits. Without a digit there is no exponent, and the length is 0.
 func exponentLength(s, letters string) int {
 	if s == "" || strings.IndexByte(letters, s[0]) < 0 {
 		return 0
@@ -328,8 +285,6 @@ func exponentLength(s, letters string) int {
 
 func isSign(c byte) bool { return c == '+' || c == '-' }
 
-// runsOn reports whether what stands after a numeral would be part of it: a letter, or a dot that does not start
-// `..`.
 func runsOn(after string) bool {
 	if after == "" {
 		return false
@@ -337,8 +292,6 @@ func runsOn(after string) bool {
 	return isNameStart(after[0]) || (after[0] == '.' && !strings.HasPrefix(after, ".."))
 }
 
-// malformedLength is how much of s a malformed numeral takes: its first byte, then every letter, digit and dot,
-// and a sign that follows an exponent letter.
 func malformedLength(s string) int {
 	n := 1
 	for n < len(s) && (isNamePart(s[n]) || s[n] == '.' || (isSign(s[n]) && strings.IndexByte("eEpP", s[n-1]) >= 0)) {
@@ -347,8 +300,6 @@ func malformedLength(s string) int {
 	return n
 }
 
-// symbol reads a symbol: the longest that Lua has here, or else one character. A character that Lua has no symbol
-// for is a fault.
 func (l *lexer) symbol() {
 	rest := l.source[l.at:]
 	for _, symbol := range longSymbols {
@@ -364,8 +315,6 @@ func (l *lexer) symbol() {
 	l.at += size
 }
 
-// simpleTokens returns the tokens of a source as the scanners that only look for names and punctuation want them:
-// without the numbers, and with every symbol but a run of dots split into its characters.
 func simpleTokens(source string) []Token {
 	tokens, _ := Tokenize(source)
 	simple := make([]Token, 0, len(tokens))
@@ -381,7 +330,6 @@ func simpleTokens(source string) []Token {
 	return simple
 }
 
-// characters splits a symbol into one symbol for each of its characters.
 func characters(symbol Token) []Token {
 	var split []Token
 	for offset := 0; offset < len(symbol.Raw); {
@@ -397,7 +345,6 @@ func characters(symbol Token) []Token {
 	return split
 }
 
-// tokenAt is tokens[i], or a symbol that no source has when there is no such token.
 func tokenAt(tokens []Token, i int) Token {
 	if i < 0 || i >= len(tokens) {
 		return Token{Kind: SymbolToken}

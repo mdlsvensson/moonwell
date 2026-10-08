@@ -29,11 +29,10 @@ func TestRunRefusesAFirstArgumentThatNamesNoMode(t *testing.T) {
 	}
 }
 
-// The refusal names the modes that the table has, so a mode is named in one place.
 func TestTheRefusalOfAnUnknownModeNamesTheModesOfTheTable(t *testing.T) {
 	for _, c := range []struct {
 		names []string
-		want  string // what the sentence says the modes are
+		want  string
 	}{
 		{[]string{"", "natives", "metadata", "game-paths"}, "natives, metadata and game-paths"},
 		{[]string{"", "natives", "game-paths"}, "natives and game-paths"},
@@ -69,7 +68,6 @@ func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
 		{[]string{"game-paths"}, gamePaths},
 		{[]string{"game-paths", "listfile.txt"}, gamePaths},
 		{[]string{"game-paths", "listfile.txt", "1.2.3.4", "more"}, gamePaths},
-		// The mode without a name is also the mode of an empty first argument, and takes nothing after it.
 		{[]string{"", "more"}, "Usage: go run ./tools/gen"},
 	} {
 		printed, files, err := newCheckout(t).run(c.args...)
@@ -82,8 +80,6 @@ func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
 	}
 }
 
-// Every row of the table refuses one argument too many with its own usage line, which names the command line of
-// its mode.
 func TestEveryModeHasAUsageLineThatNamesItsCommandLine(t *testing.T) {
 	for _, m := range modes {
 		start := strings.TrimSuffix("Usage: go run ./tools/gen "+m.name, " ")
@@ -108,13 +104,11 @@ func TestTheTableStartsWithTheModeWithoutANameAndNamesEachModeOnce(t *testing.T)
 	if len(names) == 0 || names[0] != "" {
 		t.Errorf("the table's modes are %q, want the one without a name first", names)
 	}
-	// The order is that of the command lines in the package comment, and of the sentence for an unknown mode.
 	if want := []string{"", "natives", "metadata", "game-paths"}; !slices.Equal(names, want) {
 		t.Errorf("the table's modes are %q, want %q", names, want)
 	}
 }
 
-// Each folder is given a line that names no mode: a run that finds a checkout all the same writes nothing there.
 func TestRunRefusesAFolderThatIsInNoCheckout(t *testing.T) {
 	for name, module := range map[string]string{
 		"no go.mod":                "",
@@ -133,8 +127,6 @@ func TestRunRefusesAFolderThatIsInNoCheckout(t *testing.T) {
 	}
 }
 
-// A run in the checkout, one folder down and three down writes the schema into the checkout, and nothing into
-// the folder it is run in, whatever line ending and white space the go.mod has.
 func TestRunFindsTheCheckoutAtOrAboveTheFolderItIsRunIn(t *testing.T) {
 	for name, module := range map[string]string{
 		"a line feed":                       moduleFile,
@@ -164,8 +156,6 @@ func TestRunFindsTheCheckoutAtOrAboveTheFolderItIsRunIn(t *testing.T) {
 	}
 }
 
-// A go.mod of another module, between the folder of the run and the checkout, is passed over: the run is in the
-// checkout above it, reads the metadata there and writes there.
 func TestRunPassesOverTheGoModOfAnotherModuleOnItsWayUp(t *testing.T) {
 	c := newCheckout(t)
 	c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
@@ -183,9 +173,6 @@ func TestRunPassesOverTheGoModOfAnotherModuleOnItsWayUp(t *testing.T) {
 	}
 }
 
-// Of two checkouts, one inside the other, the run is in the nearer one, and the one above is left as it is. The
-// two are one scratch folder to the helper that runs the line: it starts nothing in a scratch checkout that lies
-// inside another.
 func TestRunTakesTheNearerOfTwoCheckouts(t *testing.T) {
 	outer := newCheckout(t)
 	outer.write("data/metadata.json", metadataOfOneBuff(t, "fabo", "above"))
@@ -206,9 +193,6 @@ func TestRunTakesTheNearerOfTwoCheckouts(t *testing.T) {
 	}
 }
 
-// A failure of the system on a file of the checkout names what the system's error names, by its path from the
-// checkout: the file itself, or the step on the way to it that the system could not take. An error that names
-// nothing, or something outside the checkout, is told of the file that was being read or written.
 func TestAFailureInTheCheckoutNamesWhatTheSystemNamesByItsPathFromTheCheckout(t *testing.T) {
 	const writing = "schema/generated/HeroProps.pkl"
 	checkout := filepath.Join(t.TempDir(), "checkout")
@@ -225,7 +209,6 @@ func TestAFailureInTheCheckoutNamesWhatTheSystemNamesByItsPathFromTheCheckout(t 
 		{at("mkdir", "schema"), "schema: the reason"},
 		{fmt.Errorf("writing: %w", at("mkdir", "schema")), "schema: the reason"},
 		{at("open", "..", "elsewhere", "file"), writing + ": the reason"},
-		// The folder of the checkout has no path from itself.
 		{at("mkdir"), writing + ": the reason"},
 		{at("mkdir", "schema", ".."), writing + ": the reason"},
 		{reason, writing + ": the reason"},
@@ -236,9 +219,6 @@ func TestAFailureInTheCheckoutNamesWhatTheSystemNamesByItsPathFromTheCheckout(t 
 	}
 }
 
-// The helpers that start a generator, as a program and through run, start none in the real checkout or below
-// it, whatever they are called with: a generator writes into the checkout it finds. A folder that is no full
-// path is one from the folder of the test, which is in the real checkout.
 func TestTheHelpersRunNoGeneratorInTheRealCheckout(t *testing.T) {
 	const refusal = "is in the real checkout"
 	root := testkit.RepoRoot(t)
@@ -251,15 +231,11 @@ func TestTheHelpersRunNoGeneratorInTheRealCheckout(t *testing.T) {
 	if heard := listenTo(t, func(tb testing.TB) { notInTheRealCheckout(tb, t.TempDir()) }); heard != "" {
 		t.Errorf("a folder of the test: got %q, want nothing", heard)
 	}
-	// The program is none that could be started, and the mode none that writes: a helper that went on would do
-	// nothing to the checkout either.
 	started := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.start("no-such-program", "") })
 	called := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.runBelow("", "no-such-mode") })
 	if !strings.Contains(started, refusal) || !strings.Contains(called, refusal) {
 		t.Errorf("start said %q and runBelow %q, want the refusal from both", started, called)
 	}
-	// runBelow makes the folder it runs in, and asks before it makes one: a folder that the real checkout has
-	// not is refused, and is not there afterwards.
 	const below = "tools/gen/no-such-folder"
 	made := filepath.Join(root, filepath.FromSlash(below))
 	refused := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.runBelow(below, "no-such-mode") })
@@ -274,23 +250,20 @@ func TestTheHelpersRunNoGeneratorInTheRealCheckout(t *testing.T) {
 	}
 }
 
-// The folder a generator is started in: nothing is started where a generator that walks up from that folder
-// could find a checkout that is not the run's own.
 func TestNothingIsStartedWhereAnotherCheckoutCouldBeFound(t *testing.T) {
 	const (
 		mentioned = "module example.com/other\n\nrequire " + modulePath + " v1.0.0\n"
-		// Words of the three refusals.
-		inside   = "is inside a checkout"
-		unnamed  = "names this module: false"
-		notBelow = "nor below it"
+		inside    = "is inside a checkout"
+		unnamed   = "names this module: false"
+		notBelow  = "nor below it"
 	)
 	for name, c := range map[string]struct {
-		above     string // the go.mod of the folder above the run's; "" for none
-		own       string // the go.mod of the run's folder; "" for none
-		below     string // where the line is run, from the run's folder
-		elsewhere bool   // the line is run in a folder that is not the run's
-		ofOne     bool   // the run is of a checkout
-		refused   string // words of the refusal; "" for a folder in which a run may start
+		above     string
+		own       string
+		below     string
+		elsewhere bool
+		ofOne     bool
+		refused   string
 	}{
 		"a checkout":                              {own: moduleFile, ofOne: true},
 		"a folder below a checkout":               {own: moduleFile, below: "tools/gen", ofOne: true},
@@ -323,8 +296,6 @@ func TestNothingIsStartedWhereAnotherCheckoutCouldBeFound(t *testing.T) {
 	}
 }
 
-// Both helpers that start a generator stand behind that guard: neither starts one in a scratch checkout that
-// lies inside another, nor in a scratch folder whose kind is not the one the test made it as.
 func TestTheHelpersStartNoGeneratorWhereAnotherCheckoutCouldBeFound(t *testing.T) {
 	outer := newCheckout(t)
 	inner := checkout{t: t, root: outer.folder("inner")}
@@ -332,7 +303,7 @@ func TestTheHelpersStartNoGeneratorWhereAnotherCheckoutCouldBeFound(t *testing.T
 	lost := noCheckout(t, moduleFile)
 	for name, c := range map[string]struct {
 		in      checkout
-		refused string // words of the refusal
+		refused string
 	}{
 		"a checkout inside a checkout":        {inner, "is inside a checkout"},
 		"a checkout where the run is of none": {lost, "names this module: true"},
@@ -346,10 +317,6 @@ func TestTheHelpersStartNoGeneratorWhereAnotherCheckoutCouldBeFound(t *testing.T
 	}
 }
 
-// The program itself, built and started in a scratch checkout: main gives run the folder of the process and the
-// arguments after the program's name, sends what a run prints to standard output and its complaint to standard
-// error, and ends with the code. The test builds the generator, which takes a second or two, and is skipped
-// with -short; it needs no tool but go.
 func TestTheProgramPrintsToStandardOutputAndComplainsOnStandardError(t *testing.T) {
 	if testing.Short() {
 		t.Skip("the test builds the generator and starts it: not with -short")

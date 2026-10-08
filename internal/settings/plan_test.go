@@ -16,13 +16,10 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// mapLabel is how the errors of these tests name the map folder.
 const mapLabel = "maps/map.w3x"
 
-// byteOrderMark is what a text file may start with.
 const byteOrderMark = "\xEF\xBB\xBF"
 
-// fixtureMap is a map folder with the map info and the script of the settings fixture.
 func fixtureMap(t testing.TB) string {
 	t.Helper()
 	dir := t.TempDir()
@@ -31,7 +28,6 @@ func fixtureMap(t testing.TB) string {
 	return dir
 }
 
-// openMap opens dir as the map folder, as it is on disk now.
 func openMap(t testing.TB, dir string) *mapdir.Folder {
 	t.Helper()
 	folder, err := mapdir.Open(dir, mapLabel)
@@ -41,13 +37,11 @@ func openMap(t testing.TB, dir string) *mapdir.Folder {
 	return folder
 }
 
-// planIn plans, for the map folder at dir, the settings of the document in a project whose folder is root.
 func planIn(t testing.TB, dir, root, document string) ([]mapdir.Change, error) {
 	t.Helper()
 	return Plan(openMap(t, dir), projectOf(t, root, document))
 }
 
-// planned is planIn for settings that must plan.
 func planned(t testing.TB, dir, root, document string) []mapdir.Change {
 	t.Helper()
 	changes, err := planIn(t, dir, root, document)
@@ -57,8 +51,6 @@ func planned(t testing.TB, dir, root, document string) []mapdir.Change {
 	return changes
 }
 
-// refusedPlan is the refusal of a plan. It must name the file and say what to do, come without a change, and
-// leave the map folder as it was.
 func refusedPlan(t testing.TB, dir, root, document, file string) *diag.Error {
 	t.Helper()
 	before := testkit.Snapshot(t, dir)
@@ -88,7 +80,6 @@ func wantNames(t testing.TB, changes []mapdir.Change, names ...string) {
 	}
 }
 
-// staged is a copy of the map folder at dir with the changes written into it, the way a build stages a map.
 func staged(t testing.TB, dir string, changes []mapdir.Change) string {
 	t.Helper()
 	stage := filepath.Join(t.TempDir(), "stage")
@@ -98,7 +89,6 @@ func staged(t testing.TB, dir string, changes []mapdir.Change) string {
 	return stage
 }
 
-// fileNames is the names of the entries of a folder, sorted.
 func fileNames(t testing.TB, dir string) []string {
 	t.Helper()
 	return slices.Sorted(func(yield func(string) bool) {
@@ -109,8 +99,6 @@ func fileNames(t testing.TB, dir string) []string {
 		}
 	})
 }
-
-// ---- the four files ----
 
 func TestAPlanWritesNothingAndAMapThatHasTheSettingsPlansNoChange(t *testing.T) {
 	dir := fixtureMap(t)
@@ -169,20 +157,14 @@ func TestTextSettingsNeedNeitherTheMapInfoNorTheScript(t *testing.T) {
 	if got := string(changes[0].Bytes); got != "[CustomSkin]\nTest=" {
 		t.Errorf("war3mapSkin.txt = %q", got)
 	}
-	// A constant the map's file has already is not a change.
 	testkit.WriteFile(t, dir, "war3mapMisc.txt", []byte("[Misc]\nFoodCeiling=100\n"))
 	if none := planned(t, dir, "", `{"gameplay":{"foodLimit":100}}`); len(none) != 0 {
 		t.Errorf("a constant the file has changes %q", namesOf(none))
 	}
-	// A file without a line is not the same as no file: the map gets its keys.
 	testkit.WriteFile(t, dir, "war3mapSkin.txt", nil)
 	wantNames(t, planned(t, dir, "", `{"gameInterface":{"A":{"B":"c"}}}`), "war3mapSkin.txt")
 }
 
-// refusingMaps is two map folders that between them refuse a plan for every file it reads, by the file's name. In
-// the first every file is there and is not what it should be: a map info that is none, and a script and text
-// files that are not UTF-8. The second has no file, so a plan that asks for the map info or the script fails for
-// a file that is missing, also where it would not go on to read what the file holds.
 func refusingMaps(t testing.TB) []*mapdir.Folder {
 	t.Helper()
 	dir := t.TempDir()
@@ -199,7 +181,6 @@ func TestSettingsThatSetNothingPlanNoChangeAndReadNoMapFile(t *testing.T) {
 		`{"info":{"name":null},"players":{"5":{"name":null}},"environment":{"fog":{}},
 			"gameplayConstants":{"Misc":{}},"gameInterface":{"CustomSkin":{}}}`,
 		`{"info":{"name":null,"preview":null},"players":{"23":{"name":null}},"environment":{"fog":{}}}`,
-		// An override with nothing set is skipped: its slot need not exist in the map.
 		`{"players":{"23":{},"7":{"name":null}},"forces":{"7":{}}}`,
 	}
 	for _, folder := range refusingMaps(t) {
@@ -282,13 +263,9 @@ func TestAMapWithoutAFileTheSettingsNeedIsRefusedByThatFile(t *testing.T) {
 	testkit.WriteFile(t, dir, "war3map.w3i", fixtureInfo(t))
 	missing(`{"info":{"name":"Needs the script"}}`, "war3map.lua")
 	missing(`{"environment":{"soundEnvironment":"Mountains"}}`, "war3map.lua")
-	// A force's name has no call in the script, and a map with forces of its own must have its script all the same.
 	missing(`{"forces":{"0":{"name":"Blue"}}}`, "war3map.lua")
 }
 
-// A folder is not the file, and it is not refused as a file the map lacks: a look into the map folder shows the
-// name there. The documents for the minimap also name a player the fixture lacks: the minimap is looked for
-// before the map info is read, which would refuse the player.
 func TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder(t *testing.T) {
 	absent := `"players":{"5":{"name":"Absent"}}`
 	tests := []struct{ name, folder, document string }{
@@ -297,7 +274,6 @@ func TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder(t *testing.T) {
 		{"war3map.lua", "war3map.lua", `{"info":{"preview":"preview.tga"}}`},
 		{"war3mapMap.blp", "war3mapMap.blp", `{"info":{"preview":"preview.tga"},` + absent + `}`},
 		{"war3mapMap.blp", "war3mapMap.blp", `{"info":{"preview":"preview.blp"},` + absent + `}`},
-		// The folder is named as the map spells it.
 		{"war3map.w3i", "WAR3MAP.W3I", `{"loadingScreen":{"title":"T"}}`},
 		{"war3mapMap.blp", "War3mapMap.BLP", `{"info":{"preview":"preview.tga"},` + absent + `}`},
 	}
@@ -342,7 +318,6 @@ func TestAMapFileThatCannotBeReadIsRefusedByItsNameAndNotTakenForAnEmptyFile(t *
 		{"war3mapMisc.txt", `{"gameplay":{"heroMaxLevel":5}}`},
 		{"war3map.w3i", `{"loadingScreen":{"title":"T"}}`},
 		{"war3map.lua", `{"info":{"name":"N"}}`},
-		// The minimap is read for a preview, which keeps it; it is the last file a plan reads.
 		{"war3mapMap.blp", previewAt("preview.tga")},
 	}
 	for _, tt := range tests {
@@ -389,10 +364,6 @@ func TestAScriptThatDoesNotTakeTheSettingsRefusesThePlanAfterTheMapInfoWasPatche
 	}
 }
 
-// ---- what does not depend on the map ----
-
-// Each document also sets the map's name, and each is planned for the maps whose every file refuses a plan: one
-// that read a map file before it refused the constants would fail for that file.
 func TestConstantsThatCannotBeWrittenAreRefusedByTheManifestBeforeAMapFileIsRead(t *testing.T) {
 	folders := refusingMaps(t)
 	tests := []struct{ name, document, words string }{
@@ -422,8 +393,6 @@ func TestConstantsThatCannotBeWrittenAreRefusedByTheManifestBeforeAMapFileIsRead
 	}
 }
 
-// ---- the text of the files ----
-
 func TestAByteOrderMarkStaysInFrontOfAScriptAndATextFileThatChange(t *testing.T) {
 	dir := t.TempDir()
 	testkit.WriteFile(t, dir, "war3map.w3i", fixtureInfo(t))
@@ -435,14 +404,12 @@ func TestAByteOrderMarkStaysInFrontOfAScriptAndATextFileThatChange(t *testing.T)
 	if string(changes[1].Bytes) != want {
 		t.Error("the script is not the fixture's with its mark and the name")
 	}
-	// A file the map does not have yet starts without a mark.
 	if got := string(changes[2].Bytes); got != "[Misc]\nFoodCeiling=9" {
 		t.Errorf("war3mapMisc.txt = %q", got)
 	}
 	if got := string(changes[3].Bytes); got != byteOrderMark+"[A]\nB=c\n" {
 		t.Errorf("war3mapSkin.txt = %q", got)
 	}
-	// A file that holds its settings already is no change, with its mark or without.
 	stage := staged(t, dir, changes)
 	if again := planned(t, stage, "", `{"info":{"name":"BOM"},"gameInterface":{"A":{"B":"c"}}}`); len(again) != 0 {
 		t.Errorf("a second plan changes %q", namesOf(again))
@@ -507,17 +474,12 @@ func TestTheFilesAreFoundInAnyLetterCaseAndChangedUnderTheNamesTheMapHas(t *test
 	if got := fileNames(t, staged(t, dir, changes)); !slices.Equal(got, names) {
 		t.Errorf("the staged map holds %q, want %q", got, names)
 	}
-	// A refusal names the file as the map spells it.
 	testkit.WriteFile(t, dir, "War3Map.Lua", []byte{0xff})
 	refusedPlan(t, dir, "", document, mapLabel+"/War3Map.Lua")
 }
 
-// ---- the preview ----
-
 var minimapBytes = []byte{66, 76, 80, 49, 9, 9}
 
-// withPreview makes a map folder with the fixture's files and World Editor's minimap, and beside it a project
-// folder that holds the picture at path.
 func withPreview(t testing.TB, path string, picture []byte) (dir, root string) {
 	t.Helper()
 	base := t.TempDir()
@@ -529,7 +491,6 @@ func withPreview(t testing.TB, path string, picture []byte) (dir, root string) {
 	return dir, root
 }
 
-// previewAt is the settings that name the picture at path as the preview, and nothing else.
 func previewAt(path string) string {
 	return `{"info":{"preview":` + strconv.Quote(path) + `}}`
 }
@@ -537,7 +498,6 @@ func previewAt(path string) string {
 func TestABLPPreviewTakesTheMinimapsPlaceWhichIsKeptUnderAnotherNameAndCalledFor(t *testing.T) {
 	picture := testkit.BLP(256, 1)
 	dir, root := withPreview(t, "preview.blp", picture)
-	// The preview alone needs no map info: the plan works without the file.
 	if err := os.Remove(filepath.Join(dir, "war3map.w3i")); err != nil {
 		t.Fatal(err)
 	}
@@ -639,7 +599,6 @@ func TestAPreviewIsRefusedWhenTheMapLacksItsMinimapOrHasOneOfTheNamesThePreviewA
 			t.Fatal(err)
 		}
 	}
-	// A map info that would be refused is not read before the minimap is missed.
 	if err := os.Remove(filepath.Join(dir, "war3mapMap.blp")); err != nil {
 		t.Fatal(err)
 	}
@@ -650,8 +609,6 @@ func TestAPreviewIsRefusedWhenTheMapLacksItsMinimapOrHasOneOfTheNamesThePreviewA
 	}
 }
 
-// Each document also names a player the fixture lacks: a plan that read the map info before it looked at the
-// names would refuse for the player.
 func TestAFolderUnderANameThePreviewAddsIsRefusedBeforeAMapFileIsRead(t *testing.T) {
 	tests := []struct {
 		name, path string
@@ -677,9 +634,6 @@ func TestAFolderUnderANameThePreviewAddsIsRefusedBeforeAMapFileIsRead(t *testing
 	}
 }
 
-// The path rules of the setting are loadPreview's, and its tests hold them. Here each document also sets the map's
-// name, and each but the last is planned for the maps whose every file refuses a plan, which have no minimap: a
-// plan that looked at the map before it refused the picture would fail for a file of the map.
 func TestAPreviewThatIsNoUsablePictureIsRefusedBeforeAMapFileIsRead(t *testing.T) {
 	_, root := withPreview(t, "preview.tga", plainTGA())
 	testkit.WriteFile(t, root, "small.tga", plainTGA()[:100])
@@ -698,7 +652,6 @@ func TestAPreviewThatIsNoUsablePictureIsRefusedBeforeAMapFileIsRead(t *testing.T
 			}
 		}
 	}
-	// With the picture in order, the map is what is looked at: an empty one lacks the minimap.
 	failure := refusedPlan(t, t.TempDir(), root, previewAt("preview.tga"), mapLabel+"/war3mapMap.blp")
 	if !strings.Contains(failure.Msg, "The map has no war3mapMap.blp") {
 		t.Errorf("error = %+v", failure)

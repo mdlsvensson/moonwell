@@ -13,8 +13,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// projectWith is a project by hand, in a folder of its own: its manifest's build.folder and the manifest that
-// was evaluated.
 func projectWith(root, buildFolder, manifestFile string) *manifest.Project {
 	return &manifest.Project{
 		Root:  root,
@@ -24,20 +22,16 @@ func projectWith(root, buildFolder, manifestFile string) *manifest.Project {
 	}
 }
 
-// ---- the archive's place ----
-
 func TestArchiveOfPlacesTheArchiveUnderBuildFolder(t *testing.T) {
 	tests := []struct {
-		written string // build.folder
-		label   string // the archive, from the project folder
+		written string
+		label   string
 	}{
 		{"dist/bin", "dist/bin/map.w3x"},
-		// Every way the schema lets a folder be written names the folder.
 		{"dist/bin/", "dist/bin/map.w3x"},
 		{"./out", "out/map.w3x"},
 		{"out//bin", "out/bin/map.w3x"},
 		{`out\bin`, "out/bin/map.w3x"},
-		// A folder whose name only starts as one Moonwell keeps for itself is the project's own.
 		{"mapsout", "mapsout/map.w3x"},
 		{"dist/stages", "dist/stages/map.w3x"},
 		{"out/maps", "out/maps/map.w3x"},
@@ -64,7 +58,6 @@ func TestArchiveOfRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedManif
 	if err := os.MkdirAll(filepath.Join(root, "out", "map.w3x"), 0o777); err != nil {
 		t.Fatal(err)
 	}
-	// A folder in the archive's place, which a build would remove.
 	_, err := archiveOf(projectWith(root, "out", localManifest))
 	e := asError(t, err, "a folder in the archive's place")
 	if e.Msg != "The build output out/map.w3x is a directory; refusing to replace it." || e.File != localManifest ||
@@ -82,8 +75,6 @@ func TestArchiveOfRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedManif
 	}
 }
 
-// What the schema refuses of a build.folder is refused for a manifest that was not checked against it, and so
-// is what the schema lets through and no Windows can hold: each with the manifest as its file, and the value.
 func TestArchiveOfRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArchive(t *testing.T) {
 	tests := []struct {
 		written string
@@ -116,8 +107,6 @@ func TestArchiveOfRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArchi
 	}
 }
 
-// The map's folder names the stage and the archive too: a name in it that Windows cannot hold is refused for
-// both as it is for the source map, by the manifest, and not at a place below dist/.
 func TestTheStageAndTheArchiveRefuseAMapFolderWindowsCannotHoldByTheManifest(t *testing.T) {
 	for _, folder := range []string{"map?.w3x", "con.w3x", "campaign./one.w3x"} {
 		p := projectWith(t.TempDir(), "dist/bin", localManifest)
@@ -136,8 +125,8 @@ func TestTheStageAndTheArchiveRefuseAMapFolderWindowsCannotHoldByTheManifest(t *
 
 func TestArchiveOfRefusesAFileOnTheWayToTheArchiveByItsName(t *testing.T) {
 	tests := []struct {
-		written string // build.folder
-		file    string // the file on the way, from the project folder
+		written string
+		file    string
 	}{
 		{"dist/bin", "dist/bin"},
 		{"dist/bin/deep", "dist/bin"},
@@ -156,14 +145,12 @@ func TestArchiveOfRefusesAFileOnTheWayToTheArchiveByItsName(t *testing.T) {
 	}
 }
 
-// Every folder on the way to the archive is a real one, the first folder of build.folder too: behind a link, a
-// build would remove and write a file where the link leads, which may be the source map.
 func TestArchiveOfRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 	tests := []struct {
 		name    string
-		written string // build.folder
-		link    string // the step that is a link, from the project folder
-		target  string // what it is a link to, from the project folder
+		written string
+		link    string
+		target  string
 	}{
 		{"the first folder to the source map", "out", "out", "maps/map.w3x/war3mapImported"},
 		{"the first folder to a folder beside the source map", "out", "out", "maps/other"},
@@ -172,7 +159,6 @@ func TestArchiveOfRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
-			// A file that has the archive's name where each link leads: a build would remove it.
 			testkit.WriteFile(t, root, "maps/map.w3x/war3mapImported/map.w3x", []byte("a file of the map"))
 			testkit.WriteFile(t, root, "maps/other/map.w3x", []byte("a file beside the map"))
 			maps := testkit.Snapshot(t, filepath.Join(root, "maps"))
@@ -193,8 +179,6 @@ func TestArchiveOfRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 	}
 }
 
-// ---- what a build removes, and what it writes ----
-
 func TestRemoveArchiveRemovesAFileAndNamesAFailureFromTheProjectFolder(t *testing.T) {
 	root := t.TempDir()
 	at := place{file: testkit.WriteFile(t, root, "dist/bin/map.w3x", []byte("an archive")), label: "dist/bin/map.w3x"}
@@ -203,7 +187,6 @@ func TestRemoveArchiveRemovesAFileAndNamesAFailureFromTheProjectFolder(t *testin
 			t.Errorf("%s: %v", round, err)
 		}
 	}
-	// A folder that holds a file is not removed: a removal is of a file alone.
 	testkit.WriteFile(t, root, "dist/bin/map.w3x/kept.txt", []byte("kept"))
 	e := asError(t, removeArchive(at), "a folder in the archive's place")
 	if !strings.HasPrefix(e.Msg, "Removing dist/bin/map.w3x failed: ") || strings.Contains(e.Msg, root) ||
@@ -215,8 +198,6 @@ func TestRemoveArchiveRemovesAFileAndNamesAFailureFromTheProjectFolder(t *testin
 	}
 }
 
-// The archive is written beside its place, as <archive>.tmp, and moved to the place when it is whole: the place
-// holds a whole archive or what it held, and nothing is left beside it.
 func TestWriteArchiveWritesBesideThePlaceAndMovesTheWholeArchiveThere(t *testing.T) {
 	root := t.TempDir()
 	at := place{file: filepath.Join(root, "dist", "bin", "campaign", "one.w3x"), label: "dist/bin/campaign/one.w3x"}
@@ -225,14 +206,12 @@ func TestWriteArchiveWritesBesideThePlaceAndMovesTheWholeArchiveThere(t *testing
 			"dist": nil, "dist/bin": nil, "dist/bin/campaign": nil, "dist/bin/campaign/one.w3x": []byte(archive),
 		}
 	}
-	// The folders on the way are made.
 	if err := writeArchive(at, []byte("an archive")); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	if held := testkit.Snapshot(t, root); !reflect.DeepEqual(held, holds("an archive")) {
 		t.Errorf("after the first write the project holds %q", held)
 	}
-	// What a build that was ended left beside the place is replaced, and so is an archive at the place.
 	testkit.WriteFile(t, root, "dist/bin/campaign/one.w3x.tmp", []byte("a cut arch"))
 	if err := writeArchive(at, []byte("a second archive")); err != nil {
 		t.Fatal(diag.Format(err))
@@ -242,8 +221,6 @@ func TestWriteArchiveWritesBesideThePlaceAndMovesTheWholeArchiveThere(t *testing
 	}
 }
 
-// A link under the name the archive is written under is removed and not written through: the file it leads to,
-// here a file of the source map, stays as it is, and the archive is a file of its own.
 func TestWriteArchiveWritesThroughNoLinkBesideThePlace(t *testing.T) {
 	root := t.TempDir()
 	at := place{file: filepath.Join(root, "dist", "bin", "one.w3x"), label: "dist/bin/one.w3x"}
@@ -263,13 +240,10 @@ func TestWriteArchiveWritesThroughNoLinkBesideThePlace(t *testing.T) {
 	}
 }
 
-// A write that fails leaves the place as it was. A build removes the archive of the build before as it starts;
-// here one is at the place, to show that the failed write did not touch it.
 func TestWriteArchiveThatFailsLeavesThePlaceAsItWasAndNothingBesideIt(t *testing.T) {
 	root := t.TempDir()
 	const label = "dist/bin/one.w3x"
 	at := place{file: testkit.WriteFile(t, root, label, []byte("the archive before")), label: label}
-	// The write beside the place fails: a folder that holds a file stands under the name it writes under.
 	testkit.WriteFile(t, root, "dist/bin/one.w3x.tmp/kept.txt", []byte("kept"))
 	before := testkit.Snapshot(t, root)
 	e := asError(t, writeArchive(at, []byte("a newer archive")), "a write beside the place that fails")
@@ -280,8 +254,6 @@ func TestWriteArchiveThatFailsLeavesThePlaceAsItWasAndNothingBesideIt(t *testing
 	if !reflect.DeepEqual(testkit.Snapshot(t, root), before) {
 		t.Error("a write that failed changed the archive that was there, or what stood beside it")
 	}
-	// The move to the place fails, after the archive was written whole beside it: a folder that holds a file is at
-	// the place, made after the look at the place, and no system moves a file over it. What was written is removed.
 	blocked := place{file: filepath.Join(root, "dist", "bin"), label: "dist/bin"}
 	e = asError(t, writeArchive(blocked, []byte("a newer archive")), "a folder in the archive's place")
 	if !strings.HasPrefix(e.Msg, "Writing dist/bin failed: ") || strings.Contains(e.Msg, root) ||

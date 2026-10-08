@@ -9,7 +9,6 @@ import (
 	"unicode/utf8"
 )
 
-// recording writes a recording into a folder of the test's own and returns the folder.
 func recording(t *testing.T, name, text string) string {
 	t.Helper()
 	folder := t.TempDir()
@@ -68,7 +67,6 @@ func TestRecordedFailsTheTestWithoutARecordingAndWritesNone(t *testing.T) {
 
 func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T) {
 	folder := recording(t, "kept.txt", "before\n")
-	// Any other value than 1 asks for nothing.
 	for _, value := range []string{"", "0", "true", "yes"} {
 		t.Setenv(recordVariable, value)
 		recordedIn(newStandIn(t), folder, "kept.txt", []byte("after\n"))
@@ -91,14 +89,12 @@ func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T
 }
 
 func TestRecordedReadsBelowThePackagesFolderWhereverTheTestHasGone(t *testing.T) {
-	// The folder was taken before any test ran: it is this package's.
 	if filepath.Base(packageFolder) != "testkit" {
 		t.Fatalf("the package's folder is %s", packageFolder)
 	}
 	if _, err := os.Stat(filepath.Join(packageFolder, "recorded.go")); err != nil {
 		t.Fatalf("the package's folder does not hold the package: %v", err)
 	}
-	// A package of the test's own, so that this one needs no testdata; the test then goes somewhere else.
 	started := packageFolder
 	t.Cleanup(func() { packageFolder = started })
 	packageFolder = t.TempDir()
@@ -121,7 +117,6 @@ func TestRecordedReadsBelowThePackagesFolderWhereverTheTestHasGone(t *testing.T)
 }
 
 func TestShownWritesPlainTextAsItIsAndQuotesEveryOtherValue(t *testing.T) {
-	// The escape that Go's quoting writes for a no-break space: a backslash, the letter u and four digits.
 	noBreakSpace := `\` + "u00a0"
 	for _, c := range [][2]string{
 		{"plain text, with: marks", "plain text, with: marks"},
@@ -147,7 +142,6 @@ func TestShownWritesPlainTextAsItIsAndQuotesEveryOtherValue(t *testing.T) {
 		if !utf8.ValidString(got) || strings.HasSuffix(got, " ") || strings.ContainsAny(got, "\r\n\t") {
 			t.Errorf("Shown(%q) = %q is not a value of one line of text", value, got)
 		}
-		// What is quoted reads back as the value.
 		if got != value {
 			if back, err := strconv.Unquote(got); err != nil || back != value {
 				t.Errorf("Shown(%q) = %s reads back as %q, %v", value, got, back, err)
@@ -157,7 +151,6 @@ func TestShownWritesPlainTextAsItIsAndQuotesEveryOtherValue(t *testing.T) {
 }
 
 func TestPartingLineIsTheFirstLineTheTwoReadingsDoNotAgreeUpTo(t *testing.T) {
-	// The two readings part at the first line that holds the letter.
 	for _, c := range []struct {
 		data, letter string
 		line         int
@@ -219,7 +212,6 @@ func TestPlacedWritesTheRootAsRoot(t *testing.T) {
 	if got := string(Placed([]byte(text), root)); got != want {
 		t.Errorf("Placed = %q, want %q", got, want)
 	}
-	// The root is taken as the folder it names, however it is written.
 	if got := string(Placed([]byte(text), root+string(filepath.Separator)+"."+string(filepath.Separator))); got != want {
 		t.Errorf("Placed with a root that is not clean = %q, want %q", got, want)
 	}
@@ -267,7 +259,6 @@ func TestPlacedWritesTheRootInItsLongAndItsShortSpelling(t *testing.T) {
 	if short == "" || strings.EqualFold(short, resolved) {
 		t.Skip("this system, or the volume of the temporary folder, writes no short names")
 	}
-	// A test is given one spelling, and what it made may hold the other: both are the root.
 	text := "long " + filepath.Join(resolved, "a.txt") + "\nshort " + filepath.Join(short, "b.txt") + "\n"
 	want := "long <root>" + string(filepath.Separator) + "a.txt\nshort <root>" + string(filepath.Separator) + "b.txt\n"
 	for _, given := range []string{resolved, short} {
@@ -277,8 +268,6 @@ func TestPlacedWritesTheRootInItsLongAndItsShortSpelling(t *testing.T) {
 	}
 }
 
-// A reason is words that are not Moonwell's own: the operating system's for a failure, or the standard
-// library's where a decoder words an error.
 func TestPlacedWritesEachReasonAsReason(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "project")
 	text := "cannot read " + filepath.Join(root, "a") + ": Access is denied.\ncannot write b: permission denied\n" +
@@ -289,7 +278,6 @@ func TestPlacedWritesEachReasonAsReason(t *testing.T) {
 	if got := string(Placed([]byte(text), root, reasons...)); got != want {
 		t.Errorf("Placed = %q, want %q", got, want)
 	}
-	// A reason that names a file of the project is found before the root is written over.
 	whole := "open " + filepath.Join(root, "a") + ": no such file"
 	if got := string(Placed([]byte("failed: "+whole+"\n"), root, whole)); got != "failed: <reason>\n" {
 		t.Errorf("a reason with the root in it: %q", got)

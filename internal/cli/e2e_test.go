@@ -15,15 +15,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// The tests of this file run whole command lines in a project that init made, from the line to the map that
-// comes out of it. Each runs the real pkl, and all but those of setup the real compiler, in the real world: a
-// test of them takes a second or more, and is skipped with -short. Setup runs in a seeded world: it asks for the
-// compiler and never starts it, and what it keeps for the editor goes into a cache of the test's own. The game is
-// a stand-in that keeps what it was started with, and dev runs beside its test at a pace of milliseconds.
-
-// ---- what the tests share ----
-
-// archive opens the map a build packed.
 func archive(t *testing.T, root string) *testkit.MPQ {
 	t.Helper()
 	opened, err := testkit.OpenMPQ([]byte(read(t, root, "dist/bin/map.w3x")))
@@ -33,7 +24,6 @@ func archive(t *testing.T, root string) *testkit.MPQ {
 	return opened
 }
 
-// packed reads a file of the packed map; found is false when the map has none of that name.
 func packed(t *testing.T, opened *testkit.MPQ, name string) (data []byte, found bool) {
 	t.Helper()
 	data, found, err := opened.Read(name)
@@ -43,7 +33,6 @@ func packed(t *testing.T, opened *testkit.MPQ, name string) (data []byte, found 
 	return data, found
 }
 
-// builtScript builds the project, and returns the script of the map it packed.
 func builtScript(t *testing.T, root string) string {
 	t.Helper()
 	ok(t, root, "build")
@@ -54,8 +43,6 @@ func builtScript(t *testing.T, root string) string {
 	return string(data)
 }
 
-// stageAndLaunch runs `moonwell test` in the project, as launched does, and holds the staged script to the
-// manifest's entry. It returns the stage's path on disk.
 func stageAndLaunch(t *testing.T, root, body string) string {
 	t.Helper()
 	staged := launched(t, root, body, "test")
@@ -63,9 +50,6 @@ func stageAndLaunch(t *testing.T, root, body string) string {
 	return staged
 }
 
-// launched runs a line of `moonwell test` in the project, whose local manifest is given body and a game that
-// is a file of the project. The world is the real one but for the game: what the line starts is kept, and must
-// be that game, once, with the manifest's arguments and the stage's path on disk. It returns that path.
 func launched(t *testing.T, root, body string, line ...string) string {
 	t.Helper()
 	game := filepath.Join(root, "Warcraft III.exe")
@@ -90,8 +74,6 @@ func launched(t *testing.T, root, body string, line ...string) string {
 	return staged
 }
 
-// startDev runs dev on the project in the real world, beside the test and until it ends. wait waits for a line
-// that holds wanted, among all that dev has logged, and fails the test when none comes.
 func startDev(t *testing.T, root string) (wait func(wanted string)) {
 	t.Helper()
 	e, log := realWorld(root)
@@ -103,8 +85,6 @@ func startDev(t *testing.T, root string) (wait func(wanted string)) {
 		})
 	}
 }
-
-// ---- a build, a check and a test of the template ----
 
 func TestE2EInitBuildInjectedArchive(t *testing.T) {
 	root := compiling(t)
@@ -185,9 +165,6 @@ func TestE2EFailedBuildDeletesPreviousArchive(t *testing.T) {
 
 func TestE2ETestStagesAndLaunches(t *testing.T) { stageAndLaunch(t, compiling(t), "") }
 
-// A test stages what its line says, as a build does: the entry that --entry names in place of the manifest's,
-// and with --minify the minified form, in which a module of the bundle is marked as one that has no line of its
-// source for a line of its own. Without the two flags the same project stages the manifest's entry, unmarked.
 func TestE2ETestStagesTheEntryAndTheFormThatItsLineNames(t *testing.T) {
 	root := compiling(t)
 	write(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
@@ -197,7 +174,6 @@ func TestE2ETestStagesTheEntryAndTheFormThatItsLineNames(t *testing.T) {
 		t.Fatal("a test without flags staged another entry than the manifest's, or a minified module")
 	}
 	staged := read(t, launched(t, root, "", "test", "--entry", "src/other.yue", "--minify"), "war3map.lua")
-	// The script is named by what it lacks, and is not printed: it is a thousand lines.
 	for _, part := range []string{otherEntry, minifiedOther, `"Another entry."`} {
 		if !strings.Contains(staged, part) {
 			t.Errorf("a test with --entry src/other.yue --minify staged a script without %s", part)
@@ -207,8 +183,6 @@ func TestE2ETestStagesTheEntryAndTheFormThatItsLineNames(t *testing.T) {
 		t.Fatal("a test with --entry staged the manifest's entry")
 	}
 }
-
-// ---- setup ----
 
 func TestE2ESetupLocalManifestCreatesAndKeeps(t *testing.T) {
 	world, root := seeded(t), newProject(t, "my-map")
@@ -249,8 +223,6 @@ func TestE2ESetupUpgradesEditorFilesAndKeepsExisting(t *testing.T) {
 	}
 }
 
-// ---- what a build refuses, and what a check and dev report ----
-
 func TestE2EBuildRefusesSourceAsOutput(t *testing.T) {
 	root := compiling(t)
 	edit(t, root, "moonwell.pkl", `folder = "dist/bin"`, `folder = "maps"`)
@@ -274,7 +246,6 @@ func TestE2EDevRechecksSourceChanges(t *testing.T) {
 	wait("error: src/main.yue:")
 }
 
-// typo is what a misspelt native is reported as, when an unknown global is an error.
 const typo = "error: src/main.yue:9:10 " + mark + " Unknown global CreatUnit.\nhint: Did you mean CreateUnit? " +
 	"Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl."
 
@@ -308,8 +279,6 @@ func TestE2ELintOnlyRequiredFilesAndTheirGlobals(t *testing.T) {
 	appendTo(t, root, "src/main.yue", "\nprint Extra\n")
 	fails(t, root, []string{"Unknown global Extra."}, "check")
 }
-
-// ---- Lua modules of the project ----
 
 func TestE2ELuaModulesRequiredAndUnused(t *testing.T) {
 	root := compiling(t)
@@ -355,10 +324,6 @@ func TestE2ELuaGlobalsKnownOnlyWhenRequired(t *testing.T) {
 	ok(t, root, "check")
 }
 
-// ---- libraries ----
-
-// The setup at the end runs in a seeded world, as every setup of this file: it compiles nothing, and must leave
-// the editor's view of a module that the build compiled.
 func TestE2ELocalLibraryBuildAndEditorView(t *testing.T) {
 	root := compiling(t)
 	useLibrary(t, root, exampleLibrary(t))
@@ -447,8 +412,6 @@ func TestE2ELibraryAssetsBuildAndMapReplacement(t *testing.T) {
 	}
 }
 
-// ---- objects ----
-
 func TestE2ECaptainObjectsRepeatableAndSourceUnchanged(t *testing.T) {
 	root := compiling(t)
 	before := testkit.Snapshot(t, filepath.Join(root, "maps", "map.w3x"))
@@ -490,8 +453,6 @@ func TestE2ECaptainObjectsRepeatableAndSourceUnchanged(t *testing.T) {
 	contains(t, ok(t, root, "objects:check").output, "src/generated/objects.yue: current")
 }
 
-// captainsTexts fails the test unless the template's captain, as a skin file holds it, has its name, its model
-// and its icon, and no other text.
 func captainsTexts(t *testing.T, captain objmod.Object) {
 	t.Helper()
 	texts := map[string]string{}

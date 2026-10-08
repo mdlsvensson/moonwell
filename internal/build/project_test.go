@@ -17,11 +17,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// localManifest is the manifest a test says its project was evaluated from where it must tell the file a refusal
-// names from the name every project has.
 const localManifest = "moonwell.local.pkl"
-
-// ---- Load ----
 
 func TestLoadFindsPklAndEvaluatesTheManifestInTheProjectFolder(t *testing.T) {
 	s := newStandIn(t)
@@ -43,7 +39,6 @@ func TestLoadFindsPklAndEvaluatesTheManifestInTheProjectFolder(t *testing.T) {
 
 func TestLoadReturnsTheFailureToFindPklAndEvaluatesNothing(t *testing.T) {
 	s := newStandIn(t)
-	// A platform Moonwell has no Pkl to download for, so that an old Pkl is refused and nothing is fetched.
 	s.env.Platform = "plan9-x86_64"
 	s.answer("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
 		return env.RunResult{Stdout: "Pkl 0.31.0 (a stand-in)\n"}, nil
@@ -66,20 +61,17 @@ func TestLoadReturnsTheRefusalOfAFolderThatIsNoProject(t *testing.T) {
 	}
 }
 
-// ---- Source ----
-
 func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 	tests := []struct {
 		name   string
-		folder string // map.folder
-		at     string // where the test puts the map, from the project folder
+		folder string
+		at     string
 		label  string
 	}{
 		{"the folder below maps", "map.w3x", "maps/map.w3x", "maps/map.w3x"},
 		{"a folder further down", "campaign/one.w3x", "maps/campaign/one.w3x", "maps/campaign/one.w3x"},
 		{"a backslash separates on every system", `campaign\one.w3x`, "maps/campaign/one.w3x", "maps/campaign/one.w3x"},
 		{"a name that starts with two dots", "..one.w3x", "maps/..one.w3x", "maps/..one.w3x"},
-		// The schema drops the parts of a folder that are empty or ".", and so does the folder's label.
 		{"a part that is a dot", "./map.w3x", "maps/map.w3x", "maps/map.w3x"},
 		{"a part that is a dot, with a backslash", `.\map.w3x`, "maps/map.w3x", "maps/map.w3x"},
 		{"an empty part", "a//b.w3x", "maps/a/b.w3x", "maps/a/b.w3x"},
@@ -126,12 +118,10 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 		{"a path from a drive", `C:\x`, notInside},
 		{"a path from a drive, with a slash", "c:/maps/map.w3x", notInside},
 		{"a name on a drive", "C:x.w3x", notInside},
-		// No ".." is resolved: a path with one is refused, wherever it leads.
 		{"a way out and back in", "a/../b.w3x", notInside},
 		{"a way out and back in, with backslashes", `a\..\map.w3x`, notInside},
 		{"parts that are dots alone", "./.", notInside},
 		{"separators alone", `/\/`, notInside},
-		// A name Windows cannot hold is refused by the manifest on every system, and not at a place below maps/.
 		{"a device's name", "con.w3x", unusable},
 		{"a character Windows forbids", "map?.w3x", unusable},
 		{"a folder that ends with a dot", `campaign\.\one.\map.w3x`, unusable},
@@ -142,7 +132,6 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t)
-			// What the name could be taken for is there: the refusal is of the name, not of a missing folder.
 			s.folder("outside")
 			s.folder("maps/a")
 			s.project.File, s.project.Map.Folder = localManifest, tt.folder
@@ -183,7 +172,6 @@ func TestSourceNamesTheManifestForAMapFolderThatIsNotThere(t *testing.T) {
 	}
 }
 
-// A packed map is a file named as the folder is: it is refused as that on every system, at its own path.
 func TestAPackedMapFileWhereTheMapFolderShouldBeIsRefusedAsAFile(t *testing.T) {
 	s := newStandIn(t)
 	s.remove("maps/map.w3x")
@@ -200,7 +188,7 @@ func TestAPackedMapFileWhereTheMapFolderShouldBeIsRefusedAsAFile(t *testing.T) {
 func TestSourceRefusesALinkOnTheWayToTheMapAndALinkInTheMapsPlace(t *testing.T) {
 	tests := []struct {
 		name string
-		link string // the path that is made a link to what was there
+		link string
 	}{
 		{"maps is a link", "maps"},
 		{"the map folder is a link", "maps/map.w3x"},
@@ -252,9 +240,6 @@ func TestSourcePassesOnWhatAMapFolderCannotHold(t *testing.T) {
 	}
 }
 
-// ---- MapGlobals ----
-
-// openedSource is the source map of a stand-in project, which must open.
 func openedSource(t testing.TB, s *standIn) *mapdir.Folder {
 	t.Helper()
 	source, err := Source(s.project)
@@ -338,10 +323,6 @@ func TestAScriptThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 	}
 }
 
-// ---- Assets ----
-
-// syncedLibrary is a library as a sync leaves it in the project: its modules, and its files for the map unless
-// it ships none.
 func syncedLibrary(key string, ships bool) library.Synced {
 	s := library.Synced{Key: key, Modules: library.ModulesDir + "/" + key}
 	if ships {
@@ -350,8 +331,6 @@ func syncedLibrary(key string, ships bool) library.Synced {
 	return s
 }
 
-// describedAssets is each asset as its in-map path, its source, the library that ships it and what it holds,
-// for a comparison.
 func describedAssets(found []assets.Asset) []string {
 	var lines []string
 	for _, asset := range found {
@@ -368,7 +347,6 @@ func TestAssetsCollectsTheMapsOwnAndWhatTheSyncedLibrariesShip(t *testing.T) {
 	s.put(".moonwell/library-assets/kit/shared/Banner.blp", "kit banner")
 	s.put(".moonwell/library-assets/kit/kit/axe.blp", "kit axe")
 	s.put(".moonwell/library-assets/art/art/hero.mdx", "art hero")
-	// A library without files for the map has no folder, and what lies where one would be is not looked at.
 	s.put(".moonwell/library-assets/plain/stray.blp", "not shipped")
 	before := testkit.Snapshot(t, s.root)
 	libraries := []library.Synced{syncedLibrary("kit", true), syncedLibrary("plain", false), syncedLibrary("art", true)}
@@ -401,8 +379,6 @@ func TestAssetsOfAProjectWithoutAnyAreNone(t *testing.T) {
 	}
 }
 
-// The assets block is written in the shared manifest, and its hint says so: a mistake in it names that file,
-// whichever manifest was evaluated.
 func TestAssetsNamesTheSharedManifestForAMistakeInItsBlock(t *testing.T) {
 	for _, evaluated := range []string{manifestName, localManifest} {
 		t.Run("evaluated from "+evaluated, func(t *testing.T) {
@@ -421,8 +397,8 @@ func TestAssetsNamesTheSharedManifestForAMistakeInItsBlock(t *testing.T) {
 func TestAssetsRefusesALinkOnTheWayToALibrarysFiles(t *testing.T) {
 	tests := []struct {
 		name string
-		link string // the path that is a link to a folder with the library's files below it
-		to   string // where the library's file is below that folder
+		link string
+		to   string
 	}{
 		{".moonwell is a link", ".moonwell", "library-assets/kit/axe.blp"},
 		{"the folder of the libraries' files is a link", ".moonwell/library-assets", "kit/axe.blp"},
@@ -454,7 +430,6 @@ func TestAssetsRefusesALibraryFolderThatLeavesTheProject(t *testing.T) {
 	}
 }
 
-// A library's folder is named from the project folder in a failure, whatever form the project folder is given in.
 func TestAssetsNamesALibrarysFolderFromAProjectFolderThatIsGivenFromTheWorkingFolder(t *testing.T) {
 	s := newStandIn(t)
 	s.put(".moonwell/library-assets/kit/kit/axe.blp", "kit axe")
@@ -473,8 +448,6 @@ func TestAssetsNamesALibrarysFolderFromAProjectFolderThatIsGivenFromTheWorkingFo
 		t.Errorf("error = %+v", e)
 	}
 }
-
-// ---- OwnershipFile ----
 
 func TestOwnershipFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 	tests := []struct{ folder, want string }{

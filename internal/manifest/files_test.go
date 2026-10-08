@@ -27,7 +27,6 @@ func TestEnsureLocalManifestCreatesMoonwellLocalPklOnceAndNeverOverwritesIt(t *t
 	}
 }
 
-// A folder under the name is there, as a file is: nothing is made, and nothing fails.
 func TestEnsureLocalManifestTakesAFolderUnderTheNameForTheUsers(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "moonwell.local.pkl/kept.txt", []byte("mine"))
@@ -55,7 +54,6 @@ func TestPklProjectDependsOnThePublishedPackageOrOnALocalOne(t *testing.T) {
 		packageBaseURI != "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell" {
 		t.Errorf("remote = %q", remote)
 	}
-	// The file whole, as a new project gets it: pkl reads it, and a project keeps it under version control.
 	const wantRemote = "amends \"pkl:Project\"\n\ndependencies {\n" +
 		"  [\"moonwell\"] { uri = \"package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.1.0\" }\n}\n"
 	if remote != wantRemote {
@@ -69,7 +67,6 @@ func TestPklProjectDependsOnThePublishedPackageOrOnALocalOne(t *testing.T) {
 	if local != wantLocal {
 		t.Errorf("local = %q, want %q", local, wantLocal)
 	}
-	// The template in the checkout is a project linked to the schema beside it.
 	template, err := os.ReadFile(filepath.Join(testkit.RepoRoot(t), "template", "PklProject"))
 	if err != nil || string(template) != local {
 		t.Errorf("template/PklProject = %q, %v", template, err)
@@ -90,7 +87,6 @@ func TestLocalPklAmendsMoonwellPklAndSetsTheDefaultGamePathEscaped(t *testing.T)
 	if DefaultGameExecutable != `C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe` {
 		t.Errorf("DefaultGameExecutable = %q", DefaultGameExecutable)
 	}
-	// The file whole, as init and setup write it.
 	const want = "// Settings for this machine only. Git-ignored, so each checkout has its own; " +
 		"`moonwell setup` recreates it.\n" +
 		"// It amends moonwell.pkl, so anything set here overrides the shared manifest.\n" +

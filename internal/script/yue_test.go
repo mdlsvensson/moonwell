@@ -23,30 +23,22 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-// The tests that call bench.real run the real compiler, a few hundredths of a second for each file: they are the
-// slow ones of this package. Every other test gives the compile a compiler that is a function (bench.fake).
-
 var background = context.Background()
 
-// fakeYue is the path of the compiler in the tests that run none.
 const fakeYue = "yue-of-the-test"
 
-// bench is a project on disk with its macro module written, and what compileAll is given for it. Every run of
-// its compiler is counted.
 type bench struct {
 	t         *testing.T
 	root      string
 	world     *env.Env
 	libraries []Library
 	search    macros
-	sources   []Source // the modules as the last compile found them
+	sources   []Source
 
 	guard sync.Mutex
-	runs  [][]string // the arguments of each run of the compiler since ran was last asked
+	runs  [][]string
 }
 
-// benchOf lays a project in a new folder and writes its macro module. Its world runs no program until the test
-// gives it a compiler, with real or with fake.
 func benchOf(t *testing.T, p project) *bench {
 	t.Helper()
 	b := &bench{t: t, root: p.lay(t), libraries: p.libraries()}
@@ -61,7 +53,6 @@ func benchOf(t *testing.T, p project) *bench {
 	return b
 }
 
-// use gives the bench a compiler, and counts its runs.
 func (b *bench) use(compiler env.RunFunc) {
 	b.world.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		b.guard.Lock()
@@ -71,8 +62,6 @@ func (b *bench) use(compiler env.RunFunc) {
 	}
 }
 
-// real gives the bench the real compiler and returns its path. Without a compiler the test is skipped, or
-// failed where the tools are required.
 func (b *bench) real() string {
 	b.t.Helper()
 	yue := tooltest.Yue(b.t)
@@ -80,20 +69,14 @@ func (b *bench) real() string {
 	return yue
 }
 
-// answer is what a compiler that is a function does for one source: what it prints, how it ends, and what it
-// leaves at the output, which is nothing for nil.
 type answer struct {
 	code           int
 	stdout, stderr string
 	lua            *string
 }
 
-// leaves is the Lua a compiler leaves at an output.
 func leaves(lua string) *string { return &lua }
 
-// fake gives the bench a compiler that is a function: for a source among the answers, by its path from the
-// project folder, it does what the answer says, and for every other one it ends well and leaves a line of Lua
-// that names the source.
 func (b *bench) fake(answers map[string]answer) {
 	b.use(func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		source := b.sourceOf(args)
@@ -110,10 +93,8 @@ func (b *bench) fake(answers map[string]answer) {
 	})
 }
 
-// outputIn is the output file among a run's arguments: what follows -o.
 func outputIn(args []string) string { return args[slices.Index(args, "-o")+1] }
 
-// sourceOf is the source of a run, its last argument, as a path from the project folder with "/".
 func (b *bench) sourceOf(args []string) string {
 	below, err := filepath.Rel(b.root, args[len(args)-1])
 	if err != nil {
@@ -122,7 +103,6 @@ func (b *bench) sourceOf(args []string) string {
 	return filepath.ToSlash(below)
 }
 
-// ran is the sources the compiler was run on since this was last asked, sorted.
 func (b *bench) ran() []string {
 	b.guard.Lock()
 	defer b.guard.Unlock()
@@ -135,7 +115,6 @@ func (b *bench) ran() []string {
 	return sources
 }
 
-// compile finds the project's modules as they are now and compiles them.
 func (b *bench) compile(yue string, minify bool) (*staged, error) {
 	b.t.Helper()
 	var err error
@@ -145,7 +124,6 @@ func (b *bench) compile(yue string, minify bool) (*staged, error) {
 	return compileAll(background, b.world, yue, minify, b.search, b.sources)
 }
 
-// compiles is the result of a compile that must not fail.
 func (b *bench) compiles(yue string, minify bool) *staged {
 	b.t.Helper()
 	result, err := b.compile(yue, minify)
@@ -155,14 +133,12 @@ func (b *bench) compiles(yue string, minify bool) *staged {
 	return result
 }
 
-// refuses is the failure of a compile that must fail.
 func (b *bench) refuses(yue string, minify bool, what string) *diag.Error {
 	b.t.Helper()
 	_, err := b.compile(yue, minify)
 	return asError(b.t, err, what)
 }
 
-// source is the module at a path, as the last compile found it.
 func (b *bench) source(path string) Source {
 	b.t.Helper()
 	at := slices.IndexFunc(b.sources, func(source Source) bool { return source.Path == path })
@@ -172,7 +148,6 @@ func (b *bench) source(path string) Source {
 	return b.sources[at]
 }
 
-// luaAt is the Lua of the module at a path, which must have some.
 func (b *bench) luaAt(result *staged, path string) string {
 	b.t.Helper()
 	lua, ok, err := result.luaOf(b.source(path))
@@ -182,23 +157,18 @@ func (b *bench) luaAt(result *staged, path string) string {
 	return lua
 }
 
-// staged is a file of the compile's output folder on disk; below uses "/".
 func (b *bench) staged(below string) string {
 	return filepath.Join(b.root, "dist", "stage", "lua", filepath.FromSlash(below))
 }
 
-// write writes a file of the project.
 func (b *bench) write(path, text string) { testkit.WriteFile(b.t, b.root, path, []byte(text)) }
 
-// remove removes a file of the project.
 func (b *bench) remove(path string) {
 	b.t.Helper()
 	if err := os.Remove(filepath.Join(b.root, filepath.FromSlash(path))); err != nil {
 		b.t.Fatal(err)
 	}
 }
-
-// ---- with the real compiler ----
 
 func TestCompileAllCompilesEveryYueScriptModuleAndReadsItsLua(t *testing.T) {
 	mainText, mathText := "import \"util.math\" as M\nexport answer = M.double 21\n", "export double = (x) -> x * 2\n"
@@ -218,7 +188,6 @@ func TestCompileAllCompilesEveryYueScriptModuleAndReadsItsLua(t *testing.T) {
 	if lua := b.luaAt(result, "src/util/math.yue"); !strings.Contains(lua, "double") {
 		t.Errorf("the Lua of src/util/math.yue is\n%s", lua)
 	}
-	// A Lua module is not compiled, and neither is a YueScript module the compile was not given.
 	for _, source := range []Source{b.source("lua/tools.lua"), {Name: "missing", Path: "src/missing.yue", Kind: Yue}} {
 		if lua, ok, err := result.luaOf(source); lua != "" || ok || err != nil {
 			t.Errorf("luaOf(%s) = %q, %v, %v, want no Lua", source.Path, lua, ok, err)
@@ -242,7 +211,6 @@ func TestCompileAllCompilesALibrarysYueScriptIntoItsOwnFolder(t *testing.T) {
 	if result.lua[loud] != b.staged(".libraries/ex/example/loud.lua") || !fsx.Exists(b.staged(".libraries/ex/example/loud.lua")) {
 		t.Errorf("the library's output is at %s, want it under .libraries/ex", result.lua[loud])
 	}
-	// The texts and the hashes hold the library's sources beside the project's own.
 	for what, kept := range map[string]map[string]string{"texts": result.texts, "hashes": result.hashes} {
 		if paths := slices.Sorted(maps.Keys(kept)); !slices.Equal(paths, []string{loud, "src/main.yue"}) {
 			t.Errorf("the %s are of %q", what, paths)
@@ -284,7 +252,6 @@ func TestCompileAllReportsSyntaxErrorsWithFileAndLine(t *testing.T) {
 	if failure.File != "src/bad.yue" || failure.Line != 2 || !strings.HasPrefix(failure.Msg, "expected valid expression\n") {
 		t.Errorf("error = %+v", failure)
 	}
-	// The file that compiled keeps its place among the hashes; the failed one has none, so it compiles again.
 	kept, err := readHashes(b.root)
 	if _, ok := kept.Sources["src/ok.yue"]; err != nil || !ok || len(kept.Sources) != 1 {
 		t.Errorf("the hashes file keeps %+v, %v", kept.Sources, err)
@@ -302,7 +269,6 @@ func TestCompileAllReportsTheFirstOfSeveralFailedFilesAndCountsTheRest(t *testin
 func TestAnEmptyCompileOutputForAFileWithCodeFailsInsteadOfDroppingTheModule(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", "-- a comment\nexport x = 1\n", "src/notes.yue", "-- only comments\n\n"))
 	yue := b.real()
-	// The compiler reports success and writes nothing for main.yue; the output file follows -o.
 	b.use(func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		result, err := env.Run(ctx, program, args, options)
 		if b.sourceOf(args) == "src/main.yue" && err == nil {
@@ -331,8 +297,6 @@ func TestAFileUsingFloorDivisionCompilesNormalAndMinified(t *testing.T) {
 }
 
 func TestAFileUsingABitwiseOperatorFailsAtItsLineWithAHint(t *testing.T) {
-	// The compiler compiles the operators, but the step that rewrites or minifies the Lua does not read them: it
-	// fails and leaves the Lua it could not rewrite, which a build must not use.
 	p := files("src/main.yue", "x = 1\n\n\nflags = x & 3\nprint flags\n")
 	b := benchOf(t, p)
 	failure := b.refuses(b.real(), false, "a bitwise operator")
@@ -345,7 +309,6 @@ func TestAFileUsingABitwiseOperatorFailsAtItsLineWithAHint(t *testing.T) {
 		t.Error("the Lua that could not be rewritten was left behind")
 	}
 
-	// A minified build has no line to give: the Lua it fails on carries no line marks.
 	b = benchOf(t, p)
 	failure = b.refuses(b.real(), true, "a bitwise operator, minified")
 	if failure.Msg != "YueScript compiled this file but could not minify its Lua: Unexpected Symbol `&` in source." ||
@@ -354,7 +317,6 @@ func TestAFileUsingABitwiseOperatorFailsAtItsLineWithAHint(t *testing.T) {
 	}
 }
 
-// macroImport is the line that brings the macro into a source.
 const macroImport = "import \"moonwell.macros\" as {:$FourCC}\n"
 
 func TestCompileAllExpandsFourCCThroughTheMacroModule(t *testing.T) {
@@ -388,7 +350,6 @@ func TestAFailedMacroNamesTheFileAndLineWithTheMacrosOwnMessage(t *testing.T) {
 	if failure.File != "src/main.yue" || failure.Line != 3 || !strings.HasPrefix(failure.Msg, fourCCMessage+"\n") {
 		t.Errorf("error = %+v", failure)
 	}
-	// The compiler finds the macro module through its search path alone: without the file, the import fails.
 	b.remove(MacrosFile)
 	failure = b.refuses(yue, false, "no macro module")
 	if failure.File != "src/main.yue" || failure.Line != 1 || !strings.Contains(failure.Msg, "moonwell.macros") {
@@ -396,8 +357,6 @@ func TestAFailedMacroNamesTheFileAndLineWithTheMacrosOwnMessage(t *testing.T) {
 	}
 }
 
-// expand compiles `print <call>` after the import of the macro, in a project of its own: the Lua, or the
-// failure.
 func expand(t *testing.T, call string) (lua string, failure *diag.Error) {
 	t.Helper()
 	b := benchOf(t, files("src/main.yue", macroImport+"print "+call+"\n"))
@@ -414,8 +373,7 @@ func TestFourCCTurnsA4CharacterStringLiteralIntoTheRawcodesInteger(t *testing.T)
 		`$FourCC 'hfoo'`:  "1751543663",
 		`$FourCC("hfoo")`: "1751543663",
 		`$FourCC "Hpal"`:  "1215324524",
-		// A single-quoted string does not interpolate, so '#{a}' is its own four characters.
-		`$FourCC '#{a}'`: "595288445",
+		`$FourCC '#{a}'`:  "595288445",
 	} {
 		lua, failure := expand(t, call)
 		if failure != nil || !strings.Contains(lua, want) || strings.Contains(lua, "moonwell.macros") {
@@ -435,8 +393,6 @@ func TestFourCCRefusesAnythingButA4CharacterStringLiteral(t *testing.T) {
 		}
 	}
 }
-
-// ---- how the compiler is run ----
 
 func TestTheCompilerIsRunWithTheTargetTheModeTheOutputTheMacroPathAndTheFile(t *testing.T) {
 	for minify, mode := range map[bool]string{false: "-r", true: "-m"} {
@@ -464,8 +420,6 @@ func TestAtMostEightCompilersRunAtATime(t *testing.T) {
 	running, most := 0, 0
 	var once sync.Once
 	eightAreIn := make(chan struct{})
-	// A compile that never lets eight in is told apart by the count, after a wait that a working one never
-	// spends.
 	waited, giveUp := context.WithTimeout(background, 5*time.Second)
 	defer giveUp()
 	b.use(func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
@@ -476,8 +430,6 @@ func TestAtMostEightCompilersRunAtATime(t *testing.T) {
 			once.Do(func() { close(eightAreIn) })
 		}
 		guard.Unlock()
-		// Each of the first runs stays in until eight are in at once, and every run a moment longer, in which a
-		// ninth would come in if it were let.
 		select {
 		case <-eightAreIn:
 		case <-waited.Done():
@@ -495,12 +447,9 @@ func TestAtMostEightCompilersRunAtATime(t *testing.T) {
 }
 
 func TestEachOfGivesWhatEachItemGaveInTheOrderOfTheItems(t *testing.T) {
-	// No items: nothing is started, and nothing is given.
 	if gave, err := eachOf(nil, func(int) (int, error) { t.Error("work was started without an item"); return 0, nil }); err != nil || len(gave) != 0 {
 		t.Errorf("of no items: %v, %v", gave, err)
 	}
-	// Work that ends out of order: each item waits for the one after it, so the last of every eight that run at
-	// a time ends first.
 	const count = 30
 	items := make([]int, count)
 	ended := make([]chan struct{}, count)
@@ -511,9 +460,6 @@ func TestEachOfGivesWhatEachItemGaveInTheOrderOfTheItems(t *testing.T) {
 	var order []int
 	gave, err := eachOf(items, func(item int) (string, error) {
 		if (item+1)%atOnce != 0 && item != count-1 {
-			// The wait has a bound, so that the test ends when the item after this one is not started while this
-			// one runs. What the test proves is the order of what was given when the work ends in another order,
-			// and that some of the work runs side by side; that eight run at a time is another test's.
 			select {
 			case <-ended[item+1]:
 			case <-time.After(5 * time.Second):
@@ -537,9 +483,6 @@ func TestEachOfGivesWhatEachItemGaveInTheOrderOfTheItems(t *testing.T) {
 
 func TestEachOfStartsNoWorkAfterAnErrorAndReturnsItWhenTheRunningWorkHasEnded(t *testing.T) {
 	first, later := errors.New("the first failure"), errors.New("a later failure")
-	// The test runs in a bubble, where Wait returns once every other goroutine waits on a channel: the test then
-	// knows that eachOf has started all it will start, and taken all it was handed, with no guess at how long
-	// that takes. Work that never gets on is a deadlock there, which ends the test.
 	synctest.Test(t, func(t *testing.T) {
 		firstMayEnd, othersMayEnd, returned := make(chan struct{}), make(chan struct{}), make(chan struct{})
 		var guard sync.Mutex
@@ -571,13 +514,10 @@ func TestEachOfStartsNoWorkAfterAnErrorAndReturnsItWhenTheRunningWorkHasEnded(t 
 				return 0, later
 			})
 		}()
-		// Eight are in, and each waits to be let go.
 		synctest.Wait()
 		if in, still := counted(); in != atOnce || still != atOnce {
 			t.Errorf("%d were started and %d run before any has ended, want 8 and 8", in, still)
 		}
-		// One fails. eachOf takes its failure, starts no ninth, though thirty-two items are left, and does not
-		// return while the seven others run.
 		close(firstMayEnd)
 		synctest.Wait()
 		in, still := counted()
@@ -589,7 +529,6 @@ func TestEachOfStartsNoWorkAfterAnErrorAndReturnsItWhenTheRunningWorkHasEnded(t 
 		if in != atOnce || still != atOnce-1 {
 			t.Errorf("after the first failure %d were started and %d run, want 8 and 7", in, still)
 		}
-		// The seven others fail after it, and theirs is not the error returned.
 		close(othersMayEnd)
 		<-returned
 		if in, still := counted(); err != first || in != atOnce || still != 0 {
@@ -610,19 +549,15 @@ func TestAfterAnErrorThatIsNoCompileFailureNoFurtherCompilerIsStarted(t *testing
 			return env.RunResult{}, stopped
 		})
 		result, err := b.compile(fakeYue, false)
-		// The error is the one that came, and not one made of it.
 		if result != nil || err != stopped {
 			t.Errorf("%s: compileAll = %+v, %v", what, result, err)
 		}
-		// Eight were started before the first of them ended.
 		if ran := b.ran(); len(ran) != 8 {
 			t.Errorf("%s: the compiler was started %d times, want 8", what, len(ran))
 		}
 	}
 }
 
-// The work on a file runs in a goroutine of its own, where the recover of the command line does not reach: a
-// panic there comes back as a plain error, which is printed as the internal error it is, with its stack.
 func TestAPanicWhileAFileIsCompiledIsAPlainErrorWithItsStack(t *testing.T) {
 	b := benchOf(t, mainOnly)
 	b.use(func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
@@ -649,7 +584,6 @@ func TestACompileFailureLetsTheOtherFilesCompile(t *testing.T) {
 }
 
 func TestTheFirstOfSeveralFailedFilesIsTheFirstByBytes(t *testing.T) {
-	// By the bytes of their paths a capital letter comes before every small one, and "_" between the two.
 	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/B.yue", "x = 1\n", "src/_c.yue", "x = 1\n", "src/ok.yue", "x = 1\n"))
 	failed := func(line int) answer {
 		return answer{code: 1, stdout: fmt.Sprintf("Failed to compile: x\n%d: boom\n", line)}
@@ -682,11 +616,7 @@ func TestAFailedFilesOutputIsRemoved(t *testing.T) {
 	}
 }
 
-// ---- what is read and where it goes ----
-
 func TestASourcesTextIsItsBytesWithoutAByteOrderMarkAndItsLuaTheBytesTheCompilerWrote(t *testing.T) {
-	// Nothing is decoded: bytes that are not UTF-8 stay as they are in a source's text and in its Lua, and a
-	// source's hash is that of the whole file.
 	sources := map[string]string{
 		"src/marked.yue": mark + "x = 1\n",
 		"src/faulty.yue": "x = '\xff\xfe' -- \xe9\n",
@@ -728,12 +658,9 @@ func TestWhereASourceCompilesTo(t *testing.T) {
 		{Source{Name: "main", Path: "src/main.yue", Kind: Yue}, "main.lua"},
 		{Source{Name: "game.units.init", Path: "src/game/units/init.yue", Kind: Yue}, "game/units/init.lua"},
 		{Source{Name: "example.loud", Path: ".moonwell/libraries/ex/example/loud.yue", Kind: Yue, Library: "ex"}, ".libraries/ex/example/loud.lua"},
-		// A library's folder is where its sync put it: the output goes by the library's key and the module's name.
 		{Source{Name: "loud", Path: "vendor/kit/lua/loud.yue", Kind: Yue, Library: "kit-2"}, ".libraries/kit-2/loud.lua"},
 		{Source{Name: "src.x", Path: "elsewhere/src/x.yue", Kind: Yue, Library: "a"}, ".libraries/a/src/x.lua"},
 		{Source{Name: "x", Path: "vendor/x.yue", Kind: Yue, Library: "A_b-10"}, ".libraries/A_b-10/x.lua"},
-		// A file named by its extension alone is a module without a name, and one in a folder ends its name
-		// with a dot.
 		{Source{Name: "", Path: "src/.yue", Kind: Yue}, ".lua"},
 		{Source{Name: "a.", Path: "src/a/.yue", Kind: Yue}, "a/.lua"},
 		{Source{Name: "", Path: "vendor/kit/.yue", Kind: Yue, Library: "kit"}, ".libraries/kit/.lua"},
@@ -742,8 +669,6 @@ func TestWhereASourceCompilesTo(t *testing.T) {
 			t.Errorf("outputOf(%+v) = %q, %v, want %q", c.source, got, err, c.want)
 		}
 	}
-	// A module that is not where its name says, and a library's key that is no plain name, are mistakes of the
-	// caller: a plain error, and nothing is compiled.
 	for _, source := range []Source{
 		{Name: "main", Path: "src/other.yue", Kind: Yue},
 		{Name: "main", Path: "lua/main.yue", Kind: Yue},
@@ -786,7 +711,6 @@ func TestALibrarysModuleCompilesBelowItsKeyWhereverItsFolderIs(t *testing.T) {
 }
 
 func TestAModuleWithoutAnOutputHasNoLua(t *testing.T) {
-	// The compiler writes no file for a source without code.
 	b := benchOf(t, files("src/main.yue", "x = 1\n", "src/notes.yue", "-- only comments\n\n"))
 	b.fake(map[string]answer{"src/notes.yue": {}})
 	result := b.compiles(fakeYue, false)
@@ -796,7 +720,6 @@ func TestAModuleWithoutAnOutputHasNoLua(t *testing.T) {
 	if result.texts["src/notes.yue"] != "-- only comments\n\n" || result.lua["src/notes.yue"] != b.staged("notes.lua") {
 		t.Errorf("the module without code is not among the compiled: %+v", result)
 	}
-	// It has no output to be up to date, so the compiler is asked again each time.
 	b.ran()
 	b.compiles(fakeYue, false)
 	if ran := b.ran(); !slices.Equal(ran, []string{"src/notes.yue"}) {
@@ -805,8 +728,6 @@ func TestAModuleWithoutAnOutputHasNoLua(t *testing.T) {
 }
 
 func TestTheNamesCollectGivesPlaceEveryOutputBelowTheOutputFolder(t *testing.T) {
-	// A name is a path with a dot for each "/", and no file or folder on that path has a dot in its own name: so
-	// no step of an output's path is "." or "..", whatever the files are called.
 	p := files(
 		"src/main.yue", "", "src/.yue", "", "src/a/.yue", "", "src/a/b/init.yue", "", "src/my module.yue", "", "src/-.yue", "",
 		"src/_/_.yue", "", "src/init/init.yue", "",
@@ -848,7 +769,6 @@ func TestALinkOnTheWayToTheOutputFolderIsRefused(t *testing.T) {
 }
 
 func TestBelowTheOutputFolderALinkIsWrittenThrough(t *testing.T) {
-	// The output folder is Moonwell's own: what is below it is not looked at for links.
 	b := benchOf(t, files("src/game/units.yue", "x = 1\n"))
 	b.fake(nil)
 	at := linkTo(t, files(), b.root, "dist/stage/lua/game")
@@ -859,11 +779,8 @@ func TestBelowTheOutputFolderALinkIsWrittenThrough(t *testing.T) {
 }
 
 func TestASourceThatIsALinkIsCompiledThroughIt(t *testing.T) {
-	// A linked file that is named as a module is a module, as it is listed; its text is the file's behind the
-	// link.
 	b := benchOf(t, mainOnly.and("elsewhere/real.yue", "x = 'behind the link'\n"))
 	at := filepath.Join(b.root, "src", "linked.yue")
-	// Skipped where Windows keeps the right to make such a link from this account, and for that alone.
 	testkit.LinkFile(t, filepath.Join(b.root, "elsewhere", "real.yue"), at)
 	b.fake(nil)
 	result := b.compiles(fakeYue, false)
@@ -879,7 +796,6 @@ func TestASourceIsCompiledUnderWhateverNameTheSystemHolds(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("Windows holds no file with a question mark or a backslash in its name")
 	}
-	// A backslash in a name is a character of the name, and no separator.
 	question, backslash := "src/what?.yue", `src/back\slash.yue`
 	b := benchOf(t, mainOnly)
 	for _, path := range []string{question, backslash} {
@@ -897,8 +813,6 @@ func TestASourceIsCompiledUnderWhateverNameTheSystemHolds(t *testing.T) {
 	if ran := b.ran(); !slices.Equal(ran, []string{backslash, "src/main.yue", question}) {
 		t.Errorf("the compiler ran on %q", ran)
 	}
-	// The hashes file keeps such outputs too: nothing is compiled again, and a source that is gone loses its
-	// output.
 	b.remove(backslash)
 	b.compiles(fakeYue, false)
 	if ran := b.ran(); len(ran) != 0 || fsx.Exists(filepath.Join(b.root, "dist", "stage", "lua", `back\slash.lua`)) {
@@ -908,8 +822,6 @@ func TestASourceIsCompiledUnderWhateverNameTheSystemHolds(t *testing.T) {
 }
 
 func TestASourceThatLosesItsCodeLosesItsLua(t *testing.T) {
-	// With a file at the output, the compiler rewrites or minifies that file where the source has no code, and
-	// with none it writes none. So the output of an earlier run is removed before the compiler runs.
 	for _, minify := range []bool{false, true} {
 		b := benchOf(t, files("src/main.yue", "export x = 1\n", "src/notes.yue", "export y = 2\n"))
 		yue := b.real()
@@ -922,7 +834,6 @@ func TestASourceThatLosesItsCodeLosesItsLua(t *testing.T) {
 		for _, what := range []string{"once the code is a comment", "and on the next run"} {
 			result := b.compiles(yue, minify)
 			lua, ok, err := result.luaOf(b.source("src/notes.yue"))
-			// A source without an output is compiled on every run, as it is in a folder that was never built in.
 			if ran := b.ran(); lua != "" || ok || err != nil || fsx.Exists(b.staged("notes.lua")) || !slices.Equal(ran, []string{"src/notes.yue"}) {
 				t.Errorf("minify %v, %s: luaOf = %q, %v, %v; the output is there: %v; the compiler ran on %q",
 					minify, what, lua, ok, err, fsx.Exists(b.staged("notes.lua")), ran)
@@ -947,8 +858,6 @@ func TestACompilerThatWritesNothingLeavesNoLuaOfAnEarlierRun(t *testing.T) {
 }
 
 func TestAFileThatCompiledAndThenUsesABitwiseOperatorFailsAtItsLine(t *testing.T) {
-	// The compiler writes the Lua it cannot rewrite itself, so the line is read from it with no earlier output
-	// there.
 	for minify, wantLine := range map[bool]int{false: 4, true: 0} {
 		b := benchOf(t, files("src/main.yue", "x = 1\nprint x\n"))
 		yue := b.real()
@@ -980,8 +889,6 @@ func TestAnOutputThatAnotherProgramHoldsIsRefusedByItsPathFromTheProjectFolder(t
 	b := benchOf(t, mainOnly.and("dist/stage/lua/main.lua", "-- of the last compile\n"))
 	b.fake(nil)
 	testkit.MakeUnwritable(t, b.staged("main.lua"))
-	// The output is removed before the compiler runs, and the system refuses that: the failure is the output's
-	// own, as any other failure to remove it, and not that of a map that the game holds.
 	failure := b.refuses(fakeYue, false, "an output that is held")
 	if !strings.HasPrefix(failure.Msg, "Removing dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" ||
 		failure.Hint != distHint || strings.Contains(failure.Msg, b.root) || failure.Cause == nil || len(b.ran()) != 0 {
@@ -990,7 +897,6 @@ func TestAnOutputThatAnotherProgramHoldsIsRefusedByItsPathFromTheProjectFolder(t
 }
 
 func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T) {
-	// A file where the output's folder must be.
 	b := benchOf(t, files("src/game/units.yue", "x = 1\n", "dist/stage/lua/game", "a file, not a folder"))
 	b.fake(nil)
 	failure := b.refuses(fakeYue, false, "a file for the output's folder")
@@ -998,8 +904,6 @@ func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T
 		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil || len(b.ran()) != 0 {
 		t.Errorf("error = %+v", failure)
 	}
-	// A file at dist/stage, above the staging folder: nothing is below a file, which one system says in other
-	// words than another, and the refusal is that of the first file a compile writes, on each of them.
 	b = benchOf(t, mainOnly.and("dist/stage", "a file, not a folder"))
 	b.fake(nil)
 	failure = b.refuses(fakeYue, false, "a file at dist/stage")
@@ -1008,7 +912,6 @@ func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T
 		failure.Cause == nil || len(b.ran()) != 0 {
 		t.Errorf("error = %+v", failure)
 	}
-	// A folder with a file in it where the output is: it cannot be removed before the compiler runs.
 	b = benchOf(t, mainOnly.and("dist/stage/lua/main.lua/kept.txt", ""))
 	b.fake(nil)
 	failure = b.refuses(fakeYue, false, "a folder for the output")
@@ -1016,7 +919,6 @@ func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T
 		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil || len(b.ran()) != 0 {
 		t.Errorf("error = %+v", failure)
 	}
-	// A folder where the output is, once the compile is over: it is there, and it cannot be read as a file.
 	b = benchOf(t, mainOnly)
 	b.fake(map[string]answer{"src/main.yue": {}})
 	result := b.compiles(fakeYue, false)

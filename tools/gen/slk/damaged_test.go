@@ -12,9 +12,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-// tablesOfTheTests are the tables that the tests of this package keep in their constants and lists, the ones
-// that are read and the ones that are refused, each with a name for a failure. A table that a test writes in
-// its own body is not among them.
 func tablesOfTheTests() map[string]string {
 	named := map[string]string{
 		"mini": mini, "two semicolons in a value": semicolonsInAValue, "two semicolons after the end": semicolonsAfterTheEnd,
@@ -38,12 +35,8 @@ func tablesOfTheTests() map[string]string {
 	return named
 }
 
-// outcomes counts the damaged tables that were read and the ones that were refused.
 type outcomes struct{ read, refused int }
 
-// longerTables are tables of this file's own, longer than the ones of the tests, with what a table of the game
-// has side by side: carriage returns, records that are no cells, a Y before its X, a doubled quote, text after
-// the end.
 var longerTables = map[string]string{
 	"three rows, the last with its Y before its X": "ID;PWXL;N;E\r\nC;X1;Y1;K\"ID\"\r\nC;X2;K\"note\"\r\n" +
 		"C;X1;Y2;K\"abcd\"\r\nC;X2;K12\r\nC;X1;Y3;K\"efgh\"\r\nC;Y4;X1;K\"a;b\"\r\nC;X2;KTRUE\r\nE\r\n" +
@@ -55,16 +48,10 @@ var longerTables = map[string]string{
 		"C;Xb;Y3;K1\n",
 }
 
-// damageSeed is the seed of the changes that TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics makes. A
-// failure names the table and the index of the change: testkit.Changed makes the same text of the three again.
 const damageSeed = 1986
 
-// damagedFile is the name the test gives Parse for its errors.
 const damagedFile = "tables/damaged.slk"
 
-// readOrRefused gives Parse the text. It stops the test when Parse panics, when it returns a table with an
-// error, and when the error does not start with the file and a line of the text; the error for two columns of
-// one name is about the header row, whose cells stand on any lines, and names the file alone.
 func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 	t.Helper()
 	var table slk.Table
@@ -89,9 +76,6 @@ func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 	}
 }
 
-// TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics gives Parse the tables of the tests and the
-// longer tables of this file, each cut at every length, after each of 60 seeded changes of its lines, quotes
-// and white space, and with one character of ASCII white space put in at every place.
 func TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 	named := tablesOfTheTests()
 	maps.Copy(named, longerTables)
@@ -109,7 +93,6 @@ func TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 			damaged.readOrRefused(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
 		}
 	}
-	// The floor is against a test that passes because it gave Parse nothing.
 	if damaged.read == 0 || damaged.refused == 0 {
 		t.Errorf("%d damaged tables were read and %d refused; want some of each", damaged.read, damaged.refused)
 	}

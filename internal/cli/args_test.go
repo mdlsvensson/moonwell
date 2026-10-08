@@ -10,21 +10,14 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/env"
 )
 
-// These tests hold how a command line is read. cobra reads it, so they hold what Moonwell gives cobra, which is
-// the command table, and what a user leans on: which lines run a command and with what, which are refused,
-// and where the help, the version and a completion script are printed. cobra's words are in no test.
-
-// reading is what a command line came to.
 type reading struct {
 	code   int
-	ran    string // the command that ran; "" for a line that ran none
-	got    call   // what the command was given
-	output string // what went to the terminal
-	stdout string // what was printed for other programs
+	ran    string
+	got    call
+	output string
+	stdout string
 }
 
-// readLine carries a command line out against the command table, with every command's function replaced by
-// one that does nothing but say that it ran, and with what.
 func readLine(t *testing.T, args ...string) reading {
 	t.Helper()
 	var result reading
@@ -61,29 +54,23 @@ func TestAWellFormedLineRunsItsCommandWithWhatItSaid(t *testing.T) {
 		{[]string{"check"}, "check", call{}},
 		{[]string{"assets:check"}, "assets:check", call{}},
 
-		// A flag stands after its command: before the command's argument, or after it.
 		{[]string{"build", "--minify"}, "build", call{minify: true}},
 		{[]string{"init", "my-map", "--link"}, "init", call{arguments: []string{"my-map"}, link: true}},
 		{[]string{"init", "--link", "my-map"}, "init", call{arguments: []string{"my-map"}, link: true}},
 
-		// --entry takes its file from the next argument, or after "=".
 		{[]string{"build", "--entry", "src/a.yue", "--minify"}, "build", call{entry: "src/a.yue", minify: true}},
 		{[]string{"test", "--entry=src/a.yue"}, "test", call{entry: "src/a.yue"}},
 		{[]string{"test", "--entry", `src\game\init.yue`}, "test", call{entry: `src\game\init.yue`}},
 
-		// A flag given twice counts as it is given last, and a switch may be given its value.
 		{[]string{"build", "--minify", "--minify"}, "build", call{minify: true}},
 		{[]string{"build", "--entry", "src/a.yue", "--entry", "src/b.yue"}, "build", call{entry: "src/b.yue"}},
 		{[]string{"build", "--minify=true"}, "build", call{minify: true}},
 		{[]string{"build", "--minify=false"}, "build", call{}},
 		{[]string{"build", "--minify", "--minify=false"}, "build", call{}},
 
-		// The command's own arguments.
 		{[]string{"assets:paths"}, "assets:paths", call{}},
 		{[]string{"assets:paths", "units/Hero.mdx"}, "assets:paths", call{arguments: []string{"units/Hero.mdx"}}},
-		// A dash alone is no flag.
 		{[]string{"assets:paths", "-"}, "assets:paths", call{arguments: []string{"-"}}},
-		// What follows "--" is words, whatever it starts with; with nothing after it, "--" says nothing.
 		{[]string{"assets:paths", "--", "--odd.mdx"}, "assets:paths", call{arguments: []string{"--odd.mdx"}}},
 		{[]string{"init", "--link", "--", "-v"}, "init", call{arguments: []string{"-v"}, link: true}},
 		{[]string{"build", "--minify", "--"}, "build", call{minify: true}},
@@ -101,41 +88,30 @@ func TestAWellFormedLineRunsItsCommandWithWhatItSaid(t *testing.T) {
 	}
 }
 
-// A line that cobra does not read, a command with the wrong number of arguments, and an --entry that is no
-// .yue file under src/ are refused: the line ends with 1, runs nothing, and says why on the terminal as every
-// failure of Moonwell is printed, with a hint. named is what the refusal must name, where the line wrote it.
 func TestALineThatIsNotWellFormedIsRefused(t *testing.T) {
 	for _, c := range []struct {
 		args  []string
 		named string
 	}{
-		// A flag Moonwell does not have, and a flag of another command.
 		{[]string{"build", "--minfy"}, "--minfy"},
 		{[]string{"build", "-x"}, "x"},
 		{[]string{"check", "--minify"}, "--minify"},
 		{[]string{"build", "--link"}, "--link"},
 		{[]string{"check", "--entry", "src/a.yue"}, "--entry"},
-		// A command's flag before the command, and on a line without one.
 		{[]string{"--minify", "build"}, "--minify"},
 		{[]string{"--minify"}, "--minify"},
-		// The version is a flag of moonwell itself.
 		{[]string{"build", "--version"}, "--version"},
 		{[]string{"build", "-v"}, "v"},
-		// A switch is on or off.
 		{[]string{"build", "--minify=maybe"}, "maybe"},
-		// After a switch, true and false are arguments.
 		{[]string{"build", "--minify", "false"}, ""},
 
-		// --entry without a file, and with one that is no entry: the last one counts.
 		{[]string{"build", "--entry"}, "--entry"},
 		{[]string{"build", "--entry="}, "Entry ''"},
 		{[]string{"build", "--entry", "main.lua"}, "Entry 'main.lua'"},
 		{[]string{"test", "--entry=lua/a.yue"}, "Entry 'lua/a.yue'"},
 		{[]string{"build", "--entry", "src/a.yue", "--entry", "a.lua"}, "Entry 'a.lua'"},
-		// The argument after --entry is its file, whatever it starts with.
 		{[]string{"build", "--entry", "--minify"}, "Entry '--minify'"},
 
-		// An argument the command does not take, and a command without the argument it needs.
 		{[]string{"build", "extra"}, ""},
 		{[]string{"check", "a", "b"}, ""},
 		{[]string{"build", "--", "--minify"}, ""},
@@ -144,7 +120,6 @@ func TestALineThatIsNotWellFormedIsRefused(t *testing.T) {
 		{[]string{"init", "a", "b"}, ""},
 		{[]string{"assets:paths", "a.mdx", "b.mdx"}, ""},
 
-		// A word that names no command, far from every command and close to one, which cobra then names.
 		{[]string{"frobnicate"}, "frobnicate"},
 		{[]string{"biuld"}, "build"},
 		{[]string{"objects:evla"}, "objects:eval"},
@@ -163,10 +138,6 @@ func TestALineThatIsNotWellFormedIsRefused(t *testing.T) {
 	}
 }
 
-// The help says what Moonwell is and names every command with what it does, in the table's order, and cobra's
-// own two after them. The help of a command says how it is written and names each flag with what it does. A
-// line that asks for the help is not held to the argument its command needs, runs nothing, and prints the help
-// for other programs, so that it can be piped.
 func TestTheHelpNamesEveryCommandAndEveryFlag(t *testing.T) {
 	for _, args := range [][]string{nil, {"--help"}, {"-h"}, {"help"}, {"--"}, {"-hv"}} {
 		got := readLine(t, args...)
@@ -201,7 +172,6 @@ func TestTheHelpNamesEveryCommandAndEveryFlag(t *testing.T) {
 	}
 }
 
-// names is the names of a command table's rows, in their order.
 func names(table []command) []string {
 	var all []string
 	for _, c := range table {
@@ -210,7 +180,6 @@ func names(table []command) []string {
 	return all
 }
 
-// The version is a bare number, printed for other programs: the release workflow compares it with the tag.
 func TestTheVersionIsPrintedAsABareNumber(t *testing.T) {
 	for _, args := range [][]string{{"--version"}, {"-v"}} {
 		if got := readLine(t, args...); got.code != 0 || got.stdout != moonwell.Version || got.output != "" || got.ran != "" {
@@ -219,7 +188,6 @@ func TestTheVersionIsPrintedAsABareNumber(t *testing.T) {
 	}
 }
 
-// The completion script is output for another program: a shell reads it.
 func TestCompletionPrintsAScriptForOtherPrograms(t *testing.T) {
 	for _, shell := range []string{"powershell", "bash", "zsh", "fish"} {
 		got := readLine(t, "completion", shell)

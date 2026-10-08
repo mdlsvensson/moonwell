@@ -12,10 +12,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// These tests are in a package of their own: testkit, which makes their links, imports fsx.
-
-// refusedInside is the failure of Inside for relative, which must be a *diag.Error with the path as given as its
-// file, and no place.
 func refusedInside(t *testing.T, root, relative string) *diag.Error {
 	t.Helper()
 	place, err := fsx.Inside(root, relative)
@@ -35,7 +31,7 @@ func TestInsideIsThePlaceOfAPathBelowTheFolder(t *testing.T) {
 	for relative, want := range map[string]string{
 		"maps":                       filepath.Join(root, "maps"),
 		"maps/demo.w3x/war3map.lua":  filepath.Join(root, "maps", "demo.w3x", "war3map.lua"),
-		"dist/stage/demo.w3x":        filepath.Join(root, "dist", "stage", "demo.w3x"), // nothing is there yet
+		"dist/stage/demo.w3x":        filepath.Join(root, "dist", "stage", "demo.w3x"),
 		`maps\demo.w3x`:              filepath.Join(root, "maps", "demo.w3x"),
 		"maps/demo.w3x/..hidden.txt": filepath.Join(root, "maps", "demo.w3x", "..hidden.txt"),
 	} {
@@ -68,7 +64,7 @@ func TestInsideRefusesALinkOnTheWayAndALinkAtTheEnd(t *testing.T) {
 	testkit.LinkDir(t, filepath.Join(root, "real", "sub"), filepath.Join(root, "real", "inner"))
 	cases := []struct {
 		relative string
-		link     string // the link that is refused, from the folder
+		link     string
 	}{
 		{"link", "link"},
 		{"link/sub/a.txt", "link"},
@@ -85,15 +81,12 @@ func TestInsideRefusesALinkOnTheWayAndALinkAtTheEnd(t *testing.T) {
 			t.Errorf("Inside(%q): %+v", c.relative, failure)
 		}
 	}
-	// What is beside the links is reached.
 	beside := filepath.Join(root, "real", "sub", "a.txt")
 	if got, err := fsx.Inside(root, "real/sub/a.txt"); err != nil || got != beside {
 		t.Errorf("Inside beside the links = %q, %v", got, err)
 	}
 }
 
-// A link that stands for a file takes a right that Windows does not give every account: testkit.LinkFile skips
-// the test where this account has not got it.
 func TestInsideRefusesALinkToAFileAndALinkToNothing(t *testing.T) {
 	root := t.TempDir()
 	target := testkit.WriteFile(t, root, "real.txt", nil)
@@ -108,7 +101,6 @@ func TestInsideRefusesALinkToAFileAndALinkToNothing(t *testing.T) {
 	}
 }
 
-// The folder itself is the caller's choice: a project that is opened through a link is no way out of it.
 func TestInsideTrustsTheFolderItIsGiven(t *testing.T) {
 	base := t.TempDir()
 	testkit.WriteFile(t, base, "project/maps/a.txt", nil)
@@ -119,8 +111,6 @@ func TestInsideTrustsTheFolderItIsGiven(t *testing.T) {
 	}
 }
 
-// A file on the way to a place means that nothing is there, on every system: Inside gives the place, a look at
-// it finds nothing, and a folder or a file cannot be made there. A link before the file is refused all the same.
 func TestInsideTakesAFileOnTheWayForNothingThere(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "maps", []byte("a file, not a folder"))
@@ -160,8 +150,6 @@ func TestInsideTakesAFileOnTheWayForNothingThere(t *testing.T) {
 	}
 }
 
-// A name of three hundred letters is one that no system this program runs on can look at: each refuses it for
-// its length, and not as a name that nothing has.
 func TestInsideNamesAWayTheSystemCannotLookAt(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "maps/a.txt", nil)

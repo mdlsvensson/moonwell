@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-// miniExtrasText is Lua extras in the shape of tools/natives/lua-extras.json, and miniExtras what they hold.
 const miniExtrasText = `{
 	"functions": [{ "name": "FourCC", "params": [{ "name": "id", "type": "string" }], "returns": "integer" }],
 	"globals": ["print", "math"],
@@ -20,8 +19,6 @@ func miniExtras() extras {
 	}
 }
 
-// decodeExtras reads the text of a lua-extras.json as readExtras reads the file: by the reader of the
-// hand-written files, and held to what the natives need.
 func decodeExtras(data []byte) (extras, error) {
 	var lua extras
 	if err := decodeHandWritten(extrasPath, data, &lua); err != nil {
@@ -31,8 +28,6 @@ func decodeExtras(data []byte) (extras, error) {
 }
 
 func TestTheExtrasAreTheFunctionsAndTheTwoListsOfGlobals(t *testing.T) {
-	// A key of the file may be left out, and a list may be empty or null. A function may take nothing, and its
-	// keys may stand in any order.
 	for text, want := range map[string]extras{
 		miniExtrasText:                       miniExtras(),
 		`{}`:                                 {},
@@ -53,10 +48,6 @@ func TestTheExtrasAreTheFunctionsAndTheTwoListsOfGlobals(t *testing.T) {
 	}
 }
 
-// Every function has its three keys and every parameter its two, each with something under it, and no global
-// is an empty name: a key that is left out, null and an empty text are refused alike. What lacks something is
-// named by its place in the file, as a value of the wrong kind is: the keys on the way to it and the number of
-// an entry of a list, counted from 0.
 func TestTheExtrasAreRefusedForAFunctionOrAGlobalThatLacksSomething(t *testing.T) {
 	functions := func(list string) string { return `{"functions": [` + list + `]}` }
 	with := func(params string) string {

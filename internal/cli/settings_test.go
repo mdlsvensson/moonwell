@@ -17,17 +17,10 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The tests of this file are about a project's map settings: what settings:check says, and what a manifest's
-// settings block evaluates to. Each runs the real pkl in a project that init made, and takes the time that
-// takes. None needs the compiler: settings:check runs in a world that lets pkl alone run.
-
-// settingsValid is the line settings:check ends with for count changed files.
 func settingsValid(count string) string {
 	return "Map settings valid: " + count + " internal file(s) would change during build."
 }
 
-// loaded is the manifest of the project at root, as the real pkl evaluates it, in a world that lets pkl alone
-// run.
 func loaded(t *testing.T, root string) *manifest.Project {
 	t.Helper()
 	e, _, _ := pklOnly(t, root)
@@ -38,7 +31,6 @@ func loaded(t *testing.T, root string) *manifest.Project {
 	return p
 }
 
-// plannedSettings is what the settings of the project at root change in its map: the plan settings:check lists.
 func plannedSettings(t *testing.T, root string) []mapdir.Change {
 	t.Helper()
 	p := loaded(t, root)
@@ -53,8 +45,6 @@ func plannedSettings(t *testing.T, root string) []mapdir.Change {
 	return changes
 }
 
-// settingsCheckFails runs settings:check in a world that lets pkl alone run, and returns the failure it must
-// end with. It logs nothing before a failure.
 func settingsCheckFails(t *testing.T, root, what string) *diag.Error {
 	t.Helper()
 	e, log, _ := pklOnly(t, root)
@@ -89,7 +79,6 @@ func TestPklTemplateSettingsNoop(t *testing.T) {
 	if strings.Contains(shared, "Listing") || strings.Contains(shared, "gameplayConstants {") {
 		t.Fatal("the template's manifest has advanced settings")
 	}
-	// The template names a player, and sets nothing of it: its settings change no file of the map.
 	if player, named := loaded(t, root).Settings.Players[0]; !named || !reflect.DeepEqual(player, manifest.Player{}) {
 		t.Fatalf("player 0 of the template = %+v, named %v", player, named)
 	}
@@ -101,8 +90,6 @@ func TestPklTemplateSettingsNoop(t *testing.T) {
 	sameFiles(t, before, testkit.Snapshot(t, root), "settings check")
 }
 
-// settings:check reads the project and writes nothing: it goes on beside a build that runs, and it neither minds
-// nor takes over the lock file of a build that is long gone.
 func TestPklSettingsCheckIgnoresBuildLock(t *testing.T) {
 	for what, arrange := range map[string]func(t *testing.T, root string) string{
 		"a lock file left behind": func(t *testing.T, root string) string {
@@ -127,7 +114,6 @@ func TestPklSettingsCheckIgnoresBuildLock(t *testing.T) {
 	}
 }
 
-// everyGroup sets something in every group of the settings block, and everyGroupJSON is what that evaluates to.
 const (
 	everyGroup = `settings {
  info { name = "N"; author = ""; description = "D"; recommendedPlayers = "1-4" }
@@ -165,7 +151,6 @@ func TestPklSettingsLoadsEveryGroupAndReplacesColor(t *testing.T) {
 	if p.File != "moonwell.local.pkl" || !reflect.DeepEqual(p.Settings, wanted) {
 		t.Fatalf("got %+v want %+v", p.Settings, wanted)
 	}
-	// A colour of the manifest on this machine replaces the shared one whole; without one, the shared one holds.
 	writeLocal(t, root, "")
 	color := loaded(t, root).Settings.Environment.WaterColor
 	if color == nil || *color != [4]byte{1, 2, 3, 4} {
@@ -191,7 +176,6 @@ func TestPklSettingsErrorsNameLocalManifest(t *testing.T) {
 	}
 }
 
-// removeMapNameCall takes the call that sets the map's name out of the map's script.
 func removeMapNameCall(t *testing.T, root string) {
 	t.Helper()
 	path := "maps/map.w3x/war3map.lua"
@@ -233,7 +217,6 @@ func TestPklSettingsPreviewChangesAndNamedErrors(t *testing.T) {
 	if preview := loaded(t, root).Settings.Info.Preview; preview == nil || *preview != "art/preview.tga" {
 		t.Fatal(preview)
 	}
-	// A TGA without transparency is imported with every pixel opaque.
 	opaque := byte(255)
 	changes := plannedSettings(t, root)
 	if len(changes) != 4 ||

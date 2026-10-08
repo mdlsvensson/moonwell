@@ -8,8 +8,6 @@ import (
 	"testing"
 )
 
-// standsIn names the variable that makes this test program stand in for a compiler: it prints the version the
-// variable holds, as yue prints its own, and ends.
 const standsIn = "MOONWELL_TOOLTEST_YUE_VERSION"
 
 func TestMain(m *testing.M) {
@@ -20,7 +18,6 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// ended is a test that keeps how it was ended instead of ending.
 type ended struct {
 	testing.TB
 	failed, skipped []string
@@ -45,7 +42,6 @@ func TestYueTakesTheCompilerTheUserProvidesAsItIs(t *testing.T) {
 	}
 }
 
-// luaFile writes a Lua file into a folder of its own, with the files that stand beside it, and returns its path.
 func luaFile(t *testing.T, name, source string, beside map[string]string) string {
 	t.Helper()
 	dir := t.TempDir()
@@ -61,7 +57,6 @@ func luaFile(t *testing.T, name, source string, beside map[string]string) string
 	return file
 }
 
-// This test and the next start the real compiler.
 func TestRunLuaReturnsWhatTheFilePrintedWithLinesEndedByALineFeedAlone(t *testing.T) {
 	Yue(t)
 	file := luaFile(t, "war3map.lua", `local ok, lost = pcall(function() error("lost") end)
@@ -95,8 +90,6 @@ func TestRunLuaFailsTheTestWhenTheFileEndsWithAnErrorOrAnExitCode(t *testing.T) 
 
 func TestRunLuaFailsTheTestForAFileThatIsNotThere(t *testing.T) {
 	Yue(t)
-	// The compiler takes a name with no file behind it for code and runs it: `print(1)` is such a name, and
-	// would be returned as what a file printed. A folder is no file to run either.
 	dir := t.TempDir()
 	if err := os.Mkdir(filepath.Join(dir, "print(2)"), 0o777); err != nil {
 		t.Fatal(err)
@@ -117,7 +110,6 @@ func TestRunLuaRunsNothingWithoutACompiler(t *testing.T) {
 	t.Setenv("MOONWELL_REQUIRE_TOOLS", "")
 	left := filepath.Join(t.TempDir(), "left")
 	test := &ended{}
-	// The folder separator is a slash: a backslash in a Lua string starts an escape.
 	source := `io.open("` + filepath.ToSlash(left) + `", "w"):close()`
 	if got := RunLua(test, luaFile(t, "writes.lua", source, nil)); got != "" || len(test.skipped) != 1 || len(test.failed) != 0 {
 		t.Errorf("RunLua = %q, skipped %q, failed %q", got, test.skipped, test.failed)
@@ -131,7 +123,7 @@ func TestYueSkipsTheTestWithoutACompilerAndFailsItWhenToolsAreRequired(t *testin
 	gone := filepath.Join(t.TempDir(), "yue")
 	tests := []struct {
 		name           string
-		require        string // MOONWELL_REQUIRE_TOOLS
+		require        string
 		skips, fails   int
 		endedWithWords string
 	}{

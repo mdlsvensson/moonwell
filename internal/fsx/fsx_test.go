@@ -29,7 +29,6 @@ func write(t *testing.T, path, content string) {
 	}
 }
 
-// read is the content of the file at path, or "<missing>" when there is none.
 func read(t *testing.T, path string) string {
 	t.Helper()
 	data, err := os.ReadFile(path)
@@ -56,7 +55,6 @@ func TestListFilesReturnsPosixRelativePathsSortedByBytes(t *testing.T) {
 	write(t, filepath.Join(dir, "z.txt"), "")
 	write(t, filepath.Join(dir, "a", "b", "c.txt"), "")
 	write(t, filepath.Join(dir, "Y.txt"), "")
-	// A walk meets a.txt after the folder a; by bytes "." comes before "/", so only a sort puts it first.
 	write(t, filepath.Join(dir, "a.txt"), "")
 	got, err := ListFiles(dir)
 	if err != nil || !slices.Equal(got, []string{"Y.txt", "a.txt", "a/b/c.txt", "z.txt"}) {
@@ -76,7 +74,6 @@ func TestReplaceDirReplacesDestinationContents(t *testing.T) {
 	if !slices.Equal(got, []string{"deep/er.txt", "new.txt"}) {
 		t.Errorf("dest holds %q", got)
 	}
-	// A destination whose parent is missing is created.
 	if err := ReplaceDir(filepath.Join(dir, "src"), filepath.Join(dir, "a", "b", "dest")); err != nil {
 		t.Fatal(err)
 	}
@@ -114,7 +111,6 @@ func TestReadIfThereFindsNoFileWhereNoneCanBeAndFailsForAnythingElse(t *testing.
 		{"a file", "held.txt", "held", true},
 		{"nothing at the path", "gone.txt", "", false},
 		{"nothing on the way to the path", "gone/below.txt", "", false},
-		// What a system says of a path below a file differs from system to system; no file is there on any.
 		{"a file on the way to the path", "held.txt/below.txt", "", false},
 	} {
 		data, found, err := ReadIfThere(filepath.Join(dir, filepath.FromSlash(c.path)))
@@ -122,7 +118,6 @@ func TestReadIfThereFindsNoFileWhereNoneCanBeAndFailsForAnythingElse(t *testing.
 			t.Errorf("%s: ReadIfThere = %q, %v, %v", c.name, data, found, err)
 		}
 	}
-	// A folder is there, and is no file to read: the system's error, for the caller to word.
 	if data, found, err := ReadIfThere(filepath.Join(dir, "folder")); err == nil || found || data != nil {
 		t.Errorf("a folder: ReadIfThere = %q, %v, %v", data, found, err)
 	}
@@ -135,7 +130,6 @@ func TestReadSourceDropsALeadingByteOrderMarkAndBlanksAFirstLineStartingWithHash
 		{bom + "#!/usr/bin/lua\r\nCount = 0\n# not the first line\n", "\r\nCount = 0\n# not the first line\n"},
 		{"#only line", ""},
 		{"Count = 0 -- " + bom + " kept\n", "Count = 0 -- " + bom + " kept\n"},
-		// Bytes that are not UTF-8 stay as they are: one, a run, and a character that is cut short.
 		{"bad \xFF byte\n", "bad \xFF byte\n"},
 		{"s = '\xE9\xE9\xFF' -- \xE2\x80\n", "s = '\xE9\xE9\xFF' -- \xE2\x80\n"},
 		{bom + "#!lua \xFF\n-- \xC0\xC1", "\n-- \xC0\xC1"},
@@ -190,12 +184,10 @@ func TestTrimASCIISpaceTakesTheSixCharactersOfASCIIAndNoOther(t *testing.T) {
 		" \t\n\v\f\ra b \r\f\v\n\t ": "a b",
 		" \t\n\v\f\r":                "",
 		"":                           "",
-		// White space outside ASCII is text: a no-break space, a next line, a line separator, a wide space, and
-		// a byte order mark, which is no white space at all.
-		"\xC2\xA0a\xC2\x85": "\xC2\xA0a\xC2\x85",
-		"\xE2\x80\xA8a ":    "\xE2\x80\xA8a",
-		" \xE3\x80\x80":     "\xE3\x80\x80",
-		bom + " a":          bom + " a",
+		"\xC2\xA0a\xC2\x85":          "\xC2\xA0a\xC2\x85",
+		"\xE2\x80\xA8a ":             "\xE2\x80\xA8a",
+		" \xE3\x80\x80":              "\xE3\x80\x80",
+		bom + " a":                   bom + " a",
 	} {
 		if got := TrimASCIISpace(text); got != want {
 			t.Errorf("TrimASCIISpace(%q) = %q, want %q", text, got, want)
@@ -249,7 +241,6 @@ func TestTextWithMarkKeepsTheMarkAsideAndRefusesInvalidBytes(t *testing.T) {
 }
 
 func TestQuotedEscapesTheQuoteTheBackslashAndTheControlCharacters(t *testing.T) {
-	// How the escape of a control character without a short one starts: a backslash, the letter u and two zeros.
 	const long = `\` + "u00"
 	for _, c := range []struct{ name, text, want string }{
 		{"no text", "", `""`},
@@ -273,8 +264,6 @@ func TestQuotedEscapesTheQuoteTheBackslashAndTheControlCharacters(t *testing.T) 
 	}
 }
 
-// Of the 256 bytes, the quote, the backslash and those below a space are escaped, and no other. What is written
-// for a byte of ASCII is JSON, which reads back as the byte.
 func TestQuotedEscapesExactlyTheBytesItMustAndWritesJSON(t *testing.T) {
 	for b := range 256 {
 		text := string([]byte{byte(b)})
@@ -338,8 +327,6 @@ func TestSHA256HexHashesBytes(t *testing.T) {
 	}
 }
 
-// lockFile holds path open without sharing, as a running Warcraft III holds its map, until the returned function is
-// called.
 func lockFile(t *testing.T, path string) func() {
 	t.Helper()
 	script := "$h = [System.IO.File]::Open('" + path + "', 'Open', 'Read', 'None'); 'locked'; [Console]::In.ReadLine()"
@@ -392,7 +379,6 @@ func TestRemovingAFileAnotherProgramHoldsOpenNamesTheFileAndSaysToCloseTheGame(t
 	}
 }
 
-// refused are the paths RelPath turns down: each could leave its folder or fail on Windows.
 var refused = []string{
 	"", "/a", "a//b", "a/", "../a", "a/./b", "C:/a", "a/b?.blp", "a\tb", "a/b.", "a/b ", "con", "a/NUL.txt",
 	"com1.blp", `a\..\b`,
@@ -404,7 +390,7 @@ func TestRelPathRefusesWhatCouldLeaveItsFolderOrFailOnWindows(t *testing.T) {
 		{`icons\BTNSword.blp`, "icons/BTNSword.blp"},
 		{"a/..b/c", "a/..b/c"},
 		{"Textures/héro 1.blp", "Textures/héro 1.blp"},
-		{"console.txt", "console.txt"}, // a name that only starts like a device is fine
+		{"console.txt", "console.txt"},
 	} {
 		if got, ok := RelPath(c.value); !ok || got != c.want {
 			t.Errorf("RelPath(%q) = %q, %v, want %q", c.value, got, ok, c.want)
@@ -438,10 +424,6 @@ func TestSafeJoinRefusesASymlinkBelowTheRoot(t *testing.T) {
 	if got, err := SafeJoin(root, "missing/b.txt"); err != nil || got != filepath.Join(root, "missing", "b.txt") {
 		t.Errorf("SafeJoin of a missing path = %q, %v", got, err)
 	}
-	// Windows keeps the right to make a symlink from some accounts, and says so with its error 1314. The test is
-	// skipped for that failure alone: the junction of the next test needs no right. Any other symlink that
-	// cannot be made fails the test, on every system. testkit.LinkFile has the same rule; testkit imports this
-	// package, so the rule is written out here.
 	err = os.Symlink(filepath.Join(root, "real"), filepath.Join(root, "link"))
 	switch {
 	case err == nil:
@@ -466,7 +448,6 @@ func TestSafeJoinRefusesAJunctionBelowTheRoot(t *testing.T) {
 	refusesTheLink(t, root)
 }
 
-// refusesTheLink checks that SafeJoin does not go through root's "link" folder.
 func refusesTheLink(t *testing.T, root string) {
 	t.Helper()
 	link := filepath.Join(root, "link")

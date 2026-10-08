@@ -11,7 +11,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-// readMini reads the miniature export, after change has adjusted its files.
 func readMini(t testing.TB, change func(files map[string]string)) gameData {
 	t.Helper()
 	game, err := readExport(exportedGame(t, change))
@@ -21,7 +20,6 @@ func readMini(t testing.TB, change func(files map[string]string)) gameData {
 	return game
 }
 
-// cells is one column of the rows of a table.
 func cells(rows []slk.Row, column string) []string {
 	var values []string
 	for _, row := range rows {
@@ -35,7 +33,6 @@ func TestReadExportHoldsEveryTableAndTextThatTheMetadataIsMadeFrom(t *testing.T)
 	if len(game.labels) != 27 || game.labels["WESTRING_UHPM"] != "Hit Points Maximum (Base)" {
 		t.Errorf("the labels are %d, and the one of uhpm is %q", len(game.labels), game.labels["WESTRING_UHPM"])
 	}
-	// The strings of every file are one set of sections, and a value in quotes is read without them.
 	for id, want := range map[string]string{
 		"hfoo": "Footman", "Hpal": "|cffffcc00Paladin|r", "AHhb": "Holy Light", "ratf": "Claws of Attack +15",
 		"Rhme": "Iron Forged Swords,Steel Forged Swords",
@@ -44,7 +41,6 @@ func TestReadExportHoldsEveryTableAndTextThatTheMetadataIsMadeFrom(t *testing.T)
 			t.Errorf("the name of %s in the strings is %q, want %q", id, got, want)
 		}
 	}
-	// A row without a cell in the column that names it describes nothing, and is left out.
 	for name, c := range map[string]struct {
 		rows   []slk.Row
 		column string
@@ -72,8 +68,6 @@ func TestReadExportHoldsEveryTableAndTextThatTheMetadataIsMadeFrom(t *testing.T)
 	}
 }
 
-// Each step of a path is found without regard to its letter case, on a file system of either kind, and a file of
-// strings is one whose name ends in strings.txt in any letters.
 func TestReadExportFindsAFileWhateverTheLetterCaseOfItsPath(t *testing.T) {
 	folder := t.TempDir()
 	for name, text := range miniExport() {
@@ -88,9 +82,6 @@ func TestReadExportFindsAFileWhateverTheLetterCaseOfItsPath(t *testing.T) {
 	}
 }
 
-// The strings are those of every file of their folder whose name ends in strings.txt, read in the order of the
-// names' bytes: where two files give a key of a section, the later one has it. A folder of such a name, and a
-// file of another name, are passed over.
 func TestReadExportReadsTheFilesOfStringsInTheOrderOfTheirNames(t *testing.T) {
 	game := readMini(t, func(files map[string]string) {
 		files[stringsFolder+"/aaastrings.txt"] = "[hfoo]\nName=First\nTip=Kept\n[hbar]\nName=First\n"
@@ -99,7 +90,6 @@ func TestReadExportReadsTheFilesOfStringsInTheOrderOfTheirNames(t *testing.T) {
 		files[stringsFolder+"/notes.txt"] = "[hfoo]\nName=No strings\n"
 		files[stringsFolder+"/unitstrings.txt.bak"] = "[hfoo]\nName=No strings\n"
 		files[stringsFolder+"/morestrings.txt/held.txt"] = "[hfoo]\nName=In a folder\n"
-		// U+0130, the capital I with a dot above, is an i in small letters.
 		files[stringsFolder+"/dottedSTR\xC4\xB0NGS.TXT"] = "[hfoo]\nDotted=Read\n"
 	})
 	for id, want := range map[string]string{"hfoo": "Footman", "hbar": "Last", "Hpal": "|cffffcc00Paladin|r"} {
@@ -112,8 +102,6 @@ func TestReadExportReadsTheFilesOfStringsInTheOrderOfTheirNames(t *testing.T) {
 	}
 }
 
-// A file is decoded as fsx.DecodeText decodes one: a byte order mark at its start is dropped, and bytes that are
-// no UTF-8 become a replacement character.
 func TestReadExportDecodesItsFilesAsText(t *testing.T) {
 	const mark = "\xEF\xBB\xBF"
 	game := readMini(t, func(files map[string]string) {
@@ -133,15 +121,11 @@ func TestReadExportDecodesItsFilesAsText(t *testing.T) {
 	}
 }
 
-// A file that the export lacks is named by its path as the generator asks for it, with the folder of the export
-// as the command line gives it. A folder that is not there has no entry, and neither has a file at the place of
-// a folder. Of two files that are missing, the one that is read first is named.
 func TestReadExportNamesAMissingFileAsItAsksForIt(t *testing.T) {
 	for name := range miniExport() {
 		folder := exportedGame(t, func(files map[string]string) { delete(files, name) })
 		want := name + " is missing from " + folder
 		if strings.HasPrefix(name, stringsFolder+"/") {
-			// The strings are those of the files that are there: one file less is no fault.
 			want = ""
 		}
 		if _, err := readExport(folder); (err == nil) != (want == "") || (err != nil && err.Error() != want) {
@@ -152,7 +136,7 @@ func TestReadExportNamesAMissingFileAsItAsksForIt(t *testing.T) {
 	for name, c := range map[string]struct {
 		folder string
 		change func(files map[string]string)
-		want   string // the path that is missing
+		want   string
 	}{
 		"an export that is not there": {folder: missing, want: labelsFile},
 		"an empty folder argument":    {folder: "", want: labelsFile},
@@ -189,9 +173,6 @@ func TestReadExportNamesAMissingFileAsItAsksForIt(t *testing.T) {
 	}
 }
 
-// What the system cannot give is named by the path that was opened: the folder of the export as the line gives
-// it and the path that was found there, joined as the system joins two paths, with the system's reason and
-// without the operation.
 func TestReadExportNamesWhatTheSystemCannotGiveByThePathItOpened(t *testing.T) {
 	asFile := func(path string) error {
 		_, err := os.ReadFile(path)
@@ -203,8 +184,8 @@ func TestReadExportNamesWhatTheSystemCannotGiveByThePathItOpened(t *testing.T) {
 	}
 	for name, c := range map[string]struct {
 		change func(files map[string]string)
-		opened string                  // from the folder of the export, with "/"
-		read   func(path string) error // how the generator reads it
+		opened string
+		read   func(path string) error
 	}{
 		"a folder at the place of a table": {opened: itemsTable, read: asFile, change: func(files map[string]string) {
 			delete(files, itemsTable)
@@ -236,8 +217,6 @@ func TestReadExportNamesWhatTheSystemCannotGiveByThePathItOpened(t *testing.T) {
 	}
 }
 
-// A table that lacks a column the generator reads is refused, with the table and the column: its key, and each
-// column that columnsRead lists for it. The miniature has every one of them, as the game's tables have.
 func TestReadExportRefusesATableThatLacksAColumnTheGeneratorReads(t *testing.T) {
 	keys := map[string]string{
 		unitFieldsTable: fieldKey, abilityFieldsTable: fieldKey, buffFieldsTable: fieldKey, upgradeFieldsTable: fieldKey,
@@ -249,7 +228,6 @@ func TestReadExportRefusesATableThatLacksAColumnTheGeneratorReads(t *testing.T) 
 	}
 	for table, key := range keys {
 		for _, column := range append([]string{key}, columnsRead[table]...) {
-			// The first cell with the column's name is the one of the header row.
 			folder := exportedGame(t, func(files map[string]string) {
 				files[table] = strings.Replace(files[table], `K"`+column+`"`, `K"`+column+`2"`, 1)
 			})
@@ -259,7 +237,6 @@ func TestReadExportRefusesATableThatLacksAColumnTheGeneratorReads(t *testing.T) 
 			}
 		}
 	}
-	// A table that holds nothing has no column.
 	folder := exportedGame(t, func(files map[string]string) { files[itemsTable] = "ID;PWXL;N;E\r\nE\r\n" })
 	const want = `war3.w3mod/units/itemdata.slk has no column "itemID"`
 	if _, err := readExport(folder); err == nil || !strings.HasPrefix(err.Error(), want) {
@@ -267,7 +244,6 @@ func TestReadExportRefusesATableThatLacksAColumnTheGeneratorReads(t *testing.T) 
 	}
 }
 
-// A table that does not parse is refused with its path as the generator asks for it, and the line.
 func TestReadExportRefusesATableThatDoesNotParse(t *testing.T) {
 	folder := exportedGame(t, func(files map[string]string) {
 		files[buffsTable] = "ID;PWXL;N;E\r\nC;X1;Y1;K\"alias\"\r\nC;X1;Y2;K\"Binf\r\nE\r\n"

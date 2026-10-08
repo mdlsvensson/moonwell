@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	YueVersion = "0.34.3" // what a project gets unless its manifest says otherwise
-	PklVersion = "0.32.1" // what Moonwell downloads when PATH has no Pkl it can use
+	YueVersion = "0.34.3"
+	PklVersion = "0.32.1"
 )
 
 const (
@@ -23,8 +23,6 @@ const (
 	pklPage     = "https://pkl-lang.org/main/current/pkl-cli/index.html#installation"
 )
 
-// YueScript is the compiler. Its checksums were verified when each version was pinned. It also knows 0.34.2,
-// which a project on an older Pkl package names.
 var YueScript = Tool{
 	Name:  "yue",
 	Title: "YueScript",
@@ -59,13 +57,10 @@ var YueScript = Tool{
 		},
 	},
 	VersionArgs: []string{"-v"},
-	// The version ends at the first white space, which is ASCII's.
-	Reported:  regexp.MustCompile(`Yuescript version: ([^` + fsx.ASCIISpace + `]+)`),
-	Otherwise: "build or install yue yourself and set yue.path in moonwell.local.pkl.",
+	Reported:    regexp.MustCompile(`Yuescript version: ([^` + fsx.ASCIISpace + `]+)`),
+	Otherwise:   "build or install yue yourself and set yue.path in moonwell.local.pkl.",
 }
 
-// Pkl is the program that evaluates a project's manifest. Its checksums were verified when the version was
-// pinned; they are GitHub's digests of the release's files, which are bare executables.
 var Pkl = Tool{
 	Name:  "pkl",
 	Title: "Pkl",
@@ -88,11 +83,6 @@ var Pkl = Tool{
 	Otherwise:   "install Pkl 0.32 or newer yourself: " + pklPage,
 }
 
-// Compiler returns the YueScript compiler for a project: the manifest's yue.path when it is set, used as it is,
-// with a warning when it reports another version; else Ensure.
-//
-// A yue.path is the user's own program: it is neither verified nor copied, and it is taken on a platform and for
-// a version that Moonwell has no download of. The `yue` on PATH is never the compiler.
 func Compiler(ctx context.Context, e *env.Env, version string, path *string) (string, error) {
 	if path == nil {
 		return Ensure(ctx, e, YueScript, version)
@@ -110,8 +100,6 @@ func Compiler(ctx context.Context, e *env.Env, version string, path *string) (st
 	return *path, nil
 }
 
-// ofYuePath makes the failure to start the program a yue.path names the manifest's: it gets the manifest as its
-// file and the hint that says what to do there. Any other failure, a cancelled run among them, stays as it is.
 func ofYuePath(err error) error {
 	var failure *diag.Error
 	if errors.As(err, &failure) {
@@ -120,11 +108,6 @@ func ofYuePath(err error) error {
 	return err
 }
 
-// PklProgram returns the pkl to run: "pkl" when the one on PATH is 0.32 or newer; else Ensure, with a warning
-// when PATH has an older one.
-//
-// Where Moonwell has no download for the platform, a PATH without a usable Pkl is refused in words of its own,
-// which ask for an install.
 func PklProgram(ctx context.Context, e *env.Env) (string, error) {
 	printed, recent, err := pklOnPath(ctx, e)
 	onPath := !notStarted(err)
@@ -147,8 +130,6 @@ func PklProgram(ctx context.Context, e *env.Env) (string, error) {
 	return Ensure(ctx, e, Pkl, PklVersion)
 }
 
-// pklOnPath asks the pkl on PATH for its version: what it printed, "unknown" for nothing, and whether that is
-// Pkl 0.32 or newer. The error of a PATH without pkl carries the hint to install one.
 func pklOnPath(ctx context.Context, e *env.Env) (printed string, recent bool, err error) {
 	result, err := Pkl.ask(ctx, e, Pkl.Name, pklInstallHint)
 	if err != nil {
@@ -157,35 +138,25 @@ func pklOnPath(ctx context.Context, e *env.Env) (printed string, recent bool, er
 	return orUnknown(fsx.TrimASCIISpace(result.Stdout)), recentPkl(Pkl.versionIn(result)), nil
 }
 
-// recentPkl reports whether a version, as Pkl reports it, is 0.32 or newer; "" is none.
 func recentPkl(version string) bool {
 	numbers := strings.Split(version, ".")
 	if len(numbers) < 2 {
 		return false
 	}
-	// A number too large to hold is read as the largest there is, which is newer.
 	major, _ := strconv.Atoi(numbers[0])
 	minor, _ := strconv.Atoi(numbers[1])
 	return major > 0 || minor >= 32
 }
 
-// notStarted reports whether err is that of a program that could not be started, which Run raises as a
-// *diag.Error; every other failure of a run, a cancelled context among them, comes as it is.
 func notStarted(err error) bool {
 	var expected *diag.Error
 	return errors.As(err, &expected)
 }
 
-// ---- errors ----
-
-// pklInstallHint says how to get Pkl where Moonwell cannot download it.
 const pklInstallHint = "Install Pkl 0.32 or newer: " + pklPage
 
-// yuePathFile is the manifest a yue.path is set in: the one of this machine, as the hint of a compiler that
-// cannot be downloaded says.
 const yuePathFile = "moonwell.local.pkl"
 
-// yuePathHint says what to do about a yue.path that names no program the system can run.
 const yuePathHint = "Point yue.path in " + yuePathFile + " at a yue program this system can run, or remove it to " +
 	"use the compiler Moonwell downloads."
 

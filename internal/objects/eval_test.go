@@ -12,7 +12,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// noObjectsJSON is what objects:eval prints for a project without objects.
 const noObjectsJSON = `{
   "heroes": {},
   "units": {},
@@ -162,7 +161,6 @@ func TestEvalJSONIsJSONThatAScriptReadsBack(t *testing.T) {
 	}
 }
 
-// oneValue is a unit with one field of this value, as Resolve gives it.
 func oneValue(key string, value objects.Value) []objects.Resolved {
 	return []objects.Resolved{{
 		Category: "units", Key: key, ID: "h000", Base: "hfoo", Source: "objects/a.pkl",
@@ -170,7 +168,6 @@ func oneValue(key string, value objects.Value) []objects.Resolved {
 	}}
 }
 
-// valueLine is the line of the printed JSON that holds the value of the one field.
 func valueLine(t *testing.T, printed []byte) string {
 	t.Helper()
 	for _, line := range strings.Split(string(printed), "\n") {
@@ -188,7 +185,7 @@ func TestEvalJSONWritesANumberAsJSONDoesAndHasOneZero(t *testing.T) {
 		want   string
 	}{
 		{0, "0"},
-		{math.Copysign(0, -1), "0"}, // a real keeps the sign of the zero below 0; what is printed has one zero
+		{math.Copysign(0, -1), "0"},
 		{600, "600"},
 		{600.5, "600.5"},
 		{-0.25, "-0.25"},
@@ -214,7 +211,6 @@ func TestEvalJSONWritesANumberAsJSONDoesAndHasOneZero(t *testing.T) {
 }
 
 func TestEvalJSONWritesNullForANumberThatIsNotFinite(t *testing.T) {
-	// Resolve returns no such number; JSON has no text for one, and what is printed must stay JSON.
 	for _, number := range []float64{math.Inf(1), math.Inf(-1), math.NaN()} {
 		printed := objects.EvalJSON(oneValue("captain", objects.Value{Type: objmod.Unreal, Number: number}))
 		if got := valueLine(t, printed); got != "null" {
@@ -243,7 +239,6 @@ func TestEvalJSONEscapesOnlyTheQuoteTheBackslashAndControlCharacters(t *testing.
 		if got := valueLine(t, printed); got != c.want {
 			t.Errorf("%s: the value is printed as %s, want %s", c.name, got, c.want)
 		}
-		// The object's key is the same text, and is written the same way.
 		if key := "    " + c.want + ": {"; !strings.Contains(string(printed), "\n"+key+"\n") {
 			t.Errorf("%s: no line %s in\n%s", c.name, key, printed)
 		}

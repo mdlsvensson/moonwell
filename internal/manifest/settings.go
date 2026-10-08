@@ -5,28 +5,25 @@ import (
 	"slices"
 )
 
-// Settings is the manifest's settings block: MapSettings.pkl. A nil field is not set: the map keeps its own value.
 type Settings struct {
 	Info              Info                     `json:"info"`
 	LoadingScreen     LoadingScreen            `json:"loadingScreen"`
-	Players           map[int]Player           `json:"players"` // by slot, 0 to 23, which pkl prints as "0" to "23"
-	Forces            map[int]Force            `json:"forces"`  // by slot, as the players
+	Players           map[int]Player           `json:"players"`
+	Forces            map[int]Force            `json:"forces"`
 	Environment       Environment              `json:"environment"`
 	Gameplay          Gameplay                 `json:"gameplay"`
-	GameplayConstants Ordered[Ordered[string]] `json:"gameplayConstants"` // section, key, value, as written
+	GameplayConstants Ordered[Ordered[string]] `json:"gameplayConstants"`
 	GameInterface     Ordered[Ordered[string]] `json:"gameInterface"`
 }
 
-// Info is the map's description.
 type Info struct {
 	Name               *string `json:"name"`
 	Author             *string `json:"author"`
 	Description        *string `json:"description"`
 	RecommendedPlayers *string `json:"recommendedPlayers"`
-	Preview            *string `json:"preview"` // a picture, as a path from the project folder
+	Preview            *string `json:"preview"`
 }
 
-// LoadingScreen is the loading screen.
 type LoadingScreen struct {
 	Background *int32  `json:"background"`
 	Model      *string `json:"model"`
@@ -35,7 +32,6 @@ type LoadingScreen struct {
 	Subtitle   *string `json:"subtitle"`
 }
 
-// Player overrides one player slot.
 type Player struct {
 	Name       *string  `json:"name"`
 	Controller *string  `json:"controller"`
@@ -45,7 +41,6 @@ type Player struct {
 	Y          *float64 `json:"y"`
 }
 
-// Force overrides one force.
 type Force struct {
 	Name                  *string `json:"name"`
 	Allied                *bool   `json:"allied"`
@@ -55,14 +50,12 @@ type Force struct {
 	SharedAdvancedControl *bool   `json:"sharedAdvancedControl"`
 }
 
-// Environment overrides sound, water and fog.
 type Environment struct {
 	SoundEnvironment *string   `json:"soundEnvironment"`
-	WaterColor       *[4]uint8 `json:"waterColor"` // red, green, blue, alpha
+	WaterColor       *[4]uint8 `json:"waterColor"`
 	Fog              Fog       `json:"fog"`
 }
 
-// Fog overrides the terrain fog.
 type Fog struct {
 	Enabled *bool     `json:"enabled"`
 	Style   *int32    `json:"style"`
@@ -72,13 +65,11 @@ type Fog struct {
 	Color   *[4]uint8 `json:"color"`
 }
 
-// Gameplay is the typed gameplay constants.
 type Gameplay struct {
 	HeroMaxLevel *int `json:"heroMaxLevel"`
 	FoodLimit    *int `json:"foodLimit"`
 }
 
-// Slots returns the slots of overrides, sorted.
 func Slots[V any](overrides map[int]V) []int {
 	return slices.Sorted(maps.Keys(overrides))
 }

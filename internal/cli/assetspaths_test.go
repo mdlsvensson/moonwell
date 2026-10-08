@@ -12,27 +12,17 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The tests of this file run assets:paths. Outside a project it starts no program, and its world is one in which
-// a program that runs fails the test. In a project that init made it runs the real pkl, in a world that lets pkl
-// alone run. A test hands the command the list of the game's paths, so that it does not depend on the list the
-// program carries.
-
-// paths runs assets:paths in the world e for a file, "" for none, with the game's paths that a list names, and
-// returns the lines it logged and the failure it ended with.
 func paths(e *env.Env, log *testkit.Recorder, file, gameList string) ([]string, error) {
 	err := assetsPaths(background, e, file, assets.ParseGamePaths(gameList))
 	return log.Lines(), err
 }
 
-// knight is a model that references a texture, the team colour and a particle model.
 func knight() []byte {
 	return testkit.MDX(
 		testkit.Chunk("TEXS", testkit.Concat(testkit.Texture("Textures/Knight.blp", 0), testkit.Texture("", 1))),
 		testkit.Chunk("PREM", testkit.Emitter(`Abilities\Heal.mdx`, 0)),
 	)
 }
-
-// ---- outside a project ----
 
 func TestOutsideAProjectAssetsPathsTellsInGamePathsFromCustomOnesShownWithBackslashes(t *testing.T) {
 	root := t.TempDir()
@@ -82,14 +72,12 @@ func TestOutsideAProjectAssetsPathsNeedsAFileThatExistsAndIsNotAFolder(t *testin
 	testkit.WriteFile(t, root, "notes.mdx", []byte("Model {\n}\nBroken {\n"))
 	for _, c := range []struct {
 		what, file string
-		words      string // of the message
-		named      string // the file the failure names
+		words      string
+		named      string
 	}{
-		// Without a file there is none to name.
 		{what: "no file", file: "", words: "needs a model file outside a Moonwell project"},
 		{what: "a file that is not there", file: "missing.mdx", words: "does not exist", named: "missing.mdx"},
 		{what: "a folder", file: ".", words: "is a folder", named: "."},
-		// A file that is no model is refused in the words of the model's reader, which names it.
 		{what: "a file that is no model", file: "notes.mdx", words: "Not a readable model: ", named: "notes.mdx"},
 	} {
 		e, log := testkit.Env(t, root)
@@ -105,8 +93,6 @@ func TestOutsideAProjectAssetsPathsNeedsAFileThatExistsAndIsNotAFolder(t *testin
 	}
 }
 
-// A model that is there and cannot be read is the system's failure, and has it as its cause. The test is one of
-// its own: where a file cannot be made unreadable, it is skipped, and the refusals above are tested all the same.
 func TestOutsideAProjectAssetsPathsNamesAFileItCannotRead(t *testing.T) {
 	root := t.TempDir()
 	testkit.MakeUnreadable(t, testkit.WriteFile(t, root, "held.mdx", knight()))
@@ -122,8 +108,6 @@ func TestOutsideAProjectAssetsPathsNamesAFileItCannotRead(t *testing.T) {
 	}
 }
 
-// A model is named from the folder the command runs in when it is below it, and by its whole path when it is
-// not.
 func TestAssetsPathsNamesAModelFromTheFolderItRunsIn(t *testing.T) {
 	root, elsewhere := t.TempDir(), t.TempDir()
 	testkit.WriteFile(t, root, "units/knight.mdx", knight())
@@ -131,7 +115,6 @@ func TestAssetsPathsNamesAModelFromTheFolderItRunsIn(t *testing.T) {
 	outside := testkit.WriteFile(t, elsewhere, "knight.mdx", knight())
 	for _, c := range []struct{ file, heading string }{
 		{"units/knight.mdx", "units/knight.mdx"},
-		// A name that only starts with two dots is a file of the folder.
 		{"..knight.mdx", "..knight.mdx"},
 		{filepath.Join("units", "knight.mdx"), "units/knight.mdx"},
 		{filepath.Join(root, "units", "knight.mdx"), "units/knight.mdx"},
@@ -145,8 +128,6 @@ func TestAssetsPathsNamesAModelFromTheFolderItRunsIn(t *testing.T) {
 	}
 }
 
-// The whole line, in the real world, where it starts no program: the file is the command's argument, the list of
-// the game's paths is the one the program carries, and the report goes to the terminal.
 func TestTheAssetsPathsLineReportsOnTheFileItIsGiven(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "knight.mdx", knight())
@@ -157,17 +138,13 @@ func TestTheAssetsPathsLineReportsOnTheFileItIsGiven(t *testing.T) {
 			t.Errorf("%q: %+v", args, r)
 		}
 	}
-	// An empty argument names no file.
 	fails(t, root, []string{"error: assets:paths needs a model file outside a Moonwell project.",
 		"\nhint: moonwell assets:paths assets/Models/Knight.mdx"}, "assets:paths", "")
-	// A second file is one argument too many: the line is refused, and nothing is reported on.
 	fails(t, root, []string{"error: ", "\nhint: "}, "assets:paths", "knight.mdx", "b.mdx")
 	if entries := testkit.Snapshot(t, root); len(entries) != 1 {
 		t.Errorf("assets:paths outside a project left %d entries there, want the model alone", len(entries))
 	}
 }
-
-// ---- in a project ----
 
 func TestPklLibraryAssetsPaths(t *testing.T) {
 	root, _ := projectWithAssetLibrary(t)
@@ -176,7 +153,6 @@ func TestPklLibraryAssetsPaths(t *testing.T) {
 	e, log, ran := pklOnly(t, root)
 	lines, err := paths(e, log, "", "# test\n")
 	want := []string{
-		// The list names no path, which is said in a project as it is outside one.
 		"warning: Moonwell's in-game path list is empty, so every path shows as custom.",
 		"library golems: Models/Golem.mdx",
 		`  texture  Textures\Golem.blp  custom path, imported`,
@@ -188,7 +164,6 @@ func TestPklLibraryAssetsPaths(t *testing.T) {
 		t.Fatalf("assets:paths = %v; log =\n%s", err, strings.Join(lines, "\n"))
 	}
 	onlyPkl(t, ran)
-	// The libraries were synced for the report, under the build lock, which is given back.
 	if !exists(root, ".moonwell/library-assets/golems/Models/Golem.mdx") || exists(root, "dist/.lock") {
 		t.Error("assets:paths did not sync the library, or left the build lock behind")
 	}
@@ -224,7 +199,6 @@ func TestPklAssetsPathsClassifiesAllReferences(t *testing.T) {
 		t.Fatalf("assets:paths = %v; log =\n%s", err, strings.Join(lines, "\n"))
 	}
 
-	// Without a file, every model among the assets is reported, in the order of the assets.
 	e, log, _ = pklOnly(t, root)
 	lines, err = paths(e, log, "", gameList)
 	all := slices.Concat([]string{"assets/Models/Glow.mdx", "  (no referenced files)"}, want[:7],
@@ -243,7 +217,6 @@ func TestPklAssetsPathsReportsReadableModelsBeforeFailure(t *testing.T) {
 	e, log, _ := pklOnly(t, root)
 	lines, err := paths(e, log, "", "textures/b.blp\n")
 	failure := asError(t, err, "a model that cannot be read")
-	// The failure is of the report as a whole, and names no one file: its hint names each model.
 	if !strings.Contains(failure.Msg, "1 model could not be read") || failure.File != "" ||
 		!strings.Contains(failure.Hint, "assets/Models/A.mdl") {
 		t.Errorf("error = %+v", failure)
@@ -258,7 +231,6 @@ func TestPklAssetsPathsReportsReadableModelsBeforeFailure(t *testing.T) {
 	if !slices.Equal(lines, want) {
 		t.Fatalf("log =\n%s", strings.Join(lines, "\n"))
 	}
-	// The whole line: the failure ends the report, and is not printed ahead of it.
 	r := failsWithPklAlone(t, root,
 		[]string{"assets/Models/A.mdl\n  (unreadable: ", "\nerror: 1 model could not be read.\nhint: "}, "assets:paths")
 	if !strings.HasSuffix(r.output, "the report above lists why each one is unreadable.") || r.stdout != "" {
@@ -282,7 +254,6 @@ func TestAReportWithModelsThatCouldNotBeReadFailsAndNamesEach(t *testing.T) {
 	}
 }
 
-// A project without a model says so, and nothing else: no warning of an empty list of the game's paths either.
 func TestPklAssetsPathsOfAProjectWithoutModels(t *testing.T) {
 	root := newProject(t, "my-map")
 	write(t, root, "assets/icons/a.blp", "icon")
@@ -295,8 +266,6 @@ func TestPklAssetsPathsOfAProjectWithoutModels(t *testing.T) {
 	}
 }
 
-// In a project the statuses are a project's also when a build imports nothing: a path the game does not ship is
-// one that is not imported. The model is read from the project folder, wherever in it the file is.
 func TestPklAssetsPathsOfAFileInAProjectThatImportsNothing(t *testing.T) {
 	root := newProject(t, "my-map")
 	testkit.WriteFile(t, root, "drafts/knight.mdx", knight())
@@ -314,8 +283,6 @@ func TestPklAssetsPathsOfAFileInAProjectThatImportsNothing(t *testing.T) {
 	}
 }
 
-// In a project the command syncs the libraries, so beside a build that runs it is refused, before it has synced
-// one; outside a project it takes no lock, and there is none to take.
 func TestPklAssetsPathsIsRefusedBesideARunningBuild(t *testing.T) {
 	root, _ := projectWithAssetLibrary(t)
 	testkit.WriteFile(t, root, "knight.mdx", knight())

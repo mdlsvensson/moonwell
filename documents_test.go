@@ -8,19 +8,9 @@ import (
 	"testing"
 )
 
-// The documents for contributors name files and folders of the repository, and a name that is not there sends a
-// reader nowhere. So every path they name must be there.
-//
-// A path is what stands between two backticks on a line outside a block of code, when it has no space and none
-// of < > * ( and the ellipsis, and when it either starts with one of the repository's folders (folders, below) or
-// ends as a file of the repository does: .go, .md, .mod, .ps1 or .sh. So a document names a file by its whole
-// path from the root, internal/build/build.go: build.go alone is looked for at the root, and fails, and so does
-// a path whose first folder is misspelt. Anything else between backticks is not looked at: a name of the code, a
-// command line, a pattern such as schema/generated/*.pkl, and a file of a user's project, such as dist/stage or
-// moonwell.pkl.
 func TestTheDocumentsNameFilesAndFoldersThatAreThere(t *testing.T) {
 	folders := []string{".github", "cmd", "data", "internal", "runtime", "schema", "template", "tools"}
-	const ellipsis = "\xE2\x80\xA6" // U+2026, which a document writes for "and so on": internal/war3/...
+	const ellipsis = "\xE2\x80\xA6"
 	aFile := regexp.MustCompile(`\.(go|md|mod|ps1|sh)$`)
 	backticked := regexp.MustCompile("`([^`]+)`")
 	for _, document := range []string{"ARCHITECTURE.md", "CONTRIBUTING.md"} {
@@ -51,9 +41,6 @@ func TestTheDocumentsNameFilesAndFoldersThatAreThere(t *testing.T) {
 	}
 }
 
-// ARCHITECTURE.md quotes build.Plan and numbers its steps, so the quote must be the function as the source has
-// it: a step that is added, moved, renamed or taken out fails this test. Left out of both, before they are held
-// against each other, are the empty lines and the three lines of each error check.
 func TestArchitectureQuotesPlanAsTheSourceHasIt(t *testing.T) {
 	document, _ := os.ReadFile("ARCHITECTURE.md")
 	source, _ := os.ReadFile("internal/build/build.go")

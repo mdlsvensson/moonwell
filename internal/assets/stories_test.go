@@ -20,33 +20,23 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/imp"
 )
 
-// The stories: a project on disk, and runs of assets:sync or of a build in it, one after the other, each in the
-// project as the runs before it left it. The recorded test holds what every run plans and what it leaves behind.
-
-// storyManifest is the manifest that errors about the assets block of a story's project name.
 const storyManifest = "moonwell.pkl"
 
-// mapFolder is the source map of every project here that has one.
 const mapFolder = "map.w3x"
 
-// shippedUnder is where the files that a library ships are, from the project folder.
 const shippedUnder = ".moonwell/library-assets/"
 
-// sourceLabel is how the source map of a story is named in errors: its path from the project folder.
 const sourceLabel = "maps/" + mapFolder
 
-// stageFolder is where a build of the stories stages the map, from the project folder.
 const stageFolder = "dist/stage/" + mapFolder
 
-// project is a project on disk.
 type project struct {
-	files     map[string]string // by path from the project folder, with "/": what each file holds
-	folders   []string          // folders to make besides those the files are in
-	block     string            // the manifest's assets block as pkl prints it; "" for a block that sets nothing
-	libraries []string          // the keys of the libraries, whose files are under shippedUnder
+	files     map[string]string
+	folders   []string
+	block     string
+	libraries []string
 }
 
-// holding is files that each hold their own name, so that no two hold the same bytes.
 func holding(names ...string) map[string]string {
 	files := map[string]string{}
 	for _, name := range names {
@@ -55,10 +45,8 @@ func holding(names ...string) map[string]string {
 	return files
 }
 
-// bytesOf is what holding puts into the file of a name.
 func bytesOf(name string) string { return "the bytes of " + name }
 
-// onDisk writes the project into a folder of its own.
 func (p project) onDisk(t testing.TB) string {
 	t.Helper()
 	root := t.TempDir()
@@ -73,13 +61,11 @@ func (p project) onDisk(t testing.TB) string {
 	return root
 }
 
-// assets is the project's assets block.
 func (p project) assets(t testing.TB) manifest.Assets {
 	t.Helper()
 	return blockOf(t, cmp.Or(p.block, noBlock))
 }
 
-// shippedIn is the project's libraries, each with the folder its files are in.
 func (p project) shippedIn(root string) []Library {
 	var libraries []Library
 	for _, key := range p.libraries {
@@ -89,38 +75,32 @@ func (p project) shippedIn(root string) []Library {
 	return libraries
 }
 
-// run is one run of assets:sync, or of a build, in a project as the runs before it left it.
 type run struct {
-	edit      func(t testing.TB, root string) // what changes in the project before the run
-	block     string
-	libraries []string
-	build     bool                            // the changes go into a staged copy, and no state is written
-	meddle    func(t testing.TB, root string) // what another program does between the plan and its writes
-	// The context of the plan and of the writes, for a run that makes its own: else one that is never cancelled.
+	edit             func(t testing.TB, root string)
+	block            string
+	libraries        []string
+	build            bool
+	meddle           func(t testing.TB, root string)
 	planCtx, syncCtx func(t testing.TB, root string) *countdown
 }
 
-// story is a project and the runs in it, one after the other.
 type story struct {
 	name    string
 	project project
 	runs    []run
 }
 
-// planned is a plan as a recording holds it: its changes, and what the map then owns.
 type planned struct {
 	Changes []plannedChange
 	Owned   []Owned
 }
 
-// plannedChange is one change of a plan, its file by the path from the folder the plan is for, with "/".
 type plannedChange struct {
 	Name   string
 	Bytes  []byte
 	Remove bool
 }
 
-// plannedBy is a plan of Plan.
 func plannedBy(result *Result) *planned {
 	p := &planned{Changes: []plannedChange{}, Owned: append([]Owned{}, result.State.Files...)}
 	for _, change := range result.Changes {
@@ -129,14 +109,12 @@ func plannedBy(result *Result) *planned {
 	return p
 }
 
-// ran is what a run did.
 type ran struct {
-	plan *planned // nil for a plan that was refused
+	plan *planned
 	err  error
-	asks [2]int // how often the plan and the writes asked their contexts
+	asks [2]int
 }
 
-// contextOf is the context of one step of a run in the project at root.
 func contextOf(t testing.TB, root string, own func(testing.TB, string) *countdown) *countdown {
 	if own != nil {
 		return own(t, root)
@@ -144,8 +122,6 @@ func contextOf(t testing.TB, root string, own func(testing.TB, string) *countdow
 	return &countdown{Context: context.Background(), limit: never}
 }
 
-// in makes the run in the project at root, as a command does it: it collects, reads the state, opens the map,
-// plans, and then syncs, or stages for a build.
 func (r run) in(t testing.TB, root string) (did ran) {
 	t.Helper()
 	p := project{block: r.block, libraries: r.libraries}
@@ -185,9 +161,6 @@ func (r run) in(t testing.TB, root string) (did ran) {
 	return did
 }
 
-// ---- what a story is made of ----
-
-// with adds files that hold a text of their own to files: a name, then the text, and so on.
 func with(files map[string]string, pairs ...string) map[string]string {
 	for i := 0; i < len(pairs); i += 2 {
 		files[pairs[i]] = pairs[i+1]
@@ -195,8 +168,6 @@ func with(files map[string]string, pairs ...string) map[string]string {
 	return files
 }
 
-// putting is an edit that writes files of the project: a name from the project folder with "/", then the text
-// the file holds, and so on.
 func putting(pairs ...string) func(testing.TB, string) {
 	return func(t testing.TB, root string) {
 		t.Helper()
@@ -206,7 +177,6 @@ func putting(pairs ...string) func(testing.TB, string) {
 	}
 }
 
-// removing is an edit that removes files of the project, and folders with all that is in them.
 func removing(names ...string) func(testing.TB, string) {
 	return func(t testing.TB, root string) {
 		t.Helper()
@@ -218,8 +188,6 @@ func removing(names ...string) func(testing.TB, string) {
 	}
 }
 
-// renaming is an edit that renames a file or a folder of the project, by way of a third name: a system that
-// ignores letter case takes two spellings of a name for one.
 func renaming(from, to string) func(testing.TB, string) {
 	return func(t testing.TB, root string) {
 		t.Helper()
@@ -231,7 +199,6 @@ func renaming(from, to string) func(testing.TB, string) {
 	}
 }
 
-// several is edits made one after the other.
 func several(edits ...func(testing.TB, string)) func(testing.TB, string) {
 	return func(t testing.TB, root string) {
 		t.Helper()
@@ -241,11 +208,8 @@ func several(edits ...func(testing.TB, string)) func(testing.TB, string) {
 	}
 }
 
-// indexOf is what a war3map.imp with the entries holds.
 func indexOf(entries ...imp.Entry) string { return string(imp.Write(entries)) }
 
-// stopped is a context that is cancelled from the ask after limit on, and before that ask has another program
-// do something in the project.
 func stopped(limit int, meddle func(testing.TB, string)) func(testing.TB, string) *countdown {
 	return func(t testing.TB, root string) *countdown {
 		before := map[int]func(){limit + 1: func() { meddle(t, root) }}
@@ -253,8 +217,6 @@ func stopped(limit int, meddle func(testing.TB, string)) func(testing.TB, string
 	}
 }
 
-// beforeAsk is a context that is never cancelled, and before an ask, counted from 1, has another program do
-// something in the project.
 func beforeAsk(ask int, meddle func(testing.TB, string)) func(testing.TB, string) *countdown {
 	return func(t testing.TB, root string) *countdown {
 		before := map[int]func(){ask: func() { meddle(t, root) }}
@@ -262,10 +224,6 @@ func beforeAsk(ask int, meddle func(testing.TB, string)) func(testing.TB, string
 	}
 }
 
-// ---- the stories ----
-
-// scenarioStories is the stories of a project's life: assets mapped, changed, staged, renamed and removed, what
-// World Editor does to the index between two runs, the libraries, and each thing in the map that is in the way.
 func scenarioStories() []story {
 	const m, s = sourceLabel + "/", shippedUnder
 	const sword = "ReplaceableTextures/CommandButtons/BTNSword.blp"
@@ -326,7 +284,6 @@ func scenarioStories() []story {
 	}
 }
 
-// seededStories is stories for what the scenarios do not reach.
 func seededStories(t testing.TB) []story {
 	const m, s = sourceLabel + "/", shippedUnder
 	const state = ".asset-state/" + mapFolder + ".json"
@@ -408,8 +365,6 @@ func seededStories(t testing.TB) []story {
 			run{meddle: putting(m+"a.blp", "the editor's")}),
 		one("the state file cannot be written", holding("assets/a.blp"),
 			run{syncCtx: beforeAsk(3, putting(state+"/in the way.txt", "another program's"))}),
-		// Another program gets at the state file after the sync began. The ask before the state file is the last:
-		// the second where a.blp alone is written, the third where the index is written too.
 		{"the state file is changed before it is written",
 			project{files: holding("assets/a.blp")},
 			[]run{{}, {edit: putting("assets/a.blp", "second"),
@@ -423,13 +378,10 @@ func seededStories(t testing.TB) []story {
 			project{files: holding("assets/a.blp")},
 			[]run{{}, {edit: removing("assets/a.blp"),
 				syncCtx: beforeAsk(3, putting(state, "another program's"))}}},
-		// A state file that needs no write is not looked at again.
 		{"the state file is changed while a sync that does not write it writes the index",
 			project{files: holding("assets/a.blp")},
 			[]run{{}, {edit: putting(m+"war3map.imp", indexOf()),
 				syncCtx: beforeAsk(1, putting(state, "another program's"))}}},
-		// Nor is a state file looked for that a sync has neither to write nor to remove: the sync leaves nothing
-		// owned, and the state file is gone when it begins.
 		{"a state file is made while a sync that owns nothing, and found none, writes the map",
 			project{files: holding("assets/a.blp")},
 			[]run{{}, {edit: removing("assets/a.blp"), meddle: removing(state),
@@ -437,9 +389,6 @@ func seededStories(t testing.TB) []story {
 	}
 }
 
-// interruptedProject is a project after a sync, with an asset changed, one added and one removed since: its plan
-// asks its context before anything, before each of the two owned files and before each of the two assets, and its
-// sync before each of four changes and before the state file.
 func interruptedProject() project {
 	const m = sourceLabel + "/"
 	first, dropped := fsx.SHA256Hex([]byte("first")), fsx.SHA256Hex([]byte("dropped"))
@@ -451,11 +400,8 @@ func interruptedProject() project {
 	}}
 }
 
-// interruptedAsks is how often the plan of interruptedProject asks its context, and how often its sync does.
 const interruptedAsks = 5
 
-// interruptedStories is the plan and the sync of interruptedProject with a context that is cancelled at each of
-// their asks, one after the other, and at none: twelve projects, each with one run.
 func interruptedStories() []story {
 	limited := func(limit int) func(testing.TB, string) *countdown {
 		return func(testing.TB, string) *countdown {
@@ -476,12 +422,8 @@ func interruptedStories() []story {
 	return stories
 }
 
-// ---- the recording ----
-
-// longest is the most bytes of a file that a recording writes out; a longer file stands as its digest.
 const longest = 64
 
-// held is the bytes of a file as a recording holds them.
 func held(data []byte) string {
 	if len(data) > longest {
 		return testkit.Digest(data)
@@ -489,11 +431,8 @@ func held(data []byte) string {
 	return strconv.Quote(string(data))
 }
 
-// underRoot starts, in a recording, the file of a refusal that is a path on disk below the project folder.
 const underRoot = "<root>/"
 
-// below is a file of a refusal as a recording names it: a path on disk below the project folder is written from
-// underRoot, with "/".
 func below(root, file string) string {
 	if rel, err := filepath.Rel(root, file); err == nil && filepath.IsAbs(file) && filepath.IsLocal(rel) {
 		return underRoot + filepath.ToSlash(rel)
@@ -501,11 +440,8 @@ func below(root, file string) string {
 	return testkit.Shown(file)
 }
 
-// internalError is what stands in a recording for the file of an error that is no refusal: one a command would
-// show as an internal error.
 const internalError = "(an internal error)"
 
-// fileOf is the file that a refusal names: "" for a refusal without one.
 func fileOf(err error) string {
 	failure, expected := diag.First(err)
 	if !expected {
@@ -514,16 +450,13 @@ func fileOf(err error) string {
 	return failure.File
 }
 
-// outcome is what a run came to: what it planned, the file its refusal names, and the project as it left it.
 type outcome struct {
-	plan      *planned // nil for a plan that was refused
+	plan      *planned
 	refused   bool
-	refusedAt string            // as below writes it
-	left      map[string][]byte // testkit.Snapshot of the project afterwards
+	refusedAt string
+	left      map[string][]byte
 }
 
-// lines is the outcome as a recording holds it. The files that a run leaves are those of the project outside
-// assets/ and the libraries' files, which no run writes; the imports of an index that reads follow it.
 func (o outcome) lines() string {
 	var out strings.Builder
 	if o.refused {
@@ -565,8 +498,6 @@ func (o outcome) lines() string {
 	return out.String()
 }
 
-// recordedStories is the recording of the stories: the runs of each, one after the other in a project of its
-// own.
 func recordedStories(t testing.TB) []byte {
 	t.Helper()
 	var out strings.Builder
@@ -584,7 +515,6 @@ func recordedStories(t testing.TB) []byte {
 	return []byte(out.String())
 }
 
-// outcomeOf makes the run in the project at root.
 func outcomeOf(t testing.TB, r run, root string) outcome {
 	t.Helper()
 	did := r.in(t, root)
@@ -595,13 +525,6 @@ func outcomeOf(t testing.TB, r run, root string) outcome {
 	return made
 }
 
-// TestTheStoriesOfThePlanAndTheSyncAreAsRecorded holds every run of every story to a recording: what the run
-// plans (each change, and what the map then owns), the file its refusal names, and what it leaves on disk, the
-// map with its index of imports, the state file and the stage among it. A short file stands whole and a longer
-// one as its digest. A run that plans, writes or puts back another byte is a line of a diff under its story.
-//
-// MOONWELL_RECORD=1 go test -run TestTheStoriesOfThePlanAndTheSyncAreAsRecorded ./internal/assets writes the
-// recording anew and fails; a run without the variable then passes.
 func TestTheStoriesOfThePlanAndTheSyncAreAsRecorded(t *testing.T) {
 	testkit.Recorded(t, "stories.txt", recordedStories(t))
 }

@@ -85,7 +85,6 @@ func TestJournalUndoReturnsAFileItCannotPutBackAndRestoresTheOthers(t *testing.T
 	if err := journal.Write(stuck, []byte("after")); err != nil {
 		t.Fatal(err)
 	}
-	// Putting stuck.txt back is a write, which a read-only file refuses. It is the newest, so the undo meets it first.
 	if err := os.Chmod(stuck, 0o444); err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +120,6 @@ func TestJournalUndoLeavesAFileThatAFailedWriteDidNotChange(t *testing.T) {
 	if journal.Len() != 1 {
 		t.Errorf("the journal has touched %d files, want 1: a failed write is a touch", journal.Len())
 	}
-	// Putting the file back would fail as the write did, but there is nothing to put back.
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
 		t.Errorf("unrestored = %v, want none: the file holds what it held", unrestored)
 	}

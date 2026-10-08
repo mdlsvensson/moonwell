@@ -10,16 +10,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// damagedFile is the bytes of one modification file that reads, with its table kind and a name for a failure.
 type damagedFile struct {
 	name string
 	data []byte
 	kind objmod.TableKind
 }
 
-// filesToDamage are the fourteen files World Editor saved and a file of the test kit's making for each version
-// and kind of table: an object with a value of every type in each of its two tables, the custom one with two
-// sets from version 3 on.
 func filesToDamage(t *testing.T) []damagedFile {
 	t.Helper()
 	var files []damagedFile
@@ -44,9 +40,6 @@ func filesToDamage(t *testing.T) []damagedFile {
 	return files
 }
 
-// numberOffsets are the offsets in a file that reads of the numbers that decide how the rest is read: the count
-// of objects of each table, the count of sets of each object, the count of modifications of each set, and the
-// value type of each modification.
 func numberOffsets(t *testing.T, file damagedFile) []int {
 	t.Helper()
 	parsed := mustRead(t, file.data, file.kind, file.name)
@@ -54,14 +47,14 @@ func numberOffsets(t *testing.T, file damagedFile) []int {
 	for _, table := range []objmod.Table{parsed.Original, parsed.Custom} {
 		offsets = append(offsets, table.CountOffset)
 		for _, object := range table.Objects {
-			at := object.Start + 8 // after the base and the id
+			at := object.Start + 8
 			if parsed.Version >= 3 {
 				offsets = append(offsets, at)
 				at += 4
 			}
 			for _, set := range object.Sets {
 				if parsed.Version >= 3 {
-					at += 4 // the flag
+					at += 4
 				}
 				offsets = append(offsets, at)
 				at += 4
@@ -75,16 +68,10 @@ func numberOffsets(t *testing.T, file damagedFile) []int {
 	return offsets
 }
 
-// damageSeed is the seed of the changes that TestADamagedFileIsReadOrRefusedByNameAndNeverPanics makes. A failure
-// names the file and the index of the change: testkit.ChangedBytes makes the same bytes of the three again.
 const damageSeed = 3
 
-// tally counts the damaged files that read and the ones that were refused.
 type tally struct{ read, refused int }
 
-// readOrRefused gives Read the bytes, and AppendTo what Read made of them when it reads them. It stops the test
-// when one of them panics, when Read returns neither a value nor an error or both, when its error is not a
-// *diag.Error with the name the test gave, and when a file that reads does not come out longer by an object.
 func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmod.TableKind) {
 	t.Helper()
 	var parsed *objmod.File
@@ -111,10 +98,6 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 	}
 }
 
-// TestADamagedFileIsReadOrRefusedByNameAndNeverPanics gives Read, and AppendTo after it, every file cut at every
-// length, after each of 400 seeded changes of its bytes, and with each number that decides how the rest is read
-// set to each number at an edge and to the ones about the counts and types there are: the smallest number as a
-// count, a value type of -1 and of 4, 64 and 65 sets.
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	var damaged tally
 	for _, file := range filesToDamage(t) {
@@ -133,7 +116,6 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 			}
 		}
 	}
-	// The floor is against a test that passes because it gave Read and AppendTo nothing.
 	if damaged.read == 0 || damaged.refused == 0 {
 		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.read, damaged.refused)
 	}

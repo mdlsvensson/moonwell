@@ -19,10 +19,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// ---- the help, the version, and a line that is refused ----
-
-// args_test.go holds how a line is read, against the command table with commands that do nothing. Here the
-// program's own door is taken once for each kind of line that runs no command.
 func TestTheHelpAndTheVersionArePrintedForOtherPrograms(t *testing.T) {
 	for _, args := range [][]string{{"--help"}, {}, {"build", "--help"}, {"help", "init"}} {
 		result := ok(t, t.TempDir(), args...)
@@ -49,8 +45,6 @@ func TestARefusedLineIsPrintedAsOneFailureWithAHint(t *testing.T) {
 	}
 }
 
-// The file of --entry is refused before the line has its command: in a project too, nothing is loaded and
-// nothing is made.
 func TestAnEntryThatIsNoEntryFileIsRefusedBeforeAnythingIsLoaded(t *testing.T) {
 	root := project(t)
 	fails(t, root, []string{"error: Entry 'lua/main.lua' must be a .yue file under src/.", "\nhint: "},
@@ -60,15 +54,11 @@ func TestAnEntryThatIsNoEntryFileIsRefusedBeforeAnythingIsLoaded(t *testing.T) {
 	}
 }
 
-// A start from Windows Explorer, from a shortcut or from Win+R is a start like any other: cobra's refusal of
-// such a start is switched off for the program, in this package's init. The start itself cannot be made here.
 func TestAStartFromExplorerIsNotRefused(t *testing.T) {
 	if cobra.MousetrapHelpText != "" {
 		t.Errorf("cobra would refuse a start from Windows Explorer, saying %q", cobra.MousetrapHelpText)
 	}
 }
-
-// ---- dist/moonwell.log ----
 
 func TestALineThatRunsNoCommandMakesNoDist(t *testing.T) {
 	root := project(t)
@@ -82,7 +72,6 @@ func TestALineThatRunsNoCommandMakesNoDist(t *testing.T) {
 	}
 }
 
-// In a folder without src/, dev fails before it starts a program: a command that runs in the real world.
 func TestAProjectKeepsWhatACommandSaysInDistMoonwellLog(t *testing.T) {
 	root := project(t)
 	result := fails(t, root, []string{"error: ", "The src/ folder is missing.", "\nhint: "}, "dev")
@@ -105,7 +94,6 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 			t.Errorf("%s: %+v", name, result)
 		}
 	}
-	// assets:paths reads a model outside a project too, and is refused there only without one.
 	result := carried(t, background, root, "assets:paths")
 	if result.code != 1 || !strings.Contains(result.output, "assets:paths needs a model file") {
 		t.Errorf("assets:paths: %+v", result)
@@ -123,8 +111,6 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	}
 }
 
-// objects:eval is the one command that prints for other programs: its failure goes to the terminal as every
-// other does, and the other stream stays empty.
 func TestAFailingObjectsEvalPrintsItsErrorToTheLogWriterAndNothingToStdout(t *testing.T) {
 	result := carried(t, background, t.TempDir(), "objects:eval")
 	if result.code != 1 || !strings.Contains(result.output, "error:") || result.stdout != "" {
@@ -140,13 +126,11 @@ func TestOnlyAProjectGetsALogAndInitNeverDoes(t *testing.T) {
 	if file, want := logFile(root, rowNamed(t, "setup")), filepath.Join(root, "dist", "moonwell.log"); file != want {
 		t.Errorf("the log of a setup in a project is %q, want %q", file, want)
 	}
-	// init makes a project somewhere else: the folder it is run in is not its project.
 	if file := logFile(root, rowNamed(t, "init")); file != "" {
 		t.Errorf("init keeps a log in %s", file)
 	}
 }
 
-// What is written through a link at dist/ lands outside the project: such a project keeps no log.
 func TestALinkAtDistGetsNoLog(t *testing.T) {
 	root, elsewhere := project(t), t.TempDir()
 	testkit.LinkDir(t, elsewhere, filepath.Join(root, "dist"))
@@ -155,8 +139,6 @@ func TestALinkAtDistGetsNoLog(t *testing.T) {
 		t.Error("a log was written through the link at dist/")
 	}
 }
-
-// ---- how a command's outcome becomes printed lines and an exit code ----
 
 func TestCommandFailuresAreFormattedAndReturn1(t *testing.T) {
 	result := carried(t, background, t.TempDir(), "check")
@@ -172,9 +154,6 @@ func TestCommandFailuresAreFormattedAndReturn1(t *testing.T) {
 func TestACommandThatWasInterruptedExitsWith130(t *testing.T) {
 	cancelled, cancel := context.WithCancel(background)
 	cancel()
-	// Nothing ran, so there is nothing to report: not even the internal error a bare cancellation would be. The
-	// stand-in world answers a cancelled context as the real one does, with the context's error; the command
-	// stops at the first program it would run, which is pkl asked for its version.
 	for _, args := range [][]string{
 		{"check"}, {"build"}, {"test"}, {"setup"}, {"init", "my-map"}, {"assets:check"}, {"assets:sync"},
 		{"settings:check"}, {"objects:eval"}, {"objects:check"},
@@ -183,15 +162,12 @@ func TestACommandThatWasInterruptedExitsWith130(t *testing.T) {
 		if result := carried(t, cancelled, root, args...); result.code != 130 || result.output != "" {
 			t.Errorf("%q: exit %d, printed %q", args, result.code, result.output)
 		}
-		// init looks for Pkl before it writes anything.
 		if entries, err := os.ReadDir(root); err != nil || len(entries) != 0 {
 			t.Errorf("%q: a command that was told to stop left %v (%v)", args, entries, err)
 		}
 	}
 }
 
-// dev ends when it is told to stop, and has then not failed: its first check, which found no manifest, said so
-// itself and ended nothing.
 func TestADevThatWasToldToStopExitsWith130(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "src/main.yue", []byte("x = 1\n"))
@@ -211,7 +187,7 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 	for _, c := range []struct {
 		what    string
 		command string
-		stopped bool // the context is cancelled when the command ends
+		stopped bool
 		err     error
 		code    int
 		output  string
@@ -239,12 +215,6 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 	}
 }
 
-// A panic is a fault in Moonwell wherever it happens on the way of a line: in a command, here in the first
-// program check runs, and before a command runs, here while its outside world is made. Both are in a project, so
-// the line has a log by then, and the fault is kept in it.
-//
-// cobra reads the line on the same way, before the two: no test makes it panic, since it calls nothing a test
-// can hand it.
 func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 	inACommand := func(root string, log *env.Logger) *env.Env {
 		e := standIn(t)(root, log)
@@ -261,7 +231,6 @@ func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 		if result.code != 1 || !strings.HasPrefix(result.output, "internal error: the index is out of range\n") {
 			t.Errorf("%s: %+v", what, result)
 		}
-		// The stack names the function that panicked, in this file.
 		contains(t, result.output, "goroutine ", "cli_test.go", "This is a bug in Moonwell; please report it.")
 		if strings.Count(result.output, "internal error: ") != 1 || result.stdout != "" {
 			t.Errorf("%s: the panic is printed more than once, or for other programs:\n%s", what, result.output)
@@ -272,9 +241,6 @@ func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 	}
 }
 
-// Before a line has a command it has no log, and a fault there is printed to the terminal alone. Nothing that
-// runs so early can be made to panic but the stream the lines go to: it fails here once, as a refusal is
-// written, in the real world.
 func TestAPanicBeforeALineHasACommandIsPrintedToTheTerminal(t *testing.T) {
 	root := project(t)
 	var lines []string
@@ -296,12 +262,9 @@ func TestAPanicBeforeALineHasACommandIsPrintedToTheTerminal(t *testing.T) {
 	}
 }
 
-// A file's name is bytes, and a system may hold one that is no UTF-8: the failure names the file by the bytes it
-// has, so that the name printed is the name on disk.
 func TestAFileNameThatIsNotUTF8IsPrintedAsItIs(t *testing.T) {
 	file := "maps/\xff\xfe\xe9.w3x/war3map.lua"
 	refusal := &diag.Error{Msg: "The script cannot be read.", File: file, Line: 2, Column: 5, Hint: "Save the map again."}
-	// "\xe2\x80\xba" is the mark between the place and the message.
 	want := "error: " + file + ":2:5 \xe2\x80\xba The script cannot be read.\nhint: Save the map again."
 	if got := diag.Format(refusal); got != want {
 		t.Errorf("diag.Format = %q, want %q", got, want)
@@ -312,8 +275,6 @@ func TestAFileNameThatIsNotUTF8IsPrintedAsItIs(t *testing.T) {
 		t.Errorf("a command that ends with the failure prints %q and exits with %d, want %q and 1", printed, code, want)
 	}
 }
-
-// ---- the commands ----
 
 func TestBuildAndTestPlanWithWhatTheLineSaid(t *testing.T) {
 	for _, c := range []struct {
@@ -331,8 +292,6 @@ func TestBuildAndTestPlanWithWhatTheLineSaid(t *testing.T) {
 	}
 }
 
-// Each command of the table has what the help and a run need, and no two have one name. Each flag of a row has
-// a name and says what it does, and the usage of its row names it.
 func TestEveryCommandOfTheTableCanBeShownAndRun(t *testing.T) {
 	seen := map[string]bool{}
 	for _, c := range commands {
@@ -352,8 +311,6 @@ func TestEveryCommandOfTheTableCanBeShownAndRun(t *testing.T) {
 	}
 }
 
-// The table lists the commands in the order of the help, and each takes the arguments its usage shows: one at
-// most where the usage names one, and none else.
 func TestTheTableHasTheTwelveCommandsInTheOrderOfTheUsage(t *testing.T) {
 	want := []string{
 		"init", "setup", "build", "test", "dev", "check", "assets:check", "assets:sync", "assets:paths",
@@ -371,8 +328,6 @@ func TestTheTableHasTheTwelveCommandsInTheOrderOfTheUsage(t *testing.T) {
 	}
 }
 
-// ---- Ctrl+C ----
-
 func TestTheFirstInterruptCancelsTheCommandAndTheSecondLeaves(t *testing.T) {
 	interrupts := make(chan os.Signal)
 	cancelled, left := make(chan struct{}), make(chan struct{})
@@ -388,8 +343,6 @@ func TestTheFirstInterruptCancelsTheCommandAndTheSecondLeaves(t *testing.T) {
 	<-left
 }
 
-// What Main hands the second Ctrl+C is leaveAtOnce with the program's exit; here the exit is the test's. Nothing
-// of the program runs after the exit, so the lock a command holds is gone by then, and stays until then.
 func TestLeavingAtOnceGivesBackTheBuildLockAndThenExitsWith130(t *testing.T) {
 	root := t.TempDir()
 	release, err := build.TakeLock(root)

@@ -13,7 +13,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// sources is the file each asset was read from, in the order of the assets.
 func sources(assets []Asset) []string {
 	list := []string{}
 	for _, asset := range assets {
@@ -75,7 +74,7 @@ func TestExcludeLeavesOutAFileOrAFolderAndANameThatStartsWithADotIsSkipped(t *te
 	all := []string{"credits.txt", "credits/deep/more.txt", "credits/readme.txt", "Icons/a.blp"}
 	tests := []struct {
 		name    string
-		exclude string // the list, as JSON
+		exclude string
 		want    []string
 	}{
 		{"nothing", `[]`, all},
@@ -107,7 +106,6 @@ func TestCollectRefusesBadMappingsCollisionsAndReservedTargets(t *testing.T) {
 		words       string
 		file, hint  string
 	}{
-		// A path written in the block that no asset may have: the path's own hint, and the block's after it.
 		{"a target that leaves the map", `{"paths":{"a.blp":"../escape"}}`,
 			"Invalid asset path: ../escape", manifestName, "relative path"},
 		{"an absolute target", `{"paths":{"a.blp":"/absolute"}}`,
@@ -142,7 +140,6 @@ func TestCollectRefusesBadMappingsCollisionsAndReservedTargets(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := refused(t, root, tt.block)
-			// The hint names the manifest once: where the block is.
 			if !strings.Contains(e.Msg, tt.words) || e.File != tt.file || !strings.Contains(e.Hint, tt.hint) ||
 				!strings.Contains(e.Hint, inBlock) || strings.Count(e.Hint, "moonwell.pkl") != 1 {
 				t.Errorf("error = %+v with the hint %q, want %q at %q with a hint about %q and the block",
@@ -164,7 +161,6 @@ func TestTheFirstBadMappingIsTheFirstWrittenAlsoWhereASourceLooksLikeANumber(t *
 func TestAFileUnderAssetsNamedAsOneOfTheMapsOwnIsRefusedUnlessItIsMappedOrExcluded(t *testing.T) {
 	root := t.TempDir()
 	put(t, root, "assets/war3mapMap.blp")
-	// The path is the file's own name and is written in no manifest: the refusal names no file.
 	if e := refused(t, root, noBlock); e.Msg != "Reserved map path: war3mapMap.blp" || e.File != "" ||
 		!strings.Contains(e.Hint, "settings.info.preview") || strings.Contains(e.Hint, "assets block") {
 		t.Errorf("error = %+v", e)
@@ -215,8 +211,6 @@ func TestCollectRefusesALinkBelowTheProjectFolder(t *testing.T) {
 			t.Errorf("error = %+v", e)
 		}
 	})
-	// The link is on this machine and not among what the library ships, so the failure is not the library's. Its
-	// file is the folder, by its path from the project folder, as for a link in place of assets.
 	t.Run("in place of a library's folder", func(t *testing.T) {
 		root := t.TempDir()
 		put(t, root, "libraries/other/a.blp")
@@ -228,7 +222,6 @@ func TestCollectRefusesALinkBelowTheProjectFolder(t *testing.T) {
 			t.Errorf("error = %+v", e)
 		}
 	})
-	// A library's folder outside the project is named by its path.
 	t.Run("in place of a library's folder outside the project", func(t *testing.T) {
 		root := t.TempDir()
 		link := filepath.Join(t.TempDir(), "ui")
@@ -264,7 +257,6 @@ func TestCollectRefusesANameWindowsCannotHold(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("this system cannot hold such names")
 	}
-	// A device's name with an extension is one: the game's tools on Windows could not open the file.
 	for _, name := range []string{"what?.blp", "aux.blp"} {
 		root := t.TempDir()
 		put(t, root, "assets/Icons/"+name)
@@ -282,7 +274,6 @@ func TestAFileWhereAFolderOfAssetsShouldBeIsRefused(t *testing.T) {
 		t.Errorf("error = %+v", e)
 	}
 	os.Remove(file)
-	// A library that ships a file where its folder of files should be: that is the library's.
 	put(t, root, "libraries/ui", "a file")
 	e = refused(t, root, noBlock, "ui")
 	if e.Msg != "Library ui: Expected a folder: libraries/ui" || e.File != "libraries/ui" || !strings.Contains(e.Hint, "library's author") {
@@ -304,7 +295,6 @@ func TestALibrarysFileThatCannotBeReadIsRefusedByItsNameAndIsNotTheLibrarysFailu
 	root := t.TempDir()
 	testkit.MakeUnreadable(t, put(t, root, "libraries/ui/Icons/held.blp"))
 	e := refused(t, root, noBlock, "ui")
-	// What the system refuses is not for the library's author to mend: the error is the read's own, at the file.
 	if !strings.HasPrefix(e.Msg, "Reading") || e.File != "libraries/ui/Icons/held.blp" || e.Cause == nil ||
 		e.Hint == "" || strings.Contains(e.Hint, "library's author") {
 		t.Errorf("error = %+v", e)
@@ -312,8 +302,6 @@ func TestALibrarysFileThatCannotBeReadIsRefusedByItsNameAndIsNotTheLibrarysFailu
 }
 
 func TestBeyondTheBasicPlaneAssetsAndLibrariesAreOrderedByBytes(t *testing.T) {
-	// U+FF41 is three bytes that start with EF, and U+1F600 four that start with F0: by bytes the first comes
-	// first, where an order by UTF-16 units puts the second, which is two surrogates, before it.
 	const high, beyond = "\xef\xbd\x81", "\xf0\x9f\x98\x80"
 	root := t.TempDir()
 	for _, name := range []string{beyond + ".blp", high + ".blp", "shared.blp"} {
@@ -325,7 +313,6 @@ func TestBeyondTheBasicPlaneAssetsAndLibrariesAreOrderedByBytes(t *testing.T) {
 	if got := sources(collected); !slices.Equal(got, []string{"shared.blp", high + ".blp", beyond + ".blp"}) {
 		t.Errorf("assets = %q", got)
 	}
-	// The libraries are taken in the order of their keys, which the lines about their files show.
 	want := []string{
 		"assets/shared.blp replaces library " + high + "'s shared.blp",
 		"assets/shared.blp replaces library " + beyond + "'s shared.blp",
@@ -389,7 +376,6 @@ func TestTwoLibrariesAtOneInMapPathFailUnlessTheMapsOwnFileReplacesBoth(t *testi
 	root := t.TempDir()
 	put(t, root, "libraries/a/UI/Frame.fdf", "a")
 	put(t, root, "libraries/b/ui/frame.fdf", "b")
-	// The libraries are taken by key, in whatever order they are given.
 	e := refused(t, root, noBlock, "b", "a")
 	if e.Msg != `Libraries a and b both import ui\frame.fdf.` || e.File != manifestName ||
 		!strings.Contains(e.Hint, "Drop one of the libraries") {

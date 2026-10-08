@@ -17,18 +17,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The doors take the build lock, and the list of held locks is the package's: none of these tests runs beside
-// another.
-
-// ---- what the tests ask of a door ----
-
-// withInfo gives the stand-in's small map a war3map.w3i, without which no map is packed.
 func (s *standIn) withInfo(info string) {
 	s.t.Helper()
 	s.put("maps/"+s.project.Map.Folder+"/war3map.w3i", info)
 }
 
-// built is the archive of a build of the stand-in project, which must go well: its place and what it holds.
 func built(t testing.TB, s *standIn, opts Options) (file string, archive *testkit.MPQ) {
 	t.Helper()
 	file, err := Build(background, s.env, opts)
@@ -42,8 +35,6 @@ func built(t testing.TB, s *standIn, opts Options) (file string, archive *testki
 	return file, opened(t, data)
 }
 
-// filesBelow is the files below a folder with what they hold, each named with "/": a snapshot without its
-// folders.
 func filesBelow(t testing.TB, dir string) map[string]string {
 	t.Helper()
 	files := map[string]string{}
@@ -55,20 +46,17 @@ func filesBelow(t testing.TB, dir string) map[string]string {
 	return files
 }
 
-// door is one of the commands that plan a build, as a test runs it on a stand-in project.
 type door struct {
 	name string
 	run  func(s *standIn) error
 }
 
-// doors is the three commands. The game is not found by Test, which so ends in a refusal after it staged.
 var doors = []door{
 	{"build", func(s *standIn) error { _, err := Build(background, s.env, Options{}); return err }},
 	{"test", func(s *standIn) error { return Test(background, s.env, Options{}) }},
 	{"check", func(s *standIn) error { _, err := Check(background, s.env); return err }},
 }
 
-// launchWith is the manifest's launch block with a game, as pkl prints it.
 func launchWith(t testing.TB, game string) string {
 	t.Helper()
 	path, err := json.Marshal(game)
@@ -78,12 +66,8 @@ func launchWith(t testing.TB, game string) string {
 	return `"launch":{"gameExecutable":` + string(path) + `,"args":["-launch","-windowmode","windowed"]}`
 }
 
-// refusedPlayer is the manifest's settings block with a name for a player the map has not: a setting that is
-// refused.
 const refusedPlayer = `"settings":{"info":{},"loadingScreen":{},"gameplayConstants":{},"gameInterface":{},` +
 	`"players":{"23":{"name":"Nobody"}},"forces":{},"environment":{"fog":{}},"gameplay":{}}`
-
-// ---- Build ----
 
 func TestBuildStagesTheMapPacksItAndSaysWhatItDid(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")), settingsNamed("Built"), localKit)
@@ -112,7 +96,6 @@ func TestBuildStagesTheMapPacksItAndSaysWhatItDid(t *testing.T) {
 	if lines := s.log.Lines(); !slices.Equal(lines, want) {
 		t.Errorf("logged %q, want %q", lines, want)
 	}
-	// The archive holds what the stage holds, file by file, and nothing else.
 	staged := filesBelow(t, s.at("dist/stage/map.w3x"))
 	for name, held := range staged {
 		if fileOf(t, archive, strings.ReplaceAll(name, "/", `\`)) != held {
@@ -123,7 +106,6 @@ func TestBuildStagesTheMapPacksItAndSaysWhatItDid(t *testing.T) {
 	if len(listed) != len(staged) || archive.Blocks != len(staged)+1 {
 		t.Errorf("the archive lists %d of its %d files for %d staged ones", len(listed), archive.Blocks, len(staged))
 	}
-	// Its files are in the order of the planned map: the source map's as a scan finds them, then the new ones.
 	inSource := scanned.Files()
 	for at, name := range inSource {
 		inSource[at] = strings.ReplaceAll(name, "/", `\`)
@@ -177,10 +159,6 @@ func TestBuildPlansWithTheOptionsOfTheCommand(t *testing.T) {
 	}
 }
 
-// The project of the test has an object, a setting and an asset, so a failure after the plan's step for each
-// would show a line that the plan logged. What a build says it added, applied and imported is what it wrote into
-// the stage: a build that fails before the stage is written says none of it, and leaves the stage of the build
-// before as it was.
 func TestAFailedBuildLeavesNoArchive(t *testing.T) {
 	whole := []string{objectsWith(captain("hfoo")), settingsNamed("Built")}
 	applied := []string{
@@ -188,25 +166,22 @@ func TestAFailedBuildLeavesNoArchive(t *testing.T) {
 	}
 	tests := []struct {
 		name   string
-		blocks []string // the manifest of the build that goes well
+		blocks []string
 		spoil  func(s *standIn)
 		words  string
-		logs   []string // what the failed build logs: nothing, unless it fails after the map is staged
+		logs   []string
 	}{
 		{"a source the compiler refuses", whole, func(s *standIn) {
-			// The source is another than the one the build before compiled, so it is compiled again.
 			s.put("src/main.yue", "x = = 2\n")
 			s.refuses("src/main.yue", "1: unexpected token\n")
 		}, "unexpected token", nil},
 		{"a setting the map cannot take", whole, func(s *standIn) {
 			s.evaluatesTo(objectsWith(captain("hfoo")), refusedPlayer)
 		}, "player 23 does not exist", nil},
-		// The plan's last step: the objects, the settings and the assets are planned by then.
 		{"a script the bundle cannot be placed in", whole, func(s *standIn) {
 			script, _ := os.ReadFile(s.at("maps/map.w3x/war3map.lua"))
 			s.put("maps/map.w3x/war3map.lua", strings.ReplaceAll(string(script), "function main()", "function start()"))
 		}, "does not define function main()", nil},
-		// The settings need the file a map cannot be packed without, so this project has none.
 		{"a map that cannot be packed", whole[:1], func(s *standIn) { s.remove("maps/map.w3x/war3map.w3i") },
 			"war3map.w3i is missing", []string{applied[0], applied[2], "Packing archive..."}},
 	}
@@ -216,7 +191,6 @@ func TestAFailedBuildLeavesNoArchive(t *testing.T) {
 			s.templateMap()
 			s.put("assets/icons/sword.blp", "own sword")
 			file, _ := built(t, s, Options{})
-			// The build that goes well says what the failed one must not: a line for each of the three it has.
 			said := applied
 			if len(tt.blocks) < len(whole) {
 				said = []string{applied[0], applied[2]}
@@ -280,8 +254,6 @@ func TestBuildRefusesAnArchiveThatItCannotPlaceBeforeItPlans(t *testing.T) {
 	}
 }
 
-// A map may be kept below maps/lua: its stage is then in the folder of the compile's cache, dist/stage/lua, and
-// neither removes what the other wrote.
 func TestBuildOfAMapFolderBelowLuaKeepsTheCompilesCacheAndTheStage(t *testing.T) {
 	s := newStandIn(t)
 	s.mapAt("lua/x.w3x")
@@ -309,8 +281,6 @@ func TestBuildOfAMapFolderBelowLuaKeepsTheCompilesCacheAndTheStage(t *testing.T)
 	}
 }
 
-// ---- a file where a folder of dist goes ----
-
 func TestBuildRefusesAFileNamedDistByItsName(t *testing.T) {
 	s := newStandIn(t)
 	s.withInfo(modernInfo)
@@ -326,8 +296,6 @@ func TestBuildRefusesAFileNamedDistByItsName(t *testing.T) {
 	}
 }
 
-// A file at dist/stage is met first by the compile, which keeps its cache below it, and whose refusal names the
-// first file it could not write there: the same file on every system.
 func TestBuildNamesAFileAtDistStageAndLeavesNoArchiveAndNoLock(t *testing.T) {
 	s := newStandIn(t)
 	s.withInfo(modernInfo)
@@ -344,8 +312,8 @@ func TestBuildNamesAFileAtDistStageAndLeavesNoArchiveAndNoLock(t *testing.T) {
 
 func TestBuildRefusesAFileOnTheWayToItsStageAndToItsArchive(t *testing.T) {
 	tests := []struct {
-		file    string // the file on the way, from the project folder
-		planned bool   // whether the build plans before it meets the file
+		file    string
+		planned bool
 	}{
 		{"dist/stage/campaign", true},
 		{"dist/bin", false},
@@ -371,11 +339,6 @@ func TestBuildRefusesAFileOnTheWayToItsStageAndToItsArchive(t *testing.T) {
 	}
 }
 
-// ---- a link where a folder of the output goes ----
-
-// linkedTo makes a link in the stand-in project to a folder that holds a file: target is that folder from the
-// project folder, or "" for a folder outside the project. It returns the folder and what it and the project's
-// maps hold, for a look at both after the command.
 func linkedTo(t testing.TB, s *standIn, link, target string) (leadsTo string, before [2]map[string][]byte) {
 	t.Helper()
 	leadsTo = t.TempDir()
@@ -389,15 +352,12 @@ func linkedTo(t testing.TB, s *standIn, link, target string) (leadsTo string, be
 	return leadsTo, before
 }
 
-// untouched reports whether the folder a link leads to, and the project's maps, hold what they held.
 func untouched(t testing.TB, s *standIn, leadsTo string, before [2]map[string][]byte) bool {
 	t.Helper()
 	return reflect.DeepEqual(testkit.Snapshot(t, leadsTo), before[0]) &&
 		reflect.DeepEqual(testkit.Snapshot(t, s.at("maps")), before[1])
 }
 
-// dist is a real folder of the project. A link in its place is refused when the lock is taken, which is before
-// anything is written: so nothing is written where the link leads, not into the source map either.
 func TestEveryDoorRefusesALinkAtDistBeforeItWritesAnything(t *testing.T) {
 	for _, d := range doors {
 		for _, target := range []string{"", "maps/map.w3x", "maps"} {
@@ -410,7 +370,6 @@ func TestEveryDoorRefusesALinkAtDistBeforeItWritesAnything(t *testing.T) {
 					!strings.Contains(e.Hint, "Remove the link (or Windows junction) at dist") {
 					t.Errorf("error = %+v", e)
 				}
-				// No lock is where the link leads, before anything gives a lock back.
 				if !untouched(t, s, leadsTo, before) || len(s.compilerRan()) != 0 {
 					t.Error("the refused command wrote where the link leads or into the maps, or compiled")
 				}
@@ -423,9 +382,6 @@ func TestEveryDoorRefusesALinkAtDistBeforeItWritesAnything(t *testing.T) {
 	}
 }
 
-// dist/stage is a real folder of the project too. The compile keeps its cache below it and comes before the
-// stage, so the plan looks at the folder before it compiles: a link in its place is refused as one at dist is,
-// by every door, and nothing is written where it leads.
 func TestEveryDoorRefusesALinkAtDistStage(t *testing.T) {
 	for _, d := range doors {
 		for _, target := range []string{"", "maps/map.w3x"} {
@@ -449,13 +405,11 @@ func TestEveryDoorRefusesALinkAtDistStage(t *testing.T) {
 	}
 }
 
-// The archive's place is Build's alone: Test and Check look at no folder of build.folder.
 func TestBuildRefusesALinkAtTheFirstFolderOfBuildFolderBeforeItPlans(t *testing.T) {
 	for _, target := range []string{"", "maps/map.w3x"} {
 		t.Run("to "+cmp.Or(target, "a folder outside the project"), func(t *testing.T) {
 			s := newStandIn(t, `"build":{"folder":"out/bin","minify":false}`)
 			s.withInfo(modernInfo)
-			// A file where the link leads that has the name of the archive, which a build removes.
 			leadsTo, _ := linkedTo(t, s, "out", target)
 			testkit.WriteFile(t, leadsTo, "bin/map.w3x", []byte("not an archive of this build"))
 			before := [2]map[string][]byte{testkit.Snapshot(t, leadsTo), testkit.Snapshot(t, s.at("maps"))}
@@ -473,8 +427,6 @@ func TestBuildRefusesALinkAtTheFirstFolderOfBuildFolderBeforeItPlans(t *testing.
 		})
 	}
 }
-
-// ---- Test ----
 
 func TestTestStagesTheMapAndHandsTheGameTheStagesPath(t *testing.T) {
 	game := testkit.WriteFile(t, t.TempDir(), "Warcraft III.exe", nil)
@@ -514,8 +466,6 @@ func TestTestStagesTheMapBeforeItLooksForTheGame(t *testing.T) {
 	}
 }
 
-// ---- Check ----
-
 func TestCheckSaysWhatABuildWouldHoldAndStagesNothing(t *testing.T) {
 	s := newStandIn(t, localKit)
 	s.templateMap()
@@ -552,7 +502,6 @@ func TestCheckLeavesTheIDsModuleAloneAndFailsWhereABuildWould(t *testing.T) {
 	if result != nil || !expected || problem.File != objects.IDsFile || fsx.Exists(s.at(objects.IDsFile)) {
 		t.Fatalf("Check = %+v, %v, want a refusal of the ids module, which is not written", result, err)
 	}
-	// A project that has no map is refused as a build refuses it.
 	s = newStandIn(t)
 	s.remove("maps/map.w3x")
 	_, err = Check(background, s.env)
@@ -566,7 +515,6 @@ func TestCheckLeavesTheIDsModuleAloneAndFailsWhereABuildWould(t *testing.T) {
 
 func TestCheckReturnsTheFailureToFindPklAndEvaluatesNothing(t *testing.T) {
 	s := newStandIn(t)
-	// A platform Moonwell has no Pkl to download for, so that an old Pkl is refused and nothing is fetched.
 	s.env.Platform = "plan9-x86_64"
 	s.answer("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
 		return env.RunResult{Stdout: "Pkl 0.31.0 (a stand-in)\n"}, nil
@@ -580,8 +528,6 @@ func TestCheckReturnsTheFailureToFindPklAndEvaluatesNothing(t *testing.T) {
 	}
 }
 
-// check is the cycle of dev: it is given the Pkl program, which it does not look for again, and may write the
-// ids module that Check only compares.
 func TestTheCheckOfACycleEvaluatesWithItsProgramAndWritesTheIDsModule(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")))
 	s.templateMap()
@@ -609,8 +555,6 @@ func TestTheCheckOfACycleEvaluatesWithItsProgramAndWritesTheIDsModule(t *testing
 	}
 }
 
-// ---- the manifest and the lock, for every door ----
-
 func TestEveryDoorHoldsTheBuildLockWhileItPlansAndGivesItBackAfterwards(t *testing.T) {
 	for _, d := range doors {
 		for _, fails := range []bool{false, true} {
@@ -626,7 +570,6 @@ func TestEveryDoorHoldsTheBuildLockWhileItPlansAndGivesItBackAfterwards(t *testi
 					s.refuses("src/main.yue", "1: unexpected token\n")
 				}
 				err := d.run(s)
-				// Test ends in the refusal of a game that is not set, after it planned and staged.
 				if failed := err != nil; failed != (fails || d.name == "test") {
 					t.Errorf("%s: %v", d.name, err)
 				}
@@ -666,7 +609,6 @@ func TestEveryDoorIsRefusedBesideABuildThatRuns(t *testing.T) {
 	}
 }
 
-// The manifest is evaluated before the lock is taken: a command outside a project makes no dist folder there.
 func TestNoDoorMakesADistFolderOutsideAProject(t *testing.T) {
 	for _, d := range doors {
 		t.Run(d.name, func(t *testing.T) {

@@ -1,14 +1,3 @@
-// Package slk reads the part of SYLK that the game's .slk tables use: C records with the fields X, Y and K, quoted
-// or bare values, and the E record as the end. A record that names no X or no Y has the one of the record before
-// it. Every other record, and every other field of a C record, is passed over.
-//
-// It takes the text of a table, decoded, and the name of its file; it returns the names of the header row and the
-// rows after it by those names, or an error that names the file and the line.
-//
-// It must not know what a table holds or which columns the generator reads, nor how a file is found and decoded:
-// it has no white space, so a byte order mark and a space of any kind are part of the line they stand in.
-//
-// It imports no package of the module.
 package slk
 
 import (
@@ -18,27 +7,22 @@ import (
 	"strings"
 )
 
-// Row is one record after the header row: its cells by column name. A cell the row does not have is absent.
 type Row struct {
-	values map[string]string // the cells by column name
+	values map[string]string
 }
 
-// Get returns the cell of a column, and whether the row has it.
 func (r Row) Get(column string) (string, bool) {
 	value, has := r.values[column]
 	return value, has
 }
 
-// Value returns the cell of a column, "" when the row has none.
 func (r Row) Value(column string) string { return r.values[column] }
 
-// Table is the header row's names, in column order, and the rows after it.
 type Table struct {
 	Columns []string
 	Rows    []Row
 }
 
-// Parse reads the table in text; file names it in an error, with the line.
 func Parse(text, file string) (Table, error) {
 	cells, err := readCells(text, file)
 	if err != nil {
@@ -47,17 +31,14 @@ func Parse(text, file string) (Table, error) {
 	return tableOf(cells, file)
 }
 
-// grid is the cells of a table by their Y, which is the row, and then by their X, which is the column.
 type grid map[int]map[int]string
 
-// reader reads the C records of a table one after the other.
 type reader struct {
 	file string
-	line int // the line of the record, counted from 1
-	x, y int // the coordinates that the records so far named last; -1 before any
+	line int
+	x, y int
 }
 
-// readCells reads the C records up to the E record, and returns the cells they give.
 func readCells(text, file string) (grid, error) {
 	cells := grid{}
 	r := reader{file: file, x: -1, y: -1}
@@ -86,8 +67,6 @@ func readCells(text, file string) (grid, error) {
 	return cells, nil
 }
 
-// record reads the fields of one C record, each a letter and what belongs to it, with a ";" between two. An X and
-// a Y move the reader, a K is the value of the record, and a field of another letter is passed over.
 func (r *reader) record(line string) (value string, hasValue bool, err error) {
 	for pos := len("C;"); pos < len(line); pos++ {
 		switch line[pos] {
@@ -109,8 +88,6 @@ func (r *reader) record(line string) (value string, hasValue bool, err error) {
 	return value, hasValue, nil
 }
 
-// field reads the field whose letter is at pos, up to the next ";" or the end of the line: the number of an X or
-// of a Y is where the next cell goes. It returns the position after the field.
 func (r *reader) field(line string, pos int) (int, error) {
 	text, _, _ := strings.Cut(line[pos+1:], ";")
 	end := pos + 1 + len(text)
@@ -130,7 +107,6 @@ func (r *reader) field(line string, pos int) (int, error) {
 	return end, nil
 }
 
-// coordinate reads the digits of an X or of a Y.
 func coordinate(digits string) (int, bool) {
 	if digits == "" || strings.Trim(digits, "0123456789") != "" {
 		return 0, false
@@ -139,8 +115,6 @@ func coordinate(digits string) (int, bool) {
 	return number, err == nil
 }
 
-// value reads the value of a K that starts at pos: a quoted string, in which two quotes in a row are one quote, or
-// bare text up to the next ";". It returns the value and the position after it.
 func (r *reader) value(line string, pos int) (string, int, error) {
 	if pos == len(line) || line[pos] != '"' {
 		bare, _, _ := strings.Cut(line[pos:], ";")
@@ -161,8 +135,6 @@ func (r *reader) value(line string, pos int) (string, int, error) {
 	return "", 0, errUnterminated(r.file, r.line)
 }
 
-// tableOf makes a table of the cells. The row with the lowest Y is the header row, whose cells name the columns;
-// every row after it holds its cells by those names, in the order of their Y.
 func tableOf(cells grid, file string) (Table, error) {
 	ys := sortedKeys(cells)
 	if len(ys) == 0 {
@@ -180,7 +152,6 @@ func tableOf(cells grid, file string) (Table, error) {
 	return table, nil
 }
 
-// columnsOf is the names of the header row, in column order. No two columns have one name.
 func columnsOf(header map[int]string, file string) ([]string, error) {
 	var columns []string
 	for _, x := range sortedKeys(header) {
@@ -192,8 +163,6 @@ func columnsOf(header map[int]string, file string) ([]string, error) {
 	return columns, nil
 }
 
-// rowOf is the cells of a row by the names of the header row. A cell in a column the header row does not name is
-// left out.
 func rowOf(cells, header map[int]string) Row {
 	row := Row{values: map[string]string{}}
 	for x, cell := range cells {
@@ -212,8 +181,6 @@ func sortedKeys[V any](m map[int]V) []int {
 	slices.Sort(keys)
 	return keys
 }
-
-// ---- errors ----
 
 func errNoCoordinate(file string, line int) error {
 	return fmt.Errorf("%s:%d: cell without an X or Y coordinate", file, line)

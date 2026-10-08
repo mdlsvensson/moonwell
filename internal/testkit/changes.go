@@ -7,14 +7,10 @@ import (
 	"strings"
 )
 
-// asciiSpace is the six characters of white space in ASCII.
 const asciiSpace = " \t\n\v\f\r"
 
-// longestRun is the most bytes that one change of ChangedBytes drops or doubles.
 const longestRun = 16
 
-// Changed is the text after the changes that a seed and an index make, the same on every call: one to three,
-// each a line cut, a line doubled, a quote dropped, or a character of ASCII white space put in at one place.
 func Changed(text string, seed, index uint64) string {
 	random := rand.New(rand.NewPCG(seed, index))
 	for range 1 + random.IntN(3) {
@@ -23,8 +19,6 @@ func Changed(text string, seed, index uint64) string {
 	return text
 }
 
-// change is the text after one change. A text without a quote has white space put in for the quote that cannot
-// be dropped.
 func change(random *rand.Rand, text string) string {
 	lines := strings.Split(text, "\n")
 	line := random.IntN(len(lines))
@@ -41,9 +35,6 @@ func change(random *rand.Rand, text string) string {
 	return withSpace(random, text)
 }
 
-// withSpace is the text with one character of ASCII white space, of any of the six kinds, put in at a place that
-// is drawn: at a white-space character of the text, a line feed too, in its place, before it or after it; or at
-// the start of the text, or at its end.
 func withSpace(random *rand.Rand, text string) string {
 	kind := string(asciiSpace[random.IntN(len(asciiSpace))])
 	places := offsetsOf(text, asciiSpace)
@@ -64,7 +55,6 @@ func withSpace(random *rand.Rand, text string) string {
 	return text[:at+1] + kind + text[at+1:]
 }
 
-// offsetsOf is the offsets in text of every byte that is one of the characters.
 func offsetsOf(text, characters string) []int {
 	var offsets []int
 	for i := range len(text) {
@@ -75,10 +65,6 @@ func offsetsOf(text, characters string) []int {
 	return offsets
 }
 
-// Swept is every text that one character of ASCII white space put into text makes: each of the six kinds, at
-// each edge of each line, and at each white-space character inside a line in its place, before it and after it.
-// A line ends at a line feed. A text that several places make comes once, and text itself does not come; the
-// order is that of the places, and at a place that of the six kinds.
 func Swept(text string) []string {
 	var swept []string
 	seen := map[string]bool{text: true}
@@ -106,20 +92,11 @@ func Swept(text string) []string {
 	return swept
 }
 
-// EdgeNumbers are the numbers of 32 bits at which a reader of a binary file goes wrong when it trusts a size or
-// a count: none, one and two, the largest and the smallest number with a sign and the ones beside them, the
-// largest without a sign and the one before it, and the bits of an infinite float and of one that is no number.
 func EdgeNumbers() []uint32 {
 	return []uint32{0, 1, 2, 0x7FFFFFFE, 0x7FFFFFFF, 0x80000000, 0x80000001, 0xFFFFFFFE, 0xFFFFFFFF, 0x7F800000,
 		0x7FC00000}
 }
 
-// ChangedBytes is a copy of data after the changes that a seed and an index make, the same on every call: one
-// to three, each a byte set to another value, a run of bytes dropped, a run of bytes doubled, or four bytes set
-// to one of EdgeNumbers, little-endian. A run is of 1 to 16 bytes and ends where data ends; a number is written
-// into the last four bytes when fewer follow its place, and into data of fewer than four bytes not at all: a
-// byte of it is set. It is the changer for a binary file, as Changed is for a text; data without a byte comes
-// back empty.
 func ChangedBytes(data []byte, seed, index uint64) []byte {
 	random := rand.New(rand.NewPCG(seed, index))
 	data = slices.Clone(data)
@@ -132,7 +109,6 @@ func ChangedBytes(data []byte, seed, index uint64) []byte {
 	return data
 }
 
-// changeBytes is data, which holds a byte, after one change. It may write into data.
 func changeBytes(random *rand.Rand, data []byte) []byte {
 	at := random.IntN(len(data))
 	run := data[at:min(at+1+random.IntN(longestRun), len(data))]

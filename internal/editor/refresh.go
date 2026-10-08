@@ -1,20 +1,3 @@
-// Package editor writes the files a code editor reads: the declarations lua-language-server learns the game's
-// API, the project's objects and the map's globals from; the libraries' modules as Lua; and the project's own
-// editor files, where one is missing or lacks an entry.
-//
-// It takes what objects and script found, and a project folder. RefreshTypes takes the resolved objects, what
-// the map's script defines, the name of that script and the game's API (script.LoadNatives), and writes the
-// declarations; RefreshLibraryView takes the modules and a way to each module's Lua, clears .moonwell/lua/ of
-// all that is no module's, and writes the libraries' modules there. Both write under .moonwell/ and return the
-// paths they wrote, from the project folder. AddFiles and MergeLuarc, the scaffold, take the template's files
-// (moonwell.TemplateFiles) and bring the project's own editor files up to date: yueconfig.yue, .luarc.json,
-// .vscode/extensions.json and the lines of .gitignore. They return what they added.
-//
-// It knows nothing of maps or of builds: it reads no map, evaluates no manifest and compiles nothing. What a
-// map's script defines and what a module compiles to are handed to it.
-//
-// Of Moonwell it imports objects and script, whose findings it renders, manifest, war3/lua, diag, fsx and the
-// root package, for the template's files.
 package editor
 
 import (
@@ -27,27 +10,20 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// The folders the package writes, from the project folder.
 const (
-	TypesDir       = ".moonwell/types" // the declarations
-	LibraryViewDir = ".moonwell/lua"   // the libraries' modules as Lua, by module path
+	TypesDir       = ".moonwell/types"
+	LibraryViewDir = ".moonwell/lua"
 )
 
-// Types is what the declarations are made from.
 type Types struct {
-	Objects []objects.Resolved // only their category, key and id are used
-	Map     *lua.MapGlobals    // nil for a map without a script
-	MapLua  string             // the script as the project names it, such as "maps/map.w3x/war3map.lua"
-	Natives *script.Natives    // the game's API: script.LoadNatives()
+	Objects []objects.Resolved
+	Map     *lua.MapGlobals
+	MapLua  string
+	Natives *script.Natives
 }
 
-// RefreshTypes brings .moonwell/types/ up to date: natives.d.lua, moonwell.d.lua, objects.d.lua and map.d.lua.
-// Each file is written only when its content differs. It returns the paths it wrote, from the project folder, in
-// that order. A link on the way to a file is refused, and nothing is written through it.
 func RefreshTypes(root string, in Types) (written []string, err error) {
 	if in.Natives == nil {
-		// A plain error: the caller passes script.LoadNatives(), which is never nil, so declarations without the
-		// game's API are a mistake in Moonwell and nothing the user can put right.
 		return nil, errors.New("editor.RefreshTypes: Types.Natives is nil; pass script.LoadNatives()")
 	}
 	written = []string{}
@@ -63,13 +39,11 @@ func RefreshTypes(root string, in Types) (written []string, err error) {
 	return written, nil
 }
 
-// declarations is one file of declarations.
 type declarations struct {
-	path string // from the project folder, with "/"
+	path string
 	text string
 }
 
-// declarationsOf is the four files of declarations, in the order they are written.
 func declarationsOf(in Types) []declarations {
 	return []declarations{
 		{TypesDir + "/natives.d.lua", renderNatives(in.Natives)},
@@ -79,7 +53,6 @@ func declarationsOf(in Types) []declarations {
 	}
 }
 
-// refresh writes the file below root unless it holds the text already, and reports whether it wrote.
 func (d declarations) refresh(root string) (wrote bool, err error) {
 	file, err := fsx.Inside(root, d.path)
 	if err != nil {
@@ -91,14 +64,10 @@ func (d declarations) refresh(root string) (wrote bool, err error) {
 	return wrote, nil
 }
 
-// isExpected reports whether a failure is worded for a user already: a link where real files are needed, or a
-// file another program holds. Any other failure is the system's, and is worded where it happens.
 func isExpected(err error) bool {
 	var expected *diag.Error
 	return errors.As(err, &expected)
 }
-
-// ---- errors ----
 
 func errDeclarationsNotWritten(path string, cause error) error {
 	return &diag.Error{

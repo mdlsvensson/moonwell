@@ -10,7 +10,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/txt"
 )
 
-// written is raw sections as one text, in their order: each section's name, then its keys with their values.
 func written(raw manifest.Ordered[manifest.Ordered[string]]) string {
 	var text strings.Builder
 	for name, entries := range raw.All() {
@@ -66,7 +65,6 @@ func TestTypedGameplayConstantsMergeIntoTheRawOnesWithoutRegardToLetterCase(t *t
 			if !reflect.DeepEqual(merged, tt.want) {
 				t.Errorf("merged = %+v\nwant     %+v", merged, tt.want)
 			}
-			// The merge is a copy: neither making it nor changing it changes the settings.
 			for i := range merged {
 				for j := range merged[i].Fields {
 					merged[i].Fields[j].Value = "changed"

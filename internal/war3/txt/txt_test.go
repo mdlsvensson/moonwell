@@ -8,7 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/txt"
 )
 
-// merge is one call of Merge and the text it must return.
 type merge struct {
 	name     string
 	source   string
@@ -16,7 +15,6 @@ type merge struct {
 	want     string
 }
 
-// section builds a section from its name and its keys and values in turn.
 func section(name string, keysAndValues ...string) txt.Section {
 	made := txt.Section{Name: name}
 	for i := 0; i < len(keysAndValues); i += 2 {
@@ -25,13 +23,10 @@ func section(name string, keysAndValues ...string) txt.Section {
 	return made
 }
 
-// sections is a list of sections.
 func sections(list ...txt.Section) []txt.Section { return list }
 
-// lineBreaks are the two newline styles a source is written in.
 var lineBreaks = []struct{ name, text string }{{"LF", "\n"}, {"CRLF", "\r\n"}}
 
-// check runs every merge and compares the text it returns.
 func check(t *testing.T, merges []merge) {
 	t.Helper()
 	for _, m := range merges {
@@ -41,8 +36,6 @@ func check(t *testing.T, merges []merge) {
 	}
 }
 
-// duplicateKeyMerges set a key that two sections of one name hold, add a key and add a section, in a text with
-// lines that must stay.
 func duplicateKeyMerges() []merge {
 	wanted := sections(section("Misc", "MaxHeroLevel", "25", "Added", "0"), section("CustomSkin", "Text", ""))
 	merges := []merge{{"an empty source", "", sections(section("Misc", "FoodCeiling", "0")), "[Misc]\nFoodCeiling=0"}}
@@ -140,7 +133,6 @@ func TestSectionHeadersFollowedByCommentsAreRecognised(t *testing.T) {
 	check(t, headerCommentMerges())
 }
 
-// edgeMerges are merges at the edges of the layout rules.
 func edgeMerges() []merge {
 	return []merge{
 		{"a source of one line break", "\n", sections(section("New", "K", "v")), "\n[New]\nK=v\n"},
@@ -192,21 +184,16 @@ func TestMergeAtTheEdgesOfTheLayout(t *testing.T) {
 	check(t, edgeMerges())
 }
 
-// settledMerges are all the merges above. Merging the text of one again changes nothing.
 func settledMerges() []merge {
 	return slices.Concat(duplicateKeyMerges(), tabAndCaseMerges(), emptyAndMissingSectionMerges(), wholeLineMerges(),
 		layoutMerges(), headerCommentMerges(), edgeMerges())
 }
 
-// regrown is a merge whose text grows when it is merged again, and the text the second merge gives.
 type regrown struct {
 	merge
 	again string
 }
 
-// regrowingMerges set names and values that Merge writes and cannot find in what it wrote: a key with a space or
-// an equals sign in it reads back as another key, a section name with a closing bracket as no header, and a value
-// with a line break as two lines. Each merge adds them once more.
 func regrowingMerges() []regrown {
 	return []regrown{
 		{merge{"a key with a space", "[A]\n", sections(section("A", "my key", "1")), "[A]\nmy key=1\n"},
@@ -226,7 +213,6 @@ func TestMergingAgainAddsWhatItCannotFindInItsOwnText(t *testing.T) {
 	}
 }
 
-// carriedMerges are the settled merges and the first merge of each regrowing one.
 func carriedMerges() []merge {
 	carried := settledMerges()
 	for _, r := range regrowingMerges() {
@@ -235,8 +221,6 @@ func carriedMerges() []merge {
 	return carried
 }
 
-// TestMergeTakesTheSameNameTwice gives Merge what only a list can hold: a section and a key that come twice in
-// the same spelling. Each is applied where it stands in the list.
 func TestMergeTakesTheSameNameTwice(t *testing.T) {
 	check(t, []merge{
 		{"a key twice in one section: the last value stays", "", sections(section("A", "K", "1", "K", "2")), "[A]\nK=2"},
@@ -256,7 +240,6 @@ func TestMergingAgainChangesNothing(t *testing.T) {
 func TestMergingNoSectionsReturnsTheSource(t *testing.T) {
 	sources := []string{"", "\n", "\r\n", "\n\n", "a", "a\n", "a\r\n", "a\r\nb", "\n[A]\n\nK = 1 ; note\n\n\n", " \t\n", "a\r", "a\r\r\n"}
 	for _, m := range carriedMerges() {
-		// A source with both newline styles comes back with one.
 		if lf := strings.ReplaceAll(m.source, "\r\n", ""); !strings.Contains(m.source, "\r\n") || !strings.Contains(lf, "\n") {
 			sources = append(sources, m.source)
 		}
@@ -270,8 +253,6 @@ func TestMergingNoSectionsReturnsTheSource(t *testing.T) {
 	}
 }
 
-// whiteSpaceMerges have a character beside a header or a key, or alone on a line, that is white space somewhere
-// and not here.
 func whiteSpaceMerges() []merge {
 	add, set := sections(section("Misc", "B", "2")), sections(section("Misc", "A", "2"))
 	return []merge{
@@ -289,13 +270,10 @@ func whiteSpaceMerges() []merge {
 	}
 }
 
-// White space is a space, a tab, a vertical tab, a form feed, a carriage return and a line feed, and nothing
-// else: any other character is part of the name or the text it stands in.
 func TestOnlyASCIIWhiteSpaceIsWhiteSpace(t *testing.T) {
 	check(t, whiteSpaceMerges())
 }
 
-// separatorMerges have one of Unicode's two line separators inside the comment that follows a header.
 func separatorMerges() []merge {
 	add := sections(section("Misc", "B", "2"))
 	return []merge{
@@ -305,13 +283,10 @@ func separatorMerges() []merge {
 	}
 }
 
-// Unicode's line separator and paragraph separator end no line of these files, so one inside a header's comment
-// is part of the comment, and the line is a header.
 func TestALineOrParagraphSeparatorIsPartOfAHeadersComment(t *testing.T) {
 	check(t, separatorMerges())
 }
 
-// caseFoldingMerges have names that only some ways of comparing letters outside ASCII take for the same.
 func caseFoldingMerges() []merge {
 	return []merge{
 		{"a long s is an s", "[Misc]\nMa\xC5\xBF=1\n", sections(section("Misc", "MAS", "2")), "[Misc]\nMa\xC5\xBF=2\n"},
@@ -322,7 +297,6 @@ func caseFoldingMerges() []merge {
 	}
 }
 
-// Names are equal when Unicode's simple case folding makes them equal, letter by letter.
 func TestNamesMatchByCaseFoldingOutsideASCIIToo(t *testing.T) {
 	check(t, caseFoldingMerges())
 	check(t, []merge{{"an accented letter in both cases", "[\xC3\x89t\xC3\xA9]\nA=1\n",

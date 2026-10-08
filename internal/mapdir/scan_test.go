@@ -18,7 +18,6 @@ func TestOpenListsEachFoldersEntriesInOrder(t *testing.T) {
 	folder, _ := open(t, map[string]string{
 		"b.txt": "", "a/z.txt": "", "a/B.txt": "", "c/d/e.txt": "", "a.txt": "", "Z.txt": "",
 	})
-	// Names are ordered byte by byte, so a capital comes first; a folder is entered where it stands among them.
 	want := []string{"Z.txt", "a/B.txt", "a/z.txt", "a.txt", "b.txt", "c/d/e.txt"}
 	if got := folder.Files(); !slices.Equal(got, want) {
 		t.Errorf("Files = %q, want %q", got, want)
@@ -36,7 +35,6 @@ func TestOpenRefusesTwoSpellingsOfOnePath(t *testing.T) {
 	if !testkit.CaseSensitive(t, t.TempDir()) {
 		t.Skip("this file system cannot hold two names that differ only in letter case")
 	}
-	// Ordered byte by byte, the spelling with the capital is met first, so the other is the one the error is at.
 	cases := []struct {
 		name          string
 		files         []string
@@ -89,7 +87,6 @@ func TestOpenRefusesAFolderThatIsALink(t *testing.T) {
 	}
 }
 
-// unusable are names a file system with "/" separators can hold and Windows cannot: each is one name, not a path.
 var unusable = []struct{ why, name string }{
 	{"a backslash", `Textures\Icon.blp`},
 	{"a control character", "a\tb.txt"},
@@ -106,8 +103,6 @@ var unusable = []struct{ why, name string }{
 	{"a numbered device", "Com1.blp"},
 }
 
-// named is an entry of a folder with a name of the test's choosing. It has nothing but the name: the scan must
-// refuse the entry before it asks for more.
 type named struct {
 	fs.DirEntry
 	name string
@@ -144,7 +139,6 @@ func TestOpenRefusesANameWindowsCannotHold(t *testing.T) {
 		t.Skip("this system cannot hold such names")
 	}
 	for _, c := range unusable {
-		// As a file at the top, as a file below a folder, and as a folder: the error is at the entry so named.
 		for _, at := range []struct{ how, file, entry string }{
 			{"a file", c.name, c.name},
 			{"a file below a folder", "Units/" + c.name, "Units/" + c.name},
@@ -169,7 +163,6 @@ func TestOpenRefusesWhatIsNeitherAFileNorAFolder(t *testing.T) {
 		t.Skip("a socket's file made on Windows could not be removed again, so the test would leave it behind")
 	}
 	dir := write(t, map[string]string{"war3map.w3i": "info"})
-	// A socket is such an entry that needs no privilege. Its path must be short, so it is made from inside the folder.
 	t.Chdir(dir)
 	listener, err := net.Listen("unix", "socket")
 	if err != nil {

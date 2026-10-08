@@ -12,19 +12,15 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// input is the bytes of one war3map.w3i, whole or not, with a name for a failure.
 type input struct {
 	name string
 	data []byte
 }
 
-// replaced is data with every occurrence of one text replaced by another.
 func replaced(data []byte, from, to string) []byte {
 	return bytes.ReplaceAll(data, []byte(from), []byte(to))
 }
 
-// wholeFiles returns files that read: every version written out by the test kit, the two files World Editor saved,
-// and files whose texts are not ASCII or begin with a byte order mark.
 func wholeFiles(t *testing.T) []input {
 	t.Helper()
 	var files []input
@@ -48,9 +44,6 @@ func wholeFiles(t *testing.T) []input {
 	return files
 }
 
-// alteredFiles returns files in which one thing was changed: a number set to a value at or past the edge of what
-// is valid, a text that is not UTF-8, the format version of another layout, a player record repeated. Most of them
-// do not read.
 func alteredFiles(t *testing.T) []input {
 	t.Helper()
 	var files []input
@@ -70,7 +63,6 @@ func alteredFiles(t *testing.T) []input {
 	return files
 }
 
-// withInvalidTexts returns the file once for each of its texts, with bytes that are not UTF-8 put in front of it.
 func withInvalidTexts(t *testing.T, name string, source []byte) []input {
 	t.Helper()
 	info, err := w3i.Read(source, mapInfoFile, w3i.Basic)
@@ -93,7 +85,6 @@ func withInvalidTexts(t *testing.T, name string, source []byte) []input {
 		details := mustRead(t, source, w3i.Extended).Details
 		texts = append(texts, text{"the sound environment", details.SoundEnvironment.Start},
 			text{"a player's name", details.Players[0].Name.Start}, text{"a force's name", details.Forces[0].Name.Start})
-		// The four texts between the loading screen and the fog are read and not kept.
 		for i := range 4 {
 			texts = append(texts, text{fmt.Sprintf("text %d after the loading screen", i+1), info.Loading.Subtitle.End + 4 + i})
 		}
@@ -108,8 +99,6 @@ func withInvalidTexts(t *testing.T, name string, source []byte) []input {
 	return files
 }
 
-// withAlteredDetails returns the file once for each number of its details set to each value around its valid
-// range, and with its player record repeated.
 func withAlteredDetails(t *testing.T, name string, source []byte) []input {
 	t.Helper()
 	details := mustRead(t, source, w3i.Extended).Details
@@ -152,16 +141,10 @@ func withAlteredDetails(t *testing.T, name string, source []byte) []input {
 	)
 }
 
-// damageSeed is the seed of the changes that TestADamagedFileIsReadOrRefusedByNameAndNeverPanics makes. A failure
-// names the file and the index of the change: testkit.ChangedBytes makes the same bytes of the three again.
 const damageSeed = 39
 
-// tally counts the damaged files that read and the ones that were refused.
 type tally struct{ read, refused int }
 
-// readOrRefused gives Read the bytes at both depths, and ReadHeader. It stops the test when one of them panics,
-// when Read returns neither an Info nor an error or both, and when an error is not a *diag.Error with the name
-// the test gave.
 func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	t.Helper()
 	for _, depth := range []w3i.Depth{w3i.Basic, w3i.Extended} {
@@ -190,10 +173,6 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	}
 }
 
-// TestADamagedFileIsReadOrRefusedByNameAndNeverPanics gives the readers every whole file cut at every length and
-// after each of 1500 seeded changes of its bytes, and every altered file of every layout, whole and cut at every
-// length: its one wrong thing comes before or after the cut. Among the altered files are the numbers at the
-// edges that a seed may not hit: a count of 25, of the largest and of the smallest number, in each version.
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	var damaged tally
 	for _, file := range wholeFiles(t) {
@@ -211,7 +190,6 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", file.name, length), file.data[:length:length])
 		}
 	}
-	// The floor is against a test that passes because it gave the readers nothing.
 	if damaged.read == 0 || damaged.refused == 0 {
 		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.read, damaged.refused)
 	}

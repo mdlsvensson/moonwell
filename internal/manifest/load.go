@@ -1,15 +1,3 @@
-// Package manifest is a Moonwell project as Go values: the mirror of schema/, file for file. It evaluates the
-// manifest with pkl and decodes what pkl prints. It also holds what ties a project to its Pkl package: the
-// version check, and the PklProject and moonwell.local.pkl a new project gets.
-//
-// Load takes the project folder of an env.Env and the pkl program, and returns the Project; Decode takes what pkl
-// printed. A project that cannot be read is a *diag.Error that names the file to look at. IsProject says of a
-// folder whether it is a project at all.
-//
-// Pkl has checked every type, range and pattern, and supplied every default; this package checks nothing of that
-// again. It must not know anything of maps, or what a setting does.
-//
-// Of Moonwell it imports env, diag and fsx, and the root package for the program's version.
 package manifest
 
 import (
@@ -28,22 +16,16 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// The two manifests of a project, from the project folder.
 const (
-	// SharedFile is the manifest every project has, which the team shares.
 	SharedFile = "moonwell.pkl"
-	// LocalFile is the manifest of one machine, which amends the shared one and holds what is that machine's,
-	// such as where the game is. Where a project has it, it is the manifest that is evaluated.
-	LocalFile = "moonwell.local.pkl"
+	LocalFile  = "moonwell.local.pkl"
 )
 
-// The other files of a project that this package reads or names, from the project folder.
 const (
 	pklProjectFile = "PklProject"
 	depsFile       = "PklProject.deps.json"
 )
 
-// Load evaluates the project's manifest in e.Root with the pkl program and returns the project.
 func Load(ctx context.Context, e *env.Env, pkl string) (*Project, error) {
 	file, err := manifestFile(e.Root)
 	if err != nil {
@@ -59,10 +41,6 @@ func Load(ctx context.Context, e *env.Env, pkl string) (*Project, error) {
 	return Decode(e.Root, file, []byte(printed))
 }
 
-// Decode is the second half of Load: the JSON pkl printed, as a project. file is the manifest that was
-// evaluated: errors name it, and an object written in it has it as its source. A field the structs do not have is
-// passed over, because a later package of the same minor version may print one. JSON that does not fit the
-// structs, or that lacks a text every project has, is no project, and is refused with one error.
 func Decode(root, file string, data []byte) (*Project, error) {
 	project := &Project{Root: root, File: file}
 	if err := json.Unmarshal(data, project); err != nil {
@@ -75,10 +53,6 @@ func Decode(root, file string, data []byte) (*Project, error) {
 	return project, nil
 }
 
-// reasonOf says why JSON does not fit a project. A value of another kind than a project has in its place is named
-// by where it stands, as a manifest writes it (map.folder), and by what it is, in place of the decoder's words,
-// which name types of this program. The keys of the mappings on the way to it stand before it, as under puts them.
-// A number that its place cannot hold, the key of a slot that is none among them, is named as that number.
 func reasonOf(err error) string {
 	var mismatch *json.UnmarshalTypeError
 	if !errors.As(err, &mismatch) {
@@ -91,9 +65,6 @@ func reasonOf(err error) string {
 	return where + " is of the wrong kind (" + mismatch.Value + ")"
 }
 
-// missingTexts names the texts p lacks of the four the schema gives every project. JSON that fits the structs and
-// has none of them is the output of something that is no manifest: a file that amends another module, or none.
-// Nothing else of the shape is looked at here: it is Pkl's to check.
 func (p *Project) missingTexts() []string {
 	var missing []string
 	for _, text := range []struct{ name, value string }{
@@ -107,13 +78,10 @@ func (p *Project) missingTexts() []string {
 	return missing
 }
 
-// IsProject reports whether the folder at root is a project: a folder with a moonwell.pkl. It is what a command
-// asks before it does in a project what it does not do elsewhere, such as keep a log.
 func IsProject(root string) bool {
 	return fsx.Exists(filepath.Join(root, SharedFile))
 }
 
-// manifestFile is the manifest to evaluate: the local one, which amends the shared one, when it exists.
 func manifestFile(root string) (string, error) {
 	for _, file := range []string{LocalFile, SharedFile} {
 		if fsx.Exists(filepath.Join(root, file)) {
@@ -123,7 +91,6 @@ func manifestFile(root string) (string, error) {
 	return "", errNoManifest(root)
 }
 
-// checkPackage fails unless the moonwell Pkl package the project resolved is of this program's version.
 func checkPackage(root string) error {
 	deps, err := os.ReadFile(filepath.Join(root, depsFile))
 	if errors.Is(err, fs.ErrNotExist) {
@@ -139,7 +106,6 @@ func checkPackage(root string) error {
 	return checkPackageVersion(version, moonwell.Version)
 }
 
-// evaluate runs pkl on the manifest in the project folder and returns the JSON it printed.
 func evaluate(ctx context.Context, e *env.Env, pkl, file string) (string, error) {
 	args := []string{"eval", "--format", "json", "--project-dir", ".", file}
 	result, err := e.Run(ctx, pkl, args, env.RunOptions{Dir: e.Root})
@@ -156,7 +122,6 @@ func evaluate(ctx context.Context, e *env.Env, pkl, file string) (string, error)
 	return result.Stdout, nil
 }
 
-// firstCharacters is the start of text, at most limit characters long.
 func firstCharacters(text string, limit int) string {
 	count := 0
 	for i := range text {
@@ -167,8 +132,6 @@ func firstCharacters(text string, limit int) string {
 	}
 	return text
 }
-
-// ---- errors ----
 
 func errNoManifest(root string) error {
 	return &diag.Error{
@@ -195,7 +158,6 @@ func errDepsUnreadable(cause error) error {
 	}
 }
 
-// errEvaluation shows what pkl printed when it failed: pkl's own words name the line of the manifest.
 func errEvaluation(file, output string) error {
 	return &diag.Error{Msg: "Evaluating " + file + " failed:\n" + fsx.TrimASCIISpace(output), File: file}
 }
@@ -209,9 +171,6 @@ func errNotJSON(file, output string, cause error) error {
 	}
 }
 
-// errNotAProject is the failure for JSON that is not shaped like a project; reason says in what. Pkl checks the
-// shape of a manifest that amends the schema, so this manifest does not amend it, or amends the schema of another
-// version.
 func errNotAProject(file, reason string, cause error) error {
 	return &diag.Error{
 		Msg:  file + " does not evaluate to a Moonwell project: " + reason,

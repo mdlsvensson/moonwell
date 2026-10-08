@@ -9,7 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
 
-// textured is a binary model that references these textures, each by its path.
 func textured(paths ...string) []byte {
 	var entries []byte
 	for _, path := range paths {
@@ -18,7 +17,6 @@ func textured(paths ...string) []byte {
 	return testkit.MDX(testkit.Chunk("TEXS", entries))
 }
 
-// statuses is the status of each reference of a report, in the order of the references.
 func statuses(report ModelReport) []PathStatus {
 	list := []PathStatus{}
 	for _, ref := range report.Refs {
@@ -27,7 +25,6 @@ func statuses(report ModelReport) []PathStatus {
 	return list
 }
 
-// headings is the heading of each report, in order.
 func headings(reports []ModelReport) []string {
 	list := []string{}
 	for _, report := range reports {
@@ -36,7 +33,6 @@ func headings(reports []ModelReport) []string {
 	return list
 }
 
-// sameLines fails the test unless got is the lines of want, and shows the lines it got as they print.
 func sameLines(t *testing.T, got, want []string) {
 	t.Helper()
 	if !slices.Equal(got, want) {
@@ -98,7 +94,7 @@ func TestAReferenceIsClassifiedByTheGamesPathsAndInAProjectByWhatABuildImports(t
 	tests := []struct {
 		name      string
 		reference string
-		targets   map[string]bool // nil outside a project
+		targets   map[string]bool
 		want      PathStatus
 	}{
 		{"a Reforged .tif that the game stores as .dds", "Doodads/Corn/plant1_Normal.tif", nil, InGame},
@@ -174,7 +170,6 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 		t.Fatalf("Models = %+v", models)
 	}
 
-	// One model, as a command reports the file it is given.
 	reports := ReportModels(models[1:2], gamePaths, Targets(assets))
 	wanted := []PathStatus{InGameReplaced, CustomImported, InGame, "", CustomImported, CustomNotImported}
 	if len(reports) != 1 || !slices.Equal(statuses(reports[0]), wanted) {
@@ -185,7 +180,6 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 		t.Errorf("the summary is %q", last)
 	}
 
-	// Every model of the project.
 	reports = ReportModels(models, gamePaths, Targets(assets))
 	if got, want := headings(reports), []string{"assets/Models/Glow.mdx", "assets/Models/Knight.mdx", "assets/Models/Only.mdl"}; !slices.Equal(got, want) {
 		t.Fatalf("the reports are of %q, want %q", got, want)
@@ -267,8 +261,6 @@ func TestTheSummaryCountsModelsPathsAndEachStatusAndSaysHowManyModelsAreUnreadab
 	}
 }
 
-// A column is as wide as the most characters in it, whatever bytes a character takes: a path with a character
-// beyond the basic plane, or with an accent, lines up with the others.
 func TestTheColumnsOfAReportArePaddedByCharacters(t *testing.T) {
 	wide := Model{"wide.mdx", textured("Textures\\\xf0\x9f\x98\x80.blp", `Textures\Longer.blp`, "Textures\\\xc3\xa9.blp")}
 	reports := ReportModels([]Model{wide}, map[string]bool{}, nil)

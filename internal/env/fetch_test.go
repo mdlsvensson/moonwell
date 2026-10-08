@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-// serve starts a server with one page, /found; every other address is a 404 with a body of its own.
 func serve(t *testing.T) *httptest.Server {
 	t.Helper()
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

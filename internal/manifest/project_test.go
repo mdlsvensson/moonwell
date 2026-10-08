@@ -9,8 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/diag"
 )
 
-// The blocks pkl prints for every project, as a manifest that sets little prints them. plainBlocks leaves the
-// nullable fields out, as pkl leaves out a null.
 const (
 	plainBlocks = `"map":{"folder":"map.w3x","entry":"src/main.yue"},"build":{"folder":"dist/bin","minify":false},
 		"launch":{"args":["-launch"]},"yue":{"version":"0.34.3"}`
@@ -19,8 +17,6 @@ const (
 	librariesBlock = `"libraries":{}`
 )
 
-// printed is what pkl prints for a manifest: the plain blocks, and the blocks given, each of which replaces the
-// block of its name.
 func printed(blocks ...string) string {
 	all := []string{plainBlocks}
 	for _, standard := range []string{assetsBlock, lintBlock, librariesBlock} {
@@ -32,7 +28,6 @@ func printed(blocks ...string) string {
 	return "{" + strings.Join(append(all, blocks...), ",") + "}"
 }
 
-// decoded is the project of a document that must decode.
 func decoded(t *testing.T, document, file string) *Project {
 	t.Helper()
 	project, err := Decode("/p", file, []byte(document))
@@ -42,7 +37,6 @@ func decoded(t *testing.T, document, file string) *Project {
 	return project
 }
 
-// asError is err as the expected failure it must be.
 func asError(t *testing.T, err error, what string) *diag.Error {
 	t.Helper()
 	var failure *diag.Error
@@ -52,7 +46,6 @@ func asError(t *testing.T, err error, what string) *diag.Error {
 	return failure
 }
 
-// text is what a pointer to a text holds, or "(nil)".
 func text(value *string) string {
 	if value == nil {
 		return "(nil)"
@@ -137,8 +130,6 @@ func TestDecodeReadsTheAssetsBlockInTheOrderItWasWritten(t *testing.T) {
 	}
 }
 
-// A program reads the project of a package of its own minor version, which may print a field the program does not
-// know, and always prints every block: a block that is missing is not given a default here.
 func TestDecodeIgnoresAFieldItDoesNotKnowAndSuppliesNoDefault(t *testing.T) {
 	p := decoded(t, `{"later":{"x":1},"map":{"folder":"map.w3x","later":true,"entry":"src/main.yue"},
 		"build":{"folder":"dist/bin","minify":false,"later":[1]},"yue":{"version":"0.34.3"}}`, "moonwell.pkl")
@@ -154,8 +145,8 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 	const mapBlock, buildBlock = `"map":{"folder":"map.w3x","entry":"src/main.yue"}`, `"build":{"folder":"dist/bin","minify":false}`
 	tests := []struct {
 		name, document string
-		words          []string // of the message
-		without        []string // not in the message
+		words          []string
+		without        []string
 	}{
 		{"not an object", `[]`, []string{"array"}, nil},
 		{"a block of another type", `{"map":3}`, []string{"number", "map"}, nil},
@@ -163,7 +154,6 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 		{"a list of another type", `{"launch":{"args":[1]}}`, []string{"number", "launch.args"}, nil},
 		{"a library of another type", `{"libraries":{"a":{"path":3}}}`, []string{"number", "libraries.a.path"}, nil},
 		{"a player of another type", `{"settings":{"players":{"7":{"x":"1"}}}}`, []string{"string", "settings.players.7.x"}, nil},
-		// The only fault of these two is the slot: a slot is a whole number.
 		{"a player slot that is no number", printed(`"settings":{"players":{"first":{}}}`),
 			[]string{"first is no number", "settings.players"}, []string{"map.folder", "number first"}},
 		{"a force slot that is no whole number", printed(`"settings":{"forces":{"1.5":{}}}`),
@@ -197,7 +187,6 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 					t.Errorf("the message %q lacks %q", failure.Msg, word)
 				}
 			}
-			// The reason is in Moonwell's words: no word of the decoder's, and no type of Go or of this package.
 			for _, word := range append([]string{"json:", "unmarshal", "Go ", "of type", "manifest.", "Ordered", "Object"}, tt.without...) {
 				if strings.Contains(failure.Msg, word) {
 					t.Errorf("the message %q has %q", failure.Msg, word)

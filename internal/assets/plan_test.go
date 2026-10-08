@@ -16,7 +16,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/imp"
 )
 
-// hashed is the hash of a file that holds text.
 func hashed(text string) string { return fsx.SHA256Hex([]byte(text)) }
 
 func TestWithNothingToImportAndNothingOwnedPlanChangesNothingAndReadsNothing(t *testing.T) {
@@ -24,7 +23,6 @@ func TestWithNothingToImportAndNothingOwnedPlanChangesNothingAndReadsNothing(t *
 	put(t, s.mapDir, "war3map.imp", "\x09\x09")
 	put(t, s.mapDir, "Textures/kept.blp")
 	folder := s.open()
-	// A folder where the scan found a file: a read of either file fails.
 	for _, name := range []string{"war3map.imp", "Textures/kept.blp"} {
 		file := filepath.Join(s.mapDir, filepath.FromSlash(name))
 		if err := errors.Join(os.Remove(file), os.Mkdir(file, 0o777)); err != nil {
@@ -84,7 +82,6 @@ func TestPlanChangesOnlyWhatDiffersAndRemovesOnlyOwnedFilesNoAssetWants(t *testi
 	} {
 		put(t, s.mapDir, name, content)
 	}
-	// The state lists a file the map does not have: its asset is written again.
 	s.owns("same.blp", "edited.blp", "Sounds/dropped.wav", "dropped.blp", "gone.blp")
 	s.setImports(
 		imp.Entry{Flag: 13, Path: "same.blp"}, imp.Entry{Flag: 13, Path: "edited.blp"},
@@ -95,7 +92,6 @@ func TestPlanChangesOnlyWhatDiffersAndRemovesOnlyOwnedFilesNoAssetWants(t *testi
 	}
 
 	_, result := s.planned(noBlock)
-	// The writes in the order of the assets, the removals in the order of the state, then the index.
 	want := []string{"edited.blp", "gone.blp", "new.blp", "-Sounds/dropped.wav", "-dropped.blp", "war3map.imp"}
 	if got := names(result.Changes); !slices.Equal(got, want) {
 		t.Errorf("the changes are %q, want %q", got, want)
@@ -107,8 +103,6 @@ func TestPlanChangesOnlyWhatDiffersAndRemovesOnlyOwnedFilesNoAssetWants(t *testi
 	}
 }
 
-// The index is read and written back. An import of the map's own whose name starts with a byte order mark names
-// a file by those bytes, and is listed by them still when another asset is added.
 func TestPlanKeepsAnImportOfTheMapsOwnByteForByteWithAMarkAtItsStart(t *testing.T) {
 	const marked = "\xEF\xBB\xBFa.blp"
 	s := newSite(t)
@@ -145,7 +139,6 @@ func TestAnOwnedImportKeepsTheFlagWorldEditorSavedItWith(t *testing.T) {
 		put(t, s.mapDir, name)
 	}
 	s.owns("Textures/a.blp", "Textures/b.blp")
-	// World Editor 3.00 saves the flag 13 as 29.
 	saved := []imp.Entry{{Flag: 29, Path: `Textures\a.blp`}, {Flag: 29, Path: `Textures\b.blp`}}
 	s.setImports(saved...)
 	if _, result := s.planned(noBlock); len(result.Changes) != 0 {
@@ -162,8 +155,6 @@ func TestAnOwnedImportKeepsTheFlagWorldEditorSavedItWith(t *testing.T) {
 	}
 }
 
-// An entry without a custom path keeps its flag too, and is then written with the whole in-map path: the index
-// names another file than the asset's.
 func TestAnOwnedImportThatWorldEditorSavedWithoutACustomPathKeepsThatFlag(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/war3mapImported/a.wav")
@@ -188,7 +179,6 @@ func TestPlanSpellsFoldersAsTheMapDoesAndNewOnesAsTheFirstAssetToNameThem(t *tes
 	}
 	block := `{"paths":{"a.blp":"Sound/Music/a.blp","b.blp":"sound/music/b.blp","c.blp":"SOUND/Effects/c.blp"},"exclude":[]}`
 	_, result := s.planned(block)
-	// The assets come in the order of their paths, so c.blp is the first to name the folder Sound.
 	spelled := []string{"SOUND/Effects/c.blp", "SOUND/Music/a.blp", "SOUND/Music/b.blp", "Textures/new.blp"}
 	var targets, owned []string
 	for _, asset := range result.Assets {
@@ -228,9 +218,9 @@ func TestAnAssetAtAFileOrAnImportTheMapHasAndDoesNotOwnIsRefused(t *testing.T) {
 	const own = "Import it under another path with assets.paths, or remove the map's own copy."
 	tests := []struct {
 		name       string
-		asset      string // under assets/, or under the library's folder
+		asset      string
 		library    string
-		file       string // a file the map has
+		file       string
 		entry      *imp.Entry
 		msg, where string
 		hint       string
@@ -275,7 +265,6 @@ func TestAnAssetAtAFileOrAnImportTheMapHasAndDoesNotOwnIsRefused(t *testing.T) {
 
 func TestAnOwnedFileEditedInTheMapIsRefusedAlsoWhenNoAssetWantsIt(t *testing.T) {
 	s := newSite(t)
-	// The state spells the path in its own way: a file of the map is found in any letter case.
 	put(t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures/A.BLP", hashed("asset")}}}.Bytes()))
 	put(t, s.mapDir, "Textures/a.blp", "manual edit")
 	for _, asset := range []string{"assets/Textures/a.blp", ""} {
@@ -300,9 +289,9 @@ func TestAnAssetBelowAFileOfTheMapIsRefusedAlsoWhenTheFileIsOwned(t *testing.T) 
 	const own = "Import it under another path with assets.paths, or remove "
 	tests := []struct {
 		name                 string
-		files                []string // of the map
+		files                []string
 		owned                []string
-		asset, target        string // under assets/, and the path it is mapped to
+		asset, target        string
 		library              bool
 		inTheWay, wantsToBe  string
 		hintStart, hintWords string
@@ -310,7 +299,6 @@ func TestAnAssetBelowAFileOfTheMapIsRefusedAlsoWhenTheFileIsOwned(t *testing.T) 
 		{"a file of the map", []string{"Textures"}, nil, "a.blp", "textures/a.blp", false, "Textures", "textures/a.blp", own, "Textures"},
 		{"a file in a folder", []string{"Units/Hero"}, nil, "a.blp", "units/hero/skins/a.blp", false,
 			"Units/Hero", "units/hero/skins/a.blp", own, "Units/Hero"},
-		// The plan would remove the owned file. No file of the map becomes a folder, an owned one neither.
 		{"an owned file that no asset wants", []string{"data"}, []string{"data"}, "data/inner.txt", "", false,
 			"data", "data/inner.txt", own, "data"},
 		{"a library's file", []string{"UI"}, nil, "ui/frame.fdf", "", true, "UI", "ui/frame.fdf", "Remove UI", "source map"},
@@ -355,7 +343,6 @@ func TestAnAssetNamedAsAFolderOfTheMapIsRefused(t *testing.T) {
 	}{
 		{"a folder with a file in it", func(s *site) { put(s.t, s.mapDir, "Textures/a.blp") }},
 		{"an empty folder", empty},
-		// The file the state lists is a folder in the map: it is not checked as an owned file, and not replaced.
 		{"a folder where the state lists a file", func(s *site) {
 			empty(s)
 			put(s.t, s.root, ".asset-state/map.w3x.json", string(State{Files: []Owned{{"textures", zeros}}}.Bytes()))
@@ -384,7 +371,6 @@ func TestTheFirstAssetWithoutRoomIsTheOneRefused(t *testing.T) {
 	if e := s.refusedPlan(noBlock); !strings.Contains(e.Msg, "a in the map is a file") {
 		t.Errorf("error = %+v, want it about a/inner.blp, the first asset", e)
 	}
-	// The same two assets, the other one first.
 	block := `{"paths":{"b.blp":"0.blp"},"exclude":[]}`
 	put(t, s.mapDir, "0.blp")
 	if e := s.refusedPlan(block); !strings.Contains(e.Msg, "Asset 0.blp conflicts") {
@@ -438,7 +424,6 @@ func TestPlanStopsAtAnInterruptBetweenFilesAndWritesNothing(t *testing.T) {
 	put(t, s.mapDir, "owned.blp")
 	s.owns("owned.blp")
 	before := testkit.Snapshot(t, s.root)
-	// One ask before anything is read, one before each owned file and one before each asset.
 	const asks = 4
 	for limit := range asks {
 		ctx := &countdown{Context: background, limit: limit}
@@ -457,8 +442,6 @@ func TestPlanStopsAtAnInterruptBetweenFilesAndWritesNothing(t *testing.T) {
 	s.unchanged(before, "planning")
 }
 
-// A path that Collect and ReadState refuse cannot reach a plan through them. Given by another caller, it is that
-// caller's bug: the plan would write, or remove, one of the map's own files.
 func TestPlanRefusesAPathNoAssetMayHaveAsACallersBug(t *testing.T) {
 	script := Asset{Source: "x.lua", Target: "war3map.lua", Bytes: []byte("x"), Hash: hashed("x")}
 	tests := []struct {
@@ -505,8 +488,6 @@ func TestAMapFileThePlanNeedsAndCannotReadIsRefusedByItsName(t *testing.T) {
 	}
 }
 
-// A build lays the changes over its view of the map and stages the view: nothing is written into the source map,
-// and the state file is neither read nor written.
 func TestThePlanLaidOverAViewIsStagedAndTheSourceMapIsLeftAlone(t *testing.T) {
 	s := newSite(t)
 	put(t, s.mapDir, "Models/unit.mdx", "first")
@@ -520,7 +501,6 @@ func TestThePlanLaidOverAViewIsStagedAndTheSourceMapIsLeftAlone(t *testing.T) {
 	before := testkit.Snapshot(t, s.root)
 
 	folder, result := s.planned(noBlock)
-	// The view a build has by then holds the changes of the other areas.
 	view := folder.With([]mapdir.Change{{Name: "war3map.w3i", Bytes: []byte("patched")}}).With(result.Changes)
 	stage := filepath.Join(t.TempDir(), "stage", "map.w3x")
 	if err := view.StageTo(stage); err != nil {

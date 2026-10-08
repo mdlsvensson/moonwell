@@ -16,33 +16,20 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-// editorFiles are the committed files VS Code's YueScript extension and lua-language-server read.
 var editorFiles = []string{"yueconfig.yue", ".luarc.json", ".vscode/extensions.json"}
 
-// gitignoreLines are the .gitignore lines for what Moonwell and the extension write.
 var gitignoreLines = []string{".moonwell/", "src/**/*.lua"}
 
-// The two files of a project that are changed where they are, from the project folder.
 const (
 	gitignoreFile = ".gitignore"
 	luarcFile     = ".luarc.json"
 )
 
 const (
-	jsonSpace = " \t\r\n"   // the white space of JSON
-	lineSpace = " \t\r\v\f" // the white space of ASCII that a line may hold
+	jsonSpace = " \t\r\n"
+	lineSpace = " \t\r\v\f"
 )
 
-// AddFiles gives a project the editor files it lacks: each missing file from the template, and each missing
-// .gitignore line appended. It never overwrites a file. It returns what it added.
-//
-// What is added is named as setup reports it: each file by its path, in the order of editorFiles, and then
-// .gitignore with the lines it was given.
-//
-// The files are the project's own, which its user commits, and so is a link at one of them. A file behind a link
-// is there: an editor file is left as it is, and .gitignore is read and written through the link. A link that
-// leads to nothing, at an editor file or at .gitignore, is refused before anything is written, since a file
-// written under its name would be made where the link leads. A link to a folder at .vscode is followed.
 func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	there, err := lookAtFiles(root)
 	if err != nil {
@@ -62,8 +49,6 @@ func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
 	return added, nil
 }
 
-// lookAtFiles reports, for each editor file and for .gitignore, whether there is something under its name. All
-// four are looked at before any is written, so that a link to nothing at one of them leaves the project as it is.
 func lookAtFiles(root string) (there map[string]bool, err error) {
 	there = map[string]bool{}
 	for _, file := range append(slices.Clone(editorFiles), gitignoreFile) {
@@ -74,10 +59,6 @@ func lookAtFiles(root string) (there map[string]bool, err error) {
 	return there, nil
 }
 
-// isThere reports whether there is something under the name of a file of the project: a file, a folder, or a link
-// that leads somewhere. The name itself is looked at, and no link is followed to answer; a link that leads to
-// nothing is refused. A look that fails is taken for nothing there: the write that follows says what is in the
-// way.
 func isThere(root, file string) (bool, error) {
 	at := onDisk(root, file)
 	info, err := fsx.Lstat(at)
@@ -90,14 +71,11 @@ func isThere(root, file string) (bool, error) {
 	return true, nil
 }
 
-// leadsNowhere reports whether there is nothing where the link at a path leads.
 func leadsNowhere(link string) bool {
 	_, err := os.Stat(link)
 	return errors.Is(err, fs.ErrNotExist)
 }
 
-// addMissingFiles writes each editor file that is not there, from the template, and returns those it wrote. What
-// is there under the name of a file stays as it is, whatever it holds, and a folder too.
 func addMissingFiles(root string, template []moonwell.TemplateFile, there map[string]bool) ([]string, error) {
 	added := []string{}
 	for _, file := range editorFiles {
@@ -116,20 +94,15 @@ func addMissingFiles(root string, template []moonwell.TemplateFile, there map[st
 	return added, nil
 }
 
-// templateFile is the bytes of the template's file at path.
 func templateFile(template []moonwell.TemplateFile, path string) ([]byte, error) {
 	for _, file := range template {
 		if file.Path == path {
 			return file.Data, nil
 		}
 	}
-	// A plain error: the template is Moonwell's own and holds each editor file, so one without the file is a
-	// mistake in Moonwell and nothing the user can put right.
 	return nil, errors.New("editor: the template has no " + path + "; pass moonwell.TemplateFiles()")
 }
 
-// addIgnores appends each of gitignoreLines that .gitignore lacks, and returns those it appended. A project
-// without the file is given one.
 func addIgnores(root string) ([]string, error) {
 	held, _, err := readIfThere(root, gitignoreFile)
 	if err != nil {
@@ -145,9 +118,6 @@ func addIgnores(root string) ([]string, error) {
 	return lacking, nil
 }
 
-// ignoresLacking is each of gitignoreLines that no line of a .gitignore is. A line ends at a line feed, and is
-// compared without the white space of ASCII around it; a byte order mark at the start of the file is no part of
-// the first.
 func ignoresLacking(held []byte) []string {
 	var lines []string
 	for line := range strings.SplitSeq(fsx.WithoutMark(string(held)), "\n") {
@@ -162,8 +132,6 @@ func ignoresLacking(held []byte) []string {
 	return lacking
 }
 
-// withLines is a .gitignore with lines appended, each ended by a line feed. Every byte the file holds stays as it
-// is, and a last line without a line break is given one first.
 func withLines(held []byte, lines []string) []byte {
 	out := bytes.Clone(held)
 	if len(out) > 0 && !bytes.HasSuffix(out, []byte("\n")) {
@@ -175,22 +143,8 @@ func withLines(held []byte, lines []string) []byte {
 	return out
 }
 
-// luarcArrays are the .luarc.json arrays setup keeps up to date.
 var luarcArrays = []string{"runtime.path", "workspace.library", "workspace.ignoreDir"}
 
-// MergeLuarc adds the template's entries of those arrays that the project's .luarc.json lacks, keeps every other
-// key and value as written, and rewrites the file when it adds any. merged is false when the file is not a JSON
-// object, which is then left alone. A missing file adds nothing.
-//
-// An entry is there when the array holds the same string, however it is written; an array that is not there is
-// given whole, at the end of the file, and a value under its key that is no array stays. Where the file is
-// rewritten, it is laid out with two spaces and a final line break, without a byte order mark: a key keeps its
-// place, and a value the text of each of its tokens, a number and a string as they are written. A key of the file
-// itself that comes twice is then written once, at its first place and with its last value, which is the value
-// that was merged.
-//
-// A file behind a link is read and written through the link. A link that leads to nothing is no file: nothing is
-// added, and nothing is written.
 func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, merged bool, err error) {
 	written, found, err := readIfThere(root, luarcFile)
 	switch {
@@ -217,7 +171,6 @@ func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, 
 	return added, true, nil
 }
 
-// addLacking gives each of luarcArrays the entries it lacks, and returns all that it added, array after array.
 func addLacking(config *manifest.Ordered[json.RawMessage], entries map[string][]string) []string {
 	added := []string{}
 	for _, key := range luarcArrays {
@@ -226,12 +179,6 @@ func addLacking(config *manifest.Ordered[json.RawMessage], entries map[string][]
 	return added
 }
 
-// LuarcTemplateEntries is the entries of each of luarcArrays in the template's .luarc.json, under the key of the
-// array and in the order the template lists them: what MergeLuarc adds where a project lacks it, and what setup
-// names to the user of a .luarc.json that MergeLuarc left alone. An array without entries has a nil list.
-//
-// Its failures are plain errors: the template is Moonwell's own, and its .luarc.json is an object with the three
-// arrays of strings, so one that is not is a mistake in Moonwell and nothing the user can put right.
 func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string, error) {
 	data, err := templateFile(template, luarcFile)
 	if err != nil {
@@ -239,7 +186,6 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 	}
 	config, isObject := objectOf(data)
 	if !isObject {
-		// A plain error: the template is Moonwell's own, so this is a mistake in Moonwell and not the user's.
 		return nil, errors.New("editor: the template's .luarc.json is not a JSON object")
 	}
 	entries := map[string][]string{}
@@ -247,7 +193,6 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 		written, _ := config.Get(key)
 		list, isList := stringsOf(written)
 		if !isList {
-			// A plain error, as the one above: the template is Moonwell's own.
 			return nil, errors.New("editor: the template's .luarc.json has no " + key + " array of strings")
 		}
 		entries[key] = list
@@ -255,21 +200,14 @@ func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string
 	return entries, nil
 }
 
-// objectOf reads the text of a .luarc.json as the members of a JSON object: each key, and its value as it is
-// written, in the order of the text. A key that comes twice keeps its first place and its last value. A byte
-// order mark before the text is read past. It reports false for text that is not JSON, which has neither the
-// comments nor the comma after a last member that lua-language-server reads, and for JSON that is no object.
 func objectOf(text []byte) (config manifest.Ordered[json.RawMessage], isObject bool) {
 	text = fsx.WithoutMark(text)
-	// A null reads as a mapping without keys, so what the text starts with is asked first.
 	if !startsWith(text, '{') || json.Unmarshal(text, &config) != nil {
 		return manifest.Ordered[json.RawMessage]{}, false
 	}
 	return config, true
 }
 
-// addEntries gives the array under key the entries it lacks, after those it holds, and returns them. An array
-// that is not there is made of the entries; a value that is no array is the user's own, and stays.
 func addEntries(config *manifest.Ordered[json.RawMessage], key string, entries []string) (added []string) {
 	written, given := config.Get(key)
 	elements, isArray := elementsOf(written)
@@ -294,8 +232,6 @@ func addEntries(config *manifest.Ordered[json.RawMessage], key string, entries [
 	return added
 }
 
-// elementsOf is the elements of a JSON array, each as it is written; false for a value that is no array, and for
-// no value at all.
 func elementsOf(written json.RawMessage) (elements []json.RawMessage, isArray bool) {
 	if !startsWith(written, '[') || json.Unmarshal(written, &elements) != nil {
 		return nil, false
@@ -303,7 +239,6 @@ func elementsOf(written json.RawMessage) (elements []json.RawMessage, isArray bo
 	return elements, true
 }
 
-// stringOf is the string a JSON value is; false for a value of another kind.
 func stringOf(written json.RawMessage) (text string, isString bool) {
 	if !startsWith(written, '"') || json.Unmarshal(written, &text) != nil {
 		return "", false
@@ -311,15 +246,11 @@ func stringOf(written json.RawMessage) (text string, isString bool) {
 	return text, true
 }
 
-// startsWith reports whether the first character of JSON text, after its white space, is first: what tells an
-// object, an array and a string from every other value.
 func startsWith(text []byte, first byte) bool {
 	text = bytes.TrimLeft(text, jsonSpace)
 	return len(text) > 0 && text[0] == first
 }
 
-// stringsOf is the strings of a JSON array; false for a value that is no array, and for an array with an element
-// that is no string.
 func stringsOf(written json.RawMessage) (list []string, isList bool) {
 	elements, isArray := elementsOf(written)
 	if !isArray {
@@ -335,7 +266,6 @@ func stringsOf(written json.RawMessage) (list []string, isList bool) {
 	return list, true
 }
 
-// arrayOf is a JSON array of elements, each as it is written.
 func arrayOf(elements []json.RawMessage) json.RawMessage {
 	array := json.RawMessage("[")
 	for i, element := range elements {
@@ -347,7 +277,6 @@ func arrayOf(elements []json.RawMessage) json.RawMessage {
 	return append(array, ']')
 }
 
-// writeLuarc writes the members as the project's .luarc.json.
 func writeLuarc(root string, config manifest.Ordered[json.RawMessage]) error {
 	text, err := laidOut(config)
 	if err != nil {
@@ -356,9 +285,6 @@ func writeLuarc(root string, config manifest.Ordered[json.RawMessage]) error {
 	return writeFile(root, luarcFile, text)
 }
 
-// laidOut is the members as the text of a file: an object with a member on each line, two spaces for each depth,
-// and a final line break. A key is written with the escapes it needs and no other. A value keeps the text of each
-// of its tokens, and the white space between them is laid out with the rest.
 func laidOut(config manifest.Ordered[json.RawMessage]) ([]byte, error) {
 	var onOneLine bytes.Buffer
 	onOneLine.WriteByte('{')
@@ -372,8 +298,6 @@ func laidOut(config manifest.Ordered[json.RawMessage]) ([]byte, error) {
 	}
 	onOneLine.WriteByte('}')
 	var text bytes.Buffer
-	// A failure here is passed on as it is: the keys are quoted and the values were read as JSON, so text that
-	// cannot be laid out is a mistake in Moonwell and nothing the user can put right.
 	if err := json.Indent(&text, onOneLine.Bytes(), "", "  "); err != nil {
 		return nil, err
 	}
@@ -381,12 +305,10 @@ func laidOut(config manifest.Ordered[json.RawMessage]) ([]byte, error) {
 	return text.Bytes(), nil
 }
 
-// onDisk is where a file of the project is; file is its path from the project folder, with "/".
 func onDisk(root, file string) string {
 	return filepath.Join(root, filepath.FromSlash(file))
 }
 
-// readIfThere reads a file of the project. found is false, without an error, when there is none.
 func readIfThere(root, file string) (data []byte, found bool, err error) {
 	if data, found, err = fsx.ReadIfThere(onDisk(root, file)); err != nil {
 		return nil, false, errNotRead(file, err)
@@ -394,7 +316,6 @@ func readIfThere(root, file string) (data []byte, found bool, err error) {
 	return data, found, nil
 }
 
-// writeFile writes a file of the project, and makes the folder it is in.
 func writeFile(root, file string, data []byte) error {
 	target := onDisk(root, file)
 	err := os.MkdirAll(filepath.Dir(target), 0o777)
@@ -407,10 +328,6 @@ func writeFile(root, file string, data []byte) error {
 	return nil
 }
 
-// ---- errors ----
-
-// errLinkToNothing is the refusal of an editor file of the project that is a link to a file that is not there, by
-// its path from the project folder.
 func errLinkToNothing(file string) error {
 	return &diag.Error{
 		Msg:  file + " is a link to a file that does not exist.",
@@ -419,17 +336,14 @@ func errLinkToNothing(file string) error {
 	}
 }
 
-// errNotRead is the failure to read an editor file of the project, by its path from the project folder.
 func errNotRead(file string, cause error) error {
 	return errFile("Reading", file, cause)
 }
 
-// errNotWritten is the failure to write an editor file of the project, by its path from the project folder.
 func errNotWritten(file string, cause error) error {
 	return errFile("Writing", file, cause)
 }
 
-// errFile is the failure of an action on an editor file of the project, with what the user can do about it.
 func errFile(action, file string, cause error) error {
 	return &diag.Error{
 		Msg:  action + " " + file + " failed: " + fsx.Reason(cause),

@@ -1,17 +1,3 @@
-// Package testkit holds what Moonwell's tests share: files and folders written and read back and the fixtures World
-// Editor saved, links (LinkDir, LinkFile), files held so that they cannot be read or written (MakeUnreadable,
-// MakeUnwritable), a test world for the commands and the logger that keeps its lines (Recorder), byte helpers,
-// builders for map info, object files, MDX models, pictures and zip archives (Zip), a reader of the archives
-// Moonwell writes, and the way to what a test needs from the machine: a program (NeedPkl), the network
-// (NeedNetwork) and the game's files (NeedExport). It also holds what a test gives a reader that must stand
-// damaged input: the seeded changes of a text (Changed, Swept) and of bytes (ChangedBytes), and Panic, which
-// says of which input a reader panics. And it holds how a test keeps a whole text: Recorded compares what a test
-// made with a recording under the package's testdata/recorded, Digest stands in for a large file, and Placed
-// writes what belongs to one machine or system by a name.
-//
-// It is imported by tests only. Of Moonwell's packages it knows env, binio and the formats it builds or reads
-// (war3/objmod and war3/mpq), so the tests of those two packages are external test packages. Most helpers take a
-// testing.TB and fail the test themselves; the archive reader returns errors.
 package testkit
 
 import (
@@ -24,8 +10,6 @@ import (
 	"testing"
 )
 
-// RepoRoot returns the root of the Moonwell checkout: the folder with go.mod, found by walking up from the working
-// folder. A test starts in the folder of its package, so call RepoRoot before changing the working folder.
 func RepoRoot(t testing.TB) string {
 	t.Helper()
 	dir, err := os.Getwd()
@@ -46,7 +30,6 @@ func RepoRoot(t testing.TB) string {
 	}
 }
 
-// WriteFile writes a file under dir, creating its folders. name uses "/".
 func WriteFile(t testing.TB, dir, name string, data []byte) string {
 	t.Helper()
 	path := filepath.Join(dir, filepath.FromSlash(name))
@@ -59,7 +42,6 @@ func WriteFile(t testing.TB, dir, name string, data []byte) string {
 	return path
 }
 
-// Snapshot returns every entry below dir with its bytes (folders as nil), to prove that something wrote nothing.
 func Snapshot(t testing.TB, dir string) map[string][]byte {
 	t.Helper()
 	result := map[string][]byte{}
@@ -86,11 +68,6 @@ func Snapshot(t testing.TB, dir string) map[string][]byte {
 	return result
 }
 
-// LinkDir makes link a link to the folder target: a symlink, or a junction on Windows, where a symlink takes a
-// right that not every account has and a junction takes none. A link that cannot be made fails the test, on
-// every system: every account can make one, so the failure is a fault in what the test arranged, such as a
-// folder for the link that is not there, and a test that was skipped for it would pass for having looked at
-// nothing.
 func LinkDir(t testing.TB, target, link string) {
 	t.Helper()
 	if runtime.GOOS == "windows" {
@@ -104,14 +81,8 @@ func LinkDir(t testing.TB, target, link string) {
 	}
 }
 
-// privilegeNotHeld is the Windows error of an account that has not the right to make a symlink. The same number
-// means something else on other systems.
 const privilegeNotHeld = syscall.Errno(1314)
 
-// LinkFile makes link a symlink to target, which is a file or nothing at all. Windows has no other link that
-// stands for a file, and gives the right to make a symlink to some accounts only: where this account has not
-// got it, the test is skipped, for that failure alone, and runs where the account has. Any other failure fails
-// the test, on every system.
 func LinkFile(t testing.TB, target, link string) {
 	t.Helper()
 	err := os.Symlink(target, link)
@@ -125,14 +96,10 @@ func LinkFile(t testing.TB, target, link string) {
 	}
 }
 
-// lacksTheRightToLink reports whether a symlink failed for the one reason that is the account's and not the
-// test's: on Windows, the right that the account has not got.
 func lacksTheRightToLink(err error) bool {
 	return runtime.GOOS == "windows" && errors.Is(err, privilegeNotHeld)
 }
 
-// CaseSensitive reports whether dir's file system keeps two names that differ only in letter case apart (Linux
-// usually; Windows never).
 func CaseSensitive(t testing.TB, dir string) bool {
 	t.Helper()
 	WriteFile(t, dir, "probe", nil)

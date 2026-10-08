@@ -9,8 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// allianceNatives are the natives that set what the players of a force share, each with the bit of the force's
-// flags it follows.
 var allianceNatives = []struct {
 	native string
 	bit    int32
@@ -21,14 +19,11 @@ var allianceNatives = []struct {
 	{"SetPlayerAllianceStateFullControlBJ", sharedAdvancedControl},
 }
 
-// teamCall is a SetPlayerTeam call of the Lua: the player it puts into a team, and the team.
 type teamCall struct {
 	player int
 	team   float64
 }
 
-// flagged is the slots, in their order, of the forces whose override sets an alliance flag. A force's name is
-// stored in the map info alone.
 func flagged(overrides map[int]manifest.Force) []int {
 	var slots []int
 	for _, slot := range manifest.Slots(overrides) {
@@ -41,9 +36,6 @@ func flagged(overrides map[int]manifest.Force) []int {
 	return slots
 }
 
-// forces adds, at the end of InitCustomTeams(), the states of the players of each force whose override sets an
-// alliance flag: every state the map info has for the force, also those the override leaves alone. They stand
-// after the calls World Editor wrote, so they are the ones that hold.
 func (p *patcher) forces(overrides map[int]manifest.Force, details *w3i.Details) {
 	indexes := flagged(overrides)
 	if len(indexes) == 0 {
@@ -59,7 +51,6 @@ func (p *patcher) forces(overrides map[int]manifest.Force, details *w3i.Details)
 	p.insertBefore(teams.EndStart, states)
 }
 
-// teamCalls is the SetPlayerTeam calls of InitCustomTeams(). Each must name its player and its team as literals.
 func (p *patcher) teamCalls(teams lua.Function) []teamCall {
 	var calls []teamCall
 	for _, call := range p.callsNamed(teams, "SetPlayerTeam", 2) {
@@ -74,8 +65,6 @@ func (p *patcher) teamCalls(teams lua.Function) []teamCall {
 	return calls
 }
 
-// force is the states of the force in a slot, which is its place among the map info's forces, after it is seen
-// that the Lua puts into the force's team the players the map info has in the force, and no other.
 func (p *patcher) force(index int, details *w3i.Details, calls []teamCall) []string {
 	if index >= len(details.Forces) {
 		p.refuse(errForceNotInInfo(p.file, index))
@@ -89,8 +78,6 @@ func (p *patcher) force(index int, details *w3i.Details, calls []teamCall) []str
 	return states(members, force.Flags.Value)
 }
 
-// membersOf is the ids of the map's players that the force's mask has, in the order of the map info. The mask has
-// a bit for each slot, and a map info that w3i.Read accepts has no player outside the 24 slots.
 func membersOf(force w3i.Force, players []w3i.Player) []int {
 	var members []int
 	for _, player := range players {
@@ -101,8 +88,6 @@ func membersOf(force w3i.Force, players []w3i.Player) []int {
 	return members
 }
 
-// teamed reports whether the Lua's SetPlayerTeam calls agree with the force: a call puts a player into the
-// team of the force's number exactly when the player is a member, and each member has exactly one call.
 func (p *patcher) teamed(index int, members []int, calls []teamCall) bool {
 	for _, call := range calls {
 		if (call.team == float64(index)) != slices.Contains(members, call.player) {
@@ -120,8 +105,6 @@ func (p *patcher) teamed(index int, members []int, calls []teamCall) bool {
 	return !p.failed()
 }
 
-// states is the calls that give the members of a force the states its flags say: for each member whether an
-// allied victory counts, and for each pair of members, both ways, what the two share.
 func states(members []int, flags int32) []string {
 	victory := 0
 	if flags&alliedVictory != 0 {
@@ -142,8 +125,6 @@ func states(members []int, flags int32) []string {
 	}
 	return calls
 }
-
-// ---- errors ----
 
 func errForceNotInInfo(file string, index int) error {
 	return errLuaHint(file, fmt.Sprintf("force %d does not exist in war3map.w3i.", index),

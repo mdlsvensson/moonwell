@@ -14,11 +14,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/imp"
 )
 
-// The tests of this file run assets:check and assets:sync in a project that init made. Each runs the real pkl,
-// and takes the time that takes. None needs the compiler: the commands run in a world that lets pkl alone run.
-// A library of these tests is a folder beside the project, which a sync copies and no program fetches.
-
-// checked and synced are the lines the two commands end with.
 func checked(assets, changes string) string {
 	return "Checked " + assets + " asset(s); assets:sync would make " + changes + " file change(s). Nothing was written."
 }
@@ -28,7 +23,6 @@ func synced(assets, changes string) string {
 		"World Editor."
 }
 
-// importsOf is the paths the map's index of imports lists, in its order.
 func importsOf(t *testing.T, root string) []string {
 	t.Helper()
 	entries, err := imp.Read([]byte(read(t, root, "maps/map.w3x/war3map.imp")), "war3map.imp")
@@ -67,7 +61,6 @@ func TestPklAssetsCheckAndSync(t *testing.T) {
 	}
 	contains(t, read(t, root, ".asset-state/map.w3x.json"), "icons/a.blp")
 
-	// A map that holds the assets has nothing to change, and the asset is listed all the same.
 	e, log, _ = pklOnly(t, root)
 	if lines := logged(t, e, log, "assets:check"); !slices.Equal(lines, []string{planned[0], checked("1", "0")}) {
 		t.Fatalf("assets:check after a sync logged %q", lines)
@@ -78,8 +71,6 @@ func TestPklAssetsCheckAndSync(t *testing.T) {
 	}
 }
 
-// An asset is listed with the in-map path it is written under: below a folder as the map, or an asset ahead of
-// it, spells that folder.
 func TestPklAssetsAreListedByThePathsTheyAreWrittenUnder(t *testing.T) {
 	root := newProject(t, "my-map")
 	write(t, root, "assets/Icons/a.blp", "a")
@@ -96,9 +87,6 @@ func TestPklAssetsAreListedByThePathsTheyAreWrittenUnder(t *testing.T) {
 	}
 }
 
-// stoppingAfterTheManifest is a world that lets pkl alone run, for a command that is told to stop while it works:
-// stop is called once pkl has evaluated the manifest, so every step after the manifest runs with a context that
-// is cancelled.
 func stoppingAfterTheManifest(t *testing.T, stop context.CancelFunc) world {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _, _ := pklOnly(t, root)
@@ -115,8 +103,6 @@ func stoppingAfterTheManifest(t *testing.T, stop context.CancelFunc) world {
 	}
 }
 
-// A sync that is told to stop before it has planned writes nothing: neither into the map nor the ownership state.
-// Told before it starts, it has nothing to say; told while it plans, it says that nothing was written.
 func TestPklAssetsInterruptedSyncWritesNothing(t *testing.T) {
 	root := newProject(t, "my-map")
 	write(t, root, "assets/icons/a.blp", "icon")
@@ -142,8 +128,6 @@ func TestPklAssetsInterruptedSyncWritesNothing(t *testing.T) {
 	}
 }
 
-// projectWithAssetLibrary is a project with a library "golems" that ships a model, its texture and a file below
-// war3mapImported. plain is the project's manifest without the library.
 func projectWithAssetLibrary(t *testing.T) (root, plain string) {
 	t.Helper()
 	root = newProject(t, "my-map")
@@ -164,7 +148,6 @@ func TestPklLibraryAssetsSyncAndRemoval(t *testing.T) {
 	root, plain := projectWithAssetLibrary(t)
 	testkit.WriteFile(t, root, "assets/Textures/golem.blp", []byte{2})
 	planned := []string{
-		// The assets by their in-map paths, a library's with its key; then what the map's own replace.
 		`library golems: Models/Golem.mdx -> Models\Golem.mdx`,
 		`Textures/golem.blp -> Textures\golem.blp`,
 		`library golems: war3mapImported/golems/frames.toc -> war3mapImported\golems\frames.toc`,
@@ -178,7 +161,6 @@ func TestPklLibraryAssetsSyncAndRemoval(t *testing.T) {
 	if lines := logged(t, e, log, "assets:check"); !slices.Equal(lines, append(slices.Clone(planned), checked("3", "4"))) {
 		t.Fatalf("assets:check logged:\n%s", strings.Join(lines, "\n"))
 	}
-	// The check synced the library into the project, and wrote nothing into the map.
 	if exists(root, "maps/map.w3x/Models") || !exists(root, ".moonwell/library-assets/golems/Models/Golem.mdx") {
 		t.Fatal("assets:check wrote into the map, or did not sync the library")
 	}
@@ -192,7 +174,6 @@ func TestPklLibraryAssetsSyncAndRemoval(t *testing.T) {
 		t.Fatal("the map holds other bytes than the assets")
 	}
 
-	// Without the library, a sync takes its files out of the map again, and the library out of the project.
 	write(t, root, "moonwell.pkl", plain)
 	e, log, _ = pklOnly(t, root)
 	lines := logged(t, e, log, "assets:sync")
@@ -219,10 +200,6 @@ func TestPklLibraryAssetsSyncAndRemoval(t *testing.T) {
 	onlyPkl(t, ran)
 }
 
-// ---- what the two commands need of the map, and of the project ----
-
-// The map must be one World Editor saved in folder format with Lua as its script language: it has its script
-// and its info file. A folder under either name is no such file.
 func TestPklAssetsCommandsNeedTheMapsScriptAndItsInfoFile(t *testing.T) {
 	for _, name := range []string{"war3map.lua", "war3map.w3i"} {
 		for what, arrange := range map[string]func(t *testing.T, root string){
@@ -247,7 +224,6 @@ func TestPklAssetsCommandsNeedTheMapsScriptAndItsInfoFile(t *testing.T) {
 				}
 			}
 			sameFiles(t, before, testkit.Snapshot(t, filepath.Join(root, "maps")), name+" "+what)
-			// The map is looked at before the libraries are synced.
 			if exists(root, ".moonwell") || exists(root, ".asset-state") || exists(root, "dist/.lock") {
 				t.Errorf("%s %s: a refused command synced the libraries, wrote the state, or kept the lock", name, what)
 			}
@@ -272,8 +248,6 @@ func TestPklAssetsCommandsNeedTheSourceMap(t *testing.T) {
 	}
 }
 
-// The two commands sync the libraries and read the map as a build does, so beside a build that runs they are
-// refused, before they have touched either.
 func TestPklAssetsCommandsAreRefusedBesideARunningBuild(t *testing.T) {
 	root, _ := projectWithAssetLibrary(t)
 	holdBuildLock(t, root)
@@ -294,10 +268,6 @@ func TestPklAssetsCommandsAreRefusedBesideARunningBuild(t *testing.T) {
 	}
 }
 
-// The commands that sync the libraries hold the build lock while they do: a sync writes .moonwell/ and
-// moonwell.lock in several steps, and a build beside it would read them half written. The project's library is
-// one on GitHub, so its sync asks for a download: the world looks for the lock file as it is asked, and then
-// refuses the download, which ends the command.
 func TestPklTheAssetsCommandsHoldTheBuildLockWhileTheySyncTheLibraries(t *testing.T) {
 	for _, name := range []string{"assets:check", "assets:sync", "assets:paths"} {
 		root := newProject(t, "my-map")
@@ -326,8 +296,6 @@ func TestPklTheAssetsCommandsHoldTheBuildLockWhileTheySyncTheLibraries(t *testin
 	}
 }
 
-// The whole lines: what a command says is printed and kept in the project's log, and nothing is printed for
-// other programs.
 func TestPklAssetsCommandLinesPrintAndKeepWhatTheySay(t *testing.T) {
 	root := newProject(t, "my-map")
 	write(t, root, "assets/icons/a.blp", "icon")

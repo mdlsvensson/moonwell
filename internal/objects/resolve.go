@@ -9,23 +9,20 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// Value is a field's value as it will be stored, and as objects:eval shows it.
 type Value struct {
 	Type   objmod.ValueType
-	Number float64 // for Int, Real and Unreal
+	Number float64
 	Text   string
 }
 
-// Field is one value of an object, as it is written. Level and Column are 0 outside the files that store them.
 type Field struct {
-	ID            string // the rawcode
+	ID            string
 	Name          string
 	Level, Column int
 	Skin          bool
 	Value         Value
 }
 
-// Resolved is a custom object ready to be written. Its fields are sorted by rawcode, then level.
 type Resolved struct {
 	Category manifest.Category
 	Key      string
@@ -34,8 +31,6 @@ type Resolved struct {
 	Fields   []Field
 }
 
-// Resolve resolves and checks every object against the metadata and the custom ids the map already has. It
-// fails with every problem found, as diag.Problems. Objects come back in category order, then written order.
 func Resolve(metadata *Metadata, objects manifest.Objects, existing map[string]bool) ([]Resolved, error) {
 	r := &resolver{metadata: metadata, existing: existing, owners: map[string]owner{}}
 	resolved := []Resolved{}
@@ -52,43 +47,36 @@ func Resolve(metadata *Metadata, objects manifest.Objects, existing map[string]b
 	return resolved, nil
 }
 
-// resolver is what one call of Resolve knows and finds.
 type resolver struct {
 	metadata *Metadata
-	existing map[string]bool  // the custom ids the map already has
-	owners   map[string]owner // by id, the first object of the manifest that has it
+	existing map[string]bool
+	owners   map[string]owner
 	problems diag.Problems
 }
 
-// owner is an object that has an id: its place in the manifest and its file.
 type owner struct{ at, source string }
 
-// subject is the object being resolved.
 type subject struct {
 	*resolver
 	category manifest.Category
-	at       string // the object's place in the manifest, such as units["captain"]
+	at       string
 	object   manifest.Object
 }
 
-// fault is what is wrong at one place of an object.
 type fault struct{ msg, hint string }
 
-// report adds a problem of the object. path is the place in the object, such as .id or .properties["unam"].
 func (s *subject) report(path string, wrong fault) {
 	s.problems = append(s.problems, diag.Problem{
 		File: s.object.Source, Msg: s.at + path + ": " + wrong.msg, Hint: wrong.hint,
 	})
 }
 
-// resolve checks one object and returns it resolved; false for an object whose base is unknown.
 func (r *resolver) resolve(category manifest.Category, key string, object manifest.Object) (Resolved, bool) {
 	s := &subject{resolver: r, category: category, at: string(category) + "[" + fsx.Quoted(key) + "]", object: object}
 	s.checkID()
 	s.claimID()
 	base, known := r.metadata.Bases[category][object.Base]
 	if !known {
-		// Which fields apply depends on the base, so the fields are not checked against a base that is unknown.
 		s.report(".base", errNotABase(r.metadata, category, object.Base))
 		return Resolved{}, false
 	}
@@ -97,8 +85,6 @@ func (r *resolver) resolve(category manifest.Category, key string, object manife
 	}, true
 }
 
-// checkID reports what is wrong with the object's id by itself. An id that passes is four ASCII letters or digits,
-// which every object file can store.
 func (s *subject) checkID() {
 	id := s.object.ID
 	if !fourLettersOrDigits(id) {
@@ -120,7 +106,6 @@ func (s *subject) checkID() {
 	}
 }
 
-// claimID reports an id that an earlier object of the manifest has, and else makes the object its owner.
 func (s *subject) claimID() {
 	if first, taken := s.owners[s.object.ID]; taken {
 		s.report(".id", errIDTwice(s.object.ID, first))
@@ -142,20 +127,15 @@ func fourLettersOrDigits(id string) bool {
 	return true
 }
 
-// named writes a standard object or a field for a message: its id as authors write it, and its name.
 func named(id, name string) string {
 	return "'" + strings.TrimRight(id, "\x00") + "' (" + name + ")"
 }
 
-// ---- errors ----
-
-// exampleIDs is an id of the form each category's ids have.
 var exampleIDs = map[manifest.Category]string{
 	"heroes": "H000", "units": "h000", "buildings": "h000", "items": "I000", "abilities": "A000", "buffs": "B000",
 	"upgrades": "R000",
 }
 
-// singular is what one object of each category is called.
 var singular = map[manifest.Category]string{
 	"heroes": "hero", "units": "unit", "buildings": "building", "items": "item", "abilities": "ability",
 	"buffs": "buff", "upgrades": "upgrade",
@@ -200,8 +180,6 @@ func errIDTwice(id string, first owner) fault {
 	}
 }
 
-// errNotABase says, where it can, which category the base is a standard object of, and names the nearest standard
-// objects of the right one.
 func errNotABase(metadata *Metadata, category manifest.Category, id string) fault {
 	var hints []string
 	if other, base, found := metadata.BaseOf(id); found {

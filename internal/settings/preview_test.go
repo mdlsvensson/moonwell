@@ -18,7 +18,6 @@ func opaque() *byte {
 	return &alpha
 }
 
-// plainTGA is a picture the game shows, as a file loadPreview takes.
 func plainTGA() []byte { return testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{}) }
 
 func TestAPreviewOfEachKindIsReadFromItsPathInTheProject(t *testing.T) {
@@ -103,7 +102,6 @@ func TestAPreviewThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
 	}
 }
 
-// A file where the path needs a folder: the picture does not exist, whatever the operating system calls that.
 func TestAPreviewPathThroughAFileNamesAFileThatDoesNotExist(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "preview.tga", plainTGA())
@@ -115,8 +113,6 @@ func TestAPreviewPathThroughAFileNamesAFileThatDoesNotExist(t *testing.T) {
 	}
 }
 
-// What the operating system says on the way to the picture, given here as it says it on each system: a file
-// system gives only its own.
 func TestAFailureOnTheWayToThePreviewIsToldAsWhatTheUserCanFix(t *testing.T) {
 	const path = "art/preview.tga"
 	failed := func(reason error) error {

@@ -20,10 +20,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// mapLabel is how the errors of these tests name the map folder.
 const mapLabel = "maps/map.w3x"
 
-// fixtureFiles is the object files of the names fixture: the main and the skin file of every tab of the editor.
 var fixtureFiles = []string{
 	"war3map.w3u", "war3mapSkin.w3u", "war3map.w3t", "war3mapSkin.w3t", "war3map.w3h", "war3mapSkin.w3h",
 	"war3map.w3a", "war3mapSkin.w3a", "war3map.w3q", "war3mapSkin.w3q", "war3map.w3b", "war3mapSkin.w3b",
@@ -35,7 +33,6 @@ func fixture(t *testing.T, name string) []byte {
 	return testkit.Fixture(t, "objects-v3-names/"+name)
 }
 
-// copyFixture writes files of the names fixture into dir: the ones named, or all of them.
 func copyFixture(t *testing.T, dir string, files ...string) {
 	t.Helper()
 	if len(files) == 0 {
@@ -46,7 +43,6 @@ func copyFixture(t *testing.T, dir string, files ...string) {
 	}
 }
 
-// openMap opens dir as the map folder, as it is on disk now.
 func openMap(t *testing.T, dir string) *mapdir.Folder {
 	t.Helper()
 	folder, err := mapdir.Open(dir, mapLabel)
@@ -56,13 +52,11 @@ func openMap(t *testing.T, dir string) *mapdir.Folder {
 	return folder
 }
 
-// planIn plans the objects of the manifest for the map folder at dir, against the miniature metadata.
 func planIn(t *testing.T, dir, document string) (*objects.Result, error) {
 	t.Helper()
 	return objects.Plan(openMap(t, dir), decoded(t, document), mini)
 }
 
-// plan is planIn for objects that must plan.
 func plan(t *testing.T, dir, document string) *objects.Result {
 	t.Helper()
 	result, err := planIn(t, dir, document)
@@ -72,7 +66,6 @@ func plan(t *testing.T, dir, document string) *objects.Result {
 	return result
 }
 
-// planProblems is the problems Plan gives in place of a result.
 func planProblems(t *testing.T, dir, document string) diag.Problems {
 	t.Helper()
 	result, err := planIn(t, dir, document)
@@ -83,7 +76,6 @@ func planProblems(t *testing.T, dir, document string) diag.Problems {
 	return found
 }
 
-// planError is the one error Plan gives in place of a result.
 func planError(t *testing.T, dir, document string) *diag.Error {
 	t.Helper()
 	result, err := planIn(t, dir, document)
@@ -93,7 +85,6 @@ func planError(t *testing.T, dir, document string) *diag.Error {
 	return asError(t, err, document)
 }
 
-// saysEach reports whether there is one problem for each of the words, in order, and each has its words.
 func saysEach(found diag.Problems, words ...string) bool {
 	if len(found) != len(words) {
 		return false
@@ -125,7 +116,6 @@ func changeBytes(t *testing.T, result *objects.Result, name string) []byte {
 	return nil
 }
 
-// readObjects reads an object file a test knows to be whole.
 func readObjects(t *testing.T, name string, data []byte) *objmod.File {
 	t.Helper()
 	parsed, err := objmod.Read(data, objmod.KindOf(name), name)
@@ -135,7 +125,6 @@ func readObjects(t *testing.T, name string, data []byte) *objmod.File {
 	return parsed
 }
 
-// customMod is a modification as a test writes it: its value is a text or a float64.
 type customMod struct {
 	field         string
 	level, column int32
@@ -147,7 +136,6 @@ type customObject struct {
 	mods     []customMod
 }
 
-// customObjects is the custom objects an object file holds.
 func customObjects(t *testing.T, name string, data []byte) []customObject {
 	t.Helper()
 	var out []customObject
@@ -179,11 +167,9 @@ func wantCustom(t *testing.T, name string, data []byte, want ...customObject) {
 	}
 }
 
-// ---- no objects ----
-
 func TestNoObjectsReadNothingOfTheMapAndGiveTheEmptyIDsModule(t *testing.T) {
 	dir := t.TempDir()
-	testkit.WriteFile(t, dir, "war3map.w3u", []byte{3, 0, 0}) // refused, were it read
+	testkit.WriteFile(t, dir, "war3map.w3u", []byte{3, 0, 0})
 	folders := map[string]*mapdir.Folder{"no folder": nil, "a folder with an object file that does not read": openMap(t, dir)}
 	for name, folder := range folders {
 		result, err := objects.Plan(folder, manifest.Objects{}, mini)
@@ -196,10 +182,7 @@ func TestNoObjectsReadNothingOfTheMapAndGiveTheEmptyIDsModule(t *testing.T) {
 	}
 }
 
-// ---- known answers ----
-
 func TestTheNamesFixturesObjectsPlannedAgainstAnEmptyMapAreWorldEditorsFiles(t *testing.T) {
-	// Moonwell writes strings literally, so the fixture's TRIGSTR references are the names given here.
 	names := decoded(t, `{
 		"units":{"peasant":{"id":"h000","base":"hpea","name":"TRIGSTR_012"}},
 		"items":{"claws":{"id":"I000","base":"ratf","name":"TRIGSTR_013"}},
@@ -235,7 +218,6 @@ func TestTheNamesFixturesObjectsPlannedAgainstAnEmptyMapAreWorldEditorsFiles(t *
 	}
 }
 
-// referenceMod is a modification as the reference library mdx-m3-viewer-th lays it out.
 type referenceMod struct {
 	id                 string
 	variableType       int32
@@ -243,7 +225,6 @@ type referenceMod struct {
 	value              any
 }
 
-// bytes restates the library's Modification.save: id, var type, [level, data pointer], value, end token (0).
 func (mod referenceMod) bytes(useOptionalInts bool) []byte {
 	le := binary.LittleEndian
 	out := []byte(mod.id)
@@ -311,7 +292,6 @@ func TestAVersion2MapGetsTheReferenceLibrarysVersion2LayoutWithEveryFieldInTheMa
 	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3a"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
-	// The library's War3MapW3u.save for a version 2 file with custom objects only, restated.
 	le := binary.LittleEndian
 	want := le.AppendUint32(le.AppendUint32(le.AppendUint32(nil, 2), 0), 1)
 	want = append(want, "AHhbA000"...)
@@ -322,8 +302,6 @@ func TestAVersion2MapGetsTheReferenceLibrarysVersion2LayoutWithEveryFieldInTheMa
 		t.Errorf("the version 2 file is\n% X\nwant\n% X", result.Changes[0].Bytes, want)
 	}
 }
-
-// ---- planning against a map that has object files ----
 
 func TestPlanAppendsToTheMapsFilesSplitsBySkinSortsByIDAndWritesNothing(t *testing.T) {
 	dir := t.TempDir()
@@ -339,7 +317,6 @@ func TestPlanAppendsToTheMapsFilesSplitsBySkinSortsByIDAndWritesNothing(t *testi
 	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3u", "war3map.w3q", "war3mapSkin.w3u", "war3mapSkin.w3q"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
-	// The bytes the map has are kept (the count aside) and the new objects follow, sorted by id, on both sides.
 	for _, change := range result.Changes {
 		source := before[change.Name]
 		if !bytes.Equal(change.Bytes[:8], source[:8]) || !bytes.Equal(change.Bytes[12:len(source)], source[12:]) {
@@ -363,7 +340,6 @@ func TestPlanAppendsToTheMapsFilesSplitsBySkinSortsByIDAndWritesNothing(t *testi
 	if last := skin[len(skin)-1]; !reflect.DeepEqual(last, wantLast) {
 		t.Errorf("the upgrade in the skin file = %+v", last)
 	}
-	// The resolved objects stay in category order, then as written; only the files are sorted by id.
 	var keys []string
 	for _, object := range result.Objects {
 		keys = append(keys, object.Key)
@@ -424,7 +400,6 @@ func TestAV3MainFileWithoutItsSkinFileGetsANewSkinFileAndV1AndV2MapsGetNone(t *t
 	}
 	for _, version := range []int32{1, 2} {
 		testkit.WriteFile(t, dir, "war3map.w3u", testkit.BuildModFile(version, nil, nil, objmod.Simple))
-		// A skin file beside an older main file is left alone: the main file's version decides the split.
 		testkit.WriteFile(t, dir, "war3mapSkin.w3u", fixture(t, "war3mapSkin.w3u"))
 		older := plan(t, dir, captain)
 		if got := changeNames(older); !slices.Equal(got, []string{"war3map.w3u"}) {
@@ -437,15 +412,12 @@ func TestAV3MainFileWithoutItsSkinFileGetsANewSkinFileAndV1AndV2MapsGetNone(t *t
 	}
 }
 
-// ---- what the map's files refuse ----
-
 const captainOnly = `{"units":{"captain":{"id":"h001","base":"hfoo"}}}`
 
 func TestAnIDThatACustomObjectInAnyOfTheMapsFilesHasIsAProblemAndNothingIsWritten(t *testing.T) {
 	dir := t.TempDir()
 	copyFixture(t, dir)
 	before := testkit.Snapshot(t, dir)
-	// h000 is the fixture's custom unit and B000 its custom buff; either collides in any category.
 	found := planProblems(t, dir, `{
 		"abilities":{"holy":{"id":"h000","base":"AHhb"}},
 		"items":{"orb":{"id":"B000","base":"ckng"}},
@@ -507,7 +479,6 @@ func TestAMapFileThatDoesNotReadIsRefusedByItsName(t *testing.T) {
 }
 
 func TestAFolderWhereAnObjectFileWouldBeWrittenIsRefusedByItsName(t *testing.T) {
-	// A folder is no file of the map, so the map has no such object file; the new one cannot take its place.
 	for _, name := range []string{"war3map.w3u", "War3MapSkin.W3U"} {
 		dir := t.TempDir()
 		testkit.WriteFile(t, dir, name+"/kept.txt", []byte("kept"))
@@ -515,7 +486,6 @@ func TestAFolderWhereAnObjectFileWouldBeWrittenIsRefusedByItsName(t *testing.T) 
 		if e.File != mapLabel+"/"+name || !strings.Contains(e.Msg, "would replace a folder") || e.Hint == "" {
 			t.Errorf("%s: error = %+v", name, e)
 		}
-		// A plan that writes no file there does not mind the folder.
 		result := plan(t, dir, `{"items":{"orb":{"id":"I001","base":"ckng"}}}`)
 		if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3t", "war3mapSkin.w3t"}) {
 			t.Errorf("%s: the plan changes %q", name, got)
@@ -535,12 +505,10 @@ func TestObjectFilesAreFoundInAnyLetterCaseAndChangedUnderTheNameTheMapHas(t *te
 	if len(skin) != 2 || skin[0].id != "h000" || skin[1].id != "h001" {
 		t.Errorf("the skin file holds %+v", skin)
 	}
-	// The h000 the map has is found under its other spelling too.
 	found := planProblems(t, dir, `{"units":{"peasant":{"id":"h000","base":"hpea"}}}`)
 	if !saysEach(found, "already the id of a custom object") {
 		t.Errorf("problems:\n%s", diag.Format(found))
 	}
-	// And a file that does not read is named as the map spells it.
 	testkit.WriteFile(t, dir, "war3mapskin.w3u", []byte{3, 0, 0})
 	if e := planError(t, dir, captainOnly); e.File != mapLabel+"/war3mapskin.w3u" {
 		t.Errorf("error = %+v", e)
@@ -563,7 +531,6 @@ func TestObjectsThatDoNotResolveFailWithEveryProblemAndNothingIsWritten(t *testi
 }
 
 func TestThePlansChangesAreWhatAFolderLaysOverItself(t *testing.T) {
-	// Every planner hands the same change type to the one folder that writes them.
 	dir := t.TempDir()
 	copyFixture(t, dir, "war3map.w3u", "war3mapSkin.w3u")
 	folder := openMap(t, dir)
@@ -576,7 +543,6 @@ func TestThePlansChangesAreWhatAFolderLaysOverItself(t *testing.T) {
 	if !reflect.DeepEqual(view.Changes(), changes) || len(changes) != 2 {
 		t.Fatalf("the view changes %+v, the plan %+v", view.Changes(), changes)
 	}
-	// A plan made on the view sees the first plan's objects as the map's.
 	again, err := objects.Plan(view, decoded(t, `{"units":{"captain":{"id":"h001","base":"hfoo"}}}`), mini)
 	var found diag.Problems
 	if !errors.As(err, &found) || again != nil || !saysEach(found, "'h001' is already the id of a custom object in the map") {

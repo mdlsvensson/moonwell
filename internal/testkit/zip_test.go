@@ -17,7 +17,6 @@ func TestZipWritesEveryEntryUnderTheNameGivenAndTheComment(t *testing.T) {
 	}
 	const comment = "0123456789abcdef0123456789abcdef01234567"
 	archive := Zip(t, comment, entries...)
-	// A name that points outside the archive is reported with a reader that reads it all the same.
 	reader, err := zip.NewReader(bytes.NewReader(archive), int64(len(archive)))
 	if reader == nil {
 		t.Fatalf("the archive cannot be read: %v", err)

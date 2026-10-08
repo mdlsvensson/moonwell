@@ -12,16 +12,10 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 )
 
-// State is the ownership file: the source-map files assets:sync owns, by in-map path, with their SHA-256.
 type State struct{ Files []Owned }
 
-// Owned is one file assets:sync owns: its in-map path as the state file spells it, and the SHA-256 of what was
-// written there, in lower-case hexadecimal.
 type Owned struct{ Path, Hash string }
 
-// StateFile is the ownership file of the project at root for a map folder, by its path from the project folder,
-// which is how errors name it: .asset-state/<map folder>.json. A map folder that leads out of .asset-state, and
-// a link on the way to the file, is refused.
 func StateFile(root, mapFolder string) (string, error) {
 	file := ".asset-state/" + mapFolder + ".json"
 	if _, err := fsx.Inside(root, file); err != nil {
@@ -30,10 +24,6 @@ func StateFile(root, mapFolder string) (string, error) {
 	return file, nil
 }
 
-// ReadState reads the ownership file of the project at root; file is what StateFile returned. A project without
-// the file owns nothing: its state is empty. A file that is not a state is refused whole, and so is one that
-// lists a path no asset may have: assets:sync removes the files a state lists, and a state that named
-// war3map.lua would have it remove the map's script.
 func ReadState(root, file string) (State, error) {
 	place, err := fsx.Inside(root, file)
 	if err != nil {
@@ -63,8 +53,6 @@ func ReadState(root, file string) (State, error) {
 	return state, nil
 }
 
-// readIfThere reads the state file at place, which errors name file. found is false, without an error, when
-// there is none.
 func readIfThere(place, file string) (data []byte, found bool, err error) {
 	if data, found, err = fsx.ReadIfThere(place); err != nil {
 		return nil, false, errUnreadableState(file, err)
@@ -72,15 +60,12 @@ func readIfThere(place, file string) (data []byte, found bool, err error) {
 	return data, found, nil
 }
 
-// listedIn is the files a state document lists, each path with its hash as written, in the order of the text; or
-// what is wrong with the document.
 func listedIn(data []byte) (files manifest.Ordered[json.RawMessage], problem string) {
 	var document manifest.Ordered[json.RawMessage]
 	switch {
 	case !json.Valid(data):
 		return files, "it is not JSON"
 	case json.Unmarshal(data, &document) != nil, !isOne(document, "version"):
-		// JSON that is no object has no version either.
 		return files, "version must be 1"
 	}
 	listed, _ := document.Get("files")
@@ -90,22 +75,18 @@ func listedIn(data []byte) (files manifest.Ordered[json.RawMessage], problem str
 	return files, ""
 }
 
-// isOne reports whether the member of a document under name is the number 1, however it is written. A document
-// without the member, and a member that is no number, are not: null reads as 0, and nothing else reads at all.
 func isOne(document manifest.Ordered[json.RawMessage], name string) bool {
 	var number float64
 	written, _ := document.Get(name)
 	return json.Unmarshal(written, &number) == nil && number == 1
 }
 
-// isObject reports whether a JSON value is an object.
 func isObject(written json.RawMessage) bool {
 	return bytes.HasPrefix(bytes.TrimSpace(written), []byte("{"))
 }
 
 var sha256Hex = regexp.MustCompile(`^[a-f0-9]{64}$`)
 
-// ownedFile is one entry of a state file as an owned file: a path an asset may have, with a SHA-256.
 func ownedFile(file, path string, written json.RawMessage) (Owned, error) {
 	if _, err := targetPath(path); err != nil {
 		return Owned{}, inState(err, file)
@@ -117,7 +98,6 @@ func ownedFile(file, path string, written json.RawMessage) (Owned, error) {
 	return Owned{path, hash}, nil
 }
 
-// inState turns the refusal of a path into the state file's, which listed it. Any other error stays as it is.
 func inState(err error, file string) error {
 	var failure *diag.Error
 	if !errors.As(err, &failure) {
@@ -126,9 +106,6 @@ func inState(err error, file string) error {
 	return errStatePath(file, failure)
 }
 
-// Bytes is the state as its file holds it: the version, then the files in the order given, with two spaces of
-// indentation and a final line break. A path and a hash are written as fsx.Quoted writes them, so that a state
-// file a project has committed is not written anew for the same state.
 func (s State) Bytes() []byte {
 	var out bytes.Buffer
 	out.WriteString("{\n  \"version\": 1,\n  \"files\": {")
@@ -144,8 +121,6 @@ func (s State) Bytes() []byte {
 	out.WriteString("}\n}\n")
 	return out.Bytes()
 }
-
-// ---- errors ----
 
 const stateHint = "Restore it from version control. It records which map files assets:sync owns."
 

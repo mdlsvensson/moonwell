@@ -80,7 +80,6 @@ func TestSyncKeepsTheFlagWorldEditorSavedOnAnOwnedImport(t *testing.T) {
 	put(t, s.root, "assets/Textures/a.blp")
 	put(t, s.root, "assets/Textures/b.blp")
 	s.synced(noBlock)
-	// World Editor 3.00 saves the flag 13 as 29.
 	saved := []imp.Entry{{Flag: 29, Path: `Textures\a.blp`}, {Flag: 29, Path: `Textures\b.blp`}}
 	s.setImports(saved...)
 	if _, result := s.planned(noBlock); len(result.Changes) != 0 {
@@ -146,7 +145,6 @@ func TestTheFilesLibrariesShipAreSyncedLikeTheMapsOwnAndOwned(t *testing.T) {
 		t.Errorf("a second sync changes %q", names(again.Changes))
 	}
 
-	// Without the library, the next sync removes the file it owned.
 	s.synced(noBlock)
 	if s.inMap("war3mapImported/ui/frames.toc") != missing {
 		t.Error("the library's file is in the map after the library was dropped")
@@ -156,10 +154,6 @@ func TestTheFilesLibrariesShipAreSyncedLikeTheMapsOwnAndOwned(t *testing.T) {
 	}
 }
 
-// ---- a sync that does not finish ----
-
-// inTheWayOf puts a file where the folder of a new asset goes, which no check before the writes foresees: the
-// write of that asset fails.
 func inTheWayOf(t *testing.T, s *site, folder string) {
 	t.Helper()
 	put(t, s.mapDir, folder, "in the way")
@@ -200,9 +194,6 @@ func TestASyncThatCannotWriteOverAnOwnedFileUndoesItsWritesAndLeavesTheFileAsItW
 	s.unchanged(before, "a failed sync")
 }
 
-// changedMap is a site whose map a sync has written once and whose next sync changes it in every way: a file
-// replaced, a file added, a file removed and the index. The state file is the fifth and last thing that sync
-// writes.
 func changedMap(t *testing.T) (*site, *mapdir.Folder, *Result) {
 	t.Helper()
 	s := newSite(t)
@@ -224,7 +215,6 @@ func changedMap(t *testing.T) (*site, *mapdir.Folder, *Result) {
 	return s, folder, result
 }
 
-// mapIsChanged fails the test unless the map of a changedMap holds every change of its second sync.
 func (s *site) mapIsChanged() {
 	s.t.Helper()
 	if s.inMap("a.blp") != "second" || s.inMap("new.blp") != "asset" || s.inMap("dropped.blp") != missing {
@@ -232,8 +222,6 @@ func (s *site) mapIsChanged() {
 	}
 }
 
-// The state file is written last. When that write fails, every change of the map is made already. Each is put
-// back, and the state file is as it was.
 func TestASyncThatCannotWriteItsStateRestoresTheMapByteForByte(t *testing.T) {
 	s, folder, result := changedMap(t)
 	before := testkit.Snapshot(t, s.root)
@@ -251,12 +239,9 @@ func TestASyncThatCannotWriteItsStateRestoresTheMapByteForByte(t *testing.T) {
 	s.unchanged(before, "a failed sync")
 }
 
-// The state file is read once more just before it is written. When it cannot be read at that moment, here
-// because a folder has taken its place, every change of the map is made already. Each is put back.
 func TestASyncThatCannotReadItsStateJustBeforeWritingItRestoresTheMapByteForByte(t *testing.T) {
 	s, folder, result := changedMap(t)
 	before := testkit.Snapshot(t, s.mapDir)
-	// Before the fifth ask, the one for the state file, a folder takes the state file's place.
 	ctx := &countdown{Context: background, limit: never, before: map[int]func(){5: func() {
 		s.mapIsChanged()
 		if err := errors.Join(os.Remove(s.state), os.Mkdir(s.state, 0o777)); err != nil {
@@ -280,7 +265,6 @@ func TestAnInterruptedSyncWritesNothingAndOneInterruptedMidwayUndoesItsWrites(t 
 	put(t, s.root, "assets/a.blp")
 	put(t, s.root, "assets/b.blp")
 	before := testkit.Snapshot(t, s.root)
-	// One ask before each change, and the state file is the last: a.blp, b.blp, war3map.imp, the state.
 	const asks = 4
 	for limit := range asks {
 		folder, result := s.planned(noBlock)
@@ -311,8 +295,6 @@ func TestASyncWithNothingToWriteIsNotInterrupted(t *testing.T) {
 	}
 }
 
-// Another program gets between two writes: it replaces a.blp, which the sync has written, by a folder with a file
-// in it, and puts a file where b.blp goes. The sync stops at b.blp and cannot take a.blp out again.
 func TestAnUndoThatCannotRestoreAFileNamesTheFailureAndEveryFileItCouldNotRestore(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
@@ -358,7 +340,6 @@ func TestAnInterruptedSyncThatCannotUndoSaysSo(t *testing.T) {
 }
 
 func TestSyncRefusesAFileThatChangedAfterThePlanAndWritesOverNothing(t *testing.T) {
-	// What another program does to the map between the plan and the sync.
 	writes := func(name string, content ...string) func(*site) {
 		return func(s *site) { put(s.t, s.mapDir, name, content...) }
 	}
@@ -371,7 +352,7 @@ func TestSyncRefusesAFileThatChangedAfterThePlanAndWritesOverNothing(t *testing.
 	tests := []struct {
 		name    string
 		meddle  func(s *site)
-		changed string // the file the sync stops at
+		changed string
 	}{
 		{"an owned file the plan replaces, edited by hand", writes("replaced.blp", "edited by hand"), "replaced.blp"},
 		{"an owned file the plan removes, edited by hand", writes("dropped.blp", "edited by hand"), "dropped.blp"},
@@ -407,8 +388,6 @@ func TestSyncRefusesAFileThatChangedAfterThePlanAndWritesOverNothing(t *testing.
 	}
 }
 
-// Another program gets at the state file between the start of the sync and the ask before the state file, which
-// is the last. The sync has changed the map by then.
 func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.T) {
 	writes := func(s *site) { put(s.t, s.root, ".asset-state/map.w3x.json", "another program's") }
 	removes := func(s *site) {
@@ -418,11 +397,11 @@ func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.
 	}
 	tests := []struct {
 		name    string
-		owned   bool   // whether a sync before this one wrote a state file
-		asset   string // what assets/a.blp holds at the sync; "" for a project without the file
+		owned   bool
+		asset   string
 		meddle  func(s *site)
 		lastAsk int
-		state   string // what the state file holds afterwards
+		state   string
 	}{
 		{"changed before it is written", true, "second", writes, 2, "another program's"},
 		{"removed before it is written", true, "second", removes, 2, missing},
@@ -465,7 +444,6 @@ func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.
 	}
 }
 
-// A state file that holds the state already is not written, and so it is not looked at again.
 func TestAStateFileThatNeedsNoWriteIsNotLookedAtAgain(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
@@ -486,9 +464,6 @@ func TestAStateFileThatNeedsNoWriteIsNotLookedAtAgain(t *testing.T) {
 	}
 }
 
-// A sync that leaves nothing owned, and finds no state file when it begins, has no state file to write or to
-// remove: it does not look for one again. A state file that another program makes while the map is written is
-// not guarded, and is left as that program wrote it.
 func TestAStateFileMadeDuringASyncThatOwnsNothingAndFoundNoneIsLeftAsItIs(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
@@ -501,11 +476,9 @@ func TestAStateFileMadeDuringASyncThatOwnsNothingAndFoundNoneIsLeftAsItIs(t *tes
 		t.Fatalf("the changes are %q and the state owns %d files, want the owned file removed and nothing owned",
 			got, len(result.State.Files))
 	}
-	// The state file the plan was made from is gone by the time the sync begins.
 	if err := os.Remove(s.state); err != nil {
 		t.Fatal(err)
 	}
-	// Between the two writes of the map, another program makes a state file.
 	ctx := &countdown{Context: background, limit: never, before: map[int]func(){2: func() {
 		put(t, s.root, ".asset-state/map.w3x.json", "another program's")
 	}}}
@@ -520,9 +493,6 @@ func TestAStateFileMadeDuringASyncThatOwnsNothingAndFoundNoneIsLeftAsItIs(t *tes
 	}
 }
 
-// A file named .asset-state stands on the way to the state file: no state file is there, on every system, so the
-// project owns nothing and plans, and the sync that cannot write its state names the state file from the
-// project folder.
 func TestAFileNamedAssetStateOwnsNothingAndStopsASyncByTheStateFilesName(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
@@ -552,8 +522,6 @@ func TestSyncRefusesAStateFileItCannotReadBeforeItWritesAnything(t *testing.T) {
 	s.unchanged(before, "a refused sync")
 }
 
-// Collect refuses an asset inside another. Given by another caller, the two reach a plan, which the folder refuses
-// to write, before its first write: that caller's bug.
 func TestSyncWritesNothingOfAPlanWithAnAssetInsideAnother(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
@@ -573,8 +541,6 @@ func TestSyncWritesNothingOfAPlanWithAnAssetInsideAnother(t *testing.T) {
 	s.unchanged(before, "a refused sync")
 }
 
-// The folder a plan was made from holds what the plan read, and that is what each file is checked against before
-// it is written over. Another folder, even one opened on the same map, does not: the edited file would be lost.
 func TestSyncRefusesAnotherFolderThanTheOneThePlanWasMadeFrom(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp", "first")
@@ -592,8 +558,6 @@ func TestSyncRefusesAnotherFolderThanTheOneThePlanWasMadeFrom(t *testing.T) {
 	s.unchanged(before, "a refused sync")
 }
 
-// A sync writes the assets' changes and no other. A view that holds a change of another area can be planned on,
-// as a build does, and is refused by Sync: the other area's change would be written into the source map too.
 func TestSyncRefusesAFolderThatCarriesPlannedChanges(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")

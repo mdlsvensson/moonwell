@@ -15,14 +15,10 @@ import (
 
 type namedSource struct{ name, source string }
 
-// nested is `(((1)))` with the given number of brackets, as the argument of a call statement.
 func nested(brackets int) string {
 	return "function config() Capture(" + strings.Repeat("(", brackets) + "1" + strings.Repeat(")", brackets) + ") end"
 }
 
-// cornerSources are sources at the edges of what the tokenizer, the scanners and the line reader take: line breaks
-// of every kind, escapes at the end of a string or of the source, numerals that almost are, bytes that are not
-// text, and nesting on both sides of the limit.
 var cornerSources = []namedSource{
 	{"empty", ""},
 	{"only white space", " \t\v\f\r\n"},
@@ -56,7 +52,6 @@ var cornerSources = []namedSource{
 	{"globals inside brackets and blocks",
 		"t = { A = 1 }\nf(\nB = 2)\nwhile x do\nC = 3\nend\nrepeat\nD = 4\nuntil E\nF = 5"},
 	{"locals of every form", "local A, B\nlocal function C() end\nlocal function\nlocal\nA = 1\nB = 2\nC = 3\nD = 4"},
-	// A string that says `local` or `function` is no keyword.
 	{"a string that holds a keyword",
 		"print 'local' function F() end\nlocal 'function' G\nG = 1\nf [[local]] function H() end"},
 	{"ends without a block", "end end\nA = 1\n) ]\nB = 2"},
@@ -99,8 +94,6 @@ var cornerSources = []namedSource{
 		"function a() X(Player(1e2), Player(-0), Player(0x7fffffff), Player(1e30), Player (3)) end"},
 }
 
-// luaFilesOfTheCheckout are the two scripts World Editor saved, which are fixtures, and the runtime, which is the
-// Lua file that every build bundles. Each has its path below the root, with "/", for a name.
 func luaFilesOfTheCheckout(t *testing.T) []namedSource {
 	t.Helper()
 	var sources []namedSource
@@ -118,8 +111,6 @@ func luaFilesOfTheCheckout(t *testing.T) []namedSource {
 	return sources
 }
 
-// literal is what the two literal helpers make of some tokens: of all the tokens of a source, or of one argument
-// of a call.
 type literal struct {
 	Number   float64
 	IsNumber bool
@@ -127,7 +118,6 @@ type literal struct {
 	IsPlayer bool
 }
 
-// literalOf asks the two helpers.
 func literalOf(tokens []Token) literal {
 	var made literal
 	made.Number, made.IsNumber = LiteralNumber(tokens)
@@ -135,7 +125,6 @@ func literalOf(tokens []Token) literal {
 	return made
 }
 
-// String is the literal as a recording holds it; "" for tokens that are neither a number nor a player.
 func (l literal) String() string {
 	var parts []string
 	if l.IsNumber {
@@ -147,14 +136,11 @@ func (l literal) String() string {
 	return strings.Join(parts, ", ")
 }
 
-// refusedAt is what an error of Functions says: its file, its words, its hint and its place. An error that is
-// no *diag.Error has its text for a message and nothing else.
 type refusedAt struct {
 	File, Message, Hint string
 	Line, Column        int
 }
 
-// scanned is what the tokenizer, every scanner and the two literal helpers make of one source.
 type scanned struct {
 	Tokens    []Token
 	Fault     *Fault
@@ -162,15 +148,11 @@ type scanned struct {
 	Globals   []string
 	Map       MapGlobals
 	Functions []Function
-	// Refusal is what Functions says of a source it refuses; its message is empty for a source that is read.
-	Refusal refusedAt
-	// Whole is the literal of all the tokens, and Arguments the literal of each argument of each call of each
-	// function, in their order.
+	Refusal   refusedAt
 	Whole     literal
 	Arguments []literal
 }
 
-// scan gives the source to the tokenizer and to every scanner, and what they read to the literal helpers.
 func scan(source string) scanned {
 	made := scanned{Requires: Requires(source), Globals: TopLevelGlobals(source), Map: ReadMapGlobals(source)}
 	made.Tokens, made.Fault = Tokenize(source)
@@ -194,11 +176,8 @@ func scan(source string) scanned {
 	return made
 }
 
-// longest is the most tokens, and the most bytes of a source, that a recording writes out; of more it holds the
-// digest.
 const longest = 80
 
-// rawsOf is the source text of each token, with a space between two.
 func rawsOf(tokens []Token) string {
 	var raws []string
 	for _, token := range tokens {
@@ -207,8 +186,6 @@ func rawsOf(tokens []Token) string {
 	return strings.Join(raws, " ")
 }
 
-// tokenLines is one line for each token: its line, its bytes, its kind and its source text as Go quotes a
-// string, and its text where that is another, and whether it has an escape.
 func tokenLines(tokens []Token) string {
 	kinds := map[Kind]string{NameToken: "name", NumberToken: "number", StringToken: "string", SymbolToken: "symbol"}
 	var lines strings.Builder
@@ -225,7 +202,6 @@ func tokenLines(tokens []Token) string {
 	return lines.String()
 }
 
-// shownEach is each value as testkit.Shown writes it, with a space between two.
 func shownEach(values []string) string {
 	var shown []string
 	for _, value := range values {
@@ -234,10 +210,6 @@ func shownEach(values []string) string {
 	return strings.Join(shown, " ")
 }
 
-// text is the scan of a source as a recording holds it: a line or a few for what each scanner made. A source
-// or a list of tokens that is long stands as its digest. Every value that comes from the source is quoted or
-// written through testkit.Shown, so that the recording is text whatever bytes the source holds, and no line
-// ends in a space.
 func (s scanned) text(name, source string) string {
 	var out strings.Builder
 	fmt.Fprintf(&out, "== %s\n", testkit.Shown(name))
@@ -297,7 +269,6 @@ func (s scanned) text(name, source string) string {
 	return out.String() + "\n"
 }
 
-// scans is the recording of what scan makes of each source.
 func scans(sources []namedSource) []byte {
 	var text strings.Builder
 	for _, c := range sources {
@@ -306,12 +277,6 @@ func scans(sources []namedSource) []byte {
 	return []byte(text.String())
 }
 
-// TestTheScannersAreAsRecorded holds what the tokenizer, the four scanners and the two literal helpers make of
-// every corner source to a recording: one file for a table that would be several hundred rows. A change of
-// what any of them reads is a line of a diff that names the source.
-//
-// MOONWELL_RECORD=1 go test -run TestTheScannersAreAsRecorded ./internal/war3/lua writes the recording anew and
-// fails; a run without the variable then passes.
 func TestTheScannersAreAsRecorded(t *testing.T) {
 	testkit.Recorded(t, "corners.txt", scans(cornerSources))
 }

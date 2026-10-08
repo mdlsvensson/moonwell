@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-// handWritten is the two files that a contributor writes by hand, each with how its text is read: a row of
-// these tests holds for both, since one reader reads them.
 var handWritten = map[string]func(text string) error{
 	extrasPath: func(text string) error {
 		_, err := decodeExtras([]byte(text))
@@ -18,21 +16,17 @@ var handWritten = map[string]func(text string) error{
 	},
 }
 
-// An editor on Windows saves a file with a byte order mark at its start: the file is read as it is without one.
 func TestAHandWrittenFileMayStartWithAByteOrderMark(t *testing.T) {
 	for path, decode := range handWritten {
 		if err := decode("\xEF\xBB\xBF{}"); err != nil {
 			t.Errorf("%s with a byte order mark: %v", path, err)
 		}
-		// The mark is dropped at the start alone.
 		if err := decode("{}\xEF\xBB\xBF"); err == nil || !strings.HasPrefix(err.Error(), path+": ") {
 			t.Errorf("%s with a byte order mark at its end: got %v, want the file refused by its path", path, err)
 		}
 	}
 }
 
-// A key that an object has twice is refused, whichever object of the file it is: one of the two values would
-// be read and the other not, and nothing would say which.
 func TestAHandWrittenFileIsRefusedForAKeyThatStandsTwice(t *testing.T) {
 	for _, c := range []struct{ path, text, key string }{
 		{extrasPath, `{"globals": ["a"], "removed": ["b"], "globals": ["c"]}`, "globals"},
@@ -51,7 +45,6 @@ func TestAHandWrittenFileIsRefusedForAKeyThatStandsTwice(t *testing.T) {
 		}
 		contains(t, err.Error(), c.path+": ", `"`+c.key+`"`, "twice")
 	}
-	// A key that two objects have once each stands once.
 	for path, text := range map[string]string{
 		extrasPath: `{"functions": [{"name": "A", "params": [{"name": "a", "type": "b"}, {"name": "c", "type": "d"}], ` +
 			`"returns": "e"}, {"name": "B", "params": [], "returns": "e"}]}`,
@@ -63,7 +56,6 @@ func TestAHandWrittenFileIsRefusedForAKeyThatStandsTwice(t *testing.T) {
 	}
 }
 
-// A key that the generator does not read is refused, whichever object has it, with the key.
 func TestAHandWrittenFileIsRefusedForAKeyThatTheGeneratorDoesNotRead(t *testing.T) {
 	for _, c := range []struct{ path, text, key string }{
 		{extrasPath, `{"functions": [], "more": 1}`, "more"},
@@ -71,7 +63,6 @@ func TestAHandWrittenFileIsRefusedForAKeyThatTheGeneratorDoesNotRead(t *testing.
 		{extrasPath, `{"functions": [{"name": "A", "params": [{"name": "a", "type": "b", "array": 0}], ` +
 			`"returns": "b"}]}`, "array"},
 		{overridesPath, `{"names": {}, "renamed": {}}`, "renamed"},
-		// The value of such a key is not read: the key is refused, and not its number out of range.
 		{overridesPath, `{"zzz": 1e999}`, "zzz"},
 	} {
 		err := handWritten[c.path](c.text)
@@ -83,9 +74,6 @@ func TestAHandWrittenFileIsRefusedForAKeyThatTheGeneratorDoesNotRead(t *testing.
 	}
 }
 
-// A text that is no JSON, or more than one value, is refused with the file and the decoder's reason. A value of
-// another kind than its place takes is named by its place, key by key as the file writes it and an entry of a
-// list by its number, counted from 0, and by its kind: the refusal names no type of this program.
 func TestAHandWrittenFileIsRefusedForATextThatDoesNotFit(t *testing.T) {
 	for _, c := range []struct{ path, text, words string }{
 		{extrasPath, `{"functions": [{"name": "Fo`, "unexpected EOF"},

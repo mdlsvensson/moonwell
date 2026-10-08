@@ -12,21 +12,15 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// File is the file a library describes its own layout with, at its root.
 const File = "moonwell-library.json"
 
-// Described is what a library says about itself. A nil field is not given. Both are folders inside the library,
-// with "/".
 type Described struct {
-	Dir    *string // the folder module names start from
-	Assets *string // the folder whose files the map imports
+	Dir    *string
+	Assets *string
 }
 
-// knownKeys is the keys a library's file may have.
 var knownKeys = []string{"dir", "assets"}
 
-// parseFile reads a library's moonwell-library.json. present is false for a library without one, which ships
-// nothing but modules from its root. where names the file in errors: a path, or an address for a download.
 func parseFile(key string, data []byte, present bool, where string) (Described, error) {
 	if !present {
 		return Described{}, nil
@@ -48,8 +42,6 @@ func parseFile(key string, data []byte, present bool, where string) (Described, 
 	return described, nil
 }
 
-// membersOf is the members of the JSON object that a library's file holds, each value as the file writes it. A
-// byte order mark at the start is read past.
 func membersOf(key string, data []byte, where string) (map[string]json.RawMessage, error) {
 	text := fsx.WithoutMark(data)
 	if !utf8.Valid(text) || !json.Valid(text) {
@@ -62,7 +54,6 @@ func membersOf(key string, data []byte, where string) (map[string]json.RawMessag
 	return members, nil
 }
 
-// firstUnknown is the first key by bytes that a library's file has and may not have.
 func firstUnknown(members map[string]json.RawMessage) (name string, found bool) {
 	for _, name := range slices.Sorted(maps.Keys(members)) {
 		if !slices.Contains(knownKeys, name) {
@@ -72,8 +63,6 @@ func firstUnknown(members map[string]json.RawMessage) (name string, found bool) 
 	return "", false
 }
 
-// folderOf is the folder a library's file names under name; nil when the file has no such key. A value that is no
-// folder inside the library is refused, and shown as the file writes it.
 func folderOf(key, where string, members map[string]json.RawMessage, name string) (*string, error) {
 	written, given := members[name]
 	if !given {
@@ -86,8 +75,6 @@ func folderOf(key, where string, members map[string]json.RawMessage, name string
 	return &folder, nil
 }
 
-// insideLibrary reports whether path, written with "/", is a way to a file or a folder inside a library by plain
-// names: it has no "\" and no ":", and no segment that is empty, "." or "..". So it does not start with "/".
 func insideLibrary(path string) bool {
 	if strings.ContainsAny(path, `\:`) {
 		return false
@@ -100,8 +87,6 @@ func insideLibrary(path string) bool {
 	return true
 }
 
-// objectOf reads a JSON value as an object: its members, each value as it is written. Of a member that is written
-// twice, the last counts. It is false for a value of another kind. The value is valid JSON, or none at all.
 func objectOf(value []byte) (members map[string]json.RawMessage, isObject bool) {
 	if !bytes.HasPrefix(bytes.TrimLeft(value, " \t\r\n"), []byte("{")) {
 		return nil, false
@@ -112,7 +97,6 @@ func objectOf(value []byte) (members map[string]json.RawMessage, isObject bool) 
 	return members, true
 }
 
-// stringOf reads a JSON value as a string; false for a value of another kind, and for none at all.
 func stringOf(value json.RawMessage) (text string, isString bool) {
 	if !bytes.HasPrefix(value, []byte(`"`)) {
 		return "", false
@@ -123,7 +107,6 @@ func stringOf(value json.RawMessage) (text string, isString bool) {
 	return text, true
 }
 
-// compact is a JSON value in the characters it is written in, without the white space between its parts.
 func compact(value json.RawMessage) string {
 	var out bytes.Buffer
 	if err := json.Compact(&out, value); err != nil {
@@ -132,11 +115,8 @@ func compact(value json.RawMessage) string {
 	return out.String()
 }
 
-// ---- errors ----
-
 const reportHint = "Report it to the library's author, or use another tag of the library."
 
-// errInFile is a refusal of a library's file: problem follows the library and the file's name.
 func errInFile(key, where, problem, hint string) error {
 	return &diag.Error{Msg: "Library " + key + ": " + File + " " + problem, File: where, Hint: hint}
 }

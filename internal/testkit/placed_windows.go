@@ -2,8 +2,6 @@ package testkit
 
 import "syscall"
 
-// shortSpelling is the folder as Windows writes it with its short names, such as C:\Users\LONGNA~1 for a name
-// of more than eight letters; "" for a folder that is not there or of a volume without short names.
 func shortSpelling(folder string) string {
 	path, err := syscall.UTF16PtrFromString(folder)
 	if err != nil {

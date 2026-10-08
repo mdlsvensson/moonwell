@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-// holdForReading opens the file at path the way a program does that lets others read it, but not write or remove
-// it. The file is let go when the test ends.
 func holdForReading(t *testing.T, path string) {
 	t.Helper()
 	name, err := syscall.UTF16PtrFromString(path)
@@ -34,7 +32,6 @@ func TestJournalUndoLeavesAFileThatAFailedRemoveDidNotChange(t *testing.T) {
 	if journal.Len() != 1 {
 		t.Errorf("the journal has touched %d files, want 1: a failed remove is a touch", journal.Len())
 	}
-	// Putting the file back is a write, which the program that holds it refuses, but there is nothing to put back.
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
 		t.Errorf("unrestored = %v, want none: the file holds what it held", unrestored)
 	}

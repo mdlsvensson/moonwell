@@ -27,8 +27,6 @@ func TestMacrosOfPointsYueAtItsFolderAndHashesTheModule(t *testing.T) {
 	if MacrosFile != ".moonwell/yue/moonwell/macros.yue" {
 		t.Errorf("MacrosFile = %s", MacrosFile)
 	}
-	// The compiler puts the module's name in place of the "?", with the system's separator for its dot, and tries
-	// the pattern with .yue: that is the file RefreshMacros writes.
 	found := strings.Replace(search.path, "?.lua", "moonwell"+string(filepath.Separator)+"macros.yue", 1)
 	if written := filepath.Join(root, filepath.FromSlash(MacrosFile)); found != wantFile || written != wantFile {
 		t.Errorf("the search path %s finds %s, and the macro module is written to %s, want %s for both", search.path, found, written, wantFile)
@@ -96,7 +94,6 @@ func TestRefreshMacrosRefusesALinkOnTheWayToTheFile(t *testing.T) {
 		if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 			t.Fatal(err)
 		}
-		// The test keeps the folder the link leads to, to see that nothing was written into it.
 		testkit.LinkDir(t, elsewhere, at)
 		wrote, err := RefreshMacros(root)
 		failure := asError(t, err, link)

@@ -33,7 +33,6 @@ func TestReadArchiveSkipsFolderEntriesAsGitHubsArchivesHaveThem(t *testing.T) {
 	if err != nil || !slices.Equal(listing(files), []string{"src/greet.lua=return {}"}) {
 		t.Fatalf("files = %q, %v", listing(files), err)
 	}
-	// An archive of folders alone, and one of nothing, has a commit and no files.
 	for _, empty := range [][]testkit.ZipEntry{entries("lib/", "", "other/", ""), nil} {
 		commit, files, err := readArchive(testkit.Zip(t, commitA, empty...))
 		if err != nil || commit != commitA || len(files) != 0 {
@@ -77,12 +76,12 @@ func TestTheCommitIsTheCommentWithoutTheASCIIWhiteSpaceAroundIt(t *testing.T) {
 	}{
 		{commitB, true},
 		{" \t\n\v\f\r" + commitB + "\r\n \t\v\f", true},
-		{"\xc2\xa0" + commitB, false},                         // a no-break space
-		{commitB + "\xe2\x80\xa8", false},                     // a line separator
-		{"\xEF\xBB\xBF" + commitB, false},                     // a byte order mark
-		{commitB[:20] + " " + commitB[20:], false},            // white space inside
-		{strings.Replace(commitB, "c", "g", 1), false},        // no hexadecimal digit
-		{strings.Replace(commitB, "7", "\xd9\xa7", 1), false}, // a digit outside ASCII
+		{"\xc2\xa0" + commitB, false},
+		{commitB + "\xe2\x80\xa8", false},
+		{"\xEF\xBB\xBF" + commitB, false},
+		{commitB[:20] + " " + commitB[20:], false},
+		{strings.Replace(commitB, "c", "g", 1), false},
+		{strings.Replace(commitB, "7", "\xd9\xa7", 1), false},
 	}
 	for _, c := range cases {
 		commit, _, err := readArchive(testkit.Zip(t, c.comment, entries("lib/a.lua", "")...))
@@ -122,7 +121,6 @@ func TestFilesHashDependsOnPathsAndContentsNotOrder(t *testing.T) {
 }
 
 func TestFilesHashListsTheFilesInByteOrder(t *testing.T) {
-	// U+FFFD is before U+1F600 by bytes, and a capital before a small letter.
 	files := filesOfTest(beyond+".lua", "1", "b.lua", "2", replacement+".lua", "3", "B.lua", "4")
 	var listed strings.Builder
 	for _, f := range []file{files[3], files[1], files[2], files[0]} {
@@ -154,8 +152,6 @@ func TestArchiveURLEncodesTheTag(t *testing.T) {
 	}
 }
 
-// Each part of a tag between two "/" is written as a segment of an address's path is: the characters a segment
-// may hold stay, and the others become escapes.
 func TestATagKeepsTheCharactersASegmentOfAPathMayHold(t *testing.T) {
 	cases := []struct{ tag, want string }{
 		{"moonwell@0.4.0", "moonwell@0.4.0"},
@@ -171,8 +167,6 @@ func TestATagKeepsTheCharactersASegmentOfAPathMayHold(t *testing.T) {
 	}
 }
 
-// served is a stand-in for the network that answers every address with one status and body, and keeps the
-// addresses asked.
 type served struct {
 	status int
 	body   []byte
@@ -192,7 +186,6 @@ const (
 	exampleURL   = "https://codeload.github.com/owner/lib/zip/refs/tags/v1/x"
 )
 
-// downloadExample downloads the tag v1/x of owner/lib for the library ex.
 func downloadExample(network *served) (string, []file, error) {
 	return downloadTag(background, network.fetch, "ex", "owner/lib", "v1/x", manifestFile)
 }
@@ -255,8 +248,6 @@ func TestDownloadTagRefusesADownloadThatFailsOrIsNoArchiveOfATag(t *testing.T) {
 	}
 }
 
-// unsafePaths is paths of files inside an archive's top folder that would not stay inside a library's folder, or
-// that a folder cannot hold on every system.
 var unsafePaths = []string{"../x.lua", "a/../../x.lua", "a/./x.lua", "./x.lua", "a//x.lua", "/x.lua", `a\x.lua`, "C:/x.lua", "a:b.lua", ".."}
 
 func TestDownloadTagRefusesAPathThatWouldNotStayInsideTheLibrary(t *testing.T) {
@@ -269,15 +260,12 @@ func TestDownloadTagRefusesAPathThatWouldNotStayInsideTheLibrary(t *testing.T) {
 			t.Errorf("%s: %q, %q, %+v", path, commit, listing(files), failure)
 		}
 	}
-	// The name of the top folder is dropped, whatever it is.
 	network := &served{status: 200, body: testkit.Zip(t, commitA, entries("../a.lua", "", "../b/c.lua", "")...)}
 	if _, files, err := downloadExample(network); err != nil || !slices.Equal(listing(files), []string{"a.lua=", "b/c.lua="}) {
 		t.Errorf("a top folder named ..: %q, %v", listing(files), err)
 	}
 }
 
-// The archive reader can be set to report an archive with a name that leaves its folder, and still reads it: the
-// name is refused as it is without that setting.
 func TestAnArchiveTheReaderReportsAsInsecureIsRefusedByThePathItHolds(t *testing.T) {
 	t.Setenv("GODEBUG", "zipinsecurepath=0")
 	archive := testkit.Zip(t, commitA, entries("lib/a.lua", "a", "lib/../../x.lua", "x")...)

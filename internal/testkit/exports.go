@@ -7,17 +7,11 @@ import (
 	"testing"
 )
 
-// Export is the game's files as one environment variable names them: a folder they were exported into, or the
-// list of their names. A test reads them and never writes them.
 type Export struct {
 	t    testing.TB
-	root string // "" when the test was skipped or failed for want of the export
+	root string
 }
 
-// NeedExport returns the game's files that the environment variable names: MOONWELL_GAME_SCRIPTS and
-// MOONWELL_GAME_DATA each name a folder, MOONWELL_GAME_LISTFILE a file. They are on the maintainer's machine
-// and nowhere else, so without the variable it skips the test, or fails it when MOONWELL_REQUIRE_EXPORTS=1. A
-// variable that names nothing fails the test.
 func NeedExport(t testing.TB, variable string) Export {
 	t.Helper()
 	root := os.Getenv(variable)
@@ -36,9 +30,6 @@ func NeedExport(t testing.TB, variable string) Export {
 	return Export{t, root}
 }
 
-// Path is the export itself, or what the names lead to below it: each name is an entry of the folder before it,
-// found without regard to letter case, and the path spells it as the folder does. It fails the test, and
-// returns "", when a folder has no entry of a name or more than one.
 func (e Export) Path(below ...string) string {
 	e.t.Helper()
 	path := e.root
@@ -51,8 +42,6 @@ func (e Export) Path(below ...string) string {
 	return path
 }
 
-// Entries is the names of the entries of the folder that the names lead to, as the folder spells them and in
-// the order of their bytes.
 func (e Export) Entries(below ...string) []string {
 	e.t.Helper()
 	folder := e.Path(below...)
@@ -71,8 +60,6 @@ func (e Export) Entries(below ...string) []string {
 	return names
 }
 
-// entry is the path of the folder's one entry with the name, whatever the letter case of either. It fails the
-// test, and returns "", when the folder has none or several.
 func (e Export) entry(folder, name string) string {
 	e.t.Helper()
 	entries, err := os.ReadDir(folder)

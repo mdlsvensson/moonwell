@@ -19,13 +19,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// The tests of this file are about a project's objects: how the manifest merges the files under objects/, what
-// objects:eval prints and objects:check says, and how far check and dev get with the ids module. Each runs the
-// real pkl in a project that init made, and takes the time that takes. None needs the compiler: where a command
-// asks for it, the world lets pkl alone run, and the command fails at the compiler's download.
-
-// emptyObjectProject is a project that init made, without its object files and its ids module. Without wiring,
-// its manifest does not merge the files under objects/ either.
 func emptyObjectProject(t *testing.T, wiring bool) string {
 	t.Helper()
 	root := newProject(t, "map")
@@ -43,14 +36,11 @@ func emptyObjectProject(t *testing.T, wiring bool) string {
 	return root
 }
 
-// objectFile is a file under objects/ with this body.
 func objectFile(body string) string { return "amends \"@moonwell/ObjectFile.pkl\"\n\n" + body + "\n" }
 
 var (
-	captain = objectFile(`units { ["captain"] { id = "h000"; base = "hfoo"; name = "Captain" } }`)
-	paladin = objectFile(`heroes { ["paladin"] { id = "H000"; base = "Hpal"; properties { ["uhpm"] = 900 } } }`)
-	// onlyCaptain and bothObjects are the ids module of a project with the captain, and with the paladin too;
-	// noObjects is that of a project without objects.
+	captain        = objectFile(`units { ["captain"] { id = "h000"; base = "hfoo"; name = "Captain" } }`)
+	paladin        = objectFile(`heroes { ["paladin"] { id = "H000"; base = "Hpal"; properties { ["uhpm"] = 900 } } }`)
 	onlyCaptain, _ = objects.RenderIDs([]objects.Resolved{{Category: "units", Key: "captain", ID: "h000"}})
 	bothObjects, _ = objects.RenderIDs([]objects.Resolved{
 		{Category: "heroes", Key: "paladin", ID: "H000"}, {Category: "units", Key: "captain", ID: "h000"},
@@ -58,17 +48,14 @@ var (
 	noObjects, _ = objects.RenderIDs(nil)
 )
 
-// idsLine is the line objects:check says of the ids module.
 func idsLine(status string) string { return "  " + objects.IDsFile + ": " + status }
 
-// writeObjects gives the project a hero in one file and a unit in another, two folders down.
 func writeObjects(t *testing.T, root string) {
 	t.Helper()
 	write(t, root, "objects/heroes.pkl", paladin)
 	write(t, root, "objects/human/barracks/units.pkl", captain)
 }
 
-// evaluatePkl has the real pkl print a manifest of root as JSON.
 func evaluatePkl(t *testing.T, root, file string) env.RunResult {
 	t.Helper()
 	args := []string{"eval", "--format", "json", "--project-dir", ".", file}
@@ -79,7 +66,6 @@ func evaluatePkl(t *testing.T, root, file string) env.RunResult {
 	return result
 }
 
-// jsonObject is a JSON object as Go values.
 func jsonObject(t *testing.T, text string) map[string]any {
 	t.Helper()
 	var value map[string]any
@@ -89,7 +75,6 @@ func jsonObject(t *testing.T, text string) map[string]any {
 	return value
 }
 
-// assertEmptyObjects fails unless value has every category, each without an object.
 func assertEmptyObjects(t *testing.T, value map[string]any) {
 	t.Helper()
 	if len(value) != len(manifest.Categories) {
@@ -101,8 +86,6 @@ func assertEmptyObjects(t *testing.T, value map[string]any) {
 		}
 	}
 }
-
-// ---- how the manifest merges the files under objects/ ----
 
 func TestPklObjectsNestedMergeSources(t *testing.T) {
 	root := emptyObjectProject(t, true)
@@ -168,9 +151,6 @@ func TestPklObjectsInvalidObjectNamesOwnFile(t *testing.T) {
 	contains(t, r.Stderr, "objects/bad.pkl")
 }
 
-// ---- objects:eval ----
-
-// The lock file is that of a build that is long gone: objects:eval neither minds it nor takes it over.
 func TestPklObjectsEvalStdoutOnlyWithoutCompilerOrLock(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	writeObjects(t, root)
@@ -196,8 +176,6 @@ func TestPklObjectsEvalStdoutOnlyWithoutCompilerOrLock(t *testing.T) {
 	if hero["source"] != "objects/heroes.pkl" || hero["fields"].([]any)[0].(map[string]any)["rawcode"] != "uhpm" {
 		t.Fatal(hero)
 	}
-	// The whole line: the JSON is all that is printed, on the stream for other programs, as one text that the
-	// program ends with a line break.
 	r := okWithPklAlone(t, root, "objects:eval")
 	if r.output != "" || r.stdout != printed[0] || !strings.HasPrefix(r.stdout, "{\n  \"heroes\": {") ||
 		!strings.HasSuffix(r.stdout, "}") {
@@ -209,7 +187,6 @@ func TestPklObjectsEvalStdoutOnlyWithoutCompilerOrLock(t *testing.T) {
 func TestPklObjectsEvalInvalidStderrOnly(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	write(t, root, "objects/units.pkl", objectFile(`units { ["captain"] { id = "h000"; base = "zzzz" } }`))
-	// "\xe2\x80\xba" is the mark between the place and the message.
 	r := failsWithPklAlone(t, root, []string{
 		"error: objects/units.pkl \xe2\x80\xba units[\"captain\"].base: 'zzzz' is not a standard unit.",
 	}, "objects:eval")
@@ -234,8 +211,6 @@ func TestPklObjectsCommandsWithoutObjectsFolder(t *testing.T) {
 	sameFiles(t, before, testkit.Snapshot(t, root), "empty objects")
 }
 
-// The two commands open the source map as a build does, so they need its folder also in a project whose
-// manifest has no objects.
 func TestPklObjectsCommandsNeedTheSourceMapAlsoWithoutObjects(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	remove(t, root, "maps/map.w3x")
@@ -252,8 +227,6 @@ func TestPklObjectsCommandsNeedTheSourceMapAlsoWithoutObjects(t *testing.T) {
 		}
 	}
 }
-
-// ---- objects:check ----
 
 func TestPklObjectsCheckMissingStaleCurrent(t *testing.T) {
 	root := emptyObjectProject(t, true)
@@ -287,7 +260,6 @@ func TestPklObjectsCheckMissingStaleCurrent(t *testing.T) {
 	}
 }
 
-// Beside a build that runs, the two commands go on: they read the project and write nothing.
 func TestPklObjectsCommandsTakeNoBuildLock(t *testing.T) {
 	root := newProject(t, "map")
 	holdBuildLock(t, root)
@@ -302,10 +274,6 @@ func TestPklObjectsCommandsTakeNoBuildLock(t *testing.T) {
 	}
 }
 
-// ---- check and dev, as far as the ids module ----
-
-// The world lets pkl alone run, so a check that gets as far as the compiler fails at its download, with the
-// refusal as the failure's cause.
 func TestPklCheckRefusesMissingStaleBeforeCompile(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	writeObjects(t, root)
@@ -323,7 +291,6 @@ func TestPklCheckRefusesMissingStaleBeforeCompile(t *testing.T) {
 		read(t, root, objects.IDsFile) != onlyCaptain {
 		t.Fatal(failure)
 	}
-	// A checkout with CRLF line endings has the module that the manifest renders.
 	write(t, root, objects.IDsFile, strings.ReplaceAll(bothObjects, "\n", "\r\n"))
 	_, err = commandIn(t, background, e, "check")
 	failure = asError(t, err, "the compiler")
@@ -338,10 +305,6 @@ func TestPklCheckRefusesMissingStaleBeforeCompile(t *testing.T) {
 	contains(t, diag.Format(err), "objects/bad.pkl")
 }
 
-// devIn runs dev in the world e beside the test, at a pace of milliseconds, until the test ends: it is then told
-// to stop, and a dev that has not ended half a minute later fails the test. until waits for done to hold,
-// however long the machine takes over it within a minute, and fails the test with what dev logged when it does
-// not, or when dev ends first.
 func devIn(t *testing.T, e *env.Env, log *testkit.Recorder) (until func(what string, done func() bool)) {
 	t.Helper()
 	ctx, stop := context.WithCancel(background)
@@ -370,8 +333,6 @@ func devIn(t *testing.T, e *env.Env, log *testkit.Recorder) (until func(what str
 	}
 }
 
-// Each of dev's checks writes the ids module before it asks for the compiler: the world lets pkl alone run, so
-// every check fails at the compiler's download, and the module is current all the same.
 func TestPklDevRefreshesGeneratedObjectsOnChanges(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	write(t, root, "objects/human/barracks/units.pkl", captain)
@@ -385,7 +346,6 @@ func TestPklDevRefreshesGeneratedObjectsOnChanges(t *testing.T) {
 		t.Fatal("dev's first check did not write the ids module")
 	}
 	write(t, root, "objects/heroes.pkl", paladin)
-	// The module is read as it is on disk, and a look may find it while dev writes it.
 	until("an ids module with both objects", func() bool {
 		data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(objects.IDsFile)))
 		return err == nil && string(data) == bothObjects

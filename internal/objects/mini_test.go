@@ -5,11 +5,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/objects"
 )
 
-// mini is the metadata the tests resolve against.
 var mini = miniMetadata()
 
-// metaField is a field of the miniature metadata; the defaults describe an unleveled int field with no
-// restrictions, and change overrides them.
 func metaField(id, name string, change func(*objects.FieldMeta)) objects.FieldMeta {
 	field := objects.FieldMeta{
 		ID: id, Name: name, Label: name, Category: "stats", Type: "int", Storage: "int",
@@ -21,8 +18,6 @@ func metaField(id, name string, change func(*objects.FieldMeta)) objects.FieldMe
 	return field
 }
 
-// miniMetadata is hand-written miniature metadata, shaped like metadata.json, so that resolution tests do not
-// change when the game data is regenerated. Labels and rawcodes follow the game's where they exist.
 func miniMetadata() *objects.Metadata {
 	unitUses := []string{"unit", "hero", "building"}
 	levels := func(n int) *int { return &n }
@@ -73,8 +68,6 @@ func miniMetadata() *objects.Metadata {
 			"abilities": {
 				metaField("Crs\x00", "chanceToMiss", data("Chance to Miss", 1, "Acrs")),
 				metaField("Hhb1", "amountHealedOrDamaged", data("Amount Healed/Damaged", 1, "AHhb")),
-				// Two base-specific fields sharing a friendly name, as the game data has (the names are unique per
-				// base).
 				metaField("Hbz2", "damage", data("Damage", 2, "AHbz")),
 				metaField("Ucs1", "damage", data("Damage", 1, "AUcs")),
 				metaField("abuf", "buffs", func(f *objects.FieldMeta) {

@@ -8,9 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/jass"
 )
 
-// The scripts below are hand-written miniatures in the shape of common.j and blizzard.j; none is copied from the
-// game's files.
-
 const common = `// a leading comment
 type agent extends handle
 type widget   extends agent  // trailing comment
@@ -42,10 +39,6 @@ constant function ConstantBJ takes nothing returns integer
 endfunction
 `
 
-// corners has what the two scripts above have not: lines that end with a carriage return and a line feed, a tab
-// and a carriage return alone between two words, a line in a body that starts with endfunction and does not end
-// the body, and a body that holds a line like a declaration. Its string with a quote after a backslash is read
-// the same however a comment is cut from that line: the script refused as m.j is what holds that.
 var corners = strings.Join([]string{
 	"type\tagent\textends\thandle\t",
 	"globals",
@@ -63,12 +56,9 @@ var corners = strings.Join([]string{
 	"endfunction",
 }, "\r\n")
 
-// indented has a comment after globals, white space before and after endglobals, and an endfunction that is
-// indented: each ends its block all the same, so the native after them is read.
 const indented = "globals // g\n  integer a\n\tendglobals \nfunction F takes nothing returns nothing\n" +
 	"\tendfunction\nnative N takes nothing returns nothing\n"
 
-// noDeclaration is a script of white space and a comment.
 const noDeclaration = " \n// nothing\n"
 
 func parse(t *testing.T, text, source string) jass.File {
@@ -153,9 +143,6 @@ func TestParseReadsTheCornersOfALine(t *testing.T) {
 	}
 }
 
-// comments has a comment of two slashes that end their line, and comments with a carriage return in them, which
-// no line that is read holds after an equals sign: after a string of one character, after a string that ends
-// with a backslash that a backslash escapes, and after a backslash outside a string, which escapes nothing.
 const comments = "type agent extends handle//\n" +
 	"globals\n" +
 	"string ONE = \"a\" // one\rtwo\n" +
@@ -176,8 +163,6 @@ func TestACommentIsCutFromItsLineWhereTwoSlashesStandOutsideAString(t *testing.T
 	if got := parse(t, comments, "comments.j"); !reflect.DeepEqual(got, want) {
 		t.Errorf("got  %+v\nwant %+v", got, want)
 	}
-	// Two slashes inside a string, after other characters of it, start no comment: the carriage return after
-	// them is still in the line, which is refused for it.
 	_, err := jass.Parse("globals\nstring S = \"a//b\rc\"\nendglobals\n", "comments.j")
 	if err == nil || !strings.HasPrefix(err.Error(), "comments.j:2: cannot read ") {
 		t.Errorf("two slashes inside a string: got %v, want line 2 refused", err)
@@ -198,11 +183,8 @@ func TestABlockEndsWhateverStandsAroundTheWordThatEndsIt(t *testing.T) {
 	}
 }
 
-// escape is a backslash, the letter u and the four digits: how a message writes a character it does not write as
-// it is.
 func escape(digits string) string { return `\` + "u" + digits }
 
-// refused are the scripts that are refused, each with the place and the distinguishing words of its error.
 var refused = []struct{ text, source, place, words string }{
 	{"type unit extends widget\nlibrary Foo\n", "common.j", "common.j:2: ", `cannot read "library Foo"`},
 	{"function F takes nothing returns nothing\n", "blizzard.j", "blizzard.j:1: ", "never reaches endfunction"},
@@ -214,17 +196,10 @@ var refused = []struct{ text, source, place, words string }{
 	{"native F takes integer a, returns nothing\n", "e.j", "e.j:1: ", "cannot read"},
 	{"endglobals\n", "f.j", "f.j:1: ", `cannot read "endglobals"`},
 	{"globals\nnative F takes nothing returns nothing\nendglobals\n", "g.j", "g.j:2: ", "cannot read"},
-	// A carriage return alone is white space between two words, and no character of a parameter list or of what
-	// follows an equals sign.
 	{"native F takes integer a,\rinteger b returns nothing\n", "h.j", "h.j:1: ", `integer a,\rinteger b returns`},
 	{"globals\nstring S = \"a\rb\"\nendglobals\n", "i.j", "i.j:2: ", `cannot read "string S = \"a\rb\""`},
-	// Two slashes inside a string start no comment, so the carriage return after them is still in the line.
 	{"globals\nstring S = \"//a\rb\"\nendglobals\n", "l.j", "l.j:2: ", `cannot read "string S = \"//a\rb\""`},
-	// A quote after a backslash does not end its string, so the two slashes after it are inside the string too.
 	{"globals\nstring S = \"a\\\"//\rb\"\nendglobals\n", "m.j", "m.j:2: ", `cannot read "string S = \"a\\\"//\rb\""`},
-	// The line is quoted as it is written, comment and all, without the white space at its ends: the quote and
-	// the backslash have a backslash before them, a control character is written as an escape, and the markup
-	// characters, DEL and a character outside ASCII are written as they are.
 	{"\t call F(\"a\\b\")\v\x01\x7F<&>\xC3\xA9  // why \f\r\n", "j.j", "j.j:1: ",
 		`cannot read "call F(\"a\\b\")` + escape("000b") + escape("0001") + "\x7F<&>\xC3\xA9  // why" + `"`},
 	{"library\bA\fB\tC\n", "k.j", "k.j:1: ", `cannot read "library\bA\fB\tC"`},
@@ -242,9 +217,6 @@ func TestParseNamesTheFileAndLineOfAnythingItDoesNotUnderstand(t *testing.T) {
 	}
 }
 
-// widerSpace are scripts with a character that is white space outside ASCII. Each is text: it parts no two
-// words, it is trimmed from no line, and inside a line it is a character like any other. A case with words is a
-// script that is refused; one without is read into want.
 var widerSpace = []struct {
 	name, text   string
 	place, words string

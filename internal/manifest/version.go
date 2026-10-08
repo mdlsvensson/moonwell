@@ -12,12 +12,10 @@ import (
 )
 
 var (
-	moonwellPackage = regexp.MustCompile(`/moonwell@\d+$`)         // the key of the package among the dependencies
-	resolvedVersion = regexp.MustCompile(`@(\d+\.\d+\.\d+[^/]*)$`) // the version at the end of a resolved address
+	moonwellPackage = regexp.MustCompile(`/moonwell@\d+$`)
+	resolvedVersion = regexp.MustCompile(`@(\d+\.\d+\.\d+[^/]*)$`)
 )
 
-// readPackageVersion returns the version the moonwell Pkl package is resolved to in a PklProject.deps.json
-// document.
 func readPackageVersion(deps []byte) (string, error) {
 	text := []byte(fsx.DecodeText(deps))
 	var whole json.RawMessage
@@ -27,7 +25,6 @@ func readPackageVersion(deps []byte) (string, error) {
 	var document struct {
 		Resolved Ordered[json.RawMessage] `json:"resolvedDependencies"`
 	}
-	// A document of another shape fails here, and has no dependencies to find the package among.
 	_ = json.Unmarshal(text, &document)
 	for key, entry := range document.Resolved.All() {
 		var dependency struct {
@@ -43,8 +40,6 @@ func readPackageVersion(deps []byte) (string, error) {
 	return "", errNotResolved()
 }
 
-// checkPackageVersion fails unless the project's Pkl package and this program have the same major and minor
-// version.
 func checkPackageVersion(packageVersion, programVersion string) error {
 	pkg, program := strings.Split(packageVersion, "."), strings.Split(programVersion, ".")
 	if len(pkg) >= 2 && len(program) >= 2 && pkg[0] == program[0] && pkg[1] == program[1] {
@@ -55,7 +50,6 @@ func checkPackageVersion(packageVersion, programVersion string) error {
 
 const releases = "https://github.com/mdlsvensson/moonwell/releases/download/moonwell@"
 
-// installLine is the command that installs a Moonwell version on this machine.
 func installLine(version string) string {
 	if runtime.GOOS == "windows" {
 		return "irm " + releases + version + "/install.ps1 | iex"
@@ -63,8 +57,6 @@ func installLine(version string) string {
 	return "curl -fsSL " + releases + version + "/install.sh | sh"
 }
 
-// hasInstallScript reports whether a Moonwell version can be installed with installLine: 0.8.0 is the first that
-// has an install script.
 func hasInstallScript(version string) bool {
 	parts := strings.Split(version, ".")
 	if len(parts) < 2 {
@@ -74,8 +66,6 @@ func hasInstallScript(version string) bool {
 	minor, errMinor := strconv.Atoi(parts[1])
 	return errMajor == nil && errMinor == nil && (major > 0 || minor >= 8)
 }
-
-// ---- errors ----
 
 func errDepsNotJSON(cause error) error {
 	return &diag.Error{
@@ -94,8 +84,6 @@ func errNotResolved() error {
 	}
 }
 
-// errVersionMismatch names the two ways out: the program of the project's version, or the project moved to this
-// program's version. A package without an install script leaves only the second.
 func errVersionMismatch(packageVersion, programVersion string) error {
 	major, minor, _ := strings.Cut(programVersion, ".")
 	minor, _, _ = strings.Cut(minor, ".")

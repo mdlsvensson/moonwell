@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-// cacheVariables is every environment variable DefaultCacheDir reads.
 var cacheVariables = []string{"MOONWELL_CACHE", "LOCALAPPDATA", "XDG_CACHE_HOME", "HOME", "USERPROFILE"}
 
 func TestDefaultCacheDirTakesTheFirstFolderTheEnvironmentNames(t *testing.T) {

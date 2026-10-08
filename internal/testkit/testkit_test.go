@@ -17,15 +17,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/env"
 )
 
-// standIn is a testing.TB that records what Fatalf, Errorf and Skip were told instead of stopping or failing the
-// test, so a test can watch a helper fail or skip. Only the methods the helpers call are replaced. As a
-// testing.T does, it takes calls from several goroutines at once.
 type standIn struct {
 	testing.TB
 	real    *testing.T
 	guard   sync.Mutex
-	failed  []string // what Fatalf was told, which stops a test
-	errors  []string // what Errorf was told, which fails a test and lets it go on
+	failed  []string
+	errors  []string
 	skipped []string
 }
 
@@ -98,7 +95,6 @@ func TestEnvFailsTheTestWhenRunFetchOrSpawnIsCalled(t *testing.T) {
 			if len(stand.errors) != 1 || !strings.Contains(stand.errors[0], tc.want) {
 				t.Errorf("failures = %q, want one that names %q", stand.errors, tc.want)
 			}
-			// The call may come from a goroutine that is not the test's, which a stop would end alone.
 			if len(stand.failed) != 0 {
 				t.Errorf("the test was stopped: %q", stand.failed)
 			}
@@ -109,13 +105,11 @@ func TestEnvFailsTheTestWhenRunFetchOrSpawnIsCalled(t *testing.T) {
 	}
 }
 
-// Code under test may run programs and log from goroutines of its own. Each of them must get its error back and
-// have its failure and its lines kept, and none may stop the test.
 func TestEnvAndItsRecorderTakeCallsFromSeveralGoroutinesAtOnce(t *testing.T) {
 	const goroutines, calls = 8, 50
 	stand := newStandIn(t)
 	world, recorder := Env(stand, t.TempDir())
-	returned := make([]int, goroutines) // by goroutine, the errors its calls returned
+	returned := make([]int, goroutines)
 	var running sync.WaitGroup
 	for g := range goroutines {
 		running.Go(func() {
@@ -150,7 +144,6 @@ func TestEnvAndItsRecorderTakeCallsFromSeveralGoroutinesAtOnce(t *testing.T) {
 	if len(lines) != 2*goroutines*calls {
 		t.Fatalf("the recorder kept %d lines, want %d", len(lines), 2*goroutines*calls)
 	}
-	// Each goroutine's lines are whole and in the order it logged them.
 	next := make([]int, goroutines)
 	for i, line := range lines {
 		var call, g int
@@ -193,7 +186,6 @@ func TestRecorderKeepsEveryLevelInOrder(t *testing.T) {
 	if got := recorder.Lines(); !reflect.DeepEqual(got, want) {
 		t.Errorf("Lines = %q, want %q", got, want)
 	}
-	// The lines a caller gets are its own.
 	recorder.Lines()[0] = "changed"
 	if got := recorder.Lines(); !reflect.DeepEqual(got, want) {
 		t.Errorf("after changing the lines it returned, Lines = %q, want %q", got, want)
@@ -269,7 +261,7 @@ func TestNeedPklFindsPklOnThePathAndElseSkipsOrFailsTheTest(t *testing.T) {
 	tests := []struct {
 		name          string
 		onPath        bool
-		require       string // MOONWELL_REQUIRE_TOOLS
+		require       string
 		skips, fails  int
 		failureNaming string
 	}{
@@ -307,7 +299,6 @@ func TestNeedPklFindsPklOnThePathAndElseSkipsOrFailsTheTest(t *testing.T) {
 	}
 }
 
-// sameFile reports whether two paths name one existing file, however each spells it.
 func sameFile(a, b string) bool {
 	aInfo, aErr := os.Stat(a)
 	bInfo, bErr := os.Stat(b)
@@ -334,8 +325,6 @@ func TestLinkDirLinksToTheFolder(t *testing.T) {
 }
 
 func TestALinkToAFolderThatCannotBeMadeFailsTheTest(t *testing.T) {
-	// The folder the link is to lie in is not there. That is a fault in what a test arranged and no trait of the
-	// machine, so the test fails: skipped, it would pass for having looked at nothing.
 	dir := t.TempDir()
 	WriteFile(t, dir, "target/file.txt", []byte("x"))
 	stand := newStandIn(t)
@@ -355,7 +344,6 @@ func TestLinkFileLinksToTheFileOrSkipsTheTestWhereTheAccountMayNot(t *testing.T)
 	case len(stand.failed) != 0:
 		t.Errorf("a link to a file failed the test: %q", stand.failed)
 	case len(stand.skipped) != 0:
-		// Only Windows keeps the right from an account, and the link is then not there.
 		if _, err := os.Lstat(link); runtime.GOOS != "windows" || len(stand.skipped) != 1 || err == nil {
 			t.Errorf("skipped %q on %s, and the link is there: %v", stand.skipped, runtime.GOOS, err == nil)
 		}
@@ -371,8 +359,6 @@ func TestALinkToAFileThatCannotBeMadeFailsTheTest(t *testing.T) {
 	target := WriteFile(t, dir, "target.txt", []byte("x"))
 	stand := newStandIn(t)
 	LinkFile(stand, target, filepath.Join(dir, "no", "such", "folder", "link.txt"))
-	// Windows tells an account that it has not the right before it looks at the place of the link, so there the
-	// test is skipped for a link that could not be made either way. Everywhere else the fault fails the test.
 	withoutTheRight := runtime.GOOS == "windows" && len(stand.skipped) == 1 && len(stand.failed) == 0
 	if !withoutTheRight && (len(stand.failed) != 1 || len(stand.skipped) != 0) {
 		t.Errorf("failed %q, skipped %q, want one failure", stand.failed, stand.skipped)
@@ -384,8 +370,6 @@ func TestOnlyTheRightThatWindowsKeepsFromAnAccountIsNoFaultOfALink(t *testing.T)
 	if got := lacksTheRightToLink(link(syscall.Errno(1314))); got != (runtime.GOOS == "windows") {
 		t.Errorf("the right that is not held: %v on %s", got, runtime.GOOS)
 	}
-	// A path that is not there, a file that is there already, a failure that only reads as the one of the right,
-	// and none at all.
 	for _, other := range []error{
 		link(syscall.ENOENT), link(syscall.EEXIST), link(syscall.Errno(3)), link(syscall.Errno(5)),
 		errors.New("A required privilege is not held by the client."), nil,

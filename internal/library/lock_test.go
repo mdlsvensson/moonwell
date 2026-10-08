@@ -16,7 +16,6 @@ import (
 
 const lockHintWords = "delete it: the next check downloads every library again"
 
-// entryOfTest is the lock entry of the example library, with the hash of the files it ships when it ships any.
 func entryOfTest(assets *string) lockEntry {
 	return lockEntry{
 		GitHub: "mdlsvensson/moonwell-example-lib", Tag: "v0.1.0", Dir: "src",
@@ -33,7 +32,6 @@ func sameEntries(a, b map[string]lockEntry) bool {
 	return maps.EqualFunc(a, b, sameEntry)
 }
 
-// lockOf is the lock readLock reads in root.
 func lockOf(t *testing.T, root string) map[string]lockEntry {
 	t.Helper()
 	lock, err := readLock(root)
@@ -43,7 +41,6 @@ func lockOf(t *testing.T, root string) map[string]lockEntry {
 	return lock
 }
 
-// lockTextOf is what the lock file in root holds.
 func lockTextOf(t *testing.T, root string) string {
 	t.Helper()
 	content, err := os.ReadFile(filepath.Join(root, lockFile))
@@ -53,7 +50,6 @@ func lockTextOf(t *testing.T, root string) string {
 	return string(content)
 }
 
-// exampleEntryText is the example library's entry as the lock file has it, without an assets hash.
 const exampleEntryText = "{\n      \"github\": \"mdlsvensson/moonwell-example-lib\",\n      \"tag\": \"v0.1.0\",\n" +
 	"      \"dir\": \"src\",\n      \"commit\": \"c07126f080c3887ba667596d08aa21df3b3a20f7\",\n" +
 	"      \"files\": \"sha256:abc\"\n    }"
@@ -123,7 +119,7 @@ func TestReadLockRefusesALockFileItCannotRead(t *testing.T) {
 
 func TestALockInAnotherOrderWithMoreThanItNeedsIsRead(t *testing.T) {
 	root := t.TempDir()
-	const escaped = `\` + `u00e9` + `\` + `ud83d` + `\` + `ude00` // an e with an acute accent and U+1F600, as escapes
+	const escaped = `\` + `u00e9` + `\` + `ud83d` + `\` + `ude00`
 	testkit.WriteFile(t, root, lockFile, []byte(` { "version": 2, "libraries": { "b": { "files": "f", "assets": "s",
 		"commit": "c", "dir": "", "tag": "t", "github": "o/r", "more": [1] },
 		"a": { "github": "first", "tag": "", "dir": "", "commit": "", "files": "" },
@@ -138,7 +134,6 @@ func TestALockInAnotherOrderWithMoreThanItNeedsIsRead(t *testing.T) {
 	}
 }
 
-// A byte of a string that is not UTF-8 reads as U+FFFD, each such byte as one; outside a string it is no JSON.
 func TestAByteOfALockThatIsNotUTF8ReadsAsAReplacementCharacter(t *testing.T) {
 	root := t.TempDir()
 	entry := `{"github":"g","tag":"t` + "\xe2\x80" + `","dir":"` + "\xff\xfe" + `","commit":"c","files":"f"}`
@@ -159,7 +154,6 @@ func TestAByteOfALockThatIsNotUTF8ReadsAsAReplacementCharacter(t *testing.T) {
 
 func TestALockThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 	root := t.TempDir()
-	// A folder is read as no file is, on every system.
 	if err := os.Mkdir(filepath.Join(root, lockFile), 0o777); err != nil {
 		t.Fatal(err)
 	}
@@ -188,8 +182,6 @@ func TestAnEntryKeepsItsAssetsHashWrittenLastAndAnEntryWithoutOneGetsNoSuchKey(t
 	}
 }
 
-// The file is committed: a character written in another way would change the lock of every project that has it.
-// Only what JSON cannot hold as it is is written as an escape.
 func TestTheLockEscapesNoMoreThanJSONMust(t *testing.T) {
 	root := t.TempDir()
 	assets := "a\x7f"
@@ -214,8 +206,6 @@ func TestTheLockEscapesNoMoreThanJSONMust(t *testing.T) {
 
 func TestTheKeysOfALockAreSortedByBytes(t *testing.T) {
 	root := t.TempDir()
-	// A key that is a whole number is a text as any other: 10 is before 9, and both are after a hyphen. U+FFFD is
-	// before U+1F600.
 	keys := []string{"\xf0\x9f\x98\x80", "\xef\xbf\xbd", "b", "B", "a10", "a9", "10", "9", "-x", "_", ""}
 	written := map[string]lockEntry{}
 	for _, key := range keys {
@@ -242,7 +232,6 @@ func TestTheLockIsWrittenOnlyWhenItsTextChanges(t *testing.T) {
 	if err := writeLock(root, entries); err != nil {
 		t.Fatal(err)
 	}
-	// The time a file was last written tells whether it was written again.
 	longAgo := time.Date(2001, 2, 3, 4, 5, 6, 0, time.UTC)
 	if err := os.Chtimes(path, longAgo, longAgo); err != nil {
 		t.Fatal(err)
@@ -263,8 +252,6 @@ func TestTheLockIsWrittenOnlyWhenItsTextChanges(t *testing.T) {
 }
 
 func TestALockThatCannotBeWrittenOrRemovedIsRefusedByItsName(t *testing.T) {
-	// A folder that holds a file can neither be written as a file nor removed as one, on every system.
-	// Each failure is worded as what was tried: no entries means that the file is removed.
 	for name, entries := range map[string]map[string]lockEntry{"Writing": {"a": entryOfTest(nil)}, "Removing": nil} {
 		root := t.TempDir()
 		testkit.WriteFile(t, root, lockFile+"/in the way", nil)
@@ -278,9 +265,6 @@ func TestALockThatCannotBeWrittenOrRemovedIsRefusedByItsName(t *testing.T) {
 		}
 	}
 }
-
-// The lock is committed, so a project can come with a link in its place: what is read through it is another
-// file, and what is written through it lies outside the project.
 
 func TestReadLockRefusesALinkInTheLocksPlace(t *testing.T) {
 	for _, kind := range linkedLocks {

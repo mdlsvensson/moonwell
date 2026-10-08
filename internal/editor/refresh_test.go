@@ -15,13 +15,10 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// mapLua is the script of the tests' map, as the project names it.
 const mapLua = "maps/map.w3x/war3map.lua"
 
-// typesHint ends a failure to write a file of declarations.
 const typesHint = "Moonwell's compiler and the editor read .moonwell/; make sure it is a folder you can write, then retry."
 
-// The four files of declarations, from the project folder, in the order they are written.
 var declarationFiles = []string{
 	".moonwell/types/natives.d.lua",
 	".moonwell/types/moonwell.d.lua",
@@ -29,14 +26,11 @@ var declarationFiles = []string{
 	".moonwell/types/map.d.lua",
 }
 
-// defined is what a script defines.
 func defined(script string) *lua.MapGlobals {
 	globals := lua.ReadMapGlobals(script)
 	return &globals
 }
 
-// types is what the declarations of the tests are made from: one object, a small API, and what the script
-// defines, nil for a map without one.
 func types(globals *lua.MapGlobals) Types {
 	miniature := &script.Natives{
 		GameVersion: "9.9.9",
@@ -59,7 +53,6 @@ func TestRefreshTypesWritesTheFourDeclarationsThenOnlyWhatChanged(t *testing.T) 
 		"types/objects.d.lua":  renderObjects(in.Objects),
 		"types/map.d.lua":      renderMap(in.Map, mapLua),
 	}
-	// The macro module is the compiler's to write: the declarations are all there is.
 	if got := filesIn(t, filepath.Join(root, ".moonwell")); !maps.Equal(got, want) {
 		t.Errorf(".moonwell holds %q", slices.Sorted(maps.Keys(got)))
 	}
@@ -90,7 +83,6 @@ func TestRefreshTypesWorksWithoutAMapsScriptAndWithTheEmbeddedNatives(t *testing
 }
 
 func TestRefreshTypesReadsNoMap(t *testing.T) {
-	// What the script defines is handed in: whatever lies where the script would be is not looked at.
 	projects := map[string][]string{
 		"a script that defines other names":           {mapLua, "udg_OnDisk = 0\n"},
 		"a folder in the place of the script":         {mapLua + "/inside.txt", ""},
@@ -133,7 +125,6 @@ func TestADeclarationFileThatCannotBeWrittenIsNamed(t *testing.T) {
 		t.Fatal(err)
 	}
 	testkit.MakeUnwritable(t, filepath.Join(root, ".moonwell", "types", "objects.d.lua"))
-	// A file that cannot be written and holds what it is to hold is no failure: nothing is written.
 	if written, err := RefreshTypes(root, in); err != nil || len(written) != 0 {
 		t.Errorf("unchanged, but RefreshTypes = %q, %v", written, err)
 	}
@@ -144,7 +135,6 @@ func TestADeclarationFileThatCannotBeWrittenIsNamed(t *testing.T) {
 		failure.File != ".moonwell/types/objects.d.lua" || failure.Hint != typesHint || written != nil {
 		t.Errorf("RefreshTypes = %q, %+v", written, failure)
 	}
-	// The files are written in their order, and the first failure ends the refresh.
 	if got := read(t, root, ".moonwell/types/map.d.lua"); got != renderMap(nil, mapLua) {
 		t.Errorf("map.d.lua was written after the failure:\n%s", got)
 	}

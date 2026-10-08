@@ -2,13 +2,10 @@ package manifest
 
 import "encoding/json"
 
-// Category is a kind of custom object, by its name in the manifest.
 type Category string
 
-// Categories are the categories in the order Moonwell works through them.
 var Categories = []Category{"heroes", "units", "buildings", "items", "abilities", "buffs", "upgrades"}
 
-// Objects is the manifest's custom objects, by category and key: Objects.pkl and ObjectFile.pkl.
 type Objects struct {
 	Heroes    Ordered[Object] `json:"heroes"`
 	Units     Ordered[Object] `json:"units"`
@@ -19,7 +16,6 @@ type Objects struct {
 	Upgrades  Ordered[Object] `json:"upgrades"`
 }
 
-// of is where the objects of a category are held, or nil for a name that is no category.
 func (o *Objects) of(category Category) *Ordered[Object] {
 	switch category {
 	case "heroes":
@@ -40,8 +36,6 @@ func (o *Objects) of(category Category) *Ordered[Object] {
 	return nil
 }
 
-// Of returns the objects of a category by key, to read: the result shares its storage with o. A name that is no
-// category has none.
 func (o Objects) Of(category Category) Ordered[Object] {
 	if held := o.of(category); held != nil {
 		return *held
@@ -49,7 +43,6 @@ func (o Objects) Of(category Category) Ordered[Object] {
 	return Ordered[Object]{}
 }
 
-// Empty reports whether there is no object in any category.
 func (o Objects) Empty() bool {
 	for _, category := range Categories {
 		if o.Of(category).Len() > 0 {
@@ -59,8 +52,6 @@ func (o Objects) Empty() bool {
 	return true
 }
 
-// nameSources gives every object that names no file of its own the file as its source: an object written in the
-// manifest itself is from the manifest that was evaluated.
 func (o *Objects) nameSources(file string) {
 	for _, category := range Categories {
 		objects := o.of(category)
@@ -73,17 +64,13 @@ func (o *Objects) nameSources(file string) {
 	}
 }
 
-// Object is one custom object as the manifest gives it. A property's value is a bool, a float64, a string, or a
-// list of those and of lists of strings.
 type Object struct {
 	ID, Base   string
-	Source     string       // the object's file, or the evaluated manifest for an object written inline
-	Typed      Ordered[any] // the typed properties by friendly name; a null is left out
-	Properties Ordered[any] // the `properties` block, by friendly name or field rawcode; a null is left out
+	Source     string
+	Typed      Ordered[any]
+	Properties Ordered[any]
 }
 
-// UnmarshalJSON reads an object as pkl prints it: id, base, source and properties are its own, and every other
-// key is a typed property, in the order read.
 func (o *Object) UnmarshalJSON(data []byte) error {
 	var keys Ordered[json.RawMessage]
 	if err := keys.UnmarshalJSON(data); err != nil {
@@ -98,7 +85,6 @@ func (o *Object) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// readKey reads the value of one key of an object.
 func (o *Object) readKey(key string, value json.RawMessage) error {
 	switch key {
 	case "id":
@@ -121,8 +107,6 @@ func (o *Object) readKey(key string, value json.RawMessage) error {
 	return err
 }
 
-// setUnlessNull sets a property that has a value. A null means that the object keeps what its base has, as a
-// property that is left out does.
 func setUnlessNull(properties *Ordered[any], name string, value any) {
 	if value != nil {
 		properties.Set(name, value)

@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-// resolvedDeps is a PklProject.deps.json whose moonwell package is resolved to a version, as `pkl project resolve`
-// writes it for a project linked to a checkout.
 func resolvedDeps(version string) string {
 	return `{"schemaVersion":1,"resolvedDependencies":{
 		"package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0":{"type":"local",
@@ -23,7 +21,6 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 		{"a local package", resolvedDeps("0.1.3"), "0.1.3"},
 		{"a remote package beside another", remote, "0.9.1-rc.1"},
 		{"behind a byte order mark", "\xEF\xBB\xBF" + resolvedDeps("0.9.0"), "0.9.0"},
-		// The package is the first dependency named moonwell that is resolved to a version.
 		{"after a dependency of its name that is no mapping", `{"resolvedDependencies":{
 			"package://x/moonwell@0":"1.0.0","package://y/moonwell@1":{"uri":"p://y/moonwell@1.2.3"}}}`, "1.2.3"},
 	}
@@ -69,14 +66,13 @@ func TestCheckPackageVersionComparesTheMajorAndMinorNumbers(t *testing.T) {
 	}
 	tests := []struct {
 		name, pkg, program string
-		installs           bool // whether the hint names the package's own program to install
+		installs           bool
 		move               string
 	}{
 		{"before the first install script", "0.7.0", "0.8.0", false, "moonwell@0.8.x"},
 		{"a package with an install script", "0.8.2", "0.9.0", true, "moonwell@0.9.x"},
 		{"a later major version", "1.0.0", "0.9.1", true, "moonwell@0.9.x"},
 		{"a version that is no version", "latest", "0.9.1", false, "moonwell@0.9.x"},
-		// The numbers are compared whole: 9 is not 10, though one starts as the other does.
 		{"a minor version that starts as the program's does", "0.1.0", "0.10.0", false, "moonwell@0.10.x"},
 		{"the minor version before the program's", "0.9.1", "0.10.0", true, "moonwell@0.10.x"},
 		{"no version", "", "0.9.1", false, "moonwell@0.9.x"},

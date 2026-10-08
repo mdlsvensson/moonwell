@@ -13,10 +13,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
 
-// modelFile is the name the tests give a reader for its errors.
 const modelFile = "assets/Knight.mdx"
 
-// knight is a text model with every block that bears a path, and blocks that bear none.
 const knight = `// Exported by a modelling tool
 Version {
 	FormatVersion 800,
@@ -86,17 +84,14 @@ var knightPaths = []model.Path{
 	{Kind: model.FaceEffect, Path: `FaceFX\Knight.facefx`},
 }
 
-// header is the start of a text model: without a Version or a Model block a text is not one.
 const header = "Version {\n\tFormatVersion 800,\n}\n"
 
-// binaryModel is a binary model the tests build, with what it references.
 type binaryModel struct {
 	name string
 	data []byte
 	want []model.Path
 }
 
-// binaryModels are the binary models that read.
 func binaryModels() []binaryModel {
 	return []binaryModel{
 		{"no chunks", testkit.MDX(), nil},
@@ -116,7 +111,7 @@ func binaryModels() []binaryModel {
 			{Kind: model.Texture, ReplaceableID: 11},
 		}},
 		{"emitters, attachments, popcorn and face effects", testkit.MDX(
-			testkit.Chunk("ZZZZ", make([]byte, 13)), // a chunk the reader does not know is passed over by its size
+			testkit.Chunk("ZZZZ", make([]byte, 13)),
 			testkit.Chunk("PREM", testkit.Concat(
 				testkit.Emitter(`Abilities\Spells\Human\Heal.mdx`, testkit.EmitterUsesMDL),
 				testkit.Emitter(`Textures\Spark.blp`, testkit.EmitterUsesTGA),
@@ -145,13 +140,11 @@ func binaryModels() []binaryModel {
 			{Kind: model.Popcorn, Path: `Effects\Smoke.pkb`},
 			{Kind: model.FaceEffect, Path: "a.facefx"},
 		}},
-		// A slot is a number without a sign: the highest is 4294967295, and no negative one.
 		{"a texture of the highest slot", testkit.MDX(testkit.Chunk("TEXS", testkit.Concat(
 			testkit.Texture("", 0xFFFFFFFF), testkit.Texture("", 0x80000000),
 		))), []model.Path{
 			{Kind: model.Texture, ReplaceableID: 0xFFFFFFFF}, {Kind: model.Texture, ReplaceableID: 0x80000000},
 		}},
-		// Only the two bits say what an emitter emits: every other bit of its flags says nothing of it.
 		{"emitters with other flags than the two", testkit.MDX(testkit.Chunk("PREM", testkit.Concat(
 			testkit.Emitter("a.mdx", 1),
 			testkit.Emitter("b.blp", testkit.EmitterUsesTGA|1),
@@ -165,19 +158,16 @@ func binaryModels() []binaryModel {
 			{Kind: model.ParticleModel, Path: "d.mdx"},
 			{Kind: model.ParticleTexture, Path: "e.blp"},
 		}},
-		// The reader leaves the magic to IsMDX and reads what follows the first four bytes.
 		{"bytes shorter than the magic", []byte("MD"), nil},
 	}
 }
 
-// damagedModel is a binary model that does not read, with the words that tell its refusal from the others.
 type damagedModel struct {
 	name  string
 	data  []byte
 	words string
 }
 
-// damagedModels are binary models with one thing wrong in each.
 func damagedModels() []damagedModel {
 	whole := testkit.MDX(testkit.Chunk("TEXS", testkit.Texture("a.blp", 0)))
 	attachment := testkit.Attachment(`Models\Sword.mdx`)
@@ -204,7 +194,6 @@ func damagedModels() []damagedModel {
 			"the ATCH chunk has a record too small for its path"},
 		{"bytes after the last record", chunk("ATCH", testkit.Concat(attachment, []byte{1, 2, 3})),
 			"the ATCH chunk has a record that is cut off"},
-		// Four bytes are a size, so the record is not cut off: it is smaller than a node.
 		{"a size after the last record", chunk("ATCH", testkit.Concat(attachment, testkit.U32(4))),
 			"the ATCH chunk has a record with an invalid size"},
 		{"a record smaller than a node", chunk("PREM", testkit.SetU32(emitter, 0, 99)),
@@ -213,19 +202,16 @@ func damagedModels() []damagedModel {
 			"the PREM chunk has a node with an invalid size"},
 		{"a node that leaves no room for the path", chunk("CORN", testkit.SetU32(popcorn, 4, 96+261)),
 			"the CORN chunk has a record too small for its path"},
-		// The bytes of a tag are printed as the characters of Latin-1.
 		{"a chunk with a tag that is not ASCII, cut short", testkit.Concat(testkit.MDX(), []byte("T\xC9XS"), testkit.U32(9)),
 			"the T\xC3\x89XS chunk runs past the end of the file"},
 	}
 }
 
-// brokenText is a text that does not read as a model, with the words that tell its refusal from the others.
 type brokenText struct {
 	source string
 	words  string
 }
 
-// brokenTexts are texts whose strings or blocks do not close.
 func brokenTexts() []brokenText {
 	return []brokenText{
 		{`Bitmap { Image "Textures\A.blp`, "a string is never closed"},
@@ -237,28 +223,23 @@ func brokenTexts() []brokenText {
 	}
 }
 
-// textsThatAreNoModel are texts in which every string and block closes, without a Version or a Model block.
 func textsThatAreNoModel() []string {
 	return []string{
 		"",
 		"hello world",
-		"version https://git-lfs.github.com/spec/v1\noid sha256:abc\nsize 123\n", // a Git LFS pointer
-		"Textures 1 {\n\tBitmap {\n\t\tImage \"a.blp\",\n\t}\n}\n",               // a block, but no Version or Model
-		"Textures 1 {\n\tVersion {\n\t}\n}\n",                                    // a nested Version block does not count
-		"\"Version\" {\n}\n",                                                     // a string does not name a block
+		"version https://git-lfs.github.com/spec/v1\noid sha256:abc\nsize 123\n",
+		"Textures 1 {\n\tBitmap {\n\t\tImage \"a.blp\",\n\t}\n}\n",
+		"Textures 1 {\n\tVersion {\n\t}\n}\n",
+		"\"Version\" {\n}\n",
 	}
 }
 
-// headerOnlyTexts are text models of one block.
 func headerOnlyTexts() []string {
 	return []string{"Version {\n\tFormatVersion 800,\n}\n", "Model \"A\" {\n\tNumGeosets 0,\n}\n"}
 }
 
-// readsUnnaturally matches a message that says "a TEXS chunk" where it means the one chunk the file has.
 var readsUnnaturally = regexp.MustCompile(`\ba [A-Z]{4}\b`)
 
-// refused checks that err says the model is not readable, names the file through File and nowhere else, has a
-// hint, and has the words.
 func refused(t *testing.T, what string, err error, file, words string) {
 	t.Helper()
 	var failure *diag.Error
@@ -306,17 +287,15 @@ func TestPathsPicksTheReaderFromTheContent(t *testing.T) {
 			t.Errorf("Paths of binary, %s = %+v, %v", binary.name, got, err)
 		}
 	}
-	blp := []byte{0x42, 0x4c, 0x50, 0x31, 0, 0, 0, 0} // a BLP texture, not a model
+	blp := []byte{0x42, 0x4c, 0x50, 0x31, 0, 0, 0, 0}
 	_, err = model.Paths(blp, "icon.blp")
 	refused(t, "a texture", err, "icon.blp", "it is neither a binary MDX nor a text MDL file")
-	// A NUL is no character of a text model, wherever it stands: at the start, in a string, at the end.
 	for _, text := range []string{"\x00" + header, header + "Bitmap { Image \"a\x00.blp\", }", header + "\x00"} {
 		_, err := model.Paths([]byte(text), modelFile)
 		refused(t, strconv.Quote(text), err, modelFile, "neither a binary MDX nor a text MDL")
 	}
 }
 
-// The words of the six kinds are what a report of a project's assets prints for a referenced file.
 func TestEachKindHasItsWords(t *testing.T) {
 	for kind, words := range map[model.Kind]string{
 		model.Texture: "texture", model.ParticleModel: "particle model", model.ParticleTexture: "particle texture",
@@ -333,7 +312,7 @@ func TestPathsRefusesTextThatIsNotAModel(t *testing.T) {
 		_, err := model.Paths([]byte(source), modelFile)
 		refused(t, source, err, modelFile, "it has no Version or Model block")
 	}
-	_, err := model.Paths([]byte{0x4d, 0x44}, modelFile) // "MD": too short to be an MDX
+	_, err := model.Paths([]byte{0x4d, 0x44}, modelFile)
 	refused(t, "MD", err, modelFile, "it has no Version or Model block")
 }
 
@@ -411,14 +390,12 @@ func TestDescribeLabelsReplaceableTextures(t *testing.T) {
 	}
 }
 
-// textModel is the blocks of a text model after its header, with what they reference.
 type textModel struct {
 	name   string
 	blocks string
 	want   []model.Path
 }
 
-// emitterTexts are particle emitters whose path is in a Particle block, in the emitter, in both or in neither.
 func emitterTexts() []textModel {
 	heal := []model.Path{{Kind: model.ParticleModel, Path: "heal.mdx"}}
 	return []textModel{
@@ -446,8 +423,6 @@ func emitterTexts() []textModel {
 	}
 }
 
-// statementTexts are blocks whose statements have each shape a statement may have, and each way of writing the
-// tokens between them.
 func statementTexts() []textModel {
 	texture := func(path string, slot int64) []model.Path {
 		return []model.Path{{Kind: model.Texture, Path: path, ReplaceableID: slot}}
@@ -466,8 +441,6 @@ func statementTexts() []textModel {
 			"Bitmap { ReplaceableId 2, ReplaceableId 1.5, ReplaceableId -, ReplaceableId x1, ReplaceableId 1x, }",
 			texture("", 2)},
 		{"a number after a word that is not ReplaceableId", "Bitmap { Other 7, Image 8, }", texture("", 0)},
-		// A word ends at white space, a brace, a comma or a quote. A tilde is none of them, so Image~ and ~Image
-		// are words of their own, and no Image statement.
 		{"a tilde is part of the word it stands in", "Bitmap { Image~ \"a.blp\", ~Image \"b.blp\", }", texture("", 0)},
 		{"an image written as a word", "Bitmap { Image a.blp, }", texture("", 0)},
 		{"a statement of three words", `Bitmap { static Image "a.blp", Image "b.blp" 1, }`, texture("", 0)},
@@ -503,12 +476,10 @@ func TestReadMDLTakesAnEmittersPathFromItsParticleBlockAndReadsAStatementByItsSh
 	}
 }
 
-// spacedText is a text model whose texture has a character outside ASCII between Image and its string.
 func spacedText(space string) string {
 	return header + "Bitmap {\n\tImage" + space + "\"a.blp\",\n}\n"
 }
 
-// spacesOutsideASCII are the characters outside ASCII that are white space to some readers and text to ReadMDL.
 func spacesOutsideASCII() map[string]string {
 	return map[string]string{
 		"a no-break space":              "\xC2\xA0",
@@ -527,7 +498,6 @@ func spacesOutsideASCII() map[string]string {
 func TestOnlyASCIIWhiteSpaceSeparatesTheTokensOfATextModel(t *testing.T) {
 	noImage := []model.Path{{Kind: model.Texture}}
 	for name, space := range spacesOutsideASCII() {
-		// The character is part of the word Image, so the texture has no image.
 		got, err := model.ReadMDL(spacedText(space), "a.mdl")
 		if err != nil || !slices.Equal(got, noImage) {
 			t.Errorf("%s: ReadMDL = %+v, %v, want %+v", name, got, err, noImage)
@@ -544,18 +514,14 @@ func TestPathsDropsALeadingByteOrderMarkAndReadMDLTakesItsTextAsItIs(t *testing.
 	refused(t, "a text that starts with a byte order mark", err, modelFile, "it has no Version or Model block")
 }
 
-// invalidBytes is a model with a path that is not UTF-8, and the path Paths reads from it.
 type invalidBytes struct {
 	name string
 	data []byte
 	want string
 }
 
-// replacement is U+FFFD, which stands for bytes that are not UTF-8.
 const replacement = "\xEF\xBF\xBD"
 
-// runsOfInvalidBytes are models with a path that holds several invalid sequences in a row. Paths reads each run as
-// one U+FFFD.
 func runsOfInvalidBytes() []invalidBytes {
 	binary := func(path string) []byte { return testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(path, 0))) }
 	text := func(path string) []byte { return []byte(header + "Bitmap {\n\tImage \"" + path + "\",\n}\n") }
@@ -569,7 +535,6 @@ func runsOfInvalidBytes() []invalidBytes {
 	}
 }
 
-// singleInvalidSequences are models with a path that holds invalid sequences one at a time, and a byte order mark.
 func singleInvalidSequences() []invalidBytes {
 	binary := func(path string) []byte { return testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(path, 0))) }
 	text := func(path string) []byte { return []byte(header + "Bitmap {\n\tImage \"" + path + "\",\n}\n") }

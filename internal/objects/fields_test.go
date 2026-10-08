@@ -8,7 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/objects"
 )
 
-// holy is an ability based on Holy Light, which has three levels, with these properties.
 func holy(properties string) string {
 	return `{"abilities":{"holy":{"id":"A000","base":"AHhb","properties":` + properties + `}}}`
 }
@@ -55,17 +54,14 @@ var fieldCases = []accepted{
 const noSuchField = "no field that applies to 'AHhb' (Holy Light) has this rawcode or name"
 
 var fieldRules = []refused{
-	// Which field a property names.
 	{name: "an unknown key that a friendly name contains", document: holy(`{"amountHealed":1}`),
 		at: `abilities["holy"].properties["amountHealed"]`, says: noSuchField, hint: "Did you mean 'amountHealedOrDamaged'?"},
 	{name: "an unknown key near no name", document: holy(`{"zzzz":2}`),
 		at: `abilities["holy"].properties["zzzz"]`, says: noSuchField, hint: "Keys are field rawcodes, or friendly names"},
-	// The escape of the control character is written in two parts so that it stays an escape.
 	{name: "an unknown key with a quote, a line break and a control character", document: holy(`{"a\"b\n\u` + `0001":1}`),
 		at: `abilities["holy"].properties["a\"b\n\u` + `0001"]`, says: noSuchField, hint: "Keys are field rawcodes"},
 	{name: "an unknown key two edits from a friendly name", document: holy(`{"manaCots":1}`),
 		at: `abilities["holy"].properties["manaCots"]`, says: noSuchField, hint: "Did you mean 'manaCost'?"},
-	// 'damage' names Hbz2 (Blizzard) and Ucs1 (Carrion Swarm) only; neither is the one field to blame for Holy Light.
 	{name: "a name that several fields of other bases share", document: holy(`{"damage":1}`),
 		at: `abilities["holy"].properties["damage"]`, says: noSuchField, hint: "Did you mean 'amountHealedOrDamaged'?"},
 	{name: "a name that one field of another base has", document: holy(`{"chanceToMiss":1}`),
@@ -92,7 +88,6 @@ var fieldRules = []refused{
 		at:       `abilities["curse"].properties["chanceToMiss"]`,
 		says:     `'Crs' (Chance to Miss) is already set by properties["Crs"]`, hint: "Set each field once."},
 
-	// Levels.
 	{name: "a list on a field that is not per level",
 		document: `{"units":{"captain":{"id":"h000","base":"hfoo","hitPointsMaximumBase":[1,2]}}}`,
 		at:       `units["captain"].hitPointsMaximumBase`,
@@ -106,7 +101,6 @@ var fieldRules = []refused{
 	{name: "an empty list on a per-level field of an upgrade",
 		document: `{"upgrades":{"swords":{"id":"R000","base":"Rhme","properties":{"gnam":[]}}}}`,
 		at:       `upgrades["swords"].properties["gnam"]`, says: "an empty List sets no levels", hint: "Use null to inherit every level"},
-	// The lists of an object whose own count is below 1 are not counted against it.
 	{name: "an ability's own levels of 0", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","levels":0,"manaCost":[1]}}}`,
 		at: `abilities["holy"].levels`, says: "'alev' (Levels) must be at least 1, got 0.", hint: "at least one level; use null"},
 	{name: "an ability's own levels of the zero below 0", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","levels":-0.0}}}`,
@@ -137,8 +131,6 @@ func TestResolveRefusesAPropertyForItsFieldOrItsLevels(t *testing.T) {
 }
 
 func TestAnUnknownKeyIsComparedWithTheNamesByCharacters(t *testing.T) {
-	// A key of eight characters is near a name two edits away, whatever its characters take to store: a letter of two
-	// bytes and a face of four bytes are each one character, and replacing one is one edit.
 	const noHint = "Keys are field rawcodes, or friendly names"
 	for _, c := range []struct{ name, key, hint string }{
 		{"two letters of two bytes replaced", "m\xc3\xa4n\xc3\xa4Cost", "Did you mean 'manaCost'?"},
@@ -157,7 +149,6 @@ func TestAnUnknownKeyIsComparedWithTheNamesByCharacters(t *testing.T) {
 }
 
 func TestAnUnknownKeyIsSuggestedTheThreeNearestNamesAndEquallyNearOnesByName(t *testing.T) {
-	// Of the four names near "bonus", the one that only holds it is the farthest and is left out.
 	metadata := miniMetadata()
 	for i, name := range []string{"bonusDamage", "bonusB", "bones", "bonusA"} {
 		metadata.Fields["buffs"] = append(metadata.Fields["buffs"], metaField(fmt.Sprintf("fbo%d", i), name, nil))

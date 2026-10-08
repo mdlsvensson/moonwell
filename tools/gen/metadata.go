@@ -14,17 +14,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/objects"
 )
 
-// writeMetadata is the mode metadata: it writes data/metadata.json from an export of the game's object data,
-// and prints how many fields and standard objects each category has and which friendly names are not the names
-// of their labels. It writes nothing when the export lacks a file or a table lacks a column, a name needs a
-// pin, a unit breaks the rule for heroes, or a released name would change.
 func writeMetadata(checkout string, args []string, out io.Writer) error {
 	folder, version := args[0], args[1]
 	pins, err := readOverrides(checkout)
 	if err != nil {
 		return err
 	}
-	game, err := readExport(folder) // every table and text the metadata is made from
+	game, err := readExport(folder)
 	if err != nil {
 		return err
 	}
@@ -43,9 +39,6 @@ func writeMetadata(checkout string, args []string, out io.Writer) error {
 	return writeAndReport(checkout, metadata, renames, out)
 }
 
-// writeAndReport writes the metadata into the checkout and prints the report: how many fields each list has
-// and how many standard objects each category, the renames, in the order of the lists and in each list in the
-// order of the ids' bytes, and the command that is to be run next, which writes the schema from the file.
 func writeAndReport(checkout string, metadata *objects.Metadata, renames []rename, out io.Writer) error {
 	if err := os.WriteFile(fileIn(checkout, metadataPath), []byte(renderMetadata(metadata)), 0o666); err != nil {
 		return errInCheckout(checkout, metadataPath, err)
@@ -74,12 +67,6 @@ func writeAndReport(checkout string, metadata *objects.Metadata, renames []renam
 	return nil
 }
 
-// ---- the text of the file ----
-
-// renderMetadata is the text of data/metadata.json: one field or one standard object on a line, everything in a
-// fixed order. The lists of fields stand in the order of objects.FieldLists, each in the order it has; the
-// categories in their order, the objects of each in the order of the ids' bytes. A text is written as
-// fsx.Quoted writes it.
 func renderMetadata(metadata *objects.Metadata) string {
 	var fields, bases []string
 	for _, list := range objects.FieldLists {
@@ -107,9 +94,6 @@ func renderMetadata(metadata *objects.Metadata) string {
 	}, "\n")
 }
 
-// entriesBlock writes the entries of a list of fields, or of the objects of a category, between its two
-// brackets: each on a line of its own, six spaces in, and the closing bracket four spaces in. Without an entry
-// it is the two brackets alone.
 func entriesBlock(opening string, entries []string, closing string) string {
 	if len(entries) == 0 {
 		return opening + closing
@@ -117,8 +101,6 @@ func entriesBlock(opening string, entries []string, closing string) string {
 	return opening + "\n      " + strings.Join(entries, ",\n      ") + "\n    " + closing
 }
 
-// renderField writes a field as a JSON object on one line, without a space in it, its keys in the order of the
-// file.
 func renderField(field objects.FieldMeta) string {
 	return `{"id":` + fsx.Quoted(field.ID) +
 		`,"name":` + fsx.Quoted(field.Name) +
@@ -135,8 +117,6 @@ func renderField(field objects.FieldMeta) string {
 		`,"notSpecific":` + renderTexts(field.NotSpecific) + "}"
 }
 
-// renderBase writes a standard object as a JSON object on one line: its name, and its levels where it has a
-// count of them.
 func renderBase(base objects.BaseMeta) string {
 	if base.Levels == nil {
 		return `{"name":` + fsx.Quoted(base.Name) + "}"
@@ -144,7 +124,6 @@ func renderBase(base objects.BaseMeta) string {
 	return `{"name":` + fsx.Quoted(base.Name) + `,"levels":` + strconv.Itoa(*base.Levels) + "}"
 }
 
-// renderTexts writes a list of texts as a JSON list on one line.
 func renderTexts(texts []string) string {
 	quoted := make([]string, len(texts))
 	for i, text := range texts {

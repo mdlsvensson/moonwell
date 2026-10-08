@@ -6,17 +6,12 @@ import (
 	"testing"
 )
 
-// ZipEntry is one entry of a test archive. Its name is written as given, whatever it is: a name that ends with
-// "/" is a folder entry, and one that points outside the archive ("../x", "/x") is how a test builds an archive
-// that must not be trusted.
 type ZipEntry struct {
 	Name    string
 	Data    []byte
-	Deflate bool // compressed; stored as it is otherwise
+	Deflate bool
 }
 
-// Zip is a zip archive of the entries in the order given. comment is the archive's comment, where an archive of
-// a tag that GitHub serves holds the commit.
 func Zip(t testing.TB, comment string, entries ...ZipEntry) []byte {
 	t.Helper()
 	var out bytes.Buffer

@@ -8,11 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/ini"
 )
 
-// The texts below are hand-written miniatures in the shape of the game's files; none is copied from them.
-
-// sections has comment lines, a line before any section, a quoted value, a quoted list, a key that comes twice,
-// a key without a value, a line without an equals sign, and a section that comes twice. Its lines end with a
-// carriage return and a line feed.
 var sections = strings.Join([]string{
 	"// a comment",
 	"ignored=before any section",
@@ -30,7 +25,6 @@ var sections = strings.Join([]string{
 	"Hotkey=F",
 }, "\r\n")
 
-// The two texts of one merge: the second sets a key the first has, and adds a section.
 const (
 	merged      = "[a]\nName=One\nTip=T\n"
 	mergedLater = "[a]\nName=Two\n[b]\nName=B\n"
@@ -53,12 +47,10 @@ func TestAddMergesIntoAnExistingResultLaterTextsWinning(t *testing.T) {
 	if !reflect.DeepEqual(file, want) {
 		t.Errorf("sections: %q, want %q", file, want)
 	}
-	// A text starts outside every section, the ones of the texts before it too.
 	file.Add("Name=Three\nTip=U\n")
 	if !reflect.DeepEqual(file, want) {
 		t.Errorf("after a text of keys without a section: %q, want %q", file, want)
 	}
-	// A file that has no section takes a text as Parse reads it.
 	added := ini.File{}
 	added.Add(sections)
 	if !reflect.DeepEqual(added, ini.Parse(sections)) {
@@ -66,7 +58,6 @@ func TestAddMergesIntoAnExistingResultLaterTextsWinning(t *testing.T) {
 	}
 }
 
-// lines are texts with lines of every kind, each with the sections it is read into.
 var lines = []struct {
 	name, text string
 	want       ini.File
@@ -97,7 +88,6 @@ func TestParseReadsLines(t *testing.T) {
 	}
 }
 
-// One quoted string has a quote at each end. A value with a quote at one end only is none, and keeps it.
 func TestAValueWithAQuoteAtOneEndOnlyIsKeptAsItIsWritten(t *testing.T) {
 	got := ini.Parse("[a]\nA=\"open\nB=shut\"\nC=\"x\nD=x\"\nE=\"x\"\n")
 	want := ini.File{"a": {"A": `"open`, "B": `shut"`, "C": `"x`, "D": `x"`, "E": "x"}}
@@ -106,8 +96,6 @@ func TestAValueWithAQuoteAtOneEndOnlyIsKeptAsItIsWritten(t *testing.T) {
 	}
 }
 
-// widerSpace are texts with a character that is white space outside ASCII. Each is text: it is trimmed from
-// nothing, so it is part of the key or of the value it stands in, and a line that starts with one is no header.
 var widerSpace = []struct {
 	name, text string
 	want       ini.File
@@ -129,7 +117,6 @@ func TestWhiteSpaceOutsideASCIIIsText(t *testing.T) {
 			t.Errorf("%s: %q, want %q", c.name, got, c.want)
 		}
 	}
-	// A parser is given text that is decoded, so it knows of no byte order mark: one at the start is text too.
 	if got := ini.Parse("\xEF\xBB\xBF[a]\nName=One\n"); len(got) != 0 {
 		t.Errorf("a byte order mark before the first header: %q, want no section", got)
 	}

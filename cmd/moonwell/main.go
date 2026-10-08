@@ -1,5 +1,3 @@
-// Command moonwell is the Moonwell command line: a toolchain for Warcraft III maps with YueScript gameplay and Pkl
-// data.
 package main
 
 import (

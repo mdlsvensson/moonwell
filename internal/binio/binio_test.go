@@ -37,17 +37,16 @@ func TestWriterAndReaderRoundTrip(t *testing.T) {
 	}
 }
 
-// Every type is read once from fixed bytes, then written back: the Writer must produce the same bytes.
 func TestEveryTypeReadsFromBytesAndWritesBackToThem(t *testing.T) {
 	data := []byte{
-		0x7F,       // U8
-		0x01, 0x80, // U16
-		0x78, 0x56, 0x34, 0x12, // U32
-		0x00, 0x00, 0x00, 0x80, // I32: math.MinInt32
-		0x00, 0x00, 0xC0, 0x3F, // F32: 1.5
-		'a', 'b', 0, // CString
-		0, 0, 0, // padding, read with Skip
-		9, 8, 7, // raw bytes
+		0x7F,
+		0x01, 0x80,
+		0x78, 0x56, 0x34, 0x12,
+		0x00, 0x00, 0x00, 0x80,
+		0x00, 0x00, 0xC0, 0x3F,
+		'a', 'b', 0,
+		0, 0, 0,
+		9, 8, 7,
 	}
 
 	r := NewReader(data)
@@ -86,7 +85,6 @@ func TestReaderKeepsItsFirstFailure(t *testing.T) {
 	if err == nil || err.Offset != 2 || err.Unterminated {
 		t.Fatalf("Err = %+v", err)
 	}
-	// Later reads return zero and leave the first failure in place, even where data remains.
 	if r.U8() != 0 || r.CString() != nil || r.Offset() != 2 || r.Err() != err {
 		t.Error("the reader went on after a failure")
 	}
@@ -112,7 +110,6 @@ func TestReaderFailsOnASizeItCannotTake(t *testing.T) {
 			if err == nil || err.Offset != 1 || err.Unterminated {
 				t.Fatalf("Err = %+v", err)
 			}
-			// A failed read consumes nothing.
 			if r.Offset() != 1 || r.Len() != 2 {
 				t.Errorf("offset %d, %d left", r.Offset(), r.Len())
 			}

@@ -21,8 +21,6 @@ const (
 	helperMarker = "MOONWELL_ENV_MARKER"
 )
 
-// TestMain lets the test program stand in for the programs these tests run: one that prints and exits with 3, one
-// that prints bytes that are not UTF-8, and the parent and the child of the detached-spawn test.
 func TestMain(m *testing.M) {
 	switch os.Getenv(helperRole) {
 	case "program":
@@ -107,7 +105,6 @@ func TestRunReportsAnySpawnFailureWithTheHint(t *testing.T) {
 	if err := os.WriteFile(junk, []byte("not a program"), 0o666); err != nil {
 		t.Fatal(err)
 	}
-	// The reason is the system's own and differs between systems; the message's frame does not.
 	for name, program := range map[string]string{"a folder": dir, "a file that is not a program": junk} {
 		t.Run(name, func(t *testing.T) {
 			_, err := Run(context.Background(), program, nil, RunOptions{Hint: "fix it"})
@@ -154,7 +151,6 @@ func TestSpawnErrorNamesTheProgramTheReasonTheHintAndTheFile(t *testing.T) {
 
 func TestSpawnDetachedKeepsTheChildRunningAfterTheProgramExits(t *testing.T) {
 	marker := filepath.Join(t.TempDir(), "marker.txt")
-	// The test program is the parent, which spawns itself as the child and exits (TestMain).
 	parent := exec.Command(os.Args[0])
 	parent.Env = append(os.Environ(), helperRole+"=parent", helperMarker+"="+marker)
 	if output, err := parent.CombinedOutput(); err != nil {

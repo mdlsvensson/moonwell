@@ -1,17 +1,11 @@
 package lua
 
-// Require is one call of the global `require`.
 type Require struct {
-	Line int
-	// Name is the module name when Literal is true.
-	Name string
-	// Literal is false when the argument is not one plain string literal: nothing can follow it without running the
-	// source.
+	Line    int
+	Name    string
 	Literal bool
 }
 
-// Requires finds the calls of the global `require`: `require "name"`, `require [[name]]` and `require(...)`. A
-// `require` that is passed on or assigned without being called is none.
 func Requires(source string) []Require {
 	tokens := simpleTokens(source)
 	var calls []Require
@@ -31,8 +25,6 @@ func Requires(source string) []Require {
 	return calls
 }
 
-// isAnotherRequire reports whether the token before a `require` makes it something else than the global: a field
-// or a method of a value, or a function or a local that the source declares under that name.
 func isAnotherRequire(previous Token) bool {
 	switch previous.Kind {
 	case SymbolToken:
@@ -43,8 +35,6 @@ func isAnotherRequire(previous Token) bool {
 	return false
 }
 
-// stringArgument looks at the tokens after a `require`. called is false when they do not call it. The literal is
-// the string it is called with, or nil when its arguments are anything but one string.
 func stringArgument(after []Token) (literal *Token, called bool) {
 	switch {
 	case len(after) > 0 && after[0].Kind == StringToken:

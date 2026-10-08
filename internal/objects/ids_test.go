@@ -31,7 +31,6 @@ func object(category manifest.Category, key, id string) objects.Resolved {
 
 var captainIDs, _ = objects.RenderIDs([]objects.Resolved{object("units", "captain", "h000")})
 
-// rendered is the ids module of objects whose ids pack.
 func rendered(t *testing.T, resolved []objects.Resolved) string {
 	t.Helper()
 	ids, err := objects.RenderIDs(resolved)
@@ -73,7 +72,6 @@ func asError(t *testing.T, err error, what string) *diag.Error {
 func TestPackIDPacksARawcodeBigEndian(t *testing.T) {
 	for id, want := range map[string]uint32{
 		"h000": 1747988528, "A000": 0x41303030,
-		// The number has no sign: an id whose first byte is 0x80 or more stays above 0. U+00FF is the byte 0xFF.
 		"\xc3\xbf\x00\x00\x00": 0xff000000,
 	} {
 		if got, err := objects.PackID(id); err != nil || got != want {
@@ -144,7 +142,6 @@ func TestRenderIDsSortsKeysWithinEachCategoryAndCommentsEachRawcode(t *testing.T
 
 func TestStatusOfIDsIsCurrentStaleOrMissing(t *testing.T) {
 	root := t.TempDir()
-	// No objects and no file is current, so a project that has never had objects passes check.
 	if got := status(t, root, emptyIDs); got != objects.IDsCurrent {
 		t.Errorf("no file, no objects: %s", got)
 	}
@@ -194,7 +191,6 @@ func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.
 	if err := objects.AssertIDsCurrent(root, captainIDs); err != nil {
 		t.Error(err)
 	}
-	// A CR alone is a difference, and so is a byte order mark.
 	for name, content := range map[string]string{
 		"CR alone":          strings.ReplaceAll(captainIDs, "\n", "\r"),
 		"a byte order mark": "\xEF\xBB\xBF" + captainIDs,
@@ -204,7 +200,6 @@ func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.
 			t.Errorf("%s: %s", name, got)
 		}
 	}
-	// A folder in the module's place cannot be read.
 	other := t.TempDir()
 	if err := os.MkdirAll(idsFile(other), 0o777); err != nil {
 		t.Fatal(err)
@@ -254,7 +249,6 @@ func TestRefreshIDsWritesOnlyAStaleOrMissingModuleAndNeverAnEmptyOneThatIsNotNee
 }
 
 func TestRefreshIDsNamesTheModuleWhenItCannotBeWritten(t *testing.T) {
-	// A file where the module's folder belongs: the module cannot be read or written, whichever the system refuses.
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "src/generated", []byte("a file"))
 	wrote, err := objects.RefreshIDs(root, captainIDs)

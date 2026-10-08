@@ -14,30 +14,18 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
-// The tests of this file run setup in a project that init made. Each runs the real pkl, and takes the time that
-// takes; none runs the compiler, which setup asks for and never starts. They run in a seeded world, so that what
-// setup keeps for the editor goes into a cache of the test's own. The carried cases of setup are in e2e_test.go.
-
-// createdLocal is the line setup logs for a moonwell.local.pkl it made.
 const createdLocal = "Created moonwell.local.pkl. Check that launch.gameExecutable points at your Warcraft III.exe."
 
-// saysWhichCompiler is the line setup logs for the compiler it found.
 func saysWhichCompiler(compiler string) string {
 	return "YueScript " + toolchain.YueVersion + ": " + compiler
 }
 
-// warnsOfPath reports whether a line is the warning for a PATH without `yue`, with the command that puts binDir
-// there.
 func warnsOfPath(line, binDir string) bool {
 	return strings.HasPrefix(line, "warning: yue is not on PATH; VS Code's YueScript extension needs YueScript "+
 		toolchain.YueVersion+" there. Run this once in ") &&
 		strings.HasSuffix(line, ":\n  "+toolchain.PathCommand(binDir, runtime.GOOS))
 }
 
-// ---- the order of the steps, and what each says ----
-
-// A whole setup says its steps in their order. The compiler is copied for the editor once: a second setup finds
-// the copy, and says nothing of it.
 func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *testing.T) {
 	world, root := seeded(t), newProject(t, "my-map")
 	remove(t, root, "moonwell.local.pkl")
@@ -67,8 +55,6 @@ func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *te
 	}
 }
 
-// A yue.path is the user's own program: it is asked for its version, not copied, and the folder to put on PATH
-// is its own, with the separators the manifest writes.
 func TestSetupWithAYuePathCopiesNothingAndNamesItsFolderAsTheManifestWritesIt(t *testing.T) {
 	tools := filepath.ToSlash(t.TempDir())
 	written := tools + "/kept/yue-of-mine"
@@ -88,8 +74,6 @@ func TestSetupWithAYuePathCopiesNothingAndNamesItsFolderAsTheManifestWritesIt(t 
 	}
 }
 
-// The world lets pkl alone run, and the manifest names a compiler that is not there: setup ends at the compiler,
-// and what it has done by then is what comes before it.
 func TestSetupMakesTheLocalManifestBeforeItLooksForTheCompilerAndTheEditorsFilesAfter(t *testing.T) {
 	root := newProject(t, "my-map")
 	gone := filepath.ToSlash(filepath.Join(t.TempDir(), "no-such-yue"))
@@ -124,13 +108,11 @@ func TestSetupWithoutItsSourceMapFailsAtTheDeclarations(t *testing.T) {
 		!strings.Contains(failure.Msg, "Source map folder maps/map.w3x not found") {
 		t.Errorf("error = %+v", failure)
 	}
-	// The tools and the editor's files are in place by then.
 	logged := strings.Join(log.Lines(), "\n")
 	contains(t, logged, saysWhichCompiler(world.compiler), "Added yueconfig.yue for the editor.")
 	if !exists(root, "yueconfig.yue") || !fsx.Exists(world.binDir()) {
 		t.Error("setup did not copy the compiler and add the editor's files before it opened the map")
 	}
-	// The declarations, and the libraries after them, are not.
 	for _, path := range []string{".moonwell/types", ".moonwell/yue", ".moonwell/libraries", "dist/.lock"} {
 		if exists(root, path) {
 			t.Errorf("setup made %s though the map is not there", path)
@@ -138,9 +120,6 @@ func TestSetupWithoutItsSourceMapFailsAtTheDeclarations(t *testing.T) {
 	}
 }
 
-// The build lock is taken for the libraries and no earlier: beside a running build, and in a project whose dist
-// is a link, setup has installed the tools and written the editor's files and the declarations by the time it
-// is refused.
 func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing.T) {
 	for _, c := range []struct {
 		what    string
@@ -188,8 +167,6 @@ func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing
 	}
 }
 
-// The ids module is what the gameplay imports, and a build's to write: setup declares the project's objects for
-// the editor, and leaves the module as it is, also when it is not there.
 func TestSetupDeclaresTheObjectsAndLeavesTheIDsModuleToABuild(t *testing.T) {
 	world, root := seeded(t), newProject(t, "my-map")
 	remove(t, root, "src/generated/objects.yue")
@@ -200,9 +177,6 @@ func TestSetupDeclaresTheObjectsAndLeavesTheIDsModuleToABuild(t *testing.T) {
 	}
 }
 
-// ---- .luarc.json ----
-
-// A setup that ends well gives the build lock back, and keeps what it said in the project's log.
 func TestSetupSaysWhatItAddsToLuarcAndNamesTheEntriesOfOneItLeavesAlone(t *testing.T) {
 	world, root := seeded(t), newProject(t, "my-map")
 	write(t, root, ".luarc.json", "{\n  \"runtime.version\": \"Lua 5.3\",\n  \"runtime.path\": [\"src/?.lua\"]\n}\n")
@@ -218,7 +192,6 @@ func TestSetupSaysWhatItAddsToLuarcAndNamesTheEntriesOfOneItLeavesAlone(t *testi
 		t.Errorf("a second setup spoke of a .luarc.json that lacks nothing:\n%s", again.output)
 	}
 
-	// A comment makes the file one that only lua-language-server reads: it is left as it is.
 	mine := "// Mine.\n" + read(t, root, ".luarc.json")
 	write(t, root, ".luarc.json", mine)
 	edit(t, root, ".luarc.json", `"dist"`, `"build"`)

@@ -11,11 +11,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// What setup does so that an editor and a shell find the pinned programs: a copy of each in one folder of the
-// cache, and the command that puts that folder on PATH. Moonwell never changes PATH itself.
-
-// InstallBin copies a tool's program to <cache>/bin/, the folder users put on PATH, unless an identical copy is
-// there. It returns the copy's path, and whether it copied.
 func InstallBin(e *env.Env, tool Tool, program string) (path string, copied bool, err error) {
 	path = filepath.Join(e.CacheDir, "bin", filepath.Base(program))
 	copied, err = fsx.CopyProgram(program, path)
@@ -25,11 +20,8 @@ func InstallBin(e *env.Env, tool Tool, program string) (path string, copied bool
 	return path, copied, nil
 }
 
-// PathCommand is the one-time command that adds binDir to the user's PATH: PowerShell on Windows, a shell line
-// elsewhere. goos is the system as Go names it.
 func PathCommand(binDir, goos string) string {
 	if goos == "windows" {
-		// A single-quoted PowerShell literal takes the folder as it is; only "'" needs doubling.
 		entry := strings.ReplaceAll(";"+binDir, "'", "''")
 		return "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + '" +
 			entry + "', 'User')"
@@ -37,8 +29,6 @@ func PathCommand(binDir, goos string) string {
 	return `echo 'export PATH="` + binDir + `:$PATH"' >> ~/.profile`
 }
 
-// DirAsWritten is the folder of path with the separators the path was written with: the manifest's yue.path may
-// use "/" on Windows, and the PATH command shows that folder to the user. filepath.Dir would rewrite them.
 func DirAsWritten(path string) string {
 	root := len(filepath.VolumeName(path))
 	end := lastName(path, root)
@@ -48,15 +38,12 @@ func DirAsWritten(path string) string {
 		}
 		return "."
 	}
-	// path[:end] ends with the separators before the last name; the root keeps one of them.
 	for end > root+1 && os.IsPathSeparator(path[end-1]) {
 		end--
 	}
 	return path[:end]
 }
 
-// lastName is where the last name of path starts, after the separators before it; root is where the path's
-// volume ends. Separators after the last name do not count.
 func lastName(path string, root int) int {
 	end := len(path)
 	for end > root && os.IsPathSeparator(path[end-1]) {
@@ -68,7 +55,6 @@ func lastName(path string, root int) int {
 	return end
 }
 
-// shellOf names the shell in which a user of this system runs the PATH command.
 func shellOf(goos string) string {
 	if goos == "windows" {
 		return "PowerShell"
@@ -76,9 +62,6 @@ func shellOf(goos string) string {
 	return "your shell"
 }
 
-// ReportYueOnPath logs what VS Code's YueScript extension still needs on this machine: `yue` of this version on
-// PATH. binDir is the folder with the copy of the compiler, for the PATH command. It says nothing when PATH has
-// that version.
 func ReportYueOnPath(ctx context.Context, e *env.Env, version, binDir, goos string) error {
 	onPath, found, err := yueOnPath(ctx, e)
 	if err != nil || (found && onPath == version) {
@@ -94,8 +77,6 @@ func ReportYueOnPath(ctx context.Context, e *env.Env, version, binDir, goos stri
 	return nil
 }
 
-// yueOnPath says what `yue` on PATH is: found is false when there is none, or when it names no version, and
-// version is what it reports. A run that was cancelled is passed on.
 func yueOnPath(ctx context.Context, e *env.Env) (version string, found bool, err error) {
 	version, err = ReportedVersion(ctx, e, YueScript, YueScript.Name)
 	switch {
@@ -107,9 +88,6 @@ func yueOnPath(ctx context.Context, e *env.Env) (version string, found bool, err
 	return version, version != "", nil
 }
 
-// KeepPklForShell is setup's step for the pinned Pkl. When Moonwell runs its own Pkl (program is not the bare
-// name of the one on PATH), it copies it to <cache>/bin/ and warns when `pkl` typed in a shell still finds no
-// Pkl, with the command that puts that folder on PATH. An older pkl on PATH is PklProgram's to report.
 func KeepPklForShell(ctx context.Context, e *env.Env, program, goos string) error {
 	if program == Pkl.Name {
 		return nil
@@ -128,8 +106,6 @@ func KeepPklForShell(ctx context.Context, e *env.Env, program, goos string) erro
 		"Run this once in " + shellOf(goos) + ", then open a new terminal:\n  " + PathCommand(filepath.Dir(path), goos))
 	return nil
 }
-
-// ---- errors ----
 
 func errNotCopied(tool Tool, path string, cause error) error {
 	return &diag.Error{

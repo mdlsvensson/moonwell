@@ -14,7 +14,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// snapshot is every entry below dir as text, a folder as "<folder>".
 func snapshot(t *testing.T, dir string) map[string]string {
 	t.Helper()
 	entries := map[string]string{}
@@ -27,7 +26,6 @@ func snapshot(t *testing.T, dir string) map[string]string {
 	return entries
 }
 
-// filesOf is a snapshot without its folders.
 func filesOf(entries map[string]string) map[string]string {
 	files := map[string]string{}
 	for name, content := range entries {
@@ -57,7 +55,6 @@ func TestStageToWritesTheChangesIntoACopy(t *testing.T) {
 		put("textures/New.blp", "new"),
 	})
 	source := snapshot(t, dir)
-	// The stage is below folders that do not exist the first time, and holds an older copy the second time.
 	stage := filepath.Join(t.TempDir(), "dist", "stage", "map.w3x")
 	want := map[string]string{
 		"war3map.w3i":           "patched",
@@ -79,7 +76,6 @@ func TestStageToWritesTheChangesIntoACopy(t *testing.T) {
 		if got := snapshot(t, stage); !reflect.DeepEqual(got, want) {
 			t.Errorf("%s: the stage holds %v, want %v", round, got, want)
 		}
-		// Each folder has one spelling, so the staged map is one the scan accepts.
 		if _, err := Open(stage, label); err != nil {
 			t.Errorf("%s: the staged map cannot be opened: %v", round, err)
 		}
@@ -118,7 +114,6 @@ func TestStageToNamesTheFileItCouldNotWrite(t *testing.T) {
 	const hint = "Close Warcraft III or World Editor if they have dist/stage open, then retry."
 	folder, dir := open(t, sourceMap)
 	view := folder.With([]Change{put("new.txt", "data")})
-	// A folder made after the scan, where the new file goes: the copy has it, and no system writes a file over it.
 	if err := os.Mkdir(filepath.Join(dir, "new.txt"), 0o777); err != nil {
 		t.Fatal(err)
 	}
@@ -130,20 +125,15 @@ func TestStageToNamesTheFileItCouldNotWrite(t *testing.T) {
 	}
 }
 
-// plan is two changes the map has a place for, and then the given ones: a refusal of the plan must come before
-// the first two are written.
 func plan(changes ...Change) []Change {
 	return append([]Change{put("war3mapskin.txt", "merged"), put("new.txt", "new")}, changes...)
 }
 
-// plannersBugs are plans no planner may make: one of their changes has a name no file can have, or no place in
-// the map.
 var plannersBugs = []struct {
 	name    string
 	changes []Change
-	words   []string // of the error
+	words   []string
 }{
-	// With keeps a name that cannot be written as given, so the refusal names it so.
 	{"a path that leaves the folder", plan(put("../outside.txt", "data")),
 		[]string{`Cannot write "../outside.txt"`, "relative path"}},
 	{"a leading slash before a file the map has", plan(put("/WAR3MAP.W3I", "data")),
@@ -161,14 +151,12 @@ var plannersBugs = []struct {
 		[]string{"Cannot write WAR3MAP.W3I/x.txt", "goes through war3map.w3i, a file of the map"}},
 	{"a change through a file below a folder", plan(put("textures/old.blp/deep/x.txt", "data")),
 		[]string{"Cannot write Textures/old.blp/deep/x.txt", "goes through Textures/Old.blp, a file of the map"}},
-	// A file of the map never becomes a folder, whatever the plan does with the file.
 	{"a change through a file that the plan removes first",
 		plan(drop("WAR3MAP.W3I"), put("war3map.w3i/x.txt", "data")),
 		[]string{"Cannot write war3map.w3i/x.txt", "goes through war3map.w3i, a file of the map"}},
 	{"a change through a file that the plan removes after it",
 		plan(put("war3map.w3i/x.txt", "data"), drop("WAR3MAP.W3I")),
 		[]string{"Cannot write war3map.w3i/x.txt", "goes through war3map.w3i, a file of the map"}},
-	// Of two changes that have no place beside each other, the one planned first is named.
 	{"a new file named as the folder a later change makes",
 		plan(put("Sound", "data"), put("sound/theme.mp3", "theme")),
 		[]string{"Cannot write Sound", "the folder sound of the map"}},
@@ -177,7 +165,6 @@ var plannersBugs = []struct {
 		[]string{"Cannot write Sound/Music/theme.mp3", "goes through sound, a file of the map"}},
 }
 
-// asPlannersBug is the text of an error that must not be one a user is told to act on.
 func asPlannersBug(t *testing.T, err error) string {
 	t.Helper()
 	if err == nil {
@@ -195,7 +182,6 @@ func TestStageToRefusesAPlannersBugBeforeItWrites(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			folder, dir := open(t, sourceMap)
 			source := snapshot(t, dir)
-			// The stage holds an earlier build, and the folder it is in shows a write beside it.
 			around := t.TempDir()
 			stage := filepath.Join(around, "stage", "map.w3x")
 			testkit.WriteFile(t, stage, "left.txt", []byte("from an earlier build"))
@@ -220,7 +206,6 @@ func TestApplyInPlaceRefusesAPlannersBugBeforeItWrites(t *testing.T) {
 	for _, c := range plannersBugs {
 		t.Run(c.name, func(t *testing.T) {
 			folder, dir := open(t, sourceMap)
-			// The folder the map is in shows a write beside the map.
 			before := snapshot(t, filepath.Dir(dir))
 			var journal fsx.Journal
 			text := asPlannersBug(t, folder.With(c.changes).ApplyInPlace(context.Background(), &journal))
@@ -238,7 +223,6 @@ func TestApplyInPlaceRefusesAPlannersBugBeforeItWrites(t *testing.T) {
 
 func TestStageToNamesTheStageItCouldNotReplace(t *testing.T) {
 	folder, _ := open(t, sourceMap)
-	// A file where the folder the stage goes into should be.
 	blocked := filepath.Join(t.TempDir(), "dist")
 	if err := os.WriteFile(blocked, nil, 0o666); err != nil {
 		t.Fatal(err)
@@ -290,8 +274,6 @@ func TestStageToDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
 	outside := linkAway(t, dir)
 	before := snapshot(t, outside)
 	stage := filepath.Join(t.TempDir(), "map.w3x")
-	// How the copy fails differs by system (the link is copied as a link, or cannot be copied); that it fails, and
-	// that nothing is written where the link points, does not.
 	if e := asError(t, view.StageTo(stage)); !contains(e.Msg, "Staging the map failed") {
 		t.Errorf("error = %+v", e)
 	}
@@ -328,8 +310,6 @@ func TestApplyInPlaceDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
 	}
 }
 
-// stage is given the copy, which holds a link where the map holds one: a link made after the scan is copied as a
-// link on a system that can copy one. A change below it is not written through it.
 func TestStageDoesNotWriteAChangeThroughALinkInTheCopy(t *testing.T) {
 	_, dir := open(t, sourceMap)
 	outside := linkAway(t, dir)
@@ -348,8 +328,6 @@ func TestStageDoesNotWriteAChangeThroughALinkInTheCopy(t *testing.T) {
 func TestApplyInPlaceStopsAtAFileItCannotWrite(t *testing.T) {
 	folder, dir := open(t, sourceMap)
 	view := folder.With([]Change{put("war3mapskin.txt", "merged"), put("Sound/theme.mp3", "theme"), put("new.txt", "new")})
-	// A file made after the scan, where the second change's new folder goes. The check before the first write
-	// knows the scan only, and the check of the file itself finds no file at its path, as the scan did.
 	testkit.WriteFile(t, dir, "Sound", []byte("in the way"))
 	var journal fsx.Journal
 	e := asError(t, view.ApplyInPlace(context.Background(), &journal))
@@ -364,8 +342,6 @@ func TestApplyInPlaceStopsAtAFileItCannotWrite(t *testing.T) {
 	if _, written := after["new.txt"]; written {
 		t.Error("new.txt was written after the change that failed")
 	}
-	// The first change is in the journal, which puts it back. A system that fails the second write only when it
-	// makes the folder has the second change in the journal too.
 	if journal.Len() < 1 || journal.Len() > 2 {
 		t.Errorf("the journal has touched %d files, want the first change, and the second at most", journal.Len())
 	}
@@ -381,7 +357,6 @@ func TestApplyInPlaceStopsAtAFileItCannotWrite(t *testing.T) {
 func TestApplyInPlaceWritesThroughTheJournalWhichCanUndoIt(t *testing.T) {
 	folder, dir := open(t, sourceMap)
 	before := snapshot(t, dir)
-	// A planner reads what it changes.
 	read(t, folder, "war3map.w3i")
 	read(t, folder, "war3mapMap.blp")
 	view := folder.With([]Change{
@@ -413,7 +388,6 @@ func TestApplyInPlaceWritesThroughTheJournalWhichCanUndoIt(t *testing.T) {
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
 		t.Errorf("unrestored = %v", unrestored)
 	}
-	// The journal puts files back; the folders made for them stay.
 	if got := filesOf(snapshot(t, dir)); !reflect.DeepEqual(got, filesOf(before)) {
 		t.Errorf("after the undo the map holds %v, want %v", got, filesOf(before))
 	}
@@ -440,7 +414,7 @@ func TestApplyInPlaceRefusesAFileThatIsNotAsTheFolderSawIt(t *testing.T) {
 		name    string
 		read    func(t *testing.T, folder *Folder)
 		meddle  func(t *testing.T, dir string)
-		refused string // the file the error is at; "" when everything is written
+		refused string
 	}{
 		{"a file that was read, then edited", readIn(itself), edit("b.txt"), "b.txt"},
 		{"a file a view read, then edited", readIn(aView), edit("b.txt"), "b.txt"},
@@ -473,7 +447,6 @@ func TestApplyInPlaceRefusesAFileThatIsNotAsTheFolderSawIt(t *testing.T) {
 				!contains(e.Hint, "Close World Editor") {
 				t.Errorf("error = %+v", e)
 			}
-			// What was written before the refused file stays, for the caller's journal to undo; nothing follows it.
 			after := filesOf(snapshot(t, dir))
 			if after["a.txt"] != "1" || after["c.txt"] != "c" {
 				t.Errorf("the map holds %v, want a.txt written and c.txt untouched", after)
@@ -501,8 +474,6 @@ func TestApplyInPlaceStopsAtACancelledContext(t *testing.T) {
 	}
 }
 
-// cancelledAfter is a context that is cancelled once Err has been asked a number of times. ApplyInPlace asks once
-// before each change.
 type cancelledAfter struct {
 	context.Context
 	asks int

@@ -28,14 +28,9 @@ func TestSweptPutsEachKindOfWhiteSpaceAtEachPlaceOfEachLine(t *testing.T) {
 		count int
 		among []string
 	}{
-		// A line without white space has its two edges: six kinds at each.
 		{"ab", 12, []string{" ab", "\tab", "\nab", "\vab", "\fab", "\rab", "ab ", "ab\r"}},
-		// A white-space character is a place three times over: in its place, before it and after it. A space in
-		// the place of a space is the text itself, and a space before a space is a space after it.
 		{"a b", 28, []string{"\fa b", "a\tb", "a\t b", "a \tb", "a  b", "a\nb", "a b\v"}},
-		// Each line has its edges. A line feed at the end of one line is a line feed at the start of the next.
 		{"a\nb", 23, []string{"\ta\nb", "a\t\nb", "a\n\tb", "a\nb\t", "a\n\nb"}},
-		// The carriage return before a line feed is a white-space character of its line.
 		{"a\r\nb", 33, []string{"a\t\nb", "a\t\r\nb", "a\r\t\nb", "a\n\nb", "a\r\n\rb"}},
 		{"", 6, []string{" ", "\r"}},
 	} {
@@ -54,13 +49,11 @@ func TestSweptPutsEachKindOfWhiteSpaceAtEachPlaceOfEachLine(t *testing.T) {
 			}
 		}
 	}
-	// The texts come in the order of the places, and at a place in the order of the six kinds.
 	if swept := Swept("ab"); !slices.Equal(swept[:7], []string{" ab", "\tab", "\nab", "\vab", "\fab", "\rab", "ab "}) {
 		t.Errorf("the first texts of ab are %q", swept[:7])
 	}
 }
 
-// kindOfChange names the one change that makes changed of text; "" when no one change does.
 func kindOfChange(text, changed string) string {
 	lines := strings.Split(text, "\n")
 	for i := range lines {
@@ -93,7 +86,6 @@ func TestOneChangeIsALineCutOrDoubledAQuoteDroppedOrWhiteSpacePutIn(t *testing.T
 		kinds []string
 	}{
 		{"first \"one\"\r\nsecond\ttwo\n\nlast", append([]string{"a quote dropped"}, withoutAQuote...)},
-		// A text without a quote has white space put in for the quote that cannot be dropped.
 		{"first one\nsecond", withoutAQuote},
 	} {
 		seen := map[string]int{}
@@ -135,7 +127,6 @@ func TestChangedMakesTheSameTextOfASeedAndAnIndexOnEveryCall(t *testing.T) {
 		t.Errorf("%d texts of 200 indexes, and %d other texts of another seed; want 100 or more of each",
 			len(made), otherSeed)
 	}
-	// One to three changes: some texts are one change away, and some are not.
 	one := 0
 	for changed := range made {
 		if kindOfChange(text, changed) != "" {
@@ -147,8 +138,6 @@ func TestChangedMakesTheSameTextOfASeedAndAnIndexOnEveryCall(t *testing.T) {
 	}
 }
 
-// kindOfByteChange names the one change that makes changed of data; "" when no one change does. The lengths of
-// the two tell the three kinds apart.
 func kindOfByteChange(data, changed []byte) string {
 	grown := len(changed) - len(data)
 	for at := range data {
@@ -200,14 +189,12 @@ func TestOneChangeOfBytesIsAByteSetARunDroppedARunDoubledOrANumberSet(t *testing
 			t.Errorf("no change wrote the number %#x", edge)
 		}
 	}
-	// Bytes too few for a number have a byte set in its place: nothing is written past their end.
 	for range 200 {
 		short := []byte("xyz")
 		if changed := changeBytes(random, slices.Clone(short)); kindOfByteChange(short, changed) == "" {
 			t.Fatalf("%q became %q, which no one change makes", short, changed)
 		}
 	}
-	// A run is of 1 to 16 bytes: every length is dropped and doubled, and none is longer.
 	for grown := -longestRun; grown <= longestRun; grown++ {
 		if !lengths[grown] {
 			t.Errorf("no change made the bytes %d longer", grown)
@@ -243,7 +230,6 @@ func TestChangedBytesMakesTheSameBytesOfASeedAndAnIndexAndLeavesItsInputAlone(t 
 		t.Errorf("%d results of 200 indexes, and %d other results of another seed; want 150 or more of each",
 			len(made), otherSeed)
 	}
-	// One to three changes: some results are one change away, and some are not.
 	if one < 20 || one > 180 {
 		t.Errorf("%d of 200 results are one change away", one)
 	}
@@ -251,8 +237,6 @@ func TestChangedBytesMakesTheSameBytesOfASeedAndAnIndexAndLeavesItsInputAlone(t 
 		if changed := ChangedBytes(nil, 9, index); len(changed) != 0 {
 			t.Errorf("no bytes became %q", changed)
 		}
-		// One byte is dropped, doubled or set, and each change after that meets what is left: at most three
-		// doublings of everything.
 		if changed := ChangedBytes([]byte{7}, 9, index); len(changed) > 8 {
 			t.Errorf("one byte became %q", changed)
 		}

@@ -17,13 +17,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// ---- the scripts ----
-
-// script is a war3map.lua, or a text given as one.
 type script struct{ name, text string }
 
-// scripts is the fixture's script, every script the tests of the Lua patch or see refused, and the fixture's in
-// other layouts.
 func scripts(t testing.TB) []script {
 	t.Helper()
 	fixture := fixtureLua(t)
@@ -50,15 +45,10 @@ func scripts(t testing.TB) []script {
 	for _, source := range others {
 		all = append(all, script{fmt.Sprintf("the script %q", source), source})
 	}
-	// A call that is added takes its line ending, its indentation and its semicolon from the layout, and the one
-	// call a setting adds to a player is the one that holds the player to its start: each layout comes once more
-	// without that call for player 1.
 	all = append(all, layouts(t, "", fixture)...)
 	return append(all, layouts(t, "with player 1 not held to its start, ", notHeld)...)
 }
 
-// layouts is a script of the fixture's shape written in other ways that say the same. Each is named by what
-// stands before its name.
 func layouts(t testing.TB, before, fixture string) []script {
 	t.Helper()
 	oneLine := strings.ReplaceAll(swapped(t, fixture, "--\r\n", ""), "\r\n", " ")
@@ -78,8 +68,6 @@ func layouts(t testing.TB, before, fixture string) []script {
 	}
 }
 
-// onEveryCore runs each piece of work on one of as many goroutines as the machine runs at once, and returns when
-// all are done.
 func onEveryCore(pieces int, work func(piece int)) {
 	queue := make(chan int)
 	var workers sync.WaitGroup
@@ -97,11 +85,6 @@ func onEveryCore(pieces int, work func(piece int)) {
 	workers.Wait()
 }
 
-// ---- the map folders ----
-
-// planProject is a project folder that holds, at each path a document names as its preview, a picture of the
-// kind the path says. The picture that documents name in two spellings is written under both: a file system
-// that keeps the spellings apart then has two files and another has one, and both give the same bytes for either.
 func planProject(t testing.TB) string {
 	t.Helper()
 	root := t.TempDir()
@@ -124,19 +107,12 @@ func planProject(t testing.TB) string {
 	return root
 }
 
-// sourceMap is a map folder that the settings are planned for.
 type sourceMap struct {
 	name  string
 	files map[string][]byte
-	// every says that every document is planned for the folder. For the others it is those of routeDocuments.
 	every bool
 }
 
-// sourceMaps is the map folders the settings are planned for. The first two get every document: the fixture as
-// it is, which has neither of the optional text files and no minimap, and the fixture with every file a plan
-// reads, each text file behind a byte order mark. The others get the documents of routeDocuments: the fixture
-// with each optional file alone and with all, with files that hold nothing, under other spellings, and each
-// folder that a plan refuses for a file it lacks, cannot read as text or cannot patch, or for a name it has.
 func sourceMaps(t testing.TB) []sourceMap {
 	t.Helper()
 	info, script := fixtureInfo(t), fixtureLua(t)
@@ -185,7 +161,6 @@ func sourceMaps(t testing.TB) []sourceMap {
 	}
 }
 
-// onDisk writes the map folder into a temporary folder and returns its path.
 func (m sourceMap) onDisk(t testing.TB) string {
 	t.Helper()
 	dir := t.TempDir()
@@ -195,9 +170,6 @@ func (m sourceMap) onDisk(t testing.TB) string {
 	return dir
 }
 
-// ---- the recording ----
-
-// fileOf is the file that a refusal names.
 func fileOf(err error) string {
 	failure, expected := diag.First(err)
 	if !expected {
@@ -206,15 +178,12 @@ func fileOf(err error) string {
 	return failure.File
 }
 
-// recordedPlan is what a plan came to: its changes, or the file its refusal names.
 type recordedPlan struct {
 	changes   []mapdir.Change
 	refused   bool
 	refusedAt string
 }
 
-// lines is the plan as a recording holds it, each line indented: the file a refusal names; or a line for each
-// change, which holds a text file whole, as Go quotes a string, and any other file as its digest.
 func (p recordedPlan) lines() string {
 	var out strings.Builder
 	switch {
@@ -236,17 +205,12 @@ func (p recordedPlan) lines() string {
 	return out.String()
 }
 
-// recordedScripts is what the settings of one document make of every script, for the fixture's map info with the
-// settings in it: for each script its text with the settings, "unchanged", or "refused: " and the file the
-// refusal names. A document that the fixture's map info refuses has no script to patch.
 type recordedScripts struct {
 	refused   bool
 	refusedAt string
 	scripts   []string
 }
 
-// lines is the scripts as a recording holds them: one digest for all of them, each after its name; "as they are"
-// where no script changes; or the file that the map info's refusal names.
 func (r recordedScripts) lines(sources []script) string {
 	var out strings.Builder
 	if r.refused {
@@ -265,7 +229,6 @@ func (r recordedScripts) lines(sources []script) string {
 	return out.String()
 }
 
-// compact is a document on one line, without the white space between its values.
 func compact(t testing.TB, document string) string {
 	t.Helper()
 	var line bytes.Buffer
@@ -275,10 +238,6 @@ func compact(t testing.TB, document string) string {
 	return line.String()
 }
 
-// recordedSettings is the recording. It has a part for each document: what the document makes of the scripts,
-// when it is one that every script is patched for, and then its plan for each map folder it is planned for.
-// Every document is planned for the map folders that say so, and the documents of routeDocuments for the others.
-// The documents come in the order of their lists, each once.
 func recordedSettings(t testing.TB) []byte {
 	t.Helper()
 	forScripts, forEveryMap := scriptDocuments(), slices.Concat(documents(), constantDocuments(), duplicateDocuments)
@@ -293,8 +252,6 @@ func recordedSettings(t testing.TB) []byte {
 	for i, source := range folders {
 		dirs[i] = source.onDisk(t)
 	}
-	// A document that does not decode stops the test here, where a test may be stopped: the documents are made
-	// into their parts on several goroutines.
 	titles := make([]string, len(all))
 	for i, document := range all {
 		projectOf(t, root, document)
@@ -322,7 +279,6 @@ func recordedSettings(t testing.TB) []byte {
 	return []byte(strings.Join(parts, ""))
 }
 
-// scriptsWith is what the settings of a document make of every script.
 func scriptsWith(t testing.TB, document string, sources []script) recordedScripts {
 	t.Helper()
 	s := settingsOf(t, document)
@@ -341,10 +297,8 @@ func scriptsWith(t testing.TB, document string, sources []script) recordedScript
 	return made
 }
 
-// refusedAt is what stands for a script that the settings do not go into: the file its refusal names.
 func refusedAt(file string) string { return "refused: " + file }
 
-// madeOf is what stands for a script with the settings: its text, or "unchanged" for the script as it was.
 func madeOf(source script, text string) string {
 	if text == source.text {
 		return "unchanged"
@@ -352,7 +306,6 @@ func madeOf(source script, text string) string {
 	return text
 }
 
-// planFor is the plan of a document for a map folder.
 func planFor(t testing.TB, source sourceMap, dir, root, document string) recordedPlan {
 	t.Helper()
 	project := projectOf(t, root, document)
@@ -368,14 +321,6 @@ func planFor(t testing.TB, source sourceMap, dir, root, document string) recorde
 	return recordedPlan{changes: changes}
 }
 
-// TestTheSettingsOfEveryDocumentAreAsRecorded holds what every settings document makes of every script, and
-// what it changes in map folders of every kind, to a recording: one file for some seven thousand scripts and
-// some seven hundred plans. A script stands in it with the others of its document, as one digest, and a plan as
-// its changes: a text file whole, any other file as its digest. A byte that changes in what the settings write is
-// a line of a diff under the document, and for a plan under the map folder.
-//
-// MOONWELL_RECORD=1 go test -run TestTheSettingsOfEveryDocumentAreAsRecorded ./internal/settings writes the
-// recording anew and fails; a run without the variable then passes.
 func TestTheSettingsOfEveryDocumentAreAsRecorded(t *testing.T) {
 	testkit.Recorded(t, "settings.txt", recordedSettings(t))
 }

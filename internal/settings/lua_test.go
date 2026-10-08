@@ -15,7 +15,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// luaFile is the name the script has in errors.
 const luaFile = "maps/map.w3x/war3map.lua"
 
 const minimapCall = `BlzChangeMinimapTerrainTex("war3mapMinimap.blp")`
@@ -30,13 +29,10 @@ func fixtureInfo(t testing.TB) []byte {
 	return testkit.Fixture(t, "map-settings-v39/war3map.w3i")
 }
 
-// afterInfo brings a script into line with a map info given as the bytes patchInfo returned, as a plan does it,
-// under the names these tests give the two files.
 func afterInfo(source string, s manifest.Settings, patchedInfo []byte) (string, error) {
 	return patchLuaAfter(source, s, patchedInfo, luaFile, infoFile)
 }
 
-// withSettings puts the settings into the fixture's map info, and brings the script into line with the result.
 func withSettings(t testing.TB, document, source string) (string, error) {
 	t.Helper()
 	s := settingsOf(t, document)
@@ -47,7 +43,6 @@ func withSettings(t testing.TB, document, source string) (string, error) {
 	return afterInfo(source, s, info)
 }
 
-// inLine is the script with the settings of the document, which must go in.
 func inLine(t testing.TB, document, source string) string {
 	t.Helper()
 	result, err := withSettings(t, document, source)
@@ -57,8 +52,6 @@ func inLine(t testing.TB, document, source string) string {
 	return result
 }
 
-// refusedLua is the failure of settings that must not go into the script: an expected one that names the script
-// and says what to do.
 func refusedLua(t testing.TB, document, source string) *diag.Error {
 	t.Helper()
 	_, err := withSettings(t, document, source)
@@ -69,7 +62,6 @@ func refusedLua(t testing.TB, document, source string) *diag.Error {
 	return failure
 }
 
-// swapped is the source with the first old replaced by new. The source must have old.
 func swapped(t testing.TB, source, old, new string) string {
 	t.Helper()
 	if !strings.Contains(source, old) {
@@ -78,14 +70,12 @@ func swapped(t testing.TB, source, old, new string) string {
 	return strings.Replace(source, old, new, 1)
 }
 
-// teamsTail is the whole InitCustomTeams body after World Editor's last call.
 func teamsTail(script string) string {
 	const last = "SetPlayerTeam(Player(11), 1)\r\n"
 	start := strings.Index(script, last) + len(last)
 	return script[start : start+strings.Index(script[start:], "end")]
 }
 
-// mainCalls is the names of the calls directly in main(), of a script that must read.
 func mainCalls(t testing.TB, script string) []string {
 	t.Helper()
 	functions, err := lua.Functions(script, luaFile)
@@ -155,7 +145,6 @@ func TestSettingsWithoutLuaCounterpartsReturnTheSourceUnchangedWithoutReadingIt(
 	if got := inLine(t, `{}`, "function (((unreadable"); got != "function (((unreadable" {
 		t.Errorf("unreadable Lua was touched: %q", got)
 	}
-	// Neither is the map info looked at: there is none here.
 	if got, err := afterInfo("function (((unreadable", settingsOf(t, metadataOnly), nil); err != nil || got != "function (((unreadable" {
 		t.Errorf("patchLuaAfter without a map info = %q, %v", got, err)
 	}
@@ -212,11 +201,9 @@ func TestPlayerEditsReplaceInsertAndRemoveOnlyThatPlayersCalls(t *testing.T) {
 	if got := inLine(t, `{"players":{"1":{"fixedStart":true}}}`, unforced); got != source {
 		t.Error("forcing player 1's start location did not restore the editor's call")
 	}
-	// Player 11 is the fifth record, so its start location is 4; an existing matching call is kept.
 	if got := inLine(t, `{"players":{"11":{"fixedStart":true,"controller":"computer"}}}`, source); got != source {
 		t.Error("settings equal to the map's changed the Lua")
 	}
-	// A name changes only war3map.w3i; an existing SetPlayerName call is left alone.
 	named := swapped(t, source, "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
 		"SetPlayerColor(Player(1), ConvertPlayerColor(1))\r\nSetPlayerName(Player(1), \"TRIGSTR_006\")")
 	want = swapped(t, named, "SetPlayerController(Player(1), MAP_CONTROL_USER)",
@@ -266,7 +253,6 @@ func TestStartCoordinatesUseEffectiveFloat32MapInfoValues(t *testing.T) {
 	}
 }
 
-// withFogEnd is the fixture's map info with the fog ending at the value, and the fog shown.
 func withFogEnd(t *testing.T, end float32) []byte {
 	t.Helper()
 	data := fixtureInfo(t)
@@ -280,12 +266,10 @@ func TestANumberIsWrittenInPlainDecimalHoweverSmallOrLargeAndAZeroAsZero(t *test
 	for _, c := range []struct{ document, want string }{
 		{`{"players":{"0":{"x":-0.0000001,"y":3e-7}}}`,
 			"DefineStartLocation(0, -0.00000010000000116860974, 0.0000003000000106112566)\r\n"},
-		// The map info holds 0.000001 as the nearest float32, which is below it.
 		{`{"players":{"0":{"x":0.000001,"y":0.0000011}}}`,
 			"DefineStartLocation(0, 0.0000009999999974752427, 0.0000010999999631167157)\r\n"},
 		{`{"environment":{"fog":{"enabled":true,"start":-0.000001,"density":1e-7}}}`,
 			"SetTerrainFogEx(0, -0.0000009999999974752427, 5000, 0.00000010000000116860974, 0, 0, 0)\r\n"},
-		// A zero below 0, set as one or left of a value too small for the map info, is the one zero.
 		{`{"players":{"0":{"x":-0.0,"y":0}}}`, "DefineStartLocation(0, 0, 0)\r\n"},
 		{`{"players":{"0":{"x":1e-46,"y":-1e-46}}}`, "DefineStartLocation(0, 0, 0)\r\n"},
 		{`{"environment":{"fog":{"enabled":true,"start":-0.0,"end":-0.0,"density":-0.0,"color":[1,2,3,4]}}}`,
@@ -295,7 +279,6 @@ func TestANumberIsWrittenInPlainDecimalHoweverSmallOrLargeAndAZeroAsZero(t *test
 			t.Errorf("%s: the patched Lua lacks %q", c.document, c.want)
 		}
 	}
-	// No setting is that large: only a map's own fog can be.
 	s := settingsOf(t, `{"environment":{"fog":{"start":0}}}`)
 	info, err := patchInfo(withFogEnd(t, 1e30), s, infoFile)
 	if err != nil {
@@ -307,8 +290,6 @@ func TestANumberIsWrittenInPlainDecimalHoweverSmallOrLargeAndAZeroAsZero(t *test
 	}
 }
 
-// unsafeShapes are changes to the fixture's script after which a setting does not go in, with the words that
-// tell each refusal from the others.
 var unsafeShapes = []struct{ document, old, new, words string }{
 	{`{"info":{"name":"x"}}`, `SetMapName("TRIGSTR_001")`, `SetMapName("TRIGSTR_001", 1)`,
 		"SetMapName in config() must have 1 argument(s)"},
@@ -358,8 +339,6 @@ var unsafeShapes = []struct{ document, old, new, words string }{
 	{`{"environment":{"fog":{"enabled":false}}}`, "CreateAllUnits()\r\nInitBlizzard()",
 		"ResetTerrainFog(1)\r\nCreateAllUnits()\r\nInitBlizzard()",
 		"ResetTerrainFog in main() must have 0 argument(s)"},
-	// More than the shapes above: a team that is no whole number or the zero below 0, a statement after which
-	// nothing may follow, and a script that does not read.
 	{`{"forces":{"1":{"allied":true}}}`, "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), 0.5)",
 		"SetPlayerTeam(Player(11), 0.5) disagrees with force 1"},
 	{`{"forces":{"1":{"allied":true}}}`, "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), -0.0)",
@@ -479,14 +458,12 @@ func TestForceFlagEditsAppendEffectiveStatesAfterTheEditorsCalls(t *testing.T) {
 	if !strings.Contains(script, "SetPlayerAllianceStateAllyBJ(Player(0), Player(1), true)\r\n") {
 		t.Error("the editor's own alliance calls are gone")
 	}
-	// Force 1 has one member: only its allied-victory state (inherited false) is written.
 	one := teamsTail(inLine(t, `{"forces":{"1":{"sharedVision":true}}}`, fixtureLua(t)))
 	if one != "SetPlayerState(Player(11), PLAYER_STATE_ALLIED_VICTORY, 0)\r\n" {
 		t.Errorf("force 1's states are %q", one)
 	}
 }
 
-// indentedMain is a script that is one main(), indented, with two fog calls on one line.
 const indentedMain = "function main()\n  SetTerrainFogEx(0, 1, 2, 0.5, 1, 1, 1) ResetTerrainFog()\n  NewSoundEnvironment(\"Old\")\n  InitBlizzard()\nend\n"
 
 func TestEnvironmentEditsReplaceOldInitializationImmediatelyBeforeTheAnchor(t *testing.T) {
@@ -504,8 +481,6 @@ func TestEnvironmentEditsReplaceOldInitializationImmediatelyBeforeTheAnchor(t *t
 	}
 }
 
-// joinable are scripts in which taking a call out could join the statements around it, with what the script
-// must be up to the place where the fog is set.
 var joinable = []struct{ source, want string }{
 	{"function main()\nx = b\nResetTerrainFog();(f)()\nInitBlizzard()\nend", "function main()\nx = b\n;(f)()\n"},
 	{"function main()\nx = b\nResetTerrainFog();\n(f)()\nInitBlizzard()\nend", "function main()\nx = b\n;\n(f)()\n"},
@@ -529,7 +504,6 @@ func TestTextsAreWrittenWithQuotesBackslashesAndControlCharactersEscaped(t *test
 		"\n123":      `"\010123"`,
 		"":           `""`,
 	} {
-		// The map info is given as read, with the text put in by hand: one with a NUL cannot be stored in the file.
 		info := readInfo(t, fixtureInfo(t), w3i.Extended)
 		info.Name.Value, info.Description.Value, info.Details.SoundEnvironment.Value = input, input, input
 		s := settingsOf(t, `{"info":{"name":"x","description":"x"},"environment":{"soundEnvironment":"x"}}`)
@@ -542,7 +516,6 @@ func TestTextsAreWrittenWithQuotesBackslashesAndControlCharactersEscaped(t *test
 				t.Errorf("the patched Lua lacks %s", call)
 			}
 		}
-		// An empty sound environment is the game's default one.
 		if input == "" {
 			want = `"Default"`
 		}
@@ -573,7 +546,6 @@ func TestAMapInfoWithoutWhatTheSettingsNeedIsTheCallersMistake(t *testing.T) {
 			t.Errorf("%s: got %v, want an error that is not a diag error", document, err)
 		}
 	}
-	// The name and the description need no more than every map info has.
 	if _, err := patchLua(fixtureLua(t), settingsOf(t, `{"info":{"name":"X"}}`), basic, luaFile); err != nil {
 		t.Error(err)
 	}
@@ -595,13 +567,11 @@ func TestTheMinimapCallBecomesTheLastStatementOfMainOnALineOfItsOwn(t *testing.T
 	if n := len(calls); calls[n-1] != "BlzChangeMinimapTerrainTex" || calls[n-2] != "RunInitializationTriggers" {
 		t.Errorf("main calls %q", calls)
 	}
-	// The other functions are untouched: the call is in main alone.
 	if strings.Count(result, minimapCall) != 1 {
 		t.Error("the call was added more than once")
 	}
 }
 
-// minimapSources are scripts whose main() takes the minimap call, with what each becomes.
 var minimapSources = map[string]string{
 	"function main()\r\n  InitBlizzard()\r\n  end\r\n": "function main()\r\n  InitBlizzard()\r\n  " + minimapCall + "\r\n  end\r\n",
 	"function main()\nend\n":                           "function main()\n" + minimapCall + "\nend\n",
@@ -616,7 +586,6 @@ func TestTheMinimapCallKeepsTheScriptsLineEndingAndTheIndentationOfMainsEnd(t *t
 	}
 }
 
-// withoutOneMain are scripts that do not take the minimap call, with how many main() each has.
 var withoutOneMain = map[string]int{
 	"function config()\nend\n":                     0,
 	"function main()\nend\nfunction main()\nend\n": 2,
@@ -637,8 +606,6 @@ func TestTheMinimapCallNeedsExactlyOneGlobalMain(t *testing.T) {
 	}
 }
 
-// The scripts whose main() ends in a return. After a return that gives a value no statement can stand; a return
-// that gives none takes the call as its value, which Lua then makes.
 const (
 	mainReturnsValue = "function main()\n  InitBlizzard()\n  return 1\nend\n"
 	mainReturns      = "function main()\n  InitBlizzard()\n  return\nend\n"
@@ -660,7 +627,6 @@ func TestTheMinimapCallIsRefusedWhereItWouldStandAfterAReturnedValue(t *testing.
 	}
 }
 
-// damaged is the fixture's map info as read, with what the change does to its first player or its fog.
 func damaged(t *testing.T, change func(player *w3i.Player, fog *w3i.Fog)) *w3i.Info {
 	t.Helper()
 	info := readInfo(t, fixtureInfo(t), w3i.Extended)
@@ -715,7 +681,6 @@ func TestAValueOfTheMapInfoThatNoSettingMakesTheScriptTakeIsNotLookedAt(t *testi
 			t.Errorf("%s: %v", document, err)
 		}
 	}
-	// A fog that is not shown is reset, and none of its numbers is written.
 	broken.Flags.Value &^= fogOn
 	script, err := patchLua(fixtureLua(t), settingsOf(t, `{"environment":{"fog":{"style":1}}}`), broken, luaFile)
 	if err != nil || !strings.Contains(script, "ResetTerrainFog()\r\nCreateAllUnits()") {

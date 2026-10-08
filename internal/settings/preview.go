@@ -11,8 +11,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/picture"
 )
 
-// loadPreview reads the picture settings.info.preview names: a path from the project folder, not under assets/.
-// What is wrong with the setting names the manifest; what is wrong with the picture names its path.
 func loadPreview(root, preview, manifestFile string) (*picture.Picture, error) {
 	path, err := previewPath(preview, manifestFile)
 	if err != nil {
@@ -25,8 +23,6 @@ func loadPreview(root, preview, manifestFile string) (*picture.Picture, error) {
 	return picture.Read(data, path)
 }
 
-// previewPath is the setting as a path from the project folder, with "/". The path stays inside the project and
-// is not under assets/, in any letter case: every file there is also imported into the map under its own name.
 func previewPath(preview, manifestFile string) (string, error) {
 	path, inside := fsx.RelPath(preview)
 	switch {
@@ -38,8 +34,6 @@ func previewPath(preview, manifestFile string) (string, error) {
 	return path, nil
 }
 
-// readPreview reads the file at path below the project folder. It must be a real file: no link is followed on
-// the way to it.
 func readPreview(root, path, manifestFile string) ([]byte, error) {
 	file, err := fsx.SafeJoin(root, path)
 	if err != nil {
@@ -61,10 +55,6 @@ func readPreview(root, path, manifestFile string) ([]byte, error) {
 	return data, nil
 }
 
-// unreached is a failure on the way to the picture, as the user is told it. An expected failure, such as a link,
-// stays as it is. A file where the path needs a folder means that the picture does not exist: some systems say
-// so themselves and others call it "not a directory", and the refusal is the same on all of them. Anything else
-// is the operating system's reason, with the path it stopped at.
 func unreached(err error, path, manifestFile string) error {
 	var expected *diag.Error
 	switch {
@@ -75,8 +65,6 @@ func unreached(err error, path, manifestFile string) error {
 	}
 	return errUnreachable(path, err)
 }
-
-// ---- errors ----
 
 func errOutsideProject(manifestFile, preview string) error {
 	return &diag.Error{
@@ -113,7 +101,6 @@ func errNotAFile(manifestFile, path string) error {
 	}
 }
 
-// errUnreadable says that the picture is there and its bytes could not be read.
 func errUnreadable(path string, cause error) error {
 	return &diag.Error{
 		Msg:   "Reading the preview picture failed: " + fsx.Reason(cause),
@@ -123,7 +110,6 @@ func errUnreadable(path string, cause error) error {
 	}
 }
 
-// errUnreachable says that the operating system did not let the way to the picture be followed.
 func errUnreachable(path string, cause error) error {
 	return &diag.Error{
 		Msg:   "Reading the preview picture failed: " + fsx.Reason(cause),

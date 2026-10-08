@@ -20,13 +20,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
-// unreachable is what the stand-in pkl prints when it fails to resolve a project.
 const unreachable = "cannot reach the package server"
 
-// resolving is a stand-in world for init: its pkl reports pklVersion, and resolves a project with the exit code
-// resolveCode, printing unreachable. It resolves only in a folder that holds a PklProject, and writes nothing
-// there. The world has no download of Pkl, so a pkl that is too old is refused and never fetched, and any other
-// program fails the test.
 func resolving(t *testing.T, pklVersion string, resolveCode int) world {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
@@ -49,7 +44,6 @@ func resolving(t *testing.T, pklVersion string, resolveCode int) world {
 	}
 }
 
-// nothingRuns is a stand-in world in which a program that is run fails the test.
 func nothingRuns(t *testing.T) world {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
@@ -58,18 +52,12 @@ func nothingRuns(t *testing.T) world {
 	}
 }
 
-// created makes a project as init does, in the outside world given: dir is the folder as a command line names
-// it, from root, and schema the folder of the Pkl package it is linked to, "" for the published one. It returns
-// the lines that were logged, and the failure.
 func created(outside world, root, dir, schema string) ([]string, error) {
 	log := testkit.NewRecorder()
 	err := createProject(background, outside(root, log.Logger), dir, schema)
 	return log.Lines(), err
 }
 
-// ---- the folder ----
-
-// The folder is looked at before Pkl is looked for: no program runs for a folder that is refused.
 func TestInitRefusesATargetThatIsAFileOrIsNotEmpty(t *testing.T) {
 	parent := t.TempDir()
 	file := testkit.WriteFile(t, parent, "my-map", nil)
@@ -93,7 +81,6 @@ func TestInitRefusesATargetThatIsAFileOrIsNotEmpty(t *testing.T) {
 	}
 }
 
-// An empty name is no folder to make: it is refused, and is not read as the working folder.
 func TestInitRefusesAnEmptyFolderName(t *testing.T) {
 	for _, args := range [][]string{{"init", ""}, {"init", "--", ""}, {"init", "--link", ""}} {
 		root := t.TempDir()
@@ -107,7 +94,6 @@ func TestInitRefusesAnEmptyFolderName(t *testing.T) {
 	}
 }
 
-// A folder that the system cannot look at is named, with the system's reason: here a name no system can hold.
 func TestInitNamesAFolderItCannotLookAt(t *testing.T) {
 	parent := t.TempDir()
 	dir := "my\x00map"
@@ -121,7 +107,6 @@ func TestInitNamesAFolderItCannotLookAt(t *testing.T) {
 	}
 }
 
-// A link that leads to nothing is no folder, and stays: an init that failed later would remove it as its own.
 func TestInitRefusesATargetThatIsALinkToNothing(t *testing.T) {
 	parent := t.TempDir()
 	link := filepath.Join(parent, "my-map")
@@ -135,8 +120,6 @@ func TestInitRefusesATargetThatIsALinkToNothing(t *testing.T) {
 	}
 }
 
-// ---- Pkl ----
-
 func TestInitChecksThePklVersionBeforeWritingAnything(t *testing.T) {
 	parent := t.TempDir()
 	_, err := created(resolving(t, "Pkl 0.31.0", 0), parent, "my-map", "")
@@ -147,7 +130,6 @@ func TestInitChecksThePklVersionBeforeWritingAnything(t *testing.T) {
 
 func TestInitResolvesWithThePinnedPklWhenPklOnPathIsOld(t *testing.T) {
 	parent, cache := t.TempDir(), t.TempDir()
-	// The pinned Pkl is in the cache: a download fails the test.
 	pinned := testkit.WriteFile(t, filepath.Join(cache, "pkl", toolchain.PklVersion), "pkl", nil)
 	var resolvedWith string
 	outside := func(root string, log *env.Logger) *env.Env {
@@ -176,8 +158,6 @@ func TestInitResolvesWithThePinnedPklWhenPklOnPathIsOld(t *testing.T) {
 	}
 }
 
-// ---- what is written, and what a failure leaves ----
-
 func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 	parent := t.TempDir()
 	lines, err := created(resolving(t, "Pkl 0.32.1", 0), parent, "my-map", "")
@@ -201,7 +181,6 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 			t.Errorf("%s is missing", file)
 		}
 	}
-	// The template's own resolved dependencies are those of the checkout, and are not a project's.
 	if exists(target, "PklProject.deps.json") {
 		t.Error("init wrote the template's resolved dependencies")
 	}
@@ -217,7 +196,6 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 	}
 }
 
-// The schema is a value: a project is linked to the folder it is handed, wherever init runs.
 func TestInitLinksTheProjectToTheSchemaItIsHanded(t *testing.T) {
 	parent := t.TempDir()
 	schema := filepath.Join(parent, "moonwell", "schema")
@@ -235,7 +213,6 @@ func TestInitRemovesTheDirectoryItCreatedWhenResolvingFails(t *testing.T) {
 	target := filepath.Join(parent, "my-map")
 	lines, err := created(resolving(t, "Pkl 0.32.1", 1), parent, target, "")
 	e := asError(t, err, "a failed resolve")
-	// The file is named with "/" on every system, as the folder was given and then the file.
 	if e.Msg != "pkl project resolve failed:\n"+unreachable || e.File != filepath.ToSlash(target)+"/PklProject" ||
 		e.Hint == "" {
 		t.Errorf("error = %+v", e)
@@ -254,8 +231,6 @@ func TestInitEmptiesAPreExistingDirectoryAgainWhenItFails(t *testing.T) {
 	}
 }
 
-// A file that cannot be written is named from the folder the command was given, with "/" on every system, and
-// what stood in the way stays: a failed init removes what it wrote and nothing else.
 func TestInitNamesTheFileItCannotWriteAndRemovesNothingElse(t *testing.T) {
 	parent := t.TempDir()
 	testkit.WriteFile(t, parent, "taken", []byte("mine"))
@@ -270,8 +245,6 @@ func TestInitNamesTheFileItCannotWriteAndRemovesNothingElse(t *testing.T) {
 	}
 }
 
-// ---- --link ----
-
 func TestInitWithLinkNeedsACheckout(t *testing.T) {
 	parent := t.TempDir()
 	result := carriedIn(background, resolving(t, "Pkl 0.32.1", 0), parent, "init", "my-map", "--link")
@@ -280,7 +253,6 @@ func TestInitWithLinkNeedsACheckout(t *testing.T) {
 	if result.code != 1 || result.output != want || exists(parent, "my-map") {
 		t.Errorf("%+v", result)
 	}
-	// Below a checkout, the checkout is found: a folder whose go.mod names this module.
 	checkout := t.TempDir()
 	testkit.WriteFile(t, checkout, "go.mod", []byte("module github.com/mdlsvensson/moonwell\n\ngo 1.27\n"))
 	below := filepath.Join(checkout, "internal", "cli")
@@ -295,13 +267,11 @@ func TestInitWithLinkNeedsACheckout(t *testing.T) {
 	if got := read(t, checkout, "maps/my-map/PklProject"); got != want {
 		t.Errorf("PklProject =\n%s\nwant\n%s", got, want)
 	}
-	// init makes a project in another folder: the folder it runs in gets no dist/ and no log.
 	if exists(below, "dist") || exists(checkout, "maps/my-map/dist") {
 		t.Error("init kept a log")
 	}
 }
 
-// A go.mod of another module is no checkout of Moonwell, wherever it stands.
 func TestACheckoutIsAFolderWhoseGoModNamesThisModule(t *testing.T) {
 	base := t.TempDir()
 	testkit.WriteFile(t, base, "go.mod", []byte("// A comment.\nmodule  github.com/mdlsvensson/moonwell \n"))
@@ -327,7 +297,6 @@ func TestLinkPathRefusesATargetOnAnotherDrive(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		t.Skip("only Windows has drives")
 	}
-	// Pkl cannot load a local dependency from another drive: PklProject.deps.json has no way to write the path.
 	_, err := linkPath(`C:\Temp\my-map`, `D:\a\moonwell\schema`)
 	e := asError(t, err, "another drive")
 	if e.Msg != "--link needs the project on the same drive as this Moonwell checkout." ||
@@ -336,9 +305,6 @@ func TestLinkPathRefusesATargetOnAnotherDrive(t *testing.T) {
 	}
 }
 
-// ---- a project that the real Pkl resolves ----
-
-// It runs the real pkl.
 func TestPklInitLinkedProjectLoads(t *testing.T) {
 	root := newProject(t, "my-map")
 	for _, name := range []string{
@@ -364,13 +330,11 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 			t.Error(folder)
 		}
 	}
-	// The folders of assets/ are kept by a file each, which is no asset.
 	if r := okWithPklAlone(t, root, "assets:check"); r.output != checked("0", "0") {
 		t.Fatalf("assets:check in a new project: %+v", r)
 	}
 }
 
-// It runs the real pkl.
 func TestPklInitRefusesNonemptyDirectory(t *testing.T) {
 	root := newProject(t, "my-map")
 	write(t, root, "keep.txt", "keep")

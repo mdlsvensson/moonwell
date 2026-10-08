@@ -46,7 +46,6 @@ func TestInstallBinReportsACopyItCannotReplace(t *testing.T) {
 	for _, tc := range tests {
 		e, _ := testkit.Env(t, t.TempDir())
 		source := testkit.WriteFile(t, t.TempDir(), tc.tool.Name, []byte("v1"))
-		// A folder where the copy goes.
 		blocked := filepath.Join(e.CacheDir, "bin", tc.tool.Name)
 		if err := os.MkdirAll(blocked, 0o777); err != nil {
 			t.Fatal(err)
@@ -163,7 +162,6 @@ func TestDirAsWrittenKeepsTheSeparatorsOfThePath(t *testing.T) {
 		"tools/yue":           "tools",
 	}
 	if runtime.GOOS == "windows" {
-		// Only Windows reads a backslash as a separator and a drive letter as a root.
 		cases["C:/Users/me/yue/0.34.2/yue.exe"] = "C:/Users/me/yue/0.34.2"
 		cases[`C:\Users\me\yue\yue.exe`] = `C:\Users\me\yue`
 		cases[`C:\Users/me\yue.exe`] = `C:\Users/me`

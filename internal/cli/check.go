@@ -7,7 +7,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/env"
 )
 
-// runCheck is `moonwell check`: it plans a build, and stages and packs nothing.
 func runCheck(ctx context.Context, e *env.Env, _ call) error {
 	_, err := build.Check(ctx, e)
 	return err

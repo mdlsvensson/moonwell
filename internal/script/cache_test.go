@@ -20,10 +20,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// These tests run no compiler: the compile is given one that is a function (bench.fake), and the listing of
-// the globals a source uses one that prints what the test says (listing, in unknown_test.go).
-
-// hashesText is what the hashes file holds; "" when there is none.
 func (b *bench) hashesText() string {
 	text, err := os.ReadFile(b.staged(".hashes.json"))
 	if err != nil {
@@ -112,7 +108,6 @@ func TestASourceIsCompiledAgainWhenItChangedOrItsOutputIsGone(t *testing.T) {
 	if ran := b.ran(); !slices.Equal(ran, []string{"src/c.yue"}) {
 		t.Errorf("with c.yue changed, the compiler ran on %q", ran)
 	}
-	// A change that is undone is a change too: the output is of the text between.
 	b.write("src/c.yue", "z = 3\n")
 	b.compiles(fakeYue, false)
 	if ran := b.ran(); !slices.Equal(ran, []string{"src/c.yue"}) {
@@ -128,7 +123,6 @@ func TestTheHashesFileIsWrittenWhenSomeFilesFailedHoldingThoseThatCompiled(t *te
 	if paths := slices.Sorted(maps.Keys(kept.Sources)); err != nil || !slices.Equal(paths, []string{"src/a.yue", "src/c.yue"}) {
 		t.Errorf("the hashes file keeps %q, %v", paths, err)
 	}
-	// So the next compile is of the failed file alone.
 	b.ran()
 	b.fake(nil)
 	b.compiles(fakeYue, false)
@@ -156,7 +150,6 @@ func TestTheOutputOfASourceThatIsGoneIsRemoved(t *testing.T) {
 	}
 	b.ran()
 
-	// A source that is gone, one in a folder, and one whose output is gone already.
 	b.remove("src/util/math.yue")
 	b.remove("src/gone.yue")
 	b.remove("dist/stage/lua/gone.lua")
@@ -165,8 +158,6 @@ func TestTheOutputOfASourceThatIsGoneIsRemoved(t *testing.T) {
 		t.Errorf("with two sources gone, the compiler ran on %q and the outputs are %q", ran, left)
 	}
 
-	// A library of another key in the same folder: its module compiles below the new key, and the output below
-	// the key that is gone is removed.
 	b.libraries = []Library{{Key: "renamed", Dir: librariesDir + "/ex"}}
 	outputs = append(outputs, ".libraries/renamed/kit/loud.lua")
 	b.compiles(fakeYue, false)
@@ -174,7 +165,6 @@ func TestTheOutputOfASourceThatIsGoneIsRemoved(t *testing.T) {
 		t.Errorf("with the library's key changed, the compiler ran on %q and the outputs are %q", ran, left)
 	}
 
-	// A library that is gone.
 	b.libraries = nil
 	b.compiles(fakeYue, false)
 	if ran, left := b.ran(), there(); len(ran) != 0 || !slices.Equal(left, []string{"main.lua"}) {
@@ -183,7 +173,6 @@ func TestTheOutputOfASourceThatIsGoneIsRemoved(t *testing.T) {
 }
 
 func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
-	// The file of a compile of a.yue and b.yue, which the cases are made of.
 	first := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
 	first.fake(nil)
 	first.compiles(fakeYue, false)
@@ -222,7 +211,6 @@ func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 		b.write("dist/stage/lua/.hashes.json", text)
 		b.remove("src/b.yue")
 		b.compiles(fakeYue, false)
-		// Every source is compiled again, and no output is removed: the file says nothing of the outputs.
 		if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue"}) || !fsx.Exists(b.staged("b.lua")) {
 			t.Errorf("%s: the compiler ran on %q, and b.lua is there: %v", what, ran, fsx.Exists(b.staged("b.lua")))
 		}
@@ -232,8 +220,6 @@ func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 			t.Errorf("%s: the hashes file written over it keeps %+v, %v", what, kept, err)
 		}
 	}
-	// The file as it was written is trusted: nothing is compiled, and the output of the source that is gone is
-	// removed.
 	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
 	b.fake(nil)
 	b.compiles(fakeYue, false)
@@ -246,8 +232,6 @@ func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 	}
 }
 
-// stopAt gives the bench a compiler that is a function and that a run on one source stops: that run ends with
-// an error that is no failure of a compile, and leaves nothing. Every other run ends well and leaves its Lua.
 func (b *bench) stopAt(source string, stopped error) {
 	b.use(func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		if b.sourceOf(args) == source {
@@ -264,7 +248,6 @@ func TestAStoppedRunLeavesNothingItWasToCompileUpToDate(t *testing.T) {
 	b.compiles(fakeYue, false)
 	b.ran()
 
-	// An edit, a new file, and a run that is stopped once it has compiled both.
 	b.write("src/a.yue", "x = 2\n")
 	b.write("src/new.yue", "w = 5\n")
 	b.write("src/stop.yue", "z = 4\n")
@@ -275,8 +258,6 @@ func TestAStoppedRunLeavesNothingItWasToCompileUpToDate(t *testing.T) {
 	if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue", "src/new.yue", "src/stop.yue"}) || !fsx.Exists(b.staged("new.lua")) {
 		t.Fatalf("the stopped run ran the compiler on %q, and new.lua is there: %v", ran, fsx.Exists(b.staged("new.lua")))
 	}
-	// The hashes file vouches for the source the run did not touch, and for no other: those it was to compile
-	// are kept with their outputs and without a hash.
 	kept, err := readHashes(b.root)
 	want := map[string]keptSource{
 		"src/a.yue": {Output: "a.lua"}, "src/new.yue": {Output: "new.lua"}, "src/stop.yue": {Output: "stop.lua"},
@@ -286,8 +267,6 @@ func TestAStoppedRunLeavesNothingItWasToCompileUpToDate(t *testing.T) {
 		t.Errorf("after the stopped run the hashes file keeps %+v, %v, want %+v", kept.Sources, err, want)
 	}
 
-	// The edit undone and the new file deleted: the Lua at a.lua is of the edit, so a.yue is compiled again, and
-	// the output of the file that is gone is removed.
 	b.write("src/a.yue", "x = 1\n")
 	b.remove("src/new.yue")
 	b.fake(nil)
@@ -307,7 +286,6 @@ func TestAStoppedRunInAnotherModeLeavesNothingUpToDate(t *testing.T) {
 	b.fake(nil)
 	b.compiles(fakeYue, false)
 	b.ran()
-	// A minified run that is stopped once a.lua is minified.
 	b.stopAt("src/b.yue", stopped)
 	if _, err := b.compile(fakeYue, true); err != stopped {
 		t.Fatalf("the stopped run: %v", err)
@@ -369,7 +347,6 @@ func TestACacheFileIsReadBackAsItWasWrittenAndNotAsAnotherShape(t *testing.T) {
 	if kept, found, err := readCache[counted](root, ".counted.json"); !found || err != nil || !reflect.DeepEqual(kept, want) {
 		t.Errorf("read back: %+v, %v, %v, want %+v", kept, found, err, want)
 	}
-	// Each file has its own shape, and is nothing in the shape of the other.
 	if kept, found, err := readCache[hashes](root, ".counted.json"); found || err != nil || kept.Sources != nil {
 		t.Errorf("read as hashes: %+v, %v, %v", kept, found, err)
 	}
@@ -377,8 +354,6 @@ func TestACacheFileIsReadBackAsItWasWrittenAndNotAsAnotherShape(t *testing.T) {
 		t.Errorf("the file is %q, %v", text, err)
 	}
 }
-
-// ---- the sources that may define macros ----
 
 func TestASourceMayDefineMacrosWhenItHoldsTheWordMacro(t *testing.T) {
 	for text, want := range map[string]bool{
@@ -393,7 +368,7 @@ func TestASourceMayDefineMacrosWhenItHoldsTheWordMacro(t *testing.T) {
 		"x.macro":                         true,
 		"macro\r\n":                       true,
 		"macros and a macro":              true,
-		eAcute + "macro" + eAcute:         true, // only a letter, a digit or "_" of ASCII joins the word
+		eAcute + "macro" + eAcute:         true,
 		"":                                false,
 		"macros":                          false,
 		"mymacro":                         false,
@@ -413,7 +388,6 @@ func TestASourceMayDefineMacrosWhenItHoldsTheWordMacro(t *testing.T) {
 }
 
 func TestTheSourcesThatMayDefineMacrosAreAmongWhatEveryOutputDependsOn(t *testing.T) {
-	// member is what a compile of a project keeps, and returns, for the sources that may define macros.
 	member := func(p project) string {
 		t.Helper()
 		b := benchOf(t, p)
@@ -431,7 +405,7 @@ func TestTheSourcesThatMayDefineMacrosAreAmongWhatEveryOutputDependsOn(t *testin
 	for _, c := range []struct {
 		what string
 		of   project
-		want string // the bytes that are hashed; "" for no source with the word
+		want string
 	}{
 		{"no source with the word", mainOnly.and("src/tools.yue", macroImport), ""},
 		{"a Lua module with the word", mainOnly.and("lua/x.lua", comment), ""},
@@ -441,7 +415,6 @@ func TestTheSourcesThatMayDefineMacrosAreAmongWhatEveryOutputDependsOn(t *testin
 		{"that source and another text beside it", files("src/main.yue", "x = 2\n", "src/m.yue", one), "src/m.yue\x00" + hashed(one) + "\n"},
 		{"two sources with the word", mainOnly.and("src/m.yue", one, "src/a/b.yue", comment),
 			"src/a/b.yue\x00" + hashed(comment) + "\nsrc/m.yue\x00" + hashed(one) + "\n"},
-		// In the order of the paths' bytes, which puts a library's before the project's own.
 		{"a library's source with the word", mainOnly.with("ex").and("src/m.yue", one, inLib, comment, inLibrary("ex", "kit/x.lua"), comment),
 			inLib + "\x00" + hashed(comment) + "\nsrc/m.yue\x00" + hashed(one) + "\n"},
 		{"a source with the word after a byte order mark", mainOnly.and("src/m.yue", mark+one), "src/m.yue\x00" + hashed(mark+one) + "\n"},
@@ -481,10 +454,6 @@ func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAgain(t *testing.T
 	}
 }
 
-// ---- the globals each source uses ----
-
-// usesBench is a project folder without files, a compiler that is a listing, and what a listing of uses is
-// given beside its sources: the macro search, and the hash of the sources that may define macros.
 type usesBench struct {
 	t            *testing.T
 	root         string
@@ -494,7 +463,6 @@ type usesBench struct {
 	macroSources string
 }
 
-// usesBenchOf is a bench whose compiler prints what printed holds for each source, by its path.
 func usesBenchOf(t *testing.T, printed map[string]env.RunResult) *usesBench {
 	t.Helper()
 	root := t.TempDir()
@@ -505,7 +473,6 @@ func usesBenchOf(t *testing.T, printed map[string]env.RunResult) *usesBench {
 	return b
 }
 
-// list lists the uses of sources, given as pairs of a path and a hash, with the compiler named yue.
 func (b *usesBench) list(yue string, pairs ...string) (map[string][]globalUse, error) {
 	var sources []checked
 	for i := 0; i+1 < len(pairs); i += 2 {
@@ -514,7 +481,6 @@ func (b *usesBench) list(yue string, pairs ...string) (map[string][]globalUse, e
 	return listUses(background, b.world, yue, b.search, b.macroSources, sources)
 }
 
-// usesText is what the uses file holds; "" when there is none.
 func (b *usesBench) usesText() string {
 	text, err := os.ReadFile(filepath.Join(b.root, "dist", "stage", "lua", ".globals.json"))
 	if err != nil {
@@ -523,7 +489,6 @@ func (b *usesBench) usesText() string {
 	return string(text)
 }
 
-// sameUses reports whether two results of a listing hold the same uses for the same sources.
 func sameUses(got, want map[string][]globalUse) bool { return maps.EqualFunc(got, want, slices.Equal) }
 
 func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *testing.T) {
@@ -581,7 +546,6 @@ func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *test
 		t.Errorf("unchanged: %+v, %v after listing %q", uses, err, ran)
 	}
 
-	// An edited source is listed again, and a source that uses no global has a list without uses.
 	b.yue.printed[main] = prints("")
 	uses, err = b.list("yue", main, "h3", captain, "h2")
 	if ran := b.yue.ran(); err != nil || !slices.Equal(ran, []string{main}) || uses[main] == nil || len(uses[main]) != 0 || len(uses) != 2 {
@@ -595,12 +559,10 @@ func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *test
 		t.Errorf("a source without uses, unchanged: %+v, %v after listing %q", uses, err, ran)
 	}
 
-	// Another compiler lists every source again.
 	if _, err := b.list("other-yue", main, "h3", captain, "h2"); err != nil || !slices.Equal(b.yue.ran(), both) {
 		t.Errorf("another compiler: %v", err)
 	}
 
-	// A source that is listed no more leaves the file.
 	if _, err := b.list("other-yue", main, "h3"); err != nil || len(b.yue.ran()) != 0 {
 		t.Fatalf("one source of the two: %v", err)
 	}
@@ -643,7 +605,6 @@ func TestAUsesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 			t.Errorf("%s: %+v, %v after listing %q", what, uses, err, ran)
 		}
 	}
-	// The file as a listing writes it is trusted: the compiler is not run.
 	b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": prints("Zzz 1 1\n")})
 	testkit.WriteFile(t, b.root, "dist/stage/lua/.globals.json", []byte(good))
 	uses, err := b.list("yue", "src/main.yue", "h1")
@@ -660,7 +621,6 @@ func TestAFailedListingIsReportedLikeAFileThatFailedToCompile(t *testing.T) {
 	if uses != nil || failure.Msg != "unexpected expression\n2: unexpected expression" || failure.File != "src/main.yue" || failure.Line != 2 {
 		t.Errorf("listUses = %+v, %+v", uses, failure)
 	}
-	// What the run printed on its other stream is read too.
 	b = usesBenchOf(t, map[string]env.RunResult{"src/main.yue": {Code: 1, Stderr: "7: on the error stream\n"}})
 	_, err = b.list("yue", "src/main.yue", "h1")
 	if failure := asError(t, err, "a failed run"); failure.Line != 7 || failure.File != "src/main.yue" {
@@ -672,7 +632,6 @@ func TestOutputThatCannotBeReadIsReportedAndTheOtherSourcesAreStillKept(t *testi
 	const bad, good, worse = "src/bad.yue", "src/good.yue", "src/Worse.yue"
 	b := usesBenchOf(t, map[string]env.RunResult{bad: prints("Score one 8\n"), good: prints("print 1 1\n"), worse: prints("x\n")})
 	_, err := b.list("yue", bad, "h1", good, "h2", worse, "h3")
-	// Of two failures the one whose file is first by bytes is reported: a capital letter before every small one.
 	if failure := asError(t, err, "unreadable output"); failure.Msg != "yue -g printed a line Moonwell cannot read: x" || failure.File != worse {
 		t.Errorf("error = %+v", failure)
 	}
@@ -714,7 +673,6 @@ func TestTheCompilerIsGivenTheMacroPathAndTheUsesDependOnTheMacroModule(t *testi
 	if len(b.yue.runs) != 2 {
 		t.Error("a changed macro module lists every file again")
 	}
-	// So do other sources that may define macros: the macros a source uses may be theirs.
 	b.macroSources = "s2"
 	list()
 	list()
@@ -733,8 +691,6 @@ func TestAtMostEightSourcesAreListedAtATime(t *testing.T) {
 	running, most := 0, 0
 	var once sync.Once
 	eightAreIn := make(chan struct{})
-	// A listing that never lets eight in is told apart by the count, after a wait that a working one never
-	// spends.
 	waited, giveUp := context.WithTimeout(background, 5*time.Second)
 	defer giveUp()
 	b.world.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
@@ -745,8 +701,6 @@ func TestAtMostEightSourcesAreListedAtATime(t *testing.T) {
 			once.Do(func() { close(eightAreIn) })
 		}
 		guard.Unlock()
-		// Each of the first runs stays in until eight are in at once, and every run a moment longer, in which a
-		// ninth would come in if it were let.
 		select {
 		case <-eightAreIn:
 		case <-waited.Done():
@@ -774,7 +728,6 @@ func TestAListingThatIsStoppedPassesTheErrorOnAndKeepsNothingNew(t *testing.T) {
 		return env.RunResult{}, stopped
 	}
 	uses, err := b.list("yue", "src/a.yue", "h1", "src/b.yue", "h2")
-	// The error is the one that came, and the file is as the last listing left it.
 	if uses != nil || err != stopped || b.usesText() != before || before == "" {
 		t.Errorf("listUses = %+v, %v; .globals.json is\n%s\nand was\n%s", uses, err, b.usesText(), before)
 	}
@@ -789,7 +742,6 @@ func TestAUsesFileThatCannotBeReadOrWrittenIsRefusedByItsPath(t *testing.T) {
 		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil {
 		t.Errorf("error = %+v", failure)
 	}
-	// A link on the way to the file is refused before the compiler runs.
 	b = usesBenchOf(t, nil)
 	at := linkTo(t, files(".globals.json", "{}"), b.root, "dist/stage")
 	_, err = b.list("yue", "src/main.yue", "h1")

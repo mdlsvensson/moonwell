@@ -7,7 +7,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// raws returns the source text of each token.
 func raws(tokens []Token) []string {
 	var out []string
 	for _, token := range tokens {
@@ -54,7 +53,6 @@ func TestTheNameScannersSeeNoNumbersAndSymbolsOneCharacterAtATime(t *testing.T) 
 	}
 }
 
-// malformedSources are sources with one malformed token each: the fault it gives, and the tokens read around it.
 var malformedSources = []struct {
 	source, fault string
 	offset        int
@@ -67,17 +65,13 @@ var malformedSources = []struct {
 	{"a --[[ open", "unterminated long string or comment", 2, []string{"a"}},
 	{"a = 0x + 1.2.3 b", "invalid numeral", 4, []string{"a", "=", "0x", "+", "1.2.3", "b"}},
 	{"a @ b", "unsupported symbol", 2, []string{"a", "@", "b"}},
-	// The backslash is the last byte of the source: it escapes nothing, and the string is not closed.
 	{`a = 'open\`, "unterminated quoted string", 4, []string{"a", "=", `'open\`}},
-	// A dot alone after the prefix of a hexadecimal numeral is no digits.
 	{"a = 0x. + 1", "invalid numeral", 4, []string{"a", "=", "0x.", "+", "1"}},
-	// What opens a string or begins a numeral is the last thing in the source.
 	{"a = [[", "unterminated long string or comment", 4, []string{"a", "=", "[["}},
 	{"a = [==[", "unterminated long string or comment", 4, []string{"a", "=", "[==["}},
 	{"a = \"x\\z  ", "unterminated quoted string", 4, []string{"a", "=", "\"x\\z  "}},
 	{"a = 1e", "invalid numeral", 4, []string{"a", "=", "1e"}},
 	{"a = 0x", "invalid numeral", 4, []string{"a", "=", "0x"}},
-	// A malformed numeral takes a sign only after the letter of an exponent, in either case, and no bracket.
 	{"a = 1e+ b", "invalid numeral", 4, []string{"a", "=", "1e+", "b"}},
 	{"a = 0x1P- b", "invalid numeral", 4, []string{"a", "=", "0x1P-", "b"}},
 	{"a = 1E- b", "invalid numeral", 4, []string{"a", "=", "1E-", "b"}},
@@ -86,7 +80,6 @@ var malformedSources = []struct {
 	{"a = (0x1p)", "invalid numeral", 5, []string{"a", "=", "(", "0x1p", ")"}},
 }
 
-// afterAnOpenString has a string that its line ends, and a require on the next line.
 const afterAnOpenString = "x = \"open\nrequire \"m\""
 
 func TestTokenizeRecoversFromMalformedTokensAndReportsTheFirst(t *testing.T) {
@@ -99,14 +92,11 @@ func TestTokenizeRecoversFromMalformedTokensAndReportsTheFirst(t *testing.T) {
 			t.Errorf("Tokenize(%q) = %q, want %q", c.source, got, c.raws)
 		}
 	}
-	// A line break that ends an unterminated string still counts as a line.
 	if got := Requires(afterAnOpenString); !slices.Equal(got, []Require{{Line: 2, Name: "m", Literal: true}}) {
 		t.Errorf("Requires after an unterminated string = %+v", got)
 	}
 }
 
-// escapedStrings has a \z that skips the white space after it, line breaks included, and a backslash before CRLF
-// that continues its string.
 const escapedStrings = "a = \"one\\z\n   two\" b = \"x\\\r\ny\" require \"m\""
 
 func TestQuotedStringsFollowLuasEscapes(t *testing.T) {
@@ -143,13 +133,11 @@ func TestATokenHasItsKindItsTextAndItsPlace(t *testing.T) {
 func TestTheEdgesOfNamesNumeralsAndDots(t *testing.T) {
 	for _, c := range []struct {
 		source string
-		kind   Kind // of every token
+		kind   Kind
 		raws   []string
 	}{
 		{"A Z a z _ _9 Zz9_", NameToken, []string{"A", "Z", "a", "z", "_", "_9", "Zz9_"}},
 		{"0xa 0xA 0xf 0xF 0x09afAF 0Xa.Fp1", NumberToken, []string{"0xa", "0xA", "0xf", "0xF", "0x09afAF", "0Xa.Fp1"}},
-		// The letter of an exponent is taken in either case: e and E after decimal digits, p and P after
-		// hexadecimal ones.
 		{"0x1P4 0x1p-4 0XA.8P+1 1E5 1e5 .5E+2", NumberToken, []string{"0x1P4", "0x1p-4", "0XA.8P+1", "1E5", "1e5", ".5E+2"}},
 		{".5", NumberToken, []string{".5"}},
 		{"1 .5", NumberToken, []string{"1", ".5"}},
@@ -167,11 +155,9 @@ func TestTheEdgesOfNamesNumeralsAndDots(t *testing.T) {
 			}
 		}
 	}
-	// A dot that ends the source after a name is a symbol, and a hexadecimal numeral takes no letter after f.
 	if tokens, fault := Tokenize("a."); fault != nil || !slices.Equal(raws(tokens), []string{"a", "."}) {
 		t.Errorf("Tokenize(a.) = %q, fault %+v", raws(tokens), fault)
 	}
-	// Nor the characters just before a and A.
 	if tokens, _ := Tokenize("0x1@ 0x1`"); !slices.Equal(raws(tokens), []string{"0x1", "@", "0x1", "`"}) {
 		t.Errorf("Tokenize(0x1@ 0x1`) = %q", raws(tokens))
 	}
@@ -186,12 +172,11 @@ func TestAShortCommentEndsBeforeItsLineBreakOrWithTheSource(t *testing.T) {
 	for _, c := range []struct {
 		source string
 		raws   []string
-		line   int // the line of the last token
+		line   int
 	}{
 		{"a -- the source ends in the comment", []string{"a"}, 1},
 		{"--", nil, 0},
 		{"a -- a line feed\nb", []string{"a", "b"}, 2},
-		// A short comment runs to its line break: no character of its text ends it sooner.
 		{"a -- nothing but a line break ~ ends ; it\nb", []string{"a", "b"}, 2},
 		{"a -- a return and a line feed\r\nb", []string{"a", "b"}, 2},
 		{"a -- [[ no long comment\nb ]]", []string{"a", "b", "]", "]"}, 2},
@@ -223,8 +208,6 @@ func TestALongStringLeavesOutTheLineBreakThatFollowsItsOpeningBracket(t *testing
 	}
 }
 
-// A long bracket ends at its first closing bracket of its level: two long strings are two tokens, and a long
-// comment does not swallow what follows it.
 func TestALongBracketEndsAtItsFirstClosingBracket(t *testing.T) {
 	for _, c := range []struct {
 		source string
@@ -241,18 +224,15 @@ func TestALongBracketEndsAtItsFirstClosingBracket(t *testing.T) {
 	}
 }
 
-// What opens a long bracket, or only starts to, is the last thing in the source: each scanner takes it.
 func TestASourceThatEndsWhereALongBracketOpensIsScanned(t *testing.T) {
 	for _, source := range []string{"a = [", "a = [=", "a = [==", "a = [=[", "--[", "--[=", "--[==[", "["} {
 		if value := testkit.Panic(func() { scan(source) }); value != nil {
 			t.Errorf("a scanner panics on %q: %v", source, value)
 		}
 	}
-	// One bracket and equals signs are symbols, and no string.
 	if tokens, _ := Tokenize("a = [="); !slices.Equal(raws(tokens), []string{"a", "=", "[", "="}) {
 		t.Errorf("Tokenize(a = [=) = %q", raws(tokens))
 	}
-	// The text of a long string that never closes is what follows its opening bracket.
 	for source, text := range map[string]string{"a = [=[ open ]] b": " open ]] b", "a = [[\nopen": "open", "a = [[": ""} {
 		tokens, fault := Tokenize(source)
 		if fault == nil || len(tokens) != 3 || tokens[2].Kind != StringToken || tokens[2].Text != text {
@@ -262,13 +242,10 @@ func TestASourceThatEndsWhereALongBracketOpensIsScanned(t *testing.T) {
 }
 
 func TestAfterZOnlyLuasOwnWhiteSpaceIsSkipped(t *testing.T) {
-	// A space and a line break after \z are skipped, so the string goes on to its closing quote.
 	tokens, fault := Tokenize("a = \"x\\z \n y\" b")
 	if want := []string{"a", "=", "\"x\\z \n y\"", "b"}; fault != nil || !slices.Equal(raws(tokens), want) {
 		t.Errorf("tokens = %q, fault = %+v", raws(tokens), fault)
 	}
-	// Lua's \z stops at a no-break space (the first source) and at a byte order mark (the second): neither is white
-	// space to Lua. The line break after it is then not skipped, and ends the string unclosed.
 	for _, c := range []struct {
 		source string
 		raws   []string
@@ -290,7 +267,6 @@ func TestOnlyLuasOwnWhiteSpaceSeparatesTokens(t *testing.T) {
 	if tokens, fault := Tokenize("a\t\v\f\r\n b"); fault != nil || !slices.Equal(raws(tokens), []string{"a", "b"}) {
 		t.Errorf("tokens = %q, fault = %+v", raws(tokens), fault)
 	}
-	// A no-break space and a byte order mark are not white space in Lua: each is a symbol Lua does not have.
 	for _, c := range []struct {
 		source string
 		raws   []string

@@ -11,10 +11,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// Every change these tests make to a file gives it another size, or a time of its own choosing: two writes that
-// follow each other at once may bear the same time, which a file system keeps no finer than its clock ticks.
-
-// anything is the rule of a root for which every change counts.
 func anything(string) bool { return true }
 
 func TestPollNoticesAFileThatAppearsChangesOrGoes(t *testing.T) {
@@ -32,7 +28,6 @@ func TestPollNoticesAFileThatAppearsChangesOrGoes(t *testing.T) {
 	if !w.poll() {
 		t.Error("another size is a change")
 	}
-	// The same size at another time is a change too.
 	later := time.Now().Add(time.Hour)
 	if err := os.Chtimes(filepath.Join(dir, "a.yue"), later, later); err != nil {
 		t.Fatal(err)

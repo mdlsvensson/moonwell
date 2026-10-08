@@ -15,20 +15,14 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// modFile is the name the tests give Read for its errors.
 const modFile = "map/war3map.w3u"
 
-// moonwell is a text with characters that are not ASCII: an o with a stroke, twice.
 const moonwell = "M\xC3\xB8\xC3\xB8nwell"
 
-// nulls is the id of four NUL bytes as the test kit takes it: the id of a standard object in the original table.
 const nulls = "\x00\x00\x00\x00"
 
-// noEnd is the usual end token of a modification.
 var noEnd = objmod.ID{}
 
-// fixtureNames is the table of the fixture's README: one custom object per tab of the Object Editor, its name a
-// TRIGSTR reference. skin says which of the two files holds the name: the skin file or the main one.
 var fixtureNames = []struct {
 	ext, base, id, field string
 	skin                 bool
@@ -44,7 +38,6 @@ var fixtureNames = []struct {
 	{"w3q", "Rhme", "R000", "gnam", true, 1, "TRIGSTR_018"},
 }
 
-// fixtureFiles are the names of the fixture's fourteen files: the main and the skin file of every tab.
 func fixtureFiles() []string {
 	var files []string
 	for _, name := range fixtureNames {
@@ -58,7 +51,6 @@ func fixture(t *testing.T, name string) []byte {
 	return testkit.Fixture(t, "objects-v3-names/"+name)
 }
 
-// id is the ID a test wrote out as four characters.
 func id(s string) objmod.ID {
 	parsed, ok := objmod.ParseID(s)
 	if !ok {
@@ -72,7 +64,6 @@ func realValue(n float32) objmod.Value   { return objmod.Value{Type: objmod.Real
 func unrealValue(n float32) objmod.Value { return objmod.Value{Type: objmod.Unreal, Real: n} }
 func textValue(s string) objmod.Value    { return objmod.Value{Type: objmod.String, Text: s} }
 
-// mustRead reads a file the test knows to be whole.
 func mustRead(t *testing.T, data []byte, kind objmod.TableKind, file string) *objmod.File {
 	t.Helper()
 	parsed, err := objmod.Read(data, kind, file)
@@ -82,8 +73,6 @@ func mustRead(t *testing.T, data []byte, kind objmod.TableKind, file string) *ob
 	return parsed
 }
 
-// readOf is what Read gives for a source the test knows to be whole, and nil for no source: what AppendTo is
-// handed beside the source.
 func readOf(t *testing.T, source []byte, kind objmod.TableKind, file string) *objmod.File {
 	t.Helper()
 	if source == nil {
@@ -92,7 +81,6 @@ func readOf(t *testing.T, source []byte, kind objmod.TableKind, file string) *ob
 	return mustRead(t, source, kind, file)
 }
 
-// mustAppend appends objects the test knows can be written, to a source it knows to be whole or to none.
 func mustAppend(t *testing.T, source []byte, kind objmod.TableKind, added []objmod.NewObject, file string) []byte {
 	t.Helper()
 	data, err := objmod.AppendTo(readOf(t, source, kind, file), source, kind, added)
@@ -102,7 +90,6 @@ func mustAppend(t *testing.T, source []byte, kind objmod.TableKind, added []objm
 	return data
 }
 
-// refusal checks that err is a file error that names the file, has the words and points to World Editor 3.00.
 func refusal(t *testing.T, what string, err error, file, words string) {
 	t.Helper()
 	var failure *diag.Error
@@ -255,7 +242,6 @@ func TestSyntheticFilesRoundTripIntRealUnrealAndStringValues(t *testing.T) {
 			parsed.Custom.Stop != len(data) || object.Stop != len(data) {
 			t.Errorf("parsed = %+v", parsed)
 		}
-		// The first custom modification follows base, id, set count, set flag and modification count.
 		first := object.Sets[0].Mods[0]
 		size := 16
 		if kind == objmod.Leveled {
@@ -306,15 +292,12 @@ func TestSyntheticV1AndV2FilesWithoutSetFieldsParseWithOneImplicitSet(t *testing
 	}
 }
 
-// malformed is a simple table that does not read, and the words its error has.
 type malformed struct {
 	name  string
 	data  []byte
 	words string
 }
 
-// malformedFiles returns the skin file of the units with one thing wrong in each, and cut at every length after
-// its counts.
 func malformedFiles(t *testing.T) []malformed {
 	t.Helper()
 	valid := fixture(t, "war3mapSkin.w3u")
@@ -326,14 +309,12 @@ func malformedFiles(t *testing.T) []malformed {
 		{"version 4", with(0, 4), "unsupported version 4"},
 		{"cut inside the version", valid[:2], "truncated"},
 		{"cut inside the count of original objects", valid[:6], "truncated"},
-		// A wrong value is what the file is refused for, also where the bytes run out after it.
 		{"version 0 cut inside the count of original objects", with(0, 0)[:6], "unsupported version 0"},
 		{"a string that is not UTF-8 before an end token cut short", invalidUTF8[:len(invalidUTF8)-2], "invalid UTF-8"},
 		{"a count of 1000 custom objects", with(8, 1000), "object count 1000"},
 		{"a count of -1 custom objects", with(8, -1), "object count -1"},
 		{"a count of modifications past the end", with(28, math.MaxInt32), "modification count"},
 		{"value type 4", with(36, 4), "unknown value type 4"},
-		// The string's NUL and the end token become text, so no NUL is left after the string starts.
 		{"a string without its NUL", testkit.Concat(valid[:51], []byte("xxxxx")), "unterminated string"},
 		{"a string that is not UTF-8", invalidUTF8, "invalid UTF-8"},
 		{"a byte after the custom objects", append(bytes.Clone(valid), 0), "trailing bytes"},
@@ -357,8 +338,6 @@ func TestMalformedFilesAreFileErrorsThatPointToWorldEditor300(t *testing.T) {
 	}
 }
 
-// What follows the first thing wrong is not what the file meant, so it is not read: the error is of the first
-// object or modification that is wrong, whatever is wrong with the ones after it.
 func TestTheFirstProblemIsReportedWhenMoreObjectsOrModificationsFollowIt(t *testing.T) {
 	typed := func(number int32) testkit.SyntheticMod {
 		return testkit.SyntheticMod{Field: "unam", Value: objmod.Value{Type: objmod.ValueType(number)}}
@@ -391,10 +370,6 @@ func TestTheFirstProblemIsReportedWhenMoreObjectsOrModificationsFollowIt(t *test
 	}
 }
 
-// A count is refused when its items would not fit in the bytes that are left if each had its smallest size: an
-// object without modifications, which has a count of sets and a flag from version 3 on, and a modification whose
-// value is an empty string, which has a level and a column in a leveled table. So a file of such items reads, and
-// the same file without its last byte has a count that is wrong.
 func TestACountFitsWhenItsItemsOfTheSmallestSizeFillTheRestOfTheFile(t *testing.T) {
 	bare := testkit.SyntheticObject{Base: "hfoo", ID: "h000"}
 	empty := testkit.SyntheticMod{Field: "unam", Value: textValue("")}
@@ -419,8 +394,6 @@ func TestACountFitsWhenItsItemsOfTheSmallestSizeFillTheRestOfTheFile(t *testing.
 	}
 }
 
-// A table without objects and a set without modifications are lists that are empty and not nil: what is written
-// from a file that was read says [] of them, not null.
 func TestATableWithoutObjectsAndASetWithoutModificationsAreEmptyLists(t *testing.T) {
 	bare := []testkit.SyntheticObject{{Base: "hfoo", ID: "h000"}}
 	for _, version := range []int32{1, 2, 3} {
@@ -453,7 +426,6 @@ func TestAnObjectHasOneToSixtyFourSets(t *testing.T) {
 	}
 	_, err := objmod.Read(testkit.BuildModFile(3, nil, object(65), objmod.Simple), objmod.Simple, modFile)
 	refusal(t, "an object of 65 sets", err, modFile, "unsupported set count 65")
-	// A count of 64 is no wrong count, so an object with fewer sets than it says ends too soon.
 	counted := testkit.SetU32(testkit.BuildModFile(3, nil, object(1), objmod.Simple), 20, 64)
 	_, err = objmod.Read(counted, objmod.Simple, modFile)
 	refusal(t, "a set count of 64 before one set", err, modFile, "truncated")
@@ -470,7 +442,6 @@ func TestASliceOfALargerBufferParsesTheSameAsACopy(t *testing.T) {
 	}
 }
 
-// appended returns two objects to append, as the table kind allows them: simple tables have no level or column.
 func appended(kind objmod.TableKind) []objmod.NewObject {
 	objects := []objmod.NewObject{
 		{Base: id("hfoo"), ID: id("X001"), Mods: []objmod.NewMod{
@@ -491,7 +462,6 @@ func appended(kind objmod.TableKind) []objmod.NewObject {
 	return objects
 }
 
-// asSynthetic is what a file holds for appended objects, as the test kit's builder writes them.
 func asSynthetic(added []objmod.NewObject) []testkit.SyntheticObject {
 	var out []testkit.SyntheticObject
 	for _, object := range added {
@@ -544,7 +514,6 @@ func TestAppendingToEveryNamesFixtureFileKeepsItsBytesAndAddsTheObjectsLast(t *t
 			!reflect.DeepEqual(after.Custom.Objects[:count-2], before.Custom.Objects) || after.Custom.Stop != len(data) {
 			t.Errorf("%s: the file reads differently after appending", file)
 		}
-		// The appended objects are the bytes the test kit's builder writes for them.
 		expected := testkit.BuildModFile(3, nil, asSynthetic(appended(kind)), kind)
 		if !bytes.Equal(data[custom.Stop:], expected[12:]) {
 			t.Errorf("%s: the appended objects are not encoded as expected", file)
@@ -569,7 +538,6 @@ func TestSyntheticV1V2AndV3SourcesGetObjectsInTheirOwnVersionsShape(t *testing.T
 		{Base: "hfoo", ID: "h001", Mods: []testkit.SyntheticMod{{Field: "unam", Level: 2, Value: textValue("A")}}},
 		{Base: "hfoo", ID: "h002", Mods: []testkit.SyntheticMod{{Field: "utip", Value: textValue("B"), End: "h002"}}},
 	}
-	// A version 3 object with two sets and a flag that is not 0, which AppendTo never writes, is still copied as it is.
 	multiSet := testkit.SyntheticObject{Base: "hfoo", ID: "h003", Sets: []testkit.SyntheticSet{
 		{Flag: 7},
 		{Mods: []testkit.SyntheticMod{{Field: "uhpm", Value: intValue(5)}}},
@@ -590,8 +558,6 @@ func TestSyntheticV1V2AndV3SourcesGetObjectsInTheirOwnVersionsShape(t *testing.T
 	}
 }
 
-// A string is a text, and a text is read by the one rule for a byte order mark: one at its very start is no
-// part of it, and one anywhere else is.
 func TestAByteOrderMarkAtTheStartOfAStringIsNotPartOfIt(t *testing.T) {
 	const mark = "\xEF\xBB\xBF"
 	for written, want := range map[string]string{
@@ -606,12 +572,10 @@ func TestAByteOrderMarkAtTheStartOfAStringIsNotPartOfIt(t *testing.T) {
 	}
 }
 
-// oneMod is one object to append with one modification.
 func oneMod(mod objmod.NewMod) []objmod.NewObject {
 	return []objmod.NewObject{{Base: id("hfoo"), ID: id("X001"), Mods: []objmod.NewMod{mod}}}
 }
 
-// unwritable is objects that AppendTo must refuse, and the words its error has.
 type unwritable struct {
 	name    string
 	kind    objmod.TableKind
@@ -619,8 +583,6 @@ type unwritable struct {
 	words   string
 }
 
-// refusedByAppend checks that AppendTo refuses the objects, added to no source and to a source, with an error
-// that is not a file error and has the words, and that it returns no bytes.
 func refusedByAppend(t *testing.T, cases []unwritable) {
 	t.Helper()
 	for _, c := range cases {
@@ -654,7 +616,6 @@ func TestWhatAppendCannotWriteIsAnErrorThatIsNotAFileError(t *testing.T) {
 
 func TestAppendRefusesAValueTypeThatIsNoneOfTheFour(t *testing.T) {
 	var cases []unwritable
-	// The last is 3, the type of a string, in its low 32 bits, which are the ones a file stores.
 	for _, valueType := range []objmod.ValueType{-1, 4, 7, 1<<32 | 3} {
 		value := objmod.Value{Type: valueType, Int: 1, Real: 1, Text: "a"}
 		for _, kind := range []objmod.TableKind{objmod.Simple, objmod.Leveled} {
@@ -686,7 +647,6 @@ func TestAppendRefusesARealThatIsNotFinite(t *testing.T) {
 		}
 	}
 	refusedByAppend(t, cases)
-	// Only a real is looked at: the Real of an int or of a string is not written.
 	for _, value := range []objmod.Value{
 		{Type: objmod.Int, Int: 1, Real: float32(math.NaN())},
 		{Type: objmod.String, Text: "a", Real: float32(math.Inf(1))},
@@ -710,13 +670,11 @@ func TestAppendRefusesAnIDOfFourNULs(t *testing.T) {
 			[]objmod.NewObject{{Base: id("hfoo"), ID: id("X001"), Mods: mods}, {Base: id("hfoo")}},
 			"its id is four NUL bytes"},
 	})
-	// An id with NUL bytes in it is an id as long as one byte is not NUL.
 	partly := objmod.ID{0, 0, 0, 1}
 	object := objmod.NewObject{Base: partly, ID: partly, Mods: []objmod.NewMod{{Field: partly, Value: intValue(1)}}}
 	mustAppend(t, nil, objmod.Simple, []objmod.NewObject{object}, "war3map.w3u")
 }
 
-// TestAppendLeavesItsSourceAsItIs gives AppendTo a source with spare capacity, where an append in place would go.
 func TestAppendLeavesItsSourceAsItIs(t *testing.T) {
 	for _, file := range []string{"war3mapSkin.w3u", "war3mapSkin.w3q"} {
 		kind := objmod.KindOf(file)
@@ -729,7 +687,6 @@ func TestAppendLeavesItsSourceAsItIs(t *testing.T) {
 			if !bytes.Equal(buffer, before) {
 				t.Errorf("%s with %d objects: AppendTo changed its source or the bytes after it", file, len(added))
 			}
-			// Nothing written into the result may show in the source, or in the capacity it has to spare.
 			data = append(data, 0x55)
 			for i := range data {
 				data[i] = 0x55
@@ -742,7 +699,6 @@ func TestAppendLeavesItsSourceAsItIs(t *testing.T) {
 }
 
 func TestAppendWritesEveryNumberAndEveryID(t *testing.T) {
-	// In a new leveled file the first object's id is at 16 and its first value at 48.
 	valueAt := func(value objmod.Value) []byte {
 		t.Helper()
 		object := objmod.NewObject{Base: id("hfoo"), ID: objmod.ID{0, 0xFF, 0xE9, 'A'}, Mods: []objmod.NewMod{
@@ -768,7 +724,6 @@ func TestAppendWritesEveryNumberAndEveryID(t *testing.T) {
 		{"a real that needs every bit", unrealValue(math.Float32frombits(0x3DCCCCCD)), 0x3DCCCCCD},
 		{"an unreal below zero", unrealValue(-1.5), 0xBFC00000},
 		{"the smallest real above zero", realValue(math.Float32frombits(1)), 1},
-		// The text of a value that is not a String is not written, so nothing is wrong with it.
 		{"an int with a text", objmod.Value{Type: objmod.Int, Int: 7, Text: "a\x00b"}, 7},
 	} {
 		if got := valueAt(c.value); !bytes.Equal(got, testkit.U32(c.want)) {

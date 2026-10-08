@@ -10,20 +10,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// slot is one player of the map as the Lua must show it.
 type slot struct {
 	id       int
-	player   string // the player as the Lua writes it: `Player(3)`
-	location int    // its start location, which is the place of its record among the map info's players
+	player   string
+	location int
 	record   w3i.Player
 }
 
-// players brings InitCustomPlayerSlots() and the start locations of config() into line with the map info, for
-// the player of each override that sets something, in slot order.
-//
-// A player's name is stored in the map info alone: World Editor writes no SetPlayerName, and a call of it from
-// config() crashes Warcraft III 3.0.0.24268 when the lobby is created. An override that sets only a name still
-// asks that the Lua has the player as the map info has it.
 func (p *patcher) players(overrides map[int]manifest.Player, details *w3i.Details) {
 	if !anySet(overrides) {
 		return
@@ -38,7 +31,6 @@ func (p *patcher) players(overrides map[int]manifest.Player, details *w3i.Detail
 	}
 }
 
-// player edits the calls of one player: those the override has a setting for.
 func (p *patcher) player(config, slots lua.Function, override manifest.Player, id int, details *w3i.Details) {
 	s, found := p.slot(id, details)
 	if !found {
@@ -59,7 +51,6 @@ func (p *patcher) player(config, slots lua.Function, override manifest.Player, i
 	}
 }
 
-// slot is the map's player in the slot of the id. A setting for a player the map info lacks is refused.
 func (p *patcher) slot(id int, details *w3i.Details) (slot, bool) {
 	at := slices.IndexFunc(details.Players, func(player w3i.Player) bool { return int(player.ID.Value) == id })
 	if at < 0 {
@@ -69,8 +60,6 @@ func (p *patcher) slot(id int, details *w3i.Details) (slot, bool) {
 	return slot{id: id, player: fmt.Sprintf("Player(%d)", id), location: at, record: details.Players[at]}, true
 }
 
-// startLocation is the call that gives the player its start location, which must be the one the map info gives
-// it: every other call of the player is found by the same id, and a start location is edited by its number.
 func (p *patcher) startLocation(slots lua.Function, s slot) lua.Call {
 	start, found := p.optional(p.forPlayer(slots, "SetPlayerStartLocation", 2, s.id), "SetPlayerStartLocation("+s.player+")")
 	if !found || !literalIs(start.Args[1], s.location) {
@@ -80,7 +69,6 @@ func (p *patcher) startLocation(slots lua.Function, s slot) lua.Call {
 	return start
 }
 
-// controller writes who controls the player.
 func (p *patcher) controller(slots lua.Function, s slot) {
 	controller, known := named(controllers, s.record.Controller.Value)
 	if !known {
@@ -93,8 +81,6 @@ func (p *patcher) controller(slots lua.Function, s slot) {
 	)
 }
 
-// named is the name a number of the map info has, which is the name in its place among names, and whether it has
-// one. The empty name stands where a number has none.
 func named(names []string, number int32) (string, bool) {
 	if number < 0 || int(number) >= len(names) || names[number] == "" {
 		return "", false
@@ -102,7 +88,6 @@ func named(names []string, number int32) (string, bool) {
 	return names[number], true
 }
 
-// race writes the race the player prefers, and whether the player may choose another.
 func (p *patcher) race(slots lua.Function, s slot) {
 	race, known := named(races, s.record.Race.Value)
 	if !known {
@@ -123,8 +108,6 @@ func (p *patcher) race(slots lua.Function, s slot) {
 	)
 }
 
-// fixedStart adds the call that holds the player to its start location, after the call that gives it one, or
-// takes the call out, as the map info says. A call that is there and right is kept.
 func (p *patcher) fixedStart(slots lua.Function, s slot, start lua.Call) {
 	label := "ForcePlayerStartLocation(" + s.player + ")"
 	forced, found := p.optional(p.forPlayer(slots, "ForcePlayerStartLocation", 2, s.id), label)
@@ -140,8 +123,6 @@ func (p *patcher) fixedStart(slots lua.Function, s slot, start lua.Call) {
 	}
 }
 
-// position writes where the player's start location is. Both coordinates are the map info's, also the one the
-// override does not set, so both must be numbers.
 func (p *patcher) position(config lua.Function, s slot) {
 	if !finite(s.record.X.Value, s.record.Y.Value) {
 		p.refuse(errNoPosition(p.file, s))
@@ -164,8 +145,6 @@ func (p *patcher) position(config lua.Function, s slot) {
 			lua.Number(float64(s.record.X.Value)), lua.Number(float64(s.record.Y.Value))),
 	)
 }
-
-// ---- errors ----
 
 func errPlayerNotInInfo(file string, id int) error {
 	return errLuaHint(file, fmt.Sprintf("player %d does not exist in war3map.w3i.", id),

@@ -13,27 +13,21 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/mapdir"
 )
 
-// Asset is a file to import, and the in-map path it is imported as.
 type Asset struct {
-	Source  string // its path under assets/, or under the library's folder, with "/"
-	Library string // the library that ships it; empty for the map's own
-	Target  string // the in-map path, with "/"
+	Source  string
+	Library string
+	Target  string
 	Bytes   []byte
-	Hash    string // the SHA-256 of Bytes, in lower-case hexadecimal
+	Hash    string
 }
 
-// Library is a library that ships files for the map.
 type Library struct {
 	Key string
-	Dir string // the folder that holds those files
+	Dir string
 }
 
-// ownFolder is the folder of a project that holds the map's own assets, and how errors name it.
 const ownFolder = "assets"
 
-// Collect returns the map's own assets and then the files the libraries ship, sorted by in-map path. The map's
-// own file wins over a library's at the same in-map path, with a line in replaced saying so; two libraries at
-// one path fail. manifestFile is the file that errors about the assets block name. Nothing is written.
 func Collect(root string, config manifest.Assets, manifestFile string, libraries []Library) (assets []Asset,
 	replaced []string, err error) {
 	c := &collection{manifestFile: manifestFile, assets: []Asset{}, taken: map[string]Asset{}, replaced: []string{}}
@@ -52,25 +46,19 @@ func Collect(root string, config manifest.Assets, manifestFile string, libraries
 	return c.assets, c.replaced, nil
 }
 
-// collection is the assets found so far.
 type collection struct {
 	manifestFile string
 	assets       []Asset
-	taken        map[string]Asset // by the key of an in-map path, the asset imported there
+	taken        map[string]Asset
 	replaced     []string
 }
 
-// byKey is the libraries in the order of their keys, so that what is found does not depend on the order given.
 func byKey(libraries []Library) []Library {
 	sorted := slices.Clone(libraries)
 	slices.SortStableFunc(sorted, func(a, b Library) int { return strings.Compare(a.Key, b.Key) })
 	return sorted
 }
 
-// ---- the map's own assets ----
-
-// addOwn adds the files under assets/ that the manifest does not leave out, each under the path assets.paths
-// gives it, else under its own. They are checked among themselves and sorted before a library's files follow.
 func (c *collection) addOwn(root string, config manifest.Assets) error {
 	folder, err := open(filepath.Join(root, ownFolder), ownFolder)
 	if err != nil {
@@ -100,13 +88,11 @@ func (c *collection) addOwn(root string, config manifest.Assets) error {
 	return nil
 }
 
-// rule is one entry of assets.exclude: a file, or a folder with everything below it.
 type rule struct {
 	key    string
 	folder bool
 }
 
-// rulesOf reads assets.exclude. An entry that ends in a separator names a folder.
 func rulesOf(exclude []string) ([]rule, error) {
 	var rules []rule
 	for _, value := range exclude {
@@ -123,8 +109,6 @@ func rulesOf(exclude []string) ([]rule, error) {
 	return rules, nil
 }
 
-// leftOut reports whether the file at path is not imported: a rule names it or a folder it is in, or a part of its
-// name starts with a dot.
 func leftOut(path string, rules []rule) bool {
 	key := mapdir.Key(path)
 	return hasDotPart(path) || slices.ContainsFunc(rules, func(r rule) bool {
@@ -132,13 +116,10 @@ func leftOut(path string, rules []rule) bool {
 	})
 }
 
-// hasDotPart reports whether a part of path, with "/", starts with a dot: .gitkeep, .git/config.
 func hasDotPart(path string) bool {
 	return strings.HasPrefix(path, ".") || strings.Contains(path, "/.")
 }
 
-// mappings is the in-map path assets.paths gives each file it names, by the file's key. A mapping names a file
-// that is among files and is not left out, and no file has two.
 func (c *collection) mappings(paths manifest.Ordered[string], files []string, rules []rule) (map[string]string, error) {
 	present := map[string]bool{}
 	for _, file := range files {
@@ -168,9 +149,6 @@ func (c *collection) mappings(paths manifest.Ordered[string], files []string, ru
 	return mapped, nil
 }
 
-// inBlock makes the refusal of a path that is written in the assets block the block's own: the manifest is its
-// file, and the block's hint follows what the path's hint says. A path that is a file's own name is not written
-// there, and its refusal stays as it is.
 func (c *collection) inBlock(err error) error {
 	var failure *diag.Error
 	if errors.As(err, &failure) {
@@ -180,7 +158,6 @@ func (c *collection) inBlock(err error) error {
 	return err
 }
 
-// addOwnFile adds one of the map's own files, under the path its mapping gives, else under its own.
 func (c *collection) addOwnFile(folder *mapdir.Folder, source string, mapped map[string]string) error {
 	target, isMapped := mapped[mapdir.Key(source)]
 	if !isMapped {
@@ -195,10 +172,6 @@ func (c *collection) addOwnFile(folder *mapdir.Folder, source string, mapped map
 	return c.add(folder, Asset{Source: source, Target: target})
 }
 
-// ---- the libraries' files ----
-
-// addLibrary adds the files a library ships, each at its path in the library's folder. A file whose in-map path
-// one of the map's own has is replaced by it.
 func (c *collection) addLibrary(root string, library Library) error {
 	label := labelOf(root, library.Dir)
 	if err := refuseLinked(library.Dir, label); err != nil {
@@ -219,8 +192,6 @@ func (c *collection) addLibrary(root string, library Library) error {
 	return nil
 }
 
-// labelOf is how errors name a library's folder, and how a report names a model a command line names: by its
-// path from the project folder with "/" where it is inside the project, else by its path.
 func labelOf(root, dir string) string {
 	if below, err := filepath.Rel(root, dir); err == nil && filepath.IsLocal(below) {
 		return filepath.ToSlash(below)
@@ -228,8 +199,6 @@ func labelOf(root, dir string) string {
 	return filepath.ToSlash(dir)
 }
 
-// refuseLinked fails when a link stands in place of a library's folder, which errors name by label. A link is made
-// on this machine and is not among what the library ships, so the failure is not the library's.
 func refuseLinked(dir, label string) error {
 	if info, err := fsx.Lstat(dir); err == nil && info != nil && fsx.IsLink(info) {
 		return errLinkedFolder(dir, label)
@@ -237,8 +206,6 @@ func refuseLinked(dir, label string) error {
 	return nil
 }
 
-// addShipped adds one file of a library, unless one of the map's own is imported at its path. A path the file may
-// not have is the library's failure; two libraries at one path are the project's.
 func (c *collection) addShipped(folder *mapdir.Folder, library, label, source string) error {
 	target, err := targetPath(source)
 	if err != nil {
@@ -250,8 +217,6 @@ func (c *collection) addShipped(folder *mapdir.Folder, library, label, source st
 	return inLibrary(c.add(folder, Asset{Source: source, Library: library, Target: target}), library, label)
 }
 
-// replace notes that the map's own asset stands in for a library's file at the same in-map path. An asset of
-// another library cannot: the two libraries are refused.
 func (c *collection) replace(other Asset, library, source, target string) error {
 	if other.Library != "" {
 		return errTwoLibraries(c.manifestFile, other.Library, library, target)
@@ -260,10 +225,6 @@ func (c *collection) replace(other Asset, library, source, target string) error 
 	return nil
 }
 
-// inLibrary turns a failure about what a library's folder contains into the library's, which the map's author can
-// only report: a path no asset may have, and what a folder of map files cannot hold. A failure with a cause is
-// the system's (a file or a folder that cannot be read) and stays as it is, at the file it names with its own
-// hint. So do nil and an error that is not an expected failure.
 func inLibrary(err error, library, label string) error {
 	var failure *diag.Error
 	if !errors.As(err, &failure) || failure.Cause != nil {
@@ -272,25 +233,17 @@ func inLibrary(err error, library, label string) error {
 	return errInLibrary(library, label, failure)
 }
 
-// ---- folders and files ----
-
-// open scans a folder of files for the map, which errors name by label. A folder that is not there is nil, and
-// has no files. What a folder cannot hold (a link, two spellings of one path, a name Windows cannot hold) is
-// refused as it is for a map folder: these files become map files.
 func open(dir, label string) (*mapdir.Folder, error) {
 	if info, err := fsx.Lstat(dir); err == nil && info != nil && !info.IsDir() && !fsx.IsLink(info) {
 		return nil, errNotAFolder(label)
 	}
 	folder, err := mapdir.Open(dir, label)
-	// Only the folder itself may be missing. A folder below it that is gone by the time it is listed is an
-	// expected failure, which names that folder.
 	if _, expected := diag.First(err); !expected && errors.Is(err, fs.ErrNotExist) {
 		return nil, nil
 	}
 	return folder, err
 }
 
-// filesOf is the files of a folder as it spells them, in the order of its scan.
 func filesOf(folder *mapdir.Folder) []string {
 	if folder == nil {
 		return nil
@@ -298,7 +251,6 @@ func filesOf(folder *mapdir.Folder) []string {
 	return folder.Files()
 }
 
-// add reads the asset's file from its folder and takes the asset into the collection.
 func (c *collection) add(folder *mapdir.Folder, asset Asset) error {
 	data, _, err := folder.Read(asset.Source)
 	if err != nil {
@@ -310,8 +262,6 @@ func (c *collection) add(folder *mapdir.Folder, asset Asset) error {
 	return nil
 }
 
-// refuseNesting fails when the in-map path of one asset is a folder on the way to another's: a map cannot hold
-// a file and a folder under one name.
 func (c *collection) refuseNesting() error {
 	for _, asset := range c.assets {
 		key := mapdir.Key(asset.Target)
@@ -324,17 +274,11 @@ func (c *collection) refuseNesting() error {
 	return nil
 }
 
-// sortByTarget puts the assets in the order of their in-map paths, compared byte by byte without regard to
-// letter case.
 func (c *collection) sortByTarget() {
 	slices.SortStableFunc(c.assets, func(a, b Asset) int {
 		return strings.Compare(mapdir.Key(a.Target), mapdir.Key(b.Target))
 	})
 }
-
-// ---- errors ----
-
-// errInvalidPath, for a source or an exclusion that is no path, is with targetPath in target.go.
 
 const blockHint = "Fix the assets block in moonwell.pkl."
 
@@ -378,8 +322,6 @@ func errTwoLibraries(manifestFile, first, second, target string) error {
 	}
 }
 
-// errLinkedFolder is fsx.LinkError for the link at dir, with the folder as its file: label, the name the folder
-// has in every other error about it.
 func errLinkedFolder(dir, label string) error {
 	err := fsx.LinkError(dir)
 	var failure *diag.Error

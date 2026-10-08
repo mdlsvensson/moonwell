@@ -9,7 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/objects"
 )
 
-// namesOf is the names of the fields of a list by their ids.
 func namesOf(fields []objects.FieldMeta) map[string]string {
 	names := map[string]string{}
 	for _, field := range fields {
@@ -18,7 +17,6 @@ func namesOf(fields []objects.FieldMeta) map[string]string {
 	return names
 }
 
-// reported is the renames as the report writes them, in the order they are given.
 func reported(renames []rename) []string {
 	var lines []string
 	for _, renamed := range renames {
@@ -27,8 +25,6 @@ func reported(renames []rename) []string {
 	return lines
 }
 
-// refusal names the fields of the miniature export, after change has adjusted its files, and returns the
-// refusal: it fails the test when the fields are named.
 func refusal(t *testing.T, pins overrides, change func(files map[string]string)) string {
 	t.Helper()
 	_, _, err := nameFields(readMini(t, change), pins)
@@ -38,8 +34,6 @@ func refusal(t *testing.T, pins overrides, change func(files map[string]string))
 	return err.Error()
 }
 
-// withLabels gives the miniature's strings of the editor these lines more: a key that the strings have takes the
-// later label.
 func withLabels(lines ...string) func(files map[string]string) {
 	return func(files map[string]string) { files[labelsFile] += strings.Join(lines, "\r\n") + "\r\n" }
 }
@@ -57,11 +51,7 @@ func TestNameFieldsNamesAFieldAfterItsLabelAndRenamesTheFieldsThatClash(t *testi
 		"ushr": "shadowOnWater",
 		"uver": "modelFileExtraVersions",
 	})
-	// "Model File" is the label of two fields that never meet: umdl is no field of items, and ifil none of units.
 	equal(t, "items", namesOf(fields["items"]), map[string]string{"ifil": "modelFile", "unam": "name"})
-	// The Cooldown of Storm Bolt alone clashes with the one that every ability has, so both take their category.
-	// The Area of Effect of Holy Light alone does not clash with the one of every ability, which Holy Light is
-	// kept from (notSpecific).
 	equal(t, "abilities", namesOf(fields["abilities"]), map[string]string{
 		"Hdc1": "damageDealtPercent",
 		"Hhb1": "amountHealedOrDamaged",
@@ -80,7 +70,6 @@ func TestNameFieldsNamesAFieldAfterItsLabelAndRenamesTheFieldsThatClash(t *testi
 		"gnam": "name",
 		"gpct": "percentBonusAndMore",
 	})
-	// The renames stand in the order of the tables and of their rows: the report orders them.
 	equal(t, "the renames", reported(renames), []string{
 		`units ucls "class" -> "unitClass" (override)`,
 		`abilities acdn "cooldown" -> "statsCooldown" (category prefix)`,
@@ -95,7 +84,6 @@ func TestNameFieldsAddsTheRawcodeWhereTheCategoryLeavesAClash(t *testing.T) {
 	if !slices.Contains(reported(renames), `abilities Hhb1 "damage" -> "dataDamageHhb1" (category prefix and rawcode)`) {
 		t.Errorf("the renames are %q", reported(renames))
 	}
-	// The rawcode is added as an author writes it: the id of three letters without the NUL that pads it.
 	fields, _ = namedFields(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
 			`C;X1;Y11;K"Crs"`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`, `C;X9;K"unreal"`, `C;X13;K"AHhb"`)
@@ -104,13 +92,11 @@ func TestNameFieldsAddsTheRawcodeWhereTheCategoryLeavesAClash(t *testing.T) {
 	equal(t, "the name of the field of three letters", namesOf(fields["abilities"])["Crs\x00"], "dataDamageCrs")
 }
 
-// A name that no property can have is refused, with the field, its label and where to pin a name for it.
 func TestNameFieldsRefusesANameThatNoPropertyCanHaveWithoutAPin(t *testing.T) {
 	contains(t, refusal(t, overrides{}, nil), "cannot derive friendly names:\n  ", `units ucls "class" (Class)`,
 		`pin another under "names", "units", "ucls" in tools/metadata/overrides.json`)
 	contains(t, refusal(t, unitClass, withLabels("WESTRING_FART=Base")), `buffs fart "base" (Base)`)
 
-	// Every keyword of Pkl and every reserved name is refused: the lists are the schema's.
 	words := slices.Concat(pklKeywords, reservedNames)
 	for _, word := range []string{"private", "public", "output", "id", "class", "out"} {
 		if !slices.Contains(words, word) {
@@ -121,12 +107,10 @@ func TestNameFieldsRefusesANameThatNoPropertyCanHaveWithoutAPin(t *testing.T) {
 		label := capitalize(word)
 		contains(t, refusal(t, unitClass, withLabels("WESTRING_FART="+label)), `buffs fart "`+word+`" (`+label+`)`)
 	}
-	// So is a name that is no name at all: a label without a letter or a digit, and one that starts with a digit.
 	contains(t, refusal(t, unitClass, withLabels("WESTRING_FART=(-)")), `buffs fart "" ((-))`)
 	contains(t, refusal(t, unitClass, withLabels("WESTRING_FART=2nd Icon")), `buffs fart "2ndIcon" (2nd Icon)`)
 }
 
-// The friendly name of a label, rule by rule.
 func TestCamelCaseIsTheFriendlyNameOfALabel(t *testing.T) {
 	for label, want := range map[string]string{
 		"Hit Points Maximum (Base)":        "hitPointsMaximumBase",
@@ -173,8 +157,6 @@ func TestCamelCaseIsTheFriendlyNameOfALabel(t *testing.T) {
 	}
 }
 
-// A pin replaces the name of a label, under units or under items for a field of their table. A pinned field is
-// not renamed when it clashes: the other field is. A pin is reported, also where it pins the name of the label.
 func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 	pins := overrides{Names: map[string]map[string]string{
 		"items":     {"unam": "displayName", "ucls": "unitClass"},
@@ -202,9 +184,6 @@ func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 	})
 }
 
-// A pin that names no field is refused, with where it stands and what to do: a list under names or under
-// removed that is none of the five, in its exact letters, and an id under names that no field of its list has.
-// A pin that says nothing would let a field take its derived name in silence.
 func TestNameFieldsRefusesAPinThatNamesNoField(t *testing.T) {
 	const (
 		noList  = " is none of the lists of fields (units, items, abilities, buffs and upgrades)"
@@ -220,13 +199,11 @@ func TestNameFieldsRefusesAPinThatNamesNoField(t *testing.T) {
 		{removed: map[string][]string{"upgrade": {"gold"}}, words: []string{"removed.upgrade" + noList}},
 		{names: map[string]map[string]string{"abilities": {"Tau9": "maxUnits"}}, words: []string{
 			`the pin of "Tau9" under names.abilities names no field: no field of abilities has that id`, noField}},
-		// A field of another list, and an id in other letters, is no field of the list.
 		{names: map[string]map[string]string{"buffs": {"unam": "title"}, "upgrades": {"GNAM": "title"}},
 			words: []string{`the pin of "unam" under names.buffs names no field`,
 				`the pin of "GNAM" under names.upgrades names no field`}},
 		{names: map[string]map[string]string{"units": {"uzzz": "none"}}, words: []string{
 			`the pin of "uzzz" under names.units names no field: no field of units or items has that id`}},
-		// The id of three letters is written as its letters: with the NUL of the metadata it names no field.
 		{names: map[string]map[string]string{"abilities": {"Crs\x00": "missChance"}}, words: []string{
 			`the pin of "Crs\u0000" under names.abilities names no field`}},
 	} {
@@ -236,9 +213,6 @@ func TestNameFieldsRefusesAPinThatNamesNoField(t *testing.T) {
 		}
 		contains(t, refusal(t, pins, nil), append(c.words, "cannot derive friendly names:\n  ")...)
 	}
-	// A pin under units of a field that items alone use, and one under items of a field of units, names its
-	// field: the two lists are one table. A field that is listed as removed is one that the game's data have
-	// not: its id names no field, and is none that is asked for.
 	pins := overrides{
 		Names: map[string]map[string]string{
 			"units": {"ucls": "unitClass", "ifil": "itemModel"}, "items": {"uhpm": "health"}},
@@ -249,9 +223,6 @@ func TestNameFieldsRefusesAPinThatNamesNoField(t *testing.T) {
 	}
 }
 
-// What cannot stand after the two renamings is refused: two pins of one name in a group, each with the other
-// field and what to do; a pin that no property can have, as a pin that is refused; and two fields that share
-// their id and their label.
 func TestNameFieldsRefusesTheNamesThatStillClashOrCannotStand(t *testing.T) {
 	pinned := func(names map[string]string) overrides {
 		return overrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}, "abilities": names}}
@@ -272,8 +243,6 @@ func TestNameFieldsRefusesTheNamesThatStillClashOrCannotStand(t *testing.T) {
 	}), `buffs fnam "textNameFnam" (Name): fnam (Name) has this name too`)
 }
 
-// A field that lists a base ability twice is of that ability once: it shares its name with no other field
-// there, and keeps the name of its label.
 func TestNameFieldsFindsNoClashOfAFieldWithItself(t *testing.T) {
 	fields, renames := namedFields(t, func(files map[string]string) {
 		files[abilityFieldsTable] = strings.Replace(files[abilityFieldsTable], `K"AHtb,AHhb"`, `K"AHtb,AHtb"`, 1)
@@ -287,9 +256,6 @@ func TestNameFieldsFindsNoClashOfAFieldWithItself(t *testing.T) {
 	}
 }
 
-// The groups that a name must be the only one in: the kinds of object that use a field of the units' table;
-// for a field of abilities the base abilities it is of, or the fields of every ability and each base ability
-// that the data names and that the field is not kept from; and one group for every other table.
 func TestGroupsOfIsTheFieldsThatCanMeetInOneObject(t *testing.T) {
 	records := []objects.FieldMeta{
 		{Use: []string{"hero", "item"}},
@@ -305,8 +271,6 @@ func TestGroupsOfIsTheFieldsThatCanMeetInOneObject(t *testing.T) {
 		{"common", "AHhb", "ANew"},
 		{"common", "AHhb", "AHtb", "ANew", "AOld"},
 	})
-	// Two fields of the units' table with one label clash where one kind of object uses both: each is found
-	// with the other. A field that is twice in a group does not clash with itself.
 	shared := func(use ...string) objects.FieldMeta { return objects.FieldMeta{Name: "shared", Use: use} }
 	other := objects.FieldMeta{Name: "other", Use: []string{"item"}}
 	for _, c := range []struct {
@@ -322,8 +286,6 @@ func TestGroupsOfIsTheFieldsThatCanMeetInOneObject(t *testing.T) {
 	}
 }
 
-// decodeOverrides reads the text of an overrides.json as readOverrides reads the file: by the reader of the
-// hand-written files.
 func decodeOverrides(data []byte) (overrides, error) {
 	var pins overrides
 	if err := decodeHandWritten(overridesPath, data, &pins); err != nil {
@@ -345,7 +307,6 @@ func TestTheOverridesAreThePinsAndTheFieldsThatAreRemoved(t *testing.T) {
 	if got, err := decodeOverrides([]byte(text)); err != nil || !reflect.DeepEqual(got, want) {
 		t.Errorf("the overrides are %+v, %v; want %+v", got, err, want)
 	}
-	// A key may be left out or be null, and so may the file: it then pins nothing.
 	for text, want := range map[string]overrides{
 		`{}`:                               {},
 		`null`:                             {},
@@ -363,8 +324,6 @@ func TestTheOverridesAreThePinsAndTheFieldsThatAreRemoved(t *testing.T) {
 	}
 }
 
-// A released name must stay: the names of the data/metadata.json that the checkout holds are what authors
-// write. A pin of the name a field has now, and a field that is listed as removed, are let through.
 func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) {
 	game := readMini(t, nil)
 	metadataOf := func(pins overrides) *objects.Metadata { return metadataPinned(t, game, pins) }
@@ -383,7 +342,6 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 		t.Errorf("the names that are released: %v", err)
 	}
 	c.write(metadataPath, renamed)
-	// The refusal says what to do for each of the two kinds of line, and where, and then has the lines.
 	const lines = ":\n" +
 		"  units uhpm \"hitPoints\" would become \"hitPointsMaximumBase\"\n" +
 		"  units unam \"unitName\" would become \"name\"\n" +
@@ -402,7 +360,6 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 		t.Error("the check wrote the metadata")
 	}
 
-	// A pin under units is of the items too, and a field is removed under the list it was in.
 	pins := overrides{
 		Names:   map[string]map[string]string{"units": {"ucls": "unitClass", "uhpm": "hitPoints", "unam": "unitName"}},
 		Removed: map[string][]string{"upgrades": {"gold"}, "units": {"gold"}},
@@ -412,16 +369,12 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 		t.Errorf("with the names pinned and the field removed: %v", err)
 	}
 	equal(t, "the name of uhpm", namesOf(pinned.Fields["units"])["uhpm"], "hitPoints")
-	// A field that is removed under another list than its own would disappear all the same.
 	pins.Removed = map[string][]string{"units": {"gold"}}
 	if err := keepsReleasedNames(pinned, c.root, pins); err == nil || !strings.Contains(err.Error(), "upgrades gold") {
 		t.Errorf("a field removed under another list: got %v", err)
 	}
 }
 
-// A pin lets a released field take another name: a name is held to the one that is released unless the overrides
-// pin the name the field has now, which is how a name is changed on purpose. The fields of units and of items
-// are one table, so a pin is of both lists, under whichever of the two it is written.
 func TestKeepsReleasedNamesLetsAPinGiveAReleasedFieldAnotherName(t *testing.T) {
 	game := readMini(t, nil)
 	c := newCheckout(t)
@@ -441,8 +394,6 @@ func TestKeepsReleasedNamesLetsAPinGiveAReleasedFieldAnotherName(t *testing.T) {
 	}
 }
 
-// The id of three letters is written in the overrides as an author writes it, Crs, under names and under
-// removed alike, and a line of the refusal shows it so: without the NUL that the metadata pads it with.
 func TestKeepsReleasedNamesTakesAndShowsTheIDOfThreeLettersAsItIsWritten(t *testing.T) {
 	scratch := newCheckout(t)
 	scratch.write(metadataPath, `{"fields": {"abilities": [{"id": "Crs\u0000", "name": "missChance"}]}}`)
@@ -453,7 +404,7 @@ func TestKeepsReleasedNamesTakesAndShowsTheIDOfThreeLettersAsItIsWritten(t *test
 	for _, c := range []struct {
 		current *objects.Metadata
 		pins    overrides
-		want    string // the line of the refusal; "" for none
+		want    string
 	}{
 		{gone, overrides{}, `abilities Crs "missChance" would disappear`},
 		{gone, overrides{Removed: map[string][]string{"abilities": {"Crs"}}}, ""},
@@ -470,8 +421,6 @@ func TestKeepsReleasedNamesTakesAndShowsTheIDOfThreeLettersAsItIsWritten(t *test
 	}
 }
 
-// metadataPinned is the metadata of an export's fields, named with these pins, as the mode makes it but for the
-// standard objects.
 func metadataPinned(t testing.TB, game gameData, pins overrides) *objects.Metadata {
 	t.Helper()
 	fields, _, err := nameFields(game, pins)
@@ -481,8 +430,6 @@ func metadataPinned(t testing.TB, game gameData, pins overrides) *objects.Metada
 	return &objects.Metadata{Format: 1, Game: "3.0.0.2", Fields: fields}
 }
 
-// A released metadata that cannot be read is refused by its path from the checkout: one that is a folder, with
-// the system's reason, and one that is no JSON, with the decoder's.
 func TestKeepsReleasedNamesNamesAMetadataItCannotRead(t *testing.T) {
 	current := &objects.Metadata{Format: 1}
 	asFolder := newCheckout(t)
@@ -504,7 +451,6 @@ func TestKeepsReleasedNamesNamesAMetadataItCannotRead(t *testing.T) {
 			t.Errorf("the metadata %q: got %v, want it to start with %q", text, err, words)
 		}
 	}
-	// A metadata that releases nothing lets every name through.
 	for _, text := range []string{`{}`, `null`, `{"fields": {"elsewhere": [{"id": "gone", "name": "gone"}]}}`} {
 		c := newCheckout(t)
 		c.write(metadataPath, text)

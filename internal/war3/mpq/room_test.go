@@ -7,7 +7,6 @@ import (
 	"testing"
 )
 
-// noise is length bytes that do not compress, the same bytes for the same seed.
 func noise(seed uint64, length int) []byte {
 	random := rand.New(rand.NewPCG(seed, 2026))
 	out := make([]byte, length)
@@ -17,8 +16,6 @@ func noise(seed uint64, length int) []byte {
 	return out
 }
 
-// The guard counts an archive as Write lays one out, with every sector stored as it is. For files that do not
-// compress that is the archive's size to the byte, and for files that do it is more.
 func TestLargestArchiveIsTheSizeOfAnArchiveWhoseFilesDoNotCompress(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -34,7 +31,6 @@ func TestLargestArchiveIsTheSizeOfAnArchiveWhoseFilesDoNotCompress(t *testing.T)
 			{Name: "more.bin", Data: noise(3, 4097)},
 			{Name: "three.bin", Data: noise(4, 10000)},
 		}, true},
-		// With eleven files and the list of them, a table of sixteen slots leaves less than a third free.
 		{"more files than the smallest table takes", 0, slices.Repeat([]File{{}}, 11), true},
 		{"a file that compresses", 0,
 			[]File{{Name: "war3map.lua", Data: []byte(strings.Repeat("print()\n", 900))}}, false},
@@ -61,16 +57,13 @@ func TestLargestArchiveIsTheSizeOfAnArchiveWhoseFilesDoNotCompress(t *testing.T)
 }
 
 func TestRoomForRefusesWhatTheFormatsFieldsCannotHold(t *testing.T) {
-	const most = 1<<32 - 1 // what a field of 32 bits holds
-	// One file named "f", stored in sectors of 4096 bytes: n bytes, four for each sector's end and four more,
-	// the list of the files (3 bytes, in a sector of its own with 8 for its table), the header (32), a hash table
-	// of 16 slots and a block table of 2 blocks, 16 bytes each. With n = 4290776748 that is 4294967295 bytes.
+	const most = 1<<32 - 1
 	const largestAlone = 4290776748
 	tests := []struct {
 		name     string
 		prefix   int64
 		files    []sized
-		tooLarge string // the file that is refused; "" for the map as a whole
+		tooLarge string
 		fits     bool
 	}{
 		{"a small map", 512, []sized{{"war3map.lua", 5000}, {"war3map.w3i", 800}}, "", true},
@@ -83,7 +76,6 @@ func TestRoomForRefusesWhatTheFormatsFieldsCannotHold(t *testing.T) {
 		{"a file whose size no field holds", 0, []sized{{"small", 10}, {"big.bin", most + 1}, {"f", most + 2}},
 			"big.bin", false},
 		{"files that fit each and not together", 0, []sized{{"a", 1 << 31}, {"b", 1 << 31}}, "", false},
-		// 65536 names of 65536 bytes: the list of them alone is more than a word counts.
 		{"empty files whose names do not fit the list of the files", 0,
 			slices.Repeat([]sized{{strings.Repeat("n", 1<<16), 0}}, 1<<16), "", false},
 	}

@@ -9,7 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/ini"
 )
 
-// basesOf is the standard objects of the miniature export, after change has adjusted its files.
 func basesOf(t *testing.T, change func(files map[string]string)) map[manifest.Category]map[string]objects.BaseMeta {
 	t.Helper()
 	bases, err := standardObjects(readMini(t, change))
@@ -19,8 +18,6 @@ func basesOf(t *testing.T, change func(files map[string]string)) map[manifest.Ca
 	return bases
 }
 
-// basesRefused is the refusal of the standard objects of the miniature export, after change has adjusted its
-// files: it fails the test when there is none.
 func basesRefused(t *testing.T, change func(files map[string]string)) string {
 	t.Helper()
 	_, err := standardObjects(readMini(t, change))
@@ -43,9 +40,6 @@ func TestStandardObjectsPutsEachObjectIntoItsCategoryWithItsNameAndItsLevels(t *
 	})
 }
 
-// A unit is a hero when its id starts with a capital, and the balance of the standard units must agree: a hero
-// has a primary attribute and is no building, and no other unit has one. Every unit that breaks the rule is
-// named, in the order of the units' table.
 func TestStandardObjectsRefusesTheUnitsThatBreakTheRuleForHeroes(t *testing.T) {
 	got := basesRefused(t, func(files map[string]string) {
 		files[balanceTable] = sylk(balanceMeta,
@@ -56,8 +50,6 @@ func TestStandardObjectsRefusesTheUnitsThatBreakTheRuleForHeroes(t *testing.T) {
 			[]any{"hfoo"}, []any{"Hpal"}, []any{"hbar"}, []any{"nzzz"}, []any{"nhro"}, []any{"Hbld"}, []any{"Hodd"},
 		)
 	})
-	// The refusal names the units, the rule with the table and the column it is read from, and where the
-	// generator sorts a unit: nothing in the overrides lets such a unit through.
 	contains(t, got, "standard units break the rule for heroes: Hpal (uppercase, primary attribute '_'), "+
 		"nhro (lowercase, primary attribute 'AGI'), Hbld (uppercase, a building), "+
 		"Hodd (uppercase, primary attribute 'str'), Hodd (uppercase, a building).",
@@ -69,7 +61,6 @@ func TestStandardObjectsRefusesTheUnitsThatBreakTheRuleForHeroes(t *testing.T) {
 	}
 }
 
-// A unit without a row of balance is refused at once, before the units that break the rule for heroes.
 func TestStandardObjectsRefusesAUnitWithoutARowOfBalance(t *testing.T) {
 	got := basesRefused(t, func(files map[string]string) {
 		files[unitsTable] = sylk([]string{"unitID", "comment(s)"},
@@ -81,8 +72,6 @@ func TestStandardObjectsRefusesAUnitWithoutARowOfBalance(t *testing.T) {
 	}
 }
 
-// The categories of the unit file: an id with a capital first is a hero, a unit whose balance marks a building
-// is one, and every other unit is a unit. Of two rows of balance for one unit the later one holds.
 func TestStandardObjectsSortsTheUnitsByTheirIDAndTheirBalance(t *testing.T) {
 	bases := basesOf(t, func(files map[string]string) {
 		files[unitsTable] = sylk([]string{"unitID", "comment(s)"},
@@ -102,9 +91,6 @@ func TestStandardObjectsSortsTheUnitsByTheirIDAndTheirBalance(t *testing.T) {
 	}
 }
 
-// The name of a standard object is its string, the first of its keys that has a value, and the comment of its
-// row where the strings have none: without the game's colours and line breaks, and without ASCII white space at
-// its ends. The name of an upgrade is the first of a list.
 func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 	strs := ini.File{
 		"named":   {"Name": "From the Strings", "EditorName": "The Editor's", "Bufftip": "The Tip"},
@@ -148,15 +134,11 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 		{6, abilityName, "First Level,Second Level,Third"},
 		{6, upgradeName, "First Level"},
 		{7, upgradeName, "First, with a comma"},
-		// A list that opens a quote and never closes it is one name: all that follows the quote, to its last
-		// byte, so a name that ends in a character of several bytes stays UTF-8.
 		{8, upgradeName, "Never closed"},
 		{13, upgradeName, "Caf\xC3\xA9"},
 		{9, upgradeName, ""},
 		{10, upgradeName, "Only Level"},
-		// The comment of a row is no list: it names an upgrade whole.
 		{4, upgradeName, "from the row alone"},
-		// White space outside ASCII is part of a name.
 		{11, unitName, "\xC2\xA0Kept\xC2\xA0"},
 		{12, unitName, "|cffffccGGNo Colour"},
 	} {
@@ -167,8 +149,6 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 	}
 }
 
-// A count of levels is a whole number that is not negative, a decimal number with ASCII white space around it,
-// and 0 where the cell is empty. The row must have the cell.
 func TestLevelCountIsAWholeNumberThatIsNotNegative(t *testing.T) {
 	count := func(cell any) (int, error) {
 		rows := rowsOf(t, []string{"comments", "alias", "levels"}, []any{"a comment", "AHhb", cell})
@@ -194,8 +174,6 @@ func TestLevelCountIsAWholeNumberThatIsNotNegative(t *testing.T) {
 	}
 }
 
-// The first count of levels that is none ends the standard objects: of an ability, and then of an upgrade. The
-// refusal names the table and the row.
 func TestStandardObjectsRefusesALevelCountThatIsNone(t *testing.T) {
 	const abilities, upgrades = "war3.w3mod/units/abilitydata.slk: AHtb: ", "war3.w3mod/units/upgradedata.slk: Rhme: "
 	levels := func(ability, upgrade any) func(files map[string]string) {

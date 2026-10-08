@@ -9,12 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-// launch starts Warcraft III on a map, a folder or an archive, and does not wait for it: the game is given the
-// manifest's launch.args, then -loadfile and the map's path on disk. The game must be a file that is there; what
-// the system says when it cannot start it is worded for the user.
-//
-// A failure to start the game names the manifest of the machine, manifest.LocalFile, whichever manifest was
-// evaluated: that file holds what is this machine's, the game among it.
 func launch(e *env.Env, how manifest.Launch, mapPath string) error {
 	if how.GameExecutable == nil {
 		return errNoGame()
@@ -34,9 +28,6 @@ func launch(e *env.Env, how manifest.Launch, mapPath string) error {
 	return nil
 }
 
-// ---- errors ----
-
-// fixGame ends a failure of the game the manifest names.
 const fixGame = "Fix launch.gameExecutable in " + manifest.LocalFile + " to point at Warcraft III.exe."
 
 func errNoGame() error {

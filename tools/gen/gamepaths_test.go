@@ -19,10 +19,7 @@ func TestNormalizeGamePathStripsStoragePrefixesAndKeepsOnlyModelReferencedFileTy
 		{"_hd.w3mod/_locales/dede.w3mod/Textures/Black32.blp", "textures/black32.blp"},
 		{`war3.mpq:Abilities\Spells\Human\Heal\Heal.mdl`, "abilities/spells/human/heal/heal.mdl"},
 		{"  Effects/Fire.pkfx  ", "effects/fire.pkfx"},
-		// Reforged stores its particle effects baked, as .pkb.
 		{`war3.w3mod:_de.w3mod:abilities\ribbon\chainlightning.pkb`, "abilities/ribbon/chainlightning.pkb"},
-		// A step named as an archive is a container wherever it stands among the folders; a file whose name
-		// only has such a name inside it is none.
 		{"Textures//Deep.w3mod//Black32.tga", "black32.tga"},
 		{"Textures/Deep.mpq/Black32.tga", "black32.tga"},
 		{"textures/odd.mpq.png", "textures/odd.mpq.png"},
@@ -41,8 +38,6 @@ func TestNormalizeGamePathStripsStoragePrefixesAndKeepsOnlyModelReferencedFileTy
 	}
 }
 
-// The white space taken off a line is ASCII, and letter case is Go's: what is not ASCII white space is part of
-// the path, a byte order mark inside a text among it.
 func TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes(t *testing.T) {
 	for _, c := range []struct {
 		line, want string
@@ -50,15 +45,11 @@ func TestNormalizeGamePathTakesASCIIWhiteSpaceOffALineAndLowersItAsGoDoes(t *tes
 	}{
 		{"\t\v\f Units/A.mdx \r", "units/a.mdx", true},
 		{"Units/A.mdx\n", "units/a.mdx", true},
-		// A no-break space after the type of a file makes it another type; before the path it is part of it.
 		{"Units/A.mdx\xC2\xA0", "units/a.mdx\xC2\xA0", false},
 		{"\xC2\xA0Units/A.mdx", "\xC2\xA0units/a.mdx", true},
 		{"Units/A.mdx\xE2\x80\xA8", "units/a.mdx\xE2\x80\xA8", false},
 		{"\xEF\xBB\xBFUnits/A.mdx", "\xEF\xBB\xBFunits/a.mdx", true},
-		// A capital I with a dot above is lowered to the plain letter i.
 		{"Units/\xC4\xB0.MDX", "units/i.mdx", true},
-		// White space is taken off the ends of a line, and not off the ends of a step inside it: after the colon,
-		// beside a slash and before the dot it is part of the path, and after the dot it makes another type.
 		{"war3.w3mod: Units/A.mdx", " units/a.mdx", true},
 		{"war3.w3mod:\tUnits/A.mdx", "\tunits/a.mdx", true},
 		{"Units / A.mdx", "units / a.mdx", true},
@@ -92,7 +83,6 @@ func TestRenderGamePathsWritesAHeaderAndSortedUniquePaths(t *testing.T) {
 	}
 }
 
-// The paths are sorted by their bytes: U+E000 stands ahead of U+10000, which an order by UTF-16 units puts first.
 func TestRenderGamePathsSortsThePathsByBytes(t *testing.T) {
 	list := "b.mdx\n\xF0\x90\x80\x80.mdx\nB.blp\n\xEE\x80\x80.mdx\na/z.mdx\na.mdx"
 	want := "# Warcraft III 1\na.mdx\na/z.mdx\nb.blp\nb.mdx\n\xEE\x80\x80.mdx\n\xF0\x90\x80\x80.mdx\n"
@@ -101,8 +91,6 @@ func TestRenderGamePathsSortsThePathsByBytes(t *testing.T) {
 	}
 }
 
-// The committed list is a list of names too, and its first line, which names no file a model references, gives
-// the version: it renders to itself, byte for byte. The file of the real checkout is read, and none is written.
 func TestTheCommittedListOfTheGamesPathsRendersToItself(t *testing.T) {
 	committed := string(realFile(t, "data/game-paths.txt"))
 	first, _, _ := strings.Cut(committed, "\n")
@@ -142,8 +130,6 @@ func TestTheModeGamePathsWritesTheListAndPrintsHowManyPathsItHas(t *testing.T) {
 	}
 }
 
-// The list is read as UTF-8: a byte order mark at its start is dropped, and bytes that are no UTF-8 become one
-// replacement character together. A path named twice is written and counted once.
 func TestTheModeGamePathsDecodesTheListAndCountsEachPathOnce(t *testing.T) {
 	c := newCheckout(t)
 	c.write("data/game-paths.txt", "# Warcraft III 1.0.0\nunits/old.mdx\n")
@@ -164,7 +150,6 @@ func TestTheModeGamePathsDecodesTheListAndCountsEachPathOnce(t *testing.T) {
 
 func TestTheModeGamePathsFailsAndKeepsTheExistingListWhenNoPathIsRecognized(t *testing.T) {
 	const existing = "# Warcraft III 1.0.0\nunits/old.mdx\n"
-	// A version with a line feed gives the list a second line, which is no path: the count is of the paths.
 	for _, version := range []string{"2.0.0", "2.0.0\nunits/new.mdx"} {
 		c := newCheckout(t)
 		c.write("data/game-paths.txt", existing)
@@ -182,8 +167,6 @@ func TestTheModeGamePathsFailsAndKeepsTheExistingListWhenNoPathIsRecognized(t *t
 	}
 }
 
-// A file that the command line names is named in a failure as the line gave it, and its failure has the shape of
-// one on a file of the checkout: the path, then the system's reason.
 func TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid(t *testing.T) {
 	c := newCheckout(t)
 	c.write("data/game-paths.txt", "# Warcraft III 1.0.0\nunits/old.mdx\n")
@@ -200,7 +183,6 @@ func TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid(t *testing.T) {
 	}
 }
 
-// A file of the checkout is named by its path from there: no message holds the path of the checkout.
 func TestTheModeGamePathsNamesTheFileItCannotWriteByItsPathFromTheCheckout(t *testing.T) {
 	c := newCheckout(t)
 	list := exported(t, "listfile.txt", "Units/A.mdx\n")
@@ -217,9 +199,6 @@ func TestTheModeGamePathsNamesTheFileItCannotWriteByItsPathFromTheCheckout(t *te
 	}
 }
 
-// The game's list of file names, with the version that the committed list states, gives the committed list byte
-// for byte, and the run prints how many paths that list has: its lines after the first. The test reads the list
-// that MOONWELL_GAME_LISTFILE names, and takes a second.
 func TestTheModeGamePathsWritesTheCommittedListFromTheGamesList(t *testing.T) {
 	list := testkit.NeedExport(t, "MOONWELL_GAME_LISTFILE").Path()
 	want := string(realFile(t, gamePathsPath))

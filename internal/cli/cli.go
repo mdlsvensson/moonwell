@@ -1,12 +1,3 @@
-// Package cli is Moonwell's command line: which commands there are, how a line runs one, and how the command's
-// outcome becomes printed lines and an exit code. It takes arguments and the two streams, and returns a code. It
-// must not know in which order a map is built. It imports build, the areas a command calls, the foundations, the
-// format war3/model, whose reader refuses a file that assets:paths is given and that is no model, and the root
-// package.
-//
-// A line is read by cobra (github.com/spf13/cobra), which no other package imports. The grammar, the help, the
-// commands help and completion, and the words that refuse a line that is not well formed are cobra's: the
-// command table of this file becomes a tree of cobra's commands for each line (tree).
 package cli
 
 import (
@@ -30,52 +21,37 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/script"
 )
 
-// call is what a command gets beside the context and the outside world: what the line said of it.
 type call struct {
-	arguments []string // the command's own arguments
-	entry     string   // --entry's file, as it is written; "" without the flag
+	arguments []string
+	entry     string
 	minify    bool
 	link      bool
-	// print takes output meant for other programs; everything else a command says goes to the logger.
-	print func(text string)
+	print     func(text string)
 }
 
-// option is a flag of a command, written --name.
 type option struct {
 	name string
-	help string // what the flag does, in a line of the command's help
-	file bool   // the flag takes a file as its value; a flag that takes none is a switch
+	help string
+	file bool
 }
 
-// The flags Moonwell's commands have. A flag is a flag of the rows of the command table that list it.
 var (
 	entryOption  = option{name: "entry", help: "Compile from this .yue file under src/ in place of map.entry", file: true}
 	minifyOption = option{name: "minify", help: "Shrink the script; runtime errors lose their line numbers"}
 	linkOption   = option{name: "link", help: "Use the Pkl package of the Moonwell checkout the command runs in"}
 )
 
-// stages is the flags of the commands that compile from an entry: the two that stage a map.
 var stages = []option{entryOption, minifyOption}
 
-// command is one row of the command table.
 type command struct {
 	name  string
-	usage string // the name with its arguments and its flags, as the help shows it
-	help  string // what the command does, in a line of the help
-	// args holds the command's own arguments against how many it takes; nil for a command that takes none.
+	usage string
+	help  string
 	args  cobra.PositionalArgs
-	flags []option // the flags the command has
+	flags []option
 	run   func(ctx context.Context, e *env.Env, c call) error
 }
 
-// commands is every command Moonwell has, in the order the help lists them.
-//
-// A new command is a row here and a function in a file here: a file of its own, or the file of the command it
-// shares its steps with, as assets.go holds assets:check and assets:sync, and objects.go holds objects:eval and
-// objects:check. A command that plans a build is a door of package build that its function calls, as build.go
-// calls build.Build. Any other command opens the project with build.Load and build.Source and calls its area,
-// as settings.go calls settings.Plan and objects.go calls objects.Plan; where a build plans the same thing, the
-// command has build plan it, as assets.go calls build.PlanAssets.
 var commands = []command{
 	{name: "init", usage: "init <dir> [--link]", help: "Create a project (--link: use this local Moonwell checkout)",
 		args: cobra.ExactArgs(1), flags: []option{linkOption}, run: runInit},
@@ -102,60 +78,33 @@ var commands = []command{
 		run: runObjectsCheck},
 }
 
-// Two of cobra's settings, which are the same for every tree of a program, are changed for Moonwell. The help
-// lists the commands as the table does, where cobra would list them by their names. And a start from Windows
-// Explorer is a start like any other, as it was before cobra read the line: cobra would say that this is a
-// command line tool and leave with 1, also when a shortcut names a command.
 func init() {
 	cobra.EnableCommandSorting = false
 	cobra.MousetrapHelpText = ""
 }
 
-// Run runs one command line in the folder root and returns the exit code: 0, 1 for a failure, and 130 when ctx
-// was cancelled before the command ended. write takes the lines for the terminal; print takes output meant for
-// other programs.
-//
-// root is a full path: a command names its files from it.
 func Run(ctx context.Context, args []string, root string, write, print func(string)) int {
 	return runIn(ctx, env.New, args, root, write, print)
 }
 
-// world makes the outside world of a command that runs in the folder root and logs to log: env.New, or the
-// stand-in of a test.
 type world func(root string, log *env.Logger) *env.Env
 
-// runIn is Run with the maker of the outside world given.
 func runIn(ctx context.Context, outside world, args []string, root string, write, print func(string)) int {
 	r := &running{ctx: ctx, outside: outside, table: commands, root: root, write: write, print: print}
 	return r.carryOut(args)
 }
 
-// running is one command line as it is carried out.
 type running struct {
 	ctx     context.Context
 	outside world
-	table   []command // the command table: commands, or that of a test
+	table   []command
 	root    string
-	write   func(string) // takes the lines for the terminal
-	print   func(string) // takes output meant for other programs
-	// What the line came to: the row that ran, with its log. Both are nil for a line that ran no command.
-	chosen *command
-	log    *env.Logger
+	write   func(string)
+	print   func(string)
+	chosen  *command
+	log     *env.Logger
 }
 
-// carryOut reads the line and carries it out: the tree is made of the table, cobra reads the line by it and
-// runs what the line names, and the outcome becomes the exit code.
-//
-// What cobra prints itself is the help and a completion script. It is printed for other programs, whole, once
-// the line has ended: a shell reads the script, and the help can be piped to a pager. The version goes the same
-// way.
-//
-// Only a line that names a command of the table, and that is well formed, gets as far as a log file and the
-// outside world: a line that cobra refuses, and one that asks for the help or the version, write nothing to
-// disk. A line that is refused ends with 1, and the refusal is printed as every failure of Moonwell is.
-//
-// A panic anywhere on the way is a fault in Moonwell: it is printed as an internal error with its stack, to the
-// terminal, and to the log as well once the line has one, and the line ends with 1.
 func (r *running) carryOut(args []string) (code int) {
 	defer func() {
 		if fault := recover(); fault != nil {
@@ -171,7 +120,6 @@ func (r *running) carryOut(args []string) (code int) {
 	var printed, complaints strings.Builder
 	top.SetOut(&printed)
 	top.SetErr(&complaints)
-	// A line without arguments is given as one: for no arguments at all, cobra would read the program's own.
 	top.SetArgs(append([]string{}, args...))
 	err := top.ExecuteContext(r.ctx)
 	if printed.Len() > 0 {
@@ -190,19 +138,12 @@ func (r *running) carryOut(args []string) (code int) {
 	return 1
 }
 
-// tree is the command line as cobra reads it: moonwell itself, which prints the help or the version, and below
-// it a command for each row of the table; cobra adds its own two, help and completion. It is made anew for
-// every line, since it holds what the line came to.
 func (r *running) tree() *cobra.Command {
 	top := &cobra.Command{
-		Use:  "moonwell",
-		Long: "Moonwell " + moonwell.Version + ": Warcraft III maps with YueScript gameplay and Pkl data",
-		// A failure is printed once, by this package, as every failure of Moonwell is printed.
+		Use:           "moonwell",
+		Long:          "Moonwell " + moonwell.Version + ": Warcraft III maps with YueScript gameplay and Pkl data",
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		// moonwell alone prints the help, and with --version the version, as a bare number: the release workflow
-		// compares it with the tag. cobra's own --version prints a sentence, and prints a bare number only by a
-		// template, which makes the program 2.7 MB larger.
 		RunE: func(c *cobra.Command, _ []string) error {
 			if asked, _ := c.Flags().GetBool("version"); asked {
 				r.print(moonwell.Version)
@@ -218,13 +159,11 @@ func (r *running) tree() *cobra.Command {
 	return top
 }
 
-// commandOf is a row of the table as a command of the tree.
 func (r *running) commandOf(row command) *cobra.Command {
 	c := &cobra.Command{
-		Use:   row.usage,
-		Short: row.help,
-		Args:  row.args,
-		// The row's usage names the flags already.
+		Use:                   row.usage,
+		Short:                 row.help,
+		Args:                  row.args,
 		DisableFlagsInUseLine: true,
 		RunE: func(c *cobra.Command, arguments []string) error {
 			return r.run(row, c.Flags(), arguments)
@@ -243,13 +182,8 @@ func (r *running) commandOf(row command) *cobra.Command {
 	return c
 }
 
-// run runs the command of a row on a line that cobra has read and found well formed: flags holds the row's
-// flags as the line gave them. A file of --entry that is no entry is refused here, before the line has a log
-// and before anything is loaded: a .yue file under src/ is one. Then the line has its command: the log is made,
-// the outside world, and the command runs.
 func (r *running) run(row command, flags *pflag.FlagSet, arguments []string) error {
 	said := call{arguments: arguments, print: r.print}
-	// A flag the row does not have is not in flags: it reads as not given.
 	said.entry, _ = flags.GetString(entryOption.name)
 	said.minify, _ = flags.GetBool(minifyOption.name)
 	said.link, _ = flags.GetBool(linkOption.name)
@@ -263,8 +197,6 @@ func (r *running) run(row command, flags *pflag.FlagSet, arguments []string) err
 	return row.run(r.ctx, r.outside(r.root, r.log), said)
 }
 
-// refusal is the failure of a line that ran no command, as Moonwell prints one. The words are cobra's, but
-// those of an --entry that is no entry, which are Moonwell's already.
 func refusal(err error) error {
 	var worded *diag.Error
 	if errors.As(err, &worded) {
@@ -276,13 +208,6 @@ func refusal(err error) error {
 	}
 }
 
-// logFile is the file a command's lines are also written to: dist/moonwell.log for a project, and "" for a
-// command that keeps no log. A project is what manifest.IsProject takes for one: a command that is run elsewhere
-// makes no dist/ there. init makes a project in another folder, and the folder it is run in is not its project.
-//
-// The file is reached with fsx.Inside: a project with a link at dist/ keeps no log, since a line written
-// through the link would land outside the project. Such a link is the command's to refuse, when it writes
-// there itself.
 func logFile(root string, chosen command) string {
 	if chosen.name == "init" || !manifest.IsProject(root) {
 		return ""
@@ -294,12 +219,6 @@ func logFile(root string, chosen command) string {
 	return file
 }
 
-// exitCode prints the failure a command ended with, and returns the exit code of the outcome. A failure is
-// printed in one way, as diag.Format renders it, whether a command ended with it or the line was refused.
-//
-// A command that was told to stop ends with 130, unless it ended well all the same; when it only stopped
-// because it was told to, it has nothing to report. dev runs until it is told to stop, and ends with 130 then,
-// though it has not failed.
 func exitCode(ctx context.Context, log *env.Logger, chosen command, err error) int {
 	toldToStop := ctx.Err() != nil
 	if err != nil && !(toldToStop && errors.Is(err, context.Canceled)) {
@@ -314,10 +233,6 @@ func exitCode(ctx context.Context, log *env.Logger, chosen command, err error) i
 	return 0
 }
 
-// Main is the program: the working folder, the two streams, Ctrl+C, and the exit code.
-//
-// The first Ctrl+C asks the command to stop: dev stops watching once its check has finished, and the others
-// stop at their next waiting point. The second leaves at once, with 130 and without a build lock left behind.
 func Main() int {
 	write := func(line string) { fmt.Fprintln(os.Stderr, line) }
 	print := func(text string) { fmt.Fprintln(os.Stdout, text) }
@@ -334,7 +249,6 @@ func Main() int {
 	return Run(ctx, os.Args[1:], root, write, print)
 }
 
-// heed waits for two interrupts: at the first it cancels the command, and at the second it leaves.
 func heed(interrupts <-chan os.Signal, cancel, leave func()) {
 	<-interrupts
 	cancel()
@@ -342,20 +256,12 @@ func heed(interrupts <-chan os.Signal, cancel, leave func()) {
 	leave()
 }
 
-// leaveAtOnce is what the second Ctrl+C does: it gives back the build locks this process holds and leaves with
-// 130, without waiting for the command. The locks come first: nothing of the program runs after the exit, the
-// command's own deferred release neither, and a lock that stays is taken for a build that runs.
-//
-// exit is how the program leaves: os.Exit, or a test's stand-in for it. The release is no parameter: it is
-// called here, so that the test of this function holds it and a caller cannot leave it out.
 func leaveAtOnce(exit func(int)) func() {
 	return func() {
 		build.ReleaseHeld()
 		exit(130)
 	}
 }
-
-// ---- errors ----
 
 func errNoWorkingFolder(cause error) error {
 	return &diag.Error{

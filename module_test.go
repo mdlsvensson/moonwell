@@ -12,9 +12,6 @@ import (
 	"testing"
 )
 
-// dependencies is the modules Moonwell depends on, beside the standard library: cobra, which reads the command
-// line, and the two that cobra needs. A further module needs a design the maintainer approves; it is then added
-// here, and to layout_test.go, which says which package may import it.
 var dependencies = []string{
 	"github.com/inconshreveable/mousetrap",
 	"github.com/spf13/cobra",
@@ -26,8 +23,6 @@ func TestTheModuleDependsOnCobraAloneAndUsesNoCgo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// A release hands out the modules' licences beside the program, in THIRD_PARTY_LICENSES. The file names each
-	// module at the version go.mod requires, so a change of a version is a look at that module's licence too.
 	licences, err := os.ReadFile("THIRD_PARTY_LICENSES")
 	if err != nil {
 		t.Fatal(err)
@@ -36,7 +31,7 @@ func TestTheModuleDependsOnCobraAloneAndUsesNoCgo(t *testing.T) {
 	for _, line := range strings.Split(string(mod), "\n") {
 		words := strings.Fields(line)
 		if len(words) > 0 && words[0] == "require" {
-			words = words[1:] // a require of one line; in a block, each line is a module and its version
+			words = words[1:]
 		}
 		switch {
 		case len(words) == 0 || words[0] == "(" || words[0] == ")" || words[0] == "module" || words[0] == "go":
@@ -102,7 +97,6 @@ func TestVersionEqualsThePklPackageVersion(t *testing.T) {
 	}
 }
 
-// A stray file in template/ fails this test: every file there goes into every project init creates.
 func TestTemplateFilesAreTheProjectInitCopies(t *testing.T) {
 	files, err := TemplateFiles()
 	if err != nil {
@@ -169,8 +163,6 @@ func TestTemplateFilesSkipWhatAProjectGenerates(t *testing.T) {
 	}
 }
 
-// maps/ and assets/ are copied into the map byte for byte; a normalized CRLF file would build differently on each
-// checkout.
 func TestTheTemplatesGitattributesNeverConvertsMapsOrAssets(t *testing.T) {
 	files, err := TemplateFiles()
 	if err != nil {
@@ -200,8 +192,6 @@ func TestEmbeddedDataIsPresent(t *testing.T) {
 	}
 }
 
-// The README shows the version in two places that a reader copies: the install line of one version, and the package
-// version a project moves to.
 func TestTheREADMENamesThisVersion(t *testing.T) {
 	readme, err := os.ReadFile("README.md")
 	if err != nil {

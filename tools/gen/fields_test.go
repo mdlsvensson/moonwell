@@ -12,10 +12,8 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-// unitClass is the one pin that the miniature needs: its label Class gives a name that is a keyword of Pkl.
 var unitClass = overrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}}}
 
-// namedFields names the fields of the miniature export, after change has adjusted its files.
 func namedFields(t testing.TB, change func(files map[string]string)) (map[string][]objects.FieldMeta, []rename) {
 	t.Helper()
 	fields, renames, err := nameFields(readMini(t, change), unitClass)
@@ -25,7 +23,6 @@ func namedFields(t testing.TB, change func(files map[string]string)) (map[string
 	return fields, renames
 }
 
-// byID is the fields of a list by their ids.
 func byID(fields []objects.FieldMeta) map[string]objects.FieldMeta {
 	found := map[string]objects.FieldMeta{}
 	for _, field := range fields {
@@ -34,7 +31,6 @@ func byID(fields []objects.FieldMeta) map[string]objects.FieldMeta {
 	return found
 }
 
-// idsOf is the ids of the fields of a list, in the order of the list.
 func idsOf(fields []objects.FieldMeta) []string {
 	var ids []string
 	for _, field := range fields {
@@ -43,7 +39,6 @@ func idsOf(fields []objects.FieldMeta) []string {
 	return ids
 }
 
-// equal fails the test unless the two values are deeply equal.
 func equal[T any](t *testing.T, what string, got, want T) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {
@@ -51,7 +46,6 @@ func equal[T any](t *testing.T, what string, got, want T) {
 	}
 }
 
-// rowsOf is the rows of a table with these columns, written and parsed as a table of the game is.
 func rowsOf(t testing.TB, columns []string, rows ...[]any) []slk.Row {
 	t.Helper()
 	table, err := slk.Parse(sylk(columns, rows...), "table.slk")
@@ -68,15 +62,11 @@ func TestNameFieldsMakesARecordOfEachRowOfTheTablesOfFields(t *testing.T) {
 		ID: "uhpm", Name: "hitPointsMaximumBase", Label: "Hit Points Maximum (Base)", Category: "stats", Type: "int",
 		Storage: "int", Use: []string{"unit", "hero", "building"}, Specific: []string{}, NotSpecific: []string{},
 	})
-	// A row without an id is left out, and a field that items alone use is no field of units. A list is in the
-	// order of the ids.
 	equal(t, "the fields of units", idsOf(fields["units"]),
 		[]string{"uabi", "ucls", "udea", "uhpm", "umdl", "unam", "upro", "ushr", "uver"})
-	// A label is found through a string that is a key again. netsafe 1 alone marks a field of a skin: 11 does not.
 	equal(t, "the label of umdl", units["umdl"].Label, "Model File")
 	equal(t, "the skin marks", []bool{units["umdl"].Skin, units["ushr"].Skin, units["unam"].Skin},
 		[]bool{true, false, true})
-	// A bool, a set of flags and an enumeration are stored as an int; a list and every other type as a string.
 	equal(t, "the storage",
 		[]string{units["ushr"].Storage, units["udea"].Storage, units["uver"].Storage, units["uabi"].Storage,
 			units["umdl"].Storage},
@@ -102,7 +92,6 @@ func TestNameFieldsMakesARecordOfEachRowOfTheTablesOfFields(t *testing.T) {
 
 	upgrades := byID(fields["upgrades"])
 	equal(t, "gnam per level", upgrades["gnam"].PerLevel, true)
-	// "%s" stands for the label of the effect in World Editor; here the type of the effect's field stands for it.
 	equal(t, "the labels of the effects", []string{upgrades["gba1"].Label, upgrades["gmo1"].Label},
 		[]string{"Effect 1 - Base", "Effect 1 - Mod"})
 	equal(t, "the storage of gef1", upgrades["gef1"].Storage, "string")
@@ -110,8 +99,6 @@ func TestNameFieldsMakesARecordOfEachRowOfTheTablesOfFields(t *testing.T) {
 		slices.Sorted(slices.Values(objects.FieldLists)))
 }
 
-// The id of three letters is padded to four bytes with a NUL, and a dot stands between two ids of a list as a
-// comma does.
 func TestNameFieldsPadsAnIDOfThreeLettersAndReadsADotBetweenTwoIDs(t *testing.T) {
 	fields, _ := namedFields(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
@@ -129,7 +116,6 @@ func TestNameFieldsPadsAnIDOfThreeLettersAndReadsADotBetweenTwoIDs(t *testing.T)
 	t.Error("the field is missing")
 }
 
-// An id is padded by its bytes, to four of them: the ids of the game are of ASCII.
 func TestPaddedIDIsFourBytesLong(t *testing.T) {
 	for id, want := range map[string]string{
 		"Crs": "Crs\x00", "ab": "ab\x00\x00", "a": "a\x00\x00\x00", "uhpm": "uhpm", "longer": "longer",
@@ -156,8 +142,6 @@ func TestStorageOfIsAnIntForNumbersFlagsAndEnumerationsAndAStringForTheRest(t *t
 	}
 }
 
-// A field is a list when the name of its type has List in it, with the capital: at the end of the name, or
-// before it.
 func TestFieldRecordMarksAFieldAsAListByTheNameOfItsType(t *testing.T) {
 	for fieldType, want := range map[string]bool{
 		"abilityList": true, "stringList": true, "pathingListPrevent": true, "List": true,
@@ -170,8 +154,6 @@ func TestFieldRecordMarksAFieldAsAListByTheNameOfItsType(t *testing.T) {
 	}
 }
 
-// The uses of a field stand in the one order of a record, whatever the order of the table's columns, and 1
-// alone marks a use. A field of another table than the units' has no use.
 func TestUsesOfListsTheKindsOfObjectWhoseColumnHasOne(t *testing.T) {
 	columns := []string{"ID", "useItem", "useBuilding", "useHero", "useUnit"}
 	rows := rowsOf(t, columns,
@@ -184,8 +166,6 @@ func TestUsesOfListsTheKindsOfObjectWhoseColumnHasOne(t *testing.T) {
 	equal(t, "a field of abilities", usesOf(rows[0], "abilities"), []string{})
 }
 
-// A field of the units' table goes to the items when an item uses it and to the units when another kind of
-// object does; a field that nothing uses is refused with the fields that have another fault.
 func TestNameFieldsPutsAFieldOfTheUnitsTableIntoTheListsOfWhatUsesIt(t *testing.T) {
 	for _, c := range []struct {
 		use  []string
@@ -212,8 +192,6 @@ func TestNameFieldsPutsAFieldOfTheUnitsTableIntoTheListsOfWhatUsesIt(t *testing.
 		"\n  war3.w3mod/units/unitmetadata.slk: unon: no kind of object uses it")
 }
 
-// The fields of a list stand in the order of their ids' bytes: capitals before small letters, and two fields
-// with one id in the order of their rows.
 func TestNameFieldsOrdersTheFieldsOfAListByTheBytesOfTheirIDs(t *testing.T) {
 	fields, _ := namedFields(t, func(files map[string]string) {
 		files[buffFieldsTable] = sylk(buffMeta,
@@ -229,21 +207,18 @@ func TestNameFieldsOrdersTheFieldsOfAListByTheBytesOfTheirIDs(t *testing.T) {
 
 func TestSplitIDsReadsTheIDsBetweenCommasAndDots(t *testing.T) {
 	for cell, want := range map[string][]string{
-		"":                {},
-		"AHhb":            {"AHhb"},
-		"AHtb,AHhb":       {"AHtb", "AHhb"},
-		"AHtb.AHhb":       {"AHtb", "AHhb"},
-		" AHtb ,\t,AHhb.": {"AHtb", "AHhb"},
-		"AHtb,AHtb":       {"AHtb", "AHtb"},
-		// White space outside ASCII is part of an id.
+		"":                  {},
+		"AHhb":              {"AHhb"},
+		"AHtb,AHhb":         {"AHtb", "AHhb"},
+		"AHtb.AHhb":         {"AHtb", "AHhb"},
+		" AHtb ,\t,AHhb.":   {"AHtb", "AHhb"},
+		"AHtb,AHtb":         {"AHtb", "AHtb"},
 		"AHtb,\xC2\xA0AHhb": {"AHtb", "\xC2\xA0AHhb"},
 	} {
 		equal(t, cell, splitIDs(cell), want)
 	}
 }
 
-// The label of a field is the string that its displayName leads to, through as many as eight strings. A row
-// that leads to no string keeps its key for a label, and is refused, with what it lacks.
 func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 	labels := ini.Section{
 		"WESTRING_A": "Plain Label", "WESTRING_B": "WESTRING_A", "WESTRING_SELF": "WESTRING_SELF",
@@ -261,21 +236,17 @@ func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 	for i, c := range []struct {
 		label string
 		found bool
-		line  string // the line of the refusal, for a row without a label
+		line  string
 	}{
 		{"Plain Label", true, ""},
 		{"Plain Label", true, ""},
 		{"Eight Deep", true, ""},
-		// Nine strings deep, the label is the eighth string, which is a key.
 		{"WESTRING_8", true, ""},
 		{"WESTRING_NONE", false, "table.slk: eeee: no label for WESTRING_NONE in " + labelsFile},
 		{"WESTRING_SELF", false, "table.slk: ffff: no label for WESTRING_SELF in " + labelsFile},
-		// Two keys that lead to each other end, after eight strings, at the first.
 		{"WESTRING_PING", false, "table.slk: gggg: no label for WESTRING_PING in " + labelsFile},
 		{"", false, "table.slk: hhhh: the row has no displayName cell, which names the label"},
-		// An empty key is a key: the strings may have a label for it.
 		{"The Label of No Key", true, ""},
-		// Three keys that lead in a circle end, after eight strings, at the third: a label that is a key.
 		{"WESTRING_Z", true, ""},
 	} {
 		label, found := labelOf(rows[i], labels)
@@ -292,8 +263,6 @@ func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 	}
 }
 
-// "%s" in a label stands for the label of an upgrade's effect: the row's effectType is put there, once, and a
-// dash that then ends the label goes with the ASCII white space around it.
 func TestLabelOfPutsTheTypeOfAnEffectWhereTheLabelHasItsPlace(t *testing.T) {
 	for _, c := range []struct{ label, effectType, want string }{
 		{"Effect 1 - %s", "Base", "Effect 1 - Base"},
@@ -304,9 +273,7 @@ func TestLabelOfPutsTheTypeOfAnEffectWhereTheLabelHasItsPlace(t *testing.T) {
 		{"- %s", "", ""},
 		{"%s of %s", "Mod", "Mod of %s"},
 		{"Effect - %s (Extra)", "", "Effect -  (Extra)"},
-		// A label without the place keeps its dash, and the white space at its end.
 		{"Abilities - ", "Base", "Abilities - "},
-		// White space outside ASCII is text: the dash before it does not end the label.
 		{"Effect 1 -\xC2\xA0%s", "", "Effect 1 -\xC2\xA0"},
 		{"Effect 1\xC2\xA0- %s", "", "Effect 1\xC2\xA0"},
 	} {
@@ -317,9 +284,6 @@ func TestLabelOfPutsTheTypeOfAnEffectWhereTheLabelHasItsPlace(t *testing.T) {
 	}
 }
 
-// A cell that must be a number is a decimal number with ASCII white space around it, and 0 where it is empty or
-// not there. repeat says whether a field has a value for each level, and data which column of data it is in,
-// which must be a whole number.
 func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 	record := func(repeat, data any) (objects.FieldMeta, error) {
 		rows := rowsOf(t, []string{"ID", "repeat", "data"}, []any{"Hhb1", repeat, data})
@@ -342,7 +306,6 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 	}
 	for _, cell := range []string{
 		"x", "4 5", "Inf", "-inf", "+Infinity", "NaN", "nan", "0x1p4", "0X1P4", "-0x10p0", "0x10", "0x_1p0", "1__0", "1e999",
-		// An underscore between two digits is how Go writes a number, and no table of the game does.
 		"1_0", "1_000",
 		"\xC2\xA04", "4\xE2\x80\xA8", "\xC2\xA0",
 	} {
@@ -358,14 +321,12 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 			t.Errorf("data %q: got %v, want the cell refused as no whole number", cell, err)
 		}
 	}
-	// The repeat cell is read first, and a cell that is no number ends the fields at once.
 	if _, err := record("x", "y"); err == nil || !strings.Contains(err.Error(), "the repeat cell 'x'") {
 		t.Errorf("two cells that are no number: got %v, want the repeat cell refused", err)
 	}
 	game := readMini(t, func(files map[string]string) {
 		files[upgradeFieldsTable] = strings.Replace(files[upgradeFieldsTable], "C;X3;K1\r\n", "C;X3;K\"many\"\r\n", 1)
 	})
-	// The refusal names the table and the row.
 	_, _, err := nameFields(game, overrides{})
 	const want = "war3.w3mod/units/upgrademetadata.slk: gnam: the repeat cell 'many' is not a number"
 	if err == nil || err.Error() != want {

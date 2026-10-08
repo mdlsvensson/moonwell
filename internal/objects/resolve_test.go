@@ -14,35 +14,27 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// The tests of resolve.go, fields.go and values.go give Resolve the objects of a manifest as pkl prints them, from
-// the tables of cases each file holds. The recorded test plans every case of those tables too (tableInputs), so a
-// case added to a table comes into its recording.
-
-// accepted is objects that resolve, and what they resolve to.
 type accepted struct {
 	name     string
-	document string   // the manifest's objects
-	want     []string // see printed
+	document string
+	want     []string
 }
 
-// refused is objects with one problem.
 type refused struct {
 	name     string
-	document string   // the manifest's objects
-	existing []string // the custom ids the map already has
-	file     string   // the problem's file; "" for objects/a.pkl
-	at       string   // the place the message starts with
-	says     string   // words of the message
-	hint     string   // words of the hint
+	document string
+	existing []string
+	file     string
+	at       string
+	says     string
+	hint     string
 }
 
-// project is what pkl prints for a manifest with these objects, as far as decoding needs it.
 func project(document string) string {
 	return `{"map":{"folder":"map.w3x","entry":"src/main.yue"},"build":{"folder":"dist/bin"},` +
 		`"yue":{"version":"0.34.3"},"objects":` + document + `}`
 }
 
-// decoded returns the objects of a manifest; one that names no file is from objects/a.pkl.
 func decoded(t *testing.T, document string) manifest.Objects {
 	t.Helper()
 	p, err := manifest.Decode("/p", "objects/a.pkl", []byte(project(document)))
@@ -69,7 +61,6 @@ func resolve(t *testing.T, document string, existing ...string) []objects.Resolv
 	return resolved
 }
 
-// problemsOf returns the problems Resolve gave in place of objects.
 func problemsOf(t *testing.T, resolved []objects.Resolved, err error) diag.Problems {
 	t.Helper()
 	var found diag.Problems
@@ -87,8 +78,6 @@ func problems(t *testing.T, document string, existing ...string) diag.Problems {
 
 var typeNames = map[objmod.ValueType]string{objmod.Int: "int", objmod.Real: "real", objmod.Unreal: "unreal", objmod.String: "string"}
 
-// printed is resolved objects as lines: an object as "category key id base source", then each of its fields as
-// "  rawcode name level/column type value", with "skin" after the value of a field of the skin file.
 func printed(resolved []objects.Resolved) []string {
 	var lines []string
 	for _, object := range resolved {
@@ -204,7 +193,6 @@ func TestResolveRefusesAnObjectForItsIDOrItsBase(t *testing.T) {
 	runRefused(t, objectRules)
 }
 
-// severalProblems has three problems in two files; the fields of an object whose base is unknown are not checked.
 const severalProblems = `{
 	"heroes":{"paladin":{"id":"H000","base":"Hpla","source":"objects/heroes.pkl","noSuchField":1}},
 	"units":{"captain":{"id":"hfoo","base":"hfoo","source":"objects/units.pkl","properties":{"uhpm":1.5}}}}`
@@ -235,7 +223,6 @@ func TestResolveReportsEveryProblemInOrderEachWithItsFile(t *testing.T) {
 	}
 }
 
-// unitsInTheMap is count units, and their ids, which the map already has: one problem for each.
 func unitsInTheMap(count int) (document string, existing []string) {
 	var entries []string
 	for i := range count {

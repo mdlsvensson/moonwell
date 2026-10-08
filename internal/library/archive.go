@@ -16,14 +16,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// file is one file of a library: its path inside the library, with "/", and its bytes.
 type file struct {
 	name string
 	data []byte
 }
 
-// downloadTag downloads a tag of the library key from GitHub: the tag's commit and its files, without the
-// archive's top folder, every path checked to stay inside the library's folder. Failures name manifestFile.
 func downloadTag(
 	ctx context.Context, fetch env.FetchFunc, key, github, tag, manifestFile string,
 ) (commit string, files []file, err error) {
@@ -44,7 +41,6 @@ func downloadTag(
 	return commit, files, nil
 }
 
-// fetchTag asks address for the archive of a tag, and returns what a status from 200 to 299 came with.
 func fetchTag(ctx context.Context, fetch env.FetchFunc, address, key, github, tag, manifestFile string) ([]byte, error) {
 	status, body, err := fetch(ctx, address)
 	switch {
@@ -58,8 +54,6 @@ func fetchTag(ctx context.Context, fetch env.FetchFunc, address, key, github, ta
 	return body, nil
 }
 
-// archiveURL is the address of the zip archive of a GitHub tag. Each part of the tag between two "/" is written as
-// a segment of a path is, and the "/" stays between them.
 func archiveURL(github, tag string) string {
 	segments := strings.Split(tag, "/")
 	for i, segment := range segments {
@@ -68,15 +62,8 @@ func archiveURL(github, tag string) string {
 	return "https://codeload.github.com/" + github + "/zip/refs/tags/" + strings.Join(segments, "/")
 }
 
-// readArchive reads a GitHub tag archive: the commit, which the archive's comment holds, and the files without
-// their single top folder, whose name GitHub makes from the repository and the tag. Folder entries are skipped,
-// so every name is a file's.
-//
-// Its failures say what is wrong with the bytes and nothing else: downloadTag says whose bytes they are.
 func readArchive(data []byte) (commit string, files []file, err error) {
 	archive, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
-	// A name that leaves the archive's folder is no failure of reading: the reader that comes with it holds
-	// every entry, and downloadTag refuses the name.
 	if err != nil && !errors.Is(err, zip.ErrInsecurePath) {
 		return "", nil, errInvalidZip(err)
 	}
@@ -89,8 +76,6 @@ func readArchive(data []byte) (commit string, files []file, err error) {
 	return commit, files, nil
 }
 
-// commitOf is the commit an archive's comment holds: forty hexadecimal digits in lower case, with nothing but
-// ASCII white space around them.
 func commitOf(comment string) (string, error) {
 	commit := fsx.TrimASCIISpace(comment)
 	if len(commit) != 40 || strings.ContainsFunc(commit, notALowerHexDigit) {
@@ -101,11 +86,9 @@ func commitOf(comment string) (string, error) {
 
 func notALowerHexDigit(r rune) bool { return !strings.ContainsRune("0123456789abcdef", r) }
 
-// filesBelowTheTop reads the file entries of an archive in their order, each under its path below the one top
-// folder that all of them are in. A path that comes twice keeps its first place and its last bytes.
 func filesBelowTheTop(entries []*zip.File) ([]file, error) {
 	var files []file
-	place := map[string]int{} // where in files each path is
+	place := map[string]int{}
 	top, hasTop := "", false
 	for _, entry := range entries {
 		if strings.HasSuffix(entry.Name, "/") {
@@ -130,7 +113,6 @@ func filesBelowTheTop(entries []*zip.File) ([]file, error) {
 	return files, nil
 }
 
-// contentOf is the bytes of an entry, unpacked and checked against the entry's checksum.
 func contentOf(entry *zip.File) ([]byte, error) {
 	reader, err := entry.Open()
 	if err != nil {
@@ -144,8 +126,6 @@ func contentOf(entry *zip.File) ([]byte, error) {
 	return data, nil
 }
 
-// filesHash is "sha256:" and the SHA-256 of `<path>\n<sha256 of its bytes>\n` for each file, in the byte order of
-// the paths.
 func filesHash(files []file) string {
 	sorted := slices.SortedFunc(slices.Values(files), func(a, b file) int { return strings.Compare(a.name, b.name) })
 	var lines strings.Builder
@@ -155,8 +135,6 @@ func filesHash(files []file) string {
 	return "sha256:" + fsx.SHA256Hex([]byte(lines.String()))
 }
 
-// reasonOf is the text of a failure inside another message: what an expected failure says, or the system's
-// reason without the operation and the path.
 func reasonOf(err error) string {
 	var failure *diag.Error
 	if errors.As(err, &failure) {
@@ -164,8 +142,6 @@ func reasonOf(err error) string {
 	}
 	return fsx.Reason(err)
 }
-
-// ---- errors ----
 
 func errDownloadFailed(key, github, manifestFile string, cause error) error {
 	return &diag.Error{
@@ -208,9 +184,6 @@ func errUnsafePath(key, manifestFile, address, path string) error {
 		Hint: "Check " + address + " in a browser.",
 	}
 }
-
-// The four failures of readArchive have no file and no hint: errNotATagArchive puts the library, the manifest and
-// the address around what they say.
 
 func errInvalidZip(cause error) error {
 	return &diag.Error{Msg: "Invalid zip archive: " + strings.TrimPrefix(cause.Error(), "zip: ") + ".", Cause: cause}

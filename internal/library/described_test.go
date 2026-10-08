@@ -12,7 +12,6 @@ const (
 )
 
 func TestALibraryWithoutTheFileShipsModulesFromItsRootAndNoAssets(t *testing.T) {
-	// What is given as the content of a file that is not there is not read.
 	for _, data := range [][]byte{nil, []byte("{"), []byte(`{"dir":"src"}`)} {
 		described, err := parseFile("ex", data, false, where)
 		if err != nil || described.Dir != nil || described.Assets != nil {
@@ -71,7 +70,6 @@ func TestAnUnknownKeyIsRefusedTheFirstInSortedOrder(t *testing.T) {
 		{`{"objects":"objects","dir":"src","extra":1}`, "extra"},
 		{`{"dir":7,"Dir":"src"}`, "Dir"},
 		{`{"assets ":"a"}`, "assets "},
-		// U+FFFD is before U+1F600 by bytes.
 		{"{\"\xf0\x9f\x98\x80\":1,\"\xef\xbf\xbd\":1}", "\xef\xbf\xbd"},
 	}
 	for _, c := range cases {
@@ -84,7 +82,6 @@ func TestAnUnknownKeyIsRefusedTheFirstInSortedOrder(t *testing.T) {
 	}
 }
 
-// folderNames is the two keys of the file, each of which names a folder.
 var folderNames = []string{"dir", "assets"}
 
 func TestAFolderMustBeARelativePathOfPlainNames(t *testing.T) {
@@ -104,8 +101,6 @@ func TestAFolderMustBeARelativePathOfPlainNames(t *testing.T) {
 	}
 }
 
-// A value that is no folder is shown in the characters the file has it in, without the white space around its
-// parts: a number is not printed again, and neither is a string's escape.
 func TestAValueThatIsNoFolderIsShownAsItIsWritten(t *testing.T) {
 	cases := []struct{ written, shown string }{
 		{`1.0`, `1.0`},

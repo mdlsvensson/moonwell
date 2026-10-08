@@ -16,7 +16,6 @@ const installPage = "https://pkl-lang.org/main/current/pkl-cli/index.html#instal
 
 func TestPklProgramUsesPklOnPathWhenItIs032OrNewer(t *testing.T) {
 	for _, found := range []string{"Pkl 0.32.1 (Windows 10.0, native)", "Pkl 0.33.0 (Linux)", "Pkl 1.0.0 (Linux)"} {
-		// A machine that Moonwell has no download for takes the pkl on PATH as every other machine does.
 		for _, platform := range []string{"linux-x86_64", ""} {
 			e, log, fetches := pklInstaller(t, "")
 			e.Platform = platform
@@ -32,7 +31,6 @@ func TestPklProgramUsesPklOnPathWhenItIs032OrNewer(t *testing.T) {
 				t.Errorf("%s on %q: PklProgram = %q, %v, %d downloads, log %q",
 					found, platform, program, err, *fetches, log.Lines())
 			}
-			// The words that make a Pkl print its version: with others it prints an error, and is taken for none.
 			if !slices.Equal(asked, []string{"pkl", "--version"}) {
 				t.Errorf("%s on %q: it ran %q, want pkl --version", found, platform, asked)
 			}
@@ -78,8 +76,6 @@ func TestPklProgramWarnsAboutAnOlderPklOnPathAndUsesThePinnedOne(t *testing.T) {
 	}
 }
 
-// A pkl on PATH that names no version is no Pkl that Moonwell can use: the pinned one is downloaded, as for an
-// older one, and the warning shows what the program printed.
 func TestPklProgramTakesAPklOnPathThatNamesNoVersionForAnOlderOne(t *testing.T) {
 	for printed, shown := range map[string]string{"pkl: no such flag\n": "(pkl: no such flag)", " \r\n": "(unknown)"} {
 		e, log, fetches := pklInstaller(t, "")
@@ -244,12 +240,10 @@ func TestKeepPklForShellCopiesThePinnedPklAndSaysWhenPathStillHasNone(t *testing
 		t.Errorf("the copy holds %q", data)
 	}
 
-	// Once the folder is on PATH: no copy, no warning.
 	e.Run = pathAndPinned("Pkl "+PklVersion+" (Linux)", "")
 	if err := KeepPklForShell(background, e, pinned, "linux"); err != nil || len(log.Lines()) != len(want) {
 		t.Errorf("log = %q, %v", log.Lines(), err)
 	}
-	// Pkl on PATH is what Moonwell runs: nothing to keep, and nothing is asked of the world.
 	untouched, silence := testkit.Env(t, t.TempDir())
 	if err := KeepPklForShell(background, untouched, "pkl", "linux"); err != nil || len(silence.Lines()) != 0 ||
 		len(holds(t, untouched.CacheDir)) != 0 {

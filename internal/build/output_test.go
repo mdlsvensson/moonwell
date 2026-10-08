@@ -9,8 +9,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// ---- outputAt ----
-
 func TestOutputAtIsThePlaceBelowTheProjectFolderWhateverIsThere(t *testing.T) {
 	root := t.TempDir()
 	tests := []struct{ relative, want string }{
@@ -31,13 +29,11 @@ func TestOutputAtIsThePlaceBelowTheProjectFolderWhateverIsThere(t *testing.T) {
 	}
 }
 
-// Every folder on the way to a place Moonwell writes is a real one, the first too, and so is what is at the
-// place: a link is refused by the step it stands at, in words that say what to do about a folder Moonwell makes.
 func TestOutputAtRefusesALinkOnTheWayOrAtThePlaceByItsStep(t *testing.T) {
 	tests := []struct {
 		name  string
-		link  string // the step that is a link
-		place string // the place that is asked for
+		link  string
+		place string
 	}{
 		{"the first folder", "dist", "dist"},
 		{"the first folder on the way", "dist", "dist/stage/map.w3x"},
@@ -84,7 +80,6 @@ func TestOutputAtPassesOnTheRefusalOfAPathThatLeavesTheProjectOrThatWindowsCanno
 
 func TestOutputAtNamesAPlaceTheSystemCannotLookAtByTheWholePath(t *testing.T) {
 	root := t.TempDir()
-	// The folder above the name is there, so that the system looks at the name and does not stop before it.
 	if err := os.Mkdir(filepath.Join(root, "dist"), 0o777); err != nil {
 		t.Fatal(err)
 	}

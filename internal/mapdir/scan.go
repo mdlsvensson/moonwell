@@ -11,21 +11,17 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-// listing is what a scan found in a map folder: the names of its files and folders, not what the files hold.
-// Paths are relative to the map folder, with "/".
 type listing struct {
-	files   []string          // every file, in the order found
-	names   map[string]string // by key, the path of each file
-	folders map[string]string // by key, the path of each folder below the top
+	files   []string
+	names   map[string]string
+	folders map[string]string
 }
 
-// has reports whether the scan found a file under name, in any letter case.
 func (l *listing) has(name string) bool {
 	_, ok := l.names[Key(name)]
 	return ok
 }
 
-// spelling is the path the scan found under key, a file's or a folder's.
 func (l *listing) spelling(key string) (string, bool) {
 	if path, ok := l.names[key]; ok {
 		return path, true
@@ -34,15 +30,11 @@ func (l *listing) spelling(key string) (string, bool) {
 	return path, ok
 }
 
-// walker lists one map folder into found.
 type walker struct {
 	dir, label string
 	found      *listing
 }
 
-// scan lists the map folder at dir, once and whole. It fails on what a map folder cannot hold, wherever it is: a
-// link, an entry that is neither a file nor a folder, a name Windows cannot hold, and two paths that differ only
-// in letter case.
 func scan(dir, label string) (*listing, error) {
 	if err := realFolder(dir, label); err != nil {
 		return nil, err
@@ -54,7 +46,6 @@ func scan(dir, label string) (*listing, error) {
 	return w.found, nil
 }
 
-// realFolder fails unless dir is a folder that is not a link. A missing dir fails with the system's error.
 func realFolder(dir, label string) error {
 	info, err := os.Lstat(dir)
 	switch {
@@ -70,8 +61,6 @@ func realFolder(dir, label string) error {
 	return nil
 }
 
-// walk lists the folder at path ("" is the top) and every folder below it. os.ReadDir gives a folder's entries
-// sorted by name, byte by byte, and a folder is entered where it stands among them.
 func (w walker) walk(path string) error {
 	entries, err := os.ReadDir(filepath.Join(w.dir, filepath.FromSlash(path)))
 	if err != nil {
@@ -85,15 +74,11 @@ func (w walker) walk(path string) error {
 	return nil
 }
 
-// usable reports whether an entry of a map folder can have the name: whether it is one that fsx.RelPath takes, so
-// that Windows can hold it and every tool that reads the map there finds the file. Where "/" separates, a name can
-// also hold a backslash, which RelPath reads as a separator: the path would be another path on Windows.
 func usable(name string) bool {
 	_, ok := fsx.RelPath(name)
 	return ok && !strings.Contains(name, `\`)
 }
 
-// add notes the entry at path as a file or a folder, and lists a folder.
 func (w walker) add(path string, entry fs.DirEntry) error {
 	if !usable(entry.Name()) {
 		return errUnusableName(join(w.label, path))
@@ -119,8 +104,6 @@ func (w walker) add(path string, entry fs.DirEntry) error {
 	return errNotRegular(join(w.label, path))
 }
 
-// ---- errors ----
-
 func errNotAFolder(label string) error {
 	return &diag.Error{
 		Msg:  "Source map " + label + " is not a folder.",
@@ -138,7 +121,6 @@ func errUnlistable(file string, cause error) error {
 	}
 }
 
-// errLink is fsx.LinkError for a path of the map, at that path.
 func errLink(file string) error {
 	err := fsx.LinkError(file)
 	var failure *diag.Error

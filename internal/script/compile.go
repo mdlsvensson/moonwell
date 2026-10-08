@@ -1,23 +1,3 @@
-// Package script turns a project's source files into the Lua that goes into a map: it writes the macro module
-// the sources import, finds the modules, compiles the YueScript ones, follows the requires from the entry, checks
-// for globals nobody defines, renders the bundle, and plans the bundle's place at the end of the map's script.
-//
-// A compile is made from the outside world, an env.Env whose Root is the project folder, and from an Input: a
-// compiler, the entry, the libraries' folders, the lint block, the game's API (LoadNatives) and what the map's
-// own script defines. It is two steps. CompileSources takes the Input and returns a Compiled: the modules, and
-// the Lua of the libraries' ones. Link takes the Compiled and returns a Program: what the entry reaches, checked
-// for unknown globals. Inject takes a map folder and a Program, and returns one change: the map's script with the
-// bundle after it. EntryName and RefreshMacros are steps of a compile that other packages take alone. Collect is
-// the step that lists the modules, which no other package takes, and CollectLibraries is Collect for the
-// libraries' modules alone, which setup takes.
-//
-// It knows nothing of where a library comes from, of manifests beyond the lint block, or of how a map is built.
-// Of a map it knows one file, war3map.lua: what it defines, which a compile is handed, and its bytes, which
-// Inject reads through the folder. It writes the macro module and what a compile leaves below dist/stage/lua, and
-// no file of a map.
-//
-// Of Moonwell it imports manifest, mapdir, war3/lua, env, diag, fsx and the root package, for the files the
-// program carries: the macro module, the game's API and the runtime.
 package script
 
 import (
@@ -31,51 +11,34 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// Three values in this file hold the Lua of YueScript modules, each for a reason. A reader reads a module's Lua
-// from dist/stage/lua once, and keeps it. A Compiled holds what CompileSources read, the Lua of the libraries'
-// modules, and never changes after: an editor's view of the libraries is made from it, also when Link fails. So
-// a Link reads into a reader of its own, which starts as a copy of the Compiled's Lua, and adds the project's
-// modules that the entry reaches. A Program holds what that reader ended with.
-
-// Input is what a compile is made from.
 type Input struct {
-	Compiler  string // the compiler to run, as its path
-	Entry     string // the entry file, from the project folder, such as "src/main.yue"
+	Compiler  string
+	Entry     string
 	Minify    bool
-	Libraries []Library // in key order
+	Libraries []Library
 	Lint      manifest.Lint
-	Map       *lua.MapGlobals // what the source map's war3map.lua defines; nil for a map without a script
-	Natives   *Natives        // the game's API: LoadNatives()
+	Map       *lua.MapGlobals
+	Natives   *Natives
 }
 
-// Module is a module as Lua, ready for the bundle.
 type Module struct {
-	Name    string // the name it is required by, which is the name the bundle defines it with
-	Path    string // the file the user wrote, from the project folder
-	Kind    Kind   // Lua for a Lua module, which a minified bundle keeps line for line
-	Library string // the library's key; "" for the project's own
-	// Lua is a Lua module's text, or what the compiler wrote for a YueScript module. It is bytes: nothing is
-	// decoded, so it may hold bytes that are not UTF-8.
-	Lua string
+	Name    string
+	Path    string
+	Kind    Kind
+	Library string
+	Lua     string
 }
 
-// Program is a project's gameplay as Lua.
 type Program struct {
-	Entry   string         // the entry module's name
-	Modules []Module       // what the entry reaches, each after the modules it requires
-	Minify  bool           // whether the YueScript modules are compiled minified
-	Sources []Source       // every module found, reached or not
-	Unknown []diag.Problem // unknown globals that lint.unknownGlobals = "warning" let pass
+	Entry   string
+	Modules []Module
+	Minify  bool
+	Sources []Source
+	Unknown []diag.Problem
 
-	lua map[string]string // the Lua of each YueScript module that the compile read and that has some, by its path
+	lua map[string]string
 }
 
-// Lua returns a module as Lua. A Lua module is its own text, whichever module it is. A YueScript module is what
-// the compiler wrote for it, when the entry reaches it or it is a library's, reached or not: those are the
-// modules whose Lua the compile read.
-//
-// ok is false for any other YueScript module: one of the project that the entry does not reach, one that is not
-// among Sources, and a source without code, which the compiler writes no Lua for.
 func (p *Program) Lua(source Source) (text string, ok bool) {
 	if source.Kind == Lua {
 		return source.Text, true
@@ -84,26 +47,16 @@ func (p *Program) Lua(source Source) (text string, ok bool) {
 	return text, ok
 }
 
-// Compiled is a project's modules with their YueScript compiled, before anything follows a require: what
-// CompileSources returns and Link is handed. It is there when Link fails, so what needs the modules and not the
-// program, such as an editor's view of the libraries, is made from it between the two.
 type Compiled struct {
-	Sources []Source // every module found, as Collect lists them
+	Sources []Source
 
-	in     Input             // what it was compiled from: Link goes on from the same Input
-	search macros            // how the compiler finds the macro module
-	output *staged           // what the compile left in dist/stage/lua
-	lua    map[string]string // the Lua of each YueScript module of a library that has some, by its path
-	none   map[string]bool   // the YueScript modules of a library that have none, by the same path
+	in     Input
+	search macros
+	output *staged
+	lua    map[string]string
+	none   map[string]bool
 }
 
-// Lua returns a module as Lua, as Program.Lua does, without what a Link reads: a YueScript module of the
-// project's own has none here, since its Lua is read when Link follows the requires to it. A Lua module is its
-// own text, whichever module it is; a library's YueScript module is what the compiler wrote for it, reached or not.
-//
-// ok is false for any other YueScript module: one of the project's own, one that is not among Sources, and a
-// source without code, which the compiler writes no Lua for. Nothing is read, and a Link changes no answer: for
-// a module of a library, the Program of that Link answers the same.
 func (c *Compiled) Lua(source Source) (text string, ok bool) {
 	if source.Kind == Lua {
 		return source.Text, true
@@ -112,13 +65,6 @@ func (c *Compiled) Lua(source Source) (text string, ok bool) {
 	return text, ok
 }
 
-// CompileSources is the first step of a compile: it writes the macro module, finds the modules, compiles every
-// YueScript source that changed since the last compile, and reads the Lua of every YueScript module of a
-// library.
-//
-// The first fault ends it, and a file the compiler refuses is one. What the second step refuses is not looked at
-// here: neither the entry nor a require, nor a global. The libraries' Lua is read once the compile is over, so
-// that Compiled.Lua has it without a read that could fail.
 func CompileSources(ctx context.Context, e *env.Env, in Input) (*Compiled, error) {
 	if in.Natives == nil {
 		return nil, errNoNatives()
@@ -142,24 +88,8 @@ func CompileSources(ctx context.Context, e *env.Env, in Input) (*Compiled, error
 	return &Compiled{Sources: sources, in: in, search: search, output: output, lua: read.lua, none: read.none}, nil
 }
 
-// Link is the second step of a compile: it follows the requires from the entry, checks the modules it reaches
-// for unknown globals, and returns the program. compiled is what CompileSources returned, and e the outside world
-// it was handed; the entry, the lint block, the game's API and what the map's script defines are those of the
-// Input that CompileSources took.
-//
-// The first fault ends it: an entry that is no file of src/ is reported before a module that is not found, and
-// an unknown global last. With lint.unknownGlobals = "error" an unknown global fails with every one listed; with
-// "warning" they are logged and returned in the Program. The Lua of the libraries' modules is what
-// CompileSources read, and that of the project's modules is read as the requires are followed, so that
-// Program.Lua has both without a read that could fail. compiled stays as it is, whether Link fails or not.
-//
-// Every Link reports what it finds: a second Link of one Compiled gives the same Program, and logs the warnings
-// again. A caller that wants them logged once links once.
 func Link(ctx context.Context, e *env.Env, compiled *Compiled) (*Program, error) {
 	if compiled == nil || compiled.output == nil {
-		// A plain error: the caller passes what CompileSources returned without a failure, which is never nil and
-		// never a Compiled of the caller's own making, so a link of anything else is a mistake in Moonwell and
-		// nothing the user can put right.
 		return nil, errors.New("script.Link: compiled is not what script.CompileSources returned")
 	}
 	in, read := compiled.in, compiled.reader()
@@ -180,8 +110,6 @@ func Link(ctx context.Context, e *env.Env, compiled *Compiled) (*Program, error)
 	}, nil
 }
 
-// macroModule writes the macro module of the project at root, and returns how the compiler finds it. A project
-// folder whose path the search cannot hold is refused before anything is written.
 func macroModule(root string) (macros, error) {
 	search, err := macrosOf(root)
 	if err != nil {
@@ -193,21 +121,16 @@ func macroModule(root string) (macros, error) {
 	return search, nil
 }
 
-// reader reads the Lua of compiled modules, each once, and keeps what it read: a module that is asked for again,
-// under another name or by the Program, is the Lua that was read first.
 type reader struct {
 	output *staged
-	lua    map[string]string // the Lua of each module read that has some, by the source's path
-	none   map[string]bool   // the modules read that have none, by the same path
+	lua    map[string]string
+	none   map[string]bool
 }
 
-// reader is a reader that has read what CompileSources read, and keeps what it reads from there on for itself:
-// a Link reads the Lua of the project's modules, which is its Program's, and c stays as it is.
 func (c *Compiled) reader() *reader {
 	return &reader{output: c.output, lua: maps.Clone(c.lua), none: maps.Clone(c.none)}
 }
 
-// luaOf is the Lua of a YueScript module; ok is false for a module without an output.
 func (r *reader) luaOf(source Source) (text string, ok bool, err error) {
 	if text, ok = r.lua[source.Path]; ok || r.none[source.Path] {
 		return text, ok, nil
@@ -223,8 +146,6 @@ func (r *reader) luaOf(source Source) (text string, ok bool, err error) {
 	return text, ok, nil
 }
 
-// libraries reads the Lua of every YueScript module of a library, whether the entry reaches it or not: a view
-// of a library for an editor holds all of its modules.
 func (r *reader) libraries(sources []Source) error {
 	for _, source := range sources {
 		if source.Library == "" || source.Kind != Yue {
@@ -237,11 +158,6 @@ func (r *reader) libraries(sources []Source) error {
 	return nil
 }
 
-// ---- errors ----
-
-// errNoNatives is the failure of a compile that is handed an Input without the game's API. It is a plain error:
-// the caller passes LoadNatives(), which is never nil, so a compile without the game's API is a mistake in
-// Moonwell and nothing the user can put right.
 func errNoNatives() error {
 	return errors.New("script.CompileSources: Input.Natives is nil; pass script.LoadNatives()")
 }

@@ -6,11 +6,8 @@ import (
 	"net/http"
 )
 
-// FetchFunc downloads an address: the response's status and its whole body. A response with a failing status is
-// not an error; an error means that no response came, or that ctx was cancelled. Tests replace it.
 type FetchFunc func(ctx context.Context, url string) (status int, body []byte, err error)
 
-// HTTPFetch returns the FetchFunc that downloads with client.
 func HTTPFetch(client *http.Client) FetchFunc {
 	return func(ctx context.Context, url string) (int, []byte, error) {
 		request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)

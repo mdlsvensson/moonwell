@@ -14,11 +14,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// The tests of this file run whole command lines in a project with map settings, on the map info and the script
-// World Editor saved for the fixture map-settings-v39. Each runs the real pkl and the real compiler, takes a
-// second or more, and is skipped with -short.
-
-// settingsBody is a settings block with a setting of every group but the loading screen.
 const settingsBody = `settings {
  info { name = "Moonwell settings test"; description = "Built settings" }
  players { ["0"] { controller = "computer"; race = "orc"; fixedStart = false; x = 256 } }
@@ -32,7 +27,6 @@ const settingsBody = `settings {
  gameInterface { ["CustomSkin"] { ["Test"] = "value" } }
 }`
 
-// settingsProject is a project that compiles, on the map of the settings fixture.
 func settingsProject(t *testing.T) string {
 	t.Helper()
 	root := compiling(t)
@@ -42,13 +36,11 @@ func settingsProject(t *testing.T) string {
 	return root
 }
 
-// sourceMap is every file of the project's source map.
 func sourceMap(t *testing.T, root string) map[string][]byte {
 	t.Helper()
 	return testkit.Snapshot(t, filepath.Join(root, "maps", "map.w3x"))
 }
 
-// stageOf is every file of the project's stage; it is nil for a project without one.
 func stageOf(t *testing.T, root string) map[string][]byte {
 	t.Helper()
 	staged := filepath.Join(root, "dist", "stage", "map.w3x")
@@ -58,8 +50,6 @@ func stageOf(t *testing.T, root string) map[string][]byte {
 	return testkit.Snapshot(t, staged)
 }
 
-// assertSettingsLua fails the test unless the script makes every call that settingsBody asks for, ahead of the
-// start of the gameplay.
 func assertSettingsLua(t *testing.T, lua string) {
 	t.Helper()
 	boot := strings.Index(lua, `__mw.boot("main")`)
@@ -77,7 +67,6 @@ func assertSettingsLua(t *testing.T, lua string) {
 	}
 }
 
-// assertSettingsInfo fails the test unless a map info holds what settingsBody asks for.
 func assertSettingsInfo(t *testing.T, data []byte) {
 	t.Helper()
 	info, err := w3i.Read(data, "war3map.w3i", w3i.Extended)
@@ -168,9 +157,6 @@ func TestE2ESettingsBuildMissingMapNamesLocalManifest(t *testing.T) {
 	}, "build")
 }
 
-// A build plans every step before it touches dist/stage. So after a build that a setting refuses, the stage is
-// the one the build before it left, whole, with that build's map info, and not a copy of the source map that the
-// refused build made.
 func TestE2ESettingsFailureRemovesArchiveAndPlansAtomically(t *testing.T) {
 	root := settingsProject(t)
 	ok(t, root, "build")
@@ -200,8 +186,6 @@ func TestE2ESettingsFailureRemovesArchiveAndPlansAtomically(t *testing.T) {
 	sameFiles(t, staged, stageOf(t, root), "the stage after a refused build")
 }
 
-// A check fails wherever a build would: for no source map, no war3map.lua, and a bundle that cannot be placed.
-// So a project without its source map is refused by check also when it has neither objects nor a setting.
 func TestE2ESettingsCheckWithoutStagingAndOptionalMap(t *testing.T) {
 	root := settingsProject(t)
 	edit(t, root, "maps/map.w3x/war3map.lua", "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), 0)")

@@ -14,10 +14,6 @@ import (
 	"testing"
 )
 
-// The install scripts are tested against a local server that stands in for a GitHub release: the script of this
-// machine's system downloads a stand-in executable and its checksums from it.
-
-// release is what the stand-in release serves; a nil entry is a file the release lacks.
 type release map[string][]byte
 
 func (r release) serve(t *testing.T) string {
@@ -39,7 +35,6 @@ func sha256Hex(content []byte) string {
 	return hex.EncodeToString(sum[:])
 }
 
-// installer is the install script of this machine's system and where it installs to in home.
 type installer struct {
 	asset, target string
 	command       func(home, base string) *exec.Cmd
@@ -61,7 +56,6 @@ func thisInstaller(t *testing.T) installer {
 		}}
 	case "windows":
 		return installer{"moonwell-windows-amd64.exe", "bin/moonwell.exe", func(home, base string) *exec.Cmd {
-			// MOONWELL_INSTALL_NO_PATH: a test must not change the PATH of the user who runs it.
 			return withEnv(
 				exec.Command("powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "install.ps1"),
 				"MOONWELL_CACHE="+home, "MOONWELL_INSTALL_BASE="+base, "MOONWELL_INSTALL_NO_PATH=1",

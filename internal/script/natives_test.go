@@ -64,8 +64,6 @@ func TestParseNativesReadsEveryMemberOfTheFile(t *testing.T) {
 	}
 }
 
-// The one document the program reads is the one it carries, so a document that does not parse is a fault in
-// Moonwell: a panic, which the command line prints as an internal error, and never a value to go on with.
 func TestAFileOfNativesThatDoesNotParseIsAPanic(t *testing.T) {
 	for _, document := range []string{"", "{", `{"types": 7}`, `{"gameVersion": "1.2.3", "functions": [{"name": 1}]}`} {
 		var got *Natives

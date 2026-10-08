@@ -15,13 +15,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// These tests place a program that is made by hand in a map folder that holds a script and nothing else. They
-// run no compiler.
-
-// mapLabel is how the map folder of these tests is named in an error.
 const mapLabel = "maps/map.w3x"
 
-// mapOf lays a map folder with the files, as pairs of a name and what the file holds, and opens it.
 func mapOf(t testing.TB, pairs ...string) *mapdir.Folder {
 	t.Helper()
 	dir := filepath.Join(t.TempDir(), "map.w3x")
@@ -35,10 +30,8 @@ func mapOf(t testing.TB, pairs ...string) *mapdir.Folder {
 	return folder
 }
 
-// small is a program of one module.
 var small = byHand(false, ofSrc("main", "print('hi')\n"))
 
-// placed is the one change Inject makes of a program in a map; any other outcome fails the test.
 func placed(t testing.TB, folder *mapdir.Folder, program *Program) mapdir.Change {
 	t.Helper()
 	changes, err := Inject(folder, program)
@@ -48,8 +41,6 @@ func placed(t testing.TB, folder *mapdir.Folder, program *Program) mapdir.Change
 	return changes[0]
 }
 
-// firstDifference says where two texts first differ, with what each holds from there on for a few bytes; "" for
-// texts that are alike.
 func firstDifference(got, want string) string {
 	if got == want {
 		return ""
@@ -66,8 +57,8 @@ func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T
 	const fourLines = "function config()\nend\nfunction main()\nend"
 	for _, c := range []struct {
 		name, script string
-		added        string // what stands between the script and the bundle
-		first        int    // the line the bundle starts on
+		added        string
+		first        int
 	}{
 		{"no final line break", fourLines, "\n", 5},
 		{"a final line break", fourLines + "\n", "", 5},
@@ -93,8 +84,6 @@ func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T
 	}
 }
 
-// The scripts of two maps that World Editor saved: main and config are found in them as it writes them, and the
-// bundle follows the script, which is kept byte for byte.
 func TestInjectPlacesTheBundleInAScriptThatWorldEditorSaved(t *testing.T) {
 	for _, fixture := range []string{"map-settings-v39/war3map.lua", "map-globals-we3/war3map.lua"} {
 		script := string(testkit.Fixture(t, fixture))
@@ -137,13 +126,13 @@ func TestMainAndConfigAreFoundAtTheStartOfALineWithTheWhiteSpaceOfLua(t *testing
 		"x = 1\nfunction main()\nend\n":             true,
 		"x = 1\r\nfunction main()\r\nend\r\n":       true,
 		"\n\n  \n\t\nfunction main()":               true,
-		"function config()\rfunction main()":        false, // a carriage return alone ends no line
+		"function config()\rfunction main()":        false,
 		"\rfunction main()":                         true,
-		"function\nmain\n(":                         true, // a line feed is white space between the words
+		"function\nmain\n(":                         true,
 		"function\r\n  main\r\n  ()":                true,
-		"--[[\nfunction main()\n]]":                 true, // the script is not parsed: a block comment's line counts
+		"--[[\nfunction main()\n]]":                 true,
 		"text = [[\nfunction main()\n]]":            true,
-		mark + "function main()":                    true, // a byte order mark at the start is no part of the first line
+		mark + "function main()":                    true,
 		mark + "  function main()":                  true,
 		mark + "x = 1\nfunction main()":             true,
 		"":                                          false,
@@ -162,7 +151,7 @@ func TestMainAndConfigAreFoundAtTheStartOfALineWithTheWhiteSpaceOfLua(t *testing
 		"function Main()":                           false,
 		"function config()":                         false,
 		"function main\x00()":                       false,
-		"x = 1\n" + mark + "function main()":        false, // a mark elsewhere, and white space that is not Lua's
+		"x = 1\n" + mark + "function main()":        false,
 		mark + mark + "function main()":             false,
 		noBreakSpace + "function main()":            false,
 		"function" + noBreakSpace + "main()":        false,
@@ -170,7 +159,7 @@ func TestMainAndConfigAreFoundAtTheStartOfALineWithTheWhiteSpaceOfLua(t *testing
 		lineSeparator + "function main()":           false,
 		"x = 1" + lineSeparator + "function main()": false,
 		"x = 1" + paragraphEnd + "function main()":  false,
-		"\xa0function main()":                       false, // bytes that are not UTF-8
+		"\xa0function main()":                       false,
 		"\xfffunction main()":                       false,
 		"-- \xff\nfunction main() -- \xe2\x82":      true,
 	} {
@@ -196,7 +185,6 @@ func TestInjectKeepsAByteOrderMarkAndBytesThatAreNotUTF8(t *testing.T) {
 		if differs := firstDifference(got, c.script+c.added+bundle(small, moonwell.RuntimeLua, lines+1)); differs != "" {
 			t.Errorf("%s: the script is not kept byte for byte before the bundle: %s", c.name, differs)
 		}
-		// The folder's own bytes are not written into.
 		if kept, found, err := folder.Read("war3map.lua"); err != nil || !found || string(kept) != c.script {
 			t.Errorf("%s: after Inject the folder reads the script as %q, %v, %v", c.name, kept, found, err)
 		}
@@ -210,7 +198,6 @@ func TestInjectRefusesAMapWithoutAScript(t *testing.T) {
 		!strings.Contains(failure.Hint, "Lua as the script language") {
 		t.Errorf("no script: Inject = %+v, %+v", changes, failure)
 	}
-	// A view of the map that removes the script has none.
 	folder := mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n")
 	_, err = Inject(folder.With([]mapdir.Change{{Name: "war3map.lua", Remove: true}}), small)
 	if failure := asError(t, err, "a script that is removed"); failure.Msg != "The map has no war3map.lua." {
@@ -248,12 +235,9 @@ func TestInjectTakesTheScriptAsThePlannedChangesLeaveIt(t *testing.T) {
 	if differs := firstDifference(string(change.Bytes), want); change.Name != "war3map.lua" || differs != "" {
 		t.Errorf("the change is of %s; against the planned script and the bundle from line 6, %s", change.Name, differs)
 	}
-	// What a view plans stays what it planned.
 	if kept, _, _ := view.Read("war3map.lua"); string(kept) != planned {
 		t.Errorf("after Inject the view reads the script as %q", kept)
 	}
-	// Laid over the view, the change takes the place of the planned one: the map's script is changed once, to
-	// the planned script with the bundle.
 	after := view.With([]mapdir.Change{change}).Changes()
 	if len(after) != 1 || after[0].Name != "war3map.lua" || after[0].Remove || string(after[0].Bytes) != want {
 		t.Errorf("with the change laid over it the view changes %d files, want war3map.lua alone, with the bundle", len(after))

@@ -14,18 +14,15 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-// mapInfoFile is the name the tests give Read for its errors.
 const mapInfoFile = "map/war3map.w3i"
 
 var supportedVersions = []int32{18, 25, 28, 31, 32, 33, 39}
 
-// header is the start of a war3map.w3i with the format version and the game version that saved it.
 func header(version int32, major, minor uint32) []byte {
 	return testkit.Concat(testkit.U32(uint32(version)), make([]byte, 8), testkit.U32(major), testkit.U32(minor),
 		make([]byte, 44))
 }
 
-// mustRead reads a file the test knows to be whole.
 func mustRead(t *testing.T, data []byte, depth w3i.Depth) *w3i.Info {
 	t.Helper()
 	info, err := w3i.Read(data, mapInfoFile, depth)
@@ -35,7 +32,6 @@ func mustRead(t *testing.T, data []byte, depth w3i.Depth) *w3i.Info {
 	return info
 }
 
-// refusal checks that Read refuses data with an error that names the file and has the words.
 func refusal(t *testing.T, what string, data []byte, depth w3i.Depth, words string) {
 	t.Helper()
 	info, err := w3i.Read(data, mapInfoFile, depth)
@@ -52,7 +48,6 @@ func refusal(t *testing.T, what string, data []byte, depth w3i.Depth, words stri
 	}
 }
 
-// inserted is data with extra put in at offset.
 func inserted(data []byte, offset int, extra ...byte) []byte {
 	return slices.Concat(data[:offset], extra, data[offset:])
 }
@@ -112,7 +107,6 @@ func TestTheWorldEditorFixtureReadsWithItsRecordedOffsets(t *testing.T) {
 		t.Errorf("player 0 x is at %d and force 0 flags at %d, want 311 and 563",
 			info.Details.Players[0].X.Start, info.Details.Forces[0].Flags.Start)
 	}
-	// A slice of a larger buffer reads the same.
 	padded := testkit.Concat(make([]byte, 3), fixture, make([]byte, 4))
 	again, err := w3i.Read(padded[3:3+len(fixture)], mapInfoFile, w3i.Extended)
 	if err != nil || again.Details.Forces[0].Flags.Start != 563 {
@@ -192,18 +186,16 @@ func TestInvalidStringsCountsPlayerFieldsAndScriptModeAreFileErrors(t *testing.T
 	d := info.Details
 	player := d.Players[0]
 	playerCount, forceCount, scriptLanguage := player.ID.Start-4, d.Forces[0].Flags.Start-4, d.SoundEnvironment.End+5
-	// The first of the four texts between the loading screen and the fog, which Read passes over.
 	unkeptText := info.Loading.Subtitle.End + 4
 	set := func(offset int, value int32) []byte { return testkit.SetU32(source, offset, uint32(value)) }
 	bits := func(value float64) int32 { return int32(math.Float32bits(float32(value))) }
-	// The same player record twice: two players with one id.
 	duplicate := inserted(set(playerCount, 2), forceCount, source[player.ID.Start:forceCount]...)
 
 	for _, c := range []struct {
 		name    string
 		data    []byte
 		words   string
-		inBasic bool // the damage is in the part Basic reads
+		inBasic bool
 	}{
 		{"invalid UTF-8 in the name", inserted(source, info.Name.Start, 0xff), "invalid UTF-8", true},
 		{"invalid UTF-8 in a text that is not kept", inserted(source, unkeptText, 0xff), "invalid UTF-8", false},
@@ -273,8 +265,6 @@ func TestAStartPositionIsAnyNumberAndNothingElse(t *testing.T) {
 	}
 }
 
-// repeated is source with the bytes from start to end put in count times in all, and the number of them written
-// at countOffset, which is before start. change is given each copy to tell it from the others.
 func repeated(source []byte, countOffset, start, end, count int, change func(record []byte, index int)) []byte {
 	out := testkit.SetU32(source[:start:start], countOffset, uint32(count))
 	for index := range count {
@@ -308,8 +298,6 @@ func TestAMapHasOneToTwentyFourPlayersAndForces(t *testing.T) {
 		"player count")
 	refusal(t, "25 forces", repeated(source, forceCount, force.Flags.Start, force.Name.End, 25, numbered), w3i.Extended,
 		"force count")
-	// A count of 24 is no wrong count, so a file with fewer records than it says ends too soon: in the name of
-	// a player, or in the numbers of a force.
 	refusal(t, "a player count of 24 before one player", testkit.SetU32(source, playerCount, 24), w3i.Extended,
 		"unterminated string")
 	refusal(t, "a force count of 24 before one force", testkit.SetU32(source, forceCount, 24), w3i.Extended, "truncated")
@@ -386,7 +374,6 @@ func TestApplyEditsReplacesFieldsAndKeepsEveryOtherByte(t *testing.T) {
 	}
 }
 
-// edit replaces the bytes from start to end with text.
 func edit(start, end int, text string) w3i.Edit {
 	return w3i.Edit{Start: start, End: end, Bytes: []byte(text)}
 }
@@ -396,7 +383,7 @@ func TestApplyEditsTakesEditsInAnyOrderAndRefusesTheOnesThatCannotBeMade(t *test
 	for _, c := range []struct {
 		name  string
 		edits []w3i.Edit
-		want  string // "" when the edits are refused
+		want  string
 	}{
 		{"no edits", nil, "0123456789"},
 		{"the later edit first", []w3i.Edit{edit(6, 8, "x"), edit(1, 2, "abc")}, "0abc2345x89"},
@@ -416,7 +403,6 @@ func TestApplyEditsTakesEditsInAnyOrderAndRefusesTheOnesThatCannotBeMade(t *test
 		var expected *diag.Error
 		switch {
 		case c.want == "" && (err == nil || got != nil || errors.As(err, &expected)):
-			// A refused edit is a mistake of the caller, so it must not read as a problem with the map.
 			t.Errorf("%s: got %q, %v, want an error that is not a diag error", c.name, got, err)
 		case c.want != "" && (err != nil || string(got) != c.want):
 			t.Errorf("%s: got %q, %v, want %q", c.name, got, err, c.want)

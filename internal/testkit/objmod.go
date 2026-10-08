@@ -7,8 +7,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// SyntheticMod is one modification of a synthetic modification file. An empty End is the usual end token of four
-// NUL bytes.
 type SyntheticMod struct {
 	Field  string
 	Level  int32
@@ -17,22 +15,17 @@ type SyntheticMod struct {
 	End    string
 }
 
-// SyntheticSet is one set of modifications.
 type SyntheticSet struct {
 	Flag int32
 	Mods []SyntheticMod
 }
 
-// SyntheticObject is one object. Mods is shorthand for one set with flag 0; version 1 and 2 files take exactly one
-// set and write no set fields.
 type SyntheticObject struct {
 	Base, ID string
 	Sets     []SyntheticSet
 	Mods     []SyntheticMod
 }
 
-// BuildModFile encodes a modification file independently of the production code, from the layout seen in the
-// names fixture.
 func BuildModFile(version int32, original, custom []SyntheticObject, kind objmod.TableKind) []byte {
 	var out []byte
 	i32 := func(n int32) { out = binary.LittleEndian.AppendUint32(out, uint32(n)) }

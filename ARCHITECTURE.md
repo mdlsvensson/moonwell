@@ -81,12 +81,11 @@ Three words for the packages:
 
 - An **area** is a package with one job in a build, such as the custom objects or the imported files.
 - A **foundation** is a package that knows nothing of a build: files, errors, a map folder, the manifest.
-- A **door** is an exported function that other packages call. A package has few of them, and the file that holds
-  the main one also holds the package comment.
+- A **door** is an exported function that other packages call. A package has few of them.
 
-Every package opens with a comment of three or four parts: what the package does, what it takes and returns, what
-it must not know, and, where it imports a package of Moonwell, which. `go doc ./internal/build` prints it. Read that
-comment before the code of a package.
+The Go code has no comments: the maintainer had them all removed on 2026-10-08, after 0.11.0, and what is left are
+the lines the compiler reads (`//go:embed`, `//go:build`). What a package does and what it must not know is in the
+table below and in the rest of this document; the code as it was commented is the tag `moonwell@0.11.0`.
 
 ### Commands
 
@@ -248,13 +247,13 @@ the quote to the source, so a step added to `Plan` is a step added here:
 
 ```go
 func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*Result, error) {
-	source, err := Source(p) // maps/<map.folder>, opened one way by every command
-	globals, err := MapGlobals(source) // what the map's war3map.lua defines, read once
+	source, err := Source(p)
+	globals, err := MapGlobals(source)
 
 	objs, err := objects.Plan(source, p.Objects, objects.LoadMetadata())
-	err = writeGenerated(e, source, objs, globals, opts) // the ids module, .moonwell/types and yue
-	synced, err := library.Sync(ctx, e, p.Libraries, p.File) // .moonwell/libraries and library-assets, moonwell.lock
-	program, err := compile(ctx, e, p, synced, globals, opts) // dist/stage/lua, .moonwell/lua
+	err = writeGenerated(e, source, objs, globals, opts)
+	synced, err := library.Sync(ctx, e, p.Libraries, p.File)
+	program, err := compile(ctx, e, p, synced, globals, opts)
 
 	view := source.With(objs.Changes)
 	set, err := settings.Plan(view, p)
@@ -375,11 +374,9 @@ error: an error from the operating system is wrapped into a `*diag.Error` in the
 Three habits follow, and the code keeps them everywhere:
 
 - A user-facing error is made by a named function, such as `errNoMap` or `errHeld`. These functions stand at the
-  bottom of the file that raises them, below a line `// ---- errors ----`. To change the words of an error, search
-  for a few of its words; to see every way a file can fail, scroll to its end.
-- A plain error (`errors.New`, `fmt.Errorf`) appears only where the caller, not the user, made the mistake. A
-  comment beside it says why it is plain, in the words "a plain error" or "not a diag error"; search the code for
-  "plain error" and "diag error" to see them.
+  bottom of the file that raises them. To change the words of an error, search for a few of its words; to see
+  every way a file can fail, scroll to its end.
+- A plain error (`errors.New`, `fmt.Errorf`) appears only where the caller, not the user, made the mistake.
 - A test of an error checks its file, its hint and the words that tell it apart, not the whole sentence. The tests
   of the packages that raise such errors each have a helper, `asError`, that fails the test for an error that is no
   `*diag.Error`.
@@ -509,7 +506,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | I want to | Open |
 | --- | --- |
 | see what `moonwell build` does, in order | `internal/build/build.go`: `Build`, then `Plan`; the longer steps in `internal/build/steps.go` |
-| add a command | `internal/cli/cli.go`: the table `commands`, whose comment says what a new command needs |
+| add a command | `internal/cli/cli.go`: a row in the table `commands`, and a function in a file of the package that the row names |
 | add a flag, or give a command a flag | `internal/cli/cli.go`: an `option` beside `entryOption`, in the `flags` of each row of `commands` that has it, a field of `call` for what the flag says, and a line in `run` that reads it. The flag is also written by hand in the `usage` text of those rows. A flag of `build` and `test` then goes on through `options` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
 | know why a command line is refused | `cobra` refuses it, in its own words: an unknown flag or command, a flag without its value, a wrong number of arguments (the `args` of the row in `commands`). `refusal` in `internal/cli/cli.go` prints it. Only an `--entry` that is no entry is refused by Moonwell, in `run` |
 | change the help text | `internal/cli/cli.go`: the `usage` and `help` of each row of `commands`, the `help` of an `option`, and the `Long` text in `tree`. The layout is `cobra`'s |
@@ -616,8 +613,8 @@ Each row names the file to open and, in most rows, the function to read first.
 
 ## Decisions a reader needs
 
-Each of these is a choice the code depends on. Where a comment in the code says the same at the place it matters,
-the file is named.
+Each of these is a choice the code depends on. Where the choice is made in one place of the code, the file is
+named.
 
 **The order of a build is written once.** `Plan` is the only function that calls the areas in order, and the four
 build commands are `Plan` and one more step. So `check` cannot pass a project that `build` then refuses in a planning

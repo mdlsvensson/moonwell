@@ -11,7 +11,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-// captain is a unit based on the Footman with these properties.
 func captain(properties string) string {
 	return `{"units":{"captain":{"id":"h000","base":"hfoo","properties":` + properties + `}}}`
 }
@@ -44,7 +43,6 @@ var valueCases = []accepted{
 	{"a whole number for a real, and a Boolean for an int",
 		captain(`{"uacq":600,"uhpm":false}`),
 		[]string{"units captain h000 hfoo objects/a.pkl", "  uacq acquisitionRange 0/0 unreal 600", "  uhpm hitPointsMaximumBase 0/0 int 0"}},
-	// Pkl prints the zero below 0 as -0.0. An integer has one zero; a real keeps the sign, as its four bytes do.
 	{"a zero below 0 for an integer is 0",
 		captain(`{"uhpm":-0.0}`),
 		[]string{"units captain h000 hfoo objects/a.pkl", "  uhpm hitPointsMaximumBase 0/0 int 0"}},
@@ -80,13 +78,11 @@ var valueRules = []refused{
 	{name: "a Boolean for a real", document: captain(`{"usca":true}`),
 		at: `units["captain"].properties["usca"]`, says: "expected a number, got true.",
 		hint: "'usca' (Scaling Value) is stored as a real number."},
-	// The escape is written in two parts so that it reaches the JSON as an escape.
 	{name: "a text with a NUL", document: captain(`{"unam":"a\u` + `0000b"}`),
 		at: `units["captain"].properties["unam"]`, says: "the string contains a NUL character.",
 		hint: "Remove it: the game ends strings at NUL."},
 	{name: "a number for a text", document: captain(`{"unam":3}`),
 		at: `units["captain"].properties["unam"]`, says: "expected a string, got 3.", hint: "'unam' (Name) is stored as a string."},
-	// A message has one zero.
 	{name: "a zero below 0 for a text", document: captain(`{"unam":-0.0}`),
 		at: `units["captain"].properties["unam"]`, says: "expected a string, got 0.", hint: "'unam' (Name) is stored as a string."},
 	{name: "a zero below 0 in a list", document: `{"units":{"worker":{"id":"h000","base":"hpea","properties":{"ubui":["htow",-0.0]}}}}`,
@@ -107,16 +103,12 @@ var valueRules = []refused{
 		at: `abilities["holy"].manaCost[1]`, says: `expected an integer, got ["a","b\"c"].`, hint: "stored as an integer."},
 	{name: "a fraction for a Boolean", document: `{"items":{"orb":{"id":"I000","base":"ratf","perishable":2.5}}}`,
 		at: `items["orb"].perishable`, says: "expected a Boolean, got 2.5.", hint: "'iper' (Perishable) is stored as a Boolean (1 or 0)."},
-	// The least number above 0 and the greatest that a message writes the same in every notation.
 	{name: "a fraction of a millionth", document: captain(`{"uhpm":0.000001}`),
 		at: `units["captain"].properties["uhpm"]`, says: "expected an integer, got 0.000001.", hint: storedAsInt},
 	{name: "a number of twenty-one digits", document: captain(`{"uhpm":100000000000000000000}`),
 		at: `units["captain"].properties["uhpm"]`, says: "100000000000000000000 is out of range for an integer.", hint: storedAsInt},
 }
 
-// plainDecimalRules are problems whose message holds a number below 0.000001 or from 1e21, which is written in
-// plain decimal, with every digit and no exponent. They are a table of their own, for the test of that one rule
-// (TestAProblemWritesItsNumberInPlainDecimal).
 var plainDecimalRules = []refused{
 	{name: "a real that a float32 cannot hold", document: captain(`{"uacq":1e39}`),
 		at: `units["captain"].properties["uacq"]`, says: "1000000000000000000000000000000000000000 is out of range for a real number.",
@@ -142,8 +134,6 @@ func TestAProblemWritesItsNumberInPlainDecimal(t *testing.T) {
 	runRefused(t, plainDecimalRules)
 }
 
-// unitWith is a unit based on the Footman with one property: a value that no JSON can hold reaches Resolve only
-// in objects built by hand.
 func unitWith(key string, value any) manifest.Objects {
 	captain := manifest.Object{ID: "h000", Base: "hfoo", Source: "objects/units.pkl"}
 	captain.Properties.Set(key, value)
@@ -174,14 +164,12 @@ func TestARealThatAFloat32CannotHoldIsAProblemAndIsNotResolved(t *testing.T) {
 			}
 		})
 	}
-	// An infinity is no integer either, and no count of levels.
 	resolved, err := objects.Resolve(mini, unitWith("uhpm", math.Inf(1)), nil)
 	if found := problemsOf(t, resolved, err); len(found) != 1 || !strings.Contains(found[0].Msg, "expected an integer, got +Inf.") {
 		t.Errorf("an infinite integer: %+v", found)
 	}
 }
 
-// oneProblem resolves objects built by hand, which must give one problem, in the file of unitWith.
 func oneProblem(t *testing.T, built manifest.Objects) (msg, hint string) {
 	t.Helper()
 	resolved, err := objects.Resolve(mini, built, nil)
@@ -193,7 +181,6 @@ func oneProblem(t *testing.T, built manifest.Objects) (msg, hint string) {
 }
 
 func TestATextThatIsNotUTF8IsAProblemAndIsNotResolved(t *testing.T) {
-	// "\xff" is a byte that no UTF-8 text holds, and "\xc3" the first of two bytes without the second.
 	for _, c := range []struct {
 		name  string
 		key   string
@@ -216,8 +203,6 @@ func TestATextThatIsNotUTF8IsAProblemAndIsNotResolved(t *testing.T) {
 }
 
 func TestAValueOfAShapeTheSchemaForbidsIsAProblemThatShowsIt(t *testing.T) {
-	// Pkl lets through no object and no null in a list, so these reach Resolve only in objects built by hand. An
-	// object is shown with its keys sorted and its texts as they are.
 	object := map[string]any{"b": []any{1.0, nil, true}, "a": "x<y & \"z\""}
 	const shown = `{"a":"x<y & \"z\"","b":[1,null,true]}`
 	for _, c := range []struct {
@@ -242,13 +227,11 @@ func TestAValueOfAShapeTheSchemaForbidsIsAProblemThatShowsIt(t *testing.T) {
 	}
 }
 
-// objectFiles is the file the objects of each category are appended to.
 var objectFiles = map[manifest.Category]string{
 	"heroes": "war3map.w3u", "units": "war3map.w3u", "buildings": "war3map.w3u", "items": "war3map.w3t",
 	"abilities": "war3map.w3a", "buffs": "war3map.w3h", "upgrades": "war3map.w3q",
 }
 
-// appendable is the resolved objects as objmod appends them, each number in the type its file stores.
 func appendable(t *testing.T, resolved []objects.Resolved) []objmod.NewObject {
 	t.Helper()
 	id := func(text string) objmod.ID {
@@ -282,8 +265,6 @@ func appendable(t *testing.T, resolved []objects.Resolved) []objmod.NewObject {
 }
 
 func TestWhatResolveAcceptsCanBeAppendedToAnObjectFile(t *testing.T) {
-	// The objects of each category go to their own file: the files of units, items and buffs store no level and no
-	// column, and refuse a value that has one.
 	appended := map[string]int{}
 	check := func(name string, resolved []objects.Resolved, err error) {
 		t.Helper()
@@ -308,7 +289,6 @@ func TestWhatResolveAcceptsCanBeAppendedToAnObjectFile(t *testing.T) {
 			t.Errorf("no object was appended to %s", file)
 		}
 	}
-	// The greatest and the least real a float32 holds, and the numbers between that round to them.
 	for _, real := range []float64{math.MaxFloat32, -math.MaxFloat32, math.Nextafter(math.MaxFloat32, 0), math.SmallestNonzeroFloat64} {
 		resolved, err := objects.Resolve(mini, unitWith("uacq", real), nil)
 		check("a real at the edge", resolved, err)

@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-// settingsOf is the settings of a manifest whose settings block is the document.
 func settingsOf(t *testing.T, document string) Settings {
 	t.Helper()
 	return decoded(t, printed(`"settings":`+document), "moonwell.pkl").Settings
@@ -145,7 +144,6 @@ func TestSlotsComeInTheOrderOfTheirNumbers(t *testing.T) {
 	}
 }
 
-// Pkl prints a slot as a text, "0" to "23". It is read as the number it is.
 func TestTheSlotsOfPlayersAndForcesAreReadAsNumbers(t *testing.T) {
 	s := settingsOf(t, `{"players":{"10":{"name":"k"},"2":{"name":"c"},"0":{"name":"a"}},"forces":{"11":{},"3":{}}}`)
 	if got := Slots(s.Players); !slices.Equal(got, []int{0, 2, 10}) {

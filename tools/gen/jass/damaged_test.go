@@ -12,9 +12,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/jass"
 )
 
-// scriptsOfTheTests are the scripts that the tests of this package keep in their constants and lists, the ones
-// that are read and the ones that are refused, each with a name for a failure. A script that a test writes in
-// its own body is not among them.
 func scriptsOfTheTests() map[string]string {
 	named := map[string]string{
 		"common": common, "blizzard": blizzard, "corners": corners, "indented": indented,
@@ -29,11 +26,8 @@ func scriptsOfTheTests() map[string]string {
 	return named
 }
 
-// outcomes counts the damaged scripts that were read and the ones that were refused.
 type outcomes struct{ read, refused int }
 
-// longerScripts are scripts of this file's own, longer than the ones of the tests, with what a script of the
-// game has side by side: carriage returns, comments, a globals block, natives and functions with bodies.
 var longerScripts = map[string]string{
 	"types, globals and natives": "// first\r\ntype agent extends handle\r\n" +
 		"type unit   extends agent // a unit\r\n\r\nglobals\r\n    constant integer MAX = 24\r\n" +
@@ -49,20 +43,12 @@ var longerScripts = map[string]string{
 		"function F takes integer a returns nothing\n",
 }
 
-// damageSeed is the seed of the changes that TestADamagedScriptIsReadOrRefusedByFileAndLineAndNeverPanics makes.
-// A failure names the script and the index of the change: testkit.Changed makes the same text of the three
-// again.
 const damageSeed = 2003
 
-// damagedFile is the name the test gives Parse for its errors.
 const damagedFile = "scripts/damaged.j"
 
-// byteOrderMark is U+FEFF in UTF-8, which is text to Parse.
 const byteOrderMark = "\xEF\xBB\xBF"
 
-// readOrRefused gives Parse the text. It stops the test when Parse panics, when it returns declarations with an
-// error, and when the error does not start with the file and a line of the text; the error for a globals block
-// that the script never ends names the file alone.
 func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 	t.Helper()
 	var file jass.File
@@ -87,10 +73,6 @@ func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 	}
 }
 
-// TestADamagedScriptIsReadOrRefusedByFileAndLineAndNeverPanics gives Parse the scripts of the tests and the
-// longer scripts of this file, each cut at every length, after each of 60 seeded changes of its lines, quotes
-// and white space, a byte order mark before every third, and with one character of ASCII white space put in at
-// every place.
 func TestADamagedScriptIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 	named := scriptsOfTheTests()
 	maps.Copy(named, longerScripts)
@@ -111,7 +93,6 @@ func TestADamagedScriptIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) 
 			damaged.readOrRefused(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
 		}
 	}
-	// The floor is against a test that passes because it gave Parse nothing.
 	if damaged.read == 0 || damaged.refused == 0 {
 		t.Errorf("%d damaged scripts were read and %d refused; want some of each", damaged.read, damaged.refused)
 	}

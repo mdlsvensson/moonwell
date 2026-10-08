@@ -8,11 +8,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-// These tests run a bundle in real Lua, the one inside the YueScript compiler, on a stand-in for a map's script.
-// Each test is a run of Lua or a few.
-
-// standInMap is a map's script as far as a bundle needs one: it keeps what is logged and what is printed, and
-// defines config and main, which log that they ran.
 const standInMap = `LOG = {}
 PRINTED = {}
 print = function(...) local parts = {} for i = 1, select('#', ...) do parts[#parts + 1] = tostring((select(i, ...))) end PRINTED[#PRINTED + 1] = table.concat(parts, ' ') end
@@ -21,16 +16,8 @@ function config() log('config') end
 function main() log('main') end
 `
 
-// asTheGame comes after the bundle: it calls config and main as the game does, and then writes what was logged
-// on one line and what was printed below it.
 const asTheGame = "\nconfig()\nmain()\nio.write(table.concat(LOG, '|'), '\\n', table.concat(PRINTED, '\\n'), '\\n')\n"
 
-// runOn places the program in a map with the script, runs the map as the game does, and returns what was logged
-// and what was printed.
-//
-// The script is run under the name the runtime looks for in the position of an error. One that starts with a
-// byte order mark is run by a file beside it, through Lua's dofile, which reads a file past its mark: the Lua
-// inside the compiler takes the file it is handed as it is, mark and all.
 func runOn(t *testing.T, script string, program *Program) (log, printed string) {
 	t.Helper()
 	change := placed(t, mapOf(t, "war3map.lua", script), program)
@@ -43,7 +30,6 @@ func runOn(t *testing.T, script string, program *Program) (log, printed string) 
 	return log, printed
 }
 
-// runMap is runOn for the stand-in map.
 func runMap(t *testing.T, program *Program) (log, printed string) {
 	t.Helper()
 	return runOn(t, standInMap, program)
@@ -123,8 +109,6 @@ func TestHookRegistrationRejectsNonFunctions(t *testing.T) {
 	}
 }
 
-// TestAnErrorIsMappedToItsLineWhateverTheLineEndsOfTheScript runs the same program on scripts that end their
-// lines in other ways: the lines of the modules are counted from the line the bundle starts on.
 func TestAnErrorIsMappedToItsLineWhateverTheLineEndsOfTheScript(t *testing.T) {
 	program := byHand(false,
 		ofSrc("main", "local lib = require(\"lib\")\nlocal x = 1\n\nlib.fail()\n"),

@@ -18,9 +18,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// These tests run no compiler, but for the two at the end, which list the globals of a source with the real one.
-
-// smallAPI is a game API of a few names.
 func smallAPI() *Natives {
 	api := &Natives{
 		GameVersion: "9.9.9",
@@ -35,9 +32,6 @@ func smallAPI() *Natives {
 	return api
 }
 
-// listing stands in for the compiler where the globals of sources are listed: `yue -g --path <search> <file>`
-// prints printed[<the source's path from the project folder>], and the arguments of each run are kept. A run
-// with other arguments fails the test.
 type listing struct {
 	t       *testing.T
 	root    string
@@ -58,7 +52,6 @@ func (l *listing) run(_ context.Context, _ string, args []string, _ env.RunOptio
 	return l.printed[l.sourceOf(args)], nil
 }
 
-// sourceOf is the source of a run, its last argument, as a path from the project folder with "/".
 func (l *listing) sourceOf(args []string) string {
 	below, err := filepath.Rel(l.root, args[len(args)-1])
 	if err != nil {
@@ -67,7 +60,6 @@ func (l *listing) sourceOf(args []string) string {
 	return filepath.ToSlash(below)
 }
 
-// ran is the sources the compiler was run on since this was last asked, sorted.
 func (l *listing) ran() []string {
 	l.guard.Lock()
 	defer l.guard.Unlock()
@@ -80,7 +72,6 @@ func (l *listing) ran() []string {
 	return sources
 }
 
-// prints is a run that ends well and prints text.
 func prints(text string) env.RunResult { return env.RunResult{Stdout: text} }
 
 func TestDeclaredGlobalsReadsTheNamesOnGlobalLines(t *testing.T) {
@@ -107,7 +98,7 @@ func TestDeclaredGlobalsReadsTheNamesOnGlobalLines(t *testing.T) {
 		"global a\nglobal b":               {"a", "b"},
 		"global a -- b, c":                 {"a"},
 		"global a, 1b, c.d, e":             {"a", "e"},
-		"global class":                     {"class"}, // a keyword without what it leads is a name as any other
+		"global class":                     {"class"},
 		"global const":                     {"const"},
 		"global class 9":                   nil,
 		"global class Boss2(x)":            {"Boss2"},
@@ -116,7 +107,7 @@ func TestDeclaredGlobalsReadsTheNamesOnGlobalLines(t *testing.T) {
 		"global a = b == c":                {"a"},
 		"-- global a":                      nil,
 		"x = 1; global a":                  nil,
-		"global a\rglobal b":               nil, // a carriage return alone ends no line, and a line with one names nothing
+		"global a\rglobal b":               nil,
 		"global a\r\n\r\nglobal b = 1\r\n": {"a", "b"},
 	} {
 		if got := declaredGlobals(source); !slices.Equal(got, want) {
@@ -126,8 +117,6 @@ func TestDeclaredGlobalsReadsTheNamesOnGlobalLines(t *testing.T) {
 }
 
 func TestAGlobalLineIsReadWithWhiteSpaceOfASCIIOnly(t *testing.T) {
-	// White space is " \t\n\v\f\r" and a line ends at "\n" or "\r\n": a character outside ASCII is part of the
-	// text it stands in, and no name has one.
 	for source, want := range map[string][]string{
 		"global" + noBreakSpace + "x = 1":       nil,
 		wideSpace + "global x":                  nil,
@@ -144,15 +133,12 @@ func TestAGlobalLineIsReadWithWhiteSpaceOfASCIIOnly(t *testing.T) {
 }
 
 func TestAGlobalLineInABlockCommentOrALongStringDeclaresItsNames(t *testing.T) {
-	// A source is read line by line, and not as YueScript: a line that starts with `global` declares its names
-	// wherever it stands, so a name that only a comment or a string declares is known, and its uses are not
-	// reported.
 	for source, want := range map[string][]string{
 		"--[[\nglobal Zzz\n]]\nprint Zzz\n":     {"Zzz"},
 		"text = [[\n  global a, b = 1, 2\n]]\n": {"a", "b"},
 		"--[==[\nglobal class Boss\n]==]\n":     {"Boss"},
 		"x = [[\nglobal Yyy = 1 ]]\n":           {"Yyy"},
-		"-- global Commented\n":                 nil, // a comment that starts the line is no `global` line
+		"-- global Commented\n":                 nil,
 	} {
 		if got := declaredGlobals(source); !slices.Equal(got, want) {
 			t.Errorf("declaredGlobals(%q) = %q, want %q", source, got, want)
@@ -167,7 +153,6 @@ func TestKnownGlobalsJoinsTheNativesTheMapDeclaredNamesAndLintGlobals(t *testing
 	if names := slices.Sorted(maps.Keys(known)); !slices.Equal(names, want) {
 		t.Errorf("knownGlobals = %q", names)
 	}
-	// A global the game removes is not known.
 	if without := knownGlobals(smallAPI(), nil, nil, nil); without["udg_Score"] || without["io"] || len(without) != 5 {
 		t.Errorf("without a map: %v", without)
 	}
@@ -183,7 +168,6 @@ func TestUnknownGlobalProblemsReportsEveryUnknownUseInFileLineAndColumnOrder(t *
 			{Name: "io", Line: 2, Column: 1},
 		},
 		"src/a.yue": {{Name: "Zzz", Line: 9, Column: 1}},
-		// By bytes, a capital letter comes before every small one.
 		"src/B.yue": {{Name: "Zzz", Line: 1, Column: 1}},
 	}, known, smallAPI().Lua.Removed)
 	want := []diag.Problem{
@@ -205,8 +189,6 @@ func TestUnknownGlobalProblemsReportsEveryUnknownUseInFileLineAndColumnOrder(t *
 }
 
 func TestTheHintNamesAtMostThreeCloseNamesNearestFirstAndEachOnce(t *testing.T) {
-	// A name that is known for two reasons is one name, and close names come nearest first, then by bytes,
-	// whatever order the known names are gathered in.
 	known := knownGlobals(smallAPI(), nil, []string{"Unit1", "Unit2", "unit3", "Unit4", "CreateUnit"}, []string{"Unit2", "Units"})
 	problems := unknownGlobalProblems(map[string][]globalUse{"src/main.yue": {{Name: "Unit", Line: 1, Column: 1}}}, known, nil)
 	want := "Did you mean Unit1, Unit2 or Unit4? " + unknownGlobalHint
@@ -215,9 +197,6 @@ func TestTheHintNamesAtMostThreeCloseNamesNearestFirstAndEachOnce(t *testing.T) 
 	}
 }
 
-// checkBench is a check of modules that are values. Its compiler is a listing, and nothing is written under
-// src/: the sources reach the check through the texts the compile read, so the check must not read the files
-// again.
 type checkBench struct {
 	t       *testing.T
 	world   *env.Env
@@ -229,9 +208,6 @@ type checkBench struct {
 	modules []Module
 }
 
-// checkOf is a check of YueScript modules of src/, given as pairs of a path below src/ and a text, for which
-// `yue -g` prints printed[<path below src/>]; of Lua modules, given as their texts; and of the map's script,
-// "" for a map without one.
 func checkOf(t *testing.T, sources []string, printed map[string]string, lint manifest.Lint, mapScript string, luaTexts ...string) *checkBench {
 	t.Helper()
 	root := t.TempDir()
@@ -329,7 +305,6 @@ func TestTheCheckWarnsAboutAtMost20UsesThenHowManyMore(t *testing.T) {
 		!strings.HasPrefix(lines[19], "warning: src/main.yue:20:1 ") {
 		t.Errorf("%d problems, %v; log %q", len(problems), err, lines)
 	}
-	// Exactly as many as are shown have no line that counts the rest.
 	b = checkOf(t, []string{"main.yue", ""}, map[string]string{"main.yue": strings.Join(uses[:20], "\n")}, manifest.Lint{UnknownGlobals: "warning"}, "")
 	if problems, err := b.check(); err != nil || len(problems) != 20 || len(b.log.Lines()) != 20 {
 		t.Errorf("of 20 uses: %d problems, %v; log %q", len(problems), err, b.log.Lines())
@@ -339,13 +314,10 @@ func TestTheCheckWarnsAboutAtMost20UsesThenHowManyMore(t *testing.T) {
 func TestOnlyTheProjectsOwnYueScriptIsListedAndEveryReachedModuleDeclares(t *testing.T) {
 	b := checkOf(t, []string{"main.yue", "print Shared, Count, Nothing\n"}, map[string]string{"main.yue": "print 1 1\nShared 1 7\nCount 1 15\nNothing 1 22\n"},
 		asErrors, "", "Count = 0\n")
-	// A library's YueScript declares globals as the project's own does, and its uses are the library's to check.
 	loud := inLibrary("ex", "kit/loud.yue")
 	b.output.texts[loud], b.output.hashes[loud] = "global Shared = Undefined\n", "h-loud"
 	b.modules = append(b.modules, Module{Name: "kit.loud", Path: loud, Kind: Yue, Library: "ex"})
-	// A module that is reached under two names is listed once.
 	b.modules = append(b.modules, Module{Name: "main.again", Path: "src/main.yue", Kind: Yue})
-	// A text the compile read for a module the entry does not reach declares nothing.
 	b.output.texts["src/unreached.yue"], b.output.hashes["src/unreached.yue"] = "global Nothing = 1\n", "h-unreached"
 	_, err := b.check()
 	want := diag.Problems{{File: "src/main.yue", Line: 1, Column: 22, Msg: "Unknown global Nothing.", Hint: unknownGlobalHint}}
@@ -366,8 +338,6 @@ func TestASourceTheCompilerCannotListFailsTheCheckBeforeAnyProblem(t *testing.T)
 		t.Errorf("the check gave %+v, %+v", problems, failure)
 	}
 }
-
-// ---- with the real compiler ----
 
 func TestListUsesReadsWhatTheRealCompilerPrints(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", "global Score = 0\nprint CreatUnit!\nx = math.floor 1.5\nprint Score, x\n"))

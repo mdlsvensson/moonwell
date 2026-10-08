@@ -4,10 +4,6 @@ import (
 	"slices"
 )
 
-// The settings documents that the recorded test plans, and patches every script for. Each is a settings block as
-// pkl prints it.
-
-// Documents for the map info: its texts, a player, a force and the environment, mostly one at a time.
 var mapInfoDocuments = []string{
 	`{"loadingScreen":{"model":"Loading.mdx","text":"Text","title":"Title","subtitle":"Subtitle"}}`,
 	`{"environment":{"soundEnvironment":"Dungeon","waterColor":[255,0,0,255],` +
@@ -34,7 +30,6 @@ var mapInfoDocuments = []string{
 	`{"forces":{"0":{"name":"F"}}}`,
 }
 
-// Documents for the two text files.
 var textDocuments = []string{
 	`{"gameInterface":{"Misc":{"MaxHeroLevel":"25","Added":"0"},"CustomSkin":{"Text":""}}}`,
 	`{"gameInterface":{"Misc":{"FoodCeiling":"0"}}}`,
@@ -49,8 +44,6 @@ var textDocuments = []string{
 	`{"gameInterface":{"New":{"K":"v"}}}`,
 }
 
-// Documents for the plan: the settings of each file alone and together, what sets nothing, and a preview of each
-// kind.
 var planDocuments = []string{
 	`{"info":{"name":"Planned"},"gameplay":{"foodLimit":200}}`,
 	`{"info":{"name":"Not written"},"players":{"5":{"name":"Absent"}}}`,
@@ -92,7 +85,6 @@ var planDocuments = []string{
 		"gameInterface":{"CustomSkin":{"Test":"value"}}}`,
 }
 
-// Documents for the script: each setting with a counterpart in war3map.lua, alone and beside others.
 var luaDocuments = []string{
 	`{
 		"info":{"name":"A \"quoted\" map\n` + "\xe9\x9b\xaa" + `"},
@@ -137,8 +129,6 @@ var luaDocuments = []string{
 	`{"environment":{"fog":{"enabled":false,"density":0}}}`,
 }
 
-// Documents at the edges of what the schema takes: a null, an empty text, a zero, the least and the most of each
-// number, each controller, each race, and each flag of a force turned off.
 func optionDocuments() []string {
 	documents := []string{
 		`{"info":{"name":null},"players":{"23":{"name":null}},"environment":{"fog":{}}}`,
@@ -171,10 +161,7 @@ func optionDocuments() []string {
 	return documents
 }
 
-// Documents that each set every setting that some map info can take, and documents with more than one thing to
-// refuse.
 var everyDocuments = []string{
-	// Every setting there is, for the player and the force that every map with players and forces has.
 	`{"info":{"name":"Every \"setting\"","author":"An author","description":"One|nTwo","recommendedPlayers":"2-4",
 			"preview":"preview.tga"},
 		"loadingScreen":{"background":3,"model":"Loading\\Screen.mdx","text":"Text","title":"Title",
@@ -188,14 +175,10 @@ var everyDocuments = []string{
 		"gameplay":{"heroMaxLevel":20,"foodLimit":150},
 		"gameplayConstants":{"Misc":{"DefenseArmor":"0.05"},"Other":{"Key":""}},
 		"gameInterface":{"FrameDef":{"UPKEEP_NONE":"No upkeep"},"CustomSkin":{"A":"b"}}}`,
-	// Every setting that a map info of any version from 25 holds.
 	`{"info":{"name":"","author":"A","description":"D","recommendedPlayers":"Any","preview":"art/p.png"},
 		"loadingScreen":{"background":-1,"model":"","text":"","title":"T","subtitle":"S"}}`,
-	// Every setting that a map info of any version holds.
 	`{"info":{"name":"N","author":"A","description":"","recommendedPlayers":""},
 		"loadingScreen":{"background":0,"text":"Text","title":"","subtitle":""}}`,
-	// Every setting of the players and the forces of the fixture, written out of slot order, with the alliance
-	// flags turned the other way.
 	`{"players":{"11":{"name":"Last","controller":"rescuable","race":"undead","fixedStart":true,"x":1.5,"y":-2.5},
 			"1":{"name":"Second","controller":"neutral","race":"human","fixedStart":false,"x":0,"y":0},
 			"0":{"name":"","controller":"user","race":"selectable","fixedStart":true,"x":-0.0,"y":3e-7}},
@@ -205,9 +188,7 @@ var everyDocuments = []string{
 				"sharedAdvancedControl":true}},
 		"environment":{"soundEnvironment":"","waterColor":[0,0,0,0],
 			"fog":{"enabled":false,"style":0,"start":-10,"end":-10,"density":0,"color":[0,0,0,0]}}}`,
-	// Overrides with nothing set beside ones that set something, for slots the maps lack.
 	`{"players":{"23":{},"0":{"name":"Hero"},"9":{"name":null}},"forces":{"7":{},"0":{"sharedControl":true}}}`,
-	// The first of several refusals: a player, then a force, then the fog.
 	`{"environment":{"fog":{"start":2,"end":1}},"forces":{"9":{"name":"F"},"3":{"name":"F"}},
 		"players":{"10":{"name":"P"},"2":{"name":"P"}}}`,
 	`{"environment":{"fog":{"start":2,"end":1}},"forces":{"9":{"name":"F"},"3":{"name":"F"}}}`,
@@ -216,16 +197,11 @@ var everyDocuments = []string{
 	`{"environment":{"fog":{"end":999.5}}}`,
 }
 
-// documents is every document above.
 func documents() []string {
 	return slices.Concat(mapInfoDocuments, textDocuments, planDocuments, luaDocuments, optionDocuments(),
 		everyDocuments)
 }
 
-// constantDocuments pairs each typed gameplay constant, and both, and none, with raw constants: none at all, or a
-// Misc section in each of three spellings that holds no key of a typed constant, or such a key in one of three
-// spellings with a value that is the typed one or another. The section before Misc holds a key of a typed
-// constant too, and is left alone.
 func constantDocuments() []string {
 	var documents []string
 	for _, typed := range []string{``, `"foodLimit":200`, `"heroMaxLevel":25`, `"heroMaxLevel":25,"foodLimit":200`} {
@@ -243,7 +219,6 @@ func constantDocuments() []string {
 	return documents
 }
 
-// The documents that are refused for names that differ only in letter case.
 var duplicateDocuments = []string{
 	`{"gameplayConstants":{"Misc":{},"misc":{}}}`,
 	`{"gameInterface":{"Frame":{"X":"a","x":"b"}}}`,
@@ -252,23 +227,17 @@ var duplicateDocuments = []string{
 	`{"gameInterface":{"A":{"k":"1","K":"2"},"a":{}}}`,
 	`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"},"MISC":{}}}`,
 	`{"gameplayConstants":{"A":{"B":"1"},"a":{"B":"1","b":"2"}}}`,
-	// Two spellings in the interface beside a typed constant that disagrees with a raw one, and two spellings in
-	// both blocks: which refusal is the one told.
 	`{"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"}},` +
 		`"gameInterface":{"A":{},"a":{}}}`,
 	`{"gameInterface":{"A":{},"a":{}},"gameplayConstants":{"Misc":{"Key":"1","KEY":"2"}}}`,
 }
 
-// The documents with a zero below 0: set as one, or what the map info keeps of a number too small for it.
 var zeroDocuments = []string{
 	`{"players":{"0":{"x":-0.0,"y":0}}}`,
 	`{"players":{"0":{"x":1e-46,"y":-1e-46}}}`,
 	`{"environment":{"fog":{"enabled":true,"start":-0.0,"end":-0.0,"density":-0.0,"color":[1,2,3,4]}}}`,
 }
 
-// The documents with a number below 0.000001 in size, which a script takes in plain decimal, beside the one among
-// everyDocuments; and after them documents with such a number that no script takes: of a fog that is not shown,
-// and of a player whose position is not set.
 var apartDocuments = []string{
 	`{"players":{"0":{"x":0.000001}}}`,
 	`{"players":{"1":{"x":7},"11":{"y":-0.0000001}}}`,
@@ -277,23 +246,17 @@ var apartDocuments = []string{
 	`{"environment":{"fog":{"density":1e-7}}}`,
 }
 
-// scriptDocuments is the documents that every script is patched for.
 func scriptDocuments() []string {
 	return slices.Concat(documents(), zeroDocuments, apartDocuments)
 }
 
-// routeDocuments is one document for each way through a plan: the settings of each file alone and together, a
-// preview of each kind alone and beside other settings, and what is refused before the map is read, by the map
-// info, and by neither.
 var routeDocuments = []string{
 	`{}`,
 	`{"info":{"author":"Someone"},"loadingScreen":{"title":"T"}}`,
 	`{"info":{"name":"Planned"},"gameplay":{"foodLimit":200}}`,
 	`{"environment":{"soundEnvironment":"Mountains"}}`,
-	// A force's name is stored in the map info alone, and the script is read all the same.
 	`{"forces":{"0":{"name":"Blue"}}}`,
 	`{"players":{"5":{"name":"Absent"}}}`,
-	// The text files of sourceMaps hold this constant, and lack the interface's key.
 	`{"gameplay":{"foodLimit":100}}`,
 	`{"gameInterface":{"A":{"B":"c"}}}`,
 	`{"gameplayConstants":{"Empty":{}},"gameInterface":{"Empty":{}}}`,

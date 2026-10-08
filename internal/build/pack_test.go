@@ -13,12 +13,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// ---- what the tests of the archive are made of ----
-
-// mapLabel is how the map of these tests is named in errors.
 const mapLabel = "maps/map.w3x"
 
-// mapInfo is the start of a war3map.w3i of a format version, saved by a game of a version.
 func mapInfo(version int32, major, minor uint32) string {
 	info := make([]byte, 64)
 	binary.LittleEndian.PutUint32(info[0:], uint32(version))
@@ -27,10 +23,8 @@ func mapInfo(version int32, major, minor uint32) string {
 	return string(info)
 }
 
-// modernInfo is the war3map.w3i of a map that is packed without a header before the archive.
 var modernInfo = mapInfo(39, 3, 0)
 
-// viewOf opens a map folder that holds the files, each named with "/".
 func viewOf(t testing.TB, files map[string]string) *mapdir.Folder {
 	t.Helper()
 	dir := filepath.Join(t.TempDir(), "maps", "map.w3x")
@@ -47,7 +41,6 @@ func viewOf(t testing.TB, files map[string]string) *mapdir.Folder {
 	return view
 }
 
-// smallMap is a map with its info, its script and one imported file.
 func smallMap(info string) map[string]string {
 	return map[string]string{
 		"war3map.w3i":           info,
@@ -56,7 +49,6 @@ func smallMap(info string) map[string]string {
 	}
 }
 
-// opened is an archive as a reader of it, which must find one.
 func opened(t testing.TB, archive []byte) *testkit.MPQ {
 	t.Helper()
 	reader, err := testkit.OpenMPQ(archive)
@@ -66,7 +58,6 @@ func opened(t testing.TB, archive []byte) *testkit.MPQ {
 	return reader
 }
 
-// fileOf is a file of an archive, which must hold it.
 func fileOf(t testing.TB, archive *testkit.MPQ, name string) string {
 	t.Helper()
 	data, found, err := archive.Read(name)
@@ -76,7 +67,6 @@ func fileOf(t testing.TB, archive *testkit.MPQ, name string) string {
 	return string(data)
 }
 
-// namesIn is the names an archive lists, in its order.
 func namesIn(t testing.TB, archive *testkit.MPQ) []string {
 	t.Helper()
 	names, err := archive.Listfile()
@@ -86,7 +76,6 @@ func namesIn(t testing.TB, archive *testkit.MPQ) []string {
 	return names
 }
 
-// packedOf is the archive of a view, which must be packed.
 func packedOf(t testing.TB, view *mapdir.Folder, name string) []byte {
 	t.Helper()
 	archive, err := pack(view, name)
@@ -95,8 +84,6 @@ func packedOf(t testing.TB, view *mapdir.Folder, name string) []byte {
 	}
 	return archive
 }
-
-// ---- pack ----
 
 func TestPackWritesAHeaderlessArchiveForModernMapsWithBackslashPaths(t *testing.T) {
 	archive := opened(t, packedOf(t, viewOf(t, smallMap(modernInfo)), "map"))
@@ -153,7 +140,6 @@ func TestPackSkipsStaleArchiveMetadataFromTheMapFolder(t *testing.T) {
 	files["(attributes)"] = "stale"
 	files["(ListFile)"] = "stale\r\n"
 	files["(SIGNATURE)"] = "stale"
-	// A file of that name below a folder is a file of the map as any other.
 	files["war3mapImported/(signature)"] = "kept"
 	archive := opened(t, packedOf(t, viewOf(t, files), "map"))
 	for _, name := range []string{"(attributes)", "(signature)"} {
@@ -167,8 +153,6 @@ func TestPackSkipsStaleArchiveMetadataFromTheMapFolder(t *testing.T) {
 	}
 }
 
-// The archive is packed from the view, not from a folder on disk: it holds what the plan writes, without what
-// the plan removes, though no stage was written.
 func TestPackPacksThePlannedViewAndNotWhatIsOnDisk(t *testing.T) {
 	view := viewOf(t, smallMap(modernInfo)).With([]mapdir.Change{
 		{Name: "war3map.lua", Bytes: []byte("function main() end -- bundled")},
@@ -188,8 +172,6 @@ func TestPackPacksThePlannedViewAndNotWhatIsOnDisk(t *testing.T) {
 	}
 }
 
-// The order of the archive's files is that of Folder.Files: each folder's entries by the bytes of their names,
-// a folder's files where the folder stands, and then the files the plan adds, in the order they were planned.
 func TestPackKeepsTheOrderOfTheViewsFiles(t *testing.T) {
 	files := smallMap(modernInfo)
 	files["Zeta.txt"] = "upper case sorts first"
@@ -216,8 +198,6 @@ func TestPackKeepsTheOrderOfTheViewsFiles(t *testing.T) {
 		t.Errorf("the archive lists %q, want %q", names, want)
 	}
 }
-
-// ---- a map that is too large ----
 
 func TestTheRefusalsOfAMapThatIsTooLargeNameTheFileOrTheMap(t *testing.T) {
 	view := viewOf(t, map[string]string{"War3Map.w3i": modernInfo})

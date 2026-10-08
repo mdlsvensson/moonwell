@@ -12,15 +12,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/imp"
 )
 
-// indexFile is the name the tests give Read for its errors.
 const indexFile = "maps/map.w3x/war3map.imp"
 
-// index is the bytes of a war3map.imp: the version, the count, and whatever follows them.
 func index(version, count uint32, rest ...[]byte) []byte {
 	return testkit.Concat(testkit.U32(version), testkit.U32(count), testkit.Concat(rest...))
 }
 
-// entry is the bytes of one entry: its flag, its path and the NUL that ends the path.
 func entry(flag uint8, path string) []byte {
 	return testkit.Concat([]byte{flag}, []byte(path), []byte{0})
 }
@@ -73,7 +70,6 @@ func TestMapPathIsUnderTheImportedFolderUnlessTheFlagSaysCustomPath(t *testing.T
 }
 
 func TestWorldEditor300sFlag29IsACustomPath(t *testing.T) {
-	// Moonwell wrote this entry with flag 13; World Editor 3.00 saved it back with flag 29.
 	saved := testkit.Fixture(t, "imports-we3/war3map-flag29.imp")
 	entries, err := imp.Read(saved, indexFile)
 	if err != nil || !slices.Equal(entries, []imp.Entry{{Flag: 29, Path: "wa3mapPreview.tga"}}) {
@@ -125,8 +121,6 @@ func TestReadRefusesCorruptDataNamingTheFile(t *testing.T) {
 	}
 }
 
-// The bytes of a path are the name of a file inside the map, and are written back as they were read: so Read
-// hands them over as they are, and a byte order mark at the start of a path is part of that name.
 func TestReadKeepsAByteOrderMarkAtTheStartOfAPath(t *testing.T) {
 	for _, path := range []string{"\xEF\xBB\xBFa.blp", "\xEF\xBB\xBF", "a\xEF\xBB\xBF.blp"} {
 		read, err := imp.Read(index(1, 1, entry(imp.CustomPath, path)), indexFile)
@@ -140,7 +134,6 @@ func TestReadKeepsAByteOrderMarkAtTheStartOfAPath(t *testing.T) {
 	}
 }
 
-// Write is given entries by code that has checked them, and writes whatever it is given.
 func TestWriteDoesNotCheckWhatItWrites(t *testing.T) {
 	written := imp.Write([]imp.Entry{{Flag: 7, Path: ""}})
 	if want := index(1, 1, entry(7, "")); !bytes.Equal(written, want) {

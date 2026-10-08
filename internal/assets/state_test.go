@@ -11,13 +11,11 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// Two hashes a state file can hold.
 var (
 	zeros  = strings.Repeat("0", 64)
 	sevens = strings.Repeat("7", 64)
 )
 
-// stateOf is a project of its own whose state file holds content: its folder.
 func stateOf(t *testing.T, content string) string {
 	t.Helper()
 	root := t.TempDir()
@@ -38,8 +36,6 @@ func TestStateFileIsUnderAssetStateByTheMapFoldersNameFromTheProjectFolder(t *te
 	}
 }
 
-// A link on the way to the state file is refused where the file is named, where it is read and where it is
-// written, each time by the state file's name from the project folder.
 func TestALinkOnTheWayToTheStateFileIsRefusedByTheStateFilesName(t *testing.T) {
 	s := newSite(t)
 	put(t, s.root, "assets/a.blp")
@@ -120,7 +116,6 @@ func TestReadStateRefusesAFileThatIsNotAStateAndNamesIt(t *testing.T) {
 			"A.BLP is listed twice."},
 		{"a path listed twice by its separator", `{"version":1,"files":{"t/a.blp":` + valid + `,"t\\a.blp":` + valid + `}}`,
 			`t\a.blp is listed twice.`},
-		// A forged state cannot make assets:sync remove one of the map's own files.
 		{"one of the map's own files", entry(`"war3map.lua"`, valid), "Reserved map path: war3map.lua"},
 		{"a path that leaves the map", entry(`"../a.blp"`, valid), "Invalid asset path: ../a.blp"},
 		{"a bad path is found before its bad hash", entry(`"war3map.lua"`, `"abc"`), "Reserved map path: war3map.lua"},
@@ -145,7 +140,6 @@ func TestTheFirstBadEntryOfAStateIsTheFirstWrittenAlsoWhereAPathLooksLikeANumber
 }
 
 func TestReadStateNamesAStateFileItCannotRead(t *testing.T) {
-	// A folder where the file should be: reading it fails on every system.
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, ".asset-state", "map.w3x.json"), 0o777); err != nil {
 		t.Fatal(err)
@@ -171,8 +165,6 @@ func TestStateBytesAreTheFilesInTheOrderGivenWithTwoSpacesAndAFinalLineBreak(t *
 		{"a path that looks like a number stays where it is given",
 			State{Files: []Owned{{"b.blp", zeros}, {"7", sevens}}},
 			"{\n  \"version\": 1,\n  \"files\": {\n    \"b.blp\": \"" + zeros + "\",\n    \"7\": \"" + sevens + "\"\n  }\n}\n"},
-		// Only the quote, the backslash and the control characters are escaped: markup, a line separator (U+2028)
-		// and letters outside ASCII are written as they are.
 		{"what JSON must escape and nothing more",
 			State{Files: []Owned{{"a\"b\\c\n\x01<&>\xe2\x80\xa8\xc3\xa9.blp", zeros}}},
 			"{\n  \"version\": 1,\n  \"files\": {\n    \"a\\\"b\\\\c\\n\\u0001<&>\xe2\x80\xa8\xc3\xa9.blp\": \"" + zeros + "\"\n  }\n}\n"},

@@ -12,12 +12,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-// The generated module, compiled by the real compiler and run in its Lua. The test starts the compiler four
-// times, and is skipped on a machine without one (tooltest.Yue).
-
-// idsCheck is a Lua script that loads the compiled module from objects.lua beside it and holds it against the
-// objects it was generated from: a table for every category, no entry but theirs, and each id the integer that
-// FourCC gives for its rawcode. It prints "objects-ok" when all of it holds.
 func idsCheck(generated []objects.Resolved) string {
 	var expected, categories []string
 	for _, entry := range generated {
@@ -26,7 +20,6 @@ func idsCheck(generated []objects.Resolved) string {
 	for _, category := range manifest.Categories {
 		categories = append(categories, `"`+string(category)+`"`)
 	}
-	// FourCC as the game defines it in Lua: the four bytes big-endian.
 	return `
 local function FourCC(id) return string.unpack(">I4", id) end
 local objects = dofile("objects.lua")
@@ -51,7 +44,6 @@ io.write("objects-ok")
 
 func TestTheGeneratedIDsModuleCompilesAndEachIDEqualsFourCC(t *testing.T) {
 	compiler := tooltest.Yue(t)
-	// One object per category and several units, with keys that sort and ids that span the rawcode alphabet.
 	generated := []objects.Resolved{
 		object("heroes", "paladin", "H000"),
 		object("units", "captain", "h000"),
@@ -64,7 +56,6 @@ func TestTheGeneratedIDsModuleCompilesAndEachIDEqualsFourCC(t *testing.T) {
 		object("upgrades", "plating", "R000"),
 	}
 	check := idsCheck(generated)
-	// The two ways a build compiles a module: rewritten to keep its lines, and minified.
 	for _, mode := range []string{"-r", "-m"} {
 		t.Run(mode, func(t *testing.T) {
 			dir := t.TempDir()

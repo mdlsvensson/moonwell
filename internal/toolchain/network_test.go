@@ -11,16 +11,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-// The one test that uses the network, the user's cache and real programs: the pinned downloads of this machine,
-// with the checksums and the addresses the package carries, each run once to read its version. A program that is
-// in the user's cache is not downloaded again. It is in a test package of its own, as tooltest imports toolchain.
 func TestThePinnedProgramsAreDownloadedForRealAndReportTheirVersions(t *testing.T) {
 	testkit.NeedNetwork(t)
 	ctx := context.Background()
 	world := env.New("", env.NewLogger(func(string) {}, ""))
 
 	t.Run("the compiler, as tests get it", func(t *testing.T) {
-		// A compiler the user provides for the tests may be of any version; this one is the pinned one.
 		t.Setenv("MOONWELL_TEST_YUE", "")
 		program := tooltest.Yue(t)
 		found, err := toolchain.ReportedVersion(ctx, world, toolchain.YueScript, program)

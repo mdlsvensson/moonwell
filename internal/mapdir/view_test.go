@@ -13,7 +13,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// put is a change that writes content; drop is one that removes the file.
 func put(name, content string) Change { return Change{Name: name, Bytes: []byte(content)} }
 func drop(name string) Change         { return Change{Name: name, Remove: true} }
 
@@ -45,7 +44,6 @@ func TestAViewSeesWhatWasPlannedAndItsFolderDoesNot(t *testing.T) {
 			t.Errorf("the folder's Has(%q) = %v", c.name, got)
 		}
 	}
-	// The files the folder has, in the order of the scan, then the ones the changes add.
 	if got, want := view.Files(), []string{"a.txt", "kept.txt", "made.txt"}; !slices.Equal(got, want) {
 		t.Errorf("the view's Files = %q, want %q", got, want)
 	}
@@ -111,7 +109,6 @@ func TestChangesHoldsEachFileOnceInTheOrderFirstPlanned(t *testing.T) {
 			if got := view.Changes(); !slices.EqualFunc(got, c.want, sameChange) {
 				t.Errorf("Changes = %s, want %s", show(got), show(c.want))
 			}
-			// Each change is found where Changes lists it.
 			for _, change := range c.want {
 				content := string(change.Bytes)
 				if change.Remove {
@@ -129,8 +126,8 @@ func TestWithSpellsTheFoldersOfANewFileAsTheMapAndEarlierChangesDo(t *testing.T)
 	disk := map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script"}
 	cases := []struct {
 		name  string
-		steps [][]string // the new files of each With, as a planner names them
-		want  []string   // as the view names them, in the order planned
+		steps [][]string
+		want  []string
 	}{
 		{"two spellings of a new folder in one call",
 			[][]string{{"Sound/a.mp3", "sound/b.mp3"}}, []string{"Sound/a.mp3", "Sound/b.mp3"}},
@@ -164,7 +161,6 @@ func TestWithSpellsTheFoldersOfANewFileAsTheMapAndEarlierChangesDo(t *testing.T)
 			if got := view.Files(); !slices.Equal(got, wantFiles) {
 				t.Errorf("Files = %q, want %q", got, wantFiles)
 			}
-			// Laid one file a view, each file gets the name Place gave before it was laid: the same name.
 			one := folder
 			for i, name := range given {
 				if got := view.Name(strings.ToUpper(name)); got != c.want[i] {
@@ -192,8 +188,6 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 		name          string
 		given, stored string
 	}{
-		// None of these can be written. Each stays in the plan as it was given, so that the check before the first
-		// write refuses the plan, and the name is not taken for the file its tidied name would be.
 		{"a leading slash before a file the map has", "/WAR3MAP.W3I", "/WAR3MAP.W3I"},
 		{"two leading slashes", "//war3map.w3i", "//war3map.w3i"},
 		{"a leading slash before a folder the map has", "/textures/New.blp", "/textures/New.blp"},
@@ -202,7 +196,6 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 		{"a dot", "./war3map.w3i", "./war3map.w3i"},
 		{"a slash at the end", "new/", "new/"},
 		{"no name", "", ""},
-		// The folder the map has is respelled; what follows it stays.
 		{"an empty folder name below a folder the map has", "textures//New.blp", "Textures//New.blp"},
 		{"a way out of a folder the map has", `TEXTURES\..\WAR3MAP.W3I`, "Textures/../WAR3MAP.W3I"},
 	}
@@ -213,7 +206,6 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 			if got, want := names(view.Changes()), []string{c.stored}; !slices.Equal(got, want) {
 				t.Errorf("Changes names the files %q, want %q", got, want)
 			}
-			// The files the map has are as they were.
 			if got := read(t, view, "war3map.w3i"); got != "info" {
 				t.Errorf("the view reads war3map.w3i as %q", got)
 			}
@@ -230,7 +222,6 @@ func TestWithGivesTwoSpellingsOfAFolderOne(t *testing.T) {
 	}
 }
 
-// names is the name of each change.
 func names(changes []Change) []string {
 	listed := []string{}
 	for _, change := range changes {
@@ -244,7 +235,6 @@ func TestWithLaysManyNewFilesInOneCallQuickly(t *testing.T) {
 	const count = 20000
 	changes := make([]Change, count)
 	for i := range changes {
-		// The first file of each of fifty folders spells the folders; the rest name them in lower case.
 		name := fmt.Sprintf("units/folder%d/Model%d.mdx", i%50, i)
 		if i < 50 {
 			name = fmt.Sprintf("Units/Folder%d/Model%d.mdx", i, i)
@@ -265,8 +255,6 @@ func TestWithLaysManyNewFilesInOneCallQuickly(t *testing.T) {
 			t.Fatalf("change %d is named %q, want %q", i, change.Name, want)
 		}
 	}
-	// The work is in proportion to the files: a slow machine does it in a fraction of this bound, while work that
-	// grows with the square of them does not.
 	if took > 2*time.Second {
 		t.Errorf("laying %d new files took %v", count, took)
 	}
@@ -276,7 +264,6 @@ func sameChange(a, b Change) bool {
 	return a.Name == b.Name && a.Remove == b.Remove && string(a.Bytes) == string(b.Bytes)
 }
 
-// show lists changes as "name=content" and "-name".
 func show(changes []Change) []string {
 	shown := []string{}
 	for _, change := range changes {
@@ -302,7 +289,6 @@ func TestAViewOverAViewLeavesTheFirstAsItWas(t *testing.T) {
 	if got := read(t, first, "new.txt"); got != "1" {
 		t.Errorf("the first view reads new.txt as %q", got)
 	}
-	// The list a caller gets is its own.
 	listed := first.Changes()
 	listed[0] = drop("a.txt")
 	if got := read(t, first, "a.txt"); got != "1" {
@@ -316,7 +302,6 @@ func TestAViewKeepsTheSpellingOfAFileItRemoves(t *testing.T) {
 	if view.Has("war3mapMap.blp") {
 		t.Error("the view still has the file it removes")
 	}
-	// An error about the file names it as the source map spells it.
 	if got := view.Label("WAR3MAPMAP.BLP"); got != label+"/war3mapMap.blp" {
 		t.Errorf("Label = %q", got)
 	}
@@ -334,17 +319,14 @@ func TestPlaceKeepsTheSpellingOfFoldersAndFilesTheMapHas(t *testing.T) {
 	}{
 		{folder, "textures/New.blp", "Textures/New.blp"},
 		{folder, `TEXTURES\sub\New.blp`, "Textures/sub/New.blp"},
-		// Two new folders below a folder the map has are spelled as given.
 		{folder, "textures/Sub/Deep/New.blp", "Textures/Sub/Deep/New.blp"},
 		{folder, "textures/old.BLP", "Textures/Old.blp"},
 		{folder, "WAR3MAP.LUA", "war3map.lua"},
 		{folder, "top.txt", "top.txt"},
 		{folder, "sound/music/b.mp3", "sound/music/b.mp3"},
-		// A folder an earlier change planned keeps the spelling that change gave it.
 		{planned, "sound/music/b.mp3", "Sound/Music/b.mp3"},
 		{planned, "SOUND/Effects/hit.wav", "Sound/Effects/hit.wav"},
 		{planned, "sound/music/THEME.mp3", "Sound/Music/theme.mp3"},
-		// A folder of the map stays one when the view removes the file in it.
 		{planned, "units/hero/b.txt", "Units/Hero/b.txt"},
 	}
 	for _, c := range cases {
@@ -364,7 +346,6 @@ func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 		name, words, file string
 	}{
 		{folder, "WAR3MAP.LUA/x.txt", "war3map.lua in the map is a file, not a folder", label + "/war3map.lua"},
-		// A file of the map never becomes a folder, so it is on the way even in a view that removes it.
 		{removing, "WAR3MAP.LUA/x.txt", "war3map.lua in the map is a file, not a folder", label + "/war3map.lua"},
 		{removing, "textures/old.blp/deep/x.txt", "Textures/Old.blp in the map is a file, not a folder",
 			label + "/Textures/Old.blp"},
@@ -374,7 +355,6 @@ func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 			label + "/Sound/Music/theme.mp3"},
 		{folder, "textures", "textures would replace a folder in the map", label + "/Textures"},
 		{planned, "sound/MUSIC", "sound/MUSIC would replace a folder in the map", label + "/Sound/Music"},
-		// A removal leaves the folder: one whose only file the view removes is in the way, as IsFolder says.
 		{removing, "TEXTURES", "TEXTURES would replace a folder in the map", label + "/Textures"},
 	}
 	for _, c := range cases {
@@ -389,8 +369,6 @@ func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 	}
 }
 
-// A planner asks for the place of a fixed name or of one it has checked, so a name no file can have is its bug:
-// it shows at the planner, as a plain error, and not only when the plan is written.
 func TestPlaceRefusesANameNoFileCanHaveAsItsCallersBug(t *testing.T) {
 	folder, _ := open(t, map[string]string{"war3map.w3i": "info", "Textures/Old.blp": "old"})
 	unwritable := []string{
@@ -436,10 +414,8 @@ func TestIsFolderIsAFolderTheScanFoundOrOneAPlannedChangeMakes(t *testing.T) {
 		{"a folder a planned file makes", planned, "sound", true},
 		{"and the folder below it", planned, "SOUND/music", true},
 		{"the planned file itself", planned, "Sound/Music/theme.mp3", false},
-		// A removal takes a file away and leaves the folder it was in.
 		{"a folder of the map whose one file the view removes", planned, "units/hero", true},
 		{"and the folder above it", planned, "Units", true},
-		// A folder that only planned files make is one as long as the view plans a file in it.
 		{"a planned folder whose one write is taken back", takenBack, "sound", false},
 		{"and the folder that was below it", takenBack, "sound/music", false},
 		{"a planned folder with one of its two writes taken back", oneLeft, "sound", true},

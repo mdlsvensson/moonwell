@@ -21,29 +21,22 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-// The first test runs the real compiler on a small project. Every other test gives the compile a compiler that
-// is a function (programBench.fake).
-
-// programBench is a project on disk and what a compile of it is given. Its world runs no program until the test
-// gives it a compiler.
 type programBench struct {
 	t     *testing.T
 	root  string
 	world *env.Env
 	log   *testkit.Recorder
-	in    Input // the entry is src/main.yue, an unknown global is an error, and the game's API is smallAPI
+	in    Input
 
 	guard sync.Mutex
-	runs  []string // "compile <source>" or "list <source>" for each run of the compiler since ran was last asked
+	runs  []string
 }
 
-// programOf lays a project in a new folder.
 func programOf(t *testing.T, p project) *programBench {
 	t.Helper()
 	return programAt(t, p.lay(t), p)
 }
 
-// programAt is a bench for the project that lies at root.
 func programAt(t *testing.T, root string, p project) *programBench {
 	t.Helper()
 	b := &programBench{t: t, root: root}
@@ -52,9 +45,6 @@ func programAt(t *testing.T, root string, p project) *programBench {
 	return b
 }
 
-// fake gives the bench a compiler that is a function. A run that compiles a source does what compiles says of
-// it, by its path from the project folder, and for a source that is not among them it ends well and leaves a
-// line of Lua that names the source. A run that lists the globals of a source prints what uses holds for it.
 func (b *programBench) fake(compiles map[string]answer, uses map[string]string) {
 	b.world.Run = func(_ context.Context, _ string, args []string, _ env.RunOptions) (env.RunResult, error) {
 		source := args[len(args)-1]
@@ -85,7 +75,6 @@ func (b *programBench) note(run string) {
 	b.runs = append(b.runs, run)
 }
 
-// ran is the runs of the compiler since this was last asked, sorted.
 func (b *programBench) ran() []string {
 	b.guard.Lock()
 	defer b.guard.Unlock()
@@ -94,7 +83,6 @@ func (b *programBench) ran() []string {
 	return runs
 }
 
-// compile takes the two steps of a compile in a row, as a build does: the sources are compiled, and then linked.
 func (b *programBench) compile() (*Program, error) {
 	compiled, err := CompileSources(background, b.world, b.in)
 	if err != nil {
@@ -103,7 +91,6 @@ func (b *programBench) compile() (*Program, error) {
 	return Link(background, b.world, compiled)
 }
 
-// compiles is the program of a compile that must not fail.
 func (b *programBench) compiles() *Program {
 	b.t.Helper()
 	program, err := b.compile()
@@ -113,22 +100,18 @@ func (b *programBench) compiles() *Program {
 	return program
 }
 
-// leavingLua is a compile that ends well and leaves the Lua.
 func leavingLua(text string) answer { return answer{lua: leaves(text)} }
 
-// mapGlobalsOf is what a map's script defines.
 func mapGlobalsOf(script string) *lua.MapGlobals {
 	defined := lua.ReadMapGlobals(script)
 	return &defined
 }
 
-// sourceAt is the module at a path among those a program found.
 func sourceAt(t *testing.T, program *Program, path string) Source {
 	t.Helper()
 	return sourceIn(t, program.Sources, path)
 }
 
-// sourceIn is the module at a path among sources.
 func sourceIn(t *testing.T, sources []Source, path string) Source {
 	t.Helper()
 	at := slices.IndexFunc(sources, func(source Source) bool { return source.Path == path })
@@ -138,8 +121,6 @@ func sourceIn(t *testing.T, sources []Source, path string) Source {
 	return sources[at]
 }
 
-// luaOfEach is what lua gives for each of the sources, by the source's path; a source without Lua is not among
-// them.
 func luaOfEach(sources []Source, lua func(Source) (string, bool)) map[string]string {
 	texts := map[string]string{}
 	for _, source := range sources {
@@ -193,8 +174,6 @@ func TestCompileTurnsAProjectIntoAProgramWithTheRealCompiler(t *testing.T) {
 	if err != nil || !slices.Equal(program.Sources, found) || len(found) != 8 {
 		t.Errorf("the program's sources are %+v, want every module Collect finds: %+v, %v", program.Sources, found, err)
 	}
-	// The macro module is written, and only the modules of src/ that the entry reaches are checked: neither the
-	// unknown global of the module nothing requires nor that of the library is reported.
 	if !fsx.Exists(filepath.Join(b.root, filepath.FromSlash(MacrosFile))) {
 		t.Error("the macro module is not written")
 	}
@@ -202,8 +181,6 @@ func TestCompileTurnsAProjectIntoAProgramWithTheRealCompiler(t *testing.T) {
 	if err != nil || len(kept) != 2 || kept["src/main.yue"].Uses == nil || kept["src/util/math.yue"].Uses == nil {
 		t.Errorf("the uses file keeps %+v, %v, want the two modules of src/ that the entry reaches", kept, err)
 	}
-	// The Lua of every module the entry reaches and of every module of a library; none for a module that is
-	// neither, and none for a source without code.
 	for path, has := range map[string]bool{
 		"src/main.yue": true, "src/util/math.yue": true, "lua/counter.lua": true, inLibrary("ex", "kit/init.yue"): true,
 		inLibrary("ex", "kit/extra.yue"): true, inLibrary("ex", "plain.lua"): true, "src/unused.yue": false, "src/notes.yue": false,
@@ -222,8 +199,8 @@ func TestCompileRunsItsStepsInOrderAndReportsTheFirstFault(t *testing.T) {
 		entry    string
 		compiles map[string]answer
 		uses     map[string]string
-		wantMsg  string // how the message starts
-		wantFile string // "." for the project folder
+		wantMsg  string
+		wantFile string
 		wantRuns []string
 	}{
 		{name: "no src, and an entry that is no file of src", of: files("lua/main.lua", "return 1\n"), entry: "lua/main.lua",
@@ -281,7 +258,6 @@ func TestCompileWritesTheMacroModuleAndRefusesAFolderTheSearchCannotName(t *test
 	if written, err := os.ReadFile(filepath.Join(b.root, filepath.FromSlash(MacrosFile))); err != nil || string(written) != moonwell.MacrosYue {
 		t.Errorf("the macro module is %q, %v", written, err)
 	}
-	// A folder with ";" in its path is refused before anything is looked for or written, even src/.
 	root := filepath.Join(t.TempDir(), "pro;ject")
 	if err := os.Mkdir(root, 0o777); err != nil {
 		t.Skipf("this system makes no folder with a semicolon in its name: %v", err)
@@ -315,14 +291,12 @@ func TestAProgramHasTheLuaOfTheModulesTheEntryReachesAndOfEveryLibraryModule(t *
 	}
 	for path, want := range map[string]string{
 		"src/main.yue": "local util = require('util')\n", "src/util.yue": "return '\xfe'\n",
-		// A Lua module is its own text, reached or not, and a library's YueScript module is read, reached or not.
 		"lua/tools.lua": "return '\xff'\n", plain: "return 1\n", loud: "-- " + loud + "\n",
 	} {
 		if lua, ok := program.Lua(sourceAt(t, program, path)); !ok || lua != want {
 			t.Errorf("Lua(%s) = %q, %v, want %q", path, lua, ok, want)
 		}
 	}
-	// A module of the project that the entry does not reach, and a source without code, wherever it is.
 	for _, path := range []string{"src/unreached.yue", "src/notes.yue", empty} {
 		if lua, ok := program.Lua(sourceAt(t, program, path)); ok || lua != "" {
 			t.Errorf("Lua(%s) = %q, %v, want none", path, lua, ok)
@@ -345,9 +319,6 @@ func TestTheEntryIsTheModuleOfTheEntryFile(t *testing.T) {
 }
 
 func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
-	// The compiler writes no Lua for a source without code, so there is no module to put in the bundle. The
-	// file is there, so the refusal is not that of a module that is not found.
-	// The hint is true of a file of comments and of a file that only defines macros.
 	const hint, such = "YueScript writes no Lua for a file with nothing but comments and macros, and ", " is such a file."
 	b := programOf(t, mainOnly.and("src/game/notes.yue", "-- nothing yet\n"))
 	b.fake(map[string]answer{"src/main.yue": leavingLua("\nrequire('game.notes')\n"), "src/game/notes.yue": {}}, nil)
@@ -357,7 +328,6 @@ func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 		failure.Hint != hint+"src/game/notes.yue"+such {
 		t.Errorf("error = %+v", failure)
 	}
-	// An init module, required by its folder's name.
 	b = programOf(t, mainOnly.with("ex").and(inLibrary("ex", "kit/init.yue"), "-- nothing yet\n"))
 	b.fake(map[string]answer{"src/main.yue": leavingLua("require('kit')\n"), inLibrary("ex", "kit/init.yue"): {}}, nil)
 	_, err = b.compile()
@@ -366,7 +336,6 @@ func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 		failure.Hint != hint+inLibrary("ex", "kit/init.yue")+such {
 		t.Errorf("error = %+v", failure)
 	}
-	// The entry itself: nothing requires it, so the failure is at its own file, without a line.
 	b = programOf(t, files("src/main.yue", "-- nothing yet\n"))
 	b.fake(map[string]answer{"src/main.yue": {}}, nil)
 	_, err = b.compile()
@@ -377,9 +346,6 @@ func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 }
 
 func TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua(t *testing.T) {
-	// The line of a require is its line in the module's Lua. A normal build keeps each statement on the line of
-	// its source; a minified one puts the module on one line, so the fault of a YueScript module is at line 1,
-	// wherever the import stands in the source. This test runs the real compiler, twice.
 	yue := tooltest.Yue(t)
 	for minify, line := range map[bool]int{false: 3, true: 1} {
 		b := programOf(t, files("src/main.yue", "x = 1\n\nimport \"nope\"\nprint x, nope\n"))
@@ -397,11 +363,8 @@ func TestCompileFailsWhenTheLuaOfALibrarysModuleCannotBeRead(t *testing.T) {
 	loud := inLibrary("ex", "kit/loud.yue")
 	b := programOf(t, mainOnly.with("ex").and(loud, "z = 3\n"))
 	b.fake(nil, nil)
-	// The libraries' Lua is read once the compile is over and before the entry is looked at: with an entry that
-	// is no file of src/ as well, the failure of the read is the one reported.
 	b.in.Entry = "lua/main.lua"
 	scripted := b.world.Run
-	// A folder where the library's output is, once the compiler has run: it is there, and no file to read.
 	b.world.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		if strings.HasSuffix(filepath.ToSlash(args[len(args)-1]), loud) {
 			return env.RunResult{}, os.MkdirAll(filepath.Join(outputIn(args), "kept"), 0o777)
@@ -426,7 +389,6 @@ func TestUnknownGlobalsAsWarningsAreLoggedAndReturnedInTheProgram(t *testing.T) 
 	if !slices.Equal(program.Unknown, []diag.Problem{want}) || !slices.Equal(b.log.Lines(), []string{logged}) || len(program.Modules) != 1 {
 		t.Errorf("the compile = %+v; log %q", program, b.log.Lines())
 	}
-	// As an error, every problem is in the failure, and nothing is logged.
 	b = programOf(t, mainOnly)
 	b.fake(nil, map[string]string{"src/main.yue": "CreatUnit 1 5\nZzz 2 1\n"})
 	program, err := b.compile()
@@ -472,8 +434,6 @@ func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReach
 	b.fake(map[string]answer{"src/main.yue": leavingLua("require('util')\n")}, nil)
 	b.compiles()
 	b.ran()
-	// What the compiler does when every source is compiled and every reached one listed, but for the sources
-	// that come and go.
 	lists := []string{"list src/main.yue", "list src/util.yue"}
 	every := append([]string{"compile src/m.yue", "compile src/main.yue", "compile src/unreached.yue", "compile src/util.yue"}, lists...)
 	with := func(runs ...string) []string {
@@ -481,7 +441,7 @@ func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReach
 	}
 	for _, c := range []struct {
 		what    string
-		written []string // a path and a text
+		written []string
 		removed string
 		want    []string
 	}{
@@ -514,8 +474,6 @@ func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReach
 }
 
 func TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro(t *testing.T) {
-	// This test runs the real compiler. The project has a macro module of its own, which the compiler finds
-	// beside the source that imports it: what that source compiles to, and the globals it uses, are the macro's.
 	yue := tooltest.Yue(t)
 	b := programOf(t, files("src/m.yue", "export macro N = -> \"Foo\"\n", "src/main.yue", "import \"m\" as {:$N}\nprint $N!\n"))
 	b.world.Run = env.Run
@@ -531,25 +489,20 @@ func TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro(t *t
 	}
 }
 
-// The tests below are of the two steps of a compile, CompileSources and Link, each by itself.
-
 func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testing.T) {
 	loud, empty, plain := inLibrary("ex", "kit/loud.yue"), inLibrary("ex", "kit/empty.yue"), inLibrary("ex", "plain.lua")
 	of := files("src/main.yue", "x = 1\n", "lua/tools.lua", "return 2\n").with("ex").and(
 		loud, "z = 3\n", empty, "-- nothing\n", plain, "return 1\n")
-	// What the first step has of each module, whatever the second finds: a Lua module's own text, and what the
-	// compiler wrote for a library's YueScript module. It has none for a source without code, and none for a
-	// YueScript module of the project's own, which is read when the requires lead to it.
 	wantLua := map[string]string{"lua/tools.lua": "return 2\n", plain: "return 1\n", loud: "-- " + loud + "\n"}
 	wantCompiles := []string{"compile " + empty, "compile " + loud, "compile src/main.yue"}
 	for _, c := range []struct {
 		name     string
 		entry    string
-		main     string // the Lua the compiler leaves for src/main.yue
+		main     string
 		uses     map[string]string
-		wantMsg  string   // how the message starts
-		wantFile string   // "" for a failure without a file
-		wantRuns []string // the runs of the compiler in the second step
+		wantMsg  string
+		wantFile string
+		wantRuns []string
 	}{
 		{name: "an unknown global", entry: "src/main.yue", main: "x = 1\n", uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
 			wantMsg: "Unknown global Zzz.", wantFile: "src/main.yue", wantRuns: []string{"list src/main.yue"}},
@@ -581,8 +534,6 @@ func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testi
 		if ran := b.ran(); !slices.Equal(ran, c.wantRuns) {
 			t.Errorf("%s: in the link the compiler ran as %q, want %q", c.name, ran, c.wantRuns)
 		}
-		// A link that failed leaves what the first step returned as it was: the view of the libraries is written
-		// from it whether the link is taken before or after.
 		if got := luaOfEach(compiled.Sources, compiled.Lua); !maps.Equal(got, wantLua) {
 			t.Errorf("%s: after the link, the Lua is %q, want %q", c.name, got, wantLua)
 		}
@@ -592,7 +543,6 @@ func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testi
 func TestAStepThatIsNotHandedWhatItNeedsIsAMistakeOfTheCaller(t *testing.T) {
 	b := programOf(t, mainOnly)
 	var expected *diag.Error
-	// Nothing, and a value that CompileSources did not make, which has no Lua of any module either.
 	for _, compiled := range []*Compiled{nil, {}} {
 		program, err := Link(background, b.world, compiled)
 		if program != nil || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "CompileSources") {

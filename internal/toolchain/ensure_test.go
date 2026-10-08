@@ -110,8 +110,6 @@ func TestCompilerUsesYuePathAndWarnsOnAVersionMismatch(t *testing.T) {
 	}
 }
 
-// yue.path is the user's own program: it is taken whatever it reports, for a version Moonwell has no download of
-// and on a platform it has none for, and nothing is copied into the cache.
 func TestCompilerTakesYuePathAsItIs(t *testing.T) {
 	local := testkit.WriteFile(t, t.TempDir(), "yue", nil)
 	tests := []struct {
@@ -146,7 +144,6 @@ func TestCompilerPassesOnAYuePathThatCannotBeStartedOrIsInterrupted(t *testing.T
 	e, _ := testkit.Env(t, t.TempDir())
 	e.Run = missing
 	_, err := Compiler(background, e, "9.9.9", &local)
-	// The program is the manifest's: the failure names the manifest that sets it, and says what to do there.
 	if failure := asError(t, err, "a yue.path that is no program"); !strings.Contains(failure.Msg, "Cannot run '"+local+"'") ||
 		failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Hint, "yue.path") || failure.Cause == nil {
 		t.Errorf("error = %+v", failure)
@@ -157,7 +154,6 @@ func TestCompilerPassesOnAYuePathThatCannotBeStartedOrIsInterrupted(t *testing.T
 	}
 }
 
-// Without a yue.path the compiler is the package's own YueScript in the cache; `yue` on PATH is never asked.
 func TestCompilerWithoutYuePathEnsuresThePinnedCompiler(t *testing.T) {
 	e, _, fetches, tool := yueInstaller(t, "")
 	pin(t, &YueScript, tool)
@@ -177,11 +173,11 @@ func TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler(t *testing.T) {
 	other := zipOf(t, "README", "no compiler", "bin/yue", "in a folder", "yue.exe", "another name")
 	tests := []struct {
 		name    string
-		fetch   env.FetchFunc // nil for the installer's own
-		run     env.RunFunc   // nil for a machine on which no program may run
+		fetch   env.FetchFunc
+		run     env.RunFunc
 		sha     string
 		message string
-		hint    string // the words that tell the hint apart
+		hint    string
 	}{
 		{name: "offline", fetch: offline,
 			message: "Downloading https://example.test/yue.zip failed.", hint: "Check your connection and retry, or "},
@@ -255,12 +251,10 @@ func TestReportedVersionFindsTheVersionInWhatAProgramPrints(t *testing.T) {
 		{"the compiler, on stderr", YueScript, "", "Yuescript version: 0.34.3\n", "0.34.3"},
 		{"the compiler, with a carriage return", YueScript, "Yuescript version: 0.34.3\r\n", "", "0.34.3"},
 		{"a vertical tab ends the version", YueScript, "Yuescript version: 0.34.3\vx", "", "0.34.3"},
-		// White space outside ASCII is part of the version: a no-break space, here.
 		{"a no-break space does not", YueScript, "Yuescript version: 0.34.3\xc2\xa0x y", "", "0.34.3\xc2\xa0x"},
 		{"another program", YueScript, "not a compiler", "", ""},
 		{"nothing", YueScript, "", "", ""},
 		{"Pkl", Pkl, "Pkl 0.32.1 (Windows 10.0, native)\n", "", "0.32.1"},
-		// One rule for both tools: what a program prints is read on both streams.
 		{"Pkl, its version on standard error", Pkl, "", "Pkl 0.32.1 (Linux 6.8, native)\n", "0.32.1"},
 		{"Pkl without a third number", Pkl, "Pkl 0.32", "", ""},
 	}
@@ -325,7 +319,6 @@ func TestKnownVersionsPinTheDefaultForWindowsAndLinux(t *testing.T) {
 			}
 		}
 	}
-	// The platforms are named as env names them, so that a download is found for the machine.
 	for _, system := range []string{"windows", "linux"} {
 		if _, found := YueScript.Versions[YueVersion][env.PlatformOf(system, "amd64")]; !found {
 			t.Errorf("no download of %s for %s", YueVersion, system)
@@ -333,8 +326,6 @@ func TestKnownVersionsPinTheDefaultForWindowsAndLinux(t *testing.T) {
 	}
 }
 
-// The wording of every refusal that names the tool, for both tools: one sentence each, built from the tool's
-// title and from what its user can do in place of the download.
 func TestTheRefusalsOfBothToolsAreWordedAlike(t *testing.T) {
 	const page = "https://pkl-lang.org/main/current/pkl-cli/index.html#installation"
 	yueElse := "build or install yue yourself and set yue.path in moonwell.local.pkl."

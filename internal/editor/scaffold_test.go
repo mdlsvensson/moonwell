@@ -21,8 +21,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// smallTemplate is a template of the three editor files, each with a text of its own, and of a file that is none
-// of them. Its .luarc.json has no arrays, so it is a template for AddFiles alone.
 var smallTemplate = []moonwell.TemplateFile{
 	{Path: "yueconfig.yue", Data: []byte("return {}\n")},
 	{Path: ".luarc.json", Data: []byte("{}\n")},
@@ -30,16 +28,12 @@ var smallTemplate = []moonwell.TemplateFile{
 	{Path: "src/main.yue", Data: []byte("print 1\n")},
 }
 
-// The entries of the three arrays in the .luarc.json of the template the program carries.
 var (
 	carriedPaths   = []string{"src/?.lua", "src/?/init.lua", "lua/?.lua", "lua/?/init.lua"}
 	carriedLibrary = []string{".moonwell/types", ".moonwell/lua"}
 	carriedIgnored = []string{"dist", "maps", ".moonwell/libraries"}
 )
 
-// lackingOne is the members of a .luarc.json that lacks one entry of the carried template's arrays,
-// .moonwell/lua, without the braces around them. afterOne is those members as MergeLuarc writes them once it has
-// added the entry.
 const (
 	lackingOne = `"runtime.path":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"],` +
 		`"workspace.library":[".moonwell/types"],"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]`
@@ -60,18 +54,16 @@ const (
   ]`
 )
 
-// The characters the tests write as bytes: the file that holds them is ASCII.
 const (
-	mark      = "\xEF\xBB\xBF" // U+FEFF, the byte order mark
-	eAcute    = "\xc3\xa9"     // U+00E9
-	lineSep   = "\xe2\x80\xa8" // U+2028
-	noBreak   = "\xc2\xa0"     // U+00A0
-	wideSpace = "\xe3\x80\x80" // U+3000
-	replaced  = "\xef\xbf\xbd" // U+FFFD
-	escapeU   = "\x5cu"        // the two characters that start an escape of four hexadecimal digits in JSON
+	mark      = "\xEF\xBB\xBF"
+	eAcute    = "\xc3\xa9"
+	lineSep   = "\xe2\x80\xa8"
+	noBreak   = "\xc2\xa0"
+	wideSpace = "\xe3\x80\x80"
+	replaced  = "\xef\xbf\xbd"
+	escapeU   = "\x5cu"
 )
 
-// carried is the template the program carries.
 func carried(t testing.TB) []moonwell.TemplateFile {
 	t.Helper()
 	template, err := moonwell.TemplateFiles()
@@ -81,7 +73,6 @@ func carried(t testing.TB) []moonwell.TemplateFile {
 	return template
 }
 
-// fileOf is the bytes of a template's file.
 func fileOf(t testing.TB, template []moonwell.TemplateFile, path string) []byte {
 	t.Helper()
 	for _, file := range template {
@@ -93,7 +84,6 @@ func fileOf(t testing.TB, template []moonwell.TemplateFile, path string) []byte 
 	return nil
 }
 
-// membersOf is the members of a .luarc.json, each value as it is written, in the order of the text.
 func membersOf(t testing.TB, text string) manifest.Ordered[json.RawMessage] {
 	t.Helper()
 	var members manifest.Ordered[json.RawMessage]
@@ -103,7 +93,6 @@ func membersOf(t testing.TB, text string) manifest.Ordered[json.RawMessage] {
 	return members
 }
 
-// listUnder is the strings of the array that a .luarc.json holds under key.
 func listUnder(t testing.TB, members manifest.Ordered[json.RawMessage], key string) []string {
 	t.Helper()
 	written, _ := members.Get(key)
@@ -114,7 +103,6 @@ func listUnder(t testing.TB, members manifest.Ordered[json.RawMessage], key stri
 	return list
 }
 
-// onOneLine is a JSON value without the white space it is laid out with.
 func onOneLine(written json.RawMessage) string {
 	var text bytes.Buffer
 	if err := json.Compact(&text, written); err != nil {
@@ -123,7 +111,6 @@ func onOneLine(written json.RawMessage) string {
 	return text.String()
 }
 
-// notADiagError fails the test unless err is an error that is no *diag.Error and says every one of the words.
 func notADiagError(t testing.TB, err error, what string, words ...string) {
 	t.Helper()
 	var expected *diag.Error
@@ -132,8 +119,6 @@ func notADiagError(t testing.TB, err error, what string, words ...string) {
 	}
 	contains(t, err.Error(), words...)
 }
-
-// ---- the template ----
 
 func TestTheTemplateShipsEveryEditorFile(t *testing.T) {
 	template := carried(t)
@@ -149,13 +134,9 @@ func TestTheTemplatesLuarcIndexesTheCompiledLuaFilesAndSuggestsEveryGameGlobal(t
 	if useGitIgnore, _ := config.Get("workspace.useGitIgnore"); string(useGitIgnore) != "false" {
 		t.Errorf("workspace.useGitIgnore = %s", useGitIgnore)
 	}
-	// The library view in .moonwell/lua is what the editor should see; the copies it is made from are not
-	// workspace files.
 	if !slices.Contains(listUnder(t, config, "workspace.ignoreDir"), ".moonwell/libraries") {
 		t.Error("workspace.ignoreDir lacks .moonwell/libraries")
 	}
-	// The YueScript extension asks for completion at a placeholder word, so the typed prefix never narrows the
-	// list: lua-language-server must be allowed to suggest every native and game global at once.
 	api := script.LoadNatives()
 	names := len(api.Functions) + len(api.Globals)
 	var limit float64
@@ -164,8 +145,6 @@ func TestTheTemplatesLuarcIndexesTheCompiledLuaFilesAndSuggestsEveryGameGlobal(t
 		t.Errorf("completion.maxSuggestCount %s < %d names (%v)", written, names, err)
 	}
 }
-
-// ---- AddFiles ----
 
 func TestAddFilesAddsMissingFilesAndGitignoreLinesAndNeverOverwrites(t *testing.T) {
 	root := lay(t, ".luarc.json", "mine\n", ".gitignore", "dist/\r\n.moonwell/\r\n")
@@ -198,7 +177,6 @@ func TestAddFilesCreatesGitignoreWhenThereIsNoneAndWritesTheCarriedTemplatesFile
 			t.Errorf("%s differs from the template's", path)
 		}
 	}
-	// The three files and .gitignore, the folder of one of them, and no other file of the template.
 	if got := entriesIn(t, root); len(got) != 5 {
 		t.Errorf("the project holds %q", got)
 	}
@@ -224,7 +202,6 @@ func TestAddFilesAppendsTheIgnoresAGitignoreLacks(t *testing.T) {
 		{"both lines, the last without a line break", "src/**/*.lua\n.moonwell/", "src/**/*.lua\n.moonwell/", ""},
 	}
 	for _, c := range cases {
-		// A project that has the three files: all that can be added is lines of .gitignore.
 		root := lay(t, "yueconfig.yue", "", ".luarc.json", "", ".vscode/extensions.json", "", ".gitignore", c.held)
 		want := []string{}
 		if c.added != "" {
@@ -329,21 +306,18 @@ func TestAddFilesWithATemplateThatLacksAFileIsAMistakeOfTheCaller(t *testing.T) 
 	if added != nil {
 		t.Errorf("AddFiles = %q", added)
 	}
-	// A file the project has is not asked of the template.
 	root = lay(t, "yueconfig.yue", "", ".luarc.json", "", ".vscode/extensions.json", "")
 	if added, err := AddFiles(root, nil); err != nil || !slices.Equal(added, []string{".gitignore (.moonwell/, src/**/*.lua)"}) {
 		t.Errorf("without a template, and with every file: AddFiles = %q, %v", added, err)
 	}
 }
 
-// The files are the project's own, which its user commits, and a link at .vscode is the user's to make: the file
-// is written into the folder it leads to, and a file that is there counts as the project's.
 func TestAddFilesFollowsALinkAtTheFolderOfAFile(t *testing.T) {
 	const written = `{"recommendations":[]}` + "\n"
 	cases := []struct {
 		name         string
-		file, text   string            // the file that lies behind the link
-		wantBehind   map[string]string // what lies behind the link afterwards
+		file, text   string
+		wantBehind   map[string]string
 		wantsItAdded bool
 	}{
 		{"no file behind the link", "settings.json", "{}", map[string]string{"settings.json": "{}", "extensions.json": written}, true},
@@ -363,8 +337,6 @@ func TestAddFilesFollowsALinkAtTheFolderOfAFile(t *testing.T) {
 	}
 }
 
-// everythingBelow is every entry below a folder by its path from it with "/": a file with its bytes, a folder as
-// "(a folder)", and a link as "(a link)". A link is not followed, so one that leads to nothing is held too.
 func everythingBelow(t testing.TB, dir string) map[string]string {
 	t.Helper()
 	held := map[string]string{}
@@ -397,8 +369,6 @@ func everythingBelow(t testing.TB, dir string) map[string]string {
 	return held
 }
 
-// toAFolderThatIsGone makes at a link to a folder beside the project, and removes the folder: a junction on
-// Windows, and a symlink elsewhere. It returns where the link leads.
 func toAFolderThatIsGone(t *testing.T, above, at string) string {
 	t.Helper()
 	gone := filepath.Join(above, "gone")
@@ -412,8 +382,6 @@ func toAFolderThatIsGone(t *testing.T, above, at string) string {
 	return gone
 }
 
-// toAFileThatIsNotThere makes at a symlink to a file beside the project that is not there, and returns where the
-// link leads. The test is skipped on Windows where the account may not make such a link.
 func toAFileThatIsNotThere(t *testing.T, above, at string) string {
 	t.Helper()
 	missing := filepath.Join(above, "missing.txt")
@@ -421,7 +389,6 @@ func toAFileThatIsNotThere(t *testing.T, above, at string) string {
 	return missing
 }
 
-// linksToNothing is the two kinds of a link that leads to nothing.
 var linksToNothing = []struct {
 	name string
 	make func(t *testing.T, above, at string) (leadsTo string)
@@ -430,9 +397,6 @@ var linksToNothing = []struct {
 	{"a link to a file that is not there", toAFileThatIsNotThere},
 }
 
-// projectWithALinkToNothing is a project in a folder of its own, with a link that leads to nothing at one of its
-// files. It returns the folder above the project, which holds all that a call could write, the project, and
-// where the link leads.
 func projectWithALinkToNothing(t *testing.T, file string, link func(*testing.T, string, string) string) (above, root, leadsTo string) {
 	t.Helper()
 	above = t.TempDir()
@@ -445,8 +409,6 @@ func projectWithALinkToNothing(t *testing.T, file string, link func(*testing.T, 
 	return above, root, link(t, above, at)
 }
 
-// A file written under the name of a link to nothing is made where the link leads, which may be anywhere: AddFiles
-// refuses the link, at each of the four places, before it writes anything.
 func TestAddFilesRefusesALinkToNothingAndWritesNothing(t *testing.T) {
 	for _, kind := range linksToNothing {
 		t.Run(kind.name, func(t *testing.T) {
@@ -469,8 +431,6 @@ func TestAddFilesRefusesALinkToNothingAndWritesNothing(t *testing.T) {
 	}
 }
 
-// A link to nothing at .vscode is none of the four places: the folder cannot be made under its name, so the file
-// is reported as one that cannot be written, and nothing is made where the link leads.
 func TestAddFilesMakesNothingWhereALinkAtTheFolderOfAFileLeadsToNothing(t *testing.T) {
 	above, root, leadsTo := projectWithALinkToNothing(t, ".vscode", toAFolderThatIsGone)
 	added, err := AddFiles(root, smallTemplate)
@@ -502,15 +462,12 @@ func TestMergeLuarcTakesALinkToNothingForNoFile(t *testing.T) {
 	}
 }
 
-// TestTheScaffoldReadsAndWritesThroughALinkToAFile is skipped on Windows where the account may not make a symlink
-// to a file.
 func TestTheScaffoldReadsAndWritesThroughALinkToAFile(t *testing.T) {
 	root, behind := t.TempDir(), t.TempDir()
 	write(t, behind, "ignore", "dist/\n", "luarc", "{"+lackingOne+"}", "config", "mine\n")
 	linkToFile(t, filepath.Join(behind, "ignore"), filepath.Join(root, ".gitignore"))
 	linkToFile(t, filepath.Join(behind, "luarc"), filepath.Join(root, ".luarc.json"))
 	linkToFile(t, filepath.Join(behind, "config"), filepath.Join(root, "yueconfig.yue"))
-	// A file behind a link is there: yueconfig.yue and .luarc.json are not added, and stay as they are.
 	added, err := AddFiles(root, smallTemplate)
 	want := []string{".vscode/extensions.json", ".gitignore (.moonwell/, src/**/*.lua)"}
 	if err != nil || !slices.Equal(added, want) {
@@ -534,8 +491,6 @@ func TestTheScaffoldReadsAndWritesThroughALinkToAFile(t *testing.T) {
 		}
 	}
 }
-
-// ---- MergeLuarc ----
 
 func TestMergeLuarcAddsTheTemplatesMissingEntries(t *testing.T) {
 	root := lay(t, ".luarc.json", `{"runtime.path":["src/?.lua"],"workspace.library":[".moonwell/types","extra"],`+
@@ -578,8 +533,6 @@ func TestMergeLuarcAddsTheTemplatesMissingEntries(t *testing.T) {
 	}
 }
 
-// The entries of the carried template's three arrays, in the order of luarcArrays, are what an object without
-// them is given.
 func TestMergeLuarcGivesAnObjectWithoutTheArraysEveryEntryOfTheCarriedTemplate(t *testing.T) {
 	for _, held := range []string{"{}", "{} \r\n\t", " \n{\n}\n"} {
 		root := lay(t, ".luarc.json", held)
@@ -606,7 +559,6 @@ func TestMergeLuarcLeavesAFileThatIsNotAJSONObjectAlone(t *testing.T) {
 			t.Errorf("%q: MergeLuarc = %q, %v, %v", content, added, merged, err)
 		}
 	}
-	// No file: nothing to merge.
 	root := t.TempDir()
 	if added, merged, err := MergeLuarc(root, carried(t)); err != nil || !merged || added == nil || len(added) != 0 {
 		t.Errorf("MergeLuarc without a file = %#v, %v, %v", added, merged, err)
@@ -631,7 +583,6 @@ func TestMergeLuarcGivesAMissingKeyTheTemplatesWholeArrayAndLeavesANonArrayValue
 			t.Errorf("%s: .luarc.json =\n%s", value, read(t, root, ".luarc.json"))
 		}
 	}
-	// Three values that are no arrays: nothing is added, and nothing is written.
 	const held = `{"runtime.path":null,"workspace.library":{"a":1},"workspace.ignoreDir":3}`
 	root := lay(t, ".luarc.json", held)
 	if added, merged, err := MergeLuarc(root, carried(t)); err != nil || !merged || added == nil || len(added) != 0 ||
@@ -646,7 +597,6 @@ func TestMergeLuarcMergesAFileSavedWithABOM(t *testing.T) {
 	if want := slices.Concat(carriedLibrary, carriedIgnored); err != nil || !merged || !slices.Equal(added, want) {
 		t.Fatalf("MergeLuarc = %q, %v, %v", added, merged, err)
 	}
-	// The mark is read past, and is not written back.
 	if got := read(t, root, ".luarc.json"); got != "{\n"+afterOne+"\n}\n" {
 		t.Errorf(".luarc.json =\n%q", got)
 	}
@@ -678,8 +628,6 @@ func TestMergeLuarcReportsAFileItCannotWrite(t *testing.T) {
 	}
 }
 
-// mergedOne merges the carried template into a .luarc.json that lacks one entry of it, and returns the file as
-// it then is.
 func mergedOne(t *testing.T, name, held string) string {
 	t.Helper()
 	root := lay(t, ".luarc.json", held)
@@ -690,12 +638,10 @@ func mergedOne(t *testing.T, name, held string) string {
 	return read(t, root, ".luarc.json")
 }
 
-// each is the texts as the elements of an array that is the value of a member at the first depth, on a line each.
 func each(texts []string) string {
 	return "[\n    " + strings.Join(texts, ",\n    ") + "\n  ]"
 }
 
-// Where the file is written again, every value that the merge does not touch keeps the text of its tokens.
 func TestMergeLuarcKeepsTheTextOfEveryValue(t *testing.T) {
 	numbers := []string{
 		"1.0", "1e3", "1E+2", "-0", "-0.0", "0.10", "9007199254740993", "0.1234567890123456789", "1e400", "-1e-7",
@@ -746,8 +692,6 @@ func TestMergeLuarcLaysTheWholeFileOutWithTwoSpacesAndAFinalLineBreak(t *testing
 	}
 }
 
-// A key of the file is read and written again: it keeps its first place and its last value, and is written with
-// no escape that it does not need.
 func TestMergeLuarcWritesAKeyOfTheFileOnceAndWithTheEscapesItNeeds(t *testing.T) {
 	cases := []struct{ name, held, want string }{
 		{"a key twice",
@@ -760,7 +704,6 @@ func TestMergeLuarcWritesAKeyOfTheFileOnceAndWithTheEscapesItNeeds(t *testing.T)
 			`{"runtime` + escapeU + `002epath":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"],` +
 				`"workspace.library":[".moonwell/types"],"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`,
 			"{\n" + afterOne + "\n}\n"},
-		// Each faulty byte of a key is U+FFFD once the key is read.
 		{"a key with bytes that are not UTF-8",
 			"{\"k\xe2\x82\":1," + lackingOne + "}",
 			"{\n  \"k" + replaced + replaced + "\": 1,\n" + afterOne + "\n}\n"},
@@ -776,7 +719,7 @@ func TestMergeLuarcTakesAnEntryToBeThereOnlyAsTheSameString(t *testing.T) {
 	cases := []struct {
 		name, held string
 		added      []string
-		library    string // the array under workspace.library as it is then written, on one line
+		library    string
 	}{
 		{"another letter case, a slash at the end, a backslash",
 			`[".Moonwell/types",".moonwell/types/",".moonwell\\lua",".moonwell/lua/"]`, carriedLibrary,
@@ -846,7 +789,6 @@ func TestMergeLuarcWithATemplateItCannotReadIsAMistakeOfTheCaller(t *testing.T) 
 			t.Errorf("%s: LuarcTemplateEntries = %q", c.name, entries)
 		}
 	}
-	// A project without the file asks nothing of the template.
 	if added, merged, err := MergeLuarc(t.TempDir(), nil); err != nil || !merged || len(added) != 0 {
 		t.Errorf("without a file and without a template: MergeLuarc = %q, %v, %v", added, merged, err)
 	}
@@ -862,11 +804,8 @@ func TestLuarcTemplateEntriesListsTheTemplatesArrays(t *testing.T) {
 	}
 }
 
-// A template of the test's own, with a byte order mark, an entry that comes twice in an array and in two arrays,
-// and an array without entries.
 func TestATemplateOfItsOwnGivesItsEntriesAndEachOfThemOnce(t *testing.T) {
 	template := luarcOnly(mark + `{"runtime.path":["a","b","a"],"other":["x"],"workspace.library":["b","b"],"workspace.ignoreDir":[]}`)
-	// The door lists the arrays as the template has them, each under its key.
 	entries, err := LuarcTemplateEntries(template)
 	listed := map[string][]string{"runtime.path": {"a", "b", "a"}, "workspace.library": {"b", "b"}, "workspace.ignoreDir": nil}
 	if err != nil || !reflect.DeepEqual(entries, listed) {
@@ -894,7 +833,6 @@ func TestATemplateOfItsOwnGivesItsEntriesAndEachOfThemOnce(t *testing.T) {
 	}
 }
 
-// luarcOnly is a template that holds a .luarc.json alone.
 func luarcOnly(text string) []moonwell.TemplateFile {
 	return []moonwell.TemplateFile{{Path: ".luarc.json", Data: []byte(text)}}
 }

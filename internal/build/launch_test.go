@@ -11,10 +11,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-// started is one start of a program: the program, then its arguments.
 type started []string
 
-// recordingSpawn makes the world's Spawn keep what would be started, and start nothing.
 func recordingSpawn(e *env.Env) *[]started {
 	starts := &[]started{}
 	e.Spawn = func(program string, args []string) error {
@@ -25,7 +23,6 @@ func recordingSpawn(e *env.Env) *[]started {
 }
 
 func TestLaunchExplainsAMissingOrWrongExecutable(t *testing.T) {
-	// The world of the test fails it when anything is started.
 	e, _ := testkit.Env(t, t.TempDir())
 	const set = "Run `moonwell setup` to create moonwell.local.pkl, then set launch.gameExecutable there to your " +
 		"Warcraft III.exe."
@@ -57,7 +54,6 @@ func TestLaunchPassesTheLaunchArgsAndLoadfile(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
 	starts := recordingSpawn(e)
 	game := testkit.WriteFile(t, t.TempDir(), "Warcraft III.exe", nil)
-	// The manifest's arguments have room behind them, where an argument that was added in place would show.
 	args := make([]string, 1, 4)
 	args[0] = "-launch"
 	how := manifest.Launch{GameExecutable: &game, Args: args}

@@ -27,16 +27,12 @@ func callNames(function Function) []string {
 	return names
 }
 
-// refusal is a source that Functions must refuse, with the words that tell its error from the others and the
-// place the error names.
 type refusal struct {
 	source       string
 	words        string
 	line, column int
 }
 
-// refused checks that the source fails with an error of the file, at the place, with the words and with the hint
-// to save the map again.
 func refused(t *testing.T, c refusal) {
 	t.Helper()
 	_, err := Functions(c.source, "map.lua")
@@ -89,7 +85,6 @@ func TestOnlyDirectStandaloneCallsBelongToAnEditorFunction(t *testing.T) {
 	}
 }
 
-// visibleAlone reports whether the source is the function config with the one call of Visible, and then main.
 func visibleAlone(source string) bool {
 	functions, err := Functions(source+"\nfunction main() end", "")
 	return err == nil && len(functions) == 2 && functions[0].Name == "config" &&
@@ -107,9 +102,6 @@ func TestAParameterListIsNamesWithCommasBetweenThemAndMayEndWithThreeDots(t *tes
 	}
 }
 
-// Lua that is valid and that no other source of the tests has: the one binary operator that everyExpression
-// lacks, blocks one after the other, which nest no deeper than one, and an assignment to an index and to a field
-// of one.
 func TestGreaterThanBlocksInARowAndAnAssignmentToAnIndexAreRead(t *testing.T) {
 	for _, source := range []string{
 		"function config() local x = a > b Visible() end",
@@ -136,7 +128,6 @@ func TestEveryKeywordOfLuaIsNoNameAndAWordThatOnlyStartsLikeOneIs(t *testing.T) 
 		if !keywords[word] || named(word) {
 			t.Errorf("%s is not held as a keyword", word)
 		}
-		// Where a name must stand, a keyword is refused.
 		if _, err := Functions("function config() local "+word+" = 1 end", ""); err == nil {
 			t.Errorf("a local named %s is read", word)
 		}
@@ -149,7 +140,6 @@ func TestEveryKeywordOfLuaIsNoNameAndAWordThatOnlyStartsLikeOneIs(t *testing.T) 
 			}
 		}
 	}
-	// A keyword is no global either.
 	for _, word := range words {
 		source := "Fine = 2\n" + word + " = 1\nFine, " + word + " = 3, 4"
 		if got := TopLevelGlobals(source); !slices.Equal(got, []string{"Fine"}) {
@@ -158,7 +148,6 @@ func TestEveryKeywordOfLuaIsNoNameAndAWordThatOnlyStartsLikeOneIs(t *testing.T) 
 	}
 }
 
-// parameterRefusals are parameter lists that are none.
 var parameterRefusals = []refusal{
 	{"function config(first,) end", "expected a name", 1, 23},
 	{"function config(first second) end", "expected ')'", 1, 23},
@@ -166,7 +155,6 @@ var parameterRefusals = []refusal{
 	{"function config(first, 2) end", "expected a name", 1, 24},
 }
 
-// returnRefusals are returns with a statement after them.
 var returnRefusals = []refusal{
 	{"function config() return; Visible() end", "return must end its block", 1, 27},
 	{"function config() return 1; Visible() end", "return must end its block", 1, 29},
@@ -185,7 +173,6 @@ func TestAReturnHasValuesOrNoneAndASemicolonOrNoneAndEndsItsBlock(t *testing.T) 
 	}
 }
 
-// lowestOperator has `or`, the operator that binds least, in every place where an expression stands.
 const lowestOperator = `function config()
 if a or b then Hidden() elseif c or d then Hidden() end
 while a or b do break end
@@ -211,7 +198,6 @@ func TestAnExpressionIsReadWholeWhereverItStands(t *testing.T) {
 	}
 }
 
-// ambiguousStructures are sources whose blocks, strings or statements do not close as Lua's do.
 var ambiguousStructures = []refusal{
 	{"function config()", "unterminated block", 1, 18},
 	{`function config() X("unterminated) end`, "unterminated quoted string", 1, 21},
@@ -409,8 +395,6 @@ func TestRealWorldEditorLuaExposesTheExpectedSettingsFunctionsAndCalls(t *testin
 	}
 }
 
-// deepNesting are sources nested far deeper than the reader follows: brackets in an expression, and blocks. Each
-// is refused at the level one past the limit.
 var deepNesting = []refusal{
 	{
 		"function config() Capture(" + strings.Repeat("(", 20000) + "1" + strings.Repeat(")", 20000) + ") end",
@@ -426,7 +410,6 @@ func TestDeeplyNestedInputFailsSafely(t *testing.T) {
 	}
 }
 
-// longChain is a function whose first statement chains 1000 operands with one operator.
 func longChain(operator string) string {
 	return "function config() local s = " + strings.Repeat("a"+operator, 999) + "a X() end"
 }
@@ -479,10 +462,8 @@ func TestTokenRangesPreserveNumeralOperatorAndStringSpellings(t *testing.T) {
 	}
 }
 
-// inConfig puts a statement into a function: the statement starts at column 19.
 func inConfig(body string) string { return "function config() " + body + " end" }
 
-// invalidShapes are statements with a bracket that another kind closes, or a shape no statement has.
 var invalidShapes = []refusal{
 	{inConfig("local x = (1]"), "expected ')'", 1, 31},
 	{inConfig("local x = {[1] 2}"), "expected '='", 1, 34},
@@ -514,8 +495,6 @@ func TestMismatchedDelimitersAndInvalidStatementShapesAreRefused(t *testing.T) {
 	}
 }
 
-// placedErrors are sources whose error is not on the first line, or stands after a character of four bytes: the
-// moon, which a column counts as one.
 var placedErrors = []refusal{
 	{"-- \U0001F319\nend", "expected a name", 2, 1},
 	{"--[[\U0001F319]] end", "expected a name", 1, 9},

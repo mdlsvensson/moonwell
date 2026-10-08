@@ -2,8 +2,6 @@ package testkit
 
 import "github.com/mdlsvensson/moonwell/internal/binio"
 
-// SyntheticMapInfo builds a war3map.w3i of the given format version with one player and one force. Only version 39
-// has a file recorded from World Editor (the map-settings-v39 fixture); the older layouts are written out here.
 func SyntheticMapInfo(version int32) []byte {
 	var w binio.Writer
 	texts := func(values ...string) {
