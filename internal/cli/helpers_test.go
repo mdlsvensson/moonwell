@@ -390,8 +390,8 @@ func pklOnly(t *testing.T, root string) (e *env.Env, log *testkit.Recorder, ran 
 func commandIn(t *testing.T, ctx context.Context, e *env.Env, name string, arguments ...string) ([]string, error) {
 	t.Helper()
 	var printed []string
-	said := line{words: append([]string{name}, arguments...)}
-	err := rowNamed(t, name).run(ctx, e, call{said: said, print: func(text string) { printed = append(printed, text) }})
+	said := call{arguments: arguments, print: func(text string) { printed = append(printed, text) }}
+	err := rowNamed(t, name).run(ctx, e, said)
 	return printed, err
 }
 

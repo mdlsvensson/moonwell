@@ -160,8 +160,8 @@ func TestTheAssetsPathsLineReportsOnTheFileItIsGiven(t *testing.T) {
 	// An empty argument names no file.
 	fails(t, root, []string{"error: assets:paths needs a model file outside a Moonwell project.",
 		"\nhint: moonwell assets:paths assets/Models/Knight.mdx"}, "assets:paths", "")
-	fails(t, root, []string{"error: assets:paths takes one argument: 'b.mdx' is one too many."},
-		"assets:paths", "knight.mdx", "b.mdx")
+	// A second file is one argument too many: the line is refused, and nothing is reported on.
+	fails(t, root, []string{"error: ", "\nhint: "}, "assets:paths", "knight.mdx", "b.mdx")
 	if entries := testkit.Snapshot(t, root); len(entries) != 1 {
 		t.Errorf("assets:paths outside a project left %d entries there, want the model alone", len(entries))
 	}

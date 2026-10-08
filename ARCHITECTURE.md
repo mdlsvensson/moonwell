@@ -54,8 +54,9 @@ Four words of a project come back all through this document:
   that the version is the same everywhere, that the install scripts work, that this document names real files and
   quotes `Plan` as the source has it.
 
-The module is `github.com/mdlsvensson/moonwell` and uses the Go standard library only: `go.mod` has no `require`
-line.
+The module is `github.com/mdlsvensson/moonwell`. Beside the Go standard library it depends on one module,
+`github.com/spf13/cobra`, which reads the command line, and on the two that `cobra` needs (`pflag`, and `mousetrap`
+on Windows). `module_test.go` holds `go.mod` to exactly those three.
 
 ## The four shelves
 
@@ -159,6 +160,8 @@ A format package takes bytes and returns bytes or values. It knows nothing of pr
   program and reach the network. (`internal/fsx` is let off for `os/exec`: it names one error type of it and starts
   nothing.) Test files and the two test-only packages may import both: `internal/testkit/tools.go` looks for `pkl`
   with `os/exec`.
+- Only `internal/cli` imports `cobra` and `pflag`, the modules that read a command line: no other package knows
+  how a line is read.
 - The two test-only packages are imported by test files alone. A test file follows the rule of its package, and may
   also import its own package and the two test-only packages.
 - The root package is under no rule. A package below `internal/` may import it for the embedded files and the
@@ -183,13 +186,15 @@ Follow `moonwell build --minify`:
 2. `Main` in `internal/cli/cli.go` finds the working folder, makes two writers (lines for the terminal go to
    standard error, output meant for other programs goes to standard output), turns Ctrl+C into the cancelling of a
    `context.Context`, and calls `Run`.
-3. `Run` calls `runIn`, which does five things in order:
-   - `parse` in `internal/cli/args.go` reads the line by the table of flags, `flags`. A line it cannot read whole
-     is refused with a hint, and nothing runs.
-   - `--version` and `--help` are answered.
-   - The command's name is looked up in the table `commands`. A row has the name, the help text, how many arguments
-     the command takes, and the function that runs it.
-   - A logger and the outside world are made: `env.NewLogger` and `env.New`. In a project the logger also writes
+3. `Run` calls `runIn`, and that `carryOut`, which does these things in order:
+   - `tree` makes the command line as `cobra` reads it: a `cobra` command for each row of the table `commands`. A
+     row has the name, the help text, how many arguments the command takes, the flags it has, and the function
+     that runs it.
+   - `cobra` reads the line. It answers `--help` and `--version` itself, and so the commands `help` and
+     `completion`, which are its own. A line it cannot read is refused in `cobra`'s words, printed as every failure
+     of Moonwell is, and nothing runs.
+   - For a line that names a row, `run` refuses an `--entry` that is no `.yue` file under `src/`, and then makes a
+     logger and the outside world: `env.NewLogger` and `env.New`. In a project the logger also writes
      `dist/moonwell.log`.
    - The row's function runs, and `exitCode` turns what it returned into 0, 1, or 130 after Ctrl+C. An error is
      printed here, once, by `diag.Format`.
@@ -505,9 +510,9 @@ Each row names the file to open and, in most rows, the function to read first.
 | --- | --- |
 | see what `moonwell build` does, in order | `internal/build/build.go`: `Build`, then `Plan`; the longer steps in `internal/build/steps.go` |
 | add a command | `internal/cli/cli.go`: the table `commands`, whose comment says what a new command needs |
-| add a flag, or give a command a flag | `internal/cli/args.go`: the table `flags`, and a field of `line` for what the flag says. The flag is also written by hand in the `usage` text of each command that has it, in the table `commands` of `internal/cli/cli.go`: that text is what `--help` shows. A flag of `build` and `test` then goes on through `options` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
-| know why a command line is refused | `internal/cli/args.go`: `parse`, `fits`, and the errors at the bottom |
-| change the help text | `internal/cli/cli.go`: `Usage`, and the `usage` and `help` of each row of `commands` |
+| add a flag, or give a command a flag | `internal/cli/cli.go`: an `option` beside `entryOption`, in the `flags` of each row of `commands` that has it, a field of `call` for what the flag says, and a line in `run` that reads it. The flag is also written by hand in the `usage` text of those rows. A flag of `build` and `test` then goes on through `options` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
+| know why a command line is refused | `cobra` refuses it, in its own words: an unknown flag or command, a flag without its value, a wrong number of arguments (the `args` of the row in `commands`). `refusal` in `internal/cli/cli.go` prints it. Only an `--entry` that is no entry is refused by Moonwell, in `run` |
+| change the help text | `internal/cli/cli.go`: the `usage` and `help` of each row of `commands`, the `help` of an `option`, and the `Long` text in `tree`. The layout is `cobra`'s |
 | know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `runIn`, `exitCode` |
 | change what Ctrl+C does | `internal/cli/cli.go`: `Main`, `heed`, `leaveAtOnce`; `internal/build/lock.go`: `ReleaseHeld` |
 | know where the log file is written | `internal/cli/cli.go`: `logFile`; `internal/env/log.go` |

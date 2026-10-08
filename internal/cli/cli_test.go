@@ -17,114 +17,38 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-const usage = `Moonwell VERSION: Warcraft III maps with YueScript gameplay and Pkl data
+// ---- the help, the version, and a line that is refused ----
 
-Usage: moonwell <command> [options]
-
-Commands:
-  init <dir> [--link]            Create a project (--link: use this local Moonwell checkout)
-  setup                          Prepare a checkout: moonwell.local.pkl, Pkl, YueScript, libraries, the editor
-  build [--entry f] [--minify]   Build <build.folder>/<map.folder>
-  test [--entry f] [--minify]    Stage the map and launch Warcraft III
-  dev                            Watch sources and report errors on save
-  check                          Compile and validate without building a map
-  assets:check                   Show what assets:sync would change in the source map
-  assets:sync                    Write assets/ into the source map (close it in World Editor first)
-  assets:paths [file]            List the files a model references, as in-game or custom paths
-  settings:check                 Show which internal map files the settings would change
-  objects:eval                   Print the validated custom objects as JSON
-  objects:check                  Show which internal map files the objects would change
-
-Options:
-  -h, --help                     Show this help
-  -v, --version                  Show the version`
-
-// ---- the usage, the version, and a command Moonwell does not have ----
-
-func TestHelpAndNoCommandPrintUsage(t *testing.T) {
-	want := strings.Replace(usage, "VERSION", moonwell.Version, 1)
-	for _, args := range [][]string{
-		{"--help"}, {"-h"}, {}, {"build", "--help"}, {"frobnicate", "--help"}, {"--"}, {"--help", "--", "build"},
-	} {
-		if result := run(t.TempDir(), args...); result.code != 0 || result.output != want || result.stdout != "" {
-			t.Errorf("%q: exit %d\n%s", args, result.code, result.output)
+// args_test.go holds how a line is read, against the command table with commands that do nothing. Here the
+// program's own door is taken once for each kind of line that runs no command.
+func TestTheHelpAndTheVersionArePrintedForOtherPrograms(t *testing.T) {
+	for _, args := range [][]string{{"--help"}, {}, {"build", "--help"}, {"help", "init"}} {
+		result := ok(t, t.TempDir(), args...)
+		if result.output != "" || !strings.Contains(result.stdout, "Usage:") {
+			t.Errorf("%q: %+v", args, result)
 		}
 	}
-}
-
-func TestVersionPrintsTheVersion(t *testing.T) {
-	for _, args := range [][]string{{"--version"}, {"-v"}, {"build", "-v"}, {"--help", "--version"}} {
-		if result := ok(t, t.TempDir(), args...); result.output != moonwell.Version || result.stdout != "" {
+	for _, args := range [][]string{{"--version"}, {"-v"}} {
+		if result := ok(t, t.TempDir(), args...); result.stdout != moonwell.Version || result.output != "" {
 			t.Errorf("%q: %+v", args, result)
 		}
 	}
 }
 
-func TestUnknownCommandsFailWithUsage(t *testing.T) {
-	for _, c := range []struct {
-		args  []string
-		first string
-	}{
-		{[]string{"frobnicate"}, "Unknown command 'frobnicate'."},
-		{[]string{""}, "Unknown command ''."},
-		// The closest command is named when one is close.
-		{[]string{"buld"}, "Unknown command 'buld'. Did you mean build?"},
-		{[]string{"chek"}, "Unknown command 'chek'. Did you mean check?"},
-		{[]string{"Dev"}, "Unknown command 'Dev'. Did you mean dev?"},
-		// Two letters that changed places are one slip.
-		{[]string{"biuld"}, "Unknown command 'biuld'. Did you mean build?"},
-		{[]string{"tset"}, "Unknown command 'tset'. Did you mean test?"},
-		// After "--" the first word is the command, though a flag is written so.
-		{[]string{"--", "--minify"}, "Unknown command '--minify'."},
-		{[]string{"--", "frobnicate", "--minify"}, "Unknown command 'frobnicate'."},
+func TestARefusedLineIsPrintedAsOneFailureWithAHint(t *testing.T) {
+	for _, args := range [][]string{
+		{"frobnicate"}, {"biuld"}, {"build", "--minfy"}, {"dev", "--minify"}, {"--minify", "build"}, {"build", "extra"},
+		{"init"}, {"test", "--minify=maybe"}, {"setup", "-v"}, {"build", "--entry"},
 	} {
-		result := run(t.TempDir(), c.args...)
-		if result.code != 1 || !strings.HasPrefix(result.output, c.first+"\n\nMoonwell ") || result.stdout != "" {
-			t.Errorf("%q: %+v", c.args, result)
-		}
-		if !strings.HasSuffix(result.output, "\n\n"+Usage()) {
-			t.Errorf("%q: the usage does not end the output:\n%s", c.args, result.output)
+		result := fails(t, t.TempDir(), []string{"error: ", "\nhint: "}, args...)
+		if strings.Count(result.output, "error: ") != 1 || result.stdout != "" {
+			t.Errorf("%q printed its refusal more than once, or for other programs:\n%s", args, result.output)
 		}
 	}
 }
 
-// ---- a line that is refused ----
-
-func TestARefusedLineIsPrintedAsAFailureWithItsHintAndWithoutTheUsage(t *testing.T) {
-	for _, c := range []struct {
-		args   []string
-		wanted []string
-	}{
-		{[]string{"build", "--minfy"}, []string{"error: ", "'--minfy'", "\nhint: Did you mean --minify?"}},
-		{[]string{"dev", "--minify"}, []string{"error: dev has no flag '--minify'", "\nhint: "}},
-		{[]string{"check", "--entry", "src/a.yue"}, []string{"error: check has no flag '--entry'", "\nhint: "}},
-		{[]string{"build", "extra"}, []string{"error: build takes no arguments", "\nhint: "}},
-		{[]string{"test", "--minify=true"}, []string{"error: ", "takes no value", "\nhint: "}},
-		{[]string{"-hv"}, []string{"error: ", "'-hv'", "\nhint: "}},
-		{[]string{"--", "build", "--minify"}, []string{"error: build takes no arguments", "'--minify'", "\nhint: "}},
-		{[]string{"build", "--linkk"},
-			[]string{"error: Moonwell has no flag '--linkk'.", "\nhint: Did you mean --link? --link is a flag of init."}},
-	} {
-		result := fails(t, t.TempDir(), c.wanted, c.args...)
-		if strings.Contains(result.output, "Usage:") || strings.Count(result.output, "error: ") != 1 {
-			t.Errorf("%q printed the usage, or its refusal more than once:\n%s", c.args, result.output)
-		}
-		if result.stdout != "" {
-			t.Errorf("%q printed %q for other programs", c.args, result.stdout)
-		}
-	}
-}
-
-func TestAnEntryFlagWithoutAFileIsRefused(t *testing.T) {
-	for _, command := range []string{"build", "test"} {
-		result := run(t.TempDir(), command, "--entry")
-		if result.code != 1 || !strings.HasPrefix(result.output, "error: Entry '' must be a .yue file under src/.") {
-			t.Errorf("%s: %+v", command, result)
-		}
-	}
-}
-
-// The file of --entry is refused as the line is read: in a project too, nothing is loaded and nothing is made.
+// The file of --entry is refused before the line has its command: in a project too, nothing is loaded and
+// nothing is made.
 func TestAnEntryThatIsNoEntryFileIsRefusedBeforeAnythingIsLoaded(t *testing.T) {
 	root := project(t)
 	fails(t, root, []string{"error: Entry 'lua/main.lua' must be a .yue file under src/.", "\nhint: "},
@@ -245,13 +169,6 @@ func TestCommandFailuresAreFormattedAndReturn1(t *testing.T) {
 	if strings.Count(result.output, "error: ") != 1 {
 		t.Errorf("the failure is printed more than once:\n%s", result.output)
 	}
-	// init without its folder is refused as the line is read, in init's own words.
-	for _, args := range [][]string{{"init"}, {"init", "--link"}} {
-		result := run(t.TempDir(), args...)
-		if result.code != 1 || result.output != "error: init needs a directory.\nhint: moonwell init my-map" {
-			t.Errorf("%q: %+v", args, result)
-		}
-	}
 }
 
 func TestACommandThatWasInterruptedExitsWith130(t *testing.T) {
@@ -358,7 +275,7 @@ func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 }
 
 // Before a line has a command it has no log, and a fault there is printed to the terminal alone. Nothing that
-// runs so early can be made to panic but the stream the lines go to: it fails here once, as the version is
+// runs so early can be made to panic but the stream the lines go to: it fails here once, as a refusal is
 // written, in the real world.
 func TestAPanicBeforeALineHasACommandIsPrintedToTheTerminal(t *testing.T) {
 	root := project(t)
@@ -371,7 +288,7 @@ func TestAPanicBeforeALineHasACommandIsPrintedToTheTerminal(t *testing.T) {
 		}
 		lines = append(lines, line)
 	}
-	code := Run(background, []string{"--version"}, root, write, func(string) {})
+	code := Run(background, []string{"--frobnicate"}, root, write, func(string) {})
 	if code != 1 || len(lines) != 1 || !strings.HasPrefix(lines[0], "internal error: the stream broke\n") {
 		t.Fatalf("exit %d, printed %q", code, lines)
 	}
@@ -402,28 +319,33 @@ func TestAFileNameThatIsNotUTF8IsPrintedAsItIs(t *testing.T) {
 
 func TestBuildAndTestPlanWithWhatTheLineSaid(t *testing.T) {
 	for _, c := range []struct {
-		said line
+		said call
 		want build.Options
 	}{
-		{line{words: []string{"build"}}, build.Options{}},
-		{line{words: []string{"build"}, minify: true}, build.Options{Minify: true}},
-		{line{words: []string{"test"}, entry: "src/other.yue"}, build.Options{Entry: "src/other.yue"}},
-		{line{words: []string{"test"}, entry: "src/other.yue", minify: true},
-			build.Options{Entry: "src/other.yue", Minify: true}},
+		{call{}, build.Options{}},
+		{call{minify: true}, build.Options{Minify: true}},
+		{call{entry: "src/other.yue"}, build.Options{Entry: "src/other.yue"}},
+		{call{entry: "src/other.yue", minify: true}, build.Options{Entry: "src/other.yue", Minify: true}},
 	} {
-		if got := (call{said: c.said}).options(); got != c.want {
+		if got := c.said.options(); got != c.want {
 			t.Errorf("the options of %+v are %+v, want %+v", c.said, got, c.want)
 		}
 	}
 }
 
-// Each command of the table has what the usage and a run need, and no two have one name.
+// Each command of the table has what the help and a run need, and no two have one name. Each flag of a row has
+// a name and says what it does, and the usage of its row names it.
 func TestEveryCommandOfTheTableCanBeShownAndRun(t *testing.T) {
 	seen := map[string]bool{}
 	for _, c := range commands {
 		if c.name == "" || c.help == "" || c.run == nil || !strings.HasPrefix(c.usage+" ", c.name+" ") {
 			t.Errorf("the row of %q lacks a name, a help text or a function, or its usage does not start with its name",
 				c.name)
+		}
+		for _, o := range c.flags {
+			if o.name == "" || o.help == "" || !strings.Contains(c.usage, "[--"+o.name) {
+				t.Errorf("a flag of %s lacks a name or a help text, or the usage %q does not name it", c.name, c.usage)
+			}
 		}
 		if seen[c.name] {
 			t.Errorf("two rows are named %s", c.name)
@@ -442,24 +364,12 @@ func TestTheTableHasTheTwelveCommandsInTheOrderOfTheUsage(t *testing.T) {
 	var have []string
 	for _, c := range commands {
 		have = append(have, c.name)
-		takesOne := c.name == "init" || c.name == "assets:paths"
-		if (c.takes.most == 1) != takesOne || (c.takes.missing != nil) != (c.name == "init") {
-			t.Errorf("%s takes %+v", c.name, c.takes)
+		if takesOne := c.name == "init" || c.name == "assets:paths"; (c.args != nil) != takesOne {
+			t.Errorf("%s holds its arguments to a number, or does not, against its usage %q", c.name, c.usage)
 		}
 	}
 	if !slices.Equal(have, want) {
 		t.Errorf("the table has %q, want %q", have, want)
-	}
-}
-
-// A flag is held against the commands its row names: a name that is no command would be a flag nobody can give.
-func TestEveryCommandAFlagNamesIsARowOfTheTable(t *testing.T) {
-	for _, f := range flags {
-		for _, name := range f.commands {
-			if _, known := rowOf(commands, name); !known {
-				t.Errorf("%s is a flag of %q, which the command table does not have", f.written(), name)
-			}
-		}
 	}
 }
 

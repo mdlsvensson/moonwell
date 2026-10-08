@@ -90,19 +90,19 @@ func TestMoonwellExecutable(t *testing.T) {
 	root := compiling(t)
 	s := executable{program: theProgram(t), root: root, cache: ownCache(t)}
 
-	t.Run("the help goes to the terminal's stream", func(t *testing.T) {
+	t.Run("the help is printed for other programs", func(t *testing.T) {
 		code, out, log := s.run(t, "--help")
-		if code != 0 || out != "" {
+		if code != 0 || log != "" {
 			t.Fatalf("exit %d; stdout %q; stderr %q", code, out, log)
 		}
-		contains(t, log, "Usage: moonwell")
+		contains(t, out, "Usage:\n  moonwell")
 	})
 	t.Run("an unknown command ends with 1", func(t *testing.T) {
 		code, out, log := s.run(t, "unknown")
 		if code != 1 || out != "" {
 			t.Fatalf("exit %d; stdout %q; stderr %q", code, out, log)
 		}
-		contains(t, log, "Unknown command")
+		contains(t, log, "error: ", "unknown")
 	})
 	t.Run("objects:eval prints to the stream for programs, in the working folder", func(t *testing.T) {
 		code, out, log := s.run(t, "objects:eval")

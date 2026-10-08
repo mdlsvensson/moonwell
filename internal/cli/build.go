@@ -15,5 +15,5 @@ func runBuild(ctx context.Context, e *env.Env, c call) error {
 
 // options is what the line changes about the plan of a build or a test: --entry's file and --minify.
 func (c call) options() build.Options {
-	return build.Options{Entry: c.said.entry, Minify: c.said.minify}
+	return build.Options{Entry: c.entry, Minify: c.minify}
 }

@@ -17,8 +17,8 @@ import (
 // whether the game ships its path. In a project it also says whether a build imports a file at the path.
 func runAssetsPaths(ctx context.Context, e *env.Env, c call) error {
 	file := "" // no file: every model among the project's assets
-	if arguments := c.said.arguments(); len(arguments) > 0 {
-		file = arguments[0]
+	if len(c.arguments) > 0 {
+		file = c.arguments[0]
 	}
 	return assetsPaths(ctx, e, file, assets.LoadGamePaths())
 }

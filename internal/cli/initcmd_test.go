@@ -96,7 +96,7 @@ func TestInitRefusesATargetThatIsAFileOrIsNotEmpty(t *testing.T) {
 // An empty name is no folder to make: it is refused as an init without its argument is, and is not read as the
 // working folder.
 func TestInitRefusesAnEmptyFolderName(t *testing.T) {
-	for _, args := range [][]string{{"init", ""}, {"init", "--", ""}, {"--link", "init", ""}} {
+	for _, args := range [][]string{{"init", ""}, {"init", "--", ""}, {"init", "--link", ""}} {
 		root := t.TempDir()
 		result := carriedIn(background, nothingRuns(t), root, args...)
 		if result.code != 1 || result.output != "error: init needs a directory.\nhint: moonwell init my-map" {
@@ -288,7 +288,7 @@ func TestInitWithLinkNeedsACheckout(t *testing.T) {
 	if err := os.MkdirAll(below, 0o777); err != nil {
 		t.Fatal(err)
 	}
-	result = carriedIn(background, resolving(t, "Pkl 0.32.1", 0), below, "--link", "init", "../../maps/my-map")
+	result = carriedIn(background, resolving(t, "Pkl 0.32.1", 0), below, "init", "--link", "../../maps/my-map")
 	if result.code != 0 {
 		t.Fatalf("%+v", result)
 	}

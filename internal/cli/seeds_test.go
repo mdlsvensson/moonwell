@@ -366,13 +366,12 @@ func commandOf(args []string) string {
 }
 
 // recordedRuns is every run of the recorded test. The help and the version are not among them: both hold the
-// version number, which every release changes, and TestHelpAndNoCommandPrintUsage and
-// TestVersionPrintsTheVersion hold them whole.
+// version number, which every release changes, and the help is laid out by cobra:
+// TestTheHelpNamesEveryCommandInTheOrderOfTheTable and TestVersionPrintsTheVersion hold what they must say.
 var recordedRuns = []recordedRun{
 	// Every command on the template.
 	on(templateSeed, "build"),
 	on(templateSeed, "build", "--minify"),
-	on(templateSeed, "--minify", "build"),
 	on(templateSeed, "check"),
 	on(templateSeed, "setup"),
 	on(templateSeed, "assets:check"),
@@ -381,7 +380,6 @@ var recordedRuns = []recordedRun{
 	on(templateSeed, "settings:check"),
 	on(templateSeed, "objects:eval"),
 	on(templateSeed, "objects:check"),
-	on(templateSeed, "--", "check"),
 	// test without a game, which it looks for when the map is staged; dev without sources, which ends by itself.
 	on("no-game", "test"),
 	on("no-game", "test", "--minify"),
@@ -475,18 +473,18 @@ var recordedRuns = []recordedRun{
 
 	// A line that the grammar refuses ends with 1, prints nothing and leaves the project as it is: an unknown
 	// flag, without and with a flag close to it; a flag the command does not have; a switch that is given a
-	// value, after "=" and as a word of its own; an argument the command does not take; a flag without a
-	// command; the help asked for on a line that is refused; and short flags in a group.
+	// value that says neither on nor off, and one as a word of its own; an argument the command does not take;
+	// a flag without a command, and one before its command; and the help asked for on a line that is refused.
 	on(templateSeed, "build", "--frobnicate"),
 	on(templateSeed, "build", "--minfy"),
 	on(templateSeed, "check", "--minify"),
 	on(templateSeed, "objects:eval", "--link"),
-	on(templateSeed, "build", "--minify=false"),
+	on(templateSeed, "build", "--minify=maybe"),
 	on(templateSeed, "build", "--minify", "false"),
 	on(templateSeed, "build", "extra"),
 	on(templateSeed, "--minify"),
+	on(templateSeed, "--minify", "build"),
 	on(templateSeed, "--help", "--frobnicate"),
-	on(templateSeed, "-hv"),
 	// A command Moonwell does not have, far from every command and close to one.
 	on(templateSeed, "frobnicate"),
 	on(templateSeed, "biuld"),

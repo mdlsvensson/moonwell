@@ -21,13 +21,13 @@ import (
 // runInit is `moonwell init <dir> [--link]`: it makes a project in a folder that is new or empty. With --link
 // the project uses the Pkl package of the Moonwell checkout the command runs in, in place of the published one.
 func runInit(ctx context.Context, e *env.Env, c call) error {
-	arguments := c.said.arguments()
+	arguments := c.arguments
 	// An empty name is no folder: read against the working folder, it would be the working folder itself.
 	if len(arguments) == 0 || arguments[0] == "" {
 		return errInitNeedsAFolder()
 	}
 	schema := "" // the published package
-	if c.said.link {
+	if c.link {
 		checkout, err := checkoutAbove(e.Root)
 		if err != nil {
 			return err
