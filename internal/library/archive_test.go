@@ -100,14 +100,14 @@ func TestAPathThatAnArchiveHasTwiceKeepsItsFirstPlaceAndItsLastBytes(t *testing.
 }
 
 func TestFilesHashDependsOnPathsAndContentsNotOrder(t *testing.T) {
-	hash := filesHash(filesOfTest("x.lua", "1", "y.lua", "2"))
-	if hash != filesHash(filesOfTest("y.lua", "2", "x.lua", "1")) {
+	hash := hashFiles(filesOfTest("x.lua", "1", "y.lua", "2"))
+	if hash != hashFiles(filesOfTest("y.lua", "2", "x.lua", "1")) {
 		t.Errorf("the hash depends on the order of the files")
 	}
-	for _, other := range [][]file{
+	for _, other := range [][]archiveFile{
 		filesOfTest("x.lua", "1", "y.lua", "3"), filesOfTest("x.lua", "1", "z.lua", "2"), filesOfTest("x.lua", "1"), nil,
 	} {
-		if hash == filesHash(other) {
+		if hash == hashFiles(other) {
 			t.Errorf("%q have the hash of other files", listing(other))
 		}
 	}
@@ -115,19 +115,19 @@ func TestFilesHashDependsOnPathsAndContentsNotOrder(t *testing.T) {
 	if want := "sha256:" + fsx.SHA256Hex([]byte(listed)); hash != want {
 		t.Errorf("filesHash = %s, want %s", hash, want)
 	}
-	if want := "sha256:" + fsx.SHA256Hex(nil); filesHash(nil) != want {
-		t.Errorf("filesHash of no files = %s, want %s", filesHash(nil), want)
+	if want := "sha256:" + fsx.SHA256Hex(nil); hashFiles(nil) != want {
+		t.Errorf("filesHash of no files = %s, want %s", hashFiles(nil), want)
 	}
 }
 
 func TestFilesHashListsTheFilesInByteOrder(t *testing.T) {
 	files := filesOfTest(beyond+".lua", "1", "b.lua", "2", replacement+".lua", "3", "B.lua", "4")
 	var listed strings.Builder
-	for _, f := range []file{files[3], files[1], files[2], files[0]} {
+	for _, f := range []archiveFile{files[3], files[1], files[2], files[0]} {
 		listed.WriteString(f.name + "\n" + fsx.SHA256Hex(f.data) + "\n")
 	}
-	if want := "sha256:" + fsx.SHA256Hex([]byte(listed.String())); filesHash(files) != want {
-		t.Errorf("filesHash = %s, want %s", filesHash(files), want)
+	if want := "sha256:" + fsx.SHA256Hex([]byte(listed.String())); hashFiles(files) != want {
+		t.Errorf("filesHash = %s, want %s", hashFiles(files), want)
 	}
 	if files[0].name != beyond+".lua" {
 		t.Errorf("filesHash changed the order of the files it was given")
@@ -186,7 +186,7 @@ const (
 	exampleURL   = "https://codeload.github.com/owner/lib/zip/refs/tags/v1/x"
 )
 
-func downloadExample(network *served) (string, []file, error) {
+func downloadExample(network *served) (string, []archiveFile, error) {
 	return downloadTag(background, network.fetch, "ex", "owner/lib", "v1/x", manifestFile)
 }
 

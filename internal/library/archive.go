@@ -16,40 +16,40 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
-type file struct {
+type archiveFile struct {
 	name string
 	data []byte
 }
 
 func downloadTag(
-	ctx context.Context, fetch env.FetchFunc, key, github, tag, manifestFile string,
-) (commit string, files []file, err error) {
+	ctx context.Context, fetch env.FetchFunc, key, github, tag, manifestName string,
+) (commit string, files []archiveFile, err error) {
 	address := archiveURL(github, tag)
-	body, err := fetchTag(ctx, fetch, address, key, github, tag, manifestFile)
+	body, err := fetchTag(ctx, fetch, address, key, github, tag, manifestName)
 	if err != nil {
 		return "", nil, err
 	}
 	commit, files, err = readArchive(body)
 	if err != nil {
-		return "", nil, errNotATagArchive(key, manifestFile, address, err)
+		return "", nil, errNotATagArchive(key, manifestName, address, err)
 	}
 	for _, f := range files {
-		if !insideLibrary(f.name) {
-			return "", nil, errUnsafePath(key, manifestFile, address, f.name)
+		if !isInsideLibrary(f.name) {
+			return "", nil, errUnsafePath(key, manifestName, address, f.name)
 		}
 	}
 	return commit, files, nil
 }
 
-func fetchTag(ctx context.Context, fetch env.FetchFunc, address, key, github, tag, manifestFile string) ([]byte, error) {
+func fetchTag(ctx context.Context, fetch env.FetchFunc, address, key, github, tag, manifestName string) ([]byte, error) {
 	status, body, err := fetch(ctx, address)
 	switch {
 	case err != nil:
-		return nil, errDownloadFailed(key, github, manifestFile, err)
+		return nil, errDownloadFailed(key, github, manifestName, err)
 	case status == 404:
-		return nil, errNoSuchTag(key, github, tag, manifestFile)
+		return nil, errNoSuchTag(key, github, tag, manifestName)
 	case status < 200 || status > 299:
-		return nil, errStatus(key, status, manifestFile)
+		return nil, errStatus(key, status, manifestName)
 	}
 	return body, nil
 }
@@ -62,32 +62,32 @@ func archiveURL(github, tag string) string {
 	return "https://codeload.github.com/" + github + "/zip/refs/tags/" + strings.Join(segments, "/")
 }
 
-func readArchive(data []byte) (commit string, files []file, err error) {
+func readArchive(data []byte) (commit string, files []archiveFile, err error) {
 	archive, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
 	if err != nil && !errors.Is(err, zip.ErrInsecurePath) {
 		return "", nil, errInvalidZip(err)
 	}
-	if commit, err = commitOf(archive.Comment); err != nil {
+	if commit, err = parseCommit(archive.Comment); err != nil {
 		return "", nil, err
 	}
-	if files, err = filesBelowTheTop(archive.File); err != nil {
+	if files, err = filesBelowRoot(archive.File); err != nil {
 		return "", nil, err
 	}
 	return commit, files, nil
 }
 
-func commitOf(comment string) (string, error) {
+func parseCommit(comment string) (string, error) {
 	commit := fsx.TrimASCIISpace(comment)
-	if len(commit) != 40 || strings.ContainsFunc(commit, notALowerHexDigit) {
+	if len(commit) != 40 || strings.ContainsFunc(commit, isNotLowerHex) {
 		return "", errNoCommit()
 	}
 	return commit, nil
 }
 
-func notALowerHexDigit(r rune) bool { return !strings.ContainsRune("0123456789abcdef", r) }
+func isNotLowerHex(r rune) bool { return !strings.ContainsRune("0123456789abcdef", r) }
 
-func filesBelowTheTop(entries []*zip.File) ([]file, error) {
-	var files []file
+func filesBelowRoot(entries []*zip.File) ([]archiveFile, error) {
+	var files []archiveFile
 	place := map[string]int{}
 	top, hasTop := "", false
 	for _, entry := range entries {
@@ -99,7 +99,7 @@ func filesBelowTheTop(entries []*zip.File) ([]file, error) {
 			return nil, errNoSingleTop()
 		}
 		top, hasTop = first, true
-		data, err := contentOf(entry)
+		data, err := readZipFile(entry)
 		if err != nil {
 			return nil, err
 		}
@@ -108,12 +108,12 @@ func filesBelowTheTop(entries []*zip.File) ([]file, error) {
 			continue
 		}
 		place[path] = len(files)
-		files = append(files, file{path, data})
+		files = append(files, archiveFile{path, data})
 	}
 	return files, nil
 }
 
-func contentOf(entry *zip.File) ([]byte, error) {
+func readZipFile(entry *zip.File) ([]byte, error) {
 	reader, err := entry.Open()
 	if err != nil {
 		return nil, errEntryUnreadable(entry.Name, err)
@@ -126,8 +126,8 @@ func contentOf(entry *zip.File) ([]byte, error) {
 	return data, nil
 }
 
-func filesHash(files []file) string {
-	sorted := slices.SortedFunc(slices.Values(files), func(a, b file) int { return strings.Compare(a.name, b.name) })
+func hashFiles(files []archiveFile) string {
+	sorted := slices.SortedFunc(slices.Values(files), func(a, b archiveFile) int { return strings.Compare(a.name, b.name) })
 	var lines strings.Builder
 	for _, f := range sorted {
 		lines.WriteString(f.name + "\n" + fsx.SHA256Hex(f.data) + "\n")
@@ -135,7 +135,7 @@ func filesHash(files []file) string {
 	return "sha256:" + fsx.SHA256Hex([]byte(lines.String()))
 }
 
-func reasonOf(err error) string {
+func describeFetchError(err error) string {
 	var failure *diag.Error
 	if errors.As(err, &failure) {
 		return failure.Msg
@@ -143,44 +143,44 @@ func reasonOf(err error) string {
 	return fsx.Reason(err)
 }
 
-func errDownloadFailed(key, github, manifestFile string, cause error) error {
+func errDownloadFailed(key, github, manifestName string, cause error) error {
 	return &diag.Error{
-		Msg:   "Downloading library " + key + " failed: " + reasonOf(cause),
-		File:  manifestFile,
+		Msg:   "Downloading library " + key + " failed: " + describeFetchError(cause),
+		File:  manifestName,
 		Hint:  "Check your connection and that https://github.com/" + github + " exists.",
 		Cause: cause,
 	}
 }
 
-func errNoSuchTag(key, github, tag, manifestFile string) error {
+func errNoSuchTag(key, github, tag, manifestName string) error {
 	return &diag.Error{
 		Msg:  "Library " + key + ": " + github + " has no tag " + tag + ".",
-		File: manifestFile,
+		File: manifestName,
 		Hint: "See the tags at https://github.com/" + github + "/tags.",
 	}
 }
 
-func errStatus(key string, status int, manifestFile string) error {
+func errStatus(key string, status int, manifestName string) error {
 	return &diag.Error{
 		Msg:  fmt.Sprintf("Downloading library %s failed: HTTP %d.", key, status),
-		File: manifestFile,
+		File: manifestName,
 		Hint: "Try again later.",
 	}
 }
 
-func errNotATagArchive(key, manifestFile, address string, cause error) error {
+func errNotATagArchive(key, manifestName, address string, cause error) error {
 	return &diag.Error{
-		Msg:   "The download of library " + key + " is not a GitHub tag archive: " + reasonOf(cause),
-		File:  manifestFile,
+		Msg:   "The download of library " + key + " is not a GitHub tag archive: " + describeFetchError(cause),
+		File:  manifestName,
 		Hint:  "Check " + address + " in a browser.",
 		Cause: cause,
 	}
 }
 
-func errUnsafePath(key, manifestFile, address, path string) error {
+func errUnsafePath(key, manifestName, address, path string) error {
 	return &diag.Error{
 		Msg:  "The download of library " + key + " has an unsafe path: " + path,
-		File: manifestFile,
+		File: manifestName,
 		Hint: "Check " + address + " in a browser.",
 	}
 }

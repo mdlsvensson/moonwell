@@ -56,7 +56,7 @@ func linkTheLock(t *testing.T, kind, root, beside string) {
 		testkit.LinkDir(t, filepath.Join(beside, "folder"), link)
 		return
 	case "a link to a lock":
-		target = testkit.WriteFile(t, beside, "their.lock", []byte(lockText(map[string]lockEntry{"ex": entryOfTest(nil)})))
+		target = testkit.WriteFile(t, beside, "their.lock", []byte(formatLock(map[string]lockEntry{"ex": entryOfTest(nil)})))
 	}
 	testkit.LinkFile(t, target, link)
 }
@@ -77,15 +77,15 @@ func entries(files ...string) []testkit.ZipEntry {
 	return listed
 }
 
-func filesOfTest(files ...string) []file {
-	var listed []file
+func filesOfTest(files ...string) []archiveFile {
+	var listed []archiveFile
 	for i := 0; i < len(files); i += 2 {
-		listed = append(listed, file{files[i], []byte(files[i+1])})
+		listed = append(listed, archiveFile{files[i], []byte(files[i+1])})
 	}
 	return listed
 }
 
-func listing(files []file) []string {
+func listing(files []archiveFile) []string {
 	var listed []string
 	for _, f := range files {
 		listed = append(listed, f.name+"="+string(f.data))

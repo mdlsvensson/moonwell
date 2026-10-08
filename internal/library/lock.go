@@ -17,10 +17,10 @@ type lockEntry struct {
 	Assets                          *string
 }
 
-func lockAt(root string) (string, error) { return fsx.SafeJoinNoSymlinks(root, lockFile) }
+func lockPath(root string) (string, error) { return fsx.SafeJoinNoSymlinks(root, lockFile) }
 
 func readLock(root string) (map[string]lockEntry, error) {
-	path, err := lockAt(root)
+	path, err := lockPath(root)
 	if err != nil {
 		return nil, err
 	}
@@ -33,18 +33,18 @@ func readLock(root string) (map[string]lockEntry, error) {
 	case !json.Valid(data):
 		return nil, errLockNotJSON()
 	}
-	return entriesOf(data)
+	return parseLock(data)
 }
 
-func entriesOf(document []byte) (map[string]lockEntry, error) {
-	members, _ := objectOf(document)
-	libraries, isObject := objectOf(members["libraries"])
+func parseLock(document []byte) (map[string]lockEntry, error) {
+	members, _ := asObject(document)
+	libraries, isObject := asObject(members["libraries"])
 	if !isObject {
 		return nil, errNotALock()
 	}
 	entries := map[string]lockEntry{}
 	for key, written := range libraries {
-		entry, isEntry := entryOf(written)
+		entry, isEntry := parseLockEntry(written)
 		if !isEntry {
 			return nil, errNotALock()
 		}
@@ -53,8 +53,8 @@ func entriesOf(document []byte) (map[string]lockEntry, error) {
 	return entries, nil
 }
 
-func entryOf(written json.RawMessage) (lockEntry, bool) {
-	members, isObject := objectOf(written)
+func parseLockEntry(written json.RawMessage) (lockEntry, bool) {
+	members, isObject := asObject(written)
 	if !isObject {
 		return lockEntry{}, false
 	}
@@ -63,14 +63,14 @@ func entryOf(written json.RawMessage) (lockEntry, bool) {
 		"github": &entry.GitHub, "tag": &entry.Tag, "dir": &entry.Dir, "commit": &entry.Commit, "files": &entry.Files,
 	}
 	for name, field := range fields {
-		text, isString := stringOf(members[name])
+		text, isString := asString(members[name])
 		if !isString {
 			return lockEntry{}, false
 		}
 		*field = text
 	}
 	if hash, given := members["assets"]; given {
-		text, isString := stringOf(hash)
+		text, isString := asString(hash)
 		if !isString {
 			return lockEntry{}, false
 		}
@@ -80,7 +80,7 @@ func entryOf(written json.RawMessage) (lockEntry, bool) {
 }
 
 func writeLock(root string, entries map[string]lockEntry) error {
-	path, err := lockAt(root)
+	path, err := lockPath(root)
 	if err != nil {
 		return err
 	}
@@ -90,20 +90,20 @@ func writeLock(root string, entries map[string]lockEntry) error {
 		}
 		return nil
 	}
-	if _, err := fsx.WriteIfChanged(path, lockText(entries)); err != nil {
+	if _, err := fsx.WriteIfChanged(path, formatLock(entries)); err != nil {
 		return errUnwritableLock("Writing", err)
 	}
 	return nil
 }
 
-func lockText(entries map[string]lockEntry) string {
+func formatLock(entries map[string]lockEntry) string {
 	var out strings.Builder
 	out.WriteString("{\n  \"libraries\": {")
 	for i, key := range slices.Sorted(maps.Keys(entries)) {
 		if i > 0 {
 			out.WriteByte(',')
 		}
-		out.WriteString("\n    " + fsx.QuoteJSON(key) + ": " + objectText(entryMembers(entries[key]), "    "))
+		out.WriteString("\n    " + fsx.QuoteJSON(key) + ": " + formatObject(lockEntryMembers(entries[key]), "    "))
 	}
 	out.WriteString("\n  }\n}\n")
 	return out.String()
@@ -111,7 +111,7 @@ func lockText(entries map[string]lockEntry) string {
 
 type member struct{ name, value string }
 
-func entryMembers(entry lockEntry) []member {
+func lockEntryMembers(entry lockEntry) []member {
 	members := []member{
 		{"github", fsx.QuoteJSON(entry.GitHub)},
 		{"tag", fsx.QuoteJSON(entry.Tag)},
@@ -125,7 +125,7 @@ func entryMembers(entry lockEntry) []member {
 	return members
 }
 
-func objectText(members []member, indent string) string {
+func formatObject(members []member, indent string) string {
 	lines := make([]string, len(members))
 	for i, m := range members {
 		lines[i] = indent + "  " + fsx.QuoteJSON(m.name) + ": " + m.value
@@ -149,7 +149,7 @@ func errNotALock() error {
 
 func errUnwritableLock(doing string, cause error) error {
 	return &diag.Error{
-		Msg:   doing + " " + lockFile + " failed: " + reasonOf(cause),
+		Msg:   doing + " " + lockFile + " failed: " + describeFetchError(cause),
 		File:  lockFile,
 		Hint:  "Close programs that have " + lockFile + " open, and check it is not read-only.",
 		Cause: cause,

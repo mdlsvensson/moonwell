@@ -187,21 +187,21 @@ func TestLocalsListsTheFoldersTheSyncCopiesFrom(t *testing.T) {
 	}
 	for _, local := range locals {
 		modules := local.Folders[0].Dir
-		if got, want := textOf(t, root, modulesOf(local.Key)+"/"+stampFile), stampOfFolder(modules); got != want {
+		if got, want := textOf(t, root, modulesDirName(local.Key)+"/"+stampFile), localStampText(modules); got != want {
 			t.Errorf("%s: the sync stamped %q, and Locals lists %q", local.Key, got, modules)
 		}
 		isStamp := func(name string) bool { return name == stampFile }
-		copied := slices.DeleteFunc(filesIn(t, root, modulesOf(local.Key)), isStamp)
-		from, err := listBelow(modules, "", isModule, "")
+		copied := slices.DeleteFunc(filesIn(t, root, modulesDirName(local.Key)), isStamp)
+		from, err := listFilesBelow(modules, "", isModule, "")
 		if err != nil || !slices.Equal(copied, from) {
 			t.Errorf("%s: the sync copied %q, and the folder Locals lists holds %q, %v", local.Key, copied, from, err)
 		}
-		if shipped := there(root, assetsOf(local.Key)); shipped != (len(local.Folders) == 2) {
+		if shipped := there(root, assetsDirName(local.Key)); shipped != (len(local.Folders) == 2) {
 			t.Errorf("%s: Locals lists %d folders, and the sync's folder of files for the map is there: %v",
 				local.Key, len(local.Folders), shipped)
 		}
 	}
-	if got, want := filesIn(t, root, assetsOf("named")), filesIn(t, root, "named/art"); !slices.Equal(got, want) {
+	if got, want := filesIn(t, root, assetsDirName("named")), filesIn(t, root, "named/art"); !slices.Equal(got, want) {
 		t.Errorf("the sync copied the files %q for the map, and the folder Locals lists holds %q", got, want)
 	}
 }

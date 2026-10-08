@@ -13,7 +13,7 @@ const (
 
 func TestALibraryWithoutTheFileShipsModulesFromItsRootAndNoAssets(t *testing.T) {
 	for _, data := range [][]byte{nil, []byte("{"), []byte(`{"dir":"src"}`)} {
-		described, err := parseFile("ex", data, false, where)
+		described, err := parseLibraryFile("ex", data, false, where)
 		if err != nil || described.Dir != nil || described.Assets != nil {
 			t.Errorf("parseFile(%q) of a library without the file = %+v, %v", data, described, err)
 		}
@@ -35,7 +35,7 @@ func TestTheFileNamesTheModuleFolderAndTheAssetsFolderEachOptional(t *testing.T)
 		{`{"dir":"..src/a.b/...","assets":"\u00e9/\ud83d\ude00"}`, "..src/a.b/...", "\xc3\xa9/\xf0\x9f\x98\x80"},
 	}
 	for _, c := range cases {
-		described, err := parseFile("ex", []byte(c.document), true, where)
+		described, err := parseLibraryFile("ex", []byte(c.document), true, where)
 		if err != nil || shown(described.Dir) != c.dir || shown(described.Assets) != c.assets {
 			t.Errorf("parseFile(%q) = %q, %q, %v", c.document, shown(described.Dir), shown(described.Assets), err)
 		}
@@ -57,7 +57,7 @@ func TestAFileThatIsNotAJSONObjectIsRefusedNamingTheLibraryAndTheFile(t *testing
 		{"\xEF\xBB\xBF[]", "is not a JSON object."},
 	}
 	for _, c := range cases {
-		_, err := parseFile("ex", []byte(c.document), true, where)
+		_, err := parseLibraryFile("ex", []byte(c.document), true, where)
 		failure := asError(t, err, c.document)
 		if failure.Msg != "Library ex: moonwell-library.json "+c.problem || failure.File != where || failure.Hint != reportIt {
 			t.Errorf("parseFile(%q): %+v", c.document, failure)
@@ -73,7 +73,7 @@ func TestAnUnknownKeyIsRefusedTheFirstInSortedOrder(t *testing.T) {
 		{"{\"\xf0\x9f\x98\x80\":1,\"\xef\xbf\xbd\":1}", "\xef\xbf\xbd"},
 	}
 	for _, c := range cases {
-		_, err := parseFile("ex", []byte(c.document), true, where)
+		_, err := parseLibraryFile("ex", []byte(c.document), true, where)
 		failure := asError(t, err, c.document)
 		if !strings.Contains(failure.Msg, `has an unknown key "`+c.unknown+`".`) || failure.File != where ||
 			failure.Hint != needsNewer {
@@ -91,7 +91,7 @@ func TestAFolderMustBeARelativePathOfPlainNames(t *testing.T) {
 	}
 	for _, value := range values {
 		for _, name := range folderNames {
-			_, err := parseFile("ex", []byte(`{"`+name+`":`+value+`}`), true, where)
+			_, err := parseLibraryFile("ex", []byte(`{"`+name+`":`+value+`}`), true, where)
 			failure := asError(t, err, value)
 			want := "has " + name + " = " + value + ", which is not a folder inside the library."
 			if !strings.Contains(failure.Msg, want) || failure.File != where || failure.Hint != reportIt {
@@ -116,7 +116,7 @@ func TestAValueThatIsNoFolderIsShownAsItIsWritten(t *testing.T) {
 	}
 	for _, c := range cases {
 		for _, name := range folderNames {
-			_, err := parseFile("ex", []byte(`{"`+name+`": `+c.written+` }`), true, where)
+			_, err := parseLibraryFile("ex", []byte(`{"`+name+`": `+c.written+` }`), true, where)
 			failure := asError(t, err, c.written)
 			if want := "has " + name + " = " + c.shown + ", which is not"; !strings.Contains(failure.Msg, want) {
 				t.Errorf("%s = %s: %q, want it to say %q", name, c.written, failure.Msg, want)
@@ -132,7 +132,7 @@ func TestTheFirstProblemOfAFileIsAnUnknownKeyThenTheModuleFolderThenTheAssetsFol
 		{`{"assets":7,"dir":"src"}`, "has assets = 7"},
 	}
 	for _, c := range cases {
-		_, err := parseFile("ex", []byte(c.document), true, where)
+		_, err := parseLibraryFile("ex", []byte(c.document), true, where)
 		if failure := asError(t, err, c.document); !strings.Contains(failure.Msg, c.says) {
 			t.Errorf("parseFile(%s): %q, want it to say %q", c.document, failure.Msg, c.says)
 		}

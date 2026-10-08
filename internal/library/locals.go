@@ -29,16 +29,16 @@ func Locals(root string, libraries map[string]manifest.Library) []Local {
 }
 
 func localOf(root, key, path, dir string) Local {
-	base, err := baseOf(root, path)
+	base, err := resolveBase(root, path)
 	if err != nil {
 		base = fsx.ResolvePath(root, path)
 	}
-	described, err := describedAt(key, filepath.Join(base, File))
+	described, err := readLibraryFile(key, filepath.Join(base, File))
 	if err != nil {
-		described = Described{}
+		described = LibraryFile{}
 	}
-	folders := namedBy(dir, described)
-	from := folders.below(base)
+	folders := relativeDirsOf(dir, described)
+	from := folders.resolve(base)
 	local := Local{Key: key, Dir: base, Folders: []LocalFolder{{from.modules, labelOf(path, folders.modules)}}}
 	if folders.assets != "" {
 		local.Folders = append(local.Folders, LocalFolder{from.assets, labelOf(path, folders.assets)})

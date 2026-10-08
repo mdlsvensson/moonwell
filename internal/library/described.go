@@ -14,47 +14,47 @@ import (
 
 const File = "moonwell-library.json"
 
-type Described struct {
+type LibraryFile struct {
 	Dir    *string
 	Assets *string
 }
 
 var knownKeys = []string{"dir", "assets"}
 
-func parseFile(key string, data []byte, present bool, where string) (Described, error) {
+func parseLibraryFile(key string, data []byte, present bool, where string) (LibraryFile, error) {
 	if !present {
-		return Described{}, nil
+		return LibraryFile{}, nil
 	}
-	members, err := membersOf(key, data, where)
+	members, err := parseObject(key, data, where)
 	if err != nil {
-		return Described{}, err
+		return LibraryFile{}, err
 	}
-	if unknown, found := firstUnknown(members); found {
-		return Described{}, errUnknownKey(key, where, unknown)
+	if unknown, found := firstUnknownKey(members); found {
+		return LibraryFile{}, errUnknownKey(key, where, unknown)
 	}
-	var described Described
-	if described.Dir, err = folderOf(key, where, members, "dir"); err != nil {
-		return Described{}, err
+	var described LibraryFile
+	if described.Dir, err = parseDirMember(key, where, members, "dir"); err != nil {
+		return LibraryFile{}, err
 	}
-	if described.Assets, err = folderOf(key, where, members, "assets"); err != nil {
-		return Described{}, err
+	if described.Assets, err = parseDirMember(key, where, members, "assets"); err != nil {
+		return LibraryFile{}, err
 	}
 	return described, nil
 }
 
-func membersOf(key string, data []byte, where string) (map[string]json.RawMessage, error) {
+func parseObject(key string, data []byte, where string) (map[string]json.RawMessage, error) {
 	text := fsx.TrimBOM(data)
 	if !utf8.Valid(text) || !json.Valid(text) {
 		return nil, errNotJSON(key, where)
 	}
-	members, isObject := objectOf(text)
+	members, isObject := asObject(text)
 	if !isObject {
 		return nil, errNotAnObject(key, where)
 	}
 	return members, nil
 }
 
-func firstUnknown(members map[string]json.RawMessage) (name string, found bool) {
+func firstUnknownKey(members map[string]json.RawMessage) (name string, found bool) {
 	for _, name := range slices.Sorted(maps.Keys(members)) {
 		if !slices.Contains(knownKeys, name) {
 			return name, true
@@ -63,19 +63,19 @@ func firstUnknown(members map[string]json.RawMessage) (name string, found bool) 
 	return "", false
 }
 
-func folderOf(key, where string, members map[string]json.RawMessage, name string) (*string, error) {
+func parseDirMember(key, where string, members map[string]json.RawMessage, name string) (*string, error) {
 	written, given := members[name]
 	if !given {
 		return nil, nil
 	}
-	folder, isString := stringOf(written)
-	if !isString || !insideLibrary(folder) {
-		return nil, errNotAFolder(key, where, name, compact(written))
+	folder, isString := asString(written)
+	if !isString || !isInsideLibrary(folder) {
+		return nil, errNotAFolder(key, where, name, compactJSON(written))
 	}
 	return &folder, nil
 }
 
-func insideLibrary(path string) bool {
+func isInsideLibrary(path string) bool {
 	if strings.ContainsAny(path, `\:`) {
 		return false
 	}
@@ -87,7 +87,7 @@ func insideLibrary(path string) bool {
 	return true
 }
 
-func objectOf(value []byte) (members map[string]json.RawMessage, isObject bool) {
+func asObject(value []byte) (members map[string]json.RawMessage, isObject bool) {
 	if !bytes.HasPrefix(bytes.TrimLeft(value, " \t\r\n"), []byte("{")) {
 		return nil, false
 	}
@@ -97,7 +97,7 @@ func objectOf(value []byte) (members map[string]json.RawMessage, isObject bool) 
 	return members, true
 }
 
-func stringOf(value json.RawMessage) (text string, isString bool) {
+func asString(value json.RawMessage) (text string, isString bool) {
 	if !bytes.HasPrefix(value, []byte(`"`)) {
 		return "", false
 	}
@@ -107,7 +107,7 @@ func stringOf(value json.RawMessage) (text string, isString bool) {
 	return text, true
 }
 
-func compact(value json.RawMessage) string {
+func compactJSON(value json.RawMessage) string {
 	var out bytes.Buffer
 	if err := json.Compact(&out, value); err != nil {
 		return string(value)

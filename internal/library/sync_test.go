@@ -594,8 +594,8 @@ func TestALibrarysAssetsAreKeptBesideItsModulesWithoutDotNamesAndLockedByTheirHa
 	}
 	lock := lockOf(t, root)["ex"]
 	if textOf(t, root, ".moonwell/library-assets/ex/Models/Golem.mdx") != "model" ||
-		shown(lock.Assets) != filesHash(filesOfTest("Models/Golem.mdx", "model", "war3mapImported/lib/ui.toc", "toc")) ||
-		lock.Files != filesHash(filesOfTest("example/greet.lua", "return {}")) {
+		shown(lock.Assets) != hashFiles(filesOfTest("Models/Golem.mdx", "model", "war3mapImported/lib/ui.toc", "toc")) ||
+		lock.Files != hashFiles(filesOfTest("example/greet.lua", "return {}")) {
 		t.Errorf("lock = %+v", lock)
 	}
 	stamp := textOf(t, root, ".moonwell/libraries/ex/.moonwell-library.json")
@@ -947,8 +947,8 @@ func TestALockThatIsNoLockIsRefusedBeforeAnyDownload(t *testing.T) {
 
 func TestAFolderWhoseStampDoesNotHoldTheLockEntryIsFetchedAgain(t *testing.T) {
 	archive := tagArchive(t, commitA, "a.lua", "1")
-	entry := lockEntry{GitHub: "owner/lib", Tag: "v0.1.0", Commit: commitA, Files: filesHash(filesOfTest("a.lua", "1"))}
-	held := stampOf(entry)
+	entry := lockEntry{GitHub: "owner/lib", Tag: "v0.1.0", Commit: commitA, Files: hashFiles(filesOfTest("a.lua", "1"))}
+	held := stampText(entry)
 	cases := []struct {
 		name      string
 		stamp     string
@@ -970,7 +970,7 @@ func TestAFolderWhoseStampDoesNotHoldTheLockEntryIsFetchedAgain(t *testing.T) {
 		{"no JSON", held + "}", 1},
 		{"a byte order mark", mark + held, 1},
 		{"no object", "[" + held + "]", 1},
-		{"the stamp of a local library", stampOfFolder(`C:\libs\mine`), 1},
+		{"the stamp of a local library", localStampText(`C:\libs\mine`), 1},
 	}
 	for _, c := range cases {
 		root, server := t.TempDir(), serving(map[string][]byte{urlV1: archive})
@@ -1197,22 +1197,22 @@ func TestADownloadedFileAndAFolderThatDifferOnlyInLetterCaseAreRefusedBeforeAnyt
 
 func TestAFileIsHeldAgainstAFolderInAnotherSpellingAndNotAgainstOneInItsOwn(t *testing.T) {
 	for _, local := range []bool{false, true} {
-		kept := shipped{modules: filesOfTest("a.lua", "1", "Pack.lua", "2", "pack.lua/inner.lua", "3"), local: local}
+		kept := libraryContent{modules: filesOfTest("a.lua", "1", "Pack.lua", "2", "pack.lua/inner.lua", "3"), local: local}
 		hint := reportIt
 		if local {
 			hint = renameOne
 		}
-		e := asError(t, kept.refuseUnusable("ex", manifestFile), "a module and a folder")
+		e := asError(t, kept.checkUsable("ex", manifestFile), "a module and a folder")
 		if e.Msg != "Library ex: Pack.lua and pack.lua in its module folder differ only in letter case." || e.File != manifestFile || e.Hint != hint {
 			t.Errorf("local %v: %+v", local, e)
 		}
 	}
-	for what, kept := range map[string]shipped{
+	for what, kept := range map[string]libraryContent{
 		"a file where a folder is":                  {modules: filesOfTest("util", "1", "util/b.lua", "2")},
 		"a module and a folder of the map's files":  {modules: filesOfTest("Icons", "1"), assets: filesOfTest("icons/x.blp", "2"), shipsAssets: true},
 		"a file whose name starts as a folder does": {modules: filesOfTest("Util.lua", "1", "util/b.lua", "2", "utility/c.lua", "3")},
 	} {
-		if err := kept.refuseUnusable("ex", manifestFile); err != nil {
+		if err := kept.checkUsable("ex", manifestFile); err != nil {
 			t.Errorf("%s: %v", what, err)
 		}
 	}
@@ -1250,15 +1250,15 @@ func TestAFileThatCannotBeUsedIsTheAuthorsToReportOrTheUsersOwnToRename(t *testi
 	modules, assets := filesOfTest("a.lua", "1"), filesOfTest("x.blp", "1")
 	cases := []struct {
 		name          string
-		kept          shipped
+		kept          libraryContent
 		local, author string
 	}{
-		{"a module's name", shipped{modules: filesOfTest("a.lua", "1", "aux.lua", "2")}, renameIt, reportIt},
-		{"two modules", shipped{modules: filesOfTest("a.lua", "1", "A.lua", "2")}, renameOne, reportIt},
-		{"modules in two folders", shipped{modules: filesOfTest("u/a.lua", "1", "U/b.lua", "2")}, renameAFolder, reportIt},
-		{"an asset's name", shipped{modules: modules, assets: filesOfTest("nul", "1"), shipsAssets: true}, renameAnAsset, reportIt},
-		{"two assets", shipped{modules: modules, assets: append(assets, filesOfTest("X.blp", "2")...), shipsAssets: true}, renameAssets, reportIt},
-		{"assets in two folders", shipped{modules: modules, assets: filesOfTest("u/a", "1", "U/b", "2"), shipsAssets: true}, renameAnAssets, reportIt},
+		{"a module's name", libraryContent{modules: filesOfTest("a.lua", "1", "aux.lua", "2")}, renameIt, reportIt},
+		{"two modules", libraryContent{modules: filesOfTest("a.lua", "1", "A.lua", "2")}, renameOne, reportIt},
+		{"modules in two folders", libraryContent{modules: filesOfTest("u/a.lua", "1", "U/b.lua", "2")}, renameAFolder, reportIt},
+		{"an asset's name", libraryContent{modules: modules, assets: filesOfTest("nul", "1"), shipsAssets: true}, renameAnAsset, reportIt},
+		{"two assets", libraryContent{modules: modules, assets: append(assets, filesOfTest("X.blp", "2")...), shipsAssets: true}, renameAssets, reportIt},
+		{"assets in two folders", libraryContent{modules: modules, assets: filesOfTest("u/a", "1", "U/b", "2"), shipsAssets: true}, renameAnAssets, reportIt},
 	}
 	for _, c := range cases {
 		for _, local := range []bool{false, true} {
@@ -1267,7 +1267,7 @@ func TestAFileThatCannotBeUsedIsTheAuthorsToReportOrTheUsersOwnToRename(t *testi
 			if local {
 				want = c.local
 			}
-			if e := asError(t, c.kept.refuseUnusable("ex", manifestFile), c.name); e.Hint != want || e.File != manifestFile {
+			if e := asError(t, c.kept.checkUsable("ex", manifestFile), c.name); e.Hint != want || e.File != manifestFile {
 				t.Errorf("%s, local %v: %+v", c.name, local, e)
 			}
 		}
@@ -1592,7 +1592,7 @@ func TestALocalLibraryThatDidNotChangeKeepsItsStampAndATagsStampIsWrittenOver(t 
 	if _, written := filesBelow(t, root); !slices.Equal(written, []string{".moonwell/libraries/mine/" + stampFile}) {
 		t.Errorf("another local folder with the same files wrote %q", written)
 	}
-	if want := stampOfFolder(filepath.Join(root, "other")); textOf(t, root, ".moonwell/libraries/mine/"+stampFile) != want {
+	if want := localStampText(filepath.Join(root, "other")); textOf(t, root, ".moonwell/libraries/mine/"+stampFile) != want {
 		t.Errorf("the stamp holds %s", textOf(t, root, ".moonwell/libraries/mine/"+stampFile))
 	}
 }
