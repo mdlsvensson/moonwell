@@ -18,11 +18,11 @@ type Result struct {
 	IDs     string
 }
 
-func Plan(folder *mapdir.Folder, objects manifest.Objects, metadata *Metadata) (*Result, error) {
+func Plan(source *mapdir.Folder, objects manifest.Objects, metadata *Metadata) (*Result, error) {
 	if objects.IsEmpty() {
 		return &Result{Objects: []Resolved{}, IDs: noIDs}, nil
 	}
-	files, err := readObjectFiles(folder)
+	files, err := readObjectFiles(source)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func Plan(folder *mapdir.Folder, objects manifest.Objects, metadata *Metadata) (
 	if err != nil {
 		return nil, err
 	}
-	changes, err := files.changes(resolved)
+	changes, err := files.planChanges(resolved)
 	if err != nil {
 		return nil, err
 	}
@@ -50,12 +50,12 @@ var extensionOf = map[manifest.Category]string{
 
 const firstSkinVersion = 3
 
-func mainFile(extension string) string { return "war3map." + extension }
-func skinFile(extension string) string { return "war3mapSkin." + extension }
+func mainFileName(extension string) string { return "war3map." + extension }
+func skinFileName(extension string) string { return "war3mapSkin." + extension }
 
 type objectFiles struct {
-	folder *mapdir.Folder
-	held   map[string]objectFile
+	source *mapdir.Folder
+	files  map[string]objectFile
 }
 
 type objectFile struct {
@@ -63,10 +63,10 @@ type objectFile struct {
 	parsed *objmod.File
 }
 
-func readObjectFiles(folder *mapdir.Folder) (*objectFiles, error) {
-	files := &objectFiles{folder: folder, held: map[string]objectFile{}}
+func readObjectFiles(source *mapdir.Folder) (*objectFiles, error) {
+	files := &objectFiles{source: source, files: map[string]objectFile{}}
 	for _, name := range objectFileNames() {
-		if err := files.read(name); err != nil {
+		if err := files.readFile(name); err != nil {
 			return nil, err
 		}
 	}
@@ -76,20 +76,20 @@ func readObjectFiles(folder *mapdir.Folder) (*objectFiles, error) {
 func objectFileNames() []string {
 	var names []string
 	for _, extension := range extensions {
-		names = append(names, mainFile(extension))
+		names = append(names, mainFileName(extension))
 	}
 	for _, extension := range extensions {
-		names = append(names, skinFile(extension))
+		names = append(names, skinFileName(extension))
 	}
 	return names
 }
 
-func (f *objectFiles) read(name string) error {
-	data, found, err := f.folder.Read(name)
+func (f *objectFiles) readFile(name string) error {
+	data, found, err := f.source.Read(name)
 	if err != nil || !found {
 		return err
 	}
-	label := f.folder.DisplayPath(name)
+	label := f.source.DisplayPath(name)
 	parsed, err := objmod.Read(data, objmod.KindOf(name), label)
 	if err != nil {
 		return err
@@ -101,13 +101,13 @@ func (f *objectFiles) read(name string) error {
 		}
 		seen[object.ID] = true
 	}
-	f.held[name] = objectFile{data: data, parsed: parsed}
+	f.files[name] = objectFile{data: data, parsed: parsed}
 	return nil
 }
 
 func (f *objectFiles) customIDs() map[string]bool {
 	ids := map[string]bool{}
-	for _, file := range f.held {
+	for _, file := range f.files {
 		for _, object := range file.parsed.Custom.Objects {
 			ids[object.ID.String()] = true
 		}
@@ -115,22 +115,22 @@ func (f *objectFiles) customIDs() map[string]bool {
 	return ids
 }
 
-func (f *objectFiles) splits(extension string) bool {
+func (f *objectFiles) usesSkinFile(extension string) bool {
 	version := int32(objmod.NewFileVersion)
-	if main, has := f.held[mainFile(extension)]; has {
+	if main, has := f.files[mainFileName(extension)]; has {
 		version = main.parsed.Version
 	}
 	return version >= firstSkinVersion
 }
 
-func (f *objectFiles) changes(resolved []Resolved) ([]mapdir.Change, error) {
+func (f *objectFiles) planChanges(resolved []Resolved) ([]mapdir.Change, error) {
 	var mains, skins []mapdir.Change
 	for _, extension := range extensions {
-		family := familyOf(resolved, extension)
+		family := objectsWithExtension(resolved, extension)
 		if len(family) == 0 {
 			continue
 		}
-		main, skin, err := f.appendFamily(extension, family)
+		main, skin, err := f.appendObjects(extension, family)
 		if err != nil {
 			return nil, err
 		}
@@ -140,7 +140,7 @@ func (f *objectFiles) changes(resolved []Resolved) ([]mapdir.Change, error) {
 	return append(mains, skins...), nil
 }
 
-func familyOf(resolved []Resolved, extension string) []Resolved {
+func objectsWithExtension(resolved []Resolved, extension string) []Resolved {
 	var family []Resolved
 	for _, object := range resolved {
 		if extensionOf[object.Category] == extension {
@@ -151,29 +151,29 @@ func familyOf(resolved []Resolved, extension string) []Resolved {
 	return family
 }
 
-func (f *objectFiles) appendFamily(extension string, family []Resolved) (main mapdir.Change, skin []mapdir.Change, err error) {
-	if !f.splits(extension) {
-		main, err = f.appended(mainFile(extension), family, func(Field) bool { return true })
+func (f *objectFiles) appendObjects(extension string, family []Resolved) (main mapdir.Change, skin []mapdir.Change, err error) {
+	if !f.usesSkinFile(extension) {
+		main, err = f.appendToFile(mainFileName(extension), family, func(Field) bool { return true })
 		return main, nil, err
 	}
-	main, err = f.appended(mainFile(extension), family, func(field Field) bool { return !field.Skin })
+	main, err = f.appendToFile(mainFileName(extension), family, func(field Field) bool { return !field.Skin })
 	if err != nil {
 		return main, nil, err
 	}
-	beside, err := f.appended(skinFile(extension), family, func(field Field) bool { return field.Skin })
+	beside, err := f.appendToFile(skinFileName(extension), family, func(field Field) bool { return field.Skin })
 	return main, []mapdir.Change{beside}, err
 }
 
-func (f *objectFiles) appended(name string, family []Resolved, takes func(Field) bool) (mapdir.Change, error) {
-	placed, err := f.folder.ResolveNewPath(name)
+func (f *objectFiles) appendToFile(name string, family []Resolved, include func(Field) bool) (mapdir.Change, error) {
+	placed, err := f.source.ResolveNewPath(name)
 	if err != nil {
 		return mapdir.Change{}, err
 	}
-	added, err := newObjects(family, takes)
+	added, err := newObjects(family, include)
 	if err != nil {
 		return mapdir.Change{}, err
 	}
-	held := f.held[name]
+	held := f.files[name]
 	written, err := objmod.AppendObjects(held.parsed, held.data, objmod.KindOf(name), added)
 	if err != nil {
 		return mapdir.Change{}, err
@@ -181,15 +181,15 @@ func (f *objectFiles) appended(name string, family []Resolved, takes func(Field)
 	return mapdir.Change{Path: placed, Data: written}, nil
 }
 
-func newObjects(family []Resolved, takes func(Field) bool) ([]objmod.NewObject, error) {
-	var ids rawcodes
+func newObjects(family []Resolved, include func(Field) bool) ([]objmod.NewObject, error) {
+	var ids idParser
 	added := make([]objmod.NewObject, 0, len(family))
 	for _, object := range family {
-		one := objmod.NewObject{Base: ids.of(object.Base), ID: ids.of(object.ID), Mods: []objmod.NewMod{}}
+		one := objmod.NewObject{Base: ids.parse(object.Base), ID: ids.parse(object.ID), Mods: []objmod.NewMod{}}
 		for _, field := range object.Fields {
-			if takes(field) {
+			if include(field) {
 				one.Mods = append(one.Mods, objmod.NewMod{
-					Field: ids.of(field.ID), Level: int32(field.Level), Column: int32(field.Column), Value: fileValue(field.Value),
+					Field: ids.parse(field.ID), Level: int32(field.Level), Column: int32(field.Column), Value: toFileValue(field.Value),
 				})
 			}
 		}
@@ -198,7 +198,7 @@ func newObjects(family []Resolved, takes func(Field) bool) ([]objmod.NewObject, 
 	return added, ids.err
 }
 
-func fileValue(value Value) objmod.Value {
+func toFileValue(value Value) objmod.Value {
 	switch value.Type {
 	case objmod.Int:
 		return objmod.Value{Type: objmod.Int, Int: int32(value.Number)}
@@ -208,9 +208,9 @@ func fileValue(value Value) objmod.Value {
 	return objmod.Value{Type: value.Type, Text: value.Text}
 }
 
-type rawcodes struct{ err error }
+type idParser struct{ err error }
 
-func (r *rawcodes) of(text string) objmod.ID {
+func (r *idParser) parse(text string) objmod.ID {
 	id, ok := objmod.ParseID(text)
 	if !ok && r.err == nil {
 		r.err = fmt.Errorf("Cannot write %s to an object file: a rawcode is 4 Latin-1 characters.", fsx.QuoteJSON(text))

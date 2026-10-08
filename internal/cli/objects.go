@@ -26,12 +26,12 @@ func runObjectsCheck(ctx context.Context, e *env.Env, _ call) error {
 	for _, change := range objs.Changes {
 		e.Log.Info("  " + change.Path)
 	}
-	status, err := objects.StatusOfIDs(e.Root, objs.IDs)
+	status, err := objects.CheckIDsStatus(e.Root, objs.IDs)
 	if err != nil {
 		return err
 	}
 	e.Log.Info("  " + objects.IDsFile + ": " + string(status))
-	if err := objects.AssertIDsCurrent(e.Root, objs.IDs); err != nil {
+	if err := objects.RequireIDsCurrent(e.Root, objs.IDs); err != nil {
 		return err
 	}
 	e.Log.Info("Object data valid: " + strconv.Itoa(len(objs.Objects)) + " object(s), " +

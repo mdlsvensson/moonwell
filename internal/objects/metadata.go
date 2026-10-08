@@ -58,7 +58,7 @@ func FieldSource(category manifest.Category) (list, use string) {
 	return "", ""
 }
 
-var embedded = sync.OnceValue(func() *Metadata {
+var loadEmbedded = sync.OnceValue(func() *Metadata {
 	var metadata Metadata
 	if err := json.Unmarshal(moonwell.Metadata, &metadata); err != nil {
 		panic("the embedded metadata.json does not parse: " + err.Error())
@@ -66,9 +66,9 @@ var embedded = sync.OnceValue(func() *Metadata {
 	return &metadata
 })
 
-func LoadMetadata() *Metadata { return embedded() }
+func LoadMetadata() *Metadata { return loadEmbedded() }
 
-func (m *Metadata) fieldList(category manifest.Category) []FieldMeta {
+func (m *Metadata) fieldsOf(category manifest.Category) []FieldMeta {
 	list, _ := FieldSource(category)
 	return m.Fields[list]
 }
@@ -85,7 +85,7 @@ func AppliesTo(field *FieldMeta, category manifest.Category, base string) bool {
 
 func (m *Metadata) FieldsFor(category manifest.Category, base string) []*FieldMeta {
 	var fields []*FieldMeta
-	list := m.fieldList(category)
+	list := m.fieldsOf(category)
 	for i := range list {
 		if AppliesTo(&list[i], category, base) {
 			fields = append(fields, &list[i])
@@ -95,7 +95,7 @@ func (m *Metadata) FieldsFor(category manifest.Category, base string) []*FieldMe
 }
 
 func (m *Metadata) FieldByRawcode(category manifest.Category, id string) *FieldMeta {
-	list := m.fieldList(category)
+	list := m.fieldsOf(category)
 	for i := range list {
 		if list[i].ID == id {
 			return &list[i]
@@ -105,7 +105,7 @@ func (m *Metadata) FieldByRawcode(category manifest.Category, id string) *FieldM
 }
 
 func (m *Metadata) FieldByName(category manifest.Category, base, name string) *FieldMeta {
-	list := m.fieldList(category)
+	list := m.fieldsOf(category)
 	for i := range list {
 		if list[i].Name == name && AppliesTo(&list[i], category, base) {
 			return &list[i]
@@ -114,9 +114,9 @@ func (m *Metadata) FieldByName(category manifest.Category, base, name string) *F
 	return nil
 }
 
-func (m *Metadata) fieldsNamed(category manifest.Category, name string) []*FieldMeta {
+func (m *Metadata) fieldsByName(category manifest.Category, name string) []*FieldMeta {
 	var named []*FieldMeta
-	list := m.fieldList(category)
+	list := m.fieldsOf(category)
 	for i := range list {
 		if list[i].Name == name {
 			named = append(named, &list[i])
@@ -136,7 +136,7 @@ func (m *Metadata) BaseOf(id string) (manifest.Category, BaseMeta, bool) {
 
 type NamedBase struct{ ID, Name string }
 
-type nearBase struct {
+type baseCandidate struct {
 	NamedBase
 	distance int
 	prefix   int
@@ -144,14 +144,14 @@ type nearBase struct {
 
 func (m *Metadata) NearestBases(category manifest.Category, id string, n int) []NamedBase {
 	wanted := strings.ToLower(id)
-	candidates := make([]nearBase, 0, len(m.Bases[category]))
+	candidates := make([]baseCandidate, 0, len(m.Bases[category]))
 	for candidate, base := range m.Bases[category] {
 		lower := strings.ToLower(candidate)
-		candidates = append(candidates, nearBase{
+		candidates = append(candidates, baseCandidate{
 			NamedBase{candidate, base.Name}, diag.EditDistance(wanted, lower), sharedPrefix(wanted, lower),
 		})
 	}
-	slices.SortFunc(candidates, func(a, b nearBase) int {
+	slices.SortFunc(candidates, func(a, b baseCandidate) int {
 		switch {
 		case a.distance != b.distance:
 			return a.distance - b.distance

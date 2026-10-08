@@ -11,105 +11,105 @@ import (
 )
 
 func EvalJSON(resolved []Resolved) []byte {
-	var p printer
-	p.open('{')
+	var p jsonWriter
+	p.openBracket('{')
 	for _, category := range manifest.Categories {
-		p.key(string(category))
-		p.open('{')
+		p.writeKey(string(category))
+		p.openBracket('{')
 		for _, object := range resolved {
 			if object.Category == category {
-				p.key(object.Key)
-				p.object(object)
+				p.writeKey(object.Key)
+				p.writeObject(object)
 			}
 		}
-		p.close('}')
+		p.closeBracket('}')
 	}
-	p.close('}')
+	p.closeBracket('}')
 	return p.out.Bytes()
 }
 
-func (p *printer) object(object Resolved) {
-	p.open('{')
-	p.text("id", object.ID)
-	p.text("base", object.Base)
-	p.text("source", object.Source)
-	p.key("fields")
-	p.open('[')
+func (p *jsonWriter) writeObject(object Resolved) {
+	p.openBracket('{')
+	p.writeString("id", object.ID)
+	p.writeString("base", object.Base)
+	p.writeString("source", object.Source)
+	p.writeKey("fields")
+	p.openBracket('[')
 	for _, field := range object.Fields {
-		p.member()
-		p.field(field)
+		p.startMember()
+		p.writeField(field)
 	}
-	p.close(']')
-	p.close('}')
+	p.closeBracket(']')
+	p.closeBracket('}')
 }
 
 var typeNames = map[objmod.ValueType]string{
 	objmod.Int: "int", objmod.Real: "real", objmod.Unreal: "unreal", objmod.String: "string",
 }
 
-func (p *printer) field(field Field) {
-	p.open('{')
-	p.text("rawcode", field.ID)
-	p.text("name", field.Name)
-	p.number("level", float64(field.Level))
-	p.number("column", float64(field.Column))
-	p.truth("skin", field.Skin)
-	p.text("type", typeNames[field.Value.Type])
+func (p *jsonWriter) writeField(field Field) {
+	p.openBracket('{')
+	p.writeString("rawcode", field.ID)
+	p.writeString("name", field.Name)
+	p.writeNumber("level", float64(field.Level))
+	p.writeNumber("column", float64(field.Column))
+	p.writeBool("skin", field.Skin)
+	p.writeString("type", typeNames[field.Value.Type])
 	if field.Value.Type == objmod.String {
-		p.text("value", field.Value.Text)
+		p.writeString("value", field.Value.Text)
 	} else {
-		p.number("value", field.Value.Number)
+		p.writeNumber("value", field.Value.Number)
 	}
-	p.close('}')
+	p.closeBracket('}')
 }
 
-type printer struct {
+type jsonWriter struct {
 	out   bytes.Buffer
 	depth int
 	bare  bool
 }
 
-func (p *printer) open(bracket byte) {
+func (p *jsonWriter) openBracket(bracket byte) {
 	p.out.WriteByte(bracket)
 	p.depth++
 	p.bare = true
 }
 
-func (p *printer) close(bracket byte) {
+func (p *jsonWriter) closeBracket(bracket byte) {
 	p.depth--
 	if !p.bare {
-		p.line()
+		p.newLine()
 	}
 	p.out.WriteByte(bracket)
 	p.bare = false
 }
 
-func (p *printer) line() {
+func (p *jsonWriter) newLine() {
 	p.out.WriteByte('\n')
 	p.out.WriteString(strings.Repeat("  ", p.depth))
 }
 
-func (p *printer) member() {
+func (p *jsonWriter) startMember() {
 	if !p.bare {
 		p.out.WriteByte(',')
 	}
 	p.bare = false
-	p.line()
+	p.newLine()
 }
 
-func (p *printer) key(name string) {
-	p.member()
+func (p *jsonWriter) writeKey(name string) {
+	p.startMember()
 	p.out.WriteString(fsx.QuoteJSON(name))
 	p.out.WriteString(": ")
 }
 
-func (p *printer) text(key, value string) {
-	p.key(key)
+func (p *jsonWriter) writeString(key, value string) {
+	p.writeKey(key)
 	p.out.WriteString(fsx.QuoteJSON(value))
 }
 
-func (p *printer) truth(key string, value bool) {
-	p.key(key)
+func (p *jsonWriter) writeBool(key string, value bool) {
+	p.writeKey(key)
 	if value {
 		p.out.WriteString("true")
 	} else {
@@ -117,8 +117,8 @@ func (p *printer) truth(key string, value bool) {
 	}
 }
 
-func (p *printer) number(key string, value float64) {
-	p.key(key)
+func (p *jsonWriter) writeNumber(key string, value float64) {
+	p.writeKey(key)
 	if value == 0 {
 		value = 0
 	}

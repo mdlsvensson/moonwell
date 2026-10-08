@@ -44,7 +44,7 @@ func idsFile(root string) string { return filepath.Join(root, "src", "generated"
 
 func status(t *testing.T, root, expected string) objects.IDsStatus {
 	t.Helper()
-	got, err := objects.StatusOfIDs(root, expected)
+	got, err := objects.CheckIDsStatus(root, expected)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -163,21 +163,21 @@ func TestStatusOfIDsIsCurrentStaleOrMissing(t *testing.T) {
 
 func TestAssertIDsCurrentFailsOnAStaleOrMissingFileWithTheHintToRegenerate(t *testing.T) {
 	root := t.TempDir()
-	if err := objects.AssertIDsCurrent(root, emptyIDs); err != nil {
+	if err := objects.RequireIDsCurrent(root, emptyIDs); err != nil {
 		t.Error(err)
 	}
 	const hint = "Run moonwell build, test or dev to regenerate it."
-	missing := asError(t, objects.AssertIDsCurrent(root, captainIDs), "a missing module")
+	missing := asError(t, objects.RequireIDsCurrent(root, captainIDs), "a missing module")
 	if !strings.Contains(missing.Msg, "is missing, but the manifest has objects") || missing.File != objects.IDsFile || missing.Hint != hint {
 		t.Errorf("error = %+v", missing)
 	}
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(emptyIDs))
-	stale := asError(t, objects.AssertIDsCurrent(root, captainIDs), "a stale module")
+	stale := asError(t, objects.RequireIDsCurrent(root, captainIDs), "a stale module")
 	if !strings.Contains(stale.Msg, "does not match the objects in the manifest") || stale.File != objects.IDsFile || stale.Hint != hint {
 		t.Errorf("error = %+v", stale)
 	}
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(captainIDs))
-	if err := objects.AssertIDsCurrent(root, captainIDs); err != nil {
+	if err := objects.RequireIDsCurrent(root, captainIDs); err != nil {
 		t.Error(err)
 	}
 }
@@ -188,7 +188,7 @@ func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.
 	if got := status(t, root, captainIDs); got != objects.IDsCurrent {
 		t.Errorf("CRLF line endings: %s", got)
 	}
-	if err := objects.AssertIDsCurrent(root, captainIDs); err != nil {
+	if err := objects.RequireIDsCurrent(root, captainIDs); err != nil {
 		t.Error(err)
 	}
 	for name, content := range map[string]string{
@@ -205,9 +205,9 @@ func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.
 		t.Fatal(err)
 	}
 	for name, err := range map[string]error{
-		"StatusOfIDs":      second(objects.StatusOfIDs(other, captainIDs)),
+		"StatusOfIDs":      second(objects.CheckIDsStatus(other, captainIDs)),
 		"RefreshIDs":       second(objects.RefreshIDs(other, captainIDs)),
-		"AssertIDsCurrent": objects.AssertIDsCurrent(other, captainIDs),
+		"AssertIDsCurrent": objects.RequireIDsCurrent(other, captainIDs),
 	} {
 		failure := asError(t, err, name)
 		if failure.File != objects.IDsFile || !strings.HasPrefix(failure.Msg, "Reading the generated object ids failed: ") ||

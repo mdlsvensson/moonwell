@@ -32,11 +32,11 @@ type Resolved struct {
 }
 
 func Resolve(metadata *Metadata, objects manifest.Objects, existing map[string]bool) ([]Resolved, error) {
-	r := &resolver{metadata: metadata, existing: existing, owners: map[string]owner{}}
+	r := &resolver{metadata: metadata, existing: existing, idOwners: map[string]owner{}}
 	resolved := []Resolved{}
 	for _, category := range manifest.Categories {
 		for key, object := range objects.ByCategory(category).All() {
-			if one, ok := r.resolve(category, key, object); ok {
+			if one, ok := r.resolveObject(category, key, object); ok {
 				resolved = append(resolved, one)
 			}
 		}
@@ -50,29 +50,29 @@ func Resolve(metadata *Metadata, objects manifest.Objects, existing map[string]b
 type resolver struct {
 	metadata *Metadata
 	existing map[string]bool
-	owners   map[string]owner
+	idOwners map[string]owner
 	problems diag.Problems
 }
 
-type owner struct{ at, source string }
+type owner struct{ path, source string }
 
-type subject struct {
+type objectResolver struct {
 	*resolver
 	category manifest.Category
-	at       string
+	path     string
 	object   manifest.Object
 }
 
-type fault struct{ msg, hint string }
+type issue struct{ msg, hint string }
 
-func (s *subject) report(path string, wrong fault) {
+func (s *objectResolver) report(path string, found issue) {
 	s.problems = append(s.problems, diag.Problem{
-		File: s.object.Source, Msg: s.at + path + ": " + wrong.msg, Hint: wrong.hint,
+		File: s.object.Source, Msg: s.path + path + ": " + found.msg, Hint: found.hint,
 	})
 }
 
-func (r *resolver) resolve(category manifest.Category, key string, object manifest.Object) (Resolved, bool) {
-	s := &subject{resolver: r, category: category, at: string(category) + "[" + fsx.QuoteJSON(key) + "]", object: object}
+func (r *resolver) resolveObject(category manifest.Category, key string, object manifest.Object) (Resolved, bool) {
+	s := &objectResolver{resolver: r, category: category, path: string(category) + "[" + fsx.QuoteJSON(key) + "]", object: object}
 	s.checkID()
 	s.claimID()
 	base, known := r.metadata.Bases[category][object.Base]
@@ -81,13 +81,13 @@ func (r *resolver) resolve(category manifest.Category, key string, object manife
 		return Resolved{}, false
 	}
 	return Resolved{
-		Category: category, Key: key, ID: object.ID, Base: object.Base, Source: object.Source, Fields: s.fields(base),
+		Category: category, Key: key, ID: object.ID, Base: object.Base, Source: object.Source, Fields: s.resolveFields(base),
 	}, true
 }
 
-func (s *subject) checkID() {
+func (s *objectResolver) checkID() {
 	id := s.object.ID
-	if !fourLettersOrDigits(id) {
+	if !isFourLettersOrDigits(id) {
 		s.report(".id", errNotAnID(id, s.category))
 		return
 	}
@@ -106,15 +106,15 @@ func (s *subject) checkID() {
 	}
 }
 
-func (s *subject) claimID() {
-	if first, taken := s.owners[s.object.ID]; taken {
+func (s *objectResolver) claimID() {
+	if first, taken := s.idOwners[s.object.ID]; taken {
 		s.report(".id", errIDTwice(s.object.ID, first))
 		return
 	}
-	s.owners[s.object.ID] = owner{s.at, s.object.Source}
+	s.idOwners[s.object.ID] = owner{s.path, s.object.Source}
 }
 
-func fourLettersOrDigits(id string) bool {
+func isFourLettersOrDigits(id string) bool {
 	if len(id) != 4 {
 		return false
 	}
@@ -127,7 +127,7 @@ func fourLettersOrDigits(id string) bool {
 	return true
 }
 
-func named(id, name string) string {
+func formatNamedID(id, name string) string {
 	return "'" + strings.TrimRight(id, "\x00") + "' (" + name + ")"
 }
 
@@ -141,56 +141,56 @@ var singular = map[manifest.Category]string{
 	"buffs": "buff", "upgrades": "upgrade",
 }
 
-func errNotAnID(id string, category manifest.Category) fault {
-	return fault{"'" + id + "' is not four ASCII letters or digits.", "Use an id such as '" + exampleIDs[category] + "'."}
+func errNotAnID(id string, category manifest.Category) issue {
+	return issue{"'" + id + "' is not four ASCII letters or digits.", "Use an id such as '" + exampleIDs[category] + "'."}
 }
 
-func errNotAHeroID(id string) fault {
-	return fault{
+func errNotAHeroID(id string) issue {
+	return issue{
 		"'" + id + "' must start with an uppercase letter: the game treats exactly those unit ids as heroes.",
 		"Use an id such as '" + exampleIDs["heroes"] + "'.",
 	}
 }
 
-func errHeroID(id string, category manifest.Category) fault {
-	return fault{
+func errHeroID(id string, category manifest.Category) issue {
+	return issue{
 		"'" + id + "' must not start with an uppercase letter: the game would treat it as a hero.",
 		"Use an id such as '" + exampleIDs[category] + "', or make the object a hero.",
 	}
 }
 
-func errStandardID(id string, category manifest.Category, standard BaseMeta) fault {
-	return fault{
+func errStandardID(id string, category manifest.Category, standard BaseMeta) issue {
+	return issue{
 		"'" + id + "' is the id of a standard " + singular[category] + " (" + standard.Name + ").",
 		"Moonwell adds custom objects and cannot modify standard ones: pick an id no standard object uses.",
 	}
 }
 
-func errIDInTheMap(id string) fault {
-	return fault{
+func errIDInTheMap(id string) issue {
+	return issue{
 		"'" + id + "' is already the id of a custom object in the map.",
 		"Change the id in Pkl, or delete the object in World Editor.",
 	}
 }
 
-func errIDTwice(id string, first owner) fault {
-	return fault{
-		"'" + id + "' is also the id of " + first.at + " (" + first.source + ").",
+func errIDTwice(id string, first owner) issue {
+	return issue{
+		"'" + id + "' is also the id of " + first.path + " (" + first.source + ").",
 		"Give each object its own id.",
 	}
 }
 
-func errNotABase(metadata *Metadata, category manifest.Category, id string) fault {
+func errNotABase(metadata *Metadata, category manifest.Category, id string) issue {
 	var hints []string
 	if other, base, found := metadata.BaseOf(id); found {
 		hints = append(hints, "'"+id+"' is a standard "+singular[other]+" ("+base.Name+").")
 	}
 	var nearest []string
 	for _, candidate := range metadata.NearestBases(category, id, 3) {
-		nearest = append(nearest, named(candidate.ID, candidate.Name))
+		nearest = append(nearest, formatNamedID(candidate.ID, candidate.Name))
 	}
 	if len(nearest) > 0 {
 		hints = append(hints, "Did you mean "+diag.JoinWords(nearest, "or", -1)+"?")
 	}
-	return fault{"'" + id + "' is not a standard " + singular[category] + ".", strings.Join(hints, " ")}
+	return issue{"'" + id + "' is not a standard " + singular[category] + ".", strings.Join(hints, " ")}
 }

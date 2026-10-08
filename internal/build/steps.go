@@ -26,7 +26,7 @@ func writeGenerated(
 
 func idsModule(root, ids string, keep bool) error {
 	if keep {
-		return objects.AssertIDsCurrent(root, ids)
+		return objects.RequireIDsCurrent(root, ids)
 	}
 	_, err := objects.RefreshIDs(root, ids)
 	return err

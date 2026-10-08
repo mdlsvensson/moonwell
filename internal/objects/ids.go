@@ -27,7 +27,7 @@ func PackID(id string) (uint32, error) {
 func RenderIDs(resolved []Resolved) (string, error) {
 	lines := []string{idsHeader}
 	for _, category := range manifest.Categories {
-		table, err := idsTable(category, resolved)
+		table, err := renderIDsTable(category, resolved)
 		if err != nil {
 			return "", err
 		}
@@ -36,7 +36,7 @@ func RenderIDs(resolved []Resolved) (string, error) {
 	return strings.Join(lines, "\n") + "\n", nil
 }
 
-func idsTable(category manifest.Category, resolved []Resolved) ([]string, error) {
+func renderIDsTable(category manifest.Category, resolved []Resolved) ([]string, error) {
 	var entries []Resolved
 	for _, object := range resolved {
 		if object.Category == category {
@@ -68,7 +68,7 @@ const (
 	IDsMissing IDsStatus = "missing"
 )
 
-func StatusOfIDs(root, expected string) (IDsStatus, error) {
+func CheckIDsStatus(root, expected string) (IDsStatus, error) {
 	data, found, err := fsx.ReadFileIfExists(idsPath(root))
 	switch {
 	case err != nil:
@@ -85,7 +85,7 @@ func StatusOfIDs(root, expected string) (IDsStatus, error) {
 }
 
 func RefreshIDs(root, expected string) (wrote bool, err error) {
-	status, err := StatusOfIDs(root, expected)
+	status, err := CheckIDsStatus(root, expected)
 	if err != nil || status == IDsCurrent {
 		return false, err
 	}
@@ -95,8 +95,8 @@ func RefreshIDs(root, expected string) (wrote bool, err error) {
 	return wrote, nil
 }
 
-func AssertIDsCurrent(root, expected string) error {
-	status, err := StatusOfIDs(root, expected)
+func RequireIDsCurrent(root, expected string) error {
+	status, err := CheckIDsStatus(root, expected)
 	switch {
 	case err != nil || status == IDsCurrent:
 		return err
