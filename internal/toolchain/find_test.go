@@ -12,7 +12,84 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-const installPage = "https://pkl-lang.org/main/current/pkl-cli/index.html#installation"
+func TestCompilerUsesYuePathAndWarnsOnAVersionMismatch(t *testing.T) {
+	e, log, fetches, _ := newYueEnv(t, "")
+	local := testkit.WriteFile(t, t.TempDir(), "yue", nil)
+	e.Run = fakeYueRun("0.1.0")
+	program, err := FindCompiler(background, e, "9.9.9", &local)
+	if err != nil || program != local || *fetches != 0 {
+		t.Fatalf("Compiler = %q, %v, %d downloads", program, err, *fetches)
+	}
+	want := []string{"warning: yue.path reports version 0.1.0, expected 9.9.9."}
+	if lines := log.Lines(); !slices.Equal(lines, want) {
+		t.Errorf("log = %q", lines)
+	}
+	gone := filepath.Join(t.TempDir(), "yue")
+	_, err = FindCompiler(background, e, "9.9.9", &gone)
+	if diagErr := asDiagError(t, err, "a missing yue.path"); diagErr.Msg != "yue.path does not exist: "+gone ||
+		diagErr.File != "moonwell.local.pkl" || !strings.Contains(diagErr.Hint, "yue.path") {
+		t.Errorf("error = %+v", diagErr)
+	}
+}
+
+func TestCompilerTakesYuePathAsItIs(t *testing.T) {
+	local := testkit.WriteFile(t, t.TempDir(), "yue", nil)
+	tests := []struct {
+		name    string
+		run     env.RunFunc
+		version string
+		logs    []string
+	}{
+		{"the version asked for", fakeYueRun("9.9.9"), "9.9.9", nil},
+		{"a version with no download", fakeYueRun("0.1.0"), "0.1.0", nil},
+		{"a program that names no version", fakeRunPrinting("hello"), "9.9.9",
+			[]string{"warning: yue.path reports version unknown, expected 9.9.9."}},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			e, log := testkit.Env(t, t.TempDir())
+			e.Platform = ""
+			e.Run = tc.run
+			program, err := FindCompiler(background, e, tc.version, &local)
+			if err != nil || program != local || !slices.Equal(log.Lines(), tc.logs) {
+				t.Errorf("Compiler = %q, %v, log %q", program, err, log.Lines())
+			}
+			if left := listDir(t, e.CacheDir); len(left) != 0 {
+				t.Errorf("the cache holds %q", left)
+			}
+		})
+	}
+}
+
+func TestCompilerPassesOnAYuePathThatCannotBeStartedOrIsInterrupted(t *testing.T) {
+	local := testkit.WriteFile(t, t.TempDir(), "yue", nil)
+	e, _ := testkit.Env(t, t.TempDir())
+	e.Run = runNotFound
+	_, err := FindCompiler(background, e, "9.9.9", &local)
+	if diagErr := asDiagError(t, err, "a yue.path that is no program"); !strings.Contains(diagErr.Msg, "Cannot run '"+local+"'") ||
+		diagErr.File != "moonwell.local.pkl" || !strings.Contains(diagErr.Hint, "yue.path") || diagErr.Cause == nil {
+		t.Errorf("error = %+v", diagErr)
+	}
+	e.Run = runInterrupted
+	if _, err := FindCompiler(background, e, "9.9.9", &local); err != context.Canceled {
+		t.Errorf("Compiler = %v, want the cancellation as it is", err)
+	}
+}
+
+func TestCompilerWithoutYuePathEnsuresThePinnedCompiler(t *testing.T) {
+	e, _, fetches, tool := newYueEnv(t, "")
+	pinTool(t, &YueScript, tool)
+	e.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
+		if program == "yue" {
+			t.Errorf("yue on PATH was run")
+		}
+		return fakeYueRun("9.9.9")(ctx, program, args, options)
+	}
+	program, err := FindCompiler(background, e, "9.9.9", nil)
+	if err != nil || program != filepath.Join(e.CacheDir, "yue", "9.9.9", "yue") || *fetches != 1 {
+		t.Errorf("Compiler = %q, %v, %d downloads", program, err, *fetches)
+	}
+}
 
 func TestPklProgramUsesPklOnPathWhenItIs032OrNewer(t *testing.T) {
 	for _, found := range []string{"Pkl 0.32.1 (Windows 10.0, native)", "Pkl 0.33.0 (Linux)", "Pkl 1.0.0 (Linux)"} {
@@ -171,100 +248,5 @@ func TestPklProgramPassesOnACancelledRun(t *testing.T) {
 	e.Run = runInterrupted
 	if _, err := FindPkl(background, e); err != context.Canceled || *fetches != 0 {
 		t.Errorf("PklProgram = %v, %d downloads", err, *fetches)
-	}
-}
-
-func TestPklPinsVersion0321ForWindowsAndLinux(t *testing.T) {
-	const releases = "https://github.com/apple/pkl/releases/download/0.32.1/"
-	want := map[string]Asset{
-		"windows-x86_64": {
-			URL:    releases + "pkl-windows-amd64.exe",
-			SHA256: "8550a00fcf027335e42c5e2cd553b88e98845408cb1880b3e3d1860caf46d22a",
-			Binary: "pkl.exe",
-		},
-		"linux-x86_64": {
-			URL:    releases + "pkl-linux-amd64",
-			SHA256: "3180b62da95c0cad1d904e9bb6c5f4a8f9032413c21e53194bb91ff1ee5f3211",
-			Binary: "pkl",
-		},
-	}
-	if PklVersion != "0.32.1" || Pkl.Name != "pkl" || len(Pkl.Versions) != 1 || len(Pkl.Versions[PklVersion]) != len(want) {
-		t.Fatalf("PklVersion = %s, Pkl = %+v", PklVersion, Pkl)
-	}
-	for platform, asset := range want {
-		if Pkl.Versions[PklVersion][platform] != asset {
-			t.Errorf("the download for %s = %+v", platform, Pkl.Versions[PklVersion][platform])
-		}
-	}
-}
-
-func TestInstallBinCopiesPklOnceAndReportsACopyItCannotReplace(t *testing.T) {
-	e, _ := testkit.Env(t, t.TempDir())
-	source := testkit.WriteFile(t, t.TempDir(), "pkl.exe", []byte("v1"))
-	want := filepath.Join(e.CacheDir, "bin", "pkl.exe")
-	if path, copied, err := CopyToBinDir(e, Pkl, source); err != nil || path != want || !copied {
-		t.Fatalf("InstallBin = %q, %v, %v", path, copied, err)
-	}
-	if path, copied, err := CopyToBinDir(e, Pkl, source); err != nil || path != want || copied {
-		t.Errorf("InstallBin again = %q, %v, %v", path, copied, err)
-	}
-
-	blocked, _ := testkit.Env(t, t.TempDir())
-	if err := os.MkdirAll(filepath.Join(blocked.CacheDir, "bin", "pkl.exe"), 0o777); err != nil {
-		t.Fatal(err)
-	}
-	_, _, err := CopyToBinDir(blocked, Pkl, source)
-	diagErr := asDiagError(t, err, "a folder in the way")
-	if !strings.HasPrefix(diagErr.Msg, "Copying Pkl to "+filepath.Join(blocked.CacheDir, "bin", "pkl.exe")+" failed: ") ||
-		!strings.HasSuffix(diagErr.Hint, "then run moonwell setup again.") {
-		t.Errorf("error = %+v", diagErr)
-	}
-}
-
-func TestKeepPklForShellCopiesThePinnedPklAndSaysWhenPathStillHasNone(t *testing.T) {
-	e, log, _ := newPklEnv(t, "")
-	pinned := testkit.WriteFile(t, e.CacheDir, "pkl/"+PklVersion+"/pkl", []byte("fake-pkl"))
-	bin := filepath.Join(e.CacheDir, "bin")
-	if err := CopyPklToBinDir(background, e, pinned, "windows"); err != nil {
-		t.Fatal(err)
-	}
-	want := []string{
-		"Copied Pkl " + PklVersion + " to " + filepath.Join(bin, "pkl") + ".",
-		"warning: pkl is not on PATH, so a pkl command you type, such as `pkl project resolve`, finds no Pkl. " +
-			"Run this once in PowerShell, then open a new terminal:\n  " + AddToPathCommand(bin, "windows"),
-	}
-	if lines := log.Lines(); !slices.Equal(lines, want) {
-		t.Errorf("log = %q", lines)
-	}
-	if data, _ := os.ReadFile(filepath.Join(bin, "pkl")); string(data) != "fake-pkl" {
-		t.Errorf("the copy holds %q", data)
-	}
-
-	e.Run = fakePklRun("Pkl "+PklVersion+" (Linux)", "")
-	if err := CopyPklToBinDir(background, e, pinned, "linux"); err != nil || len(log.Lines()) != len(want) {
-		t.Errorf("log = %q, %v", log.Lines(), err)
-	}
-	untouched, silence := testkit.Env(t, t.TempDir())
-	if err := CopyPklToBinDir(background, untouched, "pkl", "linux"); err != nil || len(silence.Lines()) != 0 ||
-		len(listDir(t, untouched.CacheDir)) != 0 {
-		t.Errorf("KeepPklForShell of the pkl on PATH = %v, log %q", err, silence.Lines())
-	}
-}
-
-func TestKeepPklForShellPassesOnACancellationAndACopyThatFails(t *testing.T) {
-	e, log, _ := newPklEnv(t, "")
-	pinned := testkit.WriteFile(t, e.CacheDir, "pkl/"+PklVersion+"/pkl", []byte("fake-pkl"))
-	e.Run = runInterrupted
-	if err := CopyPklToBinDir(background, e, pinned, "linux"); err != context.Canceled {
-		t.Errorf("KeepPklForShell = %v, want the cancellation as it is", err)
-	}
-	if lines := log.Lines(); len(lines) != 1 || !strings.HasPrefix(lines[0], "Copied Pkl ") {
-		t.Errorf("log = %q", lines)
-	}
-	e.Run = failingRun(t)
-	gone := filepath.Join(e.CacheDir, "pkl", "0.0.0", "pkl")
-	err := CopyPklToBinDir(background, e, gone, "linux")
-	if diagErr := asDiagError(t, err, "no pinned Pkl"); !strings.HasPrefix(diagErr.Msg, "Copying Pkl to ") {
-		t.Errorf("error = %+v", diagErr)
 	}
 }

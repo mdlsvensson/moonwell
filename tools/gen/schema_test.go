@@ -365,7 +365,7 @@ func TestSchemaGeneratedMatchesTheObjectMetadata(t *testing.T) {
 func TestTheModeWithoutANameWritesTheCommittedSchemaFromTheCommittedMetadata(t *testing.T) {
 	c := newFakeCheckout(t)
 	c.copyRealFiles("data/metadata.json")
-	printed, files, err := c.runGen()
+	output, files, err := c.runGen()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -373,8 +373,8 @@ func TestTheModeWithoutANameWritesTheCommittedSchemaFromTheCommittedMetadata(t *
 	for _, module := range []string{"Hero", "Unit", "Building", "Item", "Ability", "Buff", "Upgrade"} {
 		wrote += "wrote schema/generated/" + module + "Props.pkl\n"
 	}
-	if printed != wrote {
-		t.Errorf("printed %q, want %q", printed, wrote)
+	if output != wrote {
+		t.Errorf("printed %q, want %q", output, wrote)
 	}
 	want := withGoMod(map[string]string{"data/metadata.json": string(realFile(t, "data/metadata.json"))})
 	for _, name := range generatedNames() {
@@ -383,12 +383,12 @@ func TestTheModeWithoutANameWritesTheCommittedSchemaFromTheCommittedMetadata(t *
 	if got := toTexts(files); !maps.Equal(got, want) {
 		t.Errorf("the checkout holds %q, and not all of them as they are committed", slices.Sorted(maps.Keys(got)))
 	}
-	printed, files, err = c.runGen()
+	output, files, err = c.runGen()
 	if err != nil {
 		t.Fatalf("the second run: %v", err)
 	}
-	if printed != "" {
-		t.Errorf("the second run printed %q, want nothing", printed)
+	if output != "" {
+		t.Errorf("the second run printed %q, want nothing", output)
 	}
 	if got := toTexts(files); !maps.Equal(got, want) {
 		t.Errorf("after the second run the checkout holds %q, and not all of them as they are committed",
@@ -403,12 +403,12 @@ func TestTheModeWithoutANameWritesNothingOverTheCommittedSchema(t *testing.T) {
 	if len(toTexts(c.readOutputs())) != 8 {
 		t.Fatalf("the checkout was given %q", slices.Sorted(maps.Keys(before)))
 	}
-	printed, files, err := c.runGen()
+	output, files, err := c.runGen()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if printed != "" || !reflect.DeepEqual(files, before) {
-		t.Errorf("the run printed %q and left %q", printed, slices.Sorted(maps.Keys(files)))
+	if output != "" || !reflect.DeepEqual(files, before) {
+		t.Errorf("the run printed %q and left %q", output, slices.Sorted(maps.Keys(files)))
 	}
 }
 
@@ -425,7 +425,7 @@ func TestTheModeWithoutANameRemovesWhatElseLiesInTheFolderOfTheSchema(t *testing
 	c.writeFile("schema/generated/UnitProps.pkl.orig", "stray\n")
 	c.writeFile("schema/generated/old/deeper/Left.pkl", "stray\n")
 	c.makeDir("schema/generated/empty")
-	printed, files, err := c.runGen()
+	output, files, err := c.runGen()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -434,8 +434,8 @@ func TestTheModeWithoutANameRemovesWhatElseLiesInTheFolderOfTheSchema(t *testing
 		"removed schema/generated/UnitProps.pkl.orig\n" +
 		"removed schema/generated/empty\n" +
 		"removed schema/generated/old\n"
-	if printed != lines {
-		t.Errorf("printed %q, want %q", printed, lines)
+	if output != lines {
+		t.Errorf("printed %q, want %q", output, lines)
 	}
 	if !reflect.DeepEqual(files, want) {
 		t.Errorf("the checkout holds %q, want %q", slices.Sorted(maps.Keys(files)), slices.Sorted(maps.Keys(want)))
@@ -456,7 +456,7 @@ func TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON(t *testing.T) 
 			scratch.writeFile("data/metadata.json", c.metadata)
 		}
 		before := scratch.readAll()
-		printed, files, err := scratch.runGen()
+		output, files, err := scratch.runGen()
 		if err == nil {
 			t.Errorf("%s: the schema was written", name)
 			continue
@@ -465,8 +465,8 @@ func TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON(t *testing.T) 
 		if strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: the message holds the path of the checkout: %v", name, err)
 		}
-		if printed != "" || !reflect.DeepEqual(files, before) {
-			t.Errorf("%s: the refused run printed %q and left %q", name, printed, slices.Sorted(maps.Keys(files)))
+		if output != "" || !reflect.DeepEqual(files, before) {
+			t.Errorf("%s: the refused run printed %q and left %q", name, output, slices.Sorted(maps.Keys(files)))
 		}
 	}
 }
@@ -477,7 +477,7 @@ func TestTheModeWithoutANameNamesAFileInTheWayOfTheSchema(t *testing.T) {
 		c.writeFile("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
 		c.writeFile(inTheWay, "a file\n")
 		before := c.readAll()
-		printed, _, err := c.runGen()
+		output, _, err := c.runGen()
 		if err == nil {
 			t.Errorf("a file at %s: the schema was written", inTheWay)
 			continue
@@ -485,9 +485,9 @@ func TestTheModeWithoutANameNamesAFileInTheWayOfTheSchema(t *testing.T) {
 		if !strings.HasPrefix(err.Error(), inTheWay+": ") || strings.Contains(err.Error(), c.root) {
 			t.Errorf("a file at %s: got %q, want %q and the system's reason", inTheWay, err, inTheWay)
 		}
-		if printed != "" || !reflect.DeepEqual(c.readAll(), before) {
+		if output != "" || !reflect.DeepEqual(c.readAll(), before) {
 			t.Errorf("a file at %s: the failed run printed %q and left %q",
-				inTheWay, printed, slices.Sorted(maps.Keys(c.readAll())))
+				inTheWay, output, slices.Sorted(maps.Keys(c.readAll())))
 		}
 	}
 }
@@ -497,12 +497,12 @@ func TestTheModeWithoutANameWritesNothingWhenANameCannotBeAProperty(t *testing.T
 	c.writeFile("data/metadata.json", metadataOfOneBuff(t, "fout", "output"))
 	c.writeFile("schema/generated/Stray.pkl", "stray\n")
 	before := c.readAll()
-	printed, files, err := c.runGen()
+	output, files, err := c.runGen()
 	if err == nil {
 		t.Fatal("a field named output was written into the schema")
 	}
 	checkContains(t, err.Error(), "cannot render the Pkl schema", `BuffProps: field "fout" (output) has the name "output"`)
-	if printed != "" || !reflect.DeepEqual(files, before) {
-		t.Errorf("the refused run printed %q and left %q", printed, slices.Sorted(maps.Keys(files)))
+	if output != "" || !reflect.DeepEqual(files, before) {
+		t.Errorf("the refused run printed %q and left %q", output, slices.Sorted(maps.Keys(files)))
 	}
 }

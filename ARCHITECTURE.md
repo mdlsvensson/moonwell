@@ -453,7 +453,7 @@ below the package's `testdata/recorded/`. Six packages have one:
 | `internal/cli` | `internal/cli/recorded_test.go` | Command lines as a user types them (in `internal/cli/seeds_test.go`): the exit code, both streams, and every file the line left. |
 | `internal/objects` | `internal/objects/recorded_test.go` | The object files and the JSON for objects of every kind. |
 | `internal/settings` | `internal/settings/recorded_test.go` | The patched script and info file for every setting, on scripts of many layouts. |
-| `internal/assets` | `internal/assets/stories_test.go` | Runs of `assets:sync` and of a build, one after the other in one project. |
+| `internal/assets` | `internal/assets/scenarios_test.go` | Runs of `assets:sync` and of a build, one after the other in one project. |
 | `internal/war3/lua` | `internal/war3/lua/corners_test.go` | What the tokenizer and the scanners make of sources at the edges of the language. |
 
 What a recording is:

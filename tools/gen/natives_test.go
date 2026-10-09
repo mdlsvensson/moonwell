@@ -432,13 +432,13 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 	} {
 		scratch := newCheckoutWithExtras(t)
 		scratch.writeFile(extrasPath, c.extras)
-		printed, files, err := scratch.runGen("natives", c.dir, "9.9.9")
+		output, files, err := scratch.runGen("natives", c.dir, "9.9.9")
 		if err != nil {
 			t.Errorf("%s: %v", name, err)
 			continue
 		}
-		if printed != "wrote data/natives.json: 3 types, 6 functions, 4 globals\n" {
-			t.Errorf("%s: printed %q", name, printed)
+		if output != "wrote data/natives.json: 3 types, 6 functions, 4 globals\n" {
+			t.Errorf("%s: printed %q", name, output)
 		}
 		got := toTexts(files)
 		if !maps.Equal(got, withGoMod(map[string]string{extrasPath: c.extras, nativesPath: want})) {
@@ -520,7 +520,7 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 			c.lay(scratch)
 		}
 		before := scratch.readAll()
-		printed, files, err := scratch.runGen("natives", c.dir, "9.9.9")
+		output, files, err := scratch.runGen("natives", c.dir, "9.9.9")
 		if err == nil {
 			t.Errorf("%s: the run wrote the natives", name)
 			continue
@@ -532,9 +532,9 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 		if strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: the error holds the full path of the checkout: %q", name, err)
 		}
-		if printed != "" || !reflect.DeepEqual(files, before) {
+		if output != "" || !reflect.DeepEqual(files, before) {
 			t.Errorf("%s: the refused run printed %q and left %q, want what the checkout held",
-				name, printed, slices.Sorted(maps.Keys(files)))
+				name, output, slices.Sorted(maps.Keys(files)))
 		}
 	}
 }
@@ -545,7 +545,7 @@ func TestTheModeNativesWritesTheCommittedNativesFromTheGamesScripts(t *testing.T
 	c := newFakeCheckout(t)
 	c.copyRealFiles(extrasPath)
 	c.makeDir("data")
-	printed, files, err := c.runGen("natives", export, committed.GameVersion)
+	output, files, err := c.runGen("natives", export, committed.GameVersion)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -555,7 +555,7 @@ func TestTheModeNativesWritesTheCommittedNativesFromTheGamesScripts(t *testing.T
 	}
 	counts := fmt.Sprintf("wrote data/natives.json: %d types, %d functions, %d globals\n",
 		len(committed.Types), len(committed.Functions), len(committed.Globals))
-	if printed != counts {
-		t.Errorf("the run printed %q, want %q", printed, counts)
+	if output != counts {
+		t.Errorf("the run printed %q, want %q", output, counts)
 	}
 }

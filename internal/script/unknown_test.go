@@ -338,28 +338,3 @@ func TestASourceTheCompilerCannotListFailsTheCheckBeforeAnyProblem(t *testing.T)
 		t.Errorf("the check gave %+v, %+v", problems, diagErr)
 	}
 }
-
-func TestListUsesReadsWhatTheRealCompilerPrints(t *testing.T) {
-	b := newCompileFixture(t, newSourceTree("src/main.yue", "global Score = 0\nprint CreatUnit!\nx = math.floor 1.5\nprint Score, x\n"))
-	uses, err := listGlobalUses(background, b.env, b.useRealCompiler(), b.macros, "", []lintSource{{path: "src/main.yue", hash: "h"}})
-	want := map[string][]globalUse{"src/main.yue": {
-		{Name: "Score", Line: 1, Column: 8},
-		{Name: "print", Line: 2, Column: 1},
-		{Name: "CreatUnit", Line: 2, Column: 7},
-		{Name: "math", Line: 3, Column: 5},
-		{Name: "print", Line: 4, Column: 1},
-		{Name: "Score", Line: 4, Column: 7},
-	}}
-	if err != nil || !maps.EqualFunc(uses, want, slices.Equal) {
-		t.Errorf("listUses = %+v, %v", uses, err)
-	}
-}
-
-func TestWithTheMacroPathTheCompilerListsNoGlobalForAFourCCCall(t *testing.T) {
-	b := newCompileFixture(t, newSourceTree("src/main.yue", macroImport+"print $FourCC \"hfoo\"\n"))
-	uses, err := listGlobalUses(background, b.env, b.useRealCompiler(), b.macros, "", []lintSource{{path: "src/main.yue", hash: "h"}})
-	want := map[string][]globalUse{"src/main.yue": {{Name: "print", Line: 2, Column: 1}}}
-	if err != nil || !maps.EqualFunc(uses, want, slices.Equal) {
-		t.Errorf("listUses = %+v, %v", uses, err)
-	}
-}

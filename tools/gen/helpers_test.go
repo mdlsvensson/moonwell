@@ -103,13 +103,13 @@ func realFiles(t testing.TB, name string) []string {
 	return files
 }
 
-func (c fakeCheckout) runGen(args ...string) (printed string, files map[string][]byte, err error) {
+func (c fakeCheckout) runGen(args ...string) (output string, files map[string][]byte, err error) {
 	c.t.Helper()
-	printed, err = c.runGenBelow("", args...)
-	return printed, c.readAll(), err
+	output, err = c.runGenBelow("", args...)
+	return output, c.readAll(), err
 }
 
-func (c fakeCheckout) runGenBelow(below string, args ...string) (printed string, err error) {
+func (c fakeCheckout) runGenBelow(below string, args ...string) (output string, err error) {
 	c.t.Helper()
 	dir := c.startsIn(below)
 	var out bytes.Buffer

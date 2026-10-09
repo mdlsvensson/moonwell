@@ -44,12 +44,12 @@ renamed (3):
 func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(t *testing.T) {
 	dir := newExportDir(t, nil)
 	c := newCheckoutWithPins(t, unitClassPins)
-	printed, files, err := c.runGen("metadata", dir, "3.0.0.1")
+	output, files, err := c.runGen("metadata", dir, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if printed != miniReport {
-		t.Errorf("the run printed\n%s\nwant\n%s", printed, miniReport)
+	if output != miniReport {
+		t.Errorf("the run printed\n%s\nwant\n%s", output, miniReport)
 	}
 	first := toTexts(files)
 	beside := withGoMod(map[string]string{overridesPath: unitClassPins, metadataPath: first[metadataPath]})
@@ -66,7 +66,7 @@ func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(
 	if err != nil {
 		t.Fatal(err)
 	}
-	if again != printed || !maps.Equal(toTexts(files), first) {
+	if again != output || !maps.Equal(toTexts(files), first) {
 		t.Errorf("the second run printed %q and wrote another file than the first: %s",
 			again, describeDifference(first[metadataPath], toTexts(files)[metadataPath]))
 	}
@@ -83,12 +83,12 @@ func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testin
 	})
 	c := newCheckoutWithPins(t, `{"names": {"items": {"unam": "unitName", "ifil": "itemModel"}, "units": {"ucls": "unitClass"},
 		"abilities": {"Crs": "missChance"}}}`)
-	printed, files, err := c.runGen("metadata", dir, "3.0.0.1")
+	output, files, err := c.runGen("metadata", dir, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
 	checkContains(t, string(files[metadataPath]), `{"id":"Crs\u0000","name":"missChance",`)
-	checkContains(t, printed, `renamed (10):
+	checkContains(t, output, `renamed (10):
   units ucls "class" -> "unitClass" (override)
   units unam "name" -> "unitName" (override)
   items ifil "modelFile" -> "itemModel" (override)
@@ -158,7 +158,7 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 			scratch.writeFile(metadataPath, c.kept)
 		}
 		before := scratch.readAll()
-		printed, files, err := scratch.runGen("metadata", c.dir, "3.0.0.2")
+		output, files, err := scratch.runGen("metadata", c.dir, "3.0.0.2")
 		if err == nil {
 			t.Errorf("%s: the run wrote the metadata", name)
 			continue
@@ -170,9 +170,9 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 		if strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: the error holds the full path of the checkout: %q", name, err)
 		}
-		if printed != "" || !reflect.DeepEqual(files, before) {
+		if output != "" || !reflect.DeepEqual(files, before) {
 			t.Errorf("%s: the refused run printed %q and left %q, want what the checkout held",
-				name, printed, slices.Sorted(maps.Keys(files)))
+				name, output, slices.Sorted(maps.Keys(files)))
 		}
 	}
 }
@@ -193,13 +193,13 @@ func TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn(t *testing.T) {
 		scratch := newFakeCheckout(t)
 		c.lay(scratch)
 		before := scratch.readAll()
-		printed, files, err := scratch.runGen("metadata", dir, "3.0.0.1")
+		output, files, err := scratch.runGen("metadata", dir, "3.0.0.1")
 		if err == nil || !strings.HasPrefix(err.Error(), c.starts) || strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: got %v, want a failure that starts with %q and holds no path of the checkout",
 				name, err, c.starts)
 		}
-		if printed != "" || !reflect.DeepEqual(files, before) {
-			t.Errorf("%s: the run printed %q and left %q", name, printed, slices.Sorted(maps.Keys(files)))
+		if output != "" || !reflect.DeepEqual(files, before) {
+			t.Errorf("%s: the run printed %q and left %q", name, output, slices.Sorted(maps.Keys(files)))
 		}
 	}
 }
@@ -298,7 +298,7 @@ func TestTheModeMetadataWritesTheCommittedMetadataFromTheGamesFiles(t *testing.T
 		c := newFakeCheckout(t)
 		c.makeDir("data")
 		c.copyRealFiles(carried...)
-		printed, files, err := c.runGen("metadata", export, committed.Game)
+		output, files, err := c.runGen("metadata", export, committed.Game)
 		if err != nil {
 			t.Errorf("%s: the run failed, and the first line of its error is %q", name, firstLine(err.Error()))
 			continue
@@ -308,9 +308,9 @@ func TestTheModeMetadataWritesTheCommittedMetadataFromTheGamesFiles(t *testing.T
 				name, metadataPath, firstDifferenceOffset(want, got))
 		}
 		const last = "\nwrote data/metadata.json. Now run `go run ./tools/gen`.\n"
-		if !strings.HasPrefix(printed, counts) || !strings.HasSuffix(printed, last) {
+		if !strings.HasPrefix(output, counts) || !strings.HasSuffix(output, last) {
 			t.Errorf("%s: the run printed %d bytes, and not the counts of the committed file first and the "+
-				"command to run next last", name, len(printed))
+				"command to run next last", name, len(output))
 		}
 	}
 }

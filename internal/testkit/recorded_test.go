@@ -16,7 +16,7 @@ func writeRecordingFile(t *testing.T, name, text string) string {
 	return dir
 }
 
-func TestRecordedPassesWhatIsRecordedAndShowsWhereAnythingElseParts(t *testing.T) {
+func TestCheckRecordedPassesWhatIsRecordedAndShowsWhereAnythingElseParts(t *testing.T) {
 	t.Setenv(recordVariable, "")
 	dir := writeRecordingFile(t, "sub/lines.txt", "one\ntwo\nthree\n")
 	same := newFakeTB(t)
@@ -51,7 +51,7 @@ func TestRecordedPassesWhatIsRecordedAndShowsWhereAnythingElseParts(t *testing.T
 	}
 }
 
-func TestRecordedFailsTheTestWithoutARecordingAndWritesNone(t *testing.T) {
+func TestCheckRecordedFailsTheTestWithoutARecordingAndWritesNone(t *testing.T) {
 	t.Setenv(recordVariable, "")
 	dir := t.TempDir()
 	missing := newFakeTB(t)
@@ -65,7 +65,7 @@ func TestRecordedFailsTheTestWithoutARecordingAndWritesNone(t *testing.T) {
 	}
 }
 
-func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T) {
+func TestCheckRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T) {
 	dir := writeRecordingFile(t, "kept.txt", "before\n")
 	for _, value := range []string{"", "0", "true", "yes"} {
 		t.Setenv(recordVariable, value)
@@ -88,7 +88,7 @@ func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T
 	}
 }
 
-func TestRecordedReadsBelowThePackagesFolderWhereverTheTestHasGone(t *testing.T) {
+func TestCheckRecordedReadsBelowThePackagesFolderWhereverTheTestHasGone(t *testing.T) {
 	if filepath.Base(packageDir) != "testkit" {
 		t.Fatalf("the package's folder is %s", packageDir)
 	}
@@ -116,7 +116,7 @@ func TestRecordedReadsBelowThePackagesFolderWhereverTheTestHasGone(t *testing.T)
 	}
 }
 
-func TestShownWritesPlainTextAsItIsAndQuotesEveryOtherValue(t *testing.T) {
+func TestQuoteIfNeededWritesPlainTextAsItIsAndQuotesEveryOtherValue(t *testing.T) {
 	noBreakSpace := `\` + "u00a0"
 	for _, c := range [][2]string{
 		{"plain text, with: marks", "plain text, with: marks"},
@@ -150,7 +150,7 @@ func TestShownWritesPlainTextAsItIsAndQuotesEveryOtherValue(t *testing.T) {
 	}
 }
 
-func TestPartingLineIsTheFirstLineTheTwoReadingsDoNotAgreeUpTo(t *testing.T) {
+func TestFirstDifferingLineIsTheFirstLineTheTwoReadingsDoNotAgreeUpTo(t *testing.T) {
 	for _, c := range []struct {
 		data, letter string
 		line         int
@@ -203,7 +203,7 @@ func TestWholeIfShortWritesAShortTextLineByLineAndAnyOtherFileByItsDigest(t *tes
 	}
 }
 
-func TestPlacedWritesTheRootAsRoot(t *testing.T) {
+func TestWithPlaceholdersWritesTheRootAsRoot(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "project")
 	slashed := filepath.ToSlash(root)
 	text := "built " + filepath.Join(root, "dist", "map.w3x") + "\nread " + slashed + "/src/main.yue\n" + root + "\n"
@@ -220,7 +220,7 @@ func TestPlacedWritesTheRootAsRoot(t *testing.T) {
 	}
 }
 
-func TestPlacedWritesTheRootAsJSONWritesItAndLeavesAFolderBesideItAlone(t *testing.T) {
+func TestWithPlaceholdersWritesTheRootAsJSONWritesItAndLeavesAFolderBesideItAlone(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "project")
 	doubled := strings.ReplaceAll(root, `\`, `\\`)
 	text := `{"file": "` + doubled + `\\src\\a.yue"}` + "\n" + root + "-other\n" + root + "_2\n" + root + "s\n" +
@@ -232,7 +232,7 @@ func TestPlacedWritesTheRootAsJSONWritesItAndLeavesAFolderBesideItAlone(t *testi
 	}
 }
 
-func TestPlacedWritesTheRootWithEitherDriveLetter(t *testing.T) {
+func TestWithPlaceholdersWritesTheRootWithEitherDriveLetter(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "project")
 	if filepath.VolumeName(root) == "" || root[1] != ':' {
 		t.Skip("this system writes no drive letter before a path")
@@ -246,7 +246,7 @@ func TestPlacedWritesTheRootWithEitherDriveLetter(t *testing.T) {
 	}
 }
 
-func TestPlacedWritesTheRootInItsLongAndItsShortSpelling(t *testing.T) {
+func TestWithPlaceholdersWritesTheRootInItsLongAndItsShortSpelling(t *testing.T) {
 	long := filepath.Join(t.TempDir(), "a folder with a long name")
 	if err := os.Mkdir(long, 0o755); err != nil {
 		t.Fatal(err)
@@ -268,7 +268,7 @@ func TestPlacedWritesTheRootInItsLongAndItsShortSpelling(t *testing.T) {
 	}
 }
 
-func TestPlacedWritesEachReasonAsReason(t *testing.T) {
+func TestWithPlaceholdersWritesEachReasonAsReason(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "project")
 	text := "cannot read " + filepath.Join(root, "a") + ": Access is denied.\ncannot write b: permission denied\n" +
 		"not a picture: invalid format: not enough pixel data.\n"

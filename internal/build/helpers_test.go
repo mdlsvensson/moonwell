@@ -141,14 +141,14 @@ func (s *fakeProject) copyTemplateMap() {
 
 func (s *fakeProject) setManifest(blocks ...string) {
 	s.t.Helper()
-	printed := pklOutputWith(s.defaults, blocks...)
-	project, err := manifest.DecodeProject(s.root, manifestName, []byte(printed))
+	output := pklOutputWith(s.defaults, blocks...)
+	project, err := manifest.DecodeProject(s.root, manifestName, []byte(output))
 	if err != nil {
-		s.t.Fatalf("the manifest %s: %v", printed, diag.Format(err))
+		s.t.Fatalf("the manifest %s: %v", output, diag.Format(err))
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.printed, s.project = printed, project
+	s.printed, s.project = output, project
 }
 
 func (s *fakeProject) setProgram(name string, stand fakeProgram) {
@@ -228,10 +228,10 @@ func (s *fakeProject) setGlobalUses(source, listing string) {
 	s.listings[source] = listing
 }
 
-func (s *fakeProject) failCompile(source, printed string) {
+func (s *fakeProject) failCompile(source, output string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.refusals[source] = printed
+	s.refusals[source] = output
 }
 
 func (s *fakeProject) compilerRuns() []compilerRun {

@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestPanicIsWhatACallPanicsWithAndNilForACallThatReturns(t *testing.T) {
+func TestPanicValueIsWhatACallPanicsWithAndNilForACallThatReturns(t *testing.T) {
 	if value := PanicValue(func() {}); value != nil {
 		t.Errorf("a call that returns: %v", value)
 	}
@@ -22,7 +22,7 @@ func TestPanicIsWhatACallPanicsWithAndNilForACallThatReturns(t *testing.T) {
 	}
 }
 
-func TestSweptPutsEachKindOfWhiteSpaceAtEachPlaceOfEachLine(t *testing.T) {
+func TestSpaceVariantsPutsEachKindOfWhiteSpaceAtEachPlaceOfEachLine(t *testing.T) {
 	for _, c := range []struct {
 		text  string
 		count int
@@ -109,7 +109,7 @@ func TestOneChangeIsALineCutOrDoubledAQuoteDroppedOrWhiteSpacePutIn(t *testing.T
 	}
 }
 
-func TestChangedMakesTheSameTextOfASeedAndAnIndexOnEveryCall(t *testing.T) {
+func TestMutateTextMakesTheSameTextOfASeedAndAnIndexOnEveryCall(t *testing.T) {
 	const text = "first \"one\"\nsecond two\nthird"
 	made := map[string]bool{}
 	otherSeed := 0
@@ -205,7 +205,7 @@ func TestOneChangeOfBytesIsAByteSetARunDroppedARunDoubledOrANumberSet(t *testing
 	}
 }
 
-func TestChangedBytesMakesTheSameBytesOfASeedAndAnIndexAndLeavesItsInputAlone(t *testing.T) {
+func TestMutateBytesMakesTheSameBytesOfASeedAndAnIndexAndLeavesItsInputAlone(t *testing.T) {
 	data := []byte("0123456789abcdefghijklmnopqrstuvwxyz")
 	kept := slices.Clone(data)
 	made := map[string]bool{}

@@ -25,7 +25,7 @@ func mustFailSafeJoin(t *testing.T, root, relative string) *diag.Error {
 	return diagErr
 }
 
-func TestInsideIsThePlaceOfAPathBelowTheFolder(t *testing.T) {
+func TestSafeJoinNoSymlinksIsThePlaceOfAPathBelowTheFolder(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "maps/demo.w3x/war3map.lua", nil)
 	for relative, want := range map[string]string{
@@ -41,7 +41,7 @@ func TestInsideIsThePlaceOfAPathBelowTheFolder(t *testing.T) {
 	}
 }
 
-func TestInsideRefusesAPathThatLeavesTheFolder(t *testing.T) {
+func TestSafeJoinNoSymlinksRefusesAPathThatLeavesTheFolder(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "project")
 	testkit.WriteFile(t, root, "maps/a.txt", nil)
 	testkit.WriteFile(t, filepath.Dir(root), "outside/a.txt", nil)
@@ -57,7 +57,7 @@ func TestInsideRefusesAPathThatLeavesTheFolder(t *testing.T) {
 	}
 }
 
-func TestInsideRefusesALinkOnTheWayAndALinkAtTheEnd(t *testing.T) {
+func TestSafeJoinNoSymlinksRefusesALinkOnTheWayAndALinkAtTheEnd(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "real/sub/a.txt", nil)
 	testkit.LinkDir(t, filepath.Join(root, "real"), filepath.Join(root, "link"))
@@ -87,7 +87,7 @@ func TestInsideRefusesALinkOnTheWayAndALinkAtTheEnd(t *testing.T) {
 	}
 }
 
-func TestInsideRefusesALinkToAFileAndALinkToNothing(t *testing.T) {
+func TestSafeJoinNoSymlinksRefusesALinkToAFileAndALinkToNothing(t *testing.T) {
 	root := t.TempDir()
 	target := testkit.WriteFile(t, root, "real.txt", nil)
 	testkit.LinkFile(t, target, filepath.Join(root, "link.txt"))
@@ -101,7 +101,7 @@ func TestInsideRefusesALinkToAFileAndALinkToNothing(t *testing.T) {
 	}
 }
 
-func TestInsideTrustsTheFolderItIsGiven(t *testing.T) {
+func TestSafeJoinNoSymlinksTrustsTheFolderItIsGiven(t *testing.T) {
 	base := t.TempDir()
 	testkit.WriteFile(t, base, "project/maps/a.txt", nil)
 	root := filepath.Join(base, "opened")
@@ -111,7 +111,7 @@ func TestInsideTrustsTheFolderItIsGiven(t *testing.T) {
 	}
 }
 
-func TestInsideTakesAFileOnTheWayForNothingThere(t *testing.T) {
+func TestSafeJoinNoSymlinksTakesAFileOnTheWayForNothingThere(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "maps", []byte("a file, not a folder"))
 	testkit.WriteFile(t, root, "real/maps", []byte("a file, not a folder"))
@@ -150,7 +150,7 @@ func TestInsideTakesAFileOnTheWayForNothingThere(t *testing.T) {
 	}
 }
 
-func TestInsideNamesAWayTheSystemCannotLookAt(t *testing.T) {
+func TestSafeJoinNoSymlinksNamesAWayTheSystemCannotLookAt(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "maps/a.txt", nil)
 	for _, relative := range []string{strings.Repeat("n", 300), "maps/" + strings.Repeat("n", 300) + "/a.txt"} {

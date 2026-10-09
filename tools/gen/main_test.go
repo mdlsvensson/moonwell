@@ -17,15 +17,15 @@ import (
 )
 
 func TestRunRefusesAFirstArgumentThatNamesNoMode(t *testing.T) {
-	printed, files, err := newFakeCheckout(t).runGen("nativs", "folder", "1.2.3.4")
+	output, files, err := newFakeCheckout(t).runGen("nativs", "folder", "1.2.3.4")
 	if err == nil {
 		t.Fatal("a mode the generator does not have was run")
 	}
 	checkContains(t, err.Error(),
 		"unknown mode 'nativs'", "The modes are natives, metadata and game-paths",
 		"without one, gen writes schema/generated")
-	if printed != "" || !asNew(files) {
-		t.Errorf("the refused line printed %q and left %v", printed, slices.Sorted(maps.Keys(files)))
+	if output != "" || !asNew(files) {
+		t.Errorf("the refused line printed %q and left %v", output, slices.Sorted(maps.Keys(files)))
 	}
 }
 
@@ -70,12 +70,12 @@ func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
 		{[]string{"game-paths", "listfile.txt", "1.2.3.4", "more"}, gamePaths},
 		{[]string{"", "more"}, "Usage: go run ./tools/gen"},
 	} {
-		printed, files, err := newFakeCheckout(t).runGen(c.args...)
+		output, files, err := newFakeCheckout(t).runGen(c.args...)
 		if err == nil || err.Error() != c.want {
 			t.Errorf("%q: got %v, want %q", c.args, err, c.want)
 		}
-		if printed != "" || !asNew(files) {
-			t.Errorf("%q: the refused line printed %q and left %v", c.args, printed, slices.Sorted(maps.Keys(files)))
+		if output != "" || !asNew(files) {
+			t.Errorf("%q: the refused line printed %q and left %v", c.args, output, slices.Sorted(maps.Keys(files)))
 		}
 	}
 }
@@ -117,12 +117,12 @@ func TestRunRefusesAFolderThatIsInNoCheckout(t *testing.T) {
 		"the module in a comment":  "// module github.com/mdlsvensson/moonwell\nmodule example.com/other\n",
 		"the module as a requires": "module example.com/other\n\nrequire github.com/mdlsvensson/moonwell v1.0.0\n",
 	} {
-		printed, err := newDirWithoutCheckout(t, module).runGenBelow("", "no-such-mode")
+		output, err := newDirWithoutCheckout(t, module).runGenBelow("", "no-such-mode")
 		if err == nil || !strings.Contains(err.Error(), "in a Moonwell checkout") {
 			t.Errorf("%s: got %v, want the refusal of a folder that is in no checkout", name, err)
 		}
-		if printed != "" {
-			t.Errorf("%s: the refused run printed %q", name, printed)
+		if output != "" {
+			t.Errorf("%s: the refused run printed %q", name, output)
 		}
 	}
 }
@@ -137,13 +137,13 @@ func TestRunFindsTheCheckoutAtOrAboveTheFolderItIsRunIn(t *testing.T) {
 			c := newFakeCheckout(t)
 			c.writeFile("go.mod", module)
 			c.writeFile("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
-			printed, err := c.runGenBelow(below)
+			output, err := c.runGenBelow(below)
 			if err != nil {
 				t.Errorf("%s, run in %q: %v", name, below, err)
 				continue
 			}
-			if strings.Count(printed, "wrote schema/generated/") != 7 {
-				t.Errorf("%s, run in %q: printed %q, want a line for each of the seven files", name, below, printed)
+			if strings.Count(output, "wrote schema/generated/") != 7 {
+				t.Errorf("%s, run in %q: printed %q, want a line for each of the seven files", name, below, output)
 			}
 			got := toTexts(c.readOutputs())
 			if len(got) != 8 || !strings.Contains(got["schema/generated/BuffProps.pkl"], "\nname: Int?\n") {

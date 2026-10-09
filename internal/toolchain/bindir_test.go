@@ -13,6 +13,77 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
+func TestInstallBinCopiesPklOnceAndReportsACopyItCannotReplace(t *testing.T) {
+	e, _ := testkit.Env(t, t.TempDir())
+	source := testkit.WriteFile(t, t.TempDir(), "pkl.exe", []byte("v1"))
+	want := filepath.Join(e.CacheDir, "bin", "pkl.exe")
+	if path, copied, err := CopyToBinDir(e, Pkl, source); err != nil || path != want || !copied {
+		t.Fatalf("InstallBin = %q, %v, %v", path, copied, err)
+	}
+	if path, copied, err := CopyToBinDir(e, Pkl, source); err != nil || path != want || copied {
+		t.Errorf("InstallBin again = %q, %v, %v", path, copied, err)
+	}
+
+	blocked, _ := testkit.Env(t, t.TempDir())
+	if err := os.MkdirAll(filepath.Join(blocked.CacheDir, "bin", "pkl.exe"), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	_, _, err := CopyToBinDir(blocked, Pkl, source)
+	diagErr := asDiagError(t, err, "a folder in the way")
+	if !strings.HasPrefix(diagErr.Msg, "Copying Pkl to "+filepath.Join(blocked.CacheDir, "bin", "pkl.exe")+" failed: ") ||
+		!strings.HasSuffix(diagErr.Hint, "then run moonwell setup again.") {
+		t.Errorf("error = %+v", diagErr)
+	}
+}
+
+func TestKeepPklForShellCopiesThePinnedPklAndSaysWhenPathStillHasNone(t *testing.T) {
+	e, log, _ := newPklEnv(t, "")
+	pinned := testkit.WriteFile(t, e.CacheDir, "pkl/"+PklVersion+"/pkl", []byte("fake-pkl"))
+	bin := filepath.Join(e.CacheDir, "bin")
+	if err := CopyPklToBinDir(background, e, pinned, "windows"); err != nil {
+		t.Fatal(err)
+	}
+	want := []string{
+		"Copied Pkl " + PklVersion + " to " + filepath.Join(bin, "pkl") + ".",
+		"warning: pkl is not on PATH, so a pkl command you type, such as `pkl project resolve`, finds no Pkl. " +
+			"Run this once in PowerShell, then open a new terminal:\n  " + AddToPathCommand(bin, "windows"),
+	}
+	if lines := log.Lines(); !slices.Equal(lines, want) {
+		t.Errorf("log = %q", lines)
+	}
+	if data, _ := os.ReadFile(filepath.Join(bin, "pkl")); string(data) != "fake-pkl" {
+		t.Errorf("the copy holds %q", data)
+	}
+
+	e.Run = fakePklRun("Pkl "+PklVersion+" (Linux)", "")
+	if err := CopyPklToBinDir(background, e, pinned, "linux"); err != nil || len(log.Lines()) != len(want) {
+		t.Errorf("log = %q, %v", log.Lines(), err)
+	}
+	untouched, silence := testkit.Env(t, t.TempDir())
+	if err := CopyPklToBinDir(background, untouched, "pkl", "linux"); err != nil || len(silence.Lines()) != 0 ||
+		len(listDir(t, untouched.CacheDir)) != 0 {
+		t.Errorf("KeepPklForShell of the pkl on PATH = %v, log %q", err, silence.Lines())
+	}
+}
+
+func TestKeepPklForShellPassesOnACancellationAndACopyThatFails(t *testing.T) {
+	e, log, _ := newPklEnv(t, "")
+	pinned := testkit.WriteFile(t, e.CacheDir, "pkl/"+PklVersion+"/pkl", []byte("fake-pkl"))
+	e.Run = runInterrupted
+	if err := CopyPklToBinDir(background, e, pinned, "linux"); err != context.Canceled {
+		t.Errorf("KeepPklForShell = %v, want the cancellation as it is", err)
+	}
+	if lines := log.Lines(); len(lines) != 1 || !strings.HasPrefix(lines[0], "Copied Pkl ") {
+		t.Errorf("log = %q", lines)
+	}
+	e.Run = failingRun(t)
+	gone := filepath.Join(e.CacheDir, "pkl", "0.0.0", "pkl")
+	err := CopyPklToBinDir(background, e, gone, "linux")
+	if diagErr := asDiagError(t, err, "no pinned Pkl"); !strings.HasPrefix(diagErr.Msg, "Copying Pkl to ") {
+		t.Errorf("error = %+v", diagErr)
+	}
+}
+
 func TestInstallBinCopiesTheCompilerOnceAndAgainWhenItChanges(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
 	source := testkit.WriteFile(t, t.TempDir(), "yue.exe", []byte("v1"))

@@ -143,3 +143,5 @@ func listDir(t testing.TB, dir string) []string {
 	}
 	return slices.Sorted(maps.Keys(testkit.Snapshot(t, dir)))
 }
+
+const installPage = "https://pkl-lang.org/main/current/pkl-cli/index.html#installation"

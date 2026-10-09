@@ -177,7 +177,7 @@ func TestEnvIsATestWorld(t *testing.T) {
 	}
 }
 
-func TestRecorderKeepsEveryLevelInOrder(t *testing.T) {
+func TestLogRecorderKeepsEveryLevelInOrder(t *testing.T) {
 	recorder := NewLogRecorder()
 	recorder.Info("one")
 	recorder.Warn("two")
@@ -305,7 +305,7 @@ func sameFile(a, b string) bool {
 	return aErr == nil && bErr == nil && os.SameFile(aInfo, bInfo)
 }
 
-func TestCaseSensitiveLeavesNoProbeBehind(t *testing.T) {
+func TestIsCaseSensitiveLeavesNoProbeBehind(t *testing.T) {
 	dir := t.TempDir()
 	IsCaseSensitive(t, dir)
 	if got := Snapshot(t, dir); len(got) != 0 {

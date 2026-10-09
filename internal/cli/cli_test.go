@@ -10,13 +10,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/internal/build"
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
+	"github.com/spf13/cobra"
 )
 
 func TestTheHelpAndTheVersionArePrintedForOtherPrograms(t *testing.T) {
@@ -181,7 +180,7 @@ func TestADevThatWasToldToStopExitsWith130(t *testing.T) {
 }
 
 func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *testing.T) {
-	refusal := &diag.Error{Msg: "The map is broken.", File: "maps/map.w3x", Line: 3, Hint: "Mend it."}
+	diagErr := &diag.Error{Msg: "The map is broken.", File: "maps/map.w3x", Line: 3, Hint: "Mend it."}
 	several := diag.Problems{{File: "objects/units.pkl", Msg: "One."}, {File: "objects/items.pkl", Msg: "Two."}}
 	toldToStop := fmt.Errorf("pkl was stopped: %w", context.Canceled)
 	for _, c := range []struct {
@@ -193,11 +192,11 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 		output  string
 	}{
 		{"a command that ends well", "check", false, nil, 0, ""},
-		{"an expected failure", "check", false, refusal, 1, diag.Format(refusal)},
+		{"an expected failure", "check", false, diagErr, 1, diag.Format(diagErr)},
 		{"several failures at once", "check", false, several, 1, diag.Format(several)},
 		{"a failure nobody expected", "check", false, errors.New("boom"), 1, diag.FormatInternalError("boom")},
 		{"a command that stopped because it was told to", "check", true, toldToStop, 130, ""},
-		{"a command that failed by itself while it was told to stop", "check", true, refusal, 130, diag.Format(refusal)},
+		{"a command that failed by itself while it was told to stop", "check", true, diagErr, 130, diag.Format(diagErr)},
 		{"a command that ended well though it was told to stop", "check", true, nil, 0, ""},
 		{"dev told to stop", "dev", true, nil, 130, ""},
 		{"a cancellation nobody asked for", "check", false, context.Canceled, 1, diag.FormatInternalError("context canceled")},
@@ -264,13 +263,13 @@ func TestAPanicBeforeALineHasACommandIsPrintedToTheTerminal(t *testing.T) {
 
 func TestAFileNameThatIsNotUTF8IsPrintedAsItIs(t *testing.T) {
 	file := "maps/\xff\xfe\xe9.w3x/war3map.lua"
-	refusal := &diag.Error{Msg: "The script cannot be read.", File: file, Line: 2, Column: 5, Hint: "Save the map again."}
+	diagErr := &diag.Error{Msg: "The script cannot be read.", File: file, Line: 2, Column: 5, Hint: "Save the map again."}
 	want := "error: " + file + ":2:5 \xe2\x80\xba The script cannot be read.\nhint: Save the map again."
-	if got := diag.Format(refusal); got != want {
+	if got := diag.Format(diagErr); got != want {
 		t.Errorf("diag.Format = %q, want %q", got, want)
 	}
 	log := testkit.NewLogRecorder()
-	code := exitCode(background, log.Logger, command{name: "check"}, refusal)
+	code := exitCode(background, log.Logger, command{name: "check"}, diagErr)
 	if printed := log.Lines(); code != 1 || len(printed) != 1 || printed[0] != want {
 		t.Errorf("a command that ends with the failure prints %q and exits with %d, want %q and 1", printed, code, want)
 	}
@@ -325,44 +324,5 @@ func TestTheTableHasTheTwelveCommandsInTheOrderOfTheUsage(t *testing.T) {
 	}
 	if !slices.Equal(have, want) {
 		t.Errorf("the table has %q, want %q", have, want)
-	}
-}
-
-func TestTheFirstInterruptCancelsTheCommandAndTheSecondLeaves(t *testing.T) {
-	interrupts := make(chan os.Signal)
-	cancelled, left := make(chan struct{}), make(chan struct{})
-	go handleInterrupts(interrupts, func() { close(cancelled) }, func() { close(left) })
-	interrupts <- os.Interrupt
-	<-cancelled
-	select {
-	case <-left:
-		t.Fatal("the first interrupt left the program")
-	default:
-	}
-	interrupts <- os.Interrupt
-	<-left
-}
-
-func TestLeavingAtOnceGivesBackTheBuildLockAndThenExitsWith130(t *testing.T) {
-	root := t.TempDir()
-	release, err := build.AcquireLock(root)
-	if err != nil {
-		t.Fatal(diag.Format(err))
-	}
-	defer release()
-	lock := filepath.Join(root, "dist", ".lock")
-	var codes []int
-	leave := newForceExit(func(code int) {
-		codes = append(codes, code)
-		if _, err := os.Stat(lock); !errors.Is(err, os.ErrNotExist) {
-			t.Errorf("the program exits with the build lock in place: %v", err)
-		}
-	})
-	if _, err := os.Stat(lock); err != nil || len(codes) != 0 {
-		t.Fatalf("before the second interrupt: the lock: %v; exits: %v", err, codes)
-	}
-	leave()
-	if !slices.Equal(codes, []int{130}) {
-		t.Errorf("leaving exits with %v, want 130 once", codes)
 	}
 }

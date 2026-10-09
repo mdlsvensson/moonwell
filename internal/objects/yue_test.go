@@ -65,8 +65,8 @@ func TestTheGeneratedIDsModuleCompilesAndEachIDEqualsFourCC(t *testing.T) {
 			if err != nil || compiled.ExitCode != 0 {
 				t.Fatalf("compiling failed with exit code %d (%v):\n%s\n%s", compiled.ExitCode, err, compiled.Stdout, compiled.Stderr)
 			}
-			if printed := tooltest.RunLua(t, testkit.WriteFile(t, dir, "check.lua", []byte(check))); printed != "objects-ok" {
-				t.Errorf("the check printed %q", printed)
+			if output := tooltest.RunLua(t, testkit.WriteFile(t, dir, "check.lua", []byte(check))); output != "objects-ok" {
+				t.Errorf("the check printed %q", output)
 			}
 		})
 	}

@@ -56,7 +56,7 @@ func TestLargestArchiveIsTheSizeOfAnArchiveWhoseFilesDoNotCompress(t *testing.T)
 	}
 }
 
-func TestRoomForRefusesWhatTheFormatsFieldsCannotHold(t *testing.T) {
+func TestCheckFitsRefusesWhatTheFormatsFieldsCannotHold(t *testing.T) {
 	const most = 1<<32 - 1
 	const largestAlone = 4290776748
 	tests := []struct {

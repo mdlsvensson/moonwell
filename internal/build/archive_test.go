@@ -22,10 +22,10 @@ func projectWith(root, buildFolder, manifestFile string) *manifest.Project {
 	}
 }
 
-func TestArchiveOfPlacesTheArchiveUnderBuildFolder(t *testing.T) {
+func TestArchivePathPlacesTheArchiveUnderBuildFolder(t *testing.T) {
 	tests := []struct {
-		written string
-		label   string
+		written     string
+		displayPath string
 	}{
 		{"dist/bin", "dist/bin/map.w3x"},
 		{"dist/bin/", "dist/bin/map.w3x"},
@@ -43,8 +43,8 @@ func TestArchiveOfPlacesTheArchiveUnderBuildFolder(t *testing.T) {
 			if err != nil {
 				t.Fatalf("archiveOf: %v", diag.Format(err))
 			}
-			if at.displayPath != tt.label || at.fullPath != filepath.Join(root, filepath.FromSlash(tt.label)) {
-				t.Errorf("archiveOf = %+v, want %s", at, tt.label)
+			if at.displayPath != tt.displayPath || at.fullPath != filepath.Join(root, filepath.FromSlash(tt.displayPath)) {
+				t.Errorf("archiveOf = %+v, want %s", at, tt.displayPath)
 			}
 			if held := testkit.Snapshot(t, root); len(held) != 0 {
 				t.Errorf("the look for the archive's place made %q", held)
@@ -53,7 +53,7 @@ func TestArchiveOfPlacesTheArchiveUnderBuildFolder(t *testing.T) {
 	}
 }
 
-func TestArchiveOfRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedManifest(t *testing.T) {
+func TestArchivePathRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedManifest(t *testing.T) {
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, "out", "map.w3x"), 0o777); err != nil {
 		t.Fatal(err)
@@ -75,7 +75,7 @@ func TestArchiveOfRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedManif
 	}
 }
 
-func TestArchiveOfRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArchive(t *testing.T) {
+func TestArchivePathRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArchive(t *testing.T) {
 	tests := []struct {
 		written string
 		words   string
@@ -123,7 +123,7 @@ func TestTheStageAndTheArchiveRefuseAMapFolderWindowsCannotHoldByTheManifest(t *
 	}
 }
 
-func TestArchiveOfRefusesAFileOnTheWayToTheArchiveByItsName(t *testing.T) {
+func TestArchivePathRefusesAFileOnTheWayToTheArchiveByItsName(t *testing.T) {
 	tests := []struct {
 		written string
 		file    string
@@ -145,7 +145,7 @@ func TestArchiveOfRefusesAFileOnTheWayToTheArchiveByItsName(t *testing.T) {
 	}
 }
 
-func TestArchiveOfRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
+func TestArchivePathRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 	tests := []struct {
 		name    string
 		written string

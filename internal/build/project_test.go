@@ -63,10 +63,10 @@ func TestLoadReturnsTheRefusalOfAFolderThatIsNoProject(t *testing.T) {
 
 func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 	tests := []struct {
-		name  string
-		dir   string
-		at    string
-		label string
+		name        string
+		dir         string
+		at          string
+		displayPath string
 	}{
 		{"the folder below maps", "map.w3x", "maps/map.w3x", "maps/map.w3x"},
 		{"a folder further down", "campaign/one.w3x", "maps/campaign/one.w3x", "maps/campaign/one.w3x"},
@@ -92,7 +92,7 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}
-			if source.Dir() != s.fullPath(tt.at) || source.DisplayPath("") != tt.label || !source.HasFile("war3map.lua") {
+			if source.Dir() != s.fullPath(tt.at) || source.DisplayPath("") != tt.displayPath || !source.HasFile("war3map.lua") {
 				t.Errorf("Source = the folder %s named %s", source.Dir(), source.DisplayPath(""))
 			}
 			if !reflect.DeepEqual(testkit.Snapshot(t, s.root), before) {

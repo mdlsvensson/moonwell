@@ -248,8 +248,8 @@ func TestEvalJSONEscapesOnlyTheQuoteTheBackslashAndControlCharacters(t *testing.
 func TestEvalJSONWritesTheRawcodeOfThreeLettersWithItsNUL(t *testing.T) {
 	resolved := mustResolve(t, `{"abilities":{"curse":{"id":"A000","base":"Acrs","properties":{"Crs":0.25}}}}`)
 	want := "          \"rawcode\": \"Crs\x5cu0000\",\n"
-	if printed := string(objects.EvalJSON(resolved)); !strings.Contains(printed, want) {
-		t.Errorf("no line %q in\n%s", want, printed)
+	if output := string(objects.EvalJSON(resolved)); !strings.Contains(output, want) {
+		t.Errorf("no line %q in\n%s", want, output)
 	}
 }
 
