@@ -24,7 +24,7 @@ import (
 const smallPassed = "Check passed: 1 module(s) reachable from main, 0 asset(s)."
 
 func watchingLine(labels ...string) string {
-	return "Watching " + strings.Join(labels, ", ") + " and the project manifests. Press Ctrl+C to stop."
+	return "Watching " + strings.Join(labels, ", ") + " and the project's settings. Press Ctrl+C to stop."
 }
 
 func (s *fakeProject) countChecks() (passed, failed int) {
@@ -292,10 +292,10 @@ func removePkl(e *env.Env) {
 
 func TestDevWatchesAssetsObjectsAndLuaWhenTheyExist(t *testing.T) {
 	tests := map[string][]string{
-		"Watching src/ and the project manifests. Press Ctrl+C to stop.":                    {},
-		"Watching src/, objects/ and the project manifests. Press Ctrl+C to stop.":          {"objects"},
-		"Watching src/, assets/, objects/ and the project manifests. Press Ctrl+C to stop.": {"assets", "objects"},
-		"Watching src/, lua/ and the project manifests. Press Ctrl+C to stop.":              {"lua"},
+		"Watching src/ and the project's settings. Press Ctrl+C to stop.":                    {},
+		"Watching src/, objects/ and the project's settings. Press Ctrl+C to stop.":          {"objects"},
+		"Watching src/, assets/, objects/ and the project's settings. Press Ctrl+C to stop.": {"assets", "objects"},
+		"Watching src/, lua/ and the project's settings. Press Ctrl+C to stop.":              {"lua"},
 	}
 	for line, folders := range tests {
 		root := t.TempDir()

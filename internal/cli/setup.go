@@ -18,8 +18,7 @@ import (
 )
 
 func runSetup(ctx context.Context, e *env.Env, _ commandArgs) error {
-	if !manifest.IsProject(e.Root) {
-		_, err := build.LoadSettings(ctx, e)
+	if _, err := build.LoadSettings(ctx, e); err != nil {
 		return err
 	}
 	if err := setupUserFile(e); err != nil {

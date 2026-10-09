@@ -81,7 +81,7 @@ func (w watchSet) merge(more watchSet) watchSet {
 }
 
 func (w watchSet) describe() string {
-	return "Watching " + strings.Join(w.displayPaths, ", ") + " and the project manifests. Press Ctrl+C to stop."
+	return "Watching " + strings.Join(w.displayPaths, ", ") + " and the project's settings. Press Ctrl+C to stop."
 }
 
 const (

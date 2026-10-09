@@ -354,7 +354,7 @@ func TestPlanWithKeepGeneratedLeavesTheIDsModuleAloneAndFailsForOneThatIsNotCurr
 		held    *string
 		says    string
 	}{
-		{"a stale module", true, &stale, "does not match the objects"},
+		{"a stale module", true, &stale, "does not match the project's objects"},
 		{"no module, and objects", true, nil, "missing"},
 		{"a current module", true, &captainIDs, ""},
 		{"a current module with the line ends of Windows", true, &windows, ""},

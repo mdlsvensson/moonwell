@@ -303,7 +303,7 @@ func TestUsesPrintedRefusesOutputItCannotRead(t *testing.T) {
 	uses, diagErr := parseGlobalUses("print 1 1\nScore one 8\nx\n", "src/main.yue")
 	if uses != nil || diagErr == nil || diagErr.Msg != "yue -g printed a line Moonwell cannot read: Score one 8" ||
 		diagErr.File != "src/main.yue" || diagErr.Line != 0 ||
-		diagErr.Hint != "Use a YueScript version Moonwell supports: remove yue.version and yue.path from the manifests." {
+		diagErr.Hint != "Use a YueScript version Moonwell supports: remove yue.version from moonwell.toml and yue.path from the config.toml of your Moonwell folder." {
 		t.Fatalf("usesPrinted = %+v, %+v", uses, diagErr)
 	}
 	for _, printed := range []string{"Score", "Score 1", "Score 1 8 9", "Score  1 8", "Score 1\t8", "Score -1 8", "1 8", "Score 1.0 8"} {

@@ -156,14 +156,14 @@ func TestPklObjectsCheckMissingStaleCurrent(t *testing.T) {
 	writeObjects(t, root)
 	before := testkit.Snapshot(t, filepath.Join(root, "maps"))
 	r := mustFailWithPklOnly(t, root, []string{"  war3map.w3u\n  war3mapSkin.w3u\n" + idsLine("missing") + "\nerror: " +
-		objects.IDsFile + " \xe2\x80\xba The file is missing, but the manifest has objects.\n" +
+		objects.IDsFile + " \xe2\x80\xba The file is missing, but the project has objects.\n" +
 		"hint: Run moonwell build, test or dev to regenerate it."}, "objects:check")
 	if r.stdout != "" || exists(root, objects.IDsFile) || strings.Contains(r.output, "Object data valid") {
 		t.Fatalf("objects:check wrote the ids module, printed for other programs, or summed up a failure: %+v", r)
 	}
 	writeFile(t, root, objects.IDsFile, noObjects)
 	r = mustFailWithPklOnly(t, root,
-		[]string{idsLine("stale"), "does not match the objects in the manifest."}, "objects:check")
+		[]string{idsLine("stale"), "does not match the project's objects."}, "objects:check")
 	if strings.Contains(r.output, "Object data valid") {
 		t.Fatalf("objects:check summed up a failure:\n%s", r.output)
 	}
@@ -202,14 +202,14 @@ func TestPklCheckRefusesMissingStaleBeforeCompile(t *testing.T) {
 	writeObjects(t, root)
 	e, _, _ := newPklOnlyEnv(t, root)
 	_, err := runCommandIn(t, background, e, "check")
-	checkContains(t, asDiagError(t, err, "missing ids").Msg, "is missing, but the manifest has objects")
+	checkContains(t, asDiagError(t, err, "missing ids").Msg, "is missing, but the project has objects")
 	if exists(root, objects.IDsFile) {
 		t.Fatal("check wrote the ids module")
 	}
 	writeFile(t, root, objects.IDsFile, onlyCaptain)
 	_, err = runCommandIn(t, background, e, "check")
 	diagErr := asDiagError(t, err, "stale ids")
-	checkContains(t, diagErr.Msg, "does not match the objects in the manifest")
+	checkContains(t, diagErr.Msg, "does not match the project's objects")
 	if diagErr.Hint != "Run moonwell build, test or dev to regenerate it." ||
 		readFile(t, root, objects.IDsFile) != onlyCaptain {
 		t.Fatal(diagErr)
@@ -261,7 +261,7 @@ func TestPklDevRefreshesGeneratedObjectsOnChanges(t *testing.T) {
 	writeFile(t, root, "objects/human/barracks/units.pkl", captain)
 	e, log, _ := newPklOnlyEnv(t, root)
 	until := startDevIn(t, e, log)
-	watching := "Watching src/, assets/, objects/, lua/ and the project manifests."
+	watching := "Watching src/, assets/, objects/, lua/ and the project's settings."
 	until("the line that says what it watches", func() bool {
 		return slices.ContainsFunc(log.Lines(), func(line string) bool { return strings.HasPrefix(line, watching) })
 	})

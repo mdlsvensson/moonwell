@@ -168,12 +168,12 @@ func TestAssertIDsCurrentFailsOnAStaleOrMissingFileWithTheHintToRegenerate(t *te
 	}
 	const hint = "Run moonwell build, test or dev to regenerate it."
 	missing := asDiagError(t, objects.RequireIDsCurrent(root, captainIDs), "a missing module")
-	if !strings.Contains(missing.Msg, "is missing, but the manifest has objects") || missing.File != objects.IDsFile || missing.Hint != hint {
+	if !strings.Contains(missing.Msg, "is missing, but the project has objects") || missing.File != objects.IDsFile || missing.Hint != hint {
 		t.Errorf("error = %+v", missing)
 	}
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(emptyIDs))
 	stale := asDiagError(t, objects.RequireIDsCurrent(root, captainIDs), "a stale module")
-	if !strings.Contains(stale.Msg, "does not match the objects in the manifest") || stale.File != objects.IDsFile || stale.Hint != hint {
+	if !strings.Contains(stale.Msg, "does not match the project's objects") || stale.File != objects.IDsFile || stale.Hint != hint {
 		t.Errorf("error = %+v", stale)
 	}
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(captainIDs))

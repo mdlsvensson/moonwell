@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -28,6 +29,16 @@ func isPathWarning(line, binDir string) bool {
 	return strings.HasPrefix(line, "warning: yue is not on PATH; VS Code's YueScript extension needs YueScript "+
 		toolchain.YueVersion+" there. Run this once in ") &&
 		strings.HasSuffix(line, ":\n  "+toolchain.AddToPathCommand(binDir, runtime.GOOS))
+}
+
+func TestSetupThatWasToldToStopSaysNothingAndMakesNoUsersFile(t *testing.T) {
+	root := newTemplateProject(t)
+	stopped, stop := context.WithCancel(background)
+	stop()
+	result := runCLIWithContext(t, stopped, root, "setup")
+	if result.code != 130 || result.output != "" || exists(root, userDir) {
+		t.Errorf("setup = %+v, and the user's folder exists: %v; want exit 130, no line and no file", result, exists(root, userDir))
+	}
 }
 
 func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *testing.T) {

@@ -269,7 +269,7 @@ func TestE2ESettingsDevWatchesPreviewAndManifest(t *testing.T) {
 	testkit.WriteFile(t, root, "art/preview.tga", testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{}))
 	setSettings(t, root, "[settings.info]\npreview = \"art/preview.tga\"\n")
 	wait := startDev(t, root)
-	wait(", art/preview.tga and the project manifests.")
+	wait(", art/preview.tga and the project's settings.")
 	testkit.WriteFile(t, root, "art/preview.tga", make([]byte, 40))
 	wait("error: art/preview.tga " + mark +
 		" The preview picture is a TGA of image type 0, not a true-colour picture.")

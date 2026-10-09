@@ -131,9 +131,9 @@ func errIDsUnwritable(cause error) error {
 }
 
 func errIDsMissing() error {
-	return &diag.Error{Msg: "The file is missing, but the manifest has objects.", File: IDsFile, Hint: regenerateIDs}
+	return &diag.Error{Msg: "The file is missing, but the project has objects.", File: IDsFile, Hint: regenerateIDs}
 }
 
 func errIDsStale() error {
-	return &diag.Error{Msg: "The file does not match the objects in the manifest.", File: IDsFile, Hint: regenerateIDs}
+	return &diag.Error{Msg: "The file does not match the project's objects.", File: IDsFile, Hint: regenerateIDs}
 }

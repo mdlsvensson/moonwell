@@ -169,6 +169,6 @@ func errUnreadableUse(path, line string) *diag.Error {
 	return &diag.Error{
 		Msg:  "yue -g printed a line Moonwell cannot read: " + line,
 		File: path,
-		Hint: "Use a YueScript version Moonwell supports: remove yue.version and yue.path from the manifests.",
+		Hint: "Use a YueScript version Moonwell supports: remove yue.version from moonwell.toml and yue.path from the config.toml of your Moonwell folder.",
 	}
 }
