@@ -22,12 +22,12 @@ type Types struct {
 	Natives *script.Natives
 }
 
-func RefreshTypes(root string, in Types) (written []string, err error) {
-	if in.Natives == nil {
+func RefreshTypes(root string, types Types) (written []string, err error) {
+	if types.Natives == nil {
 		return nil, errors.New("editor.RefreshTypes: Types.Natives is nil; pass script.LoadNatives()")
 	}
 	written = []string{}
-	for _, file := range buildDeclarationFiles(in) {
+	for _, file := range buildDeclarationFiles(types) {
 		wrote, err := file.write(root)
 		if err != nil {
 			return nil, err
@@ -44,29 +44,29 @@ type declarationFile struct {
 	text string
 }
 
-func buildDeclarationFiles(in Types) []declarationFile {
+func buildDeclarationFiles(types Types) []declarationFile {
 	return []declarationFile{
-		{TypesDir + "/natives.d.lua", renderNatives(in.Natives)},
+		{TypesDir + "/natives.d.lua", renderNatives(types.Natives)},
 		{TypesDir + "/moonwell.d.lua", runtimeDeclarations},
-		{TypesDir + "/objects.d.lua", renderObjects(in.Objects)},
-		{TypesDir + "/map.d.lua", renderMap(in.Map, in.MapLua)},
+		{TypesDir + "/objects.d.lua", renderObjects(types.Objects)},
+		{TypesDir + "/map.d.lua", renderMap(types.Map, types.MapLua)},
 	}
 }
 
 func (d declarationFile) write(root string) (wrote bool, err error) {
-	file, err := fsx.SafeJoinNoSymlinks(root, d.path)
+	fullPath, err := fsx.SafeJoinNoSymlinks(root, d.path)
 	if err != nil {
 		return false, err
 	}
-	if wrote, err = fsx.WriteIfChanged(file, d.text); err != nil {
+	if wrote, err = fsx.WriteIfChanged(fullPath, d.text); err != nil {
 		return false, errDeclarationsNotWritten(d.path, err)
 	}
 	return wrote, nil
 }
 
 func isDiagError(err error) bool {
-	var expected *diag.Error
-	return errors.As(err, &expected)
+	var diagErr *diag.Error
+	return errors.As(err, &diagErr)
 }
 
 func errDeclarationsNotWritten(path string, cause error) error {

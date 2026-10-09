@@ -2,7 +2,6 @@ package editor
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"io/fs"
 	"os"
@@ -13,7 +12,6 @@ import (
 	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
-	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
 var editorFiles = []string{"yueconfig.yue", ".luarc.json", ".vscode/extensions.json"}
@@ -31,55 +29,55 @@ const (
 )
 
 func AddFiles(root string, template []moonwell.TemplateFile) ([]string, error) {
-	there, err := findExistingFiles(root)
+	existing, err := findExistingFiles(root)
 	if err != nil {
 		return nil, err
 	}
-	added, err := addMissingFiles(root, template, there)
+	added, err := addMissingFiles(root, template, existing)
 	if err != nil {
 		return nil, err
 	}
-	ignores, err := addGitignoreLines(root)
+	ignoreLines, err := addGitignoreLines(root)
 	if err != nil {
 		return nil, err
 	}
-	if len(ignores) > 0 {
-		added = append(added, gitignoreFile+" ("+strings.Join(ignores, ", ")+")")
+	if len(ignoreLines) > 0 {
+		added = append(added, gitignoreFile+" ("+strings.Join(ignoreLines, ", ")+")")
 	}
 	return added, nil
 }
 
-func findExistingFiles(root string) (there map[string]bool, err error) {
-	there = map[string]bool{}
+func findExistingFiles(root string) (existing map[string]bool, err error) {
+	existing = map[string]bool{}
 	for _, file := range append(slices.Clone(editorFiles), gitignoreFile) {
-		if there[file], err = fileExists(root, file); err != nil {
+		if existing[file], err = fileExists(root, file); err != nil {
 			return nil, err
 		}
 	}
-	return there, nil
+	return existing, nil
 }
 
-func fileExists(root, file string) (bool, error) {
-	at := fullPathOf(root, file)
-	info, err := fsx.Lstat(at)
+func fileExists(root, path string) (bool, error) {
+	fullPath := fullPathOf(root, path)
+	info, err := fsx.Lstat(fullPath)
 	switch {
 	case err != nil || info == nil:
 		return false, nil
-	case fsx.IsSymlink(info) && isBrokenSymlink(at):
-		return false, errLinkToNothing(file)
+	case fsx.IsSymlink(info) && isBrokenSymlink(fullPath):
+		return false, errBrokenSymlink(path)
 	}
 	return true, nil
 }
 
-func isBrokenSymlink(link string) bool {
-	_, err := os.Stat(link)
+func isBrokenSymlink(symlink string) bool {
+	_, err := os.Stat(symlink)
 	return errors.Is(err, fs.ErrNotExist)
 }
 
-func addMissingFiles(root string, template []moonwell.TemplateFile, there map[string]bool) ([]string, error) {
+func addMissingFiles(root string, template []moonwell.TemplateFile, existing map[string]bool) ([]string, error) {
 	added := []string{}
 	for _, file := range editorFiles {
-		if there[file] {
+		if existing[file] {
 			continue
 		}
 		data, err := templateFile(template, file)
@@ -104,36 +102,36 @@ func templateFile(template []moonwell.TemplateFile, path string) ([]byte, error)
 }
 
 func addGitignoreLines(root string) ([]string, error) {
-	held, _, err := readFileIfExists(root, gitignoreFile)
+	content, _, err := readFileIfExists(root, gitignoreFile)
 	if err != nil {
 		return nil, err
 	}
-	lacking := missingGitignoreLines(held)
-	if len(lacking) == 0 {
+	missing := missingGitignoreLines(content)
+	if len(missing) == 0 {
 		return nil, nil
 	}
-	if err := writeFile(root, gitignoreFile, appendLines(held, lacking)); err != nil {
+	if err := writeFile(root, gitignoreFile, appendLines(content, missing)); err != nil {
 		return nil, err
 	}
-	return lacking, nil
+	return missing, nil
 }
 
-func missingGitignoreLines(held []byte) []string {
+func missingGitignoreLines(content []byte) []string {
 	var lines []string
-	for line := range strings.SplitSeq(fsx.TrimBOM(string(held)), "\n") {
+	for line := range strings.SplitSeq(fsx.TrimBOM(string(content)), "\n") {
 		lines = append(lines, strings.Trim(line, lineSpace))
 	}
-	var lacking []string
-	for _, ignore := range gitignoreLines {
-		if !slices.Contains(lines, ignore) {
-			lacking = append(lacking, ignore)
+	var missing []string
+	for _, ignoreLine := range gitignoreLines {
+		if !slices.Contains(lines, ignoreLine) {
+			missing = append(missing, ignoreLine)
 		}
 	}
-	return lacking
+	return missing
 }
 
-func appendLines(held []byte, lines []string) []byte {
-	out := bytes.Clone(held)
+func appendLines(content []byte, lines []string) []byte {
+	out := bytes.Clone(content)
 	if len(out) > 0 && !bytes.HasSuffix(out, []byte("\n")) {
 		out = append(out, '\n')
 	}
@@ -143,212 +141,50 @@ func appendLines(held []byte, lines []string) []byte {
 	return out
 }
 
-var luarcArrays = []string{"runtime.path", "workspace.library", "workspace.ignoreDir"}
-
-func MergeLuarc(root string, template []moonwell.TemplateFile) (added []string, merged bool, err error) {
-	written, found, err := readFileIfExists(root, luarcFile)
-	switch {
-	case err != nil:
-		return nil, false, err
-	case !found:
-		return []string{}, true, nil
-	}
-	entries, err := LuarcTemplateEntries(template)
-	if err != nil {
-		return nil, false, err
-	}
-	config, isObject := asObject(written)
-	if !isObject {
-		return nil, false, nil
-	}
-	added = addMissingEntries(&config, entries)
-	if len(added) == 0 {
-		return added, true, nil
-	}
-	if err := writeLuarc(root, config); err != nil {
-		return nil, false, err
-	}
-	return added, true, nil
-}
-
-func addMissingEntries(config *manifest.OrderedMap[json.RawMessage], entries map[string][]string) []string {
-	added := []string{}
-	for _, key := range luarcArrays {
-		added = append(added, addEntries(config, key, entries[key])...)
-	}
-	return added
-}
-
-func LuarcTemplateEntries(template []moonwell.TemplateFile) (map[string][]string, error) {
-	data, err := templateFile(template, luarcFile)
-	if err != nil {
-		return nil, err
-	}
-	config, isObject := asObject(data)
-	if !isObject {
-		return nil, errors.New("editor: the template's .luarc.json is not a JSON object")
-	}
-	entries := map[string][]string{}
-	for _, key := range luarcArrays {
-		written, _ := config.Get(key)
-		list, isList := asStringList(written)
-		if !isList {
-			return nil, errors.New("editor: the template's .luarc.json has no " + key + " array of strings")
-		}
-		entries[key] = list
-	}
-	return entries, nil
-}
-
-func asObject(text []byte) (config manifest.OrderedMap[json.RawMessage], isObject bool) {
-	text = fsx.TrimBOM(text)
-	if !startsWith(text, '{') || json.Unmarshal(text, &config) != nil {
-		return manifest.OrderedMap[json.RawMessage]{}, false
-	}
-	return config, true
-}
-
-func addEntries(config *manifest.OrderedMap[json.RawMessage], key string, entries []string) (added []string) {
-	written, given := config.Get(key)
-	elements, isArray := asArray(written)
-	if given && !isArray {
-		return nil
-	}
-	held := map[string]bool{}
-	for _, element := range elements {
-		if text, isString := asString(element); isString {
-			held[text] = true
-		}
-	}
-	for _, entry := range entries {
-		if held[entry] {
-			continue
-		}
-		held[entry] = true
-		elements = append(elements, json.RawMessage(fsx.QuoteJSON(entry)))
-		added = append(added, entry)
-	}
-	config.Set(key, toJSONArray(elements))
-	return added
-}
-
-func asArray(written json.RawMessage) (elements []json.RawMessage, isArray bool) {
-	if !startsWith(written, '[') || json.Unmarshal(written, &elements) != nil {
-		return nil, false
-	}
-	return elements, true
-}
-
-func asString(written json.RawMessage) (text string, isString bool) {
-	if !startsWith(written, '"') || json.Unmarshal(written, &text) != nil {
-		return "", false
-	}
-	return text, true
-}
-
-func startsWith(text []byte, first byte) bool {
-	text = bytes.TrimLeft(text, jsonSpace)
-	return len(text) > 0 && text[0] == first
-}
-
-func asStringList(written json.RawMessage) (list []string, isList bool) {
-	elements, isArray := asArray(written)
-	if !isArray {
-		return nil, false
-	}
-	for _, element := range elements {
-		text, isString := asString(element)
-		if !isString {
-			return nil, false
-		}
-		list = append(list, text)
-	}
-	return list, true
-}
-
-func toJSONArray(elements []json.RawMessage) json.RawMessage {
-	array := json.RawMessage("[")
-	for i, element := range elements {
-		if i > 0 {
-			array = append(array, ',')
-		}
-		array = append(array, element...)
-	}
-	return append(array, ']')
-}
-
-func writeLuarc(root string, config manifest.OrderedMap[json.RawMessage]) error {
-	text, err := formatLuarc(config)
-	if err != nil {
-		return err
-	}
-	return writeFile(root, luarcFile, text)
-}
-
-func formatLuarc(config manifest.OrderedMap[json.RawMessage]) ([]byte, error) {
-	var onOneLine bytes.Buffer
-	onOneLine.WriteByte('{')
-	for key, value := range config.All() {
-		if onOneLine.Len() > 1 {
-			onOneLine.WriteByte(',')
-		}
-		onOneLine.WriteString(fsx.QuoteJSON(key))
-		onOneLine.WriteByte(':')
-		onOneLine.Write(value)
-	}
-	onOneLine.WriteByte('}')
-	var text bytes.Buffer
-	if err := json.Indent(&text, onOneLine.Bytes(), "", "  "); err != nil {
-		return nil, err
-	}
-	text.WriteByte('\n')
-	return text.Bytes(), nil
-}
-
 func fullPathOf(root, file string) string {
 	return filepath.Join(root, filepath.FromSlash(file))
 }
 
-func readFileIfExists(root, file string) (data []byte, found bool, err error) {
-	if data, found, err = fsx.ReadFileIfExists(fullPathOf(root, file)); err != nil {
-		return nil, false, errNotRead(file, err)
+func readFileIfExists(root, path string) (data []byte, found bool, err error) {
+	if data, found, err = fsx.ReadFileIfExists(fullPathOf(root, path)); err != nil {
+		return nil, false, errNotRead(path, err)
 	}
 	return data, found, nil
 }
 
-func writeFile(root, file string, data []byte) error {
-	target := fullPathOf(root, file)
-	err := os.MkdirAll(filepath.Dir(target), 0o777)
+func writeFile(root, path string, data []byte) error {
+	fullPath := fullPathOf(root, path)
+	err := os.MkdirAll(filepath.Dir(fullPath), 0o777)
 	if err == nil {
-		err = os.WriteFile(target, data, 0o666)
+		err = os.WriteFile(fullPath, data, 0o666)
 	}
 	if err != nil {
-		return errNotWritten(file, err)
+		return errNotWritten(path, err)
 	}
 	return nil
 }
 
-func errLinkToNothing(file string) error {
+func errBrokenSymlink(path string) error {
 	return &diag.Error{
-		Msg:  file + " is a link to a file that does not exist.",
-		File: file,
+		Msg:  path + " is a link to a file that does not exist.",
+		File: path,
 		Hint: "Remove the link, or create the file it leads to, then run setup again.",
 	}
 }
 
-func errNotRead(file string, cause error) error {
-	return errFile("Reading", file, cause)
+func errNotRead(path string, cause error) error {
+	return errFile("Reading", path, cause)
 }
 
-func errNotWritten(file string, cause error) error {
-	return errFile("Writing", file, cause)
+func errNotWritten(path string, cause error) error {
+	return errFile("Writing", path, cause)
 }
 
-func errFile(action, file string, cause error) error {
+func errFile(action, path string, cause error) error {
 	return &diag.Error{
-		Msg:  action + " " + file + " failed: " + fsx.Reason(cause),
-		File: file,
-		Hint: "Close any program that has " + file + " open and check that it is a file you can read and write, then run " +
+		Msg:  action + " " + path + " failed: " + fsx.Reason(cause),
+		File: path,
+		Hint: "Close any program that has " + path + " open and check that it is a file you can read and write, then run " +
 			"setup again.",
 		Cause: cause,
 	}

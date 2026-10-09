@@ -581,7 +581,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | know how a local library is copied | `internal/library/local.go`: `syncLocal`; `internal/library/mirror.go`: `dirMirror` |
 | add a key to `moonwell-library.json` | `internal/library/libraryfile.go`: `parseLibraryFile` |
 | change the editor's declarations | `internal/editor/refresh.go`: `RefreshTypes`; the text of each file in `internal/editor/declarations.go` |
-| change what `setup` adds to `.luarc.json` and `.gitignore` | `internal/editor/scaffold.go`: `AddFiles`, `MergeLuarc` |
+| change what `setup` adds to `.luarc.json` and `.gitignore` | `internal/editor/scaffold.go`: `AddFiles`; `internal/editor/luarc.go`: `MergeLuarc` |
 
 ### The foundations
 
