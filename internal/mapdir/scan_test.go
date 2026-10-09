@@ -32,7 +32,7 @@ func TestOpenOfAnEmptyFolderHasNoFiles(t *testing.T) {
 }
 
 func TestOpenRefusesTwoSpellingsOfOnePath(t *testing.T) {
-	if !testkit.CaseSensitive(t, t.TempDir()) {
+	if !testkit.IsCaseSensitive(t, t.TempDir()) {
 		t.Skip("this file system cannot hold two names that differ only in letter case")
 	}
 	cases := []struct {

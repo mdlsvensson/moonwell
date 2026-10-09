@@ -20,7 +20,7 @@ func TestRecordedPassesWhatIsRecordedAndShowsWhereAnythingElseParts(t *testing.T
 	t.Setenv(recordVariable, "")
 	folder := recording(t, "sub/lines.txt", "one\ntwo\nthree\n")
 	same := newStandIn(t)
-	recordedIn(same, folder, "sub/lines.txt", []byte("one\ntwo\nthree\n"))
+	checkRecordedIn(same, folder, "sub/lines.txt", []byte("one\ntwo\nthree\n"))
 	if len(same.errors)+len(same.failed) != 0 {
 		t.Errorf("what is recorded failed the test: %q %q", same.errors, same.failed)
 	}
@@ -35,7 +35,7 @@ func TestRecordedPassesWhatIsRecordedAndShowsWhereAnythingElseParts(t *testing.T
 		{"nothing", "", []string{"offset 0, line 1", `recorded: "one"`, "14 bytes are recorded and 0 were made"}},
 	} {
 		differs := newStandIn(t)
-		recordedIn(differs, folder, "sub/lines.txt", []byte(c.made))
+		checkRecordedIn(differs, folder, "sub/lines.txt", []byte(c.made))
 		if len(differs.errors) != 1 {
 			t.Errorf("%s: the test was told %q, want one failure", c.name, differs.errors)
 			continue
@@ -55,7 +55,7 @@ func TestRecordedFailsTheTestWithoutARecordingAndWritesNone(t *testing.T) {
 	t.Setenv(recordVariable, "")
 	folder := t.TempDir()
 	missing := newStandIn(t)
-	recordedIn(missing, folder, "none.txt", []byte("text"))
+	checkRecordedIn(missing, folder, "none.txt", []byte("text"))
 	if len(missing.errors) != 1 || !strings.Contains(missing.errors[0], "none.txt") ||
 		!strings.Contains(missing.errors[0], recordVariable+"=1") {
 		t.Errorf("the test was told %q, want the file and the variable that writes it", missing.errors)
@@ -69,7 +69,7 @@ func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T
 	folder := recording(t, "kept.txt", "before\n")
 	for _, value := range []string{"", "0", "true", "yes"} {
 		t.Setenv(recordVariable, value)
-		recordedIn(newStandIn(t), folder, "kept.txt", []byte("after\n"))
+		checkRecordedIn(newStandIn(t), folder, "kept.txt", []byte("after\n"))
 		if kept, _ := os.ReadFile(filepath.Join(folder, "kept.txt")); string(kept) != "before\n" {
 			t.Errorf("%s=%q wrote the recording: %q", recordVariable, value, kept)
 		}
@@ -77,7 +77,7 @@ func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T
 	t.Setenv(recordVariable, "1")
 	for _, name := range []string{"kept.txt", "new/folder/made.txt"} {
 		recorder := newStandIn(t)
-		recordedIn(recorder, folder, name, []byte("after\r\nlines\n"))
+		checkRecordedIn(recorder, folder, name, []byte("after\r\nlines\n"))
 		written, err := os.ReadFile(filepath.Join(folder, filepath.FromSlash(name)))
 		if err != nil || string(written) != "after\r\nlines\n" {
 			t.Errorf("%s: the recording is %q, %v; want the bytes that were given", name, written, err)
@@ -89,26 +89,26 @@ func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T
 }
 
 func TestRecordedReadsBelowThePackagesFolderWhereverTheTestHasGone(t *testing.T) {
-	if filepath.Base(packageFolder) != "testkit" {
-		t.Fatalf("the package's folder is %s", packageFolder)
+	if filepath.Base(packageDir) != "testkit" {
+		t.Fatalf("the package's folder is %s", packageDir)
 	}
-	if _, err := os.Stat(filepath.Join(packageFolder, "recorded.go")); err != nil {
+	if _, err := os.Stat(filepath.Join(packageDir, "recorded.go")); err != nil {
 		t.Fatalf("the package's folder does not hold the package: %v", err)
 	}
-	started := packageFolder
-	t.Cleanup(func() { packageFolder = started })
-	packageFolder = t.TempDir()
-	WriteFile(t, filepath.Join(packageFolder, "testdata", "recorded"), "here.txt", []byte("here\n"))
+	started := packageDir
+	t.Cleanup(func() { packageDir = started })
+	packageDir = t.TempDir()
+	WriteFile(t, filepath.Join(packageDir, "testdata", "recorded"), "here.txt", []byte("here\n"))
 	t.Chdir(t.TempDir())
 	t.Setenv(recordVariable, "")
 	found := newStandIn(t)
-	Recorded(found, "here.txt", []byte("here\n"))
+	CheckRecorded(found, "here.txt", []byte("here\n"))
 	if len(found.errors) != 0 {
 		t.Errorf("the recording of the package was not found from another working folder: %q", found.errors)
 	}
 	t.Setenv(recordVariable, "1")
-	Recorded(newStandIn(t), "sub/written.txt", []byte("made\n"))
-	if _, err := os.Stat(filepath.Join(packageFolder, "testdata", "recorded", "sub", "written.txt")); err != nil {
+	CheckRecorded(newStandIn(t), "sub/written.txt", []byte("made\n"))
+	if _, err := os.Stat(filepath.Join(packageDir, "testdata", "recorded", "sub", "written.txt")); err != nil {
 		t.Errorf("a recording was not written below the package's folder: %v", err)
 	}
 	if entries, _ := os.ReadDir("."); len(entries) != 0 {
@@ -135,7 +135,7 @@ func TestShownWritesPlainTextAsItIsAndQuotesEveryOtherValue(t *testing.T) {
 		{`"starts with a quote`, `"\"starts with a quote"`},
 	} {
 		value, want := c[0], c[1]
-		got := Shown(value)
+		got := QuoteIfNeeded(value)
 		if got != want {
 			t.Errorf("Shown(%q) = %s, want %s", value, got, want)
 		}
@@ -163,7 +163,7 @@ func TestPartingLineIsTheFirstLineTheTwoReadingsDoNotAgreeUpTo(t *testing.T) {
 		{"a", "a", 1, "a"},
 	} {
 		alike := func(upTo []byte) bool { return !strings.Contains(string(upTo), c.letter) }
-		line, upTo := PartingLine([]byte(c.data), alike)
+		line, upTo := FirstDifferingLine([]byte(c.data), alike)
 		if line != c.line || string(upTo) != c.upTo {
 			t.Errorf("%q, parting at %s: line %d and %q, want line %d and %q",
 				c.data, c.letter, line, upTo, c.line, c.upTo)
@@ -183,22 +183,22 @@ func TestDigestIsTheSHA256AndTheLength(t *testing.T) {
 }
 
 func TestWholeIfShortWritesAShortTextLineByLineAndAnyOtherFileByItsDigest(t *testing.T) {
-	longest := strings.Repeat("a", longestWhole)
+	longest := strings.Repeat("a", maxWholeLength)
 	for _, c := range []struct{ name, data, want string }{
 		{"one line", "an asset", ` "an asset"` + "\n"},
 		{"one line with its line feed", "return 1\n", ` "return 1\n"` + "\n"},
 		{"several lines", "a\r\nb\n\tc", "\n" + `    "a\r\n"` + "\n" + `    "b\n"` + "\n" + `    "\tc"` + "\n"},
 		{"nothing", "", ` ""` + "\n"},
 		{"the longest text", longest, ` "` + longest + `"` + "\n"},
-		{"a text that is longer", longest + "a", ByDigest([]byte(longest + "a"))},
-		{"a control character", "a\x00b", ByDigest([]byte("a\x00b"))},
-		{"bytes that are no UTF-8", "a\xffb", ByDigest([]byte("a\xffb"))},
+		{"a text that is longer", longest + "a", DigestLine([]byte(longest + "a"))},
+		{"a control character", "a\x00b", DigestLine([]byte("a\x00b"))},
+		{"bytes that are no UTF-8", "a\xffb", DigestLine([]byte("a\xffb"))},
 	} {
 		if got := WholeIfShort([]byte(c.data)); got != c.want {
 			t.Errorf("%s: WholeIfShort = %q, want %q", c.name, got, c.want)
 		}
 	}
-	if got, want := ByDigest([]byte("abc")), " "+Digest([]byte("abc"))+"\n"; got != want {
+	if got, want := DigestLine([]byte("abc")), " "+Digest([]byte("abc"))+"\n"; got != want {
 		t.Errorf("ByDigest = %q, want %q", got, want)
 	}
 }
@@ -209,13 +209,13 @@ func TestPlacedWritesTheRootAsRoot(t *testing.T) {
 	text := "built " + filepath.Join(root, "dist", "map.w3x") + "\nread " + slashed + "/src/main.yue\n" + root + "\n"
 	want := "built <root>" + string(filepath.Separator) + "dist" + string(filepath.Separator) + "map.w3x\n" +
 		"read <root>/src/main.yue\n<root>\n"
-	if got := string(Placed([]byte(text), root)); got != want {
+	if got := string(WithPlaceholders([]byte(text), root)); got != want {
 		t.Errorf("Placed = %q, want %q", got, want)
 	}
-	if got := string(Placed([]byte(text), root+string(filepath.Separator)+"."+string(filepath.Separator))); got != want {
+	if got := string(WithPlaceholders([]byte(text), root+string(filepath.Separator)+"."+string(filepath.Separator))); got != want {
 		t.Errorf("Placed with a root that is not clean = %q, want %q", got, want)
 	}
-	if got := string(Placed([]byte(text), "")); got != text {
+	if got := string(WithPlaceholders([]byte(text), "")); got != text {
 		t.Errorf("Placed without a root = %q, want the text", got)
 	}
 }
@@ -227,7 +227,7 @@ func TestPlacedWritesTheRootAsJSONWritesItAndLeavesAFolderBesideItAlone(t *testi
 		root + ".\n" + root + ": gone\n"
 	want := `{"file": "<root>\\src\\a.yue"}` + "\n" + root + "-other\n" + root + "_2\n" + root + "s\n" +
 		"<root>.\n<root>: gone\n"
-	if got := string(Placed([]byte(text), root)); got != want {
+	if got := string(WithPlaceholders([]byte(text), root)); got != want {
 		t.Errorf("Placed = %q, want %q", got, want)
 	}
 }
@@ -240,7 +240,7 @@ func TestPlacedWritesTheRootWithEitherDriveLetter(t *testing.T) {
 	small, capital := strings.ToLower(root[:1])+root[1:], strings.ToUpper(root[:1])+root[1:]
 	for _, given := range []string{small, capital} {
 		text := "a " + small + `\x` + "\nb " + capital + "/y\nc " + filepath.ToSlash(small) + "/z\n"
-		if got := string(Placed([]byte(text), given)); got != "a <root>\\x\nb <root>/y\nc <root>/z\n" {
+		if got := string(WithPlaceholders([]byte(text), given)); got != "a <root>\\x\nb <root>/y\nc <root>/z\n" {
 			t.Errorf("Placed with the root %s = %q", given, got)
 		}
 	}
@@ -255,14 +255,14 @@ func TestPlacedWritesTheRootInItsLongAndItsShortSpelling(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	short := shortSpelling(resolved)
+	short := shortPathName(resolved)
 	if short == "" || strings.EqualFold(short, resolved) {
 		t.Skip("this system, or the volume of the temporary folder, writes no short names")
 	}
 	text := "long " + filepath.Join(resolved, "a.txt") + "\nshort " + filepath.Join(short, "b.txt") + "\n"
 	want := "long <root>" + string(filepath.Separator) + "a.txt\nshort <root>" + string(filepath.Separator) + "b.txt\n"
 	for _, given := range []string{resolved, short} {
-		if got := string(Placed([]byte(text), given)); got != want {
+		if got := string(WithPlaceholders([]byte(text), given)); got != want {
 			t.Errorf("Placed with the root %s = %q, want %q", given, got, want)
 		}
 	}
@@ -275,11 +275,11 @@ func TestPlacedWritesEachReasonAsReason(t *testing.T) {
 	want := "cannot read <root>" + string(filepath.Separator) + "a: <reason>\ncannot write b: <reason>\n" +
 		"not a picture: <reason>.\n"
 	reasons := []string{"Access is denied.", "", "permission denied", "invalid format: not enough pixel data"}
-	if got := string(Placed([]byte(text), root, reasons...)); got != want {
+	if got := string(WithPlaceholders([]byte(text), root, reasons...)); got != want {
 		t.Errorf("Placed = %q, want %q", got, want)
 	}
 	whole := "open " + filepath.Join(root, "a") + ": no such file"
-	if got := string(Placed([]byte("failed: "+whole+"\n"), root, whole)); got != "failed: <reason>\n" {
+	if got := string(WithPlaceholders([]byte("failed: "+whole+"\n"), root, whole)); got != "failed: <reason>\n" {
 		t.Errorf("a reason with the root in it: %q", got)
 	}
 }

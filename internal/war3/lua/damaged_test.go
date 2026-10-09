@@ -43,7 +43,7 @@ const damageSeed = 53
 func scannedOrRefused(t *testing.T, what, source string) (read bool) {
 	t.Helper()
 	var made scanned
-	if value := testkit.Panic(func() { made = scan(source) }); value != nil {
+	if value := testkit.PanicValue(func() { made = scan(source) }); value != nil {
 		t.Fatalf("%s: a scanner panics: %v", what, value)
 	}
 	end := 0
@@ -102,8 +102,8 @@ func TestADamagedSourceIsScannedOrRefusedByNameAndNeverPanics(t *testing.T) {
 		}
 		for index := range changes {
 			what := fmt.Sprintf("%s, change %d of seed %d", c.name, index, damageSeed)
-			count(what+" to its text", testkit.Changed(c.source, damageSeed, index))
-			count(what+" to its bytes", string(testkit.ChangedBytes([]byte(c.source), damageSeed, index)))
+			count(what+" to its text", testkit.MutateText(c.source, damageSeed, index))
+			count(what+" to its bytes", string(testkit.MutateBytes([]byte(c.source), damageSeed, index)))
 		}
 	}
 	if read == 0 || refused == 0 {

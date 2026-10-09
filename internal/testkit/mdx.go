@@ -14,11 +14,11 @@ func MDX(chunks ...[]byte) []byte {
 }
 
 func Texture(path string, replaceableID uint32) []byte {
-	return Concat(U32(replaceableID), Fixed(path, 260), U32(0))
+	return Concat(U32(replaceableID), FixedField(path, 260), U32(0))
 }
 
 func node(name string, flags uint32, extra []byte) []byte {
-	return Concat(U32(uint32(96+len(extra))), Fixed(name, 80), U32(0), U32(0xffffffff), U32(flags), extra)
+	return Concat(U32(uint32(96+len(extra))), FixedField(name, 80), U32(0), U32(0xffffffff), U32(flags), extra)
 }
 
 func record(parts ...[]byte) []byte {
@@ -33,7 +33,7 @@ func Emitter(path string, flags uint32) []byte {
 		F32(0),
 		F32(0),
 		F32(0),
-		Fixed(path, 260),
+		FixedField(path, 260),
 		F32(1),
 		F32(1),
 		make([]byte, 12),
@@ -41,7 +41,7 @@ func Emitter(path string, flags uint32) []byte {
 }
 
 func Attachment(path string) []byte {
-	return record(node("Attachment", 0, nil), Fixed(path, 260), U32(0), make([]byte, 6))
+	return record(node("Attachment", 0, nil), FixedField(path, 260), U32(0), make([]byte, 6))
 }
 
 func Popcorn(path string) []byte {
@@ -55,11 +55,11 @@ func Popcorn(path string) []byte {
 		F32(1),
 		F32(1),
 		U32(0),
-		Fixed(path, 260),
-		Fixed("", 260),
+		FixedField(path, 260),
+		FixedField("", 260),
 	)
 }
 
 func FaceEffect(kind, path string) []byte {
-	return Concat(Fixed(kind, 80), Fixed(path, 260))
+	return Concat(FixedField(kind, 80), FixedField(path, 260))
 }

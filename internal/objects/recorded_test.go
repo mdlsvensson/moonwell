@@ -177,7 +177,7 @@ func (p recordedPlan) lines() string {
 		if change.Remove {
 			what = "removed"
 		}
-		fmt.Fprintf(&out, "%s: %s\n", testkit.Shown(change.Path), what)
+		fmt.Fprintf(&out, "%s: %s\n", testkit.QuoteIfNeeded(change.Path), what)
 	}
 	fmt.Fprintf(&out, "objects:eval prints: %s\n", testkit.Digest(p.eval))
 	out.WriteString("the ids module:\n")
@@ -207,7 +207,7 @@ func recordedPlans(t *testing.T) []byte {
 				if i > 1 && !forTheFiles(in) {
 					continue
 				}
-				fmt.Fprintf(&out, "== %s, %s: %s\n", m.name, source.name, testkit.Shown(in.name))
+				fmt.Fprintf(&out, "== %s, %s: %s\n", m.name, source.name, testkit.QuoteIfNeeded(in.name))
 				out.WriteString(planOf(t, number, dir, in).lines())
 			}
 		}
@@ -229,5 +229,5 @@ func planOf(t *testing.T, metadata int, dir string, in input) recordedPlan {
 }
 
 func TestThePlannedObjectFilesAreAsRecorded(t *testing.T) {
-	testkit.Recorded(t, "plans.txt", recordedPlans(t))
+	testkit.CheckRecorded(t, "plans.txt", recordedPlans(t))
 }

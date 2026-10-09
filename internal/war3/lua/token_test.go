@@ -226,7 +226,7 @@ func TestALongBracketEndsAtItsFirstClosingBracket(t *testing.T) {
 
 func TestASourceThatEndsWhereALongBracketOpensIsScanned(t *testing.T) {
 	for _, source := range []string{"a = [", "a = [=", "a = [==", "a = [=[", "--[", "--[=", "--[==[", "["} {
-		if value := testkit.Panic(func() { scan(source) }); value != nil {
+		if value := testkit.PanicValue(func() { scan(source) }); value != nil {
 			t.Errorf("a scanner panics on %q: %v", source, value)
 		}
 	}

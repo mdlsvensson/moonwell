@@ -205,14 +205,14 @@ func tokenLines(tokens []Token) string {
 func shownEach(values []string) string {
 	var shown []string
 	for _, value := range values {
-		shown = append(shown, testkit.Shown(value))
+		shown = append(shown, testkit.QuoteIfNeeded(value))
 	}
 	return strings.Join(shown, " ")
 }
 
 func (s scanned) text(name, source string) string {
 	var out strings.Builder
-	fmt.Fprintf(&out, "== %s\n", testkit.Shown(name))
+	fmt.Fprintf(&out, "== %s\n", testkit.QuoteIfNeeded(name))
 	if len(source) > longest {
 		fmt.Fprintf(&out, "source: %s\n", testkit.Digest([]byte(source)))
 	} else {
@@ -227,7 +227,7 @@ func (s scanned) text(name, source string) string {
 		fmt.Fprintf(&out, "the tokens as a literal: %s\n", whole)
 	}
 	if s.Fault != nil {
-		fmt.Fprintf(&out, "fault: %s at %d\n", testkit.Shown(s.Fault.Msg), s.Fault.Offset)
+		fmt.Fprintf(&out, "fault: %s at %d\n", testkit.QuoteIfNeeded(s.Fault.Msg), s.Fault.Offset)
 	}
 	for _, require := range s.Requires {
 		fmt.Fprintf(&out, "require: line %d, %q, literal %v\n", require.Line, require.Name, require.Literal)
@@ -236,17 +236,17 @@ func (s scanned) text(name, source string) string {
 		fmt.Fprintf(&out, "top-level globals: %s\n", shownEach(s.Globals))
 	}
 	for _, global := range s.Map.Globals {
-		fmt.Fprintf(&out, "map global: %s %s\n", testkit.Shown(global.Name), testkit.Shown(global.Type))
+		fmt.Fprintf(&out, "map global: %s %s\n", testkit.QuoteIfNeeded(global.Name), testkit.QuoteIfNeeded(global.Type))
 	}
 	if len(s.Map.Functions) > 0 {
 		fmt.Fprintf(&out, "map functions: %s\n", shownEach(s.Map.Functions))
 	}
 	argument := 0
 	for _, function := range s.Functions {
-		fmt.Fprintf(&out, "function %s: %d-%d, its end at %d\n", testkit.Shown(function.Name), function.Start,
+		fmt.Fprintf(&out, "function %s: %d-%d, its end at %d\n", testkit.QuoteIfNeeded(function.Name), function.Start,
 			function.End, function.EndStart)
 		for _, call := range function.Calls {
-			fmt.Fprintf(&out, "  call %s: %d-%d, %d arguments\n", testkit.Shown(call.Name), call.Start, call.End,
+			fmt.Fprintf(&out, "  call %s: %d-%d, %d arguments\n", testkit.QuoteIfNeeded(call.Name), call.Start, call.End,
 				len(call.Args))
 			for i, tokens := range call.Args {
 				text := rawsOf(tokens)
@@ -264,7 +264,7 @@ func (s scanned) text(name, source string) string {
 	}
 	if s.Refusal.Message != "" {
 		fmt.Fprintf(&out, "functions refused at %d:%d: %s\n", s.Refusal.Line, s.Refusal.Column,
-			testkit.Shown(s.Refusal.Message))
+			testkit.QuoteIfNeeded(s.Refusal.Message))
 	}
 	return out.String() + "\n"
 }
@@ -278,5 +278,5 @@ func scans(sources []namedSource) []byte {
 }
 
 func TestTheScannersAreAsRecorded(t *testing.T) {
-	testkit.Recorded(t, "corners.txt", scans(cornerSources))
+	testkit.CheckRecorded(t, "corners.txt", scans(cornerSources))
 }

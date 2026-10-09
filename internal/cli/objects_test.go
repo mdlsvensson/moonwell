@@ -305,7 +305,7 @@ func TestPklCheckRefusesMissingStaleBeforeCompile(t *testing.T) {
 	contains(t, diag.Format(err), "objects/bad.pkl")
 }
 
-func devIn(t *testing.T, e *env.Env, log *testkit.Recorder) (until func(what string, done func() bool)) {
+func devIn(t *testing.T, e *env.Env, log *testkit.LogRecorder) (until func(what string, done func() bool)) {
 	t.Helper()
 	ctx, stop := context.WithCancel(background)
 	ended := make(chan error, 1)

@@ -29,7 +29,7 @@ func TestTheBuildsOfTheSeedsAreAsRecorded(t *testing.T) {
 			for _, command := range recordedCommands {
 				root := p.fresh(t, seed.name)
 				made[command.name] = ranIn(t, root, command.run).recording(t, root, command.texts)
-				testkit.Recorded(t, seed.name+"/"+command.name+".txt", made[command.name])
+				testkit.CheckRecorded(t, seed.name+"/"+command.name+".txt", made[command.name])
 			}
 			if slices.Contains(builtOverLeftovers, seed.name) {
 				p.overLeftovers(t, seed.name, made["build"])
@@ -50,7 +50,7 @@ func TestTheBuildsThatAreRefusedAreAsRecorded(t *testing.T) {
 		}
 		all = append(all, titled(fault.name, made.recording(t, root, false))...)
 	}
-	testkit.Recorded(t, "refused.txt", all)
+	testkit.CheckRecorded(t, "refused.txt", all)
 }
 
 func titled(name string, recording []byte) []byte {
@@ -68,7 +68,7 @@ func (p *recordedProjects) overLeftovers(t *testing.T, seed string, fresh []byte
 	put(t, root, seedStage+"/stale.txt", "a file of an earlier stage")
 	built := ranIn(t, root, building(Options{}))
 	if over := built.recording(t, root, true); !bytes.Equal(over, fresh) {
-		line, _ := testkit.PartingLine(fresh, func(upTo []byte) bool { return bytes.HasPrefix(over, upTo) })
+		line, _ := testkit.FirstDifferingLine(fresh, func(upTo []byte) bool { return bytes.HasPrefix(over, upTo) })
 		t.Errorf("%s: the build over the leftovers leaves another project than the build of a fresh copy: "+
 			"what the two make parts at line %d of %s/build.txt", seed, line, seed)
 	}
@@ -176,7 +176,7 @@ const internalError = "(an internal error)"
 
 func ranIn(t *testing.T, root string, run func(world *env.Env) error) outcome {
 	t.Helper()
-	log := testkit.NewRecorder()
+	log := testkit.NewLogRecorder()
 	world := env.New(root, log.Logger)
 	world.Spawn = func(program string, args []string) error {
 		t.Errorf("a recorded run starts no program: %s %q", program, args)
@@ -201,14 +201,14 @@ func (o outcome) recording(t *testing.T, root string, texts bool) []byte {
 	if o.refused {
 		return o.refusal(root, len(staged), archive != nil)
 	}
-	shown := testkit.ByDigest
+	shown := testkit.DigestLine
 	if texts {
 		shown = testkit.WholeIfShort
 	}
 	var out strings.Builder
 	out.WriteString("logged:\n")
 	for _, line := range o.lines {
-		out.WriteString("  " + testkit.Shown(line) + "\n")
+		out.WriteString("  " + testkit.QuoteIfNeeded(line) + "\n")
 	}
 	out.WriteString("staged in " + seedStage + ":\n" + fileLines(staged, shown))
 	if archive == nil {
@@ -216,14 +216,14 @@ func (o outcome) recording(t *testing.T, root string, texts bool) []byte {
 	} else {
 		inside := unpacked(t, seedArchive, archive)
 		out.WriteString("packed in " + seedArchive + ", behind " + headerOrNone(inside.before) + ":\n")
-		out.WriteString(fileLines(inside.files, testkit.ByDigest))
+		out.WriteString(fileLines(inside.files, testkit.DigestLine))
 	}
 	out.WriteString("generated:\n" + o.generatedLines(shown))
-	return testkit.Placed([]byte(out.String()), root)
+	return testkit.WithPlaceholders([]byte(out.String()), root)
 }
 
 func (o outcome) refusal(root string, staged int, packed bool) []byte {
-	at := string(testkit.Placed([]byte(o.refusedAt), root))
+	at := string(testkit.WithPlaceholders([]byte(o.refusedAt), root))
 	if strings.HasPrefix(at, "<root>") {
 		at = filepath.ToSlash(at)
 	}
@@ -236,7 +236,7 @@ func (o outcome) refusal(root string, staged int, packed bool) []byte {
 	} else {
 		left += ", no archive"
 	}
-	return []byte("refused: " + testkit.Shown(at) + "\nleft: " + left + "\n")
+	return []byte("refused: " + testkit.QuoteIfNeeded(at) + "\nleft: " + left + "\n")
 }
 
 func headerOrNone(before []byte) string {
@@ -265,9 +265,9 @@ func (o outcome) generatedLines(shown func(data []byte) string) string {
 		switch {
 		case !ofABuild || data == nil:
 		case o.bySystem(name):
-			out.WriteString("  " + testkit.Shown(name) + ": present\n")
+			out.WriteString("  " + testkit.QuoteIfNeeded(name) + ": present\n")
 		default:
-			out.WriteString("  " + testkit.Shown(name) + ":" + shown(data))
+			out.WriteString("  " + testkit.QuoteIfNeeded(name) + ":" + shown(data))
 		}
 	}
 	return out.String()
@@ -295,7 +295,7 @@ func fileLines(files map[string][]byte, shown func(data []byte) string) string {
 	}
 	var out strings.Builder
 	for _, name := range slices.Sorted(maps.Keys(files)) {
-		out.WriteString("  " + testkit.Shown(name) + ":" + shown(files[name]))
+		out.WriteString("  " + testkit.QuoteIfNeeded(name) + ":" + shown(files[name]))
 	}
 	return out.String()
 }

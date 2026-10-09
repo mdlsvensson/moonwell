@@ -21,7 +21,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, displayPat
 	t.Helper()
 	var read *picture.Picture
 	var err error
-	if value := testkit.Panic(func() { read, err = picture.Read(data, displayPath) }); value != nil {
+	if value := testkit.PanicValue(func() { read, err = picture.Read(data, displayPath) }); value != nil {
 		t.Fatalf("%s: Read panics: %v", what, value)
 	}
 	var failure *diag.Error
@@ -68,9 +68,9 @@ func TestADamagedPictureIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		start, rest := whole.data[:startOfAPicture], whole.data[startOfAPicture:]
 		for index := range uint64(150) {
 			what := fmt.Sprintf("%s, change %d of seed %d", whole.name, index, damageSeed)
-			anywhere := testkit.ChangedBytes(whole.data, damageSeed, index)
+			anywhere := testkit.MutateBytes(whole.data, damageSeed, index)
 			damaged.readOrRefused(t, what+" to the whole file", anywhere, whole.displayPath)
-			inStart := slices.Concat(testkit.ChangedBytes(start, damageSeed, index), rest)
+			inStart := slices.Concat(testkit.MutateBytes(start, damageSeed, index), rest)
 			damaged.readOrRefused(t, what+" to its first 2048 bytes", inStart, whole.displayPath)
 		}
 	}

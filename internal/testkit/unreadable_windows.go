@@ -58,15 +58,15 @@ func MakeUnwritable(t testing.TB, path string) {
 
 func lockWholeFile(t testing.TB, handle syscall.Handle) {
 	t.Helper()
-	const everyByte = 0xFFFFFFFF
-	var fromTheStart syscall.Overlapped
-	locked, _, err := lockFileEx.Call(uintptr(handle), lockExclusive|lockFailImmediately, 0, everyByte, everyByte,
-		uintptr(unsafe.Pointer(&fromTheStart)))
+	const wholeFile = 0xFFFFFFFF
+	var overlapped syscall.Overlapped
+	locked, _, err := lockFileEx.Call(uintptr(handle), lockExclusive|lockFailImmediately, 0, wholeFile, wholeFile,
+		uintptr(unsafe.Pointer(&overlapped)))
 	if locked == 0 {
 		t.Fatalf("locking the file: %v", err)
 	}
 	t.Cleanup(func() {
-		var fromTheStart syscall.Overlapped
-		unlockFileEx.Call(uintptr(handle), 0, everyByte, everyByte, uintptr(unsafe.Pointer(&fromTheStart)))
+		var overlapped syscall.Overlapped
+		unlockFileEx.Call(uintptr(handle), 0, wholeFile, wholeFile, uintptr(unsafe.Pointer(&overlapped)))
 	})
 }

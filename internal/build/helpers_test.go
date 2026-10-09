@@ -87,7 +87,7 @@ type standIn struct {
 	checkout string
 	root     string
 	env      *env.Env
-	log      *testkit.Recorder
+	log      *testkit.LogRecorder
 	project  *manifest.Project
 	compiler string
 	defaults []string

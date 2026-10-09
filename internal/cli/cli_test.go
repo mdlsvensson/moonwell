@@ -206,7 +206,7 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 		if c.stopped {
 			stop()
 		}
-		log := testkit.NewRecorder()
+		log := testkit.NewLogRecorder()
 		code := exitCode(ctx, log.Logger, command{name: c.command}, c.err)
 		stop()
 		if output := strings.Join(log.Lines(), "\n"); code != c.code || output != c.output || len(log.Lines()) > 1 {
@@ -269,7 +269,7 @@ func TestAFileNameThatIsNotUTF8IsPrintedAsItIs(t *testing.T) {
 	if got := diag.Format(refusal); got != want {
 		t.Errorf("diag.Format = %q, want %q", got, want)
 	}
-	log := testkit.NewRecorder()
+	log := testkit.NewLogRecorder()
 	code := exitCode(background, log.Logger, command{name: "check"}, refusal)
 	if printed := log.Lines(); code != 1 || len(printed) != 1 || printed[0] != want {
 		t.Errorf("a command that ends with the failure prints %q and exits with %d, want %q and 1", printed, code, want)

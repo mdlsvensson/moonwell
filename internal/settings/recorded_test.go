@@ -322,5 +322,5 @@ func planFor(t testing.TB, source sourceMap, dir, root, document string) recorde
 }
 
 func TestTheSettingsOfEveryDocumentAreAsRecorded(t *testing.T) {
-	testkit.Recorded(t, "settings.txt", recordedSettings(t))
+	testkit.CheckRecorded(t, "settings.txt", recordedSettings(t))
 }

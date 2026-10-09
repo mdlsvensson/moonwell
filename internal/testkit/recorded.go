@@ -21,16 +21,16 @@ const (
 	reasonPlaceholder = "<reason>"
 )
 
-var packageFolder, _ = os.Getwd()
+var packageDir, _ = os.Getwd()
 
-func Recorded(t testing.TB, name string, got []byte) {
+func CheckRecorded(t testing.TB, name string, got []byte) {
 	t.Helper()
-	recordedIn(t, filepath.Join(packageFolder, "testdata", "recorded"), name, got)
+	checkRecordedIn(t, filepath.Join(packageDir, "testdata", "recorded"), name, got)
 }
 
-func recordedIn(t testing.TB, folder, name string, got []byte) {
+func checkRecordedIn(t testing.TB, dir, name string, got []byte) {
 	t.Helper()
-	path := filepath.Join(folder, filepath.FromSlash(name))
+	path := filepath.Join(dir, filepath.FromSlash(name))
 	if os.Getenv(recordVariable) == "1" {
 		writeRecording(t, path, got)
 		return
@@ -43,7 +43,7 @@ func recordedIn(t testing.TB, folder, name string, got []byte) {
 	if bytes.Equal(want, got) {
 		return
 	}
-	offset, line := parting(want, got)
+	offset, line := firstDifference(want, got)
 	t.Errorf("%s: what the test made differs from the recording at offset %d, line %d:\n"+
 		"recorded: %q\nmade:     %q\n%d bytes are recorded and %d were made. %s=1 records what is made.",
 		path, offset, line, lineOf(want, line), lineOf(got, line), len(want), len(got), recordVariable)
@@ -62,14 +62,14 @@ func writeRecording(t testing.TB, path string, got []byte) {
 	t.Errorf("recorded %s, %d bytes. Run the test again without %s.", path, len(got), recordVariable)
 }
 
-func parting(want, got []byte) (offset, line int) {
+func firstDifference(want, got []byte) (offset, line int) {
 	for offset < len(want) && offset < len(got) && want[offset] == got[offset] {
 		offset++
 	}
 	if offset == len(want) {
 		return offset, bytes.Count(want, []byte("\n")) + 1
 	}
-	line, _ = PartingLine(want, func(upTo []byte) bool { return bytes.HasPrefix(got, upTo) })
+	line, _ = FirstDifferingLine(want, func(upTo []byte) bool { return bytes.HasPrefix(got, upTo) })
 	return offset, line
 }
 
@@ -81,12 +81,12 @@ func lineOf(text []byte, number int) []byte {
 	return lines[number-1]
 }
 
-func PartingLine(data []byte, alike func(upTo []byte) bool) (int, []byte) {
+func FirstDifferingLine(data []byte, matches func(upTo []byte) bool) (int, []byte) {
 	lines := bytes.SplitAfter(data, []byte("\n"))
 	upTo := func(count int) []byte { return bytes.Join(lines[:count], nil) }
 	low, high := 0, len(lines)
 	for high-low > 1 {
-		if middle := (low + high) / 2; alike(upTo(middle)) {
+		if middle := (low + high) / 2; matches(upTo(middle)) {
 			low = middle
 		} else {
 			high = middle
@@ -99,16 +99,16 @@ func Digest(data []byte) string {
 	return fmt.Sprintf("sha256 %x, %d bytes", sha256.Sum256(data), len(data))
 }
 
-func ByDigest(data []byte) string { return " " + Digest(data) + "\n" }
+func DigestLine(data []byte) string { return " " + Digest(data) + "\n" }
 
-const longestWhole = 2048
+const maxWholeLength = 2048
 
 func WholeIfShort(data []byte) string {
 	isText := utf8.Valid(data) && !bytes.ContainsFunc(data, func(r rune) bool {
 		return r < ' ' && r != '\t' && r != '\n' && r != '\r'
 	})
-	if len(data) > longestWhole || !isText {
-		return ByDigest(data)
+	if len(data) > maxWholeLength || !isText {
+		return DigestLine(data)
 	}
 	lines := strings.SplitAfter(string(data), "\n")
 	if last := len(lines) - 1; last > 0 && lines[last] == "" {
@@ -125,7 +125,7 @@ func WholeIfShort(data []byte) string {
 	return out.String()
 }
 
-func Shown(value string) string {
+func QuoteIfNeeded(value string) string {
 	bare := value != "" && utf8.ValidString(value) && !strings.HasPrefix(value, `"`) &&
 		!strings.ContainsFunc(value, func(r rune) bool { return !strconv.IsPrint(r) || r == utf8.RuneError })
 	if bare {
@@ -139,7 +139,7 @@ func Shown(value string) string {
 	return strconv.Quote(value)
 }
 
-func Placed(text []byte, root string, reasons ...string) []byte {
+func WithPlaceholders(text []byte, root string, reasons ...string) []byte {
 	for _, reason := range reasons {
 		if reason != "" {
 			text = bytes.ReplaceAll(text, []byte(reason), []byte(reasonPlaceholder))
@@ -148,21 +148,21 @@ func Placed(text []byte, root string, reasons ...string) []byte {
 	if root == "" {
 		return text
 	}
-	spellings := spellingsOf(root)
+	spellings := pathSpellings(root)
 	slices.SortFunc(spellings, func(a, b string) int { return len(b) - len(a) })
 	for _, spelling := range spellings {
-		text = replacedAsAPath(text, spelling)
+		text = replacePath(text, spelling)
 	}
 	return text
 }
 
-func spellingsOf(root string) []string {
-	folders := []string{filepath.Clean(root)}
+func pathSpellings(root string) []string {
+	dirs := []string{filepath.Clean(root)}
 	if resolved, err := filepath.EvalSymlinks(root); err == nil {
-		folders = append(folders, resolved)
+		dirs = append(dirs, resolved)
 	}
-	if short := shortSpelling(root); short != "" {
-		folders = append(folders, short)
+	if short := shortPathName(root); short != "" {
+		dirs = append(dirs, short)
 	}
 	var spellings []string
 	add := func(spelling string) {
@@ -170,40 +170,40 @@ func spellingsOf(root string) []string {
 			spellings = append(spellings, spelling)
 		}
 	}
-	for _, folder := range folders {
-		for _, lettered := range withEitherDriveLetter(folder) {
-			add(lettered)
-			add(filepath.ToSlash(lettered))
-			add(strings.ReplaceAll(lettered, `\`, `\\`))
+	for _, dir := range dirs {
+		for _, variant := range driveLetterVariants(dir) {
+			add(variant)
+			add(filepath.ToSlash(variant))
+			add(strings.ReplaceAll(variant, `\`, `\\`))
 		}
 	}
 	return spellings
 }
 
-func withEitherDriveLetter(path string) []string {
+func driveLetterVariants(path string) []string {
 	if len(path) < 2 || path[1] != ':' || !unicode.IsLetter(rune(path[0])) {
 		return []string{path}
 	}
 	return []string{path, strings.ToLower(path[:1]) + path[1:], strings.ToUpper(path[:1]) + path[1:]}
 }
 
-func replacedAsAPath(text []byte, spelling string) []byte {
+func replacePath(text []byte, spelling string) []byte {
 	var out []byte
 	for {
-		at := bytes.Index(text, []byte(spelling))
-		if at < 0 {
+		index := bytes.Index(text, []byte(spelling))
+		if index < 0 {
 			return append(out, text...)
 		}
-		end := at + len(spelling)
-		if end < len(text) && continuesAName(text[end]) {
+		end := index + len(spelling)
+		if end < len(text) && isNameByte(text[end]) {
 			out = append(out, text[:end]...)
 		} else {
-			out = append(append(out, text[:at]...), rootPlaceholder...)
+			out = append(append(out, text[:index]...), rootPlaceholder...)
 		}
 		text = text[end:]
 	}
 }
 
-func continuesAName(next byte) bool {
+func isNameByte(next byte) bool {
 	return next == '-' || next == '_' || next >= 0x80 || unicode.IsLetter(rune(next)) || unicode.IsDigit(rune(next))
 }

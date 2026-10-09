@@ -10,14 +10,14 @@ import (
 )
 
 func TestPanicIsWhatACallPanicsWithAndNilForACallThatReturns(t *testing.T) {
-	if value := Panic(func() {}); value != nil {
+	if value := PanicValue(func() {}); value != nil {
 		t.Errorf("a call that returns: %v", value)
 	}
-	if value := Panic(func() { panic("the words") }); value != "the words" {
+	if value := PanicValue(func() { panic("the words") }); value != "the words" {
 		t.Errorf("a call that panics with words: %v", value)
 	}
 	var none []byte
-	if value := Panic(func() { _ = none[3] }); value == nil {
+	if value := PanicValue(func() { _ = none[3] }); value == nil {
 		t.Error("an index past the end of a slice is no panic")
 	}
 }
@@ -34,7 +34,7 @@ func TestSweptPutsEachKindOfWhiteSpaceAtEachPlaceOfEachLine(t *testing.T) {
 		{"a\r\nb", 33, []string{"a\t\nb", "a\t\r\nb", "a\r\t\nb", "a\n\nb", "a\r\n\rb"}},
 		{"", 6, []string{" ", "\r"}},
 	} {
-		swept := Swept(c.text)
+		swept := SpaceVariants(c.text)
 		if len(swept) != c.count {
 			t.Errorf("%q: %d texts, want %d: %q", c.text, len(swept), c.count, swept)
 		}
@@ -49,7 +49,7 @@ func TestSweptPutsEachKindOfWhiteSpaceAtEachPlaceOfEachLine(t *testing.T) {
 			}
 		}
 	}
-	if swept := Swept("ab"); !slices.Equal(swept[:7], []string{" ab", "\tab", "\nab", "\vab", "\fab", "\rab", "ab "}) {
+	if swept := SpaceVariants("ab"); !slices.Equal(swept[:7], []string{" ab", "\tab", "\nab", "\vab", "\fab", "\rab", "ab "}) {
 		t.Errorf("the first texts of ab are %q", swept[:7])
 	}
 }
@@ -91,7 +91,7 @@ func TestOneChangeIsALineCutOrDoubledAQuoteDroppedOrWhiteSpacePutIn(t *testing.T
 		seen := map[string]int{}
 		random := rand.New(rand.NewPCG(1, 2))
 		for range 400 {
-			changed := change(random, c.text)
+			changed := mutateText(random, c.text)
 			kind := kindOfChange(c.text, changed)
 			if kind == "" {
 				t.Fatalf("%q became %q, which no one change makes", c.text, changed)
@@ -114,11 +114,11 @@ func TestChangedMakesTheSameTextOfASeedAndAnIndexOnEveryCall(t *testing.T) {
 	made := map[string]bool{}
 	otherSeed := 0
 	for index := range uint64(200) {
-		changed := Changed(text, 9, index)
-		if again := Changed(text, 9, index); again != changed {
+		changed := MutateText(text, 9, index)
+		if again := MutateText(text, 9, index); again != changed {
 			t.Fatalf("index %d: %q, and then %q", index, changed, again)
 		}
-		if Changed(text, 10, index) != changed {
+		if MutateText(text, 10, index) != changed {
 			otherSeed++
 		}
 		made[changed] = true
@@ -142,7 +142,7 @@ func kindOfByteChange(data, changed []byte) string {
 	grown := len(changed) - len(data)
 	for at := range data {
 		rest := data[at:]
-		run := min(max(grown, -grown), longestRun, len(rest))
+		run := min(max(grown, -grown), maxRunLength, len(rest))
 		switch {
 		case grown == 0 && changed[at] != data[at] && bytes.Equal(changed[:at], data[:at]) &&
 			bytes.Equal(changed[at+1:], rest[1:]):
@@ -166,7 +166,7 @@ func TestOneChangeOfBytesIsAByteSetARunDroppedARunDoubledOrANumberSet(t *testing
 	numbers := map[uint32]bool{}
 	random := rand.New(rand.NewPCG(1, 2))
 	for range 800 {
-		changed := changeBytes(random, slices.Clone(data))
+		changed := mutateBytes(random, slices.Clone(data))
 		kind := kindOfByteChange(data, changed)
 		if kind == "" {
 			t.Fatalf("%q became %q, which no one change makes", data, changed)
@@ -191,17 +191,17 @@ func TestOneChangeOfBytesIsAByteSetARunDroppedARunDoubledOrANumberSet(t *testing
 	}
 	for range 200 {
 		short := []byte("xyz")
-		if changed := changeBytes(random, slices.Clone(short)); kindOfByteChange(short, changed) == "" {
+		if changed := mutateBytes(random, slices.Clone(short)); kindOfByteChange(short, changed) == "" {
 			t.Fatalf("%q became %q, which no one change makes", short, changed)
 		}
 	}
-	for grown := -longestRun; grown <= longestRun; grown++ {
+	for grown := -maxRunLength; grown <= maxRunLength; grown++ {
 		if !lengths[grown] {
 			t.Errorf("no change made the bytes %d longer", grown)
 		}
 	}
-	if len(lengths) != 2*longestRun+1 {
-		t.Errorf("the changes made %d lengths, want %d", len(lengths), 2*longestRun+1)
+	if len(lengths) != 2*maxRunLength+1 {
+		t.Errorf("the changes made %d lengths, want %d", len(lengths), 2*maxRunLength+1)
 	}
 }
 
@@ -211,11 +211,11 @@ func TestChangedBytesMakesTheSameBytesOfASeedAndAnIndexAndLeavesItsInputAlone(t 
 	made := map[string]bool{}
 	otherSeed, one := 0, 0
 	for index := range uint64(200) {
-		changed := ChangedBytes(data, 9, index)
-		if again := ChangedBytes(data, 9, index); !bytes.Equal(again, changed) {
+		changed := MutateBytes(data, 9, index)
+		if again := MutateBytes(data, 9, index); !bytes.Equal(again, changed) {
 			t.Fatalf("index %d: %q, and then %q", index, changed, again)
 		}
-		if !bytes.Equal(ChangedBytes(data, 10, index), changed) {
+		if !bytes.Equal(MutateBytes(data, 10, index), changed) {
 			otherSeed++
 		}
 		if kindOfByteChange(data, changed) != "" {
@@ -234,10 +234,10 @@ func TestChangedBytesMakesTheSameBytesOfASeedAndAnIndexAndLeavesItsInputAlone(t 
 		t.Errorf("%d of 200 results are one change away", one)
 	}
 	for index := range uint64(50) {
-		if changed := ChangedBytes(nil, 9, index); len(changed) != 0 {
+		if changed := MutateBytes(nil, 9, index); len(changed) != 0 {
 			t.Errorf("no bytes became %q", changed)
 		}
-		if changed := ChangedBytes([]byte{7}, 9, index); len(changed) > 8 {
+		if changed := MutateBytes([]byte{7}, 9, index); len(changed) > 8 {
 			t.Errorf("one byte became %q", changed)
 		}
 	}

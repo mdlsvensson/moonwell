@@ -18,7 +18,7 @@ func SetU32(data []byte, offset int, value uint32) []byte {
 	return copied
 }
 
-func Fixed(value string, size int) []byte {
+func FixedField(value string, size int) []byte {
 	out := make([]byte, size)
 	copy(out[:size-1], value)
 	return out

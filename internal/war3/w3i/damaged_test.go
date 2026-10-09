@@ -150,7 +150,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	for _, depth := range []w3i.Depth{w3i.Basic, w3i.Extended} {
 		var info *w3i.Info
 		var err error
-		if value := testkit.Panic(func() { info, err = w3i.Read(data, mapInfoFile, depth) }); value != nil {
+		if value := testkit.PanicValue(func() { info, err = w3i.Read(data, mapInfoFile, depth) }); value != nil {
 			t.Fatalf("%s, depth %d: Read panics: %v", what, depth, value)
 		}
 		var failure *diag.Error
@@ -164,7 +164,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 		}
 	}
 	var err error
-	if value := testkit.Panic(func() { _, err = w3i.ReadHeader(data, mapInfoFile) }); value != nil {
+	if value := testkit.PanicValue(func() { _, err = w3i.ReadHeader(data, mapInfoFile) }); value != nil {
 		t.Fatalf("%s: ReadHeader panics: %v", what, value)
 	}
 	var failure *diag.Error
@@ -181,7 +181,7 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		}
 		for index := range uint64(1500) {
 			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.ChangedBytes(displayPath.data, damageSeed, index))
+			damaged.readOrRefused(t, what, testkit.MutateBytes(displayPath.data, damageSeed, index))
 		}
 	}
 	for _, displayPath := range alteredFiles(t) {

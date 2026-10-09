@@ -136,8 +136,8 @@ func (w seededWorld) fails(t *testing.T, root string, wanted []string, args ...s
 	return result
 }
 
-func (w seededWorld) at(root string) (*env.Env, *testkit.Recorder) {
-	log := testkit.NewRecorder()
+func (w seededWorld) at(root string) (*env.Env, *testkit.LogRecorder) {
+	log := testkit.NewLogRecorder()
 	return w.outside(root, log.Logger), log
 }
 
@@ -222,8 +222,8 @@ func asError(t *testing.T, err error, what string) *diag.Error {
 	return failure
 }
 
-func realWorld(root string) (*env.Env, *testkit.Recorder) {
-	log := testkit.NewRecorder()
+func realWorld(root string) (*env.Env, *testkit.LogRecorder) {
+	log := testkit.NewLogRecorder()
 	return env.New(root, log.Logger), log
 }
 
@@ -297,7 +297,7 @@ func failsWithPklAlone(t *testing.T, root string, wanted []string, args ...strin
 	return result
 }
 
-func pklOnly(t *testing.T, root string) (e *env.Env, log *testkit.Recorder, ran func() []string) {
+func pklOnly(t *testing.T, root string) (e *env.Env, log *testkit.LogRecorder, ran func() []string) {
 	t.Helper()
 	e, log = testkit.Env(t, root)
 	var guard sync.Mutex
@@ -332,7 +332,7 @@ func commandIn(t *testing.T, ctx context.Context, e *env.Env, name string, argum
 	return printed, err
 }
 
-func logged(t *testing.T, e *env.Env, log *testkit.Recorder, name string, arguments ...string) []string {
+func logged(t *testing.T, e *env.Env, log *testkit.LogRecorder, name string, arguments ...string) []string {
 	t.Helper()
 	if _, err := commandIn(t, background, e, name, arguments...); err != nil {
 		t.Fatalf("moonwell %s failed:\n%s\nafter it logged %q", name, diag.Format(err), log.Lines())

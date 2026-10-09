@@ -30,25 +30,25 @@ func NeedExport(t testing.TB, variable string) Export {
 	return Export{t, root}
 }
 
-func (e Export) Path(below ...string) string {
+func (e Export) Path(segments ...string) string {
 	e.t.Helper()
 	path := e.root
-	for _, name := range below {
+	for _, name := range segments {
 		if path == "" {
 			break
 		}
-		path = e.entry(path, name)
+		path = e.findEntry(path, name)
 	}
 	return path
 }
 
-func (e Export) Entries(below ...string) []string {
+func (e Export) Entries(segments ...string) []string {
 	e.t.Helper()
-	folder := e.Path(below...)
-	if folder == "" {
+	dir := e.Path(segments...)
+	if dir == "" {
 		return nil
 	}
-	entries, err := os.ReadDir(folder)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		e.t.Fatalf("the game's files: %v", err)
 		return nil
@@ -60,22 +60,22 @@ func (e Export) Entries(below ...string) []string {
 	return names
 }
 
-func (e Export) entry(folder, name string) string {
+func (e Export) findEntry(dir, name string) string {
 	e.t.Helper()
-	entries, err := os.ReadDir(folder)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		e.t.Fatalf("the game's files: %v", err)
 		return ""
 	}
-	var named []string
+	var matches []string
 	for _, entry := range entries {
 		if strings.ToLower(entry.Name()) == strings.ToLower(name) {
-			named = append(named, entry.Name())
+			matches = append(matches, entry.Name())
 		}
 	}
-	if len(named) != 1 {
-		e.t.Fatalf("%s has %d entries named %s, whatever their letter case; want 1", folder, len(named), name)
+	if len(matches) != 1 {
+		e.t.Fatalf("%s has %d entries named %s, whatever their letter case; want 1", dir, len(matches), name)
 		return ""
 	}
-	return filepath.Join(folder, named[0])
+	return filepath.Join(dir, matches[0])
 }

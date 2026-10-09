@@ -53,7 +53,7 @@ func nothingRuns(t *testing.T) envFactory {
 }
 
 func created(outside envFactory, root, dir, schema string) ([]string, error) {
-	log := testkit.NewRecorder()
+	log := testkit.NewLogRecorder()
 	err := createProject(background, outside(root, log.Logger), dir, schema)
 	return log.Lines(), err
 }

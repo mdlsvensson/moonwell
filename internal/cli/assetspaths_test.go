@@ -12,7 +12,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func paths(e *env.Env, log *testkit.Recorder, file, gameList string) ([]string, error) {
+func paths(e *env.Env, log *testkit.LogRecorder, file, gameList string) ([]string, error) {
 	err := reportAssetPaths(background, e, file, assets.ParseGamePaths(gameList))
 	return log.Lines(), err
 }

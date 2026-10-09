@@ -25,7 +25,7 @@ type programBench struct {
 	t     *testing.T
 	root  string
 	world *env.Env
-	log   *testkit.Recorder
+	log   *testkit.LogRecorder
 	in    Input
 
 	guard sync.Mutex

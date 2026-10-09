@@ -433,7 +433,7 @@ The kinds of test:
 - **Tests on damaged input.** Each reader of a format (`internal/war3/…`, and the generator's parsers) is given
   valid input with seeded changes: bytes swapped, text cut. It must return a value or an expected failure, and
   never panic. `internal/war3/w3i/damaged_test.go` is one; each reader that can refuse its input has such a file.
-  `testkit.Changed`, `testkit.Swept` and `testkit.Panic` make the input and catch the panic.
+  `testkit.MutateText`, `testkit.SpaceVariants` and `testkit.PanicValue` make the input and catch the panic.
 - **Whole command lines.** `internal/cli/e2e_test.go` runs command lines in a project that `init` made, with the
   real Pkl and the real compiler. `internal/cli/process_test.go` builds the program and runs it as a process, for
   what only a process shows: the two streams, the exit code, Ctrl+C.

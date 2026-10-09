@@ -200,7 +200,7 @@ func TestTheHintNamesAtMostThreeCloseNamesNearestFirstAndEachOnce(t *testing.T) 
 type checkBench struct {
 	t       *testing.T
 	world   *env.Env
-	log     *testkit.Recorder
+	log     *testkit.LogRecorder
 	yue     *listing
 	in      Input
 	search  macroFile

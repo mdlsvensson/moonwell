@@ -68,39 +68,39 @@ func Snapshot(t testing.TB, dir string) map[string][]byte {
 	return result
 }
 
-func LinkDir(t testing.TB, target, link string) {
+func LinkDir(t testing.TB, target, symlink string) {
 	t.Helper()
 	if runtime.GOOS == "windows" {
-		if out, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput(); err != nil {
-			t.Fatalf("no junction was made at %s to %s: %v: %s", link, target, err, out)
+		if out, err := exec.Command("cmd", "/c", "mklink", "/J", symlink, target).CombinedOutput(); err != nil {
+			t.Fatalf("no junction was made at %s to %s: %v: %s", symlink, target, err, out)
 		}
 		return
 	}
-	if err := os.Symlink(target, link); err != nil {
-		t.Fatalf("no symlink was made at %s to %s: %v", link, target, err)
+	if err := os.Symlink(target, symlink); err != nil {
+		t.Fatalf("no symlink was made at %s to %s: %v", symlink, target, err)
 	}
 }
 
 const privilegeNotHeld = syscall.Errno(1314)
 
-func LinkFile(t testing.TB, target, link string) {
+func LinkFile(t testing.TB, target, symlink string) {
 	t.Helper()
-	err := os.Symlink(target, link)
+	err := os.Symlink(target, symlink)
 	switch {
 	case err == nil:
-	case lacksTheRightToLink(err):
+	case lacksSymlinkPrivilege(err):
 		t.Skipf("this account has not the right to make a symlink on Windows; the case is covered where it has: %v",
 			err)
 	default:
-		t.Fatalf("no symlink was made at %s to %s: %v", link, target, err)
+		t.Fatalf("no symlink was made at %s to %s: %v", symlink, target, err)
 	}
 }
 
-func lacksTheRightToLink(err error) bool {
+func lacksSymlinkPrivilege(err error) bool {
 	return runtime.GOOS == "windows" && errors.Is(err, privilegeNotHeld)
 }
 
-func CaseSensitive(t testing.TB, dir string) bool {
+func IsCaseSensitive(t testing.TB, dir string) bool {
 	t.Helper()
 	WriteFile(t, dir, "probe", nil)
 	_, err := os.Stat(filepath.Join(dir, "PROBE"))

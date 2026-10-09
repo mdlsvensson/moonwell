@@ -67,7 +67,7 @@ func TestParseNativesReadsEveryMemberOfTheFile(t *testing.T) {
 func TestAFileOfNativesThatDoesNotParseIsAPanic(t *testing.T) {
 	for _, document := range []string{"", "{", `{"types": 7}`, `{"gameVersion": "1.2.3", "functions": [{"name": 1}]}`} {
 		var got *Natives
-		fault := testkit.Panic(func() { got = parseNatives([]byte(document)) })
+		fault := testkit.PanicValue(func() { got = parseNatives([]byte(document)) })
 		if said, _ := fault.(string); got != nil || !strings.Contains(said, "the embedded natives.json does not parse") {
 			t.Errorf("parseNatives(%q) = %+v, panic %v, want a panic that names the embedded natives.json", document, got, fault)
 		}

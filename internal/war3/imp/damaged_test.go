@@ -43,7 +43,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	t.Helper()
 	var entries []imp.Entry
 	var err error
-	if value := testkit.Panic(func() { entries, err = imp.Read(data, indexFile) }); value != nil {
+	if value := testkit.PanicValue(func() { entries, err = imp.Read(data, indexFile) }); value != nil {
 		t.Fatalf("%s: Read panics: %v", what, value)
 	}
 	var failure *diag.Error
@@ -77,7 +77,7 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		}
 		for index := range uint64(1500) {
 			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.ChangedBytes(displayPath.data, damageSeed, index))
+			damaged.readOrRefused(t, what, testkit.MutateBytes(displayPath.data, damageSeed, index))
 		}
 	}
 	three := testkit.Concat(entry(5, "a.blp"), entry(13, `b\c.mdx`), entry(29, "d.tga"))

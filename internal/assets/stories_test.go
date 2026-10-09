@@ -437,7 +437,7 @@ func below(root, file string) string {
 	if rel, err := filepath.Rel(root, file); err == nil && filepath.IsAbs(file) && filepath.IsLocal(rel) {
 		return underRoot + filepath.ToSlash(rel)
 	}
-	return testkit.Shown(file)
+	return testkit.QuoteIfNeeded(file)
 }
 
 const internalError = "(an internal error)"
@@ -469,10 +469,10 @@ func (o outcome) lines() string {
 			if change.Remove {
 				what = "removed"
 			}
-			fmt.Fprintf(&out, "  %s: %s\n", testkit.Shown(change.Name), what)
+			fmt.Fprintf(&out, "  %s: %s\n", testkit.QuoteIfNeeded(change.Name), what)
 		}
 		for _, owned := range o.plan.Owned {
-			fmt.Fprintf(&out, "  owned: %s %s\n", testkit.Shown(owned.Path), owned.Hash)
+			fmt.Fprintf(&out, "  owned: %s %s\n", testkit.QuoteIfNeeded(owned.Path), owned.Hash)
 		}
 	}
 	out.WriteString("left:\n")
@@ -485,13 +485,13 @@ func (o outcome) lines() string {
 	}) {
 		data := o.left[name]
 		if data == nil {
-			fmt.Fprintf(&out, "  %s/\n", testkit.Shown(name))
+			fmt.Fprintf(&out, "  %s/\n", testkit.QuoteIfNeeded(name))
 			continue
 		}
-		fmt.Fprintf(&out, "  %s: %s\n", testkit.Shown(name), held(data))
+		fmt.Fprintf(&out, "  %s: %s\n", testkit.QuoteIfNeeded(name), held(data))
 		if entries, err := imp.Read(data, name); err == nil && mapdir.Key(filepath.Base(name)) == "war3map.imp" {
 			for _, entry := range entries {
-				fmt.Fprintf(&out, "    import %d %s\n", entry.Flag, testkit.Shown(entry.Path))
+				fmt.Fprintf(&out, "    import %d %s\n", entry.Flag, testkit.QuoteIfNeeded(entry.Path))
 			}
 		}
 	}
@@ -526,5 +526,5 @@ func outcomeOf(t testing.TB, r run, root string) outcome {
 }
 
 func TestTheStoriesOfThePlanAndTheSyncAreAsRecorded(t *testing.T) {
-	testkit.Recorded(t, "stories.txt", recordedStories(t))
+	testkit.CheckRecorded(t, "stories.txt", recordedStories(t))
 }

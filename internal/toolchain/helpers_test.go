@@ -56,7 +56,7 @@ func zipOf(t testing.TB, files ...string) []byte {
 	return testkit.Zip(t, "", entries...)
 }
 
-func world(t testing.TB, address string, body []byte) (e *env.Env, log *testkit.Recorder, fetches *int) {
+func world(t testing.TB, address string, body []byte) (e *env.Env, log *testkit.LogRecorder, fetches *int) {
 	t.Helper()
 	e, log = testkit.Env(t, t.TempDir())
 	e.Platform = "linux-x86_64"
@@ -88,7 +88,7 @@ func yueWith(asset Asset) Tool {
 	return tool
 }
 
-func yueInstaller(t testing.TB, sha string) (e *env.Env, log *testkit.Recorder, fetches *int, tool Tool) {
+func yueInstaller(t testing.TB, sha string) (e *env.Env, log *testkit.LogRecorder, fetches *int, tool Tool) {
 	t.Helper()
 	archive := zipOf(t, "yue", "fake-binary")
 	if sha == "" {
@@ -118,7 +118,7 @@ func pathAndPinned(onPath, downloaded string) env.RunFunc {
 	}
 }
 
-func pklInstaller(t testing.TB, sha string) (e *env.Env, log *testkit.Recorder, fetches *int) {
+func pklInstaller(t testing.TB, sha string) (e *env.Env, log *testkit.LogRecorder, fetches *int) {
 	t.Helper()
 	executable := []byte("fake-pkl")
 	if sha == "" {

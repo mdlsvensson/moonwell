@@ -34,7 +34,7 @@ func TestTheCommandLinesAreAsRecorded(t *testing.T) {
 					all = append(all, p.recording(run, p.through(t, run))...)
 				}
 			}
-			testkit.Recorded(t, seed+".txt", all)
+			testkit.CheckRecorded(t, seed+".txt", all)
 		})
 	}
 }
@@ -159,7 +159,7 @@ func (p *recordedProjects) recording(run recordedRun, answers []answer) []byte {
 	}
 	compiler := pinnedCompilerIn(p.cache)
 	forTheEditor := filepath.Join(p.cache, "bin", filepath.Base(compiler))
-	return testkit.Placed([]byte(out.String()), root, compiler, forTheEditor)
+	return testkit.WithPlaceholders([]byte(out.String()), root, compiler, forTheEditor)
 }
 
 func (a answer) recording(command, root string) string {
@@ -185,7 +185,7 @@ func lineByLine(texts []string) string {
 	var out strings.Builder
 	out.WriteString("\n")
 	for _, line := range strings.Split(strings.Join(texts, "\n"), "\n") {
-		out.WriteString("  " + testkit.Shown(line) + "\n")
+		out.WriteString("  " + testkit.QuoteIfNeeded(line) + "\n")
 	}
 	return out.String()
 }
@@ -202,10 +202,10 @@ func complaintOf(lines []string, root string) string {
 	if !named {
 		return "a complaint that names no file"
 	}
-	if place = string(testkit.Placed([]byte(place), root)); strings.HasPrefix(place, "<root>") {
+	if place = string(testkit.WithPlaceholders([]byte(place), root)); strings.HasPrefix(place, "<root>") {
 		place = filepath.ToSlash(place)
 	}
-	return "a complaint about " + testkit.Shown(place)
+	return "a complaint about " + testkit.QuoteIfNeeded(place)
 }
 
 func (a answer) left() string {
@@ -223,10 +223,10 @@ func (a answer) left() string {
 		switch {
 		case inNoRecording(name), wasThere && isThere && (was == nil) == (is == nil) && bytes.Equal(was, is):
 		case !isThere && was != nil:
-			out.WriteString("  " + testkit.Shown(name) + ": gone\n")
+			out.WriteString("  " + testkit.QuoteIfNeeded(name) + ": gone\n")
 		case !isThere, is == nil:
 		default:
-			out.WriteString("  " + testkit.Shown(name) + ":" + leftAs(name, is))
+			out.WriteString("  " + testkit.QuoteIfNeeded(name) + ":" + leftAs(name, is))
 		}
 	}
 	if out.Len() == 0 {
@@ -244,7 +244,7 @@ func leftAs(name string, data []byte) string {
 	case strings.HasPrefix(name, "dist/bin/"), path.Base(name) == ".moonwell-library.json":
 		return " present\n"
 	case strings.HasPrefix(name, "dist/"), strings.HasPrefix(name, ".moonwell/"):
-		return testkit.ByDigest(data)
+		return testkit.DigestLine(data)
 	}
 	return testkit.WholeIfShort(data)
 }

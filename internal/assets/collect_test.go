@@ -236,7 +236,7 @@ func TestCollectRefusesALinkBelowTheProjectFolder(t *testing.T) {
 
 func TestCollectRefusesTwoSpellingsOfOnePath(t *testing.T) {
 	root := t.TempDir()
-	if !testkit.CaseSensitive(t, root) {
+	if !testkit.IsCaseSensitive(t, root) {
 		t.Skip("this file system cannot hold two names that differ only in letter case")
 	}
 	put(t, root, "assets/a.blp")

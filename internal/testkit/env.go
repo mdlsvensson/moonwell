@@ -10,45 +10,45 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/env"
 )
 
-type Recorder struct {
+type LogRecorder struct {
 	*env.Logger
-	guard sync.Mutex
+	mu    sync.Mutex
 	lines []string
 }
 
-func NewRecorder() *Recorder {
-	recorder := &Recorder{}
-	recorder.Logger = env.NewLogger(recorder.keep, "")
+func NewLogRecorder() *LogRecorder {
+	recorder := &LogRecorder{}
+	recorder.Logger = env.NewLogger(recorder.record, "")
 	return recorder
 }
 
-func (r *Recorder) keep(line string) {
-	r.guard.Lock()
-	defer r.guard.Unlock()
+func (r *LogRecorder) record(line string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	r.lines = append(r.lines, line)
 }
 
-func (r *Recorder) Lines() []string {
-	r.guard.Lock()
-	defer r.guard.Unlock()
+func (r *LogRecorder) Lines() []string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return slices.Clone(r.lines)
 }
 
-func Env(t testing.TB, root string) (*env.Env, *Recorder) {
+func Env(t testing.TB, root string) (*env.Env, *LogRecorder) {
 	t.Helper()
-	recorder := NewRecorder()
+	recorder := NewLogRecorder()
 	return &env.Env{
 		Root:     root,
 		Log:      recorder.Logger,
-		Run:      refusedRun(t),
-		Fetch:    refusedFetch(t),
-		Spawn:    refusedSpawn(t),
+		Run:      failingRun(t),
+		Fetch:    failingFetch(t),
+		Spawn:    failingSpawn(t),
 		CacheDir: t.TempDir(),
 		Platform: env.CurrentPlatform(),
 	}, recorder
 }
 
-func refusedRun(t testing.TB) env.RunFunc {
+func failingRun(t testing.TB) env.RunFunc {
 	return func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		t.Helper()
 		t.Errorf("the test did not expect a program to run: %s %q", program, args)
@@ -56,7 +56,7 @@ func refusedRun(t testing.TB) env.RunFunc {
 	}
 }
 
-func refusedFetch(t testing.TB) env.FetchFunc {
+func failingFetch(t testing.TB) env.FetchFunc {
 	return func(ctx context.Context, url string) (int, []byte, error) {
 		t.Helper()
 		t.Errorf("the test did not expect a download: %s", url)
@@ -64,7 +64,7 @@ func refusedFetch(t testing.TB) env.FetchFunc {
 	}
 }
 
-func refusedSpawn(t testing.TB) func(program string, args []string) error {
+func failingSpawn(t testing.TB) func(program string, args []string) error {
 	return func(program string, args []string) error {
 		t.Helper()
 		t.Errorf("the test did not expect a program to start: %s %q", program, args)

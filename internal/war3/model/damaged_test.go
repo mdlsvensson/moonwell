@@ -76,7 +76,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	} {
 		var paths []model.Path
 		var err error
-		if value := testkit.Panic(func() { paths, err = read() }); value != nil {
+		if value := testkit.PanicValue(func() { paths, err = read() }); value != nil {
 			t.Fatalf("%s: %s panics: %v", what, name, value)
 		}
 		var failure *diag.Error
@@ -108,9 +108,9 @@ func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		}
 		for index := range uint64(1500) {
 			what := fmt.Sprintf("%s, change %d of seed %d", whole.name, index, damageSeed)
-			damaged.readOrRefused(t, what+" to its bytes", testkit.ChangedBytes(whole.data, damageSeed, index))
+			damaged.readOrRefused(t, what+" to its bytes", testkit.MutateBytes(whole.data, damageSeed, index))
 			if whole.text {
-				text := testkit.Changed(string(whole.data), damageSeed, index)
+				text := testkit.MutateText(string(whole.data), damageSeed, index)
 				damaged.readOrRefused(t, what+" to its text", []byte(text))
 			}
 		}

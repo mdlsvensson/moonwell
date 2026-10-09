@@ -109,7 +109,7 @@ func TestAnExportFailsTheTestForANameItCannotTellApart(t *testing.T) {
 		{"a folder no folder has", []string{"war3.w3mod", "doodads", "doodads.slk"}, []string{"doodads", "0"}},
 		{"a file where a folder should be", []string{"war3.w3mod", "units", "notes.txt", "x"}, []string{"Notes.TXT"}},
 	}
-	if CaseSensitive(t, root) {
+	if IsCaseSensitive(t, root) {
 		WriteFile(t, root, "War3.W3Mod/Units/UNITDATA.slk", nil)
 		twice := []string{"war3.w3mod", "units", "unitdata.slk"}
 		tests = append(tests, lookup{"a name two entries have", twice, []string{units, "unitdata.slk", "2"}})

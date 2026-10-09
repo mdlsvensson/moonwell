@@ -77,12 +77,12 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 	var parsed *objmod.File
 	var appended []byte
 	var err, appendErr error
-	if value := testkit.Panic(func() { parsed, err = objmod.Read(data, kind, modFile) }); value != nil {
+	if value := testkit.PanicValue(func() { parsed, err = objmod.Read(data, kind, modFile) }); value != nil {
 		t.Fatalf("%s: Read panics: %v", what, value)
 	}
 	if parsed != nil {
 		added := []objmod.NewObject{{Base: id("hfoo"), ID: id("X001")}}
-		if value := testkit.Panic(func() { appended, appendErr = objmod.AppendObjects(parsed, data, kind, added) }); value != nil {
+		if value := testkit.PanicValue(func() { appended, appendErr = objmod.AppendObjects(parsed, data, kind, added) }); value != nil {
 			t.Fatalf("%s: AppendTo panics: %v", what, value)
 		}
 	}
@@ -107,7 +107,7 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		}
 		for index := range uint64(400) {
 			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.ChangedBytes(displayPath.data, damageSeed, index), displayPath.kind)
+			damaged.readOrRefused(t, what, testkit.MutateBytes(displayPath.data, damageSeed, index), displayPath.kind)
 		}
 		for _, at := range numberOffsets(t, displayPath) {
 			for _, number := range append(testkit.EdgeNumbers(), 3, 4, 5, 64, 65, 1000) {

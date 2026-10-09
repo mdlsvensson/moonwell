@@ -13,12 +13,12 @@ import (
 
 func Yue(t testing.TB) string {
 	t.Helper()
-	var provided *string
+	var yuePath *string
 	if path := os.Getenv("MOONWELL_TEST_YUE"); path != "" {
-		provided = &path
+		yuePath = &path
 	}
-	world := env.New("", env.NewLogger(func(string) {}, ""))
-	program, err := toolchain.FindCompiler(context.Background(), world, toolchain.YueVersion, provided)
+	e := env.New("", env.NewLogger(func(string) {}, ""))
+	program, err := toolchain.FindCompiler(context.Background(), e, toolchain.YueVersion, yuePath)
 	if err == nil {
 		return program
 	}
@@ -52,8 +52,8 @@ func RunLua(t testing.TB, file string) string {
 		t.Fatalf("%s was not run in Lua: %v", file, err)
 		return ""
 	case result.ExitCode != 0:
-		printed := strings.TrimRight(result.Stdout+"\n"+result.Stderr, "\r\n")
-		t.Fatalf("%s ended with exit code %d in Lua:\n%s", file, result.ExitCode, printed)
+		output := strings.TrimRight(result.Stdout+"\n"+result.Stderr, "\r\n")
+		t.Fatalf("%s ended with exit code %d in Lua:\n%s", file, result.ExitCode, output)
 		return ""
 	}
 	return strings.ReplaceAll(result.Stdout, "\r\n", "\n")

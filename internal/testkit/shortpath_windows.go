@@ -2,7 +2,7 @@ package testkit
 
 import "syscall"
 
-func shortSpelling(folder string) string {
+func shortPathName(folder string) string {
 	path, err := syscall.UTF16PtrFromString(folder)
 	if err != nil {
 		return ""

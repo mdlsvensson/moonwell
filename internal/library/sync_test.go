@@ -62,7 +62,7 @@ func tagArchive(t *testing.T, commit string, files ...string) []byte {
 	return testkit.Zip(t, commit, entries(under...)...)
 }
 
-func worldOf(t *testing.T, root string, server *tagServer) (*env.Env, *testkit.Recorder) {
+func worldOf(t *testing.T, root string, server *tagServer) (*env.Env, *testkit.LogRecorder) {
 	t.Helper()
 	e, log := testkit.Env(t, root)
 	if server != nil {
@@ -1220,7 +1220,7 @@ func TestAFileIsHeldAgainstAFolderInAnotherSpellingAndNotAgainstOneInItsOwn(t *t
 
 func TestALocalFileAndAFolderThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
 	root := t.TempDir()
-	if !testkit.CaseSensitive(t, root) {
+	if !testkit.IsCaseSensitive(t, root) {
 		t.Skip("this file system holds no file and folder that differ only in letter case; the case is covered on the other system's run")
 	}
 	put(t, root, "lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/files/Icons", "a file", "lib/files/icons/y.blp", "y")
@@ -1316,7 +1316,7 @@ func TestALocalFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten(t *test
 
 func TestTwoLocalFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
 	root := t.TempDir()
-	if !testkit.CaseSensitive(t, root) {
+	if !testkit.IsCaseSensitive(t, root) {
 		t.Skip("this file system holds no two files that differ only in letter case; the case is covered on the other system's run")
 	}
 	put(t, root, "lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/files/x.blp", "x", "lib/files/X.blp", "X")
@@ -1333,7 +1333,7 @@ func TestTwoLocalFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritte
 
 func TestLocalFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
 	root := t.TempDir()
-	if !testkit.CaseSensitive(t, root) {
+	if !testkit.IsCaseSensitive(t, root) {
 		t.Skip("this file system holds no two folders that differ only in letter case; the case is covered on the other system's run")
 	}
 	put(t, root, "lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/files/Icons/x.blp", "x", "lib/files/icons/y.blp", "y")

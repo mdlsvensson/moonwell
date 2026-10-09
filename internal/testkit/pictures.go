@@ -24,8 +24,8 @@ func NewPixels(size int) Pixels {
 			if x < size/2 {
 				color = [3]int{y % 256, 40, 200}
 			}
-			at := (y*size + x) * 4
-			rgba[at], rgba[at+1], rgba[at+2], rgba[at+3] = byte(color[0]), byte(color[1]), byte(color[2]), 7
+			offset := (y*size + x) * 4
+			rgba[offset], rgba[offset+1], rgba[offset+2], rgba[offset+3] = byte(color[0]), byte(color[1]), byte(color[2]), 7
 		}
 	}
 	return Pixels{Size: size, RGBA: rgba}
@@ -50,15 +50,15 @@ func TGA(picture Pixels, options TGAOptions) []byte {
 		if options.FromTop {
 			y = row
 		}
-		at := (y*size + x) * 4
-		bgr := []byte{picture.RGBA[at+2], picture.RGBA[at+1], picture.RGBA[at]}
+		offset := (y*size + x) * 4
+		bgr := []byte{picture.RGBA[offset+2], picture.RGBA[offset+1], picture.RGBA[offset]}
 		if step != 4 {
 			return bgr
 		}
 		if options.Alpha != nil {
 			return append(bgr, *options.Alpha)
 		}
-		return append(bgr, picture.RGBA[at+3])
+		return append(bgr, picture.RGBA[offset+3])
 	}
 	var data []byte
 	for row := range size {

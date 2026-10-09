@@ -178,7 +178,7 @@ func TestEnvIsATestWorld(t *testing.T) {
 }
 
 func TestRecorderKeepsEveryLevelInOrder(t *testing.T) {
-	recorder := NewRecorder()
+	recorder := NewLogRecorder()
 	recorder.Info("one")
 	recorder.Warn("two")
 	recorder.Error("three")
@@ -224,7 +224,7 @@ func TestByteHelpersAreLittleEndian(t *testing.T) {
 	if got := Concat([]byte{1}, nil, []byte{2, 3}); !bytes.Equal(got, []byte{1, 2, 3}) {
 		t.Errorf("Concat = % x", got)
 	}
-	if got := Fixed("ab", 4); !bytes.Equal(got, []byte{'a', 'b', 0, 0}) {
+	if got := FixedField("ab", 4); !bytes.Equal(got, []byte{'a', 'b', 0, 0}) {
 		t.Errorf("Fixed = % x", got)
 	}
 	original := []byte{0, 0, 0, 0, 9}
@@ -307,7 +307,7 @@ func sameFile(a, b string) bool {
 
 func TestCaseSensitiveLeavesNoProbeBehind(t *testing.T) {
 	dir := t.TempDir()
-	CaseSensitive(t, dir)
+	IsCaseSensitive(t, dir)
 	if got := Snapshot(t, dir); len(got) != 0 {
 		t.Errorf("left %v behind", got)
 	}
@@ -367,14 +367,14 @@ func TestALinkToAFileThatCannotBeMadeFailsTheTest(t *testing.T) {
 
 func TestOnlyTheRightThatWindowsKeepsFromAnAccountIsNoFaultOfALink(t *testing.T) {
 	link := func(reason error) error { return &os.LinkError{Op: "symlink", Old: "target", New: "link", Err: reason} }
-	if got := lacksTheRightToLink(link(syscall.Errno(1314))); got != (runtime.GOOS == "windows") {
+	if got := lacksSymlinkPrivilege(link(syscall.Errno(1314))); got != (runtime.GOOS == "windows") {
 		t.Errorf("the right that is not held: %v on %s", got, runtime.GOOS)
 	}
 	for _, other := range []error{
 		link(syscall.ENOENT), link(syscall.EEXIST), link(syscall.Errno(3)), link(syscall.Errno(5)),
 		errors.New("A required privilege is not held by the client."), nil,
 	} {
-		if lacksTheRightToLink(other) {
+		if lacksSymlinkPrivilege(other) {
 			t.Errorf("%v is taken for the right that the account has not got", other)
 		}
 	}
