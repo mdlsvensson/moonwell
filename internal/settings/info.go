@@ -27,20 +27,20 @@ const (
 	sharedAdvancedControl = 32
 )
 
-func patchInfo(data []byte, s manifest.Settings, displayPath string) ([]byte, error) {
-	if !changesInfo(s) {
+func patchInfo(data []byte, settings manifest.Settings, displayPath string) ([]byte, error) {
+	if !changesInfo(settings) {
 		return data, nil
 	}
-	info, err := w3i.Read(data, displayPath, readDepthFor(s))
+	info, err := w3i.Read(data, displayPath, readDepthFor(settings))
 	if err != nil {
 		return nil, err
 	}
 	p := &infoPatch{info: info, displayPath: displayPath, flags: info.Flags.Value}
-	p.patchDescription(s.Info)
-	p.patchLoadingScreen(s.LoadingScreen)
-	p.patchPlayers(s.Players)
-	p.patchForces(s.Forces)
-	p.patchEnvironment(s.Environment)
+	p.patchDescription(settings.Info)
+	p.patchLoadingScreen(settings.LoadingScreen)
+	p.patchPlayers(settings.Players)
+	p.patchForces(settings.Forces)
+	p.patchEnvironment(settings.Environment)
 	p.patchMapFlags()
 	if p.err != nil {
 		return nil, p.err
@@ -52,8 +52,8 @@ func patchInfo(data []byte, s manifest.Settings, displayPath string) ([]byte, er
 	return patched, nil
 }
 
-func changesInfo(s manifest.Settings) bool {
-	return needsDetails(s) || hasDescription(s.Info) || s.LoadingScreen != (manifest.LoadingScreen{})
+func changesInfo(settings manifest.Settings) bool {
+	return needsDetails(settings) || hasDescription(settings.Info) || settings.LoadingScreen != (manifest.LoadingScreen{})
 }
 
 func hasDescription(info manifest.Info) bool {
@@ -61,22 +61,22 @@ func hasDescription(info manifest.Info) bool {
 	return info != (manifest.Info{})
 }
 
-func needsDetails(s manifest.Settings) bool {
-	return hasOverrides(s.Players) || hasOverrides(s.Forces) || s.Environment != (manifest.Environment{})
+func needsDetails(settings manifest.Settings) bool {
+	return hasOverrides(settings.Players) || hasOverrides(settings.Forces) || settings.Environment != (manifest.Environment{})
 }
 
 func hasOverrides[V comparable](overrides map[int]V) bool {
-	var nothing V
+	var zero V
 	for _, override := range overrides {
-		if override != nothing {
+		if override != zero {
 			return true
 		}
 	}
 	return false
 }
 
-func readDepthFor(s manifest.Settings) w3i.Depth {
-	if needsDetails(s) {
+func readDepthFor(settings manifest.Settings) w3i.Depth {
+	if needsDetails(settings) {
 		return w3i.Extended
 	}
 	return w3i.Basic
@@ -140,11 +140,11 @@ func (p *infoPatch) patchPlayers(overrides map[int]manifest.Player) {
 
 func (p *infoPatch) findPlayer(slot int) (w3i.Player, bool) {
 	players := p.info.Details.Players
-	at := slices.IndexFunc(players, func(player w3i.Player) bool { return int(player.ID.Value) == slot })
-	if at < 0 {
+	index := slices.IndexFunc(players, func(player w3i.Player) bool { return int(player.ID.Value) == slot })
+	if index < 0 {
 		return w3i.Player{}, false
 	}
-	return players[at], true
+	return players[index], true
 }
 
 func (p *infoPatch) patchForces(overrides map[int]manifest.Force) {

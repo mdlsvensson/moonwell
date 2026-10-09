@@ -30,7 +30,7 @@ func fixtureInfo(t testing.TB) []byte {
 }
 
 func afterInfo(source string, s manifest.Settings, patchedInfo []byte) (string, error) {
-	return patchLuaAfter(source, s, patchedInfo, luaFile, infoFile)
+	return patchLuaFromInfo(source, s, patchedInfo, luaFile, infoFile)
 }
 
 func withSettings(t testing.TB, document, source string) (string, error) {

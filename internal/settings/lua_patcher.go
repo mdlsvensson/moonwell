@@ -31,6 +31,17 @@ func newPatcher(source, displayPath string) (*luaPatcher, error) {
 	return &luaPatcher{source: source, displayPath: displayPath, eol: eol, functions: functions}, nil
 }
 
+func (p *luaPatcher) patchedSource() (string, error) {
+	patched, err := lua.ApplyEdits(p.source, p.edits)
+	if err != nil {
+		return "", fmt.Errorf("patching %s: %w", p.displayPath, err)
+	}
+	if _, err := lua.ParseFunctions(patched, p.displayPath); err != nil {
+		return "", errUnsafeEdit(p.displayPath, err)
+	}
+	return patched, nil
+}
+
 func (p *luaPatcher) fail(err error) {
 	if p.err == nil {
 		p.err = err
@@ -74,12 +85,12 @@ func (p *luaPatcher) findCalls(fn lua.Function, name string, arity int) []lua.Ca
 	return calls
 }
 
-func (p *luaPatcher) requireOne(calls []lua.Call, label string) lua.Call {
+func (p *luaPatcher) requireOne(calls []lua.Call, description string) lua.Call {
 	switch {
 	case p.hasFailed():
 		return lua.Call{}
 	case len(calls) != 1:
-		p.fail(errNotOne(p.displayPath, label, len(calls)))
+		p.fail(errNotOne(p.displayPath, description, len(calls)))
 		return lua.Call{}
 	}
 	return calls[0]
@@ -89,12 +100,12 @@ func (p *luaPatcher) findOneCall(fn lua.Function, name string, arity int) lua.Ca
 	return p.requireOne(p.findCalls(fn, name, arity), name+" in "+fn.Name+"()")
 }
 
-func (p *luaPatcher) atMostOne(calls []lua.Call, label string) (lua.Call, bool) {
+func (p *luaPatcher) atMostOne(calls []lua.Call, description string) (lua.Call, bool) {
 	switch {
 	case p.hasFailed() || len(calls) == 0:
 		return lua.Call{}, false
 	case len(calls) > 1:
-		p.fail(errMoreThanOne(p.displayPath, label, len(calls)))
+		p.fail(errMoreThanOne(p.displayPath, description, len(calls)))
 		return lua.Call{}, false
 	}
 	return calls[0], true
@@ -131,22 +142,22 @@ func (p *luaPatcher) insertAfter(call lua.Call, statements []string) {
 	if p.hasFailed() || len(statements) == 0 {
 		return
 	}
-	var added strings.Builder
+	var text strings.Builder
 	for _, statement := range statements {
-		added.WriteString(p.separatorAt(call.Start) + statement + p.semicolonAfter(call))
+		text.WriteString(p.separatorAt(call.Start) + statement + p.semicolonAfter(call))
 	}
-	p.edits = append(p.edits, lua.Edit{Start: call.End, End: call.End, Text: added.String()})
+	p.edits = append(p.edits, lua.Edit{Start: call.End, End: call.End, Text: text.String()})
 }
 
-func (p *luaPatcher) insertBefore(at int, statements []string) {
+func (p *luaPatcher) insertBefore(offset int, statements []string) {
 	if p.hasFailed() || len(statements) == 0 {
 		return
 	}
-	var added strings.Builder
+	var text strings.Builder
 	for _, statement := range statements {
-		added.WriteString(statement + p.separatorAt(at))
+		text.WriteString(statement + p.separatorAt(offset))
 	}
-	p.edits = append(p.edits, lua.Edit{Start: at, End: at, Text: added.String()})
+	p.edits = append(p.edits, lua.Edit{Start: offset, End: offset, Text: text.String()})
 }
 
 func (p *luaPatcher) remove(call lua.Call) {
@@ -154,8 +165,8 @@ func (p *luaPatcher) remove(call lua.Call) {
 		return
 	}
 	rest := restOfLine(p.source[call.End:])
-	_, alone := p.indentationAt(call.Start)
-	if alone && rest != "" && startsWithName(p.source[call.End+len(rest):]) {
+	_, isOwnLine := p.indentationAt(call.Start)
+	if isOwnLine && rest != "" && startsWithName(p.source[call.End+len(rest):]) {
 		p.edits = append(p.edits, lua.Edit{Start: lineStart(p.source, call.Start), End: call.End + len(rest)})
 		return
 	}
@@ -169,20 +180,20 @@ func (p *luaPatcher) semicolonAfter(call lua.Call) string {
 	return ""
 }
 
-func (p *luaPatcher) separatorAt(at int) string {
-	if indentation, alone := p.indentationAt(at); alone {
+func (p *luaPatcher) separatorAt(offset int) string {
+	if indentation, isOwnLine := p.indentationAt(offset); isOwnLine {
 		return p.eol + indentation
 	}
 	return " "
 }
 
-func (p *luaPatcher) indentationAt(at int) (prefix string, blank bool) {
-	prefix = p.source[lineStart(p.source, at):at]
-	return prefix, strings.Trim(prefix, " \t") == ""
+func (p *luaPatcher) indentationAt(offset int) (indentation string, isOwnLine bool) {
+	indentation = p.source[lineStart(p.source, offset):offset]
+	return indentation, strings.Trim(indentation, " \t") == ""
 }
 
-func lineStart(source string, at int) int {
-	return strings.LastIndexByte(source[:at], '\n') + 1
+func lineStart(source string, offset int) int {
+	return strings.LastIndexByte(source[:offset], '\n') + 1
 }
 
 func restOfLine(text string) string {

@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	keptMinimap  = "war3mapMinimap.blp"
-	savedMinimap = "war3mapMap.blp"
-	tgaName      = "war3mapMap.tga"
+	minimapCopyName = "war3mapMinimap.blp"
+	minimapName     = "war3mapMap.blp"
+	previewTGAName  = "war3mapMap.tga"
 )
 
 func loadProjectPreview(p *manifest.Project) (*picture.Picture, error) {
@@ -33,11 +33,11 @@ func (p *planner) checkPreviewFits(preview *picture.Picture) error {
 	if err := p.requireMinimap(); err != nil {
 		return err
 	}
-	for _, added := range []string{keptMinimap, tgaName} {
-		if p.source.HasFile(added) {
-			return errNameTaken(p.source.CanonicalPath(added), p.source.DisplayPath(added))
+	for _, name := range []string{minimapCopyName, previewTGAName} {
+		if p.source.HasFile(name) {
+			return errNameTaken(p.source.CanonicalPath(name), p.source.DisplayPath(name))
 		}
-		if _, err := p.source.ResolveNewPath(added); err != nil {
+		if _, err := p.source.ResolveNewPath(name); err != nil {
 			return err
 		}
 	}
@@ -46,37 +46,37 @@ func (p *planner) checkPreviewFits(preview *picture.Picture) error {
 
 func (p *planner) requireMinimap() error {
 	switch {
-	case p.source.HasFile(savedMinimap):
+	case p.source.HasFile(minimapName):
 		return nil
-	case p.source.IsDir(savedMinimap):
-		return errIsDir(p.source.CanonicalPath(savedMinimap), p.source.DisplayPath(savedMinimap))
+	case p.source.IsDir(minimapName):
+		return errIsDir(p.source.CanonicalPath(minimapName), p.source.DisplayPath(minimapName))
 	}
-	return errNoMinimap(p.source.DisplayPath(savedMinimap))
+	return errNoMinimap(p.source.DisplayPath(minimapName))
 }
 
 func (p *planner) planPreview(preview *picture.Picture) error {
 	if preview == nil {
 		return nil
 	}
-	kept, err := p.readRequired(savedMinimap)
+	minimap, err := p.readRequired(minimapName)
 	if err != nil {
 		return err
 	}
-	if err := p.addWrite(keptMinimap, kept); err != nil {
+	if err := p.addWrite(minimapCopyName, minimap); err != nil {
 		return err
 	}
 	if preview.Extension == "blp" {
-		return p.addWrite(savedMinimap, preview.Data)
+		return p.addWrite(minimapName, preview.Data)
 	}
-	if err := p.addChange(mapdir.Change{Path: savedMinimap, Remove: true}); err != nil {
+	if err := p.addChange(mapdir.Change{Path: minimapName, Remove: true}); err != nil {
 		return err
 	}
-	return p.addWrite(tgaName, preview.Data)
+	return p.addWrite(previewTGAName, preview.Data)
 }
 
 func errNoMinimap(displayPath string) error {
 	return &diag.Error{
-		Msg:  "The map has no " + savedMinimap + ", the minimap whose place the preview picture takes.",
+		Msg:  "The map has no " + minimapName + ", the minimap whose place the preview picture takes.",
 		File: displayPath,
 		Hint: "Open and save the map in World Editor, which writes the minimap.",
 	}

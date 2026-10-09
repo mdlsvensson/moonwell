@@ -2,7 +2,6 @@ package settings
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/manifest"
@@ -10,45 +9,45 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-func patchLuaAfter(source string, s manifest.Settings, patchedInfo []byte, displayPath, infoLabel string) (string, error) {
-	if !changesLua(s) {
+func patchLuaFromInfo(source string, settings manifest.Settings, patchedInfo []byte, displayPath, infoDisplayPath string) (string, error) {
+	if !changesLua(settings) {
 		return source, nil
 	}
-	info, err := w3i.Read(patchedInfo, infoLabel, readDepthFor(s))
+	info, err := w3i.Read(patchedInfo, infoDisplayPath, readDepthFor(settings))
 	if err != nil {
 		return "", err
 	}
-	return patchLua(source, s, info, displayPath)
+	return patchLua(source, settings, info, displayPath)
 }
 
-func patchLua(source string, s manifest.Settings, info *w3i.Info, displayPath string) (string, error) {
-	if info == nil || info.Details == nil && needsDetails(s) {
+func patchLua(source string, settings manifest.Settings, info *w3i.Info, displayPath string) (string, error) {
+	if info == nil || info.Details == nil && needsDetails(settings) {
 		return "", errNoMapInfo(displayPath)
 	}
 	p, err := newPatcher(source, displayPath)
 	if err != nil {
 		return "", err
 	}
-	p.patchNameAndDescription(s.Info, info)
-	p.patchPlayers(s.Players, info.Details)
-	p.patchForces(s.Forces, info.Details)
-	p.patchEnvironment(s.Environment, info)
+	p.patchNameAndDescription(settings.Info, info)
+	p.patchPlayers(settings.Players, info.Details)
+	p.patchForces(settings.Forces, info.Details)
+	p.patchEnvironment(settings.Environment, info)
 	if p.err != nil {
 		return "", p.err
 	}
-	return p.result()
+	return p.patchedSource()
 }
 
-func changesLua(s manifest.Settings) bool {
-	return s.Info.Name != nil || s.Info.Description != nil || hasOverrides(s.Players) || len(forcesWithFlags(s.Forces)) > 0 ||
-		s.Environment != (manifest.Environment{})
+func changesLua(settings manifest.Settings) bool {
+	return settings.Info.Name != nil || settings.Info.Description != nil || hasOverrides(settings.Players) || len(forcesWithFlags(settings.Forces)) > 0 ||
+		settings.Environment != (manifest.Environment{})
 }
 
-func (p *luaPatcher) patchNameAndDescription(set manifest.Info, info *w3i.Info) {
-	if set.Name != nil {
+func (p *luaPatcher) patchNameAndDescription(override manifest.Info, info *w3i.Info) {
+	if override.Name != nil {
 		p.setTextCall("SetMapName", info.Name.Value)
 	}
-	if set.Description != nil {
+	if override.Description != nil {
 		p.setTextCall("SetMapDescription", info.Description.Value)
 	}
 }
@@ -57,27 +56,16 @@ func (p *luaPatcher) setTextCall(native, value string) {
 	p.replace(p.findOneCall(p.findFunction("config"), native, 1), native+"("+lua.QuoteString(value)+")")
 }
 
-func (p *luaPatcher) result() (string, error) {
-	result, err := lua.ApplyEdits(p.source, p.edits)
-	if err != nil {
-		return "", fmt.Errorf("patching %s: %w", p.displayPath, err)
-	}
-	if _, err := lua.ParseFunctions(result, p.displayPath); err != nil {
-		return "", errUnsafeEdit(p.displayPath, err)
-	}
-	return result, nil
-}
-
 func patchMinimap(source, displayPath string) (string, error) {
 	p, err := newPatcher(source, displayPath)
 	if err != nil {
 		return "", err
 	}
-	p.insertBefore(p.findFunction("main").EndStart, []string{"BlzChangeMinimapTerrainTex(" + lua.QuoteString(keptMinimap) + ")"})
+	p.insertBefore(p.findFunction("main").EndStart, []string{"BlzChangeMinimapTerrainTex(" + lua.QuoteString(minimapCopyName) + ")"})
 	if p.err != nil {
 		return "", p.err
 	}
-	return p.result()
+	return p.patchedSource()
 }
 
 func errUnsafeEdit(displayPath string, cause error) error {

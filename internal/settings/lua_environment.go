@@ -9,40 +9,40 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-func (p *luaPatcher) patchEnvironment(set manifest.Environment, info *w3i.Info) {
-	if set == (manifest.Environment{}) {
+func (p *luaPatcher) patchEnvironment(override manifest.Environment, info *w3i.Info) {
+	if override == (manifest.Environment{}) {
 		return
 	}
 	main := p.findFunction("main")
-	before := p.findAnchorCall(main)
-	var calls []string
-	if set.SoundEnvironment != nil {
-		calls = append(calls, p.soundStatement(main, info.Details))
+	anchor := p.findAnchorCall(main)
+	var statements []string
+	if override.SoundEnvironment != nil {
+		statements = append(statements, p.soundStatement(main, info.Details))
 	}
-	if set.WaterColor != nil {
-		calls = append(calls, p.waterStatement(main, info.Details))
+	if override.WaterColor != nil {
+		statements = append(statements, p.waterStatement(main, info.Details))
 	}
-	if set.Fog != (manifest.Fog{}) {
-		calls = append(calls, p.fogStatement(main, info))
+	if override.Fog != (manifest.Fog{}) {
+		statements = append(statements, p.fogStatement(main, info))
 	}
-	p.insertBefore(before.Start, calls)
+	p.insertBefore(anchor.Start, statements)
 }
 
 func (p *luaPatcher) findAnchorCall(main lua.Function) lua.Call {
-	at := slices.IndexFunc(main.Calls, func(call lua.Call) bool {
+	index := slices.IndexFunc(main.Calls, func(call lua.Call) bool {
 		return call.Name == "CreateAllUnits" || call.Name == "InitBlizzard"
 	})
 	switch {
 	case p.hasFailed():
 		return lua.Call{}
-	case at < 0:
+	case index < 0:
 		p.fail(errNoAnchor(p.displayPath))
 		return lua.Call{}
-	case len(main.Calls[at].Args) != 0:
-		p.fail(errArity(p.displayPath, main.Calls[at].Name, main.Name, 0))
+	case len(main.Calls[index].Args) != 0:
+		p.fail(errArity(p.displayPath, main.Calls[index].Name, main.Name, 0))
 		return lua.Call{}
 	}
-	return main.Calls[at]
+	return main.Calls[index]
 }
 
 func (p *luaPatcher) removeCalls(main lua.Function, native string, arity int) {

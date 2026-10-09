@@ -10,68 +10,23 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/txt"
 )
 
-const miscSection = "Misc"
-
-type typedConstant struct {
-	setting, key string
-	value        *int
-}
-
-func typedConstants(gameplay manifest.Gameplay) []typedConstant {
-	return []typedConstant{
-		{"heroMaxLevel", "MaxHeroLevel", gameplay.HeroMaxLevel},
-		{"foodLimit", "FoodCeiling", gameplay.FoodLimit},
-	}
-}
-
-func textSections(s manifest.Settings, manifestName string) (misc, skin []txt.Section, err error) {
-	raw, err := toSections(s.GameplayConstants, "settings.gameplayConstants", manifestName)
+func textSections(settings manifest.Settings, manifestName string) (misc, skin []txt.Section, err error) {
+	rawSections, err := toSections(settings.GameplayConstants, "settings.gameplayConstants", manifestName)
 	if err != nil {
 		return nil, nil, err
 	}
-	if skin, err = toSections(s.GameInterface, "settings.gameInterface", manifestName); err != nil {
+	if skin, err = toSections(settings.GameInterface, "settings.gameInterface", manifestName); err != nil {
 		return nil, nil, err
 	}
-	if misc, err = mergeTypedConstants(raw, s.Gameplay, manifestName); err != nil {
+	if misc, err = mergeTypedConstants(rawSections, settings.Gameplay, manifestName); err != nil {
 		return nil, nil, err
 	}
 	return misc, skin, nil
 }
 
-func mergeTypedConstants(raw []txt.Section, gameplay manifest.Gameplay, manifestName string) ([]txt.Section, error) {
-	merged := raw
-	for _, constant := range typedConstants(gameplay) {
-		if constant.value == nil {
-			continue
-		}
-		var err error
-		if merged, err = mergeConstant(merged, constant, manifestName); err != nil {
-			return nil, err
-		}
-	}
-	return merged, nil
-}
-
-func mergeConstant(merged []txt.Section, constant typedConstant, manifestName string) ([]txt.Section, error) {
-	field := txt.Field{Key: constant.key, Value: strconv.Itoa(*constant.value)}
-	at := slices.IndexFunc(merged, func(section txt.Section) bool { return equalFold(section.Name, miscSection) })
-	if at < 0 {
-		return append(merged, txt.Section{Name: miscSection, Fields: []txt.Field{field}}), nil
-	}
-	fields := merged[at].Fields
-	raw := slices.IndexFunc(fields, func(held txt.Field) bool { return equalFold(held.Key, field.Key) })
-	switch {
-	case raw < 0:
-		merged[at].Fields = append(fields, field)
-	case fields[raw].Value != field.Value:
-		return nil, errConflict(manifestName, constant)
-	}
-	return merged, nil
-}
-
-func toSections(raw manifest.OrderedMap[manifest.OrderedMap[string]], path, manifestName string) ([]txt.Section, error) {
+func toSections(constants manifest.OrderedMap[manifest.OrderedMap[string]], path, manifestName string) ([]txt.Section, error) {
 	var result []txt.Section
-	for name, entries := range raw.All() {
+	for name, entries := range constants.All() {
 		if slices.ContainsFunc(result, func(section txt.Section) bool { return equalFold(section.Name, name) }) {
 			return nil, errDuplicateSection(manifestName, path, name)
 		}
@@ -93,6 +48,51 @@ func toFields(entries manifest.OrderedMap[string], path, manifestName string) ([
 		fields = append(fields, txt.Field{Key: key, Value: value})
 	}
 	return fields, nil
+}
+
+const miscSection = "Misc"
+
+type typedConstant struct {
+	setting, key string
+	value        *int
+}
+
+func typedConstants(gameplay manifest.Gameplay) []typedConstant {
+	return []typedConstant{
+		{"heroMaxLevel", "MaxHeroLevel", gameplay.HeroMaxLevel},
+		{"foodLimit", "FoodCeiling", gameplay.FoodLimit},
+	}
+}
+
+func mergeTypedConstants(sections []txt.Section, gameplay manifest.Gameplay, manifestName string) ([]txt.Section, error) {
+	merged := sections
+	for _, constant := range typedConstants(gameplay) {
+		if constant.value == nil {
+			continue
+		}
+		var err error
+		if merged, err = mergeConstant(merged, constant, manifestName); err != nil {
+			return nil, err
+		}
+	}
+	return merged, nil
+}
+
+func mergeConstant(merged []txt.Section, constant typedConstant, manifestName string) ([]txt.Section, error) {
+	field := txt.Field{Key: constant.key, Value: strconv.Itoa(*constant.value)}
+	sectionIndex := slices.IndexFunc(merged, func(section txt.Section) bool { return equalFold(section.Name, miscSection) })
+	if sectionIndex < 0 {
+		return append(merged, txt.Section{Name: miscSection, Fields: []txt.Field{field}}), nil
+	}
+	fields := merged[sectionIndex].Fields
+	fieldIndex := slices.IndexFunc(fields, func(existing txt.Field) bool { return equalFold(existing.Key, field.Key) })
+	switch {
+	case fieldIndex < 0:
+		merged[sectionIndex].Fields = append(fields, field)
+	case fields[fieldIndex].Value != field.Value:
+		return nil, errConflict(manifestName, constant)
+	}
+	return merged, nil
 }
 
 func equalFold(a, b string) bool { return strings.EqualFold(a, b) }

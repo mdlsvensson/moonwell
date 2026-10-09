@@ -35,11 +35,11 @@ func previewPath(preview, manifestName string) (string, error) {
 }
 
 func readPreview(root, path, manifestName string) ([]byte, error) {
-	displayPath, err := fsx.SafeJoin(root, path)
+	fullPath, err := fsx.SafeJoin(root, path)
 	if err != nil {
 		return nil, wrapPreviewError(err, path, manifestName)
 	}
-	info, err := fsx.Lstat(displayPath)
+	info, err := fsx.Lstat(fullPath)
 	switch {
 	case err != nil:
 		return nil, wrapPreviewError(err, path, manifestName)
@@ -48,7 +48,7 @@ func readPreview(root, path, manifestName string) ([]byte, error) {
 	case !info.Mode().IsRegular():
 		return nil, errNotAFile(manifestName, path)
 	}
-	data, err := os.ReadFile(displayPath)
+	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return nil, errUnreadable(path, err)
 	}
@@ -56,9 +56,9 @@ func readPreview(root, path, manifestName string) ([]byte, error) {
 }
 
 func wrapPreviewError(err error, path, manifestName string) error {
-	var expected *diag.Error
+	var diagErr *diag.Error
 	switch {
-	case errors.As(err, &expected):
+	case errors.As(err, &diagErr):
 		return err
 	case errors.Is(err, syscall.ENOTDIR):
 		return errNoSuchFile(manifestName, path)
