@@ -61,7 +61,7 @@ func EvaluateObjects(ctx context.Context, e *env.Env, pkl string) (Objects, erro
 	if err := json.Unmarshal([]byte(result.Stdout), &objects); err != nil {
 		return Objects{}, errObjectsNotJSON(result.Stdout, err)
 	}
-	objects.pointSourcesAtProject()
+	objects.MapSources(func(source string) string { return strings.TrimPrefix(source, "../") })
 	return objects, nil
 }
 
@@ -74,16 +74,6 @@ func writeObjectsModule(root string) error {
 		return errObjectsModuleNotWritten(err)
 	}
 	return nil
-}
-
-func (o *Objects) pointSourcesAtProject() {
-	for _, category := range Categories {
-		objects := o.pointerTo(category)
-		for key, object := range objects.All() {
-			object.Source = strings.TrimPrefix(object.Source, "../")
-			objects.Set(key, object)
-		}
-	}
 }
 
 func errObjectsDirUnreadable(cause error) error {

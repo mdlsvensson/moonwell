@@ -1,31 +1,19 @@
 package manifest
 
 import (
+	"encoding/json"
 	"reflect"
 	"slices"
 	"testing"
 )
 
-func mustDecodeObjects(t *testing.T, document, file string) Objects {
+func mustDecodeObjects(t *testing.T, document string) Objects {
 	t.Helper()
-	return mustDecodeProject(t, pklOutput(`"objects":`+document), file).Objects
-}
-
-func TestAnObjectWithoutASourceIsFromTheEvaluatedManifest(t *testing.T) {
-	objects := mustDecodeObjects(t, `{"units":{
-		"captain":{"id":"h000","base":"hfoo","source":"objects/units.pkl","properties":{}},
-		"local":{"id":"h001","base":"hfoo","properties":{}},
-		"null":{"id":"h002","base":"hfoo","source":null}}}`, "moonwell.local.pkl")
-	if got := objects.Units.Keys(); !slices.Equal(got, []string{"captain", "local", "null"}) {
-		t.Fatalf("units = %q", got)
+	var objects Objects
+	if err := json.Unmarshal([]byte(document), &objects); err != nil {
+		t.Fatalf("the objects do not decode: %v", err)
 	}
-	for key, want := range map[string]string{
-		"captain": "objects/units.pkl", "local": "moonwell.local.pkl", "null": "moonwell.local.pkl",
-	} {
-		if object, _ := objects.Units.Get(key); object.Source != want {
-			t.Errorf("the source of %s = %q, want %q", key, object.Source, want)
-		}
-	}
+	return objects
 }
 
 func TestAnObjectsOwnKeysAreApartFromItsTypedProperties(t *testing.T) {
@@ -33,7 +21,7 @@ func TestAnObjectsOwnKeysAreApartFromItsTypedProperties(t *testing.T) {
 		"tooltipNormal":["a","b"],"id":"A000","name":"Bolt","base":"AHtb","levels":3,"hero":false,"inherited":null,
 		"source":"objects/a.pkl",
 		"properties":{"amountHealedOrDamaged":[200,400.5],"Htb1":[["x","y"],["z"]],"skipped":null,"name":"raw"},
-		"properties2":"typed too"}}}`, "moonwell.pkl")
+		"properties2":"typed too"}}}`)
 	bolt, ok := objects.Abilities.Get("bolt")
 	if !ok || bolt.ID != "A000" || bolt.Base != "AHtb" || bolt.Source != "objects/a.pkl" {
 		t.Fatalf("bolt = %+v, found %v", bolt, ok)
@@ -57,7 +45,7 @@ func TestAnObjectsOwnKeysAreApartFromItsTypedProperties(t *testing.T) {
 
 func TestObjectsAreReadByCategoryInTheOrderWritten(t *testing.T) {
 	var none Objects
-	if !none.IsEmpty() || !mustDecodeObjects(t, `{"heroes":{},"units":{},"upgrades":{}}`, "moonwell.pkl").IsEmpty() {
+	if !none.IsEmpty() || !mustDecodeObjects(t, `{"heroes":{},"units":{},"upgrades":{}}`).IsEmpty() {
 		t.Error("objects without an object are not empty")
 	}
 	objects := mustDecodeObjects(t, `{
@@ -67,7 +55,7 @@ func TestObjectsAreReadByCategoryInTheOrderWritten(t *testing.T) {
 		"items":{"i":{"id":"I000","base":"ratc"}},
 		"abilities":{"a":{"id":"A000","base":"AHtb"}},
 		"buffs":{"f":{"id":"B000","base":"BHtb"}},
-		"upgrades":{"r":{"id":"R000","base":"Rhme"}}}`, "moonwell.pkl")
+		"upgrades":{"r":{"id":"R000","base":"Rhme"}}}`)
 	want := map[Category][]string{
 		"heroes": {"h"}, "units": {"u2", "u1"}, "buildings": {"b"}, "items": {"i"}, "abilities": {"a"},
 		"buffs": {"f"}, "upgrades": {"r"},
@@ -84,7 +72,7 @@ func TestObjectsAreReadByCategoryInTheOrderWritten(t *testing.T) {
 		t.Errorf("Empty = %v, and a category that is none has %d objects", objects.IsEmpty(), objects.ByCategory("doodads").Len())
 	}
 	for _, category := range Categories {
-		one := mustDecodeObjects(t, `{"`+string(category)+`":{"x":{"id":"x000","base":"hfoo"}}}`, "moonwell.pkl")
+		one := mustDecodeObjects(t, `{"`+string(category)+`":{"x":{"id":"x000","base":"hfoo"}}}`)
 		if one.IsEmpty() || one.ByCategory(category).Len() != 1 {
 			t.Errorf("an object of %s alone: Empty = %v, Of has %d", category, one.IsEmpty(), one.ByCategory(category).Len())
 		}

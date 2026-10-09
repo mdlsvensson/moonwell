@@ -211,13 +211,13 @@ func TestARefusalThatNeedsTheMapNamesTheSetting(t *testing.T) {
 		document, words string
 	}{
 		{"a player the map lacks", source, `{"players":{"7":{"name":"P"}}}`,
-			`settings.players["7"]: player 7 does not exist in the source map.`},
+			`settings.players: player 7 does not exist in the source map.`},
 		{"a force the map lacks", source, `{"forces":{"1":{"name":"F"}}}`,
-			`settings.forces["1"]: force 1 does not exist in the source map.`},
+			`settings.forces: force 1 does not exist in the source map.`},
 		{"a force without custom forces", withoutFlags(t), `{"forces":{"0":{"name":"F"}}}`,
-			`settings.forces["0"]: force overrides require custom forces`},
+			`settings.forces: force 0 is set, and force overrides require custom forces`},
 		{"a force the map lacks, without custom forces", withoutFlags(t), `{"forces":{"1":{"name":"F"}}}`,
-			`settings.forces["1"]: force 1 does not exist`},
+			`settings.forces: force 1 does not exist`},
 		{"a fog that starts after its end", source, `{"environment":{"fog":{"start":6000}}}`,
 			"settings.environment.fog: start, end and density must be"},
 		{"a fog that ends before its start", source, `{"environment":{"fog":{"end":999}}}`,

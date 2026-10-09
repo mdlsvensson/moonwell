@@ -175,10 +175,15 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 		}
 	}
 	for _, file := range []string{
-		"moonwell.pkl", "src/main.yue", "maps/map.w3x/war3map.lua", ".gitignore", ".luarc.json",
+		"moonwell.toml", "src/main.yue", "maps/map.w3x/war3map.lua", ".gitignore", ".luarc.json",
 	} {
 		if !exists(target, file) {
 			t.Errorf("%s is missing", file)
+		}
+	}
+	for _, file := range []string{"moonwell.pkl", "moonwell.local.pkl", manifest.UserFile} {
+		if exists(target, file) {
+			t.Errorf("init wrote %s into the project", file)
 		}
 	}
 	if exists(target, "PklProject.deps.json") {
@@ -187,12 +192,14 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 	if got := readFile(t, target, "PklProject"); got != manifest.PklProjectText(moonwell.Version, "") {
 		t.Errorf("PklProject =\n%s", got)
 	}
-	if got := readFile(t, target, "moonwell.local.pkl"); got != manifest.LocalManifestText() {
-		t.Errorf("moonwell.local.pkl =\n%s", got)
+	const start, end = "Created my-map. Check launch.gameExecutable in ", ", then: cd my-map && moonwell build"
+	if len(lines) != 1 || !strings.HasPrefix(lines[0], start) || !strings.HasSuffix(lines[0], end) {
+		t.Fatalf("log = %q", lines)
 	}
-	want := "Created my-map. Check launch.gameExecutable in moonwell.local.pkl, then: cd my-map && moonwell build"
-	if !slices.Equal(lines, []string{want}) {
-		t.Errorf("log = %q", lines)
+	usersFile := strings.TrimSuffix(strings.TrimPrefix(lines[0], start), end)
+	if written, err := os.ReadFile(usersFile); err != nil || string(written) != manifest.UserFileText() ||
+		filepath.Base(usersFile) != manifest.UserFile {
+		t.Errorf("the user's file %s holds %q, %v, want the default game", usersFile, written, err)
 	}
 }
 
@@ -308,7 +315,7 @@ func TestLinkPathRefusesATargetOnAnotherDrive(t *testing.T) {
 func TestPklInitLinkedProjectLoads(t *testing.T) {
 	root := newProject(t, "my-map")
 	for _, name := range []string{
-		"moonwell.pkl", "moonwell.local.pkl", "src/main.yue", "maps/map.w3x/war3map.lua", "PklProject.deps.json",
+		"moonwell.toml", "src/main.yue", "maps/map.w3x/war3map.lua", "PklProject.deps.json",
 		".gitignore", ".gitattributes",
 	} {
 		if !exists(root, name) {
@@ -320,10 +327,12 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	if p.Map.Folder != "map.w3x" || p.Launch.GameExecutable == nil ||
-		*p.Launch.GameExecutable != manifest.DefaultGameExecutable ||
+	if p.Map.Folder != "map.w3x" || p.Launch.GameExecutable != nil ||
 		!slices.Equal(p.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) {
 		t.Fatalf("%+v", p)
+	}
+	if readFile(t, filepath.Dir(root), userFile) != manifest.UserFileText() {
+		t.Error("init made no user's file with the default game in the folder its world names")
 	}
 	for _, dir := range []string{"CommandButtons", "CommandButtonsDisabled", "PassiveButtons"} {
 		if !exists(root, "assets/ReplaceableTextures/"+dir) {
@@ -340,7 +349,7 @@ func TestPklInitRefusesNonemptyDirectory(t *testing.T) {
 	writeFile(t, root, "keep.txt", "keep")
 	mustFail(t, filepath.Dir(root), []string{"error: my-map is not empty.", "\nhint: Choose a new or empty directory."},
 		"init", "my-map")
-	if readFile(t, root, "keep.txt") != "keep" || !exists(root, "moonwell.pkl") {
+	if readFile(t, root, "keep.txt") != "keep" || !exists(root, "moonwell.toml") {
 		t.Fatal("a refused init changed the folder")
 	}
 }

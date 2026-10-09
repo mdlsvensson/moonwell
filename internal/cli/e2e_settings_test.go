@@ -14,18 +14,41 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/w3i"
 )
 
-const settingsBody = `settings {
- info { name = "Moonwell settings test"; description = "Built settings" }
- players { ["0"] { controller = "computer"; race = "orc"; fixedStart = false; x = 256 } }
- forces { ["0"] { allied = false; sharedVision = false; alliedVictory = true } }
- environment {
-  soundEnvironment = "Mountains"
-  waterColor = List(10, 20, 30, 255)
-  fog { enabled = true; start = 100; end = 1000.5 }
- }
- gameplay { heroMaxLevel = 25; foodLimit = 200 }
- gameInterface { ["CustomSkin"] { ["Test"] = "value" } }
-}`
+const settingsBody = `[settings.info]
+name = "Moonwell settings test"
+description = "Built settings"
+
+[[settings.players]]
+slot = 0
+controller = "computer"
+race = "orc"
+fixedStart = false
+x = 256
+
+[[settings.forces]]
+index = 0
+allied = false
+sharedVision = false
+alliedVictory = true
+
+[settings.environment]
+soundEnvironment = "Mountains"
+waterColor = [10, 20, 30, 255]
+
+[settings.environment.fog]
+enabled = true
+start = 100
+end = 1000.5
+
+[settings.gameplay]
+heroMaxLevel = 25
+foodLimit = 200
+
+[[settings.gameInterface]]
+section = "CustomSkin"
+key = "Test"
+value = "value"
+`
 
 func settingsProject(t *testing.T) string {
 	t.Helper()
@@ -98,7 +121,7 @@ func assertSettingsInfo(t *testing.T, data []byte) {
 
 func TestE2ESettingsArchiveOnlyRepeatably(t *testing.T) {
 	root := settingsProject(t)
-	writeLocalManifest(t, root, settingsBody)
+	setSettings(t, root, settingsBody)
 	testkit.WriteFile(t, root, "assets/Models/unit.mdx", []byte{1, 2, 3})
 	before := readSourceMap(t, root)
 	r := mustSucceed(t, root, "build")
@@ -132,7 +155,7 @@ func TestE2ESettingsArchiveOnlyRepeatably(t *testing.T) {
 func TestE2ESettingsPreservesSavedLetterCase(t *testing.T) {
 	root := settingsProject(t)
 	writeFile(t, root, "maps/map.w3x/war3mapskin.txt", "[CustomSkin]\nOld=1\n")
-	writeLocalManifest(t, root, `settings { gameInterface { ["CustomSkin"] { ["Test"] = "value" } } }`)
+	setSettings(t, root, "[[settings.gameInterface]]\nsection = \"CustomSkin\"\nkey = \"Test\"\nvalue = \"value\"\n")
 	mustSucceed(t, root, "build")
 	skin, _ := readArchiveFile(t, openBuiltArchive(t, root), "war3mapSkin.txt")
 	if string(skin) != "[CustomSkin]\nOld=1\nTest=value\n" {
@@ -149,26 +172,26 @@ func TestE2ESettingsPreservesSavedLetterCase(t *testing.T) {
 	}
 }
 
-func TestE2ESettingsBuildMissingMapNamesLocalManifest(t *testing.T) {
+func TestE2ESettingsBuildMissingMapNamesTheProjectsFile(t *testing.T) {
 	root := settingsProject(t)
-	writeLocalManifest(t, root, `map { folder = "missing.w3x" }`)
+	setSettings(t, root, "[map]\nfolder = \"missing.w3x\"\n")
 	mustFail(t, root, []string{
-		"error: moonwell.local.pkl " + mark + " Source map folder maps/missing.w3x not found.",
+		"error: moonwell.toml " + mark + " Source map folder maps/missing.w3x not found.",
 	}, "build")
 }
 
 func TestE2ESettingsFailureRemovesArchiveAndPlansAtomically(t *testing.T) {
 	root := settingsProject(t)
 	mustSucceed(t, root, "build")
-	writeLocalManifest(t, root, `settings { players { ["5"] { name = "Absent" } } }`)
+	setSettings(t, root, absentPlayer)
 	before := readSourceMap(t, root)
 	mustFail(t, root, []string{"error: maps/map.w3x/war3map.w3i " + mark +
-		` settings.players["5"]: player 5 does not exist in the source map.`}, "build")
+		" settings.players: player 5 does not exist in the source map."}, "build")
 	if exists(root, "dist/bin/map.w3x") {
 		t.Fatal("the archive of the build before is there after a build that failed")
 	}
 	checkSameFiles(t, before, readSourceMap(t, root), "absent player")
-	writeLocalManifest(t, root, `settings { info { name = "Refused" } }`)
+	setSettings(t, root, "[settings.info]\nname = \"Refused\"\n")
 	mustSucceed(t, root, "build")
 	staged := readStage(t, root)
 	removeMapNameCall(t, root)
@@ -189,32 +212,32 @@ func TestE2ESettingsFailureRemovesArchiveAndPlansAtomically(t *testing.T) {
 func TestE2ESettingsCheckWithoutStagingAndOptionalMap(t *testing.T) {
 	root := settingsProject(t)
 	replaceInFile(t, root, "maps/map.w3x/war3map.lua", "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), 0)")
-	writeLocalManifest(t, root, `settings { forces { ["0"] { allied = false } } }`)
+	setSettings(t, root, "[[settings.forces]]\nindex = 0\nallied = false\n")
 	before := readSourceMap(t, root)
 	mustFail(t, root, []string{"error: maps/map.w3x/war3map.lua " + mark + " ", "disagrees with force 0"}, "check")
 	if exists(root, "dist/stage/map.w3x") {
 		t.Fatal("a check staged the map")
 	}
 	checkSameFiles(t, before, readSourceMap(t, root), "check source")
-	writeLocalManifest(t, root,
-		`settings { gameplay { foodLimit = 200 } gameplayConstants { ["Misc"] { ["FoodCeiling"] = "1" } } }`)
+	setSettings(t, root, "[settings.gameplay]\nfoodLimit = 200\n\n"+
+		"[[settings.gameplayConstants]]\nsection = \"Misc\"\nkey = \"FoodCeiling\"\nvalue = \"1\"\n")
 	mustFail(t, root, []string{
-		"error: moonwell.local.pkl " + mark + " Conflicting typed and raw gameplay constant",
+		"error: moonwell.toml " + mark + " Conflicting typed and raw gameplay constant",
 	}, "check")
-	writeLocalManifest(t, root, `settings { info { name = "Checked" } }`)
+	setSettings(t, root, "[settings.info]\nname = \"Checked\"\n")
 	mustSucceed(t, root, "check")
 	if exists(root, "dist/stage/map.w3x") {
 		t.Fatal("a check staged the map")
 	}
 	checkSameFiles(t, before, readSourceMap(t, root), "valid check")
 
-	const noMap = "error: moonwell.local.pkl " + mark + " Source map folder maps/map.w3x not found."
-	writeLocalManifest(t, root, "")
+	const noMap = "error: moonwell.toml " + mark + " Source map folder maps/map.w3x not found."
+	setSettings(t, root, "")
 	removeFile(t, root, "objects")
 	writeFile(t, root, objects.IDsFile, noObjects)
 	removeFile(t, root, "maps/map.w3x")
 	mustFail(t, root, []string{noMap}, "check")
-	writeLocalManifest(t, root, `settings { info { name = "Needs a map" } }`)
+	setSettings(t, root, "[settings.info]\nname = \"Needs a map\"\n")
 	mustFail(t, root, []string{noMap}, "check")
 }
 
@@ -244,15 +267,15 @@ func TestE2ESettingsTestStagesAndMinifiedBuildOrders(t *testing.T) {
 func TestE2ESettingsDevWatchesPreviewAndManifest(t *testing.T) {
 	root := settingsProject(t)
 	testkit.WriteFile(t, root, "art/preview.tga", testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{}))
-	writeLocalManifest(t, root, `settings { info { preview = "art/preview.tga" } }`)
+	setSettings(t, root, "[settings.info]\npreview = \"art/preview.tga\"\n")
 	wait := startDev(t, root)
 	wait(", art/preview.tga and the project manifests.")
 	testkit.WriteFile(t, root, "art/preview.tga", make([]byte, 40))
 	wait("error: art/preview.tga " + mark +
 		" The preview picture is a TGA of image type 0, not a true-colour picture.")
-	writeLocalManifest(t, root, `settings { players { ["5"] { name = "Absent" } } }`)
+	setSettings(t, root, absentPlayer)
 	wait("error: maps/map.w3x/war3map.w3i " + mark +
-		` settings.players["5"]: player 5 does not exist in the source map.`)
+		" settings.players: player 5 does not exist in the source map.")
 }
 
 func TestE2ESettingsPreviewReplacesMinimapAndRestoresGame(t *testing.T) {
@@ -260,7 +283,7 @@ func TestE2ESettingsPreviewReplacesMinimapAndRestoresGame(t *testing.T) {
 	minimap := readFile(t, root, "maps/map.w3x/war3mapMap.blp")
 	packedRows := testkit.TGAOptions{RLE: true, FromTop: true}
 	testkit.WriteFile(t, root, "preview.tga", testkit.TGA(testkit.NewPixels(512), packedRows))
-	writeLocalManifest(t, root, `settings { info { name = "With a preview"; preview = "preview.tga" } }`)
+	setSettings(t, root, "[settings.info]\nname = \"With a preview\"\npreview = \"preview.tga\"\n")
 	before := readSourceMap(t, root)
 	r := mustSucceed(t, root, "build")
 	checkContains(t, r.output, "Applied map settings to 5 internal file(s).")

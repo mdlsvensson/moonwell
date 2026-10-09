@@ -1,3 +1,0 @@
-amends "../../Project.pkl"
-
-map { folder = "hero.w3x" }

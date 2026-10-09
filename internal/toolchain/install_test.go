@@ -200,7 +200,7 @@ func TestADownloadedProgramThatCannotBeStartedIsRefusedWithWhatElseToDo(t *testi
 		version string
 		hint    string
 	}{
-		{yueWorld, yue, "9.9.9", "Build or install yue yourself and set yue.path in moonwell.local.pkl."},
+		{yueWorld, yue, "9.9.9", "Build or install yue yourself and set yue.path in config.toml in your Moonwell folder."},
 		{pklWorld, Pkl, PklVersion,
 			"Install Pkl 0.32 or newer yourself: https://pkl-lang.org/main/current/pkl-cli/index.html#installation"},
 	}

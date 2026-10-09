@@ -10,11 +10,15 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/build"
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
-const createdLocal = "Created moonwell.local.pkl. Check that launch.gameExecutable points at your Warcraft III.exe."
+func createdUsersFile(root string) string {
+	return "Created " + filepath.Join(root, userDir, manifest.UserFile) +
+		". Check that launch.gameExecutable points at your Warcraft III.exe."
+}
 
 func compilerLine(compiler string) string {
 	return "YueScript " + toolchain.YueVersion + ": " + compiler
@@ -28,7 +32,7 @@ func isPathWarning(line, binDir string) bool {
 
 func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *testing.T) {
 	world, root := newFakeWorld(t), newProject(t, "my-map")
-	removeFile(t, root, "moonwell.local.pkl")
+	removeFile(t, root, userDir)
 	removeFile(t, root, "yueconfig.yue")
 	e, log := world.envAt(root)
 	if err := runSetup(background, e, commandArgs{}); err != nil {
@@ -36,7 +40,7 @@ func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *te
 	}
 	copied := filepath.Join(world.binDir(), filepath.Base(world.compiler))
 	lines := log.Lines()
-	if len(lines) != 5 || lines[0] != createdLocal || lines[1] != compilerLine(world.compiler) ||
+	if len(lines) != 5 || lines[0] != createdUsersFile(root) || lines[1] != compilerLine(world.compiler) ||
 		lines[2] != "Copied YueScript for the editor to "+copied+"." || !isPathWarning(lines[3], world.binDir()) ||
 		lines[4] != "Added yueconfig.yue for the editor." {
 		t.Errorf("the first setup logged %q", lines)
@@ -60,7 +64,7 @@ func TestSetupWithAYuePathCopiesNothingAndNamesItsFolderAsTheManifestWritesIt(t 
 	written := tools + "/kept/yue-of-mine"
 	testkit.WriteFile(t, tools, "kept/yue-of-mine", nil)
 	world, root := newFakeWorld(t, written), newProject(t, "my-map")
-	appendToFile(t, root, "moonwell.local.pkl", "\nyue { path = \""+written+"\" }\n")
+	writeFile(t, root, userFile, "[yue]\npath = \""+written+"\"\n")
 	e, log := world.envAt(root)
 	if err := runSetup(background, e, commandArgs{}); err != nil {
 		t.Fatal(diag.Format(err))
@@ -74,22 +78,21 @@ func TestSetupWithAYuePathCopiesNothingAndNamesItsFolderAsTheManifestWritesIt(t 
 	}
 }
 
-func TestSetupMakesTheLocalManifestBeforeItLooksForTheCompilerAndTheEditorsFilesAfter(t *testing.T) {
+func TestSetupLooksForTheCompilerBeforeItWritesAnEditorsFile(t *testing.T) {
 	root := newProject(t, "my-map")
 	gone := filepath.ToSlash(filepath.Join(t.TempDir(), "no-such-yue"))
-	appendToFile(t, root, "moonwell.pkl", "\nyue { path = \""+gone+"\" }\n")
-	removeFile(t, root, "moonwell.local.pkl")
+	writeFile(t, root, userFile, "[yue]\npath = \""+gone+"\"\n")
 	removeFile(t, root, "yueconfig.yue")
 	e, log, ran := newPklOnlyEnv(t, root)
 	diagErr := asDiagError(t, runSetup(background, e, commandArgs{}), "a compiler that is not there")
-	if !strings.Contains(diagErr.Msg, "yue.path does not exist") {
+	if !strings.Contains(diagErr.Msg, "yue.path does not exist") || diagErr.File != filepath.Join(root, userDir, manifest.UserFile) {
 		t.Errorf("error = %+v", diagErr)
 	}
-	if lines := log.Lines(); !slices.Equal(lines, []string{createdLocal}) {
+	if lines := log.Lines(); len(lines) != 0 {
 		t.Errorf("log = %q", lines)
 	}
-	if !exists(root, "moonwell.local.pkl") || exists(root, "yueconfig.yue") || exists(root, ".moonwell") {
-		t.Error("setup made no moonwell.local.pkl before the compiler, or an editor's file ahead of it")
+	if exists(root, "yueconfig.yue") || exists(root, ".moonwell/types") {
+		t.Error("setup wrote an editor's file ahead of the compiler")
 	}
 	notPkl := func(program string) bool { return program != "pkl" }
 	if programs := ran(); len(programs) == 0 || slices.ContainsFunc(programs, notPkl) {
@@ -104,7 +107,7 @@ func TestSetupWithoutItsSourceMapFailsAtTheDeclarations(t *testing.T) {
 	useLibrary(t, root, exampleLibrary(t))
 	e, log := world.envAt(root)
 	diagErr := asDiagError(t, runSetup(background, e, commandArgs{}), "a project without its source map")
-	if diagErr.File != "moonwell.local.pkl" || diagErr.Hint == "" ||
+	if diagErr.File != manifest.ProjectFile || diagErr.Hint == "" ||
 		!strings.Contains(diagErr.Msg, "Source map folder maps/map.w3x not found") {
 		t.Errorf("error = %+v", diagErr)
 	}

@@ -9,7 +9,7 @@ typealias Value = Boolean|Number|String|List<Boolean|Number|String|List<String>>
 /// The standard object this one copies, by its four-character id, such as `"hfoo"` (Footman).
 base: String(length == 4)
 
-/// The file this object is defined in, relative to `moonwell.pkl`. `Objects.merge` sets it; do not set it yourself.
+/// The file this object is defined in, relative to the project folder. `Objects.merge` sets it; do not set it yourself.
 source: String?
 
 /// Fields without a typed property, keyed by friendly name or by field rawcode, such as

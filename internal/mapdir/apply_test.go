@@ -247,7 +247,7 @@ func TestStageToRefusesAStageThatOverlapsTheSourceMap(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			project := t.TempDir()
 			dir := filepath.Join(project, "maps", "map.w3x")
-			testkit.WriteFile(t, project, "moonwell.pkl", []byte("manifest"))
+			testkit.WriteFile(t, project, "moonwell.toml", []byte("manifest"))
 			for name, content := range sourceMap {
 				testkit.WriteFile(t, dir, name, []byte(content))
 			}

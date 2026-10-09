@@ -20,7 +20,7 @@ var commands = []command{
 	{name: "init", usage: "init <dir> [--link]", help: "Create a project (--link: use this local Moonwell checkout)",
 		args: cobra.ExactArgs(1), flags: []flagSpec{linkFlag}, run: runInit},
 	{name: "setup", usage: "setup",
-		help: "Prepare a checkout: moonwell.local.pkl, Pkl, YueScript, libraries, the editor", run: runSetup},
+		help: "Prepare a checkout: your config.toml, Pkl, YueScript, libraries, the editor", run: runSetup},
 	{name: "build", usage: "build [--entry f] [--minify]", help: "Build <build.folder>/<map.folder>",
 		flags: buildFlags, run: runBuild},
 	{name: "test", usage: "test [--entry f] [--minify]", help: "Stage the map and launch Warcraft III",

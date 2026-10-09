@@ -1,399 +1,94 @@
 package manifest
 
 import (
-	"context"
-	"errors"
 	"path/filepath"
 	"reflect"
-	"slices"
-	"strings"
 	"testing"
 
 	moonwell "github.com/mdlsvensson/moonwell"
-	"github.com/mdlsvensson/moonwell/internal/diag"
-	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-var background = context.Background()
-
-func newEnv(t *testing.T, files map[string]string) *env.Env {
-	t.Helper()
-	root := t.TempDir()
-	for name, content := range files {
-		testkit.WriteFile(t, root, name, []byte(content))
-	}
-	e, _ := testkit.Env(t, root)
-	return e
-}
-
-type runCall struct{ line, dir string }
-
-func fakeRun(calls *[]runCall, results map[string]env.RunResult) env.RunFunc {
-	return func(_ context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
-		line := strings.Join(append([]string{program}, args...), " ")
-		*calls = append(*calls, runCall{line, options.Dir})
-		best, known := "", false
-		for prefix := range results {
-			if strings.HasPrefix(line, prefix) && len(prefix) >= len(best) {
-				best, known = prefix, true
-			}
-		}
-		if !known {
-			return env.RunResult{}, errors.New("unexpected command: " + line)
-		}
-		return results[best], nil
-	}
-}
-
-func TestLoadEvaluatesTheLocalManifestWhenThereIsOneWithTheProgramItIsGiven(t *testing.T) {
-	deps := depsJSON(moonwell.Version)
-	tests := []struct {
-		name  string
-		files map[string]string
-		want  string
-	}{
-		{"both manifests", map[string]string{"moonwell.pkl": "", "moonwell.local.pkl": "", "PklProject.deps.json": deps}, "moonwell.local.pkl"},
-		{"the shared manifest alone", map[string]string{"moonwell.pkl": "", "PklProject.deps.json": deps}, "moonwell.pkl"},
-		{"the local manifest alone", map[string]string{"moonwell.local.pkl": "", "PklProject.deps.json": deps}, "moonwell.local.pkl"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e := newEnv(t, tt.files)
-			var calls []runCall
-			line := "/cache/pkl/0.32.1/pkl eval --format json --project-dir . " + tt.want
-			e.Run = fakeRun(&calls, map[string]env.RunResult{line: {Stdout: pklOutput(), Stderr: "a warning"}})
-			p, err := Load(background, e, "/cache/pkl/0.32.1/pkl")
-			if err != nil {
-				t.Fatal(diag.Format(err))
-			}
-			if p.Map.Folder != "map.w3x" || p.ManifestName != tt.want || p.Root != e.Root {
-				t.Errorf("project = %+v", p)
-			}
-			if !slices.Equal(calls, []runCall{{line, e.Root}}) {
-				t.Errorf("ran %+v, want %q in the project folder", calls, line)
-			}
-		})
-	}
-}
-
-func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
-	deps := depsJSON(moonwell.Version)
-	project := map[string]string{"moonwell.pkl": "", "PklProject.deps.json": deps}
-	evaluation := func(result env.RunResult) map[string]env.RunResult {
-		return map[string]env.RunResult{"pkl eval": result}
-	}
-	tests := []struct {
-		name  string
-		files map[string]string
-		runs  map[string]env.RunResult
-		file  string
-		words []string
-		hint  string
-	}{
-		{"no manifest", map[string]string{"PklProject.deps.json": "{ not json"}, nil,
-			"<root>", []string{"No moonwell.pkl found"}, "moonwell init"},
-		{"no dependencies file", map[string]string{"moonwell.pkl": ""}, nil,
-			"PklProject", []string{"PklProject.deps.json is missing"}, "pkl project resolve"},
-		{"a dependencies file that is a folder", map[string]string{"moonwell.pkl": "", "PklProject.deps.json/x": ""}, nil,
-			"PklProject.deps.json", []string{"Reading PklProject.deps.json failed"}, "pkl project resolve"},
-		{"a dependencies file that is not JSON", map[string]string{"moonwell.pkl": "", "PklProject.deps.json": "{ not json"}, nil,
-			"PklProject.deps.json", []string{"not valid JSON"}, "pkl project resolve"},
-		{"a package that is not resolved", map[string]string{"moonwell.pkl": "", "PklProject.deps.json": "{}"}, nil,
-			"PklProject.deps.json", []string{"not a resolved dependency"}, "pkl project resolve"},
-		{"a package of another version", map[string]string{"moonwell.pkl": "", "PklProject.deps.json": depsJSON("0.1.0")}, nil,
-			"PklProject", []string{"moonwell@0.1.0", "does not match", moonwell.Version}, "pkl project resolve"},
-		{"an evaluation that fails", project,
-			evaluation(env.RunResult{ExitCode: 1, Stdout: "ignored", Stderr: "\n-- Pkl Error --\nType constraint violated\n"}),
-			"moonwell.pkl", []string{"Evaluating moonwell.pkl failed:\n-- Pkl Error --\nType constraint violated"}, ""},
-		{"an evaluation that fails and says so on the other stream", project,
-			evaluation(env.RunResult{ExitCode: 2, Stdout: "No such module\n"}),
-			"moonwell.pkl", []string{"Evaluating moonwell.pkl failed:\nNo such module"}, ""},
-		{"an evaluation that fails without a word", project, evaluation(env.RunResult{ExitCode: 3}),
-			"moonwell.pkl", []string{"Evaluating moonwell.pkl failed:"}, ""},
-		{"output that is not JSON", project, evaluation(env.RunResult{Stdout: "map { }\n"}),
-			"moonwell.pkl", []string{"not valid JSON:\nmap { }"}, "Pkl 0.32"},
-		{"no output", project, evaluation(env.RunResult{}),
-			"moonwell.pkl", []string{"not valid JSON"}, "Pkl 0.32"},
-		{"output that is not a project", project, evaluation(env.RunResult{Stdout: `{"map":[]}`}),
-			"moonwell.pkl", []string{"moonwell.pkl", "array", "map"}, "@moonwell/Project.pkl"},
-		{"output of a manifest that amends nothing", project, evaluation(env.RunResult{Stdout: "{}\n"}),
-			"moonwell.pkl", []string{"moonwell.pkl", "map.folder", "yue.version"}, "@moonwell/Project.pkl"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e := newEnv(t, tt.files)
-			var calls []runCall
-			if tt.runs != nil {
-				e.Run = fakeRun(&calls, tt.runs)
-			}
-			p, err := Load(background, e, "pkl")
-			diagErr := asDiagError(t, err, tt.name)
-			if file := strings.ReplaceAll(diagErr.File, e.Root, "<root>"); p != nil || file != tt.file {
-				t.Errorf("project = %v, File = %q, want %q", p, file, tt.file)
-			}
-			for _, word := range tt.words {
-				if !strings.Contains(diagErr.Msg, word) {
-					t.Errorf("the message %q lacks %q", diagErr.Msg, word)
-				}
-			}
-			if !strings.Contains(diagErr.Hint, tt.hint) || (tt.hint == "") != (diagErr.Hint == "") {
-				t.Errorf("hint = %q, want %q in it", diagErr.Hint, tt.hint)
-			}
-		})
-	}
-}
-
-func TestLoadShowsTheStartOfLongOutputThatIsNotJSON(t *testing.T) {
-	e := newEnv(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": depsJSON(moonwell.Version)})
-	var calls []runCall
-	e.Run = fakeRun(&calls, map[string]env.RunResult{"pkl eval": {Stdout: strings.Repeat("\xC3\xA9", 600)}})
-	_, err := Load(background, e, "pkl")
-	diagErr := asDiagError(t, err, "long output")
-	if shown := strings.Count(diagErr.Msg, "\xC3\xA9"); shown != 500 {
-		t.Errorf("the message shows %d characters of the output, want 500", shown)
-	}
-	if diagErr.Cause == nil {
-		t.Error("the error does not keep the decoder's reason as its cause")
-	}
-}
-
-func TestLoadPassesOnAProgramThatCannotBeStarted(t *testing.T) {
-	e := newEnv(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": depsJSON(moonwell.Version)})
-	failed := env.NewSpawnError("pkl", errors.New("no such program"), "", "")
-	e.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
-		return env.RunResult{}, failed
-	}
-	if p, err := Load(background, e, "pkl"); p != nil || err != error(failed) {
-		t.Errorf("Load = %v, %v, want the failure as Run gave it", p, err)
-	}
-}
-
-func newLinkedEnv(t *testing.T, files map[string]string) (*env.Env, string) {
-	t.Helper()
-	pkl := testkit.NeedPkl(t)
-	e := newEnv(t, files)
-	e.Run = env.Run
-	schema, err := filepath.Rel(e.Root, filepath.Join(testkit.RepoRoot(t), "schema"))
+func TestLoadTakesTheProjectFromItsFileAndTheMachineFromTheUsers(t *testing.T) {
+	e := newProjectEnv(t, "[build]\nminify = true\n\n[yue]\nversion = \"0.34.2\"\n")
+	testkit.WriteFile(t, e.ConfigDir, UserFile, []byte(
+		"[launch]\ngameExecutable = 'D:\\Games\\Warcraft III.exe'\nargs = [\"-launch\"]\n\n[yue]\npath = 'C:\\tools\\yue.exe'\n"))
+	project, err := Load(e)
 	if err != nil {
-		t.Fatalf("the temporary folder %s must be on the drive of the checkout: %v", e.Root, err)
+		t.Fatal(err)
 	}
-	testkit.WriteFile(t, e.Root, "PklProject", []byte(PklProjectText(moonwell.Version, filepath.ToSlash(schema))))
-	resolved, err := e.Run(background, pkl, []string{"project", "resolve"}, env.RunOptions{Dir: e.Root})
-	if err != nil || resolved.ExitCode != 0 {
-		t.Fatalf("pkl project resolve: %v\n%s", err, resolved.Stderr)
+	if !project.Build.Minify || project.ManifestName != "moonwell.toml" || project.Root != e.Root {
+		t.Errorf("project = %+v", project)
 	}
-	return e, pkl
+	if project.UserFile != filepath.Join(e.ConfigDir, "config.toml") {
+		t.Errorf("UserFile = %q", project.UserFile)
+	}
+	if derefOrNil(project.Launch.GameExecutable) != `D:\Games\Warcraft III.exe` || !reflect.DeepEqual(project.Launch.Args, []string{"-launch"}) {
+		t.Errorf("Launch = %+v", project.Launch)
+	}
+	if project.Yue.Version != "0.34.2" || derefOrNil(project.Yue.Path) != `C:\tools\yue.exe` {
+		t.Errorf("Yue = %+v: the version is the project's and the path the machine's", project.Yue)
+	}
 }
 
-func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
+func TestLoadWithoutAUsersFileStartsNoGameAndUsesTheDefaultArguments(t *testing.T) {
+	project, err := Load(newProjectEnv(t, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if project.Launch.GameExecutable != nil || len(project.Launch.Args) != 3 || project.Yue.Path != nil {
+		t.Errorf("Launch = %+v, Yue = %+v", project.Launch, project.Yue)
+	}
+}
+
+func TestLoadRefusesAProjectFirstAndThenTheUsersFileEachByItsOwnName(t *testing.T) {
+	e := newProjectEnv(t, "[build]\nfolder = \"\"\n")
+	testkit.WriteFile(t, e.ConfigDir, UserFile, []byte("[yue]\npath = \"\"\n"))
+	_, err := Load(e)
+	if diagErr := asDiagError(t, err, "a broken project file"); diagErr.File != "moonwell.toml" {
+		t.Errorf("got %q in %q, want the project's file first", diagErr.Msg, diagErr.File)
+	}
+	testkit.WriteFile(t, e.Root, ProjectFile, nil)
+	_, err = Load(e)
+	if diagErr := asDiagError(t, err, "a broken user's file"); diagErr.File != filepath.Join(e.ConfigDir, "config.toml") {
+		t.Errorf("got %q in %q, want the user's file", diagErr.Msg, diagErr.File)
+	}
+}
+
+func TestIsProjectAsksForMoonwellTomlAlone(t *testing.T) {
+	if IsProject(newEnv(t, map[string]string{"moonwell.pkl": "", "PklProject": ""}).Root) {
+		t.Error("a folder with a Pkl manifest of 0.11 counts as a project")
+	}
+	if !IsProject(newEnv(t, map[string]string{"moonwell.toml": ""}).Root) {
+		t.Error("a folder with moonwell.toml does not count as a project")
+	}
+}
+
+func TestTheTemplatesSettingsFileWritesTheDefaultsAndNothingElse(t *testing.T) {
 	template, err := moonwell.TemplateFiles()
 	if err != nil {
 		t.Fatal(err)
 	}
-	files := map[string]string{}
+	var written *Project
 	for _, file := range template {
-		if strings.HasSuffix(file.Path, ".pkl") {
-			files[file.Path] = string(file.Data)
+		if file.Path == ProjectFile {
+			written = mustReadProject(t, string(file.Data))
 		}
 	}
-	e, pkl := newLinkedEnv(t, files)
-	shared, err := Load(background, e, pkl)
-	if err != nil {
-		t.Fatal(diag.Format(err))
+	if written == nil {
+		t.Fatal("the template has no moonwell.toml")
 	}
-	if shared.ManifestName != "moonwell.pkl" || shared.Launch.GameExecutable != nil {
-		t.Errorf("File = %q, game = %q", shared.ManifestName, derefOrNil(shared.Launch.GameExecutable))
-	}
-	if created, err := EnsureLocalManifest(e.Root); err != nil || !created {
-		t.Fatalf("EnsureLocalManifest = %v, %v", created, err)
-	}
-	p, err := Load(background, e, pkl)
-	if err != nil {
-		t.Fatal(diag.Format(err))
-	}
-	if p.Root != e.Root || p.ManifestName != "moonwell.local.pkl" || derefOrNil(p.Launch.GameExecutable) != DefaultGameExecutable {
-		t.Errorf("Root = %q, File = %q, game = %q", p.Root, p.ManifestName, derefOrNil(p.Launch.GameExecutable))
-	}
-	if p.Map != (Map{Folder: "map.w3x", Entry: "src/main.yue"}) || p.Build != (Build{Folder: "dist/bin"}) ||
-		!slices.Equal(p.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) || p.Yue.Version == "" || p.Yue.Path != nil {
-		t.Errorf("map = %+v, build = %+v, launch = %q, yue = %+v", p.Map, p.Build, p.Launch.Args, p.Yue)
-	}
-	if p.Assets.Paths.Len() != 0 || p.Assets.Exclude == nil || len(p.Assets.Exclude) != 0 ||
-		p.Lint.UnknownGlobals != "error" || p.Lint.Globals == nil || p.Libraries == nil || len(p.Libraries) != 0 {
-		t.Errorf("assets = %+v, lint = %+v, libraries = %+v", p.Assets, p.Lint, p.Libraries)
-	}
-	if player, written := p.Settings.Players[0]; !written || player != (Player{}) || p.Settings.Info != (Info{}) {
-		t.Errorf("player 0 = %+v, written %v; info = %+v", player, written, p.Settings.Info)
-	}
-	captain, _ := p.Objects.Units.Get("captain")
-	typed := slices.Sorted(slices.Values(captain.Typed.Keys()))
-	if captain.ID != "h000" || captain.Base != "hfoo" || captain.Source != "objects/units.pkl" ||
-		!slices.Equal(typed, []string{"iconGameInterface", "modelFile", "name"}) {
-		t.Errorf("captain = %+v, with the typed properties %q", captain, typed)
-	}
-	if name, _ := captain.Typed.Get("name"); name != "Captain" || captain.Properties.Len() != 0 || p.Objects.Units.Len() != 1 {
-		t.Errorf("captain's name = %v, properties = %q, units = %q", name, captain.Properties.Keys(), p.Objects.Units.Keys())
+	bare := mustReadProject(t, "")
+	written.Root, bare.Root = "", ""
+	if !reflect.DeepEqual(settingsOf(written), settingsOf(bare)) {
+		t.Errorf("the template's file gives %+v, an empty file %+v: a test that writes its own file would not start from the template's settings",
+			settingsOf(written), settingsOf(bare))
 	}
 }
 
-const fullManifest = `amends "@moonwell/Project.pkl"
-
-map { folder = "hero.w3x"; entry = "src/game/init.yue" }
-build { folder = "out"; minify = true }
-launch { gameExecutable = "C:/Games/Warcraft III.exe"; args = List("-launch") }
-yue { version = "0.34.2"; path = "tools/yue" }
-assets {
-  paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# }
-  exclude = List("credits/")
-}
-lint { unknownGlobals = "warning"; globals = List("MyLibrary") }
-libraries {
-  ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.2.0"; dir = "src" }
-  ["mine"] { path = "../mine" }
-}
-settings {
-  info { name = ""; author = "A"; description = "D"; recommendedPlayers = "R"; preview = "preview.png" }
-  loadingScreen { background = 0; model = "M.mdx"; text = "T"; title = "Ti"; subtitle = "S" }
-  players {
-    ["0"] { name = "P"; controller = "user"; race = "human"; fixedStart = false; x = 0; y = -896.5 }
-  }
-  forces {
-    ["0"] {
-      name = "F"; allied = false; alliedVictory = false; sharedVision = false; sharedControl = false
-      sharedAdvancedControl = false
-    }
-  }
-  environment {
-    soundEnvironment = "Dungeon"
-    waterColor = List(0, 0, 0, 0)
-    fog { enabled = false; style = 0; start = 0; end = 0; density = 0; color = List(0, 0, 0, 0) }
-  }
-  gameplay { heroMaxLevel = 20; foodLimit = 0 }
-  gameplayConstants { ["Misc"] { ["DefenseArmor"] = "0.05" } }
-  gameInterface { ["FrameDef"] { ["UPKEEP_NONE"] = "No Upkeep" } }
-}
-objects {
-  heroes { ["paladin"] { id = "H000"; base = "Hpal"; name = "Paladin"; properties { ["raw"] = 1 } } }
-  units { ["captain"] { id = "h000"; base = "hfoo"; name = "Captain"; properties { ["raw"] = true } } }
-  buildings { ["tower"] { id = "h001"; base = "hwtw"; name = "Tower"; properties { ["raw"] = "x" } } }
-  items { ["sword"] { id = "I000"; base = "ratc"; name = "Sword"; properties { ["raw"] = List(1, 2) } } }
-  abilities { ["bolt"] { id = "A000"; base = "AHtb"; name = "Bolt"; properties { ["raw"] = List(List("a")) } } }
-  buffs { ["stun"] { id = "B000"; base = "BHtb"; tooltip = "Stunned"; properties { ["raw"] = 0.5 } } }
-  upgrades { ["armor"] { id = "R000"; base = "Rhar"; name = List("One", "Two"); properties { ["raw"] = "y" } } }
-}
-`
-
-func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T) {
-	e, pkl := newLinkedEnv(t, map[string]string{"moonwell.pkl": fullManifest})
-	p, err := Load(background, e, pkl)
-	if err != nil {
-		t.Fatal(diag.Format(err))
-	}
-	for _, path := range unsetFields(p) {
-		t.Errorf("%s is not set: the schema and its field in this package have different names, or the manifest of "+
-			"this test does not set it", path)
-	}
-	if target, _ := p.Assets.Paths.Get("icons/BTNSword.blp"); target != `ReplaceableTextures\CommandButtons\BTNSword.blp` {
-		t.Errorf("the asset path = %q", target)
-	}
-	player, force, fog := p.Settings.Players[0], p.Settings.Forces[0], p.Settings.Environment.Fog
-	if *player.Y != -896.5 || *player.X != 0 || *player.FixedStart || *force.Allied || *fog.Enabled || *fog.Density != 0 {
-		t.Errorf("player = %+v, force = %+v, fog = %+v", player, force, fog)
-	}
-	if len(p.Libraries) != 2 || derefOrNil(p.Libraries["mine"].Path) != "../mine" ||
-		derefOrNil(p.Libraries["example"].Tag) != "v0.2.0" {
-		t.Errorf("libraries = %+v", p.Libraries)
-	}
-	properties := map[Category]struct {
-		key        string
-		typed, raw any
-	}{
-		"heroes":    {"paladin", "Paladin", 1.0},
-		"units":     {"captain", "Captain", true},
-		"buildings": {"tower", "Tower", "x"},
-		"items":     {"sword", "Sword", []any{1.0, 2.0}},
-		"abilities": {"bolt", "Bolt", []any{[]any{"a"}}},
-		"buffs":     {"stun", "Stunned", 0.5},
-		"upgrades":  {"armor", []any{"One", "Two"}, "y"},
-	}
-	for _, category := range Categories {
-		objects, want := p.Objects.ByCategory(category), properties[category]
-		object, found := objects.Get(want.key)
-		if objects.Len() != 1 || !found || object.Source != "moonwell.pkl" || object.Typed.Len() != 1 || object.Properties.Len() != 1 {
-			t.Errorf("%s: %d objects; %s = %+v, found %v", category, objects.Len(), want.key, object, found)
-			continue
-		}
-		typed, _ := object.Typed.Get(object.Typed.Keys()[0])
-		if raw, _ := object.Properties.Get("raw"); !reflect.DeepEqual(raw, want.raw) || !reflect.DeepEqual(typed, want.typed) {
-			t.Errorf("%s: the typed property = %#v, want %#v; raw = %#v, want %#v", category, typed, want.typed, raw, want.raw)
-		}
-	}
-}
-
-func unsetFields(value any) []string {
-	set := map[string]bool{}
-	var paths []string
-	note := func(path string, isSet bool) {
-		if _, known := set[path]; !known {
-			paths = append(paths, path)
-		}
-		set[path] = set[path] || isSet
-	}
-	var walk func(path string, v reflect.Value)
-	walk = func(path string, v reflect.Value) {
-		switch v.Kind() {
-		case reflect.Struct:
-			for i := range v.NumField() {
-				walk(path+"."+v.Type().Field(i).Name, v.Field(i))
-			}
-		case reflect.Map:
-			note(path, v.Len() > 0)
-			for _, key := range v.MapKeys() {
-				walk(path+"[]", v.MapIndex(key))
-			}
-		case reflect.Slice:
-			note(path, v.Len() > 0)
-			for i := range v.Len() {
-				walk(path+"[]", v.Index(i))
-			}
-		case reflect.Pointer, reflect.Interface:
-			note(path, !v.IsNil())
-		default:
-			note(path, !v.IsZero())
-		}
-	}
-	walk("Project", reflect.Indirect(reflect.ValueOf(value)))
-	return slices.DeleteFunc(paths, func(path string) bool { return set[path] })
-}
-
-func TestUnsetNamesAFieldThatNoValueOfItsKindSets(t *testing.T) {
-	bare := unsetFields(mustDecodeProject(t, pklOutput(), "moonwell.pkl"))
-	for _, path := range []string{
-		"Project.Build.Minify", "Project.Launch.GameExecutable", "Project.Yue.Path", "Project.Assets.Exclude",
-		"Project.Lint.Globals", "Project.Libraries", "Project.Settings.Info.Name", "Project.Settings.Players",
-		"Project.Settings.Environment.WaterColor", "Project.Settings.Environment.Fog.Enabled",
-		"Project.Settings.Gameplay.FoodLimit", "Project.Objects.Upgrades.keys",
-	} {
-		if !slices.Contains(bare, path) {
-			t.Errorf("a manifest that sets little: %s is not named in %q", path, bare)
-		}
-	}
-	for _, path := range []string{"Project.Root", "Project.File", "Project.Map.Folder", "Project.Launch.Args", "Project.Yue.Version"} {
-		if slices.Contains(bare, path) {
-			t.Errorf("a manifest that sets little: %s is named, and it is set", path)
-		}
-	}
-	kinds := func(libraries string) []string {
-		return unsetFields(mustDecodeProject(t, pklOutput(`"libraries":`+libraries, `"settings":{"info":{"name":""}}`), "moonwell.pkl"))
-	}
-	one := kinds(`{"mine":{"path":"../mine","dir":""}}`)
-	if !slices.Contains(one, "Project.Libraries[].GitHub") || !slices.Contains(one, "Project.Libraries[].Dir") ||
-		slices.Contains(one, "Project.Libraries[].Path") || slices.Contains(one, "Project.Settings.Info.Name") {
-		t.Errorf("a library of one kind, and an empty name: %q", one)
-	}
-	both := kinds(`{"mine":{"path":"../mine","dir":""},"example":{"github":"a/b","tag":"v1","dir":"src"}}`)
-	if slices.ContainsFunc(both, func(path string) bool { return strings.HasPrefix(path, "Project.Libraries") }) {
-		t.Errorf("a library of each kind: %q", both)
+func settingsOf(project *Project) []any {
+	return []any{
+		project.Map, project.Build, project.Yue, project.Lint.UnknownGlobals, len(project.Lint.Globals),
+		project.Assets.Paths.Len(), len(project.Assets.Exclude), len(project.Libraries), project.Settings,
 	}
 }

@@ -127,7 +127,7 @@ func (c *collector) blameAssetsBlock(err error) error {
 	return err
 }
 
-const blockHint = "Fix the assets block in moonwell.pkl."
+const blockHint = "Fix assets in moonwell.toml."
 
 func errNoSuchFile(manifestName, source string) error {
 	return &diag.Error{

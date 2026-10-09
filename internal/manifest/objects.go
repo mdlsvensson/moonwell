@@ -34,14 +34,12 @@ func (o Objects) IsEmpty() bool {
 	return true
 }
 
-func (o *Objects) setSources(file string) {
+func (o *Objects) MapSources(rewrite func(source string) string) {
 	for _, category := range Categories {
 		objects := o.pointerTo(category)
 		for key, object := range objects.All() {
-			if object.Source == "" {
-				object.Source = file
-				objects.Set(key, object)
-			}
+			object.Source = rewrite(object.Source)
+			objects.Set(key, object)
 		}
 	}
 }

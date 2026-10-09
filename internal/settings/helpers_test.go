@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"encoding/json"
 	"errors"
 	"testing"
 
@@ -8,17 +9,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-const manifestName = "moonwell.local.pkl"
-
-const plainBlocks = `"map":{"folder":"map.w3x","entry":"src/main.yue"},"build":{"folder":"dist/bin","minify":false},` +
-	`"launch":{"args":[]},"yue":{"version":"0.34.3"},"assets":{"paths":{},"exclude":[]},` +
-	`"lint":{"unknownGlobals":"error","globals":[]},"libraries":{},"objects":{}`
+const manifestName = manifest.ProjectFile
 
 func mustDecodeProject(t testing.TB, root, document string) *manifest.Project {
 	t.Helper()
-	project, err := manifest.DecodeProject(root, manifestName, []byte("{"+plainBlocks+`,"settings":`+document+"}"))
-	if err != nil {
-		t.Fatalf("settings %s: %v", document, diag.Format(err))
+	project := &manifest.Project{Root: root, ManifestName: manifestName}
+	if err := json.Unmarshal([]byte(document), &project.Settings); err != nil {
+		t.Fatalf("settings %s: %v", document, err)
 	}
 	return project
 }

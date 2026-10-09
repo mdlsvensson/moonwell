@@ -17,13 +17,13 @@ left: no stage, no archive
 refused: ""
 left: no stage, no archive
 == output-is-a-folder
-refused: moonwell.local.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == no-source-map
-refused: moonwell.local.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == no-source-map-and-no-objects
-refused: moonwell.local.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == no-map-info
 refused: maps/map.w3x
@@ -32,16 +32,16 @@ left: a stage of 18 file(s), no archive
 refused: dist/.lock
 left: no stage, no archive
 == mapped-asset-missing
-refused: moonwell.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == mapped-asset-excluded
-refused: moonwell.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == two-libraries-one-path
-refused: moonwell.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == typed-against-raw-constant
-refused: moonwell.local.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == syntax-error
 refused: src/main.yue
@@ -53,13 +53,13 @@ left: no stage, no archive
 refused: lua/main.lua
 left: no stage, no archive
 == missing-library
-refused: moonwell.local.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == library-keys-in-two-cases
-refused: moonwell.local.pkl
+refused: moonwell.toml
 left: no stage, no archive
 == yue-path-to-nothing
-refused: moonwell.local.pkl
+refused: <root>/.home/config.toml
 left: no stage, no archive
 == object-id-taken
 refused: objects/units.pkl
@@ -77,10 +77,10 @@ left: no stage, no archive
 refused: preview.tga
 left: no stage, no archive
 == preview-under-assets
-refused: moonwell.local.pkl
+refused: moonwell.toml
 left: no stage, no archive
-== manifest-pkl-refuses
-refused: moonwell.local.pkl
+== settings-refused
+refused: moonwell.toml
 left: no stage, no archive
 == not-a-project
 refused: <root>

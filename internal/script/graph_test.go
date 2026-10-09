@@ -139,7 +139,7 @@ func TestReachedReportsAMissingModuleWhereItIsRequired(t *testing.T) {
 func TestTheHintOfAMissingModuleNamesEveryFileFormItIsLookedForIn(t *testing.T) {
 	_, err := reachableModules("main", fakeLoader("main", `require("game.units")`))
 	want := "Expected src/game/units.yue, lua/game/units.lua, lua/game/units/init.lua or a module of a library in " +
-		"moonwell.pkl. Built-in modules: moonwell."
+		"moonwell.toml. Built-in modules: moonwell."
 	if diagErr := asDiagError(t, err, "a missing module"); diagErr.Hint != want {
 		t.Errorf("hint = %q", diagErr.Hint)
 	}

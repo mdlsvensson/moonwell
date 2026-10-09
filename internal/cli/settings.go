@@ -12,7 +12,7 @@ import (
 )
 
 func runSettingsCheck(ctx context.Context, e *env.Env, _ commandArgs) error {
-	project, err := build.Load(ctx, e)
+	project, err := build.LoadSettings(ctx, e)
 	if err != nil {
 		return err
 	}

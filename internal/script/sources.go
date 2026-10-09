@@ -224,7 +224,7 @@ func EntryName(entry string) (string, error) {
 	return strings.ReplaceAll(modulePath, "/", "."), nil
 }
 
-const narrowDir = "narrow the library's `dir` in moonwell.pkl so it leaves this file out."
+const narrowDir = "narrow the library's `dir` in moonwell.toml so it leaves this file out."
 
 func errNoSrc(root string) error {
 	return &diag.Error{Msg: "The src/ folder is missing.", File: root}

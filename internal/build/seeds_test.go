@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
@@ -45,7 +46,7 @@ var faults = []seedProject{
 			"amends \"@moonwell/ObjectFile.pkl\"\n\nunits { [\"captain\"] { id = \"h000\"; base = \"zzzz\" } }\n")
 	}},
 	{name: "refused-setting", write: func(t *testing.T, root string) {
-		appendLocalManifest(t, root, `settings { players { ["5"] { name = "Absent" } } }`)
+		setSettings(t, root, absentPlayer)
 	}},
 	{name: "unknown-global", write: func(t *testing.T, root string) {
 		appendToFile(t, root, "src/main.yue", "\nCreatUnit Player(0), objects.units.captain, 0, 0, 0\n")
@@ -80,11 +81,11 @@ var faults = []seedProject{
 	}},
 
 	{name: "mapped-asset-missing", write: func(t *testing.T, root string) {
-		appendLocalManifest(t, root, `assets { paths { ["missing.blp"] = "x.blp" } }`)
+		setSettings(t, root, missingAsset)
 	}},
 	{name: "mapped-asset-excluded", write: func(t *testing.T, root string) {
 		writeFile(t, root, "assets/a.blp", "an asset")
-		appendLocalManifest(t, root, `assets { paths { ["a.blp"] = "x.blp" } exclude = List("a.blp") }`)
+		setSettings(t, root, "[assets]\nexclude = [\"a.blp\"]\n\n[[assets.paths]]\nfile = \"a.blp\"\npath = \"x.blp\"\n")
 	}},
 	{name: "two-libraries-one-path", write: func(t *testing.T, root string) {
 		for _, key := range []string{"one", "two"} {
@@ -92,30 +93,30 @@ var faults = []seedProject{
 			writeFile(t, root, "libs/"+key+"/src/"+key+"/m.lua", "return 1\n")
 			writeFile(t, root, "libs/"+key+"/assets/Textures/Same.blp", key)
 		}
-		appendLocalManifest(t, root, `libraries { ["one"] { path = "libs/one" } ["two"] { path = "libs/two" } }`)
+		setSettings(t, root, localLibrary("one", "libs/one")+"\n"+localLibrary("two", "libs/two"))
 	}},
 	{name: "typed-against-raw-constant", write: func(t *testing.T, root string) {
-		appendLocalManifest(t, root,
-			`settings { gameplay { foodLimit = 200 } gameplayConstants { ["Misc"] { ["FoodCeiling"] = "1" } } }`)
+		setSettings(t, root, "[settings.gameplay]\nfoodLimit = 200\n\n"+
+			"[[settings.gameplayConstants]]\nsection = \"Misc\"\nkey = \"FoodCeiling\"\nvalue = \"1\"\n")
 	}},
 	{name: "syntax-error", write: func(t *testing.T, root string) {
 		writeFile(t, root, "src/main.yue", "import \"moonwell\" as mw\nx = \n  if then\n")
 	}},
 	{name: "entry-not-there", write: func(t *testing.T, root string) {
-		appendLocalManifest(t, root, `map { entry = "src/nope.yue" }`)
+		setSettings(t, root, "[map]\nentry = \"src/nope.yue\"\n")
 	}},
 	{name: "module-twice", write: func(t *testing.T, root string) {
 		writeFile(t, root, "lua/main.lua", "return {}\n")
 	}},
 	{name: "missing-library", write: func(t *testing.T, root string) {
-		appendLocalManifest(t, root, `libraries { ["kit"] { path = "libs/kit" } }`)
+		setSettings(t, root, localLibrary("kit", "libs/kit"))
 	}},
 	{name: "library-keys-in-two-cases", write: func(t *testing.T, root string) {
 		writeFile(t, root, "libs/one/one/m.lua", "return 1\n")
-		appendLocalManifest(t, root, `libraries { ["Kit"] { path = "libs/one" } ["kit"] { path = "libs/one" } }`)
+		setSettings(t, root, localLibrary("Kit", "libs/one")+"\n"+localLibrary("kit", "libs/one"))
 	}},
 	{name: "yue-path-to-nothing", write: func(t *testing.T, root string) {
-		appendLocalManifest(t, root, `yue { path = "tools/no-such-yue" }`)
+		writeFile(t, root, seedUserFile, "[yue]\npath = \"tools/no-such-yue\"\n")
 	}},
 	{name: "object-id-taken", write: func(t *testing.T, root string) {
 		for _, file := range []string{"war3map.w3u", "war3mapSkin.w3u"} {
@@ -135,27 +136,25 @@ var faults = []seedProject{
 	}},
 	{name: "settings-without-map-info", write: func(t *testing.T, root string) {
 		removeFile(t, root, "maps/map.w3x/war3map.w3i")
-		appendLocalManifest(t, root, `settings { info { name = "Needs the info" } }`)
+		setSettings(t, root, "[settings.info]\nname = \"Needs the info\"\n")
 	}},
 	{name: "refused-picture", write: func(t *testing.T, root string) {
 		testkit.WriteFile(t, root, "preview.tga", make([]byte, 40))
-		appendLocalManifest(t, root, `settings { info { preview = "preview.tga" } }`)
+		setSettings(t, root, "[settings.info]\npreview = \"preview.tga\"\n")
 	}},
 	{name: "preview-under-assets", write: func(t *testing.T, root string) {
 		testkit.WriteFile(t, root, "assets/preview.tga", packedTGA)
-		appendLocalManifest(t, root, `settings { info { preview = "assets/preview.tga" } }`)
+		setSettings(t, root, "[settings.info]\npreview = \"assets/preview.tga\"\n")
 	}},
-	{name: "manifest-pkl-refuses", write: func(t *testing.T, root string) {
-		appendLocalManifest(t, root, `build { folder = "maps" }`)
+	{name: "settings-refused", write: func(t *testing.T, root string) {
+		setSettings(t, root, "[build]\nfolder = \"maps\"\n")
 	}},
 	{name: "not-a-project", write: func(t *testing.T, root string) {
-		removeFile(t, root, "moonwell.pkl")
-		removeFile(t, root, "moonwell.local.pkl")
+		removeFile(t, root, manifest.ProjectFile)
 	}},
 
 	{name: "refused-setting-and-mapped-asset-missing", write: func(t *testing.T, root string) {
-		appendLocalManifest(t, root, `settings { players { ["5"] { name = "Absent" } } }
-assets { paths { ["missing.blp"] = "x.blp" } }`)
+		setSettings(t, root, absentPlayer+"\n"+missingAsset)
 	}},
 	{name: "map-info-too-short", write: func(t *testing.T, root string) {
 		writeFile(t, root, "maps/map.w3x/war3map.w3i", "ab")
@@ -169,47 +168,73 @@ assets { paths { ["missing.blp"] = "x.blp" } }`)
 	}},
 }
 
-const everySetting = `settings {
-  info {
-    name = "Seed settings"
-    author = "The seed"
-    description = "Every setting is set"
-    recommendedPlayers = "2-4"
-  }
-  loadingScreen {
-    background = -1
-    model = #"war3mapImported\Loading.mdx"#
-    text = "Loading text"
-    title = "Loading title"
-    subtitle = "Loading subtitle"
-  }
-  gameplay { heroMaxLevel = 25; foodLimit = 200 }
-  gameplayConstants { ["Misc"] { ["DefenseArmor"] = "0.05" } }
-  gameInterface { ["CustomSkin"] { ["Test"] = "value" } ["FrameDef"] { ["GOLD"] = "Coins" } }
-  players {
-    ["0"] { name = "Seed"; controller = "computer"; race = "orc"; fixedStart = false; x = 256; y = -512.5 }
-  }
-  forces {
-    ["0"] {
-      name = "First force"
-      allied = false
-      alliedVictory = true
-      sharedVision = false
-      sharedControl = true
-      sharedAdvancedControl = true
-    }
-  }
-  environment {
-    soundEnvironment = "Mountains"
-    waterColor = List(10, 20, 30, 255)
-    fog { enabled = true; style = 1; start = 100; end = 1000.5; density = 0.25; color = List(1, 2, 3, 4) }
-  }
-}`
+const everySetting = `[settings.info]
+name = "Seed settings"
+author = "The seed"
+description = "Every setting is set"
+recommendedPlayers = "2-4"
+
+[settings.loadingScreen]
+background = -1
+model = 'war3mapImported\Loading.mdx'
+text = "Loading text"
+title = "Loading title"
+subtitle = "Loading subtitle"
+
+[settings.gameplay]
+heroMaxLevel = 25
+foodLimit = 200
+
+[[settings.gameplayConstants]]
+section = "Misc"
+key = "DefenseArmor"
+value = "0.05"
+
+[[settings.gameInterface]]
+section = "CustomSkin"
+key = "Test"
+value = "value"
+
+[[settings.gameInterface]]
+section = "FrameDef"
+key = "GOLD"
+value = "Coins"
+
+[[settings.players]]
+slot = 0
+name = "Seed"
+controller = "computer"
+race = "orc"
+fixedStart = false
+x = 256
+y = -512.5
+
+[[settings.forces]]
+index = 0
+name = "First force"
+allied = false
+alliedVictory = true
+sharedVision = false
+sharedControl = true
+sharedAdvancedControl = true
+
+[settings.environment]
+soundEnvironment = "Mountains"
+waterColor = [10, 20, 30, 255]
+
+[settings.environment.fog]
+enabled = true
+style = 1
+start = 100
+end = 1000.5
+density = 0.25
+color = [1, 2, 3, 4]
+`
 
 func writeSettings(t *testing.T, root string) {
 	settingsMap(t, root)
 	writeFile(t, root, "maps/map.w3x/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
-	appendLocalManifest(t, root, everySetting)
+	setSettings(t, root, everySetting)
 }
 
 func settingsMap(t *testing.T, root string) {
@@ -312,11 +337,7 @@ func writeAssets(t *testing.T, root string) {
 	writeFile(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
 	writeFile(t, root, "libs/golems/assets/war3mapImported/golems/frames.toc", "toc from the library")
 	writeFile(t, root, "libs/golems/assets/Textures/Golem.blp", "texture from the library")
-	appendLocalManifest(t, root, `assets {
-  paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# }
-  exclude = List("notes/")
-}
-libraries { ["golems"] { path = "libs/golems" } }`)
+	setSettings(t, root, "[assets]\nexclude = [\"notes/\"]\n\n"+swordIcon+"\n"+localLibrary("golems", "libs/golems"))
 	appendToFile(t, root, "src/main.yue", "\nimport \"golems.names\"\nprint names.first\n")
 }
 
@@ -326,7 +347,7 @@ func writePreview(name string, picture []byte) func(t *testing.T, root string) {
 	return func(t *testing.T, root string) {
 		settingsMap(t, root)
 		testkit.WriteFile(t, root, name, picture)
-		appendLocalManifest(t, root, `settings { info { name = "With a preview"; preview = "`+name+`" } }`)
+		setSettings(t, root, "[settings.info]\nname = \"With a preview\"\npreview = \""+name+"\"\n")
 	}
 }
 
@@ -341,8 +362,8 @@ func writeModules(t *testing.T, root string) {
 	writeFile(t, root, library+"loud.yue", "import \"example.greet\"\n\nexport shout = (name) -> greet.hello(name)\\upper!\n")
 	writeFile(t, root, library+"loud.lua", "return { shout = function() return \"stale\" end }\n")
 	writeFile(t, root, library+"globals.lua", "function ExampleAdd(a, b)\n return a + b\nend\n")
-	appendLocalManifest(t, root, `libraries { ["ex"] { path = "libs/example"; dir = "src" } }
-lint { unknownGlobals = "warning"; globals = List("MyLibrary") }`)
+	setSettings(t, root, "[lint]\nunknownGlobals = \"warning\"\nglobals = [\"MyLibrary\"]\n\n"+
+		"[[libraries]]\nname = \"ex\"\npath = \"libs/example\"\ndir = \"src\"\n")
 	appendToFile(t, root, "src/main.yue", "\nimport \"tools\"\nimport \"state\"\nimport \"game.rules\" as rules\n"+
 		"require \"counter\"\nimport \"example.loud\"\nrequire \"example.globals\"\nCountUp!\n"+
 		"print tools.greet(\"Moonwell\"), Round, rules.limit, Count\nprint loud.shout \"Moonwell\"\n"+
@@ -361,7 +382,7 @@ func writeEverything(t *testing.T, root string) {
 	if !strings.Contains(everySetting, lastOfInfo) {
 		t.Fatalf("the settings have no line %s to put the preview after", lastOfInfo)
 	}
-	withPreview := strings.Replace(everySetting, lastOfInfo, lastOfInfo+"\n    preview = \"preview.png\"", 1)
+	withPreview := strings.Replace(everySetting, lastOfInfo, lastOfInfo+"\npreview = \"preview.png\"", 1)
 
 	writeFile(t, root, "assets/Models/unit.mdx", "\x00\x01\x02\xfa\xff")
 	writeFile(t, root, "assets/icons/BTNSword.blp", "an icon")
@@ -374,9 +395,7 @@ func writeEverything(t *testing.T, root string) {
 	writeFile(t, root, "libs/golems/assets/Textures/Golem.blp", "texture from the library")
 	writeFile(t, root, "lua/tools/init.lua", greeterWith("greet"))
 	writeFile(t, root, "lua/counter.lua", "Count = 0\nfunction CountUp()\n Count = Count + 1\nend\n")
-	appendLocalManifest(t, root, withPreview+`
-assets { paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# } }
-libraries { ["golems"] { path = "libs/golems" } }`)
+	setSettings(t, root, withPreview+"\n"+swordIcon+"\n"+localLibrary("golems", "libs/golems"))
 	appendToFile(t, root, "src/main.yue", "\nimport \"tools\"\nrequire \"counter\"\nimport \"golems.loud\"\nCountUp!\n"+
 		"print tools.greet(loud.first!), Count, objects.heroes.paladin\n"+usesTheMapsScript)
 }
@@ -400,9 +419,21 @@ func writeFile(t *testing.T, root, name, text string) {
 	testkit.WriteFile(t, root, name, []byte(text))
 }
 
-func appendLocalManifest(t *testing.T, root, body string) {
+const (
+	seedUserDir  = ".home"
+	seedUserFile = seedUserDir + "/" + manifest.UserFile
+	absentPlayer = "[[settings.players]]\nslot = 5\nname = \"Absent\"\n"
+	missingAsset = "[[assets.paths]]\nfile = \"missing.blp\"\npath = \"x.blp\"\n"
+	swordIcon    = "[[assets.paths]]\nfile = \"icons/BTNSword.blp\"\npath = 'ReplaceableTextures\\CommandButtons\\BTNSword.blp'\n"
+)
+
+func localLibrary(name, path string) string {
+	return "[[libraries]]\nname = \"" + name + "\"\npath = \"" + path + "\"\n"
+}
+
+func setSettings(t *testing.T, root, settings string) {
 	t.Helper()
-	writeFile(t, root, "moonwell.local.pkl", "amends \"moonwell.pkl\"\n\n"+body+"\n")
+	writeFile(t, root, manifest.ProjectFile, settings)
 }
 
 func appendToFile(t *testing.T, root, name, more string) {

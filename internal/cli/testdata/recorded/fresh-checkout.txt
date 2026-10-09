@@ -2,7 +2,7 @@
 exit code: 0
 printed: nothing
 terminal:
-  Created moonwell.local.pkl. Check that launch.gameExecutable points at your Warcraft III.exe.
+  Created <root>\.home\config.toml. Check that launch.gameExecutable points at your Warcraft III.exe.
   YueScript 0.34.3: <reason>
   Copied YueScript for the editor to <reason>.
   Added yueconfig.yue for the editor.
@@ -13,10 +13,12 @@ the cache has a bin folder: true
 left:
   .gitignore:
     "dist/\n"
-    "moonwell.local.pkl\n"
     ".pkl-lsp/\n"
     ".moonwell/\n"
     "src/**/*.lua\n"
+  .home/config.toml:
+    "[launch]\n"
+    "gameExecutable = 'C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe'\n"
   .luarc.json:
     "{\n"
     "  \"runtime.version\": \"Lua 5.3\",\n"
@@ -37,6 +39,7 @@ left:
     "    \".moonwell/libraries\"\n"
     "  ]\n"
     "}\n"
+  .moonwell/objects.pkl: sha256 200af79d36f7342fcdddbddd23452ee473ae4f01ea0f0a8e10e93efec32257a5, 97 bytes
   .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
   .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
   .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
@@ -45,15 +48,6 @@ left:
   .vscode/extensions.json:
     "{\n"
     "  \"recommendations\": [\"LiJin.yuescript\", \"sumneko.lua\"]\n"
-    "}\n"
-  moonwell.local.pkl:
-    "// Settings for this machine only. Git-ignored, so each checkout has its own; `moonwell setup` recreates it.\n"
-    "// It amends moonwell.pkl, so anything set here overrides the shared manifest.\n"
-    "\n"
-    "amends \"moonwell.pkl\"\n"
-    "\n"
-    "launch {\n"
-    "  gameExecutable = \"C:\\\\Program Files (x86)\\\\Warcraft III\\\\_retail_\\\\x86_64\\\\Warcraft III.exe\"  // your Warcraft III.exe\n"
     "}\n"
   yueconfig.yue:
     "-- Read by VS Code's YueScript extension (LiJin.yuescript). Moonwell builds from src/ on its own; these settings only\n"

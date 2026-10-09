@@ -24,12 +24,39 @@ const (
 	scriptName = "war3map.lua"
 )
 
+type PklFinder func(ctx context.Context, e *env.Env) (string, error)
+
 func Load(ctx context.Context, e *env.Env) (*manifest.Project, error) {
-	pkl, err := toolchain.FindPkl(ctx, e)
+	return LoadWith(ctx, e, toolchain.FindPkl)
+}
+
+func LoadSettings(ctx context.Context, e *env.Env) (*manifest.Project, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	return manifest.Load(e)
+}
+
+func LoadWith(ctx context.Context, e *env.Env, findPkl PklFinder) (*manifest.Project, error) {
+	project, err := LoadSettings(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	return manifest.Load(ctx, e, pkl)
+	hasObjects, err := manifest.HasObjectFiles(e.Root)
+	if err != nil {
+		return nil, err
+	}
+	if !hasObjects {
+		return project, nil
+	}
+	pkl, err := findPkl(ctx, e)
+	if err != nil {
+		return nil, err
+	}
+	if project.Objects, err = manifest.EvaluateObjects(ctx, e, pkl); err != nil {
+		return nil, err
+	}
+	return project, nil
 }
 
 func OpenSource(project *manifest.Project) (*mapdir.Folder, error) {
@@ -87,7 +114,7 @@ func CollectAssets(project *manifest.Project, synced []library.Synced) (collecte
 	if err != nil {
 		return nil, nil, err
 	}
-	return assets.Collect(project.Root, project.Assets, manifest.SharedManifest, libraries)
+	return assets.Collect(project.Root, project.Assets, manifest.ProjectFile, libraries)
 }
 
 func librariesWithAssets(root string, synced []library.Synced) ([]assets.Library, error) {

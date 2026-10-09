@@ -144,7 +144,7 @@ func TestTemplateFilesAreTheProjectInitCopies(t *testing.T) {
 		"maps/map.w3x/war3map.wts",
 		"maps/map.w3x/war3mapMap.blp",
 		"maps/map.w3x/war3mapUnits.doo",
-		"moonwell.pkl",
+		"moonwell.toml",
 		"objects/units.pkl",
 		"src/generated/objects.yue",
 		"src/main.yue",

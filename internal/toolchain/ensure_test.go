@@ -62,7 +62,7 @@ func TestEnsureListsKnownVersionsForAnUnknownOne(t *testing.T) {
 	e, _, fetches, tool := newYueEnv(t, "")
 	_, err := Ensure(background, e, tool, "1.0.0")
 	diagErr := asDiagError(t, err, "an unknown version")
-	if diagErr.Msg != "Unknown YueScript version 1.0.0. Known versions: 9.9.9." || diagErr.File != "moonwell.pkl" ||
+	if diagErr.Msg != "Unknown YueScript version 1.0.0. Known versions: 9.9.9." || diagErr.File != "moonwell.toml" ||
 		!strings.HasPrefix(diagErr.Hint, "Use a known version, or ") || *fetches != 0 {
 		t.Errorf("error = %+v, %d downloads", diagErr, *fetches)
 	}
@@ -85,7 +85,7 @@ func TestEnsureAsksForYuePathOnUnsupportedPlatforms(t *testing.T) {
 	_, err := Ensure(background, e, tool, "9.9.9")
 	diagErr := asDiagError(t, err, "no platform")
 	if !strings.HasPrefix(diagErr.Msg, "Moonwell cannot download YueScript for this platform (") ||
-		diagErr.Hint != "Build or install yue yourself and set yue.path in moonwell.local.pkl." || *fetches != 0 {
+		diagErr.Hint != "Build or install yue yourself and set yue.path in config.toml in your Moonwell folder." || *fetches != 0 {
 		t.Errorf("error = %+v, %d downloads", diagErr, *fetches)
 	}
 }
@@ -213,7 +213,7 @@ func TestReportedVersionPassesOnAProgramThatCannotBeStartedOrIsInterrupted(t *te
 
 func TestTheRefusalsOfBothToolsAreWordedAlike(t *testing.T) {
 	const page = "https://pkl-lang.org/main/current/pkl-cli/index.html#installation"
-	yueElse := "build or install yue yourself and set yue.path in moonwell.local.pkl."
+	yueElse := "build or install yue yourself and set yue.path in config.toml in your Moonwell folder."
 	pklElse := "install Pkl 0.32 or newer yourself: " + page
 	tests := []struct {
 		name    string
@@ -227,7 +227,7 @@ func TestTheRefusalsOfBothToolsAreWordedAlike(t *testing.T) {
 			"Unknown Pkl version 1.0.0. Known versions: 0.32.1.", "Use a known version, or " + pklElse},
 		{"no compiler for the platform", errNoDownload(YueScript),
 			"Moonwell cannot download YueScript for this platform (" + platformName() + ").",
-			"Build or install yue yourself and set yue.path in moonwell.local.pkl."},
+			"Build or install yue yourself and set yue.path in config.toml in your Moonwell folder."},
 		{"no Pkl for the platform", errNoDownload(Pkl),
 			"Moonwell cannot download Pkl for this platform (" + platformName() + ").",
 			"Install Pkl 0.32 or newer yourself: " + page},

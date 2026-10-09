@@ -26,7 +26,19 @@ func TestMain(m *testing.M) {
 		sendInterrupt()
 		os.Exit(0)
 	}
-	os.Exit(m.Run())
+	os.Exit(runWithoutTheUsersOwnFolder(m))
+}
+
+func runWithoutTheUsersOwnFolder(m *testing.M) int {
+	home, err := os.MkdirTemp("", "moonwell-home-")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(home)
+	if err := os.Setenv("MOONWELL_HOME", home); err != nil {
+		panic(err)
+	}
+	return m.Run()
 }
 
 func buildProgram(t *testing.T) string {

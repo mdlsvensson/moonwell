@@ -9,40 +9,40 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-func launch(e *env.Env, config manifest.Launch, mapPath string) error {
+func launch(e *env.Env, config manifest.Launch, userFile, mapPath string) error {
 	if config.GameExecutable == nil {
-		return errNoGame()
+		return errNoGame(userFile)
 	}
 	executable := *config.GameExecutable
 	info, err := os.Stat(executable)
 	switch {
 	case err != nil:
-		return errGameNotFound(executable)
+		return errGameNotFound(executable, userFile)
 	case !info.Mode().IsRegular():
-		return errGameNotAFile(executable)
+		return errGameNotAFile(executable, userFile)
 	}
 	args := append(slices.Clone(config.Args), "-loadfile", mapPath)
 	if err := e.Spawn(executable, args); err != nil {
-		return env.NewSpawnError(executable, err, fixGame, manifest.LocalManifest)
+		return env.NewSpawnError(executable, err, fixGame, userFile)
 	}
 	return nil
 }
 
-const fixGame = "Fix launch.gameExecutable in " + manifest.LocalManifest + " to point at Warcraft III.exe."
+const fixGame = "Fix launch.gameExecutable in that file to point at Warcraft III.exe."
 
-func errNoGame() error {
+func errNoGame(userFile string) error {
 	return &diag.Error{
 		Msg:  "launch.gameExecutable is not set.",
-		File: manifest.LocalManifest,
-		Hint: "Run `moonwell setup` to create " + manifest.LocalManifest + ", then set launch.gameExecutable there to " +
+		File: userFile,
+		Hint: "Run `moonwell setup` to create that file if it is missing, then set launch.gameExecutable there to " +
 			"your Warcraft III.exe.",
 	}
 }
 
-func errGameNotFound(executable string) error {
-	return &diag.Error{Msg: "Game executable not found: " + executable, File: manifest.LocalManifest, Hint: fixGame}
+func errGameNotFound(executable, userFile string) error {
+	return &diag.Error{Msg: "Game executable not found: " + executable, File: userFile, Hint: fixGame}
 }
 
-func errGameNotAFile(executable string) error {
-	return &diag.Error{Msg: "Game executable " + executable + " is not a file.", File: manifest.LocalManifest, Hint: fixGame}
+func errGameNotAFile(executable, userFile string) error {
+	return &diag.Error{Msg: "Game executable " + executable + " is not a file.", File: userFile, Hint: fixGame}
 }

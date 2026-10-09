@@ -124,7 +124,7 @@ func Test(ctx context.Context, e *env.Env, options Options) error {
 	if err != nil {
 		return err
 	}
-	if err := launch(e, project.Launch, staged.fullPath); err != nil {
+	if err := launch(e, project.Launch, project.UserFile, staged.fullPath); err != nil {
 		return err
 	}
 	e.Log.Info("Launched Warcraft III with " + staged.displayPath + ".")
@@ -132,15 +132,11 @@ func Test(ctx context.Context, e *env.Env, options Options) error {
 }
 
 func Check(ctx context.Context, e *env.Env) (*Result, error) {
-	pkl, err := toolchain.FindPkl(ctx, e)
-	if err != nil {
-		return nil, err
-	}
-	return runCheck(ctx, e, pkl, false)
+	return runCheck(ctx, e, toolchain.FindPkl, false)
 }
 
-func runCheck(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, error) {
-	project, err := manifest.Load(ctx, e, pkl)
+func runCheck(ctx context.Context, e *env.Env, findPkl PklFinder, refresh bool) (*Result, error) {
+	project, err := LoadWith(ctx, e, findPkl)
 	if err != nil {
 		return nil, err
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/assets"
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
@@ -146,7 +147,7 @@ func TestTheAssetsPathsLineReportsOnTheFileItIsGiven(t *testing.T) {
 	}
 }
 
-func TestPklLibraryAssetsPaths(t *testing.T) {
+func TestLibraryAssetsPaths(t *testing.T) {
 	root, _ := newProjectWithAssetLibrary(t)
 	testkit.WriteFile(t, root, "assets/Models/Own.mdx",
 		testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(`textures\golem.BLP`, 0))))
@@ -163,13 +164,13 @@ func TestPklLibraryAssetsPaths(t *testing.T) {
 	if err != nil || !slices.Equal(lines, want) {
 		t.Fatalf("assets:paths = %v; log =\n%s", err, strings.Join(lines, "\n"))
 	}
-	checkOnlyPklRan(t, ran)
+	checkNoProgramRan(t, ran)
 	if !exists(root, ".moonwell/library-assets/golems/Models/Golem.mdx") || exists(root, "dist/.lock") {
 		t.Error("assets:paths did not sync the library, or left the build lock behind")
 	}
 }
 
-func TestPklAssetsPathsClassifiesAllReferences(t *testing.T) {
+func TestAssetsPathsClassifiesAllReferences(t *testing.T) {
 	root := newProject(t, "my-map")
 	textures := testkit.Concat(testkit.Texture(`Textures\Knight.blp`, 0), testkit.Texture(`Textures\Cape.blp`, 0),
 		testkit.Texture(`Textures\Missing.blp`, 0), testkit.Texture("", 1))
@@ -180,7 +181,7 @@ func TestPklAssetsPathsClassifiesAllReferences(t *testing.T) {
 	testkit.WriteFile(t, root, "assets/art/cape.blp", []byte{2})
 	testkit.WriteFile(t, root, "assets/Models/Glow.mdx", testkit.MDX())
 	writeFile(t, root, "assets/Models/Only.mdl", "Version {\n FormatVersion 800,\n}\n")
-	replaceInFile(t, root, "moonwell.pkl", "paths {}", `paths { ["art/cape.blp"] = #"Textures\Cape.blp"# }`)
+	appendToFile(t, root, manifest.ProjectFile, "\n[[assets.paths]]\nfile = \"art/cape.blp\"\npath = 'Textures\\Cape.blp'\n")
 	const gameList = "# test\ntextures/knight.dds\ntextures/missing.blp\n"
 
 	e, log, _ := newPklOnlyEnv(t, root)
@@ -209,7 +210,7 @@ func TestPklAssetsPathsClassifiesAllReferences(t *testing.T) {
 	}
 }
 
-func TestPklAssetsPathsReportsReadableModelsBeforeFailure(t *testing.T) {
+func TestAssetsPathsReportsReadableModelsBeforeFailure(t *testing.T) {
 	root := newProject(t, "my-map")
 	writeFile(t, root, "assets/Models/A.mdl", "Model {\n}\nBroken {\n")
 	testkit.WriteFile(t, root, "assets/Models/B.mdx",
@@ -254,7 +255,7 @@ func TestAReportWithModelsThatCouldNotBeReadFailsAndNamesEach(t *testing.T) {
 	}
 }
 
-func TestPklAssetsPathsOfAProjectWithoutModels(t *testing.T) {
+func TestAssetsPathsOfAProjectWithoutModels(t *testing.T) {
 	root := newProject(t, "my-map")
 	writeFile(t, root, "assets/icons/a.blp", "icon")
 	e, log, _ := newPklOnlyEnv(t, root)
@@ -266,7 +267,7 @@ func TestPklAssetsPathsOfAProjectWithoutModels(t *testing.T) {
 	}
 }
 
-func TestPklAssetsPathsOfAFileInAProjectThatImportsNothing(t *testing.T) {
+func TestAssetsPathsOfAFileInAProjectThatImportsNothing(t *testing.T) {
 	root := newProject(t, "my-map")
 	testkit.WriteFile(t, root, "drafts/knight.mdx", knightModel())
 	e, log, _ := newPklOnlyEnv(t, root)
@@ -283,7 +284,7 @@ func TestPklAssetsPathsOfAFileInAProjectThatImportsNothing(t *testing.T) {
 	}
 }
 
-func TestPklAssetsPathsIsRefusedBesideARunningBuild(t *testing.T) {
+func TestAssetsPathsIsRefusedBesideARunningBuild(t *testing.T) {
 	root, _ := newProjectWithAssetLibrary(t)
 	testkit.WriteFile(t, root, "knight.mdx", knightModel())
 	holdBuildLock(t, root)

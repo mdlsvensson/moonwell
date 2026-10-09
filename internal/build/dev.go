@@ -27,8 +27,9 @@ func Dev(ctx context.Context, e *env.Env, timing WatchTiming) error {
 	projectSet := projectWatchSet(e.Root)
 	watcher := newWatcher(projectSet.roots)
 	checkCtx := context.WithoutCancel(ctx)
-	pkl := runCheckCycle(checkCtx, e, "")
-	manifestSet := manifestWatchSet(e.Root, loadInitialManifest(checkCtx, e, pkl))
+	findPkl := rememberPkl(toolchain.FindPkl)
+	runCheckCycle(checkCtx, e, findPkl)
+	manifestSet := manifestWatchSet(e.Root, loadInitialSettings(e))
 	watcher.add(manifestSet.roots...)
 	e.Log.Info(projectSet.merge(manifestSet).describe())
 
@@ -41,33 +42,35 @@ func Dev(ctx context.Context, e *env.Env, timing WatchTiming) error {
 		case <-ticker.C:
 			changed := watcher.poll()
 			if ctx.Err() == nil && pending.isDue(changed, time.Now(), timing.Debounce) {
-				pkl = runCheckCycle(checkCtx, e, pkl)
+				runCheckCycle(checkCtx, e, findPkl)
 			}
 		}
 	}
 	return nil
 }
 
-func runCheckCycle(ctx context.Context, e *env.Env, pkl string) (pklProgram string) {
-	if pkl == "" {
-		program, err := toolchain.FindPkl(ctx, e)
-		if err != nil {
-			e.Log.Error(diag.Format(err))
-			return ""
+func rememberPkl(findPkl PklFinder) PklFinder {
+	found := ""
+	return func(ctx context.Context, e *env.Env) (string, error) {
+		if found != "" {
+			return found, nil
 		}
-		pkl = program
+		program, err := findPkl(ctx, e)
+		if err == nil {
+			found = program
+		}
+		return program, err
 	}
-	if _, err := runCheck(ctx, e, pkl, true); err != nil {
-		e.Log.Error(diag.Format(err))
-	}
-	return pkl
 }
 
-func loadInitialManifest(ctx context.Context, e *env.Env, pkl string) *manifest.Project {
-	if pkl == "" {
-		return nil
+func runCheckCycle(ctx context.Context, e *env.Env, findPkl PklFinder) {
+	if _, err := runCheck(ctx, e, findPkl, true); err != nil {
+		e.Log.Error(diag.Format(err))
 	}
-	project, err := manifest.Load(ctx, e, pkl)
+}
+
+func loadInitialSettings(e *env.Env) *manifest.Project {
+	project, err := manifest.Load(e)
 	if err != nil {
 		return nil
 	}

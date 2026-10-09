@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/mdlsvensson/moonwell/internal/env"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
@@ -27,7 +28,7 @@ func TestCompilerUsesYuePathAndWarnsOnAVersionMismatch(t *testing.T) {
 	gone := filepath.Join(t.TempDir(), "yue")
 	_, err = FindCompiler(background, e, "9.9.9", &gone)
 	if diagErr := asDiagError(t, err, "a missing yue.path"); diagErr.Msg != "yue.path does not exist: "+gone ||
-		diagErr.File != "moonwell.local.pkl" || !strings.Contains(diagErr.Hint, "yue.path") {
+		diagErr.File != manifest.UserFilePath(e) || !strings.Contains(diagErr.Hint, "yue.path") {
 		t.Errorf("error = %+v", diagErr)
 	}
 }
@@ -67,7 +68,7 @@ func TestCompilerPassesOnAYuePathThatCannotBeStartedOrIsInterrupted(t *testing.T
 	e.Run = runNotFound
 	_, err := FindCompiler(background, e, "9.9.9", &local)
 	if diagErr := asDiagError(t, err, "a yue.path that is no program"); !strings.Contains(diagErr.Msg, "Cannot run '"+local+"'") ||
-		diagErr.File != "moonwell.local.pkl" || !strings.Contains(diagErr.Hint, "yue.path") || diagErr.Cause == nil {
+		diagErr.File != manifest.UserFilePath(e) || !strings.Contains(diagErr.Hint, "yue.path") || diagErr.Cause == nil {
 		t.Errorf("error = %+v", diagErr)
 	}
 	e.Run = runInterrupted

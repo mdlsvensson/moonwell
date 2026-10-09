@@ -3,11 +3,12 @@ exit code: 0
 printed: nothing
 terminal:
   warning: src/main.yue:15:1 › Unknown global CreatUnit.
-  hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.
+  hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.toml.
   Added 1 custom object(s) to 2 file(s).
   Packing archive...
   Built dist/bin/map.w3x (2 module(s)).
 left:
+  .moonwell/objects.pkl: sha256 200af79d36f7342fcdddbddd23452ee473ae4f01ea0f0a8e10e93efec32257a5, 97 bytes
   .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
   .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
   .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes
@@ -38,9 +39,10 @@ exit code: 0
 printed: nothing
 terminal:
   warning: src/main.yue:15:1 › Unknown global CreatUnit.
-  hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.
+  hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.toml.
   Check passed: 2 module(s) reachable from main, 0 asset(s).
 left:
+  .moonwell/objects.pkl: sha256 200af79d36f7342fcdddbddd23452ee473ae4f01ea0f0a8e10e93efec32257a5, 97 bytes
   .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
   .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
   .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes

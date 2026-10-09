@@ -20,7 +20,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/imp"
 )
 
-const manifestName = "moonwell.local.pkl"
+const manifestName = "moonwell.toml"
 
 const noBlock = `{"paths":{},"exclude":[]}`
 

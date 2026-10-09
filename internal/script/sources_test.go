@@ -221,7 +221,7 @@ func TestADottedOrBuiltInNameInALibrarySuggestsNarrowingTheLibrarysDir(t *testin
 	} {
 		diagErr := mustFailCollect(t, mainOnly.withLibraries("ex").withFiles(path, ""), path)
 		if !strings.Contains(diagErr.Msg, message) || diagErr.File != path || strings.Contains(diagErr.Hint, "rename") ||
-			!strings.Contains(diagErr.Hint, "narrow the library's `dir` in moonwell.pkl") {
+			!strings.Contains(diagErr.Hint, "narrow the library's `dir` in moonwell.toml") {
 			t.Errorf("%s: %+v", path, diagErr)
 		}
 	}
@@ -251,7 +251,7 @@ func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 	_, err := library.readSource("kit/\xff.lua")
 	diagErr := asDiagError(t, err, "a library's file")
 	if !strings.Contains(diagErr.Msg, "must be valid UTF-8") || diagErr.File != librariesDir+"/ex/kit/\xff.lua" ||
-		strings.Contains(diagErr.Hint, "rename") || !strings.Contains(diagErr.Hint, "narrow the library's `dir` in moonwell.pkl") {
+		strings.Contains(diagErr.Hint, "rename") || !strings.Contains(diagErr.Hint, "narrow the library's `dir` in moonwell.toml") {
 		t.Errorf("a library's file: %+v", diagErr)
 	}
 	_, err = src.readSource("a.b\xff.yue")

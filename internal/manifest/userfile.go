@@ -15,6 +15,8 @@ import (
 
 const UserFile = "config.toml"
 
+const DefaultGameExecutable = `C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe`
+
 var defaultLaunchArgs = []string{"-launch", "-windowmode", "windowed"}
 
 var userDefaults = map[string]any{
@@ -104,6 +106,11 @@ func EnsureUserFile(e *env.Env) (created bool, err error) {
 		return false, errUserFileNotWritten(fullPath, err)
 	}
 	return true, nil
+}
+
+func pathExists(path string) bool {
+	info, err := fsx.Lstat(path)
+	return err == nil && info != nil
 }
 
 func errUserFileNotWritten(fullPath string, cause error) error {

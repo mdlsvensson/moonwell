@@ -53,7 +53,7 @@ var YueScript = Tool{
 	},
 	VersionArgs:       []string{"-v"},
 	VersionPattern:    regexp.MustCompile(`Yuescript version: ([^` + fsx.ASCIISpace + `]+)`),
-	ManualInstallHint: "build or install yue yourself and set yue.path in moonwell.local.pkl.",
+	ManualInstallHint: "build or install yue yourself and set yue.path in config.toml in your Moonwell folder.",
 }
 
 var Pkl = Tool{

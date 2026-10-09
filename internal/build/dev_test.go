@@ -18,6 +18,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/objects"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
+	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
 const smallPassed = "Check passed: 1 module(s) reachable from main, 0 asset(s)."
@@ -132,10 +133,10 @@ func TestACheckIsDueOnceTheFilesHaveStayedUnchangedForTheDebounce(t *testing.T) 
 	}
 }
 
-const previewed = `"settings":{"info":{"preview":"art/preview.tga"},"loadingScreen":{},"gameplayConstants":{},` +
-	`"gameInterface":{},"players":{"0":{}},"forces":{},"environment":{"fog":{}},"gameplay":{}}`
+const previewed = "[settings.info]\npreview = \"art/preview.tga\"\n"
 
-const threeLocals = `"libraries":{"kit":{"path":"libs/kit"},"own":{"path":"."},"gone":{"path":"libs/gone"}}`
+const threeLocals = "[[libraries]]\nname = \"kit\"\npath = \"libs/kit\"\n\n[[libraries]]\nname = \"own\"\npath = \".\"\n\n" +
+	"[[libraries]]\nname = \"gone\"\npath = \"libs/gone\"\n"
 
 func (s *fakeProject) makeWatchedDirs() {
 	s.t.Helper()
@@ -167,8 +168,8 @@ func TestAProjectIsWatchedForItsSourcesItsManifestsItsLocalLibrariesAndItsPrevie
 		{"src/game/units.yue", true},
 		{"src/notes.txt", false},
 		{"src/generated/objects.yue", false},
-		{"moonwell.pkl", true},
-		{"moonwell.local.pkl", true},
+		{"moonwell.toml", true},
+		{"moonwell.pkl", false},
 		{"PklProject", true},
 		{"PklProject.deps.json", true},
 		{"README.md", false},
@@ -237,9 +238,7 @@ func TestWhatACheckWritesIsNoChange(t *testing.T) {
 	s.makeWatchedDirs()
 	w := newWatcher(manifestWatchSetOf(s.root, s.project).roots)
 	for range 2 {
-		if pkl := runCheckCycle(background, s.env, ""); pkl != "pkl" {
-			t.Fatalf("the cycle found the Pkl program %q; it logged %q", pkl, s.log.Lines())
-		}
+		runCheckCycle(background, s.env, toolchain.FindPkl)
 		if w.poll() {
 			t.Error("what the check wrote is a change")
 		}
@@ -310,8 +309,8 @@ func TestDevWatchesAssetsObjectsAndLuaWhenTheyExist(t *testing.T) {
 		stopped, stop := context.WithCancel(background)
 		stop()
 		err := Dev(stopped, e, DefaultWatchTiming)
-		if want := []string{"error: no Pkl in this test", line}; err != nil || !slices.Equal(log.Lines(), want) {
-			t.Errorf("Dev = %v; it logged %q, want %q", err, log.Lines(), want)
+		if lines := log.Lines(); err != nil || len(lines) != 2 || lines[1] != line {
+			t.Errorf("Dev = %v; it logged %q, want the refusal of a folder without settings and then %q", err, lines, line)
 		}
 	}
 }
@@ -442,7 +441,7 @@ func TestASaveDuringTheFirstCheckIsCheckedAfterIt(t *testing.T) {
 				}
 				d := newDevRun(s, DefaultWatchTiming).start(t)
 				lines := s.log.Lines()
-				if len(lines) != 2 || lines[1] != watchingLine("src/") || !fsx.Exists(s.fullPath(objects.IDsFile)) {
+				if len(lines) != 2 || lines[1] != watchingLine("src/", "objects/") || !fsx.Exists(s.fullPath(objects.IDsFile)) {
 					t.Fatalf("Dev logged %q, want a check, with its ids module, and what it watches", lines)
 				}
 				d.waitForPolls(1)
@@ -591,26 +590,18 @@ func TestACheckThatIsUnderWayEndsBeforeDevReturns(t *testing.T) {
 func TestAManifestThatDoesNotLoadIsReportedAndWatchedOn(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		s := newFakeProject(t)
-		broken := func(args []string, options env.RunOptions) (env.RunResult, error) {
-			if len(args) > 0 && args[0] == "eval" {
-				return env.RunResult{ExitCode: 1, Stderr: "Cannot find property `mapp`.\n"}, nil
-			}
-			return s.fakePkl(args, options)
-		}
 		refused := func(line string) bool {
-			return strings.HasPrefix(line, "error: "+manifestName) && strings.Contains(line, "Cannot find property")
+			return strings.HasPrefix(line, "error: "+manifestName) && strings.Contains(line, "not valid TOML")
 		}
-		s.setProgram("pkl", broken)
+		s.writeFile(manifestName, "[build\n")
 		d := newDevRun(s, DefaultWatchTiming).start(t)
 		lines := s.log.Lines()
 		if len(lines) != 2 || !refused(lines[0]) || lines[1] != watchingLine("src/") {
 			t.Fatalf("Dev logged %q, want the manifest's failure and what it watches", lines)
 		}
-		s.setProgram("pkl", s.fakePkl)
-		s.writeFile(manifestName, "// put right\n")
+		s.writeFile(manifestName, "[build]\nminify = false\n")
 		d.waitForPolls(2)
-		s.setProgram("pkl", broken)
-		s.writeFile(manifestName, "// broken once more\n")
+		s.writeFile(manifestName, "[build\nbroken = \"once more\"\n")
 		d.waitForPolls(2)
 		lines = s.log.Lines()
 		if len(lines) != 4 || lines[2] != smallPassed || !refused(lines[3]) {
@@ -651,13 +642,14 @@ func pklCallCount(s *fakeProject) int {
 
 func TestDevLooksForPklUntilACycleFindsItAndKeepsThatProgram(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newFakeProject(t)
+		s := newFakeProject(t, objectsWith(captain("hfoo")))
+		s.copyTemplateMap()
 		s.env.Platform = ""
 		s.setProgram("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
 			return env.RunResult{}, &diag.Error{Msg: "no Pkl in this test"}
 		})
 		d := newDevRun(s, DefaultWatchTiming).start(t)
-		want := []string{"error: no Pkl in this test", watchingLine("src/")}
+		want := []string{"error: no Pkl in this test", watchingLine("src/", "objects/")}
 		if lines := s.log.Lines(); !slices.Equal(lines, want) {
 			t.Fatalf("Dev logged %q, want %q", lines, want)
 		}

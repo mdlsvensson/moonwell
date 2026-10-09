@@ -2,7 +2,6 @@ package build
 
 import (
 	"cmp"
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -57,17 +56,11 @@ var entryPoints = []entryPoint{
 	{"check", func(s *fakeProject) error { _, err := Check(background, s.env); return err }},
 }
 
-func launchWith(t testing.TB, game string) string {
-	t.Helper()
-	path, err := json.Marshal(game)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return `"launch":{"gameExecutable":` + string(path) + `,"args":["-launch","-windowmode","windowed"]}`
+func launchWith(game string) string {
+	return launchBlock + "\ngameExecutable = '" + game + "'\n"
 }
 
-const refusedPlayer = `"settings":{"info":{},"loadingScreen":{},"gameplayConstants":{},"gameInterface":{},` +
-	`"players":{"23":{"name":"Nobody"}},"forces":{},"environment":{"fog":{}},"gameplay":{}}`
+const refusedPlayer = "[[settings.players]]\nslot = 23\nname = \"Nobody\"\n"
 
 func TestBuildStagesTheMapPacksItAndSaysWhatItDid(t *testing.T) {
 	s := newFakeProject(t, objectsWith(captain("hfoo")), settingsNamed("Built"), localKit)
@@ -124,7 +117,7 @@ func TestBuildStagesTheMapPacksItAndSaysWhatItDid(t *testing.T) {
 
 func TestBuildNamesTheArchiveByTheMapFolderAndItsHeaderByTheFoldersName(t *testing.T) {
 	s := newFakeProject(t)
-	s.setMapDir("campaign/one.w3x", `"build":{"folder":"./out//packed/","minify":false}`)
+	s.setMapDir("campaign/one.w3x", "[build]\nfolder = \"./out//packed/\"\n")
 	s.writeMapInfo(mapInfo(25, 0, 0))
 	file, archive := mustBuild(t, s, Options{})
 	if file != s.fullPath("out/packed/campaign/one.w3x") || archive.HeaderOffset != 512 {
@@ -242,11 +235,12 @@ func TestABuildBesideAnotherLeavesTheArchiveOfTheBuildBefore(t *testing.T) {
 }
 
 func TestBuildRefusesAnArchiveThatItCannotPlaceBeforeItPlans(t *testing.T) {
-	s := newFakeProject(t, `"build":{"folder":"../elsewhere","minify":false}`)
+	s := newFakeProject(t)
+	s.writeFile(manifestName, "[build]\nfolder = \"../elsewhere\"\n")
 	s.writeMapInfo(modernInfo)
 	_, err := Build(background, s.env, Options{})
 	e := asDiagError(t, err, "an archive outside the project")
-	if !strings.HasSuffix(e.Msg, " is outside the project.") || e.File != manifestName {
+	if !strings.HasPrefix(e.Msg, "build.folder ") || e.File != manifestName {
 		t.Errorf("error = %+v", e)
 	}
 	if runs := s.compilerRuns(); len(runs) != 0 || fsx.Exists(s.fullPath("dist/stage")) || fsx.Exists(lockFullPath(s.root)) {
@@ -408,7 +402,7 @@ func TestEveryDoorRefusesALinkAtDistStage(t *testing.T) {
 func TestBuildRefusesALinkAtTheFirstFolderOfBuildFolderBeforeItPlans(t *testing.T) {
 	for _, target := range []string{"", "maps/map.w3x"} {
 		t.Run("to "+cmp.Or(target, "a folder outside the project"), func(t *testing.T) {
-			s := newFakeProject(t, `"build":{"folder":"out/bin","minify":false}`)
+			s := newFakeProject(t, "[build]\nfolder = \"out/bin\"\n")
 			s.writeMapInfo(modernInfo)
 			leadsTo, _ := symlinkOutput(t, s, "out", target)
 			testkit.WriteFile(t, leadsTo, "bin/map.w3x", []byte("not an archive of this build"))
@@ -430,7 +424,7 @@ func TestBuildRefusesALinkAtTheFirstFolderOfBuildFolderBeforeItPlans(t *testing.
 
 func TestTestStagesTheMapAndHandsTheGameTheStagesPath(t *testing.T) {
 	game := testkit.WriteFile(t, t.TempDir(), "Warcraft III.exe", nil)
-	s := newFakeProject(t, objectsWith(captain("hfoo")), launchWith(t, game))
+	s := newFakeProject(t, objectsWith(captain("hfoo")), launchWith(game))
 	s.copyTemplateMap()
 	starts := recordSpawns(s.env)
 	if err := Test(background, s.env, Options{}); err != nil {
@@ -458,7 +452,7 @@ func TestTestStagesTheMapBeforeItLooksForTheGame(t *testing.T) {
 	s := newFakeProject(t)
 	err := Test(background, s.env, Options{Entry: "src/main.yue"})
 	e := asDiagError(t, err, "no game")
-	if e.Msg != "launch.gameExecutable is not set." || e.File != "moonwell.local.pkl" {
+	if e.Msg != "launch.gameExecutable is not set." || e.File != s.project.UserFile {
 		t.Errorf("error = %+v", e)
 	}
 	if !fsx.Exists(s.fullPath("dist/stage/map.w3x/war3map.lua")) || len(s.log.Lines()) != 0 {
@@ -514,7 +508,7 @@ func TestCheckLeavesTheIDsModuleAloneAndFailsWhereABuildWould(t *testing.T) {
 }
 
 func TestCheckReturnsTheFailureToFindPklAndEvaluatesNothing(t *testing.T) {
-	s := newFakeProject(t)
+	s := newFakeProject(t, objectsWith(captain("hfoo")))
 	s.env.Platform = "plan9-x86_64"
 	s.setProgram("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
 		return env.RunResult{Stdout: "Pkl 0.31.0 (a stand-in)\n"}, nil
@@ -533,10 +527,10 @@ func TestTheCheckOfACycleEvaluatesWithItsProgramAndWritesTheIDsModule(t *testing
 	s.copyTemplateMap()
 	own := filepath.Join(t.TempDir(), "pkl")
 	s.setProgram(own, s.fakePkl)
-	if _, err := runCheck(background, s.env, own, false); err == nil {
+	if _, err := runCheck(background, s.env, pklAt(own), false); err == nil {
 		t.Error("a check that writes nothing passed without an ids module")
 	}
-	result, err := runCheck(background, s.env, own, true)
+	result, err := runCheck(background, s.env, pklAt(own), true)
 	if err != nil {
 		t.Fatalf("check: %v", diag.Format(err))
 	}
@@ -615,7 +609,7 @@ func TestNoDoorMakesADistFolderOutsideAProject(t *testing.T) {
 			s := newFakeProject(t)
 			s.removeFile(manifestName)
 			e := asDiagError(t, d.run(s), d.name+" outside a project")
-			if !strings.Contains(e.Msg, "No moonwell.pkl found") {
+			if !strings.Contains(e.Msg, "No moonwell.toml found") {
 				t.Errorf("error = %+v", e)
 			}
 			if fsx.Exists(s.fullPath("dist")) {

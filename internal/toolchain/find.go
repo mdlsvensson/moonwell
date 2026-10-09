@@ -9,6 +9,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
 func FindCompiler(ctx context.Context, e *env.Env, version string, path *string) (string, error) {
@@ -16,11 +17,11 @@ func FindCompiler(ctx context.Context, e *env.Env, version string, path *string)
 		return Ensure(ctx, e, YueScript, version)
 	}
 	if !fsx.Exists(*path) {
-		return "", errNoYuePath(*path)
+		return "", errNoYuePath(*path, manifest.UserFilePath(e))
 	}
 	found, err := QueryVersion(ctx, e, YueScript, *path)
 	if err != nil {
-		return "", blameYuePath(err)
+		return "", blameYuePath(err, manifest.UserFilePath(e))
 	}
 	if found != version {
 		e.Log.Warn("yue.path reports version " + versionOrUnknown(found) + ", expected " + version + ".")
@@ -28,10 +29,10 @@ func FindCompiler(ctx context.Context, e *env.Env, version string, path *string)
 	return *path, nil
 }
 
-func blameYuePath(err error) error {
+func blameYuePath(err error, userFile string) error {
 	var diagErr *diag.Error
 	if errors.As(err, &diagErr) {
-		diagErr.File, diagErr.Hint = yuePathFile, yuePathHint
+		diagErr.File, diagErr.Hint = userFile, yuePathHint
 	}
 	return err
 }
@@ -83,13 +84,11 @@ func isStartFailure(err error) bool {
 
 const pklInstallHint = "Install Pkl 0.32 or newer: " + pklPage
 
-const yuePathFile = "moonwell.local.pkl"
+const yuePathHint = "Point yue.path in that file at a yue program this system can run, or remove it to use the " +
+	"compiler Moonwell downloads."
 
-const yuePathHint = "Point yue.path in " + yuePathFile + " at a yue program this system can run, or remove it to " +
-	"use the compiler Moonwell downloads."
-
-func errNoYuePath(path string) error {
-	return &diag.Error{Msg: "yue.path does not exist: " + path, File: yuePathFile, Hint: yuePathHint}
+func errNoYuePath(path, userFile string) error {
+	return &diag.Error{Msg: "yue.path does not exist: " + path, File: userFile, Hint: yuePathHint}
 }
 
 func errPklTooOld(output string) error {

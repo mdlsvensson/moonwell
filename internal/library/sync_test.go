@@ -347,7 +347,7 @@ func TestALocalOverrideKeepsTheLibrarysLockEntryAndSwitchingBackChecksIt(t *test
 	override.Path = &source
 	mustSync(t, root, librariesOf("ex", override), first)
 	if readFile(t, root, ".moonwell/libraries/ex/a.lua") != "local" || readFile(t, root, lockFile) != locked || len(first.urls) != 1 {
-		t.Error("moonwell.local.pkl changed the lock")
+		t.Error("the local folder changed the lock")
 	}
 	moved := newFakeTagServer(map[string][]byte{urlV1: tagArchive(t, commitB, "src/a.lua", "2")})
 	e := mustFailSync(t, root, librariesOf("ex", githubLibrary("v0.1.0", "src")), moved, "switching back")

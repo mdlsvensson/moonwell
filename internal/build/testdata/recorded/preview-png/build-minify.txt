@@ -46,6 +46,7 @@ packed in dist/bin/map.w3x, behind no header:
   war3mapSkin.w3u: sha256 b661ba4d8a3b663bc6a88f1d7277f1dd43b9f6a3d954d42b93fbd3bc50f99827, 163 bytes
   war3mapUnits.doo: sha256 8ea9de4b46137aee6c683d20b34418fbbb9513067a09541591639862eea84754, 933 bytes
 generated:
+  .moonwell/objects.pkl: sha256 200af79d36f7342fcdddbddd23452ee473ae4f01ea0f0a8e10e93efec32257a5, 97 bytes
   .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
   .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
   .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes

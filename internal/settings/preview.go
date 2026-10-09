@@ -70,7 +70,7 @@ func errOutsideProject(manifestName, preview string) error {
 	return &diag.Error{
 		Msg:  `settings.info.preview must be a path inside the project, not "` + preview + `".`,
 		File: manifestName,
-		Hint: `Name a picture in the project folder, such as "preview.tga" beside moonwell.pkl.`,
+		Hint: `Name a picture in the project folder, such as "preview.tga" beside moonwell.toml.`,
 	}
 }
 
@@ -78,12 +78,12 @@ func errUnderAssets(manifestName, path string) error {
 	return &diag.Error{
 		Msg:  "settings.info.preview names a file under assets/: " + path,
 		File: manifestName,
-		Hint: "Keep the picture outside assets/, for example beside moonwell.pkl: every file under assets/ is also " +
+		Hint: "Keep the picture outside assets/, for example beside moonwell.toml: every file under assets/ is also " +
 			"imported into the map under its own name.",
 	}
 }
 
-const fromProjectFolder = "The path starts at the project folder, where moonwell.pkl is."
+const fromProjectFolder = "The path starts at the project folder, where moonwell.toml is."
 
 func errNoSuchFile(manifestName, path string) error {
 	return &diag.Error{

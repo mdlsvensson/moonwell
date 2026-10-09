@@ -23,7 +23,7 @@ func runAssetsSync(ctx context.Context, e *env.Env, _ commandArgs) error {
 }
 
 func syncOrCheckAssets(ctx context.Context, e *env.Env, write bool) error {
-	project, err := build.Load(ctx, e)
+	project, err := build.LoadSettings(ctx, e)
 	if err != nil {
 		return err
 	}

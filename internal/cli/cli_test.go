@@ -89,7 +89,7 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	}
 	for _, name := range needManifest {
 		result := runCLIWithContext(t, background, root, name)
-		if result.code != 1 || !strings.Contains(result.output, "No moonwell.pkl found") || result.stdout != "" {
+		if result.code != 1 || !strings.Contains(result.output, "No moonwell.toml found") || result.stdout != "" {
 			t.Errorf("%s: %+v", name, result)
 		}
 	}
@@ -144,7 +144,7 @@ func TestCommandFailuresAreFormattedAndReturn1(t *testing.T) {
 	if result.code != 1 || !strings.HasPrefix(result.output, "error: ") || result.stdout != "" {
 		t.Errorf("%+v", result)
 	}
-	checkContains(t, result.output, "No moonwell.pkl found in this directory.", "\nhint: ")
+	checkContains(t, result.output, "No moonwell.toml found in this directory.", "\nhint: ")
 	if strings.Count(result.output, "error: ") != 1 {
 		t.Errorf("the failure is printed more than once:\n%s", result.output)
 	}
@@ -176,7 +176,7 @@ func TestADevThatWasToldToStopExitsWith130(t *testing.T) {
 	if result.code != 130 {
 		t.Errorf("%+v", result)
 	}
-	checkContains(t, result.output, "No moonwell.pkl found in this directory.", "Watching ")
+	checkContains(t, result.output, "No moonwell.toml found in this directory.", "Watching ")
 }
 
 func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *testing.T) {
@@ -226,6 +226,7 @@ func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 	places := map[string]envFactory{"in a command": inACommand, "before the command": beforeTheCommand}
 	for what, outside := range places {
 		root := newTemplateProject(t)
+		writeFile(t, root, "objects/units.pkl", "")
 		result := runCLIIn(background, outside, root, "check")
 		if result.code != 1 || !strings.HasPrefix(result.output, "internal error: the index is out of range\n") {
 			t.Errorf("%s: %+v", what, result)

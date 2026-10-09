@@ -58,18 +58,18 @@ func TestArchivePathRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedMan
 	if err := os.MkdirAll(filepath.Join(root, "out", "map.w3x"), 0o777); err != nil {
 		t.Fatal(err)
 	}
-	_, err := archivePath(projectWith(root, "out", localManifest))
+	_, err := archivePath(projectWith(root, "out", manifestName))
 	e := asDiagError(t, err, "a folder in the archive's place")
-	if e.Msg != "The build output out/map.w3x is a directory; refusing to replace it." || e.File != localManifest ||
+	if e.Msg != "The build output out/map.w3x is a directory; refusing to replace it." || e.File != manifestName ||
 		e.Hint != "Set build.folder to a folder that only holds build output, such as dist/bin." {
 		t.Errorf("error = %+v", e)
 	}
 	outside := []string{"..", "../other", "/elsewhere", `\elsewhere`, "C:/elsewhere", `c:\elsewhere`, "out/../.."}
 	for _, dir := range outside {
-		_, err := archivePath(projectWith(root, dir, localManifest))
+		_, err := archivePath(projectWith(root, dir, manifestName))
 		e := asDiagError(t, err, dir)
 		if !strings.HasPrefix(e.Msg, "The build output ") || !strings.HasSuffix(e.Msg, " is outside the project.") ||
-			e.File != localManifest || e.Hint != "Set build.folder to a folder inside the project, such as dist/bin." {
+			e.File != manifestName || e.Hint != "Set build.folder to a folder inside the project, such as dist/bin." {
 			t.Errorf("%s: %+v", dir, e)
 		}
 	}
@@ -98,9 +98,9 @@ func TestArchivePathRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArc
 	for _, tt := range tests {
 		t.Run(tt.written, func(t *testing.T) {
 			root := t.TempDir()
-			_, err := archivePath(projectWith(root, tt.written, localManifest))
+			_, err := archivePath(projectWith(root, tt.written, manifestName))
 			e := asDiagError(t, err, tt.written)
-			if !strings.Contains(e.Msg, tt.words) || e.File != localManifest || !strings.Contains(e.Hint, "dist/bin") {
+			if !strings.Contains(e.Msg, tt.words) || e.File != manifestName || !strings.Contains(e.Hint, "dist/bin") {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -109,13 +109,13 @@ func TestArchivePathRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArc
 
 func TestTheStageAndTheArchiveRefuseAMapFolderWindowsCannotHoldByTheManifest(t *testing.T) {
 	for _, dir := range []string{"map?.w3x", "con.w3x", "campaign./one.w3x"} {
-		p := projectWith(t.TempDir(), "dist/bin", localManifest)
+		p := projectWith(t.TempDir(), "dist/bin", manifestName)
 		p.Map.Folder = dir
 		_, ofArchive := archivePath(p)
 		_, ofStage := stageOutputFile(p)
 		for what, err := range map[string]error{"the archive": ofArchive, "the stage": ofStage} {
 			e := asDiagError(t, err, what+" of map.folder "+dir)
-			if e.Msg != `map.folder has a name that Windows cannot hold: "`+dir+`".` || e.File != localManifest ||
+			if e.Msg != `map.folder has a name that Windows cannot hold: "`+dir+`".` || e.File != manifestName ||
 				!strings.Contains(e.Hint, "such as map.w3x") {
 				t.Errorf("%s of map.folder %q: error = %+v", what, dir, e)
 			}
@@ -167,7 +167,7 @@ func TestArchivePathRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 				t.Fatal(err)
 			}
 			testkit.LinkDir(t, filepath.Join(root, filepath.FromSlash(tt.target)), symlink)
-			_, err := prepareArchivePath(projectWith(root, tt.written, localManifest))
+			_, err := prepareArchivePath(projectWith(root, tt.written, manifestName))
 			e := asDiagError(t, err, "a link on the way to the archive")
 			if !strings.HasPrefix(e.Msg, tt.symlink+" is a link: ") || e.File != tt.written+"/map.w3x" || e.Hint == "" {
 				t.Errorf("error = %+v", e)

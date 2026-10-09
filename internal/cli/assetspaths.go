@@ -56,7 +56,7 @@ func reportAssetPaths(ctx context.Context, e *env.Env, modelPath string, gamePat
 }
 
 func assetsOfBuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
-	project, err := build.Load(ctx, e)
+	project, err := build.LoadSettings(ctx, e)
 	if err != nil {
 		return nil, err
 	}

@@ -135,7 +135,7 @@ func errNoModule(name string, site requireSite) error {
 		File: site.path,
 		Line: site.line,
 		Hint: "Expected src/" + path + ".yue, lua/" + path + ".lua, lua/" + path + "/init.lua or a module of a library in " +
-			"moonwell.pkl. Built-in modules: " + strings.Join(builtins, ", ") + ".",
+			"moonwell.toml. Built-in modules: " + strings.Join(builtins, ", ") + ".",
 	}
 }
 

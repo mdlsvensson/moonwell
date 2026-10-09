@@ -21,7 +21,7 @@ func (s *fakeProject) setMapDir(dir string, blocks ...string) {
 			s.t.Fatal(err)
 		}
 	}
-	s.setManifest(append(blocks, `"map":{"folder":"`+dir+`","entry":"src/main.yue"}`)...)
+	s.setManifest(append(blocks, "[map]\nfolder = \""+dir+"\"\n")...)
 }
 
 func mustStage(t testing.TB, s *fakeProject, plan *Result) outputFile {

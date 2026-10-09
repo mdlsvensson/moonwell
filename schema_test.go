@@ -14,7 +14,7 @@ func TestThePklSchemasOwnTestsPass(t *testing.T) {
 		}
 		t.Skip("pkl is not on the PATH")
 	}
-	output, err := exec.Command(pkl, "test", "schema/tests/Project.pkl", "schema/tests/Objects.pkl").CombinedOutput()
+	output, err := exec.Command(pkl, "test", "schema/tests/Objects.pkl").CombinedOutput()
 	if err != nil {
 		t.Errorf("pkl test failed: %v\n%s", err, output)
 	}

@@ -93,7 +93,7 @@ var watchedDirs = []struct{ dir, ending string }{
 	{sourcesDir, ".yue"}, {"assets", ""}, {"objects", ".pkl"}, {"lua", ".lua"},
 }
 
-var manifestFiles = []string{manifest.SharedManifest, manifest.LocalManifest, "PklProject", "PklProject.deps.json"}
+var manifestFiles = []string{manifest.ProjectFile, "PklProject", "PklProject.deps.json"}
 
 func isWatchable(root, dir string) bool {
 	return fsx.IsDir(dir) && !fsx.IsWithin(filepath.Join(root, moonwellDir), dir)

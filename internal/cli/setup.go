@@ -18,15 +18,15 @@ import (
 )
 
 func runSetup(ctx context.Context, e *env.Env, _ commandArgs) error {
-	pkl, err := setupPkl(ctx, e)
-	if err != nil {
+	if !manifest.IsProject(e.Root) {
+		_, err := build.LoadSettings(ctx, e)
 		return err
 	}
-	project, err := manifest.Load(ctx, e, pkl)
-	if err != nil {
+	if err := setupUserFile(e); err != nil {
 		return err
 	}
-	if err := setupLocalManifest(e); err != nil {
+	project, err := build.LoadWith(ctx, e, setupPkl)
+	if err != nil {
 		return err
 	}
 	if err := setupCompiler(ctx, e, project.Yue); err != nil {
@@ -49,13 +49,13 @@ func setupPkl(ctx context.Context, e *env.Env) (pkl string, err error) {
 	return pkl, toolchain.CopyPklToBinDir(ctx, e, pkl, runtime.GOOS)
 }
 
-func setupLocalManifest(e *env.Env) error {
-	created, err := manifest.EnsureLocalManifest(e.Root)
+func setupUserFile(e *env.Env) error {
+	created, err := manifest.EnsureUserFile(e)
 	if err != nil {
 		return err
 	}
 	if created {
-		e.Log.Info("Created moonwell.local.pkl. Check that launch.gameExecutable points at your Warcraft III.exe.")
+		e.Log.Info("Created " + manifest.UserFilePath(e) + ". Check that launch.gameExecutable points at your Warcraft III.exe.")
 	}
 	return nil
 }

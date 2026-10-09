@@ -1,6 +1,8 @@
 package objects_test
 
 import (
+	"cmp"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"slices"
@@ -31,17 +33,22 @@ type resolveErrorCase struct {
 }
 
 func project(document string) string {
-	return `{"map":{"folder":"map.w3x","entry":"src/main.yue"},"build":{"folder":"dist/bin"},` +
-		`"yue":{"version":"0.34.3"},"objects":` + document + `}`
+	return document
 }
 
 func mustDecodeObjects(t *testing.T, document string) manifest.Objects {
 	t.Helper()
-	p, err := manifest.DecodeProject("/p", "objects/a.pkl", []byte(project(document)))
-	if err != nil {
+	return mustDecodeObjectsOf(t, document, "objects/a.pkl")
+}
+
+func mustDecodeObjectsOf(t *testing.T, document, file string) manifest.Objects {
+	t.Helper()
+	var decoded manifest.Objects
+	if err := json.Unmarshal([]byte(document), &decoded); err != nil {
 		t.Fatalf("the test's objects %s: %v", document, err)
 	}
-	return p.Objects
+	decoded.MapSources(func(source string) string { return cmp.Or(source, file) })
+	return decoded
 }
 
 func idSet(existing []string) map[string]bool {

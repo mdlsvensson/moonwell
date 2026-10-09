@@ -115,7 +115,6 @@ func linkedProject(t *testing.T, pkl, root string) {
 		t.Fatalf("no way from the project to the checkout's Pkl package: %v", err)
 	}
 	writeFile(t, root, "PklProject", manifest.PklProjectText(moonwell.Version, filepath.ToSlash(schema)))
-	writeFile(t, root, "moonwell.local.pkl", manifest.LocalManifestText())
 	resolved, err := env.Run(background, pkl, []string{"project", "resolve"}, env.RunOptions{Dir: root})
 	if err != nil || resolved.ExitCode != 0 {
 		t.Fatalf("pkl project resolve: exit code %d, %v\n%s", resolved.ExitCode, err, resolved.Stderr)
@@ -178,6 +177,7 @@ func runIn(t *testing.T, root string, run func(world *env.Env) error) runOutcome
 	t.Helper()
 	log := testkit.NewLogRecorder()
 	world := env.New(root, log.Logger)
+	world.ConfigDir = filepath.Join(root, seedUserDir)
 	world.Spawn = func(program string, args []string) error {
 		t.Errorf("a recorded run starts no program: %s %q", program, args)
 		return nil

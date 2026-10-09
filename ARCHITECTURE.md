@@ -516,7 +516,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `execute`, `exitCode` |
 | change what Ctrl+C does | `internal/cli/main.go`: `Main`, `handleInterrupts`, `newForceExit`; `internal/build/lock.go`: `ReleaseHeldLocks` |
 | know where the log file is written | `internal/cli/cli.go`: `logFilePath`; `internal/env/log.go` |
-| change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/files.go`: `PklProjectText`, `LocalManifestText` |
+| change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/pklproject.go`: `PklProjectText`; `internal/manifest/userfile.go`: `UserFileText`, `EnsureUserFile` |
 | change what `setup` does | `internal/cli/setup.go`: `runSetup` |
 
 ### The build
@@ -538,11 +538,13 @@ Each row names the file to open and, in most rows, the function to read first.
 
 | I want to | Open |
 | --- | --- |
-| add a setting to the manifest | `schema/Project.pkl` or `schema/MapSettings.pkl`, then the struct in `internal/manifest/project.go` or `internal/manifest/settings.go`; `internal/manifest/load_test.go` fails for a field no manifest sets |
-| know how the manifest is evaluated, and which of the two files | `internal/manifest/load.go`: `Load`, `findManifest`, `DecodeProject` |
+| add a setting of a project | `internal/manifest/projectfile.go`: the struct the file is decoded into, its default in `projectDefaults`, its rule in `checkRules` and its place in `toProject`; a row in each table of `internal/manifest/projectfile_test.go` |
+| add a setting of the machine | `internal/manifest/userfile.go`: `userFile`, `userDefaults`, `checkRules`; `internal/manifest/userfile_test.go` |
+| know how the two settings files are read | `internal/manifest/load.go`: `Load`; `internal/manifest/decode.go`: `readSettingsFile`, `decodeSettings`, `refuseLossyNumbers` |
+| know how the object files are evaluated, and when Pkl runs | `internal/manifest/objectfiles.go`: `HasObjectFiles`, `EvaluateObjects`; `internal/build/project.go`: `LoadWith` |
 | change the check of the program's version against the project's | `internal/manifest/version.go`: `checkPackageVersion` |
 | know which `pkl` and which `yue` is run | `internal/toolchain/find.go`: `FindPkl`, `FindCompiler` |
-| pin a new version of YueScript or Pkl | `internal/toolchain/tools.go`: `YueScript`, `Pkl`; the default `yue.version` in `schema/Project.pkl` |
+| pin a new version of YueScript or Pkl | `internal/toolchain/tools.go`: `YueScript`, `Pkl`; the default `yue.version` is `DefaultYueVersion` in `internal/manifest/projectfile.go` |
 | change how a pinned program is downloaded and checked | `internal/toolchain/ensure.go`: `Ensure`; its steps in `internal/toolchain/install.go` |
 | change the version number | `version.go`, `schema/PklProject`, `install.ps1`, `install.sh`, and the two examples in `README.md`; `module_test.go` and `install_test.go` name one that was missed |
 

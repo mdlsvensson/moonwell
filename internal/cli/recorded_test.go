@@ -133,7 +133,7 @@ func (p *recordedProjects) runSteps(t *testing.T, run recordedRun) []stepResult 
 
 func noSpawnEnvFactory(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
-		e := env.New(root, log)
+		e := realWorld(root, log)
 		e.Spawn = func(program string, args []string) error {
 			t.Errorf("a recorded line starts no program: %s %q", program, args)
 			return nil

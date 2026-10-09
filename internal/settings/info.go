@@ -302,7 +302,7 @@ func errNoLoadingModel(displayPath string) error {
 
 func errNoPlayer(displayPath string, slot int) error {
 	return &diag.Error{
-		Msg:  fmt.Sprintf(`settings.players["%d"]: player %d does not exist in the source map.`, slot, slot),
+		Msg:  fmt.Sprintf("settings.players: player %d does not exist in the source map.", slot),
 		File: displayPath,
 		Hint: "Create this player slot in World Editor first.",
 	}
@@ -310,7 +310,7 @@ func errNoPlayer(displayPath string, slot int) error {
 
 func errNoForce(displayPath string, slot int) error {
 	return &diag.Error{
-		Msg:  fmt.Sprintf(`settings.forces["%d"]: force %d does not exist in the source map.`, slot, slot),
+		Msg:  fmt.Sprintf("settings.forces: force %d does not exist in the source map.", slot),
 		File: displayPath,
 		Hint: "Create this force in World Editor first.",
 	}
@@ -318,7 +318,7 @@ func errNoForce(displayPath string, slot int) error {
 
 func errNoCustomForces(displayPath string, slot int) error {
 	return &diag.Error{
-		Msg:  fmt.Sprintf(`settings.forces["%d"]: force overrides require custom forces enabled in the source map.`, slot),
+		Msg:  fmt.Sprintf("settings.forces: force %d is set, and force overrides require custom forces enabled in the source map.", slot),
 		File: displayPath,
 		Hint: "Enable custom forces in World Editor first.",
 	}

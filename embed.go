@@ -30,7 +30,7 @@ type TemplateFile struct {
 	Data []byte
 }
 
-var TemplateExclude = []string{"PklProject", "PklProject.deps.json", "moonwell.local.pkl"}
+var TemplateExclude = []string{"PklProject", "PklProject.deps.json"}
 
 func TemplateFiles() ([]TemplateFile, error) {
 	var files []TemplateFile

@@ -19,11 +19,11 @@ func TestFormatRendersAnExpectedFailure(t *testing.T) {
 			"error: src/main.yue:3 › unexpected symbol\nhint: check the indentation",
 		},
 		{"no location and no hint", &Error{Msg: "no project"}, "error: no project"},
-		{"a file without a line", &Error{Msg: "bad", File: "moonwell.pkl"}, "error: moonwell.pkl › bad"},
+		{"a file without a line", &Error{Msg: "bad", File: "moonwell.toml"}, "error: moonwell.toml › bad"},
 		{
 			"an error wrapped in another",
-			fmt.Errorf("while building: %w", &Error{Msg: "bad", File: "moonwell.pkl"}),
-			"error: moonwell.pkl › bad",
+			fmt.Errorf("while building: %w", &Error{Msg: "bad", File: "moonwell.toml"}),
+			"error: moonwell.toml › bad",
 		},
 		{
 			"each problem on its own line with its own hint",
@@ -119,7 +119,7 @@ func TestFirstIsAnErrorAsOneProblem(t *testing.T) {
 		{File: "src/main.yue", Line: 7, Column: 11, Msg: "first", Hint: "one"},
 		{File: "objects/b.pkl", Msg: "second"},
 	}
-	diagErr := &Error{Msg: "bad", File: "moonwell.pkl", Line: 4, Column: 2, Hint: "mend it", Cause: errors.New("x")}
+	diagErr := &Error{Msg: "bad", File: "moonwell.toml", Line: 4, Column: 2, Hint: "mend it", Cause: errors.New("x")}
 	for _, c := range []struct {
 		name string
 		err  error
@@ -130,13 +130,13 @@ func TestFirstIsAnErrorAsOneProblem(t *testing.T) {
 		{
 			"the fields of an Error",
 			diagErr,
-			Problem{File: "moonwell.pkl", Line: 4, Column: 2, Msg: "bad", Hint: "mend it"},
+			Problem{File: "moonwell.toml", Line: 4, Column: 2, Msg: "bad", Hint: "mend it"},
 			true,
 		},
 		{
 			"an Error wrapped in another error",
 			fmt.Errorf("while building: %w", diagErr),
-			Problem{File: "moonwell.pkl", Line: 4, Column: 2, Msg: "bad", Hint: "mend it"},
+			Problem{File: "moonwell.toml", Line: 4, Column: 2, Msg: "bad", Hint: "mend it"},
 			true,
 		},
 		{"an error that is not Moonwell's", errors.New("other"), Problem{}, false},

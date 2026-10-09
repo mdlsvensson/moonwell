@@ -24,17 +24,17 @@ var seeds = []seedProject{
 	{name: "other-entry", write: func(t *testing.T, root string) {
 		writeFile(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
 	}},
-	{name: "no-game", write: func(t *testing.T, root string) { writeLocalManifest(t, root, noGame) }},
+	{name: "no-game", write: func(t *testing.T, root string) { removeFile(t, root, userDir) }},
 	{name: "other-entry-and-no-game", write: func(t *testing.T, root string) {
 		writeFile(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
-		writeLocalManifest(t, root, noGame)
+		removeFile(t, root, userDir)
 	}},
 	{name: "no-src", write: func(t *testing.T, root string) { removeFile(t, root, "src") }},
 	{name: "fresh-checkout", write: func(t *testing.T, root string) {
-		for _, name := range []string{"moonwell.local.pkl", "yueconfig.yue", ".vscode"} {
+		for _, name := range []string{userDir, "yueconfig.yue", ".vscode"} {
 			removeFile(t, root, name)
 		}
-		writeFile(t, root, ".gitignore", "dist/\nmoonwell.local.pkl\n.pkl-lsp/\n")
+		writeFile(t, root, ".gitignore", "dist/\n.pkl-lsp/\n")
 		writeFile(t, root, ".luarc.json", "{\n  \"runtime.version\": \"Lua 5.3\",\n  \"workspace.library\": [\"mine\"]\n}\n")
 	}},
 	{name: "objects", write: writeSeedObjects},
@@ -43,7 +43,7 @@ var seeds = []seedProject{
 		settingsMap(t, root)
 		picture := testkit.TGA(testkit.NewPixels(512), testkit.TGAOptions{RLE: true, FromTop: true})
 		testkit.WriteFile(t, root, "preview.tga", picture)
-		writeLocalManifest(t, root, `settings { info { name = "With a preview"; preview = "preview.tga" } }`)
+		setSettings(t, root, "[settings.info]\nname = \"With a preview\"\npreview = \"preview.tga\"\n")
 	}},
 	{name: "assets", write: writeSeedAssets},
 	{name: "one-asset", write: func(t *testing.T, root string) { writeFile(t, root, "assets/a.blp", "an asset") }},
@@ -54,7 +54,7 @@ var seeds = []seedProject{
 	}},
 	{name: "warned-global", write: func(t *testing.T, root string) {
 		appendToFile(t, root, "src/main.yue", "\nCreatUnit Player(0), objects.units.captain, 0, 0, 0\n")
-		writeLocalManifest(t, root, `lint { unknownGlobals = "warning" }`)
+		setSettings(t, root, "[lint]\nunknownGlobals = \"warning\"\n")
 	}},
 	{name: "outside", bare: true, write: func(t *testing.T, root string) {
 		testkit.WriteFile(t, root, "knight.mdx", knightModel())
@@ -73,18 +73,18 @@ var seeds = []seedProject{
 		writeFile(t, root, "objects/units.pkl", objectFile(`units { ["captain"] { id = "h000"; base = "zzzz" } }`))
 	}},
 	{name: "refused-setting", write: func(t *testing.T, root string) {
-		writeLocalManifest(t, root, `settings { players { ["5"] { name = "Absent" } } }`)
+		setSettings(t, root, "[[settings.players]]\nslot = 5\nname = \"Absent\"\n")
 	}},
 	{name: "mapped-asset-missing", write: func(t *testing.T, root string) {
-		writeLocalManifest(t, root, `assets { paths { ["missing.blp"] = "x.blp" } }`)
+		setSettings(t, root, "[[assets.paths]]\nfile = \"missing.blp\"\npath = \"x.blp\"\n")
 	}},
 	{name: "stale-ids", write: func(t *testing.T, root string) { writeFile(t, root, objects.IDsFile, "-- stale\n") }},
 	{name: "no-ids", write: func(t *testing.T, root string) { removeFile(t, root, objects.IDsFile) }},
 	{name: "state-that-is-no-state", write: func(t *testing.T, root string) {
 		writeFile(t, root, ".asset-state/map.w3x.json", "not json")
 	}},
-	{name: "manifest-pkl-refuses", write: func(t *testing.T, root string) {
-		writeLocalManifest(t, root, `build { folder = "maps" }`)
+	{name: "settings-refused", write: func(t *testing.T, root string) {
+		setSettings(t, root, "[build]\nfolder = \"maps\"\n")
 	}},
 
 	{name: "no-source-map", write: func(t *testing.T, root string) { removeFile(t, root, seedMap) }},
@@ -107,60 +107,85 @@ var seeds = []seedProject{
 		writeFile(t, root, seedMap+"/Textures/Mine.blp", "a file World Editor imported")
 		writeFile(t, root, "assets/Textures/Mine.blp", "an asset at the same path")
 	}},
-	{name: "dot-map-folder", write: func(t *testing.T, root string) { writeLocalManifest(t, root, dotMapFolder) }},
+	{name: "dot-map-folder", write: func(t *testing.T, root string) { setSettings(t, root, dotMapFolder) }},
 	{name: "typed-against-raw", write: func(t *testing.T, root string) {
-		writeLocalManifest(t, root,
-			`settings { gameplay { foodLimit = 200 } gameplayConstants { ["Misc"] { ["FoodCeiling"] = "1" } } }`)
+		setSettings(t, root, "[settings.gameplay]\nfoodLimit = 200\n\n"+
+			"[[settings.gameplayConstants]]\nsection = \"Misc\"\nkey = \"FoodCeiling\"\nvalue = \"1\"\n")
 	}},
 }
 
 const (
-	noGame       = "launch { gameExecutable = null }"
-	dotMapFolder = `map { folder = "./map.w3x" }`
+	dotMapFolder = "[map]\nfolder = \"./map.w3x\"\n"
 	lockFile     = "dist/.lock"
 )
 
-const everySetting = `settings {
-  info {
-    name = "Seed settings"
-    author = "The seed"
-    description = "Every setting is set"
-    recommendedPlayers = "2-4"
-  }
-  loadingScreen {
-    background = -1
-    model = #"war3mapImported\Loading.mdx"#
-    text = "Loading text"
-    title = "Loading title"
-    subtitle = "Loading subtitle"
-  }
-  gameplay { heroMaxLevel = 25; foodLimit = 200 }
-  gameplayConstants { ["Misc"] { ["DefenseArmor"] = "0.05" } }
-  gameInterface { ["CustomSkin"] { ["Test"] = "value" } ["FrameDef"] { ["GOLD"] = "Coins" } }
-  players {
-    ["0"] { name = "Seed"; controller = "computer"; race = "orc"; fixedStart = false; x = 256; y = -512.5 }
-  }
-  forces {
-    ["0"] {
-      name = "First force"
-      allied = false
-      alliedVictory = true
-      sharedVision = false
-      sharedControl = true
-      sharedAdvancedControl = true
-    }
-  }
-  environment {
-    soundEnvironment = "Mountains"
-    waterColor = List(10, 20, 30, 255)
-    fog { enabled = true; style = 1; start = 100; end = 1000.5; density = 0.25; color = List(1, 2, 3, 4) }
-  }
-}`
+const everySetting = `[settings.info]
+name = "Seed settings"
+author = "The seed"
+description = "Every setting is set"
+recommendedPlayers = "2-4"
+
+[settings.loadingScreen]
+background = -1
+model = 'war3mapImported\Loading.mdx'
+text = "Loading text"
+title = "Loading title"
+subtitle = "Loading subtitle"
+
+[settings.gameplay]
+heroMaxLevel = 25
+foodLimit = 200
+
+[[settings.gameplayConstants]]
+section = "Misc"
+key = "DefenseArmor"
+value = "0.05"
+
+[[settings.gameInterface]]
+section = "CustomSkin"
+key = "Test"
+value = "value"
+
+[[settings.gameInterface]]
+section = "FrameDef"
+key = "GOLD"
+value = "Coins"
+
+[[settings.players]]
+slot = 0
+name = "Seed"
+controller = "computer"
+race = "orc"
+fixedStart = false
+x = 256
+y = -512.5
+
+[[settings.forces]]
+index = 0
+name = "First force"
+allied = false
+alliedVictory = true
+sharedVision = false
+sharedControl = true
+sharedAdvancedControl = true
+
+[settings.environment]
+soundEnvironment = "Mountains"
+waterColor = [10, 20, 30, 255]
+
+[settings.environment.fog]
+enabled = true
+style = 1
+start = 100
+end = 1000.5
+density = 0.25
+color = [1, 2, 3, 4]
+`
 
 func writeSeedSettings(t *testing.T, root string) {
 	settingsMap(t, root)
 	writeFile(t, root, seedMap+"/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
-	writeLocalManifest(t, root, everySetting)
+	setSettings(t, root, everySetting)
 }
 
 func settingsMap(t *testing.T, root string) {
@@ -242,11 +267,8 @@ func writeSeedAssets(t *testing.T, root string) {
 	writeFile(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
 	writeFile(t, root, "libs/golems/assets/war3mapImported/golems/frames.toc", "toc from the library")
 	writeFile(t, root, "libs/golems/assets/Textures/Golem.blp", "texture from the library")
-	writeLocalManifest(t, root, `assets {
-  paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# }
-  exclude = List("notes/")
-}
-libraries { ["golems"] { path = "libs/golems" } }`)
+	setSettings(t, root, "[assets]\nexclude = [\"notes/\"]\n\n[[assets.paths]]\nfile = \"icons/BTNSword.blp\"\n"+
+		"path = 'ReplaceableTextures\\CommandButtons\\BTNSword.blp'\n\n"+localLibrary("golems", "libs/golems"))
 	appendToFile(t, root, "src/main.yue", "\nimport \"golems.names\"\nprint names.first\n")
 }
 
@@ -260,7 +282,7 @@ func writeSeedModels(t *testing.T, root string) {
 	testkit.WriteFile(t, root, "libs/golems/assets/Models/Golem.mdx",
 		testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(`Textures\Golem.blp`, 0))))
 	testkit.WriteFile(t, root, "libs/golems/assets/Textures/Golem.blp", []byte{2})
-	writeLocalManifest(t, root, `libraries { ["golems"] { path = "libs/golems" } }`)
+	setSettings(t, root, localLibrary("golems", "libs/golems"))
 }
 
 func hashOf(text string) string {
@@ -389,7 +411,7 @@ var recordedRuns = []recordedRun{
 	runOn("state-that-is-no-state", "assets:check"),
 	runOn("state-that-is-no-state", "assets:sync"),
 	runOn("state-that-is-no-state", "build"),
-	runOn("manifest-pkl-refuses", "build"),
+	runOn("settings-refused", "build"),
 
 	runOn(templateSeed, "build", "--frobnicate"),
 	runOn(templateSeed, "build", "--minfy"),

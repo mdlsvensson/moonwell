@@ -1,8 +1,9 @@
-/// Every custom object of a project, merged from the files under `objects/`. `moonwell.pkl` wires them in with:
+/// Every custom object of a project, merged from the files under `objects/`. Moonwell gathers them with a module it
+/// writes itself, `.moonwell/objects.pkl`:
 ///
 /// ```
 /// import "@moonwell/Objects.pkl"
-/// objects = Objects.merge(import*("objects/**.pkl"))
+/// output { value = Objects.merge(import*("../objects/**.pkl")) }
 /// ```
 module moonwell.Objects
 

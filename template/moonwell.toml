@@ -1,0 +1,14 @@
+[map]
+folder = "map.w3x"
+entry = "src/main.yue"
+
+[build]
+folder = "dist/bin"
+minify = false
+
+[lint]
+unknownGlobals = "error"
+globals = []
+
+[assets]
+exclude = []

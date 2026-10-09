@@ -197,16 +197,16 @@ every file, each text file behind a byte order mark:
 the 53 scripts:
   as they are
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"foodLimit":200},"gameplayConstants":{"misc":{"foodceiling":"100"}}}
 the 53 scripts:
   as they are
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":150},"gameplayConstants":{"Other":{"A":"1"}}}
 the 53 scripts:
   as they are
@@ -573,9 +573,9 @@ every file, each text file behind a byte order mark:
 the 53 scripts:
   as they are
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"info":{"name":"BOM"},"gameInterface":{"A":{"B":"c"}}}
 the 53 scripts:
   sha256 568bbbe2224b8e5916bd2ec95bbfc28e5cbbc9aff0a36037439765b141a2e371, 257043 bytes
@@ -1685,9 +1685,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"foodceiling":"0200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
@@ -1720,9 +1720,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"foodceiling":"0200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
@@ -1755,9 +1755,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"foodceiling":"0200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
@@ -1805,9 +1805,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
@@ -1840,9 +1840,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
@@ -1875,9 +1875,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=100\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
@@ -1905,9 +1905,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"foodceiling":"0200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
@@ -1915,9 +1915,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"Misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[Misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
@@ -1940,9 +1940,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"foodceiling":"0200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
@@ -1950,9 +1950,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"misc":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[misc]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
@@ -1975,9 +1975,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"foodceiling":"0200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"Other":"1","MAXHEROLEVEL":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nOther=1\nMAXHEROLEVEL=25\nFoodCeiling=200"
@@ -1985,9 +1985,9 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=1\r\nMAXHEROLEVEL=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"maxherolevel":"7","FoodCeiling":"200"},"Last":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"heroMaxLevel":25,"foodLimit":200},"gameplayConstants":{"First":{"FoodCeiling":"1"},"MISC":{"FOODCEILING":"200","Other":"","MaxHeroLevel":"25"},"Last":{}}}
 the fixture:
   war3mapMisc.txt: "[First]\nFoodCeiling=1\n\n[MISC]\nFOODCEILING=200\nOther=\nMaxHeroLevel=25"
@@ -1995,81 +1995,81 @@ every file, each text file behind a byte order mark:
   war3mapMisc.txt: "\ufeff[Misc]\r\nFoodCeiling=200\r\nKeep=1\r\nOther=\r\nMaxHeroLevel=25\r\n\r\n[Other]\r\nA=0\r\n\r\n[First]\r\nFoodCeiling=1\r\n"
 == {"gameplayConstants":{"Misc":{},"misc":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with war3mapMisc.txt alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with war3mapSkin.txt alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the minimap alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with text files that hold nothing:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file under another spelling:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 an empty folder:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 without the script:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 without the map info:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script that is not UTF-8:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 text files that are not UTF-8:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script without SetMapName:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script whose main() returns a value:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 bytes that are no map info:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the name the minimap is kept under:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the name a TGA preview takes:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameInterface":{"Frame":{"X":"a","x":"b"}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameInterface":{"A":{"k":"v"},"B":{},"a":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplayConstants":{"Misc":{"Key":"1","Other":"2","KEY":"3"}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameInterface":{"A":{"k":"1","K":"2"},"a":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"},"MISC":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplayConstants":{"A":{"B":"1"},"a":{"B":"1","b":"2"}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameplay":{"foodLimit":1},"gameplayConstants":{"Misc":{"FoodCeiling":"2"}},"gameInterface":{"A":{},"a":{}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"gameInterface":{"A":{},"a":{}},"gameplayConstants":{"Misc":{"Key":"1","KEY":"2"}}}
 the fixture:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file, each text file behind a byte order mark:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"players":{"0":{"x":-0.0,"y":0}}}
 the 53 scripts:
   sha256 4d67cd070c206860e7a2132491f92ad6c91e53c4b1e3deb2b67026f290eb0428, 257032 bytes
@@ -2162,67 +2162,67 @@ with the name a TGA preview takes:
   no change
 == {"info":{"name":"N","preview":"missing.tga"}}
 every file:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with war3mapMisc.txt alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with war3mapSkin.txt alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the minimap alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with text files that hold nothing:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file under another spelling:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 an empty folder:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 without the script:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 without the map info:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script that is not UTF-8:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 text files that are not UTF-8:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script without SetMapName:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script whose main() returns a value:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 bytes that are no map info:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the name the minimap is kept under:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the name a TGA preview takes:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 == {"info":{"name":"N","preview":"preview.blp"},"gameplay":{"foodLimit":200},"gameplayConstants":{"MISC":{"foodCeiling":"1"}}}
 every file:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with war3mapMisc.txt alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with war3mapSkin.txt alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the minimap alone:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with text files that hold nothing:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 every file under another spelling:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 an empty folder:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 without the script:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 without the map info:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script that is not UTF-8:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 text files that are not UTF-8:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script without SetMapName:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 a script whose main() returns a value:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 bytes that are no map info:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the name the minimap is kept under:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml
 with the name a TGA preview takes:
-  refused: moonwell.local.pkl
+  refused: moonwell.toml

@@ -54,10 +54,11 @@ func launched(t *testing.T, root, body string, line ...string) string {
 	t.Helper()
 	game := filepath.Join(root, "Warcraft III.exe")
 	writeFile(t, root, "Warcraft III.exe", "")
-	writeLocalManifest(t, root, "launch { gameExecutable = #\""+game+"\"# }\n"+body)
+	writeFile(t, root, userFile, "[launch]\ngameExecutable = '"+game+"'\n")
+	setSettings(t, root, body)
 	var started [][]string
 	withTheGame := func(root string, log *env.Logger) *env.Env {
-		e := env.New(root, log)
+		e := realWorld(root, log)
 		e.Spawn = func(program string, args []string) error {
 			started = append(started, append([]string{program}, args...))
 			return nil
@@ -146,7 +147,7 @@ func TestE2EBuildImportsAssets(t *testing.T) {
 
 func TestE2ECheckReportsAssetProblem(t *testing.T) {
 	root := compiling(t)
-	replaceInFile(t, root, "moonwell.pkl", "paths {}", `paths { ["missing.blp"] = "x.blp" }`)
+	appendToFile(t, root, manifest.ProjectFile, "\n[[assets.paths]]\nfile = \"missing.blp\"\npath = \"x.blp\"\n")
 	mustFail(t, root, []string{"does not exist"}, "check")
 }
 
@@ -184,17 +185,17 @@ func TestE2ETestStagesTheEntryAndTheFormThatItsLineNames(t *testing.T) {
 	}
 }
 
-func TestE2ESetupLocalManifestCreatesAndKeeps(t *testing.T) {
+func TestE2ESetupCreatesTheUsersFileAndKeepsOneThatIsThere(t *testing.T) {
 	world, root := newFakeWorld(t), newProject(t, "my-map")
-	removeFile(t, root, "moonwell.local.pkl")
+	removeFile(t, root, userDir)
 	world.mustSucceed(t, root, "setup")
-	if readFile(t, root, "moonwell.local.pkl") != manifest.LocalManifestText() {
-		t.Fatal("wrong local manifest")
+	if readFile(t, root, userFile) != manifest.UserFileText() {
+		t.Fatal("setup made no user's file with the default game")
 	}
-	mine := "amends \"moonwell.pkl\"\nlaunch { gameExecutable = \"/games/wc3.exe\" }\n"
-	writeFile(t, root, "moonwell.local.pkl", mine)
+	mine := "[launch]\ngameExecutable = \"/games/wc3.exe\"\n"
+	writeFile(t, root, userFile, mine)
 	world.mustSucceed(t, root, "setup")
-	if readFile(t, root, "moonwell.local.pkl") != mine {
+	if readFile(t, root, userFile) != mine {
 		t.Fatal("overwritten")
 	}
 }
@@ -204,7 +205,7 @@ func TestE2ESetupUpgradesEditorFilesAndKeepsExisting(t *testing.T) {
 	for _, path := range []string{"yueconfig.yue", ".luarc.json", ".vscode"} {
 		removeFile(t, root, path)
 	}
-	writeFile(t, root, ".gitignore", "dist/\nmoonwell.local.pkl\n.pkl-lsp/\n")
+	writeFile(t, root, ".gitignore", "dist/\n.pkl-lsp/\n")
 	r := world.mustSucceed(t, root, "setup")
 	for _, path := range []string{
 		"yueconfig.yue", ".luarc.json", ".vscode/extensions.json", ".moonwell/types/natives.d.lua",
@@ -225,8 +226,8 @@ func TestE2ESetupUpgradesEditorFilesAndKeepsExisting(t *testing.T) {
 
 func TestE2EBuildRefusesSourceAsOutput(t *testing.T) {
 	root := compiling(t)
-	replaceInFile(t, root, "moonwell.pkl", `folder = "dist/bin"`, `folder = "maps"`)
-	mustFail(t, root, []string{"isReservedFolder"}, "build")
+	replaceInFile(t, root, manifest.ProjectFile, `folder = "dist/bin"`, `folder = "maps"`)
+	mustFail(t, root, []string{"build.folder must not be maps"}, "build")
 	if !exists(root, "maps/map.w3x/war3map.lua") {
 		t.Fatal("a refused build removed the source map's script")
 	}
@@ -247,7 +248,7 @@ func TestE2EDevRechecksSourceChanges(t *testing.T) {
 }
 
 const typo = "error: src/main.yue:9:10 " + mark + " Unknown global CreatUnit.\nhint: Did you mean CreateUnit? " +
-	"Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl."
+	"Declare your own globals with `global`, or add them to lint.globals in moonwell.toml."
 
 func TestE2ELintMisspeltNativePositionAndHint(t *testing.T) {
 	root := compiling(t)
@@ -258,7 +259,7 @@ func TestE2ELintMisspeltNativePositionAndHint(t *testing.T) {
 func TestE2ELintWarningBuildSucceeds(t *testing.T) {
 	root := compiling(t)
 	replaceInFile(t, root, "src/main.yue", "CreateUnit Player(0)", "CreatUnit Player(0)")
-	replaceInFile(t, root, "moonwell.pkl", `unknownGlobals = "error"`, `unknownGlobals = "warning"`)
+	replaceInFile(t, root, manifest.ProjectFile, `unknownGlobals = "error"`, `unknownGlobals = "warning"`)
 	r := mustSucceed(t, root, "build")
 	checkContains(t, r.output, strings.Replace(typo, "error: ", "warning: ", 1), "Built dist/bin/map.w3x")
 }
@@ -268,7 +269,7 @@ func TestE2ELintDeclaredConfiguredAndMapGlobals(t *testing.T) {
 	writeFile(t, root, "src/state.yue", "global Round = 1\n")
 	appendToFile(t, root, "src/main.yue",
 		"\nimport \"state\"\nglobal Score = 0\nprint Score, Round, MyLibrary, gg_unit_Hblm_0003\n")
-	replaceInFile(t, root, "moonwell.pkl", "globals = List()", `globals = List("MyLibrary")`)
+	replaceInFile(t, root, manifest.ProjectFile, "globals = []", `globals = ["MyLibrary"]`)
 	mustSucceed(t, root, "check")
 }
 
@@ -382,8 +383,7 @@ func TestE2ELibraryAssetsBuildAndMapReplacement(t *testing.T) {
 	writeFile(t, library, "src/golems/names.lua", "return { first = \"Granite\" }\n")
 	writeFile(t, library, "assets/war3mapImported/golems/frames.toc", "toc from the library")
 	writeFile(t, library, "assets/Textures/Golem.blp", "texture from the library")
-	appendToFile(t, root, "moonwell.local.pkl",
-		"\nlibraries { [\"golems\"] { path = \""+filepath.ToSlash(library)+"\" } }\n")
+	appendToFile(t, root, manifest.ProjectFile, "\n"+localLibrary("golems", filepath.ToSlash(library)))
 	appendToFile(t, root, "src/main.yue", "\nimport \"golems.names\"\nprint names.first\n")
 	r := mustSucceed(t, root, "check")
 	checkContains(t, r.output, "2 asset(s).")

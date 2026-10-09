@@ -1,5 +1,5 @@
 logged:
-  "warning: src/main.yue:25:18 › Unknown global Unheard.\nhint: Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl."
+  "warning: src/main.yue:25:18 › Unknown global Unheard.\nhint: Declare your own globals with `global`, or add them to lint.globals in moonwell.toml."
   Added 1 custom object(s) to 2 file(s).
   Packing archive...
   Built dist/bin/map.w3x (9 module(s)).
@@ -52,6 +52,7 @@ generated:
   .moonwell/lua/example/globals.lua: sha256 af05967d3e16fd382197971e2cfe00d54462675f506a92e79cee91deef76bb62, 44 bytes
   .moonwell/lua/example/greet.lua: sha256 5afb93f22b0590461b65861162abd2a1d9af816382e205bc27f984e549d8bfb3, 75 bytes
   .moonwell/lua/example/loud.lua: present
+  .moonwell/objects.pkl: sha256 200af79d36f7342fcdddbddd23452ee473ae4f01ea0f0a8e10e93efec32257a5, 97 bytes
   .moonwell/types/map.d.lua: sha256 bd6e60394e7aefe41cc42d4876be3816e440523049c9c509fc60146d58f6bca5, 719 bytes
   .moonwell/types/moonwell.d.lua: sha256 f4c6faa827ce909d7e1eb596d57b5d90ee56657ecaf4352891ece61f302a50a5, 1580 bytes
   .moonwell/types/natives.d.lua: sha256 f8452be88dd7c6d158ed68f87100a308be4f8453f6c4015951264276e5e91fd3, 458219 bytes

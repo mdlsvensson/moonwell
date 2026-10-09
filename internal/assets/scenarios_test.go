@@ -20,7 +20,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/imp"
 )
 
-const scenarioManifest = "moonwell.pkl"
+const scenarioManifest = "moonwell.toml"
 
 const mapFolder = "map.w3x"
 

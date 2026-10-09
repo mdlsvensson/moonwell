@@ -159,7 +159,7 @@ func (h *hintBuilder) buildHint(name string) string {
 	return unknownGlobalHint
 }
 
-const unknownGlobalHint = "Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl."
+const unknownGlobalHint = "Declare your own globals with `global`, or add them to lint.globals in moonwell.toml."
 
 func newUnknownGlobalProblem(path string, use globalUse, hint string) diag.Problem {
 	return diag.Problem{File: path, Line: use.Line, Column: use.Column, Msg: "Unknown global " + use.Name + ".", Hint: hint}

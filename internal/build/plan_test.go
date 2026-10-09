@@ -31,11 +31,10 @@ func objectsWith(units string) string {
 }
 
 func settingsNamed(name string) string {
-	return `"settings":{"info":{"name":"` + name + `"},"loadingScreen":{},"gameplayConstants":{},"gameInterface":{},` +
-		`"players":{"0":{}},"forces":{},"environment":{"fog":{}},"gameplay":{}}`
+	return "[settings.info]\nname = \"" + name + "\"\n"
 }
 
-const localKit = `"libraries":{"kit":{"path":"libs/kit"}}`
+const localKit = "[[libraries]]\nname = \"kit\"\npath = \"libs/kit\"\n"
 
 var captainIDs, _ = objects.RenderIDs([]objects.Resolved{{Category: "units", Key: "captain", ID: "h000"}})
 
@@ -243,7 +242,7 @@ func TestPlanWritesTheMacroModuleBeforeAnyCompilerRunsAndGivesEveryRunItsPath(t 
 
 func TestPlanNeedsTheSourceMapAndItsScript(t *testing.T) {
 	s := newFakeProject(t)
-	s.project.ManifestName = localManifest
+	s.project.ManifestName = manifestName
 	s.removeFile("maps/map.w3x/war3map.lua")
 	problem := mustFailPlan(t, s, Options{}, "a map without a script")
 	if !strings.Contains(problem.Msg, "The map has no war3map.lua") || problem.File != "maps/map.w3x/war3map.lua" ||
@@ -256,7 +255,7 @@ func TestPlanNeedsTheSourceMapAndItsScript(t *testing.T) {
 	}
 	s.removeFile("maps")
 	problem = mustFailPlan(t, s, Options{}, "a project without its map")
-	if !strings.Contains(problem.Msg, "maps/map.w3x not found") || problem.File != localManifest ||
+	if !strings.Contains(problem.Msg, "maps/map.w3x not found") || problem.File != manifestName ||
 		!strings.Contains(problem.Hint, "folder format") {
 		t.Errorf("problem = %+v", problem)
 	}
@@ -267,7 +266,7 @@ func TestPlanNeedsTheSourceMapAndItsScript(t *testing.T) {
 
 func TestPlanReportsTheFaultsOfAProjectInTheOrderOfTheBuild(t *testing.T) {
 	const entry = "src/main.yue"
-	assetsBlock := `"assets":{"paths":{"absent.blp":"icons\\Absent.blp"},"exclude":[]}`
+	assetsBlock := "[[assets.paths]]\nfile = \"absent.blp\"\npath = 'icons\\Absent.blp'\n"
 	s := newFakeProject(t, objectsWith(captain("zzzz")), settingsNamed("Ordered"), assetsBlock, localKit)
 	s.copyTemplateMap()
 	info, _ := os.ReadFile(s.fullPath("maps/map.w3x/war3map.w3i"))
@@ -436,7 +435,7 @@ func TestPlanRunsTheCompilerOfTheManifestsYuePathAndAsksItForTheManifestsVersion
 }
 
 func TestPlanCompilesTheEntryAndInTheModeThatItsOptionsAndTheManifestName(t *testing.T) {
-	minified := `"build":{"folder":"dist/bin","minify":true}`
+	minified := "[build]\nminify = true\n"
 	tests := []struct {
 		name    string
 		blocks  []string
@@ -470,8 +469,8 @@ func TestPlanCompilesTheEntryAndInTheModeThatItsOptionsAndTheManifestName(t *tes
 }
 
 func TestPlanHandsTheCompileTheLintBlockAndWhatTheMapsScriptDefines(t *testing.T) {
-	asWarnings := `"lint":{"unknownGlobals":"warning","globals":[]}`
-	withExtra := `"lint":{"unknownGlobals":"error","globals":["Extra"]}`
+	asWarnings := "[lint]\nunknownGlobals = \"warning\"\n"
+	withExtra := "[lint]\nglobals = [\"Extra\"]\n"
 	tests := []struct {
 		name     string
 		blocks   []string
@@ -621,7 +620,7 @@ func TestPlanReadsTheOwnershipStateAndNeverWritesIt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newFakeProject(t, `"map":{"folder":"`+tt.dir+`","entry":"src/main.yue"}`)
+			s := newFakeProject(t, "[map]\nfolder = \""+tt.dir+"\"\n")
 			s.makeDir(filepath.ToSlash(filepath.Dir(tt.at)))
 			if tt.at != "maps/map.w3x" {
 				if err := os.Rename(s.fullPath("maps/map.w3x"), s.fullPath(tt.at)); err != nil {

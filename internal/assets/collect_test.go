@@ -100,7 +100,7 @@ func TestCollectRefusesBadMappingsCollisionsAndReservedTargets(t *testing.T) {
 	writeFile(t, root, "assets/a.blp")
 	writeFile(t, root, "assets/b.blp")
 	writeFile(t, root, "assets/.hidden")
-	const inBlock = "Fix the assets block"
+	const inBlock = "Fix assets in"
 	tests := []struct {
 		name, block string
 		words       string
@@ -141,7 +141,7 @@ func TestCollectRefusesBadMappingsCollisionsAndReservedTargets(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := mustFailCollect(t, root, tt.block)
 			if !strings.Contains(e.Msg, tt.words) || e.File != tt.file || !strings.Contains(e.Hint, tt.hint) ||
-				!strings.Contains(e.Hint, inBlock) || strings.Count(e.Hint, "moonwell.pkl") != 1 {
+				!strings.Contains(e.Hint, inBlock) || strings.Count(e.Hint, "moonwell.toml") != 1 {
 				t.Errorf("error = %+v with the hint %q, want %q at %q with a hint about %q and the block",
 					e, e.Hint, tt.words, tt.file, tt.hint)
 			}

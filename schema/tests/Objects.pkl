@@ -4,26 +4,25 @@ import "pkl:json"
 import "pkl:test" as t
 import "../ObjectFile.pkl"
 import "../Objects.pkl"
-import "../Project.pkl"
 
 local valueError = "Expected value of type `Boolean|Number|String"
 
 local oneHero = (ObjectFile) { heroes { ["paladin"] { id = "H000"; base = "Hpal" } } }
 local oneUnit = (ObjectFile) { units { ["captain"] { id = "h000"; base = "hfoo"; source = "ignored" } } }
 
-/// A manifest that uses the public wiring over the files in `fixtures/objects/`.
+/// The public wiring over the files in `fixtures/objects/`.
 local merged = Objects.merge(import*("fixtures/objects/**.pkl"))
 local mergedJson = new json.Parser {}.parse(new JsonRenderer {}.renderValue(merged)) as Dynamic
 
 facts {
   ["defaults are empty"] {
-    Project.objects.heroes.isEmpty
-    Project.objects.units.isEmpty
-    Project.objects.buildings.isEmpty
-    Project.objects.items.isEmpty
-    Project.objects.abilities.isEmpty
-    Project.objects.buffs.isEmpty
-    Project.objects.upgrades.isEmpty
+    Objects.heroes.isEmpty
+    Objects.units.isEmpty
+    Objects.buildings.isEmpty
+    Objects.items.isEmpty
+    Objects.abilities.isEmpty
+    Objects.buffs.isEmpty
+    Objects.upgrades.isEmpty
     ObjectFile.heroes.isEmpty
     Objects.merge(new Mapping {}).units.isEmpty
   }

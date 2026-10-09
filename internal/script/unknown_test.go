@@ -180,7 +180,7 @@ func TestUnknownGlobalProblemsReportsEveryUnknownUseInFileLineAndColumnOrder(t *
 	if !slices.Equal(problems, want) {
 		t.Errorf("unknownGlobalProblems = %+v", problems)
 	}
-	if unknownGlobalHint != "Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl." {
+	if unknownGlobalHint != "Declare your own globals with `global`, or add them to lint.globals in moonwell.toml." {
 		t.Errorf("unknownGlobalHint = %s", unknownGlobalHint)
 	}
 	if none := unknownGlobalProblems(map[string][]globalUse{"src/main.yue": {{Name: "print", Line: 1, Column: 1}}}, known, nil); len(none) != 0 {

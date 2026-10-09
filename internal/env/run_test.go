@@ -139,8 +139,8 @@ func TestSpawnErrorNamesTheProgramTheReasonTheHintAndTheFile(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			e := NewSpawnError("game.exe", c.cause, "check the path", "moonwell.local.pkl")
-			if e.File != "moonwell.local.pkl" || e.Hint != "check the path" || !errors.Is(e, c.cause) ||
+			e := NewSpawnError("game.exe", c.cause, "check the path", "config.toml")
+			if e.File != "config.toml" || e.Hint != "check the path" || !errors.Is(e, c.cause) ||
 				!strings.HasPrefix(e.Msg, "Cannot run 'game.exe'") || !strings.HasSuffix(e.Msg, c.reason) ||
 				strings.Contains(e.Msg, "fork/exec") {
 				t.Errorf("error = %+v", e)

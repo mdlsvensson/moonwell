@@ -15,6 +15,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
@@ -29,11 +30,23 @@ type runResult struct {
 
 const mark = "\xe2\x80\xba"
 
+const (
+	userDir      = ".home"
+	userFile     = userDir + "/" + manifest.UserFile
+	absentPlayer = "[[settings.players]]\nslot = 5\nname = \"Absent\"\n"
+)
+
+func withUserDirInProject(e *env.Env) *env.Env {
+	e.ConfigDir = filepath.Join(e.Root, userDir)
+	return e
+}
+
+func realWorld(root string, log *env.Logger) *env.Env {
+	return withUserDirInProject(env.New(root, log))
+}
+
 func runCLI(root string, args ...string) runResult {
-	var lines, printed []string
-	code := Run(background, args, root, func(line string) { lines = append(lines, line) },
-		func(text string) { printed = append(printed, text) })
-	return runResult{code, strings.Join(lines, "\n"), strings.Join(printed, "\n")}
+	return runCLIIn(background, realWorld, root, args...)
 }
 
 func runCLIWithContext(t *testing.T, ctx context.Context, root string, args ...string) runResult {
@@ -51,7 +64,7 @@ func runCLIIn(ctx context.Context, outside envFactory, root string, args ...stri
 func fakeEnvFactory(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
-		e.Log = log
+		withUserDirInProject(e).Log = log
 		e.Run = func(ctx context.Context, program string, args []string, _ env.RunOptions) (env.RunResult, error) {
 			switch {
 			case ctx.Err() != nil:
@@ -119,7 +132,7 @@ func newFakeWorld(t *testing.T, standIns ...string) fakeWorld {
 	outside := func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
 		e.Log, e.CacheDir, e.Run = log, cache, runs
-		return e
+		return withUserDirInProject(e)
 	}
 	return fakeWorld{outside: outside, cache: cache, compiler: compiler}
 }
@@ -174,7 +187,7 @@ func mustFindCommand(t *testing.T, name string) command {
 func newTemplateProject(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
-	testkit.WriteFile(t, root, "moonwell.pkl", []byte("// A manifest that no test evaluates.\n"))
+	testkit.WriteFile(t, root, manifest.ProjectFile, nil)
 	return root
 }
 
@@ -224,7 +237,7 @@ func asDiagError(t *testing.T, err error, what string) *diag.Error {
 
 func newRealEnv(root string) (*env.Env, *testkit.LogRecorder) {
 	log := testkit.NewLogRecorder()
-	return env.New(root, log.Logger), log
+	return realWorld(root, log.Logger), log
 }
 
 func newProject(t *testing.T, name string) string {
@@ -300,6 +313,7 @@ func mustFailWithPklOnly(t *testing.T, root string, wanted []string, args ...str
 func newPklOnlyEnv(t *testing.T, root string) (e *env.Env, log *testkit.LogRecorder, ran func() []string) {
 	t.Helper()
 	e, log = testkit.Env(t, root)
+	withUserDirInProject(e)
 	var guard sync.Mutex
 	var programs []string
 	e.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
@@ -340,6 +354,13 @@ func mustRunCommand(t *testing.T, e *env.Env, log *testkit.LogRecorder, name str
 	return log.Lines()
 }
 
+func checkNoProgramRan(t *testing.T, ran func() []string) {
+	t.Helper()
+	if programs := ran(); len(programs) != 0 {
+		t.Errorf("the command ran %q, want no program", programs)
+	}
+}
+
 func checkOnlyPklRan(t *testing.T, ran func() []string) {
 	t.Helper()
 	programs := ran()
@@ -348,9 +369,13 @@ func checkOnlyPklRan(t *testing.T, ran func() []string) {
 	}
 }
 
-func writeLocalManifest(t *testing.T, root, body string) {
+func setSettings(t *testing.T, root, settings string) {
 	t.Helper()
-	writeFile(t, root, "moonwell.local.pkl", "amends \"moonwell.pkl\"\n"+body+"\n")
+	writeFile(t, root, manifest.ProjectFile, settings)
+}
+
+func localLibrary(name, path string) string {
+	return "[[libraries]]\nname = \"" + name + "\"\npath = \"" + path + "\"\n"
 }
 
 func checkSameFiles(t *testing.T, before, after map[string][]byte, what string) {
@@ -393,8 +418,7 @@ func exampleLibrary(t *testing.T) string {
 
 func useLibrary(t *testing.T, root, library string) {
 	t.Helper()
-	appendToFile(t, root, "moonwell.local.pkl",
-		"\nlibraries { [\"ex\"] { path = \""+filepath.ToSlash(library)+"\"; dir = \"src\" } }\n")
+	appendToFile(t, root, manifest.ProjectFile, "\n"+localLibrary("ex", filepath.ToSlash(library))+"dir = \"src\"\n")
 	appendToFile(t, root, "src/main.yue", "\nimport \"example.loud\"\nrequire \"example.globals\"\n"+
 		"print loud.shout \"Moonwell\"\nprint ExampleAdd 1, 2\n")
 }

@@ -97,7 +97,7 @@ func mergeConstant(merged []txt.Section, constant typedConstant, manifestName st
 
 func equalFold(a, b string) bool { return strings.EqualFold(a, b) }
 
-const schemaHint = "Check this field in settings against @moonwell/MapSettings.pkl."
+const schemaHint = "Check this setting against the list under \"Settings\" in Moonwell's README."
 
 func errDuplicateSection(manifestName, path, name string) error {
 	return &diag.Error{Msg: "Invalid or duplicate " + path + " section: " + name, File: manifestName, Hint: schemaHint}

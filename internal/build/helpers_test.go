@@ -33,30 +33,14 @@ func asDiagError(t testing.TB, err error, what string) *diag.Error {
 	return diagErr
 }
 
-const manifestName = "moonwell.pkl"
+const manifestName = manifest.ProjectFile
 
-var defaultBlocks = []string{
-	`"map":{"folder":"map.w3x","entry":"src/main.yue"}`,
-	`"build":{"folder":"dist/bin","minify":false}`,
-	`"launch":{"args":["-launch","-windowmode","windowed"]}`,
-	`"assets":{"paths":{},"exclude":[]}`,
-	`"lint":{"unknownGlobals":"error","globals":[]}`,
-	`"libraries":{}`,
-	`"settings":{"info":{},"loadingScreen":{},"gameplayConstants":{},"gameInterface":{},"players":{"0":{}},` +
-		`"forces":{},"environment":{"fog":{}},"gameplay":{}}`,
-	`"objects":{"heroes":{},"units":{},"buildings":{},"items":{},"abilities":{},"buffs":{},"upgrades":{}}`,
-}
-
-func pklOutputWith(defaults []string, blocks ...string) string {
-	all := slices.Clone(blocks)
-	for _, standard := range defaults {
-		name, _, _ := strings.Cut(standard, ":")
-		if !slices.ContainsFunc(blocks, func(block string) bool { return strings.HasPrefix(block, name+":") }) {
-			all = append(all, standard)
-		}
-	}
-	return "{" + strings.Join(all, ",") + "}"
-}
+const (
+	objectsBlock = `"objects":`
+	launchBlock  = "[launch]"
+	noObjects    = `{"heroes":{},"units":{},"buildings":{},"items":{},"abilities":{},"buffs":{},"upgrades":{}}`
+	objectFile   = "objects/units.pkl"
+)
 
 const resolvedDeps = `{"schemaVersion":1,"resolvedDependencies":{` +
 	`"package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0":{"type":"local",` +
@@ -90,7 +74,6 @@ type fakeProject struct {
 	log      *testkit.LogRecorder
 	project  *manifest.Project
 	compiler string
-	defaults []string
 
 	mu       sync.Mutex
 	printed  string
@@ -111,24 +94,18 @@ func newFakeProject(t testing.TB, blocks ...string) *fakeProject {
 	}
 	s.writeFile("maps/map.w3x/war3map.lua", smallScript)
 	s.writeFile("src/main.yue", "x = 1\n")
-	s.writeFile(manifestName, "// The stand-in for pkl prints what this manifest evaluates to, and reads no line of it.\n")
 	s.writeFile("PklProject.deps.json", resolvedDeps)
 	s.env, s.log = testkit.Env(t, s.root)
 	s.env.Run = s.run
 	s.setProgram("pkl", s.fakePkl)
 	s.compiler = testkit.WriteFile(t, t.TempDir(), "yue-stand-in", nil)
 	s.setProgram(s.compiler, s.fakeYue)
-	s.defaults = append(slices.Clone(defaultBlocks), s.yueBlock(toolchain.YueVersion))
 	s.setManifest(blocks...)
 	return s
 }
 
 func (s *fakeProject) yueBlock(version string) string {
-	path, err := json.Marshal(s.compiler)
-	if err != nil {
-		s.t.Fatal(err)
-	}
-	return `"yue":{"version":"` + version + `","path":` + string(path) + `}`
+	return "[yue]\nversion = \"" + version + "\"\n"
 }
 
 func (s *fakeProject) copyTemplateMap() {
@@ -141,14 +118,35 @@ func (s *fakeProject) copyTemplateMap() {
 
 func (s *fakeProject) setManifest(blocks ...string) {
 	s.t.Helper()
-	output := pklOutputWith(s.defaults, blocks...)
-	project, err := manifest.DecodeProject(s.root, manifestName, []byte(output))
+	objects, project, user := noObjects, []string{}, []string{"[yue]\npath = '" + s.compiler + "'\n"}
+	for _, block := range blocks {
+		switch {
+		case strings.HasPrefix(block, objectsBlock):
+			objects = strings.TrimPrefix(block, objectsBlock)
+		case strings.HasPrefix(block, launchBlock):
+			user = append(user, block)
+		default:
+			project = append(project, block)
+		}
+	}
+	s.writeFile(manifestName, strings.Join(project, "\n"))
+	testkit.WriteFile(s.t, s.env.ConfigDir, manifest.UserFile, []byte(strings.Join(user, "\n")))
+	s.removeFile(objectFile)
+	if objects != noObjects {
+		s.writeFile(objectFile, "")
+	}
+	loaded, err := manifest.Load(s.env)
 	if err != nil {
-		s.t.Fatalf("the manifest %s: %v", output, diag.Format(err))
+		s.t.Fatalf("the settings %q: %v", project, diag.Format(err))
+	}
+	if objects != noObjects {
+		if err := json.Unmarshal([]byte(objects), &loaded.Objects); err != nil {
+			s.t.Fatalf("the objects %s: %v", objects, err)
+		}
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.printed, s.project = output, project
+	s.printed, s.project = objects, loaded
 }
 
 func (s *fakeProject) setProgram(name string, stand fakeProgram) {
@@ -274,4 +272,8 @@ func sameRuns(a, b []runCall) bool {
 	return slices.EqualFunc(a, b, func(x, y runCall) bool {
 		return x.program == y.program && x.dir == y.dir && slices.Equal(x.args, y.args)
 	})
+}
+
+func pklAt(program string) PklFinder {
+	return func(context.Context, *env.Env) (string, error) { return program, nil }
 }

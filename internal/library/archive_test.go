@@ -182,7 +182,7 @@ func (s *fakeFetcher) fetch(_ context.Context, url string) (int, []byte, error) 
 var _ env.FetchFunc = (*fakeFetcher)(nil).fetch
 
 const (
-	manifestFile = "moonwell.local.pkl"
+	manifestFile = "moonwell.toml"
 	exampleURL   = "https://codeload.github.com/owner/lib/zip/refs/tags/v1/x"
 )
 

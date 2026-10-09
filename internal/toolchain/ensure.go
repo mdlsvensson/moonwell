@@ -12,6 +12,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
 type Asset struct {
@@ -120,7 +121,7 @@ func errUnknownVersion(tool Tool, version string) error {
 	known := slices.Sorted(maps.Keys(tool.Versions))
 	return &diag.Error{
 		Msg:  "Unknown " + tool.Title + " version " + version + ". Known versions: " + strings.Join(known, ", ") + ".",
-		File: "moonwell.pkl",
+		File: manifest.ProjectFile,
 		Hint: "Use a known version, or " + tool.ManualInstallHint,
 	}
 }

@@ -69,7 +69,10 @@ func createProject(ctx context.Context, e *env.Env, dir, schemaDir string) error
 		undoInit(projectDir, existed)
 		return err
 	}
-	e.Log.Info("Created " + dir + ". Check launch.gameExecutable in moonwell.local.pkl, then: cd " + dir +
+	if _, err := manifest.EnsureUserFile(e); err != nil {
+		return err
+	}
+	e.Log.Info("Created " + dir + ". Check launch.gameExecutable in " + manifest.UserFilePath(e) + ", then: cd " + dir +
 		" && moonwell build")
 	return nil
 }
@@ -123,7 +126,6 @@ func writeProject(projectDir, displayPath, schemaRelPath string) error {
 	}
 	files = append(files,
 		moonwell.TemplateFile{Path: "PklProject", Data: []byte(manifest.PklProjectText(moonwell.Version, schemaRelPath))},
-		moonwell.TemplateFile{Path: manifest.LocalManifest, Data: []byte(manifest.LocalManifestText())},
 	)
 	for _, file := range files {
 		if err := writeProjectFile(projectDir, displayPath, file); err != nil {

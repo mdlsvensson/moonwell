@@ -10,6 +10,7 @@ import (
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 	"github.com/mdlsvensson/moonwell/internal/war3/imp"
 )
@@ -36,7 +37,7 @@ func readImports(t *testing.T, root string) []string {
 	return paths
 }
 
-func TestPklAssetsCheckAndSync(t *testing.T) {
+func TestAssetsCheckAndSync(t *testing.T) {
 	root := newProject(t, "my-map")
 	writeFile(t, root, "assets/icons/a.blp", "icon")
 	planned := []string{
@@ -65,17 +66,17 @@ func TestPklAssetsCheckAndSync(t *testing.T) {
 	if lines := mustRunCommand(t, e, log, "assets:check"); !slices.Equal(lines, []string{planned[0], checkedLine("1", "0")}) {
 		t.Fatalf("assets:check after a sync logged %q", lines)
 	}
-	checkOnlyPklRan(t, ran)
+	checkNoProgramRan(t, ran)
 	if exists(root, "dist/.lock") {
 		t.Error("a command left the build lock behind")
 	}
 }
 
-func TestPklAssetsAreListedByThePathsTheyAreWrittenUnder(t *testing.T) {
+func TestAssetsAreListedByThePathsTheyAreWrittenUnder(t *testing.T) {
 	root := newProject(t, "my-map")
 	writeFile(t, root, "assets/Icons/a.blp", "a")
 	writeFile(t, root, "assets/b.blp", "b")
-	replaceInFile(t, root, "moonwell.pkl", "paths {}", `paths { ["b.blp"] = #"icons\b.blp"# }`)
+	appendToFile(t, root, manifest.ProjectFile, "\n[[assets.paths]]\nfile = \"b.blp\"\npath = 'icons\\b.blp'\n")
 	e, log, _ := newPklOnlyEnv(t, root)
 	lines := mustRunCommand(t, e, log, "assets:check")
 	want := []string{
@@ -87,39 +88,34 @@ func TestPklAssetsAreListedByThePathsTheyAreWrittenUnder(t *testing.T) {
 	}
 }
 
-func cancelAfterManifestEnv(t *testing.T, stop context.CancelFunc) envFactory {
+func cancelAtTheFirstLogLineEnv(t *testing.T, stop context.CancelFunc) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _, _ := newPklOnlyEnv(t, root)
-		e.Log = log
-		runs := e.Run
-		e.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
-			result, err := runs(ctx, program, args, options)
-			if slices.Contains(args, "eval") {
-				stop()
-			}
-			return result, err
-		}
+		e.Log = env.NewLogger(func(line string) {
+			stop()
+			log.Info(line)
+		}, "")
 		return e
 	}
 }
 
-func TestPklAssetsInterruptedSyncWritesNothing(t *testing.T) {
+func TestAssetsInterruptedSyncWritesNothing(t *testing.T) {
 	root := newProject(t, "my-map")
 	writeFile(t, root, "assets/icons/a.blp", "icon")
 	before := testkit.Snapshot(t, filepath.Join(root, "maps"))
 
 	stopped, stop := context.WithCancel(background)
 	stop()
-	if result := runCLIIn(stopped, cancelAfterManifestEnv(t, stop), root, "assets:sync"); result.code != 130 ||
+	if result := runCLIIn(stopped, cancelAtTheFirstLogLineEnv(t, stop), root, "assets:sync"); result.code != 130 ||
 		result.output != "" {
 		t.Errorf("a sync that was told to stop before it started: %+v", result)
 	}
 
-	planning, stop := context.WithCancel(background)
+	planned, stop := context.WithCancel(background)
 	defer stop()
-	result := runCLIIn(planning, cancelAfterManifestEnv(t, stop), root, "assets:sync")
-	if result.code != 130 || result.output != "error: Interrupted; nothing was written." {
-		t.Errorf("a sync that was told to stop while it planned: %+v", result)
+	result := runCLIIn(planned, cancelAtTheFirstLogLineEnv(t, stop), root, "assets:sync")
+	if result.code != 130 || !strings.HasSuffix(result.output, "error: Interrupted; nothing was written.") {
+		t.Errorf("a sync that was told to stop as it said what it would write: %+v", result)
 	}
 
 	checkSameFiles(t, before, testkit.Snapshot(t, filepath.Join(root, "maps")), "interrupted sync")
@@ -138,13 +134,12 @@ func newProjectWithAssetLibrary(t *testing.T) (root, plain string) {
 		testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(`Textures\Golem.blp`, 0))))
 	testkit.WriteFile(t, library, "assets/Textures/Golem.blp", []byte{1})
 	writeFile(t, library, "assets/war3mapImported/golems/frames.toc", "war3mapImported\\golems\\frames.fdf\n")
-	plain = readFile(t, root, "moonwell.pkl")
-	replaceInFile(t, root, "moonwell.pkl", "libraries {\n",
-		"libraries {\n  [\"golems\"] { path = \""+filepath.ToSlash(library)+"\" }\n")
+	plain = readFile(t, root, manifest.ProjectFile)
+	appendToFile(t, root, manifest.ProjectFile, "\n"+localLibrary("golems", filepath.ToSlash(library)))
 	return root, plain
 }
 
-func TestPklLibraryAssetsSyncAndRemoval(t *testing.T) {
+func TestLibraryAssetsSyncAndRemoval(t *testing.T) {
 	root, plain := newProjectWithAssetLibrary(t)
 	testkit.WriteFile(t, root, "assets/Textures/golem.blp", []byte{2})
 	planned := []string{
@@ -174,7 +169,7 @@ func TestPklLibraryAssetsSyncAndRemoval(t *testing.T) {
 		t.Fatal("the map holds other bytes than the assets")
 	}
 
-	writeFile(t, root, "moonwell.pkl", plain)
+	writeFile(t, root, manifest.ProjectFile, plain)
 	e, log, _ = newPklOnlyEnv(t, root)
 	lines := mustRunCommand(t, e, log, "assets:sync")
 	if !slices.Equal(lines, []string{
@@ -197,10 +192,10 @@ func TestPklLibraryAssetsSyncAndRemoval(t *testing.T) {
 	if imports := readImports(t, root); !slices.Equal(imports, []string{`Textures\golem.blp`}) {
 		t.Fatalf("the index lists %q", imports)
 	}
-	checkOnlyPklRan(t, ran)
+	checkNoProgramRan(t, ran)
 }
 
-func TestPklAssetsCommandsNeedTheMapsScriptAndItsInfoFile(t *testing.T) {
+func TestAssetsCommandsNeedTheMapsScriptAndItsInfoFile(t *testing.T) {
 	for _, name := range []string{"war3map.lua", "war3map.w3i"} {
 		for what, arrange := range map[string]func(t *testing.T, root string){
 			"is not there": func(t *testing.T, root string) {},
@@ -231,14 +226,14 @@ func TestPklAssetsCommandsNeedTheMapsScriptAndItsInfoFile(t *testing.T) {
 	}
 }
 
-func TestPklAssetsCommandsNeedTheSourceMap(t *testing.T) {
+func TestAssetsCommandsNeedTheSourceMap(t *testing.T) {
 	root := newProject(t, "my-map")
 	removeFile(t, root, "maps/map.w3x")
 	for _, command := range []string{"assets:check", "assets:sync"} {
 		e, _, _ := newPklOnlyEnv(t, root)
 		_, err := runCommandIn(t, background, e, command)
 		diagErr := asDiagError(t, err, command+" without the map")
-		if diagErr.File != "moonwell.local.pkl" || diagErr.Hint == "" ||
+		if diagErr.File != manifest.ProjectFile || diagErr.Hint == "" ||
 			!strings.Contains(diagErr.Msg, "Source map folder maps/map.w3x not found") {
 			t.Errorf("%s: error = %+v", command, diagErr)
 		}
@@ -248,7 +243,7 @@ func TestPklAssetsCommandsNeedTheSourceMap(t *testing.T) {
 	}
 }
 
-func TestPklAssetsCommandsAreRefusedBesideARunningBuild(t *testing.T) {
+func TestAssetsCommandsAreRefusedBesideARunningBuild(t *testing.T) {
 	root, _ := newProjectWithAssetLibrary(t)
 	holdBuildLock(t, root)
 	for _, command := range []string{"assets:check", "assets:sync"} {
@@ -268,11 +263,10 @@ func TestPklAssetsCommandsAreRefusedBesideARunningBuild(t *testing.T) {
 	}
 }
 
-func TestPklTheAssetsCommandsHoldTheBuildLockWhileTheySyncTheLibraries(t *testing.T) {
+func TestTheAssetsCommandsHoldTheBuildLockWhileTheySyncTheLibraries(t *testing.T) {
 	for _, name := range []string{"assets:check", "assets:sync", "assets:paths"} {
 		root := newProject(t, "my-map")
-		replaceInFile(t, root, "moonwell.pkl", "libraries {\n",
-			"libraries {\n  [\"kit\"] { github = \"owner/kit\"; tag = \"v1.0.0\" }\n")
+		appendToFile(t, root, manifest.ProjectFile, "\n[[libraries]]\nname = \"kit\"\ngithub = \"owner/kit\"\ntag = \"v1.0.0\"\n")
 		e, _, _ := newPklOnlyEnv(t, root)
 		var asked, locked atomic.Int32
 		e.Fetch = func(_ context.Context, url string) (int, []byte, error) {
@@ -296,7 +290,7 @@ func TestPklTheAssetsCommandsHoldTheBuildLockWhileTheySyncTheLibraries(t *testin
 	}
 }
 
-func TestPklAssetsCommandLinesPrintAndKeepWhatTheySay(t *testing.T) {
+func TestAssetsCommandLinesPrintAndKeepWhatTheySay(t *testing.T) {
 	root := newProject(t, "my-map")
 	writeFile(t, root, "assets/icons/a.blp", "icon")
 	r := mustSucceedWithPklOnly(t, root, "assets:check")
