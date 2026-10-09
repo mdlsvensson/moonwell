@@ -4,10 +4,11 @@ import (
 	"regexp"
 
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
 const (
-	YueVersion = "0.34.3"
+	YueVersion = manifest.DefaultYueVersion
 	PklVersion = "0.32.1"
 )
 

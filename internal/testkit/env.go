@@ -38,13 +38,14 @@ func Env(t testing.TB, root string) (*env.Env, *LogRecorder) {
 	t.Helper()
 	recorder := NewLogRecorder()
 	return &env.Env{
-		Root:     root,
-		Log:      recorder.Logger,
-		Run:      failingRun(t),
-		Fetch:    failingFetch(t),
-		Spawn:    failingSpawn(t),
-		CacheDir: t.TempDir(),
-		Platform: env.CurrentPlatform(),
+		Root:      root,
+		Log:       recorder.Logger,
+		Run:       failingRun(t),
+		Fetch:     failingFetch(t),
+		Spawn:     failingSpawn(t),
+		CacheDir:  t.TempDir(),
+		ConfigDir: t.TempDir(),
+		Platform:  env.CurrentPlatform(),
 	}, recorder
 }
 
