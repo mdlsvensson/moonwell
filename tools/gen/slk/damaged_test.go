@@ -56,7 +56,7 @@ func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 	t.Helper()
 	var table slk.Table
 	var err error
-	if value := testkit.Panic(func() { table, err = slk.Parse(text, damagedFile) }); value != nil {
+	if value := testkit.PanicValue(func() { table, err = slk.Parse(text, damagedFile) }); value != nil {
 		t.Fatalf("%s: Parse panics: %v", what, value)
 	}
 	if err == nil {
@@ -86,10 +86,10 @@ func TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", name, length), text[:length])
 		}
 		for index := range uint64(60) {
-			made := testkit.Changed(text, damageSeed, index)
+			made := testkit.MutateText(text, damageSeed, index)
 			damaged.readOrRefused(t, fmt.Sprintf("%s, change %d of seed %d: %q", name, index, damageSeed, made), made)
 		}
-		for i, made := range testkit.Swept(text) {
+		for i, made := range testkit.SpaceVariants(text) {
 			damaged.readOrRefused(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
 		}
 	}
