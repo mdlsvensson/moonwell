@@ -15,7 +15,7 @@ const (
 	beyond     = "\xf0\x9f\x98\x80"
 )
 
-func api() *script.Natives {
+func testNatives() *script.Natives {
 	n := &script.Natives{
 		GameVersion: "9.9.9",
 		Types:       []script.NativeType{{Name: "agent", Extends: "handle"}, {Name: "unit", Extends: "widget"}, {Name: "widget", Extends: "agent"}},
@@ -76,7 +76,7 @@ func TestTheNativesDeclarationsDeclareClassesFunctionsAndGlobals(t *testing.T) {
 		"counts = nil",
 		"",
 	}, "\n")
-	if got := renderNatives(api()); got != want {
+	if got := renderNatives(testNatives()); got != want {
 		t.Errorf("renderNatives =\n%s", got)
 	}
 }
@@ -99,9 +99,9 @@ func TestEveryKeywordOfLuaIsNoNameOfAParameter(t *testing.T) {
 	}
 	params = append(params, script.NativeParam{Name: "endX", Type: "integer"}, script.NativeParam{Name: "End", Type: "integer"})
 	declared := renderNatives(&script.Natives{Functions: []script.NativeFunction{{Name: "F", Params: params, Returns: "nothing"}}})
-	contains(t, declared, "function F("+strings.Join(keywords, "_, ")+"_, endX, End) end\n")
+	checkContains(t, declared, "function F("+strings.Join(keywords, "_, ")+"_, endX, End) end\n")
 	for _, keyword := range keywords {
-		contains(t, declared, "---@param "+keyword+"_ integer\n")
+		checkContains(t, declared, "---@param "+keyword+"_ integer\n")
 	}
 }
 
@@ -127,9 +127,9 @@ func TestTheRuntimeDeclarationsDeclareTheModulesHooksAndRequire(t *testing.T) {
 		t.Errorf("runtimeDeclarations =\n%s", declarations)
 	}
 	for _, hook := range []string{"before_config", "on_config", "before_main", "on_main"} {
-		contains(t, declarations, "---@param fn fun(): ...\nfunction moonwell."+hook+"(fn) end\n")
+		checkContains(t, declarations, "---@param fn fun(): ...\nfunction moonwell."+hook+"(fn) end\n")
 	}
-	contains(t, declarations, "function moonwell.format_error(message) end\n",
+	checkContains(t, declarations, "function moonwell.format_error(message) end\n",
 		"---@param name string\n---@return any\nfunction require(name) end\n")
 	for number, line := range strings.Split(strings.TrimSuffix(declarations, "\n"), "\n") {
 		isComment := strings.HasPrefix(line, "---") || strings.HasPrefix(line, "-- ")
@@ -141,7 +141,7 @@ func TestTheRuntimeDeclarationsDeclareTheModulesHooksAndRequire(t *testing.T) {
 	}
 }
 
-func resolved() []objects.Resolved {
+func testObjects() []objects.Resolved {
 	return []objects.Resolved{
 		{Category: "units", Key: "captain", ID: "h000"},
 		{Category: "units", Key: "archer", ID: "h001"},
@@ -150,11 +150,11 @@ func resolved() []objects.Resolved {
 }
 
 func TestTheObjectDeclarationsDeclareEveryCategoryKeysSortedWithRawcodes(t *testing.T) {
-	declarations := renderObjects(resolved())
+	declarations := renderObjects(testObjects())
 	if !strings.HasPrefix(declarations, "---@meta generated.objects\n---@diagnostic disable: missing-fields\n") {
 		t.Errorf("renderObjects =\n%s", declarations)
 	}
-	contains(t, declarations,
+	checkContains(t, declarations,
 		"---@class generated.objects.units\n---@field archer integer h001\n---@field captain integer h000\n",
 		"---@class generated.objects.heroes\n\n",
 		"---@type generated.objects.abilities\nobjects.abilities = {}\n",
@@ -186,7 +186,7 @@ func TestTheObjectDeclarationsSortKeysByBytesAndKeepTheOrderOfEqualOnes(t *testi
 		{Category: "items", Key: "same", ID: "I002"}, {Category: "items", Key: "Zed", ID: "I003"},
 		{Category: "items", Key: "same", ID: "I004"}, {Category: "items", Key: "_low", ID: "I005"},
 	})
-	contains(t, declarations, "---@class generated.objects.items\n"+
+	checkContains(t, declarations, "---@class generated.objects.items\n"+
 		"---@field Zed integer I003\n---@field _low integer I005\n"+
 		"---@field k"+fullWidthA+" integer I001\n---@field k"+beyond+" integer I000\n"+
 		"---@field same integer I002\n---@field same integer I004\n\n")

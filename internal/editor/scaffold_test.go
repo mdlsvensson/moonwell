@@ -64,7 +64,7 @@ const (
 	escapeU   = "\x5cu"
 )
 
-func carried(t testing.TB) []moonwell.TemplateFile {
+func templateFiles(t testing.TB) []moonwell.TemplateFile {
 	t.Helper()
 	template, err := moonwell.TemplateFiles()
 	if err != nil {
@@ -73,7 +73,7 @@ func carried(t testing.TB) []moonwell.TemplateFile {
 	return template
 }
 
-func fileOf(t testing.TB, template []moonwell.TemplateFile, path string) []byte {
+func templateFileData(t testing.TB, template []moonwell.TemplateFile, path string) []byte {
 	t.Helper()
 	for _, file := range template {
 		if file.Path == path {
@@ -84,7 +84,7 @@ func fileOf(t testing.TB, template []moonwell.TemplateFile, path string) []byte 
 	return nil
 }
 
-func membersOf(t testing.TB, text string) manifest.OrderedMap[json.RawMessage] {
+func mustParseObject(t testing.TB, text string) manifest.OrderedMap[json.RawMessage] {
 	t.Helper()
 	var members manifest.OrderedMap[json.RawMessage]
 	if err := json.Unmarshal([]byte(strings.TrimPrefix(text, mark)), &members); err != nil {
@@ -93,7 +93,7 @@ func membersOf(t testing.TB, text string) manifest.OrderedMap[json.RawMessage] {
 	return members
 }
 
-func listUnder(t testing.TB, members manifest.OrderedMap[json.RawMessage], key string) []string {
+func stringListAt(t testing.TB, members manifest.OrderedMap[json.RawMessage], key string) []string {
 	t.Helper()
 	written, _ := members.Get(key)
 	var list []string
@@ -103,7 +103,7 @@ func listUnder(t testing.TB, members manifest.OrderedMap[json.RawMessage], key s
 	return list
 }
 
-func onOneLine(written json.RawMessage) string {
+func compactJSON(written json.RawMessage) string {
 	var text bytes.Buffer
 	if err := json.Compact(&text, written); err != nil {
 		return err.Error()
@@ -111,17 +111,17 @@ func onOneLine(written json.RawMessage) string {
 	return text.String()
 }
 
-func notADiagError(t testing.TB, err error, what string, words ...string) {
+func checkPlainError(t testing.TB, err error, what string, words ...string) {
 	t.Helper()
 	var expected *diag.Error
 	if err == nil || errors.As(err, &expected) {
 		t.Fatalf("%s: got %v, want an error that is no *diag.Error", what, err)
 	}
-	contains(t, err.Error(), words...)
+	checkContains(t, err.Error(), words...)
 }
 
 func TestTheTemplateShipsEveryEditorFile(t *testing.T) {
-	template := carried(t)
+	template := templateFiles(t)
 	for _, path := range editorFiles {
 		if !slices.ContainsFunc(template, func(file moonwell.TemplateFile) bool { return file.Path == path }) {
 			t.Errorf("the template has no %s", path)
@@ -130,11 +130,11 @@ func TestTheTemplateShipsEveryEditorFile(t *testing.T) {
 }
 
 func TestTheTemplatesLuarcIndexesTheCompiledLuaFilesAndSuggestsEveryGameGlobal(t *testing.T) {
-	config := membersOf(t, string(fileOf(t, carried(t), ".luarc.json")))
+	config := mustParseObject(t, string(templateFileData(t, templateFiles(t), ".luarc.json")))
 	if useGitIgnore, _ := config.Get("workspace.useGitIgnore"); string(useGitIgnore) != "false" {
 		t.Errorf("workspace.useGitIgnore = %s", useGitIgnore)
 	}
-	if !slices.Contains(listUnder(t, config, "workspace.ignoreDir"), ".moonwell/libraries") {
+	if !slices.Contains(stringListAt(t, config, "workspace.ignoreDir"), ".moonwell/libraries") {
 		t.Error("workspace.ignoreDir lacks .moonwell/libraries")
 	}
 	api := script.LoadNatives()
@@ -147,15 +147,15 @@ func TestTheTemplatesLuarcIndexesTheCompiledLuaFilesAndSuggestsEveryGameGlobal(t
 }
 
 func TestAddFilesAddsMissingFilesAndGitignoreLinesAndNeverOverwrites(t *testing.T) {
-	root := lay(t, ".luarc.json", "mine\n", ".gitignore", "dist/\r\n.moonwell/\r\n")
+	root := newProjectDir(t, ".luarc.json", "mine\n", ".gitignore", "dist/\r\n.moonwell/\r\n")
 	added, err := AddFiles(root, smallTemplate)
 	want := []string{"yueconfig.yue", ".vscode/extensions.json", ".gitignore (src/**/*.lua)"}
 	if err != nil || !slices.Equal(added, want) {
 		t.Fatalf("AddFiles = %q, %v", added, err)
 	}
-	if read(t, root, ".luarc.json") != "mine\n" || read(t, root, "yueconfig.yue") != "return {}\n" ||
-		read(t, root, ".gitignore") != "dist/\r\n.moonwell/\r\nsrc/**/*.lua\n" {
-		t.Errorf(".gitignore = %q", read(t, root, ".gitignore"))
+	if readFile(t, root, ".luarc.json") != "mine\n" || readFile(t, root, "yueconfig.yue") != "return {}\n" ||
+		readFile(t, root, ".gitignore") != "dist/\r\n.moonwell/\r\nsrc/**/*.lua\n" {
+		t.Errorf(".gitignore = %q", readFile(t, root, ".gitignore"))
 	}
 	if added, err := AddFiles(root, smallTemplate); err != nil || added == nil || len(added) != 0 {
 		t.Errorf("AddFiles again = %#v, %v", added, err)
@@ -163,21 +163,21 @@ func TestAddFilesAddsMissingFilesAndGitignoreLinesAndNeverOverwrites(t *testing.
 }
 
 func TestAddFilesCreatesGitignoreWhenThereIsNoneAndWritesTheCarriedTemplatesFiles(t *testing.T) {
-	root, template := t.TempDir(), carried(t)
+	root, template := t.TempDir(), templateFiles(t)
 	added, err := AddFiles(root, template)
 	want := []string{"yueconfig.yue", ".luarc.json", ".vscode/extensions.json", ".gitignore (.moonwell/, src/**/*.lua)"}
 	if err != nil || !slices.Equal(added, want) {
 		t.Fatalf("AddFiles = %q, %v", added, err)
 	}
-	if got := read(t, root, ".gitignore"); got != ".moonwell/\nsrc/**/*.lua\n" {
+	if got := readFile(t, root, ".gitignore"); got != ".moonwell/\nsrc/**/*.lua\n" {
 		t.Errorf(".gitignore = %q", got)
 	}
 	for _, path := range editorFiles {
-		if read(t, root, path) != string(fileOf(t, template, path)) {
+		if readFile(t, root, path) != string(templateFileData(t, template, path)) {
 			t.Errorf("%s differs from the template's", path)
 		}
 	}
-	if got := entriesIn(t, root); len(got) != 5 {
+	if got := listEntries(t, root); len(got) != 5 {
 		t.Errorf("the project holds %q", got)
 	}
 }
@@ -202,7 +202,7 @@ func TestAddFilesAppendsTheIgnoresAGitignoreLacks(t *testing.T) {
 		{"both lines, the last without a line break", "src/**/*.lua\n.moonwell/", "src/**/*.lua\n.moonwell/", ""},
 	}
 	for _, c := range cases {
-		root := lay(t, "yueconfig.yue", "", ".luarc.json", "", ".vscode/extensions.json", "", ".gitignore", c.held)
+		root := newProjectDir(t, "yueconfig.yue", "", ".luarc.json", "", ".vscode/extensions.json", "", ".gitignore", c.held)
 		want := []string{}
 		if c.added != "" {
 			want = []string{".gitignore (" + c.added + ")"}
@@ -211,7 +211,7 @@ func TestAddFilesAppendsTheIgnoresAGitignoreLacks(t *testing.T) {
 		if err != nil || added == nil || !slices.Equal(added, want) {
 			t.Errorf("%s: AddFiles = %#v, %v, want %q", c.name, added, err, want)
 		}
-		if got := read(t, root, ".gitignore"); got != c.want {
+		if got := readFile(t, root, ".gitignore"); got != c.want {
 			t.Errorf("%s: .gitignore = %q, want %q", c.name, got, c.want)
 		}
 	}
@@ -219,12 +219,12 @@ func TestAddFilesAppendsTheIgnoresAGitignoreLacks(t *testing.T) {
 
 func TestAddFilesKeepsTheBytesOfAGitignoreThatIsNotUTF8(t *testing.T) {
 	const held = "caf\xe9/\n\xe2\x82\n.moonwell/\n\xff"
-	root := lay(t, ".gitignore", held)
+	root := newProjectDir(t, ".gitignore", held)
 	added, err := AddFiles(root, smallTemplate)
 	if err != nil || !slices.Contains(added, ".gitignore (src/**/*.lua)") {
 		t.Fatalf("AddFiles = %q, %v", added, err)
 	}
-	if got := read(t, root, ".gitignore"); got != held+"\nsrc/**/*.lua\n" {
+	if got := readFile(t, root, ".gitignore"); got != held+"\nsrc/**/*.lua\n" {
 		t.Errorf(".gitignore = %q", got)
 	}
 }
@@ -237,19 +237,19 @@ func TestAddFilesTakesOnlyWhiteSpaceOfASCIIOffALineOfGitignore(t *testing.T) {
 		{"a wide space and a line separator", wideSpace + ".moonwell/\nsrc/**/*.lua" + lineSep + "\n"},
 	}
 	for _, c := range cases {
-		root := lay(t, ".gitignore", c.held)
+		root := newProjectDir(t, ".gitignore", c.held)
 		added, err := AddFiles(root, smallTemplate)
 		if err != nil || !slices.Contains(added, ".gitignore (.moonwell/, src/**/*.lua)") {
 			t.Errorf("%s: AddFiles = %q, %v", c.name, added, err)
 		}
-		if got := read(t, root, ".gitignore"); got != c.held+".moonwell/\nsrc/**/*.lua\n" {
+		if got := readFile(t, root, ".gitignore"); got != c.held+".moonwell/\nsrc/**/*.lua\n" {
 			t.Errorf("%s: .gitignore = %q", c.name, got)
 		}
 	}
 }
 
 func TestAddFilesLeavesWhatIsThereInTheNameOfAFileAsItIs(t *testing.T) {
-	root := lay(t, "yueconfig.yue/kept.txt", "mine", ".vscode/extensions.json", "")
+	root := newProjectDir(t, "yueconfig.yue/kept.txt", "mine", ".vscode/extensions.json", "")
 	if err := os.Mkdir(filepath.Join(root, ".luarc.json"), 0o777); err != nil {
 		t.Fatal(err)
 	}
@@ -258,15 +258,15 @@ func TestAddFilesLeavesWhatIsThereInTheNameOfAFileAsItIs(t *testing.T) {
 		t.Fatalf("AddFiles = %q, %v", added, err)
 	}
 	want := []string{".gitignore", ".luarc.json", ".vscode", ".vscode/extensions.json", "yueconfig.yue", "yueconfig.yue/kept.txt"}
-	if got := entriesIn(t, root); !slices.Equal(got, want) || read(t, root, ".vscode/extensions.json") != "" {
+	if got := listEntries(t, root); !slices.Equal(got, want) || readFile(t, root, ".vscode/extensions.json") != "" {
 		t.Errorf("the project holds %q", got)
 	}
 }
 
 func TestAddFilesReportsAFileItCannotWrite(t *testing.T) {
-	root := lay(t, ".vscode", "a file, not a folder")
+	root := newProjectDir(t, ".vscode", "a file, not a folder")
 	added, err := AddFiles(root, smallTemplate)
-	e := asError(t, err, "a file for .vscode")
+	e := asDiagError(t, err, "a file for .vscode")
 	if added != nil || !strings.HasPrefix(e.Msg, "Writing .vscode/extensions.json failed: ") || e.File != ".vscode/extensions.json" ||
 		!strings.Contains(e.Hint, "has .vscode/extensions.json open") || e.Cause == nil {
 		t.Errorf("AddFiles = %q, %+v", added, e)
@@ -279,7 +279,7 @@ func TestAddFilesReportsAGitignoreItCannotRead(t *testing.T) {
 		t.Fatal(err)
 	}
 	added, err := AddFiles(root, smallTemplate)
-	e := asError(t, err, "a folder for .gitignore")
+	e := asDiagError(t, err, "a folder for .gitignore")
 	if added != nil || !strings.HasPrefix(e.Msg, "Reading .gitignore failed: ") || e.File != ".gitignore" ||
 		!strings.Contains(e.Hint, "has .gitignore open") || e.Cause == nil {
 		t.Errorf("AddFiles = %q, %+v", added, e)
@@ -287,14 +287,14 @@ func TestAddFilesReportsAGitignoreItCannotRead(t *testing.T) {
 }
 
 func TestAddFilesReportsAGitignoreItCannotWrite(t *testing.T) {
-	root := lay(t, ".gitignore", "dist/\n")
+	root := newProjectDir(t, ".gitignore", "dist/\n")
 	testkit.MakeUnwritable(t, filepath.Join(root, ".gitignore"))
 	_, err := AddFiles(root, smallTemplate)
-	e := asError(t, err, "a .gitignore that cannot be written")
+	e := asDiagError(t, err, "a .gitignore that cannot be written")
 	if !strings.HasPrefix(e.Msg, "Writing .gitignore failed: ") || e.File != ".gitignore" || e.Hint == "" {
 		t.Errorf("error = %+v", e)
 	}
-	if got := read(t, root, ".gitignore"); got != "dist/\n" {
+	if got := readFile(t, root, ".gitignore"); got != "dist/\n" {
 		t.Errorf(".gitignore = %q", got)
 	}
 }
@@ -302,11 +302,11 @@ func TestAddFilesReportsAGitignoreItCannotWrite(t *testing.T) {
 func TestAddFilesWithATemplateThatLacksAFileIsAMistakeOfTheCaller(t *testing.T) {
 	root := t.TempDir()
 	added, err := AddFiles(root, smallTemplate[:2])
-	notADiagError(t, err, "a template without .vscode/extensions.json", "template", ".vscode/extensions.json")
+	checkPlainError(t, err, "a template without .vscode/extensions.json", "template", ".vscode/extensions.json")
 	if added != nil {
 		t.Errorf("AddFiles = %q", added)
 	}
-	root = lay(t, "yueconfig.yue", "", ".luarc.json", "", ".vscode/extensions.json", "")
+	root = newProjectDir(t, "yueconfig.yue", "", ".luarc.json", "", ".vscode/extensions.json", "")
 	if added, err := AddFiles(root, nil); err != nil || !slices.Equal(added, []string{".gitignore (.moonwell/, src/**/*.lua)"}) {
 		t.Errorf("without a template, and with every file: AddFiles = %q, %v", added, err)
 	}
@@ -325,19 +325,19 @@ func TestAddFilesFollowsALinkAtTheFolderOfAFile(t *testing.T) {
 	}
 	for _, c := range cases {
 		root := t.TempDir()
-		at, behind := linkAt(t, root, ".vscode")
-		write(t, behind, c.file, c.text)
+		at, behind := symlinkDirAt(t, root, ".vscode")
+		writeFiles(t, behind, c.file, c.text)
 		added, err := AddFiles(root, smallTemplate)
 		if err != nil || slices.Contains(added, ".vscode/extensions.json") != c.wantsItAdded {
 			t.Fatalf("%s: AddFiles = %q, %v", c.name, added, err)
 		}
-		if got := filesIn(t, behind); !maps.Equal(got, c.wantBehind) || isPlain(t, at) {
+		if got := readFiles(t, behind); !maps.Equal(got, c.wantBehind) || isRegularFile(t, at) {
 			t.Errorf("%s: behind the link there is %q", c.name, got)
 		}
 	}
 }
 
-func everythingBelow(t testing.TB, dir string) map[string]string {
+func readTree(t testing.TB, dir string) map[string]string {
 	t.Helper()
 	held := map[string]string{}
 	err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, err error) error {
@@ -369,7 +369,7 @@ func everythingBelow(t testing.TB, dir string) map[string]string {
 	return held
 }
 
-func toAFolderThatIsGone(t *testing.T, above, at string) string {
+func brokenSymlinkToDir(t *testing.T, above, at string) string {
 	t.Helper()
 	gone := filepath.Join(above, "gone")
 	if err := os.Mkdir(gone, 0o777); err != nil {
@@ -382,26 +382,26 @@ func toAFolderThatIsGone(t *testing.T, above, at string) string {
 	return gone
 }
 
-func toAFileThatIsNotThere(t *testing.T, above, at string) string {
+func brokenSymlinkToFile(t *testing.T, above, at string) string {
 	t.Helper()
 	missing := filepath.Join(above, "missing.txt")
-	linkToFile(t, missing, at)
+	symlinkFile(t, missing, at)
 	return missing
 }
 
-var linksToNothing = []struct {
+var brokenSymlinks = []struct {
 	name string
 	make func(t *testing.T, above, at string) (leadsTo string)
 }{
-	{"a link to a folder that is gone", toAFolderThatIsGone},
-	{"a link to a file that is not there", toAFileThatIsNotThere},
+	{"a link to a folder that is gone", brokenSymlinkToDir},
+	{"a link to a file that is not there", brokenSymlinkToFile},
 }
 
-func projectWithALinkToNothing(t *testing.T, file string, link func(*testing.T, string, string) string) (above, root, leadsTo string) {
+func newProjectWithBrokenSymlink(t *testing.T, file string, link func(*testing.T, string, string) string) (above, root, leadsTo string) {
 	t.Helper()
 	above = t.TempDir()
 	root = filepath.Join(above, "project")
-	write(t, root, "src/main.yue", "print 1\n")
+	writeFiles(t, root, "src/main.yue", "print 1\n")
 	at := filepath.Join(root, filepath.FromSlash(file))
 	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 		t.Fatal(err)
@@ -410,17 +410,17 @@ func projectWithALinkToNothing(t *testing.T, file string, link func(*testing.T, 
 }
 
 func TestAddFilesRefusesALinkToNothingAndWritesNothing(t *testing.T) {
-	for _, kind := range linksToNothing {
+	for _, kind := range brokenSymlinks {
 		t.Run(kind.name, func(t *testing.T) {
 			for _, file := range append(slices.Clone(editorFiles), ".gitignore") {
-				above, root, leadsTo := projectWithALinkToNothing(t, file, kind.make)
-				before := everythingBelow(t, above)
+				above, root, leadsTo := newProjectWithBrokenSymlink(t, file, kind.make)
+				before := readTree(t, above)
 				added, err := AddFiles(root, smallTemplate)
-				e := asError(t, err, file)
+				e := asDiagError(t, err, file)
 				if added != nil || e.File != file || !strings.Contains(e.Msg, file+" is a link") || e.Hint == "" {
 					t.Errorf("%s: AddFiles = %q, %+v", file, added, e)
 				}
-				if after := everythingBelow(t, above); !maps.Equal(after, before) {
+				if after := readTree(t, above); !maps.Equal(after, before) {
 					t.Errorf("%s: the folder above the project holds %q, and held %q", file, after, before)
 				}
 				if _, err := os.Lstat(leadsTo); !errors.Is(err, fs.ErrNotExist) {
@@ -432,30 +432,30 @@ func TestAddFilesRefusesALinkToNothingAndWritesNothing(t *testing.T) {
 }
 
 func TestAddFilesMakesNothingWhereALinkAtTheFolderOfAFileLeadsToNothing(t *testing.T) {
-	above, root, leadsTo := projectWithALinkToNothing(t, ".vscode", toAFolderThatIsGone)
+	above, root, leadsTo := newProjectWithBrokenSymlink(t, ".vscode", brokenSymlinkToDir)
 	added, err := AddFiles(root, smallTemplate)
-	e := asError(t, err, "a link to nothing at .vscode")
+	e := asDiagError(t, err, "a link to nothing at .vscode")
 	if added != nil || !strings.HasPrefix(e.Msg, "Writing .vscode/extensions.json failed: ") || e.File != ".vscode/extensions.json" {
 		t.Errorf("AddFiles = %q, %+v", added, e)
 	}
-	if _, err := os.Lstat(leadsTo); !errors.Is(err, fs.ErrNotExist) || isPlain(t, filepath.Join(root, ".vscode")) {
+	if _, err := os.Lstat(leadsTo); !errors.Is(err, fs.ErrNotExist) || isRegularFile(t, filepath.Join(root, ".vscode")) {
 		t.Errorf("where the link leads there is something (%v), or the link is one no more", err)
 	}
-	if held := everythingBelow(t, above); held["project/.vscode"] != "(a link)" || held["gone"] != "" {
+	if held := readTree(t, above); held["project/.vscode"] != "(a link)" || held["gone"] != "" {
 		t.Errorf("the folder above the project holds %q", held)
 	}
 }
 
 func TestMergeLuarcTakesALinkToNothingForNoFile(t *testing.T) {
-	for _, kind := range linksToNothing {
+	for _, kind := range brokenSymlinks {
 		t.Run(kind.name, func(t *testing.T) {
-			above, root, _ := projectWithALinkToNothing(t, ".luarc.json", kind.make)
-			before := everythingBelow(t, above)
-			added, merged, err := MergeLuarc(root, carried(t))
+			above, root, _ := newProjectWithBrokenSymlink(t, ".luarc.json", kind.make)
+			before := readTree(t, above)
+			added, merged, err := MergeLuarc(root, templateFiles(t))
 			if err != nil || !merged || added == nil || len(added) != 0 {
 				t.Errorf("MergeLuarc = %#v, %v, %v", added, merged, err)
 			}
-			if after := everythingBelow(t, above); !maps.Equal(after, before) {
+			if after := readTree(t, above); !maps.Equal(after, before) {
 				t.Errorf("the folder above the project holds %q, and held %q", after, before)
 			}
 		})
@@ -464,38 +464,38 @@ func TestMergeLuarcTakesALinkToNothingForNoFile(t *testing.T) {
 
 func TestTheScaffoldReadsAndWritesThroughALinkToAFile(t *testing.T) {
 	root, behind := t.TempDir(), t.TempDir()
-	write(t, behind, "ignore", "dist/\n", "luarc", "{"+lackingOne+"}", "config", "mine\n")
-	linkToFile(t, filepath.Join(behind, "ignore"), filepath.Join(root, ".gitignore"))
-	linkToFile(t, filepath.Join(behind, "luarc"), filepath.Join(root, ".luarc.json"))
-	linkToFile(t, filepath.Join(behind, "config"), filepath.Join(root, "yueconfig.yue"))
+	writeFiles(t, behind, "ignore", "dist/\n", "luarc", "{"+lackingOne+"}", "config", "mine\n")
+	symlinkFile(t, filepath.Join(behind, "ignore"), filepath.Join(root, ".gitignore"))
+	symlinkFile(t, filepath.Join(behind, "luarc"), filepath.Join(root, ".luarc.json"))
+	symlinkFile(t, filepath.Join(behind, "config"), filepath.Join(root, "yueconfig.yue"))
 	added, err := AddFiles(root, smallTemplate)
 	want := []string{".vscode/extensions.json", ".gitignore (.moonwell/, src/**/*.lua)"}
 	if err != nil || !slices.Equal(added, want) {
 		t.Fatalf("AddFiles = %q, %v", added, err)
 	}
-	if got := read(t, behind, "luarc"); got != "{"+lackingOne+"}" {
+	if got := readFile(t, behind, "luarc"); got != "{"+lackingOne+"}" {
 		t.Errorf("after AddFiles, behind the link, luarc = %q", got)
 	}
-	if added, merged, err := MergeLuarc(root, carried(t)); err != nil || !merged || !slices.Equal(added, []string{".moonwell/lua"}) {
+	if added, merged, err := MergeLuarc(root, templateFiles(t)); err != nil || !merged || !slices.Equal(added, []string{".moonwell/lua"}) {
 		t.Fatalf("MergeLuarc = %q, %v, %v", added, merged, err)
 	}
 	wantBehind := map[string]string{
 		"ignore": "dist/\n.moonwell/\nsrc/**/*.lua\n", "luarc": "{\n" + afterOne + "\n}\n", "config": "mine\n",
 	}
-	if got := filesIn(t, behind); !maps.Equal(got, wantBehind) {
+	if got := readFiles(t, behind); !maps.Equal(got, wantBehind) {
 		t.Errorf("behind the links there is %q", got)
 	}
 	for _, symlink := range []string{".gitignore", ".luarc.json", "yueconfig.yue"} {
-		if isPlain(t, filepath.Join(root, symlink)) {
+		if isRegularFile(t, filepath.Join(root, symlink)) {
 			t.Errorf("%s is a file of its own, and no link", symlink)
 		}
 	}
 }
 
 func TestMergeLuarcAddsTheTemplatesMissingEntries(t *testing.T) {
-	root := lay(t, ".luarc.json", `{"runtime.path":["src/?.lua"],"workspace.library":[".moonwell/types","extra"],`+
+	root := newProjectDir(t, ".luarc.json", `{"runtime.path":["src/?.lua"],"workspace.library":[".moonwell/types","extra"],`+
 		`"workspace.ignoreDir":["dist","maps"],"diagnostics.globals":["X"]}`)
-	added, merged, err := MergeLuarc(root, carried(t))
+	added, merged, err := MergeLuarc(root, templateFiles(t))
 	want := []string{"src/?/init.lua", "lua/?.lua", "lua/?/init.lua", ".moonwell/lua", ".moonwell/libraries"}
 	if err != nil || !merged || !slices.Equal(added, want) {
 		t.Fatalf("MergeLuarc = %q, %v, %v", added, merged, err)
@@ -522,25 +522,25 @@ func TestMergeLuarcAddsTheTemplatesMissingEntries(t *testing.T) {
   ]
 }
 `
-	if got := read(t, root, ".luarc.json"); got != written {
+	if got := readFile(t, root, ".luarc.json"); got != written {
 		t.Errorf(".luarc.json =\n%s", got)
 	}
-	if added, merged, err := MergeLuarc(root, carried(t)); err != nil || !merged || added == nil || len(added) != 0 {
+	if added, merged, err := MergeLuarc(root, templateFiles(t)); err != nil || !merged || added == nil || len(added) != 0 {
 		t.Errorf("MergeLuarc again = %#v, %v, %v", added, merged, err)
 	}
-	if got := read(t, root, ".luarc.json"); got != written {
+	if got := readFile(t, root, ".luarc.json"); got != written {
 		t.Errorf("after a merge that added nothing, .luarc.json =\n%s", got)
 	}
 }
 
 func TestMergeLuarcGivesAnObjectWithoutTheArraysEveryEntryOfTheCarriedTemplate(t *testing.T) {
 	for _, held := range []string{"{}", "{} \r\n\t", " \n{\n}\n"} {
-		root := lay(t, ".luarc.json", held)
-		added, merged, err := MergeLuarc(root, carried(t))
+		root := newProjectDir(t, ".luarc.json", held)
+		added, merged, err := MergeLuarc(root, templateFiles(t))
 		if want := slices.Concat(carriedPaths, carriedLibrary, carriedIgnored); err != nil || !merged || !slices.Equal(added, want) {
 			t.Fatalf("%q: MergeLuarc = %q, %v, %v", held, added, merged, err)
 		}
-		if got := read(t, root, ".luarc.json"); got != "{\n"+afterOne+"\n}\n" {
+		if got := readFile(t, root, ".luarc.json"); got != "{\n"+afterOne+"\n}\n" {
 			t.Errorf("%q: .luarc.json =\n%s", held, got)
 		}
 	}
@@ -553,51 +553,51 @@ func TestMergeLuarcLeavesAFileThatIsNotAJSONObjectAlone(t *testing.T) {
 		"", " \n", "true", `"text"`, "{", mark + mark + "{}", "{'runtime.path': []}",
 	}
 	for _, content := range contents {
-		root := lay(t, ".luarc.json", content)
-		added, merged, err := MergeLuarc(root, carried(t))
-		if err != nil || merged || added != nil || read(t, root, ".luarc.json") != content {
+		root := newProjectDir(t, ".luarc.json", content)
+		added, merged, err := MergeLuarc(root, templateFiles(t))
+		if err != nil || merged || added != nil || readFile(t, root, ".luarc.json") != content {
 			t.Errorf("%q: MergeLuarc = %q, %v, %v", content, added, merged, err)
 		}
 	}
 	root := t.TempDir()
-	if added, merged, err := MergeLuarc(root, carried(t)); err != nil || !merged || added == nil || len(added) != 0 {
+	if added, merged, err := MergeLuarc(root, templateFiles(t)); err != nil || !merged || added == nil || len(added) != 0 {
 		t.Errorf("MergeLuarc without a file = %#v, %v, %v", added, merged, err)
 	}
-	if got := entriesIn(t, root); len(got) != 0 {
+	if got := listEntries(t, root); len(got) != 0 {
 		t.Errorf("without a file, the project holds %q", got)
 	}
 }
 
 func TestMergeLuarcGivesAMissingKeyTheTemplatesWholeArrayAndLeavesANonArrayValueAlone(t *testing.T) {
 	for _, value := range []string{`"not an array"`, "null", `{"0":".moonwell/types"}`, "3", "true"} {
-		root := lay(t, ".luarc.json", `{"workspace.library":`+value+`}`)
-		added, merged, err := MergeLuarc(root, carried(t))
+		root := newProjectDir(t, ".luarc.json", `{"workspace.library":`+value+`}`)
+		added, merged, err := MergeLuarc(root, templateFiles(t))
 		if want := slices.Concat(carriedPaths, carriedIgnored); err != nil || !merged || !slices.Equal(added, want) {
 			t.Fatalf("%s: MergeLuarc = %q, %v, %v", value, added, merged, err)
 		}
-		config := membersOf(t, read(t, root, ".luarc.json"))
-		if library, _ := config.Get("workspace.library"); onOneLine(library) != value ||
-			!slices.Equal(listUnder(t, config, "runtime.path"), carriedPaths) ||
-			!slices.Equal(listUnder(t, config, "workspace.ignoreDir"), carriedIgnored) ||
+		config := mustParseObject(t, readFile(t, root, ".luarc.json"))
+		if library, _ := config.Get("workspace.library"); compactJSON(library) != value ||
+			!slices.Equal(stringListAt(t, config, "runtime.path"), carriedPaths) ||
+			!slices.Equal(stringListAt(t, config, "workspace.ignoreDir"), carriedIgnored) ||
 			!slices.Equal(config.Keys(), []string{"workspace.library", "runtime.path", "workspace.ignoreDir"}) {
-			t.Errorf("%s: .luarc.json =\n%s", value, read(t, root, ".luarc.json"))
+			t.Errorf("%s: .luarc.json =\n%s", value, readFile(t, root, ".luarc.json"))
 		}
 	}
 	const held = `{"runtime.path":null,"workspace.library":{"a":1},"workspace.ignoreDir":3}`
-	root := lay(t, ".luarc.json", held)
-	if added, merged, err := MergeLuarc(root, carried(t)); err != nil || !merged || added == nil || len(added) != 0 ||
-		read(t, root, ".luarc.json") != held {
+	root := newProjectDir(t, ".luarc.json", held)
+	if added, merged, err := MergeLuarc(root, templateFiles(t)); err != nil || !merged || added == nil || len(added) != 0 ||
+		readFile(t, root, ".luarc.json") != held {
 		t.Errorf("no arrays: MergeLuarc = %#v, %v, %v", added, merged, err)
 	}
 }
 
 func TestMergeLuarcMergesAFileSavedWithABOM(t *testing.T) {
-	root := lay(t, ".luarc.json", mark+`{"runtime.path":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"]}`)
-	added, merged, err := MergeLuarc(root, carried(t))
+	root := newProjectDir(t, ".luarc.json", mark+`{"runtime.path":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"]}`)
+	added, merged, err := MergeLuarc(root, templateFiles(t))
 	if want := slices.Concat(carriedLibrary, carriedIgnored); err != nil || !merged || !slices.Equal(added, want) {
 		t.Fatalf("MergeLuarc = %q, %v, %v", added, merged, err)
 	}
-	if got := read(t, root, ".luarc.json"); got != "{\n"+afterOne+"\n}\n" {
+	if got := readFile(t, root, ".luarc.json"); got != "{\n"+afterOne+"\n}\n" {
 		t.Errorf(".luarc.json =\n%q", got)
 	}
 }
@@ -607,8 +607,8 @@ func TestMergeLuarcReportsAFileItCannotRead(t *testing.T) {
 	if err := os.Mkdir(filepath.Join(root, ".luarc.json"), 0o777); err != nil {
 		t.Fatal(err)
 	}
-	added, merged, err := MergeLuarc(root, carried(t))
-	e := asError(t, err, "a folder for .luarc.json")
+	added, merged, err := MergeLuarc(root, templateFiles(t))
+	e := asDiagError(t, err, "a folder for .luarc.json")
 	if added != nil || merged || !strings.HasPrefix(e.Msg, "Reading .luarc.json failed: ") || e.File != ".luarc.json" ||
 		!strings.Contains(e.Hint, "has .luarc.json open") || e.Cause == nil {
 		t.Errorf("MergeLuarc = %q, %v, %+v", added, merged, e)
@@ -616,29 +616,29 @@ func TestMergeLuarcReportsAFileItCannotRead(t *testing.T) {
 }
 
 func TestMergeLuarcReportsAFileItCannotWrite(t *testing.T) {
-	root := lay(t, ".luarc.json", "{"+lackingOne+"}")
+	root := newProjectDir(t, ".luarc.json", "{"+lackingOne+"}")
 	testkit.MakeUnwritable(t, filepath.Join(root, ".luarc.json"))
-	added, merged, err := MergeLuarc(root, carried(t))
-	e := asError(t, err, "a .luarc.json that cannot be written")
+	added, merged, err := MergeLuarc(root, templateFiles(t))
+	e := asDiagError(t, err, "a .luarc.json that cannot be written")
 	if added != nil || merged || !strings.HasPrefix(e.Msg, "Writing .luarc.json failed: ") || e.File != ".luarc.json" || e.Hint == "" {
 		t.Errorf("MergeLuarc = %q, %v, %+v", added, merged, e)
 	}
-	if got := read(t, root, ".luarc.json"); got != "{"+lackingOne+"}" {
+	if got := readFile(t, root, ".luarc.json"); got != "{"+lackingOne+"}" {
 		t.Errorf(".luarc.json = %q", got)
 	}
 }
 
-func mergedOne(t *testing.T, name, held string) string {
+func mustMergeLuarc(t *testing.T, name, held string) string {
 	t.Helper()
-	root := lay(t, ".luarc.json", held)
-	added, merged, err := MergeLuarc(root, carried(t))
+	root := newProjectDir(t, ".luarc.json", held)
+	added, merged, err := MergeLuarc(root, templateFiles(t))
 	if err != nil || !merged || !slices.Equal(added, []string{".moonwell/lua"}) {
 		t.Fatalf("%s: MergeLuarc = %q, %v, %v", name, added, merged, err)
 	}
-	return read(t, root, ".luarc.json")
+	return readFile(t, root, ".luarc.json")
 }
 
-func each(texts []string) string {
+func formatJSONList(texts []string) string {
 	return "[\n    " + strings.Join(texts, ",\n    ") + "\n  ]"
 }
 
@@ -656,10 +656,10 @@ func TestMergeLuarcKeepsTheTextOfEveryValue(t *testing.T) {
 	cases := []struct{ name, held, want string }{
 		{"a number",
 			"{" + lackingOne + `,"n":[` + strings.Join(numbers, ",") + `]}`,
-			"{\n" + afterOne + ",\n  \"n\": " + each(numbers) + "\n}\n"},
+			"{\n" + afterOne + ",\n  \"n\": " + formatJSONList(numbers) + "\n}\n"},
 		{"a string",
 			"{" + lackingOne + `,"s":[` + strings.Join(texts, ",") + `]}`,
-			"{\n" + afterOne + ",\n  \"s\": " + each(texts) + "\n}\n"},
+			"{\n" + afterOne + ",\n  \"s\": " + formatJSONList(texts) + "\n}\n"},
 		{"an object in a value: a key twice, keys that look like numbers, a key with an escape",
 			"{" + lackingOne + `,"o":{"x":1,"y":3,"x":2,"b":{"10":0,"2":0,"a":0},"\/":[{"1":1,"0":0}]}}`,
 			"{\n" + afterOne + ",\n  \"o\": {\n    \"x\": 1,\n    \"y\": 3,\n    \"x\": 2,\n    \"b\": {\n      \"10\": 0,\n" +
@@ -678,7 +678,7 @@ func TestMergeLuarcKeepsTheTextOfEveryValue(t *testing.T) {
 					"    \"caf\xe9\",\n", 1) + "\n}\n"},
 	}
 	for _, c := range cases {
-		if got := mergedOne(t, c.name, c.held); got != c.want {
+		if got := mustMergeLuarc(t, c.name, c.held); got != c.want {
 			t.Errorf("%s: .luarc.json = %q\nwant %q", c.name, got, c.want)
 		}
 	}
@@ -687,7 +687,7 @@ func TestMergeLuarcKeepsTheTextOfEveryValue(t *testing.T) {
 func TestMergeLuarcLaysTheWholeFileOutWithTwoSpacesAndAFinalLineBreak(t *testing.T) {
 	held := "\r\n{\r\n\t" + lackingOne + ",\r\n\t\"o\" : { \"a\" : [ ] , \"b\" : { } , \"c\":[1 , 2,[\n]] }\r\n}\r\n\r\n"
 	want := "{\n" + afterOne + ",\n  \"o\": {\n    \"a\": [],\n    \"b\": {},\n    \"c\": [\n      1,\n      2,\n      []\n    ]\n  }\n}\n"
-	if got := mergedOne(t, "white space of every kind", held); got != want {
+	if got := mustMergeLuarc(t, "white space of every kind", held); got != want {
 		t.Errorf(".luarc.json = %q\nwant %q", got, want)
 	}
 }
@@ -709,7 +709,7 @@ func TestMergeLuarcWritesAKeyOfTheFileOnceAndWithTheEscapesItNeeds(t *testing.T)
 			"{\n  \"k" + replaced + replaced + "\": 1,\n" + afterOne + "\n}\n"},
 	}
 	for _, c := range cases {
-		if got := mergedOne(t, c.name, c.held); got != c.want {
+		if got := mustMergeLuarc(t, c.name, c.held); got != c.want {
 			t.Errorf("%s: .luarc.json = %q\nwant %q", c.name, got, c.want)
 		}
 	}
@@ -737,20 +737,20 @@ func TestMergeLuarcTakesAnEntryToBeThereOnlyAsTheSameString(t *testing.T) {
 	for _, c := range cases {
 		held := `{"runtime.path":["src/?.lua","src/?/init.lua","lua/?.lua","lua/?/init.lua"],"workspace.library":` + c.held +
 			`,"workspace.ignoreDir":["dist","maps",".moonwell/libraries"]}`
-		root := lay(t, ".luarc.json", held)
-		added, merged, err := MergeLuarc(root, carried(t))
+		root := newProjectDir(t, ".luarc.json", held)
+		added, merged, err := MergeLuarc(root, templateFiles(t))
 		if err != nil || !merged || added == nil || !slices.Equal(added, c.added) {
 			t.Errorf("%s: MergeLuarc = %#v, %v, %v", c.name, added, merged, err)
 		}
-		got := read(t, root, ".luarc.json")
+		got := readFile(t, root, ".luarc.json")
 		if len(c.added) == 0 {
 			if got != held {
 				t.Errorf("%s: nothing was added, and .luarc.json = %q", c.name, got)
 			}
 			continue
 		}
-		library, _ := membersOf(t, got).Get("workspace.library")
-		if got := onOneLine(library); got != c.library {
+		library, _ := mustParseObject(t, got).Get("workspace.library")
+		if got := compactJSON(library); got != c.library {
 			t.Errorf("%s: workspace.library = %s", c.name, got)
 		}
 	}
@@ -765,26 +765,26 @@ func TestMergeLuarcWithATemplateItCannotReadIsAMistakeOfTheCaller(t *testing.T) 
 	}{
 		{"no template", nil, []string{"template", ".luarc.json"}},
 		{"a template without the file", smallTemplate[:1], []string{"template", ".luarc.json"}},
-		{"a file that is no JSON", luarcOnly("// a comment\n{" + arrays + "}"), []string{"template", "not a JSON object"}},
-		{"a file that is no object", luarcOnly("[]"), []string{"template", "not a JSON object"}},
-		{"a file that is null", luarcOnly("null"), []string{"template", "not a JSON object"}},
+		{"a file that is no JSON", templateWithLuarc("// a comment\n{" + arrays + "}"), []string{"template", "not a JSON object"}},
+		{"a file that is no object", templateWithLuarc("[]"), []string{"template", "not a JSON object"}},
+		{"a file that is null", templateWithLuarc("null"), []string{"template", "not a JSON object"}},
 		{"no array", smallTemplate, []string{"template", "runtime.path"}},
-		{"a value that is no array", luarcOnly(`{"runtime.path":["a"],"workspace.library":null,"workspace.ignoreDir":[]}`),
+		{"a value that is no array", templateWithLuarc(`{"runtime.path":["a"],"workspace.library":null,"workspace.ignoreDir":[]}`),
 			[]string{"template", "workspace.library"}},
-		{"an entry that is no string", luarcOnly(`{"runtime.path":["a"],"workspace.library":["b"],"workspace.ignoreDir":["c",1.0]}`),
+		{"an entry that is no string", templateWithLuarc(`{"runtime.path":["a"],"workspace.library":["b"],"workspace.ignoreDir":["c",1.0]}`),
 			[]string{"template", "workspace.ignoreDir"}},
-		{"an entry that is null", luarcOnly(`{"runtime.path":[null],"workspace.library":["b"],"workspace.ignoreDir":[]}`),
+		{"an entry that is null", templateWithLuarc(`{"runtime.path":[null],"workspace.library":["b"],"workspace.ignoreDir":[]}`),
 			[]string{"template", "runtime.path"}},
 	}
 	for _, c := range cases {
-		root := lay(t, ".luarc.json", "{}")
+		root := newProjectDir(t, ".luarc.json", "{}")
 		added, merged, err := MergeLuarc(root, c.template)
-		notADiagError(t, err, c.name, c.words...)
-		if added != nil || merged || read(t, root, ".luarc.json") != "{}" {
+		checkPlainError(t, err, c.name, c.words...)
+		if added != nil || merged || readFile(t, root, ".luarc.json") != "{}" {
 			t.Errorf("%s: MergeLuarc = %q, %v", c.name, added, merged)
 		}
 		entries, err := LuarcTemplateEntries(c.template)
-		notADiagError(t, err, c.name, c.words...)
+		checkPlainError(t, err, c.name, c.words...)
 		if entries != nil {
 			t.Errorf("%s: LuarcTemplateEntries = %q", c.name, entries)
 		}
@@ -795,7 +795,7 @@ func TestMergeLuarcWithATemplateItCannotReadIsAMistakeOfTheCaller(t *testing.T) 
 }
 
 func TestLuarcTemplateEntriesListsTheTemplatesArrays(t *testing.T) {
-	entries, err := LuarcTemplateEntries(carried(t))
+	entries, err := LuarcTemplateEntries(templateFiles(t))
 	want := map[string][]string{
 		"runtime.path": carriedPaths, "workspace.library": carriedLibrary, "workspace.ignoreDir": carriedIgnored,
 	}
@@ -805,7 +805,7 @@ func TestLuarcTemplateEntriesListsTheTemplatesArrays(t *testing.T) {
 }
 
 func TestATemplateOfItsOwnGivesItsEntriesAndEachOfThemOnce(t *testing.T) {
-	template := luarcOnly(mark + `{"runtime.path":["a","b","a"],"other":["x"],"workspace.library":["b","b"],"workspace.ignoreDir":[]}`)
+	template := templateWithLuarc(mark + `{"runtime.path":["a","b","a"],"other":["x"],"workspace.library":["b","b"],"workspace.ignoreDir":[]}`)
 	entries, err := LuarcTemplateEntries(template)
 	listed := map[string][]string{"runtime.path": {"a", "b", "a"}, "workspace.library": {"b", "b"}, "workspace.ignoreDir": nil}
 	if err != nil || !reflect.DeepEqual(entries, listed) {
@@ -822,17 +822,17 @@ func TestATemplateOfItsOwnGivesItsEntriesAndEachOfThemOnce(t *testing.T) {
 			"{\n  \"workspace.library\": [\n    \"b\"\n  ],\n  \"runtime.path\": [\n    \"b\",\n    \"a\"\n  ],\n  \"workspace.ignoreDir\": []\n}\n"},
 	}
 	for _, c := range cases {
-		root := lay(t, ".luarc.json", c.held)
+		root := newProjectDir(t, ".luarc.json", c.held)
 		added, merged, err := MergeLuarc(root, template)
 		if err != nil || !merged || !slices.Equal(added, c.added) {
 			t.Fatalf("%s: MergeLuarc = %q, %v, %v", c.name, added, merged, err)
 		}
-		if got := read(t, root, ".luarc.json"); got != c.want {
+		if got := readFile(t, root, ".luarc.json"); got != c.want {
 			t.Errorf("%s: .luarc.json = %q", c.name, got)
 		}
 	}
 }
 
-func luarcOnly(text string) []moonwell.TemplateFile {
+func templateWithLuarc(text string) []moonwell.TemplateFile {
 	return []moonwell.TemplateFile{{Path: ".luarc.json", Data: []byte(text)}}
 }

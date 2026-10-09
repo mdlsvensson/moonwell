@@ -16,110 +16,110 @@ import (
 )
 
 func TestSyncImportsMappedAssetsAndKeepsTheEditorsOwnImports(t *testing.T) {
-	s := newSite(t)
+	s := newAssetProject(t)
 	const icon = "ReplaceableTextures/CommandButtons/BTNSword.blp"
 	const disabled = "ReplaceableTextures/CommandButtonsDisabled/DISBTNSword.blp"
 	const block = `{"paths":{"icons/disabled.blp":"` + disabled + `"},"exclude":[]}`
-	put(t, s.root, "assets/"+icon)
-	put(t, s.root, "assets/icons/disabled.blp", "disabled")
-	put(t, s.mapDir, "war3mapImported/existing.wav", "editor")
-	s.setImports(imp.Entry{Flag: 5, Path: "existing.wav"})
+	writeFile(t, s.root, "assets/"+icon)
+	writeFile(t, s.root, "assets/icons/disabled.blp", "disabled")
+	writeFile(t, s.mapDir, "war3mapImported/existing.wav", "editor")
+	s.writeImports(imp.Entry{Flag: 5, Path: "existing.wav"})
 
-	s.synced(block)
+	s.mustSync(block)
 	want := []imp.Entry{
 		{Flag: 5, Path: "existing.wav"},
 		{Flag: imp.CustomPath, Path: strings.ReplaceAll(icon, "/", `\`)},
 		{Flag: imp.CustomPath, Path: strings.ReplaceAll(disabled, "/", `\`)},
 	}
-	if got := s.imports(); !slices.Equal(got, want) {
+	if got := s.readImports(); !slices.Equal(got, want) {
 		t.Errorf("the index lists %+v, want %+v", got, want)
 	}
-	if s.inMap(icon) != "asset" || s.inMap(disabled) != "disabled" || s.inMap("war3mapImported/existing.wav") != "editor" {
+	if s.readMapFile(icon) != "asset" || s.readMapFile(disabled) != "disabled" || s.readMapFile("war3mapImported/existing.wav") != "editor" {
 		t.Error("the map does not hold the two assets beside the editor's own file")
 	}
-	wantState := "{\n  \"version\": 1,\n  \"files\": {\n    \"" + icon + "\": \"" + hashed("asset") + "\",\n    \"" +
-		disabled + "\": \"" + hashed("disabled") + "\"\n  }\n}\n"
-	if got := s.stateText(); got != wantState {
+	wantState := "{\n  \"version\": 1,\n  \"files\": {\n    \"" + icon + "\": \"" + sha256Of("asset") + "\",\n    \"" +
+		disabled + "\": \"" + sha256Of("disabled") + "\"\n  }\n}\n"
+	if got := s.readState(); got != wantState {
 		t.Errorf("the state file is\n%s\nwant\n%s", got, wantState)
 	}
-	if _, again := s.planned(block); len(again.Changes) != 0 {
-		t.Errorf("a second sync changes %q", names(again.Changes))
+	if _, again := s.mustPlan(block); len(again.Changes) != 0 {
+		t.Errorf("a second sync changes %q", changePaths(again.Changes))
 	}
 }
 
 func TestSyncUpdatesRenamesAndRemovesOnlyOwnedFiles(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/Models/unit.mdx", "first")
-	put(t, s.mapDir, "unmanaged.txt", "keep")
-	s.synced(noBlock)
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/Models/unit.mdx", "first")
+	writeFile(t, s.mapDir, "unmanaged.txt", "keep")
+	s.mustSync(noBlock)
 
-	put(t, s.root, "assets/Models/unit.mdx", "second")
-	s.synced(noBlock)
-	if got := s.inMap("Models/unit.mdx"); got != "second" {
+	writeFile(t, s.root, "assets/Models/unit.mdx", "second")
+	s.mustSync(noBlock)
+	if got := s.readMapFile("Models/unit.mdx"); got != "second" {
 		t.Errorf("the changed asset is %q in the map", got)
 	}
-	s.synced(`{"paths":{"Models/unit.mdx":"Models/renamed.mdx"},"exclude":[]}`)
-	if s.inMap("Models/unit.mdx") != missing || s.inMap("Models/renamed.mdx") != "second" {
+	s.mustSync(`{"paths":{"Models/unit.mdx":"Models/renamed.mdx"},"exclude":[]}`)
+	if s.readMapFile("Models/unit.mdx") != missing || s.readMapFile("Models/renamed.mdx") != "second" {
 		t.Error("the asset was not renamed")
 	}
-	if got, want := s.imports(), []imp.Entry{{Flag: imp.CustomPath, Path: `Models\renamed.mdx`}}; !slices.Equal(got, want) {
+	if got, want := s.readImports(), []imp.Entry{{Flag: imp.CustomPath, Path: `Models\renamed.mdx`}}; !slices.Equal(got, want) {
 		t.Errorf("the index lists %+v, want %+v", got, want)
 	}
 
 	if err := os.Remove(filepath.Join(s.root, "assets", "Models", "unit.mdx")); err != nil {
 		t.Fatal(err)
 	}
-	s.synced(noBlock)
-	if len(s.imports()) != 0 || s.inMap("Models/renamed.mdx") != missing || s.inMap("unmanaged.txt") != "keep" {
+	s.mustSync(noBlock)
+	if len(s.readImports()) != 0 || s.readMapFile("Models/renamed.mdx") != missing || s.readMapFile("unmanaged.txt") != "keep" {
 		t.Error("removing the asset left its file or its import, or touched another file")
 	}
 }
 
 func TestSyncKeepsTheFlagWorldEditorSavedOnAnOwnedImport(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/Textures/a.blp")
-	put(t, s.root, "assets/Textures/b.blp")
-	s.synced(noBlock)
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/Textures/a.blp")
+	writeFile(t, s.root, "assets/Textures/b.blp")
+	s.mustSync(noBlock)
 	saved := []imp.Entry{{Flag: 29, Path: `Textures\a.blp`}, {Flag: 29, Path: `Textures\b.blp`}}
-	s.setImports(saved...)
-	if _, result := s.planned(noBlock); len(result.Changes) != 0 {
-		t.Errorf("a map World Editor saved is changed: %q", names(result.Changes))
+	s.writeImports(saved...)
+	if _, result := s.mustPlan(noBlock); len(result.Changes) != 0 {
+		t.Errorf("a map World Editor saved is changed: %q", changePaths(result.Changes))
 	}
-	put(t, s.root, "assets/Textures/c.blp")
-	s.synced(noBlock)
-	if got, want := s.imports(), append(saved, imp.Entry{Flag: imp.CustomPath, Path: `Textures\c.blp`}); !slices.Equal(got, want) {
+	writeFile(t, s.root, "assets/Textures/c.blp")
+	s.mustSync(noBlock)
+	if got, want := s.readImports(), append(saved, imp.Entry{Flag: imp.CustomPath, Path: `Textures\c.blp`}); !slices.Equal(got, want) {
 		t.Errorf("the index lists %+v, want %+v", got, want)
 	}
 }
 
 func TestSyncWritesNoStateFileWhenItOwnsNothingAndRemovesOneItDoesNotNeed(t *testing.T) {
-	s := newSite(t)
-	s.synced(noBlock)
-	if got := s.stateText(); got != missing {
+	s := newAssetProject(t)
+	s.mustSync(noBlock)
+	if got := s.readState(); got != missing {
 		t.Errorf("owning nothing wrote the state file %q", got)
 	}
-	put(t, s.root, "assets/a.blp")
-	s.synced(noBlock)
-	if s.stateText() == missing {
+	writeFile(t, s.root, "assets/a.blp")
+	s.mustSync(noBlock)
+	if s.readState() == missing {
 		t.Error("owning a file wrote no state file")
 	}
 	if err := os.Remove(filepath.Join(s.root, "assets", "a.blp")); err != nil {
 		t.Fatal(err)
 	}
-	s.synced(noBlock)
-	if s.inMap("a.blp") != missing || s.stateText() != missing {
+	s.mustSync(noBlock)
+	if s.readMapFile("a.blp") != missing || s.readState() != missing {
 		t.Error("the owned file or the state file is there after the asset was removed")
 	}
 }
 
 func TestTheFilesLibrariesShipAreSyncedLikeTheMapsOwnAndOwned(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/Models/Own.mdx", "own")
-	put(t, s.root, "assets/icons/shared.blp", "the map's")
-	put(t, s.root, "libraries/ui/war3mapImported/ui/frames.toc", "toc")
-	put(t, s.root, "libraries/ui/icons/shared.blp", "the library's")
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/Models/Own.mdx", "own")
+	writeFile(t, s.root, "assets/icons/shared.blp", "the map's")
+	writeFile(t, s.root, "libraries/ui/war3mapImported/ui/frames.toc", "toc")
+	writeFile(t, s.root, "libraries/ui/icons/shared.blp", "the library's")
 
-	result := s.synced(noBlock, "ui")
+	result := s.mustSync(noBlock, "ui")
 	want := []row{
 		{"", "icons/shared.blp", "icons/shared.blp"},
 		{"", "Models/Own.mdx", "Models/Own.mdx"},
@@ -128,12 +128,12 @@ func TestTheFilesLibrariesShipAreSyncedLikeTheMapsOwnAndOwned(t *testing.T) {
 	if got := rows(result.Assets); !slices.Equal(got, want) {
 		t.Fatalf("the assets are %+v, want %+v", got, want)
 	}
-	if s.inMap("war3mapImported/ui/frames.toc") != "toc" || s.inMap("icons/shared.blp") != "the map's" {
+	if s.readMapFile("war3mapImported/ui/frames.toc") != "toc" || s.readMapFile("icons/shared.blp") != "the map's" {
 		t.Error("the map does not hold the library's file and the map's own")
 	}
 	paths := func() []string {
 		var list []string
-		for _, entry := range s.imports() {
+		for _, entry := range s.readImports() {
 			list = append(list, entry.Path)
 		}
 		return list
@@ -141,12 +141,12 @@ func TestTheFilesLibrariesShipAreSyncedLikeTheMapsOwnAndOwned(t *testing.T) {
 	if got := paths(); !slices.Equal(got, []string{`icons\shared.blp`, `Models\Own.mdx`, `war3mapImported\ui\frames.toc`}) {
 		t.Errorf("the index lists %q", got)
 	}
-	if _, again := s.planned(noBlock, "ui"); len(again.Changes) != 0 {
-		t.Errorf("a second sync changes %q", names(again.Changes))
+	if _, again := s.mustPlan(noBlock, "ui"); len(again.Changes) != 0 {
+		t.Errorf("a second sync changes %q", changePaths(again.Changes))
 	}
 
-	s.synced(noBlock)
-	if s.inMap("war3mapImported/ui/frames.toc") != missing {
+	s.mustSync(noBlock)
+	if s.readMapFile("war3mapImported/ui/frames.toc") != missing {
 		t.Error("the library's file is in the map after the library was dropped")
 	}
 	if got := paths(); !slices.Equal(got, []string{`icons\shared.blp`, `Models\Own.mdx`}) {
@@ -154,102 +154,102 @@ func TestTheFilesLibrariesShipAreSyncedLikeTheMapsOwnAndOwned(t *testing.T) {
 	}
 }
 
-func inTheWayOf(t *testing.T, s *site, dir string) {
+func blockWithFile(t *testing.T, s *assetProject, dir string) {
 	t.Helper()
-	put(t, s.mapDir, dir, "in the way")
+	writeFile(t, s.mapDir, dir, "in the way")
 }
 
 func TestAFailedSyncUndoesTheWritesItMade(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	put(t, s.root, "assets/Sound/b.blp")
-	folder, result := s.planned(noBlock)
-	inTheWayOf(t, s, "Sound")
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	writeFile(t, s.root, "assets/Sound/b.blp")
+	folder, result := s.mustPlan(noBlock)
+	blockWithFile(t, s, "Sound")
 	before := testkit.Snapshot(t, s.root)
 
-	e := asError(t, Sync(background, folder, result, s.root, stateName), "a failed sync")
+	e := asDiagError(t, Sync(background, folder, result, s.root, stateName), "a failed sync")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
 		e.File != mapLabel+"/Sound/b.blp" || e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
-	s.unchanged(before, "a failed sync")
+	s.checkUnchanged(before, "a failed sync")
 }
 
 func TestASyncThatCannotWriteOverAnOwnedFileUndoesItsWritesAndLeavesTheFileAsItWas(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/0.blp", "first")
-	put(t, s.root, "assets/a.blp", "first")
-	s.synced(noBlock)
-	put(t, s.root, "assets/0.blp", "second")
-	put(t, s.root, "assets/a.blp", "second")
-	folder, result := s.planned(noBlock)
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/0.blp", "first")
+	writeFile(t, s.root, "assets/a.blp", "first")
+	s.mustSync(noBlock)
+	writeFile(t, s.root, "assets/0.blp", "second")
+	writeFile(t, s.root, "assets/a.blp", "second")
+	folder, result := s.mustPlan(noBlock)
 	before := testkit.Snapshot(t, s.root)
 	testkit.MakeUnwritable(t, filepath.Join(s.mapDir, "a.blp"))
 
-	e := asError(t, Sync(background, folder, result, s.root, stateName), "a sync that cannot write over a file")
+	e := asDiagError(t, Sync(background, folder, result, s.root, stateName), "a sync that cannot write over a file")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
 		e.File != mapLabel+"/a.blp" || e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
-	s.unchanged(before, "a failed sync")
+	s.checkUnchanged(before, "a failed sync")
 }
 
-func changedMap(t *testing.T) (*site, *mapdir.Folder, *Result) {
+func newSyncedProject(t *testing.T) (*assetProject, *mapdir.Folder, *Result) {
 	t.Helper()
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp", "first")
-	put(t, s.root, "assets/dropped.blp")
-	put(t, s.mapDir, "war3mapImported/existing.wav", "editor")
-	s.setImports(imp.Entry{Flag: 5, Path: "existing.wav"})
-	s.synced(noBlock)
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp", "first")
+	writeFile(t, s.root, "assets/dropped.blp")
+	writeFile(t, s.mapDir, "war3mapImported/existing.wav", "editor")
+	s.writeImports(imp.Entry{Flag: 5, Path: "existing.wav"})
+	s.mustSync(noBlock)
 
-	put(t, s.root, "assets/a.blp", "second")
-	put(t, s.root, "assets/new.blp")
+	writeFile(t, s.root, "assets/a.blp", "second")
+	writeFile(t, s.root, "assets/new.blp")
 	if err := os.Remove(filepath.Join(s.root, "assets", "dropped.blp")); err != nil {
 		t.Fatal(err)
 	}
-	folder, result := s.planned(noBlock)
-	if got, want := names(result.Changes), []string{"a.blp", "new.blp", "-dropped.blp", "war3map.imp"}; !slices.Equal(got, want) {
+	folder, result := s.mustPlan(noBlock)
+	if got, want := changePaths(result.Changes), []string{"a.blp", "new.blp", "-dropped.blp", "war3map.imp"}; !slices.Equal(got, want) {
 		t.Fatalf("the changes are %q, want %q", got, want)
 	}
 	return s, folder, result
 }
 
-func (s *site) mapIsChanged() {
+func (s *assetProject) checkMapChanged() {
 	s.t.Helper()
-	if s.inMap("a.blp") != "second" || s.inMap("new.blp") != "asset" || s.inMap("dropped.blp") != missing {
+	if s.readMapFile("a.blp") != "second" || s.readMapFile("new.blp") != "asset" || s.readMapFile("dropped.blp") != missing {
 		s.t.Error("the map's changes are not made before the state file is written")
 	}
 }
 
 func TestASyncThatCannotWriteItsStateRestoresTheMapByteForByte(t *testing.T) {
-	s, folder, result := changedMap(t)
+	s, folder, result := newSyncedProject(t)
 	before := testkit.Snapshot(t, s.root)
-	testkit.MakeUnwritable(t, s.state)
-	ctx := &countdown{Context: background, limit: never, before: map[int]func(){5: s.mapIsChanged}}
+	testkit.MakeUnwritable(t, s.stateFullPath)
+	ctx := &cancelAfterCtx{Context: background, limit: never, before: map[int]func(){5: s.checkMapChanged}}
 
-	e := asError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot write its state")
+	e := asDiagError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot write its state")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
 		e.File != stateName || !strings.Contains(e.Hint, "can be written") || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
-	if ctx.asks != 5 {
-		t.Errorf("the sync asked %d times, want the state file to be its ask 5 and its last", ctx.asks)
+	if ctx.calls != 5 {
+		t.Errorf("the sync asked %d times, want the state file to be its ask 5 and its last", ctx.calls)
 	}
-	s.unchanged(before, "a failed sync")
+	s.checkUnchanged(before, "a failed sync")
 }
 
 func TestASyncThatCannotReadItsStateJustBeforeWritingItRestoresTheMapByteForByte(t *testing.T) {
-	s, folder, result := changedMap(t)
+	s, folder, result := newSyncedProject(t)
 	before := testkit.Snapshot(t, s.mapDir)
-	ctx := &countdown{Context: background, limit: never, before: map[int]func(){5: func() {
-		s.mapIsChanged()
-		if err := errors.Join(os.Remove(s.state), os.Mkdir(s.state, 0o777)); err != nil {
+	ctx := &cancelAfterCtx{Context: background, limit: never, before: map[int]func(){5: func() {
+		s.checkMapChanged()
+		if err := errors.Join(os.Remove(s.stateFullPath), os.Mkdir(s.stateFullPath, 0o777)); err != nil {
 			t.Fatal(err)
 		}
 	}}}
 
-	e := asError(t, Sync(ctx, folder, result, s.root, stateName),
+	e := asDiagError(t, Sync(ctx, folder, result, s.root, stateName),
 		"a sync that cannot read its state before it writes it")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
 		e.File != stateName || !strings.Contains(e.Hint, "a readable file, not a folder") || e.Cause == nil {
@@ -261,54 +261,54 @@ func TestASyncThatCannotReadItsStateJustBeforeWritingItRestoresTheMapByteForByte
 }
 
 func TestAnInterruptedSyncWritesNothingAndOneInterruptedMidwayUndoesItsWrites(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	put(t, s.root, "assets/b.blp")
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	writeFile(t, s.root, "assets/b.blp")
 	before := testkit.Snapshot(t, s.root)
 	const asks = 4
 	for limit := range asks {
-		folder, result := s.planned(noBlock)
-		ctx := &countdown{Context: background, limit: limit}
-		e := asError(t, Sync(ctx, folder, result, s.root, stateName), "an interrupted sync")
+		folder, result := s.mustPlan(noBlock)
+		ctx := &cancelAfterCtx{Context: background, limit: limit}
+		e := asDiagError(t, Sync(ctx, folder, result, s.root, stateName), "an interrupted sync")
 		want := "Interrupted; every change was undone."
 		if limit == 0 {
 			want = "Interrupted; nothing was written."
 		}
-		if e.Msg != want || ctx.asks != limit+1 {
-			t.Errorf("cancelled at ask %d: error = %+v after %d asks, want %q", limit+1, e, ctx.asks, want)
+		if e.Msg != want || ctx.calls != limit+1 {
+			t.Errorf("cancelled at ask %d: error = %+v after %d asks, want %q", limit+1, e, ctx.calls, want)
 		}
-		s.unchanged(before, "an interrupted sync")
+		s.checkUnchanged(before, "an interrupted sync")
 	}
-	folder, result := s.planned(noBlock)
-	ctx := &countdown{Context: background, limit: asks}
-	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.asks != asks {
-		t.Errorf("Sync = %v after %d asks, want it to finish after %d", err, ctx.asks, asks)
+	folder, result := s.mustPlan(noBlock)
+	ctx := &cancelAfterCtx{Context: background, limit: asks}
+	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.calls != asks {
+		t.Errorf("Sync = %v after %d asks, want it to finish after %d", err, ctx.calls, asks)
 	}
 }
 
 func TestASyncWithNothingToWriteIsNotInterrupted(t *testing.T) {
-	s := newSite(t)
-	folder, result := s.planned(noBlock)
-	ctx := &countdown{Context: background}
-	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.asks != 0 {
-		t.Errorf("Sync = %v after %d asks, want no ask where nothing is written", err, ctx.asks)
+	s := newAssetProject(t)
+	folder, result := s.mustPlan(noBlock)
+	ctx := &cancelAfterCtx{Context: background}
+	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.calls != 0 {
+		t.Errorf("Sync = %v after %d asks, want no ask where nothing is written", err, ctx.calls)
 	}
 }
 
 func TestAnUndoThatCannotRestoreAFileNamesTheFailureAndEveryFileItCouldNotRestore(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	put(t, s.root, "assets/b.blp")
-	folder, result := s.planned(noBlock)
-	ctx := &countdown{Context: background, limit: never, before: map[int]func(){2: func() {
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	writeFile(t, s.root, "assets/b.blp")
+	folder, result := s.mustPlan(noBlock)
+	ctx := &cancelAfterCtx{Context: background, limit: never, before: map[int]func(){2: func() {
 		if err := os.Remove(filepath.Join(s.mapDir, "a.blp")); err != nil {
 			t.Fatal(err)
 		}
-		put(t, s.mapDir, "a.blp/inner.txt")
-		put(t, s.mapDir, "b.blp", "another program's")
+		writeFile(t, s.mapDir, "a.blp/inner.txt")
+		writeFile(t, s.mapDir, "b.blp", "another program's")
 	}}}
 
-	e := asError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot undo")
+	e := asDiagError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot undo")
 	failure := mapLabel + "/b.blp changed after the assets were checked."
 	if !strings.HasPrefix(e.Msg, "Writing assets failed ("+failure+"), and these files could not be restored: "+mapLabel+"/a.blp (") ||
 		!strings.Contains(e.Hint, "version control") {
@@ -317,41 +317,41 @@ func TestAnUndoThatCannotRestoreAFileNamesTheFailureAndEveryFileItCouldNotRestor
 	if cause, ok := diag.FirstProblem(e.Cause); !ok || cause.Msg != failure {
 		t.Errorf("the cause is %v, want the failure that stopped the sync", e.Cause)
 	}
-	if s.inMap("b.blp") != "another program's" || s.inMap("war3map.imp") != missing || s.stateText() != missing {
+	if s.readMapFile("b.blp") != "another program's" || s.readMapFile("war3map.imp") != missing || s.readState() != missing {
 		t.Error("the sync wrote past the file it stopped at")
 	}
 }
 
 func TestAnInterruptedSyncThatCannotUndoSaysSo(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	put(t, s.root, "assets/b.blp")
-	folder, result := s.planned(noBlock)
-	ctx := &countdown{Context: background, limit: 1, before: map[int]func(){2: func() {
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	writeFile(t, s.root, "assets/b.blp")
+	folder, result := s.mustPlan(noBlock)
+	ctx := &cancelAfterCtx{Context: background, limit: 1, before: map[int]func(){2: func() {
 		if err := os.Remove(filepath.Join(s.mapDir, "a.blp")); err != nil {
 			t.Fatal(err)
 		}
-		put(t, s.mapDir, "a.blp/inner.txt")
+		writeFile(t, s.mapDir, "a.blp/inner.txt")
 	}}}
-	e := asError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot undo")
+	e := asDiagError(t, Sync(ctx, folder, result, s.root, stateName), "a sync that cannot undo")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed (interrupted), and these files could not be restored: "+mapLabel+"/a.blp (") {
 		t.Errorf("error = %+v", e)
 	}
 }
 
 func TestSyncRefusesAFileThatChangedAfterThePlanAndWritesOverNothing(t *testing.T) {
-	writes := func(name string, content ...string) func(*site) {
-		return func(s *site) { put(s.t, s.mapDir, name, content...) }
+	writes := func(name string, content ...string) func(*assetProject) {
+		return func(s *assetProject) { writeFile(s.t, s.mapDir, name, content...) }
 	}
-	saves := func(s *site) { s.setImports(imp.Entry{Flag: 5, Path: "sound.wav"}) }
-	removes := func(s *site) {
+	saves := func(s *assetProject) { s.writeImports(imp.Entry{Flag: 5, Path: "sound.wav"}) }
+	removes := func(s *assetProject) {
 		if err := os.Remove(filepath.Join(s.mapDir, "replaced.blp")); err != nil {
 			s.t.Fatal(err)
 		}
 	}
 	tests := []struct {
 		name    string
-		meddle  func(s *site)
+		meddle  func(s *assetProject)
 		changed string
 	}{
 		{"an owned file the plan replaces, edited by hand", writes("replaced.blp", "edited by hand"), "replaced.blp"},
@@ -363,35 +363,35 @@ func TestSyncRefusesAFileThatChangedAfterThePlanAndWritesOverNothing(t *testing.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newSite(t)
-			put(t, s.root, "assets/replaced.blp", "first")
-			put(t, s.root, "assets/dropped.blp")
-			put(t, s.root, "assets/0.blp")
-			s.synced(noBlock)
-			put(t, s.root, "assets/replaced.blp", "second")
-			put(t, s.root, "assets/new.blp")
-			put(t, s.root, "assets/0.blp", "written before the others")
+			s := newAssetProject(t)
+			writeFile(t, s.root, "assets/replaced.blp", "first")
+			writeFile(t, s.root, "assets/dropped.blp")
+			writeFile(t, s.root, "assets/0.blp")
+			s.mustSync(noBlock)
+			writeFile(t, s.root, "assets/replaced.blp", "second")
+			writeFile(t, s.root, "assets/new.blp")
+			writeFile(t, s.root, "assets/0.blp", "written before the others")
 			if err := os.Remove(filepath.Join(s.root, "assets", "dropped.blp")); err != nil {
 				t.Fatal(err)
 			}
-			folder, result := s.planned(noBlock)
+			folder, result := s.mustPlan(noBlock)
 			tt.meddle(s)
 			before := testkit.Snapshot(t, s.root)
 
-			e := asError(t, Sync(background, folder, result, s.root, stateName), "a sync of a map that changed")
+			e := asDiagError(t, Sync(background, folder, result, s.root, stateName), "a sync of a map that changed")
 			file := mapLabel + "/" + tt.changed
 			if e.Msg != file+" changed after the assets were checked." || e.File != file || !strings.Contains(e.Hint, "Close World Editor") {
 				t.Errorf("error = %+v", e)
 			}
-			s.unchanged(before, "a refused sync")
+			s.checkUnchanged(before, "a refused sync")
 		})
 	}
 }
 
 func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.T) {
-	writes := func(s *site) { put(s.t, s.root, ".asset-state/map.w3x.json", "another program's") }
-	removes := func(s *site) {
-		if err := os.Remove(s.state); err != nil {
+	writes := func(s *assetProject) { writeFile(s.t, s.root, ".asset-state/map.w3x.json", "another program's") }
+	removes := func(s *assetProject) {
+		if err := os.Remove(s.stateFullPath); err != nil {
 			s.t.Fatal(err)
 		}
 	}
@@ -399,7 +399,7 @@ func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.
 		name    string
 		owned   bool
 		asset   string
-		meddle  func(s *site)
+		meddle  func(s *assetProject)
 		lastAsk int
 		state   string
 	}{
@@ -411,33 +411,33 @@ func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newSite(t)
+			s := newAssetProject(t)
 			if tt.owned {
-				put(t, s.root, "assets/a.blp", "first")
-				s.synced(noBlock)
+				writeFile(t, s.root, "assets/a.blp", "first")
+				s.mustSync(noBlock)
 			}
 			if err := os.RemoveAll(filepath.Join(s.root, "assets", "a.blp")); err != nil {
 				t.Fatal(err)
 			}
 			if tt.asset != "" {
-				put(t, s.root, "assets/a.blp", tt.asset)
+				writeFile(t, s.root, "assets/a.blp", tt.asset)
 			}
-			folder, result := s.planned(noBlock)
+			folder, result := s.mustPlan(noBlock)
 			before := testkit.Snapshot(t, s.mapDir)
-			ctx := &countdown{Context: background, limit: never, before: map[int]func(){tt.lastAsk: func() { tt.meddle(s) }}}
+			ctx := &cancelAfterCtx{Context: background, limit: never, before: map[int]func(){tt.lastAsk: func() { tt.meddle(s) }}}
 
-			e := asError(t, Sync(ctx, folder, result, s.root, stateName), "a sync whose state file changed")
+			e := asDiagError(t, Sync(ctx, folder, result, s.root, stateName), "a sync whose state file changed")
 			if e.Msg != stateName+" changed after the assets were checked." || e.File != stateName ||
 				!strings.Contains(e.Hint, "Close World Editor") {
 				t.Errorf("error = %+v", e)
 			}
-			if ctx.asks != tt.lastAsk {
-				t.Errorf("the sync asked %d times, want the state file to be its ask %d and its last", ctx.asks, tt.lastAsk)
+			if ctx.calls != tt.lastAsk {
+				t.Errorf("the sync asked %d times, want the state file to be its ask %d and its last", ctx.calls, tt.lastAsk)
 			}
 			if after := testkit.Snapshot(t, s.mapDir); !maps.EqualFunc(before, after, slices.Equal) {
 				t.Errorf("the map holds %q, want what it held before the sync", slices.Sorted(maps.Keys(after)))
 			}
-			if got := s.stateText(); got != tt.state {
+			if got := s.readState(); got != tt.state {
 				t.Errorf("the state file holds %q, want %q: what the other program left", got, tt.state)
 			}
 		})
@@ -445,88 +445,88 @@ func TestSyncRefusesAStateFileThatChangedAfterItBeganAndUndoesTheMap(t *testing.
 }
 
 func TestAStateFileThatNeedsNoWriteIsNotLookedAtAgain(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	s.synced(noBlock)
-	s.setImports()
-	folder, result := s.planned(noBlock)
-	if got := names(result.Changes); !slices.Equal(got, []string{"war3map.imp"}) {
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	s.mustSync(noBlock)
+	s.writeImports()
+	folder, result := s.mustPlan(noBlock)
+	if got := changePaths(result.Changes); !slices.Equal(got, []string{"war3map.imp"}) {
 		t.Fatalf("the changes are %q", got)
 	}
-	ctx := &countdown{Context: background, limit: never, before: map[int]func(){1: func() {
-		put(t, s.root, ".asset-state/map.w3x.json", "another program's")
+	ctx := &cancelAfterCtx{Context: background, limit: never, before: map[int]func(){1: func() {
+		writeFile(t, s.root, ".asset-state/map.w3x.json", "another program's")
 	}}}
-	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.asks != 1 {
-		t.Errorf("Sync = %v after %d asks, want it to finish after the one ask of the index", err, ctx.asks)
+	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.calls != 1 {
+		t.Errorf("Sync = %v after %d asks, want it to finish after the one ask of the index", err, ctx.calls)
 	}
-	if len(s.imports()) != 1 || s.stateText() != "another program's" {
+	if len(s.readImports()) != 1 || s.readState() != "another program's" {
 		t.Error("the index is not written, or the state file is")
 	}
 }
 
 func TestAStateFileMadeDuringASyncThatOwnsNothingAndFoundNoneIsLeftAsItIs(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	s.synced(noBlock)
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	s.mustSync(noBlock)
 	if err := os.Remove(filepath.Join(s.root, "assets", "a.blp")); err != nil {
 		t.Fatal(err)
 	}
-	folder, result := s.planned(noBlock)
-	if got := names(result.Changes); !slices.Equal(got, []string{"-a.blp", "war3map.imp"}) || len(result.State.Files) != 0 {
+	folder, result := s.mustPlan(noBlock)
+	if got := changePaths(result.Changes); !slices.Equal(got, []string{"-a.blp", "war3map.imp"}) || len(result.State.Files) != 0 {
 		t.Fatalf("the changes are %q and the state owns %d files, want the owned file removed and nothing owned",
 			got, len(result.State.Files))
 	}
-	if err := os.Remove(s.state); err != nil {
+	if err := os.Remove(s.stateFullPath); err != nil {
 		t.Fatal(err)
 	}
-	ctx := &countdown{Context: background, limit: never, before: map[int]func(){2: func() {
-		put(t, s.root, ".asset-state/map.w3x.json", "another program's")
+	ctx := &cancelAfterCtx{Context: background, limit: never, before: map[int]func(){2: func() {
+		writeFile(t, s.root, ".asset-state/map.w3x.json", "another program's")
 	}}}
-	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.asks != 2 {
-		t.Errorf("Sync = %v after %d asks, want it to finish after the two asks of the map's changes", err, ctx.asks)
+	if err := Sync(ctx, folder, result, s.root, stateName); err != nil || ctx.calls != 2 {
+		t.Errorf("Sync = %v after %d asks, want it to finish after the two asks of the map's changes", err, ctx.calls)
 	}
-	if s.inMap("a.blp") != missing || len(s.imports()) != 0 {
+	if s.readMapFile("a.blp") != missing || len(s.readImports()) != 0 {
 		t.Error("the map's changes are not made")
 	}
-	if got := s.stateText(); got != "another program's" {
+	if got := s.readState(); got != "another program's" {
 		t.Errorf("the state file holds %q, want what the other program wrote", got)
 	}
 }
 
 func TestAFileNamedAssetStateOwnsNothingAndStopsASyncByTheStateFilesName(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
 	testkit.WriteFile(t, s.root, ".asset-state", []byte("a file, not a folder"))
-	folder, result := s.planned(noBlock)
+	folder, result := s.mustPlan(noBlock)
 	before := testkit.Snapshot(t, s.root)
-	e := asError(t, Sync(background, folder, result, s.root, stateName), "a sync with a file named .asset-state")
+	e := asDiagError(t, Sync(background, folder, result, s.root, stateName), "a sync with a file named .asset-state")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || e.File != stateName || e.Hint == "" {
 		t.Errorf("error = %+v", e)
 	}
-	s.unchanged(before, "a refused sync")
+	s.checkUnchanged(before, "a refused sync")
 }
 
 func TestSyncRefusesAStateFileItCannotReadBeforeItWritesAnything(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	folder, result := s.planned(noBlock)
-	if err := os.MkdirAll(s.state, 0o777); err != nil {
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	folder, result := s.mustPlan(noBlock)
+	if err := os.MkdirAll(s.stateFullPath, 0o777); err != nil {
 		t.Fatal(err)
 	}
 	before := testkit.Snapshot(t, s.root)
-	e := asError(t, Sync(background, folder, result, s.root, stateName),
+	e := asDiagError(t, Sync(background, folder, result, s.root, stateName),
 		"a sync with a folder in place of its state file")
 	if !strings.Contains(e.Msg, "Reading the asset ownership state failed") || e.File != stateName {
 		t.Errorf("error = %+v", e)
 	}
-	s.unchanged(before, "a refused sync")
+	s.checkUnchanged(before, "a refused sync")
 }
 
 func TestSyncWritesNothingOfAPlanWithAnAssetInsideAnother(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
 	before := testkit.Snapshot(t, s.root)
-	folder := s.open()
+	folder := s.openMap()
 	assets := []Asset{{Target: "a.blp", Data: []byte("a")}, {Target: "data", Data: []byte("outer")},
 		{Target: "data/inner.txt", Data: []byte("inner")}}
 	result, err := Plan(background, folder, assets, State{})
@@ -538,37 +538,37 @@ func TestSyncWritesNothingOfAPlanWithAnAssetInsideAnother(t *testing.T) {
 	if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "Cannot write data") {
 		t.Errorf("Sync = %v, want a plain error about data, a file and a folder at once", err)
 	}
-	s.unchanged(before, "a refused sync")
+	s.checkUnchanged(before, "a refused sync")
 }
 
 func TestSyncRefusesAnotherFolderThanTheOneThePlanWasMadeFrom(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp", "first")
-	s.synced(noBlock)
-	put(t, s.root, "assets/a.blp", "second")
-	_, result := s.planned(noBlock)
-	put(t, s.mapDir, "a.blp", "edited by hand")
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp", "first")
+	s.mustSync(noBlock)
+	writeFile(t, s.root, "assets/a.blp", "second")
+	_, result := s.mustPlan(noBlock)
+	writeFile(t, s.mapDir, "a.blp", "edited by hand")
 	before := testkit.Snapshot(t, s.root)
 
-	err := Sync(background, s.open(), result, s.root, stateName)
+	err := Sync(background, s.openMap(), result, s.root, stateName)
 	var expected *diag.Error
 	if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "the folder the plan was made from") {
 		t.Errorf("Sync = %v, want a plain error about the folder", err)
 	}
-	s.unchanged(before, "a refused sync")
+	s.checkUnchanged(before, "a refused sync")
 }
 
 func TestSyncRefusesAFolderThatCarriesPlannedChanges(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	put(t, s.mapDir, "war3map.w3i", "the map's own")
-	view := s.open().WithChanges([]mapdir.Change{{Path: "war3map.w3i", Data: []byte("patched")}})
-	assets, _ := collect(t, s.root, noBlock)
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	writeFile(t, s.mapDir, "war3map.w3i", "the map's own")
+	view := s.openMap().WithChanges([]mapdir.Change{{Path: "war3map.w3i", Data: []byte("patched")}})
+	assets, _ := mustCollect(t, s.root, noBlock)
 	result, err := Plan(background, view, assets, State{})
 	if err != nil {
 		t.Fatalf("Plan: %v", diag.Format(err))
 	}
-	if got, want := names(result.Changes), []string{"a.blp", "war3map.imp"}; !slices.Equal(got, want) {
+	if got, want := changePaths(result.Changes), []string{"a.blp", "war3map.imp"}; !slices.Equal(got, want) {
 		t.Fatalf("the changes are %q, want %q", got, want)
 	}
 	before := testkit.Snapshot(t, s.root)
@@ -578,5 +578,5 @@ func TestSyncRefusesAFolderThatCarriesPlannedChanges(t *testing.T) {
 	if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "carries planned changes") {
 		t.Errorf("Sync = %v, want a plain error about the folder's planned changes", err)
 	}
-	s.unchanged(before, "a refused sync")
+	s.checkUnchanged(before, "a refused sync")
 }

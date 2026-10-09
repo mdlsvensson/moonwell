@@ -13,14 +13,14 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func lay(t testing.TB, pairs ...string) string {
+func newProjectDir(t testing.TB, pairs ...string) string {
 	t.Helper()
 	root := t.TempDir()
-	write(t, root, pairs...)
+	writeFiles(t, root, pairs...)
 	return root
 }
 
-func write(t testing.TB, root string, pairs ...string) {
+func writeFiles(t testing.TB, root string, pairs ...string) {
 	t.Helper()
 	if len(pairs)%2 != 0 {
 		t.Fatalf("files are pairs of a path and a text, and %q, the last of them, has no text", pairs[len(pairs)-1])
@@ -30,7 +30,7 @@ func write(t testing.TB, root string, pairs ...string) {
 	}
 }
 
-func read(t testing.TB, root, path string) string {
+func readFile(t testing.TB, root, path string) string {
 	t.Helper()
 	data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
 	if err != nil {
@@ -39,7 +39,7 @@ func read(t testing.TB, root, path string) string {
 	return string(data)
 }
 
-func contains(t testing.TB, text string, parts ...string) {
+func checkContains(t testing.TB, text string, parts ...string) {
 	t.Helper()
 	for _, part := range parts {
 		if !strings.Contains(text, part) {
@@ -48,7 +48,7 @@ func contains(t testing.TB, text string, parts ...string) {
 	}
 }
 
-func asError(t testing.TB, err error, what string) *diag.Error {
+func asDiagError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
 	var diagErr *diag.Error
 	if !errors.As(err, &diagErr) {
@@ -57,7 +57,7 @@ func asError(t testing.TB, err error, what string) *diag.Error {
 	return diagErr
 }
 
-func linkAt(t testing.TB, root, symlink string) (at, target string) {
+func symlinkDirAt(t testing.TB, root, symlink string) (at, target string) {
 	t.Helper()
 	at, target = filepath.Join(root, filepath.FromSlash(symlink)), t.TempDir()
 	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
@@ -67,7 +67,7 @@ func linkAt(t testing.TB, root, symlink string) (at, target string) {
 	return at, target
 }
 
-func linkToFile(t testing.TB, target, at string) {
+func symlinkFile(t testing.TB, target, at string) {
 	t.Helper()
 	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 		t.Fatal(err)
@@ -75,7 +75,7 @@ func linkToFile(t testing.TB, target, at string) {
 	testkit.LinkFile(t, target, at)
 }
 
-func entriesIn(t testing.TB, dir string) []string {
+func listEntries(t testing.TB, dir string) []string {
 	t.Helper()
 	if _, err := os.Stat(dir); err != nil {
 		return nil
@@ -83,7 +83,7 @@ func entriesIn(t testing.TB, dir string) []string {
 	return slices.Sorted(maps.Keys(testkit.Snapshot(t, dir)))
 }
 
-func filesIn(t testing.TB, dir string) map[string]string {
+func readFiles(t testing.TB, dir string) map[string]string {
 	t.Helper()
 	files := map[string]string{}
 	if _, err := os.Stat(dir); err != nil {

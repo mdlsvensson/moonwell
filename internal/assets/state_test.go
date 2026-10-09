@@ -16,10 +16,10 @@ var (
 	sevens = strings.Repeat("7", 64)
 )
 
-func stateOf(t *testing.T, content string) string {
+func newRootWithState(t *testing.T, content string) string {
 	t.Helper()
 	root := t.TempDir()
-	put(t, root, stateName, content)
+	writeFile(t, root, stateName, content)
 	return root
 }
 
@@ -30,27 +30,27 @@ func TestStateFileIsUnderAssetStateByTheMapFoldersNameFromTheProjectFolder(t *te
 		t.Errorf("StateFile = %q, %v", file, err)
 	}
 	file, err = StateFilePath(root, "../map.w3x")
-	if e := asError(t, err, "a map folder outside maps/"); file != "" || !strings.Contains(e.Msg, "../map.w3x") ||
+	if e := asDiagError(t, err, "a map folder outside maps/"); file != "" || !strings.Contains(e.Msg, "../map.w3x") ||
 		e.File != ".asset-state/../map.w3x.json" || e.Hint == "" {
 		t.Errorf("StateFile = %q, %+v", file, e)
 	}
 }
 
 func TestALinkOnTheWayToTheStateFileIsRefusedByTheStateFilesName(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/a.blp")
-	folder, result := s.planned(noBlock)
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/a.blp")
+	folder, result := s.mustPlan(noBlock)
 	testkit.LinkDir(t, t.TempDir(), filepath.Join(s.root, ".asset-state"))
 	_, named := StateFilePath(s.root, "map.w3x")
 	_, read := ReadState(s.root, stateName)
 	for what, err := range map[string]error{
 		"StateFile": named, "ReadState": read, "Sync": Sync(background, folder, result, s.root, stateName),
 	} {
-		if e := asError(t, err, what); !strings.Contains(e.Msg, "Symlinks are not supported") || e.File != stateName {
+		if e := asDiagError(t, err, what); !strings.Contains(e.Msg, "Symlinks are not supported") || e.File != stateName {
 			t.Errorf("%s: error = %+v", what, e)
 		}
 	}
-	if s.inMap("a.blp") != missing {
+	if s.readMapFile("a.blp") != missing {
 		t.Error("the refused sync wrote into the map")
 	}
 }
@@ -82,7 +82,7 @@ func TestReadStateKeepsThePathsAsWrittenInTheOrderWritten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			state, err := ReadState(stateOf(t, tt.content), stateName)
+			state, err := ReadState(newRootWithState(t, tt.content), stateName)
 			if err != nil || !slices.Equal(state.Files, tt.want) {
 				t.Errorf("ReadState = %+v, %v, want %+v", state.Files, err, tt.want)
 			}
@@ -122,8 +122,8 @@ func TestReadStateRefusesAFileThatIsNotAStateAndNamesIt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			state, err := ReadState(stateOf(t, tt.content), stateName)
-			e := asError(t, err, tt.content)
+			state, err := ReadState(newRootWithState(t, tt.content), stateName)
+			e := asDiagError(t, err, tt.content)
 			if e.Msg != "The asset ownership state is invalid: "+tt.problem || e.File != stateName ||
 				!strings.HasPrefix(e.Hint, "Restore it from version control.") || len(state.Files) != 0 {
 				t.Errorf("ReadState = %+v, %+v, want the problem %q at %s", state, e, tt.problem, stateName)
@@ -133,8 +133,8 @@ func TestReadStateRefusesAFileThatIsNotAStateAndNamesIt(t *testing.T) {
 }
 
 func TestTheFirstBadEntryOfAStateIsTheFirstWrittenAlsoWhereAPathLooksLikeANumber(t *testing.T) {
-	_, err := ReadState(stateOf(t, `{"version":1,"files":{"b.blp":"bad","7":"worse"}}`), stateName)
-	if e := asError(t, err, "two bad hashes"); !strings.Contains(e.Msg, "b.blp has no valid hash") {
+	_, err := ReadState(newRootWithState(t, `{"version":1,"files":{"b.blp":"bad","7":"worse"}}`), stateName)
+	if e := asDiagError(t, err, "two bad hashes"); !strings.Contains(e.Msg, "b.blp has no valid hash") {
 		t.Errorf("error = %+v, want it about b.blp, which is written before 7", e)
 	}
 }
@@ -145,7 +145,7 @@ func TestReadStateNamesAStateFileItCannotRead(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, err := ReadState(root, stateName)
-	e := asError(t, err, "a folder in place of the state file")
+	e := asDiagError(t, err, "a folder in place of the state file")
 	if !strings.Contains(e.Msg, "Reading the asset ownership state failed") || e.File != stateName || e.Hint == "" ||
 		e.Cause == nil {
 		t.Errorf("error = %+v", e)
@@ -182,7 +182,7 @@ func TestAStateIsReadBackAsItWasWritten(t *testing.T) {
 		{"Models/H\xc3\xa9ro.mdx", fsx.SHA256Hex([]byte("model"))},
 		{"12", zeros},
 	}}
-	read, err := ReadState(stateOf(t, string(state.Encode())), stateName)
+	read, err := ReadState(newRootWithState(t, string(state.Encode())), stateName)
 	if err != nil || !slices.Equal(read.Files, state.Files) {
 		t.Errorf("ReadState = %+v, %v, want %+v", read.Files, err, state.Files)
 	}

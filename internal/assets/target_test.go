@@ -43,7 +43,7 @@ func TestTargetPathRefusesTheMapsOwnFiles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		_, err := parseTargetPath(tt.value)
-		e := asError(t, err, tt.value)
+		e := asDiagError(t, err, tt.value)
 		if e.Msg != "Reserved map path: "+tt.value || !strings.Contains(e.Hint, tt.hint) || e.File != "" {
 			t.Errorf("targetPath(%q): %+v, want a reserved path with a hint about %q", tt.value, e, tt.hint)
 		}
@@ -53,7 +53,7 @@ func TestTargetPathRefusesTheMapsOwnFiles(t *testing.T) {
 func TestTargetPathRefusesAPathThatLeavesTheMapOrThatWindowsCannotHold(t *testing.T) {
 	for _, value := range []string{"../escape", "/absolute", `C:\escape`, "", "a//b.blp", "a/./b.blp", "con.blp", "icon.", "what?.blp", "a\tb.blp"} {
 		got, err := parseTargetPath(value)
-		e := asError(t, err, value)
+		e := asDiagError(t, err, value)
 		if got != "" || e.Msg != "Invalid asset path: "+value || !strings.Contains(e.Hint, "relative path") || e.File != "" {
 			t.Errorf("targetPath(%q) = %q, %+v", value, got, e)
 		}

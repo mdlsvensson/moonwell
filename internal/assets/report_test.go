@@ -9,7 +9,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
 
-func textured(paths ...string) []byte {
+func modelWithTextures(paths ...string) []byte {
 	var entries []byte
 	for _, path := range paths {
 		entries = append(entries, testkit.Texture(path, 0)...)
@@ -33,7 +33,7 @@ func headings(reports []ModelReport) []string {
 	return list
 }
 
-func sameLines(t *testing.T, got, want []string) {
+func checkLines(t *testing.T, got, want []string) {
 	t.Helper()
 	if !slices.Equal(got, want) {
 		t.Errorf("the report is\n%s\nwant\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
@@ -79,7 +79,7 @@ func TestOutsideAProjectAReportTellsInGamePathsFromCustomOnesShownWithBackslashe
 	if first := reports[0].Refs[0]; first.Kind != model.Texture || first.Path.Path != "Textures/Knight.blp" {
 		t.Errorf("the first reference is %+v, want the path as the model holds it", first)
 	}
-	sameLines(t, RenderReports(reports, false), []string{
+	checkLines(t, RenderReports(reports, false), []string{
 		"knight.mdx",
 		`  texture         Textures\Knight.blp   in-game path`,
 		`  texture         team colour (slot 1)`,
@@ -112,7 +112,7 @@ func TestAReferenceIsClassifiedByTheGamesPathsAndInAProjectByWhatABuildImports(t
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			reports := ReportModels([]Model{{"a.mdx", textured(tt.reference)}}, gamePaths, tt.targets)
+			reports := ReportModels([]Model{{"a.mdx", modelWithTextures(tt.reference)}}, gamePaths, tt.targets)
 			if got := statuses(reports[0]); !slices.Equal(got, []PathStatus{tt.want}) {
 				t.Errorf("statuses = %q, want %q", got, tt.want)
 			}
@@ -121,7 +121,7 @@ func TestAReferenceIsClassifiedByTheGamesPathsAndInAProjectByWhatABuildImports(t
 }
 
 func TestWithoutAnyGamePathsEveryPathIsCustom(t *testing.T) {
-	reports := ReportModels([]Model{{"a.mdx", textured(`Textures\A.blp`)}}, map[string]bool{}, nil)
+	reports := ReportModels([]Model{{"a.mdx", modelWithTextures(`Textures\A.blp`)}}, map[string]bool{}, nil)
 	if got := statuses(reports[0]); !slices.Equal(got, []PathStatus{Custom}) {
 		t.Errorf("statuses = %q", got)
 	}
@@ -129,11 +129,11 @@ func TestWithoutAnyGamePathsEveryPathIsCustom(t *testing.T) {
 
 func TestTheModelsALibraryShipsAreReportedAndItsFilesCountAsImported(t *testing.T) {
 	root := t.TempDir()
-	testkit.WriteFile(t, root, "libraries/golems/Models/Golem.mdx", textured(`Textures\Golem.blp`))
-	put(t, root, "libraries/golems/Textures/Golem.blp")
-	put(t, root, "libraries/golems/war3mapImported/golems/frames.toc")
-	testkit.WriteFile(t, root, "assets/Models/Own.mdx", textured(`textures\golem.BLP`))
-	assets, _ := collect(t, root, noBlock, "golems")
+	testkit.WriteFile(t, root, "libraries/golems/Models/Golem.mdx", modelWithTextures(`Textures\Golem.blp`))
+	writeFile(t, root, "libraries/golems/Textures/Golem.blp")
+	writeFile(t, root, "libraries/golems/war3mapImported/golems/frames.toc")
+	testkit.WriteFile(t, root, "assets/Models/Own.mdx", modelWithTextures(`textures\golem.BLP`))
+	assets, _ := mustCollect(t, root, noBlock, "golems")
 
 	reports := ReportModels(ModelsAmong(assets), ParseGamePaths("# test\n"), TargetSet(assets))
 	if got, want := headings(reports), []string{"library golems: Models/Golem.mdx", "assets/Models/Own.mdx"}; !slices.Equal(got, want) {
@@ -144,7 +144,7 @@ func TestTheModelsALibraryShipsAreReportedAndItsFilesCountAsImported(t *testing.
 			t.Errorf("%s: statuses = %q", report.Heading, got)
 		}
 	}
-	sameLines(t, RenderReports(reports, true), []string{
+	checkLines(t, RenderReports(reports, true), []string{
 		"library golems: Models/Golem.mdx",
 		`  texture  Textures\Golem.blp  custom path, imported`,
 		"assets/Models/Own.mdx",
@@ -159,11 +159,11 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 		testkit.Texture(`Textures\Missing.blp`, 0), testkit.Texture("", 1))
 	emitters := testkit.Concat(testkit.Emitter(`Models\Glow.mdl`, 0), testkit.Emitter(`Models\Only.mdx`, 0))
 	testkit.WriteFile(t, root, "assets/Models/Knight.mdx", testkit.MDX(testkit.Chunk("TEXS", textures), testkit.Chunk("PREM", emitters)))
-	put(t, root, "assets/Textures/knight.BLP")
-	put(t, root, "assets/art/cape.blp")
+	writeFile(t, root, "assets/Textures/knight.BLP")
+	writeFile(t, root, "assets/art/cape.blp")
 	testkit.WriteFile(t, root, "assets/Models/Glow.mdx", testkit.MDX())
-	put(t, root, "assets/Models/Only.mdl", "Version {\n FormatVersion 800,\n}\n")
-	assets, _ := collect(t, root, `{"paths":{"art/cape.blp":"Textures\\Cape.blp"},"exclude":[]}`)
+	writeFile(t, root, "assets/Models/Only.mdl", "Version {\n FormatVersion 800,\n}\n")
+	assets, _ := mustCollect(t, root, `{"paths":{"art/cape.blp":"Textures\\Cape.blp"},"exclude":[]}`)
 	gamePaths := ParseGamePaths("# test\ntextures/knight.dds\ntextures/missing.blp\n")
 	models := ModelsAmong(assets)
 	if len(models) != 3 || models[1].Heading != "assets/Models/Knight.mdx" {
@@ -187,7 +187,7 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 	if len(reports[0].Refs) != 0 || len(reports[2].Refs) != 0 || reports[0].Unreadable != "" || reports[2].Unreadable != "" {
 		t.Errorf("the models without references are reported as %+v and %+v", reports[0], reports[2])
 	}
-	sameLines(t, RenderReports(reports, true), []string{
+	checkLines(t, RenderReports(reports, true), []string{
 		"assets/Models/Glow.mdx",
 		"  (no referenced files)",
 		"assets/Models/Knight.mdx",
@@ -205,9 +205,9 @@ func TestInAProjectAReportClassifiesEveryReferenceOfEveryModel(t *testing.T) {
 
 func TestAModelThatCannotBeReadIsReportedInItsPlaceBesideTheOthers(t *testing.T) {
 	root := t.TempDir()
-	put(t, root, "assets/Models/A.mdl", "Model {\n}\nBroken {\n")
-	testkit.WriteFile(t, root, "assets/Models/B.mdx", textured(`Textures\B.blp`))
-	assets, _ := collect(t, root, noBlock)
+	writeFile(t, root, "assets/Models/A.mdl", "Model {\n}\nBroken {\n")
+	testkit.WriteFile(t, root, "assets/Models/B.mdx", modelWithTextures(`Textures\B.blp`))
+	assets, _ := mustCollect(t, root, noBlock)
 
 	reports := ReportModels(ModelsAmong(assets), ParseGamePaths("textures/b.blp\n"), TargetSet(assets))
 	if got, want := headings(reports), []string{"assets/Models/A.mdl", "assets/Models/B.mdx"}; !slices.Equal(got, want) {
@@ -219,7 +219,7 @@ func TestAModelThatCannotBeReadIsReportedInItsPlaceBesideTheOthers(t *testing.T)
 	if reports[1].Unreadable != "" {
 		t.Errorf("the model that can be read is reported as %+v", reports[1])
 	}
-	sameLines(t, RenderReports(reports, true), []string{
+	checkLines(t, RenderReports(reports, true), []string{
 		"assets/Models/A.mdl",
 		"  (unreadable: Not a readable model: the Broken block is never closed.)",
 		"assets/Models/B.mdx",
@@ -262,9 +262,9 @@ func TestTheSummaryCountsModelsPathsAndEachStatusAndSaysHowManyModelsAreUnreadab
 }
 
 func TestTheColumnsOfAReportArePaddedByCharacters(t *testing.T) {
-	wide := Model{"wide.mdx", textured("Textures\\\xf0\x9f\x98\x80.blp", `Textures\Longer.blp`, "Textures\\\xc3\xa9.blp")}
+	wide := Model{"wide.mdx", modelWithTextures("Textures\\\xf0\x9f\x98\x80.blp", `Textures\Longer.blp`, "Textures\\\xc3\xa9.blp")}
 	reports := ReportModels([]Model{wide}, map[string]bool{}, nil)
-	sameLines(t, RenderReports(reports, false), []string{
+	checkLines(t, RenderReports(reports, false), []string{
 		"wide.mdx",
 		"  texture  Textures\\\xf0\x9f\x98\x80.blp       custom path",
 		`  texture  Textures\Longer.blp  custom path`,

@@ -10,22 +10,22 @@ import (
 )
 
 func TestASyncThatCannotRemoveAnOwnedFileUndoesItsWritesAndLeavesTheFileAsItWas(t *testing.T) {
-	s := newSite(t)
-	put(t, s.root, "assets/0.blp", "first")
-	put(t, s.root, "assets/dropped.blp")
-	s.synced(noBlock)
-	put(t, s.root, "assets/0.blp", "second")
+	s := newAssetProject(t)
+	writeFile(t, s.root, "assets/0.blp", "first")
+	writeFile(t, s.root, "assets/dropped.blp")
+	s.mustSync(noBlock)
+	writeFile(t, s.root, "assets/0.blp", "second")
 	if err := os.Remove(filepath.Join(s.root, "assets", "dropped.blp")); err != nil {
 		t.Fatal(err)
 	}
-	folder, result := s.planned(noBlock)
+	folder, result := s.mustPlan(noBlock)
 	before := testkit.Snapshot(t, s.root)
 	testkit.MakeUnwritable(t, filepath.Join(s.mapDir, "dropped.blp"))
 
-	e := asError(t, Sync(background, folder, result, s.root, stateName), "a sync that cannot remove a file")
+	e := asDiagError(t, Sync(background, folder, result, s.root, stateName), "a sync that cannot remove a file")
 	if !strings.HasPrefix(e.Msg, "Writing assets failed: ") || !strings.HasSuffix(e.Msg, ". Every change was undone.") ||
 		e.File != mapLabel+"/dropped.blp" || e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
-	s.unchanged(before, "a failed sync")
+	s.checkUnchanged(before, "a failed sync")
 }
