@@ -42,6 +42,25 @@
   and start the game on the packed map:
   `& "<your Warcraft III.exe>" -launch -windowmode windowed -loadfile "<project>\dist\bin\map.w3x"`.
 
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-09 on Windows, and CI passed on Ubuntu and Windows with the race job.
+Of step 3, the template's map was built with this version and started from its packed archive: "Moonwell is
+running." printed, the Captain changed colour and the Footman stood beside it. Steps 4 to 14 were not played
+through in the game: no staged or packed file of a recorded project differs from 0.11.1's. The recordings differ
+in the module Moonwell writes for the object files, in the file an error names and in the words of messages.
+
+The built program was run on a fresh project from `init --link`, with a user folder that held no `config.toml`:
+`check`, `build`, `build --minify`, `objects:check`, `settings:check`, `assets:check` and `setup` end with 0, and
+none of them made that file. Map settings written in `moonwell.toml` made `settings:check` list `war3map.w3i`,
+`war3map.lua` and `war3mapMisc.txt`. The example library was fetched by its tag and locked, and the lock was
+unchanged after `.moonwell/` was deleted. Both install scripts are run by the tests, on Windows and on Ubuntu:
+each makes `config.toml` once and leaves one that is there.
+
+The game's version when the map was started was not read. Warcraft III 3.0.1 (build 24342) was installed since
+2026-10-07; Battle.net, opened after the run, had put the game and World Editor back to 3.0.0.24268.
+`moonwell test` was not confirmed in the game. The online and desync checks are deferred, not passed.
+
 ## 0.11.1 (2026-10-09)
 
 - **Nothing a user can notice has changed.** This version does what 0.11.0 does: the same commands and flags, the
