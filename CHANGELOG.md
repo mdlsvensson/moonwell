@@ -24,7 +24,8 @@
   through a module it writes to `.moonwell/objects.pkl`. A project without object files needs no Pkl, no
   `PklProject` and no `pkl project resolve`, and Moonwell downloads no Pkl for it. `settings:check`, `assets:check`,
   `assets:sync` and `assets:paths` never run Pkl. The Pkl package holds the object schema and no longer
-  `Project.pkl` and `MapSettings.pkl`; an object file is written as before.
+  `Project.pkl` and `MapSettings.pkl`; an object file is written as before. A project with object files and no
+  `PklProject` is told to create one, and an `objects/` that is a link or a Windows junction is refused.
 - **Errors about a setting name the file it is in and the setting,** such as `moonwell.toml › build.folder ...`.
   A file that is not valid TOML is reported with its line and column. A name Moonwell does not know and a value of
   the wrong kind are refused in the words of the library that reads the file, without a line number. Three errors

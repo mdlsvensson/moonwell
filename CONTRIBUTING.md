@@ -422,7 +422,7 @@ The mode `game-paths`:
 A release is built by `.github/workflows/release.yml` from a tag `moonwell@<version>`. The tag's name is fixed: the Pkl
 package's download address is built from it.
 
-1. Set the version in `version.go`, `schema/PklProject`, `install.ps1`, `install.sh` and the README's two examples (a
+1. Set the version in `version.go`, `schema/PklProject`, `install.ps1`, `install.sh` and the README's three examples (a
    test names any that was missed), re-resolve the template's Pkl
    dependencies (`cd template && pkl project resolve`), and write the changelog's section, headed
    `## <version> (<date>)`: the release notes are its entries up to the first `###` heading. Commit, push, and wait for

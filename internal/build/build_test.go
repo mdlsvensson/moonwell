@@ -12,6 +12,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
+	"github.com/mdlsvensson/moonwell/internal/manifest"
 	"github.com/mdlsvensson/moonwell/internal/objects"
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
@@ -61,6 +62,25 @@ func launchWith(game string) string {
 }
 
 const refusedPlayer = "[[settings.players]]\nslot = 23\nname = \"Nobody\"\n"
+
+func TestCheckAndBuildOfAProjectWithoutObjectFilesRunNoPklAndNeedNoPklProject(t *testing.T) {
+	s := newFakeProject(t)
+	s.copyTemplateMap()
+	s.removeFile(pklProjectFile)
+	s.removeFile(resolvedDepsFile)
+	if _, err := Check(background, s.env); err != nil {
+		t.Fatalf("Check: %v", diag.Format(err))
+	}
+	mustBuild(t, s, Options{})
+	for _, run := range s.runCalls() {
+		if run.program == "pkl" {
+			t.Errorf("a project without object files ran %s %q", run.program, run.args)
+		}
+	}
+	if fsx.Exists(s.fullPath(pklProjectFile)) || fsx.Exists(s.fullPath(resolvedDepsFile)) || fsx.Exists(s.fullPath(manifest.ObjectsModule)) {
+		t.Error("the check or the build wrote a file of Pkl's")
+	}
+}
 
 func TestBuildStagesTheMapPacksItAndSaysWhatItDid(t *testing.T) {
 	s := newFakeProject(t, objectsWith(captain("hfoo")), settingsNamed("Built"), localKit)
@@ -452,7 +472,7 @@ func TestTestStagesTheMapBeforeItLooksForTheGame(t *testing.T) {
 	s := newFakeProject(t)
 	err := Test(background, s.env, Options{Entry: "src/main.yue"})
 	e := asDiagError(t, err, "no game")
-	if e.Msg != "launch.gameExecutable is not set." || e.File != s.project.UserFile {
+	if e.Msg != "launch.gameExecutable is not set." || e.File != manifest.UserFilePath(s.env) {
 		t.Errorf("error = %+v", e)
 	}
 	if !fsx.Exists(s.fullPath("dist/stage/map.w3x/war3map.lua")) || len(s.log.Lines()) != 0 {

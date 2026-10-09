@@ -8,6 +8,7 @@ import (
 
 	moonwell "github.com/mdlsvensson/moonwell"
 	"github.com/mdlsvensson/moonwell/internal/env"
+	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
 const captainFile = `amends "@moonwell/ObjectFile.pkl"
@@ -53,8 +54,25 @@ func TestHasObjectFilesFindsAPklFileAtAnyDepthBelowObjectsAndNothingElse(t *test
 	}
 }
 
+func TestHasObjectFilesRefusesAnObjectsFolderThatIsALink(t *testing.T) {
+	e := newEnv(t, map[string]string{"src/main.yue": ""})
+	outside := t.TempDir()
+	testkit.WriteFile(t, outside, "units.pkl", []byte(captainFile))
+	testkit.LinkDir(t, outside, filepath.Join(e.Root, "objects"))
+	has, err := HasObjectFiles(e.Root)
+	if err == nil {
+		t.Fatalf("HasObjectFiles = %v for a link, want a refusal", has)
+	}
+	diagErr := asDiagError(t, err, "the refusal")
+	if diagErr.File != "objects" || !strings.HasPrefix(diagErr.Msg, "Symlinks are not supported: ") || diagErr.Hint == "" {
+		t.Errorf("got %q in %q with the hint %q", diagErr.Msg, diagErr.File, diagErr.Hint)
+	}
+}
+
 func TestEvaluateObjectsWritesItsModuleAndRunsPklOnItInTheProjectFolder(t *testing.T) {
-	e := newEnv(t, map[string]string{"objects/units.pkl": "", "PklProject.deps.json": depsJSON(moonwell.Version)})
+	e := newEnv(t, map[string]string{
+		"objects/units.pkl": "", "PklProject": PklProjectText(moonwell.Version, ""), "PklProject.deps.json": depsJSON(moonwell.Version),
+	})
 	var calls []runCall
 	const evaluated = `{"heroes":{},"units":{"captain":{"id":"h000","base":"hfoo","source":"../objects/units.pkl","properties":{}}},` +
 		`"buildings":{},"items":{},"abilities":{},"buffs":{},"upgrades":{}}`
@@ -82,9 +100,15 @@ func TestEvaluateObjectsRefusesBeforeItRunsPklWhenThePackageIsNotResolvedOrOfAno
 		name  string
 		files map[string]string
 		file  string
+		words string
 	}{
-		{"no resolved dependencies", map[string]string{"objects/units.pkl": ""}, "PklProject"},
-		{"a package of another version", map[string]string{"objects/units.pkl": "", "PklProject.deps.json": depsJSON("0.1.0")}, "PklProject"},
+		{"no PklProject", map[string]string{"objects/units.pkl": "", "PklProject.deps.json": depsJSON(moonwell.Version)},
+			"PklProject", "This project has object files and no PklProject."},
+		{"no resolved dependencies", map[string]string{"objects/units.pkl": "", "PklProject": PklProjectText(moonwell.Version, "")},
+			"PklProject", "PklProject.deps.json is missing."},
+		{"a package of another version", map[string]string{
+			"objects/units.pkl": "", "PklProject": PklProjectText("0.1.0", ""), "PklProject.deps.json": depsJSON("0.1.0"),
+		}, "PklProject", "0.1.0"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			e := newEnv(t, tt.files)
@@ -92,8 +116,8 @@ func TestEvaluateObjectsRefusesBeforeItRunsPklWhenThePackageIsNotResolvedOrOfAno
 			if err == nil {
 				t.Fatal("EvaluateObjects took it")
 			}
-			if diagErr := asDiagError(t, err, "the refusal"); diagErr.File != tt.file {
-				t.Errorf("got %q in %q, want it in %s", diagErr.Msg, diagErr.File, tt.file)
+			if diagErr := asDiagError(t, err, "the refusal"); diagErr.File != tt.file || !strings.Contains(diagErr.Msg, tt.words) || diagErr.Hint == "" {
+				t.Errorf("got %q in %q with the hint %q, want %q in %s, with a hint", diagErr.Msg, diagErr.File, diagErr.Hint, tt.words, tt.file)
 			}
 			if _, err := os.Stat(filepath.Join(e.Root, ".moonwell")); err == nil {
 				t.Error("the module was written before the package was checked")
@@ -113,7 +137,9 @@ func TestEvaluateObjectsReportsWhatPklPrintsWhenItFailsAndOutputThatIsNoJSON(t *
 		{"no JSON", env.RunResult{Stdout: "units {}\n"}, "units {}"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			e := newEnv(t, map[string]string{"objects/units.pkl": "", "PklProject.deps.json": depsJSON(moonwell.Version)})
+			e := newEnv(t, map[string]string{
+				"objects/units.pkl": "", "PklProject": PklProjectText(moonwell.Version, ""), "PklProject.deps.json": depsJSON(moonwell.Version),
+			})
 			var calls []runCall
 			e.Run = fakeRun(&calls, map[string]env.RunResult{"pkl eval": tt.result})
 			_, err := EvaluateObjects(background, e, "pkl")

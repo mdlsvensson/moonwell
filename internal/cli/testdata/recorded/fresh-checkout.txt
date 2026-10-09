@@ -2,7 +2,7 @@
 exit code: 0
 printed: nothing
 terminal:
-  Created <root>\.home\config.toml. Check that launch.gameExecutable points at your Warcraft III.exe.
+  Created <root>/.home/config.toml. Check that launch.gameExecutable points at your Warcraft III.exe.
   YueScript 0.34.3: <reason>
   Copied YueScript for the editor to <reason>.
   Added yueconfig.yue for the editor.

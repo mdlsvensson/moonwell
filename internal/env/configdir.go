@@ -13,7 +13,7 @@ func DefaultConfigDir() string {
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
-		home = "."
+		return ""
 	}
 	return filepath.Join(home, ".moonwell")
 }

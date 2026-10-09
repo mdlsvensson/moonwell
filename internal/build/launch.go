@@ -9,40 +9,41 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-func launch(e *env.Env, config manifest.Launch, userFile, mapPath string) error {
+func launch(e *env.Env, config manifest.Launch, mapPath string) error {
+	userFilePath := manifest.UserFilePath(e)
 	if config.GameExecutable == nil {
-		return errNoGame(userFile)
+		return errNoGame(userFilePath)
 	}
 	executable := *config.GameExecutable
 	info, err := os.Stat(executable)
 	switch {
 	case err != nil:
-		return errGameNotFound(executable, userFile)
+		return errGameNotFound(executable, userFilePath)
 	case !info.Mode().IsRegular():
-		return errGameNotAFile(executable, userFile)
+		return errGameNotAFile(executable, userFilePath)
 	}
 	args := append(slices.Clone(config.Args), "-loadfile", mapPath)
 	if err := e.Spawn(executable, args); err != nil {
-		return env.NewSpawnError(executable, err, fixGame, userFile)
+		return env.NewSpawnError(executable, err, fixGame, userFilePath)
 	}
 	return nil
 }
 
 const fixGame = "Fix launch.gameExecutable in that file to point at Warcraft III.exe."
 
-func errNoGame(userFile string) error {
+func errNoGame(userFilePath string) error {
 	return &diag.Error{
 		Msg:  "launch.gameExecutable is not set.",
-		File: userFile,
+		File: userFilePath,
 		Hint: "Run `moonwell setup` to create that file if it is missing, then set launch.gameExecutable there to " +
 			"your Warcraft III.exe.",
 	}
 }
 
-func errGameNotFound(executable, userFile string) error {
-	return &diag.Error{Msg: "Game executable not found: " + executable, File: userFile, Hint: fixGame}
+func errGameNotFound(executable, userFilePath string) error {
+	return &diag.Error{Msg: "Game executable not found: " + executable, File: userFilePath, Hint: fixGame}
 }
 
-func errGameNotAFile(executable, userFile string) error {
-	return &diag.Error{Msg: "Game executable " + executable + " is not a file.", File: userFile, Hint: fixGame}
+func errGameNotAFile(executable, userFilePath string) error {
+	return &diag.Error{Msg: "Game executable " + executable + " is not a file.", File: userFilePath, Hint: fixGame}
 }

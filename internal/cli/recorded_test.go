@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"unicode"
 
 	"github.com/mdlsvensson/moonwell/internal/env"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
@@ -165,9 +166,9 @@ func (p *recordedProjects) recording(run recordedRun, answers []stepResult) []by
 func (a stepResult) recording(command, root string) string {
 	var out strings.Builder
 	out.WriteString("exit code: " + strconv.Itoa(a.code) + "\n")
-	out.WriteString("printed:" + lineByLine(a.printed))
+	out.WriteString("printed:" + lineByLine(a.printed, root))
 	if a.code == 0 {
-		out.WriteString("terminal:" + lineByLine(a.lines))
+		out.WriteString("terminal:" + lineByLine(a.lines, root))
 	} else {
 		out.WriteString("terminal: " + errorLineOf(a.lines, root) + "\n")
 	}
@@ -178,16 +179,36 @@ func (a stepResult) recording(command, root string) string {
 	return out.String()
 }
 
-func lineByLine(texts []string) string {
+func lineByLine(texts []string, root string) string {
 	if len(texts) == 0 {
 		return " nothing\n"
 	}
 	var out strings.Builder
 	out.WriteString("\n")
 	for _, line := range strings.Split(strings.Join(texts, "\n"), "\n") {
-		out.WriteString("  " + testkit.QuoteIfNeeded(line) + "\n")
+		out.WriteString("  " + testkit.QuoteIfNeeded(withSlashesBelowRoot(line, root)) + "\n")
 	}
 	return out.String()
+}
+
+const rootPlaceholder = "<root>"
+
+func withSlashesBelowRoot(line, root string) string {
+	rest := string(testkit.WithPlaceholders([]byte(line), root))
+	var out strings.Builder
+	for {
+		before, after, found := strings.Cut(rest, rootPlaceholder)
+		out.WriteString(before)
+		if !found {
+			return out.String()
+		}
+		end := strings.IndexFunc(after, unicode.IsSpace)
+		if end < 0 {
+			end = len(after)
+		}
+		out.WriteString(rootPlaceholder + filepath.ToSlash(after[:end]))
+		rest = after[end:]
+	}
 }
 
 func errorLineOf(lines []string, root string) string {
@@ -202,7 +223,7 @@ func errorLineOf(lines []string, root string) string {
 	if !named {
 		return "a complaint that names no file"
 	}
-	if place = string(testkit.WithPlaceholders([]byte(place), root)); strings.HasPrefix(place, "<root>") {
+	if place = string(testkit.WithPlaceholders([]byte(place), root)); strings.HasPrefix(place, rootPlaceholder) {
 		place = filepath.ToSlash(place)
 	}
 	return "a complaint about " + testkit.QuoteIfNeeded(place)

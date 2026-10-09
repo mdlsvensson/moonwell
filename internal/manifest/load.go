@@ -17,7 +17,6 @@ func Load(e *env.Env) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
-	project.UserFile = user.File
 	project.Launch = user.Launch
 	project.Yue.Path = user.YuePath
 	project.useLocalLibraries(user)
@@ -31,7 +30,7 @@ func (p *Project) useLocalLibraries(user *User) {
 		}
 		for _, local := range user.Libraries {
 			if strings.EqualFold(local.GitHub, *library.GitHub) {
-				library.Path, library.OverriddenIn = &local.Path, user.File
+				library.Path, library.OverriddenIn = &local.Path, user.FilePath
 				p.Libraries[name] = library
 			}
 		}
@@ -40,15 +39,4 @@ func (p *Project) useLocalLibraries(user *User) {
 
 func IsProject(root string) bool {
 	return fsx.Exists(filepath.Join(root, ProjectFile))
-}
-
-func truncateRunes(text string, limit int) string {
-	count := 0
-	for i := range text {
-		if count == limit {
-			return text[:i]
-		}
-		count++
-	}
-	return text
 }

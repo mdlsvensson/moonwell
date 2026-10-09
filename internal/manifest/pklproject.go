@@ -27,6 +27,9 @@ func PklProjectText(version, schemaDir string) string {
 }
 
 func checkResolvedPackage(root string) error {
+	if !fsx.Exists(filepath.Join(root, pklProjectFile)) {
+		return errNoPklProject()
+	}
 	deps, err := os.ReadFile(filepath.Join(root, depsFile))
 	if errors.Is(err, fs.ErrNotExist) {
 		return errDepsMissing()
@@ -39,6 +42,15 @@ func checkResolvedPackage(root string) error {
 		return err
 	}
 	return checkPackageVersion(version, moonwell.Version)
+}
+
+func errNoPklProject() error {
+	return &diag.Error{
+		Msg:  "This project has object files and no PklProject.",
+		File: pklProjectFile,
+		Hint: "Create PklProject as the README shows under \"Objects\", then run `pkl project resolve` in the project " +
+			"folder.",
+	}
 }
 
 func errDepsMissing() error {

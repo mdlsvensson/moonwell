@@ -11,8 +11,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-const usersFile = "the-users-folder/config.toml"
-
 type spawnCall []string
 
 func recordSpawns(e *env.Env) *[]spawnCall {
@@ -44,8 +42,8 @@ func TestLaunchExplainsAMissingOrWrongExecutable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			diagErr := asDiagError(t, launch(e, tt.launch, usersFile, "map"), tt.name)
-			if diagErr.Msg != tt.msg || diagErr.File != usersFile || diagErr.Hint != tt.hint {
+			diagErr := asDiagError(t, launch(e, tt.launch, "map"), tt.name)
+			if diagErr.Msg != tt.msg || diagErr.File != manifest.UserFilePath(e) || diagErr.Hint != tt.hint {
 				t.Errorf("error = %+v", diagErr)
 			}
 		})
@@ -59,7 +57,7 @@ func TestLaunchPassesTheLaunchArgsAndLoadfile(t *testing.T) {
 	args := make([]string, 1, 4)
 	args[0] = "-launch"
 	how := manifest.Launch{GameExecutable: &game, Args: args}
-	err := launch(e, how, usersFile, "C:/map.w3x")
+	err := launch(e, how, "C:/map.w3x")
 	want := spawnCall{game, "-launch", "-loadfile", "C:/map.w3x"}
 	if err != nil || len(*starts) != 1 || !slices.Equal((*starts)[0], want) {
 		t.Errorf("started %q, %v, want %q", *starts, err, want)
@@ -73,8 +71,8 @@ func TestLaunchReportsAGameThatFailsToStart(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
 	e.Spawn = env.SpawnDetached
 	game := testkit.WriteFile(t, t.TempDir(), "Warcraft III.exe", []byte("not a program"))
-	diagErr := asDiagError(t, launch(e, manifest.Launch{GameExecutable: &game}, usersFile, "map"), "not a program")
-	if !strings.HasPrefix(diagErr.Msg, "Cannot run '"+game+"': ") || diagErr.File != usersFile ||
+	diagErr := asDiagError(t, launch(e, manifest.Launch{GameExecutable: &game}, "map"), "not a program")
+	if !strings.HasPrefix(diagErr.Msg, "Cannot run '"+game+"': ") || diagErr.File != manifest.UserFilePath(e) ||
 		!strings.Contains(diagErr.Hint, "launch.gameExecutable") || diagErr.Cause == nil {
 		t.Errorf("error = %+v", diagErr)
 	}

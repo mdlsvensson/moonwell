@@ -20,9 +20,6 @@ func TestLoadTakesTheProjectFromItsFileAndTheMachineFromTheUsers(t *testing.T) {
 	if !project.Build.Minify || project.ManifestName != "moonwell.toml" || project.Root != e.Root {
 		t.Errorf("project = %+v", project)
 	}
-	if project.UserFile != filepath.Join(e.ConfigDir, "config.toml") {
-		t.Errorf("UserFile = %q", project.UserFile)
-	}
 	if derefOrNil(project.Launch.GameExecutable) != `D:\Games\Warcraft III.exe` || !reflect.DeepEqual(project.Launch.Args, []string{"-launch"}) {
 		t.Errorf("Launch = %+v", project.Launch)
 	}

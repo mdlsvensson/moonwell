@@ -124,7 +124,7 @@ func Test(ctx context.Context, e *env.Env, options Options) error {
 	if err != nil {
 		return err
 	}
-	if err := launch(e, project.Launch, project.UserFile, staged.fullPath); err != nil {
+	if err := launch(e, project.Launch, staged.fullPath); err != nil {
 		return err
 	}
 	e.Log.Info("Launched Warcraft III with " + staged.displayPath + ".")

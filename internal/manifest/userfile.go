@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
@@ -24,7 +25,7 @@ var userDefaults = map[string]any{
 }
 
 type User struct {
-	File      string
+	FilePath  string
 	Launch    Launch
 	YuePath   *string
 	Libraries []LocalLibrary
@@ -51,6 +52,9 @@ func UserFilePath(e *env.Env) string {
 
 func ReadUser(e *env.Env) (*User, error) {
 	fullPath := UserFilePath(e)
+	if e.ConfigDir == "" {
+		return &User{FilePath: fullPath, Launch: Launch{Args: slices.Clone(defaultLaunchArgs)}}, nil
+	}
 	settings, _, err := readSettingsFile(fullPath, fullPath, userDefaults)
 	if err != nil {
 		return nil, err
@@ -62,7 +66,7 @@ func ReadUser(e *env.Env) (*User, error) {
 	if err := file.checkRules(fullPath); err != nil {
 		return nil, err
 	}
-	return &User{File: fullPath, Launch: file.Launch, YuePath: file.Yue.Path, Libraries: file.Libraries}, nil
+	return &User{FilePath: fullPath, Launch: file.Launch, YuePath: file.Yue.Path, Libraries: file.Libraries}, nil
 }
 
 func (u *userFile) checkRules(fullPath string) error {
@@ -86,6 +90,9 @@ func UserFileText() string {
 }
 
 func EnsureUserFile(e *env.Env) (created bool, err error) {
+	if e.ConfigDir == "" {
+		return false, errNoConfigDir()
+	}
 	fullPath := UserFilePath(e)
 	if err := os.MkdirAll(e.ConfigDir, 0o777); err != nil {
 		return false, errUserFileNotWritten(fullPath, err)
@@ -113,11 +120,19 @@ func pathExists(path string) bool {
 	return err == nil && info != nil
 }
 
+func errNoConfigDir() error {
+	return &diag.Error{
+		Msg:  "This system names no home folder, so there is no place for " + UserFile + ".",
+		File: UserFile,
+		Hint: "Set the variable MOONWELL_HOME to a folder for it.",
+	}
+}
+
 func errUserFileNotWritten(fullPath string, cause error) error {
 	return &diag.Error{
 		Msg:  "Creating " + fullPath + " failed: " + fsx.Reason(cause),
 		File: fullPath,
-		Hint: "Make sure that the folder is one you may write to and that its disk has room, then run moonwell setup " +
+		Hint: "Make sure that the folder is one you may write to and that its disk has room, then run the command " +
 			"again. The variable MOONWELL_HOME names another folder for this file.",
 		Cause: cause,
 	}

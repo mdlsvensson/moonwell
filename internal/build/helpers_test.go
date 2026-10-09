@@ -42,6 +42,11 @@ const (
 	objectFile   = "objects/units.pkl"
 )
 
+const (
+	pklProjectFile   = "PklProject"
+	resolvedDepsFile = "PklProject.deps.json"
+)
+
 const resolvedDeps = `{"schemaVersion":1,"resolvedDependencies":{` +
 	`"package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0":{"type":"local",` +
 	`"uri":"projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@` + moonwell.Version +
@@ -94,7 +99,8 @@ func newFakeProject(t testing.TB, blocks ...string) *fakeProject {
 	}
 	s.writeFile("maps/map.w3x/war3map.lua", smallScript)
 	s.writeFile("src/main.yue", "x = 1\n")
-	s.writeFile("PklProject.deps.json", resolvedDeps)
+	s.writeFile(pklProjectFile, manifest.PklProjectText(moonwell.Version, ""))
+	s.writeFile(resolvedDepsFile, resolvedDeps)
 	s.env, s.log = testkit.Env(t, s.root)
 	s.env.Run = s.run
 	s.setProgram("pkl", s.fakePkl)

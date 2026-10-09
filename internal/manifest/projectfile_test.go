@@ -3,6 +3,7 @@ package manifest
 import (
 	"path/filepath"
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
 
@@ -293,7 +294,7 @@ func TestReadProjectRefusesAValueOutsideItsRuleNamingTheSetting(t *testing.T) {
 
 func TestReadProjectRefusesWhatCannotBeDecodedNamingTheSettingAsTheFileSpellsIt(t *testing.T) {
 	for _, tt := range []struct{ name, settings, named string }{
-		{"a table that is none of Moonwell's", "[bulid]\nminify = true\n", "bulid"},
+		{"a table that is none of Moonwell's", "[bulid]\nminify = true\n", "the file has invalid keys: bulid"},
 		{"a key that is none of a table's", "[lint]\nunknownGlobal = \"error\"\n", "'lint' has invalid keys: unknownglobal"},
 		{"a key that is none of a list entry's", "[[libraries]]\nname = \"a\"\npath = \"x\"\ntga = \"v1\"\n", "'libraries[0]' has invalid keys: tga"},
 		{"text where a switch belongs", "[build]\nminify = \"yes\"\n", "'build.minify'"},
@@ -317,10 +318,40 @@ func TestReadProjectRefusesWhatCannotBeDecodedNamingTheSettingAsTheFileSpellsIt(
 			if diagErr.File != "moonwell.toml" || !strings.Contains(diagErr.Msg, tt.named) || diagErr.Hint == "" {
 				t.Errorf("got %q in %q, want an error that holds %q in moonwell.toml, with a hint", diagErr.Msg, diagErr.File, tt.named)
 			}
-			if strings.Contains(diagErr.Msg, "decoding failed") {
-				t.Errorf("the error keeps the decoder's heading line: %q", diagErr.Msg)
+			if strings.Contains(diagErr.Msg, "decoding failed") || strings.HasPrefix(diagErr.Msg, "''") {
+				t.Errorf("the error keeps the decoder's heading line, or its name for the top of the file: %q", diagErr.Msg)
 			}
 		})
+	}
+}
+
+func TestReadProjectNamesTheFileForATableOfItsTopThatIsNoneOfMoonwellsAndKeepsTheOtherLines(t *testing.T) {
+	_, err := ReadProject(newProjectEnv(t, "[bulid]\nminify = true\n\n[lint]\nunknownGlobal = \"error\"\n"))
+	message := asDiagError(t, err, "the refusal").Msg
+	lines := strings.Split(message, "\n")
+	slices.Sort(lines)
+	want := []string{"'lint' has invalid keys: unknownglobal", "the file has invalid keys: bulid"}
+	if !slices.Equal(lines, want) {
+		t.Errorf("got %q, want the lines %q", message, want)
+	}
+}
+
+func TestReadProjectReadsAFileThatStartsWithAByteOrderMarkLikeTheFileWithoutIt(t *testing.T) {
+	const settings = "[map]\nfolder = \"arena.w3x\"\n\n[build]\nminify = true\n"
+	marked, plain := mustReadProject(t, "\xEF\xBB\xBF"+settings), mustReadProject(t, settings)
+	if marked.Map != plain.Map || marked.Build != plain.Build || marked.Map.Folder != "arena.w3x" || !marked.Build.Minify {
+		t.Errorf("with the mark: Map = %+v, Build = %+v; without it: Map = %+v, Build = %+v",
+			marked.Map, marked.Build, plain.Map, plain.Build)
+	}
+}
+
+func TestReadProjectReportsAFolderWhereTheFileBelongsAsAFileItCannotRead(t *testing.T) {
+	e, _ := testkit.Env(t, t.TempDir())
+	testkit.WriteFile(t, e.Root, ProjectFile+"/inside.txt", nil)
+	_, err := ReadProject(e)
+	diagErr := asDiagError(t, err, "the refusal")
+	if diagErr.File != "moonwell.toml" || !strings.HasPrefix(diagErr.Msg, "Reading this file failed: ") || diagErr.Hint == "" {
+		t.Errorf("got %q in %q with the hint %q", diagErr.Msg, diagErr.File, diagErr.Hint)
 	}
 }
 

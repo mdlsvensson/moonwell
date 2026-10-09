@@ -30,13 +30,6 @@ func Load(ctx context.Context, e *env.Env) (*manifest.Project, error) {
 	return LoadWith(ctx, e, toolchain.FindPkl)
 }
 
-func LoadSettings(ctx context.Context, e *env.Env) (*manifest.Project, error) {
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
-	return manifest.Load(e)
-}
-
 func LoadWith(ctx context.Context, e *env.Env, findPkl PklFinder) (*manifest.Project, error) {
 	project, err := LoadSettings(ctx, e)
 	if err != nil {
@@ -57,6 +50,13 @@ func LoadWith(ctx context.Context, e *env.Env, findPkl PklFinder) (*manifest.Pro
 		return nil, err
 	}
 	return project, nil
+}
+
+func LoadSettings(ctx context.Context, e *env.Env) (*manifest.Project, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	return manifest.Load(e)
 }
 
 func OpenSource(project *manifest.Project) (*mapdir.Folder, error) {

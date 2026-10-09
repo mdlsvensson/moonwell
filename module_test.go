@@ -212,6 +212,7 @@ func TestTheREADMENamesThisVersion(t *testing.T) {
 	for _, text := range []string{
 		"releases/download/moonwell@" + Version + "/install.ps1",
 		"becomes `moonwell@" + Version + "`",
+		"moonwell/moonwell@" + Version + `" }`,
 	} {
 		if !strings.Contains(string(readme), text) {
 			t.Errorf("README.md lacks %q: update the version it shows", text)

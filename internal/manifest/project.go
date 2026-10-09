@@ -3,7 +3,6 @@ package manifest
 type Project struct {
 	Root         string `json:"-"`
 	ManifestName string `json:"-"`
-	UserFile     string `json:"-"`
 
 	Map       Map                `json:"map"`
 	Build     Build              `json:"build"`

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/fs"
-	"path/filepath"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
@@ -27,7 +26,11 @@ output {
 `
 
 func HasObjectFiles(root string) (bool, error) {
-	files, err := fsx.ListFiles(filepath.Join(root, ObjectsDir))
+	fullPath, err := fsx.SafeJoinNoSymlinks(root, ObjectsDir)
+	if err != nil {
+		return false, err
+	}
+	files, err := fsx.ListFiles(fullPath)
 	if errors.Is(err, fs.ErrNotExist) {
 		return false, nil
 	}
@@ -74,6 +77,17 @@ func writeObjectsModule(root string) error {
 		return errObjectsModuleNotWritten(err)
 	}
 	return nil
+}
+
+func truncateRunes(text string, limit int) string {
+	count := 0
+	for i := range text {
+		if count == limit {
+			return text[:i]
+		}
+		count++
+	}
+	return text
 }
 
 func errObjectsDirUnreadable(cause error) error {

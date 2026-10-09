@@ -550,7 +550,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | --- | --- |
 | add a setting of a project | `internal/manifest/projectfile.go`: the struct the file is decoded into, its default in `projectDefaults`, its rule in `checkRules` and its place in `toProject`; a row in each table of `internal/manifest/projectfile_test.go` |
 | add a setting of the machine | `internal/manifest/userfile.go`: `userFile`, `userDefaults`, `checkRules`; `internal/manifest/userfile_test.go` |
-| know how the two settings files are read | `internal/manifest/load.go`: `Load`; `internal/manifest/decode.go`: `readSettingsFile`, `decodeSettings`, `refuseLossyNumbers` |
+| know how the two settings files are read | `internal/manifest/load.go`: `Load`; `internal/manifest/decode.go`: `readSettingsFile`, `decodeSettings`, `refuseLossyValues` |
 | know how the object files are evaluated, and when Pkl runs | `internal/manifest/objectfiles.go`: `HasObjectFiles`, `EvaluateObjects`; `internal/build/project.go`: `LoadWith` |
 | change the check of the program's version against the project's | `internal/manifest/version.go`: `checkPackageVersion` |
 | know which `pkl` and which `yue` is run | `internal/toolchain/find.go`: `FindPkl`, `FindCompiler` |

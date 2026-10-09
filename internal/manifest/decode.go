@@ -1,10 +1,12 @@
 package manifest
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io/fs"
 	"math"
+	"os"
 	"reflect"
 	"strings"
 
@@ -18,18 +20,22 @@ import (
 
 func readSettingsFile(fullPath, displayPath string, defaults map[string]any) (settings *viper.Viper, exists bool, err error) {
 	settings = viper.New()
-	settings.SetConfigFile(fullPath)
 	settings.SetConfigType("toml")
 	for key, value := range defaults {
 		settings.SetDefault(key, value)
 	}
-	err = settings.ReadInConfig()
+	data, err := os.ReadFile(fullPath)
+	if errors.Is(err, fs.ErrNotExist) {
+		return settings, false, nil
+	}
+	if err != nil {
+		return nil, false, errSettingsUnreadable(displayPath, err)
+	}
+	err = settings.ReadConfig(bytes.NewReader(fsx.TrimBOM(data)))
 	var parseErr viper.ConfigParseError
 	switch {
 	case err == nil:
 		return settings, true, nil
-	case errors.Is(err, fs.ErrNotExist):
-		return settings, false, nil
 	case errors.As(err, &parseErr):
 		return nil, false, errNotTOML(displayPath, parseErr)
 	}
@@ -37,19 +43,19 @@ func readSettingsFile(fullPath, displayPath string, defaults map[string]any) (se
 }
 
 func decodeSettings(settings *viper.Viper, displayPath string, target any) error {
-	if err := settings.UnmarshalExact(target, decodeStrictly); err != nil {
+	if err := settings.UnmarshalExact(target, setStrictDecoding); err != nil {
 		return errNotDecoded(displayPath, err)
 	}
 	return nil
 }
 
-func decodeStrictly(config *mapstructure.DecoderConfig) {
+func setStrictDecoding(config *mapstructure.DecoderConfig) {
 	config.WeaklyTypedInput = false
 	config.TagName = "json"
-	config.DecodeHook = refuseLossyNumbers
+	config.DecodeHook = refuseLossyValues
 }
 
-func refuseLossyNumbers(from, to reflect.Type, data any) (any, error) {
+func refuseLossyValues(from, to reflect.Type, data any) (any, error) {
 	if from.Kind() == reflect.Slice && to.Kind() == reflect.Array {
 		if length := reflect.ValueOf(data).Len(); length != to.Len() {
 			return nil, fmt.Errorf("expected %d values, got %d", to.Len(), length)
@@ -131,10 +137,21 @@ func errSettingsUnreadable(displayPath string, cause error) error {
 	}
 }
 
+const (
+	topLevelInvalidKeys = "'' has invalid keys:"
+	fileInvalidKeys     = "the file has invalid keys:"
+)
+
 func errNotDecoded(displayPath string, cause error) error {
-	_, lines, hasHeading := strings.Cut(cause.Error(), "\n\n")
+	_, text, hasHeading := strings.Cut(cause.Error(), "\n\n")
 	if !hasHeading {
-		lines = cause.Error()
+		text = cause.Error()
 	}
-	return &diag.Error{Msg: fsx.TrimASCIISpace(lines), File: displayPath, Hint: settingsListHint, Cause: cause}
+	lines := strings.Split(fsx.TrimASCIISpace(text), "\n")
+	for index, line := range lines {
+		if keys, isTopLevel := strings.CutPrefix(line, topLevelInvalidKeys); isTopLevel {
+			lines[index] = fileInvalidKeys + keys
+		}
+	}
+	return &diag.Error{Msg: strings.Join(lines, "\n"), File: displayPath, Hint: settingsListHint, Cause: cause}
 }

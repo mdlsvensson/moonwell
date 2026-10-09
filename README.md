@@ -103,7 +103,7 @@ prints the command that puts that folder on your PATH.
 | `.luarc.json`        | Settings for lua-language-server in the editor                                                         |
 | `.vscode/`           | `extensions.json`, which recommends the YueScript and Lua extensions                                   |
 | `moonwell.lock`      | The commit of each library's GitHub tag (see "Libraries"); commit it                                   |
-| `.moonwell/`         | Libraries and editor declarations, written by `check`, `build`, `test`, `dev`, `setup` and the three `assets:` commands; git-ignored |
+| `.moonwell/`         | Libraries, editor declarations and the module that gathers the object files, written by `check`, `build`, `test`, `dev`, `setup`, `objects:check`, `objects:eval` and the three `assets:` commands; git-ignored |
 | `dist/`              | Build output                                                                                           |
 
 What belongs to your machine and not to the project, such as the game's path, is not in the project: see
@@ -111,7 +111,8 @@ What belongs to your machine and not to the project, such as the game's path, is
 
 `dist/` and the folder the map is built into (`build.folder`, by default `dist/bin`) are real folders. Moonwell
 removes and replaces what it wrote there, so it refuses a link or a Windows junction on the way to anything it writes
-below them, and names the link. A link at `.moonwell/`, `.asset-state/`, `maps/`, `src/` or `lua/` is refused too.
+below them, and names the link. A link at `.moonwell/`, `.asset-state/`, `maps/`, `objects/`, `src/` or `lua/` is
+refused too.
 
 Build only a project you trust. `build`, `test`, `check`, `dev` and `setup` run code the project brings: its macros,
 which the compiler runs while it compiles. Refusing links keeps Moonwell's own writes inside the project folder; it is
@@ -476,6 +477,19 @@ Custom units, heroes, buildings, items, abilities, buffs and upgrades are writte
 them to the map's object data (`war3map.w3u` and the other modification files, and their `war3mapSkin.*` counterparts),
 in the staged copy only. Moonwell merges every `.pkl` file under `objects/`, in any folders; a project with none has
 no objects and runs no Pkl.
+
+A project with object files has a `PklProject` in the project folder, which names the version of the `moonwell` Pkl
+package they are written for. This is the file `init` writes:
+
+```pkl
+amends "pkl:Project"
+
+dependencies {
+  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.11.1" }
+}
+```
+
+`pkl project resolve`, run in the project folder, writes `PklProject.deps.json` beside it.
 
 Every file there amends `@moonwell/ObjectFile.pkl` and fills any of the mappings `heroes`, `units`, `buildings`,
 `items`, `abilities`, `buffs` and `upgrades`. Put shared helpers in a module outside `objects/` and import them, since

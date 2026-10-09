@@ -32,8 +32,8 @@ func TestReadUserWithoutAFileGivesTheDefaultsAndNoError(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if user.File != filepath.Join(e.ConfigDir, "config.toml") {
-		t.Errorf("File = %q", user.File)
+	if user.FilePath != filepath.Join(e.ConfigDir, "config.toml") {
+		t.Errorf("FilePath = %q", user.FilePath)
 	}
 	if user.Launch.GameExecutable != nil || !reflect.DeepEqual(user.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) {
 		t.Errorf("Launch = %+v", user.Launch)
@@ -79,6 +79,42 @@ path = '`+systems+`'
 	}
 }
 
+func TestReadUserReadsAFileThatStartsWithAByteOrderMarkLikeTheFileWithoutIt(t *testing.T) {
+	const settings = "[launch]\ngameExecutable = 'D:\\Games\\Warcraft III.exe'\n\n[yue]\npath = 'C:\\tools\\yue.exe'\n"
+	marked, err := ReadUser(newUserEnv(t, "\xEF\xBB\xBF"+settings))
+	if err != nil {
+		t.Fatal(err)
+	}
+	plain, err := ReadUser(newUserEnv(t, settings))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(marked.Launch, plain.Launch) || derefOrNil(marked.YuePath) != `C:\tools\yue.exe` ||
+		derefOrNil(marked.Launch.GameExecutable) != `D:\Games\Warcraft III.exe` {
+		t.Errorf("with the mark: Launch = %+v, YuePath = %s; without it: Launch = %+v",
+			marked.Launch, derefOrNil(marked.YuePath), plain.Launch)
+	}
+}
+
+func TestReadUserWithoutAFolderForTheFileGivesTheDefaultsAndReadsNoFile(t *testing.T) {
+	t.Chdir(t.TempDir())
+	if err := os.WriteFile(UserFile, []byte("[yue]\npath = 'C:\\tools\\yue.exe'\n"), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	e, _ := testkit.Env(t, t.TempDir())
+	e.ConfigDir = ""
+	user, err := ReadUser(e)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if user.FilePath != "config.toml" || user.YuePath != nil || len(user.Libraries) != 0 {
+		t.Errorf("FilePath = %q, YuePath = %v, Libraries = %+v", user.FilePath, user.YuePath, user.Libraries)
+	}
+	if user.Launch.GameExecutable != nil || !reflect.DeepEqual(user.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) {
+		t.Errorf("Launch = %+v", user.Launch)
+	}
+}
+
 func TestReadUserTakesAnEmptyListOfArgumentsAsNoArguments(t *testing.T) {
 	user, err := ReadUser(newUserEnv(t, "[launch]\nargs = []\n"))
 	if err != nil {
@@ -116,7 +152,7 @@ func TestReadUserRefusesAValueOutsideItsRuleNamingTheSettingAndTheFile(t *testin
 
 func TestReadUserRefusesASettingOfAProjectAndAFileThatIsNoTOML(t *testing.T) {
 	for _, tt := range []struct{ name, settings, named string }{
-		{"a project's table", "[map]\nfolder = \"map.w3x\"\n", "map"},
+		{"a project's table", "[map]\nfolder = \"map.w3x\"\n", "the file has invalid keys: map"},
 		{"a compiler version", "[yue]\nversion = \"0.34.3\"\n", "'yue' has invalid keys: version"},
 		{"a tag for a library", "[[libraries]]\ngithub = \"a/b\"\npath = '" + absolutePath("b") + "'\ntag = \"v1\"\n", "'libraries[0]' has invalid keys: tag"},
 		{"a number for the game", "[launch]\ngameExecutable = 5\n", "'launch.gameExecutable'"},
@@ -165,6 +201,25 @@ func TestEnsureUserFileLeavesAFileThatIsThereAsItIs(t *testing.T) {
 	}
 }
 
+func TestEnsureUserFileWithoutAFolderForTheFileWritesNothingAndNamesTheVariable(t *testing.T) {
+	workDir := t.TempDir()
+	t.Chdir(workDir)
+	e, _ := testkit.Env(t, t.TempDir())
+	e.ConfigDir = ""
+	created, err := EnsureUserFile(e)
+	if err == nil || created {
+		t.Fatalf("EnsureUserFile = %v, %v, want a refusal", created, err)
+	}
+	diagErr := asDiagError(t, err, "the refusal")
+	if diagErr.Msg != "This system names no home folder, so there is no place for config.toml." ||
+		diagErr.File != "config.toml" || diagErr.Hint != "Set the variable MOONWELL_HOME to a folder for it." {
+		t.Errorf("got %q in %q with the hint %q", diagErr.Msg, diagErr.File, diagErr.Hint)
+	}
+	if entries, err := os.ReadDir(workDir); err != nil || len(entries) != 0 {
+		t.Errorf("the working folder holds %d entries, %v, want it left empty", len(entries), err)
+	}
+}
+
 func TestEnsureUserFileReportsAFolderThatCannotBeMadeNamingTheFile(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
 	blocker := testkit.WriteFile(t, e.ConfigDir, "a-file", []byte("x"))
@@ -174,7 +229,8 @@ func TestEnsureUserFileReportsAFolderThatCannotBeMadeNamingTheFile(t *testing.T)
 		t.Fatal("EnsureUserFile made a folder below a file")
 	}
 	diagErr := asDiagError(t, err, "the refusal")
-	if diagErr.File != UserFilePath(e) || !strings.Contains(diagErr.Hint, "MOONWELL_HOME") {
+	if diagErr.File != UserFilePath(e) || !strings.Contains(diagErr.Hint, "MOONWELL_HOME") ||
+		!strings.Contains(diagErr.Hint, "then run the command again.") {
 		t.Errorf("got %q in %q with the hint %q", diagErr.Msg, diagErr.File, diagErr.Hint)
 	}
 }
