@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.12.0 (2026-10-09)
 
 - **A project of 0.11 is not read.** The settings moved out of Pkl, and this version reads no `moonwell.pkl` and no
   `moonwell.local.pkl`. In a folder with only those it says "No moonwell.toml found in this directory."
@@ -35,6 +35,11 @@
   1 MB larger. `THIRD_PARTY_LICENSES` names all fifteen with their licences.
 - **Editors show no help for `moonwell.toml` yet.** The Pkl manifest had completion and hover in an editor with Pkl
   support; the README's list of settings stands in for it.
+- **Known issue with Warcraft III 3.0.1, as in 0.11.1: `moonwell test` starts the game, and the game shows its
+  main menu.** That version of the game no longer loads a map that is a folder when it is started with
+  `-loadfile`, which is what `test` does; a packed map still loads. Until `test` is changed, run `moonwell build`
+  and start the game on the packed map:
+  `& "<your Warcraft III.exe>" -launch -windowmode windowed -loadfile "<project>\dist\bin\map.w3x"`.
 
 ## 0.11.1 (2026-10-09)
 

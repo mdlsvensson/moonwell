@@ -9,7 +9,7 @@
   $ErrorActionPreference = 'Stop'
   $ProgressPreference = 'SilentlyContinue'
 
-  $version = '0.11.1'
+  $version = '0.12.0'
   $base = "https://github.com/mdlsvensson/moonwell/releases/download/moonwell@$version"
   if ($env:MOONWELL_INSTALL_BASE) { $base = $env:MOONWELL_INSTALL_BASE }
 
