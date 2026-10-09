@@ -76,7 +76,7 @@ program and the package must have the same major and minor version; `moonwell` r
 of the two to change. To install one version, use its own script:
 
 ```powershell
-irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.11.0/install.ps1 | iex
+irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.11.1/install.ps1 | iex
 ```
 
 To move a project to a newer Moonwell, install that version, change the package's version in the project's
@@ -87,7 +87,7 @@ To move a project to a newer Moonwell, install that version, change the package'
 A project that builds with Moonwell 0.10 or 0.9 needs three steps to build with 0.11:
 
 1. Install Moonwell 0.11: run the install line again.
-2. In the project's `PklProject`, set the package's version to `moonwell@0.11.0`.
+2. In the project's `PklProject`, set the package's version to `moonwell@0.11.1`.
 3. Run `pkl project resolve` in the project folder. If you have no `pkl` command, run `moonwell setup` there first:
    it copies Moonwell's own Pkl into its cache's `bin` folder and prints the command that puts that folder on your
    PATH. It then stops at the project's package version, which this step puts right.
@@ -106,7 +106,7 @@ project is most likely to meet is that `dist` must be a real folder.
 Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four steps:
 
 1. Install `moonwell`, as above.
-2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.11.0`.
+2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.11.1`.
 3. Run `pkl project resolve`.
 4. Delete `deno.json` and `deno.lock`. Where you ran `deno task build`, run `moonwell build`; the same goes for every
    other command.

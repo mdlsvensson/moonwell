@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.11.1 (2026-10-09)
+
+- **Nothing a user can notice has changed.** This version does what 0.11.0 does: the same commands and flags, the
+  same messages, and the same map from the same project. A project on `moonwell@0.11.0` builds with it as it is;
+  `moonwell@0.11.1` is the same schema under the new number.
+- **The Go code was made easier to read,** and that is all this release holds. Its comments were taken out, its
+  names were changed to say what a thing is, each file holds one subject and reads from the top down, and the
+  readers of the game's files name the bytes they pass over. `ARCHITECTURE.md` follows the code.
+- **Known issue with Warcraft III 3.0.1, as in 0.11.0: `moonwell test` starts the game, and the game shows its
+  main menu.** That version of the game no longer loads a map that is a folder when it is started with
+  `-loadfile`, which is what `test` does; a packed map still loads. Until `test` is changed, run `moonwell build`
+  and start the game on the packed map:
+  `& "<your Warcraft III.exe>" -launch -windowmode windowed -loadfile "<project>\dist\bin\map.w3x"`.
+
 ## 0.11.0 (2026-10-08)
 
 - **The command line is read by `cobra`** (`github.com/spf13/cobra`), the library most Go programs use for it, in
