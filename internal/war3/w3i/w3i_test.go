@@ -18,7 +18,7 @@ const mapInfoFile = "map/war3map.w3i"
 
 var supportedVersions = []int32{18, 25, 28, 31, 32, 33, 39}
 
-func header(version int32, major, minor uint32) []byte {
+func newHeader(version int32, major, minor uint32) []byte {
 	return testkit.Concat(testkit.U32(uint32(version)), make([]byte, 8), testkit.U32(major), testkit.U32(minor),
 		make([]byte, 44))
 }
@@ -32,7 +32,7 @@ func mustRead(t *testing.T, data []byte, depth w3i.Depth) *w3i.Info {
 	return info
 }
 
-func refusal(t *testing.T, what string, data []byte, depth w3i.Depth, words string) {
+func checkError(t *testing.T, what string, data []byte, depth w3i.Depth, words string) {
 	t.Helper()
 	info, err := w3i.Read(data, mapInfoFile, depth)
 	var diagErr *diag.Error
@@ -48,7 +48,7 @@ func refusal(t *testing.T, what string, data []byte, depth w3i.Depth, words stri
 	}
 }
 
-func inserted(data []byte, offset int, extra ...byte) []byte {
+func insertBytes(data []byte, offset int, extra ...byte) []byte {
 	return slices.Concat(data[:offset], extra, data[offset:])
 }
 
@@ -58,13 +58,13 @@ func TestReadHeaderReadsVersionAndGameVersion(t *testing.T) {
 		data []byte
 		want w3i.Header
 	}{
-		{"version 39 saved by 3.0", header(39, 3, 0), w3i.Header{Version: 39, HasGameVersion: true, Major: 3}},
-		{"version 25 records no game version", header(25, 1, 31), w3i.Header{Version: 25}},
-		{"version 27 is the last that records none", header(27, 1, 31), w3i.Header{Version: 27}},
-		{"version 28 with its game version", header(28, 1, 31)[:20],
+		{"version 39 saved by 3.0", newHeader(39, 3, 0), w3i.Header{Version: 39, HasGameVersion: true, Major: 3}},
+		{"version 25 records no game version", newHeader(25, 1, 31), w3i.Header{Version: 25}},
+		{"version 27 is the last that records none", newHeader(27, 1, 31), w3i.Header{Version: 27}},
+		{"version 28 with its game version", newHeader(28, 1, 31)[:20],
 			w3i.Header{Version: 28, HasGameVersion: true, Major: 1, Minor: 31}},
-		{"version 28 cut inside its game version", header(28, 1, 31)[:19], w3i.Header{Version: 28}},
-		{"only the version", header(39, 1, 31)[:4], w3i.Header{Version: 39}},
+		{"version 28 cut inside its game version", newHeader(28, 1, 31)[:19], w3i.Header{Version: 28}},
+		{"only the version", newHeader(39, 1, 31)[:4], w3i.Header{Version: 39}},
 	} {
 		got, err := w3i.ReadHeader(c.data, mapInfoFile)
 		if err != nil || got != c.want {
@@ -146,7 +146,7 @@ func TestInvalidRequiredMapStructureIsAFileError(t *testing.T) {
 		{280, ""},
 		{570, ""},
 	} {
-		refusal(t, fmt.Sprintf("a file cut at %d bytes", c.length), fixture[:c.length], w3i.Extended, c.words)
+		checkError(t, fmt.Sprintf("a file cut at %d bytes", c.length), fixture[:c.length], w3i.Extended, c.words)
 	}
 }
 
@@ -173,11 +173,11 @@ func TestEverySupportedVersionReadsAndOthersAreRefused(t *testing.T) {
 		}
 	}
 	for _, version := range []int32{18, 25} {
-		refusal(t, fmt.Sprintf("version %d read extended", version), testkit.SyntheticMapInfo(version), w3i.Extended,
+		checkError(t, fmt.Sprintf("version %d read extended", version), testkit.SyntheticMapInfo(version), w3i.Extended,
 			"version 28 or later")
 	}
 	unsupported := testkit.SetU32(testkit.SyntheticMapInfo(39), 0, 40)
-	refusal(t, "version 40", unsupported, w3i.Basic, "unsupported war3map.w3i version 40")
+	checkError(t, "version 40", unsupported, w3i.Basic, "unsupported war3map.w3i version 40")
 }
 
 func TestInvalidStringsCountsPlayerFieldsAndScriptModeAreFileErrors(t *testing.T) {
@@ -189,7 +189,7 @@ func TestInvalidStringsCountsPlayerFieldsAndScriptModeAreFileErrors(t *testing.T
 	unkeptText := info.Loading.Subtitle.End + 4
 	set := func(offset int, value int32) []byte { return testkit.SetU32(source, offset, uint32(value)) }
 	bits := func(value float64) int32 { return int32(math.Float32bits(float32(value))) }
-	duplicate := inserted(set(playerCount, 2), forceCount, source[player.ID.Start:forceCount]...)
+	duplicate := insertBytes(set(playerCount, 2), forceCount, source[player.ID.Start:forceCount]...)
 
 	for _, c := range []struct {
 		name    string
@@ -197,9 +197,9 @@ func TestInvalidStringsCountsPlayerFieldsAndScriptModeAreFileErrors(t *testing.T
 		words   string
 		inBasic bool
 	}{
-		{"invalid UTF-8 in the name", inserted(source, info.Name.Start, 0xff), "invalid UTF-8", true},
-		{"invalid UTF-8 in a text that is not kept", inserted(source, unkeptText, 0xff), "invalid UTF-8", false},
-		{"invalid UTF-8 in a force's name", inserted(source, d.Forces[0].Name.Start, 0xff), "invalid UTF-8", false},
+		{"invalid UTF-8 in the name", insertBytes(source, info.Name.Start, 0xff), "invalid UTF-8", true},
+		{"invalid UTF-8 in a text that is not kept", insertBytes(source, unkeptText, 0xff), "invalid UTF-8", false},
+		{"invalid UTF-8 in a force's name", insertBytes(source, d.Forces[0].Name.Start, 0xff), "invalid UTF-8", false},
 		{"a player count of 0", set(playerCount, 0), "player count", false},
 		{"a player count of 25", set(playerCount, 25), "player count", false},
 		{"a force count of 0", set(forceCount, 0), "force count", false},
@@ -213,9 +213,9 @@ func TestInvalidStringsCountsPlayerFieldsAndScriptModeAreFileErrors(t *testing.T
 		{"a script language of 0", set(scriptLanguage, 0), "Lua script mode", false},
 		{"a duplicated player", duplicate, "player records", false},
 	} {
-		refusal(t, c.name, c.data, w3i.Extended, c.words)
+		checkError(t, c.name, c.data, w3i.Extended, c.words)
 		if c.inBasic {
-			refusal(t, c.name+", read basic", c.data, w3i.Basic, c.words)
+			checkError(t, c.name+", read basic", c.data, w3i.Basic, c.words)
 		} else if _, err := w3i.Read(c.data, mapInfoFile, w3i.Basic); err != nil {
 			t.Errorf("%s, read basic: %v", c.name, err)
 		}
@@ -242,7 +242,7 @@ func TestAPlayerRecordTakesEveryValueOfItsRangesAndNoOther(t *testing.T) {
 			}
 		}
 		for _, value := range []int32{c.low - 1, c.high + 1, math.MinInt32, math.MaxInt32} {
-			refusal(t, fmt.Sprintf("a player's %s of %d", c.what, value), testkit.SetU32(source, offset, uint32(value)),
+			checkError(t, fmt.Sprintf("a player's %s of %d", c.what, value), testkit.SetU32(source, offset, uint32(value)),
 				w3i.Extended, "player records")
 		}
 	}
@@ -259,13 +259,13 @@ func TestAStartPositionIsAnyNumberAndNothingElse(t *testing.T) {
 			}
 		}
 		for _, value := range []float64{math.Inf(1), math.Inf(-1), math.NaN()} {
-			refusal(t, fmt.Sprintf("a start position of %v at %d", value, offset),
+			checkError(t, fmt.Sprintf("a start position of %v at %d", value, offset),
 				testkit.SetU32(source, offset, math.Float32bits(float32(value))), w3i.Extended, "player records")
 		}
 	}
 }
 
-func repeated(source []byte, countOffset, start, end, count int, change func(record []byte, index int)) []byte {
+func repeatRecords(source []byte, countOffset, start, end, count int, change func(record []byte, index int)) []byte {
 	out := testkit.SetU32(source[:start:start], countOffset, uint32(count))
 	for index := range count {
 		record := bytes.Clone(source[start:end])
@@ -282,25 +282,25 @@ func TestAMapHasOneToTwentyFourPlayersAndForces(t *testing.T) {
 	playerCount, forceCount := player.ID.Start-4, force.Flags.Start-4
 	numbered := func(record []byte, index int) { copy(record, testkit.U32(uint32(index))) }
 	for _, count := range []int{1, 2, 23, 24} {
-		players := repeated(source, playerCount, player.ID.Start, forceCount, count, numbered)
+		players := repeatRecords(source, playerCount, player.ID.Start, forceCount, count, numbered)
 		info, err := w3i.Read(players, mapInfoFile, w3i.Extended)
 		if err != nil || len(info.Details.Players) != count || info.Details.Players[count-1].ID.Value != int32(count-1) ||
 			len(info.Details.Forces) != 1 {
 			t.Errorf("%d players: %v", count, err)
 		}
-		forces := repeated(source, forceCount, force.Flags.Start, force.Name.End, count, numbered)
+		forces := repeatRecords(source, forceCount, force.Flags.Start, force.Name.End, count, numbered)
 		info, err = w3i.Read(forces, mapInfoFile, w3i.Extended)
 		if err != nil || len(info.Details.Forces) != count || info.Details.Forces[count-1].Flags.Value != int32(count-1) {
 			t.Errorf("%d forces: %v", count, err)
 		}
 	}
-	refusal(t, "25 players", repeated(source, playerCount, player.ID.Start, forceCount, 25, numbered), w3i.Extended,
+	checkError(t, "25 players", repeatRecords(source, playerCount, player.ID.Start, forceCount, 25, numbered), w3i.Extended,
 		"player count")
-	refusal(t, "25 forces", repeated(source, forceCount, force.Flags.Start, force.Name.End, 25, numbered), w3i.Extended,
+	checkError(t, "25 forces", repeatRecords(source, forceCount, force.Flags.Start, force.Name.End, 25, numbered), w3i.Extended,
 		"force count")
-	refusal(t, "a player count of 24 before one player", testkit.SetU32(source, playerCount, 24), w3i.Extended,
+	checkError(t, "a player count of 24 before one player", testkit.SetU32(source, playerCount, 24), w3i.Extended,
 		"unterminated string")
-	refusal(t, "a force count of 24 before one force", testkit.SetU32(source, forceCount, 24), w3i.Extended, "truncated")
+	checkError(t, "a force count of 24 before one force", testkit.SetU32(source, forceCount, 24), w3i.Extended, "truncated")
 }
 
 func TestTheFirstProblemInTheFileIsTheOneReported(t *testing.T) {
@@ -309,7 +309,7 @@ func TestTheFirstProblemInTheFileIsTheOneReported(t *testing.T) {
 	player := info.Details.Players[0]
 	noController := testkit.SetU32(source, player.Controller.Start, 0)
 	noForces := testkit.SetU32(noController, info.Details.Forces[0].Flags.Start-4, 0)
-	badName := inserted(source, info.Name.Start, 0xff)
+	badName := insertBytes(source, info.Name.Start, 0xff)
 
 	for _, c := range []struct {
 		name  string
@@ -323,18 +323,18 @@ func TestTheFirstProblemInTheFileIsTheOneReported(t *testing.T) {
 		{"a wrong player before the cut", noController[:player.X.Start], "truncated"},
 		{"a wrong player before a wrong force count", noForces, "player records"},
 	} {
-		refusal(t, c.name, c.data, w3i.Extended, c.words)
+		checkError(t, c.name, c.data, w3i.Extended, c.words)
 	}
 }
 
 func TestALeadingByteOrderMarkIsNotPartOfATextValue(t *testing.T) {
 	source := testkit.SyntheticMapInfo(39)
 	plain := mustRead(t, source, w3i.Basic)
-	marked := mustRead(t, inserted(source, plain.Name.Start, 0xEF, 0xBB, 0xBF), w3i.Basic)
+	marked := mustRead(t, insertBytes(source, plain.Name.Start, 0xEF, 0xBB, 0xBF), w3i.Basic)
 	if marked.Name.Value != "TRIGSTR_001" || marked.Name.Start != plain.Name.Start || marked.Name.End != plain.Name.End+3 {
 		t.Errorf("a name after a byte order mark: %+v, without it %+v", marked.Name, plain.Name)
 	}
-	inside := mustRead(t, inserted(source, plain.Name.Start+4, 0xEF, 0xBB, 0xBF), w3i.Basic)
+	inside := mustRead(t, insertBytes(source, plain.Name.Start+4, 0xEF, 0xBB, 0xBF), w3i.Basic)
 	if inside.Name.Value != "TRIG\xEF\xBB\xBFSTR_001" {
 		t.Errorf("a byte order mark inside a name: %q", inside.Name.Value)
 	}
@@ -374,7 +374,7 @@ func TestApplyEditsReplacesFieldsAndKeepsEveryOtherByte(t *testing.T) {
 	}
 }
 
-func edit(start, end int, text string) w3i.Edit {
+func newEdit(start, end int, text string) w3i.Edit {
 	return w3i.Edit{Start: start, End: end, Data: []byte(text)}
 }
 
@@ -386,17 +386,17 @@ func TestApplyEditsTakesEditsInAnyOrderAndRefusesTheOnesThatCannotBeMade(t *test
 		want  string
 	}{
 		{"no edits", nil, "0123456789"},
-		{"the later edit first", []w3i.Edit{edit(6, 8, "x"), edit(1, 2, "abc")}, "0abc2345x89"},
-		{"edits that touch", []w3i.Edit{edit(2, 4, "a"), edit(4, 6, "b")}, "01ab6789"},
-		{"insertions at one offset keep their order", []w3i.Edit{edit(5, 5, "a"), edit(5, 5, "b")}, "01234ab56789"},
-		{"an insertion before an edit at its offset", []w3i.Edit{edit(5, 5, "a"), edit(5, 7, "b")}, "01234ab789"},
-		{"at both ends", []w3i.Edit{edit(10, 10, "z"), edit(0, 1, "")}, "123456789z"},
-		{"an insertion after an edit at its offset", []w3i.Edit{edit(5, 7, "b"), edit(5, 5, "a")}, ""},
-		{"overlapping edits", []w3i.Edit{edit(4, 8, ""), edit(6, 9, "")}, ""},
-		{"one edit inside another", []w3i.Edit{edit(6, 7, ""), edit(4, 8, "")}, ""},
-		{"an edit past the end", []w3i.Edit{edit(4, 11, "")}, ""},
-		{"an edit before the start", []w3i.Edit{edit(-1, 2, "")}, ""},
-		{"an edit that ends before it starts", []w3i.Edit{edit(6, 4, "")}, ""},
+		{"the later edit first", []w3i.Edit{newEdit(6, 8, "x"), newEdit(1, 2, "abc")}, "0abc2345x89"},
+		{"edits that touch", []w3i.Edit{newEdit(2, 4, "a"), newEdit(4, 6, "b")}, "01ab6789"},
+		{"insertions at one offset keep their order", []w3i.Edit{newEdit(5, 5, "a"), newEdit(5, 5, "b")}, "01234ab56789"},
+		{"an insertion before an edit at its offset", []w3i.Edit{newEdit(5, 5, "a"), newEdit(5, 7, "b")}, "01234ab789"},
+		{"at both ends", []w3i.Edit{newEdit(10, 10, "z"), newEdit(0, 1, "")}, "123456789z"},
+		{"an insertion after an edit at its offset", []w3i.Edit{newEdit(5, 7, "b"), newEdit(5, 5, "a")}, ""},
+		{"overlapping edits", []w3i.Edit{newEdit(4, 8, ""), newEdit(6, 9, "")}, ""},
+		{"one edit inside another", []w3i.Edit{newEdit(6, 7, ""), newEdit(4, 8, "")}, ""},
+		{"an edit past the end", []w3i.Edit{newEdit(4, 11, "")}, ""},
+		{"an edit before the start", []w3i.Edit{newEdit(-1, 2, "")}, ""},
+		{"an edit that ends before it starts", []w3i.Edit{newEdit(6, 4, "")}, ""},
 	} {
 		given := slices.Clone(c.edits)
 		got, err := w3i.ApplyEdits(source, c.edits)

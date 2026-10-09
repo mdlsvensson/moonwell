@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func noise(seed uint64, length int) []byte {
+func randomBytes(seed uint64, length int) []byte {
 	random := rand.New(rand.NewPCG(seed, 2026))
 	out := make([]byte, length)
 	for i := range out {
@@ -26,10 +26,10 @@ func TestLargestArchiveIsTheSizeOfAnArchiveWhoseFilesDoNotCompress(t *testing.T)
 		{"no file", 0, nil, true},
 		{"an empty file", 0, []File{{Name: "empty.txt"}}, true},
 		{"files that end inside, at and after a sector", 512, []File{
-			{Name: "one.bin", Data: noise(1, 1)},
-			{Name: `folder\sector.bin`, Data: noise(2, 4096)},
-			{Name: "more.bin", Data: noise(3, 4097)},
-			{Name: "three.bin", Data: noise(4, 10000)},
+			{Name: "one.bin", Data: randomBytes(1, 1)},
+			{Name: `folder\sector.bin`, Data: randomBytes(2, 4096)},
+			{Name: "more.bin", Data: randomBytes(3, 4097)},
+			{Name: "three.bin", Data: randomBytes(4, 10000)},
 		}, true},
 		{"more files than the smallest table takes", 0, slices.Repeat([]File{{}}, 11), true},
 		{"a file that compresses", 0,
@@ -40,7 +40,7 @@ func TestLargestArchiveIsTheSizeOfAnArchiveWhoseFilesDoNotCompress(t *testing.T)
 			var sizes []fileSize
 			for index := range tt.files {
 				if tt.files[index].Name == "" {
-					tt.files[index] = File{Name: "file" + string(rune('a'+index)), Data: noise(uint64(index), 100)}
+					tt.files[index] = File{Name: "file" + string(rune('a'+index)), Data: randomBytes(uint64(index), 100)}
 				}
 				sizes = append(sizes, fileSize{tt.files[index].Name, int64(len(tt.files[index].Data))})
 			}

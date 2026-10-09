@@ -35,11 +35,11 @@ func everyEntry() []imp.Entry {
 	return entries
 }
 
-const damageSeed = 11
+const mutationSeed = 11
 
-type tally struct{ read, refused int }
+type outcomeCounts struct{ accepted, rejected int }
 
-func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
+func (c *outcomeCounts) record(t *testing.T, what string, data []byte) {
 	t.Helper()
 	var entries []imp.Entry
 	var err error
@@ -49,9 +49,9 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	var diagErr *diag.Error
 	switch {
 	case err == nil && entries != nil:
-		c.read++
+		c.accepted++
 	case err != nil && entries == nil && errors.As(err, &diagErr) && diagErr.File == indexFile:
-		c.refused++
+		c.rejected++
 	default:
 		t.Fatalf("%s: Read = %+v, %v; want entries, or an error of %s", what, entries, err, indexFile)
 	}
@@ -60,7 +60,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	short := []imp.Entry{{Flag: 0, Path: "a"}, {Flag: 5, Path: "b\xC3\xA5"}, {Flag: 8, Path: `c\d`},
 		{Flag: 10, Path: "e.blp"}, {Flag: 13, Path: "\xE6\x9C\x88"}, {Flag: 29, Path: "f"}}
-	var damaged tally
+	var damaged outcomeCounts
 	for _, displayPath := range []struct {
 		name string
 		data []byte
@@ -73,19 +73,19 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		{"no entries", imp.Write(nil)},
 	} {
 		for length := range len(displayPath.data) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
+			damaged.record(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
 		}
 		for index := range uint64(1500) {
-			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.MutateBytes(displayPath.data, damageSeed, index))
+			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, mutationSeed)
+			damaged.record(t, what, testkit.MutateBytes(displayPath.data, mutationSeed, index))
 		}
 	}
-	three := testkit.Concat(entry(5, "a.blp"), entry(13, `b\c.mdx`), entry(29, "d.tga"))
+	three := testkit.Concat(newEntry(5, "a.blp"), newEntry(13, `b\c.mdx`), newEntry(29, "d.tga"))
 	for _, count := range append(testkit.EdgeNumbers(), 3, 4, 5, 0x100) {
-		damaged.readOrRefused(t, fmt.Sprintf("three entries counted as %d", count), index(1, count, three))
-		damaged.readOrRefused(t, fmt.Sprintf("no entries counted as %d", count), index(1, count))
+		damaged.record(t, fmt.Sprintf("three entries counted as %d", count), newIndexFile(1, count, three))
+		damaged.record(t, fmt.Sprintf("no entries counted as %d", count), newIndexFile(1, count))
 	}
-	if damaged.read == 0 || damaged.refused == 0 {
-		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.read, damaged.refused)
+	if damaged.accepted == 0 || damaged.rejected == 0 {
+		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.accepted, damaged.rejected)
 	}
 }

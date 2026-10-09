@@ -35,7 +35,7 @@ func tablesOfTheTests() map[string]string {
 	return named
 }
 
-type outcomes struct{ read, refused int }
+type outcomeCounts struct{ read, refused int }
 
 var longerTables = map[string]string{
 	"three rows, the last with its Y before its X": "ID;PWXL;N;E\r\nC;X1;Y1;K\"ID\"\r\nC;X2;K\"note\"\r\n" +
@@ -48,11 +48,11 @@ var longerTables = map[string]string{
 		"C;Xb;Y3;K1\n",
 }
 
-const damageSeed = 1986
+const mutationSeed = 1986
 
 const damagedFile = "tables/damaged.slk"
 
-func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
+func (c *outcomeCounts) record(t *testing.T, what, text string) {
 	t.Helper()
 	var table slk.Table
 	var err error
@@ -79,18 +79,18 @@ func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 func TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 	named := tablesOfTheTests()
 	maps.Copy(named, longerTables)
-	var damaged outcomes
+	var damaged outcomeCounts
 	for _, name := range slices.Sorted(maps.Keys(named)) {
 		text := named[name]
 		for length := range len(text) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", name, length), text[:length])
+			damaged.record(t, fmt.Sprintf("%s cut at %d bytes", name, length), text[:length])
 		}
 		for index := range uint64(60) {
-			made := testkit.MutateText(text, damageSeed, index)
-			damaged.readOrRefused(t, fmt.Sprintf("%s, change %d of seed %d: %q", name, index, damageSeed, made), made)
+			made := testkit.MutateText(text, mutationSeed, index)
+			damaged.record(t, fmt.Sprintf("%s, change %d of seed %d: %q", name, index, mutationSeed, made), made)
 		}
 		for i, made := range testkit.SpaceVariants(text) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
+			damaged.record(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
 		}
 	}
 	if damaged.read == 0 || damaged.refused == 0 {

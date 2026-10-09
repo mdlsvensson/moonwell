@@ -8,9 +8,9 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func sourcesToDamage(t *testing.T) []namedSource {
+func sourcesToMutate(t *testing.T) []namedSource {
 	t.Helper()
-	sources := append(append([]namedSource{}, cornerSources...), luaFilesOfTheCheckout(t)...)
+	sources := append(append([]namedSource{}, cornerSources...), checkoutLuaFiles(t)...)
 	sources = append(sources,
 		namedSource{"direct calls", directCalls}, namedSource{"every expression", everyExpression},
 		namedSource{"token boundaries", tokenBoundaries}, namedSource{"adjacent statements", adjacentStatements},
@@ -21,14 +21,14 @@ func sourcesToDamage(t *testing.T) []namedSource {
 	for _, c := range malformedSources {
 		sources = append(sources, namedSource{"malformed: " + c.source, c.source})
 	}
-	for _, c := range refusedSources() {
+	for _, c := range mutationErrorCases() {
 		sources = append(sources, namedSource{"refused: " + sourceName(c.source), c.source})
 	}
 	return sources
 }
 
-func refusedSources() []refusal {
-	return slices.Concat(ambiguousStructures, deepNesting, invalidShapes, placedErrors, parameterRefusals, returnRefusals)
+func mutationErrorCases() []errorCase {
+	return slices.Concat(ambiguousStructures, deepNesting, invalidShapes, placedErrors, parameterErrorCases, returnErrorCases)
 }
 
 func sourceName(source string) string {
@@ -38,11 +38,11 @@ func sourceName(source string) string {
 	return fmt.Sprintf("%s... (%d bytes)", source[:longest], len(source))
 }
 
-const damageSeed = 53
+const mutationSeed = 53
 
-func scannedOrRefused(t *testing.T, what, source string) (read bool) {
+func scanOrFail(t *testing.T, what, source string) (read bool) {
 	t.Helper()
-	var made scanned
+	var made scanResult
 	if value := testkit.PanicValue(func() { made = scan(source) }); value != nil {
 		t.Fatalf("%s: a scanner panics: %v", what, value)
 	}
@@ -57,7 +57,7 @@ func scannedOrRefused(t *testing.T, what, source string) (read bool) {
 	if made.Fault != nil && (made.Fault.Offset < 0 || made.Fault.Offset > len(source) || made.Fault.Msg == "") {
 		t.Fatalf("%s: the fault %+v is no place in the source", what, made.Fault)
 	}
-	refusal := made.Refusal
+	refusal := made.Error
 	switch {
 	case refusal.Message == "":
 		for _, function := range made.Functions {
@@ -78,9 +78,9 @@ func scannedOrRefused(t *testing.T, what, source string) (read bool) {
 }
 
 func TestADamagedSourceIsScannedOrRefusedByNameAndNeverPanics(t *testing.T) {
-	read, refused, sources := 0, 0, sourcesToDamage(t)
+	read, refused, sources := 0, 0, sourcesToMutate(t)
 	count := func(what, source string) {
-		if scannedOrRefused(t, what, source) {
+		if scanOrFail(t, what, source) {
 			read++
 		} else {
 			refused++
@@ -101,9 +101,9 @@ func TestADamagedSourceIsScannedOrRefusedByNameAndNeverPanics(t *testing.T) {
 			count(fmt.Sprintf("%s, cut at %d bytes", c.name, length), c.source[:length])
 		}
 		for index := range changes {
-			what := fmt.Sprintf("%s, change %d of seed %d", c.name, index, damageSeed)
-			count(what+" to its text", testkit.MutateText(c.source, damageSeed, index))
-			count(what+" to its bytes", string(testkit.MutateBytes([]byte(c.source), damageSeed, index)))
+			what := fmt.Sprintf("%s, change %d of seed %d", c.name, index, mutationSeed)
+			count(what+" to its text", testkit.MutateText(c.source, mutationSeed, index))
+			count(what+" to its bytes", string(testkit.MutateBytes([]byte(c.source), mutationSeed, index)))
 		}
 	}
 	if read == 0 || refused == 0 {

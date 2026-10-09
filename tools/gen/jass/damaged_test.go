@@ -17,7 +17,7 @@ func scriptsOfTheTests() map[string]string {
 		"common": common, "blizzard": blizzard, "corners": corners, "indented": indented,
 		"no declaration": noDeclaration, "comments": comments,
 	}
-	for i, c := range refused {
+	for i, c := range checkError {
 		named[fmt.Sprintf("refused script %02d, of %s", i, c.source)] = c.text
 	}
 	for _, c := range widerSpace {
@@ -26,7 +26,7 @@ func scriptsOfTheTests() map[string]string {
 	return named
 }
 
-type outcomes struct{ read, refused int }
+type outcomeCounts struct{ read, refused int }
 
 var longerScripts = map[string]string{
 	"types, globals and natives": "// first\r\ntype agent extends handle\r\n" +
@@ -43,13 +43,13 @@ var longerScripts = map[string]string{
 		"function F takes integer a returns nothing\n",
 }
 
-const damageSeed = 2003
+const mutationSeed = 2003
 
 const damagedFile = "scripts/damaged.j"
 
 const byteOrderMark = "\xEF\xBB\xBF"
 
-func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
+func (c *outcomeCounts) record(t *testing.T, what, text string) {
 	t.Helper()
 	var file jass.File
 	var err error
@@ -76,21 +76,21 @@ func (c *outcomes) readOrRefused(t *testing.T, what, text string) {
 func TestADamagedScriptIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 	named := scriptsOfTheTests()
 	maps.Copy(named, longerScripts)
-	var damaged outcomes
+	var damaged outcomeCounts
 	for _, name := range slices.Sorted(maps.Keys(named)) {
 		text := named[name]
 		for length := range len(text) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", name, length), text[:length])
+			damaged.record(t, fmt.Sprintf("%s cut at %d bytes", name, length), text[:length])
 		}
 		for index := range uint64(60) {
-			made := testkit.MutateText(text, damageSeed, index)
+			made := testkit.MutateText(text, mutationSeed, index)
 			if index%3 == 0 {
 				made = byteOrderMark + made
 			}
-			damaged.readOrRefused(t, fmt.Sprintf("%s, change %d of seed %d: %q", name, index, damageSeed, made), made)
+			damaged.record(t, fmt.Sprintf("%s, change %d of seed %d: %q", name, index, mutationSeed, made), made)
 		}
 		for i, made := range testkit.SpaceVariants(text) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
+			damaged.record(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
 		}
 	}
 	if damaged.read == 0 || damaged.refused == 0 {

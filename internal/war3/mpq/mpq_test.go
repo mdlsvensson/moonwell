@@ -16,12 +16,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/mpq"
 )
 
-func script(length int) []byte {
+func luaOfLength(length int) []byte {
 	const line = "print('moonwell')\n"
 	return []byte(strings.Repeat(line, length/len(line)+1))[:length]
 }
 
-func noise(seed uint64, length int) []byte {
+func randomBytes(seed uint64, length int) []byte {
 	random := rand.New(rand.NewPCG(seed, 2026))
 	out := make([]byte, length)
 	for i := range out {
@@ -30,7 +30,7 @@ func noise(seed uint64, length int) []byte {
 	return out
 }
 
-func packed(t testing.TB, raw []byte) []byte {
+func compress(t testing.TB, raw []byte) []byte {
 	t.Helper()
 	var out bytes.Buffer
 	out.WriteByte(0x02)
@@ -44,11 +44,11 @@ func packed(t testing.TB, raw []byte) []byte {
 	return out.Bytes()
 }
 
-func evenSector(t testing.TB) []byte {
+func incompressibleSector(t testing.TB) []byte {
 	t.Helper()
 	for run := range 64 {
-		raw := slices.Concat(noise(7, 110), bytes.Repeat([]byte{'a'}, run))
-		if len(packed(t, raw)) == len(raw) {
+		raw := slices.Concat(randomBytes(7, 110), bytes.Repeat([]byte{'a'}, run))
+		if len(compress(t, raw)) == len(raw) {
 			return raw
 		}
 	}
@@ -56,39 +56,39 @@ func evenSector(t testing.TB) []byte {
 	return nil
 }
 
-func numbered(count int) []mpq.File {
+func numberedFiles(count int) []mpq.File {
 	files := []mpq.File{}
 	for i := range count {
 		file := mpq.File{Name: fmt.Sprintf(`Units\file%03d.txt`, i)}
 		if i%3 == 0 {
-			file.Data = script(1 + i*7)
+			file.Data = luaOfLength(1 + i*7)
 		}
 		files = append(files, file)
 	}
 	return files
 }
 
-func mixed() []mpq.File {
+func mixedFiles() []mpq.File {
 	return []mpq.File{
-		{Name: "war3map.lua", Data: script(10800)},
-		{Name: `war3mapImported\noise.bin`, Data: noise(2, 10000)},
+		{Name: "war3map.lua", Data: luaOfLength(10800)},
+		{Name: `war3mapImported\noise.bin`, Data: randomBytes(2, 10000)},
 		{Name: "empty.txt"},
-		{Name: "war3map.w3i", Data: script(300)},
+		{Name: "war3map.w3i", Data: luaOfLength(300)},
 	}
 }
 
-func drawn(random *rand.Rand) []mpq.File {
+func randomFiles(random *rand.Rand) []mpq.File {
 	files := []mpq.File{}
 	for i := range random.IntN(21) {
 		length := random.IntN(5001)
 		var data []byte
 		switch random.IntN(4) {
 		case 0:
-			data = script(length)
+			data = luaOfLength(length)
 		case 1:
-			data = noise(random.Uint64(), length)
+			data = randomBytes(random.Uint64(), length)
 		case 2:
-			data = slices.Concat(script(length/2), noise(random.Uint64(), length/2))
+			data = slices.Concat(luaOfLength(length/2), randomBytes(random.Uint64(), length/2))
 		}
 		files = append(files, mpq.File{Name: fmt.Sprintf(`drawn\%d-%d.bin`, i, random.IntN(1000)), Data: data})
 	}
@@ -111,20 +111,20 @@ func fileLists(t testing.TB) []fileList {
 	lists := []fileList{
 		{"no files", nil},
 		{"an empty list", []mpq.File{}},
-		{"text that compresses", []mpq.File{{Name: "war3map.lua", Data: script(10800)}}},
-		{"bytes that do not compress", []mpq.File{{Name: `war3mapImported\noise.bin`, Data: noise(1, 10000)}}},
+		{"text that compresses", []mpq.File{{Name: "war3map.lua", Data: luaOfLength(10800)}}},
+		{"bytes that do not compress", []mpq.File{{Name: `war3mapImported\noise.bin`, Data: randomBytes(1, 10000)}}},
 		{"an empty file", []mpq.File{{Name: "empty.txt"}}},
 		{"an empty file that is not nil", []mpq.File{{Name: "empty.txt", Data: []byte{}}}},
-		{"text, noise and an empty file", mixed()},
+		{"text, noise and an empty file", mixedFiles()},
 		{"empty files between others", []mpq.File{
 			{Name: "first.txt"}, {Name: "a.txt", Data: []byte("a")}, {Name: "middle.txt"}, {Name: "last.txt"},
 		}},
-		{"three sectors of text", []mpq.File{{Name: "war3map.lua", Data: script(3 * 4096)}}},
-		{"three sectors of noise", []mpq.File{{Name: "noise.bin", Data: noise(3, 3*4096)}}},
-		{"two sectors and a byte", []mpq.File{{Name: "war3map.lua", Data: script(2*4096 + 1)}}},
+		{"three sectors of text", []mpq.File{{Name: "war3map.lua", Data: luaOfLength(3 * 4096)}}},
+		{"three sectors of noise", []mpq.File{{Name: "noise.bin", Data: randomBytes(3, 3*4096)}}},
+		{"two sectors and a byte", []mpq.File{{Name: "war3map.lua", Data: luaOfLength(2*4096 + 1)}}},
 		{"sectors that compress and sectors that do not", []mpq.File{{Name: "mixed.bin", Data: slices.Concat(
-			script(4096), noise(4, 4096), script(5000), noise(5, 100))}}},
-		{"a sector as long compressed as raw", []mpq.File{{Name: "even.bin", Data: evenSector(t)}}},
+			luaOfLength(4096), randomBytes(4, 4096), luaOfLength(5000), randomBytes(5, 100))}}},
+		{"a sector as long compressed as raw", []mpq.File{{Name: "even.bin", Data: incompressibleSector(t)}}},
 		{"its own (listfile)", []mpq.File{
 			{Name: "(listfile)", Data: stale}, {Name: "a.txt", Data: []byte("a")}, {Name: "b.txt", Data: []byte("b")},
 		}},
@@ -136,18 +136,18 @@ func fileLists(t testing.TB) []fileList {
 		}},
 		{"nothing but its own (listfile)", []mpq.File{{Name: "(listfile)", Data: stale}}},
 		{"the other files of an archive's own", []mpq.File{
-			{Name: "(attributes)", Data: script(40)}, {Name: "(signature)", Data: noise(6, 72)},
+			{Name: "(attributes)", Data: luaOfLength(40)}, {Name: "(signature)", Data: randomBytes(6, 72)},
 		}},
 		{"names with backslashes", []mpq.File{
-			{Name: `war3mapImported\Icons\BTNHero.blp`, Data: noise(8, 500)},
-			{Name: `Units\Human\Footman\Footman.mdx`, Data: script(700)},
+			{Name: `war3mapImported\Icons\BTNHero.blp`, Data: randomBytes(8, 500)},
+			{Name: `Units\Human\Footman\Footman.mdx`, Data: luaOfLength(700)},
 			{Name: `a\b\c\d\e\f\g.txt`, Data: []byte("deep")},
 			{Name: `trailing\`, Data: []byte("folder")},
 		}},
 		{"names with letters that are not ASCII", []mpq.File{
-			{Name: "war3mapImported\\M\xC3\xB8\xC3\xB8nwell.blp", Data: noise(9, 300)},
+			{Name: "war3mapImported\\M\xC3\xB8\xC3\xB8nwell.blp", Data: randomBytes(9, 300)},
 			{Name: "\xC3\x89cole.txt", Data: []byte("capital")},
-			{Name: "\xE6\x9C\x88.mdx", Data: script(100)},
+			{Name: "\xE6\x9C\x88.mdx", Data: luaOfLength(100)},
 			{Name: "moon\xF0\x9F\x8C\x99.tga", Data: []byte("four bytes")},
 			{Name: "stra\xC3\x9Fe.txt", Data: []byte("sharp s")},
 		}},
@@ -159,32 +159,32 @@ func fileLists(t testing.TB) []fileList {
 			{Name: "0123456789", Data: []byte{5}},
 		}},
 		{"one text under several names", []mpq.File{
-			{Name: "a.lua", Data: script(5000)}, {Name: "b.lua", Data: script(5000)}, {Name: "c.lua", Data: script(5000)},
+			{Name: "a.lua", Data: luaOfLength(5000)}, {Name: "b.lua", Data: luaOfLength(5000)}, {Name: "c.lua", Data: luaOfLength(5000)},
 		}},
 	}
 	for _, length := range sectorEdges {
 		lists = append(lists,
-			fileList{fmt.Sprintf("%d bytes of text", length), []mpq.File{{Name: "war3map.lua", Data: script(length)}}},
-			fileList{fmt.Sprintf("%d bytes of noise", length), []mpq.File{{Name: "n.bin", Data: noise(10, length)}}},
+			fileList{fmt.Sprintf("%d bytes of text", length), []mpq.File{{Name: "war3map.lua", Data: luaOfLength(length)}}},
+			fileList{fmt.Sprintf("%d bytes of noise", length), []mpq.File{{Name: "n.bin", Data: randomBytes(10, length)}}},
 		)
 	}
 	for _, count := range tableEdges {
-		lists = append(lists, fileList{fmt.Sprintf("%d files", count), numbered(count)})
+		lists = append(lists, fileList{fmt.Sprintf("%d files", count), numberedFiles(count)})
 	}
 	random := rand.New(rand.NewPCG(12, 2026))
 	for i := range 12 {
-		lists = append(lists, fileList{fmt.Sprintf("drawn list %d", i), drawn(random)})
+		lists = append(lists, fileList{fmt.Sprintf("drawn list %d", i), randomFiles(random)})
 	}
 	return lists
 }
 
-type optionSet struct {
+type optionCase struct {
 	name    string
 	options mpq.Options
 }
 
-func optionSets() []optionSet {
-	return []optionSet{
+func optionSets() []optionCase {
+	return []optionCase{
 		{"no options", mpq.Options{}},
 		{"an HM3W header before it", mpq.Options{Prefix: mpq.HM3WHeader("A map", 0, 0)}},
 		{"sectors of 1024 bytes", mpq.Options{SectorSizeShift: 1}},
@@ -192,24 +192,24 @@ func optionSets() []optionSet {
 	}
 }
 
-func otherOptionSets() []optionSet {
-	return []optionSet{
+func otherOptionSets() []optionCase {
+	return []optionCase{
 		{"sectors of 2048 bytes", mpq.Options{SectorSizeShift: 2}},
 		{"sectors of 4096 bytes, said", mpq.Options{SectorSizeShift: 3}},
 		{"sectors of 8192 bytes", mpq.Options{SectorSizeShift: 4}},
 		{"sectors of 131072 bytes", mpq.Options{SectorSizeShift: 8}},
-		{"2048 bytes before it", mpq.Options{Prefix: noise(11, 2048)}},
+		{"2048 bytes before it", mpq.Options{Prefix: randomBytes(11, 2048)}},
 		{"an HM3W header before it and sectors of 1024 bytes",
 			mpq.Options{Prefix: mpq.HM3WHeader("", 1, 2), SectorSizeShift: 1}},
-		{"1024 bytes before it and sectors of 16384 bytes", mpq.Options{Prefix: noise(11, 1024), SectorSizeShift: 5}},
+		{"1024 bytes before it and sectors of 16384 bytes", mpq.Options{Prefix: randomBytes(11, 1024), SectorSizeShift: 5}},
 	}
 }
 
 func otherLists() []fileList {
-	return []fileList{{"no files", nil}, {"text, noise and an empty file", mixed()}, {"22 files", numbered(22)}}
+	return []fileList{{"no files", nil}, {"text, noise and an empty file", mixedFiles()}, {"22 files", numberedFiles(22)}}
 }
 
-func open(t *testing.T, archive []byte) *testkit.MPQ {
+func openArchive(t *testing.T, archive []byte) *testkit.MPQ {
 	t.Helper()
 	opened, err := testkit.OpenMPQ(archive)
 	if err != nil {
@@ -218,7 +218,7 @@ func open(t *testing.T, archive []byte) *testkit.MPQ {
 	return opened
 }
 
-func read(t *testing.T, archive *testkit.MPQ, name string) []byte {
+func readArchiveFile(t *testing.T, archive *testkit.MPQ, name string) []byte {
 	t.Helper()
 	data, ok, err := archive.Read(name)
 	if err != nil || !ok {
@@ -227,7 +227,7 @@ func read(t *testing.T, archive *testkit.MPQ, name string) []byte {
 	return data
 }
 
-func capitals(name string) string {
+func toUpperASCII(name string) string {
 	upper := []byte(name)
 	for i, c := range upper {
 		if 'a' <= c && c <= 'z' {
@@ -240,7 +240,7 @@ func capitals(name string) string {
 func withoutListfile(files []mpq.File) []mpq.File {
 	kept := []mpq.File{}
 	for _, file := range files {
-		if capitals(file.Name) != "(LISTFILE)" {
+		if toUpperASCII(file.Name) != "(LISTFILE)" {
 			kept = append(kept, file)
 		}
 	}
@@ -263,7 +263,7 @@ func readHeader(t *testing.T, archive []byte) header {
 	return h
 }
 
-func table(archive []byte, position, count, key uint32) []uint32 {
+func readTable(archive []byte, position, count, key uint32) []uint32 {
 	words := make([]uint32, count*4)
 	for i := range words {
 		words[i] = binary.LittleEndian.Uint32(archive[int(position)+i*4:])
@@ -291,20 +291,20 @@ func checkArchive(t *testing.T, what string, written []byte, files []mpq.File, o
 		size != h.BlockTableAt+h.BlockTableSize*16 || int(h.BlockTableSize) != len(kept)+1 {
 		t.Errorf("%s: an archive of %d bytes with %d files has the header %+v", what, size, len(kept), h)
 	}
-	archive := open(t, written)
+	archive := openArchive(t, written)
 	if archive.HeaderOffset != len(options.Prefix) || archive.Blocks != len(kept)+1 {
 		t.Errorf("%s: the archive starts at %d and has %d blocks", what, archive.HeaderOffset, archive.Blocks)
 	}
 	var names strings.Builder
 	for _, file := range kept {
 		names.WriteString(file.Name + "\r\n")
-		for _, name := range []string{file.Name, capitals(file.Name)} {
-			if got := read(t, archive, name); !bytes.Equal(got, file.Data) {
+		for _, name := range []string{file.Name, toUpperASCII(file.Name)} {
+			if got := readArchiveFile(t, archive, name); !bytes.Equal(got, file.Data) {
 				t.Errorf("%s: %q reads back as %d bytes, want the %d written", what, name, len(got), len(file.Data))
 			}
 		}
 	}
-	if got := read(t, archive, "(listfile)"); string(got) != names.String() {
+	if got := readArchiveFile(t, archive, "(listfile)"); string(got) != names.String() {
 		t.Errorf("%s: the (listfile) is %q, want %q", what, got, names.String())
 	}
 }
@@ -422,10 +422,10 @@ func TestHashStringGivesTheHashesOfTheFormat(t *testing.T) {
 }
 
 func TestWriteRoundTripsCompressibleIncompressibleAndEmptyFiles(t *testing.T) {
-	lua := script(10800)
+	lua := luaOfLength(10800)
 	written, err := mpq.Write([]mpq.File{
 		{Name: "war3map.lua", Data: lua},
-		{Name: `war3mapImported\noise.bin`, Data: noise(1, 10000)},
+		{Name: `war3mapImported\noise.bin`, Data: randomBytes(1, 10000)},
 		{Name: "empty.txt", Data: nil},
 	}, mpq.Options{})
 	if err != nil {
@@ -434,17 +434,17 @@ func TestWriteRoundTripsCompressibleIncompressibleAndEmptyFiles(t *testing.T) {
 	if len(written) >= len(lua) {
 		t.Errorf("the archive is %d bytes; the script alone is %d", len(written), len(lua))
 	}
-	archive := open(t, written)
+	archive := openArchive(t, written)
 	if archive.HeaderOffset != 0 {
 		t.Errorf("HeaderOffset = %d", archive.HeaderOffset)
 	}
 	for name, want := range map[string][]byte{
 		"war3map.lua":               lua,
 		"WAR3MAP.LUA":               lua,
-		`war3mapImported\noise.bin`: noise(1, 10000),
+		`war3mapImported\noise.bin`: randomBytes(1, 10000),
 		"empty.txt":                 {},
 	} {
-		if got := read(t, archive, name); !bytes.Equal(got, want) {
+		if got := readArchiveFile(t, archive, name); !bytes.Equal(got, want) {
 			t.Errorf("%s did not round trip (%d bytes, want %d)", name, len(got), len(want))
 		}
 	}
@@ -467,8 +467,8 @@ func TestWritePlacesTheMPQHeaderAfterA512BytePrefix(t *testing.T) {
 	if string(written[:4]) != "HM3W" {
 		t.Errorf("the archive starts with %q", written[:4])
 	}
-	archive := open(t, written)
-	if archive.HeaderOffset != 512 || string(read(t, archive, "a.txt")) != "a" {
+	archive := openArchive(t, written)
+	if archive.HeaderOffset != 512 || string(readArchiveFile(t, archive, "a.txt")) != "a" {
 		t.Errorf("HeaderOffset = %d", archive.HeaderOffset)
 	}
 	if !bytes.Equal(prefix[4:], make([]byte, 508)) {
@@ -540,12 +540,12 @@ func TestWriteGrowsTheHashTableWithTheFileCount(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	archive := open(t, written)
+	archive := openArchive(t, written)
 	if hashSize := binary.LittleEndian.Uint32(written[24:]); hashSize != 64 || archive.Blocks != 41 {
 		t.Errorf("hash table of %d slots for %d blocks", hashSize, archive.Blocks)
 	}
 	for i, file := range files {
-		if got := read(t, archive, file.Name); len(got) != 1 || got[0] != byte(i) {
+		if got := readArchiveFile(t, archive, file.Name); len(got) != 1 || got[0] != byte(i) {
 			t.Errorf("%s reads as %v", file.Name, got)
 		}
 	}
@@ -555,7 +555,7 @@ func TestWriteDoublesTheHashTableUntilAThirdOfItIsFree(t *testing.T) {
 	for _, c := range []struct{ files, slots int }{
 		{0, 16}, {1, 16}, {9, 16}, {10, 32}, {11, 32}, {20, 32}, {21, 64}, {22, 64}, {41, 64}, {42, 128}, {43, 128},
 	} {
-		written, err := mpq.Write(numbered(c.files), mpq.Options{})
+		written, err := mpq.Write(numberedFiles(c.files), mpq.Options{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -567,7 +567,7 @@ func TestWriteDoublesTheHashTableUntilAThirdOfItIsFree(t *testing.T) {
 }
 
 func TestWriteStoresEachFileAsABlockOfSectors(t *testing.T) {
-	text, random := script(9000), noise(1, 5000)
+	text, random := luaOfLength(9000), randomBytes(1, 5000)
 	written, err := mpq.Write([]mpq.File{
 		{Name: "text.txt", Data: text}, {Name: "empty.txt"}, {Name: "noise.bin", Data: random},
 	}, mpq.Options{})
@@ -575,9 +575,9 @@ func TestWriteStoresEachFileAsABlockOfSectors(t *testing.T) {
 		t.Fatal(err)
 	}
 	h := readHeader(t, written)
-	blocks := table(written, h.BlockTableAt, h.BlockTableSize, mpq.BlockTableKey)
+	blocks := readTable(written, h.BlockTableAt, h.BlockTableSize, mpq.BlockTableKey)
 	const exists, compressed = 0x80000000, 0x00000200
-	one, two, three := packed(t, text[:4096]), packed(t, text[4096:8192]), packed(t, text[8192:])
+	one, two, three := compress(t, text[:4096]), compress(t, text[4096:8192]), compress(t, text[8192:])
 	second, third := uint32(16+len(one)), uint32(16+len(one)+len(two))
 	end := third + uint32(len(three))
 	want := slices.Concat(testkit.U32(16), testkit.U32(second), testkit.U32(third), testkit.U32(end), one, two, three)
@@ -607,13 +607,13 @@ func TestWriteStoresEachFileAsABlockOfSectors(t *testing.T) {
 }
 
 func TestWriteFindsEveryFileThroughTheHashTable(t *testing.T) {
-	files := numbered(43)
+	files := numberedFiles(43)
 	written, err := mpq.Write(files, mpq.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
 	h := readHeader(t, written)
-	slots := table(written, h.HashTableAt, h.HashTableSize, mpq.HashTableKey)
+	slots := readTable(written, h.HashTableAt, h.HashTableSize, mpq.HashTableKey)
 	used := map[uint32]bool{}
 	for slot := range int(h.HashTableSize) {
 		entry := slots[slot*4 : slot*4+4]
@@ -638,7 +638,7 @@ func TestWriteFindsEveryFileThroughTheHashTable(t *testing.T) {
 }
 
 func TestWriteSectorSizeShiftZeroMeansThree(t *testing.T) {
-	files := []mpq.File{{Name: "war3map.lua", Data: script(20000)}, {Name: "noise.bin", Data: noise(1, 9000)}}
+	files := []mpq.File{{Name: "war3map.lua", Data: luaOfLength(20000)}, {Name: "noise.bin", Data: randomBytes(1, 9000)}}
 	unset, err := mpq.Write(files, mpq.Options{})
 	if err != nil {
 		t.Fatal(err)
@@ -664,7 +664,7 @@ func TestWriteLeavesOutAListfileItIsGiven(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		archive := open(t, written)
+		archive := openArchive(t, written)
 		names, err := archive.Listfile()
 		if err != nil || !slices.Equal(names, []string{"a.txt", "b.txt"}) || archive.Blocks != 3 {
 			t.Errorf("given %s: %d blocks, the listfile names %q, %v", given, archive.Blocks, names, err)
@@ -707,11 +707,11 @@ func TestWriteKeepsAFileWhoseNameOnlyLooksLikeTheListfile(t *testing.T) {
 			t.Errorf("%q: %v", name, err)
 			continue
 		}
-		archive := open(t, written)
-		if got := read(t, archive, name); string(got) != "kept" || archive.Blocks != 3 {
+		archive := openArchive(t, written)
+		if got := readArchiveFile(t, archive, name); string(got) != "kept" || archive.Blocks != 3 {
 			t.Errorf("%q reads back as %q from an archive of %d blocks", name, got, archive.Blocks)
 		}
-		if got := read(t, archive, "(listfile)"); string(got) != "a.txt\r\n"+name+"\r\n" {
+		if got := readArchiveFile(t, archive, "(listfile)"); string(got) != "a.txt\r\n"+name+"\r\n" {
 			t.Errorf("%q: the (listfile) is %q", name, got)
 		}
 		both := append(files, mpq.File{Name: "(listfile)", Data: []byte("stale")})
@@ -730,7 +730,7 @@ func TestWriteReadsBackEveryListInEveryWay(t *testing.T) {
 	writeAndCheck(t, otherLists(), otherOptionSets())
 }
 
-func writeAndCheck(t *testing.T, lists []fileList, ways []optionSet) {
+func writeAndCheck(t *testing.T, lists []fileList, ways []optionCase) {
 	t.Helper()
 	for _, list := range lists {
 		for _, way := range ways {
@@ -746,7 +746,7 @@ func writeAndCheck(t *testing.T, lists []fileList, ways []optionSet) {
 }
 
 func TestWriteGivesTheSameArchiveEveryTime(t *testing.T) {
-	files := numbered(30)
+	files := numberedFiles(30)
 	first, err := mpq.Write(files, mpq.Options{})
 	if err != nil {
 		t.Fatal(err)

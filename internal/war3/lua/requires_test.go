@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
-func lit(line int, name string) Require { return Require{Line: line, Name: name, Literal: true} }
+func literalRequire(line int, name string) Require {
+	return Require{Line: line, Name: name, Literal: true}
+}
 
 func TestRequires(t *testing.T) {
 	for _, c := range []struct {
@@ -16,7 +18,7 @@ func TestRequires(t *testing.T) {
 		{
 			"literal requires in every call form, with their lines",
 			"local a = require(\"a.b\")\n\nlocal c = require \"c\"\nlocal d = require [[d.e]]\n",
-			[]Require{lit(1, "a.b"), lit(3, "c"), lit(4, "d.e")},
+			[]Require{literalRequire(1, "a.b"), literalRequire(3, "c"), literalRequire(4, "d.e")},
 		},
 		{
 			"a require inside a comment or a string is none",
@@ -31,7 +33,7 @@ func TestRequires(t *testing.T) {
 				`]]`,
 				`local real = require("yes")`,
 			}, "\n"),
-			[]Require{lit(9, "yes")},
+			[]Require{literalRequire(9, "yes")},
 		},
 		{
 			"an argument that is not one literal is not followed",
@@ -51,7 +53,7 @@ func TestRequires(t *testing.T) {
 		{
 			"a require after a word that declares nothing is the global",
 			"return require(\"m\")\nx = y and require \"n\"",
-			[]Require{lit(1, "m"), lit(2, "n")},
+			[]Require{literalRequire(1, "m"), literalRequire(2, "n")},
 		},
 		{"a function named require that starts the source", "function require(name) end", nil},
 		{"a local named require, whatever follows it", "local require(\"m\")", nil},
@@ -61,7 +63,7 @@ func TestRequires(t *testing.T) {
 		{
 			"a concatenation before it is not a field access",
 			`local s = "a" .. require("b")`,
-			[]Require{lit(1, "b")},
+			[]Require{literalRequire(1, "b")},
 		},
 	} {
 		if got := FindRequires(c.source); !slices.Equal(got, c.want) {

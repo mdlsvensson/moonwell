@@ -14,18 +14,18 @@ import (
 
 const indexFile = "maps/map.w3x/war3map.imp"
 
-func index(version, count uint32, rest ...[]byte) []byte {
+func newIndexFile(version, count uint32, rest ...[]byte) []byte {
 	return testkit.Concat(testkit.U32(version), testkit.U32(count), testkit.Concat(rest...))
 }
 
-func entry(flag uint8, path string) []byte {
+func newEntry(flag uint8, path string) []byte {
 	return testkit.Concat([]byte{flag}, []byte(path), []byte{0})
 }
 
 func TestEntriesRoundTripWithDefaultAndCustomPaths(t *testing.T) {
 	entries := []imp.Entry{{Flag: 5, Path: "default.blp"}, {Flag: imp.CustomPath, Path: `Textures\custom.blp`}}
 	written := imp.Write(entries)
-	if want := index(1, 2, entry(5, "default.blp"), entry(13, `Textures\custom.blp`)); !bytes.Equal(written, want) {
+	if want := newIndexFile(1, 2, newEntry(5, "default.blp"), newEntry(13, `Textures\custom.blp`)); !bytes.Equal(written, want) {
 		t.Errorf("Write = %q, want %q", written, want)
 	}
 	read, err := imp.Read(written, indexFile)
@@ -35,7 +35,7 @@ func TestEntriesRoundTripWithDefaultAndCustomPaths(t *testing.T) {
 
 	for _, none := range [][]imp.Entry{nil, {}} {
 		written := imp.Write(none)
-		if !bytes.Equal(written, index(1, 0)) {
+		if !bytes.Equal(written, newIndexFile(1, 0)) {
 			t.Errorf("Write of no entries = %q", written)
 		}
 		if read, err := imp.Read(written, indexFile); err != nil || len(read) != 0 {
@@ -62,7 +62,7 @@ func TestMapPathIsUnderTheImportedFolderUnlessTheFlagSaysCustomPath(t *testing.T
 		if got := (imp.Entry{Flag: c.flag, Path: `Units\a.mdx`}).MapPath(); got != c.want {
 			t.Errorf("MapPath with flag %d = %q, want %q", c.flag, got, c.want)
 		}
-		read, err := imp.Read(index(1, 1, entry(c.flag, `Units\a.mdx`)), indexFile)
+		read, err := imp.Read(newIndexFile(1, 1, newEntry(c.flag, `Units\a.mdx`)), indexFile)
 		if err != nil || !slices.Equal(read, []imp.Entry{{Flag: c.flag, Path: `Units\a.mdx`}}) {
 			t.Errorf("Read of flag %d = %+v, %v", c.flag, read, err)
 		}
@@ -84,7 +84,7 @@ func TestWorldEditor300sFlag29IsACustomPath(t *testing.T) {
 }
 
 func TestReadRefusesCorruptDataNamingTheFile(t *testing.T) {
-	valid := index(1, 1, entry(13, "a.blp"))
+	valid := newIndexFile(1, 1, newEntry(13, "a.blp"))
 	for _, c := range []struct {
 		name  string
 		data  []byte
@@ -95,16 +95,16 @@ func TestReadRefusesCorruptDataNamingTheFile(t *testing.T) {
 		{"a wrong version without a count", testkit.U32(2), "truncated"},
 		{"cut inside a path", valid[:10], "truncated"},
 		{"cut before the NUL of a path", valid[:len(valid)-1], "truncated"},
-		{"cut before an entry's flag", index(1, 1), "truncated"},
-		{"fewer entries than the count", index(1, 2, entry(13, "a.blp")), "truncated"},
-		{"a count far past the end", index(1, 0xFFFFFFFF, entry(13, "a.blp")), "truncated"},
-		{"another version", index(2, 1, entry(13, "a.blp")), "version 2 is not supported"},
-		{"an unknown flag", index(1, 1, entry(7, "a.blp")), "entry 0 has unknown flag 7"},
-		{"an unknown flag in the second entry", index(1, 2, entry(13, "a.blp"), entry(12, "b.blp")), "entry 1 has unknown flag 12"},
-		{"an empty path", index(1, 1, entry(13, "")), "entry 0 has an empty path"},
-		{"a path that is not UTF-8", index(1, 1, entry(13, "a\xFF.blp")), "entry 0 is not valid UTF-8"},
-		{"a byte after the last entry", index(1, 1, entry(13, "a.blp"), []byte{0}), "trailing"},
-		{"more entries than the count", index(1, 1, entry(13, "a.blp"), entry(13, "b.blp")), "trailing"},
+		{"cut before an entry's flag", newIndexFile(1, 1), "truncated"},
+		{"fewer entries than the count", newIndexFile(1, 2, newEntry(13, "a.blp")), "truncated"},
+		{"a count far past the end", newIndexFile(1, 0xFFFFFFFF, newEntry(13, "a.blp")), "truncated"},
+		{"another version", newIndexFile(2, 1, newEntry(13, "a.blp")), "version 2 is not supported"},
+		{"an unknown flag", newIndexFile(1, 1, newEntry(7, "a.blp")), "entry 0 has unknown flag 7"},
+		{"an unknown flag in the second entry", newIndexFile(1, 2, newEntry(13, "a.blp"), newEntry(12, "b.blp")), "entry 1 has unknown flag 12"},
+		{"an empty path", newIndexFile(1, 1, newEntry(13, "")), "entry 0 has an empty path"},
+		{"a path that is not UTF-8", newIndexFile(1, 1, newEntry(13, "a\xFF.blp")), "entry 0 is not valid UTF-8"},
+		{"a byte after the last entry", newIndexFile(1, 1, newEntry(13, "a.blp"), []byte{0}), "trailing"},
+		{"more entries than the count", newIndexFile(1, 1, newEntry(13, "a.blp"), newEntry(13, "b.blp")), "trailing"},
 	} {
 		entries, err := imp.Read(c.data, indexFile)
 		var diagErr *diag.Error
@@ -123,7 +123,7 @@ func TestReadRefusesCorruptDataNamingTheFile(t *testing.T) {
 
 func TestReadKeepsAByteOrderMarkAtTheStartOfAPath(t *testing.T) {
 	for _, path := range []string{"\xEF\xBB\xBFa.blp", "\xEF\xBB\xBF", "a\xEF\xBB\xBF.blp"} {
-		read, err := imp.Read(index(1, 1, entry(imp.CustomPath, path)), indexFile)
+		read, err := imp.Read(newIndexFile(1, 1, newEntry(imp.CustomPath, path)), indexFile)
 		if err != nil || !slices.Equal(read, []imp.Entry{{Flag: imp.CustomPath, Path: path}}) {
 			t.Errorf("Read of the path %q = %+v, %v", path, read, err)
 			continue
@@ -136,7 +136,7 @@ func TestReadKeepsAByteOrderMarkAtTheStartOfAPath(t *testing.T) {
 
 func TestWriteDoesNotCheckWhatItWrites(t *testing.T) {
 	written := imp.Write([]imp.Entry{{Flag: 7, Path: ""}})
-	if want := index(1, 1, entry(7, "")); !bytes.Equal(written, want) {
+	if want := newIndexFile(1, 1, newEntry(7, "")); !bytes.Equal(written, want) {
 		t.Errorf("Write = %q, want %q", written, want)
 	}
 }

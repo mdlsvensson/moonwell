@@ -8,7 +8,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/txt"
 )
 
-type merge struct {
+type mergeCase struct {
 	name     string
 	source   string
 	sections []txt.Section
@@ -27,7 +27,7 @@ func sections(list ...txt.Section) []txt.Section { return list }
 
 var lineBreaks = []struct{ name, text string }{{"LF", "\n"}, {"CRLF", "\r\n"}}
 
-func check(t *testing.T, merges []merge) {
+func checkMerges(t *testing.T, merges []mergeCase) {
 	t.Helper()
 	for _, m := range merges {
 		if got := txt.Merge(m.source, m.sections); got != m.want {
@@ -36,9 +36,9 @@ func check(t *testing.T, merges []merge) {
 	}
 }
 
-func duplicateKeyMerges() []merge {
+func duplicateKeyMerges() []mergeCase {
 	wanted := sections(section("Misc", "MaxHeroLevel", "25", "Added", "0"), section("CustomSkin", "Text", ""))
-	merges := []merge{{"an empty source", "", sections(section("Misc", "FoodCeiling", "0")), "[Misc]\nFoodCeiling=0"}}
+	merges := []mergeCase{{"an empty source", "", sections(section("Misc", "FoodCeiling", "0")), "[Misc]\nFoodCeiling=0"}}
 	for _, nl := range lineBreaks {
 		source := strings.Join([]string{
 			"// keep", "[Misc]", "MaxHeroLevel=10", "Keep=42", "[Other]", "X=y", "[misc]", "maxherolevel=12", "",
@@ -47,17 +47,17 @@ func duplicateKeyMerges() []merge {
 			"// keep", "[Misc]", "MaxHeroLevel=25", "Keep=42", "[Other]", "X=y", "[misc]", "maxherolevel=25", "Added=0",
 			"", "[CustomSkin]", "Text=", "",
 		}, nl.text)
-		merges = append(merges, merge{"a key in two sections of one name, " + nl.name, source, wanted, want})
+		merges = append(merges, mergeCase{"a key in two sections of one name, " + nl.name, source, wanted, want})
 	}
 	return merges
 }
 
 func TestMergeKeepsUnrelatedContentAndSetsEveryDuplicateKey(t *testing.T) {
-	check(t, duplicateKeyMerges())
+	checkMerges(t, duplicateKeyMerges())
 }
 
-func tabAndCaseMerges() []merge {
-	return []merge{{
+func tabAndCaseMerges() []mergeCase {
+	return []mergeCase{{
 		"a tab-indented key under a header in other letters",
 		"[mIsC] // keep heading comment\r\n\tfoodceiling = 100\r\n",
 		sections(section("Misc", "FoodCeiling", "200")),
@@ -66,11 +66,11 @@ func tabAndCaseMerges() []merge {
 }
 
 func TestMergeRecognizesTabIndentedKeysAndCaseOnlyMatches(t *testing.T) {
-	check(t, tabAndCaseMerges())
+	checkMerges(t, tabAndCaseMerges())
 }
 
-func emptyAndMissingSectionMerges() []merge {
-	return []merge{{
+func emptyAndMissingSectionMerges() []mergeCase {
+	return []mergeCase{{
 		"two empty sections and a missing one",
 		"[Misc]\n[Skin]\n",
 		sections(section("Misc", "FoodCeiling", "0"), section("Skin", "Text", ""), section("New", "Value", "1")),
@@ -79,11 +79,11 @@ func emptyAndMissingSectionMerges() []merge {
 }
 
 func TestMergeAddsKeysToEmptySectionsAndCreatesMissingSections(t *testing.T) {
-	check(t, emptyAndMissingSectionMerges())
+	checkMerges(t, emptyAndMissingSectionMerges())
 }
 
-func wholeLineMerges() []merge {
-	return []merge{{
+func wholeLineMerges() []mergeCase {
+	return []mergeCase{{
 		"a value followed by a note",
 		"[Misc]\nFoodCeiling=100 ; stale note\n",
 		sections(section("Misc", "FoodCeiling", "200")),
@@ -92,24 +92,24 @@ func wholeLineMerges() []merge {
 }
 
 func TestMergeReplacesTheEntireExistingValueLine(t *testing.T) {
-	check(t, wholeLineMerges())
+	checkMerges(t, wholeLineMerges())
 }
 
-func layoutMerges() []merge {
-	var merges []merge
+func layoutMerges() []mergeCase {
+	var merges []mergeCase
 	for _, nl := range lineBreaks {
 		lines := func(parts ...string) string { return strings.Join(parts, nl.text) }
 		merges = append(merges,
-			merge{"a new key follows the section's last entry, and the final newline stays, " + nl.name,
+			mergeCase{"a new key follows the section's last entry, and the final newline stays, " + nl.name,
 				lines("[Misc]", "A=1", ""), sections(section("Misc", "B", "2")), lines("[Misc]", "A=1", "B=2", "")},
-			merge{"a blank line between sections stays between them, not before the new key, " + nl.name,
+			mergeCase{"a blank line between sections stays between them, not before the new key, " + nl.name,
 				lines("[A]", "X=1", "", "[B]", "Y=2", ""), sections(section("A", "K", "v")),
 				lines("[A]", "X=1", "K=v", "", "[B]", "Y=2", "")},
-			merge{"a new section gets one blank line before it and keeps the final newline, " + nl.name,
+			mergeCase{"a new section gets one blank line before it and keeps the final newline, " + nl.name,
 				lines("[A]", "X=1", ""), sections(section("New", "K", "v")), lines("[A]", "X=1", "", "[New]", "K=v", "")},
-			merge{"no second blank line when the source ends with one, " + nl.name,
+			mergeCase{"no second blank line when the source ends with one, " + nl.name,
 				lines("[A]", "X=1", "", ""), sections(section("New", "K", "v")), lines("[A]", "X=1", "", "[New]", "K=v", "")},
-			merge{"no final newline is added to a source without one, " + nl.name,
+			mergeCase{"no final newline is added to a source without one, " + nl.name,
 				lines("[A]", "X=1"), sections(section("New", "K", "v")), lines("[A]", "X=1", "", "[New]", "K=v")},
 		)
 	}
@@ -117,24 +117,24 @@ func layoutMerges() []merge {
 }
 
 func TestMergeKeepsTheLayout(t *testing.T) {
-	check(t, layoutMerges())
+	checkMerges(t, layoutMerges())
 }
 
-func headerCommentMerges() []merge {
-	var merges []merge
+func headerCommentMerges() []mergeCase {
+	var merges []mergeCase
 	for _, header := range []string{"[Misc] ; comment", "[Misc]; comment", "[Misc] // comment", "  [Misc]\t;"} {
-		merges = append(merges, merge{"the header " + header, header + "\nA=1\n", sections(section("Misc", "B", "2")),
+		merges = append(merges, mergeCase{"the header " + header, header + "\nA=1\n", sections(section("Misc", "B", "2")),
 			header + "\nA=1\nB=2\n"})
 	}
 	return merges
 }
 
 func TestSectionHeadersFollowedByCommentsAreRecognised(t *testing.T) {
-	check(t, headerCommentMerges())
+	checkMerges(t, headerCommentMerges())
 }
 
-func edgeMerges() []merge {
-	return []merge{
+func edgeMerges() []mergeCase {
+	return []mergeCase{
 		{"a source of one line break", "\n", sections(section("New", "K", "v")), "\n[New]\nK=v\n"},
 		{"a source of one line without a break", "// note", sections(section("New", "K", "v")), "// note\n\n[New]\nK=v"},
 		{"mixed line breaks become CRLF", "[A]\nX=1\r\nY=2\n", sections(section("A", "Z", "3")),
@@ -181,48 +181,48 @@ func edgeMerges() []merge {
 }
 
 func TestMergeAtTheEdgesOfTheLayout(t *testing.T) {
-	check(t, edgeMerges())
+	checkMerges(t, edgeMerges())
 }
 
-func settledMerges() []merge {
+func settledMerges() []mergeCase {
 	return slices.Concat(duplicateKeyMerges(), tabAndCaseMerges(), emptyAndMissingSectionMerges(), wholeLineMerges(),
 		layoutMerges(), headerCommentMerges(), edgeMerges())
 }
 
-type regrown struct {
-	merge
+type repeatedMergeCase struct {
+	mergeCase
 	again string
 }
 
-func regrowingMerges() []regrown {
-	return []regrown{
-		{merge{"a key with a space", "[A]\n", sections(section("A", "my key", "1")), "[A]\nmy key=1\n"},
+func regrowingMerges() []repeatedMergeCase {
+	return []repeatedMergeCase{
+		{mergeCase{"a key with a space", "[A]\n", sections(section("A", "my key", "1")), "[A]\nmy key=1\n"},
 			"[A]\nmy key=1\nmy key=1\n"},
-		{merge{"a key with an equals sign", "[A]\n", sections(section("A", "a=b", "1")), "[A]\na=b=1\n"},
+		{mergeCase{"a key with an equals sign", "[A]\n", sections(section("A", "a=b", "1")), "[A]\na=b=1\n"},
 			"[A]\na=b=1\na=b=1\n"},
-		{merge{"a section name with a closing bracket", "", sections(section("A]B", "K", "1")), "[A]B]\nK=1"},
+		{mergeCase{"a section name with a closing bracket", "", sections(section("A]B", "K", "1")), "[A]B]\nK=1"},
 			"[A]B]\nK=1\n\n[A]B]\nK=1"},
-		{merge{"a value with a line break", "[A]\nK=1\n", sections(section("A", "K", "1\n[B]"), section("B", "X", "2")),
+		{mergeCase{"a value with a line break", "[A]\nK=1\n", sections(section("A", "K", "1\n[B]"), section("B", "X", "2")),
 			"[A]\nK=1\n[B]\n\n[B]\nX=2\n"}, "[A]\nK=1\n[B]\n[B]\n\n[B]\nX=2\n"},
 	}
 }
 
 func TestMergingAgainAddsWhatItCannotFindInItsOwnText(t *testing.T) {
 	for _, r := range regrowingMerges() {
-		check(t, []merge{r.merge, {r.name + ", merged again", r.want, r.sections, r.again}})
+		checkMerges(t, []mergeCase{r.mergeCase, {r.name + ", merged again", r.want, r.sections, r.again}})
 	}
 }
 
-func carriedMerges() []merge {
+func carriedMerges() []mergeCase {
 	carried := settledMerges()
 	for _, r := range regrowingMerges() {
-		carried = append(carried, r.merge)
+		carried = append(carried, r.mergeCase)
 	}
 	return carried
 }
 
 func TestMergeTakesTheSameNameTwice(t *testing.T) {
-	check(t, []merge{
+	checkMerges(t, []mergeCase{
 		{"a key twice in one section: the last value stays", "", sections(section("A", "K", "1", "K", "2")), "[A]\nK=2"},
 		{"a section twice", "[A]\nK=0\n", sections(section("A", "K", "1"), section("B", "X", "2"), section("A", "K", "3", "N", "4")),
 			"[A]\nK=3\nN=4\n\n[B]\nX=2\n"},
@@ -253,9 +253,9 @@ func TestMergingNoSectionsReturnsTheSource(t *testing.T) {
 	}
 }
 
-func whiteSpaceMerges() []merge {
+func whiteSpaceMerges() []mergeCase {
 	add, set := sections(section("Misc", "B", "2")), sections(section("Misc", "A", "2"))
-	return []merge{
+	return []mergeCase{
 		{"a no-break space before a header", "\xC2\xA0[Misc]\nA=1\n", add, "\xC2\xA0[Misc]\nA=1\n\n[Misc]\nB=2\n"},
 		{"a no-break space after a header", "[Misc]\xC2\xA0\nA=1\n", add, "[Misc]\xC2\xA0\nA=1\n\n[Misc]\nB=2\n"},
 		{"a no-break space before a key", "[Misc]\n\xC2\xA0A=1\n", set, "[Misc]\n\xC2\xA0A=1\nA=2\n"},
@@ -271,12 +271,12 @@ func whiteSpaceMerges() []merge {
 }
 
 func TestOnlyASCIIWhiteSpaceIsWhiteSpace(t *testing.T) {
-	check(t, whiteSpaceMerges())
+	checkMerges(t, whiteSpaceMerges())
 }
 
-func separatorMerges() []merge {
+func separatorMerges() []mergeCase {
 	add := sections(section("Misc", "B", "2"))
-	return []merge{
+	return []mergeCase{
 		{"a line separator in a header's comment", "[Misc] ; a\xE2\x80\xA8b\nA=1\n", add, "[Misc] ; a\xE2\x80\xA8b\nA=1\nB=2\n"},
 		{"a paragraph separator in a header's comment", "[Misc] // a\xE2\x80\xA9b\nA=1\n", add,
 			"[Misc] // a\xE2\x80\xA9b\nA=1\nB=2\n"},
@@ -284,11 +284,11 @@ func separatorMerges() []merge {
 }
 
 func TestALineOrParagraphSeparatorIsPartOfAHeadersComment(t *testing.T) {
-	check(t, separatorMerges())
+	checkMerges(t, separatorMerges())
 }
 
-func caseFoldingMerges() []merge {
-	return []merge{
+func caseFoldingMerges() []mergeCase {
+	return []mergeCase{
 		{"a long s is an s", "[Misc]\nMa\xC5\xBF=1\n", sections(section("Misc", "MAS", "2")), "[Misc]\nMa\xC5\xBF=2\n"},
 		{"a final sigma is a sigma", "[\xCE\x9F\xCE\x94\xCE\x9F\xCE\xA3]\nA=1\n",
 			sections(section("\xCE\xBF\xCE\xB4\xCE\xBF\xCF\x82", "B", "2")), "[\xCE\x9F\xCE\x94\xCE\x9F\xCE\xA3]\nA=1\nB=2\n"},
@@ -298,7 +298,7 @@ func caseFoldingMerges() []merge {
 }
 
 func TestNamesMatchByCaseFoldingOutsideASCIIToo(t *testing.T) {
-	check(t, caseFoldingMerges())
-	check(t, []merge{{"an accented letter in both cases", "[\xC3\x89t\xC3\xA9]\nA=1\n",
+	checkMerges(t, caseFoldingMerges())
+	checkMerges(t, []mergeCase{{"an accented letter in both cases", "[\xC3\x89t\xC3\xA9]\nA=1\n",
 		sections(section("\xC3\xA9T\xC3\x89", "a", "2")), "[\xC3\x89t\xC3\xA9]\nA=2\n"}})
 }

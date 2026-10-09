@@ -32,7 +32,7 @@ type NewObject struct {
 }
 
 func AppendObjects(parsed *File, source []byte, kind TableKind, objects []NewObject) ([]byte, error) {
-	if err := checkWritable(objects, kind); err != nil {
+	if err := appendErrorCase(objects, kind); err != nil {
 		return nil, err
 	}
 	w := newWriter(parsed, source, kind, len(objects))
@@ -95,7 +95,7 @@ func (w *writer) writeModification(mod NewMod) {
 	w.out.Write(emptyEndToken[:])
 }
 
-func checkWritable(objects []NewObject, kind TableKind) error {
+func appendErrorCase(objects []NewObject, kind TableKind) error {
 	for _, object := range objects {
 		if err := checkObject(object, kind); err != nil {
 			return err

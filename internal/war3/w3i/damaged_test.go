@@ -17,7 +17,7 @@ type input struct {
 	data []byte
 }
 
-func replaced(data []byte, from, to string) []byte {
+func replaceAll(data []byte, from, to string) []byte {
 	return bytes.ReplaceAll(data, []byte(from), []byte(to))
 }
 
@@ -33,12 +33,12 @@ func wholeFiles(t *testing.T) []input {
 	)
 	for _, version := range []int32{18, 31, 39} {
 		source := testkit.SyntheticMapInfo(version)
-		source = replaced(source, "TRIGSTR_001", "\xEF\xBB\xBFM\xC3\xB8\xC3\xB8nwell \xE6\x9C\x88\xF0\x9F\x8C\x99")
-		source = replaced(source, "Author", "\xEF\xBB\xBF")
-		source = replaced(source, "Subtitle", "Sub\xEF\xBB\xBFtitle")
-		source = replaced(source, "Default", "\xEF\xBB\xBF\xEF\xBB\xBFDefault")
-		source = replaced(source, "Player 1", "\xEF\xBB\xBFSpelare \xC3\xA5\xC3\xA4\xC3\xB6")
-		source = replaced(source, "Force 1", "")
+		source = replaceAll(source, "TRIGSTR_001", "\xEF\xBB\xBFM\xC3\xB8\xC3\xB8nwell \xE6\x9C\x88\xF0\x9F\x8C\x99")
+		source = replaceAll(source, "Author", "\xEF\xBB\xBF")
+		source = replaceAll(source, "Subtitle", "Sub\xEF\xBB\xBFtitle")
+		source = replaceAll(source, "Default", "\xEF\xBB\xBF\xEF\xBB\xBFDefault")
+		source = replaceAll(source, "Player 1", "\xEF\xBB\xBFSpelare \xC3\xA5\xC3\xA4\xC3\xB6")
+		source = replaceAll(source, "Force 1", "")
 		files = append(files, input{fmt.Sprintf("synthetic version %d with texts that are not ASCII", version), source})
 	}
 	return files
@@ -93,7 +93,7 @@ func withInvalidTexts(t *testing.T, name string, source []byte) []input {
 	for _, place := range texts {
 		for _, invalid := range []string{"\xFF", "\xC3", "\xC0\x80", "\xED\xA0\x80", "\xEF\xBB"} {
 			files = append(files, input{fmt.Sprintf("%s with %q before %s", name, invalid, place.what),
-				inserted(source, place.offset, []byte(invalid)...)})
+				insertBytes(source, place.offset, []byte(invalid)...)})
 		}
 	}
 	return files
@@ -129,7 +129,7 @@ func withAlteredDetails(t *testing.T, name string, source []byte) []input {
 		}
 	}
 	record := source[player.ID.Start:forceCount]
-	twice := inserted(testkit.SetU32(source, playerCount, 2), forceCount, record...)
+	twice := insertBytes(testkit.SetU32(source, playerCount, 2), forceCount, record...)
 	second := forceCount + (player.Controller.Start - player.ID.Start)
 	return append(files,
 		input{name + " with its player twice", twice},
@@ -141,11 +141,11 @@ func withAlteredDetails(t *testing.T, name string, source []byte) []input {
 	)
 }
 
-const damageSeed = 39
+const mutationSeed = 39
 
-type tally struct{ read, refused int }
+type outcomeCounts struct{ accepted, rejected int }
 
-func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
+func (c *outcomeCounts) record(t *testing.T, what string, data []byte) {
 	t.Helper()
 	for _, depth := range []w3i.Depth{w3i.Basic, w3i.Extended} {
 		var info *w3i.Info
@@ -156,9 +156,9 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 		var diagErr *diag.Error
 		switch {
 		case err == nil && info != nil:
-			c.read++
+			c.accepted++
 		case err != nil && info == nil && errors.As(err, &diagErr) && diagErr.File == mapInfoFile:
-			c.refused++
+			c.rejected++
 		default:
 			t.Fatalf("%s, depth %d: Read = %+v, %v; want an Info, or an error of %s", what, depth, info, err, mapInfoFile)
 		}
@@ -174,23 +174,23 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 }
 
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
-	var damaged tally
+	var damaged outcomeCounts
 	for _, displayPath := range wholeFiles(t) {
 		for length := range len(displayPath.data) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
+			damaged.record(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
 		}
 		for index := range uint64(1500) {
-			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.MutateBytes(displayPath.data, damageSeed, index))
+			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, mutationSeed)
+			damaged.record(t, what, testkit.MutateBytes(displayPath.data, mutationSeed, index))
 		}
 	}
 	for _, displayPath := range alteredFiles(t) {
-		damaged.readOrRefused(t, displayPath.name, displayPath.data)
+		damaged.record(t, displayPath.name, displayPath.data)
 		for length := range len(displayPath.data) {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
+			damaged.record(t, fmt.Sprintf("%s cut at %d bytes", displayPath.name, length), displayPath.data[:length:length])
 		}
 	}
-	if damaged.read == 0 || damaged.refused == 0 {
-		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.read, damaged.refused)
+	if damaged.accepted == 0 || damaged.rejected == 0 {
+		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.accepted, damaged.rejected)
 	}
 }

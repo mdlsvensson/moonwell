@@ -11,13 +11,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/picture"
 )
 
-const damageSeed = 256
+const mutationSeed = 256
 
-const startOfAPicture = 2048
+const pictureStartLength = 2048
 
-type tally struct{ read, refused int }
+type outcomeCounts struct{ accepted, rejected int }
 
-func (c *tally) readOrRefused(t *testing.T, what string, data []byte, displayPath string) {
+func (c *outcomeCounts) record(t *testing.T, what string, data []byte, displayPath string) {
 	t.Helper()
 	var read *picture.Picture
 	var err error
@@ -27,20 +27,20 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, displayPat
 	var diagErr *diag.Error
 	switch {
 	case err == nil && read != nil:
-		c.read++
+		c.accepted++
 	case err != nil && read == nil && errors.As(err, &diagErr) && diagErr.File == displayPath:
-		c.refused++
+		c.rejected++
 	default:
 		t.Fatalf("%s: Read = %+v, %v; want a picture, or an error of %s", what, read, err, displayPath)
 	}
 }
 
-func lengthsToCut(whole int) []int {
+func truncationLengths(whole int) []int {
 	var lengths []int
-	for length := range min(startOfAPicture, whole) {
+	for length := range min(pictureStartLength, whole) {
 		lengths = append(lengths, length)
 	}
-	for length := startOfAPicture; length < whole-1; length += 97 {
+	for length := pictureStartLength; length < whole-1; length += 97 {
 		lengths = append(lengths, length)
 	}
 	return append(lengths, whole-1)
@@ -49,7 +49,7 @@ func lengthsToCut(whole int) []int {
 func TestADamagedPictureIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 	t.Parallel()
 	source := testkit.NewPixels(256)
-	var damaged tally
+	var damaged outcomeCounts
 	for _, whole := range []struct {
 		name, displayPath string
 		data              []byte
@@ -61,20 +61,20 @@ func TestADamagedPictureIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		{"an interlaced PNG", "preview.png", testkit.PNG(source, "interlaced")},
 		{"a BLP", "preview.blp", testkit.BLP(256, 1)},
 	} {
-		for _, length := range lengthsToCut(len(whole.data)) {
+		for _, length := range truncationLengths(len(whole.data)) {
 			what := fmt.Sprintf("%s cut at %d bytes", whole.name, length)
-			damaged.readOrRefused(t, what, whole.data[:length:length], whole.displayPath)
+			damaged.record(t, what, whole.data[:length:length], whole.displayPath)
 		}
-		start, rest := whole.data[:startOfAPicture], whole.data[startOfAPicture:]
+		start, rest := whole.data[:pictureStartLength], whole.data[pictureStartLength:]
 		for index := range uint64(150) {
-			what := fmt.Sprintf("%s, change %d of seed %d", whole.name, index, damageSeed)
-			anywhere := testkit.MutateBytes(whole.data, damageSeed, index)
-			damaged.readOrRefused(t, what+" to the whole file", anywhere, whole.displayPath)
-			inStart := slices.Concat(testkit.MutateBytes(start, damageSeed, index), rest)
-			damaged.readOrRefused(t, what+" to its first 2048 bytes", inStart, whole.displayPath)
+			what := fmt.Sprintf("%s, change %d of seed %d", whole.name, index, mutationSeed)
+			anywhere := testkit.MutateBytes(whole.data, mutationSeed, index)
+			damaged.record(t, what+" to the whole file", anywhere, whole.displayPath)
+			inStart := slices.Concat(testkit.MutateBytes(start, mutationSeed, index), rest)
+			damaged.record(t, what+" to its first 2048 bytes", inStart, whole.displayPath)
 		}
 	}
-	if damaged.read == 0 || damaged.refused == 0 {
-		t.Errorf("%d damaged pictures were read and %d refused; want some of each", damaged.read, damaged.refused)
+	if damaged.accepted == 0 || damaged.rejected == 0 {
+		t.Errorf("%d damaged pictures were read and %d refused; want some of each", damaged.accepted, damaged.rejected)
 	}
 }

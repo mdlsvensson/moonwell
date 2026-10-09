@@ -68,11 +68,11 @@ func numberOffsets(t *testing.T, displayPath damagedFile) []int {
 	return offsets
 }
 
-const damageSeed = 3
+const mutationSeed = 3
 
-type tally struct{ read, refused int }
+type outcomeCounts struct{ accepted, rejected int }
 
-func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmod.TableKind) {
+func (c *outcomeCounts) record(t *testing.T, what string, data []byte, kind objmod.TableKind) {
 	t.Helper()
 	var parsed *objmod.File
 	var appended []byte
@@ -81,7 +81,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 		t.Fatalf("%s: Read panics: %v", what, value)
 	}
 	if parsed != nil {
-		added := []objmod.NewObject{{Base: id("hfoo"), ID: id("X001")}}
+		added := []objmod.NewObject{{Base: mustID("hfoo"), ID: mustID("X001")}}
 		if value := testkit.PanicValue(func() { appended, appendErr = objmod.AppendObjects(parsed, data, kind, added) }); value != nil {
 			t.Fatalf("%s: AppendTo panics: %v", what, value)
 		}
@@ -89,9 +89,9 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 	var diagErr *diag.Error
 	switch {
 	case err == nil && parsed != nil && appendErr == nil && len(appended) > len(data):
-		c.read++
+		c.accepted++
 	case err != nil && parsed == nil && errors.As(err, &diagErr) && diagErr.File == modFile:
-		c.refused++
+		c.rejected++
 	default:
 		t.Fatalf("%s: Read = %+v, %v and AppendTo = %d bytes, %v; want a file and a longer one, or an error of %s",
 			what, parsed, err, len(appended), appendErr, modFile)
@@ -99,24 +99,24 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 }
 
 func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
-	var damaged tally
+	var damaged outcomeCounts
 	for _, displayPath := range filesToDamage(t) {
 		for length := range len(displayPath.data) {
 			what := fmt.Sprintf("%s cut at %d bytes", displayPath.name, length)
-			damaged.readOrRefused(t, what, displayPath.data[:length:length], displayPath.kind)
+			damaged.record(t, what, displayPath.data[:length:length], displayPath.kind)
 		}
 		for index := range uint64(400) {
-			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
-			damaged.readOrRefused(t, what, testkit.MutateBytes(displayPath.data, damageSeed, index), displayPath.kind)
+			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, mutationSeed)
+			damaged.record(t, what, testkit.MutateBytes(displayPath.data, mutationSeed, index), displayPath.kind)
 		}
 		for _, offset := range numberOffsets(t, displayPath) {
 			for _, number := range append(testkit.EdgeNumbers(), 3, 4, 5, 64, 65, 1000) {
 				what := fmt.Sprintf("%s with the number at %d set to %d", displayPath.name, offset, number)
-				damaged.readOrRefused(t, what, testkit.SetU32(displayPath.data, offset, number), displayPath.kind)
+				damaged.record(t, what, testkit.SetU32(displayPath.data, offset, number), displayPath.kind)
 			}
 		}
 	}
-	if damaged.read == 0 || damaged.refused == 0 {
-		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.read, damaged.refused)
+	if damaged.accepted == 0 || damaged.rejected == 0 {
+		t.Errorf("%d damaged files were read and %d refused; want some of each", damaged.accepted, damaged.rejected)
 	}
 }

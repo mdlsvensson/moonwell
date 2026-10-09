@@ -27,13 +27,13 @@ func callNames(function Function) []string {
 	return names
 }
 
-type refusal struct {
+type errorCase struct {
 	source       string
 	words        string
 	line, column int
 }
 
-func refused(t *testing.T, c refusal) {
+func checkError(t *testing.T, c errorCase) {
 	t.Helper()
 	_, err := ParseFunctions(c.source, "map.lua")
 	var e *diag.Error
@@ -97,8 +97,8 @@ func TestAParameterListIsNamesWithCommasBetweenThemAndMayEndWithThreeDots(t *tes
 			t.Errorf("the parameters %q are not read:\n%s", parameters, source)
 		}
 	}
-	for _, c := range parameterRefusals {
-		refused(t, c)
+	for _, c := range parameterErrorCases {
+		checkError(t, c)
 	}
 }
 
@@ -148,14 +148,14 @@ func TestEveryKeywordOfLuaIsNoNameAndAWordThatOnlyStartsLikeOneIs(t *testing.T) 
 	}
 }
 
-var parameterRefusals = []refusal{
+var parameterErrorCases = []errorCase{
 	{"function config(first,) end", "expected a name", 1, 23},
 	{"function config(first second) end", "expected ')'", 1, 23},
 	{"function config(..., last) end", "expected ')'", 1, 20},
 	{"function config(first, 2) end", "expected a name", 1, 24},
 }
 
-var returnRefusals = []refusal{
+var returnErrorCases = []errorCase{
 	{"function config() return; Visible() end", "return must end its block", 1, 27},
 	{"function config() return 1; Visible() end", "return must end its block", 1, 29},
 	{"function config() return;; end", "return must end its block", 1, 26},
@@ -168,8 +168,8 @@ func TestAReturnHasValuesOrNoneAndASemicolonOrNoneAndEndsItsBlock(t *testing.T) 
 			t.Errorf("%q is not read:\n%s", returned, source)
 		}
 	}
-	for _, c := range returnRefusals {
-		refused(t, c)
+	for _, c := range returnErrorCases {
+		checkError(t, c)
 	}
 }
 
@@ -198,7 +198,7 @@ func TestAnExpressionIsReadWholeWhereverItStands(t *testing.T) {
 	}
 }
 
-var ambiguousStructures = []refusal{
+var ambiguousStructures = []errorCase{
 	{"function config()", "unterminated block", 1, 18},
 	{`function config() X("unterminated) end`, "unterminated quoted string", 1, 21},
 	{"function config() X([=[unterminated) end", "unterminated long string or comment", 1, 21},
@@ -221,7 +221,7 @@ var ambiguousStructures = []refusal{
 
 func TestStructuralAmbiguityFailsWithAFileErrorAndReSaveHint(t *testing.T) {
 	for _, c := range ambiguousStructures {
-		refused(t, c)
+		checkError(t, c)
 	}
 }
 
@@ -395,7 +395,7 @@ func TestRealWorldEditorLuaExposesTheExpectedSettingsFunctionsAndCalls(t *testin
 	}
 }
 
-var deepNesting = []refusal{
+var deepNesting = []errorCase{
 	{
 		"function config() Capture(" + strings.Repeat("(", 20000) + "1" + strings.Repeat(")", 20000) + ") end",
 		"nesting is too deep to establish safe edit boundaries", 1, 225,
@@ -406,7 +406,7 @@ var deepNesting = []refusal{
 
 func TestDeeplyNestedInputFailsSafely(t *testing.T) {
 	for _, c := range deepNesting {
-		refused(t, c)
+		checkError(t, c)
 	}
 }
 
@@ -464,7 +464,7 @@ func TestTokenRangesPreserveNumeralOperatorAndStringSpellings(t *testing.T) {
 
 func inConfig(body string) string { return "function config() " + body + " end" }
 
-var invalidShapes = []refusal{
+var invalidShapes = []errorCase{
 	{inConfig("local x = (1]"), "expected ')'", 1, 31},
 	{inConfig("local x = {[1] 2}"), "expected '='", 1, 34},
 	{inConfig("local x = {1 2}"), "expected '}'", 1, 32},
@@ -491,11 +491,11 @@ var invalidShapes = []refusal{
 
 func TestMismatchedDelimitersAndInvalidStatementShapesAreRefused(t *testing.T) {
 	for _, c := range invalidShapes {
-		refused(t, c)
+		checkError(t, c)
 	}
 }
 
-var placedErrors = []refusal{
+var placedErrors = []errorCase{
 	{"-- \U0001F319\nend", "expected a name", 2, 1},
 	{"--[[\U0001F319]] end", "expected a name", 1, 9},
 	{"--[[\U0001F319]] x = @", "unsupported symbol", 1, 13},
@@ -506,7 +506,7 @@ var placedErrors = []refusal{
 
 func TestAnErrorNamesItsLineAndItsColumnInCharacters(t *testing.T) {
 	for _, c := range placedErrors {
-		refused(t, c)
+		checkError(t, c)
 	}
 }
 

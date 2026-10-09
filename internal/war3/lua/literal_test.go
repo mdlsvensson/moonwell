@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func argument(t *testing.T, source string) []Token {
+func argumentTokens(t *testing.T, source string) []Token {
 	t.Helper()
 	return mustFunctions(t, "function test() Capture("+source+") end")[0].Calls[0].Args[0]
 }
@@ -61,12 +61,12 @@ var playerIDs = []struct {
 
 func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 	for _, c := range literalNumbers {
-		if value, ok := ParseNumberLiteral(argument(t, c.source)); ok != c.ok || value != c.value {
+		if value, ok := ParseNumberLiteral(argumentTokens(t, c.source)); ok != c.ok || value != c.value {
 			t.Errorf("LiteralNumber(%s) = %v, %v, want %v, %v", c.source, value, ok, c.value, c.ok)
 		}
 	}
 	for _, source := range []string{"-1e999", "-0x1.fp2"} {
-		if value, ok := ParseNumberLiteral(argument(t, source)); ok || value != 0 || math.Signbit(value) {
+		if value, ok := ParseNumberLiteral(argumentTokens(t, source)); ok || value != 0 || math.Signbit(value) {
 			t.Errorf("LiteralNumber(%s) = %v, %v, want 0 and false", source, value, ok)
 		}
 	}
@@ -78,7 +78,7 @@ func TestLiteralHelpersAcceptOnlyFiniteLiteralNumericShapes(t *testing.T) {
 		t.Error("LiteralNumber accepted +1")
 	}
 	for _, c := range playerIDs {
-		if value, ok := ParsePlayerID(argument(t, c.source)); ok != c.ok || value != c.value {
+		if value, ok := ParsePlayerID(argumentTokens(t, c.source)); ok != c.ok || value != c.value {
 			t.Errorf("PlayerID(%s) = %v, %v, want %v, %v", c.source, value, ok, c.value, c.ok)
 		}
 	}

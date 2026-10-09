@@ -185,7 +185,7 @@ func TestABlockEndsWhateverStandsAroundTheWordThatEndsIt(t *testing.T) {
 
 func escape(digits string) string { return `\` + "u" + digits }
 
-var refused = []struct{ text, source, place, words string }{
+var checkError = []struct{ text, source, place, words string }{
 	{"type unit extends widget\nlibrary Foo\n", "common.j", "common.j:2: ", `cannot read "library Foo"`},
 	{"function F takes nothing returns nothing\n", "blizzard.j", "blizzard.j:1: ", "never reaches endfunction"},
 	{"globals\n    what is this\nendglobals\n", "common.j", "common.j:2: ", `cannot read "what is this"`},
@@ -206,7 +206,7 @@ var refused = []struct{ text, source, place, words string }{
 }
 
 func TestParseNamesTheFileAndLineOfAnythingItDoesNotUnderstand(t *testing.T) {
-	for _, c := range refused {
+	for _, c := range checkError {
 		file, err := jass.Parse(c.text, c.source)
 		if err == nil || !strings.HasPrefix(err.Error(), c.place) || !strings.Contains(err.Error(), c.words) {
 			t.Errorf("%s: got %v, want an error at %q with %q", c.source, err, c.place, c.words)

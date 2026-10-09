@@ -63,11 +63,11 @@ func sizesNear(size uint32) []uint32 {
 		size+1, size+4, size+260, size+268)
 }
 
-const damageSeed = 800
+const mutationSeed = 800
 
-type tally struct{ read, refused int }
+type outcomeCounts struct{ accepted, rejected int }
 
-func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
+func (c *outcomeCounts) record(t *testing.T, what string, data []byte) {
 	t.Helper()
 	for name, read := range map[string]func() ([]model.Path, error){
 		"Paths":   func() ([]model.Path, error) { return model.ReadPaths(data, modelFile) },
@@ -82,9 +82,9 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 		var diagErr *diag.Error
 		switch {
 		case err == nil:
-			c.read++
+			c.accepted++
 		case paths == nil && errors.As(err, &diagErr) && diagErr.File == modelFile:
-			c.refused++
+			c.rejected++
 		default:
 			t.Fatalf("%s: %s = %+v, %v; want paths, or an error of %s", what, name, paths, err, modelFile)
 		}
@@ -92,7 +92,7 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 }
 
 func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
-	var damaged tally
+	var damaged outcomeCounts
 	for _, whole := range []struct {
 		name string
 		data []byte
@@ -104,25 +104,25 @@ func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		{"the text with other letters", []byte(textWithOtherLetters), true},
 	} {
 		for length := range len(whole.data) + 1 {
-			damaged.readOrRefused(t, fmt.Sprintf("%s cut at %d bytes", whole.name, length), whole.data[:length:length])
+			damaged.record(t, fmt.Sprintf("%s cut at %d bytes", whole.name, length), whole.data[:length:length])
 		}
 		for index := range uint64(1500) {
-			what := fmt.Sprintf("%s, change %d of seed %d", whole.name, index, damageSeed)
-			damaged.readOrRefused(t, what+" to its bytes", testkit.MutateBytes(whole.data, damageSeed, index))
+			what := fmt.Sprintf("%s, change %d of seed %d", whole.name, index, mutationSeed)
+			damaged.record(t, what+" to its bytes", testkit.MutateBytes(whole.data, mutationSeed, index))
 			if whole.text {
-				text := testkit.MutateText(string(whole.data), damageSeed, index)
-				damaged.readOrRefused(t, what+" to its text", []byte(text))
+				text := testkit.MutateText(string(whole.data), mutationSeed, index)
+				damaged.record(t, what+" to its text", []byte(text))
 			}
 		}
 	}
 	whole := modelWithEveryChunk()
 	for _, offset := range sizeOffsets(t, whole) {
 		for _, size := range sizesNear(binary.LittleEndian.Uint32(whole[offset:])) {
-			damaged.readOrRefused(t, fmt.Sprintf("the size at %d set to %d", offset, size), testkit.SetU32(whole, offset, size))
+			damaged.record(t, fmt.Sprintf("the size at %d set to %d", offset, size), testkit.SetU32(whole, offset, size))
 		}
 	}
-	if damaged.read == 0 || damaged.refused == 0 {
-		t.Errorf("%d readings of damaged models gave paths and %d were refused; want some of each", damaged.read,
-			damaged.refused)
+	if damaged.accepted == 0 || damaged.rejected == 0 {
+		t.Errorf("%d readings of damaged models gave paths and %d were refused; want some of each", damaged.accepted,
+			damaged.rejected)
 	}
 }

@@ -238,9 +238,9 @@ func headerOnlyTexts() []string {
 	return []string{"Version {\n\tFormatVersion 800,\n}\n", "Model \"A\" {\n\tNumGeosets 0,\n}\n"}
 }
 
-var readsUnnaturally = regexp.MustCompile(`\ba [A-Z]{4}\b`)
+var articleBeforeTag = regexp.MustCompile(`\ba [A-Z]{4}\b`)
 
-func refused(t *testing.T, what string, err error, displayPath, words string) {
+func checkError(t *testing.T, what string, err error, displayPath, words string) {
 	t.Helper()
 	var diagErr *diag.Error
 	if !errors.As(err, &diagErr) || diagErr.File != displayPath {
@@ -250,7 +250,7 @@ func refused(t *testing.T, what string, err error, displayPath, words string) {
 	if !strings.HasPrefix(diagErr.Msg, "Not a readable model: ") || !strings.Contains(diagErr.Msg, words) {
 		t.Errorf("%s: message %q, want a model that is not readable and %q", what, diagErr.Msg, words)
 	}
-	if strings.Contains(diagErr.Msg, "Knight.md") || readsUnnaturally.MatchString(diagErr.Msg) || diagErr.Hint == "" {
+	if strings.Contains(diagErr.Msg, "Knight.md") || articleBeforeTag.MatchString(diagErr.Msg) || diagErr.Hint == "" {
 		t.Errorf("%s: message %q, hint %q: the file is named once, through File, and there is a hint", what,
 			diagErr.Msg, diagErr.Hint)
 	}
@@ -266,7 +266,7 @@ func TestReadMDLReadsEveryPathBearingBlockAndIgnoresTheRest(t *testing.T) {
 func TestReadMDLRefusesBrokenText(t *testing.T) {
 	for _, broken := range brokenTexts() {
 		got, err := model.ReadMDL(broken.source, "assets/Knight.mdl")
-		refused(t, broken.source, err, "assets/Knight.mdl", broken.words)
+		checkError(t, broken.source, err, "assets/Knight.mdl", broken.words)
 		if got != nil {
 			t.Errorf("%q: a refused text returned %+v", broken.source, got)
 		}
@@ -289,10 +289,10 @@ func TestPathsPicksTheReaderFromTheContent(t *testing.T) {
 	}
 	blp := []byte{0x42, 0x4c, 0x50, 0x31, 0, 0, 0, 0}
 	_, err = model.ReadPaths(blp, "icon.blp")
-	refused(t, "a texture", err, "icon.blp", "it is neither a binary MDX nor a text MDL file")
+	checkError(t, "a texture", err, "icon.blp", "it is neither a binary MDX nor a text MDL file")
 	for _, text := range []string{"\x00" + header, header + "Bitmap { Image \"a\x00.blp\", }", header + "\x00"} {
 		_, err := model.ReadPaths([]byte(text), modelFile)
-		refused(t, strconv.Quote(text), err, modelFile, "neither a binary MDX nor a text MDL")
+		checkError(t, strconv.Quote(text), err, modelFile, "neither a binary MDX nor a text MDL")
 	}
 }
 
@@ -310,10 +310,10 @@ func TestEachKindHasItsWords(t *testing.T) {
 func TestPathsRefusesTextThatIsNotAModel(t *testing.T) {
 	for _, source := range textsThatAreNoModel() {
 		_, err := model.ReadPaths([]byte(source), modelFile)
-		refused(t, source, err, modelFile, "it has no Version or Model block")
+		checkError(t, source, err, modelFile, "it has no Version or Model block")
 	}
 	_, err := model.ReadPaths([]byte{0x4d, 0x44}, modelFile)
-	refused(t, "MD", err, modelFile, "it has no Version or Model block")
+	checkError(t, "MD", err, modelFile, "it has no Version or Model block")
 }
 
 func TestReadMDLAcceptsAModelWithOnlyAVersionBlockOrOnlyAModelBlock(t *testing.T) {
@@ -353,7 +353,7 @@ func TestReadMDXReadsTexturesEmittersAttachmentsPopcornAndFaceEffectsInFileOrder
 func TestReadMDXRefusesDamagedFiles(t *testing.T) {
 	for _, damaged := range damagedModels() {
 		got, err := model.ReadMDX(damaged.data, modelFile)
-		refused(t, damaged.name, err, modelFile, damaged.words)
+		checkError(t, damaged.name, err, modelFile, damaged.words)
 		if got != nil {
 			t.Errorf("%s: a refused file returned %+v", damaged.name, got)
 		}
@@ -366,7 +366,7 @@ func TestReadMDXReturnsNoPathsOfAFileItRefuses(t *testing.T) {
 		testkit.Chunk("ATCH", testkit.Concat(testkit.Attachment("a.mdx"), []byte{1})),
 	)
 	got, err := model.ReadMDX(data, modelFile)
-	refused(t, "a second chunk that is damaged", err, modelFile, "the ATCH chunk has a record that is cut off")
+	checkError(t, "a second chunk that is damaged", err, modelFile, "the ATCH chunk has a record that is cut off")
 	if got != nil {
 		t.Errorf("a refused file returned %+v", got)
 	}
@@ -511,7 +511,7 @@ func TestPathsDropsALeadingByteOrderMarkAndReadMDLTakesItsTextAsItIs(t *testing.
 		t.Errorf("Paths = %+v, %v", got, err)
 	}
 	_, err := model.ReadMDL(marked, modelFile)
-	refused(t, "a text that starts with a byte order mark", err, modelFile, "it has no Version or Model block")
+	checkError(t, "a text that starts with a byte order mark", err, modelFile, "it has no Version or Model block")
 }
 
 type invalidBytes struct {

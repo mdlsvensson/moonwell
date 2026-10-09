@@ -94,7 +94,7 @@ var cornerSources = []namedSource{
 		"function a() X(Player(1e2), Player(-0), Player(0x7fffffff), Player(1e30), Player (3)) end"},
 }
 
-func luaFilesOfTheCheckout(t *testing.T) []namedSource {
+func checkoutLuaFiles(t *testing.T) []namedSource {
 	t.Helper()
 	var sources []namedSource
 	for _, name := range []string{
@@ -136,34 +136,34 @@ func (l literal) String() string {
 	return strings.Join(parts, ", ")
 }
 
-type refusedAt struct {
+type reportedError struct {
 	File, Message, Hint string
 	Line, Column        int
 }
 
-type scanned struct {
+type scanResult struct {
 	Tokens    []Token
 	Fault     *Fault
 	Requires  []Require
 	Globals   []string
 	Map       MapGlobals
 	Functions []Function
-	Refusal   refusedAt
+	Error     reportedError
 	Whole     literal
 	Arguments []literal
 }
 
-func scan(source string) scanned {
-	made := scanned{Requires: FindRequires(source), Globals: FindTopLevelGlobals(source), Map: ReadMapGlobals(source)}
+func scan(source string) scanResult {
+	made := scanResult{Requires: FindRequires(source), Globals: FindTopLevelGlobals(source), Map: ReadMapGlobals(source)}
 	made.Tokens, made.Fault = Tokenize(source)
 	made.Whole = literalOf(made.Tokens)
 	functions, err := ParseFunctions(source, "war3map.lua")
 	var diagErr *diag.Error
 	switch {
 	case errors.As(err, &diagErr):
-		made.Refusal = refusedAt{diagErr.File, diagErr.Msg, diagErr.Hint, diagErr.Line, diagErr.Column}
+		made.Error = reportedError{diagErr.File, diagErr.Msg, diagErr.Hint, diagErr.Line, diagErr.Column}
 	case err != nil:
-		made.Refusal = refusedAt{Message: err.Error()}
+		made.Error = reportedError{Message: err.Error()}
 	}
 	made.Functions = functions
 	for _, function := range functions {
@@ -178,7 +178,7 @@ func scan(source string) scanned {
 
 const longest = 80
 
-func rawsOf(tokens []Token) string {
+func joinRaws(tokens []Token) string {
 	var raws []string
 	for _, token := range tokens {
 		raws = append(raws, token.Raw)
@@ -202,7 +202,7 @@ func tokenLines(tokens []Token) string {
 	return lines.String()
 }
 
-func shownEach(values []string) string {
+func quoteEach(values []string) string {
 	var shown []string
 	for _, value := range values {
 		shown = append(shown, testkit.QuoteIfNeeded(value))
@@ -210,7 +210,7 @@ func shownEach(values []string) string {
 	return strings.Join(shown, " ")
 }
 
-func (s scanned) text(name, source string) string {
+func (s scanResult) text(name, source string) string {
 	var out strings.Builder
 	fmt.Fprintf(&out, "== %s\n", testkit.QuoteIfNeeded(name))
 	if len(source) > longest {
@@ -233,13 +233,13 @@ func (s scanned) text(name, source string) string {
 		fmt.Fprintf(&out, "require: line %d, %q, literal %v\n", require.Line, require.Name, require.Literal)
 	}
 	if len(s.Globals) > 0 {
-		fmt.Fprintf(&out, "top-level globals: %s\n", shownEach(s.Globals))
+		fmt.Fprintf(&out, "top-level globals: %s\n", quoteEach(s.Globals))
 	}
 	for _, global := range s.Map.Globals {
 		fmt.Fprintf(&out, "map global: %s %s\n", testkit.QuoteIfNeeded(global.Name), testkit.QuoteIfNeeded(global.Type))
 	}
 	if len(s.Map.Functions) > 0 {
-		fmt.Fprintf(&out, "map functions: %s\n", shownEach(s.Map.Functions))
+		fmt.Fprintf(&out, "map functions: %s\n", quoteEach(s.Map.Functions))
 	}
 	argument := 0
 	for _, function := range s.Functions {
@@ -249,7 +249,7 @@ func (s scanned) text(name, source string) string {
 			fmt.Fprintf(&out, "  call %s: %d-%d, %d arguments\n", testkit.QuoteIfNeeded(call.Name), call.Start, call.End,
 				len(call.Args))
 			for i, tokens := range call.Args {
-				text := rawsOf(tokens)
+				text := joinRaws(tokens)
 				if len(text) > longest {
 					text = testkit.Digest([]byte(text))
 				}
@@ -262,14 +262,14 @@ func (s scanned) text(name, source string) string {
 			}
 		}
 	}
-	if s.Refusal.Message != "" {
-		fmt.Fprintf(&out, "functions refused at %d:%d: %s\n", s.Refusal.Line, s.Refusal.Column,
-			testkit.QuoteIfNeeded(s.Refusal.Message))
+	if s.Error.Message != "" {
+		fmt.Fprintf(&out, "functions refused at %d:%d: %s\n", s.Error.Line, s.Error.Column,
+			testkit.QuoteIfNeeded(s.Error.Message))
 	}
 	return out.String() + "\n"
 }
 
-func scans(sources []namedSource) []byte {
+func formatScans(sources []namedSource) []byte {
 	var text strings.Builder
 	for _, c := range sources {
 		text.WriteString(scan(c.source).text(c.name, c.source))
@@ -278,5 +278,5 @@ func scans(sources []namedSource) []byte {
 }
 
 func TestTheScannersAreAsRecorded(t *testing.T) {
-	testkit.CheckRecorded(t, "corners.txt", scans(cornerSources))
+	testkit.CheckRecorded(t, "corners.txt", formatScans(cornerSources))
 }
