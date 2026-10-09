@@ -183,10 +183,10 @@ func libraryDirsOf(root, key string) (libraryDirs, error) {
 	return libraryDirs{key, modules, assets}, nil
 }
 
-func (f libraryDirs) toSynced(shipsAssets bool) Synced {
-	lies := Synced{Key: f.key, Modules: modulesDirName(f.key)}
+func (d libraryDirs) toSynced(shipsAssets bool) Synced {
+	lies := Synced{Key: d.key, Modules: modulesDirName(d.key)}
 	if shipsAssets {
-		lies.Assets = assetsDirName(f.key)
+		lies.Assets = assetsDirName(d.key)
 	}
 	return lies
 }
@@ -205,14 +205,14 @@ type libraryContent struct {
 	local       bool
 }
 
-func (s libraryContent) checkUsable(key, manifestName string) error {
-	if err := s.checkUsableNames(key, "module", s.modules, manifestName); err != nil {
+func (c libraryContent) checkUsable(key, manifestName string) error {
+	if err := c.checkUsableNames(key, "module", c.modules, manifestName); err != nil {
 		return err
 	}
-	return s.checkUsableNames(key, "assets", s.assets, manifestName)
+	return c.checkUsableNames(key, "assets", c.assets, manifestName)
 }
 
-func (s libraryContent) checkUsableNames(key, kind string, files []archiveFile, manifestName string) error {
+func (c libraryContent) checkUsableNames(key, kind string, files []archiveFile, manifestName string) error {
 	names := make([]string, len(files))
 	for i, f := range files {
 		names[i] = f.name
@@ -221,18 +221,18 @@ func (s libraryContent) checkUsableNames(key, kind string, files []archiveFile, 
 	spelled := map[string]string{}
 	for _, name := range names {
 		if _, portable := fsx.CleanRelPath(name); !portable || !isInsideLibrary(name) {
-			return errUnusableName(key, kind, name, manifestName, s.local)
+			return errUnusableName(key, kind, name, manifestName, c.local)
 		}
 		if other, taken := spelled[strings.ToLower(name)]; taken {
-			return errTwoSpellings(key, kind, other, name, manifestName, s.local)
+			return errTwoSpellings(key, kind, other, name, manifestName, c.local)
 		}
 		spelled[strings.ToLower(name)] = name
 	}
 	if first, second, found := findFileDirCaseConflict(names, spelled); found {
-		return errTwoSpellings(key, kind, first, second, manifestName, s.local)
+		return errTwoSpellings(key, kind, first, second, manifestName, c.local)
 	}
 	if first, second, found := findDirCaseConflict(names); found {
-		return errFoldersOfTwoSpellings(key, kind, first, second, manifestName, s.local)
+		return errFoldersOfTwoSpellings(key, kind, first, second, manifestName, c.local)
 	}
 	return nil
 }

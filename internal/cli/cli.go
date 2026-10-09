@@ -105,40 +105,40 @@ type invocation struct {
 	log        *env.Logger
 }
 
-func (r *invocation) execute(args []string) (code int) {
+func (inv *invocation) execute(args []string) (code int) {
 	defer func() {
 		if panicValue := recover(); panicValue != nil {
-			say := r.write
-			if r.log != nil {
-				say = r.log.Error
+			say := inv.write
+			if inv.log != nil {
+				say = inv.log.Error
 			}
 			say(diag.FormatInternalError(fmt.Sprintf("%v\n%s", panicValue, debug.Stack())))
 			code = 1
 		}
 	}()
-	root := r.buildCommandTree()
+	root := inv.buildCommandTree()
 	var stdout, stderr strings.Builder
 	root.SetOut(&stdout)
 	root.SetErr(&stderr)
 	root.SetArgs(append([]string{}, args...))
-	err := root.ExecuteContext(r.ctx)
+	err := root.ExecuteContext(inv.ctx)
 	if stdout.Len() > 0 {
-		r.print(strings.TrimSuffix(stdout.String(), "\n"))
+		inv.print(strings.TrimSuffix(stdout.String(), "\n"))
 	}
 	if stderr.Len() > 0 {
-		r.write(strings.TrimSuffix(stderr.String(), "\n"))
+		inv.write(strings.TrimSuffix(stderr.String(), "\n"))
 	}
 	switch {
-	case r.ranCommand != nil:
-		return exitCode(r.ctx, r.log, *r.ranCommand, err)
+	case inv.ranCommand != nil:
+		return exitCode(inv.ctx, inv.log, *inv.ranCommand, err)
 	case err == nil:
 		return 0
 	}
-	r.write(diag.Format(usageError(err)))
+	inv.write(diag.Format(usageError(err)))
 	return 1
 }
 
-func (r *invocation) buildCommandTree() *cobra.Command {
+func (inv *invocation) buildCommandTree() *cobra.Command {
 	root := &cobra.Command{
 		Use:           "moonwell",
 		Long:          "Moonwell " + moonwell.Version + ": Warcraft III maps with YueScript gameplay and Pkl data",
@@ -146,27 +146,27 @@ func (r *invocation) buildCommandTree() *cobra.Command {
 		SilenceUsage:  true,
 		RunE: func(c *cobra.Command, _ []string) error {
 			if wantsVersion, _ := c.Flags().GetBool("version"); wantsVersion {
-				r.print(moonwell.Version)
+				inv.print(moonwell.Version)
 				return nil
 			}
 			return c.Help()
 		},
 	}
 	root.Flags().BoolP("version", "v", false, "Print the version")
-	for _, cmd := range r.commands {
-		root.AddCommand(r.newCobraCommand(cmd))
+	for _, cmd := range inv.commands {
+		root.AddCommand(inv.newCobraCommand(cmd))
 	}
 	return root
 }
 
-func (r *invocation) newCobraCommand(cmd command) *cobra.Command {
+func (inv *invocation) newCobraCommand(cmd command) *cobra.Command {
 	c := &cobra.Command{
 		Use:                   cmd.usage,
 		Short:                 cmd.help,
 		Args:                  cmd.args,
 		DisableFlagsInUseLine: true,
 		RunE: func(c *cobra.Command, arguments []string) error {
-			return r.runCommand(cmd, c.Flags(), arguments)
+			return inv.runCommand(cmd, c.Flags(), arguments)
 		},
 	}
 	if cmd.args == nil {
@@ -182,8 +182,8 @@ func (r *invocation) newCobraCommand(cmd command) *cobra.Command {
 	return c
 }
 
-func (r *invocation) runCommand(cmd command, flags *pflag.FlagSet, arguments []string) error {
-	args := commandArgs{arguments: arguments, print: r.print}
+func (inv *invocation) runCommand(cmd command, flags *pflag.FlagSet, arguments []string) error {
+	args := commandArgs{arguments: arguments, print: inv.print}
 	args.entry, _ = flags.GetString(entryFlag.name)
 	args.minify, _ = flags.GetBool(minifyFlag.name)
 	args.link, _ = flags.GetBool(linkFlag.name)
@@ -192,9 +192,9 @@ func (r *invocation) runCommand(cmd command, flags *pflag.FlagSet, arguments []s
 			return err
 		}
 	}
-	r.ranCommand = &cmd
-	r.log = env.NewLogger(r.write, logFilePath(r.workDir, cmd))
-	return cmd.run(r.ctx, r.newEnv(r.workDir, r.log), args)
+	inv.ranCommand = &cmd
+	inv.log = env.NewLogger(inv.write, logFilePath(inv.workDir, cmd))
+	return cmd.run(inv.ctx, inv.newEnv(inv.workDir, inv.log), args)
 }
 
 func usageError(err error) error {

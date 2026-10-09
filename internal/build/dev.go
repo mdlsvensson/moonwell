@@ -79,14 +79,14 @@ type pendingChange struct {
 	since     time.Time
 }
 
-func (u *pendingChange) isDue(changed bool, now time.Time, debounce time.Duration) bool {
+func (c *pendingChange) isDue(changed bool, now time.Time, debounce time.Duration) bool {
 	if changed {
-		u.isWaiting, u.since = true, now
+		c.isWaiting, c.since = true, now
 	}
-	if !u.isWaiting || now.Sub(u.since) < debounce {
+	if !c.isWaiting || now.Sub(c.since) < debounce {
 		return false
 	}
-	u.isWaiting = false
+	c.isWaiting = false
 	return true
 }
 

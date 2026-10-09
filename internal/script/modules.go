@@ -128,7 +128,7 @@ type sourceSet struct {
 	byName  map[string]Source
 }
 
-func (c *sourceSet) addDir(f moduleDir) error {
+func (s *sourceSet) addDir(f moduleDir) error {
 	files, err := f.listModuleFiles()
 	if err != nil {
 		return err
@@ -138,7 +138,7 @@ func (c *sourceSet) addDir(f moduleDir) error {
 		if err != nil {
 			return err
 		}
-		if err := c.addSource(source); err != nil {
+		if err := s.addSource(source); err != nil {
 			return err
 		}
 		if source.Kind == Lua {
@@ -146,18 +146,18 @@ func (c *sourceSet) addDir(f moduleDir) error {
 				return err
 			}
 		}
-		c.sources = append(c.sources, source)
+		s.sources = append(s.sources, source)
 	}
 	return nil
 }
 
-func (f moduleDir) listModuleFiles() ([]string, error) {
-	files, err := fsx.ListFiles(f.path)
+func (d moduleDir) listModuleFiles() ([]string, error) {
+	files, err := fsx.ListFiles(d.path)
 	if err != nil {
-		return nil, errUnreadableFolder(f.failedAt(err), err)
+		return nil, errUnreadableFolder(d.failedAt(err), err)
 	}
-	outputs := f.compiledOutputs(files)
-	extension := "." + string(f.kind)
+	outputs := d.compiledOutputs(files)
+	extension := "." + string(d.kind)
 	var modules []string
 	for _, file := range files {
 		if strings.HasSuffix(file, extension) && !outputs[file] {
@@ -167,21 +167,21 @@ func (f moduleDir) listModuleFiles() ([]string, error) {
 	return modules, nil
 }
 
-func (f moduleDir) failedAt(cause error) string {
+func (d moduleDir) failedAt(cause error) string {
 	var failure *fs.PathError
 	if !errors.As(cause, &failure) {
-		return f.dir
+		return d.dir
 	}
-	below, err := filepath.Rel(f.path, failure.Path)
+	below, err := filepath.Rel(d.path, failure.Path)
 	if err != nil || below == "." || !filepath.IsLocal(below) {
-		return f.dir
+		return d.dir
 	}
-	return f.dir + "/" + fsx.ToSlash(below)
+	return d.dir + "/" + fsx.ToSlash(below)
 }
 
-func (f moduleDir) compiledOutputs(files []string) map[string]bool {
+func (d moduleDir) compiledOutputs(files []string) map[string]bool {
 	outputs := map[string]bool{}
-	if f.library == "" || f.kind != Lua {
+	if d.library == "" || d.kind != Lua {
 		return outputs
 	}
 	for _, file := range files {
@@ -192,27 +192,27 @@ func (f moduleDir) compiledOutputs(files []string) map[string]bool {
 	return outputs
 }
 
-func (f moduleDir) readSource(file string) (Source, error) {
-	path := f.dir + "/" + file
-	stem := strings.TrimSuffix(file, "."+string(f.kind))
+func (d moduleDir) readSource(file string) (Source, error) {
+	path := d.dir + "/" + file
+	stem := strings.TrimSuffix(file, "."+string(d.kind))
 	switch {
 	case strings.Contains(stem, "."):
-		return Source{}, errDottedName(path, f.library != "")
+		return Source{}, errDottedName(path, d.library != "")
 	case !utf8.ValidString(file):
-		return Source{}, errNameNotUTF8(path, f.library != "")
+		return Source{}, errNameNotUTF8(path, d.library != "")
 	}
-	return Source{Name: strings.ReplaceAll(stem, "/", "."), Path: path, Kind: f.kind, Library: f.library}, nil
+	return Source{Name: strings.ReplaceAll(stem, "/", "."), Path: path, Kind: d.kind, Library: d.library}, nil
 }
 
-func (c *sourceSet) addSource(source Source) error {
+func (s *sourceSet) addSource(source Source) error {
 	for _, name := range claimedNames(source.Name) {
 		if slices.Contains(builtins, name) {
 			return errBuiltinName(name, source)
 		}
-		if other, taken := c.byName[name]; taken {
+		if other, taken := s.byName[name]; taken {
 			return errTwoFiles(name, other, source)
 		}
-		c.byName[name] = source
+		s.byName[name] = source
 	}
 	return nil
 }

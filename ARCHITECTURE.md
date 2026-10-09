@@ -527,7 +527,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | change where the map is staged, or what is logged after | `internal/build/stage.go`: `stageOutputFile`, `logStaged` |
 | change where the archive goes, or how `build.folder` is read | `internal/build/archive.go`: `archivePath`, `resolveBuildDir`, `writeArchive` |
 | know which files go into the archive, and in which order | `internal/build/pack.go`: `packMap`, `archiveFiles` |
-| know how large a map may be, or change the archive's format | `internal/war3/mpq/room.go`: `CheckFits`; `internal/war3/mpq/write.go`: `Write` |
+| know how large a map may be, or change the archive's format | `internal/war3/mpq/size.go`: `CheckFits`; `internal/war3/mpq/write.go`: `Write` |
 | change what `dev` watches, or when it checks again | `internal/build/dev_watched.go`: `projectWatchSet`, `isProjectSource`, for what is watched; `internal/build/dev.go`: `Dev`, `isDue`, for when; the watcher in `internal/build/watch.go` |
 | change how the game is started | `internal/build/launch.go`: `launch`; `internal/env/spawn_windows.go` and `internal/env/spawn_unix.go` |
 
@@ -538,7 +538,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | add a setting to the manifest | `schema/Project.pkl` or `schema/MapSettings.pkl`, then the struct in `internal/manifest/project.go` or `internal/manifest/settings.go`; `internal/manifest/load_test.go` fails for a field no manifest sets |
 | know how the manifest is evaluated, and which of the two files | `internal/manifest/load.go`: `Load`, `findManifest`, `DecodeProject` |
 | change the check of the program's version against the project's | `internal/manifest/version.go`: `checkPackageVersion` |
-| know which `pkl` and which `yue` is run | `internal/toolchain/tools.go`: `FindPkl`, `FindCompiler` |
+| know which `pkl` and which `yue` is run | `internal/toolchain/find.go`: `FindPkl`, `FindCompiler` |
 | pin a new version of YueScript or Pkl | `internal/toolchain/tools.go`: `YueScript`, `Pkl`; the default `yue.version` in `schema/Project.pkl` |
 | change how a pinned program is downloaded and checked | `internal/toolchain/ensure.go`: `Ensure`; its steps in `internal/toolchain/install.go` |
 | change the version number | `version.go`, `schema/PklProject`, `install.ps1`, `install.sh`, and the two examples in `README.md`; `module_test.go` and `install_test.go` name one that was missed |
@@ -555,15 +555,15 @@ Each row names the file to open and, in most rows, the function to read first.
 | know what the bundle looks like, and how an error in the game finds its source line | `internal/script/bundle.go`: `bundle`; `runtime/moonwell.lua` |
 | know how the bundle gets into `war3map.lua` | `internal/script/inject.go`: `Inject` |
 | add a macro | `runtime/macros.yue`; it is written into a project by `RefreshMacros` in `internal/script/macros.go` |
-| change what Moonwell reads out of a Lua source | `internal/war3/lua/token.go`: `Tokenize`; the scanners in `internal/war3/lua/functions.go`, `internal/war3/lua/globals.go`, `internal/war3/lua/requires.go` |
+| change what Moonwell reads out of a Lua source | `internal/war3/lua/token.go`: `Tokenize`; the scanners in `internal/war3/lua/functions.go` (its parser is `internal/war3/lua/parser.go`), `internal/war3/lua/globals.go`, `internal/war3/lua/requires.go` |
 
 ### Objects, settings, assets, libraries, the editor
 
 | I want to | Open |
 | --- | --- |
-| follow an object from Pkl to the bytes of `war3map.w3u` | `internal/objects/plan.go`: `Plan`; `internal/objects/resolve.go`: `Resolve`; `internal/war3/objmod/append.go`: `AppendObjects` |
+| follow an object from Pkl to the bytes of `war3map.w3u` | `internal/objects/plan.go`: `Plan`; `internal/objects/resolve.go`: `Resolve`; `internal/objects/files.go`: `planChanges`; `internal/war3/objmod/append.go`: `AppendObjects` |
 | make a field of an object settable from Pkl | Nothing in Go: the fields are data. `go run ./tools/gen metadata <folder> <version>` writes `data/metadata.json` from the game's tables, and `go run ./tools/gen` then writes `schema/generated/`; `CONTRIBUTING.md` has the steps. The program reads the file in `internal/objects/metadata.go`: `LoadMetadata` |
-| change the words of an error about an object | the errors at the bottom of `internal/objects/resolve.go`, `internal/objects/fields.go` and `internal/objects/values.go` |
+| change the words of an error about an object | the errors at the bottom of `internal/objects/resolve.go`, `internal/objects/fields.go`, `internal/objects/levels.go` and `internal/objects/values.go` |
 | change `src/generated/objects.yue` | `internal/objects/ids.go`: `RenderIDs`, `RefreshIDs`, `RequireIDsCurrent` |
 | change the JSON of `objects:eval` | `internal/objects/eval.go`: `EvalJSON` |
 | follow a setting into `war3map.w3i` | `internal/settings/plan.go`: `Plan`; `internal/settings/info.go`: `patchInfo`; `internal/war3/w3i/edit.go` |
@@ -590,8 +590,8 @@ Each row names the file to open and, in most rows, the function to read first.
 | change how an error is printed | `internal/diag/diag.go`: `Format`, `FormatProblem` |
 | change a "did you mean" hint | `internal/diag/suggest.go`: `ClosestNames`, `EditDistance` |
 | know why a link or a file name is refused | `internal/fsx/paths.go`: `SafeJoinNoSymlinks`, `CleanRelPath` |
-| know how a map folder is scanned, and how a file is found in any letter case | `internal/mapdir/folder.go`: `Open`, `Key`, `Read`; `internal/mapdir/scan.go` |
-| know how planned changes are laid over a map | `internal/mapdir/view.go`: `WithChanges`, `ResolveNewPath` |
+| know how a map folder is scanned, and how a file is found in any letter case | `internal/mapdir/folder.go`: `Open`, `Read`; `internal/mapdir/paths.go`: `Key`; `internal/mapdir/scan.go` |
+| know how planned changes are laid over a map | `internal/mapdir/changes.go`: `WithChanges`, `ResolveNewPath` |
 | change where downloads are cached | `internal/env/cache.go`: `DefaultCacheDir` |
 | know what may import what, or add a package | `layout_test.go`: the lists at the top, and `allowed` |
 
@@ -668,7 +668,7 @@ that is under way, since the check holds the lock. The second gives back the loc
 folder beside its place, asks it for its version, and only then moves it into the cache. The `yue` on the PATH is
 never the compiler: a project names its version, or its own program with `yue.path`. The `pkl` on the PATH is used
 when it is 0.32 or newer. An older one is passed over for the pinned Pkl, with a warning, since a `pkl` command the
-user types still runs the old one. (`internal/toolchain/ensure.go`, `internal/toolchain/tools.go`.)
+user types still runs the old one. (`internal/toolchain/ensure.go`, `internal/toolchain/find.go`.)
 
 **The compile is two steps, and the editor's files are written early.** The declarations and the macro module are
 written before a library is fetched or a compiler downloaded, and the libraries' Lua between compiling and linking.
@@ -684,7 +684,7 @@ UTF-8 is kept as it is. White space is the six characters of ASCII, as Lua and t
 names sort by their bytes. A byte order mark at the start of a text that is read is dropped; a path in
 `war3map.imp` keeps one, because it is written back as it was read. (`internal/fsx/text.go`.)
 
-**One parser leaves its functions by a panic.** `parser` in `internal/war3/lua/functions.go` reads Lua's statements
+**One parser leaves its functions by a panic.** `parser` in `internal/war3/lua/parser.go` reads Lua's statements
 by recursive descent, where every step would otherwise return an error and every call check one. So `fail` panics
 with the error at a token the grammar does not allow, and `ParseFunctions`, which alone makes a `parser`, recovers
 that panic and returns the error. It is the only place where a panic is a way out of a function: any other panic is a

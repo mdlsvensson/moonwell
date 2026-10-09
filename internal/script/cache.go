@@ -78,8 +78,8 @@ func readCompileCache(root string) (compileCache, error) {
 	return kept, nil
 }
 
-func (h compileCache) hasOutputs() bool {
-	for _, source := range h.Sources {
+func (c compileCache) hasOutputs() bool {
+	for _, source := range c.Sources {
 		if !filepath.IsLocal(filepath.FromSlash(source.Output)) || !strings.HasSuffix(source.Output, ".lua") {
 			return false
 		}
@@ -87,9 +87,9 @@ func (h compileCache) hasOutputs() bool {
 	return true
 }
 
-func (h compileCache) splitStale(units []compileUnit, now dependsOn) (stale, upToDate []compileUnit) {
+func (c compileCache) splitStale(units []compileUnit, now dependsOn) (stale, upToDate []compileUnit) {
 	for _, u := range units {
-		if h.dependsOn == now && h.Sources[u.path] == (cachedSource{Hash: u.hash, Output: u.outputDir}) && fsx.Exists(u.output) {
+		if c.dependsOn == now && c.Sources[u.path] == (cachedSource{Hash: u.hash, Output: u.outputDir}) && fsx.Exists(u.output) {
 			upToDate = append(upToDate, u)
 		} else {
 			stale = append(stale, u)
@@ -152,13 +152,13 @@ func readUsesCache(root string, now listedWith) (map[string]cachedUses, error) {
 	return kept.Sources, nil
 }
 
-func (k usesCache) listsEverySource() bool {
-	for _, source := range k.Sources {
+func (c usesCache) listsEverySource() bool {
+	for _, source := range c.Sources {
 		if source.Uses == nil || slices.ContainsFunc(source.Uses, func(use globalUse) bool { return use.Name == "" }) {
 			return false
 		}
 	}
-	return k.Sources != nil
+	return c.Sources != nil
 }
 
 func writeUsesCache(root string, now listedWith, lists map[string]cachedUses) error {

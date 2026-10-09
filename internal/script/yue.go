@@ -65,8 +65,8 @@ func compileAll(ctx context.Context, e *env.Env, yue string, minify bool, m macr
 	return newCompileOutput(units, now.MacroSources), nil
 }
 
-func (s *compileOutput) readLua(source Source) (lua string, ok bool, err error) {
-	file, isCompiled := s.lua[source.Path]
+func (o *compileOutput) readLua(source Source) (lua string, ok bool, err error) {
+	file, isCompiled := o.lua[source.Path]
 	if source.Kind != Yue || !isCompiled {
 		return "", false, nil
 	}

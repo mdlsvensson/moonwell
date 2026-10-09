@@ -104,10 +104,10 @@ func relativeDirsOf(dir string, described LibraryFile) relativeDirs {
 	return folders
 }
 
-func (n relativeDirs) resolve(base string) sourceDirs {
-	from := sourceDirs{modules: fsx.ResolvePath(base, n.modules)}
-	if n.assets != "" {
-		from.assets = fsx.ResolvePath(base, n.assets)
+func (d relativeDirs) resolve(base string) sourceDirs {
+	from := sourceDirs{modules: fsx.ResolvePath(base, d.modules)}
+	if d.assets != "" {
+		from.assets = fsx.ResolvePath(base, d.assets)
 	}
 	return from
 }

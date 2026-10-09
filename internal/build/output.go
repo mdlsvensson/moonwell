@@ -73,12 +73,12 @@ func findBlockingFile(root, label string) (file string, found bool) {
 	return "", false
 }
 
-func (at outputFile) displayPathOf(file string) string {
-	below, err := filepath.Rel(at.fullPath, file)
+func (f outputFile) displayPathOf(file string) string {
+	below, err := filepath.Rel(f.fullPath, file)
 	if err != nil || below == "." || !filepath.IsLocal(below) {
-		return at.displayPath
+		return f.displayPath
 	}
-	return at.displayPath + "/" + filepath.ToSlash(below)
+	return f.displayPath + "/" + filepath.ToSlash(below)
 }
 
 func errFileForFolder(file, wanted string) error {
