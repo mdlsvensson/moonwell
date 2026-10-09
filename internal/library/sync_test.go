@@ -1698,3 +1698,30 @@ func TestAFileOfALocalLibraryThatBecameAFolderOrAFolderThatBecameAFileIsCopiedAn
 	writeTestFiles(t, root, ".moonwell/libraries/mine/"+stampFile+"/in the way", "a file")
 	asFile(t, root)
 }
+
+func TestSyncSaysWhichLibraryComesFromAFolderOfTheUsersFileAndNamesThatFileInItsErrors(t *testing.T) {
+	const usersFile = "the-users-folder/config.toml"
+	root := t.TempDir()
+	server := newFakeTagServer(nil)
+	source := filepath.Join(root, "checkout")
+	writeTestFiles(t, source, "src/a.lua", "local")
+	overridden := githubLibrary("v0.1.0", "src")
+	overridden.Path, overridden.OverriddenIn = &source, usersFile
+	e, log := newEnv(t, root, server)
+	if _, err := Sync(background, e, librariesOf("ex", overridden, "own", localLibrary(source, "src")), manifestFile); err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"Library ex: the local folder " + source + " (" + usersFile + ")."}
+	if lines := log.Lines(); !slices.Equal(lines, want) {
+		t.Errorf("logged %q, want %q: one line for the library of the user's file and none for the project's own", lines, want)
+	}
+	if readFile(t, root, ".moonwell/libraries/ex/a.lua") != "local" || len(server.urls) != 0 {
+		t.Errorf("the library was not copied from the folder, or it was downloaded: %q", server.urls)
+	}
+	gone := filepath.Join(root, "no-such-checkout")
+	overridden.Path = &gone
+	diagErr := mustFailSync(t, root, librariesOf("ex", overridden), server, "a folder of the user's file that is not there")
+	if diagErr.File != usersFile {
+		t.Errorf("got %q in %q, want the user's file named", diagErr.Msg, diagErr.File)
+	}
+}

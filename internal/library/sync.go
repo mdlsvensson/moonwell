@@ -1,6 +1,7 @@
 package library
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -147,7 +148,10 @@ func syncOne(
 	}
 	switch {
 	case library.Path != nil:
-		shipsAssets, err := syncLocal(e.Root, dirs, *library.Path, library.Dir, manifestName)
+		if library.OverriddenIn != "" {
+			e.Log.Info("Library " + key + ": the local folder " + *library.Path + " (" + library.OverriddenIn + ").")
+		}
+		shipsAssets, err := syncLocal(e.Root, dirs, *library.Path, library.Dir, cmp.Or(library.OverriddenIn, manifestName))
 		if err != nil {
 			return Synced{}, nil, err
 		}

@@ -92,3 +92,46 @@ func settingsOf(project *Project) []any {
 		project.Assets.Paths.Len(), len(project.Assets.Exclude), len(project.Libraries), project.Settings,
 	}
 }
+
+func TestLoadTakesALibraryFromTheFolderTheUsersFileNamesForItsRepository(t *testing.T) {
+	wrappers := absolutePath("moonwell-wrappers")
+	e := newProjectEnv(t, `
+[[libraries]]
+name = "wrappers"
+github = "mdlsvensson/moonwell-wrappers"
+tag = "v0.10.0"
+dir = "src"
+
+[[libraries]]
+name = "systems"
+github = "mdlsvensson/moonwell-systems"
+tag = "v0.5.0"
+
+[[libraries]]
+name = "beside"
+path = "../beside"
+`)
+	testkit.WriteFile(t, e.ConfigDir, UserFile, []byte(
+		"[[libraries]]\ngithub = \"MDLSvensson/Moonwell-Wrappers\"\npath = '"+wrappers+"'\n\n"+
+			"[[libraries]]\ngithub = \"someone/unused\"\npath = '"+absolutePath("unused")+"'\n"))
+	project, err := Load(e)
+	if err != nil {
+		t.Fatal(err)
+	}
+	overridden := project.Libraries["wrappers"]
+	if derefOrNil(overridden.Path) != wrappers || overridden.OverriddenIn != filepath.Join(e.ConfigDir, "config.toml") {
+		t.Errorf("wrappers = %+v, want the folder of the user's file, whatever the letter case of the repository", overridden)
+	}
+	if derefOrNil(overridden.Tag) != "v0.10.0" || derefOrNil(overridden.GitHub) != "mdlsvensson/moonwell-wrappers" || overridden.Dir != "src" {
+		t.Errorf("wrappers = %+v, want its repository, tag and dir as the project wrote them", overridden)
+	}
+	if systems := project.Libraries["systems"]; systems.Path != nil || systems.OverriddenIn != "" {
+		t.Errorf("systems = %+v, want it untouched: the user's file does not name its repository", systems)
+	}
+	if beside := project.Libraries["beside"]; derefOrNil(beside.Path) != "../beside" || beside.OverriddenIn != "" {
+		t.Errorf("beside = %+v, want the project's own path", beside)
+	}
+	if len(project.Libraries) != 3 {
+		t.Errorf("the project has %d libraries, want 3: the user's file adds none", len(project.Libraries))
+	}
+}

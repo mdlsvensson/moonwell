@@ -47,8 +47,9 @@ type Lint struct {
 }
 
 type Library struct {
-	GitHub *string `json:"github"`
-	Tag    *string `json:"tag"`
-	Path   *string `json:"path"`
-	Dir    string  `json:"dir"`
+	GitHub       *string `json:"github"`
+	Tag          *string `json:"tag"`
+	Path         *string `json:"path"`
+	Dir          string  `json:"dir"`
+	OverriddenIn string  `json:"-"`
 }
