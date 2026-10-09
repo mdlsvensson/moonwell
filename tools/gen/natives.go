@@ -24,20 +24,20 @@ const (
 )
 
 func writeNatives(checkout string, args []string, out io.Writer) error {
-	folder, version := args[0], args[1]
-	common, err := readScript(folder, commonScript)
+	exportDir, version := args[0], args[1]
+	common, err := readScript(exportDir, commonScript)
 	if err != nil {
 		return err
 	}
-	blizzard, err := readScript(folder, blizzardScript)
+	blizzard, err := readScript(exportDir, blizzardScript)
 	if err != nil {
 		return err
 	}
-	lua, err := readExtras(checkout)
+	extraDeclarations, err := readExtras(checkout)
 	if err != nil {
 		return err
 	}
-	natives, err := buildNatives(version, common, blizzard, lua)
+	natives, err := buildNatives(version, common, blizzard, extraDeclarations)
 	if err != nil {
 		return err
 	}
@@ -49,8 +49,8 @@ func writeNatives(checkout string, args []string, out io.Writer) error {
 	return nil
 }
 
-func readScript(folder, name string) (jass.File, error) {
-	text, err := export{folder}.readText(scriptsFolder + "/" + name)
+func readScript(exportDir, name string) (jass.File, error) {
+	text, err := export{exportDir}.readText(scriptsDir + "/" + name)
 	if err != nil {
 		return jass.File{}, err
 	}
@@ -72,7 +72,7 @@ func buildNatives(version string, common, blizzard jass.File, extras extras) (*s
 	natives.Functions = append(natives.Functions, luaFunctions(extras)...)
 	natives.Lua.Globals = append([]string{}, extras.Globals...)
 	natives.Lua.Removed = append([]string{}, extras.Removed...)
-	if err := checkDeclaredOnce(declarations(natives)); err != nil {
+	if err := checkDeclaredOnce(listDeclarations(natives)); err != nil {
 		return nil, err
 	}
 	sortByName(natives)
@@ -81,22 +81,22 @@ func buildNatives(version string, common, blizzard jass.File, extras extras) (*s
 
 func convertTypes(file jass.File) []script.NativeType {
 	types := make([]script.NativeType, len(file.Types))
-	for i, declared := range file.Types {
-		types[i] = script.NativeType{Name: declared.Name, Extends: declared.Extends}
+	for i, jassType := range file.Types {
+		types[i] = script.NativeType{Name: jassType.Name, Extends: jassType.Extends}
 	}
 	return types
 }
 
 func convertFunctions(file jass.File) []script.NativeFunction {
 	functions := make([]script.NativeFunction, len(file.Functions))
-	for i, declared := range file.Functions {
-		params := make([]script.NativeParam, len(declared.Params))
-		for j, param := range declared.Params {
+	for i, jassFunction := range file.Functions {
+		params := make([]script.NativeParam, len(jassFunction.Params))
+		for j, param := range jassFunction.Params {
 			params[j] = script.NativeParam{Name: param.Name, Type: param.Type}
 		}
 		functions[i] = script.NativeFunction{
-			Name: declared.Name, Source: declared.Source, Constant: declared.Constant, Params: params,
-			Returns: declared.Returns,
+			Name: jassFunction.Name, Source: jassFunction.Source, Constant: jassFunction.Constant, Params: params,
+			Returns: jassFunction.Returns,
 		}
 	}
 	return functions
@@ -104,18 +104,18 @@ func convertFunctions(file jass.File) []script.NativeFunction {
 
 func convertGlobals(file jass.File) []script.NativeGlobal {
 	globals := make([]script.NativeGlobal, len(file.Globals))
-	for i, declared := range file.Globals {
+	for i, jassGlobal := range file.Globals {
 		globals[i] = script.NativeGlobal{
-			Name: declared.Name, Source: declared.Source, Type: declared.Type, Constant: declared.Constant,
-			Array: declared.Array,
+			Name: jassGlobal.Name, Source: jassGlobal.Source, Type: jassGlobal.Type, Constant: jassGlobal.Constant,
+			Array: jassGlobal.Array,
 		}
 	}
 	return globals
 }
 
-func luaFunctions(lua extras) []script.NativeFunction {
-	functions := make([]script.NativeFunction, len(lua.Functions))
-	for i, extra := range lua.Functions {
+func luaFunctions(extraDeclarations extras) []script.NativeFunction {
+	functions := make([]script.NativeFunction, len(extraDeclarations.Functions))
+	for i, extra := range extraDeclarations.Functions {
 		functions[i] = script.NativeFunction{
 			Name: extra.Name, Source: luaSource, Params: append([]script.NativeParam{}, extra.Params...),
 			Returns: extra.Returns,
@@ -124,35 +124,35 @@ func luaFunctions(lua extras) []script.NativeFunction {
 	return functions
 }
 
-type declaration struct{ name, where string }
+type declaration struct{ name, source string }
 
-func declarations(natives *script.Natives) []declaration {
-	var declared []declaration
+func listDeclarations(natives *script.Natives) []declaration {
+	var all []declaration
 	for _, function := range natives.Functions {
-		declared = append(declared, declaration{function.Name, function.Source})
+		all = append(all, declaration{function.Name, function.Source})
 	}
 	for _, global := range natives.Globals {
-		declared = append(declared, declaration{global.Name, global.Source})
+		all = append(all, declaration{global.Name, global.Source})
 	}
 	for _, declaredType := range natives.Types {
-		declared = append(declared, declaration{declaredType.Name, "type"})
+		all = append(all, declaration{declaredType.Name, "type"})
 	}
 	for _, name := range natives.Lua.Globals {
-		declared = append(declared, declaration{name, "lua.globals"})
+		all = append(all, declaration{name, "lua.globals"})
 	}
 	for _, name := range natives.Lua.Removed {
-		declared = append(declared, declaration{name, "lua.removed"})
+		all = append(all, declaration{name, "lua.removed"})
 	}
-	return declared
+	return all
 }
 
 func checkDeclaredOnce(declared []declaration) error {
-	places := map[string]string{}
+	sources := map[string]string{}
 	for _, d := range declared {
-		if first, twice := places[d.name]; twice {
-			return errDeclaredTwice(d.name, first, d.where)
+		if firstSource, ok := sources[d.name]; ok {
+			return errDeclaredTwice(d.name, firstSource, d.source)
 		}
-		places[d.name] = d.where
+		sources[d.name] = d.source
 	}
 	return nil
 }
@@ -167,73 +167,48 @@ func sortByName(natives *script.Natives) {
 
 func renderNatives(natives *script.Natives) string {
 	return jsonObject(
-		member{"gameVersion", fsx.QuoteJSON(natives.GameVersion)},
-		member{"types", jsonList(natives.Types, renderType)},
-		member{"functions", jsonList(natives.Functions, renderFunction)},
-		member{"globals", jsonList(natives.Globals, renderGlobal)},
-		member{"lua", jsonObject(
-			member{"globals", jsonList(natives.Lua.Globals, fsx.QuoteJSON)},
-			member{"removed", jsonList(natives.Lua.Removed, fsx.QuoteJSON)},
+		jsonMember{"gameVersion", fsx.QuoteJSON(natives.GameVersion)},
+		jsonMember{"types", jsonList(natives.Types, renderType)},
+		jsonMember{"functions", jsonList(natives.Functions, renderFunction)},
+		jsonMember{"globals", jsonList(natives.Globals, renderGlobal)},
+		jsonMember{"lua", jsonObject(
+			jsonMember{"globals", jsonList(natives.Lua.Globals, fsx.QuoteJSON)},
+			jsonMember{"removed", jsonList(natives.Lua.Removed, fsx.QuoteJSON)},
 		)},
 	) + "\n"
 }
 
 func renderType(declared script.NativeType) string {
-	return jsonObject(member{"name", fsx.QuoteJSON(declared.Name)}, member{"extends", fsx.QuoteJSON(declared.Extends)})
+	return jsonObject(jsonMember{"name", fsx.QuoteJSON(declared.Name)}, jsonMember{"extends", fsx.QuoteJSON(declared.Extends)})
 }
 
 func renderFunction(function script.NativeFunction) string {
-	name := member{"name", fsx.QuoteJSON(function.Name)}
-	source := member{"source", fsx.QuoteJSON(function.Source)}
-	constant := member{"constant", strconv.FormatBool(function.Constant)}
-	returns := member{"returns", fsx.QuoteJSON(function.Returns)}
+	name := jsonMember{"name", fsx.QuoteJSON(function.Name)}
+	source := jsonMember{"source", fsx.QuoteJSON(function.Source)}
+	constant := jsonMember{"constant", strconv.FormatBool(function.Constant)}
+	returns := jsonMember{"returns", fsx.QuoteJSON(function.Returns)}
 	if function.Source == luaSource {
-		return jsonObject(name, member{"params", jsonList(function.Params, nameThenType)}, returns, source, constant)
+		return jsonObject(name, jsonMember{"params", jsonList(function.Params, renderLuaParam)}, returns, source, constant)
 	}
-	return jsonObject(name, source, constant, member{"params", jsonList(function.Params, typeThenName)}, returns)
+	return jsonObject(name, source, constant, jsonMember{"params", jsonList(function.Params, renderJassParam)}, returns)
 }
 
-func nameThenType(param script.NativeParam) string {
-	return jsonObject(member{"name", fsx.QuoteJSON(param.Name)}, member{"type", fsx.QuoteJSON(param.Type)})
+func renderLuaParam(param script.NativeParam) string {
+	return jsonObject(jsonMember{"name", fsx.QuoteJSON(param.Name)}, jsonMember{"type", fsx.QuoteJSON(param.Type)})
 }
 
-func typeThenName(param script.NativeParam) string {
-	return jsonObject(member{"type", fsx.QuoteJSON(param.Type)}, member{"name", fsx.QuoteJSON(param.Name)})
+func renderJassParam(param script.NativeParam) string {
+	return jsonObject(jsonMember{"type", fsx.QuoteJSON(param.Type)}, jsonMember{"name", fsx.QuoteJSON(param.Name)})
 }
 
 func renderGlobal(global script.NativeGlobal) string {
 	return jsonObject(
-		member{"name", fsx.QuoteJSON(global.Name)},
-		member{"source", fsx.QuoteJSON(global.Source)},
-		member{"type", fsx.QuoteJSON(global.Type)},
-		member{"constant", strconv.FormatBool(global.Constant)},
-		member{"array", strconv.FormatBool(global.Array)},
+		jsonMember{"name", fsx.QuoteJSON(global.Name)},
+		jsonMember{"source", fsx.QuoteJSON(global.Source)},
+		jsonMember{"type", fsx.QuoteJSON(global.Type)},
+		jsonMember{"constant", strconv.FormatBool(global.Constant)},
+		jsonMember{"array", strconv.FormatBool(global.Array)},
 	)
-}
-
-type member struct{ key, value string }
-
-func jsonObject(members ...member) string {
-	entries := make([]string, len(members))
-	for i, m := range members {
-		entries[i] = fsx.QuoteJSON(m.key) + ": " + m.value
-	}
-	return jsonBlock("{", entries, "}")
-}
-
-func jsonList[T any](items []T, render func(T) string) string {
-	entries := make([]string, len(items))
-	for i, item := range items {
-		entries[i] = render(item)
-	}
-	return jsonBlock("[", entries, "]")
-}
-
-func jsonBlock(opening string, entries []string, closing string) string {
-	if len(entries) == 0 {
-		return opening + closing
-	}
-	return opening + "\n  " + strings.ReplaceAll(strings.Join(entries, ",\n"), "\n", "\n  ") + "\n" + closing
 }
 
 func errDeclaredTwice(name, first, second string) error {

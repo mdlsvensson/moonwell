@@ -394,7 +394,7 @@ errors, printed after `error: `.
 ## The generator
 
 `tools/gen/` is a program of its own, with its own `main`. It writes the files that the program carries and the
-part of the Pkl schema that follows the game's data. It has four modes; `modes` in `tools/gen/main.go` is the table.
+part of the Pkl schema that follows the game's data. It has four modes; `subcommands` in `tools/gen/main.go` is the table.
 
 | Command line | Writes | From | Door |
 | --- | --- | --- | --- |
@@ -602,7 +602,7 @@ Each row names the file to open and, in most rows, the function to read first.
 
 | I want to | Open |
 | --- | --- |
-| add a mode to the generator | `tools/gen/main.go`: the table `modes` |
+| add a mode to the generator | `tools/gen/main.go`: the table `subcommands` |
 | change which files of an export are read, or a column's name | `tools/gen/export.go`: `readExport`, `columnsRead` |
 | change how a field gets its friendly name | `tools/gen/names.go`: `assignNames`, `camelCase` |
 | pin a name, or acknowledge a field the game dropped | `tools/metadata/overrides.json`; it is read by `readOverrides` in `tools/gen/names.go` |

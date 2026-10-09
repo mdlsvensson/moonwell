@@ -328,10 +328,10 @@ var (
 )
 
 const (
-	humanUnitStrings    = stringsFolder + "/humanunitstrings.txt"
-	humanAbilityStrings = stringsFolder + "/humanabilitystrings.txt"
-	humanUpgradeStrings = stringsFolder + "/humanupgradestrings.txt"
-	itemStrings         = stringsFolder + "/itemstrings.txt"
+	humanUnitStrings    = stringsDir + "/humanunitstrings.txt"
+	humanAbilityStrings = stringsDir + "/humanabilitystrings.txt"
+	humanUpgradeStrings = stringsDir + "/humanupgradestrings.txt"
+	itemStrings         = stringsDir + "/itemstrings.txt"
 )
 
 func miniExport() map[string]string {

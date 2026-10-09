@@ -339,11 +339,11 @@ func TestSchemaGeneratedMatchesTheObjectMetadata(t *testing.T) {
 	if len(files) != 7 {
 		t.Errorf("the schema has %d files, want 7", len(files))
 	}
-	committed := testkit.Snapshot(t, filepath.Join(testkit.RepoRoot(t), filepath.FromSlash(schemaFolder)))
+	committed := testkit.Snapshot(t, filepath.Join(testkit.RepoRoot(t), filepath.FromSlash(schemaDir)))
 	var differences []string
 	rendered := map[string]bool{}
 	for _, file := range files {
-		name := strings.TrimPrefix(file.path, schemaFolder+"/")
+		name := strings.TrimPrefix(file.path, schemaDir+"/")
 		rendered[name] = true
 		if found, there := committed[name]; !there {
 			differences = append(differences, "missing: "+file.path)
@@ -353,7 +353,7 @@ func TestSchemaGeneratedMatchesTheObjectMetadata(t *testing.T) {
 	}
 	for name := range committed {
 		if !rendered[name] {
-			differences = append(differences, "stray:   "+schemaFolder+"/"+name)
+			differences = append(differences, "stray:   "+schemaDir+"/"+name)
 		}
 	}
 	slices.Sort(differences)

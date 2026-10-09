@@ -81,21 +81,21 @@ func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
 }
 
 func TestEveryModeHasAUsageLineThatNamesItsCommandLine(t *testing.T) {
-	for _, m := range modes {
+	for _, m := range subcommands {
 		start := strings.TrimSuffix("Usage: go run ./tools/gen "+m.name, " ")
 		if m.usage != start && !strings.HasPrefix(m.usage, start+" ") {
 			t.Errorf("the mode %q: its usage line %q does not start with %q", m.name, m.usage, start)
 		}
-		args := append([]string{m.name}, make([]string, m.takes+1)...)
+		args := append([]string{m.name}, make([]string, m.argCount+1)...)
 		if _, _, err := newCheckout(t).run(args...); err == nil || err.Error() != m.usage {
-			t.Errorf("the mode %q with %d arguments: got %v, want its usage line", m.name, m.takes+1, err)
+			t.Errorf("the mode %q with %d arguments: got %v, want its usage line", m.name, m.argCount+1, err)
 		}
 	}
 }
 
 func TestTheTableStartsWithTheModeWithoutANameAndNamesEachModeOnce(t *testing.T) {
 	var names []string
-	for _, m := range modes {
+	for _, m := range subcommands {
 		if slices.Contains(names, m.name) {
 			t.Errorf("the table has the mode %q twice", m.name)
 		}

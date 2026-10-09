@@ -321,7 +321,7 @@ func TestTheModeMetadataWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	bases, err := standardObjects(game)
+	bases, err := buildBases(game)
 	if err != nil {
 		t.Fatal(err)
 	}

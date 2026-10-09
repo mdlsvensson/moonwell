@@ -14,30 +14,30 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-func standardObjects(game gameData) (map[manifest.Category]map[string]objects.BaseMeta, error) {
+func buildBases(game gameData) (map[manifest.Category]map[string]objects.BaseMeta, error) {
 	bases := map[manifest.Category]map[string]objects.BaseMeta{}
 	for _, category := range manifest.Categories {
 		bases[category] = map[string]objects.BaseMeta{}
 	}
-	if err := unitsByCategory(game, bases); err != nil {
+	if err := addUnits(game, bases); err != nil {
 		return nil, err
 	}
-	if err := objectsByTable(game, bases); err != nil {
+	if err := addObjects(game, bases); err != nil {
 		return nil, err
 	}
 	return bases, nil
 }
 
 type objectTable struct {
-	category manifest.Category
-	path     string
-	rows     []slk.Row
-	key      string
-	name     nameSource
-	levels   string
+	category     manifest.Category
+	path         string
+	rows         []slk.Row
+	key          string
+	nameSource   nameSource
+	levelsColumn string
 }
 
-func objectsByTable(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
+func addObjects(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
 	for _, table := range []objectTable{
 		{"items", itemsTable, game.items, itemKey, itemName, ""},
 		{"buffs", buffsTable, game.buffs, buffKey, buffName, ""},
@@ -46,29 +46,38 @@ func objectsByTable(game gameData, bases map[manifest.Category]map[string]object
 	} {
 		for _, row := range table.rows {
 			id := row.Value(table.key)
-			object := objects.BaseMeta{Name: table.name.nameFor(game.strings, id, row)}
-			if table.levels != "" {
-				count, err := levelCount(row, table.levels)
-				if err != nil {
-					return errInRow(table.path, id, err)
-				}
-				object.Levels = &count
+			base, err := table.newBase(game.strings, id, row)
+			if err != nil {
+				return errInRow(table.path, id, err)
 			}
-			bases[table.category][id] = object
+			bases[table.category][id] = base
 		}
 	}
 	return nil
 }
 
-func levelCount(row slk.Row, column string) (int, error) {
-	cell, has := row.Get(column)
-	if !has {
-		return 0, errNoLevels(column)
+func (t objectTable) newBase(gameStrings ini.File, id string, row slk.Row) (objects.BaseMeta, error) {
+	base := objects.BaseMeta{Name: t.nameSource.nameFor(gameStrings, id, row)}
+	if t.levelsColumn == "" {
+		return base, nil
+	}
+	count, err := parseLevelCount(row, t.levelsColumn)
+	if err != nil {
+		return objects.BaseMeta{}, err
+	}
+	base.Levels = &count
+	return base, nil
+}
+
+func parseLevelCount(row slk.Row, column string) (int, error) {
+	cell, ok := row.Get(column)
+	if !ok {
+		return 0, errNoLevelsCell(column)
 	}
 	if fsx.TrimASCIISpace(cell) == "" {
 		return 0, nil
 	}
-	count, isNumber := decimal(fsx.TrimASCIISpace(cell))
+	count, isNumber := parseDecimal(fsx.TrimASCIISpace(cell))
 	if !isNumber || count != math.Trunc(count) || count < 0 {
 		return 0, errBadLevels(column, cell)
 	}
@@ -77,70 +86,70 @@ func levelCount(row slk.Row, column string) (int, error) {
 
 var primaryAttributes = []string{"STR", "INT", "AGI"}
 
-func unitsByCategory(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
+func addUnits(game gameData, bases map[manifest.Category]map[string]objects.BaseMeta) error {
 	balance := map[string]slk.Row{}
 	for _, row := range game.balance {
 		balance[row.Value(balanceKey)] = row
 	}
-	var exceptions []string
+	var violations []string
 	for _, row := range game.units {
 		id := row.Value(unitKey)
-		stats, has := balance[id]
-		if !has {
+		balanceRow, ok := balance[id]
+		if !ok {
 			return errNoBalance(id)
 		}
-		category, broken := categoryOfUnit(id, stats)
-		exceptions = append(exceptions, broken...)
+		category, found := categoryOfUnit(id, balanceRow)
+		violations = append(violations, found...)
 		bases[category][id] = objects.BaseMeta{Name: unitName.nameFor(game.strings, id, row)}
 	}
-	if len(exceptions) > 0 {
-		return errHeroRule(exceptions)
+	if len(violations) > 0 {
+		return errHeroRule(violations)
 	}
 	return nil
 }
 
-func categoryOfUnit(id string, stats slk.Row) (category manifest.Category, broken []string) {
-	hero := id[0] >= 'A' && id[0] <= 'Z'
-	building := stats.Value("isbldg") == "1"
-	if primary := stats.Value("Primary"); hero != slices.Contains(primaryAttributes, primary) {
-		broken = append(broken, primaryDisagrees(id, hero, primary))
+func categoryOfUnit(id string, balanceRow slk.Row) (category manifest.Category, violations []string) {
+	isHero := id[0] >= 'A' && id[0] <= 'Z'
+	isBuilding := balanceRow.Value("isbldg") == "1"
+	if primary := balanceRow.Value("Primary"); isHero != slices.Contains(primaryAttributes, primary) {
+		violations = append(violations, describePrimaryMismatch(id, isHero, primary))
 	}
-	if hero && building {
-		broken = append(broken, heroIsABuilding(id))
+	if isHero && isBuilding {
+		violations = append(violations, describeHeroBuilding(id))
 	}
 	switch {
-	case hero:
-		return "heroes", broken
-	case building:
-		return "buildings", broken
+	case isHero:
+		return "heroes", violations
+	case isBuilding:
+		return "buildings", violations
 	}
-	return "units", broken
+	return "units", violations
 }
 
 type nameSource struct {
-	keys    []string
-	comment string
-	first   bool
+	keys          []string
+	commentColumn string
+	firstOfList   bool
 }
 
 var (
-	unitName    = nameSource{keys: []string{"Name"}, comment: "comment(s)"}
-	itemName    = nameSource{keys: []string{"Name"}, comment: "comment"}
-	abilityName = nameSource{keys: []string{"Name"}, comment: "comments"}
-	buffName    = nameSource{keys: []string{"EditorName", "Bufftip", "Name"}, comment: "comments"}
-	upgradeName = nameSource{keys: []string{"Name"}, comment: "comments", first: true}
+	unitName    = nameSource{keys: []string{"Name"}, commentColumn: "comment(s)"}
+	itemName    = nameSource{keys: []string{"Name"}, commentColumn: "comment"}
+	abilityName = nameSource{keys: []string{"Name"}, commentColumn: "comments"}
+	buffName    = nameSource{keys: []string{"EditorName", "Bufftip", "Name"}, commentColumn: "comments"}
+	upgradeName = nameSource{keys: []string{"Name"}, commentColumn: "comments", firstOfList: true}
 )
 
-func (s nameSource) nameFor(strs ini.File, id string, row slk.Row) string {
+func (s nameSource) nameFor(gameStrings ini.File, id string, row slk.Row) string {
 	for _, key := range s.keys {
-		if name := strs[id][key]; name != "" {
-			if s.first {
+		if name := gameStrings[id][key]; name != "" {
+			if s.firstOfList {
 				name = firstListItem(name)
 			}
 			return cleanName(name)
 		}
 	}
-	return cleanName(row.Value(s.comment))
+	return cleanName(row.Value(s.commentColumn))
 }
 
 func firstListItem(list string) string {
@@ -167,24 +176,24 @@ func errNoBalance(id string) error {
 	return errInRow(unitsTable, id, errors.New(balanceTable+" has no row for it"))
 }
 
-func errHeroRule(exceptions []string) error {
-	return errors.New("standard units break the rule for heroes: " + strings.Join(exceptions, ", ") +
+func errHeroRule(violations []string) error {
+	return errors.New("standard units break the rule for heroes: " + strings.Join(violations, ", ") +
 		". The rule: a unit whose id starts with a capital is a hero; a hero has STR, INT or AGI in the column " +
 		"Primary of " + balanceTable + " and is no building; no other unit has one of the three there. " +
 		"categoryOfUnit in tools/gen/bases.go sorts the units by it: change it to say what these units are.")
 }
 
-func primaryDisagrees(id string, capital bool, primary string) string {
+func describePrimaryMismatch(id string, isHero bool, primary string) string {
 	letters := "lowercase"
-	if capital {
+	if isHero {
 		letters = "uppercase"
 	}
 	return id + " (" + letters + ", primary attribute '" + primary + "')"
 }
 
-func heroIsABuilding(id string) string { return id + " (uppercase, a building)" }
+func describeHeroBuilding(id string) string { return id + " (uppercase, a building)" }
 
-func errNoLevels(column string) error {
+func errNoLevelsCell(column string) error {
 	return errors.New("the row has no " + column + " cell")
 }
 

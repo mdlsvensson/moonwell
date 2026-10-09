@@ -12,53 +12,6 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-const (
-	scriptsFolder = "war3.w3mod/scripts"
-	unitsFolder   = "war3.w3mod/units"
-	localeFolder  = "war3.w3mod/_locales/enus.w3mod"
-)
-
-const (
-	labelsFile    = localeFolder + "/ui/worldeditstrings.txt"
-	stringsFolder = localeFolder + "/units"
-	stringsSuffix = "strings.txt"
-
-	unitFieldsTable    = unitsFolder + "/unitmetadata.slk"
-	abilityFieldsTable = unitsFolder + "/abilitymetadata.slk"
-	buffFieldsTable    = unitsFolder + "/abilitybuffmetadata.slk"
-	upgradeFieldsTable = unitsFolder + "/upgrademetadata.slk"
-
-	abilitiesTable = unitsFolder + "/abilitydata.slk"
-	balanceTable   = unitsFolder + "/unitbalance.slk"
-	unitsTable     = unitsFolder + "/unitdata.slk"
-	itemsTable     = unitsFolder + "/itemdata.slk"
-	buffsTable     = unitsFolder + "/abilitybuffdata.slk"
-	upgradesTable  = unitsFolder + "/upgradedata.slk"
-)
-
-const (
-	fieldKey   = "ID"
-	abilityKey = "alias"
-	balanceKey = "unitBalanceID"
-	unitKey    = "unitID"
-	itemKey    = "itemID"
-	buffKey    = "alias"
-	upgradeKey = "upgradeid"
-)
-
-var columnsRead = map[string][]string{
-	unitFieldsTable:    {"displayName", "category", "type", "netsafe", "useUnit", "useHero", "useBuilding", "useItem"},
-	abilityFieldsTable: {"displayName", "category", "type", "netsafe", "repeat", "data", "useSpecific", "notSpecific"},
-	buffFieldsTable:    {"displayName", "category", "type", "netsafe"},
-	upgradeFieldsTable: {"displayName", "category", "type", "netsafe", "repeat", "effectType"},
-	abilitiesTable:     {"levels", "comments"},
-	balanceTable:       {"isbldg", "Primary"},
-	unitsTable:         {"comment(s)"},
-	itemsTable:         {"comment"},
-	buffsTable:         {"comments"},
-	upgradesTable:      {"maxlevel", "comments"},
-}
-
 type gameData struct {
 	labels  ini.Section
 	strings ini.File
@@ -74,13 +27,13 @@ type gameData struct {
 }
 
 func readExport(dir string) (gameData, error) {
-	from := export{dir}
+	source := export{dir}
 	var game gameData
 	var err error
-	if game.labels, err = from.readLabels(); err != nil {
+	if game.labels, err = source.readLabels(); err != nil {
 		return gameData{}, err
 	}
-	if game.strings, err = from.readStrings(); err != nil {
+	if game.strings, err = source.readStrings(); err != nil {
 		return gameData{}, err
 	}
 	for _, table := range []struct {
@@ -98,7 +51,7 @@ func readExport(dir string) (gameData, error) {
 		{&game.buffs, buffsTable, buffKey},
 		{&game.upgrades, upgradesTable, upgradeKey},
 	} {
-		if *table.rows, err = from.readRows(table.path, table.key); err != nil {
+		if *table.rows, err = source.readRows(table.path, table.key); err != nil {
 			return gameData{}, err
 		}
 	}
@@ -116,22 +69,22 @@ func (e export) readLabels() (ini.Section, error) {
 }
 
 func (e export) readStrings() (ini.File, error) {
-	names, err := e.listFiles(stringsFolder)
+	names, err := e.listFiles(stringsDir)
 	if err != nil {
 		return nil, err
 	}
-	all := ini.File{}
+	merged := ini.File{}
 	for _, name := range names {
 		if !strings.HasSuffix(strings.ToLower(name), stringsSuffix) {
 			continue
 		}
-		text, err := e.readText(stringsFolder + "/" + name)
+		text, err := e.readText(stringsDir + "/" + name)
 		if err != nil {
 			return nil, err
 		}
-		all.Add(text)
+		merged.Add(text)
 	}
-	return all, nil
+	return merged, nil
 }
 
 func (e export) readRows(path, key string) ([]slk.Row, error) {
@@ -158,25 +111,25 @@ func (e export) readRows(path, key string) ([]slk.Row, error) {
 }
 
 func (e export) readText(path string) (string, error) {
-	file, err := e.findFile(path)
+	fullPath, err := e.findFile(path)
 	if err != nil {
 		return "", err
 	}
-	data, err := os.ReadFile(file)
+	data, err := os.ReadFile(fullPath)
 	if err != nil {
-		return "", errFile(file, err)
+		return "", errFile(fullPath, err)
 	}
 	return fsx.DecodeText(data), nil
 }
 
 func (e export) listFiles(path string) ([]string, error) {
-	folder, err := e.findFile(path)
+	fullPath, err := e.findFile(path)
 	if err != nil {
 		return nil, err
 	}
-	entries, err := os.ReadDir(folder)
+	entries, err := os.ReadDir(fullPath)
 	if err != nil {
-		return nil, errFile(folder, err)
+		return nil, errFile(fullPath, err)
 	}
 	var names []string
 	for _, entry := range entries {
@@ -188,35 +141,82 @@ func (e export) listFiles(path string) ([]string, error) {
 }
 
 func (e export) findFile(path string) (string, error) {
-	found := e.dir
-	for step := range strings.SplitSeq(path, "/") {
-		name, has := findEntry(found, step)
-		if !has {
+	fullPath := e.dir
+	for segment := range strings.SplitSeq(path, "/") {
+		name, ok := findEntry(fullPath, segment)
+		if !ok {
 			return "", errMissingFromExport(path, e.dir)
 		}
-		found = filepath.Join(found, name)
+		fullPath = filepath.Join(fullPath, name)
 	}
-	return found, nil
+	return fullPath, nil
 }
 
-func findEntry(folder, name string) (spelled string, has bool) {
-	entries, _ := os.ReadDir(folder)
+func findEntry(dir, name string) (canonical string, ok bool) {
+	entries, _ := os.ReadDir(dir)
 	for _, entry := range entries {
 		if strings.ToLower(entry.Name()) == strings.ToLower(name) {
-			spelled, has = entry.Name(), true
+			canonical, ok = entry.Name(), true
 		}
 	}
-	return spelled, has
+	return canonical, ok
 }
 
-func errMissingFromExport(path, folder string) error {
-	return errors.New(path + " is missing from " + folder)
+const (
+	scriptsDir = "war3.w3mod/scripts"
+	unitsDir   = "war3.w3mod/units"
+	localeDir  = "war3.w3mod/_locales/enus.w3mod"
+)
+
+const (
+	labelsFile    = localeDir + "/ui/worldeditstrings.txt"
+	stringsDir    = localeDir + "/units"
+	stringsSuffix = "strings.txt"
+
+	unitFieldsTable    = unitsDir + "/unitmetadata.slk"
+	abilityFieldsTable = unitsDir + "/abilitymetadata.slk"
+	buffFieldsTable    = unitsDir + "/abilitybuffmetadata.slk"
+	upgradeFieldsTable = unitsDir + "/upgrademetadata.slk"
+
+	abilitiesTable = unitsDir + "/abilitydata.slk"
+	balanceTable   = unitsDir + "/unitbalance.slk"
+	unitsTable     = unitsDir + "/unitdata.slk"
+	itemsTable     = unitsDir + "/itemdata.slk"
+	buffsTable     = unitsDir + "/abilitybuffdata.slk"
+	upgradesTable  = unitsDir + "/upgradedata.slk"
+)
+
+const (
+	fieldKey   = "ID"
+	abilityKey = "alias"
+	balanceKey = "unitBalanceID"
+	unitKey    = "unitID"
+	itemKey    = "itemID"
+	buffKey    = "alias"
+	upgradeKey = "upgradeid"
+)
+
+var columnsRead = map[string][]string{
+	unitFieldsTable:    {"displayName", "category", "type", "netsafe", "useUnit", "useHero", "useBuilding", "useItem"},
+	abilityFieldsTable: {"displayName", "category", "type", "netsafe", "repeat", "data", "useSpecific", "notSpecific"},
+	buffFieldsTable:    {"displayName", "category", "type", "netsafe"},
+	upgradeFieldsTable: {"displayName", "category", "type", "netsafe", "repeat", "effectType"},
+	abilitiesTable:     {"levels", "comments"},
+	balanceTable:       {"isbldg", "Primary"},
+	unitsTable:         {"comment(s)"},
+	itemsTable:         {"comment"},
+	buffsTable:         {"comments"},
+	upgradesTable:      {"maxlevel", "comments"},
+}
+
+func errMissingFromExport(path, dir string) error {
+	return errors.New(path + " is missing from " + dir)
 }
 
 func rowNamed(table, id string) string { return table + ": " + id }
 
-func errInRow(table, id string, fault error) error {
-	return errors.New(rowNamed(table, id) + ": " + fault.Error())
+func errInRow(table, id string, cause error) error {
+	return errors.New(rowNamed(table, id) + ": " + cause.Error())
 }
 
 func errNoColumn(path, column string) error {

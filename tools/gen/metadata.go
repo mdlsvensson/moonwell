@@ -15,34 +15,37 @@ import (
 )
 
 func writeMetadata(checkout string, args []string, out io.Writer) error {
-	folder, version := args[0], args[1]
-	pins, err := readOverrides(checkout)
+	exportDir, version := args[0], args[1]
+	overrides, err := readOverrides(checkout)
 	if err != nil {
 		return err
 	}
-	game, err := readExport(folder)
+	game, err := readExport(exportDir)
 	if err != nil {
 		return err
 	}
-	fields, renames, err := buildNamedFields(game, pins)
+	fields, nameChanges, err := buildNamedFields(game, overrides)
 	if err != nil {
 		return err
 	}
-	bases, err := standardObjects(game)
+	bases, err := buildBases(game)
 	if err != nil {
 		return err
 	}
 	metadata := &objects.Metadata{Format: 1, Game: version, Fields: fields, Bases: bases}
-	if err := checkReleasedNamesKept(metadata, checkout, pins); err != nil {
+	if err := checkReleasedNamesKept(metadata, checkout, overrides); err != nil {
 		return err
 	}
-	return writeAndReport(checkout, metadata, renames, out)
-}
-
-func writeAndReport(checkout string, metadata *objects.Metadata, renames []rename, out io.Writer) error {
 	if err := os.WriteFile(pathIn(checkout, metadataPath), []byte(renderMetadata(metadata)), 0o666); err != nil {
 		return errInCheckout(checkout, metadataPath, err)
 	}
+	reportCounts(out, metadata)
+	reportNameChanges(out, nameChanges)
+	fmt.Fprintln(out, "wrote "+metadataPath+". Now run `"+commandLine+"`.")
+	return nil
+}
+
+func reportCounts(out io.Writer, metadata *objects.Metadata) {
 	var fields, bases []string
 	for _, list := range objects.FieldLists {
 		fields = append(fields, fsx.QuoteJSON(list)+":"+strconv.Itoa(len(metadata.Fields[list])))
@@ -52,19 +55,20 @@ func writeAndReport(checkout string, metadata *objects.Metadata, renames []renam
 	}
 	fmt.Fprintln(out, "fields: {"+strings.Join(fields, ",")+"}")
 	fmt.Fprintln(out, "bases: {"+strings.Join(bases, ",")+"}")
-	fmt.Fprintln(out, "renamed ("+strconv.Itoa(len(renames))+"):")
-	slices.SortStableFunc(renames, func(a, b rename) int {
+}
+
+func reportNameChanges(out io.Writer, nameChanges []nameChange) {
+	fmt.Fprintln(out, "renamed ("+strconv.Itoa(len(nameChanges))+"):")
+	slices.SortStableFunc(nameChanges, func(a, b nameChange) int {
 		byList := slices.Index(objects.FieldLists, a.list) - slices.Index(objects.FieldLists, b.list)
 		if byList != 0 {
 			return byList
 		}
 		return strings.Compare(a.id, b.id)
 	})
-	for _, renamed := range renames {
-		fmt.Fprintln(out, "  "+renamed.list+" "+renamed.id+" "+renamed.change)
+	for _, change := range nameChanges {
+		fmt.Fprintln(out, "  "+change.list+" "+change.id+" "+change.description)
 	}
-	fmt.Fprintln(out, "wrote "+metadataPath+". Now run `"+commandLine+"`.")
-	return nil
 }
 
 func renderMetadata(metadata *objects.Metadata) string {

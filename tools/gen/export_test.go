@@ -84,13 +84,13 @@ func TestReadExportFindsAFileWhateverTheLetterCaseOfItsPath(t *testing.T) {
 
 func TestReadExportReadsTheFilesOfStringsInTheOrderOfTheirNames(t *testing.T) {
 	game := readMini(t, func(files map[string]string) {
-		files[stringsFolder+"/aaastrings.txt"] = "[hfoo]\nName=First\nTip=Kept\n[hbar]\nName=First\n"
-		files[stringsFolder+"/zzzSTRINGS.TXT"] = "[hbar]\nName=Last\n"
-		files[stringsFolder+"/Zstrings.txt"] = "[Hpal]\nName=Before the small letters\n"
-		files[stringsFolder+"/notes.txt"] = "[hfoo]\nName=No strings\n"
-		files[stringsFolder+"/unitstrings.txt.bak"] = "[hfoo]\nName=No strings\n"
-		files[stringsFolder+"/morestrings.txt/held.txt"] = "[hfoo]\nName=In a folder\n"
-		files[stringsFolder+"/dottedSTR\xC4\xB0NGS.TXT"] = "[hfoo]\nDotted=Read\n"
+		files[stringsDir+"/aaastrings.txt"] = "[hfoo]\nName=First\nTip=Kept\n[hbar]\nName=First\n"
+		files[stringsDir+"/zzzSTRINGS.TXT"] = "[hbar]\nName=Last\n"
+		files[stringsDir+"/Zstrings.txt"] = "[Hpal]\nName=Before the small letters\n"
+		files[stringsDir+"/notes.txt"] = "[hfoo]\nName=No strings\n"
+		files[stringsDir+"/unitstrings.txt.bak"] = "[hfoo]\nName=No strings\n"
+		files[stringsDir+"/morestrings.txt/held.txt"] = "[hfoo]\nName=In a folder\n"
+		files[stringsDir+"/dottedSTR\xC4\xB0NGS.TXT"] = "[hfoo]\nDotted=Read\n"
 	})
 	for id, want := range map[string]string{"hfoo": "Footman", "hbar": "Last", "Hpal": "|cffffcc00Paladin|r"} {
 		if got := game.strings[id]["Name"]; got != want {
@@ -125,7 +125,7 @@ func TestReadExportNamesAMissingFileAsItAsksForIt(t *testing.T) {
 	for name := range miniExport() {
 		folder := exportedGame(t, func(files map[string]string) { delete(files, name) })
 		want := name + " is missing from " + folder
-		if strings.HasPrefix(name, stringsFolder+"/") {
+		if strings.HasPrefix(name, stringsDir+"/") {
 			want = ""
 		}
 		if _, err := readExport(folder); (err == nil) != (want == "") || (err != nil && err.Error() != want) {
@@ -140,7 +140,7 @@ func TestReadExportNamesAMissingFileAsItAsksForIt(t *testing.T) {
 	}{
 		"an export that is not there": {folder: missing, want: labelsFile},
 		"an empty folder argument":    {folder: "", want: labelsFile},
-		"no strings at all": {want: stringsFolder, change: func(files map[string]string) {
+		"no strings at all": {want: stringsDir, change: func(files map[string]string) {
 			for _, strs := range []string{humanUnitStrings, humanAbilityStrings, humanUpgradeStrings, itemStrings} {
 				delete(files, strs)
 			}
@@ -148,11 +148,11 @@ func TestReadExportNamesAMissingFileAsItAsksForIt(t *testing.T) {
 		"a file at the place of the folder of the tables": {want: unitFieldsTable,
 			change: func(files map[string]string) {
 				for name := range files {
-					if strings.HasPrefix(name, unitsFolder+"/") {
+					if strings.HasPrefix(name, unitsDir+"/") {
 						delete(files, name)
 					}
 				}
-				files[unitsFolder] = "a file\n"
+				files[unitsDir] = "a file\n"
 			}},
 		"two tables that are missing": {want: buffFieldsTable, change: func(files map[string]string) {
 			delete(files, upgradesTable)
@@ -195,12 +195,12 @@ func TestReadExportNamesWhatTheSystemCannotGiveByThePathItOpened(t *testing.T) {
 			delete(files, labelsFile)
 			files[labelsFile+"/held.txt"] = "held\n"
 		}},
-		"a file at the place of the folder of the strings": {opened: stringsFolder, read: asFolder,
+		"a file at the place of the folder of the strings": {opened: stringsDir, read: asFolder,
 			change: func(files map[string]string) {
 				for _, strs := range []string{humanUnitStrings, humanAbilityStrings, humanUpgradeStrings, itemStrings} {
 					delete(files, strs)
 				}
-				files[stringsFolder] = "a file\n"
+				files[stringsDir] = "a file\n"
 			}},
 	} {
 		folder := exportedGame(t, c.change)

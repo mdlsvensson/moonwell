@@ -398,8 +398,8 @@ func TestRenderNativesWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
 func exportedScripts(t testing.TB, common, blizzard string) string {
 	t.Helper()
 	folder := t.TempDir()
-	testkit.WriteFile(t, folder, scriptsFolder+"/"+commonScript, []byte(common))
-	testkit.WriteFile(t, folder, scriptsFolder+"/"+blizzardScript, []byte(blizzard))
+	testkit.WriteFile(t, folder, scriptsDir+"/"+commonScript, []byte(common))
+	testkit.WriteFile(t, folder, scriptsDir+"/"+blizzardScript, []byte(blizzard))
 	return folder
 }
 
@@ -474,11 +474,11 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 	const kept = "the natives of another version\n"
 	whole := exportedScripts(t, miniCommon, miniBlizzard)
 	noBlizzard := t.TempDir()
-	testkit.WriteFile(t, noBlizzard, scriptsFolder+"/"+commonScript, []byte(miniCommon))
+	testkit.WriteFile(t, noBlizzard, scriptsDir+"/"+commonScript, []byte(miniCommon))
 	noFolder := filepath.Join(noBlizzard, "no-such-folder")
 	blizzardAsFolder := t.TempDir()
-	testkit.WriteFile(t, blizzardAsFolder, scriptsFolder+"/"+commonScript, []byte(miniCommon))
-	testkit.WriteFile(t, blizzardAsFolder, scriptsFolder+"/"+blizzardScript+"/held.txt", []byte("held\n"))
+	testkit.WriteFile(t, blizzardAsFolder, scriptsDir+"/"+commonScript, []byte(miniCommon))
+	testkit.WriteFile(t, blizzardAsFolder, scriptsDir+"/"+blizzardScript+"/held.txt", []byte("held\n"))
 	for name, c := range map[string]struct {
 		folder string
 		lay    func(c checkout)

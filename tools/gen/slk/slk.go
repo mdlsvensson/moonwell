@@ -12,8 +12,8 @@ type Row struct {
 }
 
 func (r Row) Get(column string) (string, bool) {
-	value, has := r.values[column]
-	return value, has
+	value, ok := r.values[column]
+	return value, ok
 }
 
 func (r Row) Value(column string) string { return r.values[column] }
@@ -166,7 +166,7 @@ func buildColumns(header map[int]string, displayPath string) ([]string, error) {
 func buildRow(cells, header map[int]string) Row {
 	row := Row{values: map[string]string{}}
 	for x, cell := range cells {
-		if name, named := header[x]; named {
+		if name, ok := header[x]; ok {
 			row.values[name] = cell
 		}
 	}

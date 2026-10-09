@@ -14,8 +14,8 @@ func Parse(source string) File {
 
 func (f File) Add(source string) {
 	var section Section
-	for _, raw := range strings.Split(source, "\n") {
-		line := trim(raw)
+	for _, rawLine := range strings.Split(source, "\n") {
+		line := trim(rawLine)
 		switch {
 		case line == "" || strings.HasPrefix(line, "//"):
 		case strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]"):

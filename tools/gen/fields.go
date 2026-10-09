@@ -14,42 +14,42 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-func buildNamedFields(game gameData, pins overrides) (map[string][]objects.FieldMeta, []rename, error) {
+func buildNamedFields(game gameData, overrides nameOverrides) (map[string][]objects.FieldMeta, []nameChange, error) {
 	fields := map[string][]objects.FieldMeta{}
 	for _, list := range objects.FieldLists {
 		fields[list] = []objects.FieldMeta{}
 	}
-	var renames []rename
+	var nameChanges []nameChange
 	var problems []string
 	for _, table := range fieldTables(game) {
 		records, unlabelled, err := fieldRecords(table, game.labels)
 		if err != nil {
 			return nil, nil, err
 		}
-		changes, unnamed := assignNames(records, table.lists[0], pins, baseAbilities(game))
+		changes, unnamed := assignNames(records, table.lists[0], overrides, baseAbilities(game))
 		problems = slices.Concat(problems, unlabelled, unnamed)
 		for i, field := range records {
 			lists := listsOf(field, table.lists)
 			if len(lists) == 0 {
-				problems = append(problems, usedByNothing(table.path, field))
+				problems = append(problems, describeUnused(table.path, field))
 				continue
 			}
 			for _, list := range lists {
 				fields[list] = append(fields[list], field)
 			}
 			if changes[i] != "" {
-				renames = append(renames, rename{list: lists[0], id: displayRawcode(field.ID), change: changes[i]})
+				nameChanges = append(nameChanges, nameChange{list: lists[0], id: displayRawcode(field.ID), description: changes[i]})
 			}
 		}
 	}
-	problems = append(problems, pins.unusedPins(fields)...)
+	problems = append(problems, overrides.unusedPins(fields)...)
 	if len(problems) > 0 {
 		return nil, nil, errNoFriendlyNames(problems)
 	}
 	for _, list := range objects.FieldLists {
 		slices.SortStableFunc(fields[list], func(a, b objects.FieldMeta) int { return strings.Compare(a.ID, b.ID) })
 	}
-	return fields, renames, nil
+	return fields, nameChanges, nil
 }
 
 type fieldTable struct {
@@ -79,21 +79,21 @@ func listsOf(field objects.FieldMeta, lists []string) []string {
 	if len(lists) == 1 {
 		return lists
 	}
-	var in []string
+	var result []string
 	if slices.ContainsFunc(field.Use, func(use string) bool { return use != "item" }) {
-		in = append(in, "units")
+		result = append(result, "units")
 	}
 	if slices.Contains(field.Use, "item") {
-		in = append(in, "items")
+		result = append(result, "items")
 	}
-	return in
+	return result
 }
 
 func fieldRecords(table fieldTable, labels ini.Section) (records []objects.FieldMeta, unlabelled []string, err error) {
 	for _, row := range table.rows {
 		label, found := labelOf(row, labels)
 		if !found {
-			unlabelled = append(unlabelled, noLabel(table.path, row))
+			unlabelled = append(unlabelled, describeNoLabel(table.path, row))
 		}
 		record, err := fieldRecord(row, label, table.lists[0])
 		if err != nil {
@@ -105,11 +105,11 @@ func fieldRecords(table fieldTable, labels ini.Section) (records []objects.Field
 }
 
 func fieldRecord(row slk.Row, label, list string) (objects.FieldMeta, error) {
-	repeat, err := numberCell(row, "repeat")
+	repeat, err := parseNumberCell(row, "repeat")
 	if err != nil {
 		return objects.FieldMeta{}, err
 	}
-	column, err := dataColumn(row)
+	column, err := parseDataColumn(row)
 	if err != nil {
 		return objects.FieldMeta{}, err
 	}
@@ -181,14 +181,14 @@ func splitIDs(cell string) []string {
 const labelDepth = 8
 
 func labelOf(row slk.Row, labels ini.Section) (label string, found bool) {
-	key, named := row.Get("displayName")
-	if !named {
+	key, ok := row.Get("displayName")
+	if !ok {
 		return "", false
 	}
 	label = key
 	for range labelDepth {
-		next, leadsOn := labels[label]
-		if !leadsOn {
+		next, ok := labels[label]
+		if !ok {
 			break
 		}
 		label = next
@@ -204,14 +204,14 @@ func effectLabel(label string, row slk.Row) string {
 }
 
 func withoutLastDash(label string) string {
-	dashed, ends := strings.CutSuffix(strings.TrimRight(label, fsx.ASCIISpace), "-")
-	if !ends {
+	trimmed, ok := strings.CutSuffix(strings.TrimRight(label, fsx.ASCIISpace), "-")
+	if !ok {
 		return label
 	}
-	return strings.TrimRight(dashed, fsx.ASCIISpace)
+	return strings.TrimRight(trimmed, fsx.ASCIISpace)
 }
 
-func decimal(text string) (float64, bool) {
+func parseDecimal(text string) (float64, bool) {
 	value, err := strconv.ParseFloat(text, 64)
 	if err != nil || math.IsInf(value, 0) || math.IsNaN(value) || strings.ContainsAny(text, "xX_") {
 		return 0, false
@@ -219,20 +219,20 @@ func decimal(text string) (float64, bool) {
 	return value, true
 }
 
-func numberCell(row slk.Row, column string) (float64, error) {
+func parseNumberCell(row slk.Row, column string) (float64, error) {
 	cell := fsx.TrimASCIISpace(row.Value(column))
 	if cell == "" {
 		return 0, nil
 	}
-	value, isNumber := decimal(cell)
+	value, isNumber := parseDecimal(cell)
 	if !isNumber {
-		return 0, errNoNumber(row, column)
+		return 0, errNotANumber(row, column)
 	}
 	return value, nil
 }
 
-func dataColumn(row slk.Row) (int, error) {
-	column, err := numberCell(row, "data")
+func parseDataColumn(row slk.Row) (int, error) {
+	column, err := parseNumberCell(row, "data")
 	if err != nil {
 		return 0, err
 	}
@@ -246,20 +246,20 @@ func errNoFriendlyNames(problems []string) error {
 	return errors.New("cannot derive friendly names:\n  " + strings.Join(problems, "\n  "))
 }
 
-func noLabel(table string, row slk.Row) string {
-	key, has := row.Get("displayName")
-	if !has {
+func describeNoLabel(table string, row slk.Row) string {
+	key, ok := row.Get("displayName")
+	if !ok {
 		return rowNamed(table, row.Value(fieldKey)) + ": the row has no displayName cell, which names the label"
 	}
 	return rowNamed(table, row.Value(fieldKey)) + ": no label for " + key + " in " + labelsFile
 }
 
-func usedByNothing(table string, field objects.FieldMeta) string {
+func describeUnused(table string, field objects.FieldMeta) string {
 	return rowNamed(table, displayRawcode(field.ID)) + ": no kind of object uses it: none of useUnit, useHero, " +
 		"useBuilding and useItem is 1"
 }
 
-func errNoNumber(row slk.Row, column string) error {
+func errNotANumber(row slk.Row, column string) error {
 	return errors.New("the " + column + " cell '" + row.Value(column) + "' is not a number")
 }
 

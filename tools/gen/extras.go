@@ -23,48 +23,48 @@ type extraFunction struct {
 }
 
 func readExtras(checkout string) (extras, error) {
-	var lua extras
-	if err := readHandWritten(checkout, extrasPath, &lua); err != nil {
+	var parsed extras
+	if err := readHandWritten(checkout, extrasPath, &parsed); err != nil {
 		return extras{}, err
 	}
-	return lua, checkExtras(lua)
+	return parsed, checkExtras(parsed)
 }
 
-func checkExtras(lua extras) error {
-	for i, function := range lua.Functions {
-		place := "functions." + strconv.Itoa(i)
+func checkExtras(parsed extras) error {
+	for i, function := range parsed.Functions {
+		location := "functions." + strconv.Itoa(i)
 		switch {
 		case function.Name == "":
-			return errExtraLacks(place, "name")
+			return errExtraLacks(location, "name")
 		case function.Params == nil:
-			return errExtraLacks(place, "params")
+			return errExtraLacks(location, "params")
 		case function.Returns == "":
-			return errExtraLacks(place, "returns")
+			return errExtraLacks(location, "returns")
 		}
 		for j, param := range function.Params {
 			if param.Name == "" || param.Type == "" {
-				return errParamLacks(place + ".params." + strconv.Itoa(j))
+				return errParamLacks(location + ".params." + strconv.Itoa(j))
 			}
 		}
 	}
-	if at := slices.Index(lua.Globals, ""); at >= 0 {
-		return errEmptyGlobal("globals." + strconv.Itoa(at))
+	if index := slices.Index(parsed.Globals, ""); index >= 0 {
+		return errEmptyGlobal("globals." + strconv.Itoa(index))
 	}
-	if at := slices.Index(lua.Removed, ""); at >= 0 {
-		return errEmptyGlobal("removed." + strconv.Itoa(at))
+	if index := slices.Index(parsed.Removed, ""); index >= 0 {
+		return errEmptyGlobal("removed." + strconv.Itoa(index))
 	}
 	return nil
 }
 
-func errExtraLacks(place, key string) error {
-	return errors.New(extrasPath + ": " + place + ` has no "` + key + `". Every function has a "name", its ` +
+func errExtraLacks(location, key string) error {
+	return errors.New(extrasPath + ": " + location + ` has no "` + key + `". Every function has a "name", its ` +
 		`"params" (a list, [] for a function that takes nothing) and what it "returns".`)
 }
 
-func errParamLacks(place string) error {
-	return errors.New(extrasPath + ": " + place + ` lacks its "name" or its "type".`)
+func errParamLacks(location string) error {
+	return errors.New(extrasPath + ": " + location + ` lacks its "name" or its "type".`)
 }
 
-func errEmptyGlobal(place string) error {
-	return errors.New(extrasPath + ": " + place + " is empty or null.")
+func errEmptyGlobal(location string) error {
+	return errors.New(extrasPath + ": " + location + " is empty or null.")
 }

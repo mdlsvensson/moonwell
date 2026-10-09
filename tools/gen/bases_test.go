@@ -11,7 +11,7 @@ import (
 
 func basesOf(t *testing.T, change func(files map[string]string)) map[manifest.Category]map[string]objects.BaseMeta {
 	t.Helper()
-	bases, err := standardObjects(readMini(t, change))
+	bases, err := buildBases(readMini(t, change))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -20,7 +20,7 @@ func basesOf(t *testing.T, change func(files map[string]string)) map[manifest.Ca
 
 func basesRefused(t *testing.T, change func(files map[string]string)) string {
 	t.Helper()
-	_, err := standardObjects(readMini(t, change))
+	_, err := buildBases(readMini(t, change))
 	if err == nil {
 		t.Fatal("the standard objects were read")
 	}
@@ -152,7 +152,7 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 func TestLevelCountIsAWholeNumberThatIsNotNegative(t *testing.T) {
 	count := func(cell any) (int, error) {
 		rows := rowsOf(t, []string{"comments", "alias", "levels"}, []any{"a comment", "AHhb", cell})
-		return levelCount(rows[0], "levels")
+		return parseLevelCount(rows[0], "levels")
 	}
 	for cell, want := range map[any]int{
 		3: 3, 0: 0, "": 0, " \t": 0, " 4\r": 4, "3.0": 3, "1e1": 10, "-0": 0, "+2": 2, "100": 100,

@@ -24,7 +24,7 @@ func writeGamePaths(checkout string, args []string, out io.Writer) error {
 	if err != nil {
 		return errFile(listFile, err)
 	}
-	paths := gamePaths(fsx.DecodeText(data))
+	paths := parseGamePaths(fsx.DecodeText(data))
 	if len(paths) == 0 {
 		return errNoGamePaths()
 	}
@@ -36,35 +36,35 @@ func writeGamePaths(checkout string, args []string, out io.Writer) error {
 	return nil
 }
 
-func gamePaths(list string) []string {
-	named := map[string]bool{}
+func parseGamePaths(list string) []string {
+	seen := map[string]bool{}
 	for line := range strings.SplitSeq(list, "\n") {
-		if path, kept := normalizeGamePath(line); kept {
-			named[path] = true
+		if path, ok := normalizeGamePath(line); ok {
+			seen[path] = true
 		}
 	}
-	return slices.Sorted(maps.Keys(named))
+	return slices.Sorted(maps.Keys(seen))
 }
 
 func normalizeGamePath(line string) (string, bool) {
-	path := strings.ReplaceAll(strings.ToLower(fsx.TrimASCIISpace(line)), `\`, "/")
-	path = path[strings.LastIndex(path, ":")+1:]
-	steps := strings.FieldsFunc(path, func(r rune) bool { return r == '/' })
-	kept := strings.Join(steps[pastContainers(steps):], "/")
-	return kept, canBeReferenced(kept)
+	listed := strings.ReplaceAll(strings.ToLower(fsx.TrimASCIISpace(line)), `\`, "/")
+	listed = listed[strings.LastIndex(listed, ":")+1:]
+	segments := strings.FieldsFunc(listed, func(r rune) bool { return r == '/' })
+	path := strings.Join(segments[afterLastContainer(segments):], "/")
+	return path, isModelOrTexture(path)
 }
 
-func pastContainers(steps []string) int {
+func afterLastContainer(segments []string) int {
 	start := 0
-	for i, step := range steps {
-		if strings.HasSuffix(step, ".w3mod") || strings.HasSuffix(step, ".mpq") {
+	for i, segment := range segments {
+		if strings.HasSuffix(segment, ".w3mod") || strings.HasSuffix(segment, ".mpq") {
 			start = i + 1
 		}
 	}
 	return start
 }
 
-func canBeReferenced(path string) bool {
+func isModelOrTexture(path string) bool {
 	dot := strings.LastIndex(path, ".")
 	if dot < 0 {
 		return false

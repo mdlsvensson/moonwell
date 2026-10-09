@@ -44,8 +44,8 @@ var (
 
 func Parse(script, source string) (File, error) {
 	r := reader{source: source, file: File{Types: []Type{}, Functions: []Function{}, Globals: []Global{}}}
-	for index, raw := range strings.Split(script, "\n") {
-		if err := r.readLine(index+1, raw); err != nil {
+	for index, rawLine := range strings.Split(script, "\n") {
+		if err := r.readLine(index+1, rawLine); err != nil {
 			return File{}, err
 		}
 	}
@@ -56,42 +56,42 @@ func Parse(script, source string) (File, error) {
 }
 
 const (
-	atTheTop = iota
+	atTopLevel = iota
 	inGlobals
-	inABody
+	inFunctionBody
 )
 
 type reader struct {
 	source    string
 	file      File
-	place     int
+	state     int
 	bodyStart int
 }
 
-func (r *reader) readLine(lineNumber int, raw string) error {
-	line := trim(stripComment(raw))
+func (r *reader) readLine(lineNumber int, rawLine string) error {
+	line := trim(stripComment(rawLine))
 	switch {
 	case line == "":
-	case r.place == inABody:
+	case r.state == inFunctionBody:
 		if endFunction.MatchString(line) {
-			r.place = atTheTop
+			r.state = atTopLevel
 		}
-	case r.place == inGlobals:
-		return r.readGlobal(lineNumber, raw, line)
+	case r.state == inGlobals:
+		return r.readGlobal(lineNumber, rawLine, line)
 	default:
-		return r.readDeclaration(lineNumber, raw, line)
+		return r.readDeclaration(lineNumber, rawLine, line)
 	}
 	return nil
 }
 
-func (r *reader) readGlobal(lineNumber int, raw, line string) error {
+func (r *reader) readGlobal(lineNumber int, rawLine, line string) error {
 	if line == "endglobals" {
-		r.place = atTheTop
+		r.state = atTopLevel
 		return nil
 	}
 	match := globalLine.FindStringSubmatch(line)
 	if match == nil {
-		return errCannotRead(r.source, lineNumber, raw)
+		return errCannotRead(r.source, lineNumber, rawLine)
 	}
 	r.file.Globals = append(r.file.Globals, Global{
 		Name: match[4], Source: r.source, Type: match[2], Constant: match[1] != "", Array: match[3] != "",
@@ -99,9 +99,9 @@ func (r *reader) readGlobal(lineNumber int, raw, line string) error {
 	return nil
 }
 
-func (r *reader) readDeclaration(lineNumber int, raw, line string) error {
+func (r *reader) readDeclaration(lineNumber int, rawLine, line string) error {
 	if line == "globals" {
-		r.place = inGlobals
+		r.state = inGlobals
 		return nil
 	}
 	if match := typeLine.FindStringSubmatch(line); match != nil {
@@ -110,24 +110,24 @@ func (r *reader) readDeclaration(lineNumber int, raw, line string) error {
 	}
 	header := headerLine.FindStringSubmatch(line)
 	if header == nil {
-		return errCannotRead(r.source, lineNumber, raw)
+		return errCannotRead(r.source, lineNumber, rawLine)
 	}
 	params, ok := parseParams(header[4])
 	if !ok {
-		return errCannotRead(r.source, lineNumber, raw)
+		return errCannotRead(r.source, lineNumber, rawLine)
 	}
 	r.file.Functions = append(r.file.Functions, Function{
 		Name: header[3], Source: r.source, Constant: header[1] != "", Params: params, Returns: header[5],
 	})
 	if header[2] == "function" {
-		r.place, r.bodyStart = inABody, lineNumber
+		r.state, r.bodyStart = inFunctionBody, lineNumber
 	}
 	return nil
 }
 
 func (r *reader) finish() error {
-	switch r.place {
-	case inABody:
+	switch r.state {
+	case inFunctionBody:
 		return errNoEndFunction(r.source, r.bodyStart)
 	case inGlobals:
 		return errNoEndGlobals(r.source)
@@ -167,7 +167,7 @@ func parseParams(list string) ([]Param, bool) {
 
 func trim(text string) string { return strings.Trim(text, " \t\n\v\f\r") }
 
-func quoted(line string) string {
+func quoteLine(line string) string {
 	var out strings.Builder
 	encoder := json.NewEncoder(&out)
 	encoder.SetEscapeHTML(false)
@@ -177,8 +177,8 @@ func quoted(line string) string {
 	return strings.TrimSuffix(out.String(), "\n")
 }
 
-func errCannotRead(source string, line int, raw string) error {
-	return fmt.Errorf("%s:%d: cannot read %s", source, line, quoted(trim(raw)))
+func errCannotRead(source string, line int, rawLine string) error {
+	return fmt.Errorf("%s:%d: cannot read %s", source, line, quoteLine(trim(rawLine)))
 }
 
 func errNoEndFunction(source string, line int) error {

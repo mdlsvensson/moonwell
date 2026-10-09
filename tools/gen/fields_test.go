@@ -12,9 +12,9 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-var unitClass = overrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}}}
+var unitClass = nameOverrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}}}
 
-func namedFields(t testing.TB, change func(files map[string]string)) (map[string][]objects.FieldMeta, []rename) {
+func namedFields(t testing.TB, change func(files map[string]string)) (map[string][]objects.FieldMeta, []nameChange) {
 	t.Helper()
 	fields, renames, err := buildNamedFields(readMini(t, change), unitClass)
 	if err != nil {
@@ -184,7 +184,7 @@ func TestNameFieldsPutsAFieldOfTheUnitsTableIntoTheListsOfWhatUsesIt(t *testing.
 			`C;X1;Y13;K"unon"`, `C;X5;K"stats"`, `C;X6;K"WESTRING_NONE"`, `C;X7;K"int"`)
 		files[labelsFile] += "WESTRING_NONE=Used by Nothing\r\n"
 	})
-	_, _, err := buildNamedFields(game, overrides{})
+	_, _, err := buildNamedFields(game, nameOverrides{})
 	if err == nil {
 		t.Fatal("the fields were named")
 	}
@@ -253,8 +253,8 @@ func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 		if label != c.label || found != c.found {
 			t.Errorf("%s: the label is %q, found %v; want %q, %v", rows[i].Value("ID"), label, found, c.label, c.found)
 		}
-		if !found && noLabel("table.slk", rows[i]) != c.line {
-			t.Errorf("%s: the line is %q, want %q", rows[i].Value("ID"), noLabel("table.slk", rows[i]), c.line)
+		if !found && describeNoLabel("table.slk", rows[i]) != c.line {
+			t.Errorf("%s: the line is %q, want %q", rows[i].Value("ID"), describeNoLabel("table.slk", rows[i]), c.line)
 		}
 	}
 	_, unlabelled, err := fieldRecords(fieldTable{"table.slk", rows, []string{"buffs"}}, labels)
@@ -327,7 +327,7 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 	game := readMini(t, func(files map[string]string) {
 		files[upgradeFieldsTable] = strings.Replace(files[upgradeFieldsTable], "C;X3;K1\r\n", "C;X3;K\"many\"\r\n", 1)
 	})
-	_, _, err := buildNamedFields(game, overrides{})
+	_, _, err := buildNamedFields(game, nameOverrides{})
 	const want = "war3.w3mod/units/upgrademetadata.slk: gnam: the repeat cell 'many' is not a number"
 	if err == nil || err.Error() != want {
 		t.Errorf("a repeat cell that is no number, beside a name that needs a pin: got %v, want %q", err, want)
