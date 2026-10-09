@@ -20,6 +20,19 @@
 - **`build.folder` may not be `dist/test` or a folder below it**, as it may not be `dist/stage`: `test` writes its
   archive there.
 
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-09 on Windows, and CI passed on Ubuntu and Windows with the race job.
+Of step 3, `moonwell test` was run twice with this version, on Warcraft III 3.0.0.24268, in a fresh project from
+`init --link` and with the user's own `config.toml`. With `test.archive` on it packed `dist/test/map.w3x` and the
+game's log shows that archive opened; with it off, the log shows the staged folder `dist/stage/map.w3x` opened. The
+maintainer saw the map load both times. Steps 4 to 16 were not played: the release adds one setting, and the
+recordings of every built project are unchanged.
+
+The built program was also run on that project with a user folder that held no `config.toml`: `check`, `build`,
+`build --minify`, `objects:check`, `settings:check` and `assets:check` each ended with its line of success. The
+online and desync checks are deferred, not passed.
+
 ## 0.12.0 (2026-10-09)
 
 - **A project of 0.11 is not read.** The settings moved out of Pkl, and this version reads no `moonwell.pkl` and no
