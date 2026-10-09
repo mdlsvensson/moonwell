@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func theProgram(t *testing.T) string {
+func buildProgram(t *testing.T) string {
 	t.Helper()
 	program := filepath.Join(t.TempDir(), "moonwell")
 	if runtime.GOOS == "windows" {
@@ -73,21 +73,21 @@ func (s executable) run(t *testing.T, args ...string) (code int, stdout, stderr 
 
 func TestMoonwellExecutable(t *testing.T) {
 	root := compiling(t)
-	s := executable{program: theProgram(t), root: root, cache: ownCache(t)}
+	s := executable{program: buildProgram(t), root: root, cache: newCacheDir(t)}
 
 	t.Run("the help is printed for other programs", func(t *testing.T) {
 		code, out, log := s.run(t, "--help")
 		if code != 0 || log != "" {
 			t.Fatalf("exit %d; stdout %q; stderr %q", code, out, log)
 		}
-		contains(t, out, "Moonwell ", "assets:check")
+		checkContains(t, out, "Moonwell ", "assets:check")
 	})
 	t.Run("an unknown command ends with 1", func(t *testing.T) {
 		code, out, log := s.run(t, "unknown")
 		if code != 1 || out != "" {
 			t.Fatalf("exit %d; stdout %q; stderr %q", code, out, log)
 		}
-		contains(t, log, "error: ", "unknown")
+		checkContains(t, log, "error: ", "unknown")
 	})
 	t.Run("objects:eval prints to the stream for programs, in the working folder", func(t *testing.T) {
 		code, out, log := s.run(t, "objects:eval")
@@ -100,20 +100,20 @@ func TestMoonwellExecutable(t *testing.T) {
 		}
 	})
 	t.Run("objects that are not valid go to the terminal's stream", func(t *testing.T) {
-		write(t, root, "objects/bad.pkl", objectFile(`units { ["bad"] { id = "h001"; base = "zzzz" } }`))
-		defer remove(t, root, "objects/bad.pkl")
+		writeFile(t, root, "objects/bad.pkl", objectFile(`units { ["bad"] { id = "h001"; base = "zzzz" } }`))
+		defer removeFile(t, root, "objects/bad.pkl")
 		code, out, log := s.run(t, "objects:eval")
 		if code != 1 || out != "" {
 			t.Fatalf("exit %d; stdout %q; stderr %q", code, out, log)
 		}
-		contains(t, log, "objects/bad.pkl", "'zzzz' is not a standard unit")
+		checkContains(t, log, "objects/bad.pkl", "'zzzz' is not a standard unit")
 	})
 	t.Run("a build compiles with the compiler of the cache it is given", func(t *testing.T) {
 		code, out, log := s.run(t, "build")
 		if code != 0 || out != "" || strings.Contains(log, "Downloading") {
 			t.Fatalf("exit %d; stdout %q; stderr %q", code, out, log)
 		}
-		contains(t, log, "Built dist/bin/map.w3x")
+		checkContains(t, log, "Built dist/bin/map.w3x")
 		if exists(root, "dist/.lock") {
 			t.Fatal("a build left its lock behind")
 		}
@@ -125,7 +125,7 @@ func interruptedDev(t *testing.T, s executable) {
 	ctx, cancel := context.WithTimeout(background, 2*time.Minute)
 	defer cancel()
 	cmd := s.command(ctx, "dev")
-	apartFromTheTest(cmd)
+	detachFromTest(cmd)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		t.Fatal(err)
@@ -164,7 +164,7 @@ func interruptedDev(t *testing.T, s executable) {
 		}
 	}
 	await("Watching src/")
-	write(t, s.root, "src/main.yue", "x = \n  if then\n")
+	writeFile(t, s.root, "src/main.yue", "x = \n  if then\n")
 	await("error: src/main.yue:")
 	if err = interruptDev(cmd); err != nil {
 		t.Fatal(err)

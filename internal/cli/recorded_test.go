@@ -22,16 +22,16 @@ import (
 func TestTheCommandLinesAreAsRecorded(t *testing.T) {
 	p := newRecordedProjects(t)
 	for _, run := range recordedRuns {
-		if !slices.Contains(p.names(), run.seed) {
+		if !slices.Contains(p.seedNames(), run.seed) {
 			t.Errorf("a run is on the seed %q, and no seed has that name: %s", run.seed, said(run.steps[0].args))
 		}
 	}
-	for _, seed := range p.names() {
+	for _, seed := range p.seedNames() {
 		t.Run(seed, func(t *testing.T) {
 			var all []byte
 			for _, run := range recordedRuns {
 				if run.seed == seed {
-					all = append(all, p.recording(run, p.through(t, run))...)
+					all = append(all, p.recording(run, p.runSteps(t, run))...)
 				}
 			}
 			testkit.CheckRecorded(t, seed+".txt", all)
@@ -47,16 +47,16 @@ func newRecordedProjects(t *testing.T) *recordedProjects {
 		t.Skip("the recorded lines run Pkl for most of them, and the compiler for many: not with -short")
 	}
 	testkit.NeedPkl(t)
-	cache := ownCache(t)
+	cache := newCacheDir(t)
 	t.Setenv("MOONWELL_CACHE", cache)
 	t.Setenv("PATH", filepath.Dir(pinnedCompilerIn(cache))+string(os.PathListSeparator)+os.Getenv("PATH"))
 	base := t.TempDir()
 	p := &recordedProjects{seeds: filepath.Join(base, "seed"), runs: filepath.Join(base, "run"), cache: cache}
-	p.lay(t)
+	p.writeSeeds(t)
 	return p
 }
 
-func (p *recordedProjects) lay(t *testing.T) {
+func (p *recordedProjects) writeSeeds(t *testing.T) {
 	t.Helper()
 	template := projectIn(t, p.seeds, templateSeed)
 	for _, seed := range seeds {
@@ -70,11 +70,11 @@ func (p *recordedProjects) lay(t *testing.T) {
 		if err != nil {
 			t.Fatalf("the seed %s: %v", seed.name, err)
 		}
-		seed.lay(t, root)
+		seed.write(t, root)
 	}
 }
 
-func (p *recordedProjects) names() []string {
+func (p *recordedProjects) seedNames() []string {
 	names := []string{templateSeed}
 	for _, seed := range seeds {
 		names = append(names, seed.name)
@@ -82,11 +82,11 @@ func (p *recordedProjects) names() []string {
 	return names
 }
 
-func (p *recordedProjects) place(seed string) string { return filepath.Join(p.runs, seed) }
+func (p *recordedProjects) seedDir(seed string) string { return filepath.Join(p.runs, seed) }
 
-func (p *recordedProjects) fresh(t *testing.T, seed string) string {
+func (p *recordedProjects) copySeed(t *testing.T, seed string) string {
 	t.Helper()
-	root := p.place(seed)
+	root := p.seedDir(seed)
 	for _, gone := range []string{root, filepath.Join(p.cache, "bin")} {
 		if err := os.RemoveAll(gone); err != nil {
 			t.Fatal(err)
@@ -98,7 +98,7 @@ func (p *recordedProjects) fresh(t *testing.T, seed string) string {
 	return root
 }
 
-type answer struct {
+type stepResult struct {
 	code          int
 	printed       []string
 	lines         []string
@@ -106,10 +106,10 @@ type answer struct {
 	bin           bool
 }
 
-func (p *recordedProjects) through(t *testing.T, run recordedRun) []answer {
+func (p *recordedProjects) runSteps(t *testing.T, run recordedRun) []stepResult {
 	t.Helper()
-	root := p.fresh(t, run.seed)
-	var answers []answer
+	root := p.copySeed(t, run.seed)
+	var answers []stepResult
 	for _, step := range run.steps {
 		if step.change != nil {
 			step.change(t, root)
@@ -123,15 +123,15 @@ func (p *recordedProjects) through(t *testing.T, run recordedRun) []answer {
 				*texts = append(*texts, text)
 			}
 		}
-		given := answer{before: testkit.Snapshot(t, root)}
-		given.code = runIn(background, startingNothing(t), step.args, root, keep(&given.lines), keep(&given.printed))
+		given := stepResult{before: testkit.Snapshot(t, root)}
+		given.code = runIn(background, noSpawnEnvFactory(t), step.args, root, keep(&given.lines), keep(&given.printed))
 		given.after, given.bin = testkit.Snapshot(t, root), fsx.Exists(filepath.Join(p.cache, "bin"))
 		answers = append(answers, given)
 	}
 	return answers
 }
 
-func startingNothing(t *testing.T) envFactory {
+func noSpawnEnvFactory(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e := env.New(root, log)
 		e.Spawn = func(program string, args []string) error {
@@ -146,9 +146,9 @@ func startingNothing(t *testing.T) envFactory {
 	}
 }
 
-func (p *recordedProjects) recording(run recordedRun, answers []answer) []byte {
+func (p *recordedProjects) recording(run recordedRun, answers []stepResult) []byte {
 	var out strings.Builder
-	root, title, taken := p.place(run.seed), "== ", 0
+	root, title, taken := p.seedDir(run.seed), "== ", 0
 	for _, step := range run.steps {
 		if step.change != nil {
 			out.WriteString("-- then " + step.what + "\n")
@@ -162,19 +162,19 @@ func (p *recordedProjects) recording(run recordedRun, answers []answer) []byte {
 	return testkit.WithPlaceholders([]byte(out.String()), root, compiler, forTheEditor)
 }
 
-func (a answer) recording(command, root string) string {
+func (a stepResult) recording(command, root string) string {
 	var out strings.Builder
 	out.WriteString("exit code: " + strconv.Itoa(a.code) + "\n")
 	out.WriteString("printed:" + lineByLine(a.printed))
 	if a.code == 0 {
 		out.WriteString("terminal:" + lineByLine(a.lines))
 	} else {
-		out.WriteString("terminal: " + complaintOf(a.lines, root) + "\n")
+		out.WriteString("terminal: " + errorLineOf(a.lines, root) + "\n")
 	}
 	if command == "setup" {
 		out.WriteString("the cache has a bin folder: " + strconv.FormatBool(a.bin) + "\n")
 	}
-	out.WriteString("left:" + a.left())
+	out.WriteString("left:" + a.filesLeft())
 	return out.String()
 }
 
@@ -190,7 +190,7 @@ func lineByLine(texts []string) string {
 	return out.String()
 }
 
-func complaintOf(lines []string, root string) string {
+func errorLineOf(lines []string, root string) string {
 	if len(lines) == 0 {
 		return "nothing"
 	}
@@ -208,7 +208,7 @@ func complaintOf(lines []string, root string) string {
 	return "a complaint about " + testkit.QuoteIfNeeded(place)
 }
 
-func (a answer) left() string {
+func (a stepResult) filesLeft() string {
 	names := slices.Collect(maps.Keys(a.after))
 	for name := range a.before {
 		if _, still := a.after[name]; !still {
@@ -221,12 +221,12 @@ func (a answer) left() string {
 		was, wasThere := a.before[name]
 		is, isThere := a.after[name]
 		switch {
-		case inNoRecording(name), wasThere && isThere && (was == nil) == (is == nil) && bytes.Equal(was, is):
+		case isExcludedFromRecording(name), wasThere && isThere && (was == nil) == (is == nil) && bytes.Equal(was, is):
 		case !isThere && was != nil:
 			out.WriteString("  " + testkit.QuoteIfNeeded(name) + ": gone\n")
 		case !isThere, is == nil:
 		default:
-			out.WriteString("  " + testkit.QuoteIfNeeded(name) + ":" + leftAs(name, is))
+			out.WriteString("  " + testkit.QuoteIfNeeded(name) + ":" + formatLeftFile(name, is))
 		}
 	}
 	if out.Len() == 0 {
@@ -235,11 +235,11 @@ func (a answer) left() string {
 	return "\n" + out.String()
 }
 
-func inNoRecording(name string) bool {
+func isExcludedFromRecording(name string) bool {
 	return name == "dist/moonwell.log" || strings.HasPrefix(name, "dist/stage/lua/")
 }
 
-func leftAs(name string, data []byte) string {
+func formatLeftFile(name string, data []byte) string {
 	switch {
 	case strings.HasPrefix(name, "dist/bin/"), path.Base(name) == ".moonwell-library.json":
 		return " present\n"

@@ -16,28 +16,28 @@ import (
 
 const createdLocal = "Created moonwell.local.pkl. Check that launch.gameExecutable points at your Warcraft III.exe."
 
-func saysWhichCompiler(compiler string) string {
+func compilerLine(compiler string) string {
 	return "YueScript " + toolchain.YueVersion + ": " + compiler
 }
 
-func warnsOfPath(line, binDir string) bool {
+func isPathWarning(line, binDir string) bool {
 	return strings.HasPrefix(line, "warning: yue is not on PATH; VS Code's YueScript extension needs YueScript "+
 		toolchain.YueVersion+" there. Run this once in ") &&
 		strings.HasSuffix(line, ":\n  "+toolchain.AddToPathCommand(binDir, runtime.GOOS))
 }
 
 func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *testing.T) {
-	world, root := seeded(t), newProject(t, "my-map")
-	remove(t, root, "moonwell.local.pkl")
-	remove(t, root, "yueconfig.yue")
-	e, log := world.at(root)
+	world, root := newFakeWorld(t), newProject(t, "my-map")
+	removeFile(t, root, "moonwell.local.pkl")
+	removeFile(t, root, "yueconfig.yue")
+	e, log := world.envAt(root)
 	if err := runSetup(background, e, commandArgs{}); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	copied := filepath.Join(world.binDir(), filepath.Base(world.compiler))
 	lines := log.Lines()
-	if len(lines) != 5 || lines[0] != createdLocal || lines[1] != saysWhichCompiler(world.compiler) ||
-		lines[2] != "Copied YueScript for the editor to "+copied+"." || !warnsOfPath(lines[3], world.binDir()) ||
+	if len(lines) != 5 || lines[0] != createdLocal || lines[1] != compilerLine(world.compiler) ||
+		lines[2] != "Copied YueScript for the editor to "+copied+"." || !isPathWarning(lines[3], world.binDir()) ||
 		lines[4] != "Added yueconfig.yue for the editor." {
 		t.Errorf("the first setup logged %q", lines)
 	}
@@ -45,12 +45,12 @@ func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *te
 		t.Error("setup kept no copy of the compiler, wrote no declarations, or left the build lock behind")
 	}
 
-	e, log = world.at(root)
+	e, log = world.envAt(root)
 	if err := runSetup(background, e, commandArgs{}); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	lines = log.Lines()
-	if len(lines) != 2 || lines[0] != saysWhichCompiler(world.compiler) || !warnsOfPath(lines[1], world.binDir()) {
+	if len(lines) != 2 || lines[0] != compilerLine(world.compiler) || !isPathWarning(lines[1], world.binDir()) {
 		t.Errorf("the second setup logged %q", lines)
 	}
 }
@@ -59,14 +59,14 @@ func TestSetupWithAYuePathCopiesNothingAndNamesItsFolderAsTheManifestWritesIt(t 
 	tools := filepath.ToSlash(t.TempDir())
 	written := tools + "/kept/yue-of-mine"
 	testkit.WriteFile(t, tools, "kept/yue-of-mine", nil)
-	world, root := seeded(t, written), newProject(t, "my-map")
-	appendTo(t, root, "moonwell.local.pkl", "\nyue { path = \""+written+"\" }\n")
-	e, log := world.at(root)
+	world, root := newFakeWorld(t, written), newProject(t, "my-map")
+	appendToFile(t, root, "moonwell.local.pkl", "\nyue { path = \""+written+"\" }\n")
+	e, log := world.envAt(root)
 	if err := runSetup(background, e, commandArgs{}); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	lines := log.Lines()
-	if len(lines) != 2 || lines[0] != saysWhichCompiler(written) || !warnsOfPath(lines[1], tools+"/kept") {
+	if len(lines) != 2 || lines[0] != compilerLine(written) || !isPathWarning(lines[1], tools+"/kept") {
 		t.Errorf("setup logged %q", lines)
 	}
 	if fsx.Exists(world.binDir()) {
@@ -77,11 +77,11 @@ func TestSetupWithAYuePathCopiesNothingAndNamesItsFolderAsTheManifestWritesIt(t 
 func TestSetupMakesTheLocalManifestBeforeItLooksForTheCompilerAndTheEditorsFilesAfter(t *testing.T) {
 	root := newProject(t, "my-map")
 	gone := filepath.ToSlash(filepath.Join(t.TempDir(), "no-such-yue"))
-	appendTo(t, root, "moonwell.pkl", "\nyue { path = \""+gone+"\" }\n")
-	remove(t, root, "moonwell.local.pkl")
-	remove(t, root, "yueconfig.yue")
-	e, log, ran := pklOnly(t, root)
-	diagErr := asError(t, runSetup(background, e, commandArgs{}), "a compiler that is not there")
+	appendToFile(t, root, "moonwell.pkl", "\nyue { path = \""+gone+"\" }\n")
+	removeFile(t, root, "moonwell.local.pkl")
+	removeFile(t, root, "yueconfig.yue")
+	e, log, ran := newPklOnlyEnv(t, root)
+	diagErr := asDiagError(t, runSetup(background, e, commandArgs{}), "a compiler that is not there")
 	if !strings.Contains(diagErr.Msg, "yue.path does not exist") {
 		t.Errorf("error = %+v", diagErr)
 	}
@@ -98,18 +98,18 @@ func TestSetupMakesTheLocalManifestBeforeItLooksForTheCompilerAndTheEditorsFiles
 }
 
 func TestSetupWithoutItsSourceMapFailsAtTheDeclarations(t *testing.T) {
-	world, root := seeded(t), newProject(t, "my-map")
-	remove(t, root, "maps/map.w3x")
-	remove(t, root, "yueconfig.yue")
+	world, root := newFakeWorld(t), newProject(t, "my-map")
+	removeFile(t, root, "maps/map.w3x")
+	removeFile(t, root, "yueconfig.yue")
 	useLibrary(t, root, exampleLibrary(t))
-	e, log := world.at(root)
-	diagErr := asError(t, runSetup(background, e, commandArgs{}), "a project without its source map")
+	e, log := world.envAt(root)
+	diagErr := asDiagError(t, runSetup(background, e, commandArgs{}), "a project without its source map")
 	if diagErr.File != "moonwell.local.pkl" || diagErr.Hint == "" ||
 		!strings.Contains(diagErr.Msg, "Source map folder maps/map.w3x not found") {
 		t.Errorf("error = %+v", diagErr)
 	}
 	logged := strings.Join(log.Lines(), "\n")
-	contains(t, logged, saysWhichCompiler(world.compiler), "Added yueconfig.yue for the editor.")
+	checkContains(t, logged, compilerLine(world.compiler), "Added yueconfig.yue for the editor.")
 	if !exists(root, "yueconfig.yue") || !fsx.Exists(world.binDir()) {
 		t.Error("setup did not copy the compiler and add the editor's files before it opened the map")
 	}
@@ -139,17 +139,17 @@ func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing
 		}, "dist is a link", "dist"},
 	} {
 		t.Run(c.what, func(t *testing.T) {
-			world, root := seeded(t), newProject(t, "my-map")
-			remove(t, root, "yueconfig.yue")
+			world, root := newFakeWorld(t), newProject(t, "my-map")
+			removeFile(t, root, "yueconfig.yue")
 			useLibrary(t, root, exampleLibrary(t))
 			c.arrange(t, root)
 			held := exists(root, "dist/.lock")
-			e, log := world.at(root)
-			diagErr := asError(t, runSetup(background, e, commandArgs{}), c.what)
+			e, log := world.envAt(root)
+			diagErr := asDiagError(t, runSetup(background, e, commandArgs{}), c.what)
 			if diagErr.File != c.file || diagErr.Hint == "" || !strings.Contains(diagErr.Msg, c.msg) {
 				t.Errorf("error = %+v", diagErr)
 			}
-			contains(t, strings.Join(log.Lines(), "\n"), saysWhichCompiler(world.compiler))
+			checkContains(t, strings.Join(log.Lines(), "\n"), compilerLine(world.compiler))
 			for _, path := range []string{
 				"yueconfig.yue", ".moonwell/types/natives.d.lua", ".moonwell/yue/moonwell/macros.yue",
 			} {
@@ -168,39 +168,39 @@ func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing
 }
 
 func TestSetupDeclaresTheObjectsAndLeavesTheIDsModuleToABuild(t *testing.T) {
-	world, root := seeded(t), newProject(t, "my-map")
-	remove(t, root, "src/generated/objects.yue")
-	world.ok(t, root, "setup")
-	contains(t, read(t, root, ".moonwell/types/objects.d.lua"), "captain")
+	world, root := newFakeWorld(t), newProject(t, "my-map")
+	removeFile(t, root, "src/generated/objects.yue")
+	world.mustSucceed(t, root, "setup")
+	checkContains(t, readFile(t, root, ".moonwell/types/objects.d.lua"), "captain")
 	if exists(root, "src/generated/objects.yue") {
 		t.Error("setup wrote the ids module")
 	}
 }
 
 func TestSetupSaysWhatItAddsToLuarcAndNamesTheEntriesOfOneItLeavesAlone(t *testing.T) {
-	world, root := seeded(t), newProject(t, "my-map")
-	write(t, root, ".luarc.json", "{\n  \"runtime.version\": \"Lua 5.3\",\n  \"runtime.path\": [\"src/?.lua\"]\n}\n")
-	result := world.ok(t, root, "setup")
+	world, root := newFakeWorld(t), newProject(t, "my-map")
+	writeFile(t, root, ".luarc.json", "{\n  \"runtime.version\": \"Lua 5.3\",\n  \"runtime.path\": [\"src/?.lua\"]\n}\n")
+	result := world.mustSucceed(t, root, "setup")
 	added := "Added src/?/init.lua, lua/?.lua, lua/?/init.lua, .moonwell/types, .moonwell/lua, dist, maps, " +
 		".moonwell/libraries to .luarc.json."
-	contains(t, result.output, added)
-	contains(t, read(t, root, "dist/moonwell.log"), "] info: "+added+"\n")
+	checkContains(t, result.output, added)
+	checkContains(t, readFile(t, root, "dist/moonwell.log"), "] info: "+added+"\n")
 	if exists(root, "dist/.lock") {
 		t.Error("setup left the build lock behind")
 	}
-	if again := world.ok(t, root, "setup"); strings.Contains(again.output, ".luarc.json") {
+	if again := world.mustSucceed(t, root, "setup"); strings.Contains(again.output, ".luarc.json") {
 		t.Errorf("a second setup spoke of a .luarc.json that lacks nothing:\n%s", again.output)
 	}
 
-	mine := "// Mine.\n" + read(t, root, ".luarc.json")
-	write(t, root, ".luarc.json", mine)
-	edit(t, root, ".luarc.json", `"dist"`, `"build"`)
-	mine = read(t, root, ".luarc.json")
-	result = world.ok(t, root, "setup")
-	contains(t, result.output, "warning: .luarc.json is not plain JSON, so setup left it alone. Make sure its "+
+	mine := "// Mine.\n" + readFile(t, root, ".luarc.json")
+	writeFile(t, root, ".luarc.json", mine)
+	replaceInFile(t, root, ".luarc.json", `"dist"`, `"build"`)
+	mine = readFile(t, root, ".luarc.json")
+	result = world.mustSucceed(t, root, "setup")
+	checkContains(t, result.output, "warning: .luarc.json is not plain JSON, so setup left it alone. Make sure its "+
 		"runtime.path has src/?.lua, src/?/init.lua, lua/?.lua, lua/?/init.lua, its workspace.library has "+
 		".moonwell/types, .moonwell/lua and its workspace.ignoreDir has dist, maps, .moonwell/libraries.")
-	if read(t, root, ".luarc.json") != mine {
+	if readFile(t, root, ".luarc.json") != mine {
 		t.Error("setup changed a .luarc.json that is not plain JSON")
 	}
 }

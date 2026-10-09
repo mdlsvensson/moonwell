@@ -22,16 +22,16 @@ import (
 func emptyObjectProject(t *testing.T, wiring bool) string {
 	t.Helper()
 	root := newProject(t, "map")
-	remove(t, root, "objects")
-	remove(t, root, objects.IDsFile)
+	removeFile(t, root, "objects")
+	removeFile(t, root, objects.IDsFile)
 	if !wiring {
 		var kept []string
-		for line := range strings.SplitSeq(read(t, root, "moonwell.pkl"), "\n") {
+		for line := range strings.SplitSeq(readFile(t, root, "moonwell.pkl"), "\n") {
 			if !strings.Contains(line, "Objects") {
 				kept = append(kept, line)
 			}
 		}
-		write(t, root, "moonwell.pkl", strings.Join(kept, "\n"))
+		writeFile(t, root, "moonwell.pkl", strings.Join(kept, "\n"))
 	}
 	return root
 }
@@ -52,8 +52,8 @@ func idsLine(status string) string { return "  " + objects.IDsFile + ": " + stat
 
 func writeObjects(t *testing.T, root string) {
 	t.Helper()
-	write(t, root, "objects/heroes.pkl", paladin)
-	write(t, root, "objects/human/barracks/units.pkl", captain)
+	writeFile(t, root, "objects/heroes.pkl", paladin)
+	writeFile(t, root, "objects/human/barracks/units.pkl", captain)
 }
 
 func evaluatePkl(t *testing.T, root, file string) env.RunResult {
@@ -90,7 +90,7 @@ func assertEmptyObjects(t *testing.T, value map[string]any) {
 func TestPklObjectsNestedMergeSources(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	writeObjects(t, root)
-	write(t, root, "objects/notes.txt", "not Pkl")
+	writeFile(t, root, "objects/notes.txt", "not Pkl")
 	r := evaluatePkl(t, root, "moonwell.local.pkl")
 	if r.ExitCode != 0 {
 		t.Fatal(r.Stderr)
@@ -116,13 +116,13 @@ func TestPklObjectsMissingAndEmptyFolder(t *testing.T) {
 			t.Fatal(r.Stderr)
 		}
 		assertEmptyObjects(t, jsonObject(t, r.Stdout)["objects"].(map[string]any))
-		write(t, root, "objects/empty/.gitkeep", "")
+		writeFile(t, root, "objects/empty/.gitkeep", "")
 	}
 }
 
 func TestPklObjectsWithoutWiring(t *testing.T) {
 	root := emptyObjectProject(t, false)
-	write(t, root, "objects/heroes.pkl", paladin)
+	writeFile(t, root, "objects/heroes.pkl", paladin)
 	r := evaluatePkl(t, root, "moonwell.local.pkl")
 	if r.ExitCode != 0 {
 		t.Fatal(r.Stderr)
@@ -132,36 +132,36 @@ func TestPklObjectsWithoutWiring(t *testing.T) {
 
 func TestPklObjectsDuplicateKeyNamesBothFiles(t *testing.T) {
 	root := emptyObjectProject(t, true)
-	write(t, root, "objects/a.pkl", paladin)
-	write(t, root, "objects/b/c.pkl", paladin)
+	writeFile(t, root, "objects/a.pkl", paladin)
+	writeFile(t, root, "objects/b/c.pkl", paladin)
 	r := evaluatePkl(t, root, "moonwell.local.pkl")
 	if r.ExitCode != 1 {
 		t.Fatal(r)
 	}
-	contains(t, r.Stderr, `heroes["paladin"] is defined in both objects/a.pkl and objects/b/c.pkl`)
+	checkContains(t, r.Stderr, `heroes["paladin"] is defined in both objects/a.pkl and objects/b/c.pkl`)
 }
 
 func TestPklObjectsInvalidObjectNamesOwnFile(t *testing.T) {
 	root := emptyObjectProject(t, true)
-	write(t, root, "objects/bad.pkl", objectFile(`units { ["captain"] { id = "H000"; base = "hfoo" } }`))
+	writeFile(t, root, "objects/bad.pkl", objectFile(`units { ["captain"] { id = "H000"; base = "hfoo" } }`))
 	r := evaluatePkl(t, root, "moonwell.local.pkl")
 	if r.ExitCode != 1 {
 		t.Fatal(r)
 	}
-	contains(t, r.Stderr, "objects/bad.pkl")
+	checkContains(t, r.Stderr, "objects/bad.pkl")
 }
 
 func TestPklObjectsEvalStdoutOnlyWithoutCompilerOrLock(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	writeObjects(t, root)
-	write(t, root, "dist/.lock", "999999")
+	writeFile(t, root, "dist/.lock", "999999")
 	before := testkit.Snapshot(t, root)
-	e, log, ran := pklOnly(t, root)
-	printed, err := commandIn(t, background, e, "objects:eval")
+	e, log, ran := newPklOnlyEnv(t, root)
+	printed, err := runCommandIn(t, background, e, "objects:eval")
 	if err != nil || len(printed) != 1 || len(log.Lines()) != 0 {
 		t.Fatalf("%v %v %v", err, printed, log.Lines())
 	}
-	onlyPkl(t, ran)
+	checkOnlyPklRan(t, ran)
 	value := jsonObject(t, printed[0])
 	if len(value) != 7 {
 		t.Fatal(value)
@@ -176,18 +176,18 @@ func TestPklObjectsEvalStdoutOnlyWithoutCompilerOrLock(t *testing.T) {
 	if hero["source"] != "objects/heroes.pkl" || hero["fields"].([]any)[0].(map[string]any)["rawcode"] != "uhpm" {
 		t.Fatal(hero)
 	}
-	r := okWithPklAlone(t, root, "objects:eval")
+	r := mustSucceedWithPklOnly(t, root, "objects:eval")
 	if r.output != "" || r.stdout != printed[0] || !strings.HasPrefix(r.stdout, "{\n  \"heroes\": {") ||
 		!strings.HasSuffix(r.stdout, "}") {
 		t.Fatalf("%+v", r)
 	}
-	sameFiles(t, before, testkit.Snapshot(t, root), "eval")
+	checkSameFiles(t, before, testkit.Snapshot(t, root), "eval")
 }
 
 func TestPklObjectsEvalInvalidStderrOnly(t *testing.T) {
 	root := emptyObjectProject(t, true)
-	write(t, root, "objects/units.pkl", objectFile(`units { ["captain"] { id = "h000"; base = "zzzz" } }`))
-	r := failsWithPklAlone(t, root, []string{
+	writeFile(t, root, "objects/units.pkl", objectFile(`units { ["captain"] { id = "h000"; base = "zzzz" } }`))
+	r := mustFailWithPklOnly(t, root, []string{
 		"error: objects/units.pkl \xe2\x80\xba units[\"captain\"].base: 'zzzz' is not a standard unit.",
 	}, "objects:eval")
 	if r.stdout != "" {
@@ -198,26 +198,26 @@ func TestPklObjectsEvalInvalidStderrOnly(t *testing.T) {
 func TestPklObjectsCommandsWithoutObjectsFolder(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	before := testkit.Snapshot(t, root)
-	r := okWithPklAlone(t, root, "objects:eval")
+	r := mustSucceedWithPklOnly(t, root, "objects:eval")
 	assertEmptyObjects(t, jsonObject(t, r.stdout))
-	e, log, ran := pklOnly(t, root)
-	lines := logged(t, e, log, "objects:check")
+	e, log, ran := newPklOnlyEnv(t, root)
+	lines := mustRunCommand(t, e, log, "objects:check")
 	if !slices.Equal(lines, []string{
 		idsLine("current"), "Object data valid: 0 object(s), 0 internal file(s) would change during build.",
 	}) {
 		t.Fatal(lines)
 	}
-	onlyPkl(t, ran)
-	sameFiles(t, before, testkit.Snapshot(t, root), "empty objects")
+	checkOnlyPklRan(t, ran)
+	checkSameFiles(t, before, testkit.Snapshot(t, root), "empty objects")
 }
 
 func TestPklObjectsCommandsNeedTheSourceMapAlsoWithoutObjects(t *testing.T) {
 	root := emptyObjectProject(t, true)
-	remove(t, root, "maps/map.w3x")
+	removeFile(t, root, "maps/map.w3x")
 	for _, name := range []string{"objects:eval", "objects:check"} {
-		e, log, _ := pklOnly(t, root)
-		printed, err := commandIn(t, background, e, name)
-		diagErr := asError(t, err, name+" without the map")
+		e, log, _ := newPklOnlyEnv(t, root)
+		printed, err := runCommandIn(t, background, e, name)
+		diagErr := asDiagError(t, err, name+" without the map")
 		if diagErr.File != "moonwell.local.pkl" || diagErr.Hint == "" ||
 			!strings.Contains(diagErr.Msg, "Source map folder maps/map.w3x not found") {
 			t.Errorf("%s: error = %+v", name, diagErr)
@@ -232,29 +232,29 @@ func TestPklObjectsCheckMissingStaleCurrent(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	writeObjects(t, root)
 	before := testkit.Snapshot(t, filepath.Join(root, "maps"))
-	r := failsWithPklAlone(t, root, []string{"  war3map.w3u\n  war3mapSkin.w3u\n" + idsLine("missing") + "\nerror: " +
+	r := mustFailWithPklOnly(t, root, []string{"  war3map.w3u\n  war3mapSkin.w3u\n" + idsLine("missing") + "\nerror: " +
 		objects.IDsFile + " \xe2\x80\xba The file is missing, but the manifest has objects.\n" +
 		"hint: Run moonwell build, test or dev to regenerate it."}, "objects:check")
 	if r.stdout != "" || exists(root, objects.IDsFile) || strings.Contains(r.output, "Object data valid") {
 		t.Fatalf("objects:check wrote the ids module, printed for other programs, or summed up a failure: %+v", r)
 	}
-	write(t, root, objects.IDsFile, noObjects)
-	r = failsWithPklAlone(t, root,
+	writeFile(t, root, objects.IDsFile, noObjects)
+	r = mustFailWithPklOnly(t, root,
 		[]string{idsLine("stale"), "does not match the objects in the manifest."}, "objects:check")
 	if strings.Contains(r.output, "Object data valid") {
 		t.Fatalf("objects:check summed up a failure:\n%s", r.output)
 	}
-	write(t, root, objects.IDsFile, bothObjects)
-	e, log, ran := pklOnly(t, root)
-	lines := logged(t, e, log, "objects:check")
+	writeFile(t, root, objects.IDsFile, bothObjects)
+	e, log, ran := newPklOnlyEnv(t, root)
+	lines := mustRunCommand(t, e, log, "objects:check")
 	if !slices.Equal(lines, []string{
 		"  war3map.w3u", "  war3mapSkin.w3u", idsLine("current"),
 		"Object data valid: 2 object(s), 2 internal file(s) would change during build.",
 	}) {
 		t.Fatal(lines)
 	}
-	onlyPkl(t, ran)
-	sameFiles(t, before, testkit.Snapshot(t, filepath.Join(root, "maps")), "objects planning")
+	checkOnlyPklRan(t, ran)
+	checkSameFiles(t, before, testkit.Snapshot(t, filepath.Join(root, "maps")), "objects planning")
 	if exists(root, "dist/stage") || exists(root, "dist/.lock") {
 		t.Fatal("objects:check staged the map, or took the build lock")
 	}
@@ -263,10 +263,10 @@ func TestPklObjectsCheckMissingStaleCurrent(t *testing.T) {
 func TestPklObjectsCommandsTakeNoBuildLock(t *testing.T) {
 	root := newProject(t, "map")
 	holdBuildLock(t, root)
-	if r := okWithPklAlone(t, root, "objects:check"); !strings.Contains(r.output, "Object data valid: 1 object(s)") {
+	if r := mustSucceedWithPklOnly(t, root, "objects:check"); !strings.Contains(r.output, "Object data valid: 1 object(s)") {
 		t.Errorf("objects:check beside a build: %+v", r)
 	}
-	if r := okWithPklAlone(t, root, "objects:eval"); !strings.Contains(r.stdout, `"captain"`) {
+	if r := mustSucceedWithPklOnly(t, root, "objects:eval"); !strings.Contains(r.stdout, `"captain"`) {
 		t.Errorf("objects:eval beside a build: %+v", r)
 	}
 	if !exists(root, "dist/.lock") {
@@ -277,35 +277,35 @@ func TestPklObjectsCommandsTakeNoBuildLock(t *testing.T) {
 func TestPklCheckRefusesMissingStaleBeforeCompile(t *testing.T) {
 	root := emptyObjectProject(t, true)
 	writeObjects(t, root)
-	e, _, _ := pklOnly(t, root)
-	_, err := commandIn(t, background, e, "check")
-	contains(t, asError(t, err, "missing ids").Msg, "is missing, but the manifest has objects")
+	e, _, _ := newPklOnlyEnv(t, root)
+	_, err := runCommandIn(t, background, e, "check")
+	checkContains(t, asDiagError(t, err, "missing ids").Msg, "is missing, but the manifest has objects")
 	if exists(root, objects.IDsFile) {
 		t.Fatal("check wrote the ids module")
 	}
-	write(t, root, objects.IDsFile, onlyCaptain)
-	_, err = commandIn(t, background, e, "check")
-	diagErr := asError(t, err, "stale ids")
-	contains(t, diagErr.Msg, "does not match the objects in the manifest")
+	writeFile(t, root, objects.IDsFile, onlyCaptain)
+	_, err = runCommandIn(t, background, e, "check")
+	diagErr := asDiagError(t, err, "stale ids")
+	checkContains(t, diagErr.Msg, "does not match the objects in the manifest")
 	if diagErr.Hint != "Run moonwell build, test or dev to regenerate it." ||
-		read(t, root, objects.IDsFile) != onlyCaptain {
+		readFile(t, root, objects.IDsFile) != onlyCaptain {
 		t.Fatal(diagErr)
 	}
-	write(t, root, objects.IDsFile, strings.ReplaceAll(bothObjects, "\n", "\r\n"))
-	_, err = commandIn(t, background, e, "check")
-	diagErr = asError(t, err, "the compiler")
+	writeFile(t, root, objects.IDsFile, strings.ReplaceAll(bothObjects, "\n", "\r\n"))
+	_, err = runCommandIn(t, background, e, "check")
+	diagErr = asDiagError(t, err, "the compiler")
 	if diagErr.Cause == nil || !strings.Contains(diagErr.Cause.Error(), "tried to") {
 		t.Fatalf("check with a current ids module did not get as far as the compiler: %+v", diagErr)
 	}
-	write(t, root, "objects/bad.pkl", objectFile(`items { ["claws"] { id = "h000"; base = "ratf" } }`))
-	_, err = commandIn(t, background, e, "check")
+	writeFile(t, root, "objects/bad.pkl", objectFile(`items { ["claws"] { id = "h000"; base = "ratf" } }`))
+	_, err = runCommandIn(t, background, e, "check")
 	if err == nil {
 		t.Fatal("check took an object that is not valid")
 	}
-	contains(t, diag.Format(err), "objects/bad.pkl")
+	checkContains(t, diag.Format(err), "objects/bad.pkl")
 }
 
-func devIn(t *testing.T, e *env.Env, log *testkit.LogRecorder) (until func(what string, done func() bool)) {
+func startDevIn(t *testing.T, e *env.Env, log *testkit.LogRecorder) (until func(what string, done func() bool)) {
 	t.Helper()
 	ctx, stop := context.WithCancel(background)
 	ended := make(chan error, 1)
@@ -335,17 +335,17 @@ func devIn(t *testing.T, e *env.Env, log *testkit.LogRecorder) (until func(what 
 
 func TestPklDevRefreshesGeneratedObjectsOnChanges(t *testing.T) {
 	root := emptyObjectProject(t, true)
-	write(t, root, "objects/human/barracks/units.pkl", captain)
-	e, log, _ := pklOnly(t, root)
-	until := devIn(t, e, log)
+	writeFile(t, root, "objects/human/barracks/units.pkl", captain)
+	e, log, _ := newPklOnlyEnv(t, root)
+	until := startDevIn(t, e, log)
 	watching := "Watching src/, assets/, objects/, lua/ and the project manifests."
 	until("the line that says what it watches", func() bool {
 		return slices.ContainsFunc(log.Lines(), func(line string) bool { return strings.HasPrefix(line, watching) })
 	})
-	if read(t, root, objects.IDsFile) != onlyCaptain {
+	if readFile(t, root, objects.IDsFile) != onlyCaptain {
 		t.Fatal("dev's first check did not write the ids module")
 	}
-	write(t, root, "objects/heroes.pkl", paladin)
+	writeFile(t, root, "objects/heroes.pkl", paladin)
 	until("an ids module with both objects", func() bool {
 		data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(objects.IDsFile)))
 		return err == nil && string(data) == bothObjects

@@ -7,7 +7,7 @@ import (
 	"os/exec"
 )
 
-func apartFromTheTest(cmd *exec.Cmd) {}
+func detachFromTest(cmd *exec.Cmd) {}
 
 func interruptDev(cmd *exec.Cmd) error { return cmd.Process.Signal(os.Interrupt) }
 

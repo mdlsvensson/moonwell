@@ -22,7 +22,7 @@ import (
 
 const unreachable = "cannot reach the package server"
 
-func resolving(t *testing.T, pklVersion string, resolveCode int) envFactory {
+func resolveEnvFactory(t *testing.T, pklVersion string, resolveCode int) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
 		e.Log = log
@@ -44,7 +44,7 @@ func resolving(t *testing.T, pklVersion string, resolveCode int) envFactory {
 	}
 }
 
-func nothingRuns(t *testing.T) envFactory {
+func failingEnvFactory(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
 		e.Log = log
@@ -52,7 +52,7 @@ func nothingRuns(t *testing.T) envFactory {
 	}
 }
 
-func created(outside envFactory, root, dir, schema string) ([]string, error) {
+func createProjectIn(outside envFactory, root, dir, schema string) ([]string, error) {
 	log := testkit.NewLogRecorder()
 	err := createProject(background, outside(root, log.Logger), dir, schema)
 	return log.Lines(), err
@@ -68,8 +68,8 @@ func TestInitRefusesATargetThatIsAFileOrIsNotEmpty(t *testing.T) {
 		{"a file, named from the working folder", "my-map", "my-map is not a directory."},
 		{"a folder with a file", ".", ". is not empty."},
 	} {
-		lines, err := created(nothingRuns(t), parent, c.dir, "")
-		if e := asError(t, err, c.what); e.Msg != c.msg || e.Hint != "Choose a new or empty directory." {
+		lines, err := createProjectIn(failingEnvFactory(t), parent, c.dir, "")
+		if e := asDiagError(t, err, c.what); e.Msg != c.msg || e.Hint != "Choose a new or empty directory." {
 			t.Errorf("%s: error = %+v", c.what, e)
 		}
 		if len(lines) != 0 {
@@ -84,7 +84,7 @@ func TestInitRefusesATargetThatIsAFileOrIsNotEmpty(t *testing.T) {
 func TestInitRefusesAnEmptyFolderName(t *testing.T) {
 	for _, args := range [][]string{{"init", ""}, {"init", "--", ""}, {"init", "--link", ""}} {
 		root := t.TempDir()
-		result := carriedIn(background, nothingRuns(t), root, args...)
+		result := runCLIIn(background, failingEnvFactory(t), root, args...)
 		if result.code != 1 || result.output != "error: init needs a directory.\nhint: moonwell init my-map" {
 			t.Errorf("%q: %+v", args, result)
 		}
@@ -97,8 +97,8 @@ func TestInitRefusesAnEmptyFolderName(t *testing.T) {
 func TestInitNamesAFolderItCannotLookAt(t *testing.T) {
 	parent := t.TempDir()
 	dir := "my\x00map"
-	_, err := created(nothingRuns(t), parent, dir, "")
-	e := asError(t, err, "a name with a NUL")
+	_, err := createProjectIn(failingEnvFactory(t), parent, dir, "")
+	e := asDiagError(t, err, "a name with a NUL")
 	if e.File != dir || !strings.HasPrefix(e.Msg, "Reading "+dir+" failed: ") || e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
@@ -111,8 +111,8 @@ func TestInitRefusesATargetThatIsALinkToNothing(t *testing.T) {
 	parent := t.TempDir()
 	symlink := filepath.Join(parent, "my-map")
 	testkit.LinkDir(t, filepath.Join(parent, "gone"), symlink)
-	_, err := created(nothingRuns(t), parent, "my-map", "")
-	if e := asError(t, err, "a link to nothing"); e.Msg != "my-map is not a directory." || e.Hint == "" {
+	_, err := createProjectIn(failingEnvFactory(t), parent, "my-map", "")
+	if e := asDiagError(t, err, "a link to nothing"); e.Msg != "my-map is not a directory." || e.Hint == "" {
 		t.Errorf("error = %+v", e)
 	}
 	if info, err := fsx.Lstat(symlink); err != nil || info == nil {
@@ -122,8 +122,8 @@ func TestInitRefusesATargetThatIsALinkToNothing(t *testing.T) {
 
 func TestInitChecksThePklVersionBeforeWritingAnything(t *testing.T) {
 	parent := t.TempDir()
-	_, err := created(resolving(t, "Pkl 0.31.0", 0), parent, "my-map", "")
-	if e := asError(t, err, "an old Pkl"); !strings.Contains(e.Msg, "0.32") || exists(parent, "my-map") {
+	_, err := createProjectIn(resolveEnvFactory(t, "Pkl 0.31.0", 0), parent, "my-map", "")
+	if e := asDiagError(t, err, "an old Pkl"); !strings.Contains(e.Msg, "0.32") || exists(parent, "my-map") {
 		t.Errorf("error = %+v", e)
 	}
 }
@@ -148,7 +148,7 @@ func TestInitResolvesWithThePinnedPklWhenPklOnPathIsOld(t *testing.T) {
 		}
 		return e
 	}
-	lines, err := created(outside, parent, "my-map", "")
+	lines, err := createProjectIn(outside, parent, "my-map", "")
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -160,7 +160,7 @@ func TestInitResolvesWithThePinnedPklWhenPklOnPathIsOld(t *testing.T) {
 
 func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 	parent := t.TempDir()
-	lines, err := created(resolving(t, "Pkl 0.32.1", 0), parent, "my-map", "")
+	lines, err := createProjectIn(resolveEnvFactory(t, "Pkl 0.32.1", 0), parent, "my-map", "")
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -170,7 +170,7 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 		t.Fatalf("the template has %d files (%v)", len(template), err)
 	}
 	for _, file := range template {
-		if !exists(target, file.Path) || read(t, target, file.Path) != string(file.Data) {
+		if !exists(target, file.Path) || readFile(t, target, file.Path) != string(file.Data) {
 			t.Errorf("%s is missing, or is not the template's", file.Path)
 		}
 	}
@@ -184,10 +184,10 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 	if exists(target, "PklProject.deps.json") {
 		t.Error("init wrote the template's resolved dependencies")
 	}
-	if got := read(t, target, "PklProject"); got != manifest.PklProjectText(moonwell.Version, "") {
+	if got := readFile(t, target, "PklProject"); got != manifest.PklProjectText(moonwell.Version, "") {
 		t.Errorf("PklProject =\n%s", got)
 	}
-	if got := read(t, target, "moonwell.local.pkl"); got != manifest.LocalManifestText() {
+	if got := readFile(t, target, "moonwell.local.pkl"); got != manifest.LocalManifestText() {
 		t.Errorf("moonwell.local.pkl =\n%s", got)
 	}
 	want := "Created my-map. Check launch.gameExecutable in moonwell.local.pkl, then: cd my-map && moonwell build"
@@ -199,11 +199,11 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 func TestInitLinksTheProjectToTheSchemaItIsHanded(t *testing.T) {
 	parent := t.TempDir()
 	schema := filepath.Join(parent, "moonwell", "schema")
-	if _, err := created(resolving(t, "Pkl 0.32.1", 0), parent, "maps/my-map", schema); err != nil {
+	if _, err := createProjectIn(resolveEnvFactory(t, "Pkl 0.32.1", 0), parent, "maps/my-map", schema); err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	want := manifest.PklProjectText(moonwell.Version, "../../moonwell/schema")
-	if got := read(t, parent, "maps/my-map/PklProject"); got != want {
+	if got := readFile(t, parent, "maps/my-map/PklProject"); got != want {
 		t.Errorf("PklProject =\n%s\nwant\n%s", got, want)
 	}
 }
@@ -211,8 +211,8 @@ func TestInitLinksTheProjectToTheSchemaItIsHanded(t *testing.T) {
 func TestInitRemovesTheDirectoryItCreatedWhenResolvingFails(t *testing.T) {
 	parent := t.TempDir()
 	target := filepath.Join(parent, "my-map")
-	lines, err := created(resolving(t, "Pkl 0.32.1", 1), parent, target, "")
-	e := asError(t, err, "a failed resolve")
+	lines, err := createProjectIn(resolveEnvFactory(t, "Pkl 0.32.1", 1), parent, target, "")
+	e := asDiagError(t, err, "a failed resolve")
 	if e.Msg != "pkl project resolve failed:\n"+unreachable || e.File != filepath.ToSlash(target)+"/PklProject" ||
 		e.Hint == "" {
 		t.Errorf("error = %+v", e)
@@ -224,8 +224,8 @@ func TestInitRemovesTheDirectoryItCreatedWhenResolvingFails(t *testing.T) {
 
 func TestInitEmptiesAPreExistingDirectoryAgainWhenItFails(t *testing.T) {
 	target := t.TempDir()
-	_, err := created(resolving(t, "Pkl 0.32.1", 1), target, target, "")
-	asError(t, err, "a failed resolve")
+	_, err := createProjectIn(resolveEnvFactory(t, "Pkl 0.32.1", 1), target, target, "")
+	asDiagError(t, err, "a failed resolve")
 	if entries, readErr := os.ReadDir(target); readErr != nil || len(entries) != 0 {
 		t.Errorf("the directory holds %v (%v)", entries, readErr)
 	}
@@ -234,20 +234,20 @@ func TestInitEmptiesAPreExistingDirectoryAgainWhenItFails(t *testing.T) {
 func TestInitNamesTheFileItCannotWriteAndRemovesNothingElse(t *testing.T) {
 	parent := t.TempDir()
 	testkit.WriteFile(t, parent, "taken", []byte("mine"))
-	_, err := created(resolving(t, "Pkl 0.32.1", 0), parent, filepath.Join("taken", "my-map"), "")
-	e := asError(t, err, "a file where a folder is needed")
+	_, err := createProjectIn(resolveEnvFactory(t, "Pkl 0.32.1", 0), parent, filepath.Join("taken", "my-map"), "")
+	e := asDiagError(t, err, "a file where a folder is needed")
 	if !strings.HasPrefix(e.Msg, "Writing taken/my-map/") || !strings.HasPrefix(e.File, "taken/my-map/") ||
 		e.Hint == "" || e.Cause == nil {
 		t.Errorf("error = %+v", e)
 	}
-	if read(t, parent, "taken") != "mine" {
+	if readFile(t, parent, "taken") != "mine" {
 		t.Error("a failed init changed the file that stood in its way")
 	}
 }
 
 func TestInitWithLinkNeedsACheckout(t *testing.T) {
 	parent := t.TempDir()
-	result := carriedIn(background, resolving(t, "Pkl 0.32.1", 0), parent, "init", "my-map", "--link")
+	result := runCLIIn(background, resolveEnvFactory(t, "Pkl 0.32.1", 0), parent, "init", "my-map", "--link")
 	want := "error: --link only works when Moonwell runs from a local checkout.\n" +
 		"hint: Run it in the folder of a Moonwell checkout, or below it."
 	if result.code != 1 || result.output != want || exists(parent, "my-map") {
@@ -259,12 +259,12 @@ func TestInitWithLinkNeedsACheckout(t *testing.T) {
 	if err := os.MkdirAll(below, 0o777); err != nil {
 		t.Fatal(err)
 	}
-	result = carriedIn(background, resolving(t, "Pkl 0.32.1", 0), below, "init", "--link", "../../maps/my-map")
+	result = runCLIIn(background, resolveEnvFactory(t, "Pkl 0.32.1", 0), below, "init", "--link", "../../maps/my-map")
 	if result.code != 0 {
 		t.Fatalf("%+v", result)
 	}
 	want = manifest.PklProjectText(moonwell.Version, "../../schema")
-	if got := read(t, checkout, "maps/my-map/PklProject"); got != want {
+	if got := readFile(t, checkout, "maps/my-map/PklProject"); got != want {
 		t.Errorf("PklProject =\n%s\nwant\n%s", got, want)
 	}
 	if exists(below, "dist") || exists(checkout, "maps/my-map/dist") {
@@ -298,7 +298,7 @@ func TestLinkPathRefusesATargetOnAnotherDrive(t *testing.T) {
 		t.Skip("only Windows has drives")
 	}
 	_, err := relSchemaDir(`C:\Temp\my-map`, `D:\a\moonwell\schema`)
-	e := asError(t, err, "another drive")
+	e := asDiagError(t, err, "another drive")
 	if e.Msg != "--link needs the project on the same drive as this Moonwell checkout." ||
 		!strings.HasPrefix(e.Hint, `Create the project on D:\ (`) {
 		t.Errorf("error = %+v", e)
@@ -315,7 +315,7 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 			t.Error(name)
 		}
 	}
-	e, _, _ := pklOnly(t, root)
+	e, _, _ := newPklOnlyEnv(t, root)
 	p, err := build.Load(background, e)
 	if err != nil {
 		t.Fatal(diag.Format(err))
@@ -330,17 +330,17 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 			t.Error(dir)
 		}
 	}
-	if r := okWithPklAlone(t, root, "assets:check"); r.output != checked("0", "0") {
+	if r := mustSucceedWithPklOnly(t, root, "assets:check"); r.output != checkedLine("0", "0") {
 		t.Fatalf("assets:check in a new project: %+v", r)
 	}
 }
 
 func TestPklInitRefusesNonemptyDirectory(t *testing.T) {
 	root := newProject(t, "my-map")
-	write(t, root, "keep.txt", "keep")
-	fails(t, filepath.Dir(root), []string{"error: my-map is not empty.", "\nhint: Choose a new or empty directory."},
+	writeFile(t, root, "keep.txt", "keep")
+	mustFail(t, filepath.Dir(root), []string{"error: my-map is not empty.", "\nhint: Choose a new or empty directory."},
 		"init", "my-map")
-	if read(t, root, "keep.txt") != "keep" || !exists(root, "moonwell.pkl") {
+	if readFile(t, root, "keep.txt") != "keep" || !exists(root, "moonwell.pkl") {
 		t.Fatal("a refused init changed the folder")
 	}
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/env"
 )
 
-type reading struct {
+type parseResult struct {
 	code   int
 	ran    string
 	got    commandArgs
@@ -18,9 +18,9 @@ type reading struct {
 	stdout string
 }
 
-func readLine(t *testing.T, args ...string) reading {
+func parseArgs(t *testing.T, args ...string) parseResult {
 	t.Helper()
-	var result reading
+	var result parseResult
 	table := slices.Clone(commands)
 	for i := range table {
 		name := table[i].name
@@ -75,7 +75,7 @@ func TestAWellFormedLineRunsItsCommandWithWhatItSaid(t *testing.T) {
 		{[]string{"init", "--link", "--", "-v"}, "init", commandArgs{arguments: []string{"-v"}, link: true}},
 		{[]string{"build", "--minify", "--"}, "build", commandArgs{minify: true}},
 	} {
-		got := readLine(t, c.args...)
+		got := parseArgs(t, c.args...)
 		same := got.got.entry == c.want.entry && got.got.minify == c.want.minify && got.got.link == c.want.link &&
 			slices.Equal(got.got.arguments, c.want.arguments)
 		if got.code != 0 || got.ran != c.ran || !same {
@@ -125,7 +125,7 @@ func TestALineThatIsNotWellFormedIsRefused(t *testing.T) {
 		{[]string{"objects:evla"}, "objects:eval"},
 		{[]string{"frobnicate", "--help"}, "frobnicate"},
 	} {
-		got := readLine(t, c.args...)
+		got := parseArgs(t, c.args...)
 		message, hint, hasHint := strings.Cut(got.output, "\nhint: ")
 		if got.code != 1 || got.ran != "" || got.stdout != "" || !strings.HasPrefix(message, "error: ") || !hasHint ||
 			hint == "" || strings.Count(got.output, "error: ") != 1 {
@@ -140,14 +140,14 @@ func TestALineThatIsNotWellFormedIsRefused(t *testing.T) {
 
 func TestTheHelpNamesEveryCommandAndEveryFlag(t *testing.T) {
 	for _, args := range [][]string{nil, {"--help"}, {"-h"}, {"help"}, {"--"}, {"-hv"}} {
-		got := readLine(t, args...)
+		got := parseArgs(t, args...)
 		if got.code != 0 || got.ran != "" || got.output != "" ||
 			!strings.HasPrefix(got.stdout, "Moonwell "+moonwell.Version+": ") {
 			t.Errorf("%q: exit %d, ran %q, on the terminal %q:\n%s", args, got.code, got.ran, got.output, got.stdout)
 			continue
 		}
 		index := 0
-		for _, name := range append(names(commands), "help", "completion") {
+		for _, name := range append(commandNames(commands), "help", "completion") {
 			next := strings.Index(got.stdout[index:], "\n  "+name+" ")
 			if next < 0 {
 				t.Fatalf("%q: the help lacks %s, or lists it out of the table's order:\n%s", args, name, got.stdout)
@@ -155,24 +155,24 @@ func TestTheHelpNamesEveryCommandAndEveryFlag(t *testing.T) {
 			index += next
 		}
 		for _, c := range commands {
-			contains(t, got.stdout, c.help)
+			checkContains(t, got.stdout, c.help)
 		}
 	}
 	for _, c := range commands {
 		for _, args := range [][]string{{c.name, "--help"}, {c.name, "-h"}, {"help", c.name}} {
-			got := readLine(t, args...)
+			got := parseArgs(t, args...)
 			if got.code != 0 || got.ran != "" || got.output != "" {
 				t.Errorf("%q: exit %d, ran %q, on the terminal %q", args, got.code, got.ran, got.output)
 			}
-			contains(t, got.stdout, c.help, "moonwell "+c.usage)
+			checkContains(t, got.stdout, c.help, "moonwell "+c.usage)
 			for _, o := range c.flags {
-				contains(t, got.stdout, "--"+o.name, o.help)
+				checkContains(t, got.stdout, "--"+o.name, o.help)
 			}
 		}
 	}
 }
 
-func names(table []command) []string {
+func commandNames(table []command) []string {
 	var all []string
 	for _, c := range table {
 		all = append(all, c.name)
@@ -182,7 +182,7 @@ func names(table []command) []string {
 
 func TestTheVersionIsPrintedAsABareNumber(t *testing.T) {
 	for _, args := range [][]string{{"--version"}, {"-v"}} {
-		if got := readLine(t, args...); got.code != 0 || got.stdout != moonwell.Version || got.output != "" || got.ran != "" {
+		if got := parseArgs(t, args...); got.code != 0 || got.stdout != moonwell.Version || got.output != "" || got.ran != "" {
 			t.Errorf("%q: %+v", args, got)
 		}
 	}
@@ -190,7 +190,7 @@ func TestTheVersionIsPrintedAsABareNumber(t *testing.T) {
 
 func TestCompletionPrintsAScriptForOtherPrograms(t *testing.T) {
 	for _, shell := range []string{"powershell", "bash", "zsh", "fish"} {
-		got := readLine(t, "completion", shell)
+		got := parseArgs(t, "completion", shell)
 		if got.code != 0 || got.ran != "" || got.output != "" || !strings.Contains(got.stdout, "moonwell") {
 			t.Errorf("completion %s: exit %d, ran %q, on the terminal %q, and a script of %d bytes", shell, got.code,
 				got.ran, got.output, len(got.stdout))

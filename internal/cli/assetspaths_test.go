@@ -12,12 +12,12 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func paths(e *env.Env, log *testkit.LogRecorder, file, gameList string) ([]string, error) {
+func reportPaths(e *env.Env, log *testkit.LogRecorder, file, gameList string) ([]string, error) {
 	err := reportAssetPaths(background, e, file, assets.ParseGamePaths(gameList))
 	return log.Lines(), err
 }
 
-func knight() []byte {
+func knightModel() []byte {
 	return testkit.MDX(
 		testkit.Chunk("TEXS", testkit.Concat(testkit.Texture("Textures/Knight.blp", 0), testkit.Texture("", 1))),
 		testkit.Chunk("PREM", testkit.Emitter(`Abilities\Heal.mdx`, 0)),
@@ -26,9 +26,9 @@ func knight() []byte {
 
 func TestOutsideAProjectAssetsPathsTellsInGamePathsFromCustomOnesShownWithBackslashes(t *testing.T) {
 	root := t.TempDir()
-	testkit.WriteFile(t, root, "knight.mdx", knight())
+	testkit.WriteFile(t, root, "knight.mdx", knightModel())
 	e, log := testkit.Env(t, root)
-	lines, err := paths(e, log, "knight.mdx", "# test\ntextures/knight.dds\n")
+	lines, err := reportPaths(e, log, "knight.mdx", "# test\ntextures/knight.dds\n")
 	want := []string{
 		"knight.mdx",
 		`  texture         Textures\Knight.blp   in-game path`,
@@ -49,7 +49,7 @@ func TestAReforgedTifReferenceMatchesTheGamesDds(t *testing.T) {
 	testkit.WriteFile(t, root, "grass.mdx",
 		testkit.MDX(testkit.Chunk("TEXS", testkit.Texture("Doodads/Corn/plant1_Normal.tif", 0))))
 	e, log := testkit.Env(t, root)
-	lines, err := paths(e, log, "grass.mdx", "doodads/corn/plant1_normal.dds\n")
+	lines, err := reportPaths(e, log, "grass.mdx", "doodads/corn/plant1_normal.dds\n")
 	if err != nil || len(lines) != 3 || lines[1] != `  texture  Doodads\Corn\plant1_Normal.tif  in-game path` {
 		t.Errorf("assets:paths = %v; log = %q", err, lines)
 	}
@@ -59,7 +59,7 @@ func TestAnEmptyInGamePathListIsAnnounced(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "a.mdx", testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(`Textures\A.blp`, 0))))
 	e, log := testkit.Env(t, root)
-	lines, err := paths(e, log, "a.mdx", "")
+	lines, err := reportPaths(e, log, "a.mdx", "")
 	if err != nil || len(lines) != 4 ||
 		lines[0] != "warning: Moonwell's in-game path list is empty, so every path shows as custom." ||
 		lines[1] != "a.mdx" || lines[3] != "1 model, 1 path: 0 in-game, 1 custom." {
@@ -81,8 +81,8 @@ func TestOutsideAProjectAssetsPathsNeedsAFileThatExistsAndIsNotAFolder(t *testin
 		{what: "a file that is no model", file: "notes.mdx", words: "Not a readable model: ", named: "notes.mdx"},
 	} {
 		e, log := testkit.Env(t, root)
-		lines, err := paths(e, log, c.file, "textures/knight.dds\n")
-		diagErr := asError(t, err, c.what)
+		lines, err := reportPaths(e, log, c.file, "textures/knight.dds\n")
+		diagErr := asDiagError(t, err, c.what)
 		if !strings.Contains(diagErr.Msg, c.words) || diagErr.Hint == "" || diagErr.File != c.named ||
 			diagErr.Cause != nil {
 			t.Errorf("%s: error = %+v", c.what, diagErr)
@@ -95,10 +95,10 @@ func TestOutsideAProjectAssetsPathsNeedsAFileThatExistsAndIsNotAFolder(t *testin
 
 func TestOutsideAProjectAssetsPathsNamesAFileItCannotRead(t *testing.T) {
 	root := t.TempDir()
-	testkit.MakeUnreadable(t, testkit.WriteFile(t, root, "held.mdx", knight()))
+	testkit.MakeUnreadable(t, testkit.WriteFile(t, root, "held.mdx", knightModel()))
 	e, log := testkit.Env(t, root)
-	lines, err := paths(e, log, "held.mdx", "textures/knight.dds\n")
-	diagErr := asError(t, err, "a file that cannot be read")
+	lines, err := reportPaths(e, log, "held.mdx", "textures/knight.dds\n")
+	diagErr := asDiagError(t, err, "a file that cannot be read")
 	if !strings.Contains(diagErr.Msg, "Reading the model failed: ") || diagErr.Hint == "" || diagErr.File != "held.mdx" ||
 		diagErr.Cause == nil {
 		t.Errorf("error = %+v", diagErr)
@@ -110,9 +110,9 @@ func TestOutsideAProjectAssetsPathsNamesAFileItCannotRead(t *testing.T) {
 
 func TestAssetsPathsNamesAModelFromTheFolderItRunsIn(t *testing.T) {
 	root, elsewhere := t.TempDir(), t.TempDir()
-	testkit.WriteFile(t, root, "units/knight.mdx", knight())
-	testkit.WriteFile(t, root, "..knight.mdx", knight())
-	outside := testkit.WriteFile(t, elsewhere, "knight.mdx", knight())
+	testkit.WriteFile(t, root, "units/knight.mdx", knightModel())
+	testkit.WriteFile(t, root, "..knight.mdx", knightModel())
+	outside := testkit.WriteFile(t, elsewhere, "knight.mdx", knightModel())
 	for _, c := range []struct{ file, heading string }{
 		{"units/knight.mdx", "units/knight.mdx"},
 		{"..knight.mdx", "..knight.mdx"},
@@ -121,7 +121,7 @@ func TestAssetsPathsNamesAModelFromTheFolderItRunsIn(t *testing.T) {
 		{outside, fsx.ToSlash(outside)},
 	} {
 		e, log := testkit.Env(t, root)
-		lines, err := paths(e, log, c.file, "textures/knight.dds\n")
+		lines, err := reportPaths(e, log, c.file, "textures/knight.dds\n")
 		if err != nil || len(lines) != 5 || lines[0] != c.heading {
 			t.Errorf("%s: assets:paths = %v; log = %q, want the heading %q", c.file, err, lines, c.heading)
 		}
@@ -130,28 +130,28 @@ func TestAssetsPathsNamesAModelFromTheFolderItRunsIn(t *testing.T) {
 
 func TestTheAssetsPathsLineReportsOnTheFileItIsGiven(t *testing.T) {
 	root := t.TempDir()
-	testkit.WriteFile(t, root, "knight.mdx", knight())
+	testkit.WriteFile(t, root, "knight.mdx", knightModel())
 	for _, args := range [][]string{{"assets:paths", "knight.mdx"}, {"assets:paths", "--", "knight.mdx"}} {
-		r := ok(t, root, args...)
+		r := mustSucceed(t, root, args...)
 		if r.stdout != "" || !strings.HasPrefix(r.output, "knight.mdx\n  texture ") ||
 			!strings.Contains(r.output, "\n1 model, 3 paths: ") || strings.Contains(r.output, "warning: ") {
 			t.Errorf("%q: %+v", args, r)
 		}
 	}
-	fails(t, root, []string{"error: assets:paths needs a model file outside a Moonwell project.",
+	mustFail(t, root, []string{"error: assets:paths needs a model file outside a Moonwell project.",
 		"\nhint: moonwell assets:paths assets/Models/Knight.mdx"}, "assets:paths", "")
-	fails(t, root, []string{"error: ", "\nhint: "}, "assets:paths", "knight.mdx", "b.mdx")
+	mustFail(t, root, []string{"error: ", "\nhint: "}, "assets:paths", "knight.mdx", "b.mdx")
 	if entries := testkit.Snapshot(t, root); len(entries) != 1 {
 		t.Errorf("assets:paths outside a project left %d entries there, want the model alone", len(entries))
 	}
 }
 
 func TestPklLibraryAssetsPaths(t *testing.T) {
-	root, _ := projectWithAssetLibrary(t)
+	root, _ := newProjectWithAssetLibrary(t)
 	testkit.WriteFile(t, root, "assets/Models/Own.mdx",
 		testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(`textures\golem.BLP`, 0))))
-	e, log, ran := pklOnly(t, root)
-	lines, err := paths(e, log, "", "# test\n")
+	e, log, ran := newPklOnlyEnv(t, root)
+	lines, err := reportPaths(e, log, "", "# test\n")
 	want := []string{
 		"warning: Moonwell's in-game path list is empty, so every path shows as custom.",
 		"library golems: Models/Golem.mdx",
@@ -163,7 +163,7 @@ func TestPklLibraryAssetsPaths(t *testing.T) {
 	if err != nil || !slices.Equal(lines, want) {
 		t.Fatalf("assets:paths = %v; log =\n%s", err, strings.Join(lines, "\n"))
 	}
-	onlyPkl(t, ran)
+	checkOnlyPklRan(t, ran)
 	if !exists(root, ".moonwell/library-assets/golems/Models/Golem.mdx") || exists(root, "dist/.lock") {
 		t.Error("assets:paths did not sync the library, or left the build lock behind")
 	}
@@ -179,12 +179,12 @@ func TestPklAssetsPathsClassifiesAllReferences(t *testing.T) {
 	testkit.WriteFile(t, root, "assets/Textures/knight.BLP", []byte{1})
 	testkit.WriteFile(t, root, "assets/art/cape.blp", []byte{2})
 	testkit.WriteFile(t, root, "assets/Models/Glow.mdx", testkit.MDX())
-	write(t, root, "assets/Models/Only.mdl", "Version {\n FormatVersion 800,\n}\n")
-	edit(t, root, "moonwell.pkl", "paths {}", `paths { ["art/cape.blp"] = #"Textures\Cape.blp"# }`)
+	writeFile(t, root, "assets/Models/Only.mdl", "Version {\n FormatVersion 800,\n}\n")
+	replaceInFile(t, root, "moonwell.pkl", "paths {}", `paths { ["art/cape.blp"] = #"Textures\Cape.blp"# }`)
 	const gameList = "# test\ntextures/knight.dds\ntextures/missing.blp\n"
 
-	e, log, _ := pklOnly(t, root)
-	lines, err := paths(e, log, "assets/Models/Knight.mdx", gameList)
+	e, log, _ := newPklOnlyEnv(t, root)
+	lines, err := reportPaths(e, log, "assets/Models/Knight.mdx", gameList)
 	want := []string{
 		"assets/Models/Knight.mdx",
 		`  texture         Textures\Knight.blp   in-game path, replaced`,
@@ -199,8 +199,8 @@ func TestPklAssetsPathsClassifiesAllReferences(t *testing.T) {
 		t.Fatalf("assets:paths = %v; log =\n%s", err, strings.Join(lines, "\n"))
 	}
 
-	e, log, _ = pklOnly(t, root)
-	lines, err = paths(e, log, "", gameList)
+	e, log, _ = newPklOnlyEnv(t, root)
+	lines, err = reportPaths(e, log, "", gameList)
 	all := slices.Concat([]string{"assets/Models/Glow.mdx", "  (no referenced files)"}, want[:7],
 		[]string{"assets/Models/Only.mdl", "  (no referenced files)",
 			"3 models, 6 paths: 2 in-game, 2 custom imported, 1 custom not imported."})
@@ -211,12 +211,12 @@ func TestPklAssetsPathsClassifiesAllReferences(t *testing.T) {
 
 func TestPklAssetsPathsReportsReadableModelsBeforeFailure(t *testing.T) {
 	root := newProject(t, "my-map")
-	write(t, root, "assets/Models/A.mdl", "Model {\n}\nBroken {\n")
+	writeFile(t, root, "assets/Models/A.mdl", "Model {\n}\nBroken {\n")
 	testkit.WriteFile(t, root, "assets/Models/B.mdx",
 		testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(`Textures\B.blp`, 0))))
-	e, log, _ := pklOnly(t, root)
-	lines, err := paths(e, log, "", "textures/b.blp\n")
-	diagErr := asError(t, err, "a model that cannot be read")
+	e, log, _ := newPklOnlyEnv(t, root)
+	lines, err := reportPaths(e, log, "", "textures/b.blp\n")
+	diagErr := asDiagError(t, err, "a model that cannot be read")
 	if !strings.Contains(diagErr.Msg, "1 model could not be read") || diagErr.File != "" ||
 		!strings.Contains(diagErr.Hint, "assets/Models/A.mdl") {
 		t.Errorf("error = %+v", diagErr)
@@ -231,7 +231,7 @@ func TestPklAssetsPathsReportsReadableModelsBeforeFailure(t *testing.T) {
 	if !slices.Equal(lines, want) {
 		t.Fatalf("log =\n%s", strings.Join(lines, "\n"))
 	}
-	r := failsWithPklAlone(t, root,
+	r := mustFailWithPklOnly(t, root,
 		[]string{"assets/Models/A.mdl\n  (unreadable: ", "\nerror: 1 model could not be read.\nhint: "}, "assets:paths")
 	if !strings.HasSuffix(r.output, "the report above lists why each one is unreadable.") || r.stdout != "" {
 		t.Errorf("%+v", r)
@@ -244,7 +244,7 @@ func TestAReportWithModelsThatCouldNotBeReadFailsAndNamesEach(t *testing.T) {
 		{Heading: "assets/Models/B.mdx"},
 		{Heading: "library golems: Models/C.mdx", Unreadable: "it is cut short"},
 	}
-	diagErr := asError(t, checkModelsReadable(reports), "two models that cannot be read")
+	diagErr := asDiagError(t, checkModelsReadable(reports), "two models that cannot be read")
 	if !strings.Contains(diagErr.Msg, "2 models could not be read") ||
 		!strings.Contains(diagErr.Hint, "assets/Models/A.mdl, library golems: Models/C.mdx;") {
 		t.Errorf("error = %+v", diagErr)
@@ -256,9 +256,9 @@ func TestAReportWithModelsThatCouldNotBeReadFailsAndNamesEach(t *testing.T) {
 
 func TestPklAssetsPathsOfAProjectWithoutModels(t *testing.T) {
 	root := newProject(t, "my-map")
-	write(t, root, "assets/icons/a.blp", "icon")
-	e, log, _ := pklOnly(t, root)
-	if lines, err := paths(e, log, "", ""); err != nil || !slices.Equal(lines, []string{"No models under assets/."}) {
+	writeFile(t, root, "assets/icons/a.blp", "icon")
+	e, log, _ := newPklOnlyEnv(t, root)
+	if lines, err := reportPaths(e, log, "", ""); err != nil || !slices.Equal(lines, []string{"No models under assets/."}) {
 		t.Errorf("assets:paths = %v; log = %q", err, lines)
 	}
 	if exists(root, "dist/.lock") {
@@ -268,9 +268,9 @@ func TestPklAssetsPathsOfAProjectWithoutModels(t *testing.T) {
 
 func TestPklAssetsPathsOfAFileInAProjectThatImportsNothing(t *testing.T) {
 	root := newProject(t, "my-map")
-	testkit.WriteFile(t, root, "drafts/knight.mdx", knight())
-	e, log, _ := pklOnly(t, root)
-	lines, err := paths(e, log, "drafts/knight.mdx", "textures/knight.dds\n")
+	testkit.WriteFile(t, root, "drafts/knight.mdx", knightModel())
+	e, log, _ := newPklOnlyEnv(t, root)
+	lines, err := reportPaths(e, log, "drafts/knight.mdx", "textures/knight.dds\n")
 	want := []string{
 		"drafts/knight.mdx",
 		`  texture         Textures\Knight.blp   in-game path`,
@@ -284,13 +284,13 @@ func TestPklAssetsPathsOfAFileInAProjectThatImportsNothing(t *testing.T) {
 }
 
 func TestPklAssetsPathsIsRefusedBesideARunningBuild(t *testing.T) {
-	root, _ := projectWithAssetLibrary(t)
-	testkit.WriteFile(t, root, "knight.mdx", knight())
+	root, _ := newProjectWithAssetLibrary(t)
+	testkit.WriteFile(t, root, "knight.mdx", knightModel())
 	holdBuildLock(t, root)
 	for _, file := range []string{"", "knight.mdx"} {
-		e, log, _ := pklOnly(t, root)
-		lines, err := paths(e, log, file, "textures/knight.dds\n")
-		diagErr := asError(t, err, "assets:paths beside a build")
+		e, log, _ := newPklOnlyEnv(t, root)
+		lines, err := reportPaths(e, log, file, "textures/knight.dds\n")
+		diagErr := asDiagError(t, err, "assets:paths beside a build")
 		if diagErr.File != "dist/.lock" || diagErr.Hint == "" || len(lines) != 0 ||
 			!strings.Contains(diagErr.Msg, "Another Moonwell build is running") {
 			t.Errorf("%q: error = %+v; log = %q", file, diagErr, lines)

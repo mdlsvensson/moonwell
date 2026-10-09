@@ -22,33 +22,33 @@ import (
 
 var background = context.Background()
 
-type outcome struct {
+type runResult struct {
 	code           int
 	output, stdout string
 }
 
 const mark = "\xe2\x80\xba"
 
-func run(root string, args ...string) outcome {
+func runCLI(root string, args ...string) runResult {
 	var lines, printed []string
 	code := Run(background, args, root, func(line string) { lines = append(lines, line) },
 		func(text string) { printed = append(printed, text) })
-	return outcome{code, strings.Join(lines, "\n"), strings.Join(printed, "\n")}
+	return runResult{code, strings.Join(lines, "\n"), strings.Join(printed, "\n")}
 }
 
-func carried(t *testing.T, ctx context.Context, root string, args ...string) outcome {
+func runCLIWithContext(t *testing.T, ctx context.Context, root string, args ...string) runResult {
 	t.Helper()
-	return carriedIn(ctx, standIn(t), root, args...)
+	return runCLIIn(ctx, fakeEnvFactory(t), root, args...)
 }
 
-func carriedIn(ctx context.Context, outside envFactory, root string, args ...string) outcome {
+func runCLIIn(ctx context.Context, outside envFactory, root string, args ...string) runResult {
 	var lines, printed []string
 	code := runIn(ctx, outside, args, root, func(line string) { lines = append(lines, line) },
 		func(text string) { printed = append(printed, text) })
-	return outcome{code, strings.Join(lines, "\n"), strings.Join(printed, "\n")}
+	return runResult{code, strings.Join(lines, "\n"), strings.Join(printed, "\n")}
 }
 
-func standIn(t *testing.T) envFactory {
+func fakeEnvFactory(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
 		e, _ := testkit.Env(t, root)
 		e.Log = log
@@ -66,19 +66,19 @@ func standIn(t *testing.T) envFactory {
 	}
 }
 
-func ok(t *testing.T, root string, args ...string) outcome {
+func mustSucceed(t *testing.T, root string, args ...string) runResult {
 	t.Helper()
-	return endedWith(t, run(root, args...), 0, args)
+	return checkExitCode(t, runCLI(root, args...), 0, args)
 }
 
-func fails(t *testing.T, root string, wanted []string, args ...string) outcome {
+func mustFail(t *testing.T, root string, wanted []string, args ...string) runResult {
 	t.Helper()
-	result := endedWith(t, run(root, args...), 1, args)
-	contains(t, result.output, wanted...)
+	result := checkExitCode(t, runCLI(root, args...), 1, args)
+	checkContains(t, result.output, wanted...)
 	return result
 }
 
-func endedWith(t *testing.T, result outcome, code int, args []string) outcome {
+func checkExitCode(t *testing.T, result runResult, code int, args []string) runResult {
 	t.Helper()
 	if result.code != code {
 		t.Fatalf("moonwell %s exited with %d:\n%s", strings.Join(args, " "), result.code, result.output)
@@ -86,13 +86,13 @@ func endedWith(t *testing.T, result outcome, code int, args []string) outcome {
 	return result
 }
 
-type seededWorld struct {
+type fakeWorld struct {
 	outside  envFactory
 	cache    string
 	compiler string
 }
 
-func seeded(t *testing.T, standIns ...string) seededWorld {
+func newFakeWorld(t *testing.T, standIns ...string) fakeWorld {
 	t.Helper()
 	testkit.NeedPkl(t)
 	asset, pinned := toolchain.YueScript.Versions[toolchain.YueVersion][env.CurrentPlatform()]
@@ -121,29 +121,29 @@ func seeded(t *testing.T, standIns ...string) seededWorld {
 		e.Log, e.CacheDir, e.Run = log, cache, runs
 		return e
 	}
-	return seededWorld{outside: outside, cache: cache, compiler: compiler}
+	return fakeWorld{outside: outside, cache: cache, compiler: compiler}
 }
 
-func (w seededWorld) ok(t *testing.T, root string, args ...string) outcome {
+func (w fakeWorld) mustSucceed(t *testing.T, root string, args ...string) runResult {
 	t.Helper()
-	return endedWith(t, carriedIn(background, w.outside, root, args...), 0, args)
+	return checkExitCode(t, runCLIIn(background, w.outside, root, args...), 0, args)
 }
 
-func (w seededWorld) fails(t *testing.T, root string, wanted []string, args ...string) outcome {
+func (w fakeWorld) mustFail(t *testing.T, root string, wanted []string, args ...string) runResult {
 	t.Helper()
-	result := endedWith(t, carriedIn(background, w.outside, root, args...), 1, args)
-	contains(t, result.output, wanted...)
+	result := checkExitCode(t, runCLIIn(background, w.outside, root, args...), 1, args)
+	checkContains(t, result.output, wanted...)
 	return result
 }
 
-func (w seededWorld) at(root string) (*env.Env, *testkit.LogRecorder) {
+func (w fakeWorld) envAt(root string) (*env.Env, *testkit.LogRecorder) {
 	log := testkit.NewLogRecorder()
 	return w.outside(root, log.Logger), log
 }
 
-func (w seededWorld) binDir() string { return filepath.Join(w.cache, "bin") }
+func (w fakeWorld) binDir() string { return filepath.Join(w.cache, "bin") }
 
-func contains(t *testing.T, text string, parts ...string) {
+func checkContains(t *testing.T, text string, parts ...string) {
 	t.Helper()
 	for _, part := range parts {
 		if !strings.Contains(text, part) {
@@ -154,7 +154,7 @@ func contains(t *testing.T, text string, parts ...string) {
 
 func exists(root, path string) bool { return fsx.Exists(filepath.Join(root, filepath.FromSlash(path))) }
 
-func rowOf(table []command, name string) (command, bool) {
+func findCommand(table []command, name string) (command, bool) {
 	index := slices.IndexFunc(table, func(row command) bool { return row.name == name })
 	if index < 0 {
 		return command{}, false
@@ -162,23 +162,23 @@ func rowOf(table []command, name string) (command, bool) {
 	return table[index], true
 }
 
-func rowNamed(t *testing.T, name string) command {
+func mustFindCommand(t *testing.T, name string) command {
 	t.Helper()
-	chosen, known := rowOf(commands, name)
+	chosen, known := findCommand(commands, name)
 	if !known {
 		t.Fatalf("the command table has no %s", name)
 	}
 	return chosen
 }
 
-func project(t *testing.T) string {
+func newTemplateProject(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "moonwell.pkl", []byte("// A manifest that no test evaluates.\n"))
 	return root
 }
 
-func read(t *testing.T, root, path string) string {
+func readFile(t *testing.T, root, path string) string {
 	t.Helper()
 	data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
 	if err != nil {
@@ -187,33 +187,33 @@ func read(t *testing.T, root, path string) string {
 	return string(data)
 }
 
-func write(t *testing.T, root, path, content string) {
+func writeFile(t *testing.T, root, path, content string) {
 	t.Helper()
 	testkit.WriteFile(t, root, path, []byte(content))
 }
 
-func edit(t *testing.T, root, path, from, to string) {
+func replaceInFile(t *testing.T, root, path, from, to string) {
 	t.Helper()
-	content := read(t, root, path)
+	content := readFile(t, root, path)
 	if !strings.Contains(content, from) {
 		t.Fatalf("%s does not contain %q:\n%s", path, from, content)
 	}
-	write(t, root, path, strings.Replace(content, from, to, 1))
+	writeFile(t, root, path, strings.Replace(content, from, to, 1))
 }
 
-func appendTo(t *testing.T, root, path, more string) {
+func appendToFile(t *testing.T, root, path, more string) {
 	t.Helper()
-	write(t, root, path, read(t, root, path)+more)
+	writeFile(t, root, path, readFile(t, root, path)+more)
 }
 
-func remove(t *testing.T, root, path string) {
+func removeFile(t *testing.T, root, path string) {
 	t.Helper()
 	if err := os.RemoveAll(filepath.Join(root, filepath.FromSlash(path))); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func asError(t *testing.T, err error, what string) *diag.Error {
+func asDiagError(t *testing.T, err error, what string) *diag.Error {
 	t.Helper()
 	var diagErr *diag.Error
 	if !errors.As(err, &diagErr) {
@@ -222,7 +222,7 @@ func asError(t *testing.T, err error, what string) *diag.Error {
 	return diagErr
 }
 
-func realWorld(root string) (*env.Env, *testkit.LogRecorder) {
+func newRealEnv(root string) (*env.Env, *testkit.LogRecorder) {
 	log := testkit.NewLogRecorder()
 	return env.New(root, log.Logger), log
 }
@@ -235,7 +235,7 @@ func newProject(t *testing.T, name string) string {
 func projectIn(t *testing.T, parent, name string) string {
 	t.Helper()
 	testkit.NeedPkl(t)
-	e, _, _ := pklOnly(t, parent)
+	e, _, _ := newPklOnlyEnv(t, parent)
 	if err := createProject(background, e, name, filepath.Join(testkit.RepoRoot(t), "schema")); err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -251,7 +251,7 @@ func compiling(t *testing.T) string {
 	return newProject(t, "my-map")
 }
 
-func ownCache(t *testing.T) string {
+func newCacheDir(t *testing.T) string {
 	t.Helper()
 	compiler := tooltest.Yue(t)
 	if _, pinned := toolchain.YueScript.Versions[toolchain.YueVersion][env.CurrentPlatform()]; !pinned {
@@ -277,27 +277,27 @@ func pinnedCompilerIn(cache string) string {
 	return filepath.Join(cache, toolchain.YueScript.Name, toolchain.YueVersion, filepath.FromSlash(asset.Binary))
 }
 
-func pklAlone(t *testing.T) envFactory {
+func pklOnlyEnvFactory(t *testing.T) envFactory {
 	return func(root string, log *env.Logger) *env.Env {
-		e, _, _ := pklOnly(t, root)
+		e, _, _ := newPklOnlyEnv(t, root)
 		e.Log = log
 		return e
 	}
 }
 
-func okWithPklAlone(t *testing.T, root string, args ...string) outcome {
+func mustSucceedWithPklOnly(t *testing.T, root string, args ...string) runResult {
 	t.Helper()
-	return endedWith(t, carriedIn(background, pklAlone(t), root, args...), 0, args)
+	return checkExitCode(t, runCLIIn(background, pklOnlyEnvFactory(t), root, args...), 0, args)
 }
 
-func failsWithPklAlone(t *testing.T, root string, wanted []string, args ...string) outcome {
+func mustFailWithPklOnly(t *testing.T, root string, wanted []string, args ...string) runResult {
 	t.Helper()
-	result := endedWith(t, carriedIn(background, pklAlone(t), root, args...), 1, args)
-	contains(t, result.output, wanted...)
+	result := checkExitCode(t, runCLIIn(background, pklOnlyEnvFactory(t), root, args...), 1, args)
+	checkContains(t, result.output, wanted...)
 	return result
 }
 
-func pklOnly(t *testing.T, root string) (e *env.Env, log *testkit.LogRecorder, ran func() []string) {
+func newPklOnlyEnv(t *testing.T, root string) (e *env.Env, log *testkit.LogRecorder, ran func() []string) {
 	t.Helper()
 	e, log = testkit.Env(t, root)
 	var guard sync.Mutex
@@ -324,23 +324,23 @@ func pklOnly(t *testing.T, root string) (e *env.Env, log *testkit.LogRecorder, r
 	}
 }
 
-func commandIn(t *testing.T, ctx context.Context, e *env.Env, name string, arguments ...string) ([]string, error) {
+func runCommandIn(t *testing.T, ctx context.Context, e *env.Env, name string, arguments ...string) ([]string, error) {
 	t.Helper()
 	var printed []string
 	said := commandArgs{arguments: arguments, writeStdout: func(text string) { printed = append(printed, text) }}
-	err := rowNamed(t, name).run(ctx, e, said)
+	err := mustFindCommand(t, name).run(ctx, e, said)
 	return printed, err
 }
 
-func logged(t *testing.T, e *env.Env, log *testkit.LogRecorder, name string, arguments ...string) []string {
+func mustRunCommand(t *testing.T, e *env.Env, log *testkit.LogRecorder, name string, arguments ...string) []string {
 	t.Helper()
-	if _, err := commandIn(t, background, e, name, arguments...); err != nil {
+	if _, err := runCommandIn(t, background, e, name, arguments...); err != nil {
 		t.Fatalf("moonwell %s failed:\n%s\nafter it logged %q", name, diag.Format(err), log.Lines())
 	}
 	return log.Lines()
 }
 
-func onlyPkl(t *testing.T, ran func() []string) {
+func checkOnlyPklRan(t *testing.T, ran func() []string) {
 	t.Helper()
 	programs := ran()
 	if len(programs) == 0 || slices.ContainsFunc(programs, func(program string) bool { return program != "pkl" }) {
@@ -348,12 +348,12 @@ func onlyPkl(t *testing.T, ran func() []string) {
 	}
 }
 
-func writeLocal(t *testing.T, root, body string) {
+func writeLocalManifest(t *testing.T, root, body string) {
 	t.Helper()
-	write(t, root, "moonwell.local.pkl", "amends \"moonwell.pkl\"\n"+body+"\n")
+	writeFile(t, root, "moonwell.local.pkl", "amends \"moonwell.pkl\"\n"+body+"\n")
 }
 
-func sameFiles(t *testing.T, before, after map[string][]byte, what string) {
+func checkSameFiles(t *testing.T, before, after map[string][]byte, what string) {
 	t.Helper()
 	for name, data := range after {
 		previous, was := before[name]
@@ -382,19 +382,19 @@ func holdBuildLock(t *testing.T, root string) {
 func exampleLibrary(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
-	write(t, dir, "src/example/greet.lua",
+	writeFile(t, dir, "src/example/greet.lua",
 		"local M = {}\nfunction M.hello(name)\n return \"Hello, \" .. name\nend\nreturn M\n")
-	write(t, dir, "src/example/loud.yue",
+	writeFile(t, dir, "src/example/loud.yue",
 		"import \"example.greet\"\n\nexport shout = (name) -> greet.hello(name)\\upper!\n")
-	write(t, dir, "src/example/loud.lua", "return { shout = function() return \"stale\" end }\n")
-	write(t, dir, "src/example/globals.lua", "function ExampleAdd(a, b)\n return a + b\nend\n")
+	writeFile(t, dir, "src/example/loud.lua", "return { shout = function() return \"stale\" end }\n")
+	writeFile(t, dir, "src/example/globals.lua", "function ExampleAdd(a, b)\n return a + b\nend\n")
 	return dir
 }
 
 func useLibrary(t *testing.T, root, library string) {
 	t.Helper()
-	appendTo(t, root, "moonwell.local.pkl",
+	appendToFile(t, root, "moonwell.local.pkl",
 		"\nlibraries { [\"ex\"] { path = \""+filepath.ToSlash(library)+"\"; dir = \"src\" } }\n")
-	appendTo(t, root, "src/main.yue", "\nimport \"example.loud\"\nrequire \"example.globals\"\n"+
+	appendToFile(t, root, "src/main.yue", "\nimport \"example.loud\"\nrequire \"example.globals\"\n"+
 		"print loud.shout \"Moonwell\"\nprint ExampleAdd 1, 2\n")
 }

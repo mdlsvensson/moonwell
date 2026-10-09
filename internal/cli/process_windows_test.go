@@ -14,7 +14,7 @@ const (
 	ctrlBreakEvent        = 1
 )
 
-func apartFromTheTest(cmd *exec.Cmd) {
+func detachFromTest(cmd *exec.Cmd) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: createNewConsole | createNewProcessGroup}
 }
 

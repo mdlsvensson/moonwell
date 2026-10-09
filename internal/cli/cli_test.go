@@ -21,13 +21,13 @@ import (
 
 func TestTheHelpAndTheVersionArePrintedForOtherPrograms(t *testing.T) {
 	for _, args := range [][]string{{"--help"}, {}, {"build", "--help"}, {"help", "init"}} {
-		result := ok(t, t.TempDir(), args...)
+		result := mustSucceed(t, t.TempDir(), args...)
 		if result.output != "" || !strings.Contains(result.stdout, "moonwell") {
 			t.Errorf("%q: %+v", args, result)
 		}
 	}
 	for _, args := range [][]string{{"--version"}, {"-v"}} {
-		if result := ok(t, t.TempDir(), args...); result.stdout != moonwell.Version || result.output != "" {
+		if result := mustSucceed(t, t.TempDir(), args...); result.stdout != moonwell.Version || result.output != "" {
 			t.Errorf("%q: %+v", args, result)
 		}
 	}
@@ -38,7 +38,7 @@ func TestARefusedLineIsPrintedAsOneFailureWithAHint(t *testing.T) {
 		{"frobnicate"}, {"biuld"}, {"build", "--minfy"}, {"dev", "--minify"}, {"--minify", "build"}, {"build", "extra"},
 		{"init"}, {"test", "--minify=maybe"}, {"setup", "-v"}, {"build", "--entry"},
 	} {
-		result := fails(t, t.TempDir(), []string{"error: ", "\nhint: "}, args...)
+		result := mustFail(t, t.TempDir(), []string{"error: ", "\nhint: "}, args...)
 		if strings.Count(result.output, "error: ") != 1 || result.stdout != "" {
 			t.Errorf("%q printed its refusal more than once, or for other programs:\n%s", args, result.output)
 		}
@@ -46,8 +46,8 @@ func TestARefusedLineIsPrintedAsOneFailureWithAHint(t *testing.T) {
 }
 
 func TestAnEntryThatIsNoEntryFileIsRefusedBeforeAnythingIsLoaded(t *testing.T) {
-	root := project(t)
-	fails(t, root, []string{"error: Entry 'lua/main.lua' must be a .yue file under src/.", "\nhint: "},
+	root := newTemplateProject(t)
+	mustFail(t, root, []string{"error: Entry 'lua/main.lua' must be a .yue file under src/.", "\nhint: "},
 		"build", "--entry", "lua/main.lua")
 	if exists(root, "dist") {
 		t.Error("a refused line made dist/")
@@ -61,11 +61,11 @@ func TestAStartFromExplorerIsNotRefused(t *testing.T) {
 }
 
 func TestALineThatRunsNoCommandMakesNoDist(t *testing.T) {
-	root := project(t)
+	root := newTemplateProject(t)
 	for _, args := range [][]string{
 		{"--help"}, {"--version"}, {}, {"frobnicate"}, {"build", "--minfy"}, {"build", "--entry"}, {"check", "extra"},
 	} {
-		run(root, args...)
+		runCLI(root, args...)
 		if exists(root, "dist") {
 			t.Fatalf("%q made dist/ in a project", args)
 		}
@@ -73,9 +73,9 @@ func TestALineThatRunsNoCommandMakesNoDist(t *testing.T) {
 }
 
 func TestAProjectKeepsWhatACommandSaysInDistMoonwellLog(t *testing.T) {
-	root := project(t)
-	result := fails(t, root, []string{"error: ", "The src/ folder is missing.", "\nhint: "}, "dev")
-	logged := read(t, root, "dist/moonwell.log")
+	root := newTemplateProject(t)
+	result := mustFail(t, root, []string{"error: ", "The src/ folder is missing.", "\nhint: "}, "dev")
+	logged := readFile(t, root, "dist/moonwell.log")
 	if !strings.HasPrefix(logged, "[") || !strings.HasSuffix(logged, "] error: "+result.output+"\n") {
 		t.Errorf("dist/moonwell.log holds:\n%s\nwant the time, the level and:\n%s", logged, result.output)
 	}
@@ -83,18 +83,18 @@ func TestAProjectKeepsWhatACommandSaysInDistMoonwellLog(t *testing.T) {
 
 func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 	root := t.TempDir()
-	fails(t, root, []string{"error: ", "The src/ folder is missing."}, "dev")
+	mustFail(t, root, []string{"error: ", "The src/ folder is missing."}, "dev")
 	needManifest := []string{
 		"check", "build", "test", "setup", "assets:check", "assets:sync", "settings:check", "objects:eval",
 		"objects:check",
 	}
 	for _, name := range needManifest {
-		result := carried(t, background, root, name)
+		result := runCLIWithContext(t, background, root, name)
 		if result.code != 1 || !strings.Contains(result.output, "No moonwell.pkl found") || result.stdout != "" {
 			t.Errorf("%s: %+v", name, result)
 		}
 	}
-	result := carried(t, background, root, "assets:paths")
+	result := runCLIWithContext(t, background, root, "assets:paths")
 	if result.code != 1 || !strings.Contains(result.output, "assets:paths needs a model file") {
 		t.Errorf("assets:paths: %+v", result)
 	}
@@ -105,47 +105,47 @@ func TestCommandsOutsideAProjectLeaveNoDistBehind(t *testing.T) {
 		t.Errorf("a command outside a project left %v there (%v)", entries, err)
 	}
 	for _, name := range append([]string{"dev", "assets:paths"}, needManifest...) {
-		if file := logFilePath(root, rowNamed(t, name)); file != "" {
+		if file := logFilePath(root, mustFindCommand(t, name)); file != "" {
 			t.Errorf("%s outside a project keeps a log in %s", name, file)
 		}
 	}
 }
 
 func TestAFailingObjectsEvalPrintsItsErrorToTheLogWriterAndNothingToStdout(t *testing.T) {
-	result := carried(t, background, t.TempDir(), "objects:eval")
+	result := runCLIWithContext(t, background, t.TempDir(), "objects:eval")
 	if result.code != 1 || !strings.Contains(result.output, "error:") || result.stdout != "" {
 		t.Errorf("%+v", result)
 	}
 }
 
 func TestOnlyAProjectGetsALogAndInitNeverDoes(t *testing.T) {
-	root := project(t)
-	if file, want := logFilePath(root, rowNamed(t, "check")), filepath.Join(root, "dist", "moonwell.log"); file != want {
+	root := newTemplateProject(t)
+	if file, want := logFilePath(root, mustFindCommand(t, "check")), filepath.Join(root, "dist", "moonwell.log"); file != want {
 		t.Errorf("the log of a project is %q, want %q", file, want)
 	}
-	if file, want := logFilePath(root, rowNamed(t, "setup")), filepath.Join(root, "dist", "moonwell.log"); file != want {
+	if file, want := logFilePath(root, mustFindCommand(t, "setup")), filepath.Join(root, "dist", "moonwell.log"); file != want {
 		t.Errorf("the log of a setup in a project is %q, want %q", file, want)
 	}
-	if file := logFilePath(root, rowNamed(t, "init")); file != "" {
+	if file := logFilePath(root, mustFindCommand(t, "init")); file != "" {
 		t.Errorf("init keeps a log in %s", file)
 	}
 }
 
 func TestALinkAtDistGetsNoLog(t *testing.T) {
-	root, elsewhere := project(t), t.TempDir()
+	root, elsewhere := newTemplateProject(t), t.TempDir()
 	testkit.LinkDir(t, elsewhere, filepath.Join(root, "dist"))
-	fails(t, root, []string{"error: ", "The src/ folder is missing."}, "dev")
+	mustFail(t, root, []string{"error: ", "The src/ folder is missing."}, "dev")
 	if exists(elsewhere, "moonwell.log") {
 		t.Error("a log was written through the link at dist/")
 	}
 }
 
 func TestCommandFailuresAreFormattedAndReturn1(t *testing.T) {
-	result := carried(t, background, t.TempDir(), "check")
+	result := runCLIWithContext(t, background, t.TempDir(), "check")
 	if result.code != 1 || !strings.HasPrefix(result.output, "error: ") || result.stdout != "" {
 		t.Errorf("%+v", result)
 	}
-	contains(t, result.output, "No moonwell.pkl found in this directory.", "\nhint: ")
+	checkContains(t, result.output, "No moonwell.pkl found in this directory.", "\nhint: ")
 	if strings.Count(result.output, "error: ") != 1 {
 		t.Errorf("the failure is printed more than once:\n%s", result.output)
 	}
@@ -159,7 +159,7 @@ func TestACommandThatWasInterruptedExitsWith130(t *testing.T) {
 		{"settings:check"}, {"objects:eval"}, {"objects:check"},
 	} {
 		root := t.TempDir()
-		if result := carried(t, cancelled, root, args...); result.code != 130 || result.output != "" {
+		if result := runCLIWithContext(t, cancelled, root, args...); result.code != 130 || result.output != "" {
 			t.Errorf("%q: exit %d, printed %q", args, result.code, result.output)
 		}
 		if entries, err := os.ReadDir(root); err != nil || len(entries) != 0 {
@@ -173,11 +173,11 @@ func TestADevThatWasToldToStopExitsWith130(t *testing.T) {
 	testkit.WriteFile(t, root, "src/main.yue", []byte("x = 1\n"))
 	stopped, stop := context.WithCancel(background)
 	stop()
-	result := carried(t, stopped, root, "dev")
+	result := runCLIWithContext(t, stopped, root, "dev")
 	if result.code != 130 {
 		t.Errorf("%+v", result)
 	}
-	contains(t, result.output, "No moonwell.pkl found in this directory.", "Watching ")
+	checkContains(t, result.output, "No moonwell.pkl found in this directory.", "Watching ")
 }
 
 func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *testing.T) {
@@ -217,7 +217,7 @@ func TestTheOutcomeOfACommandBecomesItsExitCodeAndItsFailureIsPrintedOnce(t *tes
 
 func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 	inACommand := func(root string, log *env.Logger) *env.Env {
-		e := standIn(t)(root, log)
+		e := fakeEnvFactory(t)(root, log)
 		e.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
 			panic("the index is out of range")
 		}
@@ -226,23 +226,23 @@ func TestAPanicIsPrintedAsAnInternalErrorWithItsStackAndReturns1(t *testing.T) {
 	beforeTheCommand := func(string, *env.Logger) *env.Env { panic("the index is out of range") }
 	places := map[string]envFactory{"in a command": inACommand, "before the command": beforeTheCommand}
 	for what, outside := range places {
-		root := project(t)
-		result := carriedIn(background, outside, root, "check")
+		root := newTemplateProject(t)
+		result := runCLIIn(background, outside, root, "check")
 		if result.code != 1 || !strings.HasPrefix(result.output, "internal error: the index is out of range\n") {
 			t.Errorf("%s: %+v", what, result)
 		}
-		contains(t, result.output, "goroutine ", "cli_test.go", "This is a bug in Moonwell; please report it.")
+		checkContains(t, result.output, "goroutine ", "cli_test.go", "This is a bug in Moonwell; please report it.")
 		if strings.Count(result.output, "internal error: ") != 1 || result.stdout != "" {
 			t.Errorf("%s: the panic is printed more than once, or for other programs:\n%s", what, result.output)
 		}
-		if logged := read(t, root, "dist/moonwell.log"); !strings.HasSuffix(logged, "] error: "+result.output+"\n") {
+		if logged := readFile(t, root, "dist/moonwell.log"); !strings.HasSuffix(logged, "] error: "+result.output+"\n") {
 			t.Errorf("%s: dist/moonwell.log holds:\n%s\nwant the time, the level and what was printed", what, logged)
 		}
 	}
 }
 
 func TestAPanicBeforeALineHasACommandIsPrintedToTheTerminal(t *testing.T) {
-	root := project(t)
+	root := newTemplateProject(t)
 	var lines []string
 	broke := false
 	write := func(line string) {
@@ -256,7 +256,7 @@ func TestAPanicBeforeALineHasACommandIsPrintedToTheTerminal(t *testing.T) {
 	if code != 1 || len(lines) != 1 || !strings.HasPrefix(lines[0], "internal error: the stream broke\n") {
 		t.Fatalf("exit %d, printed %q", code, lines)
 	}
-	contains(t, lines[0], "goroutine ", "cli_test.go", "This is a bug in Moonwell; please report it.")
+	checkContains(t, lines[0], "goroutine ", "cli_test.go", "This is a bug in Moonwell; please report it.")
 	if exists(root, "dist") {
 		t.Error("a line without a command made dist/")
 	}

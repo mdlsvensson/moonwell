@@ -11,9 +11,9 @@ import (
 )
 
 type seedProject struct {
-	name string
-	bare bool
-	lay  func(t *testing.T, root string)
+	name  string
+	bare  bool
+	write func(t *testing.T, root string)
 }
 
 const templateSeed = "template"
@@ -21,95 +21,95 @@ const templateSeed = "template"
 const seedMap = "maps/map.w3x"
 
 var seeds = []seedProject{
-	{name: "other-entry", lay: func(t *testing.T, root string) {
-		write(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
+	{name: "other-entry", write: func(t *testing.T, root string) {
+		writeFile(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
 	}},
-	{name: "no-game", lay: func(t *testing.T, root string) { writeLocal(t, root, noGame) }},
-	{name: "other-entry-and-no-game", lay: func(t *testing.T, root string) {
-		write(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
-		writeLocal(t, root, noGame)
+	{name: "no-game", write: func(t *testing.T, root string) { writeLocalManifest(t, root, noGame) }},
+	{name: "other-entry-and-no-game", write: func(t *testing.T, root string) {
+		writeFile(t, root, "src/other.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"Another entry.\"\n")
+		writeLocalManifest(t, root, noGame)
 	}},
-	{name: "no-src", lay: func(t *testing.T, root string) { remove(t, root, "src") }},
-	{name: "fresh-checkout", lay: func(t *testing.T, root string) {
+	{name: "no-src", write: func(t *testing.T, root string) { removeFile(t, root, "src") }},
+	{name: "fresh-checkout", write: func(t *testing.T, root string) {
 		for _, name := range []string{"moonwell.local.pkl", "yueconfig.yue", ".vscode"} {
-			remove(t, root, name)
+			removeFile(t, root, name)
 		}
-		write(t, root, ".gitignore", "dist/\nmoonwell.local.pkl\n.pkl-lsp/\n")
-		write(t, root, ".luarc.json", "{\n  \"runtime.version\": \"Lua 5.3\",\n  \"workspace.library\": [\"mine\"]\n}\n")
+		writeFile(t, root, ".gitignore", "dist/\nmoonwell.local.pkl\n.pkl-lsp/\n")
+		writeFile(t, root, ".luarc.json", "{\n  \"runtime.version\": \"Lua 5.3\",\n  \"workspace.library\": [\"mine\"]\n}\n")
 	}},
-	{name: "objects", lay: layObjects},
-	{name: "settings", lay: laySettings},
-	{name: "preview", lay: func(t *testing.T, root string) {
+	{name: "objects", write: writeSeedObjects},
+	{name: "settings", write: writeSeedSettings},
+	{name: "preview", write: func(t *testing.T, root string) {
 		settingsMap(t, root)
 		picture := testkit.TGA(testkit.NewPixels(512), testkit.TGAOptions{RLE: true, FromTop: true})
 		testkit.WriteFile(t, root, "preview.tga", picture)
-		writeLocal(t, root, `settings { info { name = "With a preview"; preview = "preview.tga" } }`)
+		writeLocalManifest(t, root, `settings { info { name = "With a preview"; preview = "preview.tga" } }`)
 	}},
-	{name: "assets", lay: layAssets},
-	{name: "one-asset", lay: func(t *testing.T, root string) { write(t, root, "assets/a.blp", "an asset") }},
-	{name: "models", lay: layModels},
-	{name: "unreadable-model", lay: func(t *testing.T, root string) {
-		write(t, root, "assets/Models/Broken.mdl", "Model {\n}\nBroken {\n")
-		testkit.WriteFile(t, root, "assets/Models/Knight.mdx", knight())
+	{name: "assets", write: writeSeedAssets},
+	{name: "one-asset", write: func(t *testing.T, root string) { writeFile(t, root, "assets/a.blp", "an asset") }},
+	{name: "models", write: writeSeedModels},
+	{name: "unreadable-model", write: func(t *testing.T, root string) {
+		writeFile(t, root, "assets/Models/Broken.mdl", "Model {\n}\nBroken {\n")
+		testkit.WriteFile(t, root, "assets/Models/Knight.mdx", knightModel())
 	}},
-	{name: "warned-global", lay: func(t *testing.T, root string) {
-		appendTo(t, root, "src/main.yue", "\nCreatUnit Player(0), objects.units.captain, 0, 0, 0\n")
-		writeLocal(t, root, `lint { unknownGlobals = "warning" }`)
+	{name: "warned-global", write: func(t *testing.T, root string) {
+		appendToFile(t, root, "src/main.yue", "\nCreatUnit Player(0), objects.units.captain, 0, 0, 0\n")
+		writeLocalManifest(t, root, `lint { unknownGlobals = "warning" }`)
 	}},
-	{name: "outside", bare: true, lay: func(t *testing.T, root string) {
-		testkit.WriteFile(t, root, "knight.mdx", knight())
-		write(t, root, "notes.mdx", "Model {\n}\nBroken {\n")
-		write(t, root, "full/keep.txt", "kept")
-		write(t, root, "afile", "a file")
-	}},
-
-	{name: "syntax-error", lay: func(t *testing.T, root string) {
-		write(t, root, "src/main.yue", "import \"moonwell\" as mw\nx = \n  if then\n")
-	}},
-	{name: "unknown-global", lay: func(t *testing.T, root string) {
-		appendTo(t, root, "src/main.yue", "\nCreatUnit Player(0), objects.units.captain, 0, 0, 0\n")
-	}},
-	{name: "invalid-object", lay: func(t *testing.T, root string) {
-		write(t, root, "objects/units.pkl", objectFile(`units { ["captain"] { id = "h000"; base = "zzzz" } }`))
-	}},
-	{name: "refused-setting", lay: func(t *testing.T, root string) {
-		writeLocal(t, root, `settings { players { ["5"] { name = "Absent" } } }`)
-	}},
-	{name: "mapped-asset-missing", lay: func(t *testing.T, root string) {
-		writeLocal(t, root, `assets { paths { ["missing.blp"] = "x.blp" } }`)
-	}},
-	{name: "stale-ids", lay: func(t *testing.T, root string) { write(t, root, objects.IDsFile, "-- stale\n") }},
-	{name: "no-ids", lay: func(t *testing.T, root string) { remove(t, root, objects.IDsFile) }},
-	{name: "state-that-is-no-state", lay: func(t *testing.T, root string) {
-		write(t, root, ".asset-state/map.w3x.json", "not json")
-	}},
-	{name: "manifest-pkl-refuses", lay: func(t *testing.T, root string) {
-		writeLocal(t, root, `build { folder = "maps" }`)
+	{name: "outside", bare: true, write: func(t *testing.T, root string) {
+		testkit.WriteFile(t, root, "knight.mdx", knightModel())
+		writeFile(t, root, "notes.mdx", "Model {\n}\nBroken {\n")
+		writeFile(t, root, "full/keep.txt", "kept")
+		writeFile(t, root, "afile", "a file")
 	}},
 
-	{name: "no-source-map", lay: func(t *testing.T, root string) { remove(t, root, seedMap) }},
-	{name: "no-source-map-and-no-objects", lay: func(t *testing.T, root string) {
+	{name: "syntax-error", write: func(t *testing.T, root string) {
+		writeFile(t, root, "src/main.yue", "import \"moonwell\" as mw\nx = \n  if then\n")
+	}},
+	{name: "unknown-global", write: func(t *testing.T, root string) {
+		appendToFile(t, root, "src/main.yue", "\nCreatUnit Player(0), objects.units.captain, 0, 0, 0\n")
+	}},
+	{name: "invalid-object", write: func(t *testing.T, root string) {
+		writeFile(t, root, "objects/units.pkl", objectFile(`units { ["captain"] { id = "h000"; base = "zzzz" } }`))
+	}},
+	{name: "refused-setting", write: func(t *testing.T, root string) {
+		writeLocalManifest(t, root, `settings { players { ["5"] { name = "Absent" } } }`)
+	}},
+	{name: "mapped-asset-missing", write: func(t *testing.T, root string) {
+		writeLocalManifest(t, root, `assets { paths { ["missing.blp"] = "x.blp" } }`)
+	}},
+	{name: "stale-ids", write: func(t *testing.T, root string) { writeFile(t, root, objects.IDsFile, "-- stale\n") }},
+	{name: "no-ids", write: func(t *testing.T, root string) { removeFile(t, root, objects.IDsFile) }},
+	{name: "state-that-is-no-state", write: func(t *testing.T, root string) {
+		writeFile(t, root, ".asset-state/map.w3x.json", "not json")
+	}},
+	{name: "manifest-pkl-refuses", write: func(t *testing.T, root string) {
+		writeLocalManifest(t, root, `build { folder = "maps" }`)
+	}},
+
+	{name: "no-source-map", write: func(t *testing.T, root string) { removeFile(t, root, seedMap) }},
+	{name: "no-source-map-and-no-objects", write: func(t *testing.T, root string) {
 		for _, name := range []string{seedMap, "objects", "src/generated"} {
-			remove(t, root, name)
+			removeFile(t, root, name)
 		}
-		write(t, root, "src/main.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"There is no map.\"\n")
+		writeFile(t, root, "src/main.yue", "import \"moonwell\" as mw\n\nmw.on_main ->\n  print \"There is no map.\"\n")
 	}},
-	{name: "lock-left-behind", lay: func(t *testing.T, root string) { write(t, root, lockFile, "4242") }},
-	{name: "no-map-info", lay: func(t *testing.T, root string) { remove(t, root, seedMap+"/war3map.w3i") }},
-	{name: "map-info-too-short", lay: func(t *testing.T, root string) {
-		write(t, root, seedMap+"/war3map.w3i", "ab")
+	{name: "lock-left-behind", write: func(t *testing.T, root string) { writeFile(t, root, lockFile, "4242") }},
+	{name: "no-map-info", write: func(t *testing.T, root string) { removeFile(t, root, seedMap+"/war3map.w3i") }},
+	{name: "map-info-too-short", write: func(t *testing.T, root string) {
+		writeFile(t, root, seedMap+"/war3map.w3i", "ab")
 	}},
-	{name: "index-too-short", lay: func(t *testing.T, root string) {
-		write(t, root, seedMap+"/war3map.imp", "ab")
-		write(t, root, "assets/a.blp", "an asset")
+	{name: "index-too-short", write: func(t *testing.T, root string) {
+		writeFile(t, root, seedMap+"/war3map.imp", "ab")
+		writeFile(t, root, "assets/a.blp", "an asset")
 	}},
-	{name: "asset-at-a-file-of-the-map", lay: func(t *testing.T, root string) {
-		write(t, root, seedMap+"/Textures/Mine.blp", "a file World Editor imported")
-		write(t, root, "assets/Textures/Mine.blp", "an asset at the same path")
+	{name: "asset-at-a-file-of-the-map", write: func(t *testing.T, root string) {
+		writeFile(t, root, seedMap+"/Textures/Mine.blp", "a file World Editor imported")
+		writeFile(t, root, "assets/Textures/Mine.blp", "an asset at the same path")
 	}},
-	{name: "dot-map-folder", lay: func(t *testing.T, root string) { writeLocal(t, root, dotMapFolder) }},
-	{name: "typed-against-raw", lay: func(t *testing.T, root string) {
-		writeLocal(t, root,
+	{name: "dot-map-folder", write: func(t *testing.T, root string) { writeLocalManifest(t, root, dotMapFolder) }},
+	{name: "typed-against-raw", write: func(t *testing.T, root string) {
+		writeLocalManifest(t, root,
 			`settings { gameplay { foodLimit = 200 } gameplayConstants { ["Misc"] { ["FoodCeiling"] = "1" } } }`)
 	}},
 }
@@ -157,10 +157,10 @@ const everySetting = `settings {
   }
 }`
 
-func laySettings(t *testing.T, root string) {
+func writeSeedSettings(t *testing.T, root string) {
 	settingsMap(t, root)
-	write(t, root, seedMap+"/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
-	writeLocal(t, root, everySetting)
+	writeFile(t, root, seedMap+"/war3mapSkin.txt", "[CustomSkin]\r\nOld=1\r\n")
+	writeLocalManifest(t, root, everySetting)
 }
 
 func settingsMap(t *testing.T, root string) {
@@ -212,55 +212,55 @@ var everyCategoryIDs, _ = objects.RenderIDs([]objects.Resolved{
 	{Category: "upgrades", Key: "masonry", ID: "R001"},
 })
 
-func layObjects(t *testing.T, root string) {
+func writeSeedObjects(t *testing.T, root string) {
 	for _, kind := range []string{"w3a", "w3b", "w3d", "w3h", "w3q", "w3t", "w3u"} {
 		for _, file := range []string{"war3map." + kind, "war3mapSkin." + kind} {
 			testkit.WriteFile(t, root, seedMap+"/"+file, testkit.Fixture(t, "objects-v3-names/"+file))
 		}
 	}
 	testkit.WriteFile(t, root, seedMap+"/war3map.wts", testkit.Fixture(t, "objects-v3-names/war3map.wts"))
-	write(t, root, "objects/units.pkl", objectFile(everyCategory))
-	write(t, root, objects.IDsFile, everyCategoryIDs)
+	writeFile(t, root, "objects/units.pkl", objectFile(everyCategory))
+	writeFile(t, root, objects.IDsFile, everyCategoryIDs)
 }
 
-func layAssets(t *testing.T, root string) {
+func writeSeedAssets(t *testing.T, root string) {
 	const synced, gone = "the picture as it was synced", "a file whose asset is gone"
 	testkit.WriteFile(t, root, seedMap+"/war3map.imp", testkit.Fixture(t, "imports-we3/war3map-flag29.imp"))
-	write(t, root, seedMap+"/wa3mapPreview.tga", synced)
-	write(t, root, seedMap+"/war3mapImported/gone.txt", gone)
-	write(t, root, ".asset-state/map.w3x.json", "{\n  \"version\": 1,\n  \"files\": {\n"+
+	writeFile(t, root, seedMap+"/wa3mapPreview.tga", synced)
+	writeFile(t, root, seedMap+"/war3mapImported/gone.txt", gone)
+	writeFile(t, root, ".asset-state/map.w3x.json", "{\n  \"version\": 1,\n  \"files\": {\n"+
 		"    \"wa3mapPreview.tga\": \""+hashOf(synced)+"\",\n"+
 		"    \"war3mapImported/gone.txt\": \""+hashOf(gone)+"\"\n  }\n}\n")
 
-	write(t, root, "assets/wa3mapPreview.tga", "the picture as it is now")
-	write(t, root, "assets/Models/unit.mdx", "\x00\x01\x02\xfa\xff")
-	write(t, root, "assets/icons/BTNSword.blp", "an icon")
-	write(t, root, "assets/notes/readme.txt", "left out")
-	write(t, root, "assets/textures/golem.blp", "texture from the map")
+	writeFile(t, root, "assets/wa3mapPreview.tga", "the picture as it is now")
+	writeFile(t, root, "assets/Models/unit.mdx", "\x00\x01\x02\xfa\xff")
+	writeFile(t, root, "assets/icons/BTNSword.blp", "an icon")
+	writeFile(t, root, "assets/notes/readme.txt", "left out")
+	writeFile(t, root, "assets/textures/golem.blp", "texture from the map")
 
-	write(t, root, "libs/golems/moonwell-library.json", `{"dir":"src","assets":"assets"}`)
-	write(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
-	write(t, root, "libs/golems/assets/war3mapImported/golems/frames.toc", "toc from the library")
-	write(t, root, "libs/golems/assets/Textures/Golem.blp", "texture from the library")
-	writeLocal(t, root, `assets {
+	writeFile(t, root, "libs/golems/moonwell-library.json", `{"dir":"src","assets":"assets"}`)
+	writeFile(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
+	writeFile(t, root, "libs/golems/assets/war3mapImported/golems/frames.toc", "toc from the library")
+	writeFile(t, root, "libs/golems/assets/Textures/Golem.blp", "texture from the library")
+	writeLocalManifest(t, root, `assets {
   paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# }
   exclude = List("notes/")
 }
 libraries { ["golems"] { path = "libs/golems" } }`)
-	appendTo(t, root, "src/main.yue", "\nimport \"golems.names\"\nprint names.first\n")
+	appendToFile(t, root, "src/main.yue", "\nimport \"golems.names\"\nprint names.first\n")
 }
 
-func layModels(t *testing.T, root string) {
-	testkit.WriteFile(t, root, "assets/Models/Knight.mdx", knight())
+func writeSeedModels(t *testing.T, root string) {
+	testkit.WriteFile(t, root, "assets/Models/Knight.mdx", knightModel())
 	testkit.WriteFile(t, root, "assets/Textures/Knight.blp", []byte{1})
-	testkit.WriteFile(t, root, "drafts/knight.mdx", knight())
-	write(t, root, "drafts/notes.mdl", "Model {\n}\nBroken {\n")
-	write(t, root, "libs/golems/moonwell-library.json", `{"dir":"src","assets":"assets"}`)
-	write(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
+	testkit.WriteFile(t, root, "drafts/knight.mdx", knightModel())
+	writeFile(t, root, "drafts/notes.mdl", "Model {\n}\nBroken {\n")
+	writeFile(t, root, "libs/golems/moonwell-library.json", `{"dir":"src","assets":"assets"}`)
+	writeFile(t, root, "libs/golems/src/golems/names.lua", "return { first = \"Granite\" }\n")
 	testkit.WriteFile(t, root, "libs/golems/assets/Models/Golem.mdx",
 		testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(`Textures\Golem.blp`, 0))))
 	testkit.WriteFile(t, root, "libs/golems/assets/Textures/Golem.blp", []byte{2})
-	writeLocal(t, root, `libraries { ["golems"] { path = "libs/golems" } }`)
+	writeLocalManifest(t, root, `libraries { ["golems"] { path = "libs/golems" } }`)
 }
 
 func hashOf(text string) string {
@@ -274,9 +274,9 @@ type step struct {
 	change func(t *testing.T, root string)
 }
 
-func cmdline(args ...string) step { return step{args: args} }
+func commandStep(args ...string) step { return step{args: args} }
 
-func changed(what string, change func(t *testing.T, root string)) step {
+func changeStep(what string, change func(t *testing.T, root string)) step {
 	return step{what: what, change: change}
 }
 
@@ -285,7 +285,9 @@ type recordedRun struct {
 	steps []step
 }
 
-func on(seed string, args ...string) recordedRun { return recordedRun{seed, []step{cmdline(args...)}} }
+func runOn(seed string, args ...string) recordedRun {
+	return recordedRun{seed, []step{commandStep(args...)}}
+}
 
 func said(args []string) string { return "moonwell " + strings.Join(args, " ") }
 
@@ -299,160 +301,160 @@ func commandOf(args []string) string {
 }
 
 var recordedRuns = []recordedRun{
-	on(templateSeed, "build"),
-	on(templateSeed, "build", "--minify"),
-	on(templateSeed, "check"),
-	on(templateSeed, "setup"),
-	on(templateSeed, "assets:check"),
-	on(templateSeed, "assets:sync"),
-	on(templateSeed, "assets:paths"),
-	on(templateSeed, "settings:check"),
-	on(templateSeed, "objects:eval"),
-	on(templateSeed, "objects:check"),
-	on("no-game", "test"),
-	on("no-game", "test", "--minify"),
-	on("other-entry-and-no-game", "test", "--entry", "src/other.yue"),
-	on("no-src", "dev"),
-	on("other-entry", "build", "--entry", "src/other.yue"),
-	on("other-entry", "build", "--entry=src/other.yue", "--minify"),
-	on("other-entry", "build", "--entry", "src/missing.yue"),
-	on("other-entry", "build", "--entry", "lua/other.lua"),
-	on("other-entry", "build", "--entry"),
-	{"fresh-checkout", []step{cmdline("setup"), cmdline("setup")}},
+	runOn(templateSeed, "build"),
+	runOn(templateSeed, "build", "--minify"),
+	runOn(templateSeed, "check"),
+	runOn(templateSeed, "setup"),
+	runOn(templateSeed, "assets:check"),
+	runOn(templateSeed, "assets:sync"),
+	runOn(templateSeed, "assets:paths"),
+	runOn(templateSeed, "settings:check"),
+	runOn(templateSeed, "objects:eval"),
+	runOn(templateSeed, "objects:check"),
+	runOn("no-game", "test"),
+	runOn("no-game", "test", "--minify"),
+	runOn("other-entry-and-no-game", "test", "--entry", "src/other.yue"),
+	runOn("no-src", "dev"),
+	runOn("other-entry", "build", "--entry", "src/other.yue"),
+	runOn("other-entry", "build", "--entry=src/other.yue", "--minify"),
+	runOn("other-entry", "build", "--entry", "src/missing.yue"),
+	runOn("other-entry", "build", "--entry", "lua/other.lua"),
+	runOn("other-entry", "build", "--entry"),
+	{"fresh-checkout", []step{commandStep("setup"), commandStep("setup")}},
 
-	on("objects", "objects:eval"),
-	on("objects", "objects:check"),
-	on("objects", "build"),
-	on("objects", "check"),
-	on("objects", "setup"),
-	on("settings", "settings:check"),
-	on("settings", "build"),
-	on("settings", "check"),
-	on("preview", "settings:check"),
-	on("preview", "build"),
-	on("assets", "assets:check"),
-	on("assets", "build"),
-	on("assets", "check"),
-	on("assets", "setup"),
+	runOn("objects", "objects:eval"),
+	runOn("objects", "objects:check"),
+	runOn("objects", "build"),
+	runOn("objects", "check"),
+	runOn("objects", "setup"),
+	runOn("settings", "settings:check"),
+	runOn("settings", "build"),
+	runOn("settings", "check"),
+	runOn("preview", "settings:check"),
+	runOn("preview", "build"),
+	runOn("assets", "assets:check"),
+	runOn("assets", "build"),
+	runOn("assets", "check"),
+	runOn("assets", "setup"),
 	{"assets", []step{
-		cmdline("assets:sync"), cmdline("assets:sync"),
-		changed("assets/Models/unit.mdx is removed", func(t *testing.T, root string) {
-			remove(t, root, "assets/Models/unit.mdx")
+		commandStep("assets:sync"), commandStep("assets:sync"),
+		changeStep("assets/Models/unit.mdx is removed", func(t *testing.T, root string) {
+			removeFile(t, root, "assets/Models/unit.mdx")
 		}),
-		cmdline("assets:check"), cmdline("assets:sync"), cmdline("assets:check"),
+		commandStep("assets:check"), commandStep("assets:sync"), commandStep("assets:check"),
 	}},
-	on("models", "assets:paths"),
-	on("models", "assets:paths", "assets/Models/Knight.mdx"),
-	on("models", "assets:paths", "drafts/knight.mdx"),
-	on("models", "assets:paths", "drafts/notes.mdl"),
-	on("models", "assets:paths", "drafts/missing.mdx"),
-	on("unreadable-model", "assets:paths"),
-	on("warned-global", "build"),
-	on("warned-global", "check"),
+	runOn("models", "assets:paths"),
+	runOn("models", "assets:paths", "assets/Models/Knight.mdx"),
+	runOn("models", "assets:paths", "drafts/knight.mdx"),
+	runOn("models", "assets:paths", "drafts/notes.mdl"),
+	runOn("models", "assets:paths", "drafts/missing.mdx"),
+	runOn("unreadable-model", "assets:paths"),
+	runOn("warned-global", "build"),
+	runOn("warned-global", "check"),
 
-	on("outside", "assets:paths", "knight.mdx"),
-	on("outside", "assets:paths"),
-	on("outside", "assets:paths", "missing.mdx"),
-	on("outside", "assets:paths", "notes.mdx"),
-	on("outside", "build"),
-	on("outside", "setup"),
-	on("outside", "dev"),
-	on("outside", "assets:sync"),
-	on("outside", "objects:eval"),
-	on("outside", "init"),
-	on("outside", "init", "full"),
-	on("outside", "init", "afile"),
-	on("outside", "init", "new", "--link"),
+	runOn("outside", "assets:paths", "knight.mdx"),
+	runOn("outside", "assets:paths"),
+	runOn("outside", "assets:paths", "missing.mdx"),
+	runOn("outside", "assets:paths", "notes.mdx"),
+	runOn("outside", "build"),
+	runOn("outside", "setup"),
+	runOn("outside", "dev"),
+	runOn("outside", "assets:sync"),
+	runOn("outside", "objects:eval"),
+	runOn("outside", "init"),
+	runOn("outside", "init", "full"),
+	runOn("outside", "init", "afile"),
+	runOn("outside", "init", "new", "--link"),
 
-	on("syntax-error", "build"),
-	on("syntax-error", "check"),
-	on("unknown-global", "check"),
-	on("invalid-object", "objects:eval"),
-	on("invalid-object", "objects:check"),
-	on("invalid-object", "build"),
-	on("invalid-object", "setup"),
-	on("refused-setting", "settings:check"),
-	on("refused-setting", "build"),
-	on("refused-setting", "check"),
-	on("mapped-asset-missing", "assets:check"),
-	on("mapped-asset-missing", "assets:sync"),
-	on("mapped-asset-missing", "assets:paths"),
-	on("mapped-asset-missing", "build"),
-	on("mapped-asset-missing", "check"),
-	on("stale-ids", "check"),
-	on("stale-ids", "objects:check"),
-	on("stale-ids", "build"),
-	on("no-ids", "check"),
-	on("no-ids", "objects:check"),
-	on("state-that-is-no-state", "assets:check"),
-	on("state-that-is-no-state", "assets:sync"),
-	on("state-that-is-no-state", "build"),
-	on("manifest-pkl-refuses", "build"),
+	runOn("syntax-error", "build"),
+	runOn("syntax-error", "check"),
+	runOn("unknown-global", "check"),
+	runOn("invalid-object", "objects:eval"),
+	runOn("invalid-object", "objects:check"),
+	runOn("invalid-object", "build"),
+	runOn("invalid-object", "setup"),
+	runOn("refused-setting", "settings:check"),
+	runOn("refused-setting", "build"),
+	runOn("refused-setting", "check"),
+	runOn("mapped-asset-missing", "assets:check"),
+	runOn("mapped-asset-missing", "assets:sync"),
+	runOn("mapped-asset-missing", "assets:paths"),
+	runOn("mapped-asset-missing", "build"),
+	runOn("mapped-asset-missing", "check"),
+	runOn("stale-ids", "check"),
+	runOn("stale-ids", "objects:check"),
+	runOn("stale-ids", "build"),
+	runOn("no-ids", "check"),
+	runOn("no-ids", "objects:check"),
+	runOn("state-that-is-no-state", "assets:check"),
+	runOn("state-that-is-no-state", "assets:sync"),
+	runOn("state-that-is-no-state", "build"),
+	runOn("manifest-pkl-refuses", "build"),
 
-	on(templateSeed, "build", "--frobnicate"),
-	on(templateSeed, "build", "--minfy"),
-	on(templateSeed, "check", "--minify"),
-	on(templateSeed, "objects:eval", "--link"),
-	on(templateSeed, "build", "--minify=maybe"),
-	on(templateSeed, "build", "--minify", "false"),
-	on(templateSeed, "build", "extra"),
-	on(templateSeed, "--minify"),
-	on(templateSeed, "--minify", "build"),
-	on(templateSeed, "--help", "--frobnicate"),
-	on(templateSeed, "frobnicate"),
-	on(templateSeed, "biuld"),
-	on(templateSeed, "objects:evla"),
-	on("no-source-map", "build"),
-	on("no-source-map", "check"),
-	on("no-source-map", "setup"),
-	on("no-source-map", "objects:check"),
-	on("no-source-map", "objects:eval"),
-	on("no-source-map", "settings:check"),
-	on("no-source-map", "assets:check"),
-	on("no-source-map", "assets:sync"),
-	on("no-source-map", "assets:paths"),
-	on("no-source-map-and-no-objects", "build"),
-	on("no-source-map-and-no-objects", "check"),
-	on("no-source-map-and-no-objects", "setup"),
-	on("no-source-map-and-no-objects", "objects:check"),
-	on("no-source-map-and-no-objects", "objects:eval"),
-	on("no-source-map-and-no-objects", "settings:check"),
-	on("no-source-map-and-no-objects", "assets:check"),
-	on("no-source-map-and-no-objects", "assets:sync"),
-	on("lock-left-behind", "build"),
-	on("lock-left-behind", "check"),
-	on("lock-left-behind", "assets:check"),
-	on("lock-left-behind", "assets:sync"),
-	on("lock-left-behind", "setup"),
-	on("lock-left-behind", "assets:paths"),
-	on("lock-left-behind", "objects:eval"),
-	on("lock-left-behind", "objects:check"),
-	on("lock-left-behind", "settings:check"),
-	on("no-map-info", "build"),
-	on("no-map-info", "assets:check"),
-	on("map-info-too-short", "build"),
-	on("index-too-short", "build"),
-	on("index-too-short", "assets:check"),
-	on("asset-at-a-file-of-the-map", "build"),
-	on("asset-at-a-file-of-the-map", "assets:check"),
-	on("asset-at-a-file-of-the-map", "assets:sync"),
+	runOn(templateSeed, "build", "--frobnicate"),
+	runOn(templateSeed, "build", "--minfy"),
+	runOn(templateSeed, "check", "--minify"),
+	runOn(templateSeed, "objects:eval", "--link"),
+	runOn(templateSeed, "build", "--minify=maybe"),
+	runOn(templateSeed, "build", "--minify", "false"),
+	runOn(templateSeed, "build", "extra"),
+	runOn(templateSeed, "--minify"),
+	runOn(templateSeed, "--minify", "build"),
+	runOn(templateSeed, "--help", "--frobnicate"),
+	runOn(templateSeed, "frobnicate"),
+	runOn(templateSeed, "biuld"),
+	runOn(templateSeed, "objects:evla"),
+	runOn("no-source-map", "build"),
+	runOn("no-source-map", "check"),
+	runOn("no-source-map", "setup"),
+	runOn("no-source-map", "objects:check"),
+	runOn("no-source-map", "objects:eval"),
+	runOn("no-source-map", "settings:check"),
+	runOn("no-source-map", "assets:check"),
+	runOn("no-source-map", "assets:sync"),
+	runOn("no-source-map", "assets:paths"),
+	runOn("no-source-map-and-no-objects", "build"),
+	runOn("no-source-map-and-no-objects", "check"),
+	runOn("no-source-map-and-no-objects", "setup"),
+	runOn("no-source-map-and-no-objects", "objects:check"),
+	runOn("no-source-map-and-no-objects", "objects:eval"),
+	runOn("no-source-map-and-no-objects", "settings:check"),
+	runOn("no-source-map-and-no-objects", "assets:check"),
+	runOn("no-source-map-and-no-objects", "assets:sync"),
+	runOn("lock-left-behind", "build"),
+	runOn("lock-left-behind", "check"),
+	runOn("lock-left-behind", "assets:check"),
+	runOn("lock-left-behind", "assets:sync"),
+	runOn("lock-left-behind", "setup"),
+	runOn("lock-left-behind", "assets:paths"),
+	runOn("lock-left-behind", "objects:eval"),
+	runOn("lock-left-behind", "objects:check"),
+	runOn("lock-left-behind", "settings:check"),
+	runOn("no-map-info", "build"),
+	runOn("no-map-info", "assets:check"),
+	runOn("map-info-too-short", "build"),
+	runOn("index-too-short", "build"),
+	runOn("index-too-short", "assets:check"),
+	runOn("asset-at-a-file-of-the-map", "build"),
+	runOn("asset-at-a-file-of-the-map", "assets:check"),
+	runOn("asset-at-a-file-of-the-map", "assets:sync"),
 	{"one-asset", []step{
-		cmdline("assets:sync"),
-		changed(seedMap+"/a.blp is edited", func(t *testing.T, root string) {
-			write(t, root, seedMap+"/a.blp", "edited in the map")
+		commandStep("assets:sync"),
+		changeStep(seedMap+"/a.blp is edited", func(t *testing.T, root string) {
+			writeFile(t, root, seedMap+"/a.blp", "edited in the map")
 		}),
-		cmdline("assets:check"), cmdline("assets:sync"), cmdline("build"),
+		commandStep("assets:check"), commandStep("assets:sync"), commandStep("build"),
 	}},
-	on("dot-map-folder", "build"),
-	on("dot-map-folder", "check"),
-	on("dot-map-folder", "assets:check"),
-	on("dot-map-folder", "settings:check"),
-	on("dot-map-folder", "objects:check"),
-	on("typed-against-raw", "build"),
-	on("typed-against-raw", "check"),
-	on("typed-against-raw", "settings:check"),
-	on("typed-against-raw", "objects:eval"),
-	on("typed-against-raw", "assets:check"),
-	on("typed-against-raw", "assets:sync"),
-	on("typed-against-raw", "assets:paths"),
+	runOn("dot-map-folder", "build"),
+	runOn("dot-map-folder", "check"),
+	runOn("dot-map-folder", "assets:check"),
+	runOn("dot-map-folder", "settings:check"),
+	runOn("dot-map-folder", "objects:check"),
+	runOn("typed-against-raw", "build"),
+	runOn("typed-against-raw", "check"),
+	runOn("typed-against-raw", "settings:check"),
+	runOn("typed-against-raw", "objects:eval"),
+	runOn("typed-against-raw", "assets:check"),
+	runOn("typed-against-raw", "assets:sync"),
+	runOn("typed-against-raw", "assets:paths"),
 }
