@@ -573,7 +573,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | know which files are assets, and what path each gets in the map | `internal/assets/collect.go`: `Collect`; `internal/assets/target.go`: `parseTargetPath` |
 | know how an import is planned | `internal/build/steps.go`: `PlanAssets`, which calls `Plan` in `internal/assets/plan.go`; `internal/war3/imp/imp.go` |
 | change what `assets:sync` writes, and how it undoes a failed write | `internal/assets/sync.go`: `Sync`; `internal/mapdir/apply.go`: `ApplyInPlace`; `internal/fsx/journal.go` |
-| know which files of the source map `assets:sync` may replace or remove | `internal/assets/plan.go`: `Plan`, `checkOwnedUnchanged`, `planRemovals`; the state it is given is read in `internal/assets/state.go`: `ReadState` |
+| know which files of the source map `assets:sync` may replace or remove | `internal/assets/plan.go`: `Plan`, `planRemovals`; `internal/assets/plan_checks.go`: `checkOwnedUnchanged`; the state it is given is read in `internal/assets/state.go`: `ReadState` |
 | read or change `.asset-state/<map>.json`, the ownership state | `internal/assets/state.go`: `ReadState`, and `StateFilePath`, which names the file for a map folder and refuses a link on the way to it; `AssetStatePath` in `internal/build/project.go` is `StateFilePath` for a project, with `map.folder` read as a build reads it |
 | change the report of `assets:paths` | `internal/cli/assetspaths.go`: `reportAssetPaths`; `internal/assets/report.go`: `ReportModels`, `RenderReports` |
 | read a new kind of reference out of a model | `internal/war3/model/mdx.go`: `ReadMDX`; `internal/war3/model/mdl.go`: `ReadMDL` |

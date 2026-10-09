@@ -40,14 +40,26 @@ func ModelsAmong(assets []Asset) []Model {
 	return models
 }
 
+func isModel(target string) bool {
+	key := mapdir.Key(target)
+	return strings.HasSuffix(key, ".mdx") || strings.HasSuffix(key, ".mdl")
+}
+
+func headingOf(asset Asset) string {
+	if asset.Library != "" {
+		return "library " + asset.Library + ": " + asset.Source
+	}
+	return projectAssetsDir + "/" + asset.Source
+}
+
 func ReadModel(root, file string) (Model, error) {
-	path := fsx.ResolvePath(root, file)
-	heading := displayPathOf(root, path)
-	data, err := os.ReadFile(path)
+	fullPath := fsx.ResolvePath(root, file)
+	heading := displayPathOf(root, fullPath)
+	data, err := os.ReadFile(fullPath)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		return Model{}, errNoSuchModel(heading)
-	case err != nil && fsx.IsDir(path):
+	case err != nil && fsx.IsDir(fullPath):
 		return Model{}, errModelIsAFolder(heading)
 	case err != nil:
 		return Model{}, errModelNotRead(heading, err)
@@ -63,18 +75,6 @@ func TargetSet(imported []Asset) map[string]bool {
 	return targets
 }
 
-func isModel(target string) bool {
-	key := mapdir.Key(target)
-	return strings.HasSuffix(key, ".mdx") || strings.HasSuffix(key, ".mdl")
-}
-
-func headingOf(asset Asset) string {
-	if asset.Library != "" {
-		return "library " + asset.Library + ": " + asset.Source
-	}
-	return ownFolder + "/" + asset.Source
-}
-
 type ModelRef struct {
 	model.Path
 	Status PathStatus
@@ -88,15 +88,15 @@ type ModelReport struct {
 
 func ReportModels(models []Model, gamePaths, targets map[string]bool) []ModelReport {
 	reports := make([]ModelReport, len(models))
-	for i, found := range models {
-		reports[i] = reportModel(found, gamePaths, targets)
+	for i, modelFile := range models {
+		reports[i] = reportModel(modelFile, gamePaths, targets)
 	}
 	return reports
 }
 
-func reportModel(found Model, gamePaths, targets map[string]bool) ModelReport {
-	report := ModelReport{Heading: found.Heading}
-	paths, err := model.ReadPaths(found.Data, found.Heading)
+func reportModel(modelFile Model, gamePaths, targets map[string]bool) ModelReport {
+	report := ModelReport{Heading: modelFile.Heading}
+	paths, err := model.ReadPaths(modelFile.Data, modelFile.Heading)
 	if err != nil {
 		report.Unreadable = err.Error()
 		return report
@@ -130,7 +130,7 @@ func pathStatus(path string, gamePaths, targets map[string]bool) PathStatus {
 }
 
 func referenceKey(path string) string {
-	return loadedModel(mapdir.Key(path))
+	return loadedModelKey(mapdir.Key(path))
 }
 
 func RenderReports(reports []ModelReport, inProject bool) []string {
@@ -174,38 +174,38 @@ func padRight(text string, width int) string {
 	return text + strings.Repeat(" ", max(0, width-utf8.RuneCountInString(text)))
 }
 
-type tally struct {
+type reportCounts struct {
 	paths      int
 	byStatus   map[PathStatus]int
 	unreadable int
 }
 
-func countReports(reports []ModelReport) tally {
-	count := tally{byStatus: map[PathStatus]int{}}
+func countReports(reports []ModelReport) reportCounts {
+	counts := reportCounts{byStatus: map[PathStatus]int{}}
 	for _, report := range reports {
-		count.paths += len(report.Refs)
+		counts.paths += len(report.Refs)
 		for _, ref := range report.Refs {
-			count.byStatus[ref.Status]++
+			counts.byStatus[ref.Status]++
 		}
 		if report.Unreadable != "" {
-			count.unreadable++
+			counts.unreadable++
 		}
 	}
-	return count
+	return counts
 }
 
 func formatSummary(reports []ModelReport, inProject bool) string {
-	count := countReports(reports)
-	summary := fmt.Sprintf("%s, %s: %d in-game", pluralize(len(reports), "model"), pluralize(count.paths, "path"),
-		count.byStatus[InGame]+count.byStatus[InGameReplaced])
+	counts := countReports(reports)
+	summary := fmt.Sprintf("%s, %s: %d in-game", pluralize(len(reports), "model"), pluralize(counts.paths, "path"),
+		counts.byStatus[InGame]+counts.byStatus[InGameReplaced])
 	if inProject {
 		summary += fmt.Sprintf(", %d custom imported, %d custom not imported",
-			count.byStatus[CustomImported], count.byStatus[CustomNotImported])
+			counts.byStatus[CustomImported], counts.byStatus[CustomNotImported])
 	} else {
-		summary += fmt.Sprintf(", %d custom", count.byStatus[Custom])
+		summary += fmt.Sprintf(", %d custom", counts.byStatus[Custom])
 	}
-	if count.unreadable > 0 {
-		summary += ", " + pluralize(count.unreadable, "model") + " unreadable"
+	if counts.unreadable > 0 {
+		summary += ", " + pluralize(counts.unreadable, "model") + " unreadable"
 	}
 	return summary + "."
 }
@@ -217,27 +217,27 @@ func pluralize(count int, noun string) string {
 	return strconv.Itoa(count) + " " + noun + "s"
 }
 
-func errNoSuchModel(file string) error {
+func errNoSuchModel(displayPath string) error {
 	return &diag.Error{
 		Msg:  "This model file does not exist.",
-		File: file,
+		File: displayPath,
 		Hint: "A model's path starts at the folder the command runs in, e.g. assets/Models/Knight.mdx.",
 	}
 }
 
-func errModelIsAFolder(file string) error {
+func errModelIsAFolder(displayPath string) error {
 	return &diag.Error{
 		Msg:  "This is a folder, not a model file.",
-		File: file,
+		File: displayPath,
 		Hint: "Name one model, e.g. assets/Models/Knight.mdx. In a project, assets:paths without a file reports " +
 			"on every model among the assets.",
 	}
 }
 
-func errModelNotRead(file string, cause error) error {
+func errModelNotRead(displayPath string, cause error) error {
 	return &diag.Error{
 		Msg:   "Reading the model failed: " + fsx.Reason(cause),
-		File:  file,
+		File:  displayPath,
 		Hint:  "Close any program that has the file open and check that it is a file you may read, then try again.",
 		Cause: cause,
 	}

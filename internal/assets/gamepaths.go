@@ -10,24 +10,11 @@ import (
 
 var TextureExtensions = []string{"blp", "dds", "tga", "tif", "tiff", "png", "jpg"}
 
-const anyTexture = ".<texture>"
+func LoadGamePaths() map[string]bool { return embeddedGamePaths() }
 
-func gamePathKey(path string) string {
-	key := loadedModel(mapdir.Key(path))
-	for _, extension := range TextureExtensions {
-		if name, isTexture := strings.CutSuffix(key, "."+extension); isTexture {
-			return name + anyTexture
-		}
-	}
-	return key
-}
-
-func loadedModel(key string) string {
-	if name, isText := strings.CutSuffix(key, ".mdl"); isText {
-		return name + ".mdx"
-	}
-	return key
-}
+var embeddedGamePaths = sync.OnceValue(func() map[string]bool {
+	return ParseGamePaths(moonwell.GamePaths)
+})
 
 func ParseGamePaths(list string) map[string]bool {
 	keys := map[string]bool{}
@@ -39,8 +26,21 @@ func ParseGamePaths(list string) map[string]bool {
 	return keys
 }
 
-var embeddedGamePaths = sync.OnceValue(func() map[string]bool {
-	return ParseGamePaths(moonwell.GamePaths)
-})
+const anyTexture = ".<texture>"
 
-func LoadGamePaths() map[string]bool { return embeddedGamePaths() }
+func gamePathKey(path string) string {
+	key := loadedModelKey(mapdir.Key(path))
+	for _, extension := range TextureExtensions {
+		if name, isTexture := strings.CutSuffix(key, "."+extension); isTexture {
+			return name + anyTexture
+		}
+	}
+	return key
+}
+
+func loadedModelKey(key string) string {
+	if name, isText := strings.CutSuffix(key, ".mdl"); isText {
+		return name + ".mdx"
+	}
+	return key
+}

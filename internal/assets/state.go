@@ -17,45 +17,32 @@ type State struct{ Files []Owned }
 type Owned struct{ Path, Hash string }
 
 func StateFilePath(root, mapFolder string) (string, error) {
-	file := ".asset-state/" + mapFolder + ".json"
-	if _, err := fsx.SafeJoinNoSymlinks(root, file); err != nil {
+	stateFile := ".asset-state/" + mapFolder + ".json"
+	if _, err := fsx.SafeJoinNoSymlinks(root, stateFile); err != nil {
 		return "", err
 	}
-	return file, nil
+	return stateFile, nil
 }
 
-func ReadState(root, file string) (State, error) {
-	place, err := fsx.SafeJoinNoSymlinks(root, file)
+func ReadState(root, stateFile string) (State, error) {
+	fullPath, err := fsx.SafeJoinNoSymlinks(root, stateFile)
 	if err != nil {
 		return State{}, err
 	}
-	data, found, err := readStateFile(place, file)
+	data, found, err := readStateFile(fullPath, stateFile)
 	if err != nil || !found {
 		return State{}, err
 	}
-	listed, problem := parseFileList(data)
+	files, problem := parseFileList(data)
 	if problem != "" {
-		return State{}, errInvalidState(file, problem)
+		return State{}, errInvalidState(stateFile, problem)
 	}
-	var state State
-	seen := map[string]bool{}
-	for path, written := range listed.All() {
-		owned, err := parseOwned(file, path, written)
-		if err != nil {
-			return State{}, err
-		}
-		if seen[mapdir.Key(path)] {
-			return State{}, errInvalidState(file, path+" is listed twice")
-		}
-		seen[mapdir.Key(path)] = true
-		state.Files = append(state.Files, owned)
-	}
-	return state, nil
+	return parseOwnedFiles(stateFile, files)
 }
 
-func readStateFile(place, file string) (data []byte, found bool, err error) {
-	if data, found, err = fsx.ReadFileIfExists(place); err != nil {
-		return nil, false, errUnreadableState(file, err)
+func readStateFile(fullPath, stateFile string) (data []byte, found bool, err error) {
+	if data, found, err = fsx.ReadFileIfExists(fullPath); err != nil {
+		return nil, false, errUnreadableState(stateFile, err)
 	}
 	return data, found, nil
 }
@@ -68,8 +55,8 @@ func parseFileList(data []byte) (files manifest.OrderedMap[json.RawMessage], pro
 	case json.Unmarshal(data, &document) != nil, !isOne(document, "version"):
 		return files, "version must be 1"
 	}
-	listed, _ := document.Get("files")
-	if !isJSONObject(listed) || json.Unmarshal(listed, &files) != nil {
+	rawFiles, _ := document.Get("files")
+	if !isJSONObject(rawFiles) || json.Unmarshal(rawFiles, &files) != nil {
 		return files, "files must be an object"
 	}
 	return files, ""
@@ -77,33 +64,50 @@ func parseFileList(data []byte) (files manifest.OrderedMap[json.RawMessage], pro
 
 func isOne(document manifest.OrderedMap[json.RawMessage], name string) bool {
 	var number float64
-	written, _ := document.Get(name)
-	return json.Unmarshal(written, &number) == nil && number == 1
+	raw, _ := document.Get(name)
+	return json.Unmarshal(raw, &number) == nil && number == 1
 }
 
-func isJSONObject(written json.RawMessage) bool {
-	return bytes.HasPrefix(bytes.TrimSpace(written), []byte("{"))
+func isJSONObject(raw json.RawMessage) bool {
+	return bytes.HasPrefix(bytes.TrimSpace(raw), []byte("{"))
+}
+
+func parseOwnedFiles(stateFile string, files manifest.OrderedMap[json.RawMessage]) (State, error) {
+	var state State
+	seen := map[string]bool{}
+	for path, rawHash := range files.All() {
+		owned, err := parseOwned(stateFile, path, rawHash)
+		if err != nil {
+			return State{}, err
+		}
+		if seen[mapdir.Key(path)] {
+			return State{}, errInvalidState(stateFile, path+" is listed twice")
+		}
+		seen[mapdir.Key(path)] = true
+		state.Files = append(state.Files, owned)
+	}
+	return state, nil
 }
 
 var sha256Hex = regexp.MustCompile(`^[a-f0-9]{64}$`)
 
-func parseOwned(file, path string, written json.RawMessage) (Owned, error) {
+func parseOwned(stateFile, path string, rawHash json.RawMessage) (Owned, error) {
 	if _, err := parseTargetPath(path); err != nil {
-		return Owned{}, blameStateFile(err, file)
+		return Owned{}, blameStateFile(err, stateFile)
 	}
 	var hash string
-	if json.Unmarshal(written, &hash) != nil || !sha256Hex.MatchString(hash) {
-		return Owned{}, errInvalidState(file, path+" has no valid hash")
+	if json.Unmarshal(rawHash, &hash) != nil || !sha256Hex.MatchString(hash) {
+		return Owned{}, errInvalidState(stateFile, path+" has no valid hash")
 	}
 	return Owned{path, hash}, nil
 }
 
-func blameStateFile(err error, file string) error {
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+func blameStateFile(err error, stateFile string) error {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		return err
 	}
-	return errStatePath(file, failure)
+	return errStatePath(stateFile, diagErr)
 }
 
 func (s State) Encode() []byte {
@@ -124,23 +128,23 @@ func (s State) Encode() []byte {
 
 const stateHint = "Restore it from version control. It records which map files assets:sync owns."
 
-func errInvalidState(file, problem string) error {
-	return &diag.Error{Msg: "The asset ownership state is invalid: " + problem + ".", File: file, Hint: stateHint}
+func errInvalidState(stateFile, problem string) error {
+	return &diag.Error{Msg: "The asset ownership state is invalid: " + problem + ".", File: stateFile, Hint: stateHint}
 }
 
-func errStatePath(file string, failure *diag.Error) error {
+func errStatePath(stateFile string, diagErr *diag.Error) error {
 	return &diag.Error{
-		Msg:   "The asset ownership state is invalid: " + failure.Msg,
-		File:  file,
+		Msg:   "The asset ownership state is invalid: " + diagErr.Msg,
+		File:  stateFile,
 		Hint:  stateHint,
-		Cause: failure,
+		Cause: diagErr,
 	}
 }
 
-func errUnreadableState(file string, cause error) error {
+func errUnreadableState(stateFile string, cause error) error {
 	return &diag.Error{
 		Msg:   "Reading the asset ownership state failed: " + fsx.Reason(cause),
-		File:  file,
+		File:  stateFile,
 		Cause: cause,
 		Hint:  "Make sure it is a readable file, not a folder, and that no other program has it locked.",
 	}

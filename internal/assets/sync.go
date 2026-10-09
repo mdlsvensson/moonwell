@@ -19,140 +19,140 @@ func Sync(ctx context.Context, folder *mapdir.Folder, result *Result, root, stat
 	if len(folder.Changes()) > 0 {
 		return errFolderWithChanges()
 	}
-	state, err := planStateWrite(root, stateFile, result.State)
+	write, err := planStateWrite(root, stateFile, result.State)
 	if err != nil {
 		return err
 	}
 	var journal fsx.Journal
-	failure := applyAll(ctx, folder.WithChanges(result.Changes), state, &journal)
-	if failure == nil {
+	applyErr := applyAll(ctx, folder.WithChanges(result.Changes), write, &journal)
+	if applyErr == nil {
 		return nil
 	}
-	touched := journal.Len()
-	return wrapUndone(failure, touched, describeUndoFailures(folder, journal.Undo()))
+	writeCount := journal.Len()
+	return wrapUndone(applyErr, writeCount, describeUndoFailures(folder, journal.Undo()))
 }
 
 type stateWrite struct {
-	file     string
-	fullPath string
-	previous []byte
-	found    bool
-	data     []byte
-	remove   bool
+	stateFile    string
+	fullPath     string
+	previousData []byte
+	existed      bool
+	data         []byte
+	remove       bool
 }
 
-func planStateWrite(root, file string, state State) (*stateWrite, error) {
-	place, err := fsx.SafeJoinNoSymlinks(root, file)
+func planStateWrite(root, stateFile string, state State) (*stateWrite, error) {
+	fullPath, err := fsx.SafeJoinNoSymlinks(root, stateFile)
 	if err != nil {
 		return nil, err
 	}
-	held, found, err := readStateFile(place, file)
+	existing, found, err := readStateFile(fullPath, stateFile)
 	if err != nil {
 		return nil, err
 	}
-	change := &stateWrite{file: file, fullPath: place, previous: held, found: found}
+	write := &stateWrite{stateFile: stateFile, fullPath: fullPath, previousData: existing, existed: found}
 	if len(state.Files) == 0 {
 		if !found {
 			return nil, nil
 		}
-		change.remove = true
-		return change, nil
+		write.remove = true
+		return write, nil
 	}
-	change.data = state.Encode()
-	if found && bytes.Equal(held, change.data) {
+	write.data = state.Encode()
+	if found && bytes.Equal(existing, write.data) {
 		return nil, nil
 	}
-	return change, nil
+	return write, nil
 }
 
-func applyAll(ctx context.Context, view *mapdir.Folder, state *stateWrite, journal *fsx.Journal) error {
-	if err := view.ApplyInPlace(ctx, journal); err != nil || state == nil {
+func applyAll(ctx context.Context, view *mapdir.Folder, write *stateWrite, journal *fsx.Journal) error {
+	if err := view.ApplyInPlace(ctx, journal); err != nil || write == nil {
 		return err
 	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	return state.apply(journal)
+	return write.apply(journal)
 }
 
-func (s *stateWrite) apply(journal *fsx.Journal) error {
-	err := s.checkUnchanged()
+func (w *stateWrite) apply(journal *fsx.Journal) error {
+	err := w.checkUnchanged()
 	if err != nil {
 		return err
 	}
-	if s.remove {
-		err = journal.Remove(s.fullPath)
+	if w.remove {
+		err = journal.Remove(w.fullPath)
 	} else {
-		err = journal.Write(s.fullPath, s.data)
+		err = journal.Write(w.fullPath, w.data)
 	}
 	if err != nil {
-		return errStateNotWritten(s.file, err)
+		return errStateNotWritten(w.stateFile, err)
 	}
 	return nil
 }
 
-func (s *stateWrite) checkUnchanged() error {
-	held, found, err := readStateFile(s.fullPath, s.file)
+func (w *stateWrite) checkUnchanged() error {
+	current, found, err := readStateFile(w.fullPath, w.stateFile)
 	switch {
 	case err != nil:
 		return err
-	case found != s.found || !bytes.Equal(held, s.previous):
-		return errStateChanged(s.file)
+	case found != w.existed || !bytes.Equal(current, w.previousData):
+		return errStateChanged(w.stateFile)
 	}
 	return nil
 }
 
-func describeUndoFailures(folder *mapdir.Folder, files []fsx.UndoFailure) []string {
-	var listed []string
-	for _, file := range files {
-		listed = append(listed, displayName(folder, file.Path)+" ("+fsx.Reason(file.Err)+")")
+func describeUndoFailures(folder *mapdir.Folder, failures []fsx.UndoFailure) []string {
+	var descriptions []string
+	for _, failure := range failures {
+		descriptions = append(descriptions, mapDisplayPath(folder, failure.Path)+" ("+fsx.Reason(failure.Err)+")")
 	}
-	return listed
+	return descriptions
 }
 
-func displayName(folder *mapdir.Folder, path string) string {
+func mapDisplayPath(folder *mapdir.Folder, path string) string {
 	dir, err := filepath.Abs(folder.Dir())
 	if err != nil {
 		return path
 	}
-	below, err := filepath.Rel(dir, path)
-	if err != nil || !filepath.IsLocal(below) {
+	rel, err := filepath.Rel(dir, path)
+	if err != nil || !filepath.IsLocal(rel) {
 		return path
 	}
-	return folder.DisplayPath(filepath.ToSlash(below))
+	return folder.DisplayPath(filepath.ToSlash(rel))
 }
 
-func wrapUndone(failure error, touched int, unrestored []string) error {
-	var expected *diag.Error
-	isExpected := errors.As(failure, &expected)
+func wrapUndone(err error, writeCount int, unrestored []string) error {
+	var diagErr *diag.Error
+	isExpected := errors.As(err, &diagErr)
 	switch {
 	case len(unrestored) > 0:
-		return errNotRestored(failure, unrestored)
-	case isCancelled(failure) && touched == 0:
+		return errNotRestored(err, unrestored)
+	case isCancelled(err) && writeCount == 0:
 		return errInterruptedBeforeWriting()
-	case isCancelled(failure):
+	case isCancelled(err):
 		return errInterruptedAndUndone()
-	case isExpected && expected.Cause != nil:
-		return errNotWritten(expected)
+	case isExpected && diagErr.Cause != nil:
+		return errNotWritten(diagErr)
 	}
-	return failure
+	return err
 }
 
-func isCancelled(failure error) bool {
-	return errors.Is(failure, context.Canceled) || errors.Is(failure, context.DeadlineExceeded)
+func isCancelled(err error) bool {
+	return errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded)
 }
 
-func describeFailure(failure error) string {
-	var expected *diag.Error
+func describeFailure(err error) string {
+	var diagErr *diag.Error
 	switch {
-	case isCancelled(failure):
+	case isCancelled(err):
 		return "interrupted"
-	case !errors.As(failure, &expected):
-		return fsx.Reason(failure)
-	case expected.Cause != nil:
-		return fsx.Reason(expected.Cause)
+	case !errors.As(err, &diagErr):
+		return fsx.Reason(err)
+	case diagErr.Cause != nil:
+		return fsx.Reason(diagErr.Cause)
 	}
-	return expected.Msg
+	return diagErr.Msg
 }
 
 func errOtherFolder() error {
@@ -167,37 +167,37 @@ func errInterruptedAndUndone() error {
 	return &diag.Error{Msg: "Interrupted; every change was undone."}
 }
 
-func errStateChanged(file string) error {
+func errStateChanged(stateFile string) error {
 	return &diag.Error{
-		Msg:  file + " changed after the assets were checked.",
-		File: file,
+		Msg:  stateFile + " changed after the assets were checked.",
+		File: stateFile,
 		Hint: "Close World Editor and anything else writing to the map, then retry.",
 	}
 }
 
-func errStateNotWritten(file string, cause error) error {
+func errStateNotWritten(stateFile string, cause error) error {
 	return &diag.Error{
 		Msg:   "Writing the asset ownership state failed: " + fsx.Reason(cause),
-		File:  file,
+		File:  stateFile,
 		Cause: cause,
 		Hint:  "Make sure the file and its folder can be written and no other program has the file open, then retry.",
 	}
 }
 
-func errNotWritten(failed *diag.Error) error {
+func errNotWritten(diagErr *diag.Error) error {
 	return &diag.Error{
-		Msg:   "Writing assets failed: " + describeFailure(failed) + ". Every change was undone.",
-		File:  failed.File,
-		Cause: failed.Cause,
-		Hint:  failed.Hint,
+		Msg:   "Writing assets failed: " + describeFailure(diagErr) + ". Every change was undone.",
+		File:  diagErr.File,
+		Cause: diagErr.Cause,
+		Hint:  diagErr.Hint,
 	}
 }
 
-func errNotRestored(failure error, unrestored []string) error {
+func errNotRestored(cause error, unrestored []string) error {
 	return &diag.Error{
-		Msg: "Writing assets failed (" + describeFailure(failure) + "), and these files could not be restored: " +
+		Msg: "Writing assets failed (" + describeFailure(cause) + "), and these files could not be restored: " +
 			strings.Join(unrestored, ", "),
-		Cause: failure,
+		Cause: cause,
 		Hint:  "Restore the map folder from version control before retrying.",
 	}
 }
