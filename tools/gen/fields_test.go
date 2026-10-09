@@ -14,9 +14,9 @@ import (
 
 var unitClass = nameOverrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}}}
 
-func namedFields(t testing.TB, change func(files map[string]string)) (map[string][]objects.FieldMeta, []nameChange) {
+func mustBuildNamedFields(t testing.TB, change func(files map[string]string)) (map[string][]objects.FieldMeta, []nameChange) {
 	t.Helper()
-	fields, renames, err := buildNamedFields(readMini(t, change), unitClass)
+	fields, renames, err := buildNamedFields(readMiniExport(t, change), unitClass)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,16 +39,16 @@ func idsOf(fields []objects.FieldMeta) []string {
 	return ids
 }
 
-func equal[T any](t *testing.T, what string, got, want T) {
+func checkEqual[T any](t *testing.T, what string, got, want T) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("%s: got %v, want %v", what, got, want)
 	}
 }
 
-func rowsOf(t testing.TB, columns []string, rows ...[]any) []slk.Row {
+func newRows(t testing.TB, columns []string, rows ...[]any) []slk.Row {
 	t.Helper()
-	table, err := slk.Parse(sylk(columns, rows...), "table.slk")
+	table, err := slk.Parse(newSLK(columns, rows...), "table.slk")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,51 +56,51 @@ func rowsOf(t testing.TB, columns []string, rows ...[]any) []slk.Row {
 }
 
 func TestNameFieldsMakesARecordOfEachRowOfTheTablesOfFields(t *testing.T) {
-	fields, _ := namedFields(t, nil)
+	fields, _ := mustBuildNamedFields(t, nil)
 	units := byID(fields["units"])
-	equal(t, "uhpm", units["uhpm"], objects.FieldMeta{
+	checkEqual(t, "uhpm", units["uhpm"], objects.FieldMeta{
 		ID: "uhpm", Name: "hitPointsMaximumBase", Label: "Hit Points Maximum (Base)", Category: "stats", Type: "int",
 		Storage: "int", Use: []string{"unit", "hero", "building"}, Specific: []string{}, NotSpecific: []string{},
 	})
-	equal(t, "the fields of units", idsOf(fields["units"]),
+	checkEqual(t, "the fields of units", idsOf(fields["units"]),
 		[]string{"uabi", "ucls", "udea", "uhpm", "umdl", "unam", "upro", "ushr", "uver"})
-	equal(t, "the label of umdl", units["umdl"].Label, "Model File")
-	equal(t, "the skin marks", []bool{units["umdl"].Skin, units["ushr"].Skin, units["unam"].Skin},
+	checkEqual(t, "the label of umdl", units["umdl"].Label, "Model File")
+	checkEqual(t, "the skin marks", []bool{units["umdl"].Skin, units["ushr"].Skin, units["unam"].Skin},
 		[]bool{true, false, true})
-	equal(t, "the storage",
+	checkEqual(t, "the storage",
 		[]string{units["ushr"].Storage, units["udea"].Storage, units["uver"].Storage, units["uabi"].Storage,
 			units["umdl"].Storage},
 		[]string{"int", "int", "int", "string", "string"})
-	equal(t, "the lists", []bool{units["uabi"].List, units["upro"].List, units["unam"].List}, []bool{true, true, false})
+	checkEqual(t, "the lists", []bool{units["uabi"].List, units["upro"].List, units["unam"].List}, []bool{true, true, false})
 
 	items := byID(fields["items"])
-	equal(t, "the fields of items", idsOf(fields["items"]), []string{"ifil", "unam"})
-	equal(t, "unam of the items", items["unam"], units["unam"])
-	equal(t, "the uses of unam", items["unam"].Use, []string{"unit", "hero", "building", "item"})
+	checkEqual(t, "the fields of items", idsOf(fields["items"]), []string{"ifil", "unam"})
+	checkEqual(t, "unam of the items", items["unam"], units["unam"])
+	checkEqual(t, "the uses of unam", items["unam"].Use, []string{"unit", "hero", "building", "item"})
 
 	abilities := byID(fields["abilities"])
-	equal(t, "the fields of abilities", idsOf(fields["abilities"]),
+	checkEqual(t, "the fields of abilities", idsOf(fields["abilities"]),
 		[]string{"Hdc1", "Hhb1", "Hhb2", "Htb1", "aare", "acdn", "alev", "anam", "atp1"})
-	equal(t, "per level", []bool{abilities["anam"].PerLevel, abilities["atp1"].PerLevel, abilities["acdn"].PerLevel},
+	checkEqual(t, "per level", []bool{abilities["anam"].PerLevel, abilities["atp1"].PerLevel, abilities["acdn"].PerLevel},
 		[]bool{false, true, true})
-	equal(t, "the columns", []int{abilities["Hhb1"].Column, abilities["Hdc1"].Column, abilities["acdn"].Column},
+	checkEqual(t, "the columns", []int{abilities["Hhb1"].Column, abilities["Hdc1"].Column, abilities["acdn"].Column},
 		[]int{1, 12, 0})
-	equal(t, "the bases of Hdc1", abilities["Hdc1"].Specific, []string{"AHtb", "AHhb"})
-	equal(t, "the exceptions of aare", abilities["aare"].NotSpecific, []string{"AHhb"})
-	equal(t, "the skin mark of Hhb1", abilities["Hhb1"].Skin, false)
-	equal(t, "the uses of Hhb1", abilities["Hhb1"].Use, []string{})
+	checkEqual(t, "the bases of Hdc1", abilities["Hdc1"].Specific, []string{"AHtb", "AHhb"})
+	checkEqual(t, "the exceptions of aare", abilities["aare"].NotSpecific, []string{"AHhb"})
+	checkEqual(t, "the skin mark of Hhb1", abilities["Hhb1"].Skin, false)
+	checkEqual(t, "the uses of Hhb1", abilities["Hhb1"].Use, []string{})
 
 	upgrades := byID(fields["upgrades"])
-	equal(t, "gnam per level", upgrades["gnam"].PerLevel, true)
-	equal(t, "the labels of the effects", []string{upgrades["gba1"].Label, upgrades["gmo1"].Label},
+	checkEqual(t, "gnam per level", upgrades["gnam"].PerLevel, true)
+	checkEqual(t, "the labels of the effects", []string{upgrades["gba1"].Label, upgrades["gmo1"].Label},
 		[]string{"Effect 1 - Base", "Effect 1 - Mod"})
-	equal(t, "the storage of gef1", upgrades["gef1"].Storage, "string")
-	equal(t, "the lists that are there", slices.Sorted(maps.Keys(fields)),
+	checkEqual(t, "the storage of gef1", upgrades["gef1"].Storage, "string")
+	checkEqual(t, "the lists that are there", slices.Sorted(maps.Keys(fields)),
 		slices.Sorted(slices.Values(objects.FieldLists)))
 }
 
 func TestNameFieldsPadsAnIDOfThreeLettersAndReadsADotBetweenTwoIDs(t *testing.T) {
-	fields, _ := namedFields(t, func(files map[string]string) {
+	fields, _ := mustBuildNamedFields(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
 			`C;X1;Y11;K"Crs"`, `C;X2;K"Data"`, `C;X5;K4`, `C;X6;K1`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`,
 			`C;X9;K"unreal"`, `C;X13;K"AHtb.AHhb"`)
@@ -108,8 +108,8 @@ func TestNameFieldsPadsAnIDOfThreeLettersAndReadsADotBetweenTwoIDs(t *testing.T)
 	})
 	for _, field := range fields["abilities"] {
 		if field.Label == "Chance to Miss" {
-			equal(t, "the id", field.ID, "Crs\x00")
-			equal(t, "the bases", field.Specific, []string{"AHtb", "AHhb"})
+			checkEqual(t, "the id", field.ID, "Crs\x00")
+			checkEqual(t, "the bases", field.Specific, []string{"AHtb", "AHhb"})
 			return
 		}
 	}
@@ -147,7 +147,7 @@ func TestFieldRecordMarksAFieldAsAListByTheNameOfItsType(t *testing.T) {
 		"abilityList": true, "stringList": true, "pathingListPrevent": true, "List": true,
 		"string": false, "listing": false, "LIST": false, "": false,
 	} {
-		rows := rowsOf(t, []string{"ID", "type"}, []any{"upat", fieldType})
+		rows := newRows(t, []string{"ID", "type"}, []any{"upat", fieldType})
 		if got, err := fieldRecord(rows[0], "Label", "units"); err != nil || got.List != want {
 			t.Errorf("a field of the type %q: a list %v, %v; want %v", fieldType, got.List, err, want)
 		}
@@ -156,14 +156,14 @@ func TestFieldRecordMarksAFieldAsAListByTheNameOfItsType(t *testing.T) {
 
 func TestUsesOfListsTheKindsOfObjectWhoseColumnHasOne(t *testing.T) {
 	columns := []string{"ID", "useItem", "useBuilding", "useHero", "useUnit"}
-	rows := rowsOf(t, columns,
+	rows := newRows(t, columns,
 		[]any{"uall", 1, 1, 1, 1}, []any{"unon", 0, 0, 0, 0}, []any{"uitm", 1, 0, nil, nil},
 		[]any{"uodd", 11, "1", " 1", "yes"},
 	)
 	for i, want := range [][]string{{"unit", "hero", "building", "item"}, {}, {"item"}, {"building"}} {
-		equal(t, rows[i].Value("ID"), usesOf(rows[i], "units"), want)
+		checkEqual(t, rows[i].Value("ID"), usesOf(rows[i], "units"), want)
 	}
-	equal(t, "a field of abilities", usesOf(rows[0], "abilities"), []string{})
+	checkEqual(t, "a field of abilities", usesOf(rows[0], "abilities"), []string{})
 }
 
 func TestNameFieldsPutsAFieldOfTheUnitsTableIntoTheListsOfWhatUsesIt(t *testing.T) {
@@ -175,11 +175,11 @@ func TestNameFieldsPutsAFieldOfTheUnitsTableIntoTheListsOfWhatUsesIt(t *testing.
 		{[]string{"item"}, []string{"items"}}, {[]string{"building", "item"}, []string{"units", "items"}},
 		{[]string{}, nil},
 	} {
-		equal(t, strings.Join(c.use, " and "), listsOf(objects.FieldMeta{Use: c.use}, []string{"units", "items"}), c.want)
+		checkEqual(t, strings.Join(c.use, " and "), listsOf(objects.FieldMeta{Use: c.use}, []string{"units", "items"}), c.want)
 	}
-	equal(t, "a table with one list", listsOf(objects.FieldMeta{Use: []string{}}, []string{"buffs"}), []string{"buffs"})
+	checkEqual(t, "a table with one list", listsOf(objects.FieldMeta{Use: []string{}}, []string{"buffs"}), []string{"buffs"})
 
-	game := readMini(t, func(files map[string]string) {
+	game := readMiniExport(t, func(files map[string]string) {
 		files[unitFieldsTable] = withRow(files[unitFieldsTable],
 			`C;X1;Y13;K"unon"`, `C;X5;K"stats"`, `C;X6;K"WESTRING_NONE"`, `C;X7;K"int"`)
 		files[labelsFile] += "WESTRING_NONE=Used by Nothing\r\n"
@@ -188,20 +188,20 @@ func TestNameFieldsPutsAFieldOfTheUnitsTableIntoTheListsOfWhatUsesIt(t *testing.
 	if err == nil {
 		t.Fatal("the fields were named")
 	}
-	contains(t, err.Error(), "cannot derive friendly names:\n  units ucls \"class\" (Class): ",
+	checkContains(t, err.Error(), "cannot derive friendly names:\n  units ucls \"class\" (Class): ",
 		"\n  war3.w3mod/units/unitmetadata.slk: unon: no kind of object uses it")
 }
 
 func TestNameFieldsOrdersTheFieldsOfAListByTheBytesOfTheirIDs(t *testing.T) {
-	fields, _ := namedFields(t, func(files map[string]string) {
-		files[buffFieldsTable] = sylk(buffMeta,
+	fields, _ := mustBuildNamedFields(t, func(files map[string]string) {
+		files[buffFieldsTable] = newSLK(buffMeta,
 			[]any{"fzzz", "A", "art", "WESTRING_FA", "icon", 1}, []any{"\xF0\x90\x80\x80", "B", "art", "WESTRING_FB", "icon", 1},
 			[]any{"Fbbb", "C", "art", "WESTRING_FC", "icon", 1}, []any{"\xEE\x80\x80a", "D", "art", "WESTRING_FD", "icon", 1},
 			[]any{"f1", "E", "art", "WESTRING_FE", "icon", 1},
 		)
 		files[labelsFile] += "WESTRING_FA=A\r\nWESTRING_FB=B\r\nWESTRING_FC=C\r\nWESTRING_FD=D\r\nWESTRING_FE=E\r\n"
 	})
-	equal(t, "the fields of buffs", idsOf(fields["buffs"]),
+	checkEqual(t, "the fields of buffs", idsOf(fields["buffs"]),
 		[]string{"Fbbb", "f1\x00\x00", "fzzz", "\xEE\x80\x80a", "\xF0\x90\x80\x80"})
 }
 
@@ -215,7 +215,7 @@ func TestSplitIDsReadsTheIDsBetweenCommasAndDots(t *testing.T) {
 		"AHtb,AHtb":         {"AHtb", "AHtb"},
 		"AHtb,\xC2\xA0AHhb": {"AHtb", "\xC2\xA0AHhb"},
 	} {
-		equal(t, cell, splitIDs(cell), want)
+		checkEqual(t, cell, splitIDs(cell), want)
 	}
 }
 
@@ -228,7 +228,7 @@ func TestLabelOfFollowsTheStringsOfTheEditor(t *testing.T) {
 		"WESTRING_X": "WESTRING_Y", "WESTRING_Y": "WESTRING_Z", "WESTRING_Z": "WESTRING_X",
 		"": "The Label of No Key",
 	}
-	rows := rowsOf(t, []string{"ID", "displayName"},
+	rows := newRows(t, []string{"ID", "displayName"},
 		[]any{"aaaa", "WESTRING_A"}, []any{"bbbb", "WESTRING_B"}, []any{"cccc", "WESTRING_1"},
 		[]any{"dddd", "WESTRING_0"}, []any{"eeee", "WESTRING_NONE"}, []any{"ffff", "WESTRING_SELF"},
 		[]any{"gggg", "WESTRING_PING"}, []any{"hhhh", nil}, []any{"iiii", ""}, []any{"jjjj", "WESTRING_X"},
@@ -277,7 +277,7 @@ func TestLabelOfPutsTheTypeOfAnEffectWhereTheLabelHasItsPlace(t *testing.T) {
 		{"Effect 1 -\xC2\xA0%s", "", "Effect 1 -\xC2\xA0"},
 		{"Effect 1\xC2\xA0- %s", "", "Effect 1\xC2\xA0"},
 	} {
-		rows := rowsOf(t, []string{"ID", "displayName", "effectType"}, []any{"gba1", "KEY", c.effectType})
+		rows := newRows(t, []string{"ID", "displayName", "effectType"}, []any{"gba1", "KEY", c.effectType})
 		if got, _ := labelOf(rows[0], ini.Section{"KEY": c.label}); got != c.want {
 			t.Errorf("the label %q with the type %q is %q, want %q", c.label, c.effectType, got, c.want)
 		}
@@ -286,7 +286,7 @@ func TestLabelOfPutsTheTypeOfAnEffectWhereTheLabelHasItsPlace(t *testing.T) {
 
 func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 	record := func(repeat, data any) (objects.FieldMeta, error) {
-		rows := rowsOf(t, []string{"ID", "repeat", "data"}, []any{"Hhb1", repeat, data})
+		rows := newRows(t, []string{"ID", "repeat", "data"}, []any{"Hhb1", repeat, data})
 		return fieldRecord(rows[0], "Label", "abilities")
 	}
 	for _, c := range []struct {
@@ -324,7 +324,7 @@ func TestFieldRecordReadsANumberCellAsADecimalNumber(t *testing.T) {
 	if _, err := record("x", "y"); err == nil || !strings.Contains(err.Error(), "the repeat cell 'x'") {
 		t.Errorf("two cells that are no number: got %v, want the repeat cell refused", err)
 	}
-	game := readMini(t, func(files map[string]string) {
+	game := readMiniExport(t, func(files map[string]string) {
 		files[upgradeFieldsTable] = strings.Replace(files[upgradeFieldsTable], "C;X3;K1\r\n", "C;X3;K\"many\"\r\n", 1)
 	})
 	_, _, err := buildNamedFields(game, nameOverrides{})

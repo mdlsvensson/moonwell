@@ -48,7 +48,7 @@ constant function ConstantBJ takes nothing returns integer
 endfunction
 `
 
-func parsed(t *testing.T, text, source string) jass.File {
+func mustParse(t *testing.T, text, source string) jass.File {
 	t.Helper()
 	file, err := jass.Parse(text, source)
 	if err != nil {
@@ -59,7 +59,7 @@ func parsed(t *testing.T, text, source string) jass.File {
 
 func miniScripts(t *testing.T) (common, blizzard jass.File) {
 	t.Helper()
-	return parsed(t, miniCommon, commonScript), parsed(t, miniBlizzard, blizzardScript)
+	return mustParse(t, miniCommon, commonScript), mustParse(t, miniBlizzard, blizzardScript)
 }
 
 func params(typesAndNames ...string) []script.NativeParam {
@@ -110,7 +110,7 @@ func TestBuildNativesMergesBothFilesAndTheLuaExtrasSortedByName(t *testing.T) {
 	if !reflect.DeepEqual(given, miniExtras()) {
 		t.Errorf("buildNatives changed the extras it was given: %+v", given)
 	}
-	contains(t, renderNatives(natives),
+	checkContains(t, renderNatives(natives),
 		"{\n  \"gameVersion\": \"9.9.9\",\n  \"types\": [\n    {\n      \"name\": \"agent\",\n"+
 			"      \"extends\": \"handle\"\n    },",
 		"      \"name\": \"DoNothing\",\n      \"source\": \"common.j\",\n      \"constant\": false,\n"+
@@ -128,7 +128,7 @@ func TestBuildNativesMergesBothFilesAndTheLuaExtrasSortedByName(t *testing.T) {
 	)
 }
 
-func refuses(t *testing.T, common, blizzard jass.File, given extras, words string) {
+func checkBuildNativesError(t *testing.T, common, blizzard jass.File, given extras, words string) {
 	t.Helper()
 	if _, err := buildNatives("9.9.9", common, blizzard, given); err == nil || !strings.Contains(err.Error(), words) {
 		t.Errorf("got %v, want an error with the words %q", err, words)
@@ -137,22 +137,22 @@ func refuses(t *testing.T, common, blizzard jass.File, given extras, words strin
 
 func TestBuildNativesRefusesANameDeclaredTwice(t *testing.T) {
 	common, _ := miniScripts(t)
-	refuses(t, common, common, extras{}, "CreateThing")
+	checkBuildNativesError(t, common, common, extras{}, "CreateThing")
 }
 
 func TestBuildNativesRefusesALuaGlobalNamedLikeAJASSFunction(t *testing.T) {
 	common, blizzard := miniScripts(t)
-	refuses(t, common, blizzard, extras{Globals: []string{"CreateThing"}}, "CreateThing")
+	checkBuildNativesError(t, common, blizzard, extras{Globals: []string{"CreateThing"}}, "CreateThing")
 }
 
 func TestBuildNativesRefusesALuaNameBothProvidedAndRemoved(t *testing.T) {
 	common, blizzard := miniScripts(t)
-	refuses(t, common, blizzard, extras{Globals: []string{"print", "io"}, Removed: []string{"io"}}, "io")
+	checkBuildNativesError(t, common, blizzard, extras{Globals: []string{"print", "io"}, Removed: []string{"io"}}, "io")
 }
 
 func TestBuildNativesNamesBothPlacesOfANameDeclaredTwice(t *testing.T) {
 	common, blizzard := miniScripts(t)
-	as := func(text string) jass.File { return parsed(t, text, blizzardScript) }
+	as := func(text string) jass.File { return mustParse(t, text, blizzardScript) }
 	lua := func(names ...string) extras {
 		var given extras
 		for _, name := range names {
@@ -274,7 +274,7 @@ func TestBuildNativesMakesEveryListThatHoldsNothingAnEmptyOne(t *testing.T) {
 func TestTheCommittedNativesRenderToThemselves(t *testing.T) {
 	committed := string(moonwell.Natives)
 	if rendered := renderNatives(script.LoadNatives()); rendered != committed {
-		t.Errorf("%s does not render to itself: %s", nativesPath, parting(committed, rendered))
+		t.Errorf("%s does not render to itself: %s", nativesPath, describeDifference(committed, rendered))
 	}
 	if string(realFile(t, nativesPath)) != committed {
 		t.Errorf("the program does not carry %s as the checkout has it", nativesPath)
@@ -380,7 +380,7 @@ func TestRenderNativesWritesTheTextOfTheFile(t *testing.T) {
 }
 `
 	if got := renderNatives(natives); got != want {
-		t.Errorf("the natives are not written as the file has them: %s", parting(want, got))
+		t.Errorf("the natives are not written as the file has them: %s", describeDifference(want, got))
 	}
 }
 
@@ -395,7 +395,7 @@ func TestRenderNativesWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
 	}
 }
 
-func exportedScripts(t testing.TB, common, blizzard string) string {
+func newScriptsExport(t testing.TB, common, blizzard string) string {
 	t.Helper()
 	dir := t.TempDir()
 	testkit.WriteFile(t, dir, scriptsDir+"/"+commonScript, []byte(common))
@@ -403,15 +403,15 @@ func exportedScripts(t testing.TB, common, blizzard string) string {
 	return dir
 }
 
-func withExtras(t testing.TB) checkout {
+func newCheckoutWithExtras(t testing.TB) fakeCheckout {
 	t.Helper()
-	c := newCheckout(t)
-	c.write(extrasPath, miniExtrasText)
-	c.folder("data")
+	c := newFakeCheckout(t)
+	c.writeFile(extrasPath, miniExtrasText)
+	c.makeDir("data")
 	return c
 }
 
-func without(c checkout, name string) {
+func removeFromCheckout(c fakeCheckout, name string) {
 	c.t.Helper()
 	if err := os.Remove(c.path(name)); err != nil {
 		c.t.Fatal(err)
@@ -423,16 +423,16 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 		{"returns": "integer", "params": [{"type": "string", "name": "id"}], "name": "FourCC"}]}`
 	want := renderNatives(miniNatives())
 	withBoth := func(text string) string { return "\xEF\xBB\xBF" + strings.ReplaceAll(text, "\n", "\r\n") }
-	whole := exportedScripts(t, miniCommon, miniBlizzard)
+	whole := newScriptsExport(t, miniCommon, miniBlizzard)
 	for name, c := range map[string]struct{ dir, extras string }{
 		"line feeds": {whole, miniExtrasText},
 		"carriage returns, and a byte order mark at the start of each script": {
-			exportedScripts(t, withBoth(miniCommon), withBoth(miniBlizzard)), miniExtrasText},
+			newScriptsExport(t, withBoth(miniCommon), withBoth(miniBlizzard)), miniExtrasText},
 		"extras with their keys in another order": {whole, otherOrder},
 	} {
-		scratch := withExtras(t)
-		scratch.write(extrasPath, c.extras)
-		printed, files, err := scratch.run("natives", c.dir, "9.9.9")
+		scratch := newCheckoutWithExtras(t)
+		scratch.writeFile(extrasPath, c.extras)
+		printed, files, err := scratch.runGen("natives", c.dir, "9.9.9")
 		if err != nil {
 			t.Errorf("%s: %v", name, err)
 			continue
@@ -440,12 +440,12 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 		if printed != "wrote data/natives.json: 3 types, 6 functions, 4 globals\n" {
 			t.Errorf("%s: printed %q", name, printed)
 		}
-		got := texts(files)
+		got := toTexts(files)
 		if !maps.Equal(got, withGoMod(map[string]string{extrasPath: c.extras, nativesPath: want})) {
 			t.Errorf("%s: the checkout holds %q, want the natives of the two scripts: %s",
-				name, slices.Sorted(maps.Keys(got)), parting(want, got[nativesPath]))
+				name, slices.Sorted(maps.Keys(got)), describeDifference(want, got[nativesPath]))
 		}
-		contains(t, got[nativesPath],
+		checkContains(t, got[nativesPath],
 			"{\n  \"gameVersion\": \"9.9.9\",\n  \"types\": [\n",
 			"      \"name\": \"HelperBJ\",\n      \"source\": \"blizzard.j\",\n      \"constant\": false,\n"+
 				"      \"params\": [\n        {\n          \"type\": \"unit\",\n          \"name\": \"whichUnit\"\n",
@@ -461,18 +461,18 @@ func TestTheModeNativesFindsAScriptWhateverTheLetterCaseOfItsPath(t *testing.T) 
 	dir := t.TempDir()
 	testkit.WriteFile(t, dir, "War3.w3mod/Scripts/COMMON.J", []byte(miniCommon))
 	testkit.WriteFile(t, dir, "War3.w3mod/Scripts/Blizzard.j", []byte(miniBlizzard))
-	_, files, err := withExtras(t).run("natives", dir, "9.9.9")
+	_, files, err := newCheckoutWithExtras(t).runGen("natives", dir, "9.9.9")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if want, got := renderNatives(miniNatives()), string(files[nativesPath]); got != want {
-		t.Errorf("the natives of scripts that are named in other letters: %s", parting(want, got))
+		t.Errorf("the natives of scripts that are named in other letters: %s", describeDifference(want, got))
 	}
 }
 
 func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testing.T) {
 	const kept = "the natives of another version\n"
-	whole := exportedScripts(t, miniCommon, miniBlizzard)
+	whole := newScriptsExport(t, miniCommon, miniBlizzard)
 	noBlizzard := t.TempDir()
 	testkit.WriteFile(t, noBlizzard, scriptsDir+"/"+commonScript, []byte(miniCommon))
 	noFolder := filepath.Join(noBlizzard, "no-such-folder")
@@ -481,7 +481,7 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 	testkit.WriteFile(t, blizzardAsFolder, scriptsDir+"/"+blizzardScript+"/held.txt", []byte("held\n"))
 	for name, c := range map[string]struct {
 		dir    string
-		lay    func(c checkout)
+		lay    func(c fakeCheckout)
 		starts string
 		words  []string
 	}{
@@ -493,34 +493,34 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 			starts: "war3.w3mod/scripts/blizzard.j is missing from " + noBlizzard + "/"},
 		"a folder at the place of a script": {dir: blizzardAsFolder,
 			starts: filepath.Join(blizzardAsFolder, "war3.w3mod", "scripts", "blizzard.j") + ": "},
-		"a line that is no declaration": {dir: exportedScripts(t, miniCommon, "globals\n    real = 1\nendglobals\n"),
+		"a line that is no declaration": {dir: newScriptsExport(t, miniCommon, "globals\n    real = 1\nendglobals\n"),
 			starts: "blizzard.j:2: cannot read ", words: []string{`"real = 1"`}},
-		"a function without its end": {dir: exportedScripts(t, "\n\nfunction F takes nothing returns nothing\n", ""),
+		"a function without its end": {dir: newScriptsExport(t, "\n\nfunction F takes nothing returns nothing\n", ""),
 			starts: "common.j:3: "},
-		"a name declared twice": {dir: exportedScripts(t, miniCommon, miniCommon),
+		"a name declared twice": {dir: newScriptsExport(t, miniCommon, miniCommon),
 			starts: "CreateThing is declared twice (common.j and blizzard.j)."},
-		"no extras": {dir: whole, lay: func(c checkout) { without(c, extrasPath) },
+		"no extras": {dir: whole, lay: func(c fakeCheckout) { removeFromCheckout(c, extrasPath) },
 			starts: "tools/natives/lua-extras.json: "},
-		"extras that are no JSON": {dir: whole, lay: func(c checkout) { c.write(extrasPath, "{") },
+		"extras that are no JSON": {dir: whole, lay: func(c fakeCheckout) { c.writeFile(extrasPath, "{") },
 			starts: "tools/natives/lua-extras.json: unexpected EOF"},
-		"extras with a key too many": {dir: whole, lay: func(c checkout) { c.write(extrasPath, `{"more": []}`) },
+		"extras with a key too many": {dir: whole, lay: func(c fakeCheckout) { c.writeFile(extrasPath, `{"more": []}`) },
 			starts: "tools/natives/lua-extras.json: unknown field \"more\""},
 		"extras with a function that returns nothing": {dir: whole,
-			lay:    func(c checkout) { c.write(extrasPath, `{"functions": [{"name": "A", "params": []}]}`) },
+			lay:    func(c fakeCheckout) { c.writeFile(extrasPath, `{"functions": [{"name": "A", "params": []}]}`) },
 			starts: "tools/natives/lua-extras.json: functions.0 has no \"returns\""},
 		"a folder at the place of the natives": {dir: whole, starts: "data/natives.json: ",
-			lay: func(c checkout) {
-				without(c, nativesPath)
-				c.folder(nativesPath)
+			lay: func(c fakeCheckout) {
+				removeFromCheckout(c, nativesPath)
+				c.makeDir(nativesPath)
 			}},
 	} {
-		scratch := withExtras(t)
-		scratch.write(nativesPath, kept)
+		scratch := newCheckoutWithExtras(t)
+		scratch.writeFile(nativesPath, kept)
 		if c.lay != nil {
 			c.lay(scratch)
 		}
-		before := scratch.all()
-		printed, files, err := scratch.run("natives", c.dir, "9.9.9")
+		before := scratch.readAll()
+		printed, files, err := scratch.runGen("natives", c.dir, "9.9.9")
 		if err == nil {
 			t.Errorf("%s: the run wrote the natives", name)
 			continue
@@ -528,7 +528,7 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 		if !strings.HasPrefix(err.Error(), c.starts) {
 			t.Errorf("%s: the error is %q, want it to start with %q", name, err, c.starts)
 		}
-		contains(t, err.Error(), c.words...)
+		checkContains(t, err.Error(), c.words...)
 		if strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: the error holds the full path of the checkout: %q", name, err)
 		}
@@ -542,16 +542,16 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 func TestTheModeNativesWritesTheCommittedNativesFromTheGamesScripts(t *testing.T) {
 	export := testkit.NeedExport(t, "MOONWELL_GAME_SCRIPTS").Path()
 	committed := script.LoadNatives()
-	c := newCheckout(t)
-	c.carry(extrasPath)
-	c.folder("data")
-	printed, files, err := c.run("natives", export, committed.GameVersion)
+	c := newFakeCheckout(t)
+	c.copyRealFiles(extrasPath)
+	c.makeDir("data")
+	printed, files, err := c.runGen("natives", export, committed.GameVersion)
 	if err != nil {
 		t.Fatal(err)
 	}
 	want := string(realFile(t, nativesPath))
 	if got := string(files[nativesPath]); got != want {
-		t.Errorf("the game's scripts do not give the committed %s: %s", nativesPath, parting(want, got))
+		t.Errorf("the game's scripts do not give the committed %s: %s", nativesPath, describeDifference(want, got))
 	}
 	counts := fmt.Sprintf("wrote data/natives.json: %d types, %d functions, %d globals\n",
 		len(committed.Types), len(committed.Functions), len(committed.Globals))

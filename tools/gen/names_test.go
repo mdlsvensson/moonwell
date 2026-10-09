@@ -17,7 +17,7 @@ func namesOf(fields []objects.FieldMeta) map[string]string {
 	return names
 }
 
-func reported(renames []nameChange) []string {
+func formatNameChanges(renames []nameChange) []string {
 	var lines []string
 	for _, renamed := range renames {
 		lines = append(lines, renamed.list+" "+renamed.id+" "+renamed.description)
@@ -25,9 +25,9 @@ func reported(renames []nameChange) []string {
 	return lines
 }
 
-func refusal(t *testing.T, pins nameOverrides, change func(files map[string]string)) string {
+func mustFailAssignNames(t *testing.T, pins nameOverrides, change func(files map[string]string)) string {
 	t.Helper()
-	_, _, err := buildNamedFields(readMini(t, change), pins)
+	_, _, err := buildNamedFields(readMiniExport(t, change), pins)
 	if err == nil {
 		t.Fatal("the fields were named")
 	}
@@ -39,8 +39,8 @@ func withLabels(lines ...string) func(files map[string]string) {
 }
 
 func TestNameFieldsNamesAFieldAfterItsLabelAndRenamesTheFieldsThatClash(t *testing.T) {
-	fields, renames := namedFields(t, nil)
-	equal(t, "units", namesOf(fields["units"]), map[string]string{
+	fields, renames := mustBuildNamedFields(t, nil)
+	checkEqual(t, "units", namesOf(fields["units"]), map[string]string{
 		"uabi": "abilitiesNormal",
 		"ucls": "unitClass",
 		"udea": "deathType",
@@ -51,8 +51,8 @@ func TestNameFieldsNamesAFieldAfterItsLabelAndRenamesTheFieldsThatClash(t *testi
 		"ushr": "shadowOnWater",
 		"uver": "modelFileExtraVersions",
 	})
-	equal(t, "items", namesOf(fields["items"]), map[string]string{"ifil": "modelFile", "unam": "name"})
-	equal(t, "abilities", namesOf(fields["abilities"]), map[string]string{
+	checkEqual(t, "items", namesOf(fields["items"]), map[string]string{"ifil": "modelFile", "unam": "name"})
+	checkEqual(t, "abilities", namesOf(fields["abilities"]), map[string]string{
 		"Hdc1": "damageDealtPercent",
 		"Hhb1": "amountHealedOrDamaged",
 		"Hhb2": "areaOfEffect",
@@ -63,14 +63,14 @@ func TestNameFieldsNamesAFieldAfterItsLabelAndRenamesTheFieldsThatClash(t *testi
 		"anam": "name",
 		"atp1": "tooltipNormal",
 	})
-	equal(t, "upgrades", namesOf(fields["upgrades"]), map[string]string{
+	checkEqual(t, "upgrades", namesOf(fields["upgrades"]), map[string]string{
 		"gba1": "effect1Base",
 		"gef1": "effect1",
 		"gmo1": "effect1Mod",
 		"gnam": "name",
 		"gpct": "percentBonusAndMore",
 	})
-	equal(t, "the renames", reported(renames), []string{
+	checkEqual(t, "the renames", formatNameChanges(renames), []string{
 		`units ucls "class" -> "unitClass" (override)`,
 		`abilities acdn "cooldown" -> "statsCooldown" (category prefix)`,
 		`abilities Htb1 "cooldown" -> "dataCooldown" (category prefix)`,
@@ -78,24 +78,24 @@ func TestNameFieldsNamesAFieldAfterItsLabelAndRenamesTheFieldsThatClash(t *testi
 }
 
 func TestNameFieldsAddsTheRawcodeWhereTheCategoryLeavesAClash(t *testing.T) {
-	fields, renames := namedFields(t, withLabels("WESTRING_HHB1=Damage", "WESTRING_HDC1=Damage"))
+	fields, renames := mustBuildNamedFields(t, withLabels("WESTRING_HHB1=Damage", "WESTRING_HDC1=Damage"))
 	abilities := namesOf(fields["abilities"])
-	equal(t, "the names", []string{abilities["Hhb1"], abilities["Hdc1"]}, []string{"dataDamageHhb1", "dataDamageHdc1"})
-	if !slices.Contains(reported(renames), `abilities Hhb1 "damage" -> "dataDamageHhb1" (category prefix and rawcode)`) {
-		t.Errorf("the renames are %q", reported(renames))
+	checkEqual(t, "the names", []string{abilities["Hhb1"], abilities["Hdc1"]}, []string{"dataDamageHhb1", "dataDamageHdc1"})
+	if !slices.Contains(formatNameChanges(renames), `abilities Hhb1 "damage" -> "dataDamageHhb1" (category prefix and rawcode)`) {
+		t.Errorf("the renames are %q", formatNameChanges(renames))
 	}
-	fields, _ = namedFields(t, func(files map[string]string) {
+	fields, _ = mustBuildNamedFields(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
 			`C;X1;Y11;K"Crs"`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`, `C;X9;K"unreal"`, `C;X13;K"AHhb"`)
 		files[labelsFile] += "WESTRING_CRS=Damage\r\nWESTRING_HHB1=Damage\r\nWESTRING_HDC1=Damage\r\n"
 	})
-	equal(t, "the name of the field of three letters", namesOf(fields["abilities"])["Crs\x00"], "dataDamageCrs")
+	checkEqual(t, "the name of the field of three letters", namesOf(fields["abilities"])["Crs\x00"], "dataDamageCrs")
 }
 
 func TestNameFieldsRefusesANameThatNoPropertyCanHaveWithoutAPin(t *testing.T) {
-	contains(t, refusal(t, nameOverrides{}, nil), "cannot derive friendly names:\n  ", `units ucls "class" (Class)`,
+	checkContains(t, mustFailAssignNames(t, nameOverrides{}, nil), "cannot derive friendly names:\n  ", `units ucls "class" (Class)`,
 		`pin another under "names", "units", "ucls" in tools/metadata/overrides.json`)
-	contains(t, refusal(t, unitClass, withLabels("WESTRING_FART=Base")), `buffs fart "base" (Base)`)
+	checkContains(t, mustFailAssignNames(t, unitClass, withLabels("WESTRING_FART=Base")), `buffs fart "base" (Base)`)
 
 	words := slices.Concat(pklKeywords, reservedNames)
 	for _, word := range []string{"private", "public", "output", "id", "class", "out"} {
@@ -105,10 +105,10 @@ func TestNameFieldsRefusesANameThatNoPropertyCanHaveWithoutAPin(t *testing.T) {
 	}
 	for _, word := range words {
 		label := capitalize(word)
-		contains(t, refusal(t, unitClass, withLabels("WESTRING_FART="+label)), `buffs fart "`+word+`" (`+label+`)`)
+		checkContains(t, mustFailAssignNames(t, unitClass, withLabels("WESTRING_FART="+label)), `buffs fart "`+word+`" (`+label+`)`)
 	}
-	contains(t, refusal(t, unitClass, withLabels("WESTRING_FART=(-)")), `buffs fart "" ((-))`)
-	contains(t, refusal(t, unitClass, withLabels("WESTRING_FART=2nd Icon")), `buffs fart "2ndIcon" (2nd Icon)`)
+	checkContains(t, mustFailAssignNames(t, unitClass, withLabels("WESTRING_FART=(-)")), `buffs fart "" ((-))`)
+	checkContains(t, mustFailAssignNames(t, unitClass, withLabels("WESTRING_FART=2nd Icon")), `buffs fart "2ndIcon" (2nd Icon)`)
 }
 
 func TestCamelCaseIsTheFriendlyNameOfALabel(t *testing.T) {
@@ -162,7 +162,7 @@ func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 		"items":     {"unam": "displayName", "ucls": "unitClass"},
 		"abilities": {"acdn": "cooldown", "Crs": "missChance"},
 	}}
-	fields, renames, err := buildNamedFields(readMini(t, func(files map[string]string) {
+	fields, renames, err := buildNamedFields(readMiniExport(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
 			`C;X1;Y11;K"Crs"`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`, `C;X9;K"unreal"`)
 		files[labelsFile] += "WESTRING_CRS=Class\r\n"
@@ -170,12 +170,12 @@ func TestNameFieldsGivesAPinnedFieldItsPin(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	equal(t, "unam of the units", namesOf(fields["units"])["unam"], "displayName")
-	equal(t, "unam of the items", namesOf(fields["items"])["unam"], "displayName")
+	checkEqual(t, "unam of the units", namesOf(fields["units"])["unam"], "displayName")
+	checkEqual(t, "unam of the items", namesOf(fields["items"])["unam"], "displayName")
 	abilities := namesOf(fields["abilities"])
-	equal(t, "the two cooldowns", []string{abilities["acdn"], abilities["Htb1"]}, []string{"cooldown", "dataCooldown"})
-	equal(t, "the field of three letters", abilities["Crs\x00"], "missChance")
-	equal(t, "the renames", reported(renames), []string{
+	checkEqual(t, "the two cooldowns", []string{abilities["acdn"], abilities["Htb1"]}, []string{"cooldown", "dataCooldown"})
+	checkEqual(t, "the field of three letters", abilities["Crs\x00"], "missChance")
+	checkEqual(t, "the renames", formatNameChanges(renames), []string{
 		`units unam "name" -> "displayName" (override)`,
 		`units ucls "class" -> "unitClass" (override)`,
 		`abilities acdn "cooldown" -> "cooldown" (override)`,
@@ -211,14 +211,14 @@ func TestNameFieldsRefusesAPinThatNamesNoField(t *testing.T) {
 		for list, names := range c.names {
 			pins.Names[list] = names
 		}
-		contains(t, refusal(t, pins, nil), append(c.words, "cannot derive friendly names:\n  ")...)
+		checkContains(t, mustFailAssignNames(t, pins, nil), append(c.words, "cannot derive friendly names:\n  ")...)
 	}
 	pins := nameOverrides{
 		Names: map[string]map[string]string{
 			"units": {"ucls": "unitClass", "ifil": "itemModel"}, "items": {"uhpm": "health"}},
 		Removed: map[string][]string{"units": {"uold"}, "buffs": {}},
 	}
-	if _, _, err := buildNamedFields(readMini(t, nil), pins); err != nil {
+	if _, _, err := buildNamedFields(readMiniExport(t, nil), pins); err != nil {
 		t.Errorf("pins that name their fields, and a field that is removed: %v", err)
 	}
 }
@@ -227,8 +227,8 @@ func TestNameFieldsRefusesTheNamesThatStillClashOrCannotStand(t *testing.T) {
 	pinned := func(names map[string]string) nameOverrides {
 		return nameOverrides{Names: map[string]map[string]string{"units": {"ucls": "unitClass"}, "abilities": names}}
 	}
-	got := refusal(t, pinned(map[string]string{"acdn": "cool", "Htb1": "cool", "alev": "Levels", "anam": "class"}), nil)
-	contains(t, got, "cannot derive friendly names:\n",
+	got := mustFailAssignNames(t, pinned(map[string]string{"acdn": "cool", "Htb1": "cool", "alev": "Levels", "anam": "class"}), nil)
+	checkContains(t, got, "cannot derive friendly names:\n",
 		"\n  abilities acdn \"cool\" (Cooldown): Htb1 (Cooldown) has this name too, and one object can have both: "+
 			"pin another name for one of the two in tools/metadata/overrides.json",
 		"\n  abilities Htb1 \"cool\" (Cooldown): acdn (Cooldown) has this name too",
@@ -237,19 +237,19 @@ func TestNameFieldsRefusesTheNamesThatStillClashOrCannotStand(t *testing.T) {
 	if strings.Contains(got, `pin another under "names"`) {
 		t.Errorf("a pin that is refused is told to be pinned: %s", got)
 	}
-	contains(t, refusal(t, unitClass, func(files map[string]string) {
+	checkContains(t, mustFailAssignNames(t, unitClass, func(files map[string]string) {
 		files[buffFieldsTable] = withRow(files[buffFieldsTable],
 			`C;X1;Y4;K"fnam"`, `C;X3;K"text"`, `C;X4;K"WESTRING_FNAM"`, `C;X5;K"string"`)
 	}), `buffs fnam "textNameFnam" (Name): fnam (Name) has this name too`)
 }
 
 func TestNameFieldsFindsNoClashOfAFieldWithItself(t *testing.T) {
-	fields, renames := namedFields(t, func(files map[string]string) {
+	fields, renames := mustBuildNamedFields(t, func(files map[string]string) {
 		files[abilityFieldsTable] = strings.Replace(files[abilityFieldsTable], `K"AHtb,AHhb"`, `K"AHtb,AHtb"`, 1)
 	})
-	equal(t, "the name of Hdc1", namesOf(fields["abilities"])["Hdc1"], "damageDealtPercent")
-	equal(t, "the bases of Hdc1", byID(fields["abilities"])["Hdc1"].Specific, []string{"AHtb", "AHtb"})
-	for _, line := range reported(renames) {
+	checkEqual(t, "the name of Hdc1", namesOf(fields["abilities"])["Hdc1"], "damageDealtPercent")
+	checkEqual(t, "the bases of Hdc1", byID(fields["abilities"])["Hdc1"].Specific, []string{"AHtb", "AHtb"})
+	for _, line := range formatNameChanges(renames) {
 		if strings.Contains(line, "Hdc1") {
 			t.Errorf("the field is reported as renamed: %s", line)
 		}
@@ -263,9 +263,9 @@ func TestGroupsOfIsTheFieldsThatCanMeetInOneObject(t *testing.T) {
 		{NotSpecific: []string{"AHtb", "AOld"}},
 		{},
 	}
-	equal(t, "units", clashGroups(records, "units", []string{"AHhb"}), [][]string{{"hero", "item"}, nil, nil, nil})
-	equal(t, "buffs", clashGroups(records, "buffs", []string{"AHhb"}), [][]string{{"all"}, {"all"}, {"all"}, {"all"}})
-	equal(t, "abilities", clashGroups(records, "abilities", []string{"AHhb", "AHtb", "AHhb"}), [][]string{
+	checkEqual(t, "units", clashGroups(records, "units", []string{"AHhb"}), [][]string{{"hero", "item"}, nil, nil, nil})
+	checkEqual(t, "buffs", clashGroups(records, "buffs", []string{"AHhb"}), [][]string{{"all"}, {"all"}, {"all"}, {"all"}})
+	checkEqual(t, "abilities", clashGroups(records, "abilities", []string{"AHhb", "AHtb", "AHhb"}), [][]string{
 		{"common", "AHhb", "AHtb", "ANew", "AOld"},
 		{"AHhb", "ANew"},
 		{"common", "AHhb", "ANew"},
@@ -282,7 +282,7 @@ func TestGroupsOfIsTheFieldsThatCanMeetInOneObject(t *testing.T) {
 		{[]objects.FieldMeta{shared("unit", "item"), shared("building"), shared("item"), other}, map[int]int{0: 2, 2: 0}},
 		{[]objects.FieldMeta{shared("hero", "hero"), other}, map[int]int{}},
 	} {
-		equal(t, "the fields that clash", findClashes(c.fields, clashGroups(c.fields, "units", nil)), c.want)
+		checkEqual(t, "the fields that clash", findClashes(c.fields, clashGroups(c.fields, "units", nil)), c.want)
 	}
 }
 
@@ -325,23 +325,23 @@ func TestTheOverridesAreThePinsAndTheFieldsThatAreRemoved(t *testing.T) {
 }
 
 func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) {
-	game := readMini(t, nil)
-	metadataOf := func(pins nameOverrides) *objects.Metadata { return metadataPinned(t, game, pins) }
+	game := readMiniExport(t, nil)
+	metadataOf := func(pins nameOverrides) *objects.Metadata { return buildMetadata(t, game, pins) }
 	current := metadataOf(unitClass)
 	released := renderMetadata(current)
 	renamed := strings.Replace(released, `"name":"hitPointsMaximumBase"`, `"name":"hitPoints"`, 1)
 	renamed = strings.Replace(renamed, `{"id":"gpct"`, `{"id":"gold"`, 1)
 	renamed = strings.Replace(renamed, `"name":"name"`, `"name":"unitName"`, 2)
-	c := newCheckout(t)
+	c := newFakeCheckout(t)
 
 	if err := checkReleasedNamesKept(current, c.root, unitClass); err != nil {
 		t.Errorf("a checkout without a metadata: %v", err)
 	}
-	c.write(metadataPath, released)
+	c.writeFile(metadataPath, released)
 	if err := checkReleasedNamesKept(current, c.root, unitClass); err != nil {
 		t.Errorf("the names that are released: %v", err)
 	}
-	c.write(metadataPath, renamed)
+	c.writeFile(metadataPath, renamed)
 	const lines = ":\n" +
 		"  units uhpm \"hitPoints\" would become \"hitPointsMaximumBase\"\n" +
 		"  units unam \"unitName\" would become \"name\"\n" +
@@ -351,12 +351,12 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 	if err == nil || !strings.HasSuffix(err.Error(), lines) {
 		t.Fatalf("got %v, want the lines %q", err, lines)
 	}
-	contains(t, err.Error(), "released friendly names would change. In tools/metadata/overrides.json, ",
+	checkContains(t, err.Error(), "released friendly names would change. In tools/metadata/overrides.json, ",
 		`under "names"`, `under "removed"`)
 	if strings.Contains(err.Error(), "no longer") {
 		t.Errorf("the refusal tells of what was: %v", err)
 	}
-	if kept := string(c.all()[metadataPath]); kept != renamed {
+	if kept := string(c.readAll()[metadataPath]); kept != renamed {
 		t.Error("the check wrote the metadata")
 	}
 
@@ -368,7 +368,7 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 	if err := checkReleasedNamesKept(pinned, c.root, pins); err != nil {
 		t.Errorf("with the names pinned and the field removed: %v", err)
 	}
-	equal(t, "the name of uhpm", namesOf(pinned.Fields["units"])["uhpm"], "hitPoints")
+	checkEqual(t, "the name of uhpm", namesOf(pinned.Fields["units"])["uhpm"], "hitPoints")
 	pins.Removed = map[string][]string{"units": {"gold"}}
 	if err := checkReleasedNamesKept(pinned, c.root, pins); err == nil || !strings.Contains(err.Error(), "upgrades gold") {
 		t.Errorf("a field removed under another list: got %v", err)
@@ -376,17 +376,17 @@ func TestKeepsReleasedNamesRefusesANameThatWouldChangeOrDisappear(t *testing.T) 
 }
 
 func TestKeepsReleasedNamesLetsAPinGiveAReleasedFieldAnotherName(t *testing.T) {
-	game := readMini(t, nil)
-	c := newCheckout(t)
-	c.write(metadataPath, renderMetadata(metadataPinned(t, game, unitClass)))
+	game := readMiniExport(t, nil)
+	c := newFakeCheckout(t)
+	c.writeFile(metadataPath, renderMetadata(buildMetadata(t, game, unitClass)))
 	for under, names := range map[string]map[string]map[string]string{
 		"units": {"units": {"ucls": "unitClass", "uhpm": "health", "unam": "title"}},
 		"items": {"units": {"ucls": "unitClass", "uhpm": "health"}, "items": {"unam": "title"}},
 	} {
 		pins := nameOverrides{Names: names}
-		pinned := metadataPinned(t, game, pins)
+		pinned := buildMetadata(t, game, pins)
 		units, items := namesOf(pinned.Fields["units"]), namesOf(pinned.Fields["items"])
-		equal(t, "the names of uhpm, and of unam in both lists, with unam pinned under "+under,
+		checkEqual(t, "the names of uhpm, and of unam in both lists, with unam pinned under "+under,
 			[]string{units["uhpm"], units["unam"], items["unam"]}, []string{"health", "title", "title"})
 		if err := checkReleasedNamesKept(pinned, c.root, pins); err != nil {
 			t.Errorf("unam pinned under %s: the pins of other names than the released ones are refused: %v", under, err)
@@ -395,8 +395,8 @@ func TestKeepsReleasedNamesLetsAPinGiveAReleasedFieldAnotherName(t *testing.T) {
 }
 
 func TestKeepsReleasedNamesTakesAndShowsTheIDOfThreeLettersAsItIsWritten(t *testing.T) {
-	scratch := newCheckout(t)
-	scratch.write(metadataPath, `{"fields": {"abilities": [{"id": "Crs\u0000", "name": "missChance"}]}}`)
+	scratch := newFakeCheckout(t)
+	scratch.writeFile(metadataPath, `{"fields": {"abilities": [{"id": "Crs\u0000", "name": "missChance"}]}}`)
 	gone := &objects.Metadata{}
 	renamed := &objects.Metadata{Fields: map[string][]objects.FieldMeta{
 		"abilities": {{ID: "Crs\x00", Name: "chanceToMiss"}},
@@ -421,7 +421,7 @@ func TestKeepsReleasedNamesTakesAndShowsTheIDOfThreeLettersAsItIsWritten(t *test
 	}
 }
 
-func metadataPinned(t testing.TB, game gameData, pins nameOverrides) *objects.Metadata {
+func buildMetadata(t testing.TB, game gameData, pins nameOverrides) *objects.Metadata {
 	t.Helper()
 	fields, _, err := buildNamedFields(game, pins)
 	if err != nil {
@@ -432,8 +432,8 @@ func metadataPinned(t testing.TB, game gameData, pins nameOverrides) *objects.Me
 
 func TestKeepsReleasedNamesNamesAMetadataItCannotRead(t *testing.T) {
 	current := &objects.Metadata{Format: 1}
-	asFolder := newCheckout(t)
-	asFolder.folder(metadataPath)
+	asFolder := newFakeCheckout(t)
+	asFolder.makeDir(metadataPath)
 	err := checkReleasedNamesKept(current, asFolder.root, nameOverrides{})
 	const starts = "data/metadata.json: "
 	if err == nil || !strings.HasPrefix(err.Error(), starts) || strings.Contains(err.Error(), asFolder.root) {
@@ -445,15 +445,15 @@ func TestKeepsReleasedNamesNamesAMetadataItCannotRead(t *testing.T) {
 		"not JSON\n":    "data/metadata.json: invalid character 'o'",
 		`{"fields": 1}`: "data/metadata.json: fields is of the wrong kind (number)",
 	} {
-		c := newCheckout(t)
-		c.write(metadataPath, text)
+		c := newFakeCheckout(t)
+		c.writeFile(metadataPath, text)
 		if err := checkReleasedNamesKept(current, c.root, nameOverrides{}); err == nil || !strings.HasPrefix(err.Error(), words) {
 			t.Errorf("the metadata %q: got %v, want it to start with %q", text, err, words)
 		}
 	}
 	for _, text := range []string{`{}`, `null`, `{"fields": {"elsewhere": [{"id": "gone", "name": "gone"}]}}`} {
-		c := newCheckout(t)
-		c.write(metadataPath, text)
+		c := newFakeCheckout(t)
+		c.writeFile(metadataPath, text)
 		if err := checkReleasedNamesKept(current, c.root, nameOverrides{}); err != nil {
 			t.Errorf("the metadata %q: %v", text, err)
 		}

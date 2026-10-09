@@ -61,7 +61,7 @@ const indented = "globals // g\n  integer a\n\tendglobals \nfunction F takes not
 
 const noDeclaration = " \n// nothing\n"
 
-func parse(t *testing.T, text, source string) jass.File {
+func mustParse(t *testing.T, text, source string) jass.File {
 	t.Helper()
 	file, err := jass.Parse(text, source)
 	if err != nil {
@@ -71,7 +71,7 @@ func parse(t *testing.T, text, source string) jass.File {
 }
 
 func TestParseReadsTypesNativesAndGlobalsFromCommonJ(t *testing.T) {
-	file := parse(t, common, "common.j")
+	file := mustParse(t, common, "common.j")
 	types := []jass.Type{
 		{Name: "agent", Extends: "handle"}, {Name: "widget", Extends: "agent"}, {Name: "unit", Extends: "widget"},
 	}
@@ -100,7 +100,7 @@ func TestParseReadsTypesNativesAndGlobalsFromCommonJ(t *testing.T) {
 }
 
 func TestParseReadsBlizzardJFunctionHeadersAndSkipsTheirBodies(t *testing.T) {
-	file := parse(t, blizzard, "blizzard.j")
+	file := mustParse(t, blizzard, "blizzard.j")
 	if !reflect.DeepEqual(file.Globals, []jass.Global{{Name: "bj_ANGLE", Source: "blizzard.j", Type: "real"}}) {
 		t.Errorf("globals: %+v", file.Globals)
 	}
@@ -134,11 +134,11 @@ func TestParseReadsTheCornersOfALine(t *testing.T) {
 			{Name: "H", Source: "corners.j", Constant: true, Params: []jass.Param{}, Returns: "nothing"},
 		},
 	}
-	if got := parse(t, corners, "corners.j"); !reflect.DeepEqual(got, want) {
+	if got := mustParse(t, corners, "corners.j"); !reflect.DeepEqual(got, want) {
 		t.Errorf("got  %+v\nwant %+v", got, want)
 	}
 	empty := jass.File{Types: []jass.Type{}, Functions: []jass.Function{}, Globals: []jass.Global{}}
-	if got := parse(t, noDeclaration, "empty.j"); !reflect.DeepEqual(got, empty) {
+	if got := mustParse(t, noDeclaration, "empty.j"); !reflect.DeepEqual(got, empty) {
 		t.Errorf("a script without a declaration: %#v", got)
 	}
 }
@@ -160,7 +160,7 @@ func TestACommentIsCutFromItsLineWhereTwoSlashesStandOutsideAString(t *testing.T
 			{Name: "SLASHED", Source: "comments.j", Type: "integer"},
 		},
 	}
-	if got := parse(t, comments, "comments.j"); !reflect.DeepEqual(got, want) {
+	if got := mustParse(t, comments, "comments.j"); !reflect.DeepEqual(got, want) {
 		t.Errorf("got  %+v\nwant %+v", got, want)
 	}
 	_, err := jass.Parse("globals\nstring S = \"a//b\rc\"\nendglobals\n", "comments.j")
@@ -178,14 +178,14 @@ func TestABlockEndsWhateverStandsAroundTheWordThatEndsIt(t *testing.T) {
 			{Name: "N", Source: "indented.j", Params: []jass.Param{}, Returns: "nothing"},
 		},
 	}
-	if got := parse(t, indented, "indented.j"); !reflect.DeepEqual(got, want) {
+	if got := mustParse(t, indented, "indented.j"); !reflect.DeepEqual(got, want) {
 		t.Errorf("got  %+v\nwant %+v", got, want)
 	}
 }
 
 func escape(digits string) string { return `\` + "u" + digits }
 
-var checkError = []struct{ text, source, place, words string }{
+var errorCases = []struct{ text, source, place, words string }{
 	{"type unit extends widget\nlibrary Foo\n", "common.j", "common.j:2: ", `cannot read "library Foo"`},
 	{"function F takes nothing returns nothing\n", "blizzard.j", "blizzard.j:1: ", "never reaches endfunction"},
 	{"globals\n    what is this\nendglobals\n", "common.j", "common.j:2: ", `cannot read "what is this"`},
@@ -206,7 +206,7 @@ var checkError = []struct{ text, source, place, words string }{
 }
 
 func TestParseNamesTheFileAndLineOfAnythingItDoesNotUnderstand(t *testing.T) {
-	for _, c := range checkError {
+	for _, c := range errorCases {
 		file, err := jass.Parse(c.text, c.source)
 		if err == nil || !strings.HasPrefix(err.Error(), c.place) || !strings.Contains(err.Error(), c.words) {
 			t.Errorf("%s: got %v, want an error at %q with %q", c.source, err, c.place, c.words)

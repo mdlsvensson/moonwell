@@ -11,9 +11,9 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/slk"
 )
 
-func readMini(t testing.TB, change func(files map[string]string)) gameData {
+func readMiniExport(t testing.TB, change func(files map[string]string)) gameData {
 	t.Helper()
-	game, err := readExport(exportedGame(t, change))
+	game, err := readExport(newExportDir(t, change))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,7 +29,7 @@ func cells(rows []slk.Row, column string) []string {
 }
 
 func TestReadExportHoldsEveryTableAndTextThatTheMetadataIsMadeFrom(t *testing.T) {
-	game := readMini(t, nil)
+	game := readMiniExport(t, nil)
 	if len(game.labels) != 27 || game.labels["WESTRING_UHPM"] != "Hit Points Maximum (Base)" {
 		t.Errorf("the labels are %d, and the one of uhpm is %q", len(game.labels), game.labels["WESTRING_UHPM"])
 	}
@@ -77,13 +77,13 @@ func TestReadExportFindsAFileWhateverTheLetterCaseOfItsPath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if want := readMini(t, nil); !reflect.DeepEqual(got, want) {
+	if want := readMiniExport(t, nil); !reflect.DeepEqual(got, want) {
 		t.Errorf("an export with its paths in capitals is read as %+v, want %+v", got, want)
 	}
 }
 
 func TestReadExportReadsTheFilesOfStringsInTheOrderOfTheirNames(t *testing.T) {
-	game := readMini(t, func(files map[string]string) {
+	game := readMiniExport(t, func(files map[string]string) {
 		files[stringsDir+"/aaastrings.txt"] = "[hfoo]\nName=First\nTip=Kept\n[hbar]\nName=First\n"
 		files[stringsDir+"/zzzSTRINGS.TXT"] = "[hbar]\nName=Last\n"
 		files[stringsDir+"/Zstrings.txt"] = "[Hpal]\nName=Before the small letters\n"
@@ -104,7 +104,7 @@ func TestReadExportReadsTheFilesOfStringsInTheOrderOfTheirNames(t *testing.T) {
 
 func TestReadExportDecodesItsFilesAsText(t *testing.T) {
 	const mark = "\xEF\xBB\xBF"
-	game := readMini(t, func(files map[string]string) {
+	game := readMiniExport(t, func(files map[string]string) {
 		files[labelsFile] = mark + files[labelsFile] + "WESTRING_FART=Ic\xFF\xFEon\r\n"
 		files[itemsTable] = mark + files[itemsTable]
 		files[itemStrings] = mark + files[itemStrings]
@@ -123,7 +123,7 @@ func TestReadExportDecodesItsFilesAsText(t *testing.T) {
 
 func TestReadExportNamesAMissingFileAsItAsksForIt(t *testing.T) {
 	for name := range miniExport() {
-		dir := exportedGame(t, func(files map[string]string) { delete(files, name) })
+		dir := newExportDir(t, func(files map[string]string) { delete(files, name) })
 		want := name + " is missing from " + dir
 		if strings.HasPrefix(name, stringsDir+"/") {
 			want = ""
@@ -165,7 +165,7 @@ func TestReadExportNamesAMissingFileAsItAsksForIt(t *testing.T) {
 	} {
 		dir := c.dir
 		if c.change != nil {
-			dir = exportedGame(t, c.change)
+			dir = newExportDir(t, c.change)
 		}
 		if _, err := readExport(dir); err == nil || err.Error() != c.want+" is missing from "+dir {
 			t.Errorf("%s: got %v, want %q named as missing from %q", name, err, c.want, dir)
@@ -203,7 +203,7 @@ func TestReadExportNamesWhatTheSystemCannotGiveByThePathItOpened(t *testing.T) {
 				files[stringsDir] = "a file\n"
 			}},
 	} {
-		dir := exportedGame(t, c.change)
+		dir := newExportDir(t, c.change)
 		opened := filepath.Join(dir, filepath.FromSlash(c.opened))
 		wantErr := c.read(opened)
 		_, err := readExport(dir + "/")
@@ -228,7 +228,7 @@ func TestReadExportRefusesATableThatLacksAColumnTheGeneratorReads(t *testing.T) 
 	}
 	for table, key := range keys {
 		for _, column := range append([]string{key}, columnsRead[table]...) {
-			dir := exportedGame(t, func(files map[string]string) {
+			dir := newExportDir(t, func(files map[string]string) {
 				files[table] = strings.Replace(files[table], `K"`+column+`"`, `K"`+column+`2"`, 1)
 			})
 			want := table + ` has no column "` + column + `"`
@@ -237,7 +237,7 @@ func TestReadExportRefusesATableThatLacksAColumnTheGeneratorReads(t *testing.T) 
 			}
 		}
 	}
-	dir := exportedGame(t, func(files map[string]string) { files[itemsTable] = "ID;PWXL;N;E\r\nE\r\n" })
+	dir := newExportDir(t, func(files map[string]string) { files[itemsTable] = "ID;PWXL;N;E\r\nE\r\n" })
 	const want = `war3.w3mod/units/itemdata.slk has no column "itemID"`
 	if _, err := readExport(dir); err == nil || !strings.HasPrefix(err.Error(), want) {
 		t.Errorf("a table that holds nothing: got %v, want %q", err, want)
@@ -245,7 +245,7 @@ func TestReadExportRefusesATableThatLacksAColumnTheGeneratorReads(t *testing.T) 
 }
 
 func TestReadExportRefusesATableThatDoesNotParse(t *testing.T) {
-	dir := exportedGame(t, func(files map[string]string) {
+	dir := newExportDir(t, func(files map[string]string) {
 		files[buffsTable] = "ID;PWXL;N;E\r\nC;X1;Y1;K\"alias\"\r\nC;X1;Y2;K\"Binf\r\nE\r\n"
 	})
 	const want = "war3.w3mod/units/abilitybuffdata.slk:3: unterminated quoted string"

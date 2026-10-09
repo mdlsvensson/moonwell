@@ -35,7 +35,7 @@ func tablesOfTheTests() map[string]string {
 	return named
 }
 
-type outcomeCounts struct{ read, refused int }
+type outcomeCounts struct{ accepted, rejected int }
 
 var longerTables = map[string]string{
 	"three rows, the last with its Y before its X": "ID;PWXL;N;E\r\nC;X1;Y1;K\"ID\"\r\nC;X2;K\"note\"\r\n" +
@@ -60,10 +60,10 @@ func (c *outcomeCounts) record(t *testing.T, what, text string) {
 		t.Fatalf("%s: Parse panics: %v", what, value)
 	}
 	if err == nil {
-		c.read++
+		c.accepted++
 		return
 	}
-	c.refused++
+	c.rejected++
 	if table.Columns != nil || table.Rows != nil {
 		t.Fatalf("%s: a refused table is %v, want none", what, table)
 	}
@@ -93,7 +93,7 @@ func TestADamagedTableIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) {
 			damaged.record(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
 		}
 	}
-	if damaged.read == 0 || damaged.refused == 0 {
-		t.Errorf("%d damaged tables were read and %d refused; want some of each", damaged.read, damaged.refused)
+	if damaged.accepted == 0 || damaged.rejected == 0 {
+		t.Errorf("%d damaged tables were read and %d refused; want some of each", damaged.accepted, damaged.rejected)
 	}
 }

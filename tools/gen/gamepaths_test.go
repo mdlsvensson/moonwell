@@ -112,10 +112,10 @@ func TestRenderGamePathsOfAListThatNamesNothingIsTheLineWithTheVersion(t *testin
 }
 
 func TestTheModeGamePathsWritesTheListAndPrintsHowManyPathsItHas(t *testing.T) {
-	c := newCheckout(t)
-	c.folder("data")
-	list := exported(t, "listfile.txt", "war3.w3mod:Units/Human/Footman/Footman.mdx\n")
-	printed, files, err := c.run("game-paths", list, "2.0.0")
+	c := newFakeCheckout(t)
+	c.makeDir("data")
+	list := writeExportFile(t, "listfile.txt", "war3.w3mod:Units/Human/Footman/Footman.mdx\n")
+	printed, files, err := c.runGen("game-paths", list, "2.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,17 +125,17 @@ func TestTheModeGamePathsWritesTheListAndPrintsHowManyPathsItHas(t *testing.T) {
 	want := withGoMod(map[string]string{
 		"data/game-paths.txt": "# Warcraft III 2.0.0\nunits/human/footman/footman.mdx\n",
 	})
-	if got := texts(files); !maps.Equal(got, want) {
+	if got := toTexts(files); !maps.Equal(got, want) {
 		t.Errorf("wrote %q", got)
 	}
 }
 
 func TestTheModeGamePathsDecodesTheListAndCountsEachPathOnce(t *testing.T) {
-	c := newCheckout(t)
-	c.write("data/game-paths.txt", "# Warcraft III 1.0.0\nunits/old.mdx\n")
-	list := exported(t, "listfile.txt",
+	c := newFakeCheckout(t)
+	c.writeFile("data/game-paths.txt", "# Warcraft III 1.0.0\nunits/old.mdx\n")
+	list := writeExportFile(t, "listfile.txt",
 		"\xEF\xBB\xBFUnits\\B\xFF\xFE.mdx\r\n\r\nwar3.w3mod:units/a.MDX\r\nUnits/A.mdx\r\nSound/Hit.wav")
-	printed, files, err := c.run("game-paths", list, "2.0.0")
+	printed, files, err := c.runGen("game-paths", list, "2.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,27 +151,27 @@ func TestTheModeGamePathsDecodesTheListAndCountsEachPathOnce(t *testing.T) {
 func TestTheModeGamePathsFailsAndKeepsTheExistingListWhenNoPathIsRecognized(t *testing.T) {
 	const existing = "# Warcraft III 1.0.0\nunits/old.mdx\n"
 	for _, version := range []string{"2.0.0", "2.0.0\nunits/new.mdx"} {
-		c := newCheckout(t)
-		c.write("data/game-paths.txt", existing)
-		printed, files, err := c.run("game-paths", exported(t, "listfile.txt", "war3.w3mod:Sound/Hit.wav\n"), version)
+		c := newFakeCheckout(t)
+		c.writeFile("data/game-paths.txt", existing)
+		printed, files, err := c.runGen("game-paths", writeExportFile(t, "listfile.txt", "war3.w3mod:Sound/Hit.wav\n"), version)
 		if err == nil {
 			t.Fatalf("version %q: a listfile without a model or texture path was accepted", version)
 		}
-		contains(t, err.Error(), "no model or texture paths were recognized", "The path list was not changed")
+		checkContains(t, err.Error(), "no model or texture paths were recognized", "The path list was not changed")
 		if printed != "" {
 			t.Errorf("version %q: printed %q", version, printed)
 		}
-		if got := texts(files); !maps.Equal(got, withGoMod(map[string]string{"data/game-paths.txt": existing})) {
+		if got := toTexts(files); !maps.Equal(got, withGoMod(map[string]string{"data/game-paths.txt": existing})) {
 			t.Errorf("version %q: the list changed to %q", version, got)
 		}
 	}
 }
 
 func TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid(t *testing.T) {
-	c := newCheckout(t)
-	c.write("data/game-paths.txt", "# Warcraft III 1.0.0\nunits/old.mdx\n")
+	c := newFakeCheckout(t)
+	c.writeFile("data/game-paths.txt", "# Warcraft III 1.0.0\nunits/old.mdx\n")
 	missing := filepath.Join(t.TempDir(), "no-listfile.txt")
-	printed, files, err := c.run("game-paths", missing, "2.0.0")
+	printed, files, err := c.runGen("game-paths", missing, "2.0.0")
 	if err == nil {
 		t.Fatal("a listfile that is not there was read")
 	}
@@ -179,23 +179,23 @@ func TestTheModeGamePathsNamesAListItCannotReadAsTheLineDid(t *testing.T) {
 		t.Errorf("got %q, want the path as the line gave it, once, and then the reason", err)
 	}
 	if printed != "" || string(files["data/game-paths.txt"]) != "# Warcraft III 1.0.0\nunits/old.mdx\n" {
-		t.Errorf("the refused run printed %q and left %q", printed, texts(files))
+		t.Errorf("the refused run printed %q and left %q", printed, toTexts(files))
 	}
 }
 
 func TestTheModeGamePathsNamesTheFileItCannotWriteByItsPathFromTheCheckout(t *testing.T) {
-	c := newCheckout(t)
-	list := exported(t, "listfile.txt", "Units/A.mdx\n")
-	printed, files, err := c.run("game-paths", list, "2.0.0")
+	c := newFakeCheckout(t)
+	list := writeExportFile(t, "listfile.txt", "Units/A.mdx\n")
+	printed, files, err := c.runGen("game-paths", list, "2.0.0")
 	if err == nil {
 		t.Fatal("the list was written into a folder that is not there")
 	}
-	contains(t, err.Error(), "data/game-paths.txt")
+	checkContains(t, err.Error(), "data/game-paths.txt")
 	if strings.Contains(err.Error(), c.root) {
 		t.Errorf("the message holds the path of the checkout: %v", err)
 	}
 	if printed != "" || !asNew(files) {
-		t.Errorf("the failed run printed %q and left %q", printed, texts(files))
+		t.Errorf("the failed run printed %q and left %q", printed, toTexts(files))
 	}
 }
 
@@ -207,14 +207,14 @@ func TestTheModeGamePathsWritesTheCommittedListFromTheGamesList(t *testing.T) {
 	if !found {
 		t.Fatalf("the first line of %s is %q", gamePathsPath, first)
 	}
-	c := newCheckout(t)
-	c.folder("data")
-	printed, files, err := c.run("game-paths", list, version)
+	c := newFakeCheckout(t)
+	c.makeDir("data")
+	printed, files, err := c.runGen("game-paths", list, version)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got := string(files[gamePathsPath]); got != want {
-		t.Errorf("the game's list does not give the committed %s: %s", gamePathsPath, parting(want, got))
+		t.Errorf("the game's list does not give the committed %s: %s", gamePathsPath, describeDifference(want, got))
 	}
 	if count := fmt.Sprintf("wrote data/game-paths.txt: %d paths.\n", strings.Count(paths, "\n")); printed != count {
 		t.Errorf("the run printed %q, want %q", printed, count)

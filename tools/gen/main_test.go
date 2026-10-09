@@ -17,11 +17,11 @@ import (
 )
 
 func TestRunRefusesAFirstArgumentThatNamesNoMode(t *testing.T) {
-	printed, files, err := newCheckout(t).run("nativs", "folder", "1.2.3.4")
+	printed, files, err := newFakeCheckout(t).runGen("nativs", "folder", "1.2.3.4")
 	if err == nil {
 		t.Fatal("a mode the generator does not have was run")
 	}
-	contains(t, err.Error(),
+	checkContains(t, err.Error(),
 		"unknown mode 'nativs'", "The modes are natives, metadata and game-paths",
 		"without one, gen writes schema/generated")
 	if printed != "" || !asNew(files) {
@@ -70,7 +70,7 @@ func TestRunShowsTheUsageLineOfAModeForAWrongCountOfArguments(t *testing.T) {
 		{[]string{"game-paths", "listfile.txt", "1.2.3.4", "more"}, gamePaths},
 		{[]string{"", "more"}, "Usage: go run ./tools/gen"},
 	} {
-		printed, files, err := newCheckout(t).run(c.args...)
+		printed, files, err := newFakeCheckout(t).runGen(c.args...)
 		if err == nil || err.Error() != c.want {
 			t.Errorf("%q: got %v, want %q", c.args, err, c.want)
 		}
@@ -87,7 +87,7 @@ func TestEveryModeHasAUsageLineThatNamesItsCommandLine(t *testing.T) {
 			t.Errorf("the mode %q: its usage line %q does not start with %q", m.name, m.usage, start)
 		}
 		args := append([]string{m.name}, make([]string, m.argCount+1)...)
-		if _, _, err := newCheckout(t).run(args...); err == nil || err.Error() != m.usage {
+		if _, _, err := newFakeCheckout(t).runGen(args...); err == nil || err.Error() != m.usage {
 			t.Errorf("the mode %q with %d arguments: got %v, want its usage line", m.name, m.argCount+1, err)
 		}
 	}
@@ -117,7 +117,7 @@ func TestRunRefusesAFolderThatIsInNoCheckout(t *testing.T) {
 		"the module in a comment":  "// module github.com/mdlsvensson/moonwell\nmodule example.com/other\n",
 		"the module as a requires": "module example.com/other\n\nrequire github.com/mdlsvensson/moonwell v1.0.0\n",
 	} {
-		printed, err := noCheckout(t, module).runBelow("", "no-such-mode")
+		printed, err := newDirWithoutCheckout(t, module).runGenBelow("", "no-such-mode")
 		if err == nil || !strings.Contains(err.Error(), "in a Moonwell checkout") {
 			t.Errorf("%s: got %v, want the refusal of a folder that is in no checkout", name, err)
 		}
@@ -134,10 +134,10 @@ func TestRunFindsTheCheckoutAtOrAboveTheFolderItIsRunIn(t *testing.T) {
 		"white space around the name":       "// Moonwell\nmodule \t github.com/mdlsvensson/moonwell  \ngo 1.27\n",
 	} {
 		for _, below := range []string{"", "tools", "tools/gen/slk"} {
-			c := newCheckout(t)
-			c.write("go.mod", module)
-			c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
-			printed, err := c.runBelow(below)
+			c := newFakeCheckout(t)
+			c.writeFile("go.mod", module)
+			c.writeFile("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
+			printed, err := c.runGenBelow(below)
 			if err != nil {
 				t.Errorf("%s, run in %q: %v", name, below, err)
 				continue
@@ -145,7 +145,7 @@ func TestRunFindsTheCheckoutAtOrAboveTheFolderItIsRunIn(t *testing.T) {
 			if strings.Count(printed, "wrote schema/generated/") != 7 {
 				t.Errorf("%s, run in %q: printed %q, want a line for each of the seven files", name, below, printed)
 			}
-			got := texts(c.outputs())
+			got := toTexts(c.readOutputs())
 			if len(got) != 8 || !strings.Contains(got["schema/generated/BuffProps.pkl"], "\nname: Int?\n") {
 				t.Errorf("%s, run in %q: the checkout holds %v", name, below, slices.Sorted(maps.Keys(got)))
 			}
@@ -157,11 +157,11 @@ func TestRunFindsTheCheckoutAtOrAboveTheFolderItIsRunIn(t *testing.T) {
 }
 
 func TestRunPassesOverTheGoModOfAnotherModuleOnItsWayUp(t *testing.T) {
-	c := newCheckout(t)
-	c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
-	c.write("other/go.mod", "module example.com/other\n")
-	c.write("other/data/metadata.json", metadataOfOneBuff(t, "foth", "other"))
-	if _, err := c.runBelow("other/deeper"); err != nil {
+	c := newFakeCheckout(t)
+	c.writeFile("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
+	c.writeFile("other/go.mod", "module example.com/other\n")
+	c.writeFile("other/data/metadata.json", metadataOfOneBuff(t, "foth", "other"))
+	if _, err := c.runGenBelow("other/deeper"); err != nil {
 		t.Fatal(err)
 	}
 	all := testkit.Snapshot(t, c.root)
@@ -174,21 +174,21 @@ func TestRunPassesOverTheGoModOfAnotherModuleOnItsWayUp(t *testing.T) {
 }
 
 func TestRunTakesTheNearerOfTwoCheckouts(t *testing.T) {
-	outer := newCheckout(t)
-	outer.write("data/metadata.json", metadataOfOneBuff(t, "fabo", "above"))
-	outer.write("schema/generated/Stray.pkl", "stray\n")
-	above := outer.outputs()
-	inner := checkout{t: t, root: outer.folder("inner")}
-	inner.write("go.mod", moduleFile)
-	inner.write("data/metadata.json", metadataOfOneBuff(t, "fnea", "nearer"))
-	if _, err := outer.runBelow("inner/deeper"); err != nil {
+	outer := newFakeCheckout(t)
+	outer.writeFile("data/metadata.json", metadataOfOneBuff(t, "fabo", "above"))
+	outer.writeFile("schema/generated/Stray.pkl", "stray\n")
+	above := outer.readOutputs()
+	inner := fakeCheckout{t: t, root: outer.makeDir("inner")}
+	inner.writeFile("go.mod", moduleFile)
+	inner.writeFile("data/metadata.json", metadataOfOneBuff(t, "fnea", "nearer"))
+	if _, err := outer.runGenBelow("inner/deeper"); err != nil {
 		t.Fatal(err)
 	}
-	got := texts(inner.outputs())
+	got := toTexts(inner.readOutputs())
 	if len(got) != 8 || !strings.Contains(got["schema/generated/BuffProps.pkl"], "\nnearer: Int?\n") {
 		t.Errorf("the nearer checkout holds %v, and no schema of its own metadata", slices.Sorted(maps.Keys(got)))
 	}
-	if left := outer.outputs(); !reflect.DeepEqual(left, above) {
+	if left := outer.readOutputs(); !reflect.DeepEqual(left, above) {
 		t.Errorf("the checkout above holds %v, want what it held", slices.Sorted(maps.Keys(left)))
 	}
 }
@@ -223,22 +223,22 @@ func TestTheHelpersRunNoGeneratorInTheRealCheckout(t *testing.T) {
 	const refusal = "is in the real checkout"
 	root := testkit.RepoRoot(t)
 	for _, dir := range []string{root, filepath.Join(root, "tools"), "", ".", filepath.Join("..", "..")} {
-		heard := listenTo(t, func(tb testing.TB) { notInTheRealCheckout(tb, dir) })
+		heard := captureReports(t, func(tb testing.TB) { checkNotRealCheckout(tb, dir) })
 		if !strings.Contains(heard, refusal) {
 			t.Errorf("the folder %q: got %q, want the refusal of a folder of the real checkout", dir, heard)
 		}
 	}
-	if heard := listenTo(t, func(tb testing.TB) { notInTheRealCheckout(tb, t.TempDir()) }); heard != "" {
+	if heard := captureReports(t, func(tb testing.TB) { checkNotRealCheckout(tb, t.TempDir()) }); heard != "" {
 		t.Errorf("a folder of the test: got %q, want nothing", heard)
 	}
-	started := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.start("no-such-program", "") })
-	called := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.runBelow("", "no-such-mode") })
+	started := captureReports(t, func(tb testing.TB) { fakeCheckout{t: tb, root: root}.runProgram("no-such-program", "") })
+	called := captureReports(t, func(tb testing.TB) { fakeCheckout{t: tb, root: root}.runGenBelow("", "no-such-mode") })
 	if !strings.Contains(started, refusal) || !strings.Contains(called, refusal) {
 		t.Errorf("start said %q and runBelow %q, want the refusal from both", started, called)
 	}
 	const below = "tools/gen/no-such-folder"
 	made := filepath.Join(root, filepath.FromSlash(below))
-	refused := listenTo(t, func(tb testing.TB) { checkout{t: tb, root: root}.runBelow(below, "no-such-mode") })
+	refused := captureReports(t, func(tb testing.TB) { fakeCheckout{t: tb, root: root}.runGenBelow(below, "no-such-mode") })
 	if !strings.Contains(refused, refusal) {
 		t.Errorf("runBelow said %q of a new folder of the real checkout, want the refusal", refused)
 	}
@@ -279,17 +279,17 @@ func TestNothingIsStartedWhereAnotherCheckoutCouldBeFound(t *testing.T) {
 		"a folder that is not the run's":          {own: moduleFile, elsewhere: true, ofOne: true, refused: notBelow},
 		"a folder above the run's, by two points": {own: moduleFile, below: "..", ofOne: true, refused: notBelow},
 	} {
-		outer := checkout{t: t, root: t.TempDir()}
-		root, dir := outer.folder("above/run"), outer.folder("above/run/"+c.below)
+		outer := fakeCheckout{t: t, root: t.TempDir()}
+		root, dir := outer.makeDir("above/run"), outer.makeDir("above/run/"+c.below)
 		if c.elsewhere {
-			dir = outer.folder("above/other")
+			dir = outer.makeDir("above/other")
 		}
 		for at, text := range map[string]string{"above/go.mod": c.above, "above/run/go.mod": c.own} {
 			if text != "" {
-				outer.write(at, text)
+				outer.writeFile(at, text)
 			}
 		}
-		heard := listenTo(t, func(tb testing.TB) { onlyItsOwnCheckout(tb, root, dir, c.ofOne) })
+		heard := captureReports(t, func(tb testing.TB) { checkWritesOnlyOwnCheckout(tb, root, dir, c.ofOne) })
 		if (heard == "") != (c.refused == "") || !strings.Contains(heard, c.refused) {
 			t.Errorf("%s: the guard said %q, want the words %q", name, heard, c.refused)
 		}
@@ -297,20 +297,20 @@ func TestNothingIsStartedWhereAnotherCheckoutCouldBeFound(t *testing.T) {
 }
 
 func TestTheHelpersStartNoGeneratorWhereAnotherCheckoutCouldBeFound(t *testing.T) {
-	outer := newCheckout(t)
-	inner := checkout{t: t, root: outer.folder("inner")}
-	inner.write("go.mod", moduleFile)
-	lost := noCheckout(t, moduleFile)
+	outer := newFakeCheckout(t)
+	inner := fakeCheckout{t: t, root: outer.makeDir("inner")}
+	inner.writeFile("go.mod", moduleFile)
+	lost := newDirWithoutCheckout(t, moduleFile)
 	for name, c := range map[string]struct {
-		in      checkout
+		in      fakeCheckout
 		refused string
 	}{
 		"a checkout inside a checkout":        {inner, "is inside a checkout"},
 		"a checkout where the run is of none": {lost, "names this module: true"},
 	} {
-		heardBy := func(tb testing.TB) checkout { return checkout{t: tb, root: c.in.root, none: c.in.none} }
-		started := listenTo(t, func(tb testing.TB) { heardBy(tb).start("no-such-program", "") })
-		called := listenTo(t, func(tb testing.TB) { heardBy(tb).runBelow("", "no-such-mode") })
+		heardBy := func(tb testing.TB) fakeCheckout { return fakeCheckout{t: tb, root: c.in.root, none: c.in.none} }
+		started := captureReports(t, func(tb testing.TB) { heardBy(tb).runProgram("no-such-program", "") })
+		called := captureReports(t, func(tb testing.TB) { heardBy(tb).runGenBelow("", "no-such-mode") })
 		if !strings.Contains(started, c.refused) || !strings.Contains(called, c.refused) {
 			t.Errorf("%s: start said %q and runBelow %q, want the words %q from both", name, started, called, c.refused)
 		}
@@ -321,21 +321,21 @@ func TestTheProgramPrintsToStandardOutputAndComplainsOnStandardError(t *testing.
 	if testing.Short() {
 		t.Skip("the test builds the generator and starts it: not with -short")
 	}
-	program := builtProgram(t, generatorPackage)
-	c := newCheckout(t)
-	c.folder("data")
-	list := exported(t, "listfile.txt", "war3.w3mod:Units/Human/Footman/Footman.mdx\n")
+	program := buildProgram(t, generatorPackage)
+	c := newFakeCheckout(t)
+	c.makeDir("data")
+	list := writeExportFile(t, "listfile.txt", "war3.w3mod:Units/Human/Footman/Footman.mdx\n")
 
-	code, stdout, stderr := c.start(program, "", "game-paths", list, "2.0.0")
+	code, stdout, stderr := c.runProgram(program, "", "game-paths", list, "2.0.0")
 	if code != 0 || stdout != "wrote data/game-paths.txt: 1 paths.\n" || stderr != "" {
 		t.Errorf("a line that is carried out: exit %d; stdout %q; stderr %q", code, stdout, stderr)
 	}
 	const written = "# Warcraft III 2.0.0\nunits/human/footman/footman.mdx\n"
-	if got := texts(c.outputs()); !maps.Equal(got, map[string]string{"data/game-paths.txt": written}) {
+	if got := toTexts(c.readOutputs()); !maps.Equal(got, map[string]string{"data/game-paths.txt": written}) {
 		t.Errorf("a line that is carried out left %q in the checkout it was started in", got)
 	}
 
-	code, stdout, stderr = c.start(program, "", "game-paths", list)
+	code, stdout, stderr = c.runProgram(program, "", "game-paths", list)
 	if code != 1 || stdout != "" {
 		t.Errorf("a line that is refused: exit %d; stdout %q; stderr %q", code, stdout, stderr)
 	}

@@ -9,18 +9,18 @@ import (
 	"github.com/mdlsvensson/moonwell/tools/gen/ini"
 )
 
-func basesOf(t *testing.T, change func(files map[string]string)) map[manifest.Category]map[string]objects.BaseMeta {
+func mustBuildBases(t *testing.T, change func(files map[string]string)) map[manifest.Category]map[string]objects.BaseMeta {
 	t.Helper()
-	bases, err := buildBases(readMini(t, change))
+	bases, err := buildBases(readMiniExport(t, change))
 	if err != nil {
 		t.Fatal(err)
 	}
 	return bases
 }
 
-func basesRefused(t *testing.T, change func(files map[string]string)) string {
+func mustFailBuildBases(t *testing.T, change func(files map[string]string)) string {
 	t.Helper()
-	_, err := buildBases(readMini(t, change))
+	_, err := buildBases(readMiniExport(t, change))
 	if err == nil {
 		t.Fatal("the standard objects were read")
 	}
@@ -29,7 +29,7 @@ func basesRefused(t *testing.T, change func(files map[string]string)) string {
 
 func TestStandardObjectsPutsEachObjectIntoItsCategoryWithItsNameAndItsLevels(t *testing.T) {
 	three := 3
-	equal(t, "the standard objects", basesOf(t, nil), map[manifest.Category]map[string]objects.BaseMeta{
+	checkEqual(t, "the standard objects", mustBuildBases(t, nil), map[manifest.Category]map[string]objects.BaseMeta{
 		"heroes":    {"Hpal": {Name: "Paladin"}},
 		"units":     {"hfoo": {Name: "Footman"}, "nzzz": {Name: "unnamed critter"}},
 		"buildings": {"hbar": {Name: "Barracks"}},
@@ -41,16 +41,16 @@ func TestStandardObjectsPutsEachObjectIntoItsCategoryWithItsNameAndItsLevels(t *
 }
 
 func TestStandardObjectsRefusesTheUnitsThatBreakTheRuleForHeroes(t *testing.T) {
-	got := basesRefused(t, func(files map[string]string) {
-		files[balanceTable] = sylk(balanceMeta,
+	got := mustFailBuildBases(t, func(files map[string]string) {
+		files[balanceTable] = newSLK(balanceMeta,
 			[]any{"hfoo", 0, "_"}, []any{"Hpal", 0, "_"}, []any{"hbar", 1, "_"}, []any{"nzzz", 0, "_"},
 			[]any{"nhro", 0, "AGI"}, []any{"Hbld", 1, "INT"}, []any{"Hodd", 1, "str"},
 		)
-		files[unitsTable] = sylk([]string{"unitID", "comment(s)"},
+		files[unitsTable] = newSLK([]string{"unitID", "comment(s)"},
 			[]any{"hfoo"}, []any{"Hpal"}, []any{"hbar"}, []any{"nzzz"}, []any{"nhro"}, []any{"Hbld"}, []any{"Hodd"},
 		)
 	})
-	contains(t, got, "standard units break the rule for heroes: Hpal (uppercase, primary attribute '_'), "+
+	checkContains(t, got, "standard units break the rule for heroes: Hpal (uppercase, primary attribute '_'), "+
 		"nhro (lowercase, primary attribute 'AGI'), Hbld (uppercase, a building), "+
 		"Hodd (uppercase, primary attribute 'str'), Hodd (uppercase, a building).",
 		"war3.w3mod/units/unitbalance.slk", "Primary", "STR, INT or AGI", "categoryOfUnit in tools/gen/bases.go")
@@ -62,10 +62,10 @@ func TestStandardObjectsRefusesTheUnitsThatBreakTheRuleForHeroes(t *testing.T) {
 }
 
 func TestStandardObjectsRefusesAUnitWithoutARowOfBalance(t *testing.T) {
-	got := basesRefused(t, func(files map[string]string) {
-		files[unitsTable] = sylk([]string{"unitID", "comment(s)"},
+	got := mustFailBuildBases(t, func(files map[string]string) {
+		files[unitsTable] = newSLK([]string{"unitID", "comment(s)"},
 			[]any{"Hbad"}, []any{"hnew"}, []any{"hfoo"}, []any{"hmor"})
-		files[balanceTable] = sylk(balanceMeta, []any{"Hbad", 0, "_"}, []any{"hfoo", 0, "_"})
+		files[balanceTable] = newSLK(balanceMeta, []any{"Hbad", 0, "_"}, []any{"hfoo", 0, "_"})
 	})
 	if got != "war3.w3mod/units/unitdata.slk: hnew: war3.w3mod/units/unitbalance.slk has no row for it" {
 		t.Errorf("got %q", got)
@@ -73,11 +73,11 @@ func TestStandardObjectsRefusesAUnitWithoutARowOfBalance(t *testing.T) {
 }
 
 func TestStandardObjectsSortsTheUnitsByTheirIDAndTheirBalance(t *testing.T) {
-	bases := basesOf(t, func(files map[string]string) {
-		files[unitsTable] = sylk([]string{"unitID", "comment(s)"},
+	bases := mustBuildBases(t, func(files map[string]string) {
+		files[unitsTable] = newSLK([]string{"unitID", "comment(s)"},
 			[]any{"Zhro", "a hero"}, []any{"zbld", "a building"}, []any{"zuni", "a unit"}, []any{"0num", "a digit first"},
 			[]any{"ztwo", "two rows of balance"})
-		files[balanceTable] = sylk(balanceMeta,
+		files[balanceTable] = newSLK(balanceMeta,
 			[]any{"Zhro", 0, "INT"}, []any{"zbld", 1, nil}, []any{"zuni", "", ""}, []any{"0num", 11, "Str"},
 			[]any{"ztwo", 0, "_"}, []any{"ztwo", 1, "_"})
 	})
@@ -107,7 +107,7 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 		"notHex":  {"Name": "|cffffccGGNo Colour|r"},
 		"accent":  {"Name": "\"Caf\xC3\xA9"},
 	}
-	rows := rowsOf(t, []string{"alias", "comments", "comment", "comment(s)"},
+	rows := newRows(t, []string{"alias", "comments", "comment", "comment(s)"},
 		[]any{"named", "a comment", "another", "a third"}, []any{"tipped", "a comment", nil, nil},
 		[]any{"empty", " the |cff000000comment|r ", "of an item", "of a unit"}, []any{"other", nil, nil, nil},
 		[]any{"absent", "from the row|nalone", nil, nil}, []any{"marked", nil, nil, nil},
@@ -151,7 +151,7 @@ func TestTheNameOfAStandardObjectIsItsStringOrTheCommentOfItsRow(t *testing.T) {
 
 func TestLevelCountIsAWholeNumberThatIsNotNegative(t *testing.T) {
 	count := func(cell any) (int, error) {
-		rows := rowsOf(t, []string{"comments", "alias", "levels"}, []any{"a comment", "AHhb", cell})
+		rows := newRows(t, []string{"comments", "alias", "levels"}, []any{"a comment", "AHhb", cell})
 		return parseLevelCount(rows[0], "levels")
 	}
 	for cell, want := range map[any]int{
@@ -178,9 +178,9 @@ func TestStandardObjectsRefusesALevelCountThatIsNone(t *testing.T) {
 	const abilities, upgrades = "war3.w3mod/units/abilitydata.slk: AHtb: ", "war3.w3mod/units/upgradedata.slk: Rhme: "
 	levels := func(ability, upgrade any) func(files map[string]string) {
 		return func(files map[string]string) {
-			files[abilitiesTable] = sylk([]string{"alias", "comments", "levels"},
+			files[abilitiesTable] = newSLK([]string{"alias", "comments", "levels"},
 				[]any{"AHhb", "holy light", 3}, []any{"AHtb", "storm bolt", ability})
-			files[upgradesTable] = sylk([]string{"upgradeid", "comments", "maxlevel"}, []any{"Rhme", "swords", upgrade})
+			files[upgradesTable] = newSLK([]string{"upgradeid", "comments", "maxlevel"}, []any{"Rhme", "swords", upgrade})
 		}
 	}
 	for want, change := range map[string]func(files map[string]string){
@@ -190,13 +190,13 @@ func TestStandardObjectsRefusesALevelCountThatIsNone(t *testing.T) {
 		upgrades + "the maxlevel cell 'x' is no count of levels":  levels(3, "x"),
 		upgrades + "the row has no maxlevel cell":                 levels(3, nil),
 	} {
-		if got := basesRefused(t, change); got != want {
+		if got := mustFailBuildBases(t, change); got != want {
 			t.Errorf("got %q, want %q", got, want)
 		}
 	}
 	none := 0
-	bases := basesOf(t, levels("", " 0 "))
-	equal(t, "an ability without a count", bases["abilities"]["AHtb"], objects.BaseMeta{Name: "Storm Bolt", Levels: &none})
-	equal(t, "an upgrade with none", bases["upgrades"]["Rhme"],
+	bases := mustBuildBases(t, levels("", " 0 "))
+	checkEqual(t, "an ability without a count", bases["abilities"]["AHtb"], objects.BaseMeta{Name: "Storm Bolt", Levels: &none})
+	checkEqual(t, "an upgrade with none", bases["upgrades"]["Rhme"],
 		objects.BaseMeta{Name: "Iron Forged Swords", Levels: &none})
 }

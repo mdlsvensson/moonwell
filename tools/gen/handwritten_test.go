@@ -43,7 +43,7 @@ func TestAHandWrittenFileIsRefusedForAKeyThatStandsTwice(t *testing.T) {
 			t.Errorf("%s: %s was read", c.path, c.text)
 			continue
 		}
-		contains(t, err.Error(), c.path+": ", `"`+c.key+`"`, "twice")
+		checkContains(t, err.Error(), c.path+": ", `"`+c.key+`"`, "twice")
 	}
 	for path, text := range map[string]string{
 		extrasPath: `{"functions": [{"name": "A", "params": [{"name": "a", "type": "b"}, {"name": "c", "type": "d"}], ` +
@@ -70,7 +70,7 @@ func TestAHandWrittenFileIsRefusedForAKeyThatTheGeneratorDoesNotRead(t *testing.
 			t.Errorf("%s: %s was read", c.path, c.text)
 			continue
 		}
-		contains(t, err.Error(), c.path+": ", `unknown field "`+c.key+`"`)
+		checkContains(t, err.Error(), c.path+": ", `unknown field "`+c.key+`"`)
 	}
 }
 
@@ -106,7 +106,7 @@ func TestAHandWrittenFileIsRefusedForATextThatDoesNotFit(t *testing.T) {
 			t.Errorf("%s: %s was read", c.path, c.text)
 			continue
 		}
-		contains(t, err.Error(), c.path+": ", c.words)
+		checkContains(t, err.Error(), c.path+": ", c.words)
 		for _, ofGo := range []string{"Go ", "unmarshal", "struct", "main."} {
 			if strings.Contains(err.Error(), ofGo) {
 				t.Errorf("%s: %s: the refusal has %q in it: %v", c.path, c.text, ofGo, err)

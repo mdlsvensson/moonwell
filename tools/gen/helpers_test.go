@@ -27,36 +27,38 @@ const anotherModule = "module example.com/other\n"
 
 var outputFolders = []string{"data", "schema/generated"}
 
-type checkout struct {
+type fakeCheckout struct {
 	t    testing.TB
 	root string
 	none bool
 }
 
-func newCheckout(t testing.TB) checkout {
+func newFakeCheckout(t testing.TB) fakeCheckout {
 	t.Helper()
-	c := checkout{t: t, root: t.TempDir()}
-	c.write("go.mod", moduleFile)
+	c := fakeCheckout{t: t, root: t.TempDir()}
+	c.writeFile("go.mod", moduleFile)
 	return c
 }
 
-func noCheckout(t testing.TB, goMod string) checkout {
+func newDirWithoutCheckout(t testing.TB, goMod string) fakeCheckout {
 	t.Helper()
-	c := checkout{t: t, root: t.TempDir(), none: true}
+	c := fakeCheckout{t: t, root: t.TempDir(), none: true}
 	if goMod != "" {
-		c.write("go.mod", goMod)
+		c.writeFile("go.mod", goMod)
 	}
 	return c
 }
 
-func (c checkout) path(name string) string { return filepath.Join(c.root, filepath.FromSlash(name)) }
+func (c fakeCheckout) path(name string) string {
+	return filepath.Join(c.root, filepath.FromSlash(name))
+}
 
-func (c checkout) write(name, text string) {
+func (c fakeCheckout) writeFile(name, text string) {
 	c.t.Helper()
 	testkit.WriteFile(c.t, c.root, name, []byte(text))
 }
 
-func (c checkout) folder(name string) string {
+func (c fakeCheckout) makeDir(name string) string {
 	c.t.Helper()
 	dir := c.path(name)
 	if err := os.MkdirAll(dir, 0o777); err != nil {
@@ -65,11 +67,11 @@ func (c checkout) folder(name string) string {
 	return dir
 }
 
-func (c checkout) carry(names ...string) {
+func (c fakeCheckout) copyRealFiles(names ...string) {
 	c.t.Helper()
 	for _, name := range names {
 		for _, file := range realFiles(c.t, name) {
-			c.write(file, string(realFile(c.t, file)))
+			c.writeFile(file, string(realFile(c.t, file)))
 		}
 	}
 }
@@ -101,13 +103,13 @@ func realFiles(t testing.TB, name string) []string {
 	return files
 }
 
-func (c checkout) run(args ...string) (printed string, files map[string][]byte, err error) {
+func (c fakeCheckout) runGen(args ...string) (printed string, files map[string][]byte, err error) {
 	c.t.Helper()
-	printed, err = c.runBelow("", args...)
-	return printed, c.all(), err
+	printed, err = c.runGenBelow("", args...)
+	return printed, c.readAll(), err
 }
 
-func (c checkout) runBelow(below string, args ...string) (printed string, err error) {
+func (c fakeCheckout) runGenBelow(below string, args ...string) (printed string, err error) {
 	c.t.Helper()
 	dir := c.startsIn(below)
 	var out bytes.Buffer
@@ -115,14 +117,14 @@ func (c checkout) runBelow(below string, args ...string) (printed string, err er
 	return out.String(), err
 }
 
-func (c checkout) startsIn(below string) (dir string) {
+func (c fakeCheckout) startsIn(below string) (dir string) {
 	c.t.Helper()
-	notInTheRealCheckout(c.t, c.path(below))
-	onlyItsOwnCheckout(c.t, c.root, c.path(below), !c.none)
-	return c.folder(below)
+	checkNotRealCheckout(c.t, c.path(below))
+	checkWritesOnlyOwnCheckout(c.t, c.root, c.path(below), !c.none)
+	return c.makeDir(below)
 }
 
-func (c checkout) all() map[string][]byte {
+func (c fakeCheckout) readAll() map[string][]byte {
 	c.t.Helper()
 	return testkit.Snapshot(c.t, c.root)
 }
@@ -136,7 +138,7 @@ func withGoMod(files map[string]string) map[string]string {
 	return files
 }
 
-func (c checkout) outputs() map[string][]byte {
+func (c fakeCheckout) readOutputs() map[string][]byte {
 	c.t.Helper()
 	found := map[string][]byte{}
 	for _, dir := range outputFolders {
@@ -153,7 +155,7 @@ func (c checkout) outputs() map[string][]byte {
 
 const generatorPackage = "./tools/gen"
 
-func builtProgram(t testing.TB, pkg string) string {
+func buildProgram(t testing.TB, pkg string) string {
 	t.Helper()
 	program := filepath.Join(t.TempDir(), "gen")
 	if runtime.GOOS == "windows" {
@@ -167,7 +169,7 @@ func builtProgram(t testing.TB, pkg string) string {
 	return program
 }
 
-func (c checkout) start(program, below string, args ...string) (code int, stdout, stderr string) {
+func (c fakeCheckout) runProgram(program, below string, args ...string) (code int, stdout, stderr string) {
 	c.t.Helper()
 	dir := c.startsIn(below)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
@@ -186,7 +188,7 @@ func (c checkout) start(program, below string, args ...string) (code int, stdout
 	return code, printed.String(), said.String()
 }
 
-func notInTheRealCheckout(t testing.TB, dir string) {
+func checkNotRealCheckout(t testing.TB, dir string) {
 	t.Helper()
 	realCheckout, err := os.Stat(testkit.RepoRoot(t))
 	if err != nil {
@@ -209,7 +211,7 @@ func notInTheRealCheckout(t testing.TB, dir string) {
 	}
 }
 
-func onlyItsOwnCheckout(t testing.TB, root, dir string, ofACheckout bool) {
+func checkWritesOnlyOwnCheckout(t testing.TB, root, dir string, ofACheckout bool) {
 	t.Helper()
 	if below, err := filepath.Rel(root, dir); err != nil || !filepath.IsLocal(below) {
 		t.Fatalf("%s is not the folder of the run, %s, nor below it: nothing is started there", dir, root)
@@ -242,23 +244,23 @@ func namesTheModuleUpTo(root, dir string) bool {
 	}
 }
 
-type listener struct {
+type recordingTB struct {
 	testing.TB
 	reports []string
 }
 
 type stopped struct{}
 
-func (l *listener) Helper()                   {}
-func (l *listener) Logf(string, ...any)       {}
-func (l *listener) Error(args ...any)         { l.reports = append(l.reports, fmt.Sprint(args...)) }
-func (l *listener) Errorf(f string, a ...any) { l.reports = append(l.reports, fmt.Sprintf(f, a...)) }
-func (l *listener) Fatal(args ...any)         { l.Error(args...); panic(stopped{}) }
-func (l *listener) Fatalf(f string, a ...any) { l.Errorf(f, a...); panic(stopped{}) }
+func (l *recordingTB) Helper()                   {}
+func (l *recordingTB) Logf(string, ...any)       {}
+func (l *recordingTB) Error(args ...any)         { l.reports = append(l.reports, fmt.Sprint(args...)) }
+func (l *recordingTB) Errorf(f string, a ...any) { l.reports = append(l.reports, fmt.Sprintf(f, a...)) }
+func (l *recordingTB) Fatal(args ...any)         { l.Error(args...); panic(stopped{}) }
+func (l *recordingTB) Fatalf(f string, a ...any) { l.Errorf(f, a...); panic(stopped{}) }
 
-func listenTo(t testing.TB, reporting func(tb testing.TB)) string {
+func captureReports(t testing.TB, reporting func(tb testing.TB)) string {
 	t.Helper()
-	heard := &listener{TB: t}
+	heard := &recordingTB{TB: t}
 	func() {
 		defer func() {
 			if raised := recover(); raised != nil && raised != (stopped{}) {
@@ -270,7 +272,7 @@ func listenTo(t testing.TB, reporting func(tb testing.TB)) string {
 	return strings.Join(heard.reports, "\n")
 }
 
-func texts(outputs map[string][]byte) map[string]string {
+func toTexts(outputs map[string][]byte) map[string]string {
 	files := map[string]string{}
 	for name, data := range outputs {
 		if data != nil {
@@ -280,12 +282,12 @@ func texts(outputs map[string][]byte) map[string]string {
 	return files
 }
 
-func exported(t testing.TB, name, text string) string {
+func writeExportFile(t testing.TB, name, text string) string {
 	t.Helper()
 	return testkit.WriteFile(t, t.TempDir(), name, []byte(text))
 }
 
-func sylk(columns []string, rows ...[]any) string {
+func newSLK(columns []string, rows ...[]any) string {
 	lines := []string{"ID;PWXL;N;E"}
 	header := make([]any, len(columns))
 	for i, column := range columns {
@@ -336,7 +338,7 @@ const (
 
 func miniExport() map[string]string {
 	return map[string]string{
-		unitFieldsTable: sylk(unitMeta,
+		unitFieldsTable: newSLK(unitMeta,
 			[]any{"uhpm", "HP", "UnitBalance", -1, "stats", "WESTRING_UHPM", "int", 1, 1, 1, 0, nil, 0},
 			[]any{"unam", "Name", "Profile", 0, "text", "WESTRING_UNAM", "string", 1, 1, 1, 1, nil, 1},
 			[]any{"umdl", "file", "Profile", 0, "art", "WESTRING_UMDL", "model", 1, 1, 0, 0, nil, 1},
@@ -349,7 +351,7 @@ func miniExport() map[string]string {
 			[]any{"uver", "fileVerFlags", "Profile", -1, "art", "WESTRING_UVER", "versionFlags", 1, 1, 1, 0, nil, 1},
 			[]any{nil, "orphan", "Profile", -1, "stats", "WESTRING_UHPM", "int", 1, 1, 1, 0, nil, 0},
 		),
-		abilityFieldsTable: sylk(abilityMeta,
+		abilityFieldsTable: newSLK(abilityMeta,
 			[]any{"anam", "Name", "Profile", 0, 0, 0, "text", "WESTRING_ANAM", "string", 1, 1, 1, nil, nil, 1},
 			[]any{"alev", "levels", "AbilityData", -1, 0, 0, "stats", "WESTRING_ALEV", "int", 1, 1, 1, nil, nil, 0},
 			[]any{"acdn", "Cool", "AbilityData", -1, 4, 0, "stats", "WESTRING_ACDN", "unreal", 1, 1, 1, nil, nil, 0},
@@ -360,29 +362,29 @@ func miniExport() map[string]string {
 			[]any{"Hdc1", "Data", "AbilityData", -1, 4, 12, "data", "WESTRING_HDC1", "int", 1, 1, 1, "AHtb,AHhb", nil, 0},
 			[]any{"atp1", "Tip", "Profile", 0, 3, 0, "text", "WESTRING_ATP1", "string", 1, 1, 0, nil, nil, 1},
 		),
-		buffFieldsTable: sylk(buffMeta,
+		buffFieldsTable: newSLK(buffMeta,
 			[]any{"fnam", "EditorName", "text", "WESTRING_FNAM", "string", 1},
 			[]any{"fart", "Buffart", "art", "WESTRING_FART", "icon", 1},
 		),
-		upgradeFieldsTable: sylk(upgradeMeta,
+		upgradeFieldsTable: newSLK(upgradeMeta,
 			[]any{"gnam", "Name", 1, nil, "text", "WESTRING_GNAM", "string", 1},
 			[]any{"gef1", "effect1", 0, "EffectID", "data", "WESTRING_GEF1", "upgradeEffect", 0},
 			[]any{"gba1", "base1", 0, "Base", "data", "WESTRING_GBA1", "unreal", 0},
 			[]any{"gmo1", "mod1", 0, "Mod", "data", "WESTRING_GMO1", "unreal", 0},
 			[]any{"gpct", "pct", 0, nil, "data", "WESTRING_GPCT", "unreal", 0},
 		),
-		unitsTable: sylk([]string{"unitID", "comment(s)"},
+		unitsTable: newSLK([]string{"unitID", "comment(s)"},
 			[]any{"hfoo", "footman"}, []any{"Hpal", "paladin"}, []any{"hbar", "barracks"}, []any{"nzzz", "unnamed critter"},
 		),
-		balanceTable: sylk(balanceMeta,
+		balanceTable: newSLK(balanceMeta,
 			[]any{"hfoo", 0, "_"}, []any{"Hpal", 0, "STR"}, []any{"hbar", 1, "_"}, []any{"nzzz", 0, "_"},
 		),
-		itemsTable: sylk([]string{"itemID", "comment"}, []any{"ratf", "claws"}),
-		abilitiesTable: sylk([]string{"alias", "comments", "levels"},
+		itemsTable: newSLK([]string{"itemID", "comment"}, []any{"ratf", "claws"}),
+		abilitiesTable: newSLK([]string{"alias", "comments", "levels"},
 			[]any{"AHhb", "holy light", 3}, []any{"AHtb", "storm bolt", 3}, []any{nil, "row without an id", 1},
 		),
-		buffsTable:    sylk([]string{"alias", "comments"}, []any{"Binf", "inner fire"}, []any{"BHbd", "blizzard"}),
-		upgradesTable: sylk([]string{"upgradeid", "comments", "maxlevel"}, []any{"Rhme", "swords", 3}),
+		buffsTable:    newSLK([]string{"alias", "comments"}, []any{"Binf", "inner fire"}, []any{"BHbd", "blizzard"}),
+		upgradesTable: newSLK([]string{"upgradeid", "comments", "maxlevel"}, []any{"Rhme", "swords", 3}),
 		labelsFile: strings.Join([]string{
 			"[WorldEditStrings]",
 			"WESTRING_UHPM=Hit Points Maximum (Base)",
@@ -453,7 +455,7 @@ func writeExport(t testing.TB, dir string, change func(files map[string]string))
 	return dir
 }
 
-func exportedGame(t testing.TB, change func(files map[string]string)) string {
+func newExportDir(t testing.TB, change func(files map[string]string)) string {
 	t.Helper()
 	return writeExport(t, t.TempDir(), change)
 }
@@ -464,7 +466,7 @@ func withRow(table string, records ...string) string {
 
 const unitClassPins = `{"names": {"units": {"ucls": "unitClass"}}, "removed": {}}`
 
-func contains(t testing.TB, text string, parts ...string) {
+func checkContains(t testing.TB, text string, parts ...string) {
 	t.Helper()
 	for _, part := range parts {
 		if !strings.Contains(text, part) {
@@ -473,15 +475,15 @@ func contains(t testing.TB, text string, parts ...string) {
 	}
 }
 
-func parting(want, got string) string {
-	index := partingOffset(want, got)
+func describeDifference(want, got string) string {
+	index := firstDifferenceOffset(want, got)
 	return fmt.Sprintf("the two part at offset %d, where the line wanted is %q and the line got is %q",
 		index, lineAt(want, index), lineAt(got, index))
 }
 
 func firstLine(text string) string { return lineAt(text, 0) }
 
-func partingOffset(a, b string) int {
+func firstDifferenceOffset(a, b string) int {
 	index := 0
 	for index < len(a) && index < len(b) && a[index] == b[index] {
 		index++

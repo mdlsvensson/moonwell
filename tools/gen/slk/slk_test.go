@@ -40,7 +40,7 @@ var otherRecords = strings.Join([]string{
 
 var doubledQuotes = strings.Join([]string{`C;X1;Y1;K"ID"`, `C;X1;Y2;K"say ""hi"";ok"`, "E"}, "\n")
 
-func rows(t *testing.T, text string) []map[string]string {
+func mustParseRows(t *testing.T, text string) []map[string]string {
 	t.Helper()
 	table, err := slk.Parse(text, "mini.slk")
 	if err != nil {
@@ -76,7 +76,7 @@ func TestParseReadsCellsByHeaderWithTheLastYCarriedForward(t *testing.T) {
 		{"ID": "efgh", "count": "-1.5"},
 		{"ID": "ijkl", "field": "TRUE"},
 	}
-	if got := rows(t, mini); !reflect.DeepEqual(got, want) {
+	if got := mustParseRows(t, mini); !reflect.DeepEqual(got, want) {
 		t.Fatalf("rows: %v", got)
 	}
 	row := table.Rows[1]
@@ -110,7 +110,7 @@ var tables = []struct {
 
 func TestParseReadsTables(t *testing.T) {
 	for _, c := range tables {
-		if got := rows(t, c.text); !reflect.DeepEqual(got, c.want) {
+		if got := mustParseRows(t, c.text); !reflect.DeepEqual(got, c.want) {
 			t.Errorf("%s: rows %v, want %v", c.name, got, c.want)
 		}
 	}
@@ -122,7 +122,7 @@ func TestACellAtTheCoordinateZeroIsACell(t *testing.T) {
 	if err != nil || !reflect.DeepEqual(table.Columns, []string{"a", "b"}) {
 		t.Fatalf("columns %q, error %v", table.Columns, err)
 	}
-	if got := rows(t, text); !reflect.DeepEqual(got, []map[string]string{{"a": "1", "b": "2"}}) {
+	if got := mustParseRows(t, text); !reflect.DeepEqual(got, []map[string]string{{"a": "1", "b": "2"}}) {
 		t.Errorf("rows %v", got)
 	}
 }
@@ -138,7 +138,7 @@ func TestColumnsAndRowsAreInTheOrderOfTheirNumbers(t *testing.T) {
 		t.Errorf("columns: %q", table.Columns)
 	}
 	if len(table.Rows) != 2 || table.Rows[0].Value("b") != "2" || table.Rows[1].Value("a") != "3" {
-		t.Errorf("rows: %v, want the row of Y2, then the row of Y10", rows(t, numbered))
+		t.Errorf("rows: %v, want the row of Y2, then the row of Y10", mustParseRows(t, numbered))
 	}
 }
 
@@ -219,10 +219,10 @@ func TestParseRefusesARecordWithAnEmptyField(t *testing.T) {
 			t.Errorf("%q: got %v, want an error at %q about an empty field", c.text, err, c.place)
 		}
 	}
-	if got := rows(t, semicolonsInAValue); !reflect.DeepEqual(got, []map[string]string{{"a": "b;;c"}}) {
+	if got := mustParseRows(t, semicolonsInAValue); !reflect.DeepEqual(got, []map[string]string{{"a": "b;;c"}}) {
 		t.Errorf("two semicolons inside a quoted value: rows %v", got)
 	}
-	if got := rows(t, semicolonsAfterTheEnd); got != nil {
+	if got := mustParseRows(t, semicolonsAfterTheEnd); got != nil {
 		t.Errorf("two semicolons after the end of the table: rows %v", got)
 	}
 	if _, err := slk.Parse("C;Xa;;Y1;K1\n", "h.slk"); err == nil || !strings.Contains(err.Error(), "bad X coordinate") {
@@ -253,7 +253,7 @@ func TestWhiteSpaceOutsideASCIIIsPartOfAValue(t *testing.T) {
 		if !reflect.DeepEqual(table.Columns, c.columns) {
 			t.Errorf("%s: columns %q, want %q", c.name, table.Columns, c.columns)
 		}
-		if got := rows(t, c.text); !reflect.DeepEqual(got, c.want) {
+		if got := mustParseRows(t, c.text); !reflect.DeepEqual(got, c.want) {
 			t.Errorf("%s: rows %q, want %q", c.name, got, c.want)
 		}
 	}

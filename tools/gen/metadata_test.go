@@ -16,15 +16,15 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func withPins(t testing.TB, pins string) checkout {
+func newCheckoutWithPins(t testing.TB, pins string) fakeCheckout {
 	t.Helper()
-	c := newCheckout(t)
-	c.write(overridesPath, pins)
-	c.folder("data")
+	c := newFakeCheckout(t)
+	c.writeFile(overridesPath, pins)
+	c.makeDir("data")
 	return c
 }
 
-func written(t testing.TB, files map[string][]byte) *objects.Metadata {
+func mustReadMetadata(t testing.TB, files map[string][]byte) *objects.Metadata {
 	t.Helper()
 	metadata, err := decodeMetadata(files[metadataPath])
 	if err != nil {
@@ -42,53 +42,53 @@ renamed (3):
 ` + "wrote data/metadata.json. Now run `go run ./tools/gen`.\n"
 
 func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(t *testing.T) {
-	dir := exportedGame(t, nil)
-	c := withPins(t, unitClassPins)
-	printed, files, err := c.run("metadata", dir, "3.0.0.1")
+	dir := newExportDir(t, nil)
+	c := newCheckoutWithPins(t, unitClassPins)
+	printed, files, err := c.runGen("metadata", dir, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if printed != miniReport {
 		t.Errorf("the run printed\n%s\nwant\n%s", printed, miniReport)
 	}
-	first := texts(files)
+	first := toTexts(files)
 	beside := withGoMod(map[string]string{overridesPath: unitClassPins, metadataPath: first[metadataPath]})
 	if first[metadataPath] == "" || !maps.Equal(first, beside) {
 		t.Fatalf("the run left %q, want the metadata beside what the checkout held", slices.Sorted(maps.Keys(first)))
 	}
-	contains(t, first[metadataPath],
+	checkContains(t, first[metadataPath],
 		"{\n  \"format\": 1,\n  \"game\": \"3.0.0.1\",\n  \"fields\": {\n    \"units\": [\n      {\"id\":\"uabi\",",
 		"\n      {\"id\":\"uhpm\",\"name\":\"hitPointsMaximumBase\",",
 		"\n      \"AHhb\": {\"name\":\"Holy Light\",\"levels\":3},",
 		`"label":"% Bonus & More"`,
 	)
-	again, files, err := c.run("metadata", dir, "3.0.0.1")
+	again, files, err := c.runGen("metadata", dir, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if again != printed || !maps.Equal(texts(files), first) {
+	if again != printed || !maps.Equal(toTexts(files), first) {
 		t.Errorf("the second run printed %q and wrote another file than the first: %s",
-			again, parting(first[metadataPath], texts(files)[metadataPath]))
+			again, describeDifference(first[metadataPath], toTexts(files)[metadataPath]))
 	}
-	if metadata := written(t, files); metadata.Format != 1 || metadata.Game != "3.0.0.1" {
+	if metadata := mustReadMetadata(t, files); metadata.Format != 1 || metadata.Game != "3.0.0.1" {
 		t.Errorf("the file states the format %d and the game %q", metadata.Format, metadata.Game)
 	}
 }
 
 func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testing.T) {
-	dir := exportedGame(t, func(files map[string]string) {
+	dir := newExportDir(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
 			`C;X1;Y11;K"Crs"`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`, `C;X9;K"unreal"`)
 		files[labelsFile] += "WESTRING_GPCT=Name\r\nWESTRING_FART=Name\r\nWESTRING_CRS=Chance to Miss\r\n"
 	})
-	c := withPins(t, `{"names": {"items": {"unam": "unitName", "ifil": "itemModel"}, "units": {"ucls": "unitClass"},
+	c := newCheckoutWithPins(t, `{"names": {"items": {"unam": "unitName", "ifil": "itemModel"}, "units": {"ucls": "unitClass"},
 		"abilities": {"Crs": "missChance"}}}`)
-	printed, files, err := c.run("metadata", dir, "3.0.0.1")
+	printed, files, err := c.runGen("metadata", dir, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	contains(t, string(files[metadataPath]), `{"id":"Crs\u0000","name":"missChance",`)
-	contains(t, printed, `renamed (10):
+	checkContains(t, string(files[metadataPath]), `{"id":"Crs\u0000","name":"missChance",`)
+	checkContains(t, printed, `renamed (10):
   units ucls "class" -> "unitClass" (override)
   units unam "name" -> "unitName" (override)
   items ifil "modelFile" -> "itemModel" (override)
@@ -104,7 +104,7 @@ func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testin
 
 func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 	const released = `{"format":1,"game":"1.0","fields":{"units":[{"id":"uhpm","name":"hitPoints"}]}}`
-	whole := exportedGame(t, nil)
+	whole := newExportDir(t, nil)
 	for name, c := range map[string]struct {
 		dir    string
 		pins   string
@@ -115,26 +115,26 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 		"a name that needs a pin": {dir: whole, pins: "{}", starts: "cannot derive friendly names:\n  ",
 			words: []string{`units ucls "class" (Class)`, "tools/metadata/overrides.json"}},
 		"a file that the export lacks": {
-			dir:    exportedGame(t, func(files map[string]string) { delete(files, upgradesTable) }),
+			dir:    newExportDir(t, func(files map[string]string) { delete(files, upgradesTable) }),
 			starts: "war3.w3mod/units/upgradedata.slk is missing from "},
 		"a table whose column netsafe has another name": {
-			dir: exportedGame(t, func(files map[string]string) {
+			dir: newExportDir(t, func(files map[string]string) {
 				files[unitFieldsTable] = strings.Replace(files[unitFieldsTable], `K"netsafe"`, `K"netSafe"`, 1)
 			}),
 			starts: `war3.w3mod/units/unitmetadata.slk has no column "netsafe"`,
 			words:  []string{"tools/gen/export.go"}},
 		"a name that needs a pin, in an export with a table that lacks a column": {pins: "{}",
-			dir: exportedGame(t, func(files map[string]string) {
+			dir: newExportDir(t, func(files map[string]string) {
 				files[upgradesTable] = strings.Replace(files[upgradesTable], `K"maxlevel"`, `K"levels"`, 1)
 			}),
 			starts: `war3.w3mod/units/upgradedata.slk has no column "maxlevel"`},
 		"a name that needs a pin, in an export with a table that does not parse": {pins: "{}",
-			dir: exportedGame(t, func(files map[string]string) {
+			dir: newExportDir(t, func(files map[string]string) {
 				files[upgradesTable] = "ID;PWXL;N;E\r\nC;X1;Y1;K\"upgradeid\"\r\nC;X1;Y2;K\"Rhme\r\nE\r\n"
 			}),
 			starts: "war3.w3mod/units/upgradedata.slk:3: unterminated quoted string"},
 		"a unit that breaks the rule for heroes": {
-			dir: exportedGame(t, func(files map[string]string) {
+			dir: newExportDir(t, func(files map[string]string) {
 				files[unitsTable] = withRow(files[unitsTable], `C;X1;Y6;K"Nhro"`)
 				files[balanceTable] = withRow(files[balanceTable], `C;X1;Y6;K"Nhro"`, `C;X2;K0`, `C;X3;K"_"`)
 			}),
@@ -153,12 +153,12 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 			pins:   `{"names": {"units": {"ucls": "unitClass", "uhpn": "health"}}}`,
 			starts: "cannot derive friendly names:\n  the pin of \"uhpn\" under names.units names no field"},
 	} {
-		scratch := withPins(t, cmp.Or(c.pins, unitClassPins))
+		scratch := newCheckoutWithPins(t, cmp.Or(c.pins, unitClassPins))
 		if c.kept != "" {
-			scratch.write(metadataPath, c.kept)
+			scratch.writeFile(metadataPath, c.kept)
 		}
-		before := scratch.all()
-		printed, files, err := scratch.run("metadata", c.dir, "3.0.0.2")
+		before := scratch.readAll()
+		printed, files, err := scratch.runGen("metadata", c.dir, "3.0.0.2")
 		if err == nil {
 			t.Errorf("%s: the run wrote the metadata", name)
 			continue
@@ -166,7 +166,7 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 		if !strings.HasPrefix(err.Error(), c.starts) {
 			t.Errorf("%s: the error is %q, want it to start with %q", name, err, c.starts)
 		}
-		contains(t, err.Error(), c.words...)
+		checkContains(t, err.Error(), c.words...)
 		if strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: the error holds the full path of the checkout: %q", name, err)
 		}
@@ -178,22 +178,22 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 }
 
 func TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn(t *testing.T) {
-	dir := exportedGame(t, nil)
+	dir := newExportDir(t, nil)
 	for name, c := range map[string]struct {
-		lay    func(c checkout)
+		lay    func(c fakeCheckout)
 		starts string
 	}{
-		"no overrides": {func(c checkout) { c.folder("data") }, "tools/metadata/overrides.json: "},
-		"a folder at the place of the released metadata": {func(c checkout) {
-			c.write(overridesPath, unitClassPins)
-			c.folder(metadataPath)
+		"no overrides": {func(c fakeCheckout) { c.makeDir("data") }, "tools/metadata/overrides.json: "},
+		"a folder at the place of the released metadata": {func(c fakeCheckout) {
+			c.writeFile(overridesPath, unitClassPins)
+			c.makeDir(metadataPath)
 		}, "data/metadata.json: "},
-		"no data folder": {func(c checkout) { c.write(overridesPath, unitClassPins) }, "data/metadata.json: "},
+		"no data folder": {func(c fakeCheckout) { c.writeFile(overridesPath, unitClassPins) }, "data/metadata.json: "},
 	} {
-		scratch := newCheckout(t)
+		scratch := newFakeCheckout(t)
 		c.lay(scratch)
-		before := scratch.all()
-		printed, files, err := scratch.run("metadata", dir, "3.0.0.1")
+		before := scratch.readAll()
+		printed, files, err := scratch.runGen("metadata", dir, "3.0.0.1")
 		if err == nil || !strings.HasPrefix(err.Error(), c.starts) || strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: got %v, want a failure that starts with %q and holds no path of the checkout",
 				name, err, c.starts)
@@ -260,7 +260,7 @@ func TestRenderMetadataWritesTheTextOfTheFile(t *testing.T) {
 }
 `
 	if got := renderMetadata(metadata); got != want {
-		t.Errorf("the metadata is not written as the file has it: %s", parting(want, got))
+		t.Errorf("the metadata is not written as the file has it: %s", describeDifference(want, got))
 	}
 }
 
@@ -268,7 +268,7 @@ func TestTheCommittedMetadataRendersToItself(t *testing.T) {
 	committed := string(moonwell.Metadata)
 	metadata := objects.LoadMetadata()
 	if rendered := renderMetadata(metadata); rendered != committed {
-		t.Errorf("%s does not render to itself: %s", metadataPath, parting(committed, rendered))
+		t.Errorf("%s does not render to itself: %s", metadataPath, describeDifference(committed, rendered))
 	}
 	if string(realFile(t, metadataPath)) != committed {
 		t.Errorf("the program does not carry %s as the checkout has it", metadataPath)
@@ -295,17 +295,17 @@ func TestTheModeMetadataWritesTheCommittedMetadataFromTheGamesFiles(t *testing.T
 		"over the committed metadata": {overridesPath, metadataPath},
 		"into an empty data folder":   {overridesPath},
 	} {
-		c := newCheckout(t)
-		c.folder("data")
-		c.carry(carried...)
-		printed, files, err := c.run("metadata", export, committed.Game)
+		c := newFakeCheckout(t)
+		c.makeDir("data")
+		c.copyRealFiles(carried...)
+		printed, files, err := c.runGen("metadata", export, committed.Game)
 		if err != nil {
 			t.Errorf("%s: the run failed, and the first line of its error is %q", name, firstLine(err.Error()))
 			continue
 		}
 		if got := string(files[metadataPath]); got != want {
 			t.Errorf("%s: the game's files do not give the committed %s: the two part at offset %d",
-				name, metadataPath, partingOffset(want, got))
+				name, metadataPath, firstDifferenceOffset(want, got))
 		}
 		const last = "\nwrote data/metadata.json. Now run `go run ./tools/gen`.\n"
 		if !strings.HasPrefix(printed, counts) || !strings.HasSuffix(printed, last) {
@@ -316,7 +316,7 @@ func TestTheModeMetadataWritesTheCommittedMetadataFromTheGamesFiles(t *testing.T
 }
 
 func TestTheModeMetadataWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
-	game := readMini(t, nil)
+	game := readMiniExport(t, nil)
 	fields, _, err := buildNamedFields(game, unitClass)
 	if err != nil {
 		t.Fatal(err)

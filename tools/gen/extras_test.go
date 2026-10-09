@@ -80,6 +80,6 @@ func TestTheExtrasAreRefusedForAFunctionOrAGlobalThatLacksSomething(t *testing.T
 			t.Errorf("%s: the extras were read: %+v", text, got)
 			continue
 		}
-		contains(t, err.Error(), extrasPath+": ", words)
+		checkContains(t, err.Error(), extrasPath+": ", words)
 	}
 }

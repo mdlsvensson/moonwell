@@ -17,7 +17,7 @@ func scriptsOfTheTests() map[string]string {
 		"common": common, "blizzard": blizzard, "corners": corners, "indented": indented,
 		"no declaration": noDeclaration, "comments": comments,
 	}
-	for i, c := range checkError {
+	for i, c := range errorCases {
 		named[fmt.Sprintf("refused script %02d, of %s", i, c.source)] = c.text
 	}
 	for _, c := range widerSpace {
@@ -26,7 +26,7 @@ func scriptsOfTheTests() map[string]string {
 	return named
 }
 
-type outcomeCounts struct{ read, refused int }
+type outcomeCounts struct{ accepted, rejected int }
 
 var longerScripts = map[string]string{
 	"types, globals and natives": "// first\r\ntype agent extends handle\r\n" +
@@ -57,10 +57,10 @@ func (c *outcomeCounts) record(t *testing.T, what, text string) {
 		t.Fatalf("%s: Parse panics: %v", what, value)
 	}
 	if err == nil {
-		c.read++
+		c.accepted++
 		return
 	}
-	c.refused++
+	c.rejected++
 	if file.Types != nil || file.Functions != nil || file.Globals != nil {
 		t.Fatalf("%s: a refused script is %+v, want none", what, file)
 	}
@@ -93,7 +93,7 @@ func TestADamagedScriptIsReadOrRefusedByFileAndLineAndNeverPanics(t *testing.T) 
 			damaged.record(t, fmt.Sprintf("%s with white space put in, text %d: %q", name, i, made), made)
 		}
 	}
-	if damaged.read == 0 || damaged.refused == 0 {
-		t.Errorf("%d damaged scripts were read and %d refused; want some of each", damaged.read, damaged.refused)
+	if damaged.accepted == 0 || damaged.rejected == 0 {
+		t.Errorf("%d damaged scripts were read and %d refused; want some of each", damaged.accepted, damaged.rejected)
 	}
 }

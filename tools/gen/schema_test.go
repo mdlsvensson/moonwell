@@ -15,7 +15,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func field(id, name string, change func(*objects.FieldMeta)) objects.FieldMeta {
+func newField(id, name string, change func(*objects.FieldMeta)) objects.FieldMeta {
 	meta := objects.FieldMeta{
 		ID: id, Name: name, Label: name, Category: "stats", Type: "int", Storage: "int",
 		Use: []string{}, Specific: []string{}, NotSpecific: []string{},
@@ -26,15 +26,15 @@ func field(id, name string, change func(*objects.FieldMeta)) objects.FieldMeta {
 	return meta
 }
 
-func typed(fieldType, storage string) func(*objects.FieldMeta) {
+func withType(fieldType, storage string) func(*objects.FieldMeta) {
 	return func(meta *objects.FieldMeta) { meta.Type, meta.Storage = fieldType, storage }
 }
 
-func used(use ...string) func(*objects.FieldMeta) {
+func withUse(use ...string) func(*objects.FieldMeta) {
 	return func(meta *objects.FieldMeta) { meta.Use = use }
 }
 
-func labelled(label string) func(*objects.FieldMeta) {
+func withLabel(label string) func(*objects.FieldMeta) {
 	return func(meta *objects.FieldMeta) { meta.Label = label }
 }
 
@@ -53,7 +53,7 @@ func metadataWith(fields map[string][]objects.FieldMeta) *objects.Metadata {
 
 func metadataOfOneBuff(t testing.TB, id, name string) string {
 	t.Helper()
-	return metadataText(t, map[string][]objects.FieldMeta{"buffs": {field(id, name, nil)}})
+	return metadataText(t, map[string][]objects.FieldMeta{"buffs": {newField(id, name, nil)}})
 }
 
 func metadataText(t testing.TB, fields map[string][]objects.FieldMeta) string {
@@ -65,7 +65,7 @@ func metadataText(t testing.TB, fields map[string][]objects.FieldMeta) string {
 	return string(text)
 }
 
-func schema(t *testing.T, fields map[string][]objects.FieldMeta) map[string]string {
+func mustRenderSchema(t *testing.T, fields map[string][]objects.FieldMeta) map[string]string {
 	t.Helper()
 	files, err := renderSchema(metadataWith(fields))
 	if err != nil {
@@ -116,10 +116,10 @@ func TestRenderSchemaRendersOneAbstractModulePerObjectClass(t *testing.T) {
 		"abstract module moonwell.generated.HeroProps\n" +
 		"\n" +
 		"extends \"../objects/Object.pkl\"\n"
-	if got := schema(t, nil)["Hero"]; got != hero {
+	if got := mustRenderSchema(t, nil)["Hero"]; got != hero {
 		t.Errorf("the module of a category without a field is %q, want %q", got, hero)
 	}
-	contains(t, schema(t, nil)["Ability"],
+	checkContains(t, mustRenderSchema(t, nil)["Ability"],
 		"/// The typed properties of `Ability.pkl`: the ability fields not specific to one base ability, named after")
 }
 
@@ -154,23 +154,23 @@ func TestRenderSchemaTypesEachFieldByStorageListAndLevel(t *testing.T) {
 	list := func(fieldType string) func(*objects.FieldMeta) {
 		return func(meta *objects.FieldMeta) { meta.Type, meta.Storage, meta.List = fieldType, "string", true }
 	}
-	ability := schema(t, map[string][]objects.FieldMeta{"abilities": {
-		field("aint", "anInt", nil),
-		field("abol", "aBool", typed("bool", "int")),
-		field("arel", "aReal", typed("real", "real")),
-		field("aunr", "anUnreal", typed("unreal", "unreal")),
-		field("astr", "aString", typed("string", "string")),
-		field("alst", "aList", list("unitList")),
-		field("alvi", "levelInt", perLevel(func(meta *objects.FieldMeta) { meta.Column = 1 })),
-		field("alvb", "levelBool", perLevel(typed("bool", "int"))),
-		field("alvr", "levelReal", perLevel(typed("unreal", "unreal"))),
-		field("alvs", "levelString", perLevel(typed("string", "string"))),
-		field("alvl", "levelList", perLevel(list("targetList"))),
-		field("aenu", "anEnum", typed("attackBits", "int")),
-		field("abor", "boolAsReal", typed("bool", "real")),
-		field("abou", "boolAsUnreal", typed("bool", "unreal")),
-		field("abos", "boolAsString", typed("bool", "string")),
-		field("alor", "levelBoolAsReal", perLevel(typed("bool", "real"))),
+	ability := mustRenderSchema(t, map[string][]objects.FieldMeta{"abilities": {
+		newField("aint", "anInt", nil),
+		newField("abol", "aBool", withType("bool", "int")),
+		newField("arel", "aReal", withType("real", "real")),
+		newField("aunr", "anUnreal", withType("unreal", "unreal")),
+		newField("astr", "aString", withType("string", "string")),
+		newField("alst", "aList", list("unitList")),
+		newField("alvi", "levelInt", perLevel(func(meta *objects.FieldMeta) { meta.Column = 1 })),
+		newField("alvb", "levelBool", perLevel(withType("bool", "int"))),
+		newField("alvr", "levelReal", perLevel(withType("unreal", "unreal"))),
+		newField("alvs", "levelString", perLevel(withType("string", "string"))),
+		newField("alvl", "levelList", perLevel(list("targetList"))),
+		newField("aenu", "anEnum", withType("attackBits", "int")),
+		newField("abor", "boolAsReal", withType("bool", "real")),
+		newField("abou", "boolAsUnreal", withType("bool", "unreal")),
+		newField("abos", "boolAsString", withType("bool", "string")),
+		newField("alor", "levelBoolAsReal", perLevel(withType("bool", "real"))),
 	}})["Ability"]
 	for _, line := range []string{
 		"boolAsReal: Number?",
@@ -190,7 +190,7 @@ func TestRenderSchemaTypesEachFieldByStorageListAndLevel(t *testing.T) {
 		"levelList: (String|List<String>|List<List<String>>)?",
 		"anEnum: Int?",
 	} {
-		contains(t, ability, "\n"+line+"\n")
+		checkContains(t, ability, "\n"+line+"\n")
 	}
 }
 
@@ -198,63 +198,63 @@ func TestRenderSchemaWritesTheLabelRawcodeCategoryTypeLevelAndSkinIntoDocComment
 	name := func(meta *objects.FieldMeta) {
 		meta.Label, meta.Category, meta.Type, meta.Storage = "Name", "text", "string", "string"
 	}
-	modules := schema(t, map[string][]objects.FieldMeta{
-		"units": {field("unam", "name", func(meta *objects.FieldMeta) {
+	modules := mustRenderSchema(t, map[string][]objects.FieldMeta{
+		"units": {newField("unam", "name", func(meta *objects.FieldMeta) {
 			name(meta)
 			meta.Skin, meta.Use = true, []string{"unit"}
 		})},
-		"abilities": {field("Crs\x00", "chanceToMiss", func(meta *objects.FieldMeta) {
+		"abilities": {newField("Crs\x00", "chanceToMiss", func(meta *objects.FieldMeta) {
 			meta.Label, meta.PerLevel, meta.Column = "Chance to Miss", true, 1
 		})},
-		"upgrades": {field("gnam", "name", func(meta *objects.FieldMeta) {
+		"upgrades": {newField("gnam", "name", func(meta *objects.FieldMeta) {
 			name(meta)
 			meta.PerLevel = true
 		})},
 	})
-	contains(t, modules["Unit"], "\n/// Name\n///\n/// Field `unam` (text, `string`). Skin field.\nname: String?\n")
-	contains(t, modules["Ability"],
+	checkContains(t, modules["Unit"], "\n/// Name\n///\n/// Field `unam` (text, `string`). Skin field.\nname: String?\n")
+	checkContains(t, modules["Ability"],
 		"\n/// Chance to Miss\n///\n/// Field `Crs` (stats, `int`). Per level: a `List` sets levels 1, 2, ...\n"+
 			"chanceToMiss: (Int|List<Int>)?\n")
-	contains(t, modules["Upgrade"], "/// Field `gnam` (text, `string`). Per level: a `List` sets levels 1, 2, ...\n")
+	checkContains(t, modules["Upgrade"], "/// Field `gnam` (text, `string`). Per level: a `List` sets levels 1, 2, ...\n")
 }
 
 func TestRenderSchemaWritesALabelAndACategoryOnOneLine(t *testing.T) {
-	buff := schema(t, map[string][]objects.FieldMeta{"buffs": {
-		field("fart", "art", func(meta *objects.FieldMeta) {
+	buff := mustRenderSchema(t, map[string][]objects.FieldMeta{"buffs": {
+		newField("fart", "art", func(meta *objects.FieldMeta) {
 			meta.Label, meta.Category = "\tArt -\r\n \v\fIcon  ", " art\n\tand sound "
 		}),
-		field("fnbs", "noBreak", labelled("\xC2\xA0No\xC2\xA0\xC2\xA0Break\xC2\xA0")),
+		newField("fnbs", "noBreak", withLabel("\xC2\xA0No\xC2\xA0\xC2\xA0Break\xC2\xA0")),
 	}})["Buff"]
-	contains(t, buff,
+	checkContains(t, buff,
 		"\n/// Art - Icon\n///\n/// Field `fart` (art and sound, `int`).\nart: Int?\n",
 		"\n/// \xC2\xA0No\xC2\xA0\xC2\xA0Break\xC2\xA0\n///\n/// Field `fnbs` (stats, `int`).\nnoBreak: Int?\n")
 }
 
 func TestRenderSchemaDocumentsListFields(t *testing.T) {
-	unit := schema(t, map[string][]objects.FieldMeta{"units": {field("uabi", "normal", func(meta *objects.FieldMeta) {
+	unit := mustRenderSchema(t, map[string][]objects.FieldMeta{"units": {newField("uabi", "normal", func(meta *objects.FieldMeta) {
 		meta.Label, meta.Type, meta.Storage, meta.List = "Normal", "abilityList", "string", true
 		meta.Use = []string{"unit"}
 	})}})["Unit"]
-	contains(t, unit,
+	checkContains(t, unit,
 		"/// Field `uabi` (stats, `abilityList`). A comma-separated list: a `List<String>` is joined with commas.\n")
 }
 
 func TestRenderSchemaPlacesUnitFieldsByUseAndLeavesAbilitySpecificFieldsToProperties(t *testing.T) {
-	modules := schema(t, map[string][]objects.FieldMeta{
+	modules := mustRenderSchema(t, map[string][]objects.FieldMeta{
 		"units": {
-			field("uall", "everywhere", used("unit", "hero", "building")),
-			field("uher", "heroOnly", used("hero")),
-			field("ubld", "buildingOnly", used("building")),
-			field("uitm", "itemOnly", used("item")),
+			newField("uall", "everywhere", withUse("unit", "hero", "building")),
+			newField("uher", "heroOnly", withUse("hero")),
+			newField("ubld", "buildingOnly", withUse("building")),
+			newField("uitm", "itemOnly", withUse("item")),
 		},
-		"items": {field("iitm", "itemField", used("item"))},
+		"items": {newField("iitm", "itemField", withUse("item"))},
 		"abilities": {
-			field("acom", "common", nil),
-			field("aexc", "excluded", func(meta *objects.FieldMeta) { meta.NotSpecific = []string{"AHhb"} }),
-			field("Hhb1", "amountHealed", func(meta *objects.FieldMeta) { meta.Specific = []string{"AHhb"} }),
+			newField("acom", "common", nil),
+			newField("aexc", "excluded", func(meta *objects.FieldMeta) { meta.NotSpecific = []string{"AHhb"} }),
+			newField("Hhb1", "amountHealed", func(meta *objects.FieldMeta) { meta.Specific = []string{"AHhb"} }),
 		},
-		"buffs":    {field("fbuf", "buffField", nil)},
-		"upgrades": {field("gupg", "upgradeField", nil)},
+		"buffs":    {newField("fbuf", "buffField", nil)},
+		"upgrades": {newField("gupg", "upgradeField", nil)},
 	})
 	for module, want := range map[string][]string{
 		"Unit":     {"everywhere"},
@@ -272,11 +272,11 @@ func TestRenderSchemaPlacesUnitFieldsByUseAndLeavesAbilitySpecificFieldsToProper
 }
 
 func TestRenderSchemaSortsFieldsByNameAndIsDeterministic(t *testing.T) {
-	fields := []objects.FieldMeta{field("bzzz", "zeta", nil), field("baaa", "alpha", nil), field("bmmm", "Mu", nil)}
-	first := schema(t, map[string][]objects.FieldMeta{"buffs": fields})
+	fields := []objects.FieldMeta{newField("bzzz", "zeta", nil), newField("baaa", "alpha", nil), newField("bmmm", "Mu", nil)}
+	first := mustRenderSchema(t, map[string][]objects.FieldMeta{"buffs": fields})
 	reversed := slices.Clone(fields)
 	slices.Reverse(reversed)
-	if !reflect.DeepEqual(schema(t, map[string][]objects.FieldMeta{"buffs": reversed}), first) {
+	if !reflect.DeepEqual(mustRenderSchema(t, map[string][]objects.FieldMeta{"buffs": reversed}), first) {
 		t.Error("the order of the fields changed the schema")
 	}
 	if got := propertyNames(first["Buff"]); !slices.Equal(got, []string{"Mu", "alpha", "zeta"}) {
@@ -286,26 +286,26 @@ func TestRenderSchemaSortsFieldsByNameAndIsDeterministic(t *testing.T) {
 
 func TestRenderSchemaFailsOnAFriendlyNameClashWithinAClass(t *testing.T) {
 	_, err := renderSchema(metadataWith(map[string][]objects.FieldMeta{
-		"units": {field("uaaa", "same", used("hero")), field("ubbb", "same", used("hero"))},
+		"units": {newField("uaaa", "same", withUse("hero")), newField("ubbb", "same", withUse("hero"))},
 	}))
 	if err == nil {
 		t.Fatal("two fields of one class shared a name")
 	}
-	contains(t, err.Error(), "HeroProps", "uaaa", "ubbb", "tools/metadata/overrides.json")
-	schema(t, map[string][]objects.FieldMeta{
-		"units": {field("uaaa", "same", used("hero")), field("ubbb", "same", used("unit"))},
+	checkContains(t, err.Error(), "HeroProps", "uaaa", "ubbb", "tools/metadata/overrides.json")
+	mustRenderSchema(t, map[string][]objects.FieldMeta{
+		"units": {newField("uaaa", "same", withUse("hero")), newField("ubbb", "same", withUse("unit"))},
 	})
 }
 
 func TestRenderSchemaNamesEachFieldOfAClashWithTheOneBeforeIt(t *testing.T) {
 	_, err := renderSchema(metadataWith(map[string][]objects.FieldMeta{"buffs": {
-		field("fccc", "same", labelled("Third")), field("Crs\x00", "same", labelled("First")),
-		field("fbbb", "same", labelled("Second")),
+		newField("fccc", "same", withLabel("Third")), newField("Crs\x00", "same", withLabel("First")),
+		newField("fbbb", "same", withLabel("Second")),
 	}}))
 	if err == nil {
 		t.Fatal("three fields of one class shared a name")
 	}
-	contains(t, err.Error(),
+	checkContains(t, err.Error(),
 		"\nBuffProps: field \"fbbb\" (Second) has the name \"same\", as does field \"Crs\"."+
 			"\nBuffProps: field \"fccc\" (Third) has the name \"same\", as does field \"fbbb\".")
 	if strings.Count(err.Error(), "\n") != 2 {
@@ -318,16 +318,16 @@ func TestRenderSchemaFailsOnReservedKeywordAndInvalidPropertyNames(t *testing.T)
 		"id", "base", "source", "properties", "output", "class", "function", "private", "public", "2nd", "a-b", "",
 		"name\n", "n\xC3\xA4me",
 	} {
-		_, err := renderSchema(metadataWith(map[string][]objects.FieldMeta{"buffs": {field("fxxx", name, nil)}}))
+		_, err := renderSchema(metadataWith(map[string][]objects.FieldMeta{"buffs": {newField("fxxx", name, nil)}}))
 		if err == nil || !strings.Contains(err.Error(), "fxxx") {
 			t.Errorf("%q: got %v, want an error naming fxxx", name, err)
 			continue
 		}
-		contains(t, err.Error(), "reserved or not a Pkl identifier", "tools/metadata/overrides.json")
+		checkContains(t, err.Error(), "reserved or not a Pkl identifier", "tools/metadata/overrides.json")
 	}
-	schema(t, map[string][]objects.FieldMeta{"buffs": {
-		field("faaa", "classes", nil), field("fbbb", "_id", nil), field("fccc", "Output", nil),
-		field("fddd", "isPublic", nil),
+	mustRenderSchema(t, map[string][]objects.FieldMeta{"buffs": {
+		newField("faaa", "classes", nil), newField("fbbb", "_id", nil), newField("fccc", "Output", nil),
+		newField("fddd", "isPublic", nil),
 	}})
 }
 
@@ -363,9 +363,9 @@ func TestSchemaGeneratedMatchesTheObjectMetadata(t *testing.T) {
 }
 
 func TestTheModeWithoutANameWritesTheCommittedSchemaFromTheCommittedMetadata(t *testing.T) {
-	c := newCheckout(t)
-	c.carry("data/metadata.json")
-	printed, files, err := c.run()
+	c := newFakeCheckout(t)
+	c.copyRealFiles("data/metadata.json")
+	printed, files, err := c.runGen()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -380,30 +380,30 @@ func TestTheModeWithoutANameWritesTheCommittedSchemaFromTheCommittedMetadata(t *
 	for _, name := range generatedNames() {
 		want[name] = string(realFile(t, name))
 	}
-	if got := texts(files); !maps.Equal(got, want) {
+	if got := toTexts(files); !maps.Equal(got, want) {
 		t.Errorf("the checkout holds %q, and not all of them as they are committed", slices.Sorted(maps.Keys(got)))
 	}
-	printed, files, err = c.run()
+	printed, files, err = c.runGen()
 	if err != nil {
 		t.Fatalf("the second run: %v", err)
 	}
 	if printed != "" {
 		t.Errorf("the second run printed %q, want nothing", printed)
 	}
-	if got := texts(files); !maps.Equal(got, want) {
+	if got := toTexts(files); !maps.Equal(got, want) {
 		t.Errorf("after the second run the checkout holds %q, and not all of them as they are committed",
 			slices.Sorted(maps.Keys(got)))
 	}
 }
 
 func TestTheModeWithoutANameWritesNothingOverTheCommittedSchema(t *testing.T) {
-	c := newCheckout(t)
-	c.carry("data/metadata.json", "schema/generated")
-	before := c.all()
-	if len(texts(c.outputs())) != 8 {
+	c := newFakeCheckout(t)
+	c.copyRealFiles("data/metadata.json", "schema/generated")
+	before := c.readAll()
+	if len(toTexts(c.readOutputs())) != 8 {
 		t.Fatalf("the checkout was given %q", slices.Sorted(maps.Keys(before)))
 	}
-	printed, files, err := c.run()
+	printed, files, err := c.runGen()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -413,19 +413,19 @@ func TestTheModeWithoutANameWritesNothingOverTheCommittedSchema(t *testing.T) {
 }
 
 func TestTheModeWithoutANameRemovesWhatElseLiesInTheFolderOfTheSchema(t *testing.T) {
-	c := newCheckout(t)
-	c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
-	if _, _, err := c.run(); err != nil {
+	c := newFakeCheckout(t)
+	c.writeFile("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
+	if _, _, err := c.runGen(); err != nil {
 		t.Fatal(err)
 	}
-	c.write("schema/Kept.pkl", "beside the folder\n")
-	want := c.all()
-	c.write("schema/generated/HeroProps.pkl", "stale\n")
-	c.write("schema/generated/Stray.pkl", "stray\n")
-	c.write("schema/generated/UnitProps.pkl.orig", "stray\n")
-	c.write("schema/generated/old/deeper/Left.pkl", "stray\n")
-	c.folder("schema/generated/empty")
-	printed, files, err := c.run()
+	c.writeFile("schema/Kept.pkl", "beside the folder\n")
+	want := c.readAll()
+	c.writeFile("schema/generated/HeroProps.pkl", "stale\n")
+	c.writeFile("schema/generated/Stray.pkl", "stray\n")
+	c.writeFile("schema/generated/UnitProps.pkl.orig", "stray\n")
+	c.writeFile("schema/generated/old/deeper/Left.pkl", "stray\n")
+	c.makeDir("schema/generated/empty")
+	printed, files, err := c.runGen()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -451,17 +451,17 @@ func TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON(t *testing.T) 
 		"no JSON":       {`{"format": 1,`, "data/metadata.json: unexpected end of JSON input"},
 		"another shape": {`{"format": "one"}`, "data/metadata.json: format is of the wrong kind (string)"},
 	} {
-		scratch := newCheckout(t)
+		scratch := newFakeCheckout(t)
 		if c.metadata != "" {
-			scratch.write("data/metadata.json", c.metadata)
+			scratch.writeFile("data/metadata.json", c.metadata)
 		}
-		before := scratch.all()
-		printed, files, err := scratch.run()
+		before := scratch.readAll()
+		printed, files, err := scratch.runGen()
 		if err == nil {
 			t.Errorf("%s: the schema was written", name)
 			continue
 		}
-		contains(t, err.Error(), c.words)
+		checkContains(t, err.Error(), c.words)
 		if strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: the message holds the path of the checkout: %v", name, err)
 		}
@@ -473,11 +473,11 @@ func TestTheModeWithoutANameRefusesAMetadataThatIsMissingOrNoJSON(t *testing.T) 
 
 func TestTheModeWithoutANameNamesAFileInTheWayOfTheSchema(t *testing.T) {
 	for _, inTheWay := range []string{"schema/generated", "schema"} {
-		c := newCheckout(t)
-		c.write("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
-		c.write(inTheWay, "a file\n")
-		before := c.all()
-		printed, _, err := c.run()
+		c := newFakeCheckout(t)
+		c.writeFile("data/metadata.json", metadataOfOneBuff(t, "fnam", "name"))
+		c.writeFile(inTheWay, "a file\n")
+		before := c.readAll()
+		printed, _, err := c.runGen()
 		if err == nil {
 			t.Errorf("a file at %s: the schema was written", inTheWay)
 			continue
@@ -485,23 +485,23 @@ func TestTheModeWithoutANameNamesAFileInTheWayOfTheSchema(t *testing.T) {
 		if !strings.HasPrefix(err.Error(), inTheWay+": ") || strings.Contains(err.Error(), c.root) {
 			t.Errorf("a file at %s: got %q, want %q and the system's reason", inTheWay, err, inTheWay)
 		}
-		if printed != "" || !reflect.DeepEqual(c.all(), before) {
+		if printed != "" || !reflect.DeepEqual(c.readAll(), before) {
 			t.Errorf("a file at %s: the failed run printed %q and left %q",
-				inTheWay, printed, slices.Sorted(maps.Keys(c.all())))
+				inTheWay, printed, slices.Sorted(maps.Keys(c.readAll())))
 		}
 	}
 }
 
 func TestTheModeWithoutANameWritesNothingWhenANameCannotBeAProperty(t *testing.T) {
-	c := newCheckout(t)
-	c.write("data/metadata.json", metadataOfOneBuff(t, "fout", "output"))
-	c.write("schema/generated/Stray.pkl", "stray\n")
-	before := c.all()
-	printed, files, err := c.run()
+	c := newFakeCheckout(t)
+	c.writeFile("data/metadata.json", metadataOfOneBuff(t, "fout", "output"))
+	c.writeFile("schema/generated/Stray.pkl", "stray\n")
+	before := c.readAll()
+	printed, files, err := c.runGen()
 	if err == nil {
 		t.Fatal("a field named output was written into the schema")
 	}
-	contains(t, err.Error(), "cannot render the Pkl schema", `BuffProps: field "fout" (output) has the name "output"`)
+	checkContains(t, err.Error(), "cannot render the Pkl schema", `BuffProps: field "fout" (output) has the name "output"`)
 	if printed != "" || !reflect.DeepEqual(files, before) {
 		t.Errorf("the refused run printed %q and left %q", printed, slices.Sorted(maps.Keys(files)))
 	}
