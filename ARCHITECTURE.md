@@ -410,7 +410,7 @@ Each door reads top to bottom, like `Plan`. The rest of the generator:
 - `tools/gen/fields.go`, `tools/gen/names.go` and `tools/gen/bases.go` make the object metadata: a record for each
   field, its friendly name, and the standard objects.
 - `tools/gen/handwritten.go` reads the two hand-written JSON files. The keys of `tools/natives/lua-extras.json` are
-  in `tools/gen/extras.go`, those of `tools/metadata/overrides.json` at the top of `tools/gen/names.go`.
+  in `tools/gen/extras.go`, those of `tools/metadata/overrides.json` in `tools/gen/overrides.go`.
 - `tools/gen/jass/`, `tools/gen/slk/` and `tools/gen/ini/` are three small parsers for the game's file formats.
   They import nothing of the module.
 
@@ -605,7 +605,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | add a mode to the generator | `tools/gen/main.go`: the table `subcommands` |
 | change which files of an export are read, or a column's name | `tools/gen/export.go`: `readExport`, `columnsRead` |
 | change how a field gets its friendly name | `tools/gen/names.go`: `assignNames`, `camelCase` |
-| pin a name, or acknowledge a field the game dropped | `tools/metadata/overrides.json`; it is read by `readOverrides` in `tools/gen/names.go` |
+| pin a name, or acknowledge a field the game dropped | `tools/metadata/overrides.json`; it is read by `readOverrides` in `tools/gen/overrides.go` |
 | add a function or a global that only the game's Lua has | `tools/natives/lua-extras.json`; it is read by `readExtras` in `tools/gen/extras.go` |
 | change how a standard object gets its category | `tools/gen/bases.go`: `categoryOfUnit` |
 | add a project to the recorded builds | `internal/build/seeds_test.go`: `seeds` |
