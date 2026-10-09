@@ -10,9 +10,9 @@ back to.
 ## What Moonwell does
 
 Moonwell is one program, `moonwell`, that builds a Warcraft III map from a project folder. A project holds a map
-that World Editor saved as a folder (the source map), gameplay code in YueScript and Lua, custom objects and map
-settings written in Pkl, and files to import. `moonwell build` evaluates the project's manifest with Pkl (the
-manifest is `moonwell.pkl`, or `moonwell.local.pkl`, which amends it, where a project has one), compiles the gameplay
+that World Editor saved as a folder (the source map), gameplay code in YueScript and Lua, custom objects written in
+Pkl, settings in `moonwell.toml`, and files to import. `moonwell build` reads the project's settings and those of the
+machine (`config.toml` in the user's Moonwell folder), evaluates the object files with Pkl, compiles the gameplay
 to Lua with the YueScript compiler, and works out every file of the map that has to change: the object data, the map
 settings, the imported files, and the map's script with the gameplay added at its end. It writes the changed map as a
 folder, `dist/stage/<map.folder>`, and packs that into one `.w3x` archive. The source map is only read. The other
@@ -39,8 +39,8 @@ Four words of a project come back all through this document:
 - `tools/metadata/` and `tools/natives/`: the two files a contributor writes by hand for the generator.
 - `data/`: game data the program carries: the list of file paths the game ships, the fields and standard objects of
   the object editor, and the game's script API. The generator writes all three.
-- `schema/`: the Pkl package `moonwell`, which is the format of a project. `schema/generated/` is written by the
-  generator, the rest by hand. `schema/tests/` holds the schema's own tests, in Pkl.
+- `schema/`: the Pkl package `moonwell`, which is the format of a project's object files. `schema/generated/` is
+  written by the generator, the rest by hand. `schema/tests/` holds the schema's own tests, in Pkl.
 - `runtime/`: `runtime/moonwell.lua`, the Lua that goes into every map, and `runtime/macros.yue`, the macro module
   a project imports.
 - `template/`: the project that `moonwell init` creates, file for file.
@@ -54,9 +54,10 @@ Four words of a project come back all through this document:
   that the version is the same everywhere, that the install scripts work, that this document names real files and
   quotes `Plan` as the source has it.
 
-The module is `github.com/mdlsvensson/moonwell`. Beside the Go standard library it depends on one module,
-`github.com/spf13/cobra`, which reads the command line, and on the two that `cobra` needs (`pflag`, and `mousetrap`
-on Windows). `module_test.go` holds `go.mod` to exactly those three.
+The module is `github.com/mdlsvensson/moonwell`. Beside the Go standard library it depends on two modules:
+`github.com/spf13/cobra`, which reads the command line, with the two that `cobra` needs (`pflag`, and `mousetrap`
+on Windows); and `github.com/spf13/viper`, which reads the settings files, with the eleven it brings.
+`module_test.go` holds `go.mod` to exactly those fifteen.
 
 ## The four shelves
 
@@ -115,7 +116,7 @@ table below and in the rest of this document; the code as it was commented is th
 
 | Package | What it does |
 | --- | --- |
-| `internal/manifest` | A project as Go values, the mirror of `schema/`. It runs `pkl eval` on the manifest and decodes the JSON, checks that the project's Pkl package is of the program's version, and holds the `PklProject` and `moonwell.local.pkl` a new project gets. |
+| `internal/manifest` | A project as Go values. It reads the two settings files with `viper` (`moonwell.toml` of the project, `config.toml` of the user), gives every setting its default and checks its rule; it runs `pkl eval` on the object files through a module it writes to `.moonwell/objects.pkl` and decodes the JSON, checks that the project's Pkl package is of the program's version, and holds the `PklProject` a new project gets and the `config.toml` a user gets. |
 | `internal/mapdir` | A map saved as a folder. It scans the folder once, finds a file in any letter case, holds planned changes as a view (the folder with the changes laid over it, and nothing written yet), and writes a view to the stage or into the folder. |
 | `internal/env` | The outside world as one struct, `Env`: running a program, downloading an address, starting the game, the logger, the cache folder, the platform. |
 | `internal/diag` | The expected failure (`Error`, `Problems`), the one function that turns any error into what a user reads (`Format`), and "did you mean". |
@@ -161,6 +162,7 @@ A format package takes bytes and returns bytes or values. It knows nothing of pr
   with `os/exec`.
 - Only `internal/cli` imports `cobra`, `pflag` and `mousetrap`, the modules that read a command line: no other
   package knows how a line is read.
+- Only `internal/manifest` imports `viper` and what it brings: no other package knows how a settings file is read.
 - The two test-only packages are imported by test files alone. A test file follows the rule of its package, and may
   also import its own package and the two test-only packages.
 - The root package is under no rule. A package below `internal/` may import it for the embedded files and the
@@ -210,10 +212,10 @@ The command table and where each command goes:
 | `check` | `runCheck` in `internal/cli/check.go` | `build.Check` |
 | `dev` | `runDev` in `internal/cli/dev.go` | `build.Dev` |
 | `init` | `runInit` in `internal/cli/initcmd.go` | writes the template's files and runs `pkl project resolve` |
-| `setup` | `runSetup` in `internal/cli/setup.go` | Pkl, the manifest, the compiler, the editor's files, the libraries |
-| `assets:check`, `assets:sync` | `runAssetsCheck` and `runAssetsSync`, each one call of `syncOrCheckAssets` in `internal/cli/assets.go` | `build.Load`, `build.OpenSource`, `library.Sync`, `build.PlanAssets`, and for a sync `assets.Sync` |
-| `assets:paths` | `runAssetsPaths`, which calls `reportAssetPaths` in `internal/cli/assetspaths.go` | in a project `build.Load`, `library.Sync` and `build.CollectAssets`; then `assets.ReportModels` |
-| `settings:check` | `runSettingsCheck` in `internal/cli/settings.go` | `build.Load`, `build.OpenSource`, `settings.Plan` |
+| `setup` | `runSetup` in `internal/cli/setup.go` | the user's `config.toml`, the settings, Pkl and the objects where the project has object files, the compiler, the editor's files, the libraries |
+| `assets:check`, `assets:sync` | `runAssetsCheck` and `runAssetsSync`, each one call of `syncOrCheckAssets` in `internal/cli/assets.go` | `build.LoadSettings` (no Pkl), `build.OpenSource`, `library.Sync`, `build.PlanAssets`, and for a sync `assets.Sync` |
+| `assets:paths` | `runAssetsPaths`, which calls `reportAssetPaths` in `internal/cli/assetspaths.go` | in a project `build.LoadSettings`, `library.Sync` and `build.CollectAssets`; then `assets.ReportModels` |
+| `settings:check` | `runSettingsCheck` in `internal/cli/settings.go` | `build.LoadSettings`, `build.OpenSource`, `settings.Plan` |
 | `objects:check`, `objects:eval` | `runObjectsCheck` and `runObjectsEval`, which both start with `planObjects` in `internal/cli/objects.go` | `build.Load`, `build.OpenSource`, `objects.Plan` |
 
 The four commands that plan a whole build are one call of a door of `internal/build`. The commands about one area
@@ -225,10 +227,11 @@ of their own, as the table says.
 
 `Build` in `internal/build/build.go` reads top to bottom:
 
-1. `Load` finds Pkl (`toolchain.FindPkl`) and evaluates the manifest (`manifest.Load`). The result is a
-   `*manifest.Project`: every setting of the project as a Go value.
-2. `AcquireLock` writes `dist/.lock`, so that a second build in the same project fails at once. The manifest is
-   evaluated first, so that a command run outside a project makes no `dist` folder there.
+1. `Load` reads the settings (`manifest.Load`: the project's file, then the user's) and, where the project has a
+   `.pkl` file under `objects/`, finds Pkl (`toolchain.FindPkl`) and evaluates the object files
+   (`manifest.EvaluateObjects`). The result is a `*manifest.Project`: every setting and object as a Go value.
+2. `AcquireLock` writes `dist/.lock`, so that a second build in the same project fails at once. The settings are
+   read first, so that a command run outside a project makes no `dist` folder there.
 3. `prepareArchivePath` works out where the archive goes, `<build.folder>/<map.folder>`, and removes the archive of the
    build before.
 4. `Plan` works out the whole map. Nothing of the map is written yet.
@@ -356,9 +359,11 @@ archive from memory, a test of `build` records what the game would have been sta
 or starts anything by accident.
 
 Files are not behind `Env`. Every package reads and writes them directly, with `os` and `internal/fsx`, and a test
-gives it a temporary folder. The program reads environment variables in two places: `internal/env/cache.go`, for the
-cache folder (`MOONWELL_CACHE`, else the system's own variables), and `internal/toolchain/install.go`, for
-`SystemRoot`, to find `tar.exe` on Windows. `cobra` reads a few of its own while a shell asks it for completions.
+gives it a temporary folder. The program reads environment variables in three places: `internal/env/cache.go`, for
+the cache folder (`MOONWELL_CACHE`, else the system's own variables); `internal/env/configdir.go`, for the folder of
+the user's settings (`MOONWELL_HOME`, else `.moonwell` in the user's home folder); and
+`internal/toolchain/install.go`, for `SystemRoot`, to find `tar.exe` on Windows. `cobra` reads a few of its own while
+a shell asks it for completions. Both folders are fields of `Env`, so a test names its own.
 
 ## Errors
 
@@ -653,10 +658,12 @@ and `mapdir.Open` refuses a link, a name Windows cannot hold and two paths that 
 in it. One rule in one place means a command cannot be more lenient than a build. The game matches a map's file
 names without regard to letter case, so a `Folder` does too. (`internal/mapdir/folder.go`.)
 
-**Pkl is the one judge of a manifest's shape.** The schema holds every type, range, pattern and default, and Pkl's
-error points at the line of the user's file. The Go code decodes what Pkl printed and checks only what Pkl cannot
-see: what a setting needs of the map, and two blocks that disagree. A field the structs do not have is passed over,
-so that a later patch release of the package may add one. (`DecodeProject` in `internal/manifest/load.go`.)
+**Pkl judges the object files, and `internal/manifest` the settings.** For an object, the schema holds every type,
+range and pattern, and Pkl's error points at the line of the user's file. For a setting, `viper` decodes the file
+strictly (an unknown name, a value of the wrong kind and a number that would lose something are refused), and
+`checkRules` holds every range and pattern, each with the setting's name. The areas check only what neither can
+see: what a setting needs of the map, and two settings that disagree. No setting is read from both files, so an
+error names the file the value is in. (`internal/manifest/decode.go`, `internal/manifest/projectfile.go`.)
 
 **`internal/build` keeps one piece of state between calls.** `internal/build/lock.go` keeps the list of build locks
 this process holds. A second Ctrl+C ends the program from outside the command that is running. The function that
@@ -699,9 +706,9 @@ bug in Moonwell, and is printed as an internal error.
 whose content is refused has none. `internal/assets` reads the difference to say whether a failure is a library's
 fault or the machine's, so every error added to `internal/mapdir` keeps the rule. (`internal/mapdir/folder.go`.)
 
-**An error about the `assets` block names `moonwell.pkl`.** The block is written there. The manifest that is
-evaluated is `moonwell.local.pkl` in nearly every project, which does not hold it, and nothing Pkl prints says which
-of the two files wrote a value. (`CollectAssets` in `internal/build/project.go`.)
+**No key of a settings file is data.** `viper` reads a key without regard to letter case and keeps no order, so a
+library's name, an asset's file, a player's slot and a constant's key are values of a list entry, never a key.
+`toProject` turns the lists into the maps the areas read. (`internal/manifest/projectfile.go`.)
 
 **A preview picture is only what the game was seen to read.** A picture the game cannot read closes the game when
 the map is selected in the list. So a TGA or a PNG is decoded and written again in one layout, and only two sizes

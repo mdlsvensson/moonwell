@@ -2,7 +2,8 @@
 
 ## Layout
 
-One Go module at the root, with one dependency beyond the standard library: `cobra`, which reads the command line.
+One Go module at the root, with two dependencies beyond the standard library: `cobra`, which reads the command line,
+and `viper`, which reads the settings files.
 
 [`ARCHITECTURE.md`](ARCHITECTURE.md) is the way into the code. It says what every package does, how a command runs,
 what a build does step by step, and which file to open for what. Read it before you change the code. In short:
@@ -25,7 +26,7 @@ what a build does step by step, and which file to open for what. Read it before 
 - `tools/gen/`: the generator (below). `tools/metadata/` and `tools/natives/` hold the two files it reads that are
   written by hand.
 - `install.ps1`, `install.sh`: the install scripts a release serves.
-- `THIRD_PARTY_LICENSES`: the licences of the three modules the program is built with, each as its authors wrote
+- `THIRD_PARTY_LICENSES`: the licences of the fifteen modules the program is built with, each as its authors wrote
   it. A release hands the file out beside the programs.
 
 ## Working on Moonwell
@@ -89,9 +90,12 @@ commit that changes the behaviour, and the commit message says which recordings 
 
 ## Rules
 
-- **One dependency, `cobra`.** The only third-party modules are `github.com/spf13/cobra` and the two it needs
-  (`pflag`, and `mousetrap` on Windows). Only `internal/cli` imports them, and there is no cgo. `module_test.go`
-  holds `go.mod` to that list and `layout_test.go` holds the import. A further module needs a design the
+- **Two dependencies, `cobra` and `viper`.** The only third-party modules are `github.com/spf13/cobra` with the
+  two it needs (`pflag`, and `mousetrap` on Windows), and `github.com/spf13/viper` with the eleven it brings.
+  Only `internal/cli` imports `cobra` and `pflag`; only `internal/manifest` imports `viper`, its decoder
+  (`mapstructure`) and its TOML reader (`go-toml`), and nothing imports the other nine. There is no cgo.
+  `module_test.go` holds `go.mod` to that list and `layout_test.go` holds the imports. A further module needs a
+  design the
   maintainer approves; it is then added to the list in `module_test.go`, and `layout_test.go` says which package
   may import it. `THIRD_PARTY_LICENSES` names each module at the version `go.mod` requires, with its licence
   (`module_test.go` holds the names and the versions): when a version changes, copy the licence from the module
@@ -273,7 +277,8 @@ The mode `game-paths`:
    released.
 2. Confirm `data/game-paths.txt` starts with `# Warcraft III <version>`, not the "Not generated yet" placeholder:
    with the placeholder every in-game path is reported as `custom path, not imported`.
-3. `cd template`, run `moonwell setup` (it creates `moonwell.local.pkl` if missing; check its `gameExecutable`), then
+3. `cd template`, run `moonwell setup` (it creates `config.toml` in your Moonwell folder if missing and names it;
+   check its `gameExecutable`), then
    `moonwell test`. Confirm "Moonwell is running." prints and the Captain north of the heroes changes colour every
    second (with ally colour mode off: Alt+A toggles it, and while it is on every unit shows blue, teal or red). Confirm
    the Warcraft III window is visible and stays open after `moonwell` exits.
@@ -288,11 +293,12 @@ The mode `game-paths`:
    `ReplaceableTextures\CommandButtons\BTNMoonwell.blp`. Save the map in World Editor and close it, then confirm
    `moonwell assets:check` reports no changes and `moonwell build` succeeds (World Editor 3.00 saves the import with
    flag 29). Delete the icon, sync again and confirm it is gone.
-8. Map settings, in another throwaway project from `init --link`. In its `moonwell.pkl`, set `info.name` and
-   `loadingScreen.title`; a `players` entry for a slot the map has (such as `["0"]` with a `name`, `race` and
-   `fixedStart`); `environment.soundEnvironment`, `environment.waterColor` and fog (`enabled = true`, `start`, `end`,
-   `color`); and `gameplay.heroMaxLevel` and `gameplay.foodLimit`. For team settings, first enable custom forces in
-   World Editor (Scenario > Force Properties), save the map, and set `forces["0"]`, such as `name`, `allied` and
+8. Map settings, in another throwaway project from `init --link`. In its `moonwell.toml`, under `settings`, set
+   `info.name` and `loadingScreen.title`; a `players` entry for a slot the map has (such as `slot = 0` with a `name`,
+   `race` and `fixedStart`); `environment.soundEnvironment`, `environment.waterColor` and fog (`enabled = true`,
+   `start`, `end`, `color`); and `gameplay.heroMaxLevel` and `gameplay.foodLimit`. For team settings, first enable
+   custom forces in World Editor (Scenario > Force Properties), save the map, and set a `forces` entry with
+   `index = 0`, such as `name`, `allied` and
    `sharedVision`. Run `moonwell settings:check` and confirm it lists `war3map.w3i`, `war3map.lua` and
    `war3mapMisc.txt`. Run `moonwell test`, then `moonwell build --minify` and play `dist/bin/map.w3x` from the game's
    Maps folder. Confirm the lobby shows the map name, the slot and the team, and in the game the fog, water colour and
@@ -342,7 +348,8 @@ The mode `game-paths`:
     confirm `captain.greet` completes after the import (lua-language-server indexes the git-ignored `.lua` files). Type
     `CreatUnit` for `CreateUnit` in `src/main.yue`: the editor underlines it, and `moonwell check` fails with
     `src/main.yue:<line>:<column> › Unknown global CreatUnit.` and `Did you mean CreateUnit?`. Set
-    `lint { unknownGlobals = "warning" }` in `moonwell.pkl` and confirm `moonwell build` succeeds and prints the same
+    `unknownGlobals = "warning"` under `[lint]` in `moonwell.toml` and confirm `moonwell build` succeeds and prints
+    the same
     lines as warnings; then undo both changes. Confirm `git status` shows no `.moonwell/` and no `src/**/*.lua` files.
 11. Macros and the game's Lua, in the step 10 project: run `moonwell test` and confirm a standard Footman stands beside
     the Captain (the template makes it with `$FourCC("hfoo")`). In the editor (the project opened as step 10 says),
@@ -381,18 +388,19 @@ The mode `game-paths`:
     `moonwell test --minify`, and confirm the game's error names `lua/greeter.lua` and the right line (Lua modules keep
     their lines in minified builds). Remove the error afterwards.
 
-    Then add the example library by tag in `moonwell.pkl`
-    (`libraries { ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.1.0"; dir = "src" } }`), use it
+    Then add the example library by tag in `moonwell.toml` (a `[[libraries]]` entry with `name = "example"`,
+    `github = "mdlsvensson/moonwell-example-lib"`, `tag = "v0.1.0"` and `dir = "src"`), use it
     from `src/main.yue` (`import "example.loud"`, `print loud.shout "Moonwell"`), run `moonwell check` and commit
     `moonwell.lock`. Confirm the editor completes `loud.shout`, and the game prints the shout. Check with the Lua
     extension's bundled lua-language-server, in the editor or from the command line
     (`<extensions>/sumneko.lua-<version>/server/bin/lua-language-server --check=<project> --checklevel=Hint`), that the
     library's modules give no duplicate-definition diagnostics between `.moonwell/libraries/` and `.moonwell/lua/`.
     Delete `.moonwell/`, run `moonwell check` again, and confirm `moonwell.lock` is unchanged. Finally clone the
-    library next to the project, point `moonwell.local.pkl` at it
-    (`libraries { ["example"] { path = "../moonwell-example-lib"; dir = "src" } }`), change `hello` in its
-    `src/example/greet.lua`, and confirm `moonwell test` runs the change and `moonwell.lock` is unchanged.
-13. Map preview, in another throwaway project from `init --link`: put a 256×256 `.tga` or `.png` beside `moonwell.pkl`
+    library, name its folder in `config.toml` of your Moonwell folder (a `[[libraries]]` entry with
+    `github = "mdlsvensson/moonwell-example-lib"` and the folder's absolute `path`), change `hello` in its
+    `src/example/greet.lua`, and confirm `moonwell test` prints the line that names the local folder, runs the
+    change and leaves `moonwell.lock` unchanged. Remove the entry afterwards.
+13. Map preview, in another throwaway project from `init --link`: put a 256×256 `.tga` or `.png` beside `moonwell.toml`
     and set `settings.info.preview` to its name (both go into the map as the same `.tga`). Confirm
     `moonwell settings:check` lists `war3map.lua`, `war3mapMinimap.blp`, `war3mapMap.blp (removed)` and
     `war3mapMap.tga`. Run `moonwell build` and copy `dist/bin/map.w3x` into the game's `Maps` folder. Open the
@@ -408,7 +416,7 @@ The mode `game-paths`:
 16. The published Pkl package. This step needs the release, so it is the first check after the tag is pushed
     (Publishing, step 5): in a folder outside the checkout, run `moonwell init my-map` without `--link`, then
     `cd my-map` and `moonwell build`. Every test and every step above uses a project linked to the checkout's
-    `schema/`; only this one evaluates a manifest against the package that users get.
+    `schema/`; only this one evaluates object files against the package that users get.
 
 
 ## Publishing

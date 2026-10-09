@@ -16,13 +16,13 @@
 
 - Gameplay with [YueScript](https://yuescript.org/), [Teal](https://teal-language.org/),
   [Fennel](https://fennel-lang.org/).
-- [Pkl](https://pkl-lang.org) for object data, assets and configuration.
+- [Pkl](https://pkl-lang.org) for object data, with a schema for every field.
 - Annotated lua wrappers for Warcraft III natives.
 - Full systems suite including damage engine, physics, missiles, save/load, and more.
 - Powerful cli written in Go.
 - Asset import pipeline: Just drop em in, sync and voilà.
 - Print mdx texture paths to the console.
-- Map settings management in pkl.
+- Map settings in the project's settings file.
 
 ## Quickstart
 
@@ -46,8 +46,9 @@ cd my-map
 moonwell build
 ```
 
-`init` writes `moonwell.local.pkl`, which points `launch.gameExecutable` at the default Battle.net install. If your game
-is elsewhere, fix the path there, then run:
+`init` also makes `config.toml` in your Moonwell folder when it is missing, with `launch.gameExecutable` at the default
+Battle.net install, and its last line names that file (see [Your machine](#your-machine)). If your game is elsewhere,
+fix the path there, then run:
 
 ```powershell
 moonwell test
@@ -65,61 +66,32 @@ and puts it on your PATH:
 
 Moonwell is built for Windows and Linux on x86-64. Run the line again to upgrade: there is no update command.
 
-Moonwell evaluates projects with [Pkl](https://pkl-lang.org). It uses the `pkl` on your PATH when that is Pkl 0.32 or
+Moonwell evaluates a project's object files (`objects/`) with [Pkl](https://pkl-lang.org); a project without object
+files needs no Pkl at all. It uses the `pkl` on your PATH when that is Pkl 0.32 or
 newer. Otherwise it downloads Pkl 0.32.1 (about 100 MB, once, checked against a pinned checksum) into its cache and runs
 that, with a warning when the `pkl` on your PATH is older. `moonwell setup` then copies it next to `yue` in the `bin`
 folder of its cache, so a `pkl` command you type, such as `pkl project resolve`, finds it too. On Windows that is the
 folder above. On Linux it is `~/.cache/moonwell/bin`, and `setup` prints the command that puts it on your PATH.
 
-A project names the Moonwell it is written for in its `PklProject`, as the version of the `moonwell` Pkl package. The
-program and the package must have the same major and minor version; `moonwell` refuses another project and says which
-of the two to change. To install one version, use its own script:
+A project with object files names the Moonwell they are written for in its `PklProject`, as the version of the
+`moonwell` Pkl package. The program and the package must have the same major and minor version; `moonwell` refuses
+another project and says which of the two to change. To install one version, use its own script:
 
 ```powershell
 irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.11.1/install.ps1 | iex
 ```
 
-To move a project to a newer Moonwell, install that version, change the package's version in the project's
-`PklProject` (for example `moonwell@0.8.1` to `moonwell@0.9.0`) and run `pkl project resolve`.
-
-### Upgrading a project to 0.11
-
-A project that builds with Moonwell 0.10 or 0.9 needs three steps to build with 0.11:
-
-1. Install Moonwell 0.11: run the install line again.
-2. In the project's `PklProject`, set the package's version to `moonwell@0.11.1`.
-3. Run `pkl project resolve` in the project folder. If you have no `pkl` command, run `moonwell setup` there first:
-   it copies Moonwell's own Pkl into its cache's `bin` folder and prints the command that puts that folder on your
-   PATH. It then stops at the project's package version, which this step puts right.
-
-From 0.10, nothing else in the project has to change, and it builds the same map. What 0.11 changes is the command
-line: a flag must stand after its command (`moonwell build --minify`), and the [changelog](CHANGELOG.md) lists the
-rest.
-
-From 0.9, in nearly every project nothing in `moonwell.pkl`, the map, `moonwell.lock` or `.asset-state/` has to
-change either. The first command afterwards builds the caches under `dist/` and `.moonwell/` anew. The changelog's
-section on 0.10 lists what that version does differently, and what it refuses that 0.9 let through; the change a
-project is most likely to meet is that `dist` must be a real folder.
-
-### Upgrading a project from 0.7
-
-Moonwell 0.7 and earlier ran on Deno. A project made with one of them needs four steps:
-
-1. Install `moonwell`, as above.
-2. In `PklProject`, change the package's version: `moonwell@0.7.0` becomes `moonwell@0.11.1`.
-3. Run `pkl project resolve`.
-4. Delete `deno.json` and `deno.lock`. Where you ran `deno task build`, run `moonwell build`; the same goes for every
-   other command.
-
-Nothing else changes in the project: the manifest, the map and the libraries stay as they are. The caches under
-`dist/` and `.moonwell/` are built anew by the first command.
+To move a project's object files to a newer Moonwell, install that version, change the package's version in the
+project's `PklProject` (the line there becomes `moonwell@0.11.1`) and run `pkl project resolve`. If you have no `pkl`
+command, run `moonwell setup` in the project first: it copies Moonwell's own Pkl into its cache's `bin` folder and
+prints the command that puts that folder on your PATH.
 
 ## A project
 
 | Path                 | What                                                                                                   |
 | -------------------- | ------------------------------------------------------------------------------------------------------ |
-| `moonwell.pkl`       | Project manifest (`amends "@moonwell/Project.pkl"`), shared by the team; everyday settings written out |
-| `moonwell.local.pkl` | This machine's settings, such as the game path; git-ignored, and `moonwell setup` recreates it         |
+| `moonwell.toml`      | The project's settings and the map's, shared by the team (see [Settings](#settings))                   |
+| `PklProject`         | The version of the `moonwell` Pkl package the object files are written for; `PklProject.deps.json` beside it is written by `pkl project resolve` |
 | `src/main.yue`       | Gameplay entry                                                                                         |
 | `lua/`               | Plain Lua modules, bundled when gameplay code requires them (see "Lua modules")                        |
 | `objects/`           | Custom units, heroes, items, abilities and more, in Pkl                                                |
@@ -134,8 +106,8 @@ Nothing else changes in the project: the manifest, the map and the libraries sta
 | `.moonwell/`         | Libraries and editor declarations, written by `check`, `build`, `test`, `dev`, `setup` and the three `assets:` commands; git-ignored |
 | `dist/`              | Build output                                                                                           |
 
-`moonwell.local.pkl` amends `moonwell.pkl`, so any setting can be overridden there for your machine only. Lists such as
-`launch.args` are replaced, not extended: `args = List("-launch", "-windowmode", "fullscreen")`.
+What belongs to your machine and not to the project, such as the game's path, is not in the project: see
+[Your machine](#your-machine).
 
 `dist/` and the folder the map is built into (`build.folder`, by default `dist/bin`) are real folders. Moonwell
 removes and replaces what it wrote there, so it refuses a link or a Windows junction on the way to anything it writes
@@ -199,7 +171,7 @@ the map in World Editor to pick up new `gg_` and `udg_` globals.
   `debug` and `package` in the editor; lua-language-server cannot turn off single functions, so the editor does not flag
   the others.
 - **Pkl.** Pkl files need no editor plugin: the `pkl` and `moonwell` programs do all the work. Editors with Pkl
-  support (the Pkl extension for VS Code, the IntelliJ plugin) add completion and hover docs for `moonwell.pkl` and
+  support (the Pkl extension for VS Code, the IntelliJ plugin) add completion and hover docs for the files under
   `objects/`. They find the schema through `PklProject`, so run their "sync projects" command once after `init`. If the
   extension cannot find `pkl`, set its CLI path (`pkl.cli.path` in VS Code).
 
@@ -209,7 +181,7 @@ the map in World Editor to pick up new `gg_` and `udg_` globals.
 
 ```text
 error: src/main.yue:9:10 › Unknown global CreatUnit.
-hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl.
+hint: Did you mean CreateUnit? Declare your own globals with `global`, or add them to lint.globals in moonwell.toml.
 ```
 
 A global is known when it is a native, any function, global or constant of common.j or Blizzard.j (such as
@@ -217,7 +189,7 @@ A global is known when it is a native, any function, global or constant of commo
 (such as `gg_unit_Hpal_0002` or `udg_Score`; run the command again after saving the map in World Editor); a name
 declared with `global` (`global Score = 0`, `global a, b`), or defined at the top level of a Lua file (see "Lua
 modules"), in a module the map requires: its entry (`map.entry`, or `--entry`), and every module reached from it through
-`import`/`require`, including library modules; or a name listed in `lint.globals` in `moonwell.pkl`. Fields are not
+`import`/`require`, including library modules; or a name listed in `lint.globals` in `moonwell.toml`. Fields are not
 checked: `math.floor` checks only `math`.
 
 Only the files under `src/` that the map requires are checked. A file nothing imports is not checked, and its `global`
@@ -276,15 +248,17 @@ through `.luarc.json`'s `runtime.path`; `moonwell setup` adds the entries to a p
 ## Libraries
 
 A library is a folder of YueScript and Lua modules, and of files for the map, from a GitHub tag or a local folder. List
-libraries in `moonwell.pkl`:
+libraries in `moonwell.toml`, one entry for each:
 
-```pkl
-libraries {
-  ["example"] { github = "mdlsvensson/moonwell-example-lib"; tag = "v0.2.0" }
-}
+```toml
+[[libraries]]
+name = "example"
+github = "mdlsvensson/moonwell-example-lib"
+tag = "v0.2.0"
 ```
 
-The key names the library's folder in `.moonwell/libraries/`, so keys must differ by more than case. A library's modules
+The `name` names the library's folder in `.moonwell/libraries/`, so names must differ by more than case. A library's
+modules
 keep their own names (`import "example.loud"`), and share one set of names with `src/` and `lua/`: a name two of them
 define fails the build. A `.lua` file next to a `.yue` file of the same name in a library is its compiled output, and is
 skipped.
@@ -295,9 +269,9 @@ A library describes its own layout in a `moonwell-library.json` at its root:
 { "dir": "src", "assets": "assets" }
 ```
 
-- `dir` is the folder module names start from. A library without the file needs it in the manifest instead
-  (`["old"] { github = "owner/repo"; tag = "v1.0.0"; dir = "src" }`), and a `dir` in the manifest always wins. With
-  neither, module names start at the library's root.
+- `dir` is the folder module names start from. A library without the file needs it in its entry in `moonwell.toml`
+  instead (`dir = "src"`), and a `dir` written there always wins. With neither, module names start at the library's
+  root.
 - `assets` is a folder of files the map imports, each at its path in that folder: see [Assets](#assets).
 
 Both are optional. Any other key fails, naming the library: it may be written for a newer Moonwell.
@@ -307,13 +281,31 @@ into `.moonwell/libraries/<key>/`, and its files for the map into `.moonwell/lib
 and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`: a fresh clone then gets the same code, and if a
 tag is moved on GitHub, the command fails instead of using the new code. To upgrade, change `tag`.
 
-To work on a library next to your map, point it at a local folder, the library's root, in `moonwell.local.pkl`:
+To work on a library while a map uses it, say in `config.toml` of [your machine](#your-machine) where its repository
+is on your disk:
 
-```pkl
-libraries { ["example"] { path = "../moonwell-example-lib" } }
+```toml
+[[libraries]]
+github = "mdlsvensson/moonwell-example-lib"
+path = 'C:\Users\me\Repo\moonwell-example-lib'
 ```
 
-`path` wins over `github`. Its `.yue` and `.lua` files, and the files of its assets folder, are copied into `.moonwell/`
+Every project on your machine that lists that repository then takes the library from the folder, whatever tag it
+names, and each command says so in a line: `Library example: the local folder C:\Users\me\Repo\moonwell-example-lib
+(C:\Users\me\.moonwell\config.toml).` The entry adds no library to a project that does not list the repository, and
+nothing in any project changes: remove the entry to go back to the tag. The folder is the library's root, as an
+absolute path.
+
+A library that lives inside or beside one project can be named there by a `path` in place of `github` and `tag`,
+relative to the project or absolute:
+
+```toml
+[[libraries]]
+name = "mine"
+path = "../my-library"
+```
+
+A local folder's `.yue` and `.lua` files, and the files of its assets folder, are copied into `.moonwell/`
 (folders whose name starts with `.`, such as `.git/`, are skipped), so errors in them name the copy there, not your
 checkout. `dev` watches those folders, but picks the folders to watch when it starts: restart it after adding a local
 library. A local library keeps its entry in `moonwell.lock`, so switching back to the tag still checks it. Library code
@@ -325,14 +317,16 @@ wrote them.
 ## Assets
 
 Every file under `assets/` is imported into the built map at its relative path: `assets/Models/unit.mdx` becomes
-`Models\unit.mdx`. Names starting with `.` are skipped. The `assets` block in `moonwell.pkl` maps files to exact in-map
-paths and leaves files out:
+`Models\unit.mdx`. Names starting with `.` are skipped. `assets` in `moonwell.toml` maps files to exact in-map paths
+and leaves files out:
 
-```pkl
-assets {
-  paths { ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"# }
-  exclude = List("credits/")
-}
+```toml
+[assets]
+exclude = ["credits/"]
+
+[[assets.paths]]
+file = "icons/BTNSword.blp"
+path = 'ReplaceableTextures\CommandButtons\BTNSword.blp'
 ```
 
 An asset cannot take the name of one of the map's own files, such as `war3map.lua`. That includes `war3mapPreview.tga`,
@@ -378,22 +372,32 @@ a placeholder where a disabled icon is missing.
 
 ## Map settings
 
-The `settings` block in `moonwell.pkl` overrides the map's own settings: its name and loading screen, player slots,
-forces, environment and gameplay constants. `init` writes every everyday setting out at `null`, so a new project keeps
-everything the map has. Set only what you want to change:
+The `settings` tables in `moonwell.toml` override the map's own settings: its name and loading screen, player slots,
+forces, environment and gameplay constants. `init` writes none of them, so a new project keeps everything the map has.
+Set only what you want to change; [Settings](#settings) lists every one:
 
-```pkl
-settings {
-  info { name = "My Map"; author = "" }
-  gameplay { heroMaxLevel = 25; foodLimit = 200 }
-  environment { waterColor = List(20, 40, 80, 255) }
-}
+```toml
+[settings.info]
+name = "My Map"
+author = ""
+
+[settings.gameplay]
+heroMaxLevel = 25
+foodLimit = 200
+
+[settings.environment]
+waterColor = [20, 40, 80, 255]
+
+[[settings.players]]
+slot = 3
+name = "Blue"
+controller = "computer"
 ```
 
-- **Inheritance and clearing.** A `null` or omitted setting keeps the map's value. `false`, `0` and `""` are real
+- **Inheritance and clearing.** A setting that is not written keeps the map's value. `false`, `0` and `""` are real
   values: `author = ""` clears the author. Text you set is written as literal text; text you leave alone keeps its
   `TRIGSTR_*` reference into `war3map.wts`, which Moonwell never rewrites.
-- **Colors** are `List(red, green, blue, alpha)`, each 0 to 255, and replace the map's color whole. Setting `waterColor`
+- **Colors** are `[red, green, blue, alpha]`, each 0 to 255, and replace the map's color whole. Setting `waterColor`
   turns on the map's custom water tint. `fog.enabled` switches fog on or off; the other fog fields do not switch it on.
   After inheriting any value you leave out, fog `start` must not exceed `end`.
 - **Staged copy only.** Builds and `moonwell test` write settings into the staged copy in `dist/stage/`, never into
@@ -403,11 +407,12 @@ settings {
   saves version 39. A loading-screen `model` needs version 25 or later. `players`, `forces` and `environment` need
   version 28 or later and Lua as the script language. If a map is refused, open it in World Editor and save it again in
   folder format with Lua as the script language.
-- **Existing players and forces only.** `players["3"]` is the slot World Editor shows as Player 4 (IDs are zero-based, 0
-  to 23), and `forces["0"]` is the first force. Settings change existing slots and forces; they never add or remove one
-  or change which players are on a team. Create slots in World Editor's Scenario > Player Properties and save first.
+- **Existing players and forces only.** A `[[settings.players]]` entry with `slot = 3` is the slot World Editor shows
+  as Player 4 (slots are zero-based, 0 to 23), and a `[[settings.forces]]` entry with `index = 0` is the first force.
+  Settings change existing slots and forces; they never add or remove one or change which players are on a team.
+  Create slots in World Editor's Scenario > Player Properties and save first.
 - **Custom forces.** Force settings need custom forces: in World Editor, open Scenario > Force Properties, turn on Use
-  Custom Forces, set up the teams, and save the map. The template's commented `forces` example says the same.
+  Custom Forces, set up the teams, and save the map.
 - **Editor Lua calls.** World Editor writes some settings into `war3map.lua` too, and Moonwell edits those calls to
   match: `SetMapName` and `SetMapDescription` in `config()`, the player calls in `InitCustomPlayerSlots()`, the team
   calls in `InitCustomTeams()`, and the sound, water and fog calls in `main()` (before `CreateAllUnits()` or
@@ -419,14 +424,13 @@ settings {
 
 `settings.info.preview` names a picture that the game's map list shows for the map, instead of its minimap:
 
-```pkl
-settings {
-  info { preview = "preview.png" }
-}
+```toml
+[settings.info]
+preview = "preview.png"
 ```
 
 - **The file.** A `.png`, a `.tga` or a `.blp` of 256×256 or 512×512 pixels, at a path from the project folder. Keep
-  it beside `moonwell.pkl`, not under `assets/`.
+  it beside `moonwell.toml`, not under `assets/`.
   - A PNG of any kind is read: 8 or 16 bits, colour, grey or palette, interlaced or not. A TGA must be true colour,
     24 or 32 bits, with or without RLE compression.
   - Moonwell writes a PNG or a TGA into the map as a TGA in the one layout the game is known to read, fully opaque:
@@ -463,8 +467,8 @@ Map settings valid: 3 internal file(s) would change during build.
 
 A file a build removes is listed as `war3mapMap.blp (removed)`; that happens for a TGA picture.
 
-`moonwell check` (and so `dev`) checks settings the same way. Mistakes in the manifest name the manifest that was
-evaluated (`moonwell.local.pkl` when it exists, else `moonwell.pkl`). Problems with the map name the file under
+`moonwell check` (and so `dev`) checks settings the same way. A mistake in a setting names `moonwell.toml` and the
+setting. Problems with the map name the file under
 `maps/<folder>/`, such as `maps/map.w3x/war3map.w3i`. Map files are matched ignoring letter case, as Warcraft III
 does: a map saved with `war3mapskin.txt` is patched under that name.
 
@@ -472,12 +476,8 @@ does: a map saved with `war3mapskin.txt` is patched under that name.
 
 Custom units, heroes, buildings, items, abilities, buffs and upgrades are written in Pkl under `objects/`. Builds add
 them to the map's object data (`war3map.w3u` and the other modification files, and their `war3mapSkin.*` counterparts),
-in the staged copy only. `moonwell.pkl` merges every file under `objects/`, in any folders:
-
-```pkl
-import "@moonwell/Objects.pkl"
-objects = Objects.merge(import*("objects/**.pkl"))
-```
+in the staged copy only. Moonwell merges every `.pkl` file under `objects/`, in any folders; a project with none has
+no objects and runs no Pkl.
 
 Every file there amends `@moonwell/ObjectFile.pkl` and fills any of the mappings `heroes`, `units`, `buildings`,
 `items`, `abilities`, `buffs` and `upgrades`. Put shared helpers in a module outside `objects/` and import them, since
@@ -590,7 +590,7 @@ Not supported yet:
 | `moonwell settings:check`                       | Show which internal map files the settings would change, without building        |
 | `moonwell objects:check`                        | Validate the objects and show which internal map files they would change         |
 | `moonwell objects:eval`                         | Print the resolved objects as JSON                                               |
-| `moonwell setup`                                | Create a missing `moonwell.local.pkl`, download YueScript and prepare the editor |
+| `moonwell setup`                                | Create a missing `config.toml` of yours, download YueScript and prepare the editor |
 
 A flag is written after its command: `moonwell build --minify`. `--entry` takes its file after a space or after
 `=`, and `--` ends the flags. A line Moonwell cannot read, such as one with a flag or a command it does not have
@@ -613,40 +613,85 @@ The compiler, and Pkl when Moonwell needs its own, are downloaded once per versi
 cached in `MOONWELL_CACHE` when that is set, else in `%LOCALAPPDATA%\moonwell` on Windows, else in
 `$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`. `setup` also copies Moonwell's own Pkl to that folder's `bin`.
 
-## Advanced settings
+## Settings
 
-These are not in the generated files and keep their defaults unless you add them. The schema, `Project.pkl` in the
-`moonwell` Pkl package, documents every setting.
+Moonwell reads two files, both [TOML](https://toml.io): `moonwell.toml` in the project, shared by the team, and
+`config.toml` in your Moonwell folder, for your machine. No setting is read from both. Every setting has a default, so
+a file holds only what it changes. A setting's name is read without regard to letter case; a name Moonwell does not
+know is an error, and so is a value of the wrong kind.
 
-| Setting       | Default  | What                                                                                        |
-| ------------- | -------- | ------------------------------------------------------------------------------------------- |
-| `yue.version` | `0.34.3` | YueScript compiler version. Only versions this CLI release pins a checksum for are accepted |
-| `yue.path`    | none     | Your own `yue` binary instead of the downloaded one. Set it in `moonwell.local.pkl`         |
+### The project: `moonwell.toml`
 
-```pkl
-yue {
-  path = "C:\\tools\\yue.exe"
-}
+| Setting | Default | Rule |
+| --- | --- | --- |
+| `map.folder` | `"map.w3x"` | Ends in `.w3x`; a relative path with no `..` |
+| `map.entry` | `"src/main.yue"` | Starts with `src/`, ends in `.yue` |
+| `build.folder` | `"dist/bin"` | A relative path with no `..`; not `maps`, `src` or `dist/stage`, nor below one |
+| `build.minify` | `false` | `true` shrinks the script, but runtime errors lose their line numbers |
+| `yue.version` | `"0.34.3"` | YueScript compiler version. Only versions this release pins a checksum for are accepted |
+| `assets.exclude` | `[]` | Files under `assets/`, or folders ending in `/`, to leave out |
+| `[[assets.paths]]` | none | `file` under `assets/` and its exact in-map `path`; a `file` once |
+| `lint.unknownGlobals` | `"error"` | `"error"` or `"warning"` |
+| `lint.globals` | `[]` | Extra global names to allow; Lua names, no reserved word |
+| `[[libraries]]` | none | `name` (letters, digits, `_` and `-`); `github` as `owner/repo` with a `tag`, or a `path`; `dir` |
+| `settings.info` | absent | `name`, `author`, `description`, `recommendedPlayers`, `preview` |
+| `settings.loadingScreen` | absent | `background` (-1 selects a custom model), `model`, `text`, `title`, `subtitle` |
+| `settings.gameplay` | absent | `heroMaxLevel` 1 to 10000, `foodLimit` 0 to 300 |
+| `[[settings.players]]` | none | `slot` 0 to 23; `name`; `controller`: `user`, `computer`, `neutral` or `rescuable`; `race`: `selectable`, `human`, `orc`, `undead` or `nightelf`; `fixedStart`; `x`, `y` |
+| `[[settings.forces]]` | none | `index` 0 to 23; `name`, `allied`, `alliedVictory`, `sharedVision`, `sharedControl`, `sharedAdvancedControl` |
+| `settings.environment` | absent | `soundEnvironment` (World Editor's name, such as `"Dungeon"`), `waterColor` |
+| `settings.environment.fog` | absent | `enabled`, `style` 0 to 2, `start`, `end`, `density` 0 to 1, `color` |
+| `[[settings.gameplayConstants]]`, `[[settings.gameInterface]]` | none | `section`, `key`, `value`: see below |
+
+The names with two brackets are lists: write one entry for each library, player, force, mapped asset or constant,
+and they are used in the order they are written.
+
+### Your machine
+
+`config.toml` is in `.moonwell` in your user folder (`C:\Users\<you>\.moonwell\config.toml` on Windows), or in the
+folder the variable `MOONWELL_HOME` names. `init` and `setup` make it when it is missing and never change it afterwards.
+A missing file is no error.
+
+| Setting | Default | What |
+| --- | --- | --- |
+| `launch.gameExecutable` | none | The path of `Warcraft III.exe`, for `moonwell test` |
+| `launch.args` | `["-launch", "-windowmode", "windowed"]` | Passed to the game before `-loadfile <map>`. A list here replaces the default one |
+| `yue.path` | none | Your own `yue` binary instead of the downloaded one |
+| `[[libraries]]` | none | `github` and `path`: a repository's folder on this machine (see [Libraries](#libraries)) |
+
+```toml
+[launch]
+gameExecutable = 'D:\Games\Warcraft III\_retail_\x86_64\Warcraft III.exe'
+args = ["-launch", "-windowmode", "fullscreen"]
+
+[yue]
+path = 'C:\tools\yue.exe'
 ```
+
+A path between single quotes is written as it is, with single backslashes.
 
 ### Raw gameplay constants and game interface
 
 `settings.gameplayConstants` and `settings.gameInterface` set any section and key in `war3mapMisc.txt` (World Editor's
-Gameplay Constants) and `war3mapSkin.txt` (Game Interface). They are left out of the template; their schema is in
-`MapSettings.pkl`, which `Project.pkl` imports.
+Gameplay Constants) and `war3mapSkin.txt` (Game Interface), one entry for each key:
 
-```pkl
-settings {
-  gameplayConstants { ["Misc"] { ["MaxHeroLevel"] = "25" } }
-  gameInterface { ["CustomSkin"] { ["Test"] = "value" } }
-}
+```toml
+[[settings.gameplayConstants]]
+section = "Misc"
+key = "MaxHeroLevel"
+value = "25"
+
+[[settings.gameInterface]]
+section = "CustomSkin"
+key = "Test"
+value = "value"
 ```
 
 `CustomSkin`/`Test` only shows the syntax: it is an invented key, and nothing says Warcraft III reads it.
 
 - Values are strings, written as they are: `"25"`, not `25`. A value is one line, and `""` writes an empty `Key=`.
 - Section and key names are letters, digits and `_`, and match the file's names ignoring letter case. The file keeps its
-  own spelling. Two names in one mapping that differ only in case are an error.
+  own spelling. Two entries for one section and key, also when they differ only in case, are an error.
 - Every matching key is replaced, a missing key is added to its section, and a missing section or file is created. Other
   sections, keys and comments stay as they are.
 - `gameplay.heroMaxLevel` and `gameplay.foodLimit` write `[Misc] MaxHeroLevel` and `[Misc] FoodCeiling`. If you set the

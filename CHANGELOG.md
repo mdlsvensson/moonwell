@@ -1,5 +1,41 @@
 # Changelog
 
+## Unreleased
+
+- **A project of 0.11 is not read.** The settings moved out of Pkl, and this version reads no `moonwell.pkl` and no
+  `moonwell.local.pkl`. In a folder with only those it says "No moonwell.toml found in this directory."
+- **A project's settings are in `moonwell.toml`.** One TOML file holds what `moonwell.pkl` held, the map's settings
+  included: `map`, `build`, `yue.version`, `assets`, `lint`, `libraries` and `settings`. Every setting has its
+  default, so the file `init` writes holds the everyday ones alone. Where the manifest had a mapping keyed by a
+  name, the file has a list: `[[libraries]]` with a `name`, `[[assets.paths]]` with a `file` and a `path`,
+  `[[settings.players]]`
+  with a `slot`, `[[settings.forces]]` with an `index`, and `[[settings.gameplayConstants]]` and
+  `[[settings.gameInterface]]` with a `section`, a `key` and a `value`. A map setting that is not written keeps the
+  map's value, as `null` did. The README's new section "Settings" lists every setting with its default and rule.
+- **Your machine's settings are in `config.toml` in your Moonwell folder,** `.moonwell` in your user folder
+  (`C:\Users\<you>\.moonwell` on Windows), and no longer in a file of each project. It holds
+  `launch.gameExecutable`, `launch.args` and `yue.path`. `init` and `setup` make it when it is missing, with the
+  default Battle.net path, and say where it is; neither changes one that is there. The variable `MOONWELL_HOME` names
+  another folder. A `launch` table or a `yue.path` in a project's `moonwell.toml` is refused, naming your file.
+- **A library's local folder is said once, for its repository,** in your `config.toml`: a `[[libraries]]` entry with
+  `github` and an absolute `path`. Every project on the machine that lists that repository takes the library from
+  the folder, and each command says so in a line. The entry adds no library to a project that does not list it. A
+  `path` in a project's own entry still names a library kept inside or beside that project.
+- **Pkl is for object files alone.** Moonwell runs it only where a project has a `.pkl` file under `objects/`,
+  through a module it writes to `.moonwell/objects.pkl`. A project without object files needs no Pkl, no
+  `PklProject` and no `pkl project resolve`, and Moonwell downloads no Pkl for it. `settings:check`, `assets:check`,
+  `assets:sync` and `assets:paths` never run Pkl. The Pkl package holds the object schema and no longer
+  `Project.pkl` and `MapSettings.pkl`; an object file is written as before.
+- **Errors about a setting name the file it is in and the setting,** such as `moonwell.toml › build.folder ...`.
+  A file that is not valid TOML is reported with its line and column. A name Moonwell does not know and a value of
+  the wrong kind are refused in the words of the library that reads the file, without a line number. Three errors
+  about the map changed their words with the file's shape: a player or a force the map lacks is named by its number
+  and no longer as `settings.players["5"]`.
+- **Settings are read by `viper`.** The program is built with twelve more modules of other authors and is about
+  1 MB larger. `THIRD_PARTY_LICENSES` names all fifteen with their licences.
+- **Editors show no help for `moonwell.toml` yet.** The Pkl manifest had completion and hover in an editor with Pkl
+  support; the README's list of settings stands in for it.
+
 ## 0.11.1 (2026-10-09)
 
 - **Nothing a user can notice has changed.** This version does what 0.11.0 does: the same commands and flags, the
