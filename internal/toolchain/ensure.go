@@ -34,30 +34,30 @@ func Ensure(ctx context.Context, e *env.Env, tool Tool, version string) (path st
 	if err != nil {
 		return "", err
 	}
-	in := installer{ctx: ctx, e: e, tool: tool, version: version, asset: asset}
-	in.target = filepath.Join(e.CacheDir, tool.Name, version)
-	if cached := in.programPath(in.target); fsx.Exists(cached) {
+	inst := installer{ctx: ctx, e: e, tool: tool, version: version, asset: asset}
+	inst.target = filepath.Join(e.CacheDir, tool.Name, version)
+	if cached := inst.programPath(inst.target); fsx.Exists(cached) {
 		return cached, nil
 	}
-	download, err := in.download()
+	download, err := inst.download()
 	if err != nil {
 		return "", err
 	}
-	if err := in.verify(download); err != nil {
+	if err := inst.verify(download); err != nil {
 		return "", err
 	}
-	staging, err := in.makeStagingDir()
+	staging, err := inst.makeStagingDir()
 	if err != nil {
 		return "", err
 	}
-	defer in.removeStagingDir(staging)
-	if err := in.unpack(download, staging); err != nil {
+	defer inst.removeStagingDir(staging)
+	if err := inst.unpack(download, staging); err != nil {
 		return "", err
 	}
-	if err := in.verifyVersion(staging); err != nil {
+	if err := inst.verifyVersion(staging); err != nil {
 		return "", err
 	}
-	return in.moveIntoPlace(staging)
+	return inst.moveIntoPlace(staging)
 }
 
 func (tool Tool) assetFor(version, platform string) (Asset, error) {

@@ -20,46 +20,23 @@ func CopyToBinDir(e *env.Env, tool Tool, program string) (path string, copied bo
 	return path, copied, nil
 }
 
-func AddToPathCommand(binDir, goos string) string {
-	if goos == "windows" {
-		entry := strings.ReplaceAll(";"+binDir, "'", "''")
-		return "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + '" +
-			entry + "', 'User')"
+func CopyPklToBinDir(ctx context.Context, e *env.Env, program, goos string) error {
+	if program == Pkl.Name {
+		return nil
 	}
-	return `echo 'export PATH="` + binDir + `:$PATH"' >> ~/.profile`
-}
-
-func ParentDir(path string) string {
-	root := len(filepath.VolumeName(path))
-	end := lastNameStart(path, root)
-	if end == root {
-		if root > 0 {
-			return path[:root]
-		}
-		return "."
+	path, copied, err := CopyToBinDir(e, Pkl, program)
+	if err != nil {
+		return err
 	}
-	for end > root+1 && os.IsPathSeparator(path[end-1]) {
-		end--
+	if copied {
+		e.Log.Info("Copied Pkl " + PklVersion + " to " + path + ".")
 	}
-	return path[:end]
-}
-
-func lastNameStart(path string, root int) int {
-	end := len(path)
-	for end > root && os.IsPathSeparator(path[end-1]) {
-		end--
+	if _, err := Pkl.runVersionCommand(ctx, e, Pkl.Name, ""); !isStartFailure(err) {
+		return err
 	}
-	for end > root && !os.IsPathSeparator(path[end-1]) {
-		end--
-	}
-	return end
-}
-
-func shellName(goos string) string {
-	if goos == "windows" {
-		return "PowerShell"
-	}
-	return "your shell"
+	e.Log.Warn("pkl is not on PATH, so a pkl command you type, such as `pkl project resolve`, finds no Pkl. " +
+		"Run this once in " + shellName(goos) + ", then open a new terminal:\n  " + AddToPathCommand(filepath.Dir(path), goos))
+	return nil
 }
 
 func WarnIfYueNotOnPath(ctx context.Context, e *env.Env, version, binDir, goos string) error {
@@ -88,23 +65,46 @@ func findYueOnPath(ctx context.Context, e *env.Env) (version string, found bool,
 	return version, version != "", nil
 }
 
-func CopyPklToBinDir(ctx context.Context, e *env.Env, program, goos string) error {
-	if program == Pkl.Name {
-		return nil
+func AddToPathCommand(binDir, goos string) string {
+	if goos == "windows" {
+		entry := strings.ReplaceAll(";"+binDir, "'", "''")
+		return "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + '" +
+			entry + "', 'User')"
 	}
-	path, copied, err := CopyToBinDir(e, Pkl, program)
-	if err != nil {
-		return err
+	return `echo 'export PATH="` + binDir + `:$PATH"' >> ~/.profile`
+}
+
+func shellName(goos string) string {
+	if goos == "windows" {
+		return "PowerShell"
 	}
-	if copied {
-		e.Log.Info("Copied Pkl " + PklVersion + " to " + path + ".")
+	return "your shell"
+}
+
+func ParentDir(path string) string {
+	root := len(filepath.VolumeName(path))
+	end := lastNameStart(path, root)
+	if end == root {
+		if root > 0 {
+			return path[:root]
+		}
+		return "."
 	}
-	if _, err := Pkl.runVersionCommand(ctx, e, Pkl.Name, ""); !isStartFailure(err) {
-		return err
+	for end > root+1 && os.IsPathSeparator(path[end-1]) {
+		end--
 	}
-	e.Log.Warn("pkl is not on PATH, so a pkl command you type, such as `pkl project resolve`, finds no Pkl. " +
-		"Run this once in " + shellName(goos) + ", then open a new terminal:\n  " + AddToPathCommand(filepath.Dir(path), goos))
-	return nil
+	return path[:end]
+}
+
+func lastNameStart(path string, root int) int {
+	end := len(path)
+	for end > root && os.IsPathSeparator(path[end-1]) {
+		end--
+	}
+	for end > root && !os.IsPathSeparator(path[end-1]) {
+		end--
+	}
+	return end
 }
 
 func errNotCopied(tool Tool, path string, cause error) error {

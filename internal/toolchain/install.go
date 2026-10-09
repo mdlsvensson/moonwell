@@ -26,90 +26,90 @@ type installer struct {
 	target  string
 }
 
-func (in installer) programPath(dir string) string {
-	return filepath.Join(dir, filepath.FromSlash(in.asset.Binary))
+func (inst installer) programPath(dir string) string {
+	return filepath.Join(dir, filepath.FromSlash(inst.asset.Binary))
 }
 
-func (in installer) download() ([]byte, error) {
-	in.e.Log.Info("Downloading " + in.tool.Title + " " + in.version + "...")
-	status, body, err := in.e.Fetch(in.ctx, in.asset.URL)
+func (inst installer) download() ([]byte, error) {
+	inst.e.Log.Info("Downloading " + inst.tool.Title + " " + inst.version + "...")
+	status, body, err := inst.e.Fetch(inst.ctx, inst.asset.URL)
 	switch {
-	case err != nil && in.ctx.Err() != nil:
-		return nil, in.ctx.Err()
+	case err != nil && inst.ctx.Err() != nil:
+		return nil, inst.ctx.Err()
 	case err != nil:
-		return nil, errDownloadFailed(in.tool, in.asset.URL, err)
+		return nil, errDownloadFailed(inst.tool, inst.asset.URL, err)
 	case status < 200 || status > 299:
-		return nil, errDownloadStatus(in.tool, in.asset.URL, status)
+		return nil, errDownloadStatus(inst.tool, inst.asset.URL, status)
 	}
 	return body, nil
 }
 
-func (in installer) verify(download []byte) error {
-	if actual := fsx.SHA256Hex(download); actual != in.asset.SHA256 {
-		return errChecksum(in.tool, in.asset.SHA256, actual)
+func (inst installer) verify(download []byte) error {
+	if actual := fsx.SHA256Hex(download); actual != inst.asset.SHA256 {
+		return errChecksum(inst.tool, inst.asset.SHA256, actual)
 	}
 	return nil
 }
 
-func (in installer) makeStagingDir() (string, error) {
-	beside := filepath.Dir(in.target)
+func (inst installer) makeStagingDir() (string, error) {
+	beside := filepath.Dir(inst.target)
 	if err := os.MkdirAll(beside, 0o777); err != nil {
-		return "", errNotInstalled(in.tool, beside, err)
+		return "", errNotInstalled(inst.tool, beside, err)
 	}
 	staging, err := os.MkdirTemp(beside, ".install-")
 	if err != nil {
-		return "", errNotInstalled(in.tool, beside, err)
+		return "", errNotInstalled(inst.tool, beside, err)
 	}
 	return staging, nil
 }
 
-func (in installer) removeStagingDir(staging string) {
+func (inst installer) removeStagingDir(staging string) {
 	if err := fsx.RemoveAll(staging); err != nil {
 		reason := strings.TrimSuffix(fsx.Reason(err), ".")
-		in.e.Log.Warn("Moonwell could not remove its staging folder " + staging + " (" + reason +
+		inst.e.Log.Warn("Moonwell could not remove its staging folder " + staging + " (" + reason +
 			"). Nothing in it is used; remove the folder yourself.")
 	}
 }
 
-func (in installer) unpack(download []byte, staging string) error {
-	staged := in.programPath(staging)
+func (inst installer) unpack(download []byte, staging string) error {
+	staged := inst.programPath(staging)
 	if err := os.MkdirAll(filepath.Dir(staged), 0o777); err != nil {
-		return errNotInstalled(in.tool, filepath.Dir(staged), err)
+		return errNotInstalled(inst.tool, filepath.Dir(staged), err)
 	}
-	if err := in.unpackAs(download, staging, staged); err != nil {
+	if err := inst.unpackArchive(download, staging, staged); err != nil {
 		return err
 	}
 	if !fsx.Exists(staged) {
-		return errProgramMissing(in.tool, in.asset.Binary)
+		return errProgramMissing(inst.tool, inst.asset.Binary)
 	}
 	if runtime.GOOS == "windows" {
 		return nil
 	}
 	if err := os.Chmod(staged, 0o755); err != nil {
-		return errNotInstalled(in.tool, staged, err)
+		return errNotInstalled(inst.tool, staged, err)
 	}
 	return nil
 }
 
-func (in installer) unpackAs(download []byte, staging, staged string) error {
-	switch in.asset.Archive {
+func (inst installer) unpackArchive(download []byte, staging, staged string) error {
+	switch inst.asset.Archive {
 	case "":
-		return in.writeFile(staged, download)
+		return inst.writeFile(staged, download)
 	case "zip":
-		program, err := readZipEntry(in.tool, download, in.asset.Binary)
+		program, err := readZipEntry(inst.tool, download, inst.asset.Binary)
 		if err != nil {
 			return err
 		}
-		return in.writeFile(staged, program)
+		return inst.writeFile(staged, program)
 	case "7z":
-		return in.untar(download, staging)
+		return inst.extractWithTar(download, staging)
 	}
-	return errUnknownArchiveKind(in.asset.Archive)
+	return errUnknownArchiveKind(inst.asset.Archive)
 }
 
-func (in installer) writeFile(file string, data []byte) error {
+func (inst installer) writeFile(file string, data []byte) error {
 	if err := os.WriteFile(file, data, 0o777); err != nil {
-		return errNotInstalled(in.tool, file, err)
+		return errNotInstalled(inst.tool, file, err)
 	}
 	return nil
 }
@@ -140,21 +140,21 @@ func readZipFile(entry *zip.File) ([]byte, error) {
 	return data, nil
 }
 
-func (in installer) untar(download []byte, staging string) error {
+func (inst installer) extractWithTar(download []byte, staging string) error {
 	archive := filepath.Join(staging, "archive.7z")
-	if err := in.writeFile(archive, download); err != nil {
+	if err := inst.writeFile(archive, download); err != nil {
 		return err
 	}
-	options := env.RunOptions{Hint: capitalize(in.tool.ManualInstallHint)}
-	result, err := in.e.Run(in.ctx, windowsTarPath(), []string{"-xf", archive, "-C", staging}, options)
+	options := env.RunOptions{Hint: capitalize(inst.tool.ManualInstallHint)}
+	result, err := inst.e.Run(inst.ctx, windowsTarPath(), []string{"-xf", archive, "-C", staging}, options)
 	if err != nil {
 		return err
 	}
 	if result.ExitCode != 0 {
-		return errNotExtracted(in.tool, result.Stderr)
+		return errNotExtracted(inst.tool, result.Stderr)
 	}
 	if err := os.Remove(archive); err != nil {
-		return errNotInstalled(in.tool, archive, err)
+		return errNotInstalled(inst.tool, archive, err)
 	}
 	return nil
 }
@@ -167,29 +167,29 @@ func windowsTarPath() string {
 	return filepath.Join(systemRoot, "System32", "tar.exe")
 }
 
-func (in installer) verifyVersion(staging string) error {
-	output, err := in.tool.runVersionCommand(in.ctx, in.e, in.programPath(staging), capitalize(in.tool.ManualInstallHint))
+func (inst installer) verifyVersion(staging string) error {
+	output, err := inst.tool.runVersionCommand(inst.ctx, inst.e, inst.programPath(staging), capitalize(inst.tool.ManualInstallHint))
 	if err != nil {
 		return err
 	}
-	if found := in.tool.parseVersion(output); found != in.version {
-		return errVersionMismatch(in.tool, found, in.version)
+	if found := inst.tool.parseVersion(output); found != inst.version {
+		return errVersionMismatch(inst.tool, found, inst.version)
 	}
 	return nil
 }
 
-func (in installer) moveIntoPlace(staging string) (string, error) {
-	program := in.programPath(in.target)
-	err := os.Rename(staging, in.target)
+func (inst installer) moveIntoPlace(staging string) (string, error) {
+	program := inst.programPath(inst.target)
+	err := os.Rename(staging, inst.target)
 	switch {
 	case err == nil:
 		return program, nil
 	case fsx.Exists(program):
 		return program, nil
-	case fsx.Exists(in.target):
-		return "", errTargetBlocked(in.tool, in.target, err)
+	case fsx.Exists(inst.target):
+		return "", errTargetBlocked(inst.tool, inst.target, err)
 	}
-	return "", errNotInstalled(in.tool, in.target, err)
+	return "", errNotInstalled(inst.tool, inst.target, err)
 }
 
 func errDownloadFailed(tool Tool, url string, cause error) error {
