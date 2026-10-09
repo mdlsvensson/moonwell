@@ -36,7 +36,7 @@ func TestMacrosOfPointsYueAtItsFolderAndHashesTheModule(t *testing.T) {
 func TestMacrosOfRefusesAProjectFolderWhosePathHasASemicolonOrAQuestionMark(t *testing.T) {
 	for _, root := range []string{"/pro;ject", "/pro?ject"} {
 		search, err := readMacros(root)
-		diagErr := asError(t, err, root)
+		diagErr := asDiagError(t, err, root)
 		if diagErr.Msg != `The project folder's path contains ";" or "?", which YueScript's module search cannot handle.` ||
 			diagErr.File != root || diagErr.Hint != "Move the project to a folder whose path has neither character." || search != (macroFile{}) {
 			t.Errorf("%s: %+v, %+v", root, search, diagErr)
@@ -72,13 +72,13 @@ func TestRefreshMacrosWritesTheMacroModuleWhenItsContentDiffers(t *testing.T) {
 }
 
 func TestRefreshMacrosNamesTheFileWhenItCannotBeWritten(t *testing.T) {
-	for what, p := range map[string]project{
-		"a file for .moonwell":  files(".moonwell", "a file, not a folder"),
-		"a file for the folder": files(".moonwell/yue/moonwell", "a file, not a folder"),
-		"a folder for the file": files(MacrosFile+"/kept.txt", ""),
+	for what, p := range map[string]sourceTree{
+		"a file for .moonwell":  newSourceTree(".moonwell", "a file, not a folder"),
+		"a file for the folder": newSourceTree(".moonwell/yue/moonwell", "a file, not a folder"),
+		"a folder for the file": newSourceTree(MacrosFile+"/kept.txt", ""),
 	} {
-		wrote, err := RefreshMacros(p.lay(t))
-		diagErr := asError(t, err, what)
+		wrote, err := RefreshMacros(p.writeToTempDir(t))
+		diagErr := asDiagError(t, err, what)
 		if wrote || !strings.HasPrefix(diagErr.Msg, "Writing .moonwell/yue/moonwell/macros.yue failed: ") || diagErr.File != MacrosFile ||
 			diagErr.Hint != "Moonwell's compiler and the editor read .moonwell/; make sure it is a folder you can write, then retry." ||
 			diagErr.Cause == nil {
@@ -96,7 +96,7 @@ func TestRefreshMacrosRefusesALinkOnTheWayToTheFile(t *testing.T) {
 		}
 		testkit.LinkDir(t, elsewhere, at)
 		wrote, err := RefreshMacros(root)
-		diagErr := asError(t, err, symlink)
+		diagErr := asDiagError(t, err, symlink)
 		if wrote || diagErr.Msg != "Symlinks are not supported: "+at || diagErr.File != MacrosFile ||
 			!strings.Contains(diagErr.Hint, "real files") {
 			t.Errorf("a link at %s: wrote %v, %+v", symlink, wrote, diagErr)

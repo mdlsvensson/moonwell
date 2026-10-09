@@ -26,24 +26,24 @@ const halfPair = "\xed\xa0\x80"
 
 func inLibrary(key, file string) string { return librariesDir + "/" + key + "/" + file }
 
-type project struct {
+type sourceTree struct {
 	keys  []string
 	files []string
 }
 
-func files(pairs ...string) project { return project{files: pairs} }
+func newSourceTree(pairs ...string) sourceTree { return sourceTree{files: pairs} }
 
-func (p project) with(keys ...string) project {
+func (p sourceTree) withLibraries(keys ...string) sourceTree {
 	p.keys = keys
 	return p
 }
 
-func (p project) and(pairs ...string) project {
+func (p sourceTree) withFiles(pairs ...string) sourceTree {
 	p.files = append(slices.Clone(p.files), pairs...)
 	return p
 }
 
-func (p project) lay(t testing.TB) string {
+func (p sourceTree) writeToTempDir(t testing.TB) string {
 	t.Helper()
 	if len(p.files)%2 != 0 {
 		t.Fatalf("a project's files are pairs of a path and a text, and %q, the last of them, has no text", p.files[len(p.files)-1])
@@ -55,7 +55,7 @@ func (p project) lay(t testing.TB) string {
 	return root
 }
 
-func (p project) layAsNamed(t testing.TB) string {
+func (p sourceTree) writeToTempDirOrSkip(t testing.TB) string {
 	t.Helper()
 	root := t.TempDir()
 	for i := 0; i+1 < len(p.files); i += 2 {
@@ -79,7 +79,7 @@ func (p project) layAsNamed(t testing.TB) string {
 	return root
 }
 
-func (p project) libraries() []Library {
+func (p sourceTree) libraries() []Library {
 	var libraries []Library
 	for _, key := range slices.Sorted(slices.Values(p.keys)) {
 		libraries = append(libraries, Library{Key: key, Dir: librariesDir + "/" + key})
@@ -87,17 +87,17 @@ func (p project) libraries() []Library {
 	return libraries
 }
 
-func linkTo(t testing.TB, to project, root, symlink string) (at string) {
+func symlinkTree(t testing.TB, to sourceTree, root, symlink string) (at string) {
 	t.Helper()
 	at = filepath.Join(root, filepath.FromSlash(symlink))
 	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 		t.Fatal(err)
 	}
-	testkit.LinkDir(t, to.lay(t), at)
+	testkit.LinkDir(t, to.writeToTempDir(t), at)
 	return at
 }
 
-func asError(t testing.TB, err error, what string) *diag.Error {
+func asDiagError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
 	var diagErr *diag.Error
 	if !errors.As(err, &diagErr) {

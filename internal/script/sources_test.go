@@ -17,31 +17,31 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-func collect(t *testing.T, p project) []Source {
+func mustCollect(t *testing.T, p sourceTree) []Source {
 	t.Helper()
-	sources, err := CollectSources(p.lay(t), p.libraries())
+	sources, err := CollectSources(p.writeToTempDir(t), p.libraries())
 	if err != nil {
 		t.Fatal(err)
 	}
 	return sources
 }
 
-func refused(t *testing.T, p project, what string) *diag.Error {
+func mustFailCollect(t *testing.T, p sourceTree, what string) *diag.Error {
 	t.Helper()
-	_, err := CollectSources(p.lay(t), p.libraries())
-	return asError(t, err, what)
+	_, err := CollectSources(p.writeToTempDir(t), p.libraries())
+	return asDiagError(t, err, what)
 }
 
 func luaModule(t *testing.T, text string) Source {
 	t.Helper()
-	sources := collect(t, mainOnly.and("lua/x.lua", text))
+	sources := mustCollect(t, mainOnly.withFiles("lua/x.lua", text))
 	if len(sources) != 2 || sources[1].Path != "lua/x.lua" {
 		t.Fatalf("Collect = %+v, want src/main.yue and lua/x.lua", sources)
 	}
 	return sources[1]
 }
 
-func namesOf(sources []Source) []string {
+func sourceNames(sources []Source) []string {
 	var names []string
 	for _, source := range sources {
 		names = append(names, source.Name)
@@ -49,7 +49,7 @@ func namesOf(sources []Source) []string {
 	return names
 }
 
-func pathsOf(sources []Source) []string {
+func sourcePaths(sources []Source) []string {
 	var paths []string
 	for _, source := range sources {
 		paths = append(paths, source.Path)
@@ -57,10 +57,10 @@ func pathsOf(sources []Source) []string {
 	return paths
 }
 
-var mainOnly = files("src/main.yue", "x = 1\n")
+var mainOnly = newSourceTree("src/main.yue", "x = 1\n")
 
 func TestCollectListsYueScriptInSrcAndLuaInLuaNamedByPath(t *testing.T) {
-	got := collect(t, files(
+	got := mustCollect(t, newSourceTree(
 		"src/main.yue", "x = 1\n",
 		"src/game/units.yue", "x = 1\n",
 		"src/main.lua", "-- the editor's output, ignored\n",
@@ -88,29 +88,29 @@ func TestCollectReadsALuaFileSavedWithAByteOrderMarkWithoutItSoTheScanSeesItsFir
 
 func TestCollectRefusesAModuleThatIsOrClaimsABuiltInModulesName(t *testing.T) {
 	for _, path := range []string{"lua/moonwell.lua", "lua/moonwell/init.lua", "src/moonwell.yue"} {
-		diagErr := refused(t, mainOnly.and(path, ""), path)
+		diagErr := mustFailCollect(t, mainOnly.withFiles(path, ""), path)
 		if diagErr.Msg != "Module moonwell is built into Moonwell; rename "+path+"." || diagErr.File != path ||
 			diagErr.Hint != "`require` of a built-in name always loads the built-in module, never a project file." {
 			t.Errorf("%s: %+v", path, diagErr)
 		}
 	}
-	if got := namesOf(collect(t, mainOnly.and("lua/moonwell/extra.lua", ""))); !slices.Equal(got, []string{"main", "moonwell.extra"}) {
+	if got := sourceNames(mustCollect(t, mainOnly.withFiles("lua/moonwell/extra.lua", ""))); !slices.Equal(got, []string{"main", "moonwell.extra"}) {
 		t.Errorf("names = %q", got)
 	}
 }
 
 func TestCollectWorksWithoutLuaAndRequiresSrc(t *testing.T) {
-	if got := collect(t, mainOnly); len(got) != 1 || got[0].Path != "src/main.yue" {
+	if got := mustCollect(t, mainOnly); len(got) != 1 || got[0].Path != "src/main.yue" {
 		t.Errorf("Collect = %+v", got)
 	}
-	for what, p := range map[string]project{
-		"no src":         files("lua/x.lua", ""),
-		"a file for src": files("src", "a file, not a folder"),
-		"no file at all": files(),
+	for what, p := range map[string]sourceTree{
+		"no src":         newSourceTree("lua/x.lua", ""),
+		"a file for src": newSourceTree("src", "a file, not a folder"),
+		"no file at all": newSourceTree(),
 	} {
-		root := p.lay(t)
+		root := p.writeToTempDir(t)
 		_, err := CollectSources(root, nil)
-		if diagErr := asError(t, err, what); diagErr.Msg != "The src/ folder is missing." || diagErr.File != root {
+		if diagErr := asDiagError(t, err, what); diagErr.Msg != "The src/ folder is missing." || diagErr.File != root {
 			t.Errorf("%s: %+v", what, diagErr)
 		}
 	}
@@ -118,23 +118,23 @@ func TestCollectWorksWithoutLuaAndRequiresSrc(t *testing.T) {
 
 func TestCollectRefusesDottedNamesInEitherFolder(t *testing.T) {
 	for _, path := range []string{"src/a.b.yue", "lua/x.y/z.lua", "src/.hidden.yue", "lua/a/b.c/d/e.lua"} {
-		diagErr := refused(t, mainOnly.and(path, ""), path)
+		diagErr := mustFailCollect(t, mainOnly.withFiles(path, ""), path)
 		if diagErr.Msg != "Module file and folder names cannot contain dots." || diagErr.File != path ||
 			diagErr.Hint != "Dots separate module names in `import`; rename the file or folder." {
 			t.Errorf("%s: %+v", path, diagErr)
 		}
 	}
-	if diagErr := refused(t, files("src/a.b.yue", "export x = 1\n"), "a dotted name"); !strings.Contains(diagErr.Msg, "dots") {
+	if diagErr := mustFailCollect(t, newSourceTree("src/a.b.yue", "export x = 1\n"), "a dotted name"); !strings.Contains(diagErr.Msg, "dots") {
 		t.Errorf("error = %+v", diagErr)
 	}
-	others := mainOnly.and("src/notes.v2.txt", "", "lua/a.b/readme.md", "", "lua/x.lua.bak", "")
-	if got := pathsOf(collect(t, others)); !slices.Equal(got, []string{"src/main.yue"}) {
+	others := mainOnly.withFiles("src/notes.v2.txt", "", "lua/a.b/readme.md", "", "lua/x.lua.bak", "")
+	if got := sourcePaths(mustCollect(t, others)); !slices.Equal(got, []string{"src/main.yue"}) {
 		t.Errorf("paths = %q", got)
 	}
 }
 
 func TestCollectRefusesANameTwoFilesDefineNamingBoth(t *testing.T) {
-	diagErr := refused(t, mainOnly.and("src/tools.yue", "x = 1\n", "lua/tools.lua", ""), "two files")
+	diagErr := mustFailCollect(t, mainOnly.withFiles("src/tools.yue", "x = 1\n", "lua/tools.lua", ""), "two files")
 	if diagErr.Msg != "Module tools is defined by src/tools.yue and lua/tools.lua." || diagErr.File != "lua/tools.lua" ||
 		diagErr.Hint != "Rename one of them: module names are shared by src/ and lua/." {
 		t.Errorf("error = %+v", diagErr)
@@ -143,7 +143,7 @@ func TestCollectRefusesANameTwoFilesDefineNamingBoth(t *testing.T) {
 
 func TestCollectRefusesAnInitModuleNextToAModuleOfItsParentsName(t *testing.T) {
 	for _, first := range []string{"src/tools.yue", "lua/tools.lua"} {
-		diagErr := refused(t, mainOnly.and(first, "", "lua/tools/init.lua", ""), first)
+		diagErr := mustFailCollect(t, mainOnly.withFiles(first, "", "lua/tools/init.lua", ""), first)
 		if diagErr.Msg != "Module tools is defined by "+first+" and lua/tools/init.lua." || diagErr.File != "lua/tools/init.lua" {
 			t.Errorf("%s: %+v", first, diagErr)
 		}
@@ -151,17 +151,17 @@ func TestCollectRefusesAnInitModuleNextToAModuleOfItsParentsName(t *testing.T) {
 }
 
 func TestCollectLetsATopLevelInitModuleClaimOnlyItsOwnName(t *testing.T) {
-	if got := namesOf(collect(t, mainOnly.and("lua/init.lua", ""))); !slices.Equal(got, []string{"main", "init"}) {
+	if got := sourceNames(mustCollect(t, mainOnly.withFiles("lua/init.lua", ""))); !slices.Equal(got, []string{"main", "init"}) {
 		t.Errorf("names = %q", got)
 	}
 }
 
 func TestCollectTakesTheLibrariesInTheOrderGivenEachYueScriptBeforeItsLua(t *testing.T) {
-	root := mainOnly.and(
+	root := mainOnly.withFiles(
 		"lua/own.lua", "",
 		inLibrary("a", "one.lua"), "", inLibrary("a", "two.yue"), "",
 		inLibrary("b", "three.lua"), "", inLibrary("b", "four.yue"), "",
-	).lay(t)
+	).writeToTempDir(t)
 	a, b := Library{Key: "a", Dir: librariesDir + "/a"}, Library{Key: "b", Dir: librariesDir + "/b"}
 	for _, c := range []struct {
 		libraries []Library
@@ -173,14 +173,14 @@ func TestCollectTakesTheLibrariesInTheOrderGivenEachYueScriptBeforeItsLua(t *tes
 		{nil, []string{"main", "own"}},
 	} {
 		sources, err := CollectSources(root, c.libraries)
-		if err != nil || !slices.Equal(namesOf(sources), c.want) {
-			t.Errorf("Collect with %+v = %q, %v, want %q", c.libraries, namesOf(sources), err, c.want)
+		if err != nil || !slices.Equal(sourceNames(sources), c.want) {
+			t.Errorf("Collect with %+v = %q, %v, want %q", c.libraries, sourceNames(sources), err, c.want)
 		}
 	}
 }
 
 func TestAClashWithALibraryModuleNamesBothFilesAndSuggestsNarrowingDir(t *testing.T) {
-	diagErr := refused(t, mainOnly.with("ex").and(
+	diagErr := mustFailCollect(t, mainOnly.withLibraries("ex").withFiles(
 		"lua/example/greet.lua", "return {}\n",
 		inLibrary("ex", "example/greet.lua"), "return {}\n",
 	), "a clash")
@@ -192,7 +192,7 @@ func TestAClashWithALibraryModuleNamesBothFilesAndSuggestsNarrowingDir(t *testin
 }
 
 func TestInALibraryALuaFileBesideAYueFileOfTheSameStemIsItsCompiledOutputNotAModule(t *testing.T) {
-	got := collect(t, mainOnly.with("ex").and(
+	got := mustCollect(t, mainOnly.withLibraries("ex").withFiles(
 		inLibrary("ex", "example/loud.yue"), "x = 1\n",
 		inLibrary("ex", "example/loud.lua"), "-- compiled\n",
 		inLibrary("ex", "kit/init.yue"), "x = 1\n",
@@ -208,7 +208,7 @@ func TestInALibraryALuaFileBesideAYueFileOfTheSameStemIsItsCompiledOutputNotAMod
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("Collect = %+v", got)
 	}
-	diagErr := refused(t, mainOnly.and("src/loud.yue", "", "lua/loud.lua", ""), "the project's own")
+	diagErr := mustFailCollect(t, mainOnly.withFiles("src/loud.yue", "", "lua/loud.lua", ""), "the project's own")
 	if diagErr.Msg != "Module loud is defined by src/loud.yue and lua/loud.lua." {
 		t.Errorf("error = %+v", diagErr)
 	}
@@ -219,7 +219,7 @@ func TestADottedOrBuiltInNameInALibrarySuggestsNarrowingTheLibrarysDir(t *testin
 		inLibrary("ex", "a.b.lua"):      "cannot contain dots",
 		inLibrary("ex", "moonwell.lua"): "Module moonwell is built into Moonwell; .moonwell/libraries/ex/moonwell.lua takes its name.",
 	} {
-		diagErr := refused(t, mainOnly.with("ex").and(path, ""), path)
+		diagErr := mustFailCollect(t, mainOnly.withLibraries("ex").withFiles(path, ""), path)
 		if !strings.Contains(diagErr.Msg, message) || diagErr.File != path || strings.Contains(diagErr.Hint, "rename") ||
 			!strings.Contains(diagErr.Hint, "narrow the library's `dir` in moonwell.pkl") {
 			t.Errorf("%s: %+v", path, diagErr)
@@ -242,20 +242,20 @@ func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 	} {
 		path := c.of.dir + "/" + c.file
 		_, err := c.of.readSource(c.file)
-		diagErr := asError(t, err, path)
+		diagErr := asDiagError(t, err, path)
 		if diagErr.Msg != "Module file and folder names must be valid UTF-8." || diagErr.File != path ||
 			!strings.Contains(diagErr.Hint, "rename the file or folder") {
 			t.Errorf("%q: %+v", path, diagErr)
 		}
 	}
 	_, err := library.readSource("kit/\xff.lua")
-	diagErr := asError(t, err, "a library's file")
+	diagErr := asDiagError(t, err, "a library's file")
 	if !strings.Contains(diagErr.Msg, "must be valid UTF-8") || diagErr.File != librariesDir+"/ex/kit/\xff.lua" ||
 		strings.Contains(diagErr.Hint, "rename") || !strings.Contains(diagErr.Hint, "narrow the library's `dir` in moonwell.pkl") {
 		t.Errorf("a library's file: %+v", diagErr)
 	}
 	_, err = src.readSource("a.b\xff.yue")
-	if diagErr := asError(t, err, "a dotted name"); !strings.Contains(diagErr.Msg, "cannot contain dots") {
+	if diagErr := asDiagError(t, err, "a dotted name"); !strings.Contains(diagErr.Msg, "cannot contain dots") {
 		t.Errorf("a dotted name: %+v", diagErr)
 	}
 	for file, name := range map[string]string{
@@ -270,41 +270,41 @@ func TestAModuleFileWhoseNameIsNotUTF8IsRefused(t *testing.T) {
 
 func TestCollectRefusesAModuleFileWhoseNameIsNotUTF8(t *testing.T) {
 	for _, path := range []string{"src/a" + halfPair + ".yue", "lua/" + halfPair + "/x.lua", "src/game/" + halfPair + "/units.yue"} {
-		p := mainOnly.and(path, "")
-		_, err := CollectSources(p.layAsNamed(t), p.libraries())
-		diagErr := asError(t, err, path)
+		p := mainOnly.withFiles(path, "")
+		_, err := CollectSources(p.writeToTempDirOrSkip(t), p.libraries())
+		diagErr := asDiagError(t, err, path)
 		if diagErr.Msg != "Module file and folder names must be valid UTF-8." || diagErr.File != path ||
 			!strings.Contains(diagErr.Hint, "rename the file or folder") {
 			t.Errorf("%q: %+v", path, diagErr)
 		}
 	}
-	inALibrary := mainOnly.with("ex").and(inLibrary("ex", "kit/"+halfPair+".yue"), "")
-	_, err := CollectSources(inALibrary.layAsNamed(t), inALibrary.libraries())
-	if diagErr := asError(t, err, "a library's file"); diagErr.File != inLibrary("ex", "kit/"+halfPair+".yue") || !strings.Contains(diagErr.Hint, "narrow the library's `dir`") {
+	inALibrary := mainOnly.withLibraries("ex").withFiles(inLibrary("ex", "kit/"+halfPair+".yue"), "")
+	_, err := CollectSources(inALibrary.writeToTempDirOrSkip(t), inALibrary.libraries())
+	if diagErr := asDiagError(t, err, "a library's file"); diagErr.File != inLibrary("ex", "kit/"+halfPair+".yue") || !strings.Contains(diagErr.Hint, "narrow the library's `dir`") {
 		t.Errorf("a library's file: %+v", diagErr)
 	}
-	others := mainOnly.and("src/"+halfPair+".txt", "", "lua/"+halfPair+"/readme.md", "", "src/"+halfPair+".lua", "", "lua/x"+halfPair+".yue", "")
-	sources, err := CollectSources(others.layAsNamed(t), others.libraries())
-	if got := pathsOf(sources); err != nil || !slices.Equal(got, []string{"src/main.yue"}) {
+	others := mainOnly.withFiles("src/"+halfPair+".txt", "", "lua/"+halfPair+"/readme.md", "", "src/"+halfPair+".lua", "", "lua/x"+halfPair+".yue", "")
+	sources, err := CollectSources(others.writeToTempDirOrSkip(t), others.libraries())
+	if got := sourcePaths(sources); err != nil || !slices.Equal(got, []string{"src/main.yue"}) {
 		t.Errorf("files that are no modules: paths = %q, %v", got, err)
 	}
 }
 
 func TestALibraryWithoutAFolderHasNoModules(t *testing.T) {
-	for what, p := range map[string]project{
-		"no folder":             mainOnly.with("ex"),
-		"a file for the folder": mainOnly.with("ex").and(librariesDir+"/ex", "a file, not a folder"),
-		"a file for .moonwell":  mainOnly.with("ex").and(".moonwell", "a file, not a folder"),
-		"no module in it":       mainOnly.with("ex").and(inLibrary("ex", "notes.txt"), "no module"),
+	for what, p := range map[string]sourceTree{
+		"no folder":             mainOnly.withLibraries("ex"),
+		"a file for the folder": mainOnly.withLibraries("ex").withFiles(librariesDir+"/ex", "a file, not a folder"),
+		"a file for .moonwell":  mainOnly.withLibraries("ex").withFiles(".moonwell", "a file, not a folder"),
+		"no module in it":       mainOnly.withLibraries("ex").withFiles(inLibrary("ex", "notes.txt"), "no module"),
 	} {
-		if got := pathsOf(collect(t, p)); !slices.Equal(got, []string{"src/main.yue"}) {
+		if got := sourcePaths(mustCollect(t, p)); !slices.Equal(got, []string{"src/main.yue"}) {
 			t.Errorf("%s: paths = %q", what, got)
 		}
 	}
 }
 
 func TestCollectListsTheModulesOfAFolderInByteOrder(t *testing.T) {
-	got := pathsOf(collect(t, files(
+	got := sourcePaths(mustCollect(t, newSourceTree(
 		"src/"+beyond+".yue", "", "src/"+fullWidthA+".yue", "", "src/z.yue", "", "src/B.yue", "", "src/a/b.yue", "",
 		"src/a-b.yue", "", "src/a.yue", "", "src/a0.yue", "", "src/"+eAcute+".yue", "",
 		"lua/"+beyond+"/x.lua", "", "lua/"+fullWidthA+"/x.lua", "",
@@ -336,22 +336,22 @@ func TestALuaModulesTextIsTheBytesOfItsFile(t *testing.T) {
 			t.Errorf("%s: the text of %q is %q", what, written, module.Text)
 		}
 	}
-	sources := collect(t, mainOnly.with("ex").and(inLibrary("ex", "x.lua"), "return '\xff\xfe'\n"))
+	sources := mustCollect(t, mainOnly.withLibraries("ex").withFiles(inLibrary("ex", "x.lua"), "return '\xff\xfe'\n"))
 	if len(sources) != 2 || sources[1].Text != "return '\xff\xfe'\n" {
 		t.Errorf("Collect = %+v", sources)
 	}
 }
 
 func TestInsideAFolderOfModulesALinkToAFileIsReadAndALinkToAFolderIsNotEntered(t *testing.T) {
-	root := mainOnly.and("lua/own.lua", "return 1\n").lay(t)
-	linkTo(t, files("deep.lua", "return 2\n", "more/deeper.lua", "return 3\n"), root, "lua/linked")
-	linkTo(t, files("other.yue", "x = 2\n"), root, "src/linked")
+	root := mainOnly.withFiles("lua/own.lua", "return 1\n").writeToTempDir(t)
+	symlinkTree(t, newSourceTree("deep.lua", "return 2\n", "more/deeper.lua", "return 3\n"), root, "lua/linked")
+	symlinkTree(t, newSourceTree("other.yue", "x = 2\n"), root, "src/linked")
 	sources, err := CollectSources(root, nil)
-	if err != nil || !slices.Equal(pathsOf(sources), []string{"src/main.yue", "lua/own.lua"}) {
-		t.Errorf("with links to folders: Collect = %q, %v, want the modules that are not behind them", pathsOf(sources), err)
+	if err != nil || !slices.Equal(sourcePaths(sources), []string{"src/main.yue", "lua/own.lua"}) {
+		t.Errorf("with links to folders: Collect = %q, %v, want the modules that are not behind them", sourcePaths(sources), err)
 	}
 
-	elsewhere := files("real.lua", "return 'through the link'\n", "real.yue", "x = 3\n").lay(t)
+	elsewhere := newSourceTree("real.lua", "return 'through the link'\n", "real.yue", "x = 3\n").writeToTempDir(t)
 	for symlink, target := range map[string]string{"lua/through.lua": "real.lua", "src/also.yue": "real.yue"} {
 		testkit.LinkFile(t, filepath.Join(elsewhere, target), filepath.Join(root, filepath.FromSlash(symlink)))
 	}
@@ -368,14 +368,14 @@ func TestInsideAFolderOfModulesALinkToAFileIsReadAndALinkToAFolderIsNotEntered(t
 
 func TestALinkAtAFolderOfModulesIsRefused(t *testing.T) {
 	for _, symlink := range []string{"src", "lua", ".moonwell", librariesDir, librariesDir + "/ex"} {
-		p := mainOnly.with("ex")
+		p := mainOnly.withLibraries("ex")
 		if symlink == "src" {
-			p = files().with("ex")
+			p = newSourceTree().withLibraries("ex")
 		}
-		root := p.lay(t)
-		at := linkTo(t, files("main.yue", "x = 1\n", "libraries/ex/x.lua", "", "ex/x.lua", ""), root, symlink)
+		root := p.writeToTempDir(t)
+		at := symlinkTree(t, newSourceTree("main.yue", "x = 1\n", "libraries/ex/x.lua", "", "ex/x.lua", ""), root, symlink)
 		_, err := CollectSources(root, p.libraries())
-		diagErr := asError(t, err, symlink)
+		diagErr := asDiagError(t, err, symlink)
 		if diagErr.Msg != "Symlinks are not supported: "+at || !strings.Contains(diagErr.Hint, "real files") {
 			t.Errorf("a link at %s: %+v", symlink, diagErr)
 		}
@@ -387,7 +387,7 @@ func TestALinkAtAFolderOfModulesIsRefused(t *testing.T) {
 }
 
 func TestALibraryThatNamesNoFolderOfTheProjectIsAMistakeOfTheCaller(t *testing.T) {
-	root := mainOnly.lay(t)
+	root := mainOnly.writeToTempDir(t)
 	for _, library := range []Library{
 		{Key: "", Dir: librariesDir + "/ex"}, {Key: "ex", Dir: ""}, {Key: "ex", Dir: "../ex"}, {Key: "ex", Dir: "/ex"},
 		{Key: "ex", Dir: "a//b"}, {Key: "ex", Dir: "ex/"}, {Key: "ex", Dir: "."},
@@ -398,18 +398,18 @@ func TestALibraryThatNamesNoFolderOfTheProjectIsAMistakeOfTheCaller(t *testing.T
 			t.Errorf("Collect with %+v = %v, want an error that is no user's mistake", library, err)
 		}
 	}
-	p := mainOnly.with("ex").and(inLibrary("ex", "x.lua"), "")
-	sources, err := CollectSources(p.lay(t), []Library{{Key: "ex", Dir: `.moonwell\libraries\ex`}})
-	if err != nil || !slices.Equal(pathsOf(sources), []string{"src/main.yue", ".moonwell/libraries/ex/x.lua"}) {
-		t.Errorf("Collect = %q, %v", pathsOf(sources), err)
+	p := mainOnly.withLibraries("ex").withFiles(inLibrary("ex", "x.lua"), "")
+	sources, err := CollectSources(p.writeToTempDir(t), []Library{{Key: "ex", Dir: `.moonwell\libraries\ex`}})
+	if err != nil || !slices.Equal(sourcePaths(sources), []string{"src/main.yue", ".moonwell/libraries/ex/x.lua"}) {
+		t.Errorf("Collect = %q, %v", sourcePaths(sources), err)
 	}
 }
 
 func TestALuaModuleThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
-	root := mainOnly.and("lua/held.lua", "return {}\n").lay(t)
+	root := mainOnly.withFiles("lua/held.lua", "return {}\n").writeToTempDir(t)
 	testkit.MakeUnreadable(t, filepath.Join(root, "lua", "held.lua"))
 	_, err := CollectSources(root, nil)
-	diagErr := asError(t, err, "a held file")
+	diagErr := asDiagError(t, err, "a held file")
 	if !strings.HasPrefix(diagErr.Msg, "Reading lua/held.lua failed: ") || diagErr.File != "lua/held.lua" || diagErr.Hint == "" {
 		t.Errorf("error = %+v", diagErr)
 	}
@@ -422,14 +422,14 @@ func TestAFolderOfModulesThatCannotBeListedIsRefusedByItsName(t *testing.T) {
 	if os.Geteuid() == 0 {
 		t.Skip("root may list a folder without permissions, so the listing would not fail")
 	}
-	root := mainOnly.and("lua/closed/x.lua", "").lay(t)
+	root := mainOnly.withFiles("lua/closed/x.lua", "").writeToTempDir(t)
 	closed := filepath.Join(root, "lua", "closed")
 	if err := os.Chmod(closed, 0); err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { os.Chmod(closed, 0o777) })
 	_, err := CollectSources(root, nil)
-	diagErr := asError(t, err, "a closed folder")
+	diagErr := asDiagError(t, err, "a closed folder")
 	if !strings.HasPrefix(diagErr.Msg, "Reading lua/closed/ failed: ") || diagErr.File != "lua/closed" ||
 		!strings.Contains(diagErr.Hint, "can be read") {
 		t.Errorf("error = %+v", diagErr)
@@ -451,14 +451,14 @@ func TestAListingThatFailsBelowAFolderNamesTheFolderItFailedAt(t *testing.T) {
 		"without a path":      {errors.New("the disk is gone"), "lua"},
 		"with a path of none": {denied(""), "lua"},
 	} {
-		diagErr := asError(t, errUnreadableFolder(lua.failedPath(c.cause), c.cause), what)
+		diagErr := asDiagError(t, errUnreadableFolder(lua.failedPath(c.cause), c.cause), what)
 		if !strings.HasPrefix(diagErr.Msg, "Reading "+c.want+"/ failed: ") || diagErr.File != c.want || diagErr.Cause != c.cause {
 			t.Errorf("%s: %+v, want the folder %s", what, diagErr, c.want)
 		}
 	}
 }
 
-func ofLibraries(sources []Source) []Source {
+func librarySources(sources []Source) []Source {
 	var listed []Source
 	for _, source := range sources {
 		if source.Library != "" {
@@ -469,13 +469,13 @@ func ofLibraries(sources []Source) []Source {
 }
 
 func TestCollectLibrariesListsTheLibrariesModulesAsCollectListsThem(t *testing.T) {
-	root := mainOnly.and(
+	root := mainOnly.withFiles(
 		"lua/own.lua", "return 'own'\n",
 		inLibrary("a", "one.lua"), "return 1\n", inLibrary("a", "two.yue"), "x = 2\n",
 		inLibrary("a", "kit/init.yue"), "x = 3\n", inLibrary("a", "kit/init.lua"), "-- compiled\n",
 		inLibrary("b", "three.lua"), mark+"return 3\n", inLibrary("b", "four.yue"), "x = 4\n",
 		inLibrary("b", "notes.txt"), "no module\n",
-	).lay(t)
+	).writeToTempDir(t)
 	a, b := Library{Key: "a", Dir: librariesDir + "/a"}, Library{Key: "b", Dir: librariesDir + "/b"}
 	missing := Library{Key: "none", Dir: librariesDir + "/none"}
 	for _, c := range []struct {
@@ -493,36 +493,36 @@ func TestCollectLibrariesListsTheLibrariesModulesAsCollectListsThem(t *testing.T
 			t.Fatal(err)
 		}
 		alone, err := CollectLibrarySources(root, c.libraries)
-		if err != nil || !slices.Equal(namesOf(alone), c.want) || !reflect.DeepEqual(alone, ofLibraries(whole)) {
+		if err != nil || !slices.Equal(sourceNames(alone), c.want) || !reflect.DeepEqual(alone, librarySources(whole)) {
 			t.Errorf("CollectLibraries with %+v = %+v, %v, want the modules %q, as Collect lists them: %+v",
-				c.libraries, alone, err, c.want, ofLibraries(whole))
+				c.libraries, alone, err, c.want, librarySources(whole))
 		}
 	}
 }
 
 func TestCollectLibrariesDoesNotLookAtTheProjectsOwnModules(t *testing.T) {
 	greet := inLibrary("ex", "example/greet.lua")
-	library := files(greet, "return {}\n").with("ex")
-	withSrc := library.and("src/main.yue", "x = 1\n")
+	library := newSourceTree(greet, "return {}\n").withLibraries("ex")
+	withSrc := library.withFiles("src/main.yue", "x = 1\n")
 	const clash = "Module example.greet is defined by"
 	cases := []struct {
 		name    string
-		project project
+		project sourceTree
 		refusal string
 	}{
-		{"a module of src/ with the name", library.and("src/example/greet.yue", "x = 1\n"), clash},
-		{"a module of lua/ with the name", withSrc.and("lua/example/greet.lua", ""), clash},
-		{"a module of src/ that claims the name", library.and("src/example/greet/init.yue", ""), clash},
+		{"a module of src/ with the name", library.withFiles("src/example/greet.yue", "x = 1\n"), clash},
+		{"a module of lua/ with the name", withSrc.withFiles("lua/example/greet.lua", ""), clash},
+		{"a module of src/ that claims the name", library.withFiles("src/example/greet/init.yue", ""), clash},
 		{"no src/", library, "The src/ folder is missing."},
-		{"a file for src/", library.and("src", "a file, not a folder"), "The src/ folder is missing."},
-		{"a dotted name in src/", library.and("src/a.b.yue", ""), "cannot contain dots"},
-		{"a built-in module's name in lua/", withSrc.and("lua/moonwell.lua", ""), "is built into"},
+		{"a file for src/", library.withFiles("src", "a file, not a folder"), "The src/ folder is missing."},
+		{"a dotted name in src/", library.withFiles("src/a.b.yue", ""), "cannot contain dots"},
+		{"a built-in module's name in lua/", withSrc.withFiles("lua/moonwell.lua", ""), "is built into"},
 	}
 	want := []Source{{Name: "example.greet", Path: greet, Kind: Lua, Library: "ex", Text: "return {}\n"}}
 	for _, c := range cases {
-		root := c.project.lay(t)
+		root := c.project.writeToTempDir(t)
 		_, err := CollectSources(root, c.project.libraries())
-		if diagErr := asError(t, err, c.name); !strings.Contains(diagErr.Msg, c.refusal) {
+		if diagErr := asDiagError(t, err, c.name); !strings.Contains(diagErr.Msg, c.refusal) {
 			t.Errorf("%s: Collect refuses with %+v, want %q", c.name, diagErr, c.refusal)
 		}
 		if got, err := CollectLibrarySources(root, c.project.libraries()); err != nil || !reflect.DeepEqual(got, want) {
@@ -533,37 +533,37 @@ func TestCollectLibrariesDoesNotLookAtTheProjectsOwnModules(t *testing.T) {
 
 func TestCollectLibrariesDoesNotGoThroughALinkAtAFolderOfTheProjectsOwn(t *testing.T) {
 	for _, symlink := range []string{"src", "lua"} {
-		p := files(inLibrary("ex", "x.lua"), "").with("ex")
+		p := newSourceTree(inLibrary("ex", "x.lua"), "").withLibraries("ex")
 		if symlink == "lua" {
-			p = p.and("src/main.yue", "")
+			p = p.withFiles("src/main.yue", "")
 		}
-		root := p.lay(t)
-		at := linkTo(t, files("main.yue", "", "x.lua", ""), root, symlink)
+		root := p.writeToTempDir(t)
+		at := symlinkTree(t, newSourceTree("main.yue", "", "x.lua", ""), root, symlink)
 		_, err := CollectSources(root, p.libraries())
-		if diagErr := asError(t, err, symlink); diagErr.Msg != "Symlinks are not supported: "+at {
+		if diagErr := asDiagError(t, err, symlink); diagErr.Msg != "Symlinks are not supported: "+at {
 			t.Errorf("a link at %s: Collect refuses with %+v", symlink, diagErr)
 		}
 		got, err := CollectLibrarySources(root, p.libraries())
-		if err != nil || !slices.Equal(pathsOf(got), []string{inLibrary("ex", "x.lua")}) {
-			t.Errorf("a link at %s: CollectLibraries = %q, %v", symlink, pathsOf(got), err)
+		if err != nil || !slices.Equal(sourcePaths(got), []string{inLibrary("ex", "x.lua")}) {
+			t.Errorf("a link at %s: CollectLibraries = %q, %v", symlink, sourcePaths(got), err)
 		}
 	}
 }
 
 func TestCollectLibrariesRefusesWhatCollectRefusesOfALibrary(t *testing.T) {
-	one, two := mainOnly.with("ex"), mainOnly.with("b", "a")
-	for what, p := range map[string]project{
-		"a dotted name":              one.and(inLibrary("ex", "a.b.lua"), ""),
-		"a dotted folder":            one.and(inLibrary("ex", "a.b/c.yue"), ""),
-		"a built-in module's name":   one.and(inLibrary("ex", "moonwell.lua"), ""),
-		"a name of two libraries":    two.and(inLibrary("a", "kit.lua"), "", inLibrary("b", "kit.yue"), ""),
-		"a name that an init claims": two.and(inLibrary("a", "kit/init.yue"), "", inLibrary("b", "kit.lua"), ""),
+	one, two := mainOnly.withLibraries("ex"), mainOnly.withLibraries("b", "a")
+	for what, p := range map[string]sourceTree{
+		"a dotted name":              one.withFiles(inLibrary("ex", "a.b.lua"), ""),
+		"a dotted folder":            one.withFiles(inLibrary("ex", "a.b/c.yue"), ""),
+		"a built-in module's name":   one.withFiles(inLibrary("ex", "moonwell.lua"), ""),
+		"a name of two libraries":    two.withFiles(inLibrary("a", "kit.lua"), "", inLibrary("b", "kit.yue"), ""),
+		"a name that an init claims": two.withFiles(inLibrary("a", "kit/init.yue"), "", inLibrary("b", "kit.lua"), ""),
 	} {
-		root := p.lay(t)
+		root := p.writeToTempDir(t)
 		_, whole := CollectSources(root, p.libraries())
 		got, alone := CollectLibrarySources(root, p.libraries())
-		want := asError(t, whole, what)
-		if diagErr := asError(t, alone, what); got != nil || !reflect.DeepEqual(diagErr, want) || want.File == "" {
+		want := asDiagError(t, whole, what)
+		if diagErr := asDiagError(t, alone, what); got != nil || !reflect.DeepEqual(diagErr, want) || want.File == "" {
 			t.Errorf("%s: CollectLibraries = %+v, %+v, want the refusal of Collect: %+v", what, got, diagErr, want)
 		}
 	}
@@ -571,11 +571,11 @@ func TestCollectLibrariesRefusesWhatCollectRefusesOfALibrary(t *testing.T) {
 
 func TestCollectLibrariesRefusesALinkAtAFolderOfALibrary(t *testing.T) {
 	for _, symlink := range []string{".moonwell", librariesDir, librariesDir + "/ex"} {
-		p := mainOnly.with("ex")
-		root := p.lay(t)
-		at := linkTo(t, files("libraries/ex/x.lua", "", "ex/x.lua", "", "x.lua", ""), root, symlink)
+		p := mainOnly.withLibraries("ex")
+		root := p.writeToTempDir(t)
+		at := symlinkTree(t, newSourceTree("libraries/ex/x.lua", "", "ex/x.lua", "", "x.lua", ""), root, symlink)
 		got, err := CollectLibrarySources(root, p.libraries())
-		diagErr := asError(t, err, symlink)
+		diagErr := asDiagError(t, err, symlink)
 		if got != nil || diagErr.Msg != "Symlinks are not supported: "+at ||
 			!strings.Contains(diagErr.Hint, "real files") {
 			t.Errorf("a link at %s: CollectLibraries = %+v, %+v", symlink, got, diagErr)
@@ -584,7 +584,7 @@ func TestCollectLibrariesRefusesALinkAtAFolderOfALibrary(t *testing.T) {
 }
 
 func TestCollectLibrariesTakesALibraryThatNamesNoFolderOfTheProjectForAMistakeOfTheCaller(t *testing.T) {
-	root := files().lay(t)
+	root := newSourceTree().writeToTempDir(t)
 	for _, library := range []Library{
 		{Key: "", Dir: librariesDir + "/ex"}, {Key: "ex", Dir: ""}, {Key: "ex", Dir: "../ex"}, {Key: "ex", Dir: "/ex"},
 	} {
@@ -613,7 +613,7 @@ func TestEntryNameIsTheDottedNameOfAYueScriptFileUnderSrc(t *testing.T) {
 		"././src/main.yue", "game/src/main.yue",
 	} {
 		name, err := EntryName(entry)
-		diagErr := asError(t, err, entry)
+		diagErr := asDiagError(t, err, entry)
 		if name != "" || diagErr.Msg != "Entry '"+entry+"' must be a .yue file under src/." || diagErr.File != "" ||
 			diagErr.Hint != "For example: src/main.yue" {
 			t.Errorf("EntryName(%q) = %q, %+v", entry, name, diagErr)

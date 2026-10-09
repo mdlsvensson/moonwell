@@ -17,7 +17,7 @@ import (
 
 const mapLabel = "maps/map.w3x"
 
-func mapOf(t testing.TB, pairs ...string) *mapdir.Folder {
+func newMap(t testing.TB, pairs ...string) *mapdir.Folder {
 	t.Helper()
 	dir := filepath.Join(t.TempDir(), "map.w3x")
 	for i := 0; i+1 < len(pairs); i += 2 {
@@ -30,9 +30,9 @@ func mapOf(t testing.TB, pairs ...string) *mapdir.Folder {
 	return folder
 }
 
-var small = byHand(false, ofSrc("main", "print('hi')\n"))
+var small = newProgram(false, yueModule("main", "print('hi')\n"))
 
-func placed(t testing.TB, folder *mapdir.Folder, program *Program) mapdir.Change {
+func mustInject(t testing.TB, folder *mapdir.Folder, program *Program) mapdir.Change {
 	t.Helper()
 	changes, err := Inject(folder, program)
 	if err != nil || len(changes) != 1 || changes[0].Remove {
@@ -70,9 +70,9 @@ func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T
 		{"blank lines at the end", fourLines + "\n\n\n", "", 7},
 		{"two lines", "function main() end\nfunction config() end", "\n", 3},
 	} {
-		folder := mapOf(t, "war3map.lua", c.script, "war3map.w3i", "the map's info")
+		folder := newMap(t, "war3map.lua", c.script, "war3map.w3i", "the map's info")
 		before := testkit.Snapshot(t, folder.Dir())
-		change := placed(t, folder, small)
+		change := mustInject(t, folder, small)
 		want := c.script + c.added + renderBundle(small, moonwell.RuntimeLua, c.first)
 		if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
 			t.Errorf("%s: the change is of %s; against the script, %q and the bundle from line %d, %s",
@@ -92,7 +92,7 @@ func TestInjectPlacesTheBundleInAScriptThatWorldEditorSaved(t *testing.T) {
 			added = "\n"
 		}
 		first := strings.Count(script+added, "\n") + 1
-		change := placed(t, mapOf(t, "war3map.lua", script), small)
+		change := mustInject(t, newMap(t, "war3map.lua", script), small)
 		want := script + added + renderBundle(small, moonwell.RuntimeLua, first)
 		if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
 			t.Errorf("%s: against the script and the bundle from line %d, %s", fixture, first, differs)
@@ -107,8 +107,8 @@ func TestInjectRequiresMainAndConfig(t *testing.T) {
 		{"neither, of which main is named", "x = 1\n", "main"},
 		{"a script that holds nothing", "", "main"},
 	} {
-		changes, err := Inject(mapOf(t, "war3map.lua", c.script), small)
-		diagErr := asError(t, err, c.name)
+		changes, err := Inject(newMap(t, "war3map.lua", c.script), small)
+		diagErr := asDiagError(t, err, c.name)
 		if changes != nil || diagErr.Msg != "The map script does not define function "+c.lacks+"()." || diagErr.File != mapLabel+"/war3map.lua" ||
 			!strings.Contains(diagErr.Hint, "Lua as the script language (Scenario \xe2\x80\xba Map Options)") {
 			t.Errorf("%s: Inject = %+v, %+v", c.name, changes, diagErr)
@@ -179,8 +179,8 @@ func TestInjectKeepsAByteOrderMarkAndBytesThatAreNotUTF8(t *testing.T) {
 		{"a character that is cut short at the end", "function main()\nend\nfunction config()\nend\n-- \xe2\x82", "\n"},
 		{"a mark, a byte alone and carriage returns", mark + "s = '\xff'\r\nfunction main()\r\nend\r\nfunction config()\r\nend\r\n", ""},
 	} {
-		folder := mapOf(t, "war3map.lua", c.script)
-		got := string(placed(t, folder, small).Data)
+		folder := newMap(t, "war3map.lua", c.script)
+		got := string(mustInject(t, folder, small).Data)
 		lines := strings.Count(c.script+c.added, "\n")
 		if differs := firstDifference(got, c.script+c.added+renderBundle(small, moonwell.RuntimeLua, lines+1)); differs != "" {
 			t.Errorf("%s: the script is not kept byte for byte before the bundle: %s", c.name, differs)
@@ -192,22 +192,22 @@ func TestInjectKeepsAByteOrderMarkAndBytesThatAreNotUTF8(t *testing.T) {
 }
 
 func TestInjectRefusesAMapWithoutAScript(t *testing.T) {
-	changes, err := Inject(mapOf(t, "war3map.w3i", "the map's info", "war3map.j", "function main takes nothing returns nothing"), small)
-	diagErr := asError(t, err, "no script")
+	changes, err := Inject(newMap(t, "war3map.w3i", "the map's info", "war3map.j", "function main takes nothing returns nothing"), small)
+	diagErr := asDiagError(t, err, "no script")
 	if changes != nil || diagErr.Msg != "The map has no war3map.lua." || diagErr.File != mapLabel+"/war3map.lua" ||
 		!strings.Contains(diagErr.Hint, "Lua as the script language") {
 		t.Errorf("no script: Inject = %+v, %+v", changes, diagErr)
 	}
-	folder := mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n")
+	folder := newMap(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n")
 	_, err = Inject(folder.WithChanges([]mapdir.Change{{Path: "war3map.lua", Remove: true}}), small)
-	if diagErr := asError(t, err, "a script that is removed"); diagErr.Msg != "The map has no war3map.lua." {
+	if diagErr := asDiagError(t, err, "a script that is removed"); diagErr.Msg != "The map has no war3map.lua." {
 		t.Errorf("a script that is removed: %+v", diagErr)
 	}
 }
 
 func TestInjectRefusesAFolderInThePlaceOfTheScriptAsAFolder(t *testing.T) {
-	changes, err := Inject(mapOf(t, "War3map.lua/notes.txt", "a folder under the script's name"), small)
-	diagErr := asError(t, err, "a folder")
+	changes, err := Inject(newMap(t, "War3map.lua/notes.txt", "a folder under the script's name"), small)
+	diagErr := asDiagError(t, err, "a folder")
 	if changes != nil || diagErr.Msg != "War3map.lua in the map is a folder, not a file." || diagErr.File != mapLabel+"/War3map.lua" ||
 		!strings.Contains(diagErr.Hint, "Remove that folder") || strings.Contains(diagErr.Msg, "has no") {
 		t.Errorf("a folder: Inject = %+v, %+v", changes, diagErr)
@@ -216,22 +216,22 @@ func TestInjectRefusesAFolderInThePlaceOfTheScriptAsAFolder(t *testing.T) {
 
 func TestInjectReadsTheScriptInAnyLetterCaseAndNamesTheChangeAsTheMapSpellsIt(t *testing.T) {
 	const script = "function main()\nend\nfunction config()\nend\n"
-	folder := mapOf(t, "War3Map.LUA", script)
-	if change := placed(t, folder, small); change.Path != "War3Map.LUA" || !strings.HasPrefix(string(change.Data), script+"do\n") {
+	folder := newMap(t, "War3Map.LUA", script)
+	if change := mustInject(t, folder, small); change.Path != "War3Map.LUA" || !strings.HasPrefix(string(change.Data), script+"do\n") {
 		t.Errorf("the change is of %s: %q", change.Path, change.Data[:min(len(change.Data), 60)])
 	}
-	_, err := Inject(mapOf(t, "War3Map.LUA", "function main()\nend\n"), small)
-	if diagErr := asError(t, err, "no config"); diagErr.File != mapLabel+"/War3Map.LUA" {
+	_, err := Inject(newMap(t, "War3Map.LUA", "function main()\nend\n"), small)
+	if diagErr := asDiagError(t, err, "no config"); diagErr.File != mapLabel+"/War3Map.LUA" {
 		t.Errorf("the refusal names the script as %s", diagErr.File)
 	}
 }
 
 func TestInjectTakesTheScriptAsThePlannedChangesLeaveIt(t *testing.T) {
 	const onDisk, planned = "function main()\nend\n", "function main()\nend\nfunction config()\nend\n-- planned"
-	folder := mapOf(t, "war3map.lua", onDisk)
+	folder := newMap(t, "war3map.lua", onDisk)
 	view := folder.WithChanges([]mapdir.Change{{Path: "war3map.lua", Data: []byte(planned)}})
 	want := planned + "\n" + renderBundle(small, moonwell.RuntimeLua, 6)
-	change := placed(t, view, small)
+	change := mustInject(t, view, small)
 	if differs := firstDifference(string(change.Data), want); change.Path != "war3map.lua" || differs != "" {
 		t.Errorf("the change is of %s; against the planned script and the bundle from line 6, %s", change.Path, differs)
 	}
@@ -248,17 +248,17 @@ func TestInjectTakesTheScriptAsThePlannedChangesLeaveIt(t *testing.T) {
 }
 
 func TestInjectPassesOnAScriptThatCannotBeRead(t *testing.T) {
-	folder := mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n")
+	folder := newMap(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n")
 	testkit.MakeUnreadable(t, filepath.Join(folder.Dir(), "war3map.lua"))
 	changes, err := Inject(folder, small)
-	diagErr := asError(t, err, "a script that cannot be read")
+	diagErr := asDiagError(t, err, "a script that cannot be read")
 	if changes != nil || !strings.Contains(diagErr.Msg, "Reading a map file failed") || diagErr.File != mapLabel+"/war3map.lua" || diagErr.Cause == nil {
 		t.Errorf("Inject = %+v, %+v", changes, diagErr)
 	}
 }
 
 func TestInjectWithoutAProgramIsAMistakeOfTheCaller(t *testing.T) {
-	changes, err := Inject(mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n"), nil)
+	changes, err := Inject(newMap(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n"), nil)
 	var expected *diag.Error
 	if changes != nil || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "script.Inject") {
 		t.Errorf("Inject = %+v, %v, want a plain error that names the function", changes, err)
@@ -266,7 +266,7 @@ func TestInjectWithoutAProgramIsAMistakeOfTheCaller(t *testing.T) {
 }
 
 func TestTheProgramOfABuildIsBundledWithTheRuntimeTheProgramCarries(t *testing.T) {
-	change := placed(t, mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n"), small)
+	change := mustInject(t, newMap(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n"), small)
 	if !strings.Contains(string(change.Data), "\ndo\n"+strings.ReplaceAll(moonwell.RuntimeLua, "\r\n", "\n")+"__mw.define(\"main\", function(...)\n") {
 		t.Errorf("the bundle does not start with the runtime:\n%s", change.Data[:min(len(change.Data), 300)])
 	}

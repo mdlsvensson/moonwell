@@ -15,11 +15,11 @@ import (
 )
 
 const (
-	printedSyntax = "Failed to compile: C:\\project\\src\\bad.yue\r\n2: expected valid expression\r\n1 | x = 1\r\n2 | y = \r\n       ^\r\n3 |   if then\r\n\r\n"
-	printedMacro  = "Failed to compile: C:\\project\\src\\mac.yue\r\n" +
+	outputSyntaxError = "Failed to compile: C:\\project\\src\\bad.yue\r\n2: expected valid expression\r\n1 | x = 1\r\n2 | y = \r\n       ^\r\n3 |   if then\r\n\r\n"
+	outputMacroError  = "Failed to compile: C:\\project\\src\\mac.yue\r\n" +
 		"3: failed to expand macro: (macro FourCC):21: $FourCC needs a string literal of exactly 4 characters, such as \"hfoo\".\r\n" +
 		"1 | import \"moonwell.macros\" as {:$FourCC}\r\n2 | x = 1\r\n3 | y = $FourCC \"hfo\"\r\n        ^\r\n\r\n"
-	printedNoModule = "Failed to compile: C:\\project\\src\\nomod.yue\r\n1: module 'nothing.here' not found:\r\n" +
+	outputNoModule = "Failed to compile: C:\\project\\src\\nomod.yue\r\n1: module 'nothing.here' not found:\r\n" +
 		"\tno file \"C:\\project\\.moonwell\\yue\\nothing\\here.yue\"\r\n" +
 		"\tno file \"C:\\project\\src\\nothing\\here.yue\"\r\n" +
 		"\tno file \"C:\\yue\\lua\\nothing\\here.yue\"\r\n" +
@@ -31,18 +31,18 @@ const (
 		"\tno file \".\\nothing\\here.yue\"\r\n" +
 		"\tno file \".\\nothing\\here\\init.yue\"\r\n" +
 		"1 | import \"nothing.here\" as {:$X}\r\n                             ^\r\n2 | x = 1\r\n\r\n"
-	printedNoLine     = "Failed to compile: C:\\project\\src\\a.yue\r\n\r\n"
-	printedLoneReturn = "Failed to compile: C:\\project\\src\\a.yue\r\n1: syntax error\r\n1 | export x = 1\rexport y = 2\r\n                 ^\r\n\r\n"
+	outputNoLine     = "Failed to compile: C:\\project\\src\\a.yue\r\n\r\n"
+	outputLoneReturn = "Failed to compile: C:\\project\\src\\a.yue\r\n1: syntax error\r\n1 | export x = 1\rexport y = 2\r\n                 ^\r\n\r\n"
 
-	printedRewrite      = "Failed to rewrite: C:\\project\\dist\\stage\\lua\\bit.lua\r\n>> :3:17: Unexpected Symbol `&` in source.\r\n"
-	leftByRewrite       = "-- [yue]: C:\\project\\src\\bit.yue\r\nlocal x = 1 -- 1\r\nlocal flags = x & 3 -- 4\r\nreturn print(flags) -- 5\r\n"
-	printedMinify       = "Failed to minify: C:\\project\\dist\\stage\\lua\\bit.lua\r\n>> :2:17: Unexpected Symbol `&` in source.\r\n"
-	leftByMinify        = "local x = 1\r\nlocal flags = x & 3\r\nreturn print(flags)\r\n"
-	printedRewriteTilde = "Failed to rewrite: C:\\project\\dist\\stage\\lua\\shl.lua\r\n>> :4:12: Unexpected symbol `~` in source.\r\n"
-	leftByRewriteTilde  = "-- [yue]: C:\\project\\src\\shl.yue\r\nlocal a = 1 -- 1\r\nlocal b = a << 2 -- 2\r\nlocal c = ~a -- 3\r\n"
+	outputRewriteError   = "Failed to rewrite: C:\\project\\dist\\stage\\lua\\bit.lua\r\n>> :3:17: Unexpected Symbol `&` in source.\r\n"
+	luaAfterRewrite      = "-- [yue]: C:\\project\\src\\bit.yue\r\nlocal x = 1 -- 1\r\nlocal flags = x & 3 -- 4\r\nreturn print(flags) -- 5\r\n"
+	outputMinifyError    = "Failed to minify: C:\\project\\dist\\stage\\lua\\bit.lua\r\n>> :2:17: Unexpected Symbol `&` in source.\r\n"
+	luaAfterMinify       = "local x = 1\r\nlocal flags = x & 3\r\nreturn print(flags)\r\n"
+	outputRewriteTilde   = "Failed to rewrite: C:\\project\\dist\\stage\\lua\\shl.lua\r\n>> :4:12: Unexpected symbol `~` in source.\r\n"
+	luaAfterRewriteTilde = "-- [yue]: C:\\project\\src\\shl.yue\r\nlocal a = 1 -- 1\r\nlocal b = a << 2 -- 2\r\nlocal c = ~a -- 3\r\n"
 )
 
-func asPrinted(stdout string) string { return stdout + "\n" }
+func withFinalNewline(stdout string) string { return stdout + "\n" }
 
 func withLineFeeds(kept string) string { return strings.ReplaceAll(kept, "\r\n", "\n") }
 
@@ -60,7 +60,7 @@ const keptVersion = "0.34.3"
 
 var versionLine = regexp.MustCompile(`Yuescript version: ([^ \t\n\v\f\r]+)`)
 
-func reportedVersion(t *testing.T, yue string) string {
+func queryVersion(t *testing.T, yue string) string {
 	t.Helper()
 	result, err := env.Run(background, yue, []string{"-v"}, env.RunOptions{})
 	if err != nil {
@@ -74,7 +74,7 @@ func reportedVersion(t *testing.T, yue string) string {
 
 func TestTheCompilerPrintsWhatIsKeptHere(t *testing.T) {
 	yue := tooltest.Yue(t)
-	if reported := reportedVersion(t, yue); reported != keptVersion {
+	if reported := queryVersion(t, yue); reported != keptVersion {
 		if os.Getenv("MOONWELL_TEST_YUE") == "" {
 			t.Fatalf("the texts kept in printed_test.go are of YueScript %s, and the compiler Moonwell downloads "+
 				"reports %q: take them again", keptVersion, reported)
@@ -88,22 +88,22 @@ func TestTheCompilerPrintsWhatIsKeptHere(t *testing.T) {
 		code             int
 		printed, left    string
 	}{
-		{"bad", "x = 1\ny = \n  if then\n", "-r", 1, printedSyntax, ""},
-		{"bad", "x = 1\ny = \n  if then\n", "-m", 1, printedSyntax, ""},
-		{"mac", macroImport + "x = 1\ny = $FourCC \"hfo\"\n", "-r", 1, printedMacro, ""},
-		{"nomod", "import \"nothing.here\" as {:$X}\nx = 1\n", "-r", 1, printedNoModule, ""},
-		{"a", "export x = '\xff'\n", "-r", 1, printedNoLine, ""},
-		{"a", "export x = 1\rexport y = 2\n", "-r", 1, printedLoneReturn, ""},
-		{"bit", bit, "-r", 2, printedRewrite, leftByRewrite},
-		{"bit", bit, "-m", 2, printedMinify, leftByMinify},
-		{"shl", "a = 1\nb = a << 2\nc = ~a\n", "-r", 2, printedRewriteTilde, leftByRewriteTilde},
+		{"bad", "x = 1\ny = \n  if then\n", "-r", 1, outputSyntaxError, ""},
+		{"bad", "x = 1\ny = \n  if then\n", "-m", 1, outputSyntaxError, ""},
+		{"mac", macroImport + "x = 1\ny = $FourCC \"hfo\"\n", "-r", 1, outputMacroError, ""},
+		{"nomod", "import \"nothing.here\" as {:$X}\nx = 1\n", "-r", 1, outputNoModule, ""},
+		{"a", "export x = '\xff'\n", "-r", 1, outputNoLine, ""},
+		{"a", "export x = 1\rexport y = 2\n", "-r", 1, outputLoneReturn, ""},
+		{"bit", bit, "-r", 2, outputRewriteError, luaAfterRewrite},
+		{"bit", bit, "-m", 2, outputMinifyError, luaAfterMinify},
+		{"shl", "a = 1\nb = a << 2\nc = ~a\n", "-r", 2, outputRewriteTilde, luaAfterRewriteTilde},
 	} {
-		b := benchOf(t, files("src/"+c.name+".yue", c.text))
-		source, output := filepath.Join(b.root, "src", c.name+".yue"), b.staged(c.name+".lua")
+		b := newCompileFixture(t, newSourceTree("src/"+c.name+".yue", c.text))
+		source, output := filepath.Join(b.root, "src", c.name+".yue"), b.readStaged(c.name+".lua")
 		if err := os.MkdirAll(filepath.Dir(output), 0o777); err != nil {
 			t.Fatal(err)
 		}
-		args := []string{"--target=5.3", c.mode, "-o", output, "--path", b.search.searchPath, source}
+		args := []string{"--target=5.3", c.mode, "-o", output, "--path", b.macros.searchPath, source}
 		result, err := env.Run(background, yue, args, env.RunOptions{})
 		if err != nil {
 			t.Fatal(err)
@@ -133,14 +133,14 @@ func TestCompileErrorReadsTheLineAndTheMessageTheCompilerPrinted(t *testing.T) {
 		what, printed, wantMsg string
 		wantLine               int
 	}{
-		{"a syntax error", asPrinted(printedSyntax), "expected valid expression\n" + syntaxDetail, 2},
-		{"a syntax error, with line feeds", asPrinted(withLineFeeds(printedSyntax)), "expected valid expression\n" + syntaxDetail, 2},
-		{"a failed macro", asPrinted(printedMacro), fourCCMessage + "\n" + macroDetail, 3},
-		{"a failed macro, with line feeds", asPrinted(withLineFeeds(printedMacro)), fourCCMessage + "\n" + macroDetail, 3},
-		{"a module that is not found", asPrinted(printedNoModule), "module 'nothing.here' not found:\n" +
-			strings.TrimSpace(withLineFeeds(strings.TrimPrefix(printedNoModule, "Failed to compile: C:\\project\\src\\nomod.yue\r\n"))), 1},
-		{"no numbered line", asPrinted(printedNoLine), "YueScript compilation failed.", 0},
-		{"a carriage return alone in the excerpt", asPrinted(printedLoneReturn),
+		{"a syntax error", withFinalNewline(outputSyntaxError), "expected valid expression\n" + syntaxDetail, 2},
+		{"a syntax error, with line feeds", withFinalNewline(withLineFeeds(outputSyntaxError)), "expected valid expression\n" + syntaxDetail, 2},
+		{"a failed macro", withFinalNewline(outputMacroError), fourCCMessage + "\n" + macroDetail, 3},
+		{"a failed macro, with line feeds", withFinalNewline(withLineFeeds(outputMacroError)), fourCCMessage + "\n" + macroDetail, 3},
+		{"a module that is not found", withFinalNewline(outputNoModule), "module 'nothing.here' not found:\n" +
+			strings.TrimSpace(withLineFeeds(strings.TrimPrefix(outputNoModule, "Failed to compile: C:\\project\\src\\nomod.yue\r\n"))), 1},
+		{"no numbered line", withFinalNewline(outputNoLine), "YueScript compilation failed.", 0},
+		{"a carriage return alone in the excerpt", withFinalNewline(outputLoneReturn),
 			"syntax error\n1: syntax error\n1 | export x = 1\rexport y = 2\n                 ^", 1},
 		{"nothing printed", "\n", "YueScript compilation failed.", 0},
 		{"white space only", " \t\r\n\v\f \n", "YueScript compilation failed.", 0},
@@ -161,7 +161,7 @@ func TestCompileErrorReadsTheLineAndTheMessageTheCompilerPrinted(t *testing.T) {
 	}
 }
 
-func leaving(lua string) func() string { return func() string { return lua } }
+func readOutputFunc(lua string) func() string { return func() string { return lua } }
 
 func TestRewriteErrorReadsTheStepTheReasonAndTheLineMarkOfTheLuaLeft(t *testing.T) {
 	const and, tilde = "Unexpected Symbol `&` in source.", "Unexpected symbol `~` in source."
@@ -169,13 +169,13 @@ func TestRewriteErrorReadsTheStepTheReasonAndTheLineMarkOfTheLuaLeft(t *testing.
 		what, printed, left, wantMsg string
 		wantLine                     int
 	}{
-		{"a rewrite", asPrinted(printedRewrite), leftByRewrite, "YueScript compiled this file but could not rewrite its Lua: " + and, 4},
-		{"a rewrite, with line feeds", asPrinted(withLineFeeds(printedRewrite)), withLineFeeds(leftByRewrite),
+		{"a rewrite", withFinalNewline(outputRewriteError), luaAfterRewrite, "YueScript compiled this file but could not rewrite its Lua: " + and, 4},
+		{"a rewrite, with line feeds", withFinalNewline(withLineFeeds(outputRewriteError)), withLineFeeds(luaAfterRewrite),
 			"YueScript compiled this file but could not rewrite its Lua: " + and, 4},
-		{"a minify", asPrinted(printedMinify), leftByMinify, "YueScript compiled this file but could not minify its Lua: " + and, 0},
-		{"a rewrite of another operator", asPrinted(printedRewriteTilde), leftByRewriteTilde,
+		{"a minify", withFinalNewline(outputMinifyError), luaAfterMinify, "YueScript compiled this file but could not minify its Lua: " + and, 0},
+		{"a rewrite of another operator", withFinalNewline(outputRewriteTilde), luaAfterRewriteTilde,
 			"YueScript compiled this file but could not rewrite its Lua: " + tilde, 3},
-		{"no Lua left", asPrinted(printedRewrite), "", "YueScript compiled this file but could not rewrite its Lua: " + and, 0},
+		{"no Lua left", withFinalNewline(outputRewriteError), "", "YueScript compiled this file but could not rewrite its Lua: " + and, 0},
 		{"a line beyond the Lua left", "Failed to rewrite: x\n>> :9:1: far\n", "local x -- 1\n", "YueScript compiled this file but could not rewrite its Lua: far", 0},
 		{"line 0", "Failed to rewrite: x\n>> :0:1: zero\n", "local x -- 1\n", "YueScript compiled this file but could not rewrite its Lua: zero", 0},
 		{"a line without a mark", "Failed to rewrite: x\n>> :1:1: bare\n", "local x\nlocal y -- 2\n", "YueScript compiled this file but could not rewrite its Lua: bare", 0},
@@ -187,7 +187,7 @@ func TestRewriteErrorReadsTheStepTheReasonAndTheLineMarkOfTheLuaLeft(t *testing.
 			strings.Repeat("a -- 1\n", 11) + "b -- 40\n",
 			"YueScript compiled this file but could not rewrite its Lua: deep", 40},
 	} {
-		diagErr := newRewriteError("src/x.yue", c.printed, leaving(c.left))
+		diagErr := newRewriteError("src/x.yue", c.printed, readOutputFunc(c.left))
 		if diagErr == nil || diagErr.Msg != c.wantMsg || diagErr.Line != c.wantLine || diagErr.File != "src/x.yue" ||
 			!strings.Contains(diagErr.Hint, "bitwise operators (&, |, ~, <<, >>)") || !strings.Contains(diagErr.Hint, "lua/") {
 			t.Errorf("%s: rewriteError = %+v, want line %d and the message %q", c.what, diagErr, c.wantLine, c.wantMsg)
@@ -199,9 +199,9 @@ func TestTheLuaLeftIsReadOnlyForAStepThatFailedAtAPosition(t *testing.T) {
 	asked := 0
 	left := func() string {
 		asked++
-		return leftByRewrite
+		return luaAfterRewrite
 	}
-	for _, printed := range []string{asPrinted(printedSyntax), asPrinted(printedMacro), "\n", "x Failed to rewrite: y\n", "Failed to rewrite\n", "Failed to compile: Failed to rewrite: x\n"} {
+	for _, printed := range []string{withFinalNewline(outputSyntaxError), withFinalNewline(outputMacroError), "\n", "x Failed to rewrite: y\n", "Failed to rewrite\n", "Failed to compile: Failed to rewrite: x\n"} {
 		if diagErr := newRewriteError("src/x.yue", printed, left); diagErr != nil || asked != 0 {
 			t.Errorf("rewriteError(%q) = %+v, and the Lua left was read %d times, want no failure and no read", printed, diagErr, asked)
 		}
@@ -210,7 +210,7 @@ func TestTheLuaLeftIsReadOnlyForAStepThatFailedAtAPosition(t *testing.T) {
 	if diagErr == nil || diagErr.Msg != "YueScript compiled this file but could not minify its Lua." || diagErr.Line != 0 || asked != 0 {
 		t.Errorf("without a reason: rewriteError = %+v, and the Lua left was read %d times", diagErr, asked)
 	}
-	if diagErr := newRewriteError("src/x.yue", asPrinted(printedRewrite), left); diagErr == nil || diagErr.Line != 4 || asked != 1 {
+	if diagErr := newRewriteError("src/x.yue", withFinalNewline(outputRewriteError), left); diagErr == nil || diagErr.Line != 4 || asked != 1 {
 		t.Errorf("with a position: rewriteError = %+v, and the Lua left was read %d times, want once", diagErr, asked)
 	}
 }
@@ -264,7 +264,7 @@ func TestWhatTheCompilerPrintsIsReadWithWhiteSpaceAndLineEndsOfASCIIOnly(t *test
 		"a" + noBreakSpace + " ":  "a" + noBreakSpace,
 		wideSpace + "a":           wideSpace + "a",
 	} {
-		diagErr := newRewriteError("src/x.yue", "Failed to rewrite: x\n>> :1:1: "+reason+"\n", leaving(""))
+		diagErr := newRewriteError("src/x.yue", "Failed to rewrite: x\n>> :1:1: "+reason+"\n", readOutputFunc(""))
 		if wantMsg := "YueScript compiled this file but could not rewrite its Lua: " + want; diagErr == nil || diagErr.Msg != wantMsg {
 			t.Errorf("rewriteError with the reason %q = %+v, want the message %q", reason, diagErr, wantMsg)
 		}

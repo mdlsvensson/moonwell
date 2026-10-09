@@ -21,44 +21,44 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-type programBench struct {
+type programFixture struct {
 	t     *testing.T
 	root  string
-	world *env.Env
+	env   *env.Env
 	log   *testkit.LogRecorder
-	in    Input
+	input Input
 
-	guard sync.Mutex
-	runs  []string
+	mu   sync.Mutex
+	runs []string
 }
 
-func programOf(t *testing.T, p project) *programBench {
+func newProgramFixture(t *testing.T, p sourceTree) *programFixture {
 	t.Helper()
-	return programAt(t, p.lay(t), p)
+	return newProgramFixtureAt(t, p.writeToTempDir(t), p)
 }
 
-func programAt(t *testing.T, root string, p project) *programBench {
+func newProgramFixtureAt(t *testing.T, root string, p sourceTree) *programFixture {
 	t.Helper()
-	b := &programBench{t: t, root: root}
-	b.world, b.log = testkit.Env(t, root)
-	b.in = Input{Compiler: fakeYue, Entry: "src/main.yue", Libraries: p.libraries(), Lint: asErrors, Natives: smallAPI()}
+	b := &programFixture{t: t, root: root}
+	b.env, b.log = testkit.Env(t, root)
+	b.input = Input{Compiler: fakeYue, Entry: "src/main.yue", Libraries: p.libraries(), Lint: asErrors, Natives: testNatives()}
 	return b
 }
 
-func (b *programBench) fake(compiles map[string]answer, uses map[string]string) {
-	b.world.Run = func(_ context.Context, _ string, args []string, _ env.RunOptions) (env.RunResult, error) {
+func (b *programFixture) fakeCompiler(compiles map[string]fakeResult, uses map[string]string) {
+	b.env.Run = func(_ context.Context, _ string, args []string, _ env.RunOptions) (env.RunResult, error) {
 		source := args[len(args)-1]
 		if below, err := filepath.Rel(b.root, source); err == nil {
 			source = filepath.ToSlash(below)
 		}
 		if args[0] == "-g" {
-			b.note("list " + source)
+			b.recordRun("list " + source)
 			return env.RunResult{Stdout: uses[source]}, nil
 		}
-		b.note("compile " + source)
+		b.recordRun("compile " + source)
 		does, scripted := compiles[source]
 		if !scripted {
-			does = answer{lua: leaves("-- " + source + "\n")}
+			does = fakeResult{lua: luaOutput("-- " + source + "\n")}
 		}
 		if does.lua != nil {
 			if err := os.WriteFile(outputIn(args), []byte(*does.lua), 0o666); err != nil {
@@ -69,38 +69,38 @@ func (b *programBench) fake(compiles map[string]answer, uses map[string]string) 
 	}
 }
 
-func (b *programBench) note(run string) {
-	b.guard.Lock()
-	defer b.guard.Unlock()
+func (b *programFixture) recordRun(run string) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
 	b.runs = append(b.runs, run)
 }
 
-func (b *programBench) ran() []string {
-	b.guard.Lock()
-	defer b.guard.Unlock()
+func (b *programFixture) runsSoFar() []string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
 	runs := slices.Sorted(slices.Values(b.runs))
 	b.runs = nil
 	return runs
 }
 
-func (b *programBench) compile() (*Program, error) {
-	compiled, err := CompileSources(background, b.world, b.in)
+func (b *programFixture) tryBuild() (*Program, error) {
+	compiled, err := CompileSources(background, b.env, b.input)
 	if err != nil {
 		return nil, err
 	}
-	return Link(background, b.world, compiled)
+	return Link(background, b.env, compiled)
 }
 
-func (b *programBench) compiles() *Program {
+func (b *programFixture) mustBuild() *Program {
 	b.t.Helper()
-	program, err := b.compile()
+	program, err := b.tryBuild()
 	if err != nil {
 		b.t.Fatal(err)
 	}
 	return program
 }
 
-func leavingLua(text string) answer { return answer{lua: leaves(text)} }
+func resultWithLua(text string) fakeResult { return fakeResult{lua: luaOutput(text)} }
 
 func mapGlobalsOf(script string) *lua.MapGlobals {
 	defined := lua.ReadMapGlobals(script)
@@ -133,21 +133,21 @@ func luaOfEach(sources []Source, lua func(Source) (string, bool)) map[string]str
 
 func TestCompileTurnsAProjectIntoAProgramWithTheRealCompiler(t *testing.T) {
 	yue := tooltest.Yue(t)
-	p := files(
+	p := newSourceTree(
 		"src/main.yue", "import \"util.math\" as M\nimport \"kit\"\nrequire \"counter\"\nglobal Score = M.double 21\nprint Score, Count, kit.shout \"x\"\n",
 		"src/util/math.yue", "export double = (x) -> x * 2\n",
 		"src/unused.yue", "print Nothing\n",
 		"src/notes.yue", "-- nothing\n",
 		"lua/counter.lua", "Count = 0\n",
-	).with("ex").and(
+	).withLibraries("ex").withFiles(
 		inLibrary("ex", "kit/init.yue"), "export shout = (s) -> s\\upper!\n",
 		inLibrary("ex", "kit/extra.yue"), "export x = Undefined\n",
 		inLibrary("ex", "plain.lua"), "return 1\n",
 	)
-	b := programOf(t, p)
-	b.world.Run = env.Run
-	b.in.Compiler, b.in.Natives = yue, LoadNatives()
-	program := b.compiles()
+	b := newProgramFixture(t, p)
+	b.env.Run = env.Run
+	b.input.Compiler, b.input.Natives = yue, LoadNatives()
+	program := b.mustBuild()
 
 	type moduleAt struct{ Name, Path, Library string }
 	var modules []moduleAt
@@ -192,69 +192,69 @@ func TestCompileTurnsAProjectIntoAProgramWithTheRealCompiler(t *testing.T) {
 }
 
 func TestCompileRunsItsStepsInOrderAndReportsTheFirstFault(t *testing.T) {
-	syntax := answer{code: 1, stdout: "Failed to compile: main.yue\n2: unexpected expression\n"}
+	syntax := fakeResult{code: 1, stdout: "Failed to compile: main.yue\n2: unexpected expression\n"}
 	for _, c := range []struct {
 		name     string
-		of       project
+		of       sourceTree
 		entry    string
-		compiles map[string]answer
+		compiles map[string]fakeResult
 		uses     map[string]string
 		wantMsg  string
 		wantFile string
 		wantRuns []string
 	}{
-		{name: "no src, and an entry that is no file of src", of: files("lua/main.lua", "return 1\n"), entry: "lua/main.lua",
+		{name: "no src, and an entry that is no file of src", of: newSourceTree("lua/main.lua", "return 1\n"), entry: "lua/main.lua",
 			wantMsg: "The src/ folder is missing.", wantFile: "."},
-		{name: "a module file with a dotted name, and a file that does not compile", of: mainOnly.and("lua/a.b.lua", ""),
-			compiles: map[string]answer{"src/main.yue": syntax}, wantMsg: "Module file and folder names cannot contain dots.", wantFile: "lua/a.b.lua"},
+		{name: "a module file with a dotted name, and a file that does not compile", of: mainOnly.withFiles("lua/a.b.lua", ""),
+			compiles: map[string]fakeResult{"src/main.yue": syntax}, wantMsg: "Module file and folder names cannot contain dots.", wantFile: "lua/a.b.lua"},
 		{name: "a file that does not compile, an entry that is no file of src and a module that is not found", of: mainOnly, entry: "main.yue",
-			compiles: map[string]answer{"src/main.yue": syntax}, wantMsg: "unexpected expression", wantFile: "src/main.yue",
+			compiles: map[string]fakeResult{"src/main.yue": syntax}, wantMsg: "unexpected expression", wantFile: "src/main.yue",
 			wantRuns: []string{"compile src/main.yue"}},
 		{name: "an entry that is no file of src, a module that is not found and an unknown global", of: mainOnly, entry: "lua/main.lua",
-			compiles: map[string]answer{"src/main.yue": leavingLua("require('nope')\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
+			compiles: map[string]fakeResult{"src/main.yue": resultWithLua("require('nope')\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
 			wantMsg: "Entry 'lua/main.lua' must be a .yue file under src/.", wantRuns: []string{"compile src/main.yue"}},
 		{name: "an entry that is not there", of: mainOnly, entry: "src/other.yue",
 			wantMsg: "Module 'other' not found.", wantRuns: []string{"compile src/main.yue"}},
 		{name: "a module that is not found and an unknown global", of: mainOnly,
-			compiles: map[string]answer{"src/main.yue": leavingLua("\nrequire('nope')\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
+			compiles: map[string]fakeResult{"src/main.yue": resultWithLua("\nrequire('nope')\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
 			wantMsg: "Module 'nope' not found.", wantFile: "src/main.yue", wantRuns: []string{"compile src/main.yue"}},
 		{name: "a computed require and an unknown global", of: mainOnly,
-			compiles: map[string]answer{"src/main.yue": leavingLua("require(name)\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
+			compiles: map[string]fakeResult{"src/main.yue": resultWithLua("require(name)\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
 			wantMsg: "require must be called with a single string literal.", wantFile: "src/main.yue", wantRuns: []string{"compile src/main.yue"}},
-		{name: "a cycle and an unknown global", of: mainOnly.and("lua/a.lua", "require 'main'\n"),
-			compiles: map[string]answer{"src/main.yue": leavingLua("require('a')\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
+		{name: "a cycle and an unknown global", of: mainOnly.withFiles("lua/a.lua", "require 'main'\n"),
+			compiles: map[string]fakeResult{"src/main.yue": resultWithLua("require('a')\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
 			wantMsg: "Circular require: main \xe2\x86\x92 a \xe2\x86\x92 main", wantFile: "lua/a.lua", wantRuns: []string{"compile src/main.yue"}},
-		{name: "a source whose globals are not listed, and an unknown global in another", of: mainOnly.and("src/a.yue", "x = 1\n"),
-			compiles: map[string]answer{"src/main.yue": leavingLua("require('a')\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n", "src/a.yue": "no use\n"},
+		{name: "a source whose globals are not listed, and an unknown global in another", of: mainOnly.withFiles("src/a.yue", "x = 1\n"),
+			compiles: map[string]fakeResult{"src/main.yue": resultWithLua("require('a')\n")}, uses: map[string]string{"src/main.yue": "Zzz 1 1\n", "src/a.yue": "no use\n"},
 			wantMsg: "yue -g printed a line Moonwell cannot read: no use", wantFile: "src/a.yue",
 			wantRuns: []string{"compile src/a.yue", "compile src/main.yue", "list src/a.yue", "list src/main.yue"}},
 		{name: "an unknown global", of: mainOnly, uses: map[string]string{"src/main.yue": "Zzz 1 1\n"},
 			wantMsg: "Unknown global Zzz.", wantFile: "src/main.yue", wantRuns: []string{"compile src/main.yue", "list src/main.yue"}},
 	} {
-		b := programOf(t, c.of)
-		b.fake(c.compiles, c.uses)
+		b := newProgramFixture(t, c.of)
+		b.fakeCompiler(c.compiles, c.uses)
 		if c.entry != "" {
-			b.in.Entry = c.entry
+			b.input.Entry = c.entry
 		}
 		wantFile := c.wantFile
 		if wantFile == "." {
 			wantFile = b.root
 		}
-		program, err := b.compile()
+		program, err := b.tryBuild()
 		failure, isFailure := diag.FirstProblem(err)
 		if program != nil || !isFailure || !strings.HasPrefix(failure.Msg, c.wantMsg) || failure.File != wantFile {
 			t.Errorf("%s: the compile = %+v, %v, want a failure of %q that starts %q", c.name, program, err, wantFile, c.wantMsg)
 		}
-		if ran := b.ran(); !slices.Equal(ran, c.wantRuns) {
+		if ran := b.runsSoFar(); !slices.Equal(ran, c.wantRuns) {
 			t.Errorf("%s: the compiler ran as %q, want %q", c.name, ran, c.wantRuns)
 		}
 	}
 }
 
 func TestCompileWritesTheMacroModuleAndRefusesAFolderTheSearchCannotName(t *testing.T) {
-	b := programOf(t, mainOnly)
-	b.fake(nil, nil)
-	b.compiles()
+	b := newProgramFixture(t, mainOnly)
+	b.fakeCompiler(nil, nil)
+	b.mustBuild()
 	if written, err := os.ReadFile(filepath.Join(b.root, filepath.FromSlash(MacrosFile))); err != nil || string(written) != moonwell.MacrosYue {
 		t.Errorf("the macro module is %q, %v", written, err)
 	}
@@ -262,9 +262,9 @@ func TestCompileWritesTheMacroModuleAndRefusesAFolderTheSearchCannotName(t *test
 	if err := os.Mkdir(root, 0o777); err != nil {
 		t.Skipf("this system makes no folder with a semicolon in its name: %v", err)
 	}
-	b = programAt(t, root, files())
-	program, err := b.compile()
-	diagErr := asError(t, err, "a folder with a semicolon")
+	b = newProgramFixtureAt(t, root, newSourceTree())
+	program, err := b.tryBuild()
+	diagErr := asDiagError(t, err, "a folder with a semicolon")
 	if program != nil || !strings.Contains(diagErr.Msg, `";" or "?"`) || diagErr.File != root || fsx.Exists(filepath.Join(root, ".moonwell")) {
 		t.Errorf("the compile = %+v, %+v, and .moonwell is there: %v", program, diagErr, fsx.Exists(filepath.Join(root, ".moonwell")))
 	}
@@ -272,16 +272,16 @@ func TestCompileWritesTheMacroModuleAndRefusesAFolderTheSearchCannotName(t *test
 
 func TestAProgramHasTheLuaOfTheModulesTheEntryReachesAndOfEveryLibraryModule(t *testing.T) {
 	loud, empty, plain := inLibrary("ex", "kit/loud.yue"), inLibrary("ex", "kit/empty.yue"), inLibrary("ex", "plain.lua")
-	b := programOf(t, files(
+	b := newProgramFixture(t, newSourceTree(
 		"src/main.yue", "import \"util\"\n", "src/util.yue", "x = 1\n", "src/unreached.yue", "y = 2\n", "src/notes.yue", "-- nothing\n",
 		"lua/tools.lua", "return '\xff'\n",
-	).with("ex").and(loud, "z = 3\n", empty, "-- nothing\n", plain, "return 1\n"))
-	b.fake(map[string]answer{
-		"src/main.yue": leavingLua("local util = require('util')\n"), "src/util.yue": leavingLua("return '\xfe'\n"),
+	).withLibraries("ex").withFiles(loud, "z = 3\n", empty, "-- nothing\n", plain, "return 1\n"))
+	b.fakeCompiler(map[string]fakeResult{
+		"src/main.yue": resultWithLua("local util = require('util')\n"), "src/util.yue": resultWithLua("return '\xfe'\n"),
 		"src/notes.yue": {}, empty: {},
 	}, nil)
-	b.in.Minify = true
-	program := b.compiles()
+	b.input.Minify = true
+	program := b.mustBuild()
 	wantModules := []Module{
 		{Name: "util", Path: "src/util.yue", Kind: Yue, Lua: "return '\xfe'\n"},
 		{Name: "main", Path: "src/main.yue", Kind: Yue, Lua: "local util = require('util')\n"},
@@ -308,10 +308,10 @@ func TestAProgramHasTheLuaOfTheModulesTheEntryReachesAndOfEveryLibraryModule(t *
 }
 
 func TestTheEntryIsTheModuleOfTheEntryFile(t *testing.T) {
-	b := programOf(t, files("src/game/init.yue", "x = 1\n", "src/main.yue", "y = 2\n"))
-	b.fake(nil, nil)
-	b.in.Entry = `.\src\game\init.yue`
-	program := b.compiles()
+	b := newProgramFixture(t, newSourceTree("src/game/init.yue", "x = 1\n", "src/main.yue", "y = 2\n"))
+	b.fakeCompiler(nil, nil)
+	b.input.Entry = `.\src\game\init.yue`
+	program := b.mustBuild()
 	want := []Module{{Name: "game.init", Path: "src/game/init.yue", Kind: Yue, Lua: "-- src/game/init.yue\n"}}
 	if program.Entry != "game.init" || !slices.Equal(program.Modules, want) {
 		t.Errorf("the compile = entry %q, modules %+v", program.Entry, program.Modules)
@@ -320,26 +320,26 @@ func TestTheEntryIsTheModuleOfTheEntryFile(t *testing.T) {
 
 func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 	const hint, such = "YueScript writes no Lua for a file with nothing but comments and macros, and ", " is such a file."
-	b := programOf(t, mainOnly.and("src/game/notes.yue", "-- nothing yet\n"))
-	b.fake(map[string]answer{"src/main.yue": leavingLua("\nrequire('game.notes')\n"), "src/game/notes.yue": {}}, nil)
-	_, err := b.compile()
-	diagErr := asError(t, err, "a required module without code")
+	b := newProgramFixture(t, mainOnly.withFiles("src/game/notes.yue", "-- nothing yet\n"))
+	b.fakeCompiler(map[string]fakeResult{"src/main.yue": resultWithLua("\nrequire('game.notes')\n"), "src/game/notes.yue": {}}, nil)
+	_, err := b.tryBuild()
+	diagErr := asDiagError(t, err, "a required module without code")
 	if diagErr.Msg != "Module 'game.notes' has no code." || diagErr.File != "src/main.yue" || diagErr.Line != 2 ||
 		diagErr.Hint != hint+"src/game/notes.yue"+such {
 		t.Errorf("error = %+v", diagErr)
 	}
-	b = programOf(t, mainOnly.with("ex").and(inLibrary("ex", "kit/init.yue"), "-- nothing yet\n"))
-	b.fake(map[string]answer{"src/main.yue": leavingLua("require('kit')\n"), inLibrary("ex", "kit/init.yue"): {}}, nil)
-	_, err = b.compile()
-	diagErr = asError(t, err, "a required init module without code")
+	b = newProgramFixture(t, mainOnly.withLibraries("ex").withFiles(inLibrary("ex", "kit/init.yue"), "-- nothing yet\n"))
+	b.fakeCompiler(map[string]fakeResult{"src/main.yue": resultWithLua("require('kit')\n"), inLibrary("ex", "kit/init.yue"): {}}, nil)
+	_, err = b.tryBuild()
+	diagErr = asDiagError(t, err, "a required init module without code")
 	if diagErr.Msg != "Module 'kit' has no code." || diagErr.File != "src/main.yue" || diagErr.Line != 1 ||
 		diagErr.Hint != hint+inLibrary("ex", "kit/init.yue")+such {
 		t.Errorf("error = %+v", diagErr)
 	}
-	b = programOf(t, files("src/main.yue", "-- nothing yet\n"))
-	b.fake(map[string]answer{"src/main.yue": {}}, nil)
-	_, err = b.compile()
-	diagErr = asError(t, err, "an entry without code")
+	b = newProgramFixture(t, newSourceTree("src/main.yue", "-- nothing yet\n"))
+	b.fakeCompiler(map[string]fakeResult{"src/main.yue": {}}, nil)
+	_, err = b.tryBuild()
+	diagErr = asDiagError(t, err, "an entry without code")
 	if diagErr.Msg != "Module 'main' has no code." || diagErr.File != "src/main.yue" || diagErr.Line != 0 || diagErr.Hint != hint+"src/main.yue"+such {
 		t.Errorf("error = %+v", diagErr)
 	}
@@ -348,11 +348,11 @@ func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 func TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua(t *testing.T) {
 	yue := tooltest.Yue(t)
 	for minify, line := range map[bool]int{false: 3, true: 1} {
-		b := programOf(t, files("src/main.yue", "x = 1\n\nimport \"nope\"\nprint x, nope\n"))
-		b.world.Run = env.Run
-		b.in.Compiler, b.in.Minify = yue, minify
-		_, err := b.compile()
-		diagErr := asError(t, err, "a module that is not found")
+		b := newProgramFixture(t, newSourceTree("src/main.yue", "x = 1\n\nimport \"nope\"\nprint x, nope\n"))
+		b.env.Run = env.Run
+		b.input.Compiler, b.input.Minify = yue, minify
+		_, err := b.tryBuild()
+		diagErr := asDiagError(t, err, "a module that is not found")
 		if diagErr.Msg != "Module 'nope' not found." || diagErr.File != "src/main.yue" || diagErr.Line != line {
 			t.Errorf("minified %v: %+v, want line %d", minify, diagErr, line)
 		}
@@ -361,18 +361,18 @@ func TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua(t *testing.
 
 func TestCompileFailsWhenTheLuaOfALibrarysModuleCannotBeRead(t *testing.T) {
 	loud := inLibrary("ex", "kit/loud.yue")
-	b := programOf(t, mainOnly.with("ex").and(loud, "z = 3\n"))
-	b.fake(nil, nil)
-	b.in.Entry = "lua/main.lua"
-	scripted := b.world.Run
-	b.world.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
+	b := newProgramFixture(t, mainOnly.withLibraries("ex").withFiles(loud, "z = 3\n"))
+	b.fakeCompiler(nil, nil)
+	b.input.Entry = "lua/main.lua"
+	scripted := b.env.Run
+	b.env.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		if strings.HasSuffix(filepath.ToSlash(args[len(args)-1]), loud) {
 			return env.RunResult{}, os.MkdirAll(filepath.Join(outputIn(args), "kept"), 0o777)
 		}
 		return scripted(ctx, program, args, options)
 	}
-	program, err := b.compile()
-	diagErr := asError(t, err, "a folder for a library's output")
+	program, err := b.tryBuild()
+	diagErr := asDiagError(t, err, "a folder for a library's output")
 	const output = "dist/stage/lua/.libraries/ex/kit/loud.lua"
 	if program != nil || !strings.HasPrefix(diagErr.Msg, "Reading "+output+" failed: ") || diagErr.File != output || diagErr.Cause == nil {
 		t.Errorf("the compile = %+v, %+v", program, diagErr)
@@ -380,60 +380,60 @@ func TestCompileFailsWhenTheLuaOfALibrarysModuleCannotBeRead(t *testing.T) {
 }
 
 func TestUnknownGlobalsAsWarningsAreLoggedAndReturnedInTheProgram(t *testing.T) {
-	b := programOf(t, mainOnly)
-	b.fake(nil, map[string]string{"src/main.yue": "CreatUnit 1 5\nprint 2 1\n"})
-	b.in.Lint = manifest.Lint{UnknownGlobals: "warning", Globals: []string{"Extra"}}
-	program := b.compiles()
+	b := newProgramFixture(t, mainOnly)
+	b.fakeCompiler(nil, map[string]string{"src/main.yue": "CreatUnit 1 5\nprint 2 1\n"})
+	b.input.Lint = manifest.Lint{UnknownGlobals: "warning", Globals: []string{"Extra"}}
+	program := b.mustBuild()
 	want := diag.Problem{File: "src/main.yue", Line: 1, Column: 5, Msg: "Unknown global CreatUnit.", Hint: "Did you mean CreateUnit? " + unknownGlobalHint}
 	logged := "warning: src/main.yue:1:5 \xe2\x80\xba Unknown global CreatUnit.\nhint: Did you mean CreateUnit? " + unknownGlobalHint
 	if !slices.Equal(program.Unknown, []diag.Problem{want}) || !slices.Equal(b.log.Lines(), []string{logged}) || len(program.Modules) != 1 {
 		t.Errorf("the compile = %+v; log %q", program, b.log.Lines())
 	}
-	b = programOf(t, mainOnly)
-	b.fake(nil, map[string]string{"src/main.yue": "CreatUnit 1 5\nZzz 2 1\n"})
-	program, err := b.compile()
+	b = newProgramFixture(t, mainOnly)
+	b.fakeCompiler(nil, map[string]string{"src/main.yue": "CreatUnit 1 5\nZzz 2 1\n"})
+	program, err := b.tryBuild()
 	if problems, isProblems := err.(diag.Problems); program != nil || !isProblems || len(problems) != 2 || problems[0] != want || len(b.log.Lines()) != 0 {
 		t.Errorf("as an error: the compile = %+v, %v; log %q", program, err, b.log.Lines())
 	}
 }
 
 func TestWhatTheMapsScriptDefinesIsKnown(t *testing.T) {
-	b := programOf(t, mainOnly)
-	b.fake(nil, map[string]string{"src/main.yue": "udg_Score 1 1\nInitCustomTriggers 2 1\n"})
-	if _, err := b.compile(); err == nil {
+	b := newProgramFixture(t, mainOnly)
+	b.fakeCompiler(nil, map[string]string{"src/main.yue": "udg_Score 1 1\nInitCustomTriggers 2 1\n"})
+	if _, err := b.tryBuild(); err == nil {
 		t.Error("without a map's script, its names are known")
 	}
-	b = programOf(t, mainOnly)
-	b.fake(nil, map[string]string{"src/main.yue": "udg_Score 1 1\nInitCustomTriggers 2 1\n"})
-	b.in.Map = mapGlobalsOf("udg_Score = 0\nfunction InitCustomTriggers()\nend\n")
-	if program, err := b.compile(); err != nil || program.Unknown != nil {
+	b = newProgramFixture(t, mainOnly)
+	b.fakeCompiler(nil, map[string]string{"src/main.yue": "udg_Score 1 1\nInitCustomTriggers 2 1\n"})
+	b.input.Map = mapGlobalsOf("udg_Score = 0\nfunction InitCustomTriggers()\nend\n")
+	if program, err := b.tryBuild(); err != nil || program.Unknown != nil {
 		t.Errorf("with the map's script: %+v, %v", program, err)
 	}
 }
 
 func TestACompileOfAProjectThatDidNotChangeRunsNoCompiler(t *testing.T) {
-	b := programOf(t, files("src/main.yue", "import \"util\"\n", "src/util.yue", "x = 1\n", "src/unreached.yue", "y = 2\n"))
-	b.fake(map[string]answer{"src/main.yue": leavingLua("require('util')\n")}, nil)
-	first := b.compiles()
+	b := newProgramFixture(t, newSourceTree("src/main.yue", "import \"util\"\n", "src/util.yue", "x = 1\n", "src/unreached.yue", "y = 2\n"))
+	b.fakeCompiler(map[string]fakeResult{"src/main.yue": resultWithLua("require('util')\n")}, nil)
+	first := b.mustBuild()
 	want := []string{"compile src/main.yue", "compile src/unreached.yue", "compile src/util.yue", "list src/main.yue", "list src/util.yue"}
-	if ran := b.ran(); !slices.Equal(ran, want) {
+	if ran := b.runsSoFar(); !slices.Equal(ran, want) {
 		t.Errorf("the first compile ran the compiler as %q, want %q", ran, want)
 	}
-	second := b.compiles()
-	if ran := b.ran(); len(ran) != 0 || !slices.Equal(second.Modules, first.Modules) {
+	second := b.mustBuild()
+	if ran := b.runsSoFar(); len(ran) != 0 || !slices.Equal(second.Modules, first.Modules) {
 		t.Errorf("the second compile ran the compiler as %q, and gave %+v", ran, second.Modules)
 	}
 }
 
 func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReachedOneAgain(t *testing.T) {
 	library := inLibrary("ex", "kit/more.yue")
-	b := programOf(t, files(
+	b := newProgramFixture(t, newSourceTree(
 		"src/main.yue", "import \"m\" as {:$N}\nimport \"util\"\n", "src/m.yue", "export macro N = -> \"1\"\n",
 		"src/util.yue", "x = 1\n", "src/unreached.yue", "y = 2\n",
-	).with("ex"))
-	b.fake(map[string]answer{"src/main.yue": leavingLua("require('util')\n")}, nil)
-	b.compiles()
-	b.ran()
+	).withLibraries("ex"))
+	b.fakeCompiler(map[string]fakeResult{"src/main.yue": resultWithLua("require('util')\n")}, nil)
+	b.mustBuild()
+	b.runsSoFar()
 	lists := []string{"list src/main.yue", "list src/util.yue"}
 	every := append([]string{"compile src/m.yue", "compile src/main.yue", "compile src/unreached.yue", "compile src/util.yue"}, lists...)
 	with := func(runs ...string) []string {
@@ -466,8 +466,8 @@ func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReach
 				t.Fatal(err)
 			}
 		}
-		b.compiles()
-		if ran := b.ran(); !slices.Equal(ran, c.want) {
+		b.mustBuild()
+		if ran := b.runsSoFar(); !slices.Equal(ran, c.want) {
 			t.Errorf("after %s the compiler ran as %q, want %q", c.what, ran, c.want)
 		}
 	}
@@ -475,12 +475,12 @@ func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAndListsEveryReach
 
 func TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro(t *testing.T) {
 	yue := tooltest.Yue(t)
-	b := programOf(t, files("src/m.yue", "export macro N = -> \"Foo\"\n", "src/main.yue", "import \"m\" as {:$N}\nprint $N!\n"))
-	b.world.Run = env.Run
-	b.in.Compiler, b.in.Natives, b.in.Lint = yue, LoadNatives(), manifest.Lint{UnknownGlobals: "warning"}
+	b := newProgramFixture(t, newSourceTree("src/m.yue", "export macro N = -> \"Foo\"\n", "src/main.yue", "import \"m\" as {:$N}\nprint $N!\n"))
+	b.env.Run = env.Run
+	b.input.Compiler, b.input.Natives, b.input.Lint = yue, LoadNatives(), manifest.Lint{UnknownGlobals: "warning"}
 	for _, name := range []string{"Foo", "Bar"} {
 		testkit.WriteFile(t, b.root, "src/m.yue", []byte("export macro N = -> \""+name+"\"\n"))
-		program := b.compiles()
+		program := b.mustBuild()
 		main := program.Modules[len(program.Modules)-1]
 		if main.Path != "src/main.yue" || !strings.Contains(main.Lua, "print("+name+")") ||
 			len(program.Unknown) != 1 || program.Unknown[0].Msg != "Unknown global "+name+"." {
@@ -491,7 +491,7 @@ func TestAfterAnEditOfAMacroModuleOfTheProjectsOwnTheProgramIsOfTheNewMacro(t *t
 
 func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testing.T) {
 	loud, empty, plain := inLibrary("ex", "kit/loud.yue"), inLibrary("ex", "kit/empty.yue"), inLibrary("ex", "plain.lua")
-	of := files("src/main.yue", "x = 1\n", "lua/tools.lua", "return 2\n").with("ex").and(
+	of := newSourceTree("src/main.yue", "x = 1\n", "lua/tools.lua", "return 2\n").withLibraries("ex").withFiles(
 		loud, "z = 3\n", empty, "-- nothing\n", plain, "return 1\n")
 	wantLua := map[string]string{"lua/tools.lua": "return 2\n", plain: "return 1\n", loud: "-- " + loud + "\n"}
 	wantCompiles := []string{"compile " + empty, "compile " + loud, "compile src/main.yue"}
@@ -511,27 +511,27 @@ func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testi
 		{name: "an entry that is no file of src", entry: "lua/main.lua", main: "x = 1\n",
 			wantMsg: "Entry 'lua/main.lua' must be a .yue file under src/."},
 	} {
-		b := programOf(t, of)
-		b.fake(map[string]answer{"src/main.yue": leavingLua(c.main), empty: {}}, c.uses)
-		b.in.Entry = c.entry
-		compiled, err := CompileSources(background, b.world, b.in)
+		b := newProgramFixture(t, of)
+		b.fakeCompiler(map[string]fakeResult{"src/main.yue": resultWithLua(c.main), empty: {}}, c.uses)
+		b.input.Entry = c.entry
+		compiled, err := CompileSources(background, b.env, b.input)
 		if err != nil {
 			t.Errorf("%s: CompileSources = %v, want the sources compiled", c.name, err)
 			continue
 		}
 		found, err := CollectSources(b.root, of.libraries())
-		if ran := b.ran(); err != nil || !slices.Equal(compiled.Sources, found) || len(found) != 5 || !slices.Equal(ran, wantCompiles) {
+		if ran := b.runsSoFar(); err != nil || !slices.Equal(compiled.Sources, found) || len(found) != 5 || !slices.Equal(ran, wantCompiles) {
 			t.Errorf("%s: the sources are %+v, want what Collect finds: %+v, %v; the compiler ran as %q", c.name, compiled.Sources, found, err, ran)
 		}
 		if got := luaOfEach(compiled.Sources, compiled.Lua); !maps.Equal(got, wantLua) {
 			t.Errorf("%s: before the link, the Lua is %q, want %q", c.name, got, wantLua)
 		}
-		program, linkErr := Link(background, b.world, compiled)
+		program, linkErr := Link(background, b.env, compiled)
 		failure, isFailure := diag.FirstProblem(linkErr)
 		if program != nil || !isFailure || !strings.HasPrefix(failure.Msg, c.wantMsg) || failure.File != c.wantFile {
 			t.Errorf("%s: Link = %+v, %v, want a failure of %q that starts %q", c.name, program, linkErr, c.wantFile, c.wantMsg)
 		}
-		if ran := b.ran(); !slices.Equal(ran, c.wantRuns) {
+		if ran := b.runsSoFar(); !slices.Equal(ran, c.wantRuns) {
 			t.Errorf("%s: in the link the compiler ran as %q, want %q", c.name, ran, c.wantRuns)
 		}
 		if got := luaOfEach(compiled.Sources, compiled.Lua); !maps.Equal(got, wantLua) {
@@ -541,10 +541,10 @@ func TestTheSourcesAreCompiledAndTheLibrariesLuaIsThereWhenTheLinkFails(t *testi
 }
 
 func TestAStepThatIsNotHandedWhatItNeedsIsAMistakeOfTheCaller(t *testing.T) {
-	b := programOf(t, mainOnly)
+	b := newProgramFixture(t, mainOnly)
 	var expected *diag.Error
 	for _, compiled := range []*Compiled{nil, {}} {
-		program, err := Link(background, b.world, compiled)
+		program, err := Link(background, b.env, compiled)
 		if program != nil || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "CompileSources") {
 			t.Errorf("Link(%+v) = %+v, %v, want a plain error that names CompileSources", compiled, program, err)
 		}
@@ -552,8 +552,8 @@ func TestAStepThatIsNotHandedWhatItNeedsIsAMistakeOfTheCaller(t *testing.T) {
 	if lua, ok := (&Compiled{}).Lua(Source{Name: "main", Path: "src/main.yue", Kind: Yue}); ok || lua != "" {
 		t.Errorf("the Lua of a module of a value that CompileSources did not make = %q, %v", lua, ok)
 	}
-	b.in.Natives = nil
-	compiled, err := CompileSources(background, b.world, b.in)
+	b.input.Natives = nil
+	compiled, err := CompileSources(background, b.env, b.input)
 	if compiled != nil || err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "LoadNatives") {
 		t.Errorf("CompileSources = %+v, %v, want a plain error that names LoadNatives", compiled, err)
 	}

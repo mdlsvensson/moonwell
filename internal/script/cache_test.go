@@ -20,8 +20,8 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func (b *bench) hashesText() string {
-	text, err := os.ReadFile(b.staged(".hashes.json"))
+func (b *compileFixture) readHashesFile() string {
+	text, err := os.ReadFile(b.readStaged(".hashes.json"))
 	if err != nil {
 		return ""
 	}
@@ -30,9 +30,9 @@ func (b *bench) hashesText() string {
 
 func TestTheHashesFileHoldsWhatTheOutputsDependOnAndEachSourcesHash(t *testing.T) {
 	loud := inLibrary("ex", "kit/loud.yue")
-	b := benchOf(t, files("src/main.yue", "x = 1\n", "src/util/math.yue", "y = 2\n").with("ex").and(loud, "z = 3\n"))
-	b.fake(nil)
-	b.compiles(fakeYue, false)
+	b := newCompileFixture(t, newSourceTree("src/main.yue", "x = 1\n", "src/util/math.yue", "y = 2\n").withLibraries("ex").withFiles(loud, "z = 3\n"))
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
 	want := "{\n" +
 		"  \"compiler\": \"yue-of-the-test\",\n" +
 		"  \"mode\": \"-r\",\n" +
@@ -53,18 +53,18 @@ func TestTheHashesFileHoldsWhatTheOutputsDependOnAndEachSourcesHash(t *testing.T
 		"    }\n" +
 		"  }\n" +
 		"}\n"
-	if got := b.hashesText(); got != want {
+	if got := b.readHashesFile(); got != want {
 		t.Errorf(".hashes.json is\n%s\nwant\n%s", got, want)
 	}
-	b.compiles(fakeYue, true)
-	if got, wantMinified := b.hashesText(), strings.Replace(want, `"-r"`, `"-m"`, 1); got != wantMinified {
+	b.mustCompile(fakeYue, true)
+	if got, wantMinified := b.readHashesFile(), strings.Replace(want, `"-r"`, `"-m"`, 1); got != wantMinified {
 		t.Errorf("minified, .hashes.json is\n%s\nwant\n%s", got, wantMinified)
 	}
 }
 
 func TestEverySourceIsCompiledAgainWhenTheCompilerTheModeOrTheMacroModuleChanged(t *testing.T) {
-	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
-	b.fake(nil)
+	b := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
+	b.fakeCompiler(nil)
 	all := []string{"src/a.yue", "src/b.yue"}
 	steps := []struct {
 		what   string
@@ -84,62 +84,62 @@ func TestEverySourceIsCompiledAgainWhenTheCompilerTheModeOrTheMacroModuleChanged
 		{"all three as at first", fakeYue, false, "one", all},
 	}
 	for _, step := range steps {
-		b.search.hash = step.macros
-		b.compiles(step.yue, step.minify)
-		if ran := b.ran(); !slices.Equal(ran, step.want) {
+		b.macros.hash = step.macros
+		b.mustCompile(step.yue, step.minify)
+		if ran := b.ranSources(); !slices.Equal(ran, step.want) {
 			t.Errorf("%s: the compiler ran on %q, want %q", step.what, ran, step.want)
 		}
 	}
 }
 
 func TestASourceIsCompiledAgainWhenItChangedOrItsOutputIsGone(t *testing.T) {
-	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n", "src/c.yue", "z = 3\n"))
-	b.fake(nil)
-	b.compiles(fakeYue, false)
-	b.ran()
+	b := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n", "src/c.yue", "z = 3\n"))
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
+	b.ranSources()
 
-	b.remove("dist/stage/lua/b.lua")
-	b.compiles(fakeYue, false)
-	if ran := b.ran(); !slices.Equal(ran, []string{"src/b.yue"}) || !fsx.Exists(b.staged("b.lua")) {
+	b.removeFile("dist/stage/lua/b.lua")
+	b.mustCompile(fakeYue, false)
+	if ran := b.ranSources(); !slices.Equal(ran, []string{"src/b.yue"}) || !fsx.Exists(b.readStaged("b.lua")) {
 		t.Errorf("with the output of b.yue gone, the compiler ran on %q", ran)
 	}
-	b.write("src/c.yue", "z = 4\n")
-	b.compiles(fakeYue, false)
-	if ran := b.ran(); !slices.Equal(ran, []string{"src/c.yue"}) {
+	b.writeFile("src/c.yue", "z = 4\n")
+	b.mustCompile(fakeYue, false)
+	if ran := b.ranSources(); !slices.Equal(ran, []string{"src/c.yue"}) {
 		t.Errorf("with c.yue changed, the compiler ran on %q", ran)
 	}
-	b.write("src/c.yue", "z = 3\n")
-	b.compiles(fakeYue, false)
-	if ran := b.ran(); !slices.Equal(ran, []string{"src/c.yue"}) {
+	b.writeFile("src/c.yue", "z = 3\n")
+	b.mustCompile(fakeYue, false)
+	if ran := b.ranSources(); !slices.Equal(ran, []string{"src/c.yue"}) {
 		t.Errorf("with c.yue as it was at first, the compiler ran on %q", ran)
 	}
 }
 
 func TestTheHashesFileIsWrittenWhenSomeFilesFailedHoldingThoseThatCompiled(t *testing.T) {
-	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/bad.yue", "x = \n", "src/c.yue", "z = 3\n"))
-	b.fake(map[string]answer{"src/bad.yue": {code: 1, stdout: "Failed to compile: bad.yue\n1: boom\n"}})
-	b.refuses(fakeYue, false, "a failed file")
+	b := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/bad.yue", "x = \n", "src/c.yue", "z = 3\n"))
+	b.fakeCompiler(map[string]fakeResult{"src/bad.yue": {code: 1, stdout: "Failed to compile: bad.yue\n1: boom\n"}})
+	b.mustFailCompile(fakeYue, false, "a failed file")
 	kept, err := readCompileCache(b.root)
 	if paths := slices.Sorted(maps.Keys(kept.Sources)); err != nil || !slices.Equal(paths, []string{"src/a.yue", "src/c.yue"}) {
 		t.Errorf("the hashes file keeps %q, %v", paths, err)
 	}
-	b.ran()
-	b.fake(nil)
-	b.compiles(fakeYue, false)
-	if ran := b.ran(); !slices.Equal(ran, []string{"src/bad.yue"}) {
+	b.ranSources()
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
+	if ran := b.ranSources(); !slices.Equal(ran, []string{"src/bad.yue"}) {
 		t.Errorf("the next compile ran on %q", ran)
 	}
 }
 
 func TestTheOutputOfASourceThatIsGoneIsRemoved(t *testing.T) {
 	loud := inLibrary("ex", "kit/loud.yue")
-	b := benchOf(t, files("src/main.yue", "x = 1\n", "src/util/math.yue", "y = 2\n", "src/gone.yue", "z = 3\n").with("ex").and(loud, "w = 4\n"))
-	b.fake(nil)
-	b.compiles(fakeYue, false)
+	b := newCompileFixture(t, newSourceTree("src/main.yue", "x = 1\n", "src/util/math.yue", "y = 2\n", "src/gone.yue", "z = 3\n").withLibraries("ex").withFiles(loud, "w = 4\n"))
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
 	outputs := []string{"main.lua", "util/math.lua", "gone.lua", ".libraries/ex/kit/loud.lua"}
 	there := func() (found []string) {
 		for _, output := range outputs {
-			if fsx.Exists(b.staged(output)) {
+			if fsx.Exists(b.readStaged(output)) {
 				found = append(found, output)
 			}
 		}
@@ -148,35 +148,35 @@ func TestTheOutputOfASourceThatIsGoneIsRemoved(t *testing.T) {
 	if !slices.Equal(there(), outputs) {
 		t.Fatalf("the first compile left %q", there())
 	}
-	b.ran()
+	b.ranSources()
 
-	b.remove("src/util/math.yue")
-	b.remove("src/gone.yue")
-	b.remove("dist/stage/lua/gone.lua")
-	b.compiles(fakeYue, false)
-	if ran, left := b.ran(), there(); len(ran) != 0 || !slices.Equal(left, []string{"main.lua", ".libraries/ex/kit/loud.lua"}) {
+	b.removeFile("src/util/math.yue")
+	b.removeFile("src/gone.yue")
+	b.removeFile("dist/stage/lua/gone.lua")
+	b.mustCompile(fakeYue, false)
+	if ran, left := b.ranSources(), there(); len(ran) != 0 || !slices.Equal(left, []string{"main.lua", ".libraries/ex/kit/loud.lua"}) {
 		t.Errorf("with two sources gone, the compiler ran on %q and the outputs are %q", ran, left)
 	}
 
 	b.libraries = []Library{{Key: "renamed", Dir: librariesDir + "/ex"}}
 	outputs = append(outputs, ".libraries/renamed/kit/loud.lua")
-	b.compiles(fakeYue, false)
-	if ran, left := b.ran(), there(); !slices.Equal(ran, []string{loud}) || !slices.Equal(left, []string{"main.lua", ".libraries/renamed/kit/loud.lua"}) {
+	b.mustCompile(fakeYue, false)
+	if ran, left := b.ranSources(), there(); !slices.Equal(ran, []string{loud}) || !slices.Equal(left, []string{"main.lua", ".libraries/renamed/kit/loud.lua"}) {
 		t.Errorf("with the library's key changed, the compiler ran on %q and the outputs are %q", ran, left)
 	}
 
 	b.libraries = nil
-	b.compiles(fakeYue, false)
-	if ran, left := b.ran(), there(); len(ran) != 0 || !slices.Equal(left, []string{"main.lua"}) {
+	b.mustCompile(fakeYue, false)
+	if ran, left := b.ranSources(), there(); len(ran) != 0 || !slices.Equal(left, []string{"main.lua"}) {
 		t.Errorf("with the library gone, the compiler ran on %q and the outputs are %q", ran, left)
 	}
 }
 
 func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
-	first := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
-	first.fake(nil)
-	first.compiles(fakeYue, false)
-	good := first.hashesText()
+	first := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
+	first.fakeCompiler(nil)
+	first.mustCompile(fakeYue, false)
+	good := first.readHashesFile()
 	if !strings.Contains(good, `"output": "b.lua"`) || !strings.Contains(good, `"mode": "-r",`) {
 		t.Fatalf(".hashes.json is\n%s", good)
 	}
@@ -204,15 +204,15 @@ func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 		"an output without a name":     strings.Replace(good, `"output": "b.lua"`, `"output": ""`, 1),
 		"an output from the root":      strings.Replace(good, `"output": "b.lua"`, `"output": "/b.lua"`, 1),
 	} {
-		b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
-		b.fake(nil)
-		b.compiles(fakeYue, false)
-		b.ran()
-		b.write("dist/stage/lua/.hashes.json", text)
-		b.remove("src/b.yue")
-		b.compiles(fakeYue, false)
-		if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue"}) || !fsx.Exists(b.staged("b.lua")) {
-			t.Errorf("%s: the compiler ran on %q, and b.lua is there: %v", what, ran, fsx.Exists(b.staged("b.lua")))
+		b := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
+		b.fakeCompiler(nil)
+		b.mustCompile(fakeYue, false)
+		b.ranSources()
+		b.writeFile("dist/stage/lua/.hashes.json", text)
+		b.removeFile("src/b.yue")
+		b.mustCompile(fakeYue, false)
+		if ran := b.ranSources(); !slices.Equal(ran, []string{"src/a.yue"}) || !fsx.Exists(b.readStaged("b.lua")) {
+			t.Errorf("%s: the compiler ran on %q, and b.lua is there: %v", what, ran, fsx.Exists(b.readStaged("b.lua")))
 		}
 		kept, err := readCompileCache(b.root)
 		want := map[string]cachedSource{"src/a.yue": {Hash: hashOfA, Output: "a.lua"}}
@@ -220,20 +220,20 @@ func TestAHashesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 			t.Errorf("%s: the hashes file written over it keeps %+v, %v", what, kept, err)
 		}
 	}
-	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
-	b.fake(nil)
-	b.compiles(fakeYue, false)
-	b.ran()
-	b.write("dist/stage/lua/.hashes.json", good)
-	b.remove("src/b.yue")
-	b.compiles(fakeYue, false)
-	if ran := b.ran(); len(ran) != 0 || fsx.Exists(b.staged("b.lua")) {
-		t.Errorf("with the file as it was written, the compiler ran on %q, and b.lua is there: %v", ran, fsx.Exists(b.staged("b.lua")))
+	b := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
+	b.ranSources()
+	b.writeFile("dist/stage/lua/.hashes.json", good)
+	b.removeFile("src/b.yue")
+	b.mustCompile(fakeYue, false)
+	if ran := b.ranSources(); len(ran) != 0 || fsx.Exists(b.readStaged("b.lua")) {
+		t.Errorf("with the file as it was written, the compiler ran on %q, and b.lua is there: %v", ran, fsx.Exists(b.readStaged("b.lua")))
 	}
 }
 
-func (b *bench) stopAt(source string, stopped error) {
-	b.use(func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
+func (b *compileFixture) failCompileOf(source string, stopped error) {
+	b.setCompiler(func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		if b.sourceOf(args) == source {
 			return env.RunResult{}, stopped
 		}
@@ -243,20 +243,20 @@ func (b *bench) stopAt(source string, stopped error) {
 
 func TestAStoppedRunLeavesNothingItWasToCompileUpToDate(t *testing.T) {
 	stopped := errors.New("stopped")
-	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/kept.yue", "y = 2\n", "src/stop.yue", "z = 3\n"))
-	b.fake(nil)
-	b.compiles(fakeYue, false)
-	b.ran()
+	b := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/kept.yue", "y = 2\n", "src/stop.yue", "z = 3\n"))
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
+	b.ranSources()
 
-	b.write("src/a.yue", "x = 2\n")
-	b.write("src/new.yue", "w = 5\n")
-	b.write("src/stop.yue", "z = 4\n")
-	b.stopAt("src/stop.yue", stopped)
-	if result, err := b.compile(fakeYue, false); result != nil || err != stopped {
+	b.writeFile("src/a.yue", "x = 2\n")
+	b.writeFile("src/new.yue", "w = 5\n")
+	b.writeFile("src/stop.yue", "z = 4\n")
+	b.failCompileOf("src/stop.yue", stopped)
+	if result, err := b.tryCompile(fakeYue, false); result != nil || err != stopped {
 		t.Fatalf("the stopped run: %+v, %v", result, err)
 	}
-	if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue", "src/new.yue", "src/stop.yue"}) || !fsx.Exists(b.staged("new.lua")) {
-		t.Fatalf("the stopped run ran the compiler on %q, and new.lua is there: %v", ran, fsx.Exists(b.staged("new.lua")))
+	if ran := b.ranSources(); !slices.Equal(ran, []string{"src/a.yue", "src/new.yue", "src/stop.yue"}) || !fsx.Exists(b.readStaged("new.lua")) {
+		t.Fatalf("the stopped run ran the compiler on %q, and new.lua is there: %v", ran, fsx.Exists(b.readStaged("new.lua")))
 	}
 	kept, err := readCompileCache(b.root)
 	want := map[string]cachedSource{
@@ -267,54 +267,54 @@ func TestAStoppedRunLeavesNothingItWasToCompileUpToDate(t *testing.T) {
 		t.Errorf("after the stopped run the hashes file keeps %+v, %v, want %+v", kept.Sources, err, want)
 	}
 
-	b.write("src/a.yue", "x = 1\n")
-	b.remove("src/new.yue")
-	b.fake(nil)
-	b.compiles(fakeYue, false)
-	if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue", "src/stop.yue"}) || fsx.Exists(b.staged("new.lua")) {
-		t.Errorf("after the stopped run the compiler ran on %q, and new.lua is there: %v", ran, fsx.Exists(b.staged("new.lua")))
+	b.writeFile("src/a.yue", "x = 1\n")
+	b.removeFile("src/new.yue")
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
+	if ran := b.ranSources(); !slices.Equal(ran, []string{"src/a.yue", "src/stop.yue"}) || fsx.Exists(b.readStaged("new.lua")) {
+		t.Errorf("after the stopped run the compiler ran on %q, and new.lua is there: %v", ran, fsx.Exists(b.readStaged("new.lua")))
 	}
-	b.compiles(fakeYue, false)
-	if ran := b.ran(); len(ran) != 0 {
+	b.mustCompile(fakeYue, false)
+	if ran := b.ranSources(); len(ran) != 0 {
 		t.Errorf("with nothing changed after that, the compiler ran on %q", ran)
 	}
 }
 
 func TestAStoppedRunInAnotherModeLeavesNothingUpToDate(t *testing.T) {
 	stopped := errors.New("stopped")
-	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
-	b.fake(nil)
-	b.compiles(fakeYue, false)
-	b.ran()
-	b.stopAt("src/b.yue", stopped)
-	if _, err := b.compile(fakeYue, true); err != stopped {
+	b := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n"))
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
+	b.ranSources()
+	b.failCompileOf("src/b.yue", stopped)
+	if _, err := b.tryCompile(fakeYue, true); err != stopped {
 		t.Fatalf("the stopped run: %v", err)
 	}
-	b.ran()
-	b.fake(nil)
-	b.compiles(fakeYue, false)
-	if ran := b.ran(); !slices.Equal(ran, []string{"src/a.yue", "src/b.yue"}) {
+	b.ranSources()
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
+	if ran := b.ranSources(); !slices.Equal(ran, []string{"src/a.yue", "src/b.yue"}) {
 		t.Errorf("normal again after the stopped minified run, the compiler ran on %q", ran)
 	}
 }
 
 func TestAProjectWithoutYueScriptCompilesNothingAndKeepsNoSources(t *testing.T) {
-	b := benchOf(t, files("src/notes.txt", "", "lua/tools.lua", "return {}\n"))
-	result := b.compiles(fakeYue, false)
+	b := newCompileFixture(t, newSourceTree("src/notes.txt", "", "lua/tools.lua", "return {}\n"))
+	result := b.mustCompile(fakeYue, false)
 	if len(result.sourceTexts) != 0 || len(result.sourceHashes) != 0 || len(result.outputFiles) != 0 || result.sourceTexts == nil {
 		t.Errorf("compileAll = %+v, want nothing compiled", result)
 	}
-	if text := b.hashesText(); !strings.Contains(text, `"sources": {}`) {
+	if text := b.readHashesFile(); !strings.Contains(text, `"sources": {}`) {
 		t.Errorf(".hashes.json is\n%s", text)
 	}
 }
 
 func TestALinkOnTheWayToTheHashesFileIsRefused(t *testing.T) {
 	for _, symlink := range []string{"dist", "dist/stage", "dist/stage/lua"} {
-		b := benchOf(t, files("src/notes.txt", ""))
-		at := linkTo(t, files(".hashes.json", "{}"), b.root, symlink)
-		_, err := b.compile(fakeYue, false)
-		if diagErr := asError(t, err, "a link at "+symlink); diagErr.Msg != "Symlinks are not supported: "+at ||
+		b := newCompileFixture(t, newSourceTree("src/notes.txt", ""))
+		at := symlinkTree(t, newSourceTree(".hashes.json", "{}"), b.root, symlink)
+		_, err := b.tryCompile(fakeYue, false)
+		if diagErr := asDiagError(t, err, "a link at "+symlink); diagErr.Msg != "Symlinks are not supported: "+at ||
 			diagErr.File != "dist/stage/lua" {
 			t.Errorf("a link at %s: %+v", symlink, diagErr)
 		}
@@ -322,9 +322,9 @@ func TestALinkOnTheWayToTheHashesFileIsRefused(t *testing.T) {
 }
 
 func TestAHashesFileThatCannotBeWrittenIsRefusedByItsPath(t *testing.T) {
-	b := benchOf(t, mainOnly.and("dist/stage/lua/.hashes.json/kept.txt", ""))
-	b.fake(nil)
-	diagErr := b.refuses(fakeYue, false, "a folder for the hashes file")
+	b := newCompileFixture(t, mainOnly.withFiles("dist/stage/lua/.hashes.json/kept.txt", ""))
+	b.fakeCompiler(nil)
+	diagErr := b.mustFailCompile(fakeYue, false, "a folder for the hashes file")
 	if !strings.HasPrefix(diagErr.Msg, "Writing dist/stage/lua/.hashes.json failed: ") || diagErr.File != "dist/stage/lua/.hashes.json" ||
 		!strings.Contains(diagErr.Hint, "dist/") || diagErr.Cause == nil {
 		t.Errorf("error = %+v", diagErr)
@@ -388,11 +388,11 @@ func TestASourceMayDefineMacrosWhenItHoldsTheWordMacro(t *testing.T) {
 }
 
 func TestTheSourcesThatMayDefineMacrosAreAmongWhatEveryOutputDependsOn(t *testing.T) {
-	member := func(p project) string {
+	member := func(p sourceTree) string {
 		t.Helper()
-		b := benchOf(t, p)
-		b.fake(nil)
-		result := b.compiles(fakeYue, false)
+		b := newCompileFixture(t, p)
+		b.fakeCompiler(nil)
+		result := b.mustCompile(fakeYue, false)
 		kept, err := readCompileCache(b.root)
 		if err != nil || kept.MacroSources != result.macroSources {
 			t.Fatalf("the hashes file keeps %q and the compile returns %q, %v", kept.MacroSources, result.macroSources, err)
@@ -404,20 +404,20 @@ func TestTheSourcesThatMayDefineMacrosAreAmongWhatEveryOutputDependsOn(t *testin
 	inLib := inLibrary("ex", "kit/m.yue")
 	for _, c := range []struct {
 		what string
-		of   project
+		of   sourceTree
 		want string
 	}{
-		{"no source with the word", mainOnly.and("src/tools.yue", macroImport), ""},
-		{"a Lua module with the word", mainOnly.and("lua/x.lua", comment), ""},
-		{"a file of src that is no module", mainOnly.and("src/notes.txt", one, "src/x.lua", comment), ""},
-		{"a source with the word", mainOnly.and("src/m.yue", one), "src/m.yue\x00" + hashed(one) + "\n"},
-		{"that source with another text", mainOnly.and("src/m.yue", edited), "src/m.yue\x00" + hashed(edited) + "\n"},
-		{"that source and another text beside it", files("src/main.yue", "x = 2\n", "src/m.yue", one), "src/m.yue\x00" + hashed(one) + "\n"},
-		{"two sources with the word", mainOnly.and("src/m.yue", one, "src/a/b.yue", comment),
+		{"no source with the word", mainOnly.withFiles("src/tools.yue", macroImport), ""},
+		{"a Lua module with the word", mainOnly.withFiles("lua/x.lua", comment), ""},
+		{"a file of src that is no module", mainOnly.withFiles("src/notes.txt", one, "src/x.lua", comment), ""},
+		{"a source with the word", mainOnly.withFiles("src/m.yue", one), "src/m.yue\x00" + hashed(one) + "\n"},
+		{"that source with another text", mainOnly.withFiles("src/m.yue", edited), "src/m.yue\x00" + hashed(edited) + "\n"},
+		{"that source and another text beside it", newSourceTree("src/main.yue", "x = 2\n", "src/m.yue", one), "src/m.yue\x00" + hashed(one) + "\n"},
+		{"two sources with the word", mainOnly.withFiles("src/m.yue", one, "src/a/b.yue", comment),
 			"src/a/b.yue\x00" + hashed(comment) + "\nsrc/m.yue\x00" + hashed(one) + "\n"},
-		{"a library's source with the word", mainOnly.with("ex").and("src/m.yue", one, inLib, comment, inLibrary("ex", "kit/x.lua"), comment),
+		{"a library's source with the word", mainOnly.withLibraries("ex").withFiles("src/m.yue", one, inLib, comment, inLibrary("ex", "kit/x.lua"), comment),
 			inLib + "\x00" + hashed(comment) + "\nsrc/m.yue\x00" + hashed(one) + "\n"},
-		{"a source with the word after a byte order mark", mainOnly.and("src/m.yue", mark+one), "src/m.yue\x00" + hashed(mark+one) + "\n"},
+		{"a source with the word after a byte order mark", mainOnly.withFiles("src/m.yue", mark+one), "src/m.yue\x00" + hashed(mark+one) + "\n"},
 	} {
 		want := ""
 		if c.want != "" {
@@ -430,10 +430,10 @@ func TestTheSourcesThatMayDefineMacrosAreAmongWhatEveryOutputDependsOn(t *testin
 }
 
 func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAgain(t *testing.T) {
-	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n", "src/m.yue", "export macro N = -> 1\n"))
-	b.fake(nil)
-	b.compiles(fakeYue, false)
-	b.ran()
+	b := newCompileFixture(t, newSourceTree("src/a.yue", "x = 1\n", "src/b.yue", "y = 2\n", "src/m.yue", "export macro N = -> 1\n"))
+	b.fakeCompiler(nil)
+	b.mustCompile(fakeYue, false)
+	b.ranSources()
 	all := []string{"src/a.yue", "src/b.yue", "src/m.yue"}
 	for _, c := range []struct {
 		what, path, text string
@@ -446,42 +446,42 @@ func TestAnEditOfASourceThatMayDefineMacrosCompilesEverySourceAgain(t *testing.T
 		{"the word gone from the last source that has it", "src/m.yue", "z = 3\n", all},
 		{"an edit of that source", "src/m.yue", "z = 4\n", []string{"src/m.yue"}},
 	} {
-		b.write(c.path, c.text)
-		b.compiles(fakeYue, false)
-		if ran := b.ran(); !slices.Equal(ran, c.want) {
+		b.writeFile(c.path, c.text)
+		b.mustCompile(fakeYue, false)
+		if ran := b.ranSources(); !slices.Equal(ran, c.want) {
 			t.Errorf("after %s the compiler ran on %q, want %q", c.what, ran, c.want)
 		}
 	}
 }
 
-type usesBench struct {
+type usesFixture struct {
 	t            *testing.T
 	root         string
-	world        *env.Env
-	yue          *listing
-	search       macroFile
+	env          *env.Env
+	compiler     *fakeLister
+	macros       macroFile
 	macroSources string
 }
 
-func usesBenchOf(t *testing.T, printed map[string]env.RunResult) *usesBench {
+func newUsesFixture(t *testing.T, printed map[string]env.RunResult) *usesFixture {
 	t.Helper()
 	root := t.TempDir()
-	b := &usesBench{t: t, root: root, yue: &listing{t: t, root: root, printed: printed}, macroSources: "s1"}
-	b.world, _ = testkit.Env(t, root)
-	b.world.Run = b.yue.run
-	b.search = macroFile{searchPath: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
+	b := &usesFixture{t: t, root: root, compiler: &fakeLister{t: t, root: root, results: printed}, macroSources: "s1"}
+	b.env, _ = testkit.Env(t, root)
+	b.env.Run = b.compiler.run
+	b.macros = macroFile{searchPath: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
 	return b
 }
 
-func (b *usesBench) list(yue string, pairs ...string) (map[string][]globalUse, error) {
+func (b *usesFixture) tryList(yue string, pairs ...string) (map[string][]globalUse, error) {
 	var sources []lintSource
 	for i := 0; i+1 < len(pairs); i += 2 {
 		sources = append(sources, lintSource{path: pairs[i], hash: pairs[i+1]})
 	}
-	return listGlobalUses(background, b.world, yue, b.search, b.macroSources, sources)
+	return listGlobalUses(background, b.env, yue, b.macros, b.macroSources, sources)
 }
 
-func (b *usesBench) usesText() string {
+func (b *usesFixture) readUsesFile() string {
 	text, err := os.ReadFile(filepath.Join(b.root, "dist", "stage", "lua", ".globals.json"))
 	if err != nil {
 		return ""
@@ -493,15 +493,15 @@ func sameUses(got, want map[string][]globalUse) bool { return maps.EqualFunc(got
 
 func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *testing.T) {
 	const main, captain = "src/main.yue", "src/heroes/captain.yue"
-	b := usesBenchOf(t, map[string]env.RunResult{main: prints("print 1 1\n"), captain: prints("CreatUnit 3 5\nprint 4 1\n")})
+	b := newUsesFixture(t, map[string]env.RunResult{main: resultPrinting("print 1 1\n"), captain: resultPrinting("CreatUnit 3 5\nprint 4 1\n")})
 	expected := map[string][]globalUse{
 		captain: {{Name: "CreatUnit", Line: 3, Column: 5}, {Name: "print", Line: 4, Column: 1}},
 		main:    {{Name: "print", Line: 1, Column: 1}},
 	}
 	both := []string{captain, main}
 
-	uses, err := b.list("yue", main, "h1", captain, "h2")
-	if err != nil || !sameUses(uses, expected) || !slices.Equal(b.yue.ran(), both) {
+	uses, err := b.tryList("yue", main, "h1", captain, "h2")
+	if err != nil || !sameUses(uses, expected) || !slices.Equal(b.compiler.runsSoFar(), both) {
 		t.Fatalf("listUses = %+v, %v", uses, err)
 	}
 	want := `{
@@ -537,33 +537,33 @@ func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *test
   }
 }
 `
-	if got := b.usesText(); got != want {
+	if got := b.readUsesFile(); got != want {
 		t.Errorf(".globals.json is\n%s\nwant\n%s", got, want)
 	}
 
-	uses, err = b.list("yue", main, "h1", captain, "h2")
-	if ran := b.yue.ran(); err != nil || !sameUses(uses, expected) || len(ran) != 0 {
+	uses, err = b.tryList("yue", main, "h1", captain, "h2")
+	if ran := b.compiler.runsSoFar(); err != nil || !sameUses(uses, expected) || len(ran) != 0 {
 		t.Errorf("unchanged: %+v, %v after listing %q", uses, err, ran)
 	}
 
-	b.yue.printed[main] = prints("")
-	uses, err = b.list("yue", main, "h3", captain, "h2")
-	if ran := b.yue.ran(); err != nil || !slices.Equal(ran, []string{main}) || uses[main] == nil || len(uses[main]) != 0 || len(uses) != 2 {
+	b.compiler.results[main] = resultPrinting("")
+	uses, err = b.tryList("yue", main, "h3", captain, "h2")
+	if ran := b.compiler.runsSoFar(); err != nil || !slices.Equal(ran, []string{main}) || uses[main] == nil || len(uses[main]) != 0 || len(uses) != 2 {
 		t.Errorf("after an edit: %+v, %v after listing %q", uses, err, ran)
 	}
-	if text := b.usesText(); !strings.Contains(text, "\"hash\": \"h3\",\n      \"uses\": []\n") {
+	if text := b.readUsesFile(); !strings.Contains(text, "\"hash\": \"h3\",\n      \"uses\": []\n") {
 		t.Errorf("after an edit, .globals.json is\n%s", text)
 	}
-	uses, err = b.list("yue", main, "h3", captain, "h2")
-	if ran := b.yue.ran(); err != nil || len(ran) != 0 || uses[main] == nil || len(uses[main]) != 0 {
+	uses, err = b.tryList("yue", main, "h3", captain, "h2")
+	if ran := b.compiler.runsSoFar(); err != nil || len(ran) != 0 || uses[main] == nil || len(uses[main]) != 0 {
 		t.Errorf("a source without uses, unchanged: %+v, %v after listing %q", uses, err, ran)
 	}
 
-	if _, err := b.list("other-yue", main, "h3", captain, "h2"); err != nil || !slices.Equal(b.yue.ran(), both) {
+	if _, err := b.tryList("other-yue", main, "h3", captain, "h2"); err != nil || !slices.Equal(b.compiler.runsSoFar(), both) {
 		t.Errorf("another compiler: %v", err)
 	}
 
-	if _, err := b.list("other-yue", main, "h3"); err != nil || len(b.yue.ran()) != 0 {
+	if _, err := b.tryList("other-yue", main, "h3"); err != nil || len(b.compiler.runsSoFar()) != 0 {
 		t.Fatalf("one source of the two: %v", err)
 	}
 	kept, err := readUsesCache(b.root, usesCacheKey{Compiler: "other-yue", Macros: "m1", MacroSources: "s1"})
@@ -598,86 +598,86 @@ func TestAUsesFileInAnotherShapeCountsAsAbsent(t *testing.T) {
 		"another hash":                 strings.Replace(good, `"hash": "h1"`, `"hash": "h0"`, 1),
 		"another source":               strings.Replace(good, `"src/main.yue"`, `"src/other.yue"`, 1),
 	} {
-		b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": prints("Zzz 1 1\n")})
+		b := newUsesFixture(t, map[string]env.RunResult{"src/main.yue": resultPrinting("Zzz 1 1\n")})
 		testkit.WriteFile(t, b.root, "dist/stage/lua/.globals.json", []byte(text))
-		uses, err := b.list("yue", "src/main.yue", "h1")
-		if ran := b.yue.ran(); err != nil || !sameUses(uses, want) || !slices.Equal(ran, []string{"src/main.yue"}) {
+		uses, err := b.tryList("yue", "src/main.yue", "h1")
+		if ran := b.compiler.runsSoFar(); err != nil || !sameUses(uses, want) || !slices.Equal(ran, []string{"src/main.yue"}) {
 			t.Errorf("%s: %+v, %v after listing %q", what, uses, err, ran)
 		}
 	}
-	b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": prints("Zzz 1 1\n")})
+	b := newUsesFixture(t, map[string]env.RunResult{"src/main.yue": resultPrinting("Zzz 1 1\n")})
 	testkit.WriteFile(t, b.root, "dist/stage/lua/.globals.json", []byte(good))
-	uses, err := b.list("yue", "src/main.yue", "h1")
-	if ran := b.yue.ran(); err != nil || !sameUses(uses, map[string][]globalUse{"src/main.yue": {{Name: "print", Line: 1, Column: 1}}}) || len(ran) != 0 {
+	uses, err := b.tryList("yue", "src/main.yue", "h1")
+	if ran := b.compiler.runsSoFar(); err != nil || !sameUses(uses, map[string][]globalUse{"src/main.yue": {{Name: "print", Line: 1, Column: 1}}}) || len(ran) != 0 {
 		t.Errorf("the file as it is written: %+v, %v after listing %q", uses, err, ran)
 	}
 }
 
 func TestAFailedListingIsReportedLikeAFileThatFailedToCompile(t *testing.T) {
 	failed := env.RunResult{ExitCode: 1, Stdout: "Failed to compile: main.yue\n2: unexpected expression\n"}
-	b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": failed})
-	uses, err := b.list("yue", "src/main.yue", "h1")
-	diagErr := asError(t, err, "a failed run")
+	b := newUsesFixture(t, map[string]env.RunResult{"src/main.yue": failed})
+	uses, err := b.tryList("yue", "src/main.yue", "h1")
+	diagErr := asDiagError(t, err, "a failed run")
 	if uses != nil || diagErr.Msg != "unexpected expression\n2: unexpected expression" || diagErr.File != "src/main.yue" || diagErr.Line != 2 {
 		t.Errorf("listUses = %+v, %+v", uses, diagErr)
 	}
-	b = usesBenchOf(t, map[string]env.RunResult{"src/main.yue": {ExitCode: 1, Stderr: "7: on the error stream\n"}})
-	_, err = b.list("yue", "src/main.yue", "h1")
-	if diagErr := asError(t, err, "a failed run"); diagErr.Line != 7 || diagErr.File != "src/main.yue" {
+	b = newUsesFixture(t, map[string]env.RunResult{"src/main.yue": {ExitCode: 1, Stderr: "7: on the error stream\n"}})
+	_, err = b.tryList("yue", "src/main.yue", "h1")
+	if diagErr := asDiagError(t, err, "a failed run"); diagErr.Line != 7 || diagErr.File != "src/main.yue" {
 		t.Errorf("error = %+v", diagErr)
 	}
 }
 
 func TestOutputThatCannotBeReadIsReportedAndTheOtherSourcesAreStillKept(t *testing.T) {
 	const bad, good, worse = "src/bad.yue", "src/good.yue", "src/Worse.yue"
-	b := usesBenchOf(t, map[string]env.RunResult{bad: prints("Score one 8\n"), good: prints("print 1 1\n"), worse: prints("x\n")})
-	_, err := b.list("yue", bad, "h1", good, "h2", worse, "h3")
-	if diagErr := asError(t, err, "unreadable output"); diagErr.Msg != "yue -g printed a line Moonwell cannot read: x" || diagErr.File != worse {
+	b := newUsesFixture(t, map[string]env.RunResult{bad: resultPrinting("Score one 8\n"), good: resultPrinting("print 1 1\n"), worse: resultPrinting("x\n")})
+	_, err := b.tryList("yue", bad, "h1", good, "h2", worse, "h3")
+	if diagErr := asDiagError(t, err, "unreadable output"); diagErr.Msg != "yue -g printed a line Moonwell cannot read: x" || diagErr.File != worse {
 		t.Errorf("error = %+v", diagErr)
 	}
-	if ran := b.yue.ran(); !slices.Equal(ran, []string{worse, bad, good}) {
+	if ran := b.compiler.runsSoFar(); !slices.Equal(ran, []string{worse, bad, good}) {
 		t.Errorf("the compiler listed %q", ran)
 	}
 
-	b.yue.printed[bad], b.yue.printed[worse] = prints("Score 1 8\n"), prints("")
-	uses, err := b.list("yue", bad, "h1", good, "h2", worse, "h3")
+	b.compiler.results[bad], b.compiler.results[worse] = resultPrinting("Score 1 8\n"), resultPrinting("")
+	uses, err := b.tryList("yue", bad, "h1", good, "h2", worse, "h3")
 	want := map[string][]globalUse{
 		bad:   {{Name: "Score", Line: 1, Column: 8}},
 		good:  {{Name: "print", Line: 1, Column: 1}},
 		worse: {},
 	}
-	if ran := b.yue.ran(); err != nil || !sameUses(uses, want) || !slices.Equal(ran, []string{worse, bad}) {
+	if ran := b.compiler.runsSoFar(); err != nil || !sameUses(uses, want) || !slices.Equal(ran, []string{worse, bad}) {
 		t.Errorf("listUses = %+v, %v after listing %q", uses, err, ran)
 	}
 }
 
 func TestTheCompilerIsGivenTheMacroPathAndTheUsesDependOnTheMacroModule(t *testing.T) {
-	b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": prints("print 1 1\n")})
+	b := newUsesFixture(t, map[string]env.RunResult{"src/main.yue": resultPrinting("print 1 1\n")})
 	list := func() {
 		t.Helper()
-		if _, err := b.list("yue", "src/main.yue", "h1"); err != nil {
+		if _, err := b.tryList("yue", "src/main.yue", "h1"); err != nil {
 			t.Fatal(err)
 		}
 	}
 	list()
-	want := []string{"-g", "--path", b.search.searchPath, filepath.Join(b.root, "src", "main.yue")}
-	if len(b.yue.runs) != 1 || !slices.Equal(b.yue.runs[0], want) {
-		t.Errorf("the compiler was run with %q, want once with %q", b.yue.runs, want)
+	want := []string{"-g", "--path", b.macros.searchPath, filepath.Join(b.root, "src", "main.yue")}
+	if len(b.compiler.runs) != 1 || !slices.Equal(b.compiler.runs[0], want) {
+		t.Errorf("the compiler was run with %q, want once with %q", b.compiler.runs, want)
 	}
 	list()
-	if len(b.yue.runs) != 1 {
+	if len(b.compiler.runs) != 1 {
 		t.Error("unchanged, but listed again")
 	}
-	b.search.hash = "m2"
+	b.macros.hash = "m2"
 	list()
-	if len(b.yue.runs) != 2 {
+	if len(b.compiler.runs) != 2 {
 		t.Error("a changed macro module lists every file again")
 	}
 	b.macroSources = "s2"
 	list()
 	list()
-	if len(b.yue.runs) != 3 {
-		t.Errorf("after a change of the sources that may define macros, the compiler ran %d times in all, want 3", len(b.yue.runs))
+	if len(b.compiler.runs) != 3 {
+		t.Errorf("after a change of the sources that may define macros, the compiler ran %d times in all, want 3", len(b.compiler.runs))
 	}
 }
 
@@ -686,14 +686,14 @@ func TestAtMostEightSourcesAreListedAtATime(t *testing.T) {
 	for i := range 40 {
 		pairs = append(pairs, fmt.Sprintf("src/m%02d.yue", i), "h")
 	}
-	b := usesBenchOf(t, nil)
+	b := newUsesFixture(t, nil)
 	var guard sync.Mutex
 	running, most := 0, 0
 	var once sync.Once
 	eightAreIn := make(chan struct{})
 	waited, giveUp := context.WithTimeout(background, 5*time.Second)
 	defer giveUp()
-	b.world.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
+	b.env.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
 		guard.Lock()
 		running++
 		most = max(most, running)
@@ -709,44 +709,44 @@ func TestAtMostEightSourcesAreListedAtATime(t *testing.T) {
 		guard.Lock()
 		running--
 		guard.Unlock()
-		return prints("print 1 1\n"), nil
+		return resultPrinting("print 1 1\n"), nil
 	}
-	uses, err := b.list("yue", pairs...)
+	uses, err := b.tryList("yue", pairs...)
 	if err != nil || most != 8 || running != 0 || len(uses) != 40 {
 		t.Errorf("at most %d sources were listed at a time, %d are still listed, and %d have their uses: %v", most, running, len(uses), err)
 	}
 }
 
 func TestAListingThatIsStoppedPassesTheErrorOnAndKeepsNothingNew(t *testing.T) {
-	b := usesBenchOf(t, map[string]env.RunResult{"src/a.yue": prints("print 1 1\n"), "src/b.yue": prints("print 2 2\n")})
-	if _, err := b.list("yue", "src/a.yue", "h1"); err != nil {
+	b := newUsesFixture(t, map[string]env.RunResult{"src/a.yue": resultPrinting("print 1 1\n"), "src/b.yue": resultPrinting("print 2 2\n")})
+	if _, err := b.tryList("yue", "src/a.yue", "h1"); err != nil {
 		t.Fatal(err)
 	}
-	before := b.usesText()
+	before := b.readUsesFile()
 	stopped := errors.New("stopped")
-	b.world.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
+	b.env.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
 		return env.RunResult{}, stopped
 	}
-	uses, err := b.list("yue", "src/a.yue", "h1", "src/b.yue", "h2")
-	if uses != nil || err != stopped || b.usesText() != before || before == "" {
-		t.Errorf("listUses = %+v, %v; .globals.json is\n%s\nand was\n%s", uses, err, b.usesText(), before)
+	uses, err := b.tryList("yue", "src/a.yue", "h1", "src/b.yue", "h2")
+	if uses != nil || err != stopped || b.readUsesFile() != before || before == "" {
+		t.Errorf("listUses = %+v, %v; .globals.json is\n%s\nand was\n%s", uses, err, b.readUsesFile(), before)
 	}
 }
 
 func TestAUsesFileThatCannotBeReadOrWrittenIsRefusedByItsPath(t *testing.T) {
-	b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": prints("print 1 1\n")})
+	b := newUsesFixture(t, map[string]env.RunResult{"src/main.yue": resultPrinting("print 1 1\n")})
 	testkit.WriteFile(t, b.root, "dist/stage/lua/.globals.json/kept.txt", nil)
-	_, err := b.list("yue", "src/main.yue", "h1")
-	diagErr := asError(t, err, "a folder for the uses file")
+	_, err := b.tryList("yue", "src/main.yue", "h1")
+	diagErr := asDiagError(t, err, "a folder for the uses file")
 	if !strings.HasPrefix(diagErr.Msg, "Writing dist/stage/lua/.globals.json failed: ") || diagErr.File != "dist/stage/lua/.globals.json" ||
 		!strings.Contains(diagErr.Hint, "dist/") || diagErr.Cause == nil {
 		t.Errorf("error = %+v", diagErr)
 	}
-	b = usesBenchOf(t, nil)
-	at := linkTo(t, files(".globals.json", "{}"), b.root, "dist/stage")
-	_, err = b.list("yue", "src/main.yue", "h1")
-	if diagErr := asError(t, err, "a link at dist/stage"); diagErr.Msg != "Symlinks are not supported: "+at ||
-		diagErr.File != "dist/stage/lua/.globals.json" || len(b.yue.ran()) != 0 {
+	b = newUsesFixture(t, nil)
+	at := symlinkTree(t, newSourceTree(".globals.json", "{}"), b.root, "dist/stage")
+	_, err = b.tryList("yue", "src/main.yue", "h1")
+	if diagErr := asDiagError(t, err, "a link at dist/stage"); diagErr.Msg != "Symlinks are not supported: "+at ||
+		diagErr.File != "dist/stage/lua/.globals.json" || len(b.compiler.runsSoFar()) != 0 {
 		t.Errorf("a link at dist/stage: %+v", diagErr)
 	}
 }

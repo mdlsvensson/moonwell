@@ -18,7 +18,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/lua"
 )
 
-func smallAPI() *Natives {
+func testNatives() *Natives {
 	api := &Natives{
 		GameVersion: "9.9.9",
 		Functions: []NativeFunction{
@@ -32,27 +32,27 @@ func smallAPI() *Natives {
 	return api
 }
 
-type listing struct {
+type fakeLister struct {
 	t       *testing.T
 	root    string
-	printed map[string]env.RunResult
+	results map[string]env.RunResult
 
-	guard sync.Mutex
-	runs  [][]string
+	mu   sync.Mutex
+	runs [][]string
 }
 
-func (l *listing) run(_ context.Context, _ string, args []string, _ env.RunOptions) (env.RunResult, error) {
+func (l *fakeLister) run(_ context.Context, _ string, args []string, _ env.RunOptions) (env.RunResult, error) {
 	if len(args) != 4 || args[0] != "-g" || args[1] != "--path" {
 		l.t.Errorf("the compiler was run with %q, want -g, --path, the search and a file", args)
 		return env.RunResult{}, errors.New("a run the test does not expect")
 	}
-	l.guard.Lock()
-	defer l.guard.Unlock()
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.runs = append(l.runs, slices.Clone(args))
-	return l.printed[l.sourceOf(args)], nil
+	return l.results[l.sourceOf(args)], nil
 }
 
-func (l *listing) sourceOf(args []string) string {
+func (l *fakeLister) sourceOf(args []string) string {
 	below, err := filepath.Rel(l.root, args[len(args)-1])
 	if err != nil {
 		return args[len(args)-1]
@@ -60,9 +60,9 @@ func (l *listing) sourceOf(args []string) string {
 	return filepath.ToSlash(below)
 }
 
-func (l *listing) ran() []string {
-	l.guard.Lock()
-	defer l.guard.Unlock()
+func (l *fakeLister) runsSoFar() []string {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	sources := []string{}
 	for _, args := range l.runs {
 		sources = append(sources, l.sourceOf(args))
@@ -72,7 +72,7 @@ func (l *listing) ran() []string {
 	return sources
 }
 
-func prints(text string) env.RunResult { return env.RunResult{Stdout: text} }
+func resultPrinting(text string) env.RunResult { return env.RunResult{Stdout: text} }
 
 func TestDeclaredGlobalsReadsTheNamesOnGlobalLines(t *testing.T) {
 	source := strings.Join([]string{
@@ -148,18 +148,18 @@ func TestAGlobalLineInABlockCommentOrALongStringDeclaresItsNames(t *testing.T) {
 
 func TestKnownGlobalsJoinsTheNativesTheMapDeclaredNamesAndLintGlobals(t *testing.T) {
 	mapGlobals := &lua.MapGlobals{Globals: []lua.Global{{Name: "udg_Score", Type: "integer"}}, Functions: []string{"InitCustomTriggers"}}
-	known := knownGlobals(smallAPI(), mapGlobals, []string{"Round"}, []string{"MyLibrary"})
+	known := knownGlobals(testNatives(), mapGlobals, []string{"Round"}, []string{"MyLibrary"})
 	want := []string{"CreateUnit", "FourCC", "InitCustomTriggers", "MyLibrary", "Round", "bj_MAX_PLAYERS", "math", "print", "udg_Score"}
 	if names := slices.Sorted(maps.Keys(known)); !slices.Equal(names, want) {
 		t.Errorf("knownGlobals = %q", names)
 	}
-	if without := knownGlobals(smallAPI(), nil, nil, nil); without["udg_Score"] || without["io"] || len(without) != 5 {
+	if without := knownGlobals(testNatives(), nil, nil, nil); without["udg_Score"] || without["io"] || len(without) != 5 {
 		t.Errorf("without a map: %v", without)
 	}
 }
 
 func TestUnknownGlobalProblemsReportsEveryUnknownUseInFileLineAndColumnOrder(t *testing.T) {
-	known := knownGlobals(smallAPI(), nil, nil, nil)
+	known := knownGlobals(testNatives(), nil, nil, nil)
 	problems := unknownGlobalProblems(map[string][]globalUse{
 		"src/main.yue": {
 			{Name: "print", Line: 1, Column: 1},
@@ -169,7 +169,7 @@ func TestUnknownGlobalProblemsReportsEveryUnknownUseInFileLineAndColumnOrder(t *
 		},
 		"src/a.yue": {{Name: "Zzz", Line: 9, Column: 1}},
 		"src/B.yue": {{Name: "Zzz", Line: 1, Column: 1}},
-	}, known, smallAPI().Lua.Removed)
+	}, known, testNatives().Lua.Removed)
 	want := []diag.Problem{
 		{File: "src/B.yue", Line: 1, Column: 1, Msg: "Unknown global Zzz.", Hint: unknownGlobalHint},
 		{File: "src/a.yue", Line: 9, Column: 1, Msg: "Unknown global Zzz.", Hint: unknownGlobalHint},
@@ -189,7 +189,7 @@ func TestUnknownGlobalProblemsReportsEveryUnknownUseInFileLineAndColumnOrder(t *
 }
 
 func TestTheHintNamesAtMostThreeCloseNamesNearestFirstAndEachOnce(t *testing.T) {
-	known := knownGlobals(smallAPI(), nil, []string{"Unit1", "Unit2", "unit3", "Unit4", "CreateUnit"}, []string{"Unit2", "Units"})
+	known := knownGlobals(testNatives(), nil, []string{"Unit1", "Unit2", "unit3", "Unit4", "CreateUnit"}, []string{"Unit2", "Units"})
 	problems := unknownGlobalProblems(map[string][]globalUse{"src/main.yue": {{Name: "Unit", Line: 1, Column: 1}}}, known, nil)
 	want := "Did you mean Unit1, Unit2 or Unit4? " + unknownGlobalHint
 	if len(problems) != 1 || problems[0].Hint != want {
@@ -197,28 +197,28 @@ func TestTheHintNamesAtMostThreeCloseNamesNearestFirstAndEachOnce(t *testing.T) 
 	}
 }
 
-type checkBench struct {
-	t       *testing.T
-	world   *env.Env
-	log     *testkit.LogRecorder
-	yue     *listing
-	in      Input
-	search  macroFile
-	output  *compileOutput
-	modules []Module
+type lintFixture struct {
+	t        *testing.T
+	env      *env.Env
+	log      *testkit.LogRecorder
+	compiler *fakeLister
+	input    Input
+	macros   macroFile
+	output   *compileOutput
+	modules  []Module
 }
 
-func checkOf(t *testing.T, sources []string, printed map[string]string, lint manifest.Lint, mapScript string, luaTexts ...string) *checkBench {
+func newLintFixture(t *testing.T, sources []string, printed map[string]string, lint manifest.Lint, mapScript string, luaTexts ...string) *lintFixture {
 	t.Helper()
 	root := t.TempDir()
-	b := &checkBench{t: t, yue: &listing{t: t, root: root, printed: map[string]env.RunResult{}}}
-	b.world, b.log = testkit.Env(t, root)
-	b.world.Run = b.yue.run
-	b.in = Input{Compiler: "yue", Lint: lint, Natives: smallAPI()}
+	b := &lintFixture{t: t, compiler: &fakeLister{t: t, root: root, results: map[string]env.RunResult{}}}
+	b.env, b.log = testkit.Env(t, root)
+	b.env.Run = b.compiler.run
+	b.input = Input{Compiler: "yue", Lint: lint, Natives: testNatives()}
 	if mapScript != "" {
-		b.in.Map = mapGlobalsOf(mapScript)
+		b.input.Map = mapGlobalsOf(mapScript)
 	}
-	b.search = macroFile{searchPath: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
+	b.macros = macroFile{searchPath: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
 	b.output = &compileOutput{sourceTexts: map[string]string{}, sourceHashes: map[string]string{}, outputFiles: map[string]string{}}
 	for i := 0; i+1 < len(sources); i += 2 {
 		path := "src/" + sources[i]
@@ -226,7 +226,7 @@ func checkOf(t *testing.T, sources []string, printed map[string]string, lint man
 		b.modules = append(b.modules, Module{Name: strings.TrimSuffix(sources[i], ".yue"), Path: path, Kind: Yue})
 	}
 	for below, text := range printed {
-		b.yue.printed["src/"+below] = prints(text)
+		b.compiler.results["src/"+below] = resultPrinting(text)
 	}
 	for i, text := range luaTexts {
 		b.modules = append(b.modules, Module{Name: "m" + strconv.Itoa(i), Path: "lua/m" + strconv.Itoa(i) + ".lua", Kind: Lua, Lua: text})
@@ -234,14 +234,14 @@ func checkOf(t *testing.T, sources []string, printed map[string]string, lint man
 	return b
 }
 
-func (b *checkBench) check() ([]diag.Problem, error) {
-	return findUnknownGlobals(background, b.world, b.in, b.search, b.output, b.modules)
+func (b *lintFixture) check() ([]diag.Problem, error) {
+	return findUnknownGlobals(background, b.env, b.input, b.macros, b.output, b.modules)
 }
 
 var asErrors = manifest.Lint{UnknownGlobals: "error"}
 
 func TestTheCheckKnowsTheGlobalsALuaModuleDefinesAtItsTopLevel(t *testing.T) {
-	b := checkOf(t, []string{"main.yue", "CountUp!\n"}, map[string]string{"main.yue": "CountUp 1 1\n"}, asErrors, "",
+	b := newLintFixture(t, []string{"main.yue", "CountUp!\n"}, map[string]string{"main.yue": "CountUp 1 1\n"}, asErrors, "",
 		"Count = 0\nfunction CountUp()\n  Count = Count + 1\nend\n")
 	if problems, err := b.check(); err != nil || len(problems) != 0 {
 		t.Errorf("the check gave %+v, %v", problems, err)
@@ -249,20 +249,20 @@ func TestTheCheckKnowsTheGlobalsALuaModuleDefinesAtItsTopLevel(t *testing.T) {
 }
 
 func TestTheCheckAcceptsMapDeclaredAndLintGlobalsNames(t *testing.T) {
-	b := checkOf(t,
+	b := newLintFixture(t,
 		[]string{"main.yue", "print udg_Score, Round, MyLibrary\n", "state.yue", "global Round = 1\n"},
 		map[string]string{"main.yue": "print 1 1\nudg_Score 1 7\nRound 1 18\nMyLibrary 1 25\n", "state.yue": "Round 1 8\n"},
 		manifest.Lint{UnknownGlobals: "error", Globals: []string{"MyLibrary"}}, "udg_Score = 0\nfunction main()\nend\n")
 	if problems, err := b.check(); err != nil || len(problems) != 0 {
 		t.Errorf("the check gave %+v, %v", problems, err)
 	}
-	if ran := b.yue.ran(); !slices.Equal(ran, []string{"src/main.yue", "src/state.yue"}) {
+	if ran := b.compiler.runsSoFar(); !slices.Equal(ran, []string{"src/main.yue", "src/state.yue"}) {
 		t.Errorf("the compiler listed %q", ran)
 	}
 }
 
 func TestTheCheckFailsWithEveryUnknownUseAtOnce(t *testing.T) {
-	b := checkOf(t, []string{"main.yue", "x = CreatUnit!\nprint udg_Score\n"},
+	b := newLintFixture(t, []string{"main.yue", "x = CreatUnit!\nprint udg_Score\n"},
 		map[string]string{"main.yue": "CreatUnit 1 5\nprint 2 1\nudg_Score 2 7\n"}, asErrors, "")
 	problems, err := b.check()
 	if _, isProblems := err.(diag.Problems); !isProblems || problems != nil {
@@ -283,7 +283,7 @@ func TestTheCheckFailsWithEveryUnknownUseAtOnce(t *testing.T) {
 }
 
 func TestTheCheckOnlyWarnsWithUnknownGlobalsSetToWarning(t *testing.T) {
-	b := checkOf(t, []string{"main.yue", "x = CreatUnit!\n"}, map[string]string{"main.yue": "CreatUnit 1 5\n"},
+	b := newLintFixture(t, []string{"main.yue", "x = CreatUnit!\n"}, map[string]string{"main.yue": "CreatUnit 1 5\n"},
 		manifest.Lint{UnknownGlobals: "warning"}, "")
 	problems, err := b.check()
 	want := "warning: src/main.yue:1:5 \xe2\x80\xba Unknown global CreatUnit.\nhint: Did you mean CreateUnit? " + unknownGlobalHint
@@ -298,21 +298,21 @@ func TestTheCheckWarnsAboutAtMost20UsesThenHowManyMore(t *testing.T) {
 	for i := 1; i <= 23; i++ {
 		uses = append(uses, "Zzz "+strconv.Itoa(i)+" 1")
 	}
-	b := checkOf(t, []string{"main.yue", ""}, map[string]string{"main.yue": strings.Join(uses, "\n")}, manifest.Lint{UnknownGlobals: "warning"}, "")
+	b := newLintFixture(t, []string{"main.yue", ""}, map[string]string{"main.yue": strings.Join(uses, "\n")}, manifest.Lint{UnknownGlobals: "warning"}, "")
 	problems, err := b.check()
 	lines := b.log.Lines()
 	if err != nil || len(problems) != 23 || len(lines) != 21 || lines[20] != "warning: and 3 more unknown global(s)" ||
 		!strings.HasPrefix(lines[19], "warning: src/main.yue:20:1 ") {
 		t.Errorf("%d problems, %v; log %q", len(problems), err, lines)
 	}
-	b = checkOf(t, []string{"main.yue", ""}, map[string]string{"main.yue": strings.Join(uses[:20], "\n")}, manifest.Lint{UnknownGlobals: "warning"}, "")
+	b = newLintFixture(t, []string{"main.yue", ""}, map[string]string{"main.yue": strings.Join(uses[:20], "\n")}, manifest.Lint{UnknownGlobals: "warning"}, "")
 	if problems, err := b.check(); err != nil || len(problems) != 20 || len(b.log.Lines()) != 20 {
 		t.Errorf("of 20 uses: %d problems, %v; log %q", len(problems), err, b.log.Lines())
 	}
 }
 
 func TestOnlyTheProjectsOwnYueScriptIsListedAndEveryReachedModuleDeclares(t *testing.T) {
-	b := checkOf(t, []string{"main.yue", "print Shared, Count, Nothing\n"}, map[string]string{"main.yue": "print 1 1\nShared 1 7\nCount 1 15\nNothing 1 22\n"},
+	b := newLintFixture(t, []string{"main.yue", "print Shared, Count, Nothing\n"}, map[string]string{"main.yue": "print 1 1\nShared 1 7\nCount 1 15\nNothing 1 22\n"},
 		asErrors, "", "Count = 0\n")
 	loud := inLibrary("ex", "kit/loud.yue")
 	b.output.sourceTexts[loud], b.output.sourceHashes[loud] = "global Shared = Undefined\n", "h-loud"
@@ -324,24 +324,24 @@ func TestOnlyTheProjectsOwnYueScriptIsListedAndEveryReachedModuleDeclares(t *tes
 	if problems, isProblems := err.(diag.Problems); !isProblems || !slices.Equal(problems, want) {
 		t.Errorf("the check gave %v, want %+v", err, want)
 	}
-	if ran := b.yue.ran(); !slices.Equal(ran, []string{"src/main.yue"}) {
+	if ran := b.compiler.runsSoFar(); !slices.Equal(ran, []string{"src/main.yue"}) {
 		t.Errorf("the compiler listed %q, want the one source of src/ once", ran)
 	}
 }
 
 func TestASourceTheCompilerCannotListFailsTheCheckBeforeAnyProblem(t *testing.T) {
-	b := checkOf(t, []string{"main.yue", "x = Zzz\n", "bad.yue", "y = \n"}, map[string]string{"main.yue": "Zzz 1 5\n"}, asErrors, "")
-	b.yue.printed["src/bad.yue"] = env.RunResult{ExitCode: 1, Stdout: "Failed to compile: bad.yue\n1: unexpected expression\n"}
+	b := newLintFixture(t, []string{"main.yue", "x = Zzz\n", "bad.yue", "y = \n"}, map[string]string{"main.yue": "Zzz 1 5\n"}, asErrors, "")
+	b.compiler.results["src/bad.yue"] = env.RunResult{ExitCode: 1, Stdout: "Failed to compile: bad.yue\n1: unexpected expression\n"}
 	problems, err := b.check()
-	diagErr := asError(t, err, "a source that is not listed")
+	diagErr := asDiagError(t, err, "a source that is not listed")
 	if problems != nil || diagErr.File != "src/bad.yue" || diagErr.Line != 1 || diagErr.Msg != "unexpected expression\n1: unexpected expression" {
 		t.Errorf("the check gave %+v, %+v", problems, diagErr)
 	}
 }
 
 func TestListUsesReadsWhatTheRealCompilerPrints(t *testing.T) {
-	b := benchOf(t, files("src/main.yue", "global Score = 0\nprint CreatUnit!\nx = math.floor 1.5\nprint Score, x\n"))
-	uses, err := listGlobalUses(background, b.world, b.real(), b.search, "", []lintSource{{path: "src/main.yue", hash: "h"}})
+	b := newCompileFixture(t, newSourceTree("src/main.yue", "global Score = 0\nprint CreatUnit!\nx = math.floor 1.5\nprint Score, x\n"))
+	uses, err := listGlobalUses(background, b.env, b.useRealCompiler(), b.macros, "", []lintSource{{path: "src/main.yue", hash: "h"}})
 	want := map[string][]globalUse{"src/main.yue": {
 		{Name: "Score", Line: 1, Column: 8},
 		{Name: "print", Line: 2, Column: 1},
@@ -356,8 +356,8 @@ func TestListUsesReadsWhatTheRealCompilerPrints(t *testing.T) {
 }
 
 func TestWithTheMacroPathTheCompilerListsNoGlobalForAFourCCCall(t *testing.T) {
-	b := benchOf(t, files("src/main.yue", macroImport+"print $FourCC \"hfoo\"\n"))
-	uses, err := listGlobalUses(background, b.world, b.real(), b.search, "", []lintSource{{path: "src/main.yue", hash: "h"}})
+	b := newCompileFixture(t, newSourceTree("src/main.yue", macroImport+"print $FourCC \"hfoo\"\n"))
+	uses, err := listGlobalUses(background, b.env, b.useRealCompiler(), b.macros, "", []lintSource{{path: "src/main.yue", hash: "h"}})
 	want := map[string][]globalUse{"src/main.yue": {{Name: "print", Line: 2, Column: 1}}}
 	if err != nil || !maps.EqualFunc(uses, want, slices.Equal) {
 		t.Errorf("listUses = %+v, %v", uses, err)

@@ -12,25 +12,25 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/tooltest"
 )
 
-func ofSrc(name, lua string) Module {
+func yueModule(name, lua string) Module {
 	return Module{Name: name, Path: "src/" + strings.ReplaceAll(name, ".", "/") + ".yue", Kind: Yue, Lua: lua}
 }
 
-func ofLua(name, text string) Module {
+func luaModuleNamed(name, text string) Module {
 	return Module{Name: name, Path: "lua/" + strings.ReplaceAll(name, ".", "/") + ".lua", Kind: Lua, Lua: text}
 }
 
-func byHand(minify bool, modules ...Module) *Program {
+func newProgram(minify bool, modules ...Module) *Program {
 	return &Program{Entry: "main", Modules: modules, Minify: minify}
 }
 
 var utilAndMain = []Module{
-	ofSrc("util", "local M = {}\nreturn M\n"),
-	ofSrc("main", "local u = require(\"util\")\nprint(u)\nreturn nil"),
+	yueModule("util", "local M = {}\nreturn M\n"),
+	yueModule("main", "local u = require(\"util\")\nprint(u)\nreturn nil"),
 }
 
 func TestBundleWrapsTheModulesAndRecordsTheLinesEachHasInTheScript(t *testing.T) {
-	got := renderBundle(byHand(false, utilAndMain...), "local __mw = {}\n-- runtime", 10)
+	got := renderBundle(newProgram(false, utilAndMain...), "local __mw = {}\n-- runtime", 10)
 	want := strings.Join([]string{
 		"do",
 		"local __mw = {}",
@@ -59,9 +59,9 @@ func TestBundleWrapsTheModulesAndRecordsTheLinesEachHasInTheScript(t *testing.T)
 }
 
 func TestBundleMarksAMinifiedYueScriptModuleAndALuaModuleKeepsItsLines(t *testing.T) {
-	modules := append(slices.Clone(utilAndMain), ofLua("lib", "return {}"))
-	plain := renderBundle(byHand(false, modules...), "", 1)
-	minified := renderBundle(byHand(true, modules...), "", 1)
+	modules := append(slices.Clone(utilAndMain), luaModuleNamed("lib", "return {}"))
+	plain := renderBundle(newProgram(false, modules...), "", 1)
+	minified := renderBundle(newProgram(true, modules...), "", 1)
 	if strings.Contains(plain, ", true},") {
 		t.Errorf("a bundle that is not minified marks a module:\n%s", plain)
 	}
@@ -95,7 +95,7 @@ func TestAModulesLinesAreSplitAtLineFeedsAndAFinalLineBreakStartsNoLine(t *testi
 		{"no Lua at all", "", "", 4},
 		{"bytes that are not UTF-8", "a = '\xff'\nb = '\xe2\x82'\n", "a = '\xff'\nb = '\xe2\x82'", 5},
 	} {
-		got := renderBundle(byHand(false, ofSrc("main", c.lua)), "-- runtime\n", 1)
+		got := renderBundle(newProgram(false, yueModule("main", c.lua)), "-- runtime\n", 1)
 		want := "do\n-- runtime\n__mw.define(\"main\", function(...)\n" + c.body + "\nend)\n__mw.lines = {\n" +
 			"{4, " + strconv.Itoa(c.last) + ", \"main\", \"src/main.yue\"},\n}\n__mw.install()\n__mw.boot(\"main\")\nend\n"
 		if got != want {

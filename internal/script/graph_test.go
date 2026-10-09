@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func luaByPath(pairs ...string) func(Source) (string, bool, error) {
+func fakeReadLua(pairs ...string) func(Source) (string, bool, error) {
 	return func(source Source) (string, bool, error) {
 		for i := 0; i+1 < len(pairs); i += 2 {
 			if pairs[i] == source.Path {
@@ -20,7 +20,7 @@ func luaByPath(pairs ...string) func(Source) (string, bool, error) {
 
 const noCode = "\x00a source without code"
 
-func modulesOf(pairs ...string) func(name string) (loadResult, error) {
+func fakeLoader(pairs ...string) func(name string) (loadResult, error) {
 	return func(name string) (loadResult, error) {
 		for i := 0; i+1 < len(pairs); i += 2 {
 			path := "src/" + strings.ReplaceAll(name, ".", "/") + ".yue"
@@ -44,7 +44,7 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 		{Name: "kit.loud", Path: inLibrary("ex", "kit/loud.yue"), Kind: Yue, Library: "ex"},
 		{Name: "kit.bytes", Path: inLibrary("ex", "kit/bytes.lua"), Kind: Lua, Library: "ex", Text: "return '\xff'"},
 	}
-	load := newLoader(sources, luaByPath("src/main.yue", "local x = 1", inLibrary("ex", "kit/loud.yue"), "return 2"))
+	load := newLoader(sources, fakeReadLua("src/main.yue", "local x = 1", inLibrary("ex", "kit/loud.yue"), "return 2"))
 	for name, want := range map[string]Module{
 		"main":       {Name: "main", Path: "src/main.yue", Kind: Yue, Lua: "local x = 1"},
 		"tools":      {Name: "tools", Path: "lua/tools/init.lua", Kind: Lua, Lua: "return {}"},
@@ -85,7 +85,7 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 }
 
 func TestReachedReturnsReachableModulesDependenciesFirst(t *testing.T) {
-	load := modulesOf(
+	load := fakeLoader(
 		"main", "local mw = require(\"moonwell\")\nlocal a = require(\"a\")\nlocal b = require(\"b\")",
 		"a", `local c = require("c")`,
 		"b", `local c = require("c")`,
@@ -106,7 +106,7 @@ func TestABuiltInModuleIsNeverLoaded(t *testing.T) {
 	asked := []string{}
 	modules, err := reachableModules("main", func(name string) (loadResult, error) {
 		asked = append(asked, name)
-		return modulesOf("main", `require("moonwell")`, "moonwell", "return 'a file of that name'")(name)
+		return fakeLoader("main", `require("moonwell")`, "moonwell", "return 'a file of that name'")(name)
 	})
 	if err != nil || len(modules) != 1 || !slices.Equal(asked, []string{"main"}) {
 		t.Errorf("reached = %+v, %v, after loading %q", modules, err, asked)
@@ -118,7 +118,7 @@ func TestAModuleRequiredUnderTwoNamesIsReturnedUnderEach(t *testing.T) {
 		{Name: "main", Path: "lua/main.lua", Kind: Lua, Text: "require('tools')\nrequire('tools.init')\nrequire('tools')"},
 		{Name: "tools.init", Path: "lua/tools/init.lua", Kind: Lua, Text: "return {}"},
 	}
-	modules, err := reachableModules("main", newLoader(sources, luaByPath()))
+	modules, err := reachableModules("main", newLoader(sources, fakeReadLua()))
 	want := []Module{
 		{Name: "tools", Path: "lua/tools/init.lua", Kind: Lua, Lua: "return {}"},
 		{Name: "tools.init", Path: "lua/tools/init.lua", Kind: Lua, Lua: "return {}"},
@@ -130,49 +130,49 @@ func TestAModuleRequiredUnderTwoNamesIsReturnedUnderEach(t *testing.T) {
 }
 
 func TestReachedReportsAMissingModuleWhereItIsRequired(t *testing.T) {
-	_, err := reachableModules("main", modulesOf("main", "\n\nrequire(\"nope\")"))
-	if diagErr := asError(t, err, "a missing module"); diagErr.Msg != "Module 'nope' not found." || diagErr.File != "src/main.yue" || diagErr.Line != 3 {
+	_, err := reachableModules("main", fakeLoader("main", "\n\nrequire(\"nope\")"))
+	if diagErr := asDiagError(t, err, "a missing module"); diagErr.Msg != "Module 'nope' not found." || diagErr.File != "src/main.yue" || diagErr.Line != 3 {
 		t.Errorf("error = %+v", diagErr)
 	}
 }
 
 func TestTheHintOfAMissingModuleNamesEveryFileFormItIsLookedForIn(t *testing.T) {
-	_, err := reachableModules("main", modulesOf("main", `require("game.units")`))
+	_, err := reachableModules("main", fakeLoader("main", `require("game.units")`))
 	want := "Expected src/game/units.yue, lua/game/units.lua, lua/game/units/init.lua or a module of a library in " +
 		"moonwell.pkl. Built-in modules: moonwell."
-	if diagErr := asError(t, err, "a missing module"); diagErr.Hint != want {
+	if diagErr := asDiagError(t, err, "a missing module"); diagErr.Hint != want {
 		t.Errorf("hint = %q", diagErr.Hint)
 	}
 }
 
 func TestReachedReportsAMissingEntry(t *testing.T) {
-	_, err := reachableModules("main", modulesOf())
-	if diagErr := asError(t, err, "no entry"); diagErr.Msg != "Module 'main' not found." || diagErr.File != "" || diagErr.Line != 0 {
+	_, err := reachableModules("main", fakeLoader())
+	if diagErr := asDiagError(t, err, "no entry"); diagErr.Msg != "Module 'main' not found." || diagErr.File != "" || diagErr.Line != 0 {
 		t.Errorf("error = %+v", diagErr)
 	}
 }
 
 func TestReachedRefusesAModuleWithoutCodeAsOneAndNotAsOneThatIsNotFound(t *testing.T) {
-	_, err := reachableModules("main", modulesOf("main", "\n\nrequire('game.notes')", "game.notes", noCode))
-	diagErr := asError(t, err, "a required module without code")
+	_, err := reachableModules("main", fakeLoader("main", "\n\nrequire('game.notes')", "game.notes", noCode))
+	diagErr := asDiagError(t, err, "a required module without code")
 	if diagErr.Msg != "Module 'game.notes' has no code." || diagErr.File != "src/main.yue" || diagErr.Line != 3 ||
 		!strings.Contains(diagErr.Hint, "src/game/notes.yue") || !strings.Contains(diagErr.Hint, "writes no Lua for a file with nothing but comments and macros") {
 		t.Errorf("error = %+v", diagErr)
 	}
-	_, err = reachableModules("main", modulesOf("main", noCode))
-	diagErr = asError(t, err, "an entry without code")
+	_, err = reachableModules("main", fakeLoader("main", noCode))
+	diagErr = asDiagError(t, err, "an entry without code")
 	if diagErr.Msg != "Module 'main' has no code." || diagErr.File != "src/main.yue" || diagErr.Line != 0 || !strings.Contains(diagErr.Hint, "src/main.yue") {
 		t.Errorf("error = %+v", diagErr)
 	}
-	_, err = reachableModules("main", modulesOf("main", "require('nope')\nrequire('notes')", "notes", noCode))
-	if diagErr := asError(t, err, "a missing module before one without code"); diagErr.Msg != "Module 'nope' not found." {
+	_, err = reachableModules("main", fakeLoader("main", "require('nope')\nrequire('notes')", "notes", noCode))
+	if diagErr := asDiagError(t, err, "a missing module before one without code"); diagErr.Msg != "Module 'nope' not found." {
 		t.Errorf("error = %+v", diagErr)
 	}
 }
 
 func TestReachedRefusesARequireThatIsNoSingleStringLiteral(t *testing.T) {
-	_, err := reachableModules("main", modulesOf("main", "require('a')", "a", "\nrequire(name)"))
-	diagErr := asError(t, err, "a computed name")
+	_, err := reachableModules("main", fakeLoader("main", "require('a')", "a", "\nrequire(name)"))
+	diagErr := asDiagError(t, err, "a computed name")
 	if diagErr.Msg != "require must be called with a single string literal." || diagErr.File != "src/a.yue" || diagErr.Line != 2 ||
 		diagErr.Hint != "Moonwell bundles modules at build time and cannot follow computed module names." {
 		t.Errorf("error = %+v", diagErr)
@@ -180,15 +180,15 @@ func TestReachedRefusesARequireThatIsNoSingleStringLiteral(t *testing.T) {
 }
 
 func TestReachedReportsACycleWithItsChain(t *testing.T) {
-	load := modulesOf("main", `require("a")`, "a", "\n"+`require("b")`, "b", `require("a")`)
+	load := fakeLoader("main", `require("a")`, "a", "\n"+`require("b")`, "b", `require("a")`)
 	_, err := reachableModules("main", load)
-	diagErr := asError(t, err, "a cycle")
+	diagErr := asDiagError(t, err, "a cycle")
 	if diagErr.Msg != "Circular require: a \xe2\x86\x92 b \xe2\x86\x92 a" || diagErr.File != "src/b.yue" || diagErr.Line != 1 ||
 		diagErr.Hint != "Move the shared code into a module that both can require." {
 		t.Errorf("error = %+v", diagErr)
 	}
-	_, err = reachableModules("main", modulesOf("main", "\n\nrequire 'main'"))
-	if diagErr := asError(t, err, "a module that requires itself"); diagErr.Msg != "Circular require: main \xe2\x86\x92 main" ||
+	_, err = reachableModules("main", fakeLoader("main", "\n\nrequire 'main'"))
+	if diagErr := asDiagError(t, err, "a module that requires itself"); diagErr.Msg != "Circular require: main \xe2\x86\x92 main" ||
 		diagErr.File != "src/main.yue" || diagErr.Line != 3 {
 		t.Errorf("error = %+v", diagErr)
 	}
