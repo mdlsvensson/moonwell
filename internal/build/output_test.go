@@ -51,7 +51,7 @@ func TestOutputAtRefusesALinkOnTheWayOrAtThePlaceByItsStep(t *testing.T) {
 			}
 			testkit.LinkDir(t, elsewhere, at)
 			place, err := outputPath(root, tt.place)
-			e := asError(t, err, tt.name)
+			e := asDiagError(t, err, tt.name)
 			if place != "" || e.File != tt.place || !strings.HasPrefix(e.Msg, tt.symlink+" is a link: ") ||
 				!strings.Contains(e.Hint, "junction) at "+tt.symlink+",") || e.Cause != nil ||
 				strings.Contains(e.Msg, root) {
@@ -71,7 +71,7 @@ func TestOutputAtPassesOnTheRefusalOfAPathThatLeavesTheProjectOrThatWindowsCanno
 		`C:\dist`, "dist/con", "dist/stage/map?.w3x", "nul/x", `dist\..\maps`,
 	} {
 		place, err := outputPath(root, relative)
-		e := asError(t, err, "the place "+relative)
+		e := asDiagError(t, err, "the place "+relative)
 		if place != "" || e.File != relative || !strings.Contains(e.Msg, "Invalid path: "+relative) || e.Cause != nil {
 			t.Errorf("outputAt(%q): error = %+v", relative, e)
 		}
@@ -85,7 +85,7 @@ func TestOutputAtNamesAPlaceTheSystemCannotLookAtByTheWholePath(t *testing.T) {
 	}
 	relative := "dist/" + strings.Repeat("a", 300) + "/x"
 	place, err := outputPath(root, relative)
-	e := asError(t, err, "a name the system cannot hold")
+	e := asDiagError(t, err, "a name the system cannot hold")
 	if place != "" || e.File != relative || e.Cause == nil || strings.Contains(e.Msg, root) ||
 		!strings.HasPrefix(e.Msg, relative+" cannot be reached") {
 		t.Errorf("error = %+v", e)

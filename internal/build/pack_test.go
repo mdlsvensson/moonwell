@@ -25,7 +25,7 @@ func mapInfo(version int32, major, minor uint32) string {
 
 var modernInfo = mapInfo(39, 3, 0)
 
-func viewOf(t testing.TB, files map[string]string) *mapdir.Folder {
+func newView(t testing.TB, files map[string]string) *mapdir.Folder {
 	t.Helper()
 	dir := filepath.Join(t.TempDir(), "maps", "map.w3x")
 	if err := os.MkdirAll(dir, 0o777); err != nil {
@@ -49,7 +49,7 @@ func smallMap(info string) map[string]string {
 	}
 }
 
-func opened(t testing.TB, archive []byte) *testkit.MPQ {
+func openArchive(t testing.TB, archive []byte) *testkit.MPQ {
 	t.Helper()
 	reader, err := testkit.OpenMPQ(archive)
 	if err != nil {
@@ -58,7 +58,7 @@ func opened(t testing.TB, archive []byte) *testkit.MPQ {
 	return reader
 }
 
-func fileOf(t testing.TB, archive *testkit.MPQ, name string) string {
+func readArchiveFile(t testing.TB, archive *testkit.MPQ, name string) string {
 	t.Helper()
 	data, found, err := archive.Read(name)
 	if err != nil || !found {
@@ -67,7 +67,7 @@ func fileOf(t testing.TB, archive *testkit.MPQ, name string) string {
 	return string(data)
 }
 
-func namesIn(t testing.TB, archive *testkit.MPQ) []string {
+func archiveFileNames(t testing.TB, archive *testkit.MPQ) []string {
 	t.Helper()
 	names, err := archive.Listfile()
 	if err != nil {
@@ -76,7 +76,7 @@ func namesIn(t testing.TB, archive *testkit.MPQ) []string {
 	return names
 }
 
-func packedOf(t testing.TB, view *mapdir.Folder, name string) []byte {
+func mustPack(t testing.TB, view *mapdir.Folder, name string) []byte {
 	t.Helper()
 	archive, err := packMap(view, name)
 	if err != nil {
@@ -86,14 +86,14 @@ func packedOf(t testing.TB, view *mapdir.Folder, name string) []byte {
 }
 
 func TestPackWritesAHeaderlessArchiveForModernMapsWithBackslashPaths(t *testing.T) {
-	archive := opened(t, packedOf(t, viewOf(t, smallMap(modernInfo)), "map"))
+	archive := openArchive(t, mustPack(t, newView(t, smallMap(modernInfo)), "map"))
 	if archive.HeaderOffset != 0 {
 		t.Errorf("HeaderOffset = %d", archive.HeaderOffset)
 	}
-	if got := fileOf(t, archive, `war3mapImported\a.txt`); got != "asset" {
+	if got := readArchiveFile(t, archive, `war3mapImported\a.txt`); got != "asset" {
 		t.Errorf("the asset reads as %q", got)
 	}
-	if got := fileOf(t, archive, "war3map.lua"); got != "function main() end" {
+	if got := readArchiveFile(t, archive, "war3map.lua"); got != "function main() end" {
 		t.Errorf("the script reads as %q", got)
 	}
 }
@@ -108,9 +108,9 @@ func TestPackPrefixesHM3WForOlderMaps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			packed := packedOf(t, viewOf(t, smallMap(tt.info)), "Old Map")
+			packed := mustPack(t, newView(t, smallMap(tt.info)), "Old Map")
 			if string(packed[:4]) != "HM3W" || string(packed[8:16]) != "Old Map\x00" ||
-				opened(t, packed).HeaderOffset != 512 {
+				openArchive(t, packed).HeaderOffset != 512 {
 				t.Errorf("the archive starts with %q", packed[:16])
 			}
 		})
@@ -118,8 +118,8 @@ func TestPackPrefixesHM3WForOlderMaps(t *testing.T) {
 }
 
 func TestPackRequiresTheMapInfo(t *testing.T) {
-	_, err := packMap(viewOf(t, map[string]string{"war3map.lua": "function main() end"}), "map")
-	e := asError(t, err, "a map without war3map.w3i")
+	_, err := packMap(newView(t, map[string]string{"war3map.lua": "function main() end"}), "map")
+	e := asDiagError(t, err, "a map without war3map.w3i")
 	if e.Msg != "war3map.w3i is missing from the map folder." || e.File != mapLabel ||
 		e.Hint != "Save the source map from World Editor in folder format." {
 		t.Errorf("error = %+v", e)
@@ -128,8 +128,8 @@ func TestPackRequiresTheMapInfo(t *testing.T) {
 
 func TestPackNamesTheMapInfoItCannotRead(t *testing.T) {
 	files := smallMap("\x27\x00")
-	_, err := packMap(viewOf(t, files), "map")
-	e := asError(t, err, "a war3map.w3i of two bytes")
+	_, err := packMap(newView(t, files), "map")
+	e := asDiagError(t, err, "a war3map.w3i of two bytes")
 	if !strings.Contains(e.Msg, "war3map.w3i is truncated") || e.File != mapLabel+"/war3map.w3i" || e.Hint == "" {
 		t.Errorf("error = %+v", e)
 	}
@@ -141,33 +141,33 @@ func TestPackSkipsStaleArchiveMetadataFromTheMapFolder(t *testing.T) {
 	files["(ListFile)"] = "stale\r\n"
 	files["(SIGNATURE)"] = "stale"
 	files["war3mapImported/(signature)"] = "kept"
-	archive := opened(t, packedOf(t, viewOf(t, files), "map"))
+	archive := openArchive(t, mustPack(t, newView(t, files), "map"))
 	for _, name := range []string{"(attributes)", "(signature)"} {
 		if _, found, _ := archive.Read(name); found {
 			t.Errorf("the stale %s was packed", name)
 		}
 	}
 	want := []string{"war3map.lua", "war3map.w3i", `war3mapImported\(signature)`, `war3mapImported\a.txt`}
-	if names := namesIn(t, archive); !slices.Equal(names, want) {
+	if names := archiveFileNames(t, archive); !slices.Equal(names, want) {
 		t.Errorf("the archive lists %q, want %q", names, want)
 	}
 }
 
 func TestPackPacksThePlannedViewAndNotWhatIsOnDisk(t *testing.T) {
-	view := viewOf(t, smallMap(modernInfo)).WithChanges([]mapdir.Change{
+	view := newView(t, smallMap(modernInfo)).WithChanges([]mapdir.Change{
 		{Path: "war3map.lua", Data: []byte("function main() end -- bundled")},
 		{Path: "war3mapImported/a.txt", Remove: true},
 		{Path: "icons/new.blp", Data: []byte("new")},
 	})
-	archive := opened(t, packedOf(t, view, "map"))
-	if got := fileOf(t, archive, "war3map.lua"); got != "function main() end -- bundled" {
+	archive := openArchive(t, mustPack(t, view, "map"))
+	if got := readArchiveFile(t, archive, "war3map.lua"); got != "function main() end -- bundled" {
 		t.Errorf("the script reads as %q", got)
 	}
 	if _, found, _ := archive.Read(`war3mapImported\a.txt`); found {
 		t.Error("the file the plan removes was packed")
 	}
 	want := []string{"war3map.lua", "war3map.w3i", `icons\new.blp`}
-	if names := namesIn(t, archive); !slices.Equal(names, want) {
+	if names := archiveFileNames(t, archive); !slices.Equal(names, want) {
 		t.Errorf("the archive lists %q, want %q", names, want)
 	}
 }
@@ -178,7 +178,7 @@ func TestPackKeepsTheOrderOfTheViewsFiles(t *testing.T) {
 	files["alpha/b.txt"] = "b"
 	files["alpha/B/c.txt"] = "c"
 	files["war3map.doo"] = "doodads"
-	view := viewOf(t, files).WithChanges([]mapdir.Change{
+	view := newView(t, files).WithChanges([]mapdir.Change{
 		{Path: "zz/late.txt", Data: []byte("late")},
 		{Path: "alpha/a.txt", Data: []byte("a")},
 		{Path: "war3map.doo", Data: []byte("patched")},
@@ -194,19 +194,19 @@ func TestPackKeepsTheOrderOfTheViewsFiles(t *testing.T) {
 	if !slices.Equal(inView, want) {
 		t.Fatalf("the view lists %q, want %q", inView, want)
 	}
-	if names := namesIn(t, opened(t, packedOf(t, view, "map"))); !slices.Equal(names, want) {
+	if names := archiveFileNames(t, openArchive(t, mustPack(t, view, "map"))); !slices.Equal(names, want) {
 		t.Errorf("the archive lists %q, want %q", names, want)
 	}
 }
 
 func TestTheRefusalsOfAMapThatIsTooLargeNameTheFileOrTheMap(t *testing.T) {
-	view := viewOf(t, map[string]string{"War3Map.w3i": modernInfo})
-	file := asError(t, errTooLarge(view, "war3map.w3i"), "a file that is too large")
+	view := newView(t, map[string]string{"War3Map.w3i": modernInfo})
+	file := asDiagError(t, errTooLarge(view, "war3map.w3i"), "a file that is too large")
 	if file.File != mapLabel+"/War3Map.w3i" || !strings.Contains(file.Msg, "War3Map.w3i is too large") ||
 		file.Hint == "" {
 		t.Errorf("error = %+v", file)
 	}
-	whole := asError(t, errTooLarge(view, ""), "a map that is too large")
+	whole := asDiagError(t, errTooLarge(view, ""), "a map that is too large")
 	if whole.File != mapLabel || !strings.Contains(whole.Msg, "The map is too large") || whole.Hint == "" {
 		t.Errorf("error = %+v", whole)
 	}

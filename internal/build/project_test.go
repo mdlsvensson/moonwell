@@ -20,7 +20,7 @@ import (
 const localManifest = "moonwell.local.pkl"
 
 func TestLoadFindsPklAndEvaluatesTheManifestInTheProjectFolder(t *testing.T) {
-	s := newStandIn(t)
+	s := newFakeProject(t)
 	p, err := Load(background, s.env)
 	if err != nil {
 		t.Fatal(diag.Format(err))
@@ -28,35 +28,35 @@ func TestLoadFindsPklAndEvaluatesTheManifestInTheProjectFolder(t *testing.T) {
 	if p.Root != s.root || p.ManifestName != manifestName || !reflect.DeepEqual(p, s.project) {
 		t.Errorf("Load = %+v, want %+v", p, s.project)
 	}
-	want := []ran{
+	want := []runCall{
 		{"pkl", []string{"--version"}, ""},
 		{"pkl", []string{"eval", "--format", "json", "--project-dir", ".", manifestName}, s.root},
 	}
-	if runs := s.ranSoFar(); !sameRuns(runs, want) {
+	if runs := s.runCalls(); !sameRuns(runs, want) {
 		t.Errorf("ran %+v, want %+v", runs, want)
 	}
 }
 
 func TestLoadReturnsTheFailureToFindPklAndEvaluatesNothing(t *testing.T) {
-	s := newStandIn(t)
+	s := newFakeProject(t)
 	s.env.Platform = "plan9-x86_64"
-	s.answer("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
+	s.setProgram("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
 		return env.RunResult{Stdout: "Pkl 0.31.0 (a stand-in)\n"}, nil
 	})
 	p, err := Load(background, s.env)
-	if e := asError(t, err, "an old Pkl"); p != nil || !strings.Contains(e.Msg, "Pkl 0.32 or newer") {
+	if e := asDiagError(t, err, "an old Pkl"); p != nil || !strings.Contains(e.Msg, "Pkl 0.32 or newer") {
 		t.Errorf("Load = %+v, %+v", p, e)
 	}
-	if runs := s.ranSoFar(); len(runs) != 1 {
+	if runs := s.runCalls(); len(runs) != 1 {
 		t.Errorf("ran %+v, want the question for the version alone", runs)
 	}
 }
 
 func TestLoadReturnsTheRefusalOfAFolderThatIsNoProject(t *testing.T) {
-	s := newStandIn(t)
-	s.remove(manifestName)
+	s := newFakeProject(t)
+	s.removeFile(manifestName)
 	_, err := Load(background, s.env)
-	if e := asError(t, err, "no manifest"); !strings.Contains(e.Msg, "No moonwell.pkl found") || e.File != s.root {
+	if e := asDiagError(t, err, "no manifest"); !strings.Contains(e.Msg, "No moonwell.pkl found") || e.File != s.root {
 		t.Errorf("error = %+v", e)
 	}
 }
@@ -79,10 +79,10 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t)
+			s := newFakeProject(t)
 			if tt.at != "maps/map.w3x" {
-				s.folder(filepath.ToSlash(filepath.Dir(tt.at)))
-				if err := os.Rename(s.at("maps/map.w3x"), s.at(tt.at)); err != nil {
+				s.makeDir(filepath.ToSlash(filepath.Dir(tt.at)))
+				if err := os.Rename(s.fullPath("maps/map.w3x"), s.fullPath(tt.at)); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -92,7 +92,7 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 			if err != nil {
 				t.Fatal(diag.Format(err))
 			}
-			if source.Dir() != s.at(tt.at) || source.DisplayPath("") != tt.label || !source.HasFile("war3map.lua") {
+			if source.Dir() != s.fullPath(tt.at) || source.DisplayPath("") != tt.label || !source.HasFile("war3map.lua") {
 				t.Errorf("Source = the folder %s named %s", source.Dir(), source.DisplayPath(""))
 			}
 			if !reflect.DeepEqual(testkit.Snapshot(t, s.root), before) {
@@ -131,12 +131,12 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t)
-			s.folder("outside")
-			s.folder("maps/a")
+			s := newFakeProject(t)
+			s.makeDir("outside")
+			s.makeDir("maps/a")
 			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.dir
 			source, err := OpenSource(s.project)
-			e := asError(t, err, "map.folder "+tt.dir)
+			e := asDiagError(t, err, "map.folder "+tt.dir)
 			if source != nil || e.File != localManifest || e.Cause != nil || !strings.Contains(e.Msg, tt.words) ||
 				!strings.Contains(e.Msg, `"`+tt.dir+`"`) || !strings.Contains(e.Hint, "such as map.w3x") {
 				t.Errorf("error = %+v", e)
@@ -149,21 +149,21 @@ func TestSourceNamesTheManifestForAMapFolderThatIsNotThere(t *testing.T) {
 	tests := []struct {
 		name    string
 		dir     string
-		arrange func(s *standIn)
+		arrange func(s *fakeProject)
 	}{
-		{"another name than the map has", "absent.w3x", func(*standIn) {}},
-		{"no map in maps", "map.w3x", func(s *standIn) { s.remove("maps/map.w3x") }},
-		{"no maps folder", "map.w3x", func(s *standIn) { s.remove("maps") }},
-		{"a file named maps", "map.w3x", func(s *standIn) { s.remove("maps"); s.put("maps", "a file") }},
-		{"a file on the way to the map", "campaign/one.w3x", func(s *standIn) { s.put("maps/campaign", "a file") }},
+		{"another name than the map has", "absent.w3x", func(*fakeProject) {}},
+		{"no map in maps", "map.w3x", func(s *fakeProject) { s.removeFile("maps/map.w3x") }},
+		{"no maps folder", "map.w3x", func(s *fakeProject) { s.removeFile("maps") }},
+		{"a file named maps", "map.w3x", func(s *fakeProject) { s.removeFile("maps"); s.writeFile("maps", "a file") }},
+		{"a file on the way to the map", "campaign/one.w3x", func(s *fakeProject) { s.writeFile("maps/campaign", "a file") }},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t)
+			s := newFakeProject(t)
 			tt.arrange(s)
 			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.dir
 			source, err := OpenSource(s.project)
-			e := asError(t, err, tt.name)
+			e := asDiagError(t, err, tt.name)
 			if source != nil || e.File != localManifest || e.Cause != nil ||
 				!strings.Contains(e.Msg, "maps/"+tt.dir+" not found") || !strings.Contains(e.Hint, "folder format") {
 				t.Errorf("error = %+v", e)
@@ -173,12 +173,12 @@ func TestSourceNamesTheManifestForAMapFolderThatIsNotThere(t *testing.T) {
 }
 
 func TestAPackedMapFileWhereTheMapFolderShouldBeIsRefusedAsAFile(t *testing.T) {
-	s := newStandIn(t)
-	s.remove("maps/map.w3x")
-	s.put("maps/map.w3x", "a packed map, not a folder")
+	s := newFakeProject(t)
+	s.removeFile("maps/map.w3x")
+	s.writeFile("maps/map.w3x", "a packed map, not a folder")
 	s.project.ManifestName = localManifest
 	source, err := OpenSource(s.project)
-	e := asError(t, err, "a file for the map folder")
+	e := asDiagError(t, err, "a file for the map folder")
 	if source != nil || e.File != "maps/map.w3x" || !strings.Contains(e.Msg, "is not a folder") ||
 		!strings.Contains(e.Hint, "folder format") || e.Cause != nil {
 		t.Errorf("error = %+v", e)
@@ -195,17 +195,17 @@ func TestSourceRefusesALinkOnTheWayToTheMapAndALinkInTheMapsPlace(t *testing.T) 
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t)
+			s := newFakeProject(t)
 			elsewhere := filepath.Join(t.TempDir(), "real")
-			if err := os.Rename(s.at(tt.symlink), elsewhere); err != nil {
+			if err := os.Rename(s.fullPath(tt.symlink), elsewhere); err != nil {
 				t.Fatal(err)
 			}
-			testkit.LinkDir(t, elsewhere, s.at(tt.symlink))
+			testkit.LinkDir(t, elsewhere, s.fullPath(tt.symlink))
 			s.project.ManifestName = localManifest
 			source, err := OpenSource(s.project)
-			e := asError(t, err, tt.name)
+			e := asDiagError(t, err, tt.name)
 			if source != nil || e.File != "maps/map.w3x" || !strings.Contains(e.Msg, "Symlinks are not supported") ||
-				!strings.Contains(e.Msg, s.at(tt.symlink)) || !strings.Contains(e.Hint, "real files") {
+				!strings.Contains(e.Msg, s.fullPath(tt.symlink)) || !strings.Contains(e.Hint, "real files") {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -231,16 +231,16 @@ func TestIsMissingTellsAFolderThatIsNotThereFromAnExpectedFailure(t *testing.T) 
 }
 
 func TestSourcePassesOnWhatAMapFolderCannotHold(t *testing.T) {
-	s := newStandIn(t)
-	testkit.LinkDir(t, s.folder("elsewhere"), s.at("maps/map.w3x/linked"))
+	s := newFakeProject(t)
+	testkit.LinkDir(t, s.makeDir("elsewhere"), s.fullPath("maps/map.w3x/linked"))
 	source, err := OpenSource(s.project)
-	e := asError(t, err, "a link in the map")
+	e := asDiagError(t, err, "a link in the map")
 	if source != nil || e.File != "maps/map.w3x/linked" || !strings.Contains(e.Msg, "Symlinks are not supported") {
 		t.Errorf("error = %+v", e)
 	}
 }
 
-func openedSource(t testing.TB, s *standIn) *mapdir.Folder {
+func mustOpenSource(t testing.TB, s *fakeProject) *mapdir.Folder {
 	t.Helper()
 	source, err := OpenSource(s.project)
 	if err != nil {
@@ -250,9 +250,9 @@ func openedSource(t testing.TB, s *standIn) *mapdir.Folder {
 }
 
 func TestMapGlobalsIsWhatTheMapsScriptDefines(t *testing.T) {
-	s := newStandIn(t)
-	s.templateMap()
-	globals, err := ReadMapGlobals(openedSource(t, s))
+	s := newFakeProject(t)
+	s.copyTemplateMap()
+	globals, err := ReadMapGlobals(mustOpenSource(t, s))
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -266,10 +266,10 @@ func TestMapGlobalsIsWhatTheMapsScriptDefines(t *testing.T) {
 }
 
 func TestMapGlobalsReadsTheScriptUnderTheSpellingTheMapHas(t *testing.T) {
-	s := newStandIn(t)
-	s.remove("maps/map.w3x/war3map.lua")
-	s.put("maps/map.w3x/WAR3MAP.LUA", "udg_count = 0\nfunction main()\nend\n")
-	globals, err := ReadMapGlobals(openedSource(t, s))
+	s := newFakeProject(t)
+	s.removeFile("maps/map.w3x/war3map.lua")
+	s.writeFile("maps/map.w3x/WAR3MAP.LUA", "udg_count = 0\nfunction main()\nend\n")
+	globals, err := ReadMapGlobals(mustOpenSource(t, s))
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -280,17 +280,17 @@ func TestMapGlobalsReadsTheScriptUnderTheSpellingTheMapHas(t *testing.T) {
 }
 
 func TestMapGlobalsIsNilForAMapWithoutAScript(t *testing.T) {
-	s := newStandIn(t)
-	s.remove("maps/map.w3x/war3map.lua")
-	if globals, err := ReadMapGlobals(openedSource(t, s)); globals != nil || err != nil {
+	s := newFakeProject(t)
+	s.removeFile("maps/map.w3x/war3map.lua")
+	if globals, err := ReadMapGlobals(mustOpenSource(t, s)); globals != nil || err != nil {
 		t.Errorf("MapGlobals = %+v, %v", globals, err)
 	}
 }
 
 func TestMapGlobalsReadsAnEmptyScriptAsOneThatDefinesNothing(t *testing.T) {
-	s := newStandIn(t)
-	s.put("maps/map.w3x/war3map.lua", "")
-	globals, err := ReadMapGlobals(openedSource(t, s))
+	s := newFakeProject(t)
+	s.writeFile("maps/map.w3x/war3map.lua", "")
+	globals, err := ReadMapGlobals(mustOpenSource(t, s))
 	if err != nil || globals == nil || len(globals.Globals) != 0 || len(globals.Functions) != 0 {
 		t.Errorf("MapGlobals = %+v, %v", globals, err)
 	}
@@ -298,11 +298,11 @@ func TestMapGlobalsReadsAnEmptyScriptAsOneThatDefinesNothing(t *testing.T) {
 
 func TestAScriptThatIsAFolderFails(t *testing.T) {
 	for _, name := range []string{"war3map.lua", "War3Map.Lua"} {
-		s := newStandIn(t)
-		s.remove("maps/map.w3x/war3map.lua")
-		s.folder("maps/map.w3x/" + name)
-		globals, err := ReadMapGlobals(openedSource(t, s))
-		e := asError(t, err, "a folder for a script")
+		s := newFakeProject(t)
+		s.removeFile("maps/map.w3x/war3map.lua")
+		s.makeDir("maps/map.w3x/" + name)
+		globals, err := ReadMapGlobals(mustOpenSource(t, s))
+		e := asDiagError(t, err, "a folder for a script")
 		if globals != nil || !strings.HasPrefix(e.Msg, name+" in the map is a folder") || e.Cause != nil ||
 			e.File != "maps/map.w3x/"+name || !strings.Contains(e.Hint, "a folder where its script belongs") ||
 			!strings.Contains(e.Hint, "with Lua as the script language") {
@@ -312,11 +312,11 @@ func TestAScriptThatIsAFolderFails(t *testing.T) {
 }
 
 func TestAScriptThatCannotBeReadIsRefusedByItsName(t *testing.T) {
-	s := newStandIn(t)
-	source := openedSource(t, s)
-	testkit.MakeUnreadable(t, s.at("maps/map.w3x/war3map.lua"))
+	s := newFakeProject(t)
+	source := mustOpenSource(t, s)
+	testkit.MakeUnreadable(t, s.fullPath("maps/map.w3x/war3map.lua"))
 	globals, err := ReadMapGlobals(source)
-	e := asError(t, err, "a script that cannot be read")
+	e := asDiagError(t, err, "a script that cannot be read")
 	if globals != nil || e.File != "maps/map.w3x/war3map.lua" || e.Cause == nil ||
 		!strings.Contains(e.Msg, "Reading a map file failed") {
 		t.Errorf("error = %+v", e)
@@ -331,7 +331,7 @@ func syncedLibrary(key string, ships bool) library.Synced {
 	return s
 }
 
-func describedAssets(found []assets.Asset) []string {
+func formatAssets(found []assets.Asset) []string {
 	var lines []string
 	for _, asset := range found {
 		lines = append(lines, asset.Target+" from "+asset.Source+" of "+asset.Library+": "+string(asset.Data))
@@ -340,14 +340,14 @@ func describedAssets(found []assets.Asset) []string {
 }
 
 func TestAssetsCollectsTheMapsOwnAndWhatTheSyncedLibrariesShip(t *testing.T) {
-	s := newStandIn(t, `"assets":{"paths":{"sword.blp":"icons\\Sword.blp"},"exclude":["notes.txt"]}`)
-	s.put("assets/sword.blp", "own sword")
-	s.put("assets/notes.txt", "left out")
-	s.put("assets/shared/banner.blp", "own banner")
-	s.put(".moonwell/library-assets/kit/shared/Banner.blp", "kit banner")
-	s.put(".moonwell/library-assets/kit/kit/axe.blp", "kit axe")
-	s.put(".moonwell/library-assets/art/art/hero.mdx", "art hero")
-	s.put(".moonwell/library-assets/plain/stray.blp", "not shipped")
+	s := newFakeProject(t, `"assets":{"paths":{"sword.blp":"icons\\Sword.blp"},"exclude":["notes.txt"]}`)
+	s.writeFile("assets/sword.blp", "own sword")
+	s.writeFile("assets/notes.txt", "left out")
+	s.writeFile("assets/shared/banner.blp", "own banner")
+	s.writeFile(".moonwell/library-assets/kit/shared/Banner.blp", "kit banner")
+	s.writeFile(".moonwell/library-assets/kit/kit/axe.blp", "kit axe")
+	s.writeFile(".moonwell/library-assets/art/art/hero.mdx", "art hero")
+	s.writeFile(".moonwell/library-assets/plain/stray.blp", "not shipped")
 	before := testkit.Snapshot(t, s.root)
 	libraries := []library.Synced{syncedLibrary("kit", true), syncedLibrary("plain", false), syncedLibrary("art", true)}
 	found, replaced, err := CollectAssets(s.project, libraries)
@@ -360,7 +360,7 @@ func TestAssetsCollectsTheMapsOwnAndWhatTheSyncedLibrariesShip(t *testing.T) {
 		"kit/axe.blp from kit/axe.blp of kit: kit axe",
 		"shared/banner.blp from shared/banner.blp of : own banner",
 	}
-	if got := describedAssets(found); !slices.Equal(got, want) {
+	if got := formatAssets(found); !slices.Equal(got, want) {
 		t.Errorf("assets = %q, want %q", got, want)
 	}
 	if !slices.Equal(replaced, []string{"assets/shared/banner.blp replaces library kit's shared/Banner.blp"}) {
@@ -372,20 +372,20 @@ func TestAssetsCollectsTheMapsOwnAndWhatTheSyncedLibrariesShip(t *testing.T) {
 }
 
 func TestAssetsOfAProjectWithoutAnyAreNone(t *testing.T) {
-	s := newStandIn(t)
+	s := newFakeProject(t)
 	found, replaced, err := CollectAssets(s.project, nil)
 	if err != nil || len(found) != 0 || len(replaced) != 0 {
-		t.Errorf("Assets = %q, %q, %v", describedAssets(found), replaced, err)
+		t.Errorf("Assets = %q, %q, %v", formatAssets(found), replaced, err)
 	}
 }
 
 func TestAssetsNamesTheSharedManifestForAMistakeInItsBlock(t *testing.T) {
 	for _, evaluated := range []string{manifestName, localManifest} {
 		t.Run("evaluated from "+evaluated, func(t *testing.T) {
-			s := newStandIn(t, `"assets":{"paths":{"absent.blp":"icons\\Absent.blp"},"exclude":[]}`)
+			s := newFakeProject(t, `"assets":{"paths":{"absent.blp":"icons\\Absent.blp"},"exclude":[]}`)
 			s.project.ManifestName = evaluated
 			found, replaced, err := CollectAssets(s.project, nil)
-			e := asError(t, err, "a mapping of a file that is not there")
+			e := asDiagError(t, err, "a mapping of a file that is not there")
 			if found != nil || replaced != nil || e.File != "moonwell.pkl" || !strings.Contains(e.Msg, "assets/absent.blp") ||
 				!strings.Contains(e.Hint, "moonwell.pkl") {
 				t.Errorf("error = %+v", e)
@@ -406,15 +406,15 @@ func TestAssetsRefusesALinkOnTheWayToALibrarysFiles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t)
+			s := newFakeProject(t)
 			elsewhere := t.TempDir()
 			testkit.WriteFile(t, elsewhere, tt.to, []byte("kit axe"))
-			s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash(tt.symlink))))
-			testkit.LinkDir(t, elsewhere, s.at(tt.symlink))
+			s.makeDir(filepath.ToSlash(filepath.Dir(filepath.FromSlash(tt.symlink))))
+			testkit.LinkDir(t, elsewhere, s.fullPath(tt.symlink))
 			found, replaced, err := CollectAssets(s.project, []library.Synced{syncedLibrary("kit", true)})
-			e := asError(t, err, tt.name)
+			e := asDiagError(t, err, tt.name)
 			if found != nil || replaced != nil || e.File != ".moonwell/library-assets/kit" ||
-				!strings.Contains(e.Msg, "Symlinks are not supported") || !strings.Contains(e.Msg, s.at(tt.symlink)) {
+				!strings.Contains(e.Msg, "Symlinks are not supported") || !strings.Contains(e.Msg, s.fullPath(tt.symlink)) {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -422,27 +422,27 @@ func TestAssetsRefusesALinkOnTheWayToALibrarysFiles(t *testing.T) {
 }
 
 func TestAssetsRefusesALibraryFolderThatLeavesTheProject(t *testing.T) {
-	s := newStandIn(t)
+	s := newFakeProject(t)
 	found, replaced, err := CollectAssets(s.project, []library.Synced{{Key: "kit", Modules: "x", Assets: "../kit"}})
-	e := asError(t, err, "a folder outside the project")
+	e := asDiagError(t, err, "a folder outside the project")
 	if found != nil || replaced != nil || e.File != "../kit" || !strings.Contains(e.Msg, "Invalid path") {
 		t.Errorf("error = %+v", e)
 	}
 }
 
 func TestAssetsNamesALibrarysFolderFromAProjectFolderThatIsGivenFromTheWorkingFolder(t *testing.T) {
-	s := newStandIn(t)
-	s.put(".moonwell/library-assets/kit/kit/axe.blp", "kit axe")
-	s.put(".moonwell/library-assets/art", "a file where the library's folder belongs")
+	s := newFakeProject(t)
+	s.writeFile(".moonwell/library-assets/kit/kit/axe.blp", "kit axe")
+	s.writeFile(".moonwell/library-assets/art", "a file where the library's folder belongs")
 	t.Chdir(s.root)
 	s.project.Root = "."
 	found, _, err := CollectAssets(s.project, []library.Synced{syncedLibrary("kit", true)})
 	want := []string{"kit/axe.blp from kit/axe.blp of kit: kit axe"}
-	if got := describedAssets(found); err != nil || !slices.Equal(got, want) {
+	if got := formatAssets(found); err != nil || !slices.Equal(got, want) {
 		t.Errorf("Assets = %q, %v", got, err)
 	}
 	_, _, err = CollectAssets(s.project, []library.Synced{syncedLibrary("art", true), syncedLibrary("kit", true)})
-	e := asError(t, err, "a file for a library's folder")
+	e := asDiagError(t, err, "a file for a library's folder")
 	if e.File != ".moonwell/library-assets/art" ||
 		!strings.Contains(e.Msg, "Expected a folder: .moonwell/library-assets/art") {
 		t.Errorf("error = %+v", e)
@@ -457,7 +457,7 @@ func TestOwnershipFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 		{"./campaign//one.w3x", ".asset-state/campaign/one.w3x.json"},
 	}
 	for _, tt := range tests {
-		s := newStandIn(t)
+		s := newFakeProject(t)
 		s.project.Map.Folder = tt.dir
 		before := testkit.Snapshot(t, s.root)
 		file, err := AssetStatePath(s.project)
@@ -477,10 +477,10 @@ func TestOwnershipFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) 
 		{"map?.w3x", "has a name that Windows cannot hold"},
 	}
 	for _, tt := range tests {
-		s := newStandIn(t)
+		s := newFakeProject(t)
 		s.project.ManifestName, s.project.Map.Folder = localManifest, tt.dir
 		file, err := AssetStatePath(s.project)
-		e := asError(t, err, "map.folder "+tt.dir)
+		e := asDiagError(t, err, "map.folder "+tt.dir)
 		if file != "" || e.File != localManifest || !strings.Contains(e.Msg, tt.words) {
 			t.Errorf("map.folder %q: OwnershipFile = %q, %+v", tt.dir, file, e)
 		}

@@ -59,7 +59,7 @@ func TestArchiveOfRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedManif
 		t.Fatal(err)
 	}
 	_, err := archivePath(projectWith(root, "out", localManifest))
-	e := asError(t, err, "a folder in the archive's place")
+	e := asDiagError(t, err, "a folder in the archive's place")
 	if e.Msg != "The build output out/map.w3x is a directory; refusing to replace it." || e.File != localManifest ||
 		e.Hint != "Set build.folder to a folder that only holds build output, such as dist/bin." {
 		t.Errorf("error = %+v", e)
@@ -67,7 +67,7 @@ func TestArchiveOfRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedManif
 	outside := []string{"..", "../other", "/elsewhere", `\elsewhere`, "C:/elsewhere", `c:\elsewhere`, "out/../.."}
 	for _, dir := range outside {
 		_, err := archivePath(projectWith(root, dir, localManifest))
-		e := asError(t, err, dir)
+		e := asDiagError(t, err, dir)
 		if !strings.HasPrefix(e.Msg, "The build output ") || !strings.HasSuffix(e.Msg, " is outside the project.") ||
 			e.File != localManifest || e.Hint != "Set build.folder to a folder inside the project, such as dist/bin." {
 			t.Errorf("%s: %+v", dir, e)
@@ -99,7 +99,7 @@ func TestArchiveOfRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArchi
 		t.Run(tt.written, func(t *testing.T) {
 			root := t.TempDir()
 			_, err := archivePath(projectWith(root, tt.written, localManifest))
-			e := asError(t, err, tt.written)
+			e := asDiagError(t, err, tt.written)
 			if !strings.Contains(e.Msg, tt.words) || e.File != localManifest || !strings.Contains(e.Hint, "dist/bin") {
 				t.Errorf("error = %+v", e)
 			}
@@ -114,7 +114,7 @@ func TestTheStageAndTheArchiveRefuseAMapFolderWindowsCannotHoldByTheManifest(t *
 		_, ofArchive := archivePath(p)
 		_, ofStage := stageOutputFile(p)
 		for what, err := range map[string]error{"the archive": ofArchive, "the stage": ofStage} {
-			e := asError(t, err, what+" of map.folder "+dir)
+			e := asDiagError(t, err, what+" of map.folder "+dir)
 			if e.Msg != `map.folder has a name that Windows cannot hold: "`+dir+`".` || e.File != localManifest ||
 				!strings.Contains(e.Hint, "such as map.w3x") {
 				t.Errorf("%s of map.folder %q: error = %+v", what, dir, e)
@@ -137,7 +137,7 @@ func TestArchiveOfRefusesAFileOnTheWayToTheArchiveByItsName(t *testing.T) {
 			root := t.TempDir()
 			testkit.WriteFile(t, root, tt.file, []byte("a file"))
 			_, err := archivePath(projectWith(root, tt.written, manifestName))
-			e := asError(t, err, "a file on the way")
+			e := asDiagError(t, err, "a file on the way")
 			if e.Msg != tt.file+" is a file, not a folder." || e.File != tt.file || e.Hint == "" || e.Cause != nil {
 				t.Errorf("error = %+v", e)
 			}
@@ -168,7 +168,7 @@ func TestArchiveOfRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 			}
 			testkit.LinkDir(t, filepath.Join(root, filepath.FromSlash(tt.target)), symlink)
 			_, err := prepareArchivePath(projectWith(root, tt.written, localManifest))
-			e := asError(t, err, "a link on the way to the archive")
+			e := asDiagError(t, err, "a link on the way to the archive")
 			if !strings.HasPrefix(e.Msg, tt.symlink+" is a link: ") || e.File != tt.written+"/map.w3x" || e.Hint == "" {
 				t.Errorf("error = %+v", e)
 			}
@@ -188,7 +188,7 @@ func TestRemoveArchiveRemovesAFileAndNamesAFailureFromTheProjectFolder(t *testin
 		}
 	}
 	testkit.WriteFile(t, root, "dist/bin/map.w3x/kept.txt", []byte("kept"))
-	e := asError(t, removeArchive(at), "a folder in the archive's place")
+	e := asDiagError(t, removeArchive(at), "a folder in the archive's place")
 	if !strings.HasPrefix(e.Msg, "Removing dist/bin/map.w3x failed: ") || strings.Contains(e.Msg, root) ||
 		e.File != "dist/bin/map.w3x" || e.Cause == nil || e.Hint == "" {
 		t.Errorf("error = %+v", e)
@@ -246,7 +246,7 @@ func TestWriteArchiveThatFailsLeavesThePlaceAsItWasAndNothingBesideIt(t *testing
 	at := outputFile{fullPath: testkit.WriteFile(t, root, label, []byte("the archive before")), displayPath: label}
 	testkit.WriteFile(t, root, "dist/bin/one.w3x.tmp/kept.txt", []byte("kept"))
 	before := testkit.Snapshot(t, root)
-	e := asError(t, writeArchive(at, []byte("a newer archive")), "a write beside the place that fails")
+	e := asDiagError(t, writeArchive(at, []byte("a newer archive")), "a write beside the place that fails")
 	if !strings.HasPrefix(e.Msg, "Writing dist/bin/one.w3x failed: ") || strings.Contains(e.Msg, root) ||
 		e.File != "dist/bin/one.w3x" || e.Cause == nil || e.Hint == "" {
 		t.Errorf("error = %+v", e)
@@ -255,7 +255,7 @@ func TestWriteArchiveThatFailsLeavesThePlaceAsItWasAndNothingBesideIt(t *testing
 		t.Error("a write that failed changed the archive that was there, or what stood beside it")
 	}
 	blocked := outputFile{fullPath: filepath.Join(root, "dist", "bin"), displayPath: "dist/bin"}
-	e = asError(t, writeArchive(blocked, []byte("a newer archive")), "a folder in the archive's place")
+	e = asDiagError(t, writeArchive(blocked, []byte("a newer archive")), "a folder in the archive's place")
 	if !strings.HasPrefix(e.Msg, "Writing dist/bin failed: ") || strings.Contains(e.Msg, root) ||
 		e.File != "dist/bin" || e.Cause == nil || e.Hint == "" {
 		t.Errorf("error = %+v", e)

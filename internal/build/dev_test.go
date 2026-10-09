@@ -26,7 +26,7 @@ func watchingLine(labels ...string) string {
 	return "Watching " + strings.Join(labels, ", ") + " and the project manifests. Press Ctrl+C to stop."
 }
 
-func (s *standIn) checked() (passed, failed int) {
+func (s *fakeProject) countChecks() (passed, failed int) {
 	for _, line := range s.log.Lines() {
 		switch {
 		case strings.HasPrefix(line, "Check passed: "):
@@ -38,30 +38,30 @@ func (s *standIn) checked() (passed, failed int) {
 	return passed, failed
 }
 
-func (s *standIn) save(name, text string) {
-	if err := os.WriteFile(s.at(name), []byte(text), 0o666); err != nil {
+func (s *fakeProject) saveSource(name, text string) {
+	if err := os.WriteFile(s.fullPath(name), []byte(text), 0o666); err != nil {
 		s.t.Errorf("saving %s: %v", name, err)
 	}
 }
 
-type running struct {
-	s     *standIn
-	pace  WatchTiming
-	ctx   context.Context
-	stop  context.CancelFunc
-	ended chan struct{}
-	err   error
+type devRun struct {
+	s      *fakeProject
+	timing WatchTiming
+	ctx    context.Context
+	stop   context.CancelFunc
+	ended  chan struct{}
+	err    error
 }
 
-func devOf(s *standIn, pace WatchTiming) *running {
+func newDevRun(s *fakeProject, pace WatchTiming) *devRun {
 	ctx, stop := context.WithCancel(context.Background())
-	return &running{s: s, pace: pace, ctx: ctx, stop: stop, ended: make(chan struct{})}
+	return &devRun{s: s, timing: pace, ctx: ctx, stop: stop, ended: make(chan struct{})}
 }
 
-func (d *running) start(t *testing.T) *running {
+func (d *devRun) start(t *testing.T) *devRun {
 	go func() {
 		defer close(d.ended)
-		d.err = Dev(d.ctx, d.s.env, d.pace)
+		d.err = Dev(d.ctx, d.s.env, d.timing)
 	}()
 	t.Cleanup(func() {
 		d.stop()
@@ -71,18 +71,18 @@ func (d *running) start(t *testing.T) *running {
 	return d
 }
 
-func (d *running) looks(n int) {
-	time.Sleep(time.Duration(n) * d.pace.Interval)
+func (d *devRun) waitForPolls(n int) {
+	time.Sleep(time.Duration(n) * d.timing.Interval)
 	synctest.Wait()
 }
 
-func (d *running) end() error {
+func (d *devRun) stopAndWait() error {
 	d.stop()
 	<-d.ended
 	return d.err
 }
 
-func (d *running) hasEnded() bool {
+func (d *devRun) hasEnded() bool {
 	select {
 	case <-d.ended:
 		return true
@@ -180,24 +180,24 @@ const previewed = `"settings":{"info":{"preview":"art/preview.tga"},"loadingScre
 
 const threeLocals = `"libraries":{"kit":{"path":"libs/kit"},"own":{"path":"."},"gone":{"path":"libs/gone"}}`
 
-func (s *standIn) everyFolder() {
+func (s *fakeProject) makeWatchedDirs() {
 	s.t.Helper()
 	for _, name := range []string{"assets", "objects", "lua", "art", ".moonwell/libraries", "dist"} {
-		s.folder(name)
+		s.makeDir(name)
 	}
-	s.put("libs/kit/moonwell-library.json", `{"dir":"modules","assets":"files"}`)
-	s.put("libs/kit/modules/kit/greet.lua", "return 1\n")
-	s.put("libs/kit/files/icons/Sword.blp", "kit sword")
+	s.writeFile("libs/kit/moonwell-library.json", `{"dir":"modules","assets":"files"}`)
+	s.writeFile("libs/kit/modules/kit/greet.lua", "return 1\n")
+	s.writeFile("libs/kit/files/icons/Sword.blp", "kit sword")
 }
 
-func watchedOf(dir string, p *manifest.Project) watchSet {
+func manifestWatchSetOf(dir string, p *manifest.Project) watchSet {
 	return projectWatchSet(dir).merge(manifestWatchSet(dir, p))
 }
 
 func TestAProjectIsWatchedForItsSourcesItsManifestsItsLocalLibrariesAndItsPreviewPicture(t *testing.T) {
-	s := newStandIn(t, threeLocals, previewed)
-	s.everyFolder()
-	watch := watchedOf(s.root, s.project)
+	s := newFakeProject(t, threeLocals, previewed)
+	s.makeWatchedDirs()
+	watch := manifestWatchSetOf(s.root, s.project)
 	labels := []string{"src/", "assets/", "objects/", "lua/", "libs/kit/modules/", "libs/kit/files/", "art/preview.tga"}
 	if !slices.Equal(watch.displayPaths, labels) {
 		t.Errorf("the project is watched as %q, want %q", watch.displayPaths, labels)
@@ -236,7 +236,7 @@ func TestAProjectIsWatchedForItsSourcesItsManifestsItsLocalLibrariesAndItsPrevie
 	}
 	for _, tt := range tests {
 		w := newWatcher(watch.roots)
-		s.put(tt.file, "changed: "+tt.file+"\n")
+		s.writeFile(tt.file, "changed: "+tt.file+"\n")
 		if changed := w.poll(); changed != tt.counts {
 			t.Errorf("a change of %s: poll = %v, want %v", tt.file, changed, tt.counts)
 		}
@@ -246,27 +246,27 @@ func TestAProjectIsWatchedForItsSourcesItsManifestsItsLocalLibrariesAndItsPrevie
 func TestAProjectIsWatchedForTheFoldersThatAreThere(t *testing.T) {
 	tests := []struct {
 		name     string
-		manifest func(s *standIn) *manifest.Project
+		manifest func(s *fakeProject) *manifest.Project
 		labels   []string
 	}{
-		{"its manifest did not load", func(*standIn) *manifest.Project { return nil }, []string{"src/"}},
-		{"it has no folder but src", func(s *standIn) *manifest.Project { return s.project }, []string{"src/"}},
+		{"its manifest did not load", func(*fakeProject) *manifest.Project { return nil }, []string{"src/"}},
+		{"it has no folder but src", func(s *fakeProject) *manifest.Project { return s.project }, []string{"src/"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t, localKit, previewed)
-			watch := watchedOf(s.root, tt.manifest(s))
+			s := newFakeProject(t, localKit, previewed)
+			watch := manifestWatchSetOf(s.root, tt.manifest(s))
 			if !slices.Equal(watch.displayPaths, tt.labels) {
 				t.Errorf("the project is watched as %q, want %q", watch.displayPaths, tt.labels)
 			}
 			w := newWatcher(watch.roots)
-			s.put("libs/kit/kit/greet.lua", "return 1\n")
-			s.put("art/preview.tga", "a picture")
-			s.put("assets/icons/a.blp", "an icon")
+			s.writeFile("libs/kit/kit/greet.lua", "return 1\n")
+			s.writeFile("art/preview.tga", "a picture")
+			s.writeFile("assets/icons/a.blp", "an icon")
 			if w.poll() {
 				t.Error("a folder that was not there when the watching started is watched")
 			}
-			s.put(manifestName, "// changed\n")
+			s.writeFile(manifestName, "// changed\n")
 			if !w.poll() {
 				t.Error("the manifest is not watched")
 			}
@@ -275,10 +275,10 @@ func TestAProjectIsWatchedForTheFoldersThatAreThere(t *testing.T) {
 }
 
 func TestWhatACheckWritesIsNoChange(t *testing.T) {
-	s := newStandIn(t, objectsWith(captain("hfoo")), localKit)
-	s.templateMap()
-	s.everyFolder()
-	w := newWatcher(watchedOf(s.root, s.project).roots)
+	s := newFakeProject(t, objectsWith(captain("hfoo")), localKit)
+	s.copyTemplateMap()
+	s.makeWatchedDirs()
+	w := newWatcher(manifestWatchSetOf(s.root, s.project).roots)
 	for range 2 {
 		if pkl := runCheckCycle(background, s.env, ""); pkl != "pkl" {
 			t.Fatalf("the cycle found the Pkl program %q; it logged %q", pkl, s.log.Lines())
@@ -287,14 +287,14 @@ func TestWhatACheckWritesIsNoChange(t *testing.T) {
 			t.Error("what the check wrote is a change")
 		}
 	}
-	written, _ := os.ReadFile(s.at(objects.IDsFile))
-	if string(written) != captainIDs || !fsx.Exists(s.at(".moonwell/libraries/kit/kit/greet.lua")) {
+	written, _ := os.ReadFile(s.fullPath(objects.IDsFile))
+	if string(written) != captainIDs || !fsx.Exists(s.fullPath(".moonwell/libraries/kit/kit/greet.lua")) {
 		t.Errorf("the checks wrote no ids module, or copied no library; they logged %q", s.log.Lines())
 	}
-	if passed, failed := s.checked(); passed != 2 || failed != 0 {
+	if passed, failed := s.countChecks(); passed != 2 || failed != 0 {
 		t.Errorf("%d check(s) passed and %d failed; they logged %q", passed, failed, s.log.Lines())
 	}
-	s.put("src/main.yue", "x = 12\n")
+	s.writeFile("src/main.yue", "x = 12\n")
 	if !w.poll() {
 		t.Error("a source that changed is no change")
 	}
@@ -303,7 +303,7 @@ func TestWhatACheckWritesIsNoChange(t *testing.T) {
 func TestDevFailsBeforeAnyWorkWhenSrcIsMissing(t *testing.T) {
 	root := t.TempDir()
 	e, log := testkit.Env(t, root)
-	diagErr := asError(t, Dev(background, e, DefaultWatchTiming), "no src")
+	diagErr := asDiagError(t, Dev(background, e, DefaultWatchTiming), "no src")
 	if diagErr.Msg != "The src/ folder is missing." || diagErr.File != root ||
 		diagErr.Hint != "Run dev from a Moonwell project folder, or create one with `moonwell init <dir>`." {
 		t.Errorf("error = %+v", diagErr)
@@ -314,7 +314,7 @@ func TestDevFailsBeforeAnyWorkWhenSrcIsMissing(t *testing.T) {
 }
 
 func TestDevRefusesAPaceWithoutAnInterval(t *testing.T) {
-	s := newStandIn(t)
+	s := newFakeProject(t)
 	for _, pace := range []WatchTiming{{}, {Interval: -time.Second, Debounce: time.Second}} {
 		err := Dev(background, s.env, pace)
 		var expected *diag.Error
@@ -322,12 +322,12 @@ func TestDevRefusesAPaceWithoutAnInterval(t *testing.T) {
 			t.Errorf("Dev at the pace %+v = %v, want a plain error that names the interval", pace, err)
 		}
 	}
-	if len(s.ranSoFar()) != 0 || len(s.log.Lines()) != 0 {
-		t.Errorf("Dev ran %d program(s) and logged %q", len(s.ranSoFar()), s.log.Lines())
+	if len(s.runCalls()) != 0 || len(s.log.Lines()) != 0 {
+		t.Errorf("Dev ran %d program(s) and logged %q", len(s.runCalls()), s.log.Lines())
 	}
 }
 
-func noPkl(e *env.Env) {
+func removePkl(e *env.Env) {
 	e.Platform = ""
 	e.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
 		return env.RunResult{}, &diag.Error{Msg: "no Pkl in this test"}
@@ -349,7 +349,7 @@ func TestDevWatchesAssetsObjectsAndLuaWhenTheyExist(t *testing.T) {
 			}
 		}
 		e, log := testkit.Env(t, root)
-		noPkl(e)
+		removePkl(e)
 		stopped, stop := context.WithCancel(background)
 		stop()
 		err := Dev(stopped, e, DefaultWatchTiming)
@@ -361,29 +361,29 @@ func TestDevWatchesAssetsObjectsAndLuaWhenTheyExist(t *testing.T) {
 
 func TestDevChecksAgainOnceAfterASourceChanges(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t)
-		d := devOf(s, DefaultWatchTiming).start(t)
+		s := newFakeProject(t)
+		d := newDevRun(s, DefaultWatchTiming).start(t)
 		if lines, want := s.log.Lines(), []string{smallPassed, watchingLine("src/")}; !slices.Equal(lines, want) {
 			t.Fatalf("Dev logged %q before its first look, want %q", lines, want)
 		}
-		d.looks(4)
-		if passed, failed := s.checked(); passed != 1 || failed != 0 {
+		d.waitForPolls(4)
+		if passed, failed := s.countChecks(); passed != 1 || failed != 0 {
 			t.Fatalf("%d check(s) passed and %d failed with nothing changed", passed, failed)
 		}
-		s.put("src/main.yue", "x = 12\n")
-		d.looks(1)
-		if passed, _ := s.checked(); passed != 1 {
+		s.writeFile("src/main.yue", "x = 12\n")
+		d.waitForPolls(1)
+		if passed, _ := s.countChecks(); passed != 1 {
 			t.Errorf("%d check(s) passed by the look that found the change, want the first alone", passed)
 		}
-		d.looks(1)
-		if passed, _ := s.checked(); passed != 2 {
+		d.waitForPolls(1)
+		if passed, _ := s.countChecks(); passed != 2 {
 			t.Errorf("%d check(s) passed by the look after the change, want 2", passed)
 		}
-		d.looks(8)
-		if passed, failed := s.checked(); passed != 2 || failed != 0 {
+		d.waitForPolls(8)
+		if passed, failed := s.countChecks(); passed != 2 || failed != 0 {
 			t.Errorf("%d check(s) passed and %d failed after one change, want 2 and 0", passed, failed)
 		}
-		if err := d.end(); err != nil || fsx.Exists(lockOf(s.root)) {
+		if err := d.stopAndWait(); err != nil || fsx.Exists(lockFullPath(s.root)) {
 			t.Errorf("Dev = %v, or it left its lock", err)
 		}
 	})
@@ -391,24 +391,24 @@ func TestDevChecksAgainOnceAfterASourceChanges(t *testing.T) {
 
 func TestDevChecksOnceAfterSavesThatFollowEachOther(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t)
-		d := devOf(s, WatchTiming{Interval: 100 * time.Millisecond, Debounce: 250 * time.Millisecond}).start(t)
+		s := newFakeProject(t)
+		d := newDevRun(s, WatchTiming{Interval: 100 * time.Millisecond, Debounce: 250 * time.Millisecond}).start(t)
 		text := "x = 1\n"
 		for range 5 {
 			text += "y = 2\n"
-			s.put("src/main.yue", text)
-			d.looks(1)
+			s.writeFile("src/main.yue", text)
+			d.waitForPolls(1)
 		}
-		d.looks(2)
-		if passed, _ := s.checked(); passed != 1 {
+		d.waitForPolls(2)
+		if passed, _ := s.countChecks(); passed != 1 {
 			t.Errorf("%d check(s) passed by 200 ms after the last save, want the first alone", passed)
 		}
-		d.looks(1)
-		if passed, _ := s.checked(); passed != 2 {
+		d.waitForPolls(1)
+		if passed, _ := s.countChecks(); passed != 2 {
 			t.Errorf("%d check(s) passed 300 ms after the last save, want 2", passed)
 		}
-		d.looks(10)
-		if passed, failed := s.checked(); passed != 2 || failed != 0 {
+		d.waitForPolls(10)
+		if passed, failed := s.countChecks(); passed != 2 || failed != 0 {
 			t.Errorf("%d check(s) passed and %d failed after the saves, want 2 and 0", passed, failed)
 		}
 	})
@@ -426,30 +426,30 @@ func TestASaveDuringACheckIsCheckedAfterIt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
-				s := newStandIn(t)
-				d := devOf(s, DefaultWatchTiming).start(t)
+				s := newFakeProject(t)
+				d := newDevRun(s, DefaultWatchTiming).start(t)
 				var slow atomic.Bool
 				slow.Store(true)
-				s.answer(s.compiler, func(args []string, options env.RunOptions) (env.RunResult, error) {
+				s.setProgram(s.compiler, func(args []string, options env.RunOptions) (env.RunResult, error) {
 					if slow.CompareAndSwap(true, false) {
-						time.Sleep(3 * d.pace.Interval)
+						time.Sleep(3 * d.timing.Interval)
 						if tt.saves {
-							s.save("src/main.yue", "x = 123\n")
+							s.saveSource("src/main.yue", "x = 123\n")
 						}
 					}
-					return s.yue(args, options)
+					return s.fakeYue(args, options)
 				})
-				s.put("src/main.yue", "x = 12\n")
-				d.looks(2)
-				if passed, _ := s.checked(); passed != 1 {
+				s.writeFile("src/main.yue", "x = 12\n")
+				d.waitForPolls(2)
+				if passed, _ := s.countChecks(); passed != 1 {
 					t.Fatalf("%d check(s) passed, want the second under way", passed)
 				}
-				d.looks(3)
-				if passed, _ := s.checked(); passed != 2 {
+				d.waitForPolls(3)
+				if passed, _ := s.countChecks(); passed != 2 {
 					t.Errorf("%d check(s) passed as the slow check ended, want 2", passed)
 				}
-				d.looks(8)
-				if passed, failed := s.checked(); passed != tt.passed || failed != 0 {
+				d.waitForPolls(8)
+				if passed, failed := s.countChecks(); passed != tt.passed || failed != 0 {
 					t.Errorf("%d check(s) passed and %d failed, want %d and 0", passed, failed, tt.passed)
 				}
 			})
@@ -469,9 +469,9 @@ func TestASaveDuringTheFirstCheckIsCheckedAfterIt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
-				s := newStandIn(t, objectsWith(captain("hfoo")))
-				s.templateMap()
-				s.folder("src/generated")
+				s := newFakeProject(t, objectsWith(captain("hfoo")))
+				s.copyTemplateMap()
+				s.makeDir("src/generated")
 				var saves atomic.Bool
 				saves.Store(true)
 				run := s.env.Run
@@ -479,21 +479,21 @@ func TestASaveDuringTheFirstCheckIsCheckedAfterIt(t *testing.T) {
 					ctx context.Context, name string, args []string, options env.RunOptions,
 				) (env.RunResult, error) {
 					if saves.CompareAndSwap(true, false) {
-						s.save(tt.saved, "x = 12\n")
+						s.saveSource(tt.saved, "x = 12\n")
 					}
 					return run(ctx, name, args, options)
 				}
-				d := devOf(s, DefaultWatchTiming).start(t)
+				d := newDevRun(s, DefaultWatchTiming).start(t)
 				lines := s.log.Lines()
-				if len(lines) != 2 || lines[1] != watchingLine("src/") || !fsx.Exists(s.at(objects.IDsFile)) {
+				if len(lines) != 2 || lines[1] != watchingLine("src/") || !fsx.Exists(s.fullPath(objects.IDsFile)) {
 					t.Fatalf("Dev logged %q, want a check, with its ids module, and what it watches", lines)
 				}
-				d.looks(1)
-				if passed, failed := s.checked(); passed != 1 || failed != 0 {
+				d.waitForPolls(1)
+				if passed, failed := s.countChecks(); passed != 1 || failed != 0 {
 					t.Errorf("%d check(s) passed and %d failed by the first look after the first check", passed, failed)
 				}
-				d.looks(8)
-				if passed, failed := s.checked(); passed != tt.passed || failed != 0 {
+				d.waitForPolls(8)
+				if passed, failed := s.countChecks(); passed != tt.passed || failed != 0 {
 					t.Errorf("%d check(s) passed and %d failed, want %d and 0", passed, failed, tt.passed)
 				}
 			})
@@ -505,19 +505,19 @@ func TestASaveMadeAsDevSaysWhatItWatchesIsChecked(t *testing.T) {
 	for _, saved := range []string{"src/main.yue", "libs/kit/modules/kit/greet.lua"} {
 		t.Run(saved, func(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
-				s := newStandIn(t, localKit)
-				s.put("libs/kit/moonwell-library.json", `{"dir":"modules"}`)
-				s.put("libs/kit/modules/kit/greet.lua", "return 1\n")
+				s := newFakeProject(t, localKit)
+				s.writeFile("libs/kit/moonwell-library.json", `{"dir":"modules"}`)
+				s.writeFile("libs/kit/modules/kit/greet.lua", "return 1\n")
 				recorded := s.env.Log
 				s.env.Log = env.NewLogger(func(line string) {
 					recorded.Info(line)
 					if strings.HasPrefix(line, "Watching ") {
-						s.save(saved, "x = 12\n")
+						s.saveSource(saved, "x = 12\n")
 					}
 				}, "")
-				d := devOf(s, DefaultWatchTiming).start(t)
-				d.looks(2)
-				if passed, failed := s.checked(); passed != 2 || failed != 0 {
+				d := newDevRun(s, DefaultWatchTiming).start(t)
+				d.waitForPolls(2)
+				if passed, failed := s.countChecks(); passed != 2 || failed != 0 {
 					t.Errorf("%d check(s) passed and %d failed, want 2 and 0: %q", passed, failed, s.log.Lines())
 				}
 			})
@@ -527,30 +527,30 @@ func TestASaveMadeAsDevSaysWhatItWatchesIsChecked(t *testing.T) {
 
 func TestDevChecksAgainWhenALocalLibraryChanges(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t, localKit)
-		s.put("libs/kit/moonwell-library.json", `{"dir":"modules"}`)
-		s.put("libs/kit/modules/kit/greet.lua", "return 1\n")
-		d := devOf(s, DefaultWatchTiming).start(t)
+		s := newFakeProject(t, localKit)
+		s.writeFile("libs/kit/moonwell-library.json", `{"dir":"modules"}`)
+		s.writeFile("libs/kit/modules/kit/greet.lua", "return 1\n")
+		d := newDevRun(s, DefaultWatchTiming).start(t)
 		want := []string{smallPassed, watchingLine("src/", "libs/kit/modules/")}
 		if lines := s.log.Lines(); !slices.Equal(lines, want) {
 			t.Fatalf("Dev logged %q before its first look, want %q", lines, want)
 		}
-		s.put("libs/kit/modules/kit/greet.lua", "return 12\n")
-		d.looks(2)
-		copied, _ := os.ReadFile(s.at(".moonwell/libraries/kit/kit/greet.lua"))
-		if passed, _ := s.checked(); passed != 2 || string(copied) != "return 12\n" {
+		s.writeFile("libs/kit/modules/kit/greet.lua", "return 12\n")
+		d.waitForPolls(2)
+		copied, _ := os.ReadFile(s.fullPath(".moonwell/libraries/kit/kit/greet.lua"))
+		if passed, _ := s.countChecks(); passed != 2 || string(copied) != "return 12\n" {
 			t.Errorf("%d check(s) passed, and the project's copy of the module holds %q", passed, copied)
 		}
-		s.put("libs/kit/modules/.git/index", "an index")
-		d.looks(8)
-		if passed, failed := s.checked(); passed != 2 || failed != 0 {
+		s.writeFile("libs/kit/modules/.git/index", "an index")
+		d.waitForPolls(8)
+		if passed, failed := s.countChecks(); passed != 2 || failed != 0 {
 			t.Errorf("%d check(s) passed and %d failed after a change under .git, want 2 and 0", passed, failed)
 		}
 	})
 }
 
 func TestDevChecksAgainAfterAChangeOnTheRealClock(t *testing.T) {
-	s := newStandIn(t)
+	s := newFakeProject(t)
 	ctx, stop := context.WithCancel(background)
 	ended := make(chan error, 1)
 	go func() { ended <- Dev(ctx, s.env, WatchTiming{Interval: time.Millisecond, Debounce: time.Millisecond}) }()
@@ -570,25 +570,25 @@ func TestDevChecksAgainAfterAChangeOnTheRealClock(t *testing.T) {
 	waitFor("the line that says what it watches", func() bool {
 		return slices.Contains(s.log.Lines(), watchingLine("src/"))
 	})
-	s.put("src/main.yue", "x = 12\n")
+	s.writeFile("src/main.yue", "x = 12\n")
 	waitFor("a second check that passed", func() bool {
-		passed, _ := s.checked()
+		passed, _ := s.countChecks()
 		return passed >= 2
 	})
 }
 
 func TestDevReturnsNilWhenItIsToldToStopAndLeavesNoLock(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t)
-		d := devOf(s, DefaultWatchTiming).start(t)
-		d.looks(3)
+		s := newFakeProject(t)
+		d := newDevRun(s, DefaultWatchTiming).start(t)
+		d.waitForPolls(3)
 		if d.hasEnded() {
 			t.Fatalf("Dev returned %v before it was told to stop", d.err)
 		}
-		if err := d.end(); err != nil {
+		if err := d.stopAndWait(); err != nil {
 			t.Errorf("Dev = %v", diag.Format(err))
 		}
-		if passed, failed := s.checked(); passed != 1 || failed != 0 || fsx.Exists(lockOf(s.root)) {
+		if passed, failed := s.countChecks(); passed != 1 || failed != 0 || fsx.Exists(lockFullPath(s.root)) {
 			t.Errorf("%d check(s) passed and %d failed, or the lock is there still", passed, failed)
 		}
 	})
@@ -596,15 +596,15 @@ func TestDevReturnsNilWhenItIsToldToStopAndLeavesNoLock(t *testing.T) {
 
 func TestACheckThatIsUnderWayEndsBeforeDevReturns(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t)
-		d := devOf(s, WatchTiming{Interval: DefaultWatchTiming.Interval})
+		s := newFakeProject(t)
+		d := newDevRun(s, WatchTiming{Interval: DefaultWatchTiming.Interval})
 		var interrupts atomic.Bool
 		run := s.env.Run
 		s.env.Run = func(ctx context.Context, name string, args []string, o env.RunOptions) (env.RunResult, error) {
 			if interrupts.CompareAndSwap(true, false) {
 				d.stop()
-				s.save("src/main.yue", "x = 123\n")
-				time.Sleep(3 * d.pace.Interval)
+				s.saveSource("src/main.yue", "x = 123\n")
+				time.Sleep(3 * d.timing.Interval)
 			}
 			if ctx.Err() != nil {
 				t.Errorf("%s %q was run with a context that is cancelled", name, args)
@@ -613,19 +613,19 @@ func TestACheckThatIsUnderWayEndsBeforeDevReturns(t *testing.T) {
 		}
 		d.start(t)
 		interrupts.Store(true)
-		before := len(s.ranSoFar())
-		s.put("src/main.yue", "x = 12\n")
-		d.looks(1)
-		if passed, _ := s.checked(); passed != 1 || d.hasEnded() {
+		before := len(s.runCalls())
+		s.writeFile("src/main.yue", "x = 12\n")
+		d.waitForPolls(1)
+		if passed, _ := s.countChecks(); passed != 1 || d.hasEnded() {
 			t.Fatalf("%d check(s) passed, and Dev has ended: %v; want the second check under way", passed, d.hasEnded())
 		}
-		if err := d.end(); err != nil {
+		if err := d.stopAndWait(); err != nil {
 			t.Errorf("Dev = %v", diag.Format(err))
 		}
-		if passed, failed := s.checked(); passed != 2 || failed != 0 || fsx.Exists(lockOf(s.root)) {
+		if passed, failed := s.countChecks(); passed != 2 || failed != 0 || fsx.Exists(lockFullPath(s.root)) {
 			t.Errorf("%d check(s) passed and %d failed, want 2 and 0, and no lock left", passed, failed)
 		}
-		if after := len(s.ranSoFar()) - before; after < 3 {
+		if after := len(s.runCalls()) - before; after < 3 {
 			t.Errorf("the check ran %d program(s), want the manifest evaluated and the source compiled", after)
 		}
 	})
@@ -633,33 +633,33 @@ func TestACheckThatIsUnderWayEndsBeforeDevReturns(t *testing.T) {
 
 func TestAManifestThatDoesNotLoadIsReportedAndWatchedOn(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t)
+		s := newFakeProject(t)
 		broken := func(args []string, options env.RunOptions) (env.RunResult, error) {
 			if len(args) > 0 && args[0] == "eval" {
 				return env.RunResult{ExitCode: 1, Stderr: "Cannot find property `mapp`.\n"}, nil
 			}
-			return s.pkl(args, options)
+			return s.fakePkl(args, options)
 		}
 		refused := func(line string) bool {
 			return strings.HasPrefix(line, "error: "+manifestName) && strings.Contains(line, "Cannot find property")
 		}
-		s.answer("pkl", broken)
-		d := devOf(s, DefaultWatchTiming).start(t)
+		s.setProgram("pkl", broken)
+		d := newDevRun(s, DefaultWatchTiming).start(t)
 		lines := s.log.Lines()
 		if len(lines) != 2 || !refused(lines[0]) || lines[1] != watchingLine("src/") {
 			t.Fatalf("Dev logged %q, want the manifest's failure and what it watches", lines)
 		}
-		s.answer("pkl", s.pkl)
-		s.put(manifestName, "// put right\n")
-		d.looks(2)
-		s.answer("pkl", broken)
-		s.put(manifestName, "// broken once more\n")
-		d.looks(2)
+		s.setProgram("pkl", s.fakePkl)
+		s.writeFile(manifestName, "// put right\n")
+		d.waitForPolls(2)
+		s.setProgram("pkl", broken)
+		s.writeFile(manifestName, "// broken once more\n")
+		d.waitForPolls(2)
 		lines = s.log.Lines()
 		if len(lines) != 4 || lines[2] != smallPassed || !refused(lines[3]) {
 			t.Errorf("Dev logged %q, want a check that passed and the manifest's failure after the first two", lines)
 		}
-		if err := d.end(); err != nil || fsx.Exists(lockOf(s.root)) {
+		if err := d.stopAndWait(); err != nil || fsx.Exists(lockFullPath(s.root)) {
 			t.Errorf("Dev = %v, or it left its lock", err)
 		}
 	})
@@ -667,14 +667,14 @@ func TestAManifestThatDoesNotLoadIsReportedAndWatchedOn(t *testing.T) {
 
 func TestASourceTheCompilerRefusesIsReportedAndWatchedOn(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t)
-		d := devOf(s, DefaultWatchTiming).start(t)
-		s.refuses("src/main.yue", "1: unexpected token\n")
-		s.put("src/main.yue", "x = = 12\n")
-		d.looks(2)
-		s.refuses("src/main.yue", "")
-		s.put("src/main.yue", "x = 123\n")
-		d.looks(2)
+		s := newFakeProject(t)
+		d := newDevRun(s, DefaultWatchTiming).start(t)
+		s.failCompile("src/main.yue", "1: unexpected token\n")
+		s.writeFile("src/main.yue", "x = = 12\n")
+		d.waitForPolls(2)
+		s.failCompile("src/main.yue", "")
+		s.writeFile("src/main.yue", "x = 123\n")
+		d.waitForPolls(2)
 		lines := s.log.Lines()
 		if len(lines) != 4 || !strings.HasPrefix(lines[2], "error: src/main.yue:1") || lines[3] != smallPassed {
 			t.Errorf("Dev logged %q, want the source's failure and a check that passed after the first two", lines)
@@ -682,9 +682,9 @@ func TestASourceTheCompilerRefusesIsReportedAndWatchedOn(t *testing.T) {
 	})
 }
 
-func pklAsked(s *standIn) int {
+func pklCallCount(s *fakeProject) int {
 	asked := 0
-	for _, run := range s.ranSoFar() {
+	for _, run := range s.runCalls() {
 		if run.program == "pkl" && slices.Equal(run.args, []string{"--version"}) {
 			asked++
 		}
@@ -694,29 +694,29 @@ func pklAsked(s *standIn) int {
 
 func TestDevLooksForPklUntilACycleFindsItAndKeepsThatProgram(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		s := newStandIn(t)
+		s := newFakeProject(t)
 		s.env.Platform = ""
-		s.answer("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
+		s.setProgram("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
 			return env.RunResult{}, &diag.Error{Msg: "no Pkl in this test"}
 		})
-		d := devOf(s, DefaultWatchTiming).start(t)
+		d := newDevRun(s, DefaultWatchTiming).start(t)
 		want := []string{"error: no Pkl in this test", watchingLine("src/")}
 		if lines := s.log.Lines(); !slices.Equal(lines, want) {
 			t.Fatalf("Dev logged %q, want %q", lines, want)
 		}
-		s.put("src/main.yue", "x = 12\n")
-		d.looks(2)
-		if _, failed := s.checked(); failed != 2 || pklAsked(s) != 2 {
-			t.Fatalf("%d check(s) failed, and Pkl was looked for %d time(s), want 2 and 2", failed, pklAsked(s))
+		s.writeFile("src/main.yue", "x = 12\n")
+		d.waitForPolls(2)
+		if _, failed := s.countChecks(); failed != 2 || pklCallCount(s) != 2 {
+			t.Fatalf("%d check(s) failed, and Pkl was looked for %d time(s), want 2 and 2", failed, pklCallCount(s))
 		}
-		s.answer("pkl", s.pkl)
+		s.setProgram("pkl", s.fakePkl)
 		for _, text := range []string{"x = 123\n", "x = 1234\n", "x = 12345\n"} {
-			s.put("src/main.yue", text)
-			d.looks(2)
+			s.writeFile("src/main.yue", text)
+			d.waitForPolls(2)
 		}
-		if passed, failed := s.checked(); passed != 3 || failed != 2 || pklAsked(s) != 3 {
+		if passed, failed := s.countChecks(); passed != 3 || failed != 2 || pklCallCount(s) != 3 {
 			t.Errorf("%d check(s) passed and %d failed, and Pkl was looked for %d time(s), want 3, 2 and 3",
-				passed, failed, pklAsked(s))
+				passed, failed, pklCallCount(s))
 		}
 	})
 }

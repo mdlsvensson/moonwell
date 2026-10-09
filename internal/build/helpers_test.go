@@ -24,7 +24,7 @@ import (
 
 var background = context.Background()
 
-func asError(t testing.TB, err error, what string) *diag.Error {
+func asDiagError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
 	var diagErr *diag.Error
 	if !errors.As(err, &diagErr) {
@@ -47,7 +47,7 @@ var defaultBlocks = []string{
 	`"objects":{"heroes":{},"units":{},"buildings":{},"items":{},"abilities":{},"buffs":{},"upgrades":{}}`,
 }
 
-func printedWith(defaults []string, blocks ...string) string {
+func pklOutputWith(defaults []string, blocks ...string) string {
 	all := slices.Clone(blocks)
 	for _, standard := range defaults {
 		name, _, _ := strings.Cut(standard, ":")
@@ -63,26 +63,26 @@ const resolvedDeps = `{"schemaVersion":1,"resolvedDependencies":{` +
 	`"uri":"projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@` + moonwell.Version +
 	`","path":"../schema"}}}`
 
-type program func(args []string, options env.RunOptions) (env.RunResult, error)
+type fakeProgram func(args []string, options env.RunOptions) (env.RunResult, error)
 
-type ran struct {
+type runCall struct {
 	program string
 	args    []string
 	dir     string
 }
 
 type compilerRun struct {
-	args   []string
-	source string
-	lists  bool
-	there  []string
+	args      []string
+	source    string
+	isListing bool
+	existing  []string
 }
 
 const smallScript = "udg_count = 0\nfunction main()\nend\nfunction config()\nend\n"
 
 const compiledLua = "local x = 1\n"
 
-type standIn struct {
+type fakeProject struct {
 	t        testing.TB
 	checkout string
 	root     string
@@ -92,38 +92,38 @@ type standIn struct {
 	compiler string
 	defaults []string
 
-	guard    sync.Mutex
+	mu       sync.Mutex
 	printed  string
-	programs map[string]program
-	runs     []ran
+	programs map[string]fakeProgram
+	runs     []runCall
 	listings map[string]string
 	refusals map[string]string
 	watched  []string
 	compiled []compilerRun
 }
 
-func newStandIn(t testing.TB, blocks ...string) *standIn {
+func newFakeProject(t testing.TB, blocks ...string) *fakeProject {
 	t.Helper()
-	s := &standIn{
-		t: t, checkout: testkit.RepoRoot(t), root: t.TempDir(), programs: map[string]program{},
+	s := &fakeProject{
+		t: t, checkout: testkit.RepoRoot(t), root: t.TempDir(), programs: map[string]fakeProgram{},
 		listings: map[string]string{}, refusals: map[string]string{},
 		watched: []string{script.MacrosFile, objects.IDsFile},
 	}
-	s.put("maps/map.w3x/war3map.lua", smallScript)
-	s.put("src/main.yue", "x = 1\n")
-	s.put(manifestName, "// The stand-in for pkl prints what this manifest evaluates to, and reads no line of it.\n")
-	s.put("PklProject.deps.json", resolvedDeps)
+	s.writeFile("maps/map.w3x/war3map.lua", smallScript)
+	s.writeFile("src/main.yue", "x = 1\n")
+	s.writeFile(manifestName, "// The stand-in for pkl prints what this manifest evaluates to, and reads no line of it.\n")
+	s.writeFile("PklProject.deps.json", resolvedDeps)
 	s.env, s.log = testkit.Env(t, s.root)
 	s.env.Run = s.run
-	s.answer("pkl", s.pkl)
+	s.setProgram("pkl", s.fakePkl)
 	s.compiler = testkit.WriteFile(t, t.TempDir(), "yue-stand-in", nil)
-	s.answer(s.compiler, s.yue)
+	s.setProgram(s.compiler, s.fakeYue)
 	s.defaults = append(slices.Clone(defaultBlocks), s.yueBlock(toolchain.YueVersion))
-	s.evaluatesTo(blocks...)
+	s.setManifest(blocks...)
 	return s
 }
 
-func (s *standIn) yueBlock(version string) string {
+func (s *fakeProject) yueBlock(version string) string {
 	path, err := json.Marshal(s.compiler)
 	if err != nil {
 		s.t.Fatal(err)
@@ -131,37 +131,37 @@ func (s *standIn) yueBlock(version string) string {
 	return `"yue":{"version":"` + version + `","path":` + string(path) + `}`
 }
 
-func (s *standIn) templateMap() {
+func (s *fakeProject) copyTemplateMap() {
 	s.t.Helper()
-	s.remove("maps/map.w3x")
-	if err := fsx.CopyTree(filepath.Join(s.checkout, "template", "maps", "map.w3x"), s.at("maps/map.w3x")); err != nil {
+	s.removeFile("maps/map.w3x")
+	if err := fsx.CopyTree(filepath.Join(s.checkout, "template", "maps", "map.w3x"), s.fullPath("maps/map.w3x")); err != nil {
 		s.t.Fatal(err)
 	}
 }
 
-func (s *standIn) evaluatesTo(blocks ...string) {
+func (s *fakeProject) setManifest(blocks ...string) {
 	s.t.Helper()
-	printed := printedWith(s.defaults, blocks...)
+	printed := pklOutputWith(s.defaults, blocks...)
 	project, err := manifest.DecodeProject(s.root, manifestName, []byte(printed))
 	if err != nil {
 		s.t.Fatalf("the manifest %s: %v", printed, diag.Format(err))
 	}
-	s.guard.Lock()
-	defer s.guard.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.printed, s.project = printed, project
 }
 
-func (s *standIn) answer(name string, stand program) {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeProject) setProgram(name string, stand fakeProgram) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.programs[name] = stand
 }
 
-func (s *standIn) run(_ context.Context, name string, args []string, options env.RunOptions) (env.RunResult, error) {
-	s.guard.Lock()
-	s.runs = append(s.runs, ran{name, slices.Clone(args), options.Dir})
+func (s *fakeProject) run(_ context.Context, name string, args []string, options env.RunOptions) (env.RunResult, error) {
+	s.mu.Lock()
+	s.runs = append(s.runs, runCall{name, slices.Clone(args), options.Dir})
 	stand, known := s.programs[name]
-	s.guard.Unlock()
+	s.mu.Unlock()
 	if !known {
 		s.t.Errorf("the test has no stand-in for the program: %s %q", name, args)
 		return env.RunResult{}, errors.New("no stand-in for " + name)
@@ -169,28 +169,28 @@ func (s *standIn) run(_ context.Context, name string, args []string, options env
 	return stand(args, options)
 }
 
-func (s *standIn) pkl(args []string, _ env.RunOptions) (env.RunResult, error) {
+func (s *fakeProject) fakePkl(args []string, _ env.RunOptions) (env.RunResult, error) {
 	if len(args) == 0 || args[0] != "eval" {
 		return env.RunResult{Stdout: "Pkl 0.32.1 (a stand-in)\n"}, nil
 	}
-	s.guard.Lock()
-	defer s.guard.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return env.RunResult{Stdout: s.printed}, nil
 }
 
-func (s *standIn) yue(args []string, _ env.RunOptions) (env.RunResult, error) {
+func (s *fakeProject) fakeYue(args []string, _ env.RunOptions) (env.RunResult, error) {
 	if slices.Equal(args, toolchain.YueScript.VersionArgs) {
-		s.guard.Lock()
-		defer s.guard.Unlock()
+		s.mu.Lock()
+		defer s.mu.Unlock()
 		return env.RunResult{Stdout: "Yuescript version: " + s.project.Yue.Version + "\n"}, nil
 	}
-	source := s.fromRoot(args[len(args)-1])
+	source := s.relPath(args[len(args)-1])
 	lists := args[0] == "-g"
-	there := s.thereNow()
-	s.guard.Lock()
+	there := s.listFiles()
+	s.mu.Lock()
 	s.compiled = append(s.compiled, compilerRun{slices.Clone(args), source, lists, there})
 	listing, refusal := s.listings[source], s.refusals[source]
-	s.guard.Unlock()
+	s.mu.Unlock()
 	switch {
 	case lists:
 		return env.RunResult{Stdout: listing}, nil
@@ -201,7 +201,7 @@ func (s *standIn) yue(args []string, _ env.RunOptions) (env.RunResult, error) {
 	return env.RunResult{}, os.WriteFile(output, []byte(compiledLua), 0o666)
 }
 
-func (s *standIn) fromRoot(file string) string {
+func (s *fakeProject) relPath(file string) string {
 	below, err := filepath.Rel(s.root, file)
 	if err != nil {
 		s.t.Errorf("the compiler was run on %s, which is not below the project folder: %v", file, err)
@@ -209,69 +209,69 @@ func (s *standIn) fromRoot(file string) string {
 	return filepath.ToSlash(below)
 }
 
-func (s *standIn) thereNow() []string {
-	s.guard.Lock()
+func (s *fakeProject) listFiles() []string {
+	s.mu.Lock()
 	watched := slices.Clone(s.watched)
-	s.guard.Unlock()
-	return slices.DeleteFunc(watched, func(name string) bool { return !fsx.Exists(s.at(name)) })
+	s.mu.Unlock()
+	return slices.DeleteFunc(watched, func(name string) bool { return !fsx.Exists(s.fullPath(name)) })
 }
 
-func (s *standIn) watches(names ...string) {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeProject) watches(names ...string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.watched = append(s.watched, names...)
 }
 
-func (s *standIn) uses(source, listing string) {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeProject) setGlobalUses(source, listing string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.listings[source] = listing
 }
 
-func (s *standIn) refuses(source, printed string) {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeProject) failCompile(source, printed string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.refusals[source] = printed
 }
 
-func (s *standIn) compilerRan() []compilerRun {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeProject) compilerRuns() []compilerRun {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return slices.Clone(s.compiled)
 }
 
-func (s *standIn) ranSoFar() []ran {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeProject) runCalls() []runCall {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return slices.Clone(s.runs)
 }
 
-func (s *standIn) at(name string) string {
+func (s *fakeProject) fullPath(name string) string {
 	return filepath.Join(s.root, filepath.FromSlash(name))
 }
 
-func (s *standIn) put(name, text string) string {
+func (s *fakeProject) writeFile(name, text string) string {
 	s.t.Helper()
 	return testkit.WriteFile(s.t, s.root, name, []byte(text))
 }
 
-func (s *standIn) remove(name string) {
+func (s *fakeProject) removeFile(name string) {
 	s.t.Helper()
-	if err := os.RemoveAll(s.at(name)); err != nil {
+	if err := os.RemoveAll(s.fullPath(name)); err != nil {
 		s.t.Fatal(err)
 	}
 }
 
-func (s *standIn) folder(name string) string {
+func (s *fakeProject) makeDir(name string) string {
 	s.t.Helper()
-	if err := os.MkdirAll(s.at(name), 0o777); err != nil {
+	if err := os.MkdirAll(s.fullPath(name), 0o777); err != nil {
 		s.t.Fatal(err)
 	}
-	return s.at(name)
+	return s.fullPath(name)
 }
 
-func sameRuns(a, b []ran) bool {
-	return slices.EqualFunc(a, b, func(x, y ran) bool {
+func sameRuns(a, b []runCall) bool {
+	return slices.EqualFunc(a, b, func(x, y runCall) bool {
 		return x.program == y.program && x.dir == y.dir && slices.Equal(x.args, y.args)
 	})
 }
