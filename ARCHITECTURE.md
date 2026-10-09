@@ -578,8 +578,8 @@ Each row names the file to open and, in most rows, the function to read first.
 | change the report of `assets:paths` | `internal/cli/assetspaths.go`: `reportAssetPaths`; `internal/assets/report.go`: `ReportModels`, `RenderReports` |
 | read a new kind of reference out of a model | `internal/war3/model/mdx.go`: `ReadMDX`; `internal/war3/model/mdl.go`: `ReadMDL` |
 | know how a library is downloaded and locked | `internal/library/sync.go`: `Sync`; `internal/library/github.go`: `syncGitHub`; `internal/library/lock.go` |
-| know how a local library is copied | `internal/library/local.go`: `syncLocal` |
-| add a key to `moonwell-library.json` | `internal/library/described.go`: `parseLibraryFile` |
+| know how a local library is copied | `internal/library/local.go`: `syncLocal`; `internal/library/mirror.go`: `dirMirror` |
+| add a key to `moonwell-library.json` | `internal/library/libraryfile.go`: `parseLibraryFile` |
 | change the editor's declarations | `internal/editor/refresh.go`: `RefreshTypes`; the text of each file in `internal/editor/declarations.go` |
 | change what `setup` adds to `.luarc.json` and `.gitignore` | `internal/editor/scaffold.go`: `AddFiles`, `MergeLuarc` |
 

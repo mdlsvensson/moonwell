@@ -43,8 +43,8 @@ func parseLock(document []byte) (map[string]lockEntry, error) {
 		return nil, errNotALock()
 	}
 	entries := map[string]lockEntry{}
-	for key, written := range libraries {
-		entry, isEntry := parseLockEntry(written)
+	for key, raw := range libraries {
+		entry, isEntry := parseLockEntry(raw)
 		if !isEntry {
 			return nil, errNotALock()
 		}
@@ -53,8 +53,8 @@ func parseLock(document []byte) (map[string]lockEntry, error) {
 	return entries, nil
 }
 
-func parseLockEntry(written json.RawMessage) (lockEntry, bool) {
-	members, isObject := asObject(written)
+func parseLockEntry(raw json.RawMessage) (lockEntry, bool) {
+	members, isObject := asObject(raw)
 	if !isObject {
 		return lockEntry{}, false
 	}
@@ -69,7 +69,7 @@ func parseLockEntry(written json.RawMessage) (lockEntry, bool) {
 		}
 		*field = text
 	}
-	if hash, given := members["assets"]; given {
+	if hash, ok := members["assets"]; ok {
 		text, isString := asString(hash)
 		if !isString {
 			return lockEntry{}, false
@@ -109,10 +109,10 @@ func formatLock(entries map[string]lockEntry) string {
 	return out.String()
 }
 
-type member struct{ name, value string }
+type jsonMember struct{ name, value string }
 
-func lockEntryMembers(entry lockEntry) []member {
-	members := []member{
+func lockEntryMembers(entry lockEntry) []jsonMember {
+	members := []jsonMember{
 		{"github", fsx.QuoteJSON(entry.GitHub)},
 		{"tag", fsx.QuoteJSON(entry.Tag)},
 		{"dir", fsx.QuoteJSON(entry.Dir)},
@@ -120,12 +120,12 @@ func lockEntryMembers(entry lockEntry) []member {
 		{"files", fsx.QuoteJSON(entry.Files)},
 	}
 	if entry.Assets != nil {
-		members = append(members, member{"assets", fsx.QuoteJSON(*entry.Assets)})
+		members = append(members, jsonMember{"assets", fsx.QuoteJSON(*entry.Assets)})
 	}
 	return members
 }
 
-func formatObject(members []member, indent string) string {
+func formatObject(members []jsonMember, indent string) string {
 	lines := make([]string, len(members))
 	for i, m := range members {
 		lines[i] = indent + "  " + fsx.QuoteJSON(m.name) + ": " + m.value
@@ -147,9 +147,9 @@ func errNotALock() error {
 	return &diag.Error{Msg: lockFile + " is not a Moonwell lock file.", File: lockFile, Hint: lockHint}
 }
 
-func errUnwritableLock(doing string, cause error) error {
+func errUnwritableLock(action string, cause error) error {
 	return &diag.Error{
-		Msg:   doing + " " + lockFile + " failed: " + describeFetchError(cause),
+		Msg:   action + " " + lockFile + " failed: " + describeError(cause),
 		File:  lockFile,
 		Hint:  "Close programs that have " + lockFile + " open, and check it is not read-only.",
 		Cause: cause,

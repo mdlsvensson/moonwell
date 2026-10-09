@@ -12,7 +12,7 @@ import (
 func foldersOfLocals(locals []Local) []string {
 	var dirs []string
 	for _, local := range locals {
-		for _, folder := range local.Folders {
+		for _, folder := range local.Dirs {
 			dirs = append(dirs, folder.Dir)
 		}
 	}
@@ -22,8 +22,8 @@ func foldersOfLocals(locals []Local) []string {
 func labelsOfLocals(locals []Local) []string {
 	var labels []string
 	for _, local := range locals {
-		for _, folder := range local.Folders {
-			labels = append(labels, folder.Label)
+		for _, folder := range local.Dirs {
+			labels = append(labels, folder.DisplayPath)
 		}
 	}
 	return labels
@@ -33,7 +33,7 @@ func TestLocalsListsTheFoldersOfLocalLibrariesOnly(t *testing.T) {
 	root := t.TempDir()
 	mine := filepath.Join(filepath.Dir(root), "mine")
 	locals := Locals(root, block("mine", fromFolder("../mine", "src"), "remote", fromGitHub("v1", "")))
-	want := []Local{{Key: "mine", Dir: mine, Folders: []LocalFolder{{filepath.Join(mine, "src"), "../mine/src/"}}}}
+	want := []Local{{Key: "mine", Dir: mine, Dirs: []LocalDir{{filepath.Join(mine, "src"), "../mine/src/"}}}}
 	if !slices.EqualFunc(locals, want, sameLocal) {
 		t.Errorf("Locals = %+v, want %+v", locals, want)
 	}
@@ -46,7 +46,7 @@ func TestLocalsListsTheFoldersOfLocalLibrariesOnly(t *testing.T) {
 }
 
 func sameLocal(a, b Local) bool {
-	return a.Key == b.Key && a.Dir == b.Dir && slices.Equal(a.Folders, b.Folders)
+	return a.Key == b.Key && a.Dir == b.Dir && slices.Equal(a.Dirs, b.Dirs)
 }
 
 func TestLocalsTakesTheModuleAndAssetsFoldersFromALibrarysOwnFile(t *testing.T) {
@@ -126,11 +126,11 @@ func TestLocalsTakesALibrarysFileThatTheSyncRefusesForNone(t *testing.T) {
 		}
 		libraries := block("mine", fromFolder("lib", ""))
 		lib := filepath.Join(root, "lib")
-		want := []Local{{Key: "mine", Dir: lib, Folders: []LocalFolder{{lib, "lib/"}}}}
+		want := []Local{{Key: "mine", Dir: lib, Dirs: []LocalDir{{lib, "lib/"}}}}
 		if got := Locals(root, libraries); !slices.EqualFunc(got, want, sameLocal) {
 			t.Errorf("%s: Locals = %+v, want %+v", c.name, got, want)
 		}
-		want[0].Folders = []LocalFolder{{filepath.Join(lib, "src"), "lib/src/"}}
+		want[0].Dirs = []LocalDir{{filepath.Join(lib, "src"), "lib/src/"}}
 		if got := Locals(root, block("mine", fromFolder("lib", "src"))); !slices.EqualFunc(got, want, sameLocal) {
 			t.Errorf("%s, with a dir in the manifest: Locals = %+v, want %+v", c.name, got, want)
 		}
@@ -146,22 +146,22 @@ func TestALocalsFolderIsWrittenAsTheManifestAndTheLibrarysFileWriteIt(t *testing
 		name      string
 		path, dir string
 		own       string
-		want      []LocalFolder
+		want      []LocalDir
 	}{
-		{"the project folder", ".", "", root, []LocalFolder{{root, "./"}}},
+		{"the project folder", ".", "", root, []LocalDir{{root, "./"}}},
 		{"a folder that is not there", "nowhere/lib", "", filepath.Join(root, "nowhere", "lib"),
-			[]LocalFolder{{filepath.Join(root, "nowhere", "lib"), "nowhere/lib/"}}},
+			[]LocalDir{{filepath.Join(root, "nowhere", "lib"), "nowhere/lib/"}}},
 		{"a path that ends in a separator", "lib/", "src/", filepath.Join(root, "lib"),
-			[]LocalFolder{{filepath.Join(root, "lib", "src"), "lib/src/"}}},
+			[]LocalDir{{filepath.Join(root, "lib", "src"), "lib/src/"}}},
 		{"a path that is not the shortest", "./lib/../lib", "a/../b", filepath.Join(root, "lib"),
-			[]LocalFolder{{filepath.Join(root, "lib", "b"), "lib/b/"}}},
-		{"a folder outside the project, by its whole path", elsewhere, "", elsewhere, []LocalFolder{
+			[]LocalDir{{filepath.Join(root, "lib", "b"), "lib/b/"}}},
+		{"a folder outside the project, by its whole path", elsewhere, "", elsewhere, []LocalDir{
 			{filepath.Join(elsewhere, "src", "modules"), fsx.ToSlash(elsewhere) + "/src/modules/"},
 			{filepath.Join(elsewhere, "art"), fsx.ToSlash(elsewhere) + "/art/"},
 		}},
 	}
 	for _, c := range cases {
-		want := []Local{{Key: "mine", Dir: c.own, Folders: c.want}}
+		want := []Local{{Key: "mine", Dir: c.own, Dirs: c.want}}
 		if got := Locals(root, block("mine", fromFolder(c.path, c.dir))); !slices.EqualFunc(got, want, sameLocal) {
 			t.Errorf("%s: Locals = %+v, want %+v", c.name, got, want)
 		}
@@ -186,7 +186,7 @@ func TestLocalsListsTheFoldersTheSyncCopiesFrom(t *testing.T) {
 		t.Fatalf("Locals = %+v", locals)
 	}
 	for _, local := range locals {
-		modules := local.Folders[0].Dir
+		modules := local.Dirs[0].Dir
 		if got, want := textOf(t, root, modulesDirName(local.Key)+"/"+stampFile), localStampText(modules); got != want {
 			t.Errorf("%s: the sync stamped %q, and Locals lists %q", local.Key, got, modules)
 		}
@@ -196,9 +196,9 @@ func TestLocalsListsTheFoldersTheSyncCopiesFrom(t *testing.T) {
 		if err != nil || !slices.Equal(copied, from) {
 			t.Errorf("%s: the sync copied %q, and the folder Locals lists holds %q, %v", local.Key, copied, from, err)
 		}
-		if shipped := there(root, assetsDirName(local.Key)); shipped != (len(local.Folders) == 2) {
+		if shipped := there(root, assetsDirName(local.Key)); shipped != (len(local.Dirs) == 2) {
 			t.Errorf("%s: Locals lists %d folders, and the sync's folder of files for the map is there: %v",
-				local.Key, len(local.Folders), shipped)
+				local.Key, len(local.Dirs), shipped)
 		}
 	}
 	if got, want := filesIn(t, root, assetsDirName("named")), filesIn(t, root, "named/art"); !slices.Equal(got, want) {

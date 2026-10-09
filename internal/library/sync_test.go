@@ -1197,7 +1197,7 @@ func TestADownloadedFileAndAFolderThatDifferOnlyInLetterCaseAreRefusedBeforeAnyt
 
 func TestAFileIsHeldAgainstAFolderInAnotherSpellingAndNotAgainstOneInItsOwn(t *testing.T) {
 	for _, local := range []bool{false, true} {
-		kept := libraryContent{modules: filesOfTest("a.lua", "1", "Pack.lua", "2", "pack.lua/inner.lua", "3"), local: local}
+		kept := libraryContent{modules: filesOfTest("a.lua", "1", "Pack.lua", "2", "pack.lua/inner.lua", "3"), isLocal: local}
 		hint := reportIt
 		if local {
 			hint = renameOne
@@ -1262,7 +1262,7 @@ func TestAFileThatCannotBeUsedIsTheAuthorsToReportOrTheUsersOwnToRename(t *testi
 	}
 	for _, c := range cases {
 		for _, local := range []bool{false, true} {
-			c.kept.local = local
+			c.kept.isLocal = local
 			want := c.author
 			if local {
 				want = c.local

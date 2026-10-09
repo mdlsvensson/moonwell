@@ -65,13 +65,13 @@ func libraryWatchSet(dir string, libraries map[string]manifest.Library) watchSet
 
 func localLibraryWatchSet(dir string, local library.Local) watchSet {
 	var found watchSet
-	for _, folder := range local.Folders {
+	for _, folder := range local.Dirs {
 		if !isWatchable(dir, folder.Dir) {
 			continue
 		}
 		copied := func(path string) bool { return isLibrarySource(folder.Dir, path) }
 		found.roots = append(found.roots, watchRoot{dir: folder.Dir, deep: true, include: copied})
-		found.labels = append(found.labels, folder.Label)
+		found.labels = append(found.labels, folder.DisplayPath)
 	}
 	if isWatchable(dir, local.Dir) {
 		describes := func(path string) bool { return filepath.Base(path) == library.File }

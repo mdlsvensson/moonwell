@@ -33,9 +33,9 @@ func downloadTag(
 	if err != nil {
 		return "", nil, errNotATagArchive(key, manifestName, address, err)
 	}
-	for _, f := range files {
-		if !isInsideLibrary(f.name) {
-			return "", nil, errUnsafePath(key, manifestName, address, f.name)
+	for _, file := range files {
+		if !isInsideLibrary(file.name) {
+			return "", nil, errUnsafePath(key, manifestName, address, file.name)
 		}
 	}
 	return commit, files, nil
@@ -88,26 +88,26 @@ func isNotLowerHex(r rune) bool { return !strings.ContainsRune("0123456789abcdef
 
 func filesBelowRoot(entries []*zip.File) ([]archiveFile, error) {
 	var files []archiveFile
-	place := map[string]int{}
-	top, hasTop := "", false
+	indexByPath := map[string]int{}
+	rootDir, hasRoot := "", false
 	for _, entry := range entries {
 		if strings.HasSuffix(entry.Name, "/") {
 			continue
 		}
-		first, path, found := strings.Cut(entry.Name, "/")
-		if !found || (hasTop && first != top) {
-			return nil, errNoSingleTop()
+		firstSegment, path, found := strings.Cut(entry.Name, "/")
+		if !found || (hasRoot && firstSegment != rootDir) {
+			return nil, errNoSingleRoot()
 		}
-		top, hasTop = first, true
+		rootDir, hasRoot = firstSegment, true
 		data, err := readZipFile(entry)
 		if err != nil {
 			return nil, err
 		}
-		if at, held := place[path]; held {
-			files[at].data = data
+		if index, ok := indexByPath[path]; ok {
+			files[index].data = data
 			continue
 		}
-		place[path] = len(files)
+		indexByPath[path] = len(files)
 		files = append(files, archiveFile{path, data})
 	}
 	return files, nil
@@ -129,23 +129,23 @@ func readZipFile(entry *zip.File) ([]byte, error) {
 func hashFiles(files []archiveFile) string {
 	sorted := slices.SortedFunc(slices.Values(files), func(a, b archiveFile) int { return strings.Compare(a.name, b.name) })
 	var lines strings.Builder
-	for _, f := range sorted {
-		lines.WriteString(f.name + "\n" + fsx.SHA256Hex(f.data) + "\n")
+	for _, file := range sorted {
+		lines.WriteString(file.name + "\n" + fsx.SHA256Hex(file.data) + "\n")
 	}
 	return "sha256:" + fsx.SHA256Hex([]byte(lines.String()))
 }
 
-func describeFetchError(err error) string {
-	var failure *diag.Error
-	if errors.As(err, &failure) {
-		return failure.Msg
+func describeError(err error) string {
+	var diagErr *diag.Error
+	if errors.As(err, &diagErr) {
+		return diagErr.Msg
 	}
 	return fsx.Reason(err)
 }
 
 func errDownloadFailed(key, github, manifestName string, cause error) error {
 	return &diag.Error{
-		Msg:   "Downloading library " + key + " failed: " + describeFetchError(cause),
+		Msg:   "Downloading library " + key + " failed: " + describeError(cause),
 		File:  manifestName,
 		Hint:  "Check your connection and that https://github.com/" + github + " exists.",
 		Cause: cause,
@@ -170,7 +170,7 @@ func errStatus(key string, status int, manifestName string) error {
 
 func errNotATagArchive(key, manifestName, address string, cause error) error {
 	return &diag.Error{
-		Msg:   "The download of library " + key + " is not a GitHub tag archive: " + describeFetchError(cause),
+		Msg:   "The download of library " + key + " is not a GitHub tag archive: " + describeError(cause),
 		File:  manifestName,
 		Hint:  "Check " + address + " in a browser.",
 		Cause: cause,
@@ -193,7 +193,7 @@ func errNoCommit() error {
 	return &diag.Error{Msg: "The archive's comment is not a commit SHA."}
 }
 
-func errNoSingleTop() error {
+func errNoSingleRoot() error {
 	return &diag.Error{Msg: "The archive does not have a single top folder."}
 }
 

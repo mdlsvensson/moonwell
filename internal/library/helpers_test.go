@@ -87,8 +87,8 @@ func filesOfTest(files ...string) []archiveFile {
 
 func listing(files []archiveFile) []string {
 	var listed []string
-	for _, f := range files {
-		listed = append(listed, f.name+"="+string(f.data))
+	for _, file := range files {
+		listed = append(listed, file.name+"="+string(file.data))
 	}
 	return listed
 }

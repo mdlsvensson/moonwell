@@ -60,18 +60,18 @@ func Sync(ctx context.Context, e *env.Env, libraries map[string]manifest.Library
 }
 
 func checkKeys(keys []string, manifestName string) error {
-	spelled := map[string]string{}
+	seen := map[string]string{}
 	for _, key := range keys {
 		if !isValidKey(key) {
 			return errNotAKey(key)
 		}
-		if _, portable := fsx.CleanRelPath(key); !portable {
+		if _, ok := fsx.CleanRelPath(key); !ok {
 			return errUnusableKey(key, manifestName)
 		}
-		if other, taken := spelled[strings.ToLower(key)]; taken {
-			return errKeysDifferByCase(other, key, manifestName)
+		if existing, taken := seen[strings.ToLower(key)]; taken {
+			return errKeysDifferByCase(existing, key, manifestName)
 		}
-		spelled[strings.ToLower(key)] = key
+		seen[strings.ToLower(key)] = key
 	}
 	return nil
 }
@@ -97,8 +97,8 @@ func removeStale(root string, keys []string) error {
 	return removeUnlisted(assets, AssetsDir, keys)
 }
 
-func removeUnlisted(folder, dir string, keys []string) error {
-	entries, err := os.ReadDir(folder)
+func removeUnlisted(fullPath, dir string, keys []string) error {
+	entries, err := os.ReadDir(fullPath)
 	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return errUnwritable(dir, err)
 	}
@@ -106,7 +106,7 @@ func removeUnlisted(folder, dir string, keys []string) error {
 		if slices.Contains(keys, entry.Name()) {
 			continue
 		}
-		if err := fsx.RemoveAll(filepath.Join(folder, entry.Name())); err != nil {
+		if err := fsx.RemoveAll(filepath.Join(fullPath, entry.Name())); err != nil {
 			return errUnremovable(dir+"/"+entry.Name(), err)
 		}
 	}
@@ -126,11 +126,11 @@ func syncEach(
 		if entry, isLocked := lock[key]; isLocked {
 			locked = &entry
 		}
-		lies, entry, err := syncOne(ctx, e, key, libraries[key], locked, manifestName)
+		result, entry, err := syncOne(ctx, e, key, libraries[key], locked, manifestName)
 		if err != nil {
 			return nil, nil, err
 		}
-		synced = append(synced, lies)
+		synced = append(synced, result)
 		if entry != nil {
 			entries[key] = *entry
 		}
@@ -141,25 +141,25 @@ func syncEach(
 func syncOne(
 	ctx context.Context, e *env.Env, key string, library manifest.Library, locked *lockEntry, manifestName string,
 ) (Synced, *lockEntry, error) {
-	at, err := libraryDirsOf(e.Root, key)
+	dirs, err := libraryDirsOf(e.Root, key)
 	if err != nil {
 		return Synced{}, nil, err
 	}
 	switch {
 	case library.Path != nil:
-		shipsAssets, err := syncLocal(e.Root, at, *library.Path, library.Dir, manifestName)
+		shipsAssets, err := syncLocal(e.Root, dirs, *library.Path, library.Dir, manifestName)
 		if err != nil {
 			return Synced{}, nil, err
 		}
-		return at.toSynced(shipsAssets), locked, nil
+		return dirs.toSynced(shipsAssets), locked, nil
 	case library.GitHub == nil || library.Tag == nil:
-		return Synced{}, nil, errNeitherLocalNorOfGitHub(key)
+		return Synced{}, nil, errNoSource(key)
 	}
-	entry, err := syncGitHub(ctx, e, at, library, locked, manifestName)
+	entry, err := syncGitHub(ctx, e, dirs, library, locked, manifestName)
 	if err != nil {
 		return Synced{}, nil, err
 	}
-	return at.toSynced(entry.Assets != nil), &entry, nil
+	return dirs.toSynced(entry.Assets != nil), &entry, nil
 }
 
 type libraryDirs struct {
@@ -169,7 +169,8 @@ type libraryDirs struct {
 }
 
 func modulesDirName(key string) string { return ModulesDir + "/" + key }
-func assetsDirName(key string) string  { return AssetsDir + "/" + key }
+
+func assetsDirName(key string) string { return AssetsDir + "/" + key }
 
 func libraryDirsOf(root, key string) (libraryDirs, error) {
 	modules, err := fsx.SafeJoinNoSymlinks(root, modulesDirName(key))
@@ -184,107 +185,33 @@ func libraryDirsOf(root, key string) (libraryDirs, error) {
 }
 
 func (d libraryDirs) toSynced(shipsAssets bool) Synced {
-	lies := Synced{Key: d.key, Modules: modulesDirName(d.key)}
+	synced := Synced{Key: d.key, Modules: modulesDirName(d.key)}
 	if shipsAssets {
-		lies.Assets = assetsDirName(d.key)
+		synced.Assets = assetsDirName(d.key)
 	}
-	return lies
+	return synced
 }
 
-func removeAssets(at libraryDirs) error {
-	if err := fsx.RemoveAll(at.assets); err != nil {
-		return errUnremovable(assetsDirName(at.key), err)
+func removeAssets(dirs libraryDirs) error {
+	if err := fsx.RemoveAll(dirs.assets); err != nil {
+		return errUnremovable(assetsDirName(dirs.key), err)
 	}
 	return nil
-}
-
-type libraryContent struct {
-	modules     []archiveFile
-	assets      []archiveFile
-	shipsAssets bool
-	local       bool
-}
-
-func (c libraryContent) checkUsable(key, manifestName string) error {
-	if err := c.checkUsableNames(key, "module", c.modules, manifestName); err != nil {
-		return err
-	}
-	return c.checkUsableNames(key, "assets", c.assets, manifestName)
-}
-
-func (c libraryContent) checkUsableNames(key, kind string, files []archiveFile, manifestName string) error {
-	names := make([]string, len(files))
-	for i, f := range files {
-		names[i] = f.name
-	}
-	slices.Sort(names)
-	spelled := map[string]string{}
-	for _, name := range names {
-		if _, portable := fsx.CleanRelPath(name); !portable || !isInsideLibrary(name) {
-			return errUnusableName(key, kind, name, manifestName, c.local)
-		}
-		if other, taken := spelled[strings.ToLower(name)]; taken {
-			return errTwoSpellings(key, kind, other, name, manifestName, c.local)
-		}
-		spelled[strings.ToLower(name)] = name
-	}
-	if first, second, found := findFileDirCaseConflict(names, spelled); found {
-		return errTwoSpellings(key, kind, first, second, manifestName, c.local)
-	}
-	if first, second, found := findDirCaseConflict(names); found {
-		return errFoldersOfTwoSpellings(key, kind, first, second, manifestName, c.local)
-	}
-	return nil
-}
-
-func findFileDirCaseConflict(paths []string, spelled map[string]string) (first, second string, found bool) {
-	for _, path := range paths {
-		for i, c := range path {
-			if c != '/' {
-				continue
-			}
-			folder := path[:i]
-			if file, taken := spelled[strings.ToLower(folder)]; taken && file != folder {
-				return min(file, folder), max(file, folder), true
-			}
-		}
-	}
-	return "", "", false
-}
-
-func findDirCaseConflict(paths []string) (first, second string, found bool) {
-	type spelling struct{ folder, path string }
-	spelled := map[string]spelling{}
-	for _, path := range paths {
-		for i, c := range path {
-			if c != '/' {
-				continue
-			}
-			folder := path[:i]
-			switch other, taken := spelled[strings.ToLower(folder)]; {
-			case !taken:
-				spelled[strings.ToLower(folder)] = spelling{folder, path}
-			case other.folder != folder:
-				return other.path, path, true
-			}
-		}
-	}
-	return "", "", false
 }
 
 func stampText(entry lockEntry) string {
-	return formatObject(append(lockEntryMembers(entry), member{"layout", strconv.Itoa(stampLayout)}), "") + "\n"
+	return formatObject(append(lockEntryMembers(entry), jsonMember{"layout", strconv.Itoa(stampLayout)}), "") + "\n"
 }
 
 func localStampText(source string) string {
-	return formatObject([]member{{"path", fsx.QuoteJSON(source)}}, "") + "\n"
+	return formatObject([]jsonMember{{"path", fsx.QuoteJSON(source)}}, "") + "\n"
 }
 
 func errNotAKey(key string) error {
 	return fmt.Errorf("library: %q is not a library key: a key is made of ASCII letters, digits, _ and -", key)
 }
 
-func errNeitherLocalNorOfGitHub(key string) error {
+func errNoSource(key string) error {
 	return fmt.Errorf("library: the library %s has no path, and not both a repository and a tag", key)
 }
 
@@ -308,44 +235,9 @@ func errKeysDifferByCase(first, second, manifestName string) error {
 const folderHint = "Close programs that have files in .moonwell/ open, then retry."
 
 func errUnwritable(path string, cause error) error {
-	return &diag.Error{Msg: "Writing " + path + " failed: " + describeFetchError(cause), File: path, Hint: folderHint, Cause: cause}
+	return &diag.Error{Msg: "Writing " + path + " failed: " + describeError(cause), File: path, Hint: folderHint, Cause: cause}
 }
 
 func errUnremovable(path string, cause error) error {
-	return &diag.Error{Msg: "Removing " + path + " failed: " + describeFetchError(cause), File: path, Hint: folderHint, Cause: cause}
-}
-
-func unusableHint(local bool, kind, what, them string) string {
-	switch {
-	case !local:
-		return reportHint
-	case kind == "assets":
-		return "Rename " + what + " in the library, or set assets in the library's " + File + " to a folder without " + them + "."
-	}
-	return "Rename " + what + " in the library, or set the library's dir to a folder without " + them + "."
-}
-
-func errUnusableName(key, kind, name, manifestName string, local bool) error {
-	return &diag.Error{
-		Msg:  "Library " + key + ": " + name + " in its " + kind + " folder has a name that Windows cannot hold.",
-		File: manifestName,
-		Hint: unusableHint(local, kind, "the file", "it"),
-	}
-}
-
-func errTwoSpellings(key, kind, first, second, manifestName string, local bool) error {
-	return &diag.Error{
-		Msg:  "Library " + key + ": " + first + " and " + second + " in its " + kind + " folder differ only in letter case.",
-		File: manifestName,
-		Hint: unusableHint(local, kind, "one of them", "them"),
-	}
-}
-
-func errFoldersOfTwoSpellings(key, kind, first, second, manifestName string, local bool) error {
-	return &diag.Error{
-		Msg: "Library " + key + ": " + first + " and " + second + " in its " + kind +
-			" folder lie in folders that differ only in letter case.",
-		File: manifestName,
-		Hint: unusableHint(local, kind, "one of the two folders", "them"),
-	}
+	return &diag.Error{Msg: "Removing " + path + " failed: " + describeError(cause), File: path, Hint: folderHint, Cause: cause}
 }

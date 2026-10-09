@@ -11,12 +11,12 @@ import (
 )
 
 type Local struct {
-	Key     string
-	Dir     string
-	Folders []LocalFolder
+	Key  string
+	Dir  string
+	Dirs []LocalDir
 }
 
-type LocalFolder struct{ Dir, Label string }
+type LocalDir struct{ Dir, DisplayPath string }
 
 func Locals(root string, libraries map[string]manifest.Library) []Local {
 	var locals []Local
@@ -29,23 +29,23 @@ func Locals(root string, libraries map[string]manifest.Library) []Local {
 }
 
 func localOf(root, key, path, dir string) Local {
-	base, err := resolveBase(root, path)
+	baseDir, err := resolveBaseDir(root, path)
 	if err != nil {
-		base = fsx.ResolvePath(root, path)
+		baseDir = fsx.ResolvePath(root, path)
 	}
-	described, err := readLibraryFile(key, filepath.Join(base, File))
+	libraryFile, err := readLibraryFile(key, filepath.Join(baseDir, File))
 	if err != nil {
-		described = LibraryFile{}
+		libraryFile = LibraryFile{}
 	}
-	folders := relativeDirsOf(dir, described)
-	from := folders.resolve(base)
-	local := Local{Key: key, Dir: base, Folders: []LocalFolder{{from.modules, labelOf(path, folders.modules)}}}
-	if folders.assets != "" {
-		local.Folders = append(local.Folders, LocalFolder{from.assets, labelOf(path, folders.assets)})
+	dirs := relativeDirsOf(dir, libraryFile)
+	source := dirs.resolve(baseDir)
+	local := Local{Key: key, Dir: baseDir, Dirs: []LocalDir{{source.modules, displayPathOf(path, dirs.modules)}}}
+	if dirs.assets != "" {
+		local.Dirs = append(local.Dirs, LocalDir{source.assets, displayPathOf(path, dirs.assets)})
 	}
 	return local
 }
 
-func labelOf(path, folder string) string {
-	return strings.TrimSuffix(fsx.ToSlash(filepath.Join(path, folder)), "/") + "/"
+func displayPathOf(path, dir string) string {
+	return strings.TrimSuffix(fsx.ToSlash(filepath.Join(path, dir)), "/") + "/"
 }

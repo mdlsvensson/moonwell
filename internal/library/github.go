@@ -15,32 +15,32 @@ import (
 )
 
 func syncGitHub(
-	ctx context.Context, e *env.Env, at libraryDirs, library manifest.Library, locked *lockEntry, manifestName string,
+	ctx context.Context, e *env.Env, dirs libraryDirs, library manifest.Library, locked *lockEntry, manifestName string,
 ) (lockEntry, error) {
 	github, tag, dir := *library.GitHub, *library.Tag, library.Dir
-	if err := checkNames(at.key, github, tag, manifestName); err != nil {
+	if err := checkNames(dirs.key, github, tag, manifestName); err != nil {
 		return lockEntry{}, err
 	}
 	sameTag := locked != nil && locked.GitHub == github && locked.Tag == tag && locked.Dir == dir
-	if sameTag && isUpToDate(at, *locked) {
+	if sameTag && isUpToDate(dirs, *locked) {
 		return *locked, nil
 	}
-	commit, files, err := downloadTag(ctx, e.Fetch, at.key, github, tag, manifestName)
+	commit, files, err := downloadTag(ctx, e.Fetch, dirs.key, github, tag, manifestName)
 	if err != nil {
 		return lockEntry{}, err
 	}
-	kept, err := selectFiles(at.key, github, tag, dir, files, manifestName)
+	content, err := selectFiles(dirs.key, github, tag, dir, files, manifestName)
 	if err != nil {
 		return lockEntry{}, err
 	}
-	entry := newLockEntry(github, tag, dir, commit, kept)
+	entry := newLockEntry(github, tag, dir, commit, content)
 	if sameTag && hasTagMoved(*locked, entry) {
-		return lockEntry{}, errMoved(at.key, github, tag, locked.Commit, entry.Commit)
+		return lockEntry{}, errMoved(dirs.key, github, tag, locked.Commit, entry.Commit)
 	}
-	if err := writeDownloaded(e.Root, at, kept, entry); err != nil {
+	if err := writeDownloaded(e.Root, dirs, content, entry); err != nil {
 		return lockEntry{}, err
 	}
-	e.Log.Info("Fetched library " + at.key + ": " + github + " " + tag + " (" + shorten(entry.Commit, 7) + ").")
+	e.Log.Info("Fetched library " + dirs.key + ": " + github + " " + tag + " (" + shorten(entry.Commit, 7) + ").")
 	return entry, nil
 }
 
@@ -56,20 +56,20 @@ func checkNames(key, github, tag, manifestName string) error {
 	return nil
 }
 
-func isUpToDate(at libraryDirs, entry lockEntry) bool {
-	stamp, err := os.ReadFile(filepath.Join(at.modules, stampFile))
+func isUpToDate(dirs libraryDirs, entry lockEntry) bool {
+	data, err := os.ReadFile(filepath.Join(dirs.modules, stampFile))
 	if err != nil {
 		return false
 	}
-	stamped, isEntry := parseLockEntry(stamp)
-	if !isEntry || !hasStampLayout(stamp) || !equalEntries(stamped, entry) {
+	stampEntry, isEntry := parseLockEntry(data)
+	if !isEntry || !hasStampLayout(data) || !equalEntries(stampEntry, entry) {
 		return false
 	}
-	return entry.Assets == nil || fsx.IsDir(at.assets)
+	return entry.Assets == nil || fsx.IsDir(dirs.assets)
 }
 
-func hasStampLayout(stamp []byte) bool {
-	members, _ := asObject(stamp)
+func hasStampLayout(data []byte) bool {
+	members, _ := asObject(data)
 	var layout float64
 	return json.Unmarshal(members["layout"], &layout) == nil && layout == stampLayout
 }
@@ -82,35 +82,35 @@ func equalEntries(a, b lockEntry) bool {
 }
 
 func selectFiles(key, github, tag, dir string, files []archiveFile, manifestName string) (libraryContent, error) {
-	libraryFile := "https://github.com/" + github + "/blob/" + tag + "/" + File
-	content, present := findFile(files, File)
-	described, err := parseLibraryFile(key, content, present, libraryFile)
+	libraryFileURL := "https://github.com/" + github + "/blob/" + tag + "/" + File
+	data, exists := findFile(files, File)
+	libraryFile, err := parseLibraryFile(key, data, exists, libraryFileURL)
 	if err != nil {
 		return libraryContent{}, err
 	}
 	moduleDir := dir
-	if moduleDir == "" && described.Dir != nil {
-		moduleDir = *described.Dir
+	if moduleDir == "" && libraryFile.Dir != nil {
+		moduleDir = *libraryFile.Dir
 	}
-	kept := libraryContent{modules: filterFilesBelow(files, moduleDir, described.Assets), shipsAssets: described.Assets != nil}
+	content := libraryContent{modules: filterFilesBelow(files, moduleDir, libraryFile.Assets), shipsAssets: libraryFile.Assets != nil}
 	switch {
-	case len(kept.modules) == 0 && dir != "":
+	case len(content.modules) == 0 && dir != "":
 		return libraryContent{}, errNoFolderOfTheManifest(key, moduleDir, tag, manifestName)
-	case len(kept.modules) == 0:
-		return libraryContent{}, errNoFolderOfTheLibrary(key, moduleDir, tag, libraryFile)
+	case len(content.modules) == 0:
+		return libraryContent{}, errNoFolderOfTheLibrary(key, moduleDir, tag, libraryFileURL)
 	}
-	if kept.shipsAssets {
-		if kept.assets = filterFilesBelow(files, *described.Assets, nil); len(kept.assets) == 0 {
-			return libraryContent{}, errNoAssetsOfTheLibrary(key, *described.Assets, tag, libraryFile)
+	if content.shipsAssets {
+		if content.assets = filterFilesBelow(files, *libraryFile.Assets, nil); len(content.assets) == 0 {
+			return libraryContent{}, errNoAssetsOfTheLibrary(key, *libraryFile.Assets, tag, libraryFileURL)
 		}
 	}
-	return kept, kept.checkUsable(key, manifestName)
+	return content, content.checkUsable(key, manifestName)
 }
 
-func findFile(files []archiveFile, name string) (content []byte, present bool) {
-	for _, f := range files {
-		if f.name == name {
-			return f.data, true
+func findFile(files []archiveFile, name string) (data []byte, found bool) {
+	for _, file := range files {
+		if file.name == name {
+			return file.data, true
 		}
 	}
 	return nil, false
@@ -123,25 +123,21 @@ func filterFilesBelow(files []archiveFile, dir string, except *string) []archive
 			prefix += segment + "/"
 		}
 	}
-	var kept []archiveFile
-	for _, f := range files {
-		below, isBelow := strings.CutPrefix(f.name, prefix)
-		if !isBelow || (except != nil && strings.HasPrefix(f.name, *except+"/")) || hasHiddenSegment(below) {
+	var filtered []archiveFile
+	for _, file := range files {
+		rel, isBelow := strings.CutPrefix(file.name, prefix)
+		if !isBelow || (except != nil && strings.HasPrefix(file.name, *except+"/")) || hasHiddenSegment(rel) {
 			continue
 		}
-		kept = append(kept, archiveFile{below, f.data})
+		filtered = append(filtered, archiveFile{rel, file.data})
 	}
-	return kept
+	return filtered
 }
 
-func hasHiddenSegment(path string) bool {
-	return strings.HasPrefix(path, ".") || strings.Contains(path, "/.")
-}
-
-func newLockEntry(github, tag, dir, commit string, kept libraryContent) lockEntry {
-	entry := lockEntry{GitHub: github, Tag: tag, Dir: dir, Commit: commit, Files: hashFiles(kept.modules)}
-	if kept.shipsAssets {
-		hash := hashFiles(kept.assets)
+func newLockEntry(github, tag, dir, commit string, content libraryContent) lockEntry {
+	entry := lockEntry{GitHub: github, Tag: tag, Dir: dir, Commit: commit, Files: hashFiles(content.modules)}
+	if content.shipsAssets {
+		hash := hashFiles(content.assets)
 		entry.Assets = &hash
 	}
 	return entry
@@ -159,71 +155,71 @@ func hasTagMoved(locked, entry lockEntry) bool {
 
 func shorten(commit string, length int) string { return commit[:min(length, len(commit))] }
 
-func writeDownloaded(root string, at libraryDirs, kept libraryContent, entry lockEntry) error {
-	err := removeStamp(at)
+func writeDownloaded(root string, dirs libraryDirs, content libraryContent, entry lockEntry) error {
+	err := removeStamp(dirs)
 	switch {
 	case err != nil:
 		return err
-	case kept.shipsAssets:
-		err = replaceDir(root, AssetsDir, at.key, kept.assets, "")
+	case content.shipsAssets:
+		err = replaceDir(root, AssetsDir, dirs.key, content.assets, "")
 	default:
-		err = removeAssets(at)
+		err = removeAssets(dirs)
 	}
 	if err != nil {
 		return err
 	}
-	return replaceDir(root, ModulesDir, at.key, kept.modules, stampText(entry))
+	return replaceDir(root, ModulesDir, dirs.key, content.modules, stampText(entry))
 }
 
-func removeStamp(at libraryDirs) error {
-	stamp := filepath.Join(at.modules, stampFile)
-	if info, err := fsx.Lstat(stamp); err != nil || info == nil || info.IsDir() {
+func removeStamp(dirs libraryDirs) error {
+	stampPath := filepath.Join(dirs.modules, stampFile)
+	if info, err := fsx.Lstat(stampPath); err != nil || info == nil || info.IsDir() {
 		return nil
 	}
-	if err := fsx.RemoveFile(stamp); err != nil {
-		return errUnremovable(modulesDirName(at.key)+"/"+stampFile, err)
+	if err := fsx.RemoveFile(stampPath); err != nil {
+		return errUnremovable(modulesDirName(dirs.key)+"/"+stampFile, err)
 	}
 	return nil
 }
 
 func replaceDir(root, dir, key string, files []archiveFile, stamp string) error {
-	label := dir + "/" + key
-	temp, err := fsx.SafeJoinNoSymlinks(root, dir+"/."+key+".tmp")
+	displayPath := dir + "/" + key
+	tempDir, err := fsx.SafeJoinNoSymlinks(root, dir+"/."+key+".tmp")
 	if err != nil {
 		return err
 	}
-	target, err := fsx.SafeJoinNoSymlinks(root, label)
+	targetDir, err := fsx.SafeJoinNoSymlinks(root, displayPath)
 	if err != nil {
 		return err
 	}
 	if stamp != "" {
 		files = append(slices.Clone(files), archiveFile{stampFile, []byte(stamp)})
 	}
-	if err := writeFiles(temp, files); err != nil {
-		return errUnwritable(label, err)
+	if err := writeFiles(tempDir, files); err != nil {
+		return errUnwritable(displayPath, err)
 	}
-	if err := fsx.RemoveAll(target); err != nil {
-		return errUnremovable(label, err)
+	if err := fsx.RemoveAll(targetDir); err != nil {
+		return errUnremovable(displayPath, err)
 	}
-	if err := os.Rename(temp, target); err != nil {
-		return errUnwritable(label, err)
+	if err := os.Rename(tempDir, targetDir); err != nil {
+		return errUnwritable(displayPath, err)
 	}
 	return nil
 }
 
-func writeFiles(folder string, files []archiveFile) error {
-	if err := fsx.RemoveAll(folder); err != nil {
+func writeFiles(dir string, files []archiveFile) error {
+	if err := fsx.RemoveAll(dir); err != nil {
 		return err
 	}
-	for _, f := range files {
-		path, err := fsx.SafeJoin(folder, f.name)
+	for _, file := range files {
+		fullPath, err := fsx.SafeJoin(dir, file.name)
 		if err != nil {
 			return err
 		}
-		if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
+		if err := os.MkdirAll(filepath.Dir(fullPath), 0o777); err != nil {
 			return err
 		}
-		if err := os.WriteFile(path, f.data, 0o666); err != nil {
+		if err := os.WriteFile(fullPath, file.data, 0o666); err != nil {
 			return err
 		}
 	}
@@ -254,31 +250,31 @@ func errNoFolderOfTheManifest(key, dir, tag, manifestName string) error {
 	}
 }
 
-func errNoFolderOfTheLibrary(key, dir, tag, libraryFile string) error {
+func errNoFolderOfTheLibrary(key, dir, tag, displayPath string) error {
 	return &diag.Error{
 		Msg:  "Library " + key + " has no folder " + dir + " at " + tag + ".",
-		File: libraryFile,
+		File: displayPath,
 		Hint: "Its " + File + " names a dir that has no files.",
 	}
 }
 
-func errNoAssetsOfTheLibrary(key, assets, tag, libraryFile string) error {
+func errNoAssetsOfTheLibrary(key, assets, tag, displayPath string) error {
 	return &diag.Error{
 		Msg:  "Library " + key + " has no folder " + assets + " at " + tag + ".",
-		File: libraryFile,
+		File: displayPath,
 		Hint: "Its " + File + " names an assets folder that has no files; report it to the library's author.",
 	}
 }
 
 func errMoved(key, github, tag, from, to string) error {
-	what := "tag " + tag + " of " + github + " moved from " + shorten(from, 12) + " to " + shorten(to, 12) +
+	problem := "tag " + tag + " of " + github + " moved from " + shorten(from, 12) + " to " + shorten(to, 12) +
 		" since " + lockFile + " recorded it."
 	if from == to {
-		what = "the files of tag " + tag + " of " + github + " are not those " + lockFile + " recorded for commit " +
+		problem = "the files of tag " + tag + " of " + github + " are not those " + lockFile + " recorded for commit " +
 			shorten(to, 12) + "."
 	}
 	return &diag.Error{
-		Msg:  "Library " + key + ": " + what,
+		Msg:  "Library " + key + ": " + problem,
 		File: lockFile,
 		Hint: "If the move was intended, delete the library's entry from " + lockFile + " and run the command again.",
 	}

@@ -123,8 +123,8 @@ func TestFilesHashDependsOnPathsAndContentsNotOrder(t *testing.T) {
 func TestFilesHashListsTheFilesInByteOrder(t *testing.T) {
 	files := filesOfTest(beyond+".lua", "1", "b.lua", "2", replacement+".lua", "3", "B.lua", "4")
 	var listed strings.Builder
-	for _, f := range []archiveFile{files[3], files[1], files[2], files[0]} {
-		listed.WriteString(f.name + "\n" + fsx.SHA256Hex(f.data) + "\n")
+	for _, file := range []archiveFile{files[3], files[1], files[2], files[0]} {
+		listed.WriteString(file.name + "\n" + fsx.SHA256Hex(file.data) + "\n")
 	}
 	if want := "sha256:" + fsx.SHA256Hex([]byte(listed.String())); hashFiles(files) != want {
 		t.Errorf("filesHash = %s, want %s", hashFiles(files), want)
