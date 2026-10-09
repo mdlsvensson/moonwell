@@ -95,9 +95,8 @@ commit that changes the behaviour, and the commit message says which recordings 
   Only `internal/cli` imports `cobra` and `pflag`; only `internal/manifest` imports `viper`, its decoder
   (`mapstructure`) and its TOML reader (`go-toml`), and nothing imports the other nine. There is no cgo.
   `module_test.go` holds `go.mod` to that list and `layout_test.go` holds the imports. A further module needs a
-  design the
-  maintainer approves; it is then added to the list in `module_test.go`, and `layout_test.go` says which package
-  may import it. `THIRD_PARTY_LICENSES` names each module at the version `go.mod` requires, with its licence
+  design the maintainer approves; it is then added to the list in `module_test.go`, and `layout_test.go` says which
+  package may import it. `THIRD_PARTY_LICENSES` names each module at the version `go.mod` requires, with its licence
   (`module_test.go` holds the names and the versions): when a version changes, copy the licence from the module
   anew, and when a module is added, add its section.
 - **Errors.** An expected failure is a `*diag.Error` (or `diag.Problems`) with the file and a hint. Any other error, and
@@ -278,10 +277,9 @@ The mode `game-paths`:
 2. Confirm `data/game-paths.txt` starts with `# Warcraft III <version>`, not the "Not generated yet" placeholder:
    with the placeholder every in-game path is reported as `custom path, not imported`.
 3. `cd template`, run `moonwell setup` (it creates `config.toml` in your Moonwell folder if missing and names it;
-   check its `gameExecutable`), then
-   `moonwell test`. Confirm "Moonwell is running." prints and the Captain north of the heroes changes colour every
-   second (with ally colour mode off: Alt+A toggles it, and while it is on every unit shows blue, teal or red). Confirm
-   the Warcraft III window is visible and stays open after `moonwell` exits.
+   check its `gameExecutable`), then `moonwell test`. Confirm "Moonwell is running." prints and the Captain north of
+   the heroes changes colour every second (with ally colour mode off: Alt+A toggles it, and while it is on every unit
+   shows blue, teal or red). Confirm the Warcraft III window is visible and stays open after `moonwell` exits.
 4. Add `error "gate"` inside the `on_main` hook, run `moonwell test` again, and confirm the on-screen error names
    `src/main.yue` and the right line. Record which chunk-name form the game used.
 5. Run `moonwell build --minify` and play `dist/bin/map.w3x` directly.
@@ -298,13 +296,13 @@ The mode `game-paths`:
    `race` and `fixedStart`); `environment.soundEnvironment`, `environment.waterColor` and fog (`enabled = true`,
    `start`, `end`, `color`); and `gameplay.heroMaxLevel` and `gameplay.foodLimit`. For team settings, first enable
    custom forces in World Editor (Scenario > Force Properties), save the map, and set a `forces` entry with
-   `index = 0`, such as `name`, `allied` and
-   `sharedVision`. Run `moonwell settings:check` and confirm it lists `war3map.w3i`, `war3map.lua` and
-   `war3mapMisc.txt`. Run `moonwell test`, then `moonwell build --minify` and play `dist/bin/map.w3x` from the game's
-   Maps folder. Confirm the lobby shows the map name, the slot and the team, and in the game the fog, water colour and
-   ambient sound, the food ceiling, and that a hero cannot level past the set maximum. Open the packed map in World
-   Editor and confirm Map Description, Loading Screen, Player Properties, Force Properties, Map Options (fog, water) and
-   Gameplay Constants show the configured values. Confirm `maps/map.w3x` is unchanged (`git status`).
+   `index = 0`, such as `name`, `allied` and `sharedVision`. Run `moonwell settings:check` and confirm it lists
+   `war3map.w3i`, `war3map.lua` and `war3mapMisc.txt`. Run `moonwell test`, then `moonwell build --minify` and play
+   `dist/bin/map.w3x` from the game's Maps folder. Confirm the lobby shows the map name, the slot and the team, and in
+   the game the fog, water colour and ambient sound, the food ceiling, and that a hero cannot level past the set
+   maximum. Open the packed map in World Editor and confirm Map Description, Loading Screen, Player Properties, Force
+   Properties, Map Options (fog, water) and Gameplay Constants show the configured values. Confirm `maps/map.w3x` is
+   unchanged (`git status`).
 9. Object data, in another throwaway project: `moonwell init --link <temp dir>/objects-check` in the checkout. Commit
    it to a new git repository (`git init`) so sub-step 5 can use `git status`. This proves what the tests cannot: that
    the game and World Editor read the files Moonwell writes, including per-level values past level 1.
@@ -348,9 +346,9 @@ The mode `game-paths`:
     confirm `captain.greet` completes after the import (lua-language-server indexes the git-ignored `.lua` files). Type
     `CreatUnit` for `CreateUnit` in `src/main.yue`: the editor underlines it, and `moonwell check` fails with
     `src/main.yue:<line>:<column> › Unknown global CreatUnit.` and `Did you mean CreateUnit?`. Set
-    `unknownGlobals = "warning"` under `[lint]` in `moonwell.toml` and confirm `moonwell build` succeeds and prints
-    the same
-    lines as warnings; then undo both changes. Confirm `git status` shows no `.moonwell/` and no `src/**/*.lua` files.
+    `unknownGlobals = "warning"` under `[lint]` in `moonwell.toml` and confirm `moonwell build` succeeds and prints the
+    same lines as warnings; then undo both changes. Confirm `git status` shows no `.moonwell/` and no `src/**/*.lua`
+    files.
 11. Macros and the game's Lua, in the step 10 project: run `moonwell test` and confirm a standard Footman stands beside
     the Captain (the template makes it with `$FourCC("hfoo")`). In the editor (the project opened as step 10 says),
     confirm `src/main.yue` shows no error on the `moonwell.macros` import or on `$FourCC("hfoo")`, and that hovering
@@ -389,10 +387,10 @@ The mode `game-paths`:
     their lines in minified builds). Remove the error afterwards.
 
     Then add the example library by tag in `moonwell.toml` (a `[[libraries]]` entry with `name = "example"`,
-    `github = "mdlsvensson/moonwell-example-lib"`, `tag = "v0.1.0"` and `dir = "src"`), use it
-    from `src/main.yue` (`import "example.loud"`, `print loud.shout "Moonwell"`), run `moonwell check` and commit
-    `moonwell.lock`. Confirm the editor completes `loud.shout`, and the game prints the shout. Check with the Lua
-    extension's bundled lua-language-server, in the editor or from the command line
+    `github = "mdlsvensson/moonwell-example-lib"`, `tag = "v0.1.0"` and `dir = "src"`), use it from `src/main.yue`
+    (`import "example.loud"`, `print loud.shout "Moonwell"`), run `moonwell check` and commit `moonwell.lock`. Confirm
+    the editor completes `loud.shout`, and the game prints the shout. Check with the Lua extension's bundled
+    lua-language-server, in the editor or from the command line
     (`<extensions>/sumneko.lua-<version>/server/bin/lua-language-server --check=<project> --checklevel=Hint`), that the
     library's modules give no duplicate-definition diagnostics between `.moonwell/libraries/` and `.moonwell/lua/`.
     Delete `.moonwell/`, run `moonwell check` again, and confirm `moonwell.lock` is unchanged. Finally clone the

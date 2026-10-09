@@ -8,8 +8,7 @@
   included: `map`, `build`, `yue.version`, `assets`, `lint`, `libraries` and `settings`. Every setting has its
   default, so the file `init` writes holds the everyday ones alone. Where the manifest had a mapping keyed by a
   name, the file has a list: `[[libraries]]` with a `name`, `[[assets.paths]]` with a `file` and a `path`,
-  `[[settings.players]]`
-  with a `slot`, `[[settings.forces]]` with an `index`, and `[[settings.gameplayConstants]]` and
+  `[[settings.players]]` with a `slot`, `[[settings.forces]]` with an `index`, and `[[settings.gameplayConstants]]` and
   `[[settings.gameInterface]]` with a `section`, a `key` and a `value`. A map setting that is not written keeps the
   map's value, as `null` did. The README's new section "Settings" lists every setting with its default and rule.
 - **Your machine's settings are in `config.toml` in your Moonwell folder,** `.moonwell` in your user folder

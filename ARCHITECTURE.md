@@ -104,7 +104,7 @@ table below and in the rest of this document; the code as it was commented is th
 
 | Package | What it does |
 | --- | --- |
-| `internal/objects` | Checks the manifest's custom objects against the game's metadata and the objects the map has, plans the map's object files, and renders `src/generated/objects.yue` and the JSON of `objects:eval`. |
+| `internal/objects` | Checks the project's custom objects against the game's metadata and the objects the map has, plans the map's object files, and renders `src/generated/objects.yue` and the JSON of `objects:eval`. |
 | `internal/settings` | Plans the map settings: it patches `war3map.w3i`, edits the calls World Editor wrote into `war3map.lua`, merges the two settings text files, and puts a preview picture in the minimap's place. |
 | `internal/assets` | Collects the files to import and gives each its path in the map, plans the import with `war3map.imp`, writes it into the source map for `assets:sync`, and reports which files a model references for `assets:paths`. |
 | `internal/script` | Turns source files into the Lua that goes into the map: it finds the modules, runs the YueScript compiler and keeps its cache, follows the requires from the entry, checks for unknown globals, renders the bundle and plans its place at the end of `war3map.lua`. |
@@ -211,17 +211,19 @@ The command table and where each command goes:
 | `test` | `runTest` in `internal/cli/testcmd.go` | `build.Test` |
 | `check` | `runCheck` in `internal/cli/check.go` | `build.Check` |
 | `dev` | `runDev` in `internal/cli/dev.go` | `build.Dev` |
-| `init` | `runInit` in `internal/cli/initcmd.go` | writes the template's files and runs `pkl project resolve` |
-| `setup` | `runSetup` in `internal/cli/setup.go` | the user's `config.toml`, the settings, Pkl and the objects where the project has object files, the compiler, the editor's files, the libraries |
+| `init` | `runInit` in `internal/cli/initcmd.go` | writes the template's files, runs `pkl project resolve`, and makes the user's `config.toml` when it is missing |
+| `setup` | `runSetup` in `internal/cli/setup.go` | the settings (`build.LoadSettings`), the user's `config.toml` when it is missing, Pkl and the objects where the project has object files, the compiler, the editor's files, the libraries |
 | `assets:check`, `assets:sync` | `runAssetsCheck` and `runAssetsSync`, each one call of `syncOrCheckAssets` in `internal/cli/assets.go` | `build.LoadSettings` (no Pkl), `build.OpenSource`, `library.Sync`, `build.PlanAssets`, and for a sync `assets.Sync` |
 | `assets:paths` | `runAssetsPaths`, which calls `reportAssetPaths` in `internal/cli/assetspaths.go` | in a project `build.LoadSettings`, `library.Sync` and `build.CollectAssets`; then `assets.ReportModels` |
 | `settings:check` | `runSettingsCheck` in `internal/cli/settings.go` | `build.LoadSettings`, `build.OpenSource`, `settings.Plan` |
 | `objects:check`, `objects:eval` | `runObjectsCheck` and `runObjectsEval`, which both start with `planObjects` in `internal/cli/objects.go` | `build.Load`, `build.OpenSource`, `objects.Plan` |
 
-The four commands that plan a whole build are one call of a door of `internal/build`. The commands about one area
-(`assets:check`, `assets:sync`, `settings:check`, `objects:check`, `objects:eval`) open the project the way a build
-does, with `build.Load` and `build.OpenSource`, and then call that area. `init`, `setup` and `assets:paths` have steps
-of their own, as the table says.
+The four commands that plan a whole build are one call of a door of `internal/build`. `objects:check` and
+`objects:eval` open the project the way a build does, with `build.Load` (which runs Pkl where the project has object
+files) and `build.OpenSource`, and then call `objects.Plan`. `assets:check`, `assets:sync`, `assets:paths` and
+`settings:check` read the settings alone, with `build.LoadSettings`, and run no Pkl; `assets:check`, `assets:sync` and
+`settings:check` then open the source map with `build.OpenSource`. `init`, `setup` and `assets:paths` have steps of
+their own, as the table says.
 
 ## The build, step by step
 
@@ -281,7 +283,7 @@ The steps, one by one:
 2. **`ReadMapGlobals(source)`** reads the map's `war3map.lua` and lists what it defines: the `gg_` and `udg_` globals
    and the functions World Editor wrote. Two later steps need the list: the check for unknown globals, and the
    editor's declarations.
-3. **`objects.Plan`** checks the manifest's custom objects against the game's metadata and against the objects the
+3. **`objects.Plan`** checks the project's custom objects against the game's metadata and against the objects the
    map already has. It returns three things: the changed object files, the resolved objects, and the text of the ids
    module. It runs before the compile for two reasons: an invalid object fails before the slow steps, and the
    gameplay imports the ids module, which must be current when it is compiled.
@@ -338,19 +340,22 @@ Everything the program uses from outside itself, other than files, is in one str
 
 ```go
 type Env struct {
-	Root     string // the project folder
-	Log      *Logger
-	Run      RunFunc
-	Fetch    FetchFunc
-	Spawn    func(program string, args []string) error // detached: the game
-	CacheDir string
-	Platform string // "windows-x86_64", "linux-x86_64" or ""
+	Root      string
+	Log       *Logger
+	Run       RunFunc
+	Fetch     FetchFunc
+	Spawn     func(program string, args []string) error
+	CacheDir  string
+	ConfigDir string
+	Platform  string
 }
 ```
 
-`Run` runs a program and waits for it: `pkl`, `yue`, `tar`. `Fetch` downloads an address: a library's archive, a
-pinned program. `Spawn` starts a program that outlives Moonwell: the game. `env.New(root, log)` is the real world.
-`runCommand` in `internal/cli/cli.go` makes one for each command and hands it down as the parameter `e`.
+`Root` is the project folder. `Run` runs a program and waits for it: `pkl`, `yue`, `tar`. `Fetch` downloads an address:
+a library's archive, a pinned program. `Spawn` starts a program that outlives Moonwell: the game. `CacheDir` is the
+cache and `ConfigDir` the folder of the user's `config.toml`. `Platform` is `"windows-x86_64"`, `"linux-x86_64"` or
+empty. `env.New(root, log)` is the real world. `runCommand` in `internal/cli/cli.go` makes one for each command and
+hands it down as the parameter `e`.
 
 Only `internal/env` starts programs and reaches the network, and the layout test holds every other package to it.
 The reason is the tests. A test hands the code an `Env` of its own (`testkit.Env` in `internal/testkit/env.go`),
@@ -369,7 +374,7 @@ a shell asks it for completions. Both folders are fields of `Env`, so a test nam
 
 There are two kinds of failure, and the difference is the type of the error.
 
-An **expected failure** is anything a user can cause or meet: a mistake in the manifest, a missing file, a compile
+An **expected failure** is anything a user can cause or meet: a mistake in a settings file, a missing file, a compile
 error, a file another program holds open. It is a `*diag.Error` (`internal/diag/diag.go`): a message, the file to
 look at (with a line and a column when known), a hint that says what to do, and the system's error as its cause when
 there is one. When several are found at once, such as every invalid object or every unknown global, they are a
@@ -539,7 +544,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | change what `dev` watches, or when it checks again | `internal/build/watchset.go`: `projectWatchSet`, `isProjectSource`, for what is watched; `internal/build/dev.go`: `Dev`, `isDue`, for when; the watcher in `internal/build/watch.go` |
 | change how the game is started | `internal/build/launch.go`: `launch`; `internal/env/spawn_windows.go` and `internal/env/spawn_unix.go` |
 
-### The manifest and the tools
+### The settings and the tools
 
 | I want to | Open |
 | --- | --- |
@@ -635,10 +640,10 @@ a view and writes the view at the end. So a build writes `dist/stage/<map.folder
 succeeded: a refused setting leaves no half-written map. (The compile's cache, `dist/stage/lua`, is written during
 the plan.) It is also why `check` is cheap to keep true: it is the same plan, not written.
 
-**A library has a type in each area that takes it.** `manifest.Library` is the library as the manifest writes it,
-`library.Synced` where it lies after a sync, `script.Library` its module folder, `assets.Library` the files it ships.
-No area imports another, so `internal/build` turns one into the next: `LibraryModuleDirs` in `internal/build/steps.go`,
-`librariesWithAssets` in `internal/build/project.go`.
+**A library has a type in each area that takes it.** `manifest.Library` is the library as `moonwell.toml`
+writes it, `library.Synced` where it lies after a sync, `script.Library` its module folder, `assets.Library` the files
+it ships. No area imports another, so `internal/build` turns one into the next: `LibraryModuleDirs` in
+`internal/build/steps.go`, `librariesWithAssets` in `internal/build/project.go`.
 
 **The archive is packed from the view, not read back from the stage.** Both then hold the same bytes without a
 second read from disk that could fail. The stage is still written by `build`, though the archive does not need it: a

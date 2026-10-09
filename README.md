@@ -67,9 +67,9 @@ and puts it on your PATH:
 Moonwell is built for Windows and Linux on x86-64. Run the line again to upgrade: there is no update command.
 
 Moonwell evaluates a project's object files (`objects/`) with [Pkl](https://pkl-lang.org); a project without object
-files needs no Pkl at all. It uses the `pkl` on your PATH when that is Pkl 0.32 or
-newer. Otherwise it downloads Pkl 0.32.1 (about 100 MB, once, checked against a pinned checksum) into its cache and runs
-that, with a warning when the `pkl` on your PATH is older. `moonwell setup` then copies it next to `yue` in the `bin`
+files needs no Pkl at all. It uses the `pkl` on your PATH when that is Pkl 0.32 or newer. Otherwise it downloads Pkl
+0.32.1 (about 100 MB, once, checked against a pinned checksum) into its cache and runs that, with a warning when the
+`pkl` on your PATH is older. In a project with object files, `moonwell setup` then copies it next to `yue` in the `bin`
 folder of its cache, so a `pkl` command you type, such as `pkl project resolve`, finds it too. On Windows that is the
 folder above. On Linux it is `~/.cache/moonwell/bin`, and `setup` prints the command that puts it on your PATH.
 
@@ -113,9 +113,9 @@ What belongs to your machine and not to the project, such as the game's path, is
 removes and replaces what it wrote there, so it refuses a link or a Windows junction on the way to anything it writes
 below them, and names the link. A link at `.moonwell/`, `.asset-state/`, `maps/`, `src/` or `lua/` is refused too.
 
-Build only a project you trust. `build`, `test`, `check`, `dev` and `setup` run code the project brings: the program
-its `yue.path` names, and its macros, which the compiler runs while it compiles. Refusing links keeps Moonwell's own
-writes inside the project folder; it is no barrier against a project that means harm.
+Build only a project you trust. `build`, `test`, `check`, `dev` and `setup` run code the project brings: its macros,
+which the compiler runs while it compiles. Refusing links keeps Moonwell's own writes inside the project folder; it is
+no barrier against a project that means harm.
 
 Gameplay registers hooks with the `moonwell` module:
 
@@ -196,9 +196,9 @@ Only the files under `src/` that the map requires are checked. A file nothing im
 lines do not count; library modules are not checked either.
 
 `global *` and `global ^` make later assignments global without naming them, so Moonwell cannot see those names; list
-them in `lint.globals`. To report unknown globals without failing, set `lint { unknownGlobals = "warning" }`. In the
-editor, lua-language-server underlines most of the same names as you type; it does not know `lint.globals`, and does not
-flag `collectgarbage`, `dofile` or `loadfile`.
+them in `lint.globals`. To report unknown globals without failing, set `unknownGlobals = "warning"` under `[lint]`.
+In the editor, lua-language-server underlines most of the same names as you type; it does not know `lint.globals`,
+and does not flag `collectgarbage`, `dofile` or `loadfile`.
 
 The check runs the compiler's `yue -g` on each changed file and caches the result in `dist/stage/lua/`.
 
@@ -258,10 +258,9 @@ tag = "v0.2.0"
 ```
 
 The `name` names the library's folder in `.moonwell/libraries/`, so names must differ by more than case. A library's
-modules
-keep their own names (`import "example.loud"`), and share one set of names with `src/` and `lua/`: a name two of them
-define fails the build. A `.lua` file next to a `.yue` file of the same name in a library is its compiled output, and is
-skipped.
+modules keep their own names (`import "example.loud"`), and share one set of names with `src/` and `lua/`: a name two
+of them define fails the build. A `.lua` file next to a `.yue` file of the same name in a library is its compiled
+output, and is skipped.
 
 A library describes its own layout in a `moonwell-library.json` at its root:
 
@@ -276,10 +275,10 @@ A library describes its own layout in a `moonwell-library.json` at its root:
 
 Both are optional. Any other key fails, naming the library: it may be written for a newer Moonwell.
 
-`check`, `build`, `test`, `dev` and `setup` download a library that is missing or whose `github`, `tag` or `dir` changed
-into `.moonwell/libraries/<key>/`, and its files for the map into `.moonwell/library-assets/<key>/` (both git-ignored),
-and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`: a fresh clone then gets the same code, and if a
-tag is moved on GitHub, the command fails instead of using the new code. To upgrade, change `tag`.
+`check`, `build`, `test`, `dev` and `setup` download a library that is missing or whose `github`, `tag` or `dir`
+changed into `.moonwell/libraries/<name>/`, and its files for the map into `.moonwell/library-assets/<name>/` (both
+git-ignored), and record the tag's commit in `moonwell.lock`. Commit `moonwell.lock`: a fresh clone then gets the same
+code, and if a tag is moved on GitHub, the command fails instead of using the new code. To upgrade, change `tag`.
 
 To work on a library while a map uses it, say in `config.toml` of [your machine](#your-machine) where its repository
 is on your disk:
@@ -338,7 +337,7 @@ too, each at its path in that folder; `paths` and `exclude` apply to your own fi
 library's have the same in-map path, yours is imported and the command says so:
 `assets/Textures/Golem.blp replaces library golems's Textures/Golem.blp`. That is how you swap a library's icon or
 model. Two libraries with a file at the same path fail the build. `assets:check` lists a library's files as
-`library <key>: <file>`, `assets:sync` writes them into the source map with your own, and `assets:paths` counts them as
+`library <name>: <file>`, `assets:sync` writes them into the source map with your own, and `assets:paths` counts them as
 imported and checks a library's models too.
 
 If you write a library, keep its files under a folder of its own, such as `assets/war3mapImported/<library>/`, so they
@@ -468,9 +467,8 @@ Map settings valid: 3 internal file(s) would change during build.
 A file a build removes is listed as `war3mapMap.blp (removed)`; that happens for a TGA picture.
 
 `moonwell check` (and so `dev`) checks settings the same way. A mistake in a setting names `moonwell.toml` and the
-setting. Problems with the map name the file under
-`maps/<folder>/`, such as `maps/map.w3x/war3map.w3i`. Map files are matched ignoring letter case, as Warcraft III
-does: a map saved with `war3mapskin.txt` is patched under that name.
+setting. Problems with the map name the file under `maps/<folder>/`, such as `maps/map.w3x/war3map.w3i`. Map files are
+matched ignoring letter case, as Warcraft III does: a map saved with `war3mapskin.txt` is patched under that name.
 
 ## Objects
 
@@ -611,7 +609,8 @@ If PowerShell has no profile yet, make the file first: `if (!(Test-Path $PROFILE
 
 The compiler, and Pkl when Moonwell needs its own, are downloaded once per version and verified by checksum. They are
 cached in `MOONWELL_CACHE` when that is set, else in `%LOCALAPPDATA%\moonwell` on Windows, else in
-`$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`. `setup` also copies Moonwell's own Pkl to that folder's `bin`.
+`$XDG_CACHE_HOME/moonwell` or `~/.cache/moonwell`. In a project with object files, `setup` also copies Moonwell's own
+Pkl to that folder's `bin`.
 
 ## Settings
 
@@ -628,20 +627,20 @@ know is an error, and so is a value of the wrong kind.
 | `map.entry` | `"src/main.yue"` | Starts with `src/`, ends in `.yue` |
 | `build.folder` | `"dist/bin"` | A relative path with no `..`; not `maps`, `src` or `dist/stage`, nor below one |
 | `build.minify` | `false` | `true` shrinks the script, but runtime errors lose their line numbers |
-| `yue.version` | `"0.34.3"` | YueScript compiler version. Only versions this release pins a checksum for are accepted |
-| `assets.exclude` | `[]` | Files under `assets/`, or folders ending in `/`, to leave out |
-| `[[assets.paths]]` | none | `file` under `assets/` and its exact in-map `path`; a `file` once |
+| `yue.version` | `"0.34.3"` | YueScript compiler version: three numbers with dots. Only versions this release pins a checksum for are accepted |
+| `assets.exclude` | `[]` | Files under `assets/`, or folders ending in `/`, to leave out; no empty text |
+| `[[assets.paths]]` | none | `file` under `assets/` and its exact in-map `path`; neither is empty, and a `file` is written once |
 | `lint.unknownGlobals` | `"error"` | `"error"` or `"warning"` |
 | `lint.globals` | `[]` | Extra global names to allow; Lua names, no reserved word |
-| `[[libraries]]` | none | `name` (letters, digits, `_` and `-`); `github` as `owner/repo` with a `tag`, or a `path`; `dir` |
-| `settings.info` | absent | `name`, `author`, `description`, `recommendedPlayers`, `preview` |
-| `settings.loadingScreen` | absent | `background` (-1 selects a custom model), `model`, `text`, `title`, `subtitle` |
+| `[[libraries]]` | none | `name` (letters, digits, `_` and `-`), written once; `github` as `owner/repo` with a `tag`, or a `path`; `dir`. `tag` and `path` are not empty, `dir` is empty or a relative path without `..`, and there is a `path` or both `github` and `tag` |
+| `settings.info` | absent | `name`, `author`, `description`, `recommendedPlayers`, `preview`; the texts hold no NUL character and `preview` is not empty |
+| `settings.loadingScreen` | absent | `background` (-1 selects a custom model; -1 or more), `model`, `text`, `title`, `subtitle`; the texts hold no NUL character |
 | `settings.gameplay` | absent | `heroMaxLevel` 1 to 10000, `foodLimit` 0 to 300 |
-| `[[settings.players]]` | none | `slot` 0 to 23; `name`; `controller`: `user`, `computer`, `neutral` or `rescuable`; `race`: `selectable`, `human`, `orc`, `undead` or `nightelf`; `fixedStart`; `x`, `y` |
-| `[[settings.forces]]` | none | `index` 0 to 23; `name`, `allied`, `alliedVictory`, `sharedVision`, `sharedControl`, `sharedAdvancedControl` |
-| `settings.environment` | absent | `soundEnvironment` (World Editor's name, such as `"Dungeon"`), `waterColor` |
-| `settings.environment.fog` | absent | `enabled`, `style` 0 to 2, `start`, `end`, `density` 0 to 1, `color` |
-| `[[settings.gameplayConstants]]`, `[[settings.gameInterface]]` | none | `section`, `key`, `value`: see below |
+| `[[settings.players]]` | none | `slot` 0 to 23, required and written once; `name`; `controller`: `user`, `computer`, `neutral` or `rescuable`; `race`: `selectable`, `human`, `orc`, `undead` or `nightelf`; `fixedStart`; `x`, `y` within -10000000 and 10000000 |
+| `[[settings.forces]]` | none | `index` 0 to 23, required and written once; `name`, `allied`, `alliedVictory`, `sharedVision`, `sharedControl`, `sharedAdvancedControl` |
+| `settings.environment` | absent | `soundEnvironment` (World Editor's name, such as `"Dungeon"`; no NUL character), `waterColor` (four whole numbers, 0 to 255) |
+| `settings.environment.fog` | absent | `enabled`, `style` 0 to 2, `start` and `end` within -10000000 and 10000000, `density` 0 to 1, `color` |
+| `[[settings.gameplayConstants]]`, `[[settings.gameInterface]]` | none | `section`, `key`, `value`: see below. `value` is required |
 
 The names with two brackets are lists: write one entry for each library, player, force, mapped asset or constant,
 and they are used in the order they are written.
@@ -654,10 +653,10 @@ A missing file is no error.
 
 | Setting | Default | What |
 | --- | --- | --- |
-| `launch.gameExecutable` | none | The path of `Warcraft III.exe`, for `moonwell test` |
+| `launch.gameExecutable` | none | The path of `Warcraft III.exe`, for `moonwell test`; not empty |
 | `launch.args` | `["-launch", "-windowmode", "windowed"]` | Passed to the game before `-loadfile <map>`. A list here replaces the default one |
-| `yue.path` | none | Your own `yue` binary instead of the downloaded one |
-| `[[libraries]]` | none | `github` and `path`: a repository's folder on this machine (see [Libraries](#libraries)) |
+| `yue.path` | none | Your own `yue` binary instead of the downloaded one; not empty |
+| `[[libraries]]` | none | `github` as `owner/repo` and `path`: a repository's folder on this machine (see [Libraries](#libraries)). A `github` is written once, compared without regard to letter case, and the `path` is absolute |
 
 ```toml
 [launch]
@@ -669,6 +668,10 @@ path = 'C:\tools\yue.exe'
 ```
 
 A path between single quotes is written as it is, with single backslashes.
+
+A `launch` table or a `yue.path` in `moonwell.toml` is refused, with a hint that names your `config.toml`: the project
+does not choose the program that runs on your machine. A project's setting written in `config.toml`, such as `map` or
+`build`, is refused as a setting Moonwell does not know there.
 
 ### Raw gameplay constants and game interface
 
@@ -695,11 +698,11 @@ value = "value"
 - Every matching key is replaced, a missing key is added to its section, and a missing section or file is created. Other
   sections, keys and comments stay as they are.
 - `gameplay.heroMaxLevel` and `gameplay.foodLimit` write `[Misc] MaxHeroLevel` and `[Misc] FoodCeiling`. If you set the
-  same key raw as well, the two must agree exactly: `heroMaxLevel = 25` with `["MaxHeroLevel"] = "25"` is accepted, with
-  `"025"` it is an error.
+  same key raw as well, the two must agree exactly: `heroMaxLevel = 25` with a `[[settings.gameplayConstants]]` entry of
+  `section = "Misc"`, `key = "MaxHeroLevel"` and `value = "25"` is accepted, with `value = "025"` it is an error.
 
 ## Credits
 
 The template map derives from TriggerHappy's [wc3-ts-template](https://github.com/cipherxof/wc3-ts-template) via
-wc3-dev-framework. MIT licensed; see [LICENSE](LICENSE). The program is built with three modules of other authors,
+wc3-dev-framework. MIT licensed; see [LICENSE](LICENSE). The program is built with fifteen modules of other authors,
 whose licences are in [THIRD_PARTY_LICENSES](THIRD_PARTY_LICENSES).
