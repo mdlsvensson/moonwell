@@ -12,7 +12,7 @@ func holy(properties string) string {
 	return `{"abilities":{"holy":{"id":"A000","base":"AHhb","properties":` + properties + `}}}`
 }
 
-var fieldCases = []accepted{
+var fieldCases = []resolveCase{
 	{"properties by rawcode and by friendly name, with the data column",
 		holy(`{"amountHealedOrDamaged":[200,400],"alev":3}`),
 		[]string{
@@ -53,81 +53,81 @@ var fieldCases = []accepted{
 
 const noSuchField = "no field that applies to 'AHhb' (Holy Light) has this rawcode or name"
 
-var fieldRules = []refused{
+var fieldRules = []resolveErrorCase{
 	{name: "an unknown key that a friendly name contains", document: holy(`{"amountHealed":1}`),
-		at: `abilities["holy"].properties["amountHealed"]`, says: noSuchField, hint: "Did you mean 'amountHealedOrDamaged'?"},
+		path: `abilities["holy"].properties["amountHealed"]`, message: noSuchField, hint: "Did you mean 'amountHealedOrDamaged'?"},
 	{name: "an unknown key near no name", document: holy(`{"zzzz":2}`),
-		at: `abilities["holy"].properties["zzzz"]`, says: noSuchField, hint: "Keys are field rawcodes, or friendly names"},
+		path: `abilities["holy"].properties["zzzz"]`, message: noSuchField, hint: "Keys are field rawcodes, or friendly names"},
 	{name: "an unknown key with a quote, a line break and a control character", document: holy(`{"a\"b\n\u` + `0001":1}`),
-		at: `abilities["holy"].properties["a\"b\n\u` + `0001"]`, says: noSuchField, hint: "Keys are field rawcodes"},
+		path: `abilities["holy"].properties["a\"b\n\u` + `0001"]`, message: noSuchField, hint: "Keys are field rawcodes"},
 	{name: "an unknown key two edits from a friendly name", document: holy(`{"manaCots":1}`),
-		at: `abilities["holy"].properties["manaCots"]`, says: noSuchField, hint: "Did you mean 'manaCost'?"},
+		path: `abilities["holy"].properties["manaCots"]`, message: noSuchField, hint: "Did you mean 'manaCost'?"},
 	{name: "a name that several fields of other bases share", document: holy(`{"damage":1}`),
-		at: `abilities["holy"].properties["damage"]`, says: noSuchField, hint: "Did you mean 'amountHealedOrDamaged'?"},
+		path: `abilities["holy"].properties["damage"]`, message: noSuchField, hint: "Did you mean 'amountHealedOrDamaged'?"},
 	{name: "a name that one field of another base has", document: holy(`{"chanceToMiss":1}`),
-		at: `abilities["holy"].properties["chanceToMiss"]`, says: "'Crs' (Chance to Miss) does not apply to 'AHhb' (Holy Light)",
+		path: `abilities["holy"].properties["chanceToMiss"]`, message: "'Crs' (Chance to Miss) does not apply to 'AHhb' (Holy Light)",
 		hint: "copies of 'Acrs' (Curse)"},
 	{name: "a typed property that is no field", document: `{"units":{"captain":{"id":"h000","base":"hfoo","hitPoints":1}}}`,
-		at: `units["captain"].hitPoints`, says: "'hitPoints' is not a field of units",
+		path: `units["captain"].hitPoints`, message: "'hitPoints' is not a field of units",
 		hint: "Is the moonwell Pkl package the version this CLI expects?"},
 	{name: "a field of other uses", document: `{"buildings":{"hall":{"id":"h000","base":"htow","properties":{"structuresBuilt":"hbar"}}}}`,
-		at: `buildings["hall"].properties["structuresBuilt"]`, says: "'ubui' (Structures Built) does not apply to 'htow' (Town Hall)",
+		path: `buildings["hall"].properties["structuresBuilt"]`, message: "'ubui' (Structures Built) does not apply to 'htow' (Town Hall)",
 		hint: "It is a field of units and heroes only."},
 	{name: "a field of another base", document: holy(`{"Crs":0.5}`),
-		at: `abilities["holy"].properties["Crs"]`, says: "'Crs' (Chance to Miss) does not apply to 'AHhb' (Holy Light)",
+		path: `abilities["holy"].properties["Crs"]`, message: "'Crs' (Chance to Miss) does not apply to 'AHhb' (Holy Light)",
 		hint: "It applies only to copies of 'Acrs' (Curse)."},
 	{name: "a field the base is excluded from", document: `{"abilities":{"attack":{"id":"A000","base":"Aatk","tooltipLearn":"x"}}}`,
-		at: `abilities["attack"].tooltipLearn`, says: "'aret' (Tooltip - Learn) does not apply to 'Aatk' (Attack)",
+		path: `abilities["attack"].tooltipLearn`, message: "'aret' (Tooltip - Learn) does not apply to 'Aatk' (Attack)",
 		hint: "The game's metadata excludes 'Aatk' (Attack) from it."},
 	{name: "a field set by its name and by its rawcode",
 		document: `{"units":{"captain":{"id":"h000","base":"hfoo","hitPointsMaximumBase":1,"properties":{"uhpm":2}}}}`,
-		at:       `units["captain"].properties["uhpm"]`,
-		says:     "'uhpm' (Hit Points Maximum (Base)) is already set by hitPointsMaximumBase", hint: "Set each field once."},
+		path:     `units["captain"].properties["uhpm"]`,
+		message:  "'uhpm' (Hit Points Maximum (Base)) is already set by hitPointsMaximumBase", hint: "Set each field once."},
 	{name: "a field set twice in properties",
 		document: `{"abilities":{"curse":{"id":"A000","base":"Acrs","properties":{"Crs":1,"chanceToMiss":2}}}}`,
-		at:       `abilities["curse"].properties["chanceToMiss"]`,
-		says:     `'Crs' (Chance to Miss) is already set by properties["Crs"]`, hint: "Set each field once."},
+		path:     `abilities["curse"].properties["chanceToMiss"]`,
+		message:  `'Crs' (Chance to Miss) is already set by properties["Crs"]`, hint: "Set each field once."},
 
 	{name: "a list on a field that is not per level",
 		document: `{"units":{"captain":{"id":"h000","base":"hfoo","hitPointsMaximumBase":[1,2]}}}`,
-		at:       `units["captain"].hitPointsMaximumBase`,
-		says:     "'uhpm' (Hit Points Maximum (Base)) is not per level, so it takes one value, not a List", hint: "Write a single value."},
+		path:     `units["captain"].hitPointsMaximumBase`,
+		message:  "'uhpm' (Hit Points Maximum (Base)) is not per level, so it takes one value, not a List", hint: "Write a single value."},
 	{name: "a list of lists on a list field that is not per level",
 		document: `{"units":{"worker":{"id":"h000","base":"hpea","properties":{"ubui":[["htow"]]}}}}`,
-		at:       `units["worker"].properties["ubui"]`,
-		says:     "'ubui' (Structures Built) is not per level, so it takes one list, not a List of lists", hint: "Write one List<String>."},
+		path:     `units["worker"].properties["ubui"]`,
+		message:  "'ubui' (Structures Built) is not per level, so it takes one list, not a List of lists", hint: "Write one List<String>."},
 	{name: "an empty list on a per-level field", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","manaCost":[]}}}`,
-		at: `abilities["holy"].manaCost`, says: "an empty List sets no levels", hint: "Use null to inherit every level"},
+		path: `abilities["holy"].manaCost`, message: "an empty List sets no levels", hint: "Use null to inherit every level"},
 	{name: "an empty list on a per-level field of an upgrade",
 		document: `{"upgrades":{"swords":{"id":"R000","base":"Rhme","properties":{"gnam":[]}}}}`,
-		at:       `upgrades["swords"].properties["gnam"]`, says: "an empty List sets no levels", hint: "Use null to inherit every level"},
+		path:     `upgrades["swords"].properties["gnam"]`, message: "an empty List sets no levels", hint: "Use null to inherit every level"},
 	{name: "an ability's own levels of 0", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","levels":0,"manaCost":[1]}}}`,
-		at: `abilities["holy"].levels`, says: "'alev' (Levels) must be at least 1, got 0.", hint: "at least one level; use null"},
+		path: `abilities["holy"].levels`, message: "'alev' (Levels) must be at least 1, got 0.", hint: "at least one level; use null"},
 	{name: "an ability's own levels of the zero below 0", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","levels":-0.0}}}`,
-		at: `abilities["holy"].levels`, says: "'alev' (Levels) must be at least 1, got 0.", hint: "at least one level; use null"},
+		path: `abilities["holy"].levels`, message: "'alev' (Levels) must be at least 1, got 0.", hint: "at least one level; use null"},
 	{name: "an upgrade's own levels below 0", document: `{"upgrades":{"swords":{"id":"R000","base":"Rhme","properties":{"glvl":-2}}}}`,
-		at: `upgrades["swords"].properties["glvl"]`, says: "'glvl' (Levels) must be at least 1, got -2.", hint: "at least one level"},
+		path: `upgrades["swords"].properties["glvl"]`, message: "'glvl' (Levels) must be at least 1, got -2.", hint: "at least one level"},
 	{name: "more levels than the base ability has", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","castRange":[1,2,3,4]}}}`,
-		at: `abilities["holy"].castRange`, says: "4 levels given, but 'AHhb' (Holy Light) has 3.",
+		path: `abilities["holy"].castRange`, message: "4 levels given, but 'AHhb' (Holy Light) has 3.",
 		hint: "Set levels = 4 to add levels, or remove values."},
 	{name: "more levels than the base upgrade has", document: `{"upgrades":{"swords":{"id":"R000","base":"Rhme","name":["1","2","3","4"]}}}`,
-		at: `upgrades["swords"].name`, says: "4 levels given, but 'Rhme' (Iron Forged Swords) has 3.",
+		path: `upgrades["swords"].name`, message: "4 levels given, but 'Rhme' (Iron Forged Swords) has 3.",
 		hint: "Set levels = 4 to add levels, or remove values."},
 	{name: "more levels than the object's own", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","levels":2,"manaCost":[1,2,3]}}}`,
-		at: `abilities["holy"].manaCost`, says: "3 levels given, but levels is 2.", hint: "Raise levels to 3, or remove values."},
+		path: `abilities["holy"].manaCost`, message: "3 levels given, but levels is 2.", hint: "Raise levels to 3, or remove values."},
 	{name: "more levels than the object's own, by rawcode", document: holy(`{"alev":1,"amcs":[1,2]}`),
-		at: `abilities["holy"].properties["amcs"]`, says: "2 levels given, but levels is 1.", hint: "Raise levels to 2"},
+		path: `abilities["holy"].properties["amcs"]`, message: "2 levels given, but levels is 1.", hint: "Raise levels to 2"},
 	{name: "more levels than the one of a base with 0", document: `{"abilities":{"build":{"id":"A000","base":"AHbu","manaCost":[5,6]}}}`,
-		at: `abilities["build"].manaCost`, says: "2 levels given, but 'AHbu' (Build (Human)) has 1.",
+		path: `abilities["build"].manaCost`, message: "2 levels given, but 'AHbu' (Build (Human)) has 1.",
 		hint: "Set levels = 2 to add levels, or remove values."},
 }
 
 func TestResolveFindsTheFieldAPropertyNamesAndItsLevels(t *testing.T) {
-	runAccepted(t, fieldCases)
+	runResolveCases(t, fieldCases)
 }
 
 func TestResolveRefusesAPropertyForItsFieldOrItsLevels(t *testing.T) {
-	runRefused(t, fieldRules)
+	runResolveErrorCases(t, fieldRules)
 }
 
 func TestAnUnknownKeyIsComparedWithTheNamesByCharacters(t *testing.T) {
@@ -140,7 +140,7 @@ func TestAnUnknownKeyIsComparedWithTheNamesByCharacters(t *testing.T) {
 		{"a key of two characters is suggested no name for holding it", "ma", noHint},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			found := problems(t, holy(`{"`+c.key+`":1}`))
+			found := resolveProblems(t, holy(`{"`+c.key+`":1}`))
 			if len(found) != 1 || !strings.Contains(found[0].Msg, noSuchField) || !strings.Contains(found[0].Hint, c.hint) {
 				t.Errorf("problems = %+v, want the hint %q", found, c.hint)
 			}
@@ -153,7 +153,7 @@ func TestAnUnknownKeyIsSuggestedTheThreeNearestNamesAndEquallyNearOnesByName(t *
 	for i, name := range []string{"bonusDamage", "bonusB", "bones", "bonusA"} {
 		metadata.Fields["buffs"] = append(metadata.Fields["buffs"], metaField(fmt.Sprintf("fbo%d", i), name, nil))
 	}
-	resolved, err := objects.Resolve(metadata, decoded(t, `{"buffs":{"aura":{"id":"B000","base":"Bcrs","properties":{"bonus":1}}}}`), nil)
+	resolved, err := objects.Resolve(metadata, mustDecodeObjects(t, `{"buffs":{"aura":{"id":"B000","base":"Bcrs","properties":{"bonus":1}}}}`), nil)
 	found := problemsOf(t, resolved, err)
 	if len(found) != 1 || found[0].Hint != "Did you mean 'bones', 'bonusA' or 'bonusB'?" {
 		t.Errorf("problems = %+v", found)

@@ -31,7 +31,7 @@ func object(category manifest.Category, key, id string) objects.Resolved {
 
 var captainIDs, _ = objects.RenderIDs([]objects.Resolved{object("units", "captain", "h000")})
 
-func rendered(t *testing.T, resolved []objects.Resolved) string {
+func mustRenderIDs(t *testing.T, resolved []objects.Resolved) string {
 	t.Helper()
 	ids, err := objects.RenderIDs(resolved)
 	if err != nil {
@@ -42,7 +42,7 @@ func rendered(t *testing.T, resolved []objects.Resolved) string {
 
 func idsFile(root string) string { return filepath.Join(root, "src", "generated", "objects.yue") }
 
-func status(t *testing.T, root, expected string) objects.IDsStatus {
+func mustIDsStatus(t *testing.T, root, expected string) objects.IDsStatus {
 	t.Helper()
 	got, err := objects.CheckIDsStatus(root, expected)
 	if err != nil {
@@ -51,7 +51,7 @@ func status(t *testing.T, root, expected string) objects.IDsStatus {
 	return got
 }
 
-func refresh(t *testing.T, root, expected string) bool {
+func mustRefreshIDs(t *testing.T, root, expected string) bool {
 	t.Helper()
 	wrote, err := objects.RefreshIDs(root, expected)
 	if err != nil {
@@ -60,7 +60,7 @@ func refresh(t *testing.T, root, expected string) bool {
 	return wrote
 }
 
-func asError(t *testing.T, err error, what string) *diag.Error {
+func asDiagError(t *testing.T, err error, what string) *diag.Error {
 	t.Helper()
 	var diagErr *diag.Error
 	if !errors.As(err, &diagErr) {
@@ -142,21 +142,21 @@ func TestRenderIDsSortsKeysWithinEachCategoryAndCommentsEachRawcode(t *testing.T
 
 func TestStatusOfIDsIsCurrentStaleOrMissing(t *testing.T) {
 	root := t.TempDir()
-	if got := status(t, root, emptyIDs); got != objects.IDsCurrent {
+	if got := mustIDsStatus(t, root, emptyIDs); got != objects.IDsCurrent {
 		t.Errorf("no file, no objects: %s", got)
 	}
-	if got := status(t, root, captainIDs); got != objects.IDsMissing {
+	if got := mustIDsStatus(t, root, captainIDs); got != objects.IDsMissing {
 		t.Errorf("no file, with objects: %s", got)
 	}
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(captainIDs))
-	if got := status(t, root, captainIDs); got != objects.IDsCurrent {
+	if got := mustIDsStatus(t, root, captainIDs); got != objects.IDsCurrent {
 		t.Errorf("the module of these objects: %s", got)
 	}
-	if got := status(t, root, emptyIDs); got != objects.IDsStale {
+	if got := mustIDsStatus(t, root, emptyIDs); got != objects.IDsStale {
 		t.Errorf("the module of other objects: %s", got)
 	}
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(emptyIDs))
-	if got := status(t, root, emptyIDs); got != objects.IDsCurrent {
+	if got := mustIDsStatus(t, root, emptyIDs); got != objects.IDsCurrent {
 		t.Errorf("an empty module: %s", got)
 	}
 }
@@ -167,12 +167,12 @@ func TestAssertIDsCurrentFailsOnAStaleOrMissingFileWithTheHintToRegenerate(t *te
 		t.Error(err)
 	}
 	const hint = "Run moonwell build, test or dev to regenerate it."
-	missing := asError(t, objects.RequireIDsCurrent(root, captainIDs), "a missing module")
+	missing := asDiagError(t, objects.RequireIDsCurrent(root, captainIDs), "a missing module")
 	if !strings.Contains(missing.Msg, "is missing, but the manifest has objects") || missing.File != objects.IDsFile || missing.Hint != hint {
 		t.Errorf("error = %+v", missing)
 	}
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(emptyIDs))
-	stale := asError(t, objects.RequireIDsCurrent(root, captainIDs), "a stale module")
+	stale := asDiagError(t, objects.RequireIDsCurrent(root, captainIDs), "a stale module")
 	if !strings.Contains(stale.Msg, "does not match the objects in the manifest") || stale.File != objects.IDsFile || stale.Hint != hint {
 		t.Errorf("error = %+v", stale)
 	}
@@ -185,7 +185,7 @@ func TestAssertIDsCurrentFailsOnAStaleOrMissingFileWithTheHintToRegenerate(t *te
 func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(strings.ReplaceAll(captainIDs, "\n", "\r\n")))
-	if got := status(t, root, captainIDs); got != objects.IDsCurrent {
+	if got := mustIDsStatus(t, root, captainIDs); got != objects.IDsCurrent {
 		t.Errorf("CRLF line endings: %s", got)
 	}
 	if err := objects.RequireIDsCurrent(root, captainIDs); err != nil {
@@ -196,7 +196,7 @@ func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.
 		"a byte order mark": "\xEF\xBB\xBF" + captainIDs,
 	} {
 		testkit.WriteFile(t, root, objects.IDsFile, []byte(content))
-		if got := status(t, root, captainIDs); got != objects.IDsStale {
+		if got := mustIDsStatus(t, root, captainIDs); got != objects.IDsStale {
 			t.Errorf("%s: %s", name, got)
 		}
 	}
@@ -205,11 +205,11 @@ func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.
 		t.Fatal(err)
 	}
 	for name, err := range map[string]error{
-		"StatusOfIDs":      second(objects.CheckIDsStatus(other, captainIDs)),
-		"RefreshIDs":       second(objects.RefreshIDs(other, captainIDs)),
+		"StatusOfIDs":      errOf(objects.CheckIDsStatus(other, captainIDs)),
+		"RefreshIDs":       errOf(objects.RefreshIDs(other, captainIDs)),
 		"AssertIDsCurrent": objects.RequireIDsCurrent(other, captainIDs),
 	} {
-		diagErr := asError(t, err, name)
+		diagErr := asDiagError(t, err, name)
 		if diagErr.File != objects.IDsFile || !strings.HasPrefix(diagErr.Msg, "Reading the generated object ids failed: ") ||
 			diagErr.Hint == "" || diagErr.Cause == nil {
 			t.Errorf("%s: error = %+v", name, diagErr)
@@ -217,30 +217,30 @@ func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.
 	}
 }
 
-func second[T any](_ T, err error) error { return err }
+func errOf[T any](_ T, err error) error { return err }
 
 func TestRefreshIDsWritesOnlyAStaleOrMissingModuleAndNeverAnEmptyOneThatIsNotNeeded(t *testing.T) {
 	root := t.TempDir()
-	if refresh(t, root, emptyIDs) {
+	if mustRefreshIDs(t, root, emptyIDs) {
 		t.Error("no objects wrote a module")
 	}
 	if _, err := os.Stat(idsFile(root)); err == nil {
 		t.Error("no objects created a file")
 	}
-	if !refresh(t, root, captainIDs) {
+	if !mustRefreshIDs(t, root, captainIDs) {
 		t.Error("a missing module was not written")
 	}
 	if data, _ := os.ReadFile(idsFile(root)); string(data) != captainIDs {
 		t.Errorf("the file holds %q", data)
 	}
-	if refresh(t, root, captainIDs) {
+	if mustRefreshIDs(t, root, captainIDs) {
 		t.Error("a current module was written again")
 	}
 	testkit.WriteFile(t, root, objects.IDsFile, []byte(strings.ReplaceAll(captainIDs, "\n", "\r\n")))
-	if refresh(t, root, captainIDs) {
+	if mustRefreshIDs(t, root, captainIDs) {
 		t.Error("a checkout with CRLF line endings was rewritten")
 	}
-	if !refresh(t, root, emptyIDs) {
+	if !mustRefreshIDs(t, root, emptyIDs) {
 		t.Error("removing every object did not empty the module")
 	}
 	if data, _ := os.ReadFile(idsFile(root)); string(data) != emptyIDs {
@@ -252,7 +252,7 @@ func TestRefreshIDsNamesTheModuleWhenItCannotBeWritten(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "src/generated", []byte("a file"))
 	wrote, err := objects.RefreshIDs(root, captainIDs)
-	diagErr := asError(t, err, "a file in place of the folder")
+	diagErr := asDiagError(t, err, "a file in place of the folder")
 	if wrote || diagErr.File != objects.IDsFile || !strings.Contains(diagErr.Msg, "the generated object ids failed: ") ||
 		diagErr.Hint == "" || diagErr.Cause == nil {
 		t.Errorf("RefreshIDs = %v, %+v", wrote, diagErr)

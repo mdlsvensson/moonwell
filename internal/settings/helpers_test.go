@@ -14,7 +14,7 @@ const plainBlocks = `"map":{"folder":"map.w3x","entry":"src/main.yue"},"build":{
 	`"launch":{"args":[]},"yue":{"version":"0.34.3"},"assets":{"paths":{},"exclude":[]},` +
 	`"lint":{"unknownGlobals":"error","globals":[]},"libraries":{},"objects":{}`
 
-func projectOf(t testing.TB, root, document string) *manifest.Project {
+func mustDecodeProject(t testing.TB, root, document string) *manifest.Project {
 	t.Helper()
 	project, err := manifest.DecodeProject(root, manifestName, []byte("{"+plainBlocks+`,"settings":`+document+"}"))
 	if err != nil {
@@ -23,12 +23,12 @@ func projectOf(t testing.TB, root, document string) *manifest.Project {
 	return project
 }
 
-func settingsOf(t testing.TB, document string) manifest.Settings {
+func mustDecodeSettings(t testing.TB, document string) manifest.Settings {
 	t.Helper()
-	return projectOf(t, "", document).Settings
+	return mustDecodeProject(t, "", document).Settings
 }
 
-func asError(t testing.TB, err error, what string) *diag.Error {
+func asDiagError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
 	var diagErr *diag.Error
 	if !errors.As(err, &diagErr) {

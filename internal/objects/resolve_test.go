@@ -14,19 +14,19 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-type accepted struct {
+type resolveCase struct {
 	name     string
 	document string
 	want     []string
 }
 
-type refused struct {
+type resolveErrorCase struct {
 	name     string
 	document string
 	existing []string
 	file     string
-	at       string
-	says     string
+	path     string
+	message  string
 	hint     string
 }
 
@@ -35,7 +35,7 @@ func project(document string) string {
 		`"yue":{"version":"0.34.3"},"objects":` + document + `}`
 }
 
-func decoded(t *testing.T, document string) manifest.Objects {
+func mustDecodeObjects(t *testing.T, document string) manifest.Objects {
 	t.Helper()
 	p, err := manifest.DecodeProject("/p", "objects/a.pkl", []byte(project(document)))
 	if err != nil {
@@ -44,7 +44,7 @@ func decoded(t *testing.T, document string) manifest.Objects {
 	return p.Objects
 }
 
-func ids(existing []string) map[string]bool {
+func idSet(existing []string) map[string]bool {
 	set := map[string]bool{}
 	for _, id := range existing {
 		set[id] = true
@@ -52,9 +52,9 @@ func ids(existing []string) map[string]bool {
 	return set
 }
 
-func resolve(t *testing.T, document string, existing ...string) []objects.Resolved {
+func mustResolve(t *testing.T, document string, existing ...string) []objects.Resolved {
 	t.Helper()
-	resolved, err := objects.Resolve(mini, decoded(t, document), ids(existing))
+	resolved, err := objects.Resolve(mini, mustDecodeObjects(t, document), idSet(existing))
 	if err != nil {
 		t.Fatalf("Resolve(%s):\n%s", document, diag.Format(err))
 	}
@@ -70,15 +70,15 @@ func problemsOf(t *testing.T, resolved []objects.Resolved, err error) diag.Probl
 	return found
 }
 
-func problems(t *testing.T, document string, existing ...string) diag.Problems {
+func resolveProblems(t *testing.T, document string, existing ...string) diag.Problems {
 	t.Helper()
-	resolved, err := objects.Resolve(mini, decoded(t, document), ids(existing))
+	resolved, err := objects.Resolve(mini, mustDecodeObjects(t, document), idSet(existing))
 	return problemsOf(t, resolved, err)
 }
 
 var typeNames = map[objmod.ValueType]string{objmod.Int: "int", objmod.Real: "real", objmod.Unreal: "unreal", objmod.String: "string"}
 
-func printed(resolved []objects.Resolved) []string {
+func formatResolved(resolved []objects.Resolved) []string {
 	var lines []string
 	for _, object := range resolved {
 		lines = append(lines, fmt.Sprintf("%s %s %s %s %s", object.Category, object.Key, object.ID, object.Base, object.Source))
@@ -97,20 +97,20 @@ func printed(resolved []objects.Resolved) []string {
 	return lines
 }
 
-func runAccepted(t *testing.T, cases []accepted) {
+func runResolveCases(t *testing.T, cases []resolveCase) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := printed(resolve(t, c.document)); !slices.Equal(got, c.want) {
+			if got := formatResolved(mustResolve(t, c.document)); !slices.Equal(got, c.want) {
 				t.Errorf("resolved:\n got %q\nwant %q", got, c.want)
 			}
 		})
 	}
 }
 
-func runRefused(t *testing.T, cases []refused) {
+func runResolveErrorCases(t *testing.T, cases []resolveErrorCase) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			found := problems(t, c.document, c.existing...)
+			found := resolveProblems(t, c.document, c.existing...)
 			if len(found) != 1 {
 				t.Fatalf("%d problems:\n%s", len(found), diag.Format(found))
 			}
@@ -119,8 +119,8 @@ func runRefused(t *testing.T, cases []refused) {
 				file = "objects/a.pkl"
 			}
 			problem := found[0]
-			if problem.File != file || !strings.HasPrefix(problem.Msg, c.at+": ") || !strings.Contains(problem.Msg, c.says) {
-				t.Errorf("problem in %s: %s\n   want in %s: %s: (a message with) %s", problem.File, problem.Msg, file, c.at, c.says)
+			if problem.File != file || !strings.HasPrefix(problem.Msg, c.path+": ") || !strings.Contains(problem.Msg, c.message) {
+				t.Errorf("problem in %s: %s\n   want in %s: %s: (a message with) %s", problem.File, problem.Msg, file, c.path, c.message)
 			}
 			if !strings.Contains(problem.Hint, c.hint) {
 				t.Errorf("hint = %q, want %q in it", problem.Hint, c.hint)
@@ -129,7 +129,7 @@ func runRefused(t *testing.T, cases []refused) {
 	}
 }
 
-var objectCases = []accepted{
+var objectCases = []resolveCase{
 	{"no objects", `{}`, nil},
 	{"objects in category order, their fields by rawcode and level", `{
 		"abilities":{"holy":{"id":"A000","base":"AHhb","source":"objects/abilities.pkl",
@@ -151,35 +151,35 @@ var objectCases = []accepted{
 		[]string{"units b h001 hfoo objects/a.pkl", "units a h000 hkni objects/a.pkl", "units C h002 hpea objects/a.pkl"}},
 }
 
-var objectRules = []refused{
+var objectRules = []resolveErrorCase{
 	{name: "an id with a character that is no letter or digit", document: `{"abilities":{"holy":{"id":"A-00","base":"AHhb"}}}`,
-		at: `abilities["holy"].id`, says: "'A-00' is not four ASCII letters or digits", hint: "such as 'A000'"},
+		path: `abilities["holy"].id`, message: "'A-00' is not four ASCII letters or digits", hint: "such as 'A000'"},
 	{name: "an id of three characters", document: `{"heroes":{"hero":{"id":"h00","base":"Hpal"}}}`,
-		at: `heroes["hero"].id`, says: "'h00' is not four ASCII letters or digits", hint: "such as 'H000'"},
+		path: `heroes["hero"].id`, message: "'h00' is not four ASCII letters or digits", hint: "such as 'H000'"},
 	{name: "a hero's id that starts in lower case", document: `{"heroes":{"paladin":{"id":"h000","base":"Hpal"}}}`,
-		at: `heroes["paladin"].id`, says: "'h000' must start with an uppercase letter", hint: "such as 'H000'"},
+		path: `heroes["paladin"].id`, message: "'h000' must start with an uppercase letter", hint: "such as 'H000'"},
 	{name: "a building's id that starts in upper case", document: `{"buildings":{"hall":{"id":"H000","base":"htow"}}}`,
-		at: `buildings["hall"].id`, says: "'H000' must not start with an uppercase letter", hint: "'h000', or make the object a hero"},
+		path: `buildings["hall"].id`, message: "'H000' must not start with an uppercase letter", hint: "'h000', or make the object a hero"},
 	{name: "an id that an object of another category has", document: `{
 		"items":{"orb":{"id":"A000","base":"ratf","source":"objects/items.pkl"}},
 		"abilities":{"holy":{"id":"A000","base":"AHhb","source":"objects/abilities.pkl"}}}`,
-		file: "objects/abilities.pkl", at: `abilities["holy"].id`,
-		says: `'A000' is also the id of items["orb"] (objects/items.pkl)`, hint: "its own id"},
+		file: "objects/abilities.pkl", path: `abilities["holy"].id`,
+		message: `'A000' is also the id of items["orb"] (objects/items.pkl)`, hint: "its own id"},
 	{name: "a base that is no standard object, with the nearest ids", document: `{"heroes":{"paladin":{"id":"H000","base":"Hpla"}}}`,
-		at: `heroes["paladin"].base`, says: "'Hpla' is not a standard hero",
+		path: `heroes["paladin"].base`, message: "'Hpla' is not a standard hero",
 		hint: "Did you mean 'Hpal' (Paladin), 'Hamg' (Archmage) or 'Hmkg' (Mountain King)?"},
 	{name: "a base that is a standard object of another category", document: `{"buildings":{"hall":{"id":"h000","base":"hfoo"}}}`,
-		at: `buildings["hall"].base`, says: "'hfoo' is not a standard building",
+		path: `buildings["hall"].base`, message: "'hfoo' is not a standard building",
 		hint: "'hfoo' is a standard unit (Footman). Did you mean 'htow' (Town Hall) or 'hbar' (Barracks)?"},
 	{name: "an id that a standard object of any category has", document: `{"abilities":{"curse":{"id":"hfoo","base":"Acrs"}}}`,
-		at: `abilities["curse"].id`, says: "'hfoo' is the id of a standard unit (Footman)", hint: "cannot modify standard ones"},
+		path: `abilities["curse"].id`, message: "'hfoo' is the id of a standard unit (Footman)", hint: "cannot modify standard ones"},
 	{name: "an id that a custom object of the map has", document: `{"units":{"captain":{"id":"h000","base":"hfoo"}}}`,
-		existing: []string{"h000"}, at: `units["captain"].id`, says: "'h000' is already the id of a custom object in the map",
+		existing: []string{"h000"}, path: `units["captain"].id`, message: "'h000' is already the id of a custom object in the map",
 		hint: "delete the object in World Editor"},
 }
 
 func TestResolveGivesObjectsInCategoryOrderThenAsWritten(t *testing.T) {
-	runAccepted(t, objectCases)
+	runResolveCases(t, objectCases)
 }
 
 func TestNoObjectsResolveToAnEmptyListThatIsNotNil(t *testing.T) {
@@ -190,7 +190,7 @@ func TestNoObjectsResolveToAnEmptyListThatIsNotNil(t *testing.T) {
 }
 
 func TestResolveRefusesAnObjectForItsIDOrItsBase(t *testing.T) {
-	runRefused(t, objectRules)
+	runResolveErrorCases(t, objectRules)
 }
 
 const severalProblems = `{
@@ -198,7 +198,7 @@ const severalProblems = `{
 	"units":{"captain":{"id":"hfoo","base":"hfoo","source":"objects/units.pkl","properties":{"uhpm":1.5}}}}`
 
 func TestResolveReportsEveryProblemInOrderEachWithItsFile(t *testing.T) {
-	found := problems(t, severalProblems)
+	found := resolveProblems(t, severalProblems)
 	want := []struct{ file, start, hint string }{
 		{"objects/heroes.pkl", `heroes["paladin"].base: 'Hpla' is not a standard hero`, "Did you mean 'Hpal' (Paladin)"},
 		{"objects/units.pkl", `units["captain"].id: 'hfoo' is the id of a standard unit`, "pick an id no standard object uses"},
@@ -235,7 +235,7 @@ func unitsInTheMap(count int) (document string, existing []string) {
 
 func TestTwentyOfManyProblemsAreShownAndTheRestCounted(t *testing.T) {
 	document, existing := unitsInTheMap(23)
-	found := problems(t, document, existing...)
+	found := resolveProblems(t, document, existing...)
 	lines := strings.Split(diag.Format(found), "\n")
 	if len(found) != 23 || len(lines) != 41 || lines[40] != "and 3 more" ||
 		!strings.Contains(lines[38], `units["u19"].id: 'h019' is already the id of a custom object in the map.`) {

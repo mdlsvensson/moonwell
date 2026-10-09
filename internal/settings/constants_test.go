@@ -10,7 +10,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/txt"
 )
 
-func written(raw manifest.OrderedMap[manifest.OrderedMap[string]]) string {
+func formatSections(raw manifest.OrderedMap[manifest.OrderedMap[string]]) string {
 	var text strings.Builder
 	for name, entries := range raw.All() {
 		fmt.Fprintf(&text, "[%q]", name)
@@ -56,8 +56,8 @@ func TestTypedGameplayConstantsMergeIntoTheRawOnesWithoutRegardToLetterCase(t *t
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := settingsOf(t, tt.document)
-			before := written(s.GameplayConstants)
+			s := mustDecodeSettings(t, tt.document)
+			before := formatSections(s.GameplayConstants)
 			merged, _, err := textSections(s, manifestName)
 			if err != nil {
 				t.Fatal(err)
@@ -71,7 +71,7 @@ func TestTypedGameplayConstantsMergeIntoTheRawOnesWithoutRegardToLetterCase(t *t
 				}
 				merged[i].Fields = append(merged[i].Fields, txt.Field{Key: "Added", Value: "x"})
 			}
-			if after := written(s.GameplayConstants); after != before {
+			if after := formatSections(s.GameplayConstants); after != before {
 				t.Errorf("the settings were changed: %s, were %s", after, before)
 			}
 		})
@@ -88,15 +88,15 @@ func TestATypedGameplayConstantThatDisagreesWithARawOneIsRefusedByTheManifest(t 
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := settingsOf(t, tt.document)
-			before := written(s.GameplayConstants)
+			s := mustDecodeSettings(t, tt.document)
+			before := formatSections(s.GameplayConstants)
 			_, _, err := textSections(s, manifestName)
-			diagErr := asError(t, err, tt.document)
+			diagErr := asDiagError(t, err, tt.document)
 			if diagErr.File != manifestName || !strings.Contains(diagErr.Msg, "Conflicting typed and raw gameplay constant: "+tt.constant) ||
 				!strings.Contains(diagErr.Hint, tt.setting) {
 				t.Errorf("error = %+v", diagErr)
 			}
-			if after := written(s.GameplayConstants); after != before {
+			if after := formatSections(s.GameplayConstants); after != before {
 				t.Errorf("the settings were changed: %s, were %s", after, before)
 			}
 		})
@@ -118,7 +118,7 @@ func TestNamesThatDifferOnlyInLetterCaseAreRefusedByTheManifest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := settingsOf(t, tt.document)
+			s := mustDecodeSettings(t, tt.document)
 			_, constantsErr := toSections(s.GameplayConstants, "settings.gameplayConstants", manifestName)
 			_, interfaceErr := toSections(s.GameInterface, "settings.gameInterface", manifestName)
 			if (constantsErr == nil) == (interfaceErr == nil) {
@@ -128,7 +128,7 @@ func TestNamesThatDifferOnlyInLetterCaseAreRefusedByTheManifest(t *testing.T) {
 			if err == nil {
 				err = interfaceErr
 			}
-			diagErr := asError(t, err, tt.document)
+			diagErr := asDiagError(t, err, tt.document)
 			if diagErr.File != manifestName || diagErr.Hint == "" || !strings.Contains(diagErr.Msg, tt.words) {
 				t.Errorf("error = %+v, want %q", diagErr, tt.words)
 			}
@@ -150,8 +150,8 @@ func TestTwoSpellingsOfANameAreRefusedBeforeATypedConstantIsMergedAndTheConstant
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			misc, skin, err := textSections(settingsOf(t, tt.document), manifestName)
-			diagErr := asError(t, err, tt.document)
+			misc, skin, err := textSections(mustDecodeSettings(t, tt.document), manifestName)
+			diagErr := asDiagError(t, err, tt.document)
 			if !strings.Contains(diagErr.Msg, tt.words) || diagErr.File != manifestName || misc != nil || skin != nil {
 				t.Errorf("error = %+v, want %q", diagErr, tt.words)
 			}
@@ -160,7 +160,7 @@ func TestTwoSpellingsOfANameAreRefusedBeforeATypedConstantIsMergedAndTheConstant
 }
 
 func TestTheSectionsOfBothTextFilesComeTogether(t *testing.T) {
-	s := settingsOf(t, `{"gameplay":{"foodLimit":7},"gameInterface":{"A":{"B":"c"}},"gameplayConstants":{"Other":{}}}`)
+	s := mustDecodeSettings(t, `{"gameplay":{"foodLimit":7},"gameInterface":{"A":{"B":"c"}},"gameplayConstants":{"Other":{}}}`)
 	misc, skin, err := textSections(s, manifestName)
 	if err != nil {
 		t.Fatal(err)
@@ -173,7 +173,7 @@ func TestTheSectionsOfBothTextFilesComeTogether(t *testing.T) {
 }
 
 func TestSectionsKeepTheOrderWrittenAndASectionWithoutKeys(t *testing.T) {
-	s := settingsOf(t, `{"gameInterface":{"B":{"z":"1","a":"2"},"A":{},"C":{"k":""}}}`)
+	s := mustDecodeSettings(t, `{"gameInterface":{"B":{"z":"1","a":"2"},"A":{},"C":{"k":""}}}`)
 	got, err := toSections(s.GameInterface, "settings.gameInterface", manifestName)
 	if err != nil {
 		t.Fatal(err)

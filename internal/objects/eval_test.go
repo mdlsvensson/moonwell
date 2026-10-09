@@ -31,7 +31,7 @@ func TestEvalJSONPrintsEveryCategoryInOrderEvenWithoutObjects(t *testing.T) {
 }
 
 func TestEvalJSONPrintsEachObjectByItsKeyWithItsIDBaseSourceAndFields(t *testing.T) {
-	resolved := resolve(t, `{
+	resolved := mustResolve(t, `{
 		"abilities":{"holy":{"id":"A000","base":"AHhb","source":"objects/abilities.pkl","name":"Holier","manaCost":[75,80],
 			"properties":{"Hhb1":[200.5]}}},
 		"units":{"knight":{"id":"h001","base":"hkni"},
@@ -136,7 +136,7 @@ func TestEvalJSONPrintsEachObjectByItsKeyWithItsIDBaseSourceAndFields(t *testing
 }
 
 func TestEvalJSONIsJSONThatAScriptReadsBack(t *testing.T) {
-	resolved := resolve(t, `{
+	resolved := mustResolve(t, `{
 		"heroes":{"paladin":{"id":"H000","base":"Hpal","source":"objects/heroes.pkl","properties":{"uhpm":900}}},
 		"units":{"captain":{"id":"h000","base":"hfoo","source":"objects/human/barracks/units.pkl","name":"Captain"}}}`)
 	var read map[string]map[string]any
@@ -161,7 +161,7 @@ func TestEvalJSONIsJSONThatAScriptReadsBack(t *testing.T) {
 	}
 }
 
-func oneValue(key string, value objects.Value) []objects.Resolved {
+func resolvedWithValue(key string, value objects.Value) []objects.Resolved {
 	return []objects.Resolved{{
 		Category: "units", Key: key, ID: "h000", Base: "hfoo", Source: "objects/a.pkl",
 		Fields: []objects.Field{{ID: "uacq", Name: "acquisitionRange", Value: value}},
@@ -202,7 +202,7 @@ func TestEvalJSONWritesANumberAsJSONDoesAndHasOneZero(t *testing.T) {
 	}
 	for _, c := range cases {
 		for _, kind := range []objmod.ValueType{objmod.Real, objmod.Unreal} {
-			printed := objects.EvalJSON(oneValue("captain", objects.Value{Type: kind, Number: c.number}))
+			printed := objects.EvalJSON(resolvedWithValue("captain", objects.Value{Type: kind, Number: c.number}))
 			if got := valueLine(t, printed); got != c.want {
 				t.Errorf("%v is printed as %s, want %s", c.number, got, c.want)
 			}
@@ -212,7 +212,7 @@ func TestEvalJSONWritesANumberAsJSONDoesAndHasOneZero(t *testing.T) {
 
 func TestEvalJSONWritesNullForANumberThatIsNotFinite(t *testing.T) {
 	for _, number := range []float64{math.Inf(1), math.Inf(-1), math.NaN()} {
-		printed := objects.EvalJSON(oneValue("captain", objects.Value{Type: objmod.Unreal, Number: number}))
+		printed := objects.EvalJSON(resolvedWithValue("captain", objects.Value{Type: objmod.Unreal, Number: number}))
 		if got := valueLine(t, printed); got != "null" {
 			t.Errorf("%v is printed as %s, want null", number, got)
 		}
@@ -235,7 +235,7 @@ func TestEvalJSONEscapesOnlyTheQuoteTheBackslashAndControlCharacters(t *testing.
 		{"an empty text", "", `""`},
 	}
 	for _, c := range cases {
-		printed := objects.EvalJSON(oneValue(c.text, objects.Value{Type: objmod.String, Text: c.text}))
+		printed := objects.EvalJSON(resolvedWithValue(c.text, objects.Value{Type: objmod.String, Text: c.text}))
 		if got := valueLine(t, printed); got != c.want {
 			t.Errorf("%s: the value is printed as %s, want %s", c.name, got, c.want)
 		}
@@ -246,7 +246,7 @@ func TestEvalJSONEscapesOnlyTheQuoteTheBackslashAndControlCharacters(t *testing.
 }
 
 func TestEvalJSONWritesTheRawcodeOfThreeLettersWithItsNUL(t *testing.T) {
-	resolved := resolve(t, `{"abilities":{"curse":{"id":"A000","base":"Acrs","properties":{"Crs":0.25}}}}`)
+	resolved := mustResolve(t, `{"abilities":{"curse":{"id":"A000","base":"Acrs","properties":{"Crs":0.25}}}}`)
 	want := "          \"rawcode\": \"Crs\x5cu0000\",\n"
 	if printed := string(objects.EvalJSON(resolved)); !strings.Contains(printed, want) {
 		t.Errorf("no line %q in\n%s", want, printed)
@@ -254,7 +254,7 @@ func TestEvalJSONWritesTheRawcodeOfThreeLettersWithItsNUL(t *testing.T) {
 }
 
 func TestEvalJSONKeepsObjectsInResolvedOrderAlsoUnderKeysThatLookLikeNumbers(t *testing.T) {
-	resolved := resolve(t, `{"units":{
+	resolved := mustResolve(t, `{"units":{
 		"b":{"id":"h000","base":"hfoo"},"10":{"id":"h001","base":"hfoo"},"2":{"id":"h002","base":"hfoo"},
 		"a":{"id":"h003","base":"hfoo"}}}`)
 	var keys []string

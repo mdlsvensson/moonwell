@@ -51,16 +51,16 @@ func printedNumbers() string {
 const printedTexts = `{"units":{"<b>\"Tom\" & Jerry</b>":{"id":"h900","base":"hfoo","source":"objects/a&b<c>.pkl",` +
 	`"name":"<i>\"q\" \\ \b \f \n \r \t ` + "\x5cu0001 \x5cu007f \x5cu2028 \x5cu2029 caf\xc3\xa9 \xf0\x9f\x98\x80" + `"}}}`
 
-type input struct {
+type planInput struct {
 	name     string
 	document string
 	file     string
 }
 
-func tableInputs() []input {
-	var inputs []input
+func tableInputs() []planInput {
+	var inputs []planInput
 	add := func(name, document string) {
-		inputs = append(inputs, input{name, project(document), "objects/a.pkl"})
+		inputs = append(inputs, planInput{name, project(document), "objects/a.pkl"})
 	}
 	for _, c := range slices.Concat(objectCases, fieldCases, valueCases) {
 		add(c.name, c.document)
@@ -83,7 +83,7 @@ type sourceMap struct {
 	files map[string][]byte
 }
 
-func heldFile(name string, version int32, id string) []byte {
+func existingObjectFile(name string, version int32, id string) []byte {
 	mods := []testkit.SyntheticMod{
 		{Field: "xnam", Value: objmod.Value{Type: objmod.String, Text: "held"}},
 		{Field: "xint", Value: objmod.Value{Type: objmod.Int, Int: 7}},
@@ -96,11 +96,11 @@ func heldFile(name string, version int32, id string) []byte {
 
 func olderFiles(version int32) map[string][]byte {
 	files := map[string][]byte{
-		"war3mapSkin.w3u": heldFile("war3mapSkin.w3u", 3, "Zs00"),
-		"war3mapSkin.w3a": heldFile("war3mapSkin.w3a", 3, "Zs01"),
+		"war3mapSkin.w3u": existingObjectFile("war3mapSkin.w3u", 3, "Zs00"),
+		"war3mapSkin.w3a": existingObjectFile("war3mapSkin.w3a", 3, "Zs01"),
 	}
 	for _, extension := range []string{"w3u", "w3t", "w3h", "w3a", "w3q"} {
-		files["war3map."+extension] = heldFile("war3map."+extension, version, "Z"+extension[2:]+"00")
+		files["war3map."+extension] = existingObjectFile("war3map."+extension, version, "Z"+extension[2:]+"00")
 	}
 	return files
 }
@@ -118,9 +118,9 @@ func sourceMaps(t *testing.T) []sourceMap {
 		{name: "files of version 1", files: olderFiles(1)},
 		{name: "files of version 2", files: olderFiles(2)},
 		{name: "files under other spellings", files: map[string][]byte{
-			"WAR3MAP.W3U":     heldFile("war3map.w3u", 3, "Zu00"),
-			"war3mapskin.w3u": heldFile("war3mapSkin.w3u", 3, "Zu00"),
-			"War3Map.w3A":     heldFile("war3map.w3a", 3, "Za00"),
+			"WAR3MAP.W3U":     existingObjectFile("war3map.w3u", 3, "Zu00"),
+			"war3mapskin.w3u": existingObjectFile("war3mapSkin.w3u", 3, "Zu00"),
+			"War3Map.w3A":     existingObjectFile("war3map.w3a", 3, "Za00"),
 		}},
 		{name: "a skin file with one custom object twice", files: map[string][]byte{
 			"war3mapSkin.w3h": testkit.BuildModFile(3, nil, twice, objmod.Simple),
@@ -130,7 +130,7 @@ func sourceMaps(t *testing.T) []sourceMap {
 	}
 }
 
-func (m sourceMap) written(t *testing.T) string {
+func (m sourceMap) writeToDisk(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
 	for name, data := range m.files {
@@ -139,7 +139,7 @@ func (m sourceMap) written(t *testing.T) string {
 	return dir
 }
 
-func planned(dir string, read manifest.Objects, metadata *objects.Metadata) (*objects.Result, error) {
+func planOnDisk(dir string, read manifest.Objects, metadata *objects.Metadata) (*objects.Result, error) {
 	folder, err := mapdir.Open(dir, mapLabel)
 	if err != nil {
 		return nil, err
@@ -151,25 +151,25 @@ type recordedPlan struct {
 	changes []mapdir.Change
 	ids     string
 	eval    []byte
-	refused []string
+	errors  []string
 }
 
-func refusedFor(err error) recordedPlan {
+func recordedError(err error) recordedPlan {
 	var problems diag.Problems
 	if !errors.As(err, &problems) {
 		failure, _ := diag.FirstProblem(err)
-		return recordedPlan{refused: []string{failure.File}}
+		return recordedPlan{errors: []string{failure.File}}
 	}
 	var files []string
 	for _, problem := range problems {
 		files = append(files, problem.File)
 	}
-	return recordedPlan{refused: files}
+	return recordedPlan{errors: files}
 }
 
 func (p recordedPlan) lines() string {
-	if p.refused != nil {
-		return "refused: " + strings.Join(p.refused, ", ") + "\n"
+	if p.errors != nil {
+		return "refused: " + strings.Join(p.errors, ", ") + "\n"
 	}
 	var out strings.Builder
 	for _, change := range p.changes {
@@ -192,7 +192,7 @@ var recordedMetadata = []struct {
 	metadata *objects.Metadata
 }{{"the miniature metadata", mini}, {"the embedded metadata", metadata}}
 
-func forTheFiles(in input) bool {
+func forTheFiles(in planInput) bool {
 	return in.document == project(everyKind) || in.document == project(everyFile)
 }
 
@@ -202,28 +202,28 @@ func recordedPlans(t *testing.T) []byte {
 	inputs := tableInputs()
 	for number, m := range recordedMetadata {
 		for i, source := range sourceMaps(t) {
-			dir := source.written(t)
+			dir := source.writeToDisk(t)
 			for _, in := range inputs {
 				if i > 1 && !forTheFiles(in) {
 					continue
 				}
 				fmt.Fprintf(&out, "== %s, %s: %s\n", m.name, source.name, testkit.QuoteIfNeeded(in.name))
-				out.WriteString(planOf(t, number, dir, in).lines())
+				out.WriteString(recordPlan(t, number, dir, in).lines())
 			}
 		}
 	}
 	return []byte(out.String())
 }
 
-func planOf(t *testing.T, metadata int, dir string, in input) recordedPlan {
+func recordPlan(t *testing.T, metadata int, dir string, in planInput) recordedPlan {
 	t.Helper()
 	p, err := manifest.DecodeProject("/p", in.file, []byte(in.document))
 	if err != nil {
 		t.Fatalf("%s: %v", in.name, diag.Format(err))
 	}
-	result, err := planned(dir, p.Objects, recordedMetadata[metadata].metadata)
+	result, err := planOnDisk(dir, p.Objects, recordedMetadata[metadata].metadata)
 	if err != nil {
-		return refusedFor(err)
+		return recordedError(err)
 	}
 	return recordedPlan{changes: result.Changes, ids: result.IDs, eval: objects.EvalJSON(result.Objects)}
 }

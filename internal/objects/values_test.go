@@ -15,7 +15,7 @@ func captain(properties string) string {
 	return `{"units":{"captain":{"id":"h000","base":"hfoo","properties":` + properties + `}}}`
 }
 
-var valueCases = []accepted{
+var valueCases = []resolveCase{
 	{"a list is joined with commas",
 		`{"units":{"worker":{"id":"h000","base":"hpea","properties":{"structuresBuilt":["htow","hbar"]}}}}`,
 		[]string{"units worker h000 hpea objects/a.pkl", `  ubui structuresBuilt 0/0 string "htow,hbar"`}},
@@ -66,72 +66,72 @@ const (
 	storedAsReal = "'uacq' (Acquisition Range) is stored as a real number."
 )
 
-var valueRules = []refused{
+var valueRules = []resolveErrorCase{
 	{name: "a fraction for an integer", document: captain(`{"uhpm":1.5}`),
-		at: `units["captain"].properties["uhpm"]`, says: "expected an integer, got 1.5.", hint: storedAsInt},
+		path: `units["captain"].properties["uhpm"]`, message: "expected an integer, got 1.5.", hint: storedAsInt},
 	{name: "an integer above the greatest", document: captain(`{"uhpm":2147483648}`),
-		at: `units["captain"].properties["uhpm"]`, says: "2147483648 is out of range for an integer.", hint: storedAsInt},
+		path: `units["captain"].properties["uhpm"]`, message: "2147483648 is out of range for an integer.", hint: storedAsInt},
 	{name: "an integer below the least", document: captain(`{"uhpm":-2147483649}`),
-		at: `units["captain"].properties["uhpm"]`, says: "-2147483649 is out of range for an integer.", hint: storedAsInt},
+		path: `units["captain"].properties["uhpm"]`, message: "-2147483649 is out of range for an integer.", hint: storedAsInt},
 	{name: "a text for an integer", document: captain(`{"uhpm":"10"}`),
-		at: `units["captain"].properties["uhpm"]`, says: `expected an integer, got "10".`, hint: storedAsInt},
+		path: `units["captain"].properties["uhpm"]`, message: `expected an integer, got "10".`, hint: storedAsInt},
 	{name: "a Boolean for a real", document: captain(`{"usca":true}`),
-		at: `units["captain"].properties["usca"]`, says: "expected a number, got true.",
+		path: `units["captain"].properties["usca"]`, message: "expected a number, got true.",
 		hint: "'usca' (Scaling Value) is stored as a real number."},
 	{name: "a text with a NUL", document: captain(`{"unam":"a\u` + `0000b"}`),
-		at: `units["captain"].properties["unam"]`, says: "the string contains a NUL character.",
+		path: `units["captain"].properties["unam"]`, message: "the string contains a NUL character.",
 		hint: "Remove it: the game ends strings at NUL."},
 	{name: "a number for a text", document: captain(`{"unam":3}`),
-		at: `units["captain"].properties["unam"]`, says: "expected a string, got 3.", hint: "'unam' (Name) is stored as a string."},
+		path: `units["captain"].properties["unam"]`, message: "expected a string, got 3.", hint: "'unam' (Name) is stored as a string."},
 	{name: "a zero below 0 for a text", document: captain(`{"unam":-0.0}`),
-		at: `units["captain"].properties["unam"]`, says: "expected a string, got 0.", hint: "'unam' (Name) is stored as a string."},
+		path: `units["captain"].properties["unam"]`, message: "expected a string, got 0.", hint: "'unam' (Name) is stored as a string."},
 	{name: "a zero below 0 in a list", document: `{"units":{"worker":{"id":"h000","base":"hpea","properties":{"ubui":["htow",-0.0]}}}}`,
-		at: `units["worker"].properties["ubui"][1]`, says: "expected a string, got 0.", hint: "stored as a comma-separated list."},
+		path: `units["worker"].properties["ubui"][1]`, message: "expected a string, got 0.", hint: "stored as a comma-separated list."},
 	{name: "a list for a text", document: captain(`{"unam":[["a","b\"c"]]}`),
-		at: `units["captain"].properties["unam"]`, says: "is not per level", hint: "Write a single value."},
+		path: `units["captain"].properties["unam"]`, message: "is not per level", hint: "Write a single value."},
 	{name: "a number in a list", document: `{"units":{"worker":{"id":"h000","base":"hpea","properties":{"ubui":["htow",1]}}}}`,
-		at: `units["worker"].properties["ubui"][1]`, says: "expected a string, got 1.",
+		path: `units["worker"].properties["ubui"][1]`, message: "expected a string, got 1.",
 		hint: "'ubui' (Structures Built) is stored as a comma-separated list."},
 	{name: "a number for a list", document: `{"units":{"worker":{"id":"h000","base":"hpea","properties":{"ubui":7}}}}`,
-		at: `units["worker"].properties["ubui"]`, says: "expected a string or a List<String>, got 7.",
+		path: `units["worker"].properties["ubui"]`, message: "expected a string or a List<String>, got 7.",
 		hint: "stored as a comma-separated list."},
 	{name: "a text with a NUL in a list", document: `{"units":{"worker":{"id":"h000","base":"hpea","properties":{"ubui":["htow","h\u` + `0000"]}}}}`,
-		at: `units["worker"].properties["ubui"][1]`, says: "the string contains a NUL character.", hint: "Remove it"},
+		path: `units["worker"].properties["ubui"][1]`, message: "the string contains a NUL character.", hint: "Remove it"},
 	{name: "a fraction at one level", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","manaCost":[1,2.5]}}}`,
-		at: `abilities["holy"].manaCost[1]`, says: "expected an integer, got 2.5.", hint: "'amcs' (Mana Cost) is stored as an integer."},
+		path: `abilities["holy"].manaCost[1]`, message: "expected an integer, got 2.5.", hint: "'amcs' (Mana Cost) is stored as an integer."},
 	{name: "a list of texts at one level of a number", document: `{"abilities":{"holy":{"id":"A000","base":"AHhb","manaCost":[1,["a","b\"c"]]}}}`,
-		at: `abilities["holy"].manaCost[1]`, says: `expected an integer, got ["a","b\"c"].`, hint: "stored as an integer."},
+		path: `abilities["holy"].manaCost[1]`, message: `expected an integer, got ["a","b\"c"].`, hint: "stored as an integer."},
 	{name: "a fraction for a Boolean", document: `{"items":{"orb":{"id":"I000","base":"ratf","perishable":2.5}}}`,
-		at: `items["orb"].perishable`, says: "expected a Boolean, got 2.5.", hint: "'iper' (Perishable) is stored as a Boolean (1 or 0)."},
+		path: `items["orb"].perishable`, message: "expected a Boolean, got 2.5.", hint: "'iper' (Perishable) is stored as a Boolean (1 or 0)."},
 	{name: "a fraction of a millionth", document: captain(`{"uhpm":0.000001}`),
-		at: `units["captain"].properties["uhpm"]`, says: "expected an integer, got 0.000001.", hint: storedAsInt},
+		path: `units["captain"].properties["uhpm"]`, message: "expected an integer, got 0.000001.", hint: storedAsInt},
 	{name: "a number of twenty-one digits", document: captain(`{"uhpm":100000000000000000000}`),
-		at: `units["captain"].properties["uhpm"]`, says: "100000000000000000000 is out of range for an integer.", hint: storedAsInt},
+		path: `units["captain"].properties["uhpm"]`, message: "100000000000000000000 is out of range for an integer.", hint: storedAsInt},
 }
 
-var plainDecimalRules = []refused{
+var plainDecimalRules = []resolveErrorCase{
 	{name: "a real that a float32 cannot hold", document: captain(`{"uacq":1e39}`),
-		at: `units["captain"].properties["uacq"]`, says: "1000000000000000000000000000000000000000 is out of range for a real number.",
+		path: `units["captain"].properties["uacq"]`, message: "1000000000000000000000000000000000000000 is out of range for a real number.",
 		hint: storedAsReal},
 	{name: "a fraction below a millionth for an integer", document: captain(`{"uhpm":1.5e-7}`),
-		at: `units["captain"].properties["uhpm"]`, says: "expected an integer, got 0.00000015.", hint: storedAsInt},
+		path: `units["captain"].properties["uhpm"]`, message: "expected an integer, got 0.00000015.", hint: storedAsInt},
 	{name: "an integer of twenty-two digits", document: captain(`{"uhpm":1e21}`),
-		at: `units["captain"].properties["uhpm"]`, says: "1000000000000000000000 is out of range for an integer.", hint: storedAsInt},
+		path: `units["captain"].properties["uhpm"]`, message: "1000000000000000000000 is out of range for an integer.", hint: storedAsInt},
 	{name: "own levels of twenty-two digits below 0", document: `{"upgrades":{"swords":{"id":"R000","base":"Rhme","properties":{"glvl":-1e21}}}}`,
-		at: `upgrades["swords"].properties["glvl"]`, says: "'glvl' (Levels) must be at least 1, got -1000000000000000000000.",
+		path: `upgrades["swords"].properties["glvl"]`, message: "'glvl' (Levels) must be at least 1, got -1000000000000000000000.",
 		hint: "at least one level"},
 }
 
 func TestResolveStoresAValueAsItsFieldStoresIt(t *testing.T) {
-	runAccepted(t, valueCases)
+	runResolveCases(t, valueCases)
 }
 
 func TestResolveRefusesAValueItsFieldCannotStore(t *testing.T) {
-	runRefused(t, valueRules)
+	runResolveErrorCases(t, valueRules)
 }
 
 func TestAProblemWritesItsNumberInPlainDecimal(t *testing.T) {
-	runRefused(t, plainDecimalRules)
+	runResolveErrorCases(t, plainDecimalRules)
 }
 
 func unitWith(key string, value any) manifest.Objects {
@@ -170,7 +170,7 @@ func TestARealThatAFloat32CannotHoldIsAProblemAndIsNotResolved(t *testing.T) {
 	}
 }
 
-func oneProblem(t *testing.T, built manifest.Objects) (msg, hint string) {
+func singleProblem(t *testing.T, built manifest.Objects) (msg, hint string) {
 	t.Helper()
 	resolved, err := objects.Resolve(mini, built, nil)
 	found := problemsOf(t, resolved, err)
@@ -194,7 +194,7 @@ func TestATextThatIsNotUTF8IsAProblemAndIsNotResolved(t *testing.T) {
 		{"an entry of a list", "ubui", []any{"htow", "\xff"}, `units["captain"].properties["ubui"][1]`, "store text as UTF-8"},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			msg, hint := oneProblem(t, unitWith(c.key, c.value))
+			msg, hint := singleProblem(t, unitWith(c.key, c.value))
 			if msg != c.at+": the string is not valid UTF-8." || !strings.Contains(hint, c.hint) {
 				t.Errorf("problem = %q, hint %q", msg, hint)
 			}
@@ -220,7 +220,7 @@ func TestAValueOfAShapeTheSchemaForbidsIsAProblemThatShowsIt(t *testing.T) {
 		{"an object in a list", "ubui", []any{map[string]any{}}, `units["captain"].properties["ubui"][0]: expected a string, got {}.`},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			if msg, hint := oneProblem(t, unitWith(c.key, c.value)); msg != c.want || !strings.Contains(hint, "is stored as") {
+			if msg, hint := singleProblem(t, unitWith(c.key, c.value)); msg != c.want || !strings.Contains(hint, "is stored as") {
 				t.Errorf("problem = %q, hint %q\n   want %q", msg, hint, c.want)
 			}
 		})
@@ -232,7 +232,7 @@ var objectFiles = map[manifest.Category]string{
 	"abilities": "war3map.w3a", "buffs": "war3map.w3h", "upgrades": "war3map.w3q",
 }
 
-func appendable(t *testing.T, resolved []objects.Resolved) []objmod.NewObject {
+func toNewObjectsOf(t *testing.T, resolved []objects.Resolved) []objmod.NewObject {
 	t.Helper()
 	id := func(text string) objmod.ID {
 		parsed, ok := objmod.ParseID(text)
@@ -275,14 +275,14 @@ func TestWhatResolveAcceptsCanBeAppendedToAnObjectFile(t *testing.T) {
 		for _, category := range manifest.Categories {
 			file := objectFiles[category]
 			of := slices.DeleteFunc(slices.Clone(resolved), func(object objects.Resolved) bool { return object.Category != category })
-			if _, err := objmod.AppendObjects(nil, nil, objmod.KindOf(file), appendable(t, of)); err != nil {
+			if _, err := objmod.AppendObjects(nil, nil, objmod.KindOf(file), toNewObjectsOf(t, of)); err != nil {
 				t.Errorf("%s: %s: %v", name, category, err)
 			}
 			appended[file] += len(of)
 		}
 	}
 	for _, c := range slices.Concat(objectCases, fieldCases, valueCases) {
-		check(c.name, resolve(t, c.document), nil)
+		check(c.name, mustResolve(t, c.document), nil)
 	}
 	for file, count := range appended {
 		if count == 0 {

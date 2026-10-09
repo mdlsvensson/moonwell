@@ -22,21 +22,21 @@ type script struct{ name, text string }
 func scripts(t testing.TB) []script {
 	t.Helper()
 	fixture := fixtureLua(t)
-	notHeld := swapped(t, fixture, "ForcePlayerStartLocation(Player(1), 1)\r\n", "")
+	notHeld := mustReplace(t, fixture, "ForcePlayerStartLocation(Player(1), 1)\r\n", "")
 	all := []script{
 		{"the fixture", fixture},
-		{"without SetMapName", swapped(t, fixture, "SetMapName(", "Other(")},
+		{"without SetMapName", mustReplace(t, fixture, "SetMapName(", "Other(")},
 		{"with a second config()", fixture + "\nfunction config() SetMapName(\"x\") end"},
-		{"with SetMapName of an object", swapped(t, fixture, "SetMapName(", "object.SetMapName(")},
+		{"with SetMapName of an object", mustReplace(t, fixture, "SetMapName(", "object.SetMapName(")},
 		{"a script that does not read", "function (((unreadable"},
 		{"with player 1 not held to its start", notHeld},
-		{"with a SetPlayerName", swapped(t, fixture, "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
+		{"with a SetPlayerName", mustReplace(t, fixture, "SetPlayerColor(Player(1), ConvertPlayerColor(1))",
 			"SetPlayerColor(Player(1), ConvertPlayerColor(1))\r\nSetPlayerName(Player(1), \"TRIGSTR_006\")")},
 		{"a main() alone, indented", indentedMain},
 	}
 	for _, shape := range unsafeShapes {
 		name := fmt.Sprintf("with %q for %q", shape.new, shape.old)
-		all = append(all, script{name, swapped(t, fixture, shape.old, shape.new)})
+		all = append(all, script{name, mustReplace(t, fixture, shape.old, shape.new)})
 	}
 	for _, c := range joinable {
 		all = append(all, script{fmt.Sprintf("the script %q", c.source), c.source})
@@ -51,12 +51,12 @@ func scripts(t testing.TB) []script {
 
 func layouts(t testing.TB, before, fixture string) []script {
 	t.Helper()
-	oneLine := strings.ReplaceAll(swapped(t, fixture, "--\r\n", ""), "\r\n", " ")
-	together := swapped(t, fixture,
+	oneLine := strings.ReplaceAll(mustReplace(t, fixture, "--\r\n", ""), "\r\n", " ")
+	together := mustReplace(t, fixture,
 		"SetPlayerStartLocation(Player(0), 0)\r\nForcePlayerStartLocation(Player(0), 0)\r\nSetPlayerColor",
 		"SetPlayerStartLocation(Player(0), 0)ForcePlayerStartLocation(Player(0), 0)SetPlayerColor")
-	together = swapped(t, together, "NewSoundEnvironment(\"Default\")\r\n", "")
-	together = swapped(t, together, "SetMapMusic(\"Music\", true, 0)\r\nCreateAllUnits()\r\n",
+	together = mustReplace(t, together, "NewSoundEnvironment(\"Default\")\r\n", "")
+	together = mustReplace(t, together, "SetMapMusic(\"Music\", true, 0)\r\nCreateAllUnits()\r\n",
 		"SetMapMusic(\"Music\", true, 0)\r\nNewSoundEnvironment(\"Default\")ResetTerrainFog()CreateAllUnits()")
 	return []script{
 		{before + "with the line endings of Unix", strings.ReplaceAll(fixture, "\r\n", "\n")},
@@ -68,7 +68,7 @@ func layouts(t testing.TB, before, fixture string) []script {
 	}
 }
 
-func onEveryCore(pieces int, work func(piece int)) {
+func runOnEveryCore(pieces int, work func(piece int)) {
 	queue := make(chan int)
 	var workers sync.WaitGroup
 	for range runtime.GOMAXPROCS(0) {
@@ -124,7 +124,7 @@ func sourceMaps(t testing.TB) []sourceMap {
 		maps.Copy(all, more)
 		return all
 	}
-	returnsValue := swapped(t, script, "RunInitializationTriggers()\r\nend",
+	returnsValue := mustReplace(t, script, "RunInitializationTriggers()\r\nend",
 		"RunInitializationTriggers()\r\nreturn 1\r\nend")
 	return []sourceMap{
 		{name: "the fixture", every: true, files: fixture(nil)},
@@ -149,7 +149,7 @@ func sourceMaps(t testing.TB) []sourceMap {
 		{name: "text files that are not UTF-8", files: fixture(files{
 			"war3mapMisc.txt": {0xc3}, "war3mapSkin.txt": []byte(byteOrderMark + "[A]\n\xff")})},
 		{name: "a script without SetMapName", files: fixture(files{
-			"war3map.lua": []byte(swapped(t, script, "SetMapName(", "Other(")), "war3mapMap.blp": minimapBytes})},
+			"war3map.lua": []byte(mustReplace(t, script, "SetMapName(", "Other(")), "war3mapMap.blp": minimapBytes})},
 		{name: "a script whose main() returns a value",
 			files: fixture(files{"war3map.lua": []byte(returnsValue), "war3mapMap.blp": minimapBytes})},
 		{name: "bytes that are no map info", files: fixture(files{
@@ -161,7 +161,7 @@ func sourceMaps(t testing.TB) []sourceMap {
 	}
 }
 
-func (m sourceMap) onDisk(t testing.TB) string {
+func (m sourceMap) writeToDisk(t testing.TB) string {
 	t.Helper()
 	dir := t.TempDir()
 	for name, data := range m.files {
@@ -170,7 +170,7 @@ func (m sourceMap) onDisk(t testing.TB) string {
 	return dir
 }
 
-func fileOf(err error) string {
+func errorFile(err error) string {
 	failure, expected := diag.FirstProblem(err)
 	if !expected {
 		return "(an error without a file)"
@@ -250,20 +250,20 @@ func recordedSettings(t testing.TB) []byte {
 	sources, root, folders := scripts(t), planProject(t), sourceMaps(t)
 	dirs := make([]string, len(folders))
 	for i, source := range folders {
-		dirs[i] = source.onDisk(t)
+		dirs[i] = source.writeToDisk(t)
 	}
 	titles := make([]string, len(all))
 	for i, document := range all {
-		projectOf(t, root, document)
+		mustDecodeProject(t, root, document)
 		titles[i] = compact(t, document)
 	}
 	parts := make([]string, len(all))
-	onEveryCore(len(all), func(i int) {
+	runOnEveryCore(len(all), func(i int) {
 		document := all[i]
 		var part strings.Builder
 		fmt.Fprintf(&part, "== %s\n", titles[i])
 		if slices.Contains(forScripts, document) {
-			fmt.Fprintf(&part, "the %d scripts:\n%s", len(sources), scriptsWith(t, document, sources).lines(sources))
+			fmt.Fprintf(&part, "the %d scripts:\n%s", len(sources), recordScripts(t, document, sources).lines(sources))
 		}
 		for m, source := range folders {
 			planned := slices.Contains(routeDocuments, document)
@@ -271,7 +271,7 @@ func recordedSettings(t testing.TB) []byte {
 				planned = slices.Contains(forEveryMap, document)
 			}
 			if planned {
-				fmt.Fprintf(&part, "%s:\n%s", source.name, planFor(t, source, dirs[m], root, document).lines())
+				fmt.Fprintf(&part, "%s:\n%s", source.name, recordPlan(t, source, dirs[m], root, document).lines())
 			}
 		}
 		parts[i] = part.String()
@@ -279,18 +279,18 @@ func recordedSettings(t testing.TB) []byte {
 	return []byte(strings.Join(parts, ""))
 }
 
-func scriptsWith(t testing.TB, document string, sources []script) recordedScripts {
+func recordScripts(t testing.TB, document string, sources []script) recordedScripts {
 	t.Helper()
-	s := settingsOf(t, document)
+	s := mustDecodeSettings(t, document)
 	info, err := patchInfo(fixtureInfo(t), s, infoFile)
 	if err != nil {
-		return recordedScripts{refused: true, refusedAt: fileOf(err)}
+		return recordedScripts{refused: true, refusedAt: errorFile(err)}
 	}
 	made := recordedScripts{}
 	for _, source := range sources {
-		text, err := afterInfo(source.text, s, info)
+		text, err := patchLuaWithInfo(source.text, s, info)
 		if err != nil {
-			text = refusedAt(fileOf(err))
+			text = refusedAt(errorFile(err))
 		}
 		made.scripts = append(made.scripts, madeOf(source, text))
 	}
@@ -306,9 +306,9 @@ func madeOf(source script, text string) string {
 	return text
 }
 
-func planFor(t testing.TB, source sourceMap, dir, root, document string) recordedPlan {
+func recordPlan(t testing.TB, source sourceMap, dir, root, document string) recordedPlan {
 	t.Helper()
-	project := projectOf(t, root, document)
+	project := mustDecodeProject(t, root, document)
 	folder, err := mapdir.Open(dir, mapLabel)
 	if err != nil {
 		t.Errorf("%s: %v", source.name, err)
@@ -316,7 +316,7 @@ func planFor(t testing.TB, source sourceMap, dir, root, document string) recorde
 	}
 	changes, err := Plan(folder, project)
 	if err != nil {
-		return recordedPlan{refused: true, refusedAt: fileOf(err)}
+		return recordedPlan{refused: true, refusedAt: errorFile(err)}
 	}
 	return recordedPlan{changes: changes}
 }

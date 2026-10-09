@@ -52,14 +52,14 @@ func openMap(t *testing.T, dir string) *mapdir.Folder {
 	return folder
 }
 
-func planIn(t *testing.T, dir, document string) (*objects.Result, error) {
+func tryPlan(t *testing.T, dir, document string) (*objects.Result, error) {
 	t.Helper()
-	return objects.Plan(openMap(t, dir), decoded(t, document), mini)
+	return objects.Plan(openMap(t, dir), mustDecodeObjects(t, document), mini)
 }
 
-func plan(t *testing.T, dir, document string) *objects.Result {
+func mustPlan(t *testing.T, dir, document string) *objects.Result {
 	t.Helper()
-	result, err := planIn(t, dir, document)
+	result, err := tryPlan(t, dir, document)
 	if err != nil {
 		t.Fatalf("Plan(%s): %v", document, diag.Format(err))
 	}
@@ -68,7 +68,7 @@ func plan(t *testing.T, dir, document string) *objects.Result {
 
 func planProblems(t *testing.T, dir, document string) diag.Problems {
 	t.Helper()
-	result, err := planIn(t, dir, document)
+	result, err := tryPlan(t, dir, document)
 	var found diag.Problems
 	if !errors.As(err, &found) || result != nil {
 		t.Fatalf("Plan(%s) = %v, %v, want no result and problems", document, result, err)
@@ -76,16 +76,16 @@ func planProblems(t *testing.T, dir, document string) diag.Problems {
 	return found
 }
 
-func planError(t *testing.T, dir, document string) *diag.Error {
+func mustFailPlan(t *testing.T, dir, document string) *diag.Error {
 	t.Helper()
-	result, err := planIn(t, dir, document)
+	result, err := tryPlan(t, dir, document)
 	if result != nil {
 		t.Errorf("Plan(%s) gave a result beside its error", document)
 	}
-	return asError(t, err, document)
+	return asDiagError(t, err, document)
 }
 
-func saysEach(found diag.Problems, words ...string) bool {
+func mentionsAll(found diag.Problems, words ...string) bool {
 	if len(found) != len(words) {
 		return false
 	}
@@ -97,7 +97,7 @@ func saysEach(found diag.Problems, words ...string) bool {
 	return true
 }
 
-func changeNames(result *objects.Result) []string {
+func changePaths(result *objects.Result) []string {
 	names := []string{}
 	for _, change := range result.Changes {
 		names = append(names, change.Path)
@@ -183,7 +183,7 @@ func TestNoObjectsReadNothingOfTheMapAndGiveTheEmptyIDsModule(t *testing.T) {
 }
 
 func TestTheNamesFixturesObjectsPlannedAgainstAnEmptyMapAreWorldEditorsFiles(t *testing.T) {
-	names := decoded(t, `{
+	names := mustDecodeObjects(t, `{
 		"units":{"peasant":{"id":"h000","base":"hpea","name":"TRIGSTR_012"}},
 		"items":{"claws":{"id":"I000","base":"ratf","name":"TRIGSTR_013"}},
 		"abilities":{"acid":{"id":"A000","base":"ANab","name":"TRIGSTR_016"}},
@@ -198,7 +198,7 @@ func TestTheNamesFixturesObjectsPlannedAgainstAnEmptyMapAreWorldEditorsFiles(t *
 		"war3map.w3u", "war3map.w3t", "war3map.w3h", "war3map.w3a", "war3map.w3q",
 		"war3mapSkin.w3u", "war3mapSkin.w3t", "war3mapSkin.w3h", "war3mapSkin.w3a", "war3mapSkin.w3q",
 	}
-	if got := changeNames(result); !slices.Equal(got, want) {
+	if got := changePaths(result); !slices.Equal(got, want) {
 		t.Fatalf("the plan changes %q", got)
 	}
 	for _, change := range result.Changes {
@@ -210,7 +210,7 @@ func TestTheNamesFixturesObjectsPlannedAgainstAnEmptyMapAreWorldEditorsFiles(t *
 	for _, object := range result.Objects {
 		planned = append(planned, object.ID)
 	}
-	if !slices.Equal(planned, []string{"h000", "I000", "A000", "B000", "R000"}) || result.IDs != rendered(t, result.Objects) {
+	if !slices.Equal(planned, []string{"h000", "I000", "A000", "B000", "R000"}) || result.IDs != mustRenderIDs(t, result.Objects) {
 		t.Errorf("objects = %q", planned)
 	}
 	if left := testkit.Snapshot(t, dir); len(left) != 0 {
@@ -245,7 +245,7 @@ func (mod referenceMod) bytes(useOptionalInts bool) []byte {
 }
 
 func TestEachValueTypeIsWrittenInTheReferenceLibrarysLayout(t *testing.T) {
-	result := plan(t, t.TempDir(), `{
+	result := mustPlan(t, t.TempDir(), `{
 		"units":{"captain":{"id":"h000","base":"hfoo","hitPointsMaximumBase":500,"scalingValue":1.25,
 			"acquisitionRange":600.5,"name":"Captain"}},
 		"abilities":{"holy":{"id":"A000","base":"AHhb","heroAbility":true,"manaCost":[75,80],"name":"Holier",
@@ -267,7 +267,7 @@ func TestEachValueTypeIsWrittenInTheReferenceLibrarysLayout(t *testing.T) {
 		},
 		"war3mapSkin.w3a": {{"anam", 3, 0, 0, "Holier"}},
 	}
-	if got := changeNames(result); len(got) != len(expected) {
+	if got := changePaths(result); len(got) != len(expected) {
 		t.Fatalf("the plan changes %q", got)
 	}
 	for name, mods := range expected {
@@ -288,8 +288,8 @@ func TestEachValueTypeIsWrittenInTheReferenceLibrarysLayout(t *testing.T) {
 func TestAVersion2MapGetsTheReferenceLibrarysVersion2LayoutWithEveryFieldInTheMainFile(t *testing.T) {
 	dir := t.TempDir()
 	testkit.WriteFile(t, dir, "war3map.w3a", testkit.BuildModFile(2, nil, nil, objmod.Leveled))
-	result := plan(t, dir, `{"abilities":{"holy":{"id":"A000","base":"AHhb","name":"Holier","castRange":[500]}}}`)
-	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3a"}) {
+	result := mustPlan(t, dir, `{"abilities":{"holy":{"id":"A000","base":"AHhb","name":"Holier","castRange":[500]}}}`)
+	if got := changePaths(result); !slices.Equal(got, []string{"war3map.w3a"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
 	le := binary.LittleEndian
@@ -307,14 +307,14 @@ func TestPlanAppendsToTheMapsFilesSplitsBySkinSortsByIDAndWritesNothing(t *testi
 	dir := t.TempDir()
 	copyFixture(t, dir)
 	before := testkit.Snapshot(t, dir)
-	result := plan(t, dir, `{
+	result := mustPlan(t, dir, `{
 		"units":{"knight":{"id":"h002","base":"hkni","hitPointsMaximumBase":900},
 			"captain":{"id":"h001","base":"hfoo","name":"Captain","hitPointsMaximumBase":500}},
 		"upgrades":{"plating":{"id":"R001","base":"Rhar","name":["I","II"]}}}`)
 	if !reflect.DeepEqual(testkit.Snapshot(t, dir), before) {
 		t.Error("planning wrote to the map")
 	}
-	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3u", "war3map.w3q", "war3mapSkin.w3u", "war3mapSkin.w3q"}) {
+	if got := changePaths(result); !slices.Equal(got, []string{"war3map.w3u", "war3map.w3q", "war3mapSkin.w3u", "war3mapSkin.w3q"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
 	for _, change := range result.Changes {
@@ -344,17 +344,17 @@ func TestPlanAppendsToTheMapsFilesSplitsBySkinSortsByIDAndWritesNothing(t *testi
 	for _, object := range result.Objects {
 		keys = append(keys, object.Key)
 	}
-	if !slices.Equal(keys, []string{"knight", "captain", "plating"}) || result.IDs != rendered(t, result.Objects) {
+	if !slices.Equal(keys, []string{"knight", "captain", "plating"}) || result.IDs != mustRenderIDs(t, result.Objects) {
 		t.Errorf("objects = %q", keys)
 	}
 }
 
 func TestHeroesUnitsAndBuildingsShareTheW3uFilesSortedByIDAcrossTheThree(t *testing.T) {
-	result := plan(t, t.TempDir(), `{
+	result := mustPlan(t, t.TempDir(), `{
 		"units":{"footman":{"id":"h002","base":"hfoo"}},
 		"buildings":{"barracks":{"id":"h001","base":"hbar"}},
 		"heroes":{"paladin":{"id":"H000","base":"Hpal"}}}`)
-	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3u", "war3mapSkin.w3u"}) {
+	if got := changePaths(result); !slices.Equal(got, []string{"war3map.w3u", "war3mapSkin.w3u"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
 	for _, change := range result.Changes {
@@ -367,11 +367,11 @@ func TestStagingTheMapWithThePlanWritesThePlannedBytesUnderTheirNames(t *testing
 	dir, staged := t.TempDir(), filepath.Join(t.TempDir(), "staged")
 	copyFixture(t, dir)
 	folder := openMap(t, dir)
-	result, err := objects.Plan(folder, decoded(t, `{"items":{"orb":{"id":"I001","base":"ckng","perishable":true}}}`), mini)
+	result, err := objects.Plan(folder, mustDecodeObjects(t, `{"items":{"orb":{"id":"I001","base":"ckng","perishable":true}}}`), mini)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3t", "war3mapSkin.w3t"}) {
+	if got := changePaths(result); !slices.Equal(got, []string{"war3map.w3t", "war3mapSkin.w3t"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
 	if err := folder.WithChanges(result.Changes).StageTo(staged); err != nil {
@@ -391,8 +391,8 @@ func TestAV3MainFileWithoutItsSkinFileGetsANewSkinFileAndV1AndV2MapsGetNone(t *t
 	dir := t.TempDir()
 	copyFixture(t, dir, "war3map.w3u")
 	captain := `{"units":{"captain":{"id":"h001","base":"hfoo","name":"Captain"}}}`
-	result := plan(t, dir, captain)
-	if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3u", "war3mapSkin.w3u"}) {
+	result := mustPlan(t, dir, captain)
+	if got := changePaths(result); !slices.Equal(got, []string{"war3map.w3u", "war3mapSkin.w3u"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
 	if version := readObjects(t, "war3mapSkin.w3u", result.Changes[1].Data).Version; version != 3 {
@@ -401,8 +401,8 @@ func TestAV3MainFileWithoutItsSkinFileGetsANewSkinFileAndV1AndV2MapsGetNone(t *t
 	for _, version := range []int32{1, 2} {
 		testkit.WriteFile(t, dir, "war3map.w3u", testkit.BuildModFile(version, nil, nil, objmod.Simple))
 		testkit.WriteFile(t, dir, "war3mapSkin.w3u", fixture(t, "war3mapSkin.w3u"))
-		older := plan(t, dir, captain)
-		if got := changeNames(older); !slices.Equal(got, []string{"war3map.w3u"}) {
+		older := mustPlan(t, dir, captain)
+		if got := changePaths(older); !slices.Equal(got, []string{"war3map.w3u"}) {
 			t.Fatalf("v%d: the plan changes %q", version, got)
 		}
 		wantCustom(t, "war3map.w3u", older.Changes[0].Data, customObject{"hfoo", "h001", []customMod{{"unam", 0, 0, "Captain"}}})
@@ -422,7 +422,7 @@ func TestAnIDThatACustomObjectInAnyOfTheMapsFilesHasIsAProblemAndNothingIsWritte
 		"abilities":{"holy":{"id":"h000","base":"AHhb"}},
 		"items":{"orb":{"id":"B000","base":"ckng"}},
 		"units":{"captain":{"id":"h001","base":"hfoo"}}}`)
-	if !saysEach(found,
+	if !mentionsAll(found,
 		`items["orb"].id: 'B000' is already the id of a custom object in the map`,
 		`abilities["holy"].id: 'h000' is already the id of a custom object in the map`) {
 		t.Errorf("problems:\n%s", diag.Format(found))
@@ -437,7 +437,7 @@ func TestACustomIDThatOnlyASkinFileHasCountsAsTheMaps(t *testing.T) {
 	testkit.WriteFile(t, dir, "war3mapSkin.w3h",
 		testkit.BuildModFile(3, nil, []testkit.SyntheticObject{{Base: "BNab", ID: "X001"}}, objmod.Simple))
 	found := planProblems(t, dir, `{"abilities":{"holy":{"id":"X001","base":"AHhb"}}}`)
-	if !saysEach(found, `abilities["holy"].id: 'X001' is already the id of a custom object in the map`) {
+	if !mentionsAll(found, `abilities["holy"].id: 'X001' is already the id of a custom object in the map`) {
 		t.Errorf("problems:\n%s", diag.Format(found))
 	}
 }
@@ -448,7 +448,7 @@ func TestAMapFileWithOneCustomIDTwiceIsRefusedByItsName(t *testing.T) {
 		dir := t.TempDir()
 		testkit.WriteFile(t, dir, name, testkit.BuildModFile(3, nil, twice, objmod.Leveled))
 		before := testkit.Snapshot(t, dir)
-		e := planError(t, dir, captainOnly)
+		e := mustFailPlan(t, dir, captainOnly)
 		if !strings.Contains(e.Msg, "'A001' appears twice") || e.File != mapLabel+"/"+name || !strings.Contains(e.Hint, "World Editor 3.00") {
 			t.Errorf("%s: error = %+v", name, e)
 		}
@@ -471,7 +471,7 @@ func TestAMapFileThatDoesNotReadIsRefusedByItsName(t *testing.T) {
 	for _, c := range cases {
 		dir := t.TempDir()
 		testkit.WriteFile(t, dir, "war3mapSkin.w3q", c.data)
-		e := planError(t, dir, captainOnly)
+		e := mustFailPlan(t, dir, captainOnly)
 		if e.File != mapLabel+"/war3mapSkin.w3q" || !strings.Contains(e.Msg, c.says) || !strings.Contains(e.Hint, "World Editor 3.00") {
 			t.Errorf("%s: error = %+v", c.name, e)
 		}
@@ -482,12 +482,12 @@ func TestAFolderWhereAnObjectFileWouldBeWrittenIsRefusedByItsName(t *testing.T) 
 	for _, name := range []string{"war3map.w3u", "War3MapSkin.W3U"} {
 		dir := t.TempDir()
 		testkit.WriteFile(t, dir, name+"/kept.txt", []byte("kept"))
-		e := planError(t, dir, captainOnly)
+		e := mustFailPlan(t, dir, captainOnly)
 		if e.File != mapLabel+"/"+name || !strings.Contains(e.Msg, "would replace a folder") || e.Hint == "" {
 			t.Errorf("%s: error = %+v", name, e)
 		}
-		result := plan(t, dir, `{"items":{"orb":{"id":"I001","base":"ckng"}}}`)
-		if got := changeNames(result); !slices.Equal(got, []string{"war3map.w3t", "war3mapSkin.w3t"}) {
+		result := mustPlan(t, dir, `{"items":{"orb":{"id":"I001","base":"ckng"}}}`)
+		if got := changePaths(result); !slices.Equal(got, []string{"war3map.w3t", "war3mapSkin.w3t"}) {
 			t.Errorf("%s: the plan changes %q", name, got)
 		}
 	}
@@ -497,8 +497,8 @@ func TestObjectFilesAreFoundInAnyLetterCaseAndChangedUnderTheNameTheMapHas(t *te
 	dir := t.TempDir()
 	testkit.WriteFile(t, dir, "WAR3MAP.W3U", fixture(t, "war3map.w3u"))
 	testkit.WriteFile(t, dir, "war3mapskin.w3u", fixture(t, "war3mapSkin.w3u"))
-	result := plan(t, dir, `{"units":{"captain":{"id":"h001","base":"hfoo","name":"Captain"}}}`)
-	if got := changeNames(result); !slices.Equal(got, []string{"WAR3MAP.W3U", "war3mapskin.w3u"}) {
+	result := mustPlan(t, dir, `{"units":{"captain":{"id":"h001","base":"hfoo","name":"Captain"}}}`)
+	if got := changePaths(result); !slices.Equal(got, []string{"WAR3MAP.W3U", "war3mapskin.w3u"}) {
 		t.Fatalf("the plan changes %q", got)
 	}
 	skin := customObjects(t, "war3mapskin.w3u", result.Changes[1].Data)
@@ -506,11 +506,11 @@ func TestObjectFilesAreFoundInAnyLetterCaseAndChangedUnderTheNameTheMapHas(t *te
 		t.Errorf("the skin file holds %+v", skin)
 	}
 	found := planProblems(t, dir, `{"units":{"peasant":{"id":"h000","base":"hpea"}}}`)
-	if !saysEach(found, "already the id of a custom object") {
+	if !mentionsAll(found, "already the id of a custom object") {
 		t.Errorf("problems:\n%s", diag.Format(found))
 	}
 	testkit.WriteFile(t, dir, "war3mapskin.w3u", []byte{3, 0, 0})
-	if e := planError(t, dir, captainOnly); e.File != mapLabel+"/war3mapskin.w3u" {
+	if e := mustFailPlan(t, dir, captainOnly); e.File != mapLabel+"/war3mapskin.w3u" {
 		t.Errorf("error = %+v", e)
 	}
 }
@@ -522,7 +522,7 @@ func TestObjectsThatDoNotResolveFailWithEveryProblemAndNothingIsWritten(t *testi
 	found := planProblems(t, dir, `{"units":{
 		"a":{"id":"h001","base":"hfox"},
 		"b":{"id":"h002","base":"hfoo","properties":{"uhpm":1.5}}}}`)
-	if !saysEach(found, "'hfox' is not a standard unit", "expected an integer, got 1.5") {
+	if !mentionsAll(found, "'hfox' is not a standard unit", "expected an integer, got 1.5") {
 		t.Errorf("problems:\n%s", diag.Format(found))
 	}
 	if !reflect.DeepEqual(testkit.Snapshot(t, dir), before) {
@@ -534,7 +534,7 @@ func TestThePlansChangesAreWhatAFolderLaysOverItself(t *testing.T) {
 	dir := t.TempDir()
 	copyFixture(t, dir, "war3map.w3u", "war3mapSkin.w3u")
 	folder := openMap(t, dir)
-	result, err := objects.Plan(folder, decoded(t, `{"units":{"captain":{"id":"h001","base":"hfoo","name":"Captain"}}}`), mini)
+	result, err := objects.Plan(folder, mustDecodeObjects(t, `{"units":{"captain":{"id":"h001","base":"hfoo","name":"Captain"}}}`), mini)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
@@ -543,9 +543,9 @@ func TestThePlansChangesAreWhatAFolderLaysOverItself(t *testing.T) {
 	if !reflect.DeepEqual(view.Changes(), changes) || len(changes) != 2 {
 		t.Fatalf("the view changes %+v, the plan %+v", view.Changes(), changes)
 	}
-	again, err := objects.Plan(view, decoded(t, `{"units":{"captain":{"id":"h001","base":"hfoo"}}}`), mini)
+	again, err := objects.Plan(view, mustDecodeObjects(t, `{"units":{"captain":{"id":"h001","base":"hfoo"}}}`), mini)
 	var found diag.Problems
-	if !errors.As(err, &found) || again != nil || !saysEach(found, "'h001' is already the id of a custom object in the map") {
+	if !errors.As(err, &found) || again != nil || !mentionsAll(found, "'h001' is already the id of a custom object in the map") {
 		t.Errorf("Plan on the view = %+v, %v", again, err)
 	}
 }
