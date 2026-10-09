@@ -38,6 +38,50 @@ func TestLoadWithoutAUsersFileStartsNoGameAndUsesTheDefaultArguments(t *testing.
 	}
 }
 
+func TestLoadTakesTestArchiveFromTheProjectUnlessTheUsersFileSetsIt(t *testing.T) {
+	const on, off = "[test]\narchive = true\n", "[test]\narchive = false\n"
+	for _, tt := range []struct {
+		name    string
+		project string
+		user    string
+		want    bool
+	}{
+		{"neither file sets it", "", "", false},
+		{"the project sets it", on, "", true},
+		{"the user's file sets it", "", on, true},
+		{"the user's file turns the project's off", on, off, false},
+		{"the user's file turns it on over the project", off, on, true},
+		{"the user's file has other settings only", on, "[yue]\npath = 'C:\\tools\\yue.exe'\n", true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			e := newProjectEnv(t, tt.project)
+			testkit.WriteFile(t, e.ConfigDir, UserFile, []byte(tt.user))
+			project, err := Load(e)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if project.Test.Archive != tt.want {
+				t.Errorf("Test.Archive = %v, want %v", project.Test.Archive, tt.want)
+			}
+		})
+	}
+}
+
+func TestLoadRefusesATestArchiveThatIsNoBooleanNamingItsFile(t *testing.T) {
+	const text = "[test]\narchive = \"yes\"\n"
+	e := newProjectEnv(t, text)
+	_, err := Load(e)
+	if diagErr := asDiagError(t, err, "a text in the project"); diagErr.File != "moonwell.toml" {
+		t.Errorf("got %q in %q, want the project's file", diagErr.Msg, diagErr.File)
+	}
+	testkit.WriteFile(t, e.Root, ProjectFile, nil)
+	testkit.WriteFile(t, e.ConfigDir, UserFile, []byte(text))
+	_, err = Load(e)
+	if diagErr := asDiagError(t, err, "a text in the user's file"); diagErr.File != filepath.Join(e.ConfigDir, "config.toml") {
+		t.Errorf("got %q in %q, want the user's file", diagErr.Msg, diagErr.File)
+	}
+}
+
 func TestLoadRefusesAProjectFirstAndThenTheUsersFileEachByItsOwnName(t *testing.T) {
 	e := newProjectEnv(t, "[build]\nfolder = \"\"\n")
 	testkit.WriteFile(t, e.ConfigDir, UserFile, []byte("[yue]\npath = \"\"\n"))

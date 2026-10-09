@@ -283,7 +283,9 @@ The mode `game-paths`:
    install script makes that file, see "Working on Moonwell" above), then `moonwell test`. Confirm "Moonwell is
    running." prints and the Captain north of the heroes changes colour every second (with ally colour mode off: Alt+A
    toggles it, and while it is on every unit shows blue, teal or red). Confirm the Warcraft III window is visible and
-   stays open after `moonwell` exits.
+   stays open after `moonwell` exits. Then write `[test]` with `archive = true` in that `config.toml` and run
+   `moonwell test` again: the last line names `dist/test/map.w3x`, and the same map loads. Take the two lines out
+   again.
 4. Add `error "gate"` inside the `on_main` hook, run `moonwell test` again, and confirm the on-screen error names
    `src/main.yue` and the right line. Record which chunk-name form the game used.
 5. Run `moonwell build --minify` and play `dist/bin/map.w3x` directly.

@@ -103,6 +103,7 @@ func Build(ctx context.Context, e *env.Env, options Options) (archive string, er
 	if err := packArchive(e, plan, output); err != nil {
 		return "", err
 	}
+	logBuilt(e.Log, plan, output)
 	return output.fullPath, nil
 }
 
@@ -116,18 +117,31 @@ func Test(ctx context.Context, e *env.Env, options Options) error {
 		return err
 	}
 	defer release()
+	var archive outputFile
+	if project.Test.Archive {
+		archive, err = prepareTestArchivePath(project)
+		if err != nil {
+			return err
+		}
+	}
 	plan, err := Plan(ctx, e, project, options)
 	if err != nil {
 		return err
 	}
-	staged, err := stage(e, project, plan)
+	loaded, err := stage(e, project, plan)
 	if err != nil {
 		return err
 	}
-	if err := launch(e, project.Launch, staged.fullPath); err != nil {
+	if project.Test.Archive {
+		if err := packArchive(e, plan, archive); err != nil {
+			return err
+		}
+		loaded = archive
+	}
+	if err := launch(e, project.Launch, loaded.fullPath); err != nil {
 		return err
 	}
-	e.Log.Info("Launched Warcraft III with " + staged.displayPath + ".")
+	e.Log.Info("Launched Warcraft III with " + loaded.displayPath + ".")
 	return nil
 }
 

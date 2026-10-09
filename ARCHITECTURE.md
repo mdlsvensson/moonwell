@@ -241,7 +241,8 @@ their own, as the table says.
 5. `stage` writes the planned map to `dist/stage/<map.folder>`.
 6. `packArchive` packs the planned map into an archive and writes it.
 
-`Test` is steps 1, 2, 4 and 5, and then starts the game on the stage. `Check` is steps 1, 2 and 4, and then says
+`Test` is steps 1, 2, 4 and 5, and then starts the game on the stage; with the setting `test.archive` it packs too,
+into `dist/test/`, and starts the game on that archive. `Check` is steps 1, 2 and 4, and then says
 what the plan holds. `Dev` is that check again and again, with the ids module written as a build writes it. So the
 order of a build is written once, in `Plan`.
 
@@ -332,7 +333,8 @@ which it only compares with what the objects render. `dev` writes the ids module
   the view, in the order of `Folder.Files`, and hands them to `mpq.Write`. The archive is written beside its place
   as `<map.folder>.tmp` and renamed when it is whole.
 - `launch` in `internal/build/launch.go` starts the game with `-loadfile` and the stage, through `Env.Spawn`, and
-  does not wait for it.
+  does not wait for it. With the setting `test.archive`, `Test` packs the staged map first, to
+  `dist/test/<map.folder>` (`prepareTestArchivePath` in `internal/build/archive.go`), and the game gets that file.
 
 ## The outside world
 

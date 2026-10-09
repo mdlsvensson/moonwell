@@ -28,17 +28,35 @@ func prepareArchivePath(project *manifest.Project) (outputFile, error) {
 	return output, nil
 }
 
+func prepareTestArchivePath(project *manifest.Project) (outputFile, error) {
+	mapDir, err := sourceMapDir(project)
+	if err != nil {
+		return outputFile{}, err
+	}
+	output, err := newOutputFile(project.Root, testDir+"/"+mapDir)
+	if err != nil {
+		return outputFile{}, err
+	}
+	if fsx.IsDir(output.fullPath) {
+		return outputFile{}, errTestArchiveIsAFolder(output.displayPath)
+	}
+	if err := removeArchive(output); err != nil {
+		return outputFile{}, err
+	}
+	return output, nil
+}
+
 func packArchive(e *env.Env, plan *Result, output outputFile) error {
 	e.Log.Info("Packing archive...")
 	archive, err := packMap(plan.Map, strings.TrimSuffix(path.Base(output.displayPath), mapSuffix))
 	if err != nil {
 		return err
 	}
-	if err := writeArchive(output, archive); err != nil {
-		return err
-	}
-	e.Log.Info("Built " + output.displayPath + " (" + strconv.Itoa(len(plan.Program.Modules)) + " module(s)).")
-	return nil
+	return writeArchive(output, archive)
+}
+
+func logBuilt(log *env.Logger, plan *Result, output outputFile) {
+	log.Info("Built " + output.displayPath + " (" + strconv.Itoa(len(plan.Program.Modules)) + " module(s)).")
 }
 
 func archivePath(project *manifest.Project) (outputFile, error) {
@@ -81,11 +99,15 @@ func resolveBuildDir(project *manifest.Project, mapDir string) (string, error) {
 
 func reservedDir(parts []string) (reserved string, found bool) {
 	first := toLowerASCII(parts[0])
-	switch {
-	case first == mapsDir, first == sourcesDir:
+	if first == mapsDir || first == sourcesDir {
 		return first, true
-	case len(parts) > 1 && first+"/"+toLowerASCII(parts[1]) == stageDir:
-		return stageDir, true
+	}
+	if len(parts) == 1 {
+		return "", false
+	}
+	switch firstTwo := first + "/" + toLowerASCII(parts[1]); firstTwo {
+	case stageDir, testDir:
+		return firstTwo, true
 	}
 	return "", false
 }
@@ -172,9 +194,17 @@ func errUnusableBuildFolder(manifestName, value string) error {
 
 func errOutputInReservedDir(manifestName, output, reserved string) error {
 	return &diag.Error{
-		Msg:  "The build output " + output + " is in " + reserved + "/, a folder Moonwell reads from or stages into.",
+		Msg:  "The build output " + output + " is in " + reserved + "/, a folder Moonwell reads from or writes for itself.",
 		File: manifestName,
 		Hint: outputOnlyHint,
+	}
+}
+
+func errTestArchiveIsAFolder(displayPath string) error {
+	return &diag.Error{
+		Msg:  displayPath + " is a directory; refusing to replace it with the archive that test.archive asks for.",
+		File: displayPath,
+		Hint: "Remove or rename that directory, then retry.",
 	}
 }
 

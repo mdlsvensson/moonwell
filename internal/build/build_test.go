@@ -480,6 +480,75 @@ func TestTestStagesTheMapBeforeItLooksForTheGame(t *testing.T) {
 	}
 }
 
+const testArchive = "[test]\narchive = true\n"
+
+func TestTestWithArchivePacksTheStagedMapAndHandsTheGameTheArchive(t *testing.T) {
+	game := testkit.WriteFile(t, t.TempDir(), "Warcraft III.exe", nil)
+	s := newFakeProject(t, objectsWith(captain("hfoo")), launchWith(game), testArchive)
+	s.copyTemplateMap()
+	s.writeFile("dist/bin/map.w3x", "the last build")
+	s.writeFile("dist/test/map.w3x", "the last test")
+	starts := recordSpawns(s.env)
+	if err := Test(background, s.env, Options{}); err != nil {
+		t.Fatalf("Test: %v", diag.Format(err))
+	}
+	file := filepath.Join(s.root, "dist", "test", "map.w3x")
+	want := spawnCall{game, "-launch", "-windowmode", "windowed", "-loadfile", file}
+	if len(*starts) != 1 || !slices.Equal((*starts)[0], want) {
+		t.Errorf("started %q, want %q", *starts, want)
+	}
+	lines := []string{
+		"Added 1 custom object(s) to 2 file(s).", "Packing archive...", "Launched Warcraft III with dist/test/map.w3x.",
+	}
+	if got := s.log.Lines(); !slices.Equal(got, lines) {
+		t.Errorf("logged %q, want %q", got, lines)
+	}
+	data, err := os.ReadFile(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	archive := openArchive(t, data)
+	staged := filesBelow(t, s.fullPath("dist/stage/map.w3x"))
+	if !strings.Contains(staged["war3map.lua"], `__mw.boot("main")`) || staged["war3map.w3u"] == "" {
+		t.Error("the stage does not hold the bundle and the object file")
+	}
+	for name, held := range staged {
+		if readArchiveFile(t, archive, strings.ReplaceAll(name, "/", `\`)) != held {
+			t.Errorf("the archive's %s is not the staged one", name)
+		}
+	}
+	if built := filesBelow(t, s.fullPath("dist/bin")); built["map.w3x"] != "the last build" || len(built) != 1 {
+		t.Errorf("the test changed what build made: %q", built)
+	}
+	if fsx.Exists(lockFullPath(s.root)) {
+		t.Error("the test left its lock")
+	}
+}
+
+func TestTestWithArchiveRemovesTheLastTestsArchiveBeforeItPlans(t *testing.T) {
+	s := newFakeProject(t, testArchive)
+	s.writeFile("dist/test/map.w3x", "the last test")
+	err := Test(background, s.env, Options{Entry: "src/missing.yue"})
+	if err == nil {
+		t.Fatal("a test with an entry that is not there passed")
+	}
+	if fsx.Exists(s.fullPath("dist/test/map.w3x")) || fsx.Exists(s.fullPath("dist/stage/map.w3x")) {
+		t.Error("the failed test left the last test's archive, or staged the map")
+	}
+}
+
+func TestTestWithArchiveRefusesADirectoryWhereItsArchiveGoes(t *testing.T) {
+	s := newFakeProject(t, testArchive)
+	s.makeDir("dist/test/map.w3x")
+	e := asDiagError(t, Test(background, s.env, Options{}), "a directory at the test archive")
+	if !strings.Contains(e.Msg, "dist/test/map.w3x is a directory") || e.File != "dist/test/map.w3x" || e.Hint == "" {
+		t.Errorf("error = %+v", e)
+	}
+	if len(s.compilerRuns()) != 0 || fsx.Exists(s.fullPath("dist/stage")) || fsx.Exists(lockFullPath(s.root)) {
+		t.Error("the refused test compiled, staged or left its lock")
+	}
+}
+
 func TestCheckSaysWhatABuildWouldHoldAndStagesNothing(t *testing.T) {
 	s := newFakeProject(t, localKit)
 	s.copyTemplateMap()

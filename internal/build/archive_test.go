@@ -34,6 +34,7 @@ func TestArchivePathPlacesTheArchiveUnderBuildFolder(t *testing.T) {
 		{`out\bin`, "out/bin/map.w3x"},
 		{"mapsout", "mapsout/map.w3x"},
 		{"dist/stages", "dist/stages/map.w3x"},
+		{"dist/tests", "dist/tests/map.w3x"},
 		{"out/maps", "out/maps/map.w3x"},
 	}
 	for _, tt := range tests {
@@ -90,6 +91,8 @@ func TestArchivePathRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArc
 		{"./Src/built", "src/"},
 		{"dist/stage", "dist/stage/"},
 		{`Dist\STAGE\out`, "dist/stage/"},
+		{"dist/test", "dist/test/"},
+		{"DIST/Test/out", "dist/test/"},
 		{"out:bin", `a name that Windows cannot hold: "out:bin"`},
 		{"out/con", `a name that Windows cannot hold: "out/con"`},
 		{"dist/bin.", `a name that Windows cannot hold: "dist/bin."`},

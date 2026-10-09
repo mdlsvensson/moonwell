@@ -18,6 +18,9 @@ func Load(e *env.Env) (*Project, error) {
 		return nil, err
 	}
 	project.Launch = user.Launch
+	if user.TestArchive != nil {
+		project.Test.Archive = *user.TestArchive
+	}
 	project.Yue.Path = user.YuePath
 	project.useLocalLibraries(user)
 	return project, nil

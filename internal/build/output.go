@@ -11,6 +11,7 @@ import (
 const (
 	distDir  = "dist"
 	stageDir = distDir + "/stage"
+	testDir  = distDir + "/test"
 )
 
 type outputFile struct {

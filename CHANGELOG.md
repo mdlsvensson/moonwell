@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+- **`moonwell test` can start the game on a packed archive.** A new setting, `test.archive`, makes `test` pack the
+  staged map to `dist/test/<map.folder>` and hand the game that file where it handed it the staged folder. It is
+  `false` by default, so nothing changes until it is written:
+
+  ```toml
+  [test]
+  archive = true
+  ```
+
+  It is the one setting both files may hold. In `moonwell.toml` it is the project's; in `config.toml` of your
+  Moonwell folder it is your machine's and wins, so `archive = false` there turns it off for you. What
+  `moonwell build` made in `build.folder` is not touched.
+- **Warcraft III 3.0.1, the known issue of 0.10.0 to 0.12.0.** That version of the game shows its main menu when it
+  is started on a map that is a folder; a packed map loads on every version. With `test.archive` on, `test` works
+  there without building and starting the game by hand.
+- **`build.folder` may not be `dist/test` or a folder below it**, as it may not be `dist/stage`: `test` writes its
+  archive there.
+
 ## 0.12.0 (2026-10-09)
 
 - **A project of 0.11 is not read.** The settings moved out of Pkl, and this version reads no `moonwell.pkl` and no

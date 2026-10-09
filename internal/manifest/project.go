@@ -7,6 +7,7 @@ type Project struct {
 	Map       Map                `json:"map"`
 	Build     Build              `json:"build"`
 	Launch    Launch             `json:"launch"`
+	Test      Test               `json:"test"`
 	Yue       Yue                `json:"yue"`
 	Assets    Assets             `json:"assets"`
 	Lint      Lint               `json:"lint"`
@@ -28,6 +29,10 @@ type Build struct {
 type Launch struct {
 	GameExecutable *string  `json:"gameExecutable"`
 	Args           []string `json:"args"`
+}
+
+type Test struct {
+	Archive bool `json:"archive"`
 }
 
 type Yue struct {

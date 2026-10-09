@@ -67,7 +67,7 @@ func isReservedDir(path string) bool {
 		return false
 	}
 	return segments[0] == "maps" || segments[0] == "src" ||
-		len(segments) >= 2 && segments[0] == "dist" && segments[1] == "stage"
+		len(segments) >= 2 && segments[0] == "dist" && (segments[1] == "stage" || segments[1] == "test")
 }
 
 var luaKeywords = []string{

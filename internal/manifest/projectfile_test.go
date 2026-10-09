@@ -240,6 +240,7 @@ func TestReadProjectRefusesAValueOutsideItsRuleNamingTheSetting(t *testing.T) {
 		{"a build folder with ..", "[build]\nfolder = \"dist/../..\"\n", "build.folder"},
 		{"a build folder that is the sources", "[build]\nfolder = \"SRC/bin\"\n", "build.folder"},
 		{"a build folder below the stage", "[build]\nfolder = \"dist/stage/bin\"\n", "build.folder"},
+		{"a build folder that is the test archive's", "[build]\nfolder = \"Dist/Test\"\n", "build.folder"},
 		{"a compiler version of two numbers", "[yue]\nversion = \"0.34\"\n", "yue.version"},
 		{"an empty exclude", "[assets]\nexclude = [\"a\", \"\"]\n", "assets.exclude[1]"},
 		{"an asset without a path", "[[assets.paths]]\nfile = \"a.blp\"\n", "assets.paths[0].path"},

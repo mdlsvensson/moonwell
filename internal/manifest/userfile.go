@@ -18,10 +18,11 @@ var userDefaults = map[string]any{
 }
 
 type User struct {
-	FilePath  string
-	Launch    Launch
-	YuePath   *string
-	Libraries []LocalLibrary
+	FilePath    string
+	Launch      Launch
+	TestArchive *bool
+	YuePath     *string
+	Libraries   []LocalLibrary
 }
 
 type LocalLibrary struct {
@@ -31,8 +32,13 @@ type LocalLibrary struct {
 
 type userFile struct {
 	Launch    Launch         `json:"launch"`
+	Test      userTest       `json:"test"`
 	Yue       userYue        `json:"yue"`
 	Libraries []LocalLibrary `json:"libraries"`
+}
+
+type userTest struct {
+	Archive *bool `json:"archive"`
 }
 
 type userYue struct {
@@ -59,7 +65,10 @@ func ReadUser(e *env.Env) (*User, error) {
 	if err := file.checkRules(fullPath); err != nil {
 		return nil, err
 	}
-	return &User{FilePath: fullPath, Launch: file.Launch, YuePath: file.Yue.Path, Libraries: file.Libraries}, nil
+	return &User{
+		FilePath: fullPath, Launch: file.Launch, TestArchive: file.Test.Archive, YuePath: file.Yue.Path,
+		Libraries: file.Libraries,
+	}, nil
 }
 
 func (u *userFile) checkRules(fullPath string) error {

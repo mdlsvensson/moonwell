@@ -18,6 +18,7 @@ var projectDefaults = map[string]any{
 	"map.entry":           "src/main.yue",
 	"build.folder":        "dist/bin",
 	"build.minify":        false,
+	"test.archive":        false,
 	"yue.version":         DefaultYueVersion,
 	"lint.unknownGlobals": "error",
 }
@@ -27,6 +28,7 @@ var machineSettings = []string{"launch", "yue.path"}
 type projectFile struct {
 	Map       Map             `json:"map"`
 	Build     Build           `json:"build"`
+	Test      Test            `json:"test"`
 	Yue       projectYue      `json:"yue"`
 	Assets    assetsFile      `json:"assets"`
 	Lint      Lint            `json:"lint"`
@@ -113,7 +115,8 @@ func (p *projectFile) checkRules() error {
 	c.check(strings.HasPrefix(p.Map.Entry, "src/") && strings.HasSuffix(p.Map.Entry, ".yue"), "map.entry",
 		`must start with "src/" and end in ".yue"`)
 	c.check(isRelativeDir(p.Build.Folder), "build.folder", `must be a relative path without ".."`)
-	c.check(!isReservedDir(p.Build.Folder), "build.folder", "must not be maps, src or dist/stage, or a folder below one")
+	c.check(!isReservedDir(p.Build.Folder), "build.folder",
+		"must not be maps, src, dist/stage or dist/test, or a folder below one")
 	c.check(threeNumbers.MatchString(p.Yue.Version), "yue.version", `must be three numbers with dots, such as "`+DefaultYueVersion+`"`)
 	p.Assets.checkRules(c)
 	c.check(p.Lint.UnknownGlobals == "error" || p.Lint.UnknownGlobals == "warning", "lint.unknownGlobals",
@@ -252,6 +255,7 @@ func (p *projectFile) toProject(root string) *Project {
 		ManifestName: ProjectFile,
 		Map:          p.Map,
 		Build:        p.Build,
+		Test:         p.Test,
 		Yue:          Yue{Version: p.Yue.Version},
 		Assets:       Assets{Exclude: p.Assets.Exclude},
 		Lint:         p.Lint,

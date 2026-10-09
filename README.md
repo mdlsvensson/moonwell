@@ -596,7 +596,7 @@ Not supported yet:
 | ----------------------------------------------- | -------------------------------------------------------------------------------- |
 | `moonwell init <dir>`                           | Create a project in a new folder                                                 |
 | `moonwell build [--entry src/x.yue] [--minify]` | Build `dist/bin/<map>.w3x`                                                       |
-| `moonwell test [--entry src/x.yue] [--minify]`  | Stage the map and launch Warcraft III                                            |
+| `moonwell test [--entry src/x.yue] [--minify]`  | Stage the map and launch Warcraft III on it, or on an archive with `test.archive` |
 | `moonwell dev`                                  | Re-check on every save                                                           |
 | `moonwell check`                                | Compile and validate without building                                            |
 | `moonwell assets:check`                         | Show what `assets:sync` would change in the source map                           |
@@ -632,9 +632,10 @@ Pkl to that folder's `bin`.
 ## Settings
 
 Moonwell reads two files, both [TOML](https://toml.io): `moonwell.toml` in the project, shared by the team, and
-`config.toml` in your Moonwell folder, for your machine. No setting is read from both. Every setting has a default, so
-a file holds only what it changes. A setting's name is read without regard to letter case; a name Moonwell does not
-know is an error, and so is a value of the wrong kind.
+`config.toml` in your Moonwell folder, for your machine. One setting, `test.archive`, is read from both, and your
+machine's value wins; no other is. Every setting has a default, so a file holds only what it changes. A setting's
+name is read without regard to letter case; a name Moonwell does not know is an error, and so is a value of the wrong
+kind.
 
 ### The project: `moonwell.toml`
 
@@ -642,8 +643,9 @@ know is an error, and so is a value of the wrong kind.
 | --- | --- | --- |
 | `map.folder` | `"map.w3x"` | Ends in `.w3x`; a relative path with no `..` |
 | `map.entry` | `"src/main.yue"` | Starts with `src/`, ends in `.yue` |
-| `build.folder` | `"dist/bin"` | A relative path with no `..`; not `maps`, `src` or `dist/stage`, nor below one |
+| `build.folder` | `"dist/bin"` | A relative path with no `..`; not `maps`, `src`, `dist/stage` or `dist/test`, nor below one |
 | `build.minify` | `false` | `true` shrinks the script, but runtime errors lose their line numbers |
+| `test.archive` | `false` | `true` makes `moonwell test` pack the staged map to `dist/test/` and start the game on that archive; `config.toml` may set it too, and wins |
 | `yue.version` | `"0.34.3"` | YueScript compiler version: three numbers with dots. Only versions this release pins a checksum for are accepted |
 | `assets.exclude` | `[]` | Files under `assets/`, or folders ending in `/`, to leave out; no empty text |
 | `[[assets.paths]]` | none | `file` under `assets/` and its exact in-map `path`; neither is empty, and a `file` is written once |
@@ -674,6 +676,7 @@ below.
 | --- | --- | --- |
 | `launch.gameExecutable` | none | The path of `Warcraft III.exe`, for `moonwell test`; not empty |
 | `launch.args` | `["-launch", "-windowmode", "windowed"]` | Passed to the game before `-loadfile <map>`. A list here replaces the default one |
+| `test.archive` | the project's | `true` or `false`: whether `moonwell test` starts the game on a packed archive, on this machine, whatever `moonwell.toml` says |
 | `yue.path` | none | Your own `yue` binary instead of the downloaded one; not empty |
 | `[[libraries]]` | none | `github` as `owner/repo` and `path`: a repository's folder on this machine (see [Libraries](#libraries)). A `github` is written once, compared without regard to letter case, and the `path` is absolute |
 
@@ -691,6 +694,19 @@ A path between single quotes is written as it is, with single backslashes.
 A `launch` table or a `yue.path` in `moonwell.toml` is refused, with a hint that names your `config.toml`: the project
 does not choose the program that runs on your machine. A project's setting written in `config.toml`, such as `map` or
 `build`, is refused as a setting Moonwell does not know there.
+
+`test.archive` is the one setting both files may hold. Some versions of the game do not load a map that is a folder
+(3.0.1 showed its main menu instead), and a packed map always loads. Write it in `moonwell.toml` when everyone on the
+project should test on an archive, or in `config.toml` when only your machine should; there, `false` turns it off
+even when the project asks for it.
+
+```toml
+[test]
+archive = true
+```
+
+`moonwell test` then stages the map as always, packs it to `dist/test/<map.folder>` and starts the game on that file.
+What `moonwell build` made in `build.folder` stays as it is.
 
 ### Raw gameplay constants and game interface
 
