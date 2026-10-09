@@ -20,7 +20,7 @@ func ReadHeader(data []byte, displayPath string) (Header, error) {
 	if header.Version < 28 {
 		return header, nil
 	}
-	r.Skip(8)
+	r.Skip(saveCountAndEditorVersionSize)
 	major, minor := r.U32(), r.U32()
 	if r.Err() != nil {
 		return header, nil

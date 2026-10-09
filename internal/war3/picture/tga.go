@@ -9,12 +9,16 @@ import (
 
 const (
 	tgaHeaderSize    = 18
+	tgaNoIDField     = 0
+	tgaNoColourMap   = 0
 	tgaPlain         = 2
 	tgaRunLength     = 10
 	tgaRightToLeft   = 0x10
 	tgaFromTop       = 0x20
 	tgaPacketRepeats = 0x80
 	tgaPacketLength  = 0x7f
+
+	tgaColourMapAndOriginSize = 9
 )
 
 const (
@@ -22,45 +26,6 @@ const (
 	outputDescriptor = 8
 	opaque           = 255
 )
-
-type pixels struct {
-	width, height int
-	bytesPerPixel int
-	fromTop       bool
-	data          []byte
-}
-
-func (p pixels) rowFromBottom(row int) []byte {
-	if p.fromTop {
-		row = p.height - 1 - row
-	}
-	size := p.width * p.bytesPerPixel
-	return p.data[row*size : (row+1)*size]
-}
-
-func encodeOpaqueTGA(p pixels) []byte {
-	var w binio.Writer
-	w.U8(0)
-	w.U8(0)
-	w.U8(tgaPlain)
-	w.Zero(9)
-	w.U16(uint16(p.width))
-	w.U16(uint16(p.height))
-	w.U8(outputDepth)
-	w.U8(outputDescriptor)
-	for row := range p.height {
-		w.Write(makeRowOpaque(p.rowFromBottom(row), p.bytesPerPixel))
-	}
-	return w.Bytes()
-}
-
-func makeRowOpaque(row []byte, step int) []byte {
-	out := make([]byte, 0, len(row)/step*4)
-	for i := 0; i < len(row); i += step {
-		out = append(out, row[i], row[i+1], row[i+2], opaque)
-	}
-	return out
-}
 
 type tgaHeader struct {
 	idLength      int
@@ -90,12 +55,12 @@ func readTGA(data []byte, displayPath string) (pixels, error) {
 
 func readTGAHeader(r *binio.Reader, displayPath string) (tgaHeader, error) {
 	idLength, colourMap, kind := r.U8(), r.U8(), r.U8()
-	r.Skip(9)
+	r.Skip(tgaColourMapAndOriginSize)
 	width, height, depth, descriptor := r.U16(), r.U16(), r.U8(), r.U8()
 	switch {
 	case r.Err() != nil:
 		return tgaHeader{}, errTGAHeaderCutShort(displayPath)
-	case colourMap != 0:
+	case colourMap != tgaNoColourMap:
 		return tgaHeader{}, errTGAColourMap(displayPath)
 	case kind != tgaPlain && kind != tgaRunLength:
 		return tgaHeader{}, errTGAKind(displayPath, kind)
@@ -146,6 +111,45 @@ func readRunLengthPixels(r *binio.Reader, count, step int, displayPath string) (
 		}
 	}
 	return stored, nil
+}
+
+type pixels struct {
+	width, height int
+	bytesPerPixel int
+	fromTop       bool
+	data          []byte
+}
+
+func (p pixels) rowFromBottom(row int) []byte {
+	if p.fromTop {
+		row = p.height - 1 - row
+	}
+	size := p.width * p.bytesPerPixel
+	return p.data[row*size : (row+1)*size]
+}
+
+func encodeOpaqueTGA(p pixels) []byte {
+	var w binio.Writer
+	w.U8(tgaNoIDField)
+	w.U8(tgaNoColourMap)
+	w.U8(tgaPlain)
+	w.Zero(tgaColourMapAndOriginSize)
+	w.U16(uint16(p.width))
+	w.U16(uint16(p.height))
+	w.U8(outputDepth)
+	w.U8(outputDescriptor)
+	for row := range p.height {
+		w.Write(makeRowOpaque(p.rowFromBottom(row), p.bytesPerPixel))
+	}
+	return w.Bytes()
+}
+
+func makeRowOpaque(row []byte, step int) []byte {
+	out := make([]byte, 0, len(row)/step*4)
+	for i := 0; i < len(row); i += step {
+		out = append(out, row[i], row[i+1], row[i+2], opaque)
+	}
+	return out
 }
 
 func errTGAHeaderCutShort(displayPath string) error {

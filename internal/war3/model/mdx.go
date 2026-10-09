@@ -13,36 +13,6 @@ const (
 	chunkHeaderSize = 8
 )
 
-const (
-	pathSize           = 260
-	textureSize        = 268
-	faceEffectNameSize = 80
-	faceEffectSize     = 340
-)
-
-const (
-	recordSizeSize  = 4
-	nodeFixedSize   = 96
-	nodeFlagsOffset = 92
-	emitterUsesMDL  = 0x8000
-	emitterUsesTGA  = 0x10000
-)
-
-type nodeChunk struct {
-	pathOffset int
-	kindOf     func(nodeFlags uint32) Kind
-}
-
-var nodeChunks = map[string]nodeChunk{
-	"PREM": {16, emitterKindOf},
-	"ATCH": {0, func(uint32) Kind { return Attachment }},
-	"CORN": {32, func(uint32) Kind { return Popcorn }},
-}
-
-func emitterKindOf(nodeFlags uint32) Kind {
-	return emitterKind(nodeFlags&emitterUsesMDL != 0, nodeFlags&emitterUsesTGA != 0)
-}
-
 func IsMDX(data []byte) bool {
 	return bytes.HasPrefix(data, []byte(magic))
 }
@@ -101,6 +71,15 @@ func (c chunk) readPaths(displayPath string) ([]Path, error) {
 	return nil, nil
 }
 
+const (
+	replaceableIDSize  = 4
+	pathSize           = 260
+	textureFlagsSize   = 4
+	textureSize        = replaceableIDSize + pathSize + textureFlagsSize
+	faceEffectNameSize = 80
+	faceEffectSize     = faceEffectNameSize + pathSize
+)
+
 func readTexturePaths(body []byte, displayPath string) ([]Path, error) {
 	if len(body)%textureSize != 0 {
 		return nil, errTexturesNotWhole(displayPath)
@@ -109,7 +88,7 @@ func readTexturePaths(body []byte, displayPath string) ([]Path, error) {
 	for r := binio.NewReader(body); r.Len() > 0; {
 		slot := r.U32()
 		paths = append(paths, Path{Kind: Texture, Path: fixedFieldText(r.Bytes(pathSize)), ReplaceableID: int64(slot)})
-		r.Skip(4)
+		r.Skip(textureFlagsSize)
 	}
 	return paths, nil
 }
@@ -126,6 +105,39 @@ func readFaceEffectPaths(body []byte, displayPath string) ([]Path, error) {
 		}
 	}
 	return paths, nil
+}
+
+const (
+	recordSizeSize  = 4
+	nodeSizeSize    = 4
+	nodeNameSize    = 80
+	nodeIDSize      = 4
+	nodeFlagsSize   = 4
+	nodeFixedSize   = nodeSizeSize + nodeNameSize + 2*nodeIDSize + nodeFlagsSize
+	nodeFlagsOffset = nodeFixedSize - nodeFlagsSize
+	emitterUsesMDL  = 0x8000
+	emitterUsesTGA  = 0x10000
+)
+
+const (
+	float32Size                             = 4
+	emitterRateGravityLongitudeLatitudeSize = 4 * float32Size
+	popcornFloatsAndReplaceableIDSize       = 7*float32Size + replaceableIDSize
+)
+
+type nodeChunk struct {
+	pathOffset int
+	kindOf     func(nodeFlags uint32) Kind
+}
+
+var nodeChunks = map[string]nodeChunk{
+	"PREM": {pathOffset: emitterRateGravityLongitudeLatitudeSize, kindOf: emitterKindOf},
+	"ATCH": {pathOffset: 0, kindOf: func(uint32) Kind { return Attachment }},
+	"CORN": {pathOffset: popcornFloatsAndReplaceableIDSize, kindOf: func(uint32) Kind { return Popcorn }},
+}
+
+func emitterKindOf(nodeFlags uint32) Kind {
+	return emitterKind(nodeFlags&emitterUsesMDL != 0, nodeFlags&emitterUsesTGA != 0)
 }
 
 func readNodePaths(c chunk, layout nodeChunk, displayPath string) ([]Path, error) {

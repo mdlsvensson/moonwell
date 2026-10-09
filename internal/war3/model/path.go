@@ -25,6 +25,16 @@ type Path struct {
 	ReplaceableID int64
 }
 
+func ReadPaths(data []byte, displayPath string) ([]Path, error) {
+	if IsMDX(data) {
+		return ReadMDX(data, displayPath)
+	}
+	if bytes.IndexByte(data, 0) >= 0 {
+		return nil, errUnknownFormat(displayPath)
+	}
+	return ReadMDL(fsx.DecodeText(data), displayPath)
+}
+
 func DescribePath(p Path) string {
 	switch {
 	case p.Path != "":
@@ -35,16 +45,6 @@ func DescribePath(p Path) string {
 		return "team glow (slot 2)"
 	}
 	return fmt.Sprintf("replaceable texture (slot %d)", p.ReplaceableID)
-}
-
-func ReadPaths(data []byte, displayPath string) ([]Path, error) {
-	if IsMDX(data) {
-		return ReadMDX(data, displayPath)
-	}
-	if bytes.IndexByte(data, 0) >= 0 {
-		return nil, errUnknownFormat(displayPath)
-	}
-	return ReadMDL(fsx.DecodeText(data), displayPath)
 }
 
 func emitterKind(usesMDL, usesTGA bool) Kind {

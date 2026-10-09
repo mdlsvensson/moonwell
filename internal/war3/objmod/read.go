@@ -75,6 +75,15 @@ type File struct {
 
 const maxSets = 64
 
+const (
+	idSize              = len(ID{})
+	countSize           = 4
+	setCountAndFlagSize = 8
+	valueTypeSize       = 4
+	levelAndColumnSize  = 8
+	emptyStringSize     = 1
+)
+
 func Read(data []byte, kind TableKind, displayPath string) (*File, error) {
 	r := &reader{input: binio.NewReader(data), kind: kind, displayPath: displayPath}
 	parsed := r.readFile()
@@ -134,7 +143,7 @@ func (r *reader) readTable() Table {
 	r.repeat(r.readCount("object", r.minObjectSize()), func() {
 		table.Objects = append(table.Objects, r.readObject())
 	})
-	table.Start, table.Stop = table.CountOffset+4, r.input.Offset()
+	table.Start, table.Stop = table.CountOffset+countSize, r.input.Offset()
 	return table
 }
 
@@ -218,17 +227,19 @@ func (r *reader) repeat(count int, read func()) {
 }
 
 func (r *reader) minObjectSize() int {
+	size := 2*idSize + countSize
 	if r.version >= 3 {
-		return 20
+		size += setCountAndFlagSize
 	}
-	return 12
+	return size
 }
 
 func (r *reader) minModificationSize() int {
+	size := idSize + valueTypeSize + emptyStringSize + idSize
 	if r.kind == Leveled {
-		return 21
+		size += levelAndColumnSize
 	}
-	return 13
+	return size
 }
 
 func (r *reader) readID() ID {

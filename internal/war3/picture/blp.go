@@ -15,6 +15,12 @@ const (
 )
 
 const (
+	blpAlphaBitsSize              = 4
+	blpAlphaKindAndHasMipmapsSize = 8
+	blpOffsetSize                 = 4
+)
+
+const (
 	blpJPEG    = 0
 	blpPalette = 1
 )
@@ -60,11 +66,11 @@ func readBLPHeader(data []byte) blpHeader {
 	r := binio.NewReader(data)
 	r.Skip(len(blpMagic))
 	content := r.U32()
-	r.Skip(4)
+	r.Skip(blpAlphaBitsSize)
 	width, height := r.U32(), r.U32()
-	r.Skip(8)
+	r.Skip(blpAlphaKindAndHasMipmapsSize)
 	firstOffset := r.U32()
-	r.Skip((blpMipmaps - 1) * 4)
+	r.Skip((blpMipmaps - 1) * blpOffsetSize)
 	firstSize := r.U32()
 	return blpHeader{content, width, height, firstOffset, firstSize}
 }

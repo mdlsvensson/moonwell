@@ -27,6 +27,7 @@ const (
 	smallestSector     = 512
 	defaultSectorShift = 3
 	listfileName       = "(listfile)"
+	listfileNewline    = "\r\n"
 
 	magic         = 0x1A51504D
 	headerSize    = 32
@@ -35,9 +36,11 @@ const (
 	wordSize   = 4
 	entryWords = 4
 
-	minHashSlots = 16
-	free         = 0xFFFFFFFF
-	neutral      = 0
+	blockIndexWord = 3
+
+	minHashSlots  = 16
+	emptySlot     = 0xFFFFFFFF
+	neutralLocale = 0
 
 	flagExists     = 0x80000000
 	flagCompressed = 0x00000200
@@ -60,31 +63,23 @@ func Write(files []File, options Options) ([]byte, error) {
 		return nil, err
 	}
 	hashes := hashTable(entries)
-	hashTableAt := headerSize + len(data)
-	blockTableAt := hashTableAt + len(hashes)*wordSize
+	hashTableOffset := headerSize + len(data)
+	blockTableOffset := hashTableOffset + len(hashes)*wordSize
 
 	var w binio.Writer
 	w.Write(options.Prefix)
 	writeHeader(&w, header{
-		archiveSize:  blockTableAt + len(blocks)*wordSize,
-		sectorShift:  shift,
-		hashTableAt:  hashTableAt,
-		blockTableAt: blockTableAt,
-		hashSlots:    len(hashes) / entryWords,
-		blocks:       len(entries),
+		archiveSize:      blockTableOffset + len(blocks)*wordSize,
+		sectorShift:      shift,
+		hashTableOffset:  hashTableOffset,
+		blockTableOffset: blockTableOffset,
+		hashSlots:        len(hashes) / entryWords,
+		blocks:           len(entries),
 	})
 	w.Write(data)
 	writeTable(&w, hashes, HashTableKey)
 	writeTable(&w, blocks, BlockTableKey)
 	return w.Bytes(), nil
-}
-
-func pathKey(name string) string {
-	key := []byte(name)
-	for i, c := range key {
-		key[i] = toUpperASCII(c)
-	}
-	return string(key)
 }
 
 func checkPaths(files []File) error {
@@ -108,18 +103,26 @@ func withListfile(files []File) []File {
 			continue
 		}
 		entries = append(entries, file)
-		names.WriteString(file.Name + "\r\n")
+		names.WriteString(file.Name + listfileNewline)
 	}
 	return append(entries, File{Name: listfileName, Data: []byte(names.String())})
 }
 
+func pathKey(name string) string {
+	key := []byte(name)
+	for i, c := range key {
+		key[i] = toUpperASCII(c)
+	}
+	return string(key)
+}
+
 type header struct {
-	archiveSize  int
-	sectorShift  int
-	hashTableAt  int
-	blockTableAt int
-	hashSlots    int
-	blocks       int
+	archiveSize      int
+	sectorShift      int
+	hashTableOffset  int
+	blockTableOffset int
+	hashSlots        int
+	blocks           int
 }
 
 func writeHeader(w *binio.Writer, h header) {
@@ -128,8 +131,8 @@ func writeHeader(w *binio.Writer, h header) {
 	w.U32(uint32(h.archiveSize))
 	w.U16(formatVersion)
 	w.U16(uint16(h.sectorShift))
-	w.U32(uint32(h.hashTableAt))
-	w.U32(uint32(h.blockTableAt))
+	w.U32(uint32(h.hashTableOffset))
+	w.U32(uint32(h.blockTableOffset))
 	w.U32(uint32(h.hashSlots))
 	w.U32(uint32(h.blocks))
 }
@@ -201,11 +204,11 @@ func (p *sectorPacker) pack(raw []byte) ([]byte, error) {
 
 func hashTable(entries []File) []uint32 {
 	slots := hashSlots(len(entries))
-	table := slices.Repeat([]uint32{free}, slots*entryWords)
+	table := slices.Repeat([]uint32{emptySlot}, slots*entryWords)
 	for index, entry := range entries {
 		slot := freeSlot(table, entry.Name)
 		copy(table[slot*entryWords:], []uint32{
-			HashString(entry.Name, NameA), HashString(entry.Name, NameB), neutral, uint32(index),
+			HashString(entry.Name, NameA), HashString(entry.Name, NameB), neutralLocale, uint32(index),
 		})
 	}
 	return table
@@ -222,7 +225,7 @@ func hashSlots(count int) int {
 func freeSlot(table []uint32, name string) int {
 	mask := len(table)/entryWords - 1
 	slot := int(HashString(name, TableOffset)) & mask
-	for table[slot*entryWords+3] != free {
+	for table[slot*entryWords+blockIndexWord] != emptySlot {
 		slot = (slot + 1) & mask
 	}
 	return slot

@@ -11,16 +11,21 @@ const (
 
 const cipherKeys HashType = 4
 
+const (
+	hashTypeCount  = 5
+	byteValueCount = 1 << 8
+)
+
 var cryptTable = buildCryptTable()
 
-func buildCryptTable() (table [5 << 8]uint32) {
+func buildCryptTable() (table [hashTypeCount * byteValueCount]uint32) {
 	seed := uint32(0x00100001)
 	step := func() uint32 {
 		seed = (seed*125 + 3) % 0x2AAAAB
 		return seed & 0xFFFF
 	}
-	for b := range 1 << 8 {
-		for hashType := range 5 {
+	for b := range byteValueCount {
+		for hashType := range hashTypeCount {
 			high := step()
 			table[hashType<<8+b] = high<<16 | step()
 		}

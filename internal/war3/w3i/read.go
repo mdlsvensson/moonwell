@@ -73,6 +73,28 @@ var versions = []int32{18, 25, 28, 31, 32, 33, 39}
 
 const maxSlots = 24
 
+const luaScript = 1
+
+const (
+	saveCountAndEditorVersionSize   = 8
+	gameVersionSize                 = 16
+	cameraBoundsAndPlayableAreaSize = 56
+	tilesetSize                     = 1
+	unknownLoadingScreenSize        = 4
+	gameDataSetSize                 = 4
+	prologueTextCount               = 4
+	weatherSize                     = 4
+	unknownEnvironmentSize          = 24
+	lightTilesetSize                = 1
+	graphicsModesAndDataVersionSize = 8
+	defaultAndMaxCameraZoomSize     = 8
+	minCameraZoomSize               = 4
+	unknownScriptSize               = 40
+	unknownPlayerSize               = 4
+	allyStartPrioritiesSize         = 8
+	enemyStartPrioritiesSize        = 8
+)
+
 func Read(data []byte, displayPath string, depth Depth) (*Info, error) {
 	r := &reader{input: binio.NewReader(data), displayPath: displayPath}
 	info := r.readInfo()
@@ -122,9 +144,9 @@ func (r *reader) readInfo() *Info {
 	r.readHeader()
 	info := &Info{Version: r.version}
 	info.Name, info.Author, info.Description, info.RecommendedPlayers = r.readText(), r.readText(), r.readText(), r.readText()
-	r.input.Skip(56)
+	r.input.Skip(cameraBoundsAndPlayableAreaSize)
 	info.Flags = r.readI32()
-	r.input.Skip(1)
+	r.input.Skip(tilesetSize)
 	info.Loading = r.readLoading()
 	return info
 }
@@ -135,16 +157,16 @@ func (r *reader) readHeader() {
 		r.fail(errUnsupportedVersion(r.displayPath, r.version))
 	}
 	if r.version >= 28 {
-		r.input.Skip(24)
+		r.input.Skip(saveCountAndEditorVersionSize + gameVersionSize)
 	} else {
-		r.input.Skip(8)
+		r.input.Skip(saveCountAndEditorVersionSize)
 	}
 }
 
 func (r *reader) readLoading() Loading {
 	loading := Loading{Background: r.readI32()}
 	if r.version == 39 {
-		r.input.Skip(4)
+		r.input.Skip(unknownLoadingScreenSize)
 	}
 	if r.version >= 25 {
 		model := r.readText()
@@ -158,12 +180,12 @@ func (r *reader) readDetails() *Details {
 	details := &Details{}
 	r.skipPrologue()
 	details.Fog = r.readFog()
-	r.input.Skip(4)
+	r.input.Skip(weatherSize)
 	if r.version == 39 {
-		r.input.Skip(24)
+		r.input.Skip(unknownEnvironmentSize)
 	}
 	details.SoundEnvironment = r.readText()
-	r.input.Skip(1)
+	r.input.Skip(lightTilesetSize)
 	details.WaterColor = r.readColor()
 	r.checkScriptLanguage()
 	details.Players = r.readPlayers()
@@ -172,8 +194,8 @@ func (r *reader) readDetails() *Details {
 }
 
 func (r *reader) skipPrologue() {
-	r.input.Skip(4)
-	for range 4 {
+	r.input.Skip(gameDataSetSize)
+	for range prologueTextCount {
 		r.readText()
 	}
 }
@@ -191,20 +213,20 @@ func (r *reader) readColor() Color {
 }
 
 func (r *reader) checkScriptLanguage() {
-	if r.input.I32() != 1 {
+	if r.input.I32() != luaScript {
 		r.fail(errNotLua(r.displayPath))
 	}
 	if r.version >= 31 {
-		r.input.Skip(8)
+		r.input.Skip(graphicsModesAndDataVersionSize)
 	}
 	if r.version >= 32 {
-		r.input.Skip(8)
+		r.input.Skip(defaultAndMaxCameraZoomSize)
 	}
 	if r.version >= 33 {
-		r.input.Skip(4)
+		r.input.Skip(minCameraZoomSize)
 	}
 	if r.version == 39 {
-		r.input.Skip(40)
+		r.input.Skip(unknownScriptSize)
 	}
 }
 
@@ -223,13 +245,13 @@ func (r *reader) readPlayer() Player {
 	var player Player
 	player.ID, player.Controller, player.Race = r.readI32(), r.readI32(), r.readI32()
 	if r.version == 39 {
-		r.input.Skip(4)
+		r.input.Skip(unknownPlayerSize)
 	}
 	player.FixedStart, player.Name, player.X, player.Y = r.readI32(), r.readText(), r.readF32(), r.readF32()
 	if r.version >= 31 {
-		r.input.Skip(16)
+		r.input.Skip(allyStartPrioritiesSize + enemyStartPrioritiesSize)
 	} else {
-		r.input.Skip(8)
+		r.input.Skip(allyStartPrioritiesSize)
 	}
 	return player
 }

@@ -22,6 +22,10 @@ func FindTopLevelGlobals(source string) []string {
 		}
 		open.update(token)
 	}
+	return uniqueNonLocals(defined, locals)
+}
+
+func uniqueNonLocals(defined []string, locals map[string]bool) []string {
 	var globals []string
 	for _, name := range defined {
 		if !locals[name] && !slices.Contains(globals, name) {

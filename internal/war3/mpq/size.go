@@ -29,7 +29,7 @@ func maxArchiveSize(prefix int64, files []fileSize) int64 {
 	var list int64
 	for _, file := range files {
 		total += maxStoredSize(file.size)
-		list += int64(len(file.name)) + 2
+		list += int64(len(file.name) + len(listfileNewline))
 	}
 	entries := len(files) + 1
 	return total + maxStoredSize(list) + int64(hashSlots(entries)+entries)*entryWords*wordSize

@@ -33,38 +33,6 @@ type Fault struct {
 	Offset int
 }
 
-var longSymbols = []string{"...", "..", "//", "<<", ">>", "==", "~=", "<=", ">=", "::"}
-
-const singleSymbols = "+-*/%^#&~|<>=(){}[];:,."
-
-var keywords = map[string]bool{
-	"and": true, "break": true, "do": true, "else": true, "elseif": true, "end": true, "false": true, "for": true,
-	"function": true, "goto": true, "if": true, "in": true, "local": true, "nil": true, "not": true, "or": true,
-	"repeat": true, "return": true, "then": true, "true": true, "until": true, "while": true,
-}
-
-func isSpace(c byte) bool { return strings.IndexByte(fsx.ASCIISpace, c) >= 0 }
-
-func isNameStart(c byte) bool {
-	return c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
-}
-
-func isDigit(c byte) bool { return c >= '0' && c <= '9' }
-
-func isHexDigit(c byte) bool {
-	return isDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
-}
-
-func isNamePart(c byte) bool { return isNameStart(c) || isDigit(c) }
-
-func countPrefix(s string, is func(byte) bool) int {
-	n := 0
-	for n < len(s) && is(s[n]) {
-		n++
-	}
-	return n
-}
-
 func Tokenize(source string) ([]Token, *Fault) {
 	l := &lexer{source: source, line: 1}
 	for l.pos < len(source) {
@@ -283,8 +251,6 @@ func exponentLength(s, letters string) int {
 	return n + digits
 }
 
-func isSign(c byte) bool { return c == '+' || c == '-' }
-
 func continuesNumeral(after string) bool {
 	if after == "" {
 		return false
@@ -299,6 +265,10 @@ func malformedLength(s string) int {
 	}
 	return n
 }
+
+var longSymbols = []string{"...", "..", "//", "<<", ">>", "==", "~=", "<=", ">=", "::"}
+
+const singleSymbols = "+-*/%^#&~|<>=(){}[];:,."
 
 func (l *lexer) readSymbol() {
 	rest := l.source[l.pos:]
@@ -315,39 +285,32 @@ func (l *lexer) readSymbol() {
 	l.pos += size
 }
 
-func simpleTokens(source string) []Token {
-	tokens, _ := Tokenize(source)
-	simple := make([]Token, 0, len(tokens))
-	for _, token := range tokens {
-		switch {
-		case token.Kind == NumberToken:
-		case token.Kind == SymbolToken && strings.Trim(token.Raw, ".") != "":
-			simple = append(simple, splitSymbol(token)...)
-		default:
-			simple = append(simple, token)
-		}
-	}
-	return simple
+var keywords = map[string]bool{
+	"and": true, "break": true, "do": true, "else": true, "elseif": true, "end": true, "false": true, "for": true,
+	"function": true, "goto": true, "if": true, "in": true, "local": true, "nil": true, "not": true, "or": true,
+	"repeat": true, "return": true, "then": true, "true": true, "until": true, "while": true,
 }
 
-func splitSymbol(symbol Token) []Token {
-	var split []Token
-	for offset := 0; offset < len(symbol.Raw); {
-		_, size := utf8.DecodeRuneInString(symbol.Raw[offset:])
-		piece := symbol
-		piece.Raw = symbol.Raw[offset : offset+size]
-		piece.Text = piece.Raw
-		piece.Start = symbol.Start + offset
-		piece.End = piece.Start + size
-		split = append(split, piece)
-		offset += size
-	}
-	return split
+func isSpace(c byte) bool { return strings.IndexByte(fsx.ASCIISpace, c) >= 0 }
+
+func isNameStart(c byte) bool {
+	return c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
 }
 
-func tokenAt(tokens []Token, i int) Token {
-	if i < 0 || i >= len(tokens) {
-		return Token{Kind: SymbolToken}
+func isNamePart(c byte) bool { return isNameStart(c) || isDigit(c) }
+
+func isDigit(c byte) bool { return c >= '0' && c <= '9' }
+
+func isHexDigit(c byte) bool {
+	return isDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
+}
+
+func isSign(c byte) bool { return c == '+' || c == '-' }
+
+func countPrefix(s string, is func(byte) bool) int {
+	n := 0
+	for n < len(s) && is(s[n]) {
+		n++
 	}
-	return tokens[i]
+	return n
 }

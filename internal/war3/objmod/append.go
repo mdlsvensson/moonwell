@@ -11,6 +11,14 @@ import (
 
 const NewFileVersion = 3
 
+const (
+	originalObjectCount = 0
+	newObjectSetCount   = 1
+	newObjectSetFlag    = 0
+)
+
+var emptyEndToken ID
+
 type NewMod struct {
 	Field  ID
 	Level  int32
@@ -44,7 +52,7 @@ func newWriter(parsed *File, source []byte, kind TableKind, added int) *writer {
 	if parsed == nil {
 		w := &writer{version: NewFileVersion, kind: kind}
 		w.out.I32(NewFileVersion)
-		w.out.I32(0)
+		w.out.I32(originalObjectCount)
 		w.out.I32(int32(added))
 		return w
 	}
@@ -60,8 +68,8 @@ func (w *writer) writeObject(object NewObject) {
 	w.out.Write(object.Base[:])
 	w.out.Write(object.ID[:])
 	if w.version >= 3 {
-		w.out.I32(1)
-		w.out.I32(0)
+		w.out.I32(newObjectSetCount)
+		w.out.I32(newObjectSetFlag)
 	}
 	w.out.I32(int32(len(object.Mods)))
 	for _, mod := range object.Mods {
@@ -84,7 +92,7 @@ func (w *writer) writeModification(mod NewMod) {
 	default:
 		w.out.F32(mod.Value.Real)
 	}
-	w.out.I32(0)
+	w.out.Write(emptyEndToken[:])
 }
 
 func checkWritable(objects []NewObject, kind TableKind) error {
