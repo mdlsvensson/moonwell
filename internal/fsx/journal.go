@@ -60,17 +60,17 @@ func (j *Journal) record(path string) error {
 	return nil
 }
 
-func (t journalEntry) restore() error {
-	if t.isUnchanged() {
+func (e journalEntry) restore() error {
+	if e.isUnchanged() {
 		return nil
 	}
-	if !t.existed {
-		return RemoveFile(t.path)
+	if !e.existed {
+		return RemoveFile(e.path)
 	}
-	return os.WriteFile(t.path, t.originalData, 0o666)
+	return os.WriteFile(e.path, e.originalData, 0o666)
 }
 
-func (t journalEntry) isUnchanged() bool {
-	currentData, found, err := ReadFileIfExists(t.path)
-	return err == nil && found == t.existed && bytes.Equal(currentData, t.originalData)
+func (e journalEntry) isUnchanged() bool {
+	currentData, found, err := ReadFileIfExists(e.path)
+	return err == nil && found == e.existed && bytes.Equal(currentData, e.originalData)
 }

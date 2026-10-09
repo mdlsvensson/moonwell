@@ -2,24 +2,10 @@ package mapdir
 
 import (
 	"os"
-	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
-
-func Key(path string) string {
-	return strings.ToLower(toSlash(path))
-}
-
-func toSlash(path string) string { return strings.ReplaceAll(path, `\`, "/") }
-
-func joinPath(dir, name string) string {
-	if dir == "" {
-		return name
-	}
-	return dir + "/" + name
-}
 
 type Folder struct {
 	dir, displayPath string
@@ -94,6 +80,14 @@ func (f *Folder) filePath(key string) (string, bool) {
 	}
 	canonical, ok := f.onDisk.filePaths[key]
 	return canonical, ok
+}
+
+func (f *Folder) dirPath(key string) (string, bool) {
+	if path, ok := f.onDisk.dirPaths[key]; ok {
+		return path, true
+	}
+	path, ok := f.newDirs[key]
+	return path, ok
 }
 
 func (f *Folder) Read(path string) (data []byte, found bool, err error) {

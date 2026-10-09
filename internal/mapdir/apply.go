@@ -28,24 +28,6 @@ func (f *Folder) StageTo(dir string) error {
 	return nil
 }
 
-func (f *Folder) validateChanges() error {
-	for _, change := range f.changes {
-		if _, ok := fsx.CleanRelPath(change.Path); !ok {
-			return errInvalidChangePath(change.Path)
-		}
-		if change.Remove {
-			continue
-		}
-		if dir, ok := f.dirPath(Key(change.Path)); ok {
-			return errChangeIsDir(change.Path, dir)
-		}
-		if file, ok := f.blockingFile(change.Path); ok {
-			return errChangeBlockedByFile(change.Path, f.CanonicalPath(file))
-		}
-	}
-	return nil
-}
-
 func writeChange(dir string, change Change) error {
 	file, err := fsx.SafeJoin(dir, change.Path)
 	if err != nil {
@@ -119,6 +101,24 @@ func (f *Folder) checkUnchangedSinceRead(path, fullPath string) error {
 	}
 	if fsx.SHA256Hex(data) != hash {
 		return errChangedOnDisk(f.DisplayPath(path))
+	}
+	return nil
+}
+
+func (f *Folder) validateChanges() error {
+	for _, change := range f.changes {
+		if _, ok := fsx.CleanRelPath(change.Path); !ok {
+			return errInvalidChangePath(change.Path)
+		}
+		if change.Remove {
+			continue
+		}
+		if dir, ok := f.dirPath(Key(change.Path)); ok {
+			return errChangeIsDir(change.Path, dir)
+		}
+		if file, ok := f.blockingFile(change.Path); ok {
+			return errChangeBlockedByFile(change.Path, f.CanonicalPath(file))
+		}
 	}
 	return nil
 }

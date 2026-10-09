@@ -1,6 +1,8 @@
 package manifest
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Category string
 
@@ -14,26 +16,6 @@ type Objects struct {
 	Abilities OrderedMap[Object] `json:"abilities"`
 	Buffs     OrderedMap[Object] `json:"buffs"`
 	Upgrades  OrderedMap[Object] `json:"upgrades"`
-}
-
-func (o *Objects) pointerTo(category Category) *OrderedMap[Object] {
-	switch category {
-	case "heroes":
-		return &o.Heroes
-	case "units":
-		return &o.Units
-	case "buildings":
-		return &o.Buildings
-	case "items":
-		return &o.Items
-	case "abilities":
-		return &o.Abilities
-	case "buffs":
-		return &o.Buffs
-	case "upgrades":
-		return &o.Upgrades
-	}
-	return nil
 }
 
 func (o Objects) ByCategory(category Category) OrderedMap[Object] {
@@ -62,6 +44,26 @@ func (o *Objects) setSources(file string) {
 			}
 		}
 	}
+}
+
+func (o *Objects) pointerTo(category Category) *OrderedMap[Object] {
+	switch category {
+	case "heroes":
+		return &o.Heroes
+	case "units":
+		return &o.Units
+	case "buildings":
+		return &o.Buildings
+	case "items":
+		return &o.Items
+	case "abilities":
+		return &o.Abilities
+	case "buffs":
+		return &o.Buffs
+	case "upgrades":
+		return &o.Upgrades
+	}
+	return nil
 }
 
 type Object struct {

@@ -10,6 +10,33 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/diag"
 )
 
+func ToSlash(path string) string { return filepath.ToSlash(path) }
+
+func ResolvePath(base, path string) string {
+	if filepath.IsAbs(path) {
+		return filepath.Clean(path)
+	}
+	return filepath.Join(base, path)
+}
+
+func IsWithin(path, dir string) bool {
+	path, errPath := filepath.Abs(path)
+	dir, errDir := filepath.Abs(dir)
+	if errPath != nil || errDir != nil {
+		return false
+	}
+	if onWindows {
+		path, dir = strings.ToLower(path), strings.ToLower(dir)
+	}
+	rel, err := filepath.Rel(dir, path)
+	return err == nil && isInsideRel(rel)
+}
+
+func isInsideRel(rel string) bool {
+	escapes := rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator))
+	return !filepath.IsAbs(rel) && !escapes
+}
+
 var deviceName = regexp.MustCompile(`(?i)^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)`)
 
 func CleanRelPath(value string) (path string, ok bool) {
@@ -36,6 +63,18 @@ func SafeJoin(root, relative string) (string, error) {
 	return joinChecked(root, relative, checkNotSymlink)
 }
 
+func SafeJoinNoSymlinks(root, relative string) (string, error) {
+	fullPath, err := joinChecked(root, relative, checkNotSymlinkPastFile)
+	var diagErr *diag.Error
+	switch {
+	case err == nil:
+		return fullPath, nil
+	case errors.As(err, &diagErr):
+		return "", errPathRefused(relative, diagErr)
+	}
+	return "", errPathUnreachable(relative, err)
+}
+
 func joinChecked(root, relative string, check func(path string) error) (string, error) {
 	fullPath, err := filepath.Abs(root)
 	if err != nil {
@@ -52,18 +91,6 @@ func joinChecked(root, relative string, check func(path string) error) (string, 
 		}
 	}
 	return fullPath, nil
-}
-
-func SafeJoinNoSymlinks(root, relative string) (string, error) {
-	fullPath, err := joinChecked(root, relative, checkNotSymlinkPastFile)
-	var diagErr *diag.Error
-	switch {
-	case err == nil:
-		return fullPath, nil
-	case errors.As(err, &diagErr):
-		return "", errPathRefused(relative, diagErr)
-	}
-	return "", errPathUnreachable(relative, err)
 }
 
 func checkNotSymlinkPastFile(path string) error {

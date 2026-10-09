@@ -70,43 +70,12 @@ func (f *Folder) compactChanges() {
 	}
 }
 
-func parentDirs(path string) []string {
-	var dirs []string
-	for i := range len(path) {
-		if path[i] == '/' {
-			dirs = append(dirs, path[:i])
-		}
-	}
-	return dirs
-}
-
 func (f *Folder) addParentDirs(path string) {
 	for _, dir := range parentDirs(path) {
 		if _, exists := f.newDirs[Key(dir)]; !exists {
 			f.newDirs[Key(dir)] = dir
 		}
 	}
-}
-
-func (f *Folder) dirPath(key string) (string, bool) {
-	if path, ok := f.onDisk.dirPaths[key]; ok {
-		return path, true
-	}
-	path, ok := f.newDirs[key]
-	return path, ok
-}
-
-func (f *Folder) canonicalize(path string) string {
-	path = toSlash(path)
-	if canonical, ok := f.filePath(Key(path)); ok {
-		return canonical
-	}
-	for end := strings.LastIndexByte(path, '/'); end >= 0; end = strings.LastIndexByte(path[:end], '/') {
-		if existingDir, ok := f.dirPath(Key(path[:end])); ok {
-			return existingDir + path[end:]
-		}
-	}
-	return path
 }
 
 func (f *Folder) ResolveNewPath(path string) (string, error) {
@@ -121,6 +90,19 @@ func (f *Folder) ResolveNewPath(path string) (string, error) {
 		return "", errReplacesDir(path, joinPath(f.displayPath, existingDir))
 	}
 	return canonical, nil
+}
+
+func (f *Folder) canonicalize(path string) string {
+	path = toSlash(path)
+	if canonical, ok := f.filePath(Key(path)); ok {
+		return canonical
+	}
+	for end := strings.LastIndexByte(path, '/'); end >= 0; end = strings.LastIndexByte(path[:end], '/') {
+		if existingDir, ok := f.dirPath(Key(path[:end])); ok {
+			return existingDir + path[end:]
+		}
+	}
+	return path
 }
 
 func (f *Folder) blockingFile(path string) (file string, found bool) {

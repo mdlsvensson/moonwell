@@ -41,43 +41,6 @@ func Load(ctx context.Context, e *env.Env, pkl string) (*Project, error) {
 	return DecodeProject(e.Root, file, []byte(output))
 }
 
-func DecodeProject(root, file string, data []byte) (*Project, error) {
-	project := &Project{Root: root, ManifestName: file}
-	if err := json.Unmarshal(data, project); err != nil {
-		return nil, errNotAProject(file, describeDecodeError(err), err)
-	}
-	if missing := project.missingRequiredFields(); len(missing) > 0 {
-		return nil, errNotAProject(file, "it has no "+diag.JoinWords(missing, "and", -1), nil)
-	}
-	project.Objects.setSources(file)
-	return project, nil
-}
-
-func describeDecodeError(err error) string {
-	var typeErr *json.UnmarshalTypeError
-	if !errors.As(err, &typeErr) {
-		return strings.ReplaceAll(err.Error(), "json: ", "")
-	}
-	location := strings.TrimSuffix(err.Error(), typeErr.Error()) + cmp.Or(typeErr.Field, "the value")
-	if number, isNumber := strings.CutPrefix(typeErr.Value, "number "); isNumber {
-		return location + ": " + number + " is no number that fits there"
-	}
-	return location + " is of the wrong kind (" + typeErr.Value + ")"
-}
-
-func (p *Project) missingRequiredFields() []string {
-	var missing []string
-	for _, text := range []struct{ name, value string }{
-		{"map.folder", p.Map.Folder}, {"map.entry", p.Map.Entry}, {"build.folder", p.Build.Folder},
-		{"yue.version", p.Yue.Version},
-	} {
-		if text.value == "" {
-			missing = append(missing, text.name)
-		}
-	}
-	return missing
-}
-
 func IsProject(root string) bool {
 	return fsx.Exists(filepath.Join(root, SharedManifest))
 }
@@ -120,6 +83,43 @@ func evaluateManifest(ctx context.Context, e *env.Env, pkl, file string) (string
 		return "", errNotJSON(file, result.Stdout, err)
 	}
 	return result.Stdout, nil
+}
+
+func DecodeProject(root, file string, data []byte) (*Project, error) {
+	project := &Project{Root: root, ManifestName: file}
+	if err := json.Unmarshal(data, project); err != nil {
+		return nil, errNotAProject(file, describeDecodeError(err), err)
+	}
+	if missing := project.missingRequiredFields(); len(missing) > 0 {
+		return nil, errNotAProject(file, "it has no "+diag.JoinWords(missing, "and", -1), nil)
+	}
+	project.Objects.setSources(file)
+	return project, nil
+}
+
+func (p *Project) missingRequiredFields() []string {
+	var missing []string
+	for _, text := range []struct{ name, value string }{
+		{"map.folder", p.Map.Folder}, {"map.entry", p.Map.Entry}, {"build.folder", p.Build.Folder},
+		{"yue.version", p.Yue.Version},
+	} {
+		if text.value == "" {
+			missing = append(missing, text.name)
+		}
+	}
+	return missing
+}
+
+func describeDecodeError(err error) string {
+	var typeErr *json.UnmarshalTypeError
+	if !errors.As(err, &typeErr) {
+		return strings.ReplaceAll(err.Error(), "json: ", "")
+	}
+	location := strings.TrimSuffix(err.Error(), typeErr.Error()) + cmp.Or(typeErr.Field, "the value")
+	if number, isNumber := strings.CutPrefix(typeErr.Value, "number "); isNumber {
+		return location + ": " + number + " is no number that fits there"
+	}
+	return location + " is of the wrong kind (" + typeErr.Value + ")"
 }
 
 func truncateRunes(text string, limit int) string {

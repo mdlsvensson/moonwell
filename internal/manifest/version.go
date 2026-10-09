@@ -87,10 +87,11 @@ func errNotResolved() error {
 func errVersionMismatch(packageVersion, programVersion string) error {
 	major, minor, _ := strings.Cut(programVersion, ".")
 	minor, _, _ = strings.Cut(minor, ".")
-	move := "se moonwell@" + major + "." + minor + ".x in PklProject and run `pkl project resolve`."
-	hint := "U" + move
+	matchingPackage := "moonwell@" + major + "." + minor + ".x in PklProject and run `pkl project resolve`."
+	hint := "Use " + matchingPackage
 	if hasInstallScript(packageVersion) {
-		hint = "Install Moonwell " + packageVersion + " (" + installCommand(packageVersion) + "), or u" + move
+		hint = "Install Moonwell " + packageVersion + " (" + installCommand(packageVersion) + "), or use " +
+			matchingPackage
 	}
 	return &diag.Error{
 		Msg:  "Pkl package moonwell@" + packageVersion + " does not match Moonwell CLI " + programVersion + ".",

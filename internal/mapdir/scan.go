@@ -17,24 +17,6 @@ type diskIndex struct {
 	dirPaths  map[string]string
 }
 
-func (l *diskIndex) hasFile(path string) bool {
-	_, ok := l.filePaths[Key(path)]
-	return ok
-}
-
-func (l *diskIndex) pathOf(key string) (string, bool) {
-	if path, ok := l.filePaths[key]; ok {
-		return path, true
-	}
-	path, ok := l.dirPaths[key]
-	return path, ok
-}
-
-type walker struct {
-	dir, displayPath string
-	index            *diskIndex
-}
-
 func scanDir(dir, displayPath string) (*diskIndex, error) {
 	if err := checkRealDir(dir, displayPath); err != nil {
 		return nil, err
@@ -61,6 +43,11 @@ func checkRealDir(dir, displayPath string) error {
 	return nil
 }
 
+type walker struct {
+	dir, displayPath string
+	index            *diskIndex
+}
+
 func (w walker) walk(path string) error {
 	entries, err := os.ReadDir(filepath.Join(w.dir, filepath.FromSlash(path)))
 	if err != nil {
@@ -72,11 +59,6 @@ func (w walker) walk(path string) error {
 		}
 	}
 	return nil
-}
-
-func isValidName(name string) bool {
-	_, ok := fsx.CleanRelPath(name)
-	return ok && !strings.Contains(name, `\`)
 }
 
 func (w walker) addEntry(path string, entry fs.DirEntry) error {
@@ -102,6 +84,24 @@ func (w walker) addEntry(path string, entry fs.DirEntry) error {
 		return nil
 	}
 	return errNotRegularFile(joinPath(w.displayPath, path))
+}
+
+func isValidName(name string) bool {
+	_, ok := fsx.CleanRelPath(name)
+	return ok && !strings.Contains(name, `\`)
+}
+
+func (d *diskIndex) pathOf(key string) (string, bool) {
+	if path, ok := d.filePaths[key]; ok {
+		return path, true
+	}
+	path, ok := d.dirPaths[key]
+	return path, ok
+}
+
+func (d *diskIndex) hasFile(path string) bool {
+	_, ok := d.filePaths[Key(path)]
+	return ok
 }
 
 func errNotADir(displayPath string) error {
