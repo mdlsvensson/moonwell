@@ -38,7 +38,7 @@ func readSettingsFile(fullPath, displayPath string, defaults map[string]any) (se
 
 func decodeSettings(settings *viper.Viper, displayPath string, target any) error {
 	if err := settings.UnmarshalExact(target, decodeStrictly); err != nil {
-		return errWrongKind(displayPath, err)
+		return errNotDecoded(displayPath, err)
 	}
 	return nil
 }
@@ -131,7 +131,7 @@ func errSettingsUnreadable(displayPath string, cause error) error {
 	}
 }
 
-func errWrongKind(displayPath string, cause error) error {
+func errNotDecoded(displayPath string, cause error) error {
 	_, lines, hasHeading := strings.Cut(cause.Error(), "\n\n")
 	if !hasHeading {
 		lines = cause.Error()

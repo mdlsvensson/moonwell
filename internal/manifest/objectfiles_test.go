@@ -108,7 +108,7 @@ func TestEvaluateObjectsReportsWhatPklPrintsWhenItFailsAndOutputThatIsNoJSON(t *
 		result env.RunResult
 		want   string
 	}{
-		{"pkl fails", env.RunResult{ExitCode: 1, Stderr: "-- Pkl Error --\nat objects/units.pkl line 5\n"}, "at objects/units.pkl line 5"},
+		{"pkl fails", env.RunResult{ExitCode: 1, Stderr: "-- Pkl Error --\nat ../objects/units.pkl line 5\n"}, "at objects/units.pkl line 5"},
 		{"pkl fails and prints to standard output", env.RunResult{ExitCode: 1, Stdout: "a refusal\n"}, "a refusal"},
 		{"no JSON", env.RunResult{Stdout: "units {}\n"}, "units {}"},
 	} {
@@ -120,7 +120,7 @@ func TestEvaluateObjectsReportsWhatPklPrintsWhenItFailsAndOutputThatIsNoJSON(t *
 			if err == nil {
 				t.Fatal("EvaluateObjects took it")
 			}
-			if diagErr := asDiagError(t, err, "the refusal"); diagErr.File != "objects" || !strings.Contains(diagErr.Msg, tt.want) {
+			if diagErr := asDiagError(t, err, "the refusal"); diagErr.File != "objects" || !strings.Contains(diagErr.Msg, tt.want) || strings.Contains(diagErr.Msg, "../") {
 				t.Errorf("got %q in %q, want %q in objects", diagErr.Msg, diagErr.File, tt.want)
 			}
 		})
@@ -150,7 +150,7 @@ func TestEvaluateObjectsReportsAKeyThatTwoFilesDefineNamingBothWithRealPkl(t *te
 		t.Fatal("EvaluateObjects took a key that two files define")
 	}
 	message := asDiagError(t, err, "the refusal").Msg
-	if !strings.Contains(message, "objects/units.pkl") || !strings.Contains(message, "objects/more.pkl") {
+	if !strings.Contains(message, "objects/units.pkl") || !strings.Contains(message, "objects/more.pkl") || strings.Contains(message, "../objects/") {
 		t.Errorf("got %q, want both files named", message)
 	}
 }

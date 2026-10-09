@@ -35,11 +35,11 @@ type LocalLibrary struct {
 
 type userFile struct {
 	Launch    Launch         `json:"launch"`
-	Yue       yuePath        `json:"yue"`
+	Yue       userYue        `json:"yue"`
 	Libraries []LocalLibrary `json:"libraries"`
 }
 
-type yuePath struct {
+type userYue struct {
 	Path *string `json:"path"`
 }
 
@@ -63,12 +63,12 @@ func ReadUser(e *env.Env) (*User, error) {
 	return &User{File: fullPath, Launch: file.Launch, YuePath: file.Yue.Path, Libraries: file.Libraries}, nil
 }
 
-func (f *userFile) checkRules(fullPath string) error {
+func (u *userFile) checkRules(fullPath string) error {
 	c := &ruleChecker{file: fullPath}
-	c.check(!isSetAndEmpty(f.Launch.GameExecutable), "launch.gameExecutable", "must not be empty")
-	c.check(!isSetAndEmpty(f.Yue.Path), "yue.path", "must not be empty")
+	c.check(!isSetAndEmpty(u.Launch.GameExecutable), "launch.gameExecutable", "must not be empty")
+	c.check(!isSetAndEmpty(u.Yue.Path), "yue.path", "must not be empty")
 	seen := map[string]bool{}
-	for index, library := range f.Libraries {
+	for index, library := range u.Libraries {
 		setting := fmt.Sprintf("libraries[%d]", index)
 		c.check(gitHubRepoName.MatchString(library.GitHub), setting+".github", `must be a repository as "owner/repo"`)
 		c.check(!seen[strings.ToLower(library.GitHub)], setting+".github",

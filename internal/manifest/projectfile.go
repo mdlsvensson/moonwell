@@ -27,14 +27,14 @@ var machineSettings = []string{"launch", "yue.path"}
 type projectFile struct {
 	Map       Map             `json:"map"`
 	Build     Build           `json:"build"`
-	Yue       yueVersion      `json:"yue"`
+	Yue       projectYue      `json:"yue"`
 	Assets    assetsFile      `json:"assets"`
 	Lint      Lint            `json:"lint"`
 	Libraries []libraryEntry  `json:"libraries"`
 	Settings  mapSettingsFile `json:"settings"`
 }
 
-type yueVersion struct {
+type projectYue struct {
 	Version string `json:"version"`
 }
 
@@ -106,23 +106,23 @@ func ReadProject(e *env.Env) (*Project, error) {
 	return file.toProject(e.Root), nil
 }
 
-func (f *projectFile) checkRules() error {
+func (p *projectFile) checkRules() error {
 	c := &ruleChecker{file: ProjectFile}
-	c.check(strings.HasSuffix(f.Map.Folder, ".w3x") && isRelativeDir(f.Map.Folder), "map.folder",
+	c.check(strings.HasSuffix(p.Map.Folder, ".w3x") && isRelativeDir(p.Map.Folder), "map.folder",
 		`must be a relative path without ".." that ends in ".w3x"`)
-	c.check(strings.HasPrefix(f.Map.Entry, "src/") && strings.HasSuffix(f.Map.Entry, ".yue"), "map.entry",
+	c.check(strings.HasPrefix(p.Map.Entry, "src/") && strings.HasSuffix(p.Map.Entry, ".yue"), "map.entry",
 		`must start with "src/" and end in ".yue"`)
-	c.check(isRelativeDir(f.Build.Folder), "build.folder", `must be a relative path without ".."`)
-	c.check(!isReservedDir(f.Build.Folder), "build.folder", "must not be maps, src or dist/stage, or a folder below one")
-	c.check(threeNumbers.MatchString(f.Yue.Version), "yue.version", `must be three numbers with dots, such as "`+DefaultYueVersion+`"`)
-	f.Assets.checkRules(c)
-	c.check(f.Lint.UnknownGlobals == "error" || f.Lint.UnknownGlobals == "warning", "lint.unknownGlobals",
+	c.check(isRelativeDir(p.Build.Folder), "build.folder", `must be a relative path without ".."`)
+	c.check(!isReservedDir(p.Build.Folder), "build.folder", "must not be maps, src or dist/stage, or a folder below one")
+	c.check(threeNumbers.MatchString(p.Yue.Version), "yue.version", `must be three numbers with dots, such as "`+DefaultYueVersion+`"`)
+	p.Assets.checkRules(c)
+	c.check(p.Lint.UnknownGlobals == "error" || p.Lint.UnknownGlobals == "warning", "lint.unknownGlobals",
 		`must be "error" or "warning"`)
-	for index, global := range f.Lint.Globals {
+	for index, global := range p.Lint.Globals {
 		c.check(isLuaName(global), fmt.Sprintf("lint.globals[%d]", index), "must be a Lua name and no reserved word")
 	}
-	checkLibraryEntries(c, f.Libraries)
-	f.Settings.checkRules(c)
+	checkLibraryEntries(c, p.Libraries)
+	p.Settings.checkRules(c)
 	return c.err
 }
 
@@ -163,42 +163,42 @@ var (
 )
 
 const (
-	lastSlot        = 23
-	farthestMapUnit = 10000000
+	lastSlot         = 23
+	maxMapCoordinate = 10000000
 )
 
-func (s mapSettingsFile) checkRules(c *ruleChecker) {
-	c.checkText(s.Info.Name, "settings.info.name")
-	c.checkText(s.Info.Author, "settings.info.author")
-	c.checkText(s.Info.Description, "settings.info.description")
-	c.checkText(s.Info.RecommendedPlayers, "settings.info.recommendedPlayers")
-	c.checkText(s.Info.Preview, "settings.info.preview")
-	c.check(!isSetAndEmpty(s.Info.Preview), "settings.info.preview", "must not be empty")
-	c.check(s.LoadingScreen.Background == nil || *s.LoadingScreen.Background >= -1, "settings.loadingScreen.background",
+func (m mapSettingsFile) checkRules(c *ruleChecker) {
+	c.checkText(m.Info.Name, "settings.info.name")
+	c.checkText(m.Info.Author, "settings.info.author")
+	c.checkText(m.Info.Description, "settings.info.description")
+	c.checkText(m.Info.RecommendedPlayers, "settings.info.recommendedPlayers")
+	c.checkText(m.Info.Preview, "settings.info.preview")
+	c.check(!isSetAndEmpty(m.Info.Preview), "settings.info.preview", "must not be empty")
+	c.check(m.LoadingScreen.Background == nil || *m.LoadingScreen.Background >= -1, "settings.loadingScreen.background",
 		"must be -1 or more")
-	c.checkText(s.LoadingScreen.Model, "settings.loadingScreen.model")
-	c.checkText(s.LoadingScreen.Text, "settings.loadingScreen.text")
-	c.checkText(s.LoadingScreen.Title, "settings.loadingScreen.title")
-	c.checkText(s.LoadingScreen.Subtitle, "settings.loadingScreen.subtitle")
-	c.check(isWithin(s.Gameplay.HeroMaxLevel, 1, 10000), "settings.gameplay.heroMaxLevel", "must be 1 to 10000")
-	c.check(isWithin(s.Gameplay.FoodLimit, 0, 300), "settings.gameplay.foodLimit", "must be 0 to 300")
-	checkPlayerEntries(c, s.Players)
-	checkForceEntries(c, s.Forces)
-	s.Environment.checkRules(c)
-	checkConstantEntries(c, s.GameplayConstants, "settings.gameplayConstants")
-	checkConstantEntries(c, s.GameInterface, "settings.gameInterface")
+	c.checkText(m.LoadingScreen.Model, "settings.loadingScreen.model")
+	c.checkText(m.LoadingScreen.Text, "settings.loadingScreen.text")
+	c.checkText(m.LoadingScreen.Title, "settings.loadingScreen.title")
+	c.checkText(m.LoadingScreen.Subtitle, "settings.loadingScreen.subtitle")
+	c.check(isWithin(m.Gameplay.HeroMaxLevel, 1, 10000), "settings.gameplay.heroMaxLevel", "must be 1 to 10000")
+	c.check(isWithin(m.Gameplay.FoodLimit, 0, 300), "settings.gameplay.foodLimit", "must be 0 to 300")
+	checkPlayerEntries(c, m.Players)
+	checkForceEntries(c, m.Forces)
+	m.Environment.checkRules(c)
+	checkConstantEntries(c, m.GameplayConstants, "settings.gameplayConstants")
+	checkConstantEntries(c, m.GameInterface, "settings.gameInterface")
 }
 
 func checkPlayerEntries(c *ruleChecker, players []playerEntry) {
 	seen := map[int]bool{}
 	for index, player := range players {
 		setting := fmt.Sprintf("settings.players[%d]", index)
-		checkSlot(c, player.Slot, seen, setting+".slot")
+		checkEntryNumber(c, player.Slot, seen, setting+".slot")
 		c.checkText(player.Name, setting+".name")
 		c.checkOneOf(player.Controller, controllers, setting+".controller")
 		c.checkOneOf(player.Race, races, setting+".race")
-		c.check(isWithin(player.X, -farthestMapUnit, farthestMapUnit), setting+".x", "must be within -10000000 and 10000000")
-		c.check(isWithin(player.Y, -farthestMapUnit, farthestMapUnit), setting+".y", "must be within -10000000 and 10000000")
+		c.check(isWithin(player.X, -maxMapCoordinate, maxMapCoordinate), setting+".x", "must be within -10000000 and 10000000")
+		c.check(isWithin(player.Y, -maxMapCoordinate, maxMapCoordinate), setting+".y", "must be within -10000000 and 10000000")
 	}
 }
 
@@ -206,12 +206,12 @@ func checkForceEntries(c *ruleChecker, forces []forceEntry) {
 	seen := map[int]bool{}
 	for index, force := range forces {
 		setting := fmt.Sprintf("settings.forces[%d]", index)
-		checkSlot(c, force.Index, seen, setting+".index")
+		checkEntryNumber(c, force.Index, seen, setting+".index")
 		c.checkText(force.Name, setting+".name")
 	}
 }
 
-func checkSlot(c *ruleChecker, slot *int, seen map[int]bool, setting string) {
+func checkEntryNumber(c *ruleChecker, slot *int, seen map[int]bool, setting string) {
 	c.check(slot != nil, setting, "is missing")
 	if slot == nil {
 		return
@@ -224,9 +224,9 @@ func checkSlot(c *ruleChecker, slot *int, seen map[int]bool, setting string) {
 func (e Environment) checkRules(c *ruleChecker) {
 	c.checkText(e.SoundEnvironment, "settings.environment.soundEnvironment")
 	c.check(isWithin(e.Fog.Style, 0, 2), "settings.environment.fog.style", "must be 0, 1 or 2")
-	c.check(isWithin(e.Fog.Start, -farthestMapUnit, farthestMapUnit), "settings.environment.fog.start",
+	c.check(isWithin(e.Fog.Start, -maxMapCoordinate, maxMapCoordinate), "settings.environment.fog.start",
 		"must be within -10000000 and 10000000")
-	c.check(isWithin(e.Fog.End, -farthestMapUnit, farthestMapUnit), "settings.environment.fog.end",
+	c.check(isWithin(e.Fog.End, -maxMapCoordinate, maxMapCoordinate), "settings.environment.fog.end",
 		"must be within -10000000 and 10000000")
 	c.check(isWithin(e.Fog.Density, 0, 1), "settings.environment.fog.density", "must be 0 to 1")
 }
@@ -246,37 +246,37 @@ func checkConstantEntries(c *ruleChecker, constants []constantEntry, list string
 	}
 }
 
-func (f *projectFile) toProject(root string) *Project {
+func (p *projectFile) toProject(root string) *Project {
 	project := &Project{
 		Root:         root,
 		ManifestName: ProjectFile,
-		Map:          f.Map,
-		Build:        f.Build,
-		Yue:          Yue{Version: f.Yue.Version},
-		Assets:       Assets{Exclude: f.Assets.Exclude},
-		Lint:         f.Lint,
+		Map:          p.Map,
+		Build:        p.Build,
+		Yue:          Yue{Version: p.Yue.Version},
+		Assets:       Assets{Exclude: p.Assets.Exclude},
+		Lint:         p.Lint,
 		Libraries:    map[string]Library{},
 		Settings: Settings{
-			Info:              f.Settings.Info,
-			LoadingScreen:     f.Settings.LoadingScreen,
+			Info:              p.Settings.Info,
+			LoadingScreen:     p.Settings.LoadingScreen,
 			Players:           map[int]Player{},
 			Forces:            map[int]Force{},
-			Environment:       f.Settings.Environment,
-			Gameplay:          f.Settings.Gameplay,
-			GameplayConstants: groupBySection(f.Settings.GameplayConstants),
-			GameInterface:     groupBySection(f.Settings.GameInterface),
+			Environment:       p.Settings.Environment,
+			Gameplay:          p.Settings.Gameplay,
+			GameplayConstants: groupBySection(p.Settings.GameplayConstants),
+			GameInterface:     groupBySection(p.Settings.GameInterface),
 		},
 	}
-	for _, entry := range f.Assets.Paths {
+	for _, entry := range p.Assets.Paths {
 		project.Assets.Paths.Set(entry.File, entry.Path)
 	}
-	for _, library := range f.Libraries {
+	for _, library := range p.Libraries {
 		project.Libraries[library.Name] = Library{GitHub: library.GitHub, Tag: library.Tag, Path: library.Path, Dir: library.Dir}
 	}
-	for _, player := range f.Settings.Players {
+	for _, player := range p.Settings.Players {
 		project.Settings.Players[*player.Slot] = player.Player
 	}
-	for _, force := range f.Settings.Forces {
+	for _, force := range p.Settings.Forces {
 		project.Settings.Forces[*force.Index] = force.Force
 	}
 	return project

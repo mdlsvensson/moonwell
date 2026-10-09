@@ -96,6 +96,7 @@ func errObjectsDirUnreadable(cause error) error {
 }
 
 func errObjectsNotEvaluated(output string) error {
+	output = strings.ReplaceAll(output, "../"+ObjectsDir+"/", ObjectsDir+"/")
 	return &diag.Error{Msg: "Evaluating the object files failed:\n" + fsx.TrimASCIISpace(output), File: ObjectsDir}
 }
 

@@ -13,18 +13,18 @@ type ruleChecker struct {
 	err  error
 }
 
-func (c *ruleChecker) check(holds bool, setting, rule string) {
-	if c.err == nil && !holds {
-		c.err = errBrokenRule(c.file, setting, rule)
+func (r *ruleChecker) check(holds bool, setting, rule string) {
+	if r.err == nil && !holds {
+		r.err = errBrokenRule(r.file, setting, rule)
 	}
 }
 
-func (c *ruleChecker) checkText(text *string, setting string) {
-	c.check(text == nil || !strings.Contains(*text, "\x00"), setting, "must not hold a NUL character")
+func (r *ruleChecker) checkText(text *string, setting string) {
+	r.check(text == nil || !strings.Contains(*text, "\x00"), setting, "must not hold a NUL character")
 }
 
-func (c *ruleChecker) checkOneOf(text *string, allowed []string, setting string) {
-	c.check(text == nil || slices.Contains(allowed, *text), setting, "must be one of "+diag.JoinWords(quoteAll(allowed), "or", -1))
+func (r *ruleChecker) checkOneOf(text *string, allowed []string, setting string) {
+	r.check(text == nil || slices.Contains(allowed, *text), setting, "must be one of "+diag.JoinWords(quoteAll(allowed), "or", -1))
 }
 
 func quoteAll(words []string) []string {
