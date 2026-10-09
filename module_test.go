@@ -13,12 +13,24 @@ import (
 )
 
 var dependencies = []string{
+	"github.com/fsnotify/fsnotify",
+	"github.com/go-viper/mapstructure/v2",
 	"github.com/inconshreveable/mousetrap",
+	"github.com/pelletier/go-toml/v2",
+	"github.com/sagikazarmark/locafero",
+	"github.com/sourcegraph/conc",
+	"github.com/spf13/afero",
+	"github.com/spf13/cast",
 	"github.com/spf13/cobra",
 	"github.com/spf13/pflag",
+	"github.com/spf13/viper",
+	"github.com/subosito/gotenv",
+	"go.yaml.in/yaml/v3",
+	"golang.org/x/sys",
+	"golang.org/x/text",
 }
 
-func TestTheModuleDependsOnCobraAloneAndUsesNoCgo(t *testing.T) {
+func TestTheModuleDependsOnCobraAndViperAndUsesNoCgo(t *testing.T) {
 	mod, err := os.ReadFile("go.mod")
 	if err != nil {
 		t.Fatal(err)

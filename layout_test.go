@@ -41,6 +41,12 @@ var (
 	commandLineModules = []string{
 		"github.com/spf13/cobra", "github.com/spf13/pflag", "github.com/inconshreveable/mousetrap",
 	}
+	settingsFileModules = []string{
+		"github.com/spf13/viper", "github.com/go-viper/mapstructure/v2", "github.com/pelletier/go-toml/v2",
+		"github.com/fsnotify/fsnotify", "github.com/sagikazarmark/locafero", "github.com/sourcegraph/conc",
+		"github.com/spf13/afero", "github.com/spf13/cast", "github.com/subosito/gotenv", "go.yaml.in/yaml/v3",
+		"golang.org/x/sys", "golang.org/x/text",
+	}
 	generatorImports  = []string{"objects", "script", "assets", "manifest", "fsx"}
 	parserTestImports = []string{"fsx"}
 )
@@ -114,7 +120,15 @@ func packageBelow(file, top string) (string, bool) {
 func isParser(tool string) bool { return path.Dir(tool) == "gen" }
 
 var rules = []func(f goFile, target string) string{
-	ruleOutsideWorldOnlyInEnv, ruleCommandLineOnlyInCli, ruleCommandsImportOnlyCli, ruleImportsGoDownShelves, ruleOnlyToolsImportTools, ruleToolImports,
+	ruleOutsideWorldOnlyInEnv, ruleCommandLineOnlyInCli, ruleSettingsFilesOnlyInManifest, ruleCommandsImportOnlyCli, ruleImportsGoDownShelves, ruleOnlyToolsImportTools, ruleToolImports,
+}
+
+func ruleSettingsFilesOnlyInManifest(f goFile, target string) string {
+	isSettingsFileModule := slices.ContainsFunc(settingsFileModules, func(m string) bool { return target == m || strings.HasPrefix(target, m+"/") })
+	if !isSettingsFileModule || f.onShelf && f.pkg == "manifest" {
+		return ""
+	}
+	return fmt.Sprintf("%s imports %s; only manifest reads the settings files", f.path, target)
 }
 
 func ruleCommandLineOnlyInCli(f goFile, target string) string {
@@ -321,6 +335,30 @@ func TestTheWalkLetsOnlyCliReadTheCommandLine(t *testing.T) {
 		"internal/testkit/lines.go imports "+cobra+"; only cli reads the command line",
 		"internal/war3/mpq/flags.go imports "+pflag+"; only cli reads the command line",
 		"internal/fsx/explorer.go imports github.com/inconshreveable/mousetrap; only cli reads the command line",
+	)
+}
+
+func TestTheWalkLetsOnlyManifestReadTheSettingsFiles(t *testing.T) {
+	const viper, decoder, toml = "github.com/spf13/viper", "github.com/go-viper/mapstructure/v2", "github.com/pelletier/go-toml/v2"
+	checkWalk(t, map[string]string{
+		"internal/manifest/read.go":      goFileImporting("manifest", viper, decoder, toml),
+		"internal/manifest/read_test.go": goFileImporting("manifest", viper),
+		"internal/cli/cli.go":            goFileImporting("cli", viper),
+		"internal/build/build.go":        goFileImporting("build", decoder),
+		"internal/settings/plan_test.go": goFileImporting("settings", toml+"/unstable"),
+		"internal/env/env.go":            goFileImporting("env", "github.com/spf13/afero"),
+		"internal/script/vipers.go":      goFileImporting("script", "github.com/spf13/viperfish"),
+		"internal/testkit/files.go":      goFileImporting("testkit", "go.yaml.in/yaml/v3"),
+		"cmd/moonwell/main.go":           goFileImporting("main", "golang.org/x/sys/windows"),
+		"tools/gen/main.go":              goFileImporting("main", viper),
+	},
+		"internal/cli/cli.go imports "+viper+"; only manifest reads the settings files",
+		"internal/build/build.go imports "+decoder+"; only manifest reads the settings files",
+		"internal/settings/plan_test.go imports "+toml+"/unstable; only manifest reads the settings files",
+		"internal/env/env.go imports github.com/spf13/afero; only manifest reads the settings files",
+		"internal/testkit/files.go imports go.yaml.in/yaml/v3; only manifest reads the settings files",
+		"cmd/moonwell/main.go imports golang.org/x/sys/windows; only manifest reads the settings files",
+		"tools/gen/main.go imports "+viper+"; only manifest reads the settings files",
 	)
 }
 
