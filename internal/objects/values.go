@@ -13,84 +13,84 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/objmod"
 )
 
-func (s *objectResolver) toValue(field *FieldMeta, value any, path string) (Value, bool) {
+func (r *objectResolver) toValue(field *FieldMeta, value any, path string) (Value, bool) {
 	switch {
 	case field.List:
-		return s.toListValue(field, value, path)
+		return r.toListValue(field, value, path)
 	case field.Storage == "int":
-		return s.toIntValue(field, value, path)
+		return r.toIntValue(field, value, path)
 	case field.Storage == "real" || field.Storage == "unreal":
-		return s.toRealValue(field, value, path)
+		return r.toRealValue(field, value, path)
 	}
-	return s.toTextValue(field, value, path)
+	return r.toTextValue(field, value, path)
 }
 
-func (s *objectResolver) toListValue(field *FieldMeta, value any, path string) (Value, bool) {
+func (r *objectResolver) toListValue(field *FieldMeta, value any, path string) (Value, bool) {
 	if text, isText := value.(string); isText {
-		return s.toTextValue(field, text, path)
+		return r.toTextValue(field, text, path)
 	}
 	entries, isList := value.([]any)
 	if !isList {
-		s.report(path, errWrongType("a string or a List<String>", value, field))
+		r.report(path, errWrongType("a string or a List<String>", value, field))
 		return Value{}, false
 	}
 	parts, storable := make([]string, len(entries)), true
 	for i, entry := range entries {
-		text, ok := s.toTextValue(field, entry, fmt.Sprintf("%s[%d]", path, i))
+		text, ok := r.toTextValue(field, entry, fmt.Sprintf("%s[%d]", path, i))
 		parts[i], storable = text.Text, storable && ok
 	}
 	return Value{Type: objmod.String, Text: strings.Join(parts, ",")}, storable
 }
 
-func (s *objectResolver) toIntValue(field *FieldMeta, value any, path string) (Value, bool) {
-	if truth, isBool := value.(bool); isBool {
-		if truth {
+func (r *objectResolver) toIntValue(field *FieldMeta, value any, path string) (Value, bool) {
+	if flag, isBool := value.(bool); isBool {
+		if flag {
 			return Value{Type: objmod.Int, Number: 1}, true
 		}
 		return Value{Type: objmod.Int}, true
 	}
-	whole, isNumber := value.(float64)
+	number, isNumber := value.(float64)
 	switch {
-	case !isNumber || whole != math.Trunc(whole) || math.IsInf(whole, 0):
+	case !isNumber || number != math.Trunc(number) || math.IsInf(number, 0):
 		expected := "an integer"
 		if field.Type == "bool" {
 			expected = "a Boolean"
 		}
-		s.report(path, errWrongType(expected, value, field))
-	case whole < math.MinInt32 || whole > math.MaxInt32:
-		s.report(path, errOutOfRange(whole, "an integer", field))
+		r.report(path, errWrongType(expected, value, field))
+	case number < math.MinInt32 || number > math.MaxInt32:
+		r.report(path, errOutOfRange(number, "an integer", field))
 	default:
-		return Value{Type: objmod.Int, Number: float64(int32(whole))}, true
+		return Value{Type: objmod.Int, Number: float64(int32(number))}, true
 	}
 	return Value{}, false
 }
 
-func (s *objectResolver) toRealValue(field *FieldMeta, value any, path string) (Value, bool) {
-	amount, isNumber := value.(float64)
+func (r *objectResolver) toRealValue(field *FieldMeta, value any, path string) (Value, bool) {
+	number, isNumber := value.(float64)
 	switch {
 	case !isNumber:
-		s.report(path, errWrongType("a number", value, field))
-	case math.IsNaN(amount) || math.Abs(amount) > math.MaxFloat32:
-		s.report(path, errOutOfRange(amount, "a real number", field))
+		r.report(path, errWrongType("a number", value, field))
+	case math.IsNaN(number) || math.Abs(number) > math.MaxFloat32:
+		r.report(path, errOutOfRange(number, "a real number", field))
 	default:
-		kind := objmod.Unreal
+		valueType := objmod.Unreal
 		if field.Storage == "real" {
-			kind = objmod.Real
+			valueType = objmod.Real
 		}
-		return Value{Type: kind, Number: amount}, true
+		return Value{Type: valueType, Number: number}, true
 	}
 	return Value{}, false
 }
 
-func (s *objectResolver) toTextValue(field *FieldMeta, value any, path string) (Value, bool) {
+func (r *objectResolver) toTextValue(field *FieldMeta, value any, path string) (Value, bool) {
 	text, isText := value.(string)
 	switch {
 	case !isText:
-		s.report(path, errWrongType("a string", value, field))
+		r.report(path, errWrongType("a string", value, field))
 	case strings.Contains(text, "\x00"):
-		s.report(path, errHasNUL())
+		r.report(path, errHasNUL())
 	case !utf8.ValidString(text):
-		s.report(path, errNotUTF8())
+		r.report(path, errNotUTF8())
 	default:
 		return Value{Type: objmod.String, Text: text}, true
 	}
@@ -130,25 +130,25 @@ func formatValue(value any) string {
 	return fmt.Sprint(value)
 }
 
-func storageName(field *FieldMeta) string {
-	kind := map[string]string{"int": "an integer", "real": "a real number", "unreal": "a real number"}[field.Storage]
+func describeStorage(field *FieldMeta) string {
+	storage := map[string]string{"int": "an integer", "real": "a real number", "unreal": "a real number"}[field.Storage]
 	switch {
 	case field.List:
-		kind = "a comma-separated list"
+		storage = "a comma-separated list"
 	case field.Storage == "int" && field.Type == "bool":
-		kind = "a Boolean (1 or 0)"
-	case kind == "":
-		kind = "a string"
+		storage = "a Boolean (1 or 0)"
+	case storage == "":
+		storage = "a string"
 	}
-	return describeField(field) + " is stored as " + kind + "."
+	return describeField(field) + " is stored as " + storage + "."
 }
 
 func errWrongType(expected string, value any, field *FieldMeta) issue {
-	return issue{"expected " + expected + ", got " + formatValue(value) + ".", storageName(field)}
+	return issue{"expected " + expected + ", got " + formatValue(value) + ".", describeStorage(field)}
 }
 
 func errOutOfRange(value float64, kind string, field *FieldMeta) issue {
-	return issue{formatNumber(value) + " is out of range for " + kind + ".", storageName(field)}
+	return issue{formatNumber(value) + " is out of range for " + kind + ".", describeStorage(field)}
 }
 
 func errHasNUL() issue {

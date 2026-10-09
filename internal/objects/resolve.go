@@ -32,12 +32,12 @@ type Resolved struct {
 }
 
 func Resolve(metadata *Metadata, objects manifest.Objects, existing map[string]bool) ([]Resolved, error) {
-	r := &resolver{metadata: metadata, existing: existing, idOwners: map[string]owner{}}
+	r := &resolver{metadata: metadata, existing: existing, idOwners: map[string]idOwner{}}
 	resolved := []Resolved{}
 	for _, category := range manifest.Categories {
 		for key, object := range objects.ByCategory(category).All() {
-			if one, ok := r.resolveObject(category, key, object); ok {
-				resolved = append(resolved, one)
+			if resolvedObject, ok := r.resolveObject(category, key, object); ok {
+				resolved = append(resolved, resolvedObject)
 			}
 		}
 	}
@@ -50,11 +50,26 @@ func Resolve(metadata *Metadata, objects manifest.Objects, existing map[string]b
 type resolver struct {
 	metadata *Metadata
 	existing map[string]bool
-	idOwners map[string]owner
+	idOwners map[string]idOwner
 	problems diag.Problems
 }
 
-type owner struct{ path, source string }
+type idOwner struct{ path, source string }
+
+func (r *resolver) resolveObject(category manifest.Category, key string, object manifest.Object) (Resolved, bool) {
+	path := string(category) + "[" + fsx.QuoteJSON(key) + "]"
+	objResolver := &objectResolver{resolver: r, category: category, path: path, object: object}
+	objResolver.checkID()
+	objResolver.claimID()
+	base, known := r.metadata.Bases[category][object.Base]
+	if !known {
+		objResolver.report(".base", errNotABase(r.metadata, category, object.Base))
+		return Resolved{}, false
+	}
+	return Resolved{
+		Category: category, Key: key, ID: object.ID, Base: object.Base, Source: object.Source, Fields: objResolver.resolveFields(base),
+	}, true
+}
 
 type objectResolver struct {
 	*resolver
@@ -65,53 +80,39 @@ type objectResolver struct {
 
 type issue struct{ msg, hint string }
 
-func (s *objectResolver) report(path string, found issue) {
-	s.problems = append(s.problems, diag.Problem{
-		File: s.object.Source, Msg: s.path + path + ": " + found.msg, Hint: found.hint,
+func (r *objectResolver) report(path string, found issue) {
+	r.problems = append(r.problems, diag.Problem{
+		File: r.object.Source, Msg: r.path + path + ": " + found.msg, Hint: found.hint,
 	})
 }
 
-func (r *resolver) resolveObject(category manifest.Category, key string, object manifest.Object) (Resolved, bool) {
-	s := &objectResolver{resolver: r, category: category, path: string(category) + "[" + fsx.QuoteJSON(key) + "]", object: object}
-	s.checkID()
-	s.claimID()
-	base, known := r.metadata.Bases[category][object.Base]
-	if !known {
-		s.report(".base", errNotABase(r.metadata, category, object.Base))
-		return Resolved{}, false
-	}
-	return Resolved{
-		Category: category, Key: key, ID: object.ID, Base: object.Base, Source: object.Source, Fields: s.resolveFields(base),
-	}, true
-}
-
-func (s *objectResolver) checkID() {
-	id := s.object.ID
+func (r *objectResolver) checkID() {
+	id := r.object.ID
 	if !isFourLettersOrDigits(id) {
-		s.report(".id", errNotAnID(id, s.category))
+		r.report(".id", errNotAnID(id, r.category))
 		return
 	}
 	startsUppercase := id[0] >= 'A' && id[0] <= 'Z'
 	switch {
-	case s.category == "heroes" && !startsUppercase:
-		s.report(".id", errNotAHeroID(id))
-	case (s.category == "units" || s.category == "buildings") && startsUppercase:
-		s.report(".id", errHeroID(id, s.category))
+	case r.category == "heroes" && !startsUppercase:
+		r.report(".id", errNotAHeroID(id))
+	case (r.category == "units" || r.category == "buildings") && startsUppercase:
+		r.report(".id", errHeroID(id, r.category))
 	}
-	if category, standard, found := s.metadata.BaseOf(id); found {
-		s.report(".id", errStandardID(id, category, standard))
+	if category, standard, found := r.metadata.BaseOf(id); found {
+		r.report(".id", errStandardID(id, category, standard))
 	}
-	if s.existing[id] {
-		s.report(".id", errIDInTheMap(id))
+	if r.existing[id] {
+		r.report(".id", errIDInTheMap(id))
 	}
 }
 
-func (s *objectResolver) claimID() {
-	if first, taken := s.idOwners[s.object.ID]; taken {
-		s.report(".id", errIDTwice(s.object.ID, first))
+func (r *objectResolver) claimID() {
+	if first, taken := r.idOwners[r.object.ID]; taken {
+		r.report(".id", errIDTwice(r.object.ID, first))
 		return
 	}
-	s.idOwners[s.object.ID] = owner{s.path, s.object.Source}
+	r.idOwners[r.object.ID] = idOwner{r.path, r.object.Source}
 }
 
 func isFourLettersOrDigits(id string) bool {
@@ -173,7 +174,7 @@ func errIDInTheMap(id string) issue {
 	}
 }
 
-func errIDTwice(id string, first owner) issue {
+func errIDTwice(id string, first idOwner) issue {
 	return issue{
 		"'" + id + "' is also the id of " + first.path + " (" + first.source + ").",
 		"Give each object its own id.",

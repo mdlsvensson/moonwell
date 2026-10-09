@@ -11,120 +11,124 @@ import (
 )
 
 func EvalJSON(resolved []Resolved) []byte {
-	var p jsonWriter
-	p.openBracket('{')
+	var w jsonWriter
+	w.openBracket('{')
 	for _, category := range manifest.Categories {
-		p.writeKey(string(category))
-		p.openBracket('{')
+		w.writeKey(string(category))
+		w.openBracket('{')
 		for _, object := range resolved {
 			if object.Category == category {
-				p.writeKey(object.Key)
-				p.writeObject(object)
+				w.writeKey(object.Key)
+				w.writeObject(object)
 			}
 		}
-		p.closeBracket('}')
+		w.closeBracket('}')
 	}
-	p.closeBracket('}')
-	return p.out.Bytes()
+	w.closeBracket('}')
+	return w.out.Bytes()
 }
 
-func (p *jsonWriter) writeObject(object Resolved) {
-	p.openBracket('{')
-	p.writeString("id", object.ID)
-	p.writeString("base", object.Base)
-	p.writeString("source", object.Source)
-	p.writeKey("fields")
-	p.openBracket('[')
+type jsonWriter struct {
+	out     bytes.Buffer
+	depth   int
+	isEmpty bool
+}
+
+func (w *jsonWriter) writeObject(object Resolved) {
+	w.openBracket('{')
+	w.writeString("id", object.ID)
+	w.writeString("base", object.Base)
+	w.writeString("source", object.Source)
+	w.writeKey("fields")
+	w.openBracket('[')
 	for _, field := range object.Fields {
-		p.startMember()
-		p.writeField(field)
+		w.startMember()
+		w.writeField(field)
 	}
-	p.closeBracket(']')
-	p.closeBracket('}')
+	w.closeBracket(']')
+	w.closeBracket('}')
 }
 
 var typeNames = map[objmod.ValueType]string{
 	objmod.Int: "int", objmod.Real: "real", objmod.Unreal: "unreal", objmod.String: "string",
 }
 
-func (p *jsonWriter) writeField(field Field) {
-	p.openBracket('{')
-	p.writeString("rawcode", field.ID)
-	p.writeString("name", field.Name)
-	p.writeNumber("level", float64(field.Level))
-	p.writeNumber("column", float64(field.Column))
-	p.writeBool("skin", field.Skin)
-	p.writeString("type", typeNames[field.Value.Type])
+func (w *jsonWriter) writeField(field Field) {
+	w.openBracket('{')
+	w.writeString("rawcode", field.ID)
+	w.writeString("name", field.Name)
+	w.writeNumber("level", float64(field.Level))
+	w.writeNumber("column", float64(field.Column))
+	w.writeBool("skin", field.Skin)
+	w.writeString("type", typeNames[field.Value.Type])
 	if field.Value.Type == objmod.String {
-		p.writeString("value", field.Value.Text)
+		w.writeString("value", field.Value.Text)
 	} else {
-		p.writeNumber("value", field.Value.Number)
+		w.writeNumber("value", field.Value.Number)
 	}
-	p.closeBracket('}')
+	w.closeBracket('}')
 }
 
-type jsonWriter struct {
-	out   bytes.Buffer
-	depth int
-	bare  bool
+func (w *jsonWriter) openBracket(bracket byte) {
+	w.out.WriteByte(bracket)
+	w.depth++
+	w.isEmpty = true
 }
 
-func (p *jsonWriter) openBracket(bracket byte) {
-	p.out.WriteByte(bracket)
-	p.depth++
-	p.bare = true
-}
-
-func (p *jsonWriter) closeBracket(bracket byte) {
-	p.depth--
-	if !p.bare {
-		p.newLine()
+func (w *jsonWriter) closeBracket(bracket byte) {
+	w.depth--
+	if !w.isEmpty {
+		w.newLine()
 	}
-	p.out.WriteByte(bracket)
-	p.bare = false
+	w.out.WriteByte(bracket)
+	w.isEmpty = false
 }
 
-func (p *jsonWriter) newLine() {
-	p.out.WriteByte('\n')
-	p.out.WriteString(strings.Repeat("  ", p.depth))
+func (w *jsonWriter) newLine() {
+	w.out.WriteByte('\n')
+	w.out.WriteString(strings.Repeat("  ", w.depth))
 }
 
-func (p *jsonWriter) startMember() {
-	if !p.bare {
-		p.out.WriteByte(',')
+func (w *jsonWriter) startMember() {
+	if !w.isEmpty {
+		w.out.WriteByte(',')
 	}
-	p.bare = false
-	p.newLine()
+	w.isEmpty = false
+	w.newLine()
 }
 
-func (p *jsonWriter) writeKey(name string) {
-	p.startMember()
-	p.out.WriteString(fsx.QuoteJSON(name))
-	p.out.WriteString(": ")
+func (w *jsonWriter) writeKey(name string) {
+	w.startMember()
+	w.out.WriteString(fsx.QuoteJSON(name))
+	w.out.WriteString(": ")
 }
 
-func (p *jsonWriter) writeString(key, value string) {
-	p.writeKey(key)
-	p.out.WriteString(fsx.QuoteJSON(value))
+func (w *jsonWriter) writeString(key, value string) {
+	w.writeKey(key)
+	w.out.WriteString(fsx.QuoteJSON(value))
 }
 
-func (p *jsonWriter) writeBool(key string, value bool) {
-	p.writeKey(key)
+func (w *jsonWriter) writeBool(key string, value bool) {
+	w.writeKey(key)
 	if value {
-		p.out.WriteString("true")
+		w.out.WriteString("true")
 	} else {
-		p.out.WriteString("false")
+		w.out.WriteString("false")
 	}
 }
 
-func (p *jsonWriter) writeNumber(key string, value float64) {
-	p.writeKey(key)
-	if value == 0 {
-		value = 0
-	}
-	written, err := json.Marshal(value)
+func (w *jsonWriter) writeNumber(key string, value float64) {
+	w.writeKey(key)
+	written, err := json.Marshal(withoutNegativeZero(value))
 	if err != nil {
 		written = []byte("null")
 	}
-	p.out.Write(written)
+	w.out.Write(written)
+}
+
+func withoutNegativeZero(value float64) float64 {
+	if value == 0 {
+		return 0
+	}
+	return value
 }
