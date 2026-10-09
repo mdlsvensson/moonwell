@@ -14,6 +14,17 @@
   and start the game on the packed map:
   `& "<your Warcraft III.exe>" -launch -windowmode windowed -loadfile "<project>\dist\bin\map.w3x"`.
 
+### Release gate
+
+Steps 1 and 2 (CONTRIBUTING) passed 2026-10-09 on Windows, and CI passed on Ubuntu and Windows with the race job.
+Steps 3 to 14 were not played through in the game: nothing that reaches a map changed. Every recording is that of
+0.11.0 and passes unchanged: the builds of every seed project, the object data, the map settings, the assets, the
+map scripts and the command lines. The generator's run on the game's files writes the same data. The built program
+was run on a fresh project from `init --link`: `check`, `build`, `build --minify`, `objects:check`,
+`settings:check` and `assets:check` end with 0.
+
+`moonwell test` was not run: the known issue above stands. The online and desync checks are deferred, not passed.
+
 ## 0.11.0 (2026-10-08)
 
 - **The command line is read by `cobra`** (`github.com/spf13/cobra`), the library most Go programs use for it, in
