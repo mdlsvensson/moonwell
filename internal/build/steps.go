@@ -16,12 +16,12 @@ import (
 )
 
 func writeGenerated(
-	e *env.Env, source *mapdir.Folder, objs *objects.Result, globals *lua.MapGlobals, opts Options,
+	e *env.Env, source *mapdir.Folder, objectPlan *objects.Result, globals *lua.MapGlobals, options Options,
 ) error {
-	if err := writeIDsModule(e.Root, objs.IDs, opts.KeepGenerated); err != nil {
+	if err := writeIDsModule(e.Root, objectPlan.IDs, options.KeepGenerated); err != nil {
 		return err
 	}
-	return RefreshDeclarations(e.Root, source, objs.Objects, globals)
+	return RefreshDeclarations(e.Root, source, objectPlan.Objects, globals)
 }
 
 func writeIDsModule(root, ids string, keep bool) error {
@@ -33,10 +33,10 @@ func writeIDsModule(root, ids string, keep bool) error {
 }
 
 func RefreshDeclarations(
-	root string, source *mapdir.Folder, objs []objects.Resolved, globals *lua.MapGlobals,
+	root string, source *mapdir.Folder, resolved []objects.Resolved, globals *lua.MapGlobals,
 ) error {
 	_, err := editor.RefreshTypes(root, editor.Types{
-		Objects: objs, Map: globals, MapLua: source.DisplayPath(scriptName), Natives: script.LoadNatives(),
+		Objects: resolved, Map: globals, MapLua: source.DisplayPath(scriptName), Natives: script.LoadNatives(),
 	})
 	if err != nil {
 		return err
@@ -46,17 +46,17 @@ func RefreshDeclarations(
 }
 
 func compile(
-	ctx context.Context, e *env.Env, p *manifest.Project, synced []library.Synced, globals *lua.MapGlobals,
-	opts Options,
+	ctx context.Context, e *env.Env, project *manifest.Project, synced []library.Synced, globals *lua.MapGlobals,
+	options Options,
 ) (*script.Program, error) {
-	if _, err := outputPath(p.Root, stageDir); err != nil {
+	if _, err := outputPath(project.Root, stageDir); err != nil {
 		return nil, err
 	}
-	compiler, err := toolchain.FindCompiler(ctx, e, p.Yue.Version, p.Yue.Path)
+	compiler, err := toolchain.FindCompiler(ctx, e, project.Yue.Version, project.Yue.Path)
 	if err != nil {
 		return nil, err
 	}
-	compiled, err := script.CompileSources(ctx, e, compileInput(compiler, p, synced, globals, opts))
+	compiled, err := script.CompileSources(ctx, e, compileInput(compiler, project, synced, globals, options))
 	if err != nil {
 		return nil, err
 	}
@@ -67,53 +67,53 @@ func compile(
 }
 
 func compileInput(
-	compiler string, p *manifest.Project, synced []library.Synced, globals *lua.MapGlobals, opts Options,
+	compiler string, project *manifest.Project, synced []library.Synced, globals *lua.MapGlobals, options Options,
 ) script.Input {
-	in := script.Input{
+	input := script.Input{
 		Compiler:  compiler,
-		Entry:     p.Map.Entry,
-		Minify:    opts.Minify || p.Build.Minify,
+		Entry:     project.Map.Entry,
+		Minify:    options.Minify || project.Build.Minify,
 		Libraries: LibraryModuleDirs(synced),
-		Lint:      p.Lint,
+		Lint:      project.Lint,
 		Map:       globals,
 		Natives:   script.LoadNatives(),
 	}
-	if opts.Entry != "" {
-		in.Entry = opts.Entry
+	if options.Entry != "" {
+		input.Entry = options.Entry
 	}
-	return in
+	return input
 }
 
 func LibraryModuleDirs(synced []library.Synced) []script.Library {
-	var folders []script.Library
-	for _, lib := range synced {
-		folders = append(folders, script.Library{Key: lib.Key, Dir: lib.Modules})
+	var dirs []script.Library
+	for _, syncedLibrary := range synced {
+		dirs = append(dirs, script.Library{Key: syncedLibrary.Key, Dir: syncedLibrary.Modules})
 	}
-	return folders
+	return dirs
 }
 
 func PlanAssets(
-	ctx context.Context, source *mapdir.Folder, p *manifest.Project, synced []library.Synced,
-) (imported *assets.Result, replaced []string, err error) {
-	found, replaced, err := CollectAssets(p, synced)
+	ctx context.Context, source *mapdir.Folder, project *manifest.Project, synced []library.Synced,
+) (plan *assets.Result, replaced []string, err error) {
+	collected, replaced, err := CollectAssets(project, synced)
 	if err != nil {
 		return nil, nil, err
 	}
-	owned, err := readAssetState(p)
+	owned, err := readAssetState(project)
 	if err != nil {
 		return nil, nil, err
 	}
-	imported, err = assets.Plan(ctx, source, found, owned)
+	plan, err = assets.Plan(ctx, source, collected, owned)
 	if err != nil {
 		return nil, nil, err
 	}
-	return imported, replaced, nil
+	return plan, replaced, nil
 }
 
-func readAssetState(p *manifest.Project) (assets.State, error) {
-	file, err := AssetStatePath(p)
+func readAssetState(project *manifest.Project) (assets.State, error) {
+	stateFile, err := AssetStatePath(project)
 	if err != nil {
 		return assets.State{}, err
 	}
-	return assets.ReadState(p.Root, file)
+	return assets.ReadState(project.Root, stateFile)
 }

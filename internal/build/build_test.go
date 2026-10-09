@@ -22,9 +22,9 @@ func (s *standIn) withInfo(info string) {
 	s.put("maps/"+s.project.Map.Folder+"/war3map.w3i", info)
 }
 
-func built(t testing.TB, s *standIn, opts Options) (file string, archive *testkit.MPQ) {
+func built(t testing.TB, s *standIn, options Options) (file string, archive *testkit.MPQ) {
 	t.Helper()
-	file, err := Build(background, s.env, opts)
+	file, err := Build(background, s.env, options)
 	if err != nil {
 		t.Fatalf("Build: %v", diag.Format(err))
 	}

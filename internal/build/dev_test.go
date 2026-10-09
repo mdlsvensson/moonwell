@@ -46,14 +46,14 @@ func (s *standIn) save(name, text string) {
 
 type running struct {
 	s     *standIn
-	pace  Pace
+	pace  WatchTiming
 	ctx   context.Context
 	stop  context.CancelFunc
 	ended chan struct{}
 	err   error
 }
 
-func devOf(s *standIn, pace Pace) *running {
+func devOf(s *standIn, pace WatchTiming) *running {
 	ctx, stop := context.WithCancel(context.Background())
 	return &running{s: s, pace: pace, ctx: ctx, stop: stop, ended: make(chan struct{})}
 }
@@ -199,8 +199,8 @@ func TestAProjectIsWatchedForItsSourcesItsManifestsItsLocalLibrariesAndItsPrevie
 	s.everyFolder()
 	watch := watchedOf(s.root, s.project)
 	labels := []string{"src/", "assets/", "objects/", "lua/", "libs/kit/modules/", "libs/kit/files/", "art/preview.tga"}
-	if !slices.Equal(watch.labels, labels) {
-		t.Errorf("the project is watched as %q, want %q", watch.labels, labels)
+	if !slices.Equal(watch.displayPaths, labels) {
+		t.Errorf("the project is watched as %q, want %q", watch.displayPaths, labels)
 	}
 	tests := []struct {
 		file   string
@@ -256,8 +256,8 @@ func TestAProjectIsWatchedForTheFoldersThatAreThere(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t, localKit, previewed)
 			watch := watchedOf(s.root, tt.manifest(s))
-			if !slices.Equal(watch.labels, tt.labels) {
-				t.Errorf("the project is watched as %q, want %q", watch.labels, tt.labels)
+			if !slices.Equal(watch.displayPaths, tt.labels) {
+				t.Errorf("the project is watched as %q, want %q", watch.displayPaths, tt.labels)
 			}
 			w := newWatcher(watch.roots)
 			s.put("libs/kit/kit/greet.lua", "return 1\n")
@@ -303,7 +303,7 @@ func TestWhatACheckWritesIsNoChange(t *testing.T) {
 func TestDevFailsBeforeAnyWorkWhenSrcIsMissing(t *testing.T) {
 	root := t.TempDir()
 	e, log := testkit.Env(t, root)
-	failure := asError(t, Dev(background, e, DefaultPace), "no src")
+	failure := asError(t, Dev(background, e, DefaultWatchTiming), "no src")
 	if failure.Msg != "The src/ folder is missing." || failure.File != root ||
 		failure.Hint != "Run dev from a Moonwell project folder, or create one with `moonwell init <dir>`." {
 		t.Errorf("error = %+v", failure)
@@ -315,7 +315,7 @@ func TestDevFailsBeforeAnyWorkWhenSrcIsMissing(t *testing.T) {
 
 func TestDevRefusesAPaceWithoutAnInterval(t *testing.T) {
 	s := newStandIn(t)
-	for _, pace := range []Pace{{}, {Interval: -time.Second, Debounce: time.Second}} {
+	for _, pace := range []WatchTiming{{}, {Interval: -time.Second, Debounce: time.Second}} {
 		err := Dev(background, s.env, pace)
 		var expected *diag.Error
 		if err == nil || errors.As(err, &expected) || !strings.Contains(err.Error(), "interval") {
@@ -352,7 +352,7 @@ func TestDevWatchesAssetsObjectsAndLuaWhenTheyExist(t *testing.T) {
 		noPkl(e)
 		stopped, stop := context.WithCancel(background)
 		stop()
-		err := Dev(stopped, e, DefaultPace)
+		err := Dev(stopped, e, DefaultWatchTiming)
 		if want := []string{"error: no Pkl in this test", line}; err != nil || !slices.Equal(log.Lines(), want) {
 			t.Errorf("Dev = %v; it logged %q, want %q", err, log.Lines(), want)
 		}
@@ -362,7 +362,7 @@ func TestDevWatchesAssetsObjectsAndLuaWhenTheyExist(t *testing.T) {
 func TestDevChecksAgainOnceAfterASourceChanges(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		s := newStandIn(t)
-		d := devOf(s, DefaultPace).start(t)
+		d := devOf(s, DefaultWatchTiming).start(t)
 		if lines, want := s.log.Lines(), []string{smallPassed, watchingLine("src/")}; !slices.Equal(lines, want) {
 			t.Fatalf("Dev logged %q before its first look, want %q", lines, want)
 		}
@@ -392,7 +392,7 @@ func TestDevChecksAgainOnceAfterASourceChanges(t *testing.T) {
 func TestDevChecksOnceAfterSavesThatFollowEachOther(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		s := newStandIn(t)
-		d := devOf(s, Pace{Interval: 100 * time.Millisecond, Debounce: 250 * time.Millisecond}).start(t)
+		d := devOf(s, WatchTiming{Interval: 100 * time.Millisecond, Debounce: 250 * time.Millisecond}).start(t)
 		text := "x = 1\n"
 		for range 5 {
 			text += "y = 2\n"
@@ -427,7 +427,7 @@ func TestASaveDuringACheckIsCheckedAfterIt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
 				s := newStandIn(t)
-				d := devOf(s, DefaultPace).start(t)
+				d := devOf(s, DefaultWatchTiming).start(t)
 				var slow atomic.Bool
 				slow.Store(true)
 				s.answer(s.compiler, func(args []string, options env.RunOptions) (env.RunResult, error) {
@@ -483,7 +483,7 @@ func TestASaveDuringTheFirstCheckIsCheckedAfterIt(t *testing.T) {
 					}
 					return run(ctx, name, args, options)
 				}
-				d := devOf(s, DefaultPace).start(t)
+				d := devOf(s, DefaultWatchTiming).start(t)
 				lines := s.log.Lines()
 				if len(lines) != 2 || lines[1] != watchingLine("src/") || !fsx.Exists(s.at(objects.IDsFile)) {
 					t.Fatalf("Dev logged %q, want a check, with its ids module, and what it watches", lines)
@@ -515,7 +515,7 @@ func TestASaveMadeAsDevSaysWhatItWatchesIsChecked(t *testing.T) {
 						s.save(saved, "x = 12\n")
 					}
 				}, "")
-				d := devOf(s, DefaultPace).start(t)
+				d := devOf(s, DefaultWatchTiming).start(t)
 				d.looks(2)
 				if passed, failed := s.checked(); passed != 2 || failed != 0 {
 					t.Errorf("%d check(s) passed and %d failed, want 2 and 0: %q", passed, failed, s.log.Lines())
@@ -530,7 +530,7 @@ func TestDevChecksAgainWhenALocalLibraryChanges(t *testing.T) {
 		s := newStandIn(t, localKit)
 		s.put("libs/kit/moonwell-library.json", `{"dir":"modules"}`)
 		s.put("libs/kit/modules/kit/greet.lua", "return 1\n")
-		d := devOf(s, DefaultPace).start(t)
+		d := devOf(s, DefaultWatchTiming).start(t)
 		want := []string{smallPassed, watchingLine("src/", "libs/kit/modules/")}
 		if lines := s.log.Lines(); !slices.Equal(lines, want) {
 			t.Fatalf("Dev logged %q before its first look, want %q", lines, want)
@@ -553,7 +553,7 @@ func TestDevChecksAgainAfterAChangeOnTheRealClock(t *testing.T) {
 	s := newStandIn(t)
 	ctx, stop := context.WithCancel(background)
 	ended := make(chan error, 1)
-	go func() { ended <- Dev(ctx, s.env, Pace{Interval: time.Millisecond, Debounce: time.Millisecond}) }()
+	go func() { ended <- Dev(ctx, s.env, WatchTiming{Interval: time.Millisecond, Debounce: time.Millisecond}) }()
 	defer func() {
 		stop()
 		if err := <-ended; err != nil {
@@ -580,7 +580,7 @@ func TestDevChecksAgainAfterAChangeOnTheRealClock(t *testing.T) {
 func TestDevReturnsNilWhenItIsToldToStopAndLeavesNoLock(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		s := newStandIn(t)
-		d := devOf(s, DefaultPace).start(t)
+		d := devOf(s, DefaultWatchTiming).start(t)
 		d.looks(3)
 		if d.hasEnded() {
 			t.Fatalf("Dev returned %v before it was told to stop", d.err)
@@ -597,7 +597,7 @@ func TestDevReturnsNilWhenItIsToldToStopAndLeavesNoLock(t *testing.T) {
 func TestACheckThatIsUnderWayEndsBeforeDevReturns(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		s := newStandIn(t)
-		d := devOf(s, Pace{Interval: DefaultPace.Interval})
+		d := devOf(s, WatchTiming{Interval: DefaultWatchTiming.Interval})
 		var interrupts atomic.Bool
 		run := s.env.Run
 		s.env.Run = func(ctx context.Context, name string, args []string, o env.RunOptions) (env.RunResult, error) {
@@ -644,7 +644,7 @@ func TestAManifestThatDoesNotLoadIsReportedAndWatchedOn(t *testing.T) {
 			return strings.HasPrefix(line, "error: "+manifestName) && strings.Contains(line, "Cannot find property")
 		}
 		s.answer("pkl", broken)
-		d := devOf(s, DefaultPace).start(t)
+		d := devOf(s, DefaultWatchTiming).start(t)
 		lines := s.log.Lines()
 		if len(lines) != 2 || !refused(lines[0]) || lines[1] != watchingLine("src/") {
 			t.Fatalf("Dev logged %q, want the manifest's failure and what it watches", lines)
@@ -668,7 +668,7 @@ func TestAManifestThatDoesNotLoadIsReportedAndWatchedOn(t *testing.T) {
 func TestASourceTheCompilerRefusesIsReportedAndWatchedOn(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		s := newStandIn(t)
-		d := devOf(s, DefaultPace).start(t)
+		d := devOf(s, DefaultWatchTiming).start(t)
 		s.refuses("src/main.yue", "1: unexpected token\n")
 		s.put("src/main.yue", "x = = 12\n")
 		d.looks(2)
@@ -699,7 +699,7 @@ func TestDevLooksForPklUntilACycleFindsItAndKeepsThatProgram(t *testing.T) {
 		s.answer("pkl", func([]string, env.RunOptions) (env.RunResult, error) {
 			return env.RunResult{}, &diag.Error{Msg: "no Pkl in this test"}
 		})
-		d := devOf(s, DefaultPace).start(t)
+		d := devOf(s, DefaultWatchTiming).start(t)
 		want := []string{"error: no Pkl in this test", watchingLine("src/")}
 		if lines := s.log.Lines(); !slices.Equal(lines, want) {
 			t.Fatalf("Dev logged %q, want %q", lines, want)

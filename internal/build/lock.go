@@ -14,33 +14,33 @@ import (
 const lockName = distDir + "/.lock"
 
 type heldLock struct {
-	file string
+	fullPath string
 }
 
-var held = struct {
+var heldLocks = struct {
 	sync.Mutex
 	locks map[string]*heldLock
 }{locks: map[string]*heldLock{}}
 
 func AcquireLock(root string) (release func(), err error) {
-	file, err := lockPath(root)
+	fullPath, err := lockPath(root)
 	if err != nil {
 		return nil, err
 	}
-	mine, err := acquireLock(file)
+	lock, err := acquireLock(fullPath)
 	if err != nil {
 		return nil, err
 	}
-	return func() { releaseLock(mine) }, nil
+	return func() { releaseLock(lock) }, nil
 }
 
 func ReleaseHeldLocks() {
-	held.Lock()
-	defer held.Unlock()
-	for file := range held.locks {
-		removeLock(file)
+	heldLocks.Lock()
+	defer heldLocks.Unlock()
+	for fullPath := range heldLocks.locks {
+		removeLock(fullPath)
 	}
-	clear(held.locks)
+	clear(heldLocks.locks)
 }
 
 func lockPath(root string) (string, error) {
@@ -54,55 +54,55 @@ func lockPath(root string) (string, error) {
 	return outputPath(root, lockName)
 }
 
-func acquireLock(file string) (*heldLock, error) {
-	held.Lock()
-	defer held.Unlock()
-	if err := writeLock(file); err != nil {
+func acquireLock(fullPath string) (*heldLock, error) {
+	heldLocks.Lock()
+	defer heldLocks.Unlock()
+	if err := writeLock(fullPath); err != nil {
 		return nil, err
 	}
-	mine := &heldLock{file: file}
-	held.locks[file] = mine
-	return mine, nil
+	lock := &heldLock{fullPath: fullPath}
+	heldLocks.locks[fullPath] = lock
+	return lock, nil
 }
 
-func writeLock(file string) error {
-	lock, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
+func writeLock(fullPath string) error {
+	out, err := os.OpenFile(fullPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
 	switch {
-	case errors.Is(err, fs.ErrExist), err != nil && fsx.IsDir(file):
-		return errHeld(readLockHolder(file))
+	case errors.Is(err, fs.ErrExist), err != nil && fsx.IsDir(fullPath):
+		return errHeld(readLockHolder(fullPath))
 	case err != nil:
 		return errLockNotWritten(err)
 	}
-	_, err = lock.WriteString(strconv.Itoa(os.Getpid()))
-	if closed := lock.Close(); err == nil {
-		err = closed
+	_, err = out.WriteString(strconv.Itoa(os.Getpid()))
+	if closeErr := out.Close(); err == nil {
+		err = closeErr
 	}
 	if err != nil {
-		removeLock(file)
+		removeLock(fullPath)
 		return errLockNotWritten(err)
 	}
 	return nil
 }
 
-func readLockHolder(file string) string {
-	data, err := os.ReadFile(file)
+func readLockHolder(fullPath string) string {
+	data, err := os.ReadFile(fullPath)
 	if holder := fsx.TrimASCIISpace(string(data)); err == nil && holder != "" {
 		return holder
 	}
 	return "unknown"
 }
 
-func releaseLock(mine *heldLock) {
-	held.Lock()
-	defer held.Unlock()
-	if held.locks[mine.file] == mine {
-		delete(held.locks, mine.file)
-		removeLock(mine.file)
+func releaseLock(lock *heldLock) {
+	heldLocks.Lock()
+	defer heldLocks.Unlock()
+	if heldLocks.locks[lock.fullPath] == lock {
+		delete(heldLocks.locks, lock.fullPath)
+		removeLock(lock.fullPath)
 	}
 }
 
-func removeLock(file string) {
-	_ = os.Remove(file)
+func removeLock(fullPath string) {
+	_ = os.Remove(fullPath)
 }
 
 func errHeld(holder string) error {

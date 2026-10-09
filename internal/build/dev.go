@@ -13,42 +13,42 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
-type Pace struct{ Interval, Debounce time.Duration }
+type WatchTiming struct{ Interval, Debounce time.Duration }
 
-var DefaultPace = Pace{Interval: 250 * time.Millisecond, Debounce: 150 * time.Millisecond}
+var DefaultWatchTiming = WatchTiming{Interval: 250 * time.Millisecond, Debounce: 150 * time.Millisecond}
 
-func Dev(ctx context.Context, e *env.Env, pace Pace) error {
-	if pace.Interval <= 0 {
-		return errors.New("build.Dev: the pace has no interval; pass DefaultPace")
+func Dev(ctx context.Context, e *env.Env, timing WatchTiming) error {
+	if timing.Interval <= 0 {
+		return errors.New("build.Dev: the timing has no interval; pass DefaultWatchTiming")
 	}
 	if !fsx.IsDir(filepath.Join(e.Root, sourcesDir)) {
 		return errNoSources(e.Root)
 	}
-	watch := projectWatchSet(e.Root)
-	files := newWatcher(watch.roots)
-	working := context.WithoutCancel(ctx)
-	pkl := runCheckCycle(working, e, "")
-	named := manifestWatchSet(e.Root, loadInitialManifest(working, e, pkl))
-	files.add(named.roots...)
-	e.Log.Info(watch.merge(named).describe())
+	projectSet := projectWatchSet(e.Root)
+	watcher := newWatcher(projectSet.roots)
+	checkCtx := context.WithoutCancel(ctx)
+	pkl := runCheckCycle(checkCtx, e, "")
+	manifestSet := manifestWatchSet(e.Root, loadInitialManifest(checkCtx, e, pkl))
+	watcher.add(manifestSet.roots...)
+	e.Log.Info(projectSet.merge(manifestSet).describe())
 
-	ticker := time.NewTicker(pace.Interval)
+	ticker := time.NewTicker(timing.Interval)
 	defer ticker.Stop()
-	var waiting pendingChange
+	var pending pendingChange
 	for ctx.Err() == nil {
 		select {
 		case <-ctx.Done():
 		case <-ticker.C:
-			changed := files.poll()
-			if ctx.Err() == nil && waiting.isDue(changed, time.Now(), pace.Debounce) {
-				pkl = runCheckCycle(working, e, pkl)
+			changed := watcher.poll()
+			if ctx.Err() == nil && pending.isDue(changed, time.Now(), timing.Debounce) {
+				pkl = runCheckCycle(checkCtx, e, pkl)
 			}
 		}
 	}
 	return nil
 }
 
-func runCheckCycle(ctx context.Context, e *env.Env, pkl string) (found string) {
+func runCheckCycle(ctx context.Context, e *env.Env, pkl string) (pklProgram string) {
 	if pkl == "" {
 		program, err := toolchain.FindPkl(ctx, e)
 		if err != nil {
@@ -67,11 +67,11 @@ func loadInitialManifest(ctx context.Context, e *env.Env, pkl string) *manifest.
 	if pkl == "" {
 		return nil
 	}
-	p, err := manifest.Load(ctx, e, pkl)
+	project, err := manifest.Load(ctx, e, pkl)
 	if err != nil {
 		return nil
 	}
-	return p
+	return project
 }
 
 type pendingChange struct {

@@ -9,21 +9,21 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-func launch(e *env.Env, how manifest.Launch, mapPath string) error {
-	if how.GameExecutable == nil {
+func launch(e *env.Env, config manifest.Launch, mapPath string) error {
+	if config.GameExecutable == nil {
 		return errNoGame()
 	}
-	game := *how.GameExecutable
-	info, err := os.Stat(game)
+	executable := *config.GameExecutable
+	info, err := os.Stat(executable)
 	switch {
 	case err != nil:
-		return errGameNotFound(game)
+		return errGameNotFound(executable)
 	case !info.Mode().IsRegular():
-		return errGameNotAFile(game)
+		return errGameNotAFile(executable)
 	}
-	args := append(slices.Clone(how.Args), "-loadfile", mapPath)
-	if err := e.Spawn(game, args); err != nil {
-		return env.NewSpawnError(game, err, fixGame, manifest.LocalManifest)
+	args := append(slices.Clone(config.Args), "-loadfile", mapPath)
+	if err := e.Spawn(executable, args); err != nil {
+		return env.NewSpawnError(executable, err, fixGame, manifest.LocalManifest)
 	}
 	return nil
 }
@@ -39,10 +39,10 @@ func errNoGame() error {
 	}
 }
 
-func errGameNotFound(game string) error {
-	return &diag.Error{Msg: "Game executable not found: " + game, File: manifest.LocalManifest, Hint: fixGame}
+func errGameNotFound(executable string) error {
+	return &diag.Error{Msg: "Game executable not found: " + executable, File: manifest.LocalManifest, Hint: fixGame}
 }
 
-func errGameNotAFile(game string) error {
-	return &diag.Error{Msg: "Game executable " + game + " is not a file.", File: manifest.LocalManifest, Hint: fixGame}
+func errGameNotAFile(executable string) error {
+	return &diag.Error{Msg: "Game executable " + executable + " is not a file.", File: manifest.LocalManifest, Hint: fixGame}
 }

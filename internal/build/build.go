@@ -30,8 +30,8 @@ type Result struct {
 	Program  *script.Program
 }
 
-func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*Result, error) {
-	source, err := OpenSource(p)
+func Plan(ctx context.Context, e *env.Env, project *manifest.Project, options Options) (*Result, error) {
+	source, err := OpenSource(project)
 	if err != nil {
 		return nil, err
 	}
@@ -40,44 +40,47 @@ func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*
 		return nil, err
 	}
 
-	objs, err := objects.Plan(source, p.Objects, objects.LoadMetadata())
+	objectPlan, err := objects.Plan(source, project.Objects, objects.LoadMetadata())
 	if err != nil {
 		return nil, err
 	}
-	err = writeGenerated(e, source, objs, globals, opts)
+	err = writeGenerated(e, source, objectPlan, globals, options)
 	if err != nil {
 		return nil, err
 	}
-	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
+	synced, err := library.Sync(ctx, e, project.Libraries, project.ManifestName)
 	if err != nil {
 		return nil, err
 	}
-	program, err := compile(ctx, e, p, synced, globals, opts)
+	program, err := compile(ctx, e, project, synced, globals, options)
 	if err != nil {
 		return nil, err
 	}
 
-	view := source.WithChanges(objs.Changes)
-	set, err := settings.Plan(view, p)
+	view := source.WithChanges(objectPlan.Changes)
+	settingsChanges, err := settings.Plan(view, project)
 	if err != nil {
 		return nil, err
 	}
-	view = view.WithChanges(set)
-	imported, replaced, err := PlanAssets(ctx, view, p, synced)
+	view = view.WithChanges(settingsChanges)
+	assetPlan, replaced, err := PlanAssets(ctx, view, project, synced)
 	if err != nil {
 		return nil, err
 	}
-	view = view.WithChanges(imported.Changes)
-	bundle, err := script.Inject(view, program)
+	view = view.WithChanges(assetPlan.Changes)
+	scriptChanges, err := script.Inject(view, program)
 	if err != nil {
 		return nil, err
 	}
-	view = view.WithChanges(bundle)
-	return &Result{Map: view, Objects: objs, Settings: set, Assets: imported, Replaced: replaced, Program: program}, nil
+	view = view.WithChanges(scriptChanges)
+	return &Result{
+		Map: view, Objects: objectPlan, Settings: settingsChanges, Assets: assetPlan, Replaced: replaced,
+		Program: program,
+	}, nil
 }
 
-func Build(ctx context.Context, e *env.Env, opts Options) (archive string, err error) {
-	p, err := Load(ctx, e)
+func Build(ctx context.Context, e *env.Env, options Options) (archive string, err error) {
+	project, err := Load(ctx, e)
 	if err != nil {
 		return "", err
 	}
@@ -86,25 +89,25 @@ func Build(ctx context.Context, e *env.Env, opts Options) (archive string, err e
 		return "", err
 	}
 	defer release()
-	out, err := prepareArchivePath(p)
+	output, err := prepareArchivePath(project)
 	if err != nil {
 		return "", err
 	}
-	plan, err := Plan(ctx, e, p, opts)
+	plan, err := Plan(ctx, e, project, options)
 	if err != nil {
 		return "", err
 	}
-	if _, err := stage(e, p, plan); err != nil {
+	if _, err := stage(e, project, plan); err != nil {
 		return "", err
 	}
-	if err := packArchive(e, plan, out); err != nil {
+	if err := packArchive(e, plan, output); err != nil {
 		return "", err
 	}
-	return out.fullPath, nil
+	return output.fullPath, nil
 }
 
-func Test(ctx context.Context, e *env.Env, opts Options) error {
-	p, err := Load(ctx, e)
+func Test(ctx context.Context, e *env.Env, options Options) error {
+	project, err := Load(ctx, e)
 	if err != nil {
 		return err
 	}
@@ -113,15 +116,15 @@ func Test(ctx context.Context, e *env.Env, opts Options) error {
 		return err
 	}
 	defer release()
-	plan, err := Plan(ctx, e, p, opts)
+	plan, err := Plan(ctx, e, project, options)
 	if err != nil {
 		return err
 	}
-	staged, err := stage(e, p, plan)
+	staged, err := stage(e, project, plan)
 	if err != nil {
 		return err
 	}
-	if err := launch(e, p.Launch, staged.fullPath); err != nil {
+	if err := launch(e, project.Launch, staged.fullPath); err != nil {
 		return err
 	}
 	e.Log.Info("Launched Warcraft III with " + staged.displayPath + ".")
@@ -137,7 +140,7 @@ func Check(ctx context.Context, e *env.Env) (*Result, error) {
 }
 
 func runCheck(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Result, error) {
-	p, err := manifest.Load(ctx, e, pkl)
+	project, err := manifest.Load(ctx, e, pkl)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +149,7 @@ func runCheck(ctx context.Context, e *env.Env, pkl string, refresh bool) (*Resul
 		return nil, err
 	}
 	defer release()
-	plan, err := Plan(ctx, e, p, Options{KeepGenerated: !refresh})
+	plan, err := Plan(ctx, e, project, Options{KeepGenerated: !refresh})
 	if err != nil {
 		return nil, err
 	}

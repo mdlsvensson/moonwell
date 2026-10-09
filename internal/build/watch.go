@@ -7,17 +7,6 @@ import (
 	"time"
 )
 
-type watchRoot struct {
-	dir     string
-	deep    bool
-	include func(path string) bool
-}
-
-type fileStamp struct {
-	size    int64
-	modTime time.Time
-}
-
 type watcher struct {
 	roots      []watchRoot
 	lastStamps []map[string]fileStamp
@@ -38,30 +27,18 @@ func (w *watcher) add(roots ...watchRoot) {
 
 func (w *watcher) poll() bool {
 	changed := false
-	for at, root := range w.roots {
-		now := root.stamps()
-		changed = changed || root.hasChanged(w.lastStamps[at], now)
-		w.lastStamps[at] = now
+	for index, root := range w.roots {
+		stamps := root.stamps()
+		changed = changed || root.hasChanged(w.lastStamps[index], stamps)
+		w.lastStamps[index] = stamps
 	}
 	return changed
 }
 
-func (r watchRoot) hasChanged(before, now map[string]fileStamp) bool {
-	for path, current := range now {
-		if previous, known := before[path]; !(known && previous.equals(current)) && r.include(path) {
-			return true
-		}
-	}
-	for path := range before {
-		if _, still := now[path]; !still && r.include(path) {
-			return true
-		}
-	}
-	return false
-}
-
-func (s fileStamp) equals(other fileStamp) bool {
-	return s.size == other.size && s.modTime.Equal(other.modTime)
+type watchRoot struct {
+	dir     string
+	deep    bool
+	include func(path string) bool
 }
 
 func (r watchRoot) stamps() map[string]fileStamp {
@@ -71,36 +48,59 @@ func (r watchRoot) stamps() map[string]fileStamp {
 	return stampsIn(r.dir)
 }
 
+func (r watchRoot) hasChanged(oldStamps, newStamps map[string]fileStamp) bool {
+	for path, newStamp := range newStamps {
+		if oldStamp, ok := oldStamps[path]; !(ok && oldStamp.equals(newStamp)) && r.include(path) {
+			return true
+		}
+	}
+	for path := range oldStamps {
+		if _, ok := newStamps[path]; !ok && r.include(path) {
+			return true
+		}
+	}
+	return false
+}
+
+type fileStamp struct {
+	size    int64
+	modTime time.Time
+}
+
+func (s fileStamp) equals(other fileStamp) bool {
+	return s.size == other.size && s.modTime.Equal(other.modTime)
+}
+
 func stampsIn(dir string) map[string]fileStamp {
-	found := map[string]fileStamp{}
+	stamps := map[string]fileStamp{}
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return found
+		return stamps
 	}
 	for _, entry := range entries {
 		if !entry.IsDir() {
-			recordStamp(found, filepath.Join(dir, entry.Name()), entry)
+			recordStamp(stamps, filepath.Join(dir, entry.Name()), entry)
 		}
 	}
-	return found
+	return stamps
 }
 
 func stampsBelow(dir string) map[string]fileStamp {
-	found := map[string]fileStamp{}
+	stamps := map[string]fileStamp{}
 	_ = filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
 		switch {
 		case err != nil && entry != nil && entry.IsDir():
 			return fs.SkipDir
 		case err == nil && !entry.IsDir():
-			recordStamp(found, path, entry)
+			recordStamp(stamps, path, entry)
 		}
 		return nil
 	})
-	return found
+	return stamps
 }
 
-func recordStamp(found map[string]fileStamp, path string, entry fs.DirEntry) {
+func recordStamp(stamps map[string]fileStamp, path string, entry fs.DirEntry) {
 	if info, err := entry.Info(); err == nil {
-		found[path] = fileStamp{info.Size(), info.ModTime()}
+		stamps[path] = fileStamp{info.Size(), info.ModTime()}
 	}
 }

@@ -8,5 +8,5 @@ import (
 )
 
 func runDev(ctx context.Context, e *env.Env, _ commandArgs) error {
-	return build.Dev(ctx, e, build.DefaultPace)
+	return build.Dev(ctx, e, build.DefaultWatchTiming)
 }

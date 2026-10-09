@@ -310,7 +310,7 @@ func devIn(t *testing.T, e *env.Env, log *testkit.Recorder) (until func(what str
 	ctx, stop := context.WithCancel(background)
 	ended := make(chan error, 1)
 	go func() {
-		ended <- build.Dev(ctx, e, build.Pace{Interval: 10 * time.Millisecond, Debounce: 20 * time.Millisecond})
+		ended <- build.Dev(ctx, e, build.WatchTiming{Interval: 10 * time.Millisecond, Debounce: 20 * time.Millisecond})
 	}()
 	t.Cleanup(func() {
 		stop()

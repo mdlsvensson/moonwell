@@ -13,87 +13,87 @@ const (
 	stageDir = distDir + "/stage"
 )
 
-func outputPath(root, relative string) (string, error) {
-	place, err := fsx.SafeJoinNoSymlinks(root, relative)
-	if err == nil {
-		return place, nil
-	}
-	if link, found := findSymlinkOnPath(root, relative); found {
-		return "", errLinkedOutput(link, relative)
-	}
-	return "", err
-}
-
-func findSymlinkOnPath(root, relative string) (link string, found bool) {
-	slashed, portable := fsx.CleanRelPath(relative)
-	if !portable {
-		return "", false
-	}
-	for end := 1; end <= len(slashed); end++ {
-		if end < len(slashed) && slashed[end] != '/' {
-			continue
-		}
-		info, err := fsx.Lstat(filepath.Join(root, filepath.FromSlash(slashed[:end])))
-		if err != nil || info == nil {
-			return "", false
-		}
-		if fsx.IsSymlink(info) {
-			return slashed[:end], true
-		}
-	}
-	return "", false
-}
-
 type outputFile struct {
 	fullPath    string
 	displayPath string
 }
 
-func newOutputFile(root, label string) (outputFile, error) {
-	file, err := outputPath(root, label)
+func newOutputFile(root, displayPath string) (outputFile, error) {
+	fullPath, err := outputPath(root, displayPath)
 	if err != nil {
 		return outputFile{}, err
 	}
-	if blocking, found := findBlockingFile(root, label); found {
-		return outputFile{}, errFileForFolder(blocking, label)
+	if blocking, found := findBlockingFile(root, displayPath); found {
+		return outputFile{}, errFileForFolder(blocking, displayPath)
 	}
-	return outputFile{fullPath: file, displayPath: label}, nil
+	return outputFile{fullPath: fullPath, displayPath: displayPath}, nil
 }
 
-func findBlockingFile(root, label string) (file string, found bool) {
-	for at, char := range label {
-		if char != '/' {
+func outputPath(root, relative string) (string, error) {
+	fullPath, err := fsx.SafeJoinNoSymlinks(root, relative)
+	if err == nil {
+		return fullPath, nil
+	}
+	if symlink, found := findSymlinkOnPath(root, relative); found {
+		return "", errLinkedOutput(symlink, relative)
+	}
+	return "", err
+}
+
+func findSymlinkOnPath(root, relative string) (symlink string, found bool) {
+	path, ok := fsx.CleanRelPath(relative)
+	if !ok {
+		return "", false
+	}
+	for end := 1; end <= len(path); end++ {
+		if end < len(path) && path[end] != '/' {
 			continue
 		}
-		info, err := os.Stat(filepath.Join(root, filepath.FromSlash(label[:at])))
-		if err == nil && !info.IsDir() {
-			return label[:at], true
+		info, err := fsx.Lstat(filepath.Join(root, filepath.FromSlash(path[:end])))
+		if err != nil || info == nil {
+			return "", false
+		}
+		if fsx.IsSymlink(info) {
+			return path[:end], true
 		}
 	}
 	return "", false
 }
 
-func (f outputFile) displayPathOf(file string) string {
-	below, err := filepath.Rel(f.fullPath, file)
-	if err != nil || below == "." || !filepath.IsLocal(below) {
+func findBlockingFile(root, displayPath string) (file string, found bool) {
+	for index, char := range displayPath {
+		if char != '/' {
+			continue
+		}
+		info, err := os.Stat(filepath.Join(root, filepath.FromSlash(displayPath[:index])))
+		if err == nil && !info.IsDir() {
+			return displayPath[:index], true
+		}
+	}
+	return "", false
+}
+
+func (f outputFile) displayPathOf(fullPath string) string {
+	rel, err := filepath.Rel(f.fullPath, fullPath)
+	if err != nil || rel == "." || !filepath.IsLocal(rel) {
 		return f.displayPath
 	}
-	return f.displayPath + "/" + filepath.ToSlash(below)
+	return f.displayPath + "/" + filepath.ToSlash(rel)
 }
 
-func errFileForFolder(file, wanted string) error {
+func errFileForFolder(path, wantedPath string) error {
 	return &diag.Error{
-		Msg:  file + " is a file, not a folder.",
-		File: file,
-		Hint: "Moonwell writes " + wanted + " below it: remove or rename the file, then try again.",
+		Msg:  path + " is a file, not a folder.",
+		File: path,
+		Hint: "Moonwell writes " + wantedPath + " below it: remove or rename the file, then try again.",
 	}
 }
 
-func errLinkedOutput(link, file string) error {
+func errLinkedOutput(symlink, path string) error {
 	return &diag.Error{
-		Msg:  link + " is a link: Moonwell writes what it builds into real files and folders.",
-		File: file,
-		Hint: "Remove the link (or Windows junction) at " + link + ", then try again: Moonwell makes what it needs " +
+		Msg:  symlink + " is a link: Moonwell writes what it builds into real files and folders.",
+		File: path,
+		Hint: "Remove the link (or Windows junction) at " + symlink + ", then try again: Moonwell makes what it needs " +
 			"there.",
 	}
 }

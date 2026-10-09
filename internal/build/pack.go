@@ -17,7 +17,7 @@ const infoName = "war3map.w3i"
 var archiveMetadata = map[string]bool{"(attributes)": true, "(listfile)": true, "(signature)": true}
 
 func packMap(view *mapdir.Folder, name string) ([]byte, error) {
-	format, err := readInfoHeader(view)
+	header, err := readInfoHeader(view)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func packMap(view *mapdir.Folder, name string) ([]byte, error) {
 		return nil, err
 	}
 	var options mpq.Options
-	if !format.IsHeaderless() {
+	if !header.IsHeaderless() {
 		options.Prefix = mpq.HM3WHeader(name, 0, 0)
 	}
 	if tooLarge, fits := mpq.CheckFits(len(options.Prefix), files); !fits {
@@ -34,7 +34,7 @@ func packMap(view *mapdir.Folder, name string) ([]byte, error) {
 	}
 	archive, err := mpq.Write(files, options)
 	if err != nil {
-		return nil, withFile(err, view.DisplayPath(""))
+		return nil, copied(err, view.DisplayPath(""))
 	}
 	return archive, nil
 }
@@ -68,37 +68,37 @@ func archiveFiles(view *mapdir.Folder) ([]mpq.File, error) {
 	return files, nil
 }
 
-func withFile(err error, file string) error {
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+func copied(err error, file string) error {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		return err
 	}
-	withFile := *failure
-	withFile.File = file
-	return &withFile
+	copied := *diagErr
+	copied.File = file
+	return &copied
 }
 
-func errNoMapInfo(mapLabel string) error {
+func errNoMapInfo(displayPath string) error {
 	return &diag.Error{
 		Msg:  infoName + " is missing from the map folder.",
-		File: mapLabel,
+		File: displayPath,
 		Hint: "Save the source map from World Editor in folder format.",
 	}
 }
 
-func errTooLarge(view *mapdir.Folder, file string) error {
+func errTooLarge(view *mapdir.Folder, name string) error {
 	limit := strconv.FormatInt(mpq.MaxSize, 10) + " bytes"
-	if file == "" {
+	if name == "" {
 		return &diag.Error{
 			Msg:  "The map is too large to pack: an archive holds at most " + limit + ".",
 			File: view.DisplayPath(""),
 			Hint: "Take files out of the map or out of assets/.",
 		}
 	}
-	inMap := view.CanonicalPath(strings.ReplaceAll(file, `\`, "/"))
+	path := view.CanonicalPath(strings.ReplaceAll(name, `\`, "/"))
 	return &diag.Error{
-		Msg:  inMap + " is too large to pack: a file of an archive holds at most " + limit + ".",
-		File: view.DisplayPath(inMap),
+		Msg:  path + " is too large to pack: a file of an archive holds at most " + limit + ".",
+		File: view.DisplayPath(path),
 		Hint: "Take the file out of the map or out of assets/, or make it smaller.",
 	}
 }

@@ -39,18 +39,18 @@ const localKit = `"libraries":{"kit":{"path":"libs/kit"}}`
 
 var captainIDs, _ = objects.RenderIDs([]objects.Resolved{{Category: "units", Key: "captain", ID: "h000"}})
 
-func planOf(t testing.TB, s *standIn, opts Options) *Result {
+func planOf(t testing.TB, s *standIn, options Options) *Result {
 	t.Helper()
-	result, err := Plan(background, s.env, s.project, opts)
+	result, err := Plan(background, s.env, s.project, options)
 	if err != nil {
 		t.Fatalf("Plan: %v", diag.Format(err))
 	}
 	return result
 }
 
-func firstProblem(t testing.TB, s *standIn, opts Options, what string) diag.Problem {
+func firstProblem(t testing.TB, s *standIn, options Options, what string) diag.Problem {
 	t.Helper()
-	result, err := Plan(background, s.env, s.project, opts)
+	result, err := Plan(background, s.env, s.project, options)
 	problem, expected := diag.FirstProblem(err)
 	if result != nil || !expected {
 		t.Fatalf("%s: Plan = %+v, %v, want an expected failure", what, result, err)
@@ -399,14 +399,14 @@ func TestPlanWithKeepGeneratedLeavesTheIDsModuleAloneAndFailsForOneThatIsNotCurr
 func TestPlanWritesTheDeclarationsOfTheObjectsAndOfTheMapsScript(t *testing.T) {
 	s := newStandIn(t, objectsWith(captain("hfoo")))
 	s.templateMap()
-	for _, opts := range []Options{{}, {KeepGenerated: true}} {
-		planOf(t, s, opts)
+	for _, options := range []Options{{}, {KeepGenerated: true}} {
+		planOf(t, s, options)
 		ofObjects, _ := os.ReadFile(s.at(editor.TypesDir + "/objects.d.lua"))
 		ofMap, _ := os.ReadFile(s.at(editor.TypesDir + "/map.d.lua"))
 		if !strings.Contains(string(ofObjects), "captain") || !fsx.Exists(s.at(editor.TypesDir+"/natives.d.lua")) ||
 			!strings.Contains(string(ofMap), "gg_trg_Initialization") ||
 			!strings.Contains(string(ofMap), "maps/map.w3x/war3map.lua") {
-			t.Errorf("with %+v the declarations hold\n%s\n%s", opts, ofObjects, ofMap)
+			t.Errorf("with %+v the declarations hold\n%s\n%s", options, ofObjects, ofMap)
 		}
 		s.remove(editor.TypesDir)
 	}
@@ -438,11 +438,11 @@ func TestPlanRunsTheCompilerOfTheManifestsYuePathAndAsksItForTheManifestsVersion
 func TestPlanCompilesTheEntryAndInTheModeThatItsOptionsAndTheManifestName(t *testing.T) {
 	minified := `"build":{"folder":"dist/bin","minify":true}`
 	tests := []struct {
-		name   string
-		blocks []string
-		opts   Options
-		entry  string
-		mode   string
+		name    string
+		blocks  []string
+		options Options
+		entry   string
+		mode    string
 	}{
 		{"the manifest's entry, as it is written", nil, Options{}, "main", "-r"},
 		{"the entry of the options", nil, Options{Entry: "src/game/other.yue"}, "game.other", "-r"},
@@ -455,7 +455,7 @@ func TestPlanCompilesTheEntryAndInTheModeThatItsOptionsAndTheManifestName(t *tes
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t, tt.blocks...)
 			s.put("src/game/other.yue", "y = 2\n")
-			result := planOf(t, s, tt.opts)
+			result := planOf(t, s, tt.options)
 			if result.Program.Entry != tt.entry || result.Program.Minify != (tt.mode == "-m") ||
 				!strings.Contains(heldBy(t, result.Map, "war3map.lua"), `__mw.boot("`+tt.entry+`")`) {
 				t.Errorf("the program starts at %s, minified: %v", result.Program.Entry, result.Program.Minify)

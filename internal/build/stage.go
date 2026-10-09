@@ -10,32 +10,32 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/manifest"
 )
 
-func stage(e *env.Env, p *manifest.Project, plan *Result) (outputFile, error) {
-	at, err := stageOutputFile(p)
+func stage(e *env.Env, project *manifest.Project, plan *Result) (outputFile, error) {
+	staged, err := stageOutputFile(project)
 	if err != nil {
 		return outputFile{}, err
 	}
-	if err := plan.Map.StageTo(at.fullPath); err != nil {
-		return outputFile{}, wrapStageError(err, at)
+	if err := plan.Map.StageTo(staged.fullPath); err != nil {
+		return outputFile{}, wrapStageError(err, staged)
 	}
 	logStaged(e.Log, plan)
-	return at, nil
+	return staged, nil
 }
 
-func stageOutputFile(p *manifest.Project) (outputFile, error) {
-	folder, err := sourceMapDir(p)
+func stageOutputFile(project *manifest.Project) (outputFile, error) {
+	mapDir, err := sourceMapDir(project)
 	if err != nil {
 		return outputFile{}, err
 	}
-	return newOutputFile(p.Root, stageDir+"/"+folder)
+	return newOutputFile(project.Root, stageDir+"/"+mapDir)
 }
 
-func wrapStageError(err error, at outputFile) error {
-	var failure *diag.Error
-	if !errors.As(err, &failure) || failure.Cause == nil {
+func wrapStageError(err error, staged outputFile) error {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) || diagErr.Cause == nil {
 		return err
 	}
-	return errNotStaged(at.displayPath, at.displayPathOf(failure.File), failure.Cause)
+	return errNotStaged(staged.displayPath, staged.displayPathOf(diagErr.File), diagErr.Cause)
 }
 
 func logStaged(log *env.Logger, plan *Result) {
@@ -56,10 +56,10 @@ func logStaged(log *env.Logger, plan *Result) {
 
 const stagingHint = "Close Warcraft III or World Editor if they have dist/stage open, then retry."
 
-func errNotStaged(stage, file string, cause error) error {
+func errNotStaged(stageDisplayPath, displayPath string, cause error) error {
 	return &diag.Error{
-		Msg:   "Staging the map into " + stage + " failed: " + fsx.Reason(cause),
-		File:  file,
+		Msg:   "Staging the map into " + stageDisplayPath + " failed: " + fsx.Reason(cause),
+		File:  displayPath,
 		Hint:  stagingHint,
 		Cause: cause,
 	}

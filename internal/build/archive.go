@@ -17,69 +17,69 @@ import (
 
 const mapSuffix = ".w3x"
 
-func prepareArchivePath(p *manifest.Project) (outputFile, error) {
-	out, err := archivePath(p)
+func prepareArchivePath(project *manifest.Project) (outputFile, error) {
+	output, err := archivePath(project)
 	if err != nil {
 		return outputFile{}, err
 	}
-	if err := removeArchive(out); err != nil {
+	if err := removeArchive(output); err != nil {
 		return outputFile{}, err
 	}
-	return out, nil
+	return output, nil
 }
 
-func packArchive(e *env.Env, plan *Result, out outputFile) error {
+func packArchive(e *env.Env, plan *Result, output outputFile) error {
 	e.Log.Info("Packing archive...")
-	archive, err := packMap(plan.Map, strings.TrimSuffix(path.Base(out.displayPath), mapSuffix))
+	archive, err := packMap(plan.Map, strings.TrimSuffix(path.Base(output.displayPath), mapSuffix))
 	if err != nil {
 		return err
 	}
-	if err := writeArchive(out, archive); err != nil {
+	if err := writeArchive(output, archive); err != nil {
 		return err
 	}
-	e.Log.Info("Built " + out.displayPath + " (" + strconv.Itoa(len(plan.Program.Modules)) + " module(s)).")
+	e.Log.Info("Built " + output.displayPath + " (" + strconv.Itoa(len(plan.Program.Modules)) + " module(s)).")
 	return nil
 }
 
-func archivePath(p *manifest.Project) (outputFile, error) {
-	folder, err := sourceMapDir(p)
+func archivePath(project *manifest.Project) (outputFile, error) {
+	mapDir, err := sourceMapDir(project)
 	if err != nil {
 		return outputFile{}, err
 	}
-	into, err := resolveBuildDir(p, folder)
+	buildDir, err := resolveBuildDir(project, mapDir)
 	if err != nil {
 		return outputFile{}, err
 	}
-	out, err := newOutputFile(p.Root, into+"/"+folder)
+	output, err := newOutputFile(project.Root, buildDir+"/"+mapDir)
 	if err != nil {
 		return outputFile{}, err
 	}
-	if fsx.IsDir(out.fullPath) {
-		return outputFile{}, errOutputIsAFolder(p.ManifestName, out.displayPath)
+	if fsx.IsDir(output.fullPath) {
+		return outputFile{}, errOutputIsAFolder(project.ManifestName, output.displayPath)
 	}
-	return out, nil
+	return output, nil
 }
 
-func resolveBuildDir(p *manifest.Project, folder string) (string, error) {
-	written := p.Build.Folder
-	parts, fault := parseDir(written)
+func resolveBuildDir(project *manifest.Project, mapDir string) (string, error) {
+	value := project.Build.Folder
+	parts, fault := parseDir(value)
 	switch fault {
-	case leavesItsFolder:
-		asWritten := strings.TrimRight(strings.ReplaceAll(written, `\`, "/"), "/")
-		return "", errOutputOutside(p.ManifestName, asWritten+"/"+folder)
-	case namesNoFolder:
-		return "", errNoBuildFolder(p.ManifestName, written)
-	case unusableName:
-		return "", errUnusableBuildFolder(p.ManifestName, written)
+	case dirEscapes:
+		normalized := strings.TrimRight(strings.ReplaceAll(value, `\`, "/"), "/")
+		return "", errOutputOutside(project.ManifestName, normalized+"/"+mapDir)
+	case dirEmpty:
+		return "", errNoBuildFolder(project.ManifestName, value)
+	case dirNotPortable:
+		return "", errUnusableBuildFolder(project.ManifestName, value)
 	}
-	into := strings.Join(parts, "/")
-	if kept, isKept := keptFolder(parts); isKept {
-		return "", errOutputInKeptFolder(p.ManifestName, into+"/"+folder, kept)
+	buildDir := strings.Join(parts, "/")
+	if reserved, isReserved := reservedDir(parts); isReserved {
+		return "", errOutputInReservedDir(project.ManifestName, buildDir+"/"+mapDir, reserved)
 	}
-	return into, nil
+	return buildDir, nil
 }
 
-func keptFolder(parts []string) (kept string, found bool) {
+func reservedDir(parts []string) (reserved string, found bool) {
 	first := toLowerASCII(parts[0])
 	switch {
 	case first == mapsDir, first == sourcesDir:
@@ -91,56 +91,56 @@ func keptFolder(parts []string) (kept string, found bool) {
 }
 
 func toLowerASCII(text string) string {
-	lowered := []byte(text)
-	for at, char := range lowered {
+	lower := []byte(text)
+	for index, char := range lower {
 		if char >= 'A' && char <= 'Z' {
-			lowered[at] = char + 'a' - 'A'
+			lower[index] = char + 'a' - 'A'
 		}
 	}
-	return string(lowered)
+	return string(lower)
 }
 
-func removeArchive(at outputFile) error {
-	err := fsx.RemoveFile(at.fullPath)
+func removeArchive(output outputFile) error {
+	err := fsx.RemoveFile(output.fullPath)
 	if err == nil {
 		return nil
 	}
-	var held *diag.Error
-	if errors.As(err, &held) && held.Cause != nil {
-		err = held.Cause
+	var diagErr *diag.Error
+	if errors.As(err, &diagErr) && diagErr.Cause != nil {
+		err = diagErr.Cause
 	}
-	return errNotRemoved(at.displayPath, err)
+	return errNotRemoved(output.displayPath, err)
 }
 
-const unfinished = ".tmp"
+const tempSuffix = ".tmp"
 
-func writeArchive(at outputFile, archive []byte) error {
-	if err := os.MkdirAll(filepath.Dir(at.fullPath), 0o777); err != nil {
-		return errArchiveNotWritten(at.displayPath, err)
+func writeArchive(output outputFile, archive []byte) error {
+	if err := os.MkdirAll(filepath.Dir(output.fullPath), 0o777); err != nil {
+		return errArchiveNotWritten(output.displayPath, err)
 	}
-	beside := at.fullPath + unfinished
-	err := writeFileAtomic(beside, archive)
+	tempPath := output.fullPath + tempSuffix
+	err := writeNewFile(tempPath, archive)
 	if err == nil {
-		err = os.Rename(beside, at.fullPath)
+		err = os.Rename(tempPath, output.fullPath)
 	}
 	if err != nil {
-		_ = os.Remove(beside)
-		return errArchiveNotWritten(at.displayPath, err)
+		_ = os.Remove(tempPath)
+		return errArchiveNotWritten(output.displayPath, err)
 	}
 	return nil
 }
 
-func writeFileAtomic(file string, data []byte) error {
-	if err := os.Remove(file); err != nil && !errors.Is(err, fs.ErrNotExist) {
+func writeNewFile(fullPath string, data []byte) error {
+	if err := os.Remove(fullPath); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
-	made, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
+	created, err := os.OpenFile(fullPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
 	if err != nil {
 		return err
 	}
-	_, err = made.Write(data)
-	if closed := made.Close(); err == nil {
-		err = closed
+	_, err = created.Write(data)
+	if closeErr := created.Close(); err == nil {
+		err = closeErr
 	}
 	return err
 }
@@ -150,38 +150,38 @@ const (
 	outputOnlyHint = "Set build.folder to a folder that only holds build output, such as dist/bin."
 )
 
-func errOutputOutside(manifestFile, output string) error {
+func errOutputOutside(manifestName, output string) error {
 	return &diag.Error{
 		Msg:  "The build output " + output + " is outside the project.",
-		File: manifestFile,
+		File: manifestName,
 		Hint: insideHint,
 	}
 }
 
-func errNoBuildFolder(manifestFile, written string) error {
-	return &diag.Error{Msg: `build.folder names no folder: "` + written + `".`, File: manifestFile, Hint: insideHint}
+func errNoBuildFolder(manifestName, value string) error {
+	return &diag.Error{Msg: `build.folder names no folder: "` + value + `".`, File: manifestName, Hint: insideHint}
 }
 
-func errUnusableBuildFolder(manifestFile, written string) error {
+func errUnusableBuildFolder(manifestName, value string) error {
 	return &diag.Error{
-		Msg:  `build.folder has a name that Windows cannot hold: "` + written + `".`,
-		File: manifestFile,
+		Msg:  `build.folder has a name that Windows cannot hold: "` + value + `".`,
+		File: manifestName,
 		Hint: insideHint + " " + unusableNames,
 	}
 }
 
-func errOutputInKeptFolder(manifestFile, output, kept string) error {
+func errOutputInReservedDir(manifestName, output, reserved string) error {
 	return &diag.Error{
-		Msg:  "The build output " + output + " is in " + kept + "/, a folder Moonwell reads from or stages into.",
-		File: manifestFile,
+		Msg:  "The build output " + output + " is in " + reserved + "/, a folder Moonwell reads from or stages into.",
+		File: manifestName,
 		Hint: outputOnlyHint,
 	}
 }
 
-func errOutputIsAFolder(manifestFile, output string) error {
+func errOutputIsAFolder(manifestName, output string) error {
 	return &diag.Error{
 		Msg:  "The build output " + output + " is a directory; refusing to replace it.",
-		File: manifestFile,
+		File: manifestName,
 		Hint: outputOnlyHint,
 	}
 }

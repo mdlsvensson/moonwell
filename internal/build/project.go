@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io/fs"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/mdlsvensson/moonwell/internal/assets"
@@ -33,166 +32,115 @@ func Load(ctx context.Context, e *env.Env) (*manifest.Project, error) {
 	return manifest.Load(ctx, e, pkl)
 }
 
-func OpenSource(p *manifest.Project) (*mapdir.Folder, error) {
-	folder, err := sourceMapDir(p)
+func OpenSource(project *manifest.Project) (*mapdir.Folder, error) {
+	mapDir, err := sourceMapDir(project)
 	if err != nil {
 		return nil, err
 	}
-	label := mapsDir + "/" + folder
-	dir, err := fsx.SafeJoinNoSymlinks(p.Root, label)
+	displayPath := mapsDir + "/" + mapDir
+	fullPath, err := fsx.SafeJoinNoSymlinks(project.Root, displayPath)
 	if err != nil {
 		return nil, err
 	}
-	if !fsx.Exists(dir) {
-		return nil, errNoMap(p.ManifestName, label)
+	if !fsx.Exists(fullPath) {
+		return nil, errNoMap(project.ManifestName, displayPath)
 	}
-	source, err := mapdir.Open(dir, label)
+	source, err := mapdir.Open(fullPath, displayPath)
 	if isMissing(err) {
-		return nil, errNoMap(p.ManifestName, label)
+		return nil, errNoMap(project.ManifestName, displayPath)
 	}
 	return source, err
 }
 
-func sourceMapDir(p *manifest.Project) (string, error) {
-	parts, fault := parseDir(p.Map.Folder)
+func sourceMapDir(project *manifest.Project) (string, error) {
+	parts, fault := parseDir(project.Map.Folder)
 	switch fault {
-	case leavesItsFolder, namesNoFolder:
-		return "", errNotInsideMaps(p.ManifestName, p.Map.Folder)
-	case unusableName:
-		return "", errUnusableMapFolder(p.ManifestName, p.Map.Folder)
+	case dirEscapes, dirEmpty:
+		return "", errNotInsideMaps(project.ManifestName, project.Map.Folder)
+	case dirNotPortable:
+		return "", errUnusableMapFolder(project.ManifestName, project.Map.Folder)
 	}
 	return strings.Join(parts, "/"), nil
 }
 
-type dirProblem int
-
-const (
-	noFault dirProblem = iota
-	leavesItsFolder
-	namesNoFolder
-	unusableName
-)
-
-func parseDir(written string) (parts []string, fault dirProblem) {
-	parts = splitPath(written)
-	switch {
-	case isRooted(written) || slices.Contains(parts, ".."):
-		return nil, leavesItsFolder
-	case len(parts) == 0:
-		return nil, namesNoFolder
-	case !isPortablePath(parts):
-		return nil, unusableName
-	}
-	return parts, noFault
-}
-
-func isPortablePath(parts []string) bool {
-	_, portable := fsx.CleanRelPath(strings.Join(parts, "/"))
-	return portable
-}
-
-func splitPath(written string) []string {
-	var parts []string
-	for part := range strings.SplitSeq(strings.ReplaceAll(written, `\`, "/"), "/") {
-		if part != "" && part != "." {
-			parts = append(parts, part)
-		}
-	}
-	return parts
-}
-
-func isRooted(written string) bool {
-	if strings.HasPrefix(written, "/") || strings.HasPrefix(written, `\`) {
-		return true
-	}
-	if len(written) < 2 || written[1] != ':' {
-		return false
-	}
-	letter := written[0] | 0x20
-	return letter >= 'a' && letter <= 'z'
-}
-
 func isMissing(err error) bool {
-	var expected *diag.Error
-	return errors.Is(err, fs.ErrNotExist) && !errors.As(err, &expected)
+	var diagErr *diag.Error
+	return errors.Is(err, fs.ErrNotExist) && !errors.As(err, &diagErr)
 }
 
 func ReadMapGlobals(source *mapdir.Folder) (*lua.MapGlobals, error) {
-	script, found, err := source.Read(scriptName)
+	data, found, err := source.Read(scriptName)
 	switch {
 	case err != nil:
 		return nil, err
 	case found:
-		defined := lua.ReadMapGlobals(string(script))
-		return &defined, nil
+		globals := lua.ReadMapGlobals(string(data))
+		return &globals, nil
 	case source.IsDir(scriptName):
 		return nil, errFolderForScript(source.CanonicalPath(scriptName), source.DisplayPath(scriptName))
 	}
 	return nil, nil
 }
 
-func CollectAssets(p *manifest.Project, synced []library.Synced) (found []assets.Asset, replaced []string, err error) {
-	shipping, err := librariesWithAssets(p.Root, synced)
+func CollectAssets(project *manifest.Project, synced []library.Synced) (collected []assets.Asset, replaced []string, err error) {
+	libraries, err := librariesWithAssets(project.Root, synced)
 	if err != nil {
 		return nil, nil, err
 	}
-	return assets.Collect(p.Root, p.Assets, manifest.SharedManifest, shipping)
+	return assets.Collect(project.Root, project.Assets, manifest.SharedManifest, libraries)
 }
 
 func librariesWithAssets(root string, synced []library.Synced) ([]assets.Library, error) {
-	var shipping []assets.Library
-	for _, lib := range synced {
-		if lib.Assets == "" {
+	var libraries []assets.Library
+	for _, syncedLibrary := range synced {
+		if syncedLibrary.Assets == "" {
 			continue
 		}
-		if _, err := fsx.SafeJoinNoSymlinks(root, lib.Assets); err != nil {
+		if _, err := fsx.SafeJoinNoSymlinks(root, syncedLibrary.Assets); err != nil {
 			return nil, err
 		}
-		below, _ := fsx.CleanRelPath(lib.Assets)
-		shipping = append(shipping, assets.Library{Key: lib.Key, Dir: filepath.Join(root, filepath.FromSlash(below))})
+		relPath, _ := fsx.CleanRelPath(syncedLibrary.Assets)
+		libraries = append(libraries, assets.Library{Key: syncedLibrary.Key, Dir: filepath.Join(root, filepath.FromSlash(relPath))})
 	}
-	return shipping, nil
+	return libraries, nil
 }
 
-func AssetStatePath(p *manifest.Project) (string, error) {
-	folder, err := sourceMapDir(p)
+func AssetStatePath(project *manifest.Project) (string, error) {
+	mapDir, err := sourceMapDir(project)
 	if err != nil {
 		return "", err
 	}
-	return assets.StateFilePath(p.Root, folder)
+	return assets.StateFilePath(project.Root, mapDir)
 }
 
-func errNotInsideMaps(manifestFile, folder string) error {
+func errNotInsideMaps(manifestName, mapFolder string) error {
 	return &diag.Error{
-		Msg:  `map.folder must name a folder inside maps/, not "` + folder + `".`,
-		File: manifestFile,
+		Msg:  `map.folder must name a folder inside maps/, not "` + mapFolder + `".`,
+		File: manifestName,
 		Hint: "Set map.folder to the name of the map folder under maps/, such as map.w3x.",
 	}
 }
 
-const unusableNames = `A name cannot hold a control character or any of < > : " | ? *, end with a dot or a ` +
-	"space, or be a device name such as CON or NUL."
-
-func errUnusableMapFolder(manifestFile, folder string) error {
+func errUnusableMapFolder(manifestName, mapFolder string) error {
 	return &diag.Error{
-		Msg:  `map.folder has a name that Windows cannot hold: "` + folder + `".`,
-		File: manifestFile,
+		Msg:  `map.folder has a name that Windows cannot hold: "` + mapFolder + `".`,
+		File: manifestName,
 		Hint: "Set map.folder to the name of the map folder under maps/, such as map.w3x. " + unusableNames,
 	}
 }
 
-func errNoMap(manifestFile, label string) error {
+func errNoMap(manifestName, displayPath string) error {
 	return &diag.Error{
-		Msg:  "Source map folder " + label + " not found.",
-		File: manifestFile,
+		Msg:  "Source map folder " + displayPath + " not found.",
+		File: manifestName,
 		Hint: "Set map.folder to a folder under maps/ saved by World Editor in folder format.",
 	}
 }
 
-func errFolderForScript(folder, file string) error {
+func errFolderForScript(dir, displayPath string) error {
 	return &diag.Error{
-		Msg:  folder + " in the map is a folder, not a file.",
-		File: file,
+		Msg:  dir + " in the map is a folder, not a file.",
+		File: displayPath,
 		Hint: "The map has a folder where its script belongs. Remove that folder from the source map, or save the " +
 			"map in World Editor with Lua as the script language.",
 	}

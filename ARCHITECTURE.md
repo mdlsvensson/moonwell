@@ -246,32 +246,35 @@ This is the function as the source has it, with the error check after each step 
 the quote to the source, so a step added to `Plan` is a step added here:
 
 ```go
-func Plan(ctx context.Context, e *env.Env, p *manifest.Project, opts Options) (*Result, error) {
-	source, err := OpenSource(p)
+func Plan(ctx context.Context, e *env.Env, project *manifest.Project, options Options) (*Result, error) {
+	source, err := OpenSource(project)
 	globals, err := ReadMapGlobals(source)
 
-	objs, err := objects.Plan(source, p.Objects, objects.LoadMetadata())
-	err = writeGenerated(e, source, objs, globals, opts)
-	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
-	program, err := compile(ctx, e, p, synced, globals, opts)
+	objectPlan, err := objects.Plan(source, project.Objects, objects.LoadMetadata())
+	err = writeGenerated(e, source, objectPlan, globals, options)
+	synced, err := library.Sync(ctx, e, project.Libraries, project.ManifestName)
+	program, err := compile(ctx, e, project, synced, globals, options)
 
-	view := source.WithChanges(objs.Changes)
-	set, err := settings.Plan(view, p)
-	view = view.WithChanges(set)
-	imported, replaced, err := PlanAssets(ctx, view, p, synced)
-	view = view.WithChanges(imported.Changes)
-	bundle, err := script.Inject(view, program)
-	view = view.WithChanges(bundle)
-	return &Result{Map: view, Objects: objs, Settings: set, Assets: imported, Replaced: replaced, Program: program}, nil
+	view := source.WithChanges(objectPlan.Changes)
+	settingsChanges, err := settings.Plan(view, project)
+	view = view.WithChanges(settingsChanges)
+	assetPlan, replaced, err := PlanAssets(ctx, view, project, synced)
+	view = view.WithChanges(assetPlan.Changes)
+	scriptChanges, err := script.Inject(view, program)
+	view = view.WithChanges(scriptChanges)
+	return &Result{
+		Map: view, Objects: objectPlan, Settings: settingsChanges, Assets: assetPlan, Replaced: replaced,
+		Program: program,
+	}, nil
 }
 ```
 
 The steps, one by one:
 
-1. **`OpenSource(p)`** opens the source map, `maps/<map.folder>`, as a `*mapdir.Folder`. The folder is scanned whole,
-   once: a link, a name Windows cannot hold, or two paths that differ only in letter case is refused here, wherever
-   in the map it is. It comes first because every later step reads the map, and a map that is missing should be
-   reported before a compile error.
+1. **`OpenSource(project)`** opens the source map, `maps/<map.folder>`, as a `*mapdir.Folder`. The folder is scanned
+   whole, once: a link, a name Windows cannot hold, or two paths that differ only in letter case is refused here,
+   wherever in the map it is. It comes first because every later step reads the map, and a map that is missing
+   should be reported before a compile error.
 2. **`ReadMapGlobals(source)`** reads the map's `war3map.lua` and lists what it defines: the `gg_` and `udg_` globals
    and the functions World Editor wrote. Two later steps need the list: the check for unknown globals, and the
    editor's declarations.
@@ -291,9 +294,9 @@ The steps, one by one:
    the compile's cache, `dist/stage/lua`. `script.Link` follows the requires from the entry and checks the modules
    it reaches for unknown globals. Between the two, `editor.RefreshLibraryView` writes the libraries' modules as
    Lua into `.moonwell/lua`: the editor then has them also when `script.Link` fails, which is when a user looks.
-7. **`source.WithChanges(objs.Changes)`** makes the first view. A view is the source map with planned changes laid
-   over it: a read through the view gives the changed file, and nothing is on disk yet.
-8. **`settings.Plan(view, p)`** plans the map settings on the map as the objects leave it. It patches
+7. **`source.WithChanges(objectPlan.Changes)`** makes the first view. A view is the source map with planned changes
+   laid over it: a read through the view gives the changed file, and nothing is on disk yet.
+8. **`settings.Plan(view, project)`** plans the map settings on the map as the objects leave it. It patches
    `war3map.w3i`, edits the calls World Editor wrote into `war3map.lua`, and merges the two text files.
 9. **`PlanAssets`** (in `internal/build/steps.go`) collects the project's assets and the files the libraries ship,
    reads which files of the map `assets:sync` owns (the ownership state, `.asset-state/<map>.json`), and has
@@ -521,14 +524,14 @@ Each row names the file to open and, in most rows, the function to read first.
 | I want to | Open |
 | --- | --- |
 | add a step to a build, or move one | `internal/build/build.go`: `Plan` |
-| know how `map.folder` is read and the source map opened | `internal/build/project.go`: `OpenSource`, `sourceMapDir`, `parseDir` |
+| know how `map.folder` is read and the source map opened | `internal/build/project.go`: `OpenSource`, `sourceMapDir`; `internal/build/dirsetting.go`: `parseDir` |
 | know where "Another Moonwell build is running" comes from | `internal/build/lock.go`: `AcquireLock`, `errHeld` |
 | know why a link at `dist` is refused | `internal/build/output.go`: `outputPath` |
 | change where the map is staged, or what is logged after | `internal/build/stage.go`: `stageOutputFile`, `logStaged` |
 | change where the archive goes, or how `build.folder` is read | `internal/build/archive.go`: `archivePath`, `resolveBuildDir`, `writeArchive` |
 | know which files go into the archive, and in which order | `internal/build/pack.go`: `packMap`, `archiveFiles` |
 | know how large a map may be, or change the archive's format | `internal/war3/mpq/size.go`: `CheckFits`; `internal/war3/mpq/write.go`: `Write` |
-| change what `dev` watches, or when it checks again | `internal/build/dev_watched.go`: `projectWatchSet`, `isProjectSource`, for what is watched; `internal/build/dev.go`: `Dev`, `isDue`, for when; the watcher in `internal/build/watch.go` |
+| change what `dev` watches, or when it checks again | `internal/build/watchset.go`: `projectWatchSet`, `isProjectSource`, for what is watched; `internal/build/dev.go`: `Dev`, `isDue`, for when; the watcher in `internal/build/watch.go` |
 | change how the game is started | `internal/build/launch.go`: `launch`; `internal/env/spawn_windows.go` and `internal/env/spawn_unix.go` |
 
 ### The manifest and the tools
