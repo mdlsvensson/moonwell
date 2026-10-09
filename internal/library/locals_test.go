@@ -9,7 +9,7 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func foldersOfLocals(locals []Local) []string {
+func localDirs(locals []Local) []string {
 	var dirs []string
 	for _, local := range locals {
 		for _, folder := range local.Dirs {
@@ -19,7 +19,7 @@ func foldersOfLocals(locals []Local) []string {
 	return dirs
 }
 
-func labelsOfLocals(locals []Local) []string {
+func localDisplayPaths(locals []Local) []string {
 	var labels []string
 	for _, local := range locals {
 		for _, folder := range local.Dirs {
@@ -32,12 +32,12 @@ func labelsOfLocals(locals []Local) []string {
 func TestLocalsListsTheFoldersOfLocalLibrariesOnly(t *testing.T) {
 	root := t.TempDir()
 	mine := filepath.Join(filepath.Dir(root), "mine")
-	locals := Locals(root, block("mine", fromFolder("../mine", "src"), "remote", fromGitHub("v1", "")))
+	locals := Locals(root, librariesOf("mine", localLibrary("../mine", "src"), "remote", githubLibrary("v1", "")))
 	want := []Local{{Key: "mine", Dir: mine, Dirs: []LocalDir{{filepath.Join(mine, "src"), "../mine/src/"}}}}
 	if !slices.EqualFunc(locals, want, sameLocal) {
 		t.Errorf("Locals = %+v, want %+v", locals, want)
 	}
-	if got := Locals(root, block("remote", fromGitHub("v1", ""))); got != nil {
+	if got := Locals(root, librariesOf("remote", githubLibrary("v1", ""))); got != nil {
 		t.Errorf("Locals of a project without a local library = %+v", got)
 	}
 	if got := Locals(root, nil); got != nil {
@@ -51,14 +51,14 @@ func sameLocal(a, b Local) bool {
 
 func TestLocalsTakesTheModuleAndAssetsFoldersFromALibrarysOwnFile(t *testing.T) {
 	root := t.TempDir()
-	put(t, root,
+	writeTestFiles(t, root,
 		"described/moonwell-library.json", `{"dir":"src","assets":"art"}`,
 		"broken/moonwell-library.json", "{",
 		"rooted/moonwell-library.json", "{}",
 	)
-	locals := Locals(root, block(
-		"a", fromFolder("described", ""), "b", fromFolder("described", "lua"), "c", fromFolder("broken", ""),
-		"d", fromFolder("rooted", ""),
+	locals := Locals(root, librariesOf(
+		"a", localLibrary("described", ""), "b", localLibrary("described", "lua"), "c", localLibrary("broken", ""),
+		"d", localLibrary("rooted", ""),
 	))
 	wantDirs := []string{
 		filepath.Join(root, "described", "src"),
@@ -68,11 +68,11 @@ func TestLocalsTakesTheModuleAndAssetsFoldersFromALibrarysOwnFile(t *testing.T) 
 		filepath.Join(root, "broken"),
 		filepath.Join(root, "rooted"),
 	}
-	if got := foldersOfLocals(locals); !slices.Equal(got, wantDirs) {
+	if got := localDirs(locals); !slices.Equal(got, wantDirs) {
 		t.Errorf("the folders are %q, want %q", got, wantDirs)
 	}
 	wantLabels := []string{"described/src/", "described/art/", "described/lua/", "described/art/", "broken/", "rooted/"}
-	if got := labelsOfLocals(locals); !slices.Equal(got, wantLabels) {
+	if got := localDisplayPaths(locals); !slices.Equal(got, wantLabels) {
 		t.Errorf("the labels are %q, want %q", got, wantLabels)
 	}
 	var keys, dirs []string
@@ -90,9 +90,9 @@ func TestLocalsTakesTheModuleAndAssetsFoldersFromALibrarysOwnFile(t *testing.T) 
 
 func TestLocalsAreInTheOrderOfTheirKeysBytes(t *testing.T) {
 	root := t.TempDir()
-	locals := Locals(root, block(
-		"b", fromFolder("one", ""), "a", fromFolder("two", ""), "_x", fromFolder("three", ""),
-		"B", fromFolder("four", ""), "a-1", fromFolder("five", ""), "0", fromFolder("six", ""),
+	locals := Locals(root, librariesOf(
+		"b", localLibrary("one", ""), "a", localLibrary("two", ""), "_x", localLibrary("three", ""),
+		"B", localLibrary("four", ""), "a-1", localLibrary("five", ""), "0", localLibrary("six", ""),
 	))
 	var keys []string
 	for _, local := range locals {
@@ -120,28 +120,28 @@ func TestLocalsTakesALibrarysFileThatTheSyncRefusesForNone(t *testing.T) {
 	}
 	for _, c := range cases {
 		root := t.TempDir()
-		put(t, root, "lib/"+c.file, c.text, "lib/src/a.lua", "return 1", "lib/art/x.blp", "x")
+		writeTestFiles(t, root, "lib/"+c.file, c.text, "lib/src/a.lua", "return 1", "lib/art/x.blp", "x")
 		if c.held {
 			testkit.MakeUnreadable(t, filepath.Join(root, "lib", File))
 		}
-		libraries := block("mine", fromFolder("lib", ""))
+		libraries := librariesOf("mine", localLibrary("lib", ""))
 		lib := filepath.Join(root, "lib")
 		want := []Local{{Key: "mine", Dir: lib, Dirs: []LocalDir{{lib, "lib/"}}}}
 		if got := Locals(root, libraries); !slices.EqualFunc(got, want, sameLocal) {
 			t.Errorf("%s: Locals = %+v, want %+v", c.name, got, want)
 		}
 		want[0].Dirs = []LocalDir{{filepath.Join(lib, "src"), "lib/src/"}}
-		if got := Locals(root, block("mine", fromFolder("lib", "src"))); !slices.EqualFunc(got, want, sameLocal) {
+		if got := Locals(root, librariesOf("mine", localLibrary("lib", "src"))); !slices.EqualFunc(got, want, sameLocal) {
 			t.Errorf("%s, with a dir in the manifest: Locals = %+v, want %+v", c.name, got, want)
 		}
-		refusal(t, root, libraries, nil, c.name)
+		mustFailSync(t, root, libraries, nil, c.name)
 	}
 }
 
 func TestALocalsFolderIsWrittenAsTheManifestAndTheLibrarysFileWriteIt(t *testing.T) {
 	root := t.TempDir()
 	elsewhere := filepath.Join(t.TempDir(), "kit")
-	put(t, elsewhere, "moonwell-library.json", `{"dir":"src/modules","assets":"art"}`)
+	writeTestFiles(t, elsewhere, "moonwell-library.json", `{"dir":"src/modules","assets":"art"}`)
 	cases := []struct {
 		name      string
 		path, dir string
@@ -162,7 +162,7 @@ func TestALocalsFolderIsWrittenAsTheManifestAndTheLibrarysFileWriteIt(t *testing
 	}
 	for _, c := range cases {
 		want := []Local{{Key: "mine", Dir: c.own, Dirs: c.want}}
-		if got := Locals(root, block("mine", fromFolder(c.path, c.dir))); !slices.EqualFunc(got, want, sameLocal) {
+		if got := Locals(root, librariesOf("mine", localLibrary(c.path, c.dir))); !slices.EqualFunc(got, want, sameLocal) {
 			t.Errorf("%s: Locals = %+v, want %+v", c.name, got, want)
 		}
 	}
@@ -170,38 +170,38 @@ func TestALocalsFolderIsWrittenAsTheManifestAndTheLibrarysFileWriteIt(t *testing
 
 func TestLocalsListsTheFoldersTheSyncCopiesFrom(t *testing.T) {
 	root := t.TempDir()
-	put(t, root,
+	writeTestFiles(t, root,
 		"plain/a.lua", "return 'plain'",
 		"named/moonwell-library.json", `{"dir":"src","assets":"art"}`,
 		"named/src/b.lua", "return 'named'", "named/other/c.lua", "return 'other'", "named/art/x.blp", "x",
 		"../beside/lua/d.lua", "return 'beside'",
 	)
-	libraries := block(
-		"plain", fromFolder("plain", ""), "named", fromFolder("named", ""), "over", fromFolder("named", "other"),
-		"beside", fromFolder("../beside", "lua"),
+	libraries := librariesOf(
+		"plain", localLibrary("plain", ""), "named", localLibrary("named", ""), "over", localLibrary("named", "other"),
+		"beside", localLibrary("../beside", "lua"),
 	)
-	sync(t, root, libraries, nil)
+	mustSync(t, root, libraries, nil)
 	locals := Locals(root, libraries)
 	if len(locals) != len(libraries) {
 		t.Fatalf("Locals = %+v", locals)
 	}
 	for _, local := range locals {
 		modules := local.Dirs[0].Dir
-		if got, want := textOf(t, root, modulesDirName(local.Key)+"/"+stampFile), localStampText(modules); got != want {
+		if got, want := readFile(t, root, modulesDirName(local.Key)+"/"+stampFile), localStampText(modules); got != want {
 			t.Errorf("%s: the sync stamped %q, and Locals lists %q", local.Key, got, modules)
 		}
 		isStamp := func(name string) bool { return name == stampFile }
-		copied := slices.DeleteFunc(filesIn(t, root, modulesDirName(local.Key)), isStamp)
+		copied := slices.DeleteFunc(listFiles(t, root, modulesDirName(local.Key)), isStamp)
 		from, err := listFilesBelow(modules, "", isModule, "")
 		if err != nil || !slices.Equal(copied, from) {
 			t.Errorf("%s: the sync copied %q, and the folder Locals lists holds %q, %v", local.Key, copied, from, err)
 		}
-		if shipped := there(root, assetsDirName(local.Key)); shipped != (len(local.Dirs) == 2) {
+		if shipped := exists(root, assetsDirName(local.Key)); shipped != (len(local.Dirs) == 2) {
 			t.Errorf("%s: Locals lists %d folders, and the sync's folder of files for the map is there: %v",
 				local.Key, len(local.Dirs), shipped)
 		}
 	}
-	if got, want := filesIn(t, root, assetsDirName("named")), filesIn(t, root, "named/art"); !slices.Equal(got, want) {
+	if got, want := listFiles(t, root, assetsDirName("named")), listFiles(t, root, "named/art"); !slices.Equal(got, want) {
 		t.Errorf("the sync copied the files %q for the map, and the folder Locals lists holds %q", got, want)
 	}
 }

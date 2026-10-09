@@ -18,7 +18,7 @@ import (
 
 var background = context.Background()
 
-func asError(t testing.TB, err error, what string) *diag.Error {
+func asDiagError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
 	var diagErr *diag.Error
 	if !errors.As(err, &diagErr) {
@@ -27,7 +27,7 @@ func asError(t testing.TB, err error, what string) *diag.Error {
 	return diagErr
 }
 
-func shown(text *string) string {
+func derefOrNil(text *string) string {
 	if text == nil {
 		return "<nil>"
 	}
@@ -47,7 +47,7 @@ const (
 
 var linkedLocks = []string{"a link to a lock", "a link to nothing", "a link to a folder"}
 
-func linkTheLock(t *testing.T, kind, root, beside string) {
+func symlinkLock(t *testing.T, kind, root, beside string) {
 	t.Helper()
 	symlink, target := filepath.Join(root, lockFile), filepath.Join(beside, "nothing.lock")
 	switch kind {
@@ -56,20 +56,20 @@ func linkTheLock(t *testing.T, kind, root, beside string) {
 		testkit.LinkDir(t, filepath.Join(beside, "folder"), symlink)
 		return
 	case "a link to a lock":
-		target = testkit.WriteFile(t, beside, "their.lock", []byte(formatLock(map[string]lockEntry{"ex": entryOfTest(nil)})))
+		target = testkit.WriteFile(t, beside, "their.lock", []byte(formatLock(map[string]lockEntry{"ex": testLockEntry(nil)})))
 	}
 	testkit.LinkFile(t, target, symlink)
 }
 
-func refusedLink(t *testing.T, err error, what, path, file string) {
+func checkSymlinkError(t *testing.T, err error, what, path, file string) {
 	t.Helper()
-	diagErr := asError(t, err, what)
+	diagErr := asDiagError(t, err, what)
 	if diagErr.Msg != "Symlinks are not supported: "+path || diagErr.File != file || !strings.Contains(diagErr.Hint, "real files") {
 		t.Errorf("%s: %+v", what, diagErr)
 	}
 }
 
-func entries(files ...string) []testkit.ZipEntry {
+func zipEntries(files ...string) []testkit.ZipEntry {
 	var listed []testkit.ZipEntry
 	for i := 0; i < len(files); i += 2 {
 		listed = append(listed, testkit.ZipEntry{Name: files[i], Data: []byte(files[i+1])})
@@ -77,7 +77,7 @@ func entries(files ...string) []testkit.ZipEntry {
 	return listed
 }
 
-func filesOfTest(files ...string) []archiveFile {
+func archiveFilesOf(files ...string) []archiveFile {
 	var listed []archiveFile
 	for i := 0; i < len(files); i += 2 {
 		listed = append(listed, archiveFile{files[i], []byte(files[i+1])})
@@ -85,7 +85,7 @@ func filesOfTest(files ...string) []archiveFile {
 	return listed
 }
 
-func listing(files []archiveFile) []string {
+func fileNames(files []archiveFile) []string {
 	var listed []string
 	for _, file := range files {
 		listed = append(listed, file.name+"="+string(file.data))
@@ -93,7 +93,7 @@ func listing(files []archiveFile) []string {
 	return listed
 }
 
-func changed(files []string, name, content string) []string {
+func withFile(files []string, name, content string) []string {
 	other := slices.Clone(files)
 	other[slices.Index(other, name)+1] = content
 	return other
@@ -101,10 +101,10 @@ func changed(files []string, name, content string) []string {
 
 var longAgo = time.Date(2001, 2, 3, 4, 5, 6, 0, time.UTC)
 
-func filesBelow(t *testing.T, dir string) (files map[string]*string, written []string) {
+func readTree(t *testing.T, dir string) (files map[string]*string, written []string) {
 	t.Helper()
 	files = map[string]*string{}
-	eachBelow(t, dir, func(path, name string, info fs.FileInfo) {
+	walkFiles(t, dir, func(path, name string, info fs.FileInfo) {
 		switch {
 		case info.IsDir():
 			files[name] = nil
@@ -126,7 +126,7 @@ func filesBelow(t *testing.T, dir string) (files map[string]*string, written []s
 	return files, written
 }
 
-func eachBelow(t *testing.T, dir string, visit func(path, name string, info fs.FileInfo)) {
+func walkFiles(t *testing.T, dir string, visit func(path, name string, info fs.FileInfo)) {
 	t.Helper()
 	err := filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil || path == dir {
@@ -145,9 +145,9 @@ func eachBelow(t *testing.T, dir string, visit func(path, name string, info fs.F
 	}
 }
 
-func makeOld(t *testing.T, dir string) {
+func backdate(t *testing.T, dir string) {
 	t.Helper()
-	eachBelow(t, dir, func(path, _ string, info fs.FileInfo) {
+	walkFiles(t, dir, func(path, _ string, info fs.FileInfo) {
 		if !info.Mode().IsRegular() || info.ModTime().Equal(longAgo) {
 			return
 		}

@@ -16,7 +16,7 @@ import (
 
 const lockHintWords = "delete it: the next check downloads every library again"
 
-func entryOfTest(assets *string) lockEntry {
+func testLockEntry(assets *string) lockEntry {
 	return lockEntry{
 		GitHub: "mdlsvensson/moonwell-example-lib", Tag: "v0.1.0", Dir: "src",
 		Commit: commitB, Files: "sha256:abc", Assets: assets,
@@ -25,14 +25,14 @@ func entryOfTest(assets *string) lockEntry {
 
 func sameEntry(a, b lockEntry) bool {
 	return a.GitHub == b.GitHub && a.Tag == b.Tag && a.Dir == b.Dir && a.Commit == b.Commit && a.Files == b.Files &&
-		shown(a.Assets) == shown(b.Assets)
+		derefOrNil(a.Assets) == derefOrNil(b.Assets)
 }
 
 func sameEntries(a, b map[string]lockEntry) bool {
 	return maps.EqualFunc(a, b, sameEntry)
 }
 
-func lockOf(t *testing.T, root string) map[string]lockEntry {
+func mustReadLock(t *testing.T, root string) map[string]lockEntry {
 	t.Helper()
 	lock, err := readLock(root)
 	if err != nil {
@@ -41,7 +41,7 @@ func lockOf(t *testing.T, root string) map[string]lockEntry {
 	return lock
 }
 
-func lockTextOf(t *testing.T, root string) string {
+func readLockText(t *testing.T, root string) string {
 	t.Helper()
 	content, err := os.ReadFile(filepath.Join(root, lockFile))
 	if err != nil {
@@ -59,16 +59,16 @@ func TestWriteLockWritesSortedJSONReadLockReadsItBackAndNoLibrariesRemovesTheFil
 	if lock, err := readLock(root); err != nil || lock == nil || len(lock) != 0 {
 		t.Errorf("no lock file reads as %v, %v", lock, err)
 	}
-	written := map[string]lockEntry{"z": entryOfTest(nil), "a": entryOfTest(nil), "B": entryOfTest(nil)}
+	written := map[string]lockEntry{"z": testLockEntry(nil), "a": testLockEntry(nil), "B": testLockEntry(nil)}
 	if err := writeLock(root, written); err != nil {
 		t.Fatal(err)
 	}
 	want := "{\n  \"libraries\": {\n    \"B\": " + exampleEntryText + ",\n    \"a\": " + exampleEntryText +
 		",\n    \"z\": " + exampleEntryText + "\n  }\n}\n"
-	if content := lockTextOf(t, root); content != want || lockFile != "moonwell.lock" {
+	if content := readLockText(t, root); content != want || lockFile != "moonwell.lock" {
 		t.Errorf("%s is\n%s\nwant\n%s", lockFile, content, want)
 	}
-	if lock := lockOf(t, root); !sameEntries(lock, written) {
+	if lock := mustReadLock(t, root); !sameEntries(lock, written) {
 		t.Errorf("the lock reads back as %+v", lock)
 	}
 	for _, none := range []map[string]lockEntry{nil, {}} {
@@ -109,7 +109,7 @@ func TestReadLockRefusesALockFileItCannotRead(t *testing.T) {
 	for _, c := range cases {
 		testkit.WriteFile(t, root, lockFile, []byte(c.content))
 		lock, err := readLock(root)
-		diagErr := asError(t, err, c.content)
+		diagErr := asDiagError(t, err, c.content)
 		if lock != nil || diagErr.Msg != lockFile+" "+c.says || diagErr.File != lockFile ||
 			!strings.Contains(diagErr.Hint, lockHintWords) {
 			t.Errorf("%s: %v, %+v", c.content, lock, diagErr)
@@ -129,7 +129,7 @@ func TestALockInAnotherOrderWithMoreThanItNeedsIsRead(t *testing.T) {
 		"a": {GitHub: "o/a", Tag: "v\xc3\xa9\xf0\x9f\x98\x80", Dir: "d", Commit: "c", Files: "g"},
 		"b": {GitHub: "o/r", Tag: "t", Commit: "c", Files: "f", Assets: &assets},
 	}
-	if lock := lockOf(t, root); !sameEntries(lock, want) {
+	if lock := mustReadLock(t, root); !sameEntries(lock, want) {
 		t.Errorf("the lock reads as %+v, want %+v", lock, want)
 	}
 }
@@ -142,12 +142,12 @@ func TestAByteOfALockThatIsNotUTF8ReadsAsAReplacementCharacter(t *testing.T) {
 	want := map[string]lockEntry{
 		"a" + replaced: {GitHub: "g", Tag: "t" + replaced + replaced, Dir: replaced + replaced, Commit: "c", Files: "f"},
 	}
-	if lock := lockOf(t, root); !sameEntries(lock, want) {
+	if lock := mustReadLock(t, root); !sameEntries(lock, want) {
 		t.Errorf("the lock reads as %+v, want %+v", lock, want)
 	}
 	testkit.WriteFile(t, root, lockFile, []byte("{\"libraries\":{}}\xff"))
 	_, err := readLock(root)
-	if diagErr := asError(t, err, "a byte after the document"); !strings.Contains(diagErr.Msg, "is not valid JSON") {
+	if diagErr := asDiagError(t, err, "a byte after the document"); !strings.Contains(diagErr.Msg, "is not valid JSON") {
 		t.Errorf("error = %+v", diagErr)
 	}
 }
@@ -158,7 +158,7 @@ func TestALockThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 		t.Fatal(err)
 	}
 	lock, err := readLock(root)
-	diagErr := asError(t, err, "a folder in place of the lock")
+	diagErr := asDiagError(t, err, "a folder in place of the lock")
 	if lock != nil || !strings.HasPrefix(diagErr.Msg, "Reading moonwell.lock failed: ") || diagErr.File != lockFile ||
 		!strings.Contains(diagErr.Hint, lockHintWords) || diagErr.Cause == nil || strings.Contains(diagErr.Msg, root) {
 		t.Errorf("readLock = %v, %+v", lock, diagErr)
@@ -168,16 +168,16 @@ func TestALockThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 func TestAnEntryKeepsItsAssetsHashWrittenLastAndAnEntryWithoutOneGetsNoSuchKey(t *testing.T) {
 	root := t.TempDir()
 	hash := "sha256:def"
-	written := map[string]lockEntry{"plain": entryOfTest(nil), "shipping": entryOfTest(&hash)}
+	written := map[string]lockEntry{"plain": testLockEntry(nil), "shipping": testLockEntry(&hash)}
 	if err := writeLock(root, written); err != nil {
 		t.Fatal(err)
 	}
 	shipping := strings.Replace(exampleEntryText, "\"sha256:abc\"\n", "\"sha256:abc\",\n      \"assets\": \"sha256:def\"\n", 1)
 	want := "{\n  \"libraries\": {\n    \"plain\": " + exampleEntryText + ",\n    \"shipping\": " + shipping + "\n  }\n}\n"
-	if content := lockTextOf(t, root); content != want {
+	if content := readLockText(t, root); content != want {
 		t.Errorf("%s is\n%s\nwant\n%s", lockFile, content, want)
 	}
-	if lock := lockOf(t, root); !sameEntries(lock, written) {
+	if lock := mustReadLock(t, root); !sameEntries(lock, written) {
 		t.Errorf("the lock reads back as %+v", lock)
 	}
 }
@@ -196,10 +196,10 @@ func TestTheLockEscapesNoMoreThanJSONMust(t *testing.T) {
 		"      \"tag\": \"v\xe2\x80\xa8\xe2\x80\xa9\xc3\xa9\",\n      \"dir\": \"a\\\\b/\\\"c\\\"\",\n" +
 		"      \"commit\": \"\\u0000\\u001f\\b\\f\\n\\r\\t\",\n      \"files\": \"\xf0\x9f\x98\x80\",\n" +
 		"      \"assets\": \"a\x7f\"\n    }\n  }\n}\n"
-	if content := lockTextOf(t, root); content != want {
+	if content := readLockText(t, root); content != want {
 		t.Errorf("%s is\n%q\nwant\n%q", lockFile, content, want)
 	}
-	if lock := lockOf(t, root); !sameEntries(lock, map[string]lockEntry{"k<\xe2\x80\xa8>\n": entry}) {
+	if lock := mustReadLock(t, root); !sameEntries(lock, map[string]lockEntry{"k<\xe2\x80\xa8>\n": entry}) {
 		t.Errorf("the lock reads back as %+v", lock)
 	}
 }
@@ -215,7 +215,7 @@ func TestTheKeysOfALockAreSortedByBytes(t *testing.T) {
 		t.Fatal(err)
 	}
 	var order []string
-	for line := range strings.SplitSeq(lockTextOf(t, root), "\n") {
+	for line := range strings.SplitSeq(readLockText(t, root), "\n") {
 		if key, isKey := strings.CutSuffix(line, `": {`); isKey && strings.HasPrefix(line, `    "`) {
 			order = append(order, strings.TrimPrefix(key, `    "`))
 		}
@@ -228,7 +228,7 @@ func TestTheKeysOfALockAreSortedByBytes(t *testing.T) {
 func TestTheLockIsWrittenOnlyWhenItsTextChanges(t *testing.T) {
 	root := t.TempDir()
 	path := filepath.Join(root, lockFile)
-	entries := map[string]lockEntry{"a": entryOfTest(nil)}
+	entries := map[string]lockEntry{"a": testLockEntry(nil)}
 	if err := writeLock(root, entries); err != nil {
 		t.Fatal(err)
 	}
@@ -242,20 +242,20 @@ func TestTheLockIsWrittenOnlyWhenItsTextChanges(t *testing.T) {
 	if info, err := os.Stat(path); err != nil || !info.ModTime().Equal(longAgo) {
 		t.Errorf("the same libraries wrote the lock again: %v, %v", info.ModTime(), err)
 	}
-	entries["b"] = entryOfTest(nil)
+	entries["b"] = testLockEntry(nil)
 	if err := writeLock(root, entries); err != nil {
 		t.Fatal(err)
 	}
-	if info, err := os.Stat(path); err != nil || info.ModTime().Equal(longAgo) || len(lockOf(t, root)) != 2 {
+	if info, err := os.Stat(path); err != nil || info.ModTime().Equal(longAgo) || len(mustReadLock(t, root)) != 2 {
 		t.Errorf("another library did not write the lock: %v", err)
 	}
 }
 
 func TestALockThatCannotBeWrittenOrRemovedIsRefusedByItsName(t *testing.T) {
-	for name, entries := range map[string]map[string]lockEntry{"Writing": {"a": entryOfTest(nil)}, "Removing": nil} {
+	for name, entries := range map[string]map[string]lockEntry{"Writing": {"a": testLockEntry(nil)}, "Removing": nil} {
 		root := t.TempDir()
 		testkit.WriteFile(t, root, lockFile+"/in the way", nil)
-		diagErr := asError(t, writeLock(root, entries), name)
+		diagErr := asDiagError(t, writeLock(root, entries), name)
 		if !strings.HasPrefix(diagErr.Msg, name+" moonwell.lock failed: ") || diagErr.File != lockFile ||
 			!strings.Contains(diagErr.Hint, "Close programs that have moonwell.lock open") || diagErr.Cause == nil {
 			t.Errorf("%s: %+v", name, diagErr)
@@ -270,9 +270,9 @@ func TestReadLockRefusesALinkInTheLocksPlace(t *testing.T) {
 	for _, kind := range linkedLocks {
 		t.Run(kind, func(t *testing.T) {
 			root, beside := t.TempDir(), t.TempDir()
-			linkTheLock(t, kind, root, beside)
+			symlinkLock(t, kind, root, beside)
 			entries, err := readLock(root)
-			refusedLink(t, err, kind, filepath.Join(root, lockFile), lockFile)
+			checkSymlinkError(t, err, kind, filepath.Join(root, lockFile), lockFile)
 			if entries != nil {
 				t.Errorf("a lock that is refused comes with %+v", entries)
 			}
@@ -283,12 +283,12 @@ func TestReadLockRefusesALinkInTheLocksPlace(t *testing.T) {
 func TestWriteLockRefusesALinkInTheLocksPlace(t *testing.T) {
 	for _, kind := range linkedLocks {
 		t.Run(kind, func(t *testing.T) {
-			for name, entries := range map[string]map[string]lockEntry{"written": {"a": entryOfTest(nil)}, "removed": nil} {
+			for name, entries := range map[string]map[string]lockEntry{"written": {"a": testLockEntry(nil)}, "removed": nil} {
 				root, beside := t.TempDir(), t.TempDir()
-				linkTheLock(t, kind, root, beside)
-				before, _ := filesBelow(t, beside)
-				refusedLink(t, writeLock(root, entries), name, filepath.Join(root, lockFile), lockFile)
-				if after, _ := filesBelow(t, beside); !reflect.DeepEqual(after, before) {
+				symlinkLock(t, kind, root, beside)
+				before, _ := readTree(t, beside)
+				checkSymlinkError(t, writeLock(root, entries), name, filepath.Join(root, lockFile), lockFile)
+				if after, _ := readTree(t, beside); !reflect.DeepEqual(after, before) {
 					t.Errorf("%s: the lock was written or removed through the link: %v", name, slices.Sorted(maps.Keys(after)))
 				}
 				if info, err := fsx.Lstat(filepath.Join(root, lockFile)); err != nil || info == nil || !fsx.IsSymlink(info) {

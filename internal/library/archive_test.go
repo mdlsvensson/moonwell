@@ -22,39 +22,39 @@ func TestReadArchiveStripsTheSingleTopFolderAndReadsTheCommit(t *testing.T) {
 	)
 	commit, files, err := readArchive(archive)
 	want := []string{"README.md=# lib", "src/example/greet.lua=return {}", "src/empty.lua="}
-	if err != nil || commit != commitB || !slices.Equal(listing(files), want) {
-		t.Fatalf("readArchive = %q, %q, %v", commit, listing(files), err)
+	if err != nil || commit != commitB || !slices.Equal(fileNames(files), want) {
+		t.Fatalf("readArchive = %q, %q, %v", commit, fileNames(files), err)
 	}
 }
 
 func TestReadArchiveSkipsFolderEntriesAsGitHubsArchivesHaveThem(t *testing.T) {
-	archive := testkit.Zip(t, commitA, entries("lib-0.1.0/", "", "lib-0.1.0/src/", "", "lib-0.1.0/src/greet.lua", "return {}")...)
+	archive := testkit.Zip(t, commitA, zipEntries("lib-0.1.0/", "", "lib-0.1.0/src/", "", "lib-0.1.0/src/greet.lua", "return {}")...)
 	_, files, err := readArchive(archive)
-	if err != nil || !slices.Equal(listing(files), []string{"src/greet.lua=return {}"}) {
-		t.Fatalf("files = %q, %v", listing(files), err)
+	if err != nil || !slices.Equal(fileNames(files), []string{"src/greet.lua=return {}"}) {
+		t.Fatalf("files = %q, %v", fileNames(files), err)
 	}
-	for _, empty := range [][]testkit.ZipEntry{entries("lib/", "", "other/", ""), nil} {
+	for _, empty := range [][]testkit.ZipEntry{zipEntries("lib/", "", "other/", ""), nil} {
 		commit, files, err := readArchive(testkit.Zip(t, commitA, empty...))
 		if err != nil || commit != commitA || len(files) != 0 {
-			t.Errorf("an archive without files = %q, %q, %v", commit, listing(files), err)
+			t.Errorf("an archive without files = %q, %q, %v", commit, fileNames(files), err)
 		}
 	}
 }
 
 func TestReadArchiveRefusesAnArchiveWithoutACommitOrASingleTopFolder(t *testing.T) {
-	stored := testkit.Zip(t, commitA, entries("lib/a.lua", "return {}")...)
+	stored := testkit.Zip(t, commitA, zipEntries("lib/a.lua", "return {}")...)
 	cases := []struct {
 		name    string
 		archive []byte
 		says    string
 	}{
-		{"no comment", testkit.Zip(t, "", entries("lib/a.lua", "")...), "The archive's comment is not a commit SHA."},
-		{"a short commit", testkit.Zip(t, commitA[1:], entries("lib/a.lua", "")...), "comment is not a commit SHA."},
-		{"a commit in capitals", testkit.Zip(t, strings.ToUpper(commitA), entries("lib/a.lua", "")...), "comment is not a commit SHA."},
-		{"two commits", testkit.Zip(t, commitA+"\n"+commitB, entries("lib/a.lua", "")...), "comment is not a commit SHA."},
-		{"two top folders", testkit.Zip(t, commitA, entries("a/x.lua", "", "b/y.lua", "")...), "The archive does not have a single top folder."},
-		{"a file at the top", testkit.Zip(t, commitA, entries("top-level.lua", "")...), "does not have a single top folder."},
-		{"a file beside the top folder", testkit.Zip(t, commitA, entries("lib/a.lua", "", "b.lua", "")...), "does not have a single top folder."},
+		{"no comment", testkit.Zip(t, "", zipEntries("lib/a.lua", "")...), "The archive's comment is not a commit SHA."},
+		{"a short commit", testkit.Zip(t, commitA[1:], zipEntries("lib/a.lua", "")...), "comment is not a commit SHA."},
+		{"a commit in capitals", testkit.Zip(t, strings.ToUpper(commitA), zipEntries("lib/a.lua", "")...), "comment is not a commit SHA."},
+		{"two commits", testkit.Zip(t, commitA+"\n"+commitB, zipEntries("lib/a.lua", "")...), "comment is not a commit SHA."},
+		{"two top folders", testkit.Zip(t, commitA, zipEntries("a/x.lua", "", "b/y.lua", "")...), "The archive does not have a single top folder."},
+		{"a file at the top", testkit.Zip(t, commitA, zipEntries("top-level.lua", "")...), "does not have a single top folder."},
+		{"a file beside the top folder", testkit.Zip(t, commitA, zipEntries("lib/a.lua", "", "b.lua", "")...), "does not have a single top folder."},
 		{"not a zip", []byte("not a zip"), "Invalid zip archive: not a valid zip file."},
 		{"nothing", nil, "Invalid zip archive: "},
 		{"a file whose bytes are not what the archive says", bytes.Replace(stored, []byte("return {}"), []byte("return {!"), 1),
@@ -62,9 +62,9 @@ func TestReadArchiveRefusesAnArchiveWithoutACommitOrASingleTopFolder(t *testing.
 	}
 	for _, c := range cases {
 		commit, files, err := readArchive(c.archive)
-		diagErr := asError(t, err, c.name)
+		diagErr := asDiagError(t, err, c.name)
 		if commit != "" || files != nil || !strings.Contains(diagErr.Msg, c.says) || !strings.HasSuffix(diagErr.Msg, ".") {
-			t.Errorf("%s: %q, %q, %+v", c.name, commit, listing(files), diagErr)
+			t.Errorf("%s: %q, %q, %+v", c.name, commit, fileNames(files), diagErr)
 		}
 	}
 }
@@ -84,7 +84,7 @@ func TestTheCommitIsTheCommentWithoutTheASCIIWhiteSpaceAroundIt(t *testing.T) {
 		{strings.Replace(commitB, "7", "\xd9\xa7", 1), false},
 	}
 	for _, c := range cases {
-		commit, _, err := readArchive(testkit.Zip(t, c.comment, entries("lib/a.lua", "")...))
+		commit, _, err := readArchive(testkit.Zip(t, c.comment, zipEntries("lib/a.lua", "")...))
 		if c.isOne != (err == nil) || (c.isOne && commit != commitB) {
 			t.Errorf("the comment %q: commit %q, %v", c.comment, commit, err)
 		}
@@ -92,23 +92,23 @@ func TestTheCommitIsTheCommentWithoutTheASCIIWhiteSpaceAroundIt(t *testing.T) {
 }
 
 func TestAPathThatAnArchiveHasTwiceKeepsItsFirstPlaceAndItsLastBytes(t *testing.T) {
-	archive := testkit.Zip(t, commitA, entries("lib/a.lua", "first", "lib/b.lua", "b", "lib/a.lua", "last")...)
+	archive := testkit.Zip(t, commitA, zipEntries("lib/a.lua", "first", "lib/b.lua", "b", "lib/a.lua", "last")...)
 	_, files, err := readArchive(archive)
-	if err != nil || !slices.Equal(listing(files), []string{"a.lua=last", "b.lua=b"}) {
-		t.Errorf("files = %q, %v", listing(files), err)
+	if err != nil || !slices.Equal(fileNames(files), []string{"a.lua=last", "b.lua=b"}) {
+		t.Errorf("files = %q, %v", fileNames(files), err)
 	}
 }
 
 func TestFilesHashDependsOnPathsAndContentsNotOrder(t *testing.T) {
-	hash := hashFiles(filesOfTest("x.lua", "1", "y.lua", "2"))
-	if hash != hashFiles(filesOfTest("y.lua", "2", "x.lua", "1")) {
+	hash := hashFiles(archiveFilesOf("x.lua", "1", "y.lua", "2"))
+	if hash != hashFiles(archiveFilesOf("y.lua", "2", "x.lua", "1")) {
 		t.Errorf("the hash depends on the order of the files")
 	}
 	for _, other := range [][]archiveFile{
-		filesOfTest("x.lua", "1", "y.lua", "3"), filesOfTest("x.lua", "1", "z.lua", "2"), filesOfTest("x.lua", "1"), nil,
+		archiveFilesOf("x.lua", "1", "y.lua", "3"), archiveFilesOf("x.lua", "1", "z.lua", "2"), archiveFilesOf("x.lua", "1"), nil,
 	} {
 		if hash == hashFiles(other) {
-			t.Errorf("%q have the hash of other files", listing(other))
+			t.Errorf("%q have the hash of other files", fileNames(other))
 		}
 	}
 	listed := "x.lua\n" + fsx.SHA256Hex([]byte("1")) + "\ny.lua\n" + fsx.SHA256Hex([]byte("2")) + "\n"
@@ -121,7 +121,7 @@ func TestFilesHashDependsOnPathsAndContentsNotOrder(t *testing.T) {
 }
 
 func TestFilesHashListsTheFilesInByteOrder(t *testing.T) {
-	files := filesOfTest(beyond+".lua", "1", "b.lua", "2", replacement+".lua", "3", "B.lua", "4")
+	files := archiveFilesOf(beyond+".lua", "1", "b.lua", "2", replacement+".lua", "3", "B.lua", "4")
 	var listed strings.Builder
 	for _, file := range []archiveFile{files[3], files[1], files[2], files[0]} {
 		listed.WriteString(file.name + "\n" + fsx.SHA256Hex(file.data) + "\n")
@@ -167,37 +167,37 @@ func TestATagKeepsTheCharactersASegmentOfAPathMayHold(t *testing.T) {
 	}
 }
 
-type served struct {
+type fakeFetcher struct {
 	status int
 	body   []byte
 	err    error
-	asked  []string
+	urls   []string
 }
 
-func (s *served) fetch(_ context.Context, url string) (int, []byte, error) {
-	s.asked = append(s.asked, url)
+func (s *fakeFetcher) fetch(_ context.Context, url string) (int, []byte, error) {
+	s.urls = append(s.urls, url)
 	return s.status, s.body, s.err
 }
 
-var _ env.FetchFunc = (*served)(nil).fetch
+var _ env.FetchFunc = (*fakeFetcher)(nil).fetch
 
 const (
 	manifestFile = "moonwell.local.pkl"
 	exampleURL   = "https://codeload.github.com/owner/lib/zip/refs/tags/v1/x"
 )
 
-func downloadExample(network *served) (string, []archiveFile, error) {
+func downloadExample(network *fakeFetcher) (string, []archiveFile, error) {
 	return downloadTag(background, network.fetch, "ex", "owner/lib", "v1/x", manifestFile)
 }
 
 func TestDownloadTagAsksForTheTagsArchiveAndReturnsItsCommitAndFiles(t *testing.T) {
-	network := &served{status: 200, body: testkit.Zip(t, commitB, entries("lib-1/a.lua", "a", "lib-1/src/b.yue", "b", "lib-1/.x/c", "c")...)}
+	network := &fakeFetcher{status: 200, body: testkit.Zip(t, commitB, zipEntries("lib-1/a.lua", "a", "lib-1/src/b.yue", "b", "lib-1/.x/c", "c")...)}
 	commit, files, err := downloadExample(network)
-	if err != nil || commit != commitB || !slices.Equal(listing(files), []string{"a.lua=a", "src/b.yue=b", ".x/c=c"}) {
-		t.Errorf("downloadTag = %q, %q, %v", commit, listing(files), err)
+	if err != nil || commit != commitB || !slices.Equal(fileNames(files), []string{"a.lua=a", "src/b.yue=b", ".x/c=c"}) {
+		t.Errorf("downloadTag = %q, %q, %v", commit, fileNames(files), err)
 	}
-	if !slices.Equal(network.asked, []string{exampleURL}) {
-		t.Errorf("downloadTag asked %q", network.asked)
+	if !slices.Equal(network.urls, []string{exampleURL}) {
+		t.Errorf("downloadTag asked %q", network.urls)
 	}
 	for _, status := range []int{201, 299} {
 		network.status = status
@@ -208,41 +208,41 @@ func TestDownloadTagAsksForTheTagsArchiveAndReturnsItsCommitAndFiles(t *testing.
 }
 
 func TestDownloadTagRefusesADownloadThatFailsOrIsNoArchiveOfATag(t *testing.T) {
-	good := testkit.Zip(t, commitA, entries("lib/a.lua", "")...)
+	good := testkit.Zip(t, commitA, zipEntries("lib/a.lua", "")...)
 	unreachable := &fs.PathError{Op: "dial", Path: "codeload.github.com", Err: errors.New("no such host")}
 	inABrowser := "Check " + exampleURL + " in a browser."
 	cases := []struct {
 		name       string
-		network    served
+		network    fakeFetcher
 		says, hint string
 	}{
-		{"no answer", served{err: unreachable}, "Downloading library ex failed: no such host",
+		{"no answer", fakeFetcher{err: unreachable}, "Downloading library ex failed: no such host",
 			"Check your connection and that https://github.com/owner/lib exists."},
-		{"interrupted", served{err: context.Canceled}, "Downloading library ex failed: context canceled", "Check your connection"},
-		{"no such tag", served{status: 404, body: good}, "Library ex: owner/lib has no tag v1/x.",
+		{"interrupted", fakeFetcher{err: context.Canceled}, "Downloading library ex failed: context canceled", "Check your connection"},
+		{"no such tag", fakeFetcher{status: 404, body: good}, "Library ex: owner/lib has no tag v1/x.",
 			"See the tags at https://github.com/owner/lib/tags."},
-		{"the server fails", served{status: 500, body: good}, "Downloading library ex failed: HTTP 500.", "Try again later."},
-		{"moved", served{status: 302, body: good}, "Downloading library ex failed: HTTP 302.", "Try again later."},
-		{"a status below 200", served{status: 199, body: good}, "failed: HTTP 199.", "Try again later."},
-		{"a page in place of the archive", served{status: 200, body: []byte("<html>")},
+		{"the server fails", fakeFetcher{status: 500, body: good}, "Downloading library ex failed: HTTP 500.", "Try again later."},
+		{"moved", fakeFetcher{status: 302, body: good}, "Downloading library ex failed: HTTP 302.", "Try again later."},
+		{"a status below 200", fakeFetcher{status: 199, body: good}, "failed: HTTP 199.", "Try again later."},
+		{"a page in place of the archive", fakeFetcher{status: 200, body: []byte("<html>")},
 			"The download of library ex is not a GitHub tag archive: Invalid zip archive: ", inABrowser},
-		{"an archive of no tag", served{status: 200, body: testkit.Zip(t, "", entries("lib/a.lua", "")...)},
+		{"an archive of no tag", fakeFetcher{status: 200, body: testkit.Zip(t, "", zipEntries("lib/a.lua", "")...)},
 			"The download of library ex is not a GitHub tag archive: The archive's comment is not a commit SHA.", inABrowser},
-		{"an archive without a top folder", served{status: 200, body: testkit.Zip(t, commitA, entries("a.lua", "")...)},
+		{"an archive without a top folder", fakeFetcher{status: 200, body: testkit.Zip(t, commitA, zipEntries("a.lua", "")...)},
 			"is not a GitHub tag archive: The archive does not have a single top folder.", inABrowser},
 	}
 	for _, c := range cases {
 		commit, files, err := downloadExample(&c.network)
-		diagErr := asError(t, err, c.name)
+		diagErr := asDiagError(t, err, c.name)
 		if commit != "" || files != nil || !strings.Contains(diagErr.Msg, c.says) || diagErr.File != manifestFile ||
 			!strings.Contains(diagErr.Hint, c.hint) {
-			t.Errorf("%s: %q, %q, %+v", c.name, commit, listing(files), diagErr)
+			t.Errorf("%s: %q, %q, %+v", c.name, commit, fileNames(files), diagErr)
 		}
-		if !slices.Equal(c.network.asked, []string{exampleURL}) {
-			t.Errorf("%s: downloadTag asked %q", c.name, c.network.asked)
+		if !slices.Equal(c.network.urls, []string{exampleURL}) {
+			t.Errorf("%s: downloadTag asked %q", c.name, c.network.urls)
 		}
 	}
-	_, _, err := downloadExample(&served{err: unreachable})
+	_, _, err := downloadExample(&fakeFetcher{err: unreachable})
 	if !errors.Is(err, unreachable) {
 		t.Errorf("the failure of a download does not hold its cause: %v", err)
 	}
@@ -252,29 +252,29 @@ var unsafePaths = []string{"../x.lua", "a/../../x.lua", "a/./x.lua", "./x.lua", 
 
 func TestDownloadTagRefusesAPathThatWouldNotStayInsideTheLibrary(t *testing.T) {
 	for _, path := range unsafePaths {
-		network := &served{status: 200, body: testkit.Zip(t, commitA, entries("lib/a.lua", "", "lib/"+path, "")...)}
+		network := &fakeFetcher{status: 200, body: testkit.Zip(t, commitA, zipEntries("lib/a.lua", "", "lib/"+path, "")...)}
 		commit, files, err := downloadExample(network)
-		diagErr := asError(t, err, path)
+		diagErr := asDiagError(t, err, path)
 		if commit != "" || files != nil || !strings.HasSuffix(diagErr.Msg, "has an unsafe path: "+path) ||
 			diagErr.File != manifestFile || !strings.Contains(diagErr.Hint, exampleURL) {
-			t.Errorf("%s: %q, %q, %+v", path, commit, listing(files), diagErr)
+			t.Errorf("%s: %q, %q, %+v", path, commit, fileNames(files), diagErr)
 		}
 	}
-	network := &served{status: 200, body: testkit.Zip(t, commitA, entries("../a.lua", "", "../b/c.lua", "")...)}
-	if _, files, err := downloadExample(network); err != nil || !slices.Equal(listing(files), []string{"a.lua=", "b/c.lua="}) {
-		t.Errorf("a top folder named ..: %q, %v", listing(files), err)
+	network := &fakeFetcher{status: 200, body: testkit.Zip(t, commitA, zipEntries("../a.lua", "", "../b/c.lua", "")...)}
+	if _, files, err := downloadExample(network); err != nil || !slices.Equal(fileNames(files), []string{"a.lua=", "b/c.lua="}) {
+		t.Errorf("a top folder named ..: %q, %v", fileNames(files), err)
 	}
 }
 
 func TestAnArchiveTheReaderReportsAsInsecureIsRefusedByThePathItHolds(t *testing.T) {
 	t.Setenv("GODEBUG", "zipinsecurepath=0")
-	archive := testkit.Zip(t, commitA, entries("lib/a.lua", "a", "lib/../../x.lua", "x")...)
+	archive := testkit.Zip(t, commitA, zipEntries("lib/a.lua", "a", "lib/../../x.lua", "x")...)
 	commit, files, err := readArchive(archive)
-	if err != nil || commit != commitA || !slices.Equal(listing(files), []string{"a.lua=a", "../../x.lua=x"}) {
-		t.Errorf("readArchive = %q, %q, %v", commit, listing(files), err)
+	if err != nil || commit != commitA || !slices.Equal(fileNames(files), []string{"a.lua=a", "../../x.lua=x"}) {
+		t.Errorf("readArchive = %q, %q, %v", commit, fileNames(files), err)
 	}
-	_, _, err = downloadExample(&served{status: 200, body: archive})
-	if diagErr := asError(t, err, "an insecure archive"); !strings.HasSuffix(diagErr.Msg, "has an unsafe path: ../../x.lua") {
+	_, _, err = downloadExample(&fakeFetcher{status: 200, body: archive})
+	if diagErr := asDiagError(t, err, "an insecure archive"); !strings.HasSuffix(diagErr.Msg, "has an unsafe path: ../../x.lua") {
 		t.Errorf("error = %+v", diagErr)
 	}
 }
