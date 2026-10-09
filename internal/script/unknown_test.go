@@ -218,11 +218,11 @@ func checkOf(t *testing.T, sources []string, printed map[string]string, lint man
 	if mapScript != "" {
 		b.in.Map = mapGlobalsOf(mapScript)
 	}
-	b.search = macroFile{path: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
-	b.output = &compileOutput{texts: map[string]string{}, hashes: map[string]string{}, lua: map[string]string{}}
+	b.search = macroFile{searchPath: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
+	b.output = &compileOutput{sourceTexts: map[string]string{}, sourceHashes: map[string]string{}, outputFiles: map[string]string{}}
 	for i := 0; i+1 < len(sources); i += 2 {
 		path := "src/" + sources[i]
-		b.output.texts[path], b.output.hashes[path] = sources[i+1], "h"+strconv.Itoa(i)
+		b.output.sourceTexts[path], b.output.sourceHashes[path] = sources[i+1], "h"+strconv.Itoa(i)
 		b.modules = append(b.modules, Module{Name: strings.TrimSuffix(sources[i], ".yue"), Path: path, Kind: Yue})
 	}
 	for below, text := range printed {
@@ -315,10 +315,10 @@ func TestOnlyTheProjectsOwnYueScriptIsListedAndEveryReachedModuleDeclares(t *tes
 	b := checkOf(t, []string{"main.yue", "print Shared, Count, Nothing\n"}, map[string]string{"main.yue": "print 1 1\nShared 1 7\nCount 1 15\nNothing 1 22\n"},
 		asErrors, "", "Count = 0\n")
 	loud := inLibrary("ex", "kit/loud.yue")
-	b.output.texts[loud], b.output.hashes[loud] = "global Shared = Undefined\n", "h-loud"
+	b.output.sourceTexts[loud], b.output.sourceHashes[loud] = "global Shared = Undefined\n", "h-loud"
 	b.modules = append(b.modules, Module{Name: "kit.loud", Path: loud, Kind: Yue, Library: "ex"})
 	b.modules = append(b.modules, Module{Name: "main.again", Path: "src/main.yue", Kind: Yue})
-	b.output.texts["src/unreached.yue"], b.output.hashes["src/unreached.yue"] = "global Nothing = 1\n", "h-unreached"
+	b.output.sourceTexts["src/unreached.yue"], b.output.sourceHashes["src/unreached.yue"] = "global Nothing = 1\n", "h-unreached"
 	_, err := b.check()
 	want := diag.Problems{{File: "src/main.yue", Line: 1, Column: 22, Msg: "Unknown global Nothing.", Hint: unknownGlobalHint}}
 	if problems, isProblems := err.(diag.Problems); !isProblems || !slices.Equal(problems, want) {

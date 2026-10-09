@@ -21,15 +21,15 @@ func TestMacrosOfPointsYueAtItsFolderAndHashesTheModule(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if search.path != wantPath || search.hash != fsx.SHA256Hex([]byte(moonwell.MacrosYue)) {
+	if search.searchPath != wantPath || search.hash != fsx.SHA256Hex([]byte(moonwell.MacrosYue)) {
 		t.Errorf("macrosOf = %+v, want the path %s", search, wantPath)
 	}
 	if MacrosFile != ".moonwell/yue/moonwell/macros.yue" {
 		t.Errorf("MacrosFile = %s", MacrosFile)
 	}
-	found := strings.Replace(search.path, "?.lua", "moonwell"+string(filepath.Separator)+"macros.yue", 1)
+	found := strings.Replace(search.searchPath, "?.lua", "moonwell"+string(filepath.Separator)+"macros.yue", 1)
 	if written := filepath.Join(root, filepath.FromSlash(MacrosFile)); found != wantFile || written != wantFile {
-		t.Errorf("the search path %s finds %s, and the macro module is written to %s, want %s for both", search.path, found, written, wantFile)
+		t.Errorf("the search path %s finds %s, and the macro module is written to %s, want %s for both", search.searchPath, found, written, wantFile)
 	}
 }
 

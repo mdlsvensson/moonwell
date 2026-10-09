@@ -103,7 +103,7 @@ func TestTheCompilerPrintsWhatIsKeptHere(t *testing.T) {
 		if err := os.MkdirAll(filepath.Dir(output), 0o777); err != nil {
 			t.Fatal(err)
 		}
-		args := []string{"--target=5.3", c.mode, "-o", output, "--path", b.search.path, source}
+		args := []string{"--target=5.3", c.mode, "-o", output, "--path", b.search.searchPath, source}
 		result, err := env.Run(background, yue, args, env.RunOptions{})
 		if err != nil {
 			t.Fatal(err)
@@ -112,7 +112,7 @@ func TestTheCompilerPrintsWhatIsKeptHere(t *testing.T) {
 			source, `C:\project\src\`+c.name+`.yue`, output, `C:\project\dist\stage\lua\`+c.name+`.lua`,
 			b.root, `C:\project`, filepath.Dir(yue), `C:\yue`,
 		)
-		printed, left := asKept.Replace(result.Stdout), asKept.Replace(leftAt(output))
+		printed, left := asKept.Replace(result.Stdout), asKept.Replace(readOrEmpty(output))
 		wantPrinted, wantLeft := c.printed, c.left
 		if runtime.GOOS != "windows" {
 			wantPrinted, wantLeft = withoutSearchedFiles(withLineFeeds(wantPrinted)), withLineFeeds(wantLeft)

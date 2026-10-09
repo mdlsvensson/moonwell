@@ -175,9 +175,9 @@ func TestCompileAllCompilesEveryYueScriptModuleAndReadsItsLua(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", mainText, "src/util/math.yue", mathText, "lua/tools.lua", "return {}\n"))
 	result := b.compiles(b.real(), false)
 	want := &compileOutput{
-		texts:  map[string]string{"src/main.yue": mainText, "src/util/math.yue": mathText},
-		hashes: map[string]string{"src/main.yue": fsx.SHA256Hex([]byte(mainText)), "src/util/math.yue": fsx.SHA256Hex([]byte(mathText))},
-		lua:    map[string]string{"src/main.yue": b.staged("main.lua"), "src/util/math.yue": b.staged("util/math.lua")},
+		sourceTexts:  map[string]string{"src/main.yue": mainText, "src/util/math.yue": mathText},
+		sourceHashes: map[string]string{"src/main.yue": fsx.SHA256Hex([]byte(mainText)), "src/util/math.yue": fsx.SHA256Hex([]byte(mathText))},
+		outputFiles:  map[string]string{"src/main.yue": b.staged("main.lua"), "src/util/math.yue": b.staged("util/math.lua")},
 	}
 	if !reflect.DeepEqual(result, want) {
 		t.Errorf("compileAll = %+v, want %+v", result, want)
@@ -208,10 +208,10 @@ func TestCompileAllCompilesALibrarysYueScriptIntoItsOwnFolder(t *testing.T) {
 	if lua := b.luaAt(result, loud); !strings.Contains(lua, "upper") {
 		t.Errorf("the Lua of the library's module is\n%s", lua)
 	}
-	if result.lua[loud] != b.staged(".libraries/ex/example/loud.lua") || !fsx.Exists(b.staged(".libraries/ex/example/loud.lua")) {
-		t.Errorf("the library's output is at %s, want it under .libraries/ex", result.lua[loud])
+	if result.outputFiles[loud] != b.staged(".libraries/ex/example/loud.lua") || !fsx.Exists(b.staged(".libraries/ex/example/loud.lua")) {
+		t.Errorf("the library's output is at %s, want it under .libraries/ex", result.outputFiles[loud])
 	}
-	for what, kept := range map[string]map[string]string{"texts": result.texts, "hashes": result.hashes} {
+	for what, kept := range map[string]map[string]string{"texts": result.sourceTexts, "hashes": result.sourceHashes} {
 		if paths := slices.Sorted(maps.Keys(kept)); !slices.Equal(paths, []string{loud, "src/main.yue"}) {
 			t.Errorf("the %s are of %q", what, paths)
 		}
@@ -441,13 +441,13 @@ func TestAtMostEightCompilersRunAtATime(t *testing.T) {
 		return env.RunResult{}, os.WriteFile(outputIn(args), []byte("-- lua\n"), 0o666)
 	})
 	result := b.compiles(fakeYue, false)
-	if most != 8 || running != 0 || len(result.lua) != 40 || len(b.ran()) != 40 {
-		t.Errorf("at most %d compilers ran at a time, %d still run, and %d modules were compiled", most, running, len(result.lua))
+	if most != 8 || running != 0 || len(result.outputFiles) != 40 || len(b.ran()) != 40 {
+		t.Errorf("at most %d compilers ran at a time, %d still run, and %d modules were compiled", most, running, len(result.outputFiles))
 	}
 }
 
 func TestEachOfGivesWhatEachItemGaveInTheOrderOfTheItems(t *testing.T) {
-	if gave, err := eachOf(nil, func(int) (int, error) { t.Error("work was started without an item"); return 0, nil }); err != nil || len(gave) != 0 {
+	if gave, err := runParallel(nil, func(int) (int, error) { t.Error("work was started without an item"); return 0, nil }); err != nil || len(gave) != 0 {
 		t.Errorf("of no items: %v, %v", gave, err)
 	}
 	const count = 30
@@ -458,8 +458,8 @@ func TestEachOfGivesWhatEachItemGaveInTheOrderOfTheItems(t *testing.T) {
 	}
 	var guard sync.Mutex
 	var order []int
-	gave, err := eachOf(items, func(item int) (string, error) {
-		if (item+1)%atOnce != 0 && item != count-1 {
+	gave, err := runParallel(items, func(item int) (string, error) {
+		if (item+1)%maxParallel != 0 && item != count-1 {
 			select {
 			case <-ended[item+1]:
 			case <-time.After(5 * time.Second):
@@ -495,7 +495,7 @@ func TestEachOfStartsNoWorkAfterAnErrorAndReturnsItWhenTheRunningWorkHasEnded(t 
 		var err error
 		go func() {
 			defer close(returned)
-			_, err = eachOf(make([]int, 40), func(int) (int, error) {
+			_, err = runParallel(make([]int, 40), func(int) (int, error) {
 				guard.Lock()
 				started++
 				running++
@@ -515,7 +515,7 @@ func TestEachOfStartsNoWorkAfterAnErrorAndReturnsItWhenTheRunningWorkHasEnded(t 
 			})
 		}()
 		synctest.Wait()
-		if in, still := counted(); in != atOnce || still != atOnce {
+		if in, still := counted(); in != maxParallel || still != maxParallel {
 			t.Errorf("%d were started and %d run before any has ended, want 8 and 8", in, still)
 		}
 		close(firstMayEnd)
@@ -526,12 +526,12 @@ func TestEachOfStartsNoWorkAfterAnErrorAndReturnsItWhenTheRunningWorkHasEnded(t 
 			t.Errorf("eachOf returned %v while %d of its work still ran", err, still)
 		default:
 		}
-		if in != atOnce || still != atOnce-1 {
+		if in != maxParallel || still != maxParallel-1 {
 			t.Errorf("after the first failure %d were started and %d run, want 8 and 7", in, still)
 		}
 		close(othersMayEnd)
 		<-returned
-		if in, still := counted(); err != first || in != atOnce || still != 0 {
+		if in, still := counted(); err != first || in != maxParallel || still != 0 {
 			t.Errorf("eachOf = %v; %d were started and %d still run, want the first failure, 8 and 0", err, in, still)
 		}
 	})
@@ -637,12 +637,12 @@ func TestASourcesTextIsItsBytesWithoutAByteOrderMarkAndItsLuaTheBytesTheCompiler
 	written := mark + "local x = '\xff\xfe' -- \xe9\r\n"
 	b.fake(map[string]answer{"src/faulty.yue": {lua: leaves(written)}})
 	result := b.compiles(fakeYue, false)
-	if !reflect.DeepEqual(result.texts, wantTexts) {
-		t.Errorf("the texts are %q, want %q", result.texts, wantTexts)
+	if !reflect.DeepEqual(result.sourceTexts, wantTexts) {
+		t.Errorf("the texts are %q, want %q", result.sourceTexts, wantTexts)
 	}
 	for path, text := range sources {
-		if result.hashes[path] != fsx.SHA256Hex([]byte(text)) {
-			t.Errorf("the hash of %s is %s, which is not that of the file's bytes", path, result.hashes[path])
+		if result.sourceHashes[path] != fsx.SHA256Hex([]byte(text)) {
+			t.Errorf("the hash of %s is %s, which is not that of the file's bytes", path, result.sourceHashes[path])
 		}
 	}
 	if lua := b.luaAt(result, "src/faulty.yue"); lua != written {
@@ -665,7 +665,7 @@ func TestWhereASourceCompilesTo(t *testing.T) {
 		{Source{Name: "a.", Path: "src/a/.yue", Kind: Yue}, "a/.lua"},
 		{Source{Name: "", Path: "vendor/kit/.yue", Kind: Yue, Library: "kit"}, ".libraries/kit/.lua"},
 	} {
-		if got, err := outputPath(c.source); got != c.want || err != nil {
+		if got, err := luaPathOf(c.source); got != c.want || err != nil {
 			t.Errorf("outputOf(%+v) = %q, %v, want %q", c.source, got, err, c.want)
 		}
 	}
@@ -688,7 +688,7 @@ func TestWhereASourceCompilesTo(t *testing.T) {
 		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: eAcute},
 		{Name: "loud", Path: "vendor/loud.yue", Kind: Yue, Library: "kit\n"},
 	} {
-		got, err := outputPath(source)
+		got, err := luaPathOf(source)
 		var expected *diag.Error
 		if got != "" || err == nil || errors.As(err, &expected) {
 			t.Errorf("outputOf(%+v) = %q, %v, want a plain error", source, got, err)
@@ -705,8 +705,8 @@ func TestALibrarysModuleCompilesBelowItsKeyWhereverItsFolderIs(t *testing.T) {
 	b.libraries = []Library{{Key: "kit", Dir: "vendor/kit"}}
 	b.fake(nil)
 	result := b.compiles(fakeYue, false)
-	if lua := b.luaAt(result, "vendor/kit/tools/loud.yue"); lua != "-- vendor/kit/tools/loud.yue\n" || result.lua["vendor/kit/tools/loud.yue"] != b.staged(".libraries/kit/tools/loud.lua") {
-		t.Errorf("the library's Lua is %q, at %s", lua, result.lua["vendor/kit/tools/loud.yue"])
+	if lua := b.luaAt(result, "vendor/kit/tools/loud.yue"); lua != "-- vendor/kit/tools/loud.yue\n" || result.outputFiles["vendor/kit/tools/loud.yue"] != b.staged(".libraries/kit/tools/loud.lua") {
+		t.Errorf("the library's Lua is %q, at %s", lua, result.outputFiles["vendor/kit/tools/loud.yue"])
 	}
 }
 
@@ -717,7 +717,7 @@ func TestAModuleWithoutAnOutputHasNoLua(t *testing.T) {
 	if lua, ok, err := result.readLua(b.source("src/notes.yue")); lua != "" || ok || err != nil {
 		t.Errorf("luaOf(src/notes.yue) = %q, %v, %v, want no Lua", lua, ok, err)
 	}
-	if result.texts["src/notes.yue"] != "-- only comments\n\n" || result.lua["src/notes.yue"] != b.staged("notes.lua") {
+	if result.sourceTexts["src/notes.yue"] != "-- only comments\n\n" || result.outputFiles["src/notes.yue"] != b.staged("notes.lua") {
 		t.Errorf("the module without code is not among the compiled: %+v", result)
 	}
 	b.ran()
@@ -739,7 +739,7 @@ func TestTheNamesCollectGivesPlaceEveryOutputBelowTheOutputFolder(t *testing.T) 
 	}
 	placed := 0
 	for _, source := range sources {
-		output, err := outputPath(source)
+		output, err := luaPathOf(source)
 		if err != nil || !filepath.IsLocal(filepath.FromSlash(output)) || !strings.HasSuffix(output, ".lua") {
 			t.Errorf("outputOf(%+v) = %q, %v, want a path that stays below its folder", source, output, err)
 			continue
@@ -784,8 +784,8 @@ func TestASourceThatIsALinkIsCompiledThroughIt(t *testing.T) {
 	testkit.LinkFile(t, filepath.Join(b.root, "elsewhere", "real.yue"), at)
 	b.fake(nil)
 	result := b.compiles(fakeYue, false)
-	if lua := b.luaAt(result, "src/linked.yue"); lua != "-- src/linked.yue\n" || result.texts["src/linked.yue"] != "x = 'behind the link'\n" {
-		t.Errorf("the Lua is %q and the text %q", lua, result.texts["src/linked.yue"])
+	if lua := b.luaAt(result, "src/linked.yue"); lua != "-- src/linked.yue\n" || result.sourceTexts["src/linked.yue"] != "x = 'behind the link'\n" {
+		t.Errorf("the Lua is %q and the text %q", lua, result.sourceTexts["src/linked.yue"])
 	}
 	if ran := b.ran(); !slices.Equal(ran, []string{"src/linked.yue", "src/main.yue"}) {
 		t.Errorf("the compiler ran on %q", ran)
@@ -806,8 +806,8 @@ func TestASourceIsCompiledUnderWhateverNameTheSystemHolds(t *testing.T) {
 	b.fake(nil)
 	result := b.compiles(fakeYue, false)
 	for path, output := range map[string]string{question: "what?.lua", backslash: `back\slash.lua`} {
-		if lua := b.luaAt(result, path); lua != "-- "+path+"\n" || result.texts[path] != "x = 1\n" || result.lua[path] != filepath.Join(b.root, "dist", "stage", "lua", output) {
-			t.Errorf("%s: the Lua is %q, the text %q and the output %s", path, lua, result.texts[path], result.lua[path])
+		if lua := b.luaAt(result, path); lua != "-- "+path+"\n" || result.sourceTexts[path] != "x = 1\n" || result.outputFiles[path] != filepath.Join(b.root, "dist", "stage", "lua", output) {
+			t.Errorf("%s: the Lua is %q, the text %q and the output %s", path, lua, result.sourceTexts[path], result.outputFiles[path])
 		}
 	}
 	if ran := b.ran(); !slices.Equal(ran, []string{backslash, "src/main.yue", question}) {

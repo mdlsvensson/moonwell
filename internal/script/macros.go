@@ -12,19 +12,19 @@ import (
 const MacrosFile = ".moonwell/yue/moonwell/macros.yue"
 
 func RefreshMacros(root string) (wrote bool, err error) {
-	file, err := fsx.SafeJoinNoSymlinks(root, MacrosFile)
+	fullPath, err := fsx.SafeJoinNoSymlinks(root, MacrosFile)
 	if err != nil {
 		return false, err
 	}
-	if wrote, err = fsx.WriteIfChanged(file, moonwell.MacrosYue); err != nil {
+	if wrote, err = fsx.WriteIfChanged(fullPath, moonwell.MacrosYue); err != nil {
 		return false, errMacrosNotWritten(err)
 	}
 	return wrote, nil
 }
 
 type macroFile struct {
-	path string
-	hash string
+	searchPath string
+	hash       string
 }
 
 func readMacros(root string) (macroFile, error) {
@@ -32,8 +32,8 @@ func readMacros(root string) (macroFile, error) {
 		return macroFile{}, errUnsearchableFolder(root)
 	}
 	return macroFile{
-		path: filepath.Join(root, ".moonwell", "yue", "?.lua"),
-		hash: fsx.SHA256Hex([]byte(moonwell.MacrosYue)),
+		searchPath: filepath.Join(root, ".moonwell", "yue", "?.lua"),
+		hash:       fsx.SHA256Hex([]byte(moonwell.MacrosYue)),
 	}, nil
 }
 

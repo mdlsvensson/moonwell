@@ -13,7 +13,7 @@ import (
 
 const scriptName = "war3map.lua"
 
-var hooked = []string{"main", "config"}
+var hookedFunctions = []string{"main", "config"}
 
 func Inject(source *mapdir.Folder, program *Program) ([]mapdir.Change, error) {
 	if program == nil {
@@ -26,11 +26,11 @@ func Inject(source *mapdir.Folder, program *Program) ([]mapdir.Change, error) {
 	if err := checkHooksDefined(script, source.DisplayPath(scriptName)); err != nil {
 		return nil, err
 	}
-	name, err := source.ResolveNewPath(scriptName)
+	path, err := source.ResolveNewPath(scriptName)
 	if err != nil {
 		return nil, err
 	}
-	return []mapdir.Change{{Path: name, Data: appendBundle(script, program)}}, nil
+	return []mapdir.Change{{Path: path, Data: appendBundle(script, program)}}, nil
 }
 
 func readMapScript(source *mapdir.Folder) ([]byte, error) {
@@ -46,10 +46,10 @@ func readMapScript(source *mapdir.Folder) ([]byte, error) {
 	return nil, errNoScript(source.DisplayPath(scriptName))
 }
 
-func checkHooksDefined(script []byte, file string) error {
-	for _, name := range hooked {
+func checkHooksDefined(script []byte, displayPath string) error {
+	for _, name := range hookedFunctions {
 		if !definesFunction(script, name) {
-			return errNotDefined(name, file)
+			return errNotDefined(name, displayPath)
 		}
 	}
 	return nil
@@ -83,35 +83,35 @@ func startsDefinition(script []byte, name string) bool {
 }
 
 func appendBundle(script []byte, program *Program) []byte {
-	var ending []byte
+	var newline []byte
 	if !bytes.HasSuffix(script, []byte("\n")) {
-		ending = []byte("\n")
+		newline = []byte("\n")
 	}
-	firstLine := bytes.Count(script, []byte("\n")) + len(ending) + 1
-	return slices.Concat(script, ending, []byte(renderBundle(program, moonwell.RuntimeLua, firstLine)))
+	firstLine := bytes.Count(script, []byte("\n")) + len(newline) + 1
+	return slices.Concat(script, newline, []byte(renderBundle(program, moonwell.RuntimeLua, firstLine)))
 }
 
-func errNoScript(file string) error {
+func errNoScript(displayPath string) error {
 	return &diag.Error{
 		Msg:  "The map has no war3map.lua.",
-		File: file,
+		File: displayPath,
 		Hint: "Save the map in World Editor with Lua as the script language.",
 	}
 }
 
-func errFolderForScript(folder, file string) error {
+func errFolderForScript(dir, displayPath string) error {
 	return &diag.Error{
-		Msg:  folder + " in the map is a folder, not a file.",
-		File: file,
+		Msg:  dir + " in the map is a folder, not a file.",
+		File: displayPath,
 		Hint: "The map has a folder where its script belongs. Remove that folder from the source map, or save the map " +
 			"in World Editor with Lua as the script language.",
 	}
 }
 
-func errNotDefined(function, file string) error {
+func errNotDefined(function, displayPath string) error {
 	return &diag.Error{
 		Msg:  "The map script does not define function " + function + "().",
-		File: file,
+		File: displayPath,
 		Hint: "Save the map in World Editor with Lua as the script language (Scenario \xe2\x80\xba Map Options).",
 	}
 }

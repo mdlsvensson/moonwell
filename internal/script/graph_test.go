@@ -27,7 +27,7 @@ func modulesOf(pairs ...string) func(name string) (loadResult, error) {
 			switch {
 			case pairs[i] != name:
 			case pairs[i+1] == noCode:
-				return loadResult{without: path}, nil
+				return loadResult{emptySourcePath: path}, nil
 			default:
 				return loadResult{module: &Module{Name: name, Path: path, Kind: Yue, Lua: pairs[i+1]}}, nil
 			}
@@ -52,7 +52,7 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 		"kit.loud":   {Name: "kit.loud", Path: inLibrary("ex", "kit/loud.yue"), Kind: Yue, Library: "ex", Lua: "return 2"},
 		"kit.bytes":  {Name: "kit.bytes", Path: inLibrary("ex", "kit/bytes.lua"), Kind: Lua, Library: "ex", Lua: "return '\xff'"},
 	} {
-		if got, err := load(name); err != nil || got.module == nil || *got.module != want || got.without != "" {
+		if got, err := load(name); err != nil || got.module == nil || *got.module != want || got.emptySourcePath != "" {
 			t.Errorf("load(%s) = %+v, %v, want %+v", name, got, err, want)
 		}
 	}
@@ -61,7 +61,7 @@ func TestAModuleIsLoadedByItsNameThenAsItsInitUnderTheNameThatWasRequired(t *tes
 			t.Errorf("load(%s) = %+v, %v, want no module", name, got, err)
 		}
 	}
-	if got, err := load("pending"); got != (loadResult{without: "src/pending.yue"}) || err != nil {
+	if got, err := load("pending"); got != (loadResult{emptySourcePath: "src/pending.yue"}) || err != nil {
 		t.Errorf("load(pending) = %+v, %v, want the file of a module without Lua", got, err)
 	}
 

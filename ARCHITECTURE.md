@@ -547,11 +547,11 @@ Each row names the file to open and, in most rows, the function to read first.
 
 | I want to | Open |
 | --- | --- |
-| know how a file becomes a module, and what its name is | `internal/script/modules.go`: `CollectSources` |
-| change how the compiler is run, or what is compiled again | `internal/script/yue.go`: `compileAll`, and `compile` for the one call of the compiler; the cache in `internal/script/cache.go`. The check for unknown globals runs the compiler too: `listUses` in `internal/script/unknown.go` |
-| change the words of a compile error | `internal/script/printed.go`: `newCompileError`, `newRewriteError` |
+| know how a file becomes a module, and what its name is | `internal/script/sources.go`: `CollectSources` |
+| change how the compiler is run, or what is compiled again | `internal/script/yue.go`: `compileAll`, and `compile` for the one call of the compiler; the cache in `internal/script/cache.go`. The check for unknown globals runs the compiler too: `listUses` in `internal/script/uses.go`; up to eight at once, `runParallel` in `internal/script/parallel.go` |
+| change the words of a compile error | `internal/script/yue_errors.go`: `newCompileError`, `newRewriteError` |
 | know which modules go into the map, and where "module not found" comes from | `internal/script/graph.go`: `reachableModules`, `errNoModule` |
-| change the check for unknown globals | `internal/script/unknown.go`: `findUnknownGlobals`, `knownGlobals` |
+| change the check for unknown globals | `internal/script/unknown.go`: `findUnknownGlobals`, `knownGlobals`; the uses the compiler lists, and their cache, in `internal/script/uses.go` |
 | know what the bundle looks like, and how an error in the game finds its source line | `internal/script/bundle.go`: `bundle`; `runtime/moonwell.lua` |
 | know how the bundle gets into `war3map.lua` | `internal/script/inject.go`: `Inject` |
 | add a macro | `runtime/macros.yue`; it is written into a project by `RefreshMacros` in `internal/script/macros.go` |

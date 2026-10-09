@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"context"
 	"maps"
-	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
@@ -17,18 +16,18 @@ import (
 )
 
 func findUnknownGlobals(
-	ctx context.Context, e *env.Env, in Input, m macroFile, output *compileOutput, modules []Module,
+	ctx context.Context, e *env.Env, input Input, macros macroFile, output *compileOutput, modules []Module,
 ) ([]diag.Problem, error) {
-	uses, err := listGlobalUses(ctx, e, in.Compiler, m, output.macroSources, lintSources(modules, output))
+	uses, err := listGlobalUses(ctx, e, input.Compiler, macros, output.macroSources, lintSources(modules, output))
 	if err != nil {
 		return nil, err
 	}
-	known := knownGlobals(in.Natives, in.Map, collectDeclaredGlobals(modules, output), in.Lint.Globals)
-	problems := unknownGlobalProblems(uses, known, in.Natives.Lua.Removed)
+	known := knownGlobals(input.Natives, input.Map, collectDeclaredGlobals(modules, output), input.Lint.Globals)
+	problems := unknownGlobalProblems(uses, known, input.Natives.Lua.Removed)
 	if len(problems) == 0 {
 		return nil, nil
 	}
-	if in.Lint.UnknownGlobals == "error" {
+	if input.Lint.UnknownGlobals == "error" {
 		return nil, diag.Problems(problems)
 	}
 	logWarnings(e.Log, problems)
@@ -50,7 +49,7 @@ func collectDeclaredGlobals(modules []Module, output *compileOutput) []string {
 		if module.Kind == Lua {
 			declared = append(declared, lua.FindTopLevelGlobals(module.Lua)...)
 		} else {
-			declared = append(declared, parseDeclaredGlobals(output.texts[module.Path])...)
+			declared = append(declared, parseDeclaredGlobals(output.sourceTexts[module.Path])...)
 		}
 	}
 	return declared
@@ -116,12 +115,12 @@ func knownGlobals(natives *Natives, mapGlobals *lua.MapGlobals, declared, extra 
 }
 
 func unknownGlobalProblems(uses map[string][]globalUse, known map[string]bool, removed []string) []diag.Problem {
-	hint := hintBuilder{known: known, removed: removed, cache: map[string]string{}}
+	hints := hintBuilder{known: known, removed: removed, cache: map[string]string{}}
 	var problems []diag.Problem
-	for file, used := range uses {
-		for _, use := range used {
+	for path, fileUses := range uses {
+		for _, use := range fileUses {
 			if !known[use.Name] {
-				problems = append(problems, newUnknownGlobalProblem(file, use, hint.hintFor(use.Name)))
+				problems = append(problems, newUnknownGlobalProblem(path, use, hints.hintFor(use.Name)))
 			}
 		}
 	}
@@ -139,8 +138,8 @@ type hintBuilder struct {
 }
 
 func (h *hintBuilder) hintFor(name string) string {
-	hint, made := h.cache[name]
-	if !made {
+	hint, ok := h.cache[name]
+	if !ok {
 		hint = h.buildHint(name)
 		h.cache[name] = hint
 	}
@@ -160,97 +159,10 @@ func (h *hintBuilder) buildHint(name string) string {
 	return unknownGlobalHint
 }
 
-type lintSource struct {
-	path string
-	hash string
-}
-
-func lintSources(modules []Module, output *compileOutput) []lintSource {
-	byPath := map[string]lintSource{}
-	for _, module := range modules {
-		if hash, hashed := output.hashes[module.Path]; hashed && module.Kind == Yue && module.Library == "" {
-			byPath[module.Path] = lintSource{path: module.Path, hash: hash}
-		}
-	}
-	sources := make([]lintSource, 0, len(byPath))
-	for _, path := range slices.Sorted(maps.Keys(byPath)) {
-		sources = append(sources, byPath[path])
-	}
-	return sources
-}
-
-type lintResult struct {
-	source  lintSource
-	uses    []globalUse
-	diagErr *diag.Error
-}
-
-func listGlobalUses(ctx context.Context, e *env.Env, yue string, m macroFile, macroSources string, sources []lintSource) (map[string][]globalUse, error) {
-	now := listedWith{Compiler: yue, Macros: m.hash, MacroSources: macroSources}
-	kept, err := readUsesCache(e.Root, now)
-	if err != nil {
-		return nil, err
-	}
-	lists, stale := splitCachedUses(kept, sources)
-	with := compiler{ctx: ctx, run: e.Run, program: yue, search: m.path}
-	results, err := eachOf(stale, func(source lintSource) (lintResult, error) { return with.listUses(e.Root, source) })
-	if err != nil {
-		return nil, err
-	}
-	var failures []*diag.Error
-	for _, result := range results {
-		if result.diagErr != nil {
-			failures = append(failures, result.diagErr)
-		} else {
-			lists[result.source.path] = cachedUses{Hash: result.source.hash, Uses: result.uses}
-		}
-	}
-	if err := writeUsesCache(e.Root, now, lists); err != nil {
-		return nil, err
-	}
-	if len(failures) > 0 {
-		return nil, firstByPath(failures)
-	}
-	return flattenUses(lists), nil
-}
-
-func splitCachedUses(kept map[string]cachedUses, sources []lintSource) (lists map[string]cachedUses, stale []lintSource) {
-	lists = map[string]cachedUses{}
-	for _, source := range sources {
-		if last, found := kept[source.path]; found && last.Hash == source.hash {
-			lists[source.path] = last
-		} else {
-			stale = append(stale, source)
-		}
-	}
-	return lists, stale
-}
-
-func flattenUses(lists map[string]cachedUses) map[string][]globalUse {
-	uses := make(map[string][]globalUse, len(lists))
-	for path, list := range lists {
-		uses[path] = list.Uses
-	}
-	return uses
-}
-
-func (c compiler) listUses(root string, source lintSource) (lintResult, error) {
-	file := filepath.Join(root, filepath.FromSlash(source.path))
-	result, err := c.run(c.ctx, c.program, []string{"-g", "--path", c.search, file}, env.RunOptions{})
-	if err != nil {
-		return lintResult{}, err
-	}
-	if result.ExitCode != 0 {
-		return lintResult{source: source, diagErr: newCompileError(source.path, result.Stdout+"\n"+result.Stderr)}, nil
-	}
-	uses, failure := parseGlobalUses(result.Stdout, source.path)
-	return lintResult{source: source, uses: uses, diagErr: failure}, nil
-}
-
 const unknownGlobalHint = "Declare your own globals with `global`, or add them to lint.globals in moonwell.pkl."
 
-func newUnknownGlobalProblem(file string, use globalUse, hint string) diag.Problem {
-	return diag.Problem{File: file, Line: use.Line, Column: use.Column, Msg: "Unknown global " + use.Name + ".", Hint: hint}
+func newUnknownGlobalProblem(path string, use globalUse, hint string) diag.Problem {
+	return diag.Problem{File: path, Line: use.Line, Column: use.Column, Msg: "Unknown global " + use.Name + ".", Hint: hint}
 }
 
 func hintRemoved(name string) string {

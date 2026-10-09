@@ -177,7 +177,7 @@ func TestCompileTurnsAProjectIntoAProgramWithTheRealCompiler(t *testing.T) {
 	if !fsx.Exists(filepath.Join(b.root, filepath.FromSlash(MacrosFile))) {
 		t.Error("the macro module is not written")
 	}
-	kept, err := readUsesCache(b.root, listedWith{Compiler: yue, Macros: fsx.SHA256Hex([]byte(moonwell.MacrosYue))})
+	kept, err := readUsesCache(b.root, usesCacheKey{Compiler: yue, Macros: fsx.SHA256Hex([]byte(moonwell.MacrosYue))})
 	if err != nil || len(kept) != 2 || kept["src/main.yue"].Uses == nil || kept["src/util/math.yue"].Uses == nil {
 		t.Errorf("the uses file keeps %+v, %v, want the two modules of src/ that the entry reaches", kept, err)
 	}

@@ -301,7 +301,7 @@ func TestAStoppedRunInAnotherModeLeavesNothingUpToDate(t *testing.T) {
 func TestAProjectWithoutYueScriptCompilesNothingAndKeepsNoSources(t *testing.T) {
 	b := benchOf(t, files("src/notes.txt", "", "lua/tools.lua", "return {}\n"))
 	result := b.compiles(fakeYue, false)
-	if len(result.texts) != 0 || len(result.hashes) != 0 || len(result.lua) != 0 || result.texts == nil {
+	if len(result.sourceTexts) != 0 || len(result.sourceHashes) != 0 || len(result.outputFiles) != 0 || result.sourceTexts == nil {
 		t.Errorf("compileAll = %+v, want nothing compiled", result)
 	}
 	if text := b.hashesText(); !strings.Contains(text, `"sources": {}`) {
@@ -469,7 +469,7 @@ func usesBenchOf(t *testing.T, printed map[string]env.RunResult) *usesBench {
 	b := &usesBench{t: t, root: root, yue: &listing{t: t, root: root, printed: printed}, macroSources: "s1"}
 	b.world, _ = testkit.Env(t, root)
 	b.world.Run = b.yue.run
-	b.search = macroFile{path: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
+	b.search = macroFile{searchPath: filepath.Join(root, ".moonwell", "yue", "?.lua"), hash: "m1"}
 	return b
 }
 
@@ -566,7 +566,7 @@ func TestTheCompilerListsEachChangedSourceOnceAndItsUsesAreKeptByItsHash(t *test
 	if _, err := b.list("other-yue", main, "h3"); err != nil || len(b.yue.ran()) != 0 {
 		t.Fatalf("one source of the two: %v", err)
 	}
-	kept, err := readUsesCache(b.root, listedWith{Compiler: "other-yue", Macros: "m1", MacroSources: "s1"})
+	kept, err := readUsesCache(b.root, usesCacheKey{Compiler: "other-yue", Macros: "m1", MacroSources: "s1"})
 	if err != nil || len(kept) != 1 || kept[main].Hash != "h3" {
 		t.Errorf("the uses file keeps %+v, %v", kept, err)
 	}
@@ -660,7 +660,7 @@ func TestTheCompilerIsGivenTheMacroPathAndTheUsesDependOnTheMacroModule(t *testi
 		}
 	}
 	list()
-	want := []string{"-g", "--path", b.search.path, filepath.Join(b.root, "src", "main.yue")}
+	want := []string{"-g", "--path", b.search.searchPath, filepath.Join(b.root, "src", "main.yue")}
 	if len(b.yue.runs) != 1 || !slices.Equal(b.yue.runs[0], want) {
 		t.Errorf("the compiler was run with %q, want once with %q", b.yue.runs, want)
 	}

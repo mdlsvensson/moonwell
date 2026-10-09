@@ -50,11 +50,11 @@ func (p *Program) Lua(source Source) (text string, ok bool) {
 type Compiled struct {
 	Sources []Source
 
-	in     Input
+	input  Input
 	macros macroFile
 	output *compileOutput
 	lua    map[string]string
-	none   map[string]bool
+	noLua  map[string]bool
 }
 
 func (c *Compiled) Lua(source Source) (text string, ok bool) {
@@ -65,74 +65,74 @@ func (c *Compiled) Lua(source Source) (text string, ok bool) {
 	return text, ok
 }
 
-func CompileSources(ctx context.Context, e *env.Env, in Input) (*Compiled, error) {
-	if in.Natives == nil {
+func CompileSources(ctx context.Context, e *env.Env, input Input) (*Compiled, error) {
+	if input.Natives == nil {
 		return nil, errNoNatives()
 	}
-	search, err := loadMacroModule(e.Root)
+	macros, err := loadMacroModule(e.Root)
 	if err != nil {
 		return nil, err
 	}
-	sources, err := CollectSources(e.Root, in.Libraries)
+	sources, err := CollectSources(e.Root, input.Libraries)
 	if err != nil {
 		return nil, err
 	}
-	output, err := compileAll(ctx, e, in.Compiler, in.Minify, search, sources)
+	output, err := compileAll(ctx, e, input.Compiler, input.Minify, macros, sources)
 	if err != nil {
 		return nil, err
 	}
-	read := &luaReader{output: output, lua: map[string]string{}, none: map[string]bool{}}
-	if err := read.readLibraries(sources); err != nil {
+	reader := &luaReader{output: output, lua: map[string]string{}, noLua: map[string]bool{}}
+	if err := reader.readLibraries(sources); err != nil {
 		return nil, err
 	}
-	return &Compiled{Sources: sources, in: in, macros: search, output: output, lua: read.lua, none: read.none}, nil
+	return &Compiled{Sources: sources, input: input, macros: macros, output: output, lua: reader.lua, noLua: reader.noLua}, nil
 }
 
 func Link(ctx context.Context, e *env.Env, compiled *Compiled) (*Program, error) {
 	if compiled == nil || compiled.output == nil {
 		return nil, errors.New("script.Link: compiled is not what script.CompileSources returned")
 	}
-	in, read := compiled.in, compiled.newLuaReader()
-	entry, err := EntryName(in.Entry)
+	input, reader := compiled.input, compiled.newLuaReader()
+	entry, err := EntryName(input.Entry)
 	if err != nil {
 		return nil, err
 	}
-	modules, err := reachableModules(entry, newLoader(compiled.Sources, read.readLua))
+	modules, err := reachableModules(entry, newLoader(compiled.Sources, reader.readLua))
 	if err != nil {
 		return nil, err
 	}
-	unknown, err := findUnknownGlobals(ctx, e, in, compiled.macros, compiled.output, modules)
+	unknown, err := findUnknownGlobals(ctx, e, input, compiled.macros, compiled.output, modules)
 	if err != nil {
 		return nil, err
 	}
 	return &Program{
-		Entry: entry, Modules: modules, Minify: in.Minify, Sources: compiled.Sources, Unknown: unknown, lua: read.lua,
+		Entry: entry, Modules: modules, Minify: input.Minify, Sources: compiled.Sources, Unknown: unknown, lua: reader.lua,
 	}, nil
 }
 
 func loadMacroModule(root string) (macroFile, error) {
-	search, err := readMacros(root)
+	macros, err := readMacros(root)
 	if err != nil {
 		return macroFile{}, err
 	}
 	if _, err := RefreshMacros(root); err != nil {
 		return macroFile{}, err
 	}
-	return search, nil
+	return macros, nil
 }
 
 type luaReader struct {
 	output *compileOutput
 	lua    map[string]string
-	none   map[string]bool
+	noLua  map[string]bool
 }
 
 func (c *Compiled) newLuaReader() *luaReader {
-	return &luaReader{output: c.output, lua: maps.Clone(c.lua), none: maps.Clone(c.none)}
+	return &luaReader{output: c.output, lua: maps.Clone(c.lua), noLua: maps.Clone(c.noLua)}
 }
 
 func (r *luaReader) readLua(source Source) (text string, ok bool, err error) {
-	if text, ok = r.lua[source.Path]; ok || r.none[source.Path] {
+	if text, ok = r.lua[source.Path]; ok || r.noLua[source.Path] {
 		return text, ok, nil
 	}
 	if text, ok, err = r.output.readLua(source); err != nil {
@@ -141,7 +141,7 @@ func (r *luaReader) readLua(source Source) (text string, ok bool, err error) {
 	if ok {
 		r.lua[source.Path] = text
 	} else {
-		r.none[source.Path] = true
+		r.noLua[source.Path] = true
 	}
 	return text, ok, nil
 }

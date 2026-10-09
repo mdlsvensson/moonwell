@@ -437,21 +437,21 @@ func TestAFolderOfModulesThatCannotBeListedIsRefusedByItsName(t *testing.T) {
 }
 
 func TestAListingThatFailsBelowAFolderNamesTheFolderItFailedAt(t *testing.T) {
-	lua := moduleDir{dir: "lua", path: filepath.Join(t.TempDir(), "lua"), kind: Lua}
+	lua := moduleDir{dir: "lua", fullPath: filepath.Join(t.TempDir(), "lua"), kind: Lua}
 	denied := func(path string) error { return &fs.PathError{Op: "open", Path: path, Err: fs.ErrPermission} }
 	for what, c := range map[string]struct {
 		cause error
 		want  string
 	}{
-		"below the folder":    {denied(filepath.Join(lua.path, "a", "closed")), "lua/a/closed"},
-		"wrapped once more":   {fmt.Errorf("listing: %w", denied(filepath.Join(lua.path, "closed"))), "lua/closed"},
-		"at the folder":       {denied(lua.path), "lua"},
-		"outside the folder":  {denied(filepath.Dir(lua.path)), "lua"},
-		"beside the folder":   {denied(lua.path + "x"), "lua"},
+		"below the folder":    {denied(filepath.Join(lua.fullPath, "a", "closed")), "lua/a/closed"},
+		"wrapped once more":   {fmt.Errorf("listing: %w", denied(filepath.Join(lua.fullPath, "closed"))), "lua/closed"},
+		"at the folder":       {denied(lua.fullPath), "lua"},
+		"outside the folder":  {denied(filepath.Dir(lua.fullPath)), "lua"},
+		"beside the folder":   {denied(lua.fullPath + "x"), "lua"},
 		"without a path":      {errors.New("the disk is gone"), "lua"},
 		"with a path of none": {denied(""), "lua"},
 	} {
-		failure := asError(t, errUnreadableFolder(lua.failedAt(c.cause), c.cause), what)
+		failure := asError(t, errUnreadableFolder(lua.failedPath(c.cause), c.cause), what)
 		if !strings.HasPrefix(failure.Msg, "Reading "+c.want+"/ failed: ") || failure.File != c.want || failure.Cause != c.cause {
 			t.Errorf("%s: %+v, want the folder %s", what, failure, c.want)
 		}
