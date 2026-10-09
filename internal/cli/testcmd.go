@@ -7,6 +7,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/env"
 )
 
-func runTest(ctx context.Context, e *env.Env, c commandArgs) error {
-	return build.Test(ctx, e, c.buildOptions())
+func runTest(ctx context.Context, e *env.Env, args commandArgs) error {
+	return build.Test(ctx, e, args.buildOptions())
 }

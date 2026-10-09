@@ -12,15 +12,15 @@ import (
 )
 
 func runSettingsCheck(ctx context.Context, e *env.Env, _ commandArgs) error {
-	p, err := build.Load(ctx, e)
+	project, err := build.Load(ctx, e)
 	if err != nil {
 		return err
 	}
-	source, err := build.OpenSource(p)
+	source, err := build.OpenSource(project)
 	if err != nil {
 		return err
 	}
-	changes, err := settings.Plan(source, p)
+	changes, err := settings.Plan(source, project)
 	if err != nil {
 		return err
 	}

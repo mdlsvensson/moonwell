@@ -22,23 +22,23 @@ func runSetup(ctx context.Context, e *env.Env, _ commandArgs) error {
 	if err != nil {
 		return err
 	}
-	p, err := manifest.Load(ctx, e, pkl)
+	project, err := manifest.Load(ctx, e, pkl)
 	if err != nil {
 		return err
 	}
 	if err := setupLocalManifest(e); err != nil {
 		return err
 	}
-	if err := setupCompiler(ctx, e, p.Yue); err != nil {
+	if err := setupCompiler(ctx, e, project.Yue); err != nil {
 		return err
 	}
 	if err := setupEditorFiles(e); err != nil {
 		return err
 	}
-	if err := refreshDeclarations(e, p); err != nil {
+	if err := refreshDeclarations(e, project); err != nil {
 		return err
 	}
-	return syncLibrariesAndView(ctx, e, p)
+	return syncLibrariesAndView(ctx, e, project)
 }
 
 func setupPkl(ctx context.Context, e *env.Env) (pkl string, err error) {
@@ -77,14 +77,14 @@ func binDirFor(e *env.Env, yue manifest.Yue, compiler string) (string, error) {
 	if yue.Path != nil {
 		return toolchain.ParentDir(*yue.Path), nil
 	}
-	path, copied, err := toolchain.CopyToBinDir(e, toolchain.YueScript, compiler)
+	copyPath, copied, err := toolchain.CopyToBinDir(e, toolchain.YueScript, compiler)
 	if err != nil {
 		return "", err
 	}
 	if copied {
-		e.Log.Info("Copied YueScript for the editor to " + path + ".")
+		e.Log.Info("Copied YueScript for the editor to " + copyPath + ".")
 	}
-	return filepath.Dir(path), nil
+	return filepath.Dir(copyPath), nil
 }
 
 func setupEditorFiles(e *env.Env) error {
@@ -96,8 +96,8 @@ func setupEditorFiles(e *env.Env) error {
 	if err != nil {
 		return err
 	}
-	for _, file := range added {
-		e.Log.Info("Added " + file + " for the editor.")
+	for _, name := range added {
+		e.Log.Info("Added " + name + " for the editor.")
 	}
 	return mergeLuarc(e, template)
 }
@@ -127,8 +127,8 @@ func warnAboutLuarc(e *env.Env, template []moonwell.TemplateFile) error {
 	return nil
 }
 
-func refreshDeclarations(e *env.Env, p *manifest.Project) error {
-	source, err := build.OpenSource(p)
+func refreshDeclarations(e *env.Env, project *manifest.Project) error {
+	source, err := build.OpenSource(project)
 	if err != nil {
 		return err
 	}
@@ -136,20 +136,20 @@ func refreshDeclarations(e *env.Env, p *manifest.Project) error {
 	if err != nil {
 		return err
 	}
-	objs, err := objects.Plan(source, p.Objects, objects.LoadMetadata())
+	objectPlan, err := objects.Plan(source, project.Objects, objects.LoadMetadata())
 	if err != nil {
 		return err
 	}
-	return build.RefreshDeclarations(e.Root, source, objs.Objects, globals)
+	return build.RefreshDeclarations(e.Root, source, objectPlan.Objects, globals)
 }
 
-func syncLibrariesAndView(ctx context.Context, e *env.Env, p *manifest.Project) error {
+func syncLibrariesAndView(ctx context.Context, e *env.Env, project *manifest.Project) error {
 	release, err := build.AcquireLock(e.Root)
 	if err != nil {
 		return err
 	}
 	defer release()
-	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
+	synced, err := library.Sync(ctx, e, project.Libraries, project.ManifestName)
 	if err != nil {
 		return err
 	}

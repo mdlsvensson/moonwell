@@ -23,7 +23,7 @@ func runAssetsSync(ctx context.Context, e *env.Env, _ commandArgs) error {
 }
 
 func syncOrCheckAssets(ctx context.Context, e *env.Env, write bool) error {
-	p, err := build.Load(ctx, e)
+	project, err := build.Load(ctx, e)
 	if err != nil {
 		return err
 	}
@@ -32,18 +32,18 @@ func syncOrCheckAssets(ctx context.Context, e *env.Env, write bool) error {
 		return err
 	}
 	defer release()
-	source, err := build.OpenSource(p)
+	source, err := build.OpenSource(project)
 	if err != nil {
 		return err
 	}
 	if err := checkLuaScriptMap(source); err != nil {
 		return err
 	}
-	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
+	synced, err := library.Sync(ctx, e, project.Libraries, project.ManifestName)
 	if err != nil {
 		return err
 	}
-	plan, replaced, err := build.PlanAssets(ctx, source, p, synced)
+	plan, replaced, err := build.PlanAssets(ctx, source, project, synced)
 	if err != nil {
 		return err
 	}
@@ -52,17 +52,17 @@ func syncOrCheckAssets(ctx context.Context, e *env.Env, write bool) error {
 		logNothingWritten(e.Log, plan)
 		return nil
 	}
-	return writeAssets(ctx, e, p, source, plan)
+	return writeAssets(ctx, e, project, source, plan)
 }
 
 func writeAssets(
-	ctx context.Context, e *env.Env, p *manifest.Project, source *mapdir.Folder, plan *assets.Result,
+	ctx context.Context, e *env.Env, project *manifest.Project, source *mapdir.Folder, plan *assets.Result,
 ) error {
-	stateFile, err := build.AssetStatePath(p)
+	stateFile, err := build.AssetStatePath(project)
 	if err != nil {
 		return err
 	}
-	if err := assets.Sync(ctx, source, plan, p.Root, stateFile); err != nil {
+	if err := assets.Sync(ctx, source, plan, project.Root, stateFile); err != nil {
 		return err
 	}
 	e.Log.Info("Synced " + strconv.Itoa(len(plan.Assets)) + " asset(s) into " + source.DisplayPath("") + " (" +
@@ -80,22 +80,22 @@ func checkLuaScriptMap(source *mapdir.Folder) error {
 }
 
 func collectSyncedAssets(
-	ctx context.Context, e *env.Env, p *manifest.Project,
-) (found []assets.Asset, replaced []string, err error) {
-	synced, err := library.Sync(ctx, e, p.Libraries, p.ManifestName)
+	ctx context.Context, e *env.Env, project *manifest.Project,
+) (collected []assets.Asset, replaced []string, err error) {
+	synced, err := library.Sync(ctx, e, project.Libraries, project.ManifestName)
 	if err != nil {
 		return nil, nil, err
 	}
-	return build.CollectAssets(p, synced)
+	return build.CollectAssets(project, synced)
 }
 
 func logAssetPlan(log *env.Logger, source *mapdir.Folder, plan *assets.Result, replaced []string) {
 	for _, asset := range plan.Assets {
-		from := asset.Source
+		origin := asset.Source
 		if asset.Library != "" {
-			from = "library " + asset.Library + ": " + asset.Source
+			origin = "library " + asset.Library + ": " + asset.Source
 		}
-		log.Info(from + " -> " + strings.ReplaceAll(asset.Target, "/", `\`))
+		log.Info(origin + " -> " + strings.ReplaceAll(asset.Target, "/", `\`))
 	}
 	for _, line := range replaced {
 		log.Info(line)
@@ -114,10 +114,10 @@ func logNothingWritten(log *env.Logger, plan *assets.Result) {
 		strconv.Itoa(len(plan.Changes)) + " file change(s). Nothing was written.")
 }
 
-func errMapLacks(name, folder string) error {
+func errMapLacks(name, displayPath string) error {
 	return &diag.Error{
 		Msg:  "The source map has no " + name + ".",
-		File: folder,
+		File: displayPath,
 		Hint: "Save the map in World Editor in folder format with Lua as the script language.",
 	}
 }

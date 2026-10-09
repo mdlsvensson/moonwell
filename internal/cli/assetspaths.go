@@ -13,26 +13,26 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/war3/model"
 )
 
-func runAssetsPaths(ctx context.Context, e *env.Env, c commandArgs) error {
-	file := ""
-	if len(c.arguments) > 0 {
-		file = c.arguments[0]
+func runAssetsPaths(ctx context.Context, e *env.Env, args commandArgs) error {
+	modelPath := ""
+	if len(args.arguments) > 0 {
+		modelPath = args.arguments[0]
 	}
-	return reportAssetPaths(ctx, e, file, assets.LoadGamePaths())
+	return reportAssetPaths(ctx, e, modelPath, assets.LoadGamePaths())
 }
 
-func reportAssetPaths(ctx context.Context, e *env.Env, file string, gamePaths map[string]bool) error {
+func reportAssetPaths(ctx context.Context, e *env.Env, modelPath string, gamePaths map[string]bool) error {
 	inProject := manifest.IsProject(e.Root)
-	var imported []assets.Asset
+	var projectAssets []assets.Asset
 	var targets map[string]bool
 	if inProject {
-		found, err := assetsOfBuild(ctx, e)
+		collected, err := assetsOfBuild(ctx, e)
 		if err != nil {
 			return err
 		}
-		imported, targets = found, assets.TargetSet(found)
+		projectAssets, targets = collected, assets.TargetSet(collected)
 	}
-	models, err := selectModels(e.Root, file, inProject, imported)
+	models, err := selectModels(e.Root, modelPath, inProject, projectAssets)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func reportAssetPaths(ctx context.Context, e *env.Env, file string, gamePaths ma
 	if len(gamePaths) == 0 {
 		e.Log.Warn("Moonwell's in-game path list is empty, so every path shows as custom.")
 	}
-	if file != "" {
+	if modelPath != "" {
 		if _, err := model.ReadPaths(models[0].Data, models[0].Heading); err != nil {
 			return err
 		}
@@ -56,7 +56,7 @@ func reportAssetPaths(ctx context.Context, e *env.Env, file string, gamePaths ma
 }
 
 func assetsOfBuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
-	p, err := build.Load(ctx, e)
+	project, err := build.Load(ctx, e)
 	if err != nil {
 		return nil, err
 	}
@@ -65,22 +65,22 @@ func assetsOfBuild(ctx context.Context, e *env.Env) ([]assets.Asset, error) {
 		return nil, err
 	}
 	defer release()
-	found, _, err := collectSyncedAssets(ctx, e, p)
-	return found, err
+	collected, _, err := collectSyncedAssets(ctx, e, project)
+	return collected, err
 }
 
-func selectModels(root, file string, inProject bool, imported []assets.Asset) ([]assets.Model, error) {
+func selectModels(root, modelPath string, inProject bool, projectAssets []assets.Asset) ([]assets.Model, error) {
 	switch {
-	case file != "":
-		named, err := assets.ReadModel(root, file)
+	case modelPath != "":
+		modelFile, err := assets.ReadModel(root, modelPath)
 		if err != nil {
 			return nil, err
 		}
-		return []assets.Model{named}, nil
+		return []assets.Model{modelFile}, nil
 	case !inProject:
 		return nil, errNeedsAModel()
 	}
-	return assets.ModelsAmong(imported), nil
+	return assets.ModelsAmong(projectAssets), nil
 }
 
 func checkModelsReadable(reports []assets.ModelReport) error {

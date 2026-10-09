@@ -25,19 +25,19 @@ func readLine(t *testing.T, args ...string) reading {
 	for i := range table {
 		name := table[i].name
 		table[i].run = func(_ context.Context, _ *env.Env, c commandArgs) error {
-			c.print = nil
+			c.writeStdout = nil
 			result.ran, result.got = name, c
 			return nil
 		}
 	}
 	var lines, printed []string
 	r := &invocation{
-		ctx:      background,
-		newEnv:   func(string, *env.Logger) *env.Env { return nil },
-		commands: table,
-		workDir:  t.TempDir(),
-		write:    func(line string) { lines = append(lines, line) },
-		print:    func(text string) { printed = append(printed, text) },
+		ctx:         background,
+		newEnv:      func(string, *env.Logger) *env.Env { return nil },
+		commands:    table,
+		workDir:     t.TempDir(),
+		writeStderr: func(line string) { lines = append(lines, line) },
+		writeStdout: func(text string) { printed = append(printed, text) },
 	}
 	result.code = r.execute(args)
 	result.output, result.stdout = strings.Join(lines, "\n"), strings.Join(printed, "\n")

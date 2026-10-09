@@ -287,7 +287,7 @@ func TestACheckoutIsAFolderWhoseGoModNamesThisModule(t *testing.T) {
 
 func TestLinkPathIsRelativeWhenTheTargetSharesARootWithTheCheckout(t *testing.T) {
 	base := t.TempDir()
-	path, err := schemaLinkPath(filepath.Join(base, "maps", "my-map"), filepath.Join(base, "moonwell", "schema"))
+	path, err := relSchemaDir(filepath.Join(base, "maps", "my-map"), filepath.Join(base, "moonwell", "schema"))
 	if err != nil || path != "../../moonwell/schema" {
 		t.Errorf("linkPath = %q, %v", path, err)
 	}
@@ -297,7 +297,7 @@ func TestLinkPathRefusesATargetOnAnotherDrive(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		t.Skip("only Windows has drives")
 	}
-	_, err := schemaLinkPath(`C:\Temp\my-map`, `D:\a\moonwell\schema`)
+	_, err := relSchemaDir(`C:\Temp\my-map`, `D:\a\moonwell\schema`)
 	e := asError(t, err, "another drive")
 	if e.Msg != "--link needs the project on the same drive as this Moonwell checkout." ||
 		!strings.HasPrefix(e.Hint, `Create the project on D:\ (`) {

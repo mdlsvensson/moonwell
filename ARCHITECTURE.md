@@ -182,7 +182,7 @@ A new package is added to that file, on its shelf, and to the tables above.
 Follow `moonwell build --minify`:
 
 1. `cmd/moonwell/main.go` is `os.Exit(cli.Main())`.
-2. `Main` in `internal/cli/cli.go` finds the working folder, makes two writers (lines for the terminal go to
+2. `Main` in `internal/cli/main.go` finds the working folder, makes two writers (lines for the terminal go to
    standard error, output meant for other programs goes to standard output), turns Ctrl+C into the cancelling of a
    `context.Context`, and calls `Run`.
 3. `Run` calls `runIn`, and that `execute`, which does these things in order:
@@ -509,12 +509,12 @@ Each row names the file to open and, in most rows, the function to read first.
 | I want to | Open |
 | --- | --- |
 | see what `moonwell build` does, in order | `internal/build/build.go`: `Build`, then `Plan`; the longer steps in `internal/build/steps.go` |
-| add a command | `internal/cli/cli.go`: a row in the table `commands`, and a function in a file of the package that the row names |
-| add a flag, or give a command a flag | `internal/cli/cli.go`: an `flagSpec` beside `entryFlag`, in the `flags` of each row of `commands` that has it, a field of `commandArgs` for what the flag says, and a line in `runCommand` that reads it. The flag is also written by hand in the `usage` text of those rows. A flag of `build` and `test` then goes on through `buildOptions` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
+| add a command | `internal/cli/commands.go`: a row in the table `commands`, and a function in a file of the package that the row names |
+| add a flag, or give a command a flag | `internal/cli/commands.go`: a `flagSpec` beside `entryFlag`, in the `flags` of each row of `commands` that has it, and a field of `commandArgs` for what the flag says; `internal/cli/cli.go`: a line in `runCommand` that reads it. The flag is also written by hand in the `usage` text of those rows. A flag of `build` and `test` then goes on through `buildOptions` in `internal/cli/build.go` to `Options` in `internal/build/build.go` |
 | know why a command line is refused | `cobra` refuses it, in its own words: an unknown flag or command, a flag without its value, a wrong number of arguments (the `args` of the row in `commands`). `usageError` in `internal/cli/cli.go` prints it. Only an `--entry` that is no entry is refused by Moonwell, in `runCommand` |
-| change the help text | `internal/cli/cli.go`: the `usage` and `help` of each row of `commands`, the `help` of an `flagSpec`, and the `Long` text in `buildCommandTree`. The layout is `cobra`'s |
+| change the help text | `internal/cli/commands.go`: the `usage` and `help` of each row of `commands`, and the `help` of a `flagSpec`; `internal/cli/cli.go`: the `Long` text in `buildCommandTree`. The layout is `cobra`'s |
 | know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `execute`, `exitCode` |
-| change what Ctrl+C does | `internal/cli/cli.go`: `Main`, `handleInterrupts`, `newForceExit`; `internal/build/lock.go`: `ReleaseHeldLocks` |
+| change what Ctrl+C does | `internal/cli/main.go`: `Main`, `handleInterrupts`, `newForceExit`; `internal/build/lock.go`: `ReleaseHeldLocks` |
 | know where the log file is written | `internal/cli/cli.go`: `logFilePath`; `internal/env/log.go` |
 | change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/files.go`: `PklProjectText`, `LocalManifestText` |
 | change what `setup` does | `internal/cli/setup.go`: `runSetup` |
@@ -658,14 +658,14 @@ so that a later patch release of the package may add one. (`DecodeProject` in `i
 
 **`internal/build` keeps one piece of state between calls.** `internal/build/lock.go` keeps the list of build locks
 this process holds. A second Ctrl+C ends the program from outside the command that is running. The function that
-handles it, `newForceExit` in `internal/cli/cli.go`, knows no project and has no release function to call, and it
+handles it, `newForceExit` in `internal/cli/main.go`, knows no project and has no release function to call, and it
 must still leave no lock behind: the next build would take a lock that stays for a build that runs. The
 only other values a package keeps are the three files of `data/`, each parsed once when it is first asked for
 (`objects.LoadMetadata`, `script.LoadNatives`, `assets.LoadGamePaths`).
 
 **Ctrl+C asks first, and leaves at the second.** The first cancels the command's context: `dev` finishes the check
 that is under way, since the check holds the lock. The second gives back the locks and exits with 130 at once.
-(`Main` and `newForceExit` in `internal/cli/cli.go`.)
+(`Main` and `newForceExit` in `internal/cli/main.go`.)
 
 **A pinned program is checked before it is kept or run.** `Ensure` checks the SHA-256 of a download, unpacks it in a
 folder beside its place, asks it for its version, and only then moves it into the cache. The `yue` on the PATH is
