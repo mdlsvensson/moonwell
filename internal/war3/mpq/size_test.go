@@ -38,11 +38,11 @@ func TestLargestArchiveIsTheSizeOfAnArchiveWhoseFilesDoNotCompress(t *testing.T)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var sizes []fileSize
-			for at := range tt.files {
-				if tt.files[at].Name == "" {
-					tt.files[at] = File{Name: "file" + string(rune('a'+at)), Data: noise(uint64(at), 100)}
+			for index := range tt.files {
+				if tt.files[index].Name == "" {
+					tt.files[index] = File{Name: "file" + string(rune('a'+index)), Data: noise(uint64(index), 100)}
 				}
-				sizes = append(sizes, fileSize{tt.files[at].Name, int64(len(tt.files[at].Data))})
+				sizes = append(sizes, fileSize{tt.files[index].Name, int64(len(tt.files[index].Data))})
 			}
 			written, err := Write(tt.files, Options{Prefix: make([]byte, tt.prefix)})
 			if err != nil {

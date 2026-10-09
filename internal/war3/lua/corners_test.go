@@ -158,10 +158,10 @@ func scan(source string) scanned {
 	made.Tokens, made.Fault = Tokenize(source)
 	made.Whole = literalOf(made.Tokens)
 	functions, err := ParseFunctions(source, "war3map.lua")
-	var failure *diag.Error
+	var diagErr *diag.Error
 	switch {
-	case errors.As(err, &failure):
-		made.Refusal = refusedAt{failure.File, failure.Msg, failure.Hint, failure.Line, failure.Column}
+	case errors.As(err, &diagErr):
+		made.Refusal = refusedAt{diagErr.File, diagErr.Msg, diagErr.Hint, diagErr.Line, diagErr.Column}
 	case err != nil:
 		made.Refusal = refusedAt{Message: err.Error()}
 	}

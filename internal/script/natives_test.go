@@ -19,11 +19,11 @@ func TestLoadNativesReadsTheEmbeddedNativesOnce(t *testing.T) {
 			natives.GameVersion, len(natives.Types), len(natives.Functions), len(natives.Globals))
 	}
 	find := func(name string) NativeFunction {
-		at := slices.IndexFunc(natives.Functions, func(function NativeFunction) bool { return function.Name == name })
-		if at < 0 {
+		index := slices.IndexFunc(natives.Functions, func(function NativeFunction) bool { return function.Name == name })
+		if index < 0 {
 			t.Fatalf("no function %s", name)
 		}
-		return natives.Functions[at]
+		return natives.Functions[index]
 	}
 	create := find("CreateUnit")
 	wantParams := []NativeParam{{"id", "player"}, {"unitid", "integer"}, {"x", "real"}, {"y", "real"}, {"face", "real"}}

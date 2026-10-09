@@ -59,7 +59,7 @@ func errNotPNG(displayPath string) error {
 
 func errPNGUnreadable(displayPath string, cause error) error {
 	reason := strings.TrimPrefix(cause.Error(), "png: ")
-	failure := newPictureError(displayPath, "is a PNG that could not be read: "+reason+".", pngHint)
-	failure.Cause = cause
-	return failure
+	diagErr := newPictureError(displayPath, "is a PNG that could not be read: "+reason+".", pngHint)
+	diagErr.Cause = cause
+	return diagErr
 }

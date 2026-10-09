@@ -42,9 +42,9 @@ renamed (3):
 ` + "wrote data/metadata.json. Now run `go run ./tools/gen`.\n"
 
 func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(t *testing.T) {
-	folder := exportedGame(t, nil)
+	dir := exportedGame(t, nil)
 	c := withPins(t, unitClassPins)
-	printed, files, err := c.run("metadata", folder, "3.0.0.1")
+	printed, files, err := c.run("metadata", dir, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,7 +62,7 @@ func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(
 		"\n      \"AHhb\": {\"name\":\"Holy Light\",\"levels\":3},",
 		`"label":"% Bonus & More"`,
 	)
-	again, files, err := c.run("metadata", folder, "3.0.0.1")
+	again, files, err := c.run("metadata", dir, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,14 +76,14 @@ func TestTheModeMetadataWritesTheSameFileTwiceAndReportsTheCountsOfEachCategory(
 }
 
 func TestTheModeMetadataReportsTheRenamesInTheOrderOfTheListsAndTheIds(t *testing.T) {
-	folder := exportedGame(t, func(files map[string]string) {
+	dir := exportedGame(t, func(files map[string]string) {
 		files[abilityFieldsTable] = withRow(files[abilityFieldsTable],
 			`C;X1;Y11;K"Crs"`, `C;X7;K"data"`, `C;X8;K"WESTRING_CRS"`, `C;X9;K"unreal"`)
 		files[labelsFile] += "WESTRING_GPCT=Name\r\nWESTRING_FART=Name\r\nWESTRING_CRS=Chance to Miss\r\n"
 	})
 	c := withPins(t, `{"names": {"items": {"unam": "unitName", "ifil": "itemModel"}, "units": {"ucls": "unitClass"},
 		"abilities": {"Crs": "missChance"}}}`)
-	printed, files, err := c.run("metadata", folder, "3.0.0.1")
+	printed, files, err := c.run("metadata", dir, "3.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,50 +106,50 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 	const released = `{"format":1,"game":"1.0","fields":{"units":[{"id":"uhpm","name":"hitPoints"}]}}`
 	whole := exportedGame(t, nil)
 	for name, c := range map[string]struct {
-		folder string
+		dir    string
 		pins   string
 		kept   string
 		starts string
 		words  []string
 	}{
-		"a name that needs a pin": {folder: whole, pins: "{}", starts: "cannot derive friendly names:\n  ",
+		"a name that needs a pin": {dir: whole, pins: "{}", starts: "cannot derive friendly names:\n  ",
 			words: []string{`units ucls "class" (Class)`, "tools/metadata/overrides.json"}},
 		"a file that the export lacks": {
-			folder: exportedGame(t, func(files map[string]string) { delete(files, upgradesTable) }),
+			dir:    exportedGame(t, func(files map[string]string) { delete(files, upgradesTable) }),
 			starts: "war3.w3mod/units/upgradedata.slk is missing from "},
 		"a table whose column netsafe has another name": {
-			folder: exportedGame(t, func(files map[string]string) {
+			dir: exportedGame(t, func(files map[string]string) {
 				files[unitFieldsTable] = strings.Replace(files[unitFieldsTable], `K"netsafe"`, `K"netSafe"`, 1)
 			}),
 			starts: `war3.w3mod/units/unitmetadata.slk has no column "netsafe"`,
 			words:  []string{"tools/gen/export.go"}},
 		"a name that needs a pin, in an export with a table that lacks a column": {pins: "{}",
-			folder: exportedGame(t, func(files map[string]string) {
+			dir: exportedGame(t, func(files map[string]string) {
 				files[upgradesTable] = strings.Replace(files[upgradesTable], `K"maxlevel"`, `K"levels"`, 1)
 			}),
 			starts: `war3.w3mod/units/upgradedata.slk has no column "maxlevel"`},
 		"a name that needs a pin, in an export with a table that does not parse": {pins: "{}",
-			folder: exportedGame(t, func(files map[string]string) {
+			dir: exportedGame(t, func(files map[string]string) {
 				files[upgradesTable] = "ID;PWXL;N;E\r\nC;X1;Y1;K\"upgradeid\"\r\nC;X1;Y2;K\"Rhme\r\nE\r\n"
 			}),
 			starts: "war3.w3mod/units/upgradedata.slk:3: unterminated quoted string"},
 		"a unit that breaks the rule for heroes": {
-			folder: exportedGame(t, func(files map[string]string) {
+			dir: exportedGame(t, func(files map[string]string) {
 				files[unitsTable] = withRow(files[unitsTable], `C;X1;Y6;K"Nhro"`)
 				files[balanceTable] = withRow(files[balanceTable], `C;X1;Y6;K"Nhro"`, `C;X2;K0`, `C;X3;K"_"`)
 			}),
 			starts: "standard units break the rule for heroes: Nhro (uppercase, "},
-		"a released name that would change": {folder: whole, kept: released,
+		"a released name that would change": {dir: whole, kept: released,
 			starts: "released friendly names would change.",
 			words:  []string{`units uhpm "hitPoints" would become "hitPointsMaximumBase"`}},
-		"a released file that is no JSON": {folder: whole, kept: `{"format":`, starts: "data/metadata.json: "},
-		"overrides that are no JSON":      {folder: whole, pins: `{"names":`, starts: "tools/metadata/overrides.json: "},
-		"overrides with a key too many": {folder: whole, pins: `{"names": {}, "renamed": {}}`,
+		"a released file that is no JSON": {dir: whole, kept: `{"format":`, starts: "data/metadata.json: "},
+		"overrides that are no JSON":      {dir: whole, pins: `{"names":`, starts: "tools/metadata/overrides.json: "},
+		"overrides with a key too many": {dir: whole, pins: `{"names": {}, "renamed": {}}`,
 			starts: `tools/metadata/overrides.json: unknown field "renamed"`},
-		"a pin under a list that is none": {folder: whole,
+		"a pin under a list that is none": {dir: whole,
 			pins:   `{"names": {"units": {"ucls": "unitClass"}, "ability": {"anam": "title"}}}`,
 			starts: "cannot derive friendly names:\n  names.ability is none of the lists of fields"},
-		"a pin of an id that no field has": {folder: whole,
+		"a pin of an id that no field has": {dir: whole,
 			pins:   `{"names": {"units": {"ucls": "unitClass", "uhpn": "health"}}}`,
 			starts: "cannot derive friendly names:\n  the pin of \"uhpn\" under names.units names no field"},
 	} {
@@ -158,7 +158,7 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 			scratch.write(metadataPath, c.kept)
 		}
 		before := scratch.all()
-		printed, files, err := scratch.run("metadata", c.folder, "3.0.0.2")
+		printed, files, err := scratch.run("metadata", c.dir, "3.0.0.2")
 		if err == nil {
 			t.Errorf("%s: the run wrote the metadata", name)
 			continue
@@ -178,7 +178,7 @@ func TestTheModeMetadataWritesNothingWhenItRefuses(t *testing.T) {
 }
 
 func TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn(t *testing.T) {
-	folder := exportedGame(t, nil)
+	dir := exportedGame(t, nil)
 	for name, c := range map[string]struct {
 		lay    func(c checkout)
 		starts string
@@ -193,7 +193,7 @@ func TestTheModeMetadataNamesTheFileOfTheCheckoutItFailsOn(t *testing.T) {
 		scratch := newCheckout(t)
 		c.lay(scratch)
 		before := scratch.all()
-		printed, files, err := scratch.run("metadata", folder, "3.0.0.1")
+		printed, files, err := scratch.run("metadata", dir, "3.0.0.1")
 		if err == nil || !strings.HasPrefix(err.Error(), c.starts) || strings.Contains(err.Error(), scratch.root) {
 			t.Errorf("%s: got %v, want a failure that starts with %q and holds no path of the checkout",
 				name, err, c.starts)

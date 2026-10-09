@@ -82,10 +82,10 @@ func TestOutsideAProjectAssetsPathsNeedsAFileThatExistsAndIsNotAFolder(t *testin
 	} {
 		e, log := testkit.Env(t, root)
 		lines, err := paths(e, log, c.file, "textures/knight.dds\n")
-		failure := asError(t, err, c.what)
-		if !strings.Contains(failure.Msg, c.words) || failure.Hint == "" || failure.File != c.named ||
-			failure.Cause != nil {
-			t.Errorf("%s: error = %+v", c.what, failure)
+		diagErr := asError(t, err, c.what)
+		if !strings.Contains(diagErr.Msg, c.words) || diagErr.Hint == "" || diagErr.File != c.named ||
+			diagErr.Cause != nil {
+			t.Errorf("%s: error = %+v", c.what, diagErr)
 		}
 		if len(lines) != 0 {
 			t.Errorf("%s: assets:paths logged %q before it failed", c.what, lines)
@@ -98,10 +98,10 @@ func TestOutsideAProjectAssetsPathsNamesAFileItCannotRead(t *testing.T) {
 	testkit.MakeUnreadable(t, testkit.WriteFile(t, root, "held.mdx", knight()))
 	e, log := testkit.Env(t, root)
 	lines, err := paths(e, log, "held.mdx", "textures/knight.dds\n")
-	failure := asError(t, err, "a file that cannot be read")
-	if !strings.Contains(failure.Msg, "Reading the model failed: ") || failure.Hint == "" || failure.File != "held.mdx" ||
-		failure.Cause == nil {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, err, "a file that cannot be read")
+	if !strings.Contains(diagErr.Msg, "Reading the model failed: ") || diagErr.Hint == "" || diagErr.File != "held.mdx" ||
+		diagErr.Cause == nil {
+		t.Errorf("error = %+v", diagErr)
 	}
 	if len(lines) != 0 {
 		t.Errorf("assets:paths logged %q before it failed", lines)
@@ -216,10 +216,10 @@ func TestPklAssetsPathsReportsReadableModelsBeforeFailure(t *testing.T) {
 		testkit.MDX(testkit.Chunk("TEXS", testkit.Texture(`Textures\B.blp`, 0))))
 	e, log, _ := pklOnly(t, root)
 	lines, err := paths(e, log, "", "textures/b.blp\n")
-	failure := asError(t, err, "a model that cannot be read")
-	if !strings.Contains(failure.Msg, "1 model could not be read") || failure.File != "" ||
-		!strings.Contains(failure.Hint, "assets/Models/A.mdl") {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, err, "a model that cannot be read")
+	if !strings.Contains(diagErr.Msg, "1 model could not be read") || diagErr.File != "" ||
+		!strings.Contains(diagErr.Hint, "assets/Models/A.mdl") {
+		t.Errorf("error = %+v", diagErr)
 	}
 	want := []string{
 		"assets/Models/A.mdl",
@@ -244,10 +244,10 @@ func TestAReportWithModelsThatCouldNotBeReadFailsAndNamesEach(t *testing.T) {
 		{Heading: "assets/Models/B.mdx"},
 		{Heading: "library golems: Models/C.mdx", Unreadable: "it is cut short"},
 	}
-	failure := asError(t, checkModelsReadable(reports), "two models that cannot be read")
-	if !strings.Contains(failure.Msg, "2 models could not be read") ||
-		!strings.Contains(failure.Hint, "assets/Models/A.mdl, library golems: Models/C.mdx;") {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, checkModelsReadable(reports), "two models that cannot be read")
+	if !strings.Contains(diagErr.Msg, "2 models could not be read") ||
+		!strings.Contains(diagErr.Hint, "assets/Models/A.mdl, library golems: Models/C.mdx;") {
+		t.Errorf("error = %+v", diagErr)
 	}
 	if err := checkModelsReadable(reports[1:2]); err != nil {
 		t.Errorf("a report whose models were all read fails: %v", err)
@@ -290,10 +290,10 @@ func TestPklAssetsPathsIsRefusedBesideARunningBuild(t *testing.T) {
 	for _, file := range []string{"", "knight.mdx"} {
 		e, log, _ := pklOnly(t, root)
 		lines, err := paths(e, log, file, "textures/knight.dds\n")
-		failure := asError(t, err, "assets:paths beside a build")
-		if failure.File != "dist/.lock" || failure.Hint == "" || len(lines) != 0 ||
-			!strings.Contains(failure.Msg, "Another Moonwell build is running") {
-			t.Errorf("%q: error = %+v; log = %q", file, failure, lines)
+		diagErr := asError(t, err, "assets:paths beside a build")
+		if diagErr.File != "dist/.lock" || diagErr.Hint == "" || len(lines) != 0 ||
+			!strings.Contains(diagErr.Msg, "Another Moonwell build is running") {
+			t.Errorf("%q: error = %+v; log = %q", file, diagErr, lines)
 		}
 	}
 	if exists(root, ".moonwell") || !exists(root, "dist/.lock") {

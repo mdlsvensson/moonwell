@@ -62,9 +62,9 @@ func TestReadArchiveRefusesAnArchiveWithoutACommitOrASingleTopFolder(t *testing.
 	}
 	for _, c := range cases {
 		commit, files, err := readArchive(c.archive)
-		failure := asError(t, err, c.name)
-		if commit != "" || files != nil || !strings.Contains(failure.Msg, c.says) || !strings.HasSuffix(failure.Msg, ".") {
-			t.Errorf("%s: %q, %q, %+v", c.name, commit, listing(files), failure)
+		diagErr := asError(t, err, c.name)
+		if commit != "" || files != nil || !strings.Contains(diagErr.Msg, c.says) || !strings.HasSuffix(diagErr.Msg, ".") {
+			t.Errorf("%s: %q, %q, %+v", c.name, commit, listing(files), diagErr)
 		}
 	}
 }
@@ -233,10 +233,10 @@ func TestDownloadTagRefusesADownloadThatFailsOrIsNoArchiveOfATag(t *testing.T) {
 	}
 	for _, c := range cases {
 		commit, files, err := downloadExample(&c.network)
-		failure := asError(t, err, c.name)
-		if commit != "" || files != nil || !strings.Contains(failure.Msg, c.says) || failure.File != manifestFile ||
-			!strings.Contains(failure.Hint, c.hint) {
-			t.Errorf("%s: %q, %q, %+v", c.name, commit, listing(files), failure)
+		diagErr := asError(t, err, c.name)
+		if commit != "" || files != nil || !strings.Contains(diagErr.Msg, c.says) || diagErr.File != manifestFile ||
+			!strings.Contains(diagErr.Hint, c.hint) {
+			t.Errorf("%s: %q, %q, %+v", c.name, commit, listing(files), diagErr)
 		}
 		if !slices.Equal(c.network.asked, []string{exampleURL}) {
 			t.Errorf("%s: downloadTag asked %q", c.name, c.network.asked)
@@ -254,10 +254,10 @@ func TestDownloadTagRefusesAPathThatWouldNotStayInsideTheLibrary(t *testing.T) {
 	for _, path := range unsafePaths {
 		network := &served{status: 200, body: testkit.Zip(t, commitA, entries("lib/a.lua", "", "lib/"+path, "")...)}
 		commit, files, err := downloadExample(network)
-		failure := asError(t, err, path)
-		if commit != "" || files != nil || !strings.HasSuffix(failure.Msg, "has an unsafe path: "+path) ||
-			failure.File != manifestFile || !strings.Contains(failure.Hint, exampleURL) {
-			t.Errorf("%s: %q, %q, %+v", path, commit, listing(files), failure)
+		diagErr := asError(t, err, path)
+		if commit != "" || files != nil || !strings.HasSuffix(diagErr.Msg, "has an unsafe path: "+path) ||
+			diagErr.File != manifestFile || !strings.Contains(diagErr.Hint, exampleURL) {
+			t.Errorf("%s: %q, %q, %+v", path, commit, listing(files), diagErr)
 		}
 	}
 	network := &served{status: 200, body: testkit.Zip(t, commitA, entries("../a.lua", "", "../b/c.lua", "")...)}
@@ -274,7 +274,7 @@ func TestAnArchiveTheReaderReportsAsInsecureIsRefusedByThePathItHolds(t *testing
 		t.Errorf("readArchive = %q, %q, %v", commit, listing(files), err)
 	}
 	_, _, err = downloadExample(&served{status: 200, body: archive})
-	if failure := asError(t, err, "an insecure archive"); !strings.HasSuffix(failure.Msg, "has an unsafe path: ../../x.lua") {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asError(t, err, "an insecure archive"); !strings.HasSuffix(diagErr.Msg, "has an unsafe path: ../../x.lua") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }

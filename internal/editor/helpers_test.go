@@ -50,16 +50,16 @@ func contains(t testing.TB, text string, parts ...string) {
 
 func asError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
 	}
-	return failure
+	return diagErr
 }
 
-func linkAt(t testing.TB, root, link string) (at, target string) {
+func linkAt(t testing.TB, root, symlink string) (at, target string) {
 	t.Helper()
-	at, target = filepath.Join(root, filepath.FromSlash(link)), t.TempDir()
+	at, target = filepath.Join(root, filepath.FromSlash(symlink)), t.TempDir()
 	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 		t.Fatal(err)
 	}

@@ -154,9 +154,9 @@ func TestCompileErrorReadsTheLineAndTheMessageTheCompilerPrinted(t *testing.T) {
 		{"a line of many digits", "99999999999999999999999: far", "far\n99999999999999999999999: far", math.MaxInt},
 		{"a line that only starts with the words", "Failed to compile\nFailed to compiler: x\n3: y", "y\n3: y", 3},
 	} {
-		failure := newCompileError("src/x.yue", c.printed)
-		if failure.Msg != c.wantMsg || failure.Line != c.wantLine || failure.File != "src/x.yue" || failure.Hint != "" || failure.Column != 0 {
-			t.Errorf("%s: compileError = %+v, want line %d and the message %q", c.what, failure, c.wantLine, c.wantMsg)
+		diagErr := newCompileError("src/x.yue", c.printed)
+		if diagErr.Msg != c.wantMsg || diagErr.Line != c.wantLine || diagErr.File != "src/x.yue" || diagErr.Hint != "" || diagErr.Column != 0 {
+			t.Errorf("%s: compileError = %+v, want line %d and the message %q", c.what, diagErr, c.wantLine, c.wantMsg)
 		}
 	}
 }
@@ -187,10 +187,10 @@ func TestRewriteErrorReadsTheStepTheReasonAndTheLineMarkOfTheLuaLeft(t *testing.
 			strings.Repeat("a -- 1\n", 11) + "b -- 40\n",
 			"YueScript compiled this file but could not rewrite its Lua: deep", 40},
 	} {
-		failure := newRewriteError("src/x.yue", c.printed, leaving(c.left))
-		if failure == nil || failure.Msg != c.wantMsg || failure.Line != c.wantLine || failure.File != "src/x.yue" ||
-			!strings.Contains(failure.Hint, "bitwise operators (&, |, ~, <<, >>)") || !strings.Contains(failure.Hint, "lua/") {
-			t.Errorf("%s: rewriteError = %+v, want line %d and the message %q", c.what, failure, c.wantLine, c.wantMsg)
+		diagErr := newRewriteError("src/x.yue", c.printed, leaving(c.left))
+		if diagErr == nil || diagErr.Msg != c.wantMsg || diagErr.Line != c.wantLine || diagErr.File != "src/x.yue" ||
+			!strings.Contains(diagErr.Hint, "bitwise operators (&, |, ~, <<, >>)") || !strings.Contains(diagErr.Hint, "lua/") {
+			t.Errorf("%s: rewriteError = %+v, want line %d and the message %q", c.what, diagErr, c.wantLine, c.wantMsg)
 		}
 	}
 }
@@ -202,16 +202,16 @@ func TestTheLuaLeftIsReadOnlyForAStepThatFailedAtAPosition(t *testing.T) {
 		return leftByRewrite
 	}
 	for _, printed := range []string{asPrinted(printedSyntax), asPrinted(printedMacro), "\n", "x Failed to rewrite: y\n", "Failed to rewrite\n", "Failed to compile: Failed to rewrite: x\n"} {
-		if failure := newRewriteError("src/x.yue", printed, left); failure != nil || asked != 0 {
-			t.Errorf("rewriteError(%q) = %+v, and the Lua left was read %d times, want no failure and no read", printed, failure, asked)
+		if diagErr := newRewriteError("src/x.yue", printed, left); diagErr != nil || asked != 0 {
+			t.Errorf("rewriteError(%q) = %+v, and the Lua left was read %d times, want no failure and no read", printed, diagErr, asked)
 		}
 	}
-	failure := newRewriteError("src/x.yue", "Failed to minify: x\n", left)
-	if failure == nil || failure.Msg != "YueScript compiled this file but could not minify its Lua." || failure.Line != 0 || asked != 0 {
-		t.Errorf("without a reason: rewriteError = %+v, and the Lua left was read %d times", failure, asked)
+	diagErr := newRewriteError("src/x.yue", "Failed to minify: x\n", left)
+	if diagErr == nil || diagErr.Msg != "YueScript compiled this file but could not minify its Lua." || diagErr.Line != 0 || asked != 0 {
+		t.Errorf("without a reason: rewriteError = %+v, and the Lua left was read %d times", diagErr, asked)
 	}
-	if failure := newRewriteError("src/x.yue", asPrinted(printedRewrite), left); failure == nil || failure.Line != 4 || asked != 1 {
-		t.Errorf("with a position: rewriteError = %+v, and the Lua left was read %d times, want once", failure, asked)
+	if diagErr := newRewriteError("src/x.yue", asPrinted(printedRewrite), left); diagErr == nil || diagErr.Line != 4 || asked != 1 {
+		t.Errorf("with a position: rewriteError = %+v, and the Lua left was read %d times, want once", diagErr, asked)
 	}
 }
 
@@ -254,8 +254,8 @@ func TestWhatTheCompilerPrintsIsReadWithWhiteSpaceAndLineEndsOfASCIIOnly(t *test
 		{noBreakSpace + "oops" + wideSpace + "\n", noBreakSpace + "oops" + wideSpace, 0},
 		{mark + "\n", mark, 0},
 	} {
-		if failure := newCompileError("src/x.yue", c.printed); failure.Msg != c.wantMsg || failure.Line != c.wantLine {
-			t.Errorf("compileError(%q) = %+v, want line %d and the message %q", c.printed, failure, c.wantLine, c.wantMsg)
+		if diagErr := newCompileError("src/x.yue", c.printed); diagErr.Msg != c.wantMsg || diagErr.Line != c.wantLine {
+			t.Errorf("compileError(%q) = %+v, want line %d and the message %q", c.printed, diagErr, c.wantLine, c.wantMsg)
 		}
 	}
 	for reason, want := range map[string]string{
@@ -264,9 +264,9 @@ func TestWhatTheCompilerPrintsIsReadWithWhiteSpaceAndLineEndsOfASCIIOnly(t *test
 		"a" + noBreakSpace + " ":  "a" + noBreakSpace,
 		wideSpace + "a":           wideSpace + "a",
 	} {
-		failure := newRewriteError("src/x.yue", "Failed to rewrite: x\n>> :1:1: "+reason+"\n", leaving(""))
-		if wantMsg := "YueScript compiled this file but could not rewrite its Lua: " + want; failure == nil || failure.Msg != wantMsg {
-			t.Errorf("rewriteError with the reason %q = %+v, want the message %q", reason, failure, wantMsg)
+		diagErr := newRewriteError("src/x.yue", "Failed to rewrite: x\n>> :1:1: "+reason+"\n", leaving(""))
+		if wantMsg := "YueScript compiled this file but could not rewrite its Lua: " + want; diagErr == nil || diagErr.Msg != wantMsg {
+			t.Errorf("rewriteError with the reason %q = %+v, want the message %q", reason, diagErr, wantMsg)
 		}
 	}
 	for source, want := range map[string]bool{
@@ -300,11 +300,11 @@ func TestUsesPrintedReadsOutputWithCarriageReturnsAndSkipsBlankLines(t *testing.
 }
 
 func TestUsesPrintedRefusesOutputItCannotRead(t *testing.T) {
-	uses, failure := parseGlobalUses("print 1 1\nScore one 8\nx\n", "src/main.yue")
-	if uses != nil || failure == nil || failure.Msg != "yue -g printed a line Moonwell cannot read: Score one 8" ||
-		failure.File != "src/main.yue" || failure.Line != 0 ||
-		failure.Hint != "Use a YueScript version Moonwell supports: remove yue.version and yue.path from the manifests." {
-		t.Fatalf("usesPrinted = %+v, %+v", uses, failure)
+	uses, diagErr := parseGlobalUses("print 1 1\nScore one 8\nx\n", "src/main.yue")
+	if uses != nil || diagErr == nil || diagErr.Msg != "yue -g printed a line Moonwell cannot read: Score one 8" ||
+		diagErr.File != "src/main.yue" || diagErr.Line != 0 ||
+		diagErr.Hint != "Use a YueScript version Moonwell supports: remove yue.version and yue.path from the manifests." {
+		t.Fatalf("usesPrinted = %+v, %+v", uses, diagErr)
 	}
 	for _, printed := range []string{"Score", "Score 1", "Score 1 8 9", "Score  1 8", "Score 1\t8", "Score -1 8", "1 8", "Score 1.0 8"} {
 		if uses, err := parseGlobalUses(printed+"\n", "src/main.yue"); err == nil {
@@ -322,9 +322,9 @@ func TestWhatYueGPrintsIsReadWithWhiteSpaceOfASCIIOnly(t *testing.T) {
 		t.Errorf("usesPrinted = %+v, %v", uses, err)
 	}
 	for _, printed := range []string{"Score 1 8" + noBreakSpace + "\n", "a 1 2" + paragraphEnd + "b 3 4\n", "Score" + wideSpace + "1 8\n"} {
-		uses, failure := parseGlobalUses(printed, "src/main.yue")
-		if failure == nil || !strings.HasPrefix(failure.Msg, "yue -g printed a line Moonwell cannot read: ") {
-			t.Errorf("usesPrinted(%q) = %+v, %+v, want a refusal", printed, uses, failure)
+		uses, diagErr := parseGlobalUses(printed, "src/main.yue")
+		if diagErr == nil || !strings.HasPrefix(diagErr.Msg, "yue -g printed a line Moonwell cannot read: ") {
+			t.Errorf("usesPrinted(%q) = %+v, %+v, want a refusal", printed, uses, diagErr)
 		}
 	}
 }

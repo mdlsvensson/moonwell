@@ -235,7 +235,7 @@ func TestPlanWritesTheMacroModuleBeforeAnyCompilerRunsAndGivesEveryRunItsPath(t 
 		if !slices.Contains(run.there, script.MacrosFile) {
 			t.Errorf("the compiler ran on %s before the macro module was there", run.source)
 		}
-		if at := slices.Index(run.args, "--path"); at < 0 || run.args[at+1] != search || at+2 != len(run.args)-1 {
+		if index := slices.Index(run.args, "--path"); index < 0 || run.args[index+1] != search || index+2 != len(run.args)-1 {
 			t.Errorf("run = %+v", run)
 		}
 	}
@@ -611,7 +611,7 @@ func TestPlanImportsTheAssetsOfTheProjectAndOfItsLibrariesIntoThePlannedMap(t *t
 func TestPlanReadsTheOwnershipStateAndNeverWritesIt(t *testing.T) {
 	tests := []struct {
 		name      string
-		folder    string
+		dir       string
 		at        string
 		stateFile string
 	}{
@@ -621,7 +621,7 @@ func TestPlanReadsTheOwnershipStateAndNeverWritesIt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newStandIn(t, `"map":{"folder":"`+tt.folder+`","entry":"src/main.yue"}`)
+			s := newStandIn(t, `"map":{"folder":"`+tt.dir+`","entry":"src/main.yue"}`)
 			s.folder(filepath.ToSlash(filepath.Dir(tt.at)))
 			if tt.at != "maps/map.w3x" {
 				if err := os.Rename(s.at("maps/map.w3x"), s.at(tt.at)); err != nil {

@@ -17,40 +17,40 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/env"
 )
 
-type standIn struct {
+type fakeTB struct {
 	testing.TB
 	real    *testing.T
-	guard   sync.Mutex
+	mu      sync.Mutex
 	failed  []string
 	errors  []string
 	skipped []string
 }
 
-func newStandIn(t *testing.T) *standIn { return &standIn{real: t} }
+func newFakeTB(t *testing.T) *fakeTB { return &fakeTB{real: t} }
 
-func (s *standIn) Helper()         {}
-func (s *standIn) TempDir() string { return s.real.TempDir() }
-func (s *standIn) Cleanup(f func()) {
+func (s *fakeTB) Helper()         {}
+func (s *fakeTB) TempDir() string { return s.real.TempDir() }
+func (s *fakeTB) Cleanup(f func()) {
 	s.real.Cleanup(f)
 }
-func (s *standIn) Fatalf(format string, args ...any) {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeTB) Fatalf(format string, args ...any) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.failed = append(s.failed, fmt.Sprintf(format, args...))
 }
-func (s *standIn) Errorf(format string, args ...any) {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeTB) Errorf(format string, args ...any) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.errors = append(s.errors, fmt.Sprintf(format, args...))
 }
-func (s *standIn) Skip(args ...any) {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeTB) Skip(args ...any) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.skipped = append(s.skipped, fmt.Sprint(args...))
 }
-func (s *standIn) Skipf(format string, args ...any) {
-	s.guard.Lock()
-	defer s.guard.Unlock()
+func (s *fakeTB) Skipf(format string, args ...any) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.skipped = append(s.skipped, fmt.Sprintf(format, args...))
 }
 
@@ -62,7 +62,7 @@ func TestFixtureReturnsTheBytesOfAFileUnderTestdata(t *testing.T) {
 }
 
 func TestFixtureFailsTheTestWhenTheFileIsMissing(t *testing.T) {
-	stand := newStandIn(t)
+	stand := newFakeTB(t)
 	Fixture(stand, "no-such-folder/no-such-file")
 	if len(stand.failed) != 1 || !strings.Contains(stand.failed[0], "no-such-folder/no-such-file") {
 		t.Errorf("failures = %q, want one that names the fixture", stand.failed)
@@ -89,7 +89,7 @@ func TestEnvFailsTheTestWhenRunFetchOrSpawnIsCalled(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			stand := newStandIn(t)
+			stand := newFakeTB(t)
 			world, _ := Env(stand, t.TempDir())
 			err := tc.call(world)
 			if len(stand.errors) != 1 || !strings.Contains(stand.errors[0], tc.want) {
@@ -107,7 +107,7 @@ func TestEnvFailsTheTestWhenRunFetchOrSpawnIsCalled(t *testing.T) {
 
 func TestEnvAndItsRecorderTakeCallsFromSeveralGoroutinesAtOnce(t *testing.T) {
 	const goroutines, calls = 8, 50
-	stand := newStandIn(t)
+	stand := newFakeTB(t)
 	world, recorder := Env(stand, t.TempDir())
 	returned := make([]int, goroutines)
 	var running sync.WaitGroup
@@ -241,7 +241,7 @@ func TestRepoRootIsTheFolderWithGoMod(t *testing.T) {
 
 func TestRepoRootFailsTheTestOnceWhereNoFolderAboveHasGoMod(t *testing.T) {
 	t.Chdir(t.TempDir())
-	stand := newStandIn(t)
+	stand := newFakeTB(t)
 	root := RepoRoot(stand)
 	if root != "" {
 		if _, err := os.Stat(filepath.Join(root, "go.mod")); err == nil {
@@ -281,7 +281,7 @@ func TestNeedPklFindsPklOnThePathAndElseSkipsOrFailsTheTest(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			stand := newStandIn(t)
+			stand := newFakeTB(t)
 			got := NeedPkl(stand)
 			if len(stand.skipped) != tc.skips || len(stand.failed) != tc.fails {
 				t.Errorf("skipped %q and failed %q, want %d and %d", stand.skipped, stand.failed, tc.skips, tc.fails)
@@ -317,9 +317,9 @@ func TestLinkDirLinksToTheFolder(t *testing.T) {
 	dir := t.TempDir()
 	target := filepath.Join(dir, "target")
 	WriteFile(t, target, "file.txt", []byte("x"))
-	link := filepath.Join(dir, "link")
-	LinkDir(t, target, link)
-	if data, err := os.ReadFile(filepath.Join(link, "file.txt")); err != nil || string(data) != "x" {
+	symlink := filepath.Join(dir, "link")
+	LinkDir(t, target, symlink)
+	if data, err := os.ReadFile(filepath.Join(symlink, "file.txt")); err != nil || string(data) != "x" {
 		t.Errorf("through the link: %q, %v", data, err)
 	}
 }
@@ -327,28 +327,28 @@ func TestLinkDirLinksToTheFolder(t *testing.T) {
 func TestALinkToAFolderThatCannotBeMadeFailsTheTest(t *testing.T) {
 	dir := t.TempDir()
 	WriteFile(t, dir, "target/file.txt", []byte("x"))
-	stand := newStandIn(t)
-	link := filepath.Join(dir, "no", "such", "folder", "link")
-	LinkDir(stand, filepath.Join(dir, "target"), link)
-	if len(stand.failed) != 1 || len(stand.skipped) != 0 || !strings.Contains(stand.failed[0], link) {
+	stand := newFakeTB(t)
+	symlink := filepath.Join(dir, "no", "such", "folder", "link")
+	LinkDir(stand, filepath.Join(dir, "target"), symlink)
+	if len(stand.failed) != 1 || len(stand.skipped) != 0 || !strings.Contains(stand.failed[0], symlink) {
 		t.Errorf("failed %q, skipped %q, want one failure that names the link", stand.failed, stand.skipped)
 	}
 }
 
 func TestLinkFileLinksToTheFileOrSkipsTheTestWhereTheAccountMayNot(t *testing.T) {
 	dir := t.TempDir()
-	target, link := WriteFile(t, dir, "target.txt", []byte("x")), filepath.Join(dir, "link.txt")
-	stand := newStandIn(t)
-	LinkFile(stand, target, link)
+	target, symlink := WriteFile(t, dir, "target.txt", []byte("x")), filepath.Join(dir, "link.txt")
+	stand := newFakeTB(t)
+	LinkFile(stand, target, symlink)
 	switch {
 	case len(stand.failed) != 0:
 		t.Errorf("a link to a file failed the test: %q", stand.failed)
 	case len(stand.skipped) != 0:
-		if _, err := os.Lstat(link); runtime.GOOS != "windows" || len(stand.skipped) != 1 || err == nil {
+		if _, err := os.Lstat(symlink); runtime.GOOS != "windows" || len(stand.skipped) != 1 || err == nil {
 			t.Errorf("skipped %q on %s, and the link is there: %v", stand.skipped, runtime.GOOS, err == nil)
 		}
 	default:
-		if data, err := os.ReadFile(link); err != nil || string(data) != "x" {
+		if data, err := os.ReadFile(symlink); err != nil || string(data) != "x" {
 			t.Errorf("through the link: %q, %v", data, err)
 		}
 	}
@@ -357,7 +357,7 @@ func TestLinkFileLinksToTheFileOrSkipsTheTestWhereTheAccountMayNot(t *testing.T)
 func TestALinkToAFileThatCannotBeMadeFailsTheTest(t *testing.T) {
 	dir := t.TempDir()
 	target := WriteFile(t, dir, "target.txt", []byte("x"))
-	stand := newStandIn(t)
+	stand := newFakeTB(t)
 	LinkFile(stand, target, filepath.Join(dir, "no", "such", "folder", "link.txt"))
 	withoutTheRight := runtime.GOOS == "windows" && len(stand.skipped) == 1 && len(stand.failed) == 0
 	if !withoutTheRight && (len(stand.failed) != 1 || len(stand.skipped) != 0) {

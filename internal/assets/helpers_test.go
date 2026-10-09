@@ -26,11 +26,11 @@ const noBlock = `{"paths":{},"exclude":[]}`
 
 func asError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
 	}
-	return failure
+	return diagErr
 }
 
 func put(t testing.TB, root, file string, content ...string) string {

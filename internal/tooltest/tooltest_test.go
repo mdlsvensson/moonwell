@@ -18,16 +18,16 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-type ended struct {
+type fakeTB struct {
 	testing.TB
 	failed, skipped []string
 }
 
-func (e *ended) Helper() {}
-func (e *ended) Fatalf(format string, args ...any) {
+func (e *fakeTB) Helper() {}
+func (e *fakeTB) Fatalf(format string, args ...any) {
 	e.failed = append(e.failed, fmt.Sprintf(format, args...))
 }
-func (e *ended) Skipf(format string, args ...any) {
+func (e *fakeTB) Skipf(format string, args ...any) {
 	e.skipped = append(e.skipped, fmt.Sprintf(format, args...))
 }
 
@@ -35,7 +35,7 @@ func TestYueTakesTheCompilerTheUserProvidesAsItIs(t *testing.T) {
 	for _, version := range []string{"0.34.3", "0.1.0"} {
 		t.Setenv("MOONWELL_TEST_YUE", os.Args[0])
 		t.Setenv(standsIn, version)
-		test := &ended{}
+		test := &fakeTB{}
 		if got := Yue(test); got != os.Args[0] || len(test.failed)+len(test.skipped) != 0 {
 			t.Errorf("a compiler of version %s: Yue = %q, failed %q, skipped %q", version, got, test.failed, test.skipped)
 		}
@@ -74,7 +74,7 @@ func TestRunLuaFailsTheTestWhenTheFileEndsWithAnErrorOrAnExitCode(t *testing.T) 
 		`io.write("printed before") error("the file failed")`: {"exit code 1", "printed before", "the file failed"},
 		`io.stderr:write("written as an error") os.exit(3)`:   {"exit code 3", "written as an error"},
 	} {
-		test := &ended{}
+		test := &fakeTB{}
 		got := RunLua(test, luaFile(t, "fails.lua", source, nil))
 		if got != "" || len(test.failed) != 1 || len(test.skipped) != 0 {
 			t.Errorf("%s: RunLua = %q, failed %q, skipped %q", source, got, test.failed, test.skipped)
@@ -95,7 +95,7 @@ func TestRunLuaFailsTheTestForAFileThatIsNotThere(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, name := range []string{"missing.lua", "print(1)", "print(2)"} {
-		test := &ended{}
+		test := &fakeTB{}
 		got := RunLua(test, filepath.Join(dir, name))
 		if got != "" || len(test.failed) != 1 || len(test.skipped) != 0 || !strings.Contains(test.failed[0], name) ||
 			!strings.Contains(test.failed[0], "no file") {
@@ -109,7 +109,7 @@ func TestRunLuaRunsNothingWithoutACompiler(t *testing.T) {
 	t.Setenv("MOONWELL_TEST_YUE", filepath.Join(t.TempDir(), "yue"))
 	t.Setenv("MOONWELL_REQUIRE_TOOLS", "")
 	left := filepath.Join(t.TempDir(), "left")
-	test := &ended{}
+	test := &fakeTB{}
 	source := `io.open("` + filepath.ToSlash(left) + `", "w"):close()`
 	if got := RunLua(test, luaFile(t, "writes.lua", source, nil)); got != "" || len(test.skipped) != 1 || len(test.failed) != 0 {
 		t.Errorf("RunLua = %q, skipped %q, failed %q", got, test.skipped, test.failed)
@@ -135,7 +135,7 @@ func TestYueSkipsTheTestWithoutACompilerAndFailsItWhenToolsAreRequired(t *testin
 		t.Run(tc.name, func(t *testing.T) {
 			t.Setenv("MOONWELL_TEST_YUE", gone)
 			t.Setenv("MOONWELL_REQUIRE_TOOLS", tc.require)
-			test := &ended{}
+			test := &fakeTB{}
 			got := Yue(test)
 			if got != "" || len(test.skipped) != tc.skips || len(test.failed) != tc.fails {
 				t.Fatalf("Yue = %q, skipped %q, failed %q", got, test.skipped, test.failed)

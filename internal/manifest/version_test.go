@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func resolvedDeps(version string) string {
+func depsJSON(version string) string {
 	return `{"schemaVersion":1,"resolvedDependencies":{
 		"package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0":{"type":"local",
 		"uri":"projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@` + version + `","path":"../schema"}}}`
@@ -18,9 +18,9 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 		"package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0":{"type":"remote",
 		"uri":"projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.9.1-rc.1"}}}`
 	found := []struct{ name, deps, want string }{
-		{"a local package", resolvedDeps("0.1.3"), "0.1.3"},
+		{"a local package", depsJSON("0.1.3"), "0.1.3"},
 		{"a remote package beside another", remote, "0.9.1-rc.1"},
-		{"behind a byte order mark", "\xEF\xBB\xBF" + resolvedDeps("0.9.0"), "0.9.0"},
+		{"behind a byte order mark", "\xEF\xBB\xBF" + depsJSON("0.9.0"), "0.9.0"},
 		{"after a dependency of its name that is no mapping", `{"resolvedDependencies":{
 			"package://x/moonwell@0":"1.0.0","package://y/moonwell@1":{"uri":"p://y/moonwell@1.2.3"}}}`, "1.2.3"},
 	}
@@ -43,10 +43,10 @@ func TestReadPackageVersionFindsTheResolvedMoonwellVersion(t *testing.T) {
 	}
 	for _, tt := range refused {
 		version, err := readPackageVersion([]byte(tt.deps))
-		failure := asError(t, err, tt.name)
-		if version != "" || failure.File != "PklProject.deps.json" || !strings.Contains(failure.Msg, tt.word) ||
-			!strings.Contains(failure.Hint, "pkl project resolve") {
-			t.Errorf("%s: %q, %+v", tt.name, version, failure)
+		diagErr := asDiagError(t, err, tt.name)
+		if version != "" || diagErr.File != "PklProject.deps.json" || !strings.Contains(diagErr.Msg, tt.word) ||
+			!strings.Contains(diagErr.Hint, "pkl project resolve") {
+			t.Errorf("%s: %q, %+v", tt.name, version, diagErr)
 		}
 	}
 }
@@ -80,15 +80,15 @@ func TestCheckPackageVersionComparesTheMajorAndMinorNumbers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			failure := asError(t, checkPackageVersion(tt.pkg, tt.program), tt.name)
-			if failure.File != "PklProject" || !strings.Contains(failure.Msg, "moonwell@"+tt.pkg) || !strings.Contains(failure.Msg, tt.program) {
-				t.Errorf("error = %+v", failure)
+			diagErr := asDiagError(t, checkPackageVersion(tt.pkg, tt.program), tt.name)
+			if diagErr.File != "PklProject" || !strings.Contains(diagErr.Msg, "moonwell@"+tt.pkg) || !strings.Contains(diagErr.Msg, tt.program) {
+				t.Errorf("error = %+v", diagErr)
 			}
-			if !strings.Contains(failure.Hint, tt.move) || !strings.Contains(failure.Hint, "pkl project resolve") {
-				t.Errorf("the hint %q does not say how to move to %s", failure.Hint, tt.move)
+			if !strings.Contains(diagErr.Hint, tt.move) || !strings.Contains(diagErr.Hint, "pkl project resolve") {
+				t.Errorf("the hint %q does not say how to move to %s", diagErr.Hint, tt.move)
 			}
-			if got := strings.Contains(failure.Hint, installCommand(tt.pkg)); got != tt.installs {
-				t.Errorf("the hint %q names the install line: %v, want %v", failure.Hint, got, tt.installs)
+			if got := strings.Contains(diagErr.Hint, installCommand(tt.pkg)); got != tt.installs {
+				t.Errorf("the hint %q names the install line: %v, want %v", diagErr.Hint, got, tt.installs)
 			}
 		})
 	}

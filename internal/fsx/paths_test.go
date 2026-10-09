@@ -12,17 +12,17 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func refusedInside(t *testing.T, root, relative string) *diag.Error {
+func mustFailSafeJoin(t *testing.T, root, relative string) *diag.Error {
 	t.Helper()
 	place, err := fsx.SafeJoinNoSymlinks(root, relative)
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Fatalf("Inside(%q) = %q, %v, want a *diag.Error", relative, place, err)
 	}
-	if place != "" || failure.File != relative {
-		t.Errorf("Inside(%q) = %q, with the file %q", relative, place, failure.File)
+	if place != "" || diagErr.File != relative {
+		t.Errorf("Inside(%q) = %q, with the file %q", relative, place, diagErr.File)
 	}
-	return failure
+	return diagErr
 }
 
 func TestInsideIsThePlaceOfAPathBelowTheFolder(t *testing.T) {
@@ -49,10 +49,10 @@ func TestInsideRefusesAPathThatLeavesTheFolder(t *testing.T) {
 		"../outside", "../outside/a.txt", "maps/../../outside/a.txt", `maps\..\..\outside`, "..", "maps/..", "",
 		"/outside", "C:/outside",
 	} {
-		failure := refusedInside(t, root, relative)
-		if !strings.Contains(failure.Msg, "Invalid path: "+relative) ||
-			!strings.Contains(failure.Hint, "relative path") || failure.Cause != nil {
-			t.Errorf("Inside(%q): %+v", relative, failure)
+		diagErr := mustFailSafeJoin(t, root, relative)
+		if !strings.Contains(diagErr.Msg, "Invalid path: "+relative) ||
+			!strings.Contains(diagErr.Hint, "relative path") || diagErr.Cause != nil {
+			t.Errorf("Inside(%q): %+v", relative, diagErr)
 		}
 	}
 }
@@ -64,7 +64,7 @@ func TestInsideRefusesALinkOnTheWayAndALinkAtTheEnd(t *testing.T) {
 	testkit.LinkDir(t, filepath.Join(root, "real", "sub"), filepath.Join(root, "real", "inner"))
 	cases := []struct {
 		relative string
-		link     string
+		symlink  string
 	}{
 		{"link", "link"},
 		{"link/sub/a.txt", "link"},
@@ -74,11 +74,11 @@ func TestInsideRefusesALinkOnTheWayAndALinkAtTheEnd(t *testing.T) {
 		{"real/inner/a.txt", "real/inner"},
 	}
 	for _, c := range cases {
-		failure := refusedInside(t, root, c.relative)
-		link := filepath.Join(root, filepath.FromSlash(c.link))
-		if failure.Msg != "Symlinks are not supported: "+link || !strings.Contains(failure.Hint, "real files") ||
-			failure.Cause != nil {
-			t.Errorf("Inside(%q): %+v", c.relative, failure)
+		diagErr := mustFailSafeJoin(t, root, c.relative)
+		symlink := filepath.Join(root, filepath.FromSlash(c.symlink))
+		if diagErr.Msg != "Symlinks are not supported: "+symlink || !strings.Contains(diagErr.Hint, "real files") ||
+			diagErr.Cause != nil {
+			t.Errorf("Inside(%q): %+v", c.relative, diagErr)
 		}
 	}
 	beside := filepath.Join(root, "real", "sub", "a.txt")
@@ -93,10 +93,10 @@ func TestInsideRefusesALinkToAFileAndALinkToNothing(t *testing.T) {
 	testkit.LinkFile(t, target, filepath.Join(root, "link.txt"))
 	testkit.LinkFile(t, filepath.Join(root, "nothing"), filepath.Join(root, "dangling"))
 	for _, relative := range []string{"link.txt", "dangling", "dangling/below"} {
-		failure := refusedInside(t, root, relative)
-		link := filepath.Join(root, strings.TrimSuffix(relative, "/below"))
-		if failure.Msg != "Symlinks are not supported: "+link || !strings.Contains(failure.Hint, "real files") {
-			t.Errorf("Inside(%q): %+v", relative, failure)
+		diagErr := mustFailSafeJoin(t, root, relative)
+		symlink := filepath.Join(root, strings.TrimSuffix(relative, "/below"))
+		if diagErr.Msg != "Symlinks are not supported: "+symlink || !strings.Contains(diagErr.Hint, "real files") {
+			t.Errorf("Inside(%q): %+v", relative, diagErr)
 		}
 	}
 }
@@ -137,9 +137,9 @@ func TestInsideTakesAFileOnTheWayForNothingThere(t *testing.T) {
 	}
 	testkit.LinkDir(t, filepath.Join(root, "real"), filepath.Join(root, "link"))
 	for _, relative := range []string{"link/maps/demo.w3x", "link/maps/demo.w3x/sub/war3map.lua"} {
-		failure := refusedInside(t, root, relative)
-		if failure.Msg != "Symlinks are not supported: "+filepath.Join(root, "link") || failure.Cause != nil {
-			t.Errorf("Inside(%q): %+v", relative, failure)
+		diagErr := mustFailSafeJoin(t, root, relative)
+		if diagErr.Msg != "Symlinks are not supported: "+filepath.Join(root, "link") || diagErr.Cause != nil {
+			t.Errorf("Inside(%q): %+v", relative, diagErr)
 		}
 	}
 	for _, file := range []string{"maps", "real/maps"} {
@@ -154,13 +154,13 @@ func TestInsideNamesAWayTheSystemCannotLookAt(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "maps/a.txt", nil)
 	for _, relative := range []string{strings.Repeat("n", 300), "maps/" + strings.Repeat("n", 300) + "/a.txt"} {
-		failure := refusedInside(t, root, relative)
-		if failure.Cause == nil || failure.Msg != relative+" cannot be reached: "+fsx.Reason(failure.Cause) ||
-			!strings.Contains(failure.Hint, "on the way to it") {
-			t.Errorf("Inside(%.20q...): %+v", relative, failure)
+		diagErr := mustFailSafeJoin(t, root, relative)
+		if diagErr.Cause == nil || diagErr.Msg != relative+" cannot be reached: "+fsx.Reason(diagErr.Cause) ||
+			!strings.Contains(diagErr.Hint, "on the way to it") {
+			t.Errorf("Inside(%.20q...): %+v", relative, diagErr)
 		}
-		if strings.Contains(failure.Msg, root) {
-			t.Errorf("Inside(%.20q...) names the folder on disk: %s", relative, failure.Msg)
+		if strings.Contains(diagErr.Msg, root) {
+			t.Errorf("Inside(%.20q...) names the folder on disk: %s", relative, diagErr.Msg)
 		}
 	}
 }

@@ -114,11 +114,11 @@ func sourceAt(t *testing.T, program *Program, path string) Source {
 
 func sourceIn(t *testing.T, sources []Source, path string) Source {
 	t.Helper()
-	at := slices.IndexFunc(sources, func(source Source) bool { return source.Path == path })
-	if at < 0 {
+	index := slices.IndexFunc(sources, func(source Source) bool { return source.Path == path })
+	if index < 0 {
 		t.Fatalf("no module at %s was found", path)
 	}
-	return sources[at]
+	return sources[index]
 }
 
 func luaOfEach(sources []Source, lua func(Source) (string, bool)) map[string]string {
@@ -264,9 +264,9 @@ func TestCompileWritesTheMacroModuleAndRefusesAFolderTheSearchCannotName(t *test
 	}
 	b = programAt(t, root, files())
 	program, err := b.compile()
-	failure := asError(t, err, "a folder with a semicolon")
-	if program != nil || !strings.Contains(failure.Msg, `";" or "?"`) || failure.File != root || fsx.Exists(filepath.Join(root, ".moonwell")) {
-		t.Errorf("the compile = %+v, %+v, and .moonwell is there: %v", program, failure, fsx.Exists(filepath.Join(root, ".moonwell")))
+	diagErr := asError(t, err, "a folder with a semicolon")
+	if program != nil || !strings.Contains(diagErr.Msg, `";" or "?"`) || diagErr.File != root || fsx.Exists(filepath.Join(root, ".moonwell")) {
+		t.Errorf("the compile = %+v, %+v, and .moonwell is there: %v", program, diagErr, fsx.Exists(filepath.Join(root, ".moonwell")))
 	}
 }
 
@@ -323,25 +323,25 @@ func TestAModuleWhoseSourceHasNoCodeIsRefusedAsOneWithoutCode(t *testing.T) {
 	b := programOf(t, mainOnly.and("src/game/notes.yue", "-- nothing yet\n"))
 	b.fake(map[string]answer{"src/main.yue": leavingLua("\nrequire('game.notes')\n"), "src/game/notes.yue": {}}, nil)
 	_, err := b.compile()
-	failure := asError(t, err, "a required module without code")
-	if failure.Msg != "Module 'game.notes' has no code." || failure.File != "src/main.yue" || failure.Line != 2 ||
-		failure.Hint != hint+"src/game/notes.yue"+such {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, err, "a required module without code")
+	if diagErr.Msg != "Module 'game.notes' has no code." || diagErr.File != "src/main.yue" || diagErr.Line != 2 ||
+		diagErr.Hint != hint+"src/game/notes.yue"+such {
+		t.Errorf("error = %+v", diagErr)
 	}
 	b = programOf(t, mainOnly.with("ex").and(inLibrary("ex", "kit/init.yue"), "-- nothing yet\n"))
 	b.fake(map[string]answer{"src/main.yue": leavingLua("require('kit')\n"), inLibrary("ex", "kit/init.yue"): {}}, nil)
 	_, err = b.compile()
-	failure = asError(t, err, "a required init module without code")
-	if failure.Msg != "Module 'kit' has no code." || failure.File != "src/main.yue" || failure.Line != 1 ||
-		failure.Hint != hint+inLibrary("ex", "kit/init.yue")+such {
-		t.Errorf("error = %+v", failure)
+	diagErr = asError(t, err, "a required init module without code")
+	if diagErr.Msg != "Module 'kit' has no code." || diagErr.File != "src/main.yue" || diagErr.Line != 1 ||
+		diagErr.Hint != hint+inLibrary("ex", "kit/init.yue")+such {
+		t.Errorf("error = %+v", diagErr)
 	}
 	b = programOf(t, files("src/main.yue", "-- nothing yet\n"))
 	b.fake(map[string]answer{"src/main.yue": {}}, nil)
 	_, err = b.compile()
-	failure = asError(t, err, "an entry without code")
-	if failure.Msg != "Module 'main' has no code." || failure.File != "src/main.yue" || failure.Line != 0 || failure.Hint != hint+"src/main.yue"+such {
-		t.Errorf("error = %+v", failure)
+	diagErr = asError(t, err, "an entry without code")
+	if diagErr.Msg != "Module 'main' has no code." || diagErr.File != "src/main.yue" || diagErr.Line != 0 || diagErr.Hint != hint+"src/main.yue"+such {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -352,9 +352,9 @@ func TestInAMinifiedBuildAFaultOfTheGraphIsAtTheLineOfTheMinifiedLua(t *testing.
 		b.world.Run = env.Run
 		b.in.Compiler, b.in.Minify = yue, minify
 		_, err := b.compile()
-		failure := asError(t, err, "a module that is not found")
-		if failure.Msg != "Module 'nope' not found." || failure.File != "src/main.yue" || failure.Line != line {
-			t.Errorf("minified %v: %+v, want line %d", minify, failure, line)
+		diagErr := asError(t, err, "a module that is not found")
+		if diagErr.Msg != "Module 'nope' not found." || diagErr.File != "src/main.yue" || diagErr.Line != line {
+			t.Errorf("minified %v: %+v, want line %d", minify, diagErr, line)
 		}
 	}
 }
@@ -372,10 +372,10 @@ func TestCompileFailsWhenTheLuaOfALibrarysModuleCannotBeRead(t *testing.T) {
 		return scripted(ctx, program, args, options)
 	}
 	program, err := b.compile()
-	failure := asError(t, err, "a folder for a library's output")
+	diagErr := asError(t, err, "a folder for a library's output")
 	const output = "dist/stage/lua/.libraries/ex/kit/loud.lua"
-	if program != nil || !strings.HasPrefix(failure.Msg, "Reading "+output+" failed: ") || failure.File != output || failure.Cause == nil {
-		t.Errorf("the compile = %+v, %+v", program, failure)
+	if program != nil || !strings.HasPrefix(diagErr.Msg, "Reading "+output+" failed: ") || diagErr.File != output || diagErr.Cause == nil {
+		t.Errorf("the compile = %+v, %+v", program, diagErr)
 	}
 }
 

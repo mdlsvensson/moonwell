@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func serve(t *testing.T) *httptest.Server {
+func newTestServer(t *testing.T) *httptest.Server {
 	t.Helper()
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet || r.URL.Path != "/found" {
@@ -23,7 +23,7 @@ func serve(t *testing.T) *httptest.Server {
 }
 
 func TestHTTPFetchReturnsTheStatusAndTheBody(t *testing.T) {
-	server := serve(t)
+	server := newTestServer(t)
 	fetch := HTTPFetch(server.Client())
 	cases := []struct {
 		path   string
@@ -42,7 +42,7 @@ func TestHTTPFetchReturnsTheStatusAndTheBody(t *testing.T) {
 }
 
 func TestHTTPFetchFailsWhenTheContextIsCancelledOrTheAddressIsNotOne(t *testing.T) {
-	server := serve(t)
+	server := newTestServer(t)
 	fetch := HTTPFetch(server.Client())
 	cancelled, cancel := context.WithCancel(context.Background())
 	cancel()

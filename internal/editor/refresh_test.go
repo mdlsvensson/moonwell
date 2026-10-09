@@ -111,10 +111,10 @@ func TestRefreshTypesReadsNoMap(t *testing.T) {
 func TestAMoonwellFolderThatCannotBeWrittenFails(t *testing.T) {
 	root := lay(t, ".moonwell", "a file, not a folder")
 	written, err := RefreshTypes(root, types(nil))
-	failure := asError(t, err, "a file for .moonwell")
-	if !strings.HasPrefix(failure.Msg, "Writing .moonwell/types/natives.d.lua failed: ") ||
-		failure.File != ".moonwell/types/natives.d.lua" || failure.Hint != typesHint || failure.Cause == nil || written != nil {
-		t.Errorf("RefreshTypes = %q, %+v", written, failure)
+	diagErr := asError(t, err, "a file for .moonwell")
+	if !strings.HasPrefix(diagErr.Msg, "Writing .moonwell/types/natives.d.lua failed: ") ||
+		diagErr.File != ".moonwell/types/natives.d.lua" || diagErr.Hint != typesHint || diagErr.Cause == nil || written != nil {
+		t.Errorf("RefreshTypes = %q, %+v", written, diagErr)
 	}
 }
 
@@ -130,10 +130,10 @@ func TestADeclarationFileThatCannotBeWrittenIsNamed(t *testing.T) {
 	}
 	in.Objects, in.Map = resolved(), defined("udg_Score = 0\n")
 	written, err := RefreshTypes(root, in)
-	failure := asError(t, err, "a file that cannot be written")
-	if !strings.HasPrefix(failure.Msg, "Writing .moonwell/types/objects.d.lua failed: ") ||
-		failure.File != ".moonwell/types/objects.d.lua" || failure.Hint != typesHint || written != nil {
-		t.Errorf("RefreshTypes = %q, %+v", written, failure)
+	diagErr := asError(t, err, "a file that cannot be written")
+	if !strings.HasPrefix(diagErr.Msg, "Writing .moonwell/types/objects.d.lua failed: ") ||
+		diagErr.File != ".moonwell/types/objects.d.lua" || diagErr.Hint != typesHint || written != nil {
+		t.Errorf("RefreshTypes = %q, %+v", written, diagErr)
 	}
 	if got := read(t, root, ".moonwell/types/map.d.lua"); got != renderMap(nil, mapLua) {
 		t.Errorf("map.d.lua was written after the failure:\n%s", got)
@@ -141,17 +141,17 @@ func TestADeclarationFileThatCannotBeWrittenIsNamed(t *testing.T) {
 }
 
 func TestALinkOnTheWayToTheDeclarationsIsRefused(t *testing.T) {
-	for _, link := range []string{".moonwell", ".moonwell/types"} {
+	for _, symlink := range []string{".moonwell", ".moonwell/types"} {
 		root := t.TempDir()
-		at, target := linkAt(t, root, link)
+		at, target := linkAt(t, root, symlink)
 		written, err := RefreshTypes(root, types(nil))
-		failure := asError(t, err, "a link at "+link)
-		if failure.Msg != "Symlinks are not supported: "+at || failure.File != ".moonwell/types/natives.d.lua" ||
-			!strings.Contains(failure.Hint, "real files") || written != nil {
-			t.Errorf("a link at %s: RefreshTypes = %q, %+v", link, written, failure)
+		diagErr := asError(t, err, "a link at "+symlink)
+		if diagErr.Msg != "Symlinks are not supported: "+at || diagErr.File != ".moonwell/types/natives.d.lua" ||
+			!strings.Contains(diagErr.Hint, "real files") || written != nil {
+			t.Errorf("a link at %s: RefreshTypes = %q, %+v", symlink, written, diagErr)
 		}
 		if behind := testkit.Snapshot(t, target); len(behind) != 0 {
-			t.Errorf("a link at %s: written behind the link: %q", link, slices.Sorted(maps.Keys(behind)))
+			t.Errorf("a link at %s: written behind the link: %q", symlink, slices.Sorted(maps.Keys(behind)))
 		}
 	}
 }
@@ -161,10 +161,10 @@ func TestALinkAtAFileOfDeclarationsIsRefused(t *testing.T) {
 	at := filepath.Join(root, ".moonwell", "types", "map.d.lua")
 	linkToFile(t, filepath.Join(root, "elsewhere", "mine.lua"), at)
 	written, err := RefreshTypes(root, types(nil))
-	failure := asError(t, err, "a link at map.d.lua")
-	if failure.Msg != "Symlinks are not supported: "+at || failure.File != ".moonwell/types/map.d.lua" ||
-		!strings.Contains(failure.Hint, "real files") || written != nil {
-		t.Errorf("RefreshTypes = %q, %+v", written, failure)
+	diagErr := asError(t, err, "a link at map.d.lua")
+	if diagErr.Msg != "Symlinks are not supported: "+at || diagErr.File != ".moonwell/types/map.d.lua" ||
+		!strings.Contains(diagErr.Hint, "real files") || written != nil {
+		t.Errorf("RefreshTypes = %q, %+v", written, diagErr)
 	}
 	if got := read(t, root, "elsewhere/mine.lua"); got != "mine" {
 		t.Errorf("the file behind the link holds %q", got)

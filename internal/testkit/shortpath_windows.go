@@ -2,8 +2,8 @@ package testkit
 
 import "syscall"
 
-func shortPathName(folder string) string {
-	path, err := syscall.UTF16PtrFromString(folder)
+func shortPathName(dir string) string {
+	path, err := syscall.UTF16PtrFromString(dir)
 	if err != nil {
 		return ""
 	}

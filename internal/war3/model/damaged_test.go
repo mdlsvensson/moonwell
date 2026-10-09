@@ -38,19 +38,19 @@ const textWithOtherLetters = "// M\xC3\xA5ne \xE6\x9C\x88\r\nVersion {\r\n\tForm
 
 func sizeOffsets(t *testing.T, data []byte) []int {
 	t.Helper()
-	u32 := func(at int) int {
-		return int(data[at]) | int(data[at+1])<<8 | int(data[at+2])<<16 | int(data[at+3])<<24
+	u32 := func(offset int) int {
+		return int(data[offset]) | int(data[offset+1])<<8 | int(data[offset+2])<<16 | int(data[offset+3])<<24
 	}
 	var offsets []int
-	for at := 4; at < len(data); {
-		tag, size := string(data[at:at+4]), u32(at+4)
-		offsets = append(offsets, at+4)
+	for offset := 4; offset < len(data); {
+		tag, size := string(data[offset:offset+4]), u32(offset+4)
+		offsets = append(offsets, offset+4)
 		if tag == "PREM" || tag == "ATCH" || tag == "CORN" {
-			for record := at + 8; record < at+8+size; record += u32(record) {
+			for record := offset + 8; record < offset+8+size; record += u32(record) {
 				offsets = append(offsets, record, record+4)
 			}
 		}
-		at += 8 + size
+		offset += 8 + size
 	}
 	if len(offsets) < 15 {
 		t.Fatalf("found only %d sizes in the model", len(offsets))
@@ -79,11 +79,11 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 		if value := testkit.PanicValue(func() { paths, err = read() }); value != nil {
 			t.Fatalf("%s: %s panics: %v", what, name, value)
 		}
-		var failure *diag.Error
+		var diagErr *diag.Error
 		switch {
 		case err == nil:
 			c.read++
-		case paths == nil && errors.As(err, &failure) && failure.File == modelFile:
+		case paths == nil && errors.As(err, &diagErr) && diagErr.File == modelFile:
 			c.refused++
 		default:
 			t.Fatalf("%s: %s = %+v, %v; want paths, or an error of %s", what, name, paths, err, modelFile)
@@ -116,9 +116,9 @@ func TestADamagedModelIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 		}
 	}
 	whole := modelWithEveryChunk()
-	for _, at := range sizeOffsets(t, whole) {
-		for _, size := range sizesNear(binary.LittleEndian.Uint32(whole[at:])) {
-			damaged.readOrRefused(t, fmt.Sprintf("the size at %d set to %d", at, size), testkit.SetU32(whole, at, size))
+	for _, offset := range sizeOffsets(t, whole) {
+		for _, size := range sizesNear(binary.LittleEndian.Uint32(whole[offset:])) {
+			damaged.readOrRefused(t, fmt.Sprintf("the size at %d set to %d", offset, size), testkit.SetU32(whole, offset, size))
 		}
 	}
 	if damaged.read == 0 || damaged.refused == 0 {

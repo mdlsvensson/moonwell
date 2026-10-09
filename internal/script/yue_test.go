@@ -141,11 +141,11 @@ func (b *bench) refuses(yue string, minify bool, what string) *diag.Error {
 
 func (b *bench) source(path string) Source {
 	b.t.Helper()
-	at := slices.IndexFunc(b.sources, func(source Source) bool { return source.Path == path })
-	if at < 0 {
+	index := slices.IndexFunc(b.sources, func(source Source) bool { return source.Path == path })
+	if index < 0 {
 		b.t.Fatalf("the project has no module at %s", path)
 	}
-	return b.sources[at]
+	return b.sources[index]
 }
 
 func (b *bench) luaAt(result *compileOutput, path string) string {
@@ -248,9 +248,9 @@ func TestCompileAllOnlyRecompilesChangedFilesAndRemovesDeletedOutputs(t *testing
 
 func TestCompileAllReportsSyntaxErrorsWithFileAndLine(t *testing.T) {
 	b := benchOf(t, files("src/ok.yue", "export x = 1\n", "src/bad.yue", "x = 1\ny = \n  if then\n"))
-	failure := b.refuses(b.real(), false, "a syntax error")
-	if failure.File != "src/bad.yue" || failure.Line != 2 || !strings.HasPrefix(failure.Msg, "expected valid expression\n") {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(b.real(), false, "a syntax error")
+	if diagErr.File != "src/bad.yue" || diagErr.Line != 2 || !strings.HasPrefix(diagErr.Msg, "expected valid expression\n") {
+		t.Errorf("error = %+v", diagErr)
 	}
 	kept, err := readCompileCache(b.root)
 	if _, ok := kept.Sources["src/ok.yue"]; err != nil || !ok || len(kept.Sources) != 1 {
@@ -260,9 +260,9 @@ func TestCompileAllReportsSyntaxErrorsWithFileAndLine(t *testing.T) {
 
 func TestCompileAllReportsTheFirstOfSeveralFailedFilesAndCountsTheRest(t *testing.T) {
 	b := benchOf(t, files("src/b.yue", "y = \n  if then\n", "src/A.yue", "\ny = \n  if then\n", "src/c.yue", "y = \n  if then\n"))
-	failure := b.refuses(b.real(), false, "three syntax errors")
-	if failure.File != "src/A.yue" || failure.Line != 2 || !strings.HasSuffix(failure.Msg, "\n(2 more file(s) failed to compile)") || failure.Hint != "" {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(b.real(), false, "three syntax errors")
+	if diagErr.File != "src/A.yue" || diagErr.Line != 2 || !strings.HasSuffix(diagErr.Msg, "\n(2 more file(s) failed to compile)") || diagErr.Hint != "" {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -276,10 +276,10 @@ func TestAnEmptyCompileOutputForAFileWithCodeFailsInsteadOfDroppingTheModule(t *
 		}
 		return result, err
 	})
-	failure := b.refuses(yue, false, "an empty output")
-	if failure.Msg != "YueScript reported success but wrote no Lua for src/main.yue, although the file has code." ||
-		failure.File != "src/main.yue" || !strings.Contains(failure.Hint, "//") || !strings.Contains(failure.Hint, "0.34.2") {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(yue, false, "an empty output")
+	if diagErr.Msg != "YueScript reported success but wrote no Lua for src/main.yue, although the file has code." ||
+		diagErr.File != "src/main.yue" || !strings.Contains(diagErr.Hint, "//") || !strings.Contains(diagErr.Hint, "0.34.2") {
+		t.Errorf("error = %+v", diagErr)
 	}
 	if fsx.Exists(b.staged("main.lua")) {
 		t.Error("the empty output was left behind")
@@ -299,21 +299,21 @@ func TestAFileUsingFloorDivisionCompilesNormalAndMinified(t *testing.T) {
 func TestAFileUsingABitwiseOperatorFailsAtItsLineWithAHint(t *testing.T) {
 	p := files("src/main.yue", "x = 1\n\n\nflags = x & 3\nprint flags\n")
 	b := benchOf(t, p)
-	failure := b.refuses(b.real(), false, "a bitwise operator")
-	if failure.Msg != "YueScript compiled this file but could not rewrite its Lua: Unexpected Symbol `&` in source." ||
-		failure.File != "src/main.yue" || failure.Line != 4 || !strings.Contains(failure.Hint, "bitwise operators") ||
-		!strings.Contains(failure.Hint, "lua/") {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(b.real(), false, "a bitwise operator")
+	if diagErr.Msg != "YueScript compiled this file but could not rewrite its Lua: Unexpected Symbol `&` in source." ||
+		diagErr.File != "src/main.yue" || diagErr.Line != 4 || !strings.Contains(diagErr.Hint, "bitwise operators") ||
+		!strings.Contains(diagErr.Hint, "lua/") {
+		t.Errorf("error = %+v", diagErr)
 	}
 	if fsx.Exists(b.staged("main.lua")) {
 		t.Error("the Lua that could not be rewritten was left behind")
 	}
 
 	b = benchOf(t, p)
-	failure = b.refuses(b.real(), true, "a bitwise operator, minified")
-	if failure.Msg != "YueScript compiled this file but could not minify its Lua: Unexpected Symbol `&` in source." ||
-		failure.File != "src/main.yue" || failure.Line != 0 || !strings.Contains(failure.Hint, "bitwise operators") {
-		t.Errorf("minified: error = %+v", failure)
+	diagErr = b.refuses(b.real(), true, "a bitwise operator, minified")
+	if diagErr.Msg != "YueScript compiled this file but could not minify its Lua: Unexpected Symbol `&` in source." ||
+		diagErr.File != "src/main.yue" || diagErr.Line != 0 || !strings.Contains(diagErr.Hint, "bitwise operators") {
+		t.Errorf("minified: error = %+v", diagErr)
 	}
 }
 
@@ -346,18 +346,18 @@ const fourCCMessage = `$FourCC needs a string literal of exactly 4 characters, s
 func TestAFailedMacroNamesTheFileAndLineWithTheMacrosOwnMessage(t *testing.T) {
 	b := benchOf(t, files("src/main.yue", macroImport+"x = 1\ny = $FourCC \"hfo\"\n"))
 	yue := b.real()
-	failure := b.refuses(yue, false, "a failed macro")
-	if failure.File != "src/main.yue" || failure.Line != 3 || !strings.HasPrefix(failure.Msg, fourCCMessage+"\n") {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(yue, false, "a failed macro")
+	if diagErr.File != "src/main.yue" || diagErr.Line != 3 || !strings.HasPrefix(diagErr.Msg, fourCCMessage+"\n") {
+		t.Errorf("error = %+v", diagErr)
 	}
 	b.remove(MacrosFile)
-	failure = b.refuses(yue, false, "no macro module")
-	if failure.File != "src/main.yue" || failure.Line != 1 || !strings.Contains(failure.Msg, "moonwell.macros") {
-		t.Errorf("without the macro module: error = %+v", failure)
+	diagErr = b.refuses(yue, false, "no macro module")
+	if diagErr.File != "src/main.yue" || diagErr.Line != 1 || !strings.Contains(diagErr.Msg, "moonwell.macros") {
+		t.Errorf("without the macro module: error = %+v", diagErr)
 	}
 }
 
-func expand(t *testing.T, call string) (lua string, failure *diag.Error) {
+func expand(t *testing.T, call string) (lua string, diagErr *diag.Error) {
 	t.Helper()
 	b := benchOf(t, files("src/main.yue", macroImport+"print "+call+"\n"))
 	result, err := b.compile(b.real(), false)
@@ -375,9 +375,9 @@ func TestFourCCTurnsA4CharacterStringLiteralIntoTheRawcodesInteger(t *testing.T)
 		`$FourCC "Hpal"`:  "1215324524",
 		`$FourCC '#{a}'`:  "595288445",
 	} {
-		lua, failure := expand(t, call)
-		if failure != nil || !strings.Contains(lua, want) || strings.Contains(lua, "moonwell.macros") {
-			t.Errorf("%s: %+v\n%s", call, failure, lua)
+		lua, diagErr := expand(t, call)
+		if diagErr != nil || !strings.Contains(lua, want) || strings.Contains(lua, "moonwell.macros") {
+			t.Errorf("%s: %+v\n%s", call, diagErr, lua)
 		}
 	}
 }
@@ -387,9 +387,9 @@ func TestFourCCRefusesAnythingButA4CharacterStringLiteral(t *testing.T) {
 		"$FourCC!", "$FourCC x", `$FourCC "hfo"`, `$FourCC "hfooo"`, "$FourCC 1234", `$FourCC "h\oo"`, `$FourCC "h` + eAcute + eAcute + `"`,
 		`$FourCC "h` + eAcute + `!"`, "$FourCC [[hfoo]]", `$FourCC "hfoo", "x"`, `$FourCC "#{x}"`,
 	} {
-		lua, failure := expand(t, call)
-		if failure == nil || failure.File != "src/main.yue" || failure.Line != 2 || !strings.HasPrefix(failure.Msg, fourCCMessage+"\n") {
-			t.Errorf("%s: %+v\n%s", call, failure, lua)
+		lua, diagErr := expand(t, call)
+		if diagErr == nil || diagErr.File != "src/main.yue" || diagErr.Line != 2 || !strings.HasPrefix(diagErr.Msg, fourCCMessage+"\n") {
+			t.Errorf("%s: %+v\n%s", call, diagErr, lua)
 		}
 	}
 }
@@ -574,9 +574,9 @@ func TestAPanicWhileAFileIsCompiledIsAPlainErrorWithItsStack(t *testing.T) {
 func TestACompileFailureLetsTheOtherFilesCompile(t *testing.T) {
 	b := benchOf(t, files("src/a.yue", "x = 1\n", "src/bad.yue", "x = 1\n", "src/c.yue", "x = 1\n"))
 	b.fake(map[string]answer{"src/bad.yue": {code: 1, stdout: "Failed to compile: bad.yue\n1: boom\n"}})
-	failure := b.refuses(fakeYue, false, "one failed file of three")
-	if failure.File != "src/bad.yue" || failure.Line != 1 || failure.Msg != "boom\n1: boom" {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(fakeYue, false, "one failed file of three")
+	if diagErr.File != "src/bad.yue" || diagErr.Line != 1 || diagErr.Msg != "boom\n1: boom" {
+		t.Errorf("error = %+v", diagErr)
 	}
 	if ran := b.ran(); len(ran) != 3 || !fsx.Exists(b.staged("a.lua")) || !fsx.Exists(b.staged("c.lua")) {
 		t.Errorf("the compiler ran on %q, and the two files without a fault must have their Lua", ran)
@@ -589,9 +589,9 @@ func TestTheFirstOfSeveralFailedFilesIsTheFirstByBytes(t *testing.T) {
 		return answer{code: 1, stdout: fmt.Sprintf("Failed to compile: x\n%d: boom\n", line)}
 	}
 	b.fake(map[string]answer{"src/a.yue": failed(1), "src/B.yue": failed(2), "src/_c.yue": failed(3)})
-	failure := b.refuses(fakeYue, false, "three failed files")
-	if failure.File != "src/B.yue" || failure.Line != 2 || failure.Msg != "boom\n2: boom\n(2 more file(s) failed to compile)" || failure.Hint != "" {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(fakeYue, false, "three failed files")
+	if diagErr.File != "src/B.yue" || diagErr.Line != 2 || diagErr.Msg != "boom\n2: boom\n(2 more file(s) failed to compile)" || diagErr.Hint != "" {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -608,9 +608,9 @@ func TestAFailedFilesOutputIsRemoved(t *testing.T) {
 		"a rewrite failure that leaves its Lua":                 {code: 2, stdout: "Failed to rewrite: main.lua\n>> :1:1: boom\n", lua: leaves("local x = 1 & 2 -- 1\n")},
 	} {
 		b.fake(map[string]answer{"src/main.yue": does})
-		failure := b.refuses(fakeYue, false, what)
-		if failure.File != "src/main.yue" || failure.Line != 1 || fsx.Exists(b.staged("main.lua")) {
-			t.Errorf("%s: %+v, and the output is there: %v", what, failure, fsx.Exists(b.staged("main.lua")))
+		diagErr := b.refuses(fakeYue, false, what)
+		if diagErr.File != "src/main.yue" || diagErr.Line != 1 || fsx.Exists(b.staged("main.lua")) {
+			t.Errorf("%s: %+v, and the output is there: %v", what, diagErr, fsx.Exists(b.staged("main.lua")))
 		}
 		b.write("dist/stage/lua/main.lua", "-- of the last compile\n")
 	}
@@ -755,15 +755,15 @@ func TestTheNamesCollectGivesPlaceEveryOutputBelowTheOutputFolder(t *testing.T) 
 }
 
 func TestALinkOnTheWayToTheOutputFolderIsRefused(t *testing.T) {
-	for _, link := range []string{"dist", "dist/stage", "dist/stage/lua"} {
+	for _, symlink := range []string{"dist", "dist/stage", "dist/stage/lua"} {
 		b := benchOf(t, files("src/game/units.yue", "x = 1\n"))
 		b.fake(nil)
 		elsewhere := files()
-		at := linkTo(t, elsewhere, b.root, link)
-		failure := b.refuses(fakeYue, false, "a link at "+link)
-		if failure.Msg != "Symlinks are not supported: "+at || failure.File != "dist/stage/lua" ||
-			!strings.Contains(failure.Hint, "real files") || len(b.ran()) != 0 {
-			t.Errorf("a link at %s: %+v", link, failure)
+		at := linkTo(t, elsewhere, b.root, symlink)
+		diagErr := b.refuses(fakeYue, false, "a link at "+symlink)
+		if diagErr.Msg != "Symlinks are not supported: "+at || diagErr.File != "dist/stage/lua" ||
+			!strings.Contains(diagErr.Hint, "real files") || len(b.ran()) != 0 {
+			t.Errorf("a link at %s: %+v", symlink, diagErr)
 		}
 	}
 }
@@ -863,10 +863,10 @@ func TestAFileThatCompiledAndThenUsesABitwiseOperatorFailsAtItsLine(t *testing.T
 		yue := b.real()
 		b.compiles(yue, minify)
 		b.write("src/main.yue", "x = 1\n\n\nflags = x & 3\nprint flags\n")
-		failure := b.refuses(yue, minify, "a bitwise operator in a file that compiled")
-		if failure.File != "src/main.yue" || failure.Line != wantLine || !strings.HasSuffix(failure.Msg, "its Lua: Unexpected Symbol `&` in source.") ||
+		diagErr := b.refuses(yue, minify, "a bitwise operator in a file that compiled")
+		if diagErr.File != "src/main.yue" || diagErr.Line != wantLine || !strings.HasSuffix(diagErr.Msg, "its Lua: Unexpected Symbol `&` in source.") ||
 			fsx.Exists(b.staged("main.lua")) {
-			t.Errorf("minify %v: %+v, and the output is there: %v", minify, failure, fsx.Exists(b.staged("main.lua")))
+			t.Errorf("minify %v: %+v, and the output is there: %v", minify, diagErr, fsx.Exists(b.staged("main.lua")))
 		}
 	}
 }
@@ -875,10 +875,10 @@ func TestASourceThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
 	b := benchOf(t, mainOnly.and("src/held.yue", "x = 1\n"))
 	b.fake(nil)
 	testkit.MakeUnreadable(t, filepath.Join(b.root, "src", "held.yue"))
-	failure := b.refuses(fakeYue, false, "a held source")
-	if !strings.HasPrefix(failure.Msg, "Reading src/held.yue failed: ") || failure.File != "src/held.yue" || failure.Hint == "" ||
-		failure.Cause == nil || len(b.ran()) != 0 {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(fakeYue, false, "a held source")
+	if !strings.HasPrefix(diagErr.Msg, "Reading src/held.yue failed: ") || diagErr.File != "src/held.yue" || diagErr.Hint == "" ||
+		diagErr.Cause == nil || len(b.ran()) != 0 {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -889,43 +889,43 @@ func TestAnOutputThatAnotherProgramHoldsIsRefusedByItsPathFromTheProjectFolder(t
 	b := benchOf(t, mainOnly.and("dist/stage/lua/main.lua", "-- of the last compile\n"))
 	b.fake(nil)
 	testkit.MakeUnwritable(t, b.staged("main.lua"))
-	failure := b.refuses(fakeYue, false, "an output that is held")
-	if !strings.HasPrefix(failure.Msg, "Removing dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" ||
-		failure.Hint != distHint || strings.Contains(failure.Msg, b.root) || failure.Cause == nil || len(b.ran()) != 0 {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(fakeYue, false, "an output that is held")
+	if !strings.HasPrefix(diagErr.Msg, "Removing dist/stage/lua/main.lua failed: ") || diagErr.File != "dist/stage/lua/main.lua" ||
+		diagErr.Hint != distHint || strings.Contains(diagErr.Msg, b.root) || diagErr.Cause == nil || len(b.ran()) != 0 {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
 func TestAnOutputThatCannotBeWrittenRemovedOrReadIsRefusedByItsPath(t *testing.T) {
 	b := benchOf(t, files("src/game/units.yue", "x = 1\n", "dist/stage/lua/game", "a file, not a folder"))
 	b.fake(nil)
-	failure := b.refuses(fakeYue, false, "a file for the output's folder")
-	if !strings.HasPrefix(failure.Msg, "Writing dist/stage/lua/game/units.lua failed: ") || failure.File != "dist/stage/lua/game/units.lua" ||
-		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil || len(b.ran()) != 0 {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(fakeYue, false, "a file for the output's folder")
+	if !strings.HasPrefix(diagErr.Msg, "Writing dist/stage/lua/game/units.lua failed: ") || diagErr.File != "dist/stage/lua/game/units.lua" ||
+		!strings.Contains(diagErr.Hint, "dist/") || diagErr.Cause == nil || len(b.ran()) != 0 {
+		t.Errorf("error = %+v", diagErr)
 	}
 	b = benchOf(t, mainOnly.and("dist/stage", "a file, not a folder"))
 	b.fake(nil)
-	failure = b.refuses(fakeYue, false, "a file at dist/stage")
-	if !strings.HasPrefix(failure.Msg, "Writing dist/stage/lua/.hashes.json failed: ") ||
-		failure.File != "dist/stage/lua/.hashes.json" || !strings.Contains(failure.Hint, "dist/") ||
-		failure.Cause == nil || len(b.ran()) != 0 {
-		t.Errorf("error = %+v", failure)
+	diagErr = b.refuses(fakeYue, false, "a file at dist/stage")
+	if !strings.HasPrefix(diagErr.Msg, "Writing dist/stage/lua/.hashes.json failed: ") ||
+		diagErr.File != "dist/stage/lua/.hashes.json" || !strings.Contains(diagErr.Hint, "dist/") ||
+		diagErr.Cause == nil || len(b.ran()) != 0 {
+		t.Errorf("error = %+v", diagErr)
 	}
 	b = benchOf(t, mainOnly.and("dist/stage/lua/main.lua/kept.txt", ""))
 	b.fake(nil)
-	failure = b.refuses(fakeYue, false, "a folder for the output")
-	if !strings.HasPrefix(failure.Msg, "Removing dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" ||
-		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil || len(b.ran()) != 0 {
-		t.Errorf("error = %+v", failure)
+	diagErr = b.refuses(fakeYue, false, "a folder for the output")
+	if !strings.HasPrefix(diagErr.Msg, "Removing dist/stage/lua/main.lua failed: ") || diagErr.File != "dist/stage/lua/main.lua" ||
+		!strings.Contains(diagErr.Hint, "dist/") || diagErr.Cause == nil || len(b.ran()) != 0 {
+		t.Errorf("error = %+v", diagErr)
 	}
 	b = benchOf(t, mainOnly)
 	b.fake(map[string]answer{"src/main.yue": {}})
 	result := b.compiles(fakeYue, false)
 	b.write("dist/stage/lua/main.lua/kept.txt", "")
 	_, ok, err := result.readLua(b.source("src/main.yue"))
-	failure = asError(t, err, "a folder for the output, read")
-	if ok || !strings.HasPrefix(failure.Msg, "Reading dist/stage/lua/main.lua failed: ") || failure.File != "dist/stage/lua/main.lua" || failure.Cause == nil {
-		t.Errorf("luaOf: ok %v, %+v", ok, failure)
+	diagErr = asError(t, err, "a folder for the output, read")
+	if ok || !strings.HasPrefix(diagErr.Msg, "Reading dist/stage/lua/main.lua failed: ") || diagErr.File != "dist/stage/lua/main.lua" || diagErr.Cause == nil {
+		t.Errorf("luaOf: ok %v, %+v", ok, diagErr)
 	}
 }

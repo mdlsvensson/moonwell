@@ -91,10 +91,10 @@ func refusal(t *testing.T, root string, libraries map[string]manifest.Library, s
 	return asError(t, err, what)
 }
 
-func put(t *testing.T, folder string, files ...string) {
+func put(t *testing.T, dir string, files ...string) {
 	t.Helper()
 	for i := 0; i < len(files); i += 2 {
-		testkit.WriteFile(t, folder, files[i], []byte(files[i+1]))
+		testkit.WriteFile(t, dir, files[i], []byte(files[i+1]))
 	}
 }
 
@@ -434,10 +434,10 @@ func TestALockThatCannotBeWrittenIsAnError(t *testing.T) {
 		return server.fetch(ctx, url)
 	}
 	synced, err := Sync(background, e, block("ex", fromGitHub("v0.1.0", "src")), manifestFile)
-	failure := asError(t, err, "a folder for a lock")
-	if !strings.HasPrefix(failure.Msg, "Writing moonwell.lock failed: ") || failure.File != "moonwell.lock" ||
-		failure.Hint != "Close programs that have moonwell.lock open, and check it is not read-only." || synced != nil {
-		t.Errorf("error = %+v, with %+v", failure, synced)
+	diagErr := asError(t, err, "a folder for a lock")
+	if !strings.HasPrefix(diagErr.Msg, "Writing moonwell.lock failed: ") || diagErr.File != "moonwell.lock" ||
+		diagErr.Hint != "Close programs that have moonwell.lock open, and check it is not read-only." || synced != nil {
+		t.Errorf("error = %+v, with %+v", diagErr, synced)
 	}
 }
 
@@ -1080,7 +1080,7 @@ func TestALibraryThatIsNeitherLocalNorOfGitHubIsTheCallersBug(t *testing.T) {
 }
 
 func TestADownloadedFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten(t *testing.T) {
-	cases := []struct{ name, shown, folder string }{
+	cases := []struct{ name, shown, dir string }{
 		{"src/aux.lua", "aux.lua", "module"},
 		{"src/NUL", "NUL", "module"},
 		{"src/nul.tar.gz", "nul.tar.gz", "module"},
@@ -1101,7 +1101,7 @@ func TestADownloadedFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten(t 
 	for _, c := range cases {
 		root, server := t.TempDir(), serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), c.name, "x")...)})
 		e := refusal(t, root, block("ex", fromGitHub("v0.1.0", "")), server, c.name)
-		if e.Msg != "Library ex: "+c.shown+" in its "+c.folder+" folder has a name that Windows cannot hold." || e.File != manifestFile ||
+		if e.Msg != "Library ex: "+c.shown+" in its "+c.dir+" folder has a name that Windows cannot hold." || e.File != manifestFile ||
 			e.Hint != reportIt {
 			t.Errorf("%q: %+v", c.name, e)
 		}
@@ -1116,9 +1116,9 @@ func TestADownloadedFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten(t 
 
 func TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
 	cases := []struct {
-		files  []string
-		says   string
-		folder string
+		files []string
+		says  string
+		dir   string
 	}{
 		{[]string{"src/Greet.lua", "1", "src/greet.lua", "2"}, "Greet.lua and greet.lua", "module"},
 		{[]string{"src/a/x.lua", "1", "src/A/X.lua", "2"}, "A/X.lua and a/x.lua", "module"},
@@ -1128,7 +1128,7 @@ func TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsW
 	for _, c := range cases {
 		root, server := t.TempDir(), serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), c.files...)...)})
 		e := refusal(t, root, block("ex", fromGitHub("v0.1.0", "")), server, c.says)
-		if e.Msg != "Library ex: "+c.says+" in its "+c.folder+" folder differ only in letter case." || e.File != manifestFile ||
+		if e.Msg != "Library ex: "+c.says+" in its "+c.dir+" folder differ only in letter case." || e.File != manifestFile ||
 			e.Hint != reportIt {
 			t.Errorf("%s: %+v", c.says, e)
 		}
@@ -1143,9 +1143,9 @@ func TestTwoDownloadedFilesThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsW
 
 func TestDownloadedFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
 	cases := []struct {
-		files  []string
-		says   string
-		folder string
+		files []string
+		says  string
+		dir   string
 	}{
 		{[]string{"src/Util/a.lua", "1", "src/util/b.lua", "2"}, "Util/a.lua and util/b.lua", "module"},
 		{[]string{"src/Example/other.lua", "1"}, "Example/other.lua and example/greet.lua", "module"},
@@ -1157,7 +1157,7 @@ func TestDownloadedFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnyth
 	for _, c := range cases {
 		root, server := t.TempDir(), serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), c.files...)...)})
 		e := refusal(t, root, block("ex", fromGitHub("v0.1.0", "")), server, c.says)
-		if e.Msg != "Library ex: "+c.says+" in its "+c.folder+" folder lie in folders that differ only in letter case." ||
+		if e.Msg != "Library ex: "+c.says+" in its "+c.dir+" folder lie in folders that differ only in letter case." ||
 			e.File != manifestFile || e.Hint != reportIt {
 			t.Errorf("%s: %+v", c.says, e)
 		}
@@ -1172,9 +1172,9 @@ func TestDownloadedFilesInFoldersThatDifferOnlyInLetterCaseAreRefusedBeforeAnyth
 
 func TestADownloadedFileAndAFolderThatDifferOnlyInLetterCaseAreRefusedBeforeAnythingIsWritten(t *testing.T) {
 	cases := []struct {
-		files  []string
-		says   string
-		folder string
+		files []string
+		says  string
+		dir   string
 	}{
 		{[]string{"src/Util", "1", "src/util/b.lua", "2"}, "Util and util", "module"},
 		{[]string{"src/util", "1", "src/Util/b.lua", "2"}, "Util and util", "module"},
@@ -1185,7 +1185,7 @@ func TestADownloadedFileAndAFolderThatDifferOnlyInLetterCaseAreRefusedBeforeAnyt
 	for _, c := range cases {
 		root, server := t.TempDir(), serving(map[string][]byte{urlV1: tagArchive(t, commitA, append(slices.Clone(shipping), c.files...)...)})
 		e := refusal(t, root, block("ex", fromGitHub("v0.1.0", "")), server, c.says)
-		if e.Msg != "Library ex: "+c.says+" in its "+c.folder+" folder differ only in letter case." || e.File != manifestFile ||
+		if e.Msg != "Library ex: "+c.says+" in its "+c.dir+" folder differ only in letter case." || e.File != manifestFile ||
 			e.Hint != reportIt {
 			t.Errorf("%s: %+v", c.says, e)
 		}
@@ -1278,7 +1278,7 @@ func TestALocalFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten(t *test
 	if runtime.GOOS == "windows" {
 		t.Skip("Windows holds no file of such a name; the case is covered on the other system's run")
 	}
-	cases := []struct{ name, shown, folder string }{
+	cases := []struct{ name, shown, dir string }{
 		{"src/aux.lua", "aux.lua", "module"},
 		{"src/a.lua.", "", ""},
 		{"src/dir./a.lua", "dir./a.lua", "module"},
@@ -1300,13 +1300,13 @@ func TestALocalFileWhoseNameCannotBeUsedIsRefusedBeforeAnythingIsWritten(t *test
 			}
 			continue
 		}
-		failure, hint := asError(t, err, c.name), renameIt
-		if c.folder == "assets" {
+		diagErr, hint := asError(t, err, c.name), renameIt
+		if c.dir == "assets" {
 			hint = renameAnAsset
 		}
-		if failure.Msg != "Library mine: "+c.shown+" in its "+c.folder+" folder has a name that Windows cannot hold." ||
-			failure.File != manifestFile || failure.Hint != hint {
-			t.Errorf("%q: %+v", c.name, failure)
+		if diagErr.Msg != "Library mine: "+c.shown+" in its "+c.dir+" folder has a name that Windows cannot hold." ||
+			diagErr.File != manifestFile || diagErr.Hint != hint {
+			t.Errorf("%q: %+v", c.name, diagErr)
 		}
 		if there(root, ".moonwell") {
 			t.Errorf("%q: something was written", c.name)
@@ -1374,7 +1374,7 @@ func TestALinkAtAFolderOfTheLibrariesIsRefusedBeforeAnythingGoesThroughIt(t *tes
 	archive := tagArchive(t, commitA, shipping...)
 	local := []string{"lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/sub/b.lua", "2", "lib/files/x.blp", "x", "lib/files/sub/y.blp", "y"}
 	cases := []struct {
-		link      string
+		symlink   string
 		target    string
 		libraries map[string]manifest.Library
 	}{
@@ -1398,24 +1398,24 @@ func TestALinkAtAFolderOfTheLibrariesIsRefusedBeforeAnythingGoesThroughIt(t *tes
 		server := serving(map[string][]byte{urlV1: archive, archiveURL("owner/lib", "v0.2.0"): tagArchive(t, commitB, "a.lua", "1")})
 		put(t, root, local...)
 		beside, untouched := outside(t)
-		link := filepath.Join(root, filepath.FromSlash(c.link))
-		if err := os.MkdirAll(filepath.Dir(link), 0o777); err != nil {
+		symlink := filepath.Join(root, filepath.FromSlash(c.symlink))
+		if err := os.MkdirAll(filepath.Dir(symlink), 0o777); err != nil {
 			t.Fatal(err)
 		}
-		testkit.LinkDir(t, filepath.Join(beside, filepath.FromSlash(c.target)), link)
+		testkit.LinkDir(t, filepath.Join(beside, filepath.FromSlash(c.target)), symlink)
 		before := filesIn(t, root, ".")
-		e := refusal(t, root, c.libraries, server, c.link)
-		if e.Msg != "Symlinks are not supported: "+link || !strings.HasPrefix(e.File, c.link) || !strings.Contains(e.Hint, "real files") {
-			t.Errorf("%s: %+v", c.link, e)
+		e := refusal(t, root, c.libraries, server, c.symlink)
+		if e.Msg != "Symlinks are not supported: "+symlink || !strings.HasPrefix(e.File, c.symlink) || !strings.Contains(e.Hint, "real files") {
+			t.Errorf("%s: %+v", c.symlink, e)
 		}
 		if !untouched() {
-			t.Errorf("%s: the sync wrote or removed through the link: %v", c.link, filesIn(t, beside, "."))
+			t.Errorf("%s: the sync wrote or removed through the link: %v", c.symlink, filesIn(t, beside, "."))
 		}
-		if info, err := fsx.Lstat(link); err != nil || info == nil || !fsx.IsSymlink(info) {
-			t.Errorf("%s: the link is gone", c.link)
+		if info, err := fsx.Lstat(symlink); err != nil || info == nil || !fsx.IsSymlink(info) {
+			t.Errorf("%s: the link is gone", c.symlink)
 		}
 		if after := filesIn(t, root, "."); !slices.Equal(after, before) {
-			t.Errorf("%s: a sync that was refused left %q, from %q", c.link, after, before)
+			t.Errorf("%s: a sync that was refused left %q, from %q", c.symlink, after, before)
 		}
 	}
 }
@@ -1423,7 +1423,7 @@ func TestALinkAtAFolderOfTheLibrariesIsRefusedBeforeAnythingGoesThroughIt(t *tes
 func TestALinkThatIsNoFolderOfALibraryIsRemovedAsTheLinkItIs(t *testing.T) {
 	t.Parallel()
 	archive := tagArchive(t, commitA, shipping...)
-	for _, link := range []string{
+	for _, symlink := range []string{
 		".moonwell/libraries/gone", ".moonwell/library-assets/gone", ".moonwell/libraries/.ex.tmp", ".moonwell/library-assets/.ex.tmp",
 		".moonwell/libraries/gone/inside", ".moonwell/libraries/ex/inside", ".moonwell/library-assets/ex/deep/inside",
 		".moonwell/libraries/mine/inside", ".moonwell/library-assets/mine/deep/inside",
@@ -1431,17 +1431,17 @@ func TestALinkThatIsNoFolderOfALibraryIsRemovedAsTheLinkItIs(t *testing.T) {
 		root, server := t.TempDir(), serving(map[string][]byte{urlV1: archive})
 		put(t, root, "lib/moonwell-library.json", `{"assets":"files"}`, "lib/a.lua", "1", "lib/files/x.blp", "x")
 		beside, untouched := outside(t)
-		at := filepath.Join(root, filepath.FromSlash(link))
+		at := filepath.Join(root, filepath.FromSlash(symlink))
 		if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 			t.Fatal(err)
 		}
 		testkit.LinkDir(t, beside, at)
 		sync(t, root, block("ex", fromGitHub("v0.1.0", ""), "mine", fromFolder("lib", "")), server)
 		if info, err := fsx.Lstat(at); err != nil || info != nil {
-			t.Errorf("%s: the link is still there", link)
+			t.Errorf("%s: the link is still there", symlink)
 		}
 		if !untouched() {
-			t.Errorf("%s: the sync wrote or removed through the link: %v", link, filesIn(t, beside, "."))
+			t.Errorf("%s: the sync wrote or removed through the link: %v", symlink, filesIn(t, beside, "."))
 		}
 	}
 }

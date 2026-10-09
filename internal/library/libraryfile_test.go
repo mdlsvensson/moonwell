@@ -58,9 +58,9 @@ func TestAFileThatIsNotAJSONObjectIsRefusedNamingTheLibraryAndTheFile(t *testing
 	}
 	for _, c := range cases {
 		_, err := parseLibraryFile("ex", []byte(c.document), true, where)
-		failure := asError(t, err, c.document)
-		if failure.Msg != "Library ex: moonwell-library.json "+c.problem || failure.File != where || failure.Hint != reportIt {
-			t.Errorf("parseFile(%q): %+v", c.document, failure)
+		diagErr := asError(t, err, c.document)
+		if diagErr.Msg != "Library ex: moonwell-library.json "+c.problem || diagErr.File != where || diagErr.Hint != reportIt {
+			t.Errorf("parseFile(%q): %+v", c.document, diagErr)
 		}
 	}
 }
@@ -74,10 +74,10 @@ func TestAnUnknownKeyIsRefusedTheFirstInSortedOrder(t *testing.T) {
 	}
 	for _, c := range cases {
 		_, err := parseLibraryFile("ex", []byte(c.document), true, where)
-		failure := asError(t, err, c.document)
-		if !strings.Contains(failure.Msg, `has an unknown key "`+c.unknown+`".`) || failure.File != where ||
-			failure.Hint != needsNewer {
-			t.Errorf("parseFile(%q): %+v", c.document, failure)
+		diagErr := asError(t, err, c.document)
+		if !strings.Contains(diagErr.Msg, `has an unknown key "`+c.unknown+`".`) || diagErr.File != where ||
+			diagErr.Hint != needsNewer {
+			t.Errorf("parseFile(%q): %+v", c.document, diagErr)
 		}
 	}
 }
@@ -92,10 +92,10 @@ func TestAFolderMustBeARelativePathOfPlainNames(t *testing.T) {
 	for _, value := range values {
 		for _, name := range folderNames {
 			_, err := parseLibraryFile("ex", []byte(`{"`+name+`":`+value+`}`), true, where)
-			failure := asError(t, err, value)
+			diagErr := asError(t, err, value)
 			want := "has " + name + " = " + value + ", which is not a folder inside the library."
-			if !strings.Contains(failure.Msg, want) || failure.File != where || failure.Hint != reportIt {
-				t.Errorf("%s = %s: %+v", name, value, failure)
+			if !strings.Contains(diagErr.Msg, want) || diagErr.File != where || diagErr.Hint != reportIt {
+				t.Errorf("%s = %s: %+v", name, value, diagErr)
 			}
 		}
 	}
@@ -117,9 +117,9 @@ func TestAValueThatIsNoFolderIsShownAsItIsWritten(t *testing.T) {
 	for _, c := range cases {
 		for _, name := range folderNames {
 			_, err := parseLibraryFile("ex", []byte(`{"`+name+`": `+c.written+` }`), true, where)
-			failure := asError(t, err, c.written)
-			if want := "has " + name + " = " + c.shown + ", which is not"; !strings.Contains(failure.Msg, want) {
-				t.Errorf("%s = %s: %q, want it to say %q", name, c.written, failure.Msg, want)
+			diagErr := asError(t, err, c.written)
+			if want := "has " + name + " = " + c.shown + ", which is not"; !strings.Contains(diagErr.Msg, want) {
+				t.Errorf("%s = %s: %q, want it to say %q", name, c.written, diagErr.Msg, want)
 			}
 		}
 	}
@@ -133,8 +133,8 @@ func TestTheFirstProblemOfAFileIsAnUnknownKeyThenTheModuleFolderThenTheAssetsFol
 	}
 	for _, c := range cases {
 		_, err := parseLibraryFile("ex", []byte(c.document), true, where)
-		if failure := asError(t, err, c.document); !strings.Contains(failure.Msg, c.says) {
-			t.Errorf("parseFile(%s): %q, want it to say %q", c.document, failure.Msg, c.says)
+		if diagErr := asError(t, err, c.document); !strings.Contains(diagErr.Msg, c.says) {
+			t.Errorf("parseFile(%s): %q, want it to say %q", c.document, diagErr.Msg, c.says)
 		}
 	}
 }

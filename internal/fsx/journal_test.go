@@ -11,8 +11,8 @@ func TestJournalUndoPutsBackEveryFileItWroteOrRemoved(t *testing.T) {
 	created := filepath.Join(dir, "new", "folder", "created.txt")
 	changed := filepath.Join(dir, "changed.txt")
 	removed := filepath.Join(dir, "removed.txt")
-	write(t, changed, "before")
-	write(t, removed, "kept")
+	writeFile(t, changed, "before")
+	writeFile(t, removed, "kept")
 
 	var journal Journal
 	if journal.Len() != 0 {
@@ -28,7 +28,7 @@ func TestJournalUndoPutsBackEveryFileItWroteOrRemoved(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, c := range []struct{ path, want string }{{created, "made"}, {changed, "after"}, {removed, "<missing>"}} {
-		if got := read(t, c.path); got != c.want {
+		if got := readFile(t, c.path); got != c.want {
 			t.Errorf("before the undo %s holds %q, want %q", c.path, got, c.want)
 		}
 	}
@@ -40,7 +40,7 @@ func TestJournalUndoPutsBackEveryFileItWroteOrRemoved(t *testing.T) {
 		t.Errorf("unrestored = %v", unrestored)
 	}
 	for _, c := range []struct{ path, want string }{{created, "<missing>"}, {changed, "before"}, {removed, "kept"}} {
-		if got := read(t, c.path); got != c.want {
+		if got := readFile(t, c.path); got != c.want {
 			t.Errorf("after the undo %s holds %q, want %q", c.path, got, c.want)
 		}
 	}
@@ -54,7 +54,7 @@ func TestJournalUndoPutsBackEveryFileItWroteOrRemoved(t *testing.T) {
 
 func TestJournalUndoGoesNewestFirst(t *testing.T) {
 	file := filepath.Join(t.TempDir(), "a.txt")
-	write(t, file, "first")
+	writeFile(t, file, "first")
 	var journal Journal
 	for _, content := range []string{"second", "third"} {
 		if err := journal.Write(file, []byte(content)); err != nil {
@@ -64,7 +64,7 @@ func TestJournalUndoGoesNewestFirst(t *testing.T) {
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
 		t.Errorf("unrestored = %v", unrestored)
 	}
-	if got := read(t, file); got != "first" {
+	if got := readFile(t, file); got != "first" {
 		t.Errorf("the file holds %q, want what it held before the first write", got)
 	}
 }
@@ -76,7 +76,7 @@ func TestJournalUndoReturnsAFileItCannotPutBackAndRestoresTheOthers(t *testing.T
 	dir := t.TempDir()
 	stuck := filepath.Join(dir, "stuck.txt")
 	created := filepath.Join(dir, "created.txt")
-	write(t, stuck, "before")
+	writeFile(t, stuck, "before")
 
 	var journal Journal
 	if err := journal.Write(created, []byte("made")); err != nil {
@@ -94,10 +94,10 @@ func TestJournalUndoReturnsAFileItCannotPutBackAndRestoresTheOthers(t *testing.T
 	if len(unrestored) != 1 || unrestored[0].Path != stuck || unrestored[0].Err == nil {
 		t.Fatalf("unrestored = %v, want only %s with the system's error", unrestored, stuck)
 	}
-	if got := read(t, stuck); got != "after" {
+	if got := readFile(t, stuck); got != "after" {
 		t.Errorf("the read-only file holds %q", got)
 	}
-	if got := read(t, created); got != "<missing>" {
+	if got := readFile(t, created); got != "<missing>" {
 		t.Errorf("the file written first holds %q; the undo stopped at the failure", got)
 	}
 }
@@ -107,7 +107,7 @@ func TestJournalUndoLeavesAFileThatAFailedWriteDidNotChange(t *testing.T) {
 		t.Skip("root may write a read-only file, so the write would not fail")
 	}
 	locked := filepath.Join(t.TempDir(), "locked.txt")
-	write(t, locked, "before")
+	writeFile(t, locked, "before")
 	if err := os.Chmod(locked, 0o444); err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func TestJournalUndoLeavesAFileThatAFailedWriteDidNotChange(t *testing.T) {
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
 		t.Errorf("unrestored = %v, want none: the file holds what it held", unrestored)
 	}
-	if got := read(t, locked); got != "before" {
+	if got := readFile(t, locked); got != "before" {
 		t.Errorf("the read-only file holds %q, want what it held before the write", got)
 	}
 }

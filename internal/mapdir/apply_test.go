@@ -26,7 +26,7 @@ func snapshot(t *testing.T, dir string) map[string]string {
 	return entries
 }
 
-func filesOf(entries map[string]string) map[string]string {
+func withoutDirs(entries map[string]string) map[string]string {
 	files := map[string]string{}
 	for name, content := range entries {
 		if content != "<folder>" {
@@ -44,15 +44,15 @@ var sourceMap = map[string]string{
 }
 
 func TestStageToWritesTheChangesIntoACopy(t *testing.T) {
-	folder, dir := open(t, sourceMap)
+	folder, dir := openFolder(t, sourceMap)
 	view := folder.WithChanges([]Change{
-		put("war3map.w3i", "patched"),
-		put("war3mapMinimap.blp", "minimap"),
-		drop("war3mapmap.blp"),
-		put("war3mapSkin.txt", "merged"),
-		put("Sound/Music/theme.mp3", "theme"),
-		put("sound/effects/hit.wav", "hit"),
-		put("textures/New.blp", "new"),
+		newWrite("war3map.w3i", "patched"),
+		newWrite("war3mapMinimap.blp", "minimap"),
+		newRemoval("war3mapmap.blp"),
+		newWrite("war3mapSkin.txt", "merged"),
+		newWrite("Sound/Music/theme.mp3", "theme"),
+		newWrite("sound/effects/hit.wav", "hit"),
+		newWrite("textures/New.blp", "new"),
 	})
 	source := snapshot(t, dir)
 	stage := filepath.Join(t.TempDir(), "dist", "stage", "map.w3x")
@@ -76,7 +76,7 @@ func TestStageToWritesTheChangesIntoACopy(t *testing.T) {
 		if got := snapshot(t, stage); !reflect.DeepEqual(got, want) {
 			t.Errorf("%s: the stage holds %v, want %v", round, got, want)
 		}
-		if _, err := Open(stage, label); err != nil {
+		if _, err := Open(stage, mapDisplayPath); err != nil {
 			t.Errorf("%s: the staged map cannot be opened: %v", round, err)
 		}
 		if got := snapshot(t, dir); !reflect.DeepEqual(got, source) {
@@ -88,7 +88,7 @@ func TestStageToWritesTheChangesIntoACopy(t *testing.T) {
 }
 
 func TestStageToWithoutChangesIsACopy(t *testing.T) {
-	folder, dir := open(t, sourceMap)
+	folder, dir := openFolder(t, sourceMap)
 	stage := filepath.Join(t.TempDir(), "map.w3x")
 	if err := folder.StageTo(stage); err != nil {
 		t.Fatal(err)
@@ -99,8 +99,8 @@ func TestStageToWithoutChangesIsACopy(t *testing.T) {
 }
 
 func TestStageToRemovesAFileThatIsAlreadyGone(t *testing.T) {
-	folder, dir := open(t, sourceMap)
-	view := folder.WithChanges([]Change{drop("war3mapMap.blp")})
+	folder, dir := openFolder(t, sourceMap)
+	view := folder.WithChanges([]Change{newRemoval("war3mapMap.blp")})
 	if err := os.Remove(filepath.Join(dir, "war3mapMap.blp")); err != nil {
 		t.Fatal(err)
 	}
@@ -112,60 +112,60 @@ func TestStageToRemovesAFileThatIsAlreadyGone(t *testing.T) {
 
 func TestStageToNamesTheFileItCouldNotWrite(t *testing.T) {
 	const hint = "Close Warcraft III or World Editor if they have dist/stage open, then retry."
-	folder, dir := open(t, sourceMap)
-	view := folder.WithChanges([]Change{put("new.txt", "data")})
+	folder, dir := openFolder(t, sourceMap)
+	view := folder.WithChanges([]Change{newWrite("new.txt", "data")})
 	if err := os.Mkdir(filepath.Join(dir, "new.txt"), 0o777); err != nil {
 		t.Fatal(err)
 	}
 	stage := filepath.Join(t.TempDir(), "stage", "map.w3x")
-	e := asError(t, view.StageTo(stage))
+	e := asDiagError(t, view.StageTo(stage))
 	if !contains(e.Msg, "Staging the map failed") || e.Cause == nil || e.Hint != hint ||
 		e.File != filepath.Join(stage, "new.txt") {
 		t.Errorf("error = %+v", e)
 	}
 }
 
-func plan(changes ...Change) []Change {
-	return append([]Change{put("war3mapskin.txt", "merged"), put("new.txt", "new")}, changes...)
+func withBaseChanges(changes ...Change) []Change {
+	return append([]Change{newWrite("war3mapskin.txt", "merged"), newWrite("new.txt", "new")}, changes...)
 }
 
-var plannersBugs = []struct {
+var callerMistakes = []struct {
 	name    string
 	changes []Change
 	words   []string
 }{
-	{"a path that leaves the folder", plan(put("../outside.txt", "data")),
+	{"a path that leaves the folder", withBaseChanges(newWrite("../outside.txt", "data")),
 		[]string{`Cannot write "../outside.txt"`, "relative path"}},
-	{"a leading slash before a file the map has", plan(put("/WAR3MAP.W3I", "data")),
+	{"a leading slash before a file the map has", withBaseChanges(newWrite("/WAR3MAP.W3I", "data")),
 		[]string{`Cannot write "/WAR3MAP.W3I"`, "relative path"}},
-	{"an empty folder name", plan(put("a//b", "data")), []string{`Cannot write "a//b"`, "relative path"}},
-	{"a way out of a folder", plan(put("textures/../war3map.w3i", "data")),
+	{"an empty folder name", withBaseChanges(newWrite("a//b", "data")), []string{`Cannot write "a//b"`, "relative path"}},
+	{"a way out of a folder", withBaseChanges(newWrite("textures/../war3map.w3i", "data")),
 		[]string{`Cannot write "Textures/../war3map.w3i"`, "relative path"}},
-	{"a character Windows forbids", plan(put("what?.blp", "data")),
+	{"a character Windows forbids", withBaseChanges(newWrite("what?.blp", "data")),
 		[]string{`Cannot write "what?.blp"`, "relative path"}},
-	{"a device name below a new folder", plan(put("Sound/nul.mp3", "data")),
+	{"a device name below a new folder", withBaseChanges(newWrite("Sound/nul.mp3", "data")),
 		[]string{`Cannot write "Sound/nul.mp3"`, "relative path"}},
-	{"a change named as a folder of the map", plan(put("textures", "data")),
+	{"a change named as a folder of the map", withBaseChanges(newWrite("textures", "data")),
 		[]string{"Cannot write textures", "the folder Textures of the map"}},
-	{"a change through a file of the map", plan(put("WAR3MAP.W3I/x.txt", "data")),
+	{"a change through a file of the map", withBaseChanges(newWrite("WAR3MAP.W3I/x.txt", "data")),
 		[]string{"Cannot write WAR3MAP.W3I/x.txt", "goes through war3map.w3i, a file of the map"}},
-	{"a change through a file below a folder", plan(put("textures/old.blp/deep/x.txt", "data")),
+	{"a change through a file below a folder", withBaseChanges(newWrite("textures/old.blp/deep/x.txt", "data")),
 		[]string{"Cannot write Textures/old.blp/deep/x.txt", "goes through Textures/Old.blp, a file of the map"}},
 	{"a change through a file that the plan removes first",
-		plan(drop("WAR3MAP.W3I"), put("war3map.w3i/x.txt", "data")),
+		withBaseChanges(newRemoval("WAR3MAP.W3I"), newWrite("war3map.w3i/x.txt", "data")),
 		[]string{"Cannot write war3map.w3i/x.txt", "goes through war3map.w3i, a file of the map"}},
 	{"a change through a file that the plan removes after it",
-		plan(put("war3map.w3i/x.txt", "data"), drop("WAR3MAP.W3I")),
+		withBaseChanges(newWrite("war3map.w3i/x.txt", "data"), newRemoval("WAR3MAP.W3I")),
 		[]string{"Cannot write war3map.w3i/x.txt", "goes through war3map.w3i, a file of the map"}},
 	{"a new file named as the folder a later change makes",
-		plan(put("Sound", "data"), put("sound/theme.mp3", "theme")),
+		withBaseChanges(newWrite("Sound", "data"), newWrite("sound/theme.mp3", "theme")),
 		[]string{"Cannot write Sound", "the folder sound of the map"}},
 	{"a new file below the name a later change writes as a file",
-		plan(put("Sound/Music/theme.mp3", "theme"), put("sound", "data")),
+		withBaseChanges(newWrite("Sound/Music/theme.mp3", "theme"), newWrite("sound", "data")),
 		[]string{"Cannot write Sound/Music/theme.mp3", "goes through sound, a file of the map"}},
 }
 
-func asPlannersBug(t *testing.T, err error) string {
+func mustBePlainError(t *testing.T, err error) string {
 	t.Helper()
 	if err == nil {
 		t.Fatal("got no error")
@@ -178,15 +178,15 @@ func asPlannersBug(t *testing.T, err error) string {
 }
 
 func TestStageToRefusesAPlannersBugBeforeItWrites(t *testing.T) {
-	for _, c := range plannersBugs {
+	for _, c := range callerMistakes {
 		t.Run(c.name, func(t *testing.T) {
-			folder, dir := open(t, sourceMap)
+			folder, dir := openFolder(t, sourceMap)
 			source := snapshot(t, dir)
 			around := t.TempDir()
 			stage := filepath.Join(around, "stage", "map.w3x")
 			testkit.WriteFile(t, stage, "left.txt", []byte("from an earlier build"))
 			earlier := snapshot(t, around)
-			text := asPlannersBug(t, folder.WithChanges(c.changes).StageTo(stage))
+			text := mustBePlainError(t, folder.WithChanges(c.changes).StageTo(stage))
 			for _, words := range c.words {
 				if !contains(text, words) {
 					t.Errorf("error = %q, want it to say %q", text, words)
@@ -203,12 +203,12 @@ func TestStageToRefusesAPlannersBugBeforeItWrites(t *testing.T) {
 }
 
 func TestApplyInPlaceRefusesAPlannersBugBeforeItWrites(t *testing.T) {
-	for _, c := range plannersBugs {
+	for _, c := range callerMistakes {
 		t.Run(c.name, func(t *testing.T) {
-			folder, dir := open(t, sourceMap)
+			folder, dir := openFolder(t, sourceMap)
 			before := snapshot(t, filepath.Dir(dir))
 			var journal fsx.Journal
-			text := asPlannersBug(t, folder.WithChanges(c.changes).ApplyInPlace(context.Background(), &journal))
+			text := mustBePlainError(t, folder.WithChanges(c.changes).ApplyInPlace(context.Background(), &journal))
 			for _, words := range c.words {
 				if !contains(text, words) {
 					t.Errorf("error = %q, want it to say %q", text, words)
@@ -222,13 +222,13 @@ func TestApplyInPlaceRefusesAPlannersBugBeforeItWrites(t *testing.T) {
 }
 
 func TestStageToNamesTheStageItCouldNotReplace(t *testing.T) {
-	folder, _ := open(t, sourceMap)
+	folder, _ := openFolder(t, sourceMap)
 	blocked := filepath.Join(t.TempDir(), "dist")
 	if err := os.WriteFile(blocked, nil, 0o666); err != nil {
 		t.Fatal(err)
 	}
 	stage := filepath.Join(blocked, "map.w3x")
-	e := asError(t, folder.StageTo(stage))
+	e := asDiagError(t, folder.StageTo(stage))
 	if !contains(e.Msg, "Staging the map failed") || e.File != stage || e.Cause == nil || e.Hint == "" {
 		t.Errorf("error = %+v", e)
 	}
@@ -251,14 +251,14 @@ func TestStageToRefusesAStageThatOverlapsTheSourceMap(t *testing.T) {
 			for name, content := range sourceMap {
 				testkit.WriteFile(t, dir, name, []byte(content))
 			}
-			folder, err := Open(dir, label)
+			folder, err := Open(dir, mapDisplayPath)
 			if err != nil {
 				t.Fatal(err)
 			}
 			before := testkit.Snapshot(t, project)
-			err = folder.WithChanges([]Change{put("war3map.w3i", "patched"), put("new.txt", "new")}).StageTo(c.stage(dir))
-			e := asError(t, err)
-			if !contains(e.Msg, "source map") || e.File != label || e.Hint == "" {
+			err = folder.WithChanges([]Change{newWrite("war3map.w3i", "patched"), newWrite("new.txt", "new")}).StageTo(c.stage(dir))
+			e := asDiagError(t, err)
+			if !contains(e.Msg, "source map") || e.File != mapDisplayPath || e.Hint == "" {
 				t.Errorf("error = %+v", e)
 			}
 			if after := testkit.Snapshot(t, project); !reflect.DeepEqual(after, before) {
@@ -269,12 +269,12 @@ func TestStageToRefusesAStageThatOverlapsTheSourceMap(t *testing.T) {
 }
 
 func TestStageToDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
-	folder, dir := open(t, sourceMap)
-	view := folder.WithChanges([]Change{put("textures/old.blp", "patched"), put("Textures/New.blp", "new")})
-	outside := linkAway(t, dir)
+	folder, dir := openFolder(t, sourceMap)
+	view := folder.WithChanges([]Change{newWrite("textures/old.blp", "patched"), newWrite("Textures/New.blp", "new")})
+	outside := symlinkTexturesOutside(t, dir)
 	before := snapshot(t, outside)
 	stage := filepath.Join(t.TempDir(), "map.w3x")
-	if e := asError(t, view.StageTo(stage)); !contains(e.Msg, "Staging the map failed") {
+	if e := asDiagError(t, view.StageTo(stage)); !contains(e.Msg, "Staging the map failed") {
 		t.Errorf("error = %+v", e)
 	}
 	if after := snapshot(t, outside); !reflect.DeepEqual(after, before) {
@@ -288,19 +288,19 @@ func TestApplyInPlaceDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
 		change Change
 		at     string
 	}{
-		{"a file the map had", put("textures/old.blp", "patched"), "Textures/Old.blp"},
-		{"a file to remove", drop("Textures/Old.blp"), "Textures/Old.blp"},
-		{"a new file", put("textures/New.blp", "new"), "Textures/New.blp"},
+		{"a file the map had", newWrite("textures/old.blp", "patched"), "Textures/Old.blp"},
+		{"a file to remove", newRemoval("Textures/Old.blp"), "Textures/Old.blp"},
+		{"a new file", newWrite("textures/New.blp", "new"), "Textures/New.blp"},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			folder, dir := open(t, sourceMap)
+			folder, dir := openFolder(t, sourceMap)
 			view := folder.WithChanges([]Change{c.change})
-			outside := linkAway(t, dir)
+			outside := symlinkTexturesOutside(t, dir)
 			before := snapshot(t, outside)
 			var journal fsx.Journal
-			e := asError(t, view.ApplyInPlace(context.Background(), &journal))
-			if !contains(e.Msg, "Writing a map file failed") || !contains(e.Msg, "Symlinks") || e.File != label+"/"+c.at {
+			e := asDiagError(t, view.ApplyInPlace(context.Background(), &journal))
+			if !contains(e.Msg, "Writing a map file failed") || !contains(e.Msg, "Symlinks") || e.File != mapDisplayPath+"/"+c.at {
 				t.Errorf("error = %+v", e)
 			}
 			if after := snapshot(t, outside); journal.Len() != 0 || !reflect.DeepEqual(after, before) {
@@ -311,13 +311,13 @@ func TestApplyInPlaceDoesNotWriteThroughALinkMadeAfterTheScan(t *testing.T) {
 }
 
 func TestStageDoesNotWriteAChangeThroughALinkInTheCopy(t *testing.T) {
-	_, dir := open(t, sourceMap)
-	outside := linkAway(t, dir)
+	_, dir := openFolder(t, sourceMap)
+	outside := symlinkTexturesOutside(t, dir)
 	before := snapshot(t, outside)
-	for _, change := range []Change{put("Textures/Old.blp", "patched"), put("Textures/New.blp", "new"), drop("Textures/Old.blp")} {
+	for _, change := range []Change{newWrite("Textures/Old.blp", "patched"), newWrite("Textures/New.blp", "new"), newRemoval("Textures/Old.blp")} {
 		err := writeChange(dir, change)
-		if e := asError(t, err); !contains(e.Msg, "Symlinks are not supported") || !contains(e.Msg, filepath.Join(dir, "Textures")) {
-			t.Errorf("staging %s: error = %+v, want the link refused by its path", show([]Change{change}), e)
+		if e := asDiagError(t, err); !contains(e.Msg, "Symlinks are not supported") || !contains(e.Msg, filepath.Join(dir, "Textures")) {
+			t.Errorf("staging %s: error = %+v, want the link refused by its path", formatChanges([]Change{change}), e)
 		}
 	}
 	if after := snapshot(t, outside); !reflect.DeepEqual(after, before) {
@@ -326,16 +326,16 @@ func TestStageDoesNotWriteAChangeThroughALinkInTheCopy(t *testing.T) {
 }
 
 func TestApplyInPlaceStopsAtAFileItCannotWrite(t *testing.T) {
-	folder, dir := open(t, sourceMap)
-	view := folder.WithChanges([]Change{put("war3mapskin.txt", "merged"), put("Sound/theme.mp3", "theme"), put("new.txt", "new")})
+	folder, dir := openFolder(t, sourceMap)
+	view := folder.WithChanges([]Change{newWrite("war3mapskin.txt", "merged"), newWrite("Sound/theme.mp3", "theme"), newWrite("new.txt", "new")})
 	testkit.WriteFile(t, dir, "Sound", []byte("in the way"))
 	var journal fsx.Journal
-	e := asError(t, view.ApplyInPlace(context.Background(), &journal))
-	if !contains(e.Msg, "Writing a map file failed") || e.File != label+"/Sound/theme.mp3" || e.Cause == nil ||
+	e := asDiagError(t, view.ApplyInPlace(context.Background(), &journal))
+	if !contains(e.Msg, "Writing a map file failed") || e.File != mapDisplayPath+"/Sound/theme.mp3" || e.Cause == nil ||
 		!contains(e.Hint, "Close World Editor") {
 		t.Errorf("error = %+v", e)
 	}
-	after := filesOf(snapshot(t, dir))
+	after := withoutDirs(snapshot(t, dir))
 	if after["war3mapskin.txt"] != "merged" || after["Sound"] != "in the way" {
 		t.Errorf("the map holds %v, want the first change written and the file in the way as it was", after)
 	}
@@ -348,22 +348,22 @@ func TestApplyInPlaceStopsAtAFileItCannotWrite(t *testing.T) {
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
 		t.Errorf("unrestored = %v", unrestored)
 	}
-	undone := filesOf(snapshot(t, dir))
+	undone := withoutDirs(snapshot(t, dir))
 	if undone["war3mapskin.txt"] != "skin" || undone["Sound"] != "in the way" {
 		t.Errorf("after the undo the map holds %v, want the first change taken back", undone)
 	}
 }
 
 func TestApplyInPlaceWritesThroughTheJournalWhichCanUndoIt(t *testing.T) {
-	folder, dir := open(t, sourceMap)
+	folder, dir := openFolder(t, sourceMap)
 	before := snapshot(t, dir)
-	read(t, folder, "war3map.w3i")
-	read(t, folder, "war3mapMap.blp")
+	readFile(t, folder, "war3map.w3i")
+	readFile(t, folder, "war3mapMap.blp")
 	view := folder.WithChanges([]Change{
-		put("WAR3MAP.W3I", "patched"),
-		drop("war3mapmap.blp"),
-		put("Sound/Music/theme.mp3", "theme"),
-		put("Textures/New.blp", "new"),
+		newWrite("WAR3MAP.W3I", "patched"),
+		newRemoval("war3mapmap.blp"),
+		newWrite("Sound/Music/theme.mp3", "theme"),
+		newWrite("Textures/New.blp", "new"),
 	})
 	var journal fsx.Journal
 	if err := view.ApplyInPlace(context.Background(), &journal); err != nil {
@@ -388,13 +388,13 @@ func TestApplyInPlaceWritesThroughTheJournalWhichCanUndoIt(t *testing.T) {
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
 		t.Errorf("unrestored = %v", unrestored)
 	}
-	if got := filesOf(snapshot(t, dir)); !reflect.DeepEqual(got, filesOf(before)) {
-		t.Errorf("after the undo the map holds %v, want %v", got, filesOf(before))
+	if got := withoutDirs(snapshot(t, dir)); !reflect.DeepEqual(got, withoutDirs(before)) {
+		t.Errorf("after the undo the map holds %v, want %v", got, withoutDirs(before))
 	}
 }
 
 func TestApplyInPlaceRefusesAFileThatIsNotAsTheFolderSawIt(t *testing.T) {
-	changes := []Change{put("a.txt", "1"), put("b.txt", "2"), put("new.txt", "3"), put("c.txt", "4")}
+	changes := []Change{newWrite("a.txt", "1"), newWrite("b.txt", "2"), newWrite("new.txt", "3"), newWrite("c.txt", "4")}
 	edit := func(name string) func(t *testing.T, dir string) {
 		return func(t *testing.T, dir string) { testkit.WriteFile(t, dir, name, []byte("edited elsewhere")) }
 	}
@@ -406,10 +406,10 @@ func TestApplyInPlaceRefusesAFileThatIsNotAsTheFolderSawIt(t *testing.T) {
 		}
 	}
 	readIn := func(view func(*Folder) *Folder) func(t *testing.T, folder *Folder) {
-		return func(t *testing.T, folder *Folder) { read(t, view(folder), "B.TXT") }
+		return func(t *testing.T, folder *Folder) { readFile(t, view(folder), "B.TXT") }
 	}
 	itself := func(folder *Folder) *Folder { return folder }
-	aView := func(folder *Folder) *Folder { return folder.WithChanges([]Change{put("other.txt", "")}) }
+	aView := func(folder *Folder) *Folder { return folder.WithChanges([]Change{newWrite("other.txt", "")}) }
 	cases := []struct {
 		name    string
 		read    func(t *testing.T, folder *Folder)
@@ -426,7 +426,7 @@ func TestApplyInPlaceRefusesAFileThatIsNotAsTheFolderSawIt(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			folder, dir := open(t, map[string]string{"a.txt": "a", "b.txt": "b", "c.txt": "c"})
+			folder, dir := openFolder(t, map[string]string{"a.txt": "a", "b.txt": "b", "c.txt": "c"})
 			if c.read != nil {
 				c.read(t, folder)
 			}
@@ -442,12 +442,12 @@ func TestApplyInPlaceRefusesAFileThatIsNotAsTheFolderSawIt(t *testing.T) {
 				}
 				return
 			}
-			e := asError(t, err)
-			if !contains(e.Msg, label+"/"+c.refused+" changed after") || e.File != label+"/"+c.refused ||
+			e := asDiagError(t, err)
+			if !contains(e.Msg, mapDisplayPath+"/"+c.refused+" changed after") || e.File != mapDisplayPath+"/"+c.refused ||
 				!contains(e.Hint, "Close World Editor") {
 				t.Errorf("error = %+v", e)
 			}
-			after := filesOf(snapshot(t, dir))
+			after := withoutDirs(snapshot(t, dir))
 			if after["a.txt"] != "1" || after["c.txt"] != "c" {
 				t.Errorf("the map holds %v, want a.txt written and c.txt untouched", after)
 			}
@@ -460,12 +460,12 @@ func TestApplyInPlaceRefusesAFileThatIsNotAsTheFolderSawIt(t *testing.T) {
 }
 
 func TestApplyInPlaceStopsAtACancelledContext(t *testing.T) {
-	folder, dir := open(t, sourceMap)
+	folder, dir := openFolder(t, sourceMap)
 	before := snapshot(t, dir)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	var journal fsx.Journal
-	err := folder.WithChanges([]Change{put("war3map.w3i", "patched")}).ApplyInPlace(ctx, &journal)
+	err := folder.WithChanges([]Change{newWrite("war3map.w3i", "patched")}).ApplyInPlace(ctx, &journal)
 	if !errors.Is(err, context.Canceled) {
 		t.Errorf("ApplyInPlace = %v, want the context's error", err)
 	}
@@ -474,28 +474,28 @@ func TestApplyInPlaceStopsAtACancelledContext(t *testing.T) {
 	}
 }
 
-type cancelledAfter struct {
+type cancelAfterCtx struct {
 	context.Context
-	asks int
+	calls int
 }
 
-func (c *cancelledAfter) Err() error {
-	if c.asks == 0 {
+func (c *cancelAfterCtx) Err() error {
+	if c.calls == 0 {
 		return context.Canceled
 	}
-	c.asks--
+	c.calls--
 	return nil
 }
 
 func TestApplyInPlaceStopsBetweenTwoChanges(t *testing.T) {
-	folder, dir := open(t, sourceMap)
-	view := folder.WithChanges([]Change{put("war3map.w3i", "patched"), put("war3mapskin.txt", "merged"), put("new.txt", "new")})
+	folder, dir := openFolder(t, sourceMap)
+	view := folder.WithChanges([]Change{newWrite("war3map.w3i", "patched"), newWrite("war3mapskin.txt", "merged"), newWrite("new.txt", "new")})
 	var journal fsx.Journal
-	err := view.ApplyInPlace(&cancelledAfter{Context: context.Background(), asks: 1}, &journal)
+	err := view.ApplyInPlace(&cancelAfterCtx{Context: context.Background(), calls: 1}, &journal)
 	if !errors.Is(err, context.Canceled) {
 		t.Errorf("ApplyInPlace = %v, want the context's error", err)
 	}
-	after := filesOf(snapshot(t, dir))
+	after := withoutDirs(snapshot(t, dir))
 	if after["war3map.w3i"] != "patched" || after["war3mapskin.txt"] != "skin" || journal.Len() != 1 {
 		t.Errorf("the journal touched %d files and the map holds %v, want only war3map.w3i written", journal.Len(), after)
 	}

@@ -180,9 +180,9 @@ func errMissing(displayPath string) error {
 	return &diag.Error{Msg: "A map file needed by the configured settings is missing.", File: displayPath, Hint: resaveMap}
 }
 
-func errIsDir(folder, displayPath string) error {
+func errIsDir(dir, displayPath string) error {
 	return &diag.Error{
-		Msg:  folder + " in the map is a folder, not a file.",
+		Msg:  dir + " in the map is a folder, not a file.",
 		File: displayPath,
 		Hint: "The map has a folder where a file the configured settings need belongs. Remove that folder from the " +
 			"source map, or open and re-save the map in World Editor.",

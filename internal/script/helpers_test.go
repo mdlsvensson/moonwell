@@ -87,9 +87,9 @@ func (p project) libraries() []Library {
 	return libraries
 }
 
-func linkTo(t testing.TB, to project, root, link string) (at string) {
+func linkTo(t testing.TB, to project, root, symlink string) (at string) {
 	t.Helper()
-	at = filepath.Join(root, filepath.FromSlash(link))
+	at = filepath.Join(root, filepath.FromSlash(symlink))
 	if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 		t.Fatal(err)
 	}
@@ -99,9 +99,9 @@ func linkTo(t testing.TB, to project, root, link string) (at string) {
 
 func asError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
 	}
-	return failure
+	return diagErr
 }

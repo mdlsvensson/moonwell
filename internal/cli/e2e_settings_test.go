@@ -61,7 +61,7 @@ func assertSettingsLua(t *testing.T, lua string) {
 		"SetPlayerController(Player(0), MAP_CONTROL_COMPUTER)", "SetPlayerRacePreference(Player(0), RACE_PREF_ORC)",
 		`NewSoundEnvironment("Mountains")`, "SetWaterBaseColor(10, 20, 30, 255)", "SetTerrainFogEx(",
 	} {
-		if at := strings.Index(lua, call); at < 0 || at >= boot {
+		if index := strings.Index(lua, call); index < 0 || index >= boot {
 			t.Errorf("%s is not there, or comes after the start of the gameplay", call)
 		}
 	}
@@ -77,11 +77,11 @@ func assertSettingsInfo(t *testing.T, data []byte) {
 		t.Fatalf("the map info is named %q and described as %q", info.Name.Value, info.Description.Value)
 	}
 	details := info.Details
-	at := slices.IndexFunc(details.Players, func(p w3i.Player) bool { return p.ID.Value == 0 })
-	if at < 0 {
+	index := slices.IndexFunc(details.Players, func(p w3i.Player) bool { return p.ID.Value == 0 })
+	if index < 0 {
 		t.Fatal("the map info has no player 0")
 	}
-	if p := details.Players[at]; p.Controller.Value != 2 || p.Race.Value != 2 || p.FixedStart.Value != 0 ||
+	if p := details.Players[index]; p.Controller.Value != 2 || p.Race.Value != 2 || p.FixedStart.Value != 0 ||
 		p.X.Value != 256 {
 		t.Fatalf("player 0 is %+v", p)
 	}

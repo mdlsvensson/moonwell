@@ -153,11 +153,11 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 		if value := testkit.PanicValue(func() { info, err = w3i.Read(data, mapInfoFile, depth) }); value != nil {
 			t.Fatalf("%s, depth %d: Read panics: %v", what, depth, value)
 		}
-		var failure *diag.Error
+		var diagErr *diag.Error
 		switch {
 		case err == nil && info != nil:
 			c.read++
-		case err != nil && info == nil && errors.As(err, &failure) && failure.File == mapInfoFile:
+		case err != nil && info == nil && errors.As(err, &diagErr) && diagErr.File == mapInfoFile:
 			c.refused++
 		default:
 			t.Fatalf("%s, depth %d: Read = %+v, %v; want an Info, or an error of %s", what, depth, info, err, mapInfoFile)
@@ -167,8 +167,8 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	if value := testkit.PanicValue(func() { _, err = w3i.ReadHeader(data, mapInfoFile) }); value != nil {
 		t.Fatalf("%s: ReadHeader panics: %v", what, value)
 	}
-	var failure *diag.Error
-	if err != nil && (!errors.As(err, &failure) || failure.File != mapInfoFile) {
+	var diagErr *diag.Error
+	if err != nil && (!errors.As(err, &diagErr) || diagErr.File != mapInfoFile) {
 		t.Fatalf("%s: ReadHeader: %v, which is not an error of %s", what, err, mapInfoFile)
 	}
 }

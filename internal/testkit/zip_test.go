@@ -56,7 +56,7 @@ func TestZipOfNothingIsAnArchiveWithoutEntriesOrComment(t *testing.T) {
 func TestNeedNetworkSkipsTheTestUnlessNetworkTestsAreAskedFor(t *testing.T) {
 	for value, skips := range map[string]int{"1": 0, "": 1, "0": 1, "true": 1} {
 		t.Setenv("MOONWELL_NETWORK_TESTS", value)
-		stand := newStandIn(t)
+		stand := newFakeTB(t)
 		NeedNetwork(stand)
 		if len(stand.skipped) != skips || len(stand.failed) != 0 {
 			t.Errorf("MOONWELL_NETWORK_TESTS=%q: skipped %q and failed %q, want %d skips", value, stand.skipped, stand.failed, skips)

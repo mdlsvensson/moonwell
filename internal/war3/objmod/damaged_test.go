@@ -47,20 +47,20 @@ func numberOffsets(t *testing.T, displayPath damagedFile) []int {
 	for _, table := range []objmod.Table{parsed.Original, parsed.Custom} {
 		offsets = append(offsets, table.CountOffset)
 		for _, object := range table.Objects {
-			at := object.Start + 8
+			offset := object.Start + 8
 			if parsed.Version >= 3 {
-				offsets = append(offsets, at)
-				at += 4
+				offsets = append(offsets, offset)
+				offset += 4
 			}
 			for _, set := range object.Sets {
 				if parsed.Version >= 3 {
-					at += 4
+					offset += 4
 				}
-				offsets = append(offsets, at)
-				at += 4
+				offsets = append(offsets, offset)
+				offset += 4
 				for _, mod := range set.Mods {
 					offsets = append(offsets, mod.Start+4)
-					at = mod.Stop
+					offset = mod.Stop
 				}
 			}
 		}
@@ -86,11 +86,11 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte, kind objmo
 			t.Fatalf("%s: AppendTo panics: %v", what, value)
 		}
 	}
-	var failure *diag.Error
+	var diagErr *diag.Error
 	switch {
 	case err == nil && parsed != nil && appendErr == nil && len(appended) > len(data):
 		c.read++
-	case err != nil && parsed == nil && errors.As(err, &failure) && failure.File == modFile:
+	case err != nil && parsed == nil && errors.As(err, &diagErr) && diagErr.File == modFile:
 		c.refused++
 	default:
 		t.Fatalf("%s: Read = %+v, %v and AppendTo = %d bytes, %v; want a file and a longer one, or an error of %s",
@@ -109,10 +109,10 @@ func TestADamagedFileIsReadOrRefusedByNameAndNeverPanics(t *testing.T) {
 			what := fmt.Sprintf("%s, change %d of seed %d", displayPath.name, index, damageSeed)
 			damaged.readOrRefused(t, what, testkit.MutateBytes(displayPath.data, damageSeed, index), displayPath.kind)
 		}
-		for _, at := range numberOffsets(t, displayPath) {
+		for _, offset := range numberOffsets(t, displayPath) {
 			for _, number := range append(testkit.EdgeNumbers(), 3, 4, 5, 64, 65, 1000) {
-				what := fmt.Sprintf("%s with the number at %d set to %d", displayPath.name, at, number)
-				damaged.readOrRefused(t, what, testkit.SetU32(displayPath.data, at, number), displayPath.kind)
+				what := fmt.Sprintf("%s with the number at %d set to %d", displayPath.name, offset, number)
+				damaged.readOrRefused(t, what, testkit.SetU32(displayPath.data, offset, number), displayPath.kind)
 			}
 		}
 	}

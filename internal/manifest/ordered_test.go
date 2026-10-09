@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func entries[V comparable](t *testing.T, o OrderedMap[V]) string {
+func formatEntries[V comparable](t *testing.T, o OrderedMap[V]) string {
 	t.Helper()
 	var words []string
 	for key, value := range o.All() {
@@ -41,7 +41,7 @@ func TestOrderedDecodesAMappingInTheOrderItWasWritten(t *testing.T) {
 			if err := json.Unmarshal([]byte(tt.document), &o); err != nil {
 				t.Fatal(err)
 			}
-			if got := entries(t, o); got != tt.want {
+			if got := formatEntries(t, o); got != tt.want {
 				t.Errorf("got %q, want %q", got, tt.want)
 			}
 		})
@@ -60,8 +60,8 @@ func TestOrderedDecodesInsideAStructAndInsideItself(t *testing.T) {
 		t.Fatal(err)
 	}
 	misc, ok := held.Sections.Get("Misc")
-	if got := held.Sections.Keys(); !slices.Equal(got, []string{"Misc", "Frame"}) || !ok || entries(t, misc) != "B=1 A=2" {
-		t.Errorf("sections = %q, Misc = %q", got, entries(t, misc))
+	if got := held.Sections.Keys(); !slices.Equal(got, []string{"Misc", "Frame"}) || !ok || formatEntries(t, misc) != "B=1 A=2" {
+		t.Errorf("sections = %q, Misc = %q", got, formatEntries(t, misc))
 	}
 	if held.Missing.Len() != 0 || held.Null.Len() != 0 {
 		t.Errorf("a missing mapping has %d keys, a null one %d", held.Missing.Len(), held.Null.Len())
@@ -76,7 +76,7 @@ func TestOrderedSetKeepsTheOrderKeysWereAddedIn(t *testing.T) {
 	o.Set("b", 1)
 	o.Set("a", 2)
 	o.Set("b", 3)
-	if got := entries(t, o); got != "b=3 a=2" {
+	if got := formatEntries(t, o); got != "b=3 a=2" {
 		t.Errorf("got %q, want a key already there to keep its place", got)
 	}
 	keys := o.Keys()

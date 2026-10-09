@@ -83,9 +83,9 @@ func TestAPreviewSettingThatNamesNoUsablePictureIsRefused(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := loadPreview(root, tt.preview, manifestName)
-			failure := asError(t, err, tt.preview)
-			if !strings.Contains(failure.Msg, tt.words) || failure.File != tt.displayPath || failure.Hint == "" {
-				t.Errorf("error = %+v, want %q naming %s", failure, tt.words, tt.displayPath)
+			diagErr := asError(t, err, tt.preview)
+			if !strings.Contains(diagErr.Msg, tt.words) || diagErr.File != tt.displayPath || diagErr.Hint == "" {
+				t.Errorf("error = %+v, want %q naming %s", diagErr, tt.words, tt.displayPath)
 			}
 		})
 	}
@@ -95,10 +95,10 @@ func TestAPreviewThatCannotBeReadIsRefusedByItsPath(t *testing.T) {
 	root := t.TempDir()
 	testkit.MakeUnreadable(t, testkit.WriteFile(t, root, "art/preview.tga", plainTGA()))
 	_, err := loadPreview(root, "art/preview.tga", manifestName)
-	failure := asError(t, err, "a picture that cannot be read")
-	if !strings.Contains(failure.Msg, "Reading the preview picture failed: ") || failure.File != "art/preview.tga" ||
-		failure.Hint == "" || failure.Cause == nil {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, err, "a picture that cannot be read")
+	if !strings.Contains(diagErr.Msg, "Reading the preview picture failed: ") || diagErr.File != "art/preview.tga" ||
+		diagErr.Hint == "" || diagErr.Cause == nil {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -106,10 +106,10 @@ func TestAPreviewPathThroughAFileNamesAFileThatDoesNotExist(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "preview.tga", plainTGA())
 	_, err := loadPreview(root, "preview.tga/inner.tga", manifestName)
-	failure := asError(t, err, "a path through a file")
-	if !strings.Contains(failure.Msg, "names a file that does not exist: preview.tga/inner.tga") ||
-		failure.File != manifestName || failure.Hint == "" {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, err, "a path through a file")
+	if !strings.Contains(diagErr.Msg, "names a file that does not exist: preview.tga/inner.tga") ||
+		diagErr.File != manifestName || diagErr.Hint == "" {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -119,21 +119,21 @@ func TestAFailureOnTheWayToThePreviewIsToldAsWhatTheUserCanFix(t *testing.T) {
 		return &fs.PathError{Op: "lstat", Path: filepath.Join("project", "art", "preview.tga"), Err: reason}
 	}
 	t.Run("a file where the path needs a folder", func(t *testing.T) {
-		failure := asError(t, wrapPreviewError(failed(syscall.ENOTDIR), path, manifestName), "not a directory")
-		if !strings.Contains(failure.Msg, "names a file that does not exist: "+path) || failure.File != manifestName ||
-			failure.Hint == "" {
-			t.Errorf("error = %+v", failure)
+		diagErr := asError(t, wrapPreviewError(failed(syscall.ENOTDIR), path, manifestName), "not a directory")
+		if !strings.Contains(diagErr.Msg, "names a file that does not exist: "+path) || diagErr.File != manifestName ||
+			diagErr.Hint == "" {
+			t.Errorf("error = %+v", diagErr)
 		}
 	})
 	t.Run("a folder that may not be entered", func(t *testing.T) {
 		cause := failed(syscall.EACCES)
-		failure := asError(t, wrapPreviewError(cause, path, manifestName), "permission denied")
-		if !strings.Contains(failure.Msg, "Reading the preview picture failed: ") || failure.File != path ||
-			failure.Cause != cause {
-			t.Errorf("error = %+v", failure)
+		diagErr := asError(t, wrapPreviewError(cause, path, manifestName), "permission denied")
+		if !strings.Contains(diagErr.Msg, "Reading the preview picture failed: ") || diagErr.File != path ||
+			diagErr.Cause != cause {
+			t.Errorf("error = %+v", diagErr)
 		}
-		if !strings.Contains(failure.Hint, "folder") || strings.Contains(failure.Hint, "locked") {
-			t.Errorf("the hint is %q, want one that fits a folder and claims no lock", failure.Hint)
+		if !strings.Contains(diagErr.Hint, "folder") || strings.Contains(diagErr.Hint, "locked") {
+			t.Errorf("the hint is %q, want one that fits a folder and claims no lock", diagErr.Hint)
 		}
 	})
 	t.Run("a link", func(t *testing.T) {
@@ -149,7 +149,7 @@ func TestAPreviewBehindALinkIsRefused(t *testing.T) {
 	testkit.WriteFile(t, outside, "preview.tga", plainTGA())
 	testkit.LinkDir(t, outside, filepath.Join(root, "art"))
 	_, err := loadPreview(root, "art/preview.tga", manifestName)
-	if failure := asError(t, err, "a picture behind a link"); !strings.Contains(failure.Msg, "Symlinks are not supported") {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asError(t, err, "a picture behind a link"); !strings.Contains(diagErr.Msg, "Symlinks are not supported") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }

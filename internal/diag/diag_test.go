@@ -119,7 +119,7 @@ func TestFirstIsAnErrorAsOneProblem(t *testing.T) {
 		{File: "src/main.yue", Line: 7, Column: 11, Msg: "first", Hint: "one"},
 		{File: "objects/b.pkl", Msg: "second"},
 	}
-	failure := &Error{Msg: "bad", File: "moonwell.pkl", Line: 4, Column: 2, Hint: "mend it", Cause: errors.New("x")}
+	diagErr := &Error{Msg: "bad", File: "moonwell.pkl", Line: 4, Column: 2, Hint: "mend it", Cause: errors.New("x")}
 	for _, c := range []struct {
 		name string
 		err  error
@@ -129,13 +129,13 @@ func TestFirstIsAnErrorAsOneProblem(t *testing.T) {
 		{"the first of several problems", problems, problems[0], true},
 		{
 			"the fields of an Error",
-			failure,
+			diagErr,
 			Problem{File: "moonwell.pkl", Line: 4, Column: 2, Msg: "bad", Hint: "mend it"},
 			true,
 		},
 		{
 			"an Error wrapped in another error",
-			fmt.Errorf("while building: %w", failure),
+			fmt.Errorf("while building: %w", diagErr),
 			Problem{File: "moonwell.pkl", Line: 4, Column: 2, Msg: "bad", Hint: "mend it"},
 			true,
 		},
@@ -151,11 +151,11 @@ func TestFirstIsAnErrorAsOneProblem(t *testing.T) {
 
 func TestAnErrorReadsAsItsMessageAndUnwrapsToItsCause(t *testing.T) {
 	cause := errors.New("access denied")
-	failure := &Error{Msg: "cannot write the map", File: "dist/map.w3x", Cause: cause}
-	if failure.Error() != "cannot write the map" {
-		t.Errorf("Error() = %q", failure.Error())
+	diagErr := &Error{Msg: "cannot write the map", File: "dist/map.w3x", Cause: cause}
+	if diagErr.Error() != "cannot write the map" {
+		t.Errorf("Error() = %q", diagErr.Error())
 	}
-	if !errors.Is(failure, cause) {
+	if !errors.Is(diagErr, cause) {
 		t.Error("errors.Is does not find the cause of an Error")
 	}
 	problems := Problems{{File: "objects/a.pkl", Msg: "first"}, {File: "objects/b.pkl", Msg: "second"}}

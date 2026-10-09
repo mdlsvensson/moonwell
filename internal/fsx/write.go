@@ -84,11 +84,11 @@ func copyEntry(path, target string, entry fs.DirEntry) error {
 	case entry.IsDir():
 		return os.MkdirAll(target, 0o777)
 	case entry.Type()&fs.ModeSymlink != 0:
-		link, err := os.Readlink(path)
+		symlink, err := os.Readlink(path)
 		if err != nil {
 			return err
 		}
-		return os.Symlink(link, target)
+		return os.Symlink(symlink, target)
 	}
 	return CopyFile(path, target)
 }

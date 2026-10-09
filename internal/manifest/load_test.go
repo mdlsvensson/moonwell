@@ -17,7 +17,7 @@ import (
 
 var background = context.Background()
 
-func world(t *testing.T, files map[string]string) *env.Env {
+func newEnv(t *testing.T, files map[string]string) *env.Env {
 	t.Helper()
 	root := t.TempDir()
 	for name, content := range files {
@@ -27,12 +27,12 @@ func world(t *testing.T, files map[string]string) *env.Env {
 	return e
 }
 
-type ran struct{ line, dir string }
+type runCall struct{ line, dir string }
 
-func answering(calls *[]ran, results map[string]env.RunResult) env.RunFunc {
+func fakeRun(calls *[]runCall, results map[string]env.RunResult) env.RunFunc {
 	return func(_ context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		line := strings.Join(append([]string{program}, args...), " ")
-		*calls = append(*calls, ran{line, options.Dir})
+		*calls = append(*calls, runCall{line, options.Dir})
 		best, known := "", false
 		for prefix := range results {
 			if strings.HasPrefix(line, prefix) && len(prefix) >= len(best) {
@@ -47,7 +47,7 @@ func answering(calls *[]ran, results map[string]env.RunResult) env.RunFunc {
 }
 
 func TestLoadEvaluatesTheLocalManifestWhenThereIsOneWithTheProgramItIsGiven(t *testing.T) {
-	deps := resolvedDeps(moonwell.Version)
+	deps := depsJSON(moonwell.Version)
 	tests := []struct {
 		name  string
 		files map[string]string
@@ -59,10 +59,10 @@ func TestLoadEvaluatesTheLocalManifestWhenThereIsOneWithTheProgramItIsGiven(t *t
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := world(t, tt.files)
-			var calls []ran
+			e := newEnv(t, tt.files)
+			var calls []runCall
 			line := "/cache/pkl/0.32.1/pkl eval --format json --project-dir . " + tt.want
-			e.Run = answering(&calls, map[string]env.RunResult{line: {Stdout: printed(), Stderr: "a warning"}})
+			e.Run = fakeRun(&calls, map[string]env.RunResult{line: {Stdout: pklOutput(), Stderr: "a warning"}})
 			p, err := Load(background, e, "/cache/pkl/0.32.1/pkl")
 			if err != nil {
 				t.Fatal(diag.Format(err))
@@ -70,7 +70,7 @@ func TestLoadEvaluatesTheLocalManifestWhenThereIsOneWithTheProgramItIsGiven(t *t
 			if p.Map.Folder != "map.w3x" || p.ManifestName != tt.want || p.Root != e.Root {
 				t.Errorf("project = %+v", p)
 			}
-			if !slices.Equal(calls, []ran{{line, e.Root}}) {
+			if !slices.Equal(calls, []runCall{{line, e.Root}}) {
 				t.Errorf("ran %+v, want %q in the project folder", calls, line)
 			}
 		})
@@ -78,7 +78,7 @@ func TestLoadEvaluatesTheLocalManifestWhenThereIsOneWithTheProgramItIsGiven(t *t
 }
 
 func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
-	deps := resolvedDeps(moonwell.Version)
+	deps := depsJSON(moonwell.Version)
 	project := map[string]string{"moonwell.pkl": "", "PklProject.deps.json": deps}
 	evaluation := func(result env.RunResult) map[string]env.RunResult {
 		return map[string]env.RunResult{"pkl eval": result}
@@ -101,7 +101,7 @@ func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
 			"PklProject.deps.json", []string{"not valid JSON"}, "pkl project resolve"},
 		{"a package that is not resolved", map[string]string{"moonwell.pkl": "", "PklProject.deps.json": "{}"}, nil,
 			"PklProject.deps.json", []string{"not a resolved dependency"}, "pkl project resolve"},
-		{"a package of another version", map[string]string{"moonwell.pkl": "", "PklProject.deps.json": resolvedDeps("0.1.0")}, nil,
+		{"a package of another version", map[string]string{"moonwell.pkl": "", "PklProject.deps.json": depsJSON("0.1.0")}, nil,
 			"PklProject", []string{"moonwell@0.1.0", "does not match", moonwell.Version}, "pkl project resolve"},
 		{"an evaluation that fails", project,
 			evaluation(env.RunResult{ExitCode: 1, Stdout: "ignored", Stderr: "\n-- Pkl Error --\nType constraint violated\n"}),
@@ -122,44 +122,44 @@ func TestLoadRefusesInOrderWhatItCannotRead(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := world(t, tt.files)
-			var calls []ran
+			e := newEnv(t, tt.files)
+			var calls []runCall
 			if tt.runs != nil {
-				e.Run = answering(&calls, tt.runs)
+				e.Run = fakeRun(&calls, tt.runs)
 			}
 			p, err := Load(background, e, "pkl")
-			failure := asError(t, err, tt.name)
-			if file := strings.ReplaceAll(failure.File, e.Root, "<root>"); p != nil || file != tt.file {
+			diagErr := asDiagError(t, err, tt.name)
+			if file := strings.ReplaceAll(diagErr.File, e.Root, "<root>"); p != nil || file != tt.file {
 				t.Errorf("project = %v, File = %q, want %q", p, file, tt.file)
 			}
 			for _, word := range tt.words {
-				if !strings.Contains(failure.Msg, word) {
-					t.Errorf("the message %q lacks %q", failure.Msg, word)
+				if !strings.Contains(diagErr.Msg, word) {
+					t.Errorf("the message %q lacks %q", diagErr.Msg, word)
 				}
 			}
-			if !strings.Contains(failure.Hint, tt.hint) || (tt.hint == "") != (failure.Hint == "") {
-				t.Errorf("hint = %q, want %q in it", failure.Hint, tt.hint)
+			if !strings.Contains(diagErr.Hint, tt.hint) || (tt.hint == "") != (diagErr.Hint == "") {
+				t.Errorf("hint = %q, want %q in it", diagErr.Hint, tt.hint)
 			}
 		})
 	}
 }
 
 func TestLoadShowsTheStartOfLongOutputThatIsNotJSON(t *testing.T) {
-	e := world(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": resolvedDeps(moonwell.Version)})
-	var calls []ran
-	e.Run = answering(&calls, map[string]env.RunResult{"pkl eval": {Stdout: strings.Repeat("\xC3\xA9", 600)}})
+	e := newEnv(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": depsJSON(moonwell.Version)})
+	var calls []runCall
+	e.Run = fakeRun(&calls, map[string]env.RunResult{"pkl eval": {Stdout: strings.Repeat("\xC3\xA9", 600)}})
 	_, err := Load(background, e, "pkl")
-	failure := asError(t, err, "long output")
-	if shown := strings.Count(failure.Msg, "\xC3\xA9"); shown != 500 {
+	diagErr := asDiagError(t, err, "long output")
+	if shown := strings.Count(diagErr.Msg, "\xC3\xA9"); shown != 500 {
 		t.Errorf("the message shows %d characters of the output, want 500", shown)
 	}
-	if failure.Cause == nil {
+	if diagErr.Cause == nil {
 		t.Error("the error does not keep the decoder's reason as its cause")
 	}
 }
 
 func TestLoadPassesOnAProgramThatCannotBeStarted(t *testing.T) {
-	e := world(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": resolvedDeps(moonwell.Version)})
+	e := newEnv(t, map[string]string{"moonwell.pkl": "", "PklProject.deps.json": depsJSON(moonwell.Version)})
 	failed := env.NewSpawnError("pkl", errors.New("no such program"), "", "")
 	e.Run = func(context.Context, string, []string, env.RunOptions) (env.RunResult, error) {
 		return env.RunResult{}, failed
@@ -169,10 +169,10 @@ func TestLoadPassesOnAProgramThatCannotBeStarted(t *testing.T) {
 	}
 }
 
-func linked(t *testing.T, files map[string]string) (*env.Env, string) {
+func newLinkedEnv(t *testing.T, files map[string]string) (*env.Env, string) {
 	t.Helper()
 	pkl := testkit.NeedPkl(t)
-	e := world(t, files)
+	e := newEnv(t, files)
 	e.Run = env.Run
 	schema, err := filepath.Rel(e.Root, filepath.Join(testkit.RepoRoot(t), "schema"))
 	if err != nil {
@@ -197,13 +197,13 @@ func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
 			files[file.Path] = string(file.Data)
 		}
 	}
-	e, pkl := linked(t, files)
+	e, pkl := newLinkedEnv(t, files)
 	shared, err := Load(background, e, pkl)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
 	if shared.ManifestName != "moonwell.pkl" || shared.Launch.GameExecutable != nil {
-		t.Errorf("File = %q, game = %q", shared.ManifestName, text(shared.Launch.GameExecutable))
+		t.Errorf("File = %q, game = %q", shared.ManifestName, derefOrNil(shared.Launch.GameExecutable))
 	}
 	if created, err := EnsureLocalManifest(e.Root); err != nil || !created {
 		t.Fatalf("EnsureLocalManifest = %v, %v", created, err)
@@ -212,8 +212,8 @@ func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	if p.Root != e.Root || p.ManifestName != "moonwell.local.pkl" || text(p.Launch.GameExecutable) != DefaultGameExecutable {
-		t.Errorf("Root = %q, File = %q, game = %q", p.Root, p.ManifestName, text(p.Launch.GameExecutable))
+	if p.Root != e.Root || p.ManifestName != "moonwell.local.pkl" || derefOrNil(p.Launch.GameExecutable) != DefaultGameExecutable {
+		t.Errorf("Root = %q, File = %q, game = %q", p.Root, p.ManifestName, derefOrNil(p.Launch.GameExecutable))
 	}
 	if p.Map != (Map{Folder: "map.w3x", Entry: "src/main.yue"}) || p.Build != (Build{Folder: "dist/bin"}) ||
 		!slices.Equal(p.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) || p.Yue.Version == "" || p.Yue.Path != nil {
@@ -237,7 +237,7 @@ func TestLoadReadsTheTemplatesManifestWithRealPkl(t *testing.T) {
 	}
 }
 
-const everything = `amends "@moonwell/Project.pkl"
+const fullManifest = `amends "@moonwell/Project.pkl"
 
 map { folder = "hero.w3x"; entry = "src/game/init.yue" }
 build { folder = "out"; minify = true }
@@ -285,12 +285,12 @@ objects {
 `
 
 func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T) {
-	e, pkl := linked(t, map[string]string{"moonwell.pkl": everything})
+	e, pkl := newLinkedEnv(t, map[string]string{"moonwell.pkl": fullManifest})
 	p, err := Load(background, e, pkl)
 	if err != nil {
 		t.Fatal(diag.Format(err))
 	}
-	for _, path := range unset(p) {
+	for _, path := range unsetFields(p) {
 		t.Errorf("%s is not set: the schema and its field in this package have different names, or the manifest of "+
 			"this test does not set it", path)
 	}
@@ -301,8 +301,8 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 	if *player.Y != -896.5 || *player.X != 0 || *player.FixedStart || *force.Allied || *fog.Enabled || *fog.Density != 0 {
 		t.Errorf("player = %+v, force = %+v, fog = %+v", player, force, fog)
 	}
-	if len(p.Libraries) != 2 || text(p.Libraries["mine"].Path) != "../mine" ||
-		text(p.Libraries["example"].Tag) != "v0.2.0" {
+	if len(p.Libraries) != 2 || derefOrNil(p.Libraries["mine"].Path) != "../mine" ||
+		derefOrNil(p.Libraries["example"].Tag) != "v0.2.0" {
 		t.Errorf("libraries = %+v", p.Libraries)
 	}
 	properties := map[Category]struct {
@@ -331,7 +331,7 @@ func TestLoadSetsEveryFieldOfAManifestThatSetsEverythingWithRealPkl(t *testing.T
 	}
 }
 
-func unset(value any) []string {
+func unsetFields(value any) []string {
 	set := map[string]bool{}
 	var paths []string
 	note := func(path string, isSet bool) {
@@ -368,7 +368,7 @@ func unset(value any) []string {
 }
 
 func TestUnsetNamesAFieldThatNoValueOfItsKindSets(t *testing.T) {
-	bare := unset(decoded(t, printed(), "moonwell.pkl"))
+	bare := unsetFields(mustDecodeProject(t, pklOutput(), "moonwell.pkl"))
 	for _, path := range []string{
 		"Project.Build.Minify", "Project.Launch.GameExecutable", "Project.Yue.Path", "Project.Assets.Exclude",
 		"Project.Lint.Globals", "Project.Libraries", "Project.Settings.Info.Name", "Project.Settings.Players",
@@ -385,7 +385,7 @@ func TestUnsetNamesAFieldThatNoValueOfItsKindSets(t *testing.T) {
 		}
 	}
 	kinds := func(libraries string) []string {
-		return unset(decoded(t, printed(`"libraries":`+libraries, `"settings":{"info":{"name":""}}`), "moonwell.pkl"))
+		return unsetFields(mustDecodeProject(t, pklOutput(`"libraries":`+libraries, `"settings":{"info":{"name":""}}`), "moonwell.pkl"))
 	}
 	one := kinds(`{"mine":{"path":"../mine","dir":""}}`)
 	if !slices.Contains(one, "Project.Libraries[].GitHub") || !slices.Contains(one, "Project.Libraries[].Dir") ||

@@ -6,15 +6,15 @@ import (
 	"testing"
 )
 
-func settingsOf(t *testing.T, document string) Settings {
+func mustDecodeSettings(t *testing.T, document string) Settings {
 	t.Helper()
-	return decoded(t, printed(`"settings":`+document), "moonwell.pkl").Settings
+	return mustDecodeProject(t, pklOutput(`"settings":`+document), "moonwell.pkl").Settings
 }
 
 func ptr[T any](value T) *T { return &value }
 
 func TestASettingThatIsNullOrLeftOutIsNotSet(t *testing.T) {
-	s := settingsOf(t, `{"info":{"name":null},"players":{"23":{"name":null}},"environment":{"fog":{}}}`)
+	s := mustDecodeSettings(t, `{"info":{"name":null},"players":{"23":{"name":null}},"environment":{"fog":{}}}`)
 	if s.Info != (Info{}) || s.LoadingScreen != (LoadingScreen{}) || s.Environment != (Environment{}) || s.Gameplay != (Gameplay{}) {
 		t.Errorf("settings of nulls and empty blocks hold a value: %+v", s)
 	}
@@ -28,7 +28,7 @@ func TestASettingThatIsNullOrLeftOutIsNotSet(t *testing.T) {
 }
 
 func TestAnExplicitFalseZeroAndEmptyTextAreSet(t *testing.T) {
-	s := settingsOf(t, `{"info":{"name":""},"players":{"0":{"fixedStart":false,"x":0}},"gameplay":{"foodLimit":0}}`)
+	s := mustDecodeSettings(t, `{"info":{"name":""},"players":{"0":{"fixedStart":false,"x":0}},"gameplay":{"foodLimit":0}}`)
 	if s.Info.Name == nil || *s.Info.Name != "" || s.Info.Author != nil {
 		t.Errorf("info = %+v", s.Info)
 	}
@@ -42,7 +42,7 @@ func TestAnExplicitFalseZeroAndEmptyTextAreSet(t *testing.T) {
 }
 
 func TestColoursAndRawSectionsKeepWhatWasWritten(t *testing.T) {
-	s := settingsOf(t, `{"environment":{"waterColor":[1,2,3,4]},
+	s := mustDecodeSettings(t, `{"environment":{"waterColor":[1,2,3,4]},
 		"gameplayConstants":{"misc":{"FoodCeiling":"0","DefenseArmor":"0.05"},"Misc":{"x":""}},
 		"gameInterface":{"constructor":{"constructor":"ok"}}}`)
 	if s.Environment.WaterColor == nil || *s.Environment.WaterColor != [4]uint8{1, 2, 3, 4} {
@@ -52,7 +52,7 @@ func TestColoursAndRawSectionsKeepWhatWasWritten(t *testing.T) {
 		t.Errorf("sections = %q, want both spellings in the order written", got)
 	}
 	misc, _ := s.GameplayConstants.Get("misc")
-	if got := entries(t, misc); got != "FoodCeiling=0 DefenseArmor=0.05" {
+	if got := formatEntries(t, misc); got != "FoodCeiling=0 DefenseArmor=0.05" {
 		t.Errorf("misc = %q", got)
 	}
 	section, _ := s.GameInterface.Get("constructor")
@@ -62,7 +62,7 @@ func TestColoursAndRawSectionsKeepWhatWasWritten(t *testing.T) {
 }
 
 func TestWholeNumberCoordinatesAndFogValuesAreNumbers(t *testing.T) {
-	s := settingsOf(t, `{"players":{"0":{"x":256,"y":-896}},"environment":{"fog":{"start":100,"end":1000,"density":1}}}`)
+	s := mustDecodeSettings(t, `{"players":{"0":{"x":256,"y":-896}},"environment":{"fog":{"start":100,"end":1000,"density":1}}}`)
 	if player := s.Players[0]; *player.X != 256 || *player.Y != -896 {
 		t.Errorf("player = %v, %v", *player.X, *player.Y)
 	}
@@ -73,17 +73,17 @@ func TestWholeNumberCoordinatesAndFogValuesAreNumbers(t *testing.T) {
 }
 
 func TestThePreviewIsReadBesideTheOtherInfo(t *testing.T) {
-	s := settingsOf(t, `{"info":{"name":"N","preview":"art/preview.tga"}}`)
-	if text(s.Info.Name) != "N" || text(s.Info.Preview) != "art/preview.tga" {
-		t.Errorf("info = %q, %q", text(s.Info.Name), text(s.Info.Preview))
+	s := mustDecodeSettings(t, `{"info":{"name":"N","preview":"art/preview.tga"}}`)
+	if derefOrNil(s.Info.Name) != "N" || derefOrNil(s.Info.Preview) != "art/preview.tga" {
+		t.Errorf("info = %q, %q", derefOrNil(s.Info.Name), derefOrNil(s.Info.Preview))
 	}
-	if none := settingsOf(t, `{"info":{"preview":null}}`); none.Info.Preview != nil {
+	if none := mustDecodeSettings(t, `{"info":{"preview":null}}`); none.Info.Preview != nil {
 		t.Errorf("a null preview = %q", *none.Info.Preview)
 	}
 }
 
 func TestDecodeReadsEverySetting(t *testing.T) {
-	got := settingsOf(t, `{
+	got := mustDecodeSettings(t, `{
 		"info":{"name":"N","author":"A","description":"D","recommendedPlayers":"R","preview":"p.png"},
 		"loadingScreen":{"background":-1,"model":"M","text":"T","title":"Ti","subtitle":"S"},
 		"players":{"3":{"name":"P","controller":"computer","race":"orc","fixedStart":true,"x":1.5,"y":-2}},
@@ -145,14 +145,14 @@ func TestSlotsComeInTheOrderOfTheirNumbers(t *testing.T) {
 }
 
 func TestTheSlotsOfPlayersAndForcesAreReadAsNumbers(t *testing.T) {
-	s := settingsOf(t, `{"players":{"10":{"name":"k"},"2":{"name":"c"},"0":{"name":"a"}},"forces":{"11":{},"3":{}}}`)
+	s := mustDecodeSettings(t, `{"players":{"10":{"name":"k"},"2":{"name":"c"},"0":{"name":"a"}},"forces":{"11":{},"3":{}}}`)
 	if got := SortedSlots(s.Players); !slices.Equal(got, []int{0, 2, 10}) {
 		t.Errorf("players = %v", got)
 	}
 	if got := SortedSlots(s.Forces); !slices.Equal(got, []int{3, 11}) {
 		t.Errorf("forces = %v", got)
 	}
-	if text(s.Players[10].Name) != "k" || text(s.Players[2].Name) != "c" || text(s.Players[0].Name) != "a" {
+	if derefOrNil(s.Players[10].Name) != "k" || derefOrNil(s.Players[2].Name) != "c" || derefOrNil(s.Players[0].Name) != "a" {
 		t.Errorf("players = %+v, want each under the number of its slot", s.Players)
 	}
 }

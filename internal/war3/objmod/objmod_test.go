@@ -92,16 +92,16 @@ func mustAppend(t *testing.T, source []byte, kind objmod.TableKind, added []objm
 
 func refusal(t *testing.T, what string, err error, displayPath, words string) {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Errorf("%s: got %v, want a *diag.Error", what, err)
 		return
 	}
-	if failure.File != displayPath || !strings.Contains(failure.Msg, words) {
-		t.Errorf("%s: error %q of file %s, want file %s and a message with %q", what, failure.Msg, failure.File, displayPath, words)
+	if diagErr.File != displayPath || !strings.Contains(diagErr.Msg, words) {
+		t.Errorf("%s: error %q of file %s, want file %s and a message with %q", what, diagErr.Msg, diagErr.File, displayPath, words)
 	}
-	if !strings.Contains(failure.Hint, "World Editor 3.00") {
-		t.Errorf("%s: hint %q, want one that points to World Editor 3.00", what, failure.Hint)
+	if !strings.Contains(diagErr.Hint, "World Editor 3.00") {
+		t.Errorf("%s: hint %q, want one that points to World Editor 3.00", what, diagErr.Hint)
 	}
 }
 

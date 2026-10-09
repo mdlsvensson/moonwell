@@ -20,11 +20,11 @@ var background = context.Background()
 
 func asError(t testing.TB, err error, what string) *diag.Error {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
 	}
-	return failure
+	return diagErr
 }
 
 func shown(text *string) string {
@@ -49,23 +49,23 @@ var linkedLocks = []string{"a link to a lock", "a link to nothing", "a link to a
 
 func linkTheLock(t *testing.T, kind, root, beside string) {
 	t.Helper()
-	link, target := filepath.Join(root, lockFile), filepath.Join(beside, "nothing.lock")
+	symlink, target := filepath.Join(root, lockFile), filepath.Join(beside, "nothing.lock")
 	switch kind {
 	case "a link to a folder":
 		testkit.WriteFile(t, beside, "folder/kept.txt", []byte("kept"))
-		testkit.LinkDir(t, filepath.Join(beside, "folder"), link)
+		testkit.LinkDir(t, filepath.Join(beside, "folder"), symlink)
 		return
 	case "a link to a lock":
 		target = testkit.WriteFile(t, beside, "their.lock", []byte(formatLock(map[string]lockEntry{"ex": entryOfTest(nil)})))
 	}
-	testkit.LinkFile(t, target, link)
+	testkit.LinkFile(t, target, symlink)
 }
 
 func refusedLink(t *testing.T, err error, what, path, file string) {
 	t.Helper()
-	failure := asError(t, err, what)
-	if failure.Msg != "Symlinks are not supported: "+path || failure.File != file || !strings.Contains(failure.Hint, "real files") {
-		t.Errorf("%s: %+v", what, failure)
+	diagErr := asError(t, err, what)
+	if diagErr.Msg != "Symlinks are not supported: "+path || diagErr.File != file || !strings.Contains(diagErr.Hint, "real files") {
+		t.Errorf("%s: %+v", what, diagErr)
 	}
 }
 

@@ -109,10 +109,10 @@ func TestReadLockRefusesALockFileItCannotRead(t *testing.T) {
 	for _, c := range cases {
 		testkit.WriteFile(t, root, lockFile, []byte(c.content))
 		lock, err := readLock(root)
-		failure := asError(t, err, c.content)
-		if lock != nil || failure.Msg != lockFile+" "+c.says || failure.File != lockFile ||
-			!strings.Contains(failure.Hint, lockHintWords) {
-			t.Errorf("%s: %v, %+v", c.content, lock, failure)
+		diagErr := asError(t, err, c.content)
+		if lock != nil || diagErr.Msg != lockFile+" "+c.says || diagErr.File != lockFile ||
+			!strings.Contains(diagErr.Hint, lockHintWords) {
+			t.Errorf("%s: %v, %+v", c.content, lock, diagErr)
 		}
 	}
 }
@@ -147,8 +147,8 @@ func TestAByteOfALockThatIsNotUTF8ReadsAsAReplacementCharacter(t *testing.T) {
 	}
 	testkit.WriteFile(t, root, lockFile, []byte("{\"libraries\":{}}\xff"))
 	_, err := readLock(root)
-	if failure := asError(t, err, "a byte after the document"); !strings.Contains(failure.Msg, "is not valid JSON") {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asError(t, err, "a byte after the document"); !strings.Contains(diagErr.Msg, "is not valid JSON") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -158,10 +158,10 @@ func TestALockThatCannotBeReadIsRefusedByItsName(t *testing.T) {
 		t.Fatal(err)
 	}
 	lock, err := readLock(root)
-	failure := asError(t, err, "a folder in place of the lock")
-	if lock != nil || !strings.HasPrefix(failure.Msg, "Reading moonwell.lock failed: ") || failure.File != lockFile ||
-		!strings.Contains(failure.Hint, lockHintWords) || failure.Cause == nil || strings.Contains(failure.Msg, root) {
-		t.Errorf("readLock = %v, %+v", lock, failure)
+	diagErr := asError(t, err, "a folder in place of the lock")
+	if lock != nil || !strings.HasPrefix(diagErr.Msg, "Reading moonwell.lock failed: ") || diagErr.File != lockFile ||
+		!strings.Contains(diagErr.Hint, lockHintWords) || diagErr.Cause == nil || strings.Contains(diagErr.Msg, root) {
+		t.Errorf("readLock = %v, %+v", lock, diagErr)
 	}
 }
 
@@ -255,10 +255,10 @@ func TestALockThatCannotBeWrittenOrRemovedIsRefusedByItsName(t *testing.T) {
 	for name, entries := range map[string]map[string]lockEntry{"Writing": {"a": entryOfTest(nil)}, "Removing": nil} {
 		root := t.TempDir()
 		testkit.WriteFile(t, root, lockFile+"/in the way", nil)
-		failure := asError(t, writeLock(root, entries), name)
-		if !strings.HasPrefix(failure.Msg, name+" moonwell.lock failed: ") || failure.File != lockFile ||
-			!strings.Contains(failure.Hint, "Close programs that have moonwell.lock open") || failure.Cause == nil {
-			t.Errorf("%s: %+v", name, failure)
+		diagErr := asError(t, writeLock(root, entries), name)
+		if !strings.HasPrefix(diagErr.Msg, name+" moonwell.lock failed: ") || diagErr.File != lockFile ||
+			!strings.Contains(diagErr.Hint, "Close programs that have moonwell.lock open") || diagErr.Cause == nil {
+			t.Errorf("%s: %+v", name, diagErr)
 		}
 		if !fsx.Exists(filepath.Join(root, lockFile, "in the way")) {
 			t.Errorf("%s: the folder in the lock's place lost its file", name)

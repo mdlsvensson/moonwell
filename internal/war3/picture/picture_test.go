@@ -26,18 +26,18 @@ type refusal struct {
 func (r refusal) check(t *testing.T) *diag.Error {
 	t.Helper()
 	result, err := picture.Read(r.data, r.file)
-	var failure *diag.Error
-	if !errors.As(err, &failure) || failure.File != r.file {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) || diagErr.File != r.file {
 		t.Errorf("%s: got %v, want an error naming %s", r.name, err, r.file)
 		return nil
 	}
-	if !strings.Contains(failure.Msg, r.words) || failure.Hint == "" {
-		t.Errorf("%s: message %q, hint %q, want a message with %q and a hint", r.name, failure.Msg, failure.Hint, r.words)
+	if !strings.Contains(diagErr.Msg, r.words) || diagErr.Hint == "" {
+		t.Errorf("%s: message %q, hint %q, want a message with %q and a hint", r.name, diagErr.Msg, diagErr.Hint, r.words)
 	}
 	if result != nil {
 		t.Errorf("%s: a refused picture returned %d bytes", r.name, len(result.Data))
 	}
-	return failure
+	return diagErr
 }
 
 func opaque() *byte {
@@ -188,8 +188,8 @@ func sizeRefusals() []refusal {
 
 func TestOnlyTheTwoSizesSeenToWorkAreAccepted(t *testing.T) {
 	for _, c := range sizeRefusals() {
-		if failure := c.check(t); failure != nil && !strings.Contains(failure.Hint, "256x256") {
-			t.Errorf("%s: hint = %q", c.name, failure.Hint)
+		if diagErr := c.check(t); diagErr != nil && !strings.Contains(diagErr.Hint, "256x256") {
+			t.Errorf("%s: hint = %q", c.name, diagErr.Hint)
 		}
 	}
 }
@@ -247,9 +247,9 @@ func blpRefusals() []refusal {
 
 func TestABLPTheGameCouldNotReadIsRefused(t *testing.T) {
 	for _, c := range blpRefusals() {
-		failure := c.check(t)
-		if c.name == "a BLP2" && failure != nil && !strings.Contains(failure.Hint, "BLP1") {
-			t.Errorf("%s: hint = %q", c.name, failure.Hint)
+		diagErr := c.check(t)
+		if c.name == "a BLP2" && diagErr != nil && !strings.Contains(diagErr.Hint, "BLP1") {
+			t.Errorf("%s: hint = %q", c.name, diagErr.Hint)
 		}
 	}
 }
@@ -286,8 +286,8 @@ func TestAPNGOfAnyKindGoesInAsTheTGAThatATGAOfTheSamePictureGives(t *testing.T) 
 
 func withAlpha(alpha byte) testkit.Pixels {
 	source := testkit.NewPixels(256)
-	for at := 3; at < len(source.RGBA); at += 4 {
-		source.RGBA[at] = alpha
+	for index := 3; index < len(source.RGBA); index += 4 {
+		source.RGBA[index] = alpha
 	}
 	return source
 }
@@ -377,8 +377,8 @@ func pngSizeRefusals() []refusal {
 
 func TestAPNGsSizeIsJudgedBeforeItsPixelsAreRead(t *testing.T) {
 	for _, c := range pngSizeRefusals() {
-		if failure := c.check(t); failure != nil && !strings.Contains(failure.Hint, "256x256") {
-			t.Errorf("%s: hint = %q", c.name, failure.Hint)
+		if diagErr := c.check(t); diagErr != nil && !strings.Contains(diagErr.Hint, "256x256") {
+			t.Errorf("%s: hint = %q", c.name, diagErr.Hint)
 		}
 	}
 }
@@ -415,18 +415,18 @@ func damagedPNGRefusals() []refusal {
 
 func TestAFileThatIsNotAReadablePNGIsRefused(t *testing.T) {
 	for _, c := range notPNGRefusals() {
-		if failure := c.check(t); failure != nil && !strings.Contains(failure.Hint, "PNG") {
-			t.Errorf("%s: hint = %q", c.name, failure.Hint)
+		if diagErr := c.check(t); diagErr != nil && !strings.Contains(diagErr.Hint, "PNG") {
+			t.Errorf("%s: hint = %q", c.name, diagErr.Hint)
 		}
 	}
 	for _, c := range damagedPNGRefusals() {
-		failure := c.check(t)
-		if failure == nil {
+		diagErr := c.check(t)
+		if diagErr == nil {
 			continue
 		}
-		if failure.Cause == nil || !strings.HasSuffix(failure.Msg, ".") || strings.HasSuffix(failure.Msg, "..") ||
-			strings.Contains(failure.Msg, "png: ") || !strings.Contains(failure.Hint, "PNG") {
-			t.Errorf("%s: %+v", c.name, failure)
+		if diagErr.Cause == nil || !strings.HasSuffix(diagErr.Msg, ".") || strings.HasSuffix(diagErr.Msg, "..") ||
+			strings.Contains(diagErr.Msg, "png: ") || !strings.Contains(diagErr.Hint, "PNG") {
+			t.Errorf("%s: %+v", c.name, diagErr)
 		}
 	}
 }
@@ -459,8 +459,8 @@ func otherFormatRefusals() []refusal {
 
 func TestTheExtensionDecidesHowAPictureIsReadAndAnotherExtensionIsRefused(t *testing.T) {
 	for _, c := range nameRefusals() {
-		if failure := c.check(t); failure != nil && !strings.Contains(failure.Hint, "TGA") {
-			t.Errorf("%s: hint = %q", c.name, failure.Hint)
+		if diagErr := c.check(t); diagErr != nil && !strings.Contains(diagErr.Hint, "TGA") {
+			t.Errorf("%s: hint = %q", c.name, diagErr.Hint)
 		}
 	}
 	for _, c := range otherFormatRefusals() {

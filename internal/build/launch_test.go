@@ -28,7 +28,7 @@ func TestLaunchExplainsAMissingOrWrongExecutable(t *testing.T) {
 		"Warcraft III.exe."
 	const fix = "Fix launch.gameExecutable in moonwell.local.pkl to point at Warcraft III.exe."
 	missing := filepath.Join(t.TempDir(), "Warcraft III.exe")
-	folder := t.TempDir()
+	dir := t.TempDir()
 	tests := []struct {
 		name   string
 		launch manifest.Launch
@@ -38,13 +38,13 @@ func TestLaunchExplainsAMissingOrWrongExecutable(t *testing.T) {
 		{"no executable", manifest.Launch{}, "launch.gameExecutable is not set.", set},
 		{"a missing executable", manifest.Launch{GameExecutable: &missing},
 			"Game executable not found: " + missing, fix},
-		{"a folder", manifest.Launch{GameExecutable: &folder}, "Game executable " + folder + " is not a file.", fix},
+		{"a folder", manifest.Launch{GameExecutable: &dir}, "Game executable " + dir + " is not a file.", fix},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			failure := asError(t, launch(e, tt.launch, "map"), tt.name)
-			if failure.Msg != tt.msg || failure.File != "moonwell.local.pkl" || failure.Hint != tt.hint {
-				t.Errorf("error = %+v", failure)
+			diagErr := asError(t, launch(e, tt.launch, "map"), tt.name)
+			if diagErr.Msg != tt.msg || diagErr.File != "moonwell.local.pkl" || diagErr.Hint != tt.hint {
+				t.Errorf("error = %+v", diagErr)
 			}
 		})
 	}
@@ -71,9 +71,9 @@ func TestLaunchReportsAGameThatFailsToStart(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
 	e.Spawn = env.SpawnDetached
 	game := testkit.WriteFile(t, t.TempDir(), "Warcraft III.exe", []byte("not a program"))
-	failure := asError(t, launch(e, manifest.Launch{GameExecutable: &game}, "map"), "not a program")
-	if !strings.HasPrefix(failure.Msg, "Cannot run '"+game+"': ") || failure.File != "moonwell.local.pkl" ||
-		!strings.Contains(failure.Hint, "moonwell.local.pkl") || failure.Cause == nil {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, launch(e, manifest.Launch{GameExecutable: &game}, "map"), "not a program")
+	if !strings.HasPrefix(diagErr.Msg, "Cannot run '"+game+"': ") || diagErr.File != "moonwell.local.pkl" ||
+		!strings.Contains(diagErr.Hint, "moonwell.local.pkl") || diagErr.Cause == nil {
+		t.Errorf("error = %+v", diagErr)
 	}
 }

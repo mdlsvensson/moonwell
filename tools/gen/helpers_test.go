@@ -58,11 +58,11 @@ func (c checkout) write(name, text string) {
 
 func (c checkout) folder(name string) string {
 	c.t.Helper()
-	folder := c.path(name)
-	if err := os.MkdirAll(folder, 0o777); err != nil {
+	dir := c.path(name)
+	if err := os.MkdirAll(dir, 0o777); err != nil {
 		c.t.Fatal(err)
 	}
-	return folder
+	return dir
 }
 
 func (c checkout) carry(names ...string) {
@@ -139,13 +139,13 @@ func withGoMod(files map[string]string) map[string]string {
 func (c checkout) outputs() map[string][]byte {
 	c.t.Helper()
 	found := map[string][]byte{}
-	for _, folder := range outputFolders {
-		if !fsx.IsDir(c.path(folder)) {
+	for _, dir := range outputFolders {
+		if !fsx.IsDir(c.path(dir)) {
 			continue
 		}
-		found[folder] = nil
-		for name, data := range testkit.Snapshot(c.t, c.path(folder)) {
-			found[folder+"/"+name] = data
+		found[dir] = nil
+		for name, data := range testkit.Snapshot(c.t, c.path(dir)) {
+			found[dir+"/"+name] = data
 		}
 	}
 	return found
@@ -474,19 +474,19 @@ func contains(t testing.TB, text string, parts ...string) {
 }
 
 func parting(want, got string) string {
-	at := partingOffset(want, got)
+	index := partingOffset(want, got)
 	return fmt.Sprintf("the two part at offset %d, where the line wanted is %q and the line got is %q",
-		at, lineAt(want, at), lineAt(got, at))
+		index, lineAt(want, index), lineAt(got, index))
 }
 
 func firstLine(text string) string { return lineAt(text, 0) }
 
 func partingOffset(a, b string) int {
-	at := 0
-	for at < len(a) && at < len(b) && a[at] == b[at] {
-		at++
+	index := 0
+	for index < len(a) && index < len(b) && a[index] == b[index] {
+		index++
 	}
-	return at
+	return index
 }
 
 func lineAt(text string, offset int) string {

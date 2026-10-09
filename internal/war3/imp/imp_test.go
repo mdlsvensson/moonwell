@@ -107,13 +107,13 @@ func TestReadRefusesCorruptDataNamingTheFile(t *testing.T) {
 		{"more entries than the count", index(1, 1, entry(13, "a.blp"), entry(13, "b.blp")), "trailing"},
 	} {
 		entries, err := imp.Read(c.data, indexFile)
-		var failure *diag.Error
-		if !errors.As(err, &failure) || failure.File != indexFile {
+		var diagErr *diag.Error
+		if !errors.As(err, &diagErr) || diagErr.File != indexFile {
 			t.Errorf("%s: got %v, want an error naming %s", c.name, err, indexFile)
 			continue
 		}
-		if !strings.Contains(failure.Msg, c.words) || failure.Hint == "" {
-			t.Errorf("%s: message %q, hint %q, want a message with %q and a hint", c.name, failure.Msg, failure.Hint, c.words)
+		if !strings.Contains(diagErr.Msg, c.words) || diagErr.Hint == "" {
+			t.Errorf("%s: message %q, hint %q, want a message with %q and a hint", c.name, diagErr.Msg, diagErr.Hint, c.words)
 		}
 		if entries != nil {
 			t.Errorf("%s: a refused file returned %+v", c.name, entries)

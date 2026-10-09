@@ -49,11 +49,11 @@ func settingsCheckFails(t *testing.T, root, what string) *diag.Error {
 	t.Helper()
 	e, log, _ := pklOnly(t, root)
 	_, err := commandIn(t, background, e, "settings:check")
-	failure := asError(t, err, what)
+	diagErr := asError(t, err, what)
 	if lines := log.Lines(); len(lines) != 0 {
 		t.Errorf("%s: settings:check logged %q before it failed", what, lines)
 	}
-	return failure
+	return diagErr
 }
 
 func TestPklSettingsCheckWithoutStagingOrCompiler(t *testing.T) {
@@ -167,10 +167,10 @@ func TestPklSettingsErrorsNameLocalManifest(t *testing.T) {
 			"FoodCeiling"},
 	} {
 		writeLocal(t, root, c.body)
-		failure := settingsCheckFails(t, root, c.message)
-		contains(t, failure.Msg, c.message)
-		if failure.File != "moonwell.local.pkl" {
-			t.Errorf("%s: the error names %q", c.message, failure.File)
+		diagErr := settingsCheckFails(t, root, c.message)
+		contains(t, diagErr.Msg, c.message)
+		if diagErr.File != "moonwell.local.pkl" {
+			t.Errorf("%s: the error names %q", c.message, diagErr.File)
 		}
 		failsWithPklAlone(t, root, []string{"error: moonwell.local.pkl"}, "settings:check")
 	}
@@ -193,8 +193,8 @@ func TestPklSettingsUnsafeLuaNamesMapFile(t *testing.T) {
 	removeMapNameCall(t, root)
 	before := testkit.Snapshot(t, filepath.Join(root, "maps"))
 	writeLocal(t, root, `settings { info { name = "No call" } }`)
-	if failure := settingsCheckFails(t, root, "a script without the call"); failure.File != "maps/map.w3x/war3map.lua" {
-		t.Fatalf("error = %+v", failure)
+	if diagErr := settingsCheckFails(t, root, "a script without the call"); diagErr.File != "maps/map.w3x/war3map.lua" {
+		t.Fatalf("error = %+v", diagErr)
 	}
 	sameFiles(t, before, testkit.Snapshot(t, filepath.Join(root, "maps")), "a script without the call")
 }
@@ -202,10 +202,10 @@ func TestPklSettingsUnsafeLuaNamesMapFile(t *testing.T) {
 func TestPklSettingsMissingMapNamesManifest(t *testing.T) {
 	root := newProject(t, "map")
 	writeLocal(t, root, "map { folder = \"other.w3x\" }\nsettings { info { name = \"x\" } }")
-	failure := settingsCheckFails(t, root, "a map that is not there")
-	contains(t, failure.Msg, "not found")
-	if failure.File != "moonwell.local.pkl" {
-		t.Fatal(failure.File)
+	diagErr := settingsCheckFails(t, root, "a map that is not there")
+	contains(t, diagErr.Msg, "not found")
+	if diagErr.File != "moonwell.local.pkl" {
+		t.Fatal(diagErr.File)
 	}
 }
 
@@ -243,16 +243,16 @@ func TestPklSettingsPreviewChangesAndNamedErrors(t *testing.T) {
 	sameFiles(t, before, testkit.Snapshot(t, filepath.Join(root, "maps")), "preview planning")
 
 	writeLocal(t, root, `settings { info { preview = "missing.tga" } }`)
-	failure := settingsCheckFails(t, root, "a preview that is not there")
-	contains(t, failure.Msg, "settings.info.preview names a file that does not exist: missing.tga")
-	if failure.File != "moonwell.local.pkl" {
-		t.Fatal(failure.File)
+	diagErr := settingsCheckFails(t, root, "a preview that is not there")
+	contains(t, diagErr.Msg, "settings.info.preview names a file that does not exist: missing.tga")
+	if diagErr.File != "moonwell.local.pkl" {
+		t.Fatal(diagErr.File)
 	}
 	testkit.WriteFile(t, root, "preview.blp", testkit.TGA(testkit.NewPixels(256), testkit.TGAOptions{}))
 	writeLocal(t, root, `settings { info { preview = "preview.blp" } }`)
-	failure = settingsCheckFails(t, root, "a preview of another kind than its name says")
-	contains(t, failure.Msg, "The preview picture is not a BLP file")
-	if failure.File != "preview.blp" {
-		t.Fatal(failure.File)
+	diagErr = settingsCheckFails(t, root, "a preview of another kind than its name says")
+	contains(t, diagErr.Msg, "The preview picture is not a BLP file")
+	if diagErr.File != "preview.blp" {
+		t.Fatal(diagErr.File)
 	}
 }

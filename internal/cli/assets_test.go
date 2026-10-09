@@ -214,10 +214,10 @@ func TestPklAssetsCommandsNeedTheMapsScriptAndItsInfoFile(t *testing.T) {
 			for _, command := range []string{"assets:check", "assets:sync"} {
 				e, log, _ := pklOnly(t, root)
 				_, err := commandIn(t, background, e, command)
-				failure := asError(t, err, command+" in a map whose "+name+" "+what)
-				if !strings.Contains(failure.Msg, "source map has no "+name) || failure.File != "maps/map.w3x" ||
-					!strings.Contains(failure.Hint, "Lua as the script language") {
-					t.Errorf("%s, %s %s: error = %+v", command, name, what, failure)
+				diagErr := asError(t, err, command+" in a map whose "+name+" "+what)
+				if !strings.Contains(diagErr.Msg, "source map has no "+name) || diagErr.File != "maps/map.w3x" ||
+					!strings.Contains(diagErr.Hint, "Lua as the script language") {
+					t.Errorf("%s, %s %s: error = %+v", command, name, what, diagErr)
 				}
 				if lines := log.Lines(); len(lines) != 0 {
 					t.Errorf("%s, %s %s: logged %q", command, name, what, lines)
@@ -237,10 +237,10 @@ func TestPklAssetsCommandsNeedTheSourceMap(t *testing.T) {
 	for _, command := range []string{"assets:check", "assets:sync"} {
 		e, _, _ := pklOnly(t, root)
 		_, err := commandIn(t, background, e, command)
-		failure := asError(t, err, command+" without the map")
-		if failure.File != "moonwell.local.pkl" || failure.Hint == "" ||
-			!strings.Contains(failure.Msg, "Source map folder maps/map.w3x not found") {
-			t.Errorf("%s: error = %+v", command, failure)
+		diagErr := asError(t, err, command+" without the map")
+		if diagErr.File != "moonwell.local.pkl" || diagErr.Hint == "" ||
+			!strings.Contains(diagErr.Msg, "Source map folder maps/map.w3x not found") {
+			t.Errorf("%s: error = %+v", command, diagErr)
 		}
 	}
 	if exists(root, "maps/map.w3x") || exists(root, ".asset-state") {
@@ -254,10 +254,10 @@ func TestPklAssetsCommandsAreRefusedBesideARunningBuild(t *testing.T) {
 	for _, command := range []string{"assets:check", "assets:sync"} {
 		e, log, _ := pklOnly(t, root)
 		_, err := commandIn(t, background, e, command)
-		failure := asError(t, err, command+" beside a build")
-		if failure.File != "dist/.lock" || failure.Hint == "" ||
-			!strings.Contains(failure.Msg, "Another Moonwell build is running") {
-			t.Errorf("%s: error = %+v", command, failure)
+		diagErr := asError(t, err, command+" beside a build")
+		if diagErr.File != "dist/.lock" || diagErr.Hint == "" ||
+			!strings.Contains(diagErr.Msg, "Another Moonwell build is running") {
+			t.Errorf("%s: error = %+v", command, diagErr)
 		}
 		if lines := log.Lines(); len(lines) != 0 {
 			t.Errorf("%s logged %q", command, lines)

@@ -146,13 +146,13 @@ func TestTheHelpNamesEveryCommandAndEveryFlag(t *testing.T) {
 			t.Errorf("%q: exit %d, ran %q, on the terminal %q:\n%s", args, got.code, got.ran, got.output, got.stdout)
 			continue
 		}
-		at := 0
+		index := 0
 		for _, name := range append(names(commands), "help", "completion") {
-			next := strings.Index(got.stdout[at:], "\n  "+name+" ")
+			next := strings.Index(got.stdout[index:], "\n  "+name+" ")
 			if next < 0 {
 				t.Fatalf("%q: the help lacks %s, or lists it out of the table's order:\n%s", args, name, got.stdout)
 			}
-			at += next
+			index += next
 		}
 		for _, c := range commands {
 			contains(t, got.stdout, c.help)

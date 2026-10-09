@@ -13,13 +13,13 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func put(name, content string) Change { return Change{Path: name, Data: []byte(content)} }
-func drop(name string) Change         { return Change{Path: name, Remove: true} }
+func newWrite(name, content string) Change { return Change{Path: name, Data: []byte(content)} }
+func newRemoval(name string) Change        { return Change{Path: name, Remove: true} }
 
 func TestAViewSeesWhatWasPlannedAndItsFolderDoesNot(t *testing.T) {
-	folder, dir := open(t, map[string]string{"a.txt": "old", "gone.txt": "leaving", "kept.txt": "kept"})
+	folder, dir := openFolder(t, map[string]string{"a.txt": "old", "gone.txt": "leaving", "kept.txt": "kept"})
 	before := testkit.Snapshot(t, dir)
-	view := folder.WithChanges([]Change{put("a.txt", "new"), drop("gone.txt"), put("made.txt", "made")})
+	view := folder.WithChanges([]Change{newWrite("a.txt", "new"), newRemoval("gone.txt"), newWrite("made.txt", "made")})
 
 	cases := []struct {
 		name            string
@@ -31,13 +31,13 @@ func TestAViewSeesWhatWasPlannedAndItsFolderDoesNot(t *testing.T) {
 		{"made.txt", "made", "<missing>"},
 	}
 	for _, c := range cases {
-		if got := read(t, view, c.name); got != c.inView {
+		if got := readFile(t, view, c.name); got != c.inView {
 			t.Errorf("the view reads %s as %q, want %q", c.name, got, c.inView)
 		}
 		if got := view.HasFile(c.name); got != (c.inView != "<missing>") {
 			t.Errorf("the view's Has(%q) = %v", c.name, got)
 		}
-		if got := read(t, folder, c.name); got != c.inFirst {
+		if got := readFile(t, folder, c.name); got != c.inFirst {
 			t.Errorf("the folder it came from reads %s as %q, want %q", c.name, got, c.inFirst)
 		}
 		if got := folder.HasFile(c.name); got != (c.inFirst != "<missing>") {
@@ -66,55 +66,55 @@ func TestChangesHoldsEachFileOnceInTheOrderFirstPlanned(t *testing.T) {
 		want  []Change
 	}{
 		{"every planned write is a change, even of the bytes the file has",
-			[][]Change{{put("a.txt", "a")}}, []Change{put("a.txt", "a")}},
+			[][]Change{{newWrite("a.txt", "a")}}, []Change{newWrite("a.txt", "a")}},
 		{"a later change replaces the earlier one where it stands",
-			[][]Change{{put("a.txt", "1"), put("b.txt", "1")}, {put("a.txt", "2")}},
-			[]Change{put("a.txt", "2"), put("b.txt", "1")}},
+			[][]Change{{newWrite("a.txt", "1"), newWrite("b.txt", "1")}, {newWrite("a.txt", "2")}},
+			[]Change{newWrite("a.txt", "2"), newWrite("b.txt", "1")}},
 		{"within one call too",
-			[][]Change{{put("a.txt", "1"), put("b.txt", "1"), put("a.txt", "2")}},
-			[]Change{put("a.txt", "2"), put("b.txt", "1")}},
+			[][]Change{{newWrite("a.txt", "1"), newWrite("b.txt", "1"), newWrite("a.txt", "2")}},
+			[]Change{newWrite("a.txt", "2"), newWrite("b.txt", "1")}},
 		{"a change lands on the spelling the file has",
-			[][]Change{{put("war3mapSkin.txt", "new"), drop("A.TXT")}},
-			[]Change{put("war3mapskin.txt", "new"), drop("a.txt")}},
+			[][]Change{{newWrite("war3mapSkin.txt", "new"), newRemoval("A.TXT")}},
+			[]Change{newWrite("war3mapskin.txt", "new"), newRemoval("a.txt")}},
 		{"and on the spelling an earlier change gave a new file",
-			[][]Change{{put("New.txt", "1")}, {put("NEW.TXT", "2")}}, []Change{put("New.txt", "2")}},
+			[][]Change{{newWrite("New.txt", "1")}, {newWrite("NEW.TXT", "2")}}, []Change{newWrite("New.txt", "2")}},
 		{"a new file is named as given, with forward slashes",
-			[][]Change{{put(`Textures\New.blp`, "new")}}, []Change{put("Textures/New.blp", "new")}},
+			[][]Change{{newWrite(`Textures\New.blp`, "new")}}, []Change{newWrite("Textures/New.blp", "new")}},
 		{"removing a file the view does not have does nothing",
-			[][]Change{{drop("missing.txt")}}, []Change{}},
+			[][]Change{{newRemoval("missing.txt")}}, []Change{}},
 		{"a file removed twice is removed once",
-			[][]Change{{drop("a.txt")}, {drop("A.txt")}}, []Change{drop("a.txt")}},
+			[][]Change{{newRemoval("a.txt")}, {newRemoval("A.txt")}}, []Change{newRemoval("a.txt")}},
 		{"a file removed and written again is one write, under the spelling it has",
-			[][]Change{{drop("a.txt"), put("b.txt", "1")}, {put("A.TXT", "back")}},
-			[]Change{put("a.txt", "back"), put("b.txt", "1")}},
+			[][]Change{{newRemoval("a.txt"), newWrite("b.txt", "1")}, {newWrite("A.TXT", "back")}},
+			[]Change{newWrite("a.txt", "back"), newWrite("b.txt", "1")}},
 		{"a new file that is removed again changes nothing",
-			[][]Change{{put("new.txt", "1"), put("b.txt", "1"), put("other.txt", "1")}, {drop("NEW.txt")}},
-			[]Change{put("b.txt", "1"), put("other.txt", "1")}},
+			[][]Change{{newWrite("new.txt", "1"), newWrite("b.txt", "1"), newWrite("other.txt", "1")}, {newRemoval("NEW.txt")}},
+			[]Change{newWrite("b.txt", "1"), newWrite("other.txt", "1")}},
 		{"and written once more it is planned last",
-			[][]Change{{put("new.txt", "1"), put("b.txt", "1")}, {drop("new.txt")}, {put("new.txt", "2")}},
-			[]Change{put("b.txt", "1"), put("new.txt", "2")}},
+			[][]Change{{newWrite("new.txt", "1"), newWrite("b.txt", "1")}, {newRemoval("new.txt")}, {newWrite("new.txt", "2")}},
+			[]Change{newWrite("b.txt", "1"), newWrite("new.txt", "2")}},
 		{"a new file removed in the call that planned it changes nothing",
-			[][]Change{{put("new.txt", "1"), put("b.txt", "1"), drop("NEW.txt"), put("other.txt", "1")}},
-			[]Change{put("b.txt", "1"), put("other.txt", "1")}},
+			[][]Change{{newWrite("new.txt", "1"), newWrite("b.txt", "1"), newRemoval("NEW.txt"), newWrite("other.txt", "1")}},
+			[]Change{newWrite("b.txt", "1"), newWrite("other.txt", "1")}},
 		{"and written once more in that call it is planned last, as it is then named",
-			[][]Change{{put("new.txt", "1"), put("b.txt", "1"), drop("new.txt"), put("New.txt", "2")}},
-			[]Change{put("b.txt", "1"), put("New.txt", "2")}},
+			[][]Change{{newWrite("new.txt", "1"), newWrite("b.txt", "1"), newRemoval("new.txt"), newWrite("New.txt", "2")}},
+			[]Change{newWrite("b.txt", "1"), newWrite("New.txt", "2")}},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			view, _ := open(t, disk)
+			view, _ := openFolder(t, disk)
 			for _, step := range c.steps {
 				view = view.WithChanges(step)
 			}
 			if got := view.Changes(); !slices.EqualFunc(got, c.want, sameChange) {
-				t.Errorf("Changes = %s, want %s", show(got), show(c.want))
+				t.Errorf("Changes = %s, want %s", formatChanges(got), formatChanges(c.want))
 			}
 			for _, change := range c.want {
 				content := string(change.Data)
 				if change.Remove {
 					content = "<missing>"
 				}
-				if got := read(t, view, change.Path); got != content {
+				if got := readFile(t, view, change.Path); got != content {
 					t.Errorf("the view reads %s as %q, want %q", change.Path, got, content)
 				}
 			}
@@ -143,18 +143,18 @@ func TestWithSpellsTheFoldersOfANewFileAsTheMapAndEarlierChangesDo(t *testing.T)
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			folder, _ := open(t, disk)
+			folder, _ := openFolder(t, disk)
 			view := folder
 			var given []string
 			for _, step := range c.steps {
 				var changes []Change
 				for _, name := range step {
-					changes = append(changes, put(name, name))
+					changes = append(changes, newWrite(name, name))
 				}
 				view = view.WithChanges(changes)
 				given = append(given, step...)
 			}
-			if got := names(view.Changes()); !slices.Equal(got, c.want) {
+			if got := changePaths(view.Changes()); !slices.Equal(got, c.want) {
 				t.Errorf("Changes names the files %q, want %q", got, c.want)
 			}
 			wantFiles := append([]string{"Textures/Old.blp", "war3map.lua"}, c.want...)
@@ -166,14 +166,14 @@ func TestWithSpellsTheFoldersOfANewFileAsTheMapAndEarlierChangesDo(t *testing.T)
 				if got := view.CanonicalPath(strings.ToUpper(name)); got != c.want[i] {
 					t.Errorf("Name of %s in capitals = %q, want %q", name, got, c.want[i])
 				}
-				if got := read(t, view, name); got != name {
+				if got := readFile(t, view, name); got != name {
 					t.Errorf("the view reads %s as %q", name, got)
 				}
 				placed, err := one.ResolveNewPath(name)
 				if err != nil || placed != c.want[i] {
 					t.Errorf("Place(%q) = %q, %v, want %q", name, placed, err, c.want[i])
 				}
-				one = one.WithChanges([]Change{put(name, name)})
+				one = one.WithChanges([]Change{newWrite(name, name)})
 				if got := one.CanonicalPath(name); got != placed {
 					t.Errorf("With stores %s as %q, Place said %q", name, got, placed)
 				}
@@ -201,12 +201,12 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			folder, _ := open(t, disk)
-			view := folder.WithChanges([]Change{put(c.given, "new")})
-			if got, want := names(view.Changes()), []string{c.stored}; !slices.Equal(got, want) {
+			folder, _ := openFolder(t, disk)
+			view := folder.WithChanges([]Change{newWrite(c.given, "new")})
+			if got, want := changePaths(view.Changes()), []string{c.stored}; !slices.Equal(got, want) {
 				t.Errorf("Changes names the files %q, want %q", got, want)
 			}
-			if got := read(t, view, "war3map.w3i"); got != "info" {
+			if got := readFile(t, view, "war3map.w3i"); got != "info" {
 				t.Errorf("the view reads war3map.w3i as %q", got)
 			}
 		})
@@ -214,15 +214,15 @@ func TestWithRespellsOnlyTheFoldersItKnowsAndLeavesTheRestOfANameAsGiven(t *test
 }
 
 func TestWithGivesTwoSpellingsOfAFolderOne(t *testing.T) {
-	folder, _ := open(t, map[string]string{"textures/Old.blp": "old"})
-	view := folder.WithChanges([]Change{put("Textures/new.blp", "new"), put("Sound/a.mp3", "a"), put("sound/b.mp3", "b")})
+	folder, _ := openFolder(t, map[string]string{"textures/Old.blp": "old"})
+	view := folder.WithChanges([]Change{newWrite("Textures/new.blp", "new"), newWrite("Sound/a.mp3", "a"), newWrite("sound/b.mp3", "b")})
 	want := []string{"textures/new.blp", "Sound/a.mp3", "Sound/b.mp3"}
-	if got := names(view.Changes()); !slices.Equal(got, want) {
+	if got := changePaths(view.Changes()); !slices.Equal(got, want) {
 		t.Errorf("Changes names the files %q, want %q", got, want)
 	}
 }
 
-func names(changes []Change) []string {
+func changePaths(changes []Change) []string {
 	listed := []string{}
 	for _, change := range changes {
 		listed = append(listed, change.Path)
@@ -231,7 +231,7 @@ func names(changes []Change) []string {
 }
 
 func TestWithLaysManyNewFilesInOneCallQuickly(t *testing.T) {
-	folder, _ := open(t, map[string]string{"war3map.w3i": "info"})
+	folder, _ := openFolder(t, map[string]string{"war3map.w3i": "info"})
 	const count = 20000
 	changes := make([]Change, count)
 	for i := range changes {
@@ -264,7 +264,7 @@ func sameChange(a, b Change) bool {
 	return a.Path == b.Path && a.Remove == b.Remove && string(a.Data) == string(b.Data)
 }
 
-func show(changes []Change) []string {
+func formatChanges(changes []Change) []string {
 	shown := []string{}
 	for _, change := range changes {
 		if change.Remove {
@@ -277,32 +277,32 @@ func show(changes []Change) []string {
 }
 
 func TestAViewOverAViewLeavesTheFirstAsItWas(t *testing.T) {
-	folder, _ := open(t, map[string]string{"a.txt": "a"})
-	first := folder.WithChanges([]Change{put("a.txt", "1"), put("new.txt", "1")})
-	second := first.WithChanges([]Change{put("A.txt", "2"), drop("new.txt"), put("more.txt", "2")})
-	if got, want := show(first.Changes()), []string{"a.txt=1", "new.txt=1"}; !slices.Equal(got, want) {
+	folder, _ := openFolder(t, map[string]string{"a.txt": "a"})
+	first := folder.WithChanges([]Change{newWrite("a.txt", "1"), newWrite("new.txt", "1")})
+	second := first.WithChanges([]Change{newWrite("A.txt", "2"), newRemoval("new.txt"), newWrite("more.txt", "2")})
+	if got, want := formatChanges(first.Changes()), []string{"a.txt=1", "new.txt=1"}; !slices.Equal(got, want) {
 		t.Errorf("the first view's Changes = %s, want %s", got, want)
 	}
-	if got, want := show(second.Changes()), []string{"a.txt=2", "more.txt=2"}; !slices.Equal(got, want) {
+	if got, want := formatChanges(second.Changes()), []string{"a.txt=2", "more.txt=2"}; !slices.Equal(got, want) {
 		t.Errorf("the second view's Changes = %s, want %s", got, want)
 	}
-	if got := read(t, first, "new.txt"); got != "1" {
+	if got := readFile(t, first, "new.txt"); got != "1" {
 		t.Errorf("the first view reads new.txt as %q", got)
 	}
 	listed := first.Changes()
-	listed[0] = drop("a.txt")
-	if got := read(t, first, "a.txt"); got != "1" {
+	listed[0] = newRemoval("a.txt")
+	if got := readFile(t, first, "a.txt"); got != "1" {
 		t.Errorf("after changing the list Changes returned, the view reads a.txt as %q", got)
 	}
 }
 
 func TestAViewKeepsTheSpellingOfAFileItRemoves(t *testing.T) {
-	folder, _ := open(t, map[string]string{"war3mapMap.blp": "minimap"})
-	view := folder.WithChanges([]Change{drop("war3mapmap.BLP")})
+	folder, _ := openFolder(t, map[string]string{"war3mapMap.blp": "minimap"})
+	view := folder.WithChanges([]Change{newRemoval("war3mapmap.BLP")})
 	if view.HasFile("war3mapMap.blp") {
 		t.Error("the view still has the file it removes")
 	}
-	if got := view.DisplayPath("WAR3MAPMAP.BLP"); got != label+"/war3mapMap.blp" {
+	if got := view.DisplayPath("WAR3MAPMAP.BLP"); got != mapDisplayPath+"/war3mapMap.blp" {
 		t.Errorf("Label = %q", got)
 	}
 	if got, want := view.Files(), []string{}; !slices.Equal(got, want) {
@@ -311,8 +311,8 @@ func TestAViewKeepsTheSpellingOfAFileItRemoves(t *testing.T) {
 }
 
 func TestPlaceKeepsTheSpellingOfFoldersAndFilesTheMapHas(t *testing.T) {
-	folder, _ := open(t, map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script", "Units/Hero/a.txt": ""})
-	planned := folder.WithChanges([]Change{put("Sound/Music/theme.mp3", "theme"), drop("Units/Hero/a.txt")})
+	folder, _ := openFolder(t, map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script", "Units/Hero/a.txt": ""})
+	planned := folder.WithChanges([]Change{newWrite("Sound/Music/theme.mp3", "theme"), newRemoval("Units/Hero/a.txt")})
 	cases := []struct {
 		view        *Folder
 		name, place string
@@ -338,28 +338,28 @@ func TestPlaceKeepsTheSpellingOfFoldersAndFilesTheMapHas(t *testing.T) {
 }
 
 func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
-	folder, _ := open(t, map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script"})
-	planned := folder.WithChanges([]Change{put("Sound/Music/theme.mp3", "theme")})
-	removing := folder.WithChanges([]Change{drop("WAR3MAP.LUA"), drop("textures/old.blp")})
+	folder, _ := openFolder(t, map[string]string{"Textures/Old.blp": "old", "war3map.lua": "script"})
+	planned := folder.WithChanges([]Change{newWrite("Sound/Music/theme.mp3", "theme")})
+	removing := folder.WithChanges([]Change{newRemoval("WAR3MAP.LUA"), newRemoval("textures/old.blp")})
 	cases := []struct {
 		view              *Folder
 		name, words, file string
 	}{
-		{folder, "WAR3MAP.LUA/x.txt", "war3map.lua in the map is a file, not a folder", label + "/war3map.lua"},
-		{removing, "WAR3MAP.LUA/x.txt", "war3map.lua in the map is a file, not a folder", label + "/war3map.lua"},
+		{folder, "WAR3MAP.LUA/x.txt", "war3map.lua in the map is a file, not a folder", mapDisplayPath + "/war3map.lua"},
+		{removing, "WAR3MAP.LUA/x.txt", "war3map.lua in the map is a file, not a folder", mapDisplayPath + "/war3map.lua"},
 		{removing, "textures/old.blp/deep/x.txt", "Textures/Old.blp in the map is a file, not a folder",
-			label + "/Textures/Old.blp"},
+			mapDisplayPath + "/Textures/Old.blp"},
 		{folder, "textures/old.blp/deep/x.txt", "Textures/Old.blp in the map is a file, not a folder",
-			label + "/Textures/Old.blp"},
+			mapDisplayPath + "/Textures/Old.blp"},
 		{planned, "sound/music/theme.mp3/x.txt", "Sound/Music/theme.mp3 in the map is a file, not a folder",
-			label + "/Sound/Music/theme.mp3"},
-		{folder, "textures", "textures would replace a folder in the map", label + "/Textures"},
-		{planned, "sound/MUSIC", "sound/MUSIC would replace a folder in the map", label + "/Sound/Music"},
-		{removing, "TEXTURES", "TEXTURES would replace a folder in the map", label + "/Textures"},
+			mapDisplayPath + "/Sound/Music/theme.mp3"},
+		{folder, "textures", "textures would replace a folder in the map", mapDisplayPath + "/Textures"},
+		{planned, "sound/MUSIC", "sound/MUSIC would replace a folder in the map", mapDisplayPath + "/Sound/Music"},
+		{removing, "TEXTURES", "TEXTURES would replace a folder in the map", mapDisplayPath + "/Textures"},
 	}
 	for _, c := range cases {
 		got, err := c.view.ResolveNewPath(c.name)
-		e := asError(t, err)
+		e := asDiagError(t, err)
 		if got != "" || !contains(e.Msg, c.words) || e.File != c.file || e.Hint == "" {
 			t.Errorf("Place(%q) = %q, %+v, want %q at %s", c.name, got, e, c.words, c.file)
 		}
@@ -370,14 +370,14 @@ func TestPlaceRefusesAWayThroughAFileAndANameThatIsAFolder(t *testing.T) {
 }
 
 func TestPlaceRefusesANameNoFileCanHaveAsItsCallersBug(t *testing.T) {
-	folder, _ := open(t, map[string]string{"war3map.w3i": "info", "Textures/Old.blp": "old"})
+	folder, _ := openFolder(t, map[string]string{"war3map.w3i": "info", "Textures/Old.blp": "old"})
 	unwritable := []string{
 		"", "/WAR3MAP.W3I", "//war3map.w3i", "/textures/New.blp", "a//b", "a/../b", "./war3map.w3i", "new/",
 		"../outside.txt", "textures//New.blp", `TEXTURES\..\WAR3MAP.W3I`, "what?.blp", "Sound/nul.mp3", "Sound/a.mp3 ",
 	}
 	for _, name := range unwritable {
 		placed, err := folder.ResolveNewPath(name)
-		text := asPlannersBug(t, err)
+		text := mustBePlainError(t, err)
 		if placed != "" || !contains(text, fmt.Sprintf("Cannot place %q", name)) || !contains(text, "relative path") {
 			t.Errorf("Place(%q) = %q, %q, want a refusal that names it", name, placed, text)
 		}
@@ -385,17 +385,17 @@ func TestPlaceRefusesANameNoFileCanHaveAsItsCallersBug(t *testing.T) {
 }
 
 func TestIsFolderIsAFolderTheScanFoundOrOneAPlannedChangeMakes(t *testing.T) {
-	dir := write(t, map[string]string{"Textures/Old.blp": "old", "Units/Hero/a.txt": "", "war3map.lua": "script"})
+	dir := writeFiles(t, map[string]string{"Textures/Old.blp": "old", "Units/Hero/a.txt": "", "war3map.lua": "script"})
 	if err := os.Mkdir(filepath.Join(dir, "Empty"), 0o777); err != nil {
 		t.Fatal(err)
 	}
-	folder, err := Open(dir, label)
+	folder, err := Open(dir, mapDisplayPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	planned := folder.WithChanges([]Change{put("Sound/Music/theme.mp3", "theme"), drop("Units/Hero/a.txt")})
-	takenBack := planned.WithChanges([]Change{drop("sound/music/THEME.mp3")})
-	oneLeft := planned.WithChanges([]Change{put("sound/Effects/hit.wav", "hit")}).WithChanges([]Change{drop("Sound/Music/theme.mp3")})
+	planned := folder.WithChanges([]Change{newWrite("Sound/Music/theme.mp3", "theme"), newRemoval("Units/Hero/a.txt")})
+	takenBack := planned.WithChanges([]Change{newRemoval("sound/music/THEME.mp3")})
+	oneLeft := planned.WithChanges([]Change{newWrite("sound/Effects/hit.wav", "hit")}).WithChanges([]Change{newRemoval("Sound/Music/theme.mp3")})
 	cases := []struct {
 		what string
 		view *Folder

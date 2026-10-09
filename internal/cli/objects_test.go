@@ -217,10 +217,10 @@ func TestPklObjectsCommandsNeedTheSourceMapAlsoWithoutObjects(t *testing.T) {
 	for _, name := range []string{"objects:eval", "objects:check"} {
 		e, log, _ := pklOnly(t, root)
 		printed, err := commandIn(t, background, e, name)
-		failure := asError(t, err, name+" without the map")
-		if failure.File != "moonwell.local.pkl" || failure.Hint == "" ||
-			!strings.Contains(failure.Msg, "Source map folder maps/map.w3x not found") {
-			t.Errorf("%s: error = %+v", name, failure)
+		diagErr := asError(t, err, name+" without the map")
+		if diagErr.File != "moonwell.local.pkl" || diagErr.Hint == "" ||
+			!strings.Contains(diagErr.Msg, "Source map folder maps/map.w3x not found") {
+			t.Errorf("%s: error = %+v", name, diagErr)
 		}
 		if len(printed) != 0 || len(log.Lines()) != 0 {
 			t.Errorf("%s printed %q and logged %q before it failed", name, printed, log.Lines())
@@ -285,17 +285,17 @@ func TestPklCheckRefusesMissingStaleBeforeCompile(t *testing.T) {
 	}
 	write(t, root, objects.IDsFile, onlyCaptain)
 	_, err = commandIn(t, background, e, "check")
-	failure := asError(t, err, "stale ids")
-	contains(t, failure.Msg, "does not match the objects in the manifest")
-	if failure.Hint != "Run moonwell build, test or dev to regenerate it." ||
+	diagErr := asError(t, err, "stale ids")
+	contains(t, diagErr.Msg, "does not match the objects in the manifest")
+	if diagErr.Hint != "Run moonwell build, test or dev to regenerate it." ||
 		read(t, root, objects.IDsFile) != onlyCaptain {
-		t.Fatal(failure)
+		t.Fatal(diagErr)
 	}
 	write(t, root, objects.IDsFile, strings.ReplaceAll(bothObjects, "\n", "\r\n"))
 	_, err = commandIn(t, background, e, "check")
-	failure = asError(t, err, "the compiler")
-	if failure.Cause == nil || !strings.Contains(failure.Cause.Error(), "tried to") {
-		t.Fatalf("check with a current ids module did not get as far as the compiler: %+v", failure)
+	diagErr = asError(t, err, "the compiler")
+	if diagErr.Cause == nil || !strings.Contains(diagErr.Cause.Error(), "tried to") {
+		t.Fatalf("check with a current ids module did not get as far as the compiler: %+v", diagErr)
 	}
 	write(t, root, "objects/bad.pkl", objectFile(`items { ["claws"] { id = "h000"; base = "ratf" } }`))
 	_, err = commandIn(t, background, e, "check")

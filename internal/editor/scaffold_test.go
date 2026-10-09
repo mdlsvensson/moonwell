@@ -485,9 +485,9 @@ func TestTheScaffoldReadsAndWritesThroughALinkToAFile(t *testing.T) {
 	if got := filesIn(t, behind); !maps.Equal(got, wantBehind) {
 		t.Errorf("behind the links there is %q", got)
 	}
-	for _, link := range []string{".gitignore", ".luarc.json", "yueconfig.yue"} {
-		if isPlain(t, filepath.Join(root, link)) {
-			t.Errorf("%s is a file of its own, and no link", link)
+	for _, symlink := range []string{".gitignore", ".luarc.json", "yueconfig.yue"} {
+		if isPlain(t, filepath.Join(root, symlink)) {
+			t.Errorf("%s is a file of its own, and no link", symlink)
 		}
 	}
 }

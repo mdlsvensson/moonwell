@@ -55,14 +55,14 @@ func refusedPlan(t testing.TB, dir, root, document, displayPath string) *diag.Er
 	t.Helper()
 	before := testkit.Snapshot(t, dir)
 	changes, err := planIn(t, dir, root, document)
-	failure := asError(t, err, document)
-	if failure.File != displayPath || failure.Hint == "" || changes != nil {
-		t.Errorf("%s: the refusal names %q, want %q, with %d changes: %+v", document, failure.File, displayPath, len(changes), failure)
+	diagErr := asError(t, err, document)
+	if diagErr.File != displayPath || diagErr.Hint == "" || changes != nil {
+		t.Errorf("%s: the refusal names %q, want %q, with %d changes: %+v", document, diagErr.File, displayPath, len(changes), diagErr)
 	}
 	if !reflect.DeepEqual(testkit.Snapshot(t, dir), before) {
 		t.Errorf("%s: a refused plan changed the map folder", document)
 	}
-	return failure
+	return diagErr
 }
 
 func namesOf(changes []mapdir.Change) []string {
@@ -114,8 +114,8 @@ func TestAPlanWritesNothingAndAMapThatHasTheSettingsPlansNoChange(t *testing.T) 
 		t.Errorf("a second plan changes %q", namesOf(again))
 	}
 	absent := `{"info":{"name":"Not written"},"players":{"5":{"name":"Absent"}}}`
-	if failure := refusedPlan(t, stage, "", absent, mapLabel+"/war3map.w3i"); !strings.Contains(failure.Msg, "player 5") {
-		t.Errorf("error = %+v", failure)
+	if diagErr := refusedPlan(t, stage, "", absent, mapLabel+"/war3map.w3i"); !strings.Contains(diagErr.Msg, "player 5") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -236,8 +236,8 @@ func TestPlayersAndForcesAreTakenInTheOrderOfTheirSlots(t *testing.T) {
 		{`{"forces":{"11":{"name":"k"},"3":{"name":"c"}},"players":{"0":{"name":"a"}}}`, "force 3"},
 	}
 	for _, tt := range tests {
-		if failure := refusedPlan(t, dir, "", tt.document, mapLabel+"/war3map.w3i"); !strings.Contains(failure.Msg, tt.words) {
-			t.Errorf("%s: the first refusal is %q, want one of %s", tt.document, failure.Msg, tt.words)
+		if diagErr := refusedPlan(t, dir, "", tt.document, mapLabel+"/war3map.w3i"); !strings.Contains(diagErr.Msg, tt.words) {
+			t.Errorf("%s: the first refusal is %q, want one of %s", tt.document, diagErr.Msg, tt.words)
 		}
 	}
 }
@@ -253,10 +253,10 @@ func TestAMapWithoutAFileTheSettingsNeedIsRefusedByThatFile(t *testing.T) {
 	dir := t.TempDir()
 	missing := func(document, name string) {
 		t.Helper()
-		failure := refusedPlan(t, dir, "", document, mapLabel+"/"+name)
-		if !strings.Contains(failure.Msg, "needed by the configured settings is missing") ||
-			!strings.Contains(failure.Hint, "World Editor") {
-			t.Errorf("%s: error = %+v", document, failure)
+		diagErr := refusedPlan(t, dir, "", document, mapLabel+"/"+name)
+		if !strings.Contains(diagErr.Msg, "needed by the configured settings is missing") ||
+			!strings.Contains(diagErr.Hint, "World Editor") {
+			t.Errorf("%s: error = %+v", document, diagErr)
 		}
 	}
 	missing(`{"loadingScreen":{"title":"T"}}`, "war3map.w3i")
@@ -268,7 +268,7 @@ func TestAMapWithoutAFileTheSettingsNeedIsRefusedByThatFile(t *testing.T) {
 
 func TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder(t *testing.T) {
 	absent := `"players":{"5":{"name":"Absent"}}`
-	tests := []struct{ name, folder, document string }{
+	tests := []struct{ name, dir, document string }{
 		{"war3map.w3i", "war3map.w3i", `{"loadingScreen":{"title":"T"}}`},
 		{"war3map.lua", "war3map.lua", `{"info":{"name":"Needs the script"}}`},
 		{"war3map.lua", "war3map.lua", `{"info":{"preview":"preview.tga"}}`},
@@ -278,19 +278,19 @@ func TestAFolderWhereAFileTheSettingsNeedBelongsIsToldAsAFolder(t *testing.T) {
 		{"war3mapMap.blp", "War3mapMap.BLP", `{"info":{"preview":"preview.tga"},` + absent + `}`},
 	}
 	for _, tt := range tests {
-		t.Run(tt.folder+" for "+tt.document, func(t *testing.T) {
+		t.Run(tt.dir+" for "+tt.document, func(t *testing.T) {
 			dir, root := withPreview(t, "preview.tga", plainTGA())
 			testkit.WriteFile(t, root, "preview.blp", testkit.BLP(256, 1))
 			if err := os.Remove(filepath.Join(dir, tt.name)); err != nil {
 				t.Fatal(err)
 			}
-			if err := os.Mkdir(filepath.Join(dir, tt.folder), 0o777); err != nil {
+			if err := os.Mkdir(filepath.Join(dir, tt.dir), 0o777); err != nil {
 				t.Fatal(err)
 			}
-			failure := refusedPlan(t, dir, root, tt.document, mapLabel+"/"+tt.folder)
-			if !strings.Contains(failure.Msg, tt.folder+" in the map is a folder, not a file") ||
-				!strings.Contains(failure.Hint, "Remove") || !strings.Contains(failure.Hint, "World Editor") {
-				t.Errorf("error = %+v", failure)
+			diagErr := refusedPlan(t, dir, root, tt.document, mapLabel+"/"+tt.dir)
+			if !strings.Contains(diagErr.Msg, tt.dir+" in the map is a folder, not a file") ||
+				!strings.Contains(diagErr.Hint, "Remove") || !strings.Contains(diagErr.Hint, "World Editor") {
+				t.Errorf("error = %+v", diagErr)
 			}
 		})
 	}
@@ -306,9 +306,9 @@ func TestAFolderWhereATextFileGoesIsRefusedAndNotTakenForAMapWithoutTheFile(t *t
 		if err := os.Mkdir(filepath.Join(dir, tt.name), 0o777); err != nil {
 			t.Fatal(err)
 		}
-		failure := refusedPlan(t, dir, "", tt.document, mapLabel+"/"+tt.name)
-		if !strings.Contains(failure.Msg, tt.name+" would replace a folder") {
-			t.Errorf("%s: error = %+v", tt.name, failure)
+		diagErr := refusedPlan(t, dir, "", tt.document, mapLabel+"/"+tt.name)
+		if !strings.Contains(diagErr.Msg, tt.name+" would replace a folder") {
+			t.Errorf("%s: error = %+v", tt.name, diagErr)
 		}
 	}
 }
@@ -326,10 +326,10 @@ func TestAMapFileThatCannotBeReadIsRefusedByItsNameAndNotTakenForAnEmptyFile(t *
 			testkit.WriteFile(t, dir, "war3mapMisc.txt", []byte("[Misc]\n"))
 			testkit.MakeUnreadable(t, filepath.Join(dir, tt.name))
 			changes, err := planIn(t, dir, root, tt.document)
-			failure := asError(t, err, tt.document)
-			if failure.File != mapLabel+"/"+tt.name || !strings.Contains(failure.Msg, "Reading a map file failed") ||
-				failure.Hint == "" || changes != nil {
-				t.Errorf("error = %+v, with %d changes", failure, len(changes))
+			diagErr := asError(t, err, tt.document)
+			if diagErr.File != mapLabel+"/"+tt.name || !strings.Contains(diagErr.Msg, "Reading a map file failed") ||
+				diagErr.Hint == "" || changes != nil {
+				t.Errorf("error = %+v, with %d changes", diagErr, len(changes))
 			}
 		})
 	}
@@ -347,9 +347,9 @@ func TestMapFilesThatAreNotUTF8TextAreRefusedByTheirNames(t *testing.T) {
 		{"war3mapMisc.txt", `{"gameplay":{"foodLimit":1}}`},
 	}
 	for _, tt := range tests {
-		failure := refusedPlan(t, dir, "", tt.document, mapLabel+"/"+tt.name)
-		if !strings.Contains(failure.Msg, "not valid UTF-8 text") {
-			t.Errorf("%s: error = %+v", tt.name, failure)
+		diagErr := refusedPlan(t, dir, "", tt.document, mapLabel+"/"+tt.name)
+		if !strings.Contains(diagErr.Msg, "not valid UTF-8 text") {
+			t.Errorf("%s: error = %+v", tt.name, diagErr)
 		}
 	}
 }
@@ -359,8 +359,8 @@ func TestAScriptThatDoesNotTakeTheSettingsRefusesThePlanAfterTheMapInfoWasPatche
 	testkit.WriteFile(t, dir, "war3map.w3i", fixtureInfo(t))
 	testkit.WriteFile(t, dir, "war3map.lua", []byte(swapped(t, fixtureLua(t), "SetMapName(", "Other(")))
 	document := `{"info":{"name":"Refused"},"gameplay":{"foodLimit":1},"gameInterface":{"A":{"B":"c"}}}`
-	if failure := refusedPlan(t, dir, "", document, mapLabel+"/war3map.lua"); !strings.Contains(failure.Msg, "SetMapName") {
-		t.Errorf("error = %+v", failure)
+	if diagErr := refusedPlan(t, dir, "", document, mapLabel+"/war3map.lua"); !strings.Contains(diagErr.Msg, "SetMapName") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -384,9 +384,9 @@ func TestConstantsThatCannotBeWrittenAreRefusedByTheManifestBeforeAMapFileIsRead
 		t.Run(tt.name, func(t *testing.T) {
 			for _, folder := range folders {
 				changes, err := Plan(folder, projectOf(t, "", tt.document))
-				failure := asError(t, err, tt.document)
-				if failure.File != manifestName || !strings.Contains(failure.Msg, tt.words) || failure.Hint == "" || changes != nil {
-					t.Errorf("error = %+v, want %q", failure, tt.words)
+				diagErr := asError(t, err, tt.document)
+				if diagErr.File != manifestName || !strings.Contains(diagErr.Msg, tt.words) || diagErr.Hint == "" || changes != nil {
+					t.Errorf("error = %+v, want %q", diagErr, tt.words)
 				}
 			}
 		})
@@ -591,9 +591,9 @@ func TestAPreviewIsRefusedWhenTheMapLacksItsMinimapOrHasOneOfTheNamesThePreviewA
 	dir, root := withPreview(t, "preview.tga", plainTGA())
 	for _, taken := range []string{"war3mapminimap.blp", "War3mapMap.TGA"} {
 		path := testkit.WriteFile(t, dir, taken, []byte{1})
-		failure := refusedPlan(t, dir, root, previewAt("preview.tga"), mapLabel+"/"+taken)
-		if failure.Msg != "The map already has "+taken+", a name the preview picture needs." {
-			t.Errorf("error = %+v", failure)
+		diagErr := refusedPlan(t, dir, root, previewAt("preview.tga"), mapLabel+"/"+taken)
+		if diagErr.Msg != "The map already has "+taken+", a name the preview picture needs." {
+			t.Errorf("error = %+v", diagErr)
 		}
 		if err := os.Remove(path); err != nil {
 			t.Fatal(err)
@@ -603,9 +603,9 @@ func TestAPreviewIsRefusedWhenTheMapLacksItsMinimapOrHasOneOfTheNamesThePreviewA
 		t.Fatal(err)
 	}
 	absent := `{"info":{"preview":"preview.tga"},"players":{"5":{"name":"Absent"}}}`
-	failure := refusedPlan(t, dir, root, absent, mapLabel+"/war3mapMap.blp")
-	if !strings.Contains(failure.Msg, "The map has no war3mapMap.blp") || !strings.Contains(failure.Hint, "World Editor") {
-		t.Errorf("error = %+v", failure)
+	diagErr := refusedPlan(t, dir, root, absent, mapLabel+"/war3mapMap.blp")
+	if !strings.Contains(diagErr.Msg, "The map has no war3mapMap.blp") || !strings.Contains(diagErr.Hint, "World Editor") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -613,7 +613,7 @@ func TestAFolderUnderANameThePreviewAddsIsRefusedBeforeAMapFileIsRead(t *testing
 	tests := []struct {
 		name, path string
 		picture    []byte
-		folder     string
+		dir        string
 	}{
 		{"a BLP preview, which writes no TGA", "preview.blp", testkit.BLP(256, 1), "war3mapMap.tga"},
 		{"a TGA preview", "preview.tga", plainTGA(), "war3mapMinimap.blp"},
@@ -622,13 +622,13 @@ func TestAFolderUnderANameThePreviewAddsIsRefusedBeforeAMapFileIsRead(t *testing
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dir, root := withPreview(t, tt.path, tt.picture)
-			if err := os.Mkdir(filepath.Join(dir, tt.folder), 0o777); err != nil {
+			if err := os.Mkdir(filepath.Join(dir, tt.dir), 0o777); err != nil {
 				t.Fatal(err)
 			}
 			document := `{"info":{"preview":` + strconv.Quote(tt.path) + `},"players":{"5":{"name":"Absent"}}}`
-			failure := refusedPlan(t, dir, root, document, mapLabel+"/"+tt.folder)
-			if !strings.Contains(failure.Msg, "would replace a folder in the map") {
-				t.Errorf("error = %+v", failure)
+			diagErr := refusedPlan(t, dir, root, document, mapLabel+"/"+tt.dir)
+			if !strings.Contains(diagErr.Msg, "would replace a folder in the map") {
+				t.Errorf("error = %+v", diagErr)
 			}
 		})
 	}
@@ -646,15 +646,15 @@ func TestAPreviewThatIsNoUsablePictureIsRefusedBeforeAMapFileIsRead(t *testing.T
 	for _, tt := range tests {
 		for _, folder := range folders {
 			changes, err := Plan(folder, projectOf(t, root, `{"info":{"name":"N","preview":`+strconv.Quote(tt.path)+`}}`))
-			failure := asError(t, err, tt.path)
-			if !strings.Contains(failure.Msg, tt.words) || failure.File != tt.displayPath || failure.Hint == "" || changes != nil {
-				t.Errorf("preview %q: %+v, want %q naming %s", tt.path, failure, tt.words, tt.displayPath)
+			diagErr := asError(t, err, tt.path)
+			if !strings.Contains(diagErr.Msg, tt.words) || diagErr.File != tt.displayPath || diagErr.Hint == "" || changes != nil {
+				t.Errorf("preview %q: %+v, want %q naming %s", tt.path, diagErr, tt.words, tt.displayPath)
 			}
 		}
 	}
-	failure := refusedPlan(t, t.TempDir(), root, previewAt("preview.tga"), mapLabel+"/war3mapMap.blp")
-	if !strings.Contains(failure.Msg, "The map has no war3mapMap.blp") {
-		t.Errorf("error = %+v", failure)
+	diagErr := refusedPlan(t, t.TempDir(), root, previewAt("preview.tga"), mapLabel+"/war3mapMap.blp")
+	if !strings.Contains(diagErr.Msg, "The map has no war3mapMap.blp") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 

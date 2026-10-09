@@ -19,7 +19,7 @@ import (
 
 const bom = "\xEF\xBB\xBF"
 
-func write(t *testing.T, path, content string) {
+func writeFile(t *testing.T, path, content string) {
 	t.Helper()
 	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
 		t.Fatal(err)
@@ -29,7 +29,7 @@ func write(t *testing.T, path, content string) {
 	}
 }
 
-func read(t *testing.T, path string) string {
+func readFile(t *testing.T, path string) string {
 	t.Helper()
 	data, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
@@ -41,7 +41,7 @@ func read(t *testing.T, path string) string {
 	return string(data)
 }
 
-func asError(t *testing.T, err error) *diag.Error {
+func asDiagError(t *testing.T, err error) *diag.Error {
 	t.Helper()
 	var e *diag.Error
 	if !errors.As(err, &e) {
@@ -52,10 +52,10 @@ func asError(t *testing.T, err error) *diag.Error {
 
 func TestListFilesReturnsPosixRelativePathsSortedByBytes(t *testing.T) {
 	dir := t.TempDir()
-	write(t, filepath.Join(dir, "z.txt"), "")
-	write(t, filepath.Join(dir, "a", "b", "c.txt"), "")
-	write(t, filepath.Join(dir, "Y.txt"), "")
-	write(t, filepath.Join(dir, "a.txt"), "")
+	writeFile(t, filepath.Join(dir, "z.txt"), "")
+	writeFile(t, filepath.Join(dir, "a", "b", "c.txt"), "")
+	writeFile(t, filepath.Join(dir, "Y.txt"), "")
+	writeFile(t, filepath.Join(dir, "a.txt"), "")
 	got, err := ListFiles(dir)
 	if err != nil || !slices.Equal(got, []string{"Y.txt", "a.txt", "a/b/c.txt", "z.txt"}) {
 		t.Errorf("ListFiles = %q, %v", got, err)
@@ -64,9 +64,9 @@ func TestListFilesReturnsPosixRelativePathsSortedByBytes(t *testing.T) {
 
 func TestReplaceDirReplacesDestinationContents(t *testing.T) {
 	dir := t.TempDir()
-	write(t, filepath.Join(dir, "src", "new.txt"), "new")
-	write(t, filepath.Join(dir, "src", "deep", "er.txt"), "deeper")
-	write(t, filepath.Join(dir, "dest", "old.txt"), "old")
+	writeFile(t, filepath.Join(dir, "src", "new.txt"), "new")
+	writeFile(t, filepath.Join(dir, "src", "deep", "er.txt"), "deeper")
+	writeFile(t, filepath.Join(dir, "dest", "old.txt"), "old")
 	if err := ReplaceDir(filepath.Join(dir, "src"), filepath.Join(dir, "dest")); err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func TestReplaceDirReplacesDestinationContents(t *testing.T) {
 	if err := ReplaceDir(filepath.Join(dir, "src"), filepath.Join(dir, "a", "b", "dest")); err != nil {
 		t.Fatal(err)
 	}
-	if got := read(t, filepath.Join(dir, "a", "b", "dest", "new.txt")); got != "new" {
+	if got := readFile(t, filepath.Join(dir, "a", "b", "dest", "new.txt")); got != "new" {
 		t.Errorf("copied file holds %q", got)
 	}
 }
@@ -93,14 +93,14 @@ func TestWriteIfChangedOnlyWritesDifferingContent(t *testing.T) {
 			t.Errorf("WriteIfChanged(%q) = %v, %v, want %v", c.content, got, err, c.want)
 		}
 	}
-	if got := read(t, file); got != "b" {
+	if got := readFile(t, file); got != "b" {
 		t.Errorf("file holds %q", got)
 	}
 }
 
 func TestReadIfThereFindsNoFileWhereNoneCanBeAndFailsForAnythingElse(t *testing.T) {
 	dir := t.TempDir()
-	write(t, filepath.Join(dir, "held.txt"), "held")
+	writeFile(t, filepath.Join(dir, "held.txt"), "held")
 	if err := os.Mkdir(filepath.Join(dir, "folder"), 0o777); err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func TestReadSourceDropsALeadingByteOrderMarkAndBlanksAFirstLineStartingWithHash
 		{"s = '\xE9\xE9\xFF' -- \xE2\x80\n", "s = '\xE9\xE9\xFF' -- \xE2\x80\n"},
 		{bom + "#!lua \xFF\n-- \xC0\xC1", "\n-- \xC0\xC1"},
 	} {
-		write(t, file, c.content)
+		writeFile(t, file, c.content)
 		got, err := ReadSource(file, "lua/x.lua")
 		if err != nil || got != c.want {
 			t.Errorf("ReadSource(%q) = %q, %v, want %q", c.content, got, err, c.want)
@@ -148,13 +148,13 @@ func TestReadSourceReportsAFileItCannotReadNamingTheLabel(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, err := ReadSource(filepath.Join(dir, "x.lua"), "lua/x.lua")
-	e := asError(t, err)
+	e := asDiagError(t, err)
 	if !strings.Contains(e.Msg, "Reading lua/x.lua failed") || e.File != "lua/x.lua" || e.Cause == nil ||
 		!strings.Contains(e.Hint, "readable") {
 		t.Errorf("error = %+v", e)
 	}
 	_, err = ReadSource(filepath.Join(dir, "gone.lua"), "lua/gone.lua")
-	if e := asError(t, err); e.File != "lua/gone.lua" {
+	if e := asDiagError(t, err); e.File != "lua/gone.lua" {
 		t.Errorf("error = %+v", e)
 	}
 }
@@ -283,21 +283,21 @@ func TestQuotedEscapesExactlyTheBytesItMustAndWritesJSON(t *testing.T) {
 }
 
 func TestIsWithin(t *testing.T) {
-	folder := filepath.Join("projects", "map")
+	dir := filepath.Join("projects", "map")
 	for _, c := range []struct {
 		path string
 		want bool
 		why  string
 	}{
-		{folder, true, "a path is within itself"},
-		{filepath.Join(folder, "src", "main.yue"), true, "and its descendants"},
-		{filepath.Join(folder, "..map", "x"), true, "a name starting with two dots is inside"},
+		{dir, true, "a path is within itself"},
+		{filepath.Join(dir, "src", "main.yue"), true, "and its descendants"},
+		{filepath.Join(dir, "..map", "x"), true, "a name starting with two dots is inside"},
 		{filepath.Join("projects", "map-2"), false, "not its siblings"},
 		{filepath.Join("projects", "other", "x"), false, "not its siblings' files"},
 		{"projects", false, "not its parent"},
 		{filepath.Join("Projects", "MAP", "src"), runtime.GOOS == "windows", "case on Windows only"},
 	} {
-		if got := IsWithin(c.path, folder); got != c.want {
+		if got := IsWithin(c.path, dir); got != c.want {
 			t.Errorf("IsWithin(%q) = %v: %s", c.path, got, c.why)
 		}
 	}
@@ -311,7 +311,7 @@ func TestRemoveAllAndRemoveFileIgnoreMissingPaths(t *testing.T) {
 	if err := RemoveFile(filepath.Join(dir, "missing")); err != nil {
 		t.Error(err)
 	}
-	write(t, filepath.Join(dir, "f"), "")
+	writeFile(t, filepath.Join(dir, "f"), "")
 	if err := RemoveAll(filepath.Join(dir, "f")); err != nil {
 		t.Error(err)
 	}
@@ -364,10 +364,10 @@ func TestRemovingAFileAnotherProgramHoldsOpenNamesTheFileAndSaysToCloseTheGame(t
 		t.Skip("only Windows refuses to delete an open file")
 	}
 	file := filepath.Join(t.TempDir(), "map.w3x")
-	write(t, file, "archive")
+	writeFile(t, file, "archive")
 	unlock := lockFile(t, file)
 	for _, remove := range []func(string) error{RemoveFile, RemoveAll} {
-		e := asError(t, remove(file))
+		e := asDiagError(t, remove(file))
 		if !strings.Contains(e.Msg, "in use by another program") || !strings.Contains(e.Msg, file) ||
 			!strings.Contains(e.Hint, "Warcraft III") || e.Cause == nil {
 			t.Errorf("error = %+v", e)
@@ -379,7 +379,7 @@ func TestRemovingAFileAnotherProgramHoldsOpenNamesTheFileAndSaysToCloseTheGame(t
 	}
 }
 
-var refused = []string{
+var unsafePaths = []string{
 	"", "/a", "a//b", "a/", "../a", "a/./b", "C:/a", "a/b?.blp", "a\tb", "a/b.", "a/b ", "con", "a/NUL.txt",
 	"com1.blp", `a\..\b`,
 }
@@ -396,7 +396,7 @@ func TestRelPathRefusesWhatCouldLeaveItsFolderOrFailOnWindows(t *testing.T) {
 			t.Errorf("RelPath(%q) = %q, %v, want %q", c.value, got, ok, c.want)
 		}
 	}
-	for _, value := range refused {
+	for _, value := range unsafePaths {
 		if got, ok := CleanRelPath(value); ok || got != "" {
 			t.Errorf("RelPath(%q) = %q, %v, want it refused", value, got, ok)
 		}
@@ -405,9 +405,9 @@ func TestRelPathRefusesWhatCouldLeaveItsFolderOrFailOnWindows(t *testing.T) {
 
 func TestSafeJoinNamesAPathRelPathRefuses(t *testing.T) {
 	root := t.TempDir()
-	for _, value := range refused {
+	for _, value := range unsafePaths {
 		got, err := SafeJoin(root, value)
-		e := asError(t, err)
+		e := asDiagError(t, err)
 		if got != "" || !strings.Contains(e.Msg, "Invalid path: "+value) || !strings.Contains(e.Hint, "relative path") {
 			t.Errorf("SafeJoin(%q) = %q, %+v", value, got, e)
 		}
@@ -416,7 +416,7 @@ func TestSafeJoinNamesAPathRelPathRefuses(t *testing.T) {
 
 func TestSafeJoinRefusesASymlinkBelowTheRoot(t *testing.T) {
 	root := t.TempDir()
-	write(t, filepath.Join(root, "real", "a.txt"), "a")
+	writeFile(t, filepath.Join(root, "real", "a.txt"), "a")
 	got, err := SafeJoin(root, "real/a.txt")
 	if err != nil || got != filepath.Join(root, "real", "a.txt") {
 		t.Errorf("SafeJoin = %q, %v", got, err)
@@ -432,7 +432,7 @@ func TestSafeJoinRefusesASymlinkBelowTheRoot(t *testing.T) {
 	default:
 		t.Fatalf("no symlink was made: %v", err)
 	}
-	refusesTheLink(t, root)
+	checkSymlinkRefused(t, root)
 }
 
 func TestSafeJoinRefusesAJunctionBelowTheRoot(t *testing.T) {
@@ -440,20 +440,20 @@ func TestSafeJoinRefusesAJunctionBelowTheRoot(t *testing.T) {
 		t.Skip("only Windows has junctions")
 	}
 	root := t.TempDir()
-	write(t, filepath.Join(root, "real", "a.txt"), "a")
+	writeFile(t, filepath.Join(root, "real", "a.txt"), "a")
 	mklink := exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(root, "link"), filepath.Join(root, "real"))
 	if out, err := mklink.CombinedOutput(); err != nil {
 		t.Fatalf("mklink /J: %v\n%s", err, out)
 	}
-	refusesTheLink(t, root)
+	checkSymlinkRefused(t, root)
 }
 
-func refusesTheLink(t *testing.T, root string) {
+func checkSymlinkRefused(t *testing.T, root string) {
 	t.Helper()
-	link := filepath.Join(root, "link")
+	symlink := filepath.Join(root, "link")
 	_, err := SafeJoin(root, "link/a.txt")
-	e := asError(t, err)
-	if !strings.Contains(e.Msg, "Symlinks are not supported") || !strings.Contains(e.Msg, link) ||
+	e := asDiagError(t, err)
+	if !strings.Contains(e.Msg, "Symlinks are not supported") || !strings.Contains(e.Msg, symlink) ||
 		!strings.Contains(e.Hint, "real files") {
 		t.Errorf("error = %+v", e)
 	}

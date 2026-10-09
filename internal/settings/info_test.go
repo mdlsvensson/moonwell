@@ -33,11 +33,11 @@ func patched(t *testing.T, source []byte, document string) []byte {
 func refusedInfo(t *testing.T, source []byte, document string) *diag.Error {
 	t.Helper()
 	_, err := patchInfo(source, settingsOf(t, document), infoFile)
-	failure := asError(t, err, document)
-	if failure.File != infoFile || failure.Hint == "" {
-		t.Errorf("%s: the error names %q and hints %q", document, failure.File, failure.Hint)
+	diagErr := asError(t, err, document)
+	if diagErr.File != infoFile || diagErr.Hint == "" {
+		t.Errorf("%s: the error names %q and hints %q", document, diagErr.File, diagErr.Hint)
 	}
-	return failure
+	return diagErr
 }
 
 func readInfo(t *testing.T, data []byte, depth w3i.Depth) *w3i.Info {
@@ -197,9 +197,9 @@ func TestOnlyFogEditsLookAtTheFogTheMapHas(t *testing.T) {
 }
 
 func TestForceEditsNeedTheCustomForcesOfTheMap(t *testing.T) {
-	failure := refusedInfo(t, withoutFlags(t), `{"forces":{"0":{"name":"X"}}}`)
-	if !strings.Contains(failure.Msg, "custom forces") {
-		t.Errorf("error = %+v", failure)
+	diagErr := refusedInfo(t, withoutFlags(t), `{"forces":{"0":{"name":"X"}}}`)
+	if !strings.Contains(diagErr.Msg, "custom forces") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -227,8 +227,8 @@ func TestARefusalThatNeedsTheMapNamesTheSetting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if failure := refusedInfo(t, tt.source, tt.document); !strings.Contains(failure.Msg, tt.words) {
-				t.Errorf("%s: %q, want %q", tt.document, failure.Msg, tt.words)
+			if diagErr := refusedInfo(t, tt.source, tt.document); !strings.Contains(diagErr.Msg, tt.words) {
+				t.Errorf("%s: %q, want %q", tt.document, diagErr.Msg, tt.words)
 			}
 		})
 	}
@@ -244,8 +244,8 @@ func TestPlayersAndForcesGoInSlotOrder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if failure := refusedInfo(t, source, tt.document); !strings.Contains(failure.Msg, tt.words) {
-				t.Errorf("the first refusal is %q, want %q", failure.Msg, tt.words)
+			if diagErr := refusedInfo(t, source, tt.document); !strings.Contains(diagErr.Msg, tt.words) {
+				t.Errorf("the first refusal is %q, want %q", diagErr.Msg, tt.words)
 			}
 		})
 	}
@@ -289,8 +289,8 @@ func TestAControllerOrARaceWithoutANumberIsNotTheUsersMistake(t *testing.T) {
 }
 
 func TestSettingsStoredInTheMapInfoNeedOneThatReads(t *testing.T) {
-	failure := refusedInfo(t, []byte{39, 0, 0}, `{"info":{"name":"N"}}`)
-	if !strings.Contains(failure.Msg, "Cannot read map settings") {
-		t.Errorf("error = %+v", failure)
+	diagErr := refusedInfo(t, []byte{39, 0, 0}, `{"info":{"name":"N"}}`)
+	if !strings.Contains(diagErr.Msg, "Cannot read map settings") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }

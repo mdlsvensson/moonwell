@@ -242,17 +242,17 @@ var readsUnnaturally = regexp.MustCompile(`\ba [A-Z]{4}\b`)
 
 func refused(t *testing.T, what string, err error, displayPath, words string) {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) || failure.File != displayPath {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) || diagErr.File != displayPath {
 		t.Errorf("%s: got %v, want an error naming %s", what, err, displayPath)
 		return
 	}
-	if !strings.HasPrefix(failure.Msg, "Not a readable model: ") || !strings.Contains(failure.Msg, words) {
-		t.Errorf("%s: message %q, want a model that is not readable and %q", what, failure.Msg, words)
+	if !strings.HasPrefix(diagErr.Msg, "Not a readable model: ") || !strings.Contains(diagErr.Msg, words) {
+		t.Errorf("%s: message %q, want a model that is not readable and %q", what, diagErr.Msg, words)
 	}
-	if strings.Contains(failure.Msg, "Knight.md") || readsUnnaturally.MatchString(failure.Msg) || failure.Hint == "" {
+	if strings.Contains(diagErr.Msg, "Knight.md") || readsUnnaturally.MatchString(diagErr.Msg) || diagErr.Hint == "" {
 		t.Errorf("%s: message %q, hint %q: the file is named once, through File, and there is a hint", what,
-			failure.Msg, failure.Hint)
+			diagErr.Msg, diagErr.Hint)
 	}
 }
 

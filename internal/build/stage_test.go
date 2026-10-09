@@ -13,15 +13,15 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/testkit"
 )
 
-func (s *standIn) mapAt(folder string, blocks ...string) {
+func (s *standIn) mapAt(dir string, blocks ...string) {
 	s.t.Helper()
-	if folder != "map.w3x" {
-		s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash("maps/" + folder))))
-		if err := os.Rename(s.at("maps/map.w3x"), s.at("maps/"+folder)); err != nil {
+	if dir != "map.w3x" {
+		s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash("maps/" + dir))))
+		if err := os.Rename(s.at("maps/map.w3x"), s.at("maps/"+dir)); err != nil {
 			s.t.Fatal(err)
 		}
 	}
-	s.evaluatesTo(append(blocks, `"map":{"folder":"`+folder+`","entry":"src/main.yue"}`)...)
+	s.evaluatesTo(append(blocks, `"map":{"folder":"`+dir+`","entry":"src/main.yue"}`)...)
 }
 
 func stagedOf(t testing.TB, s *standIn, plan *Result) outputFile {
@@ -76,9 +76,9 @@ func TestStageOfAMapWithoutObjectsSettingsOrAssetsSaysNothing(t *testing.T) {
 
 func TestStageRefusesAFileOnTheWayToTheStageByItsName(t *testing.T) {
 	tests := []struct {
-		name   string
-		folder string
-		file   string
+		name string
+		dir  string
+		file string
 	}{
 		{"a file at dist/stage", "map.w3x", "dist/stage"},
 		{"a file where a folder of the map's folder goes", "campaign/one.w3x", "dist/stage/campaign"},
@@ -86,7 +86,7 @@ func TestStageRefusesAFileOnTheWayToTheStageByItsName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t)
-			s.mapAt(tt.folder)
+			s.mapAt(tt.dir)
 			plan := planOf(t, s, Options{})
 			s.remove(tt.file)
 			s.put(tt.file, "a file")
@@ -118,9 +118,9 @@ func TestStageNamesTheStageItCouldNotWriteFromTheProjectFolder(t *testing.T) {
 
 func TestStageRefusesALinkOnTheWayToTheStageByItsStep(t *testing.T) {
 	tests := []struct {
-		name   string
-		link   string
-		target string
+		name    string
+		symlink string
+		target  string
 	}{
 		{"dist to the source map", "dist", "maps/map.w3x"},
 		{"dist to a folder of the source map", "dist", "maps/map.w3x/war3mapImported"},
@@ -134,12 +134,12 @@ func TestStageRefusesALinkOnTheWayToTheStageByItsStep(t *testing.T) {
 			s.put("maps/map.w3x/war3mapImported/a.txt", "asset")
 			s.put("maps/other/kept.txt", "kept")
 			plan := planOf(t, s, Options{})
-			s.remove(tt.link)
-			testkit.LinkDir(t, s.at(tt.target), s.at(tt.link))
+			s.remove(tt.symlink)
+			testkit.LinkDir(t, s.at(tt.target), s.at(tt.symlink))
 			maps := testkit.Snapshot(t, s.at("maps"))
 			_, err := stage(s.env, s.project, plan)
 			e := asError(t, err, "a link on the way to the stage")
-			if !strings.HasPrefix(e.Msg, tt.link+" is a link: ") || e.File != "dist/stage/map.w3x" || e.Hint == "" {
+			if !strings.HasPrefix(e.Msg, tt.symlink+" is a link: ") || e.File != "dist/stage/map.w3x" || e.Hint == "" {
 				t.Errorf("error = %+v", e)
 			}
 			if !reflect.DeepEqual(testkit.Snapshot(t, s.at("maps")), maps) {

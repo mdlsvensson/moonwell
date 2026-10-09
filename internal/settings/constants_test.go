@@ -91,10 +91,10 @@ func TestATypedGameplayConstantThatDisagreesWithARawOneIsRefusedByTheManifest(t 
 			s := settingsOf(t, tt.document)
 			before := written(s.GameplayConstants)
 			_, _, err := textSections(s, manifestName)
-			failure := asError(t, err, tt.document)
-			if failure.File != manifestName || !strings.Contains(failure.Msg, "Conflicting typed and raw gameplay constant: "+tt.constant) ||
-				!strings.Contains(failure.Hint, tt.setting) {
-				t.Errorf("error = %+v", failure)
+			diagErr := asError(t, err, tt.document)
+			if diagErr.File != manifestName || !strings.Contains(diagErr.Msg, "Conflicting typed and raw gameplay constant: "+tt.constant) ||
+				!strings.Contains(diagErr.Hint, tt.setting) {
+				t.Errorf("error = %+v", diagErr)
 			}
 			if after := written(s.GameplayConstants); after != before {
 				t.Errorf("the settings were changed: %s, were %s", after, before)
@@ -128,9 +128,9 @@ func TestNamesThatDifferOnlyInLetterCaseAreRefusedByTheManifest(t *testing.T) {
 			if err == nil {
 				err = interfaceErr
 			}
-			failure := asError(t, err, tt.document)
-			if failure.File != manifestName || failure.Hint == "" || !strings.Contains(failure.Msg, tt.words) {
-				t.Errorf("error = %+v, want %q", failure, tt.words)
+			diagErr := asError(t, err, tt.document)
+			if diagErr.File != manifestName || diagErr.Hint == "" || !strings.Contains(diagErr.Msg, tt.words) {
+				t.Errorf("error = %+v, want %q", diagErr, tt.words)
 			}
 		})
 	}
@@ -151,9 +151,9 @@ func TestTwoSpellingsOfANameAreRefusedBeforeATypedConstantIsMergedAndTheConstant
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			misc, skin, err := textSections(settingsOf(t, tt.document), manifestName)
-			failure := asError(t, err, tt.document)
-			if !strings.Contains(failure.Msg, tt.words) || failure.File != manifestName || misc != nil || skin != nil {
-				t.Errorf("error = %+v, want %q", failure, tt.words)
+			diagErr := asError(t, err, tt.document)
+			if !strings.Contains(diagErr.Msg, tt.words) || diagErr.File != manifestName || misc != nil || skin != nil {
+				t.Errorf("error = %+v, want %q", diagErr, tt.words)
 			}
 		})
 	}

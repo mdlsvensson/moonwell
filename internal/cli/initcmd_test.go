@@ -109,13 +109,13 @@ func TestInitNamesAFolderItCannotLookAt(t *testing.T) {
 
 func TestInitRefusesATargetThatIsALinkToNothing(t *testing.T) {
 	parent := t.TempDir()
-	link := filepath.Join(parent, "my-map")
-	testkit.LinkDir(t, filepath.Join(parent, "gone"), link)
+	symlink := filepath.Join(parent, "my-map")
+	testkit.LinkDir(t, filepath.Join(parent, "gone"), symlink)
 	_, err := created(nothingRuns(t), parent, "my-map", "")
 	if e := asError(t, err, "a link to nothing"); e.Msg != "my-map is not a directory." || e.Hint == "" {
 		t.Errorf("error = %+v", e)
 	}
-	if info, err := fsx.Lstat(link); err != nil || info == nil {
+	if info, err := fsx.Lstat(symlink); err != nil || info == nil {
 		t.Errorf("a refused init removed the link (%v)", err)
 	}
 }
@@ -325,9 +325,9 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 		!slices.Equal(p.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) {
 		t.Fatalf("%+v", p)
 	}
-	for _, folder := range []string{"CommandButtons", "CommandButtonsDisabled", "PassiveButtons"} {
-		if !exists(root, "assets/ReplaceableTextures/"+folder) {
-			t.Error(folder)
+	for _, dir := range []string{"CommandButtons", "CommandButtonsDisabled", "PassiveButtons"} {
+		if !exists(root, "assets/ReplaceableTextures/"+dir) {
+			t.Error(dir)
 		}
 	}
 	if r := okWithPklAlone(t, root, "assets:check"); r.output != checked("0", "0") {

@@ -35,13 +35,13 @@ func mustRead(t *testing.T, data []byte, depth w3i.Depth) *w3i.Info {
 func refusal(t *testing.T, what string, data []byte, depth w3i.Depth, words string) {
 	t.Helper()
 	info, err := w3i.Read(data, mapInfoFile, depth)
-	var failure *diag.Error
-	if !errors.As(err, &failure) || failure.File != mapInfoFile {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) || diagErr.File != mapInfoFile {
 		t.Errorf("%s: got %v, want an error naming %s", what, err, mapInfoFile)
 		return
 	}
-	if !strings.Contains(failure.Msg, words) || failure.Hint == "" {
-		t.Errorf("%s: message %q, hint %q, want a message with %q and a hint", what, failure.Msg, failure.Hint, words)
+	if !strings.Contains(diagErr.Msg, words) || diagErr.Hint == "" {
+		t.Errorf("%s: message %q, hint %q, want a message with %q and a hint", what, diagErr.Msg, diagErr.Hint, words)
 	}
 	if info != nil {
 		t.Errorf("%s: a refused file returned %+v", what, info)
@@ -72,9 +72,9 @@ func TestReadHeaderReadsVersionAndGameVersion(t *testing.T) {
 		}
 	}
 	_, err := w3i.ReadHeader([]byte{1, 2}, mapInfoFile)
-	var failure *diag.Error
-	if !errors.As(err, &failure) || !strings.Contains(failure.Msg, "truncated") || failure.File != mapInfoFile ||
-		failure.Hint == "" {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) || !strings.Contains(diagErr.Msg, "truncated") || diagErr.File != mapInfoFile ||
+		diagErr.Hint == "" {
 		t.Errorf("a file of two bytes: %+v", err)
 	}
 }

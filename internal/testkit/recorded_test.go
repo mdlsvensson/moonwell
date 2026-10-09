@@ -9,18 +9,18 @@ import (
 	"unicode/utf8"
 )
 
-func recording(t *testing.T, name, text string) string {
+func writeRecordingFile(t *testing.T, name, text string) string {
 	t.Helper()
-	folder := t.TempDir()
-	WriteFile(t, folder, name, []byte(text))
-	return folder
+	dir := t.TempDir()
+	WriteFile(t, dir, name, []byte(text))
+	return dir
 }
 
 func TestRecordedPassesWhatIsRecordedAndShowsWhereAnythingElseParts(t *testing.T) {
 	t.Setenv(recordVariable, "")
-	folder := recording(t, "sub/lines.txt", "one\ntwo\nthree\n")
-	same := newStandIn(t)
-	checkRecordedIn(same, folder, "sub/lines.txt", []byte("one\ntwo\nthree\n"))
+	dir := writeRecordingFile(t, "sub/lines.txt", "one\ntwo\nthree\n")
+	same := newFakeTB(t)
+	checkRecordedIn(same, dir, "sub/lines.txt", []byte("one\ntwo\nthree\n"))
 	if len(same.errors)+len(same.failed) != 0 {
 		t.Errorf("what is recorded failed the test: %q %q", same.errors, same.failed)
 	}
@@ -34,8 +34,8 @@ func TestRecordedPassesWhatIsRecordedAndShowsWhereAnythingElseParts(t *testing.T
 		{"no line feed at the end", "one\ntwo\nthree", []string{"offset 13, line 3", `made:     "three"`}},
 		{"nothing", "", []string{"offset 0, line 1", `recorded: "one"`, "14 bytes are recorded and 0 were made"}},
 	} {
-		differs := newStandIn(t)
-		checkRecordedIn(differs, folder, "sub/lines.txt", []byte(c.made))
+		differs := newFakeTB(t)
+		checkRecordedIn(differs, dir, "sub/lines.txt", []byte(c.made))
 		if len(differs.errors) != 1 {
 			t.Errorf("%s: the test was told %q, want one failure", c.name, differs.errors)
 			continue
@@ -46,39 +46,39 @@ func TestRecordedPassesWhatIsRecordedAndShowsWhereAnythingElseParts(t *testing.T
 			}
 		}
 	}
-	if kept, _ := os.ReadFile(filepath.Join(folder, "sub", "lines.txt")); string(kept) != "one\ntwo\nthree\n" {
+	if kept, _ := os.ReadFile(filepath.Join(dir, "sub", "lines.txt")); string(kept) != "one\ntwo\nthree\n" {
 		t.Errorf("a comparison changed the recording to %q", kept)
 	}
 }
 
 func TestRecordedFailsTheTestWithoutARecordingAndWritesNone(t *testing.T) {
 	t.Setenv(recordVariable, "")
-	folder := t.TempDir()
-	missing := newStandIn(t)
-	checkRecordedIn(missing, folder, "none.txt", []byte("text"))
+	dir := t.TempDir()
+	missing := newFakeTB(t)
+	checkRecordedIn(missing, dir, "none.txt", []byte("text"))
 	if len(missing.errors) != 1 || !strings.Contains(missing.errors[0], "none.txt") ||
 		!strings.Contains(missing.errors[0], recordVariable+"=1") {
 		t.Errorf("the test was told %q, want the file and the variable that writes it", missing.errors)
 	}
-	if entries, _ := os.ReadDir(folder); len(entries) != 0 {
+	if entries, _ := os.ReadDir(dir); len(entries) != 0 {
 		t.Errorf("a run that does not record left %d files", len(entries))
 	}
 }
 
 func TestRecordedWritesTheRecordingOnlyWhenAskedAndThenFailsTheTest(t *testing.T) {
-	folder := recording(t, "kept.txt", "before\n")
+	dir := writeRecordingFile(t, "kept.txt", "before\n")
 	for _, value := range []string{"", "0", "true", "yes"} {
 		t.Setenv(recordVariable, value)
-		checkRecordedIn(newStandIn(t), folder, "kept.txt", []byte("after\n"))
-		if kept, _ := os.ReadFile(filepath.Join(folder, "kept.txt")); string(kept) != "before\n" {
+		checkRecordedIn(newFakeTB(t), dir, "kept.txt", []byte("after\n"))
+		if kept, _ := os.ReadFile(filepath.Join(dir, "kept.txt")); string(kept) != "before\n" {
 			t.Errorf("%s=%q wrote the recording: %q", recordVariable, value, kept)
 		}
 	}
 	t.Setenv(recordVariable, "1")
 	for _, name := range []string{"kept.txt", "new/folder/made.txt"} {
-		recorder := newStandIn(t)
-		checkRecordedIn(recorder, folder, name, []byte("after\r\nlines\n"))
-		written, err := os.ReadFile(filepath.Join(folder, filepath.FromSlash(name)))
+		recorder := newFakeTB(t)
+		checkRecordedIn(recorder, dir, name, []byte("after\r\nlines\n"))
+		written, err := os.ReadFile(filepath.Join(dir, filepath.FromSlash(name)))
 		if err != nil || string(written) != "after\r\nlines\n" {
 			t.Errorf("%s: the recording is %q, %v; want the bytes that were given", name, written, err)
 		}
@@ -101,13 +101,13 @@ func TestRecordedReadsBelowThePackagesFolderWhereverTheTestHasGone(t *testing.T)
 	WriteFile(t, filepath.Join(packageDir, "testdata", "recorded"), "here.txt", []byte("here\n"))
 	t.Chdir(t.TempDir())
 	t.Setenv(recordVariable, "")
-	found := newStandIn(t)
+	found := newFakeTB(t)
 	CheckRecorded(found, "here.txt", []byte("here\n"))
 	if len(found.errors) != 0 {
 		t.Errorf("the recording of the package was not found from another working folder: %q", found.errors)
 	}
 	t.Setenv(recordVariable, "1")
-	CheckRecorded(newStandIn(t), "sub/written.txt", []byte("made\n"))
+	CheckRecorded(newFakeTB(t), "sub/written.txt", []byte("made\n"))
 	if _, err := os.Stat(filepath.Join(packageDir, "testdata", "recorded", "sub", "written.txt")); err != nil {
 		t.Errorf("a recording was not written below the package's folder: %v", err)
 	}

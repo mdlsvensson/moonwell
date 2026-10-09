@@ -55,11 +55,11 @@ func inLine(t testing.TB, document, source string) string {
 func refusedLua(t testing.TB, document, source string) *diag.Error {
 	t.Helper()
 	_, err := withSettings(t, document, source)
-	failure := asError(t, err, document)
-	if failure.File != luaFile || failure.Hint == "" || !strings.HasPrefix(failure.Msg, "Cannot apply map settings to Lua: ") {
-		t.Errorf("%s: the error names %q, hints %q and says %q", document, failure.File, failure.Hint, failure.Msg)
+	diagErr := asError(t, err, document)
+	if diagErr.File != luaFile || diagErr.Hint == "" || !strings.HasPrefix(diagErr.Msg, "Cannot apply map settings to Lua: ") {
+		t.Errorf("%s: the error names %q, hints %q and says %q", document, diagErr.File, diagErr.Hint, diagErr.Msg)
 	}
-	return failure
+	return diagErr
 }
 
 func swapped(t testing.TB, source, old, new string) string {
@@ -126,8 +126,8 @@ func TestMissingOrDuplicateEditorCallsRefuseAnEdit(t *testing.T) {
 		{source + "\nfunction config() SetMapName(\"x\") end", "exactly one global function config(), found 2"},
 		{swapped(t, source, "SetMapName(", "object.SetMapName("), "exactly one direct SetMapName in config() call, found 0"},
 	} {
-		if failure := refusedLua(t, name, c.source); !strings.Contains(failure.Msg, c.words) {
-			t.Errorf("the error says %q, want %q in it", failure.Msg, c.words)
+		if diagErr := refusedLua(t, name, c.source); !strings.Contains(diagErr.Msg, c.words) {
+			t.Errorf("the error says %q, want %q in it", diagErr.Msg, c.words)
 		}
 	}
 }
@@ -353,10 +353,10 @@ func TestUnsafePlayerTeamAndEnvironmentShapesAreRefused(t *testing.T) {
 	source := fixtureLua(t)
 	for _, c := range unsafeShapes {
 		_, err := withSettings(t, c.document, swapped(t, source, c.old, c.new))
-		failure := asError(t, err, c.document)
-		if failure.File != luaFile || failure.Hint == "" || !strings.Contains(failure.Msg, c.words) {
+		diagErr := asError(t, err, c.document)
+		if diagErr.File != luaFile || diagErr.Hint == "" || !strings.Contains(diagErr.Msg, c.words) {
 			t.Errorf("%s with %q: the error names %q, hints %q and says %q, want %q in it",
-				c.document, c.new, failure.File, failure.Hint, failure.Msg, c.words)
+				c.document, c.new, diagErr.File, diagErr.Hint, diagErr.Msg, c.words)
 		}
 	}
 }
@@ -364,13 +364,13 @@ func TestUnsafePlayerTeamAndEnvironmentShapesAreRefused(t *testing.T) {
 func TestAScriptThatDoesNotReadIsRefusedWithItsLineAndColumn(t *testing.T) {
 	source := swapped(t, fixtureLua(t), "function InitGlobals()", "function InitGlobals(((")
 	_, err := withSettings(t, `{"info":{"name":"x"}}`, source)
-	failure := asError(t, err, "a script that does not read")
-	if failure.File != luaFile || failure.Line != 4 || failure.Column != 22 || failure.Msg != "Cannot safely read map Lua: expected a name" {
-		t.Errorf("the error is %+v", failure)
+	diagErr := asError(t, err, "a script that does not read")
+	if diagErr.File != luaFile || diagErr.Line != 4 || diagErr.Column != 22 || diagErr.Msg != "Cannot safely read map Lua: expected a name" {
+		t.Errorf("the error is %+v", diagErr)
 	}
 	_, err = patchMinimap(source, luaFile)
-	if again := asError(t, err, "a script that does not read"); *again != *failure {
-		t.Errorf("the minimap call is refused with %+v, the settings with %+v", again, failure)
+	if again := asError(t, err, "a script that does not read"); *again != *diagErr {
+		t.Errorf("the minimap call is refused with %+v, the settings with %+v", again, diagErr)
 	}
 }
 
@@ -380,18 +380,18 @@ func TestATeamInARefusalIsWrittenInPlainDecimal(t *testing.T) {
 		"1e21":      "SetPlayerTeam(Player(11), 1000000000000000000000) disagrees with force 1",
 	} {
 		source := swapped(t, fixtureLua(t), "SetPlayerTeam(Player(11), 1)", "SetPlayerTeam(Player(11), "+team+")")
-		if failure := refusedLua(t, `{"forces":{"1":{"allied":true}}}`, source); !strings.Contains(failure.Msg, want) {
-			t.Errorf("the error says %q, want %q in it", failure.Msg, want)
+		if diagErr := refusedLua(t, `{"forces":{"1":{"allied":true}}}`, source); !strings.Contains(diagErr.Msg, want) {
+			t.Errorf("the error says %q, want %q in it", diagErr.Msg, want)
 		}
 	}
 }
 
 func TestAScriptThatNoLongerReadsAfterTheEditsIsRefusedWithWhatIsWrongWithIt(t *testing.T) {
 	source := swapped(t, fixtureLua(t), "SetPlayerTeam(Player(11), 1)\r\nend", "SetPlayerTeam(Player(11), 1)\r\nreturn\r\nend")
-	failure := refusedLua(t, `{"forces":{"0":{"allied":true}}}`, source)
+	diagErr := refusedLua(t, `{"forces":{"0":{"allied":true}}}`, source)
 	var cause *diag.Error
-	if !errors.As(failure.Cause, &cause) || cause.File != luaFile || !strings.Contains(cause.Msg, "return must end its block") {
-		t.Errorf("the cause is %v", failure.Cause)
+	if !errors.As(diagErr.Cause, &cause) || cause.File != luaFile || !strings.Contains(cause.Msg, "return must end its block") {
+		t.Errorf("the cause is %v", diagErr.Cause)
 	}
 }
 
@@ -403,13 +403,13 @@ func TestTheFirstOfSeveralRefusalsIsTheOneReported(t *testing.T) {
 		"forces":{"7":{"allied":true}},"environment":{"waterColor":[1,2,3,4]}}`
 	s := settingsOf(t, everything)
 	_, err := patchLua(source, s, readInfo(t, fixtureInfo(t), w3i.Extended), luaFile)
-	if failure := asError(t, err, everything); !strings.Contains(failure.Msg, "SetMapName in config() must have 1 argument(s)") {
-		t.Errorf("the error says %q", failure.Msg)
+	if diagErr := asError(t, err, everything); !strings.Contains(diagErr.Msg, "SetMapName in config() must have 1 argument(s)") {
+		t.Errorf("the error says %q", diagErr.Msg)
 	}
 	s.Info = manifest.Info{}
 	_, err = patchLua(source, s, readInfo(t, fixtureInfo(t), w3i.Extended), luaFile)
-	if failure := asError(t, err, everything); !strings.Contains(failure.Msg, "must call SetPlayerStartLocation(Player(1), 1)") {
-		t.Errorf("without the name, the error says %q", failure.Msg)
+	if diagErr := asError(t, err, everything); !strings.Contains(diagErr.Msg, "must call SetPlayerStartLocation(Player(1), 1)") {
+		t.Errorf("without the name, the error says %q", diagErr.Msg)
 	}
 }
 
@@ -420,9 +420,9 @@ func TestAPlayerOrAForceTheMapInfoLacksIsRefusedWithWhatToCreate(t *testing.T) {
 		{`{"forces":{"2":{"allied":true}}}`, "force 2 does not exist in war3map.w3i", "Create this force"},
 	} {
 		_, err := patchLua(fixtureLua(t), settingsOf(t, c.document), info, luaFile)
-		failure := asError(t, err, c.document)
-		if failure.File != luaFile || !strings.Contains(failure.Msg, c.words) || !strings.Contains(failure.Hint, c.hint) {
-			t.Errorf("%s: the error names %q, says %q and hints %q", c.document, failure.File, failure.Msg, failure.Hint)
+		diagErr := asError(t, err, c.document)
+		if diagErr.File != luaFile || !strings.Contains(diagErr.Msg, c.words) || !strings.Contains(diagErr.Hint, c.hint) {
+			t.Errorf("%s: the error names %q, says %q and hints %q", c.document, diagErr.File, diagErr.Msg, diagErr.Hint)
 		}
 	}
 }
@@ -527,8 +527,8 @@ func TestTextsAreWrittenWithQuotesBackslashesAndControlCharactersEscaped(t *test
 
 func TestUnreadablePatchedMapInfoIsReportedAgainstTheMapInfoFile(t *testing.T) {
 	_, err := afterInfo(fixtureLua(t), settingsOf(t, `{"info":{"name":"X"}}`), []byte{1, 2})
-	if failure := asError(t, err, "a cut-off map info"); failure.File != infoFile {
-		t.Errorf("the error names %q", failure.File)
+	if diagErr := asError(t, err, "a cut-off map info"); diagErr.File != infoFile {
+		t.Errorf("the error names %q", diagErr.File)
 	}
 }
 
@@ -594,15 +594,15 @@ var withoutOneMain = map[string]int{
 func TestTheMinimapCallNeedsExactlyOneGlobalMain(t *testing.T) {
 	for source, count := range withoutOneMain {
 		_, err := patchMinimap(source, luaFile)
-		failure := asError(t, err, source)
+		diagErr := asError(t, err, source)
 		want := fmt.Sprintf("expected exactly one global function main(), found %d.", count)
-		if !strings.Contains(failure.Msg, want) || failure.File != luaFile || failure.Hint == "" {
-			t.Errorf("error = %+v", failure)
+		if !strings.Contains(diagErr.Msg, want) || diagErr.File != luaFile || diagErr.Hint == "" {
+			t.Errorf("error = %+v", diagErr)
 		}
 	}
 	_, err := patchMinimap("function main(", luaFile)
-	if failure := asError(t, err, "a script that does not read"); failure.File != luaFile {
-		t.Errorf("the error names %q", failure.File)
+	if diagErr := asError(t, err, "a script that does not read"); diagErr.File != luaFile {
+		t.Errorf("the error names %q", diagErr.File)
 	}
 }
 
@@ -613,13 +613,13 @@ const (
 
 func TestTheMinimapCallIsRefusedWhereItWouldStandAfterAReturnedValue(t *testing.T) {
 	_, err := patchMinimap(mainReturnsValue, luaFile)
-	failure := asError(t, err, mainReturnsValue)
-	if failure.File != luaFile || failure.Hint == "" || !strings.Contains(failure.Msg, "the edited script could not be read back safely") {
-		t.Errorf("the error names %q, hints %q and says %q", failure.File, failure.Hint, failure.Msg)
+	diagErr := asError(t, err, mainReturnsValue)
+	if diagErr.File != luaFile || diagErr.Hint == "" || !strings.Contains(diagErr.Msg, "the edited script could not be read back safely") {
+		t.Errorf("the error names %q, hints %q and says %q", diagErr.File, diagErr.Hint, diagErr.Msg)
 	}
 	var cause *diag.Error
-	if !errors.As(failure.Cause, &cause) || !strings.Contains(cause.Msg, "return must end its block") {
-		t.Errorf("the cause is %v", failure.Cause)
+	if !errors.As(diagErr.Cause, &cause) || !strings.Contains(cause.Msg, "return must end its block") {
+		t.Errorf("the cause is %v", diagErr.Cause)
 	}
 	want := "function main()\n  InitBlizzard()\n  return\n" + minimapCall + "\nend\n"
 	if got, err := patchMinimap(mainReturns, luaFile); err != nil || got != want {
@@ -661,9 +661,9 @@ func TestAMapInfoWithAValueTheScriptCannotTakeIsRefused(t *testing.T) {
 			func(_ *w3i.Player, fog *w3i.Fog) { fog.Start.Value = endless }},
 	} {
 		_, err := patchLua(fixtureLua(t), settingsOf(t, c.document), damaged(t, c.change), luaFile)
-		failure := asError(t, err, c.document)
-		if failure.File != luaFile || !strings.Contains(failure.Msg, c.words) || !strings.Contains(failure.Hint, "Re-save the map in World Editor") {
-			t.Errorf("%s: the error names %q, says %q and hints %q; want %q in it", c.document, failure.File, failure.Msg, failure.Hint, c.words)
+		diagErr := asError(t, err, c.document)
+		if diagErr.File != luaFile || !strings.Contains(diagErr.Msg, c.words) || !strings.Contains(diagErr.Hint, "Re-save the map in World Editor") {
+			t.Errorf("%s: the error names %q, says %q and hints %q; want %q in it", c.document, diagErr.File, diagErr.Msg, diagErr.Hint, c.words)
 		}
 	}
 }

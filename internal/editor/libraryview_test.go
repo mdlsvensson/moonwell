@@ -329,21 +329,21 @@ func TestRefreshLibraryViewRefusesAModuleWhoseNameNamesNoFileOfTheFolder(t *test
 }
 
 func TestALinkOnTheWayToTheLibraryViewIsRefused(t *testing.T) {
-	for _, link := range []string{".moonwell", ".moonwell/lua"} {
+	for _, symlink := range []string{".moonwell", ".moonwell/lua"} {
 		root := t.TempDir()
-		at, target := linkAt(t, root, link)
+		at, target := linkAt(t, root, symlink)
 		write(t, target, "lua/behind.lua", "return 0", "behind.lua", "return 0")
 		behind := testkit.Snapshot(t, target)
 		for _, lua := range []func(script.Source) (string, bool){nil, compiled(nil)} {
 			written, err := RefreshLibraryView(root, librarySources(), lua)
-			failure := asError(t, err, "a link at "+link)
-			if failure.Msg != "Symlinks are not supported: "+at || failure.File != LibraryViewDir ||
-				!strings.Contains(failure.Hint, "real files") || written != nil {
-				t.Errorf("a link at %s: RefreshLibraryView = %q, %+v", link, written, failure)
+			diagErr := asError(t, err, "a link at "+symlink)
+			if diagErr.Msg != "Symlinks are not supported: "+at || diagErr.File != LibraryViewDir ||
+				!strings.Contains(diagErr.Hint, "real files") || written != nil {
+				t.Errorf("a link at %s: RefreshLibraryView = %q, %+v", symlink, written, diagErr)
 			}
 		}
 		if !reflect.DeepEqual(behind, testkit.Snapshot(t, target)) {
-			t.Errorf("a link at %s: what is behind the link changed", link)
+			t.Errorf("a link at %s: what is behind the link changed", symlink)
 		}
 	}
 }
@@ -427,11 +427,11 @@ func TestAFileInThePlaceOfTheLibraryViewIsRemovedAndTheViewsAreWritten(t *testin
 func TestAMoonwellFolderThatIsAFileFailsTheLibraryView(t *testing.T) {
 	root := lay(t, ".moonwell", "a file, not a folder")
 	written, err := RefreshLibraryView(root, librarySources(), compiled(nil))
-	failure := asError(t, err, "a file for .moonwell")
-	atFolder := failure.File == ".moonwell/lua" && strings.HasPrefix(failure.Msg, "Writing .moonwell/lua failed: ")
-	atView := failure.File == ".moonwell/lua/example/greet.lua" && strings.HasPrefix(failure.Msg, "Writing .moonwell/lua/example/greet.lua failed: ")
-	if !(atFolder || atView) || failure.Hint != folderHint || written != nil {
-		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	diagErr := asError(t, err, "a file for .moonwell")
+	atFolder := diagErr.File == ".moonwell/lua" && strings.HasPrefix(diagErr.Msg, "Writing .moonwell/lua failed: ")
+	atView := diagErr.File == ".moonwell/lua/example/greet.lua" && strings.HasPrefix(diagErr.Msg, "Writing .moonwell/lua/example/greet.lua failed: ")
+	if !(atFolder || atView) || diagErr.Hint != folderHint || written != nil {
+		t.Errorf("RefreshLibraryView = %q, %+v", written, diagErr)
 	}
 	if got := read(t, root, ".moonwell"); got != "a file, not a folder" {
 		t.Errorf(".moonwell holds %q", got)
@@ -450,10 +450,10 @@ func TestRefreshLibraryViewReportsAViewItCannotWrite(t *testing.T) {
 	}
 	sources[2].Text, sources[4].Text = "return 'greet'", "return 'kit'"
 	written, err := RefreshLibraryView(root, sources, nil)
-	failure := asError(t, err, "a view that cannot be written")
-	if !strings.HasPrefix(failure.Msg, "Writing .moonwell/lua/kit/init.lua failed: ") || failure.File != ".moonwell/lua/kit/init.lua" ||
-		failure.Hint != folderHint || failure.Cause == nil || written != nil {
-		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	diagErr := asError(t, err, "a view that cannot be written")
+	if !strings.HasPrefix(diagErr.Msg, "Writing .moonwell/lua/kit/init.lua failed: ") || diagErr.File != ".moonwell/lua/kit/init.lua" ||
+		diagErr.Hint != folderHint || diagErr.Cause == nil || written != nil {
+		t.Errorf("RefreshLibraryView = %q, %+v", written, diagErr)
 	}
 	if got := viewIn(t, root); got["example/greet.lua"] != "return 'greet'" || got["kit/init.lua"] != "return 2" {
 		t.Errorf("the view holds %q", got)
@@ -475,13 +475,13 @@ func TestAFileOfTheLibraryViewThatCannotBeRemovedIsReported(t *testing.T) {
 		t.Cleanup(func() { os.Chmod(filepath.Dir(gone), 0o777) })
 	}
 	written, err := RefreshLibraryView(root, nil, nil)
-	failure := asError(t, err, "a file that cannot be removed")
-	if !strings.HasPrefix(failure.Msg, "Removing .moonwell/lua/old/gone.lua failed: ") || failure.File != ".moonwell/lua/old/gone.lua" ||
-		failure.Hint != removalHint || failure.Cause == nil || written != nil {
-		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	diagErr := asError(t, err, "a file that cannot be removed")
+	if !strings.HasPrefix(diagErr.Msg, "Removing .moonwell/lua/old/gone.lua failed: ") || diagErr.File != ".moonwell/lua/old/gone.lua" ||
+		diagErr.Hint != removalHint || diagErr.Cause == nil || written != nil {
+		t.Errorf("RefreshLibraryView = %q, %+v", written, diagErr)
 	}
-	if strings.Contains(failure.Msg, root) || strings.Contains(failure.Msg+failure.Hint, "Warcraft") {
-		t.Errorf("the failure is worded for another file: %+v", failure)
+	if strings.Contains(diagErr.Msg, root) || strings.Contains(diagErr.Msg+diagErr.Hint, "Warcraft") {
+		t.Errorf("the failure is worded for another file: %+v", diagErr)
 	}
 }
 
@@ -510,10 +510,10 @@ func TestAFolderOfTheLibraryViewThatCannotBeListedOrAViewThatCannotBeLookedAtIsA
 		}
 		t.Cleanup(func() { os.Chmod(kit, 0o777) })
 		written, err := RefreshLibraryView(root, renamed("kit.init"), nil)
-		failure := asError(t, err, c.what)
-		if !slices.Contains(c.files, failure.File) || !strings.HasPrefix(failure.Msg, "Reading "+failure.File+" failed: ") ||
-			failure.Hint != readingHint || failure.Cause == nil || written != nil {
-			t.Errorf("%s: RefreshLibraryView = %q, %+v", c.what, written, failure)
+		diagErr := asError(t, err, c.what)
+		if !slices.Contains(c.files, diagErr.File) || !strings.HasPrefix(diagErr.Msg, "Reading "+diagErr.File+" failed: ") ||
+			diagErr.Hint != readingHint || diagErr.Cause == nil || written != nil {
+			t.Errorf("%s: RefreshLibraryView = %q, %+v", c.what, written, diagErr)
 		}
 	}
 }
@@ -535,10 +535,10 @@ func TestAFolderOfTheLibraryViewThatCannotBeRemovedIsReported(t *testing.T) {
 	}
 	t.Cleanup(func() { os.Chmod(guarded, 0o777) })
 	written, err := RefreshLibraryView(root, renamed("kit.init"), nil)
-	failure := asError(t, err, "a folder that cannot be removed")
-	if !strings.HasPrefix(failure.Msg, "Removing .moonwell/lua/held/hollow failed: ") || failure.File != ".moonwell/lua/held/hollow" ||
-		failure.Hint != removalHint || failure.Cause == nil || written != nil {
-		t.Errorf("RefreshLibraryView = %q, %+v", written, failure)
+	diagErr := asError(t, err, "a folder that cannot be removed")
+	if !strings.HasPrefix(diagErr.Msg, "Removing .moonwell/lua/held/hollow failed: ") || diagErr.File != ".moonwell/lua/held/hollow" ||
+		diagErr.Hint != removalHint || diagErr.Cause == nil || written != nil {
+		t.Errorf("RefreshLibraryView = %q, %+v", written, diagErr)
 	}
 	if got := viewIn(t, root); len(got) != 0 {
 		t.Errorf("a view was written before the folder was cleared: %q", got)

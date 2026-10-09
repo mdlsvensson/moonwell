@@ -132,8 +132,8 @@ func GreyPixels(size int) Pixels {
 	for y := range size {
 		for x := range size {
 			grey := byte((x*3 + y*5) % 256)
-			at := (y*size + x) * 4
-			rgba[at], rgba[at+1], rgba[at+2], rgba[at+3] = grey, grey, grey, 255
+			offset := (y*size + x) * 4
+			rgba[offset], rgba[offset+1], rgba[offset+2], rgba[offset+3] = grey, grey, grey, 255
 		}
 	}
 	return Pixels{Size: size, RGBA: rgba}
@@ -151,39 +151,39 @@ func PNG(picture Pixels, kind string) []byte {
 		source = &image.NRGBA{Pix: slices.Clone(picture.RGBA), Stride: size * 4, Rect: area}
 	case "rgb":
 		opaque := image.NewRGBA(area)
-		for at := 0; at < len(picture.RGBA); at += 4 {
-			copy(opaque.Pix[at:], picture.RGBA[at:at+3])
-			opaque.Pix[at+3] = 255
+		for offset := 0; offset < len(picture.RGBA); offset += 4 {
+			copy(opaque.Pix[offset:], picture.RGBA[offset:offset+3])
+			opaque.Pix[offset+3] = 255
 		}
 		source = opaque
 	case "rgba16":
 		deep := image.NewNRGBA64(area)
-		for at, value := range picture.RGBA {
-			binary.BigEndian.PutUint16(deep.Pix[at*2:], wide(value))
+		for offset, value := range picture.RGBA {
+			binary.BigEndian.PutUint16(deep.Pix[offset*2:], wide(value))
 		}
 		source = deep
 	case "rgb16":
 		deep := image.NewRGBA64(area)
-		for at, value := range picture.RGBA {
-			if at%4 == 3 {
+		for offset, value := range picture.RGBA {
+			if offset%4 == 3 {
 				value = 255
 			}
-			binary.BigEndian.PutUint16(deep.Pix[at*2:], wide(value))
+			binary.BigEndian.PutUint16(deep.Pix[offset*2:], wide(value))
 		}
-		for at := 6; at < len(deep.Pix); at += 8 {
-			deep.Pix[at], deep.Pix[at+1] = 255, 255
+		for offset := 6; offset < len(deep.Pix); offset += 8 {
+			deep.Pix[offset], deep.Pix[offset+1] = 255, 255
 		}
 		source = deep
 	case "grey":
 		grey := image.NewGray(area)
-		for at := range grey.Pix {
-			grey.Pix[at] = picture.RGBA[at*4]
+		for offset := range grey.Pix {
+			grey.Pix[offset] = picture.RGBA[offset*4]
 		}
 		source = grey
 	case "grey16":
 		grey := image.NewGray16(area)
-		for at := 0; at < size*size; at++ {
-			binary.BigEndian.PutUint16(grey.Pix[at*2:], wide(picture.RGBA[at*4]))
+		for offset := 0; offset < size*size; offset++ {
+			binary.BigEndian.PutUint16(grey.Pix[offset*2:], wide(picture.RGBA[offset*4]))
 		}
 		source = grey
 	case "palette":
@@ -193,8 +193,8 @@ func PNG(picture Pixels, kind string) []byte {
 			palette[index] = color.RGBA{R: grey, G: grey, B: grey, A: 255}
 		}
 		indexed := image.NewPaletted(area, palette)
-		for at := range indexed.Pix {
-			indexed.Pix[at] = 255 - picture.RGBA[at*4]
+		for offset := range indexed.Pix {
+			indexed.Pix[offset] = 255 - picture.RGBA[offset*4]
 		}
 		source = indexed
 	case "interlaced":
@@ -236,8 +236,8 @@ func interlacedPNG(picture Pixels) []byte {
 		for y := pass[1]; y < size; y += pass[3] {
 			rows.WriteByte(0)
 			for x := pass[0]; x < size; x += pass[2] {
-				at := (y*size + x) * 4
-				rows.Write(picture.RGBA[at : at+4])
+				offset := (y*size + x) * 4
+				rows.Write(picture.RGBA[offset : offset+4])
 			}
 		}
 	}

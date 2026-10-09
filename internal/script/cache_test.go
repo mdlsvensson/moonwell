@@ -310,13 +310,13 @@ func TestAProjectWithoutYueScriptCompilesNothingAndKeepsNoSources(t *testing.T) 
 }
 
 func TestALinkOnTheWayToTheHashesFileIsRefused(t *testing.T) {
-	for _, link := range []string{"dist", "dist/stage", "dist/stage/lua"} {
+	for _, symlink := range []string{"dist", "dist/stage", "dist/stage/lua"} {
 		b := benchOf(t, files("src/notes.txt", ""))
-		at := linkTo(t, files(".hashes.json", "{}"), b.root, link)
+		at := linkTo(t, files(".hashes.json", "{}"), b.root, symlink)
 		_, err := b.compile(fakeYue, false)
-		if failure := asError(t, err, "a link at "+link); failure.Msg != "Symlinks are not supported: "+at ||
-			failure.File != "dist/stage/lua" {
-			t.Errorf("a link at %s: %+v", link, failure)
+		if diagErr := asError(t, err, "a link at "+symlink); diagErr.Msg != "Symlinks are not supported: "+at ||
+			diagErr.File != "dist/stage/lua" {
+			t.Errorf("a link at %s: %+v", symlink, diagErr)
 		}
 	}
 }
@@ -324,10 +324,10 @@ func TestALinkOnTheWayToTheHashesFileIsRefused(t *testing.T) {
 func TestAHashesFileThatCannotBeWrittenIsRefusedByItsPath(t *testing.T) {
 	b := benchOf(t, mainOnly.and("dist/stage/lua/.hashes.json/kept.txt", ""))
 	b.fake(nil)
-	failure := b.refuses(fakeYue, false, "a folder for the hashes file")
-	if !strings.HasPrefix(failure.Msg, "Writing dist/stage/lua/.hashes.json failed: ") || failure.File != "dist/stage/lua/.hashes.json" ||
-		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil {
-		t.Errorf("error = %+v", failure)
+	diagErr := b.refuses(fakeYue, false, "a folder for the hashes file")
+	if !strings.HasPrefix(diagErr.Msg, "Writing dist/stage/lua/.hashes.json failed: ") || diagErr.File != "dist/stage/lua/.hashes.json" ||
+		!strings.Contains(diagErr.Hint, "dist/") || diagErr.Cause == nil {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -617,14 +617,14 @@ func TestAFailedListingIsReportedLikeAFileThatFailedToCompile(t *testing.T) {
 	failed := env.RunResult{ExitCode: 1, Stdout: "Failed to compile: main.yue\n2: unexpected expression\n"}
 	b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": failed})
 	uses, err := b.list("yue", "src/main.yue", "h1")
-	failure := asError(t, err, "a failed run")
-	if uses != nil || failure.Msg != "unexpected expression\n2: unexpected expression" || failure.File != "src/main.yue" || failure.Line != 2 {
-		t.Errorf("listUses = %+v, %+v", uses, failure)
+	diagErr := asError(t, err, "a failed run")
+	if uses != nil || diagErr.Msg != "unexpected expression\n2: unexpected expression" || diagErr.File != "src/main.yue" || diagErr.Line != 2 {
+		t.Errorf("listUses = %+v, %+v", uses, diagErr)
 	}
 	b = usesBenchOf(t, map[string]env.RunResult{"src/main.yue": {ExitCode: 1, Stderr: "7: on the error stream\n"}})
 	_, err = b.list("yue", "src/main.yue", "h1")
-	if failure := asError(t, err, "a failed run"); failure.Line != 7 || failure.File != "src/main.yue" {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asError(t, err, "a failed run"); diagErr.Line != 7 || diagErr.File != "src/main.yue" {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -632,8 +632,8 @@ func TestOutputThatCannotBeReadIsReportedAndTheOtherSourcesAreStillKept(t *testi
 	const bad, good, worse = "src/bad.yue", "src/good.yue", "src/Worse.yue"
 	b := usesBenchOf(t, map[string]env.RunResult{bad: prints("Score one 8\n"), good: prints("print 1 1\n"), worse: prints("x\n")})
 	_, err := b.list("yue", bad, "h1", good, "h2", worse, "h3")
-	if failure := asError(t, err, "unreadable output"); failure.Msg != "yue -g printed a line Moonwell cannot read: x" || failure.File != worse {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asError(t, err, "unreadable output"); diagErr.Msg != "yue -g printed a line Moonwell cannot read: x" || diagErr.File != worse {
+		t.Errorf("error = %+v", diagErr)
 	}
 	if ran := b.yue.ran(); !slices.Equal(ran, []string{worse, bad, good}) {
 		t.Errorf("the compiler listed %q", ran)
@@ -737,16 +737,16 @@ func TestAUsesFileThatCannotBeReadOrWrittenIsRefusedByItsPath(t *testing.T) {
 	b := usesBenchOf(t, map[string]env.RunResult{"src/main.yue": prints("print 1 1\n")})
 	testkit.WriteFile(t, b.root, "dist/stage/lua/.globals.json/kept.txt", nil)
 	_, err := b.list("yue", "src/main.yue", "h1")
-	failure := asError(t, err, "a folder for the uses file")
-	if !strings.HasPrefix(failure.Msg, "Writing dist/stage/lua/.globals.json failed: ") || failure.File != "dist/stage/lua/.globals.json" ||
-		!strings.Contains(failure.Hint, "dist/") || failure.Cause == nil {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, err, "a folder for the uses file")
+	if !strings.HasPrefix(diagErr.Msg, "Writing dist/stage/lua/.globals.json failed: ") || diagErr.File != "dist/stage/lua/.globals.json" ||
+		!strings.Contains(diagErr.Hint, "dist/") || diagErr.Cause == nil {
+		t.Errorf("error = %+v", diagErr)
 	}
 	b = usesBenchOf(t, nil)
 	at := linkTo(t, files(".globals.json", "{}"), b.root, "dist/stage")
 	_, err = b.list("yue", "src/main.yue", "h1")
-	if failure := asError(t, err, "a link at dist/stage"); failure.Msg != "Symlinks are not supported: "+at ||
-		failure.File != "dist/stage/lua/.globals.json" || len(b.yue.ran()) != 0 {
-		t.Errorf("a link at dist/stage: %+v", failure)
+	if diagErr := asError(t, err, "a link at dist/stage"); diagErr.Msg != "Symlinks are not supported: "+at ||
+		diagErr.File != "dist/stage/lua/.globals.json" || len(b.yue.ran()) != 0 {
+		t.Errorf("a link at dist/stage: %+v", diagErr)
 	}
 }

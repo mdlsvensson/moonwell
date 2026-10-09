@@ -54,7 +54,7 @@ func TestSweptPutsEachKindOfWhiteSpaceAtEachPlaceOfEachLine(t *testing.T) {
 	}
 }
 
-func kindOfChange(text, changed string) string {
+func describeChange(text, changed string) string {
 	lines := strings.Split(text, "\n")
 	for i := range lines {
 		switch changed {
@@ -92,7 +92,7 @@ func TestOneChangeIsALineCutOrDoubledAQuoteDroppedOrWhiteSpacePutIn(t *testing.T
 		random := rand.New(rand.NewPCG(1, 2))
 		for range 400 {
 			changed := mutateText(random, c.text)
-			kind := kindOfChange(c.text, changed)
+			kind := describeChange(c.text, changed)
 			if kind == "" {
 				t.Fatalf("%q became %q, which no one change makes", c.text, changed)
 			}
@@ -129,7 +129,7 @@ func TestChangedMakesTheSameTextOfASeedAndAnIndexOnEveryCall(t *testing.T) {
 	}
 	one := 0
 	for changed := range made {
-		if kindOfChange(text, changed) != "" {
+		if describeChange(text, changed) != "" {
 			one++
 		}
 	}
@@ -138,21 +138,21 @@ func TestChangedMakesTheSameTextOfASeedAndAnIndexOnEveryCall(t *testing.T) {
 	}
 }
 
-func kindOfByteChange(data, changed []byte) string {
+func describeByteChange(data, changed []byte) string {
 	grown := len(changed) - len(data)
-	for at := range data {
-		rest := data[at:]
+	for offset := range data {
+		rest := data[offset:]
 		run := min(max(grown, -grown), maxRunLength, len(rest))
 		switch {
-		case grown == 0 && changed[at] != data[at] && bytes.Equal(changed[:at], data[:at]) &&
-			bytes.Equal(changed[at+1:], rest[1:]):
+		case grown == 0 && changed[offset] != data[offset] && bytes.Equal(changed[:offset], data[:offset]) &&
+			bytes.Equal(changed[offset+1:], rest[1:]):
 			return "a byte set"
-		case grown < 0 && grown == -run && bytes.Equal(changed, slices.Concat(data[:at], rest[run:])):
+		case grown < 0 && grown == -run && bytes.Equal(changed, slices.Concat(data[:offset], rest[run:])):
 			return "a run dropped"
-		case grown > 0 && grown == run && bytes.Equal(changed, slices.Concat(data[:at], rest[:run], rest)):
+		case grown > 0 && grown == run && bytes.Equal(changed, slices.Concat(data[:offset], rest[:run], rest)):
 			return "a run doubled"
-		case grown == 0 && len(rest) >= 4 && bytes.Equal(changed[:at], data[:at]) &&
-			bytes.Equal(changed[at+4:], rest[4:]) && slices.Contains(EdgeNumbers(), binary.LittleEndian.Uint32(changed[at:])):
+		case grown == 0 && len(rest) >= 4 && bytes.Equal(changed[:offset], data[:offset]) &&
+			bytes.Equal(changed[offset+4:], rest[4:]) && slices.Contains(EdgeNumbers(), binary.LittleEndian.Uint32(changed[offset:])):
 			return "a number set"
 		}
 	}
@@ -167,15 +167,15 @@ func TestOneChangeOfBytesIsAByteSetARunDroppedARunDoubledOrANumberSet(t *testing
 	random := rand.New(rand.NewPCG(1, 2))
 	for range 800 {
 		changed := mutateBytes(random, slices.Clone(data))
-		kind := kindOfByteChange(data, changed)
+		kind := describeByteChange(data, changed)
 		if kind == "" {
 			t.Fatalf("%q became %q, which no one change makes", data, changed)
 		}
 		seen[kind]++
 		lengths[len(changed)-len(data)] = true
 		if kind == "a number set" {
-			for at := 0; at+4 <= len(changed); at++ {
-				numbers[binary.LittleEndian.Uint32(changed[at:])] = true
+			for offset := 0; offset+4 <= len(changed); offset++ {
+				numbers[binary.LittleEndian.Uint32(changed[offset:])] = true
 			}
 		}
 	}
@@ -191,7 +191,7 @@ func TestOneChangeOfBytesIsAByteSetARunDroppedARunDoubledOrANumberSet(t *testing
 	}
 	for range 200 {
 		short := []byte("xyz")
-		if changed := mutateBytes(random, slices.Clone(short)); kindOfByteChange(short, changed) == "" {
+		if changed := mutateBytes(random, slices.Clone(short)); describeByteChange(short, changed) == "" {
 			t.Fatalf("%q became %q, which no one change makes", short, changed)
 		}
 	}
@@ -218,7 +218,7 @@ func TestChangedBytesMakesTheSameBytesOfASeedAndAnIndexAndLeavesItsInputAlone(t 
 		if !bytes.Equal(MutateBytes(data, 10, index), changed) {
 			otherSeed++
 		}
-		if kindOfByteChange(data, changed) != "" {
+		if describeByteChange(data, changed) != "" {
 			one++
 		}
 		made[string(changed)] = true

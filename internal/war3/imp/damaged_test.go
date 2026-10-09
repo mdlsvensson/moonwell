@@ -46,11 +46,11 @@ func (c *tally) readOrRefused(t *testing.T, what string, data []byte) {
 	if value := testkit.PanicValue(func() { entries, err = imp.Read(data, indexFile) }); value != nil {
 		t.Fatalf("%s: Read panics: %v", what, value)
 	}
-	var failure *diag.Error
+	var diagErr *diag.Error
 	switch {
 	case err == nil && entries != nil:
 		c.read++
-	case err != nil && entries == nil && errors.As(err, &failure) && failure.File == indexFile:
+	case err != nil && entries == nil && errors.As(err, &diagErr) && diagErr.File == indexFile:
 		c.refused++
 	default:
 		t.Fatalf("%s: Read = %+v, %v; want entries, or an error of %s", what, entries, err, indexFile)

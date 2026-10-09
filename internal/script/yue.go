@@ -197,8 +197,8 @@ func readOrEmpty(path string) string {
 
 func withoutFailed(units []compileUnit, failures []*diag.Error) []compileUnit {
 	failed := map[string]bool{}
-	for _, failure := range failures {
-		failed[failure.File] = true
+	for _, diagErr := range failures {
+		failed[diagErr.File] = true
 	}
 	return slices.DeleteFunc(slices.Clone(units), func(unit compileUnit) bool { return failed[unit.path] })
 }

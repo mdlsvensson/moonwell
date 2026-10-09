@@ -125,8 +125,8 @@ func TestSettingsLuaOverridesPrecedeUnitCreation(t *testing.T) {
 	}
 	firstUnit := slices.IndexFunc(calls, func(s string) bool { return strings.HasPrefix(s, "BlzCreateUnitWithSkin(") })
 	for _, prefix := range []string{"NewSoundEnvironment(", "SetWaterBaseColor(", "SetTerrainFogEx("} {
-		at := slices.IndexFunc(calls, func(s string) bool { return strings.HasPrefix(s, prefix) })
-		if at < 0 || at >= firstUnit {
+		index := slices.IndexFunc(calls, func(s string) bool { return strings.HasPrefix(s, prefix) })
+		if index < 0 || index >= firstUnit {
 			t.Error(prefix + " must precede unit creation")
 		}
 	}

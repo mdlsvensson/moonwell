@@ -81,9 +81,9 @@ func TestSetupMakesTheLocalManifestBeforeItLooksForTheCompilerAndTheEditorsFiles
 	remove(t, root, "moonwell.local.pkl")
 	remove(t, root, "yueconfig.yue")
 	e, log, ran := pklOnly(t, root)
-	failure := asError(t, runSetup(background, e, commandArgs{}), "a compiler that is not there")
-	if !strings.Contains(failure.Msg, "yue.path does not exist") {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, runSetup(background, e, commandArgs{}), "a compiler that is not there")
+	if !strings.Contains(diagErr.Msg, "yue.path does not exist") {
+		t.Errorf("error = %+v", diagErr)
 	}
 	if lines := log.Lines(); !slices.Equal(lines, []string{createdLocal}) {
 		t.Errorf("log = %q", lines)
@@ -103,10 +103,10 @@ func TestSetupWithoutItsSourceMapFailsAtTheDeclarations(t *testing.T) {
 	remove(t, root, "yueconfig.yue")
 	useLibrary(t, root, exampleLibrary(t))
 	e, log := world.at(root)
-	failure := asError(t, runSetup(background, e, commandArgs{}), "a project without its source map")
-	if failure.File != "moonwell.local.pkl" || failure.Hint == "" ||
-		!strings.Contains(failure.Msg, "Source map folder maps/map.w3x not found") {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, runSetup(background, e, commandArgs{}), "a project without its source map")
+	if diagErr.File != "moonwell.local.pkl" || diagErr.Hint == "" ||
+		!strings.Contains(diagErr.Msg, "Source map folder maps/map.w3x not found") {
+		t.Errorf("error = %+v", diagErr)
 	}
 	logged := strings.Join(log.Lines(), "\n")
 	contains(t, logged, saysWhichCompiler(world.compiler), "Added yueconfig.yue for the editor.")
@@ -145,9 +145,9 @@ func TestSetupIsRefusedAtTheLibrariesByAHeldBuildLockAndByALinkAtDist(t *testing
 			c.arrange(t, root)
 			held := exists(root, "dist/.lock")
 			e, log := world.at(root)
-			failure := asError(t, runSetup(background, e, commandArgs{}), c.what)
-			if failure.File != c.file || failure.Hint == "" || !strings.Contains(failure.Msg, c.msg) {
-				t.Errorf("error = %+v", failure)
+			diagErr := asError(t, runSetup(background, e, commandArgs{}), c.what)
+			if diagErr.File != c.file || diagErr.Hint == "" || !strings.Contains(diagErr.Msg, c.msg) {
+				t.Errorf("error = %+v", diagErr)
 			}
 			contains(t, strings.Join(log.Lines(), "\n"), saysWhichCompiler(world.compiler))
 			for _, path := range []string{

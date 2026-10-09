@@ -63,10 +63,10 @@ func TestLoadReturnsTheRefusalOfAFolderThatIsNoProject(t *testing.T) {
 
 func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 	tests := []struct {
-		name   string
-		folder string
-		at     string
-		label  string
+		name  string
+		dir   string
+		at    string
+		label string
 	}{
 		{"the folder below maps", "map.w3x", "maps/map.w3x", "maps/map.w3x"},
 		{"a folder further down", "campaign/one.w3x", "maps/campaign/one.w3x", "maps/campaign/one.w3x"},
@@ -86,7 +86,7 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			s.project.Map.Folder = tt.folder
+			s.project.Map.Folder = tt.dir
 			before := testkit.Snapshot(t, s.root)
 			source, err := OpenSource(s.project)
 			if err != nil {
@@ -104,7 +104,7 @@ func TestSourceOpensTheMapFolderOfTheProject(t *testing.T) {
 
 func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 	const notInside, unusable = "must name a folder inside maps/", "has a name that Windows cannot hold"
-	tests := []struct{ name, folder, words string }{
+	tests := []struct{ name, dir, words string }{
 		{"no name", "", notInside},
 		{"maps itself", ".", notInside},
 		{"maps itself, the long way", "map.w3x/..", notInside},
@@ -134,11 +134,11 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 			s := newStandIn(t)
 			s.folder("outside")
 			s.folder("maps/a")
-			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
+			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.dir
 			source, err := OpenSource(s.project)
-			e := asError(t, err, "map.folder "+tt.folder)
+			e := asError(t, err, "map.folder "+tt.dir)
 			if source != nil || e.File != localManifest || e.Cause != nil || !strings.Contains(e.Msg, tt.words) ||
-				!strings.Contains(e.Msg, `"`+tt.folder+`"`) || !strings.Contains(e.Hint, "such as map.w3x") {
+				!strings.Contains(e.Msg, `"`+tt.dir+`"`) || !strings.Contains(e.Hint, "such as map.w3x") {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -148,7 +148,7 @@ func TestSourceRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 func TestSourceNamesTheManifestForAMapFolderThatIsNotThere(t *testing.T) {
 	tests := []struct {
 		name    string
-		folder  string
+		dir     string
 		arrange func(s *standIn)
 	}{
 		{"another name than the map has", "absent.w3x", func(*standIn) {}},
@@ -161,11 +161,11 @@ func TestSourceNamesTheManifestForAMapFolderThatIsNotThere(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t)
 			tt.arrange(s)
-			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
+			s.project.ManifestName, s.project.Map.Folder = localManifest, tt.dir
 			source, err := OpenSource(s.project)
 			e := asError(t, err, tt.name)
 			if source != nil || e.File != localManifest || e.Cause != nil ||
-				!strings.Contains(e.Msg, "maps/"+tt.folder+" not found") || !strings.Contains(e.Hint, "folder format") {
+				!strings.Contains(e.Msg, "maps/"+tt.dir+" not found") || !strings.Contains(e.Hint, "folder format") {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -187,8 +187,8 @@ func TestAPackedMapFileWhereTheMapFolderShouldBeIsRefusedAsAFile(t *testing.T) {
 
 func TestSourceRefusesALinkOnTheWayToTheMapAndALinkInTheMapsPlace(t *testing.T) {
 	tests := []struct {
-		name string
-		link string
+		name    string
+		symlink string
 	}{
 		{"maps is a link", "maps"},
 		{"the map folder is a link", "maps/map.w3x"},
@@ -197,15 +197,15 @@ func TestSourceRefusesALinkOnTheWayToTheMapAndALinkInTheMapsPlace(t *testing.T) 
 		t.Run(tt.name, func(t *testing.T) {
 			s := newStandIn(t)
 			elsewhere := filepath.Join(t.TempDir(), "real")
-			if err := os.Rename(s.at(tt.link), elsewhere); err != nil {
+			if err := os.Rename(s.at(tt.symlink), elsewhere); err != nil {
 				t.Fatal(err)
 			}
-			testkit.LinkDir(t, elsewhere, s.at(tt.link))
+			testkit.LinkDir(t, elsewhere, s.at(tt.symlink))
 			s.project.ManifestName = localManifest
 			source, err := OpenSource(s.project)
 			e := asError(t, err, tt.name)
 			if source != nil || e.File != "maps/map.w3x" || !strings.Contains(e.Msg, "Symlinks are not supported") ||
-				!strings.Contains(e.Msg, s.at(tt.link)) || !strings.Contains(e.Hint, "real files") {
+				!strings.Contains(e.Msg, s.at(tt.symlink)) || !strings.Contains(e.Hint, "real files") {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -396,9 +396,9 @@ func TestAssetsNamesTheSharedManifestForAMistakeInItsBlock(t *testing.T) {
 
 func TestAssetsRefusesALinkOnTheWayToALibrarysFiles(t *testing.T) {
 	tests := []struct {
-		name string
-		link string
-		to   string
+		name    string
+		symlink string
+		to      string
 	}{
 		{".moonwell is a link", ".moonwell", "library-assets/kit/axe.blp"},
 		{"the folder of the libraries' files is a link", ".moonwell/library-assets", "kit/axe.blp"},
@@ -409,12 +409,12 @@ func TestAssetsRefusesALinkOnTheWayToALibrarysFiles(t *testing.T) {
 			s := newStandIn(t)
 			elsewhere := t.TempDir()
 			testkit.WriteFile(t, elsewhere, tt.to, []byte("kit axe"))
-			s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash(tt.link))))
-			testkit.LinkDir(t, elsewhere, s.at(tt.link))
+			s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash(tt.symlink))))
+			testkit.LinkDir(t, elsewhere, s.at(tt.symlink))
 			found, replaced, err := CollectAssets(s.project, []library.Synced{syncedLibrary("kit", true)})
 			e := asError(t, err, tt.name)
 			if found != nil || replaced != nil || e.File != ".moonwell/library-assets/kit" ||
-				!strings.Contains(e.Msg, "Symlinks are not supported") || !strings.Contains(e.Msg, s.at(tt.link)) {
+				!strings.Contains(e.Msg, "Symlinks are not supported") || !strings.Contains(e.Msg, s.at(tt.symlink)) {
 				t.Errorf("error = %+v", e)
 			}
 		})
@@ -450,7 +450,7 @@ func TestAssetsNamesALibrarysFolderFromAProjectFolderThatIsGivenFromTheWorkingFo
 }
 
 func TestOwnershipFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
-	tests := []struct{ folder, want string }{
+	tests := []struct{ dir, want string }{
 		{"map.w3x", ".asset-state/map.w3x.json"},
 		{"campaign/one.w3x", ".asset-state/campaign/one.w3x.json"},
 		{`campaign\one.w3x`, ".asset-state/campaign/one.w3x.json"},
@@ -458,31 +458,31 @@ func TestOwnershipFileIsNamedByTheMapFolderAsEveryCommandReadsIt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		s := newStandIn(t)
-		s.project.Map.Folder = tt.folder
+		s.project.Map.Folder = tt.dir
 		before := testkit.Snapshot(t, s.root)
 		file, err := AssetStatePath(s.project)
 		if err != nil || file != tt.want {
-			t.Errorf("map.folder %q: OwnershipFile = %q, %v, want %q", tt.folder, file, err, tt.want)
+			t.Errorf("map.folder %q: OwnershipFile = %q, %v, want %q", tt.dir, file, err, tt.want)
 		}
 		if !reflect.DeepEqual(testkit.Snapshot(t, s.root), before) {
-			t.Errorf("map.folder %q: naming the state file changed the project", tt.folder)
+			t.Errorf("map.folder %q: naming the state file changed the project", tt.dir)
 		}
 	}
 }
 
 func TestOwnershipFileRefusesAMapFolderThatIsNotAFolderInsideMaps(t *testing.T) {
 	const notInside = "must name a folder inside maps/"
-	tests := []struct{ folder, words string }{
+	tests := []struct{ dir, words string }{
 		{"", notInside}, {"../outside", notInside}, {`C:\x`, notInside}, {"a/../b.w3x", notInside},
 		{"map?.w3x", "has a name that Windows cannot hold"},
 	}
 	for _, tt := range tests {
 		s := newStandIn(t)
-		s.project.ManifestName, s.project.Map.Folder = localManifest, tt.folder
+		s.project.ManifestName, s.project.Map.Folder = localManifest, tt.dir
 		file, err := AssetStatePath(s.project)
-		e := asError(t, err, "map.folder "+tt.folder)
+		e := asError(t, err, "map.folder "+tt.dir)
 		if file != "" || e.File != localManifest || !strings.Contains(e.Msg, tt.words) {
-			t.Errorf("map.folder %q: OwnershipFile = %q, %+v", tt.folder, file, e)
+			t.Errorf("map.folder %q: OwnershipFile = %q, %+v", tt.dir, file, e)
 		}
 	}
 }

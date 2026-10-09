@@ -786,14 +786,14 @@ func TestHM3WHeaderCutsTheNameAtTheLastByteThatFits(t *testing.T) {
 		{"a letter of two bytes across the limit", strings.Repeat("n", 494) + "\xC3\xA9", 495},
 	} {
 		header := mpq.HM3WHeader(c.given, 0x01020304, 0x05060708)
-		at := 8 + c.nameSize
-		if len(header) != 512 || string(header[8:at]) != c.given[:c.nameSize] || header[at] != 0 {
-			t.Errorf("%s: the name is %q", c.name, header[8:at+1])
+		index := 8 + c.nameSize
+		if len(header) != 512 || string(header[8:index]) != c.given[:c.nameSize] || header[index] != 0 {
+			t.Errorf("%s: the name is %q", c.name, header[8:index+1])
 			continue
 		}
-		numbers, rest := header[at+1:at+9], header[at+9:]
+		numbers, rest := header[index+1:index+9], header[index+9:]
 		if !bytes.Equal(numbers, []byte{4, 3, 2, 1, 8, 7, 6, 5}) || !bytes.Equal(rest, make([]byte, len(rest))) {
-			t.Errorf("%s: after the name comes % X", c.name, header[at+1:])
+			t.Errorf("%s: after the name comes % X", c.name, header[index+1:])
 		}
 	}
 }

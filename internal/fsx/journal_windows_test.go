@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func holdForReading(t *testing.T, path string) {
+func openForReading(t *testing.T, path string) {
 	t.Helper()
 	name, err := syscall.UTF16PtrFromString(path)
 	if err != nil {
@@ -22,8 +22,8 @@ func holdForReading(t *testing.T, path string) {
 
 func TestJournalUndoLeavesAFileThatAFailedRemoveDidNotChange(t *testing.T) {
 	held := filepath.Join(t.TempDir(), "held.txt")
-	write(t, held, "before")
-	holdForReading(t, held)
+	writeFile(t, held, "before")
+	openForReading(t, held)
 
 	var journal Journal
 	if err := journal.Remove(held); err == nil {
@@ -35,7 +35,7 @@ func TestJournalUndoLeavesAFileThatAFailedRemoveDidNotChange(t *testing.T) {
 	if unrestored := journal.Undo(); len(unrestored) != 0 {
 		t.Errorf("unrestored = %v, want none: the file holds what it held", unrestored)
 	}
-	if got := read(t, held); got != "before" {
+	if got := readFile(t, held); got != "before" {
 		t.Errorf("the held file holds %q, want what it held before the remove", got)
 	}
 }

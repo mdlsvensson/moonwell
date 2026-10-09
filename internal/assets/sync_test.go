@@ -154,9 +154,9 @@ func TestTheFilesLibrariesShipAreSyncedLikeTheMapsOwnAndOwned(t *testing.T) {
 	}
 }
 
-func inTheWayOf(t *testing.T, s *site, folder string) {
+func inTheWayOf(t *testing.T, s *site, dir string) {
 	t.Helper()
-	put(t, s.mapDir, folder, "in the way")
+	put(t, s.mapDir, dir, "in the way")
 }
 
 func TestAFailedSyncUndoesTheWritesItMade(t *testing.T) {

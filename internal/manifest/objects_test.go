@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-func objectsOf(t *testing.T, document, file string) Objects {
+func mustDecodeObjects(t *testing.T, document, file string) Objects {
 	t.Helper()
-	return decoded(t, printed(`"objects":`+document), file).Objects
+	return mustDecodeProject(t, pklOutput(`"objects":`+document), file).Objects
 }
 
 func TestAnObjectWithoutASourceIsFromTheEvaluatedManifest(t *testing.T) {
-	objects := objectsOf(t, `{"units":{
+	objects := mustDecodeObjects(t, `{"units":{
 		"captain":{"id":"h000","base":"hfoo","source":"objects/units.pkl","properties":{}},
 		"local":{"id":"h001","base":"hfoo","properties":{}},
 		"null":{"id":"h002","base":"hfoo","source":null}}}`, "moonwell.local.pkl")
@@ -29,7 +29,7 @@ func TestAnObjectWithoutASourceIsFromTheEvaluatedManifest(t *testing.T) {
 }
 
 func TestAnObjectsOwnKeysAreApartFromItsTypedProperties(t *testing.T) {
-	objects := objectsOf(t, `{"abilities":{"bolt":{
+	objects := mustDecodeObjects(t, `{"abilities":{"bolt":{
 		"tooltipNormal":["a","b"],"id":"A000","name":"Bolt","base":"AHtb","levels":3,"hero":false,"inherited":null,
 		"source":"objects/a.pkl",
 		"properties":{"amountHealedOrDamaged":[200,400.5],"Htb1":[["x","y"],["z"]],"skipped":null,"name":"raw"},
@@ -57,10 +57,10 @@ func TestAnObjectsOwnKeysAreApartFromItsTypedProperties(t *testing.T) {
 
 func TestObjectsAreReadByCategoryInTheOrderWritten(t *testing.T) {
 	var none Objects
-	if !none.IsEmpty() || !objectsOf(t, `{"heroes":{},"units":{},"upgrades":{}}`, "moonwell.pkl").IsEmpty() {
+	if !none.IsEmpty() || !mustDecodeObjects(t, `{"heroes":{},"units":{},"upgrades":{}}`, "moonwell.pkl").IsEmpty() {
 		t.Error("objects without an object are not empty")
 	}
-	objects := objectsOf(t, `{
+	objects := mustDecodeObjects(t, `{
 		"heroes":{"h":{"id":"H000","base":"Hpal"}},
 		"units":{"u2":{"id":"h001","base":"hfoo"},"u1":{"id":"h000","base":"hfoo"}},
 		"buildings":{"b":{"id":"h002","base":"htow"}},
@@ -84,7 +84,7 @@ func TestObjectsAreReadByCategoryInTheOrderWritten(t *testing.T) {
 		t.Errorf("Empty = %v, and a category that is none has %d objects", objects.IsEmpty(), objects.ByCategory("doodads").Len())
 	}
 	for _, category := range Categories {
-		one := objectsOf(t, `{"`+string(category)+`":{"x":{"id":"x000","base":"hfoo"}}}`, "moonwell.pkl")
+		one := mustDecodeObjects(t, `{"`+string(category)+`":{"x":{"id":"x000","base":"hfoo"}}}`, "moonwell.pkl")
 		if one.IsEmpty() || one.ByCategory(category).Len() != 1 {
 			t.Errorf("an object of %s alone: Empty = %v, Of has %d", category, one.IsEmpty(), one.ByCategory(category).Len())
 		}

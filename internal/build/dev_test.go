@@ -120,7 +120,7 @@ func TestCountsInProjectTakesSourcesModulesAssetsObjectFilesAndManifestsOnly(t *
 }
 
 func TestCountsInLibraryPassesOverWhatIsUnderADotFolder(t *testing.T) {
-	folder := filepath.Join(t.TempDir(), "lib", "src")
+	dir := filepath.Join(t.TempDir(), "lib", "src")
 	tests := map[string]bool{
 		"example/greet.lua":    true,
 		"example":              true,
@@ -128,7 +128,7 @@ func TestCountsInLibraryPassesOverWhatIsUnderADotFolder(t *testing.T) {
 		"example/.cache/x.lua": false,
 	}
 	for file, want := range tests {
-		if got := isLibrarySource(folder, filepath.Join(folder, filepath.FromSlash(file))); got != want {
+		if got := isLibrarySource(dir, filepath.Join(dir, filepath.FromSlash(file))); got != want {
 			t.Errorf("countsInLibrary(%s) = %v", file, got)
 		}
 	}
@@ -303,10 +303,10 @@ func TestWhatACheckWritesIsNoChange(t *testing.T) {
 func TestDevFailsBeforeAnyWorkWhenSrcIsMissing(t *testing.T) {
 	root := t.TempDir()
 	e, log := testkit.Env(t, root)
-	failure := asError(t, Dev(background, e, DefaultWatchTiming), "no src")
-	if failure.Msg != "The src/ folder is missing." || failure.File != root ||
-		failure.Hint != "Run dev from a Moonwell project folder, or create one with `moonwell init <dir>`." {
-		t.Errorf("error = %+v", failure)
+	diagErr := asError(t, Dev(background, e, DefaultWatchTiming), "no src")
+	if diagErr.Msg != "The src/ folder is missing." || diagErr.File != root ||
+		diagErr.Hint != "Run dev from a Moonwell project folder, or create one with `moonwell init <dir>`." {
+		t.Errorf("error = %+v", diagErr)
 	}
 	if entries, err := os.ReadDir(root); err != nil || len(entries) != 0 || len(log.Lines()) != 0 {
 		t.Errorf("Dev left %d file(s) in the folder, %v, and logged %q", len(entries), err, log.Lines())
@@ -343,8 +343,8 @@ func TestDevWatchesAssetsObjectsAndLuaWhenTheyExist(t *testing.T) {
 	}
 	for line, folders := range tests {
 		root := t.TempDir()
-		for _, folder := range append([]string{"src"}, folders...) {
-			if err := os.Mkdir(filepath.Join(root, folder), 0o777); err != nil {
+		for _, dir := range append([]string{"src"}, folders...) {
+			if err := os.Mkdir(filepath.Join(root, dir), 0o777); err != nil {
 				t.Fatal(err)
 			}
 		}

@@ -40,7 +40,7 @@ type installer struct {
 	command       func(home, base string) *exec.Cmd
 }
 
-func thisInstaller(t *testing.T) installer {
+func currentInstaller(t *testing.T) installer {
 	t.Helper()
 	if runtime.GOARCH != "amd64" {
 		t.Skip("the install scripts install the x86-64 builds")
@@ -71,7 +71,7 @@ func (i installer) checksums(content []byte) []byte {
 }
 
 func TestTheInstallScriptInstallsAndUpgrades(t *testing.T) {
-	install := thisInstaller(t)
+	install := currentInstaller(t)
 	home := t.TempDir()
 	target := filepath.Join(home, filepath.FromSlash(install.target))
 	for _, content := range []string{"the first executable", "the executable of a later run"} {
@@ -94,7 +94,7 @@ func TestTheInstallScriptInstallsAndUpgrades(t *testing.T) {
 }
 
 func TestTheInstallScriptRefusesABadDownloadAndKeepsTheInstalledFile(t *testing.T) {
-	install := thisInstaller(t)
+	install := currentInstaller(t)
 	content := []byte("the executable")
 	for name, c := range map[string]struct {
 		files release

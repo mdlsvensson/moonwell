@@ -123,9 +123,9 @@ func errUnreadableDir(file string, cause error) error {
 
 func errSymlink(file string) error {
 	err := fsx.NewSymlinkError(file)
-	var failure *diag.Error
-	if errors.As(err, &failure) {
-		failure.File = file
+	var diagErr *diag.Error
+	if errors.As(err, &diagErr) {
+		diagErr.File = file
 	}
 	return err
 }

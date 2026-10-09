@@ -45,12 +45,12 @@ func firstDifference(got, want string) string {
 	if got == want {
 		return ""
 	}
-	at := 0
-	for at < len(got) && at < len(want) && got[at] == want[at] {
-		at++
+	index := 0
+	for index < len(got) && index < len(want) && got[index] == want[index] {
+		index++
 	}
 	return fmt.Sprintf("they differ first at byte %d, of %d and %d: got %q, want %q",
-		at, len(got), len(want), got[at:min(len(got), at+40)], want[at:min(len(want), at+40)])
+		index, len(got), len(want), got[index:min(len(got), index+40)], want[index:min(len(want), index+40)])
 }
 
 func TestInjectAppendsTheBundleAfterTheScriptAndTellsItItsFirstLine(t *testing.T) {
@@ -108,10 +108,10 @@ func TestInjectRequiresMainAndConfig(t *testing.T) {
 		{"a script that holds nothing", "", "main"},
 	} {
 		changes, err := Inject(mapOf(t, "war3map.lua", c.script), small)
-		failure := asError(t, err, c.name)
-		if changes != nil || failure.Msg != "The map script does not define function "+c.lacks+"()." || failure.File != mapLabel+"/war3map.lua" ||
-			!strings.Contains(failure.Hint, "Lua as the script language (Scenario \xe2\x80\xba Map Options)") {
-			t.Errorf("%s: Inject = %+v, %+v", c.name, changes, failure)
+		diagErr := asError(t, err, c.name)
+		if changes != nil || diagErr.Msg != "The map script does not define function "+c.lacks+"()." || diagErr.File != mapLabel+"/war3map.lua" ||
+			!strings.Contains(diagErr.Hint, "Lua as the script language (Scenario \xe2\x80\xba Map Options)") {
+			t.Errorf("%s: Inject = %+v, %+v", c.name, changes, diagErr)
 		}
 	}
 }
@@ -193,24 +193,24 @@ func TestInjectKeepsAByteOrderMarkAndBytesThatAreNotUTF8(t *testing.T) {
 
 func TestInjectRefusesAMapWithoutAScript(t *testing.T) {
 	changes, err := Inject(mapOf(t, "war3map.w3i", "the map's info", "war3map.j", "function main takes nothing returns nothing"), small)
-	failure := asError(t, err, "no script")
-	if changes != nil || failure.Msg != "The map has no war3map.lua." || failure.File != mapLabel+"/war3map.lua" ||
-		!strings.Contains(failure.Hint, "Lua as the script language") {
-		t.Errorf("no script: Inject = %+v, %+v", changes, failure)
+	diagErr := asError(t, err, "no script")
+	if changes != nil || diagErr.Msg != "The map has no war3map.lua." || diagErr.File != mapLabel+"/war3map.lua" ||
+		!strings.Contains(diagErr.Hint, "Lua as the script language") {
+		t.Errorf("no script: Inject = %+v, %+v", changes, diagErr)
 	}
 	folder := mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n")
 	_, err = Inject(folder.WithChanges([]mapdir.Change{{Path: "war3map.lua", Remove: true}}), small)
-	if failure := asError(t, err, "a script that is removed"); failure.Msg != "The map has no war3map.lua." {
-		t.Errorf("a script that is removed: %+v", failure)
+	if diagErr := asError(t, err, "a script that is removed"); diagErr.Msg != "The map has no war3map.lua." {
+		t.Errorf("a script that is removed: %+v", diagErr)
 	}
 }
 
 func TestInjectRefusesAFolderInThePlaceOfTheScriptAsAFolder(t *testing.T) {
 	changes, err := Inject(mapOf(t, "War3map.lua/notes.txt", "a folder under the script's name"), small)
-	failure := asError(t, err, "a folder")
-	if changes != nil || failure.Msg != "War3map.lua in the map is a folder, not a file." || failure.File != mapLabel+"/War3map.lua" ||
-		!strings.Contains(failure.Hint, "Remove that folder") || strings.Contains(failure.Msg, "has no") {
-		t.Errorf("a folder: Inject = %+v, %+v", changes, failure)
+	diagErr := asError(t, err, "a folder")
+	if changes != nil || diagErr.Msg != "War3map.lua in the map is a folder, not a file." || diagErr.File != mapLabel+"/War3map.lua" ||
+		!strings.Contains(diagErr.Hint, "Remove that folder") || strings.Contains(diagErr.Msg, "has no") {
+		t.Errorf("a folder: Inject = %+v, %+v", changes, diagErr)
 	}
 }
 
@@ -221,8 +221,8 @@ func TestInjectReadsTheScriptInAnyLetterCaseAndNamesTheChangeAsTheMapSpellsIt(t 
 		t.Errorf("the change is of %s: %q", change.Path, change.Data[:min(len(change.Data), 60)])
 	}
 	_, err := Inject(mapOf(t, "War3Map.LUA", "function main()\nend\n"), small)
-	if failure := asError(t, err, "no config"); failure.File != mapLabel+"/War3Map.LUA" {
-		t.Errorf("the refusal names the script as %s", failure.File)
+	if diagErr := asError(t, err, "no config"); diagErr.File != mapLabel+"/War3Map.LUA" {
+		t.Errorf("the refusal names the script as %s", diagErr.File)
 	}
 }
 
@@ -251,9 +251,9 @@ func TestInjectPassesOnAScriptThatCannotBeRead(t *testing.T) {
 	folder := mapOf(t, "war3map.lua", "function main()\nend\nfunction config()\nend\n")
 	testkit.MakeUnreadable(t, filepath.Join(folder.Dir(), "war3map.lua"))
 	changes, err := Inject(folder, small)
-	failure := asError(t, err, "a script that cannot be read")
-	if changes != nil || !strings.Contains(failure.Msg, "Reading a map file failed") || failure.File != mapLabel+"/war3map.lua" || failure.Cause == nil {
-		t.Errorf("Inject = %+v, %+v", changes, failure)
+	diagErr := asError(t, err, "a script that cannot be read")
+	if changes != nil || !strings.Contains(diagErr.Msg, "Reading a map file failed") || diagErr.File != mapLabel+"/war3map.lua" || diagErr.Cause == nil {
+		t.Errorf("Inject = %+v, %+v", changes, diagErr)
 	}
 }
 

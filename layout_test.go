@@ -35,14 +35,14 @@ var (
 	belowFormats = []string{"diag", "fsx", "binio"}
 	testOnly     = []string{"testkit", "tooltest"}
 	outsideWorld = []string{"os/exec", "net/http"}
-	excused      = map[string][]string{
+	exemptions   = map[string][]string{
 		"fsx": {"os/exec"},
 	}
-	commandLine = []string{
+	commandLineModules = []string{
 		"github.com/spf13/cobra", "github.com/spf13/pflag", "github.com/inconshreveable/mousetrap",
 	}
-	generatorMay   = []string{"objects", "script", "assets", "manifest", "fsx"}
-	parserTestsMay = []string{"fsx"}
+	generatorImports  = []string{"objects", "script", "assets", "manifest", "fsx"}
+	parserTestImports = []string{"fsx"}
 )
 
 func isFormat(pkg string) bool { return strings.HasPrefix(pkg, "war3/") }
@@ -52,12 +52,12 @@ func isFoundation(pkg string) bool {
 	return is
 }
 
-func onAShelf(pkg string) bool {
+func isOnShelf(pkg string) bool {
 	return isFormat(pkg) || pkg == "build" || pkg == "cli" || isFoundation(pkg) ||
 		slices.Contains(areas, pkg) || slices.Contains(testOnly, pkg)
 }
 
-func allowed(from, to string) bool {
+func mayImport(from, to string) bool {
 	below := isFormat(to) || isFoundation(to)
 	switch {
 	case from == "testkit" && (slices.Contains(areas, to) || to == "tooltest"):
@@ -84,20 +84,20 @@ func allowed(from, to string) bool {
 	return false
 }
 
-func allowedInATest(from, to string) bool {
-	return from == to || slices.Contains(testOnly, to) || allowed(from, to)
+func testMayImport(from, to string) bool {
+	return from == to || slices.Contains(testOnly, to) || mayImport(from, to)
 }
 
 type goFile struct {
 	path    string
 	pkg     string
-	shelved bool
+	onShelf bool
 	tool    string
-	tooled  bool
+	isTool  bool
 	isTest  bool
 }
 
-func fileAt(file string) goFile {
+func newGoFile(file string) goFile {
 	pkg, shelved := packageBelow(file, "internal")
 	tool, tooled := packageBelow(file, "tools")
 	return goFile{file, pkg, shelved, tool, tooled, strings.HasSuffix(file, "_test.go")}
@@ -114,26 +114,26 @@ func packageBelow(file, top string) (string, bool) {
 func isParser(tool string) bool { return path.Dir(tool) == "gen" }
 
 var rules = []func(f goFile, target string) string{
-	insideTheProgram, lineReadByCli, cliAlone, downTheShelves, offTheTools, amongTheTools,
+	ruleOutsideWorldOnlyInEnv, ruleCommandLineOnlyInCli, ruleCommandsImportOnlyCli, ruleImportsGoDownShelves, ruleOnlyToolsImportTools, ruleToolImports,
 }
 
-func lineReadByCli(f goFile, target string) string {
-	reads := slices.ContainsFunc(commandLine, func(m string) bool { return target == m || strings.HasPrefix(target, m+"/") })
-	if !reads || f.shelved && f.pkg == "cli" {
+func ruleCommandLineOnlyInCli(f goFile, target string) string {
+	isCommandLineModule := slices.ContainsFunc(commandLineModules, func(m string) bool { return target == m || strings.HasPrefix(target, m+"/") })
+	if !isCommandLineModule || f.onShelf && f.pkg == "cli" {
 		return ""
 	}
 	return fmt.Sprintf("%s imports %s; only cli reads the command line", f.path, target)
 }
 
-func insideTheProgram(f goFile, target string) string {
-	let := f.isTest || f.pkg == "env" || slices.Contains(testOnly, f.pkg) || slices.Contains(excused[f.pkg], target)
-	if let || !slices.Contains(outsideWorld, target) {
+func ruleOutsideWorldOnlyInEnv(f goFile, target string) string {
+	isExempt := f.isTest || f.pkg == "env" || slices.Contains(testOnly, f.pkg) || slices.Contains(exemptions[f.pkg], target)
+	if isExempt || !slices.Contains(outsideWorld, target) {
 		return ""
 	}
 	return fmt.Sprintf("%s imports %s; only env and test files may", f.path, target)
 }
 
-func cliAlone(f goFile, target string) string {
+func ruleCommandsImportOnlyCli(f goFile, target string) string {
 	inModule := target == module || strings.HasPrefix(target, module+"/")
 	to, onShelves := strings.CutPrefix(target, shelves)
 	switch {
@@ -146,29 +146,29 @@ func cliAlone(f goFile, target string) string {
 	return ""
 }
 
-func downTheShelves(f goFile, target string) string {
+func ruleImportsGoDownShelves(f goFile, target string) string {
 	to, onShelves := strings.CutPrefix(target, shelves)
 	switch {
-	case !onShelves || !f.shelved:
-	case f.isTest && !allowedInATest(f.pkg, to):
+	case !onShelves || !f.onShelf:
+	case f.isTest && !testMayImport(f.pkg, to):
 		return fmt.Sprintf("%s: a test of package %s must not import %s", f.path, f.pkg, to)
-	case !f.isTest && !allowed(f.pkg, to):
+	case !f.isTest && !mayImport(f.pkg, to):
 		return fmt.Sprintf("%s: package %s must not import %s", f.path, f.pkg, to)
 	}
 	return ""
 }
 
-func offTheTools(f goFile, target string) string {
-	if f.tooled || !strings.HasPrefix(target, toolsTree) {
+func ruleOnlyToolsImportTools(f goFile, target string) string {
+	if f.isTool || !strings.HasPrefix(target, toolsTree) {
 		return ""
 	}
 	return fmt.Sprintf("%s imports %s; only the generator and its parsers import a package below tools", f.path, target)
 }
 
-func amongTheTools(f goFile, target string) string {
+func ruleToolImports(f goFile, target string) string {
 	inModule := target == module || strings.HasPrefix(target, module+"/")
 	switch {
-	case !f.tooled || !inModule || toolMay(f, target):
+	case !f.isTool || !inModule || toolMayImport(f, target):
 		return ""
 	case f.isTest:
 		return fmt.Sprintf("%s: a test of package %s must not import %s", f.path, path.Join("tools", f.tool), target)
@@ -176,27 +176,27 @@ func amongTheTools(f goFile, target string) string {
 	return fmt.Sprintf("%s: package %s must not import %s", f.path, path.Join("tools", f.tool), target)
 }
 
-func toolMay(f goFile, target string) bool {
+func toolMayImport(f goFile, target string) bool {
 	to, onShelves := strings.CutPrefix(target, shelves)
 	below := func(packages []string) bool { return onShelves && slices.Contains(packages, to) }
 	switch {
 	case f.isTest && (target == toolsTree+f.tool || below(testOnly)):
 		return true
 	case f.tool == "gen":
-		return target == module || below(generatorMay) || isParser(strings.TrimPrefix(target, toolsTree))
+		return target == module || below(generatorImports) || isParser(strings.TrimPrefix(target, toolsTree))
 	case isParser(f.tool):
-		return f.isTest && below(parserTestsMay)
+		return f.isTest && below(parserTestImports)
 	}
 	return false
 }
 
-func (f goFile) broken(imports []string) []string {
+func (f goFile) violations(imports []string) []string {
 	var reports []string
 	const onNoShelf = "%s: package %s is on no shelf; add it to this test and to ARCHITECTURE.md"
-	if f.shelved && !onAShelf(f.pkg) {
+	if f.onShelf && !isOnShelf(f.pkg) {
 		reports = append(reports, fmt.Sprintf(onNoShelf, f.path, f.pkg))
 	}
-	if f.tooled && f.tool != "gen" && !isParser(f.tool) {
+	if f.isTool && f.tool != "gen" && !isParser(f.tool) {
 		reports = append(reports, fmt.Sprintf(onNoShelf, f.path, path.Join("tools", f.tool)))
 	}
 	for _, target := range imports {
@@ -226,8 +226,8 @@ func importsOf(file string) ([]string, error) {
 }
 
 func walkShelves(root string, report func(format string, args ...any)) error {
-	for _, folder := range scanned {
-		top := filepath.Join(root, folder)
+	for _, dir := range scanned {
+		top := filepath.Join(root, dir)
 		if _, err := os.Stat(top); errors.Is(err, fs.ErrNotExist) {
 			continue
 		}
@@ -251,7 +251,7 @@ func walkFolder(root, top string, report func(format string, args ...any)) error
 		if err != nil {
 			return err
 		}
-		for _, broken := range fileAt(filepath.ToSlash(below)).broken(imports) {
+		for _, broken := range newGoFile(filepath.ToSlash(below)).violations(imports) {
 			report("%s", broken)
 		}
 		return nil
@@ -259,9 +259,9 @@ func walkFolder(root, top string, report func(format string, args ...any)) error
 }
 
 func TestImportsOnlyGoDownTheShelves(t *testing.T) {
-	for _, folder := range scanned {
-		if _, err := os.Stat(folder); err != nil {
-			t.Fatalf("the folder %s of the module is not read: %v", folder, err)
+	for _, dir := range scanned {
+		if _, err := os.Stat(dir); err != nil {
+			t.Fatalf("the folder %s of the module is not read: %v", dir, err)
 		}
 	}
 	if err := walkShelves(".", t.Errorf); err != nil {
@@ -269,7 +269,7 @@ func TestImportsOnlyGoDownTheShelves(t *testing.T) {
 	}
 }
 
-func importing(pkg string, targets ...string) string {
+func goFileImporting(pkg string, targets ...string) string {
 	source := "package " + pkg + "\n"
 	for _, target := range targets {
 		source += "\nimport _ " + strconv.Quote(target)
@@ -277,7 +277,7 @@ func importing(pkg string, targets ...string) string {
 	return source + "\n"
 }
 
-func walked(t *testing.T, files map[string]string, want ...string) {
+func checkWalk(t *testing.T, files map[string]string, want ...string) {
 	t.Helper()
 	root := t.TempDir()
 	for name, source := range files {
@@ -302,17 +302,17 @@ func walked(t *testing.T, files map[string]string, want ...string) {
 
 func TestTheWalkLetsOnlyCliReadTheCommandLine(t *testing.T) {
 	const cobra, pflag = "github.com/spf13/cobra", "github.com/spf13/pflag"
-	walked(t, map[string]string{
-		"internal/cli/cli.go":        importing("cli", cobra, pflag),
-		"internal/cli/cli_test.go":   importing("cli", cobra),
-		"internal/build/build.go":    importing("build", pflag),
-		"internal/env/env_test.go":   importing("env", cobra+"/doc"),
-		"cmd/moonwell/main.go":       importing("main", cobra),
-		"tools/gen/main.go":          importing("main", pflag),
-		"internal/script/cobras.go":  importing("script", "github.com/spf13/cobrasnake"),
-		"internal/testkit/lines.go":  importing("testkit", cobra),
-		"internal/war3/mpq/flags.go": importing("mpq", pflag),
-		"internal/fsx/explorer.go":   importing("fsx", "github.com/inconshreveable/mousetrap"),
+	checkWalk(t, map[string]string{
+		"internal/cli/cli.go":        goFileImporting("cli", cobra, pflag),
+		"internal/cli/cli_test.go":   goFileImporting("cli", cobra),
+		"internal/build/build.go":    goFileImporting("build", pflag),
+		"internal/env/env_test.go":   goFileImporting("env", cobra+"/doc"),
+		"cmd/moonwell/main.go":       goFileImporting("main", cobra),
+		"tools/gen/main.go":          goFileImporting("main", pflag),
+		"internal/script/cobras.go":  goFileImporting("script", "github.com/spf13/cobrasnake"),
+		"internal/testkit/lines.go":  goFileImporting("testkit", cobra),
+		"internal/war3/mpq/flags.go": goFileImporting("mpq", pflag),
+		"internal/fsx/explorer.go":   goFileImporting("fsx", "github.com/inconshreveable/mousetrap"),
 	},
 		"internal/build/build.go imports "+pflag+"; only cli reads the command line",
 		"internal/env/env_test.go imports "+cobra+"/doc; only cli reads the command line",
@@ -325,12 +325,12 @@ func TestTheWalkLetsOnlyCliReadTheCommandLine(t *testing.T) {
 }
 
 func TestTheWalkReportsAFileThatBreaksARuleATestFileToo(t *testing.T) {
-	walked(t, map[string]string{
-		"internal/assets/breaks_test.go": importing("assets", shelves+"mapdir", shelves+"settings"),
-		"internal/mapdir/breaks.go":      importing("mapdir", shelves+"fsx", shelves+"assets"),
-		"internal/assets/keeps_test.go":  importing("assets", shelves+"assets", shelves+"testkit", shelves+"war3/imp"),
-		"internal/editor/keeps.go":       importing("editor", shelves+"objects", shelves+"script", shelves+"mapdir"),
-		"internal/mapdir/keeps_test.go":  importing("mapdir", shelves+"testkit", shelves+"diag"),
+	checkWalk(t, map[string]string{
+		"internal/assets/breaks_test.go": goFileImporting("assets", shelves+"mapdir", shelves+"settings"),
+		"internal/mapdir/breaks.go":      goFileImporting("mapdir", shelves+"fsx", shelves+"assets"),
+		"internal/assets/keeps_test.go":  goFileImporting("assets", shelves+"assets", shelves+"testkit", shelves+"war3/imp"),
+		"internal/editor/keeps.go":       goFileImporting("editor", shelves+"objects", shelves+"script", shelves+"mapdir"),
+		"internal/mapdir/keeps_test.go":  goFileImporting("mapdir", shelves+"testkit", shelves+"diag"),
 	},
 		"internal/assets/breaks_test.go: a test of package assets must not import settings",
 		"internal/mapdir/breaks.go: package mapdir must not import assets",
@@ -345,17 +345,17 @@ func TestTheWalkHoldsBuildAndCliToTheirShelves(t *testing.T) {
 		}
 		return targets
 	}
-	walked(t, map[string]string{
-		"internal/build/keeps.go":       importing("build", in("script", "editor", "mapdir", "env", "war3/mpq")...),
-		"internal/build/keeps_test.go":  importing("build", in("build", "testkit", "tooltest", "script")...),
-		"internal/build/breaks.go":      importing("build", in("cli", "testkit", "watch")...),
-		"internal/build/breaks_test.go": importing("build", in("cli")...),
-		"internal/cli/keeps.go":         importing("cli", in("build", "toolchain", "manifest", "diag", "war3/lua")...),
-		"internal/cli/keeps_test.go":    importing("cli", in("cli", "build", "testkit", "tooltest")...),
-		"internal/cli/breaks.go":        importing("cli", in("tooltest", "watch")...),
-		"internal/cli/breaks_test.go":   importing("cli", in("watch")...),
-		"internal/script/breaks.go":     importing("script", in("build", "cli")...),
-		"internal/env/breaks_test.go":   importing("env", in("build")...),
+	checkWalk(t, map[string]string{
+		"internal/build/keeps.go":       goFileImporting("build", in("script", "editor", "mapdir", "env", "war3/mpq")...),
+		"internal/build/keeps_test.go":  goFileImporting("build", in("build", "testkit", "tooltest", "script")...),
+		"internal/build/breaks.go":      goFileImporting("build", in("cli", "testkit", "watch")...),
+		"internal/build/breaks_test.go": goFileImporting("build", in("cli")...),
+		"internal/cli/keeps.go":         goFileImporting("cli", in("build", "toolchain", "manifest", "diag", "war3/lua")...),
+		"internal/cli/keeps_test.go":    goFileImporting("cli", in("cli", "build", "testkit", "tooltest")...),
+		"internal/cli/breaks.go":        goFileImporting("cli", in("tooltest", "watch")...),
+		"internal/cli/breaks_test.go":   goFileImporting("cli", in("watch")...),
+		"internal/script/breaks.go":     goFileImporting("script", in("build", "cli")...),
+		"internal/env/breaks_test.go":   goFileImporting("env", in("build")...),
 	},
 		"internal/build/breaks.go: package build must not import cli",
 		"internal/build/breaks.go: package build must not import testkit",
@@ -371,12 +371,12 @@ func TestTheWalkHoldsBuildAndCliToTheirShelves(t *testing.T) {
 }
 
 func TestTheWalkHoldsTheTestOnlyPackagesOffBuildAndCli(t *testing.T) {
-	walked(t, map[string]string{
-		"internal/testkit/keeps.go":        importing("testkit", shelves+"env", shelves+"war3/mpq"),
-		"internal/tooltest/keeps.go":       importing("tooltest", shelves+"toolchain", shelves+"testkit"),
-		"internal/testkit/breaks.go":       importing("testkit", shelves+"build", shelves+"cli"),
-		"internal/tooltest/breaks.go":      importing("tooltest", shelves+"build", shelves+"cli"),
-		"internal/tooltest/breaks_test.go": importing("tooltest", shelves+"build", shelves+"tooltest"),
+	checkWalk(t, map[string]string{
+		"internal/testkit/keeps.go":        goFileImporting("testkit", shelves+"env", shelves+"war3/mpq"),
+		"internal/tooltest/keeps.go":       goFileImporting("tooltest", shelves+"toolchain", shelves+"testkit"),
+		"internal/testkit/breaks.go":       goFileImporting("testkit", shelves+"build", shelves+"cli"),
+		"internal/tooltest/breaks.go":      goFileImporting("tooltest", shelves+"build", shelves+"cli"),
+		"internal/tooltest/breaks_test.go": goFileImporting("tooltest", shelves+"build", shelves+"tooltest"),
 	},
 		"internal/testkit/breaks.go: package testkit must not import build",
 		"internal/testkit/breaks.go: package testkit must not import cli",
@@ -387,12 +387,12 @@ func TestTheWalkHoldsTheTestOnlyPackagesOffBuildAndCli(t *testing.T) {
 }
 
 func TestTheWalkLetsACommandImportCliAlone(t *testing.T) {
-	walked(t, map[string]string{
-		"cmd/moonwell/main.go":        importing("main", "os", shelves+"cli"),
-		"cmd/moonwell/main_test.go":   importing("main", "os", shelves+"cli", shelves+"testkit", shelves+"tooltest"),
-		"cmd/moonwell/breaks.go":      importing("main", shelves+"build", shelves+"env", module, module+"/cmd/other"),
-		"cmd/moonwell/breaks_test.go": importing("main", shelves+"script", shelves+"clitest"),
-		"cmd/other/breaks.go":         importing("main", shelves+"testkit"),
+	checkWalk(t, map[string]string{
+		"cmd/moonwell/main.go":        goFileImporting("main", "os", shelves+"cli"),
+		"cmd/moonwell/main_test.go":   goFileImporting("main", "os", shelves+"cli", shelves+"testkit", shelves+"tooltest"),
+		"cmd/moonwell/breaks.go":      goFileImporting("main", shelves+"build", shelves+"env", module, module+"/cmd/other"),
+		"cmd/moonwell/breaks_test.go": goFileImporting("main", shelves+"script", shelves+"clitest"),
+		"cmd/other/breaks.go":         goFileImporting("main", shelves+"testkit"),
 	},
 		"cmd/moonwell/breaks.go: a command imports cli and nothing else of the module, not "+shelves+"build",
 		"cmd/moonwell/breaks.go: a command imports cli and nothing else of the module, not "+shelves+"env",
@@ -405,12 +405,12 @@ func TestTheWalkLetsACommandImportCliAlone(t *testing.T) {
 }
 
 func TestTheWalkReadsInternalCmdAndToolsAndNothingBesideThem(t *testing.T) {
-	walked(t, map[string]string{
-		"internal/script/breaks.go": importing("script", "os/exec"),
-		"cmd/moonwell/breaks.go":    importing("main", "net/http"),
-		"tools/gen/breaks.go":       importing("main", "os/exec"),
-		"unread.go":                 importing("moonwell", "net/http", shelves+"cli"),
-		"template/unread.go":        importing("template", "os/exec", toolsTree+"gen"),
+	checkWalk(t, map[string]string{
+		"internal/script/breaks.go": goFileImporting("script", "os/exec"),
+		"cmd/moonwell/breaks.go":    goFileImporting("main", "net/http"),
+		"tools/gen/breaks.go":       goFileImporting("main", "os/exec"),
+		"unread.go":                 goFileImporting("moonwell", "net/http", shelves+"cli"),
+		"template/unread.go":        goFileImporting("template", "os/exec", toolsTree+"gen"),
 	},
 		"internal/script/breaks.go imports os/exec; only env and test files may",
 		"cmd/moonwell/breaks.go imports net/http; only env and test files may",
@@ -432,18 +432,18 @@ func TestTheWalkHoldsTheGeneratorAndItsParsersToTheirShelf(t *testing.T) {
 	generator := append(in("objects", "script", "assets", "manifest", "fsx"), "os", module, slk, ini, jass)
 	generatorTest := append(in("testkit", "tooltest", "objects"), slk, "os/exec")
 	notForIt := append(in("settings", "env", "diag", "war3/lua", "build", "testkit"), command, "os/exec")
-	walked(t, map[string]string{
-		"tools/gen/keeps.go":             importing("main", generator...),
-		"tools/gen/keeps_test.go":        importing("main", generatorTest...),
-		"tools/gen/slk/keeps.go":         importing("slk", "strings", "encoding/json"),
-		"tools/gen/slk/keeps_test.go":    importing("slk_test", slk, shelves+"testkit", shelves+"fsx"),
-		"tools/gen/breaks.go":            importing("main", notForIt...),
-		"tools/gen/breaks_test.go":       importing("main", append(in("library", "cli"), deeper)...),
-		"tools/gen/slk/breaks.go":        importing("slk", module, shelves+"fsx", shelves+"diag", ini, gen),
-		"tools/gen/slk/breaks_test.go":   importing("slk", shelves+"objects", shelves+"diag", jass, module),
-		"tools/gen/slk/deeper/breaks.go": importing("deeper", "os"),
-		"tools/other/breaks.go":          importing("other", shelves+"fsx"),
-		"tools/breaks_test.go":           importing("tools", shelves+"testkit", shelves+"fsx"),
+	checkWalk(t, map[string]string{
+		"tools/gen/keeps.go":             goFileImporting("main", generator...),
+		"tools/gen/keeps_test.go":        goFileImporting("main", generatorTest...),
+		"tools/gen/slk/keeps.go":         goFileImporting("slk", "strings", "encoding/json"),
+		"tools/gen/slk/keeps_test.go":    goFileImporting("slk_test", slk, shelves+"testkit", shelves+"fsx"),
+		"tools/gen/breaks.go":            goFileImporting("main", notForIt...),
+		"tools/gen/breaks_test.go":       goFileImporting("main", append(in("library", "cli"), deeper)...),
+		"tools/gen/slk/breaks.go":        goFileImporting("slk", module, shelves+"fsx", shelves+"diag", ini, gen),
+		"tools/gen/slk/breaks_test.go":   goFileImporting("slk", shelves+"objects", shelves+"diag", jass, module),
+		"tools/gen/slk/deeper/breaks.go": goFileImporting("deeper", "os"),
+		"tools/other/breaks.go":          goFileImporting("other", shelves+"fsx"),
+		"tools/breaks_test.go":           goFileImporting("tools", shelves+"testkit", shelves+"fsx"),
 	},
 		"tools/gen/breaks.go: package tools/gen must not import "+shelves+"settings",
 		"tools/gen/breaks.go: package tools/gen must not import "+shelves+"env",
@@ -476,13 +476,13 @@ func TestTheWalkHoldsTheGeneratorAndItsParsersToTheirShelf(t *testing.T) {
 func TestTheWalkKeepsEveryFileThatIsNotBelowToolsOffTheGenerator(t *testing.T) {
 	gen, slk := toolsTree+"gen", toolsTree+"gen/slk"
 	const onlyThey = "; only the generator and its parsers import a package below tools"
-	walked(t, map[string]string{
-		"tools/gen/keeps.go":              importing("main", slk),
-		"internal/objects/breaks.go":      importing("objects", slk, shelves+"manifest"),
-		"internal/objects/breaks_test.go": importing("objects", gen),
-		"internal/testkit/breaks.go":      importing("testkit", slk),
-		"internal/cli/breaks.go":          importing("cli", gen, shelves+"build"),
-		"cmd/moonwell/breaks.go":          importing("main", gen, shelves+"cli"),
+	checkWalk(t, map[string]string{
+		"tools/gen/keeps.go":              goFileImporting("main", slk),
+		"internal/objects/breaks.go":      goFileImporting("objects", slk, shelves+"manifest"),
+		"internal/objects/breaks_test.go": goFileImporting("objects", gen),
+		"internal/testkit/breaks.go":      goFileImporting("testkit", slk),
+		"internal/cli/breaks.go":          goFileImporting("cli", gen, shelves+"build"),
+		"cmd/moonwell/breaks.go":          goFileImporting("main", gen, shelves+"cli"),
 	},
 		"internal/objects/breaks.go imports "+slk+onlyThey,
 		"internal/objects/breaks_test.go imports "+gen+onlyThey,
@@ -493,21 +493,21 @@ func TestTheWalkKeepsEveryFileThatIsNotBelowToolsOffTheGenerator(t *testing.T) {
 }
 
 func TestTheWalkLetsOnlyEnvAndTestsReachOutsideTheProgram(t *testing.T) {
-	walked(t, map[string]string{
-		"internal/env/keeps.go":          importing("env", "os/exec", "net/http"),
-		"internal/library/keeps_test.go": importing("library", "net/http", "os/exec"),
-		"internal/testkit/keeps.go":      importing("testkit", "os/exec"),
-		"internal/tooltest/keeps.go":     importing("tooltest", "net/http"),
-		"internal/fsx/keeps.go":          importing("fsx", "os/exec", "os"),
-		"internal/script/keeps.go":       importing("script", "os", "net/url", "net/http/httptest"),
-		"cmd/moonwell/main_test.go":      importing("main", "os/exec"),
-		"internal/script/breaks.go":      importing("script", "os/exec"),
-		"internal/library/breaks.go":     importing("library", "net/http"),
-		"internal/fsx/breaks.go":         importing("fsx", "net/http"),
-		"internal/build/breaks.go":       importing("build", "os/exec", "net/http"),
-		"internal/cli/breaks.go":         importing("cli", "os/exec"),
-		"internal/war3/mpq/breaks.go":    importing("mpq", "net/http"),
-		"cmd/moonwell/breaks.go":         importing("main", "os/exec"),
+	checkWalk(t, map[string]string{
+		"internal/env/keeps.go":          goFileImporting("env", "os/exec", "net/http"),
+		"internal/library/keeps_test.go": goFileImporting("library", "net/http", "os/exec"),
+		"internal/testkit/keeps.go":      goFileImporting("testkit", "os/exec"),
+		"internal/tooltest/keeps.go":     goFileImporting("tooltest", "net/http"),
+		"internal/fsx/keeps.go":          goFileImporting("fsx", "os/exec", "os"),
+		"internal/script/keeps.go":       goFileImporting("script", "os", "net/url", "net/http/httptest"),
+		"cmd/moonwell/main_test.go":      goFileImporting("main", "os/exec"),
+		"internal/script/breaks.go":      goFileImporting("script", "os/exec"),
+		"internal/library/breaks.go":     goFileImporting("library", "net/http"),
+		"internal/fsx/breaks.go":         goFileImporting("fsx", "net/http"),
+		"internal/build/breaks.go":       goFileImporting("build", "os/exec", "net/http"),
+		"internal/cli/breaks.go":         goFileImporting("cli", "os/exec"),
+		"internal/war3/mpq/breaks.go":    goFileImporting("mpq", "net/http"),
+		"cmd/moonwell/breaks.go":         goFileImporting("main", "os/exec"),
 	},
 		"internal/script/breaks.go imports os/exec; only env and test files may",
 		"internal/library/breaks.go imports net/http; only env and test files may",
@@ -584,15 +584,15 @@ func TestTheRulesOfTheShelvesForTestOnlyPackagesAndForTestFiles(t *testing.T) {
 		{"tooltest", "script", false, true},
 	}
 	for _, c := range cases {
-		got := allowed(c.from, c.to)
+		got := mayImport(c.from, c.to)
 		if c.inATest {
-			got = allowedInATest(c.from, c.to)
+			got = testMayImport(c.from, c.to)
 		}
 		if got != c.want {
 			t.Errorf("%s importing %s, in a test %v: allowed = %v, want %v", c.from, c.to, c.inATest, got, c.want)
 		}
 	}
-	if !onAShelf("tooltest") {
+	if !isOnShelf("tooltest") {
 		t.Error("tooltest is on no shelf")
 	}
 }

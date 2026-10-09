@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func plantedExport(t *testing.T) string {
+func newFakeExport(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
 	WriteFile(t, root, "War3.W3Mod/Units/UnitData.SLK", []byte("a table"))
@@ -19,7 +19,7 @@ func plantedExport(t *testing.T) string {
 }
 
 func TestNeedExportFindsEachNameWithoutRegardToLetterCase(t *testing.T) {
-	root := plantedExport(t)
+	root := newFakeExport(t)
 	t.Setenv("MOONWELL_GAME_DATA", root)
 	t.Setenv("MOONWELL_REQUIRE_EXPORTS", "1")
 	export := NeedExport(t, "MOONWELL_GAME_DATA")
@@ -75,7 +75,7 @@ func TestNeedExportSkipsOrFailsTheTestWithoutTheGamesFiles(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Setenv("MOONWELL_GAME_DATA", tc.value)
 			t.Setenv("MOONWELL_REQUIRE_EXPORTS", tc.require)
-			stand := newStandIn(t)
+			stand := newFakeTB(t)
 			export := NeedExport(stand, "MOONWELL_GAME_DATA")
 			if len(stand.skipped) != tc.skips || len(stand.failed) != tc.fails {
 				t.Fatalf("skipped %q and failed %q, want %d and %d", stand.skipped, stand.failed, tc.skips, tc.fails)
@@ -96,7 +96,7 @@ func TestNeedExportSkipsOrFailsTheTestWithoutTheGamesFiles(t *testing.T) {
 }
 
 func TestAnExportFailsTheTestForANameItCannotTellApart(t *testing.T) {
-	root := plantedExport(t)
+	root := newFakeExport(t)
 	t.Setenv("MOONWELL_GAME_DATA", root)
 	units := filepath.Join(root, "War3.W3Mod", "Units")
 	type lookup struct {
@@ -116,7 +116,7 @@ func TestAnExportFailsTheTestForANameItCannotTellApart(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			stand := newStandIn(t)
+			stand := newFakeTB(t)
 			path := NeedExport(stand, "MOONWELL_GAME_DATA").Path(tc.below...)
 			if path != "" || len(stand.failed) != 1 || len(stand.skipped) != 0 {
 				t.Fatalf("the path is %q, with the failures %q, want none and one", path, stand.failed)
@@ -128,7 +128,7 @@ func TestAnExportFailsTheTestForANameItCannotTellApart(t *testing.T) {
 			}
 		})
 	}
-	stand := newStandIn(t)
+	stand := newFakeTB(t)
 	entries := NeedExport(stand, "MOONWELL_GAME_DATA").Entries("war3.w3mod", "units", "abilitydata.slk")
 	if entries != nil || len(stand.failed) != 1 || !strings.Contains(stand.failed[0], "abilitydata.slk") {
 		t.Errorf("the entries of a file are %q, with the failures %q", entries, stand.failed)

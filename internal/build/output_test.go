@@ -31,9 +31,9 @@ func TestOutputAtIsThePlaceBelowTheProjectFolderWhateverIsThere(t *testing.T) {
 
 func TestOutputAtRefusesALinkOnTheWayOrAtThePlaceByItsStep(t *testing.T) {
 	tests := []struct {
-		name  string
-		link  string
-		place string
+		name    string
+		symlink string
+		place   string
 	}{
 		{"the first folder", "dist", "dist"},
 		{"the first folder on the way", "dist", "dist/stage/map.w3x"},
@@ -45,15 +45,15 @@ func TestOutputAtRefusesALinkOnTheWayOrAtThePlaceByItsStep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			root, elsewhere := t.TempDir(), t.TempDir()
-			at := filepath.Join(root, filepath.FromSlash(tt.link))
+			at := filepath.Join(root, filepath.FromSlash(tt.symlink))
 			if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 				t.Fatal(err)
 			}
 			testkit.LinkDir(t, elsewhere, at)
 			place, err := outputPath(root, tt.place)
 			e := asError(t, err, tt.name)
-			if place != "" || e.File != tt.place || !strings.HasPrefix(e.Msg, tt.link+" is a link: ") ||
-				!strings.Contains(e.Hint, "junction) at "+tt.link+",") || e.Cause != nil ||
+			if place != "" || e.File != tt.place || !strings.HasPrefix(e.Msg, tt.symlink+" is a link: ") ||
+				!strings.Contains(e.Hint, "junction) at "+tt.symlink+",") || e.Cause != nil ||
 				strings.Contains(e.Msg, root) {
 				t.Errorf("error = %+v", e)
 			}

@@ -17,7 +17,7 @@ const (
 	librariesBlock = `"libraries":{}`
 )
 
-func printed(blocks ...string) string {
+func pklOutput(blocks ...string) string {
 	all := []string{plainBlocks}
 	for _, standard := range []string{assetsBlock, lintBlock, librariesBlock} {
 		name, _, _ := strings.Cut(standard, ":")
@@ -28,7 +28,7 @@ func printed(blocks ...string) string {
 	return "{" + strings.Join(append(all, blocks...), ",") + "}"
 }
 
-func decoded(t *testing.T, document, file string) *Project {
+func mustDecodeProject(t *testing.T, document, file string) *Project {
 	t.Helper()
 	project, err := DecodeProject("/p", file, []byte(document))
 	if err != nil {
@@ -37,16 +37,16 @@ func decoded(t *testing.T, document, file string) *Project {
 	return project
 }
 
-func asError(t *testing.T, err error, what string) *diag.Error {
+func asDiagError(t *testing.T, err error, what string) *diag.Error {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
 	}
-	return failure
+	return diagErr
 }
 
-func text(value *string) string {
+func derefOrNil(value *string) string {
 	if value == nil {
 		return "(nil)"
 	}
@@ -54,7 +54,7 @@ func text(value *string) string {
 }
 
 func TestDecodeLeavesANullableFieldThatPklOmittedNil(t *testing.T) {
-	p := decoded(t, printed(), "moonwell.pkl")
+	p := mustDecodeProject(t, pklOutput(), "moonwell.pkl")
 	if p.Root != "/p" || p.ManifestName != "moonwell.pkl" {
 		t.Errorf("Root = %q, File = %q", p.Root, p.ManifestName)
 	}
@@ -79,7 +79,7 @@ func TestDecodeLeavesANullableFieldThatPklOmittedNil(t *testing.T) {
 }
 
 func TestDecodeReadsEveryPlainBlock(t *testing.T) {
-	p := decoded(t, `{"map":{"folder":"hero.w3x","entry":"src/game/init.yue"},
+	p := mustDecodeProject(t, `{"map":{"folder":"hero.w3x","entry":"src/game/init.yue"},
 		"build":{"folder":"out","minify":true},
 		"launch":{"gameExecutable":"C:/wc3.exe","args":["-launch","-windowmode","windowed"]},
 		"yue":{"version":"0.34.2","path":"tools/yue"},
@@ -90,11 +90,11 @@ func TestDecodeReadsEveryPlainBlock(t *testing.T) {
 	if p.Build != (Build{Folder: "out", Minify: true}) {
 		t.Errorf("build = %+v", p.Build)
 	}
-	if text(p.Launch.GameExecutable) != "C:/wc3.exe" || !slices.Equal(p.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) {
-		t.Errorf("launch = %q, %q", text(p.Launch.GameExecutable), p.Launch.Args)
+	if derefOrNil(p.Launch.GameExecutable) != "C:/wc3.exe" || !slices.Equal(p.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) {
+		t.Errorf("launch = %q, %q", derefOrNil(p.Launch.GameExecutable), p.Launch.Args)
 	}
-	if p.Yue.Version != "0.34.2" || text(p.Yue.Path) != "tools/yue" {
-		t.Errorf("yue = %q, %q", p.Yue.Version, text(p.Yue.Path))
+	if p.Yue.Version != "0.34.2" || derefOrNil(p.Yue.Path) != "tools/yue" {
+		t.Errorf("yue = %q, %q", p.Yue.Version, derefOrNil(p.Yue.Path))
 	}
 	if p.Lint.UnknownGlobals != "warning" || !slices.Equal(p.Lint.Globals, []string{"MyLibrary"}) {
 		t.Errorf("lint = %+v", p.Lint)
@@ -102,27 +102,27 @@ func TestDecodeReadsEveryPlainBlock(t *testing.T) {
 }
 
 func TestDecodeReadsLibrariesOfBothKinds(t *testing.T) {
-	p := decoded(t, printed(`"libraries":{
+	p := mustDecodeProject(t, pklOutput(`"libraries":{
 		"mine":{"path":"../mine","dir":""},
 		"example":{"github":"mdlsvensson/moonwell-example-lib","tag":"v0.1.0","dir":"src"},
 		"Zeta":{"path":"z","dir":""}}`), "moonwell.pkl")
 	example, mine := p.Libraries["example"], p.Libraries["mine"]
-	if text(example.GitHub) != "mdlsvensson/moonwell-example-lib" || text(example.Tag) != "v0.1.0" ||
+	if derefOrNil(example.GitHub) != "mdlsvensson/moonwell-example-lib" || derefOrNil(example.Tag) != "v0.1.0" ||
 		example.Path != nil || example.Dir != "src" {
-		t.Errorf("example = %q, %q, %q, %q", text(example.GitHub), text(example.Tag), text(example.Path), example.Dir)
+		t.Errorf("example = %q, %q, %q, %q", derefOrNil(example.GitHub), derefOrNil(example.Tag), derefOrNil(example.Path), example.Dir)
 	}
-	if mine.GitHub != nil || mine.Tag != nil || text(mine.Path) != "../mine" || mine.Dir != "" {
-		t.Errorf("mine = %q, %q, %q, %q", text(mine.GitHub), text(mine.Tag), text(mine.Path), mine.Dir)
+	if mine.GitHub != nil || mine.Tag != nil || derefOrNil(mine.Path) != "../mine" || mine.Dir != "" {
+		t.Errorf("mine = %q, %q, %q, %q", derefOrNil(mine.GitHub), derefOrNil(mine.Tag), derefOrNil(mine.Path), mine.Dir)
 	}
-	if len(p.Libraries) != 3 || len(decoded(t, printed(), "moonwell.pkl").Libraries) != 0 {
-		t.Errorf("libraries = %+v, and of a manifest without any %+v", p.Libraries, decoded(t, printed(), "moonwell.pkl").Libraries)
+	if len(p.Libraries) != 3 || len(mustDecodeProject(t, pklOutput(), "moonwell.pkl").Libraries) != 0 {
+		t.Errorf("libraries = %+v, and of a manifest without any %+v", p.Libraries, mustDecodeProject(t, pklOutput(), "moonwell.pkl").Libraries)
 	}
 }
 
 func TestDecodeReadsTheAssetsBlockInTheOrderItWasWritten(t *testing.T) {
-	p := decoded(t, printed(`"assets":{"paths":{"b.blp":"Textures\\b.blp","a.blp":"Textures\\a.blp"},
+	p := mustDecodeProject(t, pklOutput(`"assets":{"paths":{"b.blp":"Textures\\b.blp","a.blp":"Textures\\a.blp"},
 		"exclude":["credits/"]}`), "moonwell.pkl")
-	if got := entries(t, p.Assets.Paths); got != `b.blp=Textures\b.blp a.blp=Textures\a.blp` {
+	if got := formatEntries(t, p.Assets.Paths); got != `b.blp=Textures\b.blp a.blp=Textures\a.blp` {
 		t.Errorf("paths = %s", got)
 	}
 	if target, _ := p.Assets.Paths.Get("a.blp"); target != `Textures\a.blp` || !slices.Equal(p.Assets.Exclude, []string{"credits/"}) {
@@ -131,7 +131,7 @@ func TestDecodeReadsTheAssetsBlockInTheOrderItWasWritten(t *testing.T) {
 }
 
 func TestDecodeIgnoresAFieldItDoesNotKnowAndSuppliesNoDefault(t *testing.T) {
-	p := decoded(t, `{"later":{"x":1},"map":{"folder":"map.w3x","later":true,"entry":"src/main.yue"},
+	p := mustDecodeProject(t, `{"later":{"x":1},"map":{"folder":"map.w3x","later":true,"entry":"src/main.yue"},
 		"build":{"folder":"dist/bin","minify":false,"later":[1]},"yue":{"version":"0.34.3"}}`, "moonwell.pkl")
 	if p.Map != (Map{Folder: "map.w3x", Entry: "src/main.yue"}) || p.Build.Folder != "dist/bin" {
 		t.Errorf("map = %+v, build = %+v", p.Map, p.Build)
@@ -154,9 +154,9 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 		{"a list of another type", `{"launch":{"args":[1]}}`, []string{"number", "launch.args"}, nil},
 		{"a library of another type", `{"libraries":{"a":{"path":3}}}`, []string{"number", "libraries.a.path"}, nil},
 		{"a player of another type", `{"settings":{"players":{"7":{"x":"1"}}}}`, []string{"string", "settings.players.7.x"}, nil},
-		{"a player slot that is no number", printed(`"settings":{"players":{"first":{}}}`),
+		{"a player slot that is no number", pklOutput(`"settings":{"players":{"first":{}}}`),
 			[]string{"first is no number", "settings.players"}, []string{"map.folder", "number first"}},
-		{"a force slot that is no whole number", printed(`"settings":{"forces":{"1.5":{}}}`),
+		{"a force slot that is no whole number", pklOutput(`"settings":{"forces":{"1.5":{}}}`),
 			[]string{"1.5 is no number", "settings.forces"}, []string{"map.folder", "number 1.5"}},
 		{"asset paths as a list", `{"assets":{"paths":[]}}`, []string{"array", "a mapping"}, nil},
 		{"an asset path of another type", `{"assets":{"paths":{"a.blp":3}}}`, []string{"number", "a.blp: "}, nil},
@@ -178,22 +178,22 @@ func TestDecodeRefusesWhatIsNotShapedLikeAProjectWithOneError(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			project, err := DecodeProject("/p", "moonwell.local.pkl", []byte(tt.document))
-			failure := asError(t, err, tt.document)
-			if project != nil || failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Msg, "moonwell.local.pkl") {
-				t.Errorf("project = %v, error = %+v", project, failure)
+			diagErr := asDiagError(t, err, tt.document)
+			if project != nil || diagErr.File != "moonwell.local.pkl" || !strings.Contains(diagErr.Msg, "moonwell.local.pkl") {
+				t.Errorf("project = %v, error = %+v", project, diagErr)
 			}
 			for _, word := range tt.words {
-				if !strings.Contains(failure.Msg, word) {
-					t.Errorf("the message %q lacks %q", failure.Msg, word)
+				if !strings.Contains(diagErr.Msg, word) {
+					t.Errorf("the message %q lacks %q", diagErr.Msg, word)
 				}
 			}
 			for _, word := range append([]string{"json:", "unmarshal", "Go ", "of type", "manifest.", "Ordered", "Object"}, tt.without...) {
-				if strings.Contains(failure.Msg, word) {
-					t.Errorf("the message %q has %q", failure.Msg, word)
+				if strings.Contains(diagErr.Msg, word) {
+					t.Errorf("the message %q has %q", diagErr.Msg, word)
 				}
 			}
-			if !strings.Contains(failure.Hint, "@moonwell/Project.pkl") || !strings.Contains(failure.Hint, "PklProject") {
-				t.Errorf("hint = %q", failure.Hint)
+			if !strings.Contains(diagErr.Hint, "@moonwell/Project.pkl") || !strings.Contains(diagErr.Hint, "PklProject") {
+				t.Errorf("hint = %q", diagErr.Hint)
 			}
 		})
 	}

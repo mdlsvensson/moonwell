@@ -15,7 +15,7 @@ import (
 )
 
 func TestEnsureDownloadsVerifiesAndCachesTheCompilerOnce(t *testing.T) {
-	e, log, fetches, tool := yueInstaller(t, "")
+	e, log, fetches, tool := newYueEnv(t, "")
 	program, err := Ensure(background, e, tool, "9.9.9")
 	if err != nil || program != filepath.Join(e.CacheDir, "yue", "9.9.9", "yue") {
 		t.Fatalf("Ensure = %q, %v", program, err)
@@ -29,7 +29,7 @@ func TestEnsureDownloadsVerifiesAndCachesTheCompilerOnce(t *testing.T) {
 	if lines := log.Lines(); !slices.Equal(lines, []string{"Downloading YueScript 9.9.9..."}) {
 		t.Errorf("log = %q", lines)
 	}
-	if left := holds(t, e.CacheDir); !slices.Equal(left, []string{"yue", "yue/9.9.9", "yue/9.9.9/yue"}) {
+	if left := listDir(t, e.CacheDir); !slices.Equal(left, []string{"yue", "yue/9.9.9", "yue/9.9.9/yue"}) {
 		t.Errorf("the cache holds %q", left)
 	}
 }
@@ -38,62 +38,62 @@ func TestEnsureReturnsTheCachedProgramWithoutAskingTheWorld(t *testing.T) {
 	e, log := testkit.Env(t, t.TempDir())
 	e.Platform = "linux-x86_64"
 	cached := testkit.WriteFile(t, e.CacheDir, "yue/9.9.9/yue", []byte("kept"))
-	program, err := Ensure(background, e, yueWith(Asset{URL: yueAddress, Archive: "zip", Binary: "yue"}), "9.9.9")
+	program, err := Ensure(background, e, yueToolWith(Asset{URL: yueAddress, Archive: "zip", Binary: "yue"}), "9.9.9")
 	if err != nil || program != cached || len(log.Lines()) != 0 {
 		t.Errorf("Ensure = %q, %v, log %q", program, err, log.Lines())
 	}
 }
 
 func TestEnsureRejectsAChecksumMismatchAndInstallsNothing(t *testing.T) {
-	e, _, _, tool := yueInstaller(t, strings.Repeat("0", 64))
-	e.Run = noProgram(t)
+	e, _, _, tool := newYueEnv(t, strings.Repeat("0", 64))
+	e.Run = failingRun(t)
 	_, err := Ensure(background, e, tool, "9.9.9")
-	failure := asError(t, err, "a wrong checksum")
-	if !strings.HasPrefix(failure.Msg, "YueScript download checksum mismatch (expected "+strings.Repeat("0", 64)+", got ") ||
-		!strings.Contains(failure.Hint, "do not bypass the check") || !strings.Contains(failure.Hint, "yue.path") {
-		t.Errorf("error = %+v", failure)
+	diagErr := asDiagError(t, err, "a wrong checksum")
+	if !strings.HasPrefix(diagErr.Msg, "YueScript download checksum mismatch (expected "+strings.Repeat("0", 64)+", got ") ||
+		!strings.Contains(diagErr.Hint, "do not bypass the check") || !strings.Contains(diagErr.Hint, "yue.path") {
+		t.Errorf("error = %+v", diagErr)
 	}
-	if left := holds(t, e.CacheDir); len(left) != 0 {
+	if left := listDir(t, e.CacheDir); len(left) != 0 {
 		t.Errorf("the cache holds %q", left)
 	}
 }
 
 func TestEnsureListsKnownVersionsForAnUnknownOne(t *testing.T) {
-	e, _, fetches, tool := yueInstaller(t, "")
+	e, _, fetches, tool := newYueEnv(t, "")
 	_, err := Ensure(background, e, tool, "1.0.0")
-	failure := asError(t, err, "an unknown version")
-	if failure.Msg != "Unknown YueScript version 1.0.0. Known versions: 9.9.9." || failure.File != "moonwell.pkl" ||
-		!strings.HasPrefix(failure.Hint, "Use a known version, or ") || *fetches != 0 {
-		t.Errorf("error = %+v, %d downloads", failure, *fetches)
+	diagErr := asDiagError(t, err, "an unknown version")
+	if diagErr.Msg != "Unknown YueScript version 1.0.0. Known versions: 9.9.9." || diagErr.File != "moonwell.pkl" ||
+		!strings.HasPrefix(diagErr.Hint, "Use a known version, or ") || *fetches != 0 {
+		t.Errorf("error = %+v, %d downloads", diagErr, *fetches)
 	}
 }
 
 func TestTheKnownVersionsAreListedInByteOrder(t *testing.T) {
-	e, _, _, tool := yueInstaller(t, "")
+	e, _, _, tool := newYueEnv(t, "")
 	for _, version := range []string{"10.0.0", "0.34.3", "9.10.0"} {
 		tool.Versions[version] = nil
 	}
 	_, err := Ensure(background, e, tool, "1.0.0")
-	if failure := asError(t, err, "an unknown version"); !strings.HasSuffix(failure.Msg, "Known versions: 0.34.3, 10.0.0, 9.10.0, 9.9.9.") {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "an unknown version"); !strings.HasSuffix(diagErr.Msg, "Known versions: 0.34.3, 10.0.0, 9.10.0, 9.9.9.") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
 func TestEnsureAsksForYuePathOnUnsupportedPlatforms(t *testing.T) {
-	e, _, fetches, tool := yueInstaller(t, "")
+	e, _, fetches, tool := newYueEnv(t, "")
 	e.Platform = ""
 	_, err := Ensure(background, e, tool, "9.9.9")
-	failure := asError(t, err, "no platform")
-	if !strings.HasPrefix(failure.Msg, "Moonwell cannot download YueScript for this platform (") ||
-		failure.Hint != "Build or install yue yourself and set yue.path in moonwell.local.pkl." || *fetches != 0 {
-		t.Errorf("error = %+v, %d downloads", failure, *fetches)
+	diagErr := asDiagError(t, err, "no platform")
+	if !strings.HasPrefix(diagErr.Msg, "Moonwell cannot download YueScript for this platform (") ||
+		diagErr.Hint != "Build or install yue yourself and set yue.path in moonwell.local.pkl." || *fetches != 0 {
+		t.Errorf("error = %+v, %d downloads", diagErr, *fetches)
 	}
 }
 
 func TestCompilerUsesYuePathAndWarnsOnAVersionMismatch(t *testing.T) {
-	e, log, fetches, _ := yueInstaller(t, "")
+	e, log, fetches, _ := newYueEnv(t, "")
 	local := testkit.WriteFile(t, t.TempDir(), "yue", nil)
-	e.Run = yueOf("0.1.0")
+	e.Run = fakeYueRun("0.1.0")
 	program, err := FindCompiler(background, e, "9.9.9", &local)
 	if err != nil || program != local || *fetches != 0 {
 		t.Fatalf("Compiler = %q, %v, %d downloads", program, err, *fetches)
@@ -104,9 +104,9 @@ func TestCompilerUsesYuePathAndWarnsOnAVersionMismatch(t *testing.T) {
 	}
 	gone := filepath.Join(t.TempDir(), "yue")
 	_, err = FindCompiler(background, e, "9.9.9", &gone)
-	if failure := asError(t, err, "a missing yue.path"); failure.Msg != "yue.path does not exist: "+gone ||
-		failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Hint, "yue.path") {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "a missing yue.path"); diagErr.Msg != "yue.path does not exist: "+gone ||
+		diagErr.File != "moonwell.local.pkl" || !strings.Contains(diagErr.Hint, "yue.path") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
@@ -118,9 +118,9 @@ func TestCompilerTakesYuePathAsItIs(t *testing.T) {
 		version string
 		logs    []string
 	}{
-		{"the version asked for", yueOf("9.9.9"), "9.9.9", nil},
-		{"a version with no download", yueOf("0.1.0"), "0.1.0", nil},
-		{"a program that names no version", prints("hello"), "9.9.9",
+		{"the version asked for", fakeYueRun("9.9.9"), "9.9.9", nil},
+		{"a version with no download", fakeYueRun("0.1.0"), "0.1.0", nil},
+		{"a program that names no version", fakeRunPrinting("hello"), "9.9.9",
 			[]string{"warning: yue.path reports version unknown, expected 9.9.9."}},
 	}
 	for _, tc := range tests {
@@ -132,7 +132,7 @@ func TestCompilerTakesYuePathAsItIs(t *testing.T) {
 			if err != nil || program != local || !slices.Equal(log.Lines(), tc.logs) {
 				t.Errorf("Compiler = %q, %v, log %q", program, err, log.Lines())
 			}
-			if left := holds(t, e.CacheDir); len(left) != 0 {
+			if left := listDir(t, e.CacheDir); len(left) != 0 {
 				t.Errorf("the cache holds %q", left)
 			}
 		})
@@ -142,26 +142,26 @@ func TestCompilerTakesYuePathAsItIs(t *testing.T) {
 func TestCompilerPassesOnAYuePathThatCannotBeStartedOrIsInterrupted(t *testing.T) {
 	local := testkit.WriteFile(t, t.TempDir(), "yue", nil)
 	e, _ := testkit.Env(t, t.TempDir())
-	e.Run = missing
+	e.Run = runNotFound
 	_, err := FindCompiler(background, e, "9.9.9", &local)
-	if failure := asError(t, err, "a yue.path that is no program"); !strings.Contains(failure.Msg, "Cannot run '"+local+"'") ||
-		failure.File != "moonwell.local.pkl" || !strings.Contains(failure.Hint, "yue.path") || failure.Cause == nil {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "a yue.path that is no program"); !strings.Contains(diagErr.Msg, "Cannot run '"+local+"'") ||
+		diagErr.File != "moonwell.local.pkl" || !strings.Contains(diagErr.Hint, "yue.path") || diagErr.Cause == nil {
+		t.Errorf("error = %+v", diagErr)
 	}
-	e.Run = interrupted
+	e.Run = runInterrupted
 	if _, err := FindCompiler(background, e, "9.9.9", &local); err != context.Canceled {
 		t.Errorf("Compiler = %v, want the cancellation as it is", err)
 	}
 }
 
 func TestCompilerWithoutYuePathEnsuresThePinnedCompiler(t *testing.T) {
-	e, _, fetches, tool := yueInstaller(t, "")
-	pin(t, &YueScript, tool)
+	e, _, fetches, tool := newYueEnv(t, "")
+	pinTool(t, &YueScript, tool)
 	e.Run = func(ctx context.Context, program string, args []string, options env.RunOptions) (env.RunResult, error) {
 		if program == "yue" {
 			t.Errorf("yue on PATH was run")
 		}
-		return yueOf("9.9.9")(ctx, program, args, options)
+		return fakeYueRun("9.9.9")(ctx, program, args, options)
 	}
 	program, err := FindCompiler(background, e, "9.9.9", nil)
 	if err != nil || program != filepath.Join(e.CacheDir, "yue", "9.9.9", "yue") || *fetches != 1 {
@@ -170,7 +170,7 @@ func TestCompilerWithoutYuePathEnsuresThePinnedCompiler(t *testing.T) {
 }
 
 func TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler(t *testing.T) {
-	other := zipOf(t, "README", "no compiler", "bin/yue", "in a folder", "yue.exe", "another name")
+	other := newZip(t, "README", "no compiler", "bin/yue", "in a folder", "yue.exe", "another name")
 	tests := []struct {
 		name    string
 		fetch   env.FetchFunc
@@ -179,15 +179,15 @@ func TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler(t *testing.T) {
 		message string
 		hint    string
 	}{
-		{name: "offline", fetch: offline,
+		{name: "offline", fetch: fetchOffline,
 			message: "Downloading https://example.test/yue.zip failed.", hint: "Check your connection and retry, or "},
-		{name: "a server failure", fetch: status(500),
+		{name: "a server failure", fetch: fetchStatus(500),
 			message: "Downloading https://example.test/yue.zip failed with HTTP 500.", hint: "Retry later, or "},
-		{name: "a redirect that was not followed", fetch: status(304),
+		{name: "a redirect that was not followed", fetch: fetchStatus(304),
 			message: "Downloading https://example.test/yue.zip failed with HTTP 304.", hint: "Retry later, or "},
-		{name: "another version", run: yueOf("9.9.8"),
+		{name: "another version", run: fakeYueRun("9.9.8"),
 			message: "Downloaded YueScript reports version 9.9.8, expected 9.9.9."},
-		{name: "a program that names no version", run: prints("hello"),
+		{name: "a program that names no version", run: fakeRunPrinting("hello"),
 			message: "Downloaded YueScript reports version unknown, expected 9.9.9."},
 		{name: "no compiler in the archive", sha: fsx.SHA256Hex(other),
 			fetch:   func(context.Context, string) (int, []byte, error) { return 200, other, nil },
@@ -195,8 +195,8 @@ func TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			e, _, _, tool := yueInstaller(t, tc.sha)
-			e.Run = noProgram(t)
+			e, _, _, tool := newYueEnv(t, tc.sha)
+			e.Run = failingRun(t)
 			if tc.run != nil {
 				e.Run = tc.run
 			}
@@ -204,12 +204,12 @@ func TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler(t *testing.T) {
 				e.Fetch = tc.fetch
 			}
 			_, err := Ensure(background, e, tool, "9.9.9")
-			failure := asError(t, err, tc.name)
-			if failure.Msg != tc.message || failure.File != "" || !strings.HasPrefix(failure.Hint, tc.hint) ||
-				(tc.hint == "") != (failure.Hint == "") {
-				t.Errorf("error = %+v", failure)
+			diagErr := asDiagError(t, err, tc.name)
+			if diagErr.Msg != tc.message || diagErr.File != "" || !strings.HasPrefix(diagErr.Hint, tc.hint) ||
+				(tc.hint == "") != (diagErr.Hint == "") {
+				t.Errorf("error = %+v", diagErr)
 			}
-			if left := holds(t, filepath.Join(e.CacheDir, "yue")); len(left) != 0 {
+			if left := listDir(t, filepath.Join(e.CacheDir, "yue")); len(left) != 0 {
 				t.Errorf("something was left in the cache: %q", left)
 			}
 		})
@@ -218,7 +218,7 @@ func TestEnsureRefusesADownloadThatFailsOrIsNotTheCompiler(t *testing.T) {
 
 func TestEnsurePassesOnACancellationAsItIs(t *testing.T) {
 	t.Run("of the download", func(t *testing.T) {
-		e, _, _, tool := yueInstaller(t, "")
+		e, _, _, tool := newYueEnv(t, "")
 		ctx, cancel := context.WithCancel(background)
 		e.Fetch = func(ctx context.Context, _ string) (int, []byte, error) {
 			cancel()
@@ -229,12 +229,12 @@ func TestEnsurePassesOnACancellationAsItIs(t *testing.T) {
 		}
 	})
 	t.Run("of the downloaded program", func(t *testing.T) {
-		e, _, _, tool := yueInstaller(t, "")
-		e.Run = interrupted
+		e, _, _, tool := newYueEnv(t, "")
+		e.Run = runInterrupted
 		if _, err := Ensure(background, e, tool, "9.9.9"); err != context.Canceled {
 			t.Errorf("Ensure = %v, want the cancellation as it is", err)
 		}
-		if left := holds(t, filepath.Join(e.CacheDir, "yue")); len(left) != 0 {
+		if left := listDir(t, filepath.Join(e.CacheDir, "yue")); len(left) != 0 {
 			t.Errorf("something was left in the cache: %q", left)
 		}
 	})
@@ -279,12 +279,12 @@ func TestReportedVersionFindsTheVersionInWhatAProgramPrints(t *testing.T) {
 
 func TestReportedVersionPassesOnAProgramThatCannotBeStartedOrIsInterrupted(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
-	e.Run = missing
+	e.Run = runNotFound
 	_, err := QueryVersion(background, e, YueScript, "yue")
-	if failure := asError(t, err, "no yue"); failure.Msg != "Cannot run 'yue': command not found." {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "no yue"); diagErr.Msg != "Cannot run 'yue': command not found." {
+		t.Errorf("error = %+v", diagErr)
 	}
-	e.Run = interrupted
+	e.Run = runInterrupted
 	if _, err := QueryVersion(background, e, YueScript, "yue"); err != context.Canceled {
 		t.Errorf("ReportedVersion = %v, want the cancellation as it is", err)
 	}
@@ -373,9 +373,9 @@ func TestTheRefusalsOfBothToolsAreWordedAlike(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			failure := asError(t, tc.refusal, tc.name)
-			if failure.Msg != tc.message || failure.Hint != tc.hint {
-				t.Errorf("message %q\n   hint %q\nwant    %q\n   hint %q", failure.Msg, failure.Hint, tc.message, tc.hint)
+			diagErr := asDiagError(t, tc.refusal, tc.name)
+			if diagErr.Msg != tc.message || diagErr.Hint != tc.hint {
+				t.Errorf("message %q\n   hint %q\nwant    %q\n   hint %q", diagErr.Msg, diagErr.Hint, tc.message, tc.hint)
 			}
 		})
 	}

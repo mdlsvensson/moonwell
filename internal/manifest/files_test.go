@@ -41,10 +41,10 @@ func TestEnsureLocalManifestTakesAFolderUnderTheNameForTheUsers(t *testing.T) {
 func TestEnsureLocalManifestNamesTheFileItCannotMake(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "no-such-folder")
 	created, err := EnsureLocalManifest(root)
-	failure := asError(t, err, "in a folder that does not exist")
-	if created || failure.File != "moonwell.local.pkl" || failure.Hint == "" || failure.Cause == nil ||
-		!strings.Contains(failure.Msg, "Creating moonwell.local.pkl failed: ") {
-		t.Errorf("created = %v, error = %+v", created, failure)
+	diagErr := asDiagError(t, err, "in a folder that does not exist")
+	if created || diagErr.File != "moonwell.local.pkl" || diagErr.Hint == "" || diagErr.Cause == nil ||
+		!strings.Contains(diagErr.Msg, "Creating moonwell.local.pkl failed: ") {
+		t.Errorf("created = %v, error = %+v", created, diagErr)
 	}
 }
 

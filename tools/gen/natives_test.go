@@ -397,10 +397,10 @@ func TestRenderNativesWritesAFileThatReadsBackAsItWasMade(t *testing.T) {
 
 func exportedScripts(t testing.TB, common, blizzard string) string {
 	t.Helper()
-	folder := t.TempDir()
-	testkit.WriteFile(t, folder, scriptsDir+"/"+commonScript, []byte(common))
-	testkit.WriteFile(t, folder, scriptsDir+"/"+blizzardScript, []byte(blizzard))
-	return folder
+	dir := t.TempDir()
+	testkit.WriteFile(t, dir, scriptsDir+"/"+commonScript, []byte(common))
+	testkit.WriteFile(t, dir, scriptsDir+"/"+blizzardScript, []byte(blizzard))
+	return dir
 }
 
 func withExtras(t testing.TB) checkout {
@@ -424,7 +424,7 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 	want := renderNatives(miniNatives())
 	withBoth := func(text string) string { return "\xEF\xBB\xBF" + strings.ReplaceAll(text, "\n", "\r\n") }
 	whole := exportedScripts(t, miniCommon, miniBlizzard)
-	for name, c := range map[string]struct{ folder, extras string }{
+	for name, c := range map[string]struct{ dir, extras string }{
 		"line feeds": {whole, miniExtrasText},
 		"carriage returns, and a byte order mark at the start of each script": {
 			exportedScripts(t, withBoth(miniCommon), withBoth(miniBlizzard)), miniExtrasText},
@@ -432,7 +432,7 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 	} {
 		scratch := withExtras(t)
 		scratch.write(extrasPath, c.extras)
-		printed, files, err := scratch.run("natives", c.folder, "9.9.9")
+		printed, files, err := scratch.run("natives", c.dir, "9.9.9")
 		if err != nil {
 			t.Errorf("%s: %v", name, err)
 			continue
@@ -458,10 +458,10 @@ func TestTheModeNativesWritesTheNativesAndPrintsHowManyTheyAre(t *testing.T) {
 }
 
 func TestTheModeNativesFindsAScriptWhateverTheLetterCaseOfItsPath(t *testing.T) {
-	folder := t.TempDir()
-	testkit.WriteFile(t, folder, "War3.w3mod/Scripts/COMMON.J", []byte(miniCommon))
-	testkit.WriteFile(t, folder, "War3.w3mod/Scripts/Blizzard.j", []byte(miniBlizzard))
-	_, files, err := withExtras(t).run("natives", folder, "9.9.9")
+	dir := t.TempDir()
+	testkit.WriteFile(t, dir, "War3.w3mod/Scripts/COMMON.J", []byte(miniCommon))
+	testkit.WriteFile(t, dir, "War3.w3mod/Scripts/Blizzard.j", []byte(miniBlizzard))
+	_, files, err := withExtras(t).run("natives", dir, "9.9.9")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -480,35 +480,35 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 	testkit.WriteFile(t, blizzardAsFolder, scriptsDir+"/"+commonScript, []byte(miniCommon))
 	testkit.WriteFile(t, blizzardAsFolder, scriptsDir+"/"+blizzardScript+"/held.txt", []byte("held\n"))
 	for name, c := range map[string]struct {
-		folder string
+		dir    string
 		lay    func(c checkout)
 		starts string
 		words  []string
 	}{
-		"a script that is not there": {folder: noBlizzard,
+		"a script that is not there": {dir: noBlizzard,
 			starts: "war3.w3mod/scripts/blizzard.j is missing from " + noBlizzard},
-		"a folder that is not there": {folder: noFolder,
+		"a folder that is not there": {dir: noFolder,
 			starts: "war3.w3mod/scripts/common.j is missing from " + noFolder},
-		"a folder with a slash at its end": {folder: noBlizzard + "/",
+		"a folder with a slash at its end": {dir: noBlizzard + "/",
 			starts: "war3.w3mod/scripts/blizzard.j is missing from " + noBlizzard + "/"},
-		"a folder at the place of a script": {folder: blizzardAsFolder,
+		"a folder at the place of a script": {dir: blizzardAsFolder,
 			starts: filepath.Join(blizzardAsFolder, "war3.w3mod", "scripts", "blizzard.j") + ": "},
-		"a line that is no declaration": {folder: exportedScripts(t, miniCommon, "globals\n    real = 1\nendglobals\n"),
+		"a line that is no declaration": {dir: exportedScripts(t, miniCommon, "globals\n    real = 1\nendglobals\n"),
 			starts: "blizzard.j:2: cannot read ", words: []string{`"real = 1"`}},
-		"a function without its end": {folder: exportedScripts(t, "\n\nfunction F takes nothing returns nothing\n", ""),
+		"a function without its end": {dir: exportedScripts(t, "\n\nfunction F takes nothing returns nothing\n", ""),
 			starts: "common.j:3: "},
-		"a name declared twice": {folder: exportedScripts(t, miniCommon, miniCommon),
+		"a name declared twice": {dir: exportedScripts(t, miniCommon, miniCommon),
 			starts: "CreateThing is declared twice (common.j and blizzard.j)."},
-		"no extras": {folder: whole, lay: func(c checkout) { without(c, extrasPath) },
+		"no extras": {dir: whole, lay: func(c checkout) { without(c, extrasPath) },
 			starts: "tools/natives/lua-extras.json: "},
-		"extras that are no JSON": {folder: whole, lay: func(c checkout) { c.write(extrasPath, "{") },
+		"extras that are no JSON": {dir: whole, lay: func(c checkout) { c.write(extrasPath, "{") },
 			starts: "tools/natives/lua-extras.json: unexpected EOF"},
-		"extras with a key too many": {folder: whole, lay: func(c checkout) { c.write(extrasPath, `{"more": []}`) },
+		"extras with a key too many": {dir: whole, lay: func(c checkout) { c.write(extrasPath, `{"more": []}`) },
 			starts: "tools/natives/lua-extras.json: unknown field \"more\""},
-		"extras with a function that returns nothing": {folder: whole,
+		"extras with a function that returns nothing": {dir: whole,
 			lay:    func(c checkout) { c.write(extrasPath, `{"functions": [{"name": "A", "params": []}]}`) },
 			starts: "tools/natives/lua-extras.json: functions.0 has no \"returns\""},
-		"a folder at the place of the natives": {folder: whole, starts: "data/natives.json: ",
+		"a folder at the place of the natives": {dir: whole, starts: "data/natives.json: ",
 			lay: func(c checkout) {
 				without(c, nativesPath)
 				c.folder(nativesPath)
@@ -520,7 +520,7 @@ func TestTheModeNativesNamesTheFileItFailsOnAndKeepsTheExistingNatives(t *testin
 			c.lay(scratch)
 		}
 		before := scratch.all()
-		printed, files, err := scratch.run("natives", c.folder, "9.9.9")
+		printed, files, err := scratch.run("natives", c.dir, "9.9.9")
 		if err == nil {
 			t.Errorf("%s: the run wrote the natives", name)
 			continue

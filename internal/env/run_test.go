@@ -48,7 +48,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func asError(t *testing.T, err error) *diag.Error {
+func asDiagError(t *testing.T, err error) *diag.Error {
 	t.Helper()
 	var e *diag.Error
 	if !errors.As(err, &e) {
@@ -92,7 +92,7 @@ func TestRunDecodesOutputThatIsNotUTF8(t *testing.T) {
 func TestRunReportsAMissingProgramWithTheHint(t *testing.T) {
 	const program = "definitely-not-a-program-moonwell"
 	_, err := Run(context.Background(), program, nil, RunOptions{Hint: "install it"})
-	e := asError(t, err)
+	e := asDiagError(t, err)
 	if e.Hint != "install it" || e.File != "" || e.Cause == nil ||
 		!strings.Contains(e.Msg, "'"+program+"'") || !strings.Contains(e.Msg, "command not found") {
 		t.Errorf("error = %+v", e)
@@ -108,7 +108,7 @@ func TestRunReportsAnySpawnFailureWithTheHint(t *testing.T) {
 	for name, program := range map[string]string{"a folder": dir, "a file that is not a program": junk} {
 		t.Run(name, func(t *testing.T) {
 			_, err := Run(context.Background(), program, nil, RunOptions{Hint: "fix it"})
-			e := asError(t, err)
+			e := asDiagError(t, err)
 			if e.Hint != "fix it" || e.File != "" || !strings.HasPrefix(e.Msg, "Cannot run '"+program+"': ") ||
 				!strings.HasSuffix(e.Msg, ".") || strings.HasSuffix(e.Msg, "..") {
 				t.Errorf("error = %+v", e)

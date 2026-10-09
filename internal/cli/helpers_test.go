@@ -155,11 +155,11 @@ func contains(t *testing.T, text string, parts ...string) {
 func exists(root, path string) bool { return fsx.Exists(filepath.Join(root, filepath.FromSlash(path))) }
 
 func rowOf(table []command, name string) (command, bool) {
-	at := slices.IndexFunc(table, func(row command) bool { return row.name == name })
-	if at < 0 {
+	index := slices.IndexFunc(table, func(row command) bool { return row.name == name })
+	if index < 0 {
 		return command{}, false
 	}
-	return table[at], true
+	return table[index], true
 }
 
 func rowNamed(t *testing.T, name string) command {
@@ -215,11 +215,11 @@ func remove(t *testing.T, root, path string) {
 
 func asError(t *testing.T, err error, what string) *diag.Error {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
 	}
-	return failure
+	return diagErr
 }
 
 func realWorld(root string) (*env.Env, *testkit.LogRecorder) {

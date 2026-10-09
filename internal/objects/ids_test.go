@@ -62,11 +62,11 @@ func refresh(t *testing.T, root, expected string) bool {
 
 func asError(t *testing.T, err error, what string) *diag.Error {
 	t.Helper()
-	var failure *diag.Error
-	if !errors.As(err, &failure) {
+	var diagErr *diag.Error
+	if !errors.As(err, &diagErr) {
 		t.Fatalf("%s: got %v, want a *diag.Error", what, err)
 	}
-	return failure
+	return diagErr
 }
 
 func TestPackIDPacksARawcodeBigEndian(t *testing.T) {
@@ -209,10 +209,10 @@ func TestStatusOfIDsReadsACheckoutWithCRLFLineEndingsAsTheSameModule(t *testing.
 		"RefreshIDs":       second(objects.RefreshIDs(other, captainIDs)),
 		"AssertIDsCurrent": objects.RequireIDsCurrent(other, captainIDs),
 	} {
-		failure := asError(t, err, name)
-		if failure.File != objects.IDsFile || !strings.HasPrefix(failure.Msg, "Reading the generated object ids failed: ") ||
-			failure.Hint == "" || failure.Cause == nil {
-			t.Errorf("%s: error = %+v", name, failure)
+		diagErr := asError(t, err, name)
+		if diagErr.File != objects.IDsFile || !strings.HasPrefix(diagErr.Msg, "Reading the generated object ids failed: ") ||
+			diagErr.Hint == "" || diagErr.Cause == nil {
+			t.Errorf("%s: error = %+v", name, diagErr)
 		}
 	}
 }
@@ -252,9 +252,9 @@ func TestRefreshIDsNamesTheModuleWhenItCannotBeWritten(t *testing.T) {
 	root := t.TempDir()
 	testkit.WriteFile(t, root, "src/generated", []byte("a file"))
 	wrote, err := objects.RefreshIDs(root, captainIDs)
-	failure := asError(t, err, "a file in place of the folder")
-	if wrote || failure.File != objects.IDsFile || !strings.Contains(failure.Msg, "the generated object ids failed: ") ||
-		failure.Hint == "" || failure.Cause == nil {
-		t.Errorf("RefreshIDs = %v, %+v", wrote, failure)
+	diagErr := asError(t, err, "a file in place of the folder")
+	if wrote || diagErr.File != objects.IDsFile || !strings.Contains(diagErr.Msg, "the generated object ids failed: ") ||
+		diagErr.Hint == "" || diagErr.Cause == nil {
+		t.Errorf("RefreshIDs = %v, %+v", wrote, diagErr)
 	}
 }

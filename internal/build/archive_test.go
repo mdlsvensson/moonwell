@@ -65,12 +65,12 @@ func TestArchiveOfRefusesAFolderOrAPlaceOutsideTheProjectNamingTheEvaluatedManif
 		t.Errorf("error = %+v", e)
 	}
 	outside := []string{"..", "../other", "/elsewhere", `\elsewhere`, "C:/elsewhere", `c:\elsewhere`, "out/../.."}
-	for _, folder := range outside {
-		_, err := archivePath(projectWith(root, folder, localManifest))
-		e := asError(t, err, folder)
+	for _, dir := range outside {
+		_, err := archivePath(projectWith(root, dir, localManifest))
+		e := asError(t, err, dir)
 		if !strings.HasPrefix(e.Msg, "The build output ") || !strings.HasSuffix(e.Msg, " is outside the project.") ||
 			e.File != localManifest || e.Hint != "Set build.folder to a folder inside the project, such as dist/bin." {
-			t.Errorf("%s: %+v", folder, e)
+			t.Errorf("%s: %+v", dir, e)
 		}
 	}
 }
@@ -108,16 +108,16 @@ func TestArchiveOfRefusesABuildFolderThatNamesNoFolderOrOneThatCannotHoldAnArchi
 }
 
 func TestTheStageAndTheArchiveRefuseAMapFolderWindowsCannotHoldByTheManifest(t *testing.T) {
-	for _, folder := range []string{"map?.w3x", "con.w3x", "campaign./one.w3x"} {
+	for _, dir := range []string{"map?.w3x", "con.w3x", "campaign./one.w3x"} {
 		p := projectWith(t.TempDir(), "dist/bin", localManifest)
-		p.Map.Folder = folder
+		p.Map.Folder = dir
 		_, ofArchive := archivePath(p)
 		_, ofStage := stageOutputFile(p)
 		for what, err := range map[string]error{"the archive": ofArchive, "the stage": ofStage} {
-			e := asError(t, err, what+" of map.folder "+folder)
-			if e.Msg != `map.folder has a name that Windows cannot hold: "`+folder+`".` || e.File != localManifest ||
+			e := asError(t, err, what+" of map.folder "+dir)
+			if e.Msg != `map.folder has a name that Windows cannot hold: "`+dir+`".` || e.File != localManifest ||
 				!strings.Contains(e.Hint, "such as map.w3x") {
-				t.Errorf("%s of map.folder %q: error = %+v", what, folder, e)
+				t.Errorf("%s of map.folder %q: error = %+v", what, dir, e)
 			}
 		}
 	}
@@ -149,7 +149,7 @@ func TestArchiveOfRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 	tests := []struct {
 		name    string
 		written string
-		link    string
+		symlink string
 		target  string
 	}{
 		{"the first folder to the source map", "out", "out", "maps/map.w3x/war3mapImported"},
@@ -162,14 +162,14 @@ func TestArchiveOfRefusesALinkOnTheWayToTheArchiveByItsStep(t *testing.T) {
 			testkit.WriteFile(t, root, "maps/map.w3x/war3mapImported/map.w3x", []byte("a file of the map"))
 			testkit.WriteFile(t, root, "maps/other/map.w3x", []byte("a file beside the map"))
 			maps := testkit.Snapshot(t, filepath.Join(root, "maps"))
-			link := filepath.Join(root, filepath.FromSlash(tt.link))
-			if err := os.MkdirAll(filepath.Dir(link), 0o777); err != nil {
+			symlink := filepath.Join(root, filepath.FromSlash(tt.symlink))
+			if err := os.MkdirAll(filepath.Dir(symlink), 0o777); err != nil {
 				t.Fatal(err)
 			}
-			testkit.LinkDir(t, filepath.Join(root, filepath.FromSlash(tt.target)), link)
+			testkit.LinkDir(t, filepath.Join(root, filepath.FromSlash(tt.target)), symlink)
 			_, err := prepareArchivePath(projectWith(root, tt.written, localManifest))
 			e := asError(t, err, "a link on the way to the archive")
-			if !strings.HasPrefix(e.Msg, tt.link+" is a link: ") || e.File != tt.written+"/map.w3x" || e.Hint == "" {
+			if !strings.HasPrefix(e.Msg, tt.symlink+" is a link: ") || e.File != tt.written+"/map.w3x" || e.Hint == "" {
 				t.Errorf("error = %+v", e)
 			}
 			if !reflect.DeepEqual(testkit.Snapshot(t, filepath.Join(root, "maps")), maps) {

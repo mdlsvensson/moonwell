@@ -17,14 +17,14 @@ const installPage = "https://pkl-lang.org/main/current/pkl-cli/index.html#instal
 func TestPklProgramUsesPklOnPathWhenItIs032OrNewer(t *testing.T) {
 	for _, found := range []string{"Pkl 0.32.1 (Windows 10.0, native)", "Pkl 0.33.0 (Linux)", "Pkl 1.0.0 (Linux)"} {
 		for _, platform := range []string{"linux-x86_64", ""} {
-			e, log, fetches := pklInstaller(t, "")
+			e, log, fetches := newPklEnv(t, "")
 			e.Platform = platform
 			var asked []string
 			e.Run = func(
 				ctx context.Context, program string, args []string, options env.RunOptions,
 			) (env.RunResult, error) {
 				asked = append([]string{program}, args...)
-				return pathAndPinned(found, "")(ctx, program, args, options)
+				return fakePklRun(found, "")(ctx, program, args, options)
 			}
 			program, err := FindPkl(background, e)
 			if err != nil || program != "pkl" || *fetches != 0 || len(log.Lines()) != 0 {
@@ -39,7 +39,7 @@ func TestPklProgramUsesPklOnPathWhenItIs032OrNewer(t *testing.T) {
 }
 
 func TestPklProgramDownloadsVerifiesAndCachesThePinnedPklOnceWhenPathHasNone(t *testing.T) {
-	e, log, fetches := pklInstaller(t, "")
+	e, log, fetches := newPklEnv(t, "")
 	program, err := FindPkl(background, e)
 	want := filepath.Join(e.CacheDir, "pkl", PklVersion, "pkl")
 	if err != nil || program != want {
@@ -54,14 +54,14 @@ func TestPklProgramDownloadsVerifiesAndCachesThePinnedPklOnceWhenPathHasNone(t *
 	if lines := log.Lines(); !slices.Equal(lines, []string{"Downloading Pkl " + PklVersion + "..."}) {
 		t.Errorf("log = %q", lines)
 	}
-	if left := holds(t, e.CacheDir); !slices.Equal(left, []string{"pkl", "pkl/" + PklVersion, "pkl/" + PklVersion + "/pkl"}) {
+	if left := listDir(t, e.CacheDir); !slices.Equal(left, []string{"pkl", "pkl/" + PklVersion, "pkl/" + PklVersion + "/pkl"}) {
 		t.Errorf("the cache holds %q", left)
 	}
 }
 
 func TestPklProgramWarnsAboutAnOlderPklOnPathAndUsesThePinnedOne(t *testing.T) {
-	e, log, _ := pklInstaller(t, "")
-	e.Run = pathAndPinned("Pkl 0.31.0 (Linux)\n", "Pkl "+PklVersion+" (Linux)")
+	e, log, _ := newPklEnv(t, "")
+	e.Run = fakePklRun("Pkl 0.31.0 (Linux)\n", "Pkl "+PklVersion+" (Linux)")
 	program, err := FindPkl(background, e)
 	if err != nil || program != filepath.Join(e.CacheDir, "pkl", PklVersion, "pkl") {
 		t.Fatalf("PklProgram = %q, %v", program, err)
@@ -78,8 +78,8 @@ func TestPklProgramWarnsAboutAnOlderPklOnPathAndUsesThePinnedOne(t *testing.T) {
 
 func TestPklProgramTakesAPklOnPathThatNamesNoVersionForAnOlderOne(t *testing.T) {
 	for output, shown := range map[string]string{"pkl: no such flag\n": "(pkl: no such flag)", " \r\n": "(unknown)"} {
-		e, log, fetches := pklInstaller(t, "")
-		e.Run = pathAndPinned(output, "Pkl "+PklVersion+" (Linux)")
+		e, log, fetches := newPklEnv(t, "")
+		e.Run = fakePklRun(output, "Pkl "+PklVersion+" (Linux)")
 		program, err := FindPkl(background, e)
 		if err != nil || program != filepath.Join(e.CacheDir, "pkl", PklVersion, "pkl") || *fetches != 1 {
 			t.Errorf("%q: PklProgram = %q, %v, %d downloads", output, program, err, *fetches)
@@ -93,11 +93,11 @@ func TestPklProgramTakesAPklOnPathThatNamesNoVersionForAnOlderOne(t *testing.T) 
 
 func TestPklProgramAsksForAnInstallWhereItCannotDownloadPkl(t *testing.T) {
 	const hint = "Install Pkl 0.32 or newer: " + installPage
-	e, _, fetches := pklInstaller(t, "")
+	e, _, fetches := newPklEnv(t, "")
 	e.Platform = ""
 	_, err := FindPkl(background, e)
-	if failure := asError(t, err, "no pkl"); failure.Msg != "Cannot run 'pkl': command not found." || failure.Hint != hint {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "no pkl"); diagErr.Msg != "Cannot run 'pkl': command not found." || diagErr.Hint != hint {
+		t.Errorf("error = %+v", diagErr)
 	}
 	for found, message := range map[string]string{
 		"Pkl 0.31.0 (Linux)": "Moonwell needs Pkl 0.32 or newer (found: Pkl 0.31.0 (Linux)).",
@@ -105,10 +105,10 @@ func TestPklProgramAsksForAnInstallWhereItCannotDownloadPkl(t *testing.T) {
 		" \t\r\n":            "Moonwell needs Pkl 0.32 or newer (found: unknown).",
 		"pkl: no such flag":  "Moonwell needs Pkl 0.32 or newer (found: pkl: no such flag).",
 	} {
-		e.Run = prints(found)
+		e.Run = fakeRunPrinting(found)
 		_, err := FindPkl(background, e)
-		if failure := asError(t, err, found); failure.Msg != message || failure.Hint != hint || failure.File != "" {
-			t.Errorf("error = %+v", failure)
+		if diagErr := asDiagError(t, err, found); diagErr.Msg != message || diagErr.Hint != hint || diagErr.File != "" {
+			t.Errorf("error = %+v", diagErr)
 		}
 	}
 	if *fetches != 0 {
@@ -128,47 +128,47 @@ func TestAPklIs032OrNewerByItsFirstTwoNumbers(t *testing.T) {
 }
 
 func TestPklProgramRejectsAChecksumMismatchAndInstallsNothing(t *testing.T) {
-	e, _, _ := pklInstaller(t, strings.Repeat("0", 64))
+	e, _, _ := newPklEnv(t, strings.Repeat("0", 64))
 	_, err := FindPkl(background, e)
-	failure := asError(t, err, "a wrong checksum")
-	if !strings.HasPrefix(failure.Msg, "Pkl download checksum mismatch (expected "+strings.Repeat("0", 64)+", got ") ||
-		!strings.Contains(failure.Hint, "do not bypass the check") {
-		t.Errorf("error = %+v", failure)
+	diagErr := asDiagError(t, err, "a wrong checksum")
+	if !strings.HasPrefix(diagErr.Msg, "Pkl download checksum mismatch (expected "+strings.Repeat("0", 64)+", got ") ||
+		!strings.Contains(diagErr.Hint, "do not bypass the check") {
+		t.Errorf("error = %+v", diagErr)
 	}
-	if left := holds(t, e.CacheDir); len(left) != 0 {
+	if left := listDir(t, e.CacheDir); len(left) != 0 {
 		t.Errorf("the cache holds %q", left)
 	}
 }
 
 func TestPklProgramRefusesADownloadThatFailsOrIsNotThePinnedPkl(t *testing.T) {
-	e, _, _ := pklInstaller(t, "")
-	e.Fetch = offline
+	e, _, _ := newPklEnv(t, "")
+	e.Fetch = fetchOffline
 	_, err := FindPkl(background, e)
-	if failure := asError(t, err, "offline"); failure.Msg != "Downloading https://example.test/pkl-linux-amd64 failed." ||
-		failure.Hint != "Check your connection and retry, or install Pkl 0.32 or newer yourself: "+installPage {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "offline"); diagErr.Msg != "Downloading https://example.test/pkl-linux-amd64 failed." ||
+		diagErr.Hint != "Check your connection and retry, or install Pkl 0.32 or newer yourself: "+installPage {
+		t.Errorf("error = %+v", diagErr)
 	}
-	e.Fetch = status(404)
+	e.Fetch = fetchStatus(404)
 	_, err = FindPkl(background, e)
-	if failure := asError(t, err, "a server failure"); failure.Msg != "Downloading https://example.test/pkl-linux-amd64 failed with HTTP 404." ||
-		failure.Hint != "Retry later, or install Pkl 0.32 or newer yourself: "+installPage {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "a server failure"); diagErr.Msg != "Downloading https://example.test/pkl-linux-amd64 failed with HTTP 404." ||
+		diagErr.Hint != "Retry later, or install Pkl 0.32 or newer yourself: "+installPage {
+		t.Errorf("error = %+v", diagErr)
 	}
 
-	e, _, _ = pklInstaller(t, "")
-	e.Run = pathAndPinned("", "Pkl 0.32.0 (Linux)")
+	e, _, _ = newPklEnv(t, "")
+	e.Run = fakePklRun("", "Pkl 0.32.0 (Linux)")
 	_, err = FindPkl(background, e)
-	if failure := asError(t, err, "another version"); failure.Msg != "Downloaded Pkl reports version 0.32.0, expected "+PklVersion+"." {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "another version"); diagErr.Msg != "Downloaded Pkl reports version 0.32.0, expected "+PklVersion+"." {
+		t.Errorf("error = %+v", diagErr)
 	}
-	if left := holds(t, filepath.Join(e.CacheDir, "pkl")); len(left) != 0 {
+	if left := listDir(t, filepath.Join(e.CacheDir, "pkl")); len(left) != 0 {
 		t.Errorf("something was installed: %q", left)
 	}
 }
 
 func TestPklProgramPassesOnACancelledRun(t *testing.T) {
-	e, _, fetches := pklInstaller(t, "")
-	e.Run = interrupted
+	e, _, fetches := newPklEnv(t, "")
+	e.Run = runInterrupted
 	if _, err := FindPkl(background, e); err != context.Canceled || *fetches != 0 {
 		t.Errorf("PklProgram = %v, %d downloads", err, *fetches)
 	}
@@ -214,15 +214,15 @@ func TestInstallBinCopiesPklOnceAndReportsACopyItCannotReplace(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, _, err := CopyToBinDir(blocked, Pkl, source)
-	failure := asError(t, err, "a folder in the way")
-	if !strings.HasPrefix(failure.Msg, "Copying Pkl to "+filepath.Join(blocked.CacheDir, "bin", "pkl.exe")+" failed: ") ||
-		!strings.HasSuffix(failure.Hint, "then run moonwell setup again.") {
-		t.Errorf("error = %+v", failure)
+	diagErr := asDiagError(t, err, "a folder in the way")
+	if !strings.HasPrefix(diagErr.Msg, "Copying Pkl to "+filepath.Join(blocked.CacheDir, "bin", "pkl.exe")+" failed: ") ||
+		!strings.HasSuffix(diagErr.Hint, "then run moonwell setup again.") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }
 
 func TestKeepPklForShellCopiesThePinnedPklAndSaysWhenPathStillHasNone(t *testing.T) {
-	e, log, _ := pklInstaller(t, "")
+	e, log, _ := newPklEnv(t, "")
 	pinned := testkit.WriteFile(t, e.CacheDir, "pkl/"+PklVersion+"/pkl", []byte("fake-pkl"))
 	bin := filepath.Join(e.CacheDir, "bin")
 	if err := CopyPklToBinDir(background, e, pinned, "windows"); err != nil {
@@ -240,31 +240,31 @@ func TestKeepPklForShellCopiesThePinnedPklAndSaysWhenPathStillHasNone(t *testing
 		t.Errorf("the copy holds %q", data)
 	}
 
-	e.Run = pathAndPinned("Pkl "+PklVersion+" (Linux)", "")
+	e.Run = fakePklRun("Pkl "+PklVersion+" (Linux)", "")
 	if err := CopyPklToBinDir(background, e, pinned, "linux"); err != nil || len(log.Lines()) != len(want) {
 		t.Errorf("log = %q, %v", log.Lines(), err)
 	}
 	untouched, silence := testkit.Env(t, t.TempDir())
 	if err := CopyPklToBinDir(background, untouched, "pkl", "linux"); err != nil || len(silence.Lines()) != 0 ||
-		len(holds(t, untouched.CacheDir)) != 0 {
+		len(listDir(t, untouched.CacheDir)) != 0 {
 		t.Errorf("KeepPklForShell of the pkl on PATH = %v, log %q", err, silence.Lines())
 	}
 }
 
 func TestKeepPklForShellPassesOnACancellationAndACopyThatFails(t *testing.T) {
-	e, log, _ := pklInstaller(t, "")
+	e, log, _ := newPklEnv(t, "")
 	pinned := testkit.WriteFile(t, e.CacheDir, "pkl/"+PklVersion+"/pkl", []byte("fake-pkl"))
-	e.Run = interrupted
+	e.Run = runInterrupted
 	if err := CopyPklToBinDir(background, e, pinned, "linux"); err != context.Canceled {
 		t.Errorf("KeepPklForShell = %v, want the cancellation as it is", err)
 	}
 	if lines := log.Lines(); len(lines) != 1 || !strings.HasPrefix(lines[0], "Copied Pkl ") {
 		t.Errorf("log = %q", lines)
 	}
-	e.Run = noProgram(t)
+	e.Run = failingRun(t)
 	gone := filepath.Join(e.CacheDir, "pkl", "0.0.0", "pkl")
 	err := CopyPklToBinDir(background, e, gone, "linux")
-	if failure := asError(t, err, "no pinned Pkl"); !strings.HasPrefix(failure.Msg, "Copying Pkl to ") {
-		t.Errorf("error = %+v", failure)
+	if diagErr := asDiagError(t, err, "no pinned Pkl"); !strings.HasPrefix(diagErr.Msg, "Copying Pkl to ") {
+		t.Errorf("error = %+v", diagErr)
 	}
 }

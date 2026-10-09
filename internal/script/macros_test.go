@@ -36,10 +36,10 @@ func TestMacrosOfPointsYueAtItsFolderAndHashesTheModule(t *testing.T) {
 func TestMacrosOfRefusesAProjectFolderWhosePathHasASemicolonOrAQuestionMark(t *testing.T) {
 	for _, root := range []string{"/pro;ject", "/pro?ject"} {
 		search, err := readMacros(root)
-		failure := asError(t, err, root)
-		if failure.Msg != `The project folder's path contains ";" or "?", which YueScript's module search cannot handle.` ||
-			failure.File != root || failure.Hint != "Move the project to a folder whose path has neither character." || search != (macroFile{}) {
-			t.Errorf("%s: %+v, %+v", root, search, failure)
+		diagErr := asError(t, err, root)
+		if diagErr.Msg != `The project folder's path contains ";" or "?", which YueScript's module search cannot handle.` ||
+			diagErr.File != root || diagErr.Hint != "Move the project to a folder whose path has neither character." || search != (macroFile{}) {
+			t.Errorf("%s: %+v, %+v", root, search, diagErr)
 		}
 	}
 }
@@ -78,31 +78,31 @@ func TestRefreshMacrosNamesTheFileWhenItCannotBeWritten(t *testing.T) {
 		"a folder for the file": files(MacrosFile+"/kept.txt", ""),
 	} {
 		wrote, err := RefreshMacros(p.lay(t))
-		failure := asError(t, err, what)
-		if wrote || !strings.HasPrefix(failure.Msg, "Writing .moonwell/yue/moonwell/macros.yue failed: ") || failure.File != MacrosFile ||
-			failure.Hint != "Moonwell's compiler and the editor read .moonwell/; make sure it is a folder you can write, then retry." ||
-			failure.Cause == nil {
-			t.Errorf("%s: wrote %v, %+v", what, wrote, failure)
+		diagErr := asError(t, err, what)
+		if wrote || !strings.HasPrefix(diagErr.Msg, "Writing .moonwell/yue/moonwell/macros.yue failed: ") || diagErr.File != MacrosFile ||
+			diagErr.Hint != "Moonwell's compiler and the editor read .moonwell/; make sure it is a folder you can write, then retry." ||
+			diagErr.Cause == nil {
+			t.Errorf("%s: wrote %v, %+v", what, wrote, diagErr)
 		}
 	}
 }
 
 func TestRefreshMacrosRefusesALinkOnTheWayToTheFile(t *testing.T) {
-	for _, link := range []string{".moonwell", ".moonwell/yue", ".moonwell/yue/moonwell"} {
+	for _, symlink := range []string{".moonwell", ".moonwell/yue", ".moonwell/yue/moonwell"} {
 		root, elsewhere := t.TempDir(), t.TempDir()
-		at := filepath.Join(root, filepath.FromSlash(link))
+		at := filepath.Join(root, filepath.FromSlash(symlink))
 		if err := os.MkdirAll(filepath.Dir(at), 0o777); err != nil {
 			t.Fatal(err)
 		}
 		testkit.LinkDir(t, elsewhere, at)
 		wrote, err := RefreshMacros(root)
-		failure := asError(t, err, link)
-		if wrote || failure.Msg != "Symlinks are not supported: "+at || failure.File != MacrosFile ||
-			!strings.Contains(failure.Hint, "real files") {
-			t.Errorf("a link at %s: wrote %v, %+v", link, wrote, failure)
+		diagErr := asError(t, err, symlink)
+		if wrote || diagErr.Msg != "Symlinks are not supported: "+at || diagErr.File != MacrosFile ||
+			!strings.Contains(diagErr.Hint, "real files") {
+			t.Errorf("a link at %s: wrote %v, %+v", symlink, wrote, diagErr)
 		}
 		if through := testkit.Snapshot(t, elsewhere); len(through) != 0 {
-			t.Errorf("a link at %s: %d files were written through it", link, len(through))
+			t.Errorf("a link at %s: %d files were written through it", symlink, len(through))
 		}
 	}
 }

@@ -50,8 +50,8 @@ func bytesOf(name string) string { return "the bytes of " + name }
 func (p project) onDisk(t testing.TB) string {
 	t.Helper()
 	root := t.TempDir()
-	for _, folder := range p.folders {
-		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(folder)), 0o777); err != nil {
+	for _, dir := range p.folders {
+		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(dir)), 0o777); err != nil {
 			t.Fatal(err)
 		}
 	}

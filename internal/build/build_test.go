@@ -107,8 +107,8 @@ func TestBuildStagesTheMapPacksItAndSaysWhatItDid(t *testing.T) {
 		t.Errorf("the archive lists %d of its %d files for %d staged ones", len(listed), archive.Blocks, len(staged))
 	}
 	inSource := scanned.Files()
-	for at, name := range inSource {
-		inSource[at] = strings.ReplaceAll(name, "/", `\`)
+	for index, name := range inSource {
+		inSource[index] = strings.ReplaceAll(name, "/", `\`)
 	}
 	added := []string{"war3map.w3u", "war3mapSkin.w3u", `icons\sword.blp`, "war3map.imp"}
 	if !slices.Equal(listed, slices.Concat(inSource, added)) {
@@ -339,16 +339,16 @@ func TestBuildRefusesAFileOnTheWayToItsStageAndToItsArchive(t *testing.T) {
 	}
 }
 
-func linkedTo(t testing.TB, s *standIn, link, target string) (leadsTo string, before [2]map[string][]byte) {
+func linkedTo(t testing.TB, s *standIn, symlink, target string) (leadsTo string, before [2]map[string][]byte) {
 	t.Helper()
 	leadsTo = t.TempDir()
 	if target != "" {
 		leadsTo = s.folder(target)
 	}
 	testkit.WriteFile(t, leadsTo, "kept.txt", []byte("kept"))
-	s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash(link))))
+	s.folder(filepath.ToSlash(filepath.Dir(filepath.FromSlash(symlink))))
 	before = [2]map[string][]byte{testkit.Snapshot(t, leadsTo), testkit.Snapshot(t, s.at("maps"))}
-	testkit.LinkDir(t, leadsTo, s.at(link))
+	testkit.LinkDir(t, leadsTo, s.at(symlink))
 	return leadsTo, before
 }
 
