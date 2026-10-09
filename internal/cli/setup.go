@@ -18,12 +18,6 @@ import (
 )
 
 func runSetup(ctx context.Context, e *env.Env, _ commandArgs) error {
-	if _, err := build.LoadSettings(ctx, e); err != nil {
-		return err
-	}
-	if err := setupUserFile(e); err != nil {
-		return err
-	}
 	project, err := build.LoadWith(ctx, e, setupPkl)
 	if err != nil {
 		return err
@@ -46,17 +40,6 @@ func setupPkl(ctx context.Context, e *env.Env) (pkl string, err error) {
 		return "", err
 	}
 	return pkl, toolchain.CopyPklToBinDir(ctx, e, pkl, runtime.GOOS)
-}
-
-func setupUserFile(e *env.Env) error {
-	created, err := manifest.EnsureUserFile(e)
-	if err != nil {
-		return err
-	}
-	if created {
-		e.Log.Info("Created " + manifest.UserFilePath(e) + ". Check that launch.gameExecutable points at your Warcraft III.exe.")
-	}
-	return nil
 }
 
 func setupCompiler(ctx context.Context, e *env.Env, yue manifest.Yue) error {

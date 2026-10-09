@@ -1,22 +1,15 @@
 package manifest
 
 import (
-	"errors"
 	"fmt"
-	"io/fs"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 
-	"github.com/mdlsvensson/moonwell/internal/diag"
 	"github.com/mdlsvensson/moonwell/internal/env"
-	"github.com/mdlsvensson/moonwell/internal/fsx"
 )
 
 const UserFile = "config.toml"
-
-const DefaultGameExecutable = `C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe`
 
 var defaultLaunchArgs = []string{"-launch", "-windowmode", "windowed"}
 
@@ -83,57 +76,4 @@ func (u *userFile) checkRules(fullPath string) error {
 		c.check(filepath.IsAbs(library.Path), setting+".path", "must be an absolute path to the library's folder")
 	}
 	return c.err
-}
-
-func UserFileText() string {
-	return "[launch]\ngameExecutable = '" + DefaultGameExecutable + "'\n"
-}
-
-func EnsureUserFile(e *env.Env) (created bool, err error) {
-	if e.ConfigDir == "" {
-		return false, errNoConfigDir()
-	}
-	fullPath := UserFilePath(e)
-	if err := os.MkdirAll(e.ConfigDir, 0o777); err != nil {
-		return false, errUserFileNotWritten(fullPath, err)
-	}
-	file, err := os.OpenFile(fullPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666)
-	switch {
-	case errors.Is(err, fs.ErrExist), err != nil && pathExists(fullPath):
-		return false, nil
-	case err != nil:
-		return false, errUserFileNotWritten(fullPath, err)
-	}
-	_, err = file.WriteString(UserFileText())
-	if closeErr := file.Close(); err == nil {
-		err = closeErr
-	}
-	if err != nil {
-		_ = os.Remove(fullPath)
-		return false, errUserFileNotWritten(fullPath, err)
-	}
-	return true, nil
-}
-
-func pathExists(path string) bool {
-	info, err := fsx.Lstat(path)
-	return err == nil && info != nil
-}
-
-func errNoConfigDir() error {
-	return &diag.Error{
-		Msg:  "This system names no home folder, so there is no place for " + UserFile + ".",
-		File: UserFile,
-		Hint: "Set the variable MOONWELL_HOME to a folder for it.",
-	}
-}
-
-func errUserFileNotWritten(fullPath string, cause error) error {
-	return &diag.Error{
-		Msg:  "Creating " + fullPath + " failed: " + fsx.Reason(cause),
-		File: fullPath,
-		Hint: "Make sure that the folder is one you may write to and that its disk has room, then run the command " +
-			"again. The variable MOONWELL_HOME names another folder for this file.",
-		Cause: cause,
-	}
 }

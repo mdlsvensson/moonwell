@@ -16,11 +16,6 @@ import (
 	"github.com/mdlsvensson/moonwell/internal/toolchain"
 )
 
-func createdUsersFile(root string) string {
-	return "Created " + filepath.Join(root, userDir, manifest.UserFile) +
-		". Check that launch.gameExecutable points at your Warcraft III.exe."
-}
-
 func compilerLine(compiler string) string {
 	return "YueScript " + toolchain.YueVersion + ": " + compiler
 }
@@ -31,13 +26,13 @@ func isPathWarning(line, binDir string) bool {
 		strings.HasSuffix(line, ":\n  "+toolchain.AddToPathCommand(binDir, runtime.GOOS))
 }
 
-func TestSetupThatWasToldToStopSaysNothingAndMakesNoUsersFile(t *testing.T) {
+func TestSetupThatWasToldToStopSaysNothing(t *testing.T) {
 	root := newTemplateProject(t)
 	stopped, stop := context.WithCancel(background)
 	stop()
 	result := runCLIWithContext(t, stopped, root, "setup")
-	if result.code != 130 || result.output != "" || exists(root, userDir) {
-		t.Errorf("setup = %+v, and the user's folder exists: %v; want exit 130, no line and no file", result, exists(root, userDir))
+	if result.code != 130 || result.output != "" {
+		t.Errorf("setup = %+v; want exit 130 and no line", result)
 	}
 }
 
@@ -51,13 +46,16 @@ func TestSetupSaysItsStepsInTheirOrderAndCopiesTheCompilerForTheEditorOnce(t *te
 	}
 	copied := filepath.Join(world.binDir(), filepath.Base(world.compiler))
 	lines := log.Lines()
-	if len(lines) != 5 || lines[0] != createdUsersFile(root) || lines[1] != compilerLine(world.compiler) ||
-		lines[2] != "Copied YueScript for the editor to "+copied+"." || !isPathWarning(lines[3], world.binDir()) ||
-		lines[4] != "Added yueconfig.yue for the editor." {
+	if len(lines) != 4 || lines[0] != compilerLine(world.compiler) ||
+		lines[1] != "Copied YueScript for the editor to "+copied+"." || !isPathWarning(lines[2], world.binDir()) ||
+		lines[3] != "Added yueconfig.yue for the editor." {
 		t.Errorf("the first setup logged %q", lines)
 	}
 	if !fsx.Exists(copied) || !exists(root, ".moonwell/types/natives.d.lua") || exists(root, "dist/.lock") {
 		t.Error("setup kept no copy of the compiler, wrote no declarations, or left the build lock behind")
+	}
+	if exists(root, userDir) {
+		t.Error("setup made the user's folder")
 	}
 
 	e, log = world.envAt(root)

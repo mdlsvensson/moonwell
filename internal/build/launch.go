@@ -35,8 +35,8 @@ func errNoGame(userFilePath string) error {
 	return &diag.Error{
 		Msg:  "launch.gameExecutable is not set.",
 		File: userFilePath,
-		Hint: "Run `moonwell setup` to create that file if it is missing, then set launch.gameExecutable there to " +
-			"your Warcraft III.exe.",
+		Hint: "Set launch.gameExecutable there to your Warcraft III.exe. Moonwell's install script makes that file; " +
+			"if it is missing, create it as \"Your machine\" in Moonwell's README shows.",
 	}
 }
 

@@ -24,8 +24,8 @@ func recordSpawns(e *env.Env) *[]spawnCall {
 
 func TestLaunchExplainsAMissingOrWrongExecutable(t *testing.T) {
 	e, _ := testkit.Env(t, t.TempDir())
-	const set = "Run `moonwell setup` to create that file if it is missing, then set launch.gameExecutable there to " +
-		"your Warcraft III.exe."
+	const set = "Set launch.gameExecutable there to your Warcraft III.exe. Moonwell's install script makes that file; " +
+		"if it is missing, create it as \"Your machine\" in Moonwell's README shows."
 	const fix = "Fix launch.gameExecutable in that file to point at Warcraft III.exe."
 	missing := filepath.Join(t.TempDir(), "Warcraft III.exe")
 	dir := t.TempDir()

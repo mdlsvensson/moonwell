@@ -48,7 +48,8 @@ Four words of a project come back all through this document:
   (`.github/workflows/release.yml`).
 - `embed.go` and `version.go`: the root package, `moonwell`. It holds the files the program carries inside its
   executable (`template/`, `runtime/`, `data/`) and the version number.
-- `install.ps1` and `install.sh`: the install scripts a release serves.
+- `install.ps1` and `install.sh`: the install scripts a release serves. They also make the user's `config.toml` when
+  it is missing; no command of the program writes that file.
 - The test files at the root (`layout_test.go`, `module_test.go`, `schema_test.go`, `install_test.go`,
   `documents_test.go`) are tests of the repository as a whole: what may import what, that no dependency crept in,
   that the version is the same everywhere, that the install scripts work, that this document names real files and
@@ -211,8 +212,8 @@ The command table and where each command goes:
 | `test` | `runTest` in `internal/cli/testcmd.go` | `build.Test` |
 | `check` | `runCheck` in `internal/cli/check.go` | `build.Check` |
 | `dev` | `runDev` in `internal/cli/dev.go` | `build.Dev` |
-| `init` | `runInit` in `internal/cli/initcmd.go` | writes the template's files, runs `pkl project resolve`, and makes the user's `config.toml` when it is missing |
-| `setup` | `runSetup` in `internal/cli/setup.go` | the settings (`build.LoadSettings`), the user's `config.toml` when it is missing, Pkl and the objects where the project has object files, the compiler, the editor's files, the libraries |
+| `init` | `runInit` in `internal/cli/initcmd.go` | writes the template's files and runs `pkl project resolve` |
+| `setup` | `runSetup` in `internal/cli/setup.go` | the settings, Pkl and the objects where the project has object files (`build.LoadWith`), the compiler, the editor's files, the libraries |
 | `assets:check`, `assets:sync` | `runAssetsCheck` and `runAssetsSync`, each one call of `syncOrCheckAssets` in `internal/cli/assets.go` | `build.LoadSettings` (no Pkl), `build.OpenSource`, `library.Sync`, `build.PlanAssets`, and for a sync `assets.Sync` |
 | `assets:paths` | `runAssetsPaths`, which calls `reportAssetPaths` in `internal/cli/assetspaths.go` | in a project `build.LoadSettings`, `library.Sync` and `build.CollectAssets`; then `assets.ReportModels` |
 | `settings:check` | `runSettingsCheck` in `internal/cli/settings.go` | `build.LoadSettings`, `build.OpenSource`, `settings.Plan` |
@@ -526,7 +527,8 @@ Each row names the file to open and, in most rows, the function to read first.
 | know how an outcome becomes an exit code, and where a panic goes | `internal/cli/cli.go`: `execute`, `exitCode` |
 | change what Ctrl+C does | `internal/cli/main.go`: `Main`, `handleInterrupts`, `newForceExit`; `internal/build/lock.go`: `ReleaseHeldLocks` |
 | know where the log file is written | `internal/cli/cli.go`: `logFilePath`; `internal/env/log.go` |
-| change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/pklproject.go`: `PklProjectText`; `internal/manifest/userfile.go`: `UserFileText`, `EnsureUserFile` |
+| change what `init` writes | `template/` for the files; `internal/cli/initcmd.go`: `createProject`; `internal/manifest/pklproject.go`: `PklProjectText` |
+| change the user's `config.toml` that an install makes | `install.ps1` and `install.sh`; `install_test.go` holds both to one text |
 | change what `setup` does | `internal/cli/setup.go`: `runSetup` |
 
 ### The build
@@ -556,7 +558,7 @@ Each row names the file to open and, in most rows, the function to read first.
 | know which `pkl` and which `yue` is run | `internal/toolchain/find.go`: `FindPkl`, `FindCompiler` |
 | pin a new version of YueScript or Pkl | `internal/toolchain/tools.go`: `YueScript`, `Pkl`; the default `yue.version` is `DefaultYueVersion` in `internal/manifest/projectfile.go` |
 | change how a pinned program is downloaded and checked | `internal/toolchain/ensure.go`: `Ensure`; its steps in `internal/toolchain/install.go` |
-| change the version number | `version.go`, `schema/PklProject`, `install.ps1`, `install.sh`, and the two examples in `README.md`; `module_test.go` and `install_test.go` name one that was missed |
+| change the version number | `version.go`, `schema/PklProject`, `install.ps1`, `install.sh`, and the three examples in `README.md`; `module_test.go` and `install_test.go` name one that was missed |
 
 ### The gameplay code
 

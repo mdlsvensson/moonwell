@@ -13,9 +13,10 @@
   map's value, as `null` did. The README's new section "Settings" lists every setting with its default and rule.
 - **Your machine's settings are in `config.toml` in your Moonwell folder,** `.moonwell` in your user folder
   (`C:\Users\<you>\.moonwell` on Windows), and no longer in a file of each project. It holds
-  `launch.gameExecutable`, `launch.args` and `yue.path`. `init` and `setup` make it when it is missing, with the
-  default Battle.net path, and say where it is; neither changes one that is there. The variable `MOONWELL_HOME` names
-  another folder. A `launch` table or a `yue.path` in a project's `moonwell.toml` is refused, naming your file.
+  `launch.gameExecutable`, `launch.args` and `yue.path`. The install script makes it when it is missing, with the
+  default Battle.net path, and says where it is; it never changes one that is there, and no command of `moonwell`
+  writes it. The variable `MOONWELL_HOME` names another folder. A `launch` table or a `yue.path` in a project's
+  `moonwell.toml` is refused, naming your file.
 - **A library's local folder is said once, for its repository,** in your `config.toml`: a `[[libraries]]` entry with
   `github` and an absolute `path`. Every project on the machine that lists that repository takes the library from
   the folder, and each command says so in a line. The entry adds no library to a project that does not list it. A

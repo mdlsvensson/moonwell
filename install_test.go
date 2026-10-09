@@ -52,18 +52,33 @@ func currentInstaller(t *testing.T) installer {
 	switch runtime.GOOS {
 	case "linux":
 		return installer{"moonwell-linux-amd64", ".local/bin/moonwell", func(home, base string) *exec.Cmd {
-			return withEnv(exec.Command("sh", "install.sh"), "HOME="+home, "MOONWELL_INSTALL_BASE="+base)
+			return withEnv(exec.Command("sh", "install.sh"), "HOME="+home, "MOONWELL_HOME=", "MOONWELL_INSTALL_BASE="+base)
 		}}
 	case "windows":
 		return installer{"moonwell-windows-amd64.exe", "bin/moonwell.exe", func(home, base string) *exec.Cmd {
 			return withEnv(
 				exec.Command("powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "install.ps1"),
-				"MOONWELL_CACHE="+home, "MOONWELL_INSTALL_BASE="+base, "MOONWELL_INSTALL_NO_PATH=1",
+				"USERPROFILE="+home, "MOONWELL_HOME=", "MOONWELL_CACHE="+home, "MOONWELL_INSTALL_BASE="+base,
+				"MOONWELL_INSTALL_NO_PATH=1",
 			)
 		}}
 	}
 	t.Skip("there is no install script for " + runtime.GOOS)
 	return installer{}
+}
+
+const usersFileOfAnInstall = "[launch]\ngameExecutable = 'C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe'\n"
+
+func (i installer) run(t *testing.T, home string, content string, env ...string) string {
+	t.Helper()
+	files := release{i.asset: []byte(content), "checksums.txt": i.checksums([]byte(content))}
+	cmd := i.command(home, files.serve(t))
+	cmd.Env = append(cmd.Env, env...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("the script failed: %v\n%s", err, output)
+	}
+	return string(output)
 }
 
 func (i installer) checksums(content []byte) []byte {
@@ -75,12 +90,8 @@ func TestTheInstallScriptInstallsAndUpgrades(t *testing.T) {
 	home := t.TempDir()
 	target := filepath.Join(home, filepath.FromSlash(install.target))
 	for _, content := range []string{"the first executable", "the executable of a later run"} {
-		files := release{install.asset: []byte(content), "checksums.txt": install.checksums([]byte(content))}
-		output, err := install.command(home, files.serve(t)).CombinedOutput()
-		if err != nil {
-			t.Fatalf("the script failed: %v\n%s", err, output)
-		}
-		if !strings.Contains(string(output), "Installed Moonwell "+Version+" to ") {
+		output := install.run(t, home, content)
+		if !strings.Contains(output, "Installed Moonwell "+Version+" to ") {
 			t.Errorf("output:\n%s", output)
 		}
 		installed, err := os.ReadFile(target)
@@ -90,6 +101,42 @@ func TestTheInstallScriptInstallsAndUpgrades(t *testing.T) {
 		if info, _ := os.Stat(target); runtime.GOOS != "windows" && info.Mode()&0o111 == 0 {
 			t.Error("the installed file is not executable")
 		}
+	}
+}
+
+func TestTheInstallScriptMakesTheUsersFileOnceAndKeepsOneThatIsThere(t *testing.T) {
+	install := currentInstaller(t)
+	home := t.TempDir()
+	usersFile := filepath.Join(home, ".moonwell", "config.toml")
+	output := install.run(t, home, "the first executable")
+	if written, err := os.ReadFile(usersFile); err != nil || string(written) != usersFileOfAnInstall {
+		t.Fatalf("the user's file holds %q, %v, want the default game", written, err)
+	}
+	if !strings.Contains(output, "Created "+usersFile+". Check that launch.gameExecutable points at your Warcraft III.exe.") {
+		t.Errorf("the script does not say where the user's file is:\n%s", output)
+	}
+	const own = "[launch]\ngameExecutable = 'D:\\mine.exe'\n"
+	if err := os.WriteFile(usersFile, []byte(own), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	output = install.run(t, home, "the executable of a later run")
+	if kept, err := os.ReadFile(usersFile); err != nil || string(kept) != own {
+		t.Errorf("after an upgrade the user's file holds %q, %v, want it untouched", kept, err)
+	}
+	if strings.Contains(output, "Created ") {
+		t.Errorf("an upgrade says it created the file that was there:\n%s", output)
+	}
+}
+
+func TestTheInstallScriptMakesTheUsersFileInTheFolderMoonwellHomeNames(t *testing.T) {
+	install := currentInstaller(t)
+	home, named := t.TempDir(), filepath.Join(t.TempDir(), "not", "there", "yet")
+	install.run(t, home, "the executable", "MOONWELL_HOME="+named)
+	if written, err := os.ReadFile(filepath.Join(named, "config.toml")); err != nil || string(written) != usersFileOfAnInstall {
+		t.Errorf("the user's file in the named folder holds %q, %v, want the default game", written, err)
+	}
+	if _, err := os.Stat(filepath.Join(home, ".moonwell")); err == nil {
+		t.Error("the script also made a folder in the user's folder")
 	}
 }
 
@@ -122,6 +169,9 @@ func TestTheInstallScriptRefusesABadDownloadAndKeepsTheInstalledFile(t *testing.
 		}
 		if kept, _ := os.ReadFile(target); string(kept) != "installed before" {
 			t.Errorf("%s: the installed file is now %q", name, kept)
+		}
+		if _, err := os.Stat(filepath.Join(home, ".moonwell")); err == nil {
+			t.Errorf("%s: the script made the user's folder though nothing was installed", name)
 		}
 	}
 }

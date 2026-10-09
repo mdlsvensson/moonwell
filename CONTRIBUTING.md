@@ -36,6 +36,9 @@ what a build does step by step, and which file to open for what. Read it before 
   `schema/`. On Windows the folder must be on the same drive as the checkout: Pkl cannot load a local dependency from
   another drive. A linked project is built with whatever `moonwell` is run in it.
 - `go build -o <a folder on your PATH> ./cmd/moonwell` gives you the checkout's program as `moonwell`.
+- The settings of your machine, `config.toml` in `.moonwell` in your user folder, are made by the install scripts and
+  by no command. If you never ran an install script, write the file yourself as the README's "Your machine" shows:
+  `moonwell test` needs its `launch.gameExecutable`. `install_test.go` runs the scripts with a user folder of its own.
 
 ## Checks
 
@@ -276,10 +279,11 @@ The mode `game-paths`:
    released.
 2. Confirm `data/game-paths.txt` starts with `# Warcraft III <version>`, not the "Not generated yet" placeholder:
    with the placeholder every in-game path is reported as `custom path, not imported`.
-3. `cd template`, run `moonwell setup` (it creates `config.toml` in your Moonwell folder if missing and names it;
-   check its `gameExecutable`), then `moonwell test`. Confirm "Moonwell is running." prints and the Captain north of
-   the heroes changes colour every second (with ally colour mode off: Alt+A toggles it, and while it is on every unit
-   shows blue, teal or red). Confirm the Warcraft III window is visible and stays open after `moonwell` exits.
+3. `cd template`, run `moonwell setup`, check `launch.gameExecutable` in `config.toml` of your Moonwell folder (the
+   install script makes that file, see "Working on Moonwell" above), then `moonwell test`. Confirm "Moonwell is
+   running." prints and the Captain north of the heroes changes colour every second (with ally colour mode off: Alt+A
+   toggles it, and while it is on every unit shows blue, teal or red). Confirm the Warcraft III window is visible and
+   stays open after `moonwell` exits.
 4. Add `error "gate"` inside the `on_main` hook, run `moonwell test` again, and confirm the on-screen error names
    `src/main.yue` and the right line. Record which chunk-name form the game used.
 5. Run `moonwell build --minify` and play `dist/bin/map.w3x` directly.

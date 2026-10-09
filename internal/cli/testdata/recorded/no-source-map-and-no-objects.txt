@@ -13,10 +13,7 @@ exit code: 1
 printed: nothing
 terminal: a complaint about moonwell.toml
 the cache has a bin folder: true
-left:
-  .home/config.toml:
-    "[launch]\n"
-    "gameExecutable = 'C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe'\n"
+left: nothing
 == moonwell objects:check
 exit code: 1
 printed: nothing

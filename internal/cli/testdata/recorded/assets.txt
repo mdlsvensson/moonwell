@@ -90,14 +90,10 @@ left:
 exit code: 0
 printed: nothing
 terminal:
-  Created <root>/.home/config.toml. Check that launch.gameExecutable points at your Warcraft III.exe.
   YueScript 0.34.3: <reason>
   Copied YueScript for the editor to <reason>.
 the cache has a bin folder: true
 left:
-  .home/config.toml:
-    "[launch]\n"
-    "gameExecutable = 'C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe'\n"
   .moonwell/libraries/golems/.moonwell-library.json: present
   .moonwell/libraries/golems/golems/names.lua: sha256 fb76a3d5d40614dd1d20f7763081e14074c12816e07e4008ab535c74e53139f3, 29 bytes
   .moonwell/library-assets/golems/Textures/Golem.blp: sha256 883a080351ee4bf07016589f5d18b35f7d8d56a7b024c919b22c1488eb274150, 24 bytes

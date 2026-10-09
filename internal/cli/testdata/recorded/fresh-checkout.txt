@@ -2,7 +2,6 @@
 exit code: 0
 printed: nothing
 terminal:
-  Created <root>/.home/config.toml. Check that launch.gameExecutable points at your Warcraft III.exe.
   YueScript 0.34.3: <reason>
   Copied YueScript for the editor to <reason>.
   Added yueconfig.yue for the editor.
@@ -16,9 +15,6 @@ left:
     ".pkl-lsp/\n"
     ".moonwell/\n"
     "src/**/*.lua\n"
-  .home/config.toml:
-    "[launch]\n"
-    "gameExecutable = 'C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe'\n"
   .luarc.json:
     "{\n"
     "  \"runtime.version\": \"Lua 5.3\",\n"

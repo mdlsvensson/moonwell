@@ -185,12 +185,12 @@ func TestE2ETestStagesTheEntryAndTheFormThatItsLineNames(t *testing.T) {
 	}
 }
 
-func TestE2ESetupCreatesTheUsersFileAndKeepsOneThatIsThere(t *testing.T) {
+func TestE2ESetupMakesNoUsersFileAndKeepsOneThatIsThere(t *testing.T) {
 	world, root := newFakeWorld(t), newProject(t, "my-map")
 	removeFile(t, root, userDir)
 	world.mustSucceed(t, root, "setup")
-	if readFile(t, root, userFile) != manifest.UserFileText() {
-		t.Fatal("setup made no user's file with the default game")
+	if exists(root, userDir) {
+		t.Fatal("setup made the user's folder")
 	}
 	mine := "[launch]\ngameExecutable = \"/games/wc3.exe\"\n"
 	writeFile(t, root, userFile, mine)

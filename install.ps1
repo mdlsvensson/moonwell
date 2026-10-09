@@ -56,6 +56,19 @@
   }
   Write-Host "Installed Moonwell $version to $target."
 
+  $configDir = $env:MOONWELL_HOME
+  if (-not $configDir) { $configDir = Join-Path $env:USERPROFILE '.moonwell' }
+  $config = Join-Path $configDir 'config.toml'
+  if (-not (Test-Path -LiteralPath $config)) {
+    try {
+      New-Item -ItemType Directory -Force -Path $configDir | Out-Null
+      [IO.File]::WriteAllText($config, "[launch]`ngameExecutable = 'C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe'`n")
+    } catch {
+      throw "Creating $config failed: $($_.Exception.Message) Moonwell itself is installed. The variable MOONWELL_HOME names another folder for this file."
+    }
+    Write-Host "Created $config. Check that launch.gameExecutable points at your Warcraft III.exe."
+  }
+
   if ($env:MOONWELL_INSTALL_NO_PATH -eq '1') { return }
   $entries = @([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ })
   $wanted = $bin.TrimEnd('\')

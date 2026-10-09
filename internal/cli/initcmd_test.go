@@ -197,9 +197,8 @@ func TestInitWritesTheTemplateAndEndsWithTheNextCommand(t *testing.T) {
 		t.Fatalf("log = %q", lines)
 	}
 	usersFile := strings.TrimSuffix(strings.TrimPrefix(lines[0], start), end)
-	if written, err := os.ReadFile(usersFile); err != nil || string(written) != manifest.UserFileText() ||
-		filepath.Base(usersFile) != manifest.UserFile {
-		t.Errorf("the user's file %s holds %q, %v, want the default game", usersFile, written, err)
+	if filepath.Base(usersFile) != manifest.UserFile || fsx.Exists(usersFile) {
+		t.Errorf("init names the user's file as %s, or made it: %v", usersFile, fsx.Exists(usersFile))
 	}
 }
 
@@ -331,8 +330,8 @@ func TestPklInitLinkedProjectLoads(t *testing.T) {
 		!slices.Equal(p.Launch.Args, []string{"-launch", "-windowmode", "windowed"}) {
 		t.Fatalf("%+v", p)
 	}
-	if readFile(t, filepath.Dir(root), userFile) != manifest.UserFileText() {
-		t.Error("init made no user's file with the default game in the folder its world names")
+	if exists(filepath.Dir(root), userFile) {
+		t.Error("init made the user's file")
 	}
 	for _, dir := range []string{"CommandButtons", "CommandButtonsDisabled", "PassiveButtons"} {
 		if !exists(root, "assets/ReplaceableTextures/"+dir) {

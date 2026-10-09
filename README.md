@@ -46,9 +46,9 @@ cd my-map
 moonwell build
 ```
 
-`init` also makes `config.toml` in your Moonwell folder when it is missing, with `launch.gameExecutable` at the default
-Battle.net install, and its last line names that file (see [Your machine](#your-machine)). If your game is elsewhere,
-fix the path there, then run:
+The install line also made `config.toml` in your Moonwell folder, with `launch.gameExecutable` at the default
+Battle.net install, and the last line of `init` names that file (see [Your machine](#your-machine)). If your game is
+elsewhere, fix the path there, then run:
 
 ```powershell
 moonwell test
@@ -63,6 +63,9 @@ and puts it on your PATH:
   adds the folder to your user PATH; open a new terminal afterwards. It is the folder `moonwell setup` keeps `yue` in
   for the editor, so one PATH entry serves both.
 - **Linux:** `~/.local/bin/moonwell`. The script says so when that folder is not on your PATH.
+
+The script also makes `config.toml`, the settings of [your machine](#your-machine), in `.moonwell` in your user folder
+when that file is missing, and says where it is. It never changes one that is there.
 
 Moonwell is built for Windows and Linux on x86-64. Run the line again to upgrade: there is no update command.
 
@@ -602,7 +605,7 @@ Not supported yet:
 | `moonwell settings:check`                       | Show which internal map files the settings would change, without building        |
 | `moonwell objects:check`                        | Validate the objects and show which internal map files they would change         |
 | `moonwell objects:eval`                         | Print the resolved objects as JSON                                               |
-| `moonwell setup`                                | Create a missing `config.toml` of yours, download YueScript and prepare the editor |
+| `moonwell setup`                                | Download YueScript and prepare the editor                                        |
 
 A flag is written after its command: `moonwell build --minify`. `--entry` takes its file after a space or after
 `=`, and `--` ends the flags. A line Moonwell cannot read, such as one with a flag or a command it does not have
@@ -662,8 +665,10 @@ and they are used in the order they are written.
 ### Your machine
 
 `config.toml` is in `.moonwell` in your user folder (`C:\Users\<you>\.moonwell\config.toml` on Windows), or in the
-folder the variable `MOONWELL_HOME` names. `init` and `setup` make it when it is missing and never change it afterwards.
-A missing file is no error.
+folder the variable `MOONWELL_HOME` names. The install script makes it when it is missing, with the game at the default
+Battle.net install, and never changes it afterwards; no command of `moonwell` writes it. A missing file is no error:
+only `moonwell test` needs it, for the game's path. To make it yourself, create the file with the `[launch]` table
+below.
 
 | Setting | Default | What |
 | --- | --- | --- |

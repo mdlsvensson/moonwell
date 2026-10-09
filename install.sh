@@ -54,6 +54,17 @@ chmod +x "$work/$asset"
 mv -f "$work/$asset" "$bin/moonwell"
 echo "Installed Moonwell $version to $bin/moonwell."
 
+config_dir="${MOONWELL_HOME:-$HOME/.moonwell}"
+config="$config_dir/config.toml"
+if [ ! -e "$config" ]; then
+  mkdir -p "$config_dir" || fail "Creating $config_dir failed. Moonwell itself is installed. The variable MOONWELL_HOME names another folder for config.toml."
+  cat > "$config" <<'EOF' || fail "Creating $config failed. Moonwell itself is installed. The variable MOONWELL_HOME names another folder for this file."
+[launch]
+gameExecutable = 'C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe'
+EOF
+  echo "Created $config. Check that launch.gameExecutable points at your Warcraft III.exe."
+fi
+
 case ":$PATH:" in
   *":$bin:"*) ;;
   *)

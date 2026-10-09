@@ -69,9 +69,6 @@ func createProject(ctx context.Context, e *env.Env, dir, schemaDir string) error
 		undoInit(projectDir, existed)
 		return err
 	}
-	if _, err := manifest.EnsureUserFile(e); err != nil {
-		return err
-	}
 	e.Log.Info("Created " + dir + ". Check launch.gameExecutable in " + manifest.UserFilePath(e) + ", then: cd " + dir +
 		" && moonwell build")
 	return nil
