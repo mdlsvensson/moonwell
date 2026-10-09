@@ -81,11 +81,11 @@ A project with object files names the Moonwell they are written for in its `PklP
 another project and says which of the two to change. To install one version, use its own script:
 
 ```powershell
-irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.12.0/install.ps1 | iex
+irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.12.1/install.ps1 | iex
 ```
 
 To move a project's object files to a newer Moonwell, install that version, change the package's version in the
-project's `PklProject` (the line there becomes `moonwell@0.12.0`) and run `pkl project resolve`. If you have no `pkl`
+project's `PklProject` (the line there becomes `moonwell@0.12.1`) and run `pkl project resolve`. If you have no `pkl`
 command, run `moonwell setup` in the project first: it copies Moonwell's own Pkl into its cache's `bin` folder and
 prints the command that puts that folder on your PATH.
 
@@ -488,7 +488,7 @@ package they are written for. This is the file `init` writes:
 amends "pkl:Project"
 
 dependencies {
-  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.0" }
+  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.1" }
 }
 ```
 

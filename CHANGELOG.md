@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.12.1 (2026-10-09)
 
 - **`moonwell test` can start the game on a packed archive.** A new setting, `test.archive`, makes `test` pack the
   staged map to `dist/test/<map.folder>` and hand the game that file where it handed it the staged folder. It is
