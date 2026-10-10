@@ -44,6 +44,10 @@ Four words of a project come back all through this document:
 - `runtime/`: `runtime/moonwell.lua`, the Lua that goes into every map, and `runtime/macros.yue`, the macro module
   a project imports.
 - `template/`: the project that `moonwell init` creates, file for file.
+- `gate/`: the files of the release gate, copied over a new project to make the gate project: its four runs
+  (`gate/src/gate_start.yue` and the three beside it), the module they share (`gate/src/gate/steps.yue`), and the
+  objects, settings, picture and Lua modules they show. The program is not built from it; `CONTRIBUTING.md` says how
+  a release uses it, and `internal/cli/gate_test.go` builds every run.
 - `.github/workflows/`: the checks that run on every push (`.github/workflows/ci.yml`) and the release
   (`.github/workflows/release.yml`).
 - `embed.go` and `version.go`: the root package, `moonwell`. It holds the files the program carries inside its

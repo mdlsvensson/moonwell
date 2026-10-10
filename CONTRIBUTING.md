@@ -23,6 +23,8 @@ what a build does step by step, and which file to open for what. Read it before 
   the `pkl` executable for tools that launch it from the repo root.)
 - `template/`: the project `init` scaffolds. It is a linked project (its `PklProject` imports `../schema`), so use it to
   try changes. Nothing stray may be left in it: every file there goes into every new project, and a test pins the list.
+- `gate/`: the files of the release gate (below): copied over a new project, they make the gate project. Not part of
+  the program, and not embedded.
 - `tools/gen/`: the generator (below). `tools/metadata/` and `tools/natives/` hold the two files it reads that are
   written by hand.
 - `install.ps1`, `install.sh`: the install scripts a release serves.
@@ -270,157 +272,171 @@ The mode `game-paths`:
 | --- | --- |
 | `no model or texture paths were recognized in the listfile; …` | A list with one file name on a line, in UTF-8. The path list was not changed. |
 
-## Release gate (manual, before every release)
+## Release gate (before every release)
 
-1. Run every check above from a clean checkout. Then build the checkout's program into the folder the install script
-   uses, so that the steps below run it as `moonwell`:
+The gate is what the tests cannot hold: that the game and World Editor read what Moonwell writes. It has three
+parts. What a command can settle is settled by commands. What only the game shows is looked at in a gate run: a map
+that shows one thing at a time and writes what it prints to a file. What only World Editor or a code editor shows is
+looked at there, one thing at a time. A release needs only the runs and looks whose code changed.
+
+Up to 0.12.1 the gate was sixteen numbered steps, and the changelog's sections up to that release name them
+("step 13"); they are in this file as the tag `moonwell@0.12.1` has it.
+
+### The gate project
+
+`gate/` holds the gate's own files. A gate project is a new linked project with `gate/` copied over it:
+
+```
+moonwell init --link <a folder outside the checkout>/gate     # in the checkout
+```
+
+Then copy everything in `gate/` into that folder, replacing its `moonwell.toml`. The project keeps the template's
+map, its Captain and its `src/main.yue`, and gains:
+
+- `objects/gate.pkl`: a hero, an ability of four levels, a buff, an item, a building and an upgrade of two levels;
+- the map settings and the preview picture in `moonwell.toml`, with `preview.png` beside it;
+- `assets/war3mapImported/gate-probe.tga`, a picture to import;
+- `lua/gate_greeter.lua` and `lua/gate_counter.lua`, a module that returns a table and one that defines a global;
+- `src/gate/steps.yue`, the module the runs share, and the four runs: `src/gate_start.yue`, `src/gate_objects.yue`,
+  `src/gate_settings.yue` and `src/gate_assets.yue`.
+
+A run is built with `moonwell build --entry src/gate_<run>.yue` (`--minify` for a minified run), and the game is
+started on `dist/bin/map.w3x`:
+
+```
+& "<the game's folder>\_retail_\x86_64\Warcraft III.exe" -launch -windowmode windowed -loadfile "<project>\dist\bin\map.w3x"
+```
+
+Every line a run prints, Moonwell's own among them, is also written to
+`Documents\Warcraft III\CustomMapData\moonwell-gate-<run>.pld`, anew at every line, so a run is read from that file
+afterwards and needs no screenshot. A value a native can give is printed, and the file is held against the lists
+below. What has to be seen is a step: one line on screen says what to look for, and Esc goes on to the next. Each
+step stands alone: it makes what it shows and takes it away again, so nothing of an earlier step is on screen. Esc
+is the only key; to see a step again, start the map again. Nothing is timed. A run says when it is done.
+
+A test, `internal/cli/gate_test.go`, makes the gate project and builds every run, plain and minified, so a gate
+file that no longer compiles fails the checks.
+
+### Which runs a release needs
+
+Build the recorded projects (`internal/build/seeds_test.go`) with the version being released and with the release
+before, and compare every staged and packed file. Where nothing differs and none of the paths below changed, the
+gate is the commands and one start of the run `start`. Otherwise:
+
+| What changed | Runs and looks |
+| --- | --- |
+| `runtime/`, `internal/script`, `internal/war3/lua` | `start`, and `start` minified |
+| `internal/objects`, `internal/war3/objmod`, `schema/`, `data/metadata.json` | `objects`; the Object Editor |
+| `internal/settings`, `internal/war3/w3i`, `internal/war3/txt`, `internal/war3/picture` | `settings`; the lobby; World Editor's dialogs |
+| `internal/assets`, `internal/war3/imp`, `internal/war3/model` | `assets`; the Import Manager |
+| `internal/war3/mpq`, `internal/build/pack.go`, `internal/build/archive.go` | `start`; the packed map opens in World Editor |
+| `internal/editor`, `data/natives.json` | The looks in the editor |
+| `internal/build/launch.go`, `internal/env/spawn_windows.go`, `internal/env/spawn_unix.go`, `internal/cli/testcmd.go` | `moonwell test` |
+| A new version of the game | Every run, once |
+
+The changelog's section of the release says which runs and looks were made, which were left out and why, and the
+versions of the game and of World Editor.
+
+### Checked by commands
+
+1. Every check above, from a clean checkout. Then build the checkout's program into the folder the install script
+   uses, so that the commands below run it as `moonwell`:
    `go build -o "$env:LOCALAPPDATA\moonwell\bin\moonwell.exe" ./cmd/moonwell` on Windows,
    `go build -o ~/.local/bin/moonwell ./cmd/moonwell` on Linux. `moonwell --version` must print the version being
    released.
-2. Confirm `data/game-paths.txt` starts with `# Warcraft III <version>`, not the "Not generated yet" placeholder:
-   with the placeholder every in-game path is reported as `custom path, not imported`.
-3. `cd template`, run `moonwell setup`, check `launch.gameExecutable` in `config.toml` of your Moonwell folder (the
-   install script makes that file, see "Working on Moonwell" above), then `moonwell test`. Confirm "Moonwell is
-   running." prints and the Captain north of the heroes changes colour every second (with ally colour mode off: Alt+A
-   toggles it, and while it is on every unit shows blue, teal or red). Confirm the Warcraft III window is visible and
-   stays open after `moonwell` exits. Then write `[test]` with `archive = true` in that `config.toml` and run
-   `moonwell test` again: the last line names `dist/test/map.w3x`, and the same map loads. Take the two lines out
-   again.
-4. Add `error "gate"` inside the `on_main` hook, run `moonwell test` again, and confirm the on-screen error names
-   `src/main.yue` and the right line. Record which chunk-name form the game used.
-5. Run `moonwell build --minify` and play `dist/bin/map.w3x` directly.
-6. Open the packed map in World Editor and confirm it loads.
-7. Assets, in a throwaway project so `template/` stays clean (a stray file there fails the template test):
-   `moonwell init --link <temp dir>/assets-check` in the checkout, then in that project put a `.blp` icon at
-   `assets/ReplaceableTextures/CommandButtons/BTNMoonwell.blp` and run `moonwell test`; the map must load. Close World
-   Editor, run `moonwell assets:sync`, open `maps/map.w3x` and confirm the Import Manager lists
-   `ReplaceableTextures\CommandButtons\BTNMoonwell.blp`. Save the map in World Editor and close it, then confirm
-   `moonwell assets:check` reports no changes and `moonwell build` succeeds (World Editor 3.00 saves the import with
-   flag 29). Delete the icon, sync again and confirm it is gone.
-8. Map settings, in another throwaway project from `init --link`. In its `moonwell.toml`, under `settings`, set
-   `info.name` and `loadingScreen.title`; a `players` entry for a slot the map has (such as `slot = 0` with a `name`,
-   `race` and `fixedStart`); `environment.soundEnvironment`, `environment.waterColor` and fog (`enabled = true`,
-   `start`, `end`, `color`); and `gameplay.heroMaxLevel` and `gameplay.foodLimit`. For team settings, first enable
-   custom forces in World Editor (Scenario > Force Properties), save the map, and set a `forces` entry with
-   `index = 0`, such as `name`, `allied` and `sharedVision`. Run `moonwell settings:check` and confirm it lists
-   `war3map.w3i`, `war3map.lua` and `war3mapMisc.txt`. Run `moonwell test`, then `moonwell build --minify` and play
-   `dist/bin/map.w3x` from the game's Maps folder. Confirm the lobby shows the map name, the slot and the team, and in
-   the game the fog, water colour and ambient sound, the food ceiling, and that a hero cannot level past the set
-   maximum. Open the packed map in World Editor and confirm Map Description, Loading Screen, Player Properties, Force
-   Properties, Map Options (fog, water) and Gameplay Constants show the configured values. Confirm `maps/map.w3x` is
-   unchanged (`git status`).
-9. Object data, in another throwaway project: `moonwell init --link <temp dir>/objects-check` in the checkout. Commit
-   it to a new git repository (`git init`) so sub-step 5 can use `git status`. This proves what the tests cannot: that
-   the game and World Editor read the files Moonwell writes, including per-level values past level 1.
-   1. Run `moonwell test`. Confirm the unit north of the heroes is the Captain (its model, name and icon) and still
-      changes colour.
-   2. Add `objects/gate.pkl` with: a hero based on the Paladin (`Hpal`) with a custom `name` and `startingStrength`,
-      whose `hero` abilities are a custom ability based on Holy Light (`AHhb`) with `levels = 4`,
-      `cooldown = List(1, 2, 3, 4)` and `properties { ["amountHealedOrDamaged"] = List(111, 222, 333, 444) }` (set
-      `heroSkin` to the same list, as the game data does for every hero); a custom buff for that ability's `buffs`, with
-      a new `icon`; a custom item with a new `name`, `goldCost` and `interfaceIcon`; and a custom building based on the
-      Blacksmith (`hbla`) whose `researchesAvailable` is a custom upgrade with `levels = 2` and per-level names and
-      tooltips (`name = List("...", "...")`, `tooltip = List("...", "...")`). Run `moonwell objects:check`: it lists
-      the ten files and reports `src/generated/objects.yue` stale until the next build. In `main.yue`, create the hero,
-      the building and the item for player 0 (from `objects.heroes`, `objects.buildings` and `objects.items`), raise the
-      hero to level 7 (`SetHeroLevel hero, 7, false`; a hero ability's level 4 needs hero level 7), and give player 0
-      gold and lumber for the research (`SetPlayerState Player(0), PLAYER_STATE_RESOURCE_GOLD, 5000`, and the same for
-      lumber).
-   3. Run `moonwell test`. The hero shows its name and strength. Learning the ability shows its level 1 to 4 tooltips,
-      and healing a wounded unit heals 111, 222, 333 and 444 at the four levels, with the four cooldowns. The item shows
-      its name and icon. The building offers only the custom upgrade; its button shows the level 1 tooltip, and after
-      researching level 1 the level 2 tooltip (the research button shows the tooltip, not the name; level 2, like the
-      Blacksmith's, needs a Keep, so it shows greyed out).
-   4. In World Editor, change the standard Footman's hit points in the project's `maps/map.w3x` and save. Run
-      `moonwell build --minify`, play `dist/bin/map.w3x`, and confirm the Footman change survived next to the Moonwell
-      objects.
-   5. Open the packed map in World Editor. The Object Editor lists every custom object under Custom with the configured
-      values: the per-level heal amounts and upgrade names, the item's price, the skin fields (models, icons), and the
-      buff's icon (Holy Light applies no buff in game, so the buff is only checked here). Confirm `maps/map.w3x` is
-      unchanged apart from sub-step 4's edit (`git status`), and that a second build leaves `src/generated/objects.yue`
-      unchanged.
-10. Editor, in another throwaway project: `moonwell init --link <temp dir>/editor-check` in the checkout, committed
-    to a new git repository (`git init`). Run `moonwell setup` there and, if it prints a PATH command, run it once in
-    PowerShell, then open a new terminal. Open the project folder itself in VS Code (File > Open Folder; opened any
-    other way, lua-language-server finds no `.luarc.json`) and install the YueScript and Lua extensions it recommends.
-    In `src/main.yue`, confirm that hovering or completing `CreateUnit` shows its parameter names and types, and that
-    `mw.on_main` and `objects.units.captain` complete. In World Editor, place a unit in `maps/map.w3x`, reference it in
-    a trigger (World Editor writes a `gg_unit_...` global only for a unit a trigger uses) and save; after
-    `moonwell check`, confirm typing `gg_unit_` offers every placed unit a trigger uses, including the template's
-    `gg_unit_Hblm_0003` and `gg_unit_Hpal_0002`. Create `src/heroes/captain.yue` with
-    `export default { greet: -> print "Hello" }`, add `import "heroes.captain"` to `src/main.yue`, save both, and
-    confirm `captain.greet` completes after the import (lua-language-server indexes the git-ignored `.lua` files). Type
-    `CreatUnit` for `CreateUnit` in `src/main.yue`: the editor underlines it, and `moonwell check` fails with
-    `src/main.yue:<line>:<column> › Unknown global CreatUnit.` and `Did you mean CreateUnit?`. Set
-    `unknownGlobals = "warning"` under `[lint]` in `moonwell.toml` and confirm `moonwell build` succeeds and prints the
-    same lines as warnings; then undo both changes. Confirm `git status` shows no `.moonwell/` and no `src/**/*.lua`
-    files.
-11. Macros and the game's Lua, in the step 10 project: run `moonwell test` and confirm a standard Footman stands beside
-    the Captain (the template makes it with `$FourCC("hfoo")`). In the editor (the project opened as step 10 says),
-    confirm `src/main.yue` shows no error on the `moonwell.macros` import or on `$FourCC("hfoo")`, and that hovering
-    `$FourCC("hfoo")` is quiet (the YueScript extension finds the module through `yueconfig.yue`'s `include`). Then save
-    the Lua probe below as `src/probe.yue`, run `moonwell test --entry src/probe.yue`, and confirm the game shows
-    `missing: collectgarbage dofile loadfile debug io package` (the `removed` list in `tools/natives/lua-extras.json`)
-    and `os: clock date difftime time` (as README's "The game's Lua" says). Printed lines show on screen for a few
-    seconds only; the message log (F12) does not keep them. Delete `src/probe.yue` afterwards.
+2. `data/game-paths.txt` starts with `# Warcraft III <version>`, not the "Not generated yet" placeholder: with the
+   placeholder every in-game path is reported as `custom path, not imported`.
+3. In the gate project, `moonwell objects:check` lists the ten object files, `moonwell settings:check` lists
+   `war3map.w3i`, `war3map.lua`, `war3mapMisc.txt`, `war3mapMinimap.blp`, `war3mapMap.blp (removed)` and
+   `war3mapMap.tga`, and every run builds. The gate's test does the same; this is the same thing with the program
+   that is released.
+4. Tests hold what earlier gates checked by hand, and need no step of their own: a misspelt native and its hint, and
+   the warning mode (`TestE2ELintMisspeltNativePositionAndHint`, `TestE2ELintWarningBuildSucceeds`); Lua modules and
+   their globals (`TestE2ELuaModulesRequiredAndUnused`, `TestE2ELuaGlobalsKnownOnlyWhenRequired`); a library from a
+   local folder and a library by tag (`TestE2ELocalLibraryBuildAndEditorView`, the network tests of
+   `internal/library`); an archive that is written whole or not at all
+   (`TestWriteArchiveWritesBesideThePlaceAndMovesTheWholeArchiveThere`); Ctrl+C and the build lock
+   (`TestMoonwellExecutable`, `TestLeavingAtOnceGivesBackTheBuildLockAndThenExitsWith130`).
+5. The published Pkl package is checked by the release workflow's last job, which installs the release and builds a
+   project made by a plain `moonwell init` (Publishing, step 4).
 
-    ```yue
-    import "moonwell" as mw
+### The runs
 
-    names = {
-      "assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs", "load", "loadfile", "next", "pairs",
-      "pcall", "print", "rawequal", "rawget", "rawlen", "rawset", "require", "select", "setmetatable", "tonumber",
-      "tostring", "type", "xpcall", "_VERSION", "_G", "coroutine", "debug", "io", "math", "os", "package", "string",
-      "table", "utf8", "FourCC", "__jarray"
-    }
+**`start`** shows the runtime, the script and the modules. Its file holds, in this order:
 
-    mw.on_main ->
-      missing = [name for name in *names when _G[name] == nil]
-      print "missing: " .. table.concat missing, " "
-      for lib in *{"os", "debug", "package"}
-        t = _G[lib]
-        if type(t) == "table"
-          keys = [key for key in pairs t]
-          table.sort keys
-          print lib .. ": " .. table.concat keys, " "
-    ```
-12. Lua modules and libraries, in another throwaway project from `init --link`: add `lua/greeter.lua` that returns a
-    table with a function that prints, and a global-style `lua/counter.lua` that defines a global function
-    (`function CountUp() print("counted") end`). Use both from `src/main.yue` (`import "greeter"`, `require "counter"`,
-    `CountUp!`). Confirm the editor completes the module's function and the global, `moonwell check` passes, and in the
-    game (`moonwell test`) both print. Then add `error "lua gate"` inside the module's function, run
-    `moonwell test --minify`, and confirm the game's error names `lua/greeter.lua` and the right line (Lua modules keep
-    their lines in minified builds). Remove the error afterwards.
+```text
+Moonwell is running.
+Gate start: missing collectgarbage dofile loadfile debug io package
+Gate start: os clock date difftime time
+Gate start: fourcc 1751543663
+Gate start: captain 1747988528
+Gate start: lua module hello gate
+Gate start: lua global 1
+Gate start: the next two lines are errors raised on purpose
+[moonwell] on_main failed: src/gate_start.yue:41: gate error in a hook
+[moonwell] on_main failed: lua/gate_greeter.lua:8: gate error in a Lua module
+```
 
-    Then add the example library by tag in `moonwell.toml` (a `[[libraries]]` entry with `name = "example"`,
-    `github = "mdlsvensson/moonwell-example-lib"`, `tag = "v0.1.0"` and `dir = "src"`), use it from `src/main.yue`
-    (`import "example.loud"`, `print loud.shout "Moonwell"`), run `moonwell check` and commit `moonwell.lock`. Confirm
-    the editor completes `loud.shout`, and the game prints the shout. Check with the Lua extension's bundled
-    lua-language-server, in the editor or from the command line
-    (`<extensions>/sumneko.lua-<version>/server/bin/lua-language-server --check=<project> --checklevel=Hint`), that the
-    library's modules give no duplicate-definition diagnostics between `.moonwell/libraries/` and `.moonwell/lua/`.
-    Delete `.moonwell/`, run `moonwell check` again, and confirm `moonwell.lock` is unchanged. Finally clone the
-    library, name its folder in `config.toml` of your Moonwell folder (a `[[libraries]]` entry with
-    `github = "mdlsvensson/moonwell-example-lib"` and the folder's absolute `path`), change `hello` in its
-    `src/example/greet.lua`, and confirm `moonwell test` prints the line that names the local folder, runs the
-    change and leaves `moonwell.lock` unchanged. Remove the entry afterwards.
-13. Map preview, in another throwaway project from `init --link`: put a 256×256 `.tga` or `.png` beside `moonwell.toml`
-    and set `settings.info.preview` to its name (both go into the map as the same `.tga`). Confirm
-    `moonwell settings:check` lists `war3map.lua`, `war3mapMinimap.blp`, `war3mapMap.blp (removed)` and
-    `war3mapMap.tga`. Run `moonwell build` and copy `dist/bin/map.w3x` into the game's `Maps` folder. Open the
-    single-player custom game screen and select the map: the list must show the picture, not the minimap. Start the
-    game: the minimap must show the terrain, not the picture. A picture the game cannot read closes the game when the
-    map is selected, so a crash there is this step failing.
-14. The build lock, in any of the throwaway projects: run `moonwell build --minify` and, while it runs, press Ctrl+C
-    twice. Confirm that the command ends at once, that `dist/.lock` is gone, and that the next `moonwell build` does
-    not say "Another Moonwell build is running". Confirm that `dist/bin/map.w3x` is not there, or is a whole map:
-    never a cut one. Note whether `dist/bin/map.w3x.tmp` is left: a build that is ended while it writes the archive
-    can leave it, and the next build that packs replaces it.
-15. Record the Warcraft III and World Editor versions in the changelog.
-16. The published Pkl package. This step needs the release, so it is the first check after the tag is pushed
-    (Publishing, step 5): in a folder outside the checkout, run `moonwell init my-map` without `--link`, then
-    `cd my-map` and `moonwell build`. Every test and every step above uses a project linked to the checkout's
-    `schema/`; only this one evaluates object files against the package that users get.
+The two `[moonwell]` lines carry the game's colour codes, and the numbers are the lines the two `error` calls stand
+on. In a minified build the first names `src/gate_start.yue` without a line and the second keeps its line. The
+`missing` names are the `removed` list of `tools/natives/lua-extras.json`. Then two steps to look at:
+
+1. A Captain stands in view, with a captain's model, and its own icon when it is selected.
+2. The Captain changes colour every second (with ally colour mode off: Alt+A toggles it).
+
+**`objects`** shows custom objects of every kind. Its file holds what natives say of `objects/gate.pkl`: the hero's
+name (`Gate Paladin`), its proper name (`Gatekeeper`) and its strength (33); the ability's level (4), and for levels 1
+to 4 what it heals (111, 222, 333, 444) and its cooldown (1, 2, 3, 4); the item's name (`Gate Claws`) and icon path;
+the buff's icon path; the upgrade's name; the building's name (`Gate Smith`). Then four steps to look at:
+
+1. The selected hero is Gatekeeper, a Gate Paladin.
+2. The selected hero carries one item with the holy bolt icon, called Gate Claws.
+3. The research button of the selected building reads "Research Gate Edge One".
+4. With the first level researched, it reads "Research Gate Edge Two".
+
+**`settings`** shows the map settings the template's map allows. Its file holds: player 0 is an orc (`true`); the
+food ceiling (42); the level a hero stops at (7); and that World Editor's minimap is in the map under the name a
+build gives it (`true`). Then two steps to look at:
+
+1. The ground far away fades into red fog.
+2. The minimap shows the terrain, not the preview picture (red with a white square).
+
+**`assets`** shows that an imported file reaches the game. Its file holds `true` for the imported picture and
+`false` for a name that is not in the map (`BlzChangeMinimapTerrainTex` answers so). It has no step to look at.
+
+A value a run prints that differs from these lists is the gate failing, or the game answering a native in a way
+this file did not expect: the lists were written from the gate's own files, and the section of the first release
+that played each run records what the game printed.
+
+### The looks outside a run
+
+- **The lobby.** Copy `dist/bin/map.w3x` into the game's `Maps` folder and select it in the single-player custom
+  game screen: the list shows the preview picture, the map is called "Moonwell Gate", and the first slot is named
+  "Gate Player". A picture the game cannot read closes the game when the map is selected, so a crash there is this
+  look failing.
+- **World Editor, on the packed map.** It opens. The Import Manager lists `war3mapImported\gate-probe.tga`. The
+  Object Editor lists every custom object under Custom with the values of `objects/gate.pkl`: the heal amounts and
+  cooldowns per level, the upgrade's names per level, the item's price (123), the icons. Map Description, Loading
+  Screen ("Moonwell Gate Loading"), Player Properties, Map Options (red fog, red water, the Dungeon sound
+  environment) and Gameplay Constants show the configured values. The water's colour and the sound environment are
+  looked at here and not in a run: the template's map has no water, and an echo is nothing a step can show.
+- **World Editor, on the source map.** Change the standard Footman's hit points in the project's `maps/map.w3x` and
+  save. A build must keep the change beside the gate's objects: the packed map's Object Editor shows both. For the
+  import index, run `moonwell assets:sync`, open the source map and confirm the Import Manager lists the picture;
+  save the map in World Editor and close it, then `moonwell assets:check` must report no changes (World Editor 3.00
+  saves the import with flag 29).
+- **Forces.** When the code for forces changed: enable custom forces in World Editor (Scenario > Force Properties),
+  save the source map, and add a `[[settings.forces]]` entry with `index = 0` and a `name`, `allied` and
+  `sharedVision`. The lobby shows the team, and World Editor's Force Properties show the values.
+- **The editor.** Run `moonwell setup` in the gate project and open the project folder itself in VS Code (File >
+  Open Folder; opened any other way, lua-language-server finds no `.luarc.json`), with the YueScript and Lua
+  extensions it recommends. In `src/gate_start.yue`: hovering `CreateUnit` shows its parameter names and types;
+  `mw.on_main` and `objects.units.captain` complete; `greeter.greet` completes; no error stands on the
+  `moonwell.macros` import or on `$FourCC("hfoo")`.
+- **`moonwell test`.** In the gate project, with `launch.gameExecutable` in your `config.toml`: the game starts on
+  the staged map, its window stays open after `moonwell` has ended, and the game's log
+  (`Documents\Warcraft III\Logs\War3Log.txt`) names `dist\stage\map.w3x` as the map it opened. With `[test]` and
+  `archive = true` in that `config.toml`, the last line names `dist/test/map.w3x` and the log names that file.
 
 
 ## Publishing
@@ -442,9 +458,8 @@ package's download address is built from it.
    `THIRD_PARTY_LICENSES`.
 4. Read the workflow's result (`gh run watch`). Its last job is the check from outside the repository: on Ubuntu and
    Windows it runs the install line of the new version, then `moonwell init my-map` and `moonwell build`.
-5. On your own machine, run the install line once, then step 16 of the release gate: a plain `moonwell init` and a
-   build against the published package. A release that fails after the tag is pushed is fixed with a new version,
-   not by moving the tag: projects and the Pkl package index remember what a tag held.
+5. On your own machine, run the install line once. A release that fails after the tag is pushed is fixed with a new
+   version, not by moving the tag: projects and the Pkl package index remember what a tag held.
 
 A Moonwell release is a full release, never a pre-release. The README's install line downloads from
 `releases/latest/download/`, and GitHub's "latest" skips pre-releases: marking the newest release as a pre-release
