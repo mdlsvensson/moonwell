@@ -1,0 +1,68 @@
+import "moonwell" as mw
+
+printedLines = {}
+fileName = "moonwell-gate.pld"
+canWriteFile = false
+printToScreen = print
+
+writeFile = ->
+  PreloadGenClear!
+  PreloadGenStart!
+  for line in *printedLines
+    for at = 1, #line, 200
+      Preload (line\sub(at, at + 199)\gsub "\"", "'")
+  PreloadGenEnd fileName
+  PreloadGenClear!
+
+printToScreenAndFile = (...) ->
+  printToScreen ...
+  parts = [tostring(select(index, ...)) for index = 1, select("#", ...)]
+  printedLines[#printedLines + 1] = table.concat parts, " "
+  writeFile! if canWriteFile
+
+showPrompt = (text) ->
+  ClearTextMessages!
+  DisplayTimedTextToPlayer GetLocalPlayer!, 0, 0, 600, text
+
+reportFailure = (what, action) ->
+  ->
+    ok, err = pcall action
+    print "#{what} failed: #{mw.format_error err}" unless ok
+
+export record = (run) ->
+  fileName = "moonwell-gate-#{run}.pld"
+  _G.print = printToScreenAndFile
+
+export afterLoading = (run, action) ->
+  mw.on_main ->
+    TimerStart CreateTimer!, 0, false, reportFailure run, ->
+      canWriteFile = true
+      writeFile!
+      action!
+
+export stepByStep = (run) ->
+  steps = {}
+  step = (text, show) -> steps[#steps + 1] = {:text, :show}
+  start = (finish) ->
+    index = 0
+    remove = nil
+    escape = CreateTrigger!
+    TriggerRegisterPlayerEvent escape, Player(0), EVENT_PLAYER_END_CINEMATIC
+    advance = ->
+      removing = remove
+      remove = nil
+      removing! if removing
+      index += 1
+      current = steps[index]
+      if current
+        shown = current.show!
+        remove = shown if type(shown) == "function"
+        print "#{run} step #{index} of #{#steps}: #{current.text}"
+        showPrompt "Step #{index} of #{#steps}. #{current.text}. Then press Esc."
+      else
+        DestroyTrigger escape
+        ClearTextMessages!
+        finish!
+    TriggerAddAction escape, reportFailure run, advance
+    advance!
+  step, start

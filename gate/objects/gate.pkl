@@ -1,0 +1,62 @@
+amends "@moonwell/ObjectFile.pkl"
+
+heroes {
+  ["gate_paladin"] {
+    id = "H900"
+    base = "Hpal"
+    name = "Gate Paladin"
+    properNames = "Gatekeeper"
+    properNamesUsed = 1
+    startingStrength = 33
+    hero = "A900"
+    heroSkin = "A900"
+  }
+}
+
+abilities {
+  ["gate_holy_light"] {
+    id = "A900"
+    base = "AHhb"
+    levels = 4
+    cooldown = List(1, 2, 3, 4)
+    buffs = "B900"
+    properties { ["amountHealedOrDamaged"] = List(111, 222, 333, 444) }
+  }
+}
+
+buffs {
+  ["gate_buff"] {
+    id = "B900"
+    base = "Binf"
+    icon = #"ReplaceableTextures\CommandButtons\BTNHolyBolt.blp"#
+  }
+}
+
+items {
+  ["gate_claws"] {
+    id = "I900"
+    base = "ratf"
+    name = "Gate Claws"
+    goldCost = 123
+    interfaceIcon = #"ReplaceableTextures\CommandButtons\BTNHolyBolt.blp"#
+  }
+}
+
+buildings {
+  ["gate_smith"] {
+    id = "h901"
+    base = "hbla"
+    name = "Gate Smith"
+    researchesAvailable = "R900"
+  }
+}
+
+upgrades {
+  ["gate_edge"] {
+    id = "R900"
+    base = "Rhme"
+    levels = 2
+    name = List("Gate Edge One", "Gate Edge Two")
+    tooltip = List("Research Gate Edge One", "Research Gate Edge Two")
+  }
+}

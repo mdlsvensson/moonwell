@@ -1,0 +1,32 @@
+import "moonwell.macros" as {:$FourCC}
+import "gate.steps" as {:record, :afterLoading, :stepByStep}
+
+record "settings"
+
+owner = Player 0
+
+printPlayer = ->
+  isOrc = GetPlayerRace(owner) == RACE_ORC
+  print "Gate settings: player 0 is an orc #{isOrc}"
+  print "Gate settings: food ceiling #{GetPlayerState(owner, PLAYER_STATE_FOOD_CAP_CEILING)}"
+
+printHeroLevelCap = ->
+  hero = CreateUnit(owner, $FourCC("Hpal"), 0, -400, 270)
+  SetHeroLevel hero, 99, false
+  print "Gate settings: a hero stops at level #{GetHeroLevel(hero)}"
+  RemoveUnit hero
+
+printEditorsMinimap = ->
+  found = BlzChangeMinimapTerrainTex "war3mapMinimap.blp"
+  print "Gate settings: the editor's minimap is in the map #{found}"
+
+afterLoading "Gate settings", ->
+  printPlayer!
+  printHeroLevelCap!
+  printEditorsMinimap!
+  step, start = stepByStep "Gate settings"
+  step "Look: the ground far away fades into red fog", ->
+    SetCameraPosition 0, 0
+    nil
+  step "Look at the minimap: it shows the terrain, not a red picture with a white square", -> nil
+  start -> print "Gate settings: done"

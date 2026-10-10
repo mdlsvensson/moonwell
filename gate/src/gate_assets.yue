@@ -1,0 +1,10 @@
+import "gate.steps" as {:record, :afterLoading}
+
+record "assets"
+
+afterLoading "Gate assets", ->
+  imported = BlzChangeMinimapTerrainTex "war3mapImported\\gate-probe.tga"
+  absent = BlzChangeMinimapTerrainTex "war3mapImported\\gate-no-such-file.tga"
+  print "Gate assets: the imported picture is found #{imported}"
+  print "Gate assets: a picture that is not in the map is found #{absent}"
+  print "Gate assets: done"

@@ -1,0 +1,72 @@
+import "generated.objects" as objects
+import "gate.steps" as {:record, :afterLoading, :stepByStep}
+
+record "objects"
+
+owner = Player 0
+x = 0
+y = -400
+holyLight = objects.abilities.gate_holy_light
+edge = objects.upgrades.gate_edge
+
+selectAlone = (unit) ->
+  SetCameraPosition x, y
+  ClearSelection!
+  SelectUnit unit, true
+  unit
+
+createHero = -> selectAlone CreateUnit(owner, objects.heroes.gate_paladin, x, y, 270)
+
+createSmith = -> selectAlone CreateUnit(owner, objects.buildings.gate_smith, x, y, 270)
+
+printHeroAndAbility = ->
+  hero = CreateUnit(owner, objects.heroes.gate_paladin, x, y, 270)
+  print "Gate objects: hero name #{GetUnitName(hero)}"
+  print "Gate objects: hero proper name #{GetHeroProperName(hero)}"
+  print "Gate objects: hero strength #{GetHeroStr(hero, false)}"
+  SetHeroLevel hero, 7, false
+  for _ = 1, 4
+    SelectHeroSkill hero, holyLight
+  print "Gate objects: ability level #{GetUnitAbilityLevel(hero, holyLight)}"
+  ability = BlzGetUnitAbility(hero, holyLight)
+  for level = 0, 3
+    heals = BlzGetAbilityRealLevelField(ability, ABILITY_RLF_AMOUNT_HEALED_DAMAGED_HHB1, level)
+    cooldown = BlzGetUnitAbilityCooldown(hero, holyLight, level)
+    print "Gate objects: ability level #{level + 1} heals #{heals} cooldown #{cooldown}"
+  RemoveUnit hero
+
+printItemBuffUpgradeAndBuilding = ->
+  claws = CreateItem(objects.items.gate_claws, x, y)
+  print "Gate objects: item name #{GetItemName(claws)}"
+  print "Gate objects: item icon #{BlzGetItemIconPath(claws)}"
+  RemoveItem claws
+  print "Gate objects: buff icon #{BlzGetAbilityIcon(objects.buffs.gate_buff)}"
+  print "Gate objects: upgrade name #{GetObjectName(edge)}"
+  smith = CreateUnit(owner, objects.buildings.gate_smith, x, y, 270)
+  print "Gate objects: building name #{GetUnitName(smith)}"
+  RemoveUnit smith
+
+afterLoading "Gate objects", ->
+  printHeroAndAbility!
+  printItemBuffUpgradeAndBuilding!
+  step, start = stepByStep "Gate objects"
+  step "Look: the selected hero is Gatekeeper, a Gate Paladin", ->
+    hero = createHero!
+    -> RemoveUnit hero
+  step "Look: the selected hero carries one item with the holy bolt icon. Hover it: Gate Claws", ->
+    hero = createHero!
+    claws = CreateItem(objects.items.gate_claws, x, y)
+    UnitAddItem hero, claws
+    ->
+      RemoveItem claws
+      RemoveUnit hero
+  step "Hover the research button of the selected building: Research Gate Edge One", ->
+    smith = createSmith!
+    -> RemoveUnit smith
+  step "Hover the research button of the selected building: Research Gate Edge Two", ->
+    SetPlayerTechResearched owner, edge, 1
+    smith = createSmith!
+    ->
+      RemoveUnit smith
+      BlzDecPlayerTechResearched owner, edge, 1
+  start -> print "Gate objects: done"

@@ -1,0 +1,61 @@
+import "moonwell" as mw
+import "moonwell.macros" as {:$FourCC}
+import "generated.objects" as objects
+import "gate.steps" as {:record, :afterLoading, :stepByStep}
+import "gate_greeter" as greeter
+require "gate_counter"
+
+record "start"
+
+luaNames = {
+  "assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs", "load", "loadfile", "next", "pairs",
+  "pcall", "print", "rawequal", "rawget", "rawlen", "rawset", "require", "select", "setmetatable", "tonumber",
+  "tostring", "type", "xpcall", "_VERSION", "_G", "coroutine", "debug", "io", "math", "os", "package", "string",
+  "table", "utf8", "FourCC", "__jarray"
+}
+
+sortedKeys = (tbl) ->
+  keys = [key for key in pairs tbl]
+  table.sort keys
+  table.concat keys, " "
+
+captainX = 45
+captainY = -650
+
+createCaptain = ->
+  SetCameraPosition captainX, captainY
+  CreateUnit Player(0), objects.units.captain, captainX, captainY, 270
+
+mw.on_main ->
+  print "Moonwell is running."
+  missing = [name for name in *luaNames when _G[name] == nil]
+  print "Gate start: missing " .. table.concat missing, " "
+  print "Gate start: os " .. sortedKeys os
+  print "Gate start: fourcc " .. $FourCC("hfoo")
+  print "Gate start: captain " .. objects.units.captain
+  print "Gate start: lua module " .. greeter.greet "gate"
+  print "Gate start: lua global " .. GateCount!
+  print "Gate start: the next two lines are errors raised on purpose"
+
+mw.on_main ->
+  error "gate error in a hook"
+  nil
+
+mw.on_main ->
+  greeter.fail!
+  nil
+
+afterLoading "Gate start", ->
+  step, start = stepByStep "Gate start"
+  step "Look: a Captain stands here, with a captain's model, and its own icon when you select it", ->
+    captain = createCaptain!
+    -> RemoveUnit captain
+  step "Look: the Captain changes colour every second (ally colours off: Alt+A)", ->
+    captain = createCaptain!
+    timer = CreateTimer!
+    TimerStart timer, 1.0, true, ->
+      SetUnitColor captain, GetPlayerColor Player GetRandomInt 0, bj_MAX_PLAYERS - 1
+    ->
+      DestroyTimer timer
+      RemoveUnit captain
+  start -> print "Gate start: done"
