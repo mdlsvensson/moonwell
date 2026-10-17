@@ -58,6 +58,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "game.dispatch-removal", Run = ActorCases.GameDispatchRemoval });
             list.Add(new Case { Name = "players.get", Run = ActorCases.PlayersGet });
             list.Add(new Case { Name = "players.existing-out-of-range", Run = ActorCases.ExistingOutOfRange });
+            list.Add(new Case { Name = "map.components-in-order", Run = MapCases.ComponentsInOrder });
+            list.Add(new Case { Name = "map.components-not-added-early", Run = MapCases.ComponentsNotAddedEarly });
+            list.Add(new Case { Name = "map.settings-default-empty", Run = MapCases.SettingsDefaultEmpty });
             list.Add(new Case { Name = "types.fourcc", Run = UnitCases.FourCC });
             list.Add(new Case { Name = "types.duplicate", Run = UnitCases.Duplicate });
             list.Add(new Case { Name = "types.idof", Run = UnitCases.IdOf });

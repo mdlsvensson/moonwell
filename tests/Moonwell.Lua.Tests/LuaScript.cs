@@ -17,7 +17,7 @@ internal static class LuaScript
 
     public static string Compile(string csproj)
     {
-        var map = Map.Open(Path.Combine(RepoRoot, "tests", "Moonwell.Lua.Tests", "map"), MapFiles.All & ~MapFiles.Triggers & ~MapFiles.CustomTextTriggers);
+        var map = War3Net.Build.Map.Open(Path.Combine(RepoRoot, "tests", "Moonwell.Lua.Tests", "map"), MapFiles.All & ~MapFiles.Triggers & ~MapFiles.CustomTextTriggers);
         var outputFolder = Path.Combine(Path.GetTempPath(), "moonwell-lua", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(outputFolder);
         var compiler = new Compiler(csproj, outputFolder, string.Empty, null, null, string.Empty, string.Empty, false, null, string.Empty)

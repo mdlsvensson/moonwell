@@ -48,6 +48,22 @@ namespace Moonwell
             NativeWorld.Later(() => Begin(setup));
         }
 
+        /// <summary>Starts the runtime on the game with a map: the map's Main calls it once, and the map's components are added before the game's start.</summary>
+        public static void Start(Map map)
+        {
+            Start(() => Install(map));
+        }
+
+        /// <summary>Adds the map's starting components to the game, in list order; Start runs it as the setup.</summary>
+        internal static void Install(Map map)
+        {
+            var components = map.StartComponents;
+            for (var i = 0; i < components.Count; i++)
+            {
+                Game.Instance.Add(components[i]);
+            }
+        }
+
         /// <summary>Runs the setup, then takes in what is already in the world and starts the game's components.</summary>
         private static void Begin(Action setup)
         {
