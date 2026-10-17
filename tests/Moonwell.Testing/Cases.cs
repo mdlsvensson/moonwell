@@ -45,6 +45,17 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "hooks.overrides", Run = HookCases.Overrides });
             list.Add(new Case { Name = "hooks.cached", Run = HookCases.Cached });
             list.Add(new Case { Name = "events.need-listens-once", Run = HookCases.NeedListensOnce });
+            list.Add(new Case { Name = "actors.add-and-get", Run = ActorCases.AddAndGet });
+            list.Add(new Case { Name = "actors.remove", Run = ActorCases.RemoveOne });
+            list.Add(new Case { Name = "actors.remove-all", Run = ActorCases.RemoveAllOf });
+            list.Add(new Case { Name = "actors.current-in-onadded", Run = ActorCases.CurrentInOnAdded });
+            list.Add(new Case { Name = "actors.end-removes-last-first", Run = ActorCases.EndRemovesLastFirst });
+            list.Add(new Case { Name = "actors.add-to-ended", Run = ActorCases.AddToEnded });
+            list.Add(new Case { Name = "actors.component-owns-timer", Run = ActorCases.ComponentOwnsTimer });
+            list.Add(new Case { Name = "actors.error-in-onadded", Run = ActorCases.ErrorInOnAdded });
+            list.Add(new Case { Name = "game.start-order", Run = ActorCases.GameStartOrder });
+            list.Add(new Case { Name = "game.dispatch-removal", Run = ActorCases.GameDispatchRemoval });
+            list.Add(new Case { Name = "players.get", Run = ActorCases.PlayersGet });
             return list;
         }
 
@@ -80,8 +91,7 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>Writes one line of output.</summary>
-        // In Lua this is the print global, which the Lua test host captures.
+        // Writes one line of output; in Lua this is the print global, which the Lua test host captures.
         /// @CSharpLua.Template = "print({0})"
         public static void Emit(string line)
         {

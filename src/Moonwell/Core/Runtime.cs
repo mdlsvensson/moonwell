@@ -19,10 +19,12 @@ namespace Moonwell
         {
             World = world;
             Errors.Reset();
+            Scheduler = new Scheduler();
             Hooks.Reset();
             Events.Reset();
-            Scheduler = new Scheduler();
-            Root = new RootOwner();
+            Game.Instance = new Game();
+            Root = Game.Instance;
+            Player.Reset();
             Owner.current = null;
         }
 
