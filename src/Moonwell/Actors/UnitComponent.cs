@@ -4,7 +4,7 @@ namespace Moonwell
     public abstract class UnitComponent : Component
     {
         /// <summary>The reactions of unit components, named as Unit's are.</summary>
-        internal static readonly HookTable ComponentHooks = new HookTable(typeof(UnitComponent), new string[] { "OnItemPickedUp", "OnItemDropped" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped });
+        internal static readonly HookTable ComponentHooks = new HookTable(typeof(UnitComponent), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill });
 
         /// <summary>The unit this component is on.</summary>
         public Unit Unit => (Unit)Actor;
@@ -19,6 +19,26 @@ namespace Moonwell
 
         /// <summary>Runs when the unit drops an item.</summary>
         public virtual void OnItemDropped(Item item)
+        {
+        }
+
+        /// <summary>Runs when the unit takes damage.</summary>
+        public virtual void OnDamaged(Damage damage)
+        {
+        }
+
+        /// <summary>Runs when the unit deals damage.</summary>
+        public virtual void OnDealtDamage(Damage damage)
+        {
+        }
+
+        /// <summary>Runs when the unit dies; the killer is null when none is known.</summary>
+        public virtual void OnDeath(Unit? killer)
+        {
+        }
+
+        /// <summary>Runs when the unit kills another.</summary>
+        public virtual void OnKill(Unit victim)
         {
         }
     }

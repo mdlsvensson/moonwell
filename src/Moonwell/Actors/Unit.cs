@@ -7,7 +7,7 @@ namespace Moonwell
     public class Unit : Widget
     {
         /// <summary>The reactions of units; declared here, so that an override in a subclass is found.</summary>
-        internal static readonly HookTable UnitHooks = new HookTable(typeof(Unit), new string[] { "OnItemPickedUp", "OnItemDropped" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped });
+        internal static readonly HookTable UnitHooks = new HookTable(typeof(Unit), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill });
 
         /// <summary>The bit mask of the reactions this class overrides, worked out when the unit is taken in.</summary>
         internal int Mask;
@@ -82,6 +82,26 @@ namespace Moonwell
 
         /// <summary>Runs when the unit drops an item, before the unit's components see it.</summary>
         public virtual void OnItemDropped(Item item)
+        {
+        }
+
+        /// <summary>Runs when the unit takes damage, before the unit's components see it.</summary>
+        public virtual void OnDamaged(Damage damage)
+        {
+        }
+
+        /// <summary>Runs when the unit deals damage, before the unit's components see it.</summary>
+        public virtual void OnDealtDamage(Damage damage)
+        {
+        }
+
+        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when none is known.</summary>
+        public virtual void OnDeath(Unit? killer)
+        {
+        }
+
+        /// <summary>Runs when the unit kills another, before the unit's components see it.</summary>
+        public virtual void OnKill(Unit victim)
         {
         }
 

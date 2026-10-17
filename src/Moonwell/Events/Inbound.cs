@@ -122,6 +122,90 @@ namespace Moonwell
             dead.EndDispatch();
         }
 
+        /// <summary>A unit takes damage: the source's type and components deal it, the target's take it, then the map's and the players' reactions; returns the amount after them.</summary>
+        internal static float Damaged(unit target, unit? source, float amount, bool isAttack)
+        {
+            if (Units.Find(target) == null && (source == null || Units.Find(source) == null) && !Events.Wants(Hook.OnUnitDamaged))
+            {
+                return amount;
+            }
+
+            var hit = Unit.Of(target);
+            if (hit == null)
+            {
+                return amount;
+            }
+
+            Unit? from = source == null ? null : Unit.Of(source);
+            var damage = new Damage(hit, from, amount, isAttack);
+            if (from != null)
+            {
+                DealtDamage(from, damage);
+            }
+
+            TookDamage(hit, damage);
+            MapDamaged(Game.Instance, damage);
+            var hitSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(hit.Handle));
+            var first = Player.Existing(hitSlot);
+            if (first != null)
+            {
+                MapDamaged(first, damage);
+            }
+
+            if (from != null)
+            {
+                var fromSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(from.Handle));
+                var second = Player.Existing(fromSlot);
+                if (second != null && fromSlot != hitSlot)
+                {
+                    MapDamaged(second, damage);
+                }
+            }
+
+            return damage.Amount;
+        }
+
+        /// <summary>A unit dies: its type's OnDeath and components, then the killer's OnKill and components, then the map's and the players' reactions; a killer equal to the dying unit counts as none.</summary>
+        internal static void Died(unit dying, unit? killer)
+        {
+            unit? slain = killer == dying ? null : killer;
+            if (Units.Find(dying) == null && (slain == null || Units.Find(slain) == null) && !Events.Wants(Hook.OnUnitDied))
+            {
+                return;
+            }
+
+            var dead = Unit.Of(dying);
+            if (dead == null)
+            {
+                return;
+            }
+
+            Unit? slayer = slain == null ? null : Unit.Of(slain);
+            Dying(dead, slayer);
+            if (slayer != null)
+            {
+                Killing(slayer, dead);
+            }
+
+            MapDied(Game.Instance, dead, slayer);
+            var deadSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(dead.Handle));
+            var first = Player.Existing(deadSlot);
+            if (first != null)
+            {
+                MapDied(first, dead, slayer);
+            }
+
+            if (slayer != null)
+            {
+                var slayerSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(slayer.Handle));
+                var second = Player.Existing(slayerSlot);
+                if (second != null && slayerSlot != deadSlot)
+                {
+                    MapDied(second, dead, slayer);
+                }
+            }
+        }
+
         /// <summary>Runs OnPickedUp on an item, then on its components, in add order.</summary>
         private static void ItemPickedUp(Item item, Unit by)
         {
@@ -300,6 +384,244 @@ namespace Moonwell
             }
 
             unit.EndDispatch();
+        }
+
+        /// <summary>Runs OnDealtDamage on a unit, then on its components, in add order.</summary>
+        private static void DealtDamage(Unit from, Damage damage)
+        {
+            if (!from.HasEnded && (from.Mask & Hook.OnDealtDamage) != 0)
+            {
+                var previous = Owner.current;
+                Owner.current = from;
+                try
+                {
+                    from.OnDealtDamage(damage);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(from) + ".OnDealtDamage", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            var count = from.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = from.ComponentAt(i) as UnitComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnDealtDamage) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnDealtDamage(damage);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnDealtDamage", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            from.EndDispatch();
+        }
+
+        /// <summary>Runs OnDamaged on a unit, then on its components, in add order.</summary>
+        private static void TookDamage(Unit hit, Damage damage)
+        {
+            if (!hit.HasEnded && (hit.Mask & Hook.OnDamaged) != 0)
+            {
+                var previous = Owner.current;
+                Owner.current = hit;
+                try
+                {
+                    hit.OnDamaged(damage);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(hit) + ".OnDamaged", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            var count = hit.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = hit.ComponentAt(i) as UnitComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnDamaged) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnDamaged(damage);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnDamaged", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            hit.EndDispatch();
+        }
+
+        /// <summary>Runs OnDeath on a unit, then on its components, in add order.</summary>
+        private static void Dying(Unit dead, Unit? killer)
+        {
+            if (!dead.HasEnded && (dead.Mask & Hook.OnDeath) != 0)
+            {
+                var previous = Owner.current;
+                Owner.current = dead;
+                try
+                {
+                    dead.OnDeath(killer);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(dead) + ".OnDeath", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            var count = dead.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = dead.ComponentAt(i) as UnitComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnDeath) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnDeath(killer);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnDeath", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            dead.EndDispatch();
+        }
+
+        /// <summary>Runs OnKill on a unit, then on its components, in add order.</summary>
+        private static void Killing(Unit slayer, Unit victim)
+        {
+            if (!slayer.HasEnded && (slayer.Mask & Hook.OnKill) != 0)
+            {
+                var previous = Owner.current;
+                Owner.current = slayer;
+                try
+                {
+                    slayer.OnKill(victim);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(slayer) + ".OnKill", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            var count = slayer.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = slayer.ComponentAt(i) as UnitComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnKill) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnKill(victim);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnKill", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            slayer.EndDispatch();
+        }
+
+        /// <summary>Runs OnUnitDamaged on the map components of an actor, in add order.</summary>
+        private static void MapDamaged(Actor actor, Damage damage)
+        {
+            var count = actor.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = actor.ComponentAt(i) as MapComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnUnitDamaged) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnUnitDamaged(damage);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnUnitDamaged", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            actor.EndDispatch();
+        }
+
+        /// <summary>Runs OnUnitDied on the map components of an actor, in add order.</summary>
+        private static void MapDied(Actor actor, Unit dying, Unit? killer)
+        {
+            var count = actor.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = actor.ComponentAt(i) as MapComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnUnitDied) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnUnitDied(dying, killer);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnUnitDied", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            actor.EndDispatch();
         }
 
         /// <summary>Runs OnGameStart on the map components of an actor, in add order.</summary>

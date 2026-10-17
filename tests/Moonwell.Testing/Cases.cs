@@ -79,6 +79,16 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.owned-create", Run = ItemCases.OwnedByOwner });
             list.Add(new Case { Name = "destructables.watch", Run = DestructableCases.Watch });
             list.Add(new Case { Name = "destructables.sweep", Run = DestructableCases.SweepDetectsRemoval });
+            list.Add(new Case { Name = "damage.order", Run = DamageCases.Order });
+            list.Add(new Case { Name = "damage.change-amount", Run = DamageCases.ChangeAmount });
+            list.Add(new Case { Name = "damage.unknown-units", Run = DamageCases.UnknownUnits });
+            list.Add(new Case { Name = "damage.listen", Run = DamageCases.Listen });
+            list.Add(new Case { Name = "damage.nested", Run = DamageCases.Nested });
+            list.Add(new Case { Name = "damage.actor-ends-mid-dispatch", Run = DamageCases.ActorEndsMidDispatch });
+            list.Add(new Case { Name = "damage.error-isolated", Run = DamageCases.ErrorIsolated });
+            list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
+            list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
+            list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });
             return list;
         }
 
