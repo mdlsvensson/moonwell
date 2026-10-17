@@ -33,6 +33,15 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ownership.error-does-not-stop", Run = OwnershipCases.ErrorDoesNotStop });
             list.Add(new Case { Name = "ownership.run-sets-current", Run = OwnershipCases.RunSetsCurrent });
             list.Add(new Case { Name = "ownership.adopt-in-finish", Run = OwnershipCases.AdoptInFinish });
+            list.Add(new Case { Name = "timers.after", Run = TimerCases.After });
+            list.Add(new Case { Name = "timers.every", Run = TimerCases.Every });
+            list.Add(new Case { Name = "timers.no-drift", Run = TimerCases.NoDrift });
+            list.Add(new Case { Name = "timers.same-time-in-creation-order", Run = TimerCases.SameTimeInCreationOrder });
+            list.Add(new Case { Name = "timers.end-cancels", Run = TimerCases.EndCancels });
+            list.Add(new Case { Name = "timers.owned", Run = TimerCases.OwnerAdopts });
+            list.Add(new Case { Name = "timers.current-in-callback", Run = TimerCases.CurrentInCallback });
+            list.Add(new Case { Name = "timers.error-isolated", Run = TimerCases.ErrorIsolated });
+            list.Add(new Case { Name = "timers.remaining", Run = TimerCases.Remaining });
             return list;
         }
 
