@@ -3,3 +3,5 @@ obj/
 .vs/
 *.user
 TestResults/
+tests/Moonwell.Build.Tests/Fixtures/*/build/
+tests/Moonwell.Build.Tests/Fixtures/Temp-*/
