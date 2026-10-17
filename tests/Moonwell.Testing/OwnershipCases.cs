@@ -27,6 +27,24 @@ namespace Moonwell.Testing
             }
         }
 
+        /// <summary>An owner that adopts a child from its Finish, which runs after its children have ended.</summary>
+        private sealed class FinishAdopter : Owner
+        {
+            private readonly Owned child;
+
+            /// <summary>Makes an owner that adopts the child when it finishes.</summary>
+            public FinishAdopter(Owned child)
+            {
+                this.child = child;
+            }
+
+            /// <summary>Adopts the child.</summary>
+            internal override void Finish()
+            {
+                Adopt(child);
+            }
+        }
+
         /// <summary>Checks that the log is exactly the expected lines, in order.</summary>
         private static void ExpectLog(List<string> log, string[] expected, string what)
         {
@@ -138,6 +156,18 @@ namespace Moonwell.Testing
             Expect.Same(Runtime.Root, Owner.Current, "Owner.Current after Run");
             Expect.Throws<InvalidOperationException>(() => owner.Run(() => { throw new InvalidOperationException("boom"); }), "Run whose action throws");
             Expect.Same(Runtime.Root, Owner.Current, "Owner.Current after Run threw");
+        }
+
+        /// <summary>A child adopted from an owner's Finish, after its children have ended, ends at once.</summary>
+        public static void AdoptInFinish(FakeWorld world)
+        {
+            var log = new List<string>();
+            var child = new TestOwned("child", log);
+            var owner = new FinishAdopter(child);
+            owner.End();
+            ExpectLog(log, new string[] { "end child" }, "log after adopting from Finish");
+            Expect.True(child.HasEnded, "the child has ended");
+            Expect.Equal(0, owner.OwnedCount, "owned count of the owner after it ends");
         }
     }
 }

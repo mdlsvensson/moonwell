@@ -17,6 +17,7 @@ namespace Moonwell
             World = world;
             Errors.Reset();
             Root = new RootOwner();
+            Owner.current = null;
         }
 
         /// <summary>Called when a wake request is due; empty until the timers are built.</summary>

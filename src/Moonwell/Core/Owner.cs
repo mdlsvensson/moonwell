@@ -11,6 +11,9 @@ namespace Moonwell
         /// <summary>The newest child, the first one to end.</summary>
         internal Owned? newest;
 
+        /// <summary>Whether the children have ended; a child adopted from then on ends at once.</summary>
+        internal bool childrenEnded;
+
         /// <summary>How many children are linked to this owner.</summary>
         private int count;
 
@@ -52,7 +55,7 @@ namespace Moonwell
         {
             Dev.Check(child.Owner == null && !child.HasEnded, "Owner.Adopt: the child already has an owner or has ended");
             child.Owner = this;
-            if (HasEnded)
+            if (HasEnded || childrenEnded)
             {
                 child.End();
                 return;

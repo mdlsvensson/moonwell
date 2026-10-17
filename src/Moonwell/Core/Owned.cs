@@ -49,6 +49,8 @@ namespace Moonwell
                     owner.Unlink(child);
                     child.End();
                 }
+
+                owner.childrenEnded = true;
             }
 
             try
