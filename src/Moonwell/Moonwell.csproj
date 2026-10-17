@@ -4,4 +4,8 @@
     <ProjectReference Include="..\Moonwell.Natives\Moonwell.Natives.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="moonwell.lua" LogicalName="Moonwell.moonwell.lua" />
+  </ItemGroup>
+
 </Project>

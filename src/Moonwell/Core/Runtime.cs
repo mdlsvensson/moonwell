@@ -19,6 +19,8 @@ namespace Moonwell
         {
             World = world;
             Errors.Reset();
+            Hooks.Reset();
+            Events.Reset();
             Scheduler = new Scheduler();
             Root = new RootOwner();
             Owner.current = null;

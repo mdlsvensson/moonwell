@@ -42,6 +42,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "timers.current-in-callback", Run = TimerCases.CurrentInCallback });
             list.Add(new Case { Name = "timers.error-isolated", Run = TimerCases.ErrorIsolated });
             list.Add(new Case { Name = "timers.remaining", Run = TimerCases.Remaining });
+            list.Add(new Case { Name = "hooks.overrides", Run = HookCases.Overrides });
+            list.Add(new Case { Name = "hooks.cached", Run = HookCases.Cached });
+            list.Add(new Case { Name = "events.need-listens-once", Run = HookCases.NeedListensOnce });
             return list;
         }
 
