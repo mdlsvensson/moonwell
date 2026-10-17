@@ -12,6 +12,11 @@ namespace Moonwell.Testing
             var list = new List<Case>();
             list.Add(new Case { Name = "harness.handles-are-keys", Run = HarnessCases.HandlesAreKeys });
             list.Add(new Case { Name = "harness.expect-fails", Run = HarnessCases.ExpectFails });
+            list.Add(new Case { Name = "collections.set-keeps-order", Run = CollectionCases.SetKeepsOrder });
+            list.Add(new Case { Name = "collections.set-remove-keeps-order", Run = CollectionCases.SetRemoveKeepsOrder });
+            list.Add(new Case { Name = "collections.set-snapshot", Run = CollectionCases.SetSnapshot });
+            list.Add(new Case { Name = "collections.map-keeps-order", Run = CollectionCases.MapKeepsOrder });
+            list.Add(new Case { Name = "collections.map-remove", Run = CollectionCases.MapRemove });
             return list;
         }
 
