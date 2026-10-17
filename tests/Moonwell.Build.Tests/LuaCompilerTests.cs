@@ -7,12 +7,13 @@ namespace Moonwell.Build.Tests
     [Collection("Sample")]
     public sealed class LuaCompilerTests : IDisposable
     {
+        private readonly TestFolders folders = new TestFolders();
         private readonly List<string> temporaryFolders = new List<string>();
 
         [Fact]
         public void script_has_main_config_and_entry()
         {
-            var script = CompileScript(Fixture("Sample"), false);
+            var script = CompileScript(TestFolders.Fixture("Sample"), false);
 
             Assert.Contains("function main(", script);
             Assert.Contains("function config(", script);
@@ -27,7 +28,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void development_script_keeps_debug()
         {
-            var script = CompileScript(Fixture("Sample"), false);
+            var script = CompileScript(TestFolders.Fixture("Sample"), false);
 
             Assert.Contains("sample: started (development)", script);
             Assert.DoesNotContain("sample: started (release)", script);
@@ -36,7 +37,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void release_script_drops_debug()
         {
-            var script = CompileScript(Fixture("Sample"), true);
+            var script = CompileScript(TestFolders.Fixture("Sample"), true);
 
             Assert.Contains("sample: started (release)", script);
             Assert.DoesNotContain("sample: started (development)", script);
@@ -45,7 +46,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void jass_source_map_becomes_lua()
         {
-            var folder = TemporaryCopyOfSample();
+            var folder = folders.TemporaryCopyOfSample();
             var infoPath = Path.Combine(folder, "map", "war3map.w3i");
             MapInfo info;
             using (var reader = new BinaryReader(File.OpenRead(infoPath)))
@@ -94,6 +95,7 @@ namespace Moonwell.Build.Tests
 
         public void Dispose()
         {
+            folders.Dispose();
             foreach (var folder in temporaryFolders)
             {
                 if (Directory.Exists(folder))
@@ -101,11 +103,6 @@ namespace Moonwell.Build.Tests
                     Directory.Delete(folder, true);
                 }
             }
-        }
-
-        private static string Fixture(string name)
-        {
-            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Fixtures", name));
         }
 
         private static string CompileScript(string folder, bool release)
@@ -116,34 +113,6 @@ namespace Moonwell.Build.Tests
             var map = SourceMap.Open(project, settings);
             EntryWriter.Write(project, settings);
             return LuaCompiler.Compile(project, map, assembly, release);
-        }
-
-        private string TemporaryCopyOfSample()
-        {
-            var folder = Path.Combine(Fixture("."), "Temp-" + Guid.NewGuid().ToString("N"));
-            temporaryFolders.Add(folder);
-            CopyFolder(Fixture("Sample"), folder);
-            return folder;
-        }
-
-        private static void CopyFolder(string from, string to)
-        {
-            Directory.CreateDirectory(to);
-            foreach (var file in Directory.GetFiles(from))
-            {
-                File.Copy(file, Path.Combine(to, Path.GetFileName(file)));
-            }
-
-            foreach (var directory in Directory.GetDirectories(from))
-            {
-                var name = Path.GetFileName(directory);
-                if (name is "bin" or "obj" or "build")
-                {
-                    continue;
-                }
-
-                CopyFolder(directory, Path.Combine(to, name));
-            }
         }
     }
 }
