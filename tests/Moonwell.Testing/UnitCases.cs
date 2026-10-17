@@ -192,7 +192,6 @@ namespace Moonwell.Testing
         public static void Enter(FakeWorld world)
         {
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
-            Expect.True(world.Listening.Contains(GameEvent.Enter), "the enter event is listened for");
 
             var registered = world.NewUnit(ObjectTypes.FourCC("H001"), hero: true);
             Inbound.Entered(registered);

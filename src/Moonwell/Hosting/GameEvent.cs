@@ -17,8 +17,5 @@ namespace Moonwell.Hosting
 
         /// <summary>A unit drops an item.</summary>
         Drop,
-
-        /// <summary>A unit enters the map.</summary>
-        Enter,
     }
 }

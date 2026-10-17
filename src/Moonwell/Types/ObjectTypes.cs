@@ -24,7 +24,6 @@ namespace Moonwell
             ids[typeof(T)] = id;
             makers[id] = make;
             Events.Need(Hooks.MaskOf(make(), Moonwell.Unit.UnitHooks));
-            Events.NeedEnter();
         }
 
         /// <summary>The object id a class is registered with; throws when the class is not registered.</summary>
