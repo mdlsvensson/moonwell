@@ -1,0 +1,23 @@
+using Moonwell.Hosting;
+
+namespace Moonwell
+{
+    /// <summary>The runtime's static state: the world it talks to, and the state each task adds.</summary>
+    public static class Runtime
+    {
+        /// <summary>The world the runtime talks to; set by Reset.</summary>
+        internal static IWorld World = null!;
+
+        /// <summary>Makes a world the runtime's world and clears the state of every task.</summary>
+        internal static void Reset(IWorld world)
+        {
+            World = world;
+            Errors.Reset();
+        }
+
+        /// <summary>Called when a wake request is due; empty until the timers are built.</summary>
+        internal static void Wake()
+        {
+        }
+    }
+}
