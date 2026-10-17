@@ -137,6 +137,8 @@ namespace Moonwell
             }
 
             Unit? from = source == null ? null : Unit.Of(source);
+            var hitSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(hit.Handle));
+            var fromSlot = from == null ? -1 : Runtime.World.SlotOf(Runtime.World.OwnerOf(from.Handle));
             var damage = new Damage(hit, from, amount, isAttack);
             if (from != null)
             {
@@ -145,7 +147,6 @@ namespace Moonwell
 
             TookDamage(hit, damage);
             MapDamaged(Game.Instance, damage);
-            var hitSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(hit.Handle));
             var first = Player.Existing(hitSlot);
             if (first != null)
             {
@@ -154,7 +155,6 @@ namespace Moonwell
 
             if (from != null)
             {
-                var fromSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(from.Handle));
                 var second = Player.Existing(fromSlot);
                 if (second != null && fromSlot != hitSlot)
                 {
@@ -181,6 +181,8 @@ namespace Moonwell
             }
 
             Unit? slayer = slain == null ? null : Unit.Of(slain);
+            var deadSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(dead.Handle));
+            var slayerSlot = slayer == null ? -1 : Runtime.World.SlotOf(Runtime.World.OwnerOf(slayer.Handle));
             Dying(dead, slayer);
             if (slayer != null)
             {
@@ -188,7 +190,6 @@ namespace Moonwell
             }
 
             MapDied(Game.Instance, dead, slayer);
-            var deadSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(dead.Handle));
             var first = Player.Existing(deadSlot);
             if (first != null)
             {
@@ -197,7 +198,6 @@ namespace Moonwell
 
             if (slayer != null)
             {
-                var slayerSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(slayer.Handle));
                 var second = Player.Existing(slayerSlot);
                 if (second != null && slayerSlot != deadSlot)
                 {

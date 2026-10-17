@@ -50,6 +50,11 @@ namespace Moonwell
         /// <summary>The player object of a slot when one has been made; null otherwise.</summary>
         internal static Player? Existing(int slot)
         {
+            if (slot < 0 || slot >= MaxSlots)
+            {
+                return null;
+            }
+
             return bySlot[slot];
         }
 

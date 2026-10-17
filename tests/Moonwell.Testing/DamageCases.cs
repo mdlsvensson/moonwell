@@ -77,16 +77,17 @@ namespace Moonwell.Testing
             Expect.Near(100f, amount, "the outer amount");
         }
 
-        /// <summary>A reaction that removes its own unit stops the unit's later reactions, and nothing is reported.</summary>
+        /// <summary>A reaction that removes its own unit stops the unit's later reactions, nothing is reported, and the map's reactions still run.</summary>
         public static void ActorEndsMidDispatch(FakeWorld world)
         {
-            ObjectTypes.Unit(ObjectTypes.FourCC("h000"), () => new Dummy());
+            Arena();
+            var striker = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), slot: 0))!;
             var dummy = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h000"), slot: 1))!;
             dummy.Add(new Remover());
             dummy.Add(new B());
             TestLog.Lines.Clear();
-            var amount = Inbound.Damaged(dummy.Handle, null, 100f, true);
-            ExpectLog(new string[] { "dummy damaged", "dummy comp damaged" }, "the log");
+            var amount = Inbound.Damaged(dummy.Handle, striker.Handle, 100f, true);
+            ExpectLog(new string[] { "striker dealt", "striker comp dealt", "dummy damaged", "dummy comp damaged", "game damaged", "p1 damaged", "p0 damaged" }, "the log");
             Expect.Equal(0, world.Logged.Count, "the lines logged");
             Expect.True(dummy.HasEnded, "the dummy has ended");
             Expect.Near(100f, amount, "the amount");

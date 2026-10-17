@@ -282,5 +282,12 @@ namespace Moonwell.Testing
             Expect.Same(three, Player.Get(3), "the player asked for again");
             Expect.Same(three, Player.Of(world.PlayerAt(3)), "the player of its handle");
         }
+
+        /// <summary>A slot outside the player slots has no player object, and asking for it does not fail.</summary>
+        public static void ExistingOutOfRange(FakeWorld world)
+        {
+            Expect.True(Player.Existing(-1) == null, "a slot below the range");
+            Expect.True(Player.Existing(Player.MaxSlots) == null, "a slot above the range");
+        }
     }
 }
