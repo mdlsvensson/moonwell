@@ -1,3 +1,5 @@
+using System;
+
 namespace Moonwell
 {
     /// <summary>The class and the class name of an object, in .NET and in Lua.</summary>
@@ -8,6 +10,13 @@ namespace Moonwell
         internal static object ClassOf(object obj)
         {
             return obj.GetType();
+        }
+
+        // In Lua a type's table holds the class at [1], the same class ClassOf gives an object of that type.
+        /// @CSharpLua.Template = "{0}[1]"
+        internal static object ClassOfType(Type type)
+        {
+            return type;
         }
 
         // In Lua the class name is the name of the class's System type.

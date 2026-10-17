@@ -91,6 +91,56 @@ namespace Moonwell
         public T Add<T>(T component)
             where T : UnitComponent => AddComponent(component);
 
+        /// <summary>Applies a buff to the unit and returns the buff now on it: a buff of its class already there is refreshed, as its stacking says, and the given buff is dropped; otherwise the given buff is added and started.</summary>
+        public T Apply<T>(T buff, Unit? source = null)
+            where T : Buff
+        {
+            Dev.Check(buff.Duration >= 0f && buff.Tick >= 0f, "Unit.Apply: Duration and Tick must be 0 or more");
+            var existing = StackedWith(buff, source);
+            if (existing != null)
+            {
+                existing.Source = source;
+                existing.Reapply();
+                return (T)existing;
+            }
+
+            buff.Source = source;
+            Add(buff);
+            if (!buff.HasEnded)
+            {
+                buff.Begin();
+            }
+
+            return buff;
+        }
+
+        /// <summary>The buff on the unit that a new apply stacks with, or null: the first of its class for Refresh, the first of its class from the same source for PerSource, none for Separate.</summary>
+        private Buff? StackedWith(Buff buff, Unit? source)
+        {
+            if (buff.Stacking == Stacking.Separate)
+            {
+                return null;
+            }
+
+            var found = GetAll<Buff>();
+            var key = Names.ClassOf(buff);
+            for (var i = 0; i < found.Count; i++)
+            {
+                var other = found[i];
+                if (other.HasEnded || Names.ClassOf(other) != key)
+                {
+                    continue;
+                }
+
+                if (buff.Stacking == Stacking.Refresh || other.Source == source)
+                {
+                    return other;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>Removes the unit from the game: it ends, which runs its OnLeave.</summary>
         public void Remove() => End();
 

@@ -21,6 +21,12 @@ namespace Moonwell
         /// <summary>The id each registered class is registered with, keyed by the class; a lookup only.</summary>
         private static Dictionary<Type, int> ids = new Dictionary<Type, int>();
 
+        /// <summary>The game buff each registered buff class shows, keyed by the class; a lookup only.</summary>
+        private static Dictionary<object, int> buffIds = new Dictionary<object, int>();
+
+        /// <summary>The hidden ability that carries each registered buff class on its unit, keyed by the class; a lookup only.</summary>
+        private static Dictionary<object, int> carriers = new Dictionary<object, int>();
+
         /// <summary>Registers a unit type with its id and the function that makes its object, and listens for the events its class needs.</summary>
         public static void Unit<T>(int id, Func<T> make)
             where T : Moonwell.Unit
@@ -75,6 +81,20 @@ namespace Moonwell
             ids[typeof(T)] = id;
             abilityMakers[id] = make;
             Events.Need(Hooks.MaskOf(make(), Moonwell.Ability.AbilityHooks));
+        }
+
+        /// <summary>Registers a buff class with the game buff it shows and the hidden ability that carries it on its unit; a buff of the class shows only with this.</summary>
+        public static void BuffDisplay<T>(int buffId, int carrierId)
+            where T : Buff
+        {
+            var key = Names.ClassOfType(typeof(T));
+            if (carriers.ContainsKey(key))
+            {
+                throw new MoonwellException("ObjectTypes.BuffDisplay: " + typeof(T).Name + " is registered twice");
+            }
+
+            buffIds[key] = buffId;
+            carriers[key] = carrierId;
         }
 
         /// <summary>The object id a class is registered with; throws when the class is not registered.</summary>
@@ -138,6 +158,28 @@ namespace Moonwell
             return null;
         }
 
+        /// <summary>The hidden ability that carries a buff on its unit: 0 when its class has no display.</summary>
+        internal static int CarrierOf(Buff buff)
+        {
+            if (carriers.TryGetValue(Names.ClassOf(buff), out var carrier))
+            {
+                return carrier;
+            }
+
+            return 0;
+        }
+
+        /// <summary>The game buff a buff shows: 0 when its class has no display.</summary>
+        internal static int BuffIdOf(Buff buff)
+        {
+            if (buffIds.TryGetValue(Names.ClassOf(buff), out var id))
+            {
+                return id;
+            }
+
+            return 0;
+        }
+
         /// <summary>Forgets every registered type; Runtime.Reset calls it.</summary>
         internal static void Reset()
         {
@@ -146,6 +188,8 @@ namespace Moonwell
             destructableMakers = new Dictionary<int, Func<Destructable>>();
             abilityMakers = new Dictionary<int, Func<Moonwell.Ability>>();
             ids = new Dictionary<Type, int>();
+            buffIds = new Dictionary<object, int>();
+            carriers = new Dictionary<object, int>();
         }
 
         /// <summary>The character code at an index of a string.</summary>

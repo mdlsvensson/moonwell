@@ -1,0 +1,222 @@
+using System;
+
+namespace Moonwell
+{
+    /// <summary>A unit component that lasts for a duration, ticks at an interval, and stacks with the buffs of its class.</summary>
+    public abstract class Buff : UnitComponent
+    {
+        /// <summary>The timer that ends the buff; a refresh ends it and starts a new one. Null when the buff has no expiry.</summary>
+        internal Timer? expiry;
+
+        /// <summary>The seconds the buff lasts; 0 until it is removed.</summary>
+        public float Duration { get; protected set; }
+
+        /// <summary>The seconds between ticks; 0 for no ticks.</summary>
+        public float Tick { get; protected set; }
+
+        /// <summary>What a second apply of the buff does when the unit already has one of its class.</summary>
+        public Stacking Stacking { get; protected set; } = Stacking.Refresh;
+
+        /// <summary>The unit that applied the buff last; null when none did.</summary>
+        public Unit? Source { get; internal set; }
+
+        /// <summary>The seconds until the buff expires; 0 without an expiry.</summary>
+        public float Remaining
+        {
+            get
+            {
+                return expiry != null && !expiry.HasEnded ? expiry.Remaining : 0f;
+            }
+        }
+
+        /// <summary>Runs when the buff is applied, and again each time it is applied while it is on.</summary>
+        public virtual void OnApply()
+        {
+        }
+
+        /// <summary>Runs at each tick.</summary>
+        public virtual void OnTick()
+        {
+        }
+
+        /// <summary>Runs when the buff expires, before it ends.</summary>
+        public virtual void OnExpire()
+        {
+        }
+
+        /// <summary>Starts a buff that was just added to its unit: it shows when it is the first of its class, starts its ticks and expiry, and runs OnApply.</summary>
+        internal void Begin()
+        {
+            if (!HasOtherLive())
+            {
+                Show();
+            }
+
+            if (Tick > 0f)
+            {
+                Timer.Every(Tick, () => CallTick(), this);
+            }
+
+            if (Duration > 0f)
+            {
+                StartExpiry();
+            }
+
+            CallApply();
+        }
+
+        /// <summary>Gives a buff already on its unit a new expiry, and runs OnApply again.</summary>
+        internal void Reapply()
+        {
+            if (Duration > 0f)
+            {
+                StartExpiry();
+            }
+
+            CallApply();
+        }
+
+        /// <summary>Runs after the buff's children have ended: it removes its display from the unit when it was the last buff of its class, and the unit is still in the game.</summary>
+        internal override void Finish()
+        {
+            base.Finish();
+            if (actor == null || Unit.IsGone || HasOtherLive())
+            {
+                return;
+            }
+
+            var carrier = ObjectTypes.CarrierOf(this);
+            if (carrier == 0)
+            {
+                return;
+            }
+
+            Runtime.World.RemoveAbility(Unit.Handle, carrier);
+            Runtime.World.RemoveAbility(Unit.Handle, ObjectTypes.BuffIdOf(this));
+        }
+
+        /// <summary>Whether another buff of this class is live on the unit.</summary>
+        private bool HasOtherLive()
+        {
+            var found = Unit.GetAll<Buff>();
+            var key = Names.ClassOf(this);
+            for (var i = 0; i < found.Count; i++)
+            {
+                var other = found[i];
+                if (other != this && !other.HasEnded && Names.ClassOf(other) == key)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>Shows the buff on its unit through its carrier ability, when a display is registered for its class.</summary>
+        private void Show()
+        {
+            var carrier = ObjectTypes.CarrierOf(this);
+            if (carrier == 0)
+            {
+                return;
+            }
+
+            Runtime.World.AddAbility(Unit.Handle, carrier);
+            Runtime.World.HideAbility(Unit.Handle, carrier);
+        }
+
+        /// <summary>Ends the expiry timer the buff has, if any, and starts a new one for its duration.</summary>
+        private void StartExpiry()
+        {
+            if (expiry != null)
+            {
+                expiry.End();
+            }
+
+            Timer? made = null;
+            made = Timer.After(Duration, () => Expire(made), this);
+            expiry = made;
+        }
+
+        /// <summary>Runs OnExpire, then ends the buff unless OnExpire ended it or applied it again.</summary>
+        private void Expire(Timer? made)
+        {
+            if (HasEnded)
+            {
+                return;
+            }
+
+            CallExpire();
+            if (!HasEnded && expiry == made)
+            {
+                End();
+            }
+        }
+
+        /// <summary>Runs OnApply as a reaction of the buff.</summary>
+        private void CallApply()
+        {
+            if (HasEnded)
+            {
+                return;
+            }
+
+            var previous = Owner.current;
+            Owner.current = this;
+            try
+            {
+                OnApply();
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(this) + ".OnApply", error);
+            }
+
+            Owner.current = previous;
+        }
+
+        /// <summary>Runs OnTick as a reaction of the buff.</summary>
+        private void CallTick()
+        {
+            if (HasEnded)
+            {
+                return;
+            }
+
+            var previous = Owner.current;
+            Owner.current = this;
+            try
+            {
+                OnTick();
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(this) + ".OnTick", error);
+            }
+
+            Owner.current = previous;
+        }
+
+        /// <summary>Runs OnExpire as a reaction of the buff.</summary>
+        private void CallExpire()
+        {
+            if (HasEnded)
+            {
+                return;
+            }
+
+            var previous = Owner.current;
+            Owner.current = this;
+            try
+            {
+                OnExpire();
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(this) + ".OnExpire", error);
+            }
+
+            Owner.current = previous;
+        }
+    }
+}

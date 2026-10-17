@@ -23,6 +23,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "errors.report-throttles", Run = ErrorCases.ReportThrottles });
             list.Add(new Case { Name = "errors.report-many-keys", Run = ErrorCases.ReportManyKeys });
             list.Add(new Case { Name = "names.of", Run = ErrorCases.NamesOf });
+            list.Add(new Case { Name = "names.class-of-type", Run = ErrorCases.ClassOfType });
             list.Add(new Case { Name = "world.advance", Run = ErrorCases.WorldAdvance });
             list.Add(new Case { Name = "ownership.ends-newest-first", Run = OwnershipCases.EndsNewestFirst });
             list.Add(new Case { Name = "ownership.ends-grandchildren", Run = OwnershipCases.EndsGrandchildren });
@@ -97,6 +98,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "cast.owns-what-it-starts", Run = AbilityCases.OwnsWhatItStarts });
             list.Add(new Case { Name = "cast.next-ends-previous", Run = AbilityCases.NextEndsPrevious });
             list.Add(new Case { Name = "cast.listen", Run = AbilityCases.Listens });
+            list.Add(new Case { Name = "buff.ticks-then-expiry", Run = BuffCases.TicksThenExpiry });
+            list.Add(new Case { Name = "buff.refresh", Run = BuffCases.Refresh });
+            list.Add(new Case { Name = "buff.separate", Run = BuffCases.Separate });
+            list.Add(new Case { Name = "buff.per-source", Run = BuffCases.PerSource });
+            list.Add(new Case { Name = "buff.display", Run = BuffCases.Display });
+            list.Add(new Case { Name = "buff.unit-ends", Run = BuffCases.UnitEnds });
+            list.Add(new Case { Name = "buff.reapply-in-onexpire", Run = BuffCases.ReapplyInOnExpire });
+            list.Add(new Case { Name = "buff.until-removed", Run = BuffCases.UntilRemoved });
             return list;
         }
 

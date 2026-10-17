@@ -69,6 +69,12 @@ namespace Moonwell.Testing
             Expect.True(first != Names.ClassOf(new MoonwellException("c")), "the class of a MoonwellException is another class");
         }
 
+        /// <summary>The class a type names is the class of the objects of that type.</summary>
+        public static void ClassOfType(FakeWorld world)
+        {
+            Expect.Same(Names.ClassOfType(typeof(ExpectationFailed)), Names.ClassOf(new ExpectationFailed("x")), "the class of the type and of an object");
+        }
+
         /// <summary>A wake request fires when time reaches it, and time moves on to the target after it.</summary>
         public static void WorldAdvance(FakeWorld world)
         {
