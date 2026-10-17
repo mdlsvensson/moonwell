@@ -24,6 +24,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "errors.report-many-keys", Run = ErrorCases.ReportManyKeys });
             list.Add(new Case { Name = "names.of", Run = ErrorCases.NamesOf });
             list.Add(new Case { Name = "world.advance", Run = ErrorCases.WorldAdvance });
+            list.Add(new Case { Name = "ownership.ends-newest-first", Run = OwnershipCases.EndsNewestFirst });
+            list.Add(new Case { Name = "ownership.ends-grandchildren", Run = OwnershipCases.EndsGrandchildren });
+            list.Add(new Case { Name = "ownership.end-once", Run = OwnershipCases.EndOnce });
+            list.Add(new Case { Name = "ownership.adopt-into-ended", Run = OwnershipCases.AdoptIntoEnded });
+            list.Add(new Case { Name = "ownership.child-ends-alone", Run = OwnershipCases.ChildEndsAlone });
+            list.Add(new Case { Name = "ownership.adopt-while-ending", Run = OwnershipCases.AdoptWhileEnding });
+            list.Add(new Case { Name = "ownership.error-does-not-stop", Run = OwnershipCases.ErrorDoesNotStop });
+            list.Add(new Case { Name = "ownership.run-sets-current", Run = OwnershipCases.RunSetsCurrent });
             return list;
         }
 
