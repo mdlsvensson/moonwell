@@ -1,3 +1,5 @@
+using System;
+using Moonwell.Engine;
 using Moonwell.Hosting;
 
 namespace Moonwell
@@ -37,6 +39,60 @@ namespace Moonwell
         internal static void Wake()
         {
             Scheduler.Wake();
+        }
+
+        /// <summary>Starts the runtime on the game; the map's Main calls it once, with the setup that registers its types and components.</summary>
+        public static void Start(Action setup)
+        {
+            Reset(new NativeWorld());
+            NativeWorld.Later(() => Begin(setup));
+        }
+
+        /// <summary>Runs the setup, then takes in what is already in the world and starts the game's components.</summary>
+        private static void Begin(Action setup)
+        {
+            var previous = Owner.current;
+            Owner.current = Game.Instance;
+            try
+            {
+                setup();
+            }
+            catch (Exception error)
+            {
+                Errors.Report("Moonwell.Setup", error);
+            }
+
+            Owner.current = previous;
+
+            try
+            {
+                foreach (var handle in World.UnitsInWorld())
+                {
+                    Units.TakeIn(handle, null);
+                }
+
+                foreach (var handle in World.ItemsInWorld())
+                {
+                    if (ObjectTypes.ItemMaker(World.ItemTypeId(handle)) != null)
+                    {
+                        Items.TakeIn(handle, null);
+                    }
+                }
+
+                foreach (var handle in World.DestructablesInWorld())
+                {
+                    if (ObjectTypes.DestructableMaker(World.DestructableTypeId(handle)) != null)
+                    {
+                        Destructables.TakeIn(handle, null);
+                    }
+                }
+
+                Inbound.GameStarted();
+            }
+            catch (Exception error)
+            {
+                Errors.Report("Moonwell.Start", error);
+            }
         }
     }
 }
