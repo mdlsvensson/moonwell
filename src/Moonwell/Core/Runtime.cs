@@ -64,29 +64,50 @@ namespace Moonwell
 
             Owner.current = previous;
 
-            try
+            foreach (var handle in World.UnitsInWorld())
             {
-                foreach (var handle in World.UnitsInWorld())
+                try
                 {
                     Units.TakeIn(handle, null);
                 }
-
-                foreach (var handle in World.ItemsInWorld())
+                catch (Exception error)
                 {
-                    if (ObjectTypes.ItemMaker(World.ItemTypeId(handle)) != null)
+                    Errors.Report("Moonwell.Start", error);
+                }
+            }
+
+            foreach (var handle in World.ItemsInWorld())
+            {
+                if (ObjectTypes.ItemMaker(World.ItemTypeId(handle)) != null)
+                {
+                    try
                     {
                         Items.TakeIn(handle, null);
                     }
+                    catch (Exception error)
+                    {
+                        Errors.Report("Moonwell.Start", error);
+                    }
                 }
+            }
 
-                foreach (var handle in World.DestructablesInWorld())
+            foreach (var handle in World.DestructablesInWorld())
+            {
+                if (ObjectTypes.DestructableMaker(World.DestructableTypeId(handle)) != null)
                 {
-                    if (ObjectTypes.DestructableMaker(World.DestructableTypeId(handle)) != null)
+                    try
                     {
                         Destructables.TakeIn(handle, null);
                     }
+                    catch (Exception error)
+                    {
+                        Errors.Report("Moonwell.Start", error);
+                    }
                 }
+            }
 
+            try
+            {
                 Inbound.GameStarted();
             }
             catch (Exception error)
