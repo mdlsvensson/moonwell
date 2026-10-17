@@ -56,6 +56,20 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "game.start-order", Run = ActorCases.GameStartOrder });
             list.Add(new Case { Name = "game.dispatch-removal", Run = ActorCases.GameDispatchRemoval });
             list.Add(new Case { Name = "players.get", Run = ActorCases.PlayersGet });
+            list.Add(new Case { Name = "types.fourcc", Run = UnitCases.FourCC });
+            list.Add(new Case { Name = "types.duplicate", Run = UnitCases.Duplicate });
+            list.Add(new Case { Name = "types.idof", Run = UnitCases.IdOf });
+            list.Add(new Case { Name = "units.registered-class", Run = UnitCases.RegisteredClass });
+            list.Add(new Case { Name = "units.fallback-class", Run = UnitCases.FallbackClass });
+            list.Add(new Case { Name = "units.components-before-enter", Run = UnitCases.ComponentsBeforeEnter });
+            list.Add(new Case { Name = "units.sweep-detects-removal", Run = UnitCases.SweepDetectsRemoval });
+            list.Add(new Case { Name = "units.remove", Run = UnitCases.Remove });
+            list.Add(new Case { Name = "units.owned", Run = UnitCases.OwnedByOwner });
+            list.Add(new Case { Name = "units.not-owned-by-current", Run = UnitCases.NotOwnedByCurrent });
+            list.Add(new Case { Name = "units.create-generic", Run = UnitCases.CreateGeneric });
+            list.Add(new Case { Name = "units.sweep-continues-after-error", Run = UnitCases.SweepContinuesAfterError });
+            list.Add(new Case { Name = "units.add-in-onleave", Run = UnitCases.AddInOnLeave });
+            list.Add(new Case { Name = "units.enter", Run = UnitCases.Enter });
             return list;
         }
 

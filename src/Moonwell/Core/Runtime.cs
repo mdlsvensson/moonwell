@@ -25,7 +25,10 @@ namespace Moonwell
             Game.Instance = new Game();
             Root = Game.Instance;
             Player.Reset();
+            Units.Reset();
+            ObjectTypes.Reset();
             Owner.current = null;
+            Timer.Every(0.25f, Sweep.Run, Game.Instance);
         }
 
         /// <summary>Called when a wake request is due; runs the timers that are due.</summary>

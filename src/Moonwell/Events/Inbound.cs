@@ -19,6 +19,20 @@ namespace Moonwell
             }
         }
 
+        /// <summary>A unit enters the map: it is taken in when its type is registered, or when a component wants to hear of entries.</summary>
+        internal static void Entered(unit handle)
+        {
+            if (Units.Find(handle) != null)
+            {
+                return;
+            }
+
+            if (ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitEnter))
+            {
+                Units.TakeIn(handle, null);
+            }
+        }
+
         /// <summary>Runs OnGameStart on the map components of an actor, in add order.</summary>
         private static void StartComponents(Actor actor)
         {
