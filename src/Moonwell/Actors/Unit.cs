@@ -47,7 +47,7 @@ namespace Moonwell
         /// <summary>Creates a unit of a type for a player at a place and facing; owner, when given, owns it.</summary>
         public static Unit Create(int typeId, Player player, float x, float y, float facing, Owner? owner = null)
         {
-            var handle = Runtime.World.CreateUnit(player.Handle, typeId, x, y, facing);
+            var handle = Runtime.World.SpawnUnit(player.Handle, typeId, x, y, facing);
             var made = Units.TakeIn(handle, owner)!;
             if (owner != null && made.Owner == null)
             {
@@ -211,7 +211,7 @@ namespace Moonwell
         {
             if (!IsGone)
             {
-                Runtime.World.RemoveUnit(Handle);
+                Runtime.World.DeleteUnit(Handle);
                 IsGone = true;
             }
 

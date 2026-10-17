@@ -16,6 +16,9 @@ namespace Moonwell.Engine
         /// <summary>The timer that calls Runtime.Wake when the next wake is due.</summary>
         private readonly timer wake;
 
+        /// <summary>The rect of the whole map, made once; every call to GetWorldBounds makes a new one.</summary>
+        private readonly rect bounds;
+
         /// <summary>The trigger that sees each destructable die, shared by every destructable watched.</summary>
         private readonly trigger deathTrigger;
 
@@ -31,12 +34,13 @@ namespace Moonwell.Engine
         /// <summary>Starts the clock and the wake timer, and listens for units entering the map.</summary>
         public NativeWorld()
         {
+            bounds = Natives.GetWorldBounds();
             clock = Natives.CreateTimer();
             Natives.TimerStart(clock, 604800f, false, ClockDone);
             wake = Natives.CreateTimer();
 
             var region = Natives.CreateRegion();
-            Natives.RegionAddRect(region, Natives.GetWorldBounds());
+            Natives.RegionAddRect(region, bounds);
             var enter = Natives.CreateTrigger();
             Natives.TriggerRegisterEnterRegion(enter, region, null);
             Natives.TriggerAddAction(enter, EnterAction);
@@ -54,7 +58,7 @@ namespace Moonwell.Engine
         /// <summary>Calls Runtime.Wake once after the seconds; a later request replaces it.</summary>
         public void WakeIn(float seconds)
         {
-            Natives.TimerStart(wake, seconds < 0f ? 0f : seconds, false, Runtime.Wake);
+            Natives.TimerStart(wake, seconds < 0f ? 0f : seconds, false, WakeAction);
         }
 
         /// <summary>Starts delivering an event to Inbound.</summary>
@@ -128,7 +132,7 @@ namespace Moonwell.Engine
         public List<unit> UnitsInWorld()
         {
             var group = Natives.CreateGroup();
-            Natives.GroupEnumUnitsInRect(group, Natives.GetWorldBounds(), null);
+            Natives.GroupEnumUnitsInRect(group, bounds, null);
             var units = new List<unit>();
             var count = Natives.BlzGroupGetSize(group);
             for (var i = 0; i < count; i++)
@@ -144,7 +148,7 @@ namespace Moonwell.Engine
         public List<item> ItemsInWorld()
         {
             foundItems = new List<item>();
-            Natives.EnumItemsInRect(Natives.GetWorldBounds(), null, CollectItem);
+            Natives.EnumItemsInRect(bounds, null, CollectItem);
             return foundItems;
         }
 
@@ -152,18 +156,18 @@ namespace Moonwell.Engine
         public List<destructable> DestructablesInWorld()
         {
             foundDestructables = new List<destructable>();
-            Natives.EnumDestructablesInRect(Natives.GetWorldBounds(), null, CollectDestructable);
+            Natives.EnumDestructablesInRect(bounds, null, CollectDestructable);
             return foundDestructables;
         }
 
         /// <summary>Creates a unit of a type for an owner at a place and facing.</summary>
-        public unit CreateUnit(player owner, int typeId, float x, float y, float facing)
+        public unit SpawnUnit(player owner, int typeId, float x, float y, float facing)
         {
             return Natives.CreateUnit(owner, typeId, x, y, facing);
         }
 
         /// <summary>Creates an item of a type at a place.</summary>
-        public item CreateItem(int typeId, float x, float y)
+        public item SpawnItem(int typeId, float x, float y)
         {
             return Natives.CreateItem(typeId, x, y);
         }
@@ -187,19 +191,19 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Removes a unit from the world.</summary>
-        public void RemoveUnit(unit unit)
+        public void DeleteUnit(unit unit)
         {
             Natives.RemoveUnit(unit);
         }
 
         /// <summary>Removes an item from the world.</summary>
-        public void RemoveItem(item item)
+        public void DeleteItem(item item)
         {
             Natives.RemoveItem(item);
         }
 
         /// <summary>Removes a destructable from the world.</summary>
-        public void RemoveDestructable(destructable destructable)
+        public void DeleteDestructable(destructable destructable)
         {
             Natives.RemoveDestructable(destructable);
         }
@@ -261,6 +265,20 @@ namespace Moonwell.Engine
             }
 
             Natives.TriggerAddAction(trigger, action);
+        }
+
+        /// <summary>The wake timer's callback: runs the timers that are due, and keeps the wake alive if that fails.</summary>
+        private static void WakeAction()
+        {
+            try
+            {
+                Runtime.Wake();
+            }
+            catch (Exception error)
+            {
+                Errors.Report("Moonwell.Wake", error);
+                Runtime.Scheduler.Rearm();
+            }
         }
 
         /// <summary>Hands a unit's entry to Inbound.</summary>

@@ -76,6 +76,12 @@ namespace Moonwell
                 }
             }
 
+            Rearm();
+        }
+
+        /// <summary>Drops the ended timers from the top, and asks the world to wake for the next one, if any is left.</summary>
+        internal void Rearm()
+        {
             while (heap.Count > 0 && heap[0].timer.HasEnded)
             {
                 Pop();
@@ -83,7 +89,7 @@ namespace Moonwell
 
             if (heap.Count > 0)
             {
-                Runtime.World.WakeIn(heap[0].due - now);
+                Runtime.World.WakeIn(heap[0].due - Runtime.World.Now());
             }
         }
 

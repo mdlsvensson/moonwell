@@ -97,7 +97,7 @@ namespace Moonwell
         {
             if (!IsGone)
             {
-                Runtime.World.RemoveDestructable(Handle);
+                Runtime.World.DeleteDestructable(Handle);
                 IsGone = true;
             }
 

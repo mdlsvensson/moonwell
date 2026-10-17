@@ -233,13 +233,13 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Makes a unit owned by the owner's slot; the place and facing are not kept.</summary>
-        public unit CreateUnit(player owner, int typeId, float x, float y, float facing)
+        public unit SpawnUnit(player owner, int typeId, float x, float y, float facing)
         {
             return NewUnit(typeId, SlotOf(owner));
         }
 
         /// <summary>Makes an item; the place is not kept.</summary>
-        public item CreateItem(int typeId, float x, float y)
+        public item SpawnItem(int typeId, float x, float y)
         {
             return NewItem(typeId);
         }
@@ -278,21 +278,21 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Records a unit removed by the runtime, and reads its type id as 0.</summary>
-        public void RemoveUnit(unit unit)
+        public void DeleteUnit(unit unit)
         {
             RemovedUnits.Add(unit);
             unitTypes[unit] = 0;
         }
 
         /// <summary>Records an item removed by the runtime, and reads its type id as 0.</summary>
-        public void RemoveItem(item item)
+        public void DeleteItem(item item)
         {
             RemovedItems.Add(item);
             itemTypes[item] = 0;
         }
 
         /// <summary>Records a destructable removed by the runtime, and reads its type id as 0.</summary>
-        public void RemoveDestructable(destructable destructable)
+        public void DeleteDestructable(destructable destructable)
         {
             RemovedDestructables.Add(destructable);
             destructableTypes[destructable] = 0;

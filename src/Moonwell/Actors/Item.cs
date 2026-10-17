@@ -38,7 +38,7 @@ namespace Moonwell
         /// <summary>Creates an item of a type at a place; owner, when given, owns it.</summary>
         public static Item Create(int typeId, float x, float y, Owner? owner = null)
         {
-            var handle = Runtime.World.CreateItem(typeId, x, y);
+            var handle = Runtime.World.SpawnItem(typeId, x, y);
             var made = Items.TakeIn(handle, owner)!;
             if (owner != null && made.Owner == null)
             {
@@ -97,7 +97,7 @@ namespace Moonwell
         {
             if (!IsGone)
             {
-                Runtime.World.RemoveItem(Handle);
+                Runtime.World.DeleteItem(Handle);
                 IsGone = true;
             }
 

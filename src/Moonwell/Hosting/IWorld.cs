@@ -39,10 +39,10 @@ namespace Moonwell.Hosting
         List<destructable> DestructablesInWorld();
 
         /// <summary>Creates a unit of a type for an owner at a place and facing.</summary>
-        unit CreateUnit(player owner, int typeId, float x, float y, float facing);
+        unit SpawnUnit(player owner, int typeId, float x, float y, float facing);
 
         /// <summary>Creates an item of a type at a place.</summary>
-        item CreateItem(int typeId, float x, float y);
+        item SpawnItem(int typeId, float x, float y);
 
         /// <summary>The type id of a unit; 0 once the game has removed it.</summary>
         int UnitTypeId(unit unit);
@@ -54,13 +54,13 @@ namespace Moonwell.Hosting
         int DestructableTypeId(destructable destructable);
 
         /// <summary>Removes a unit from the world.</summary>
-        void RemoveUnit(unit unit);
+        void DeleteUnit(unit unit);
 
         /// <summary>Removes an item from the world.</summary>
-        void RemoveItem(item item);
+        void DeleteItem(item item);
 
         /// <summary>Removes a destructable from the world.</summary>
-        void RemoveDestructable(destructable destructable);
+        void DeleteDestructable(destructable destructable);
 
         /// <summary>Whether a unit is a hero.</summary>
         bool IsHero(unit unit);
