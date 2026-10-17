@@ -65,7 +65,7 @@ namespace Moonwell.Hosting
         /// <summary>Whether a unit is a hero.</summary>
         bool IsHero(unit unit);
 
-        /// <summary>The player that owns a unit.</summary>
+        /// <summary>The player that owns a unit; null a while after the game has removed it.</summary>
         player OwnerOf(unit unit);
 
         /// <summary>The level of an ability on a unit; 0 when the unit has none.</summary>

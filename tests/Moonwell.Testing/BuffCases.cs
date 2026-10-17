@@ -1,3 +1,5 @@
+using Moonwell.Hosting;
+
 namespace Moonwell.Testing
 {
     /// <summary>Cases that check buffs: their hooks and ticks, expiry, stacking, what is shown on the unit, and a unit ending.</summary>
@@ -146,6 +148,41 @@ namespace Moonwell.Testing
             var buff = target.Apply(new Lasting());
             world.Advance(100f);
             Expect.True(!buff.HasEnded, "the buff is still on after 100 seconds");
+        }
+
+        /// <summary>A death ends a buff: the buff sees the death first, then it is removed.</summary>
+        public static void EndsOnDeath(FakeWorld world)
+        {
+            var target = Target(world);
+            var buff = target.Apply(new DyingBurn());
+            TestLog.Lines.Clear();
+            Inbound.Died(target.Handle, null);
+            Expect.True(buff.HasEnded, "the buff has ended");
+            var died = TestLog.Lines.IndexOf("burn died");
+            Expect.True(died >= 0, "the buff saw the death");
+            Expect.True(TestLog.Lines.IndexOf("removed") > died, "the buff was removed after it saw the death");
+        }
+
+        /// <summary>A buff whose class keeps it through death goes on ticking on the dead unit.</summary>
+        public static void KeptThroughDeath(FakeWorld world)
+        {
+            var target = Target(world);
+            var buff = target.Apply(new DeathlessBurn());
+            Inbound.Died(target.Handle, null);
+            TestLog.Lines.Clear();
+            world.Advance(1.1f);
+            Expect.True(!buff.HasEnded, "the buff is still on");
+            ExpectLog(new string[] { "tick" }, "the log");
+        }
+
+        /// <summary>Applying a buff that a death ends makes the world deliver deaths; one kept through death does not.</summary>
+        public static void ListensForDeath(FakeWorld world)
+        {
+            var target = NewSource(world);
+            target.Apply(new DeathlessBurn());
+            Expect.True(!world.Listening.Contains(GameEvent.Death), "deaths are not delivered for a buff kept through death");
+            target.Apply(new Burn());
+            Expect.True(world.Listening.Contains(GameEvent.Death), "deaths are delivered");
         }
     }
 }

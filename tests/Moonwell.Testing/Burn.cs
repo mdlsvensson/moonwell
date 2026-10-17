@@ -11,7 +11,7 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Logs that the burn was added to its unit.</summary>
-        protected internal override void OnAdded()
+        protected override void OnAdded()
         {
             TestLog.Lines.Add("added");
         }
@@ -35,7 +35,7 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Logs that the burn was removed.</summary>
-        protected internal override void OnRemoved()
+        protected override void OnRemoved()
         {
             TestLog.Lines.Add("removed");
         }

@@ -72,6 +72,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.sweep-continues-after-error", Run = UnitCases.SweepContinuesAfterError });
             list.Add(new Case { Name = "units.add-in-onleave", Run = UnitCases.AddInOnLeave });
             list.Add(new Case { Name = "units.enter", Run = UnitCases.Enter });
+            list.Add(new Case { Name = "units.player-after-removal", Run = UnitCases.PlayerAfterRemoval });
             list.Add(new Case { Name = "items.registered-class", Run = ItemCases.RegisteredClass });
             list.Add(new Case { Name = "items.fallback-class", Run = ItemCases.FallbackClass });
             list.Add(new Case { Name = "items.pickup-order", Run = ItemCases.PickupOrder });
@@ -106,6 +107,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "buff.unit-ends", Run = BuffCases.UnitEnds });
             list.Add(new Case { Name = "buff.reapply-in-onexpire", Run = BuffCases.ReapplyInOnExpire });
             list.Add(new Case { Name = "buff.until-removed", Run = BuffCases.UntilRemoved });
+            list.Add(new Case { Name = "buff.ends-on-death", Run = BuffCases.EndsOnDeath });
+            list.Add(new Case { Name = "buff.kept-through-death", Run = BuffCases.KeptThroughDeath });
+            list.Add(new Case { Name = "buff.listens-for-death", Run = BuffCases.ListensForDeath });
             return list;
         }
 

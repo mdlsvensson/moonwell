@@ -68,7 +68,7 @@ namespace Moonwell
                 Owner.current = made;
                 try
                 {
-                    made.OnEnter();
+                    made.CallEnter();
                 }
                 catch (Exception error)
                 {

@@ -55,6 +55,7 @@ namespace Moonwell
 
             made.Handle = handle;
             made.TypeId = typeId;
+            made.owner = Runtime.World.OwnerOf(handle);
             known[handle] = made;
             Live.Add(made);
             owner?.Adopt(made);
@@ -71,7 +72,7 @@ namespace Moonwell
                 Owner.current = made;
                 try
                 {
-                    made.OnEnter();
+                    made.CallEnter();
                 }
                 catch (Exception error)
                 {
@@ -84,7 +85,7 @@ namespace Moonwell
             if (Events.Wants(Hook.OnUnitEnter) && !made.HasEnded)
             {
                 EnterComponents(Game.Instance, made);
-                var player = Player.Existing(Runtime.World.SlotOf(Runtime.World.OwnerOf(handle)));
+                var player = Player.Existing(made.Player.Slot);
                 if (player != null)
                 {
                     EnterComponents(player, made);

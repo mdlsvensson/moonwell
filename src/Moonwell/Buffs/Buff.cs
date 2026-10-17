@@ -17,6 +17,9 @@ namespace Moonwell
         /// <summary>What a second apply of the buff does when the unit already has one of its class.</summary>
         public Stacking Stacking { get; protected set; } = Stacking.Refresh;
 
+        /// <summary>Whether the unit's death ends the buff, after the buff has seen it; true unless the class keeps it through death.</summary>
+        public bool EndsOnDeath { get; protected set; } = true;
+
         /// <summary>The unit that applied the buff last; null when none did.</summary>
         public Unit? Source { get; internal set; }
 
@@ -44,9 +47,27 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Starts a buff that was just added to its unit: it shows when it is the first of its class, starts its ticks and expiry, and runs OnApply.</summary>
+        /// <summary>Ends the buffs on a unit that its death ends, newest first; Inbound calls it after the death's reactions.</summary>
+        internal static void EndOnDeath(Unit unit)
+        {
+            var found = unit.GetAll<Buff>();
+            for (var i = found.Count - 1; i >= 0; i--)
+            {
+                if (found[i].EndsOnDeath)
+                {
+                    found[i].End();
+                }
+            }
+        }
+
+        /// <summary>Starts a buff that was just added to its unit: it shows when it is the first of its class, starts its ticks and expiry, listens for deaths when a death ends it, and runs OnApply.</summary>
         internal void Begin()
         {
+            if (EndsOnDeath)
+            {
+                Events.Need(Hook.OnDeath);
+            }
+
             if (!HasOtherLive())
             {
                 Show();

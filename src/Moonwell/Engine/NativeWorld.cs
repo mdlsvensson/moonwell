@@ -10,8 +10,14 @@ namespace Moonwell.Engine
         /// <summary>How many lines the log keeps; the file holds the last ones.</summary>
         private const int LogLines = 200;
 
-        /// <summary>The clock: its elapsed time is the game time the runtime has run for.</summary>
+        /// <summary>The seconds the clock runs before it starts again: its elapsed time reads exact at 10 s, and steps by 0.0625 s at 604800 s.</summary>
+        private const float Lap = 10f;
+
+        /// <summary>The clock: the game time is the laps it has run plus its elapsed time.</summary>
         private readonly timer clock;
+
+        /// <summary>The game time the clock last started at, a whole number of laps.</summary>
+        private float lapStart;
 
         /// <summary>The timer that calls Runtime.Wake when the next wake is due.</summary>
         private readonly timer wake;
@@ -36,7 +42,7 @@ namespace Moonwell.Engine
         {
             bounds = Natives.GetWorldBounds();
             clock = Natives.CreateTimer();
-            Natives.TimerStart(clock, 604800f, false, ClockDone);
+            Natives.TimerStart(clock, Lap, false, ClockLapped);
             wake = Natives.CreateTimer();
 
             var region = Natives.CreateRegion();
@@ -52,7 +58,7 @@ namespace Moonwell.Engine
         /// <summary>Game seconds since the runtime started.</summary>
         public float Now()
         {
-            return Natives.TimerGetElapsed(clock);
+            return lapStart + Natives.TimerGetElapsed(clock);
         }
 
         /// <summary>Calls Runtime.Wake once after the seconds; a later request replaces it.</summary>
@@ -128,16 +134,21 @@ namespace Moonwell.Engine
             return Natives.GetPlayerId(player);
         }
 
-        /// <summary>Every unit in the world.</summary>
+        /// <summary>Every unit in the world, by player slot: the world's rect misses hidden and Locust units, a player's units do not.</summary>
         public List<unit> UnitsInWorld()
         {
             var group = Natives.CreateGroup();
-            Natives.GroupEnumUnitsInRect(group, bounds, null);
             var units = new List<unit>();
-            var count = Natives.BlzGroupGetSize(group);
-            for (var i = 0; i < count; i++)
+            for (var slot = 0; slot < Natives.bj_MAX_PLAYER_SLOTS; slot++)
             {
-                units.Add(Natives.BlzGroupUnitAt(group, i));
+                Natives.GroupEnumUnitsOfPlayer(group, Natives.Player(slot), null);
+                var count = Natives.BlzGroupGetSize(group);
+                for (var i = 0; i < count; i++)
+                {
+                    units.Add(Natives.BlzGroupUnitAt(group, i));
+                }
+
+                Natives.GroupClear(group);
             }
 
             Natives.DestroyGroup(group);
@@ -250,9 +261,11 @@ namespace Moonwell.Engine
             Natives.TimerStart(Natives.CreateTimer(), 0f, false, callback);
         }
 
-        /// <summary>The clock's callback; the clock only measures time, so it does nothing.</summary>
-        private static void ClockDone()
+        /// <summary>The clock's callback: counts the lap and starts the clock again.</summary>
+        private void ClockLapped()
         {
+            lapStart += Lap;
+            Natives.TimerStart(clock, Lap, false, ClockLapped);
         }
 
         /// <summary>Registers a player unit event for every player slot, with one trigger that runs the action.</summary>

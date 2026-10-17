@@ -10,13 +10,13 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Logs enter.</summary>
-        protected internal override void OnEnter()
+        protected override void OnEnter()
         {
             TestLog.Lines.Add("enter");
         }
 
         /// <summary>Logs leave.</summary>
-        protected internal override void OnLeave()
+        protected override void OnLeave()
         {
             TestLog.Lines.Add("leave");
         }

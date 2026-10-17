@@ -137,8 +137,8 @@ namespace Moonwell
             }
 
             Unit? from = source == null ? null : Unit.Of(source);
-            var hitSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(hit.Handle));
-            var fromSlot = from == null ? -1 : Runtime.World.SlotOf(Runtime.World.OwnerOf(from.Handle));
+            var hitSlot = hit.Player.Slot;
+            var fromSlot = from == null ? -1 : from.Player.Slot;
             var damage = new Damage(hit, from, amount, isAttack);
             if (from != null)
             {
@@ -165,7 +165,7 @@ namespace Moonwell
             return damage.Amount;
         }
 
-        /// <summary>A unit dies: its type's OnDeath and components, then the killer's OnKill and components, then the map's and the players' reactions; a killer equal to the dying unit counts as none.</summary>
+        /// <summary>A unit dies: its type's OnDeath and components, then the killer's OnKill and components, then the map's and the players' reactions, then the buffs a death ends end; a killer equal to the dying unit counts as none.</summary>
         internal static void Died(unit dying, unit? killer)
         {
             unit? slain = killer == dying ? null : killer;
@@ -181,8 +181,8 @@ namespace Moonwell
             }
 
             Unit? slayer = slain == null ? null : Unit.Of(slain);
-            var deadSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(dead.Handle));
-            var slayerSlot = slayer == null ? -1 : Runtime.World.SlotOf(Runtime.World.OwnerOf(slayer.Handle));
+            var deadSlot = dead.Player.Slot;
+            var slayerSlot = slayer == null ? -1 : slayer.Player.Slot;
             Dying(dead, slayer);
             if (slayer != null)
             {
@@ -204,6 +204,8 @@ namespace Moonwell
                     MapDied(second, dead, slayer);
                 }
             }
+
+            Buff.EndOnDeath(dead);
         }
 
         /// <summary>A unit's spell takes effect: its previous cast ends, the ability and the caster see the new cast, then the map's and the caster's player's reactions run.</summary>
@@ -220,7 +222,7 @@ namespace Moonwell
                 return;
             }
 
-            var casterSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(by.Handle));
+            var casterSlot = by.Player.Slot;
             var running = by.ActiveCast;
             if (running != null)
             {

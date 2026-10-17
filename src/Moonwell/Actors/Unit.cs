@@ -27,8 +27,26 @@ namespace Moonwell
         /// <summary>The type id of the unit, as the game read it when the unit was taken in.</summary>
         public int TypeId { get; internal set; }
 
-        /// <summary>The player that owns the unit.</summary>
-        public Player Player => Player.Of(Runtime.World.OwnerOf(Handle))!;
+        /// <summary>The game's player that owned the unit when it was last read; kept for when the game no longer gives it.</summary>
+        internal player owner = null!;
+
+        /// <summary>The player that owns the unit; once the game has removed the unit, the last owner read.</summary>
+        public Player Player
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    var now = Runtime.World.OwnerOf(Handle);
+                    if (now != null)
+                    {
+                        owner = now;
+                    }
+                }
+
+                return Player.Of(owner)!;
+            }
+        }
 
         /// <summary>The starting components, which the runtime adds in order when the unit enters.</summary>
         internal List<UnitComponent> StartComponents => Components;
@@ -145,13 +163,19 @@ namespace Moonwell
         public void Remove() => End();
 
         /// <summary>Runs when the unit enters the game, after its starting components are added.</summary>
-        protected internal virtual void OnEnter()
+        protected virtual void OnEnter()
         {
         }
 
         /// <summary>Runs when the unit leaves the game, before its components end.</summary>
-        protected internal virtual void OnLeave()
+        protected virtual void OnLeave()
         {
+        }
+
+        /// <summary>Runs OnEnter; Units calls it, since a map overrides the hook as protected.</summary>
+        internal void CallEnter()
+        {
+            OnEnter();
         }
 
         /// <summary>Runs when the unit picks up an item, before the unit's components see it.</summary>

@@ -51,13 +51,19 @@ namespace Moonwell
         public void Remove() => End();
 
         /// <summary>Runs when the destructable enters the game, after its starting components are added.</summary>
-        protected internal virtual void OnEnter()
+        protected virtual void OnEnter()
         {
         }
 
         /// <summary>Runs when the destructable leaves the game, before its components end.</summary>
-        protected internal virtual void OnLeave()
+        protected virtual void OnLeave()
         {
+        }
+
+        /// <summary>Runs OnEnter; Destructables calls it, since a map overrides the hook as protected.</summary>
+        internal void CallEnter()
+        {
+            OnEnter();
         }
 
         /// <summary>Runs when the destructable dies, before the components see it.</summary>

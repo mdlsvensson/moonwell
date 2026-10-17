@@ -21,13 +21,19 @@ namespace Moonwell
         internal abstract HookTable Table { get; }
 
         /// <summary>Runs when the component is added to its actor.</summary>
-        protected internal virtual void OnAdded()
+        protected virtual void OnAdded()
         {
         }
 
         /// <summary>Runs when the component is removed or its actor ends, before it leaves its actor.</summary>
-        protected internal virtual void OnRemoved()
+        protected virtual void OnRemoved()
         {
+        }
+
+        /// <summary>Runs OnAdded; Actor calls it, since a map overrides the hook as protected.</summary>
+        internal void CallAdded()
+        {
+            OnAdded();
         }
 
         /// <summary>Runs OnRemoved, then takes the component off its actor; a component never added does nothing.</summary>

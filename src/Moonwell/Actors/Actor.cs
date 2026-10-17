@@ -106,7 +106,7 @@ namespace Moonwell
             Owner.current = component;
             try
             {
-                component.OnAdded();
+                component.CallAdded();
             }
             catch (Exception error)
             {

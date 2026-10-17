@@ -13,7 +13,7 @@ namespace Moonwell.Testing
             public Tally? Added;
 
             /// <summary>Adds a Tally, which ends with the unit.</summary>
-            protected internal override void OnLeave()
+            protected override void OnLeave()
             {
                 Added = Add(new Tally());
             }
@@ -115,6 +115,17 @@ namespace Moonwell.Testing
             Expect.True(hero.IsGone, "the vanished unit is gone");
             ExpectLogEnds(new string[] { "leave", "tally removed" }, "the log");
             Expect.Equal(0, world.RemovedUnits.Count, "the units the game was asked to remove");
+        }
+
+        /// <summary>A unit the game has removed still reads its owner, which the game no longer gives.</summary>
+        public static void PlayerAfterRemoval(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 1);
+            var unit = Unit.Of(handle)!;
+            world.VanishUnit(handle);
+            Expect.Equal(1, unit.Player.Slot, "the owner's slot before the sweep");
+            world.Advance(0.3f);
+            Expect.Equal(1, unit.Player.Slot, "the owner's slot after the sweep");
         }
 
         /// <summary>Remove ends the unit once, removes it from the game, and forgets it.</summary>

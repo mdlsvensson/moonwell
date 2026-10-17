@@ -6,7 +6,7 @@ namespace Moonwell.Testing
     public class ThrowingLeave : Unit
     {
         /// <summary>Throws an InvalidOperationException with the message boom.</summary>
-        protected internal override void OnLeave()
+        protected override void OnLeave()
         {
             throw new InvalidOperationException("boom");
         }

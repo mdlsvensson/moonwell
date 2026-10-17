@@ -51,6 +51,9 @@ namespace Moonwell.Testing
         /// <summary>The slot of the player that owns each unit the world made.</summary>
         private readonly Dictionary<unit, int> unitSlots = new Dictionary<unit, int>();
 
+        /// <summary>The units whose owner reads null, as a unit the game removed a while ago does.</summary>
+        private readonly HashSet<unit> ownerless = new HashSet<unit>();
+
         /// <summary>Whether each unit the world made is a hero.</summary>
         private readonly Dictionary<unit, bool> heroes = new Dictionary<unit, bool>();
 
@@ -103,10 +106,11 @@ namespace Moonwell.Testing
             return created;
         }
 
-        /// <summary>Makes a unit vanish the way the game does: its type id reads 0 and nothing is told.</summary>
+        /// <summary>Makes a unit vanish the way the game does: its type id and its owner read 0 and null, and nothing is told.</summary>
         public void VanishUnit(unit u)
         {
             unitTypes[u] = 0;
+            ownerless.Add(u);
         }
 
         /// <summary>Makes an item vanish the way the game does: its type id reads 0 and nothing is told.</summary>
@@ -304,9 +308,14 @@ namespace Moonwell.Testing
             return heroes.TryGetValue(unit, out var hero) && hero;
         }
 
-        /// <summary>The player owning a unit; slot 0 for a unit the world did not make.</summary>
+        /// <summary>The player owning a unit; null for a vanished unit, slot 0 for a unit the world did not make.</summary>
         public player OwnerOf(unit unit)
         {
+            if (ownerless.Contains(unit))
+            {
+                return null!;
+            }
+
             if (unitSlots.TryGetValue(unit, out var slot))
             {
                 return PlayerAt(slot);

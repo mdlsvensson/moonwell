@@ -4,13 +4,13 @@ namespace Moonwell.Testing
     public class Tally : UnitComponent
     {
         /// <summary>Logs that the tally was added.</summary>
-        protected internal override void OnAdded()
+        protected override void OnAdded()
         {
             TestLog.Lines.Add("tally added");
         }
 
         /// <summary>Logs that the tally was removed.</summary>
-        protected internal override void OnRemoved()
+        protected override void OnRemoved()
         {
             TestLog.Lines.Add("tally removed");
         }

@@ -19,7 +19,7 @@ namespace Moonwell.Testing
             }
 
             /// <summary>Logs the name.</summary>
-            protected internal override void OnRemoved()
+            protected override void OnRemoved()
             {
                 log.Add(name);
             }
@@ -55,7 +55,7 @@ namespace Moonwell.Testing
             public Owner? Seen;
 
             /// <summary>Counts the add and keeps the current owner.</summary>
-            protected internal override void OnAdded()
+            protected override void OnAdded()
             {
                 Adds++;
                 Seen = Owner.Current;
@@ -69,7 +69,7 @@ namespace Moonwell.Testing
             public int Runs;
 
             /// <summary>Starts a timer every half second, which the component owns.</summary>
-            protected internal override void OnAdded()
+            protected override void OnAdded()
             {
                 Timer.Every(0.5f, () => { Runs++; });
             }
