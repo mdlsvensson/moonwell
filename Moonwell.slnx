@@ -11,5 +11,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Moonwell.Build.Tests/Moonwell.Build.Tests.csproj" />
+    <Project Path="tests/Moonwell.Generator.Tests/Moonwell.Generator.Tests.csproj" />
   </Folder>
 </Solution>

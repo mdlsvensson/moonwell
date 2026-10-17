@@ -1,3 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <!-- The generated layer names its types as the game does (unit, player), and its members are templates. -->
+    <NoWarn>$(NoWarn);CS0626;CS8981</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Generated/types.lua" LogicalName="Moonwell.Natives.types.lua" />
+  </ItemGroup>
+
 </Project>
