@@ -6,8 +6,8 @@ namespace Moonwell
     /// <summary>A unit of the game: an object of its declared class, which holds the components the class starts with.</summary>
     public class Unit : Widget
     {
-        /// <summary>The reactions of units; empty until the reactions of the unit events are declared.</summary>
-        internal static readonly HookTable UnitHooks = new HookTable(typeof(Unit), new string[] { }, new int[] { });
+        /// <summary>The reactions of units; declared here, so that an override in a subclass is found.</summary>
+        internal static readonly HookTable UnitHooks = new HookTable(typeof(Unit), new string[] { "OnItemPickedUp", "OnItemDropped" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped });
 
         /// <summary>The bit mask of the reactions this class overrides, worked out when the unit is taken in.</summary>
         internal int Mask;
@@ -72,6 +72,16 @@ namespace Moonwell
 
         /// <summary>Runs when the unit leaves the game, before its components end.</summary>
         protected internal virtual void OnLeave()
+        {
+        }
+
+        /// <summary>Runs when the unit picks up an item, before the unit's components see it.</summary>
+        public virtual void OnItemPickedUp(Item item)
+        {
+        }
+
+        /// <summary>Runs when the unit drops an item, before the unit's components see it.</summary>
+        public virtual void OnItemDropped(Item item)
         {
         }
 

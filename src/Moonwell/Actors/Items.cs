@@ -1,0 +1,97 @@
+using System;
+using System.Collections.Generic;
+
+namespace Moonwell
+{
+    /// <summary>The items the runtime holds: the object of each game item, found by its handle, and the live ones in order.</summary>
+    internal static class Items
+    {
+        /// <summary>The object of each item the runtime holds, keyed by the game's handle; a lookup only.</summary>
+        private static Dictionary<item, Item> known = new Dictionary<item, Item>();
+
+        /// <summary>The items the runtime holds, in the order they were taken in.</summary>
+        internal static OrderedSet<Item> Live = new OrderedSet<Item>();
+
+        /// <summary>The object of a game item when the runtime holds it; null otherwise.</summary>
+        internal static Item? Find(item handle)
+        {
+            if (known.TryGetValue(handle, out var found))
+            {
+                return found;
+            }
+
+            return null;
+        }
+
+        /// <summary>Takes a game item in: makes its object, adds its starting components, and runs OnEnter.</summary>
+        internal static Item? TakeIn(item handle, Owner? owner)
+        {
+            var existing = Find(handle);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            var typeId = Runtime.World.ItemTypeId(handle);
+            if (typeId == 0)
+            {
+                return null;
+            }
+
+            var maker = ObjectTypes.ItemMaker(typeId);
+            Item made;
+            if (maker != null)
+            {
+                made = maker();
+            }
+            else
+            {
+                made = new Item();
+            }
+
+            made.Handle = handle;
+            made.TypeId = typeId;
+            known[handle] = made;
+            Live.Add(made);
+            owner?.Adopt(made);
+            made.Mask = Hooks.MaskOf(made, Item.ItemHooks);
+            Events.Need(made.Mask);
+            for (var i = 0; i < made.StartComponents.Count; i++)
+            {
+                made.Add(made.StartComponents[i]);
+            }
+
+            if (!made.HasEnded)
+            {
+                var previous = Owner.current;
+                Owner.current = made;
+                try
+                {
+                    made.OnEnter();
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(made) + ".OnEnter", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            return made;
+        }
+
+        /// <summary>Forgets an item the game has removed, so that its handle makes no object again.</summary>
+        internal static void Forget(Item item)
+        {
+            known.Remove(item.Handle);
+            Live.Remove(item);
+        }
+
+        /// <summary>Forgets every item; Runtime.Reset calls it.</summary>
+        internal static void Reset()
+        {
+            known.Clear();
+            Live.Clear();
+        }
+    }
+}

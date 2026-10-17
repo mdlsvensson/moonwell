@@ -20,5 +20,17 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("leave");
         }
+
+        /// <summary>Logs that the hero got an item.</summary>
+        public override void OnItemPickedUp(Item item)
+        {
+            TestLog.Lines.Add("hero got orb");
+        }
+
+        /// <summary>Logs that the hero dropped an item.</summary>
+        public override void OnItemDropped(Item item)
+        {
+            TestLog.Lines.Add("hero dropped orb");
+        }
     }
 }

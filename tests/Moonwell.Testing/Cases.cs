@@ -70,6 +70,15 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.sweep-continues-after-error", Run = UnitCases.SweepContinuesAfterError });
             list.Add(new Case { Name = "units.add-in-onleave", Run = UnitCases.AddInOnLeave });
             list.Add(new Case { Name = "units.enter", Run = UnitCases.Enter });
+            list.Add(new Case { Name = "items.registered-class", Run = ItemCases.RegisteredClass });
+            list.Add(new Case { Name = "items.fallback-class", Run = ItemCases.FallbackClass });
+            list.Add(new Case { Name = "items.pickup-order", Run = ItemCases.PickupOrder });
+            list.Add(new Case { Name = "items.drop-order", Run = ItemCases.DropOrder });
+            list.Add(new Case { Name = "items.listen", Run = ItemCases.Listens });
+            list.Add(new Case { Name = "items.sweep", Run = ItemCases.SweepDetectsRemoval });
+            list.Add(new Case { Name = "items.owned-create", Run = ItemCases.OwnedByOwner });
+            list.Add(new Case { Name = "destructables.watch", Run = DestructableCases.Watch });
+            list.Add(new Case { Name = "destructables.sweep", Run = DestructableCases.SweepDetectsRemoval });
             return list;
         }
 

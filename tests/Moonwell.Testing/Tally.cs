@@ -14,5 +14,17 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("tally removed");
         }
+
+        /// <summary>Logs that the tally saw its unit pick up an item.</summary>
+        public override void OnItemPickedUp(Item item)
+        {
+            TestLog.Lines.Add("tally got orb");
+        }
+
+        /// <summary>Logs that the tally saw its unit drop an item.</summary>
+        public override void OnItemDropped(Item item)
+        {
+            TestLog.Lines.Add("tally dropped orb");
+        }
     }
 }

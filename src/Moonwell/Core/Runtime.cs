@@ -26,6 +26,8 @@ namespace Moonwell
             Root = Game.Instance;
             Player.Reset();
             Units.Reset();
+            Items.Reset();
+            Destructables.Reset();
             ObjectTypes.Reset();
             Owner.current = null;
             Timer.Every(0.25f, Sweep.Run, Game.Instance);

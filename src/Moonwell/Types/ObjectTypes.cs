@@ -9,6 +9,12 @@ namespace Moonwell
         /// <summary>The function that makes the object of each registered unit type, keyed by its id; a lookup only.</summary>
         private static Dictionary<int, Func<Unit>> makers = new Dictionary<int, Func<Unit>>();
 
+        /// <summary>The function that makes the object of each registered item type, keyed by its id; a lookup only.</summary>
+        private static Dictionary<int, Func<Item>> itemMakers = new Dictionary<int, Func<Item>>();
+
+        /// <summary>The function that makes the object of each registered destructable type, keyed by its id; a lookup only.</summary>
+        private static Dictionary<int, Func<Destructable>> destructableMakers = new Dictionary<int, Func<Destructable>>();
+
         /// <summary>The id each registered class is registered with, keyed by the class; a lookup only.</summary>
         private static Dictionary<Type, int> ids = new Dictionary<Type, int>();
 
@@ -24,6 +30,34 @@ namespace Moonwell
             ids[typeof(T)] = id;
             makers[id] = make;
             Events.Need(Hooks.MaskOf(make(), Moonwell.Unit.UnitHooks));
+        }
+
+        /// <summary>Registers an item type with its id and the function that makes its object, and listens for the events its class needs.</summary>
+        public static void Item<T>(int id, Func<T> make)
+            where T : Moonwell.Item
+        {
+            if (itemMakers.ContainsKey(id))
+            {
+                throw new MoonwellException("ObjectTypes.Item: " + id + " is registered twice");
+            }
+
+            ids[typeof(T)] = id;
+            itemMakers[id] = make;
+            Events.Need(Hooks.MaskOf(make(), Moonwell.Item.ItemHooks));
+        }
+
+        /// <summary>Registers a destructable type with its id and the function that makes its object, and listens for the events its class needs.</summary>
+        public static void Destructable<T>(int id, Func<T> make)
+            where T : Moonwell.Destructable
+        {
+            if (destructableMakers.ContainsKey(id))
+            {
+                throw new MoonwellException("ObjectTypes.Destructable: " + id + " is registered twice");
+            }
+
+            ids[typeof(T)] = id;
+            destructableMakers[id] = make;
+            Events.Need(Hooks.MaskOf(make(), Moonwell.Destructable.DestructableHooks));
         }
 
         /// <summary>The object id a class is registered with; throws when the class is not registered.</summary>
@@ -54,10 +88,34 @@ namespace Moonwell
             return null;
         }
 
+        /// <summary>The function that makes the object of a registered item type; null for an id that is not registered.</summary>
+        internal static Func<Item>? ItemMaker(int id)
+        {
+            if (itemMakers.TryGetValue(id, out var maker))
+            {
+                return maker;
+            }
+
+            return null;
+        }
+
+        /// <summary>The function that makes the object of a registered destructable type; null for an id that is not registered.</summary>
+        internal static Func<Destructable>? DestructableMaker(int id)
+        {
+            if (destructableMakers.TryGetValue(id, out var maker))
+            {
+                return maker;
+            }
+
+            return null;
+        }
+
         /// <summary>Forgets every registered type; Runtime.Reset calls it.</summary>
         internal static void Reset()
         {
             makers = new Dictionary<int, Func<Unit>>();
+            itemMakers = new Dictionary<int, Func<Item>>();
+            destructableMakers = new Dictionary<int, Func<Destructable>>();
             ids = new Dictionary<Type, int>();
         }
 
