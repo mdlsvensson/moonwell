@@ -14,5 +14,11 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("striker comp killed");
         }
+
+        /// <summary>Logs that the component saw the striker cast a spell.</summary>
+        public override void OnCast(Cast cast)
+        {
+            TestLog.Lines.Add("striker comp cast");
+        }
     }
 }

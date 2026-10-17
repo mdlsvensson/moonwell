@@ -7,13 +7,19 @@ namespace Moonwell
     public class Unit : Widget
     {
         /// <summary>The reactions of units; declared here, so that an override in a subclass is found.</summary>
-        internal static readonly HookTable UnitHooks = new HookTable(typeof(Unit), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill });
+        internal static readonly HookTable UnitHooks = new HookTable(typeof(Unit), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill", "OnCast" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill, Hook.OnCast });
 
         /// <summary>The bit mask of the reactions this class overrides, worked out when the unit is taken in.</summary>
         internal int Mask;
 
+        /// <summary>The cast the unit is making now, which ends when its spell ends or its next cast begins; null when none.</summary>
+        internal Cast? ActiveCast;
+
         /// <summary>The components the class starts with, added in order when the unit enters.</summary>
         protected List<UnitComponent> Components { get; } = new List<UnitComponent>();
+
+        /// <summary>The ability objects of the unit, one per ability id, in the order they were first asked for.</summary>
+        private readonly OrderedMap<int, Ability> abilities = new OrderedMap<int, Ability>();
 
         /// <summary>The game's handle of the unit.</summary>
         public unit Handle { get; internal set; } = null!;
@@ -57,6 +63,29 @@ namespace Moonwell
         {
             return (T)Create(ObjectTypes.IdOf<T>(), player, x, y, facing, owner);
         }
+
+        /// <summary>The ability of the unit with an id: one object per id, made by the registered maker or as a plain Ability, and owned by the unit.</summary>
+        public Ability AbilityOf(int abilityId)
+        {
+            if (abilities.TryGetValue(abilityId, out var known))
+            {
+                return known;
+            }
+
+            var maker = ObjectTypes.AbilityMaker(abilityId);
+            var made = maker != null ? maker() : new Ability();
+            made.Unit = this;
+            made.Id = abilityId;
+            Adopt(made);
+            made.Mask = Hooks.MaskOf(made, Ability.AbilityHooks);
+            Events.Need(made.Mask);
+            abilities[abilityId] = made;
+            return made;
+        }
+
+        /// <summary>The ability of the unit of a registered class: the object of that class.</summary>
+        public T AbilityOf<T>()
+            where T : Ability => (T)AbilityOf(ObjectTypes.IdOf<T>());
 
         /// <summary>Adds a component to the unit, and returns it.</summary>
         public T Add<T>(T component)
@@ -102,6 +131,11 @@ namespace Moonwell
 
         /// <summary>Runs when the unit kills another, before the unit's components see it.</summary>
         public virtual void OnKill(Unit victim)
+        {
+        }
+
+        /// <summary>Runs when the unit begins a cast, after the cast's ability has seen it and before the unit's components see it.</summary>
+        public virtual void OnCast(Cast cast)
         {
         }
 

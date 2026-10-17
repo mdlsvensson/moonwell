@@ -206,6 +206,57 @@ namespace Moonwell
             }
         }
 
+        /// <summary>A unit's spell takes effect: its previous cast ends, the ability and the caster see the new cast, then the map's and the caster's player's reactions run.</summary>
+        internal static void SpellEffect(unit caster, int abilityId, unit? target, float x, float y)
+        {
+            if (Units.Find(caster) == null && ObjectTypes.AbilityMaker(abilityId) == null && !Events.Wants(Hook.OnUnitCast))
+            {
+                return;
+            }
+
+            var by = Unit.Of(caster);
+            if (by == null)
+            {
+                return;
+            }
+
+            var casterSlot = Runtime.World.SlotOf(Runtime.World.OwnerOf(by.Handle));
+            var running = by.ActiveCast;
+            if (running != null)
+            {
+                running.End();
+            }
+
+            var ability = by.AbilityOf(abilityId);
+            var cast = new Cast(ability, by, target == null ? null : Unit.Of(target), x, y, Runtime.World.AbilityLevel(caster, abilityId));
+            ability.Adopt(cast);
+            by.ActiveCast = cast;
+            AbilityCast(ability, cast);
+            CasterCast(by, cast);
+            MapCast(Game.Instance, cast);
+            var first = Player.Existing(casterSlot);
+            if (first != null)
+            {
+                MapCast(first, cast);
+            }
+        }
+
+        /// <summary>A unit's spell ends: the cast it is making ends, when that cast is live and is for this ability.</summary>
+        internal static void SpellEnded(unit caster, int abilityId)
+        {
+            var ended = Units.Find(caster);
+            if (ended == null)
+            {
+                return;
+            }
+
+            var cast = ended.ActiveCast;
+            if (cast != null && !cast.HasEnded && cast.Ability.Id == abilityId)
+            {
+                cast.End();
+            }
+        }
+
         /// <summary>Runs OnPickedUp on an item, then on its components, in add order.</summary>
         private static void ItemPickedUp(Item item, Unit by)
         {
@@ -616,6 +667,100 @@ namespace Moonwell
                 catch (Exception error)
                 {
                     Errors.Report(Names.NameOf(component) + ".OnUnitDied", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            actor.EndDispatch();
+        }
+
+        /// <summary>Runs OnCast on an ability, with the cast as the current owner, unless the ability has ended or does not override it.</summary>
+        private static void AbilityCast(Ability ability, Cast cast)
+        {
+            if (!ability.HasEnded && (ability.Mask & Hook.OnCast) != 0)
+            {
+                var previous = Owner.current;
+                Owner.current = cast;
+                try
+                {
+                    ability.OnCast(cast);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(ability) + ".OnCast", error);
+                }
+
+                Owner.current = previous;
+            }
+        }
+
+        /// <summary>Runs OnCast on a unit, then on its components, in add order.</summary>
+        private static void CasterCast(Unit caster, Cast cast)
+        {
+            if (!caster.HasEnded && (caster.Mask & Hook.OnCast) != 0)
+            {
+                var previous = Owner.current;
+                Owner.current = caster;
+                try
+                {
+                    caster.OnCast(cast);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(caster) + ".OnCast", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            var count = caster.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = caster.ComponentAt(i) as UnitComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnCast) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnCast(cast);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnCast", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            caster.EndDispatch();
+        }
+
+        /// <summary>Runs OnUnitCast on the map components of an actor, in add order.</summary>
+        private static void MapCast(Actor actor, Cast cast)
+        {
+            var count = actor.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = actor.ComponentAt(i) as MapComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnUnitCast) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnUnitCast(cast);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnUnitCast", error);
                 }
 
                 Owner.current = previous;

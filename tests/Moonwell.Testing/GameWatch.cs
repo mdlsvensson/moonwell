@@ -14,5 +14,11 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("game died");
         }
+
+        /// <summary>Logs the cast.</summary>
+        public override void OnUnitCast(Cast cast)
+        {
+            TestLog.Lines.Add("game cast");
+        }
     }
 }

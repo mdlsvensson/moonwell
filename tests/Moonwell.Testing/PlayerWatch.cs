@@ -23,5 +23,11 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add(label + " died");
         }
+
+        /// <summary>Logs the cast under the label.</summary>
+        public override void OnUnitCast(Cast cast)
+        {
+            TestLog.Lines.Add(label + " cast");
+        }
     }
 }

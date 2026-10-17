@@ -1,0 +1,26 @@
+namespace Moonwell
+{
+    /// <summary>An ability of a unit: one object per unit and ability id, which owns the casts of the ability.</summary>
+    public class Ability : Owner
+    {
+        /// <summary>The reactions of abilities; declared here, so that an override in a subclass is found.</summary>
+        internal static readonly HookTable AbilityHooks = new HookTable(typeof(Ability), new string[] { "OnCast" }, new int[] { Hook.OnCast });
+
+        /// <summary>The bit mask of the reactions this class overrides, worked out when the ability is made for its unit.</summary>
+        internal int Mask;
+
+        /// <summary>The unit that has the ability.</summary>
+        public Unit Unit { get; internal set; } = null!;
+
+        /// <summary>The id of the ability.</summary>
+        public int Id { get; internal set; }
+
+        /// <summary>The level of the ability on its unit, as the game reads it now.</summary>
+        public int Level => Runtime.World.AbilityLevel(Unit.Handle, Id);
+
+        /// <summary>Runs when the unit begins a cast of the ability; Owner.Current is the cast while it runs.</summary>
+        public virtual void OnCast(Cast cast)
+        {
+        }
+    }
+}

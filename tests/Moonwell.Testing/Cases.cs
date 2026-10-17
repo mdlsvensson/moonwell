@@ -90,6 +90,13 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
             list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
             list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });
+            list.Add(new Case { Name = "abilities.registered", Run = AbilityCases.Registered });
+            list.Add(new Case { Name = "abilities.generic", Run = AbilityCases.Generic });
+            list.Add(new Case { Name = "cast.order", Run = AbilityCases.Order });
+            list.Add(new Case { Name = "cast.fields", Run = AbilityCases.Fields });
+            list.Add(new Case { Name = "cast.owns-what-it-starts", Run = AbilityCases.OwnsWhatItStarts });
+            list.Add(new Case { Name = "cast.next-ends-previous", Run = AbilityCases.NextEndsPrevious });
+            list.Add(new Case { Name = "cast.listen", Run = AbilityCases.Listens });
             return list;
         }
 
