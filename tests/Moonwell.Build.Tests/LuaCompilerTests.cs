@@ -82,7 +82,7 @@ namespace Moonwell.Build.Tests
             var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
             var settings = MapSettingsReader.Read(assembly, project);
 
-            var map = SourceMap.Open(project, settings);
+            var map = SourceMap.Open(project, settings, TextWriter.Null);
 
             Assert.Equal(ScriptLanguage.Lua, map.Info!.ScriptLanguage);
             Assert.Equal("Sample map", map.Info.MapName);

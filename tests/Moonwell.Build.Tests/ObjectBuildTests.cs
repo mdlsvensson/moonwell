@@ -91,7 +91,7 @@ namespace Moonwell.Build.Tests
         {
             var project = MapProject.Find(folders.TemporaryCopyOfSample());
             var settings = new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, balance);
-            var map = SourceMap.Open(project, settings);
+            var map = SourceMap.Open(project, settings, TextWriter.Null);
             map.Script = "-- script";
 
             Stage.WriteWithoutObjects(project, map, TextWriter.Null);
@@ -101,6 +101,51 @@ namespace Moonwell.Build.Tests
             Assert.Equal(set, info.GameDataSet);
             Assert.Equal(version, info.GameDataVersion);
             Assert.Equal(tables, GameBalance.SetOf(balance));
+        }
+
+        [Theory]
+        [InlineData(0, null)]
+        [InlineData(1, "note: the map's game data option Default is replaced by Melee (RoC) (Map.Balance)")]
+        [InlineData(2, "note: the map's game data option Default is replaced by Custom (RoC) (Map.Balance)")]
+        [InlineData(3, "note: the map's game data option Default is replaced by Custom (TFT) (Map.Balance)")]
+        public void balance_that_changes_the_game_data_option_is_noted(int balance, string? note)
+        {
+            // The Sample's World Editor map has the default option.
+            var project = MapProject.Find(folders.TemporaryCopyOfSample());
+            var log = new StringWriter { NewLine = "\n" };
+
+            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, balance), log);
+
+            Assert.Equal(note == null ? string.Empty : note + "\n", log.ToString());
+        }
+
+        [Fact]
+        public void a_changed_option_is_noted_with_the_one_the_map_had()
+        {
+            var copy = folders.TemporaryCopyOfSample();
+            var infoPath = Path.Combine(copy, "map", "war3map.w3i");
+            MapInfo info;
+            using (var reader = new BinaryReader(File.OpenRead(infoPath)))
+            {
+                info = reader.ReadMapInfo();
+            }
+
+            info.GameDataSet = GameDataSet.Custom;
+            info.GameDataVersion = GameDataVersion.TFT;
+            using (var writer = new BinaryWriter(File.Create(infoPath)))
+            {
+                writer.Write(info);
+            }
+
+            var project = MapProject.Find(copy);
+            var log = new StringWriter { NewLine = "\n" };
+
+            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, 1), log);
+            Assert.Equal("note: the map's game data option Custom (TFT) is replaced by Melee (RoC) (Map.Balance)\n", log.ToString());
+
+            log.GetStringBuilder().Clear();
+            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, 3), log);
+            Assert.Equal(string.Empty, log.ToString());
         }
 
         [Fact]
@@ -273,7 +318,7 @@ namespace Moonwell.Build.Tests
         public void placed_ids_are_those_of_the_units_and_doodads_the_map_places()
         {
             var project = MapProject.Find(folders.TemporaryCopyOfSample());
-            var map = SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty));
+            var map = SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty), TextWriter.Null);
 
             var placed = MapObjectIds.Placed(map);
 

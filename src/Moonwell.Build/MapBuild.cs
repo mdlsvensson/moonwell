@@ -17,7 +17,7 @@ namespace Moonwell.Build
             var targetPath = DotnetBuild.Run(project, options.Release, log);
             PackageSources.Check(project);
             var settings = MapSettingsReader.Read(targetPath, project);
-            var map = SourceMap.Open(project, settings);
+            var map = SourceMap.Open(project, settings, log);
 
             // The reference decides, not a Moonwell.Objects.dll an earlier build left beside the assembly.
             if (Declarations.UsesObjects(targetPath))

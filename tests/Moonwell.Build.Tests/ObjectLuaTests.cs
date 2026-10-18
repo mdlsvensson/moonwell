@@ -271,7 +271,7 @@ namespace Moonwell.Build.Tests
                 var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
                 Standard = StandardData.Read(Path.Combine(Path.GetDirectoryName(assembly)!, "Moonwell.Objects.dll"));
                 var settings = MapSettingsReader.Read(assembly, project);
-                var map = SourceMap.Open(project, settings);
+                var map = SourceMap.Open(project, settings, TextWriter.Null);
                 Declarations = Build.Declarations.Read(assembly, project, Standard, null);
                 var standardIds = new HashSet<string>();
                 foreach (var kind in Kinds)
@@ -283,7 +283,7 @@ namespace Moonwell.Build.Tests
                 Registry = File.ReadAllText(RegistryWriter.Write(project, Declarations.Used, Declarations.Objects, Ids));
                 Entry = File.ReadAllText(EntryWriter.Write(project, settings, true));
                 Script = LuaCompiler.Compile(project, map, assembly, false, Declarations, Ids, Standard, null);
-                ReleaseScript = LuaCompiler.Compile(project, SourceMap.Open(project, settings), assembly, true, Declarations, Ids, Standard, null);
+                ReleaseScript = LuaCompiler.Compile(project, SourceMap.Open(project, settings, TextWriter.Null), assembly, true, Declarations, Ids, Standard, null);
             }
 
             public StandardData Standard { get; }
