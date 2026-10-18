@@ -20,6 +20,15 @@ namespace Moonwell.Build.Tests
             return folder;
         }
 
+        /// <summary>Copies the Sample, without its bin, obj and build folders, into the system's temporary folder, outside the repository.</summary>
+        public string TemporaryCopyOfSampleOutsideRepository()
+        {
+            var folder = Path.Combine(Path.GetTempPath(), "moonwell-packaged-" + Guid.NewGuid().ToString("N"));
+            folders.Add(folder);
+            CopyFolder(Fixture("Sample"), folder);
+            return folder;
+        }
+
         /// <summary>Deletes the temporary copies.</summary>
         public void Dispose()
         {

@@ -8,4 +8,13 @@
     <EmbeddedResource Include="moonwell.lua" LogicalName="Moonwell.moonwell.lua" />
   </ItemGroup>
 
+  <!--
+    The package carries its C# source beside its library: dotnet build uses the library, CSharp.lua compiles the source
+    (from ~/.nuget/packages/moonwell/<version>/contentFiles/cs). obj/ and bin/ are left out: MSBuild generates files there.
+  -->
+  <ItemGroup>
+    <Content Include="**/*.cs" Exclude="obj/**;bin/**" Pack="true" PackagePath="contentFiles/cs/net10.0/Moonwell/" BuildAction="None" />
+    <Content Include="buildTransitive/Moonwell.props" Pack="true" PackagePath="buildTransitive/Moonwell.props" />
+  </ItemGroup>
+
 </Project>

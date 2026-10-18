@@ -5,6 +5,11 @@
     <NoWarn>$(NoWarn);CS0626;CS8981</NoWarn>
   </PropertyGroup>
 
+  <!-- The package carries its C# source beside its library; see Moonwell.csproj. -->
+  <ItemGroup>
+    <Content Include="**/*.cs" Exclude="obj/**;bin/**" Pack="true" PackagePath="contentFiles/cs/net10.0/Moonwell.Natives/" BuildAction="None" />
+  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Generated/types.lua" LogicalName="Moonwell.Natives.types.lua" />
   </ItemGroup>
