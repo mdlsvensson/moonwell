@@ -12,6 +12,12 @@ namespace Objects
             Natives.DisplayTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, "objects: " + arthas.HitPoints + " " + firebolt.Damage[2]);
         }
 
+        // Arthas's description has no value: it reads as the empty text.
+        public static string Described(Arthas arthas)
+        {
+            return arthas.Description + "!";
+        }
+
         public override void OnUnitDied(Unit dying, Unit? killer)
         {
             // Standard classes used only inside a reaction.

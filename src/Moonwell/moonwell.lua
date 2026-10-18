@@ -26,7 +26,7 @@ end
 
 local levelsTable = { __index = {
   get = function (self, level) return self[level] end,
-  getCount = function (self) return rawget(self, "n") or #self end,
+  getCount = function (self) return #self end,
 } }
 
 local listTable = { __index = {

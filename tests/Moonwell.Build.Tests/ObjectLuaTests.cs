@@ -126,15 +126,29 @@ namespace Moonwell.Build.Tests
             Assert.Contains("Moonwell.Objects.StandardHero", types);
         }
 
-        [Fact]
-        public void values_only_read_fields()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void values_only_read_fields(bool release)
         {
-            var values = compiled.Values();
+            // A release build writes no comment before the compiled code; the library's own getters stay out of the scan.
+            var values = CompiledObjects.ValuesOf(release ? compiled.ReleaseScript : compiled.Script);
             var arthas = Regex.Match(values, "\\[\"Objects\\.Arthas\"\\] = \\{[^\\n]*").Value;
 
             Assert.Contains("[\"uhpm\"] = ", arthas);
             // No code reads Arthas's AI placement radius.
             Assert.DoesNotContain("[\"uabr\"]", values);
+        }
+
+        [Fact]
+        public void unset_string_reads_empty_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Arthas's description has no value; it reads as the empty text, in compiled code (Description + "!") and in plain Lua.
+            Assert.Equal("!", Query(lua, "return Objects.Report.Described(Objects.Arthas())"));
+            Assert.True(Truth(lua, "return Objects.Arthas():getDescription() == ''"));
+            Assert.Equal("!", Query(lua, "return Objects.Arthas():getDescription() .. '!'"));
         }
 
         [Fact]
@@ -241,6 +255,7 @@ namespace Moonwell.Build.Tests
                 Registry = File.ReadAllText(RegistryWriter.Write(project, Declarations.Used, Declarations.Objects, Ids));
                 Entry = File.ReadAllText(EntryWriter.Write(project, settings, true));
                 Script = LuaCompiler.Compile(project, map, assembly, false, Declarations, Ids, Standard, null);
+                ReleaseScript = LuaCompiler.Compile(project, SourceMap.Open(project, settings), assembly, true, Declarations, Ids, Standard, null);
             }
 
             public StandardData Standard { get; }
@@ -255,6 +270,9 @@ namespace Moonwell.Build.Tests
 
             public string Script { get; }
 
+            /// <summary>The script of a release build, which has no comments.</summary>
+            public string ReleaseScript { get; }
+
             /// <summary>The names in System.init's types list, in order.</summary>
             public List<string> InitTypes()
             {
@@ -264,12 +282,12 @@ namespace Moonwell.Build.Tests
                 return Regex.Matches(Script.Substring(open, close - open), "\"([^\"]+)\"").Select(match => match.Groups[1].Value).ToList();
             }
 
-            /// <summary>The values table appended to the script.</summary>
-            public string Values()
+            /// <summary>The values table appended to a script.</summary>
+            public static string ValuesOf(string script)
             {
-                var at = Script.LastIndexOf("MoonwellObjectValues = {", StringComparison.Ordinal);
+                var at = script.LastIndexOf("MoonwellObjectValues = {", StringComparison.Ordinal);
                 Assert.True(at >= 0, "the script has no values table");
-                return Script.Substring(at);
+                return script.Substring(at);
             }
 
             /// <summary>

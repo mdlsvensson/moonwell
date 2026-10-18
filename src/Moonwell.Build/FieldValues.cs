@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 
 namespace Moonwell.Build
 {
@@ -71,14 +70,7 @@ namespace Moonwell.Build
                 values.Add(Scalar(type, Raw(field, level)));
             }
 
-            // A level with no value leaves a hole in the table, so the count is given.
-            var text = new StringBuilder("{");
-            if (values.Contains("nil"))
-            {
-                text.Append("n = ").Append(count.ToString(CultureInfo.InvariantCulture)).Append(", ");
-            }
-
-            return text.Append(string.Join(", ", values)).Append('}').ToString();
+            return "{" + string.Join(", ", values) + "}";
         }
 
         // The ids of a list or a reference; a field with levels has one list for every level, level 1's.
@@ -147,7 +139,8 @@ namespace Moonwell.Build
             return int.TryParse(standard.Value(root, field, 0, set), NumberStyles.Integer, CultureInfo.InvariantCulture, out var standardCount) ? standardCount : 0;
         }
 
-        // A value of a field's type: a put value is of the type; a standard text is read as the type, its default when it has none.
+        // A value of a field's type: a put value is of the type; a standard text is read as the type, its default when it has
+        // none. A string with no text is the empty text, not nil: Lua's .. fails on nil, where C# adds nothing.
         private static string Scalar(string type, object? value)
         {
             switch (value)
@@ -175,7 +168,7 @@ namespace Moonwell.Build
                 case "bool":
                     return text == "1" ? "true" : "false";
                 default:
-                    return text == null ? "nil" : ObjectLua.Quote(text);
+                    return ObjectLua.Quote(text ?? string.Empty);
             }
         }
 
