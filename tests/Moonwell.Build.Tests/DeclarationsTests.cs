@@ -15,7 +15,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void reads_arthas()
         {
-            var arthas = Find(built.Read(null), "Objects.Arthas");
+            var arthas = Find(built.Read(null).Objects, "Objects.Arthas");
 
             Assert.Equal("hero", arthas.Kind);
             Assert.Equal("Hpal", arthas.StandardRoot);
@@ -53,7 +53,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void contains_and_add_see_the_standard_list()
         {
-            var duelist = Find(built.Read(null), "Objects.Duelist");
+            var duelist = Find(built.Read(null).Objects, "Objects.Duelist");
 
             // Contains<Defend> was true in the constructor; Footman's list is Defend and Aihn, then Firebolt (added in a lambda).
             Assert.Equal("Defender", duelist.Changed["unam"]);
@@ -66,7 +66,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_reference_and_a_bool_are_read()
         {
-            var duelist = Find(built.Read(null), "Objects.Duelist");
+            var duelist = Find(built.Read(null).Objects, "Objects.Duelist");
 
             Assert.Equal("Objects.Firebolt", duelist.Changed["udaa"]);
             Assert.Equal(true, duelist.Changed["ubdg"]);
@@ -76,7 +76,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_reference_of_each_level()
         {
-            var elemental = Find(built.Read(null), "Objects.Elemental");
+            var elemental = Find(built.Read(null).Objects, "Objects.Elemental");
 
             Assert.Equal("ability", elemental.Kind);
             Assert.Equal("AHwe", elemental.StandardRoot);
@@ -88,7 +88,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_list_of_each_level_is_one_list()
         {
-            var portal = Find(built.Read(null), "Objects.Portal");
+            var portal = Find(built.Read(null).Objects, "Objects.Portal");
 
             Assert.Equal(new[] { "Ndp1:1", "Ndp1:2", "Ndp1:3" }, portal.Changed.Keys);
             foreach (var value in portal.Changed.Values)
@@ -103,7 +103,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_level_put_by_itself_wins_over_the_whole_field()
         {
-            var tuned = Find(built.Read(null), "Objects.Tuned");
+            var tuned = Find(built.Read(null).Objects, "Objects.Tuned");
 
             Assert.Equal(100f, tuned.Changed["Htb1:1"]);
             Assert.Equal(250f, tuned.Changed["Htb1:2"]);
@@ -116,7 +116,7 @@ namespace Moonwell.Build.Tests
             // Hpal's gold cost is 400 in the base tables and 500 in melee_v0.
             Assert.Equal("500", built.Standard.Value("Hpal", "ugol", 0, "melee_v0"));
 
-            var arthas = Find(built.Read("melee_v0"), "Objects.Arthas");
+            var arthas = Find(built.Read("melee_v0").Objects, "Objects.Arthas");
 
             Assert.Equal(1000, arthas.Changed["ugol"]);
             Assert.Equal(200, arthas.Changed["uhpm"]);
@@ -125,8 +125,8 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void chain_merges()
         {
-            var arthas = Find(built.Read(null), "Objects.Arthas");
-            var dark = Find(built.Read(null), "Objects.DarkArthas");
+            var arthas = Find(built.Read(null).Objects, "Objects.Arthas");
+            var dark = Find(built.Read(null).Objects, "Objects.DarkArthas");
 
             Assert.Equal("Hpal", dark.StandardRoot);
             Assert.Equal("hero", dark.Kind);
@@ -142,7 +142,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void per_level_values()
         {
-            var firebolt = Find(built.Read(null), "Objects.Firebolt");
+            var firebolt = Find(built.Read(null).Objects, "Objects.Firebolt");
 
             Assert.Equal("ability", firebolt.Kind);
             Assert.Equal("AHtb", firebolt.StandardRoot);
@@ -160,7 +160,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void plain_buff_has_no_object()
         {
-            var declared = built.Read(null);
+            var declared = built.Read(null).Objects;
 
             Assert.DoesNotContain(declared, one => one.ClassName == "Objects.Smoke");
             var burn = Find(declared, "Objects.Burn");
@@ -173,7 +173,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void replaces_is_marked()
         {
-            var declared = built.Read(null);
+            var declared = built.Read(null).Objects;
 
             var strong = Find(declared, "Objects.StrongFootman");
             Assert.True(strong.Replaces);
@@ -190,7 +190,7 @@ namespace Moonwell.Build.Tests
         [InlineData("Objects.Forge", "upgrade", "Rhme", "gnam:3", "Forge 3")]
         public void every_kind_is_read(string className, string kind, string root, string field, object value)
         {
-            var declared = Find(built.Read(null), className);
+            var declared = Find(built.Read(null).Objects, className);
 
             Assert.Equal(kind, declared.Kind);
             Assert.Equal(root, declared.StandardRoot);
@@ -200,7 +200,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void ordered_by_class_name()
         {
-            var names = built.Read(null).Select(one => one.ClassName).ToList();
+            var names = built.Read(null).Objects.Select(one => one.ClassName).ToList();
 
             Assert.Equal(
                 new[]
@@ -213,12 +213,24 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void standard_classes_named_by_lists_and_references_have_their_ids()
+        {
+            var ids = built.Read(null).StandardClassIds;
+
+            Assert.Equal("AHhb", ids["Moonwell.Objects.Abilities.Human.HolyLight"]);
+            Assert.Equal("AHds", ids["Moonwell.Objects.Abilities.Human.DivineShield"]);
+            Assert.Equal("Adef", ids["Moonwell.Objects.Abilities.Human.Defend"]);
+            Assert.DoesNotContain("Objects.Firebolt", ids.Keys);
+            Assert.DoesNotContain("Moonwell.Objects.Units.Human.Paladin", ids.Keys);
+        }
+
+        [Fact]
         public void map_without_objects_declares_none()
         {
             var project = MapProject.Find(TestFolders.Fixture("CallsGame"));
             var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
 
-            Assert.Empty(Declarations.Read(assembly, project, built.Standard, null));
+            Assert.Empty(Declarations.Read(assembly, project, built.Standard, null).Objects);
         }
 
         [Fact]
@@ -344,7 +356,7 @@ namespace Moonwell.Build.Tests
 
             public StandardData Standard { get; }
 
-            public IReadOnlyList<DeclaredObject> Read(string? set)
+            public DeclarationSet Read(string? set)
             {
                 return Declarations.Read(assembly, project, Standard, set);
             }
