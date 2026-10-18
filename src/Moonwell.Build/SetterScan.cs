@@ -3,9 +3,10 @@ using System.Reflection.Emit;
 
 namespace Moonwell.Build
 {
-    // Finds a call to a declared field's setter from a method that is not a constructor (design call 5): declared fields
-    // are class defaults, set once while the class is declared. A lambda inside a constructor is compiled to a method
-    // whose name holds <.ctor>, and counts as the constructor.
+    // Finds a change to a declared field from a method that is not a constructor (design call 5): a call to its setter,
+    // to Add or Remove of its list, to Set of its reference, or to a kind base's Set. Declared fields are class defaults,
+    // set once while the class is declared. A lambda inside a constructor is compiled to a method whose name holds
+    // <.ctor>, and counts as the constructor.
     internal static class SetterScan
     {
         private const string FieldAttributeName = "Moonwell.Objects.FieldAttribute";
@@ -28,16 +29,16 @@ namespace Moonwell.Build
                         continue;
                     }
 
-                    var property = FirstFieldSetterCalled(method);
-                    if (property != null)
+                    var found = FirstChangeCalled(method);
+                    if (found != null)
                     {
-                        throw new BuildException($"{MapClasses.Describe(type)}.{method.Name} sets {property.Name}; declared fields are set only in the constructor");
+                        throw new BuildException($"{MapClasses.Describe(type)}.{method.Name} {found.Value.Verb} {found.Value.Name}; declared fields are set only in the constructor");
                     }
                 }
             }
         }
 
-        private static PropertyInfo? FirstFieldSetterCalled(MethodBase method)
+        private static (string Verb, string Name)? FirstChangeCalled(MethodBase method)
         {
             var il = method.GetMethodBody()?.GetILAsByteArray();
             if (il == null)
@@ -47,19 +48,44 @@ namespace Moonwell.Build
 
             var typeArguments = method.DeclaringType!.IsGenericType ? method.DeclaringType.GetGenericArguments() : null;
             var methodArguments = method is MethodInfo { IsGenericMethod: true } generic ? generic.GetGenericArguments() : null;
+
+            // The list or reference being changed was read from its property just before; Set names its field by a string before it.
+            string? lastProperty = null;
+            string? lastString = null;
             var position = 0;
             while (position < il.Length)
             {
                 var code = il[position++];
                 var key = code == 0xFE ? unchecked((short)(0xFE00 | il[position++])) : code;
                 var opCode = OpCodesByValue[key];
-                if (opCode == OpCodes.Call || opCode == OpCodes.Callvirt)
+                if (opCode == OpCodes.Ldstr)
+                {
+                    lastString = method.Module.ResolveString(BitConverter.ToInt32(il, position));
+                }
+                else if (opCode == OpCodes.Call || opCode == OpCodes.Callvirt)
                 {
                     var target = Resolve(method, BitConverter.ToInt32(il, position), typeArguments, methodArguments);
-                    var property = target == null ? null : FieldPropertyOfSetter(target);
-                    if (property != null)
+                    if (target != null)
                     {
-                        return property;
+                        var setter = FieldPropertyOf(target, "set_");
+                        if (setter != null)
+                        {
+                            return ("sets", setter.Name);
+                        }
+
+                        var getter = FieldPropertyOf(target, "get_");
+                        if (getter != null)
+                        {
+                            lastProperty = getter.Name;
+                        }
+                        else if (IsListOrReferenceChange(target))
+                        {
+                            return ("changes", lastProperty ?? "a list or reference");
+                        }
+                        else if (target.Name == "Set" && Declarations.KindOfBase.ContainsKey(target.DeclaringType!.FullName ?? string.Empty))
+                        {
+                            return ("changes", lastString ?? "a field");
+                        }
                     }
                 }
 
@@ -67,6 +93,19 @@ namespace Moonwell.Build
             }
 
             return null;
+        }
+
+        private static bool IsListOrReferenceChange(MethodBase target)
+        {
+            var owner = target.DeclaringType;
+            if (owner == null || !owner.IsGenericType)
+            {
+                return false;
+            }
+
+            var definition = owner.GetGenericTypeDefinition().FullName;
+            return (definition == "Moonwell.Objects.ObjectList`1" && (target.Name == "Add" || target.Name == "Remove"))
+                || (definition == "Moonwell.Objects.ObjectRef`1" && target.Name == "Set");
         }
 
         private static MethodBase? Resolve(MethodBase method, int token, Type[]? typeArguments, Type[]? methodArguments)
@@ -82,16 +121,17 @@ namespace Moonwell.Build
             }
         }
 
-        private static PropertyInfo? FieldPropertyOfSetter(MethodBase target)
+        private static PropertyInfo? FieldPropertyOf(MethodBase target, string prefix)
         {
-            if (!target.IsSpecialName || !target.Name.StartsWith("set_", StringComparison.Ordinal))
+            if (!target.IsSpecialName || !target.Name.StartsWith(prefix, StringComparison.Ordinal))
             {
                 return null;
             }
 
             foreach (var property in target.DeclaringType!.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
             {
-                if (property.SetMethod == target && property.GetCustomAttributesData().Any(data => data.AttributeType.FullName == FieldAttributeName))
+                var accessor = prefix == "set_" ? property.SetMethod : property.GetMethod;
+                if (accessor == target && property.GetCustomAttributesData().Any(data => data.AttributeType.FullName == FieldAttributeName))
                 {
                     return property;
                 }

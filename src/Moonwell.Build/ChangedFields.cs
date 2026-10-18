@@ -11,26 +11,28 @@ namespace Moonwell.Build
 
         private readonly StandardData standard;
         private readonly string? set;
+        private readonly MapProject project;
         private readonly IReadOnlyDictionary<string, string> classNames;
-        private readonly HashSet<string> classNameSet;
 
         /// <param name="standard">The standard values.</param>
         /// <param name="set">The balance set the unset fields read; null for the base tables.</param>
+        /// <param name="project">The map project; lines in messages are relative to its folder.</param>
         /// <param name="classNames">The full class name of each standard id that has a standard class.</param>
-        public ChangedFields(StandardData standard, string? set, IReadOnlyDictionary<string, string> classNames)
+        public ChangedFields(StandardData standard, string? set, MapProject project, IReadOnlyDictionary<string, string> classNames)
         {
             this.standard = standard;
             this.set = set;
+            this.project = project;
             this.classNames = classNames;
-            classNameSet = new HashSet<string>(classNames.Values, StringComparer.Ordinal);
         }
 
         /// <summary>Gives the values that differ from the standard object, and adds the classes its lists and references hold to <paramref name="references"/>.</summary>
+        /// <param name="className">The declared class, for messages.</param>
         /// <param name="kind">The object's kind.</param>
         /// <param name="root">The id of the standard object at the root of the class's base chain.</param>
         /// <param name="declared">The values the class put, by field id.</param>
         /// <param name="references">Where the classes of changed lists and references are added.</param>
-        public SortedDictionary<string, object?> Compute(string kind, string root, IReadOnlyDictionary<string, object?> declared, ISet<string> references)
+        public SortedDictionary<string, object?> Compute(string className, string kind, string root, IReadOnlyDictionary<string, object?> declared, ISet<string> references)
         {
             var fields = new Dictionary<string, StandardData.ObjectField>(StringComparer.Ordinal);
             foreach (var field in standard.Fields(kind))
@@ -46,7 +48,7 @@ namespace Moonwell.Build
             {
                 if (!entry.Key.Contains(':') && entry.Value != null)
                 {
-                    Whole(fields[entry.Key], entry.Value, root, levels, changed, references);
+                    Whole(className, fields[entry.Key], entry.Value, root, levels, changed, references);
                 }
             }
 
@@ -103,17 +105,24 @@ namespace Moonwell.Build
             return int.TryParse(standard.Value(root, field, 0, set), NumberStyles.Integer, CultureInfo.InvariantCulture, out var standardCount) ? standardCount : 0;
         }
 
-        private void Whole(StandardData.ObjectField field, object value, string root, int levels, SortedDictionary<string, object?> changed, ISet<string> references)
+        private void Whole(string className, StandardData.ObjectField field, object value, string root, int levels, SortedDictionary<string, object?> changed, ISet<string> references)
         {
             var type = value.GetType();
             var generic = type.IsGenericType ? type.GetGenericTypeDefinition().FullName : null;
             switch (generic)
             {
                 case "Moonwell.Objects.Levels`1":
-                    WholeLevels(field, value, type, root, levels, changed);
+                    WholeLevels(className, field, value, type, root, levels, changed);
                     break;
                 case "Moonwell.Objects.ObjectList`1":
-                    WholeList(field, (IReadOnlyList<Type>)type.GetProperty("Types", Internal)!.GetValue(value)!, root, levels, changed, references);
+                    WholeList(
+                        field,
+                        (IReadOnlyList<object>)type.GetProperty("Entries", Internal)!.GetValue(value)!,
+                        (IReadOnlyList<object>)type.GetProperty("Standard", Internal)!.GetValue(value)!,
+                        root,
+                        levels,
+                        changed,
+                        references);
                     break;
                 case "Moonwell.Objects.ObjectRef`1":
                     WholeReference(field, (Type?)type.GetProperty("Type", Internal)!.GetValue(value), root, levels, changed, references);
@@ -129,9 +138,18 @@ namespace Moonwell.Build
         }
 
         // A field with a value for each level is written with every level when any one differs.
-        private void WholeLevels(StandardData.ObjectField field, object value, Type type, string root, int levels, SortedDictionary<string, object?> changed)
+        private void WholeLevels(string className, StandardData.ObjectField field, object value, Type type, string root, int levels, SortedDictionary<string, object?> changed)
         {
-            type.GetMethod("Resolve", Internal)!.Invoke(value, new object[] { levels });
+            try
+            {
+                type.GetMethod("Resolve", Internal)!.Invoke(value, new object[] { levels });
+            }
+            catch (TargetInvocationException wrapped) when (wrapped.InnerException != null)
+            {
+                // A formula that throws or calls the game fails the way a constructor does.
+                throw MapClasses.ConstructionError(wrapped.InnerException, className, project);
+            }
+
             var values = (Array)type.GetProperty("Values", Internal)!.GetValue(value)!;
             var differs = false;
             for (var i = 0; i < values.Length; i++)
@@ -148,27 +166,22 @@ namespace Moonwell.Build
             }
         }
 
-        // The classes the standard object's list holds, then the ones the class added; a field with levels has the list of each level.
-        private void WholeList(StandardData.ObjectField field, IReadOnlyList<Type> added, string root, int levels, SortedDictionary<string, object?> changed, ISet<string> references)
+        // The list as the constructor left it. A list the constructor did not change is not written. A field with levels
+        // has one list for every level, written under each level when it differs from the standard list of any level.
+        private void WholeList(StandardData.ObjectField field, IReadOnlyList<object> entries, IReadOnlyList<object> started, string root, int levels, SortedDictionary<string, object?> changed, ISet<string> references)
         {
-            var levelKeys = field.PerLevel ? levels : 0;
-            var lists = new List<string[]>();
-            var differs = false;
-            for (var level = field.PerLevel ? 1 : 0; level <= levelKeys; level++)
+            var final = entries.Select(NameOf).ToArray();
+            if (final.SequenceEqual(started.Select(NameOf)))
             {
-                var names = NamesOf(standard.Value(root, field.Id, level, set));
-                var count = names.Count;
-                foreach (var type in added)
-                {
-                    var name = MapClasses.Describe(type);
-                    if (!names.Contains(name))
-                    {
-                        names.Add(name);
-                    }
-                }
+                return;
+            }
 
-                differs |= names.Count != count;
-                lists.Add(names.ToArray());
+            var first = field.PerLevel ? 1 : 0;
+            var last = field.PerLevel ? levels : 0;
+            var differs = false;
+            for (var level = first; level <= last; level++)
+            {
+                differs |= !final.SequenceEqual(NamesOf(standard.Value(root, field.Id, level, set)));
             }
 
             if (!differs)
@@ -176,10 +189,17 @@ namespace Moonwell.Build
                 return;
             }
 
-            for (var i = 0; i < lists.Count; i++)
+            for (var level = first; level <= last; level++)
             {
-                changed[field.PerLevel ? Key(field.Id, i + 1) : field.Id] = lists[i];
-                AddReferences(lists[i], added, references);
+                changed[field.PerLevel ? Key(field.Id, level) : field.Id] = final;
+            }
+
+            foreach (var entry in entries)
+            {
+                if (entry is Type type)
+                {
+                    references.Add(MapClasses.Describe(type));
+                }
             }
         }
 
@@ -212,22 +232,6 @@ namespace Moonwell.Build
             references.Add(name);
         }
 
-        private void AddReferences(string[] names, IReadOnlyList<Type> added, ISet<string> references)
-        {
-            foreach (var name in names)
-            {
-                if (classNameSet.Contains(name))
-                {
-                    references.Add(name);
-                }
-            }
-
-            foreach (var type in added)
-            {
-                references.Add(MapClasses.Describe(type));
-            }
-        }
-
         // The class names of a standard list's ids; an id with no standard class stays as it is.
         private List<string> NamesOf(string? text)
         {
@@ -241,6 +245,12 @@ namespace Moonwell.Build
             }
 
             return names;
+        }
+
+        // A class's full name, or the id of a standard object that has no class.
+        private static string NameOf(object entry)
+        {
+            return entry is Type type ? MapClasses.Describe(type) : (string)entry;
         }
 
         private static string Key(string field, int level)

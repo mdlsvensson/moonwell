@@ -11,7 +11,7 @@ namespace Moonwell.Build
         private const string ReplacesAttributeName = "Moonwell.Objects.ReplacesAttribute";
         private const string ObjectIdAttributeName = "Moonwell.Objects.ObjectIdAttribute";
 
-        private static readonly Dictionary<string, string> KindOfBase = new Dictionary<string, string>(StringComparer.Ordinal)
+        internal static readonly Dictionary<string, string> KindOfBase = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["Moonwell.Objects.StandardUnit"] = "unit",
             ["Moonwell.Objects.StandardHero"] = "hero",
@@ -81,7 +81,7 @@ namespace Moonwell.Build
             values.SetValue(null, (Func<string, string, int, string?>)((id, field, level) => standard.Value(id, field, level, set)));
             try
             {
-                var comparer = new ChangedFields(standard, set, classNames);
+                var comparer = new ChangedFields(standard, set, project, classNames);
                 var declared = new List<DeclaredObject>();
                 foreach (var type in candidates)
                 {
@@ -125,7 +125,7 @@ namespace Moonwell.Build
 
             var put = (IReadOnlyDictionary<string, object?>)kindBase.GetProperty("Declared", BindingFlags.Instance | BindingFlags.Public)!.GetValue(instance)!;
             var references = new SortedSet<string>(StringComparer.Ordinal);
-            var changed = comparer.Compute(kind, root, put, references);
+            var changed = comparer.Compute(name, kind, root, put, references);
             return new DeclaredObject(
                 name,
                 kind,

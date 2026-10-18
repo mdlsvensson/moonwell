@@ -110,8 +110,13 @@ namespace Moonwell.Build
                 var kindIds = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var entry in document.RootElement.GetProperty("objects").EnumerateObject())
                 {
+                    // Value is keyed by the id alone, which holds while no id is in two kinds (true of the game's data).
+                    if (!objects.TryAdd(entry.Name, ReadObject(entry.Value)))
+                    {
+                        throw new BuildException($"the standard id {entry.Name} is in two object kinds; Value cannot tell them apart");
+                    }
+
                     kindIds.Add(entry.Name);
-                    objects[entry.Name] = ReadObject(entry.Value);
                 }
 
                 ids[kind] = kindIds;

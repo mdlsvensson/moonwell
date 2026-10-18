@@ -21,14 +21,93 @@ namespace Moonwell.Build.Tests
             Assert.Equal("Hpal", arthas.StandardRoot);
             Assert.False(arthas.Replaces);
             Assert.Null(arthas.PinnedId);
-            Assert.Equal(new[] { "uabi", "ugol", "uhpm", "unam" }, arthas.Changed.Keys);
+            Assert.Equal(new[] { "uabi", "ugol", "uhab", "uhpm", "unam" }, arthas.Changed.Keys);
             Assert.Equal("Arthas", arthas.Changed["unam"]);
             Assert.Equal(2 * BaseInt("Hpal", "uhpm"), arthas.Changed["uhpm"]);
             Assert.Equal(2 * BaseInt("Hpal", "ugol"), arthas.Changed["ugol"]);
             Assert.Equal(
                 new[] { "Moonwell.Objects.Abilities.Other.Inventory", "Objects.Firebolt" },
                 Assert.IsAssignableFrom<IReadOnlyList<string>>(arthas.Changed["uabi"]));
-            Assert.Equal(new[] { "Moonwell.Objects.Abilities.Other.Inventory", "Objects.Firebolt" }, arthas.References);
+            // The Paladin's hero abilities without the one Arthas removed; it stands in the standard list before.
+            var heroAbilities = Assert.IsAssignableFrom<IReadOnlyList<string>>(arthas.Changed["uhab"]);
+            Assert.Equal(
+                new[]
+                {
+                    "Moonwell.Objects.Abilities.Human.HolyLight",
+                    "Moonwell.Objects.Abilities.Human.DivineShield",
+                    "Moonwell.Objects.Abilities.Human.Resurrection",
+                },
+                heroAbilities);
+            Assert.Equal(
+                new[]
+                {
+                    "Moonwell.Objects.Abilities.Human.DivineShield",
+                    "Moonwell.Objects.Abilities.Human.HolyLight",
+                    "Moonwell.Objects.Abilities.Human.Resurrection",
+                    "Moonwell.Objects.Abilities.Other.Inventory",
+                    "Objects.Firebolt",
+                },
+                arthas.References);
+        }
+
+        [Fact]
+        public void contains_and_add_see_the_standard_list()
+        {
+            var duelist = Find(built.Read(null), "Objects.Duelist");
+
+            // Contains<Defend> was true in the constructor; Footman's list is Defend and Aihn, then Firebolt (added in a lambda).
+            Assert.Equal("Defender", duelist.Changed["unam"]);
+            var abilities = Assert.IsAssignableFrom<IReadOnlyList<string>>(duelist.Changed["uabi"]);
+            Assert.Equal(3, abilities.Count);
+            Assert.Equal("Moonwell.Objects.Abilities.Human.Defend", abilities[0]);
+            Assert.Equal("Objects.Firebolt", abilities[2]);
+        }
+
+        [Fact]
+        public void a_reference_and_a_bool_are_read()
+        {
+            var duelist = Find(built.Read(null), "Objects.Duelist");
+
+            Assert.Equal("Objects.Firebolt", duelist.Changed["udaa"]);
+            Assert.Equal(true, duelist.Changed["ubdg"]);
+            Assert.Contains("Objects.Firebolt", duelist.References);
+        }
+
+        [Fact]
+        public void a_reference_of_each_level()
+        {
+            var elemental = Find(built.Read(null), "Objects.Elemental");
+
+            Assert.Equal("ability", elemental.Kind);
+            Assert.Equal("AHwe", elemental.StandardRoot);
+            Assert.Equal(new[] { "Hwe1:1", "Hwe1:2", "Hwe1:3" }, elemental.Changed.Keys);
+            Assert.All(elemental.Changed.Values, value => Assert.Equal("Objects.Arthas", value));
+            Assert.Equal(new[] { "Objects.Arthas" }, elemental.References);
+        }
+
+        [Fact]
+        public void a_list_of_each_level_is_one_list()
+        {
+            var portal = Find(built.Read(null), "Objects.Portal");
+
+            Assert.Equal(new[] { "Ndp1:1", "Ndp1:2", "Ndp1:3" }, portal.Changed.Keys);
+            foreach (var value in portal.Changed.Values)
+            {
+                var list = Assert.IsAssignableFrom<IReadOnlyList<string>>(value);
+                Assert.Equal(3, list.Count);
+                Assert.Equal("Objects.Arthas", list[2]);
+                Assert.Equal(portal.Changed["Ndp1:1"], value);
+            }
+        }
+
+        [Fact]
+        public void a_level_put_by_itself_wins_over_the_whole_field()
+        {
+            var tuned = Find(built.Read(null), "Objects.Tuned");
+
+            Assert.Equal(100f, tuned.Changed["Htb1:1"]);
+            Assert.Equal(250f, tuned.Changed["Htb1:2"]);
+            Assert.Equal(300f, tuned.Changed["Htb1:3"]);
         }
 
         [Fact]
@@ -126,8 +205,9 @@ namespace Moonwell.Build.Tests
             Assert.Equal(
                 new[]
                 {
-                    "Objects.Arthas", "Objects.Burn", "Objects.Claws", "Objects.DarkArthas", "Objects.Firebolt",
-                    "Objects.Forge", "Objects.Gate", "Objects.Rock", "Objects.StrongFootman",
+                    "Objects.Arthas", "Objects.Burn", "Objects.Claws", "Objects.DarkArthas", "Objects.Duelist",
+                    "Objects.Elemental", "Objects.Firebolt", "Objects.Forge", "Objects.Gate", "Objects.Portal",
+                    "Objects.Rock", "Objects.StrongFootman", "Objects.Tuned",
                 },
                 names);
         }
@@ -189,6 +269,36 @@ namespace Moonwell.Build.Tests
         public void replaces_modder()
         {
             AssertFails("ReplacesModder", "ReplacesModder.Veteran replaces ReplacesModder.Captain, which is not a standard object");
+        }
+
+        [Fact]
+        public void list_add_outside_ctor()
+        {
+            AssertFails(
+                "AddOutsideCtor",
+                "AddOutsideCtor.Grow.Learn changes Abilities; declared fields are set only in the constructor");
+        }
+
+        [Fact]
+        public void set_by_id_outside_ctor()
+        {
+            AssertFails(
+                "SetByIdOutsideCtor",
+                "SetByIdOutsideCtor.Grow.Retune changes uhpm; declared fields are set only in the constructor");
+        }
+
+        [Fact]
+        public void formula_that_throws_names_line()
+        {
+            AssertFails("FormulaThrows", "Objects.cs:13: FormulaThrows.Bolt's constructor threw: no level 1");
+        }
+
+        [Fact]
+        public void formula_that_calls_the_game_names_line()
+        {
+            AssertFails(
+                "FormulaCallsGame",
+                "Objects.cs:13: FormulaCallsGame.Bolt calls the game while it is declared; game work starts from a reaction or the game's start");
         }
 
         [Fact]

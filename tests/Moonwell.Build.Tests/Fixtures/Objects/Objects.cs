@@ -14,6 +14,7 @@ namespace Objects
             HitPoints = HitPoints * 2;
             GoldCost = GoldCost * 2;
             Abilities.Add<Firebolt>();
+            HeroAbilities.Remove<Moonwell.Objects.Abilities.Human.DevotionAura>();
             Components.Add(new Rage());
         }
     }
@@ -33,6 +34,49 @@ namespace Objects
             Name = "Firebolt";
             Damage = Levels(100f, 200f, 300f);
             Tooltip = PerLevel(level => $"Deals {Damage[level]} damage");
+        }
+    }
+
+    public class Tuned : Firebolt
+    {
+        public Tuned()
+        {
+            // One level put by itself wins over the whole field Firebolt put.
+            Set("Htb1", 2, 250f);
+        }
+    }
+
+    public class Elemental : Moonwell.Objects.Abilities.Human.SummonWaterElemental
+    {
+        public Elemental()
+        {
+            SummonedUnitType.Set<Arthas>();
+        }
+    }
+
+    public class Portal : Moonwell.Objects.Abilities.Creeps.DarkPortal
+    {
+        public Portal()
+        {
+            SpawnedUnits.Add<Arthas>();
+        }
+    }
+
+    public class Duelist : Moonwell.Objects.Units.Human.Footman
+    {
+        public Duelist()
+        {
+            if (Abilities.Contains<Moonwell.Objects.Abilities.Human.Defend>())
+            {
+                Name = "Defender";
+            }
+
+            DefaultActiveAbility.Set<Firebolt>();
+            IsABuilding = true;
+
+            // A lambda inside a constructor counts as the constructor.
+            System.Action learn = () => Abilities.Add<Firebolt>();
+            learn();
         }
     }
 
