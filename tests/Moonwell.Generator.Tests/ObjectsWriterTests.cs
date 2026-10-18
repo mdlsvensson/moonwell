@@ -155,6 +155,20 @@ public class ObjectsWriterTests
     }
 
     [Fact]
+    public void destructable_and_doodad_classes_are_named_by_the_label_of_their_key()
+    {
+        var destructables = MiniFiles.Value["Destructables.g.cs"];
+        var doodads = MiniFiles.Value["Doodads.g.cs"];
+
+        Assert.Contains("    /// <summary>Summer Tree Wall (LTlt).</summary>\n", destructables);
+        Assert.Contains("public class SummerTreeWall : global::Moonwell.Objects.StandardDestructable\n", destructables);
+        Assert.Contains("    /// <summary>Lilypad (ZPlp).</summary>\n", doodads);
+        Assert.Contains("public class Lilypad : global::Moonwell.Objects.StandardDoodad\n", doodads);
+        Assert.DoesNotContain("WESTRING", destructables);
+        Assert.DoesNotContain("WESTRING", doodads);
+    }
+
+    [Fact]
     public void every_type_is_ignored()
     {
         foreach (var (path, text) in MiniFiles.Value.Where(f => f.Key.EndsWith(".cs", StringComparison.Ordinal)))

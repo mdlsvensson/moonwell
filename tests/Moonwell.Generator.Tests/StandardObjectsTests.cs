@@ -347,8 +347,40 @@ public class StandardObjectsTests
         var doodad = Of(Kind.Doodad).First();
 
         Assert.NotEmpty(doodad.Name);
-        Assert.Equal(doodad.Name, doodad.Values["dnam"]);
+        Assert.Equal("Lilypad", doodad.Name);
         Assert.Empty(doodad.Race);
         Assert.False(doodad.Campaign);
+    }
+
+    [Fact]
+    public void a_world_editor_string_key_as_a_name_is_resolved_to_the_label()
+    {
+        var tables = ExportTables.Read(MiniExportFolder());
+        var doodad = Find(Of(tables, Kind.Doodad), "ZPlp");
+        var destructable = Find(Of(tables, Kind.Destructable), "LTlt");
+
+        Assert.Equal("Lilypad", doodad.Name);
+        Assert.Equal("Summer Tree Wall", destructable.Name);
+    }
+
+    [Fact]
+    public void the_values_keep_the_raw_key()
+    {
+        var tables = ExportTables.Read(MiniExportFolder());
+
+        Assert.Equal("WESTRING_DOOD_LPLP", Find(Of(tables, Kind.Doodad), "ZPlp").Values["dnam"]);
+        Assert.Equal("WESTRING_DEST_SUMMER_TREE_WALL", Find(Of(tables, Kind.Destructable), "LTlt").Values["bnam"]);
+    }
+
+    [Fact]
+    public void a_world_editor_string_key_without_a_label_is_no_name()
+    {
+        using var copy = new Copy();
+        copy.Replace("_locales/enus.w3mod/ui/worldeditstrings.txt", "WESTRING_DOOD_LPLP=", "WESTRING_DOOD_LPLP=Lilypad", "WESTRING_DOOD_OTHER=Lilypad");
+        copy.Replace("_locales/enus.w3mod/ui/worldeditgamestrings.txt", "WESTRING_DOOD_LPLP=", "WESTRING_DOOD_LPLP=", "WESTRING_DOOD_OTHER=");
+
+        var doodad = Find(Of(copy.Tables(), Kind.Doodad), "ZPlp");
+        Assert.Equal("", doodad.Name);
+        Assert.Equal("WESTRING_DOOD_LPLP", doodad.Values["dnam"]);
     }
 }

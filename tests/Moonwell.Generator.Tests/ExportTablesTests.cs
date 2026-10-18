@@ -243,6 +243,26 @@ public class ExportTablesTests
     }
 
     [Fact]
+    public void labels_from_the_game_file_too_and_the_editor_file_wins()
+    {
+        var tables = ExportTables.Read(MiniExport());
+
+        Assert.Equal("Summer Tree Wall", tables.Label("WESTRING_DEST_SUMMER_TREE_WALL"));
+        Assert.Equal("Lilypad", tables.Label("WESTRING_DOOD_LPLP"));
+    }
+
+    [Fact]
+    public void missing_game_labels_file_names_it()
+    {
+        using var copy = new TempExport(MiniExport());
+        File.Delete(Path.Combine(copy.Folder, "_locales", "enus.w3mod", "ui", "worldeditgamestrings.txt"));
+
+        var error = Assert.Throws<FileNotFoundException>(() => ExportTables.Read(copy.Folder));
+
+        Assert.Contains("_locales/enus.w3mod/ui/worldeditgamestrings.txt", error.Message);
+    }
+
+    [Fact]
     public void missing_text_files_are_named_by_their_pattern()
     {
         using var copy = new TempExport(MiniExport());

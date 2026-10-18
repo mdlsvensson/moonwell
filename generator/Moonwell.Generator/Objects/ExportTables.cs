@@ -92,6 +92,7 @@ public sealed class ExportTables
 
     private const string LocaleFolder = "_locales/enus.w3mod";
     private const string LabelsFile = LocaleFolder + "/ui/worldeditstrings.txt";
+    private const string GameLabelsFile = LocaleFolder + "/ui/worldeditgamestrings.txt";
     private const string LabelsSection = "WorldEditStrings";
 
     private readonly string _folder;
@@ -105,21 +106,30 @@ public sealed class ExportTables
         _labels = labels;
     }
 
-    /// <summary>Opens the export in <paramref name="folder"/> (the <c>war3.w3mod</c> folder) and reads its labels.</summary>
+    /// <summary>
+    /// Opens the export in <paramref name="folder"/> (the <c>war3.w3mod</c> folder) and reads its labels: the editor's
+    /// (<c>worldeditstrings.txt</c>), then those only the game uses (<c>worldeditgamestrings.txt</c>, the destructables'
+    /// names among them).
+    /// </summary>
     public static ExportTables Read(string folder)
     {
         var tables = new ExportTables(folder, new Dictionary<string, string>(StringComparer.Ordinal));
-        var labelsPath = tables.Require(LabelsFile, null);
-        var text = ReadSections(labelsPath, out _);
+        tables.ReadLabels(LabelsFile);
+        tables.ReadLabels(GameLabelsFile);
+        return tables;
+    }
+
+    /// <summary>Adds the labels of a locale file; a key an earlier file has keeps its label.</summary>
+    private void ReadLabels(string relative)
+    {
+        var text = ReadSections(Require(relative, null), out _);
         if (text.TryGetValue(LabelsSection, out var section))
         {
             foreach (var label in section)
             {
-                tables._labels[label.Key] = label.Value;
+                _labels.TryAdd(label.Key, label.Value);
             }
         }
-
-        return tables;
     }
 
     /// <summary>
@@ -219,7 +229,7 @@ public sealed class ExportTables
         return present;
     }
 
-    /// <summary>The editor's English label for a <c>WESTRING_</c> key, or the key itself when the export has none.</summary>
+    /// <summary>The English label for a <c>WESTRING_</c> key, or the key itself when the export has none.</summary>
     public string Label(string key)
     {
         return _labels.TryGetValue(key, out var label) ? label : key;

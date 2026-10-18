@@ -102,7 +102,7 @@ namespace Objects
         }
     }
 
-    public class Gate : Moonwell.Objects.Destructables.WESTRINGDESTDEMONGATEHORIZONTAL
+    public class Gate : Moonwell.Objects.Destructables.DemonicGate
     {
         public Gate()
         {
@@ -110,7 +110,7 @@ namespace Objects
         }
     }
 
-    public class Rock : Moonwell.Objects.Doodads.WESTRINGDOODNRRKBRrk
+    public class Rock : Moonwell.Objects.Doodads.RocksBRrk
     {
         public Rock()
         {

@@ -7,7 +7,9 @@ namespace Moonwell.Generator.Objects;
 /// <param name="Id">The object id (<c>Hpal</c>).</param>
 /// <param name="Name">
 /// The in-game name: the kind's <c>Name</c> field (an upgrade's at level 1; a buff's tooltip title first), or the
-/// empty string.
+/// empty string. A <c>WESTRING_</c> key, which the game resolves itself, is replaced by the editor's English label
+/// (<see cref="ExportTables.Label"/>), or by the empty string when the export has none; <paramref name="Values"/>
+/// keeps the key.
 /// </param>
 /// <param name="Race">The export's <c>race</c> value as written (<c>human</c>), or the empty string for a kind without one.</param>
 /// <param name="Campaign">True for a unit whose <c>campaign</c> column is 1; false for every other kind.</param>
@@ -66,6 +68,7 @@ public static class StandardObjects
     private const string LevelCountName = "LevelCount";
     private const string NameName = "Name";
     private const string TooltipName = "Tooltip";
+    private const string KeyPrefix = "WESTRING_";
 
     /// <summary>The standard objects of <paramref name="kind"/> ordered by id (ordinal), with the values of <paramref name="fields"/>.</summary>
     public static IReadOnlyList<StandardObject> Of(ExportTables tables, Kind kind, IReadOnlyList<Field> fields)
@@ -98,7 +101,7 @@ public static class StandardObjects
         var objects = new List<StandardObject>(ids.Count);
         foreach (var id in ids)
         {
-            objects.Add(Build(kind, id, evaluator, baseRows, setNames, setRows, present));
+            objects.Add(Build(tables, kind, id, evaluator, baseRows, setNames, setRows, present));
         }
 
         return objects;
@@ -116,6 +119,7 @@ public static class StandardObjects
     }
 
     private static StandardObject Build(
+        ExportTables tables,
         Kind kind,
         string id,
         Evaluator evaluator,
@@ -153,7 +157,7 @@ public static class StandardObjects
         return new StandardObject(
             kind,
             id,
-            evaluator.NameOf(values),
+            Resolved(tables, evaluator.NameOf(values)),
             Clean(row.Get("race")) ?? "",
             kind == Kind.Unit && Clean(row.Get("campaign")) == "1",
             IsHero(kind, id),
@@ -161,6 +165,13 @@ public static class StandardObjects
             values,
             sets,
             missing);
+    }
+
+    /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the export has no label for; any other name as it is.</summary>
+    private static string Resolved(ExportTables tables, string name)
+    {
+        var label = tables.Label(name);
+        return string.Equals(label, name, StringComparison.Ordinal) && name.StartsWith(KeyPrefix, StringComparison.Ordinal) ? "" : label;
     }
 
     private static bool IsHero(Kind kind, string id)

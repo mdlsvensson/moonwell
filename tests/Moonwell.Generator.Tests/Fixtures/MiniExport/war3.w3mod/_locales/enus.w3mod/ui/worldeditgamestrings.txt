@@ -1,0 +1,5 @@
+// Strings the game uses.
+
+[WorldEditStrings]
+WESTRING_DEST_SUMMER_TREE_WALL=Summer Tree Wall
+WESTRING_DOOD_LPLP=Lily Pad (game)

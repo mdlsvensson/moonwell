@@ -178,6 +178,15 @@ namespace Moonwell.Objects.Tests
         }
 
         [Fact]
+        public void no_class_is_named_after_a_world_editor_string_key()
+        {
+            foreach (var type in StandardClasses())
+            {
+                Assert.False(type.Name.StartsWith("WESTRING", StringComparison.OrdinalIgnoreCase), type.FullName);
+            }
+        }
+
+        [Fact]
         public void each_class_has_the_base_of_its_kind()
         {
             var ids = new HashSet<string>();
