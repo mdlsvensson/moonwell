@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Moonwell\Moonwell.csproj" />
+    <!-- PrivateAssets none, so that a map that references only Moonwell.Objects still gets Moonwell's analyzer. -->
+    <ProjectReference Include="..\Moonwell\Moonwell.csproj" PrivateAssets="none" />
   </ItemGroup>
 
   <ItemGroup>

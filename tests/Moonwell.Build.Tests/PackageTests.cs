@@ -66,6 +66,7 @@ namespace Moonwell.Build.Tests
             Assert.Equal("None", declared.Attribute("buildAction")!.Value);
             var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
             Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
+            Assert.DoesNotContain("Analyzers", dependency.Attribute("exclude")?.Value ?? string.Empty);
         }
 
         [Fact]
