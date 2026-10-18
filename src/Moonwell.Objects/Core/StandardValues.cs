@@ -10,7 +10,10 @@ namespace Moonwell.Objects
         /// <summary>Gives the game's value as text for a standard id, a field id and a level (0 when the field has none); null when it has none. The build sets it.</summary>
         public static Func<string, string, int, string?>? Read { get; set; }
 
-        /// <summary>Turns the text of a value into its type; null gives the default of the type.</summary>
+        /// <summary>
+        /// Turns the text of a value into its type; null gives the default of the type. A text that is not a number of its type
+        /// reads as the build's Lua side reads it: a decimal truncated for an <c>int</c>, else 0.
+        /// </summary>
         internal static T Parse<T>(string? text)
         {
             if (typeof(T) == typeof(string))
@@ -25,12 +28,17 @@ namespace Moonwell.Objects
 
             if (typeof(T) == typeof(int))
             {
-                return (T)(object)int.Parse(text, CultureInfo.InvariantCulture);
+                if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var whole))
+                {
+                    return (T)(object)whole;
+                }
+
+                return (T)(object)(float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var truncated) ? (int)truncated : 0);
             }
 
             if (typeof(T) == typeof(float))
             {
-                return (T)(object)float.Parse(text, CultureInfo.InvariantCulture);
+                return (T)(object)(float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0f);
             }
 
             if (typeof(T) == typeof(bool))

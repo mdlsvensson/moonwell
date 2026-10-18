@@ -285,9 +285,23 @@ namespace Moonwell.Objects.Tests
         [Theory]
         [InlineData("12", 12)]
         [InlineData(null, 0)]
+        [InlineData("45.5", 45)]
+        [InlineData("-45.5", -45)]
+        [InlineData("#VALUE!", 0)]
+        [InlineData("MBUR", 0)]
+        [InlineData("ap04", 0)]
         public void parse_int(string? text, int expected)
         {
             Assert.Equal(expected, StandardValues.Parse<int>(text));
+        }
+
+        [Theory]
+        [InlineData("0.25", 0.25f)]
+        [InlineData("#VALUE!", 0f)]
+        [InlineData("ap04", 0f)]
+        public void parse_float_takes_zero_for_what_is_not_a_number(string text, float expected)
+        {
+            Assert.Equal(expected, StandardValues.Parse<float>(text));
         }
 
         [Fact]
