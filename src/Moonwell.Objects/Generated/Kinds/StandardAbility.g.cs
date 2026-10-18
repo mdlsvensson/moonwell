@@ -978,8 +978,8 @@ namespace Moonwell.Objects
         /// <summary>The declared values of this object, created on first use.</summary>
         protected global::Moonwell.Objects.Declared Fields => declared ??= new global::Moonwell.Objects.Declared();
 
-        /// <summary>The values put on this object so far, by field id.</summary>
-        public global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;
+        /// <summary>The values put on this object so far, by field id; the build reads them.</summary>
+        internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;
 
         /// <summary>The field <c>aaea</c>.</summary>
         [global::Moonwell.Objects.Field("aaea")]

@@ -159,7 +159,7 @@ namespace Moonwell.Build
                 throw MapClasses.ConstructionError(wrapped.InnerException, name, project);
             }
 
-            var put = (IReadOnlyDictionary<string, object?>)kindBase.GetProperty("Declared", BindingFlags.Instance | BindingFlags.Public)!.GetValue(instance)!;
+            var put = (IReadOnlyDictionary<string, object?>)kindBase.GetProperty("Declared", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(instance)!;
             var references = new SortedSet<string>(StringComparer.Ordinal);
             var changed = comparer.Compute(name, kind, root, put, references);
             return new DeclaredObject(

@@ -218,7 +218,7 @@ namespace Moonwell.Objects.Tests
             {
                 var made = Activator.CreateInstance(type)!;
 
-                var declared = (IReadOnlyDictionary<string, object?>)type.GetProperty("Declared")!.GetValue(made)!;
+                var declared = (IReadOnlyDictionary<string, object?>)type.GetProperty("Declared", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(made)!;
                 Assert.Empty(declared);
             }
         }
