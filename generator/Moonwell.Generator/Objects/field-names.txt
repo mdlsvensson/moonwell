@@ -65,7 +65,7 @@ doodad dnam Name
 doodad dfil Model
 doodad ddes Scale
 ability anam Name
-ability alev Levels
+ability alev LevelCount
 ability acdn Cooldown
 ability amcs ManaCost
 ability aran Range
@@ -94,5 +94,5 @@ upgrade gtp1 Tooltip
 upgrade gub1 ExtendedTooltip
 upgrade ghk1 Hotkey
 upgrade gar1 Icon
-upgrade glvl MaxLevel
+upgrade glvl LevelCount
 upgrade greq Requires

@@ -23,7 +23,8 @@ public class FieldsTests
     [InlineData(Kind.Unit, "uabi", "Abilities")]
     [InlineData(Kind.Ability, "acdn", "Cooldown")]
     [InlineData(Kind.Ability, "amcs", "ManaCost")]
-    [InlineData(Kind.Ability, "alev", "Levels")]
+    [InlineData(Kind.Ability, "alev", "LevelCount")]
+    [InlineData(Kind.Upgrade, "glvl", "LevelCount")]
     [InlineData(Kind.Ability, "anam", "Name")]
     [InlineData(Kind.Ability, "abuf", "Buffs")]
     [InlineData(Kind.Ability, "atar", "Targets")]
@@ -168,6 +169,29 @@ public class FieldsTests
         var names = FieldNames.Assign(new[] { new NameCandidate("utyp", "GetType", false, new[] { "unit" }) });
 
         Assert.Equal(new[] { "GetTypeUtyp" }, names);
+    }
+
+    [Theory]
+    [InlineData("Fields")]
+    [InlineData("Levels")]
+    [InlineData("PerLevel")]
+    [InlineData("Set")]
+    public void a_name_of_a_kind_base_member_gets_its_id(string name)
+    {
+        var names = FieldNames.Assign(new[] { new NameCandidate("ulev", name, false, new[] { "unit" }) });
+
+        Assert.Equal(new[] { name + "Ulev" }, names);
+    }
+
+    [Theory]
+    [InlineData("Set")]
+    [InlineData("Per Level")]
+    public void a_label_that_gives_a_kind_base_member_gets_its_id(string label)
+    {
+        var name = FieldNames.FromLabel(label);
+        var names = FieldNames.Assign(new[] { new NameCandidate("abcd", name, false, new[] { "all" }) });
+
+        Assert.Equal(name + "Abcd", names[0]);
     }
 
     [Fact]
