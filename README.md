@@ -4,7 +4,9 @@ A framework for making Warcraft III maps in C#. A map is one C# project: units, 
 declared as classes based on the game's own objects, their behaviour is made of components, and the build turns the
 project and a World Editor map into a playable map, with the script compiled to Lua.
 
-Nothing works yet.
+`moonwell build [folder] [--release]` builds the map project in the folder (the current one by default) into
+`build\<Name>.w3x`. A development build is the default; `--release` makes a release build.
+`moonwell run [folder] [--release] [--game <exe>]` builds the same way, then starts Warcraft III with the map.
 
 | Path | What it is |
 |---|---|

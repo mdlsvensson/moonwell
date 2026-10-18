@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Moonwell.Build\Moonwell.Build.csproj" />
+    <ProjectReference Include="..\..\src\Moonwell.Cli\Moonwell.Cli.csproj" />
   </ItemGroup>
 
 </Project>

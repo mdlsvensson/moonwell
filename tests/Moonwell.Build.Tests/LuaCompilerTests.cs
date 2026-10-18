@@ -7,13 +7,19 @@ namespace Moonwell.Build.Tests
     [Collection("Sample")]
     public sealed class LuaCompilerTests : IDisposable
     {
+        private readonly SampleBuilds builds;
         private readonly TestFolders folders = new TestFolders();
         private readonly List<string> temporaryFolders = new List<string>();
+
+        public LuaCompilerTests(SampleBuilds builds)
+        {
+            this.builds = builds;
+        }
 
         [Fact]
         public void script_has_main_config_and_entry()
         {
-            var script = CompileScript(TestFolders.Fixture("Sample"), false);
+            var script = builds.Development.Script;
 
             Assert.Contains("function main(", script);
             Assert.Contains("function config(", script);
@@ -28,7 +34,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void development_script_keeps_debug()
         {
-            var script = CompileScript(TestFolders.Fixture("Sample"), false);
+            var script = builds.Development.Script;
 
             Assert.Contains("sample: started (development)", script);
             Assert.DoesNotContain("sample: started (release)", script);
@@ -37,7 +43,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void release_script_drops_debug()
         {
-            var script = CompileScript(TestFolders.Fixture("Sample"), true);
+            var script = builds.Release.Script;
 
             Assert.Contains("sample: started (release)", script);
             Assert.DoesNotContain("sample: started (development)", script);
@@ -103,16 +109,6 @@ namespace Moonwell.Build.Tests
                     Directory.Delete(folder, true);
                 }
             }
-        }
-
-        private static string CompileScript(string folder, bool release)
-        {
-            var project = MapProject.Find(folder);
-            var assembly = DotnetBuild.Run(project, release, TextWriter.Null);
-            var settings = MapSettingsReader.Read(assembly, project);
-            var map = SourceMap.Open(project, settings);
-            EntryWriter.Write(project, settings);
-            return LuaCompiler.Compile(project, map, assembly, release);
         }
     }
 }
