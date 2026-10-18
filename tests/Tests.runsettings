@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The settings of every dotnet test run (Directory.Build.props points the test projects here).
+
+  The Build tests run nested dotnet builds, which wait without a limit. When no test finishes for 10 minutes, the
+  blame collector stops the test host and the run fails with "Test Run Aborted" instead of hanging; the Sequence file
+  it attaches lists the test that was running with Completed="False". A full run's longest stretch without a
+  finished test is under a minute, so 10 minutes is a hang and not a slow machine. A nested dotnet process the
+  stopped test started may be left running; it is the one whose command line names that test's project copy.
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="blame" enabled="True">
+        <Configuration>
+          <CollectDumpOnTestSessionHang TestTimeout="10m" HangDumpType="None" />
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
