@@ -1,33 +1,61 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Moonwell.Objects
 {
-    /// <summary>A list of declared classes a field holds, in the order they were added, each once.</summary>
+    /// <summary>A list of declared classes a field holds, in order, each once; it starts as the standard object's list.</summary>
     /// @CSharpLua.Ignore
     public sealed class ObjectList<T>
     {
-        private readonly List<Type> types = new List<Type>();
+        // Each entry is a Type, or the id text of a standard object that has no standard class.
+        private readonly List<object> entries;
+        private readonly object[] standard;
 
-        /// <summary>The number of classes in the list.</summary>
-        public int Count
+        /// <summary>Makes an empty list.</summary>
+        public ObjectList()
+            : this(Array.Empty<object>())
         {
-            get { return types.Count; }
         }
 
-        /// <summary>The classes in the list, in order.</summary>
+        /// <summary>Makes a list that starts with the standard object's entries.</summary>
+        internal ObjectList(IReadOnlyList<object> standard)
+        {
+            this.standard = standard.ToArray();
+            entries = new List<object>(this.standard);
+        }
+
+        /// <summary>The number of entries in the list.</summary>
+        public int Count
+        {
+            get { return entries.Count; }
+        }
+
+        /// <summary>The classes in the list, in order; ids of standard objects with no class are left out.</summary>
         internal IReadOnlyList<Type> Types
         {
-            get { return types; }
+            get { return entries.OfType<Type>().ToList(); }
+        }
+
+        /// <summary>The entries in order: a <see cref="Type"/>, or the id text of a standard object with no class.</summary>
+        internal IReadOnlyList<object> Entries
+        {
+            get { return entries; }
+        }
+
+        /// <summary>The entries the list started with.</summary>
+        internal IReadOnlyList<object> Standard
+        {
+            get { return standard; }
         }
 
         /// <summary>Adds a class to the end of the list; one already there stays where it is.</summary>
         public void Add<TObject>()
             where TObject : T
         {
-            if (!types.Contains(typeof(TObject)))
+            if (!entries.Contains(typeof(TObject)))
             {
-                types.Add(typeof(TObject));
+                entries.Add(typeof(TObject));
             }
         }
 
@@ -35,14 +63,14 @@ namespace Moonwell.Objects
         public void Remove<TObject>()
             where TObject : T
         {
-            types.Remove(typeof(TObject));
+            entries.Remove(typeof(TObject));
         }
 
         /// <summary>Whether the list holds this class.</summary>
         public bool Contains<TObject>()
             where TObject : T
         {
-            return types.Contains(typeof(TObject));
+            return entries.Contains(typeof(TObject));
         }
     }
 }

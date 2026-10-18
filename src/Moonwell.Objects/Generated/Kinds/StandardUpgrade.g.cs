@@ -310,7 +310,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("greq")]
         public global::Moonwell.Objects.ObjectList<object> Requires
         {
-            get { return Fields.GetList<object>("greq"); }
+            get { return Fields.GetList<object>(this, "greq"); }
         }
 
         /// <summary>The field <c>grqc</c>.</summary>

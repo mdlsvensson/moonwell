@@ -28,7 +28,7 @@ namespace Moonwell.Objects.Tests
         [Field("utra")]
         public ObjectList<Moonwell.Unit> Trains
         {
-            get { return Fields.GetList<Moonwell.Unit>("utra"); }
+            get { return Fields.GetList<Moonwell.Unit>(this, "utra"); }
         }
 
         /// <summary>The unit this one upgrades to.</summary>

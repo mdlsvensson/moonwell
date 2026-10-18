@@ -1033,7 +1033,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("abuf")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Buff> Buffs
         {
-            get { return Fields.GetList<global::Moonwell.Buff>("abuf"); }
+            get { return Fields.GetList<global::Moonwell.Buff>(this, "abuf"); }
         }
 
         /// <summary>The field <c>aca1</c>.</summary>
@@ -1312,7 +1312,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("areq")]
         public global::Moonwell.Objects.ObjectList<object> Requires
         {
-            get { return Fields.GetList<object>("areq"); }
+            get { return Fields.GetList<object>(this, "areq"); }
         }
 
         /// <summary>The field <c>aret</c>.</summary>

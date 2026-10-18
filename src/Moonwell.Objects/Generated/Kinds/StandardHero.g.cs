@@ -512,7 +512,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("uabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Abilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("uabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "uabi"); }
         }
 
         /// <summary>The field <c>uabr</c>.</summary>
@@ -719,7 +719,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("ubui")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> Builds
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("ubui"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "ubui"); }
         }
 
         /// <summary>The field <c>ucam</c>.</summary>
@@ -861,7 +861,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("udep")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> DependencyEquivalents
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("udep"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "udep"); }
         }
 
         /// <summary>The field <c>udl1</c>.</summary>
@@ -1044,7 +1044,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("uhab")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> HeroAbilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("uhab"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "uhab"); }
         }
 
         /// <summary>The field <c>uhas</c>.</summary>
@@ -1379,7 +1379,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("umki")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Item> ItemsMade
         {
-            get { return Fields.GetList<global::Moonwell.Item>("umki"); }
+            get { return Fields.GetList<global::Moonwell.Item>(this, "umki"); }
         }
 
         /// <summary>The field <c>umpi</c>.</summary>
@@ -1562,7 +1562,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("upgr")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Upgrade> UpgradesUsed
         {
-            get { return Fields.GetList<global::Moonwell.Upgrade>("upgr"); }
+            get { return Fields.GetList<global::Moonwell.Upgrade>(this, "upgr"); }
         }
 
         /// <summary>The field <c>upoi</c>.</summary>
@@ -1665,14 +1665,14 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("ureq")]
         public global::Moonwell.Objects.ObjectList<object> Requires
         {
-            get { return Fields.GetList<object>("ureq"); }
+            get { return Fields.GetList<object>(this, "ureq"); }
         }
 
         /// <summary>The field <c>ures</c>.</summary>
         [global::Moonwell.Objects.Field("ures")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Upgrade> ResearchesAvailable
         {
-            get { return Fields.GetList<global::Moonwell.Upgrade>("ures"); }
+            get { return Fields.GetList<global::Moonwell.Upgrade>(this, "ures"); }
         }
 
         /// <summary>The field <c>urev</c>.</summary>
@@ -1719,56 +1719,56 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("urq1")]
         public global::Moonwell.Objects.ObjectList<object> RequirementsTier2
         {
-            get { return Fields.GetList<object>("urq1"); }
+            get { return Fields.GetList<object>(this, "urq1"); }
         }
 
         /// <summary>The field <c>urq2</c>.</summary>
         [global::Moonwell.Objects.Field("urq2")]
         public global::Moonwell.Objects.ObjectList<object> RequirementsTier3
         {
-            get { return Fields.GetList<object>("urq2"); }
+            get { return Fields.GetList<object>(this, "urq2"); }
         }
 
         /// <summary>The field <c>urq3</c>.</summary>
         [global::Moonwell.Objects.Field("urq3")]
         public global::Moonwell.Objects.ObjectList<object> RequirementsTier4
         {
-            get { return Fields.GetList<object>("urq3"); }
+            get { return Fields.GetList<object>(this, "urq3"); }
         }
 
         /// <summary>The field <c>urq4</c>.</summary>
         [global::Moonwell.Objects.Field("urq4")]
         public global::Moonwell.Objects.ObjectList<object> RequirementsTier5
         {
-            get { return Fields.GetList<object>("urq4"); }
+            get { return Fields.GetList<object>(this, "urq4"); }
         }
 
         /// <summary>The field <c>urq5</c>.</summary>
         [global::Moonwell.Objects.Field("urq5")]
         public global::Moonwell.Objects.ObjectList<object> RequirementsTier6
         {
-            get { return Fields.GetList<object>("urq5"); }
+            get { return Fields.GetList<object>(this, "urq5"); }
         }
 
         /// <summary>The field <c>urq6</c>.</summary>
         [global::Moonwell.Objects.Field("urq6")]
         public global::Moonwell.Objects.ObjectList<object> RequirementsTier7
         {
-            get { return Fields.GetList<object>("urq6"); }
+            get { return Fields.GetList<object>(this, "urq6"); }
         }
 
         /// <summary>The field <c>urq7</c>.</summary>
         [global::Moonwell.Objects.Field("urq7")]
         public global::Moonwell.Objects.ObjectList<object> RequirementsTier8
         {
-            get { return Fields.GetList<object>("urq7"); }
+            get { return Fields.GetList<object>(this, "urq7"); }
         }
 
         /// <summary>The field <c>urq8</c>.</summary>
         [global::Moonwell.Objects.Field("urq8")]
         public global::Moonwell.Objects.ObjectList<object> RequirementsTier9
         {
-            get { return Fields.GetList<object>("urq8"); }
+            get { return Fields.GetList<object>(this, "urq8"); }
         }
 
         /// <summary>The field <c>urqa</c>.</summary>
@@ -1815,7 +1815,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("urva")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> HeroRevivalLocations
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("urva"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "urva"); }
         }
 
         /// <summary>The field <c>usca</c>.</summary>
@@ -1854,14 +1854,14 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("usei")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Item> Sells
         {
-            get { return Fields.GetList<global::Moonwell.Item>("usei"); }
+            get { return Fields.GetList<global::Moonwell.Item>(this, "usei"); }
         }
 
         /// <summary>The field <c>useu</c>.</summary>
         [global::Moonwell.Objects.Field("useu")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> SellsUnits
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("useu"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "useu"); }
         }
 
         /// <summary>The field <c>usew</c>.</summary>
@@ -2140,7 +2140,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("utra")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> Trains
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("utra"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "utra"); }
         }
 
         /// <summary>The field <c>utss</c>.</summary>
@@ -2187,7 +2187,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("uupt")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UpgradesTo
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("uupt"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "uupt"); }
         }
 
         /// <summary>The field <c>uver</c>.</summary>

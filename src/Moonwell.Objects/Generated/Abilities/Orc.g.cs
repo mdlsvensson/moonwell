@@ -904,28 +904,28 @@ namespace Moonwell.Objects.Abilities.Orc
         [global::Moonwell.Objects.Field("Ply2")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsGround
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply2"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply2"); }
         }
 
         /// <summary>The field <c>Ply3</c>.</summary>
         [global::Moonwell.Objects.Field("Ply3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsAir
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply3"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply3"); }
         }
 
         /// <summary>The field <c>Ply4</c>.</summary>
         [global::Moonwell.Objects.Field("Ply4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsAmphibious
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply4"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply4"); }
         }
 
         /// <summary>The field <c>Ply5</c>.</summary>
         [global::Moonwell.Objects.Field("Ply5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsWater
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply5"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply5"); }
         }
     }
 
@@ -946,28 +946,28 @@ namespace Moonwell.Objects.Abilities.Orc
         [global::Moonwell.Objects.Field("Ply2")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsGround
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply2"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply2"); }
         }
 
         /// <summary>The field <c>Ply3</c>.</summary>
         [global::Moonwell.Objects.Field("Ply3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsAir
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply3"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply3"); }
         }
 
         /// <summary>The field <c>Ply4</c>.</summary>
         [global::Moonwell.Objects.Field("Ply4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsAmphibious
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply4"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply4"); }
         }
 
         /// <summary>The field <c>Ply5</c>.</summary>
         [global::Moonwell.Objects.Field("Ply5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsWater
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply5"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply5"); }
         }
     }
 

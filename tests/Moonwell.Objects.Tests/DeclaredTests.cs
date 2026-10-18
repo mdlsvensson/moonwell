@@ -68,6 +68,15 @@ namespace Moonwell.Objects.Tests
         }
     }
 
+    public class Barracks : Paladin
+    {
+        public Barracks()
+        {
+            Trains.Remove<Moonwell.Objects.Units.Human.Footman>();
+            Trains.Add<Arthas>();
+        }
+    }
+
     public class Thin : Paladin
     {
         public Thin()
@@ -185,6 +194,42 @@ namespace Moonwell.Objects.Tests
             trains.Remove<Footman>();
             Assert.False(trains.Contains<Footman>());
             Assert.Equal(new[] { typeof(Arthas) }, trains.Types);
+        }
+
+        [Fact]
+        public void list_starts_as_the_standard_list()
+        {
+            StandardValues.Read = (id, field, level) => id == "Hpal" && field == "utra" && level == 0 ? "hfoo,zzzz,Hpal" : null;
+
+            var trains = new Paladin().Trains;
+
+            Assert.Equal(3, trains.Count);
+            Assert.Equal(new object[] { typeof(Moonwell.Objects.Units.Human.Footman), "zzzz", typeof(Moonwell.Objects.Units.Human.Paladin) }, trains.Entries);
+            Assert.Equal(trains.Entries, trains.Standard);
+            Assert.Equal(new[] { typeof(Moonwell.Objects.Units.Human.Footman), typeof(Moonwell.Objects.Units.Human.Paladin) }, trains.Types);
+            Assert.True(trains.Contains<Moonwell.Objects.Units.Human.Footman>());
+        }
+
+        [Fact]
+        public void standard_entries_can_be_removed_and_classes_added_after_them()
+        {
+            StandardValues.Read = (id, field, level) => id == "Hpal" && field == "utra" && level == 0 ? "hfoo,zzzz" : null;
+
+            var trains = new Barracks().Trains;
+
+            Assert.Equal(new object[] { "zzzz", typeof(Arthas) }, trains.Entries);
+            Assert.Equal(new object[] { typeof(Moonwell.Objects.Units.Human.Footman), "zzzz" }, trains.Standard);
+            Assert.False(trains.Contains<Moonwell.Objects.Units.Human.Footman>());
+        }
+
+        [Fact]
+        public void list_of_a_field_with_levels_starts_as_level_1()
+        {
+            StandardValues.Read = (id, field, level) => id == "Hpal" && field == "utra" && level == 1 ? "hfoo" : null;
+
+            var trains = new Paladin().Trains;
+
+            Assert.Equal(new object[] { typeof(Moonwell.Objects.Units.Human.Footman) }, trains.Entries);
         }
 
         [Fact]

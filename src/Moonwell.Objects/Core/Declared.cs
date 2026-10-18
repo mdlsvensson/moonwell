@@ -7,6 +7,8 @@ namespace Moonwell.Objects
     /// @CSharpLua.Ignore
     public sealed class Declared
     {
+        private static readonly Lazy<Dictionary<string, Type>> StandardClasses = new Lazy<Dictionary<string, Type>>(FindStandardClasses);
+
         private readonly Dictionary<string, object?> values = new Dictionary<string, object?>();
 
         /// <summary>The fields that were put (and the lists and references that were asked for), by field id.</summary>
@@ -43,12 +45,12 @@ namespace Moonwell.Objects
             return new Levels<T>(level => StandardValues.Parse<T>(ReadStandard(owner, field, level)));
         }
 
-        /// <summary>Gives the list of a field, made empty the first time it is asked for.</summary>
-        public ObjectList<T> GetList<T>(string field)
+        /// <summary>Gives the list of a field, made the first time it is asked for as the standard object's list; a field with levels starts as level 1's.</summary>
+        public ObjectList<T> GetList<T>(object owner, string field)
         {
             if (!values.TryGetValue(field, out var list))
             {
-                list = new ObjectList<T>();
+                list = new ObjectList<T>(StandardEntries(ReadStandard(owner, field, 0) ?? ReadStandard(owner, field, 1)));
                 values[field] = list;
             }
 
@@ -67,11 +69,41 @@ namespace Moonwell.Objects
             return (ObjectRef<T>)reference!;
         }
 
+        private static List<object> StandardEntries(string? text)
+        {
+            var entries = new List<object>();
+            if (!string.IsNullOrEmpty(text))
+            {
+                foreach (var id in text.Split(','))
+                {
+                    entries.Add(StandardClasses.Value.TryGetValue(id, out var type) ? type : id);
+                }
+            }
+
+            return entries;
+        }
+
         private static string? ReadStandard(object owner, string field, int level)
         {
             var read = StandardValues.Read;
             var id = StandardIdOf(owner.GetType());
             return read == null || id == null ? null : read(id, field, level);
+        }
+
+        /// <summary>The standard classes of this assembly by the id they stand for.</summary>
+        private static Dictionary<string, Type> FindStandardClasses()
+        {
+            var classes = new Dictionary<string, Type>();
+            foreach (var type in typeof(Declared).Assembly.GetTypes())
+            {
+                var standard = (StandardAttribute?)Attribute.GetCustomAttribute(type, typeof(StandardAttribute), false);
+                if (standard != null)
+                {
+                    classes[standard.Id] = type;
+                }
+            }
+
+            return classes;
         }
 
         /// <summary>The id of the nearest class in the base chain that is a standard object; null when none is.</summary>

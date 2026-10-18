@@ -27,7 +27,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("hwc1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> BonusAbilitiesList
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("hwc1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "hwc1"); }
         }
     }
 
@@ -40,7 +40,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("hwc1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> BonusAbilitiesList
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("hwc1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "hwc1"); }
         }
     }
 
@@ -796,28 +796,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -1874,28 +1874,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -1984,28 +1984,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -2034,28 +2034,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -2142,28 +2142,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -2192,28 +2192,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -2240,7 +2240,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ibl1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UnitCreatedPerPlayerRace
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ibl1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ibl1"); }
         }
     }
 
@@ -2253,7 +2253,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ibl1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UnitCreatedPerPlayerRace
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ibl1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ibl1"); }
         }
     }
 
@@ -2266,7 +2266,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ibl1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UnitCreatedPerPlayerRace
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ibl1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ibl1"); }
         }
     }
 
@@ -2279,7 +2279,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ibl1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UnitCreatedPerPlayerRace
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ibl1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ibl1"); }
         }
     }
 
@@ -2292,7 +2292,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ibl1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UnitCreatedPerPlayerRace
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ibl1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ibl1"); }
         }
     }
 
@@ -2305,7 +2305,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ibl1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UnitCreatedPerPlayerRace
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ibl1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ibl1"); }
         }
     }
 
@@ -2318,7 +2318,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ibl1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UnitCreatedPerPlayerRace
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ibl1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ibl1"); }
         }
     }
 
@@ -2331,7 +2331,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ibl1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UnitCreatedPerPlayerRace
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ibl1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ibl1"); }
         }
     }
 
@@ -2566,28 +2566,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -2661,28 +2661,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -2741,28 +2741,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -2791,28 +2791,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -2909,28 +2909,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -3056,28 +3056,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -3152,28 +3152,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -3202,28 +3202,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -3550,28 +3550,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -3614,28 +3614,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -3742,28 +3742,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -3792,28 +3792,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -3962,28 +3962,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -4012,28 +4012,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -4062,28 +4062,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -4843,28 +4843,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -4893,28 +4893,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -5586,28 +5586,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -5636,28 +5636,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -5756,28 +5756,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -5806,28 +5806,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -5870,28 +5870,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -5958,28 +5958,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -6160,28 +6160,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -7061,7 +7061,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -7122,7 +7122,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -7183,7 +7183,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -7382,7 +7382,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -7440,7 +7440,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -8111,7 +8111,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -8172,7 +8172,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -8415,7 +8415,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -8551,7 +8551,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -8612,7 +8612,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -8717,7 +8717,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -8792,7 +8792,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -8907,7 +8907,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9116,7 +9116,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9223,7 +9223,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9314,7 +9314,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9405,7 +9405,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9466,7 +9466,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9587,7 +9587,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9648,7 +9648,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9910,7 +9910,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -9971,7 +9971,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -10164,7 +10164,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -11665,7 +11665,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -11694,7 +11694,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -11755,7 +11755,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -11889,7 +11889,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -12216,7 +12216,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -12533,7 +12533,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -12594,7 +12594,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -12655,7 +12655,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -12716,7 +12716,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -12867,7 +12867,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ndp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> SpawnedUnits
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ndp1"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ndp1"); }
         }
 
         /// <summary>The field <c>Ndp2</c>.</summary>
@@ -13494,7 +13494,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -13693,7 +13693,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -13775,7 +13775,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -13887,7 +13887,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -13948,7 +13948,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -13991,7 +13991,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -14052,7 +14052,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -14113,7 +14113,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -14318,7 +14318,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -14996,7 +14996,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -15055,7 +15055,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -15084,7 +15084,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -16627,7 +16627,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -16756,7 +16756,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -16855,7 +16855,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -16954,7 +16954,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -17041,7 +17041,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -17335,7 +17335,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -17485,7 +17485,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -17984,7 +17984,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -18695,7 +18695,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -19149,7 +19149,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -19264,7 +19264,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -19401,7 +19401,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -19452,7 +19452,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -19519,7 +19519,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -19810,7 +19810,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -19893,7 +19893,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -20316,7 +20316,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -20445,7 +20445,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -20536,7 +20536,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -20659,7 +20659,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -20720,7 +20720,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -20803,7 +20803,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -20875,7 +20875,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -20942,28 +20942,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Ply2")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsGround
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply2"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply2"); }
         }
 
         /// <summary>The field <c>Ply3</c>.</summary>
         [global::Moonwell.Objects.Field("Ply3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsAir
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply3"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply3"); }
         }
 
         /// <summary>The field <c>Ply4</c>.</summary>
         [global::Moonwell.Objects.Field("Ply4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsAmphibious
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply4"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply4"); }
         }
 
         /// <summary>The field <c>Ply5</c>.</summary>
         [global::Moonwell.Objects.Field("Ply5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> MorphUnitsWater
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("Ply5"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "Ply5"); }
         }
     }
 
@@ -20984,7 +20984,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -21221,7 +21221,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -22643,7 +22643,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -22710,7 +22710,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -22977,7 +22977,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -23297,7 +23297,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -23420,7 +23420,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -23541,7 +23541,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -23623,7 +23623,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -23889,7 +23889,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -23948,7 +23948,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -24101,7 +24101,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -24160,28 +24160,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -24248,28 +24248,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -24355,28 +24355,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -24717,28 +24717,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -24767,28 +24767,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -24928,28 +24928,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -25176,28 +25176,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -25308,7 +25308,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -25352,7 +25352,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -25381,7 +25381,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("opp1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Ability
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("opp1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "opp1"); }
         }
 
         /// <summary>The field <c>opp2</c>.</summary>
@@ -25426,28 +25426,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -25564,28 +25564,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -25822,28 +25822,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -26091,28 +26091,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -26163,28 +26163,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -26213,28 +26213,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -26401,28 +26401,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -26533,28 +26533,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -27173,28 +27173,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -27223,28 +27223,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -27273,28 +27273,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -27323,28 +27323,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -27460,28 +27460,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -27989,28 +27989,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -28060,28 +28060,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -28370,28 +28370,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -28541,28 +28541,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -28871,28 +28871,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -28905,7 +28905,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("spb1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> SpellList
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("spb1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "spb1"); }
         }
 
         /// <summary>The field <c>spb2</c>.</summary>
@@ -29045,28 +29045,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -29117,28 +29117,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -29257,28 +29257,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -29329,28 +29329,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -29439,28 +29439,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -30439,7 +30439,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("aabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> TalentTierAbilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("aabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "aabi"); }
         }
     }
 
@@ -30452,7 +30452,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("aabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> TalentTierAbilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("aabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "aabi"); }
         }
     }
 
@@ -30465,7 +30465,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("aabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> TalentTierAbilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("aabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "aabi"); }
         }
     }
 
@@ -30478,7 +30478,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("aabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> TalentTierAbilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("aabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "aabi"); }
         }
     }
 
@@ -30491,7 +30491,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("aabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> TalentTierAbilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("aabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "aabi"); }
         }
     }
 
@@ -30504,7 +30504,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("aabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> TalentTierAbilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("aabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "aabi"); }
         }
     }
 
@@ -30517,7 +30517,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("aabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> TalentTierAbilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("aabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "aabi"); }
         }
     }
 
@@ -30546,28 +30546,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -30596,28 +30596,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -30668,28 +30668,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -30804,28 +30804,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -30854,28 +30854,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -30904,28 +30904,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -31248,28 +31248,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -31525,28 +31525,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -31575,28 +31575,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -32153,28 +32153,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -32255,28 +32255,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -32303,7 +32303,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("hwc1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> BonusAbilitiesList
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("hwc1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "hwc1"); }
         }
     }
 
@@ -32316,7 +32316,7 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("hwc1")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> BonusAbilitiesList
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("hwc1"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "hwc1"); }
         }
     }
 
@@ -32460,28 +32460,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 
@@ -32694,28 +32694,28 @@ namespace Moonwell.Objects.Abilities.Other
         [global::Moonwell.Objects.Field("Neg3")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade1
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg3"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg3"); }
         }
 
         /// <summary>The field <c>Neg4</c>.</summary>
         [global::Moonwell.Objects.Field("Neg4")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade2
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg4"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg4"); }
         }
 
         /// <summary>The field <c>Neg5</c>.</summary>
         [global::Moonwell.Objects.Field("Neg5")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade3
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg5"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg5"); }
         }
 
         /// <summary>The field <c>Neg6</c>.</summary>
         [global::Moonwell.Objects.Field("Neg6")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("Neg6"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
         }
     }
 }

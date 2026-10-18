@@ -72,7 +72,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("iabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Abilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("iabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "iabi"); }
         }
 
         /// <summary>The field <c>iarm</c>.</summary>
@@ -414,7 +414,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("ureq")]
         public global::Moonwell.Objects.ObjectList<object> Requires
         {
-            get { return Fields.GetList<object>("ureq"); }
+            get { return Fields.GetList<object>(this, "ureq"); }
         }
 
         /// <summary>The field <c>urqa</c>.</summary>

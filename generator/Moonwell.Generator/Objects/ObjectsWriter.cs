@@ -245,7 +245,7 @@ public static class ObjectsWriter
         text.Append($"{indent}public {PropertyType(field)} {field.Name}\n{indent}{{\n");
         if (field.Type == FieldType.ObjectList)
         {
-            text.Append($"{indent}    get {{ return Fields.GetList<{element}>({id}); }}\n");
+            text.Append($"{indent}    get {{ return Fields.GetList<{element}>(this, {id}); }}\n");
         }
         else if (field.Type == FieldType.ObjectRef)
         {

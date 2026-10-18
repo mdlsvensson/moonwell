@@ -487,7 +487,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("uabi")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Abilities
         {
-            get { return Fields.GetList<global::Moonwell.Ability>("uabi"); }
+            get { return Fields.GetList<global::Moonwell.Ability>(this, "uabi"); }
         }
 
         /// <summary>The field <c>uabr</c>.</summary>
@@ -670,7 +670,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("ubui")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> Builds
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("ubui"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "ubui"); }
         }
 
         /// <summary>The field <c>ucam</c>.</summary>
@@ -812,7 +812,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("udep")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> DependencyEquivalents
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("udep"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "udep"); }
         }
 
         /// <summary>The field <c>udl1</c>.</summary>
@@ -1283,7 +1283,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("umki")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Item> ItemsMade
         {
-            get { return Fields.GetList<global::Moonwell.Item>("umki"); }
+            get { return Fields.GetList<global::Moonwell.Item>(this, "umki"); }
         }
 
         /// <summary>The field <c>umpi</c>.</summary>
@@ -1466,7 +1466,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("upgr")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Upgrade> UpgradesUsed
         {
-            get { return Fields.GetList<global::Moonwell.Upgrade>("upgr"); }
+            get { return Fields.GetList<global::Moonwell.Upgrade>(this, "upgr"); }
         }
 
         /// <summary>The field <c>upoi</c>.</summary>
@@ -1545,14 +1545,14 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("ureq")]
         public global::Moonwell.Objects.ObjectList<object> Requires
         {
-            get { return Fields.GetList<object>("ureq"); }
+            get { return Fields.GetList<object>(this, "ureq"); }
         }
 
         /// <summary>The field <c>ures</c>.</summary>
         [global::Moonwell.Objects.Field("ures")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Upgrade> ResearchesAvailable
         {
-            get { return Fields.GetList<global::Moonwell.Upgrade>("ures"); }
+            get { return Fields.GetList<global::Moonwell.Upgrade>(this, "ures"); }
         }
 
         /// <summary>The field <c>urev</c>.</summary>
@@ -1663,14 +1663,14 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("usei")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Item> Sells
         {
-            get { return Fields.GetList<global::Moonwell.Item>("usei"); }
+            get { return Fields.GetList<global::Moonwell.Item>(this, "usei"); }
         }
 
         /// <summary>The field <c>useu</c>.</summary>
         [global::Moonwell.Objects.Field("useu")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> SellsUnits
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("useu"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "useu"); }
         }
 
         /// <summary>The field <c>usew</c>.</summary>
@@ -1925,7 +1925,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("utra")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> Trains
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("utra"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "utra"); }
         }
 
         /// <summary>The field <c>utss</c>.</summary>
@@ -1972,7 +1972,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("uupt")]
         public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> UpgradesTo
         {
-            get { return Fields.GetList<global::Moonwell.Unit>("uupt"); }
+            get { return Fields.GetList<global::Moonwell.Unit>(this, "uupt"); }
         }
 
         /// <summary>The field <c>uver</c>.</summary>

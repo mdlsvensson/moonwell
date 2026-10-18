@@ -212,7 +212,7 @@ public class ObjectsWriterTests
         Assert.Contains(
             "public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Abilities\n"
             + "        {\n"
-            + "            get { return Fields.GetList<global::Moonwell.Ability>(\"uabi\"); }\n"
+            + "            get { return Fields.GetList<global::Moonwell.Ability>(this, \"uabi\"); }\n"
             + "        }\n",
             unit);
         Assert.Contains(
