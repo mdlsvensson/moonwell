@@ -15,6 +15,7 @@ public static class ClassNames
     private const string Root = "Moonwell.Objects";
     private const string CampaignPart = "Campaign";
     private const string OtherPart = "Other";
+    private const string ProperNamesId = "upro";
 
     private static readonly Dictionary<string, string> Races = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -55,7 +56,7 @@ public static class ClassNames
     /// The class name of each of <paramref name="objects"/>, keyed by kind and id. The namespace is
     /// <c>Moonwell.Objects.</c> and the kind's plural, then the race for a unit, ability, buff or upgrade
     /// (<c>Campaign</c> for a campaign unit). The name is the in-game name as <see cref="FieldNames.FromLabel"/>
-    /// writes it, or the id when there is none.
+    /// writes it, or the id when there is none; a hero with exactly one proper name (<c>Arthas</c>) is named by it.
     /// </summary>
     /// <remarks>
     /// A name that is a C# keyword, the last part of its namespace or a type of <see cref="TakenByTypes"/> gets the
@@ -130,13 +131,30 @@ public static class ClassNames
 
     private static string Plain(StandardObject o)
     {
-        var name = FieldNames.FromLabel(o.Name);
+        var name = FieldNames.FromLabel(SingleProperName(o) ?? o.Name);
+        if (name.Length == 0)
+        {
+            name = FieldNames.FromLabel(o.Name);
+        }
+
         if (name.Length > 0)
         {
             return name;
         }
 
         return o.Id.Length > 0 && char.IsAsciiDigit(o.Id[0]) ? "_" + o.Id : o.Id;
+    }
+
+    /// <summary>The proper name of a hero whose proper names hold exactly one non-empty name, otherwise null.</summary>
+    private static string? SingleProperName(StandardObject o)
+    {
+        if (!o.IsHero || !o.Values.TryGetValue(ProperNamesId, out var names))
+        {
+            return null;
+        }
+
+        var parts = names.Split(',');
+        return parts.Length == 1 && parts[0].Trim().Length > 0 ? parts[0].Trim() : null;
     }
 
     private static bool IsReserved(string name, string space)

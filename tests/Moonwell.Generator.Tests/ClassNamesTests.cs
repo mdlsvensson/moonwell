@@ -9,7 +9,8 @@ public class ClassNamesTests
         string id,
         string name,
         string race = "",
-        bool campaign = false)
+        bool campaign = false,
+        string? properNames = null)
     {
         return new StandardObject(
             kind,
@@ -19,7 +20,7 @@ public class ClassNamesTests
             campaign,
             kind == Kind.Unit && char.IsAsciiLetterUpper(id[0]),
             null,
-            new Dictionary<string, string>(),
+            properNames == null ? new Dictionary<string, string>() : new Dictionary<string, string> { ["upro"] = properNames },
             new Dictionary<string, IReadOnlyDictionary<string, string>>(),
             new List<string>());
     }
@@ -83,8 +84,8 @@ public class ClassNamesTests
     {
         var names = ClassNames.Assign(new[]
         {
-            Object(Kind.Unit, "Hart", "Arthas", campaign: true),
-            Object(Kind.Unit, "Uear", "Arthas", campaign: true),
+            Object(Kind.Unit, "Hart", "Paladin", campaign: true, properNames: "Arthas"),
+            Object(Kind.Unit, "Uear", "Lich", campaign: true, properNames: "Arthas"),
             Object(Kind.Unit, "hfoo", "Footman", "human", campaign: true),
         });
 
@@ -96,9 +97,49 @@ public class ClassNamesTests
     [Fact]
     public void campaign_namespace()
     {
-        var arthas = Object(Kind.Unit, "Hart", "Arthas", "human", campaign: true);
+        var arthas = Object(Kind.Unit, "Hart", "Paladin", "human", campaign: true, properNames: "Arthas");
 
         Assert.Equal("Moonwell.Objects.Units.Campaign.Arthas", FullName(arthas));
+    }
+
+    [Fact]
+    public void a_hero_with_several_proper_names_keeps_its_class_name()
+    {
+        var paladin = Object(Kind.Unit, "Hpal", "Paladin", "human", properNames: "Granis Darkhammer,Jorn the Redeemer");
+
+        Assert.Equal("Moonwell.Objects.Units.Human.Paladin", FullName(paladin));
+    }
+
+    [Fact]
+    public void a_hero_with_one_proper_name_is_named_by_it()
+    {
+        Assert.Equal(
+            "Moonwell.Objects.Units.Campaign.KelThuzad",
+            FullName(Object(Kind.Unit, "Uktl", "Lich", "undead", true, " Kel'Thuzad ")));
+        Assert.Equal("Moonwell.Objects.Units.Human.Paladin", FullName(Object(Kind.Unit, "Hxxx", "Paladin", "human", properNames: " ")));
+        Assert.Equal("Moonwell.Objects.Units.Human.Paladin", FullName(Object(Kind.Unit, "Hyyy", "Paladin", "human", properNames: "'")));
+        Assert.Equal("Moonwell.Objects.Units.Human.Paladin", FullName(Object(Kind.Unit, "Hzzz", "Paladin", "human", properNames: "Arthas,")));
+    }
+
+    [Fact]
+    public void a_non_hero_with_one_proper_name_is_unaffected()
+    {
+        var unit = Object(Kind.Unit, "hfoo", "Footman", "human", properNames: "Arthas");
+
+        Assert.Equal("Moonwell.Objects.Units.Human.Footman", FullName(unit));
+    }
+
+    [Fact]
+    public void two_heroes_with_the_same_proper_name_both_get_ids()
+    {
+        var names = ClassNames.Assign(new[]
+        {
+            Object(Kind.Unit, "Hct1", "Guard Lieutenant", "human", properNames: "Garek"),
+            Object(Kind.Unit, "Hctl", "Guard Captain", "human", properNames: "Garek"),
+        });
+
+        Assert.Equal("Garek", names[(Kind.Unit, "Hct1")].Name);
+        Assert.Equal("GarekHctl", names[(Kind.Unit, "Hctl")].Name);
     }
 
     [Fact]
