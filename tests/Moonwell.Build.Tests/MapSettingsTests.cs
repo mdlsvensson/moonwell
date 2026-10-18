@@ -54,6 +54,67 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void static_field_game_call_names_line()
+        {
+            using var folders = new TestFolders();
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllText(
+                Path.Combine(folder, "Map.cs"),
+                "using Moonwell;\n"
+                + "\n"
+                + "namespace Sample\n"
+                + "{\n"
+                + "    public sealed class SampleMap : Map\n"
+                + "    {\n"
+                + "        // The static field runs before the constructor does.\n"
+                + "        private static readonly int Seed = Natives.GetRandomInt(1, 2);\n"
+                + "\n"
+                + "        public SampleMap()\n"
+                + "        {\n"
+                + "            Name = \"Seed \" + Seed;\n"
+                + "        }\n"
+                + "    }\n"
+                + "}\n");
+            var project = MapProject.Find(folder);
+            var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
+
+            var error = Assert.Throws<BuildException>(() => MapSettingsReader.Read(assembly, project));
+
+            Assert.Equal(
+                "Map.cs:8: Sample.SampleMap calls the game while it is declared; game work starts from a reaction or the game's start",
+                error.Message);
+        }
+
+        [Fact]
+        public void hiding_property_is_read_from_the_map_base()
+        {
+            using var folders = new TestFolders();
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllText(
+                Path.Combine(folder, "Map.cs"),
+                "using Moonwell;\n"
+                + "\n"
+                + "namespace Sample\n"
+                + "{\n"
+                + "    public sealed class SampleMap : Map\n"
+                + "    {\n"
+                + "        public SampleMap()\n"
+                + "        {\n"
+                + "            base.Name = \"Base name\";\n"
+                + "        }\n"
+                + "\n"
+                + "        public new string Name => \"Hiding name\";\n"
+                + "    }\n"
+                + "}\n");
+            var project = MapProject.Find(folder);
+            var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
+
+            var settings = MapSettingsReader.Read(assembly, project);
+
+            Assert.Equal("Base name", settings.Name);
+        }
+
+        [Fact]
         public void throwing_constructor_names_line()
         {
             AssertReadFails("Throws", "Map.cs:9: Throws.GameMap's constructor threw: no name");

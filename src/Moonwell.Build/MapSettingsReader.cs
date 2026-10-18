@@ -110,12 +110,25 @@ namespace Moonwell.Build
 
         private static string ReadSetting(object map, string property)
         {
-            var info = map.GetType().GetProperty(property, BindingFlags.Instance | BindingFlags.Public)!;
+            // Read from the Moonwell.Map base type, so that a property the class hides with new is not asked for.
+            var baseType = map.GetType().BaseType!;
+            while (baseType.FullName != MapBaseName)
+            {
+                baseType = baseType.BaseType!;
+            }
+
+            var info = baseType.GetProperty(property, BindingFlags.Instance | BindingFlags.Public)!;
             return (string?)info.GetValue(map) ?? string.Empty;
         }
 
         private static BuildException ConstructionError(Exception inner, string name, MapProject project)
         {
+            // A static field or a static constructor that throws surfaces as the type initializer's failure.
+            while (inner is TypeInitializationException { InnerException: not null })
+            {
+                inner = inner.InnerException!;
+            }
+
             var place = FirstLineInProject(inner, project);
             var prefix = place == null ? string.Empty : place + ": ";
             if (inner is BadImageFormatException)
