@@ -1,0 +1,95 @@
+namespace Moonwell.Analyzers.Tests;
+
+/// <summary>MW0003 to MW0005: handle ids, hash loops and number types, anywhere in map code.</summary>
+public class AnywhereTests
+{
+    [Fact]
+    public void get_handle_id_is_rejected()
+    {
+        Assert.Equal(new[] { "MW0003: Natives.GetHandleId(u)", "MW0003: Natives.GetHandleIdBJ(u)" },
+            MapCode.Check("var a = Natives.GetHandleId(u); var b = Natives.GetHandleIdBJ(u);"));
+    }
+
+    [Fact]
+    public void looping_over_a_dictionary_or_hash_set_is_rejected()
+    {
+        var found = MapCode.Check("""
+            var map = new Dictionary<unit, int>();
+            var set = new HashSet<int>();
+            foreach (var pair in map) { }
+            foreach (var key in map.Keys) { }
+            foreach (var item in set) { }
+            var first = set.First();
+            var copy = new List<int>(set);
+            var text = string.Join(",", map.Values);
+            """);
+
+        Assert.Equal(new[]
+        {
+            "MW0004: map",
+            "MW0004: map.Keys",
+            "MW0004: set",
+            "MW0004: set",
+            "MW0004: set",
+            "MW0004: map.Values",
+        }, found);
+    }
+
+    [Fact]
+    public void lookups_and_ordered_loops_are_allowed()
+    {
+        Assert.Empty(MapCode.Check("""
+            var map = new Dictionary<unit, int>();
+            map[u] = 1;
+            var has = map.ContainsKey(u) && map.TryGetValue(u, out var value) && new HashSet<int>().Contains(value);
+            var list = new List<int> { 1, 2 };
+            foreach (var item in list) { }
+            var ordered = new OrderedSet<int>();
+            foreach (var item in ordered.Snapshot()) { }
+            """));
+    }
+
+    [Fact]
+    public void number_types_the_game_cannot_carry_are_rejected()
+    {
+        var found = MapCode.Check(
+            """
+            long a = 1;
+            var b = 1.5;
+            var c = new List<double>();
+            var d = (long)a;
+            float e = (float)Math.Sqrt(4f);
+            var f = 2u;
+            """,
+            """
+                private static uint count;
+                private static ulong Big(int x) => 0;
+                private static void Take(double x) { }
+                private enum Wide : long { One }
+            """);
+
+        Assert.Equal(new[]
+        {
+            "MW0005: a",
+            "MW0005: b",
+            "MW0005: 1.5",
+            "MW0005: c",
+            "MW0005: d",
+            "MW0005: (long)a",
+            "MW0005: f",
+            "MW0005: 2u",
+            "MW0005: count",
+            "MW0005: Big",
+            "MW0005: Take",
+            "MW0005: Wide",
+        }, found);
+    }
+
+    [Fact]
+    public void a_number_type_message_says_what_to_use()
+    {
+        Assert.Equal("'uint' arithmetic becomes a float in the game's Lua; use int", MapCode.Message("", "private static uint count;"));
+        Assert.Equal("'double' is a single-precision float in the game's Lua; use float", MapCode.Message("", "private static double rate;"));
+        Assert.Equal("'long' is a 32-bit integer in the game's Lua; use int", MapCode.Message("", "private static long total;"));
+    }
+}

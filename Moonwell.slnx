@@ -3,6 +3,7 @@
     <Project Path="generator/Moonwell.Generator/Moonwell.Generator.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/Moonwell.Analyzers/Moonwell.Analyzers.csproj" />
     <Project Path="src/Moonwell.Build/Moonwell.Build.csproj" />
     <Project Path="src/Moonwell.Cli/Moonwell.Cli.csproj" />
     <Project Path="src/Moonwell.Natives/Moonwell.Natives.csproj" />
@@ -10,6 +11,7 @@
     <Project Path="src/Moonwell/Moonwell.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Moonwell.Analyzers.Tests/Moonwell.Analyzers.Tests.csproj" />
     <Project Path="tests/Moonwell.Build.Tests/Moonwell.Build.Tests.csproj" />
     <Project Path="tests/Moonwell.Generator.Tests/Moonwell.Generator.Tests.csproj" />
     <Project Path="tests/Moonwell.Lua.Tests/Moonwell.Lua.Tests.csproj" />
