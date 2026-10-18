@@ -19,6 +19,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "collections.map-remove", Run = CollectionCases.MapRemove });
             list.Add(new Case { Name = "errors.log-line", Run = ErrorCases.LogLine });
             list.Add(new Case { Name = "errors.screen-line", Run = ErrorCases.ScreenLine });
+            list.Add(new Case { Name = "errors.log-line-where", Run = ErrorCases.LogLineWhere });
+            list.Add(new Case { Name = "errors.screen-line-where", Run = ErrorCases.ScreenLineWhere });
             list.Add(new Case { Name = "errors.shows-at", Run = ErrorCases.ShowsAt });
             list.Add(new Case { Name = "errors.report-throttles", Run = ErrorCases.ReportThrottles });
             list.Add(new Case { Name = "errors.report-many-keys", Run = ErrorCases.ReportManyKeys });

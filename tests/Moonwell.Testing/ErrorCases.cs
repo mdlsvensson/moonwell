@@ -8,15 +8,33 @@ namespace Moonwell.Testing
         /// <summary>The log line of an error is the head and the message, and the count shows when it repeats.</summary>
         public static void LogLine(FakeWorld world)
         {
-            Expect.Equal("Moonwell: Rage.OnDamaged failed: boom", Errors.LogLine("Rage.OnDamaged", "boom", 1), "log line at 1");
-            Expect.Equal("Moonwell: Rage.OnDamaged failed 10 times: boom", Errors.LogLine("Rage.OnDamaged", "boom", 10), "log line at 10");
+            Expect.Equal("Moonwell: Rage.OnDamaged failed: boom", Errors.LogLine("Rage.OnDamaged", "boom", 1, ""), "log line at 1");
+            Expect.Equal("Moonwell: Rage.OnDamaged failed 10 times: boom", Errors.LogLine("Rage.OnDamaged", "boom", 10, ""), "log line at 10");
+        }
+
+        /// <summary>The log line names every location, innermost first.</summary>
+        public static void LogLineWhere(FakeWorld world)
+        {
+            Expect.Equal("Moonwell: Rage.OnDamaged failed: boom (Rage.cs:12)", Errors.LogLine("Rage.OnDamaged", "boom", 1, "Rage.cs:12"), "log line with one location");
+            Expect.Equal(
+                "Moonwell: Rage.OnDamaged failed: boom (Rage.cs:12, from Units/Helper.cs:30, Rage.cs:8)",
+                Errors.LogLine("Rage.OnDamaged", "boom", 1, "Rage.cs:12\nUnits/Helper.cs:30\nRage.cs:8"),
+                "log line with three locations");
         }
 
         /// <summary>The screen line is coloured, and a release build shows the head only.</summary>
         public static void ScreenLine(FakeWorld world)
         {
-            Expect.Equal("|cffff4040Moonwell: Rage.OnDamaged failed:|r boom", Errors.ScreenLine("Rage.OnDamaged", "boom", 1, false), "development screen line");
-            Expect.Equal("|cffff4040Moonwell: Rage.OnDamaged failed|r", Errors.ScreenLine("Rage.OnDamaged", "boom", 1, true), "release screen line");
+            Expect.Equal("|cffff4040Moonwell: Rage.OnDamaged failed:|r boom", Errors.ScreenLine("Rage.OnDamaged", "boom", 1, false, ""), "development screen line");
+            Expect.Equal("|cffff4040Moonwell: Rage.OnDamaged failed|r", Errors.ScreenLine("Rage.OnDamaged", "boom", 1, true, ""), "release screen line");
+        }
+
+        /// <summary>The screen line names the innermost location only.</summary>
+        public static void ScreenLineWhere(FakeWorld world)
+        {
+            var where = "Rage.cs:12\nUnits/Helper.cs:30";
+            Expect.Equal("|cffff4040Moonwell: Rage.OnDamaged failed:|r boom (Rage.cs:12)", Errors.ScreenLine("Rage.OnDamaged", "boom", 1, false, where), "development screen line with locations");
+            Expect.Equal("|cffff4040Moonwell: Rage.OnDamaged failed|r (Rage.cs:12)", Errors.ScreenLine("Rage.OnDamaged", "boom", 1, true, where), "release screen line with locations");
         }
 
         /// <summary>An error shows at its first time, and then at every power of ten.</summary>

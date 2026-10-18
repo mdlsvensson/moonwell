@@ -87,3 +87,84 @@ function MoonwellField(obj, id, kind)
   end
   return value
 end
+
+-- Where errors happened. The build appends MoonwellLines, a table from the script's lines to C# files and lines (LineTable in
+-- Moonwell.Build): files lists the marked files, and map holds triples in script order (the line as the difference from the
+-- previous triple's, the file's number or 0 for none, the C# line). CoreSystem calls an exception's traceback where it is
+-- thrown and in try's handler, before the stack unwinds; this one reads the stack with error's position, which
+-- pcall(error, "", level) gives without the debug library, and keeps the C# locations, innermost first, one a line, at most
+-- eight. MoonwellWhere(e) gives them to Errors.Where. A Lua error's message loses its position in war3map.lua.
+local lineStarts, lineFiles, lineNumbers
+
+local function loadLines()
+  lineStarts, lineFiles, lineNumbers = {}, {}, {}
+  local lines = rawget(_G, "MoonwellLines")
+  if type(lines) ~= "table" or type(lines.map) ~= "string" then return end
+  local line, count, k, triple = 0, 0, 0, {}
+  for number in string.gmatch(lines.map, "%d+") do
+    k = k + 1
+    triple[k] = tonumber(number)
+    if k == 3 then
+      line = line + triple[1]
+      count = count + 1
+      lineStarts[count] = line
+      lineFiles[count] = lines.files[triple[2]]
+      lineNumbers[count] = triple[3]
+      k = 0
+    end
+  end
+end
+
+local function locationOf(line)
+  if lineStarts == nil then loadLines() end
+  local low, high, found = 1, #lineStarts, 0
+  while low <= high do
+    local middle = (low + high) // 2
+    if lineStarts[middle] <= line then
+      found = middle
+      low = middle + 1
+    else
+      high = middle - 1
+    end
+  end
+  local file = lineFiles[found]
+  if file == nil then return nil end
+  return file .. ":" .. lineNumbers[found]
+end
+
+local maxLevels = 32
+local maxLocations = 8
+
+local function stackLocations()
+  local found, count, last = {}, 0, nil
+  for level = 2, maxLevels do
+    local _, position = pcall(error, "", level)
+    local digits = type(position) == "string" and string.match(position, ":(%d+): $")
+    local location = digits and locationOf(tonumber(digits))
+    if location ~= nil and location ~= last then
+      count = count + 1
+      found[count] = location
+      last = location
+      if count == maxLocations then break end
+    end
+  end
+  return table.concat(found, "\n")
+end
+
+local function withoutPosition(message)
+  if type(message) ~= "string" then return message end
+  return string.match(message, '^%[string "war3map%.lua"%]:%d+: (.*)$')
+    or string.match(message, "^war3map%.lua:%d+: (.*)$")
+    or message
+end
+
+-- A rethrown exception keeps where it was first thrown.
+System.Exception.traceback = function (this)
+  if this.moonwellWhere ~= nil then return end
+  this.moonwellWhere = stackLocations()
+  this.message = withoutPosition(this.message)
+end
+
+function MoonwellWhere(e)
+  return e.moonwellWhere or ""
+end
