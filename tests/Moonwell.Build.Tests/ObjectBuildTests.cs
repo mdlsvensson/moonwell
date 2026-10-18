@@ -228,6 +228,31 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_stale_objects_library_beside_the_assembly_does_not_make_the_objects_build()
+        {
+            var copy = folders.TemporaryCopyOfSample();
+            File.Delete(Path.Combine(copy, "Objects.cs"));
+            File.Delete(Path.Combine(copy, "ids.json"));
+            var project = Path.Combine(copy, "Sample.csproj");
+            var text = File.ReadAllText(project);
+            File.WriteAllText(project, Regex.Replace(text, @"[ 	]*<ProjectReference [^>]*Moonwell\.Objects\.csproj"" />?
+", string.Empty));
+
+            // The library an earlier build of the project, when it still used Moonwell.Objects, left in its output.
+            var output = Path.Combine(copy, "bin", "Debug", "net10.0");
+            Directory.CreateDirectory(output);
+            File.Copy(Path.Combine(TestFolders.Fixture("Sample"), "bin", "Debug", "net10.0", "Moonwell.Objects.dll"), Path.Combine(output, "Moonwell.Objects.dll"));
+
+            var log = new StringWriter();
+            var archive = MapBuild.Run(copy, new BuildOptions(), log);
+
+            Assert.True(File.Exists(archive), log.ToString());
+            Assert.True(File.Exists(Path.Combine(output, "Moonwell.Objects.dll")));
+            Assert.False(File.Exists(Path.Combine(copy, "ids.json")));
+            Assert.DoesNotContain("MoonwellObjectValues = {", File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua")));
+        }
+
+        [Fact]
         public void source_map_ids_are_those_of_its_object_files()
         {
             var copy = folders.TemporaryCopyOfSample();

@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 
 namespace Moonwell.Build
@@ -22,6 +24,25 @@ namespace Moonwell.Build
             ["Moonwell.Objects.StandardBuff"] = "buff",
             ["Moonwell.Objects.StandardUpgrade"] = "upgrade",
         };
+
+        /// <summary>Tells whether the built assembly references <c>Moonwell.Objects</c>, read from its metadata without loading it.</summary>
+        /// <param name="assemblyPath">The map's built assembly.</param>
+        /// <returns>True when it references the library.</returns>
+        public static bool UsesObjects(string assemblyPath)
+        {
+            using var stream = File.OpenRead(assemblyPath);
+            using var pe = new PEReader(stream);
+            var metadata = pe.GetMetadataReader();
+            foreach (var handle in metadata.AssemblyReferences)
+            {
+                if (metadata.GetString(metadata.GetAssemblyReference(handle).Name) == ObjectsAssemblyName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         /// <summary>Loads the built assembly, constructs every declared object class and collects what each changed from its standard object.</summary>
         /// <param name="assemblyPath">The map's built assembly; <c>Moonwell.Objects.dll</c> is beside it.</param>

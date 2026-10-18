@@ -18,10 +18,11 @@ namespace Moonwell.Build
             PackageSources.Check(project);
             var settings = MapSettingsReader.Read(targetPath, project);
             var map = SourceMap.Open(project, settings);
-            var objectsDll = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(targetPath))!, Declarations.ObjectsAssemblyName + ".dll");
 
-            if (File.Exists(objectsDll))
+            // The reference decides, not a Moonwell.Objects.dll an earlier build left beside the assembly.
+            if (Declarations.UsesObjects(targetPath))
             {
+                var objectsDll = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(targetPath))!, Declarations.ObjectsAssemblyName + ".dll");
                 BuildWithObjects(project, settings, map, targetPath, objectsDll, options, log);
             }
             else
