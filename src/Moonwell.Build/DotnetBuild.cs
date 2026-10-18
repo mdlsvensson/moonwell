@@ -14,14 +14,14 @@ namespace Moonwell.Build
         public static string Run(MapProject project, bool release, TextWriter log)
         {
             var configuration = release ? "Release" : "Debug";
-            var build = Dotnet(project, new[] { "build", project.ProjectFile, "-c", configuration, "-nologo" }, log);
+            var build = Dotnet(project, new[] { "build", project.ProjectFile, "-c", configuration, "-nologo", "--disable-build-servers" }, log);
             if (build != 0)
             {
                 throw new BuildException("dotnet build failed");
             }
 
             var captured = new StringWriter();
-            var query = Dotnet(project, new[] { "msbuild", project.ProjectFile, "-getProperty:TargetPath", "-p:Configuration=" + configuration }, captured);
+            var query = Dotnet(project, new[] { "msbuild", project.ProjectFile, "-getProperty:TargetPath", "-p:Configuration=" + configuration, "--disable-build-servers" }, captured);
             if (query != 0)
             {
                 log.Write(captured.ToString());
