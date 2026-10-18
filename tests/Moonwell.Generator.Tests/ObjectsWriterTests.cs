@@ -235,6 +235,16 @@ public class ObjectsWriterTests
     }
 
     [Fact]
+    public void a_kind_base_summary_has_the_right_article()
+    {
+        Assert.Contains("/// <summary>The fields of a unit, which every standard unit class has.</summary>", MiniFiles.Value["Kinds/StandardUnit.g.cs"]);
+        Assert.Contains("/// <summary>The fields of a hero, which every standard hero class has.</summary>", MiniFiles.Value["Kinds/StandardHero.g.cs"]);
+        Assert.Contains("/// <summary>The fields of an item, which every standard item class has.</summary>", MiniFiles.Value["Kinds/StandardItem.g.cs"]);
+        Assert.Contains("/// <summary>The fields of an upgrade, which every standard upgrade class has.</summary>", MiniFiles.Value["Kinds/StandardUpgrade.g.cs"]);
+        Assert.Contains("/// <summary>The fields of an ability, which every standard ability class has.</summary>", MiniFiles.Value["Kinds/StandardAbility.g.cs"]);
+    }
+
+    [Fact]
     public void a_kind_base_has_the_helpers_and_a_table_of_the_types_its_fields_hold()
     {
         var unit = MiniFiles.Value["Kinds/StandardUnit.g.cs"];
@@ -244,6 +254,7 @@ public class ObjectsWriterTests
         Assert.Contains("protected static global::Moonwell.Objects.Levels<T> Levels<T>(params T[] values)", unit);
         Assert.Contains("protected static global::Moonwell.Objects.Levels<T> PerLevel<T>(global::System.Func<int, T> formula)", unit);
         Assert.Contains("protected void Set(string field, object value)", unit);
+        Assert.Contains("\n        internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;", unit);
         Assert.Contains("protected void Set(string field, int level, object value)", unit);
         Assert.Contains("[\"uhpm\"] = typeof(int),", unit);
         Assert.Contains("[\"ua1b\"] = typeof(int),", unit);

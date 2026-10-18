@@ -79,8 +79,8 @@ public static class ObjectsWriter
         text.Append($"        private {Root}.Declared? declared;\n\n");
         text.Append("        /// <summary>The declared values of this object, created on first use.</summary>\n");
         text.Append($"        protected {Root}.Declared Fields => declared ??= new {Root}.Declared();\n\n");
-        text.Append("        /// <summary>The values put on this object so far, by field id.</summary>\n");
-        text.Append("        public global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;\n");
+        text.Append("        /// <summary>The values put on this object so far, by field id; the build reads them.</summary>\n");
+        text.Append("        internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;\n");
         foreach (var field in common)
         {
             text.Append('\n');
@@ -315,7 +315,8 @@ public static class ObjectsWriter
     private static string Describe(ObjectKind kind, bool hero)
     {
         var noun = Noun(kind, hero);
-        return ("aeiou".Contains(noun[0]) ? "an " : "a ") + noun;
+        // "unit" starts with a vowel but is said with a consonant.
+        return ("aeiou".Contains(noun[0]) && !noun.StartsWith("uni", StringComparison.Ordinal) ? "an " : "a ") + noun;
     }
 
     private static string Noun(ObjectKind kind, bool hero)
