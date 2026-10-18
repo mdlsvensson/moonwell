@@ -42,14 +42,15 @@ namespace Moonwell.Build
                 var main = ObjectTable.Read(Path.Combine(project.MapFolder, mainName), kind);
                 var skin = ObjectTable.Read(Path.Combine(project.MapFolder, skinName), kind);
 
-                var declared = new HashSet<string>(StringComparer.Ordinal);
+                var declared = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
                 foreach (var one in ofKind)
                 {
-                    declared.Add(IdOf(one, ids));
+                    declared[IdOf(one, ids)] = one;
                 }
 
-                RemoveDeclared(main, declared);
-                RemoveDeclared(skin, declared);
+                var replaced = new HashSet<string>(StringComparer.Ordinal);
+                RemoveDeclared(main, mainName, declared, replaced, log);
+                RemoveDeclared(skin, skinName, declared, replaced, log);
                 WarnKept(main, skin, mainName, skinName, standard.Ids(kind), log);
 
                 var fields = new Dictionary<string, StandardData.ObjectField>(StringComparer.Ordinal);
@@ -85,10 +86,19 @@ namespace Moonwell.Build
             return ids.TryGetValue(one.ClassName, out var id) ? id : throw new BuildException($"{one.ClassName} has no object id");
         }
 
-        private static void RemoveDeclared(ObjectTable table, HashSet<string> declared)
+        // A new object of the source map that a declared object takes the id of is replaced; a different base is worth a word.
+        private static void RemoveDeclared(ObjectTable table, string name, Dictionary<string, DeclaredObject> declared, HashSet<string> warned, TextWriter log)
         {
-            table.Originals.RemoveAll(entry => declared.Contains(entry.Id));
-            table.News.RemoveAll(entry => declared.Contains(entry.Id));
+            table.Originals.RemoveAll(entry => declared.ContainsKey(entry.Id));
+            foreach (var entry in table.News)
+            {
+                if (declared.TryGetValue(entry.Id, out var one) && entry.OldId != one.StandardRoot && warned.Add(entry.Id))
+                {
+                    log.WriteLine($@"warning: map\{name}'s {entry.Id} (based on {entry.OldId}) is replaced by {one.ClassName} (based on {one.StandardRoot})");
+                }
+            }
+
+            table.News.RemoveAll(entry => declared.ContainsKey(entry.Id));
         }
 
         // What is left is the source map's, and no class declares it. A standard object World Editor changed is not worth a word.

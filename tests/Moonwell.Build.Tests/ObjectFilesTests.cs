@@ -270,10 +270,10 @@ namespace Moonwell.Build.Tests
         {
             // A saved built map: Arthas is in the source map already, with other values, and so is the replaced footman.
             var source = new UnitObjectData(ObjectDataFormatVersion.v3);
-            source.NewUnits.Add(NewUnit("hpal", "H001", Mod("uhpm", 1)));
+            source.NewUnits.Add(NewUnit("Hpal", "H001", Mod("uhpm", 1)));
             source.BaseUnits.Add(NewUnit("hfoo", string.Empty, Mod("uhpm", 1)));
             var skinSource = new UnitObjectData(ObjectDataFormatVersion.v3);
-            skinSource.NewUnits.Add(NewUnit("hpal", "H001", Mod("unam", "Old name")));
+            skinSource.NewUnits.Add(NewUnit("Hpal", "H001", Mod("unam", "Old name")));
             skinSource.BaseUnits.Add(NewUnit("hfoo", string.Empty));
             WriteSource("war3map.w3u", source);
             WriteSource("war3mapSkin.w3u", skinSource);
@@ -289,6 +289,37 @@ namespace Moonwell.Build.Tests
             Assert.Equal("Arthas", Assert.Single(Assert.Single(skin.NewUnits, one => one.NewId == IdOf("H001")).Modifications).Value);
             Assert.Equal(600, Assert.Single(Assert.Single(main.BaseUnits).Modifications, one => one.Id == IdOf("uhpm")).Value);
             Assert.DoesNotContain("warning:", log.ToString());
+        }
+
+        [Fact]
+        public void a_declared_object_replacing_another_base_is_warned_about()
+        {
+            // World Editor's H001 is a footman; the class with H001 is a paladin.
+            var source = new UnitObjectData(ObjectDataFormatVersion.v3);
+            source.NewUnits.Add(NewUnit("hfoo", "H001", Mod("uhpm", 1)));
+            var skinSource = new UnitObjectData(ObjectDataFormatVersion.v3);
+            skinSource.NewUnits.Add(NewUnit("hfoo", "H001", Mod("unam", "Mine")));
+            WriteSource("war3map.w3u", source);
+            WriteSource("war3mapSkin.w3u", skinSource);
+            var arthas = new DeclaredObject("Objects.Arthas", "hero", "Hpal", false, null, new SortedDictionary<string, object?>(), Array.Empty<string>());
+
+            var staged = WriteObjects(new[] { arthas }, new Dictionary<string, string> { ["Objects.Arthas"] = "H001" }, new Dictionary<string, string>());
+
+            Assert.Equal(@"warning: map\war3map.w3u's H001 (based on hfoo) is replaced by Objects.Arthas (based on Hpal)" + "\n", log.ToString());
+            Assert.Equal(IdOf("Hpal"), Assert.Single(ReadUnits(staged, "war3map.w3u").NewUnits).OldId);
+        }
+
+        [Fact]
+        public void a_declared_object_replacing_the_same_base_is_silent()
+        {
+            var source = new UnitObjectData(ObjectDataFormatVersion.v3);
+            source.NewUnits.Add(NewUnit("Hpal", "H001", Mod("uhpm", 1)));
+            WriteSource("war3map.w3u", source);
+            var arthas = new DeclaredObject("Objects.Arthas", "hero", "Hpal", false, null, new SortedDictionary<string, object?>(), Array.Empty<string>());
+
+            WriteObjects(new[] { arthas }, new Dictionary<string, string> { ["Objects.Arthas"] = "H001" }, new Dictionary<string, string>());
+
+            Assert.Empty(log.ToString());
         }
 
         [Fact]
