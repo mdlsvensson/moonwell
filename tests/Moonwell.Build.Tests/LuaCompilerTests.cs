@@ -87,6 +87,30 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void unused_map_file_is_not_parsed()
+        {
+            var folder = folders.TemporaryCopyOfSample();
+            var garbage = new byte[] { 7, 0, 0, 0, 9, 9, 9, 9, 9, 9, 9 };
+            File.WriteAllBytes(Path.Combine(folder, "map", "war3map.mmp"), garbage);
+
+            var archive = MapBuild.Run(folder, new BuildOptions(), TextWriter.Null);
+
+            Assert.True(File.Exists(archive));
+            Assert.Equal(garbage, File.ReadAllBytes(Path.Combine(folder, "build", "Sample", "war3map.mmp")));
+        }
+
+        [Fact]
+        public void unreadable_map_file_is_reported()
+        {
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllBytes(Path.Combine(folder, "map", "war3map.w3i"), new byte[] { 1, 2, 3 });
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(folder, new BuildOptions(), TextWriter.Null));
+
+            Assert.StartsWith(@"cannot read the World Editor map in map\: ", error.Message);
+        }
+
+        [Fact]
         public void csharplua_error_is_a_build_error()
         {
             var folder = folders.TemporaryCopyOfSample();

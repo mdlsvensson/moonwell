@@ -52,14 +52,21 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void unexpected_error_exits_1()
         {
-            var folder = folders.TemporaryCopyOfSample();
-            File.WriteAllBytes(Path.Combine(folder, "map", "war3map.w3i"), new byte[] { 1, 2, 3 });
+            var game = Path.Combine(Path.GetTempPath(), "moonwell-game-" + Guid.NewGuid().ToString("N") + ".exe");
+            File.WriteAllText(game, string.Empty);
+            temporaryFiles.Add(game);
+            var output = new StringWriter();
+            var error = new StringWriter();
 
-            var (exitCode, _, error, _) = Run("build", folder);
+            var exitCode = Cli.Run(
+                new[] { "run", TestFolders.Fixture("Sample"), "--game", game },
+                output,
+                error,
+                (_, _) => throw new InvalidOperationException("starter failed"));
 
             Assert.Equal(1, exitCode);
-            Assert.StartsWith("moonwell: unexpected error: ", error);
-            Assert.Contains(" at ", error);
+            Assert.StartsWith("moonwell: unexpected error: InvalidOperationException: starter failed", error.ToString());
+            Assert.Contains(" at ", error.ToString());
         }
 
         [Fact]
