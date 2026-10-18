@@ -61,9 +61,13 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "map.components-in-order", Run = MapCases.ComponentsInOrder });
             list.Add(new Case { Name = "map.components-not-added-early", Run = MapCases.ComponentsNotAddedEarly });
             list.Add(new Case { Name = "map.settings-default-empty", Run = MapCases.SettingsDefaultEmpty });
+            list.Add(new Case { Name = "map.balance-default", Run = MapCases.BalanceDefault });
             list.Add(new Case { Name = "types.fourcc", Run = UnitCases.FourCC });
             list.Add(new Case { Name = "types.duplicate", Run = UnitCases.Duplicate });
             list.Add(new Case { Name = "types.idof", Run = UnitCases.IdOf });
+            list.Add(new Case { Name = "objects.upgrade-level", Run = ObjectKindCases.UpgradeLevel });
+            list.Add(new Case { Name = "objects.id-twice", Run = ObjectKindCases.IdTwice });
+            list.Add(new Case { Name = "objects.register-before-components", Run = ObjectKindCases.RegisterBeforeComponents });
             list.Add(new Case { Name = "units.registered-class", Run = UnitCases.RegisteredClass });
             list.Add(new Case { Name = "units.fallback-class", Run = UnitCases.FallbackClass });
             list.Add(new Case { Name = "units.components-before-enter", Run = UnitCases.ComponentsBeforeEnter });

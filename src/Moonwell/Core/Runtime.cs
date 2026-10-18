@@ -51,12 +51,19 @@ namespace Moonwell
         /// <summary>Starts the runtime on the game with a map: the map's Main calls it once, and the map's components are added before the game's start.</summary>
         public static void Start(Map map)
         {
-            Start(() => Install(map));
+            Start(map, () => { });
         }
 
-        /// <summary>Adds the map's starting components to the game, in list order; Start runs it as the setup.</summary>
-        internal static void Install(Map map)
+        /// <summary>Starts the runtime on the game with a map and a register step: the register step runs first, before the map's components are added.</summary>
+        public static void Start(Map map, Action register)
         {
+            Start(() => Install(map, register));
+        }
+
+        /// <summary>Runs the register step, then adds the map's starting components to the game, in list order; Start runs it as the setup.</summary>
+        internal static void Install(Map map, Action register)
+        {
+            register();
             var components = map.StartComponents;
             for (var i = 0; i < components.Count; i++)
             {

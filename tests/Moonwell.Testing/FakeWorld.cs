@@ -69,6 +69,9 @@ namespace Moonwell.Testing
         /// <summary>The player made for each slot, once it is asked for.</summary>
         private readonly Dictionary<int, player> players = new Dictionary<int, player>();
 
+        /// <summary>The upgrade levels of each player slot, keyed by slot and then by upgrade id.</summary>
+        private readonly Dictionary<int, Dictionary<int, int>> upgradeLevels = new Dictionary<int, Dictionary<int, int>>();
+
         /// <summary>The slot of each player made.</summary>
         private readonly Dictionary<player, int> slots = new Dictionary<player, int>();
 
@@ -135,6 +138,18 @@ namespace Moonwell.Testing
             }
 
             levels[abilityId] = level;
+        }
+
+        /// <summary>Sets the level a player slot has of an upgrade.</summary>
+        public void SetUpgradeLevel(int slot, int upgradeId, int level)
+        {
+            if (!upgradeLevels.TryGetValue(slot, out var levels))
+            {
+                levels = new Dictionary<int, int>();
+                upgradeLevels[slot] = levels;
+            }
+
+            levels[upgradeId] = level;
         }
 
         /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way.</summary>
@@ -328,6 +343,17 @@ namespace Moonwell.Testing
         public int AbilityLevel(unit unit, int abilityId)
         {
             if (abilityLevels.TryGetValue(unit, out var levels) && levels.TryGetValue(abilityId, out var level))
+            {
+                return level;
+            }
+
+            return 0;
+        }
+
+        /// <summary>The level set for a player's slot for an upgrade; 0 when none was set.</summary>
+        public int UpgradeLevel(player p, int upgradeId)
+        {
+            if (upgradeLevels.TryGetValue(SlotOf(p), out var levels) && levels.TryGetValue(upgradeId, out var level))
             {
                 return level;
             }

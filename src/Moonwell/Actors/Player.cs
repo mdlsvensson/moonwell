@@ -58,6 +58,12 @@ namespace Moonwell
             return bySlot[slot];
         }
 
+        /// <summary>The level the player has of an upgrade class.</summary>
+        public int LevelOf<T>() where T : Upgrade
+        {
+            return Runtime.World.UpgradeLevel(Handle, ObjectTypes.IdOf<T>());
+        }
+
         /// <summary>Adds a component to the player, and returns it.</summary>
         public T Add<T>(T component) where T : PlayerComponent => AddComponent(component);
 

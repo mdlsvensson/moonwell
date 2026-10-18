@@ -231,6 +231,12 @@ namespace Moonwell.Engine
             return Natives.GetOwningPlayer(unit);
         }
 
+        /// <summary>The level a player has of an upgrade; 0 when the player has none.</summary>
+        public int UpgradeLevel(player p, int upgradeId)
+        {
+            return Natives.GetPlayerTechCount(p, upgradeId, true);
+        }
+
         /// <summary>The level of an ability on a unit; 0 when the unit has none.</summary>
         public int AbilityLevel(unit unit, int abilityId)
         {

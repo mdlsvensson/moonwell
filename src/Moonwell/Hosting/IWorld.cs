@@ -68,6 +68,9 @@ namespace Moonwell.Hosting
         /// <summary>The player that owns a unit; null a while after the game has removed it.</summary>
         player OwnerOf(unit unit);
 
+        /// <summary>The level a player has of an upgrade; 0 when the player has none.</summary>
+        int UpgradeLevel(player p, int upgradeId);
+
         /// <summary>The level of an ability on a unit; 0 when the unit has none.</summary>
         int AbilityLevel(unit unit, int abilityId);
 

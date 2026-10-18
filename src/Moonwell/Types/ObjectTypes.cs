@@ -83,6 +83,18 @@ namespace Moonwell
             Events.Need(Hooks.MaskOf(make(), Moonwell.Ability.AbilityHooks));
         }
 
+        /// <summary>Registers a class with its object id and no maker, for kinds such as doodads, upgrades and buffs; throws when the class is registered twice.</summary>
+        public static void Id<T>(int id)
+            where T : class
+        {
+            if (ids.ContainsKey(typeof(T)))
+            {
+                throw new MoonwellException("ObjectTypes.Id: " + typeof(T).Name + " is registered twice");
+            }
+
+            ids[typeof(T)] = id;
+        }
+
         /// <summary>Registers a buff class with the game buff it shows and the hidden ability that carries it on its unit; a buff of the class shows only with this.</summary>
         public static void BuffDisplay<T>(int buffId, int carrierId)
             where T : Buff
