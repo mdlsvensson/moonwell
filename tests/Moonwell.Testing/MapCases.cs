@@ -25,11 +25,12 @@ namespace Moonwell.Testing
             Expect.Equal(0, ((TestGameB)map.StartComponents[1]).Adds, "OnAdded runs of TestGameB after construction");
         }
 
-        /// <summary>A map that sets no balance reads Balance.Default.</summary>
+        /// <summary>A map that sets no game data option reads DataSet.Default and DataVersion.ForsakenKingdom.</summary>
         public static void BalanceDefault(FakeWorld world)
         {
             var map = new TestMap();
-            Expect.True(map.Balance == Balance.Default, "Balance");
+            Expect.True(map.DataSet == DataSet.Default, "DataSet");
+            Expect.True(map.DataVersion == DataVersion.ForsakenKingdom, "DataVersion");
         }
 
         /// <summary>A map that sets none of its settings reads an empty string for each of the four.</summary>
