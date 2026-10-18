@@ -16,6 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Fixtures/**" />
+    <None Remove="Fixtures/**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\generator\Moonwell.Generator\Moonwell.Generator.csproj" />
   </ItemGroup>
 

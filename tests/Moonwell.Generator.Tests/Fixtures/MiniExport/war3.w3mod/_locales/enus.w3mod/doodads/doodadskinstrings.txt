@@ -1,0 +1,3 @@
+[ZPlp]
+SkinName=WESTRING_DOOD_LPLP
+EditorSuffix= (Default)

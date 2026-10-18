@@ -1,0 +1,19 @@
+[AHtb]
+skinType=ability
+Art=ReplaceableTextures\CommandButtons\BTNStormBolt.blp
+Researchart=ReplaceableTextures\CommandButtons\BTNStormBolt.blp
+Missileart=Abilities\Spells\Human\StormBolt\StormBoltMissile.mdl
+Animnames=spell,throw
+
+[AHhb]
+skinType=ability
+Art=ReplaceableTextures\CommandButtons\BTNHolyBolt.blp
+Researchart=ReplaceableTextures\CommandButtons\BTNHolyBolt.blp
+Targetart=Abilities\Spells\Human\HolyBolt\HolyBoltSpecialArt.mdl
+
+// Divine Shield
+
+[BHbd]
+skinType=buff
+Buffart=ReplaceableTextures\CommandButtons\BTNBlizzard.blp
+Targetart=Abilities\Spells\Other\FrostDamage\FrostDamage.mdl

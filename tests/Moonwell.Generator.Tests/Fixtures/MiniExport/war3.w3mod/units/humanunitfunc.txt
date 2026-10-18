@@ -1,0 +1,12 @@
+[Hpal]
+Buttonpos=2,2
+Requirescount=3
+Requires=
+Requires1=hkee
+Requires2=hcas
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+ScoreScreenIcon=UI\Glues\ScoreScreen\scorescreen-hero-paladin.blp
+
+[hfoo]
+Buttonpos=0,0
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl

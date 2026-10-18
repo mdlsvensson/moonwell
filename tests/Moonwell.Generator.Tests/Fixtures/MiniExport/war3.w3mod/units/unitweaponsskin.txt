@@ -1,0 +1,17 @@
+[Hpal]
+impactSwimZ=0
+impactZ=60
+weapType1=MetalHeavyBash
+launchSwimZ=0
+showUI1=1
+showUI2=1
+launchZ=60
+
+[hfoo]
+impactSwimZ=0
+impactZ=60
+weapType1=MetalMediumSlice
+launchSwimZ=0
+showUI1=1
+showUI2=1
+launchZ=60

@@ -1,0 +1,7 @@
+[Hpal]
+launchX=0
+launchY=0
+
+[hfoo]
+launchX=0
+launchY=0

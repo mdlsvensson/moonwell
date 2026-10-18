@@ -1,0 +1,4 @@
+[ratf]
+Art=ReplaceableTextures\CommandButtons\BTNClawsOfAttack.blp
+
+// manual of health

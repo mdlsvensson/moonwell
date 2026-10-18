@@ -1,0 +1,3 @@
+[WorldEditStrings]
+WESTRING_UEVAL_UHPM=Hit Points Maximum (Base)
+WESTRING_UEVAL_IABI=Abilities

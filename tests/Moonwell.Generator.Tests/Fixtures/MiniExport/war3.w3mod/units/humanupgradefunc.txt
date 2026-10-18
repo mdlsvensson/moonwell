@@ -1,0 +1,7 @@
+[Rhme]
+Art=ReplaceableTextures\CommandButtons\BTNSteelMelee.blp,ReplaceableTextures\CommandButtons\BTNThoriumMelee.blp,ReplaceableTextures\CommandButtons\BTNArcaniteMelee.blp
+Buttonpos=0,0
+Requirescount=3
+Requires=
+Requires1=hkee
+Requires2=hcas

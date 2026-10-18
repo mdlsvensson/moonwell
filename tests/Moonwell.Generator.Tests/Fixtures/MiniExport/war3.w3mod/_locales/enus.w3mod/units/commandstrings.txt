@@ -1,0 +1,4 @@
+[CmdMove]
+Tip=Move
+Ubertip="Orders your units to move to the target area while ignoring enemy units and attacks. Issuing a move order onto a target unit will cause your unit to follow the target using move orders."
+Hotkey=M

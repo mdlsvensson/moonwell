@@ -1,0 +1,5 @@
+[ratf]
+Name=Claws of Attack +15
+Tip=Purchase Claws of Attack +15
+Ubertip="Increases the attack damage of the Hero by 15 when worn."
+Description=Boosts attack damage by 15.

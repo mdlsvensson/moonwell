@@ -1,0 +1,16 @@
+[AHtb]
+Buttonpos=0,2
+Researchbuttonpos=0,0
+Missilespeed=1000
+MissileHoming=1
+Order=thunderbolt
+
+[AHhb]
+Buttonpos=0,2
+Researchbuttonpos=0,0
+Order=holybolt
+
+// Divine Shield
+
+[BHbd]
+

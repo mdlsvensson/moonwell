@@ -1,0 +1,7 @@
+[Rhme]
+Name=Iron Forged Swords,Steel Forged Swords,Mithril Forged Swords
+Tip=Upgrade to Iron Forged Swords,Upgrade to Steel Forged Swords,Upgrade to Mithril Forged Swords
+Ubertip="Increases the attack damage of Militia, Footmen, Spellbreakers, Dragonhawk Riders, Gryphon Riders and Knights.","Further increases the attack damage of Militia, Footmen, Spellbreakers, Dragonhawk Riders, Gryphon Riders and Knights.","Further increases the attack damage of Militia, Footmen, Spellbreakers, Dragonhawk Riders, Gryphon Riders and Knights."
+Ubertip:custom,V0="Increases the attack damage of Militia, Footmen, Gryphon Riders and Knights.","Further increases the attack damage of Militia, Footmen, Gryphon Riders and Knights.","Further increases the attack damage of Militia, Footmen, Gryphon Riders and Knights."
+Ubertip:melee,V0="Increases the attack damage of Militia, Footmen, Gryphon Riders and Knights.","Further increases the attack damage of Militia, Footmen, Gryphon Riders and Knights.","Further increases the attack damage of Militia, Footmen, Gryphon Riders and Knights."
+Hotkey=S,S,S

@@ -1,0 +1,3 @@
+[CmdMove]
+Art=CommandMove
+Buttonpos=0,0
