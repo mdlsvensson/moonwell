@@ -26,7 +26,8 @@ namespace Moonwell.Build
 
         /// <summary>
         /// The declared classes of the map, every class of <c>Moonwell.Objects</c> the map assembly's type references name that is
-        /// a kind base or inherits one, and their bases up to the kind base; each base before the classes that inherit it.
+        /// a kind base or inherits one, and their bases up to the kind base; each base before the classes that inherit it. A class
+        /// of <c>Moonwell.Objects</c> keeps the fields and methods the assembly's member references name.
         /// </summary>
         /// <param name="map">The map assembly, loaded in the build's load context.</param>
         /// <param name="objects">The map's copy of <c>Moonwell.Objects</c>, in the same context.</param>
@@ -43,30 +44,42 @@ namespace Moonwell.Build
                 }
             }
 
+            // The names of the members each class of Moonwell.Objects is referenced for, a property by its own name.
+            var members = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
             using (var pe = new PEReader(new MemoryStream(File.ReadAllBytes(assemblyPath))))
             {
                 var reader = pe.GetMetadataReader();
                 foreach (var handle in reader.TypeReferences)
                 {
-                    var reference = reader.GetTypeReference(handle);
-                    if (reference.ResolutionScope.Kind != HandleKind.AssemblyReference)
-                    {
-                        continue;
-                    }
-
-                    var scope = reader.GetAssemblyReference((AssemblyReferenceHandle)reference.ResolutionScope);
-                    if (reader.GetString(scope.Name) != Declarations.ObjectsAssemblyName)
-                    {
-                        continue;
-                    }
-
-                    var space = reader.GetString(reference.Namespace);
-                    var name = reader.GetString(reference.Name);
-                    var type = objects.GetType(space.Length == 0 ? name : space + "." + name);
+                    var name = ObjectsTypeName(reader, handle);
+                    var type = name == null ? null : objects.GetType(name);
                     if (type != null && (IsKindBase(type) || Declarations.KindBaseOf(type) != null))
                     {
                         starts.Add(type);
                     }
+                }
+
+                foreach (var handle in reader.MemberReferences)
+                {
+                    var member = reader.GetMemberReference(handle);
+                    var parent = member.Parent.Kind == HandleKind.TypeReference ? ObjectsTypeName(reader, (TypeReferenceHandle)member.Parent) : null;
+                    if (parent == null)
+                    {
+                        continue;
+                    }
+
+                    var name = reader.GetString(member.Name);
+                    if (name.StartsWith("get_", StringComparison.Ordinal) || name.StartsWith("set_", StringComparison.Ordinal))
+                    {
+                        name = name.Substring(4);
+                    }
+
+                    if (!members.TryGetValue(parent, out var names))
+                    {
+                        members[parent] = names = new HashSet<string>(StringComparer.Ordinal);
+                    }
+
+                    names.Add(name);
                 }
             }
 
@@ -74,7 +87,7 @@ namespace Moonwell.Build
             var seen = new HashSet<string>(StringComparer.Ordinal);
             foreach (var type in starts.OrderBy(MapClasses.Describe, StringComparer.Ordinal))
             {
-                Add(type, used, seen);
+                Add(type, used, seen, members);
             }
 
             return used;
@@ -82,10 +95,11 @@ namespace Moonwell.Build
 
         /// <summary>
         /// The library of the used classes of <c>Moonwell.Objects</c>: the namespace tables and the generic types the compiled
-        /// files evaluate when they load, then each class with its base and, for each field it declares, a getter that reads the
-        /// class's values (<c>MoonwellField</c> in <c>moonwell.lua</c>) and a setter that does nothing. A kind base also has
-        /// <c>Levels</c> and <c>PerLevel</c>, which give nil, and <c>Set</c>, which does nothing: the fields' values are written
-        /// into the object files, so what a constructor puts has no effect in the game.
+        /// files evaluate when they load, then each class with its base, its methods the map calls (such as <c>Set</c>, which does
+        /// nothing, and <c>Levels</c>, which gives nil) and, for each field of it the map names, a getter that reads the class's
+        /// values (<c>MoonwellField</c> in <c>moonwell.lua</c>) and a setter that does nothing: the fields' values are written into
+        /// the object files, so what a constructor puts has no effect in the game. The members are those of the class's stub
+        /// (<see cref="ObjectStubs"/>), the only ones CSharp.lua can call.
         /// </summary>
         /// <param name="used">The used classes.</param>
         /// <returns>The library's Lua.</returns>
@@ -319,7 +333,7 @@ namespace Moonwell.Build
             return ((id[0] * 256 + id[1]) * 256 + id[2]) * 256 + id[3];
         }
 
-        private static void Add(Type type, List<UsedClass> used, HashSet<string> seen)
+        private static void Add(Type type, List<UsedClass> used, HashSet<string> seen, IReadOnlyDictionary<string, HashSet<string>> members)
         {
             var name = MapClasses.Describe(type);
             if (seen.Contains(name))
@@ -331,23 +345,48 @@ namespace Moonwell.Build
             var kindBase = IsKindBase(type) ? type : Declarations.KindBaseOf(type)!;
             if (type != kindBase)
             {
-                Add(type.BaseType!, used, seen);
+                Add(type.BaseType!, used, seen, members);
             }
 
             var inObjects = type.Assembly.GetName().Name == Declarations.ObjectsAssemblyName;
+            IReadOnlySet<string> names = members.TryGetValue(name, out var referenced) ? referenced : new HashSet<string>();
             used.Add(new UsedClass(
                 name,
                 MapClasses.Describe(type.BaseType!),
                 Declarations.KindOfBase[kindBase.FullName!],
                 Declarations.StandardIdOf(type),
                 inObjects,
-                inObjects ? FieldsOf(type) : Array.Empty<UsedField>()));
+                inObjects ? FieldsOf(type, names) : Array.Empty<UsedField>(),
+                inObjects ? ObjectStubs.Methods(type, names) : Array.Empty<UsedMethod>(),
+                inObjects ? ObjectStubs.Class(type, names) : string.Empty));
         }
 
-        private static List<UsedField> FieldsOf(Type type)
+        // The full name of a type a reference names in Moonwell.Objects; null for a type of another assembly or a nested type.
+        private static string? ObjectsTypeName(MetadataReader reader, TypeReferenceHandle handle)
+        {
+            var reference = reader.GetTypeReference(handle);
+            if (reference.ResolutionScope.Kind != HandleKind.AssemblyReference)
+            {
+                return null;
+            }
+
+            var scope = reader.GetAssemblyReference((AssemblyReferenceHandle)reference.ResolutionScope);
+            if (reader.GetString(scope.Name) != Declarations.ObjectsAssemblyName)
+            {
+                return null;
+            }
+
+            var space = reader.GetString(reference.Namespace);
+            var name = reader.GetString(reference.Name);
+            return space.Length == 0 ? name : space + "." + name;
+        }
+
+        private static List<UsedField> FieldsOf(Type type, IReadOnlySet<string> names)
         {
             var fields = new List<UsedField>();
-            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly).OrderBy(property => property.MetadataToken);
+            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .Where(property => names.Contains(property.Name))
+                .OrderBy(property => property.MetadataToken);
             foreach (var property in properties)
             {
                 var attribute = property.GetCustomAttributesData().FirstOrDefault(data => data.AttributeType.FullName == FieldAttributeName);
@@ -382,10 +421,9 @@ namespace Moonwell.Build
             text.Append("      base = function (out)\n");
             text.Append("        return { out.").Append(one.BaseFullName).Append(" }\n");
             text.Append("      end");
-            if (Declarations.KindOfBase.ContainsKey(one.FullName))
+            foreach (var method in one.Methods)
             {
-                // Set(field, value) and Set(field, level, value): CSharp.lua names the second overload Set1.
-                text.Append(",\n      Levels = none,\n      PerLevel = none,\n      Set = nothing,\n      Set1 = nothing");
+                text.Append(",\n      ").Append(method.LuaName).Append(method.Void ? " = nothing" : " = none");
             }
 
             foreach (var field in one.Fields)

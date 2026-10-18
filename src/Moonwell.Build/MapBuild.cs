@@ -68,12 +68,14 @@ namespace Moonwell.Build
         // The map does not reference Moonwell.Objects: its own object files are used as they are.
         private static void BuildWithoutObjects(MapProject project, MapSettings settings, War3Net.Build.Map map, string targetPath, BuildOptions options, TextWriter log)
         {
-            // A registry left by an earlier build would not compile any more.
+            // A registry or stubs left by an earlier build would not compile any more.
             var registry = Path.Combine(project.GeneratedFolder, "ObjectRegistry.g.cs");
             if (File.Exists(registry))
             {
                 File.Delete(registry);
             }
+
+            ObjectStubs.Delete(project);
 
             EntryWriter.Write(project, settings);
             LuaCompiler.Compile(project, map, targetPath, options.Release);

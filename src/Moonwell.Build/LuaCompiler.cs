@@ -47,6 +47,7 @@ namespace Moonwell.Build
             StandardData standard,
             string? set)
         {
+            ObjectStubs.Write(project, declarations.Used);
             var script = Compile(project, map, targetPath, release, ObjectLua.Definitions(declarations.Used), out var files);
             var named = new Dictionary<string, string>(declarations.StandardClassIds, StringComparer.Ordinal);
             foreach (var entry in ids)
@@ -82,9 +83,11 @@ namespace Moonwell.Build
                 libraries.Add(path);
             }
 
-            var marked = MarkedProject.Stage(project, release ? Array.Empty<string>() : new[] { "DEBUG" });
+            // MOONWELL_LUA leaves out the generated classes of Moonwell.Objects; CSharp.lua compiles the build's stubs of them instead.
+            var symbols = release ? new[] { "MOONWELL_LUA" } : new[] { "DEBUG", "MOONWELL_LUA" };
+            var marked = MarkedProject.Stage(project, symbols);
             files = marked.Files;
-            var compiler = new Compiler(marked.ProjectFile, project.GeneratedFolder, string.Empty, null!, null!, "*", release ? string.Empty : "-define:DEBUG", false, null!, string.Empty)
+            var compiler = new Compiler(marked.ProjectFile, project.GeneratedFolder, string.Empty, null!, null!, "*", "-define:" + string.Join(";", symbols), false, null!, string.Empty)
             {
                 IsExportMetadata = false,
                 IsModule = false,
@@ -109,7 +112,15 @@ namespace Moonwell.Build
             {
                 var errors = result.Diagnostics
                     .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-                    .Select(diagnostic => marked.Unstage(diagnostic.ToString()));
+                    .Select(diagnostic => marked.Unstage(diagnostic.ToString()))
+                    .ToList();
+
+                // dotnet build compiled the same code, so a name missing from the stubs is the likely cause.
+                if (objects != null)
+                {
+                    errors.Add("CSharp.lua sees only the members of Moonwell.Objects that the map's assembly references: a name used only in nameof is not one");
+                }
+
                 throw new BuildException(string.Join(Environment.NewLine, errors));
             }
 
