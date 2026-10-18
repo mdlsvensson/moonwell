@@ -12,6 +12,11 @@ An object is a class in the project that inherits one of the standard classes of
 its constructor changes the fields, and the build writes the object into the map and keeps its id in `ids.json`. Set
 `DataSet` and `DataVersion` in the map class, as World Editor's Data Set and Data Version, to play with another balance.
 
+An error in a reaction is shown on the screen with the C# file and line it happened at, and written in full to
+`Documents\Warcraft III\CustomMapData\Moonwell\log.txt` with the lines that called it; a release build shows no message
+on the screen. Expression-bodied members and field initializers name no line of their own, so the line that used them
+is shown.
+
 It needs the .NET 10 SDK, and `common.j` and `Blizzard.j` in `Documents\Warcraft III\JassHelper`.
 
 | Path | What it is |
