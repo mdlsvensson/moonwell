@@ -3,6 +3,7 @@ using System.Globalization;
 namespace Moonwell.Build.Tests
 {
     /// <summary>The Fails fixture built both ways and run in Lua: its reported errors name the C# file and line.</summary>
+    [Collection("Sample")]
     public sealed class ErrorLinesTests : IClassFixture<ErrorLinesTests.FailsBuilds>
     {
         private const string Red = "|cffff4040";

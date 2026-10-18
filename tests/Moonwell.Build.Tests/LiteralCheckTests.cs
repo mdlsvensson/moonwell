@@ -1,5 +1,6 @@
 namespace Moonwell.Build.Tests
 {
+    [Collection("Sample")]
     public sealed class LiteralCheckTests : IDisposable
     {
         private static readonly string[] Debug = { "DEBUG" };

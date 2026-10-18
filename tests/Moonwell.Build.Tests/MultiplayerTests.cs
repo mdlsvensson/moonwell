@@ -2,6 +2,7 @@ using Xunit;
 
 namespace Moonwell.Build.Tests
 {
+    [Collection("Sample")]
     public sealed class MultiplayerTests
     {
         [Fact]
