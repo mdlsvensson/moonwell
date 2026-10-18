@@ -23,7 +23,7 @@ namespace Fails
         public override void OnGameStart()
         {
             var value = holder!.Value;
-            Natives.DisplayTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, "value " + value);
+            Natives.DisplayTextToPlayer(Natives.Player(0), 0f, 0f, "value " + value);
         }
     }
 
@@ -58,7 +58,7 @@ namespace Fails
         public override void OnGameStart()
         {
             var value = Broken;
-            Natives.DisplayTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, "value " + value);
+            Natives.DisplayTextToPlayer(Natives.Player(0), 0f, 0f, "value " + value);
         }
     }
 }
