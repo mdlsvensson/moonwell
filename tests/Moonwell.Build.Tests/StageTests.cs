@@ -9,7 +9,7 @@ namespace Moonwell.Build.Tests
     [Collection("Sample")]
     public sealed class StageTests : IDisposable
     {
-        private static readonly string[] DroppedFiles = { "war3map.wtg", "war3map.wct", "war3map.j" };
+        private static readonly string[] DroppedFiles = { "war3map.j" };
 
         private static readonly Lazy<(MapProject Project, War3Net.Build.Map Map)> CompiledSample =
             new Lazy<(MapProject, War3Net.Build.Map)>(() =>
@@ -53,6 +53,14 @@ namespace Moonwell.Build.Tests
             }
 
             Assert.Equal(map.Script, File.ReadAllText(Path.Combine(project.StagedFolder, "war3map.lua")));
+            foreach (var trigger in new[] { "war3map.wtg", "war3map.wct" })
+            {
+                Assert.Contains(trigger, staged);
+                Assert.Equal(
+                    File.ReadAllBytes(Path.Combine(project.MapFolder, trigger)),
+                    File.ReadAllBytes(Path.Combine(project.StagedFolder, trigger)));
+            }
+
             foreach (var file in RelativeFiles(project.MapFolder))
             {
                 if (DroppedFiles.Contains(file) || file == "war3map.lua" || file == "war3map.w3i")

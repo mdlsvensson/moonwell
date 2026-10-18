@@ -5,10 +5,9 @@ namespace Moonwell.Build
     /// <summary>Writes the staged map folder: the files the archive holds.</summary>
     public static class Stage
     {
+        // The script and info files are regenerated. The trigger files stay: World Editor needs them to open the map, so they are copied unparsed.
         private static readonly string[] IgnoredMapFiles =
         {
-            "war3map.wtg",
-            "war3map.wct",
             "war3map.lua",
             "war3map.j",
             "war3map.w3i",
