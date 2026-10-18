@@ -20,7 +20,8 @@ namespace Moonwell
 #else
             const bool release = true;
 #endif
-            var key = label + "\n" + error.Message;
+            var where = Where(error);
+            var key = label + "\n" + error.Message + "\n" + First(where);
             var times = 1;
             if (counts.TryGetValue(key, out var seen))
             {
@@ -34,8 +35,8 @@ namespace Moonwell
 
             if (ShowsAt(times))
             {
-                Runtime.World.Print(ScreenLine(label, error.Message, times, release));
-                Runtime.World.Log(LogLine(label, error.Message, times));
+                Runtime.World.Print(ScreenLine(label, error.Message, times, release, where));
+                Runtime.World.Log(LogLine(label, error.Message, times, where));
             }
         }
 
@@ -45,21 +46,44 @@ namespace Moonwell
             counts.Clear();
         }
 
-        /// <summary>The line appended to the log for an error.</summary>
-        internal static string LogLine(string label, string message, int times)
+        // The C# locations an error was raised at, innermost first, one a line; empty when none is known. In Lua MoonwellWhere
+        // (moonwell.lua) reads what the exception's traceback recorded; .NET has none. No summary goes above this line: CSharp.lua
+        // then ignores the template.
+        /// @CSharpLua.Template = "MoonwellWhere({0})"
+        internal static string Where(Exception error)
         {
-            return Head(label, times) + ": " + message;
+            return string.Empty;
         }
 
-        /// <summary>The line shown on the screen for an error; a release build shows the head only.</summary>
-        internal static string ScreenLine(string label, string message, int times, bool release)
+        /// <summary>The line appended to the log for an error, with every location an error's Where gave.</summary>
+        internal static string LogLine(string label, string message, int times, string where)
         {
-            if (release)
+            var line = Head(label, times) + ": " + message;
+            if (where.Length == 0)
             {
-                return "|cffff4040" + Head(label, times) + "|r";
+                return line;
             }
 
-            return "|cffff4040" + Head(label, times) + ":|r " + message;
+            var newline = where.IndexOf('\n');
+            if (newline < 0)
+            {
+                return line + " (" + where + ")";
+            }
+
+            return line + " (" + where.Substring(0, newline) + ", from " + where.Substring(newline + 1).Replace("\n", ", ") + ")";
+        }
+
+        /// <summary>The line shown on the screen for an error, with its innermost location; a release build leaves the message out.</summary>
+        internal static string ScreenLine(string label, string message, int times, bool release, string where)
+        {
+            var first = First(where);
+            var location = first.Length == 0 ? string.Empty : " (" + first + ")";
+            if (release)
+            {
+                return "|cffff4040" + Head(label, times) + "|r" + location;
+            }
+
+            return "|cffff4040" + Head(label, times) + ":|r " + message + location;
         }
 
         /// <summary>Whether an error that has happened this many times is shown: 1, 10, 100, 1000 and every power of ten.</summary>
@@ -77,6 +101,13 @@ namespace Moonwell
             }
 
             return rest == 1;
+        }
+
+        /// <summary>The innermost of the locations, or empty.</summary>
+        private static string First(string where)
+        {
+            var newline = where.IndexOf('\n');
+            return newline < 0 ? where : where.Substring(0, newline);
         }
 
         /// <summary>The start of an error's line, with the count once it has repeated.</summary>

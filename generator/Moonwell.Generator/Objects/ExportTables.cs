@@ -42,8 +42,9 @@ public sealed record ObjectRows(string Id, IReadOnlyDictionary<string, string> V
 /// set has replaces the base's file of the same name, a file it lacks is read from the base.
 /// </para>
 /// <para>
-/// SLK files are read here and not with <c>War3Net.IO.Slk</c> 6.0.2, which drops the last row and the last column
-/// of these files, narrows decimals to a float and turns <c>#VALUE!</c> into 0.
+/// SLK files are read here and not with <c>War3Net.IO.Slk</c> 6.0.2, which types each cell: it narrows decimals to a
+/// float (<c>19.7984999999999</c> becomes <c>19.7985</c>) and turns <c>#VALUE!</c> and <c>#REF!</c> into 0, by design.
+/// Its <c>Rows</c> and <c>Columns</c> are the highest indexes holding a cell, not counts.
 /// </para>
 /// </remarks>
 public sealed class ExportTables
