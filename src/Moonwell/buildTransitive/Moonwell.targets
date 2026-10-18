@@ -1,0 +1,11 @@
+<Project>
+
+  <!--
+    build/ holds what the Moonwell build writes (the map's Main, the staged map); dotnet build must not compile it.
+    This is a targets file because the Remove must come after the SDK adds Compile Include="**/*.cs", which props files precede.
+  -->
+  <ItemGroup>
+    <Compile Remove="build/**" />
+  </ItemGroup>
+
+</Project>

@@ -28,6 +28,7 @@ namespace Moonwell.Build.Tests
             var names = archive.Entries.Select(entry => entry.FullName).ToList();
             Assert.Contains("contentFiles/cs/net10.0/Moonwell/Core/Runtime.cs", names);
             Assert.Contains("buildTransitive/Moonwell.props", names);
+            Assert.Contains("buildTransitive/Moonwell.targets", names);
             Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
 
             using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.nuspec").Open());
@@ -50,21 +51,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void packaged_sample_builds()
         {
-            var copy = folders.TemporaryCopyOfSampleOutsideRepository();
-            var project = Path.Combine(copy, "Sample.csproj");
-            var text = File.ReadAllText(project);
-            var replaced = Regex.Replace(text, @"<ProjectReference [^>]*/>", $"<PackageReference Include=\"Moonwell\" Version=\"{packed.Version}\" />");
-            Assert.NotEqual(text, replaced);
-            File.WriteAllText(project, replaced);
-            File.WriteAllText(
-                Path.Combine(copy, "nuget.config"),
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                + "<configuration>\n"
-                + "  <packageSources>\n"
-                + "    <add key=\"nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />\n"
-                + $"    <add key=\"moonwell-test\" value=\"{packed.Feed}\" />\n"
-                + "  </packageSources>\n"
-                + "</configuration>\n");
+            var copy = PackagedSample(false);
 
             var log = new StringWriter();
             var archive = MapBuild.Run(copy, new BuildOptions(), log);
@@ -73,6 +60,21 @@ namespace Moonwell.Build.Tests
             var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
             Assert.Contains("Moonwell.Runtime", script);
             Assert.Contains("sample: started (development)", script);
+        }
+
+        [Fact]
+        public void second_build_without_own_remove()
+        {
+            var copy = PackagedSample(true);
+
+            var first = new StringWriter();
+            MapBuild.Run(copy, new BuildOptions(), first);
+            Assert.True(File.Exists(Path.Combine(copy, "build", "generated", "MapMain.g.cs")), first.ToString());
+
+            var second = new StringWriter();
+            var archive = MapBuild.Run(copy, new BuildOptions(), second);
+
+            Assert.True(File.Exists(archive), second.ToString());
         }
 
         [Fact]
@@ -98,6 +100,33 @@ namespace Moonwell.Build.Tests
             WriteAssets(copy, "War3Net.Build/0.0.0-missing", "package");
 
             PackageSources.Check(MapProject.Find(copy));
+        }
+
+        private string PackagedSample(bool withoutOwnRemove)
+        {
+            var copy = folders.TemporaryCopyOfSampleOutsideRepository();
+            var project = Path.Combine(copy, "Sample.csproj");
+            var text = File.ReadAllText(project);
+            var replaced = Regex.Replace(text, @"<ProjectReference [^>]*/>", $"<PackageReference Include=\"Moonwell\" Version=\"{packed.Version}\" />");
+            Assert.NotEqual(text, replaced);
+            if (withoutOwnRemove)
+            {
+                var removed = Regex.Replace(replaced, @"[ \t]*<Compile Remove=""build/\*\*"" />\r?\n", string.Empty);
+                Assert.NotEqual(replaced, removed);
+                replaced = removed;
+            }
+
+            File.WriteAllText(project, replaced);
+            File.WriteAllText(
+                Path.Combine(copy, "nuget.config"),
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                + "<configuration>\n"
+                + "  <packageSources>\n"
+                + "    <add key=\"nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />\n"
+                + $"    <add key=\"moonwell-test\" value=\"{packed.Feed}\" />\n"
+                + "  </packageSources>\n"
+                + "</configuration>\n");
+            return copy;
         }
 
         private static void WriteAssets(string folder, string library, string type)
