@@ -7,6 +7,9 @@ namespace Moonwell.Build
     /// <summary>The game's standard objects: their fields and their values in the base tables and in each balance set.</summary>
     public sealed class StandardData
     {
+        // The name a missingFrom list gives the base tables.
+        private const string BaseSet = "base";
+
         private static readonly string[] KindFiles = { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" };
 
         private readonly Dictionary<string, IReadOnlyList<ObjectField>> fields;
@@ -99,6 +102,15 @@ namespace Moonwell.Build
             return standard.Values.TryGetValue(key, out var value) ? value : null;
         }
 
+        /// <summary>Whether a standard object does not exist in the game under a balance set.</summary>
+        /// <param name="standardId">The id of the standard object.</param>
+        /// <param name="set">Null for the base tables, else <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>.</param>
+        /// <returns>True when the set's tables leave the object out; false when it exists there, and for an id that is no standard object.</returns>
+        public bool IsMissing(string standardId, string? set)
+        {
+            return objects.TryGetValue(standardId, out var standard) && standard.MissingFrom.Contains(set ?? BaseSet);
+        }
+
         // Kept apart from Read so that nothing of the loaded assembly is on Read's frame when the context unloads.
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static StandardData ReadIn(MapLoadContext context, string objectsDll)
@@ -157,7 +169,16 @@ namespace Moonwell.Build
                 sets[set.Name] = ReadMap(set.Value);
             }
 
-            return new StandardObject(ReadMap(element.GetProperty("values")), sets);
+            var missing = new HashSet<string>(StringComparer.Ordinal);
+            if (element.TryGetProperty("missingFrom", out var missingFrom))
+            {
+                foreach (var set in missingFrom.EnumerateArray())
+                {
+                    missing.Add(set.GetString()!);
+                }
+            }
+
+            return new StandardObject(ReadMap(element.GetProperty("values")), sets, missing);
         }
 
         private static Dictionary<string, string> ReadMap(JsonElement element)
@@ -178,6 +199,7 @@ namespace Moonwell.Build
 
         private sealed record StandardObject(
             IReadOnlyDictionary<string, string> Values,
-            IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Sets);
+            IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Sets,
+            IReadOnlySet<string> MissingFrom);
     }
 }

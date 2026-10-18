@@ -264,6 +264,24 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void standard_objects_missing_from_a_balance_set()
+        {
+            var standard = built.Standard;
+
+            // Illidan is in the base tables only; the Spur of Shadows is in a set only.
+            Assert.False(standard.IsMissing("Eevi", null));
+            Assert.True(standard.IsMissing("Eevi", "custom_v0"));
+            Assert.True(standard.IsMissing("Eevi", "melee_v0"));
+            Assert.False(standard.IsMissing("Eevi", "custom_v1"));
+            Assert.True(standard.IsMissing("spur", null));
+            Assert.True(standard.IsMissing("spur", "custom_v1"));
+            Assert.False(standard.IsMissing("spur", "melee_v0"));
+            Assert.False(standard.IsMissing("Hpal", "melee_v0"));
+            Assert.False(standard.IsMissing("nope", "melee_v0"));
+            Assert.False(StandardData.Empty.IsMissing("Eevi", "custom_v0"));
+        }
+
+        [Fact]
         public void setter_outside_ctor()
         {
             AssertFails(

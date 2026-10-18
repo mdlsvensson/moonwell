@@ -183,6 +183,12 @@ namespace Moonwell.Build
                 var candidates = pending.Where(declared => spaces.Contains(SpaceOf(declared.Kind))).ToList();
                 if (candidates.Count == 0)
                 {
+                    // Nothing could have replaced it, but the map still places the object.
+                    if (placedIds.Contains(entry.Value))
+                    {
+                        log.WriteLine($"warning: {entry.Key} was {entry.Value}, which the map places, and no class declares it now");
+                    }
+
                     continue;
                 }
 

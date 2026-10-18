@@ -3,6 +3,8 @@ namespace Moonwell.Build
     /// <summary>Builds a map project into a map archive.</summary>
     public static class MapBuild
     {
+        private static readonly string[] StandardKinds = { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" };
+
         /// <summary>Runs every step of the build, in order.</summary>
         /// <param name="path">A project folder, or the path of its <c>.csproj</c> file.</param>
         /// <param name="options">What kind of build to make.</param>
@@ -18,16 +20,15 @@ namespace Moonwell.Build
             PackageSources.Check(project);
             var settings = MapSettingsReader.Read(targetPath, project);
             var map = SourceMap.Open(project, settings);
-            EntryWriter.Write(project, settings);
-            LuaCompiler.Compile(project, map, targetPath, options.Release);
+            var objectsDll = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(targetPath))!, Declarations.ObjectsAssemblyName + ".dll");
 
-            try
+            if (File.Exists(objectsDll))
             {
-                Stage.Write(project, map, log);
+                BuildWithObjects(project, settings, map, targetPath, objectsDll, options, log);
             }
-            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            else
             {
-                throw CannotWrite(project, project.StagedFolder, error);
+                BuildWithoutObjects(project, settings, map, targetPath, options, log);
             }
 
             try
@@ -41,6 +42,61 @@ namespace Moonwell.Build
 
             log.WriteLine($@"moonwell: built build\{project.Name}.w3x");
             return project.ArchivePath;
+        }
+
+        // The map uses Moonwell.Objects: its declarations, ids, Lua, registry and object files are part of the build.
+        private static void BuildWithObjects(
+            MapProject project,
+            MapSettings settings,
+            War3Net.Build.Map map,
+            string targetPath,
+            string objectsDll,
+            BuildOptions options,
+            TextWriter log)
+        {
+            var set = GameBalance.SetOf(settings.Balance);
+            var standard = StandardData.Read(objectsDll);
+            var declarations = Declarations.Read(targetPath, project, standard, set);
+            BalanceCheck.Run(declarations, standard, set);
+
+            var standardIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var kind in StandardKinds)
+            {
+                standardIds.UnionWith(standard.Ids(kind));
+            }
+
+            var ids = ObjectIds.Assign(project, declarations.Objects, standardIds, MapObjectIds.Defined(project), MapObjectIds.Placed(map), log);
+            EntryWriter.Write(project, settings, true);
+            RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
+            LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, set);
+            StageWith(project, () => Stage.Write(project, map, declarations.Objects, ids, declarations.StandardClassIds, standard, log));
+        }
+
+        // The map does not reference Moonwell.Objects: its own object files are used as they are.
+        private static void BuildWithoutObjects(MapProject project, MapSettings settings, War3Net.Build.Map map, string targetPath, BuildOptions options, TextWriter log)
+        {
+            // A registry left by an earlier build would not compile any more.
+            var registry = Path.Combine(project.GeneratedFolder, "ObjectRegistry.g.cs");
+            if (File.Exists(registry))
+            {
+                File.Delete(registry);
+            }
+
+            EntryWriter.Write(project, settings);
+            LuaCompiler.Compile(project, map, targetPath, options.Release);
+            StageWith(project, () => Stage.WriteWithoutObjects(project, map, log));
+        }
+
+        private static void StageWith(MapProject project, Action stage)
+        {
+            try
+            {
+                stage();
+            }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            {
+                throw CannotWrite(project, project.StagedFolder, error);
+            }
         }
 
         private static BuildException CannotWrite(MapProject project, string path, Exception error)

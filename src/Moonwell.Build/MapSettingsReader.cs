@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -80,7 +81,8 @@ namespace Moonwell.Build
                 ReadSetting(map, "Name"),
                 ReadSetting(map, "Author"),
                 ReadSetting(map, "Description"),
-                ReadSetting(map, "RecommendedPlayers"));
+                ReadSetting(map, "RecommendedPlayers"),
+                ReadBalance(map));
         }
 
         private static bool IsMapClass(Type type)
@@ -103,15 +105,25 @@ namespace Moonwell.Build
 
         private static string ReadSetting(object map, string property)
         {
-            // Read from the Moonwell.Map base type, so that a property the class hides with new is not asked for.
+            return (string?)SettingOf(map, property).GetValue(map) ?? string.Empty;
+        }
+
+        // The enum crosses the load context as its number.
+        private static int ReadBalance(object map)
+        {
+            return Convert.ToInt32(SettingOf(map, "Balance").GetValue(map), CultureInfo.InvariantCulture);
+        }
+
+        // Read from the Moonwell.Map base type, so that a property the class hides with new is not asked for.
+        private static PropertyInfo SettingOf(object map, string property)
+        {
             var baseType = map.GetType().BaseType!;
             while (baseType.FullName != MapBaseName)
             {
                 baseType = baseType.BaseType!;
             }
 
-            var info = baseType.GetProperty(property, BindingFlags.Instance | BindingFlags.Public)!;
-            return (string?)info.GetValue(map) ?? string.Empty;
+            return baseType.GetProperty(property, BindingFlags.Instance | BindingFlags.Public)!;
         }
     }
 }

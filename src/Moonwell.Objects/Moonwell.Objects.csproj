@@ -1,15 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Moonwell\Moonwell.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Generated/Values/*.json" LogicalName="Moonwell.Objects.Values.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!--
+    The package carries its C# source beside its library, like Moonwell (see Moonwell.csproj): the generated classes are source
+    too, and the values the build reads are embedded in the library. It depends on Moonwell through the project reference.
+  -->
+  <ItemGroup>
+    <Content Include="**/*.cs" Exclude="obj/**;bin/**" Pack="true" PackagePath="contentFiles/cs/net10.0/Moonwell.Objects/" BuildAction="None" />
   </ItemGroup>
 
   <ItemGroup>

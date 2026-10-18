@@ -221,6 +221,27 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void gone_placed_id_without_a_new_class_is_a_warning()
+        {
+            Assign(Obj("Objects.Old", "unit"));
+
+            var ids = Assign(None, None, new HashSet<string> { "h001" }, Obj("Objects.Other", "item"));
+
+            Assert.Equal("I001", ids["Objects.Other"]);
+            Assert.Equal("warning: Objects.Old was h001, which the map places, and no class declares it now\n", log.ToString());
+        }
+
+        [Fact]
+        public void gone_id_the_map_does_not_place_is_no_warning_without_a_new_class()
+        {
+            Assign(Obj("Objects.Old", "unit"));
+
+            Assign(Obj("Objects.Other", "item"));
+
+            Assert.Equal(string.Empty, log.ToString());
+        }
+
+        [Fact]
         public void replaces_takes_standard_id()
         {
             var ids = Assign(Obj("Objects.Footman", "unit", root: "hfoo", replaces: true), Obj("Objects.Other", "unit"));

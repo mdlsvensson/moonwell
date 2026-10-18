@@ -8,6 +8,10 @@ project and a World Editor map into a playable map, with the script compiled to 
 `build\<Name>.w3x`. A development build is the default; `--release` makes a release build.
 `moonwell run [folder] [--release] [--game <exe>]` builds the same way, then starts Warcraft III with the map.
 
+An object is a class in the project that inherits one of the standard classes of `Moonwell.Objects` (`class Arthas : Paladin`);
+its constructor changes the fields, and the build writes the object into the map and keeps its id in `ids.json`. Set
+`Balance` in the map class to play with the melee or a custom balance data.
+
 It needs the .NET 10 SDK, and `common.j` and `Blizzard.j` in `Documents\Warcraft III\JassHelper`.
 
 | Path | What it is |

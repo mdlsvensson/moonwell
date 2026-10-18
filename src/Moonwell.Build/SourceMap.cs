@@ -10,7 +10,7 @@ namespace Moonwell.Build
         private const MapFiles ScriptFiles = MapFiles.Info | MapFiles.Units | MapFiles.UnitObjectData | MapFiles.Doodads
             | MapFiles.Regions | MapFiles.Cameras | MapFiles.Sounds | MapFiles.Environment | MapFiles.TriggerStrings;
 
-        /// <summary>Opens the project's map without its GUI triggers and applies the map class's settings.</summary>
+        /// <summary>Opens the project's map without its GUI triggers and applies the map class's settings, its balance among them.</summary>
         /// <param name="project">The map project.</param>
         /// <param name="settings">The settings read from the map class; empty ones keep World Editor's values.</param>
         /// <returns>The opened map, its script language set to Lua.</returns>
@@ -28,6 +28,7 @@ namespace Moonwell.Build
 
             var info = map.Info ?? throw new BuildException(@"no World Editor map: map\war3map.w3i is missing");
             info.ScriptLanguage = ScriptLanguage.Lua;
+            GameBalance.Apply(info, settings.Balance);
             if (settings.Name.Length > 0)
             {
                 info.MapName = settings.Name;

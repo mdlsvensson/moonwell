@@ -49,9 +49,28 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void objects_package_has_source_and_depends_on_moonwell()
+        {
+            using var archive = ZipFile.OpenRead(packed.ObjectsPackage);
+            var names = archive.Entries.Select(entry => entry.FullName).ToList();
+            Assert.Contains("contentFiles/cs/net10.0/Moonwell.Objects/Core/Declared.cs", names);
+            Assert.Contains(names, name => name.StartsWith("contentFiles/cs/net10.0/Moonwell.Objects/Generated/Units/", StringComparison.Ordinal) && name.EndsWith(".cs", StringComparison.Ordinal));
+            Assert.Contains(names, name => name.StartsWith("lib/", StringComparison.Ordinal) && name.EndsWith("/Moonwell.Objects.dll", StringComparison.Ordinal));
+            Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
+
+            using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.Objects.nuspec").Open());
+            var nuspec = XDocument.Parse(reader.ReadToEnd());
+            var files = nuspec.Descendants().Where(element => element.Name.LocalName == "files").ToList();
+            var declared = files.Single(file => file.Attribute("include")!.Value.Replace('\\', '/') == "cs/net10.0/Moonwell.Objects/Core/Declared.cs");
+            Assert.Equal("None", declared.Attribute("buildAction")!.Value);
+            var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
+            Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
+        }
+
+        [Fact]
         public void packaged_sample_builds()
         {
-            var copy = PackagedSample(false);
+            var copy = PackagedSample(false, false);
 
             var log = new StringWriter();
             var archive = MapBuild.Run(copy, new BuildOptions(), log);
@@ -63,9 +82,25 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void packaged_objects_build()
+        {
+            var copy = PackagedSample(false, true);
+
+            var log = new StringWriter();
+            var archive = MapBuild.Run(copy, new BuildOptions(), log);
+
+            Assert.True(File.Exists(archive), log.ToString());
+            var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
+            Assert.Contains("namespace.class(\"Paladin\"", script);
+            Assert.Contains("[\"Sample.Arthas\"]", script);
+            Assert.DoesNotContain("Archmage", script);
+            Assert.True(File.Exists(Path.Combine(copy, "ids.json")));
+        }
+
+        [Fact]
         public void second_build_without_own_remove()
         {
-            var copy = PackagedSample(true);
+            var copy = PackagedSample(true, true);
 
             var first = new StringWriter();
             MapBuild.Run(copy, new BuildOptions(), first);
@@ -102,13 +137,20 @@ namespace Moonwell.Build.Tests
             PackageSources.Check(MapProject.Find(copy));
         }
 
-        private string PackagedSample(bool withoutOwnRemove)
+        private string PackagedSample(bool withoutOwnRemove, bool withObjects)
         {
             var copy = folders.TemporaryCopyOfSampleOutsideRepository();
             var project = Path.Combine(copy, "Sample.csproj");
             var text = File.ReadAllText(project);
-            var replaced = Regex.Replace(text, @"<ProjectReference [^>]*/>", $"<PackageReference Include=\"Moonwell\" Version=\"{packed.Version}\" />");
+            var references = Regex.Replace(text, @"<ProjectReference [^>]*Moonwell\.Objects\.csproj"" />", withObjects ? $"<PackageReference Include=\"Moonwell.Objects\" Version=\"{packed.Version}\" />" : "<!-- no objects -->");
+            var replaced = Regex.Replace(references, @"<ProjectReference [^>]*Moonwell\.csproj"" />", $"<PackageReference Include=\"Moonwell\" Version=\"{packed.Version}\" />");
             Assert.NotEqual(text, replaced);
+            if (!withObjects)
+            {
+                File.Delete(Path.Combine(copy, "Objects.cs"));
+                File.Delete(Path.Combine(copy, "ids.json"));
+            }
+
             if (withoutOwnRemove)
             {
                 var removed = Regex.Replace(replaced, @"[ \t]*<Compile Remove=""build/\*\*"" />\r?\n", string.Empty);
