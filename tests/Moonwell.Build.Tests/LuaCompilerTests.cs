@@ -87,6 +87,29 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void csharplua_error_is_a_build_error()
+        {
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllText(
+                Path.Combine(folder, "Bad.cs"),
+                "namespace Sample\n"
+                + "{\n"
+                + "    public static class Bad\n"
+                + "    {\n"
+                + "        public static void Call(dynamic target)\n"
+                + "        {\n"
+                + "            target.Foo(x: 1);\n"
+                + "        }\n"
+                + "    }\n"
+                + "}\n");
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(folder, new BuildOptions(), TextWriter.Null));
+
+            Assert.Contains("named argument is not support at dynamic", error.Message);
+            Assert.DoesNotContain("unexpected error", error.Message);
+        }
+
+        [Fact]
         public void missing_libraries_are_an_error()
         {
             var empty = Path.Combine(Path.GetTempPath(), "moonwell-empty-" + Guid.NewGuid().ToString("N"));

@@ -37,7 +37,16 @@ namespace Moonwell.Build
 
             var builder = new MapScriptBuilder(triggerData: null!);
             builder.SetDefaultOptionsForCSharpLua();
-            var result = map.CompileScript(compiler, builder, libraries, commonJ, blizzardJ);
+            CompileResult result;
+            try
+            {
+                result = map.CompileScript(compiler, builder, libraries, commonJ, blizzardJ);
+            }
+            catch (CompilationErrorException failure)
+            {
+                // CSharp.lua's own translation errors; a Roslyn error comes back as a result below.
+                throw new BuildException(failure.Message);
+            }
             if (!result.Success)
             {
                 var errors = result.Diagnostics
