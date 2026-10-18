@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Moonwell.Build
 {
-    /// <summary>The game's standard objects: their fields and their values in the base tables and in each balance set.</summary>
+    /// <summary>The game's standard objects: their fields and their values in the base tables and in each set of tables.</summary>
     public sealed class StandardData
     {
         // The name a missingFrom list gives the base tables.
@@ -115,7 +115,7 @@ namespace Moonwell.Build
             return standard.Values.TryGetValue(key, out var value) ? value : null;
         }
 
-        /// <summary>Whether a standard object does not exist in the game under a balance set.</summary>
+        /// <summary>Whether a standard object does not exist in the game under a set of tables (<see cref="GameData.ExistenceSet"/>).</summary>
         /// <param name="standardId">The id of the standard object.</param>
         /// <param name="set">Null for the base tables, else <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>.</param>
         /// <returns>True when the set's tables leave the object out; false when it exists there, and for an id that is no standard object.</returns>

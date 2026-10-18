@@ -207,7 +207,7 @@ namespace Moonwell.Build
         /// <param name="declared">The declared objects.</param>
         /// <param name="ids">The object id of each declared class, and of each standard class the declarations name.</param>
         /// <param name="standard">The standard data.</param>
-        /// <param name="set">The balance set standard values are read from: null for the base tables.</param>
+        /// <param name="set">The tables standard values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
         /// <returns>The script with the values table at its end.</returns>
         /// <exception cref="BuildException">A declared list or reference names a class that has no object id.</exception>
         public static string Values(

@@ -48,7 +48,7 @@ namespace Moonwell.Build
         /// <param name="assemblyPath">The map's built assembly; <c>Moonwell.Objects.dll</c> is beside it.</param>
         /// <param name="project">The map project; lines in messages are relative to its folder.</param>
         /// <param name="standard">The standard values.</param>
-        /// <param name="set">The balance set that fields a class leaves unset read: null for the base tables, else <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>.</param>
+        /// <param name="set">The tables that fields a class leaves unset read (<see cref="GameData.ValueSet"/>): null for the base tables, else <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>.</param>
         /// <returns>The declared objects, ordered by class name, the ids of the standard classes their lists and references name, and the classes the map's Lua uses; all empty when the map does not use <c>Moonwell.Objects</c>.</returns>
         /// <exception cref="BuildException">A constructor calls the game or throws, a declared field is set outside a constructor, or <c>[Replaces]</c> is misused.</exception>
         public static DeclarationSet Read(string assemblyPath, MapProject project, StandardData standard, string? set)

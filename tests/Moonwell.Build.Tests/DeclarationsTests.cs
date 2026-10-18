@@ -251,6 +251,34 @@ namespace Moonwell.Build.Tests
             Assert.Null(standard.Value("nope", "uhpm", 0, null));
         }
 
+        [Theory]
+        [InlineData(2, 2, "400")]
+        [InlineData(0, 2, "400")]
+        [InlineData(0, 1, "425")]
+        [InlineData(1, 1, "425")]
+        [InlineData(2, 1, "400")]
+        [InlineData(2, 0, "500")]
+        public void game_data_option_decides_the_tables_values_come_from(int dataSet, int dataVersion, string gold)
+        {
+            // Hpal's gold cost is 400 in the base tables, 425 in custom_v1 and 500 in melee_v0.
+            var data = GameData.Of(dataSet, dataVersion);
+
+            Assert.Equal(gold, built.Standard.Value("Hpal", "ugol", 0, data.ValueSet));
+        }
+
+        [Fact]
+        public void melee_with_frozen_throne_has_base_values_and_the_objects_of_custom_v1()
+        {
+            var data = GameData.Of(2, 1);
+
+            // Eevi (Illidan) is in custom_v1 and the base tables, not in melee_v0; the spur is in neither custom_v1 nor the base tables.
+            Assert.False(built.Standard.IsMissing("Eevi", data.ExistenceSet));
+            Assert.True(built.Standard.IsMissing("spur", data.ExistenceSet));
+            Assert.Equal("400", built.Standard.Value("Hpal", "ugol", 0, data.ValueSet));
+            Assert.True(built.Standard.IsMissing("Eevi", GameData.Of(2, 0).ExistenceSet));
+            Assert.False(built.Standard.IsMissing("spur", GameData.Of(2, 0).ExistenceSet));
+        }
+
         [Fact]
         public void standard_fields_and_ids_by_kind()
         {

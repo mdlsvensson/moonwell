@@ -53,15 +53,15 @@ namespace Moonwell.Build
             BuildOptions options,
             TextWriter log)
         {
-            var set = GameBalance.SetOf(settings.Balance);
+            var data = GameData.Of(settings.DataSet, settings.DataVersion);
             var standard = StandardData.Read(objectsDll);
-            var declarations = Declarations.Read(targetPath, project, standard, set);
-            BalanceCheck.Run(declarations, standard, set);
+            var declarations = Declarations.Read(targetPath, project, standard, data.ValueSet);
+            BalanceCheck.Run(declarations, standard, data);
 
             var ids = ObjectIds.Assign(project, declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project), MapObjectIds.Placed(map), log);
             EntryWriter.Write(project, settings, true);
             RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
-            LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, set);
+            LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, data.ValueSet);
             StageWith(project, () => Stage.Write(project, map, declarations.Objects, ids, declarations.StandardClassIds, standard, log));
         }
 

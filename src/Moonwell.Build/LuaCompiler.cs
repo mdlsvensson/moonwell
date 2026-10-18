@@ -31,7 +31,7 @@ namespace Moonwell.Build
         /// <param name="declarations">What the map declares and the classes it uses.</param>
         /// <param name="ids">The object id of each declared class.</param>
         /// <param name="standard">The standard data.</param>
-        /// <param name="set">The balance set: null for the base tables.</param>
+        /// <param name="set">The tables values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
         /// <returns>The script, also set on <paramref name="map"/>.</returns>
         /// <exception cref="BuildException">Common.j and Blizzard.j are missing, the C# does not compile to Lua, or a declared list names a class with no id.</exception>
         public static string Compile(

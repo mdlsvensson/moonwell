@@ -19,7 +19,7 @@ namespace Moonwell.Build
         /// <param name="changed">The values the class changed, as <see cref="DeclaredObject.Changed"/>; empty for a standard class.</param>
         /// <param name="ids">The object id of each class a changed list or reference may name.</param>
         /// <param name="standard">The standard data.</param>
-        /// <param name="set">The balance set: null for the base tables.</param>
+        /// <param name="set">The tables values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
         public FieldValues(UsedClass used, string root, IReadOnlyDictionary<string, object?> changed, IReadOnlyDictionary<string, string> ids, StandardData standard, string? set)
         {
             this.used = used;

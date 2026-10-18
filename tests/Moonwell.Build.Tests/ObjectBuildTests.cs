@@ -82,15 +82,21 @@ namespace Moonwell.Build.Tests
             Assert.Equal(committed, File.ReadAllBytes(Path.Combine(copy, "ids.json")));
         }
 
+        // DataSet: 0 Default, 1 Custom, 2 Melee. DataVersion: 0 ReignOfChaos, 1 FrozenThrone, 2 ForsakenKingdom.
         [Theory]
-        [InlineData(0, GameDataSet.Default, GameDataVersion.Unset, null)]
-        [InlineData(1, GameDataSet.Melee, GameDataVersion.RoC, "melee_v0")]
-        [InlineData(2, GameDataSet.Custom, GameDataVersion.RoC, "custom_v0")]
-        [InlineData(3, GameDataSet.Custom, GameDataVersion.TFT, "custom_v1")]
-        public void balance_writes_option(int balance, GameDataSet set, GameDataVersion version, string? tables)
+        [InlineData(0, 2, GameDataSet.Default, GameDataVersion.Unset, null, null)]
+        [InlineData(1, 2, GameDataSet.Custom, GameDataVersion.Unset, null, null)]
+        [InlineData(2, 2, GameDataSet.Melee, GameDataVersion.Unset, null, null)]
+        [InlineData(0, 1, GameDataSet.Default, GameDataVersion.TFT, "custom_v1", "custom_v1")]
+        [InlineData(1, 1, GameDataSet.Custom, GameDataVersion.TFT, "custom_v1", "custom_v1")]
+        [InlineData(2, 1, GameDataSet.Melee, GameDataVersion.TFT, null, "custom_v1")]
+        [InlineData(0, 0, GameDataSet.Default, GameDataVersion.RoC, "custom_v0", "custom_v0")]
+        [InlineData(1, 0, GameDataSet.Custom, GameDataVersion.RoC, "custom_v0", "custom_v0")]
+        [InlineData(2, 0, GameDataSet.Melee, GameDataVersion.RoC, "melee_v0", "melee_v0")]
+        public void data_option_writes_info_values_and_reads_tables(int dataSet, int dataVersion, GameDataSet set, GameDataVersion version, string? values, string? existence)
         {
             var project = MapProject.Find(folders.TemporaryCopyOfSample());
-            var settings = new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, balance);
+            var settings = new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, dataSet, dataVersion);
             var map = SourceMap.Open(project, settings, TextWriter.Null);
             map.Script = "-- script";
 
@@ -100,21 +106,25 @@ namespace Moonwell.Build.Tests
             var info = reader.ReadMapInfo();
             Assert.Equal(set, info.GameDataSet);
             Assert.Equal(version, info.GameDataVersion);
-            Assert.Equal(tables, GameBalance.SetOf(balance));
+            var data = GameData.Of(dataSet, dataVersion);
+            Assert.Equal(values, data.ValueSet);
+            Assert.Equal(existence, data.ExistenceSet);
         }
 
         [Theory]
-        [InlineData(0, null)]
-        [InlineData(1, "note: the map's game data option Default is replaced by Melee (RoC) (Map.Balance)")]
-        [InlineData(2, "note: the map's game data option Default is replaced by Custom (RoC) (Map.Balance)")]
-        [InlineData(3, "note: the map's game data option Default is replaced by Custom (TFT) (Map.Balance)")]
-        public void balance_that_changes_the_game_data_option_is_noted(int balance, string? note)
+        [InlineData(0, 2, null)]
+        [InlineData(2, 0, "note: the map's game data option Default / Forsaken Kingdom is replaced by Melee / Reign of Chaos")]
+        [InlineData(1, 0, "note: the map's game data option Default / Forsaken Kingdom is replaced by Custom / Reign of Chaos")]
+        [InlineData(2, 1, "note: the map's game data option Default / Forsaken Kingdom is replaced by Melee / Frozen Throne")]
+        [InlineData(0, 1, "note: the map's game data option Default / Forsaken Kingdom is replaced by Default / Frozen Throne")]
+        [InlineData(1, 2, "note: the map's game data option Default / Forsaken Kingdom is replaced by Custom / Forsaken Kingdom")]
+        public void data_option_that_changes_the_game_data_option_is_noted(int dataSet, int dataVersion, string? note)
         {
             // The Sample's World Editor map has the default option.
             var project = MapProject.Find(folders.TemporaryCopyOfSample());
             var log = new StringWriter { NewLine = "\n" };
 
-            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, balance), log);
+            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, dataSet, dataVersion), log);
 
             Assert.Equal(note == null ? string.Empty : note + "\n", log.ToString());
         }
@@ -140,49 +150,63 @@ namespace Moonwell.Build.Tests
             var project = MapProject.Find(copy);
             var log = new StringWriter { NewLine = "\n" };
 
-            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, 1), log);
-            Assert.Equal("note: the map's game data option Custom (TFT) is replaced by Melee (RoC) (Map.Balance)\n", log.ToString());
+            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, 2, 0), log);
+            Assert.Equal("note: the map's game data option Custom / Frozen Throne is replaced by Melee / Reign of Chaos\n", log.ToString());
 
             log.GetStringBuilder().Clear();
-            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, 3), log);
+            SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty, 1, 1), log);
             Assert.Equal(string.Empty, log.ToString());
         }
 
         [Fact]
-        public void unknown_balance_is_an_error()
+        public void unknown_data_set_or_version_is_an_error()
         {
-            var error = Assert.Throws<BuildException>(() => GameBalance.SetOf(9));
-
-            Assert.Equal("Balance 9 is not a balance of this version of Moonwell", error.Message);
+            Assert.Equal("DataSet 9 is not a data set of this version of Moonwell", Assert.Throws<BuildException>(() => GameData.Of(9, 0)).Message);
+            Assert.Equal("DataVersion 9 is not a data version of this version of Moonwell", Assert.Throws<BuildException>(() => GameData.Of(0, 9)).Message);
         }
 
         [Fact]
-        public void balance_numbers_match_the_runtime()
+        public void data_set_and_version_numbers_match_the_runtime()
         {
             // Read from the Sample's own copy of Moonwell, from bytes so that no file stays locked.
             Assert.Equal(0, builds.Development.ExitCode);
             var dll = Path.Combine(TestFolders.Fixture("Sample"), "bin", "Debug", "net10.0", "Moonwell.dll");
-            var balance = Assembly.Load(File.ReadAllBytes(dll)).GetType("Moonwell.Balance", true)!;
+            var runtime = Assembly.Load(File.ReadAllBytes(dll));
+            var dataSet = runtime.GetType("Moonwell.DataSet", true)!;
+            var dataVersion = runtime.GetType("Moonwell.DataVersion", true)!;
 
-            var expected = new Dictionary<string, string?>
+            var sets = new Dictionary<string, GameDataSet>
             {
-                ["Default"] = null,
-                ["MeleeV0"] = "melee_v0",
-                ["CustomV0"] = "custom_v0",
-                ["CustomV1"] = "custom_v1",
+                ["Default"] = GameDataSet.Default,
+                ["Custom"] = GameDataSet.Custom,
+                ["Melee"] = GameDataSet.Melee,
             };
-            Assert.Equal(expected.Keys.Order(StringComparer.Ordinal), Enum.GetNames(balance).Order(StringComparer.Ordinal));
-            foreach (var name in expected.Keys)
+            var versions = new Dictionary<string, GameDataVersion>
             {
-                Assert.Equal(expected[name], GameBalance.SetOf((int)Enum.Parse(balance, name)));
+                ["ReignOfChaos"] = GameDataVersion.RoC,
+                ["FrozenThrone"] = GameDataVersion.TFT,
+                ["ForsakenKingdom"] = GameDataVersion.Unset,
+            };
+            Assert.Equal(sets.Keys.Order(StringComparer.Ordinal), Enum.GetNames(dataSet).Order(StringComparer.Ordinal));
+            Assert.Equal(versions.Keys.Order(StringComparer.Ordinal), Enum.GetNames(dataVersion).Order(StringComparer.Ordinal));
+            var forsaken = (int)Enum.Parse(dataVersion, "ForsakenKingdom");
+            var defaultSet = (int)Enum.Parse(dataSet, "Default");
+            foreach (var name in sets.Keys)
+            {
+                Assert.Equal(sets[name], GameData.Of((int)Enum.Parse(dataSet, name), forsaken).InfoSet);
+            }
+
+            foreach (var name in versions.Keys)
+            {
+                Assert.Equal(versions[name], GameData.Of(defaultSet, (int)Enum.Parse(dataVersion, name)).InfoVersion);
             }
         }
 
         [Fact]
-        public void balance_of_the_map_class_reaches_the_info_file()
+        public void data_option_of_the_map_class_reaches_the_info_file()
         {
             var copy = folders.TemporaryCopyOfSample();
-            SetBalance(copy, "CustomV1");
+            SetData(copy, "Custom", "FrozenThrone");
 
             MapBuild.Run(copy, new BuildOptions(), TextWriter.Null);
 
@@ -193,47 +217,63 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void declared_object_missing_from_the_balance_set_is_an_error()
+        public void declared_object_missing_from_the_game_data_option_is_an_error()
         {
             var copy = folders.TemporaryCopyOfSample();
-            SetBalance(copy, "CustomV0");
+            SetData(copy, "Custom", "ReignOfChaos");
             File.WriteAllText(
                 Path.Combine(copy, "Illidan.cs"),
                 "namespace Sample\n{\n    public sealed class Illidan : Moonwell.Objects.Units.Campaign.IllidanEevi\n    {\n    }\n}\n");
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
 
-            Assert.Equal("Sample.Illidan: Eevi does not exist in custom_v0; its balance set leaves it out", error.Message);
+            Assert.Equal("Sample.Illidan: Eevi does not exist under Custom / Reign of Chaos", error.Message);
         }
 
         [Fact]
-        public void used_standard_class_missing_from_the_balance_set_is_an_error()
+        public void used_standard_class_missing_from_the_game_data_option_is_an_error()
         {
             var copy = folders.TemporaryCopyOfSample();
-            SetBalance(copy, "MeleeV0");
-            File.WriteAllText(
-                Path.Combine(copy, "Spawn.cs"),
-                "using Moonwell;\n\nnamespace Sample\n{\n    public sealed class Spawn : GameComponent\n    {\n"
-                + "        public override void OnUnitDied(Unit dying, Unit? killer)\n        {\n"
-                + "            Unit.Create<Moonwell.Objects.Units.Campaign.IllidanEevi>(Player.Get(0), 0f, 0f, 0f);\n        }\n    }\n}\n");
-            ReplaceInFile(Path.Combine(copy, "Map.cs"), "Components.Add(new Hello());", "Components.Add(new Hello());\n            Components.Add(new Spawn());");
+            SetData(copy, "Melee", "ReignOfChaos");
+            UseIllidan(copy);
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
 
-            Assert.Equal("Moonwell.Objects.Units.Campaign.IllidanEevi: Eevi does not exist in melee_v0; its balance set leaves it out", error.Message);
+            Assert.Equal("Moonwell.Objects.Units.Campaign.IllidanEevi: Eevi does not exist under Melee / Reign of Chaos", error.Message);
         }
 
         [Fact]
-        public void object_in_every_balance_set_builds_under_melee()
+        public void melee_with_frozen_throne_has_the_objects_of_custom_v1()
         {
+            // Eevi (Illidan) is in custom_v1 but not in melee_v0, so it exists here; the spur is in neither custom_v1 nor the base.
             var copy = folders.TemporaryCopyOfSample();
-            SetBalance(copy, "MeleeV0");
+            SetData(copy, "Melee", "FrozenThrone");
+            UseIllidan(copy);
+            Assert.True(File.Exists(MapBuild.Run(copy, new BuildOptions(), TextWriter.Null)));
 
-            var archive = MapBuild.Run(copy, new BuildOptions(), TextWriter.Null);
+            File.WriteAllText(
+                Path.Combine(copy, "Spurred.cs"),
+                "namespace Sample\n{\n    public sealed class Spurred : Moonwell.Objects.Items.spur\n    {\n    }\n}\n");
 
-            Assert.True(File.Exists(archive));
-            using var reader = new BinaryReader(File.OpenRead(Path.Combine(copy, "build", "Sample", "war3map.w3i")));
-            Assert.Equal(GameDataSet.Melee, reader.ReadMapInfo().GameDataSet);
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
+
+            Assert.Equal("Sample.Spurred: spur does not exist under Melee / Frozen Throne", error.Message);
+        }
+
+        [Fact]
+        public void object_in_every_set_of_tables_builds_under_melee()
+        {
+            foreach (var version in new[] { "ReignOfChaos", "FrozenThrone", "ForsakenKingdom" })
+            {
+                var copy = folders.TemporaryCopyOfSample();
+                SetData(copy, "Melee", version);
+
+                var archive = MapBuild.Run(copy, new BuildOptions(), TextWriter.Null);
+
+                Assert.True(File.Exists(archive));
+                using var reader = new BinaryReader(File.OpenRead(Path.Combine(copy, "build", "Sample", "war3map.w3i")));
+                Assert.Equal(GameDataSet.Melee, reader.ReadMapInfo().GameDataSet);
+            }
         }
 
         [Fact]
@@ -334,9 +374,23 @@ namespace Moonwell.Build.Tests
             }
         }
 
-        private static void SetBalance(string folder, string balance)
+        private static void SetData(string folder, string dataSet, string dataVersion)
         {
-            ReplaceInFile(Path.Combine(folder, "Map.cs"), RecommendedPlayers, RecommendedPlayers + "\n            Balance = Balance." + balance + ";");
+            ReplaceInFile(
+                Path.Combine(folder, "Map.cs"),
+                RecommendedPlayers,
+                RecommendedPlayers + "\n            DataSet = DataSet." + dataSet + ";\n            DataVersion = DataVersion." + dataVersion + ";");
+        }
+
+        // The map's code uses Illidan, whom the game has in the base tables and in custom_v1 only.
+        private static void UseIllidan(string folder)
+        {
+            File.WriteAllText(
+                Path.Combine(folder, "Spawn.cs"),
+                "using Moonwell;\n\nnamespace Sample\n{\n    public sealed class Spawn : GameComponent\n    {\n"
+                + "        public override void OnUnitDied(Unit dying, Unit? killer)\n        {\n"
+                + "            Unit.Create<Moonwell.Objects.Units.Campaign.IllidanEevi>(Player.Get(0), 0f, 0f, 0f);\n        }\n    }\n}\n");
+            ReplaceInFile(Path.Combine(folder, "Map.cs"), "Components.Add(new Hello());", "Components.Add(new Hello());\n            Components.Add(new Spawn());");
         }
 
         private static void ReplaceInFile(string path, string text, string with)

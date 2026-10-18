@@ -15,7 +15,7 @@ namespace Moonwell.Build
         private readonly IReadOnlyDictionary<string, string> classNames;
 
         /// <param name="standard">The standard values.</param>
-        /// <param name="set">The balance set the unset fields read; null for the base tables.</param>
+        /// <param name="set">The tables the unset fields read (<see cref="GameData.ValueSet"/>); null for the base tables.</param>
         /// <param name="project">The map project; lines in messages are relative to its folder.</param>
         /// <param name="classNames">The full class name of each standard id that has a standard class.</param>
         public ChangedFields(StandardData standard, string? set, MapProject project, IReadOnlyDictionary<string, string> classNames)

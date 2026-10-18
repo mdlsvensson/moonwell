@@ -82,7 +82,8 @@ namespace Moonwell.Build
                 ReadSetting(map, "Author"),
                 ReadSetting(map, "Description"),
                 ReadSetting(map, "RecommendedPlayers"),
-                ReadBalance(map));
+                ReadNumber(map, "DataSet"),
+                ReadNumber(map, "DataVersion"));
         }
 
         private static bool IsMapClass(Type type)
@@ -109,9 +110,9 @@ namespace Moonwell.Build
         }
 
         // The enum crosses the load context as its number.
-        private static int ReadBalance(object map)
+        private static int ReadNumber(object map, string property)
         {
-            return Convert.ToInt32(SettingOf(map, "Balance").GetValue(map), CultureInfo.InvariantCulture);
+            return Convert.ToInt32(SettingOf(map, property).GetValue(map), CultureInfo.InvariantCulture);
         }
 
         // Read from the Moonwell.Map base type, so that a property the class hides with new is not asked for.
