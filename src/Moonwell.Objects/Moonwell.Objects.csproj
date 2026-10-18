@@ -8,4 +8,8 @@
     <ProjectReference Include="..\Moonwell\Moonwell.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Moonwell.Objects.Tests" />
+  </ItemGroup>
+
 </Project>

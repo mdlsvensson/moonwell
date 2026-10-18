@@ -13,6 +13,7 @@
     <Project Path="tests/Moonwell.Build.Tests/Moonwell.Build.Tests.csproj" />
     <Project Path="tests/Moonwell.Generator.Tests/Moonwell.Generator.Tests.csproj" />
     <Project Path="tests/Moonwell.Lua.Tests/Moonwell.Lua.Tests.csproj" />
+    <Project Path="tests/Moonwell.Objects.Tests/Moonwell.Objects.Tests.csproj" />
     <Project Path="tests/Moonwell.Testing/Moonwell.Testing.csproj" />
     <Project Path="tests/Moonwell.Tests/Moonwell.Tests.csproj" />
   </Folder>
