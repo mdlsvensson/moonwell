@@ -5,4 +5,8 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Objects\field-names.txt" LogicalName="field-names.txt" />
+  </ItemGroup>
+
 </Project>
