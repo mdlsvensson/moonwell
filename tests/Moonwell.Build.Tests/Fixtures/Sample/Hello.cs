@@ -8,9 +8,9 @@ namespace Sample
         public override void OnGameStart()
         {
 #if DEBUG
-            Natives.DisplayTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, "sample: started (development)");
+            Natives.DisplayTextToPlayer(Natives.Player(0), 0f, 0f, "sample: started (development)");
 #else
-            Natives.DisplayTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, "sample: started (release)");
+            Natives.DisplayTextToPlayer(Natives.Player(0), 0f, 0f, "sample: started (release)");
 #endif
         }
     }

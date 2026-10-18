@@ -9,7 +9,7 @@ namespace Objects
         {
             var arthas = new Arthas();
             var firebolt = new Firebolt();
-            Natives.DisplayTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, "objects: " + arthas.HitPoints + " " + firebolt.Damage[2]);
+            Natives.DisplayTextToPlayer(Natives.Player(0), 0f, 0f, "objects: " + arthas.HitPoints + " " + firebolt.Damage[2]);
         }
 
         // Arthas's description has no value: it reads as the empty text.

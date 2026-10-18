@@ -29,6 +29,7 @@ namespace Moonwell.Build.Tests
             Assert.Contains("contentFiles/cs/net10.0/Moonwell/Core/Runtime.cs", names);
             Assert.Contains("buildTransitive/Moonwell.props", names);
             Assert.Contains("buildTransitive/Moonwell.targets", names);
+            Assert.Contains("analyzers/dotnet/cs/Moonwell.Analyzers.dll", names);
             Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
 
             using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.nuspec").Open());
@@ -79,6 +80,20 @@ namespace Moonwell.Build.Tests
             var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
             Assert.Contains("Moonwell.Runtime", script);
             Assert.Contains("sample: started (development)", script);
+        }
+
+        [Fact]
+        public void packaged_sample_runs_the_analyzer()
+        {
+            var copy = PackagedSample(false, false);
+            File.WriteAllText(
+                Path.Combine(copy, "Desync.cs"),
+                "namespace Sample\n{\n    public static class Desync\n    {\n        public static object Local() => Moonwell.Natives.GetLocalPlayer();\n    }\n}\n");
+
+            var log = new StringWriter();
+            Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), log));
+
+            Assert.Contains("Desync.cs(5,41): error MW0002", log.ToString());
         }
 
         [Fact]

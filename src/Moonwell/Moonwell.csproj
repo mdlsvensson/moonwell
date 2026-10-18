@@ -4,6 +4,15 @@
     <ProjectReference Include="..\Moonwell.Natives\Moonwell.Natives.csproj" />
   </ItemGroup>
 
+  <!--
+    The multiplayer analyzer runs in every project that references the package: it is built first and packed under
+    analyzers/dotnet/cs. A project that references Moonwell.csproj itself adds it as an Analyzer reference.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\Moonwell.Analyzers\Moonwell.Analyzers.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <None Include="..\Moonwell.Analyzers\bin\$(Configuration)\netstandard2.0\Moonwell.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="moonwell.lua" LogicalName="Moonwell.moonwell.lua" />
   </ItemGroup>
