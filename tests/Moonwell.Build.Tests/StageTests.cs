@@ -125,6 +125,49 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void object_files_are_written_by_object_files()
+        {
+            var project = MapProject.Find(folders.TemporaryCopyOfSample());
+            var map = OpenWithPlaceholderScript(project);
+            var fixture = TestFolders.Fixture("WorldEditorObjects");
+            foreach (var name in new[] { "war3map.w3u", "war3mapSkin.w3u" })
+            {
+                File.Copy(Path.Combine(fixture, name), Path.Combine(project.MapFolder, name));
+            }
+
+            // The source map's object files come through unchanged when no class declares an object.
+            var log = new StringWriter();
+            Stage.Write(project, map, log);
+
+            foreach (var name in new[] { "war3map.w3u", "war3mapSkin.w3u" })
+            {
+                Assert.Equal(File.ReadAllBytes(Path.Combine(fixture, name)), File.ReadAllBytes(Path.Combine(project.StagedFolder, name)));
+            }
+
+            Assert.Contains(@"warning: map\war3map.w3u keeps h000, which no class declares", log.ToString());
+
+            // A declared object is written beside them.
+            var declared = new DeclaredObject(
+                "Objects.Peasant",
+                "unit",
+                "hpea",
+                false,
+                null,
+                new SortedDictionary<string, object?>(),
+                Array.Empty<string>());
+            Stage.Write(
+                project,
+                map,
+                new[] { declared },
+                new Dictionary<string, string> { ["Objects.Peasant"] = "h001" },
+                new Dictionary<string, string>(),
+                StandardData.Empty,
+                TextWriter.Null);
+
+            Assert.NotEqual(File.ReadAllBytes(Path.Combine(fixture, "war3map.w3u")), File.ReadAllBytes(Path.Combine(project.StagedFolder, "war3map.w3u")));
+        }
+
+        [Fact]
         public void stale_staged_files_are_gone()
         {
             var project = MapProject.Find(folders.TemporaryCopyOfSample());

@@ -23,6 +23,12 @@ namespace Moonwell.Build
             this.objects = objects;
         }
 
+        /// <summary>No standard objects and no fields: for the build of a map that declares no objects.</summary>
+        public static StandardData Empty { get; } = new StandardData(
+            KindFiles.ToDictionary(kind => kind, kind => (IReadOnlyList<ObjectField>)new List<ObjectField>(), StringComparer.Ordinal),
+            KindFiles.ToDictionary(kind => kind, kind => (IReadOnlySet<string>)new HashSet<string>(), StringComparer.Ordinal),
+            new Dictionary<string, StandardObject>(StringComparer.Ordinal));
+
         /// <summary>A field of an object kind, as the metadata describes it.</summary>
         /// <param name="Id">The field's four-character id.</param>
         /// <param name="Type">The field's type: <c>int</c>, <c>float</c>, <c>bool</c>, <c>string</c>, <c>objectList</c> or <c>objectRef</c>.</param>
