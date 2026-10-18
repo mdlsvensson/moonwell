@@ -73,7 +73,8 @@ namespace Moonwell.Build
             return changed;
         }
 
-        private static string FieldOfLevelCount(string kind)
+        // The field that holds the number of levels of an object of a kind; empty for a kind without levels.
+        internal static string FieldOfLevelCount(string kind)
         {
             switch (kind)
             {

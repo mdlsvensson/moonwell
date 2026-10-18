@@ -1,0 +1,318 @@
+using System.Globalization;
+using System.Text.RegularExpressions;
+using Xunit;
+
+namespace Moonwell.Build.Tests
+{
+    [Collection("Sample")]
+    public sealed class ObjectLuaTests : IClassFixture<ObjectLuaTests.CompiledObjects>
+    {
+        private readonly CompiledObjects compiled;
+
+        public ObjectLuaTests(CompiledObjects compiled)
+        {
+            this.compiled = compiled;
+        }
+
+        [Fact]
+        public void declared_value_reads_in_lua()
+        {
+            var paladin = int.Parse(compiled.Standard.Value("Hpal", "uhpm", 0, null)!, CultureInfo.InvariantCulture);
+
+            var run = compiled.Run();
+
+            Assert.Empty(run.Errors);
+            Assert.Contains($"objects: {2 * paladin} 200", run.Lines);
+        }
+
+        [Fact]
+        public void standard_class_used_in_code_is_defined()
+        {
+            // Footman is also the base of declared classes; Rifleman is used only inside a reaction.
+            foreach (var (name, id) in new[] { ("Footman", "hfoo"), ("Rifleman", "hrif") })
+            {
+                var full = "Moonwell.Objects.Units.Human." + name;
+                Assert.Contains($"namespace.class(\"{name}\"", compiled.Script);
+                Assert.Contains(full, compiled.InitTypes());
+                Assert.Contains($"global::{full}>(global::Moonwell.ObjectTypes.FourCC(\"{id}\")", compiled.Registry);
+            }
+
+            using var lua = compiled.Start();
+            Assert.True(Truth(lua, "local made = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('hrif'))(); return System.is(made, Moonwell.Objects.Units.Human.Rifleman)"));
+            Assert.Equal(
+                "hrif",
+                Query(lua, "local id = Moonwell.ObjectTypes.IdOf(Moonwell.Objects.Units.Human.Rifleman); return string.char(id >> 24, (id >> 16) & 255, (id >> 8) & 255, id & 255)"));
+        }
+
+        [Fact]
+        public void setter_does_nothing_in_lua()
+        {
+            var paladin = int.Parse(compiled.Standard.Value("Hpal", "uhpm", 0, null)!, CultureInfo.InvariantCulture);
+            using var lua = compiled.Start();
+
+            // Arthas's constructor runs HitPoints = HitPoints * 2: the value read is the declared one, and stays it.
+            Assert.Equal(
+                (2 * paladin).ToString(CultureInfo.InvariantCulture),
+                Query(lua, "local a = Objects.Arthas(); return tostring(a:getHitPoints())"));
+            Assert.Equal(
+                (2 * paladin).ToString(CultureInfo.InvariantCulture),
+                Query(lua, "local a = Objects.Arthas(); a:setHitPoints(5); return tostring(MoonwellObjectValues['Objects.Arthas']['uhpm'])"));
+        }
+
+        [Fact]
+        public void constructor_with_levels_per_level_and_set_runs()
+        {
+            using var lua = compiled.Start();
+
+            // Tuned's constructor runs Firebolt's (Levels and PerLevel), then Set by level and Set of a whole field.
+            Assert.Equal("100 250 300 3", Query(lua, "local t = Objects.Tuned(); local d = t:getDamage(); return d:get(1) .. ' ' .. d:get(2) .. ' ' .. d:get(3) .. ' ' .. d:getCount()"));
+        }
+
+        [Fact]
+        public void lists_and_references_read_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            Assert.True(Truth(lua, "return Objects.Duelist():getAbilities():Contains(Objects.Firebolt)"));
+            Assert.True(Truth(lua, "return Objects.Duelist():getAbilities():Contains(Moonwell.Objects.Abilities.Human.Defend)"));
+            Assert.False(Truth(lua, "return Objects.Arthas():getHeroAbilities():Contains(Moonwell.Objects.Abilities.Human.DevotionAura)"));
+            // Arthas's hero abilities hold the ids of the standard objects in the order the declaration left them.
+            Assert.True(Truth(lua, "local list = Objects.Arthas():getHeroAbilities(); return list:getCount() == 3 and list[1] == Moonwell.ObjectTypes.FourCC('AHhb')"));
+            Assert.True(Truth(lua, "return Objects.Duelist():getDefaultActiveAbility():Is(Objects.Firebolt)"));
+            Assert.False(Truth(lua, "return Objects.Duelist():getDefaultActiveAbility():Is(Moonwell.Objects.Abilities.Human.Defend)"));
+            Assert.Equal("3", Query(lua, "return tostring(Objects.Duelist():getAbilities():getCount())"));
+        }
+
+        [Fact]
+        public void values_are_found_through_the_base_chain()
+        {
+            using var lua = compiled.Start();
+
+            // A class with no entry of its own reads the entry of the nearest base that has one; a nested class's name has a +.
+            lua.DoString("System.define('Test.Outer+Inner', { base = { Objects.Arthas } })");
+            Assert.Equal(
+                Query(lua, "return tostring(MoonwellObjectValues['Objects.Arthas']['uhpm'])"),
+                Query(lua, "return tostring(Test.Outer.Inner():getHitPoints())"));
+        }
+
+        [Fact]
+        public void unused_standard_class_absent()
+        {
+            Assert.DoesNotContain("Archmage", compiled.Script);
+            Assert.DoesNotContain("Archmage", compiled.Registry);
+        }
+
+        [Fact]
+        public void init_list_after_base()
+        {
+            var types = compiled.InitTypes();
+            var pairs = new List<(string Class, string Base)>();
+            foreach (var used in compiled.Declarations.Used)
+            {
+                pairs.Add((used.FullName, used.BaseFullName));
+            }
+
+            pairs.Add(("Objects.Arthas", "Moonwell.Objects.Units.Human.Paladin"));
+            pairs.Add(("Objects.DarkArthas", "Objects.Arthas"));
+            pairs.Add(("Objects.Duelist", "Moonwell.Objects.Units.Human.Footman"));
+            pairs.Add(("Objects.Tuned", "Objects.Firebolt"));
+            foreach (var (name, parent) in pairs)
+            {
+                var at = types.IndexOf(name);
+                Assert.True(at >= 0, name + " is not in the init list");
+                Assert.True(types.IndexOf(parent) >= 0 && types.IndexOf(parent) < at, $"{name} comes before its base {parent}");
+            }
+
+            Assert.Contains("Moonwell.Objects.StandardHero", types);
+        }
+
+        [Fact]
+        public void values_only_read_fields()
+        {
+            var values = compiled.Values();
+            var arthas = Regex.Match(values, "\\[\"Objects\\.Arthas\"\\] = \\{[^\\n]*").Value;
+
+            Assert.Contains("[\"uhpm\"] = ", arthas);
+            // No code reads Arthas's AI placement radius.
+            Assert.DoesNotContain("[\"uabr\"]", values);
+        }
+
+        [Fact]
+        public void ctor_runs_runtime_base()
+        {
+            using var lua = compiled.Start();
+
+            Assert.Equal("1", Query(lua, "local a = Objects.Arthas(); return tostring(a.Components:getCount())"));
+            Assert.True(Truth(lua, "local a = Objects.Arthas(); return System.is(a.Components:get(0), Objects.Rage)"));
+        }
+
+        [Fact]
+        public void registry_written()
+        {
+            var registry = compiled.Registry;
+            var ids = compiled.Ids;
+
+            Assert.StartsWith("// Generated by Moonwell's build.", registry);
+            Assert.Contains("namespace Moonwell.Generated", registry);
+            Assert.Contains("public static void Register()", registry);
+            Assert.Contains($"global::Moonwell.ObjectTypes.Unit<global::Objects.Arthas>(global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Arthas"]}\"), () => new global::Objects.Arthas());", registry);
+            Assert.Contains($"global::Moonwell.ObjectTypes.Ability<global::Objects.Firebolt>(global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Firebolt"]}\"), () => new global::Objects.Firebolt());", registry);
+            Assert.Contains($"global::Moonwell.ObjectTypes.Item<global::Objects.Claws>(global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Claws"]}\"), () => new global::Objects.Claws());", registry);
+            Assert.Contains($"global::Moonwell.ObjectTypes.Destructable<global::Objects.Gate>(global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Gate"]}\"), () => new global::Objects.Gate());", registry);
+            Assert.Contains($"global::Moonwell.ObjectTypes.Id<global::Objects.Rock>(global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Rock"]}\"));", registry);
+            Assert.Contains($"global::Moonwell.ObjectTypes.Id<global::Objects.Forge>(global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Forge"]}\"));", registry);
+            Assert.Contains($"global::Moonwell.ObjectTypes.Id<global::Objects.Burn>(global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Burn"]}\"));", registry);
+            Assert.Contains($"global::Moonwell.ObjectTypes.BuffDisplay<global::Objects.Burn>(global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Burn"]}\"), global::Moonwell.ObjectTypes.FourCC(\"{ids["Objects.Burn#carrier"]}\"));", registry);
+
+            // StrongFootman replaces Footman: it is made at hfoo, and Footman only has the id.
+            Assert.Contains("global::Moonwell.ObjectTypes.Unit<global::Objects.StrongFootman>(global::Moonwell.ObjectTypes.FourCC(\"hfoo\"), () => new global::Objects.StrongFootman());", registry);
+            Assert.DoesNotContain("Unit<global::Moonwell.Objects.Units.Human.Footman>", registry);
+            Assert.Contains("global::Moonwell.ObjectTypes.Id<global::Moonwell.Objects.Units.Human.Footman>(global::Moonwell.ObjectTypes.FourCC(\"hfoo\"));", registry);
+
+            // The kind bases have no object.
+            Assert.DoesNotContain("StandardHero", registry);
+
+            Assert.Contains("global::Moonwell.Runtime.Start(new global::Objects.ObjectsMap(), global::Moonwell.Generated.ObjectRegistry.Register);", compiled.Entry);
+        }
+
+        [Fact]
+        public void registrations_run_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            Assert.True(Truth(lua, "local made = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('hfoo'))(); return System.is(made, Objects.StrongFootman)"));
+            Assert.Equal(compiled.Ids["Objects.Burn"], Query(lua, "local id = Moonwell.ObjectTypes.IdOf(Objects.Burn); return string.char(id >> 24, (id >> 16) & 255, (id >> 8) & 255, id & 255)"));
+        }
+
+        [Fact]
+        public void a_map_without_object_classes_loads()
+        {
+            // A map that references Moonwell.Objects loads its ignored files' preambles, even with no class used.
+            var definitions = ObjectLua.Definitions(Array.Empty<UsedClass>());
+
+            using var lua = new NLua.Lua();
+            lua.DoString("Moonwell = {}");
+            lua.DoString(definitions);
+            Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.Levels_1(1))"));
+            Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectList_1(1))"));
+            Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectRef_1(1))"));
+        }
+
+        private static bool Truth(NLua.Lua lua, string chunk)
+        {
+            return (bool)lua.DoString(chunk)[0];
+        }
+
+        private static string Query(NLua.Lua lua, string chunk)
+        {
+            return Convert.ToString(lua.DoString(chunk)[0], CultureInfo.InvariantCulture)!;
+        }
+
+        /// <summary>The Objects fixture, copied and compiled to Lua with its objects' library, values and registry.</summary>
+        public sealed class CompiledObjects : IDisposable
+        {
+            private static readonly string[] Kinds = { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" };
+
+            private readonly TestFolders folders = new TestFolders();
+
+            public CompiledObjects()
+            {
+                var folder = folders.TemporaryCopyOf("Objects");
+
+                // The Sample's World Editor map: the script War3Net writes for the fixture's bare map has no main.
+                foreach (var file in Directory.GetFiles(Path.Combine(TestFolders.Fixture("Sample"), "map")))
+                {
+                    File.Copy(file, Path.Combine(folder, "map", Path.GetFileName(file)), true);
+                }
+
+                var project = MapProject.Find(folder);
+                var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
+                Standard = StandardData.Read(Path.Combine(Path.GetDirectoryName(assembly)!, "Moonwell.Objects.dll"));
+                var settings = MapSettingsReader.Read(assembly, project);
+                var map = SourceMap.Open(project, settings);
+                Declarations = Build.Declarations.Read(assembly, project, Standard, null);
+                var standardIds = new HashSet<string>();
+                foreach (var kind in Kinds)
+                {
+                    standardIds.UnionWith(Standard.Ids(kind));
+                }
+
+                Ids = ObjectIds.Assign(project, Declarations.Objects, standardIds, new HashSet<string>(), new HashSet<string>(), TextWriter.Null);
+                Registry = File.ReadAllText(RegistryWriter.Write(project, Declarations.Used, Declarations.Objects, Ids));
+                Entry = File.ReadAllText(EntryWriter.Write(project, settings, true));
+                Script = LuaCompiler.Compile(project, map, assembly, false, Declarations, Ids, Standard, null);
+            }
+
+            public StandardData Standard { get; }
+
+            public DeclarationSet Declarations { get; }
+
+            public IReadOnlyDictionary<string, string> Ids { get; }
+
+            public string Registry { get; }
+
+            public string Entry { get; }
+
+            public string Script { get; }
+
+            /// <summary>The names in System.init's types list, in order.</summary>
+            public List<string> InitTypes()
+            {
+                var start = Script.IndexOf("System.init({", StringComparison.Ordinal);
+                var open = Script.IndexOf("types = {", start, StringComparison.Ordinal);
+                var close = Script.IndexOf('}', open + "types = {".Length);
+                return Regex.Matches(Script.Substring(open, close - open), "\"([^\"]+)\"").Select(match => match.Groups[1].Value).ToList();
+            }
+
+            /// <summary>The values table appended to the script.</summary>
+            public string Values()
+            {
+                var at = Script.LastIndexOf("MoonwellObjectValues = {", StringComparison.Ordinal);
+                Assert.True(at >= 0, "the script has no values table");
+                return Script.Substring(at);
+            }
+
+            /// <summary>
+            /// Loads the script with the game's globals stubbed, runs main (which defines the classes and starts the runtime), then runs the
+            /// timers the start asked for once: the runtime's setup registers the objects and starts the game.
+            /// </summary>
+            public NLua.Lua Start()
+            {
+                var lua = new NLua.Lua();
+                lua.DoString("lines = {}; pending = {}");
+                lua.DoString("print = function(...) end");
+                lua.DoString("setmetatable(_G, { __index = function(_, name) return function() return nil end end })");
+                lua.DoString("bj_MAX_PLAYER_SLOTS = 0");
+                lua.DoString("TimerStart = function(timer, timeout, periodic, callback) pending[#pending + 1] = callback end");
+                lua.DoString("DisplayTextToPlayer = function(p, x, y, text) lines[#lines + 1] = text end");
+                lua.DoString("DisplayTimedTextToPlayer = function(p, x, y, duration, text) lines[#lines + 1] = 'error: ' .. text end");
+                lua.DoString(Script);
+                lua.DoString("main()");
+                lua.DoString("local due = pending; pending = {}; for i = 1, #due do due[i]() end");
+                return lua;
+            }
+
+            /// <summary>Starts the map and gives what it showed.</summary>
+            public LuaRun Run()
+            {
+                using var lua = Start();
+                var count = Convert.ToInt32(lua.DoString("return #lines")[0], CultureInfo.InvariantCulture);
+                var lines = new List<string>();
+                for (var i = 1; i <= count; i++)
+                {
+                    lines.Add((string)lua.DoString($"return lines[{i}]")[0]);
+                }
+
+                return new LuaRun(lines.Where(line => !line.StartsWith("error: ", StringComparison.Ordinal)).ToList(), lines.Where(line => line.StartsWith("error: ", StringComparison.Ordinal)).ToList());
+            }
+
+            public void Dispose()
+            {
+                folders.Dispose();
+            }
+        }
+
+        /// <summary>What a run of the map showed: its lines, and the errors the runtime reported.</summary>
+        public sealed record LuaRun(IReadOnlyList<string> Lines, IReadOnlyList<string> Errors);
+    }
+}

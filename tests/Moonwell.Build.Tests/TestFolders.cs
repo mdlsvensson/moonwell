@@ -14,9 +14,15 @@ namespace Moonwell.Build.Tests
         /// <summary>Copies the Sample, without its bin, obj and build folders, beside the other fixtures so its relative reference to Moonwell holds.</summary>
         public string TemporaryCopyOfSample()
         {
+            return TemporaryCopyOf("Sample");
+        }
+
+        /// <summary>Copies a fixture, without its bin, obj and build folders, beside the other fixtures so its relative references hold.</summary>
+        public string TemporaryCopyOf(string fixture)
+        {
             var folder = Path.Combine(Fixture("."), "Temp-" + Guid.NewGuid().ToString("N"));
             folders.Add(folder);
-            CopyFolder(Fixture("Sample"), folder);
+            CopyFolder(Fixture(fixture), folder);
             return folder;
         }
 

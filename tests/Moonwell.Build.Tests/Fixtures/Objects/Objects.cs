@@ -43,6 +43,7 @@ namespace Objects
         {
             // One level put by itself wins over the whole field Firebolt put.
             Set("Htb1", 2, 250f);
+            Set("ahky", "T");
         }
     }
 

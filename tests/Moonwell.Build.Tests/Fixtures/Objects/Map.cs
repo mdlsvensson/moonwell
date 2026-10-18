@@ -7,6 +7,7 @@ namespace Objects
         public ObjectsMap()
         {
             Name = "Objects map";
+            Components.Add(new Report());
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Moonwell.Build
     /// <summary>Reads the objects a map declares by constructing their classes on .NET.</summary>
     public static class Declarations
     {
-        private const string ObjectsAssemblyName = "Moonwell.Objects";
+        internal const string ObjectsAssemblyName = "Moonwell.Objects";
         private const string StandardAttributeName = "Moonwell.Objects.StandardAttribute";
         private const string ReplacesAttributeName = "Moonwell.Objects.ReplacesAttribute";
         private const string ObjectIdAttributeName = "Moonwell.Objects.ObjectIdAttribute";
@@ -28,7 +28,7 @@ namespace Moonwell.Build
         /// <param name="project">The map project; lines in messages are relative to its folder.</param>
         /// <param name="standard">The standard values.</param>
         /// <param name="set">The balance set that fields a class leaves unset read: null for the base tables, else <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>.</param>
-        /// <returns>The declared objects, ordered by class name, and the ids of the standard classes their lists and references name; both empty when the map does not use <c>Moonwell.Objects</c>.</returns>
+        /// <returns>The declared objects, ordered by class name, the ids of the standard classes their lists and references name, and the classes the map's Lua uses; all empty when the map does not use <c>Moonwell.Objects</c>.</returns>
         /// <exception cref="BuildException">A constructor calls the game or throws, a declared field is set outside a constructor, or <c>[Replaces]</c> is misused.</exception>
         public static DeclarationSet Read(string assemblyPath, MapProject project, StandardData standard, string? set)
         {
@@ -55,11 +55,12 @@ namespace Moonwell.Build
             var map = context.Open(assemblyPath);
             if (!map.GetReferencedAssemblies().Any(name => name.Name == ObjectsAssemblyName))
             {
-                return new DeclarationSet(Array.Empty<DeclaredObject>(), new Dictionary<string, string>());
+                return new DeclarationSet(Array.Empty<DeclaredObject>(), new Dictionary<string, string>(), Array.Empty<UsedClass>());
             }
 
             var objects = context.LoadFromAssemblyName(new AssemblyName(ObjectsAssemblyName));
             SetterScan.Check(map);
+            var used = ObjectLua.UsedClasses(map, objects, assemblyPath);
 
             var classNames = new Dictionary<string, string>(StringComparer.Ordinal);
             var standardClasses = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -102,7 +103,7 @@ namespace Moonwell.Build
                     }
                 }
 
-                return new DeclarationSet(declared, named);
+                return new DeclarationSet(declared, named, used);
             }
             finally
             {
@@ -151,12 +152,12 @@ namespace Moonwell.Build
         }
 
         // A class that is constructed: not abstract or open generic, not a standard class, and its base chain reaches a kind base.
-        private static bool IsDeclaredClass(Type type)
+        internal static bool IsDeclaredClass(Type type)
         {
             return !type.IsAbstract && !type.IsGenericTypeDefinition && StandardIdOf(type) == null && KindBaseOf(type) != null;
         }
 
-        private static Type? KindBaseOf(Type type)
+        internal static Type? KindBaseOf(Type type)
         {
             for (var parent = type.BaseType; parent != null; parent = parent.BaseType)
             {
@@ -209,7 +210,7 @@ namespace Moonwell.Build
             return null;
         }
 
-        private static string? StandardIdOf(Type type)
+        internal static string? StandardIdOf(Type type)
         {
             return FirstArgument(type, StandardAttributeName);
         }
