@@ -8,6 +8,8 @@ project and a World Editor map into a playable map, with the script compiled to 
 `build\<Name>.w3x`. A development build is the default; `--release` makes a release build.
 `moonwell run [folder] [--release] [--game <exe>]` builds the same way, then starts Warcraft III with the map.
 
+It needs the .NET 10 SDK, and `common.j` and `Blizzard.j` in `Documents\Warcraft III\JassHelper`.
+
 | Path | What it is |
 |---|---|
 | `src/Moonwell.Natives` | The game's natives as C#, generated |

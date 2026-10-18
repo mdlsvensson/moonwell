@@ -122,7 +122,7 @@ namespace Moonwell.Build.Tests
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<configuration>\n"
                 + "  <packageSources>\n"
-                + "    <add key=\"nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />\n"
+                + "    <clear />\n"
                 + $"    <add key=\"moonwell-test\" value=\"{packed.Feed}\" />\n"
                 + "  </packageSources>\n"
                 + "</configuration>\n");

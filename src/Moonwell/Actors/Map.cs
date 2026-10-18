@@ -14,7 +14,7 @@ namespace Moonwell
         /// <summary>The description of the map; empty keeps the value World Editor set.</summary>
         public string Description { get; protected set; } = "";
 
-        /// <summary>The number of players the map recommends; empty keeps the value World Editor set.</summary>
+        /// <summary>The players the map recommends, as free text such as "Any" or "2-4"; empty keeps the value World Editor set.</summary>
         public string RecommendedPlayers { get; protected set; } = "";
 
         /// <summary>The components the game starts with, added in list order when the game starts; the constructor lists them.</summary>

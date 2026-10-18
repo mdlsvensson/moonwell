@@ -26,9 +26,16 @@ namespace Moonwell.Build.Tests
             Assert.Contains("Moonwell.Generated.MapMain.Main()", script);
             using var lua = new NLua.Lua();
             lua.DoString("print = function() end");
-            lua.DoString("setmetatable(_G, { __index = function(_, name) return function() return nil end end })");
+            lua.DoString("called = {}");
+            lua.DoString("setmetatable(_G, { __index = function(_, name) return function() called[#called + 1] = name; return nil end end })");
             lua.DoString(script);
             Assert.True((bool)lua.DoString("return rawget(_G, 'main') ~= nil and rawget(_G, 'config') ~= nil")[0]);
+
+            // main runs MapMain.Main, which constructs the map and starts the runtime (which asks the game for the world's bounds).
+            lua.DoString("main()");
+            var called = (string)lua.DoString("return ',' .. table.concat(called, ',') .. ','")[0];
+            Assert.Contains(",InitBlizzard,", called);
+            Assert.Contains(",GetWorldBounds,", called);
         }
 
         [Fact]
