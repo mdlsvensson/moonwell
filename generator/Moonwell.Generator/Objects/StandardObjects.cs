@@ -1,0 +1,518 @@
+using System.Globalization;
+
+namespace Moonwell.Generator.Objects;
+
+/// <summary>One standard object of the game: its identity and its field values under the base tables and each balance set.</summary>
+/// <param name="Kind">The kind of object.</param>
+/// <param name="Id">The object id (<c>Hpal</c>).</param>
+/// <param name="Name">
+/// The in-game name: the kind's <c>Name</c> field (an upgrade's at level 1; a buff's tooltip title first), or the
+/// empty string.
+/// </param>
+/// <param name="Race">The export's <c>race</c> value as written (<c>human</c>), or the empty string for a kind without one.</param>
+/// <param name="Campaign">True for a unit whose <c>campaign</c> column is 1; false for every other kind.</param>
+/// <param name="IsHero">True for a unit whose id starts with a capital letter.</param>
+/// <param name="Code">An ability's <c>code</c> column, the ability it behaves as; null for every other kind.</param>
+/// <param name="Values">
+/// The field values under the base tables, as the tables write them (a placeholder <c>-</c> or <c>_</c> of a table
+/// cell is no value and is left out), keyed by field id, or <c>id:level</c> for a field of each level (level 1 first).
+/// For an object the base tables lack, the values under the first set that has it.
+/// </param>
+/// <param name="Sets">
+/// For each balance set the object exists in, the keys whose value differs from <paramref name="Values"/>; the empty
+/// string stands for a key the set has no value for. A set the object is missing from has no entry.
+/// </param>
+/// <param name="MissingFrom">
+/// The balance sets the object does not exist under (<c>melee_v0</c>, <c>custom_v0</c>, <c>custom_v1</c>), and
+/// <c>base</c> when the base tables lack it.
+/// </param>
+public sealed record StandardObject(
+    Kind Kind,
+    string Id,
+    string Name,
+    string Race,
+    bool Campaign,
+    bool IsHero,
+    string? Code,
+    IReadOnlyDictionary<string, string> Values,
+    IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Sets,
+    IReadOnlyList<string> MissingFrom);
+
+/// <summary>The game's standard objects of a kind, with the value of each field that applies to them.</summary>
+/// <remarks>
+/// <para>
+/// A field applies to a unit by its use flags (a building by <c>useBuilding</c>, a hero by <c>useHero</c>, any other
+/// unit by <c>useUnit</c>; a unit is a building when its <c>isbldg</c> is 1); to an ability when the ability's
+/// <c>code</c> is in the field's <c>Specific</c>, or, for a common field, is not in the metadata's
+/// <c>notSpecific</c>; and to every object of another kind. Two fields of one ability that share a column, such as a
+/// common <c>Area</c> and a specific one, both get the value.
+/// </para>
+/// <para>
+/// An object exists under a balance set when <see cref="ExportTables.Present"/> says so. Its level count is the
+/// ability's <c>levels</c> and the upgrade's <c>maxlevel</c> (the field named <c>LevelCount</c>); a per-level field
+/// then has a value for each level from 1 to the count. A kind without a level count (a doodad's tinting colours)
+/// has a value for each entry of its comma list.
+/// </para>
+/// <para>
+/// Keys are looked up as the tables spell them and, failing that, without regard to case when one key matches
+/// (<c>Ubertip</c> is <c>UberTip</c> in the text files). A per-level text value held in the text files is a comma
+/// list, level 1 first, unless it was wrapped in quotes (<see cref="ObjectRows.Wrapped"/>), when it is one entry; a
+/// list with fewer entries than levels has values for the levels it names only.
+/// </para>
+/// </remarks>
+public static class StandardObjects
+{
+    private const string BaseTables = "base";
+    private const string LevelCountName = "LevelCount";
+    private const string NameName = "Name";
+    private const string TooltipName = "Tooltip";
+
+    /// <summary>The standard objects of <paramref name="kind"/> ordered by id (ordinal), with the values of <paramref name="fields"/>.</summary>
+    public static IReadOnlyList<StandardObject> Of(ExportTables tables, Kind kind, IReadOnlyList<Field> fields)
+    {
+        var meta = new Dictionary<string, MetaRow>(StringComparer.Ordinal);
+        foreach (var row in tables.Meta(kind))
+        {
+            meta[row.Id] = row;
+        }
+
+        var plans = new List<FieldPlan>();
+        foreach (var field in fields)
+        {
+            plans.Add(new FieldPlan(field, meta[field.Id]));
+        }
+
+        var evaluator = new Evaluator(kind, plans);
+        var baseRows = Index(tables.Objects(kind, null));
+        var setNames = tables.Sets;
+        var setRows = new Dictionary<string, Dictionary<string, ObjectRows>>(StringComparer.Ordinal);
+        var present = new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal);
+        var ids = new SortedSet<string>(baseRows.Keys, StringComparer.Ordinal);
+        foreach (var set in setNames)
+        {
+            setRows[set] = Index(tables.Objects(kind, set));
+            present[set] = tables.Present(kind, set);
+            ids.UnionWith(present[set]);
+        }
+
+        var objects = new List<StandardObject>(ids.Count);
+        foreach (var id in ids)
+        {
+            objects.Add(Build(kind, id, evaluator, baseRows, setNames, setRows, present));
+        }
+
+        return objects;
+    }
+
+    private static Dictionary<string, ObjectRows> Index(IReadOnlyList<ObjectRows> rows)
+    {
+        var index = new Dictionary<string, ObjectRows>(StringComparer.Ordinal);
+        foreach (var row in rows)
+        {
+            index[row.Id] = row;
+        }
+
+        return index;
+    }
+
+    private static StandardObject Build(
+        Kind kind,
+        string id,
+        Evaluator evaluator,
+        Dictionary<string, ObjectRows> baseRows,
+        IReadOnlyList<string> setNames,
+        Dictionary<string, Dictionary<string, ObjectRows>> setRows,
+        Dictionary<string, IReadOnlySet<string>> present)
+    {
+        var missing = new List<string>();
+        var existing = new List<string>();
+        foreach (var set in setNames)
+        {
+            (present[set].Contains(id) ? existing : missing).Add(set);
+        }
+
+        ObjectRows primary;
+        if (baseRows.TryGetValue(id, out var baseRow))
+        {
+            primary = baseRow;
+        }
+        else
+        {
+            primary = setRows[existing[0]][id];
+            missing.Insert(0, BaseTables);
+        }
+
+        var row = new Row(primary);
+        var values = evaluator.Values(id, row);
+        var sets = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
+        foreach (var set in existing)
+        {
+            sets[set] = Diff(values, evaluator.Values(id, new Row(setRows[set][id])));
+        }
+
+        return new StandardObject(
+            kind,
+            id,
+            evaluator.NameOf(values),
+            Clean(row.Get("race")) ?? "",
+            kind == Kind.Unit && Clean(row.Get("campaign")) == "1",
+            IsHero(kind, id),
+            kind == Kind.Ability ? Clean(row.Get("code")) : null,
+            values,
+            sets,
+            missing);
+    }
+
+    private static bool IsHero(Kind kind, string id)
+    {
+        return kind == Kind.Unit && id.Length > 0 && id[0] >= 'A' && id[0] <= 'Z';
+    }
+
+    private static Dictionary<string, string> Diff(Dictionary<string, string> baseValues, Dictionary<string, string> setValues)
+    {
+        var diff = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var pair in setValues)
+        {
+            if (!baseValues.TryGetValue(pair.Key, out var original) || !string.Equals(original, pair.Value, StringComparison.Ordinal))
+            {
+                diff[pair.Key] = pair.Value;
+            }
+        }
+
+        foreach (var pair in baseValues)
+        {
+            if (!setValues.ContainsKey(pair.Key))
+            {
+                diff[pair.Key] = "";
+            }
+        }
+
+        return diff;
+    }
+
+    /// <summary>A cell's value, trimmed: null when empty or a table's placeholder <c>-</c> or <c>_</c>.</summary>
+    private static string? Clean(string? cell)
+    {
+        var value = cell?.Trim();
+        return string.IsNullOrEmpty(value) || value == "-" || value == "_" ? null : value;
+    }
+
+    /// <summary>
+    /// The entries of a comma list; an empty entry is null. An entry that starts with a quote ends at the next
+    /// quote, so it may hold commas and loses its quotes.
+    /// </summary>
+    private static List<string?> Entries(string text)
+    {
+        var entries = new List<string?>();
+        var i = 0;
+        while (true)
+        {
+            while (i < text.Length && (text[i] == ' ' || text[i] == '\t'))
+            {
+                i++;
+            }
+
+            string entry;
+            var close = i < text.Length && text[i] == '"' ? text.IndexOf('"', i + 1) : -1;
+            if (close >= 0)
+            {
+                entry = text.Substring(i + 1, close - i - 1);
+                var comma = text.IndexOf(',', close + 1);
+                i = comma < 0 ? text.Length : comma;
+            }
+            else
+            {
+                var comma = text.IndexOf(',', i);
+                var end = comma < 0 ? text.Length : comma;
+                entry = text.Substring(i, end - i);
+                i = end;
+            }
+
+            entries.Add(Clean(entry));
+            if (i >= text.Length)
+            {
+                return entries;
+            }
+
+            i++;
+        }
+    }
+
+    /// <summary>The keys of one object's merged rows, looked up as spelled and then without regard to case.</summary>
+    private sealed class Row
+    {
+        private readonly ObjectRows _rows;
+        private Dictionary<string, string?>? _folded;
+
+        public Row(ObjectRows rows)
+        {
+            _rows = rows;
+        }
+
+        /// <summary>The value of the key, or null when no key matches or several keys match without regard to case.</summary>
+        public string? Get(string key)
+        {
+            var spelled = Spelling(key);
+            return spelled == null ? null : _rows.Values[spelled];
+        }
+
+        /// <summary>
+        /// The entries of the key's comma list, null when there is no value. A value that was wrapped in quotes in
+        /// the text file is one entry, with its commas.
+        /// </summary>
+        public List<string?>? Entries(string key)
+        {
+            var spelled = Spelling(key);
+            if (spelled == null)
+            {
+                return null;
+            }
+
+            var value = _rows.Values[spelled];
+            if (_rows.Wrapped != null && _rows.Wrapped.Contains(spelled))
+            {
+                return new List<string?> { Clean(value) };
+            }
+
+            return StandardObjects.Entries(value);
+        }
+
+        private string? Spelling(string key)
+        {
+            if (_rows.Values.ContainsKey(key))
+            {
+                return key;
+            }
+
+            if (_folded == null)
+            {
+                _folded = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+                foreach (var pair in _rows.Values)
+                {
+                    _folded[pair.Key] = _folded.ContainsKey(pair.Key) ? null : pair.Key;
+                }
+            }
+
+            return _folded.GetValueOrDefault(key);
+        }
+    }
+
+    /// <summary>How one field's value is found in an object's rows, and which objects it applies to.</summary>
+    private sealed class FieldPlan
+    {
+        private readonly string _column;
+        private readonly bool _perLevelColumn;
+        private readonly int _element;
+        private readonly bool _list;
+        private readonly bool _appended;
+        private readonly HashSet<string> _specific;
+        private readonly HashSet<string> _notSpecific;
+        private readonly bool _hero;
+        private readonly bool _unit;
+        private readonly bool _building;
+
+        public FieldPlan(Field field, MetaRow meta)
+        {
+            Field = field;
+            _specific = new HashSet<string>(field.Specific, StringComparer.Ordinal);
+            _notSpecific = new HashSet<string>(Codes(Cell(meta, "notSpecific")), StringComparer.Ordinal);
+            _hero = Cell(meta, "useHero") == "1";
+            _unit = Cell(meta, "useUnit") == "1";
+            _building = Cell(meta, "useBuilding") == "1";
+            _appended = Cell(meta, "appendIndex") == "1";
+            _element = -1;
+            _column = field.Column;
+            if (_column.EndsWith(']'))
+            {
+                var open = _column.LastIndexOf('[');
+                _element = int.Parse(_column.AsSpan(open + 1, _column.Length - open - 2), NumberStyles.None, CultureInfo.InvariantCulture);
+                _column = _column.Substring(0, open);
+            }
+
+            _perLevelColumn = _column.Contains("{level}", StringComparison.Ordinal);
+            _list = field.PerLevel && !_perLevelColumn;
+            if (_element >= 0 && field.PerLevel)
+            {
+                throw new InvalidOperationException($"{field.Kind} field {field.Id}: a per-level field that is one element of a list is not supported");
+            }
+        }
+
+        public Field Field { get; }
+
+        public bool Applies(Kind kind, string? code, bool hero, bool building)
+        {
+            switch (kind)
+            {
+                case Kind.Unit:
+                    return building ? _building : hero ? _hero : _unit;
+                case Kind.Ability:
+                    return _specific.Count > 0 ? _specific.Contains(code ?? "") : !_notSpecific.Contains(code ?? "");
+                default:
+                    return true;
+            }
+        }
+
+        /// <summary>Adds the field's values: one, or one for each level up to <paramref name="levels"/> (null: no level count).</summary>
+        public void Read(Row row, int? levels, Dictionary<string, string> values)
+        {
+            if (_perLevelColumn)
+            {
+                for (var level = 1; level <= (levels ?? 0); level++)
+                {
+                    var key = _column.Replace("{level}", level.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+                    Add(values, level, Clean(row.Get(key)));
+                }
+            }
+            else if (_list && _appended)
+            {
+                for (var level = 1; level <= (levels ?? 0); level++)
+                {
+                    var key = level == 1 ? _column : _column + (level - 1).ToString(CultureInfo.InvariantCulture);
+                    Add(values, level, Clean(row.Get(key)));
+                }
+            }
+            else if (_list)
+            {
+                var entries = row.Entries(_column);
+                for (var i = 0; entries != null && i < entries.Count && (levels == null || i < levels); i++)
+                {
+                    Add(values, i + 1, entries[i]);
+                }
+            }
+            else if (_element >= 0)
+            {
+                var entries = row.Entries(_column);
+                if (entries != null && _element < entries.Count)
+                {
+                    Add(values, 0, entries[_element]);
+                }
+            }
+            else
+            {
+                Add(values, 0, Clean(row.Get(_column)));
+            }
+        }
+
+        private void Add(Dictionary<string, string> values, int level, string? value)
+        {
+            if (value != null)
+            {
+                values[level == 0 ? Field.Id : Field.Id + ":" + level.ToString(CultureInfo.InvariantCulture)] = value;
+            }
+        }
+
+        private static string Cell(MetaRow meta, string column)
+        {
+            return meta.Columns.TryGetValue(column, out var value) ? value.Trim() : "";
+        }
+
+        private static IEnumerable<string> Codes(string cell)
+        {
+            foreach (var part in cell.Split(',', '.'))
+            {
+                var code = part.Trim();
+                if (code.Length > 0)
+                {
+                    yield return code;
+                }
+            }
+        }
+    }
+
+    /// <summary>The values of every field that applies to an object of one kind.</summary>
+    private sealed class Evaluator
+    {
+        private readonly Kind _kind;
+        private readonly List<FieldPlan> _plans;
+        private readonly FieldPlan? _levels;
+        private readonly List<string> _nameIds = new();
+
+        public Evaluator(Kind kind, List<FieldPlan> plans)
+        {
+            _kind = kind;
+            _plans = plans;
+            string? name = null;
+            string? tooltip = null;
+            foreach (var plan in plans)
+            {
+                if (plan.Field.Name == LevelCountName)
+                {
+                    _levels = plan;
+                }
+                else if (plan.Field.Name == NameName)
+                {
+                    name = plan.Field.Id;
+                }
+                else if (plan.Field.Name == TooltipName)
+                {
+                    tooltip = plan.Field.Id;
+                }
+            }
+
+            // A buff's name in the game is the tooltip title; its Name field is the editor's.
+            if (kind == Kind.Buff && tooltip != null)
+            {
+                _nameIds.Add(tooltip);
+            }
+
+            if (name != null)
+            {
+                _nameIds.Add(name);
+            }
+        }
+
+        public Dictionary<string, string> Values(string id, Row row)
+        {
+            var code = _kind == Kind.Ability ? Clean(row.Get("code")) : null;
+            var hero = IsHero(_kind, id);
+            var building = _kind == Kind.Unit && Clean(row.Get("isbldg")) == "1";
+            var levels = LevelCount(row);
+            var values = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var plan in _plans)
+            {
+                if (plan.Applies(_kind, code, hero, building))
+                {
+                    plan.Read(row, levels, values);
+                }
+            }
+
+            return values;
+        }
+
+        /// <summary>The name in <paramref name="values"/>: the <c>Name</c> field's (an upgrade's at level 1; a buff's tooltip first).</summary>
+        public string NameOf(Dictionary<string, string> values)
+        {
+            foreach (var id in _nameIds)
+            {
+                if (values.TryGetValue(id, out var name) || values.TryGetValue(id + ":1", out name))
+                {
+                    return name;
+                }
+            }
+
+            return "";
+        }
+
+        private int? LevelCount(Row row)
+        {
+            if (_levels == null)
+            {
+                return null;
+            }
+
+            var cell = new Dictionary<string, string>(StringComparer.Ordinal);
+            _levels.Read(row, null, cell);
+            if (!cell.TryGetValue(_levels.Field.Id, out var text))
+            {
+                return 0;
+            }
+
+            if (!int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out var count))
+            {
+                throw new FormatException($"{_kind} {_levels.Field.Id}: the level count '{text}' is not a whole number");
+            }
+
+            return count;
+        }
+    }
+}

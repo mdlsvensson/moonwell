@@ -59,6 +59,18 @@ public class ExportTablesTests
         Assert.Equal("Iron Forged Swords,Steel Forged Swords,Mithril Forged Swords", values["Name"]);
     }
 
+    [Fact]
+    public void a_value_wrapped_in_quotes_is_named()
+    {
+        var tables = ExportTables.Read(MiniExport());
+
+        var paladin = Find(tables.Objects(Kind.Unit, null), "Hpal");
+        Assert.Contains("Ubertip", paladin.Wrapped!);
+        Assert.DoesNotContain("Name", paladin.Wrapped!);
+        var upgradeWrapped = Find(tables.Objects(Kind.Upgrade, null), "Rhme").Wrapped;
+        Assert.True(upgradeWrapped == null || !upgradeWrapped.Contains("Ubertip"));
+    }
+
     [Theory]
     [InlineData(Kind.Ability, "AHtb", "Buttonpos", "0,2")]
     [InlineData(Kind.Ability, "AHhb", "alias", "AHhb")]
@@ -137,6 +149,33 @@ public class ExportTablesTests
         var error = Assert.Throws<DirectoryNotFoundException>(() => tables.Objects(Kind.Unit, "custom_v1"));
 
         Assert.Contains("_balance/custom_v1.w3mod", error.Message);
+    }
+
+    [Fact]
+    public void the_sets_an_export_holds()
+    {
+        var tables = ExportTables.Read(MiniExport());
+
+        Assert.Equal(new[] { "melee_v0", "custom_v0" }, tables.Sets);
+    }
+
+    [Fact]
+    public void present_ids_need_a_row_in_every_table_the_set_replaces()
+    {
+        var tables = ExportTables.Read(MiniExport());
+
+        Assert.Equal(new[] { "hfoo" }, tables.Present(Kind.Unit, "melee_v0").OrderBy(id => id, StringComparer.Ordinal));
+        Assert.Equal(new[] { "Hpal", "hfoo" }, tables.Present(Kind.Unit, "custom_v0").OrderBy(id => id, StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void a_kind_no_table_of_the_set_replaces_is_present_whole()
+    {
+        var tables = ExportTables.Read(MiniExport());
+
+        Assert.Equal(
+            tables.Objects(Kind.Doodad, null).Select(o => o.Id).OrderBy(id => id, StringComparer.Ordinal),
+            tables.Present(Kind.Doodad, "melee_v0").OrderBy(id => id, StringComparer.Ordinal));
     }
 
     [Fact]

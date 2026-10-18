@@ -18,7 +18,13 @@ public enum Kind
 public sealed record MetaRow(string Id, IReadOnlyDictionary<string, string> Columns);
 
 /// <summary>Every column and every key=value of one object, keys as the tables spell them.</summary>
-public sealed record ObjectRows(string Id, IReadOnlyDictionary<string, string> Values);
+/// <param name="Id">The object id.</param>
+/// <param name="Values">The values by key.</param>
+/// <param name="Wrapped">
+/// The keys whose last text-file value was wrapped in one pair of quotes, which <paramref name="Values"/> has
+/// stripped: such a value is one entry even where it holds commas. Null when none was.
+/// </param>
+public sealed record ObjectRows(string Id, IReadOnlyDictionary<string, string> Values, IReadOnlySet<string>? Wrapped = null);
 
 /// <summary>
 /// The game's data export (the <c>war3.w3mod</c> folder): metadata tables, per-object tables and text, and the
@@ -104,7 +110,7 @@ public sealed class ExportTables
     {
         var tables = new ExportTables(folder, new Dictionary<string, string>(StringComparer.Ordinal));
         var labelsPath = tables.Require(LabelsFile, null);
-        var text = ReadSections(labelsPath);
+        var text = ReadSections(labelsPath, out _);
         if (text.TryGetValue(LabelsSection, out var section))
         {
             foreach (var label in section)
@@ -157,6 +163,62 @@ public sealed class ExportTables
         return objects;
     }
 
+    /// <summary>
+    /// The balance sets the export holds, in the order <c>melee_v0</c>, <c>custom_v0</c>, <c>custom_v1</c> (the three
+    /// the game has; a set whose folder is missing from <c>_balance</c> is left out).
+    /// </summary>
+    public IReadOnlyList<string> Sets
+    {
+        get
+        {
+            var sets = new List<string>();
+            foreach (var set in BalanceSets)
+            {
+                if (Find(_folder, "_balance/" + set + ".w3mod") != null)
+                {
+                    sets.Add(set);
+                }
+            }
+
+            return sets;
+        }
+    }
+
+    /// <summary>
+    /// The ids of the kind's objects that exist in the game under the balance set: an object whose row every table
+    /// the set replaces holds. A set's tables are whole tables and an object one of them leaves out does not exist
+    /// (the game gives it 0 hit points), so it is not here even when the base tables hold it. An id the set's tables
+    /// hold and the base tables do not is here.
+    /// </summary>
+    public IReadOnlySet<string> Present(Kind kind, string set)
+    {
+        var present = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var listed in Objects(kind, set))
+        {
+            present.Add(listed.Id);
+        }
+
+        var setFolder = SetFolder(set);
+        foreach (var path in Sources[kind].Tables)
+        {
+            var file = Find(setFolder, path);
+            if (file == null)
+            {
+                continue;
+            }
+
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var row in ReadTable(file, path))
+            {
+                ids.Add(row.Id);
+            }
+
+            present.IntersectWith(ids);
+        }
+
+        return present;
+    }
+
     /// <summary>The editor's English label for a <c>WESTRING_</c> key, or the key itself when the export has none.</summary>
     public string Label(string key)
     {
@@ -190,39 +252,56 @@ public sealed class ExportTables
             }
         }
 
+        var wrapped = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
         foreach (var pattern in source.Text.Func)
         {
-            MergeText(values, Expand(pattern, set, true));
+            MergeText(values, wrapped, Expand(pattern, set, true));
         }
 
         foreach (var pattern in source.Text.Strings)
         {
-            MergeText(values, Expand(pattern, set, false));
+            MergeText(values, wrapped, Expand(pattern, set, false));
         }
 
         var objects = new List<ObjectRows>(order.Count);
         foreach (var id in order)
         {
-            objects.Add(new ObjectRows(id, values[id]));
+            objects.Add(new ObjectRows(id, values[id], wrapped.TryGetValue(id, out var keys) && keys.Count > 0 ? keys : null));
         }
 
         return objects;
     }
 
-    private static void MergeText(Dictionary<string, Dictionary<string, string>> values, List<string> files)
+    private static void MergeText(
+        Dictionary<string, Dictionary<string, string>> values,
+        Dictionary<string, HashSet<string>> wrapped,
+        List<string> files)
     {
         foreach (var file in files)
         {
-            foreach (var section in ReadSections(file))
+            foreach (var section in ReadSections(file, out var wrappedKeys))
             {
                 if (!values.TryGetValue(section.Key, out var merged))
                 {
                     continue;
                 }
 
+                if (!wrapped.TryGetValue(section.Key, out var keys))
+                {
+                    wrapped[section.Key] = keys = new HashSet<string>(StringComparer.Ordinal);
+                }
+
                 foreach (var entry in section.Value)
                 {
                     merged[entry.Key] = entry.Value;
+                    if (wrappedKeys[section.Key].Contains(entry.Key))
+                    {
+                        keys.Add(entry.Key);
+                    }
+                    else
+                    {
+                        keys.Remove(entry.Key);
+                    }
                 }
             }
         }
@@ -349,12 +428,17 @@ public sealed class ExportTables
 
     /// <summary>
     /// A <c>[section]</c> and <c>key=value</c> text file. A line that is blank, starts with <c>//</c> or has no
-    /// <c>=</c> is ignored; a value wrapped in one pair of quotes loses them. A section repeated in the file is merged.
+    /// <c>=</c> is ignored; a value wrapped in one pair of quotes loses them and its key is in
+    /// <paramref name="wrapped"/> (by section). A section repeated in the file is merged.
     /// </summary>
-    private static Dictionary<string, Dictionary<string, string>> ReadSections(string path)
+    private static Dictionary<string, Dictionary<string, string>> ReadSections(
+        string path,
+        out Dictionary<string, HashSet<string>> wrapped)
     {
         var sections = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
+        wrapped = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
         Dictionary<string, string>? section = null;
+        HashSet<string>? wrappedKeys = null;
         foreach (var raw in ReadText(path).Split('\n'))
         {
             var line = raw.Trim(' ', '\t', '\r', '\v', '\f');
@@ -369,15 +453,28 @@ public sealed class ExportTables
                 if (!sections.TryGetValue(name, out section))
                 {
                     sections[name] = section = new Dictionary<string, string>(StringComparer.Ordinal);
+                    wrapped[name] = new HashSet<string>(StringComparer.Ordinal);
                 }
 
+                wrappedKeys = wrapped[name];
                 continue;
             }
 
             var equals = line.IndexOf('=');
-            if (section != null && equals >= 0)
+            if (section != null && wrappedKeys != null && equals >= 0)
             {
-                section[line.Substring(0, equals).Trim()] = Unquote(line.Substring(equals + 1).Trim());
+                var key = line.Substring(0, equals).Trim();
+                var text = line.Substring(equals + 1).Trim();
+                var value = Unquote(text);
+                section[key] = value;
+                if (value.Length != text.Length)
+                {
+                    wrappedKeys.Add(key);
+                }
+                else
+                {
+                    wrappedKeys.Remove(key);
+                }
             }
         }
 
