@@ -87,6 +87,7 @@ namespace Moonwell.Build
             var symbols = release ? new[] { "MOONWELL_LUA" } : new[] { "DEBUG", "MOONWELL_LUA" };
             var marked = MarkedProject.Stage(project, symbols);
             files = marked.Files;
+            LiteralCheck.Check(project.Folder, marked.Files, symbols);
             var compiler = new Compiler(marked.ProjectFile, project.GeneratedFolder, string.Empty, null!, null!, "*", "-define:" + string.Join(";", symbols), false, null!, string.Empty)
             {
                 IsExportMetadata = false,
