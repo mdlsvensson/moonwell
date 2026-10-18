@@ -157,6 +157,23 @@ namespace Moonwell.Build.Tests
             Assert.Contains("[\"uhpm\"] = ", values);
         }
 
+        [Theory]
+        [InlineData("int", "12", "12")]
+        [InlineData("int", "45.5", "45")]
+        [InlineData("int", "-45.5", "-45")]
+        [InlineData("int", "#VALUE!", "0")]
+        [InlineData("int", "MBUR", "0")]
+        [InlineData("int", "ap04", "0")]
+        [InlineData("int", null, "0")]
+        [InlineData("float", "0.25", "0.25")]
+        [InlineData("float", "#VALUE!", "0")]
+        [InlineData("float", "ap04", "0")]
+        public void standard_text_that_is_not_a_number_reads_as_the_net_side_does(string type, string? text, string expected)
+        {
+            // The same texts as DeclaredTests.parse_int and parse_float_takes_zero_for_what_is_not_a_number: both sides agree.
+            Assert.Equal(expected, FieldValues.Scalar(type, text));
+        }
+
         [Fact]
         public void unset_string_reads_empty_in_lua()
         {

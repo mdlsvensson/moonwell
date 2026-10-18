@@ -141,7 +141,7 @@ namespace Moonwell.Build
 
         // A value of a field's type: a put value is of the type; a standard text is read as the type, its default when it has
         // none. A string with no text is the empty text, not nil: Lua's .. fails on nil, where C# adds nothing.
-        private static string Scalar(string type, object? value)
+        internal static string Scalar(string type, object? value)
         {
             switch (value)
             {
