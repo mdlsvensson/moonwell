@@ -3,17 +3,6 @@ namespace Moonwell.Build
     /// <summary>The object ids the source map already uses: those its object files define and those it places.</summary>
     public static class MapObjectIds
     {
-        private static readonly (string Kind, string Extension)[] Files =
-        {
-            ("unit", "w3u"),
-            ("item", "w3t"),
-            ("destructable", "w3b"),
-            ("doodad", "w3d"),
-            ("ability", "w3a"),
-            ("buff", "w3h"),
-            ("upgrade", "w3q"),
-        };
-
         /// <summary>The id of every object in the source map's object files, main and skin, of every kind.</summary>
         /// <param name="project">The map project; its map folder holds the object files.</param>
         /// <returns>The ids; empty when the map has no object file.</returns>
@@ -21,9 +10,9 @@ namespace Moonwell.Build
         public static IReadOnlySet<string> Defined(MapProject project)
         {
             var ids = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var (kind, extension) in Files)
+            foreach (var (kind, extension) in ObjectKinds.All)
             {
-                foreach (var name in new[] { "war3map." + extension, "war3mapSkin." + extension })
+                foreach (var name in new[] { ObjectKinds.MainName(extension), ObjectKinds.SkinName(extension) })
                 {
                     var table = ObjectTable.Read(Path.Combine(project.MapFolder, name), kind);
                     foreach (var entry in table.Originals.Concat(table.News))

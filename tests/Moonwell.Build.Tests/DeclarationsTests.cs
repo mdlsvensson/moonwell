@@ -264,6 +264,17 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void all_standard_ids_span_the_kinds()
+        {
+            var all = built.Standard.AllIds();
+
+            Assert.Contains("Hpal", all);
+            Assert.Contains("AHtb", all);
+            Assert.Contains("hfoo", all);
+            Assert.Empty(StandardData.Empty.AllIds());
+        }
+
+        [Fact]
         public void standard_objects_missing_from_a_balance_set()
         {
             var standard = built.Standard;

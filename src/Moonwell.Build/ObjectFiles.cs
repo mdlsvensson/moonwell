@@ -5,18 +5,6 @@ namespace Moonwell.Build
     /// <summary>Writes the declared objects into the staged map's object-data files, merged with the source map's own.</summary>
     public static class ObjectFiles
     {
-        // The file kind and extension of each object-data file; a hero is in the unit file.
-        private static readonly (string Kind, string Extension)[] Files =
-        {
-            ("unit", "w3u"),
-            ("item", "w3t"),
-            ("destructable", "w3b"),
-            ("doodad", "w3d"),
-            ("ability", "w3a"),
-            ("buff", "w3h"),
-            ("upgrade", "w3q"),
-        };
-
         /// <summary>
         /// Writes the main and the skin file of each kind into the staged folder: the source map's objects, except those a
         /// declared object has the id of, then the declared objects (a <c>[Replaces]</c> one in the table of changed standard
@@ -46,11 +34,11 @@ namespace Moonwell.Build
             var resolver = new Resolver(ids, standardClassIds, standard);
 
             Directory.CreateDirectory(stagedFolder);
-            foreach (var (kind, extension) in Files)
+            foreach (var (kind, extension) in ObjectKinds.All)
             {
                 var ofKind = written.Where(one => FileKindOf(one.Kind) == kind).ToList();
-                var mainName = "war3map." + extension;
-                var skinName = "war3mapSkin." + extension;
+                var mainName = ObjectKinds.MainName(extension);
+                var skinName = ObjectKinds.SkinName(extension);
                 var main = ObjectTable.Read(Path.Combine(project.MapFolder, mainName), kind);
                 var skin = ObjectTable.Read(Path.Combine(project.MapFolder, skinName), kind);
 
@@ -169,10 +157,7 @@ namespace Moonwell.Build
             {
                 this.ids = ids;
                 this.standardClassIds = standardClassIds;
-                foreach (var kind in new[] { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" })
-                {
-                    standardIds.UnionWith(standard.Ids(kind));
-                }
+                standardIds.UnionWith(standard.AllIds());
             }
 
             public string IdOf(string owner, string field, string name)

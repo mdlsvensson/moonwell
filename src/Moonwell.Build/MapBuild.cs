@@ -3,8 +3,6 @@ namespace Moonwell.Build
     /// <summary>Builds a map project into a map archive.</summary>
     public static class MapBuild
     {
-        private static readonly string[] StandardKinds = { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" };
-
         /// <summary>Runs every step of the build, in order.</summary>
         /// <param name="path">A project folder, or the path of its <c>.csproj</c> file.</param>
         /// <param name="options">What kind of build to make.</param>
@@ -59,13 +57,7 @@ namespace Moonwell.Build
             var declarations = Declarations.Read(targetPath, project, standard, set);
             BalanceCheck.Run(declarations, standard, set);
 
-            var standardIds = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var kind in StandardKinds)
-            {
-                standardIds.UnionWith(standard.Ids(kind));
-            }
-
-            var ids = ObjectIds.Assign(project, declarations.Objects, standardIds, MapObjectIds.Defined(project), MapObjectIds.Placed(map), log);
+            var ids = ObjectIds.Assign(project, declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project), MapObjectIds.Placed(map), log);
             EntryWriter.Write(project, settings, true);
             RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
             LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, set);

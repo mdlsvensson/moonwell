@@ -10,7 +10,7 @@ namespace Moonwell.Build
         // The name a missingFrom list gives the base tables.
         private const string BaseSet = "base";
 
-        private static readonly string[] KindFiles = { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" };
+        private static readonly string[] KindFiles = ObjectKinds.All.Select(kind => kind.Kind).ToArray();
 
         private readonly Dictionary<string, IReadOnlyList<ObjectField>> fields;
         private readonly Dictionary<string, IReadOnlySet<string>> ids;
@@ -77,6 +77,19 @@ namespace Moonwell.Build
         public IReadOnlySet<string> Ids(string kind)
         {
             return ids[FileOf(kind)];
+        }
+
+        /// <summary>The ids of the standard objects of every kind.</summary>
+        /// <returns>The ids.</returns>
+        public IReadOnlySet<string> AllIds()
+        {
+            var all = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var kind in KindFiles)
+            {
+                all.UnionWith(ids[kind]);
+            }
+
+            return all;
         }
 
         /// <summary>The value of a field of a standard object, as the game's text.</summary>

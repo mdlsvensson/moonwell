@@ -6,23 +6,10 @@ namespace Moonwell.Build
     public static class Stage
     {
         // The object files are written by ObjectFiles, or copied as they are when the map does not use Moonwell.Objects.
-        private static readonly string[] ObjectFileNames =
-        {
-            "war3map.w3u",
-            "war3map.w3t",
-            "war3map.w3b",
-            "war3map.w3d",
-            "war3map.w3a",
-            "war3map.w3h",
-            "war3map.w3q",
-            "war3mapSkin.w3u",
-            "war3mapSkin.w3t",
-            "war3mapSkin.w3b",
-            "war3mapSkin.w3d",
-            "war3mapSkin.w3a",
-            "war3mapSkin.w3h",
-            "war3mapSkin.w3q",
-        };
+        private static readonly string[] ObjectFileNames = ObjectKinds.All
+            .Select(kind => ObjectKinds.MainName(kind.Extension))
+            .Concat(ObjectKinds.All.Select(kind => ObjectKinds.SkinName(kind.Extension)))
+            .ToArray();
 
         // The script and info files are regenerated. The trigger files stay: World Editor needs them to open the map, so they are copied unparsed.
         private static readonly string[] IgnoredMapFiles = new[] { "war3map.lua", "war3map.j", "war3map.w3i" }.Concat(ObjectFileNames).ToArray();
