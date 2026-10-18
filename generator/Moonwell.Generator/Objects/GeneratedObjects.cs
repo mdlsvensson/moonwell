@@ -24,7 +24,9 @@ public static class GeneratedObjects
     public static IReadOnlyDictionary<string, string> Make(ExportTables tables, RuntimeMembers? runtime, string gameVersion)
     {
         var files = new SortedDictionary<string, string>(StringComparer.Ordinal);
-        var header = ObjectsWriter.Header(gameVersion) + "\n#nullable enable\n";
+        // CSharp.lua compiles with MOONWELL_LUA and reads the build's stubs of the used classes instead.
+        var header = ObjectsWriter.Header(gameVersion) + "\n#if !MOONWELL_LUA\n\n#nullable enable\n";
+        const string footer = "\n#endif\n";
         var fieldsOf = new Dictionary<Kind, IReadOnlyList<Field>>();
         var objectsOf = new Dictionary<Kind, IReadOnlyList<StandardObject>>();
         var everything = new List<StandardObject>();
@@ -36,10 +38,10 @@ public static class GeneratedObjects
             objectsOf[kind] = objects;
             everything.AddRange(objects);
             files[ValuesFile(kind)] = ObjectsWriter.Values(objects, fields);
-            files["Kinds/" + ObjectsWriter.KindBase(kind, false) + ".g.cs"] = header + "\n" + ObjectsWriter.Kind(kind, fields, false);
+            files["Kinds/" + ObjectsWriter.KindBase(kind, false) + ".g.cs"] = header + "\n" + ObjectsWriter.Kind(kind, fields, false) + footer;
             if (kind == Kind.Unit)
             {
-                files["Kinds/" + ObjectsWriter.KindBase(kind, true) + ".g.cs"] = header + "\n" + ObjectsWriter.Kind(kind, fields, true);
+                files["Kinds/" + ObjectsWriter.KindBase(kind, true) + ".g.cs"] = header + "\n" + ObjectsWriter.Kind(kind, fields, true) + footer;
             }
         }
 
@@ -58,7 +60,7 @@ public static class GeneratedObjects
 
         foreach (var (ns, classes) in byNamespace)
         {
-            files[PathOf(ns)] = header + "\n" + ObjectsWriter.Namespace(ns, classes, fieldsOf[Kind.Ability]);
+            files[PathOf(ns)] = header + "\n" + ObjectsWriter.Namespace(ns, classes, fieldsOf[Kind.Ability]) + footer;
         }
 
         return files;
